@@ -1,0 +1,6 @@
+[pack]
+name = "indian-markets-tax"
+version = "0.1.0"
+description = "Reusable Indian equity tax & market-structure rules for finance projects."
+author = "arpit arya"
+# Opt in from a project's .fux/config.toml:  packs = ["indian-markets-tax"]

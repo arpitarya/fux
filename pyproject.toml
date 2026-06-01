@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fux-engine"
+version = "0.1.0"
+description = "Fux — a portable, Claude-aware knowledge engine: rules, memory, narrative, and graph in one frontmatter substrate."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "arpit arya" }]
+keywords = ["knowledge", "rules", "graph", "claude", "frontmatter"]
+dependencies = []  # stdlib only — $0, deterministic, dependency-free (see docs/fux-plan.md §3)
+
+[project.scripts]
+fux = "fux.cli:main"
+
+[project.optional-dependencies]
+# Phase-2 opt-in local embedding re-rank (recall-engine.compare.md). Never required.
+embeddings = ["sentence-transformers>=2.2"]
+dev = ["pytest>=8"]
+
+[tool.setuptools]
+packages = ["fux"]
+
+[tool.setuptools.package-data]
+fux = ["templates/*.md", "assets/*"]
+
+[tool.ruff]
+line-length = 100

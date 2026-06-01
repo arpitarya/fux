@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fux — knowledge graph</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
+         background: #0e1116; color: #e6edf3; overflow: hidden; }
+  #side { position: fixed; top: 0; left: 0; width: 260px; height: 100%;
+          background: #161b22; border-right: 1px solid #30363d; padding: 14px;
+          overflow-y: auto; }
+  h1 { font-size: 15px; margin: 0 0 4px; }
+  .muted { color: #8b949e; font-size: 11px; }
+  input[type=search] { width: 100%; margin: 10px 0; padding: 6px 8px;
+          background: #0e1116; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; }
+  label { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; }
+  #detail { margin-top: 12px; font-size: 12px; }
+  #detail b { color: #58a6ff; }
+  canvas { position: fixed; left: 260px; top: 0; }
+  #tip { position: fixed; pointer-events: none; background: #161b22cc;
+         border: 1px solid #30363d; border-radius: 6px; padding: 4px 8px;
+         font-size: 11px; display: none; }
+</style>
+</head>
+<body>
+<div id="side">
+  <h1>Fux graph</h1>
+  <div class="muted" id="stats"></div>
+  <input type="search" id="q" placeholder="search nodes…" />
+  <div id="filters"></div>
+  <div id="detail" class="muted">Click a node to inspect its neighbors.</div>
+</div>
+<canvas id="cv"></canvas>
+<div id="tip"></div>
+<script>
+const DATA = __GRAPH_DATA__;
+const COLORS = { "code-file":"#7d8590","function":"#3fb950","class":"#a371f7",
+  "rule":"#58a6ff","formula":"#d29922","glossary":"#56d4dd","invariant":"#f85149",
+  "adr":"#db61a2","edge-case":"#e3b341","convention":"#79c0ff","regulatory":"#ff7b72",
+  "runbook":"#3fb950","narrative":"#bc8cff","memory":"#f0883e","spec":"#a5d6ff","task":"#ffa657" };
+const color = t => COLORS[t] || "#8b949e";
+__BOOT__
+</script>
+</body>
+</html>

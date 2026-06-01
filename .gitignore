@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Fux generated outputs are rebuilt by `fux build` ($0) — not tracked by default.
+# (Per-project .fux/out/ lives in the *consuming* repo; this ignore covers any
+#  generated artifacts produced while developing/testing the engine.)
+**/.fux/out/
+tests/fixtures/sample_project/.fux/out/
+
+# Personal-scope memory entries are gitignored in consuming repos (scope: personal)
+**/.fux/memory/personal/
+
+# Local embedding cache (phase-2 opt-in recall)
+.fux/embeddings.cache

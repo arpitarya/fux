@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Fux rule entry",
+  "description": "Validated frontmatter for a .fux/rules/*.md entry (plan §6).",
+  "type": "object",
+  "required": ["id", "type", "status"],
+  "additionalProperties": true,
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+    "domain": { "type": "string" },
+    "type": {
+      "type": "string",
+      "enum": ["rule", "formula", "glossary", "invariant", "adr", "edge-case",
+               "convention", "regulatory", "runbook", "narrative", "memory",
+               "spec", "task"]
+    },
+    "subtype": { "type": "string", "enum": ["user", "feedback", "project", "reference"] },
+    "scope": { "type": "string", "enum": ["personal", "shared"] },
+    "status": { "type": "string", "enum": ["draft", "active", "deprecated", "todo", "done"] },
+    "created": { "type": "string" },
+    "updated": { "type": "string" },
+    "author": { "type": "string" },
+    "aliases": { "type": "array", "items": { "type": "string" } },
+    "keywords": { "type": "array", "items": { "type": "string" } },
+    "code_refs": { "type": "array", "items": { "type": "string" } },
+    "related": { "type": "array", "items": { "type": "string" } },
+    "edges": {
+      "type": "object",
+      "additionalProperties": { "type": "array", "items": { "type": "string" } },
+      "properties": {
+        "depends-on": { "type": "array" },
+        "supersedes": { "type": "array" },
+        "contradicts": { "type": "array" },
+        "implements": { "type": "array" }
+      }
+    },
+    "check": { "type": "string" },
+    "examples": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["given", "expect"],
+        "properties": { "given": { "type": "string" }, "expect": { "type": "string" } }
+      }
+    }
+  }
+}
