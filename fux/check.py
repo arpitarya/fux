@@ -53,8 +53,12 @@ def _stale(r: Rule, root: Path) -> list[Finding]:
             continue
         commit = gitutil.last_commit_date(target, root)
         if commit and updated and commit > updated:
-            out.append(Finding("stale", r.id,
-                               f"{rel} changed {commit} > rule updated {updated}", fixable=True))
+            if r.type in ("task", "spec") and r.status not in ("done",):
+                out.append(Finding("plan-drift", r.id,
+                                   f"{r.type} not done but {rel} changed {commit} > updated {updated}"))
+            else:
+                out.append(Finding("stale", r.id,
+                                   f"{rel} changed {commit} > rule updated {updated}", fixable=True))
     return out
 
 
@@ -77,7 +81,7 @@ def _conflicts(layered: list[Rule]) -> list[Finding]:
 def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
     lines = ["# Fux DRIFT report", "",
              f"_{len(findings)} finding(s)._" if findings else "_No drift — all rules current._", ""]
-    for kind in ("schema", "dead-ref", "conflict", "stale", "invariant"):
+    for kind in ("schema", "dead-ref", "conflict", "stale", "plan-drift", "invariant"):
         group = [f for f in findings if f.kind == kind]
         if group:
             lines.append(f"## {kind} ({len(group)})")

@@ -39,5 +39,5 @@ def test_init_wires_hooks_idempotently(tmp_path):
     initcmd.run(root)  # second time must not duplicate
     data = json.loads((root / ".claude" / "settings.json").read_text())
     cmds = [h["command"] for e in data["hooks"]["SessionStart"] for h in e["hooks"]]
-    assert cmds.count("fux context") == 1
+    assert len(cmds) == 1 and "fux" in cmds[0]   # exactly one Fux hook, not duplicated
     assert "<!-- fux:start -->" in (root / "CLAUDE.md").read_text()

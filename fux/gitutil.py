@@ -23,3 +23,14 @@ def last_commit_date(path: Path, root: Path) -> str | None:
     rel = path.resolve()
     out = _run(["log", "-1", "--format=%cs", "--", str(rel)], root)
     return out or None
+
+
+def diff_since(path: Path, since: str, root: Path, limit: int = 2000) -> str | None:
+    """Patch for ``path`` from the state at ``since`` (YYYY-MM-DD) to HEAD."""
+    rel = str(path.resolve())
+    base = _run(["rev-list", "-1", f"--before={since} 23:59:59", "HEAD", "--", rel], root)
+    args = ["diff", f"{base}..HEAD", "--", rel] if base else ["log", "-p", "--", rel]
+    out = _run(args, root)
+    if not out:
+        return None
+    return out if len(out) <= limit else out[:limit] + "\n… (truncated)"

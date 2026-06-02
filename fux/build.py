@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fux import config, graph, graphhtml, index, loader, paths
+from fux import config, graph, graphhtml, index, loader, paths, report
 
 
 def run(root: Path) -> dict:
@@ -18,7 +18,8 @@ def run(root: Path) -> dict:
     g = graph.build(root, rs, cfg)
     fp.out_file("graph.json").write_text(graph.to_json(g), encoding="utf-8")
     fp.out_file("graph.html").write_text(graphhtml.render(g), encoding="utf-8")
+    fp.out_file("GRAPH_REPORT.md").write_text(report.render(g), encoding="utf-8")
 
     return {"rules": len(rs.rules), "active": len(rs.active()),
             "code_files": g["meta"]["code_files"], "edges": len(g["edges"]),
-            "out": str(fp.out)}
+            "communities": g["meta"]["communities"], "out": str(fp.out)}

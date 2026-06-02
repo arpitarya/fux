@@ -36,6 +36,9 @@ def _doc_tokens(r: Rule) -> list[str]:
 def run(root: Path, query: str, top: int = 6) -> list[tuple[Rule, float]]:
     cfg = config.load(paths.Footprint(root).config)
     rules = loader.resolve(root, cfg).active()
+    if cfg.get("recall_rerank"):
+        from fux import embed  # lazy: keeps the default path dependency-free
+        return embed.rerank(query, rank(rules, query, top * 3), cfg)[:top]
     return rank(rules, query, top)
 
 

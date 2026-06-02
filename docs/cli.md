@@ -17,6 +17,16 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux coverage` | % of "important" code files (config globs) with at least one governing rule; lists the uncovered. | $0 |
 | `fux verify` | Run invariant `check:` assertions against verification data (`verify_cmd:` / `.fux/verify/<id>.json`). Skips when no data. | $0 |
 | `fux tour` | Emit an ordered `ONBOARDING.md` reading path from the rules. | $0 |
+| `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
+| `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |
+| `fux explain <term>` | A graph node + its community + neighbours. | $0 |
+| `fux report` | Write `GRAPH_REPORT.md` — god nodes (degree) + community structure. | $0 |
+
+`fux build` also writes `GRAPH_REPORT.md` and tags every graph node with a
+**community** index (deterministic label propagation); `graph.html` has a
+*colour: type ⇄ community* toggle. The graph carries `governs` (rule→code),
+`contains` (file→symbol), `calls` (Python intra-file), and `references`
+(cross-file/cross-language) edges.
 
 ### Internal hook entrypoints
 

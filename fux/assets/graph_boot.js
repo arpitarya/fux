@@ -5,7 +5,13 @@ const nodes = DATA.nodes.map(n => ({ ...n, x: Math.random()*800-400, y: Math.ran
 const byId = Object.fromEntries(nodes.map(n => [n.id, n]));
 const edges = DATA.edges.filter(e => byId[e.source] && byId[e.target]);
 const deg = {}; edges.forEach(e => { deg[e.source]=(deg[e.source]||0)+1; deg[e.target]=(deg[e.target]||0)+1; });
-let view = { x: 0, y: 0, k: 1 }, hidden = new Set(), selected = null, query = "";
+let view = { x: 0, y: 0, k: 1 }, hidden = new Set(), selected = null, query = "", colorMode = "type";
+const ccolor = c => "hsl(" + (((c || 0) * 67) % 360) + ",62%,55%)";
+const nodeColor = n => colorMode === "community" ? ccolor(n.community) : color(n.type);
+document.getElementById("cmode").onclick = e => {
+  colorMode = colorMode === "type" ? "community" : "type";
+  e.target.textContent = "colour: " + colorMode;
+};
 
 document.getElementById("stats").textContent =
   `${nodes.length} nodes · ${edges.length} edges · ${DATA.meta.code_files} code files · ${DATA.meta.rules} rules`;
@@ -49,7 +55,7 @@ function draw(){
     const r=Math.min(4+(deg[n.id]||0)*0.8,14)*view.k;
     const dim = (selected && near && !near.has(n.id) && n.id!==selected) ||
                 (query && !n.label.toLowerCase().includes(query) && !n.id.toLowerCase().includes(query));
-    ctx.globalAlpha = dim ? 0.2 : 1; ctx.fillStyle = color(n.type);
+    ctx.globalAlpha = dim ? 0.2 : 1; ctx.fillStyle = nodeColor(n);
     ctx.beginPath(); ctx.arc(p.x,p.y,r,0,7); ctx.fill();
     if(n.id===selected){ ctx.strokeStyle="#fff"; ctx.lineWidth=2; ctx.stroke(); }
     if(view.k>1.1 || n.id===selected){ ctx.globalAlpha=dim?0.2:0.9; ctx.fillStyle="#c9d1d9";

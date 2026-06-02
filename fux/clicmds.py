@@ -20,7 +20,7 @@ def cmd_init(args) -> int:
 def cmd_build(_args) -> int:
     s = build.run(root())
     print(f"✔ Built: {s['active']} active rules · {s['code_files']} code files · "
-          f"{s['edges']} edges → {s['out']}")
+          f"{s['edges']} edges · {s['communities']} communities → {s['out']}")
     return 0
 
 

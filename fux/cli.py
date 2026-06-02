@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 
-from fux import __version__, clicmds, cliquery, hooks
+from fux import __version__, clicmds, cligraph, cliquery, hooks
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -44,6 +44,22 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("coverage", help="%% of important files with a governing rule").set_defaults(fn=cliquery.cmd_coverage)
     sub.add_parser("verify", help="run invariant/example checks").set_defaults(fn=cliquery.cmd_verify)
     sub.add_parser("tour", help="emit an ordered ONBOARDING.md").set_defaults(fn=cliquery.cmd_tour)
+
+    q = sub.add_parser("query", help="traverse the graph from rules matching a question")
+    q.add_argument("query")
+    q.add_argument("--depth", type=int, default=1)
+    q.set_defaults(fn=cligraph.cmd_query)
+
+    pa = sub.add_parser("path", help="shortest path between two graph nodes")
+    pa.add_argument("a")
+    pa.add_argument("b")
+    pa.set_defaults(fn=cligraph.cmd_path)
+
+    ex = sub.add_parser("explain", help="explain a graph node + its neighbors")
+    ex.add_argument("term")
+    ex.set_defaults(fn=cligraph.cmd_explain)
+
+    sub.add_parser("report", help="write GRAPH_REPORT.md (god nodes + communities)").set_defaults(fn=cligraph.cmd_report)
 
     # Internal hook entrypoints (wired by `fux init`, not for direct use).
     sub.add_parser("hook-touch").set_defaults(fn=lambda a: hooks.post_tool_use())

@@ -23,6 +23,8 @@ def _isolated_layers(tmp_path, monkeypatch):
     monkeypatch.setenv("FUX_GLOBAL", str(empty_global))
     monkeypatch.setenv("FUX_PACKS", str(empty_packs))
     monkeypatch.setenv("FUX_SCHEMA", str(REPO / "schema.json"))
+    # Isolate from any real ~/.claude install so hook wiring is deterministic.
+    monkeypatch.setenv("CLAUDE_CONFIG_DIR", str(tmp_path / "claude_home"))
 
 
 @pytest.fixture

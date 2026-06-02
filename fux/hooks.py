@@ -9,7 +9,7 @@ from __future__ import annotations
 import sys
 
 from fux import check as checkmod
-from fux import context, explain, fix, frontmatter, recall, touch
+from fux import context, drift, explain, fix, frontmatter, loader, recall, touch
 from fux.findings import blocking
 from fux.hookio import edited_rel, event, mode_of, root_of
 
@@ -54,6 +54,7 @@ def stop() -> int:
     if not findings:
         return 0
     if mode == "fix":
+        _emit_drift_prompts(root, findings)   # semantic drift → scoped prompt first
         for note in fix.apply(root, findings):
             print(f"✔ Fux auto-fixed: {note}")
         findings = checkmod.run(root)  # re-check after mechanical fixes
@@ -63,6 +64,18 @@ def stop() -> int:
         sys.stderr.write("Fux strict: unresolved blocking findings — see above.\n")
         return 2
     return 0
+
+
+def _emit_drift_prompts(root, findings) -> None:
+    """For stale/plan-drift findings, print the scoped edit prompt with the diff."""
+    ids = {f.rule_id for f in findings if f.kind in ("stale", "plan-drift")}
+    if not ids:
+        return
+    by_id = loader.resolve(root).by_id()
+    for rid in sorted(ids):
+        rule = by_id.get(rid)
+        if rule:
+            print(drift.scoped_prompt(rule, root))
 
 
 def user_prompt_recall() -> int:

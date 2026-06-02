@@ -3,6 +3,31 @@
 What shipped against [fux-plan.md](fux-plan.md), and where the implementation made
 a concrete call on a plan-level "still open" question (§14).
 
+## Update — gaps closed after the first cut
+
+The following partial items from the first cut are now implemented:
+
+- **Graph traversals** — `fux query` / `path` / `explain` / `report`, plus
+  deterministic **community detection** (label propagation), a `GRAPH_REPORT.md`
+  (god nodes + communities), cross-file/cross-language **`references`** edges, and
+  a colour-by-community toggle in `graph.html`.
+- **Recall phase-2** — `recall_rerank = true` enables a local re-rank:
+  sentence-transformers if the `[embeddings]` extra is installed, otherwise a
+  **$0 char-trigram cosine** fallback (still local, no API). Default path
+  unchanged.
+- **`verify` examples** — examples whose `given` is JSON are executed against the
+  rule's `check:`; NL examples are skipped (never a false fail).
+- **Plan-drift** — `fux check` emits a distinct `plan-drift` finding for a
+  `task`/`spec` that is not `done` while its `code_refs` changed.
+- **Semantic-drift scoped prompt** — in `fix` mode the Stop hook now emits the
+  tightly-scoped edit prompt **with the actual `git diff`** of the changed
+  `code_refs` before applying mechanical fixes (plan §8).
+
+Still future work: full multi-language *call-graph* parity with graphify (we have
+declaration nodes + heuristic cross-file references, Python call edges), and the
+rollout phases 6–7 decommission step (retiring `graphify-out/` once parity is
+verified).
+
 ## Decisions taken (the plan's "still open" items)
 
 | Open question (plan §14) | Call made in v0.1.0 | Rationale |

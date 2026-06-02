@@ -20,15 +20,25 @@ DECL = [
 ]
 
 
+_CALL = re.compile(r"\b([A-Za-z_][\w]*)\s*\(")
+
+
 def extract(path: Path, rel: str) -> tuple[list[dict], list[dict]]:
     """Return (nodes, edges) for one source file. ``rel`` is repo-relative."""
     try:
         text = path.read_text(encoding="utf-8")
     except (OSError, UnicodeDecodeError):
         return [], []
-    if path.suffix == ".py":
-        return _python(text, rel)
-    return _generic(text, rel)
+    return extract_text(text, path.suffix, rel)
+
+
+def extract_text(text: str, suffix: str, rel: str) -> tuple[list[dict], list[dict]]:
+    return _python(text, rel) if suffix == ".py" else _generic(text, rel)
+
+
+def call_names(text: str) -> set[str]:
+    """Identifiers used as calls — language-agnostic, for cross-file xref edges."""
+    return set(_CALL.findall(text))
 
 
 def _python(text: str, rel: str) -> tuple[list[dict], list[dict]]:

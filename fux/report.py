@@ -1,0 +1,51 @@
+"""GRAPH_REPORT.md — god nodes + community structure, like graphify's report (plan §7)."""
+from __future__ import annotations
+
+from collections import Counter
+
+from fux import graphquery
+
+
+def render(graph: dict) -> str:
+    nodes = graph["nodes"]
+    by_id = {n["id"]: n for n in nodes}
+    meta = graph["meta"]
+    lines = ["# Fux GRAPH_REPORT", "",
+             f"_{len(nodes)} nodes · {len(graph['edges'])} edges · "
+             f"{meta.get('code_files', 0)} code files · {meta.get('rules', 0)} rules · "
+             f"{meta.get('communities', 0)} communities._", ""]
+    lines += _types(nodes)
+    lines += _god(graph, by_id)
+    lines += _communities(nodes)
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def _types(nodes: list[dict]) -> list[str]:
+    counts = Counter(n["type"] for n in nodes)
+    out = ["## Node types", ""]
+    out += [f"- {t}: {c}" for t, c in sorted(counts.items(), key=lambda kv: -kv[1])]
+    return out + [""]
+
+
+def _god(graph: dict, by_id: dict) -> list[str]:
+    out = ["## God nodes (highest connectivity)", ""]
+    for nid, deg in graphquery.god_nodes(graph, 12):
+        if deg == 0:
+            continue
+        n = by_id[nid]
+        out.append(f"- **{n.get('label', nid)}** ({n['type']}) — {deg} edges")
+    return out + [""]
+
+
+def _communities(nodes: list[dict]) -> list[str]:
+    groups: dict[int, list[dict]] = {}
+    for n in nodes:
+        groups.setdefault(n.get("community", -1), []).append(n)
+    out = ["## Communities", ""]
+    for cid in sorted(g for g in groups if g >= 0):
+        members = groups[cid]
+        if len(members) < 2:
+            continue
+        labels = ", ".join(sorted(m.get("label", m["id"]) for m in members)[:12])
+        out.append(f"- **community {cid}** ({len(members)} nodes): {labels}")
+    return out + [""]
