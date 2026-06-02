@@ -23,10 +23,34 @@ The following partial items from the first cut are now implemented:
   tightly-scoped edit prompt **with the actual `git diff`** of the changed
   `code_refs` before applying mechanical fixes (plan §8).
 
+Also fixed: glob matching now honours recursive `**` (`fux/globs.py`) — `fnmatch`
+treated `a/**/*.py` as non-recursive and missed files directly under `a/`, which
+made `coverage` under-count. `install.sh` now installs **editable** (`pip -e`) so
+repo edits live-reflect in the `fux` binary. `verify`'s safe namespace gained the
+pure iteration builtins (`zip`, `range`, `enumerate`, …).
+
+## Rollout status (plan §13)
+
+- **Phases 1–3** (engine, hooks, global seed) — done; installed to `~/.claude/fux`,
+  `/fux`+`fux-plan`/`-adr`/`-trace` skills registered.
+- **Phase 4 — Anton pilot** — done: 4 rules grounded in `aggregator.py`
+  (`inr-normalization`, `portfolio-valuation`, `day-pnl`, `holdings-sum-equals-total`),
+  scoped to the brokers domain. `fux build/check/coverage/why/refs/recall/query` all
+  exercised on real code.
+- **Phase 5 — verification** — done: the `holdings-sum-equals-total` invariant is
+  wired to `probes/fux_totals_probe.py` and verifies green; `just fux-check` recipe
+  added to Anton.
+- **Phase 6 — Wagner** — done: `fux init` in Wagner, one real rule
+  (`api-key-hashing`), global best-practices inherited — portability confirmed.
+- **Phase 7 — absorb & migrate** — *additive only*: Anton's cross-session memory
+  imported as `type: memory` (`scope: shared`) and an `anton-overview` `type:
+  narrative` entry authored. **Decommission deferred**: `graphify-out/`, the
+  home-dir `memory/`, and `docs/` are left in place until parity is verified and
+  explicitly retired.
+
 Still future work: full multi-language *call-graph* parity with graphify (we have
 declaration nodes + heuristic cross-file references, Python call edges), and the
-rollout phases 6–7 decommission step (retiring `graphify-out/` once parity is
-verified).
+phase-7 decommission once parity is signed off.
 
 ## Decisions taken (the plan's "still open" items)
 

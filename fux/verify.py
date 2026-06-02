@@ -7,17 +7,20 @@ Examples whose ``given`` is JSON are run too. No LLM is ever called.
 """
 from __future__ import annotations
 
+import builtins
 import json
 import math
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
-from fux import config, loader, paths
+from fux import config, loader, paths, vexamples
 from fux.model import Rule
 
-_SAFE = {"abs": abs, "sum": sum, "min": min, "max": max, "len": len,
-         "round": round, "all": all, "any": any, "math": math}
+# Restricted, pure builtins for evaluating `check:` expressions (no __builtins__).
+_SAFE = {n: getattr(builtins, n) for n in
+         "abs sum min max len round all any zip range enumerate sorted map filter "
+         "list dict set tuple".split()} | {"math": math}
 
 
 @dataclass
@@ -34,38 +37,8 @@ def run(root: Path) -> list[VResult]:
     for r in rs.rules:
         if r.fm.get("check"):
             out.append(_verify_one(r, root))
-        out += _examples(r)
+        out += [VResult(*t) for t in vexamples.run_examples(r, _SAFE)]
     return out
-
-
-def _examples(r: Rule) -> list[VResult]:
-    """Run examples whose `given` is structured JSON; NL examples are skipped."""
-    check = r.fm.get("check")
-    results: list[VResult] = []
-    for i, ex in enumerate(r.fm.get("examples") or [], 1):
-        given = _as_json(ex.get("given"))
-        if given is None or not isinstance(given, dict) or not check:
-            continue
-        rid = f"{r.id}[ex{i}]"
-        try:
-            got = eval(str(check), {"__builtins__": {}}, {**_SAFE, **given})
-        except Exception as exc:  # noqa: BLE001
-            results.append(VResult(rid, "fail", f"raised: {exc}"))
-            continue
-        want = _as_json(ex.get("expect"))
-        ok = (got == want) if want is not None else bool(got)
-        results.append(VResult(rid, "pass" if ok else "fail",
-                               "" if ok else f"got {got!r}, want {want!r}"))
-    return results
-
-
-def _as_json(val):
-    if not isinstance(val, str):
-        return val
-    try:
-        return json.loads(val)
-    except (json.JSONDecodeError, ValueError):
-        return None
 
 
 def _verify_one(r: Rule, root: Path) -> VResult:

@@ -15,10 +15,10 @@ case "$($PY -c 'import sys;print(sys.version_info>=(3,11))')" in
   True) ;; *) echo "Fux needs Python ≥3.11 (tomllib). Found $($PY --version)"; exit 1;;
 esac
 
-echo "→ engine"
+echo "→ engine (editable: repo edits live-reflect in the installed binary)"
 mkdir -p "$HOME_FUX"
-"$PY" -m pip install -q --user "$REPO" || "$PY" -m pip install -q --user --break-system-packages "$REPO"
-ln -sfn "$REPO" "$HOME_FUX/engine"            # source kept linked for `pip install -e`-style edits
+"$PY" -m pip install -q --user -e "$REPO" || "$PY" -m pip install -q --user --break-system-packages -e "$REPO"
+ln -sfn "$REPO" "$HOME_FUX/engine"
 cp "$REPO/schema.json" "$HOME_FUX/schema.json"
 
 echo "→ hooks"

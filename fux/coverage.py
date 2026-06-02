@@ -1,11 +1,10 @@
 """`fux coverage` — % of important code files with a governing rule (plan §10.3)."""
 from __future__ import annotations
 
-import fnmatch
 from dataclasses import dataclass
 from pathlib import Path
 
-from fux import config, loader, paths
+from fux import config, globs, loader, paths
 
 
 @dataclass
@@ -37,8 +36,8 @@ def _important_files(root: Path, cfg: dict) -> list[str]:
         rel = path.relative_to(root).as_posix()
         if rel.startswith(".fux/"):
             continue
-        if any(fnmatch.fnmatch(rel, g) for g in cfg["ignore_globs"]):
+        if globs.match_any(rel, cfg["ignore_globs"]):
             continue
-        if any(fnmatch.fnmatch(rel, g) for g in cfg["important_globs"]):
+        if globs.match_any(rel, cfg["important_globs"]):
             out.append(rel)
     return out

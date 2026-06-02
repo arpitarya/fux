@@ -1,12 +1,11 @@
 """Merge code nodes (AST) with knowledge nodes (rules) into one graph. plan §7/§11."""
 from __future__ import annotations
 
-import fnmatch
 import json
 import re
 from pathlib import Path
 
-from fux import astextract, community
+from fux import astextract, community, globs
 from fux.model import RuleSet
 
 REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
@@ -19,9 +18,9 @@ def _iter_sources(root: Path, important: list[str], ignore: list[str]):
         if not path.is_file():
             continue
         rel = path.relative_to(root).as_posix()
-        if any(fnmatch.fnmatch(rel, g) for g in ignore):
+        if globs.match_any(rel, ignore):
             continue
-        if any(fnmatch.fnmatch(rel, g) for g in important):
+        if globs.match_any(rel, important):
             yield path, rel
 
 
