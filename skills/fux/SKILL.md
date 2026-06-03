@@ -25,10 +25,17 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux new <type> <id>       # scaffold a rule from a template                   ($0)
 /fux coverage              # % of important code files with a governing rule   ($0)
 /fux verify                # run invariant/example checks                      ($0)
+/fux lint                  # rule *quality*: missing why / code_refs / edges   ($0)
+/fux stats                 # knowledge-health dashboard + score                ($0)
+/fux savings ["<question>"]# measure the token-cost win from real file sizes   ($0)
+/fux gate [--install]      # CI/pre-commit enforcement (exit 2 on blocking)    ($0)
+/fux mcp                   # serve the substrate to agents over MCP (stdio)    ($0)
 /fux tour                  # emit an ordered ONBOARDING.md                     ($0)
 /fux plan "<request>"      # spec → design → tasks, each a durable Fux entry   (skill)
 /fux adr "<decision>"      # capture an architecture decision as an `adr`      (skill)
 /fux trace "<feature>"     # walk the graph to explain how a feature spans modules
+/fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
+/fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
 ```
 
 ## What Fux is for
@@ -93,10 +100,16 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux new <type> <id>` | `$FUX new <type> <id>` then open the stub and fill the body |
 | `/fux coverage` | `$FUX coverage` |
 | `/fux verify` | `$FUX verify` |
+| `/fux lint` | `$FUX lint` — fix `no-why` / `no-code-refs` before finishing |
+| `/fux stats` | `$FUX stats` — summarise the health score + weakest signal |
+| `/fux savings ["Q"]` | `$FUX savings ["Q"]` — or follow `skills/savings/SKILL.md` |
+| `/fux gate [--install]` | `$FUX gate` (CI) or `$FUX gate --install` (git pre-commit) |
+| `/fux mcp` | `$FUX mcp` — run the MCP stdio server (registered via `claude mcp add`) |
 | `/fux tour` | `$FUX tour` then read `.fux/out/ONBOARDING.md` |
 | `/fux plan "<request>"` | follow `skills/plan/SKILL.md` |
 | `/fux adr "<decision>"` | follow `skills/adr/SKILL.md` |
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
+| `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
 
 ### Step 4 — When you author or edit a rule
 

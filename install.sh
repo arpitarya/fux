@@ -41,7 +41,7 @@ fi
 echo "→ /fux skill"
 mkdir -p "$SKILLS/fux"
 cp -R "$REPO"/skills/fux/* "$SKILLS/fux/"
-for s in plan adr trace; do mkdir -p "$SKILLS/fux-$s"; cp -R "$REPO/skills/$s/"* "$SKILLS/fux-$s/" 2>/dev/null || true; done
+for s in plan adr trace savings distill; do mkdir -p "$SKILLS/fux-$s"; cp -R "$REPO/skills/$s/"* "$SKILLS/fux-$s/" 2>/dev/null || true; done
 
 echo
 echo "✔ Fux installed. Verify:  fux --version   (or: $PY -m fux --version)"

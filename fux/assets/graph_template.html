@@ -5,46 +5,107 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Fux — knowledge graph</title>
 <style>
-  :root { color-scheme: dark; }
+  :root { color-scheme: dark; --bg:#0e1116; --panel:#161b22; --line:#30363d;
+          --fg:#e6edf3; --muted:#8b949e; --accent:#58a6ff; }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 13px/1.4 ui-sans-serif, system-ui, sans-serif;
-         background: #0e1116; color: #e6edf3; overflow: hidden; }
-  #side { position: fixed; top: 0; left: 0; width: 260px; height: 100%;
-          background: #161b22; border-right: 1px solid #30363d; padding: 14px;
-          overflow-y: auto; }
-  h1 { font-size: 15px; margin: 0 0 4px; }
-  .muted { color: #8b949e; font-size: 11px; }
-  input[type=search] { width: 100%; margin: 10px 0; padding: 6px 8px;
-          background: #0e1116; color: #e6edf3; border: 1px solid #30363d; border-radius: 6px; }
-  label { display: flex; align-items: center; gap: 6px; padding: 2px 0; cursor: pointer; }
-  .sw { width: 11px; height: 11px; border-radius: 3px; }
-  #detail { margin-top: 12px; font-size: 12px; }
-  #detail b { color: #58a6ff; }
-  canvas { position: fixed; left: 260px; top: 0; }
-  #tip { position: fixed; pointer-events: none; background: #161b22cc;
-         border: 1px solid #30363d; border-radius: 6px; padding: 4px 8px;
-         font-size: 11px; display: none; }
+  body { margin: 0; font: 13px/1.45 ui-sans-serif, system-ui, sans-serif;
+         background: var(--bg); color: var(--fg); overflow: hidden; }
+  #side { position: fixed; top: 0; left: 0; width: 290px; height: 100%;
+          background: var(--panel); border-right: 1px solid var(--line); padding: 14px 14px 40px;
+          overflow-y: auto; scrollbar-width: thin; }
+  h1 { font-size: 15px; margin: 0 0 2px; display:flex; align-items:center; gap:6px; }
+  h1 .dot { width:9px;height:9px;border-radius:50%;background:var(--accent); }
+  h2 { font-size: 11px; text-transform: uppercase; letter-spacing:.06em;
+       color: var(--muted); margin: 16px 0 6px; border-bottom:1px solid var(--line); padding-bottom:3px; }
+  .muted { color: var(--muted); font-size: 11px; }
+  input[type=search], select { width: 100%; padding: 6px 8px; background: var(--bg);
+          color: var(--fg); border: 1px solid var(--line); border-radius: 6px; font: inherit; }
+  input[type=search] { margin: 10px 0 4px; }
+  .row { display:flex; gap:6px; flex-wrap:wrap; margin:6px 0; }
+  button { flex:1; min-width:0; padding:5px 6px; background: var(--bg); color: var(--fg);
+           border:1px solid var(--line); border-radius:6px; cursor:pointer; font: inherit; white-space:nowrap; }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button.on { background:#1f6feb33; border-color:var(--accent); color:var(--accent); }
+  label { display: flex; align-items: center; gap: 6px; padding: 1px 0; cursor: pointer; font-size:12px; }
+  label .ct { margin-left:auto; color:var(--muted); font-size:10px; }
+  .sw { width: 11px; height: 11px; border-radius: 3px; flex:none; }
+  .ln { width: 14px; height: 0; border-top:2px solid; flex:none; }
+  .slider { display:flex; align-items:center; gap:8px; margin:4px 0; font-size:11px; color:var(--muted); }
+  .slider input { flex:1; }
+  #detail b { color: var(--accent); }
+  #detail .nb { cursor:pointer; } #detail .nb:hover { color: var(--accent); }
+  #detail .pill { display:inline-block; padding:1px 6px; border:1px solid var(--line);
+                  border-radius:10px; margin:0 4px 4px 0; font-size:10px; color:var(--muted); }
+  canvas { position: fixed; left: 290px; top: 0; cursor: grab; }
+  canvas:active { cursor: grabbing; }
+  #tip { position: fixed; pointer-events: none; background: #161b22ee; max-width:320px;
+         border: 1px solid var(--line); border-radius: 6px; padding: 5px 9px;
+         font-size: 11px; display: none; z-index:5; }
+  #toast { position: fixed; bottom: 16px; left: 306px; background:#1f6feb; color:#fff;
+           padding:7px 12px; border-radius:6px; font-size:12px; display:none; z-index:6; }
+  #help { position: fixed; right: 14px; top: 12px; background:#161b22ee; border:1px solid var(--line);
+          border-radius:8px; padding:10px 14px; font-size:11px; color:var(--muted); z-index:5; }
+  #help b { color: var(--fg); }
+  kbd { background:var(--bg); border:1px solid var(--line); border-radius:4px; padding:0 4px; color:var(--fg); }
 </style>
 </head>
 <body>
 <div id="side">
-  <h1>Fux graph</h1>
+  <h1><span class="dot"></span>Fux graph</h1>
   <div class="muted" id="stats"></div>
-  <input type="search" id="q" placeholder="search nodes…" />
-  <button id="cmode" style="width:100%;margin-bottom:8px;padding:5px;background:#0e1116;
-    color:#e6edf3;border:1px solid #30363d;border-radius:6px;cursor:pointer">colour: type</button>
+  <input type="search" id="q" placeholder="search nodes…  ( / )" />
+  <div class="muted" id="qhits"></div>
+
+  <h2>Colour by</h2>
+  <select id="cmode">
+    <option value="type">node type</option>
+    <option value="community">community</option>
+    <option value="layer">rule layer</option>
+    <option value="degree">degree (heat)</option>
+  </select>
+
+  <div class="row">
+    <button id="bfit" title="Fit all (f)">Fit</button>
+    <button id="breset" title="Reset view (r)">Reset</button>
+    <button id="bpause" title="Pause layout (space)">Pause</button>
+    <button id="blabels" class="on" title="Toggle labels (l)">Labels</button>
+  </div>
+  <div class="row">
+    <button id="bfocus" title="Isolate selection + neighbours (e)">Focus sel.</button>
+    <button id="bclear" title="Clear focus (Esc)">Unfocus</button>
+  </div>
+  <div class="slider"><span>link</span><input type="range" id="slink" min="30" max="200" value="70"></div>
+  <div class="slider"><span>charge</span><input type="range" id="scharge" min="200" max="2000" value="900"></div>
+
+  <h2>Node types <span class="muted" id="ntoggle" style="cursor:pointer;float:right">all/none</span></h2>
   <div id="filters"></div>
-  <div id="detail" class="muted">Click a node to inspect its neighbors.</div>
+  <h2>Edge types <span class="muted" id="etoggle" style="cursor:pointer;float:right">all/none</span></h2>
+  <div id="efilters"></div>
+
+  <h2>Inspect</h2>
+  <div id="detail" class="muted">Click a node. Double-click to focus its neighbourhood.</div>
+  <div class="row" id="agentrow" style="display:none">
+    <button id="bcopy" title="Copy this node + neighbours as markdown for an agent">Copy node ⧉</button>
+  </div>
+  <div class="row"><button id="bexport" title="Copy the visible sub-graph as markdown">Copy visible graph ⧉</button></div>
 </div>
 <canvas id="cv"></canvas>
 <div id="tip"></div>
+<div id="toast"></div>
+<div id="help"><b>keys</b> &nbsp; <kbd>/</kbd> search · <kbd>f</kbd> fit · <kbd>r</kbd> reset ·
+  <kbd>space</kbd> pause · <kbd>e</kbd> focus · <kbd>Esc</kbd> clear · <kbd>l</kbd> labels</div>
 <script>
 const DATA = __GRAPH_DATA__;
 const COLORS = { "code-file":"#7d8590","function":"#3fb950","class":"#a371f7",
   "rule":"#58a6ff","formula":"#d29922","glossary":"#56d4dd","invariant":"#f85149",
   "adr":"#db61a2","edge-case":"#e3b341","convention":"#79c0ff","regulatory":"#ff7b72",
   "runbook":"#3fb950","narrative":"#bc8cff","memory":"#f0883e","spec":"#a5d6ff","task":"#ffa657" };
+const EDGE_COLORS = { "contains":"#30363d","calls":"#3fb950","references":"#6e7681",
+  "governs":"#58a6ff","related":"#8957e5","depends-on":"#d29922","supersedes":"#db61a2",
+  "contradicts":"#f85149","implements":"#56d4dd" };
+const LAYER_COLORS = { "project":"#58a6ff","global":"#3fb950" };
 const color = t => COLORS[t] || "#8b949e";
+const edgeColor = t => EDGE_COLORS[t] || "#6e7681";
 __BOOT__
 </script>
 </body>

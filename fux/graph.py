@@ -9,8 +9,6 @@ from fux import astextract, community, globs
 from fux.model import RuleSet
 
 REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
-_KEYWORDS = {"if", "for", "while", "switch", "catch", "return", "function",
-             "print", "len", "range", "super", "self"}
 
 
 def _iter_sources(root: Path, important: list[str], ignore: list[str]):
@@ -29,18 +27,22 @@ def build(root: Path, rs: RuleSet, cfg: dict) -> dict:
     nodes: dict[str, dict] = {}
     edges: list[dict] = []
     texts: dict[str, str] = {}
+    suffixes: dict[str, str] = {}
     for path, rel in _iter_sources(root, cfg["important_globs"], cfg["ignore_globs"]):
         try:
             texts[rel] = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):
             continue
+        suffixes[rel] = path.suffix
         nodes[rel] = {"id": rel, "label": rel.split("/")[-1], "type": "code-file", "file": rel}
         syms, sym_edges = astextract.extract_text(texts[rel], path.suffix, rel)
         for s in syms:
             nodes[s["id"]] = s
             edges.append({"source": rel, "target": s["id"], "type": "contains"})
         edges += sym_edges
-    edges += _xref(nodes, texts)
+    xcalls, covered = _crossfile_calls(nodes, texts, suffixes)
+    edges += xcalls
+    edges += _xref(nodes, texts, covered)
     _add_knowledge(nodes, edges, rs)
     comm = community.detect(list(nodes.values()), edges)
     for nid, c in comm.items():
@@ -50,19 +52,51 @@ def build(root: Path, rs: RuleSet, cfg: dict) -> dict:
                      "rules": len(rs.rules), "communities": len(set(comm.values()))}}
 
 
-def _xref(nodes: dict, texts: dict[str, str]) -> list[dict]:
-    """Cross-file reference edges: file → a symbol defined in another file."""
+def _symbol_index(nodes: dict) -> dict[str, list[str]]:
     index: dict[str, list[str]] = {}
     for n in nodes.values():
         if n.get("type") in ("function", "class"):
             index.setdefault(n["label"], []).append(n["id"])
+    return index
+
+
+def _crossfile_calls(nodes: dict, texts: dict[str, str], suffixes: dict[str, str]
+                     ) -> tuple[list[dict], set[tuple[str, str]]]:
+    """Precise cross-*file* `calls` edges: symbol → symbol in another file.
+
+    Returns the edges and the set of (caller_file, target_symbol) pairs they cover,
+    so `_xref` can suppress the looser file→symbol `references` duplicates.
+    """
+    index = _symbol_index(nodes)
+    out: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    covered: set[tuple[str, str]] = set()
+    for rel, text in texts.items():
+        for src, name in astextract.external_call_sites(text, suffixes.get(rel, ""), rel):
+            if src not in nodes:
+                continue
+            for tid in index.get(name, []):
+                if tid.split("::", 1)[0] == rel:
+                    continue                         # intra-file handled by extract
+                covered.add((rel, tid))
+                if (src, tid) not in seen:
+                    seen.add((src, tid))
+                    out.append({"source": src, "target": tid, "type": "calls"})
+    return out, covered
+
+
+def _xref(nodes: dict, texts: dict[str, str], covered: set[tuple[str, str]]) -> list[dict]:
+    """Looser cross-file `references` (file → symbol), minus pairs a precise
+    cross-file `calls` edge already covers."""
+    index = _symbol_index(nodes)
     seen, out = set(), []
     for rel, text in texts.items():
-        for name in astextract.call_names(text) - _KEYWORDS:
+        for name in astextract.call_names(text) - astextract.CALL_KEYWORDS:
             for tid in index.get(name, []):
-                if not tid.startswith(rel + "::") and (rel, tid) not in seen:
-                    seen.add((rel, tid))
-                    out.append({"source": rel, "target": tid, "type": "references"})
+                if tid.startswith(rel + "::") or (rel, tid) in covered or (rel, tid) in seen:
+                    continue
+                seen.add((rel, tid))
+                out.append({"source": rel, "target": tid, "type": "references"})
     return out
 
 

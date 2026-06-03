@@ -195,7 +195,12 @@ home-dir memory into versioned, optionally team-shared institutional knowledge.
    used, now **owned by Fux**) and merges code nodes with rule / memory /
    narrative nodes via `code_refs` → one interactive `graph.html` (search,
    per-type color filters, click-through neighbors) + `graph.json`.
-   *Replaces `graphify-out/`.*
+   *Replaces `graphify-out/`.* **v0.1.0:** Python symbols + call edges via the
+   stdlib `ast`; JS/TS, Go, and Rust get declaration nodes plus **intra- and
+   cross-file `calls` edges** via a brace-matched heuristic (symbol→symbol),
+   with looser file→symbol `references` as a fallback. The viewer (§10 item 16)
+   is filterable, focusable, and agent-exportable
+   (see [implementation-notes.md](implementation-notes.md)).
 
 You maintain **only #1**. The other two regenerate on `fux build`.
 
@@ -267,13 +272,18 @@ fux refs <file>    # reverse lookup: which rules govern this file     ($0)
 fux new <type> <id># scaffold a rule from a template                  ($0)
 fux coverage       # % of important code files with a governing rule  ($0)
 fux verify         # run invariant/example checks (see §10)           ($0)
+fux lint           # rule *quality*: why / code_refs / edges / stub   ($0)
+fux stats          # knowledge-health dashboard + weighted score      ($0)
+fux savings ["Q"]  # measured token-cost win (see §12)                ($0)
+fux gate [--install]# CI / git pre-commit enforcement (exit 2)         ($0)
+fux mcp            # serve the substrate to agents over MCP (stdio)   ($0)
 ```
 
 Every command is deterministic — the same "no API cost" guarantee that made
 graphify trustworthy.
 
-Higher-level **skills** (`plan`, `adr`, `trace`) layer on top of these
-commands — see §16.
+Higher-level **skills** (`plan`, `adr`, `trace`, `savings`, `distill`) layer on
+top of these commands — see §16.
 
 ---
 
@@ -324,6 +334,33 @@ Beyond the core, these make Fux materially more useful:
 11. **Cheap by default, smart if asked.** `recall` is **hybrid, staged**:
     lexical (`$0`) by default, with an opt-in **local** embedding re-rank for
     paraphrase recall — no API spend, honoring the "cheapest" mandate.
+
+12. **Measured cost savings.** `fux savings` turns §12's illustrative table into
+    real numbers from this project's file sizes — INDEX + rule-corpus +
+    governed-code token totals, and a without-Fux vs with-Fux per-lookup
+    comparison (optionally for a specific query). Deterministic, `$0`, no LLM:
+    it makes the ROI argument auditable instead of asserted.
+
+13. **Quality lint + health score.** `fux lint` judges whether a rule earns its
+    weight (missing **why**, ungrounded, dangling edges, stub body — complementary
+    to `check`'s structural validation); `fux stats` folds coverage, verify, drift,
+    lint, and savings into one weighted **health score** (0–100). Both `$0`.
+
+14. **Out-of-session enforcement.** `fux gate` is the CI / git-pre-commit backstop
+    to the in-session Stop hook: it rebuilds the views and hard-blocks (`exit 2`)
+    on blocking `check` findings or failed invariants. `fux gate --install` wires
+    the pre-commit hook. Closes the "drift only caught inside a session" gap.
+
+15. **Agent-native access (MCP).** `fux mcp` serves the read paths
+    (recall/why/refs/coverage/savings/stats/context) as Model Context Protocol
+    tools over stdio — a hand-rolled, **stdlib-only** JSON-RPC server (no new
+    dependency) — so any agent queries the substrate directly, not by shelling out.
+
+16. **Reviewable graph.** The interactive `graph.html` carries node/edge-type
+    filters, colour-by (type/community/layer/degree), focus + neighbour
+    highlighting, directed arrows, a details panel, and **agent export** (copy a
+    node's neighbourhood or the visible sub-graph as markdown) — built so a human
+    *or* an agent can navigate the merged code⊕knowledge graph.
 
 ---
 
@@ -383,8 +420,11 @@ time a question would otherwise re-scan the codebase. Hot paths (valuation, P&L,
 broker quirks) cross that line almost immediately; rarely-touched corners may
 never need a rule — so **author by demand, not exhaustively**.
 
-*(Numbers are illustrative, not benchmarked. `fux coverage` and a recall test
-set (§10) would measure the real figures once built.)*
+*(The ratios above are illustrative. **`fux savings`** now measures the real
+figures from this project's file sizes — INDEX + rule-corpus + governed-code token
+totals, and a without-Fux vs with-Fux per-lookup comparison — using a transparent
+≈4-chars/token heuristic applied identically to both sides, so the multiplier is
+the honest signal. See §10 item 12.)*
 
 ---
 
@@ -423,14 +463,16 @@ set (§10) would measure the real figures once built.)*
 | **Recall engine** | **Hybrid** (staged): lexical candidate-gen ships first, local embedding re-rank is the phase-2 upgrade of the same design | [recall-engine.compare.md](recall-engine.compare.md) |
 | **Scope / positioning** | Fux **replaces** graphify, memory, and the narrative docs — not a sixth store beside them | §11 |
 
-### Still open
+### Resolved in v0.1.0
 
-- **Optional UserPromptSubmit recall:** include in v1, or ship after the core 3
-  hooks prove out?
-- **Generated `.fux/out/` tracking:** git-track it (like `graphify-out/`) for
-  zero-rebuild reads, or gitignore it and rebuild on `fux build`?
-- **Skills layer (§16):** ship `plan` (kiro-style) alone first to prove the
-  spec→task→rule loop, or build `plan` + `adr` + `trace` together?
+These were the three open questions at design time; all are now decided and
+implemented (see [implementation-notes.md](implementation-notes.md) §"Decisions taken"):
+
+| Question | Call made |
+|---|---|
+| **Optional UserPromptSubmit recall** — v1 or later? | Shipped as `fux hook-recall`, **opt-in** via `fux init --recall`; the core 3 hooks are the default. |
+| **Generated `.fux/out/` tracking** — git-track or gitignore? | **Gitignored** by default; rebuilt by `fux build` ($0). Drop the ignore line to commit `out/`. |
+| **Skills layer (§16)** — `plan` alone or all three? | All three shipped (`plan` flagship + `adr` + `trace`); `plan` is the fleshed-out one. |
 
 ---
 
@@ -493,7 +535,8 @@ This is the capstone: it closes the loop the rest of Fux only stores.
 | `plan` | Request → requirements → design → tasks (above) | Spec-driven dev, code-linked & tracked | **Add (flagship)** |
 | `adr "<decision>"` | Capture an architecture decision as an `adr` entry | One-step durable *why*; `adr` type already exists (§6) | **Add** |
 | `trace "<feature>"` | Walk the graph to explain how a feature spans modules | The graphify-replacement query value, as a workflow | **Add** |
-| `distill` | Turn this session's decisions into `memory` entries | Feeds the memory-replacement goal — but needs careful scoping | **Defer** |
+| `savings ["<question>"]` | Interpret the measured token-cost report → a next action | Makes the §12 ROI auditable, not asserted; pure `$0` measurement | **Add** |
+| `distill ["<focus>"]` | Capture this session's decisions as `memory`/`adr` entries | Closes the memory-replacement loop; scoped + human-confirmed so it never orphans noise | **Add (shipped)** |
 | `review <diff>` | Check a diff against governing rules / invariants only | Useful, but overlaps `/code-review` — better as the `strict` hook (§8) | **Skip (fold into hook)** |
 | `tour` | Ordered onboarding reading path | Already core (§10, item 10) | **Alias, don't duplicate** |
 
@@ -517,6 +560,68 @@ no other skill will.
 
 A `spec.guide.md` (using the [guide.guide.md](guide.guide.md) pattern) should
 define the plan artifact's required sections *before* `plan` is built.
+
+---
+
+## 17. Next steps (roadmap)
+
+> Informed by a competitive scan of the agent-memory field (agentmemory, Mem0,
+> Zep, Letta, Cognee) and the Anton pilot context. **Guiding principle:** borrow
+> the *retrieval and capture mechanics* those tools do well, but never trade away
+> Fux's moat — **authored, code-linked, deterministic, `$0`, verifiable** knowledge
+> (the *why* + drift-checking), which none of them have. Compete on knowledge
+> engineering, not on conversational recall.
+
+### Near-term (high ROI, on-brand, `$0`)
+
+1. **RRF hybrid retrieval.** Fuse the three signals Fux already computes — BM25
+   ([recall.py](../fux/recall.py)), local embeddings ([embed.py](../fux/embed.py)),
+   and graph proximity ([graphquery.py](../fux/graphquery.py)) — with Reciprocal
+   Rank Fusion (k≈60) instead of using them separately. The single biggest recall
+   win; stays local/`$0`. *(agentmemory's triple-stream + RRF is the thing to copy.)*
+2. **Opt-in capture → assisted `distill`.** A Stop-hook (behind a config flag) that
+   *drafts* candidate `memory`/`edge-case` entries from the session, with SHA-256
+   dedup and a secret/PII filter, **queued for human confirmation** — never
+   auto-committed. Keeps "authored, not captured" while removing the friction.
+   Especially valuable for Anton's multi-session broker work.
+3. **Memory governance.** Decay + supersession for `type: memory` only (not rules):
+   extend [check.py](../fux/check.py) to flag a memory stale after N untouched days
+   and exclude decayed memories from `fux context`; auto-suggest `supersedes:` on
+   contradiction. *(TTL/forgetting/contradiction-resolution, scoped to memory.)*
+
+### Mid-term (proof & reach)
+
+4. **A standard recall benchmark.** Grow [test_recall_eval.py](../tests/test_recall_eval.py)
+   into a LoCoMo / LongMemEval-style set so Fux can publish a real `recall@k` — the
+   number competitors lead their marketing with.
+5. **Expand the MCP surface (guarded).** Add draft-only **write** tools
+   (`fux_new`/`fux_save`) and `fux_trace`/`fux_query` to
+   [mcpserver.py](../fux/mcpserver.py) so agents *contribute* knowledge, not just
+   read. Coordinate with Anton's existing repo-context MCP — distinct concerns
+   (rules+why vs repo structure); keep separate or merge deliberately.
+6. **Live dashboard (optional).** `fux serve` turning the static `graph.html` +
+   `stats` + `DRIFT.md` into a live view (cf. agentmemory's viewer).
+
+### Pilot & cleanup
+
+7. **Anton brokers pilot.** `fux init` in Anton; ground real rules in
+   `backend/app/modules/brokers/` (`day-pnl`, `inr-normalization`, the `dump_utils`
+   CSV contract as a `convention`, per-broker quirks as `edge-case`); wire
+   `fux verify`/`fux gate` into the existing `probes/` + `just` gate; seed the
+   global layer from Anton's `docs/conventions.md` + `guardrails.md`. Measure with
+   `fux coverage` + `fux savings`.
+8. **Graph hardening.** Block-comment / multiline-template awareness in the brace
+   matcher; cross-file call edges for more languages.
+9. **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
+   migrated `docs/` in Anton once parity is signed off (§13.7).
+
+### Explicitly *not* doing
+
+- Becoming a conversational-memory vendor (Mem0/Zep/Letta). Fux may *interoperate*
+  with such a backend for raw episodic recall, but the authored-rule + graph +
+  verify layer is the product.
+- Any mandatory LLM call in a maintenance path (§3, §15) — the capture hook (item 2)
+  rides the current session and only drafts; it never spends in the background.
 
 ---
 

@@ -48,9 +48,62 @@ pure iteration builtins (`zip`, `range`, `enumerate`, …).
   home-dir `memory/`, and `docs/` are left in place until parity is verified and
   explicitly retired.
 
-Still future work: full multi-language *call-graph* parity with graphify (we have
-declaration nodes + heuristic cross-file references, Python call edges), and the
-phase-7 decommission once parity is signed off.
+## Update — multi-language call edges, recall eval, richer examples
+
+A second pass closed the remaining engine 🟡/⬜ items (the phase-7 decommission and
+live-project benchmarks stay out of scope — they are operations on Anton/Wagner,
+not engine code):
+
+- **Cross-language call-graph parity** — `fux/astextract.py` now emits intra-file
+  `calls` edges for JS/TS, Go, and Rust, not just Python. Function bodies are
+  resolved by a string/comment-aware **brace matcher** (`_body_span`), call sites
+  are matched against same-file declarations, and a shared `CALL_KEYWORDS` set
+  (now reused by `graph._xref`) filters control-flow/builtin noise. Covered by
+  `tests/test_astextract.py`.
+- **Recall eval set** — `tests/test_recall_eval.py` adds a labelled paraphrase
+  corpus so the phase-2 re-rank is validated, not just asserted: lexical recall@1
+  is 1.0 on the set and the local re-rank is checked not to regress.
+- **Verify examples beyond JSON** — `fux/vexamples.py` now executes examples whose
+  `given` is an inline `key=value` / `key: value` pair string (with numeric /
+  boolean / currency scalar coercion on values and `expect`), in addition to JSON
+  objects. Unparseable prose still skips — the "never a false fail" guarantee
+  holds. Covered by `tests/test_examples.py`.
+- **Measured cost savings** — `fux savings ["query"]` (`fux/savings.py`) makes
+  plan §12's ROI table auditable: it counts INDEX / rule-corpus / governed-code
+  tokens from real file sizes (≈4 chars/token, applied to both sides) and prints a
+  without-Fux vs with-Fux per-lookup comparison plus an aggregate over documented
+  topics. Deterministic and `$0`. Covered by `tests/test_savings.py`.
+
+## Update — quality, health, enforcement, agents, and the graph viewer
+
+A developer/agent-experience pass (all `$0`, stdlib-only, tested):
+
+- **`fux lint`** (`fux/lint.py`) — rule *quality* beside `check`'s *structure*:
+  `no-why`, `no-code-refs`, `dangling-edge`, `no-provenance`, `stub-body`.
+- **`fux stats`** (`fux/stats.py`) — a weighted health score (coverage 40 ·
+  verify 30 · authoring 30 − blocking-drift penalty) + corpus/signal breakdown,
+  composed from the existing commands.
+- **`fux gate`** (`fux/gate.py`) — the out-of-session enforcement surface
+  (rebuild → exit 2 on blocking `check`/`verify`); `--install` writes a git
+  pre-commit hook. `gitutil.hooks_dir` resolves the hooks path.
+- **Cross-file call edges** — `astextract.external_call_sites` attributes each
+  call to its enclosing symbol (Python + brace languages); `graph._crossfile_calls`
+  resolves callees against the global symbol index into symbol→symbol `calls`
+  edges and suppresses the now-redundant file→symbol `references`.
+- **`fux mcp`** (`fux/mcpserver.py`) — a hand-rolled MCP stdio server (newline
+  JSON-RPC 2.0, **no `mcp` dependency**) exposing the read paths as tools.
+- **Graph viewer** (`fux/assets/`) — node + edge-type filters, colour modes
+  (type/community/layer/degree), focus/neighbour highlighting, directed arrows, a
+  details panel, layout sliders, keyboard shortcuts, and markdown **agent export**
+  of a node's neighbourhood or the visible sub-graph.
+- **`distill` skill** (`skills/distill/`) — capture a session's durable decisions
+  as `memory`/`adr` entries (human-confirmed, scoped); the plan §16 "Defer" item,
+  now shipped.
+
+Still future work: cross-**file** call edges for non-Python languages (today:
+intra-file calls + heuristic cross-file references), block-comment / multiline
+template-literal awareness in the brace matcher, and the phase-7 decommission
+once parity is signed off.
 
 ## Decisions taken (the plan's "still open" items)
 
@@ -62,38 +115,45 @@ phase-7 decommission once parity is signed off.
 
 ## Scope of the AST graph backend (plan §7/§13.1)
 
-The graph engine is Fux-owned and `$0`, but v0.1.0 is a **focused** extractor, not
-a full re-implementation of graphify's multi-language pipeline:
+The graph engine is Fux-owned and `$0`. v0.1.0 extracts symbols **and intra-file
+call edges across languages**, though it remains a focused extractor, not a full
+re-implementation of graphify's multi-language pipeline:
 
 - **Python** — real symbol + call-edge extraction via the stdlib `ast` module
   (functions, classes, intra-file `calls`).
-- **JS/TS, Go, Rust** — declaration-level nodes via lightweight regexes
-  (functions/classes), no call edges yet.
-- **All languages** — file nodes, plus `governs` edges to rules via `code_refs`,
-  and rule↔rule `related`/typed edges.
+- **JS/TS, Go, Rust** — declaration nodes via regex **plus intra-file `calls`
+  edges** via a brace-matched, string/comment-aware heuristic (`_body_span`).
+- **All languages** — file nodes, `governs` edges to rules via `code_refs`,
+  heuristic cross-file `references` edges, rule↔rule `related`/typed edges,
+  community detection, and the `query/path/explain` traversals.
 
-This is enough to merge code and knowledge nodes into one navigable
-`graph.html` (the plan's core claim). Cross-language call-graph parity with
-graphify, community detection, and the `query/path/explain` traversals are future
-work (plan §13.7 "absorb & migrate").
+Remaining gap vs graphify: cross-**file** call edges for the non-Python languages
+(today: intra-file calls + heuristic cross-file references).
 
 ## Recall (plan §10.11, recall-engine.compare.md)
 
-Phase 1 only: BM25-lite over body + frontmatter-weighted fields
+Phase 1 (default): BM25-lite over body + frontmatter-weighted fields
 (`id`/`domain`/`aliases`/`keywords`/`related`/`type`). Phase-2 local embedding
-re-rank is gated behind `recall_rerank = true` in config and the `[embeddings]`
-extra — **not** implemented yet, but the config seam and dependency extra exist so
-turning it on later changes no default behaviour. Default path stays `$0`.
+re-rank is **implemented** and gated behind `recall_rerank = true` in config:
+sentence-transformers when the `[embeddings]` extra is installed, else a `$0`
+char-trigram cosine fallback. Default path stays `$0` and unchanged; the re-rank
+is validated against a labelled paraphrase eval set (`tests/test_recall_eval.py`)
+so it can be promoted with evidence.
 
 ## Verify (plan §10.1)
 
 `fux verify` evaluates a rule's `check:` expression in a restricted namespace
-(`abs`/`sum`/`min`/`max`/`len`/`round`/`all`/`any`/`math`, no builtins). Data
-comes from, in order: the rule's `verify_cmd:` (a shell command printing JSON —
-this is the probes/just wiring), `.fux/verify/<id>.json`, or
-`.fux/out/verify_context.json`. No data → **skip** (never a false failure). The
-`examples:` given→expect pairs are carried and shown but not auto-executed in
-v0.1.0 (they document the invariant `check` covers).
+(`abs`/`sum`/`min`/`max`/`len`/`round`/`all`/`any`/`math` + pure iteration
+builtins, no `__builtins__`). Data comes from, in order: the rule's `verify_cmd:`
+(a shell command printing JSON — this is the probes/just wiring),
+`.fux/verify/<id>.json`, or `.fux/out/verify_context.json`. No data → **skip**
+(never a false failure).
+
+The `examples:` given→expect pairs are now **auto-executed** against `check:`.
+`given` is accepted as a JSON object, an inline `key=value` / `key: value` pair
+string, or an already-parsed mapping; values and `expect` are scalar-coerced
+(numbers, booleans, comma/currency-stripped numerics). Prose that fits none of
+these is skipped, so the "never a false fail" guarantee is preserved.
 
 ## Strictness / auto-fix split (plan §8)
 
