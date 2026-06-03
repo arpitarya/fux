@@ -37,20 +37,26 @@ code-linked, instead of evaporating when the session ends. Scoped deliberately:
 ## Procedure
 
 1. **Resolve `$FUX`** exactly as in `skills/fux/SKILL.md` Step 1.
-2. **Propose first.** List the 1–5 candidate entries — for each: type, a kebab `id`,
+2. **Read the capture queue (if enabled).** Run `$FUX capture --list` — when
+   `capture = true`, the Stop hook has already queued the important files that
+   changed this session, split into *uncovered* (candidate new rules) and
+   *governed* (a rule's **why** may need updating). Use it as the seed for what to
+   distill; combine with what you remember from the session.
+3. **Propose first.** List the 1–5 candidate entries — for each: type, a kebab `id`,
    a one-line summary, and (for code-bound ones) the `code_refs`. **Ask the user to
    confirm/trim** before writing. Don't bulk-author.
-3. **Scaffold + fill.** For each confirmed item:
+4. **Scaffold + fill.** For each confirmed item:
    ```bash
    $FUX new memory <id>      # or: $FUX new adr <id> / $FUX new rule <id>
    ```
    Fill the body — `**Observation:** / **Why:** / **How to apply:**` for `memory`,
    `**Decision:** / **Context:** / **Consequences:**` for `adr`. Set `scope:`
    (`personal` gitignored vs `shared` committed) and real `code_refs`.
-4. **Link.** Add `related:` / typed `edges:` to neighbouring entries so the new
+5. **Link.** Add `related:` / typed `edges:` to neighbouring entries so the new
    knowledge joins the graph rather than floating.
-5. **Rebuild + lint.** `$FUX build && $FUX lint <id-ish>` — fix `no-why` /
-   `no-code-refs` findings before finishing. A memory without a **Why:** is noise.
+6. **Rebuild, lint, clear.** `$FUX build && $FUX lint` — fix `no-why` /
+   `no-code-refs` findings before finishing (a memory without a **Why:** is noise).
+   Then `$FUX capture --clear` to empty the queue you just distilled.
 
 ## Why a skill, not a hook
 

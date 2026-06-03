@@ -13,12 +13,13 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 20 commands wired in [fux/cli.py](fux/cli.py) |
-| Hooks (3 core + 1 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit |
+| Core CLI surface (plan §9) | ✅ | 22 commands wired in [fux/cli.py](fux/cli.py) |
+| Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
-| Graph engine (AST extraction) | ✅ | Python via `ast`; JS/TS/Go/Rust intra- **and cross-file** `calls` edges |
-| Recall | ✅ | BM25-lite default; opt-in local re-rank, validated by a recall eval set |
+| Graph engine (AST extraction) | ✅ | Python via `ast`; JS/TS/Go/Rust intra- **and cross-file** `calls`; block-comment-aware sanitizer |
+| Recall | ✅ | BM25-lite default; opt-in local re-rank **+ RRF hybrid** (lexical⊕semantic⊕graph) |
+| Memory governance + capture | ✅ | TTL decay ([fux/governance.py](fux/governance.py)); opt-in capture queue ([fux/capture.py](fux/capture.py)) |
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
@@ -44,7 +45,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux build` | ✅ | [fux/build.py](fux/build.py) |
 | `fux check [--fix]` | ✅ | [fux/check.py](fux/check.py), [fux/fix.py](fux/fix.py) |
 | `fux context` | ✅ | [fux/context.py](fux/context.py) |
-| `fux recall "Q" [--top N]` | ✅ | [fux/recall.py](fux/recall.py), [fux/cliquery.py](fux/cliquery.py) |
+| `fux recall "Q" [--top N] [--hybrid]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
 | `fux why <id>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
 | `fux refs <file>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
 | `fux new <type> <id> [--domain D]` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
@@ -55,6 +56,8 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux stats` | ✅ | [fux/stats.py](fux/stats.py) |
 | `fux gate [--install] [--strict-lint]` | ✅ | [fux/gate.py](fux/gate.py) |
 | `fux mcp` | ✅ | [fux/mcpserver.py](fux/mcpserver.py) |
+| `fux capture [--list] [--clear]` | ✅ | [fux/capture.py](fux/capture.py) |
+| `fux serve [--port N]` | ✅ | [fux/serve.py](fux/serve.py) |
 | `fux tour` | ✅ | [fux/tour.py](fux/tour.py) |
 | `fux query "Q" [--depth N]` | ✅ | [fux/cligraph.py](fux/cligraph.py), [fux/graphquery.py](fux/graphquery.py) |
 | `fux path <a> <b>` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
@@ -122,10 +125,13 @@ Implemented ([fux/graph.py](fux/graph.py), [fux/astextract.py](fux/astextract.py
   sentence-transformers if the `[embeddings]` extra is installed, else a `$0`
   char-trigram cosine fallback ([fux/embed.py](fux/embed.py)). Default path
   unchanged.
-- **Validated** against a labelled paraphrase eval set
-  ([tests/test_recall_eval.py](tests/test_recall_eval.py)): lexical recall@1 = 1.0
-  on the corpus, and the local re-rank is asserted not to regress. Unit coverage
-  in [tests/test_embed_rerank.py](tests/test_embed_rerank.py).
+- **Phase 3 (opt-in, $0):** `recall_hybrid` / `fux recall --hybrid` fuses three
+  ranked lists — BM25, local semantic ($0 trigram fallback), and **graph
+  proximity** (BFS from lexical anchors) — via **Reciprocal Rank Fusion** (k=60)
+  ([fux/hybrid.py](fux/hybrid.py)). Default path unchanged.
+- **Validated** against a labelled paraphrase eval set + `recall@k`/MRR metrics
+  ([fux/bench.py](fux/bench.py), [tests/test_recall_eval.py](tests/test_recall_eval.py)):
+  lexical recall@1 = 1.0, hybrid recall@3 = 1.0; hybrid asserted not to regress.
 
 ### 2.8 Verify — ✅ (plan §10.1)
 
@@ -241,25 +247,57 @@ entries — the memory-replacement loop, human-confirmed). Guides:
 `plan`/`adr`/`distill` author via the LLM in-session; `trace`/`savings` are pure
 `$0`. All ride the current session (no background spend).
 
-### 2.17 Packaging & install — ✅
+### 2.17 Roadmap §17 — memory, capture, governance, dashboard — ✅
+
+The plan §17 engine items, all `$0` and opt-in (defaults unchanged):
+
+- **RRF hybrid recall** ([fux/hybrid.py](fux/hybrid.py)) — see §2.7.
+- **Opt-in capture** ([fux/capture.py](fux/capture.py)) — when `capture = true`, the
+  Stop hook records which important files changed this session (governed vs
+  uncovered), with a secret-path filter (`.env`/`*.key`/…) and SHA-256 dedup, into
+  `.fux/capture/`. **Never** auto-authors a `memory` entry — the `distill` skill
+  (human-confirmed) consumes `fux capture --list`. No LLM.
+- **Memory governance** ([fux/governance.py](fux/governance.py)) — `type: memory`
+  decays after `memory_ttl_days` (default 180): `fux check` emits `memory-stale`
+  and `fux context` excludes it from the SessionStart injection (kept on disk).
+  Rules never decay.
+- **Recall benchmark** ([fux/bench.py](fux/bench.py)) — `recall@k` + MRR over a
+  labelled set; the harness that lets Fux quote a real number.
+- **Expanded MCP** ([fux/mcpserver.py](fux/mcpserver.py)) — `fux_query`/`fux_trace`
+  (graph traversal) + draft-only `fux_new` added to the tool set.
+- **`fux serve`** ([fux/serve.py](fux/serve.py)) — a `http.server` dashboard: the
+  `stats` health summary + links to `graph.html`/reports.
+- **Graph hardening** ([fux/astextract.py](fux/astextract.py)) — `sanitize_lines`,
+  a char state machine that blanks string/template literals and `//` + `/* */`
+  (multi-line) comments before brace matching, so braces inside them don't skew
+  function spans.
+
+Covered by [tests/test_hybrid.py](tests/test_hybrid.py),
+[tests/test_capture_governance.py](tests/test_capture_governance.py),
+[tests/test_mcp_extra.py](tests/test_mcp_extra.py),
+[tests/test_serve_sanitize.py](tests/test_serve_sanitize.py).
+
+### 2.18 Packaging & install — ✅
 
 - [install.sh](install.sh) installs **editable** (`pip -e`) → `~/.claude/fux/{engine,global,packs,hooks}` + skills.
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.18 Tests — ✅ (52 tests)
+### 2.19 Tests — ✅ (70 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
-embed/rerank, schema/scaffold/init, cross-language AST call edges
-([test_astextract.py](tests/test_astextract.py)), **cross-file call edges**
-([test_crossfile_calls.py](tests/test_crossfile_calls.py)), extended verify
-examples ([test_examples.py](tests/test_examples.py)), a recall eval set
-([test_recall_eval.py](tests/test_recall_eval.py)), the cost-savings estimator
-([test_savings.py](tests/test_savings.py)), **lint/stats/gate**
-([test_lint_stats_gate.py](tests/test_lint_stats_gate.py)), the **MCP server**
-([test_mcp.py](tests/test_mcp.py)), and the **graph-HTML render**
-([test_graphhtml.py](tests/test_graphhtml.py)). Run with `python -m pytest`
-(Python ≥ 3.11).
+embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
+([test_astextract.py](tests/test_astextract.py), [test_crossfile_calls.py](tests/test_crossfile_calls.py)),
+extended verify examples ([test_examples.py](tests/test_examples.py)), the
+**recall eval set + recall@k/MRR** ([test_recall_eval.py](tests/test_recall_eval.py)),
+**RRF hybrid** ([test_hybrid.py](tests/test_hybrid.py)), the cost-savings estimator
+([test_savings.py](tests/test_savings.py)), lint/stats/gate
+([test_lint_stats_gate.py](tests/test_lint_stats_gate.py)), **capture + governance**
+([test_capture_governance.py](tests/test_capture_governance.py)), the MCP server +
+expanded tools ([test_mcp.py](tests/test_mcp.py), [test_mcp_extra.py](tests/test_mcp_extra.py)),
+and the graph-HTML render + **serve/sanitizer**
+([test_graphhtml.py](tests/test_graphhtml.py), [test_serve_sanitize.py](tests/test_serve_sanitize.py)).
+Run with `python -m pytest` (Python ≥ 3.11).
 
 ---
 
@@ -277,24 +315,21 @@ examples ([test_examples.py](tests/test_examples.py)), a recall eval set
 
 ## 4. Remaining / future work
 
-The prioritised roadmap (informed by an agent-memory competitive scan + the Anton
-pilot) now lives in **[fux-plan.md §17](fux-plan.md)**. Highlights:
+The full roadmap lives in **[fux-plan.md §17](fux-plan.md)**. The **engine items
+(§17.1–6, 8) are now shipped** — RRF hybrid recall, opt-in capture, memory
+governance, the recall benchmark, expanded MCP, `fux serve`, and the
+block-comment-aware sanitizer (see §2.7 and §2.17 above).
 
-**Near-term, engine, `$0`:**
-- ⬜ **RRF hybrid retrieval** — fuse BM25 ⊕ local embeddings ⊕ graph proximity via
-  Reciprocal Rank Fusion (today they run separately).
-- ⬜ **Opt-in capture hook** — a Stop-hook that *drafts* `memory` entries
-  (dedup + secret filter, human-confirmed); assisted `distill`.
-- ⬜ **Memory governance** — decay/supersession for `type: memory`, extending `check`.
+What remains is **operational, not engine code in this repo**:
 
-**Mid-term:** standard recall benchmark (LoCoMo/LongMemEval-style); guarded MCP
-**write** tools + `trace`/`query`; optional `fux serve` live dashboard.
-
-**Pilot & cleanup (not engine code in this repo):**
-- ⬜ **Anton brokers pilot** — ground real broker rules, wire `verify`/`gate` into
-  `probes/` + `just`, measure with `coverage`/`savings`.
+- ⬜ **Anton brokers pilot** — ground real broker rules in
+  `backend/app/modules/brokers/`, wire `verify`/`gate` into `probes/` + `just`,
+  measure with `coverage`/`savings`.
 - ⬜ **Phase-7 decommission** — retire `graphify-out/`, home-dir `memory/`, migrated
-  `docs/` once parity is signed off.
+  `docs/` in Anton once parity is signed off.
+
+Possible engine follow-ups (not blocking): cross-**file** call edges for more
+languages; auto-suggest `supersedes:` on memory contradiction.
 - ⬜ **Graph hardening** — block-comment / multiline-template awareness in the brace
   matcher; cross-file call edges for more languages.
 

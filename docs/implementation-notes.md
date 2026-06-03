@@ -100,6 +100,28 @@ A developer/agent-experience pass (all `$0`, stdlib-only, tested):
   as `memory`/`adr` entries (human-confirmed, scoped); the plan §16 "Defer" item,
   now shipped.
 
+## Update — roadmap §17 (retrieval, capture, governance, dashboard)
+
+The plan §17 engine items, all opt-in and `$0` (defaults unchanged):
+
+- **RRF hybrid recall** (`fux/hybrid.py`) — Reciprocal Rank Fusion (k=60) of BM25 ⊕
+  local-semantic (`embed`, $0 trigram fallback) ⊕ graph proximity (BFS from lexical
+  anchors). Behind `recall_hybrid` / `fux recall --hybrid`. `fux/bench.py` adds
+  `recall@k`/MRR; the eval set (`tests/test_recall_eval.py`) reports lexical
+  recall@1 = 1.0 and hybrid recall@3 = 1.0.
+- **Opt-in capture** (`fux/capture.py`) — Stop-hook (`capture = true`) records which
+  important files changed (governed vs uncovered) via `gitutil.changed_files`, with
+  a secret-path filter + SHA-256 dedup, into `.fux/capture/`. Never authors a
+  `memory` entry; `distill` consumes the queue. No LLM.
+- **Memory governance** (`fux/governance.py`) — `type: memory` decays after
+  `memory_ttl_days`; `check` emits `memory-stale`, `context` excludes it. Rules
+  never decay.
+- **Expanded MCP** (`fux/mcpserver.py`) — `fux_query`/`fux_trace`/draft-`fux_new`.
+- **`fux serve`** (`fux/serve.py`) — `http.server` dashboard (stats + view links).
+- **Sanitizer hardening** (`fux/astextract.sanitize_lines`) — a char state machine
+  blanking strings/templates and `//` + multi-line `/* */` comments before brace
+  matching, replacing the old per-line regex.
+
 Still future work: cross-**file** call edges for non-Python languages (today:
 intra-file calls + heuristic cross-file references), block-comment / multiline
 template-literal awareness in the brace matcher, and the phase-7 decommission

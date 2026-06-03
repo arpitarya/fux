@@ -44,9 +44,10 @@ affected doc reflect it. If you're unsure a doc is affected, check it.
 
 - `fux/` — the engine. CLI dispatch in [fux/cli.py](fux/cli.py); commands in
   `clicmds`/`cliquery`/`cligraph`; graph in `graph`/`astextract`/`community` +
-  the viewer in `assets/`; recall in `recall`/`embed`; verify in
-  `verify`/`vexamples`; quality/health/enforcement in `lint`/`stats`/`gate`;
-  cost in `savings`; agent integration in `mcpserver`; hooks in
+  the viewer in `assets/`; recall in `recall`/`embed`/`hybrid` + `bench`; verify
+  in `verify`/`vexamples`; quality/health/enforcement in `lint`/`stats`/`gate`;
+  cost in `savings`; memory capture/governance in `capture`/`governance`; agent
+  integration in `mcpserver`; dashboard in `serve`; hooks in
   `hooks`/`touch`/`hookio`.
 - `hooks/` — shell hook wrappers wired into a project by `fux init`.
 - `global/` — seed best-practice rules shared across projects.

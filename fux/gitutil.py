@@ -24,6 +24,18 @@ def hooks_dir(root: Path) -> Path | None:
     return (root / rel) if rel else None
 
 
+def changed_files(root: Path) -> list[str]:
+    """Repo-relative paths changed in the working tree (staged + unstaged + new).
+
+    Uses `diff --name-only HEAD` (tracked) + `ls-files --others` (untracked) — clean
+    one-path-per-line output, no porcelain column parsing.
+    """
+    tracked = _run(["diff", "--name-only", "HEAD"], root) or ""
+    untracked = _run(["ls-files", "--others", "--exclude-standard"], root) or ""
+    files = {ln.strip() for ln in (tracked + "\n" + untracked).splitlines() if ln.strip()}
+    return sorted(files)
+
+
 def last_commit_date(path: Path, root: Path) -> str | None:
     """ISO date (YYYY-MM-DD) of the last commit touching ``path``."""
     rel = path.resolve()

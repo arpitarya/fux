@@ -9,7 +9,8 @@ from __future__ import annotations
 import sys
 
 from fux import check as checkmod
-from fux import context, drift, explain, fix, frontmatter, loader, recall, touch
+from fux import (capture, config, context, drift, explain, fix, frontmatter,
+                 loader, paths, recall, touch)
 from fux.findings import blocking
 from fux.hookio import edited_rel, event, mode_of, root_of
 
@@ -47,9 +48,14 @@ def stop() -> int:
     root = root_of(ev)
     if not root:
         return 0
-    mode = mode_of(root)
+    cfg = config.load(paths.Footprint(root).config)
+    mode = cfg.get("mode", "fix")
     if mode == "off":
         return 0
+    if cfg.get("capture"):
+        new = capture.observe(root, cfg)
+        if new:
+            print(capture.summary(capture.pending(root)))
     findings = checkmod.run(root)
     if not findings:
         return 0

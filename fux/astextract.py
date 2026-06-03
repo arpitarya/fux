@@ -2,9 +2,11 @@
 
 $0 and deterministic. Python uses the stdlib ``ast`` module for symbols + call
 edges; brace languages (JS/TS, Go, Rust) get declaration nodes via regex *and*
-intra-file ``calls`` edges via brace-matched function bodies — a heuristic, not a
-full parser, but enough for cross-language call-graph parity (plan §13.1). Code
-nodes later merge with rule/memory/narrative nodes by ``code_refs`` (plan §11).
+intra-/cross-file ``calls`` edges via brace-matched function bodies — a heuristic,
+not a full parser, but enough for call-graph parity (plan §13.1). A stateful
+sanitizer blanks string/char/template literals and ``//`` + ``/* */`` comments
+(including multi-line) before brace matching, so braces inside them don't skew
+spans. Code nodes later merge with rule/memory/narrative nodes by ``code_refs``.
 """
 from __future__ import annotations
 
@@ -27,10 +29,45 @@ CALL_KEYWORDS = {"if", "for", "while", "switch", "catch", "return", "function",
                  "print", "len", "range", "super", "self", "await", "typeof",
                  "new", "match", "fn", "func", "go", "defer", "yield", "throw"}
 
-# Strip string/char/template literals and `//` line comments so brace matching
-# and call scanning don't trip over braces or call-shaped text inside them.
-_STRLIT = re.compile(r"\"(?:\\.|[^\"\\])*\"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`")
-_LINECOMMENT = re.compile(r"//.*")
+def sanitize_lines(text: str) -> list[str]:
+    """Blank string/char/template literals and //, /* */ comments; keep newlines.
+
+    A small char state machine — handles multi-line block comments and template
+    literals that the old per-line regex missed. Newline positions are preserved,
+    so the returned list aligns 1:1 with ``text.split("\\n")``.
+    """
+    out: list[str] = []
+    i, n, state = 0, len(text), None        # state: None|'line'|'block'|quote-char
+    while i < n:
+        c = text[i]
+        nxt = text[i + 1] if i + 1 < n else ""
+        if state is None:
+            if c == "/" and nxt == "/":
+                out.append("  "); state = "line"; i += 2
+            elif c == "/" and nxt == "*":
+                out.append("  "); state = "block"; i += 2
+            elif c in "\"'`":
+                out.append(" "); state = c; i += 1
+            else:
+                out.append(c); i += 1
+        elif state == "line":
+            out.append("\n" if c == "\n" else " "); state = None if c == "\n" else state; i += 1
+        elif state == "block":
+            if c == "*" and nxt == "/":
+                out.append("  "); state = None; i += 2
+            else:
+                out.append("\n" if c == "\n" else " "); i += 1
+        else:                                # inside a string / template literal
+            if c == "\\":
+                out.append(" ")
+                if nxt:
+                    out.append("\n" if nxt == "\n" else " ")
+                i += 2
+            elif c == state:
+                out.append(" "); state = None; i += 1
+            else:
+                out.append("\n" if c == "\n" else " "); i += 1
+    return "".join(out).split("\n")
 
 
 def extract(path: Path, rel: str) -> tuple[list[dict], list[dict]]:
@@ -77,16 +114,9 @@ def _py_externals(text: str, rel: str) -> list[tuple[str, str]]:
 
 
 def _generic_externals(text: str, rel: str) -> list[tuple[str, str]]:
-    lines = text.splitlines()
-    decls: list[tuple[int, str, str]] = []
-    for i, line in enumerate(lines):
-        for pattern, kind in DECL:
-            m = pattern.match(line)
-            if m:
-                decls.append((i, m.group(1), kind))
-                break
+    decls = _scan_decls(text)
     defined = {name for _, name, _ in decls}
-    san = [_LINECOMMENT.sub("", _STRLIT.sub('""', ln)) for ln in lines]
+    san = sanitize_lines(text)
     out: list[tuple[str, str]] = []
     for i, name, kind in decls:
         if kind != "function":
@@ -131,25 +161,29 @@ def _callee(func) -> str | None:
     return None
 
 
-def _generic(text: str, rel: str) -> tuple[list[dict], list[dict]]:
-    lines = text.splitlines()
-    decls: list[tuple[int, str, str]] = []  # (0-based line, name, kind)
-    for i, line in enumerate(lines):
+def _scan_decls(text: str) -> list[tuple[int, str, str]]:
+    """(0-based line, name, kind) for each declaration matched line-by-line."""
+    decls: list[tuple[int, str, str]] = []
+    for i, line in enumerate(text.split("\n")):
         for pattern, kind in DECL:
             m = pattern.match(line)
             if m:
                 decls.append((i, m.group(1), kind))
                 break
+    return decls
+
+
+def _generic(text: str, rel: str) -> tuple[list[dict], list[dict]]:
+    decls = _scan_decls(text)
     nodes = [{"id": f"{rel}::{name}", "label": name, "type": kind, "file": rel, "line": i + 1}
              for i, name, kind in decls]
-    return nodes, _generic_calls(lines, decls, rel)
+    return nodes, _generic_calls(sanitize_lines(text), decls, rel)
 
 
-def _generic_calls(lines: list[str], decls: list[tuple[int, str, str]], rel: str
+def _generic_calls(san: list[str], decls: list[tuple[int, str, str]], rel: str
                    ) -> list[dict]:
     """Intra-file ``calls`` edges for brace languages via brace-matched bodies."""
     defined = {name: f"{rel}::{name}" for _, name, _ in decls}
-    san = [_LINECOMMENT.sub("", _STRLIT.sub('""', ln)) for ln in lines]
     edges, seen = [], set()
     for i, name, kind in decls:
         if kind != "function":

@@ -3,7 +3,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fux import build, check, config, context, fix, gate, initcmd, mcpserver, paths
+from fux import (build, check, config, context, fix, gate, initcmd, mcpserver,
+                 paths, serve)
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -60,3 +61,7 @@ def cmd_gate(args) -> int:
 
 def cmd_mcp(_args) -> int:
     return mcpserver.serve()
+
+
+def cmd_serve(args) -> int:
+    return serve.serve(root(), port=args.port)

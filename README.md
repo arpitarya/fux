@@ -59,7 +59,7 @@ fux build                      # regenerate INDEX.md + rules.json + graph   ($0)
 fux check --fix                # validate; repair mechanical drift           ($0)
 fux why day-pnl                # explain a rule + rationale + linked code
 fux refs src/aggregator.py     # which rules govern this file
-fux recall "how is day P&L computed"   # keyword-retrieve relevant rules
+fux recall "how is day P&L computed" --hybrid  # RRF-fuse lexical+semantic+graph
 fux coverage                   # % of important files with a governing rule
 fux verify                     # run invariant `check:` assertions
 fux savings "how is day P&L computed"  # measured token-cost win, this lookup
@@ -67,6 +67,8 @@ fux lint                       # rule *quality*: missing why / code_refs / edges
 fux stats                      # knowledge-health dashboard + score
 fux gate --install             # wire a git pre-commit enforcement hook
 fux mcp                        # serve the substrate to agents over MCP (stdio)
+fux capture                    # queue this session's changes for `fux distill`
+fux serve                      # local dashboard over the generated views
 fux tour                       # ordered ONBOARDING.md
 ```
 
@@ -96,12 +98,17 @@ node/edge-type filters, colour-by (type/community/layer/degree), focus +
 neighbour highlighting, a details panel, and one-click **markdown export** of a
 node's neighbourhood or the visible sub-graph.
 
-`fux recall` is lexical (`$0`) by default with an opt-in **local** (no-API)
-re-rank; `fux verify` runs a rule's invariant `check:` and worked `examples:`.
+`fux recall` is lexical (`$0`) by default, with an opt-in **local** re-rank and an
+opt-in **RRF hybrid** that fuses lexical ⊕ local-semantic ⊕ graph proximity (no
+API); `fux verify` runs a rule's invariant `check:` and worked `examples:`.
 Beyond authoring, Fux **enforces and reports**: `fux lint` grades rule quality,
 `fux stats` scores knowledge health, `fux gate` blocks drift at commit/CI time,
-and `fux mcp` exposes the whole substrate to agents over MCP — every one `$0` and
-deterministic.
+and `fux mcp` exposes the whole substrate to agents over MCP.
+
+For cross-session memory it stays **authored, not captured**: an opt-in `capture`
+hook queues *which* files changed for `fux distill` (human-confirmed) rather than
+auto-summarising, and `type: memory` entries **decay** after a TTL so stale notes
+stop costing context — every one `$0` and deterministic.
 
 ### Layered rules (maintain once, inherit everywhere)
 

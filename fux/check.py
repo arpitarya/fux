@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from fux import config, gitutil, loader, paths, schema
+from fux import config, gitutil, governance, loader, paths, schema
 from fux.findings import Finding
 from fux.model import Rule
 
@@ -21,9 +21,17 @@ def run(root: Path) -> list[Finding]:
         findings += _schema(r)
         findings += _refs(r, root)
         findings += _stale(r, root)
+        findings += _memory_decay(r, cfg)
     findings += _conflicts(layered)
     _write_drift(fp, findings)
     return findings
+
+
+def _memory_decay(r: Rule, cfg: dict) -> list[Finding]:
+    if governance.is_decayed(r, cfg):
+        return [Finding("memory-stale", r.id,
+                        f"memory untouched > {governance.ttl(cfg)}d — re-confirm or deprecate")]
+    return []
 
 
 def _schema(r: Rule) -> list[Finding]:
@@ -81,7 +89,8 @@ def _conflicts(layered: list[Rule]) -> list[Finding]:
 def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
     lines = ["# Fux DRIFT report", "",
              f"_{len(findings)} finding(s)._" if findings else "_No drift — all rules current._", ""]
-    for kind in ("schema", "dead-ref", "conflict", "stale", "plan-drift", "invariant"):
+    for kind in ("schema", "dead-ref", "conflict", "stale", "plan-drift", "invariant",
+                 "memory-stale"):
         group = [f for f in findings if f.kind == kind]
         if group:
             lines.append(f"## {kind} ({len(group)})")
