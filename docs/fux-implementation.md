@@ -277,23 +277,26 @@ examples ([test_examples.py](tests/test_examples.py)), a recall eval set
 
 ## 4. Remaining / future work
 
-These are the items that are **not engine code in this repo** — they are
-operational tasks against the consuming projects (Anton/Wagner) or measurements,
-so they can't be "implemented" here:
+The prioritised roadmap (informed by an agent-memory competitive scan + the Anton
+pilot) now lives in **[fux-plan.md §17](fux-plan.md)**. Highlights:
 
-- ⬜ **Phase-7 decommission** — retire `graphify-out/`, the home-dir `memory/`,
-  and the migrated `docs/` in Anton once parity is explicitly signed off (kept in
-  place for now). External-project operation, not engine code.
-- ⬜ **Benchmarks** — the cost numbers in plan §12 are illustrative; measure real
-  token figures via `fux coverage` + the recall eval set on a live project.
+**Near-term, engine, `$0`:**
+- ⬜ **RRF hybrid retrieval** — fuse BM25 ⊕ local embeddings ⊕ graph proximity via
+  Reciprocal Rank Fusion (today they run separately).
+- ⬜ **Opt-in capture hook** — a Stop-hook that *drafts* `memory` entries
+  (dedup + secret filter, human-confirmed); assisted `distill`.
+- ⬜ **Memory governance** — decay/supersession for `type: memory`, extending `check`.
 
-Possible engine follow-ups (not blocking; current heuristics are deterministic
-and tested):
+**Mid-term:** standard recall benchmark (LoCoMo/LongMemEval-style); guarded MCP
+**write** tools + `trace`/`query`; optional `fux serve` live dashboard.
 
-- Cross-**file** call edges for non-Python languages (today: intra-file `calls`
-  + heuristic cross-file `references`).
-- Block-comment / multiline-template-literal awareness in the brace matcher
-  (today: string + `//` line-comment aware).
+**Pilot & cleanup (not engine code in this repo):**
+- ⬜ **Anton brokers pilot** — ground real broker rules, wire `verify`/`gate` into
+  `probes/` + `just`, measure with `coverage`/`savings`.
+- ⬜ **Phase-7 decommission** — retire `graphify-out/`, home-dir `memory/`, migrated
+  `docs/` once parity is signed off.
+- ⬜ **Graph hardening** — block-comment / multiline-template awareness in the brace
+  matcher; cross-file call edges for more languages.
 
 ---
 

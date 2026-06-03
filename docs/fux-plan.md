@@ -563,6 +563,68 @@ define the plan artifact's required sections *before* `plan` is built.
 
 ---
 
+## 17. Next steps (roadmap)
+
+> Informed by a competitive scan of the agent-memory field (agentmemory, Mem0,
+> Zep, Letta, Cognee) and the Anton pilot context. **Guiding principle:** borrow
+> the *retrieval and capture mechanics* those tools do well, but never trade away
+> Fux's moat — **authored, code-linked, deterministic, `$0`, verifiable** knowledge
+> (the *why* + drift-checking), which none of them have. Compete on knowledge
+> engineering, not on conversational recall.
+
+### Near-term (high ROI, on-brand, `$0`)
+
+1. **RRF hybrid retrieval.** Fuse the three signals Fux already computes — BM25
+   ([recall.py](../fux/recall.py)), local embeddings ([embed.py](../fux/embed.py)),
+   and graph proximity ([graphquery.py](../fux/graphquery.py)) — with Reciprocal
+   Rank Fusion (k≈60) instead of using them separately. The single biggest recall
+   win; stays local/`$0`. *(agentmemory's triple-stream + RRF is the thing to copy.)*
+2. **Opt-in capture → assisted `distill`.** A Stop-hook (behind a config flag) that
+   *drafts* candidate `memory`/`edge-case` entries from the session, with SHA-256
+   dedup and a secret/PII filter, **queued for human confirmation** — never
+   auto-committed. Keeps "authored, not captured" while removing the friction.
+   Especially valuable for Anton's multi-session broker work.
+3. **Memory governance.** Decay + supersession for `type: memory` only (not rules):
+   extend [check.py](../fux/check.py) to flag a memory stale after N untouched days
+   and exclude decayed memories from `fux context`; auto-suggest `supersedes:` on
+   contradiction. *(TTL/forgetting/contradiction-resolution, scoped to memory.)*
+
+### Mid-term (proof & reach)
+
+4. **A standard recall benchmark.** Grow [test_recall_eval.py](../tests/test_recall_eval.py)
+   into a LoCoMo / LongMemEval-style set so Fux can publish a real `recall@k` — the
+   number competitors lead their marketing with.
+5. **Expand the MCP surface (guarded).** Add draft-only **write** tools
+   (`fux_new`/`fux_save`) and `fux_trace`/`fux_query` to
+   [mcpserver.py](../fux/mcpserver.py) so agents *contribute* knowledge, not just
+   read. Coordinate with Anton's existing repo-context MCP — distinct concerns
+   (rules+why vs repo structure); keep separate or merge deliberately.
+6. **Live dashboard (optional).** `fux serve` turning the static `graph.html` +
+   `stats` + `DRIFT.md` into a live view (cf. agentmemory's viewer).
+
+### Pilot & cleanup
+
+7. **Anton brokers pilot.** `fux init` in Anton; ground real rules in
+   `backend/app/modules/brokers/` (`day-pnl`, `inr-normalization`, the `dump_utils`
+   CSV contract as a `convention`, per-broker quirks as `edge-case`); wire
+   `fux verify`/`fux gate` into the existing `probes/` + `just` gate; seed the
+   global layer from Anton's `docs/conventions.md` + `guardrails.md`. Measure with
+   `fux coverage` + `fux savings`.
+8. **Graph hardening.** Block-comment / multiline-template awareness in the brace
+   matcher; cross-file call edges for more languages.
+9. **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
+   migrated `docs/` in Anton once parity is signed off (§13.7).
+
+### Explicitly *not* doing
+
+- Becoming a conversational-memory vendor (Mem0/Zep/Letta). Fux may *interoperate*
+  with such a backend for raw episodic recall, but the authored-rule + graph +
+  verify layer is the product.
+- Any mandatory LLM call in a maintenance path (§3, §15) — the capture hook (item 2)
+  rides the current session and only drafts; it never spends in the background.
+
+---
+
 ## Appendix A — worked example rule (grounded in real code)
 
 `.fux/rules/day-pnl.md` — extracted from
