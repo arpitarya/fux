@@ -25,6 +25,7 @@ def build_parser() -> argparse.ArgumentParser:
     rc = sub.add_parser("recall", help="keyword-retrieve relevant rules")
     rc.add_argument("query")
     rc.add_argument("--top", type=int, default=6)
+    rc.add_argument("--hybrid", action="store_true", help="RRF-fuse lexical + semantic + graph ($0)")
     rc.set_defaults(fn=cliquery.cmd_recall)
 
     why = sub.add_parser("why", help="explain a rule + rationale + linked code")
@@ -56,12 +57,21 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("stats", help="project knowledge-health dashboard + score").set_defaults(fn=cliquery.cmd_stats)
 
+    cap = sub.add_parser("capture", help="session observation queue for `fux distill`")
+    cap.add_argument("--list", action="store_true", help="show the pending queue without observing")
+    cap.add_argument("--clear", action="store_true", help="empty the queue (after distilling)")
+    cap.set_defaults(fn=cliquery.cmd_capture)
+
     gt = sub.add_parser("gate", help="CI / pre-commit enforcement (exit 2 on blocking)")
     gt.add_argument("--install", action="store_true", help="install a git pre-commit hook")
     gt.add_argument("--strict-lint", action="store_true", help="treat lint findings as blocking")
     gt.set_defaults(fn=clicmds.cmd_gate)
 
     sub.add_parser("mcp", help="serve the substrate over MCP (stdio JSON-RPC)").set_defaults(fn=clicmds.cmd_mcp)
+
+    srv = sub.add_parser("serve", help="local dashboard over the generated views ($0)")
+    srv.add_argument("--port", type=int, default=8765)
+    srv.set_defaults(fn=clicmds.cmd_serve)
 
     q = sub.add_parser("query", help="traverse the graph from rules matching a question")
     q.add_argument("query")

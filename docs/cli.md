@@ -10,7 +10,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux build` | Regenerate `.fux/out/INDEX.md` + `rules.json` + `graph.json` + `graph.html` from source frontmatter. | $0 |
 | `fux check [--fix]` | Validate schema, dead `code_refs`, git-staleness, and conflicts; write `DRIFT.md`. `--fix` applies mechanical repairs (drop dead refs, bump `updated`). Exit 2 under `strict` mode with blocking findings. | $0 |
 | `fux context` | Emit the compact Tier-1 INDEX (global ⊕ packs ⊕ project) — the SessionStart injection. | $0 |
-| `fux recall "Q" [--top N]` | BM25-lite lexical retrieval of the rules relevant to a query (frontmatter-weighted). | $0 |
+| `fux recall "Q" [--top N] [--hybrid]` | BM25-lite lexical retrieval (frontmatter-weighted). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity (still `$0`). | $0 |
 | `fux why <id>` | Explain a rule: rationale + linked code + edges + invariant + body. | $0 |
 | `fux refs <file>` | Reverse lookup — which rules govern this file. | $0 |
 | `fux new <type> <id> [--domain D]` | Scaffold a schema-valid stub from a template into the right directory for its type. | $0 |
@@ -20,7 +20,9 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux lint [--strict]` | Rule *quality* (complements `check`'s structure): `no-why`, `no-code-refs`, `dangling-edge`, `no-provenance`, `stub-body`. Advisory; `--strict` exits 1. | $0 |
 | `fux stats` | Knowledge-health dashboard: weighted score (coverage 40 · verify 30 · authoring 30 − drift) + corpus breakdown + every signal. | $0 |
 | `fux gate [--install] [--strict-lint]` | CI / git pre-commit enforcement: rebuild views, then exit 2 on blocking `check`/`verify`. `--install` writes the pre-commit hook. | $0 |
-| `fux mcp` | Serve the read paths (recall/why/refs/coverage/savings/stats/context) to agents over MCP (stdio JSON-RPC, stdlib-only). | $0 |
+| `fux mcp` | Serve the read paths + `query`/`trace`/draft-`new` to agents over MCP (stdio JSON-RPC, stdlib-only). | $0 |
+| `fux capture [--list] [--clear]` | Session observation queue (changed files, governed vs uncovered) that `fux distill` consumes. Wired into the Stop hook when `capture = true`. | $0 |
+| `fux serve [--port N]` | Local `http.server` dashboard: the `stats` health summary + links to `graph.html`/reports. | $0 |
 | `fux tour` | Emit an ordered `ONBOARDING.md` reading path from the rules. | $0 |
 | `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
 | `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |
@@ -68,7 +70,8 @@ claude mcp add fux -- fux mcp          # exposes recall/why/refs/coverage/saving
 ```
 
 Tools published: `fux_recall`, `fux_why`, `fux_refs`, `fux_coverage`,
-`fux_savings`, `fux_stats`, `fux_context` — each deterministic, `$0`, no LLM.
+`fux_savings`, `fux_stats`, `fux_context`, `fux_query`, `fux_trace`, and
+draft-only `fux_new` — each deterministic, `$0`, no LLM.
 
 ### Environment overrides
 

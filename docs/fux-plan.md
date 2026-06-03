@@ -277,6 +277,9 @@ fux stats          # knowledge-health dashboard + weighted score      ($0)
 fux savings ["Q"]  # measured token-cost win (see §12)                ($0)
 fux gate [--install]# CI / git pre-commit enforcement (exit 2)         ($0)
 fux mcp            # serve the substrate to agents over MCP (stdio)   ($0)
+fux capture        # session observation queue for `fux distill`      ($0)
+fux serve          # local dashboard over the generated views         ($0)
+fux recall --hybrid# RRF-fuse lexical + semantic + graph              ($0)
 ```
 
 Every command is deterministic — the same "no API cost" guarantee that made
@@ -571,48 +574,49 @@ define the plan artifact's required sections *before* `plan` is built.
 > Fux's moat — **authored, code-linked, deterministic, `$0`, verifiable** knowledge
 > (the *why* + drift-checking), which none of them have. Compete on knowledge
 > engineering, not on conversational recall.
+>
+> **Status:** the engine items (1–6, 8) are **shipped**; 7 and 9 are operational
+> tasks in the Anton repo, not engine code here.
 
 ### Near-term (high ROI, on-brand, `$0`)
 
-1. **RRF hybrid retrieval.** Fuse the three signals Fux already computes — BM25
+1. ✅ **RRF hybrid retrieval.** Fuse the three signals Fux already computes — BM25
    ([recall.py](../fux/recall.py)), local embeddings ([embed.py](../fux/embed.py)),
    and graph proximity ([graphquery.py](../fux/graphquery.py)) — with Reciprocal
-   Rank Fusion (k≈60) instead of using them separately. The single biggest recall
-   win; stays local/`$0`. *(agentmemory's triple-stream + RRF is the thing to copy.)*
-2. **Opt-in capture → assisted `distill`.** A Stop-hook (behind a config flag) that
-   *drafts* candidate `memory`/`edge-case` entries from the session, with SHA-256
-   dedup and a secret/PII filter, **queued for human confirmation** — never
-   auto-committed. Keeps "authored, not captured" while removing the friction.
-   Especially valuable for Anton's multi-session broker work.
-3. **Memory governance.** Decay + supersession for `type: memory` only (not rules):
-   extend [check.py](../fux/check.py) to flag a memory stale after N untouched days
-   and exclude decayed memories from `fux context`; auto-suggest `supersedes:` on
-   contradiction. *(TTL/forgetting/contradiction-resolution, scoped to memory.)*
+   Rank Fusion (k=60). Shipped in [hybrid.py](../fux/hybrid.py); opt-in via
+   `recall_hybrid` / `fux recall --hybrid`, default path unchanged.
+2. ✅ **Opt-in capture → assisted `distill`.** A Stop-hook (behind `capture = true`)
+   that records *which* important files changed — split governed vs uncovered, with
+   a secret-path filter and SHA-256 dedup — into a queue ([capture.py](../fux/capture.py)),
+   **never auto-authored**. The `distill` skill consumes `fux capture --list`. Keeps
+   "authored, not captured."
+3. ✅ **Memory governance.** TTL decay for `type: memory` only ([governance.py](../fux/governance.py)):
+   `fux check` flags `memory-stale` past `memory_ttl_days` and `fux context` excludes
+   decayed memories; supersession rides the existing `supersedes:` edge.
 
 ### Mid-term (proof & reach)
 
-4. **A standard recall benchmark.** Grow [test_recall_eval.py](../tests/test_recall_eval.py)
-   into a LoCoMo / LongMemEval-style set so Fux can publish a real `recall@k` — the
-   number competitors lead their marketing with.
-5. **Expand the MCP surface (guarded).** Add draft-only **write** tools
-   (`fux_new`/`fux_save`) and `fux_trace`/`fux_query` to
-   [mcpserver.py](../fux/mcpserver.py) so agents *contribute* knowledge, not just
-   read. Coordinate with Anton's existing repo-context MCP — distinct concerns
-   (rules+why vs repo structure); keep separate or merge deliberately.
-6. **Live dashboard (optional).** `fux serve` turning the static `graph.html` +
-   `stats` + `DRIFT.md` into a live view (cf. agentmemory's viewer).
+4. ✅ **A standard recall benchmark.** [bench.py](../fux/bench.py) (recall@k + MRR) over
+   an expanded labelled set ([test_recall_eval.py](../tests/test_recall_eval.py)) —
+   lexical recall@1 = 1.0 / hybrid recall@3 = 1.0 on the corpus.
+5. ✅ **Expanded MCP surface.** `fux_query` / `fux_trace` (graph traversal) and a
+   draft-only `fux_new` added to [mcpserver.py](../fux/mcpserver.py). Coordinate
+   with Anton's repo-context MCP — distinct concerns; keep separate or merge.
+6. ✅ **Live dashboard.** `fux serve` ([serve.py](../fux/serve.py)) serves the
+   `stats` health summary + links to `graph.html`/reports over `http.server`.
 
 ### Pilot & cleanup
 
-7. **Anton brokers pilot.** `fux init` in Anton; ground real rules in
+7. ⬜ **Anton brokers pilot.** `fux init` in Anton; ground real rules in
    `backend/app/modules/brokers/` (`day-pnl`, `inr-normalization`, the `dump_utils`
    CSV contract as a `convention`, per-broker quirks as `edge-case`); wire
    `fux verify`/`fux gate` into the existing `probes/` + `just` gate; seed the
    global layer from Anton's `docs/conventions.md` + `guardrails.md`. Measure with
    `fux coverage` + `fux savings`.
-8. **Graph hardening.** Block-comment / multiline-template awareness in the brace
-   matcher; cross-file call edges for more languages.
-9. **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
+8. ✅ **Graph hardening.** A stateful sanitizer ([astextract.py](../fux/astextract.py)
+   `sanitize_lines`) makes the brace matcher block-comment- and
+   multiline-template-aware before counting braces.
+9. ⬜ **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
    migrated `docs/` in Anton once parity is signed off (§13.7).
 
 ### Explicitly *not* doing

@@ -1,13 +1,15 @@
 """Read-only query command handlers (recall/why/refs/new/coverage/verify/tour)."""
 from __future__ import annotations
 
-from fux import coverage, explain, lint, recall, savings, scaffold, stats, tour, verify
+from fux import (capture, coverage, explain, lint, recall, savings, scaffold,
+                 stats, tour, verify)
 from fux.cliutil import root
 
 
 def cmd_recall(args) -> int:
-    for r, score in recall.run(root(), args.query, top=args.top):
-        print(f"{score:6.2f}  {r.id} ({r.type}) — {r.title}")
+    hybrid = True if getattr(args, "hybrid", False) else None
+    for r, score in recall.run(root(), args.query, top=args.top, hybrid=hybrid):
+        print(f"{score:6.3f}  {r.id} ({r.type}) — {r.title}")
     return 0
 
 
@@ -73,4 +75,16 @@ def cmd_lint(args) -> int:
 
 def cmd_stats(_args) -> int:
     print(stats.render(stats.build(root())))
+    return 0
+
+
+def cmd_capture(args) -> int:
+    here = root()
+    if getattr(args, "clear", False):
+        capture.clear(here)
+        print("✔ capture queue cleared")
+        return 0
+    if not getattr(args, "list", False):
+        capture.observe(here)
+    print(capture.summary(capture.pending(here)))
     return 0

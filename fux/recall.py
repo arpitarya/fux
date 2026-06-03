@@ -33,9 +33,14 @@ def _doc_tokens(r: Rule) -> list[str]:
     return toks
 
 
-def run(root: Path, query: str, top: int = 6) -> list[tuple[Rule, float]]:
+def run(root: Path, query: str, top: int = 6, hybrid: bool | None = None
+        ) -> list[tuple[Rule, float]]:
     cfg = config.load(paths.Footprint(root).config)
     rules = loader.resolve(root, cfg).active()
+    use_hybrid = cfg.get("recall_hybrid", False) if hybrid is None else hybrid
+    if use_hybrid:
+        from fux import hybrid as hy  # lazy: pulls embed/graphquery only when asked
+        return hy.fuse(root, query, rules, top=top, cfg=cfg)
     if cfg.get("recall_rerank"):
         from fux import embed  # lazy: keeps the default path dependency-free
         return embed.rerank(query, rank(rules, query, top * 3), cfg)[:top]

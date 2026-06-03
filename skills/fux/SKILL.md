@@ -30,6 +30,9 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux savings ["<question>"]# measure the token-cost win from real file sizes   ($0)
 /fux gate [--install]      # CI/pre-commit enforcement (exit 2 on blocking)    ($0)
 /fux mcp                   # serve the substrate to agents over MCP (stdio)    ($0)
+/fux capture [--list]      # session change-queue for `fux distill`           ($0)
+/fux serve                 # local dashboard over the generated views         ($0)
+/fux recall "Q" --hybrid   # RRF-fuse lexical + semantic + graph              ($0)
 /fux tour                  # emit an ordered ONBOARDING.md                     ($0)
 /fux plan "<request>"      # spec → design → tasks, each a durable Fux entry   (skill)
 /fux adr "<decision>"      # capture an architecture decision as an `adr`      (skill)
@@ -105,6 +108,8 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux savings ["Q"]` | `$FUX savings ["Q"]` — or follow `skills/savings/SKILL.md` |
 | `/fux gate [--install]` | `$FUX gate` (CI) or `$FUX gate --install` (git pre-commit) |
 | `/fux mcp` | `$FUX mcp` — run the MCP stdio server (registered via `claude mcp add`) |
+| `/fux capture` | `$FUX capture --list` — seed for `/fux distill` |
+| `/fux serve` | `$FUX serve` — open the local dashboard |
 | `/fux tour` | `$FUX tour` then read `.fux/out/ONBOARDING.md` |
 | `/fux plan "<request>"` | follow `skills/plan/SKILL.md` |
 | `/fux adr "<decision>"` | follow `skills/adr/SKILL.md` |

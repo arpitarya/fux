@@ -16,7 +16,8 @@ import json
 import sys
 from pathlib import Path
 
-from fux import __version__, coverage, explain, paths, recall, savings, stats
+from fux import (__version__, coverage, explain, graphquery, paths, recall,
+                 savings, scaffold, stats)
 
 PROTOCOL = "2024-11-05"
 
@@ -46,6 +47,19 @@ TOOLS = [
     {"name": "fux_context",
      "description": "The compact Tier-1 INDEX (global ⊕ packs ⊕ project).",
      "inputSchema": {"type": "object", "properties": {}}},
+    {"name": "fux_query",
+     "description": "Traverse the merged code⊕knowledge graph from rules matching a question.",
+     "inputSchema": {"type": "object", "required": ["query"], "properties": {
+         "query": {"type": "string"}, "depth": {"type": "integer", "default": 1}}}},
+    {"name": "fux_trace",
+     "description": "Explain how a feature spans modules by walking the graph (depth 2).",
+     "inputSchema": {"type": "object", "required": ["feature"],
+                     "properties": {"feature": {"type": "string"}}}},
+    {"name": "fux_new",
+     "description": "Scaffold a DRAFT rule stub (status: draft) for an agent to fill — never auto-published.",
+     "inputSchema": {"type": "object", "required": ["type", "id"], "properties": {
+         "type": {"type": "string"}, "id": {"type": "string"},
+         "domain": {"type": "string", "default": "general"}}}},
 ]
 
 
@@ -80,7 +94,38 @@ def _call(name: str, args: dict) -> str:
     if name == "fux_context":
         from fux import context
         return context.run(root)
+    if name == "fux_query":
+        return _graph_query(root, args["query"], int(args.get("depth", 1)))
+    if name == "fux_trace":
+        return _graph_query(root, args["feature"], depth=2)
+    if name == "fux_new":
+        target = scaffold.make(root, args["type"], args["id"],
+                               domain=args.get("domain", "general"))
+        return (f"draft created → {target}\nFill **Rule:/Why:** and set code_refs, "
+                f"then `fux build`. It stays status: draft until you confirm it.")
     raise ValueError(f"unknown tool '{name}'")
+
+
+def _graph_query(root: Path, query: str, depth: int) -> str:
+    try:
+        graph = graphquery.load(root)
+    except SystemExit:
+        return "no graph yet — run `fux build` first."
+    by_id = {n["id"]: n for n in graph["nodes"]}
+    anchors = [f"rule:{r.id}" for r, _ in recall.run(root, query, top=3)]
+    anchors = [a for a in anchors if a in by_id]
+    if not anchors:
+        node = graphquery.find(graph, query)
+        anchors = [node["id"]] if node else []
+    if not anchors:
+        return f"nothing in the graph matches '{query}'."
+    out = []
+    for a in anchors:
+        out.append(f"# {by_id[a].get('label', a)} ({by_id[a]['type']})")
+        for nid in graphquery.neighbors(graph, a, depth=depth):
+            n = by_id[nid]
+            out.append(f"  → {n.get('label', nid)} ({n['type']})")
+    return "\n".join(out)
 
 
 def _handle(msg: dict) -> dict | None:
