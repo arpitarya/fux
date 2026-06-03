@@ -1,7 +1,7 @@
 """Read-only query command handlers (recall/why/refs/new/coverage/verify/tour)."""
 from __future__ import annotations
 
-from fux import coverage, explain, recall, scaffold, tour, verify
+from fux import coverage, explain, lint, recall, savings, scaffold, stats, tour, verify
 from fux.cliutil import root
 
 
@@ -53,4 +53,24 @@ def cmd_verify(_args) -> int:
 def cmd_tour(_args) -> int:
     target = tour.write(root())
     print(f"✔ onboarding path → {target}")
+    return 0
+
+
+def cmd_savings(args) -> int:
+    rep = savings.build(root(), query=getattr(args, "query", None), top=args.top)
+    print(savings.render(rep))
+    return 0
+
+
+def cmd_lint(args) -> int:
+    issues = lint.run(root())
+    for f in issues:
+        print(f.line())
+    if not issues:
+        print("✔ No lint findings — every rule carries its weight.")
+    return 1 if (issues and getattr(args, "strict", False)) else 0
+
+
+def cmd_stats(_args) -> int:
+    print(stats.render(stats.build(root())))
     return 0

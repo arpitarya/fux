@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fux import build, check, config, context, fix, initcmd, paths
+from fux import build, check, config, context, fix, gate, initcmd, mcpserver, paths
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -44,3 +44,19 @@ def cmd_context(_args) -> int:
     if here:
         print(context.run(here))
     return 0
+
+
+def cmd_gate(args) -> int:
+    here = root()
+    if args.install:
+        hook = gate.install_precommit(here)
+        print(f"✔ pre-commit gate installed → {hook}")
+        print("  it runs `fux gate` on every commit; bypass once with `git commit --no-verify`.")
+        return 0
+    code, report = gate.run(here, strict_lint=args.strict_lint)
+    print(report)
+    return code
+
+
+def cmd_mcp(_args) -> int:
+    return mcpserver.serve()

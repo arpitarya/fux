@@ -16,6 +16,11 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux new <type> <id> [--domain D]` | Scaffold a schema-valid stub from a template into the right directory for its type. | $0 |
 | `fux coverage` | % of "important" code files (config globs) with at least one governing rule; lists the uncovered. | $0 |
 | `fux verify` | Run invariant `check:` assertions against verification data (`verify_cmd:` / `.fux/verify/<id>.json`). Skips when no data. | $0 |
+| `fux savings ["Q"] [--top N]` | Estimate the token-cost win — measured from real file sizes (≈4 chars/token): INDEX + rule corpus + governed-code totals, and a without-Fux vs with-Fux per-lookup comparison (pass a query to cost a specific lookup). | $0 |
+| `fux lint [--strict]` | Rule *quality* (complements `check`'s structure): `no-why`, `no-code-refs`, `dangling-edge`, `no-provenance`, `stub-body`. Advisory; `--strict` exits 1. | $0 |
+| `fux stats` | Knowledge-health dashboard: weighted score (coverage 40 · verify 30 · authoring 30 − drift) + corpus breakdown + every signal. | $0 |
+| `fux gate [--install] [--strict-lint]` | CI / git pre-commit enforcement: rebuild views, then exit 2 on blocking `check`/`verify`. `--install` writes the pre-commit hook. | $0 |
+| `fux mcp` | Serve the read paths (recall/why/refs/coverage/savings/stats/context) to agents over MCP (stdio JSON-RPC, stdlib-only). | $0 |
 | `fux tour` | Emit an ordered `ONBOARDING.md` reading path from the rules. | $0 |
 | `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
 | `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |
@@ -25,8 +30,9 @@ find it), except `fux init` which scaffolds one in the current directory.
 `fux build` also writes `GRAPH_REPORT.md` and tags every graph node with a
 **community** index (deterministic label propagation); `graph.html` has a
 *colour: type ⇄ community* toggle. The graph carries `governs` (rule→code),
-`contains` (file→symbol), `calls` (Python intra-file), and `references`
-(cross-file/cross-language) edges.
+`contains` (file→symbol), `calls` (intra-file — Python via `ast`, JS/TS/Go/Rust
+via a brace-matched heuristic), and `references` (cross-file/cross-language)
+edges.
 
 ### Internal hook entrypoints
 
@@ -39,13 +45,30 @@ Wired by `fux init`, not for direct use:
 | `fux hook-check` | Stop | Runs `check`; in `fix` mode applies mechanical repairs and reports the rest; in `strict` mode exits 2 on blocking findings. |
 | `fux hook-recall` | UserPromptSubmit (opt-in) | Reads the prompt; injects the top recalled rules. |
 
-### Skills (call the LLM, ride the current session)
+### Skills (workflows that ride the current session)
+
+`plan`/`adr` call the LLM in-session (no background spend); `trace`/`savings` are
+pure `$0` traversal/measurement.
 
 | Command | What |
 |---|---|
 | `fux plan "<request>"` | Spec-driven: requirements → design → tasks, each a durable Fux entry. See [spec.guide.md](spec.guide.md). |
 | `fux adr "<decision>"` | Capture an architecture decision as an `adr` entry. |
 | `fux trace "<feature>"` | Walk the merged graph to explain how a feature spans modules ($0 traversal). |
+| `fux savings ["<question>"]` | Interpret the measured token-cost report and turn it into a next action ($0). |
+| `fux distill ["<focus>"]` | Capture this session's durable decisions as `memory`/`adr` entries — human-confirmed, scoped. |
+
+### MCP server (`fux mcp`)
+
+A stdlib-only Model Context Protocol server over stdio (newline-delimited JSON-RPC
+2.0). Run it from inside a project and register it with an MCP client:
+
+```bash
+claude mcp add fux -- fux mcp          # exposes recall/why/refs/coverage/savings/stats/context
+```
+
+Tools published: `fux_recall`, `fux_why`, `fux_refs`, `fux_coverage`,
+`fux_savings`, `fux_stats`, `fux_context` — each deterministic, `$0`, no LLM.
 
 ### Environment overrides
 

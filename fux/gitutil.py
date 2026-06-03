@@ -18,6 +18,12 @@ def is_repo(root: Path) -> bool:
     return _run(["rev-parse", "--is-inside-work-tree"], root) == "true"
 
 
+def hooks_dir(root: Path) -> Path | None:
+    """Resolve the repo's git hooks dir (honours core.hooksPath / worktrees)."""
+    rel = _run(["rev-parse", "--git-path", "hooks"], root)
+    return (root / rel) if rel else None
+
+
 def last_commit_date(path: Path, root: Path) -> str | None:
     """ISO date (YYYY-MM-DD) of the last commit touching ``path``."""
     rel = path.resolve()

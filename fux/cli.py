@@ -45,6 +45,24 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("verify", help="run invariant/example checks").set_defaults(fn=cliquery.cmd_verify)
     sub.add_parser("tour", help="emit an ordered ONBOARDING.md").set_defaults(fn=cliquery.cmd_tour)
 
+    sv = sub.add_parser("savings", help="estimate the token-cost win of Fux ($0)")
+    sv.add_argument("query", nargs="?", help="optional: cost a specific lookup")
+    sv.add_argument("--top", type=int, default=3)
+    sv.set_defaults(fn=cliquery.cmd_savings)
+
+    lt = sub.add_parser("lint", help="rule-quality checks (why/code_refs/edges/provenance)")
+    lt.add_argument("--strict", action="store_true", help="exit 1 if any finding")
+    lt.set_defaults(fn=cliquery.cmd_lint)
+
+    sub.add_parser("stats", help="project knowledge-health dashboard + score").set_defaults(fn=cliquery.cmd_stats)
+
+    gt = sub.add_parser("gate", help="CI / pre-commit enforcement (exit 2 on blocking)")
+    gt.add_argument("--install", action="store_true", help="install a git pre-commit hook")
+    gt.add_argument("--strict-lint", action="store_true", help="treat lint findings as blocking")
+    gt.set_defaults(fn=clicmds.cmd_gate)
+
+    sub.add_parser("mcp", help="serve the substrate over MCP (stdio JSON-RPC)").set_defaults(fn=clicmds.cmd_mcp)
+
     q = sub.add_parser("query", help="traverse the graph from rules matching a question")
     q.add_argument("query")
     q.add_argument("--depth", type=int, default=1)
