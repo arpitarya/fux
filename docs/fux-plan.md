@@ -617,7 +617,18 @@ define the plan artifact's required sections *before* `plan` is built.
    `sanitize_lines`) makes the brace matcher block-comment- and
    multiline-template-aware before counting braces.
 9. ⬜ **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
-   migrated `docs/` in Anton once parity is signed off (§13.7).
+   migrated `docs/` in Anton once parity is signed off (§13.7). **Readiness checked
+   2026-06-04 — not met; do not delete yet:**
+   - `graphify-out/` — **no graph parity**: Anton's Fux graph has 329 nodes vs
+     graphify's 1906 (Fux's `important_globs` cover a fraction of the repo). Widen
+     Fux graph coverage to match before retiring.
+   - `docs/` — only 1 of 18 tracked docs (`anton-overview`) migrated to a `narrative`
+     entry; `WHAT/WHY/HOW/architecture/…` still authored only in `docs/`. And
+     `conventions.md`/`guardrails.md` **stay** (they seed the global layer, §11).
+   - home `memory/` — the 3 project memories *are* mirrored in `.fux/memory/shared/`,
+     but they're personal/cross-project; import-then-retire deliberately, not bulk.
+   **Gate:** widen graph coverage → migrate the narrative docs → then retire
+   `graphify-out/` + the migrated docs; handle memory last.
 
 ### Packaging & distribution (PyPI)
 

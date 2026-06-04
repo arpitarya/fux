@@ -26,7 +26,7 @@
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
-| Decommission old stores (graphify-out, memory/, docs) | ⬜ | Operational task in Anton/Wagner, not engine code — deferred until parity signed off |
+| Decommission old stores (graphify-out, memory/, docs) | ⬜ | **Not ready** (checked 2026-06-04): graph parity 329/1906 nodes, docs 1/18 migrated. See [plan §17.9](fux-plan.md) |
 
 Zero third-party runtime dependencies (stdlib only); requires Python ≥ 3.11.
 
