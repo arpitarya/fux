@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 110" width="440" height="110">
+  <defs>
+    <!-- background -->
+    <linearGradient id="lk-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="#121110"/>
+      <stop offset="100%" stop-color="#0a0a09"/>
+    </linearGradient>
+    <!-- vertical rule -->
+    <linearGradient id="lk-rule" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"   stop-color="rgba(255,255,255,0)"/>
+      <stop offset="50%"  stop-color="rgba(255,255,255,.14)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <!-- mark gradient -->
+    <linearGradient id="lk-mg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#D2F58F"/>
+      <stop offset="55%"  stop-color="#8FD13F"/>
+      <stop offset="100%" stop-color="#4C8A1B"/>
+    </linearGradient>
+    <clipPath id="lk-mc">
+      <rect x="12" y="10" width="40" height="44" rx="10"/>
+    </clipPath>
+    <filter id="lk-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&amp;family=Space+Mono&amp;display=swap');
+      .lk-eyebrow { font: 8.5px 'Space Mono', 'Courier New', monospace; letter-spacing: .34em; fill: #7a756b; }
+      .lk-name    { font: 700 30px 'Space Grotesk', 'Helvetica Neue', Arial, sans-serif; letter-spacing: .16em; fill: #f2efe9; }
+      .lk-role    { font: 10px 'Space Mono', 'Courier New', monospace; letter-spacing: .26em; fill: #9ed94a; }
+    </style>
+  </defs>
+
+  <!-- plate -->
+  <rect width="440" height="110" rx="14" fill="url(#lk-bg)" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+
+  <!-- mark: 74×74, vertically centred → y=18 -->
+  <svg x="34" y="18" width="74" height="74" viewBox="0 0 64 64" overflow="visible">
+    <defs>
+      <linearGradient id="lk-mg2" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%"   stop-color="#D2F58F"/>
+        <stop offset="55%"  stop-color="#8FD13F"/>
+        <stop offset="100%" stop-color="#4C8A1B"/>
+      </linearGradient>
+      <clipPath id="lk-mc2">
+        <rect x="12" y="10" width="40" height="44" rx="10"/>
+      </clipPath>
+    </defs>
+    <g filter="url(#lk-glow)">
+      <rect x="12" y="10" width="40" height="44" rx="10" fill="url(#lk-mg2)"/>
+      <g clip-path="url(#lk-mc2)">
+        <polygon points="12,10 32,10 12,30" fill="#fff" opacity=".15"/>
+        <polygon points="52,54 52,34 32,54" fill="#000" opacity=".17"/>
+      </g>
+      <path d="M26 10 L38 10 L38 33 L32 28 L26 33 Z" fill="#000" opacity=".26"/>
+      <rect x="19" y="42" width="26" height="3" rx="1.5" fill="#000" opacity=".24"/>
+      <rect x="19" y="48" width="17" height="3" rx="1.5" fill="#000" opacity=".24"/>
+    </g>
+  </svg>
+
+  <!-- vertical rule: x=130, margin 22px top+bottom → y=22..88 -->
+  <rect x="130" y="22" width="1" height="66" fill="url(#lk-rule)"/>
+
+  <!-- text block: x=153, centred on y=55 -->
+  <text x="153" y="30"  class="lk-eyebrow">ALPHA FORGE</text>
+  <text x="153" y="68"  class="lk-name">FUX</text>
+  <text x="153" y="88"  class="lk-role">KNOWLEDGE INDEX</text>
+</svg>

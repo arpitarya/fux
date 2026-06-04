@@ -11,24 +11,31 @@ from fux.model import RuleSet
 REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
 
 
-def _iter_sources(root: Path, important: list[str], ignore: list[str]):
+def _iter_sources(root: Path, include: list[str], ignore: list[str]):
     for path in sorted(root.rglob("*")):
         if not path.is_file():
             continue
         rel = path.relative_to(root).as_posix()
+        if rel.startswith(".fux/") or rel.startswith(".git/"):
+            continue
         if globs.match_any(rel, ignore):
             continue
-        if globs.match_any(rel, important):
+        if globs.match_any(rel, include):
             yield path, rel
 
 
-def build(root: Path, rs: RuleSet, cfg: dict) -> dict:
-    """Return a {nodes, edges, meta} graph dict (with community indices)."""
+def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
+    """Return a {nodes, edges, meta} graph dict (with community indices).
+
+    Graphs the files matching ``graph_globs`` (broader than ``important_globs``);
+    ``full=True`` widens to every non-ignored file — a whole-repo scan (plan §17.13).
+    """
     nodes: dict[str, dict] = {}
     edges: list[dict] = []
     texts: dict[str, str] = {}
     suffixes: dict[str, str] = {}
-    for path, rel in _iter_sources(root, cfg["important_globs"], cfg["ignore_globs"]):
+    src_globs = ["**/*"] if full else (cfg.get("graph_globs") or cfg["important_globs"])
+    for path, rel in _iter_sources(root, src_globs, cfg["ignore_globs"]):
         try:
             texts[rel] = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError):

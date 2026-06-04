@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="fux-g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"   stop-color="#D2F58F"/>
+      <stop offset="55%"  stop-color="#8FD13F"/>
+      <stop offset="100%" stop-color="#4C8A1B"/>
+    </linearGradient>
+    <clipPath id="fux-c">
+      <rect x="12" y="10" width="40" height="44" rx="10"/>
+    </clipPath>
+    <filter id="fux-glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <g filter="url(#fux-glow)">
+    <rect x="12" y="10" width="40" height="44" rx="10" fill="url(#fux-g)"/>
+    <g clip-path="url(#fux-c)">
+      <polygon points="12,10 32,10 12,30" fill="#fff" opacity=".15"/>
+      <polygon points="52,54 52,34 32,54" fill="#000" opacity=".17"/>
+    </g>
+    <path d="M26 10 L38 10 L38 33 L32 28 L26 33 Z" fill="#000" opacity=".26"/>
+    <rect x="19" y="42" width="26" height="3" rx="1.5" fill="#000" opacity=".24"/>
+    <rect x="19" y="48" width="17" height="3" rx="1.5" fill="#000" opacity=".24"/>
+  </g>
+</svg>

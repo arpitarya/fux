@@ -7,7 +7,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | Command | What it does | Cost |
 |---|---|---|
 | `fux init [--recall]` | Scaffold `.fux/` footprint, wire the 3 core hooks into `.claude/settings.json`, drop a CLAUDE.md pointer. `--recall` also wires the optional UserPromptSubmit recall hook. | $0 |
-| `fux build` | Regenerate `.fux/out/INDEX.md` + `rules.json` + `graph.json` + `graph.html` from source frontmatter. | $0 |
+| `fux build [--full]` | Regenerate `INDEX.md` + `rules.json` + graph + `NARRATIVE.md`. Graphs files matching `graph_globs` (broader than `important_globs`); `--full` graphs every non-ignored file. | $0 |
 | `fux check [--fix]` | Validate schema, dead `code_refs`, git-staleness, and conflicts; write `DRIFT.md`. `--fix` applies mechanical repairs (drop dead refs, bump `updated`). Exit 2 under `strict` mode with blocking findings. | $0 |
 | `fux context` | Emit the compact Tier-1 INDEX (global ⊕ packs ⊕ project) — the SessionStart injection. | $0 |
 | `fux recall "Q" [--top N] [--hybrid]` | BM25-lite lexical retrieval (frontmatter-weighted). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity (still `$0`). | $0 |
@@ -23,6 +23,9 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux mcp` | Serve the read paths + `query`/`trace`/draft-`new` to agents over MCP (stdio JSON-RPC, stdlib-only). | $0 |
 | `fux capture [--list] [--clear]` | Session observation queue (changed files, governed vs uncovered) that `fux distill` consumes. Wired into the Stop hook when `capture = true`. | $0 |
 | `fux serve [--port N]` | Local `http.server` dashboard: the `stats` health summary + links to `graph.html`/reports. | $0 |
+| `fux import <path…> [--type T] [--domain D] [--force]` | Ingest existing markdown files/dirs as `narrative` (default) entries — the one-pass `docs/` migration. | $0 |
+| `fux import-memory [--scope shared\|personal] [--force]` | Mirror Claude's home-dir `memory/*.md` for this project into `.fux/memory/<scope>/`. | $0 |
+| `fux parity` | Decommission readiness: graph coverage vs `graphify-out/`, `docs/` not yet `narrative`, home-memory not yet imported. Exit 1 until READY. | $0 |
 | `fux tour` | Emit an ordered `ONBOARDING.md` reading path from the rules. | $0 |
 | `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
 | `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |

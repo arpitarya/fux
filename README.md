@@ -69,6 +69,8 @@ fux gate --install             # wire a git pre-commit enforcement hook
 fux mcp                        # serve the substrate to agents over MCP (stdio)
 fux capture                    # queue this session's changes for `fux distill`
 fux serve                      # local dashboard over the generated views
+fux import docs/               # migrate existing markdown → narrative entries
+fux parity                     # is it safe to retire the old graph/docs/memory?
 fux tour                       # ordered ONBOARDING.md
 ```
 

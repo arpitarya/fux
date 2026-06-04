@@ -3,8 +3,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fux import (build, check, config, context, fix, gate, initcmd, mcpserver,
-                 paths, serve)
+from fux import (build, check, config, context, fix, gate, importer, initcmd,
+                 mcpserver, paths, serve)
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -18,8 +18,8 @@ def cmd_init(args) -> int:
     return 0
 
 
-def cmd_build(_args) -> int:
-    s = build.run(root())
+def cmd_build(args) -> int:
+    s = build.run(root(), full=getattr(args, "full", False))
     print(f"✔ Built: {s['active']} active rules · {s['code_files']} code files · "
           f"{s['edges']} edges · {s['communities']} communities → {s['out']}")
     return 0
@@ -65,3 +65,28 @@ def cmd_mcp(_args) -> int:
 
 def cmd_serve(args) -> int:
     return serve.serve(root(), port=args.port)
+
+
+def cmd_import(args) -> int:
+    created, skipped = importer.import_docs(root(), args.paths, rtype=args.type,
+                                            domain=args.domain, force=args.force)
+    for p in created:
+        print(f"✔ imported → {p}")
+    if skipped:
+        print(f"· skipped {len(skipped)} existing (use --force to overwrite)")
+    if created:
+        print(f"Next: review the {len(created)} entr(y/ies), set `code_refs`, then `fux build`.")
+    elif not skipped:
+        print("fux: no .md files found to import.")
+    return 0
+
+
+def cmd_import_memory(args) -> int:
+    created, skipped = importer.import_memory(root(), scope=args.scope, force=args.force)
+    for p in created:
+        print(f"✔ imported memory → {p}")
+    if skipped:
+        print(f"· skipped {len(skipped)} existing (use --force to overwrite)")
+    if not created and not skipped:
+        print("fux: no home-dir memory found for this project.")
+    return 0

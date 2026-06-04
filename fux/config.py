@@ -13,6 +13,14 @@ DEFAULTS = {
     "mode": "fix",
     "packs": [],
     "important_globs": ["**/*.py", "**/*.ts", "**/*.tsx", "**/*.go", "**/*.rs"],
+    # What `fux build` graphs — broader than important_globs (the coverage target),
+    # so the graph can match a whole-repo scan (plan §17.13). `fux build --full`
+    # widens this to every non-ignored file.
+    "graph_globs": ["**/*.py", "**/*.pyi", "**/*.ts", "**/*.tsx", "**/*.js",
+                    "**/*.jsx", "**/*.mjs", "**/*.go", "**/*.rs", "**/*.java",
+                    "**/*.rb", "**/*.php", "**/*.c", "**/*.h", "**/*.cc",
+                    "**/*.cpp", "**/*.hpp", "**/*.cs", "**/*.kt", "**/*.swift",
+                    "**/*.scala", "**/*.sh"],
     "ignore_globs": ["**/node_modules/**", "**/.venv/**", "**/dist/**", "**/build/**"],
     "use_global": True,
     "recall_rerank": False,   # phase-2 opt-in local embeddings (recall-engine.compare.md)
@@ -46,6 +54,10 @@ def default_toml() -> str:
         "use_global = true\n\n"
         "# Files that should ideally have a governing rule (fux coverage)\n"
         'important_globs = ["**/*.py", "**/*.ts", "**/*.tsx"]\n'
+        "# What `fux build` graphs — broaden toward a whole-repo scan (plan §17.13);\n"
+        "# `fux build --full` graphs every non-ignored file. Empty = use important_globs.\n"
+        'graph_globs = ["**/*.py", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", '
+        '"**/*.go", "**/*.rs"]\n'
         'ignore_globs = ["**/node_modules/**", "**/.venv/**", "**/dist/**"]\n\n'
         "# Phase-2 local embedding re-rank for recall (no API). Off by default.\n"
         "recall_rerank = false\n\n"

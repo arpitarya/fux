@@ -13,7 +13,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 22 commands wired in [fux/cli.py](fux/cli.py) |
+| Core CLI surface (plan §9) | ✅ | 25 commands wired in [fux/cli.py](fux/cli.py) |
 | Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
@@ -26,7 +26,8 @@
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
-| Decommission old stores (graphify-out, memory/, docs) | ⬜ | **Not ready** (checked 2026-06-04): graph parity 329/1906 nodes, docs 1/18 migrated. See [plan §17.9](fux-plan.md) |
+| Decommission tooling (graph coverage, import, parity) | ✅ | `build --full`, `import`/`import-memory`, `fux parity` gate — see §2.20 |
+| Decommission old stores in Anton | ⬜ | Tooling shipped; run it against Anton then retire when `fux parity` is READY ([plan §17.9](fux-plan.md)) |
 
 Zero third-party runtime dependencies (stdlib only); requires Python ≥ 3.11.
 
@@ -42,7 +43,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | Command | Status | Module |
 |---|---|---|
 | `fux init [--recall]` | ✅ | [fux/clicmds.py](fux/clicmds.py), [fux/initcmd.py](fux/initcmd.py), [fux/scaffold.py](fux/scaffold.py) |
-| `fux build` | ✅ | [fux/build.py](fux/build.py) |
+| `fux build [--full]` | ✅ | [fux/build.py](fux/build.py), [fux/graph.py](fux/graph.py) |
 | `fux check [--fix]` | ✅ | [fux/check.py](fux/check.py), [fux/fix.py](fux/fix.py) |
 | `fux context` | ✅ | [fux/context.py](fux/context.py) |
 | `fux recall "Q" [--top N] [--hybrid]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
@@ -58,6 +59,9 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux mcp` | ✅ | [fux/mcpserver.py](fux/mcpserver.py) |
 | `fux capture [--list] [--clear]` | ✅ | [fux/capture.py](fux/capture.py) |
 | `fux serve [--port N]` | ✅ | [fux/serve.py](fux/serve.py) |
+| `fux import <path…>` | ✅ | [fux/importer.py](fux/importer.py) |
+| `fux import-memory [--scope]` | ✅ | [fux/importer.py](fux/importer.py) |
+| `fux parity` | ✅ | [fux/parity.py](fux/parity.py) |
 | `fux tour` | ✅ | [fux/tour.py](fux/tour.py) |
 | `fux query "Q" [--depth N]` | ✅ | [fux/cligraph.py](fux/cligraph.py), [fux/graphquery.py](fux/graphquery.py) |
 | `fux path <a> <b>` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
@@ -277,13 +281,38 @@ Covered by [tests/test_hybrid.py](tests/test_hybrid.py),
 [tests/test_mcp_extra.py](tests/test_mcp_extra.py),
 [tests/test_serve_sanitize.py](tests/test_serve_sanitize.py).
 
-### 2.18 Packaging & install — ✅
+### 2.18 Decommission-unblocking parity work — ✅ (plan §17.13–17)
+
+The engine capability needed before Anton's old stores can be safely retired —
+each maps to a readiness blocker, all `$0`:
+
+- **Full-repo graph coverage** ([fux/graph.py](fux/graph.py), [fux/config.py](fux/config.py))
+  — `graph_globs` decoupled from `important_globs`: `fux build` graphs the broad
+  set (so the graph approaches a whole-repo scan, closing the 329/1906 gap),
+  `coverage` keeps the narrow target. `fux build --full` graphs every non-ignored
+  file (`.fux/`/`.git/` always skipped).
+- **`fux import`** ([fux/importer.py](fux/importer.py)) — ingest existing markdown
+  files/dirs as `narrative` entries (frontmatter stamped, body preserved); the
+  one-pass `docs/` migration. Skips existing without `--force`.
+- **Narrative rendering** ([fux/narrative.py](fux/narrative.py)) — `fux build`
+  writes `NARRATIVE.md` (TOC + bodies), linked from `fux serve` — §11's "browsable
+  view" delivered, so `docs/` has a real destination.
+- **`fux import-memory`** ([fux/importer.py](fux/importer.py)) — mirror Claude's
+  home-dir `memory/*.md` into `.fux/memory/<scope>/`, normalising `subtype`/`scope`.
+- **`fux parity`** ([fux/parity.py](fux/parity.py)) — the measurable gate: graph
+  coverage vs `graphify-out/graph.json`, `docs/` not yet `narrative` (excluding the
+  STAY-listed `conventions`/`guardrails`), home-memory not yet imported, with a
+  `READY`/`NOT READY` verdict (exit 1 until ready).
+
+Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
+
+### 2.19 Packaging & install — ✅
 
 - [install.sh](install.sh) installs **editable** (`pip -e`) → `~/.claude/fux/{engine,global,packs,hooks}` + skills.
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.19 Tests — ✅ (70 tests)
+### 2.20 Tests — ✅ (78 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -295,8 +324,10 @@ extended verify examples ([test_examples.py](tests/test_examples.py)), the
 ([test_lint_stats_gate.py](tests/test_lint_stats_gate.py)), **capture + governance**
 ([test_capture_governance.py](tests/test_capture_governance.py)), the MCP server +
 expanded tools ([test_mcp.py](tests/test_mcp.py), [test_mcp_extra.py](tests/test_mcp_extra.py)),
-and the graph-HTML render + **serve/sanitizer**
-([test_graphhtml.py](tests/test_graphhtml.py), [test_serve_sanitize.py](tests/test_serve_sanitize.py)).
+the graph-HTML render + **serve/sanitizer**
+([test_graphhtml.py](tests/test_graphhtml.py), [test_serve_sanitize.py](tests/test_serve_sanitize.py)),
+and **graph coverage / import / narrative / parity**
+([test_parity_import.py](tests/test_parity_import.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
 ---
@@ -320,19 +351,21 @@ The full roadmap lives in **[fux-plan.md §17](fux-plan.md)**. The **engine item
 governance, the recall benchmark, expanded MCP, `fux serve`, and the
 block-comment-aware sanitizer (see §2.7 and §2.17 above).
 
-What remains is **operational, not engine code in this repo**:
+What remains is **operational, not engine code in this repo** — the decommission
+*tooling* now exists (§2.18), so these are runs against Anton, not engine gaps:
 
 - ⬜ **Anton brokers pilot** — ground real broker rules in
   `backend/app/modules/brokers/`, wire `verify`/`gate` into `probes/` + `just`,
   measure with `coverage`/`savings`.
-- ⬜ **Phase-7 decommission** — retire `graphify-out/`, home-dir `memory/`, migrated
-  `docs/` in Anton once parity is signed off.
+- ⬜ **Run the decommission** — in Anton: `fux build --full` → `fux import docs/`
+  → `fux import-memory`, watching `fux parity` until READY, then retire
+  `graphify-out/` + the migrated `docs/`.
 
 Planned (engine, see [fux-plan.md §17.10–12](fux-plan.md)):
 
 - ⬜ **PyPI packaging** — bundle `schema.json`/`hooks`/`global`/`skills` as package
-  data, add a `fux setup` command (port `install.sh`'s global steps), and a
-  Trusted-Publishing release workflow → `pipx install fux-engine && fux setup`.
+  data, add a `fux setup` command, and a Trusted-Publishing release workflow →
+  `pipx install fux-engine && fux setup`.
 
 Possible follow-ups (not blocking): cross-**file** call edges for more languages;
 auto-suggest `supersedes:` on memory contradiction.

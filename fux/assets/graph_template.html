@@ -13,8 +13,7 @@
   #side { position: fixed; top: 0; left: 0; width: 290px; height: 100%;
           background: var(--panel); border-right: 1px solid var(--line); padding: 14px 14px 40px;
           overflow-y: auto; scrollbar-width: thin; }
-  h1 { font-size: 15px; margin: 0 0 2px; display:flex; align-items:center; gap:6px; }
-  h1 .dot { width:9px;height:9px;border-radius:50%;background:var(--accent); }
+  h1 { font-size: 15px; margin: 0 0 2px; display:flex; align-items:center; gap:7px; }
   h2 { font-size: 11px; text-transform: uppercase; letter-spacing:.06em;
        color: var(--muted); margin: 16px 0 6px; border-bottom:1px solid var(--line); padding-bottom:3px; }
   .muted { color: var(--muted); font-size: 11px; }
@@ -51,7 +50,7 @@
 </head>
 <body>
 <div id="side">
-  <h1><span class="dot"></span>Fux graph</h1>
+  <h1><svg width="20" height="20" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" style="display:block;flex:none;filter:drop-shadow(0 0 6px #9ed94a55)"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#D2F58F"/><stop offset="55%" stop-color="#8FD13F"/><stop offset="100%" stop-color="#4C8A1B"/></linearGradient><clipPath id="hc"><rect x="12" y="10" width="40" height="44" rx="10"/></clipPath></defs><rect x="12" y="10" width="40" height="44" rx="10" fill="url(#hg)"/><g clip-path="url(#hc)"><polygon points="12,10 32,10 12,30" fill="#fff" opacity=".15"/><polygon points="52,54 52,34 32,54" fill="#000" opacity=".17"/></g><path d="M26 10 L38 10 L38 33 L32 28 L26 33 Z" fill="#000" opacity=".26"/><rect x="19" y="42" width="26" height="3" rx="1.5" fill="#000" opacity=".24"/><rect x="19" y="48" width="17" height="3" rx="1.5" fill="#000" opacity=".24"/></svg>Fux graph</h1>
   <div class="muted" id="stats"></div>
   <input type="search" id="q" placeholder="search nodes…  ( / )" />
   <div class="muted" id="qhits"></div>

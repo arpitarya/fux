@@ -122,6 +122,24 @@ The plan §17 engine items, all opt-in and `$0` (defaults unchanged):
   blanking strings/templates and `//` + multi-line `/* */` comments before brace
   matching, replacing the old per-line regex.
 
+## Update — decommission-unblocking parity work (§17.13–17)
+
+The 2026-06-04 readiness check found the decommission blocked by missing engine
+capability (Fux couldn't *match* the stores it replaces), so retiring would lose
+data. Built the tooling that makes "parity signed off" measurable, all `$0`:
+
+- **`graph_globs`** (`fux/config.py`, `fux/graph.py`) — decoupled from
+  `important_globs`; `fux build` graphs the broad set, `fux build --full` graphs
+  every non-ignored file (`.fux/`/`.git/` skipped). Closes the 329-vs-1906 gap.
+- **`fux import` / `import-memory`** (`fux/importer.py`) — ingest existing markdown
+  as `narrative` entries and home-dir memory as `memory` entries (frontmatter
+  stamped, bodies preserved, skip-existing).
+- **Narrative rendering** (`fux/narrative.py`) — `NARRATIVE.md` on build, linked
+  from `fux serve`.
+- **`fux parity`** (`fux/parity.py`) — graph coverage vs `graphify-out/graph.json`,
+  unmigrated `docs/` (minus STAY-listed conventions/guardrails), unimported memory;
+  `READY`/`NOT READY` verdict, exit 1 until ready. The gate for §17.9.
+
 Still future work: cross-**file** call edges for non-Python languages (today:
 intra-file calls + heuristic cross-file references), block-comment / multiline
 template-literal awareness in the brace matcher, and the phase-7 decommission
