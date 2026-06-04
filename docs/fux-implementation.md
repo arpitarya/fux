@@ -328,8 +328,14 @@ What remains is **operational, not engine code in this repo**:
 - ⬜ **Phase-7 decommission** — retire `graphify-out/`, home-dir `memory/`, migrated
   `docs/` in Anton once parity is signed off.
 
-Possible engine follow-ups (not blocking): cross-**file** call edges for more
-languages; auto-suggest `supersedes:` on memory contradiction.
+Planned (engine, see [fux-plan.md §17.10–12](fux-plan.md)):
+
+- ⬜ **PyPI packaging** — bundle `schema.json`/`hooks`/`global`/`skills` as package
+  data, add a `fux setup` command (port `install.sh`'s global steps), and a
+  Trusted-Publishing release workflow → `pipx install fux-engine && fux setup`.
+
+Possible follow-ups (not blocking): cross-**file** call edges for more languages;
+auto-suggest `supersedes:` on memory contradiction.
 - ⬜ **Graph hardening** — block-comment / multiline-template awareness in the brace
   matcher; cross-file call edges for more languages.
 

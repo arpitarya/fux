@@ -619,6 +619,36 @@ define the plan artifact's required sections *before* `plan` is built.
 9. ⬜ **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
    migrated `docs/` in Anton once parity is signed off (§13.7).
 
+### Packaging & distribution (PyPI)
+
+> **Why:** Fux is stdlib-only and already shaped as a package
+> ([pyproject.toml](../pyproject.toml): dist `fux-engine`, `fux = "fux.cli:main"`,
+> `[embeddings]` extra) — the ideal PyPI profile (no runtime deps, tiny wheel). The
+> blocker is that the **integration layer lives outside the `fux/` package**, so a
+> wheel currently ships only the CLI. Fix that, then `pipx install fux-engine`
+> becomes the install path. Constraint: stays stdlib-only — `[embeddings]` remains
+> the only (opt-in) extra; no runtime dependency is added.
+
+10. ⬜ **Bundle the data into the package.** Today `package-data` only ships
+    `templates/` + `assets/`; `schema.json`, `hooks/`, `global/`, and `skills/` sit
+    at the repo root and are absent from a wheel — so `fux init` would fail schema
+    validation and ship no `/fux` skill/hooks. Relocate/bundle them as package data
+    and resolve `schema.json` from the package first ([paths.py](../fux/paths.py)).
+11. ⬜ **`fux setup` command.** Port `install.sh`'s global steps (scaffold
+    `~/.claude/fux/{engine,global,packs,hooks}`, install skills, seed the global git
+    repo) into an idempotent subcommand sourcing the **bundled** data, so the
+    install story is `pipx install fux-engine && fux setup`. `install.sh` becomes
+    `pip install -e . && fux setup` for contributors (editable/live-reflect kept).
+12. ⬜ **Release workflow.** GitHub Actions + PyPI **Trusted Publishing** (OIDC, no
+    token); `python -m build`; tag `vX.Y.Z`. Keep dist name `fux-engine` (the bare
+    `fux` name appears unclaimed on PyPI — optionally grab it; the import package
+    stays `fux`). Add `pipx`/`uvx` usage to the README.
+
+> **Sequencing:** items 10–11 are the right architecture regardless and remove the
+> only blocker — do them first. Gate the **public** `0.1.0` release (12) on the
+> Anton pilot (item 7) so the README can lead with measured `fux savings`/`coverage`
+> from a real project, not a toy.
+
 ### Explicitly *not* doing
 
 - Becoming a conversational-memory vendor (Mem0/Zep/Letta). Fux may *interoperate*
