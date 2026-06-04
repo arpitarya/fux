@@ -47,8 +47,8 @@ affected doc reflect it. If you're unsure a doc is affected, check it.
   the viewer in `assets/`; recall in `recall`/`embed`/`hybrid` + `bench`; verify
   in `verify`/`vexamples`; quality/health/enforcement in `lint`/`stats`/`gate`;
   cost in `savings`; memory capture/governance in `capture`/`governance`; agent
-  integration in `mcpserver`; dashboard in `serve`; hooks in
-  `hooks`/`touch`/`hookio`.
+  integration in `mcpserver`; dashboard in `serve`; migration/decommission in
+  `importer`/`narrative`/`parity`; hooks in `hooks`/`touch`/`hookio`.
 - `hooks/` — shell hook wrappers wired into a project by `fux init`.
 - `global/` — seed best-practice rules shared across projects.
 - `skills/` — workflow skill docs (`plan`/`adr`/`trace`/`savings`); only

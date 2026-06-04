@@ -1,8 +1,8 @@
 """Read-only query command handlers (recall/why/refs/new/coverage/verify/tour)."""
 from __future__ import annotations
 
-from fux import (capture, coverage, explain, lint, recall, savings, scaffold,
-                 stats, tour, verify)
+from fux import (capture, coverage, explain, lint, parity, recall, savings,
+                 scaffold, stats, tour, verify)
 from fux.cliutil import root
 
 
@@ -76,6 +76,12 @@ def cmd_lint(args) -> int:
 def cmd_stats(_args) -> int:
     print(stats.render(stats.build(root())))
     return 0
+
+
+def cmd_parity(_args) -> int:
+    p = parity.build(root())
+    print(parity.render(p))
+    return 0 if p.ready() else 1
 
 
 def cmd_capture(args) -> int:

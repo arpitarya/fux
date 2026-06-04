@@ -628,7 +628,8 @@ define the plan artifact's required sections *before* `plan` is built.
    - home `memory/` — the 3 project memories *are* mirrored in `.fux/memory/shared/`,
      but they're personal/cross-project; import-then-retire deliberately, not bulk.
    **Gate:** widen graph coverage → migrate the narrative docs → then retire
-   `graphify-out/` + the migrated docs; handle memory last.
+   `graphify-out/` + the migrated docs; handle memory last. The engine work that
+   makes each step possible (and the gate measurable) is **items 13–17 below**.
 
 ### Packaging & distribution (PyPI)
 
@@ -659,6 +660,37 @@ define the plan artifact's required sections *before* `plan` is built.
 > only blocker — do them first. Gate the **public** `0.1.0` release (12) on the
 > Anton pilot (item 7) so the README can lead with measured `fux savings`/`coverage`
 > from a real project, not a toy.
+
+### Unblocking decommission (parity engine work)
+
+> The 2026-06-04 readiness check (§17.9) found the decommission isn't blocked by
+> *policy* but by **missing engine capability** — Fux can't yet *match* the stores
+> it claims to replace, so retiring them would lose data. Each blocker maps to a
+> concrete feature; with these built, "parity signed off" is now **measurable** via
+> `fux parity`. All `$0`, deterministic. **Status: shipped — the remaining work is
+> running them against Anton (item 7).**
+
+13. ✅ **Full-repo graph coverage.** `graph_globs` ([config.py](../fux/config.py)) is
+    decoupled from `important_globs` — `fux build` graphs the broad set, `coverage`
+    keeps the narrow one; `fux build --full` widens to every non-ignored file
+    ([graph.py](../fux/graph.py) `_iter_sources` skips `.fux/`/`.git/`).
+14. ✅ **`fux import <path…>` — docs → `narrative`.** [importer.py](../fux/importer.py)
+    `import_docs` ingests markdown files/dirs as `narrative` entries (frontmatter
+    stamped, body preserved); skips existing without `--force`.
+15. ✅ **Narrative rendering.** [narrative.py](../fux/narrative.py) renders a
+    `NARRATIVE.md` (TOC + bodies) on `fux build`, linked from `fux serve`.
+16. ✅ **`fux import-memory`.** `importer.import_memory` mirrors home-dir
+    `~/.claude/.../memory/*.md` into `.fux/memory/<scope>/`, normalising
+    `subtype`/`scope` and skipping the `MEMORY.md` index.
+17. ✅ **`fux parity` (measurable gate).** [parity.py](../fux/parity.py) reports
+    graph coverage vs `graphify-out/graph.json`, `docs/` not yet `narrative`
+    (excluding the STAY-listed `conventions`/`guardrails`), and home-memory not yet
+    imported — with a `READY`/`NOT READY` verdict (exit 1 until ready). **This is the
+    gate that says when it is safe to delete.**
+
+> **Order to retire Anton's stores (now tool-backed):** `fux build --full` until
+> `fux parity` graph ✓ → `fux import docs/` + rebuild until docs ✓ →
+> `fux import-memory` until memory ✓ → then §17.9's retirement is a green-light.
 
 ### Explicitly *not* doing
 

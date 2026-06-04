@@ -26,6 +26,12 @@ def schema_path() -> Path:
     return installed if installed.exists() else Path(__file__).parent.parent / "schema.json"
 
 
+def home_memory_dir(root: Path) -> Path:
+    """Claude's home-dir cross-session memory for a project (plan §17.16)."""
+    slug = str(root.resolve()).replace("/", "-")
+    return claude_home() / "projects" / slug / "memory"
+
+
 def find_project_root(start: Path | None = None) -> Path | None:
     """Walk up from ``start`` to the dir containing a ``.fux/`` footprint."""
     cur = (start or Path.cwd()).resolve()

@@ -15,7 +15,9 @@ def build_parser() -> argparse.ArgumentParser:
     init.add_argument("--recall", action="store_true", help="also wire the UserPromptSubmit recall hook")
     init.set_defaults(fn=clicmds.cmd_init)
 
-    sub.add_parser("build", help="regenerate INDEX + rules.json + graph ($0)").set_defaults(fn=clicmds.cmd_build)
+    bld = sub.add_parser("build", help="regenerate INDEX + rules.json + graph ($0)")
+    bld.add_argument("--full", action="store_true", help="graph every non-ignored file (whole-repo)")
+    bld.set_defaults(fn=clicmds.cmd_build)
     chk = sub.add_parser("check", help="validate schema/refs/staleness/conflicts")
     chk.add_argument("--fix", action="store_true", help="apply mechanical $0 repairs")
     chk.set_defaults(fn=clicmds.cmd_check)
@@ -72,6 +74,20 @@ def build_parser() -> argparse.ArgumentParser:
     srv = sub.add_parser("serve", help="local dashboard over the generated views ($0)")
     srv.add_argument("--port", type=int, default=8765)
     srv.set_defaults(fn=clicmds.cmd_serve)
+
+    imp = sub.add_parser("import", help="import existing markdown as narrative entries")
+    imp.add_argument("paths", nargs="+", help="files or directories of .md to import")
+    imp.add_argument("--type", default="narrative", help="entry type (default: narrative)")
+    imp.add_argument("--domain", default="general")
+    imp.add_argument("--force", action="store_true", help="overwrite existing entries")
+    imp.set_defaults(fn=clicmds.cmd_import)
+
+    impm = sub.add_parser("import-memory", help="import Claude's home-dir memory into .fux/memory")
+    impm.add_argument("--scope", choices=["shared", "personal"], default="shared")
+    impm.add_argument("--force", action="store_true")
+    impm.set_defaults(fn=clicmds.cmd_import_memory)
+
+    sub.add_parser("parity", help="decommission readiness vs graphify-out/docs/memory").set_defaults(fn=cliquery.cmd_parity)
 
     q = sub.add_parser("query", help="traverse the graph from rules matching a question")
     q.add_argument("query")
