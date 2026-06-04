@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 
@@ -27,8 +28,12 @@ def schema_path() -> Path:
 
 
 def home_memory_dir(root: Path) -> Path:
-    """Claude's home-dir cross-session memory for a project (plan §17.16)."""
-    slug = str(root.resolve()).replace("/", "-")
+    """Claude's home-dir cross-session memory for a project (plan §17.16).
+
+    Claude slugifies the absolute project path by replacing every non-alphanumeric
+    run with ``-`` (so ``/Users/a/my_programs/anton`` → ``-Users-a-my-programs-anton``
+    — underscores become hyphens too, not just slashes)."""
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", str(root.resolve()))
     return claude_home() / "projects" / slug / "memory"
 
 

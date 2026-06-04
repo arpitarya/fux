@@ -299,10 +299,11 @@ each maps to a readiness blocker, all `$0`:
   view" delivered, so `docs/` has a real destination.
 - **`fux import-memory`** ([fux/importer.py](fux/importer.py)) — mirror Claude's
   home-dir `memory/*.md` into `.fux/memory/<scope>/`, normalising `subtype`/`scope`.
-- **`fux parity`** ([fux/parity.py](fux/parity.py)) — the measurable gate: graph
-  coverage vs `graphify-out/graph.json`, `docs/` not yet `narrative` (excluding the
-  STAY-listed `conventions`/`guardrails`), home-memory not yet imported, with a
-  `READY`/`NOT READY` verdict (exit 1 until ready).
+- **`fux parity`** ([fux/parity.py](fux/parity.py)) — the measurable gate: coverage
+  of **current** source files by the graph (not a node-count match against a
+  possibly stale `graphify-out/`, which it flags), `docs/` not yet `narrative`
+  (excluding `conventions`/`guardrails` + `parity_stay`), home-memory not yet
+  imported (the home-dir slug fix handles `_`→`-`), `READY`/`NOT READY`, exit 1.
 
 Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 
@@ -312,7 +313,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (78 tests)
+### 2.20 Tests — ✅ (80 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges

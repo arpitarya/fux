@@ -25,7 +25,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux serve [--port N]` | Local `http.server` dashboard: the `stats` health summary + links to `graph.html`/reports. | $0 |
 | `fux import <path…> [--type T] [--domain D] [--force]` | Ingest existing markdown files/dirs as `narrative` (default) entries — the one-pass `docs/` migration. | $0 |
 | `fux import-memory [--scope shared\|personal] [--force]` | Mirror Claude's home-dir `memory/*.md` for this project into `.fux/memory/<scope>/`. | $0 |
-| `fux parity` | Decommission readiness: graph coverage vs `graphify-out/`, `docs/` not yet `narrative`, home-memory not yet imported. Exit 1 until READY. | $0 |
+| `fux parity` | Decommission readiness: coverage of current source files by the graph, `docs/` not yet `narrative` (minus `conventions`/`guardrails`/`parity_stay`), home-memory not yet imported; flags a stale `graphify-out/`. Exit 1 until READY. | $0 |
 | `fux tour` | Emit an ordered `ONBOARDING.md` reading path from the rules. | $0 |
 | `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
 | `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |
