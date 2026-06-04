@@ -27,6 +27,7 @@ DEFAULTS = {
     "recall_hybrid": False,   # opt-in RRF fusion of lexical ⊕ semantic ⊕ graph (§17.1)
     "capture": False,         # opt-in Stop-hook session capture for distill (§17.2)
     "memory_ttl_days": 180,   # type: memory decays after this many untouched days (§17.3)
+    "parity_stay": [],        # docs that stay/are out-of-scope for `fux parity` (§17.17)
 }
 
 
@@ -66,5 +67,8 @@ def default_toml() -> str:
         "# Opt-in Stop-hook session capture → queue observations for `fux distill`.\n"
         "capture = false\n\n"
         "# type: memory entries decay (excluded from `fux context`) after N days.\n"
-        "memory_ttl_days = 180\n"
+        "memory_ttl_days = 180\n\n"
+        "# Docs that stay / are out-of-scope for `fux parity` (beyond conventions,\n"
+        "# guardrails) — e.g. process docs that get deleted, not migrated to narrative.\n"
+        "parity_stay = []\n"
     )

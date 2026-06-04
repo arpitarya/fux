@@ -89,7 +89,26 @@ def test_parity_reports_not_ready_with_unmigrated_docs(project):
     assert not p.docs_ok() and not p.ready()
 
 
-def test_parity_graph_ok_when_no_legacy_store(project):
+def test_parity_graph_measures_current_file_coverage(project):
+    (project / "src" / "app.py").write_text("def main():\n    return 1\n")
     build.run(project)
     p = parity.build(project)
-    assert p.graph_legacy is None and p.graph_ok()
+    assert p.graph_current >= 1 and p.graph_covered == p.graph_current  # 100% of current
+    assert p.legacy_nodes is None and p.graph_ok()
+
+
+def test_parity_stay_excludes_configured_docs(project):
+    cfg = project / ".fux" / "config.toml"
+    cfg.write_text(cfg.read_text() + '\nparity_stay = ["fux-plan"]\n')
+    (project / "docs").mkdir()
+    (project / "docs" / "fux-plan.md").write_text("# Plan\n\nmeta\n")
+    build.run(project)
+    p = parity.build(project)
+    assert "fux-plan.md" not in p.docs_unmigrated      # excluded via parity_stay
+
+
+def test_home_memory_slug_hyphenates_underscores(tmp_path):
+    p = tmp_path / "my_programs" / "anton"
+    slug = paths.home_memory_dir(p).parent.name
+    assert "_" not in slug and "/" not in slug
+    assert slug.endswith("my-programs-anton")

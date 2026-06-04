@@ -682,11 +682,13 @@ define the plan artifact's required sections *before* `plan` is built.
 16. ✅ **`fux import-memory`.** `importer.import_memory` mirrors home-dir
     `~/.claude/.../memory/*.md` into `.fux/memory/<scope>/`, normalising
     `subtype`/`scope` and skipping the `MEMORY.md` index.
-17. ✅ **`fux parity` (measurable gate).** [parity.py](../fux/parity.py) reports
-    graph coverage vs `graphify-out/graph.json`, `docs/` not yet `narrative`
-    (excluding the STAY-listed `conventions`/`guardrails`), and home-memory not yet
-    imported — with a `READY`/`NOT READY` verdict (exit 1 until ready). **This is the
-    gate that says when it is safe to delete.**
+17. ✅ **`fux parity` (measurable gate).** [parity.py](../fux/parity.py) asks the
+    question that matters — *is any current source file invisible to the graph?*
+    (coverage of `graph_globs` files, not a node-count match against a possibly
+    **stale** `graphify-out/`) — plus `docs/` not yet `narrative` (excluding
+    `conventions`/`guardrails` and any `parity_stay`) and home-memory not yet
+    imported. `READY`/`NOT READY`, exit 1 until ready. It also flags a stale legacy
+    graph. **This is the gate that says when it is safe to delete.**
 
 > **Order to retire Anton's stores (now tool-backed):** `fux build --full` until
 > `fux parity` graph ✓ → `fux import docs/` + rebuild until docs ✓ →
