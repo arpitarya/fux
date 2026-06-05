@@ -4,7 +4,7 @@ from __future__ import annotations
 # Stable key order so diffs stay clean across regenerations.
 ORDER = ["id", "domain", "type", "subtype", "scope", "status", "created",
          "updated", "author", "aliases", "keywords", "code_refs", "related",
-         "edges", "check", "examples"]
+         "edges", "seal", "check", "examples"]
 
 
 def dump(fm: dict, body: str) -> str:

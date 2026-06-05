@@ -16,6 +16,7 @@ def render(graph: dict) -> str:
              f"{meta.get('communities', 0)} communities._", ""]
     lines += _types(nodes)
     lines += _god(graph, by_id)
+    lines += _chokepoints(graph, by_id)
     lines += _communities(nodes)
     return "\n".join(lines).rstrip() + "\n"
 
@@ -34,6 +35,17 @@ def _god(graph: dict, by_id: dict) -> list[str]:
             continue
         n = by_id[nid]
         out.append(f"- **{n.get('label', nid)}** ({n['type']}) — {deg} edges")
+    return out + [""]
+
+
+def _chokepoints(graph: dict, by_id: dict) -> list[str]:
+    """Architectural centrality (PageRank) — bridges a raw degree count misses."""
+    out = ["## Chokepoints (PageRank centrality)", ""]
+    for nid, score in graphquery.chokepoints(graph, 12):
+        n = by_id.get(nid)
+        if n is None or score <= 0:
+            continue
+        out.append(f"- **{n.get('label', nid)}** ({n['type']}) — {score:.4f}")
     return out + [""]
 
 

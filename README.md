@@ -57,12 +57,14 @@ fux init                       # scaffold .fux/ + wire 3 hooks + CLAUDE.md point
 fux new formula day-pnl        # scaffold a rule; fill **Rule:/Why:/Edge cases:**
 fux build                      # regenerate INDEX.md + rules.json + graph   ($0)
 fux check --fix                # validate; repair mechanical drift           ($0)
-fux why day-pnl                # explain a rule + rationale + linked code
+fux why day-pnl [--history]    # explain a rule (+ how its *why* evolved, via git)
 fux refs src/aggregator.py     # which rules govern this file
-fux recall "how is day P&L computed" --hybrid  # RRF-fuse lexical+semantic+graph
+fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semantic+graph
+fux seal --all                 # bind rules to an AST fingerprint of their code
 fux coverage                   # % of important files with a governing rule
-fux verify                     # run invariant `check:` assertions
-fux savings "how is day P&L computed"  # measured token-cost win, this lookup
+fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
+fux mine                       # surface candidate rules latent in the code (drafts)
+fux savings "how is day P&L computed"  # measured token-cost win (+ cumulative ledger)
 fux lint                       # rule *quality*: missing why / code_refs / edges
 fux stats                      # knowledge-health dashboard + score
 fux gate --install             # wire a git pre-commit enforcement hook
@@ -74,8 +76,10 @@ fux parity                     # is it safe to retire the old graph/docs/memory?
 fux tour                       # ordered ONBOARDING.md
 ```
 
-Full command reference: [docs/cli.md](docs/cli.md). Authoring a rule:
-[docs/rule.guide.md](docs/rule.guide.md). Writing a spec: [docs/spec.guide.md](docs/spec.guide.md).
+**Complete, example-driven guide to everything Fux does:
+[docs/guide.md](docs/guide.md).** Full command reference: [docs/cli.md](docs/cli.md).
+Authoring a rule: [docs/rule.guide.md](docs/rule.guide.md). Writing a spec:
+[docs/spec.guide.md](docs/spec.guide.md).
 
 ## How it works
 
@@ -94,15 +98,20 @@ drifted, Stop validates before the turn ends.
 The **graph** merges your rules with code symbols and call edges extracted across
 **Python** (via the stdlib `ast`) and **JS/TS, Go, and Rust** (a brace-matched
 heuristic), now including **cross-file** `calls` (symbol→symbol) — one navigable
-map of *which rule governs which code*, with community clustering and a
+map of *which rule governs which code*, with community clustering, **PageRank
+centrality** (architectural chokepoints, not just raw degree), and a
 `GRAPH_REPORT.md`. The interactive `graph.html` is built for review *and* agents:
 node/edge-type filters, colour-by (type/community/layer/degree), focus +
 neighbour highlighting, a details panel, and one-click **markdown export** of a
 node's neighbourhood or the visible sub-graph.
 
-`fux recall` is lexical (`$0`) by default, with an opt-in **local** re-rank and an
+`fux recall` is lexical **BM25F** (`$0`) by default, with opt-in **query expansion**
+(glossary synonyms + 1-hop graph neighbours), an opt-in **local** re-rank, and an
 opt-in **RRF hybrid** that fuses lexical ⊕ local-semantic ⊕ graph proximity (no
-API); `fux verify` runs a rule's invariant `check:` and worked `examples:`.
+API); `fux verify [--fuzz]` runs a rule's invariant `check:` and worked `examples:`,
+optionally boundary-fuzzing for unguarded div-by-zero. **Proof-carrying rules:**
+`fux seal` binds a rule to a normalized-AST fingerprint of its code, so `fux check`
+flags `unsealed` when the governed code changes *structure* (not just its mtime).
 Beyond authoring, Fux **enforces and reports**: `fux lint` grades rule quality,
 `fux stats` scores knowledge health, `fux gate` blocks drift at commit/CI time,
 and `fux mcp` exposes the whole substrate to agents over MCP.
@@ -110,7 +119,8 @@ and `fux mcp` exposes the whole substrate to agents over MCP.
 For cross-session memory it stays **authored, not captured**: an opt-in `capture`
 hook queues *which* files changed for `fux distill` (human-confirmed) rather than
 auto-summarising, and `type: memory` entries **decay** after a TTL so stale notes
-stop costing context — every one `$0` and deterministic.
+stop costing context — with opt-in **usage-weighted decay** (a memory still being
+recalled stays alive; an unused one decays). Every path `$0` and deterministic.
 
 ### Layered rules (maintain once, inherit everywhere)
 

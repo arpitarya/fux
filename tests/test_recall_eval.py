@@ -28,20 +28,43 @@ CORPUS = {
                   "Short-term vs long-term capital gains split at a one-year holding period."),
     "broker-zero-holdings": ("domain: brokers\nkeywords: [broker, empty, dump, silent]\n",
                              "A broker source may silently return zero holdings on a failed sync."),
+    "dividend-reinvest": ("domain: portfolio\nkeywords: [dividend, payout, reinvest, drip]\n",
+                          "Cash dividends are reinvested into the same security by default."),
+    "order-slippage": ("domain: trading\nkeywords: [slippage, fill, market, spread]\n",
+                       "Slippage is the gap between the expected and the actual fill price."),
+    "rate-limit": ("domain: api\nkeywords: [throttle, quota, requests, backoff]\n",
+                   "Each broker API caps requests per minute; exceed it and calls are throttled."),
+    "wash-sale": ("domain: tax\nkeywords: [loss, repurchase, disallow, window]\n",
+                  "A loss is disallowed if the same security is rebought inside the wash window."),
 }
 
-# (paraphrased query, expected id) — none share the id verbatim.
+# (paraphrased query, expected id) — none share the id verbatim. Several pairs are
+# near-misses (hard negatives) that share vocabulary with a sibling rule.
 EVAL = [
     ("how much did my holdings earn or lose today", "day-pnl"),
     ("what was my gain or loss for the day", "day-pnl"),
+    ("is the daily change based on market price or what i paid", "day-pnl"),
     ("converting dollars to rupees before adding them up", "inr-normalization"),
     ("normalise foreign currency to INR first", "inr-normalization"),
+    ("how are overseas holdings handled in the total", "inr-normalization"),
     ("annualised rate of return on my investments", "xirr"),
+    ("time-weighted yield across dated cash flows", "xirr"),
     ("where do we hash credentials before saving", "api-key-hashing"),
+    ("are secret tokens stored in plain text", "api-key-hashing"),
     ("how is the average buy price used for cost", "avg-cost-basis"),
+    ("what method values my purchase lots", "avg-cost-basis"),
     ("when does the NSE trading session open and close", "market-hours"),
+    ("what hours is the indian market open", "market-hours"),
     ("difference between short and long term capital gains", "stcg-ltcg"),
+    ("what holding period flips the tax rate", "stcg-ltcg"),
     ("a broker returning empty holdings after a sync failure", "broker-zero-holdings"),
+    ("why did one source report nothing for the portfolio", "broker-zero-holdings"),
+    ("what happens to my cash payouts automatically", "dividend-reinvest"),
+    ("are distributions bought back into the stock", "dividend-reinvest"),
+    ("the gap between expected and actual execution price", "order-slippage"),
+    ("how many api calls can i make before being throttled", "rate-limit"),
+    ("backoff when the broker quota is exceeded", "rate-limit"),
+    ("loss disallowed when rebuying the same stock quickly", "wash-sale"),
 ]
 
 
@@ -69,6 +92,29 @@ def test_hybrid_does_not_regress_recall(project):
     base = bench.recall_at_k(_results(project, rules), 3)
     hyb = bench.recall_at_k(_results(project, rules_h), 3)
     assert hyb >= base
+
+
+def test_expansion_does_not_regress_recall(project):
+    _seed(project)
+    base = bench.recall_at_k(_results(
+        project, lambda q: [r for r, _ in recall.run(project, q, top=5)]), 3)
+    exp = bench.recall_at_k(_results(
+        project, lambda q: [r for r, _ in recall.run(project, q, top=5, expand=True)]), 3)
+    assert exp >= base
+
+
+def test_recall_regression_gate(project):
+    """CI gate: the labelled set must clear these bars on every commit (§17.18c).
+
+    Lower the bar here only with evidence — this is the number Fux can quote.
+    """
+    _seed(project)
+    rep = bench.report(_results(
+        project, lambda q: [r for r, _ in recall.run(project, q, top=5)]))
+    assert rep["n"] >= 20                       # a set big enough to be credible
+    assert rep["recall@1"] >= 0.80, rep
+    assert rep["recall@3"] >= 0.90, rep
+    assert rep["mrr"] >= 0.85, rep
 
 
 def test_metrics_are_well_formed():

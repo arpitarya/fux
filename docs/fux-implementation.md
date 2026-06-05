@@ -13,7 +13,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 25 commands wired in [fux/cli.py](fux/cli.py) |
+| Core CLI surface (plan §9) | ✅ | 27 commands wired in [fux/cli.py](fux/cli.py) (incl. `seal`, `mine`) |
 | Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
@@ -46,13 +46,15 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux build [--full]` | ✅ | [fux/build.py](fux/build.py), [fux/graph.py](fux/graph.py) |
 | `fux check [--fix]` | ✅ | [fux/check.py](fux/check.py), [fux/fix.py](fux/fix.py) |
 | `fux context` | ✅ | [fux/context.py](fux/context.py) |
-| `fux recall "Q" [--top N] [--hybrid]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
-| `fux why <id>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
+| `fux recall "Q" [--top N] [--hybrid] [--expand]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
+| `fux why <id> [--history]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/explain.py](fux/explain.py) |
+| `fux seal [ids] [--all]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/seal.py](fux/seal.py) |
+| `fux mine [--min-sites N]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/mine.py](fux/mine.py) |
 | `fux refs <file>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
 | `fux new <type> <id> [--domain D]` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
 | `fux coverage` | ✅ | [fux/coverage.py](fux/coverage.py) |
-| `fux verify` | ✅ | [fux/verify.py](fux/verify.py), [fux/vexamples.py](fux/vexamples.py) |
-| `fux savings ["Q"]` | ✅ | [fux/savings.py](fux/savings.py) |
+| `fux verify [--fuzz]` | ✅ | [fux/verify.py](fux/verify.py), [fux/vexamples.py](fux/vexamples.py) |
+| `fux savings ["Q"] [--reset]` | ✅ | [fux/savings.py](fux/savings.py), [fux/costledger.py](fux/costledger.py) |
 | `fux lint [--strict]` | ✅ | [fux/lint.py](fux/lint.py) |
 | `fux stats` | ✅ | [fux/stats.py](fux/stats.py) |
 | `fux gate [--install] [--strict-lint]` | ✅ | [fux/gate.py](fux/gate.py) |
@@ -179,8 +181,14 @@ applied identically to both sides):
   lookups (rule only, INDEX already in context), each with a savings multiplier.
 - **Aggregate** — the same averaged over every documented topic (a rule with an
   existing governed file). Missing `code_refs` are excluded from the baseline.
+- **Cumulative ledger** ([fux/costledger.py](fux/costledger.py)) — opt-in
+  `cost_tracking` records *every* `fux recall` lookup's measured savings into
+  `.fux/cost.json` (lifetime tokens-without/with/saved + recent queries), so the
+  project can quote a real running total, not a per-call estimate. Only **code-bound**
+  matches count (same "topic" restriction). `fux savings` prints it; `--reset` clears.
 
-Deterministic, `$0`, no LLM. Covered by [tests/test_savings.py](tests/test_savings.py).
+Deterministic, `$0`, no LLM. Covered by [tests/test_savings.py](tests/test_savings.py),
+[tests/test_costledger.py](tests/test_costledger.py).
 
 ### 2.12 Quality, health & enforcement — ✅
 
@@ -313,7 +321,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (80 tests)
+### 2.20 Tests — ✅ (111 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -328,7 +336,13 @@ expanded tools ([test_mcp.py](tests/test_mcp.py), [test_mcp_extra.py](tests/test
 the graph-HTML render + **serve/sanitizer**
 ([test_graphhtml.py](tests/test_graphhtml.py), [test_serve_sanitize.py](tests/test_serve_sanitize.py)),
 and **graph coverage / import / narrative / parity**
-([test_parity_import.py](tests/test_parity_import.py)).
+([test_parity_import.py](tests/test_parity_import.py)), plus the beyond-roadmap
+work: **PageRank centrality** ([test_centrality.py](tests/test_centrality.py)),
+**AST seals + history** ([test_seal.py](tests/test_seal.py)), **BM25F + query
+expansion** ([test_bm25f_expand.py](tests/test_bm25f_expand.py)), **knapsack context
+packing** ([test_pack.py](tests/test_pack.py)), **usage-weighted decay + overlap
+lint** ([test_verify_hardening.py](tests/test_verify_hardening.py)), and **fuzzing +
+rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
 ---
@@ -373,10 +387,37 @@ auto-suggest `supersedes:` on memory contradiction.
 - ⬜ **Graph hardening** — block-comment / multiline-template awareness in the brace
   matcher; cross-file call edges for more languages.
 
+### Beyond roadmap — SOTA & frontier ([fux-plan.md §17, items 18–27](fux-plan.md))
+
+Pushes past the planned scope; all `$0`, deterministic, stdlib-only. **Shipped (8 of
+10 sub-areas):**
+
+- ✅ **18 Retrieval to SOTA** — true per-field BM25F ([recall.py](../fux/recall.py)),
+  opt-in deterministic query expansion (`recall_expand`/`--expand`), eval grown to 24
+  queries + hard negatives + a regression gate ([test_recall_eval.py](../tests/test_recall_eval.py)):
+  recall@1 0.875 / recall@3 1.0 / MRR 0.931.
+- 🟡 **19 Graph to exact** — ✅ deterministic **PageRank centrality**
+  ([graphquery.py](../fux/graphquery.py)) on every node + a `GRAPH_REPORT.md`
+  "Chokepoints" section; ⬜ the `tree-sitter` extra (needs an external grammar dep).
+- ✅ **20 Verification hardening** — `fux verify --fuzz` div-by-zero boundary fuzzing
+  ([vexamples.py](../fux/vexamples.py)), `overlap-unlinked` lint ([lint.py](../fux/lint.py)),
+  usage-weighted decay (`usage_tracking`, [usage.py](../fux/usage.py) → [governance.py](../fux/governance.py)).
+- ✅ **22 Proof-carrying rules (AST seals)** — [seal.py](../fux/seal.py), `seal:` field,
+  `fux seal`, advisory `unsealed` finding.
+- ✅ **23 Rule mining** — `fux mine` ([mine.py](../fux/mine.py)), magic-number first cut.
+- ✅ **24 Knowledge archaeology** — `fux why <id> --history` ([explain.py](../fux/explain.py)).
+- ✅ **25 Optimal context packing** — 0/1 knapsack ([pack.py](../fux/pack.py)) gated on
+  `context_budget_tokens`.
+
+**Deferred (need a non-`$0` / runtime surface, kept ⬜):** 19a `tree-sitter` extra
+(external dep), 21 automated value proof (live agent runs), 26 self-densifying graph
+(MCP-runtime traversal logging), 27 federated mesh (**undecided — may never ship**).
+
 ---
 
 ## 5. Key references
 
+- Complete example-driven guide: [docs/guide.md](docs/guide.md)
 - Design of record: [docs/fux-plan.md](docs/fux-plan.md)
 - Architecture: [docs/architecture.md](docs/architecture.md)
 - CLI reference: [docs/cli.md](docs/cli.md)

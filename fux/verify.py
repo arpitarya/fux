@@ -30,7 +30,7 @@ class VResult:
     detail: str = ""
 
 
-def run(root: Path) -> list[VResult]:
+def run(root: Path, fuzz: bool = False) -> list[VResult]:
     cfg = config.load(paths.Footprint(root).config)
     rs = loader.resolve(root, cfg)
     out: list[VResult] = []
@@ -38,6 +38,8 @@ def run(root: Path) -> list[VResult]:
         if r.fm.get("check"):
             out.append(_verify_one(r, root))
         out += [VResult(*t) for t in vexamples.run_examples(r, _SAFE)]
+        if fuzz:
+            out += [VResult(*t) for t in vexamples.fuzz_examples(r, _SAFE)]
     return out
 
 

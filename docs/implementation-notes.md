@@ -145,6 +145,44 @@ intra-file calls + heuristic cross-file references), block-comment / multiline
 template-literal awareness in the brace matcher, and the phase-7 decommission
 once parity is signed off.
 
+## Update — beyond-roadmap SOTA & frontier (§17.18–25)
+
+Pushed past the planned scope; all `$0`, deterministic, stdlib-only. Eight of ten
+sub-areas shipped (106 tests):
+
+- **Retrieval to SOTA** (§17.18) — the default scorer is now **true per-field BM25F**
+  (`fux/recall.py` `_bm25f`: each field length-normalised before a single
+  saturation), superseding the "BM25-lite" bag-of-fields. Opt-in **query expansion**
+  (`recall_expand` / `--expand`) widens the query with glossary synonyms + 1-hop
+  `related` neighbours. The eval (`tests/test_recall_eval.py`) grew to 24 queries with
+  hard negatives + a `test_recall_regression_gate` (recall@1 0.875 / recall@3 1.0 /
+  MRR 0.931). Supersedes the "BM25-lite" note in the Recall section below.
+- **Graph centrality** (§17.19b) — deterministic **PageRank** (`fux/graphquery.py`
+  `pagerank`/`chokepoints`) stored as `centrality` on every node and surfaced in a
+  `GRAPH_REPORT.md` "Chokepoints" section. (The `tree-sitter` extra, §17.19a, is
+  deferred — it needs an external grammar dependency, off-limits to the default.)
+- **Verification hardening** (§17.20) — `fux verify --fuzz` boundary-perturbs numeric
+  example inputs and flags unguarded **div-by-zero** (`fux/vexamples.py`
+  `fuzz_examples`, only `ZeroDivisionError` is treated as a clean signal); an
+  `overlap-unlinked` lint (`fux/lint.py` `_overlaps`) catches two unlinked rules over
+  the same code span; opt-in `usage_tracking` (`fux/usage.py`) feeds **usage-weighted
+  decay** in `fux/governance.py` (a memory served within the TTL window stays alive).
+- **Proof-carrying rules / AST seals** (§17.22) — `fux/seal.py` fingerprints the
+  normalized-AST *skeleton* of a rule's `code_refs` (names/literals folded); `fux seal`
+  stamps a `seal:` field; `fux check` emits an advisory `unsealed` finding when the
+  governed code changes structure. Whitespace/comment/rename edits don't break it.
+- **Rule mining** (§17.23) — `fux mine` (`fux/mine.py`) surfaces magic numbers
+  repeated across ≥N sites as draft `convention` candidates (never auto-authored).
+- **Knowledge archaeology** (§17.24) — `fux why <id> --history` (`fux/explain.py`
+  `render_history` over `gitutil.file_history`, `--follow`).
+- **Optimal context packing** (§17.25) — a real 0/1 knapsack DP (`fux/pack.py`) gated
+  on `context_budget_tokens` (default 0 ⇒ inject everything), wired into `fux/context.py`.
+
+Deferred (need a non-`$0` or runtime surface): the `tree-sitter` extra (19a),
+automated A/B value proof (21, needs live agent runs), the self-densifying graph (26,
+needs MCP-runtime traversal logging), and the federated mesh (27, **undecided**).
+Also fixed a pre-existing `tomllib` duplicate-key failure in `tests/test_parity_import.py`.
+
 ## Decisions taken (the plan's "still open" items)
 
 | Open question (plan §14) | Call made in v0.1.0 | Rationale |

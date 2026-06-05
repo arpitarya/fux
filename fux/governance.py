@@ -29,16 +29,27 @@ def ttl(cfg: dict) -> int:
         return 0
 
 
-def is_decayed(rule: Rule, cfg: dict, today: _dt.date | None = None) -> bool:
+def is_decayed(rule: Rule, cfg: dict, today: _dt.date | None = None,
+               last_served: _dt.date | None = None) -> bool:
     if rule.type != "memory":
         return False
     days = ttl(cfg)
     if days <= 0:
         return False
-    age = _age_days(rule, today or _dt.date.today())
+    today = today or _dt.date.today()
+    # Usage-weighted (plan §17.20c): a memory *served* within the TTL window is
+    # demonstrably still live, so it stays even if its `updated` date is old.
+    if last_served is not None and (today - last_served).days <= days:
+        return False
+    age = _age_days(rule, today)
     return age is not None and age > days
 
 
-def for_context(rules: list[Rule], cfg: dict, today: _dt.date | None = None) -> list[Rule]:
-    """Drop decayed memory entries from the context-injection set."""
-    return [r for r in rules if not is_decayed(r, cfg, today)]
+def for_context(rules: list[Rule], cfg: dict, today: _dt.date | None = None,
+                served: dict[str, _dt.date] | None = None) -> list[Rule]:
+    """Drop decayed memory entries from the context-injection set.
+
+    ``served`` ({id: last-served date}, from ``usage``) keeps hot memories alive.
+    """
+    served = served or {}
+    return [r for r in rules if not is_decayed(r, cfg, today, served.get(r.id))]

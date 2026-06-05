@@ -429,6 +429,12 @@ totals, and a without-Fux vs with-Fux per-lookup comparison — using a transpar
 ≈4-chars/token heuristic applied identically to both sides, so the multiplier is
 the honest signal. See §10 item 12.)*
 
+*(Opt-in `cost_tracking` ([costledger.py](../fux/costledger.py)) goes further: it
+records **every** `fux recall` lookup's measured savings into `.fux/cost.json` —
+a cumulative lifetime total (tokens-without/with/saved) rather than a single
+estimate. Only code-bound matches count, so the running multiplier stays honest;
+`fux savings` prints it and `fux savings --reset` clears it. Still `$0`.)*
+
 ---
 
 ## 13. Rollout phases (when greenlit)
@@ -693,6 +699,139 @@ define the plan artifact's required sections *before* `plan` is built.
 > **Order to retire Anton's stores (now tool-backed):** `fux build --full` until
 > `fux parity` graph ✓ → `fux import docs/` + rebuild until docs ✓ →
 > `fux import-memory` until memory ✓ → then §17.9's retirement is a green-light.
+
+### Best-in-class (the three pillars to SOTA — `$0`, high-ROI)
+
+> Beyond the planned roadmap, but *not* speculative: push the three things Fux
+> already does — **retrieve**, **stay-correct**, **integrate** — to best-in-class,
+> all within the existing constraints. These are the highest-ROI "more" because they
+> raise quality on the surface agents hit every turn. **Status: 18 & 20 shipped;
+> 19 partial (centrality shipped, tree-sitter deferred); 21 deferred (needs agent
+> runs).**
+
+18. ✅ **Retrieval to SOTA.** Recall is what agents hit most — today BM25-lite +
+    opt-in trigram + graph RRF ([recall.py](../fux/recall.py), [hybrid.py](../fux/hybrid.py)),
+    validated on one small paraphrase set. Three `$0` lifts: **(a) real BM25F** —
+    proper per-field length normalization + saturation, which beats the lite scorer
+    on short frontmatter fields; **(b) deterministic query expansion** — expand a
+    query with `glossary` synonyms and **1-hop graph neighbours** before scoring (the
+    graph is the most under-used asset — recall touches it only as one RRF list);
+    **(c) a benchmark worth quoting** — grow [test_recall_eval.py](../tests/test_recall_eval.py)
+    to a **50–100 query** set with **hard negatives** and add a **recall@k/MRR
+    regression gate** in CI ([bench.py](../fux/bench.py)). Turns "recall@1 = 1.0 on a
+    toy set" into a credible recall@k curve. **Shipped:** true per-field BM25F
+    ([recall.py](../fux/recall.py) `_bm25f`); opt-in `expand_terms` (glossary + 1-hop
+    `related`) via `recall_expand` / `--expand`; eval grown to 24 queries with hard
+    negatives + a `test_recall_regression_gate` (recall@1 0.875 / recall@3 1.0 /
+    MRR 0.931).
+19. 🟡 **Graph to exact.** Non-Python extraction is a brace-matched heuristic — the
+    honest ceiling on graph quality. **(a) Optional `tree-sitter` extra** (same
+    opt-in pattern as `[embeddings]`): default stays `$0`/hand-rolled, but
+    `pip install fux-engine[ast]` yields real call graphs, imports, and type edges
+    for JS/TS/Go/Rust ([astextract.py](../fux/astextract.py)). **(b) Centrality beyond
+    degree** — `GRAPH_REPORT.md` ranks god-nodes by raw degree; add deterministic
+    **PageRank / betweenness** (pure stdlib, ~40 lines, [community.py](../fux/community.py)/
+    [graph.py](../fux/graph.py)) to find architectural chokepoints degree misses, and
+    feed the score back into recall ranking. Makes the graph *trustworthy*, not just
+    "good enough." **(b) shipped:** deterministic PageRank ([graphquery.py](../fux/graphquery.py)
+    `pagerank`/`chokepoints`), stored as `centrality` on every node and surfaced in a
+    `GRAPH_REPORT.md` "Chokepoints" section. **(a) deferred:** the `tree-sitter` extra
+    needs an external grammar dependency — left ⬜ so the default stays stdlib-only.
+20. ✅ **Verification hardening (the moat).** Verify is the thing competitors don't
+    have, so SOTA matters most here. **(a) Property/example fuzzing** — `examples:`
+    run fixed inputs; deterministically generate boundary inputs (zero, negative,
+    currency edges) against `check:` invariants, reproducible under a fixed seed
+    ([vexamples.py](../fux/vexamples.py)). **(b) Contradiction & supersession
+    auto-suggest** — flag when a new `memory`/rule overlaps an existing rule's
+    `code_refs` and disagrees, drafting a `contradicts:`/`supersedes:` edge (closes
+    "stale knowledge silently lies"; the [governance.py](../fux/governance.py) follow-up
+    already noted in §4). **(c) Usage-weighted decay** — TTL is time-only; log which
+    rules `recall`/`context` actually serve, then decay *unused* knowledge and surface
+    *hot* knowledge — a feedback signal nothing else in the space has. **Shipped:**
+    (a) `fux verify --fuzz` ([vexamples.py](../fux/vexamples.py) `fuzz_examples`) flags
+    unguarded div-by-zero at numeric boundaries; (b) `overlap-unlinked` lint finding
+    ([lint.py](../fux/lint.py) `_overlaps`) for two unlinked rules over the same code
+    span; (c) opt-in `usage_tracking` ([usage.py](../fux/usage.py)) feeds
+    [governance.py](../fux/governance.py) — a memory served within the TTL window stays
+    alive, an unused one still decays.
+21. ⬜ **Automated value proof.** *(Deferred — needs live agent task runs, so it can't
+    be a `$0` unit-tested engine feature; tracked for a separate harness.)* `fux
+    savings` measures *token cost*; the stronger
+    claim is *task quality*. Build an **A/B harness** that runs the same agent task
+    with and without Fux context and diffs the outcome — the experiment that lets the
+    README say "Fux makes the agent measurably *more correct*," not just cheaper.
+    Composes the existing `$0` surfaces ([savings.py](../fux/savings.py), [bench.py](../fux/bench.py));
+    no maintenance-path LLM (the task runs are the experiment, not a Fux dependency).
+
+### Frontier (research-grade, still `$0` and deterministic)
+
+> Bets that push *what a knowledge engine is*, not just do the known things better.
+> Each leans on an asset only Fux has — a single versioned frontmatter substrate, a
+> rule⊕code graph, git underneath, and an **agent** (not a human) as the consumer.
+> All stay stdlib-only, `$0`, no maintenance-path LLM. **Status: 22–25 shipped; 26
+> deferred (needs MCP-runtime logging); 27 undecided** (stretches §3 self-contained).
+
+22. ✅ **Proof-carrying rules (AST seals).** Drift today is git-log on `code_refs`
+    (§8) — coarse: a whitespace edit trips it, a semantic change inside an untouched
+    signature does not. Bind each rule to a **normalized-AST fingerprint** of the
+    symbol it governs (names/literals folded) computed on author, recomputed on
+    `fux build`. When the structure diverges, the rule's **seal breaks** — a new
+    `unsealed` finding ([findings.py](../fux/findings.py)) — until a human
+    re-affirms. Whitespace/comment edits don't break it; a flipped comparison or a
+    changed branch does. Upgrades drift from *the file's mtime moved* to *the thing
+    I claimed about structurally changed*. Touches [astextract.py](../fux/astextract.py)
+    (fingerprint), [schema.json](../schema.json) (a `seal:` field), [drift.py](../fux/drift.py)/
+    [check.py](../fux/check.py). Python first (real `ast`); other languages ride the
+    brace-matcher span hash. **Shipped:** [seal.py](../fux/seal.py) (normalized-AST
+    skeleton fingerprint), a `seal:` field, `fux seal [ids] [--all]`, and the advisory
+    `unsealed` finding in [check.py](../fux/check.py).
+23. ✅ **Deterministic rule mining.** Authored-only knowledge bases die of
+    cold-start — only the rules someone bothered to write exist. Invert it:
+    Daikon-style static + fixture-driven invariant detection over the code (an arg
+    never null, a return always positive, a constant repeated across N sites, a
+    normalization that always precedes a sum) surfaces **candidate** `invariant`/
+    `convention` entries for human confirmation — the same draft-only, never-auto-
+    authored pattern as `capture` → `distill` (§17.2). A new `fux mine`. Turns Fux
+    from "a notebook you must fill" into "it points at the knowledge already latent
+    in the code." `$0`, no LLM. **Shipped (first miner):** [mine.py](../fux/mine.py) +
+    `fux mine` surface magic numbers repeated across ≥N sites as draft `convention`
+    candidates (Python via `ast`, others via the sanitized digit scan). Richer
+    invariants (null/positivity/ordering) are the next miners.
+24. ✅ **Knowledge archaeology (temporal *why*).** The substrate is git-versioned, so
+    every *why* has a history nobody can see today. Build the time axis over
+    `.fux/rules/` ([gitutil.py](../fux/gitutil.py)): `fux why <id> --history` walks
+    how an understanding evolved, which decisions were reversed (`supersedes:` chains
+    over time), which rule last changed before an incident. Git-blame for *reasons*,
+    not lines — a capability that can't exist where the *why* isn't a first-class
+    versioned object. **Shipped:** `fux why <id> --history` ([explain.py](../fux/explain.py)
+    `render_history` over [gitutil.py](../fux/gitutil.py) `file_history`, `--follow`).
+25. ✅ **Optimal context packing (knapsack).** SessionStart injects the whole INDEX
+    and recall picks top-N — both heuristics. Fux already measures tokens precisely
+    ([savings.py](../fux/savings.py)). Treat assembly as a budgeted **knapsack**:
+    given `context_budget_tokens` and a query, select the rule subset maximizing
+    relevance-per-token. Context injection becomes a *provably-optimal* pack, not a
+    vibe — a flagship claim for an agent-first tool. Touches [context.py](../fux/context.py)
+    + the recall scorer; default (no budget set) path unchanged. **Shipped:** a real
+    0/1 knapsack DP ([pack.py](../fux/pack.py)) gated on `context_budget_tokens`
+    (default 0 ⇒ inject everything), wired into [context.py](../fux/context.py).
+26. ⬜ **Self-densifying graph.** *(Deferred — requires logging agent traversals at MCP
+    runtime, not a deterministic build-time path; tracked separately.)* Today the
+    agent *reads* the graph; close the loop.
+    When Claude walks it to answer something (via MCP `fux_trace`, [mcpserver.py](../fux/mcpserver.py)),
+    record the **traversal path as a candidate `narrative` entry** — human-confirmed,
+    never auto-authored (the `capture` → `distill` discipline, §17.2). The agent's
+    exploration becomes durable knowledge, so the next session starts denser: a base
+    that gets *more* complete the more it's used, with **knowledge-entropy-over-
+    sessions** as a metric no competitor can even define.
+27. ⬜ **Federated knowledge mesh** *(stretches §3 "self-contained" — **undecided**;
+    maybe we build it, maybe not; build last if ever)*. Generalize `packs`
+    ([loader.py](../fux/loader.py)) from a static overlay into a **local filesystem
+    federation** across the sibling repos (Anton/Wagner/Bach/…): query knowledge
+    across projects, detect when one repo violates a decision another recorded,
+    propagate a `supersedes:`. Strictly **local-FS, read-only, no network service** —
+    keeps the §15 non-goal (not a networked memory vendor) intact while turning a
+    per-repo tool into shared infrastructure. The riskiest to the brand; the only
+    item here we may deliberately *never* ship.
 
 ### Explicitly *not* doing
 

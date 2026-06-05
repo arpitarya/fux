@@ -43,6 +43,21 @@ def last_commit_date(path: Path, root: Path) -> str | None:
     return out or None
 
 
+def file_history(path: Path, root: Path, limit: int = 30) -> list[tuple[str, str, str]]:
+    """(date, short-hash, subject) for each commit touching ``path``, newest first.
+
+    Follows renames so a rule's reasoning history survives a file move (plan §17.24).
+    """
+    out = _run(["log", f"-{limit}", "--follow", "--format=%cs%x09%h%x09%s",
+                "--", str(path.resolve())], root)
+    rows: list[tuple[str, str, str]] = []
+    for ln in (out or "").splitlines():
+        parts = ln.split("\t", 2)
+        if len(parts) == 3:
+            rows.append((parts[0], parts[1], parts[2]))
+    return rows
+
+
 def diff_since(path: Path, since: str, root: Path, limit: int = 2000) -> str | None:
     """Patch for ``path`` from the state at ``since`` (YYYY-MM-DD) to HEAD."""
     rel = str(path.resolve())

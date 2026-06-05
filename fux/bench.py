@@ -30,4 +30,5 @@ def mrr(results: list[Result]) -> float:
 def report(results: list[Result], ks=(1, 3, 5)) -> dict[str, float]:
     out = {f"recall@{k}": round(recall_at_k(results, k), 3) for k in ks}
     out["mrr"] = round(mrr(results), 3)
+    out["n"] = len(results)
     return out

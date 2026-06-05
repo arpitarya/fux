@@ -25,9 +25,13 @@ DEFAULTS = {
     "use_global": True,
     "recall_rerank": False,   # phase-2 opt-in local embeddings (recall-engine.compare.md)
     "recall_hybrid": False,   # opt-in RRF fusion of lexical ⊕ semantic ⊕ graph (§17.1)
+    "recall_expand": False,   # opt-in deterministic query expansion (glossary+graph, §17.18b)
     "capture": False,         # opt-in Stop-hook session capture for distill (§17.2)
     "memory_ttl_days": 180,   # type: memory decays after this many untouched days (§17.3)
+    "usage_tracking": False,   # opt-in: record served rules → usage-weighted decay (§17.20c)
+    "cost_tracking": False,    # opt-in: record each lookup's savings → cumulative cost.json (§12)
     "parity_stay": [],        # docs that stay/are out-of-scope for `fux parity` (§17.17)
+    "context_budget_tokens": 0,  # >0 ⇒ knapsack-pack the SessionStart INDEX (§17.25)
 }
 
 
@@ -68,7 +72,14 @@ def default_toml() -> str:
         "capture = false\n\n"
         "# type: memory entries decay (excluded from `fux context`) after N days.\n"
         "memory_ttl_days = 180\n\n"
+        "# Opt-in: record which rules recall/why serve → usage-weighted decay ($0).\n"
+        "usage_tracking = false\n\n"
+        "# Opt-in: accumulate each lookup's token savings into .fux/cost.json ($0).\n"
+        "cost_tracking = false\n\n"
         "# Docs that stay / are out-of-scope for `fux parity` (beyond conventions,\n"
         "# guardrails) — e.g. process docs that get deleted, not migrated to narrative.\n"
-        "parity_stay = []\n"
+        "parity_stay = []\n\n"
+        "# Token budget for the SessionStart INDEX. 0 = inject everything; >0 picks\n"
+        "# the optimal (knapsack) rule subset that fits — for very large corpora.\n"
+        "context_budget_tokens = 0\n"
     )

@@ -4,7 +4,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from fux import config, gitutil, governance, loader, paths, schema
+from fux import config, gitutil, governance, loader, paths, schema, seal
 from fux.findings import Finding
 from fux.model import Rule
 
@@ -22,6 +22,7 @@ def run(root: Path) -> list[Finding]:
         findings += _refs(r, root)
         findings += _stale(r, root)
         findings += _memory_decay(r, cfg)
+        findings += _seal(r, root)
     findings += _conflicts(layered)
     _write_drift(fp, findings)
     return findings
@@ -36,6 +37,22 @@ def _memory_decay(r: Rule, cfg: dict) -> list[Finding]:
 
 def _schema(r: Rule) -> list[Finding]:
     return [Finding("schema", r.id, e) for e in schema.validate(r.fm)]
+
+
+def _seal(r: Rule, root: Path) -> list[Finding]:
+    """A sealed rule whose governed code changed *structure* (plan §17.22).
+
+    Advisory only — re-affirmed by a human via `fux seal <id>`, never auto-fixed.
+    """
+    stored = r.fm.get("seal")
+    if not stored:
+        return []
+    actual = seal.current(root, r)
+    if actual is None or actual == stored:
+        return []
+    return [Finding("unsealed", r.id,
+                    "governed code changed structurally since sealed — review, "
+                    "then `fux seal " + r.id + "` to re-affirm")]
 
 
 def _refs(r: Rule, root: Path) -> list[Finding]:
@@ -90,7 +107,7 @@ def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
     lines = ["# Fux DRIFT report", "",
              f"_{len(findings)} finding(s)._" if findings else "_No drift — all rules current._", ""]
     for kind in ("schema", "dead-ref", "conflict", "stale", "plan-drift", "invariant",
-                 "memory-stale"):
+                 "memory-stale", "unsealed"):
         group = [f for f in findings if f.kind == kind]
         if group:
             lines.append(f"## {kind} ({len(group)})")

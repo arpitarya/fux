@@ -38,6 +38,9 @@ def _gitignore(fp: paths.Footprint) -> None:
         return
     gi.write_text("# Generated derived views — rebuilt by `fux build` ($0).\n"
                   "out/\n"
+                  "# Machine-local runtime ledgers (usage + cumulative cost tracking).\n"
+                  "usage.json\n"
+                  "cost.json\n"
                   "# Personal-scope memory (scope: personal) stays local.\n"
                   "memory/personal/\n", encoding="utf-8")
 

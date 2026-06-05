@@ -76,3 +76,38 @@ def god_nodes(graph: dict, top: int = 12) -> list[tuple[str, int]]:
         if e["target"] in deg:
             deg[e["target"]] += 1
     return sorted(deg.items(), key=lambda kv: (-kv[1], kv[0]))[:top]
+
+
+def pagerank(graph: dict, damping: float = 0.85, iterations: int = 100,
+             tol: float = 1e-9) -> dict[str, float]:
+    """Deterministic PageRank over the undirected merged graph ($0, stdlib).
+
+    Finds *architectural* centrality — chokepoints a raw degree count misses (a
+    node bridging two communities outranks a locally-busy leaf). Nodes are visited
+    in sorted order so float accumulation is reproducible across runs (plan §17.19b).
+    """
+    ids = sorted(n["id"] for n in graph["nodes"])
+    n = len(ids) or 1
+    adj = _adj(graph)
+    deg = {nid: len(adj.get(nid, ())) for nid in ids}
+    rank = {nid: 1.0 / n for nid in ids}
+    base = (1.0 - damping) / n
+    for _ in range(iterations):
+        dangling = damping * sum(rank[nid] for nid in ids if deg[nid] == 0) / n
+        nxt = {nid: base + dangling for nid in ids}
+        for nid in ids:
+            if deg[nid]:
+                share = damping * rank[nid] / deg[nid]
+                for m in sorted(adj[nid]):
+                    nxt[m] += share
+        if sum(abs(nxt[nid] - rank[nid]) for nid in ids) < tol:
+            rank = nxt
+            break
+        rank = nxt
+    return rank
+
+
+def chokepoints(graph: dict, top: int = 12) -> list[tuple[str, float]]:
+    """Top nodes by PageRank centrality (desc), id-tie-broken for determinism."""
+    pr = pagerank(graph)
+    return sorted(pr.items(), key=lambda kv: (-kv[1], kv[0]))[:top]

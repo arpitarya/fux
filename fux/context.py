@@ -15,7 +15,17 @@ def run(root: Path) -> str:
     """
     cfg = config.load(paths.Footprint(root).config)
     rs = loader.resolve(root, cfg)
-    live = RuleSet(rules=governance.for_context(rs.rules, cfg))
+    served = None
+    if cfg.get("usage_tracking"):
+        from fux import usage
+        served = usage.last_served(root)
+    kept = governance.for_context(rs.rules, cfg, served=served)
+    budget = int(cfg.get("context_budget_tokens", 0) or 0)
+    if budget > 0:
+        from fux import pack          # lazy: knapsack only when a budget is set
+        shown = [r for r in kept if r.is_active and r.type != "narrative"]
+        kept = pack.select(shown, budget)
+    live = RuleSet(rules=kept)
     header = ("<!-- Injected by Fux at SessionStart. This is the Tier-1 INDEX: "
               "open a rule with `fux why <id>` only when relevant. -->\n\n")
     return header + index.render_index(live)

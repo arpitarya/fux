@@ -1,24 +1,51 @@
 """Read-only query command handlers (recall/why/refs/new/coverage/verify/tour)."""
 from __future__ import annotations
 
-from fux import (capture, coverage, explain, lint, parity, recall, savings,
-                 scaffold, stats, tour, verify)
+from fux import (capture, config, costledger, coverage, explain, lint, loader,
+                 mine, parity, paths, recall, savings, scaffold, seal, stats,
+                 tour, verify)
 from fux.cliutil import root
 
 
 def cmd_recall(args) -> int:
     hybrid = True if getattr(args, "hybrid", False) else None
-    for r, score in recall.run(root(), args.query, top=args.top, hybrid=hybrid):
+    expand = True if getattr(args, "expand", False) else None
+    for r, score in recall.run(root(), args.query, top=args.top, hybrid=hybrid, expand=expand):
         print(f"{score:6.3f}  {r.id} ({r.type}) — {r.title}")
     return 0
 
 
 def cmd_why(args) -> int:
-    r = explain.why(root(), args.id)
+    here = root()
+    r = explain.why(here, args.id)
     if r is None:
         print(f"fux: no rule '{args.id}'")
         return 1
+    if getattr(args, "history", False):
+        print(explain.render_history(here, r))
+        return 0
     print(explain.render_why(r))
+    return 0
+
+
+def cmd_seal(args) -> int:
+    here = root()
+    cfg = config.load(paths.Footprint(here).config)
+    rules = loader.resolve(here, cfg).rules
+    if not getattr(args, "all", False):
+        wanted = set(args.ids)
+        if not wanted:
+            print("fux: pass rule ids or --all")
+            return 1
+        rules = [r for r in rules if r.id in wanted]
+        missing = wanted - {r.id for r in rules}
+        for m in sorted(missing):
+            print(f"fux: no rule '{m}'")
+    sealed = seal.stamp(here, rules)
+    if sealed:
+        print("✔ sealed " + ", ".join(sealed))
+    else:
+        print("· nothing to seal (no resolvable code_refs, or already current)")
     return 0
 
 
@@ -43,8 +70,8 @@ def cmd_coverage(_args) -> int:
     return 0
 
 
-def cmd_verify(_args) -> int:
-    results = verify.run(root())
+def cmd_verify(args) -> int:
+    results = verify.run(root(), fuzz=getattr(args, "fuzz", False))
     failed = [v for v in results if v.status == "fail"]
     for v in results:
         mark = {"pass": "✔", "fail": "✗", "skip": "·"}[v.status]
@@ -59,8 +86,14 @@ def cmd_tour(_args) -> int:
 
 
 def cmd_savings(args) -> int:
-    rep = savings.build(root(), query=getattr(args, "query", None), top=args.top)
+    here = root()
+    if getattr(args, "reset", False):
+        costledger.reset(here)
+        print("✔ cost ledger cleared")
+        return 0
+    rep = savings.build(here, query=getattr(args, "query", None), top=args.top)
     print(savings.render(rep))
+    print(costledger.render_summary(costledger.load(here)), end="")
     return 0
 
 
@@ -75,6 +108,11 @@ def cmd_lint(args) -> int:
 
 def cmd_stats(_args) -> int:
     print(stats.render(stats.build(root())))
+    return 0
+
+
+def cmd_mine(args) -> int:
+    print(mine.render(mine.mine(root(), min_sites=getattr(args, "min_sites", 3))))
     return 0
 
 

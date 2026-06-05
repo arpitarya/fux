@@ -5,7 +5,7 @@ import json
 import re
 from pathlib import Path
 
-from fux import astextract, community, globs
+from fux import astextract, community, globs, graphquery
 from fux.model import RuleSet
 
 REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
@@ -54,6 +54,9 @@ def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
     comm = community.detect(list(nodes.values()), edges)
     for nid, c in comm.items():
         nodes[nid]["community"] = c
+    pr = graphquery.pagerank({"nodes": list(nodes.values()), "edges": edges})
+    for nid, score in pr.items():
+        nodes[nid]["centrality"] = round(score, 6)
     return {"nodes": list(nodes.values()), "edges": edges,
             "meta": {"code_files": sum(n["type"] == "code-file" for n in nodes.values()),
                      "rules": len(rs.rules), "communities": len(set(comm.values()))}}

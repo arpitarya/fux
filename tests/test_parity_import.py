@@ -99,7 +99,10 @@ def test_parity_graph_measures_current_file_coverage(project):
 
 def test_parity_stay_excludes_configured_docs(project):
     cfg = project / ".fux" / "config.toml"
-    cfg.write_text(cfg.read_text() + '\nparity_stay = ["fux-plan"]\n')
+    # Replace the scaffolded empty default rather than appending a duplicate key
+    # (TOML forbids duplicates — tomllib rightly rejects two `parity_stay =` lines).
+    cfg.write_text(cfg.read_text().replace("parity_stay = []",
+                                           'parity_stay = ["fux-plan"]'))
     (project / "docs").mkdir()
     (project / "docs" / "fux-plan.md").write_text("# Plan\n\nmeta\n")
     build.run(project)

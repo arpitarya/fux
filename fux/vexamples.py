@@ -92,6 +92,38 @@ def _expected(val):
     return _coerce(val) if isinstance(val, str) else val
 
 
+# Deterministic boundary set for example fuzzing (no randomness — reproducible).
+_BOUNDARIES = (0, -1, 1, 10 ** 9, -(10 ** 9))
+
+
+def fuzz_examples(rule: Rule, safe: dict) -> list[tuple[str, str, str]]:
+    """Perturb each numeric example input to a boundary; report `check:` *crashes*.
+
+    A boundary that merely makes the invariant False is fine (bad input *should*
+    violate it). A boundary that makes `check:` raise `ZeroDivisionError` is a real
+    robustness gap — an unguarded division (plan §17.20a). Other exception types are
+    noisy (a scalar where a list was expected) and deliberately ignored. `$0`.
+    """
+    check = rule.fm.get("check")
+    out: list[tuple[str, str, str]] = []
+    for i, ex in enumerate(rule.fm.get("examples") or [], 1):
+        given = as_bindings(ex.get("given"))
+        if not isinstance(given, dict) or not check:
+            continue
+        numeric = [k for k, v in given.items()
+                   if isinstance(v, (int, float)) and not isinstance(v, bool)]
+        for k in numeric:
+            for bv in _BOUNDARIES:
+                try:
+                    eval(str(check), {"__builtins__": {}}, {**safe, **given, k: bv})
+                except ZeroDivisionError:
+                    out.append((f"{rule.id}[fuzz {k}={bv}]", "fail",
+                                "check divides by zero at the boundary — add a guard"))
+                except Exception:  # noqa: BLE001 — only div-by-zero is a clean signal
+                    pass
+    return out
+
+
 def run_examples(rule: Rule, safe: dict) -> list[tuple[str, str, str]]:
     check = rule.fm.get("check")
     out: list[tuple[str, str, str]] = []

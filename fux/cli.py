@@ -28,11 +28,19 @@ def build_parser() -> argparse.ArgumentParser:
     rc.add_argument("query")
     rc.add_argument("--top", type=int, default=6)
     rc.add_argument("--hybrid", action="store_true", help="RRF-fuse lexical + semantic + graph ($0)")
+    rc.add_argument("--expand", action="store_true", help="expand query w/ glossary + graph neighbours ($0)")
     rc.set_defaults(fn=cliquery.cmd_recall)
 
     why = sub.add_parser("why", help="explain a rule + rationale + linked code")
     why.add_argument("id")
+    why.add_argument("--history", action="store_true",
+                     help="show how this rule's reasoning evolved (git, $0)")
     why.set_defaults(fn=cliquery.cmd_why)
+
+    sl = sub.add_parser("seal", help="bind rules to an AST fingerprint of their code")
+    sl.add_argument("ids", nargs="*", help="rule ids to (re)seal; omit with --all")
+    sl.add_argument("--all", action="store_true", help="seal every rule with resolvable code")
+    sl.set_defaults(fn=cliquery.cmd_seal)
 
     refs = sub.add_parser("refs", help="reverse lookup: which rules govern this file")
     refs.add_argument("file")
@@ -45,12 +53,15 @@ def build_parser() -> argparse.ArgumentParser:
     new.set_defaults(fn=cliquery.cmd_new)
 
     sub.add_parser("coverage", help="%% of important files with a governing rule").set_defaults(fn=cliquery.cmd_coverage)
-    sub.add_parser("verify", help="run invariant/example checks").set_defaults(fn=cliquery.cmd_verify)
+    vf = sub.add_parser("verify", help="run invariant/example checks")
+    vf.add_argument("--fuzz", action="store_true", help="boundary-fuzz examples for unguarded div-by-zero")
+    vf.set_defaults(fn=cliquery.cmd_verify)
     sub.add_parser("tour", help="emit an ordered ONBOARDING.md").set_defaults(fn=cliquery.cmd_tour)
 
     sv = sub.add_parser("savings", help="estimate the token-cost win of Fux ($0)")
     sv.add_argument("query", nargs="?", help="optional: cost a specific lookup")
     sv.add_argument("--top", type=int, default=3)
+    sv.add_argument("--reset", action="store_true", help="clear the cumulative cost ledger")
     sv.set_defaults(fn=cliquery.cmd_savings)
 
     lt = sub.add_parser("lint", help="rule-quality checks (why/code_refs/edges/provenance)")
@@ -58,6 +69,10 @@ def build_parser() -> argparse.ArgumentParser:
     lt.set_defaults(fn=cliquery.cmd_lint)
 
     sub.add_parser("stats", help="project knowledge-health dashboard + score").set_defaults(fn=cliquery.cmd_stats)
+
+    mn = sub.add_parser("mine", help="surface candidate rules latent in the code (drafts)")
+    mn.add_argument("--min-sites", type=int, default=3, help="min repeats to flag a magic number")
+    mn.set_defaults(fn=cliquery.cmd_mine)
 
     cap = sub.add_parser("capture", help="session observation queue for `fux distill`")
     cap.add_argument("--list", action="store_true", help="show the pending queue without observing")
