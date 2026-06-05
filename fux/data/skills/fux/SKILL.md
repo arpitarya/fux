@@ -39,6 +39,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux trace "<feature>"     # walk the graph to explain how a feature spans modules
 /fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
 /fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
+/fux fetch-rules <source>  # fetch URL/PDF/txt → extract durable rule entries  (skill)
 ```
 
 ## What Fux is for
@@ -115,6 +116,7 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux adr "<decision>"` | follow `skills/adr/SKILL.md` |
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
 | `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
+| `/fux fetch-rules <src>` | follow `skills/fetch-rules/SKILL.md` |
 
 ### Step 4 — When you author or edit a rule
 

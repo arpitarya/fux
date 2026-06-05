@@ -3,6 +3,9 @@
 #   ~/.claude/fux/engine/   ~/.claude/fux/global/ (git repo)   ~/.claude/fux/packs/
 #   ~/.claude/fux/hooks/    ~/.claude/fux/schema.json          ~/.claude/skills/fux/
 # $0, idempotent. Run from the repo root.
+#
+# For PyPI installs (`pip install fux-engine`), use `fux setup` instead — it
+# does the same asset copy from the bundled fux/data/ tree.
 set -euo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -19,29 +22,9 @@ echo "→ engine (editable: repo edits live-reflect in the installed binary)"
 mkdir -p "$HOME_FUX"
 "$PY" -m pip install -q --user -e "$REPO" || "$PY" -m pip install -q --user --break-system-packages -e "$REPO"
 ln -sfn "$REPO" "$HOME_FUX/engine"
-cp "$REPO/schema.json" "$HOME_FUX/schema.json"
 
-echo "→ hooks"
-mkdir -p "$HOME_FUX/hooks"
-cp "$REPO"/hooks/*.sh "$HOME_FUX/hooks/" && chmod +x "$HOME_FUX"/hooks/*.sh
-
-echo "→ packs"
-mkdir -p "$HOME_FUX/packs"
-cp -R "$REPO"/packs/* "$HOME_FUX/packs/" 2>/dev/null || true
-
-echo "→ global rules (git repo in place — global-rules-home.compare.md verdict B)"
-if [ ! -d "$HOME_FUX/global" ]; then
-  cp -R "$REPO/global" "$HOME_FUX/global"
-  ( cd "$HOME_FUX/global" && git init -q && git add -A && git commit -qm "seed global best practices" )
-  echo "  initialised $HOME_FUX/global as a git repo — add a private remote to sync across machines"
-else
-  echo "  $HOME_FUX/global exists — leaving your versioned rules untouched"
-fi
-
-echo "→ /fux skill"
-mkdir -p "$SKILLS/fux"
-cp -R "$REPO"/skills/fux/* "$SKILLS/fux/"
-for s in plan adr trace savings distill; do mkdir -p "$SKILLS/fux-$s"; cp -R "$REPO/skills/$s/"* "$SKILLS/fux-$s/" 2>/dev/null || true; done
+echo "→ assets (schema, hooks, packs, global rules, skills)"
+"$PY" -m fux setup
 
 echo
 echo "✔ Fux installed. Verify:  fux --version   (or: $PY -m fux --version)"

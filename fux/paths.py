@@ -19,12 +19,19 @@ def packs_dir() -> Path:
     return Path(os.environ.get("FUX_PACKS", claude_home() / "fux" / "packs"))
 
 
+def bundled_data_dir() -> Path:
+    """Seed data shipped with the fux package (global rules, hooks, skills, schema)."""
+    return Path(__file__).parent / "data"
+
+
 def schema_path() -> Path:
     env = os.environ.get("FUX_SCHEMA")
     if env:
         return Path(env)
     installed = claude_home() / "fux" / "schema.json"
-    return installed if installed.exists() else Path(__file__).parent.parent / "schema.json"
+    if installed.exists():
+        return installed
+    return bundled_data_dir() / "schema.json"
 
 
 def home_memory_dir(root: Path) -> Path:

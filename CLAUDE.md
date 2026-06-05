@@ -24,7 +24,7 @@ Then update **any other file the change touches**, e.g.:
 - **[docs/implementation-notes.md](docs/implementation-notes.md)** — deltas vs the
   plan; the per-topic sections (AST scope, Recall, Verify, …) must not go stale.
 - **[docs/cli.md](docs/cli.md)** — when a command, flag, or output changes.
-- **[schema.json](schema.json)** + guides ([docs/rule.guide.md](docs/rule.guide.md),
+- **[fux/data/schema.json](fux/data/schema.json)** + guides ([docs/rule.guide.md](docs/rule.guide.md),
   [docs/spec.guide.md](docs/spec.guide.md)) — when the rule schema changes.
 - **[tests/](tests/)** — every behaviour change ships with a test.
 
@@ -49,11 +49,13 @@ affected doc reflect it. If you're unsure a doc is affected, check it.
   cost in `savings`; memory capture/governance in `capture`/`governance`; agent
   integration in `mcpserver`; dashboard in `serve`; migration/decommission in
   `importer`/`narrative`/`parity`; hooks in `hooks`/`touch`/`hookio`.
-- `hooks/` — shell hook wrappers wired into a project by `fux init`.
-- `global/` — seed best-practice rules shared across projects.
+- `fux/data/` — seed assets bundled into the PyPI package: `hooks/` (shell hook
+  wrappers), `global/` (best-practice rules), `skills/` (workflow skill docs),
+  `packs/` (optional knowledge packs), `schema.json`. Copied to `~/.claude/fux/`
+  by `fux setup` (PyPI install) or `install.sh` (dev/editable install).
 - `skills/` — workflow skill docs (`plan`/`adr`/`trace`/`savings`); only
   `plan`/`adr` call the LLM. Add one → also wire it into [install.sh](install.sh)
-  and the top-level `skills/fux/SKILL.md`.
+  and `fux/data/skills/fux/SKILL.md`.
 - `tests/` — pytest suite; `docs/` — plan + status + reference.
 
 ## Build & test

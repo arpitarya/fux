@@ -1,6 +1,8 @@
 """Mutating / build command handlers — print output, return an exit code."""
 from __future__ import annotations
 
+import shutil
+import subprocess
 from pathlib import Path
 
 from fux import (build, check, config, context, fix, gate, importer, initcmd,
@@ -90,3 +92,71 @@ def cmd_import_memory(args) -> int:
     if not created and not skipped:
         print("fux: no home-dir memory found for this project.")
     return 0
+
+
+def cmd_setup(_args) -> int:
+    """Copy bundled seed data (schema, hooks, global rules, skills) to ~/.claude/fux/.
+
+    Equivalent to what install.sh does for a PyPI-installed package.
+    Idempotent: global rules and packs are skipped if already present.
+    """
+    data = paths.bundled_data_dir()
+    home_fux = paths.claude_home() / "fux"
+    skills_dir = paths.claude_home() / "skills"
+    home_fux.mkdir(parents=True, exist_ok=True)
+
+    # schema.json
+    shutil.copy2(data / "schema.json", home_fux / "schema.json")
+    print(f"✔ schema      → {home_fux / 'schema.json'}")
+
+    # hooks (chmod +x each script)
+    dest_hooks = home_fux / "hooks"
+    dest_hooks.mkdir(parents=True, exist_ok=True)
+    for sh in sorted((data / "hooks").glob("*.sh")):
+        dst = dest_hooks / sh.name
+        shutil.copy2(sh, dst)
+        dst.chmod(dst.stat().st_mode | 0o111)
+    print(f"✔ hooks       → {dest_hooks}/")
+
+    # packs (skip if already present — user may have customised)
+    dest_packs = home_fux / "packs"
+    if not dest_packs.exists():
+        shutil.copytree(data / "packs", dest_packs)
+        print(f"✔ packs       → {dest_packs}/")
+    else:
+        print(f"· packs       → {dest_packs}/ (exists — skipped)")
+
+    # global rules seed (init as a git repo so users can push to a private remote)
+    dest_global = home_fux / "global"
+    if not dest_global.exists():
+        shutil.copytree(data / "global", dest_global)
+        for cmd in (["git", "init", "-q"], ["git", "add", "-A"],
+                    ["git", "commit", "-qm", "seed global best practices"]):
+            subprocess.run(cmd, cwd=dest_global, check=False,
+                           capture_output=True)
+        print(f"✔ global      → {dest_global}/ (git-initialised)")
+        print("  Add a private remote to sync global rules across machines.")
+    else:
+        print(f"· global      → {dest_global}/ (exists — skipped)")
+
+    # skills
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    skills_src = data / "skills"
+    _copy_skill(skills_src / "fux", skills_dir / "fux")
+    print(f"✔ /fux skill  → {skills_dir / 'fux'}/")
+    for name in ("plan", "adr", "trace", "savings", "distill", "fetch-rules"):
+        src = skills_src / name
+        if src.exists():
+            _copy_skill(src, skills_dir / f"fux-{name}")
+    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,trace,savings,distill,fetch-rules}}/")
+
+    print("\n✔ Fux assets installed.")
+    print("  In any project: fux init  →  fux new formula <id>  →  fux build")
+    return 0
+
+
+def _copy_skill(src: Path, dst: Path) -> None:
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in src.iterdir():
+        if f.is_file():
+            shutil.copy2(f, dst / f.name)

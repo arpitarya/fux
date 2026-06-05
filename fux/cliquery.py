@@ -1,9 +1,10 @@
 """Read-only query command handlers (recall/why/refs/new/coverage/verify/tour)."""
 from __future__ import annotations
+import sys
 
-from fux import (capture, config, costledger, coverage, explain, lint, loader,
-                 mine, parity, paths, recall, savings, scaffold, seal, stats,
-                 tour, verify)
+from fux import (capture, config, costledger, coverage, explain, fetchrules,
+                 lint, loader, mine, parity, paths, recall, savings, scaffold,
+                 seal, stats, tour, verify)
 from fux.cliutil import root
 
 
@@ -131,4 +132,26 @@ def cmd_capture(args) -> int:
     if not getattr(args, "list", False):
         capture.observe(here)
     print(capture.summary(capture.pending(here)))
+    return 0
+
+
+def cmd_fetch_rules(args) -> int:
+    """Fetch and print the plain-text content of a URL / file / PDF.
+
+    This is the $0 extraction half of ``/fux fetch-rules``.  Pass the output
+    to the skill (Claude) which analyzes it and authors durable rule entries.
+    """
+    source = args.source
+    try:
+        text = fetchrules.fetch_text(source)
+    except fetchrules.PDFDependencyError as exc:
+        print(f"fux: {exc}", file=sys.stderr)
+        return 1
+    except fetchrules.FetchError as exc:
+        print(f"fux: {exc}", file=sys.stderr)
+        return 1
+    label = fetchrules.source_label(source)
+    if not getattr(args, "raw", False):
+        print(f"# Source: {label}  ({len(text):,} chars)\n")
+    print(text)
     return 0

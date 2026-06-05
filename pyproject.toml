@@ -4,14 +4,34 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fux-engine"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Fux — a portable, Claude-aware knowledge engine: rules, memory, narrative, and graph in one frontmatter substrate."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
-authors = [{ name = "arpit arya" }]
-keywords = ["knowledge", "rules", "graph", "claude", "frontmatter"]
+authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
+keywords = ["knowledge", "rules", "graph", "claude", "frontmatter", "llm", "memory", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = []  # stdlib only — $0, deterministic, dependency-free (see docs/fux-plan.md §3)
+
+[project.urls]
+Homepage = "https://github.com/arpitarya/fux"
+Repository = "https://github.com/arpitarya/fux"
+Documentation = "https://github.com/arpitarya/fux/blob/main/docs/guide.md"
+"Bug Tracker" = "https://github.com/arpitarya/fux/issues"
 
 [project.scripts]
 fux = "fux.cli:main"
@@ -19,13 +39,28 @@ fux = "fux.cli:main"
 [project.optional-dependencies]
 # Phase-2 opt-in local embedding re-rank (recall-engine.compare.md). Never required.
 embeddings = ["sentence-transformers>=2.2"]
-dev = ["pytest>=8"]
+# PDF text extraction for `fux fetch-rules` with .pdf sources.
+pdf = ["pypdf>=4.0"]
+dev = ["pytest>=8", "build>=1.0", "twine>=5.0"]
 
-[tool.setuptools]
-packages = ["fux"]
+[tool.setuptools.dynamic]
+version = {attr = "fux.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fux*"]
 
 [tool.setuptools.package-data]
-fux = ["templates/*.md", "assets/*"]
+fux = [
+    "templates/*.md",
+    "assets/*",
+    "data/schema.json",
+    "data/global/README.md",
+    "data/global/rules/*.md",
+    "data/hooks/*.sh",
+    "data/packs/**/*",
+    "data/skills/**/*",
+]
 
 [tool.ruff]
 line-length = 100

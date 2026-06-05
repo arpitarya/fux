@@ -120,6 +120,13 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("report", help="write GRAPH_REPORT.md (god nodes + communities)").set_defaults(fn=cligraph.cmd_report)
 
+    sub.add_parser("setup", help="copy bundled assets (schema, hooks, skills) to ~/.claude/fux/").set_defaults(fn=clicmds.cmd_setup)
+
+    fr = sub.add_parser("fetch-rules", help="fetch plain text from a URL / file / PDF for rule extraction")
+    fr.add_argument("source", help="http(s):// URL, local .txt/.md, or .pdf path")
+    fr.add_argument("--raw", action="store_true", help="omit the header line (pure text output)")
+    fr.set_defaults(fn=cliquery.cmd_fetch_rules)
+
     # Internal hook entrypoints (wired by `fux init`, not for direct use).
     sub.add_parser("hook-touch").set_defaults(fn=lambda a: hooks.post_tool_use())
     sub.add_parser("hook-check").set_defaults(fn=lambda a: hooks.stop())
