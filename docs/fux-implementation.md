@@ -116,6 +116,11 @@ Implemented ([fux/graph.py](fux/graph.py), [fux/astextract.py](fux/astextract.py
 - **JS/TS, Go, Rust** — declaration nodes **and intra-file `calls` edges** via
   brace-matched function bodies (string/comment-aware heuristic, shared
   `CALL_KEYWORDS` filter). Covered by [tests/test_astextract.py](tests/test_astextract.py).
+- **Optional real ASTs (`[ast]` extra, plan §19a)** — `pip install fux-engine[ast]`
+  swaps the heuristic for `tree-sitter` on JS/TS/Go/Rust (`_treesitter`/`_ts_parser`),
+  **same node/edge schema**, default still stdlib-only/$0. `graph.build` stamps
+  `meta.extractor` and `fux check` flags `extractor-drift` on backend mismatch so the
+  graph stays reproducible. Covered by [tests/test_ast_backend.py](tests/test_ast_backend.py).
 - File nodes + `governs` (rule→code), `contains` (file→symbol), `references`
   (cross-file/cross-language heuristic) edges; rule↔rule typed edges.
 - Deterministic **community detection** (label propagation) + `GRAPH_REPORT.md`
@@ -245,6 +250,9 @@ viewer. Built for both developer review and **agent use**:
 - **Agent export** — *Copy node ⧉* (selected node + connections as markdown) and
   *Copy visible graph ⧉* (the filtered sub-graph as markdown) → paste straight
   into an agent prompt.
+- **Performance** — repulsion loop processes each pair once (`i<j`) for O(n²/2)
+  work instead of O(n²); `PHYS_STRIDE` skips physics every other frame on graphs
+  with >600 nodes so the render thread stays at ≥30 fps regardless of graph size.
 
 Render contract covered by [tests/test_graphhtml.py](tests/test_graphhtml.py).
 
@@ -321,11 +329,12 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (111 tests)
+### 2.20 Tests — ✅ (133 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
 ([test_astextract.py](tests/test_astextract.py), [test_crossfile_calls.py](tests/test_crossfile_calls.py)),
+the optional **tree-sitter backend + extractor provenance** ([test_ast_backend.py](tests/test_ast_backend.py)),
 extended verify examples ([test_examples.py](tests/test_examples.py)), the
 **recall eval set + recall@k/MRR** ([test_recall_eval.py](tests/test_recall_eval.py)),
 **RRF hybrid** ([test_hybrid.py](tests/test_hybrid.py)), the cost-savings estimator
@@ -396,9 +405,14 @@ Pushes past the planned scope; all `$0`, deterministic, stdlib-only. **Shipped (
   opt-in deterministic query expansion (`recall_expand`/`--expand`), eval grown to 24
   queries + hard negatives + a regression gate ([test_recall_eval.py](../tests/test_recall_eval.py)):
   recall@1 0.875 / recall@3 1.0 / MRR 0.931.
-- 🟡 **19 Graph to exact** — ✅ deterministic **PageRank centrality**
+- ✅ **19 Graph to exact** — ✅ deterministic **PageRank centrality**
   ([graphquery.py](../fux/graphquery.py)) on every node + a `GRAPH_REPORT.md`
-  "Chokepoints" section; ⬜ the `tree-sitter` extra (needs an external grammar dep).
+  "Chokepoints" section; ✅ optional **`[ast]` tree-sitter extra**
+  ([astextract.py](../fux/astextract.py) `_treesitter`/`_ts_parser`) — real ASTs for
+  JS/TS/Go/Rust when installed, identical node/edge schema, default still stdlib-only.
+  Reproducibility kept honest: `graph.build` stamps `meta.extractor`
+  (`backend_fingerprint()`) and `fux check` raises a non-blocking `extractor-drift`
+  finding on backend mismatch ([test_ast_backend.py](../tests/test_ast_backend.py)).
 - ✅ **20 Verification hardening** — `fux verify --fuzz` div-by-zero boundary fuzzing
   ([vexamples.py](../fux/vexamples.py)), `overlap-unlinked` lint ([lint.py](../fux/lint.py)),
   usage-weighted decay (`usage_tracking`, [usage.py](../fux/usage.py) → [governance.py](../fux/governance.py)).
@@ -409,9 +423,9 @@ Pushes past the planned scope; all `$0`, deterministic, stdlib-only. **Shipped (
 - ✅ **25 Optimal context packing** — 0/1 knapsack ([pack.py](../fux/pack.py)) gated on
   `context_budget_tokens`.
 
-**Deferred (need a non-`$0` / runtime surface, kept ⬜):** 19a `tree-sitter` extra
-(external dep), 21 automated value proof (live agent runs), 26 self-densifying graph
-(MCP-runtime traversal logging), 27 federated mesh (**undecided — may never ship**).
+**Deferred (need a non-`$0` / runtime surface, kept ⬜):** 21 automated value proof
+(live agent runs), 26 self-densifying graph (MCP-runtime traversal logging), 27
+federated mesh (**undecided — may never ship**).
 
 ---
 

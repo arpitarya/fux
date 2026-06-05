@@ -76,11 +76,22 @@ const inFocus = n => !focusSet || focusSet.has(n.id);
 const visible = n => !hidden.has(n.type) && inFocus(n);
 const eVisible = e => !hiddenE.has(e.type) && visible(byId[e.source]) && visible(byId[e.target]);
 
+// Physics runs every PHYS_STRIDE render frames so rendering stays at ≥30 fps
+// even when the simulation is expensive (large graphs).
+const PHYS_STRIDE = nodes.length > 600 ? 2 : 1;
+let _drawFrame = 0;
+
 function step(){
   const vis = nodes.filter(visible);
-  for (const a of vis) for (const b of vis){ if(a===b) continue;
-    let dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy)||1;
-    if(d<280){ const f=charge/(d*d); a.vx+=dx/d*f; a.vy+=dy/d*f; } }
+  // Process each pair once (i<j) and apply equal-and-opposite forces to both
+  // nodes — halves the O(n²) work vs the naive double-loop.
+  for (let i=0; i<vis.length; i++){
+    const a=vis[i];
+    for (let j=i+1; j<vis.length; j++){
+      const b=vis[j];
+      let dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy)||1;
+      if(d<280){ const f=charge/(d*d*d);
+        a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f; } } }
   for (const e of edges){ if(!eVisible(e)) continue; const a=byId[e.source], b=byId[e.target];
     let dx=b.x-a.x, dy=b.y-a.y, d=Math.hypot(dx,dy)||1, f=(d-linkDist)*0.01;
     a.vx+=dx/d*f; a.vy+=dy/d*f; b.vx-=dx/d*f; b.vy-=dy/d*f; }
@@ -103,7 +114,8 @@ function clearFocus(){ focusSet = null; }
 
 // ---- render -------------------------------------------------------------
 function draw(){
-  if(running) step();
+  _drawFrame++;
+  if(running && _drawFrame % PHYS_STRIDE === 0) step();
   ctx.clearRect(0,0,cv.width,cv.height);
   const near = selected ? neighbors(selected) : (hover ? neighbors(hover) : null);
   const anchor = selected || hover;

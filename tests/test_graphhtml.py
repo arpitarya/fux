@@ -13,3 +13,6 @@ def test_render_substitutes_data_and_boot():
     # Exceptional-UI affordances are wired in the template/boot.
     for marker in ("Colour by", "Edge types", "EDGE_COLORS", "Copy node", "graphMarkdown"):
         assert marker in html
+    # Performance: O(n²/2) pair loop and adaptive stride must be present.
+    assert "PHYS_STRIDE" in html
+    assert "i<vis.length" in html      # inner loop uses index (not for-of pairs)
