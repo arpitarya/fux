@@ -24,8 +24,35 @@ def run(root: Path) -> list[Finding]:
         findings += _memory_decay(r, cfg)
         findings += _seal(r, root)
     findings += _conflicts(layered)
+    findings += _extractor_drift(fp)
     _write_drift(fp, findings)
     return findings
+
+
+def _extractor_drift(fp) -> list[Finding]:
+    """Advisory: graph.json was built with a different non-Python extractor than
+    the one available now (e.g. committed with the [ast] extra, but it's not
+    installed here). Keeps Fux honestly reproducible — the divergence is surfaced,
+    not silent (plan §19a). Non-blocking; a `fux build` reconciles it."""
+    import json
+
+    from fux import astextract
+    f = fp.out / "graph.json"
+    if not f.exists():
+        return []
+    try:
+        stored = json.loads(f.read_text(encoding="utf-8")).get("meta", {}).get("extractor")
+    except (OSError, ValueError):
+        return []
+    if stored is None:
+        return []
+    current = astextract.backend_fingerprint()
+    if stored != current:
+        return [Finding("extractor-drift", "graph.json",
+                        f"graph built with {stored.get('non_python', '?')} "
+                        f"({stored.get('grammars', 'n/a')}), but this machine has "
+                        f"{current.get('non_python', '?')} — run `fux build` to reconcile")]
+    return []
 
 
 def _memory_decay(r: Rule, cfg: dict) -> list[Finding]:
@@ -107,7 +134,7 @@ def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
     lines = ["# Fux DRIFT report", "",
              f"_{len(findings)} finding(s)._" if findings else "_No drift — all rules current._", ""]
     for kind in ("schema", "dead-ref", "conflict", "stale", "plan-drift", "invariant",
-                 "memory-stale", "unsealed"):
+                 "memory-stale", "unsealed", "extractor-drift"):
         group = [f for f in findings if f.kind == kind]
         if group:
             lines.append(f"## {kind} ({len(group)})")

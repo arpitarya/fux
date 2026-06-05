@@ -59,7 +59,8 @@ def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
         nodes[nid]["centrality"] = round(score, 6)
     return {"nodes": list(nodes.values()), "edges": edges,
             "meta": {"code_files": sum(n["type"] == "code-file" for n in nodes.values()),
-                     "rules": len(rs.rules), "communities": len(set(comm.values()))}}
+                     "rules": len(rs.rules), "communities": len(set(comm.values())),
+                     "extractor": astextract.backend_fingerprint()}}
 
 
 def _symbol_index(nodes: dict) -> dict[str, list[str]]:

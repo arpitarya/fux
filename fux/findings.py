@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 # Severity ordering drives strict-mode blocking and DRIFT.md grouping.
 KINDS = ["schema", "dead-ref", "stale", "plan-drift", "conflict", "invariant",
-         "memory-stale", "unsealed"]
+         "memory-stale", "unsealed", "extractor-drift"]
 # Kinds that hard-block in `strict` mode (plan §8 strictness table).
 BLOCKING = {"schema", "dead-ref", "invariant", "conflict"}
 

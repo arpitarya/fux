@@ -159,8 +159,19 @@ sub-areas shipped (106 tests):
   MRR 0.931). Supersedes the "BM25-lite" note in the Recall section below.
 - **Graph centrality** (§17.19b) — deterministic **PageRank** (`fux/graphquery.py`
   `pagerank`/`chokepoints`) stored as `centrality` on every node and surfaced in a
-  `GRAPH_REPORT.md` "Chokepoints" section. (The `tree-sitter` extra, §17.19a, is
-  deferred — it needs an external grammar dependency, off-limits to the default.)
+  `GRAPH_REPORT.md` "Chokepoints" section.
+- **Optional tree-sitter backend** (§17.19a) — the `[ast]` extra
+  (`pip install fux-engine[ast]`) swaps the regex/brace heuristic for real ASTs on
+  JS/TS/Go/Rust (`fux/astextract.py` `_treesitter`/`_ts_parser`, built on the stable
+  `tree_sitter.Parser` + a grammar pack's `get_language`). Emits the **same node/edge
+  schema** as the heuristic — only accuracy changes (e.g. Go structs now surface as
+  `class` nodes). The default stays stdlib-only/$0; tree-sitter is never required.
+  Reproducibility is kept honest by design: `graph.build` records `meta.extractor`
+  (`backend_fingerprint()` — backend + grammar versions) and `fux check` raises a
+  **non-blocking `extractor-drift`** finding when a committed graph was built with a
+  different backend than the one installed locally. Richer import/type edges are
+  intentionally **not** added to the stored substrate (reserved for the report layer)
+  so the graph never diverges by more than the heuristic already does.
 - **Verification hardening** (§17.20) — `fux verify --fuzz` boundary-perturbs numeric
   example inputs and flags unguarded **div-by-zero** (`fux/vexamples.py`
   `fuzz_examples`, only `ZeroDivisionError` is treated as a clean signal); an
@@ -178,9 +189,9 @@ sub-areas shipped (106 tests):
 - **Optimal context packing** (§17.25) — a real 0/1 knapsack DP (`fux/pack.py`) gated
   on `context_budget_tokens` (default 0 ⇒ inject everything), wired into `fux/context.py`.
 
-Deferred (need a non-`$0` or runtime surface): the `tree-sitter` extra (19a),
-automated A/B value proof (21, needs live agent runs), the self-densifying graph (26,
-needs MCP-runtime traversal logging), and the federated mesh (27, **undecided**).
+Deferred (need a non-`$0` or runtime surface): automated A/B value proof (21, needs
+live agent runs), the self-densifying graph (26, needs MCP-runtime traversal logging),
+and the federated mesh (27, **undecided**).
 Also fixed a pre-existing `tomllib` duplicate-key failure in `tests/test_parity_import.py`.
 
 ## Decisions taken (the plan's "still open" items)
@@ -200,7 +211,9 @@ re-implementation of graphify's multi-language pipeline:
 - **Python** — real symbol + call-edge extraction via the stdlib `ast` module
   (functions, classes, intra-file `calls`).
 - **JS/TS, Go, Rust** — declaration nodes via regex **plus intra-file `calls`
-  edges** via a brace-matched, string/comment-aware heuristic (`_body_span`).
+  edges** via a brace-matched, string/comment-aware heuristic (`_body_span`). With
+  the optional `[ast]` extra installed (plan §19a) these languages are extracted with
+  **real tree-sitter ASTs** instead, at the same node/edge schema.
 - **All languages** — file nodes, `governs` edges to rules via `code_refs`,
   heuristic cross-file `references` edges, rule↔rule `related`/typed edges,
   community detection, and the `query/path/explain` traversals.

@@ -97,7 +97,9 @@ drifted, Stop validates before the turn ends.
 
 The **graph** merges your rules with code symbols and call edges extracted across
 **Python** (via the stdlib `ast`) and **JS/TS, Go, and Rust** (a brace-matched
-heuristic), now including **cross-file** `calls` (symbol→symbol) — one navigable
+heuristic by default, or **real tree-sitter ASTs** with the optional
+`pip install fux-engine[ast]` extra — same schema, more accuracy, still $0 by
+default), now including **cross-file** `calls` (symbol→symbol) — one navigable
 map of *which rule governs which code*, with community clustering, **PageRank
 centrality** (architectural chokepoints, not just raw degree), and a
 `GRAPH_REPORT.md`. The interactive `graph.html` is built for review *and* agents:

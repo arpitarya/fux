@@ -11,7 +11,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 |---|---|---|
 | `fux init [--recall]` | Scaffold `.fux/` footprint, wire the 3 core hooks into `.claude/settings.json`, drop a CLAUDE.md pointer. `--recall` also wires the optional UserPromptSubmit recall hook. | $0 |
 | `fux build [--full]` | Regenerate `INDEX.md` + `rules.json` + graph + `NARRATIVE.md`. Graphs files matching `graph_globs` (broader than `important_globs`); `--full` graphs every non-ignored file. | $0 |
-| `fux check [--fix]` | Validate schema, dead `code_refs`, git-staleness, and conflicts; write `DRIFT.md`. `--fix` applies mechanical repairs (drop dead refs, bump `updated`). Exit 2 under `strict` mode with blocking findings. | $0 |
+| `fux check [--fix]` | Validate schema, dead `code_refs`, git-staleness, and conflicts; write `DRIFT.md`. Also raises a non-blocking `extractor-drift` advisory when `graph.json` was built with a different graph backend than is installed locally (the optional `[ast]` tree-sitter extra). `--fix` applies mechanical repairs (drop dead refs, bump `updated`). Exit 2 under `strict` mode with blocking findings. | $0 |
 | `fux context` | Emit the compact Tier-1 INDEX (global ⊕ packs ⊕ project) — the SessionStart injection. | $0 |
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | **BM25F** lexical retrieval (per-field length-normalised). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity; `--expand` widens the query with glossary synonyms + 1-hop `related` neighbours. All `$0`. | $0 |
 | `fux why <id> [--history]` | Explain a rule: rationale + linked code + edges + invariant + body. `--history` shows how the *why* evolved (git log over the rule file, `--follow`). | $0 |
@@ -90,3 +90,14 @@ draft-only `fux_new` — each deterministic, `$0`, no LLM.
 | `FUX_PACKS` | Packs dir (default `~/.claude/fux/packs`). |
 | `FUX_SCHEMA` | `schema.json` path. |
 | `FUX_PYTHON` | Interpreter the hook wrappers use when `fux` is not on PATH. |
+
+### Optional extras
+
+All off by default — Fux is `$0` and stdlib-only without them. None is ever required,
+and none calls an LLM.
+
+| Extra | Install | What it adds |
+|---|---|---|
+| `embeddings` | `pip install fux-engine[embeddings]` | Local sentence-transformers re-rank for `recall` (gated on `recall_rerank`); falls back to a $0 char-trigram cosine when absent. |
+| `ast` | `pip install fux-engine[ast]` | Real **tree-sitter** ASTs for JS/TS/Go/Rust graph extraction instead of the brace heuristic — same node/edge schema, more accuracy. `fux build` records the active backend in `graph.json` `meta.extractor`; `fux check` flags `extractor-drift` if a committed graph was built with a different backend, so the graph stays reproducible across machines. |
+| `pdf` | `pip install fux-engine[pdf]` | `.pdf` text extraction for `fux fetch-rules`. |

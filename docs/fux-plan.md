@@ -705,9 +705,9 @@ define the plan artifact's required sections *before* `plan` is built.
 > Beyond the planned roadmap, but *not* speculative: push the three things Fux
 > already does — **retrieve**, **stay-correct**, **integrate** — to best-in-class,
 > all within the existing constraints. These are the highest-ROI "more" because they
-> raise quality on the surface agents hit every turn. **Status: 18 & 20 shipped;
-> 19 partial (centrality shipped, tree-sitter deferred); 21 deferred (needs agent
-> runs).**
+> raise quality on the surface agents hit every turn. **Status: 18, 19 & 20 shipped
+> (19: centrality + the optional `[ast]` tree-sitter extra, default still stdlib-only);
+> 21 deferred (needs agent runs).**
 
 18. ✅ **Retrieval to SOTA.** Recall is what agents hit most — today BM25-lite +
     opt-in trigram + graph RRF ([recall.py](../fux/recall.py), [hybrid.py](../fux/hybrid.py)),
@@ -724,19 +724,30 @@ define the plan artifact's required sections *before* `plan` is built.
     `related`) via `recall_expand` / `--expand`; eval grown to 24 queries with hard
     negatives + a `test_recall_regression_gate` (recall@1 0.875 / recall@3 1.0 /
     MRR 0.931).
-19. 🟡 **Graph to exact.** Non-Python extraction is a brace-matched heuristic — the
+19. ✅ **Graph to exact.** Non-Python extraction is a brace-matched heuristic — the
     honest ceiling on graph quality. **(a) Optional `tree-sitter` extra** (same
     opt-in pattern as `[embeddings]`): default stays `$0`/hand-rolled, but
-    `pip install fux-engine[ast]` yields real call graphs, imports, and type edges
-    for JS/TS/Go/Rust ([astextract.py](../fux/astextract.py)). **(b) Centrality beyond
+    `pip install fux-engine[ast]` yields real call graphs for JS/TS/Go/Rust
+    ([astextract.py](../fux/astextract.py)). **(b) Centrality beyond
     degree** — `GRAPH_REPORT.md` ranks god-nodes by raw degree; add deterministic
     **PageRank / betweenness** (pure stdlib, ~40 lines, [community.py](../fux/community.py)/
     [graph.py](../fux/graph.py)) to find architectural chokepoints degree misses, and
     feed the score back into recall ranking. Makes the graph *trustworthy*, not just
     "good enough." **(b) shipped:** deterministic PageRank ([graphquery.py](../fux/graphquery.py)
     `pagerank`/`chokepoints`), stored as `centrality` on every node and surfaced in a
-    `GRAPH_REPORT.md` "Chokepoints" section. **(a) deferred:** the `tree-sitter` extra
-    needs an external grammar dependency — left ⬜ so the default stays stdlib-only.
+    `GRAPH_REPORT.md` "Chokepoints" section. **(a) shipped:** the optional `[ast]`
+    extra ([astextract.py](../fux/astextract.py) `_treesitter`/`_ts_parser`) swaps the
+    regex/brace heuristic for real ASTs on JS/TS/Go/Rust when
+    `tree-sitter`+`tree-sitter-language-pack` are installed — **same node/edge schema**,
+    just more accurate (e.g. Go structs become `class` nodes the heuristic missed).
+    The default stays stdlib-only; tree-sitter is never required, never an LLM, still
+    deterministic. To keep the graph **reproducible across machines**, `graph.build`
+    stamps `meta.extractor` with the active backend + grammar versions
+    (`backend_fingerprint()`), and `fux check` raises a non-blocking `extractor-drift`
+    finding when a committed graph was built with a different backend than the one
+    present locally — divergence is *auditable*, not silent. Richer import/type edges
+    are deliberately **not** added to the stored substrate (kept for the report layer)
+    so the graph never diverges by more than the heuristic already does.
 20. ✅ **Verification hardening (the moat).** Verify is the thing competitors don't
     have, so SOTA matters most here. **(a) Property/example fuzzing** — `examples:`
     run fixed inputs; deterministically generate boundary inputs (zero, negative,

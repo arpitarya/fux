@@ -39,6 +39,10 @@ fux = "fux.cli:main"
 [project.optional-dependencies]
 # Phase-2 opt-in local embedding re-rank (recall-engine.compare.md). Never required.
 embeddings = ["sentence-transformers>=2.2"]
+# Opt-in real ASTs for non-Python graph extraction (plan §19a). Default stays the
+# stdlib heuristic — this only upgrades JS/TS/Go/Rust call graphs. Never required;
+# `fux build` records which backend produced a graph so it stays reproducible.
+ast = ["tree-sitter>=0.23", "tree-sitter-language-pack>=0.7"]
 # PDF text extraction for `fux fetch-rules` with .pdf sources.
 pdf = ["pypdf>=4.0"]
 dev = ["pytest>=8", "build>=1.0", "twine>=5.0"]

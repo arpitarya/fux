@@ -7,6 +7,13 @@ not a full parser, but enough for call-graph parity (plan §13.1). A stateful
 sanitizer blanks string/char/template literals and ``//`` + ``/* */`` comments
 (including multi-line) before brace matching, so braces inside them don't skew
 spans. Code nodes later merge with rule/memory/narrative nodes by ``code_refs``.
+
+**Optional `[ast]` extra (plan §19a).** If ``tree-sitter`` + a grammar pack are
+installed (``pip install fux-engine[ast]``), JS/TS/Go/Rust are extracted with real
+ASTs instead of the regex/brace heuristic — same node/edge *schema*, just more
+accurate. The default stays stdlib-only and $0; tree-sitter is never required.
+``backend_fingerprint()`` records which backend ran so a built graph stays
+reproducible across machines (the meta is stamped by ``graph.build``).
 """
 from __future__ import annotations
 
@@ -80,7 +87,14 @@ def extract(path: Path, rel: str) -> tuple[list[dict], list[dict]]:
 
 
 def extract_text(text: str, suffix: str, rel: str) -> tuple[list[dict], list[dict]]:
-    return _python(text, rel) if suffix == ".py" else _generic(text, rel)
+    if suffix == ".py":
+        return _python(text, rel)
+    lang = _TS_LANG.get(suffix)
+    if lang:
+        parser = _ts_parser(lang)
+        if parser is not None:
+            return _treesitter(text, parser, lang, rel)
+    return _generic(text, rel)
 
 
 def call_names(text: str) -> set[str]:
@@ -91,7 +105,14 @@ def call_names(text: str) -> set[str]:
 def external_call_sites(text: str, suffix: str, rel: str) -> list[tuple[str, str]]:
     """(enclosing_symbol_id, callee_name) for calls whose callee is NOT defined in
     this file — the raw material for cross-*file* `calls` edges (plan §13.1)."""
-    return _py_externals(text, rel) if suffix == ".py" else _generic_externals(text, rel)
+    if suffix == ".py":
+        return _py_externals(text, rel)
+    lang = _TS_LANG.get(suffix)
+    if lang:
+        parser = _ts_parser(lang)
+        if parser is not None:
+            return _treesitter_externals(text, parser, lang, rel)
+    return _generic_externals(text, rel)
 
 
 def _py_externals(text: str, rel: str) -> list[tuple[str, str]]:
@@ -207,3 +228,183 @@ def _body_span(lines: list[str], start: int) -> tuple[int, int]:
         if opened and depth <= 0:
             return start, j + 1
     return start, len(lines)
+
+
+# ── Optional tree-sitter backend (plan §19a) ────────────────────────────────
+# Only active when the [ast] extra is installed; otherwise every helper here is
+# bypassed and the regex/brace heuristic above runs unchanged. Emits the *same*
+# node/edge schema as ``_generic`` so the graph substrate is backend-agnostic —
+# the only difference is accuracy. Richer edges (imports/types) are deliberately
+# NOT added to the substrate (kept for the report layer) so the stored graph does
+# not diverge by more than the heuristic already does.
+
+_TS_LANG = {".js": "javascript", ".jsx": "javascript", ".mjs": "javascript",
+            ".cjs": "javascript", ".ts": "typescript", ".tsx": "tsx",
+            ".go": "go", ".rs": "rust"}
+
+# Function/value-expression node types whose `variable_declarator` we treat as a
+# named function (JS/TS `const f = () => {}` / `const f = function () {}`).
+_FN_EXPR_TYPES = {"arrow_function", "function", "function_expression",
+                  "generator_function"}
+_TS_CALL = {"call_expression"}
+_IDENT_TYPES = {"identifier", "property_identifier", "field_identifier",
+                "type_identifier", "shorthand_property_identifier"}
+
+_JS_DECLS = {"function_declaration": "function",
+             "generator_function_declaration": "function",
+             "method_definition": "function",
+             "class_declaration": "class"}
+_TYPESCRIPT_DECLS = {**_JS_DECLS, "abstract_class_declaration": "class",
+                     "interface_declaration": "class",
+                     "function_signature": "function"}
+_GO_DECLS = {"function_declaration": "function",
+             "method_declaration": "function", "type_spec": "class"}
+_RUST_DECLS = {"function_item": "function", "struct_item": "class",
+               "enum_item": "class", "trait_item": "class", "union_item": "class"}
+_TS_DECLS = {"javascript": _JS_DECLS, "typescript": _TYPESCRIPT_DECLS,
+             "tsx": _TYPESCRIPT_DECLS, "go": _GO_DECLS, "rust": _RUST_DECLS}
+
+
+def _ts_parser(lang: str):
+    """Cached tree-sitter parser for ``lang``, or None when the extra is absent.
+
+    Builds a stdlib-style ``tree_sitter.Parser`` from a grammar ``Language`` so we
+    depend only on the stable py-tree-sitter API (``root_node``/``type``/
+    ``named_children``), not on a grammar pack's bespoke ``get_parser`` binding.
+    Prefers the maintained ``tree-sitter-language-pack``; falls back to the legacy
+    ``tree-sitter-languages``. Any import/lookup failure → None → heuristic path."""
+    cache = _ts_parser.__dict__.setdefault("_cache", {})
+    if lang in cache:
+        return cache[lang]
+    parser = None
+    try:
+        from tree_sitter import Parser
+        for mod in ("tree_sitter_language_pack", "tree_sitter_languages"):
+            try:
+                get_language = __import__(mod, fromlist=["get_language"]).get_language
+                parser = Parser(get_language(lang))
+                break
+            except Exception:
+                parser = None
+    except Exception:
+        parser = None
+    cache[lang] = parser
+    return parser
+
+
+def backend_fingerprint() -> dict:
+    """Which non-Python extractor is active + version, for graph provenance.
+
+    Stamped into ``graph.build``'s meta so a graph built with real ASTs is
+    self-describing: a teammate without the [ast] extra sees the graph came from
+    tree-sitter and can rebuild, instead of chasing a phantom diff. Keeps Fux
+    *honestly* deterministic — divergence is auditable, not silent (plan §19a)."""
+    from importlib.metadata import PackageNotFoundError, version
+    try:
+        import tree_sitter  # noqa: F401
+    except ModuleNotFoundError:
+        return {"non_python": "heuristic"}
+    for pkg in ("tree-sitter-language-pack", "tree-sitter-languages"):
+        try:
+            return {"non_python": "tree-sitter",
+                    "tree_sitter": version("tree-sitter"),
+                    "grammars": f"{pkg}=={version(pkg)}"}
+        except PackageNotFoundError:
+            continue
+    return {"non_python": "heuristic"}
+
+
+def _ts_text(node, src: bytes) -> str:
+    return src[node.start_byte:node.end_byte].decode("utf-8", "replace")
+
+
+def _ts_name(node, src: bytes) -> str | None:
+    field = node.child_by_field_name("name")
+    return _ts_text(field, src) if field is not None else None
+
+
+def _rightmost_ident(node, src: bytes) -> str | None:
+    """Trailing identifier of a callee expression: ``a.b.c()`` → ``c`` (parity with
+    the heuristic ``_CALL`` regex, which captures the name just before ``(``)."""
+    if node is None:
+        return None
+    if node.type in _IDENT_TYPES:
+        return _ts_text(node, src)
+    for child in reversed(node.named_children):
+        found = _rightmost_ident(child, src)
+        if found:
+            return found
+    return None
+
+
+def _ts_collect(text: str, parser, lang: str) -> tuple[bytes, list]:
+    """(source_bytes, [(name, kind, 1-based line, node)]) for every definition."""
+    src = text.encode("utf-8")
+    decls = _TS_DECLS.get(lang, {})
+    defs: list = []
+
+    def visit(node) -> None:
+        kind = decls.get(node.type)
+        name = _ts_name(node, src) if kind else None
+        if node.type == "type_spec" and not any(
+                c.type in ("struct_type", "interface_type") for c in node.named_children):
+            kind = name = None                       # Go type aliases aren't "classes"
+        if kind is None and lang in ("javascript", "typescript", "tsx") \
+                and node.type == "variable_declarator":
+            value = node.child_by_field_name("value")
+            if value is not None and value.type in _FN_EXPR_TYPES:
+                kind, name = "function", _ts_name(node, src)
+        if kind and name:
+            defs.append((name, kind, node.start_point[0] + 1, node))
+        for child in node.named_children:
+            visit(child)
+
+    visit(parser.parse(src).root_node)
+    return src, defs
+
+
+def _calls_in(node, src: bytes) -> list[str]:
+    out: list[str] = []
+
+    def walk(n) -> None:
+        if n.type in _TS_CALL:
+            callee = _rightmost_ident(n.child_by_field_name("function"), src)
+            if callee:
+                out.append(callee)
+        for child in n.named_children:
+            walk(child)
+
+    walk(node)
+    return out
+
+
+def _ts_edges(src: bytes, defs: list, rel: str) -> tuple[list[dict], list[tuple[str, str]]]:
+    """(intra-file `calls` edges, external (caller_id, callee_name) pairs)."""
+    defined = {name: f"{rel}::{name}" for name, _, _, _ in defs}
+    intra, seen, externals = [], set(), []
+    for name, kind, _line, node in defs:
+        if kind != "function":
+            continue
+        sid = f"{rel}::{name}"
+        for callee in _calls_in(node, src):
+            tid = defined.get(callee)
+            if tid:
+                if tid != sid and (sid, tid) not in seen:
+                    seen.add((sid, tid))
+                    intra.append({"source": sid, "target": tid, "type": "calls"})
+            elif callee not in CALL_KEYWORDS:
+                externals.append((sid, callee))
+    return intra, externals
+
+
+def _treesitter(text: str, parser, lang: str, rel: str) -> tuple[list[dict], list[dict]]:
+    src, defs = _ts_collect(text, parser, lang)
+    nodes = [{"id": f"{rel}::{name}", "label": name, "type": kind, "file": rel, "line": line}
+             for name, kind, line, _ in defs]
+    intra, _ = _ts_edges(src, defs, rel)
+    return nodes, intra
+
+
+def _treesitter_externals(text: str, parser, lang: str, rel: str) -> list[tuple[str, str]]:
+    src, defs = _ts_collect(text, parser, lang)
+    return _ts_edges(src, defs, rel)[1]
