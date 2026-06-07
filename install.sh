@@ -2,6 +2,7 @@
 # Install the Fux engine into the global layout (plan §4):
 #   ~/.claude/fux/engine/   ~/.claude/fux/global/ (git repo)   ~/.claude/fux/packs/
 #   ~/.claude/fux/hooks/    ~/.claude/fux/schema.json          ~/.claude/skills/fux/
+#   ~/.codex/skills/fux/    (or $CODEX_HOME/skills/fux/)
 # $0, idempotent. Run from the repo root.
 #
 # For PyPI installs (`pip install fux-engine`), use `fux setup` instead — it

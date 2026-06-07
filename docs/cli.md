@@ -9,7 +9,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 
 | Command | What it does | Cost |
 |---|---|---|
-| `fux init [--recall]` | Scaffold `.fux/` footprint, wire the 3 core hooks into `.claude/settings.json`, drop a CLAUDE.md pointer. `--recall` also wires the optional UserPromptSubmit recall hook. | $0 |
+| `fux init [--recall]` | Scaffold `.fux/` footprint, wire the 3 core hooks into `.claude/settings.json`, and drop Claude/Codex/Copilot pointers (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`). `--recall` also wires the optional UserPromptSubmit recall hook. | $0 |
 | `fux build [--full]` | Regenerate `INDEX.md` + `rules.json` + graph + `NARRATIVE.md`. Graphs files matching `graph_globs` (broader than `important_globs`); `--full` graphs every non-ignored file. | $0 |
 | `fux check [--fix]` | Validate schema, dead `code_refs`, git-staleness, and conflicts; write `DRIFT.md`. Also raises a non-blocking `extractor-drift` advisory when `graph.json` was built with a different graph backend than is installed locally (the optional `[ast]` tree-sitter extra). `--fix` applies mechanical repairs (drop dead refs, bump `updated`). Exit 2 under `strict` mode with blocking findings. | $0 |
 | `fux context` | Emit the compact Tier-1 INDEX (global ⊕ packs ⊕ project) — the SessionStart injection. | $0 |

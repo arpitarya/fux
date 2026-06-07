@@ -1,12 +1,12 @@
 ---
 name: fux
-description: "portable Claude-aware knowledge engine — rules, memory, narrative & graph in one frontmatter substrate; $0 deterministic maintenance"
+description: "portable agent-aware knowledge engine — rules, memory, narrative & graph in one frontmatter substrate; $0 deterministic maintenance"
 trigger: /fux
 ---
 
 # /fux
 
-Fux unifies three things Claude projects usually run separately — the structural
+Fux unifies three things agent-assisted projects usually run separately — the structural
 graph (graphify), cross-session memory, and the narrative docs — and adds the
 **business-rules layer** none of them held. One frontmatter substrate in `.fux/`,
 with derived **INDEX**, **graph**, and **memory** views. Continuously referenced,
@@ -16,7 +16,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 
 ```
 /fux                       # in an initialised project: build + report drift
-/fux init                  # scaffold .fux/ footprint + wire hooks + CLAUDE.md pointer
+/fux init                  # scaffold .fux/ footprint + agent pointers
 /fux build                 # regenerate INDEX.md + rules.json + graph        ($0)
 /fux check [--fix]         # validate schema/refs/staleness/conflicts; --fix repairs ($0)
 /fux recall "<question>"   # keyword-retrieve the rules relevant to a question ($0)
@@ -142,7 +142,7 @@ re-scan files for knowledge a rule already holds.
 
 ## Strictness (per project — `.fux/config.toml`)
 
-`off` (nothing) · `warn` (surface only) · **`fix`** (default — Claude
+`off` (nothing) · `warn` (surface only) · **`fix`** (default — the agent
 auto-repairs mechanically-fixable drift in-session; semantic drift becomes a
 scoped edit prompt) · `strict` (`exit 2` hard-block on blocking findings — CI
 gate).

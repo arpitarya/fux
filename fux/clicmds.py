@@ -16,6 +16,10 @@ def cmd_init(args) -> int:
     print(f"✔ Fux initialised at {info['footprint']}")
     print(f"  hooks wired   → {info['settings']}")
     print(f"  pointer added → {info['claude_md']}")
+    print(f"  codex guide   → {info['agents_md']}")
+    print(f"  copilot guide → {info['copilot_instructions']}")
+    if info["copilot_prompts"]:
+        print(f"  copilot prompts → {Path(info['copilot_prompts'][0]).parent}/")
     print("Next: `fux new formula <id>` to author your first rule, then `fux build`.")
     return 0
 
@@ -95,7 +99,7 @@ def cmd_import_memory(args) -> int:
 
 
 def cmd_setup(_args) -> int:
-    """Copy bundled seed data (schema, hooks, global rules, skills) to ~/.claude/fux/.
+    """Copy bundled seed data (schema, hooks, global rules, skills) to agent homes.
 
     Equivalent to what install.sh does for a PyPI-installed package.
     Idempotent: global rules and packs are skipped if already present.
@@ -103,6 +107,7 @@ def cmd_setup(_args) -> int:
     data = paths.bundled_data_dir()
     home_fux = paths.claude_home() / "fux"
     skills_dir = paths.claude_home() / "skills"
+    codex_skills_dir = paths.codex_home() / "skills"
     home_fux.mkdir(parents=True, exist_ok=True)
 
     # schema.json
@@ -149,6 +154,14 @@ def cmd_setup(_args) -> int:
         if src.exists():
             _copy_skill(src, skills_dir / f"fux-{name}")
     print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,trace,savings,distill,fetch-rules}}/")
+
+    codex_skills_dir.mkdir(parents=True, exist_ok=True)
+    _copy_skill(skills_src / "fux", codex_skills_dir / "fux")
+    for name in ("plan", "adr", "trace", "savings", "distill", "fetch-rules"):
+        src = skills_src / name
+        if src.exists():
+            _copy_skill(src, codex_skills_dir / f"fux-{name}")
+    print(f"✔ codex skills → {codex_skills_dir}/fux*")
 
     print("\n✔ Fux assets installed.")
     print("  In any project: fux init  →  fux new formula <id>  →  fux build")

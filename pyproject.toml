@@ -5,12 +5,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fux-engine"
 dynamic = ["version"]
-description = "Fux — a portable, Claude-aware knowledge engine: rules, memory, narrative, and graph in one frontmatter substrate."
+description = "Fux — a portable agent-aware knowledge engine: rules, memory, narrative, and graph in one frontmatter substrate."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
-keywords = ["knowledge", "rules", "graph", "claude", "frontmatter", "llm", "memory", "mcp"]
+keywords = ["knowledge", "rules", "graph", "claude", "codex", "copilot", "frontmatter", "llm", "memory", "mcp"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -64,6 +64,7 @@ fux = [
     "data/hooks/*.sh",
     "data/packs/**/*",
     "data/skills/**/*",
+    "data/copilot/**/*",
 ]
 
 [tool.ruff]

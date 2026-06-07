@@ -1,4 +1,4 @@
-"""`fux init` — scaffold the .fux/ footprint + wire hooks + CLAUDE.md pointer (plan §4)."""
+"""`fux init` — scaffold the .fux/ footprint + wire hooks + agent pointers."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -18,6 +18,32 @@ This project's rules, memory, narrative, and graph live in `.fux/` (one substrat
 - Author a new entry: `fux new <type> <id>`
 {POINTER_END}"""
 
+AGENTS_POINTER_START = "<!-- fux:agents:start -->"
+AGENTS_POINTER_END = "<!-- fux:agents:end -->"
+_AGENTS_POINTER = f"""{AGENTS_POINTER_START}
+## Fux knowledge engine
+
+This project's rules, memory, narrative, and graph live in `.fux/` (one substrate).
+
+- First check `fux context` for the compact INDEX when answering project questions.
+- Look up a rule with `fux why <id>` and file coverage with `fux refs <path>`.
+- Rebuild derived views with `fux build`; check drift with `fux check`.
+- Keep durable project knowledge in `.fux/` entries instead of orphan notes.
+{AGENTS_POINTER_END}"""
+
+COPILOT_POINTER_START = "<!-- fux:copilot:start -->"
+COPILOT_POINTER_END = "<!-- fux:copilot:end -->"
+_COPILOT_POINTER = f"""{COPILOT_POINTER_START}
+# Fux knowledge engine
+
+This repository stores durable rules, memory, narrative, and graph data in `.fux/`.
+
+When answering, reviewing, or suggesting code:
+- Prefer `fux context`, `fux recall "<question>"`, `fux why <id>`, and `fux refs <path>` for project knowledge.
+- Preserve and update `.fux/` entries when a code change creates or changes a durable rule.
+- Treat `.fux/out/` as generated output from `fux build`.
+{COPILOT_POINTER_END}"""
+
 
 def run(root: Path, recall: bool = False) -> dict:
     fp = paths.Footprint(root)
@@ -29,7 +55,13 @@ def run(root: Path, recall: bool = False) -> dict:
     (fp.out / ".gitkeep").touch()
     settings_path = settings.wire(root, recall=recall)
     pointer = _claude_pointer(root)
-    return {"footprint": str(fp.base), "settings": str(settings_path), "claude_md": str(pointer)}
+    agents = _agents_pointer(root)
+    copilot = _copilot_pointer(root)
+    prompts = _copilot_prompts(root)
+    return {"footprint": str(fp.base), "settings": str(settings_path),
+            "claude_md": str(pointer), "agents_md": str(agents),
+            "copilot_instructions": str(copilot),
+            "copilot_prompts": [str(p) for p in prompts]}
 
 
 def _gitignore(fp: paths.Footprint) -> None:
@@ -47,12 +79,46 @@ def _gitignore(fp: paths.Footprint) -> None:
 
 def _claude_pointer(root: Path) -> Path:
     path = root / "CLAUDE.md"
-    text = path.read_text(encoding="utf-8") if path.exists() else "# CLAUDE.md\n"
-    if POINTER_START in text:
-        head, _, rest = text.partition(POINTER_START)
-        _, _, tail = rest.partition(POINTER_END)
-        text = head + _POINTER + tail
-    else:
-        text = text.rstrip() + "\n\n" + _POINTER + "\n"
-    path.write_text(text, encoding="utf-8")
+    _write_pointer(path, "# CLAUDE.md\n", POINTER_START, POINTER_END, _POINTER)
     return path
+
+
+def _agents_pointer(root: Path) -> Path:
+    path = root / "AGENTS.md"
+    _write_pointer(path, "# AGENTS.md\n", AGENTS_POINTER_START, AGENTS_POINTER_END,
+                   _AGENTS_POINTER)
+    return path
+
+
+def _copilot_pointer(root: Path) -> Path:
+    path = root / ".github" / "copilot-instructions.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    _write_pointer(path, "", COPILOT_POINTER_START, COPILOT_POINTER_END,
+                   _COPILOT_POINTER)
+    return path
+
+
+def _copilot_prompts(root: Path) -> list[Path]:
+    src = paths.bundled_data_dir() / "copilot" / "prompts"
+    if not src.exists():
+        return []
+    dst = root / ".github" / "prompts"
+    dst.mkdir(parents=True, exist_ok=True)
+    copied = []
+    for prompt in sorted(src.glob("*.prompt.md")):
+        target = dst / prompt.name
+        if not target.exists():
+            target.write_text(prompt.read_text(encoding="utf-8"), encoding="utf-8")
+        copied.append(target)
+    return copied
+
+
+def _write_pointer(path: Path, default: str, start: str, end: str, pointer: str) -> None:
+    text = path.read_text(encoding="utf-8") if path.exists() else default
+    if start in text:
+        head, _, rest = text.partition(start)
+        _, _, tail = rest.partition(end)
+        text = head + pointer + tail
+    else:
+        text = text.rstrip() + "\n\n" + pointer + "\n"
+    path.write_text(text, encoding="utf-8")

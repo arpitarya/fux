@@ -2,7 +2,7 @@
 
 # Fux
 
-> A portable, Claude-aware **knowledge engine**. One frontmatter substrate →
+> A portable, agent-aware **knowledge engine**. One frontmatter substrate →
 > derived **index**, **graph**, and **memory** views. `$0` deterministic
 > maintenance — no mandatory LLM calls. Continuously referenced, cheaply
 > maintained.
@@ -24,10 +24,10 @@ live only in one builder's head. When they go home, nobody remembers why.
 
 **Fux is a notebook for those reasons.** You write each important rule down once —
 *what* it is and *why* — and Fux sticks a tiny one-line list on the cover so your
-helper (Claude) can flip straight to the right page instead of searching the whole
-city every time. Fux also **draws a map** showing which notes belong to which
-buildings, and **checks** that the notes still match the city — and it does all of
-that for free, without phoning anyone for help.
+helper can flip straight to the right page instead of searching the whole city
+every time. Fux also **draws a map** showing which notes belong to which
+buildings, and **checks** that the notes still match the city — and it does all
+of that for free, without phoning anyone for help.
 
 So: write the *why* down once → it's found fast, stays correct, and never gets lost.
 
@@ -45,7 +45,7 @@ on faith: **`fux savings`** measures the multiplier from your own file sizes.
 
 ```bash
 git clone git@github.com:arpitarya/fux.git && cd fux
-./install.sh          # → ~/.claude/fux/{engine,global,packs,hooks} + /fux skill
+./install.sh          # → ~/.claude/fux + Claude skills + ~/.codex/skills/fux*
 fux --version
 ```
 
@@ -55,7 +55,7 @@ Requires Python ≥ 3.11 (stdlib only — zero third-party dependencies).
 
 ```bash
 cd your-project
-fux init                       # scaffold .fux/ + wire 3 hooks + CLAUDE.md pointer
+fux init                       # scaffold .fux/ + Claude/Codex/Copilot pointers
 fux new formula day-pnl        # scaffold a rule; fill **Rule:/Why:/Edge cases:**
 fux build                      # regenerate INDEX.md + rules.json + graph   ($0)
 fux check --fix                # validate; repair mechanical drift           ($0)
@@ -86,7 +86,7 @@ Authoring a rule: [docs/rule.guide.md](docs/rule.guide.md). Writing a spec:
 ## How it works
 
 ```
-Tier 0  CLAUDE.md pointer ........ 1 line, always in context
+Tier 0  agent pointers ............ CLAUDE.md, AGENTS.md, Copilot instructions
 Tier 1  .fux/out/INDEX.md ........ ~1 line/rule, read FIRST        ← cheap
 Tier 2  .fux/rules/<id>.md ....... opened ONLY when relevant       ← lazy
 Tier 3  .fux/out/{rules,graph}.json  machine lookup + browsing

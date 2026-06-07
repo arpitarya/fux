@@ -1,13 +1,13 @@
 ---
 name: fux-fetch-rules
-description: "parse a URL, PDF, or text file and automatically derive + create durable Fux rule entries from the content — Claude reads the document and extracts every actionable rule"
+description: "parse a URL, PDF, or text file and automatically derive + create durable Fux rule entries from the content — the agent reads the document and extracts every actionable rule"
 trigger: /fux fetch-rules
 ---
 
 # /fux fetch-rules — derive rules from a document
 
 Read a source document (URL, PDF, or text file) and automatically extract every
-actionable rule it contains as durable `.fux/rules/` entries. Claude does the
+actionable rule it contains as durable `.fux/rules/` entries. The agent does the
 derivation — you don't need to read the document yourself.
 
 ## Inputs
@@ -35,8 +35,8 @@ project has a `.fux/` footprint (`$FUX init` if not).
 $FUX fetch-rules "<source>" --raw
 ```
 
-**Local PDF** — use Claude Code's `Read` tool directly (it handles PDFs
-natively). For a remote PDF URL, the CLI extractor handles it if `pypdf` is
+**Local PDF** — use the agent's file reader directly when it handles PDFs
+natively. For a remote PDF URL, the CLI extractor handles it if `pypdf` is
 installed (`pip install 'fux-engine[pdf]'`); otherwise download first:
 
 ```bash
@@ -143,5 +143,5 @@ Every created entry must:
 
 ## Cost
 
-The derivation step uses Claude (LLM). The fetch/extract step
+The derivation step uses the current agent/LLM. The fetch/extract step
 (`$FUX fetch-rules --raw`) is `$0` — pure stdlib, no API cost.

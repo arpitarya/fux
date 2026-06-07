@@ -10,6 +10,10 @@ def claude_home() -> Path:
     return Path(os.environ.get("CLAUDE_CONFIG_DIR", Path.home() / ".claude"))
 
 
+def codex_home() -> Path:
+    return Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+
+
 def global_dir() -> Path:
     """Cross-project best practices (its own git repo). plan §5."""
     return Path(os.environ.get("FUX_GLOBAL", claude_home() / "fux" / "global"))
