@@ -107,6 +107,8 @@ def build_parser() -> argparse.ArgumentParser:
     q = sub.add_parser("query", help="traverse the graph from rules matching a question")
     q.add_argument("query")
     q.add_argument("--depth", type=int, default=1)
+    q.add_argument("--budget", type=int, default=1200,
+                   help="approx token cap on output (keeps Claude's context cost bounded)")
     q.set_defaults(fn=cligraph.cmd_query)
 
     pa = sub.add_parser("path", help="shortest path between two graph nodes")

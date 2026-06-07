@@ -1,3 +1,5 @@
+<img src="fux/assets/fux-lockup.svg" alt="Fux — Alpha Forge Knowledge Index" width="360" />
+
 # Fux
 
 > A portable, Claude-aware **knowledge engine**. One frontmatter substrate →
@@ -102,10 +104,14 @@ heuristic by default, or **real tree-sitter ASTs** with the optional
 default), now including **cross-file** `calls` (symbol→symbol) — one navigable
 map of *which rule governs which code*, with community clustering, **PageRank
 centrality** (architectural chokepoints, not just raw degree), and a
-`GRAPH_REPORT.md`. The interactive `graph.html` is built for review *and* agents:
-node/edge-type filters, colour-by (type/community/layer/degree), focus +
-neighbour highlighting, a details panel, and one-click **markdown export** of a
-node's neighbourhood or the visible sub-graph.
+`GRAPH_REPORT.md`. The interactive `graph.html` is the **"Solar Terminal"** viewer,
+built for review *and* agents: code desaturates to graphite dust while knowledge
+nodes ignite amber and the rare `governs` links stream across as glowing threads,
+so *which rule governs which code* is impossible to miss. A three-rail layout adds
+a search-with-clickable-hits Lens grid, per-type filter meters, a live minimap, a
+**governance ledger** of every knowledge→code link, semantic-zoom community
+super-nodes, BFS path mode, and one-click **markdown export** of a node's
+neighbourhood, the visible sub-graph, or the governed subgraph.
 
 `fux recall` is lexical **BM25F** (`$0`) by default, with opt-in **query expansion**
 (glossary synonyms + 1-hop graph neighbours), an opt-in **local** re-rank, and an

@@ -92,10 +92,69 @@ A developer/agent-experience pass (all `$0`, stdlib-only, tested):
   edges and suppresses the now-redundant file→symbol `references`.
 - **`fux mcp`** (`fux/mcpserver.py`) — a hand-rolled MCP stdio server (newline
   JSON-RPC 2.0, **no `mcp` dependency**) exposing the read paths as tools.
-- **Graph viewer** (`fux/assets/`) — node + edge-type filters, colour modes
-  (type/community/layer/degree), focus/neighbour highlighting, directed arrows, a
-  details panel, layout sliders, keyboard shortcuts, and markdown **agent export**
-  of a node's neighbourhood or the visible sub-graph.
+- **Graph viewer** (`fux/assets/`) — the **"Solar Terminal"** viewer (a Claude
+  Design handoff, implemented from `docs/graph-viewer-design-brief.md`). A
+  three-rail instrument layout on a single self-contained canvas page; still
+  offline, dependency-free, system-font only. The signature treatment solves the
+  brief's "function-soup" + "knowledge↔code" problems visually: **code desaturates
+  to graphite dust, knowledge nodes ignite incandescent amber, and the precious
+  `governs` edges stream across as glowing amber threads.**
+    - **Brand mark** — the left-rail glyph, the dashboard (`fux serve`) header, and
+      both pages' favicons all use the real **Fux product mark** (the Alpha Forge
+      "bookmark-over-index" symbol in the lime-green family accent, from the
+      *Alpha Forge — Product Logos* design; standalone copies live in
+      `fux/assets/fux-{mark,lockup,icon}.svg`, and the README leads with the
+      lockup). Inlined as `$0` SVG/data-URI — no external asset fetch.
+    - **Left instrument rail** — brand + live stats (nodes / edges / govern links),
+      search → **clickable hit list** (`jumpTo`), a 2×2 **Lens grid**
+      (Knowledge · Communities · Heat · Path), per-type **meters** that double as
+      visibility filters (`[data-t]`), and a themed inspector with a "⚖ governed by"
+      section first (says so when nothing links — the rules-aren't-wired signal).
+    - **Centre stage** — graphite/incandescent canvas, a Micro/Macro **mode pill**,
+      an **edge-language legend** (`[data-e]`, click to filter) + key hints, and a
+      zoom well reflecting `view.k`.
+    - **Right rail** — the whole aside is **collapsible** and starts **collapsed
+      by default** (bottom-edge tab toggles it; the canvas reclaims the width).
+      When collapsed a compact **floating minimap** sits bottom-right so the
+      overview is always available; expanded, the rail shows the full minimap
+      (code dust grey, knowledge island amber, draggable frame, `drawMini`) plus a
+      separately **collapsible governance ledger** (`govTargets`) of every
+      knowledge→code link, rows expandable to targets, with "Copy governed
+      subgraph" export.
+    - **Settled & stable** — clicking a node never moves it: dragging needs a small
+      threshold so a plain click can't nudge the layout, and selecting/inspector
+      hops don't pan the view (only search + ledger "go-to" actions recentre).
+      Macro super-nodes are warm graphite (amber for knowledge communities) to stay
+      on-theme rather than a rainbow.
+    - **Community palette** (`ccolor`) is the **Tableau-10** categorical set (as
+      Graphify uses) — cool, distinct, cohesive on near-black — with three shade
+      tiers so 100+ communities still separate; knowledge stays amber regardless.
+      The viewer defaults to the **Communities** lens with these colours and
+      bigger, solid nodes; the Knowledge lens switches to graphite dust + amber.
+    - **Stable like Graphify** — the layout is computed once and frozen; clicking,
+      and hiding/showing node- or edge-types, only highlight or remove — they never
+      re-run the layout, so nodes never rearrange under you.
+    - **Macro = real-node overview** — Micro/Macro just change zoom over the same
+      real nodes (Macro fits the whole graph); there is no separate super-node
+      abstraction.
+    - **Label-free until hover** — the field draws no node or community labels; only
+      the hovered (or selected) node shows its name (plus the hover tooltip), so the
+      graph stays clean.
+    - **Robust sizing** — `100%` (not `100vw/100vh`) sizing, a floating overview
+      anchored to the viewport (`position:fixed`), and a `reframe` (resize + fit)
+      that runs on first paint / tab-visibility / resize until the user pans or
+      zooms — fixing both the "cut off until I switch tabs" and "overview off-screen"
+      glitches.
+  The engine underneath is unchanged in spirit: inverse-square (Coulomb) repulsion
+  bounded by centring gravity + a per-step community centroid pull (`COMM_PULL`) so
+  the graph spreads and clusters instead of hairballing. Forces scale with an
+  annealing `alpha` that decays each tick (`ALPHA_DECAY`); once it bottoms out the
+  layout has settled and the sim **stops so the graph holds still** — drag, filter,
+  focus, lens and resume all `reheat()` it. Plus a percentile `fit`;
+  **semantic-zoom** collapse to community super-nodes below `COLLAPSE_K`
+  (`drawClusters`, drill-in on click); centrality-weighted radii + hub halos
+  (`isGod`); a knowledge **lens** (`toggleLens`); and BFS **path mode**
+  (`shortestPath`) highlighted + copyable as markdown.
 - **`distill` skill** (`skills/distill/`) — capture a session's durable decisions
   as `memory`/`adr` entries (human-confirmed, scoped); the plan §16 "Defer" item,
   now shipped.

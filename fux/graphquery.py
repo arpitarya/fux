@@ -39,6 +39,27 @@ def find(graph: dict, term: str) -> dict | None:
     return min(part, key=lambda n: len(n["id"])) if part else None
 
 
+def score_nodes(graph: dict, terms: list[str], types: set[str] | None = None) -> list[dict]:
+    """Score every node by query-term overlap, return best-first (mirrors graphify).
+
+    +1 per term found in the node label, +0.5 per term in its id/file path. This
+    surfaces the *implementation* (`GrowwSource`) over an incidental shortest-id
+    match (`groww_probe.py`) — the single-pick `find()` couldn't. `$0`, stdlib.
+    """
+    tl = [t.lower() for t in terms]
+    scored: list[tuple[float, str, dict]] = []
+    for n in graph["nodes"]:
+        if types and n.get("type") not in types:
+            continue
+        label = (n.get("label") or "").lower()
+        ident = (n["id"] + " " + (n.get("file") or "")).lower()
+        s = sum(1 for t in tl if t in label) + sum(0.5 for t in tl if t in ident)
+        if s > 0:
+            scored.append((s, n["id"], n))
+    scored.sort(key=lambda x: (-x[0], x[1]))   # score desc, id tie-break → deterministic
+    return [n for _, _, n in scored]
+
+
 def neighbors(graph: dict, node_id: str, depth: int = 1) -> list[str]:
     adj = _adj(graph)
     seen, frontier = {node_id}, {node_id}
