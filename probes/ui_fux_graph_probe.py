@@ -15,6 +15,13 @@ Run:
     just probe fux-graph
     uv run python probes/ui_fux_graph_probe.py [--graph PATH]
 
+By default it launches its own headless Chromium. Pass --cdp to instead drive an
+already-running, *visible* Chrome over CDP (e.g. the :9299 session) so you can
+watch and inspect the graph; in that mode the browser is left open on exit:
+
+    uv run python probes/ui_fux_graph_probe.py --cdp http://localhost:9299 \
+        --graph /path/to/.fux/out/graph.html
+
 Screenshots saved to <repo-root>/screenshots/fux-graph-*.png.
 """
 
@@ -39,19 +46,26 @@ def _record(label: str, ok: bool, detail: str = "") -> None:
     print(f"  {icon}  {label}" + (f"  — {detail}" if detail else ""))
 
 
-async def run(graph_path: Path) -> bool:
+async def run(graph_path: Path, cdp: str | None = None) -> bool:
     SHOT_DIR.mkdir(parents=True, exist_ok=True)
     file_url = graph_path.as_uri()
 
     console_errors: list[str] = []
 
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(
-            headless=True,
-            args=["--allow-file-access-from-files"],
-        )
-        ctx = await browser.new_context(viewport={"width": 1400, "height": 900})
-        page = await ctx.new_page()
+        if cdp:
+            # Drive an already-running, *visible* Chrome over CDP so the user can
+            # watch / inspect the graph. Don't close it at the end.
+            browser = await pw.chromium.connect_over_cdp(cdp)
+            ctx = browser.contexts[0] if browser.contexts else await browser.new_context()
+            page = await ctx.new_page()
+        else:
+            browser = await pw.chromium.launch(
+                headless=True,
+                args=["--allow-file-access-from-files"],
+            )
+            ctx = await browser.new_context(viewport={"width": 1400, "height": 900})
+            page = await ctx.new_page()
 
         page.on("console", lambda msg: console_errors.append(msg.text) if msg.type == "error" else None)
         page.on("pageerror", lambda err: console_errors.append(str(err)))
@@ -62,7 +76,8 @@ async def run(graph_path: Path) -> bool:
             _record("page loads without network error", True)
         except Exception as exc:
             _record("page loads without network error", False, str(exc))
-            await browser.close()
+            if not cdp:
+                await browser.close()
             return False
 
         # give the JS one tick to execute synchronously
@@ -120,8 +135,10 @@ async def run(graph_path: Path) -> bool:
         detail_visible_before = await page.is_visible("#agentrow")
         _record("detail panel hidden before node click", not detail_visible_before)
 
-        # click in the canvas centre — likely to hit a dense cluster
-        cx, cy = 1400 // 2, 900 // 2
+        # click in the canvas centre — likely to hit a dense cluster.
+        # Use the live bounding box so this works regardless of window size.
+        box = await page.eval_on_selector("#cv", "el => { const r = el.getBoundingClientRect(); return {x: r.x, y: r.y, w: r.width, h: r.height}; }")
+        cx, cy = box["x"] + box["w"] / 2, box["y"] + box["h"] / 2
         await page.mouse.click(cx, cy)
         await page.wait_for_timeout(200)
         detail_visible_after = await page.is_visible("#agentrow")
@@ -130,7 +147,10 @@ async def run(graph_path: Path) -> bool:
 
         await page.screenshot(path=str(SHOT_DIR / "fux-graph-04-click.png"))
 
-        await browser.close()
+        if not cdp:
+            await browser.close()
+        else:
+            print(f"\n  (CDP mode: leaving browser open — graph is on screen at {file_url})")
 
     return all(ok for _, ok, _ in _results)
 
@@ -139,14 +159,18 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Fux graph viewer probe")
     parser.add_argument("--graph", type=Path, default=GRAPH_HTML,
                         help="Path to graph.html (default: .fux/out/graph.html)")
+    parser.add_argument("--cdp", nargs="?", const="http://localhost:9222", default=None,
+                        help="Connect to a running Chrome over CDP (visible browser) "
+                             "instead of launching headless. Default endpoint http://localhost:9222.")
     args = parser.parse_args()
 
     if not args.graph.exists():
         print(f"❌ graph.html not found: {args.graph}", file=sys.stderr)
         sys.exit(1)
 
-    print(f"AlphaForge Anton  Fux Graph Probe  →  {args.graph.as_uri()}")
-    ok = asyncio.run(run(args.graph))
+    mode = f"CDP {args.cdp}" if args.cdp else "headless"
+    print(f"AlphaForge Anton  Fux Graph Probe  ({mode})  →  {args.graph.as_uri()}")
+    ok = asyncio.run(run(args.graph, cdp=args.cdp))
     passed = sum(1 for _, o, _ in _results if o)
     print(f"\n── Summary\n  {passed}/{len(_results)} checks passed")
     sys.exit(0 if ok else 1)

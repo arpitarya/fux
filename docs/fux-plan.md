@@ -359,11 +359,21 @@ Beyond the core, these make Fux materially more useful:
     tools over stdio — a hand-rolled, **stdlib-only** JSON-RPC server (no new
     dependency) — so any agent queries the substrate directly, not by shelling out.
 
-16. **Reviewable graph.** The interactive `graph.html` carries node/edge-type
-    filters, colour-by (type/community/layer/degree), focus + neighbour
-    highlighting, directed arrows, a details panel, and **agent export** (copy a
-    node's neighbourhood or the visible sub-graph as markdown) — built so a human
-    *or* an agent can navigate the merged code⊕knowledge graph.
+16. **Reviewable graph.** The interactive `graph.html` is the **"Solar Terminal"**
+    viewer (a Claude Design handoff): a three-rail instrument layout where **code
+    desaturates to graphite dust, knowledge nodes ignite incandescent amber, and
+    the rare `governs` edges stream across as glowing threads** — so the brief's
+    function-soup and knowledge↔code problems are solved by the visual language
+    itself. Left rail: stats, search→clickable hits, a Lens grid
+    (Knowledge/Communities/Heat/Path), per-type meters-as-filters, and an inspector
+    that surfaces "governed by" first. Centre: the canvas, a Micro/Macro mode pill,
+    an edge-language legend, a zoom well. Right rail: a live **minimap** and a
+    **governance ledger** of every knowledge→code link with "copy governed
+    subgraph" export. Underneath: bounded inverse-square repulsion + community
+    centroid pull (spreads + clusters, no hairball), percentile `fit`, **semantic
+    zoom** to community super-nodes you can drill into, centrality-driven size +
+    hub halos, a knowledge lens, and BFS **path mode** — all still offline,
+    dependency-free, system-font, and **agent-exportable as markdown**.
 
 ---
 

@@ -49,6 +49,21 @@ _MARK_SVG = (
     '</svg>'
 )
 
+# Fux mark as an SVG favicon (data URI) — same bookmark-over-index, no external deps.
+_FAVICON = (
+    '<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,'
+    "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E"
+    "%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E"
+    "%3Cstop offset='0%25' stop-color='%23D2F58F'/%3E"
+    "%3Cstop offset='55%25' stop-color='%238FD13F'/%3E"
+    "%3Cstop offset='100%25' stop-color='%234C8A1B'/%3E%3C/linearGradient%3E%3C/defs%3E"
+    "%3Crect x='12' y='10' width='40' height='44' rx='10' fill='url(%23g)'/%3E"
+    "%3Cpath d='M26 10 L38 10 L38 33 L32 28 L26 33 Z' fill='%23000' opacity='.26'/%3E"
+    "%3Crect x='19' y='42' width='26' height='3' rx='1.5' fill='%23000' opacity='.24'/%3E"
+    "%3Crect x='19' y='48' width='17' height='3' rx='1.5' fill='%23000' opacity='.24'/%3E"
+    '%3C/svg%3E"/>'
+)
+
 
 def dashboard_html(root: Path) -> str:
     summary = stats.render(stats.build(root))
@@ -56,7 +71,7 @@ def dashboard_html(root: Path) -> str:
     items = "".join(f'<li><a href="{h}">{label}</a></li>'
                     for h, label in _LINKS if (out / h).exists())
     return (f"<!doctype html><meta charset=utf-8><title>Fux dashboard</title>"
-            f"<style>{_CSS}</style><h1>{_MARK_SVG}Fux dashboard</h1>"
+            f"{_FAVICON}<style>{_CSS}</style><h1>{_MARK_SVG}Fux dashboard</h1>"
             f"<pre>{html.escape(summary)}</pre><h2>Views</h2><ul>{items}</ul>")
 
 
