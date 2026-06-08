@@ -28,6 +28,19 @@ def _adj(graph: dict) -> dict[str, set[str]]:
     return adj
 
 
+def _wadj(graph: dict) -> dict[str, dict[str, float]]:
+    """Weighted undirected adjacency for centrality — low-confidence `references`
+    edges (weight 0.25) carry proportionally less rank than precise `calls`."""
+    adj: dict[str, dict[str, float]] = {n["id"]: {} for n in graph["nodes"]}
+    for e in graph["edges"]:
+        s, t = e["source"], e["target"]
+        if s in adj and t in adj:
+            w = float(e.get("weight", 1.0))
+            adj[s][t] = adj[s].get(t, 0.0) + w
+            adj[t][s] = adj[t].get(s, 0.0) + w
+    return adj
+
+
 def find(graph: dict, term: str) -> dict | None:
     """Resolve a free-text term to the best-matching node."""
     t = term.lower().strip()
@@ -109,8 +122,8 @@ def pagerank(graph: dict, damping: float = 0.85, iterations: int = 100,
     """
     ids = sorted(n["id"] for n in graph["nodes"])
     n = len(ids) or 1
-    adj = _adj(graph)
-    deg = {nid: len(adj.get(nid, ())) for nid in ids}
+    adj = _wadj(graph)
+    deg = {nid: sum(adj.get(nid, {}).values()) for nid in ids}    # weighted degree
     rank = {nid: 1.0 / n for nid in ids}
     base = (1.0 - damping) / n
     for _ in range(iterations):
@@ -119,8 +132,8 @@ def pagerank(graph: dict, damping: float = 0.85, iterations: int = 100,
         for nid in ids:
             if deg[nid]:
                 share = damping * rank[nid] / deg[nid]
-                for m in sorted(adj[nid]):
-                    nxt[m] += share
+                for m, w in sorted(adj[nid].items()):
+                    nxt[m] += share * w
         if sum(abs(nxt[nid] - rank[nid]) for nid in ids) < tol:
             rank = nxt
             break

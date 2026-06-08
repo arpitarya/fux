@@ -29,7 +29,11 @@ def fuse(root: Path, query: str, rules: list[Rule], top: int = 6,
     if semantic:
         rankings.append(semantic)
 
-    graphical = _graph_ranking(root, lexical[:3])
+    # Seed graph proximity from the lexical anchors — but fall back to the semantic
+    # top when lexical is empty, which is exactly the paraphrase case hybrid exists
+    # to rescue (no shared keyword → no lexical hit → the graph leg would otherwise
+    # go dark). plan §17.1 / recall-engine.compare.md phase-2 trigger.
+    graphical = _graph_ranking(root, (lexical or semantic)[:3])
     if graphical:
         rankings.append([rid for rid in graphical if rid in by_id])
 

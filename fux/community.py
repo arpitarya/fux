@@ -2,20 +2,24 @@
 
 Replaces graphify's clustering. Synchronous label propagation with sorted,
 tie-broken updates so the result is reproducible across runs (no randomness).
+Votes are **edge-weighted**: a low-confidence `references` edge (weight 0.25) pulls
+a node into a community far less than a precise `calls`/`contains` edge, so the
+loose whole-file xref can't over-fragment or mis-merge clusters by raw count.
 """
 from __future__ import annotations
 
-from collections import Counter
+_TIE = 1e-9
 
 
-def _adjacency(nodes: list[dict], edges: list[dict]) -> dict[str, set[str]]:
+def _adjacency(nodes: list[dict], edges: list[dict]) -> dict[str, dict[str, float]]:
     ids = {n["id"] for n in nodes}
-    adj: dict[str, set[str]] = {n["id"]: set() for n in nodes}
+    adj: dict[str, dict[str, float]] = {n["id"]: {} for n in nodes}
     for e in edges:
         s, t = e.get("source"), e.get("target")
         if s in ids and t in ids and s != t:
-            adj[s].add(t)
-            adj[t].add(s)
+            w = float(e.get("weight", 1.0))
+            adj[s][t] = adj[s].get(t, 0.0) + w
+            adj[t][s] = adj[t].get(s, 0.0) + w
     return adj
 
 
@@ -29,10 +33,12 @@ def detect(nodes: list[dict], edges: list[dict], max_iter: int = 30) -> dict[str
         for nid in order:
             if not adj[nid]:
                 continue
-            votes = Counter(label[n] for n in adj[nid])
+            votes: dict[str, float] = {}
+            for nbr, w in adj[nid].items():
+                votes[label[nbr]] = votes.get(label[nbr], 0.0) + w
             top = max(votes.values())
-            # Deterministic tie-break: smallest label among the winners.
-            best = min(lab for lab, c in votes.items() if c == top)
+            # Deterministic tie-break: smallest label among the (near-)winners.
+            best = min(lab for lab, c in votes.items() if top - c < _TIE)
             if label[nid] != best:
                 label[nid] = best
                 changed = True

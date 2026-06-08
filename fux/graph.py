@@ -10,6 +10,29 @@ from fux.model import RuleSet
 
 REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
 
+# Per-edge-type confidence + clustering/centrality weight. Structural (`contains`,
+# `calls`) and authored (`governs`, `related`, typed rule↔rule) edges are precise —
+# EXTRACTED, full weight. The looser whole-file `references` xref ([_xref]) matches
+# any identifier against any symbol label, so it is INFERRED and down-weighted: it
+# is the dominant edge by raw count and would otherwise drown the precise signal in
+# community detection + PageRank. graphify carried this confidence label; Fux now does too.
+_EDGE_CONF: dict[str, tuple[str, float]] = {
+    "contains": ("EXTRACTED", 1.0),
+    "calls": ("EXTRACTED", 1.0),
+    "governs": ("EXTRACTED", 1.0),
+    "related": ("EXTRACTED", 1.0),
+    "references": ("INFERRED", 0.25),
+}
+_DEFAULT_CONF = ("EXTRACTED", 1.0)          # authored typed rule↔rule edges
+
+
+def _stamp_confidence(edges: list[dict]) -> None:
+    """Annotate each edge with ``confidence`` (EXTRACTED|INFERRED) + clustering ``weight``."""
+    for e in edges:
+        conf, weight = _EDGE_CONF.get(e["type"], _DEFAULT_CONF)
+        e.setdefault("confidence", conf)
+        e.setdefault("weight", weight)
+
 
 def _iter_sources(root: Path, include: list[str], ignore: list[str]):
     for path in sorted(root.rglob("*")):
@@ -51,6 +74,7 @@ def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
     edges += xcalls
     edges += _xref(nodes, texts, covered)
     _add_knowledge(nodes, edges, rs)
+    _stamp_confidence(edges)            # weight-aware before clustering/centrality
     comm = community.detect(list(nodes.values()), edges)
     for nid, c in comm.items():
         nodes[nid]["community"] = c

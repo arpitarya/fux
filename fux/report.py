@@ -15,6 +15,7 @@ def render(graph: dict) -> str:
              f"{meta.get('code_files', 0)} code files · {meta.get('rules', 0)} rules · "
              f"{meta.get('communities', 0)} communities._", ""]
     lines += _types(nodes)
+    lines += _edges(graph["edges"])
     lines += _god(graph, by_id)
     lines += _chokepoints(graph, by_id)
     lines += _communities(nodes)
@@ -25,6 +26,16 @@ def _types(nodes: list[dict]) -> list[str]:
     counts = Counter(n["type"] for n in nodes)
     out = ["## Node types", ""]
     out += [f"- {t}: {c}" for t, c in sorted(counts.items(), key=lambda kv: -kv[1])]
+    return out + [""]
+
+
+def _edges(edges: list[dict]) -> list[str]:
+    """Edge mix by type + confidence — INFERRED edges are the loose, down-weighted ones."""
+    by_type = Counter(e.get("type") for e in edges)
+    inferred = sum(1 for e in edges if e.get("confidence") == "INFERRED")
+    out = ["## Edges", "", f"_{inferred} of {len(edges)} are INFERRED "
+           "(low-confidence `references`, down-weighted in clustering/centrality)._", ""]
+    out += [f"- {t}: {c}" for t, c in sorted(by_type.items(), key=lambda kv: -kv[1])]
     return out + [""]
 
 
