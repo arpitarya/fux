@@ -126,7 +126,9 @@ def _xref(nodes: dict, texts: dict[str, str], covered: set[tuple[str, str]]) -> 
     index = _symbol_index(nodes)
     seen, out = set(), []
     for rel, text in texts.items():
-        for name in astextract.call_names(text) - astextract.CALL_KEYWORDS:
+        # `call_names` returns a set — sort so reference-edge order (and thus
+        # graph.json) is reproducible across builds (no PYTHONHASHSEED churn).
+        for name in sorted(astextract.call_names(text) - astextract.CALL_KEYWORDS):
             for tid in index.get(name, []):
                 if tid.startswith(rel + "::") or (rel, tid) in covered or (rel, tid) in seen:
                     continue
