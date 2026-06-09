@@ -2,10 +2,22 @@
 from __future__ import annotations
 import sys
 
-from fux import (capture, config, costledger, coverage, explain, fetchrules,
-                 lint, loader, mine, parity, paths, recall, savings, scaffold,
-                 seal, stats, tour, verify)
+from fux import (capture, config, costledger, coverage, explain, feedback,
+                 fetchrules, lint, loader, mine, parity, paths, recall, savings,
+                 scaffold, seal, stats, tour, verify)
 from fux.cliutil import root
+
+
+def cmd_feedback(args) -> int:
+    import json
+    here = root()
+    if getattr(args, "record", None):
+        raw = sys.stdin.read() if args.record == "-" else open(args.record).read()
+        feedback.record(here, json.loads(raw))
+        print("fux feedback: recorded")
+        return 0
+    print(feedback.render(feedback.load(here)))
+    return 0
 
 
 def cmd_recall(args) -> int:

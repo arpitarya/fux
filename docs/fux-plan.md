@@ -864,6 +864,106 @@ define the plan artifact's required sections *before* `plan` is built.
 
 ---
 
+## 18. Fux as Anton's brain — two consumers, one substrate
+
+> **Status: the full on-the-fly pipeline is shipped.** Engine: `fux impact`
+> ([impact.py](../fux/impact.py)), `fux components` ([components.py](../fux/components.py)),
+> `fux validate-spec` ([uispec.py](../fux/uispec.py)), `fux feedback`
+> ([feedback.py](../fux/feedback.py)) — all exposed over MCP. Anton: a `/concierge/compose`
+> endpoint generates a declarative UISpec, Fux validates it, and a whitelisted
+> `DynamicRenderer` mounts it; the `ui-component-contract` rule governs the loop.
+> **Guiding principle held:** Fux is the *read/validate* brain — it never executes.
+> Orff emits a **declarative spec, never code**; Anton renders from a fixed whitelist.
+
+The earlier sections frame Fux as a knowledge engine read by **Claude Code at
+dev-time**. The target is bigger: Fux becomes the brain serving **two consumers
+through one interface** —
+
+| Consumer | When | Reads Fux for | Interface |
+|---|---|---|---|
+| **Claude Code** | dev-time | maintain + write code against the rules/graph | CLI + hooks |
+| **Orff concierge** | **runtime** | build components on the fly, bound to real data | **`fux mcp`** |
+
+The unifying decision (already half-built): the **MCP server (§17.5) is the shared
+brain interface**. Orff already does parallel tool execution + RAG; Fux is one more
+tool it calls. Everything below is exposed there, so dev-time and runtime read the
+*same* substrate instead of forking into two systems.
+
+### 18.1 Maintain code — `fux impact <file>` ✅
+
+The "what will I break?" query, before an edit. Pure `$0` traversal of the merged
+graph ([impact.py](../fux/impact.py)): given a file it returns
+
+- **Invariants that must still hold** — governing rules carrying a `check:`, with
+  the assertion shown → run `fux verify`.
+- **Governing rules whose *why* may go stale** → the `doc-per-code-change` target,
+  made concrete.
+- **Downstream callers** (precise `calls`) split from **possibly-affected**
+  (loose `references`, INFERRED) — honouring the graph's own confidence model so
+  generic names like `value`/`total` don't drown the real dependents.
+
+Exposed as `fux_impact` in [mcpserver.py](../fux/mcpserver.py). Proven on Anton:
+editing `aggregator.py` surfaces `day-pnl` + `holdings-sum-equals-total` to
+re-verify, the two governing formulas to refresh, and 5 precise callers (the route
+handlers, the broker test, and `fux_totals_probe.py`).
+
+### 18.2 Write code — born-compliant generation ⬜
+
+- **Populate the `examples:` field** (schema §6, currently empty) with canonical
+  patterns — "a new `BrokerSource` looks like this," "a query hook looks like this"
+  — so generation copies, not invents.
+- **Machine-readable contracts.** The `dump_utils` CSV contract / `BrokerSource`
+  interface become `convention` rules holding *interface + invariants*; the agent
+  generates against them and `fux check` validates before they land.
+
+### 18.3 Orff builds components on the fly — the runtime leap
+
+Three things Fux must expose so Orff composes instead of hallucinating:
+
+1. ✅ **A component registry** (`fux components`). Each TS/TSX source is scanned
+   for the `<Name>Props` convention; Fux emits every component with its **prop
+   fields** (name, type, optional) — backend-independent (works with or without
+   tree-sitter). On Anton: 68 components (41 in `packages/solar-ui`), with full
+   prop lists. The prerequisite for safe runtime generation, shipped in
+   [components.py](../fux/components.py).
+2. ✅ **A data-binding catalog.** The same command surfaces the **data hooks**
+   (`use*`, e.g. `useHoldings`) and **DTOs** (`*DTO`, e.g. `HoldingDTO`) — 37 + 19
+   on Anton — so Orff binds to the real data layer instead of refetching. `--json`
+   output is what `fux_components` returns over MCP for Orff to consume.
+3. ✅ **Mount-time enforcement** (`fux validate-spec`). The model emits a declarative
+   UISpec, never code; [uispec.py](../fux/uispec.py) validates it against the registry
+   (unknown component / undeclared prop / unknown data hook / illegal children →
+   rejected) before the client sees it, and the client `DynamicRenderer` *re-gates*
+   against a whitelist. This is the safe-by-construction answer to "execute generated
+   UI": there is **no code path that runs model output** — the worst a bad model emits
+   is a spec the validator rejects. The `ui-component-contract` rule (in Anton's
+   `.fux/`) governs the loop; new primitives become composable just by being exported
+   + whitelisted (they then appear in `fux components` automatically).
+
+### 18.4 Feedback loop — the brain learns ✅
+
+Every compose outcome (valid / rejected / repaired, with the violations) is appended
+by `fux feedback` ([feedback.py](../fux/feedback.py)); `fux feedback` reports the
+acceptance rate and the top rejection reasons — so a recurring failure (a component
+the model keeps reaching for that isn't whitelisted) surfaces as a concrete registry
+or contract gap. Deterministic, `$0`, no `memory` writes — telemetry that closes the
+loop without the "captured-not-authored" compromise.
+
+### The end-to-end flow (Anton)
+
+```
+prompt → /concierge/compose → fux components (vocabulary) → LLM emits UISpec JSON
+       → fux validate-spec (reject/repair, 1 retry) → ComposeResponse
+       → <DynamicRenderer> mounts from the whitelist → fux feedback records outcome
+```
+
+`compose_service.py` + `fux_bridge.py` (backend) talk to the brain over the `fux`
+CLI; `DynamicRenderer.tsx` + `compose.registry.ts` (frontend) render only whitelisted
+primitives. Every brain step is `$0` and deterministic; the only LLM call is the
+generation itself, which rides the user's request (no background spend).
+
+---
+
 ## Appendix A — worked example rule (grounded in real code)
 
 `.fux/rules/day-pnl.md` — extracted from

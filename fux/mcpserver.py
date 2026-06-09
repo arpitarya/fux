@@ -16,8 +16,8 @@ import json
 import sys
 from pathlib import Path
 
-from fux import (__version__, coverage, explain, graphquery, paths, recall,
-                 savings, scaffold, stats)
+from fux import (__version__, components, coverage, explain, graphquery, impact,
+                 paths, recall, savings, scaffold, stats, uispec)
 
 PROTOCOL = "2024-11-05"
 
@@ -34,6 +34,23 @@ TOOLS = [
      "description": "Reverse lookup — which rules govern a given file path.",
      "inputSchema": {"type": "object", "required": ["file"],
                      "properties": {"file": {"type": "string"}}}},
+    {"name": "fux_impact",
+     "description": "Downstream blast radius of changing a file: governing rules whose "
+                    "why may go stale, invariants to re-verify, and caller files that may break.",
+     "inputSchema": {"type": "object", "required": ["file"],
+                     "properties": {"file": {"type": "string"}}}},
+    {"name": "fux_components",
+     "description": "The design-system registry + data-binding catalog (JSON): UI components "
+                    "with their prop fields, data hooks (use*), and DTO shapes — so a generated "
+                    "component composes from real primitives and binds to real data.",
+     "inputSchema": {"type": "object", "properties": {
+         "scope": {"type": "string"}}}},
+    {"name": "fux_validate_spec",
+     "description": "Validate a declarative UISpec against the registry before mounting — "
+                    "rejects unknown components, undeclared props, and unknown data hooks. "
+                    "Returns 'valid' or the list of violations. The runtime guardrail.",
+     "inputSchema": {"type": "object", "required": ["spec"], "properties": {
+         "spec": {"type": "object", "description": "the UISpec node tree"}}}},
     {"name": "fux_coverage",
      "description": "Percent of important code files that carry a governing rule.",
      "inputSchema": {"type": "object", "properties": {}}},
@@ -83,6 +100,13 @@ def _call(name: str, args: dict) -> str:
         hits = explain.refs(root, args["file"])
         return "\n".join(f"{r.id} ({r.type}) — {r.title}" for r in hits) \
             or f"(no rules govern {args['file']})"
+    if name == "fux_impact":
+        return impact.render(impact.run(root, args["file"]))
+    if name == "fux_components":
+        return components.render_json(components.registry(root, scope=args.get("scope")))
+    if name == "fux_validate_spec":
+        errs = uispec.validate(components.registry(root), args["spec"])
+        return uispec.render(not errs, errs)
     if name == "fux_coverage":
         c = coverage.run(root)
         return f"{c.pct:.0f}% ({c.governed}/{c.total} important files governed)"

@@ -113,6 +113,35 @@ def cmd_explain(args) -> int:
     return 0
 
 
+def cmd_impact(args) -> int:
+    from fux import impact
+    print(impact.render(impact.run(root(), args.file)), end="")
+    return 0
+
+
+def cmd_components(args) -> int:
+    from fux import components
+    reg = components.registry(root(), scope=getattr(args, "scope", None))
+    if getattr(args, "json", False):
+        print(components.render_json(reg), end="")
+    else:
+        print(components.render(reg, kind=getattr(args, "kind", "all")), end="")
+    return 0
+
+
+def cmd_validate_spec(args) -> int:
+    import json
+    from pathlib import Path
+
+    from fux import uispec
+    ok, errs = uispec.run(root(), Path(args.file))
+    if getattr(args, "json", False):
+        print(json.dumps({"ok": ok, "errors": errs}))
+    else:
+        print(uispec.render(ok, errs), end="")
+    return 0 if ok else 2
+
+
 def cmd_report(_args) -> int:
     from fux import paths
     here = root()

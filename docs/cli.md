@@ -35,6 +35,10 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
 | `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |
 | `fux explain <term>` | A graph node + its community + neighbours. | $0 |
+| `fux impact <file>` | Downstream blast radius of changing a file: invariants to re-verify, governing rules whose *why* may go stale, and dependent caller files (precise `calls` split from loose `references`). | $0 |
+| `fux components [--kind ...] [--scope P] [--json]` | The design-system registry + data-binding catalog: UI components with their prop fields, data hooks (`use*`), and DTO shapes — so a generated component composes from real primitives and binds to real data (the §18.3 Orff-runtime prerequisite). `--json` for machine/Orff use. | $0 |
+| `fux validate-spec <file> [--json]` | The mount-time guardrail (§18.3.3): validate a generated declarative UISpec against the registry — rejects unknown components, undeclared props, and unknown data hooks. Exit 2 on violations. | $0 |
+| `fux feedback [--record FILE]` | The generation learning loop (§18.4): summarise on-the-fly compose outcomes (acceptance rate + top rejection reasons); `--record -` appends one outcome from JSON on stdin. | $0 |
 | `fux report` | Write `GRAPH_REPORT.md` — god nodes (degree) + **chokepoints (PageRank centrality)** + community structure. | $0 |
 
 `fux build` also writes `GRAPH_REPORT.md` and tags every graph node with a

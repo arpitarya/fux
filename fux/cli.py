@@ -120,6 +120,25 @@ def build_parser() -> argparse.ArgumentParser:
     ex.add_argument("term")
     ex.set_defaults(fn=cligraph.cmd_explain)
 
+    imp2 = sub.add_parser("impact", help="downstream blast radius of changing a file ($0)")
+    imp2.add_argument("file")
+    imp2.set_defaults(fn=cligraph.cmd_impact)
+
+    cmp = sub.add_parser("components", help="design-system registry + data-binding catalog ($0)")
+    cmp.add_argument("--kind", choices=["all", "components", "hooks", "dtos"], default="all")
+    cmp.add_argument("--scope", help="restrict to files under this path prefix")
+    cmp.add_argument("--json", action="store_true", help="machine-readable output (for Orff)")
+    cmp.set_defaults(fn=cligraph.cmd_components)
+
+    vs = sub.add_parser("validate-spec", help="validate a generated UISpec against the registry ($0)")
+    vs.add_argument("file")
+    vs.add_argument("--json", action="store_true", help="emit {ok, errors} as JSON")
+    vs.set_defaults(fn=cligraph.cmd_validate_spec)
+
+    fb = sub.add_parser("feedback", help="record/summarise on-the-fly generation outcomes ($0)")
+    fb.add_argument("--record", metavar="FILE", help="append one outcome from JSON ('-' = stdin)")
+    fb.set_defaults(fn=cliquery.cmd_feedback)
+
     sub.add_parser("report", help="write GRAPH_REPORT.md (god nodes + communities)").set_defaults(fn=cligraph.cmd_report)
 
     sub.add_parser("setup", help="copy bundled assets (schema, hooks, skills) to ~/.claude/fux/").set_defaults(fn=clicmds.cmd_setup)
