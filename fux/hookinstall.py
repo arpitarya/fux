@@ -1,8 +1,8 @@
 """`fux hooks install` — wire Fux across every agent surface from one command.
 
-Four surfaces, all pointing at the *installed package* scripts (~/.claude/fux/hooks),
-never a sibling dev checkout:
-  git      → .git/hooks/pre-commit shim → packaged pre_commit.sh (build + stage views)
+Four surfaces, all invoking the *installed* `fux` console script — the package is
+the single source of truth, no copied wrapper scripts or dev-checkout paths:
+  git      → .git/hooks/pre-commit (self-contained: `fux build` + stage views)
   claude   → .claude/settings.json      (SessionStart/PostToolUse/Stop hooks)
   codex    → .codex/hooks.json
   copilot  → .copilot/settings.json
@@ -13,22 +13,28 @@ from __future__ import annotations
 import stat
 from pathlib import Path
 
-from fux import gitutil, paths, settings
+from fux import gitutil, settings
 
 SURFACES = ["git", "claude", "codex", "copilot"]
 _MARK = "fux-hook"
 
-
-def _packaged_precommit() -> Path:
-    return paths.claude_home() / "fux" / "hooks" / "pre_commit.sh"
-
-
-def _shim(target: Path) -> str:
-    return (f"#!/bin/sh\n# {_MARK} — installed by `fux hooks install`. Delegates to the\n"
-            f"# packaged Fux pre-commit (build derived views + stage them).\n"
-            f'HOOK="{target}"\n'
-            '[ -x "$HOOK" ] && exec "$HOOK" "$@"\n'
-            'exit 0\n')
+# Self-contained pre-commit: resolve `fux` (or `python -m fux`), then rebuild the
+# derived views and stage them so .fux/out/ matches the committed code in the same
+# commit. Non-blocking; skips during rebase/merge. No external script reference.
+_SHIM = f"""#!/bin/sh
+# {_MARK} — installed by `fux hooks install`. Rebuild + stage .fux/out/ ($0).
+if command -v fux >/dev/null 2>&1; then FUX="fux"; else
+  PY="${{FUX_PYTHON:-$(command -v python3.14 || command -v python3 || command -v python)}}"
+  [ -n "$PY" ] && "$PY" -c "import fux" 2>/dev/null && FUX="$PY -m fux" || exit 0
+fi
+G="$(git rev-parse --git-dir 2>/dev/null || echo .git)"
+[ -d "$G/rebase-merge" ] || [ -d "$G/rebase-apply" ] && exit 0
+[ -f "$G/MERGE_HEAD" ] || [ -f "$G/CHERRY_PICK_HEAD" ] && exit 0
+$FUX context >/dev/null 2>&1 || exit 0
+echo "[fux hook] rebuilding derived views..."
+$FUX build >/dev/null 2>&1 && git add .fux/out 2>/dev/null
+exit 0
+"""
 
 
 def _install_git(root: Path) -> str:
@@ -43,7 +49,7 @@ def _install_git(root: Path) -> str:
         note = f" (existing hook backed up → {backup.name})"
     else:
         note = ""
-    hook.write_text(_shim(_packaged_precommit()), encoding="utf-8")
+    hook.write_text(_SHIM, encoding="utf-8")
     hook.chmod(hook.stat().st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
     return f"{hook}{note}"
 

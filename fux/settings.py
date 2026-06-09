@@ -2,24 +2,25 @@
 
 Claude (`.claude/settings.json`), Codex (`.codex/hooks.json`), and Copilot
 (`.copilot/settings.json`) share one event→hook shape, so one writer serves all
-three. Prefers the installed wrapper scripts (~/.claude/fux/hooks/*.sh, which carry
-a `python -m fux` fallback) so hooks fire even when the `fux` console script is not
-on PATH; falls back to the bare `fux <subcommand>` form otherwise.
+three. Hooks invoke the installed `fux` **console script** directly (`fux context`,
+`fux hook-touch`, …) — the package is the single source of truth, no copied wrapper
+scripts and no dev-checkout paths baked into a committed settings file. Set
+`FUX_PYTHON`/PATH so `fux` resolves; for a missing-PATH safety net the bundled
+`~/.claude/fux/hooks/*.sh` wrappers (with a `python -m fux` fallback) still ship and
+can be referenced by hand.
 """
 from __future__ import annotations
 
 import json
 from pathlib import Path
 
-from fux import paths
-
-# event → (wrapper script name, bare-command fallback, optional matcher)
+# event → (fux subcommand, optional matcher)
 _SPEC = {
-    "SessionStart": ("session_start.sh", "fux context", None),
-    "PostToolUse": ("post_tool_use.sh", "fux hook-touch", "Edit|Write"),
-    "Stop": ("stop.sh", "fux hook-check", None),
+    "SessionStart": ("fux context", None),
+    "PostToolUse": ("fux hook-touch", "Edit|Write"),
+    "Stop": ("fux hook-check", None),
 }
-_RECALL = {"UserPromptSubmit": ("user_prompt_submit.sh", "fux hook-recall", None)}
+_RECALL = {"UserPromptSubmit": ("fux hook-recall", None)}
 
 # agent → settings file (relative to project root)
 AGENT_FILES = {
@@ -29,28 +30,26 @@ AGENT_FILES = {
 }
 
 
-def _command(script: str, fallback: str) -> str:
-    wrapper = paths.claude_home() / "fux" / "hooks" / script
-    return str(wrapper) if wrapper.exists() else fallback
-
-
-def _entry(script: str, fallback: str, matcher: str | None) -> dict:
-    hook = {"hooks": [{"type": "command", "command": _command(script, fallback)}]}
+def _entry(command: str, matcher: str | None) -> dict:
+    hook = {"hooks": [{"type": "command", "command": command}]}
     if matcher:
         hook["matcher"] = matcher
     return hook
 
 
 def wire_file(path: Path, recall: bool = False) -> Path:
-    """Wire the Fux hook spec into one agent settings file. Idempotent per event."""
+    """Wire the Fux hook spec into one agent settings file. Idempotent, and
+    *migrating*: a re-install rewrites any stale Fux entry (e.g. an old wrapper-script
+    path) to the current `fux <subcommand>` form, leaving foreign hooks untouched."""
     path.parent.mkdir(parents=True, exist_ok=True)
     data = json.loads(path.read_text()) if path.exists() else {}
     hooks = data.setdefault("hooks", {})
     spec = {**_SPEC, **(_RECALL if recall else {})}
-    for event, (script, fallback, matcher) in spec.items():
-        existing = hooks.setdefault(event, [])
-        if not _already(existing):
-            existing.append(_entry(script, fallback, matcher))
+    for event, (command, matcher) in spec.items():
+        kept = [e for e in hooks.get(event, [])
+                if not any("fux" in h.get("command", "") for h in e.get("hooks", []))]
+        kept.append(_entry(command, matcher))
+        hooks[event] = kept
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
     return path
 
@@ -87,9 +86,3 @@ def is_wired(path: Path) -> bool:
     hooks = json.loads(path.read_text()).get("hooks", {})
     return any("fux" in h.get("command", "")
                for evs in hooks.values() for e in evs for h in e.get("hooks", []))
-
-
-def _already(existing: list) -> bool:
-    """True if any Fux hook (either wiring form) is already present for this event."""
-    cmds = [h.get("command", "") for e in existing for h in e.get("hooks", [])]
-    return any("fux" in c for c in cmds)
