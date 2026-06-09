@@ -32,6 +32,8 @@ DEFAULTS = {
     "cost_tracking": False,    # opt-in: record each lookup's savings → cumulative cost.json (§12)
     "parity_stay": [],        # docs that stay/are out-of-scope for `fux parity` (§17.17)
     "context_budget_tokens": 0,  # >0 ⇒ knapsack-pack the SessionStart INDEX (§17.25)
+    "graph_editor": "vscode",  # editor URI scheme for clickable graph.html node links:
+                               # vscode | vscode-insiders | cursor | windsurf (§7)
 }
 
 
@@ -81,5 +83,8 @@ def default_toml() -> str:
         "parity_stay = []\n\n"
         "# Token budget for the SessionStart INDEX. 0 = inject everything; >0 picks\n"
         "# the optimal (knapsack) rule subset that fits — for very large corpora.\n"
-        "context_budget_tokens = 0\n"
+        "context_budget_tokens = 0\n\n"
+        "# Editor for clickable file:line node links in graph.html.\n"
+        "# vscode | vscode-insiders | cursor | windsurf\n"
+        'graph_editor = "vscode"\n'
     )

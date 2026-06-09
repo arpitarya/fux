@@ -25,6 +25,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux stats` | Knowledge-health dashboard: weighted score (coverage 40 · verify 30 · authoring 30 − drift) + corpus breakdown + every signal. | $0 |
 | `fux mine [--min-sites N]` | Surface *candidate* rules latent in the code (first miner: magic numbers repeated across ≥N sites) as drafts to confirm — never auto-authored. | $0 |
 | `fux gate [--install] [--strict-lint]` | CI / git pre-commit enforcement: rebuild views, then exit 2 on blocking `check`/`verify`. `--install` writes the pre-commit hook. | $0 |
+| `fux hooks <install\|uninstall\|status> [--git] [--claude] [--codex] [--copilot] [--all] [--recall]` | Wire Fux across every agent surface from one command — **git** (`.git/hooks/pre-commit` shim → packaged `pre_commit.sh`: rebuild + stage `.fux/out/` in the same commit, non-blocking), **claude** (`.claude/settings.json`), **codex** (`.codex/hooks.json`), **copilot** (`.copilot/settings.json`). All point at the installed package scripts (`~/.claude/fux/hooks/`), never a dev checkout. No surface flag ⇒ all four. Idempotent; `status` reports what's wired, `uninstall` removes only Fux entries (foreign hooks preserved; a pre-existing git pre-commit is backed up to `.pre-fux`). | $0 |
 | `fux mcp` | Serve the read paths + `query`/`trace`/draft-`new` to agents over MCP (stdio JSON-RPC, stdlib-only). | $0 |
 | `fux capture [--list] [--clear]` | Session observation queue (changed files, governed vs uncovered) that `fux distill` consumes. Wired into the Stop hook when `capture = true`. | $0 |
 | `fux serve [--port N]` | Local `http.server` dashboard: the `stats` health summary + links to `graph.html`/reports. | $0 |
@@ -46,7 +47,10 @@ find it), except `fux init` which scaffolds one in the current directory.
 *colour: type ⇄ community* toggle. The graph carries `governs` (rule→code),
 `contains` (file→symbol), `calls` (intra-file — Python via `ast`, JS/TS/Go/Rust
 via a brace-matched heuristic), and `references` (cross-file/cross-language)
-edges.
+edges. In the `graph.html` inspector, a node's `file:line` is a clickable
+`<editor>://file/<abs>:<line>` deep link that opens the exact line in your editor
+— set `graph_editor` in `.fux/config.toml` (`vscode` (default) · `vscode-insiders`
+· `cursor` · `windsurf`).
 
 ### Internal hook entrypoints
 

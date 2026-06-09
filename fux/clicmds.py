@@ -5,8 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from fux import (build, check, config, context, fix, gate, importer, initcmd,
-                 mcpserver, paths, serve)
+from fux import (build, check, config, context, fix, gate, hookinstall, importer,
+                 initcmd, mcpserver, paths, serve)
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -21,6 +21,23 @@ def cmd_init(args) -> int:
     if info["copilot_prompts"]:
         print(f"  copilot prompts → {Path(info['copilot_prompts'][0]).parent}/")
     print("Next: `fux new formula <id>` to author your first rule, then `fux build`.")
+    return 0
+
+
+def cmd_hooks(args) -> int:
+    """install | uninstall | status across git + claude + codex + copilot surfaces."""
+    picked = [s for s in hookinstall.SURFACES if getattr(args, s, False)]
+    surfaces = None if (getattr(args, "all", False) or not picked) else picked
+    if args.action == "status":
+        for surface, on in hookinstall.status(root()).items():
+            print(f"  {'✔' if on else '·'} {surface:<8} {'wired' if on else 'not wired'}")
+        return 0
+    fn = hookinstall.uninstall if args.action == "uninstall" else hookinstall.install
+    kw = {} if args.action == "uninstall" else {"recall": getattr(args, "recall", False)}
+    verb = "removed from" if args.action == "uninstall" else "wired into"
+    print(f"✔ Fux hooks {verb}:")
+    for surface, where in fn(root(), surfaces, **kw).items():
+        print(f"  {surface:<8} → {where}")
     return 0
 
 

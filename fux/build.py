@@ -17,7 +17,9 @@ def run(root: Path, full: bool = False) -> dict:
 
     g = graph.build(root, rs, cfg, full=full)
     fp.out_file("graph.json").write_text(graph.to_json(g), encoding="utf-8")
-    fp.out_file("graph.html").write_text(graphhtml.render(g), encoding="utf-8")
+    fp.out_file("graph.html").write_text(
+        graphhtml.render(g, root=root, editor=cfg.get("graph_editor", "vscode")),
+        encoding="utf-8")
     fp.out_file("GRAPH_REPORT.md").write_text(report.render(g), encoding="utf-8")
 
     narr = narrative.render(rs)

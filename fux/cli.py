@@ -141,6 +141,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("report", help="write GRAPH_REPORT.md (god nodes + communities)").set_defaults(fn=cligraph.cmd_report)
 
+    hk = sub.add_parser("hooks", help="install/uninstall/status Fux hooks across git + agents")
+    hk.add_argument("action", choices=["install", "uninstall", "status"], nargs="?",
+                    default="install", help="default: install")
+    hk.add_argument("--all", action="store_true", help="all surfaces (the default)")
+    for _s in ("git", "claude", "codex", "copilot"):
+        hk.add_argument(f"--{_s}", action="store_true", help=f"only the {_s} surface")
+    hk.add_argument("--recall", action="store_true", help="also wire the UserPromptSubmit recall hook")
+    hk.set_defaults(fn=clicmds.cmd_hooks)
+
     sub.add_parser("setup", help="copy bundled assets (schema, hooks, skills) to ~/.claude/fux/").set_defaults(fn=clicmds.cmd_setup)
 
     fr = sub.add_parser("fetch-rules", help="fetch plain text from a URL / file / PDF for rule extraction")

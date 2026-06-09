@@ -459,7 +459,7 @@ function showDetail(n){ $("agentrow").style.display="flex";
     `<span class="lab" style="${hue!=null?"":"color:var(--muted)"}">${n.type}${isKnow(n)?" · knowledge layer":""}</span></div>`+
     `<div class="ins-title">${esc(n.label)}</div>`+
     `<div class="ins-sub">community ${n.community} · degree ${deg[n.id]||0} · centrality ${(n.centrality||0).toFixed(3)}`+
-      (n.file?` · ${esc(n.file)}${n.line?":"+n.line:""}`:"")+`</div>`;
+      (n.file?` · ${fileLink(n)}`:"")+`</div>`;
   const pills=[]; if(n.layer)pills.push(["layer: "+n.layer,1]); if(n.domain)pills.push(["domain: "+n.domain,0]);
   if(n.status)pills.push(["status: "+n.status,0]); if(isGod(n))pills.push(["⭐ hub",1]);
   if(pills.length) s += `<div class="pills">`+pills.map(([p,a])=>`<span class="pill${a?" amb":""}">${esc(p)}</span>`).join("")+`</div>`;
@@ -472,6 +472,14 @@ function showDetail(n){ $("agentrow").style.display="flex";
   $("detail").innerHTML = s; wireGo(); }
 function clearDetail(){ $("agentrow").style.display="none";
   $("detail").innerHTML = `<div class="ins-sub" style="margin:0">Click a node. Double-click to focus its neighbourhood.</div>`; }
+// file:line → an <editor>://file/<abs>:<line>:<col> deep link (opens VSCode/Cursor on
+// the exact line). Falls back to plain text when the build embedded no project ROOT.
+function fileLink(n){
+  const label = esc(n.file) + (n.line ? ":"+n.line : "");
+  if(!ROOT) return label;
+  const href = encodeURI(EDITOR + "://file" + ROOT + "/" + n.file + ":" + (n.line||1) + ":1");
+  return `<a href="${href}" title="open in ${esc(EDITOR)} at line ${n.line||1}"`+
+    ` style="color:#ffb877;text-decoration:none">${label}<span style="opacity:.6"> ↗</span></a>`; }
 
 // ---- markdown export ----------------------------------------------------
 function nodeMarkdown(n){ let s=`### ${n.label} (${n.type})\n`;
