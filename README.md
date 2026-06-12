@@ -76,6 +76,13 @@ fux serve                      # local dashboard over the generated views
 fux import docs/               # migrate existing markdown → narrative entries
 fux parity                     # is it safe to retire the old graph/docs/memory?
 fux tour                       # ordered ONBOARDING.md
+
+# Runtime consumers (agents + apps, e.g. Anton's Orff concierge)
+fux components [--scope dir]   # component/hook registry for on-the-fly UI generation
+fux validate-spec              # validate a declarative UISpec against the registry
+fux feedback                   # record rejected specs as candidate vocabulary gaps
+fux hook-recall                # stdin-JSON recall for agent prompt hooks
+fux query / path / explain     # graph traversal: cross-module "how does X relate to Y"
 ```
 
 **Complete, example-driven guide to everything Fux does:
@@ -140,6 +147,12 @@ effective ruleset = ~/.claude/fux/global/   (cross-project best practices)
 
 `project` overrides `pack` overrides `global`. `fux check` flags conflicts
 instead of silently shadowing.
+
+> Packs are optional. A single-project setup can keep `packs = []` and hold all
+> authored knowledge in the repo's own `.fux/` — version-controlled with the code
+> it governs (see Anton's `knowledge-location` rule for the reasoning). Global
+> rules are seeded from this repo's `fux/data/global/`, so they stay versioned
+> tool code, not loose documents.
 
 ## Guarantee
 
