@@ -9,6 +9,10 @@ not just a per-call estimate. Opt-in via `cost_tracking`; recorded on each
 `tokens_without` = reading the governed source file(s) for the matched rules;
 `tokens_with` = the matched Tier-2 rule(s) only (the realistic later-lookup cost,
 since the Tier-1 INDEX is injected once per session). `saved = without − with`.
+
+The summary reports the lifetime total *and* a per-day / per-week / per-month rate
+— `tokens_saved` amortised across the observed span (`first`→`last`, floored at one
+day), then scaled — so the win reads as an ongoing throughput, not just a total.
 """
 from __future__ import annotations
 
@@ -104,16 +108,45 @@ def overall_ratio(led: dict) -> float:
     return (led.get("tokens_without", 0) / w) if w else 0.0
 
 
+_AVG_MONTH = 365.25 / 12  # mean calendar month, in days
+
+
+def _date(s: str | None) -> _dt.date | None:
+    try:
+        return _dt.date.fromisoformat(s) if s else None
+    except ValueError:
+        return None
+
+
+def span_days(led: dict) -> int:
+    """Calendar days spanned by the recorded lookups (floored at 1, so a same-day
+    ledger still yields a finite per-day rate rather than dividing by zero)."""
+    a, b = _date(led.get("first")), _date(led.get("last"))
+    return max(1, (b - a).days) if a and b else 1
+
+
+def rates(led: dict) -> dict:
+    """Average tokens saved per day / week / month over the observed span — the
+    lifetime `tokens_saved` amortised across `span_days`, then scaled up."""
+    days = span_days(led)
+    per_day = led.get("tokens_saved", 0) / days
+    return {"days": days, "day": per_day, "week": per_day * 7, "month": per_day * _AVG_MONTH}
+
+
 def render_summary(led: dict) -> str:
     if not led.get("lookups"):
         return ""
     span = led.get("first") or "?"
     ratio = overall_ratio(led)
     x = f"{ratio:.1f}×" if ratio else "—"
+    r = rates(led)
     return "\n".join([
         "",
         f"Cumulative (tracked across {led['lookups']} lookup(s) since {span})",
         f"  tokens without Fux:  {led['tokens_without']:>10,} tok",
         f"  tokens with Fux:     {led['tokens_with']:>10,} tok",
         f"  tokens saved:        {led['tokens_saved']:>10,} tok   → {x} overall",
+        f"  {'≈ saved per day:':<21}{round(r['day']):>10,} tok   (avg over {r['days']} day(s))",
+        f"  {'≈ saved per week:':<21}{round(r['week']):>10,} tok",
+        f"  {'≈ saved per month:':<21}{round(r['month']):>10,} tok",
     ])

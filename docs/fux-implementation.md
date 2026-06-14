@@ -189,8 +189,11 @@ applied identically to both sides):
 - **Cumulative ledger** ([fux/costledger.py](fux/costledger.py)) — opt-in
   `cost_tracking` records *every* `fux recall` lookup's measured savings into
   `.fux/cost.json` (lifetime tokens-without/with/saved + recent queries), so the
-  project can quote a real running total, not a per-call estimate. Only **code-bound**
-  matches count (same "topic" restriction). `fux savings` prints it; `--reset` clears.
+  project can quote a real running total, not a per-call estimate. The summary also
+  amortises the lifetime `tokens_saved` across the observed span (`first`→`last`,
+  floored at one day) into a **per-day / per-week / per-month** rate, so the win
+  reads as ongoing throughput. Only **code-bound** matches count (same "topic"
+  restriction). `fux savings` prints it; `--reset` clears.
 
 Deterministic, `$0`, no LLM. Covered by [tests/test_savings.py](tests/test_savings.py),
 [tests/test_costledger.py](tests/test_costledger.py).

@@ -2,7 +2,8 @@
 
 Session-aware: rules whose own source was edited this session are skipped, so the
 PostToolUse hook only nags about rules that drifted, not ones you just updated.
-Session state lives in ``.fux/out/.session-<id>.json`` (gitignored).
+Session state lives in ``.fux/out/sessions/<id>.json`` (gitignored) — tucked in its
+own subdir so it never clutters the derived html/reports at the top of ``out/``.
 """
 from __future__ import annotations
 
@@ -15,8 +16,8 @@ from fux.model import Rule
 
 def _state_path(root: Path, session: str) -> Path:
     fp = paths.Footprint(root)
-    fp.out.mkdir(parents=True, exist_ok=True)
-    return fp.out / f".session-{session or 'default'}.json"
+    fp.sessions.mkdir(parents=True, exist_ok=True)
+    return fp.sessions / f"{session or 'default'}.json"
 
 
 def mark_rule_edited(root: Path, session: str, rule_id: str) -> None:

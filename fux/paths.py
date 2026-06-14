@@ -81,6 +81,12 @@ class Footprint:
         return self.base / "out"
 
     @property
+    def sessions(self) -> Path:
+        """Per-session runtime state (gitignored), kept out of ``out/``'s top level
+        so the derived html/reports there stay easy to browse."""
+        return self.base / "out" / "sessions"
+
+    @property
     def config(self) -> Path:
         return self.base / "config.toml"
 

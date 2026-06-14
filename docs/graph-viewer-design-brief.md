@@ -108,7 +108,10 @@ Click a super-node to drill into that community. Zoom in to expand back to nodes
 ## 4. Everything it can do (capability inventory)
 
 **Navigate**
-- Pan (drag canvas), zoom (wheel), Fit-to-view, Reset view.
+- Pan (drag canvas), zoom (wheel/trackpad/pinch — delta-proportional and eased so
+  it glides rather than stepping), drag the zoom-well slider to scrub zoom live,
+  Fit-to-view, Reset view. All button/search/ledger recentres animate (camera
+  tween); direct manipulation — pan, node-drag, slider — stays 1:1.
 - Drag individual nodes to reposition; physics re-settles around them.
 - Pause/resume the force simulation.
 - Semantic zoom: macro community map ⇄ micro node view by zoom level.
@@ -144,8 +147,8 @@ Click a super-node to drill into that community. Zoom in to expand back to nodes
 - Copy the entire visible subgraph as markdown.
 - Copy the highlighted path as markdown.
 
-**Keyboard:** `/` search · `f` fit · `r` reset · `space` pause · `e` focus ·
-`c` clusters · `p` path · `Esc` clear · `l` labels.
+**Keyboard:** `/` search · `+`/`-` zoom · `f` fit · `r` reset · `space` pause ·
+`e` focus · `c` clusters · `p` path · `Esc` clear · `l` labels.
 
 ---
 

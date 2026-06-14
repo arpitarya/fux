@@ -42,6 +42,8 @@ for (const e of edges){ const a=byId[e.source], b=byId[e.target];
     (govTargets[kn.id]=govTargets[kn.id]||[]).push({id:other.id, type:e.type}); }
 
 let view = { x: 0, y: 0, k: 1 }, hidden = new Set(), hiddenE = new Set();
+let vTarget = null;           // when set, the camera eases toward it (smooth zoom/fly)
+const VIEW_EASE = 0.2;        // per-frame approach fraction toward vTarget
 let selected = null, hover = null, query = "", lens = "know";
 let running = true, showLabels = true, focusSet = null;
 let pathMode = false, pathA = null, pathSet = null, pathEdge = new Set(), pathMD = null;
@@ -135,7 +137,7 @@ function updateHits(){ if(!query){ $("qhits").innerHTML=""; return; }
     + (m.length>14 ? `<div class="ct" style="padding:5px 7px">+${m.length-14} more</div>` : "");
   $("qhits").querySelectorAll("[data-jump]").forEach(el => el.onclick = () => jumpTo(el.dataset.jump)); }
 function jumpTo(id){ const n=byId[id]; if(!n) return; selected=id; clearPath(); showDetail(n);
-  if(view.k<1) view.k=1; view.x=-n.x*view.k; view.y=-n.y*view.k; }
+  const k=Math.max(view.k,1); flyTo(-n.x*k, -n.y*k, k); }
 
 // ---- copy / governance footer buttons ----
 $("bcopy").onclick = () => { if(pathSet && pathMD) copy(pathMD(), "path copied");
@@ -151,10 +153,10 @@ $("railtab").onclick = () => { $("right").classList.toggle("collapsed"); applyRi
 applyRightState();   // honour the default-collapsed markup on load
 // Micro / Macro both show the real nodes — they just change zoom. Micro zooms in
 // (centred on the selection if any); Macro fits the whole graph as an overview.
-$("bmicro").onclick = () => { focusSet=null; userMoved=true; const z=Math.max(view.k,1.3); const p=selected&&byId[selected];
-  view.k=z; if(p){ view.x=-p.x*z; view.y=-p.y*z; } };
+$("bmicro").onclick = () => { focusSet=null; const z=Math.max(view.k,1.3); const p=selected&&byId[selected];
+  if(p) flyTo(-p.x*z, -p.y*z, z); else zoomToCenter(z); };
 // Macro = the auto-framed overview; re-enable auto-fit so it stays framed on resize.
-$("bmacro").onclick = () => { focusSet=null; userMoved=false; query=""; $("q").value=""; updateHits(); clearPath(); fit(); };
+$("bmacro").onclick = () => { focusSet=null; userMoved=false; query=""; $("q").value=""; updateHits(); clearPath(); fitAnimated(); };
 
 // ---- layout & geometry --------------------------------------------------
 let W=0, H=0;
@@ -201,7 +203,7 @@ function step(){
     if(c){ n.vx+=(c.x-n.x)*COMM_PULL*alpha; n.vy+=(c.y-n.y)*COMM_PULL*alpha; }
     n.vx*=.85; n.vy*=.85; n.x+=n.vx*0.5; n.y+=n.vy*0.5;
     n.vx-=n.x*GRAVITY*alpha; n.vy-=n.y*GRAVITY*alpha; }
-  alpha *= ALPHA_DECAY; if(alpha < ALPHA_MIN){ alpha = 0; running = false; if(!userMoved) fit(); }
+  alpha *= ALPHA_DECAY; if(alpha < ALPHA_MIN){ alpha = 0; running = false; if(!userMoved && !vTarget) fit(); }
 }
 const TC = (wx,wy) => ({ x: wx*view.k+W/2+view.x, y: wy*view.k+H/2+view.y });
 const T = n => TC(n.x, n.y);
@@ -213,13 +215,16 @@ const baseR = n => isKnow(n) ? (3 + (n.centrality||0)*3.4 + Math.min((deg[n.id]|
 const radius = n => baseR(n) * Math.min(2.4, Math.max(0.7, view.k));
 const neighbors = id => new Set(adj[id].map(([t])=>t));
 
-function fit(){ const vis = nodes.filter(visible); if(!vis.length) return;
+function fitView(){ const vis = nodes.filter(visible); if(!vis.length) return null;
   const xs=vis.map(n=>n.x).sort((a,b)=>a-b), ys=vis.map(n=>n.y).sort((a,b)=>a-b);
   const lo=i=>i[Math.floor(i.length*0.02)], hi=i=>i[Math.floor(i.length*0.98)];
   const minX=lo(xs),maxX=hi(xs),minY=lo(ys),maxY=hi(ys);
   const w=maxX-minX||1, h=maxY-minY||1;
-  view.k = Math.max(0.2, Math.min(2.5, 0.85*Math.min(W/w, H/h)));
-  view.x = -(minX+maxX)/2*view.k; view.y = -(minY+maxY)/2*view.k; }
+  const k = Math.max(0.2, Math.min(2.5, 0.85*Math.min(W/w, H/h)));
+  return { k, x:-(minX+maxX)/2*k, y:-(minY+maxY)/2*k }; }
+// fit() snaps (used by the settling physics loop); fitAnimated() glides (user-driven).
+function fit(){ const t=fitView(); if(t){ view.k=t.k; view.x=t.x; view.y=t.y; vTarget=null; } }
+function fitAnimated(){ const t=fitView(); if(t) vTarget={...t}; }
 function setFocus(id){ focusSet = new Set([id, ...neighbors(id)]); reheat(0.45); }
 function clearFocus(){ focusSet = null; reheat(0.3); }
 function toggleLens(){ const knowOn = focusSet && focusSet._lens;
@@ -249,11 +254,13 @@ function clearPath(){ pathSet=null; pathEdge=new Set(); pathA=null; pathMD=null;
 // ---- render : the Solar pipeline ----------------------------------------
 function draw(){
   _f++;
+  easeView();
   if(running && _f % PHYS_STRIDE === 0) step();
   // The layout grows as it settles, so keep re-framing to fit (driven by the draw
   // loop, not events) until the user takes control — this is the real fix for the
-  // "graph is cut off until I switch tabs" glitch.
-  if(running && !userMoved && _f % 16 === 0) fit();
+  // "graph is cut off until I switch tabs" glitch. Suppressed while a camera tween
+  // is in flight, so the auto-fit and the glide never fight.
+  if(running && !userMoved && !vTarget && _f % 16 === 0) fit();
   ctx.clearRect(0,0,W,H);
   const anchor = selected || hover, near = anchor ? neighbors(anchor) : null;
   const dimCode = lens==="know";
@@ -370,19 +377,46 @@ function bindMM(mm){ if(!mm) return;
   const panTo = ev => { if(!_mmBounds) return; const r=mm.getBoundingClientRect();
     const wx=((ev.clientX-r.left)-_mmBounds.ox)/_mmBounds.s, wy=((ev.clientY-r.top)-_mmBounds.oy)/_mmBounds.s;
     view.x=-wx*view.k; view.y=-wy*view.k; };
-  mm.onmousedown = e => { panTo(e); const mv=ev=>panTo(ev);
+  mm.onmousedown = e => { vTarget=null; panTo(e); const mv=ev=>panTo(ev);
     const up=()=>{ window.removeEventListener("mousemove",mv); window.removeEventListener("mouseup",up); };
     window.addEventListener("mousemove",mv); window.addEventListener("mouseup",up); }; }
 bindMM($("mm")); bindMM($("fmm"));
 
 // ---- zoom well + mode pill ----------------------------------------------
 const K_MIN=0.15, K_MAX=5, LK=Math.log(K_MIN), LKR=Math.log(K_MAX)-LK;
+const clampK = k => Math.max(K_MIN, Math.min(K_MAX, k));
+// Smooth camera. Every interactive zoom/recenter sets `vTarget`; easeView() (run
+// once per frame in draw) glides the live `view` toward it, so nothing snaps.
+// Direct manipulation — panning, node-drag, the zoom slider — cancels the tween so
+// it stays 1:1 with the cursor; the physics auto-fit is suppressed while one runs.
+function easeView(){ if(!vTarget) return;
+  view.k += (vTarget.k-view.k)*VIEW_EASE;
+  view.x += (vTarget.x-view.x)*VIEW_EASE;
+  view.y += (vTarget.y-view.y)*VIEW_EASE;
+  if(Math.abs(vTarget.k-view.k)<1e-3 && Math.hypot(vTarget.x-view.x, vTarget.y-view.y)<0.4){
+    view.k=vTarget.k; view.x=vTarget.x; view.y=vTarget.y; vTarget=null; } }
+// Zoom keeping the world point under (ex,ey) pinned — compounded in target space so
+// rapid wheel ticks anchor consistently while the previous glide is still in flight.
+function zoomBy(ex, ey, factor){ userMoved=true; const b=vTarget||view; const k=clampK(b.k*factor);
+  const wx=(ex-W/2-b.x)/b.k, wy=(ey-H/2-b.y)/b.k;
+  vTarget={ k, x: ex-W/2-wx*k, y: ey-H/2-wy*k }; }
+function zoomToCenter(k){ userMoved=true; const b=vTarget||view; k=clampK(k);
+  const wx=-b.x/b.k, wy=-b.y/b.k; vTarget={ k, x:-wx*k, y:-wy*k }; }
+function flyTo(x, y, k){ userMoved=true; vTarget={ k:clampK(k), x, y }; }
 function updatePill(){ const macro = view.k < 0.55;   // zoomed-out overview = macro
   $("bmacro").classList.toggle("on",macro); $("bmicro").classList.toggle("on",!macro);
-  $("zthumb").style.left=((Math.log(Math.max(K_MIN,Math.min(K_MAX,view.k)))-LK)/LKR*100)+"%";
+  $("zthumb").style.left=((Math.log(clampK(view.k))-LK)/LKR*100)+"%";
   $("zlabel").textContent = macro ? "macro" : (view.k>1.4 ? "detail" : "micro"); }
-$("ztrack").onclick = e => { userMoved=true; const r=$("ztrack").getBoundingClientRect();
-  view.k = Math.exp(LK + Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*LKR); };
+// Zoom slider: drag (not just click) the thumb. Writes the camera directly so the
+// thumb tracks the cursor 1:1, recentred on the viewport so the graph scales in place.
+const kFromTrack = clientX => { const r=$("ztrack").getBoundingClientRect();
+  return Math.exp(LK + Math.max(0,Math.min(1,(clientX-r.left)/r.width))*LKR); };
+function zoomCenterNow(k){ userMoved=true; vTarget=null; k=clampK(k);
+  const wx=-view.x/view.k, wy=-view.y/view.k; view.k=k; view.x=-wx*k; view.y=-wy*k; }
+$("ztrack").onmousedown = e => { e.preventDefault(); zoomCenterNow(kFromTrack(e.clientX));
+  const mv=ev=>zoomCenterNow(kFromTrack(ev.clientX));
+  const up=()=>{ window.removeEventListener("mousemove",mv); window.removeEventListener("mouseup",up); };
+  window.addEventListener("mousemove",mv); window.addEventListener("mouseup",up); };
 
 // ---- governance ledger --------------------------------------------------
 (function buildLedger(){
@@ -404,17 +438,17 @@ $("ztrack").onclick = e => { userMoved=true; const r=$("ztrack").getBoundingClie
     if(e.target.closest(".tgt")) return;
     body.querySelectorAll(".lrow").forEach(x=>x.classList.remove("open")); row.classList.add("open");
     const n=byId[row.dataset.rule]; selected=n.id; clearPath(); showDetail(n);
-    if(view.k<1) view.k=1.1; view.x=-n.x*view.k; view.y=-n.y*view.k; }; });
+    const k=Math.max(view.k,1.1); flyTo(-n.x*k, -n.y*k, k); }; });
   body.querySelectorAll(".tgt").forEach(t => { t.onclick = () => { const n=byId[t.dataset.go];
-    if(!n) return; selected=n.id; clearPath(); showDetail(n); if(view.k<1) view.k=1.1;
-    view.x=-n.x*view.k; view.y=-n.y*view.k; }; });
+    if(!n) return; selected=n.id; clearPath(); showDetail(n);
+    const k=Math.max(view.k,1.1); flyTo(-n.x*k, -n.y*k, k); }; });
 })();
 
 // ---- interaction --------------------------------------------------------
 function hit(mx,my){ let best=null,bd=1e9; for(const n of nodes){ if(!visible(n)) continue; const p=T(n);
   const d=Math.hypot(mx-p.x,my-p.y); if(d < radius(n)+4 && d<bd){ bd=d; best=n; } } return best; }
 let drag=null, pan=false, last=null, downAt=null;
-cv.onmousedown = e => { last={x:e.offsetX,y:e.offsetY}; downAt={x:e.offsetX,y:e.offsetY};
+cv.onmousedown = e => { vTarget=null; last={x:e.offsetX,y:e.offsetY}; downAt={x:e.offsetX,y:e.offsetY};
   const n=hit(e.offsetX,e.offsetY);
   if(pathMode){ if(n){ if(!pathA){ pathA=n.id; selected=n.id; showDetail(n); toast("now click the target node"); }
       else { setPath(shortestPath(pathA,n.id)); pathA=null; togglePath(); } } return; }
@@ -433,13 +467,19 @@ cv.onmousemove = e => {
   last={x:e.offsetX,y:e.offsetY}; };
 window.addEventListener("mouseup", () => { drag=null; pan=false; });
 cv.ondblclick = e => { const n=hit(e.offsetX,e.offsetY); if(n){ selected=n.id; setFocus(n.id); showDetail(n); } };
-cv.onwheel = e => { e.preventDefault(); userMoved=true; const f=e.deltaY<0?1.1:0.9;
-  const mx=e.offsetX-W/2-view.x, my=e.offsetY-H/2-view.y;
-  view.k=Math.max(K_MIN,Math.min(K_MAX,view.k*f)); view.x-=mx*(f-1); view.y-=my*(f-1); };
+// Wheel/trackpad zoom: scale by the *magnitude* of the delta (normalised across
+// pixel/line/page deltaModes) so one mouse notch and a trackpad swipe both feel
+// natural, then glide there. macOS pinch arrives as ctrl+wheel with coarser deltas.
+cv.onwheel = e => { e.preventDefault();
+  let d = e.deltaY; if(e.deltaMode===1) d*=16; else if(e.deltaMode===2) d*=(H||500);
+  const factor = Math.max(0.4, Math.min(2.5, Math.exp(-d * (e.ctrlKey ? 0.010 : 0.0018))));
+  zoomBy(e.offsetX, e.offsetY, factor); };
 window.addEventListener("keydown", e => { if(e.target.tagName==="INPUT"){ if(e.key==="Escape")e.target.blur(); return; }
   const k=e.key.toLowerCase();
   if(k==="/"){ e.preventDefault(); $("q").focus(); }
-  else if(k==="f"){ userMoved=false; fit(); } else if(k==="r"){ userMoved=true; view={x:0,y:0,k:1}; }
+  else if(k==="f"){ userMoved=false; fitAnimated(); } else if(k==="r"){ flyTo(0,0,1); }
+  else if(k==="+"||k==="="){ zoomToCenter((vTarget?vTarget.k:view.k)*1.3); }
+  else if(k==="-"||k==="_"){ zoomToCenter((vTarget?vTarget.k:view.k)/1.3); }
   else if(k===" "){ e.preventDefault(); running ? (running=false) : reheat(0.3); }
   else if(k==="e"){ if(selected) setFocus(selected); }
   else if(k==="l"){ showLabels=!showLabels; }
