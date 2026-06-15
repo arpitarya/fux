@@ -177,7 +177,10 @@ Implemented ([fux/graph.py](fux/graph.py), [fux/astextract.py](fux/astextract.py
 
 `fux savings ["query"]` ([fux/savings.py](fux/savings.py)) turns plan §12's
 illustrative table into **measured** numbers from real file sizes (≈4 chars/token,
-applied identically to both sides):
+applied identically to both sides), priced in **tokens *and* dollars** at a
+configurable `usd_per_mtok` (default = Claude Opus 4.8's $5/M input rate; the win is
+on input tokens, so the input price is the right one — model-agnostic, set per
+project):
 
 - **Corpus** — active rule count, INDEX (Tier-1) tokens, average rule (Tier-2)
   tokens, and total governed-code tokens across distinct `code_refs` files.
@@ -192,7 +195,9 @@ applied identically to both sides):
   project can quote a real running total, not a per-call estimate. The summary also
   amortises the lifetime `tokens_saved` across the observed span (`first`→`last`,
   floored at one day) into a **per-day / per-week / per-month** rate, so the win
-  reads as ongoing throughput. Only **code-bound** matches count (same "topic"
+  reads as ongoing throughput. Every figure is also shown in **dollars** (shared
+  `savings.usd` pricing); the ledger stores only tokens, so a price change re-prices
+  history without a rewrite. Only **code-bound** matches count (same "topic"
   restriction). `fux savings` prints it; `--reset` clears.
 
 Deterministic, `$0`, no LLM. Covered by [tests/test_savings.py](tests/test_savings.py),
@@ -332,7 +337,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (133 tests)
+### 2.20 Tests — ✅ (173 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges

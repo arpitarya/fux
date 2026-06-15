@@ -58,3 +58,29 @@ def test_render_is_stringable(project):
     _seed(project)
     text = savings.render(savings.build(project, query="day pnl"))
     assert "fux savings" in text and "cheaper" in text
+
+
+def test_usd_conversion_math():
+    assert savings.usd(1_000_000, 5.0) == 5.0
+    assert savings.usd(500_000, 10.0) == 5.0
+    assert savings.fmt_usd(12.5) == "$12.50"        # cents once past a dollar
+    assert savings.fmt_usd(0.003) == "$0.0030"      # 4 dp below a cent
+
+
+def test_render_shows_dollars(project):
+    _seed(project)
+    rep = savings.build(project, query="day pnl")
+    assert rep.usd_per_mtok == savings.DEFAULT_USD_PER_MTOK
+    text = savings.render(rep)
+    assert "$" in text and "/M input tok" in text and "you save" in text
+
+
+def test_usd_per_mtok_config_override(project):
+    _seed(project)
+    cfg = project / ".fux" / "config.toml"
+    cfg.write_text(cfg.read_text().replace("usd_per_mtok = 5.0", "usd_per_mtok = 10.0"),
+                   encoding="utf-8")
+    rep = savings.build(project)
+    assert rep.usd_per_mtok == 10.0
+    # Same tokens, double the price → double the dollars on the aggregate baseline.
+    assert savings.usd(rep.avg_without, 10.0) == 2 * savings.usd(rep.avg_without, 5.0)

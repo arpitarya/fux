@@ -30,6 +30,8 @@ DEFAULTS = {
     "memory_ttl_days": 180,   # type: memory decays after this many untouched days (§17.3)
     "usage_tracking": False,   # opt-in: record served rules → usage-weighted decay (§17.20c)
     "cost_tracking": False,    # opt-in: record each lookup's savings → cumulative cost.json (§12)
+    "usd_per_mtok": 5.0,       # $/million input tokens for `fux savings` dollar figures (§12);
+                               # default = Claude Opus 4.8 input price. Model-agnostic — override per project.
     "parity_stay": [],        # docs that stay/are out-of-scope for `fux parity` (§17.17)
     "context_budget_tokens": 0,  # >0 ⇒ knapsack-pack the SessionStart INDEX (§17.25)
     "graph_editor": "vscode",  # editor URI scheme for clickable graph.html node links:
@@ -78,6 +80,9 @@ def default_toml() -> str:
         "usage_tracking = false\n\n"
         "# Opt-in: accumulate each lookup's token savings into .fux/cost.json ($0).\n"
         "cost_tracking = false\n\n"
+        "# $/million input tokens used to price `fux savings` in dollars (model-agnostic).\n"
+        "# Default = Claude Opus 4.8 input price; set to your model's rate.\n"
+        "usd_per_mtok = 5.0\n\n"
         "# Docs that stay / are out-of-scope for `fux parity` (beyond conventions,\n"
         "# guardrails) — e.g. process docs that get deleted, not migrated to narrative.\n"
         "parity_stay = []\n\n"

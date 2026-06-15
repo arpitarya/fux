@@ -69,6 +69,19 @@ def test_rates_amortise_over_span(project):
         assert label in out
 
 
+def test_summary_prices_in_dollars(project):
+    _seed(project)
+    from fux import loader, config, paths
+    rules = loader.resolve(project, config.load(paths.Footprint(project).config)).active()
+    costledger.record(project, "pnl", rules, today=_dt.date(2026, 6, 5))
+    led = costledger.load(project)
+    out = costledger.render_summary(led, per_mtok=5.0)
+    assert "$" in out and "/M input tok" in out
+    # The dollar figure must match the shared savings pricing of the saved tokens.
+    from fux import savings
+    assert savings.fmt_usd(savings.usd(led["tokens_saved"], 5.0)) in out
+
+
 def test_span_floored_to_one_day(project):
     """A same-day ledger (first == last) yields span 1, not a divide-by-zero."""
     _seed(project)

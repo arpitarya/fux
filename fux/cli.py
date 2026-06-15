@@ -58,7 +58,7 @@ def build_parser() -> argparse.ArgumentParser:
     vf.set_defaults(fn=cliquery.cmd_verify)
     sub.add_parser("tour", help="emit an ordered ONBOARDING.md").set_defaults(fn=cliquery.cmd_tour)
 
-    sv = sub.add_parser("savings", help="estimate the token-cost win of Fux ($0)")
+    sv = sub.add_parser("savings", help="estimate the token + dollar cost win of Fux ($0)")
     sv.add_argument("query", nargs="?", help="optional: cost a specific lookup")
     sv.add_argument("--top", type=int, default=3)
     sv.add_argument("--reset", action="store_true", help="clear the cumulative cost ledger")

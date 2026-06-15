@@ -1,8 +1,9 @@
-"""`fux savings` — estimate the token-cost win of Fux ($0, deterministic, plan §12).
+"""`fux savings` — estimate the token- and dollar-cost win of Fux ($0, deterministic, plan §12).
 
 Turns the plan's *illustrative* cost table into **measured** numbers from this
 project's real file sizes. No LLM, no network — just byte counts and a transparent
-≈4-chars/token heuristic. Two framings:
+≈4-chars/token heuristic, priced in **dollars** at a configurable `usd_per_mtok`
+(default = Claude Opus 4.8's input rate; the win is on input tokens). Two framings:
 
 * **Per lookup** (optionally for a query) — answering a question about some
   governed logic costs, without Fux, a read of the governed source file(s); with
@@ -24,10 +25,22 @@ from fux import config, index, loader, paths, recall
 from fux.model import Rule, RuleSet
 
 CHARS_PER_TOKEN = 4  # rough, model-agnostic; applied identically to both sides
+DEFAULT_USD_PER_MTOK = 5.0  # $/million input tokens — Claude Opus 4.8 input price (config: usd_per_mtok)
 
 
 def tok(text: str) -> int:
     return round(len(text) / CHARS_PER_TOKEN)
+
+
+def usd(tokens: float, per_mtok: float = DEFAULT_USD_PER_MTOK) -> float:
+    """Dollar cost of `tokens` at `per_mtok` $/million tokens — the savings is on
+    *input* tokens (a small rule read instead of the whole governed file)."""
+    return tokens / 1_000_000 * per_mtok
+
+
+def fmt_usd(amount: float) -> str:
+    """Compact dollar string: cents precision once past a cent, 4 dp below it."""
+    return f"${amount:,.2f}" if abs(amount) >= 1 else f"${amount:.4f}"
 
 
 def _read_tokens(p: Path) -> int:
@@ -89,6 +102,7 @@ class Report:
     topics: int              # rules with at least one existing governed file
     avg_without: float
     avg_rule: float
+    usd_per_mtok: float = DEFAULT_USD_PER_MTOK
     lookup: Lookup | None = None
     notes: list[str] = field(default_factory=list)
 
@@ -96,14 +110,14 @@ class Report:
         return self.avg_without / self.avg_rule if self.avg_rule else 0.0
 
 
-def _ruleset(root: Path) -> tuple[RuleSet, int]:
+def _ruleset(root: Path) -> tuple[RuleSet, int, dict]:
     cfg = config.load(paths.Footprint(root).config)
     rs = loader.resolve(root, cfg)
-    return rs, tok(index.render_index(rs))
+    return rs, tok(index.render_index(rs)), cfg
 
 
 def build(root: Path, query: str | None = None, top: int = 3) -> Report:
-    rs, index_tok = _ruleset(root)
+    rs, index_tok, cfg = _ruleset(root)
     active = rs.active()
 
     gov_tok = gov_files = topics = 0
@@ -127,6 +141,7 @@ def build(root: Path, query: str | None = None, top: int = 3) -> Report:
         governed_tok=gov_tok, governed_files=gov_files, topics=topics,
         avg_without=(sum_without / topics) if topics else 0.0,
         avg_rule=(sum_rule / topics) if topics else 0.0,
+        usd_per_mtok=float(cfg.get("usd_per_mtok", DEFAULT_USD_PER_MTOK)),
     )
     if topics == 0:
         report.notes.append("No active rule carries an existing `code_refs` file, "
@@ -157,32 +172,39 @@ def _lookup(root: Path, query: str, index_tok: int, top: int) -> Lookup:
 
 
 def render(rep: Report) -> str:
-    L = [f"fux savings — token estimate ($0, heuristic ≈{CHARS_PER_TOKEN} chars/token)", ""]
+    price = rep.usd_per_mtok
+    money = lambda t: fmt_usd(usd(t, price))  # noqa: E731 — local shorthand
+    L = [f"fux savings — cost estimate ($0, heuristic ≈{CHARS_PER_TOKEN} chars/token · "
+         f"${price:,.2f}/M input tok)", ""]
     L.append("Corpus")
     L.append(f"  active rules:        {rep.n_rules}")
-    L.append(f"  INDEX (Tier-1):      {rep.index_tok:>8,} tok   ← injected once per session")
+    L.append(f"  INDEX (Tier-1):      {rep.index_tok:>8,} tok  ≈ {money(rep.index_tok):>9}   ← injected once per session")
     if rep.topics:
-        L.append(f"  avg rule (Tier-2):   {rep.avg_rule:>8,.0f} tok   ← opened only when relevant")
-    L.append(f"  governed code:       {rep.governed_tok:>8,} tok across {rep.governed_files} files")
+        L.append(f"  avg rule (Tier-2):   {rep.avg_rule:>8,.0f} tok  ≈ {money(rep.avg_rule):>9}   ← opened only when relevant")
+    L.append(f"  governed code:       {rep.governed_tok:>8,} tok  ≈ {money(rep.governed_tok):>9}   across {rep.governed_files} files")
     L.append("")
 
     if rep.lookup is not None:
         lk = rep.lookup
         ids = ", ".join(r.id for r in lk.rules) or "(no rule matched)"
+        saved = lk.without - lk.with_later
         L.append(f'Per lookup — "{lk.query}"')
         L.append(f"  matched rules:       {ids}")
-        L.append(f"  without Fux:         {lk.without:>8,} tok   (read governed file(s))")
-        L.append(f"  with Fux (1st):      {lk.with_first:>8,} tok   → {_x(lk.ratio_first())} cheaper")
-        L.append(f"  with Fux (later):    {lk.with_later:>8,} tok   → {_x(lk.ratio_later())} cheaper "
+        L.append(f"  without Fux:         {lk.without:>8,} tok  ≈ {money(lk.without):>9}   (read governed file(s))")
+        L.append(f"  with Fux (1st):      {lk.with_first:>8,} tok  ≈ {money(lk.with_first):>9}   → {_x(lk.ratio_first())} cheaper")
+        L.append(f"  with Fux (later):    {lk.with_later:>8,} tok  ≈ {money(lk.with_later):>9}   → {_x(lk.ratio_later())} cheaper "
                  f"(INDEX already in context)")
+        L.append(f"  you save (later):    {saved:>8,} tok  ≈ {money(saved):>9}   per repeat lookup")
         if lk.missing:
             L.append(f"  · {lk.missing} referenced file(s) missing — excluded from the baseline")
         L.append("")
 
     if rep.topics:
+        avg_saved = rep.avg_without - rep.avg_rule
         L.append(f"Across {rep.topics} documented topic(s), per lookup (avg)")
-        L.append(f"  without Fux:         {rep.avg_without:>8,.0f} tok")
-        L.append(f"  with Fux (later):    {rep.avg_rule:>8,.0f} tok   → {_x(rep.avg_ratio())} cheaper")
+        L.append(f"  without Fux:         {rep.avg_without:>8,.0f} tok  ≈ {money(rep.avg_without):>9}")
+        L.append(f"  with Fux (later):    {rep.avg_rule:>8,.0f} tok  ≈ {money(rep.avg_rule):>9}   → {_x(rep.avg_ratio())} cheaper")
+        L.append(f"  you save (avg):      {avg_saved:>8,.0f} tok  ≈ {money(avg_saved):>9}")
     for n in rep.notes:
         L.append(f"· {n}")
     return "\n".join(L)

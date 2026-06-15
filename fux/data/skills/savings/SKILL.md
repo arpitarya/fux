@@ -1,15 +1,17 @@
 ---
 name: fux-savings
-description: "measure the token-cost win of Fux from your project's real file sizes — auditable ROI, not asserted ($0, no LLM)"
+description: "measure the token + dollar cost win of Fux from your project's real file sizes — auditable ROI, not asserted ($0, no LLM)"
 trigger: /fux savings
 ---
 
-# /fux savings — measure the token-cost win
+# /fux savings — measure the token + dollar cost win
 
 Turns the plan's *illustrative* ROI table (fux-plan.md §12) into **measured**
 numbers from this project's real file sizes. Pure byte-counting with a transparent
-≈4-chars/token heuristic applied identically to both sides — deterministic, `$0`,
-no LLM. Use it to answer "is Fux actually saving me anything here?" with evidence.
+≈4-chars/token heuristic applied identically to both sides, priced in **dollars**
+at a configurable `usd_per_mtok` (default = Claude Opus 4.8's $5/M input rate) —
+deterministic, `$0`, no LLM. Use it to answer "is Fux actually saving me anything
+here?" with evidence in both tokens and money.
 
 ## Inputs
 
@@ -30,9 +32,12 @@ no LLM. Use it to answer "is Fux actually saving me anything here?" with evidenc
      governed-code tokens across the distinct `code_refs` files.
    - **Per lookup** — *without Fux* (read the governed file(s)) vs *with Fux*
      first-lookup (INDEX once + the rule) and later lookups (rule only, INDEX
-     already in context), each with its savings multiplier.
+     already in context), each with its savings multiplier, plus a "you save"
+     line — every figure in tokens *and* dollars.
    - **Aggregate** — the same averaged over every documented topic (a rule with an
      existing governed file).
+   - With `cost_tracking = true`, a **Cumulative** block follows: lifetime
+     tokens/dollars saved and a per-day / week / month rate.
 4. **Explain honestly.** The *ratio* is the signal, not the absolute tokens:
    "without Fux" assumes you read the whole governed file because you don't yet
    know the lines; "with Fux" assumes the rule points you straight to them. Both

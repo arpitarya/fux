@@ -55,7 +55,7 @@ TOOLS = [
      "description": "Percent of important code files that carry a governing rule.",
      "inputSchema": {"type": "object", "properties": {}}},
     {"name": "fux_savings",
-     "description": "Estimate the token-cost win, optionally for a specific lookup.",
+     "description": "Estimate the token + dollar cost win, optionally for a specific lookup.",
      "inputSchema": {"type": "object", "properties": {
          "query": {"type": "string"}, "top": {"type": "integer", "default": 3}}}},
     {"name": "fux_stats",

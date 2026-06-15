@@ -106,7 +106,7 @@ def cmd_savings(args) -> int:
         return 0
     rep = savings.build(here, query=getattr(args, "query", None), top=args.top)
     print(savings.render(rep))
-    print(costledger.render_summary(costledger.load(here)), end="")
+    print(costledger.render_summary(costledger.load(here), per_mtok=rep.usd_per_mtok), end="")
     return 0
 
 

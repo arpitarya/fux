@@ -341,8 +341,10 @@ Beyond the core, these make Fux materially more useful:
 12. **Measured cost savings.** `fux savings` turns §12's illustrative table into
     real numbers from this project's file sizes — INDEX + rule-corpus +
     governed-code token totals, and a without-Fux vs with-Fux per-lookup
-    comparison (optionally for a specific query). Deterministic, `$0`, no LLM:
-    it makes the ROI argument auditable instead of asserted.
+    comparison (optionally for a specific query), reported in **tokens and dollars**
+    (configurable `usd_per_mtok`, default = Claude Opus 4.8's $5/M input rate).
+    Deterministic, `$0`, no LLM: it makes the ROI argument auditable instead of
+    asserted.
 
 13. **Quality lint + health score.** `fux lint` judges whether a rule earns its
     weight (missing **why**, ungrounded, dangling edges, stub body — complementary
@@ -437,13 +439,18 @@ never need a rule — so **author by demand, not exhaustively**.
 figures from this project's file sizes — INDEX + rule-corpus + governed-code token
 totals, and a without-Fux vs with-Fux per-lookup comparison — using a transparent
 ≈4-chars/token heuristic applied identically to both sides, so the multiplier is
-the honest signal. See §10 item 12.)*
+the honest signal. It also prices every figure in **dollars** at a configurable
+`usd_per_mtok` (default = Claude Opus 4.8's $5/M input rate; the win is on input
+tokens, so the input price is the right one — model-agnostic, set per project). See
+§10 item 12.)*
 
 *(Opt-in `cost_tracking` ([costledger.py](../fux/costledger.py)) goes further: it
 records **every** `fux recall` lookup's measured savings into `.fux/cost.json` —
-a cumulative lifetime total (tokens-without/with/saved) rather than a single
-estimate. Only code-bound matches count, so the running multiplier stays honest;
-`fux savings` prints it and `fux savings --reset` clears it. Still `$0`.)*
+a cumulative lifetime total (tokens-without/with/saved, shown in tokens *and*
+dollars) rather than a single estimate. The ledger stores only tokens, so a price
+change re-prices history without a rewrite. Only code-bound matches count, so the
+running multiplier stays honest; `fux savings` prints it and `fux savings --reset`
+clears it. Still `$0`.)*
 
 ---
 

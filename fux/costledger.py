@@ -12,7 +12,9 @@ since the Tier-1 INDEX is injected once per session). `saved = without − with`
 
 The summary reports the lifetime total *and* a per-day / per-week / per-month rate
 — `tokens_saved` amortised across the observed span (`first`→`last`, floored at one
-day), then scaled — so the win reads as an ongoing throughput, not just a total.
+day), then scaled — so the win reads as an ongoing throughput, not just a total. Each
+figure is also priced in **dollars** via `savings.usd` (config `usd_per_mtok`); the
+ledger stores only tokens, so a price change re-prices history without a rewrite.
 """
 from __future__ import annotations
 
@@ -133,20 +135,29 @@ def rates(led: dict) -> dict:
     return {"days": days, "day": per_day, "week": per_day * 7, "month": per_day * _AVG_MONTH}
 
 
-def render_summary(led: dict) -> str:
+def render_summary(led: dict, per_mtok: float | None = None) -> str:
     if not led.get("lookups"):
         return ""
+    from fux import savings   # lazy: shared token→dollar pricing, avoids an import cycle
+
+    price = savings.DEFAULT_USD_PER_MTOK if per_mtok is None else per_mtok
+    money = lambda t: savings.fmt_usd(savings.usd(t, price))  # noqa: E731
     span = led.get("first") or "?"
     ratio = overall_ratio(led)
     x = f"{ratio:.1f}×" if ratio else "—"
     r = rates(led)
+
+    def row(label: str, toks: float, extra: str = "") -> str:
+        return f"  {label:<21}{toks:>10,} tok  ≈ {money(toks):>10}{extra}"
+
     return "\n".join([
         "",
-        f"Cumulative (tracked across {led['lookups']} lookup(s) since {span})",
-        f"  tokens without Fux:  {led['tokens_without']:>10,} tok",
-        f"  tokens with Fux:     {led['tokens_with']:>10,} tok",
-        f"  tokens saved:        {led['tokens_saved']:>10,} tok   → {x} overall",
-        f"  {'≈ saved per day:':<21}{round(r['day']):>10,} tok   (avg over {r['days']} day(s))",
-        f"  {'≈ saved per week:':<21}{round(r['week']):>10,} tok",
-        f"  {'≈ saved per month:':<21}{round(r['month']):>10,} tok",
+        f"Cumulative (tracked across {led['lookups']} lookup(s) since {span}, "
+        f"${price:,.2f}/M input tok)",
+        row("tokens without Fux:", led["tokens_without"]),
+        row("tokens with Fux:", led["tokens_with"]),
+        row("tokens saved:", led["tokens_saved"], f"   → {x} overall"),
+        row("≈ saved per day:", round(r["day"]), f"   (avg over {r['days']} day(s))"),
+        row("≈ saved per week:", round(r["week"])),
+        row("≈ saved per month:", round(r["month"])),
     ])

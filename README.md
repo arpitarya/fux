@@ -2,15 +2,25 @@
 
 # Fux
 
-> A portable, agent-aware **knowledge engine**. One frontmatter substrate →
-> derived **index**, **graph**, and **memory** views. `$0` deterministic
-> maintenance — no mandatory LLM calls. Continuously referenced, cheaply
-> maintained.
+> **Fux records *why* your code is the way it is — and checks it's still true.**
+> A portable, agent-aware knowledge engine: one frontmatter substrate → derived
+> **index**, **graph**, and **memory** views. `$0` and deterministic — zero
+> third-party deps, no mandatory LLM calls. Author each rule once; your agent
+> reads a cheap one-line index first and opens the full rule only when it's
+> relevant — and `fux seal` lets `fux check` tell you when the governed code
+> drifted out from under it.
+
+<!-- launch: replace the line below with the demo GIF — `fux why day-pnl` → rule + why +
+     governed code, then the Solar Terminal graph igniting the `governs` links.
+     Storyboard + capture script: docs/launch/gif-storyboard.md -->
+<p align="center"><em>▶ demo GIF goes here — see <a href="docs/launch/gif-storyboard.md">docs/launch/gif-storyboard.md</a></em></p>
+
+**Pronounced "fox."** (Say it like the animal — *fux* → *fox*.)
 
 Named after *Johann Joseph Fux*, author of *Gradus ad Parnassum* (1725) — the
 counterpoint treatise every composer learned the rules from. A tool that codifies
-and enforces rules, named after the man who wrote *the* rulebook. Sits beside
-`wagner`, `bach`, `orff`.
+and enforces rules, named after the man who wrote *the* rulebook. (The name is
+deliberate.) Sits beside `wagner`, `bach`, `orff`.
 
 Fux **unifies and replaces** three things a project usually runs separately — the
 structural graph (graphify), cross-session memory, and the narrative docs — and
@@ -34,12 +44,14 @@ So: write the *why* down once → it's found fast, stays correct, and never gets
 ## Why
 
 The *why* behind a formula — why current value not invested cost, why
-INR-normalize first, which cost-basis method — usually lives only as an inline
+dollar-normalize first, which cost-basis method — usually lives only as an inline
 comment, invisible until someone greps for it. Fux makes that knowledge
 **first-class**: one entry, authored once, served back through a tiny index (read
 first) plus lazily-opened rules (read only when relevant). Lookups run ~5–10×
 cheaper and more correct on every later session — and you don't have to take that
-on faith: **`fux savings`** measures the multiplier from your own file sizes.
+on faith: **`fux savings`** measures the multiplier from your own file sizes and
+prices the win in **real dollars** (configurable `usd_per_mtok`, default = Claude
+Opus 4.8's $5/M input rate), per lookup and as a cumulative ledger.
 
 ## Install
 
@@ -66,7 +78,7 @@ fux seal --all                 # bind rules to an AST fingerprint of their code
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
 fux mine                       # surface candidate rules latent in the code (drafts)
-fux savings "how is day P&L computed"  # measured token-cost win (+ cumulative ledger)
+fux savings "how is day P&L computed"  # measured token + dollar cost win (+ cumulative ledger)
 fux lint                       # rule *quality*: missing why / code_refs / edges
 fux stats                      # knowledge-health dashboard + score
 fux gate --install             # wire a git pre-commit enforcement hook

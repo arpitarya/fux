@@ -27,7 +27,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux verify                # run invariant/example checks                      ($0)
 /fux lint                  # rule *quality*: missing why / code_refs / edges   ($0)
 /fux stats                 # knowledge-health dashboard + score                ($0)
-/fux savings ["<question>"]# measure the token-cost win from real file sizes   ($0)
+/fux savings ["<question>"]# measure the token + dollar cost win (real file sizes)($0)
 /fux gate [--install]      # CI/pre-commit enforcement (exit 2 on blocking)    ($0)
 /fux mcp                   # serve the substrate to agents over MCP (stdio)    ($0)
 /fux capture [--list]      # session change-queue for `fux distill`           ($0)
