@@ -183,6 +183,30 @@ sizing. `memory` carries a subtype (`user`/`feedback`/`project`/`reference`) and
 a `scope`: `personal` (gitignored) or `shared` (committed) — turning today's
 home-dir memory into versioned, optionally team-shared institutional knowledge.
 
+### Constitution layer (tiered governance)
+
+Fux's substrate gains an optional, additive **governance tier** layered on the §6
+schema. Every rule carries a `tier` — `constitutional` | `standard` (default) |
+`advisory` — fixing how hard it bites, orthogonal to *coverage* (how much of the
+project is governed):
+
+- **Constitutional** — the thin apex of must-never-break invariants (determinism,
+  money/PII, audit, and the amendment process itself). Ratified, supersession-only,
+  blocks unconditionally regardless of `mode`.
+- **Standard** (default) — conventions, ADRs, domain rules. Today's kind-based
+  blocking under the gate; change via normal PR + `fux check`.
+- **Advisory** — style nudges and memories. Warn only.
+
+The layer is purely additive and a no-op until opted in: `tier` defaults to
+`standard`, upgrading promotes nothing, and every existing rule stays valid unchanged.
+
+The meta-rule that governs the layer itself is
+[`con-amendment`](../.fux/rules/con-amendment.md): a constitutional rule is created or
+changed only via **propose → debate → ratify**, changes only by **supersession** (never
+in-place edit), and ratification needs a named human ratifier plus a recorded debate. It
+is authored in Phase 0; deterministic enforcement (`tier` blocking, `tampered`/
+`unsealed`, the `.fux/constitution.lock`, and `fux ratify`) arrives in Phases 1–2.
+
 ---
 
 ## 7. The three formats (all derived from §6 source)
