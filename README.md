@@ -77,6 +77,7 @@ fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semanti
 fux seal --all                 # bind rules to an AST fingerprint of their code
 fux debate "<rule>" (skill)    # two-agent free debate → you ratify the result
 fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident; the only path)
+fux critic "<change>"          # critique a change vs principles before it lands (deterministic pass; $0)
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
 fux mine                       # surface candidate rules latent in the code (drafts)
@@ -161,6 +162,14 @@ Each principle is tagged `enforcement: deterministic` (money/PII/numbers — dec
 by AI self-critique, **never** faked as a machine check); the split is enforced structurally
 by a `$0` router, and `fux check` flags untagged rules that look like principles so backfill
 is guided, not guessed.
+
+At the action boundary (PreToolUse / pre-commit), `fux critic "<change>"` runs the
+**deterministic pass first** (hard-invariant fails block, no LLM), then the host agent
+self-critiques the `judgment` principles with its own tokens (the `critic` skill drives the
+bounded revise / escalate / `/fux debate` loop); verdicts land in `.fux/out/critic.jsonl`,
+and `fux gate` reports any ungoverned `important_globs` path (report-first, never blocks).
+A headless AI critic for no-session/runtime use ships behind an opt-in `[critic]` extra
+(mirroring `[embeddings]`) — the default install stays model-free.
 
 For cross-session memory it stays **authored, not captured**: an opt-in `capture`
 hook queues *which* files changed for `fux distill` (human-confirmed) rather than

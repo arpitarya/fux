@@ -12,8 +12,11 @@ import fux
 FUX_DIR = Path(fux.__file__).resolve().parent
 
 # The deterministic maintenance/enforcement path — none of these may import a model client.
-MAINT = ["check", "gate", "verify", "seal", "constitution", "critic", "baseline",
-         "findings", "hooks", "hookio", "touch", "mcpserver", "lint", "stats", "fix"]
+MAINT = ["check", "gate", "verify", "seal", "constitution", "critic", "criticloop",
+         "baseline", "findings", "hooks", "hookio", "touch", "mcpserver", "lint", "stats", "fix"]
+# `criticllm.py` is the ONE sanctioned edge — the opt-in `[critic]` headless judge, never on
+# the maintenance path. Every other module is scanned.
+EDGE = "criticllm.py"
 # LLM *API clients*. `sentence_transformers` (the [embeddings] LOCAL model extra) is allowed —
 # it is not an LLM client and is never on the default import path.
 FORBIDDEN = re.compile(
@@ -27,12 +30,24 @@ def test_maintenance_path_imports_no_llm_client():
         assert hit is None, f"fux/{name}.py imports an LLM client: {hit.group(0)!r}"
 
 
+def test_only_the_opt_in_edge_may_reference_a_model_client():
+    """Across the whole package, only `criticllm.py` (the `[critic]` edge) may name a model
+    client — proving there is no stray model import on any default path."""
+    for py in sorted(FUX_DIR.glob("*.py")):
+        if py.name == EDGE:
+            continue
+        hit = FORBIDDEN.search(py.read_text(encoding="utf-8"))
+        assert hit is None, f"fux/{py.name} imports an LLM client: {hit.group(0)!r}"
+
+
 def test_default_install_is_model_free():
-    """A fresh interpreter importing fux + the enforcement path pulls in no LLM client —
-    run in a subprocess so it is independent of whatever other tests imported."""
+    """A fresh interpreter importing fux + the enforcement path + even the critic edge pulls in
+    no LLM client (the edge imports its model lazily). Run in a subprocess so it is independent
+    of whatever other tests imported."""
     code = (
         "import importlib, sys\n"
-        "for m in ['fux','fux.check','fux.gate','fux.constitution','fux.seal','fux.hooks']:\n"
+        "for m in ['fux','fux.check','fux.gate','fux.constitution','fux.seal','fux.hooks',\n"
+        "          'fux.critic','fux.criticloop','fux.criticllm']:\n"
         "    importlib.import_module(m)\n"
         "bad = [m for m in ('anthropic','openai','cohere','litellm','mistralai') if m in sys.modules]\n"
         "assert not bad, bad\n"

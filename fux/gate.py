@@ -10,7 +10,7 @@ from __future__ import annotations
 import stat
 from pathlib import Path
 
-from fux import build, check, config, gitutil, lint, paths, verify
+from fux import build, check, config, coverage, gitutil, lint, paths, verify
 from fux.baseline import new_findings
 from fux.findings import blocking
 
@@ -55,6 +55,11 @@ def run(root: Path, strict_lint: bool = False, baseline: Path | None = None) -> 
                  f"{' (enforced)' if strict_lint else ''}")
     for f in lints[:10]:
         lines.append(f"    · {f.line()}")
+    cov = coverage.run(root)                          # total governance (plan §7e), report-first
+    lines.append(f"  coverage: {cov.governed}/{cov.total} important files governed, "
+                 f"{len(cov.uncovered)} ungoverned (report-only — never blocks on adoption)")
+    for path in cov.uncovered[:10]:
+        lines.append(f"    · {path} — no governing rule")
 
     # In baseline mode the migration guard judges new blocking findings only; verify/lint
     # are reported but don't gate (transient upgrade check, not a regression subsystem).

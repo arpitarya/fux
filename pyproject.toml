@@ -45,6 +45,10 @@ embeddings = ["sentence-transformers>=2.2"]
 ast = ["tree-sitter>=0.23", "tree-sitter-language-pack>=0.7"]
 # PDF text extraction for `fux fetch-rules` with .pdf sources.
 pdf = ["pypdf>=4.0"]
+# Opt-in headless AI self-critique for the constitutional critic (plan §7d). The default
+# build-agent path uses the host session's tokens via the `critic` skill and needs nothing;
+# this is only for a no-session/runtime critic. The maintenance path never imports it.
+critic = ["anthropic>=0.40"]
 dev = ["pytest>=8", "build>=1.0", "twine>=5.0"]
 
 [tool.setuptools.dynamic]

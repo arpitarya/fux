@@ -17,6 +17,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux why <id> [--history]` | Explain a rule: rationale + linked code + edges + invariant + body. `--history` shows how the *why* evolved (git log over the rule file, `--follow`). | $0 |
 | `fux seal [ids…] [--all]` | Bind rules to a normalized-AST fingerprint of their `code_refs` (proof-carrying rules). `fux check` then flags `unsealed` when the governed code changes *structure*; re-affirm by re-running `seal`. | $0 |
 | `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | The **only path into the constitutional tier** (deterministic, no LLM): stamp `ratification.{by,date,content_seal}`, freeze the code seal, and write/update the committed `.fux/constitution.lock`. `--by` defaults to git `user.name`; `--debate FILE` hashes a `/fux debate` transcript into `ratification.debate_hash` (the audit record). Afterwards any in-place edit, add, or delete of the rule is an always-blocking `tampered` finding. | $0 |
+| `fux critic "<change>"` | Critique a proposed change at the action boundary (plan §7c): recall relevant principles, run the **deterministic pass first** (`check:`/seal for `deterministic` principles — exit 2 on a hard-invariant fail, **no LLM**), list the `judgment` principles the host agent must self-critique, and record verdicts to `.fux/out/critic.jsonl`. The judgment self-critique is the agent's own tokens (see the `critic` skill); Fux calls no model. | $0 |
 | `fux refs <file>` | Reverse lookup — which rules govern this file. | $0 |
 | `fux new <type> <id> [--domain D]` | Scaffold a schema-valid stub from a template into the right directory for its type. | $0 |
 | `fux coverage` | % of "important" code files (config globs) with at least one governing rule; lists the uncovered. | $0 |
@@ -25,7 +26,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux lint [--strict]` | Rule *quality* (complements `check`'s structure): `no-why`, `no-code-refs`, `dangling-edge`, `no-provenance`, `stub-body`. Advisory; `--strict` exits 1. | $0 |
 | `fux stats` | Knowledge-health dashboard: weighted score (coverage 40 · verify 30 · authoring 30 − drift) + corpus breakdown + every signal. | $0 |
 | `fux mine [--min-sites N]` | Surface *candidate* rules latent in the code (first miner: magic numbers repeated across ≥N sites) as drafts to confirm — never auto-authored. | $0 |
-| `fux gate [--install] [--strict-lint] [--baseline FILE]` | CI / git pre-commit enforcement: rebuild views, then exit 2 on blocking `check`/`verify`. Blocking is **tier-aware** (constitution layer): `constitutional` rules block in any `mode`, `standard` only under `strict`, `advisory` never. `--baseline FILE` runs the §5b migration gate — fail only on findings *new* since a `check --baseline-write` snapshot (verify/lint reported but don't gate). `--strict-lint` treats lint as blocking. `--install` writes the pre-commit hook. | $0 |
+| `fux gate [--install] [--strict-lint] [--baseline FILE]` | CI / git pre-commit enforcement: rebuild views, then exit 2 on blocking `check`/`verify`. Blocking is **tier-aware** (constitution layer): `constitutional` rules block in any `mode`, `standard` only under `strict`, `advisory` never. Also **reports** (report-first, never blocks) every `important_globs` path governed by zero rules — the coverage gate (plan §7e). `--baseline FILE` runs the §5b migration gate — fail only on findings *new* since a `check --baseline-write` snapshot (verify/lint/coverage reported but don't gate). `--strict-lint` treats lint as blocking. `--install` writes the pre-commit hook. | $0 |
 | `fux hooks <install\|uninstall\|status> [--git] [--claude] [--codex] [--copilot] [--all] [--recall]` | Wire Fux across every agent surface from one command — **git** (`.git/hooks/pre-commit`: self-contained, rebuilds + stages `.fux/out/` in the same commit, non-blocking), **claude** (`.claude/settings.json`), **codex** (`.codex/hooks.json`), **copilot** (`.copilot/settings.json`). Every hook invokes the installed `fux` **console script** directly (`fux context`, `fux hook-touch`, …) — the package is the single source of truth, no copied wrapper scripts or dev-checkout paths in a committed settings file. No surface flag ⇒ all four. Idempotent and *migrating* (a re-install rewrites a stale wrapper-path entry to the `fux <cmd>` form); `status` reports what's wired, `uninstall` removes only Fux entries (foreign hooks preserved; a pre-existing git pre-commit is backed up to `.pre-fux`). | $0 |
 | `fux mcp` | Serve the read paths + `query`/`trace`/draft-`new` to agents over MCP (stdio JSON-RPC, stdlib-only). | $0 |
 | `fux capture [--list] [--clear]` | Session observation queue (changed files, governed vs uncovered) that `fux distill` consumes. Wired into the Stop hook when `capture = true`. | $0 |
@@ -66,14 +67,15 @@ Wired by `fux init`, not for direct use:
 
 ### Skills (workflows that ride the current session)
 
-`plan`/`adr`/`debate` call the LLM in-session (no background spend); `trace`/`savings`
-are pure `$0` traversal/measurement. Fux's own code never calls a model.
+`plan`/`adr`/`debate`/`critic` call the LLM in-session (no background spend);
+`trace`/`savings` are pure `$0` traversal/measurement. Fux's own code never calls a model.
 
 | Command | What |
 |---|---|
 | `fux plan "<request>"` | Spec-driven: requirements → design → tasks, each a durable Fux entry. See [spec.guide.md](spec.guide.md). |
 | `fux adr "<decision>"` | Capture an architecture decision as an `adr` entry. |
 | `fux debate "<rule>"` | Two-agent free debate (blind first pass → anti-sycophancy → human ratifier) to author a rule; the transcript is hashed into `ratification.debate_hash` by `fux ratify --debate`. Plan §7b. |
+| `fux critic "<change>"` | Critique→revise→act at the boundary: `fux critic` runs the deterministic pass; the skill drives the host agent to self-critique each `judgment` principle, revise (bounded), and escalate / `/fux debate` if borderline. Plan §7c. |
 | `fux trace "<feature>"` | Walk the merged graph to explain how a feature spans modules ($0 traversal). |
 | `fux savings ["<question>"]` | Interpret the measured token-cost report and turn it into a next action ($0). |
 | `fux distill ["<focus>"]` | Capture this session's durable decisions as `memory`/`adr` entries — human-confirmed, scoped. |
@@ -111,3 +113,4 @@ and none calls an LLM.
 | `embeddings` | `pip install fux-engine[embeddings]` | Local sentence-transformers re-rank for `recall` (gated on `recall_rerank`); falls back to a $0 char-trigram cosine when absent. |
 | `ast` | `pip install fux-engine[ast]` | Real **tree-sitter** ASTs for JS/TS/Go/Rust graph extraction instead of the brace heuristic — same node/edge schema, more accuracy. `fux build` records the active backend in `graph.json` `meta.extractor`; `fux check` flags `extractor-drift` if a committed graph was built with a different backend, so the graph stays reproducible across machines. |
 | `pdf` | `pip install fux-engine[pdf]` | `.pdf` text extraction for `fux fetch-rules`. |
+| `critic` | `pip install fux-engine[critic]` | Headless AI self-critique for the constitutional critic ([fux/criticllm.py](../fux/criticllm.py)) — only for a no-session/runtime critic. The default build-agent path uses the host session's tokens via the `critic` skill and needs nothing; the maintenance path never imports it (the model is loaded lazily, only when you opt in). |

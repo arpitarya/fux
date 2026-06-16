@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 
-from fux import __version__, clicmds, cligraph, cliquery, hooks
+from fux import __version__, clicmds, cliconstitution, cligraph, cliquery, hooks
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -50,7 +50,11 @@ def build_parser() -> argparse.ArgumentParser:
     rt.add_argument("--date", help="ISO ratification date (default: today)")
     rt.add_argument("--debate", metavar="FILE",
                     help="debate transcript (from /fux debate) to hash into ratification.debate_hash")
-    rt.set_defaults(fn=clicmds.cmd_ratify)
+    rt.set_defaults(fn=cliconstitution.cmd_ratify)
+
+    cr = sub.add_parser("critic", help="critique a proposed change against principles (deterministic pass first; $0)")
+    cr.add_argument("proposal", help="the proposed change / commit message / diff summary to critique")
+    cr.set_defaults(fn=cliconstitution.cmd_critic)
 
     refs = sub.add_parser("refs", help="reverse lookup: which rules govern this file")
     refs.add_argument("file")

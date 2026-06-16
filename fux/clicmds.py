@@ -1,14 +1,12 @@
 """Mutating / build command handlers — print output, return an exit code."""
 from __future__ import annotations
 
-import hashlib
 import shutil
 import subprocess
-from datetime import date as _date
 from pathlib import Path
 
-from fux import (baseline, build, check, config, constitution, context, fix, gate,
-                 gitutil, hookinstall, importer, initcmd, loader, mcpserver, paths, serve)
+from fux import (baseline, build, check, config, context, fix, gate, hookinstall,
+                 importer, initcmd, mcpserver, paths, serve)
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -87,37 +85,6 @@ def cmd_gate(args) -> int:
     code, report = gate.run(here, strict_lint=args.strict_lint, baseline=base)
     print(report)
     return code
-
-
-def cmd_ratify(args) -> int:
-    """Stamp ratification + freeze the seal + update the lock — the only path to the apex."""
-    here = root()
-    cfg = config.load(paths.Footprint(here).config)
-    rules = loader.resolve(here, cfg).rules
-    by = args.by or gitutil.user_name(here) or ""
-    if not by:
-        print("fux: no ratifier — pass --by <name> (or set git user.name)")
-        return 1
-    when = args.date or _date.today().isoformat()
-    dhash = None
-    if args.debate:
-        dpath = Path(args.debate)
-        if not dpath.is_file():
-            print(f"fux: debate transcript not found: {args.debate}")
-            return 1
-        dhash = hashlib.sha256(dpath.read_bytes()).hexdigest()[:16]
-    try:
-        r = constitution.ratify(here, rules, args.id, by=by, date=when, debate_hash=dhash)
-    except KeyError:
-        print(f"fux: no rule with id '{args.id}'")
-        return 1
-    except ValueError as e:
-        print(f"fux: {e}")
-        return 1
-    print(f"✔ ratified {r.id} → constitutional (by {by}, {when})")
-    print(f"  content_seal frozen{f' + debate_hash {dhash}' if dhash else ''} + "
-          ".fux/constitution.lock updated — the only path into the apex.")
-    return 0
 
 
 def cmd_mcp(_args) -> int:
@@ -204,15 +171,15 @@ def cmd_setup(_args) -> int:
     skills_src = data / "skills"
     _copy_skill(skills_src / "fux", skills_dir / "fux")
     print(f"✔ /fux skill  → {skills_dir / 'fux'}/")
-    for name in ("plan", "adr", "debate", "trace", "savings", "distill", "fetch-rules"):
+    for name in ("plan", "adr", "debate", "critic", "trace", "savings", "distill", "fetch-rules"):
         src = skills_src / name
         if src.exists():
             _copy_skill(src, skills_dir / f"fux-{name}")
-    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,debate,trace,savings,distill,fetch-rules}}/")
+    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,debate,critic,trace,savings,distill,fetch-rules}}/")
 
     codex_skills_dir.mkdir(parents=True, exist_ok=True)
     _copy_skill(skills_src / "fux", codex_skills_dir / "fux")
-    for name in ("plan", "adr", "debate", "trace", "savings", "distill", "fetch-rules"):
+    for name in ("plan", "adr", "debate", "critic", "trace", "savings", "distill", "fetch-rules"):
         src = skills_src / name
         if src.exists():
             _copy_skill(src, codex_skills_dir / f"fux-{name}")

@@ -38,6 +38,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux adr "<decision>"      # capture an architecture decision as an `adr`      (skill)
 /fux debate "<rule>"       # two-agent free debate → human ratifies a rule     (skill)
 /fux ratify <id>           # ratify a constitutional rule (tamper-evident)     ($0)
+/fux critic "<change>"     # critique a change vs principles before it lands   (skill)
 /fux trace "<feature>"     # walk the graph to explain how a feature spans modules
 /fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
 /fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
@@ -118,6 +119,7 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux adr "<decision>"` | follow `skills/adr/SKILL.md` |
 | `/fux debate "<rule>"` | follow `skills/debate/SKILL.md` (two-agent debate → human ratifies) |
 | `/fux ratify <id>` | `$FUX ratify <id> --by "<name>" [--debate <transcript>]` |
+| `/fux critic "<change>"` | follow `skills/critic/SKILL.md` (deterministic pass → self-critique → revise) |
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
 | `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
 | `/fux fetch-rules <src>` | follow `skills/fetch-rules/SKILL.md` |

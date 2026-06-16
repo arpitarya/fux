@@ -23,7 +23,7 @@
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
-| Constitution layer (tiers, integrity, `ratify`, debate, split) | 🟡 | Tiers + `--baseline` guard + tamper/lock/`fux ratify` + `/fux debate` + **deterministic/judgment router** shipped (Phases 0–4); AI critic loop next ([fux/constitution.py](fux/constitution.py), [fux/critic.py](fux/critic.py)) |
+| Constitution layer (tiers, integrity, debate, split, critic) | 🟡 | Tiers + `--baseline` + tamper/lock/`ratify` + `/fux debate` + split router + **critic loop & report-first coverage gate** shipped (Phases 0–5); runtime critic deferred ([fux/criticloop.py](fux/criticloop.py), [fux/critic.py](fux/critic.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
@@ -50,7 +50,8 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
 | `fux why <id> [--history]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/explain.py](fux/explain.py) |
 | `fux seal [ids] [--all]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/seal.py](fux/seal.py) |
-| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | ✅ | [fux/clicmds.py](fux/clicmds.py), [fux/constitution.py](fux/constitution.py) |
+| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/constitution.py](fux/constitution.py) |
+| `fux critic "<change>"` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/criticloop.py](fux/criticloop.py) |
 | `fux mine [--min-sites N]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/mine.py](fux/mine.py) |
 | `fux refs <file>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
 | `fux new <type> <id> [--domain D]` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
@@ -341,7 +342,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (189 tests)
+### 2.20 Tests — ✅ (195 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -367,6 +368,7 @@ rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)), and the **constitu
 layer — tier blocking + §5b migration guard** ([test_constitution_tier.py](tests/test_constitution_tier.py))
 and **tamper-evidence + ratification + lock** ([test_constitution_integrity.py](tests/test_constitution_integrity.py)),
 the **deterministic/judgment split + backfill guide** ([test_critic_split.py](tests/test_critic_split.py)),
+the **critique→act loop + report-first coverage gate** ([test_critic_loop.py](tests/test_critic_loop.py)),
 plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
@@ -405,15 +407,26 @@ The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0�
   `deterministic` one can never reach the AI pass), `for_deterministic` returns deterministic
   only (a `judgment` one is never faked deterministic). `fux check` emits an advisory
   `untagged-candidate` for project rules that look like principles but are untagged — a
-  backfill guide that never blocks (even on the apex). The AI pass itself is Phase 5.
+  backfill guide that never blocks (even on the apex).
+- **Critic loop** ([fux/criticloop.py](fux/criticloop.py)) — `critique()` runs one pass at the
+  action boundary: gather principles via recall → **deterministic pass first** (`check:`/seal,
+  a fail blocks, no LLM) → judgment principles to a `judge` seam. The seam is the **host
+  agent** (`$0`, via [the critic skill](fux/data/skills/critic/SKILL.md)) by default, or the
+  opt-in headless backend [fux/criticllm.py](fux/criticllm.py) — the **only** model-importing
+  module, lazy + behind the `[critic]` extra, never on the maintenance path. `fux critic
+  "<change>"` runs the deterministic pass + lists pending judgment principles + records to
+  `.fux/out/critic.jsonl`. `fux gate` **reports** (never blocks) ungoverned `important_globs`
+  paths — the report-first coverage gate. (`cmd_ratify`/`cmd_critic` now live in
+  [fux/cliconstitution.py](fux/cliconstitution.py), shrinking `clicmds.py`.)
 - **Bootstrap rule** [`con-amendment`](../.fux/rules/con-amendment.md) — the amendment
   article (Phase 0), `tier: constitutional`; ratify it with `fux ratify con-amendment`.
 
-**Next (Phase 5+):** the critic loop (deterministic pass first, AI self-critique behind the
-`[critic]` extra) + the coverage gate. Covered by
+**Next (deferred):** the runtime critic (§5 step 3) — expose `critique` as a callable in
+front of an app's live money/PII paths. Covered by
 [tests/test_constitution_tier.py](tests/test_constitution_tier.py),
 [tests/test_constitution_integrity.py](tests/test_constitution_integrity.py),
 [tests/test_critic_split.py](tests/test_critic_split.py),
+[tests/test_critic_loop.py](tests/test_critic_loop.py),
 [tests/test_no_llm_imports.py](tests/test_no_llm_imports.py).
 
 ---

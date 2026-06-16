@@ -266,13 +266,26 @@ Tagging is deliberate, never auto-guessed: `fux check` emits an **advisory**
 `invariant`/`regulatory` type) but is untagged — a backfill guide, never a blocker (it stays
 advisory even on the apex).
 
+**Critic loop (§7c — `fux/criticloop.py` core + a judge seam; coverage gate §7e).** At the
+action boundary (PreToolUse / pre-commit for build agents) `critique()` runs one pass:
+**gather** the relevant principles via recall → **deterministic pass first** (`check:`/seals
+for `deterministic` principles; a hard-invariant fail blocks with **no LLM**) → judgment
+principles go to a `judge` callable, which is the **host agent's** own self-critique (default,
+`$0`) or the opt-in headless backend (`fux/criticllm.py`, behind the `[critic]` extra — the
+only model-importing module, lazily imported, never on the maintenance path). Bounded revise
++ escalation and borderline `/fux debate` are the `critic` skill's loop; verdicts + applied
+principles are appended to `.fux/out/critic.jsonl`. `fux gate` also **reports** (report-first,
+never blocks on adoption) every `important_globs` path governed by zero rules — total
+governance made measurable without flooding an existing repo.
+
 The meta-rule that governs the layer itself is
 [`con-amendment`](../.fux/rules/con-amendment.md): a constitutional rule is created or
 changed only via **propose → debate → ratify**, changes only by **supersession** (never
 in-place edit), and ratification needs a named human ratifier plus a recorded debate. Tier
 blocking + migration guard ship in Phase 1; tamper-evidence + `fux ratify` in Phase 2; the
 two-agent debate that stamps `ratification.debate_hash` in Phase 3; the deterministic/
-judgment router + `untagged-candidate` backfill guide in Phase 4.
+judgment router + `untagged-candidate` backfill guide in Phase 4; the critic loop (behind the
+`[critic]` extra) + the report-first coverage gate in Phase 5.
 
 ---
 
