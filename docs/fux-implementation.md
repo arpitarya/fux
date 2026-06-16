@@ -1,6 +1,6 @@
 # Fux — Implementation Status
 
-> Engine **v0.1.0**. A portable, Claude-aware knowledge engine: one frontmatter
+> Engine **v0.4.0** — the constitutional-app engine. A portable, Claude-aware knowledge engine: one frontmatter
 > substrate → derived index, graph, and memory views, with `$0` deterministic
 > maintenance. This file tracks **what has shipped** and **what remains**, mapped
 > to the design of record in [docs/fux-plan.md](docs/fux-plan.md).
@@ -23,7 +23,7 @@
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
-| Constitution layer (tiers, integrity, debate, split, critic) | 🟡 | Tiers + `--baseline` + tamper/lock/`ratify` + `/fux debate` + split router + **critic loop & report-first coverage gate** shipped (Phases 0–5); runtime critic deferred ([fux/criticloop.py](fux/criticloop.py), [fux/critic.py](fux/critic.py)) |
+| Constitution layer (tiers, integrity, debate, split, critic) | ✅ | Tiers + `--baseline` + tamper/lock/`ratify` + `/fux debate` + split router + critic loop & report-first coverage gate (Phases 0–5, v0.4.0); only the runtime critic is deferred ([fux/criticloop.py](fux/criticloop.py), [fux/critic.py](fux/critic.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
@@ -339,7 +339,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 ### 2.19 Packaging & install — ✅
 
 - [install.sh](install.sh) installs **editable** (`pip -e`) → `~/.claude/fux/{engine,global,packs,hooks}` + skills.
-- [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
+- [pyproject.toml](pyproject.toml) (v0.4.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
 ### 2.20 Tests — ✅ (195 tests)
@@ -372,7 +372,7 @@ the **critique→act loop + report-first coverage gate** ([test_critic_loop.py](
 plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
-### 2.21 Constitution layer — 🟡 (plan §6 "Constitution layer", Phases 0–2)
+### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5, v0.4.0)
 
 The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0–2):**
 

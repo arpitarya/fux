@@ -10,6 +10,15 @@
 > relevant — and `fux seal` lets `fux check` tell you when the governed code
 > drifted out from under it.
 
+> **New in v0.4.0 — the constitutional-app engine.** Govern where trust lives, opt-in and
+> `$0`: give a rule a `tier` (`constitutional` · `standard` · `advisory`); author principles
+> by two-agent **`/fux debate`**; **`fux ratify`** a rule into a tamper-evident constitution
+> (sealed in **`.fux/constitution.lock`** — any later edit/add/delete is an always-blocking
+> `tampered` finding); critique changes against the constitution with **`fux critic`** before
+> they land (deterministic pass first, no LLM); and **`fux gate`** reports every ungoverned
+> path (report-first, never blocks). The AI self-critique ships behind an opt-in **`[critic]`**
+> extra — the default install stays model-free. Adopting it changes nothing until you opt in.
+
 <!-- launch: replace the line below with the demo GIF — `fux why day-pnl` → rule + why +
      governed code, then the Solar Terminal graph igniting the `governs` links.
      Storyboard + capture script: docs/launch/gif-storyboard.md -->
