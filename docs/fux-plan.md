@@ -221,12 +221,31 @@ advisories are tolerated. Captured pre-upgrade and committed to the upgrade PR, 
 serialization, and `fux check` output is canonically sorted so the diff is meaningful.
 This is a transient upgrade check, **not** a permanent regression subsystem.
 
+**Tamper-evidence (`fux/constitution.py`, deterministic, `$0`).** A ratified
+constitutional rule is made tamper-evident with two independent seals, both recomputed by
+`fux check` and surfaced as an always-blocking `tampered` finding (any tier/mode):
+
+- `ratification.content_seal` — a hash of the rule's normalized body + governing
+  frontmatter (volatile `seal`/`ratification`/`updated` excluded). `check_tamper`
+  recomputes it and compares to the stamped value, catching an in-place body/meaning edit.
+- `.fux/constitution.lock` — a committed `{id: content_seal}` manifest of every ratified
+  constitutional rule. `check_lock` compares it to the live set, catching a rule **added,
+  deleted, or re-stamped outside the ritual**. To fake an edit you must change both the
+  rule and the lock — and the lock is only ever written by `fux ratify`, so it shows in the
+  PR diff.
+
+`fux ratify <id>` (deterministic, no LLM) is the **only path into the constitutional
+tier**: it stamps `ratification.{by,date,content_seal}`, freezes the code seal, and rewrites
+the lock. Tamper/lock checks apply to **ratified constitutional rules only** — un-ratified
+rules and every non-constitutional rule are untouched, so adoption stays a no-op until you
+opt in by ratifying.
+
 The meta-rule that governs the layer itself is
 [`con-amendment`](../.fux/rules/con-amendment.md): a constitutional rule is created or
 changed only via **propose → debate → ratify**, changes only by **supersession** (never
-in-place edit), and ratification needs a named human ratifier plus a recorded debate.
-Tier blocking and the migration guard ship in Phase 1; tamper-evidence (`tampered`/
-`unsealed` self-seal, the `.fux/constitution.lock`, and `fux ratify`) arrives in Phase 2.
+in-place edit), and ratification needs a named human ratifier plus a recorded debate. Tier
+blocking + migration guard ship in Phase 1; tamper-evidence + `fux ratify` in Phase 2;
+the two-agent debate that produces `ratification.debate_hash` in Phase 3.
 
 ---
 

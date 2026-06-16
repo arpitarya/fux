@@ -75,6 +75,7 @@ fux why day-pnl [--history]    # explain a rule (+ how its *why* evolved, via gi
 fux refs src/aggregator.py     # which rules govern this file
 fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semantic+graph
 fux seal --all                 # bind rules to an AST fingerprint of their code
+fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident; the only path)
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
 fux mine                       # surface candidate rules latent in the code (drafts)
@@ -142,6 +143,13 @@ flags `unsealed` when the governed code changes *structure* (not just its mtime)
 Beyond authoring, Fux **enforces and reports**: `fux lint` grades rule quality,
 `fux stats` scores knowledge health, `fux gate` blocks drift at commit/CI time,
 and `fux mcp` exposes the whole substrate to agents over MCP.
+
+**Constitutional tier (opt-in):** a rule's `tier` (`constitutional` · `standard` ·
+`advisory`) sets how hard it bites — constitutional rules block in any mode. `fux ratify`
+makes one tamper-evident: it stamps a `content_seal` and records the rule in a committed
+`.fux/constitution.lock`, so any in-place edit, add, or delete becomes an always-blocking
+`tampered` finding. All deterministic and `$0` — the maintenance path never calls an LLM.
+Default behaviour is unchanged until you ratify (`tier` defaults to `standard`).
 
 For cross-session memory it stays **authored, not captured**: an opt-in `capture`
 hook queues *which* files changed for `fux distill` (human-confirmed) rather than

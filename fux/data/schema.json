@@ -18,6 +18,17 @@
     "scope": { "type": "string", "enum": ["personal", "shared"] },
     "status": { "type": "string", "enum": ["draft", "active", "deprecated", "todo", "done"] },
     "tier": { "type": "string", "enum": ["constitutional", "standard", "advisory"], "default": "standard" },
+    "ratification": {
+      "type": "object",
+      "required": ["by", "date", "content_seal"],
+      "properties": {
+        "by": { "type": "string" },
+        "date": { "type": "string" },
+        "content_seal": { "type": "string" },
+        "debate_hash": { "type": "string" },
+        "supersedes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
     "created": { "type": "string" },
     "updated": { "type": "string" },
     "author": { "type": "string" },

@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+from datetime import date as _date
 from pathlib import Path
 
-from fux import (baseline, build, check, config, context, fix, gate, hookinstall,
-                 importer, initcmd, mcpserver, paths, serve)
+from fux import (baseline, build, check, config, constitution, context, fix, gate,
+                 gitutil, hookinstall, importer, initcmd, loader, mcpserver, paths, serve)
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -85,6 +86,29 @@ def cmd_gate(args) -> int:
     code, report = gate.run(here, strict_lint=args.strict_lint, baseline=base)
     print(report)
     return code
+
+
+def cmd_ratify(args) -> int:
+    """Stamp ratification + freeze the seal + update the lock — the only path to the apex."""
+    here = root()
+    cfg = config.load(paths.Footprint(here).config)
+    rules = loader.resolve(here, cfg).rules
+    by = args.by or gitutil.user_name(here) or ""
+    if not by:
+        print("fux: no ratifier — pass --by <name> (or set git user.name)")
+        return 1
+    when = args.date or _date.today().isoformat()
+    try:
+        r = constitution.ratify(here, rules, args.id, by=by, date=when)
+    except KeyError:
+        print(f"fux: no rule with id '{args.id}'")
+        return 1
+    except ValueError as e:
+        print(f"fux: {e}")
+        return 1
+    print(f"✔ ratified {r.id} → constitutional (by {by}, {when})")
+    print("  content_seal frozen + .fux/constitution.lock updated — the only path into the apex.")
+    return 0
 
 
 def cmd_mcp(_args) -> int:

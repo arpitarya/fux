@@ -44,6 +44,12 @@ def build_parser() -> argparse.ArgumentParser:
     sl.add_argument("--all", action="store_true", help="seal every rule with resolvable code")
     sl.set_defaults(fn=cliquery.cmd_seal)
 
+    rt = sub.add_parser("ratify", help="ratify a constitutional rule (stamp + seal + lock; no LLM)")
+    rt.add_argument("id")
+    rt.add_argument("--by", help="named human ratifier (default: git user.name)")
+    rt.add_argument("--date", help="ISO ratification date (default: today)")
+    rt.set_defaults(fn=clicmds.cmd_ratify)
+
     refs = sub.add_parser("refs", help="reverse lookup: which rules govern this file")
     refs.add_argument("file")
     refs.set_defaults(fn=cliquery.cmd_refs)

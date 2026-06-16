@@ -4,10 +4,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 # Severity ordering drives strict-mode blocking and DRIFT.md grouping.
-KINDS = ["schema", "dead-ref", "stale", "plan-drift", "conflict", "invariant",
-         "memory-stale", "unsealed", "extractor-drift"]
-# Kinds that hard-block in `strict` mode (plan §8 strictness table).
-BLOCKING = {"schema", "dead-ref", "invariant", "conflict"}
+KINDS = ["tampered", "schema", "dead-ref", "stale", "plan-drift", "conflict",
+         "invariant", "memory-stale", "unsealed", "extractor-drift"]
+# Kinds that hard-block in `strict` mode (plan §8 strictness table). `tampered` is
+# special-cased in blocking() to block in ANY mode (constitution layer, plan §6).
+BLOCKING = {"tampered", "schema", "dead-ref", "invariant", "conflict"}
 
 
 @dataclass
@@ -26,6 +27,7 @@ class Finding:
 def blocking(findings: list[Finding], mode: str = "strict") -> list[Finding]:
     """Findings that block, by tier (constitution layer, plan §6):
 
+    `tampered` → ALWAYS (any tier/mode — a deleted rule has no tier to stamp);
     constitutional → ANY finding, regardless of `mode` (the thin apex; this also
     makes `unsealed` block for constitutional rules); standard → kind-based, but
     only under `strict`; advisory → never. `mode` defaults to `strict` so callers
@@ -33,7 +35,7 @@ def blocking(findings: list[Finding], mode: str = "strict") -> list[Finding]:
     """
     out: list[Finding] = []
     for f in findings:
-        if f.tier == "constitutional":
+        if f.kind == "tampered" or f.tier == "constitutional":
             out.append(f)
         elif f.tier == "advisory":
             continue

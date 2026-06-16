@@ -18,6 +18,11 @@ def is_repo(root: Path) -> bool:
     return _run(["rev-parse", "--is-inside-work-tree"], root) == "true"
 
 
+def user_name(root: Path) -> str | None:
+    """The configured git author name — the default `fux ratify --by` ratifier."""
+    return _run(["config", "user.name"], root) or None
+
+
 def hooks_dir(root: Path) -> Path | None:
     """Resolve the repo's git hooks dir (honours core.hooksPath / worktrees)."""
     rel = _run(["rev-parse", "--git-path", "hooks"], root)

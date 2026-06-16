@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 # Stable key order so diffs stay clean across regenerations.
-ORDER = ["id", "domain", "type", "subtype", "scope", "status", "created",
+ORDER = ["id", "domain", "type", "subtype", "scope", "status", "tier", "created",
          "updated", "author", "aliases", "keywords", "code_refs", "related",
-         "edges", "seal", "check", "examples"]
+         "edges", "seal", "ratification", "check", "examples"]
 
 
 def dump(fm: dict, body: str) -> str:
