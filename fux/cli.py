@@ -20,6 +20,8 @@ def build_parser() -> argparse.ArgumentParser:
     bld.set_defaults(fn=clicmds.cmd_build)
     chk = sub.add_parser("check", help="validate schema/refs/staleness/conflicts")
     chk.add_argument("--fix", action="store_true", help="apply mechanical $0 repairs")
+    chk.add_argument("--baseline-write", metavar="FILE",
+                     help="snapshot current findings for the §5b migration gate (then exit)")
     chk.set_defaults(fn=clicmds.cmd_check)
 
     sub.add_parser("context", help="emit the compact INDEX (SessionStart hook)").set_defaults(fn=clicmds.cmd_context)
@@ -82,6 +84,8 @@ def build_parser() -> argparse.ArgumentParser:
     gt = sub.add_parser("gate", help="CI / pre-commit enforcement (exit 2 on blocking)")
     gt.add_argument("--install", action="store_true", help="install a git pre-commit hook")
     gt.add_argument("--strict-lint", action="store_true", help="treat lint findings as blocking")
+    gt.add_argument("--baseline", metavar="FILE",
+                    help="§5b migration gate: fail only on findings new since this snapshot")
     gt.set_defaults(fn=clicmds.cmd_gate)
 
     sub.add_parser("mcp", help="serve the substrate over MCP (stdio JSON-RPC)").set_defaults(fn=clicmds.cmd_mcp)

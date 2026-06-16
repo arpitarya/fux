@@ -193,19 +193,40 @@ project is governed):
 - **Constitutional** — the thin apex of must-never-break invariants (determinism,
   money/PII, audit, and the amendment process itself). Ratified, supersession-only,
   blocks unconditionally regardless of `mode`.
-- **Standard** (default) — conventions, ADRs, domain rules. Today's kind-based
-  blocking under the gate; change via normal PR + `fux check`.
+- **Standard** (default) — conventions, ADRs, domain rules. Kind-based blocking, but
+  only under `strict` (the project `mode`); change via normal PR + `fux check`.
 - **Advisory** — style nudges and memories. Warn only.
 
 The layer is purely additive and a no-op until opted in: `tier` defaults to
 `standard`, upgrading promotes nothing, and every existing rule stays valid unchanged.
 
+**Enforcement (`fux/findings.py::blocking`, deterministic, `$0`).** A finding blocks by
+the tier of the rule it is raised against:
+
+| tier | blocks when |
+|---|---|
+| `constitutional` | **any** finding, in **any** `mode` (this also makes `unsealed` block for the apex) |
+| `standard` | `kind ∈ BLOCKING` **and** `mode == "strict"` |
+| `advisory` | never |
+
+`fux gate` reads the project `mode` and applies this matrix — so constitutional rules
+are the only ones that block a non-`strict` tree.
+
+**Migration guard (§5b, transient).** Adopting the layer on a repo that already has rules
+must change nothing until opted in. `fux check --baseline-write <file>` snapshots current
+findings (canonical order: kind, rule_id, message); `fux gate --baseline <file>` re-runs
+and exits 2 only on findings *new* since the snapshot — pre-existing findings and all
+advisories are tolerated. Captured pre-upgrade and committed to the upgrade PR, it makes
+"no surprise breakage" CI-testable. A small `fux/baseline.py` helper reuses the `Finding`
+serialization, and `fux check` output is canonically sorted so the diff is meaningful.
+This is a transient upgrade check, **not** a permanent regression subsystem.
+
 The meta-rule that governs the layer itself is
 [`con-amendment`](../.fux/rules/con-amendment.md): a constitutional rule is created or
 changed only via **propose → debate → ratify**, changes only by **supersession** (never
-in-place edit), and ratification needs a named human ratifier plus a recorded debate. It
-is authored in Phase 0; deterministic enforcement (`tier` blocking, `tampered`/
-`unsealed`, the `.fux/constitution.lock`, and `fux ratify`) arrives in Phases 1–2.
+in-place edit), and ratification needs a named human ratifier plus a recorded debate.
+Tier blocking and the migration guard ship in Phase 1; tamper-evidence (`tampered`/
+`unsealed` self-seal, the `.fux/constitution.lock`, and `fux ratify`) arrives in Phase 2.
 
 ---
 

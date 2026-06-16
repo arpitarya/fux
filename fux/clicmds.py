@@ -5,8 +5,8 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from fux import (build, check, config, context, fix, gate, hookinstall, importer,
-                 initcmd, mcpserver, paths, serve)
+from fux import (baseline, build, check, config, context, fix, gate, hookinstall,
+                 importer, initcmd, mcpserver, paths, serve)
 from fux.cliutil import root
 from fux.findings import blocking
 
@@ -51,6 +51,10 @@ def cmd_build(args) -> int:
 def cmd_check(args) -> int:
     here = root()
     findings = check.run(here)
+    if getattr(args, "baseline_write", None):
+        n = baseline.write(Path(args.baseline_write), findings)
+        print(f"✔ baseline written: {n} finding(s) → {args.baseline_write}")
+        return 0
     if args.fix:
         for n in fix.apply(here, findings):
             print(f"✔ fixed: {n}")
@@ -77,7 +81,8 @@ def cmd_gate(args) -> int:
         print(f"✔ pre-commit gate installed → {hook}")
         print("  it runs `fux gate` on every commit; bypass once with `git commit --no-verify`.")
         return 0
-    code, report = gate.run(here, strict_lint=args.strict_lint)
+    base = Path(args.baseline) if getattr(args, "baseline", None) else None
+    code, report = gate.run(here, strict_lint=args.strict_lint, baseline=base)
     print(report)
     return code
 

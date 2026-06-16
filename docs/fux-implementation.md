@@ -22,7 +22,8 @@
 | Memory governance + capture | ✅ | TTL decay ([fux/governance.py](fux/governance.py)); opt-in capture queue ([fux/capture.py](fux/capture.py)) |
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
-| Enforcement (`gate`) | ✅ | CI / git pre-commit; exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
+| Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
+| Constitution layer (tiers + §5b migration guard) | 🟡 | `tier` blocking + `--baseline` guard shipped (Phases 0–1); tamper/lock/`ratify` next ([fux/findings.py](fux/findings.py), [fux/baseline.py](fux/baseline.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
@@ -44,7 +45,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 |---|---|---|
 | `fux init [--recall]` | ✅ | [fux/clicmds.py](fux/clicmds.py), [fux/initcmd.py](fux/initcmd.py), [fux/scaffold.py](fux/scaffold.py) |
 | `fux build [--full]` | ✅ | [fux/build.py](fux/build.py), [fux/graph.py](fux/graph.py) |
-| `fux check [--fix]` | ✅ | [fux/check.py](fux/check.py), [fux/fix.py](fux/fix.py) |
+| `fux check [--fix] [--baseline-write FILE]` | ✅ | [fux/check.py](fux/check.py), [fux/fix.py](fux/fix.py), [fux/baseline.py](fux/baseline.py) |
 | `fux context` | ✅ | [fux/context.py](fux/context.py) |
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
 | `fux why <id> [--history]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/explain.py](fux/explain.py) |
@@ -57,7 +58,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux savings ["Q"] [--reset]` | ✅ | [fux/savings.py](fux/savings.py), [fux/costledger.py](fux/costledger.py) |
 | `fux lint [--strict]` | ✅ | [fux/lint.py](fux/lint.py) |
 | `fux stats` | ✅ | [fux/stats.py](fux/stats.py) |
-| `fux gate [--install] [--strict-lint]` | ✅ | [fux/gate.py](fux/gate.py) |
+| `fux gate [--install] [--strict-lint] [--baseline FILE]` | ✅ | [fux/gate.py](fux/gate.py), [fux/baseline.py](fux/baseline.py) |
 | `fux mcp` | ✅ | [fux/mcpserver.py](fux/mcpserver.py) |
 | `fux capture [--list] [--clear]` | ✅ | [fux/capture.py](fux/capture.py) |
 | `fux serve [--port N]` | ✅ | [fux/serve.py](fux/serve.py) |
@@ -337,7 +338,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (173 tests)
+### 2.20 Tests — ✅ (177 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -359,8 +360,30 @@ work: **PageRank centrality** ([test_centrality.py](tests/test_centrality.py)),
 expansion** ([test_bm25f_expand.py](tests/test_bm25f_expand.py)), **knapsack context
 packing** ([test_pack.py](tests/test_pack.py)), **usage-weighted decay + overlap
 lint** ([test_verify_hardening.py](tests/test_verify_hardening.py)), and **fuzzing +
-rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)).
+rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)), and the **constitution
+layer — tier blocking + §5b migration guard** ([test_constitution_tier.py](tests/test_constitution_tier.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
+
+### 2.21 Constitution layer — 🟡 (plan §6 "Constitution layer", Phases 0–1)
+
+The tiered-governance substrate from plan §6. **Shipped (Phases 0–1):**
+
+- **`tier`** schema field (`constitutional`/`standard`/`advisory`, default `standard`)
+  — additive and optional; every existing rule stays valid unchanged ([schema.json](schema.json)).
+- **Tier-aware blocking** ([fux/findings.py](fux/findings.py) `blocking(findings, mode)`):
+  constitutional findings block in **any** `mode` (so `unsealed` blocks the apex),
+  standard only under `strict`, advisory never. `fux gate` reads the project `mode` and
+  applies it; `fux check` output is canonically sorted (kind, rule_id, message).
+- **§5b migration guard** ([fux/baseline.py](fux/baseline.py)) — `fux check
+  --baseline-write <file>` snapshots findings; `fux gate --baseline <file>` fails only on
+  findings *new* since the snapshot (a transient upgrade check, **not** a regression
+  subsystem). Proven a no-op on fux's own `.fux/` rules.
+- **Bootstrap rule** [`con-amendment`](../.fux/rules/con-amendment.md) — the amendment
+  article (Phase 0), `tier: constitutional`, ratified once `fux ratify` lands.
+
+**Next (Phase 2+):** tamper-evidence (`tampered`/self-seal, `.fux/constitution.lock`,
+`fux ratify`), then `principle`/`enforcement` tagging + the critic loop. Covered by
+[tests/test_constitution_tier.py](tests/test_constitution_tier.py).
 
 ---
 

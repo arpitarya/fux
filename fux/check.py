@@ -25,6 +25,10 @@ def run(root: Path) -> list[Finding]:
         findings += _seal(r, root)
     findings += _conflicts(layered)
     findings += _extractor_drift(fp)
+    tier_of = {r.id: str(r.fm.get("tier", "standard")) for r in rs.rules}
+    for f in findings:
+        f.tier = tier_of.get(f.rule_id, "standard")   # constitution layer (plan §6)
+    findings.sort(key=lambda f: (f.kind, f.rule_id, f.message))  # canonical → baseline diff
     _write_drift(fp, findings)
     return findings
 

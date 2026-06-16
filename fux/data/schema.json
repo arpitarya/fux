@@ -17,6 +17,7 @@
     "subtype": { "type": "string", "enum": ["user", "feedback", "project", "reference"] },
     "scope": { "type": "string", "enum": ["personal", "shared"] },
     "status": { "type": "string", "enum": ["draft", "active", "deprecated", "todo", "done"] },
+    "tier": { "type": "string", "enum": ["constitutional", "standard", "advisory"], "default": "standard" },
     "created": { "type": "string" },
     "updated": { "type": "string" },
     "author": { "type": "string" },

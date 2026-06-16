@@ -62,7 +62,9 @@ def test_gate_passes_clean_and_blocks_on_dead_ref(project):
     _good(project)
     code, _ = gate.run(project)
     assert code == 0
-    # Point a rule at a non-existent file → a blocking dead-ref finding.
+    # A standard-tier dead-ref blocks the gate only under strict mode (constitution layer);
+    # constitutional rules block in any mode — see tests/test_constitution_tier.py.
+    (project / ".fux" / "config.toml").write_text('[fux]\nmode = "strict"\n', encoding="utf-8")
     write_rule(project, "ghost", GOOD.replace("src/agg.py#L1-L2", "src/gone.py"))
     code, report = gate.run(project)
     assert code == 2 and "blocking" in report

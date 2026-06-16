@@ -16,11 +16,27 @@ class Finding:
     rule_id: str
     message: str
     fixable: bool = False   # True if a mechanical $0 auto-fix exists (fix mode)
+    tier: str = "standard"  # governing rule's tier (constitution layer, plan §6)
 
     def line(self) -> str:
         flag = " [auto-fixable]" if self.fixable else ""
         return f"[{self.kind}] {self.rule_id}: {self.message}{flag}"
 
 
-def blocking(findings: list[Finding]) -> list[Finding]:
-    return [f for f in findings if f.kind in BLOCKING]
+def blocking(findings: list[Finding], mode: str = "strict") -> list[Finding]:
+    """Findings that block, by tier (constitution layer, plan §6):
+
+    constitutional → ANY finding, regardless of `mode` (the thin apex; this also
+    makes `unsealed` block for constitutional rules); standard → kind-based, but
+    only under `strict`; advisory → never. `mode` defaults to `strict` so callers
+    already gated on strict keep their exact semantics.
+    """
+    out: list[Finding] = []
+    for f in findings:
+        if f.tier == "constitutional":
+            out.append(f)
+        elif f.tier == "advisory":
+            continue
+        elif f.kind in BLOCKING and mode == "strict":
+            out.append(f)
+    return out

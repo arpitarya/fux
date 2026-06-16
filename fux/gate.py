@@ -10,7 +10,8 @@ from __future__ import annotations
 import stat
 from pathlib import Path
 
-from fux import build, check, gitutil, lint, verify
+from fux import build, check, config, gitutil, lint, paths, verify
+from fux.baseline import new_findings
 from fux.findings import blocking
 
 _PRECOMMIT = """#!/bin/sh
@@ -23,17 +24,26 @@ exec $FUX gate
 """
 
 
-def run(root: Path, strict_lint: bool = False) -> tuple[int, str]:
-    """Return (exit_code, report). 0 = pass, 2 = blocked."""
+def run(root: Path, strict_lint: bool = False, baseline: Path | None = None) -> tuple[int, str]:
+    """Return (exit_code, report). 0 = pass, 2 = blocked.
+
+    Blocking is tier-aware (constitution layer): constitutional findings block in any
+    `mode`, standard only under `strict`, advisory never. With `baseline` (§5b migration
+    guard) only findings *new* since the snapshot are judged — pre-existing ones and all
+    advisories are tolerated, so a backward-compatible upgrade exits 0.
+    """
     build.run(root)                                   # views current before judging
     findings = check.run(root)
-    blockers = blocking(findings)
+    mode = config.load(paths.Footprint(root).config).get("mode", "fix")
+    judged = new_findings(baseline, findings) if baseline is not None else findings
+    blockers = blocking(judged, mode)
     vres = verify.run(root)
     vfail = [v for v in vres if v.status == "fail"]
     lints = lint.run(root)
 
+    scope = " new (vs baseline)" if baseline is not None else ""
     lines = ["fux gate", ""]
-    lines.append(f"  check:   {len(findings)} finding(s), {len(blockers)} blocking")
+    lines.append(f"  check:   {len(findings)} finding(s), {len(blockers)}{scope} blocking")
     for f in blockers:
         lines.append(f"    ✗ {f.line()}")
     vpass = sum(v.status == "pass" for v in vres)
@@ -46,7 +56,9 @@ def run(root: Path, strict_lint: bool = False) -> tuple[int, str]:
     for f in lints[:10]:
         lines.append(f"    · {f.line()}")
 
-    failed = bool(blockers) or bool(vfail) or (strict_lint and bool(lints))
+    # In baseline mode the migration guard judges new blocking findings only; verify/lint
+    # are reported but don't gate (transient upgrade check, not a regression subsystem).
+    failed = bool(blockers) or (baseline is None and (bool(vfail) or (strict_lint and bool(lints))))
     lines.append("")
     lines.append("✗ gate failed — resolve the blocking findings above." if failed
                  else "✔ gate passed — knowledge is in sync with code.")
