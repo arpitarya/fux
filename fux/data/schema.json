@@ -18,6 +18,8 @@
     "scope": { "type": "string", "enum": ["personal", "shared"] },
     "status": { "type": "string", "enum": ["draft", "active", "deprecated", "todo", "done"] },
     "tier": { "type": "string", "enum": ["constitutional", "standard", "advisory"], "default": "standard" },
+    "principle": { "type": "string" },
+    "enforcement": { "type": "string", "enum": ["deterministic", "judgment"] },
     "ratification": {
       "type": "object",
       "required": ["by", "date", "content_seal"],

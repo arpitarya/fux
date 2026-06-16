@@ -4,7 +4,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from fux import config, constitution, gitutil, governance, loader, paths, schema, seal
+from fux import (config, constitution, critic, gitutil, governance, loader, paths,
+                 schema, seal)
 from fux.findings import Finding
 from fux.model import Rule
 
@@ -27,6 +28,7 @@ def run(root: Path) -> list[Finding]:
     findings += _extractor_drift(fp)
     findings += constitution.check_tamper(rs.rules)   # constitution layer (plan §6, §7a)
     findings += constitution.check_lock(root, rs.rules)
+    findings += critic.untagged_candidates(rs.rules)  # advisory backfill guide (plan §3, §5b)
     tier_of = {r.id: str(r.fm.get("tier", "standard")) for r in rs.rules}
     for f in findings:
         f.tier = tier_of.get(f.rule_id, "standard")   # constitution layer (plan §6)
@@ -140,7 +142,8 @@ def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
     lines = ["# Fux DRIFT report", "",
              f"_{len(findings)} finding(s)._" if findings else "_No drift — all rules current._", ""]
     for kind in ("tampered", "schema", "dead-ref", "conflict", "stale", "plan-drift",
-                 "invariant", "memory-stale", "unsealed", "extractor-drift"):
+                 "invariant", "memory-stale", "unsealed", "untagged-candidate",
+                 "extractor-drift"):
         group = [f for f in findings if f.kind == kind]
         if group:
             lines.append(f"## {kind} ({len(group)})")

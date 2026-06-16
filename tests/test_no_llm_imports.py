@@ -12,8 +12,8 @@ import fux
 FUX_DIR = Path(fux.__file__).resolve().parent
 
 # The deterministic maintenance/enforcement path — none of these may import a model client.
-MAINT = ["check", "gate", "verify", "seal", "constitution", "baseline", "findings",
-         "hooks", "hookio", "touch", "mcpserver", "lint", "stats", "fix"]
+MAINT = ["check", "gate", "verify", "seal", "constitution", "critic", "baseline",
+         "findings", "hooks", "hookio", "touch", "mcpserver", "lint", "stats", "fix"]
 # LLM *API clients*. `sentence_transformers` (the [embeddings] LOCAL model extra) is allowed —
 # it is not an LLM client and is never on the default import path.
 FORBIDDEN = re.compile(

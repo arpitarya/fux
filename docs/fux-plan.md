@@ -252,12 +252,27 @@ is captured to `.fux/debates/<id>.md`, and `fux ratify … --debate <file>` hash
 `ratification.debate_hash` — so the *reasoning*, not just the verdict, is auditable. Fux
 makes no API call; the maintenance path stays model-free (guarded by a test, plan §0).
 
+**Deterministic / judgment split (`fux/critic.py`, the router; `$0`, NO LLM).** Every
+principle carries `enforcement` (plan §3): `deterministic` principles (money, PII, audit,
+numbers) are decided by a `check:`/seal/matcher and may **never** be routed to the AI
+critic; `judgment` principles (tone, completeness, grounding) are decided by AI
+self-critique and are **never** run as a deterministic check. `critic.py` enforces this
+*structurally* — `for_ai(rules)` returns judgment principles only, `for_deterministic(rules)`
+returns deterministic only; the partitions are disjoint, so a deterministic principle
+cannot reach the AI pass and a judgment principle cannot be faked deterministic. The AI pass
+itself ships behind the `[critic]` extra in Phase 5; this router is the guard that gates it.
+Tagging is deliberate, never auto-guessed: `fux check` emits an **advisory**
+`untagged-candidate` for a project rule that looks like a principle (a `check:` or an
+`invariant`/`regulatory` type) but is untagged — a backfill guide, never a blocker (it stays
+advisory even on the apex).
+
 The meta-rule that governs the layer itself is
 [`con-amendment`](../.fux/rules/con-amendment.md): a constitutional rule is created or
 changed only via **propose → debate → ratify**, changes only by **supersession** (never
 in-place edit), and ratification needs a named human ratifier plus a recorded debate. Tier
 blocking + migration guard ship in Phase 1; tamper-evidence + `fux ratify` in Phase 2; the
-two-agent debate that stamps `ratification.debate_hash` in Phase 3.
+two-agent debate that stamps `ratification.debate_hash` in Phase 3; the deterministic/
+judgment router + `untagged-candidate` backfill guide in Phase 4.
 
 ---
 

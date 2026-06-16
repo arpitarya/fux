@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 # Severity ordering drives strict-mode blocking and DRIFT.md grouping.
 KINDS = ["tampered", "schema", "dead-ref", "stale", "plan-drift", "conflict",
-         "invariant", "memory-stale", "unsealed", "extractor-drift"]
+         "invariant", "memory-stale", "unsealed", "untagged-candidate", "extractor-drift"]
 # Kinds that hard-block in `strict` mode (plan §8 strictness table). `tampered` is
 # special-cased in blocking() to block in ANY mode (constitution layer, plan §6).
 BLOCKING = {"tampered", "schema", "dead-ref", "invariant", "conflict"}
@@ -27,6 +27,7 @@ class Finding:
 def blocking(findings: list[Finding], mode: str = "strict") -> list[Finding]:
     """Findings that block, by tier (constitution layer, plan §6):
 
+    `untagged-candidate` → NEVER (a backfill nudge, advisory even on the apex);
     `tampered` → ALWAYS (any tier/mode — a deleted rule has no tier to stamp);
     constitutional → ANY finding, regardless of `mode` (the thin apex; this also
     makes `unsealed` block for constitutional rules); standard → kind-based, but
@@ -35,6 +36,8 @@ def blocking(findings: list[Finding], mode: str = "strict") -> list[Finding]:
     """
     out: list[Finding] = []
     for f in findings:
+        if f.kind == "untagged-candidate":
+            continue                       # always advisory — a backfill nudge, never a blocker
         if f.kind == "tampered" or f.tier == "constitutional":
             out.append(f)
         elif f.tier == "advisory":

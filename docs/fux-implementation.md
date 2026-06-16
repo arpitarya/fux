@@ -23,7 +23,7 @@
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
-| Constitution layer (tiers, integrity, `ratify`, debate) | 🟡 | Tiers + `--baseline` guard + tamper/lock/`fux ratify` + **two-agent `/fux debate`** shipped (Phases 0–3); critic loop next ([fux/constitution.py](fux/constitution.py), [fux/data/skills/debate/](fux/data/skills/debate/)) |
+| Constitution layer (tiers, integrity, `ratify`, debate, split) | 🟡 | Tiers + `--baseline` guard + tamper/lock/`fux ratify` + `/fux debate` + **deterministic/judgment router** shipped (Phases 0–4); AI critic loop next ([fux/constitution.py](fux/constitution.py), [fux/critic.py](fux/critic.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
@@ -341,7 +341,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (184 tests)
+### 2.20 Tests — ✅ (189 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -366,6 +366,7 @@ lint** ([test_verify_hardening.py](tests/test_verify_hardening.py)), and **fuzzi
 rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)), and the **constitution
 layer — tier blocking + §5b migration guard** ([test_constitution_tier.py](tests/test_constitution_tier.py))
 and **tamper-evidence + ratification + lock** ([test_constitution_integrity.py](tests/test_constitution_integrity.py)),
+the **deterministic/judgment split + backfill guide** ([test_critic_split.py](tests/test_critic_split.py)),
 plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
@@ -398,12 +399,21 @@ The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0�
   it into `ratification.debate_hash`. Fux spends nothing — guarded by
   [tests/test_no_llm_imports.py](tests/test_no_llm_imports.py) (no maintenance-path module
   imports an LLM client; default install is model-free).
+- **Deterministic/judgment split** ([fux/critic.py](fux/critic.py)) — `principle` +
+  `enforcement` schema fields (both optional → existing rules stay valid/untagged). The
+  router enforces the split *structurally*: `for_ai` returns judgment principles only (a
+  `deterministic` one can never reach the AI pass), `for_deterministic` returns deterministic
+  only (a `judgment` one is never faked deterministic). `fux check` emits an advisory
+  `untagged-candidate` for project rules that look like principles but are untagged — a
+  backfill guide that never blocks (even on the apex). The AI pass itself is Phase 5.
 - **Bootstrap rule** [`con-amendment`](../.fux/rules/con-amendment.md) — the amendment
   article (Phase 0), `tier: constitutional`; ratify it with `fux ratify con-amendment`.
 
-**Next (Phase 4+):** `principle`/`enforcement` tagging + the critic loop (behind the
-`[critic]` extra). Covered by [tests/test_constitution_tier.py](tests/test_constitution_tier.py),
+**Next (Phase 5+):** the critic loop (deterministic pass first, AI self-critique behind the
+`[critic]` extra) + the coverage gate. Covered by
+[tests/test_constitution_tier.py](tests/test_constitution_tier.py),
 [tests/test_constitution_integrity.py](tests/test_constitution_integrity.py),
+[tests/test_critic_split.py](tests/test_critic_split.py),
 [tests/test_no_llm_imports.py](tests/test_no_llm_imports.py).
 
 ---

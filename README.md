@@ -156,6 +156,12 @@ the *host session's* tokens; Fux's own code never calls an LLM (a guard test pro
 maintenance path is model-free). All deterministic and `$0`. Default behaviour is unchanged
 until you ratify (`tier` defaults to `standard`).
 
+Each principle is tagged `enforcement: deterministic` (money/PII/numbers — decided by a
+`check:`/seal, **never** sent to the AI critic) or `judgment` (tone/completeness — decided
+by AI self-critique, **never** faked as a machine check); the split is enforced structurally
+by a `$0` router, and `fux check` flags untagged rules that look like principles so backfill
+is guided, not guessed.
+
 For cross-session memory it stays **authored, not captured**: an opt-in `capture`
 hook queues *which* files changed for `fux distill` (human-confirmed) rather than
 auto-summarising, and `type: memory` entries **decay** after a TTL so stale notes
