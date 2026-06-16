@@ -1,6 +1,7 @@
 """Mutating / build command handlers — print output, return an exit code."""
 from __future__ import annotations
 
+import hashlib
 import shutil
 import subprocess
 from datetime import date as _date
@@ -98,8 +99,15 @@ def cmd_ratify(args) -> int:
         print("fux: no ratifier — pass --by <name> (or set git user.name)")
         return 1
     when = args.date or _date.today().isoformat()
+    dhash = None
+    if args.debate:
+        dpath = Path(args.debate)
+        if not dpath.is_file():
+            print(f"fux: debate transcript not found: {args.debate}")
+            return 1
+        dhash = hashlib.sha256(dpath.read_bytes()).hexdigest()[:16]
     try:
-        r = constitution.ratify(here, rules, args.id, by=by, date=when)
+        r = constitution.ratify(here, rules, args.id, by=by, date=when, debate_hash=dhash)
     except KeyError:
         print(f"fux: no rule with id '{args.id}'")
         return 1
@@ -107,7 +115,8 @@ def cmd_ratify(args) -> int:
         print(f"fux: {e}")
         return 1
     print(f"✔ ratified {r.id} → constitutional (by {by}, {when})")
-    print("  content_seal frozen + .fux/constitution.lock updated — the only path into the apex.")
+    print(f"  content_seal frozen{f' + debate_hash {dhash}' if dhash else ''} + "
+          ".fux/constitution.lock updated — the only path into the apex.")
     return 0
 
 
@@ -195,15 +204,15 @@ def cmd_setup(_args) -> int:
     skills_src = data / "skills"
     _copy_skill(skills_src / "fux", skills_dir / "fux")
     print(f"✔ /fux skill  → {skills_dir / 'fux'}/")
-    for name in ("plan", "adr", "trace", "savings", "distill", "fetch-rules"):
+    for name in ("plan", "adr", "debate", "trace", "savings", "distill", "fetch-rules"):
         src = skills_src / name
         if src.exists():
             _copy_skill(src, skills_dir / f"fux-{name}")
-    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,trace,savings,distill,fetch-rules}}/")
+    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,debate,trace,savings,distill,fetch-rules}}/")
 
     codex_skills_dir.mkdir(parents=True, exist_ok=True)
     _copy_skill(skills_src / "fux", codex_skills_dir / "fux")
-    for name in ("plan", "adr", "trace", "savings", "distill", "fetch-rules"):
+    for name in ("plan", "adr", "debate", "trace", "savings", "distill", "fetch-rules"):
         src = skills_src / name
         if src.exists():
             _copy_skill(src, codex_skills_dir / f"fux-{name}")

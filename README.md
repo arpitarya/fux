@@ -75,6 +75,7 @@ fux why day-pnl [--history]    # explain a rule (+ how its *why* evolved, via gi
 fux refs src/aggregator.py     # which rules govern this file
 fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semantic+graph
 fux seal --all                 # bind rules to an AST fingerprint of their code
+fux debate "<rule>" (skill)    # two-agent free debate → you ratify the result
 fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident; the only path)
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
@@ -145,11 +146,15 @@ Beyond authoring, Fux **enforces and reports**: `fux lint` grades rule quality,
 and `fux mcp` exposes the whole substrate to agents over MCP.
 
 **Constitutional tier (opt-in):** a rule's `tier` (`constitutional` · `standard` ·
-`advisory`) sets how hard it bites — constitutional rules block in any mode. `fux ratify`
-makes one tamper-evident: it stamps a `content_seal` and records the rule in a committed
-`.fux/constitution.lock`, so any in-place edit, add, or delete becomes an always-blocking
-`tampered` finding. All deterministic and `$0` — the maintenance path never calls an LLM.
-Default behaviour is unchanged until you ratify (`tier` defaults to `standard`).
+`advisory`) sets how hard it bites — constitutional rules block in any mode. A principle
+*becomes* law through `/fux debate "<rule>"` — a skill that spawns **two sub-agents** (no
+assigned sides, blind first passes, anti-sycophancy gates) and escalates to **you** as
+tie-breaker — then `fux ratify` makes it tamper-evident: it stamps a `content_seal` (and the
+debate's `debate_hash`) and records the rule in a committed `.fux/constitution.lock`, so any
+in-place edit, add, or delete becomes an always-blocking `tampered` finding. The debate is
+the *host session's* tokens; Fux's own code never calls an LLM (a guard test proves the
+maintenance path is model-free). All deterministic and `$0`. Default behaviour is unchanged
+until you ratify (`tier` defaults to `standard`).
 
 For cross-session memory it stays **authored, not captured**: an opt-in `capture`
 hook queues *which* files changed for `fux distill` (human-confirmed) rather than

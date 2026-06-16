@@ -23,7 +23,7 @@
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
-| Constitution layer (tiers, integrity, `ratify`) | 🟡 | Tiers + `--baseline` guard + **tamper/lock/`fux ratify`** shipped (Phases 0–2); debate + critic next ([fux/constitution.py](fux/constitution.py), [fux/findings.py](fux/findings.py), [fux/baseline.py](fux/baseline.py)) |
+| Constitution layer (tiers, integrity, `ratify`, debate) | 🟡 | Tiers + `--baseline` guard + tamper/lock/`fux ratify` + **two-agent `/fux debate`** shipped (Phases 0–3); critic loop next ([fux/constitution.py](fux/constitution.py), [fux/data/skills/debate/](fux/data/skills/debate/)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
@@ -50,7 +50,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
 | `fux why <id> [--history]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/explain.py](fux/explain.py) |
 | `fux seal [ids] [--all]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/seal.py](fux/seal.py) |
-| `fux ratify <id> [--by NAME] [--date ISO]` | ✅ | [fux/clicmds.py](fux/clicmds.py), [fux/constitution.py](fux/constitution.py) |
+| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | ✅ | [fux/clicmds.py](fux/clicmds.py), [fux/constitution.py](fux/constitution.py) |
 | `fux mine [--min-sites N]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/mine.py](fux/mine.py) |
 | `fux refs <file>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
 | `fux new <type> <id> [--domain D]` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
@@ -270,12 +270,14 @@ Render contract covered by [tests/test_graphhtml.py](tests/test_graphhtml.py).
 
 Registered under `~/.claude/skills/` (installed by [install.sh](install.sh)):
 `fux`, `fux-plan` (flagship, spec-driven requirements → design → tasks),
-`fux-adr`, `fux-trace`, `fux-savings` (interpret the cost report → a next action),
+`fux-adr`, `fux-debate` (two-agent free debate → human ratifies a rule, plan §7b),
+`fux-trace`, `fux-savings` (interpret the cost report → a next action),
 and `fux-distill` (capture this session's decisions as durable `memory`/`adr`
 entries — the memory-replacement loop, human-confirmed). Guides:
 [docs/spec.guide.md](docs/spec.guide.md), [docs/rule.guide.md](docs/rule.guide.md).
-`plan`/`adr`/`distill` author via the LLM in-session; `trace`/`savings` are pure
-`$0`. All ride the current session (no background spend).
+`plan`/`adr`/`debate`/`distill` author via the LLM in-session; `trace`/`savings` are
+pure `$0`. All ride the current session (no background spend) — Fux itself never calls
+a model, asserted by [tests/test_no_llm_imports.py](tests/test_no_llm_imports.py).
 
 ### 2.17 Roadmap §17 — memory, capture, governance, dashboard — ✅
 
@@ -339,7 +341,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.1.0, stdlib-only, `[embeddings]` extra),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (182 tests)
+### 2.20 Tests — ✅ (184 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -363,7 +365,8 @@ packing** ([test_pack.py](tests/test_pack.py)), **usage-weighted decay + overlap
 lint** ([test_verify_hardening.py](tests/test_verify_hardening.py)), and **fuzzing +
 rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)), and the **constitution
 layer — tier blocking + §5b migration guard** ([test_constitution_tier.py](tests/test_constitution_tier.py))
-and **tamper-evidence + ratification + lock** ([test_constitution_integrity.py](tests/test_constitution_integrity.py)).
+and **tamper-evidence + ratification + lock** ([test_constitution_integrity.py](tests/test_constitution_integrity.py)),
+plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
 ### 2.21 Constitution layer — 🟡 (plan §6 "Constitution layer", Phases 0–2)
@@ -388,13 +391,20 @@ The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0�
   no LLM) is the **only** path that stamps ratification, freezes the code seal, and writes
   the lock — tamper/lock apply to *ratified constitutional* rules only, so non-constitutional
   and un-ratified rules are untouched.
+- **Debate engine** ([fux/data/skills/debate/SKILL.md](fux/data/skills/debate/SKILL.md)) —
+  the `/fux debate "<rule>"` skill drives the **host** session to spawn two no-assigned-side
+  sub-agents (blind first pass → reveal → anti-sycophancy gates → human escalation on
+  non-convergence). Fux's only code is the harness: `fux ratify --debate <transcript>` hashes
+  it into `ratification.debate_hash`. Fux spends nothing — guarded by
+  [tests/test_no_llm_imports.py](tests/test_no_llm_imports.py) (no maintenance-path module
+  imports an LLM client; default install is model-free).
 - **Bootstrap rule** [`con-amendment`](../.fux/rules/con-amendment.md) — the amendment
   article (Phase 0), `tier: constitutional`; ratify it with `fux ratify con-amendment`.
 
-**Next (Phase 3+):** the two-agent debate that produces `ratification.debate_hash`, then
-`principle`/`enforcement` tagging + the critic loop. Covered by
-[tests/test_constitution_tier.py](tests/test_constitution_tier.py),
-[tests/test_constitution_integrity.py](tests/test_constitution_integrity.py).
+**Next (Phase 4+):** `principle`/`enforcement` tagging + the critic loop (behind the
+`[critic]` extra). Covered by [tests/test_constitution_tier.py](tests/test_constitution_tier.py),
+[tests/test_constitution_integrity.py](tests/test_constitution_integrity.py),
+[tests/test_no_llm_imports.py](tests/test_no_llm_imports.py).
 
 ---
 

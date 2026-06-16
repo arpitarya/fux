@@ -16,7 +16,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | **BM25F** lexical retrieval (per-field length-normalised). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity; `--expand` widens the query with glossary synonyms + 1-hop `related` neighbours. All `$0`. | $0 |
 | `fux why <id> [--history]` | Explain a rule: rationale + linked code + edges + invariant + body. `--history` shows how the *why* evolved (git log over the rule file, `--follow`). | $0 |
 | `fux seal [ids…] [--all]` | Bind rules to a normalized-AST fingerprint of their `code_refs` (proof-carrying rules). `fux check` then flags `unsealed` when the governed code changes *structure*; re-affirm by re-running `seal`. | $0 |
-| `fux ratify <id> [--by NAME] [--date ISO]` | The **only path into the constitutional tier** (deterministic, no LLM): stamp `ratification.{by,date,content_seal}`, freeze the code seal, and write/update the committed `.fux/constitution.lock`. `--by` defaults to git `user.name`. Afterwards any in-place edit, add, or delete of the rule is an always-blocking `tampered` finding. | $0 |
+| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | The **only path into the constitutional tier** (deterministic, no LLM): stamp `ratification.{by,date,content_seal}`, freeze the code seal, and write/update the committed `.fux/constitution.lock`. `--by` defaults to git `user.name`; `--debate FILE` hashes a `/fux debate` transcript into `ratification.debate_hash` (the audit record). Afterwards any in-place edit, add, or delete of the rule is an always-blocking `tampered` finding. | $0 |
 | `fux refs <file>` | Reverse lookup — which rules govern this file. | $0 |
 | `fux new <type> <id> [--domain D]` | Scaffold a schema-valid stub from a template into the right directory for its type. | $0 |
 | `fux coverage` | % of "important" code files (config globs) with at least one governing rule; lists the uncovered. | $0 |
@@ -66,13 +66,14 @@ Wired by `fux init`, not for direct use:
 
 ### Skills (workflows that ride the current session)
 
-`plan`/`adr` call the LLM in-session (no background spend); `trace`/`savings` are
-pure `$0` traversal/measurement.
+`plan`/`adr`/`debate` call the LLM in-session (no background spend); `trace`/`savings`
+are pure `$0` traversal/measurement. Fux's own code never calls a model.
 
 | Command | What |
 |---|---|
 | `fux plan "<request>"` | Spec-driven: requirements → design → tasks, each a durable Fux entry. See [spec.guide.md](spec.guide.md). |
 | `fux adr "<decision>"` | Capture an architecture decision as an `adr` entry. |
+| `fux debate "<rule>"` | Two-agent free debate (blind first pass → anti-sycophancy → human ratifier) to author a rule; the transcript is hashed into `ratification.debate_hash` by `fux ratify --debate`. Plan §7b. |
 | `fux trace "<feature>"` | Walk the merged graph to explain how a feature spans modules ($0 traversal). |
 | `fux savings ["<question>"]` | Interpret the measured token-cost report and turn it into a next action ($0). |
 | `fux distill ["<focus>"]` | Capture this session's durable decisions as `memory`/`adr` entries — human-confirmed, scoped. |

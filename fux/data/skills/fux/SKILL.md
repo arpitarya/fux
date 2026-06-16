@@ -36,6 +36,8 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux tour                  # emit an ordered ONBOARDING.md                     ($0)
 /fux plan "<request>"      # spec → design → tasks, each a durable Fux entry   (skill)
 /fux adr "<decision>"      # capture an architecture decision as an `adr`      (skill)
+/fux debate "<rule>"       # two-agent free debate → human ratifies a rule     (skill)
+/fux ratify <id>           # ratify a constitutional rule (tamper-evident)     ($0)
 /fux trace "<feature>"     # walk the graph to explain how a feature spans modules
 /fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
 /fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
@@ -114,6 +116,8 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux tour` | `$FUX tour` then read `.fux/out/ONBOARDING.md` |
 | `/fux plan "<request>"` | follow `skills/plan/SKILL.md` |
 | `/fux adr "<decision>"` | follow `skills/adr/SKILL.md` |
+| `/fux debate "<rule>"` | follow `skills/debate/SKILL.md` (two-agent debate → human ratifies) |
+| `/fux ratify <id>` | `$FUX ratify <id> --by "<name>" [--debate <transcript>]` |
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
 | `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
 | `/fux fetch-rules <src>` | follow `skills/fetch-rules/SKILL.md` |
@@ -151,4 +155,6 @@ gate).
 
 Every command above is deterministic and `$0` — the same "no API cost" promise
 that made graphify trustworthy. The only paths that call the LLM are the `plan` /
-`adr` skills, and they ride the session you are already in (no background spend).
+`adr` / `debate` skills, and they ride the session you are already in (no background
+spend). `fux ratify` is itself `$0`: it only hashes the debate transcript the skill
+captured — the *judgement* was the session's tokens, the *record* is deterministic.

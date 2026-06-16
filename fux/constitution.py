@@ -77,19 +77,20 @@ def check_lock(root: Path, rules: list[Rule]) -> list[Finding]:
     return out
 
 
-def ratify(root: Path, rules: list[Rule], rule_id: str, by: str, date: str) -> Rule:
-    """The only path into the constitutional tier: stamp ratification.{by,date,content_seal},
-    freeze the code seal, and rewrite `.fux/constitution.lock`. Raises if id absent or not
-    constitutional. Deterministic — no LLM, no clock (caller supplies `date`)."""
+def ratify(root: Path, rules: list[Rule], rule_id: str, by: str, date: str,
+           debate_hash: str | None = None) -> Rule:
+    """The only path into the constitutional tier: stamp ratification.{by,date,content_seal,
+    debate_hash?}, freeze the code seal, rewrite `.fux/constitution.lock`. Raises if id absent
+    or not constitutional. Deterministic — no LLM, no clock (caller supplies date + hash)."""
     from fux import fmwrite
     rule = next((r for r in rules if r.id == rule_id), None)
     if rule is None:
         raise KeyError(rule_id)
     if str(rule.fm.get("tier")) != "constitutional":
         raise ValueError(f"{rule_id} is tier={rule.fm.get('tier', 'standard')}, not constitutional")
-    rule.fm["ratification"] = {"by": by, "date": date, "content_seal": content_seal(rule)}
-    code_seal = seal.current(root, rule)
-    if code_seal:
+    rat = {"by": by, "date": date, "content_seal": content_seal(rule)}
+    rule.fm["ratification"] = {**rat, "debate_hash": debate_hash} if debate_hash else rat
+    if (code_seal := seal.current(root, rule)):
         rule.fm["seal"] = code_seal
     rule.path.write_text(fmwrite.dump(rule.fm, rule.body), encoding="utf-8")
     lock = _lock_path(root)
