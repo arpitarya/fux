@@ -86,6 +86,7 @@ fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semanti
 fux seal --all                 # bind rules to an AST fingerprint of their code
 fux debate "<rule>" (skill)    # two-agent free debate → you ratify the result
 fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident; the only path)
+fux constitution               # status view: what's law, what it governs, current violations
 fux critic "<change>"          # critique a change vs principles before it lands (deterministic pass; $0)
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero

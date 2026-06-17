@@ -52,6 +52,10 @@ def build_parser() -> argparse.ArgumentParser:
                     help="debate transcript (from /fux debate) to hash into ratification.debate_hash")
     rt.set_defaults(fn=cliconstitution.cmd_ratify)
 
+    sub.add_parser("constitution",
+                   help="status view: what's constitutional, what each governs, current violations"
+                   ).set_defaults(fn=cliconstitution.cmd_constitution)
+
     cr = sub.add_parser("critic", help="critique a proposed change against principles (deterministic pass first; $0)")
     cr.add_argument("proposal", help="the proposed change / commit message / diff summary to critique")
     cr.set_defaults(fn=cliconstitution.cmd_critic)

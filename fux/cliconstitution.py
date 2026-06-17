@@ -1,11 +1,10 @@
 """CLI handlers for the constitution layer — `ratify` + `critic` (deterministic, no LLM)."""
 from __future__ import annotations
 
-import hashlib
 from datetime import date as _date
 from pathlib import Path
 
-from fux import config, constitution, criticloop, gitutil, loader, paths
+from fux import config, constatus, constitution, criticloop, gitutil, loader, paths, provenance
 from fux.cliutil import root
 
 
@@ -25,7 +24,13 @@ def cmd_ratify(args) -> int:
         if not dpath.is_file():
             print(f"fux: debate transcript not found: {args.debate}")
             return 1
-        dhash = hashlib.sha256(dpath.read_bytes()).hexdigest()[:16]
+        # Pin the transcript as immutable evidence at the canonical path so `check_provenance`
+        # can re-verify it. Re-hash from there, so the stamp matches what the check reads.
+        canon = provenance.transcript_path(here, args.id)
+        canon.parent.mkdir(parents=True, exist_ok=True)
+        if dpath.resolve() != canon.resolve():
+            canon.write_bytes(dpath.read_bytes())
+        dhash = provenance.transcript_hash(canon)
     try:
         r = constitution.ratify(here, rules, args.id, by=by, date=when, debate_hash=dhash)
     except KeyError:
@@ -38,6 +43,13 @@ def cmd_ratify(args) -> int:
     print(f"  content_seal frozen{f' + debate_hash {dhash}' if dhash else ''} + "
           ".fux/constitution.lock updated — the only path into the apex.")
     return 0
+
+
+def cmd_constitution(args) -> int:
+    """Status view of the apex: what's constitutional, what each governs, current violations."""
+    out = constatus.render(root())
+    print(out)
+    return 2 if "blocking violations" in out else 0
 
 
 def cmd_critic(args) -> int:

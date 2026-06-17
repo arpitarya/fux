@@ -23,7 +23,7 @@
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
-| Constitution layer (tiers, integrity, debate, split, critic) | ✅ | Tiers + `--baseline` + tamper/lock/`ratify` + `/fux debate` + split router + critic loop & report-first coverage gate (Phases 0–5, v0.4.0); only the runtime critic is deferred ([fux/criticloop.py](fux/criticloop.py), [fux/critic.py](fux/critic.py)) |
+| Constitution layer (tiers, integrity, provenance, debate, split, critic) | ✅ | Tiers + `--baseline` + tamper/lock/`ratify` (incl. un-ratified/promoted-tier block) + provenance drift + `/fux debate` + split router + critic loop & report-first coverage gate (Phases 0–5 + 3b, v0.4.0); only the runtime critic is deferred ([fux/constitution.py](fux/constitution.py), [fux/provenance.py](fux/provenance.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
@@ -342,7 +342,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.4.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (195 tests)
+### 2.20 Tests — ✅ (204 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -372,7 +372,7 @@ the **critique→act loop + report-first coverage gate** ([test_critic_loop.py](
 plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
-### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5, v0.4.0)
+### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 
 The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0–2):**
 
@@ -392,8 +392,19 @@ The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0�
   `check_tamper` (recompute vs stamp) + `check_lock` (stamp vs lock) raise an always-
   blocking `tampered` on any in-place edit, add, or delete. `fux ratify <id>` (deterministic,
   no LLM) is the **only** path that stamps ratification, freezes the code seal, and writes
-  the lock — tamper/lock apply to *ratified constitutional* rules only, so non-constitutional
-  and un-ratified rules are untouched.
+  the lock. A `tier: constitutional` rule that carries **no** `ratification.content_seal` —
+  added directly, or promoted by a `tier:` frontmatter edit — is itself an always-blocking
+  `tampered` finding, so the apex tier cannot be entered or promoted-into outside `fux ratify`.
+  Non-constitutional rules are untouched.
+- **Provenance drift** ([fux/provenance.py](fux/provenance.py)) — `fux ratify --debate <file>`
+  pins the transcript at `.fux/debates/<id>.md` and stamps its raw-bytes hash into
+  `ratification.debate_hash`; `check_provenance` re-hashes that file on every `fux check` and
+  raises an always-blocking `tampered` when it drifts (or goes missing), **constitutional rules
+  only**. A transcript is corrected by re-ratification, never by editing the file. ($0, stdlib.)
+- **Status view** ([fux/constatus.py](fux/constatus.py)) — `fux constitution` renders the apex on
+  one screen: each constitutional rule, ratified/un-ratified, what it governs, ratifier + debate
+  hash with a live transcript-drift check, and current blocking violations. Read-only, $0, reuses
+  the same `check` the gate runs; exits 2 if the apex has blocking findings.
 - **Debate engine** ([fux/data/skills/debate/SKILL.md](fux/data/skills/debate/SKILL.md)) —
   the `/fux debate "<rule>"` skill drives the **host** session to spawn two no-assigned-side
   sub-agents (blind first pass → reveal → anti-sycophancy gates → human escalation on

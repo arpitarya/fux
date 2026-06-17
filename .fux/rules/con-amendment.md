@@ -1,13 +1,27 @@
 ---
 id: con-amendment
 domain: governance
-tier: constitutional
 type: rule
 status: active
+tier: constitutional
 created: 2026-06-16
 updated: 2026-06-16
-aliases: [amendment-article, constitution-amendment]
-keywords: [constitution, amendment, ratify, supersession, governance, propose, debate]
+aliases:
+  - amendment-article
+  - constitution-amendment
+keywords:
+  - constitution
+  - amendment
+  - ratify
+  - supersession
+  - governance
+  - propose
+  - debate
+ratification:
+  by: arpit arya
+  date: 2026-06-17
+  content_seal: 9eda2f6b1309972b
+  debate_hash: 36e62224da098227
 ---
 **Rule (constitutional — the amendment article):** A constitutional rule is created
 or changed **only** through `propose → debate → ratify`. It changes **only by
@@ -23,11 +37,9 @@ rather than overwritten.
 
 **How to apply:** To add or amend a constitutional rule, run `/fux debate "<rule>"`
 (two-agent debate, human tie-break) then `fux ratify <id>`, which records the ratifier
-and the debate hash. To retire or replace one, author its successor with
-`edges.supersedes: [<old-id>]` and ratify that — do not edit the ratified body.
-Deterministic enforcement of this article — `tier` blocking, `tampered`/`unsealed`,
-the `.fux/constitution.lock`, and `fux ratify` — lands in Phases 1–2.
-
-<!-- ratification: TODO — pending `fux ratify con-amendment` (Phase 2); stamps
-     ratification.by (named human), ratification.date, ratification.content_seal and
-     ratification.debate_hash, then freezes the code seal and updates the lock. -->
+and the debate hash. The debate transcript is **immutable evidence**, pinned at
+`.fux/debates/<id>.md`: it is corrected by re-ratification, never by editing the file —
+`fux check` re-hashes it and blocks on drift. To retire or replace a rule, author its
+successor with `edges.supersedes: [<old-id>]` and ratify that — do not edit the ratified body.
+Deterministic enforcement of this article — `tier` blocking, `tampered`/`unsealed`, the
+`.fux/constitution.lock`, the provenance check, and `fux ratify` — is implemented (Phases 1–3).

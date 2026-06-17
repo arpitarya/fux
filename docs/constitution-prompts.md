@@ -109,9 +109,27 @@ Fux's code role is only the deterministic harness: capture transcript → hash �
 Wire the skill into install.sh and fux/data/skills/fux/SKILL.md alongside plan/adr/propose. Add a
 GUARD TEST asserting no maintenance-path module (check/gate/verify/seal/constitution/critic/hooks)
 imports an LLM client, and that `pip install fux-engine` with no extras imports model-free.
+Keep cmd_ratify's body OUT of clicmds.py (≤100-line rule — call into constitution.py).
 Update all four docs. Plan before coding.
 ```
 Acceptance: a debate yields a transcript + hash; `fux ratify` records `debate_hash`; guard test passes; default install is model-free.
+
+---
+
+## Prompt 4b — Phase 3b: provenance verification (fux repo)
+
+```
+Phase 3b — fast-follow to the debate engine. The stamped debate_hash is currently a one-time audit
+stamp that fux check does NOT re-verify, so editing a ratified transcript fires nothing — a forgeable
+audit trail. Close it: in check (via constitution.py), re-hash .fux/debates/<id>.md against the
+ratified debate_hash and fire a distinct `provenance-drift` finding on mismatch, BLOCKING for
+constitutional rules only. Model the transcript as immutable evidence — hash the RAW transcript (not
+a code seal; prose has no AST), so the rule is "a transcript is corrected by re-ratification, never by
+editing the file." Add that line to con-amendment. Tests: edit a ratified transcript → gate fails
+provenance-drift; re-ratify → green; a non-constitutional rule's transcript edit does not block.
+Update all four docs.
+```
+Acceptance: transcript edit on a constitutional rule fails `fux gate`; re-ratify clears it; non-constitutional unaffected.
 
 ---
 

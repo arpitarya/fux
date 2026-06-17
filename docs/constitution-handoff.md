@@ -126,6 +126,7 @@ A non-empty blocking diff means the upgrade is not backward-compatible — fix t
 ### 7a. Integrity layer — tier, tamper, ratify, lock (deterministic, `$0`)
 - `tier` enforced in `fux/findings.py`: any finding against a `constitutional` rule blocks unconditionally regardless of `mode`; `standard` keeps kind-based blocking under strict; `advisory` warns. `unsealed` becomes blocking for constitutional rules.
 - New `fux/constitution.py` (≤ 100 lines): `content_seal(rule)`, `check_tamper(rules)` → always-blocking `tampered` finding on mismatch, `lock_manifest(rules)` + `check_lock(root, rules)` over `.fux/constitution.lock` (catches add/delete outside the ritual). Reuse `seal.py` normalization; no new deps. Wire into `check.py::run`.
+- **Provenance verification** (fast-follow to the debate engine, §7b): the ratified `debate_hash` is re-checked against `.fux/debates/<id>.md` on every `fux check`. Model the transcript as **immutable evidence**, not a code seal — hash the raw transcript and fire a distinct **`provenance-drift`** finding on mismatch, **blocking for constitutional rules only**. The amendment rule is explicit: *a transcript is corrected by re-ratification, never by editing the file* — which is why a raw hash is correct and won't false-positive. Closes the "stamped but unverified, therefore forgeable" gap in the audit trail.
 - `fux ratify <id>` (deterministic, no LLM): stamps `ratification.*`, freezes the code seal, updates the lock. **The only path into the constitutional tier.**
 
 ### 7b. Debate engine — agent-driven, `$0` to Fux
@@ -164,6 +165,9 @@ Run in order; do not start a phase until the previous acceptance test is green. 
 **Phase 2 — Self-seal + tamper + lock.** Build `constitution.py` (§7a), `tampered` finding, `fux ratify`, `.fux/constitution.lock`; wire into `check.py`. *Acceptance:* `fux ratify con-amendment`; hand-edit its body → `fux gate` fails `tampered`; restore + re-ratify → green.
 
 **Phase 3 — Debate engine.** Add `/fux debate` (§7b) using spawned sub-agents, blind first pass, escalation to human, transcript hashing into `debate_hash`; `fux ratify` consumes it. Add a guard test asserting no maintenance-path module imports an LLM client. *Acceptance:* a debate produces a transcript + hash; ratify records it; guard test passes; `pip install fux-engine` (no extra) imports with no model deps.
+*Housekeeping in this phase:* keep `cmd_ratify`'s body out of `clicmds.py` (respect the ≤100-line rule — call into `constitution.py`).
+
+**Phase 3b — Provenance verification (fast-follow).** Implement the `provenance-drift` check from §7a: `fux check` re-hashes `.fux/debates/<id>.md` against the stamped `debate_hash` and fires a blocking finding for constitutional rules on mismatch; document in `con-amendment` that a transcript is corrected by re-ratification, never edited. *Acceptance:* editing a ratified transcript → `fux gate` fails `provenance-drift`; re-ratify → green; a non-constitutional rule's transcript edit does not block.
 
 **Phase 4 — Principle tagging + deterministic/judgment split.** Add `principle` + `enforcement` (§6); enforce that `deterministic` principles are never routed to the AI path and `judgment` never faked deterministic. *Acceptance:* a test asserts a `deterministic` principle cannot reach the critic's AI pass.
 

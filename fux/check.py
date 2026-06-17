@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 
 from fux import (config, constitution, critic, gitutil, governance, loader, paths,
-                 schema, seal)
+                 provenance, schema, seal)
 from fux.findings import Finding
 from fux.model import Rule
 
@@ -28,6 +28,7 @@ def run(root: Path) -> list[Finding]:
     findings += _extractor_drift(fp)
     findings += constitution.check_tamper(rs.rules)   # constitution layer (plan §6, §7a)
     findings += constitution.check_lock(root, rs.rules)
+    findings += provenance.check_provenance(root, rs.rules)    # provenance drift (plan §7a, 3b)
     findings += critic.untagged_candidates(rs.rules)  # advisory backfill guide (plan §3, §5b)
     tier_of = {r.id: str(r.fm.get("tier", "standard")) for r in rs.rules}
     for f in findings:

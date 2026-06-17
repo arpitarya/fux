@@ -1,7 +1,6 @@
-"""Constitutional integrity — tamper-evidence, ratification & the lock ($0, deterministic).
-A ratified constitutional rule (§6) carries `ratification.content_seal`, recorded in
-`.fux/constitution.lock`; `fux check` recomputes both → always-blocking `tampered`; `fux
-ratify` is the only path that stamps them. No LLM, no new deps."""
+"""Constitutional integrity — tamper-evidence, ratification & the lock ($0, deterministic; §6).
+A ratified rule carries `ratification.content_seal` in `.fux/constitution.lock`; `fux check`
+recomputes both → always-blocking `tampered`; `fux ratify` is the only stamping path. No LLM."""
 from __future__ import annotations
 
 import json
@@ -28,15 +27,18 @@ def _constitutional(rules: list[Rule]) -> list[Rule]:
 
 
 def check_tamper(rules: list[Rule]) -> list[Finding]:
-    """`tampered` for any ratified constitutional rule whose recomputed content_seal no
-    longer matches its stamped `ratification.content_seal` (a body/meaning edit)."""
+    """`tampered` for a ratified constitutional rule whose recomputed content_seal no longer
+    matches its stamped `ratification.content_seal` (a body/meaning edit), OR a constitutional
+    rule with no `content_seal` at all — added or promoted via a `tier:` edit, never ratified."""
     out: list[Finding] = []
     for r in _constitutional(rules):
         stored = (r.fm.get("ratification") or {}).get("content_seal")
-        if stored and content_seal(r) != stored:
-            out.append(Finding("tampered", r.id,
-                                "body/frontmatter changed since ratification — constitutional "
-                                "rules never change in place; supersede + re-ratify"))
+        if not stored:
+            out.append(Finding("tampered", r.id, "tier: constitutional but un-ratified (no "
+                               "ratification.content_seal) — `fux ratify` it or drop the tier"))
+        elif content_seal(r) != stored:
+            out.append(Finding("tampered", r.id, "body/frontmatter changed since ratification — "
+                               "constitutional rules never change in place; supersede + re-ratify"))
     return out
 
 
@@ -47,12 +49,8 @@ def lock_manifest(rules: list[Rule]) -> dict[str, str]:
     return {k: v for k, v in sorted(out.items()) if v}
 
 
-def _lock_path(root: Path) -> Path:
-    return root / ".fux" / LOCK
-
-
 def _read_lock(root: Path) -> dict[str, str]:
-    p = _lock_path(root)
+    p = root / ".fux" / LOCK
     if not p.exists():
         return {}
     try:
@@ -93,7 +91,7 @@ def ratify(root: Path, rules: list[Rule], rule_id: str, by: str, date: str,
     if (code_seal := seal.current(root, rule)):
         rule.fm["seal"] = code_seal
     rule.path.write_text(fmwrite.dump(rule.fm, rule.body), encoding="utf-8")
-    lock = _lock_path(root)
+    lock = root / ".fux" / LOCK
     lock.parent.mkdir(parents=True, exist_ok=True)
     lock.write_text(json.dumps(lock_manifest(rules), indent=2, sort_keys=True) + "\n",
                     encoding="utf-8")
