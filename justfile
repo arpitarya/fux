@@ -23,3 +23,10 @@ fux-check:
 # Install the engine into ~/.claude/fux + the /fux skill
 install:
     ./install.sh
+
+# Audit branch protection vs the committed source of truth (.github/branch-protection.json).
+# Branch protection is GitHub config Fux cannot seal — this is the scheduled drift guard
+# (handoff §1/§3). Fails loudly if the required checks or enforce_admins ever drift.
+# Requires gh authenticated; read access is enough.
+audit-protection owner="arpitarya" repo="fux" branch="main":
+    ./scripts/audit-branch-protection.sh {{owner}} {{repo}} {{branch}}

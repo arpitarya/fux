@@ -39,8 +39,26 @@ Branch protection lives in **GitHub, outside the repo**. Fux cannot `seal` it, `
 > no force-push/deletion, confirmed via `…/branches/main` (`protected: true`).
 > That still routes every change through a green-gate PR (no direct commit to
 > `main` by anyone). Restore the 1-review requirement if a second maintainer
-> joins. §2e (CODEOWNERS), §2f live-push test, §2g (ratify-opens-PR),
-> §3 (drift audit), §4 (full proof) still open.
+> joins.
+>
+> **Update (2026-06-18, second pass — §2R + §2e/§2g + §3 DONE):** a second
+> required check `ai-review` (bare job name) was added to `ci.yml` + branch
+> protection — `scripts/ai-review.sh` refuses (exit 3) when reviewer == PR author
+> (separation of duties), and runs `fux gate` + `fux critic` on the diff
+> (model-free per the engine's non-negotiables). `.github/CODEOWNERS` routes
+> `/.fux/` + `constitution.lock` to `@arpitarya` (login must be a real account;
+> `@arpit` would match nothing). `fux ratify` now opens a `constitution/<id>`
+> branch + PR itself (`--no-pr` for local) so a ratification can never land on
+> `main` directly (§2g). Claude Code has a distinct git identity
+> (`Claude (agent) <claude-code@fux.local>`) + `Agent: claude-code` trailer
+> (`scripts/git-identity-claude.sh` + `.gitmessage-claude`); **no GitHub account
+> created** (§2R.3, §2R.4 deferred). Drift audit shipped: weekly
+> `.github/workflows/audit-protection.yml` + `just audit-protection` run
+> `scripts/audit-branch-protection.sh`, which asserts both contexts +
+> `enforce_admins=true` and fails loudly on any diff vs the committed JSON; it
+> needs an admin-scoped `BRANCH_PROTECTION_TOKEN` secret in CI (the default
+> `GITHUB_TOKEN` can't read protection) and exits non-zero rather than passing
+> silently if it can't. §4 proof run separately.
 
 Prerequisites: admin on the repo; a `gh` token with `repo` scope (the
 `administration` scope is *not* required for branch protection on an

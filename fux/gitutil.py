@@ -63,6 +63,54 @@ def file_history(path: Path, root: Path, limit: int = 30) -> list[tuple[str, str
     return rows
 
 
+def current_branch(root: Path) -> str | None:
+    """The checked-out branch name (None on detached HEAD or non-repo)."""
+    b = _run(["rev-parse", "--abbrev-ref", "HEAD"], root)
+    return b if b and b != "HEAD" else None
+
+
+def default_branch(root: Path) -> str:
+    """The remote's default branch (the protected one), falling back to 'main'."""
+    ref = _run(["symbolic-ref", "--quiet", "refs/remotes/origin/HEAD"], root)
+    return ref.rsplit("/", 1)[-1] if ref else "main"
+
+
+def has_remote(root: Path) -> bool:
+    return bool(_run(["remote"], root))
+
+
+def open_pr_branch(root: Path, branch: str, paths_: list[str], message: str,
+                   title: str, body: str) -> tuple[bool, str]:
+    """Switch to a NEW branch, commit ``paths_``, push, and open a PR — never
+    committing to the protected branch (§2g). Deterministic git/gh only, no model.
+
+    Returns (ok, info). ok=False with a reason if any step fails (e.g. branch
+    exists, no remote, gh missing) so the caller can fall back to printing manual
+    commands. The ratification write has already happened on disk; this only
+    routes it through the gated PR path.
+    """
+    if _run(["switch", "-c", branch], root) is None:
+        return False, f"could not create branch '{branch}' (already exists?)"
+    add = subprocess.run(["git", "add", "--", *paths_], cwd=root,
+                         capture_output=True, text=True)
+    if add.returncode != 0:
+        return False, f"git add failed: {add.stderr.strip()}"
+    if _run(["commit", "-m", message], root) is None:
+        return False, "git commit failed (nothing staged?)"
+    if _run(["push", "-u", "origin", branch], root) is None:
+        return False, f"git push failed for '{branch}'"
+    try:
+        pr = subprocess.run(
+            ["gh", "pr", "create", "--base", default_branch(root), "--head", branch,
+             "--title", title, "--body", body],
+            cwd=root, capture_output=True, text=True, timeout=30)
+    except (OSError, subprocess.SubprocessError) as e:
+        return False, f"gh pr create unavailable: {e}"
+    if pr.returncode != 0:
+        return False, f"gh pr create failed: {pr.stderr.strip()}"
+    return True, pr.stdout.strip()
+
+
 def diff_since(path: Path, since: str, root: Path, limit: int = 2000) -> str | None:
     """Patch for ``path`` from the state at ``since`` (YYYY-MM-DD) to HEAD."""
     rel = str(path.resolve())

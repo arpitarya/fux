@@ -475,6 +475,19 @@ Beyond the core, these make Fux materially more useful:
     on blocking `check` findings or failed invariants. `fux gate --install` wires
     the pre-commit hook. Closes the "drift only caught inside a session" gap.
 
+    **The merge wall (the half Fux can't seal).** `--no-verify` bypasses local
+    hooks, so the binding block is GitHub branch protection — config *outside* the
+    repo that `fux seal`/`check`/`constitution.lock` cannot reach. It is enforced as
+    **two required status checks** on `main`: `fux gate` (constitution integrity) and
+    `ai-review` (a *separate* reviewer identity reviews the PR diff and refuses when
+    reviewer == author — separation of duties, model-free), with `enforce_admins:true`
+    and force-push/deletion off, so the only path in is a gated PR for everyone
+    including the owner. `fux ratify` opens that PR itself (`constitution/<id>` branch,
+    deterministic git/gh, no model). The setting nobody can `seal` is instead
+    **watched**: a weekly drift-audit Action + `just audit-protection` fail loudly if
+    live protection drifts from the committed `.github/branch-protection.json` (source
+    of truth). Full design + proof: `docs/constitution-enforcement-handoff.md`.
+
 15. **Agent-native access (MCP).** `fux mcp` serves the read paths
     (recall/why/refs/coverage/savings/stats/context) as Model Context Protocol
     tools over stdio — a hand-rolled, **stdlib-only** JSON-RPC server (no new

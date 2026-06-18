@@ -23,6 +23,7 @@
 | Verify | ✅ | `check:` invariants + examples (JSON, inline `key=value`, scalar coercion) |
 | Quality & health (`lint`/`stats`) | ✅ | Rule-quality lint + weighted health score ([fux/lint.py](fux/lint.py), [fux/stats.py](fux/stats.py)) |
 | Enforcement (`gate`) | ✅ | CI / git pre-commit; **tier-aware** exit 2 on blocking ([fux/gate.py](fux/gate.py)) |
+| Merge wall (required checks + branch protection) | ✅ | `fux gate` + `ai-review` are **required status checks** on `main` (`enforce_admins`, no force-push); only path in is a gated PR. Source of truth [.github/branch-protection.json](.github/branch-protection.json) + apply/audit scripts; weekly drift-audit Action. `fux ratify` opens the PR itself (§2g). See [docs/constitution-enforcement-handoff.md](docs/constitution-enforcement-handoff.md) |
 | Constitution layer (tiers, integrity, provenance, debate, split, critic) | ✅ | Tiers + `--baseline` + tamper/lock/`ratify` (incl. un-ratified/promoted-tier block) + provenance drift + `/fux debate` + split router + critic loop & report-first coverage gate (Phases 0–5 + 3b, v0.4.0); only the runtime critic is deferred ([fux/constitution.py](fux/constitution.py), [fux/provenance.py](fux/provenance.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
@@ -50,7 +51,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
 | `fux why <id> [--history]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/explain.py](fux/explain.py) |
 | `fux seal [ids] [--all]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/seal.py](fux/seal.py) |
-| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/constitution.py](fux/constitution.py) |
+| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE] [--no-pr]` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/constitution.py](fux/constitution.py); routes through a `constitution/<id>` branch+PR ([fux/gitutil.py](fux/gitutil.py)) |
 | `fux critic "<change>"` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/criticloop.py](fux/criticloop.py) |
 | `fux mine [--min-sites N]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/mine.py](fux/mine.py) |
 | `fux refs <file>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
@@ -342,7 +343,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.5.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (208 tests)
+### 2.20 Tests — ✅ (213 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -371,6 +372,7 @@ the **status view — recent debates + violations-by-severity** ([test_constitut
 the **deterministic/judgment split + backfill guide** ([test_critic_split.py](tests/test_critic_split.py)),
 the **critique→act loop + advisory-first critic + report-first coverage gate**
 ([test_critic_loop.py](tests/test_critic_loop.py)),
+the **ratify → branch+PR routing guards** ([test_ratify_pr_routing.py](tests/test_ratify_pr_routing.py)),
 plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 

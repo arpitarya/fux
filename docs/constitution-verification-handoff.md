@@ -48,8 +48,14 @@ For each attack: the mechanism that must catch it, and the signal you should see
 | 8 | Regenerate the migration baseline to hide a blocker | **procedural** — baseline committed pre-upgrade; regeneration shows in the PR diff | reviewer sees it (no fired finding) |
 | 9 | Route a `deterministic` money/PII principle through the AI critic | enforcement-split guard (Phase 4) | refuses / errors, never reaches AI |
 | 10 | `pip install fux-engine` (no extra) and import the maintenance path | import guard test | model-free; no LLM import reachable |
+| 11 | Merge a PR while `fux gate` is RED | **CI required check** `fux gate` (branch protection) | merge **BLOCKED**, the check named as the blocker |
+| 12 | Direct commit/push to the protected branch (as owner) | branch protection (`enforce_admins`, PR-only) | push **REJECTED** — the only path in is a new branch + PR |
+| 13 | Set the `ai-review` reviewer == PR author | `scripts/ai-review.sh` separation-of-duties guard | job **REFUSES** (exit 3), names author==reviewer |
+| 14 | Plant a constitutional violation in a PR diff | **CI required check** `ai-review` (`fux gate`/`critic` on the diff) | `ai-review` RED → merge **BLOCKED** |
+| 15 | Admin-merge a PR past a red required check | `enforce_admins: true` | merge **BLOCKED** even for an admin |
+| 16 | Remove/rename a required check on live protection | scheduled drift-audit (`scripts/audit-branch-protection.sh`) | audit **FAILS loudly** (live ≠ committed JSON) |
 
-**Honesty note:** rows 1–6, 9, 10 are **mechanical** (a check fires). Row 7 is mechanical *at CI* but bypassable locally by design — CI is the wall, so confirm the required-check config. Row 8 is **procedural** — its guard is a visible diff in the upgrade PR, not a fired finding. Disclose both; don't claim a mechanical guard where there's a procedural one.
+**Honesty note:** rows 1–6, 9, 10 are **mechanical** (a check fires). Row 7 is mechanical *at CI* but bypassable locally by design — CI is the wall, so confirm the required-check config. Row 8 is **procedural** — its guard is a visible diff in the upgrade PR, not a fired finding. Rows 11–15 are **mechanical at the GitHub boundary** (branch protection / required checks / the `ai-review` guard) — a green config readout is *not* proof; a blocked merge is, so run them for real (§4). Row 16 is the **drift-audit on a setting Fux can't seal** — GitHub config watched on a schedule, not sealed by `fux gate`. Disclose all three kinds; don't claim a mechanical guard where there's a procedural or watched-config one.
 
 ---
 
