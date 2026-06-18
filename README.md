@@ -2,225 +2,153 @@
 
 # Fux
 
-> **Fux records *why* your code is the way it is — and checks it's still true.**
-> A portable, agent-aware knowledge engine: one frontmatter substrate → derived
-> **index**, **graph**, and **memory** views. `$0` and deterministic — zero
-> third-party deps, no mandatory LLM calls. Author each rule once; your agent
-> reads a cheap one-line index first and opens the full rule only when it's
-> relevant — and `fux seal` lets `fux check` tell you when the governed code
-> drifted out from under it.
+> **Memory tools record what your agent *did*. Fux records *why* your code is the way it is — and checks it's still true.**
 
-> **New in v0.6.0 — the wall is real.** Merging to `main` now requires **two** checks:
-> **`fux gate`** (constitution integrity) and **`ai-review`** — a *separate reviewer identity*
-> that reviews the PR diff and **refuses when reviewer == author** (separation of duties),
-> model-free. **`fux ratify`** opens its own gated `constitution/<id>` PR (`--no-pr` for local),
-> so a ratification can never land on `main` directly; a weekly **drift audit**
-> (`just audit-protection`) fails loudly if protection ever drifts from the committed
-> `.github/branch-protection.json`. Claude Code commits under a distinct `Agent: claude-code`
-> identity — no GitHub account. See
-> [docs/constitution-enforcement-handoff.md](docs/constitution-enforcement-handoff.md).
->
-> **v0.5.0 — advisory-first critic + the first constitutional amendment.** The judgment
-> critic now **suggests, not blocks**, by default (only deterministic money/PII/audit invariants
-> block — escalate a trusted judgment principle with `critic_block_judgment`); **`fux constitution`**
-> gains recent debates + violations grouped by severity; and the amendment article itself was
-> amended **by supersession** (`con-amendment` → `con-amendment-v2`, adding the "is this
-> constitutional?" authoring test) — the rule proving it binds its own author.
->
-> **v0.4.0 — the constitutional-app engine.** Govern where trust lives, opt-in and
-> `$0`: give a rule a `tier` (`constitutional` · `standard` · `advisory`); author principles
-> by two-agent **`/fux debate`**; **`fux ratify`** a rule into a tamper-evident constitution
-> (sealed in **`.fux/constitution.lock`** — any later edit/add/delete is an always-blocking
-> `tampered` finding); critique changes against the constitution with **`fux critic`** before
-> they land (deterministic pass first, no LLM); and **`fux gate`** reports every ungoverned
-> path (report-first, never blocks). The AI self-critique ships behind an opt-in **`[critic]`**
-> extra — the default install stays model-free. Adopting it changes nothing until you opt in.
+[![PyPI](https://img.shields.io/pypi/v/fux-engine.svg)](https://pypi.org/project/fux-engine/)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+[![Dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](#the-0-guarantee)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-<!-- launch: replace the line below with the demo GIF — `fux why day-pnl` → rule + why +
-     governed code, then the Solar Terminal graph igniting the `governs` links.
-     Storyboard + capture script: docs/launch/gif-storyboard.md -->
-<p align="center"><em>▶ demo GIF goes here — see <a href="docs/launch/gif-storyboard.md">docs/launch/gif-storyboard.md</a></em></p>
+The *why* behind your code — why this formula, why this invariant, why it was done *this* way — usually lives in someone's head and dies when they leave. Fux makes it a first-class, version-controlled thing your agent reads before it touches anything, and tells you the moment the code drifts away from what you wrote. **`$0`, deterministic, zero dependencies, no mandatory LLM calls.**
 
-**Pronounced "fox."** (Say it like the animal — *fux* → *fox*.)
+**Pronounced "fox."** · Python ≥ 3.11 · stdlib only · MIT
 
-Named after *Johann Joseph Fux*, author of *Gradus ad Parnassum* (1725) — the
-counterpoint treatise every composer learned the rules from. A tool that codifies
-and enforces rules, named after the man who wrote *the* rulebook. (The name is
-deliberate.) Sits beside `wagner`, `bach`, `orff`.
+<!-- launch: replace the <p> below with the demo GIF — `fux why day-pnl` → rule + why +
+     governed code, then the Solar Terminal graph igniting the `governs` links. -->
+<p align="center"><em>▶ Demo GIF coming soon.</em></p>
 
-Fux **unifies and replaces** three things a project usually runs separately — the
-structural graph (graphify), cross-session memory, and the narrative docs — and
-adds the **business-rules layer** none of them held. See [docs/fux-plan.md](docs/fux-plan.md).
+## The story
 
-## In plain words (the 5-year-old version)
+> *A story? In a README? I know — stop clutching your config flags.* We don't do stories here. We do badges, a wall of CLI options, and a "Contributing" section nobody's opened since 2019, and we call it documentation. But here's the thing: you will not remember my feature list. You'll remember the pipe. So I wrote the pipe. Ninety seconds, it's about a basement, and — spoiler — you're the idiot in it. Read it. — *Arpit*
 
-Think of your code as a big LEGO city. The *reasons* things are built a certain
-way — why the bridge is red, why you add the towers before the walls — usually
-live only in one builder's head. When they go home, nobody remembers why.
+You move into an old house. Down in the basement, the previous owner painted one pipe bright red. You have no idea why — so when you renovate, you treat it like any other pipe and reroute it. A week later, the basement floods. That red pipe froze every winter, and the paint was the owner's way of saying *leave this one alone.* They knew. They just never wrote it down, and then they moved out.
 
-**Fux is a notebook for those reasons.** You write each important rule down once —
-*what* it is and *why* — and Fux sticks a tiny one-line list on the cover so your
-helper can flip straight to the right page instead of searching the whole city
-every time. Fux also **draws a map** showing which notes belong to which
-buildings, and **checks** that the notes still match the city — and it does all
-of that for free, without phoning anyone for help.
+That's how almost all important knowledge works. The *reason* behind a choice lives in one person's head, and the day they leave, it's gone — so the next person changes it with complete confidence, and something quietly breaks. (Swap "person" for "AI assistant" and it happens ten times faster.)
 
-So: write the *why* down once → it's found fast, stays correct, and never gets lost.
+**Fux is the note taped to the red pipe.** You write the reason down once, it stays right next to the thing it explains, and whoever comes next — a new owner, a contractor, an AI — reads it *before* they touch anything. And if someone reroutes the pipe anyway, Fux flips the note over: *heads up — this may no longer match what's actually here.* The reason can't vanish, and it can't quietly go out of date.
 
-## Why
+In code, the red pipe is the one line some genius is always about to "clean up":
 
-The *why* behind a formula — why current value not invested cost, why
-dollar-normalize first, which cost-basis method — usually lives only as an inline
-comment, invisible until someone greps for it. Fux makes that knowledge
-**first-class**: one entry, authored once, served back through a tiny index (read
-first) plus lazily-opened rules (read only when relevant). Lookups run ~5–10×
-cheaper and more correct on every later session — and you don't have to take that
-on faith: **`fux savings`** measures the multiplier from your own file sizes and
-prices the win in **real dollars** (configurable `usd_per_mtok`, default = Claude
-Opus 4.8's $5/M input rate), per lookup and as a cumulative ledger.
-
-## Install
-
-```bash
-git clone git@github.com:arpitarya/fux.git && cd fux
-./install.sh          # → ~/.claude/fux + Claude skills + ~/.codex/skills/fux*
-fux --version
+```python
+def day_pnl(holding):
+    # No, this cannot be one tidy line. Normalize each leg to dollars BEFORE
+    # summing — percentages double-count during a corporate action.
+    # Yes, you have 15 years of experience. So did the last principal who
+    # "simplified" this and took prod down on dividend day. (see: day-pnl)
+    return sum(to_usd(leg) for leg in holding.legs)
 ```
 
-Requires Python ≥ 3.11 (stdlib only — zero third-party dependencies).
+Six months later, a Principal Engineer With Opinions skims that comment, concludes whoever wrote it "didn't really understand the domain," deletes it, and ships the one clean line — right before the next corporate action quietly poisons the numbers. The comment was right. It usually is. (We've all been that engineer.) Fux turns it from a comment a confident person can delete into a rule they *can't* — checked, and bound to the exact lines it explains.
 
-## Use
+## See it
 
 ```bash
+$ fux why day-pnl
+```
+
+```
+formula · day-pnl · governs backend/app/aggregator.py#L40-58
+
+  Rule:  Day P&L = current market value − previous close value, per holding,
+         summed. Dollar-normalize each leg before summing.
+  Why:   Quantity drifts intraday (corporate actions, partial fills); summing
+         percentages double-counts. Dollars are the only safe common unit.
+  Edge:  New position with no previous close → previous = cost basis, not 0.
+
+  ⚑ unsealed — aggregator.py changed structure since this rule was sealed.
+     The logic this rule describes may no longer match. Run `fux why day-pnl --history`.
+```
+
+One entry, authored once, answered back with the rule, the reason, the code it governs, and — the part no doc tool does — **a warning that the code moved and the rule might be stale.** That last line is the whole product.
+
+## Quickstart
+
+```bash
+pip install fux-engine        # the CLI, zero third-party deps
+
 cd your-project
-fux init                       # scaffold .fux/ + Claude/Codex/Copilot pointers
-fux new formula day-pnl        # scaffold a rule; fill **Rule:/Why:/Edge cases:**
-fux build                      # regenerate INDEX.md + rules.json + graph   ($0)
-fux check --fix                # validate; repair mechanical drift           ($0)
-fux why day-pnl [--history]    # explain a rule (+ how its *why* evolved, via git)
-fux refs src/aggregator.py     # which rules govern this file
-fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semantic+graph
-fux seal --all                 # bind rules to an AST fingerprint of their code
-fux debate "<rule>" (skill)    # two-agent free debate → you ratify the result
-fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident; the only path)
-fux constitution               # status view: what's law, what it governs, recent debates, violations by severity
-fux critic "<change>"          # critique a change vs principles before it lands (deterministic pass; $0)
-fux coverage                   # % of important files with a governing rule
-fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
-fux mine                       # surface candidate rules latent in the code (drafts)
-fux savings "how is day P&L computed"  # measured token + dollar cost win (+ cumulative ledger)
-fux lint                       # rule *quality*: missing why / code_refs / edges
-fux stats                      # knowledge-health dashboard + score
-fux gate --install             # wire a git pre-commit enforcement hook
-fux mcp                        # serve the substrate to agents over MCP (stdio)
-fux capture                    # queue this session's changes for `fux distill`
-fux serve                      # local dashboard over the generated views
-fux import docs/               # migrate existing markdown → narrative entries
-fux parity                     # is it safe to retire the old graph/docs/memory?
-fux tour                       # ordered ONBOARDING.md
-
-# Runtime consumers (agents + apps, e.g. Anton's Orff concierge)
-fux components [--scope dir]   # component/hook registry for on-the-fly UI generation
-fux validate-spec              # validate a declarative UISpec against the registry
-fux feedback                   # record rejected specs as candidate vocabulary gaps
-fux hook-recall                # stdin-JSON recall for agent prompt hooks
-fux query / path / explain     # graph traversal: cross-module "how does X relate to Y"
+fux init                      # scaffold .fux/ + agent pointers
+fux new formula day-pnl       # scaffold a rule; fill Rule: / Why: / Edge cases:
+fux build                     # regenerate INDEX + graph        ($0)
+fux why day-pnl               # explain a rule + the code it governs
 ```
 
-**Complete, example-driven guide to everything Fux does:
-[docs/guide.md](docs/guide.md).** Full command reference: [docs/cli.md](docs/cli.md).
-Authoring a rule: [docs/rule.guide.md](docs/rule.guide.md). Writing a spec:
-[docs/spec.guide.md](docs/spec.guide.md).
+> **Full agent integration** (Claude Code / Codex / Copilot skills + hooks): clone and run `./install.sh` instead — it wires `~/.claude/fux`, the skills, and the SessionStart/PostToolUse/Stop hooks.
+
+Complete, example-driven guide: [docs/guide.md](docs/guide.md) · full command reference: [docs/cli.md](docs/cli.md).
+
+## Explain it like I'm five
+
+Your code is a giant LEGO city. The *reasons* things are built a certain way — why the bridge is red, why the towers go up before the walls — usually live in one builder's head. When they go home, nobody remembers why.
+
+**Fux is a notebook for those reasons.** You write each important one down once, and Fux glues a tiny one-line table of contents to the cover, so your helper can flip straight to the right page instead of searching the whole city. It also draws a map of which notes belong to which buildings — and checks that the notes still match the city, telling you when a building changed but its note didn't. And it does all that for free, without phoning anyone for help.
+
+## Why it's different
+
+It's not another wiki or memory service. The difference is a set of *properties*, not features:
+
+- **Deterministic.** Every maintenance command is shell / AST / parse. Same inputs, same output, every time — your knowledge layer never hallucinates because it never guesses.
+- **Verifiable.** `fux seal` binds a rule to an AST fingerprint of its code; `fux check` tells you when the *structure* drifted (not just the mtime). Rules carry `check:` invariants and worked `examples:` that actually run.
+- **`$0` and zero-dependency.** Stdlib-only Python, no third-party deps, no API key required to read, write, or serve. Portable as a tarball, auditable line by line.
+- **Agent-native.** Typed frontmatter, machine-readable output, an MCP server, and prompt hooks — built so an agent can call it *and verify the result*, not just read prose.
+
+The "so what" chain: deterministic → so your context never hallucinates → so an agent can act on it safely → so you can put the result in front of an auditor. That last clause is the one a memory tool can't say.
+
+## The constitution — rules neither you nor your agent can break by accident
+
+Ordinary rules document and warn. A **constitutional** rule is one a developer *or* an AI agent cannot break without it being caught and named.
+
+- **Debate → ratify.** A principle becomes law through **`/fux debate`** — a skill that spawns two sub-agents to argue it freely (blind first passes, anti-sycophancy gates, no assigned sides) and escalates to **you** as tie-breaker. **`fux ratify`** then makes it tamper-evident: it stamps a `content_seal` + the debate's `debate_hash` and records the rule in a committed **`.fux/constitution.lock`**, so any later in-place edit, add, or delete is an always-blocking `tampered` finding. To change a constitutional rule you must supersede it — the amendment article governs its own amendment, and has already amended *itself*.
+- **Critique before it lands.** **`fux critic`** checks a change against the constitution: a deterministic pass first (money / PII / numbers — decided by a `check:` or seal, *never* sent to an LLM, and they hard-block), then the host agent self-critiques the judgment principles (tone, completeness) with its own tokens. The judgment critic is **advisory-first** — a suggestion, not a blocker — so it earns trust before it interrupts.
+- **A real wall.** Every merge to `main` requires two checks — `fux gate` (integrity) and `ai-review` (a *separate reviewer identity* that refuses when reviewer == author). New branch → PR → both green → merge is the only path, for everyone including the owner. Branch protection lives outside the repo, so a weekly drift audit fails loudly if it ever changes. ([details](docs/constitution-enforcement-handoff.md))
+
+Crucially, the debates and critiques spend the *host session's* tokens — **Fux's own code never calls an LLM** (a guard test proves it) — and the whole layer is opt-in: `tier` defaults to `standard`, so adopting Fux changes nothing until you ratify your first rule.
+
+> The bet: once verifiable, governed code-context is normal, shipping an AI change against undocumented, unchecked invariants will look as reckless as deploying without tests.
 
 ## How it works
 
+You maintain **only** the source frontmatter. Everything else is derived, lazily, for `$0`:
+
 ```
-Tier 0  agent pointers ............ CLAUDE.md, AGENTS.md, Copilot instructions
+Tier 0  agent pointers ........... CLAUDE.md, AGENTS.md, Copilot instructions
 Tier 1  .fux/out/INDEX.md ........ ~1 line/rule, read FIRST        ← cheap
 Tier 2  .fux/rules/<id>.md ....... opened ONLY when relevant       ← lazy
 Tier 3  .fux/out/{rules,graph}.json  machine lookup + browsing
 ```
 
-You maintain **only** the source frontmatter. INDEX, `rules.json`, and the
-interactive `graph.html` regenerate on `fux build`. Three hooks keep it live:
-SessionStart injects the INDEX, PostToolUse reminds you when an edited file's rule
-drifted, Stop validates before the turn ends.
+Your agent reads the one-line index first and opens a full rule only when it's relevant, so lookups run **~5–10× cheaper and more correct** on every later session — and you don't take that on faith: `fux savings` prices the win in real dollars from your own file sizes. Three hooks keep it live: SessionStart injects the index, PostToolUse warns when an edited file's rule drifted, Stop validates before the turn ends.
 
-The **graph** merges your rules with code symbols and call edges extracted across
-**Python** (via the stdlib `ast`) and **JS/TS, Go, and Rust** (a brace-matched
-heuristic by default, or **real tree-sitter ASTs** with the optional
-`pip install fux-engine[ast]` extra — same schema, more accuracy, still $0 by
-default), now including **cross-file** `calls` (symbol→symbol) — one navigable
-map of *which rule governs which code*, with community clustering, **PageRank
-centrality** (architectural chokepoints, not just raw degree), and a
-`GRAPH_REPORT.md`. The interactive `graph.html` is the **"Solar Terminal"** viewer,
-built for review *and* agents: code desaturates to graphite dust while knowledge
-nodes ignite amber and the rare `governs` links stream across as glowing threads,
-so *which rule governs which code* is impossible to miss. A three-rail layout adds
-a search-with-clickable-hits Lens grid, per-type filter meters, a live minimap, a
-**governance ledger** of every knowledge→code link, semantic-zoom community
-super-nodes, BFS path mode, and one-click **markdown export** of a node's
-neighbourhood, the visible sub-graph, or the governed subgraph.
+The **graph** merges your rules with code symbols and call edges across **Python** (stdlib `ast`) and **JS/TS, Go, Rust** (brace-heuristic, or real tree-sitter ASTs via the optional `[ast]` extra), with community clustering and **PageRank centrality** for architectural chokepoints. The interactive `graph.html` "Solar Terminal" viewer desaturates code to graphite while knowledge nodes ignite amber and `governs` links stream across as glowing threads — so *which rule governs which code* is impossible to miss.
 
-`fux recall` is lexical **BM25F** (`$0`) by default, with opt-in **query expansion**
-(glossary synonyms + 1-hop graph neighbours), an opt-in **local** re-rank, and an
-opt-in **RRF hybrid** that fuses lexical ⊕ local-semantic ⊕ graph proximity (no
-API); `fux verify [--fuzz]` runs a rule's invariant `check:` and worked `examples:`,
-optionally boundary-fuzzing for unguarded div-by-zero. **Proof-carrying rules:**
-`fux seal` binds a rule to a normalized-AST fingerprint of its code, so `fux check`
-flags `unsealed` when the governed code changes *structure* (not just its mtime).
-Beyond authoring, Fux **enforces and reports**: `fux lint` grades rule quality,
-`fux stats` scores knowledge health, `fux gate` blocks drift at commit/CI time,
-and `fux mcp` exposes the whole substrate to agents over MCP.
+<details>
+<summary><strong>The full command surface</strong> (authoring · verification · governance · runtime)</summary>
 
-**Constitutional tier (opt-in):** a rule's `tier` (`constitutional` · `standard` ·
-`advisory`) sets how hard it bites — constitutional rules block in any mode. A principle
-*becomes* law through `/fux debate "<rule>"` — a skill that spawns **two sub-agents** (no
-assigned sides, blind first passes, anti-sycophancy gates) and escalates to **you** as
-tie-breaker — then `fux ratify` makes it tamper-evident: it stamps a `content_seal` (and the
-debate's `debate_hash`) and records the rule in a committed `.fux/constitution.lock`, so any
-in-place edit, add, or delete becomes an always-blocking `tampered` finding. The debate is
-the *host session's* tokens; Fux's own code never calls an LLM (a guard test proves the
-maintenance path is model-free). All deterministic and `$0`. Default behaviour is unchanged
-until you ratify (`tier` defaults to `standard`).
+```bash
+fux check --fix                # validate; repair mechanical drift           ($0)
+fux why day-pnl --history      # how a rule's *why* evolved, via git
+fux refs src/aggregator.py     # which rules govern this file
+fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semantic+graph
+fux seal --all                 # bind rules to an AST fingerprint of their code
+fux debate "<rule>" (skill)    # two-agent free debate → you ratify the result
+fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident)
+fux constitution               # status: what's law, what it governs, debates, violations
+fux critic "<change>"          # critique a change vs principles before it lands ($0)
+fux coverage                   # % of important files with a governing rule
+fux verify --fuzz              # run invariant `check:`; boundary-fuzz div-by-zero
+fux mine                       # surface candidate rules latent in the code (drafts)
+fux savings "how is day P&L computed"  # measured token + dollar cost win
+fux lint                       # rule quality: missing why / code_refs / edges
+fux stats                      # knowledge-health dashboard + score
+fux gate --install             # wire a git pre-commit enforcement hook
+fux mcp                        # serve the substrate to agents over MCP (stdio)
+fux serve                      # local dashboard over the generated views
+fux import docs/               # migrate existing markdown → narrative entries
+fux query / path / explain     # graph traversal: "how does X relate to Y"
+```
+</details>
 
-**The merge wall.** `fux gate` enforces this in-repo, but `--no-verify` skips local hooks —
-so the real block is GitHub branch protection (config *outside* the repo Fux can't seal). On
-this repo, two **required status checks** gate every merge to `main`: **`fux gate`**
-(constitution integrity) and **`ai-review`** (a separate reviewer identity reviews the PR diff
-and *refuses when reviewer == author* — separation of duties). With `enforce_admins: true` and
-force-push/deletion disabled, the only path to `main` is *new branch → PR → both checks green →
-merge*, for everyone including the owner; `fux ratify` opens that PR itself, so a constitutional
-change can never land except through the gate. Because that setting lives in GitHub, it is
-*watched* not sealed — a weekly drift-audit (`just audit-protection`) fails loudly if the
-required checks or `enforce_admins` ever drift from the committed
-[`.github/branch-protection.json`](.github/branch-protection.json). See
-[`docs/constitution-enforcement-handoff.md`](docs/constitution-enforcement-handoff.md).
-
-Each principle is tagged `enforcement: deterministic` (money/PII/numbers — decided by a
-`check:`/seal, **never** sent to the AI critic) or `judgment` (tone/completeness — decided
-by AI self-critique, **never** faked as a machine check); the split is enforced structurally
-by a `$0` router, and `fux check` flags untagged rules that look like principles so backfill
-is guided, not guessed.
-
-At the action boundary (PreToolUse / pre-commit), `fux critic "<change>"` runs the
-**deterministic pass first** (hard-invariant fails block, no LLM), then the host agent
-self-critiques the `judgment` principles with its own tokens (the `critic` skill drives the
-bounded revise / escalate / `/fux debate` loop); verdicts land in `.fux/out/critic.jsonl`,
-and `fux gate` reports any ungoverned `important_globs` path (report-first, never blocks).
-The judgment critic is **advisory-first**: a judgment fail is a *suggestion*, not a blocker,
-so it earns trust before it interrupts — only deterministic hard-invariants block by default,
-and you escalate a trusted judgment principle to blocking with `critic_block_judgment` in
-`.fux/config.toml`. A headless AI critic for no-session/runtime use ships behind an opt-in
-`[critic]` extra (mirroring `[embeddings]`) — the default install stays model-free.
-
-For cross-session memory it stays **authored, not captured**: an opt-in `capture`
-hook queues *which* files changed for `fux distill` (human-confirmed) rather than
-auto-summarising, and `type: memory` entries **decay** after a TTL so stale notes
-stop costing context — with opt-in **usage-weighted decay** (a memory still being
-recalled stays alive; an unused one decays). Every path `$0` and deterministic.
-
-### Layered rules (maintain once, inherit everywhere)
+### Layered rules — maintain once, inherit everywhere
 
 ```
 effective ruleset = ~/.claude/fux/global/   (cross-project best practices)
@@ -228,21 +156,29 @@ effective ruleset = ~/.claude/fux/global/   (cross-project best practices)
                   ⊕ ./.fux/rules/            (this project's domain rules)
 ```
 
-`project` overrides `pack` overrides `global`. `fux check` flags conflicts
-instead of silently shadowing.
+`project` overrides `pack` overrides `global`, and `fux check` flags conflicts instead of silently shadowing. Packs are optional — a single project can keep everything version-controlled in its own `.fux/`, beside the code it governs.
 
-> Packs are optional. A single-project setup can keep `packs = []` and hold all
-> authored knowledge in the repo's own `.fux/` — version-controlled with the code
-> it governs (see Anton's `knowledge-location` rule for the reasoning). Global
-> rules are seeded from this repo's `fux/data/global/`, so they stay versioned
-> tool code, not loose documents.
+## The `$0` guarantee
 
-## Guarantee
+Every maintenance command is shell / AST / parse — **no LLM calls, ever.** The only paths that touch a model are the authoring skills (`debate`, `plan`, `adr`, and the judgment critic), and they ride the session you're already in — no background spend. The headless AI critic ships behind an opt-in `[critic]` extra; the default install stays model-free.
 
-Every maintenance command is shell/AST/parse — **no LLM calls**. The only paths
-that call the LLM are the `plan` / `adr` skills, and they ride the session you are
-already in (no background spend). The same "$0, deterministic" promise that made
-graphify trustworthy.
+**Honest limits.** Fux doesn't write your rules for you — `fux mine` drafts candidates, but the *why* is yours. The constitution governs where trust lives (money, PII, audit), not every line — making everything constitutional would crush your velocity, and the design says so. And branch protection lives in GitHub, so Fux can *watch* it but can't *seal* it; that one link is honest about being outside its reach.
+
+## What's new
+
+- **v0.6.0 — the wall is real.** Merging to `main` requires `fux gate` + `ai-review` (separate reviewer, refuses when reviewer == author). `fux ratify` opens its own gated PR; a weekly drift audit catches protection changes. ([details](docs/constitution-enforcement-handoff.md))
+- **v0.5.0 — advisory-first critic + first amendment.** The judgment critic suggests rather than blocks; `fux constitution` gains debates + violations by severity; the amendment article amended *itself* by supersession.
+- **v0.4.0 — the constitutional-app engine.** `tier`, `/fux debate`, `fux ratify`, `.fux/constitution.lock`, `fux critic`, and the deterministic/judgment split. Opt-in and `$0`.
+
+## The name
+
+Named after *Johann Joseph Fux*, author of *Gradus ad Parnassum* (1725) — the counterpoint treatise every composer learned the rules from. A tool that codifies and enforces rules, named after the man who wrote *the* rulebook. The name is deliberate (yes, I kept it). Sits beside `wagner`, `bach`, `orff`.
+
+Fux **unifies and replaces** three things a project usually runs separately — the structural graph, cross-session memory, and the narrative docs — and adds the **business-rules and governance layer** none of them held. See [docs/fux-plan.md](docs/fux-plan.md).
+
+---
+
+If the red-pipe problem is real in your codebase, **★ star the repo** and try Fux on one rule — `pip install fux-engine`.
 
 ## License
 
