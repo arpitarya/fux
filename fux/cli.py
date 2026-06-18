@@ -50,6 +50,9 @@ def build_parser() -> argparse.ArgumentParser:
     rt.add_argument("--date", help="ISO ratification date (default: today)")
     rt.add_argument("--debate", metavar="FILE",
                     help="debate transcript (from /fux debate) to hash into ratification.debate_hash")
+    rt.add_argument("--no-pr", action="store_true",
+                    help="ratify in place without opening a branch+PR (local/offline; by default a "
+                         "ratification on the protected branch is routed through a new branch + gated PR)")
     rt.set_defaults(fn=cliconstitution.cmd_ratify)
 
     sub.add_parser("constitution",
