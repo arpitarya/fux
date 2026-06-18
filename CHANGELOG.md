@@ -2,6 +2,24 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.5.1] — 2026-06-18 — the gate is now a real wall
+
+Infrastructure-only: makes the constitutional `fux gate` a **required, merge-blocking
+status check** on `main`, closing the load-bearing gap from the enforcement handoff. No engine
+behaviour, command, or schema change — upgrading is a no-op for the CLI.
+
+### Added
+- **`fux gate` as a required CI check** (`.github/workflows/ci.yml`) — a new `gate` job runs
+  `fux gate` on every PR; its check context is the bare job name **`fux gate`**. A red/pending
+  gate now blocks merge.
+- **Branch protection as code** (`.github/branch-protection.json`) — the diffable source of
+  truth for `main`: required `fux gate` check (`strict`), `enforce_admins: true`, no
+  force-push/deletion. `required_pull_request_reviews` is `null` on purpose (solo repo: a sole
+  developer can't approve their own PR). Every change now routes through a green-gate PR — no
+  direct commits to `main`, including by admins.
+- **`scripts/apply-branch-protection.sh OWNER REPO BRANCH`** — one-command reproducible apply
+  of the checked-in protection config.
+
 ## [0.4.0] — 2026-06-17 — the constitutional-app engine
 
 Fux becomes a **constitutional-app engine**: an optional, additive governance layer on the
