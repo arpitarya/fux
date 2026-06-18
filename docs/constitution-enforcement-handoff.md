@@ -32,9 +32,14 @@ Branch protection lives in **GitHub, outside the repo**. Fux cannot `seal` it, `
 > `ci.yml` (no `fux gate` workflow existed before). Protection applied with
 > `repo` scope alone — `administration` scope was *not* needed for an
 > owner-managed github.com repo. `scripts/apply-branch-protection.sh` is the
-> committed wrapper. `restrictions` is `null`; the wall is enforced by
-> `enforce_admins: true` + required PR review, confirmed via `…/branches/main`
-> (`protected: true`). §2e (CODEOWNERS), §2f live-push test, §2g (ratify-opens-PR),
+> committed wrapper. `restrictions` is `null`. **Solo-repo decision:**
+> `required_pull_request_reviews` is `null` — a sole developer cannot approve
+> their own PR, so a review requirement is unsatisfiable friction, not a control.
+> The wall is therefore the required `fux gate` check + `enforce_admins: true` +
+> no force-push/deletion, confirmed via `…/branches/main` (`protected: true`).
+> That still routes every change through a green-gate PR (no direct commit to
+> `main` by anyone). Restore the 1-review requirement if a second maintainer
+> joins. §2e (CODEOWNERS), §2f live-push test, §2g (ratify-opens-PR),
 > §3 (drift audit), §4 (full proof) still open.
 
 Prerequisites: admin on the repo; a `gh` token with `repo` scope (the
