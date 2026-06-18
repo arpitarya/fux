@@ -2,6 +2,13 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.6.2] — 2026-06-19 — README copy edit
+
+Docs-only. No engine, command, schema, or dependency change — upgrading is a CLI no-op.
+
+### Changed
+- **README "story" intro reworded** — a sharper opening line for the red-pipe story.
+
 ## [0.6.1] — 2026-06-18 — README rewrite (the red-pipe story)
 
 Docs-only. No engine, command, schema, or dependency change — upgrading is a CLI no-op.
