@@ -24,7 +24,22 @@ Branch protection lives in **GitHub, outside the repo**. Fux cannot `seal` it, `
 
 ## 2. Set it — required check + branch protection (both repos)
 
-Prerequisites: admin on the repo; a `gh` token with `repo` (and `administration`) scope.
+> **Status (`fux` repo, 2026-06-18): §2a–2d DONE.** The required check context is
+> **`fux gate`** — the *bare job name*, not `CI / fux gate`. The check-runs API
+> (`repos/OWNER/REPO/commits/<sha>/check-runs`) reports the job name alone, and
+> the modern `required_status_checks.checks[].context` must match *that*, not the
+> `workflow / job` form shown in the PR UI. A new `gate` job was added to
+> `ci.yml` (no `fux gate` workflow existed before). Protection applied with
+> `repo` scope alone — `administration` scope was *not* needed for an
+> owner-managed github.com repo. `scripts/apply-branch-protection.sh` is the
+> committed wrapper. `restrictions` is `null`; the wall is enforced by
+> `enforce_admins: true` + required PR review, confirmed via `…/branches/main`
+> (`protected: true`). §2e (CODEOWNERS), §2f live-push test, §2g (ratify-opens-PR),
+> §3 (drift audit), §4 (full proof) still open.
+
+Prerequisites: admin on the repo; a `gh` token with `repo` scope (the
+`administration` scope is *not* required for branch protection on an
+owner-managed github.com repo — `repo` alone sufficed here).
 
 ### 2a. Get the exact check name (the #1 footgun)
 The required `context` string must match **exactly** what appears in the PR's checks — for a GitHub Actions job that's the **job name** (often shown as `workflow / job`). A typo here means the rule is configured but silently enforces nothing. Read the real name from a recent run, do not guess:

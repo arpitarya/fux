@@ -57,8 +57,9 @@ jobs:
         run: pip install twine && twine check dist/*
 
   gate:
-    # The constitutional merge gate. This job's check context ("CI / fux gate")
-    # is the REQUIRED status check on the protected branch — see
+    # The constitutional merge gate. This job's check context ("fux gate" —
+    # the bare job name, as the check-runs API reports it) is the REQUIRED
+    # status check on the protected branch — see
     # .github/branch-protection.json and docs/constitution-enforcement-handoff.md.
     name: fux gate
     runs-on: ubuntu-latest
