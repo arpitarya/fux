@@ -2,6 +2,17 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.6.1] — 2026-06-18 — README rewrite (the red-pipe story)
+
+Docs-only. No engine, command, schema, or dependency change — upgrading is a CLI no-op.
+
+### Changed
+- **README rewritten** around the "red pipe" story: a tighter value proposition, a
+  `fux why day-pnl` walkthrough as the lead example, shields.io badges, an
+  explain-like-I'm-five section, a constitution overview, a collapsible full command
+  surface, an honest-limits section, and a "what's new" digest. The absolute-URL PNG logo
+  (so it renders on PyPI) and all doc links are preserved.
+
 ## [0.6.0] — 2026-06-18 — the wall is real (review, ratify-through-PR, drift audit)
 
 Completes the enforcement hardening begun in 0.5.1: a **second required check**, a
