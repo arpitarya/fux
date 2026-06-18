@@ -54,3 +54,5 @@ and the debate hash. The debate transcript is **immutable evidence**, pinned at
 successor with `edges.supersedes: [<old-id>]` and ratify that — do not edit the ratified body.
 Deterministic enforcement of this article — `tier` blocking, `tampered`/`unsealed`, the
 `.fux/constitution.lock`, the provenance check, and `fux ratify` — is implemented (Phases 1–3).
+
+<!-- probe: tamper to make ai-review RED on a branch that HAS the ai-review job -->
