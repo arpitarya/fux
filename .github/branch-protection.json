@@ -1,0 +1,14 @@
+{
+  "_note": "Source of truth for `main` branch protection. Apply with scripts/apply-branch-protection.sh arpitarya fux main. The required `fux gate` check + required PR review + enforce_admins together mean NO direct commits to `main` by anyone (incl. admins) — every change goes via a new branch + PR. enforce_admins MUST stay true; setting it false is a real weakening of the wall (see docs/constitution-enforcement-handoff.md §2f).",
+  "required_status_checks": {
+    "strict": true,
+    "checks": [{ "context": "CI / fux gate" }]
+  },
+  "enforce_admins": true,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1
+  },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
