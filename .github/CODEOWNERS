@@ -1,0 +1,16 @@
+# CODEOWNERS — human review routed to the maintainer on constitutional paths only
+# (§2e/§2R.2 of docs/constitution-enforcement-handoff.md). Ordinary code PRs merge
+# on the mechanical reviewers (`fux gate` + `ai-review`); changes to the files that
+# ARE the constitution get the human's judgment.
+#
+# NOTE (solo repo): required_pull_request_reviews is currently null in
+# .github/branch-protection.json, so a code-owner review is not yet *enforced* as a
+# merge block (a solo author can't approve his own PR). This file pre-stages the
+# routing so that the day a second maintainer joins, restoring
+# required_pull_request_reviews.require_code_owner_reviews=true makes the human a
+# required reviewer on these paths with zero further edits.
+#
+# Login must be a real GitHub account; the repo owner is @arpitarya.
+
+/.fux/                   @arpitarya
+/.fux/constitution.lock  @arpitarya

@@ -16,7 +16,7 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | **BM25F** lexical retrieval (per-field length-normalised). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity; `--expand` widens the query with glossary synonyms + 1-hop `related` neighbours. All `$0`. | $0 |
 | `fux why <id> [--history]` | Explain a rule: rationale + linked code + edges + invariant + body. `--history` shows how the *why* evolved (git log over the rule file, `--follow`). | $0 |
 | `fux seal [ids…] [--all]` | Bind rules to a normalized-AST fingerprint of their `code_refs` (proof-carrying rules). `fux check` then flags `unsealed` when the governed code changes *structure*; re-affirm by re-running `seal`. | $0 |
-| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE]` | The **only path into the constitutional tier** (deterministic, no LLM): stamp `ratification.{by,date,content_seal}`, freeze the code seal, and write/update the committed `.fux/constitution.lock`. `--by` defaults to git `user.name`; `--debate FILE` pins the transcript at `.fux/debates/<id>.md` and hashes it into `ratification.debate_hash`, which `fux check` re-verifies on every run (a transcript edit is an always-blocking `tampered` finding — provenance is corrected by re-ratification, never by editing). Afterwards any in-place edit, add, delete, or un-ratified `tier:` promotion of a constitutional rule is an always-blocking `tampered` finding. | $0 |
+| `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE] [--no-pr]` | The **only path into the constitutional tier** (deterministic, no LLM): stamp `ratification.{by,date,content_seal}`, freeze the code seal, and write/update the committed `.fux/constitution.lock`. `--by` defaults to git `user.name`; `--debate FILE` pins the transcript at `.fux/debates/<id>.md` and hashes it into `ratification.debate_hash`, which `fux check` re-verifies on every run (a transcript edit is an always-blocking `tampered` finding — provenance is corrected by re-ratification, never by editing). Afterwards any in-place edit, add, delete, or un-ratified `tier:` promotion of a constitutional rule is an always-blocking `tampered` finding. **Routed through the gate (§2g):** when run on the protected branch with a remote, ratify writes the change on a **new `constitution/<id>` branch and opens a PR** automatically (deterministic git/gh, no model) — a ratification can never land on the protected branch directly; it merges only after the required `fux gate` + `ai-review` checks pass. `--no-pr` does a local/offline in-place ratify; on a feature branch ratify leaves the write for you to commit. | $0 |
 | `fux constitution` | Status view of the apex (read-only, $0): every constitutional rule, whether it's ratified, what it governs (`code_refs`/domain), its ratifier + debate hash (with a live transcript-drift check), the **recent debate transcripts** (newest first), and all **current violations grouped by severity** (blocking vs advisory). Exits 2 if the apex has blocking findings, else 0 — one screen for "what's law and is it intact." | $0 |
 | `fux critic "<change>"` | Critique a proposed change at the action boundary (plan §7c): recall relevant principles, run the **deterministic pass first** (`check:`/seal for `deterministic` principles — exit 2 on a hard-invariant fail, **no LLM**), list the `judgment` principles the host agent must self-critique, and record verdicts to `.fux/out/critic.jsonl`. **Advisory-first (§7d):** a `judgment` fail is a *suggestion* and does **not** block; only deterministic hard-invariants (money/PII/numbers/audit) block by default. Escalate a trusted judgment principle to blocking with `critic_block_judgment` in `.fux/config.toml` (`= true` blocks all judgment principles, or a list of rule ids blocks just those). The judgment self-critique is the agent's own tokens (see the `critic` skill); Fux calls no model. | $0 |
 | `fux refs <file>` | Reverse lookup — which rules govern this file. | $0 |
@@ -54,6 +54,35 @@ edges. In the `graph.html` inspector, a node's `file:line` is a clickable
 `<editor>://file/<abs>:<line>` deep link that opens the exact line in your editor
 — set `graph_editor` in `.fux/config.toml` (`vscode` (default) · `vscode-insiders`
 · `cursor` · `windsurf`).
+
+### Enforcement & the merge wall (the part Fux can't seal)
+
+`fux gate` is the in-repo enforcement surface, but **CI is the wall** — `git commit
+--no-verify` skips local hooks, so the real block lives in GitHub branch protection,
+which is config *outside* the repo that Fux cannot `seal`, `check`, or cover with
+`constitution.lock`. The wall is therefore enforced as **two required status checks**
+on the protected branch (`main`):
+
+| Required check | Job | What it enforces |
+|---|---|---|
+| `fux gate` | `gate` in `.github/workflows/ci.yml` | Constitution integrity on the merge result — exit 2 blocks merge. |
+| `ai-review` | `ai-review` in `ci.yml` (`scripts/ai-review.sh`) | A *separate reviewer identity* reviews the PR diff against the constitution; **refuses (exit 3) when reviewer == PR author** (separation of duties, §2R.1). Model-free: it is `fux gate` + `fux critic` on the diff — the second-set-of-eyes a solo author's missing approval would otherwise provide. |
+
+Branch protection adds `enforce_admins: true` (no admin escape hatch), `strict: true`
+(branch must be up to date), and blocks force-push/deletion — so **the only path to
+`main` is a new branch → PR → both required checks green → merge**, for everyone
+including the owner. The intended config is the committed **source of truth**
+[`.github/branch-protection.json`](../.github/branch-protection.json); re-apply it with
+`scripts/apply-branch-protection.sh OWNER REPO BRANCH`.
+
+Because that setting lives in GitHub and nobody can `seal` it, it is **watched on a
+schedule, not sealed**: the weekly `.github/workflows/audit-protection.yml` Action and the
+`just audit-protection` recipe both run `scripts/audit-branch-protection.sh`, which asserts
+the required contexts + `enforce_admins=true` and **fails loudly** if live protection
+drifts from the committed JSON. `.github/CODEOWNERS` routes `/.fux/` + `constitution.lock`
+to the human maintainer (constitutional paths get human judgment; enforced as a required
+code-owner review once a second maintainer joins — see §2R.2 of the enforcement handoff).
+Full design: [`docs/constitution-enforcement-handoff.md`](constitution-enforcement-handoff.md).
 
 ### Internal hook entrypoints
 

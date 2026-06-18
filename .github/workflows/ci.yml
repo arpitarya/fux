@@ -80,3 +80,37 @@ jobs:
 
       - name: Gate — knowledge must be in sync with code (exit 2 blocks merge)
         run: fux gate
+
+  ai-review:
+    # The second-set-of-eyes review (§2R.1). A solo author can't approve his own
+    # PR, so the missing human approval is enforced as a CHECK: a separate
+    # reviewer identity reviews the PR diff against the constitution and exits
+    # non-zero on problems. REFUSES (exit 3) if reviewer == PR author
+    # (separation of duties). Required alongside `fux gate` — see
+    # .github/branch-protection.json. PRs only (needs an author to check against).
+    name: ai-review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # need base sha to diff the PR
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install (stdlib-only engine)
+        run: pip install -e .
+
+      - name: Seed agent home (schema + bundled rules)
+        run: fux setup
+
+      - name: Constitutional review of the PR diff (separation of duties enforced)
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          REVIEWER: fux-ci-reviewer
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: ./scripts/ai-review.sh

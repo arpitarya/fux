@@ -39,8 +39,26 @@ Branch protection lives in **GitHub, outside the repo**. Fux cannot `seal` it, `
 > no force-push/deletion, confirmed via `…/branches/main` (`protected: true`).
 > That still routes every change through a green-gate PR (no direct commit to
 > `main` by anyone). Restore the 1-review requirement if a second maintainer
-> joins. §2e (CODEOWNERS), §2f live-push test, §2g (ratify-opens-PR),
-> §3 (drift audit), §4 (full proof) still open.
+> joins.
+>
+> **Update (2026-06-18, second pass — §2R + §2e/§2g + §3 DONE):** a second
+> required check `ai-review` (bare job name) was added to `ci.yml` + branch
+> protection — `scripts/ai-review.sh` refuses (exit 3) when reviewer == PR author
+> (separation of duties), and runs `fux gate` + `fux critic` on the diff
+> (model-free per the engine's non-negotiables). `.github/CODEOWNERS` routes
+> `/.fux/` + `constitution.lock` to `@arpitarya` (login must be a real account;
+> `@arpit` would match nothing). `fux ratify` now opens a `constitution/<id>`
+> branch + PR itself (`--no-pr` for local) so a ratification can never land on
+> `main` directly (§2g). Claude Code has a distinct git identity
+> (`Claude (agent) <claude-code@fux.local>`) + `Agent: claude-code` trailer
+> (`scripts/git-identity-claude.sh` + `.gitmessage-claude`); **no GitHub account
+> created** (§2R.3, §2R.4 deferred). Drift audit shipped: weekly
+> `.github/workflows/audit-protection.yml` + `just audit-protection` run
+> `scripts/audit-branch-protection.sh`, which asserts both contexts +
+> `enforce_admins=true` and fails loudly on any diff vs the committed JSON; it
+> needs an admin-scoped `BRANCH_PROTECTION_TOKEN` secret in CI (the default
+> `GITHUB_TOKEN` can't read protection) and exits non-zero rather than passing
+> silently if it can't. §4 proof run separately.
 
 Prerequisites: admin on the repo; a `gh` token with `repo` scope (the
 `administration` scope is *not* required for branch protection on an
@@ -108,6 +126,34 @@ So the loop above is the path of least resistance, not friction: `/fux debate` /
 
 ---
 
+## 2R. PR review enforcement — who reviews when agents author (Claude Code scope)
+
+Context: §2 set `required_pull_request_reviews: null` because a solo human can't approve his own PR — an approval *count* is unsatisfiable friction. That decision stands. But "no approval requirement" must not become "no review." With Claude Code as a PR author (and Codex/Copilot later), the reviewer role is **split**, and review is enforced as *checks*, not an approval click.
+
+### 2R.1 Mechanical reviewers — required checks, always
+- `fux gate` (constitution integrity) **plus** a new **AI-review check**: a CI job where a *different* agent reviews the PR diff against the constitution and exits non-zero on problems. Because it's a *check*, not a GitHub approval, it works for a solo author — it is the second set of eyes the missing human approval would otherwise provide.
+- **Separation of duties:** the reviewing identity must differ from the PR author; the job refuses if `author == reviewer`. This mirrors the two-signature correction lane — the reviewer is never the author.
+
+### 2R.2 Human reviewer — you, reserved for the constitution
+You read and merge. CODEOWNERS (§2e) routes `.fux/**` + `constitution.lock` to you specifically, so constitutional changes always get human judgment. Ordinary code PRs merge on the mechanical reviewers + your merge.
+
+### 2R.3 Agent identity — NOW, Claude Code only (no new GitHub account)
+**Do not create a new GitHub username/password account yet.** A separate account buys exactly one thing — making the agent the GitHub-level PR *author* so GitHub can force your approval click — and a solo dev merging his own reviewed PRs doesn't need it. Instead:
+
+- Give Claude Code a distinct **git author identity** — `git config user.name "Claude (agent)"`, a dedicated email — plus an `Agent: claude-code` commit trailer, so authorship is auditable in history. No account, no credential to manage.
+- Claude Code opens PRs via the forced branch → PR flow (§2f/§2g); merge is gated by the required checks; you review the diff and merge.
+
+This fully covers Claude-Code-only review for a solo maintainer: **the wall is `fux gate` + AI-review check + your merge.**
+
+### 2R.4 Bot identity — DEFERRED (later, and how)
+Create a dedicated agent identity only when **(a)** you want GitHub to force an explicit approval *click* (true "agent authors → human approves"), or **(b)** you add Codex/Copilot and must tell agents apart at the GitHub level. When that day comes:
+
+- Prefer a **GitHub App** over a username/password account — no password to leak, scoped, revocable, proper bot attribution.
+- **Least privilege, never admin:** the agent identity gets only `contents` + `pull requests` on these repos; it must not be a repo admin and must not hold branch-protection rights — *the author cannot be allowed to move the wall* (same separation-of-duties as the constitution).
+- Re-enable `required_pull_request_reviews` (count 1, `require_code_owner_reviews: true`), `dismiss_stale_reviews: true`, and **"require review from someone other than the most recent pusher"** at that point.
+
+---
+
 ## 3. Keep it set — drift audit (the second half)
 
 Because §1: a one-time setting is not a guarantee. Add a **scheduled drift audit** that fails/alerts if the required check is ever removed or renamed:
@@ -128,7 +174,9 @@ Run these for real in each repo; a green config readout is not proof, a blocked 
 3. Attempt a **direct commit/push** to the protected branch (as yourself) → rejected; the only way in is a new branch + PR.
 4. (If `enforce_admins: true`) attempt an **admin merge** past the red check → blocked.
 5. Run `/fux ratify` (or `/fux debate` → ratify) and confirm it lands on a **new branch and opens a PR**, not on the protected branch (§2g).
-6. Run the §3 drift audit; then manually remove the required check and confirm the audit **fails**; restore it.
+6. Open a PR and confirm the **AI-review check** runs, blocks on a planted violation, and **refuses when author == reviewer** (separation of duties, §2R.1).
+7. Confirm Claude Code's PRs carry the distinct author identity + `Agent: claude-code` trailer (§2R.3).
+8. Run the §3 drift audit; then manually remove the required check and confirm the audit **fails**; restore it.
 
 ---
 
@@ -140,6 +188,8 @@ Run these for real in each repo; a green config readout is not proof, a blocked 
 - Admin-enforcement decision made explicitly (enforced, or documented exception).
 - Intended protection captured in `.github/branch-protection.json` + an apply script, both committed.
 - A scheduled drift audit exists and demonstrably fails when the required check is removed.
+- An **AI-review check** is required and enforces reviewer ≠ author (§2R.1); the human is the required reviewer on constitutional paths via CODEOWNERS (§2R.2).
+- Claude Code authors under a distinct git identity + `Agent:` trailer; **no new GitHub account created** (§2R.3). Bot-identity path documented as deferred (§2R.4).
 - §4 verification all pass — a failing PR genuinely cannot merge.
 
 ---
@@ -163,4 +213,22 @@ real yet. Close it for THIS repo, following docs/constitution-enforcement-handof
    it's rejected. Paste the blocked-merge evidence.
 Prereqs: I have admin + a token with repo+administration scope. Stop and tell me if a step needs perms
 I haven't granted. Surgical — touch only .github/ and the audit recipe.
+```
+
+### 6b. PR review model — Claude Code only (paste into Claude Code)
+
+```
+Set up PR review enforcement for THIS repo per §2R of docs/constitution-enforcement-handoff.md.
+Scope: Claude Code only — do NOT create a new GitHub account.
+1. Add an AI-review required CI check: a job where a SEPARATE agent reviews the PR diff against the
+   constitution and exits non-zero on problems. It must refuse if the reviewer identity == the PR
+   author (separation of duties). Make it a required status check alongside `fux gate`.
+2. Give Claude Code a distinct git author identity (user.name "Claude (agent)", a dedicated email) and
+   add an `Agent: claude-code` commit trailer to its commits. No GitHub account, no new credential.
+3. Confirm .github/CODEOWNERS routes /.fux/ and constitution.lock to me (human review on constitutional
+   paths only).
+4. PROVE it: open a PR, confirm the AI-review check runs and blocks a planted violation, refuses when
+   author==reviewer, and that the PR carries the Agent trailer + distinct author. Paste evidence.
+Leave the bot-identity / GitHub-App path for later (§2R.4) — do not build it now. Surgical: only the
+CI workflow, CODEOWNERS, and git-identity config.
 ```

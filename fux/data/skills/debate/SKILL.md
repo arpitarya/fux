@@ -69,7 +69,11 @@ on instant agreement) and means the result, if ratified, enters the apex via `fu
      fux ratify <rule-id> --by "<human name>" --debate .fux/debates/<rule-id>.md
      ```
      `fux ratify` hashes the transcript into `ratification.debate_hash` — the durable
-     "who argued what, and when" record behind the law.
+     "who argued what, and when" record behind the law. On a protected branch with a
+     remote, `fux ratify` **automatically writes on a new `constitution/<rule-id>` branch
+     and opens a PR** (§2g of the enforcement handoff) — a ratification can never land on
+     the protected branch directly; it merges only after the required `fux gate` +
+     `ai-review` checks pass. `--no-pr` does a local/offline in-place ratify instead.
    - **Not converged** → **escalate to the human** with both final positions side by side and
      the unresolved crux. Do **not** author or ratify. The human is the tie-breaker; once they
      decide, write the transcript (including their ruling) and proceed to ratify as above.
