@@ -2,6 +2,44 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.6.0] — 2026-06-18 — the wall is real (review, ratify-through-PR, drift audit)
+
+Completes the enforcement hardening begun in 0.5.1: a **second required check**, a
+distinct agent author identity, the amendment ritual that **opens its own gated PR**, and a
+**scheduled drift audit** for the one setting Fux can't seal. Branch protection is now two
+required checks + `enforce_admins` + a watched source-of-truth config. Adopting is still a
+CLI no-op unless you opt into the constitution layer; `fux ratify` gains PR-routing behaviour.
+
+### Added
+- **`ai-review` as a second required CI check** (`.github/workflows/ci.yml`,
+  `scripts/ai-review.sh`) — a *separate reviewer identity* reviews the PR diff against the
+  constitution and **refuses (exit 3) when reviewer == PR author** (separation of duties,
+  §2R.1). Model-free per the engine's non-negotiables: it is `fux gate` + `fux critic` on the
+  diff — the second set of eyes a solo author's missing approval would otherwise provide. Its
+  check context is the bare job name **`ai-review`**.
+- **`fux ratify … [--no-pr]` routes through a gated PR** (`fux/cliconstitution.py`,
+  `fux/gitutil.py`) — on the protected branch with a remote, ratify writes on a new
+  `constitution/<id>` branch and opens a PR automatically (deterministic git/gh, no model), so
+  a ratification can never land on `main` directly (§2g). `--no-pr` does a local/offline
+  in-place ratify.
+- **Branch-protection drift audit** — `scripts/audit-branch-protection.sh` +
+  `.github/workflows/audit-protection.yml` (weekly) + a `just audit-protection` recipe assert
+  the required contexts + `enforce_admins=true` and **fail loudly** on any diff vs the committed
+  `.github/branch-protection.json` (source of truth). The audit needs an admin-scoped
+  `BRANCH_PROTECTION_TOKEN` secret in CI (the default `GITHUB_TOKEN` can't read protection) and
+  exits non-zero rather than passing silently if it can't.
+- **`.github/CODEOWNERS`** routing `/.fux/` + `constitution.lock` to the human maintainer
+  (constitutional paths get human judgment; enforced as a required code-owner review once a
+  second maintainer joins, §2R.2).
+- **Distinct agent git identity** — `scripts/git-identity-claude.sh` + `.gitmessage-claude`
+  give Claude Code the author `Claude (agent) <claude-code@fux.local>` and an
+  `Agent: claude-code` commit trailer for auditable authorship. **No GitHub account created**
+  (§2R.3; the GitHub-App / bot path stays deferred, §2R.4).
+
+### Changed
+- `.github/branch-protection.json` now requires **two** checks (`fux gate` + `ai-review`).
+- `/fux debate` skill + `docs/cli.md` document the ratify→PR routing.
+
 ## [0.5.1] — 2026-06-18 — the gate is now a real wall
 
 Infrastructure-only: makes the constitutional `fux gate` a **required, merge-blocking

@@ -1,4 +1,4 @@
-<img src="fux/assets/fux-lockup.svg" alt="Fux — Alpha Forge Knowledge Index" width="360" />
+<img src="https://raw.githubusercontent.com/arpitarya/fux/main/fux/assets/fux-lockup.png" alt="Fux — Alpha Forge Knowledge Index" width="360" />
 
 # Fux
 
@@ -10,7 +10,17 @@
 > relevant — and `fux seal` lets `fux check` tell you when the governed code
 > drifted out from under it.
 
-> **New in v0.5.0 — advisory-first critic + the first constitutional amendment.** The judgment
+> **New in v0.6.0 — the wall is real.** Merging to `main` now requires **two** checks:
+> **`fux gate`** (constitution integrity) and **`ai-review`** — a *separate reviewer identity*
+> that reviews the PR diff and **refuses when reviewer == author** (separation of duties),
+> model-free. **`fux ratify`** opens its own gated `constitution/<id>` PR (`--no-pr` for local),
+> so a ratification can never land on `main` directly; a weekly **drift audit**
+> (`just audit-protection`) fails loudly if protection ever drifts from the committed
+> `.github/branch-protection.json`. Claude Code commits under a distinct `Agent: claude-code`
+> identity — no GitHub account. See
+> [docs/constitution-enforcement-handoff.md](docs/constitution-enforcement-handoff.md).
+>
+> **v0.5.0 — advisory-first critic + the first constitutional amendment.** The judgment
 > critic now **suggests, not blocks**, by default (only deterministic money/PII/audit invariants
 > block — escalate a trusted judgment principle with `critic_block_judgment`); **`fux constitution`**
 > gains recent debates + violations grouped by severity; and the amendment article itself was
