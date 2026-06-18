@@ -174,6 +174,19 @@ the *host session's* tokens; Fux's own code never calls an LLM (a guard test pro
 maintenance path is model-free). All deterministic and `$0`. Default behaviour is unchanged
 until you ratify (`tier` defaults to `standard`).
 
+**The merge wall.** `fux gate` enforces this in-repo, but `--no-verify` skips local hooks —
+so the real block is GitHub branch protection (config *outside* the repo Fux can't seal). On
+this repo, two **required status checks** gate every merge to `main`: **`fux gate`**
+(constitution integrity) and **`ai-review`** (a separate reviewer identity reviews the PR diff
+and *refuses when reviewer == author* — separation of duties). With `enforce_admins: true` and
+force-push/deletion disabled, the only path to `main` is *new branch → PR → both checks green →
+merge*, for everyone including the owner; `fux ratify` opens that PR itself, so a constitutional
+change can never land except through the gate. Because that setting lives in GitHub, it is
+*watched* not sealed — a weekly drift-audit (`just audit-protection`) fails loudly if the
+required checks or `enforce_admins` ever drift from the committed
+[`.github/branch-protection.json`](.github/branch-protection.json). See
+[`docs/constitution-enforcement-handoff.md`](docs/constitution-enforcement-handoff.md).
+
 Each principle is tagged `enforcement: deterministic` (money/PII/numbers — decided by a
 `check:`/seal, **never** sent to the AI critic) or `judgment` (tone/completeness — decided
 by AI self-critique, **never** faked as a machine check); the split is enforced structurally

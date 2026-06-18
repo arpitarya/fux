@@ -42,6 +42,44 @@ def cmd_ratify(args) -> int:
     print(f"✔ ratified {r.id} → constitutional (by {by}, {when})")
     print(f"  content_seal frozen{f' + debate_hash {dhash}' if dhash else ''} + "
           ".fux/constitution.lock updated — the only path into the apex.")
+    return _route_through_pr(here, r, by, when, no_pr=args.no_pr)
+
+
+def _route_through_pr(here: Path, r, by: str, when: str, no_pr: bool) -> int:
+    """Route a ratification through a NEW branch + gated PR (§2g) so the constitution
+    can never land except via the required `fux gate`/`ai-review` checks. Deterministic
+    git/gh only — no model call. If a PR can't be opened (no remote, gh missing, branch
+    exists, --no-pr, or not on the protected branch) the on-disk ratification stands and
+    the manual push→PR commands are printed instead of committing to a protected branch."""
+    if no_pr or not gitutil.is_repo(here) or not gitutil.has_remote(here):
+        return 0
+    branch = f"constitution/{r.id}"
+    on = gitutil.current_branch(here)
+    if on is not None and on != gitutil.default_branch(here):
+        # Already on a feature branch — leave the write for the caller to commit/PR.
+        return 0
+    paths_ = [str(r.path.relative_to(here)), ".fux/constitution.lock"]
+    tpath = provenance.transcript_path(here, r.id)
+    if tpath.is_file():
+        paths_.append(str(tpath.relative_to(here)))
+    msg = (f"constitution: ratify {r.id} (by {by}, {when})\n\n"
+           f"Routed through a gated PR — a ratification never lands on the protected "
+           f"branch directly (§2g).\n\nAgent: claude-code")
+    body = (f"Ratifies constitutional rule **{r.id}** (by {by}, {when}).\n\n"
+            f"Authored on a new branch and opened as a PR by `fux ratify` so the change "
+            f"is routed through the required `fux gate` + `ai-review` checks — the apex can "
+            f"never land except via the gate (§2g).")
+    ok, info = gitutil.open_pr_branch(here, branch, paths_, msg,
+                                      title=f"constitution: ratify {r.id}", body=body)
+    if ok:
+        print(f"  → opened PR on branch '{branch}': {info}")
+        print("  the ratification lands only after the required checks pass (§2g).")
+    else:
+        print(f"  ⚠ could not auto-open the PR ({info}). The ratification is written on "
+              f"disk; route it through the gate manually:")
+        print(f"      git switch -c {branch} && git add {' '.join(paths_)}")
+        print(f"      git commit -m 'constitution: ratify {r.id}' && git push -u origin {branch}")
+        print(f"      gh pr create --base {gitutil.default_branch(here)} --head {branch}")
     return 0
 
 

@@ -24,6 +24,12 @@ expected signal vs what you saw.
 8  regenerate the migration baseline to hide a new blocker (is it visible in the PR diff?)
 9  route a `deterministic` money/PII principle through the AI critic
 10 `pip install fux-engine` with no extras and confirm the maintenance path imports model-free
+11 open a PR while `fux gate` is RED and try to merge → must be BLOCKED, naming the check
+12 direct commit/push to the protected branch (as the owner) → must be REJECTED (PR is the only path)
+13 set reviewer == PR author for the `ai-review` job → must REFUSE (separation of duties, exit 3)
+14 plant a constitutional violation and open a PR → `ai-review` must turn RED and block the merge
+15 admin-merge a PR past a red required check (enforce_admins) → must be BLOCKED
+16 remove a required check from live protection → the weekly drift-audit (`just audit-protection`) must FAIL loudly
 For every SLIP, give the minimal fix but DO NOT apply it. Label each guard mechanical / CI / procedural
 honestly. End with a one-line verdict: is the claim true?
 ```
