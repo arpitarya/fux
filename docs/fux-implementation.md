@@ -1,6 +1,6 @@
 # Fux — Implementation Status
 
-> Engine **v0.5.0** — advisory-first critic + the first constitutional amendment (on the v0.4.0 constitutional-app engine). A portable, Claude-aware knowledge engine: one frontmatter
+> Engine **v0.6.0** — the real merge wall: two required checks (`fux gate` + `ai-review`), ratify-through-PR, and a scheduled branch-protection drift audit (on the v0.5.0 advisory-first critic / v0.4.0 constitutional-app engine). A portable, Claude-aware knowledge engine: one frontmatter
 > substrate → derived index, graph, and memory views, with `$0` deterministic
 > maintenance. This file tracks **what has shipped** and **what remains**, mapped
 > to the design of record in [docs/fux-plan.md](docs/fux-plan.md).
@@ -340,7 +340,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 ### 2.19 Packaging & install — ✅
 
 - [install.sh](install.sh) installs **editable** (`pip -e`) → `~/.claude/fux/{engine,global,packs,hooks}` + skills.
-- [pyproject.toml](pyproject.toml) (v0.5.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
+- [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
 ### 2.20 Tests — ✅ (213 tests)
