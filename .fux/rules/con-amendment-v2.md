@@ -1,10 +1,10 @@
 ---
-id: con-amendment
+id: con-amendment-v2
 domain: governance
 type: rule
-status: deprecated
+status: active
 tier: constitutional
-created: 2026-06-16
+created: 2026-06-18
 updated: 2026-06-18
 aliases:
   - amendment-article
@@ -17,19 +17,27 @@ keywords:
   - governance
   - propose
   - debate
+  - constitutional-test
 edges:
-  superseded-by:
-    - con-amendment-v2
+  supersedes:
+    - con-amendment
 ratification:
   by: arpit arya
   date: 2026-06-18
-  content_seal: 1ab8b1702ba9d50c
-  debate_hash: 36e62224da098227
+  content_seal: 014cce6a37d3157b
+  debate_hash: f1f5eefc8924fb6c
 ---
 **Rule (constitutional — the amendment article):** A constitutional rule is created
 or changed **only** through `propose → debate → ratify`. It changes **only by
 supersession** — a successor rule that supersedes it — and **never by in-place edit**.
 Ratification requires a **named human ratifier** and a **recorded debate**.
+
+**Is this constitutional? (the authoring test):** A rule belongs in the constitutional tier
+**only if** a wrong answer costs money, PII, audit, or trust **and** the rule never legitimately
+changes. If either half fails — the stakes are ordinary, or the rule is expected to evolve — it
+is a `standard` rule, not constitutional. This test stops both over-constitutionalizing (locking
+down rules that should flex) and under-constitutionalizing (leaving a must-never-break invariant
+in the mutable tier).
 
 **Why:** The constitution is the thin apex of trust — the must-never-break invariants
 (determinism, money/PII, audit, and this process itself). An invariant that can be

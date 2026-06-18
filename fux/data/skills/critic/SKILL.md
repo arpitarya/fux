@@ -34,9 +34,13 @@ about to make.
    honestly → a `pass`/`fail` verdict **with a one-line rationale**. Be adversarial: look for
    the way the proposal violates the principle, don't rationalise it.
 
-4. **Revise + re-run (bounded).** If any judgment verdict is `fail`, revise the proposal and
-   re-run from step 2. Cap at **3 rounds** — if it still fails, **escalate to the human** with
-   the principle, your proposal, and why they conflict. Do not land the change.
+4. **Revise + re-run (bounded).** A judgment `fail` is **advisory by default** — a *suggestion*
+   that does not block (advisory-first; the critic earns trust before it interrupts). Still
+   revise and re-run from step 2 when a suggestion is right; cap at **3 rounds** — if a judgment
+   call is genuinely contested, **escalate to the human** with the principle, your proposal, and
+   why they conflict. Once a project trusts a judgment principle enough to make it hard-blocking,
+   add its id to `critic_block_judgment` in `.fux/config.toml` (`= true` blocks all judgment
+   principles; deterministic ones always block regardless).
 
 5. **Borderline → debate.** If a judgment call is genuinely contested (you can argue it both
    ways), fire `/fux debate "<the contested rule/decision>"` (two-agent debate) rather than
@@ -53,3 +57,8 @@ for. Money/PII/numbers run as code and can never be argued down; tone/completene
 get a real self-critique instead of a rubber stamp. The split is enforced structurally
 (`fux/critic.py`): a deterministic principle can never reach this self-critique step, and a
 judgment principle is never faked as a machine check.
+
+**Advisory-first** is the trust lever: a judgment critic that blocks on day one gets turned
+off. Judgment fails suggest until a project opts a specific principle into blocking
+(`critic_block_judgment`); deterministic hard-invariants block from the start. Earn the
+interrupt before you spend it.

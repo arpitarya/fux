@@ -1,6 +1,6 @@
 # Fux — Implementation Status
 
-> Engine **v0.4.0** — the constitutional-app engine. A portable, Claude-aware knowledge engine: one frontmatter
+> Engine **v0.5.0** — advisory-first critic + the first constitutional amendment (on the v0.4.0 constitutional-app engine). A portable, Claude-aware knowledge engine: one frontmatter
 > substrate → derived index, graph, and memory views, with `$0` deterministic
 > maintenance. This file tracks **what has shipped** and **what remains**, mapped
 > to the design of record in [docs/fux-plan.md](docs/fux-plan.md).
@@ -339,10 +339,10 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 ### 2.19 Packaging & install — ✅
 
 - [install.sh](install.sh) installs **editable** (`pip -e`) → `~/.claude/fux/{engine,global,packs,hooks}` + skills.
-- [pyproject.toml](pyproject.toml) (v0.4.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
+- [pyproject.toml](pyproject.toml) (v0.5.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (204 tests)
+### 2.20 Tests — ✅ (208 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -366,9 +366,11 @@ packing** ([test_pack.py](tests/test_pack.py)), **usage-weighted decay + overlap
 lint** ([test_verify_hardening.py](tests/test_verify_hardening.py)), and **fuzzing +
 rule mining** ([test_fuzz_mine.py](tests/test_fuzz_mine.py)), and the **constitution
 layer — tier blocking + §5b migration guard** ([test_constitution_tier.py](tests/test_constitution_tier.py))
-and **tamper-evidence + ratification + lock** ([test_constitution_integrity.py](tests/test_constitution_integrity.py)),
+and **tamper-evidence + ratification + lock + supersession** ([test_constitution_integrity.py](tests/test_constitution_integrity.py)),
+the **status view — recent debates + violations-by-severity** ([test_constitution_status.py](tests/test_constitution_status.py)),
 the **deterministic/judgment split + backfill guide** ([test_critic_split.py](tests/test_critic_split.py)),
-the **critique→act loop + report-first coverage gate** ([test_critic_loop.py](tests/test_critic_loop.py)),
+the **critique→act loop + advisory-first critic + report-first coverage gate**
+([test_critic_loop.py](tests/test_critic_loop.py)),
 plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
@@ -403,8 +405,9 @@ The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0�
   only**. A transcript is corrected by re-ratification, never by editing the file. ($0, stdlib.)
 - **Status view** ([fux/constatus.py](fux/constatus.py)) — `fux constitution` renders the apex on
   one screen: each constitutional rule, ratified/un-ratified, what it governs, ratifier + debate
-  hash with a live transcript-drift check, and current blocking violations. Read-only, $0, reuses
-  the same `check` the gate runs; exits 2 if the apex has blocking findings.
+  hash with a live transcript-drift check, the **recent debate transcripts** (newest first by
+  mtime), and all current **violations grouped by severity** (blocking vs advisory). Read-only,
+  $0, reuses the same `check` the gate runs; exits 2 if the apex has blocking findings.
 - **Debate engine** ([fux/data/skills/debate/SKILL.md](fux/data/skills/debate/SKILL.md)) —
   the `/fux debate "<rule>"` skill drives the **host** session to spawn two no-assigned-side
   sub-agents (blind first pass → reveal → anti-sycophancy gates → human escalation on
@@ -426,11 +429,20 @@ The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0�
   opt-in headless backend [fux/criticllm.py](fux/criticllm.py) — the **only** model-importing
   module, lazy + behind the `[critic]` extra, never on the maintenance path. `fux critic
   "<change>"` runs the deterministic pass + lists pending judgment principles + records to
-  `.fux/out/critic.jsonl`. `fux gate` **reports** (never blocks) ungoverned `important_globs`
-  paths — the report-first coverage gate. (`cmd_ratify`/`cmd_critic` now live in
-  [fux/cliconstitution.py](fux/cliconstitution.py), shrinking `clicmds.py`.)
-- **Bootstrap rule** [`con-amendment`](../.fux/rules/con-amendment.md) — the amendment
-  article (Phase 0), `tier: constitutional`; ratify it with `fux ratify con-amendment`.
+  `.fux/out/critic.jsonl`. **Advisory-first (§7d, F1):** judgment fails are *suggestions*
+  (`CriticResult.suggestions`) and do not block; only deterministic fails block by default.
+  `critic_block_judgment` in `.fux/config.toml` (`true` or a list of ids) escalates a trusted
+  judgment principle to blocking. `fux gate` **reports** (never blocks) ungoverned
+  `important_globs` paths — the report-first coverage gate. (`cmd_ratify`/`cmd_critic` now live
+  in [fux/cliconstitution.py](fux/cliconstitution.py), shrinking `clicmds.py`.)
+- **Bootstrap rule** [`con-amendment`](../.fux/rules/con-amendment.md) — the founding amendment
+  article (Phase 0), `tier: constitutional`, ratified with its genesis debate. **Now superseded
+  by** [`con-amendment-v2`](../.fux/rules/con-amendment-v2.md) (F3) — the constitution's first
+  amendment, landed by supersession (new id, `edges.supersedes: [con-amendment]`, predecessor
+  deprecated + re-sealed, fresh debate) rather than in-place edit, dogfooding the rule. v2 adds the
+  **"is this constitutional?" authoring test** (money/PII/audit/trust **and** never-changes), which
+  `/fux debate` surfaces for `tier: constitutional` proposals. Both stay in
+  `.fux/constitution.lock`; v1 remains on the record as immutable, sealed, deprecated evidence.
 
 **Next (deferred):** the runtime critic (§5 step 3) — expose `critique` as a callable in
 front of an app's live money/PII paths. Covered by
@@ -476,6 +488,28 @@ Planned (engine, see [fux-plan.md §17.10–12](fux-plan.md)):
 - ⬜ **PyPI packaging** — bundle `schema.json`/`hooks`/`global`/`skills` as package
   data, add a `fux setup` command, and a Trusted-Publishing release workflow →
   `pipx install fux-engine && fux setup`.
+
+**Constitution layer — tracked Phase-2 follow-up (from the founding `con-amendment` debate's
+disclosed implementation debt; one enforcement now has live evidence):**
+
+- ⬜ **`supersedes:` edge check (HIGH — live evidence).** The engine should reject re-stamping a
+  constitutional rule whose *body* changed without a declared supersession, and validate that a
+  successor declares `edges.supersedes: [<old-id>]` **and** is itself `tier: constitutional`.
+  *Why now:* the [`con-amendment` → `con-amendment-v2`](../.fux/rules/con-amendment-v2.md)
+  amendment (F3) was landed by supersession **manually** — the human upheld the discipline the
+  engine cannot yet enforce. Until this check exists, `fux ratify` would also accept an in-place
+  body edit re-stamped under the same id (the laundering path). This is the concrete reason the
+  check is the priority of the four.
+- ⬜ **Predecessor → `deprecated` at ratification** of a successor (today done by hand + a
+  re-ratify of the predecessor to re-seal its deprecated frontmatter — `status` is not in
+  `_VOLATILE`, so deprecating a ratified rule changes its `content_seal` and must be re-stamped).
+- ⬜ **Minimum-transcript-content check** (≥2 distinct reviewer positions, ≥1 sustained objection,
+  a recorded tie-break) — today `debate_hash` accepts any recorded bytes.
+- ⬜ **Constitutional-successor tier check** — a successor to a constitutional rule must itself be
+  `tier: constitutional` + ratified, else supersession is a downgrade-laundering path.
+
+These four land as a later supersession (`con-amendment-v3`) once built — single-concern, the way
+v2 carried only the authoring heuristic.
 
 Possible follow-ups (not blocking): cross-**file** call edges for more languages;
 auto-suggest `supersedes:` on memory contradiction.

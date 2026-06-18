@@ -10,7 +10,14 @@
 > relevant — and `fux seal` lets `fux check` tell you when the governed code
 > drifted out from under it.
 
-> **New in v0.4.0 — the constitutional-app engine.** Govern where trust lives, opt-in and
+> **New in v0.5.0 — advisory-first critic + the first constitutional amendment.** The judgment
+> critic now **suggests, not blocks**, by default (only deterministic money/PII/audit invariants
+> block — escalate a trusted judgment principle with `critic_block_judgment`); **`fux constitution`**
+> gains recent debates + violations grouped by severity; and the amendment article itself was
+> amended **by supersession** (`con-amendment` → `con-amendment-v2`, adding the "is this
+> constitutional?" authoring test) — the rule proving it binds its own author.
+>
+> **v0.4.0 — the constitutional-app engine.** Govern where trust lives, opt-in and
 > `$0`: give a rule a `tier` (`constitutional` · `standard` · `advisory`); author principles
 > by two-agent **`/fux debate`**; **`fux ratify`** a rule into a tamper-evident constitution
 > (sealed in **`.fux/constitution.lock`** — any later edit/add/delete is an always-blocking
@@ -86,7 +93,7 @@ fux recall "how is day P&L computed" --hybrid  # BM25F; RRF-fuse lexical+semanti
 fux seal --all                 # bind rules to an AST fingerprint of their code
 fux debate "<rule>" (skill)    # two-agent free debate → you ratify the result
 fux ratify <id> --by Arpit     # ratify a constitutional rule (tamper-evident; the only path)
-fux constitution               # status view: what's law, what it governs, current violations
+fux constitution               # status view: what's law, what it governs, recent debates, violations by severity
 fux critic "<change>"          # critique a change vs principles before it lands (deterministic pass; $0)
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz for div-by-zero
@@ -178,8 +185,11 @@ At the action boundary (PreToolUse / pre-commit), `fux critic "<change>"` runs t
 self-critiques the `judgment` principles with its own tokens (the `critic` skill drives the
 bounded revise / escalate / `/fux debate` loop); verdicts land in `.fux/out/critic.jsonl`,
 and `fux gate` reports any ungoverned `important_globs` path (report-first, never blocks).
-A headless AI critic for no-session/runtime use ships behind an opt-in `[critic]` extra
-(mirroring `[embeddings]`) — the default install stays model-free.
+The judgment critic is **advisory-first**: a judgment fail is a *suggestion*, not a blocker,
+so it earns trust before it interrupts — only deterministic hard-invariants block by default,
+and you escalate a trusted judgment principle to blocking with `critic_block_judgment` in
+`.fux/config.toml`. A headless AI critic for no-session/runtime use ships behind an opt-in
+`[critic]` extra (mirroring `[embeddings]`) — the default install stays model-free.
 
 For cross-session memory it stays **authored, not captured**: an opt-in `capture`
 hook queues *which* files changed for `fux distill` (human-confirmed) rather than

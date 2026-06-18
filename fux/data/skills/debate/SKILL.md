@@ -24,7 +24,22 @@ on instant agreement) and means the result, if ratified, enters the apex via `fu
 
 1. **Ensure engine + project** — `skills/fux/SKILL.md` Steps 1–2.
 
-2. **Spawn two sub-agents — blind first pass.** Use the Task tool (Claude Code) / Agent tool
+2. **"Is this constitutional?" test — only when `--tier constitutional` (surface, don't gate).**
+   Before spawning the debate, put this test to the human in one line (it is a **judgment** call,
+   never a deterministic check — per the deterministic/judgment split, no `$0` check can decide it):
+
+   > A rule is constitutional **only if** a wrong answer costs **money, PII, audit, or trust**
+   > **AND** the rule **never legitimately changes**. If either half fails, it is a `standard`
+   > rule — not constitutional.
+
+   - **Over-constitutionalizing** — the rule is expected to evolve (a convention, a default, a
+     style call): drop `--tier constitutional`, author it as `standard`.
+   - **Under-constitutionalizing** — a money/PII/audit invariant proposed as `standard`: raise it.
+
+   This is the authoring article of [`con-amendment-v2`](../../../../.fux/rules/con-amendment-v2.md).
+   Surface it; let the human classify; record their answer in the transcript's first lines.
+
+3. **Spawn two sub-agents — blind first pass.** Use the Task tool (Claude Code) / Agent tool
    (Cowork) to spawn **two** agents. Brief **both identically**: each is *fluent in building
    **and** selling* the product, and has **no assigned side** — this is a free debate, not a
    pro/con setup. Give each only the proposed rule and the codebase, **not the other's
@@ -34,17 +49,17 @@ on instant agreement) and means the result, if ratified, enters the apex via `fu
    - **at least one concrete objection** to the rule as written (a failure mode, a cost, a
      case it breaks) — an agent that raises none has not done its job; send it back.
 
-3. **Reveal + debate.** Show each agent the other's first pass and run 1–3 rounds where they
+4. **Reveal + debate.** Show each agent the other's first pass and run 1–3 rounds where they
    cross-examine: defend, concede, or amend. Capture every round verbatim.
 
-4. **Anti-sycophancy gates (enforce, do not skip):**
-   - Each agent must have surfaced **≥ 1 concrete objection** (step 2).
+5. **Anti-sycophancy gates (enforce, do not skip):**
+   - Each agent must have surfaced **≥ 1 concrete objection** (step 3).
    - **Convergence counts only after both genuinely tried to break the rule** — if either
      agreed without attempting to falsify it, run another adversarial round.
    - **Instant agreement on a `--tier constitutional` rule forces one extra adversarial
      round** — the apex is too important to wave through.
 
-5. **Outcome.**
+6. **Outcome.**
    - **Converged** → write the full transcript (both blind passes + every round + the agreed
      final wording + residual risks) to `.fux/debates/<rule-id>.md`. Then present the agreed
      rule and hand the user the exact commands to author + ratify — **do not ratify

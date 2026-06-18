@@ -73,3 +73,25 @@ def test_non_constitutional_rules_unaffected(project):
     assert not [f for f in findings if f.kind == "tampered"]   # tamper/lock skip standard
     code, _ = gate.run(project)
     assert code == 0                                   # standard dead-ref is non-blocking under fix
+
+
+def test_supersession_keeps_predecessor_sealed_and_gate_clean(project):
+    # The F3 amendment shape: change a constitutional rule by SUPERSESSION, not in-place edit.
+    # Predecessor is deprecated + re-sealed; successor is ratified; both stay in the lock; clean.
+    v1 = ("---\nid: con-v1\ntype: rule\nstatus: active\ntier: constitutional\n---\n"
+          "**Rule:** the founding article.\n")
+    write_rule(project, "con-v1", v1)
+    _ratify(project, "con-v1")
+    # Author the successor (single-concern additive change), deprecate + re-seal the predecessor.
+    v2 = ("---\nid: con-v2\ntype: rule\nstatus: active\ntier: constitutional\n"
+          "edges:\n  supersedes:\n    - con-v1\n---\n**Rule:** the founding article, plus a clause.\n")
+    write_rule(project, "con-v2", v2)
+    dep = ("---\nid: con-v1\ntype: rule\nstatus: deprecated\ntier: constitutional\n"
+           "edges:\n  superseded-by:\n    - con-v2\n---\n**Rule:** the founding article.\n")
+    write_rule(project, "con-v1", dep)
+    _ratify(project, "con-v1")                         # re-seal the deprecated frontmatter
+    _ratify(project, "con-v2")                         # ratify the successor
+    lock = (project / ".fux" / "constitution.lock").read_text()
+    assert "con-v1" in lock and "con-v2" in lock       # both on the record, sealed
+    code, report = gate.run(project)
+    assert code == 0, report                            # supersession lands clean — no tamper

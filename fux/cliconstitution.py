@@ -54,20 +54,29 @@ def cmd_constitution(args) -> int:
 
 def cmd_critic(args) -> int:
     """Critique a proposed change: deterministic pass first, then list judgment principles the
-    host agent must self-critique. $0, no LLM — the agent (or `[critic]` extra) is the judge."""
+    host agent must self-critique. $0, no LLM — the agent (or `[critic]` extra) is the judge.
+
+    Advisory-first (F1): deterministic fails block (exit 2); judgment fails are *suggestions*
+    by default and do not block unless escalated via `critic_block_judgment`."""
     here = root()
     result = criticloop.critique(here, args.proposal)
     criticloop.record(here, result)
     for v in result.verdicts:
+        suffix = " (advisory)" if v.status == "fail" and v.advisory else ""
         mark = {"pass": "✔", "fail": "✗", "needs-judgment": "?"}.get(v.status, "·")
-        print(f"  {mark} [{v.status}] {v.principle}: {v.rationale}".rstrip())
+        print(f"  {mark} [{v.status}{suffix}] {v.principle}: {v.rationale}".rstrip())
+    sugg = result.suggestions
+    if sugg:
+        print(f"\n{len(sugg)} judgment suggestion(s) — advisory, not blocking. Escalate a trusted "
+              "principle with `critic_block_judgment` in .fux/config.toml to make it block.")
     pend = result.pending
     if pend:
         print(f"\n{len(pend)} judgment principle(s) need self-critique — review each against the "
               "proposal, revise, escalate if borderline (skills/critic/SKILL.md).")
     if result.blocked:
-        print("\n✗ critic: a deterministic principle is violated — fix before proceeding.")
+        print("\n✗ critic: a blocking principle is violated — fix before proceeding.")
         return 2
     if not pend:
-        print("\n✔ critic: deterministic pass clean.")
+        print("\n✔ critic: deterministic pass clean."
+              + (" Judgment suggestions are advisory." if sugg else ""))
     return 0

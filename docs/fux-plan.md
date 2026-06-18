@@ -278,14 +278,29 @@ principles are appended to `.fux/out/critic.jsonl`. `fux gate` also **reports** 
 never blocks on adoption) every `important_globs` path governed by zero rules — total
 governance made measurable without flooding an existing repo.
 
+**§7d — Advisory-first critic (the trust lever).** Only **deterministic** hard-invariants
+(money / PII / numbers / audit) block by default. A **judgment** principle fail surfaces as an
+*advisory suggestion* and does **not** fail the gate — a judgment critic that interrupts on day
+one gets turned off, so it must earn trust before it bites. A repo escalates a now-trusted
+judgment principle to blocking with `critic_block_judgment` in `.fux/config.toml`
+(`= true` ⇒ every judgment principle blocks; a list of ids ⇒ only those). `CriticResult.blocked`
+counts only non-advisory fails; `CriticResult.suggestions` carries the advisory ones. The
+deterministic/judgment split (§7c) is unchanged — this only softens the *judgment* side's default
+from block to suggest.
+
 The meta-rule that governs the layer itself is
-[`con-amendment`](../.fux/rules/con-amendment.md): a constitutional rule is created or
-changed only via **propose → debate → ratify**, changes only by **supersession** (never
-in-place edit), and ratification needs a named human ratifier plus a recorded debate. Tier
-blocking + migration guard ship in Phase 1; tamper-evidence + `fux ratify` in Phase 2; the
-two-agent debate that stamps `ratification.debate_hash` in Phase 3; the deterministic/
-judgment router + `untagged-candidate` backfill guide in Phase 4; the critic loop (behind the
-`[critic]` extra) + the report-first coverage gate in Phase 5.
+[`con-amendment-v2`](../.fux/rules/con-amendment-v2.md) (which **supersedes** the founding
+[`con-amendment`](../.fux/rules/con-amendment.md) — the constitution's first real amendment,
+landed by supersession to prove the rule binds its own author): a constitutional rule is created
+or changed only via **propose → debate → ratify**, changes only by **supersession** (never
+in-place edit), and ratification needs a named human ratifier plus a recorded debate. v2 adds the
+**"is this constitutional?" authoring test** — a rule is constitutional *only if* a wrong answer
+costs money/PII/audit/trust **and** the rule never legitimately changes; `/fux debate` surfaces
+this test (a judgment call, never a deterministic gate) when a proposal is tagged
+`tier: constitutional`. Tier blocking + migration guard ship in Phase 1; tamper-evidence +
+`fux ratify` in Phase 2; the two-agent debate that stamps `ratification.debate_hash` in Phase 3;
+the deterministic/judgment router + `untagged-candidate` backfill guide in Phase 4; the critic
+loop (behind the `[critic]` extra) + the report-first coverage gate in Phase 5.
 
 ---
 
