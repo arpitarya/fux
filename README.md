@@ -19,7 +19,7 @@ The *why* behind your code — why this formula, why this invariant, why it was 
 
 ## The story
 
-> *A story? In a README? I know — stop clutching your config flags.* We don't do stories here. We do badges, a wall of CLI options, and a "Contributing" section nobody's opened since 2019, and we call it documentation. But here's the thing: you will not remember my feature list. You'll remember the pipe. So I wrote the pipe. Ninety seconds, it's about a basement, and — spoiler — you're the idiot in it. Read it. — *Arpit*
+> *A story? In a README? I know. But here's a fun fact about the human animal: nobody, in the entire history of the species, was ever moved by a bullet point.* We do badges, a wall of CLI flags, and a "Contributing" section nobody's opened since 2019 — and we call it documentation. You will not remember my feature list. You'll remember the pipe. So I wrote the pipe. Ninety seconds, it's about a basement, and — spoiler — you're the idiot in it. Read it. — *Arpit*
 
 You move into an old house. Down in the basement, the previous owner painted one pipe bright red. You have no idea why — so when you renovate, you treat it like any other pipe and reroute it. A week later, the basement floods. That red pipe froze every winter, and the paint was the owner's way of saying *leave this one alone.* They knew. They just never wrote it down, and then they moved out.
 
