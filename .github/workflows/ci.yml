@@ -55,3 +55,28 @@ jobs:
 
       - name: Check distribution metadata
         run: pip install twine && twine check dist/*
+
+  gate:
+    # The constitutional merge gate. This job's check context ("fux gate" —
+    # the bare job name, as the check-runs API reports it) is the REQUIRED
+    # status check on the protected branch — see
+    # .github/branch-protection.json and docs/constitution-enforcement-handoff.md.
+    name: fux gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install (stdlib-only engine)
+        run: pip install -e .
+
+      - name: Seed agent home (schema + bundled rules)
+        run: fux setup
+
+      - name: Gate — knowledge must be in sync with code (exit 2 blocks merge)
+        run: fux gate
