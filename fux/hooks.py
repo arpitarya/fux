@@ -92,8 +92,28 @@ def user_prompt_recall() -> int:
         return 0
     hits = recall.run(root, prompt, top=4)
     if hits:
-        print("Fux — rules relevant to this prompt:")
+        lines = ["Fux — rules relevant to this prompt:"]
         for r, _ in hits:
-            print(explain.render_why(r))
-            print("---")
+            lines.append(explain.render_why(r))
+            lines.append("---")
+        payload = "\n".join(lines)
+        print(payload)
+        _emit_recall_receipt(root, ev, [r for r, _ in hits], payload)
     return 0
+
+
+def _emit_recall_receipt(root, ev, rules, payload) -> None:
+    """File a token-saving receipt: distilled recall vs the selected rules' whole
+    source files (the §5 conservative default). Fail-open — never breaks the hook."""
+    try:
+        from fux import cage_receipt
+        seen, raw = set(), 0
+        for r in rules:                       # whole source files fux selected, deduped
+            if r.path in seen:
+                continue
+            seen.add(r.path)
+            raw += cage_receipt.toks(r.path.read_text(encoding="utf-8"))
+        cage_receipt.emit("fux", raw, cage_receipt.toks(payload),
+                          task=ev.get("session_id", ""), op="hook-recall")
+    except Exception:                          # any error → no receipt, no disruption
+        return
