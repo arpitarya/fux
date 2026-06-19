@@ -147,6 +147,16 @@ Implemented ([fux/graph.py](fux/graph.py), [fux/astextract.py](fux/astextract.py
 - **Validated** against a labelled paraphrase eval set + `recall@k`/MRR metrics
   ([fux/bench.py](fux/bench.py), [tests/test_recall_eval.py](tests/test_recall_eval.py)):
   lexical recall@1 = 1.0, hybrid recall@3 = 1.0; hybrid asserted not to regress.
+- **Optional cage receipt (token-savings, off-by-default).** `hook-recall` injects
+  only the relevant rules instead of the whole corpus — a measurable token saving.
+  When the optional `cage` ledger is installed, the recall hook files one
+  `tool="fux"` receipt: `actual` = the injected payload's tokens, `raw_alternative`
+  = the selected rules' **whole source files** loaded raw (the conservative
+  distilled-vs-source default), tagged `modeled`, `confidence=0.7`, `meta={"op":
+  "hook-recall"}`. It is a **fail-open lazy shim** ([fux/cage_receipt.py](fux/cage_receipt.py)):
+  cage is **never** a dependency — `import cage` is wrapped in `try/except` and the
+  hook is byte-identical with cage absent. No rule text or PII leaves fux — counts
+  only. See cage's [receipt contract](https://github.com/arpitarya/cage).
 
 ### 2.8 Verify — ✅ (plan §10.1)
 
