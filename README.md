@@ -178,7 +178,7 @@ Fux **unifies and replaces** three things a project usually runs separately — 
 
 ---
 
-If the red-pipe problem is real in your codebase, **★ star the repo** and try Fux on one rule — `pip install fux-engine`.
+If the red-pipe problem is real in your codebase, try Fux on one rule — `pip install fux-engine`.
 
 ## License
 
