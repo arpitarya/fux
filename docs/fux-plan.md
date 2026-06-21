@@ -500,14 +500,24 @@ Beyond the core, these make Fux materially more useful:
     function-soup and knowledge↔code problems are solved by the visual language
     itself. Left rail: stats, search→clickable hits, a Lens grid
     (Knowledge/Communities/Heat/Path), per-type meters-as-filters, and an inspector
-    that surfaces "governed by" first. Centre: the canvas, a Micro/Macro mode pill,
+    that surfaces "governed by" first. The Lens grid also carries a **Coverage**
+    lens (warm = code a rule touches, cold-grey = ungoverned) so the governed/
+    ungoverned split reads at a glance. Centre: the canvas, a Micro/Macro mode pill,
     an edge-language legend, a zoom well. Right rail: a live **minimap** and a
     **governance ledger** of every knowledge→code link with "copy governed
-    subgraph" export. Underneath: bounded inverse-square repulsion + community
-    centroid pull (spreads + clusters, no hairball), percentile `fit`, **semantic
-    zoom** to community super-nodes you can drill into, centrality-driven size +
-    hub halos, a knowledge lens, and BFS **path mode** — all still offline,
-    dependency-free, system-font, and **agent-exportable as markdown**.
+    subgraph" export. Underneath: a hand-rolled **Barnes–Hut quadtree** repulsion
+    (O(n log n), θ≈0.8) + community centroid pull (spreads + clusters, no hairball,
+    smooth at thousands of nodes), percentile `fit`, **viewport culling** and
+    **pre-rendered glow sprites** in the draw path, an **offscreen static-substrate
+    cache** blitted when idle, real **macro LOD** (below `view.k<0.4` each community
+    collapses to one blob with a faint convex-hull territory + top-centrality label;
+    individual nodes return on zoom-in), centrality-driven size + hub halos, a
+    knowledge lens, BFS **path mode**, and a deterministic **governance overlay** —
+    rules whose AST seal has drifted pulse red, constitutional-tier rules wear a
+    crown (both stamped into `graph.json` from the `seal`/`check` pass, never a
+    model) — all still offline, dependency-free, system-font, and
+    **agent-exportable as markdown**. *(Deferred: git-history playback — animating
+    rules + `governs` threads appearing over commits.)*
 
 ---
 

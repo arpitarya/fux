@@ -262,21 +262,47 @@ The interactive `graph.html` ([fux/assets/graph_template.html](fux/assets/graph_
 viewer. Built for both developer review and **agent use**:
 
 - **Filters** — per node-type and per **edge-type** toggles (with counts), all/none.
-- **Colour modes** — node type · community · rule layer · degree heat.
+- **Lenses** — Knowledge · Communities · Heat · Path · **Coverage** (warm = code a
+  rule touches via `governs`/`related`/`references`/`implements`, cold-grey =
+  ungoverned — the governed/ungoverned split at a glance, client-only).
 - **Focus** — click to select, double-click to isolate a node's neighbourhood,
   neighbour highlighting on hover, directed **arrowheads** coloured by edge type.
-- **Details panel** — metadata pills (domain/layer/status/community/degree) +
-  neighbours grouped by edge type, click-through to navigate.
-- **Layout controls** — pause/resume, link-distance & charge sliders, fit, reset,
-  label toggle; keyboard shortcuts (`/ f r space e Esc l`).
-- **Agent export** — *Copy node ⧉* (selected node + connections as markdown) and
-  *Copy visible graph ⧉* (the filtered sub-graph as markdown) → paste straight
-  into an agent prompt.
-- **Performance** — repulsion loop processes each pair once (`i<j`) for O(n²/2)
-  work instead of O(n²); `PHYS_STRIDE` skips physics every other frame on graphs
-  with >600 nodes so the render thread stays at ≥30 fps regardless of graph size.
+- **Macro LOD** — below `view.k < 0.4` each community collapses to **one blob**
+  (area ∝ member count, coloured by community, amber-cored if it holds knowledge)
+  behind a faint **convex-hull territory** with a **top-centrality label**;
+  individual nodes return on zoom-in. Both faster *and* clearer at overview.
+- **Governance overlay** — rules whose **AST seal has drifted** pulse red;
+  **constitutional**-tier rules wear a crown. Both read off `drift`/`tier` fields
+  stamped into `graph.json` (§2.15a) — deterministic, sourced from `seal`/`check`.
+- **Details panel** — metadata pills (domain/layer/status/community/degree, plus
+  `♚ constitutional` / `⚠ drifted`) + neighbours grouped by edge type, click-through.
+- **Agent export** — *Copy node ⧉* / *Copy visible graph ⧉* / *Copy governed
+  subgraph ⧉* as markdown → paste straight into an agent prompt.
+- **Performance** — a hand-rolled **Barnes–Hut quadtree** (O(n log n), θ≈0.8)
+  replaces the old O(n²) pair loop; the draw path adds **viewport culling**,
+  **pre-rendered amber glow sprites** + a two-pass governs-thread stroke (no
+  per-frame `shadowBlur`/gradients), a cached visible-node list, and an **offscreen
+  static-substrate cache** blitted when idle. On the largest available graph
+  (~2,356 nodes / 14,744 edges) median frame time dropped **~38 ms → ~5 ms**
+  active and **~1.9 ms** idle, with no visual regression. Still zero deps, offline.
 
-Render contract covered by [tests/test_graphhtml.py](tests/test_graphhtml.py).
+The new `graph.json` rule-node fields are documented in §2.15a. *(Deferred: Horizon 3
+git-history playback — animating rules + `governs` threads over commits.)*
+
+Render contract + drift/tier stamping covered by
+[tests/test_graphhtml.py](tests/test_graphhtml.py) and
+[tests/test_graph_drift.py](tests/test_graph_drift.py).
+
+### 2.15a Graph drift/tier stamp — ✅
+
+`graph.build` ([fux/graph.py](fux/graph.py)) stamps every **rule node** with two
+extra fields the viewer's governance overlay reads, both **$0 / deterministic / no
+model**:
+
+| Field | Type | Source |
+|---|---|---|
+| `tier` | `"constitutional" \| "standard" \| "advisory"` | verbatim `r.fm.get("tier", "standard")` — the constitutional crown follows ratification, nothing derived |
+| `drift` | `true \| false` | `true` iff the rule has a stored `seal:` **and** `seal.current(root, r)` differs from it (governed code changed *structure* since affirmed) — the **same signal** as `fux check`'s `unsealed` finding ([fux/check.py](fux/check.py) `_seal` / [fux/seal.py](fux/seal.py)). A rule with no seal or no resolvable code is `drift: false` — nothing affirmed to drift from. |
 
 ### 2.16 Skills — ✅ (plan §16)
 

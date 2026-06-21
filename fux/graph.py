@@ -5,7 +5,7 @@ import json
 import re
 from pathlib import Path
 
-from fux import astextract, community, globs, graphquery
+from fux import astextract, community, globs, graphquery, seal
 from fux.model import RuleSet
 
 REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
@@ -73,7 +73,7 @@ def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
     xcalls, covered = _crossfile_calls(nodes, texts, suffixes)
     edges += xcalls
     edges += _xref(nodes, texts, covered)
-    _add_knowledge(nodes, edges, rs)
+    _add_knowledge(nodes, edges, rs, root)
     _stamp_confidence(edges)            # weight-aware before clustering/centrality
     comm = community.detect(list(nodes.values()), edges)
     for nid, c in comm.items():
@@ -137,11 +137,28 @@ def _xref(nodes: dict, texts: dict[str, str], covered: set[tuple[str, str]]) -> 
     return out
 
 
-def _add_knowledge(nodes: dict, edges: list, rs: RuleSet) -> None:
+def _drift_of(root: Path, r) -> bool:
+    """Has a sealed rule's governed code changed *structure* since it was sealed?
+
+    Sourced identically to ``fux check``'s ``unsealed`` finding (``check._seal`` /
+    ``seal.current``) — $0, deterministic AST/parse, never a model. A rule with no
+    stored ``seal:`` (or no resolvable code) is *not* drifted: there's nothing
+    affirmed to drift from.
+    """
+    stored = r.fm.get("seal")
+    if not stored:
+        return False
+    actual = seal.current(root, r)
+    return actual is not None and actual != stored
+
+
+def _add_knowledge(nodes: dict, edges: list, rs: RuleSet, root: Path) -> None:
     ids = {r.id for r in rs.rules}
     for r in rs.rules:
-        nodes[f"rule:{r.id}"] = {"id": f"rule:{r.id}", "label": r.id, "type": r.type,
-                                 "layer": r.layer, "status": r.status, "domain": r.domain}
+        node = {"id": f"rule:{r.id}", "label": r.id, "type": r.type,
+                "layer": r.layer, "status": r.status, "domain": r.domain,
+                "tier": str(r.fm.get("tier", "standard")), "drift": _drift_of(root, r)}
+        nodes[f"rule:{r.id}"] = node
     for r in rs.rules:
         for ref in r.code_refs:
             m = REF_RE.match(ref.strip())
