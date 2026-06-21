@@ -46,11 +46,18 @@ find it), except `fux init` which scaffolds one in the current directory.
 | `fux report` | Write `GRAPH_REPORT.md` — god nodes (degree) + **chokepoints (PageRank centrality)** + community structure. | $0 |
 
 `fux build` also writes `GRAPH_REPORT.md` and tags every graph node with a
-**community** index (deterministic label propagation); `graph.html` has a
-*colour: type ⇄ community* toggle. The graph carries `governs` (rule→code),
-`contains` (file→symbol), `calls` (intra-file — Python via `ast`, JS/TS/Go/Rust
-via a brace-matched heuristic), and `references` (cross-file/cross-language)
-edges. In the `graph.html` inspector, a node's `file:line` is a clickable
+**community** index (deterministic label propagation); `graph.html` has
+Knowledge / Communities / Heat / Path / **Coverage** lenses. The graph carries
+`governs` (rule→code), `contains` (file→symbol), `calls` (intra-file — Python via
+`ast`, JS/TS/Go/Rust via a brace-matched heuristic), and `references`
+(cross-file/cross-language) edges. Each **rule node** is also stamped with `tier`
+(verbatim from frontmatter) and `drift` (`true` when its `seal:` no longer matches
+the governed code's structure — the same signal as `fux check`'s `unsealed`, $0 and
+deterministic); the viewer pulses drifted rules red and crowns constitutional ones.
+The viewer stays smooth at thousands of nodes (Barnes–Hut layout + viewport culling
++ pre-rendered glow + idle substrate cache) and collapses each community to one
+labelled blob when zoomed out. In the `graph.html` inspector, a node's `file:line`
+is a clickable
 `<editor>://file/<abs>:<line>` deep link that opens the exact line in your editor
 — set `graph_editor` in `.fux/config.toml` (`vscode` (default) · `vscode-insiders`
 · `cursor` · `windsurf`).

@@ -2,6 +2,50 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.8.0] — 2026-06-21 — Solar Terminal viewer: fast, legible, governance-aware
+
+The interactive `graph.html` viewer was reworked end-to-end so it stays smooth at
+thousands of nodes and turns from eye-candy into a decision tool. Additive and
+backward-compatible — `graph.json` gains two rule-node fields; upgrading is a CLI
+no-op. Still zero runtime deps, one self-contained offline file, deterministic `$0`
+build, same Solar Terminal look.
+
+### Added
+- **Macro LOD** — below `view.k < 0.4` each community collapses to one blob (area ∝
+  member count, community-coloured, amber-cored if it holds knowledge) behind a faint
+  **convex-hull territory** with a top-centrality label; individual nodes return on
+  zoom-in (`drawMacro`/`macroRollup`/`convexHull`).
+- **Coverage lens** — tints code warm when a rule touches it (via `governs`/`related`/
+  `references`/`implements`), cold-grey when ungoverned, so the governed/ungoverned
+  split reads at a glance. Client-only, no data change.
+- **Governance overlay** — rules whose **AST seal has drifted** pulse red and
+  **constitutional**-tier rules wear a crown. Driven by two new `graph.json` rule-node
+  fields, **`drift`** and **`tier`**, stamped by `graph.build` from the existing
+  `seal`/`check` pass — `$0`, deterministic, never a model. `drift` equals `fux check`'s
+  `unsealed` set exactly (`graph._drift_of` mirrors `check._seal`/`seal.current`).
+
+### Changed
+- **Layout + render rewritten for scale** — a hand-rolled **Barnes–Hut quadtree**
+  (O(n log n), θ≈0.8) replaces the O(n²) repulsion loop; the draw path adds viewport
+  culling, pre-rendered amber glow sprites + a two-pass governs-thread stroke (no
+  per-frame `shadowBlur`/gradients), a cached visible-node list, and an offscreen
+  static-substrate cache blitted when idle. On the largest test graph (~2,356 nodes /
+  14,744 edges) median frame time dropped **~38 ms → ~5 ms** active and **~1.9 ms**
+  idle, with no visual regression.
+
+### Deferred
+- **Git-history playback** (animating rules + `governs` threads over commits) — noted
+  as a follow-up, not built.
+
+## [0.7.0] — 2026-06-21 — optional cage token-savings receipt + docs reorg
+
+### Added
+- **Cage token-savings receipt** — optional per-session savings attribution from the
+  Cage ledger.
+
+### Changed
+- **Docs reorganised.** No engine/command/schema change beyond the above.
+
 ## [0.6.2] — 2026-06-19 — README copy edit
 
 Docs-only. No engine, command, schema, or dependency change — upgrading is a CLI no-op.

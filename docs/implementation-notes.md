@@ -315,6 +315,44 @@ these is skipped, so the "never a false fail" guarantee is preserved.
   stale finding with the changed path so the `/fux` skill / Stop reminder hands it
   to Claude. Full diff-in-the-prompt is a small follow-up.
 
+## Update — graph viewer: fast, legible, governance-aware
+
+The Solar Terminal viewer was reworked end-to-end (`fux/assets/graph_boot.js`,
+`graph_template.html`, `fux/graphhtml.py`, `fux/graph.py`) against the largest
+available graph (~2,356 nodes / 14,744 edges). All four non-negotiables held: zero
+runtime deps, one self-contained offline file, deterministic `$0` build, same look.
+
+- **Barnes–Hut repulsion** (`buildBH`/`bhForce`/`BH_THETA`) — the bottleneck was the
+  O(n²) pair loop in `step()`, not rendering (~38 ms/frame was ~38 ms of physics). A
+  hand-rolled flat-array quadtree (per-cell centre-of-mass + count; a far cell is one
+  charge when `size²/dist² < θ²`, θ=0.8) replaces it, preserving the *exact* force law
+  + `REP_RANGE` cutoff so the settled layout is indistinguishable. **~38 ms → ~3 ms**
+  step.
+- **Draw path** — once-per-frame **viewport culling** (`updateViewport`/`onPt`/
+  `segVisible`, a separating-axis reject so a segment can't be culled if it crosses
+  the screen); **pre-rendered amber glow sprites** (`glowSprite`) + a two-pass static
+  governs-thread stroke replace per-node `createRadialGradient` and per-frame
+  `shadowBlur`/`createLinearGradient`; a **cached visible-node list** (`visList`,
+  invalidated by `invalidateVis()` on filter/focus toggles); and an **offscreen
+  static-substrate canvas** (`substratePass`) blitted with one `drawImage` when the
+  layout is settled and the camera still. Net: **~5 ms** active, **~1.9 ms** idle.
+- **Macro LOD** (`drawMacro`/`macroRollup`/`convexHull`, `MACRO_K=0.4`) — far out,
+  each community renders as one blob (area ∝ member count, community-coloured,
+  amber-cored if it holds knowledge) behind a faint convex-hull territory with a
+  de-overlapped top-centrality label; the per-node passes are skipped. Individual
+  nodes return on zoom-in. This replaces the old node-mode "Macro" with a real
+  semantic-zoom overview — faster *and* clearer. (`drawClusters`/`COLLAPSE_K` from the
+  earlier note are superseded by this.)
+- **Coverage + drift overlay** — a client-only **Coverage lens** tints code warm when
+  a rule touches it (`governedCode`/`isGoverned`), cold-grey otherwise. The **drift
+  pulse** + **constitutional crown** read two new `graph.json` rule-node fields,
+  `drift` and `tier`, stamped by `graph.build` from the existing `seal`/`check` pass
+  (`graph._drift_of` mirrors `check._seal` / `seal.current`; `tier` is a verbatim
+  frontmatter read). Both are $0, deterministic, never a model — `drift` equals
+  `fux check`'s `unsealed` set exactly (pinned by `tests/test_graph_drift.py`).
+- **Deferred** (Horizon 3): git-history playback — animating rules + `governs`
+  threads appearing over commits. Not built; left as a follow-up.
+
 ## Dependencies
 
 Zero third-party runtime dependencies (stdlib only) — including a hand-rolled
