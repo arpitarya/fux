@@ -166,6 +166,8 @@ Every maintenance command is shell / AST / parse — **no LLM calls, ever.** The
 
 ## What's new
 
+- **v0.8.0 — Solar Terminal viewer: fast, legible, governance-aware.** A hand-rolled Barnes–Hut layout keeps `graph.html` smooth at thousands of nodes (~38 ms → ~5 ms/frame on a ~2,400-node graph); zoom out and each community collapses to one labelled blob. A **Coverage** lens warms the governed code so the ungoverned grey is the finding, and rules whose **AST seal drifted pulse red** (constitutional ones wear a crown) — straight from `fux check`, never invented. Still one offline file, zero deps.
+- **v0.7.0 — optional cage token-savings receipt.** Per-session savings attribution from the Cage ledger, plus a docs reorg. `$0`, no engine change.
 - **v0.6.0 — the wall is real.** Merging to `main` requires `fux gate` + `ai-review` (separate reviewer, refuses when reviewer == author). `fux ratify` opens its own gated PR; a weekly drift audit catches protection changes. ([details](docs/constitution-enforcement-handoff.md))
 - **v0.5.0 — advisory-first critic + first amendment.** The judgment critic suggests rather than blocks; `fux constitution` gains debates + violations by severity; the amendment article amended *itself* by supersession.
 - **v0.4.0 — the constitutional-app engine.** `tier`, `/fux debate`, `fux ratify`, `.fux/constitution.lock`, `fux critic`, and the deterministic/judgment split. Opt-in and `$0`.
