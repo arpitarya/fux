@@ -13,7 +13,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 27 commands wired in [fux/cli.py](fux/cli.py) (incl. `seal`, `mine`) |
+| Core CLI surface (plan §9) | ✅ | 39 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
 | Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
@@ -73,6 +73,10 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux path <a> <b>` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
 | `fux explain <term>` | ✅ | [fux/explain.py](fux/explain.py) |
 | `fux report` | ✅ | [fux/report.py](fux/report.py) |
+| `fux help [<cmd>]` · grouped `--help` | ✅ | [fux/registry.py](fux/registry.py), [fux/clihelp.py](fux/clihelp.py) |
+| `fux how "Q" [--top N] [--explain]` | ✅ | [fux/howto.py](fux/howto.py) (reuses [fux/recall.py](fux/recall.py)) |
+| `fux scrape <url>` · `<id> --recheck` | ✅ | skill ([data/skills/scrape](fux/data/skills/scrape/SKILL.md)) + [fux/scrape.py](fux/scrape.py), [fux/cdp_utils.py](fux/cdp_utils.py) |
+| `fux fetch-rules <source> [--raw]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/fetchrules.py](fux/fetchrules.py) |
 
 ### 2.2 Hooks — ✅ (plan §8)
 
@@ -379,7 +383,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (213 tests)
+### 2.20 Tests — ✅ (254 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -409,8 +413,45 @@ the **deterministic/judgment split + backfill guide** ([test_critic_split.py](te
 the **critique→act loop + advisory-first critic + report-first coverage gate**
 ([test_critic_loop.py](tests/test_critic_loop.py)),
 the **ratify → branch+PR routing guards** ([test_ratify_pr_routing.py](tests/test_ratify_pr_routing.py)),
-plus the **no-LLM-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
+the **CLI help registry + `fux how` self-docs + CDP precedence + scrape provenance/recheck**
+([test_howto_help_scrape.py](tests/test_howto_help_scrape.py)),
+plus the **no-LLM-and-no-network-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
+
+### 2.20a Command registry + `fux how` + scrape — ✅ (handoff A–D)
+
+The web-rules / self-docs / CLI-help bundle, all `$0`/stdlib/deterministic:
+
+- **D · One command registry** ([fux/registry.py](fux/registry.py)) — name · group
+  (authoring · verification · governance · runtime) · one-line desc · copy-paste
+  example · related, one per public command. [fux/clihelp.py](fux/clihelp.py) renders
+  the grouped `fux --help`, the per-command `fux help <cmd>` / `fux <cmd> --help`
+  (desc + usage + example + related), and the `docs/cli.md` registry table — a test
+  asserts the doc block equals `clihelp.render_cli_md_block()` so help/docs can't drift,
+  and another asserts the registry equals the CLI dispatch surface.
+- **C · `fux how`** ([fux/howto.py](fux/howto.py)) — builds a synthetic corpus from the
+  registry + a few self-doc snippets and runs the **existing BM25F recall**
+  ([fux/recall.py](fux/recall.py)) over it; returns a short explanation **plus the exact
+  command** for the task. Deterministic + byte-stable; `--explain` emits a fenced prompt
+  the *host agent* answers (its tokens), never an engine call.
+- **B · CDP endpoint** ([fux/cdp_utils.py](fux/cdp_utils.py), ≤50 lines) — pure-string
+  resolution by precedence: `--cdp-port`/`--cdp-host` flags → `FUX_CDP_PORT`/`FUX_CDP_HOST`
+  env → `cdp_port`/`cdp_host` in config → default `127.0.0.1:9299`. No socket on the engine
+  side; config defaults + template entry in [fux/config.py](fux/config.py).
+- **A · Scrape** — a **skill** ([data/skills/scrape/SKILL.md](fux/data/skills/scrape/SKILL.md)),
+  wired into `fux setup`/`install.sh` + the `/fux` index: the agent fetches (HTTP → CDP),
+  classifies trust (docs→`convention`; own→`rule`/`glossary`; market→`rule`;
+  regulatory/tax/compliance→`regulatory`, DRAFT-VERIFY, mandatory human ratify), and drafts
+  `status: draft` rules with new additive optional schema fields `source`/`fetched`/
+  `source_hash` ([schema.json](schema.json)). The only network-touching engine path is the
+  opt-in `fux scrape <id> --recheck` ([fux/scrape.py](fux/scrape.py), behind the `[scrape]`
+  extra, lazily importing [fux/fetchrules.py](fux/fetchrules.py)) which re-fetches a source,
+  recomputes the canonical hash, and raises a non-blocking `source-drift` finding — **never
+  on the default `fux check` path**.
+- **Guard** ([tests/test_no_llm_imports.py](tests/test_no_llm_imports.py)) extended: no LLM
+  **and no network** import is reachable from check/gate/verify/seal/recall/howto (+
+  registry/clihelp/cdp_utils); only `fetchrules`/`scrape` may name a network client, both
+  lazily imported; the default install is model-free **and offline** (subprocess check).
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 

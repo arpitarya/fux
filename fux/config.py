@@ -39,6 +39,8 @@ DEFAULTS = {
     "critic_block_judgment": False,  # advisory-first critic (§7d, F1): judgment principles
                                # SUGGEST by default. `true` ⇒ all block; a list of ids ⇒ only
                                # those block. Deterministic principles always block regardless.
+    "cdp_host": "127.0.0.1",   # CDP endpoint for the `/fux scrape` render escalation (§B).
+    "cdp_port": 9299,          # Overridden by --cdp-host/--cdp-port flags or FUX_CDP_HOST/PORT env.
 }
 
 
@@ -98,5 +100,9 @@ def default_toml() -> str:
         "# Advisory-first critic (fux critic): judgment principles SUGGEST, not block, by\n"
         "# default. Escalate trusted ones to blocking — true = all, or a list of rule ids.\n"
         "# Deterministic (money/PII/numbers/audit) principles always block regardless.\n"
-        "critic_block_judgment = false\n"
+        "critic_block_judgment = false\n\n"
+        "# CDP endpoint for the `/fux scrape` skill's render escalation (client-rendered\n"
+        "# pages). Precedence: --cdp-host/--cdp-port flags > FUX_CDP_HOST/PORT env > these.\n"
+        'cdp_host = "127.0.0.1"\n'
+        "cdp_port = 9299\n"
     )
