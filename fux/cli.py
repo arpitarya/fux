@@ -1,15 +1,31 @@
-"""`fux` CLI — argparse dispatch over the deterministic command surface (plan §9)."""
+"""`fux` CLI — argparse dispatch over the deterministic command surface (plan §9).
+
+Top-level `--help` and per-command help are rendered from the single command
+registry (``fux/registry.py``) via ``clihelp`` — the same table that powers
+``fux how`` and the generated ``docs/cli.md``, so help can never drift (plan §20).
+"""
 from __future__ import annotations
 
 import argparse
 
-from fux import __version__, clicmds, cliconstitution, cligraph, cliquery, hooks
+from fux import __version__, clicmds, cliconstitution, cligraph, clihelp, cliquery, hooks, registry
+
+
+class _GroupedHelp(argparse.ArgumentParser):
+    """Top-level parser whose `--help`/usage prints the registry-grouped view."""
+
+    def format_help(self) -> str:        # noqa: D401 — argparse override
+        return clihelp.grouped_help() + "\n"
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog="fux", description="Fux knowledge engine ($0, deterministic).")
+    p = _GroupedHelp(prog="fux", description="Fux knowledge engine ($0, deterministic).")
     p.add_argument("--version", action="version", version=f"fux {__version__}")
     sub = p.add_subparsers(dest="cmd", required=True)
+
+    hp = sub.add_parser("help", help="show grouped help, or detail for one command")
+    hp.add_argument("topic", nargs="?", help="a command name (omit for the grouped list)")
+    hp.set_defaults(fn=cmd_help)
 
     init = sub.add_parser("init", help="scaffold .fux/ + wire hooks in this project")
     init.add_argument("--recall", action="store_true", help="also wire the UserPromptSubmit recall hook")
@@ -180,11 +196,39 @@ def build_parser() -> argparse.ArgumentParser:
     fr.add_argument("--raw", action="store_true", help="omit the header line (pure text output)")
     fr.set_defaults(fn=cliquery.cmd_fetch_rules)
 
+    ho = sub.add_parser("how", help="fux explains fux: a question → the exact command ($0)")
+    ho.add_argument("question", help="what you're trying to do, in plain words")
+    ho.add_argument("--top", type=int, default=3, help="how many candidate commands to show")
+    ho.add_argument("--explain", action="store_true",
+                    help="emit a host-agent prompt for a richer NL answer (opt-in; not on the $0 path)")
+    ho.set_defaults(fn=cliquery.cmd_how)
+
+    sc = sub.add_parser("scrape", help="agent-driven web → draft rules (skill); --recheck re-verifies a source")
+    sc.add_argument("target", nargs="?", help="a URL to scrape (skill) or a rule id to --recheck")
+    sc.add_argument("--recheck", action="store_true",
+                    help="re-fetch a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
+    sc.add_argument("--cdp-port", type=int, help="CDP port for the scrape skill's render escalation")
+    sc.add_argument("--cdp-host", help="CDP host for the scrape skill's render escalation")
+    sc.set_defaults(fn=cliquery.cmd_scrape)
+
     # Internal hook entrypoints (wired by `fux init`, not for direct use).
     sub.add_parser("hook-touch").set_defaults(fn=lambda a: hooks.post_tool_use())
     sub.add_parser("hook-check").set_defaults(fn=lambda a: hooks.stop())
     sub.add_parser("hook-recall").set_defaults(fn=lambda a: hooks.user_prompt_recall())
+
+    # `fux <cmd> --help` shows the registry detail (desc + usage + example + related).
+    for name, parser in sub.choices.items():
+        if registry.get(name) is not None:
+            parser.format_help = (lambda n: lambda: clihelp.command_help(n) + "\n")(name)
     return p
+
+
+def cmd_help(args) -> int:
+    if getattr(args, "topic", None):
+        print(clihelp.command_help(args.topic), end="")
+    else:
+        print(clihelp.grouped_help())
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:

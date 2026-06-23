@@ -171,15 +171,15 @@ def cmd_setup(_args) -> int:
     skills_src = data / "skills"
     _copy_skill(skills_src / "fux", skills_dir / "fux")
     print(f"✔ /fux skill  → {skills_dir / 'fux'}/")
-    for name in ("plan", "adr", "debate", "critic", "trace", "savings", "distill", "fetch-rules"):
+    for name in ("plan", "adr", "debate", "critic", "trace", "savings", "distill", "fetch-rules", "scrape"):
         src = skills_src / name
         if src.exists():
             _copy_skill(src, skills_dir / f"fux-{name}")
-    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,debate,critic,trace,savings,distill,fetch-rules}}/")
+    print(f"✔ sub-skills  → {skills_dir}/fux-{{plan,adr,debate,critic,trace,savings,distill,fetch-rules,scrape}}/")
 
     codex_skills_dir.mkdir(parents=True, exist_ok=True)
     _copy_skill(skills_src / "fux", codex_skills_dir / "fux")
-    for name in ("plan", "adr", "debate", "critic", "trace", "savings", "distill", "fetch-rules"):
+    for name in ("plan", "adr", "debate", "critic", "trace", "savings", "distill", "fetch-rules", "scrape"):
         src = skills_src / name
         if src.exists():
             _copy_skill(src, codex_skills_dir / f"fux-{name}")

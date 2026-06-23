@@ -71,6 +71,7 @@ fux init                      # scaffold .fux/ + agent pointers
 fux new formula day-pnl       # scaffold a rule; fill Rule: / Why: / Edge cases:
 fux build                     # regenerate INDEX + graph        ($0)
 fux why day-pnl               # explain a rule + the code it governs
+fux how "which rules govern a file"   # fux explains fux → the exact command ($0)
 ```
 
 > **Full agent integration** (Claude Code / Codex / Copilot skills + hooks): clone and run `./install.sh` instead — it wires `~/.claude/fux`, the skills, and the SessionStart/PostToolUse/Stop hooks.
@@ -166,6 +167,7 @@ Every maintenance command is shell / AST / parse — **no LLM calls, ever.** The
 
 ## What's new
 
+- **v0.9.0 — web → draft rules, and fux explains fux.** `/fux scrape <url>` lets the agent fetch a page (HTTP, escalating to **CDP** for client-rendered shells — port configurable by flag/env/config, default `:9299`) and draft governed rules with `source`/`fetched`/`source_hash` provenance — always `status: draft`, never auto-active, regulatory drafts flagged *verify-against-source*. `fux how "<question>"` dogfoods the engine: it runs the same `$0` BM25F recall over fux's **own** command registry and returns the exact command for the task (`fux how "which rules govern a file"` → `fux refs <path>`). And one **command registry** now drives a grouped `fux --help`, `fux help <cmd>`, *and* the generated `docs/cli.md` — so help and docs can't drift. The maintenance path stays model-free **and offline** (a guard test proves it).
 - **v0.8.0 — Solar Terminal viewer: fast, legible, governance-aware.** A hand-rolled Barnes–Hut layout keeps `graph.html` smooth at thousands of nodes (~38 ms → ~5 ms/frame on a ~2,400-node graph); zoom out and each community collapses to one labelled blob. A **Coverage** lens warms the governed code so the ungoverned grey is the finding, and rules whose **AST seal drifted pulse red** (constitutional ones wear a crown) — straight from `fux check`, never invented. Still one offline file, zero deps.
 - **v0.7.0 — optional cage token-savings receipt.** Per-session savings attribution from the Cage ledger, plus a docs reorg. `$0`, no engine change.
 - **v0.6.0 — the wall is real.** Merging to `main` requires `fux gate` + `ai-review` (separate reviewer, refuses when reviewer == author). `fux ratify` opens its own gated PR; a weekly drift audit catches protection changes. ([details](docs/constitution-enforcement-handoff.md))

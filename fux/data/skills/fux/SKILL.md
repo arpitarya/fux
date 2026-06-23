@@ -20,6 +20,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux build                 # regenerate INDEX.md + rules.json + graph        ($0)
 /fux check [--fix]         # validate schema/refs/staleness/conflicts; --fix repairs ($0)
 /fux recall "<question>"   # keyword-retrieve the rules relevant to a question ($0)
+/fux how "<question>"      # fux explains fux: a question → the exact command  ($0)
 /fux why <id>              # explain a rule + rationale + linked code         ($0)
 /fux refs <file>           # reverse lookup: which rules govern this file      ($0)
 /fux new <type> <id>       # scaffold a rule from a template                   ($0)
@@ -43,6 +44,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
 /fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
 /fux fetch-rules <source>  # fetch URL/PDF/txt → extract durable rule entries  (skill)
+/fux scrape <url>          # agent fetches a page → drafts governed rules      (skill)
 ```
 
 ## What Fux is for
@@ -102,6 +104,7 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux` or `/fux build` | `$FUX build` then `$FUX check` and summarise drift |
 | `/fux check [--fix]` | `$FUX check [--fix]` |
 | `/fux recall "Q"` | `$FUX recall "Q"` — open the top rule(s) with `$FUX why <id>` |
+| `/fux how "Q"` | `$FUX how "Q"` — fux explains fux: the right command + a one-line why |
 | `/fux why <id>` | `$FUX why <id>` |
 | `/fux refs <file>` | `$FUX refs <file>` |
 | `/fux new <type> <id>` | `$FUX new <type> <id>` then open the stub and fill the body |
@@ -123,6 +126,7 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
 | `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
 | `/fux fetch-rules <src>` | follow `skills/fetch-rules/SKILL.md` |
+| `/fux scrape <url>` | follow `skills/scrape/SKILL.md` (agent fetches → drafts; never auto-active) |
 
 ### Step 4 — When you author or edit a rule
 

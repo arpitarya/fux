@@ -147,6 +147,35 @@ def cmd_capture(args) -> int:
     return 0
 
 
+def cmd_how(args) -> int:
+    """fux explains fux: deterministic recall over the command registry + self-docs.
+
+    Pure $0 — `--explain` only emits a prompt for the host agent (no engine model call).
+    """
+    from fux import howto
+    result = howto.answer(args.question, top=getattr(args, "top", 3))
+    print(howto.render(result))
+    if getattr(args, "explain", False):
+        print("\n" + howto.explain_prompt(result))
+    return 0 if result["hits"] else 1
+
+
+def cmd_scrape(args) -> int:
+    """`/fux scrape <url>` is a SKILL (the agent fetches + drafts). The engine only
+    handles the opt-in `--recheck` source-drift re-verification, behind the network
+    extra — never on the default `fux check` path.
+    """
+    if getattr(args, "recheck", False):
+        from fux import scrape          # lazy: the only network-touching path
+        return scrape.recheck_cmd(root(), getattr(args, "target", None))
+    print("fux scrape is an agent skill — fetching and drafting are the host agent's "
+          "tokens, not the engine.\n"
+          "  Run it via Claude: /fux scrape <url>   (see skills/scrape/SKILL.md)\n"
+          "  Engine side ($0):  fux scrape <rule-id> --recheck   "
+          "(re-verify a drafted source; needs the [scrape] extra)")
+    return 0
+
+
 def cmd_fetch_rules(args) -> int:
     """Fetch and print the plain-text content of a URL / file / PDF.
 

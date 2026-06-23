@@ -399,13 +399,41 @@ fux mcp            # serve the substrate to agents over MCP (stdio)   ($0)
 fux capture        # session observation queue for `fux distill`      ($0)
 fux serve          # local dashboard over the generated views         ($0)
 fux recall --hybrid# RRF-fuse lexical + semantic + graph              ($0)
+fux how "Q"        # fux explains fux: question → the exact command   ($0)
+fux help [<cmd>]   # grouped help / per-command detail (from registry) ($0)
+fux scrape <url>   # agent fetches a page → drafts governed rules     (skill)
+fux fetch-rules <s># fetch URL/PDF/txt → extract durable rule entries (skill)
 ```
 
 Every command is deterministic — the same "no API cost" guarantee that made
 graphify trustworthy.
 
-Higher-level **skills** (`plan`, `adr`, `trace`, `savings`, `distill`) layer on
-top of these commands — see §16.
+**One command registry** ([fux/registry.py](../fux/registry.py)) is the single
+source of truth for the *help surface*: `fux --help` groups commands by group
+(authoring · verification · governance · runtime); `fux help <cmd>` / `fux <cmd>
+--help` print the description, usage, example, and related commands; `docs/cli.md`'s
+command table is regenerated from it (a test fails on drift); and `fux how` recalls
+over it — so the help text, the docs, and the self-documentation can never diverge.
+
+`fux how "<question>"` **dogfoods the engine**: it runs the existing BM25F recall
+(`recall.py`, `$0`, no model) over a corpus built from the registry + a few bundled
+self-doc snippets, and returns a short explanation **plus the exact CLI command** for
+the task (e.g. `fux how "which rules govern a file"` → `fux refs <path>`).
+Deterministic by default; the opt-in `--explain` emits a *fenced prompt* the host
+agent answers with its own tokens — never an engine call, never on the `$0` path.
+
+Higher-level **skills** (`plan`, `adr`, `trace`, `savings`, `distill`, `scrape`)
+layer on top of these commands — see §16. `scrape` (web → draft rules) is a skill,
+not engine code: the agent fetches (HTTP, escalating to **CDP** for client-rendered
+shells — endpoint resolved by [fux/cdp_utils.py](../fux/cdp_utils.py) with precedence
+flags → `FUX_CDP_*` env → config → default `127.0.0.1:9299`), classifies the source's
+trust, and drafts `status: draft` rules carrying `source`/`fetched`/`source_hash`
+provenance (additive optional schema fields). A scraped rule is **never** auto-active
+and **never** auto-constitutional — it is a draft until a human reviews it and (if it
+binds) runs `/fux debate` → `fux ratify`. The only network-touching engine path is the
+opt-in `fux scrape <id> --recheck` (re-fetch a source, recompute the hash, raise a
+non-blocking `source-drift` finding), fenced behind the `[scrape]` extra and never on
+the default `fux check` path.
 
 ---
 

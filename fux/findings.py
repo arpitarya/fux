@@ -5,7 +5,8 @@ from dataclasses import dataclass
 
 # Severity ordering drives strict-mode blocking and DRIFT.md grouping.
 KINDS = ["tampered", "schema", "dead-ref", "stale", "plan-drift", "conflict",
-         "invariant", "memory-stale", "unsealed", "untagged-candidate", "extractor-drift"]
+         "invariant", "memory-stale", "unsealed", "untagged-candidate", "extractor-drift",
+         "source-drift"]
 # Kinds that hard-block in `strict` mode (plan §8 strictness table). `tampered` is
 # special-cased in blocking() to block in ANY mode (constitution layer, plan §6).
 BLOCKING = {"tampered", "schema", "dead-ref", "invariant", "conflict"}
