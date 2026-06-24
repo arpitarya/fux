@@ -18,9 +18,14 @@ from fux.model import LONGFORM, Rule
 # regulatory/narrative/memory are knowledge, not code-bound.
 CODE_BOUND = {"rule", "formula", "invariant", "edge-case"}
 LINT_KINDS = ["no-why", "no-code-refs", "dangling-edge", "no-provenance",
-              "stub-body", "overlap-unlinked"]
+              "stub-body", "overlap-unlinked", "verify-source"]
 _WHY = re.compile(r"\*\*\s*why[\s:：]*\*\*", re.I)
 _REF = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
+# A money figure: a currency symbol/code or a "N%" rate next to a number — enough to
+# flag an image/OCR-derived draft for human verify-source (ingest-files §4), without
+# trying to be a real money parser.
+_MONEY = re.compile(r"[$€£¥]\s?\d|\b\d[\d,.]*\s?%|\b(?:USD|EUR|GBP|INR|JPY)\b", re.I)
+_VERIFY_SOURCE_HINT = re.compile(r"verify[\s-]?source", re.I)
 
 
 def run(root: Path) -> list[Finding]:
@@ -32,6 +37,7 @@ def run(root: Path) -> list[Finding]:
     for r in active:
         out += _lint_one(r, ids)
     out += _overlaps(active)
+    out += _verify_source_candidates(rs.rules)
     return out
 
 
@@ -72,6 +78,24 @@ def _overlaps(active: list[Rule]) -> list[Finding]:
                                    f"governs the same code as '{b.id}' but they are "
                                    "unlinked — add supersedes:/contradicts: or merge"))
                 break
+    return out
+
+
+def _verify_source_candidates(rules: list[Rule]) -> list[Finding]:
+    """Flag image/scanned-PDF-derived drafts that carry a money figure or are
+    `regulatory` — never auto-trusted (ingest-files §4). Scans EVERY rule, including
+    drafts, since an ingested draft never reaches `rs.active()` for review."""
+    out: list[Finding] = []
+    for r in rules:
+        if r.fm.get("source_type") != "image":
+            continue
+        if _VERIFY_SOURCE_HINT.search(r.body):
+            continue   # the skill already flagged it in prose — don't duplicate
+        if r.type == "regulatory" or _MONEY.search(r.body):
+            out.append(Finding(
+                "verify-source", r.id,
+                "image-derived money/regulatory figure — verify against the original "
+                "image/document before trusting it; never auto-ratify"))
     return out
 
 

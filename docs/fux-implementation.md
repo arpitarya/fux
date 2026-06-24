@@ -75,7 +75,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux report` | ✅ | [fux/report.py](fux/report.py) |
 | `fux help [<cmd>]` · grouped `--help` | ✅ | [fux/registry.py](fux/registry.py), [fux/clihelp.py](fux/clihelp.py) |
 | `fux how "Q" [--top N] [--explain]` | ✅ | [fux/howto.py](fux/howto.py) (reuses [fux/recall.py](fux/recall.py)) |
-| `fux scrape <url>` · `<id> --recheck` | ✅ | skill ([data/skills/scrape](fux/data/skills/scrape/SKILL.md)) + [fux/scrape.py](fux/scrape.py), [fux/cdp_utils.py](fux/cdp_utils.py) |
+| `fux ingest <url\|file>` · `<id> --recheck` | ✅ | skill ([data/skills/ingest](fux/data/skills/ingest/SKILL.md)) + [fux/ingest.py](fux/ingest.py), [fux/cdp_utils.py](fux/cdp_utils.py) — `scrape` is a deprecated alias |
 | `fux fetch-rules <source> [--raw]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/fetchrules.py](fux/fetchrules.py) |
 
 ### 2.2 Hooks — ✅ (plan §8)
@@ -413,9 +413,10 @@ the **deterministic/judgment split + backfill guide** ([test_critic_split.py](te
 the **critique→act loop + advisory-first critic + report-first coverage gate**
 ([test_critic_loop.py](tests/test_critic_loop.py)),
 the **ratify → branch+PR routing guards** ([test_ratify_pr_routing.py](tests/test_ratify_pr_routing.py)),
-the **CLI help registry + `fux how` self-docs + CDP precedence + scrape provenance/recheck**
-([test_howto_help_scrape.py](tests/test_howto_help_scrape.py)),
-plus the **no-LLM-and-no-network-on-the-maintenance-path guard** ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
+the **CLI help registry + `fux how` self-docs + CDP precedence + ingest provenance/recheck**
+([test_howto_help_ingest.py](tests/test_howto_help_ingest.py)),
+plus the **no-LLM-and-no-network-and-no-doc/vision-lib-on-the-maintenance-path guard**
+([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
 ### 2.20a Command registry + `fux how` + scrape — ✅ (handoff A–D)
@@ -452,6 +453,48 @@ The web-rules / self-docs / CLI-help bundle, all `$0`/stdlib/deterministic:
   **and no network** import is reachable from check/gate/verify/seal/recall/howto (+
   registry/clihelp/cdp_utils); only `fetchrules`/`scrape` may name a network client, both
   lazily imported; the default install is model-free **and offline** (subprocess check).
+
+### 2.20b Ingest from files (URL → multi-source) — ✅ (ingest-files-handoff.md, PR2)
+
+Generalizes 2.20a's URL-only scraper into a multi-source ingester. Single concern:
+the *extract* step branches on source type; classify → draft → govern is the
+PR1 pipeline, reused as-is.
+
+- **Rename.** `/fux scrape <url>` → `/fux ingest <url|file>`
+  ([fux/cli.py](fux/cli.py), [fux/cliquery.py](fux/cliquery.py),
+  [fux/ingest.py](fux/ingest.py) — was `fux/scrape.py`). `scrape` stays wired as a
+  **deprecated alias** (`cmd_scrape_deprecated`) for one release: same behaviour,
+  prints a one-line deprecation note to stderr.
+- **Five extract branches, all agent-side** ([data/skills/ingest/SKILL.md](fux/data/skills/ingest/SKILL.md),
+  was `data/skills/scrape/SKILL.md`): URL (HTTP → CDP, unchanged from PR1), PDF (the
+  agent's `pdf` skill), Excel/CSV (its `xlsx` skill), TXT/Markdown (read directly),
+  image (native vision/OCR). The engine adds no PDF/Excel/OCR/vision dependency for
+  any of this — extraction is always the host agent's tokens.
+- **Schema** ([schema.json](fux/data/schema.json)) — additive optional `source_type`
+  enum (`url|pdf|xlsx|txt|image`); existing rules with no `source_type` still validate.
+- **Image/OCR trust caution** (handoff §4) — [fux/lint.py](fux/lint.py)
+  `_verify_source_candidates` deterministically scans **every** rule (drafts included,
+  since they never reach `rs.active()`) for `source_type: image` combined with
+  `type: regulatory` or a money pattern in the body, and raises the new `verify-source`
+  finding (added to [fux/findings.py](fux/findings.py) `KINDS`) — advisory, never
+  blocks (`fux gate --strict-lint` can still escalate it like any lint finding).
+- **`--recheck` extended to files** — [fux/ingest.py](fux/ingest.py) `recheck()` already
+  called `fetchrules.fetch_text(source)`, which branches on URL vs local path; no
+  engine change needed — file bytes are read (with `errors="replace"` for non-text
+  files) and hashed the same deterministic way, so a changed local file raises
+  `source-drift` exactly like a changed page.
+- **Guard extended** ([tests/test_no_llm_imports.py](tests/test_no_llm_imports.py)) —
+  `DOC_LIB` regex (`pypdf`/`PyPDF2`/`pdfplumber`/`fitz`/`openpyxl`/`xlrd`/`pandas`/
+  `pytesseract`/`PIL`/`cv2`/`easyocr`) must not be reachable from the maintenance path
+  or anywhere outside `fetchrules.py` (the one sanctioned, lazily-imported `[pdf]` edge
+  for the unrelated `fux fetch-rules` URL/PDF path) — proving `fux ingest`'s file
+  branches stay entirely agent-side.
+- **Tests** ([test_howto_help_ingest.py](tests/test_howto_help_ingest.py), was
+  `test_howto_help_scrape.py`) — a draft per source type carries `source_type` +
+  provenance; an image-derived money/regulatory draft is flagged `verify-source`
+  (and a non-image one is not); `--recheck` fires `source-drift` on a changed local
+  file and stays silent when unchanged; the deprecated `scrape` alias still dispatches
+  and warns; `fux how` now answers "scrape a website into rules" → `ingest`.
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 

@@ -24,7 +24,8 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `build` | authoring | regenerate INDEX + rules.json + graph ($0) | `fux build --full` |
 | `import` | authoring | import existing markdown as narrative entries | `fux import docs/ --type narrative` |
 | `import-memory` | authoring | mirror Claude's home-dir memory into .fux/memory | `fux import-memory --scope shared` |
-| `scrape` | authoring | agent fetches a URL → drafts governed rules (skill) | `fux scrape "https://docs.example.com/api"` |
+| `ingest` | authoring | agent ingests URL/PDF/Excel/TXT/image → drafts governed rules (skill) | `fux ingest "https://docs.example.com/api"` |
+| `scrape` | authoring | deprecated alias for 'ingest' — use 'ingest' instead | `fux ingest "https://docs.example.com/api"` |
 | `fetch-rules` | authoring | fetch URL/PDF/txt → extract durable rule entries (skill) | `fux fetch-rules "https://example.com/policy" --raw` |
 | `check` | verification | validate schema/refs/staleness/conflicts; --fix repairs | `fux check --fix` |
 | `verify` | verification | run invariant/example checks against data | `fux verify --fuzz` |
@@ -62,7 +63,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 <!-- END registry-table -->
 
 > **Regenerating this table.** The block above is rewritten from the registry, not
-> hand-edited. A test (`tests/test_howto_help_scrape.py`) asserts it equals
+> hand-edited. A test (`tests/test_howto_help_ingest.py`) asserts it equals
 > `clihelp.render_cli_md_block()`, so help and docs can't drift. To regenerate after
 > a registry change: `python -c "import pathlib; from fux import clihelp;
 > p=pathlib.Path('docs/cli.md'); p.write_text(clihelp.sync_cli_md(p.read_text()))"`.
@@ -77,7 +78,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `fux context` | Emit the compact Tier-1 INDEX (global ⊕ packs ⊕ project) — the SessionStart injection. | $0 |
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | **BM25F** lexical retrieval (per-field length-normalised). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity; `--expand` widens the query with glossary synonyms + 1-hop `related` neighbours. All `$0`. | $0 |
 | `fux how "Q" [--top N] [--explain]` | **fux explains fux** — runs the same BM25F recall over fux's own **command registry + self-docs** and returns the exact CLI command for the task plus a one-line why (e.g. `fux how "which rules govern a file"` → `fux refs <path>`). Deterministic and `$0`; `--explain` is the *only* path that uses a model — it emits a fenced prompt the **host agent** answers with its own tokens (never an engine call). | $0 |
-| `fux scrape <url> [--cdp-port N] [--cdp-host H]` · `fux scrape <id> --recheck` | Without `--recheck`, `scrape` is an **agent skill** ([skills/scrape](../fux/data/skills/scrape/SKILL.md)): the host agent fetches the page (HTTP, escalating to CDP for client-rendered shells — endpoint resolved by `cdp_utils`, see *CDP endpoint* below), classifies the source's trust, and drafts `status: draft` rules with `source`/`fetched`/`source_hash` provenance — never auto-active, never auto-constitutional. The engine side is the opt-in `--recheck`: re-fetch a drafted rule's `source`, recompute `source_hash`, and raise a non-blocking **`source-drift`** finding if the page changed since `fetched`. `--recheck` is behind the `[scrape]` extra and **never on the default `fux check` path**. | $0 |
+| `fux ingest <url\|file> [--cdp-port N] [--cdp-host H]` · `fux ingest <id> --recheck` | Without `--recheck`, `ingest` is an **agent skill** ([skills/ingest](../fux/data/skills/ingest/SKILL.md)): the host agent extracts the source — URL (HTTP, escalating to CDP for client-rendered shells — endpoint resolved by `cdp_utils`, see *CDP endpoint* below), PDF/Excel (its own `pdf`/`xlsx` skills), TXT/Markdown (read directly), or image (native vision/OCR) — classifies the source's trust, and drafts `status: draft` rules with `source`/`source_type`/`fetched`/`source_hash` provenance — never auto-active, never auto-constitutional. An image/OCR-derived money or regulatory figure is additionally flagged **`verify-source`** (non-blocking; `fux lint`) — never auto-trusted. The engine side is the opt-in `--recheck`: re-read a drafted rule's `source` (URL or local file), recompute `source_hash`, and raise a non-blocking **`source-drift`** finding if it changed since `fetched`. `--recheck` is behind the `[scrape]` extra and **never on the default `fux check` path**. `fux scrape` is a **deprecated alias** for `ingest` (one release). | $0 |
 | `fux fetch-rules <source> [--raw]` | Fetch plain text from an `http(s)://` URL, local `.txt`/`.md`, or `.pdf` (the `$0` extraction half of the `fetch-rules` skill; `.pdf` needs the `[pdf]` extra). `--raw` omits the header line. | $0 |
 | `fux why <id> [--history]` | Explain a rule: rationale + linked code + edges + invariant + body. `--history` shows how the *why* evolved (git log over the rule file, `--follow`). | $0 |
 | `fux seal [ids…] [--all]` | Bind rules to a normalized-AST fingerprint of their `code_refs` (proof-carrying rules). `fux check` then flags `unsealed` when the governed code changes *structure*; re-affirm by re-running `seal`. | $0 |
@@ -89,7 +90,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `fux coverage` | % of "important" code files (config globs) with at least one governing rule; lists the uncovered. | $0 |
 | `fux verify [--fuzz]` | Run invariant `check:` assertions against verification data (`verify_cmd:` / `.fux/verify/<id>.json`). Skips when no data. `--fuzz` perturbs numeric example inputs to boundaries and flags unguarded div-by-zero. | $0 |
 | `fux savings ["Q"] [--top N] [--reset]` | Estimate the cost win in **tokens and dollars** — measured from real file sizes (≈4 chars/token, priced at config `usd_per_mtok`, default = Claude Opus 4.8's $5/M input): INDEX + rule corpus + governed-code totals, and a without-Fux vs with-Fux per-lookup comparison (pass a query to cost a specific lookup). With `cost_tracking = true`, also prints the **cumulative** savings ledger (`.fux/cost.json`) in tokens + dollars; `--reset` clears it. | $0 |
-| `fux lint [--strict]` | Rule *quality* (complements `check`'s structure): `no-why`, `no-code-refs`, `dangling-edge`, `no-provenance`, `stub-body`. Advisory; `--strict` exits 1. | $0 |
+| `fux lint [--strict]` | Rule *quality* (complements `check`'s structure): `no-why`, `no-code-refs`, `dangling-edge`, `no-provenance`, `stub-body`, `verify-source` (an image/OCR-sourced draft with a money figure or `type: regulatory` — never auto-trusted). Advisory; `--strict` exits 1. | $0 |
 | `fux stats` | Knowledge-health dashboard: weighted score (coverage 40 · verify 30 · authoring 30 − drift) + corpus breakdown + every signal. | $0 |
 | `fux mine [--min-sites N]` | Surface *candidate* rules latent in the code (first miner: magic numbers repeated across ≥N sites) as drafts to confirm — never auto-authored. | $0 |
 | `fux gate [--install] [--strict-lint] [--baseline FILE]` | CI / git pre-commit enforcement: rebuild views, then exit 2 on blocking `check`/`verify`. Blocking is **tier-aware** (constitution layer): `constitutional` rules block in any `mode`, `standard` only under `strict`, `advisory` never. Also **reports** (report-first, never blocks) every `important_globs` path governed by zero rules — the coverage gate (plan §7e). `--baseline FILE` runs the §5b migration gate — fail only on findings *new* since a `check --baseline-write` snapshot (verify/lint/coverage reported but don't gate). `--strict-lint` treats lint as blocking. `--install` writes the pre-commit hook. | $0 |
@@ -204,16 +205,16 @@ draft-only `fux_new` — each deterministic, `$0`, no LLM.
 | `FUX_PACKS` | Packs dir (default `~/.claude/fux/packs`). |
 | `FUX_SCHEMA` | `schema.json` path. |
 | `FUX_PYTHON` | Interpreter the hook wrappers use when `fux` is not on PATH. |
-| `FUX_CDP_HOST` / `FUX_CDP_PORT` | CDP endpoint for the `/fux scrape` skill's render escalation (see below). |
+| `FUX_CDP_HOST` / `FUX_CDP_PORT` | CDP endpoint for the `/fux ingest` skill's render escalation (see below). |
 
-### CDP endpoint (for the `/fux scrape` render escalation)
+### CDP endpoint (for the `/fux ingest` render escalation)
 
-When a page is a client-rendered shell, the `scrape` skill renders it through a
+When a URL source is a client-rendered shell, the `ingest` skill renders it through a
 Chrome DevTools Protocol endpoint. The endpoint is resolved by
 [`fux/cdp_utils.py`](../fux/cdp_utils.py) — pure string resolution, **no socket on
 the engine side** — by this precedence (first set wins):
 
-1. `--cdp-port` / `--cdp-host` flags (`fux scrape <url> --cdp-port 9333`)
+1. `--cdp-port` / `--cdp-host` flags (`fux ingest <url> --cdp-port 9333`)
 2. `FUX_CDP_PORT` / `FUX_CDP_HOST` environment variables
 3. `cdp_port` / `cdp_host` in `.fux/config.toml`
 4. default **`127.0.0.1:9299`**
@@ -230,5 +231,5 @@ and none calls an LLM.
 | `embeddings` | `pip install fux-engine[embeddings]` | Local sentence-transformers re-rank for `recall` (gated on `recall_rerank`); falls back to a $0 char-trigram cosine when absent. |
 | `ast` | `pip install fux-engine[ast]` | Real **tree-sitter** ASTs for JS/TS/Go/Rust graph extraction instead of the brace heuristic — same node/edge schema, more accuracy. `fux build` records the active backend in `graph.json` `meta.extractor`; `fux check` flags `extractor-drift` if a committed graph was built with a different backend, so the graph stays reproducible across machines. |
 | `pdf` | `pip install fux-engine[pdf]` | `.pdf` text extraction for `fux fetch-rules`. |
-| `scrape` | `pip install fux-engine[scrape]` | Opt-in flag for `fux scrape <id> --recheck` — re-fetch a drafted rule's `source` and raise `source-drift` if it changed. The fetch is stdlib (urllib); this extra exists only to fence the network-touching path behind an explicit opt-in. **Never on the default `fux check` path.** |
+| `scrape` | `pip install fux-engine[scrape]` | Opt-in flag for `fux ingest <id> --recheck` — re-read a drafted rule's `source` (URL or local file) and raise `source-drift` if it changed. The fetch/read itself is stdlib; this extra exists only to fence the network/file-reading path behind an explicit opt-in. **Never on the default `fux check` path.** PDF/Excel/OCR/vision extraction for `fux ingest` itself is always the host agent's job — never an engine dependency. |
 | `critic` | `pip install fux-engine[critic]` | Headless AI self-critique for the constitutional critic ([fux/criticllm.py](../fux/criticllm.py)) — only for a no-session/runtime critic. The default build-agent path uses the host session's tokens via the `critic` skill and needs nothing; the maintenance path never imports it (the model is loaded lazily, only when you opt in). |

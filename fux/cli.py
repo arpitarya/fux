@@ -203,13 +203,22 @@ def build_parser() -> argparse.ArgumentParser:
                     help="emit a host-agent prompt for a richer NL answer (opt-in; not on the $0 path)")
     ho.set_defaults(fn=cliquery.cmd_how)
 
-    sc = sub.add_parser("scrape", help="agent-driven web → draft rules (skill); --recheck re-verifies a source")
-    sc.add_argument("target", nargs="?", help="a URL to scrape (skill) or a rule id to --recheck")
+    ig = sub.add_parser("ingest", help="agent-driven URL/PDF/Excel/TXT/image → draft rules (skill); --recheck re-verifies a source")
+    ig.add_argument("target", nargs="?", help="a URL/file to ingest (skill) or a rule id to --recheck")
+    ig.add_argument("--recheck", action="store_true",
+                    help="re-read a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
+    ig.add_argument("--cdp-port", type=int, help="CDP port for the ingest skill's render escalation")
+    ig.add_argument("--cdp-host", help="CDP host for the ingest skill's render escalation")
+    ig.set_defaults(fn=cliquery.cmd_ingest)
+
+    # Deprecated alias for `ingest` (kept for one release after the PR2 rename).
+    sc = sub.add_parser("scrape", help="deprecated alias for 'ingest' — use 'ingest' instead")
+    sc.add_argument("target", nargs="?", help="a URL/file to ingest (skill) or a rule id to --recheck")
     sc.add_argument("--recheck", action="store_true",
-                    help="re-fetch a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
-    sc.add_argument("--cdp-port", type=int, help="CDP port for the scrape skill's render escalation")
-    sc.add_argument("--cdp-host", help="CDP host for the scrape skill's render escalation")
-    sc.set_defaults(fn=cliquery.cmd_scrape)
+                    help="re-read a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
+    sc.add_argument("--cdp-port", type=int, help="CDP port for the ingest skill's render escalation")
+    sc.add_argument("--cdp-host", help="CDP host for the ingest skill's render escalation")
+    sc.set_defaults(fn=cliquery.cmd_scrape_deprecated)
 
     # Internal hook entrypoints (wired by `fux init`, not for direct use).
     sub.add_parser("hook-touch").set_defaults(fn=lambda a: hooks.post_tool_use())

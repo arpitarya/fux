@@ -45,10 +45,11 @@ embeddings = ["sentence-transformers>=2.2"]
 ast = ["tree-sitter>=0.23", "tree-sitter-language-pack>=0.7"]
 # PDF text extraction for `fux fetch-rules` with .pdf sources.
 pdf = ["pypdf>=4.0"]
-# Opt-in source re-verification for `/fux scrape`: `fux scrape <id> --recheck`
-# re-fetches a drafted rule's `source` and flags `source-drift`. The fetch itself
-# is stdlib (urllib) — this extra exists to fence the only network-touching path
-# behind an explicit opt-in; it is NEVER on the default `fux check` path.
+# Opt-in source re-verification for `/fux ingest`: `fux ingest <id> --recheck`
+# re-reads a drafted rule's `source` (URL or file) and flags `source-drift`. The
+# fetch itself is stdlib (urllib); this extra exists to fence the only
+# network/file-reading path behind an explicit opt-in; it is NEVER on the default
+# `fux check` path. (Extra name kept as `scrape` for back-compat with PR1.)
 scrape = []
 # Opt-in headless AI self-critique for the constitutional critic (plan §7d). The default
 # build-agent path uses the host session's tokens via the `critic` skill and needs nothing;
