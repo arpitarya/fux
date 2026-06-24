@@ -160,20 +160,28 @@ def cmd_how(args) -> int:
     return 0 if result["hits"] else 1
 
 
-def cmd_scrape(args) -> int:
-    """`/fux scrape <url>` is a SKILL (the agent fetches + drafts). The engine only
-    handles the opt-in `--recheck` source-drift re-verification, behind the network
-    extra — never on the default `fux check` path.
+def cmd_ingest(args) -> int:
+    """`/fux ingest <url|file>` is a SKILL (the agent extracts + drafts, from a URL,
+    PDF, Excel, TXT, or image). The engine only handles the opt-in `--recheck`
+    source-drift re-verification, behind the network extra — never on the default
+    `fux check` path.
     """
     if getattr(args, "recheck", False):
-        from fux import scrape          # lazy: the only network-touching path
-        return scrape.recheck_cmd(root(), getattr(args, "target", None))
-    print("fux scrape is an agent skill — fetching and drafting are the host agent's "
-          "tokens, not the engine.\n"
-          "  Run it via Claude: /fux scrape <url>   (see skills/scrape/SKILL.md)\n"
-          "  Engine side ($0):  fux scrape <rule-id> --recheck   "
+        from fux import ingest          # lazy: the only network/file-reading path
+        return ingest.recheck_cmd(root(), getattr(args, "target", None))
+    print("fux ingest is an agent skill — fetching/extracting and drafting are the "
+          "host agent's tokens, not the engine.\n"
+          "  Run it via Claude: /fux ingest <url|file>   (see skills/ingest/SKILL.md)\n"
+          "  Engine side ($0):  fux ingest <rule-id> --recheck   "
           "(re-verify a drafted source; needs the [scrape] extra)")
     return 0
+
+
+def cmd_scrape_deprecated(args) -> int:
+    """Deprecated alias for `cmd_ingest` — kept for one release after the rename."""
+    print("fux: 'scrape' is deprecated, use 'ingest' instead (same behaviour).",
+          file=sys.stderr)
+    return cmd_ingest(args)
 
 
 def cmd_fetch_rules(args) -> int:

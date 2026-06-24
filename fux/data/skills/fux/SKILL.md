@@ -44,7 +44,7 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
 /fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
 /fux fetch-rules <source>  # fetch URL/PDF/txt → extract durable rule entries  (skill)
-/fux scrape <url>          # agent fetches a page → drafts governed rules      (skill)
+/fux ingest <url|file>     # agent extracts URL/PDF/Excel/TXT/image → drafts   (skill)
 ```
 
 ## What Fux is for
@@ -126,7 +126,7 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
 | `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
 | `/fux fetch-rules <src>` | follow `skills/fetch-rules/SKILL.md` |
-| `/fux scrape <url>` | follow `skills/scrape/SKILL.md` (agent fetches → drafts; never auto-active) |
+| `/fux ingest <url\|file>` | follow `skills/ingest/SKILL.md` (agent extracts → drafts; never auto-active) |
 
 ### Step 4 — When you author or edit a rule
 

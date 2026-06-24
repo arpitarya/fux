@@ -1,6 +1,6 @@
 """Guard: Fux's maintenance/enforcement path imports no LLM client AND no network
-client, and the default install (no extras) is model-free + offline — the $0 promise
-(handoff §0/§9.1, plan §0)."""
+client AND no PDF/Excel/OCR/vision library, and the default install (no extras) is
+model-free + offline — the $0 promise (handoff §0/§9.1, plan §0; ingest-files §1)."""
 from __future__ import annotations
 
 import re
@@ -21,10 +21,11 @@ MAINT = ["check", "gate", "verify", "seal", "constitution", "critic", "criticloo
 # `criticllm.py` is the ONE sanctioned edge — the opt-in `[critic]` headless judge, never on
 # the maintenance path. Every other module is scanned.
 EDGE = "criticllm.py"
-# The two sanctioned network-touching modules — both lazily imported, never reachable from
-# the maintenance path: `fetchrules` (the $0 fetch-rules extractor) and `scrape` (the opt-in
-# `--recheck`, which imports `fetchrules` lazily and only behind the `[scrape]` extra).
-NET_EDGE = {"fetchrules.py", "scrape.py"}
+# The two sanctioned network/file-reading modules — both lazily imported, never reachable
+# from the maintenance path: `fetchrules` (the $0 fetch-rules extractor; also the engine-side
+# optional `pypdf` PDF path) and `ingest` (the opt-in `--recheck`, which imports `fetchrules`
+# lazily and only behind the `[scrape]` extra).
+NET_EDGE = {"fetchrules.py", "ingest.py"}
 # LLM *API clients*. `sentence_transformers` (the [embeddings] LOCAL model extra) is allowed —
 # it is not an LLM client and is never on the default import path.
 FORBIDDEN = re.compile(
@@ -33,6 +34,13 @@ FORBIDDEN = re.compile(
 # maintenance path; cdp_utils computes an endpoint *string* but opens no socket.
 NETWORK = re.compile(
     r"\b(?:import|from)\s+(urllib|http\.client|socket|requests|httpx|aiohttp)\b")
+# PDF/Excel/OCR/vision libraries (ingest-files §1/§6): extraction for these source types is
+# the HOST AGENT's job (its own pdf/xlsx/vision skills), never the engine's. `pypdf` is the
+# one sanctioned exception, confined to the `fetchrules.py` edge above for the unrelated,
+# already-shipped `fux fetch-rules --raw` PDF path.
+DOC_LIB = re.compile(
+    r"\b(?:import|from)\s+(pypdf|PyPDF2|pdfplumber|fitz|openpyxl|xlrd|pandas|"
+    r"pytesseract|PIL|Pillow|cv2|easyocr)\b")
 
 
 def test_maintenance_path_imports_no_llm_client():
@@ -68,6 +76,26 @@ def test_only_the_opt_in_edge_may_reference_a_model_client():
             continue
         hit = FORBIDDEN.search(py.read_text(encoding="utf-8"))
         assert hit is None, f"fux/{py.name} imports an LLM client: {hit.group(0)!r}"
+
+
+def test_maintenance_path_imports_no_doc_or_vision_library():
+    """check/gate/verify/seal/recall/howto etc. never import a PDF/Excel/OCR/vision lib —
+    extraction for those source types is the host agent's job (ingest-files §1)."""
+    for name in MAINT:
+        src = (FUX_DIR / f"{name}.py").read_text(encoding="utf-8")
+        hit = DOC_LIB.search(src)
+        assert hit is None, f"fux/{name}.py imports a doc/vision library: {hit.group(0)!r}"
+
+
+def test_only_fetchrules_may_reference_a_doc_or_vision_library():
+    """Across the package, only `fetchrules.py` (the lazy, optional `[pdf]` extra for the
+    unrelated `fux fetch-rules` URL/PDF path) may name a PDF/Excel/OCR/vision library — proving
+    `fux ingest`'s PDF/Excel/image branches stay entirely agent-side."""
+    for py in sorted(FUX_DIR.glob("*.py")):
+        if py.name == "fetchrules.py":
+            continue
+        hit = DOC_LIB.search(py.read_text(encoding="utf-8"))
+        assert hit is None, f"fux/{py.name} imports a doc/vision library: {hit.group(0)!r}"
 
 
 def test_default_install_is_model_free_and_offline():

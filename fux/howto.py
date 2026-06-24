@@ -31,10 +31,10 @@ _SELF_DOCS = [
     ("which-rules-govern-file", "refs",
      "which rules govern this file reverse lookup who owns covers path",
      "`fux refs <path>` is the reverse lookup — the rules that govern a given file."),
-    ("web-source-rules", "scrape",
-     "scrape website url web page docs draft rule from internet source",
-     "`/fux scrape <url>` has the agent fetch a page and draft governed rules "
-     "(status: draft) with provenance; nothing auto-activates."),
+    ("web-source-rules", "ingest",
+     "scrape ingest website url web page pdf excel image docs draft rule from file or internet source",
+     "`/fux ingest <url|file>` has the agent extract a URL, PDF, Excel, TXT, or image "
+     "and draft governed rules (status: draft) with provenance; nothing auto-activates."),
 ]
 
 

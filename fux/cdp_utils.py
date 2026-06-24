@@ -1,4 +1,4 @@
-"""Resolve the Chrome DevTools Protocol endpoint for the scrape skill's render
+"""Resolve the Chrome DevTools Protocol endpoint for the ingest skill's render
 escalation (handoff §B). Precedence: ``--cdp-port``/``--cdp-host`` flags →
 ``FUX_CDP_PORT``/``FUX_CDP_HOST`` env → ``cdp_port``/``cdp_host`` in config →
 default ``127.0.0.1:9299``.
