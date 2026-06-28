@@ -47,6 +47,7 @@ def build_parser() -> argparse.ArgumentParser:
     rc.add_argument("--top", type=int, default=6)
     rc.add_argument("--hybrid", action="store_true", help="RRF-fuse lexical + semantic + graph ($0)")
     rc.add_argument("--expand", action="store_true", help="expand query w/ glossary + graph neighbours ($0)")
+    rc.add_argument("--self", action="store_true", help="query fux's own bundled rules instead of the project")
     rc.set_defaults(fn=cliquery.cmd_recall)
 
     why = sub.add_parser("why", help="explain a rule + rationale + linked code")
@@ -148,15 +149,18 @@ def build_parser() -> argparse.ArgumentParser:
     q.add_argument("--depth", type=int, default=1)
     q.add_argument("--budget", type=int, default=1200,
                    help="approx token cap on output (keeps Claude's context cost bounded)")
+    q.add_argument("--self", action="store_true", help="traverse fux's own architecture (the bundled self graph)")
     q.set_defaults(fn=cligraph.cmd_query)
 
     pa = sub.add_parser("path", help="shortest path between two graph nodes")
     pa.add_argument("a")
     pa.add_argument("b")
+    pa.add_argument("--self", action="store_true", help="traverse fux's own architecture (the bundled self graph)")
     pa.set_defaults(fn=cligraph.cmd_path)
 
     ex = sub.add_parser("explain", help="explain a graph node + its neighbors")
     ex.add_argument("term")
+    ex.add_argument("--self", action="store_true", help="explain a node in fux's own architecture (the bundled self graph)")
     ex.set_defaults(fn=cligraph.cmd_explain)
 
     imp2 = sub.add_parser("impact", help="downstream blast radius of changing a file ($0)")
@@ -190,6 +194,8 @@ def build_parser() -> argparse.ArgumentParser:
     hk.set_defaults(fn=clicmds.cmd_hooks)
 
     sub.add_parser("setup", help="copy bundled assets (schema, hooks, skills) to ~/.claude/fux/").set_defaults(fn=clicmds.cmd_setup)
+
+    sub.add_parser("self-build", help="regenerate fux's self-knowledge bundle from its own source ($0, AST-only)").set_defaults(fn=clicmds.cmd_self_build)
 
     fr = sub.add_parser("fetch-rules", help="fetch plain text from a URL / file / PDF for rule extraction")
     fr.add_argument("source", help="http(s):// URL, local .txt/.md, or .pdf path")

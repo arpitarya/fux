@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 from fux import graphquery, recall, report
-from fux.cliutil import root
+from fux.cliutil import root, scope_root
 
 
 def cmd_query(args) -> int:
-    here = root()
+    here = scope_root(args)
     graph = graphquery.load(here)
     # Phase 1: anchor on recall-matched rule nodes.
     anchors = [f"rule:{r.id}" for r, _ in recall.run(here, args.query, top=3)]
@@ -82,7 +82,7 @@ def _fmt(n: dict) -> str:
 
 
 def cmd_path(args) -> int:
-    graph = graphquery.load(root())
+    graph = graphquery.load(scope_root(args))
     a, b = graphquery.find(graph, args.a), graphquery.find(graph, args.b)
     if not a or not b:
         print("fux: could not resolve both endpoints in the graph")
@@ -97,7 +97,7 @@ def cmd_path(args) -> int:
 
 
 def cmd_explain(args) -> int:
-    graph = graphquery.load(root())
+    graph = graphquery.load(scope_root(args))
     node = graphquery.find(graph, args.term)
     if not node:
         print(f"fux: no node matches '{args.term}'")

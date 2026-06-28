@@ -35,6 +35,11 @@ _SELF_DOCS = [
      "scrape ingest website url web page pdf excel image docs draft rule from file or internet source",
      "`/fux ingest <url|file>` has the agent extract a URL, PDF, Excel, TXT, or image "
      "and draft governed rules (status: draft) with provenance; nothing auto-activates."),
+    ("how-fux-itself-works", "explain --self",
+     "how does fux itself work own architecture internals modules self explain query path",
+     "`fux explain --self <node>` / `fux query --self \"<q>\"` traverse fux's OWN module "
+     "graph (the bundled self-knowledge from `fux self-build`) — answers \"how does fux "
+     "work\" from its real code, in any repo, with no project .fux/."),
 ]
 
 

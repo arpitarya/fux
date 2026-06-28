@@ -22,6 +22,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `init` | authoring | scaffold .fux/ + wire hooks in this project | `fux init --recall` |
 | `new` | authoring | scaffold a schema-valid rule stub from a template | `fux new formula stcg-equity-rate --domain tax` |
 | `build` | authoring | regenerate INDEX + rules.json + graph ($0) | `fux build --full` |
+| `self-build` | authoring | regenerate fux's self-knowledge bundle from its own source ($0, AST-only) | `fux self-build` |
 | `import` | authoring | import existing markdown as narrative entries | `fux import docs/ --type narrative` |
 | `import-memory` | authoring | mirror Claude's home-dir memory into .fux/memory | `fux import-memory --scope shared` |
 | `ingest` | authoring | agent batch-ingests URLs/files/globs (+ --follow-links) → draft review queue (skill) | `fux ingest ./docs/*.pdf "https://docs.example.com/api"` |

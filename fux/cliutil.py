@@ -11,3 +11,19 @@ def root() -> Path:
     if found is None:
         raise SystemExit("fux: no .fux/ footprint found here. Run `fux init` first.")
     return found
+
+
+def self_root() -> Path:
+    """The shipped self-knowledge bundle (a pre-built footprint mirror).
+
+    Reads fux's *own* graph/rules instead of the project's — so `--self` works in
+    any repo, even one with no `.fux/`. Raises if `fux self-build` was never run."""
+    bundle = paths.bundled_data_dir() / "self"
+    if not (bundle / ".fux" / "out" / "graph.json").exists():
+        raise SystemExit("fux: no self-knowledge bundle — run `fux self-build` first.")
+    return bundle
+
+
+def scope_root(args) -> Path:
+    """Pick the project root, or the self bundle when `--self` is passed."""
+    return self_root() if getattr(args, "self", False) else root()
