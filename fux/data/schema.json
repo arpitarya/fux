@@ -20,6 +20,10 @@
     "tier": { "type": "string", "enum": ["constitutional", "standard", "advisory"], "default": "standard" },
     "principle": { "type": "string" },
     "enforcement": { "type": "string", "enum": ["deterministic", "judgment"] },
+    "decided_by": { "type": "string" },
+    "method": { "type": "string", "enum": ["debate", "decision-council"] },
+    "route": { "type": "string", "enum": ["fux", "anton", "elgar"] },
+    "elgar_ref": { "type": "string", "pattern": "^elgar://decision/[a-z0-9][a-z0-9-]*$" },
     "ratification": {
       "type": "object",
       "required": ["by", "date", "content_seal"],

@@ -77,6 +77,11 @@ class Footprint:
         return self.base / "memory"
 
     @property
+    def decisions(self) -> Path:
+        """Captured decision records (ADRs) from `fux capture-decision` (plan §6)."""
+        return self.base / "decisions"
+
+    @property
     def out(self) -> Path:
         return self.base / "out"
 

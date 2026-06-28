@@ -4,12 +4,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 # Severity ordering drives strict-mode blocking and DRIFT.md grouping.
-KINDS = ["tampered", "schema", "dead-ref", "stale", "plan-drift", "conflict",
+KINDS = ["tampered", "firewall", "schema", "dead-ref", "stale", "plan-drift", "conflict",
          "invariant", "memory-stale", "unsealed", "untagged-candidate", "extractor-drift",
          "source-drift", "verify-source"]
-# Kinds that hard-block in `strict` mode (plan §8 strictness table). `tampered` is
-# special-cased in blocking() to block in ANY mode (constitution layer, plan §6).
-BLOCKING = {"tampered", "schema", "dead-ref", "invariant", "conflict"}
+# Kinds that hard-block in `strict` mode (plan §8 strictness table). `tampered` +
+# `firewall` are special-cased in blocking() to block in ANY mode — `firewall` is the
+# ADR 0001 money-leak guard, as non-negotiable as constitutional tamper-evidence.
+BLOCKING = {"tampered", "firewall", "schema", "dead-ref", "invariant", "conflict"}
 
 
 @dataclass
@@ -39,7 +40,7 @@ def blocking(findings: list[Finding], mode: str = "strict") -> list[Finding]:
     for f in findings:
         if f.kind == "untagged-candidate":
             continue                       # always advisory — a backfill nudge, never a blocker
-        if f.kind == "tampered" or f.tier == "constitutional":
+        if f.kind in ("tampered", "firewall") or f.tier == "constitutional":
             out.append(f)
         elif f.tier == "advisory":
             continue
