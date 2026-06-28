@@ -203,22 +203,32 @@ def build_parser() -> argparse.ArgumentParser:
                     help="emit a host-agent prompt for a richer NL answer (opt-in; not on the $0 path)")
     ho.set_defaults(fn=cliquery.cmd_how)
 
-    ig = sub.add_parser("ingest", help="agent-driven URL/PDF/Excel/TXT/image → draft rules (skill); --recheck re-verifies a source")
-    ig.add_argument("target", nargs="?", help="a URL/file to ingest (skill) or a rule id to --recheck")
-    ig.add_argument("--recheck", action="store_true",
-                    help="re-read a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
-    ig.add_argument("--cdp-port", type=int, help="CDP port for the ingest skill's render escalation")
-    ig.add_argument("--cdp-host", help="CDP host for the ingest skill's render escalation")
-    ig.set_defaults(fn=cliquery.cmd_ingest)
-
-    # Deprecated alias for `ingest` (kept for one release after the PR2 rename).
-    sc = sub.add_parser("scrape", help="deprecated alias for 'ingest' — use 'ingest' instead")
-    sc.add_argument("target", nargs="?", help="a URL/file to ingest (skill) or a rule id to --recheck")
-    sc.add_argument("--recheck", action="store_true",
-                    help="re-read a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
-    sc.add_argument("--cdp-port", type=int, help="CDP port for the ingest skill's render escalation")
-    sc.add_argument("--cdp-host", help="CDP host for the ingest skill's render escalation")
-    sc.set_defaults(fn=cliquery.cmd_scrape_deprecated)
+    for name, fn in (("ingest", cliquery.cmd_ingest),
+                     ("scrape", cliquery.cmd_scrape_deprecated)):
+        # `scrape` is a deprecated alias for `ingest` (one release after the rename).
+        h = ("agent-driven batch URL/PDF/Excel/Word/TXT/image/JSON/YAML/Swagger → "
+             "draft rules (skill); --recheck re-verifies a source") if name == "ingest" \
+            else "deprecated alias for 'ingest' — use 'ingest' instead"
+        ig = sub.add_parser(name, help=h)
+        ig.add_argument("targets", nargs="*",
+                        help="URLs/files/globs to ingest (skill) or one rule id to --recheck")
+        ig.add_argument("--recheck", action="store_true",
+                        help="re-read a rule's source + flag source-drift (opt-in; needs the [scrape] extra)")
+        ig.add_argument("--queue", action="store_true",
+                        help="show the draft review queue (.fux/ingest/queue.md) and exit")
+        ig.add_argument("--follow-links", action="store_true",
+                        help="opt-in: discover the documents an HTML page links (depth-1, bounded)")
+        ig.add_argument("--cross-origin", action="store_true",
+                        help="with --follow-links, allow off-origin document links (default same-origin)")
+        ig.add_argument("--max", type=int, default=20, dest="max",
+                        help="with --follow-links, cap on discovered documents (default 20)")
+        ig.add_argument("--yes", action="store_true",
+                        help="with --follow-links, take all discovered docs up to --max (skip confirm)")
+        ig.add_argument("--full", action="store_true",
+                        help="bypass reduce-before-draft; feed the whole extract (high-stakes regulatory)")
+        ig.add_argument("--cdp-port", type=int, help="CDP port for the ingest skill's render escalation")
+        ig.add_argument("--cdp-host", help="CDP host for the ingest skill's render escalation")
+        ig.set_defaults(fn=fn)
 
     # Internal hook entrypoints (wired by `fux init`, not for direct use).
     sub.add_parser("hook-touch").set_defaults(fn=lambda a: hooks.post_tool_use())

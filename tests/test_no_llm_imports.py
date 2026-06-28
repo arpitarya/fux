@@ -30,10 +30,13 @@ NET_EDGE = {"fetchrules.py", "ingest.py"}
 # it is not an LLM client and is never on the default import path.
 FORBIDDEN = re.compile(
     r"\b(?:import|from)\s+(anthropic|openai|cohere|litellm|google\.generativeai|mistralai)\b")
-# Network clients. urllib/http.client/socket/requests/httpx must not be reachable from the
-# maintenance path; cdp_utils computes an endpoint *string* but opens no socket.
+# Network clients. urllib.request/http.client/socket/requests/httpx must not be reachable
+# from the maintenance path; cdp_utils computes an endpoint *string* but opens no socket.
+# `urllib.parse` (pure URL-string manipulation, no socket) is NOT a network client — the
+# bounded link-discovery helper (ingestfollow) uses it to apply the same-origin fence.
 NETWORK = re.compile(
-    r"\b(?:import|from)\s+(urllib|http\.client|socket|requests|httpx|aiohttp)\b")
+    r"\b(?:import|from)\s+(urllib\.request|urllib\.error|http\.client|socket|"
+    r"requests|httpx|aiohttp)\b")
 # PDF/Excel/OCR/vision libraries (ingest-files §1/§6): extraction for these source types is
 # the HOST AGENT's job (its own pdf/xlsx/vision skills), never the engine's. `pypdf` is the
 # one sanctioned exception, confined to the `fetchrules.py` edge above for the unrelated,
