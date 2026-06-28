@@ -78,6 +78,24 @@ on instant agreement) and means the result, if ratified, enters the apex via `fu
      the unresolved crux. Do **not** author or ratify. The human is the tie-breaker; once they
      decide, write the transcript (including their ruling) and proceed to ratify as above.
 
+7. **Capture the decision (every concluded debate/council).** A debate is also a *decision* —
+   capture it as a tamper-evident ADR routed by content. Classify the subject, **suggest** a
+   route, write a JSON verdict (`{title, decision, why, crux, strongest_dissent,
+   what_would_reverse}`), and run:
+   ```
+   fux capture-decision <id> --route fux|anton|elgar --method debate \
+       --by "<human>" --from verdict.json --debate .fux/debates/<id>.md
+   ```
+   - **world / code / architecture / tool design → `--route fux`** (full ADR, sealed).
+   - **Anton-app-specific → `--route anton`** (run it in the anton repo; full ADR, sealed).
+   - **money / personal figures / portfolio plans → `--route elgar`.** The **firewall
+     (ADR 0001): confirmation is MANDATORY** — `capture-decision` refuses a money route
+     without `--yes`, and fux stores **only** `elgar://decision/<id>`, never the body. The
+     agent/elgar writes the actual record; fux is decider + link-keeper.
+   `fux check` then re-verifies the ADR's `content_seal` and the link-only firewall on every
+   run. **Never** put a money figure in a fux-side record — it is a `firewall` finding that
+   hard-blocks in any mode.
+
 ## Why a debate, not a prompt
 
 A rule waved into the constitution on one agent's say-so is a single point of failure. Two

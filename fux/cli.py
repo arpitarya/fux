@@ -72,6 +72,22 @@ def build_parser() -> argparse.ArgumentParser:
                          "ratification on the protected branch is routed through a new branch + gated PR)")
     rt.set_defaults(fn=cliconstitution.cmd_ratify)
 
+    cd = sub.add_parser("capture-decision",
+                        help="capture a concluded debate/council as a routed, tamper-evident ADR (no LLM)")
+    cd.add_argument("id")
+    cd.add_argument("--route", choices=["fux", "anton", "elgar"], required=True,
+                    help="store by content: world/code→fux, app→anton, money→elgar (link-only)")
+    cd.add_argument("--method", choices=["debate", "decision-council"], default="debate")
+    cd.add_argument("--by", help="named human decider (default: git user.name)")
+    cd.add_argument("--date", help="ISO decision date (default: today)")
+    cd.add_argument("--from", dest="from_file", metavar="FILE",
+                    help="JSON verdict: {title, decision, why, crux, strongest_dissent, what_would_reverse}")
+    cd.add_argument("--debate", metavar="FILE",
+                    help="debate transcript to hash into ratification.debate_hash")
+    cd.add_argument("--yes", action="store_true",
+                    help="confirm a MONEY/elgar route (mandatory; fux stores only the elgar:// link)")
+    cd.set_defaults(fn=cliconstitution.cmd_capture_decision)
+
     sub.add_parser("constitution",
                    help="status view: what's constitutional, what each governs, current violations"
                    ).set_defaults(fn=cliconstitution.cmd_constitution)

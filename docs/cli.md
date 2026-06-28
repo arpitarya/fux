@@ -37,6 +37,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `mine` | verification | surface candidate rules latent in the code (drafts) | `fux mine --min-sites 3` |
 | `parity` | verification | decommission readiness vs graphify-out/docs/memory | `fux parity` |
 | `ratify` | governance | ratify a constitutional rule (stamp + seal + lock) | `fux ratify money-never-floats --by "Arpit"` |
+| `capture-decision` | governance | capture a concluded debate/council as a routed, tamper-evident ADR | `fux capture-decision use-postgres --route fux --by "Arpit"` |
 | `constitution` | governance | status: what's constitutional + current violations | `fux constitution` |
 | `critic` | governance | critique a change vs principles (deterministic first) | `fux critic "drop the rounding guard"` |
 | `gate` | governance | CI / pre-commit enforcement (exit 2 on blocking) | `fux gate --install` |

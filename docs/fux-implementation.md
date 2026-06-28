@@ -13,7 +13,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 40 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
+| Core CLI surface (plan §9) | ✅ | 41 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
 | Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
@@ -52,6 +52,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux why <id> [--history]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/explain.py](fux/explain.py) |
 | `fux seal [ids] [--all]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/seal.py](fux/seal.py) |
 | `fux ratify <id> [--by NAME] [--date ISO] [--debate FILE] [--no-pr]` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/constitution.py](fux/constitution.py); routes through a `constitution/<id>` branch+PR ([fux/gitutil.py](fux/gitutil.py)) |
+| `fux capture-decision <id> --route fux\|anton\|elgar [--method M] [--by N] [--from FILE] [--debate FILE] [--yes]` | ✅ | [fux/decisioncapture.py](fux/decisioncapture.py), [fux/cliconstitution.py](fux/cliconstitution.py); routed, content-sealed ADRs in `.fux/decisions/`; money→elgar link-only (ADR 0001) |
 | `fux critic "<change>"` | ✅ | [fux/cliconstitution.py](fux/cliconstitution.py), [fux/criticloop.py](fux/criticloop.py) |
 | `fux mine [--min-sites N]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/mine.py](fux/mine.py) |
 | `fux refs <file>` | ✅ | [fux/cliquery.py](fux/cliquery.py) |
@@ -384,7 +385,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (309 tests)
+### 2.20 Tests — ✅ (313 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -577,6 +578,38 @@ after the v0.9.0 `fux how`/registry work:
   fails); the config is hermetic; `explain --self`/`recall --self` answer from a temp dir
   with no footprint; the guard test ([test_no_llm_imports.py](tests/test_no_llm_imports.py))
   now covers `selfbuild` as `$0`/offline/model-free.
+
+### 2.20e Decision capture — ✅ (decision-capture-handoff.md, v0.13.0)
+
+Every concluded `/fux debate` or decision-council becomes a routed, tamper-evident
+ADR. The *debating* is the host agent's tokens; the **capture** — format, seal, route
+— is pure `$0`/deterministic harness.
+
+- **Capture + routing** ([fux/decisioncapture.py](fux/decisioncapture.py), ≤100) —
+  `build_adr` formats the verdict (`decision`/`why`/`crux`/`strongest_dissent`/
+  `what_would_reverse`); `capture` seals it with `ratification.content_seal` (reusing
+  [fux/constitution.py](fux/constitution.py)'s hash) + the transcript's `debate_hash`
+  ([fux/provenance.py](fux/provenance.py)), and **routes by content**: `fux`/`anton`
+  → full sealed ADR in `.fux/decisions/`; `elgar` (money) → a **link-only** record
+  (`elgar_ref: elgar://decision/<id>`, no body).
+- **Money firewall** (ADR 0001) — `capture-decision --route elgar` **refuses without
+  `--yes`** (a money route is never silent), and `check_firewall` flags any fux-side
+  elgar record that isn't link-only (residual body after heading + stub → breach),
+  independent of the seal. A new always-blocking **`firewall`** finding kind
+  ([fux/findings.py](fux/findings.py)) hard-blocks in any mode, like `tampered`.
+- **Verification** ([fux/check.py](fux/check.py)) — `check_seals` raises `tampered` for
+  any captured ADR whose `content_seal` no longer matches (ADRs are immutable);
+  `check_firewall` enforces the link-only rule on every run.
+- **Wiring** — `.fux/decisions/` added as a loader source dir
+  ([fux/loader.py](fux/loader.py), [fux/paths.py](fux/paths.py)); schema gains
+  `decided_by`/`method`/`route`/`elgar_ref` (additive); `capture-decision` in the
+  registry + CLI ([fux/cliconstitution.py](fux/cliconstitution.py)); the debate skill
+  ([data/skills/debate/SKILL.md](fux/data/skills/debate/SKILL.md)) captures on
+  conclusion and requires money confirm.
+- **Tests** ([tests/test_decision_capture.py](tests/test_decision_capture.py)) — fux
+  route writes a full sealed ADR; money route is link-only (no body, only the link);
+  editing a captured ADR trips `tampered`; a sealed-but-not-link-only elgar record trips
+  a hard-blocking `firewall`; the guard test covers `decisioncapture` as `$0`/offline.
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 

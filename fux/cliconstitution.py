@@ -8,6 +8,41 @@ from fux import config, constatus, constitution, criticloop, gitutil, loader, pa
 from fux.cliutil import root
 
 
+def cmd_capture_decision(args) -> int:
+    """Capture a concluded debate/council as a routed, sealed ADR (decision-capture)."""
+    import json
+
+    from fux import decisioncapture
+    here = root()
+    by = args.by or gitutil.user_name(here) or ""
+    if not by:
+        print("fux: no decider — pass --by <name> (or set git user.name)")
+        return 1
+    if args.route == "elgar" and not args.yes:
+        print("fux: refusing to capture a MONEY/elgar decision without --yes.\n"
+              "  ADR 0001: fux will store only the elgar://decision/<id> link, never the\n"
+              "  body. Confirm the money route explicitly with --yes.")
+        return 1
+    sections: dict = {}
+    if args.from_file:
+        p = Path(args.from_file)
+        if not p.is_file():
+            print(f"fux: verdict file not found: {args.from_file}")
+            return 1
+        sections = json.loads(p.read_text(encoding="utf-8"))
+    meta = {"id": args.id, "date": args.date or _date.today().isoformat(),
+            "decided_by": by, "method": args.method, "route": args.route}
+    debate = Path(args.debate) if args.debate else None
+    if debate is not None and not debate.is_file():
+        print(f"fux: debate transcript not found: {args.debate}")
+        return 1
+    target = decisioncapture.capture(here, meta, sections, debate=debate)
+    note = " (link-only — body stored in elgar per ADR 0001)" if args.route == "elgar" else ""
+    print(f"✔ captured {args.id} → {args.route}{note}\n  {target} — content_seal stamped; "
+          "`fux check` re-verifies the seal + firewall.")
+    return 0
+
+
 def cmd_ratify(args) -> int:
     """Stamp ratification + freeze the seal + update the lock — the only path to the apex."""
     here = root()

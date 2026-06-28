@@ -63,6 +63,8 @@ COMMANDS: list[Command] = [
        "fux parity", "import", "report"),
     _c("ratify", "governance", "ratify a constitutional rule (stamp + seal + lock)",
        'fux ratify money-never-floats --by "Arpit"', "constitution", "critic", "seal"),
+    _c("capture-decision", "governance", "capture a concluded debate/council as a routed, tamper-evident ADR",
+       'fux capture-decision use-postgres --route fux --by "Arpit"', "ratify", "constitution"),
     _c("constitution", "governance", "status: what's constitutional + current violations",
        "fux constitution", "ratify", "critic"),
     _c("critic", "governance", "critique a change vs principles (deterministic first)",

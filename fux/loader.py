@@ -27,7 +27,7 @@ def load_dir(directory: Path, layer: str) -> list[Rule]:
 
 
 def _source_dirs(fp: paths.Footprint) -> list[Path]:
-    return [fp.rules, fp.glossary, fp.memory]
+    return [fp.rules, fp.glossary, fp.memory, fp.decisions]
 
 
 def resolve(root: Path, cfg: dict | None = None) -> RuleSet:

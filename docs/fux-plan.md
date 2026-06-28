@@ -252,6 +252,24 @@ is captured to `.fux/debates/<id>.md`, and `fux ratify … --debate <file>` hash
 `ratification.debate_hash` — so the *reasoning*, not just the verdict, is auditable. Fux
 makes no API call; the maintenance path stays model-free (guarded by a test, plan §0).
 
+**Decision capture — every debate becomes a routed, tamper-evident ADR
+([fux/decisioncapture.py](../fux/decisioncapture.py); `$0`, NO LLM).** A concluded
+debate/council isn't only a *rule* — it's a *decision*. `fux capture-decision <id>
+--route fux|anton|elgar` writes the verdict as an `type: adr` record in
+`.fux/decisions/`, sealed with `ratification.content_seal` (reusing the constitution's
+hash) + the transcript's `debate_hash`; `fux check` re-verifies both and raises
+`tampered` on any later edit (ADRs are immutable — supersede, never edit in place).
+**Routing is by content, operationalizing the standing rule:** world/code/architecture/
+tool-design → **fux**, app-specific → **anton**, money/personal figures → **elgar**.
+The **money firewall (ADR 0001, [docs/decisions/0001-fux-elgar-relationship.md](decisions/0001-fux-elgar-relationship.md))**
+is enforced two ways: `capture-decision --route elgar` **refuses without `--yes`** (a
+money route is never silent), and it writes a **link-only** record — `elgar_ref:
+elgar://decision/<id>`, never the body. A new always-blocking `firewall` finding
+(`fux/decisioncapture.py:check_firewall`, hard-blocks in any mode like `tampered`)
+catches any fux-side decision that isn't link-only, so a money figure can never leak
+into the public tree. The agent/elgar writes the actual money record; fux is **decider
++ link-keeper, never custodian**.
+
 **Deterministic / judgment split (`fux/critic.py`, the router; `$0`, NO LLM).** Every
 principle carries `enforcement` (plan §3): `deterministic` principles (money, PII, audit,
 numbers) are decided by a `check:`/seal/matcher and may **never** be routed to the AI
