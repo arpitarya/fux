@@ -75,6 +75,11 @@ fux = [
     "data/packs/**/*",
     "data/skills/**/*",
     "data/copilot/**/*",
+    # The self-knowledge bundle (`fux self-build`) — a pre-built footprint mirror,
+    # shipped so `--self` works on a plain `pip install fux` with no project `.fux/`.
+    "data/self/.fux/config.toml",
+    "data/self/.fux/out/*",
+    "data/self/.fux/rules/*.md",
 ]
 
 [tool.ruff]

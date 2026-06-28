@@ -5,7 +5,7 @@ import sys
 from fux import (capture, config, costledger, coverage, explain, feedback,
                  fetchrules, lint, loader, mine, parity, paths, recall, savings,
                  scaffold, seal, stats, tour, verify)
-from fux.cliutil import root
+from fux.cliutil import root, scope_root
 
 
 def cmd_feedback(args) -> int:
@@ -23,7 +23,7 @@ def cmd_feedback(args) -> int:
 def cmd_recall(args) -> int:
     hybrid = True if getattr(args, "hybrid", False) else None
     expand = True if getattr(args, "expand", False) else None
-    for r, score in recall.run(root(), args.query, top=args.top, hybrid=hybrid, expand=expand):
+    for r, score in recall.run(scope_root(args), args.query, top=args.top, hybrid=hybrid, expand=expand):
         print(f"{score:6.3f}  {r.id} ({r.type}) — {r.title}")
     return 0
 

@@ -48,6 +48,14 @@ def cmd_build(args) -> int:
     return 0
 
 
+def cmd_self_build(_args) -> int:
+    from fux import selfbuild
+    s = selfbuild.build()
+    print(f"✔ Self-knowledge bundle: {s['nodes']} nodes · {s['edges']} edges · "
+          f"{s['rules']} rules → {s['bundle']}")
+    return 0
+
+
 def cmd_check(args) -> int:
     here = root()
     findings = check.run(here)

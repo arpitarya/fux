@@ -400,6 +400,8 @@ fux capture        # session observation queue for `fux distill`      ($0)
 fux serve          # local dashboard over the generated views         ($0)
 fux recall --hybrid# RRF-fuse lexical + semantic + graph              ($0)
 fux how "Q"        # fux explains fux: question → the exact command   ($0)
+fux self-build     # regenerate fux's self-knowledge bundle from source ($0)
+fux explain --self # traverse fux's OWN module graph (the bundle)      ($0)
 fux help [<cmd>]   # grouped help / per-command detail (from registry) ($0)
 fux ingest <srcs…> # agent batch-ingests URLs/files/globs → draft queue (skill)
 fux fetch-rules <s># fetch URL/PDF/txt → extract durable rule entries (skill)
@@ -421,6 +423,19 @@ self-doc snippets, and returns a short explanation **plus the exact CLI command*
 the task (e.g. `fux how "which rules govern a file"` → `fux refs <path>`).
 Deterministic by default; the opt-in `--explain` emits a *fenced prompt* the host
 agent answers with its own tokens — never an engine call, never on the `$0` path.
+
+**fux explains fux, from fux's real code.** `fux self-build`
+([fux/selfbuild.py](../fux/selfbuild.py)) runs fux's *own* `$0`, AST-only graph
+extraction over the `fux/` package + resolves its `.fux/rules`, and writes a
+**pre-built footprint mirror** to `data/self/` (shipped in the wheel). The `--self`
+scope on `query` / `explain` / `path` / `recall` simply points those existing
+commands at that bundle instead of the project — so `fux explain --self "drift"`
+shows how `seal`/`check`/`drift` actually relate across fux's modules
+(EXTRACTED + INFERRED edges), grounded in code, **in any repo with no project
+`.fux/`**. The bundle is a hermetic footprint (`use_global = false`, fux's rules
+only) and `meta.extractor` is pinned (`python`/`stdlib-ast`), so it regenerates
+**byte-identically** from source regardless of environment — a test fails CI if the
+committed bundle drifts from fux's code, keeping fux's self-knowledge honest.
 
 Higher-level **skills** (`plan`, `adr`, `trace`, `savings`, `distill`, `ingest`)
 layer on top of these commands — see §16. `ingest` is a skill, not engine code: the

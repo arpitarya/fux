@@ -17,7 +17,8 @@ FUX_DIR = Path(fux.__file__).resolve().parent
 # it must be pure recall over the in-repo registry, never a fetch or a model call.
 MAINT = ["check", "gate", "verify", "seal", "constitution", "critic", "criticloop",
          "baseline", "findings", "hooks", "hookio", "touch", "mcpserver", "lint",
-         "stats", "fix", "recall", "howto", "registry", "clihelp", "cdp_utils"]
+         "stats", "fix", "recall", "howto", "registry", "clihelp", "cdp_utils",
+         "selfbuild"]
 # `criticllm.py` is the ONE sanctioned edge — the opt-in `[critic]` headless judge, never on
 # the maintenance path. Every other module is scanned.
 EDGE = "criticllm.py"
@@ -109,7 +110,7 @@ def test_default_install_is_model_free_and_offline():
         "import importlib, sys\n"
         "for m in ['fux','fux.check','fux.gate','fux.constitution','fux.seal','fux.hooks',\n"
         "          'fux.recall','fux.howto','fux.registry','fux.clihelp','fux.cdp_utils',\n"
-        "          'fux.critic','fux.criticloop','fux.criticllm']:\n"
+        "          'fux.selfbuild','fux.critic','fux.criticloop','fux.criticllm']:\n"
         "    importlib.import_module(m)\n"
         "bad = [m for m in ('anthropic','openai','cohere','litellm','mistralai') if m in sys.modules]\n"
         "assert not bad, ('llm', bad)\n"

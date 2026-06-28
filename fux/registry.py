@@ -33,6 +33,8 @@ COMMANDS: list[Command] = [
        "fux new formula stcg-equity-rate --domain tax", "build", "lint"),
     _c("build", "authoring", "regenerate INDEX + rules.json + graph ($0)",
        "fux build --full", "check", "stats"),
+    _c("self-build", "authoring", "regenerate fux's self-knowledge bundle from its own source ($0, AST-only)",
+       "fux self-build", "build", "how"),
     _c("import", "authoring", "import existing markdown as narrative entries",
        "fux import docs/ --type narrative", "import-memory", "parity"),
     _c("import-memory", "authoring", "mirror Claude's home-dir memory into .fux/memory",

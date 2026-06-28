@@ -13,7 +13,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 39 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
+| Core CLI surface (plan §9) | ✅ | 40 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
 | Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
@@ -69,9 +69,10 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux import-memory [--scope]` | ✅ | [fux/importer.py](fux/importer.py) |
 | `fux parity` | ✅ | [fux/parity.py](fux/parity.py) |
 | `fux tour` | ✅ | [fux/tour.py](fux/tour.py) |
-| `fux query "Q" [--depth N]` | ✅ | [fux/cligraph.py](fux/cligraph.py), [fux/graphquery.py](fux/graphquery.py) |
-| `fux path <a> <b>` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
-| `fux explain <term>` | ✅ | [fux/explain.py](fux/explain.py) |
+| `fux query "Q" [--depth N] [--self]` | ✅ | [fux/cligraph.py](fux/cligraph.py), [fux/graphquery.py](fux/graphquery.py) |
+| `fux path <a> <b> [--self]` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
+| `fux explain <term> [--self]` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
+| `fux self-build` · `--self` scope | ✅ | [fux/selfbuild.py](fux/selfbuild.py), [fux/cliutil.py](fux/cliutil.py) (`scope_root`) — pre-built self-knowledge bundle in `data/self/` |
 | `fux report` | ✅ | [fux/report.py](fux/report.py) |
 | `fux help [<cmd>]` · grouped `--help` | ✅ | [fux/registry.py](fux/registry.py), [fux/clihelp.py](fux/clihelp.py) |
 | `fux how "Q" [--top N] [--explain]` | ✅ | [fux/howto.py](fux/howto.py) (reuses [fux/recall.py](fux/recall.py)) |
@@ -383,7 +384,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (306 tests)
+### 2.20 Tests — ✅ (309 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -550,6 +551,32 @@ governs. Three new `$0`, stdlib-only engine modules:
   cross-origin widening; reduce cuts tokens / `--full` bypass / xlsx never sends the
   full grid / contract slice / incremental changed-sections; Swagger contract drift via
   `--recheck`; trust flags round-trip with nothing auto-active.
+
+### 2.20d Self-build + `--self` scope — ✅ (scrape-howto-cli-handoff.md §C/§4b, v0.12.0)
+
+"fux explains fux" from fux's *real* code, not prose. The remaining piece of §C
+after the v0.9.0 `fux how`/registry work:
+
+- **Self-knowledge bundle** ([fux/selfbuild.py](fux/selfbuild.py)) — `fux self-build`
+  runs fux's *own* `$0`, AST-only graph extraction (`graph.build` over `fux/**/*.py`)
+  + resolves fux's `.fux/rules`, and writes a **pre-built footprint mirror** to
+  `data/self/.fux/{out/graph.json, out/rules.json, out/INDEX.md, rules/, config.toml}`,
+  shipped in the wheel. Hermetic (`use_global = false` — fux's rules only) and
+  `meta.extractor` pinned to `python`/`stdlib-ast`, so it regenerates **byte-identically**
+  from source regardless of whether the `[ast]` extra is installed.
+- **`--self` scope** ([fux/cliutil.py](fux/cliutil.py) `scope_root`/`self_root`) — a
+  pure root-swap: `query`/`path`/`explain`/`recall` ([fux/cligraph.py](fux/cligraph.py),
+  [fux/cliquery.py](fux/cliquery.py)) read the bundle instead of the project, reusing
+  every existing loader. Works in any repo with **no project `.fux/`**; `fux how` gains
+  a self-doc pointer to it.
+- **Packaging** ([pyproject.toml](pyproject.toml), [.gitignore](.gitignore)) — the
+  bundle is committed (the `**/.fux/out/` ignore is negated for `data/self/`) and added
+  to `package-data` so `--self` works on a plain `pip install`.
+- **Tests** ([tests/test_selfbuild.py](tests/test_selfbuild.py)) — byte-identical
+  regeneration; the committed bundle is **fresh** vs a rebuild (CI gate — a stale bundle
+  fails); the config is hermetic; `explain --self`/`recall --self` answer from a temp dir
+  with no footprint; the guard test ([test_no_llm_imports.py](tests/test_no_llm_imports.py))
+  now covers `selfbuild` as `$0`/offline/model-free.
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 
