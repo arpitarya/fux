@@ -75,7 +75,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux report` | ✅ | [fux/report.py](fux/report.py) |
 | `fux help [<cmd>]` · grouped `--help` | ✅ | [fux/registry.py](fux/registry.py), [fux/clihelp.py](fux/clihelp.py) |
 | `fux how "Q" [--top N] [--explain]` | ✅ | [fux/howto.py](fux/howto.py) (reuses [fux/recall.py](fux/recall.py)) |
-| `fux ingest <url\|file>` · `<id> --recheck` | ✅ | skill ([data/skills/ingest](fux/data/skills/ingest/SKILL.md)) + [fux/ingest.py](fux/ingest.py), [fux/cdp_utils.py](fux/cdp_utils.py) — `scrape` is a deprecated alias |
+| `fux ingest <srcs…> [--follow-links] [--queue]` · `<id> --recheck` | ✅ | skill ([data/skills/ingest](fux/data/skills/ingest/SKILL.md)) + [fux/ingest.py](fux/ingest.py), [fux/ingestqueue.py](fux/ingestqueue.py), [fux/ingestfollow.py](fux/ingestfollow.py), [fux/ingestreduce.py](fux/ingestreduce.py), [fux/cdp_utils.py](fux/cdp_utils.py) — batch + bounded link-following + reduce-before-draft; `scrape` is a deprecated alias |
 | `fux fetch-rules <source> [--raw]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/fetchrules.py](fux/fetchrules.py) |
 
 ### 2.2 Hooks — ✅ (plan §8)
@@ -383,7 +383,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (254 tests)
+### 2.20 Tests — ✅ (306 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -414,7 +414,9 @@ the **critique→act loop + advisory-first critic + report-first coverage gate**
 ([test_critic_loop.py](tests/test_critic_loop.py)),
 the **ratify → branch+PR routing guards** ([test_ratify_pr_routing.py](tests/test_ratify_pr_routing.py)),
 the **CLI help registry + `fux how` self-docs + CDP precedence + ingest provenance/recheck**
-([test_howto_help_ingest.py](tests/test_howto_help_ingest.py)),
+([test_howto_help_ingest.py](tests/test_howto_help_ingest.py)), the **batch +
+linked-document ingestion — queue/dedup, bounded follow-links, reduce-before-draft,
+Swagger drift** ([test_ingest_batch.py](tests/test_ingest_batch.py)),
 plus the **no-LLM-and-no-network-and-no-doc/vision-lib-on-the-maintenance-path guard**
 ([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
@@ -495,6 +497,59 @@ PR1 pipeline, reused as-is.
   (and a non-image one is not); `--recheck` fires `source-drift` on a changed local
   file and stays silent when unchanged; the deprecated `scrape` alias still dispatches
   and warns; `fux how` now answers "scrape a website into rules" → `ingest`.
+
+### 2.20c Batch + linked-document ingestion — ✅ (batch-ingest-handoff.md, PR3, v0.11.0)
+
+Adds (a) *many* sources at once and (b) opt-in following of a page to the documents
+it links — both bounded, both producing a **draft review queue**, nothing auto-active.
+Builds on 2.20b's single-source pipeline; the agent fetches/crawls/parses, the engine
+governs. Three new `$0`, stdlib-only engine modules:
+
+- **Draft review queue** ([fux/ingestqueue.py](fux/ingestqueue.py)) — writes/reads the
+  Markdown manifest at `.fux/ingest/queue.md` (one row per item: `source` /
+  `source_type` / `status: draft|failed` / trust flag / draft id / `source_hash` /
+  reason), deduped by `source_hash`; `expand_sources` expands globs deterministically
+  (sorted) + dedups the input list; `classify_type` maps an extension/URL to the
+  enum. `fux ingest --queue` renders it. Partial-failure-tolerant by construction —
+  a `failed` row coexists with drafts.
+- **Bounded depth-1 link discovery** ([fux/ingestfollow.py](fux/ingestfollow.py)) — the
+  agent fetches the page HTML; `discover()` applies the fence: same-origin by default
+  (`--cross-origin` widens), an extension allow-list (`ALLOW_EXT`; never
+  executables/scripts/archives), a `--max` cap (raises `FollowError` —
+  refuse-with-message, no silent truncate), depth-1 (it inspects one page, never
+  recurses). `is_direct_file()` lets a direct file/spec URL skip discovery. Uses only
+  `urllib.parse` (URL-string math, no socket).
+- **Reduce-before-draft** ([fux/ingestreduce.py](fux/ingestreduce.py)) — operates on
+  the agent's *extracted text* only (never a binary): per-type structure slicing
+  (prose → headings + tables + rule passages; `xlsx` → schema + sample rows + formulas,
+  **never the full grid**; `json/yaml/openapi` → contract keys, not example values),
+  a rule-signal pre-filter reusing `recall._tokens`, boilerplate/page-number strip,
+  and `changed_sections()` for incremental re-ingest. `reduce(..., full=True)` bypasses
+  it; reports tokens before→after and files the saving via `cage_receipt` (fail-open).
+- **CLI** ([fux/cli.py](fux/cli.py), [fux/cliquery.py](fux/cliquery.py)) — `ingest`
+  (and the `scrape` alias) take N positional `targets` + `--follow-links`,
+  `--cross-origin`, `--max N`, `--yes`, `--queue`, `--full`. `cmd_ingest` does the
+  deterministic parts ($0): `--queue` renders the manifest, `--recheck` re-verifies a
+  source, and with targets it prints the expanded/deduped source list + the skill
+  pointer (drafting itself stays the agent's tokens).
+- **Schema** ([schema.json](fux/data/schema.json)) — `source_type` enum extended
+  additively with `docx`, `json`, `yaml`, `openapi` (now
+  `url|pdf|xlsx|docx|txt|image|json|yaml|openapi`).
+- **Skill** ([data/skills/ingest/SKILL.md](fux/data/skills/ingest/SKILL.md)) —
+  multi-source loop, `--follow-links` discovery procedure, new extract branches
+  (Word, JSON/YAML, **Swagger/OpenAPI** → per-endpoint/param/auth/deprecation rules
+  with `--recheck` contract drift), reduce-before-draft step, and the queue-write step.
+- **Guard** ([tests/test_no_llm_imports.py](tests/test_no_llm_imports.py),
+  [test_ingest_batch.py](tests/test_ingest_batch.py)) — the `NETWORK` regex now bans
+  `urllib.request`/`urllib.error` (not the socket-free `urllib.parse`); a dedicated
+  test proves the three new modules import no parser/network/LLM library and stay
+  offline/model-free on import.
+- **Tests** ([test_ingest_batch.py](tests/test_ingest_batch.py), 36 cases) — batch
+  glob-expand/dedup, mixed draft|failed queue + partial-failure tolerance + dedup by
+  `source_hash`; follow-links depth-1/same-origin/allow-list/cap/direct-file-skip +
+  cross-origin widening; reduce cuts tokens / `--full` bypass / xlsx never sends the
+  full grid / contract slice / incremental changed-sections; Swagger contract drift via
+  `--recheck`; trust flags round-trip with nothing auto-active.
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 

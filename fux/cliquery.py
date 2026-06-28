@@ -161,18 +161,38 @@ def cmd_how(args) -> int:
 
 
 def cmd_ingest(args) -> int:
-    """`/fux ingest <url|file>` is a SKILL (the agent extracts + drafts, from a URL,
-    PDF, Excel, TXT, or image). The engine only handles the opt-in `--recheck`
-    source-drift re-verification, behind the network extra — never on the default
-    `fux check` path.
+    """`/fux ingest <sources…>` is a SKILL (the agent fetches/extracts/drafts, from
+    URLs, PDF, Excel, Word, TXT, image, JSON/YAML, or Swagger — and, with
+    `--follow-links`, the documents a page links). The engine only does the
+    deterministic, $0 parts: glob-expand + dedup the source list, show the draft
+    review queue (`--queue`), and re-verify a drafted source (`--recheck`, behind
+    the network extra) — never on the default `fux check` path, never a model call.
     """
+    targets = list(getattr(args, "targets", None) or [])
+    if getattr(args, "queue", False):
+        from fux import ingestqueue
+        print(ingestqueue.render(root()))
+        return 0
     if getattr(args, "recheck", False):
         from fux import ingest          # lazy: the only network/file-reading path
-        return ingest.recheck_cmd(root(), getattr(args, "target", None))
+        return ingest.recheck_cmd(root(), targets[0] if targets else None)
+    if targets:
+        from fux import ingestqueue
+        srcs = ingestqueue.expand_sources(targets)   # globs expand against cwd
+        print(f"fux ingest is an agent skill — fetching/extracting/drafting are the "
+              f"host agent's tokens, not the engine.\n  {len(srcs)} source(s) "
+              f"(globs expanded, deduped):")
+        for s in srcs:
+            print(f"    {s}  [{ingestqueue.classify_type(s)}]")
+        print("  Run it via Claude: /fux ingest <sources…> [--follow-links] "
+              "(see skills/ingest/SKILL.md)\n"
+              "  Drafts land in the review queue — show it: fux ingest --queue")
+        return 0
     print("fux ingest is an agent skill — fetching/extracting and drafting are the "
           "host agent's tokens, not the engine.\n"
-          "  Run it via Claude: /fux ingest <url|file>   (see skills/ingest/SKILL.md)\n"
-          "  Engine side ($0):  fux ingest <rule-id> --recheck   "
+          "  Run it via Claude: /fux ingest <sources…>   (see skills/ingest/SKILL.md)\n"
+          "  Queue ($0):        fux ingest --queue        (show the draft review queue)\n"
+          "  Recheck ($0):      fux ingest <rule-id> --recheck   "
           "(re-verify a drafted source; needs the [scrape] extra)")
     return 0
 

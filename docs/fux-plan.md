@@ -401,7 +401,7 @@ fux serve          # local dashboard over the generated views         ($0)
 fux recall --hybrid# RRF-fuse lexical + semantic + graph              ($0)
 fux how "Q"        # fux explains fux: question → the exact command   ($0)
 fux help [<cmd>]   # grouped help / per-command detail (from registry) ($0)
-fux ingest <url|f> # agent extracts URL/PDF/Excel/TXT/image → drafts (skill)
+fux ingest <srcs…> # agent batch-ingests URLs/files/globs → draft queue (skill)
 fux fetch-rules <s># fetch URL/PDF/txt → extract durable rule entries (skill)
 ```
 
@@ -423,24 +423,50 @@ Deterministic by default; the opt-in `--explain` emits a *fenced prompt* the hos
 agent answers with its own tokens — never an engine call, never on the `$0` path.
 
 Higher-level **skills** (`plan`, `adr`, `trace`, `savings`, `distill`, `ingest`)
-layer on top of these commands — see §16. `ingest` (URL/PDF/Excel/TXT/image → draft
-rules) is a skill, not engine code: the agent extracts — URL (HTTP, escalating to
-**CDP** for client-rendered shells — endpoint resolved by
-[fux/cdp_utils.py](../fux/cdp_utils.py) with precedence flags → `FUX_CDP_*` env →
-config → default `127.0.0.1:9299`), PDF/Excel (its own `pdf`/`xlsx` skills), TXT/MD
-(read directly), or image (native vision/OCR) — classifies the source's trust, and
+layer on top of these commands — see §16. `ingest` is a skill, not engine code: the
+agent extracts — URL (HTTP, escalating to **CDP** for client-rendered shells —
+endpoint resolved by [fux/cdp_utils.py](../fux/cdp_utils.py) with precedence flags →
+`FUX_CDP_*` env → config → default `127.0.0.1:9299`), PDF/Excel/Word (its own
+`pdf`/`xlsx`/`docx` skills), TXT/MD (read directly), image (native vision/OCR),
+JSON/YAML, or **Swagger/OpenAPI** (spec file, raw-spec URL, or Swagger-UI page →
+per-endpoint/param/auth/deprecation rules) — classifies the source's trust, and
 drafts `status: draft` rules carrying `source`/`source_type`/`fetched`/`source_hash`
-provenance (additive optional schema fields). An ingested rule is **never** auto-active
-and **never** auto-constitutional — it is a draft until a human reviews it and (if it
-binds) runs `/fux debate` → `fux ratify`. An image- or scanned-PDF-derived **money or
-regulatory** figure is additionally flagged the deterministic `verify-source` lint
-finding — never auto-trusted, human confirmation required. The only network/file-reading
-engine path is the opt-in `fux ingest <id> --recheck` (re-read a source — URL or local
-file — recompute the hash, raise a non-blocking `source-drift` finding), fenced behind
-the `[scrape]` extra and never on the default `fux check` path. `fux scrape <url>` keeps
-working as a **deprecated alias** for `ingest` for one release. The engine imports no
-PDF/Excel/OCR/vision library outside the unrelated, already-shipped `fetchrules.py`
-`[pdf]` edge — a guard test proves it.
+provenance (additive optional schema fields; `source_type` ∈
+`url|pdf|xlsx|docx|txt|image|json|yaml|openapi`).
+
+**Batch + linked documents (PR3).** `ingest` takes **N** URLs/files/globs at once;
+the engine deterministically expands globs and dedups the source list
+([fux/ingestqueue.py](../fux/ingestqueue.py)), then the agent loops the single-source
+pipeline over each — **partial-failure-tolerant** (a failing source is recorded
+`failed` with a reason; the batch continues), **deduped by `source_hash`**. The
+output is a **draft review queue** (`.fux/ingest/queue.md`, `fux ingest --queue`):
+one row per item (`source` / `source_type` / `status: draft|failed` / trust flag /
+draft id) — nothing auto-activates. With `--follow-links`, when a URL is an HTML
+page the agent discovers the documents it links and the engine
+([fux/ingestfollow.py](../fux/ingestfollow.py)) applies hard bounds: **depth-1 only**,
+**same-origin** by default (`--cross-origin` widens), an extension allow-list (never
+executables/scripts/archives), a `--max` cap (refuse-with-message, no silent
+mass-download), and list-and-confirm unless `--yes`; a direct file URL skips
+discovery. A **reduce-before-draft** pass ([fux/ingestreduce.py](../fux/ingestreduce.py),
+`$0`, deterministic) trims the agent's *extracted text* per type before drafting —
+PDF/Word → headings + tables + rule passages; Excel → schema + sample rows + formulas,
+**never the full grid**; JSON/YAML/Swagger → the contract, not example values — using
+a rule-signal pre-filter (reusing `recall.py`'s tokenizer), boilerplate strip, and an
+incremental diff that drafts only changed sections on re-ingest; it reports tokens
+before→after via `cage_receipt` and is bypassed by `--full` for high-stakes regulatory
+precision. It imports no parser/network/LLM library (guard test).
+
+An ingested rule is **never** auto-active and **never** auto-constitutional — it is a
+draft until a human reviews it and (if it binds) runs `/fux debate` → `fux ratify`. An
+image- or scanned-PDF-derived **money or regulatory** figure is additionally flagged
+the deterministic `verify-source` lint finding — never auto-trusted, human confirmation
+required. The only network/file-reading engine path is the opt-in
+`fux ingest <id> --recheck` (re-read a source — URL or local file — recompute the hash,
+raise a non-blocking `source-drift` finding; the contract-drift signal for
+Swagger/OpenAPI), fenced behind the `[scrape]` extra and never on the default
+`fux check` path. `fux scrape <url>` keeps working as a **deprecated alias** for
+`ingest` for one release. The engine imports no PDF/Excel/OCR/vision library outside
+the unrelated, already-shipped `fetchrules.py` `[pdf]` edge — a guard test proves it.
 
 ---
 

@@ -1,14 +1,17 @@
 ---
 name: fux-ingest
-description: "ingest a URL, PDF, Excel, TXT, or image → draft governed Fux rules — the agent extracts (HTTP/CDP for URLs, the pdf/xlsx skills for files, native vision for images), classifies the source's trust, and drafts status: draft rules with provenance; the engine validates and governs"
+description: "batch-ingest N URLs/files/globs (PDF, Excel, Word, TXT, image, JSON/YAML, Swagger/OpenAPI) — and optionally follow a page to the documents it links — → a draft review queue of governed Fux rules; the agent extracts (HTTP/CDP, its pdf/xlsx/docx/vision skills) and drafts status: draft rules with provenance, the engine validates, queues, and governs"
 trigger: /fux ingest
 ---
 
-# /fux ingest — file or web source → draft rules (agent extracts, fux governs)
+# /fux ingest — batch file/web sources → draft review queue (agent extracts, fux governs)
 
-Read a URL, PDF, Excel/CSV, TXT/Markdown, or image and draft the rules it implies as
-`status: draft` Fux entries **with provenance**. The split that keeps Fux `$0` and
-trustworthy:
+Read **one or many** sources — URLs, PDF, Excel/CSV, Word, TXT/Markdown, images,
+JSON/YAML, or Swagger/OpenAPI specs — and draft the rules they imply as
+`status: draft` Fux entries **with provenance**, collected into a **draft review
+queue** (`.fux/ingest/queue.md`). With `--follow-links`, when a URL is an HTML
+*page*, also discover and ingest the documents it links — **bounded and confirmed**
+(§ "Following links"). The split that keeps Fux `$0` and trustworthy:
 
 - **The agent** (you, this session) does the extraction and the judgement — HTTP,
   CDP rendering, PDF/Excel reading, OCR/vision, deciding what's a rule. Those are
@@ -26,11 +29,15 @@ one release) — prefer `/fux ingest` going forward.
 ## Inputs
 
 ```
-/fux ingest <url|file> [--domain <domain>] [--cdp-port <n>] [--cdp-host <host>]
+/fux ingest <sources…> [--follow-links] [--cross-origin] [--max <N>] [--yes]
+            [--full] [--domain <domain>] [--cdp-port <n>] [--cdp-host <host>]
+/fux ingest --queue            # show the draft review queue, then stop
 ```
 
-`<url|file>` may be an `http(s)://` URL or a local path: `.pdf`, `.xlsx`/`.csv`,
-`.txt`/`.md`, or an image (`.png`/`.jpg`/…).
+`<sources…>` is **one or more** `http(s)://` URLs and/or local paths/globs:
+`.pdf`, `.xlsx`/`.csv`, `.docx`, `.txt`/`.md`, images (`.png`/`.jpg`/…),
+`.json`, `.yaml`/`.yml`, or a Swagger/OpenAPI spec (file, raw-spec URL, or
+Swagger-UI page).
 
 ## Procedure
 
@@ -39,9 +46,29 @@ one release) — prefer `/fux ingest` going forward.
 Follow `skills/fux/SKILL.md` Step 1–2 to confirm `$FUX` resolves and the project
 has a `.fux/` footprint (`$FUX init` if not).
 
+### Step 1.5 — Expand + dedup the source list ($0, engine)
+
+Let the engine expand globs deterministically and dedup the source list — never
+hand-expand `*.pdf` yourself:
+
+```bash
+$FUX ingest <sources…>      # prints the expanded, deduped source list + type per item
+```
+
+If `--follow-links` is set and a source is an HTML **page**, run § "Following
+links" *first* to turn that page into a confirmed set of document URLs, then add
+those to the list. A **direct file URL** (ends in a doc extension) is ingested as
+that file — it skips discovery.
+
+Then **loop Steps 2–5 over each source** (this is PR2's single-source pipeline,
+run N times). The loop is **partial-failure-tolerant**: if a source 404s, is
+unreadable, or won't parse, record it as `failed` with the reason (Step 5b) and
+**continue** — one bad source never aborts the batch.
+
 ### Step 2 — Extract the source (branches on source type)
 
-Pick the branch for the input and record `source_type` for Step 4:
+Pick the branch for the input and record `source_type` for Step 4. **Before
+drafting, reduce the extracted text** — see § "Reduce before draft".
 
 **URL (`source_type: url`)** — HTTP first, escalate to CDP only if the page is a
 client-rendered shell (near-empty body, a lone spinner, "enable JavaScript…"):
@@ -70,10 +97,33 @@ caution** in Step 3.5 before trusting any number you read this way.
 **Excel / CSV (`source_type: xlsx`)** — use your `xlsx` skill to read the
 structured cells; note the sheet/range a figure came from.
 
+**Word (`source_type: docx`)** — use your `docx` skill to extract the headings,
+section text, and tables. The engine never opens a `.docx`.
+
 **TXT / Markdown (`source_type: txt`)** — read the file directly.
 
 **Image (`source_type: image`)** — use your native vision/OCR to read the text
 or figures in the image. See the OCR caution below before trusting it.
+
+**JSON / YAML (`source_type: json` / `yaml`)** — read the file/response and treat
+the **structure as the contract**: keys, required/enum/constraint fields, and
+defined shapes are rules; example *values* are not. Draft from the schema, not the
+sample data.
+
+**Swagger / OpenAPI (`source_type: openapi`)** — the standout structured source.
+The spec may be a `.json`/`.yaml` file, a raw-spec URL, or a **Swagger-UI page**
+(a client-rendered shell — CDP-render it as in the URL branch to find the linked
+`openapi.json`/`swagger.json`, then fetch *that*). Parse the spec and draft **one
+rule per contract**:
+
+- one per **endpoint contract** (method + path + its required request/response shape),
+- one per **required-param set** (which params are mandatory, their types/enums/limits),
+- one per **auth scheme** (which security scheme guards which operations),
+- one per **deprecation** (`deprecated: true` operations/params).
+
+Because the spec is machine-precise, `source_hash` + `fux ingest <id> --recheck`
+later **flag contract drift** — an endpoint dropped, a param removed, a scheme
+changed (Step "Re-verifying" below). Spec sources are the prime beneficiaries.
 
 ### Step 3 — Classify the source → type + trust
 
@@ -120,7 +170,7 @@ type: <convention|rule|glossary|regulatory>
 status: draft            # ingested — never active until a human reviews it
 domain: <domain>
 source: "<exact url or file path>"
-source_type: <url|pdf|xlsx|txt|image>
+source_type: <url|pdf|xlsx|docx|txt|image|json|yaml|openapi>
 fetched: "<ISO date, e.g. 2026-06-23>"
 source_hash: "<see below>"
 ---
@@ -155,9 +205,28 @@ $FUX build && $FUX check && $FUX lint
 ```
 
 Fix every schema and `no-why` finding. Then **stop** — do not activate or ratify.
-Tell the user what to do next:
 
-- Review each draft against the source.
+### Step 5b — Record the source in the draft review queue
+
+Whether the source drafted rules or failed, append one row to the queue so the
+batch has a single triage surface. Append per source in your loop:
+
+```bash
+$FUX_PY -c "
+from fux import ingestqueue as q, paths; import pathlib
+root = paths.find_project_root() or pathlib.Path('.')
+q.upsert(root, [q.Item(source='<source>', source_type='<type>',
+                       status='draft', trust='<verify-source|>',
+                       draft_id='<rule-id>', source_hash='<hash>')])"
+```
+
+A **failed** source records `status='failed'` + a `reason` and **no draft_id**.
+`upsert` dedups by `source_hash` (re-ingesting an identical doc updates its row).
+Show the whole queue any time with `fux ingest --queue`.
+
+### Step 5c — Tell the user what to do next
+
+- Review each draft against the source (triage the queue by trust flag first).
 - For anything that should **bind**: `/fux debate "<rule>"` → `fux ratify <id>`.
 - Regulatory drafts: verify against the primary/official source first.
 - Image/OCR-derived money or regulatory drafts: verify against the original
@@ -165,15 +234,85 @@ Tell the user what to do next:
 
 ### Step 6 — Report
 
+Report the batch as a whole — the queue is the output:
+
 ```
-✔ Drafted N rules from <source>  [domain: <domain>]  — all status: draft
+✔ Ingested M sources → K drafts (J failed)  [domain: <domain>]  — all status: draft
+  tokens (reduce-before-draft): <before> → <after>
 
-  convention  api-rate-limit-100rpm    100 requests/min per API key
-  regulatory  vat-standard-rate-20pct  DRAFT-VERIFY · 20% standard VAT (cite §X)
+  draft   openapi  api/openapi.json    12 endpoint/param/auth/deprecation rules
+  draft   pdf      ./circular-2026.pdf  3 rules   (⚑ regulatory · verify-source)
+  failed  url      https://x/404        404 Not Found
 
-Next: review, then /fux debate → fux ratify anything that binds.
+Queue: fux ingest --queue
+Next:  triage by trust flag, then /fux debate → fux ratify anything that binds.
 Re-check a source later:  fux ingest <id> --recheck   (opt-in; needs the [scrape] extra)
 ```
+
+## Following links (`--follow-links`, opt-in, BOUNDED)
+
+Off by default. With `--follow-links`, when a URL resolves to an HTML **page**
+(not a direct file), discover the documents it links and ingest them — under
+**hard bounds the engine enforces for you** so this can never become a crawler:
+
+1. **You** fetch the page HTML (HTTP, or CDP for a client-rendered shell) — your
+   tokens, as always.
+2. The **engine** filters the page's links to a bounded, allow-listed set:
+
+```bash
+$FUX_PY -c "
+from fux import ingestfollow as f
+import sys
+html = open('/tmp/page.html').read()
+for u in f.discover(html, '<page-url>', cross_origin=<False|True>, max_n=<N>):
+    print(u)"
+```
+
+`discover` applies the bounds: **depth-1 only** (it inspects *this* page's links,
+never recurses), **same-origin** by default (`--cross-origin` widens), an
+**extension allow-list** (`.pdf .xlsx .csv .docx .txt .md .json .yaml .yml` +
+images + OpenAPI/Swagger specs — **never** executables/scripts/archives), and a
+**cap** (`--max N`, default 20) — over the cap it raises `FollowError`
+(refuse-with-message; **no silent mass-download**).
+
+3. **List-and-confirm by default:** show the user the discovered links and let
+   them pick which to ingest. `--yes` takes all (up to the cap) without asking.
+4. Ingest the confirmed set as ordinary sources (Steps 2–5b). A **direct file
+   URL** (`…/circular.pdf`, or a raw-spec URL) is `is_direct_file()` → ingest it
+   directly, skipping discovery.
+
+## Reduce before draft (`$0`, deterministic — cut the token cost)
+
+Reading whole PDFs/Excels/Words is the dominant token cost of ingestion. Before
+you draft, feed your **extracted text** through the engine reducer and draft from
+the *reduced* extract, not the whole document. It never parses a binary — it
+operates on the text you already extracted:
+
+```bash
+$FUX_PY -c "
+from fux import ingestreduce as r
+import sys
+text = sys.stdin.read()
+out, stats = r.reduce(text, source_type='<type>', full=<False|True>)
+sys.stderr.write(f'tokens {stats[\"before_tokens\"]} -> {stats[\"after_tokens\"]}\n')
+print(out)" < /tmp/fux-ingest.txt > /tmp/fux-reduced.txt
+```
+
+- **Structure-aware per type:** PDF/Word → headings + tables + rule-bearing
+  passages; **Excel → schema + sample rows + formulas, NEVER the full data grid**;
+  JSON/YAML/Swagger → the contract/schema, not example values.
+- **Rule-signal pre-filter** (reusing fux's recall tokenizer): keeps chunks with
+  `must`/`shall`/`required`/`deprecated`/`limit`/`rate`/`threshold`/… plus their
+  section — reduces toward candidates, never a hard cut.
+- **Boilerplate/page-number strip + whitespace normalize + dedup.**
+- **Incremental re-ingest:** on a changed source, diff new vs the cached prior
+  extract and draft only the **changed** sections:
+  `ingestreduce.changed_sections(old_text, new_text)`.
+- **`--full` bypasses reduction** — use for high-stakes regulatory where
+  precision beats cost. The reducer reports tokens before→after and files the
+  saving via `cage_receipt` (fail-open).
+
+Report the per-source `before → after` token saving in Step 6.
 
 ## Re-verifying a source later (opt-in, `$0`-fenced)
 
@@ -181,6 +320,10 @@ Re-check a source later:  fux ingest <id> --recheck   (opt-in; needs the [scrape
 recomputes `source_hash`, and raises a `source-drift` finding if it changed since
 `fetched`. It is **behind the `[scrape]` extra and never on the default
 `fux check` path** — drift in an external source must never silently fail a build.
+
+For **Swagger/OpenAPI** sources this is the contract-drift signal: when the spec
+changes (an endpoint dropped, a param removed, an auth scheme changed), `--recheck`
+flags the drafted rule so you re-read the spec and re-draft the affected contracts.
 
 ## Quality bar
 
