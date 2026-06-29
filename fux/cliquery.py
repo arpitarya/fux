@@ -173,6 +173,23 @@ def cmd_ingest(args) -> int:
         from fux import ingestqueue
         print(ingestqueue.render(root()))
         return 0
+    if getattr(args, "connector", None):
+        from fux import ingestconnector
+        try:
+            pl = ingestconnector.plan(args.connector, getattr(args, "query", None),
+                                      since=getattr(args, "since", None),
+                                      max_items=getattr(args, "max", ingestconnector.DEFAULT_MAX))
+        except ingestconnector.ConnectorError as e:
+            print(f"fux: {e}")
+            return 1
+        print("fux ingest (connector) is an agent skill — the agent pulls server-side-filtered\n"
+              "  structured data (MCP → REST+PAT → export/clone → CDP-JSON → DOM; GitHub first);\n"
+              "  fux never builds a client or calls an API ($0). The engine only bounds + governs.\n"
+              f"  {pl.describe()}\n"
+              "  Run it via Claude: /fux ingest --connector <c> --query \"<filter>\" "
+              "(see skills/ingest/SKILL.md)\n"
+              "  Low-trust drafts land in the review queue — show it: fux ingest --queue")
+        return 0
     if getattr(args, "recheck", False):
         from fux import ingest          # lazy: the only network/file-reading path
         return ingest.recheck_cmd(root(), targets[0] if targets else None)

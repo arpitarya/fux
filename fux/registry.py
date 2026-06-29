@@ -39,7 +39,7 @@ COMMANDS: list[Command] = [
        "fux import docs/ --type narrative", "import-memory", "parity"),
     _c("import-memory", "authoring", "mirror Claude's home-dir memory into .fux/memory",
        "fux import-memory --scope shared", "import", "capture"),
-    _c("ingest", "authoring", "agent batch-ingests URLs/files/globs (+ --follow-links) → draft review queue (skill)",
+    _c("ingest", "authoring", "agent batch-ingests URLs/files/globs (+ --follow-links / --connector) → draft review queue (skill)",
        'fux ingest ./docs/*.pdf "https://docs.example.com/api"', "fetch-rules", "check", "ratify"),
     _c("scrape", "authoring", "deprecated alias for 'ingest' — use 'ingest' instead",
        'fux ingest "https://docs.example.com/api"', "ingest"),

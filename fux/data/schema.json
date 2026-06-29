@@ -39,7 +39,7 @@
     "updated": { "type": "string" },
     "author": { "type": "string" },
     "source": { "type": "string" },
-    "source_type": { "type": "string", "enum": ["url", "pdf", "xlsx", "docx", "txt", "image", "json", "yaml", "openapi"] },
+    "source_type": { "type": "string", "enum": ["url", "pdf", "xlsx", "docx", "txt", "image", "json", "yaml", "openapi", "jira", "confluence", "github"] },
     "fetched": { "type": "string" },
     "source_hash": { "type": "string" },
     "aliases": { "type": "array", "items": { "type": "string" } },

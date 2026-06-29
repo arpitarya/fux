@@ -248,6 +248,10 @@ def build_parser() -> argparse.ArgumentParser:
                         help="with --follow-links, take all discovered docs up to --max (skip confirm)")
         ig.add_argument("--full", action="store_true",
                         help="bypass reduce-before-draft; feed the whole extract (high-stakes regulatory)")
+        ig.add_argument("--connector", choices=["github", "jira", "confluence"],
+                        help="ingest from a connector (agent pulls via MCP/API; --query is mandatory)")
+        ig.add_argument("--query", help="server-side filter for --connector (JQL / GitHub query / space); refuses 'everything'")
+        ig.add_argument("--since", help="with --connector, only items changed since this cursor/date (delta ingest)")
         ig.add_argument("--cdp-port", type=int, help="CDP port for the ingest skill's render escalation")
         ig.add_argument("--cdp-host", help="CDP host for the ingest skill's render escalation")
         ig.set_defaults(fn=fn)

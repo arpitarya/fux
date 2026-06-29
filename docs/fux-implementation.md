@@ -77,7 +77,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux report` | ✅ | [fux/report.py](fux/report.py) |
 | `fux help [<cmd>]` · grouped `--help` | ✅ | [fux/registry.py](fux/registry.py), [fux/clihelp.py](fux/clihelp.py) |
 | `fux how "Q" [--top N] [--explain]` | ✅ | [fux/howto.py](fux/howto.py) (reuses [fux/recall.py](fux/recall.py)) |
-| `fux ingest <srcs…> [--follow-links] [--queue]` · `<id> --recheck` | ✅ | skill ([data/skills/ingest](fux/data/skills/ingest/SKILL.md)) + [fux/ingest.py](fux/ingest.py), [fux/ingestqueue.py](fux/ingestqueue.py), [fux/ingestfollow.py](fux/ingestfollow.py), [fux/ingestreduce.py](fux/ingestreduce.py), [fux/cdp_utils.py](fux/cdp_utils.py) — batch + bounded link-following + reduce-before-draft; `scrape` is a deprecated alias |
+| `fux ingest <srcs…> [--follow-links] [--connector C --query Q] [--queue]` · `<id> --recheck` | ✅ | skill ([data/skills/ingest](fux/data/skills/ingest/SKILL.md)) + [fux/ingest.py](fux/ingest.py), [fux/ingestqueue.py](fux/ingestqueue.py), [fux/ingestfollow.py](fux/ingestfollow.py), [fux/ingestreduce.py](fux/ingestreduce.py), [fux/ingestconnector.py](fux/ingestconnector.py), [fux/cdp_utils.py](fux/cdp_utils.py) — batch + bounded link-following + connectors + reduce-before-draft; `scrape` is a deprecated alias |
 | `fux fetch-rules <source> [--raw]` | ✅ | [fux/cliquery.py](fux/cliquery.py), [fux/fetchrules.py](fux/fetchrules.py) |
 
 ### 2.2 Hooks — ✅ (plan §8)
@@ -385,7 +385,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (313 tests)
+### 2.20 Tests — ✅ (325 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -610,6 +610,33 @@ ADR. The *debating* is the host agent's tokens; the **capture** — format, seal
   route writes a full sealed ADR; money route is link-only (no body, only the link);
   editing a captured ADR trips `tampered`; a sealed-but-not-link-only elgar record trips
   a hard-blocking `firewall`; the guard test covers `decisioncapture` as `$0`/offline.
+
+### 2.20f Connector ingestion — ✅ (batch-ingest-handoff.md §7, PR4, v0.14.0)
+
+Jira/Confluence/GitHub as a connector source class. The **agent** pulls structured,
+server-side-filtered data via MCP/API (the fallback ladder lives in the skill); **fux
+never builds a client or calls an API** — the engine is only the deterministic, `$0`
+fence + the same reduce → draft → review-queue → govern pipeline.
+
+- **Guardrail** ([fux/ingestconnector.py](fux/ingestconnector.py), ≤60) — `plan()`
+  validates `connector ∈ {github,jira,confluence}`, **refuses an unbounded query**
+  (empty / `*` / `all` / `everything` → `ConnectorError`; explicit server-side filter
+  mandatory), enforces the cap, carries a `--since` delta cursor, and marks every item
+  **low-trust** (`trust: candidate` — a ticket/wiki/PR is not a spec). Imports nothing
+  network/LLM.
+- **CLI** ([fux/cli.py](fux/cli.py), [fux/cliquery.py](fux/cliquery.py)) — `fux ingest`
+  gains `--connector`, `--query`, `--since`; `cmd_ingest`'s connector branch validates +
+  prints the bounded plan + skill pointer (the agent pulls & drafts into the queue).
+- **Schema** ([schema.json](fux/data/schema.json)) — `source_type` += `jira`/
+  `confluence`/`github` (additive).
+- **Skill** ([data/skills/ingest/SKILL.md](fux/data/skills/ingest/SKILL.md)) — the
+  efficiency stack (server-side filter → `--since` delta → structure-slice → reduce/dedup,
+  **GitHub first**), the fallback ladder (MCP → REST+PAT → export/`git clone` → CDP-JSON
+  → DOM; probes last), and the low-trust queue-write step.
+- **Tests** ([tests/test_ingest_connector.py](tests/test_ingest_connector.py)) — bounded
+  query accepted; unbounded/empty/`*`/`all` refused; unknown connector + `max<1` rejected;
+  `--since` carried; the CLI branch returns 0 on valid / 1 on unbounded; the guard test
+  covers `ingestconnector` as `$0`/offline.
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 

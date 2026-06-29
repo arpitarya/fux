@@ -501,6 +501,22 @@ Swagger/OpenAPI), fenced behind the `[scrape]` extra and never on the default
 `ingest` for one release. The engine imports no PDF/Excel/OCR/vision library outside
 the unrelated, already-shipped `fetchrules.py` `[pdf]` edge — a guard test proves it.
 
+**Connector sources (PR4) — Jira/Confluence/GitHub.** A connector source is distinct
+from file/URL: the agent pulls **structured, server-side-filtered** data via the
+existing **MCP connectors / APIs** — **fux never builds a client or calls an API** —
+then the same reduce → draft → review-queue → govern pipeline runs. These are
+**low-trust** (`trust: candidate` — a ticket/wiki/PR is not a spec) and never
+auto-active. The engine's only role is the deterministic, `$0` fence
+([fux/ingestconnector.py](../fux/ingestconnector.py)): `fux ingest --connector
+github|jira|confluence --query "<filter>"` **requires an explicit server-side query**
+and **refuses an unbounded "everything" pull** (the abuse surface), caps the item
+count (`--max`), and supports a `--since` delta cursor. The efficiency stack
+(server-side filter → delta → structure-slice → reduce/dedup, **GitHub first**) and
+the fallback ladder (MCP → REST+PAT → export/`git clone` → CDP-JSON → DOM scrape;
+probes are rungs 4–5, not the default) live in the ingest skill — at every rung the
+*agent* fetches; fux governs; the engine stays `$0` and client-free. `source_type`
+gains `jira`/`confluence`/`github`.
+
 ---
 
 ## 10. Additional capabilities (the "more things")
