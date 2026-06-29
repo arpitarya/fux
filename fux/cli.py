@@ -213,6 +213,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     sub.add_parser("self-build", help="regenerate fux's self-knowledge bundle from its own source ($0, AST-only)").set_defaults(fn=clicmds.cmd_self_build)
 
+    ps = sub.add_parser("pii-scan", help="scan non-plan .py/.md for hard PII identifiers (PAN/Aadhaar/account); exit 2 blocks the gate")
+    ps.add_argument("paths", nargs="*", help="files to scan (default: all git-tracked .py + .md)")
+    ps.set_defaults(fn=clicmds.cmd_pii_scan)
+
     fr = sub.add_parser("fetch-rules", help="fetch plain text from a URL / file / PDF for rule extraction")
     fr.add_argument("source", help="http(s):// URL, local .txt/.md, or .pdf path")
     fr.add_argument("--raw", action="store_true", help="omit the header line (pure text output)")

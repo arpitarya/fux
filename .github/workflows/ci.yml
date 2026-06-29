@@ -81,6 +81,9 @@ jobs:
       - name: Gate — knowledge must be in sync with code (exit 2 blocks merge)
         run: fux gate
 
+      - name: PII probe — no hard identifiers in non-plan .py/.md (exit 2 blocks merge)
+        run: fux pii-scan
+
   ai-review:
     # The second-set-of-eyes review (§2R.1). A solo author can't approve his own
     # PR, so the missing human approval is enforced as a CHECK: a separate

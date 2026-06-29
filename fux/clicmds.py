@@ -48,6 +48,23 @@ def cmd_build(args) -> int:
     return 0
 
 
+def cmd_pii_scan(args) -> int:
+    """Deterministic PII probe: hard identifiers (PAN/Aadhaar/account) in non-plan
+    `.py`/`.md` → exit 2 (blocks the gate). $0, stdlib, no LLM (port of dante)."""
+    from fux import gitutil, piiscan
+    here = Path.cwd()
+    given = list(getattr(args, "paths", None) or [])
+    if given:
+        targets = [Path(p) for p in given]
+    else:
+        names = gitutil.tracked_files(here, ["*.py", "*.md"]) or \
+            [str(p) for p in here.rglob("*.py")] + [str(p) for p in here.rglob("*.md")]
+        targets = [here / n for n in names]
+    hits = piiscan.scan(targets)
+    print(piiscan.render(hits))
+    return 2 if hits else 0
+
+
 def cmd_self_build(_args) -> int:
     from fux import selfbuild
     s = selfbuild.build()

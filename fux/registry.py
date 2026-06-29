@@ -57,6 +57,8 @@ COMMANDS: list[Command] = [
        "fux coverage", "stats", "mine"),
     _c("stats", "verification", "knowledge-health dashboard + score",
        "fux stats", "coverage", "lint"),
+    _c("pii-scan", "verification", "scan non-plan .py/.md for hard PII (PAN/Aadhaar/account); blocks the gate",
+       "fux pii-scan", "gate", "check"),
     _c("mine", "verification", "surface candidate rules latent in the code (drafts)",
        "fux mine --min-sites 3", "new", "coverage"),
     _c("parity", "verification", "decommission readiness vs graphify-out/docs/memory",

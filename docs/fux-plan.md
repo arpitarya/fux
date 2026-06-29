@@ -598,6 +598,15 @@ Beyond the core, these make Fux materially more useful:
     live protection drifts from the committed `.github/branch-protection.json` (source
     of truth). Full design + proof: `docs/constitution-enforcement-handoff.md`.
 
+    **PII content probe ([fux/piiscan.py](../fux/piiscan.py); `$0`, stdlib).** The
+    `fux gate` job also runs `fux pii-scan` — a port of dante's BLOCK-tier regexes
+    (PAN, Aadhaar, account/folio + a 6+ digit run) into a hand-rolled stdlib probe (no
+    pip dependency on dante). It scans non-plan `.py`/`.md` and exits 2 on a hard
+    identifier, so a stray PAN/Aadhaar is caught **in CI**, closing the gap a local-only
+    hook leaves (`--no-verify` bypasses it). Plan/spec/handoff/decision docs are exempt
+    by path (they cite the identifiers as examples) and any line can opt out with an
+    inline `pii-allow` marker. Deterministic — no LLM, no network.
+
 15. **Agent-native access (MCP).** `fux mcp` serves the read paths
     (recall/why/refs/coverage/savings/stats/context) as Model Context Protocol
     tools over stdio — a hand-rolled, **stdlib-only** JSON-RPC server (no new
