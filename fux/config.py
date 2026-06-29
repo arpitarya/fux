@@ -27,6 +27,7 @@ DEFAULTS = {
     "recall_hybrid": False,   # opt-in RRF fusion of lexical ⊕ semantic ⊕ graph (§17.1)
     "recall_expand": False,   # opt-in deterministic query expansion (glossary+graph, §17.18b)
     "capture": False,         # opt-in Stop-hook session capture for distill (§17.2)
+    "propose_forward": False,  # opt-in SessionEnd nudge to propose rules-with-why (rule-proposer §3A)
     "memory_ttl_days": 180,   # type: memory decays after this many untouched days (§17.3)
     "usage_tracking": False,   # opt-in: record served rules → usage-weighted decay (§17.20c)
     "cost_tracking": False,    # opt-in: record each lookup's savings → cumulative cost.json (§12)
@@ -79,6 +80,9 @@ def default_toml() -> str:
         "recall_hybrid = false\n\n"
         "# Opt-in Stop-hook session capture → queue observations for `fux distill`.\n"
         "capture = false\n\n"
+        "# Opt-in SessionEnd nudge: propose draft rules-with-why from the session\n"
+        "# (host-agent skill; drafts await triage in .fux/CANDIDATES.md, never blocks).\n"
+        "propose_forward = false\n\n"
         "# type: memory entries decay (excluded from `fux context`) after N days.\n"
         "memory_ttl_days = 180\n\n"
         "# Opt-in: record which rules recall/why serve → usage-weighted decay ($0).\n"

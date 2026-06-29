@@ -13,7 +13,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Core CLI surface (plan §9) | ✅ | 41 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
+| Core CLI surface (plan §9) | ✅ | 43 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
 | Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
@@ -27,7 +27,8 @@
 | Constitution layer (tiers, integrity, provenance, debate, split, critic) | ✅ | Tiers + `--baseline` + tamper/lock/`ratify` (incl. un-ratified/promoted-tier block) + provenance drift + `/fux debate` + split router + critic loop & report-first coverage gate (Phases 0–5 + 3b, v0.4.0); only the runtime critic is deferred ([fux/constitution.py](fux/constitution.py), [fux/provenance.py](fux/provenance.py)) |
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
-| Skills (`plan`/`adr`/`trace`/`savings`/`distill`) | ✅ | `plan` flagship; `distill` closes the memory loop |
+| Skills (`plan`/`adr`/`trace`/`savings`/`distill`/`propose-rules`) | ✅ | `plan` flagship; `distill` closes the memory loop; `propose-rules` the authoring loop |
+| Rule Proposer (agents author, humans ratify; [rule-proposer.md](rule-proposer.md)) | ✅ | `fux propose-rules [--retro\|--from]` + `fux candidates [accept\|reject]` → persistent, never-blocking `.fux/CANDIDATES.md`; §4 gate, dedup vs rules+queue, capped; nothing auto-active/constitutional; $0 harness (guard) ([fux/proposer.py](fux/proposer.py), [fux/candidates.py](fux/candidates.py)) |
 | Decommission tooling (graph coverage, import, parity) | ✅ | `build --full`, `import`/`import-memory`, `fux parity` gate — see §2.20 |
 | Decommission old stores in Anton | ⬜ | Tooling shipped; run it against Anton then retire when `fux parity` is READY ([plan §17.9](fux-plan.md)) |
 
@@ -386,7 +387,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (331 tests)
+### 2.20 Tests — ✅ (344 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges

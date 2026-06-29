@@ -128,6 +128,23 @@ def build_parser() -> argparse.ArgumentParser:
     mn.add_argument("--min-sites", type=int, default=3, help="min repeats to flag a magic number")
     mn.set_defaults(fn=cliquery.cmd_mine)
 
+    pr = sub.add_parser("propose-rules",
+                        help="propose draft rules → .fux/CANDIDATES.md (forward skill / --retro $0)")
+    pr.add_argument("--retro", action="store_true",
+                    help="$0 retro pass: fux mine + git-history why-extraction (capped, deduped)")
+    pr.add_argument("--from", dest="from_file", metavar="FILE",
+                    help="file the agent's drafted candidates (JSON list; '-' = stdin)")
+    pr.set_defaults(fn=cliquery.cmd_propose_rules)
+
+    cn = sub.add_parser("candidates", help="review/triage the candidate rules surface (.fux/CANDIDATES.md)")
+    cn.add_argument("action", nargs="?", choices=["accept", "reject"],
+                    help="accept → active rule (human ratify); reject → drop (not re-proposed)")
+    cn.add_argument("id", nargs="?", help="candidate id (for accept/reject)")
+    cn.add_argument("--pending", action="store_true", help="show only pending candidates")
+    cn.add_argument("--why-todo", dest="why_todo", action="store_true",
+                    help="show only candidates flagged why: TODO")
+    cn.set_defaults(fn=cliquery.cmd_candidates)
+
     cap = sub.add_parser("capture", help="session observation queue for `fux distill`")
     cap.add_argument("--list", action="store_true", help="show the pending queue without observing")
     cap.add_argument("--clear", action="store_true", help="empty the queue (after distilling)")
@@ -264,6 +281,7 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("hook-touch").set_defaults(fn=lambda a: hooks.post_tool_use())
     sub.add_parser("hook-check").set_defaults(fn=lambda a: hooks.stop())
     sub.add_parser("hook-recall").set_defaults(fn=lambda a: hooks.user_prompt_recall())
+    sub.add_parser("hook-propose").set_defaults(fn=lambda a: hooks.session_end_propose())
 
     # `fux <cmd> --help` shows the registry detail (desc + usage + example + related).
     for name, parser in sub.choices.items():

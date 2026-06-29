@@ -84,6 +84,22 @@ def _emit_drift_prompts(root, findings) -> None:
             print(drift.scoped_prompt(rule, root))
 
 
+def session_end_propose() -> int:
+    """Opt-in (config `propose_forward`) SessionEnd nudge to propose rules-with-why.
+
+    The harness calls no model — it only prompts the host agent to run the
+    propose-rules skill, whose drafts land in .fux/CANDIDATES.md for triage. Never
+    blocks, never nags when the gate is off (rule-proposer §3A)."""
+    root = root_of(event())
+    if not root or not config.load(paths.Footprint(root).config).get("propose_forward"):
+        return 0
+    print("Fux: consider proposing rules from this session — review the diff + your "
+          "rationale, draft candidates-with-why, then `fux propose-rules --from drafts.json` "
+          "(skills/propose-rules/SKILL.md). Drafts await triage in .fux/CANDIDATES.md; "
+          "nothing auto-activates.")
+    return 0
+
+
 def user_prompt_recall() -> int:
     ev = event()
     root = root_of(ev)
