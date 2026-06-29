@@ -34,6 +34,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `seal` | verification | bind rules to an AST fingerprint of their code | `fux seal --all` |
 | `coverage` | verification | % of important files with a governing rule | `fux coverage` |
 | `stats` | verification | knowledge-health dashboard + score | `fux stats` |
+| `pii-scan` | verification | scan non-plan .py/.md for hard PII (PAN/Aadhaar/account); blocks the gate | `fux pii-scan` |
 | `mine` | verification | surface candidate rules latent in the code (drafts) | `fux mine --min-sites 3` |
 | `parity` | verification | decommission readiness vs graphify-out/docs/memory | `fux parity` |
 | `ratify` | governance | ratify a constitutional rule (stamp + seal + lock) | `fux ratify money-never-floats --by "Arpit"` |

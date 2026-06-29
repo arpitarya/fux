@@ -18,6 +18,12 @@ def is_repo(root: Path) -> bool:
     return _run(["rev-parse", "--is-inside-work-tree"], root) == "true"
 
 
+def tracked_files(root: Path, patterns: list[str]) -> list[str]:
+    """Git-tracked files matching the pathspec patterns (e.g. ['*.py', '*.md'])."""
+    out = _run(["ls-files", *patterns], root) or ""
+    return [ln.strip() for ln in out.splitlines() if ln.strip()]
+
+
 def user_name(root: Path) -> str | None:
     """The configured git author name — the default `fux ratify --by` ratifier."""
     return _run(["config", "user.name"], root) or None

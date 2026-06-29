@@ -63,6 +63,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux lint [--strict]` | ✅ | [fux/lint.py](fux/lint.py) |
 | `fux stats` | ✅ | [fux/stats.py](fux/stats.py) |
 | `fux gate [--install] [--strict-lint] [--baseline FILE]` | ✅ | [fux/gate.py](fux/gate.py), [fux/baseline.py](fux/baseline.py) |
+| `fux pii-scan [paths…]` | ✅ | [fux/piiscan.py](fux/piiscan.py), [fux/clicmds.py](fux/clicmds.py); dante's BLOCK regexes (stdlib), wired into the `fux gate` CI job |
 | `fux mcp` | ✅ | [fux/mcpserver.py](fux/mcpserver.py) |
 | `fux capture [--list] [--clear]` | ✅ | [fux/capture.py](fux/capture.py) |
 | `fux serve [--port N]` | ✅ | [fux/serve.py](fux/serve.py) |
@@ -385,7 +386,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
 
-### 2.20 Tests — ✅ (325 tests)
+### 2.20 Tests — ✅ (331 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -637,6 +638,31 @@ fence + the same reduce → draft → review-queue → govern pipeline.
   query accepted; unbounded/empty/`*`/`all` refused; unknown connector + `max<1` rejected;
   `--since` carried; the CLI branch returns 0 on valid / 1 on unbounded; the guard test
   covers `ingestconnector` as `$0`/offline.
+
+### 2.20g PII content gate probe — ✅ (constitution-enforcement / backlog item 5, v0.15.0)
+
+Closes the residual gap: a stray PAN/Aadhaar in a non-plan `.py`/`.md` was only caught
+by a local hook (bypassable via `--no-verify`, absent from CI). dante's BLOCK-tier
+regexes, ported to a hand-rolled **stdlib** probe (no pip dependency on dante), wired
+into the required `fux gate` CI job.
+
+- **Probe** ([fux/piiscan.py](fux/piiscan.py), ≤100) — `BLOCK_PATTERNS` mirror dante's
+  PAN / Aadhaar / account-id regexes; `scan_text`/`scan_file`/`scan` return
+  `(path, line, kind, snippet)` hits in deterministic order. Plan/spec/handoff/decision
+  docs are **exempt by path** (`is_exempt`); any line opts out with an inline `pii-allow`
+  marker. Imports only `re` — no LLM, no network.
+- **CLI** ([fux/clicmds.py](fux/clicmds.py), [fux/cli.py](fux/cli.py)) — `fux pii-scan
+  [paths…]` scans the given paths or all git-tracked `.py`/`.md`
+  ([fux/gitutil.py](fux/gitutil.py) `tracked_files`) and **exits 2** on a hit (blocks the
+  gate), 0 clean.
+- **Wall** ([.github/workflows/ci.yml](.github/workflows/ci.yml)) — `fux pii-scan` is a
+  step in the `fux gate` job, so a hard identifier blocks the merge in CI, not just
+  locally.
+- **Tests** ([tests/test_pii_scan.py](tests/test_pii_scan.py)) — each identifier
+  detected; clean text passes; the `pii-allow` marker + path exemption skip a line/file;
+  the CLI exits 2 on a hit / 0 clean; the guard test covers `piiscan` as `$0`/offline.
+  (The test's own example identifiers carry `pii-allow` markers so the gate doesn't flag
+  the test file.)
 
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 
