@@ -167,7 +167,7 @@ Every maintenance command is shell / AST / parse — **no LLM calls, ever.** The
 
 ## What's new
 
-**Latest — v0.13.0:** decision capture — every `/fux debate` becomes a tamper-evident, content-routed ADR (money → elgar link-only, ADR 0001).
+**Latest — v0.14.0:** connector ingestion — pull Jira/Confluence/GitHub via MCP/API into the low-trust review queue, server-side filtered (an explicit query is mandatory; fux stays client-free).
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name

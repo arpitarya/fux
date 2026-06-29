@@ -25,7 +25,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `self-build` | authoring | regenerate fux's self-knowledge bundle from its own source ($0, AST-only) | `fux self-build` |
 | `import` | authoring | import existing markdown as narrative entries | `fux import docs/ --type narrative` |
 | `import-memory` | authoring | mirror Claude's home-dir memory into .fux/memory | `fux import-memory --scope shared` |
-| `ingest` | authoring | agent batch-ingests URLs/files/globs (+ --follow-links) → draft review queue (skill) | `fux ingest ./docs/*.pdf "https://docs.example.com/api"` |
+| `ingest` | authoring | agent batch-ingests URLs/files/globs (+ --follow-links / --connector) → draft review queue (skill) | `fux ingest ./docs/*.pdf "https://docs.example.com/api"` |
 | `scrape` | authoring | deprecated alias for 'ingest' — use 'ingest' instead | `fux ingest "https://docs.example.com/api"` |
 | `fetch-rules` | authoring | fetch URL/PDF/txt → extract durable rule entries (skill) | `fux fetch-rules "https://example.com/policy" --raw` |
 | `check` | verification | validate schema/refs/staleness/conflicts; --fix repairs | `fux check --fix` |

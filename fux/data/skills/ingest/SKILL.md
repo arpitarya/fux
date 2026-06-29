@@ -325,6 +325,68 @@ For **Swagger/OpenAPI** sources this is the contract-drift signal: when the spec
 changes (an endpoint dropped, a param removed, an auth scheme changed), `--recheck`
 flags the drafted rule so you re-read the spec and re-draft the affected contracts.
 
+## Connector sources (`--connector`, agent pulls structured data; fux governs)
+
+A connector source — **Jira / Confluence / GitHub** — is distinct from file/URL: the
+agent pulls **structured, server-side-filtered** data via the existing **MCP connectors
+/ APIs**; **fux never builds a client or calls an API.** Then the *same* reduce → draft
+→ review-queue → govern pipeline runs. These are **low-trust** (a ticket/wiki/PR is not
+a spec): they land in the queue weighted `trust: candidate`, bounded and confirmed like
+`--follow-links`, never auto-active. `source_type` is `jira|confluence|github`.
+
+**Bounds (mandatory — the engine enforces them via `fux ingest --connector …`):**
+- An explicit **server-side query/filter is required** — `fux ingest --connector jira
+  --query "<JQL>"` etc. The engine **refuses an unbounded "everything" pull** (empty /
+  `*` / `all`). Tokens you never fetch cost nothing.
+- Cap the item count (`--max`); `--since <cursor>` does a **delta** (only what changed).
+- **List-and-confirm before drafting**, same discipline as `--follow-links`.
+
+**Efficiency stack — most impactful first ("pull less" beats "reduce more"):**
+1. **Server-side filter, never the firehose.** Jira → JQL (acceptance-criteria/decision
+   tickets, a board, a label — never "all sprints"); GitHub → API query (PRs/ADRs/docs,
+   not CI logs or bot comments); Confluence → space/page query.
+2. **Delta / `--since` cursor** — ingest once, then only what changed.
+3. **Structure-slice each item** — Jira: title + description + **acceptance criteria**
+   (drop comment threads/status history); GitHub: PR/commit title + body + linked issue +
+   ADRs (drop CI logs/bot noise; code rules stay `fux mine`'s job); Confluence: page body
+   (drop comments/version history).
+4. **Reduce-before-draft** + **dedup by `source_hash`** on what remains.
+
+**What's worth ingesting (recommended order — GitHub first, highest signal):** GitHub →
+PR/commit *rationale* + ADRs + docs (the *why*); Jira → acceptance criteria + decisions;
+Confluence → runbooks/decisions/glossary pages.
+
+**Fallback ladder — when the MCP connector doesn't work (most efficient first; always
+prefer structured, server-filtered JSON over scraped DOM):**
+1. **MCP connector** — default. Structured, server-filtered, auth managed by the connector.
+2. **Direct REST API + token (PAT)** — same JSON, same server-side filtering. *The* real
+   fallback (the connector was only a wrapper around this).
+3. **Native export / `git clone`** — bulk offline snapshot. **GitHub needs neither
+   connector nor probe** — `git clone` gives code + ADRs + docs for `$0`, plus the API for
+   PRs. Jira/Confluence: CSV / space export for a one-shot.
+4. **CDP via the authenticated browser session, calling the JSON REST endpoints** — only
+   when the API is reachable *only* through the logged-in browser (SSO-only, no PAT). The
+   SPA calls `/rest/api/...` with the session cookie; `fetch()` those in page context →
+   **structured JSON, not scraped DOM.**
+5. **CDP DOM scraping** — absolute last resort, only when even the in-browser API is
+   blocked. Fragile, token-heavy; accept the cost knowingly.
+
+Probes (CDP) are rungs 4–5, **not** the default — reach for the REST API and export/clone
+first. At every rung the *agent* fetches; fux governs; the engine stays `$0` and
+client-free.
+
+**Queue write (low-trust):** record each connector item exactly like Step 5b, with
+`source_type='jira|confluence|github'` and `trust='candidate'`:
+```bash
+fux build >/dev/null 2>&1 || true
+python -c "
+from fux import ingestqueue as q, paths; import pathlib
+root = paths.find_project_root() or pathlib.Path('.')
+q.upsert(root, [q.Item(source='<jira-key|pr-url|page-id>', source_type='github',
+                       status='draft', trust='candidate',
+                       draft_id='<rule-id>', source_hash='<hash>')])"
+```
+
 ## Quality bar
 
 Every drafted entry must:
