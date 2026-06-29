@@ -11,8 +11,8 @@ from collections import Counter
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from fux import (check, config, coverage, findings, lint, loader, paths,
-                 savings, verify)
+from fux import (candidates, check, config, coverage, findings, lint, loader,
+                 paths, savings, verify)
 from fux.model import RuleSet
 
 
@@ -32,6 +32,7 @@ class Stats:
     verify: dict         # status -> count
     savings_x: float
     graph: dict          # nodes/edges/communities (0 if no graph.json yet)
+    pending_candidates: int = 0   # drafts awaiting triage in .fux/CANDIDATES.md
     score: int = 0
     components: dict = field(default_factory=dict)
 
@@ -58,6 +59,7 @@ def build(root: Path) -> Stats:
         verify=dict(Counter(v.status for v in vres)),
         savings_x=round(sav.avg_ratio(), 1),
         graph=_graph_shape(root),
+        pending_candidates=candidates.pending_count(root),
     )
     _score(st, rs)
     return st
@@ -125,6 +127,8 @@ def render(st: Stats) -> str:
     shape = "not built yet (run `fux build`)" if g.get("stale") else \
             f"{g['nodes']} nodes · {g['edges']} edges · {g['communities']} communities"
     L.append(f"  graph:     {shape}")
+    if st.pending_candidates:
+        L.append(f"  candidates: {st.pending_candidates} draft(s) pending review → .fux/CANDIDATES.md")
     return "\n".join(L)
 
 

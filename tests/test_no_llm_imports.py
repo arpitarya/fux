@@ -18,7 +18,8 @@ FUX_DIR = Path(fux.__file__).resolve().parent
 MAINT = ["check", "gate", "verify", "seal", "constitution", "critic", "criticloop",
          "baseline", "findings", "hooks", "hookio", "touch", "mcpserver", "lint",
          "stats", "fix", "recall", "howto", "registry", "clihelp", "cdp_utils",
-         "selfbuild", "decisioncapture", "ingestconnector", "piiscan"]
+         "selfbuild", "decisioncapture", "ingestconnector", "piiscan",
+         "candidates", "proposer"]
 # `criticllm.py` is the ONE sanctioned edge — the opt-in `[critic]` headless judge, never on
 # the maintenance path. Every other module is scanned.
 EDGE = "criticllm.py"

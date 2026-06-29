@@ -1086,6 +1086,27 @@ define the plan artifact's required sections *before* `plan` is built.
     `fux mine` surface magic numbers repeated across ≥N sites as draft `convention`
     candidates (Python via `ast`, others via the sanitized digit scan). Richer
     invariants (null/positivity/ordering) are the next miners.
+24a. ✅ **Rule Proposer — agents author, humans ratify ([docs/rule-proposer.md](rule-proposer.md)).**
+    Closes the authoring loop: the agent that wrote the code **proposes the
+    rules-with-why**; you only ratify. Two surfaces, one persistent review file
+    `.fux/CANDIDATES.md` (NOT the derived `DRIFT.md`; persistent, never blocks).
+    **Forward** (the high-value one, agent skill [propose-rules](../fux/data/skills/propose-rules/SKILL.md)):
+    on an opt-in SessionEnd / per-PR pass the agent reviews the diff **plus its
+    rationale** (commit/PR/session) and drafts candidates-with-why — captured at
+    decision-time while it's fresh. **Retro** (`fux propose-rules --retro`, $0): `fux
+    mine` AST candidates + their *why* recovered from git commit subjects, capped +
+    deduped + why-density-sorted. The **§4 gate** keeps it honest — no recoverable
+    why ⇒ no draft (a genuine invariant may draft `why: TODO`, a pure restatement is
+    dropped); dedup is vs **existing rules + the queue**. **Hard lines:** every
+    proposal is `status: draft`, `tier: standard` — *nothing* auto-active, **nothing
+    auto-constitutional** (`con-amendment` is sacred). The agent spends the tokens
+    (drafting); the engine's gate/dedup/file step is `$0`/stdlib/deterministic and
+    calls no model (guard test). The forward hook is **opt-in** (`propose_forward`).
+    `fux candidates [accept|reject] <id>` triages; `accept` is the human ratification
+    → an active standard rule (constitutional candidates route via `/fux debate` →
+    `fux ratify`). **Shipped:** [candidates.py](../fux/candidates.py) (the surface),
+    [proposer.py](../fux/proposer.py) (retro + the gate), `fux propose-rules` /
+    `fux candidates`, the opt-in `hook-propose` nudge.
 24. ✅ **Knowledge archaeology (temporal *why*).** The substrate is git-versioned, so
     every *why* has a history nobody can see today. Build the time axis over
     `.fux/rules/` ([gitutil.py](../fux/gitutil.py)): `fux why <id> --history` walks

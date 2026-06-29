@@ -36,7 +36,7 @@ def run(root: Path) -> list[Finding]:
     for f in findings:
         f.tier = tier_of.get(f.rule_id, "standard")   # constitution layer (plan §6)
     findings.sort(key=lambda f: (f.kind, f.rule_id, f.message))  # canonical → baseline diff
-    _write_drift(fp, findings)
+    _write_drift(fp, findings, root)
     return findings
 
 
@@ -141,7 +141,7 @@ def _conflicts(layered: list[Rule]) -> list[Finding]:
     return out
 
 
-def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
+def _write_drift(fp: paths.Footprint, findings: list[Finding], root: Path) -> None:
     lines = ["# Fux DRIFT report", "",
              f"_{len(findings)} finding(s)._" if findings else "_No drift — all rules current._", ""]
     for kind in ("tampered", "firewall", "schema", "dead-ref", "conflict", "stale",
@@ -152,4 +152,7 @@ def _write_drift(fp: paths.Footprint, findings: list[Finding]) -> None:
             lines.append(f"## {kind} ({len(group)})")
             lines += [f"- {f.rule_id}: {f.message}" for f in group]
             lines.append("")
+    from fux import candidates       # read-only pointer; NEVER a Finding, NEVER blocks
+    if ptr := candidates.pointer(root):
+        lines += ["## candidates", f"- {ptr}", ""]
     fp.out_file("DRIFT.md").write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")

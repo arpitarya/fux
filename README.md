@@ -138,6 +138,8 @@ fux critic "<change>"          # critique a change vs principles before it lands
 fux coverage                   # % of important files with a governing rule
 fux verify --fuzz              # run invariant `check:`; boundary-fuzz div-by-zero
 fux mine                       # surface candidate rules latent in the code (drafts)
+fux propose-rules --retro      # agent proposes rules-with-why → drafts you ratify ($0 retro)
+fux candidates accept <id>     # triage .fux/CANDIDATES.md: promote a draft → active rule
 fux savings "how is day P&L computed"  # measured token + dollar cost win
 fux lint                       # rule quality: missing why / code_refs / edges
 fux stats                      # knowledge-health dashboard + score
@@ -167,7 +169,7 @@ Every maintenance command is shell / AST / parse — **no LLM calls, ever.** The
 
 ## What's new
 
-**Latest — v0.15.0:** PII content gate — `fux pii-scan` catches a stray PAN/Aadhaar/account number in non-plan `.py`/`.md` as a required CI check (dante's regexes, ported stdlib; `$0`).
+**Latest — v0.16.0:** Rule Proposer — the agent that wrote the code proposes the rules-with-why; you only ratify. `fux propose-rules --retro` (mine + git-history why) and a forward agent skill land drafts in the persistent `.fux/CANDIDATES.md`; `fux candidates accept|reject` triages. Nothing auto-active, nothing auto-constitutional; `$0`/stdlib harness.
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name

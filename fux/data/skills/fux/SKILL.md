@@ -43,6 +43,8 @@ cheaply maintained: every maintenance path is shell/AST/parse — **no LLM calls
 /fux trace "<feature>"     # walk the graph to explain how a feature spans modules
 /fux savings ["<q>"]       # interpret the cost-savings report → next action   (skill)
 /fux distill ["<focus>"]   # capture this session's decisions as memory/adr    (skill)
+/fux propose-rules [--retro]# agent proposes rules-with-why → drafts you ratify (skill)
+/fux candidates [accept|reject <id>]# triage the proposed-rule review surface   ($0)
 /fux fetch-rules <source>  # fetch URL/PDF/txt → extract durable rule entries  (skill)
 /fux ingest <url|file>     # agent extracts URL/PDF/Excel/TXT/image → drafts   (skill)
 ```
@@ -125,6 +127,8 @@ $FUX context >/dev/null 2>&1 || $FUX init
 | `/fux critic "<change>"` | follow `skills/critic/SKILL.md` (deterministic pass → self-critique → revise) |
 | `/fux trace "<feature>"` | follow `skills/trace/SKILL.md` |
 | `/fux distill ["focus"]` | follow `skills/distill/SKILL.md` |
+| `/fux propose-rules [--retro]` | follow `skills/propose-rules/SKILL.md` (forward: agent drafts-with-why → `$FUX propose-rules --from`; retro: `$FUX propose-rules --retro`) |
+| `/fux candidates [accept\|reject <id>]` | `$FUX candidates` to triage; `accept` → active rule, `reject` → drop (never auto-active) |
 | `/fux fetch-rules <src>` | follow `skills/fetch-rules/SKILL.md` |
 | `/fux ingest <url\|file>` | follow `skills/ingest/SKILL.md` (agent extracts → drafts; never auto-active) |
 

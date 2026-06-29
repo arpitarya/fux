@@ -2,9 +2,9 @@
 from __future__ import annotations
 import sys
 
-from fux import (capture, config, costledger, coverage, explain, feedback,
-                 fetchrules, lint, loader, mine, parity, paths, recall, savings,
-                 scaffold, seal, stats, tour, verify)
+from fux import (candidates, capture, config, costledger, coverage, explain,
+                 feedback, fetchrules, lint, loader, mine, parity, paths, recall,
+                 savings, scaffold, seal, stats, tour, verify)
 from fux.cliutil import root, scope_root
 
 
@@ -126,6 +126,81 @@ def cmd_stats(_args) -> int:
 
 def cmd_mine(args) -> int:
     print(mine.render(mine.mine(root(), min_sites=getattr(args, "min_sites", 3))))
+    return 0
+
+
+def cmd_propose_rules(args) -> int:
+    """Propose draft rules into .fux/CANDIDATES.md — forward (agent --from) or retro ($0).
+
+    The harness never calls an LLM: --retro is pure mine+git; --from just gates/files
+    the candidates the host agent drafted. Nothing here auto-activates (§2).
+    """
+    from fux import proposer
+    here = root()
+    if getattr(args, "from_file", None):
+        import json
+        raw = sys.stdin.read() if args.from_file == "-" else open(args.from_file).read()
+        added = proposer.from_json(here, json.loads(raw))
+    elif getattr(args, "retro", False):
+        added = proposer.retro(here)
+    else:
+        print("fux propose-rules — two-sided (drafts only; nothing auto-activates):\n"
+              "  forward (skill): the agent drafts candidates-with-why from the diff +\n"
+              "    its rationale, then files them: fux propose-rules --from drafts.json\n"
+              "    (see skills/propose-rules/SKILL.md)\n"
+              "  retro ($0):      fux propose-rules --retro   (mine + git-history why)\n"
+              "  triage:          fux candidates [--pending] · accept|reject <id>")
+        return 0
+    print(f"✔ {len(added)} draft(s) → {candidates.path_of(here)}" if added
+          else "· no new candidates (all dropped by the gate, duplicate, or capped)")
+    return 0
+
+
+def cmd_candidates(args) -> int:
+    here = root()
+    action, cid = getattr(args, "action", None), getattr(args, "id", None)
+    if action in ("accept", "reject"):
+        if not cid:
+            print(f"fux: `fux candidates {action} <id>` needs a candidate id")
+            return 1
+        if action == "reject":
+            c = candidates.set_state(here, cid, "rejected")
+            print(f"✔ rejected {cid}" if c else f"fux: no candidate '{cid}'")
+            return 0 if c else 1
+        return _accept_candidate(here, cid)
+    print(candidates.render(here, pending=getattr(args, "pending", False),
+                            why_todo=getattr(args, "why_todo", False)))
+    return 0
+
+
+def _accept_candidate(here, cid) -> int:
+    """Human ratification: promote one draft to an active, standard-tier rule."""
+    import datetime as _dt
+
+    from fux import fmwrite, schema
+    from fux.model import TYPES
+    c = next((x for x in candidates.read(here) if x.cid == cid), None)
+    if c is None:
+        print(f"fux: no candidate '{cid}'")
+        return 1
+    rid, today = candidates._slug(c.title) or cid, _dt.date.today().isoformat()
+    fm = {"id": rid, "type": c.kind if c.kind in TYPES else "rule", "status": "active",
+          "tier": "standard", "created": today, "updated": today,
+          "code_refs": [r.split(":")[0] for r in c.code_refs], "source": c.source}
+    if c.why_source:
+        fm["why_source"] = c.why_source
+    if errs := schema.validate(fm):
+        print("fux: cannot accept — " + "; ".join(errs))
+        return 1
+    target = paths.Footprint(here).rules / f"{rid}.md"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        print(f"fux: rule '{rid}' already exists — reject the candidate or rename it")
+        return 1
+    target.write_text(fmwrite.dump(fm, f"**{c.kind.title()}:** {c.title}\n\n**Why:** {c.why}"),
+                      encoding="utf-8")
+    candidates.set_state(here, cid, "accepted")
+    print(f"✔ accepted {cid} → active rule {target}")
     return 0
 
 
