@@ -1,0 +1,58 @@
+# skillgen platform manifest
+#
+# Build-time only. This file (and everything under tools/skillgen/) is NOT shipped
+# in the wheel; it drives the render of fux's committed skill artifacts. Run
+# `python -m tools.skillgen` from the repo root to regenerate, `--check` to fail on
+# drift, `--bless` to refresh expected/.
+#
+# Each [platform.<key>] table declares how that host's `fux` skill is assembled.
+# Every host is single-body: it renders exactly one artifact from its `core`
+# fragment (under fragments/core/) with the per-host slots filled. The `fux` skill
+# fans out no subagents, so there is no dispatch slot and no references sidecar.
+#
+# Keys:
+#   core          body fragment basename under fragments/core/.
+#   skill_dst     rendered artifact path, relative to the repo root.
+#   kind          frontmatter kind: "skill" (name + quoted description, Agent
+#                 Skills spec) | "prompt" (agent + bare description, copilot
+#                 .prompt.md convention).
+#   description   frontmatter description, PRESERVED VERBATIM per platform. Required.
+#                 (The firing trigger — never normalized by the renderer.)
+#   name          frontmatter name (kind="skill"; default "fux").
+#   agent         frontmatter agent (kind="prompt").
+#   pointer_file  @@POINTER_FILE@@ — the always-on pointer file `fux init` writes
+#                 (CLAUDE.md for claude, AGENTS.md for the generic agents host).
+#
+# codex is intentionally NOT a render target here: it is served by the claude
+# artifact verbatim (fux setup copies fux/data/skills/fux/ -> ~/.codex/skills/fux/;
+# see fux/clicmds.py). It inherits every core.md edit through that copy.
+
+[platform.claude]
+core = "core"
+skill_dst = "fux/data/skills/fux/SKILL.md"
+kind = "skill"
+name = "fux"
+description = "portable agent-aware knowledge engine — rules, memory, narrative & graph in one frontmatter substrate; $0 deterministic maintenance"
+pointer_file = "CLAUDE.md"
+
+# The generic cross-framework Agent-Skills target (~/.agents/skills global and
+# ./.agents/skills project). Same shared core body as claude; the only per-host
+# delta is the always-on pointer file (AGENTS.md, not CLAUDE.md). This is the
+# breadth proof for the renderer: one core.md edit updates claude AND agents in a
+# single --bless.
+[platform.agents]
+core = "core"
+skill_dst = "fux/data/skills/agents/SKILL.md"
+kind = "skill"
+name = "fux"
+description = "portable agent-aware knowledge engine — rules, memory, narrative & graph in one frontmatter substrate; $0 deterministic maintenance"
+pointer_file = "AGENTS.md"
+
+# GitHub Copilot ships a differently shaped prompt (agent: ask frontmatter,
+# numbered steps), not a SKILL.md — so it renders from its own copilot.md body.
+[platform.copilot]
+core = "copilot"
+skill_dst = "fux/data/copilot/prompts/fux.prompt.md"
+kind = "prompt"
+agent = "ask"
+description = "Use Fux project knowledge to answer, review, or orient in this repository."

@@ -433,23 +433,12 @@ discipline as capture → distill.
 
 ## 13. Migration & decommission
 
-For absorbing what a project already runs separately (graphify, docs, scattered memory):
+For absorbing what a project already runs separately (a code-graph tool, docs, scattered memory):
 
 - **`fux import <path…>`** — ingest existing markdown as `narrative` entries (frontmatter
   stamped, body preserved). The one-pass `docs/` migration.
 - **`fux import-memory [--scope]`** — mirror Claude's home-dir `memory/*.md` into
   `.fux/memory/<scope>/`.
-- **`fux parity`** — the measurable gate: is every current source file graphed, every doc
-  migrated, every memory imported? Verdict `READY`/`NOT READY` (exit 1 until ready):
-
-```bash
-$ fux parity
-fux parity — decommission readiness  [READY]
-  ✓ graph    340/340 current source files graphed (100%)
-  ✓ docs     10/10 migrated to narrative
-  ✓ memory   3/3 home entries imported
-```
-
 - **`fux tour`** — emit an ordered `ONBOARDING.md` reading path from the rules.
 
 ---
@@ -500,7 +489,6 @@ explicit `contradicts:`) instead of silently shadowing.
 | `usage_tracking` | `false` | record served rules → usage-weighted decay |
 | `cost_tracking` | `false` | accumulate each lookup's savings → `.fux/cost.json` |
 | `context_budget_tokens` | `0` | `>0` ⇒ knapsack-pack the SessionStart INDEX |
-| `parity_stay` | `[]` | docs out-of-scope for `fux parity` |
 
 ---
 

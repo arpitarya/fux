@@ -14,7 +14,8 @@
 | Area | Status | Notes |
 |---|---|---|
 | Core CLI surface (plan §9) | ✅ | 43 public commands wired in [fux/cli.py](fux/cli.py) from one registry ([fux/registry.py](fux/registry.py)); grouped `--help` + `fux help <cmd>` + `fux how` |
-| Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture |
+| Hooks (3 core + 2 optional) | ✅ | SessionStart, PostToolUse, Stop + opt-in UserPromptSubmit & capture; **fail-open** (a hook error never breaks the session; strict `stop`→2 preserved) |
+| Error-handling contract | ✅ | One `FuxError` ([fux/errors.py](fux/errors.py)); CLI `main()` boundary maps exit codes `0/1/2/130`; `FUX_DEBUG=1` for tracebacks + swallowed-hook traces ([tests/test_errors.py](tests/test_errors.py)) |
 | Rule schema + frontmatter parser | ✅ | Hand-rolled, stdlib-only ([fux/frontmatter.py](fux/frontmatter.py), [schema.json](schema.json)) |
 | Layered resolution (global ⊕ packs ⊕ project) | ✅ | Precedence + conflict detection |
 | Graph engine (AST extraction) | ✅ | Python via `ast`; JS/TS/Go/Rust intra- **and cross-file** `calls`; block-comment-aware sanitizer |
@@ -28,9 +29,10 @@
 | Agent integration (`mcp`) | ✅ | Stdlib MCP stdio server ([fux/mcpserver.py](fux/mcpserver.py)) |
 | Graph UI | ✅ | Filters, focus, details, arrows, agent export ([fux/assets/](fux/assets/)) |
 | Skills (`plan`/`adr`/`trace`/`savings`/`distill`/`propose-rules`) | ✅ | `plan` flagship; `distill` closes the memory loop; `propose-rules` the authoring loop |
+| Skill renderer (`tools/skillgen`) | 🟡 | Build-time, stdlib-only renderer: one fragment set → the `fux` skill's `claude`/`agents`(AGENTS.md)/`copilot` artifacts; `--check` drift-guard in CI + pre-commit. Foundation only — other skills/hosts hand-authored ([docs/skillgen.md](skillgen.md)) |
 | Rule Proposer (agents author, humans ratify; [rule-proposer.md](rule-proposer.md)) | ✅ | `fux propose-rules [--retro\|--from]` + `fux candidates [accept\|reject]` → persistent, never-blocking `.fux/CANDIDATES.md`; §4 gate, dedup vs rules+queue, capped; nothing auto-active/constitutional; $0 harness (guard) ([fux/proposer.py](fux/proposer.py), [fux/candidates.py](fux/candidates.py)) |
-| Decommission tooling (graph coverage, import, parity) | ✅ | `build --full`, `import`/`import-memory`, `fux parity` gate — see §2.20 |
-| Decommission old stores in Anton | ⬜ | Tooling shipped; run it against Anton then retire when `fux parity` is READY ([plan §17.9](fux-plan.md)) |
+| Decommission tooling (graph coverage, import) | ✅ | `build --full`, `import`/`import-memory` — see §2.20 |
+| Decommission old stores in Anton | ⬜ | Tooling shipped; run it against Anton, then retire the legacy stores once coverage is confirmed ([plan §17.9](fux-plan.md)) |
 
 Zero third-party runtime dependencies (stdlib only); requires Python ≥ 3.11.
 
@@ -70,7 +72,6 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | `fux serve [--port N]` | ✅ | [fux/serve.py](fux/serve.py) |
 | `fux import <path…>` | ✅ | [fux/importer.py](fux/importer.py) |
 | `fux import-memory [--scope]` | ✅ | [fux/importer.py](fux/importer.py) |
-| `fux parity` | ✅ | [fux/parity.py](fux/parity.py) |
 | `fux tour` | ✅ | [fux/tour.py](fux/tour.py) |
 | `fux query "Q" [--depth N] [--self]` | ✅ | [fux/cligraph.py](fux/cligraph.py), [fux/graphquery.py](fux/graphquery.py) |
 | `fux path <a> <b> [--self]` | ✅ | [fux/cligraph.py](fux/cligraph.py) |
@@ -94,6 +95,14 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 Hook shells live in [hooks/](hooks/); I/O contract in [fux/hookio.py](fux/hookio.py),
 [fux/hooks.py](fux/hooks.py). Strictness modes `off`/`warn`/`fix`/`strict`
 (default `fix`) implemented in [fux/config.py](fux/config.py) + check/fix path.
+
+Every entrypoint is **fail-open** ([fux/hooks.py](fux/hooks.py)): a caught exception
+returns 0 so a broken `.fux/` never breaks the session — the only non-zero exit is the
+deliberate strict `stop`→2 (computed in `_stop()`, passed straight through the wrapper).
+Swallowed exceptions are silent to the user but printed under `FUX_DEBUG=1` (fail-open ≠
+fail-silent). The shell wrappers for the three non-blocking hooks guard `fux_run` with
+`|| true`; `stop.sh` deliberately does not, so its exit-2 passes through. See the exit-code
+contract in [docs/cli.md](docs/cli.md).
 
 ### 2.3 Schema, model & substrate — ✅ (plan §6)
 
@@ -355,7 +364,7 @@ Covered by [tests/test_hybrid.py](tests/test_hybrid.py),
 [tests/test_mcp_extra.py](tests/test_mcp_extra.py),
 [tests/test_serve_sanitize.py](tests/test_serve_sanitize.py).
 
-### 2.18 Decommission-unblocking parity work — ✅ (plan §17.13–17)
+### 2.18 Decommission-unblocking work — ✅ (plan §17.13–17)
 
 The engine capability needed before Anton's old stores can be safely retired —
 each maps to a readiness blocker, all `$0`:
@@ -372,12 +381,8 @@ each maps to a readiness blocker, all `$0`:
   writes `NARRATIVE.md` (TOC + bodies), linked from `fux serve` — §11's "browsable
   view" delivered, so `docs/` has a real destination.
 - **`fux import-memory`** ([fux/importer.py](fux/importer.py)) — mirror Claude's
-  home-dir `memory/*.md` into `.fux/memory/<scope>/`, normalising `subtype`/`scope`.
-- **`fux parity`** ([fux/parity.py](fux/parity.py)) — the measurable gate: coverage
-  of **current** source files by the graph (not a node-count match against a
-  possibly stale `graphify-out/`, which it flags), `docs/` not yet `narrative`
-  (excluding `conventions`/`guardrails` + `parity_stay`), home-memory not yet
-  imported (the home-dir slug fix handles `_`→`-`), `READY`/`NOT READY`, exit 1.
+  home-dir `memory/*.md` into `.fux/memory/<scope>/`, normalising `subtype`/`scope`
+  (the home-dir slug fix handles `_`→`-`).
 
 Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 
@@ -386,8 +391,10 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - [install.sh](install.sh) installs **editable** (`pip -e`) → `~/.claude/fux/{engine,global,packs,hooks}` + skills.
 - [pyproject.toml](pyproject.toml) (v0.6.0, stdlib-only; `[embeddings]`/`[ast]`/`[pdf]`/`[critic]` extras),
   [justfile](justfile), global seed in [global/](global/).
+- `[tool.setuptools.packages.find]` carries an explicit `exclude = ["tools*"]` so the
+  build-time `tools/skillgen/` renderer never ships in the wheel/sdist (tested).
 
-### 2.20 Tests — ✅ (344 tests)
+### 2.20 Tests — ✅ (364 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -422,7 +429,12 @@ the **CLI help registry + `fux how` self-docs + CDP precedence + ingest provenan
 linked-document ingestion — queue/dedup, bounded follow-links, reduce-before-draft,
 Swagger drift** ([test_ingest_batch.py](tests/test_ingest_batch.py)),
 plus the **no-LLM-and-no-network-and-no-doc/vision-lib-on-the-maintenance-path guard**
-([test_no_llm_imports.py](tests/test_no_llm_imports.py)).
+([test_no_llm_imports.py](tests/test_no_llm_imports.py)), and the **skill renderer —
+byte-determinism, `--check` pass/fail, per-host anchors, no-unfilled-slot, runtime-import
+boundary + wheel/sdist exclusion** ([test_skillgen.py](tests/test_skillgen.py)), and the
+**error-handling contract — CLI exit codes (`FuxError`→1, Ctrl-C→130, unexpected→1 with
+traceback only under `FUX_DEBUG`), per-hook fail-open, strict `stop`→2 preserved, and the
+`FUX_DEBUG` swallowed-exception trace** ([test_errors.py](tests/test_errors.py)).
 Run with `python -m pytest` (Python ≥ 3.11).
 
 ### 2.20a Command registry + `fux how` + scrape — ✅ (handoff A–D)
@@ -665,6 +677,36 @@ into the required `fux gate` CI job.
   (The test's own example identifiers carry `pii-allow` markers so the gate doesn't flag
   the test file.)
 
+### 2.20h Skill renderer (`tools/skillgen`) — 🟡 (renderer foundation)
+
+The per-host skill artifacts were hand-authored per surface and drifted independently.
+A build-time, stdlib-only renderer now emits them from one human-edited fragment set,
+guarded against drift by `--check`. **Foundation scope:** the flagship `fux` skill only,
+to three hosts; the other 10 skills and more hosts are follow-on packets. Full design in
+[docs/skillgen.md](skillgen.md).
+
+- **Renderer** ([tools/skillgen/gen.py](tools/skillgen/gen.py), ~210 lines, stdlib-only —
+  `argparse`/`re`/`sys`/`tomllib`) — a self-contained renderer (no shared module with any
+  other repo). `load_platforms` → `Platform` records; `_render_core` fills the
+  body template's `@@FRONTMATTER@@`/`@@POINTER_FILE@@` slots (raises on any surviving
+  `@@SLOT@@`); `check` byte-diffs the render against the committed artifacts **and** the
+  blessed `expected/` snapshots; `bless` refreshes them. Deterministic: LF-normalized, one
+  trailing newline, no clocks/random. **Never imported by the `fux` package at runtime.**
+- **Manifest + fragments** ([tools/skillgen/platforms.toml](tools/skillgen/platforms.toml),
+  `fragments/core/{core,copilot}.md`) — `claude` + `agents` share `core/core.md` (the
+  breadth proof: one edit updates both, differing only by the always-on pointer file
+  `CLAUDE.md` vs `AGENTS.md`); `copilot` renders its own `agent: ask` body. Each host's
+  `description` (the firing trigger) is preserved **verbatim**.
+- **Rendered artifacts** — `claude` → [fux/data/skills/fux/SKILL.md](fux/data/skills/fux/SKILL.md)
+  (existing path, unmoved), `agents` → `fux/data/skills/agents/SKILL.md` (new, generic
+  `~/.agents/skills` target), `copilot` → `fux/data/copilot/prompts/fux.prompt.md`
+  (regenerated). **codex** is served by the `claude` artifact verbatim (copied by
+  `fux setup`), so it is not a separate render target.
+- **Drift wall** — `python -m tools.skillgen --check` runs in CI
+  ([.github/workflows/ci.yml](.github/workflows/ci.yml) `skillgen-check` job) and a local
+  pre-commit hook ([.pre-commit-config.yaml](.pre-commit-config.yaml)); the wheel/sdist
+  `tools*` exclusion is tested.
+
 ### 2.21 Constitution layer — ✅ (plan §6 "Constitution layer", Phases 0–5 + 3b, v0.4.0)
 
 The tiered-governance + integrity substrate from plan §6. **Shipped (Phases 0–2):**
@@ -771,8 +813,8 @@ What remains is **operational, not engine code in this repo** — the decommissi
   `backend/app/modules/brokers/`, wire `verify`/`gate` into `probes/` + `just`,
   measure with `coverage`/`savings`.
 - ⬜ **Run the decommission** — in Anton: `fux build --full` → `fux import docs/`
-  → `fux import-memory`, watching `fux parity` until READY, then retire
-  `graphify-out/` + the migrated `docs/`.
+  → `fux import-memory`, confirm coverage of current files, then retire the legacy
+  code-graph output + the migrated `docs/`.
 
 Planned (engine, see [fux-plan.md §17.10–12](fux-plan.md)):
 

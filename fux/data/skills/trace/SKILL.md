@@ -1,12 +1,12 @@
 ---
 name: fux-trace
-description: "walk the merged graph to explain how a feature spans modules — the graphify-replacement query value, as a workflow ($0)"
+description: "walk the merged graph to explain how a feature spans modules — graph-query value delivered as a workflow ($0)"
 trigger: /fux trace
 ---
 
 # /fux trace — explain how a feature spans modules
 
-The graphify-replacement query value delivered as a workflow. Pure graph
+Graph-query value delivered as a workflow. Pure graph
 traversal → effectively `$0` (no LLM required for the traversal itself).
 
 ## Inputs

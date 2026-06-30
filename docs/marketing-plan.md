@@ -44,8 +44,8 @@ opposite, and that spine *is* the wedge:
 - **Tool-agnostic** — they target a *protocol* (a rule schema, a wire format),
   never a named vendor. Works with Claude Code, Codex, Copilot, any client.
 
-This is a *family* with a shared philosophy (alongside the earlier `graphify`:
-code → graph). That coherence is a marketing asset — it lets each launch lift the
+This is a *family* with a shared philosophy of deterministic, substrate-first
+tools. That coherence is a marketing asset — it lets each launch lift the
 next, and it tells a bigger story than any single tool: **a deterministic
 substrate layer underneath the probabilistic AI-dev stack.**
 
@@ -90,8 +90,8 @@ Why it holds:
   a generic "LLM cost tracker" can't claim.
 
 **Category bid (the visionary line, use sparingly):**
-"graphify turned code into a graph. fux turned decisions into verifiable rules.
-Cage turns AI-tool traffic into an honest ledger. Three deterministic substrates
+"fux turns decisions into verifiable rules.
+Cage turns AI-tool traffic into an honest ledger. Deterministic substrates
 under the probabilistic stack."
 
 ---
@@ -176,7 +176,7 @@ Cage follows ~4–6 weeks later and reuses the proven copy.
 - Don't treat X as a launch-day spike — run it as the connective tissue:
   - The wedge thread on launch day (thread = the dev.to article, compressed).
   - Ongoing: short demo clips (the graph viewer is *visually* striking — use it),
-    one honest tradeoff per post, the family story (graphify → fux → cage).
+    one honest tradeoff per post, the family story (fux → cage).
   - Reply to people complaining about exactly the problem Fux/Cage solve.
 
 ### More channels worth a shot (lower priority, opportunistic)
@@ -278,7 +278,7 @@ graph viewer igniting the `governs` links.)*
 Tell this once the individual tools have landed — it converts users into people
 who repeat your worldview:
 
-> **graphify** turns code into a graph. **fux** turns decisions into verifiable
+> **fux** turns decisions into verifiable
 > rules. **cage** turns AI-tool traffic into an honest ledger. Same constitution
 > every time — `$0`, stdlib-only, deterministic, substrate → derived views, no
 > model in the maintenance path. A deterministic layer underneath the

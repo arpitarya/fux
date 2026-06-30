@@ -41,7 +41,7 @@ track it for zero-rebuild reads — see [implementation-notes.md](implementation
 | | `config.py` | `.fux/config.toml` (tomllib), strictness, defaults |
 | | `loader.py` | load dirs; resolve project ⊕ packs ⊕ global by precedence |
 | **Derived views** | `index.py` | INDEX.md + rules.json |
-| | `astextract.py` | per-language symbol/edge extraction (the graphify engine) |
+| | `astextract.py` | per-language symbol/edge extraction (the code-graph engine) |
 | | `graph.py` | merge code nodes + knowledge nodes → graph dict |
 | | `graphhtml.py` + `assets/` | self-contained interactive HTML |
 | | `build.py` | orchestrate all derived views |
@@ -74,5 +74,5 @@ author .fux/rules/*.md ──► loader.resolve ──► RuleSet
 The graph merges two node families: **code** (`code-file`, `function`, `class`
 from AST) and **knowledge** (`rule`, `formula`, … from frontmatter), joined by
 `code_refs` (`governs` edges) and `related`/typed `edges` (rule↔rule). This is
-how graphify's structural graph and the business-rules layer become one view
+how the structural code graph and the business-rules layer become one view
 (plan §11).

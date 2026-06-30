@@ -4,4 +4,5 @@ set -euo pipefail
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=_common.sh
 . "$DIR/_common.sh"
-fux_run hook-touch
+# Non-blocking hook: fail-open so a failing/missing fux never breaks the session.
+fux_run hook-touch || true

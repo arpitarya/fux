@@ -11,8 +11,8 @@ def cmd_query(args) -> int:
     # Phase 1: anchor on recall-matched rule nodes.
     anchors = [f"rule:{r.id}" for r, _ in recall.run(here, args.query, top=3)]
     anchors = [a for a in anchors if any(n["id"] == a for n in graph["nodes"])]
-    # Phase 2: augment with the top-scored code nodes (mirrors graphify's
-    # multi-seed scoring — the single shortest-id `find()` surfaced incidental
+    # Phase 2: augment with the top-scored code nodes (multi-seed scoring —
+    # the single shortest-id `find()` surfaced incidental
     # probes over the real implementation). Recall already handles rule anchors.
     _CODE_TYPES = {"code-file", "function", "class", "module"}
     seen = set(anchors)
@@ -28,7 +28,7 @@ def cmd_query(args) -> int:
     by_id = {n["id"]: n for n in graph["nodes"]}
     printed: set[str] = set()        # global dedup: each node emitted at most once
     # Buffer + budget: cap total output so a broad query can't blow up Claude's
-    # context. ~4 chars/token is the usual rule of thumb (graphify uses ~3).
+    # context. ~4 chars/token is the usual rule of thumb.
     out: list[str] = []
     char_budget = max(0, getattr(args, "budget", 1200)) * 4
     used = 0

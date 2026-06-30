@@ -96,7 +96,7 @@ $FUX context >/dev/null 2>&1 || $FUX init
 
 `fux init` is idempotent: it creates `.fux/{rules,glossary,memory,out}`, writes
 `.fux/config.toml` (strictness `fix` by default), wires the 3 core hooks into
-`.claude/settings.json`, and drops a Tier-0 pointer into `CLAUDE.md`.
+`.claude/settings.json`, and drops a Tier-0 pointer into `AGENTS.md`.
 
 ### Step 3 — Dispatch the subcommand
 

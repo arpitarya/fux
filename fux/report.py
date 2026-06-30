@@ -1,4 +1,4 @@
-"""GRAPH_REPORT.md — god nodes + community structure, like graphify's report (plan §7)."""
+"""GRAPH_REPORT.md — god nodes + community structure (plan §7)."""
 from __future__ import annotations
 
 from collections import Counter

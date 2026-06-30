@@ -38,7 +38,6 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `mine` | verification | surface candidate rules latent in the code (drafts) | `fux mine --min-sites 3` |
 | `propose-rules` | authoring | propose draft rules-with-why → .fux/CANDIDATES.md (forward skill / --retro $0) | `fux propose-rules --retro` |
 | `candidates` | governance | review/triage proposed draft rules; accept → active rule, reject → drop | `fux candidates --pending` |
-| `parity` | verification | decommission readiness vs graphify-out/docs/memory | `fux parity` |
 | `ratify` | governance | ratify a constitutional rule (stamp + seal + lock) | `fux ratify money-never-floats --by "Arpit"` |
 | `capture-decision` | governance | capture a concluded debate/council as a routed, tamper-evident ADR | `fux capture-decision use-postgres --route fux --by "Arpit"` |
 | `constitution` | governance | status: what's constitutional + current violations | `fux constitution` |
@@ -72,6 +71,10 @@ table* below). Use `fux help <command>` for usage + an example, or
 > `clihelp.render_cli_md_block()`, so help and docs can't drift. To regenerate after
 > a registry change: `python -c "import pathlib; from fux import clihelp;
 > p=pathlib.Path('docs/cli.md'); p.write_text(clihelp.sync_cli_md(p.read_text()))"`.
+
+> **Not a `fux` command.** The skill renderer is build-time tooling invoked as
+> `python -m tools.skillgen` (see [docs/skillgen.md](skillgen.md)), **not** a `fux`
+> subcommand — it adds no `fux` CLI surface and no entry to the registry above.
 
 ## Full reference (per-command detail)
 
@@ -107,9 +110,8 @@ table* below). Use `fux help <command>` for usage + an example, or
 | `fux serve [--port N]` | Local `http.server` dashboard: the `stats` health summary + links to `graph.html`/reports. | $0 |
 | `fux import <path…> [--type T] [--domain D] [--force]` | Ingest existing markdown files/dirs as `narrative` (default) entries — the one-pass `docs/` migration. | $0 |
 | `fux import-memory [--scope shared\|personal] [--force]` | Mirror Claude's home-dir `memory/*.md` for this project into `.fux/memory/<scope>/`. | $0 |
-| `fux parity` | Decommission readiness: coverage of current source files by the graph, `docs/` not yet `narrative` (minus `conventions`/`guardrails`/`parity_stay`), home-memory not yet imported; flags a stale `graphify-out/`. Exit 1 until READY. | $0 |
 | `fux tour` | Emit an ordered `ONBOARDING.md` reading path from the rules. | $0 |
-| `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graphify-replacement query). | $0 |
+| `fux query "Q" [--depth N]` | Anchor on rules matching Q, then traverse the merged graph N hops (the graph-query path). | $0 |
 | `fux path <a> <b>` | Shortest path between two graph nodes (rules, files, or symbols). | $0 |
 | `fux explain <term>` | A graph node + its community + neighbours. | $0 |
 | `fux impact <file>` | Downstream blast radius of changing a file: invariants to re-verify, governing rules whose *why* may go stale, and dependent caller files (precise `calls` split from loose `references`). | $0 |
@@ -203,6 +205,23 @@ Tools published: `fux_recall`, `fux_why`, `fux_refs`, `fux_coverage`,
 `fux_savings`, `fux_stats`, `fux_context`, `fux_query`, `fux_trace`, and
 draft-only `fux_new` — each deterministic, `$0`, no LLM.
 
+### Exit codes & error handling
+
+`fux` has one error boundary — the CLI `main()` ([fux/cli.py](../fux/cli.py)) — so a
+command never dumps a raw traceback at the user:
+
+| Code | Meaning |
+|---|---|
+| `0` | OK. |
+| `1` | Error — an expected failure (`FuxError`: unknown rule id, missing `.fux/`, bad arg) renders as a terse `error: <msg>`; an *unexpected* exception renders `error: <msg>` plus a `FUX_DEBUG=1` hint (full traceback only under `FUX_DEBUG=1`). |
+| `2` | Blocking — a `strict`-mode `stop`/`gate` hit a blocking finding (the deliberate hard-block; unchanged). |
+| `130` | Interrupted — `Ctrl-C` exits clean (`aborted.`), no traceback. |
+
+Hooks are **fail-open**: every hook entrypoint returns 0 if its core raises, so a
+broken `.fux/` can never break an agent session — the **only** non-zero hook exit is
+the intentional strict `stop` → `2`. A swallowed hook exception is silent to the user
+but printed to stderr under `FUX_DEBUG=1`. Set `FUX_DEBUG=1` to see what was hidden.
+
 ### Environment overrides
 
 | Var | Overrides |
@@ -212,6 +231,7 @@ draft-only `fux_new` — each deterministic, `$0`, no LLM.
 | `FUX_PACKS` | Packs dir (default `~/.claude/fux/packs`). |
 | `FUX_SCHEMA` | `schema.json` path. |
 | `FUX_PYTHON` | Interpreter the hook wrappers use when `fux` is not on PATH. |
+| `FUX_DEBUG` | `=1` surfaces the full traceback of an *unexpected* CLI error and prints any exception a hook swallowed to stderr (fail-open ≠ fail-silent). Off by default. |
 | `FUX_CDP_HOST` / `FUX_CDP_PORT` | CDP endpoint for the `/fux ingest` skill's render escalation (see below). |
 
 ### CDP endpoint (for the `/fux ingest` render escalation)

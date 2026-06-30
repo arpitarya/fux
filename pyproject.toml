@@ -63,6 +63,11 @@ version = {attr = "fux.__version__"}
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["fux*"]
+# tools/skillgen/ is build-time only — it renders the committed skill artifacts
+# and must never ship in the wheel or be importable at runtime. include=["fux*"]
+# already excludes it; this is the explicit, declarative guard (tested in
+# tests/test_skillgen.py).
+exclude = ["tools*"]
 
 [tool.setuptools.package-data]
 fux = [

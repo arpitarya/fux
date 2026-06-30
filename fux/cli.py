@@ -175,8 +175,6 @@ def build_parser() -> argparse.ArgumentParser:
     impm.add_argument("--force", action="store_true")
     impm.set_defaults(fn=clicmds.cmd_import_memory)
 
-    sub.add_parser("parity", help="decommission readiness vs graphify-out/docs/memory").set_defaults(fn=cliquery.cmd_parity)
-
     q = sub.add_parser("query", help="traverse the graph from rules matching a question")
     q.add_argument("query")
     q.add_argument("--depth", type=int, default=1)
@@ -299,5 +297,30 @@ def cmd_help(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
+    """Top-level dispatch + the CLI's single error boundary (plan §error contract).
+
+    Exit codes: 0 ok · 1 error (FuxError / unexpected) · 2 blocking (strict gate/
+    stop, returned by the command) · 130 interrupted. A raw traceback is shown only
+    under `FUX_DEBUG=1`; expected failures raise `FuxError` and render terse.
+    """
+    import os
+    import sys
+    import traceback
+
+    from fux.errors import FuxError
+
     args = build_parser().parse_args(argv)
-    return args.fn(args)
+    try:
+        return args.fn(args)
+    except KeyboardInterrupt:
+        print("\naborted.", file=sys.stderr)
+        return 130
+    except FuxError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 1
+    except Exception as e:  # noqa: BLE001 — top-level CLI guard: render, don't dump a traceback
+        if os.environ.get("FUX_DEBUG") == "1":
+            traceback.print_exc()
+        else:
+            print(f"error: {e}\n(re-run with FUX_DEBUG=1 for the full traceback)", file=sys.stderr)
+        return 1

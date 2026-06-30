@@ -15,7 +15,7 @@ REF_RE = re.compile(r"^([^#]+)(?:#L(\d+)(?:-L?(\d+))?)?$")
 # EXTRACTED, full weight. The looser whole-file `references` xref ([_xref]) matches
 # any identifier against any symbol label, so it is INFERRED and down-weighted: it
 # is the dominant edge by raw count and would otherwise drown the precise signal in
-# community detection + PageRank. graphify carried this confidence label; Fux now does too.
+# community detection + PageRank. Fux carries this confidence label on every edge.
 _EDGE_CONF: dict[str, tuple[str, float]] = {
     "contains": ("EXTRACTED", 1.0),
     "calls": ("EXTRACTED", 1.0),

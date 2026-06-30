@@ -1,7 +1,7 @@
 """Cumulative cost ledger — track the savings of *every* lookup ($0, plan §12).
 
 `fux savings` estimates the win for one lookup; this persists the win of **every**
-lookup into `.fux/cost.json` (mirroring graphify's `cost.json` name), so the project
+lookup into `.fux/cost.json`, so the project
 can quote a real *lifetime* number — "Fux has saved N tokens across M lookups" —
 not just a per-call estimate. Opt-in via `cost_tracking`; recorded on each
 `fux recall` using the same `savings` token model. Deterministic, no LLM.
