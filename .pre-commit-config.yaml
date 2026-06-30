@@ -1,0 +1,20 @@
+# Run with: pre-commit install   (then it fires on every commit)
+# One-off across the tree: pre-commit run --all-files
+#
+# The skillgen hook is the local anti-drift guard. The skill artifacts under
+# fux/data/skills/ and the copilot prompt are generated from the fragments in
+# tools/skillgen/; a hand-edit to a generated file fails this check the same way
+# CI does. After editing a fragment, run `python -m tools.skillgen` to re-render
+# then `python -m tools.skillgen --bless` to refresh the expected/ snapshots.
+#
+# The hook is stdlib-only (language: system) — it needs no install beyond a
+# Python >=3.11 on PATH.
+repos:
+  - repo: local
+    hooks:
+      - id: skillgen-check
+        name: skillgen --check (generated skill artifacts are up to date)
+        entry: python -m tools.skillgen --check
+        language: system
+        pass_filenames: false
+        always_run: true

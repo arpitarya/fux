@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 
 from fux import (candidates, capture, config, costledger, coverage, explain,
-                 feedback, fetchrules, lint, loader, mine, parity, paths, recall,
+                 feedback, fetchrules, lint, loader, mine, paths, recall,
                  savings, scaffold, seal, stats, tour, verify)
 from fux.cliutil import root, scope_root
 
@@ -202,12 +202,6 @@ def _accept_candidate(here, cid) -> int:
     candidates.set_state(here, cid, "accepted")
     print(f"✔ accepted {cid} → active rule {target}")
     return 0
-
-
-def cmd_parity(_args) -> int:
-    p = parity.build(root())
-    print(parity.render(p))
-    return 0 if p.ready() else 1
 
 
 def cmd_capture(args) -> int:

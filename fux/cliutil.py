@@ -4,12 +4,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from fux import paths
+from fux.errors import FuxError
 
 
 def root() -> Path:
     found = paths.find_project_root()
     if found is None:
-        raise SystemExit("fux: no .fux/ footprint found here. Run `fux init` first.")
+        raise FuxError(f"no .fux/ in {Path.cwd()} — run `fux init` first")
     return found
 
 
@@ -20,7 +21,7 @@ def self_root() -> Path:
     any repo, even one with no `.fux/`. Raises if `fux self-build` was never run."""
     bundle = paths.bundled_data_dir() / "self"
     if not (bundle / ".fux" / "out" / "graph.json").exists():
-        raise SystemExit("fux: no self-knowledge bundle — run `fux self-build` first.")
+        raise FuxError("no self-knowledge bundle — run `fux self-build` first")
     return bundle
 
 

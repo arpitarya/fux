@@ -6,6 +6,24 @@ on:
   pull_request:
 
 jobs:
+  skillgen-check:
+    # The skill artifacts under fux/data/skills/ + the copilot prompt are
+    # generated from the fragments in tools/skillgen/. This fails if someone
+    # hand-edited a generated file (or forgot to --bless after a fragment edit).
+    # Stdlib-only and build-time — no install needed.
+    name: skillgen --check
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generated skill artifacts are up to date
+        run: python -m tools.skillgen --check
+
   test:
     name: Python ${{ matrix.python }}
     runs-on: ubuntu-latest

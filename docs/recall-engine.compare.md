@@ -42,8 +42,8 @@ rules) and richly tagged (`id`, `domain`, `type`, `related`, `code_refs`).
 ### A — Keyword / lexical *(phase 1)*
 - **Pros:** `$0`, deterministic, zero dependencies, instant, trivial to keep
   fresh (it's just text). Frontmatter weighting (`domain`, `type`, `related`,
-  `id`) gives strong precision on a curated corpus. Same spirit as graphify's
-  no-API model.
+  `id`) gives strong precision on a curated corpus. Same spirit as the
+  no-API, deterministic model.
 - **Cons:** misses pure paraphrase with no shared keywords (e.g. "how much did I
   make today" vs a rule titled "day-pnl") — mitigated by good `related`/synonym
   tags and the small corpus size.

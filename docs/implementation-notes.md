@@ -44,9 +44,9 @@ pure iteration builtins (`zip`, `range`, `enumerate`, …).
   (`api-key-hashing`), global best-practices inherited — portability confirmed.
 - **Phase 7 — absorb & migrate** — *additive only*: Anton's cross-session memory
   imported as `type: memory` (`scope: shared`) and an `anton-overview` `type:
-  narrative` entry authored. **Decommission deferred**: `graphify-out/`, the
-  home-dir `memory/`, and `docs/` are left in place until parity is verified and
-  explicitly retired.
+  narrative` entry authored. **Decommission deferred**: the legacy code-graph
+  output, the home-dir `memory/`, and `docs/` are left in place until coverage is
+  verified and they are explicitly retired.
 
 ## Update — multi-language call edges, recall eval, richer examples
 
@@ -126,12 +126,12 @@ A developer/agent-experience pass (all `$0`, stdlib-only, tested):
       hops don't pan the view (only search + ledger "go-to" actions recentre).
       Macro super-nodes are warm graphite (amber for knowledge communities) to stay
       on-theme rather than a rainbow.
-    - **Community palette** (`ccolor`) is the **Tableau-10** categorical set (as
-      Graphify uses) — cool, distinct, cohesive on near-black — with three shade
+    - **Community palette** (`ccolor`) is the **Tableau-10** categorical set —
+      cool, distinct, cohesive on near-black — with three shade
       tiers so 100+ communities still separate; knowledge stays amber regardless.
       The viewer defaults to the **Communities** lens with these colours and
       bigger, solid nodes; the Knowledge lens switches to graphite dust + amber.
-    - **Stable like Graphify** — the layout is computed once and frozen; clicking,
+    - **Stable layout** — the layout is computed once and frozen; clicking,
       and hiding/showing node- or edge-types, only highlight or remove — they never
       re-run the layout, so nodes never rearrange under you.
     - **Macro = real-node overview** — Micro/Macro just change zoom over the same
@@ -195,9 +195,6 @@ data. Built the tooling that makes "parity signed off" measurable, all `$0`:
   stamped, bodies preserved, skip-existing).
 - **Narrative rendering** (`fux/narrative.py`) — `NARRATIVE.md` on build, linked
   from `fux serve`.
-- **`fux parity`** (`fux/parity.py`) — graph coverage vs `graphify-out/graph.json`,
-  unmigrated `docs/` (minus STAY-listed conventions/guardrails), unimported memory;
-  `READY`/`NOT READY` verdict, exit 1 until ready. The gate for §17.9.
 
 Still future work: cross-**file** call edges for non-Python languages (today:
 intra-file calls + heuristic cross-file references), block-comment / multiline
@@ -265,7 +262,7 @@ Also fixed a pre-existing `tomllib` duplicate-key failure in `tests/test_parity_
 
 The graph engine is Fux-owned and `$0`. v0.1.0 extracts symbols **and intra-file
 call edges across languages**, though it remains a focused extractor, not a full
-re-implementation of graphify's multi-language pipeline:
+re-implementation of a heavyweight multi-language pipeline:
 
 - **Python** — real symbol + call-edge extraction via the stdlib `ast` module
   (functions, classes, intra-file `calls`).
@@ -277,7 +274,7 @@ re-implementation of graphify's multi-language pipeline:
   heuristic cross-file `references` edges, rule↔rule `related`/typed edges,
   community detection, and the `query/path/explain` traversals.
 
-Remaining gap vs graphify: cross-**file** call edges for the non-Python languages
+Remaining gap: native cross-**file** call edges for the non-Python languages
 (today: intra-file calls + heuristic cross-file references).
 
 ## Recall (plan §10.11, recall-engine.compare.md)

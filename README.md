@@ -167,9 +167,13 @@ Every maintenance command is shell / AST / parse — **no LLM calls, ever.** The
 
 **Honest limits.** Fux doesn't write your rules for you — `fux mine` drafts candidates, but the *why* is yours. The constitution governs where trust lives (money, PII, audit), not every line — making everything constitutional would crush your velocity, and the design says so. And branch protection lives in GitHub, so Fux can *watch* it but can't *seal* it; that one link is honest about being outside its reach.
 
+## Editing the agent skills (contributors)
+
+The per-host skill artifacts — the Claude `SKILL.md`, the Codex copy, the Copilot prompt, and the generic `AGENTS.md` target — are **generated**, not hand-authored. Edit the fragments under [tools/skillgen/fragments/](tools/skillgen/fragments/), then run `python -m tools.skillgen` to re-render and `python -m tools.skillgen --bless` to refresh the snapshots. A hand-edit to a rendered file fails `python -m tools.skillgen --check` in CI and pre-commit. Build-time, stdlib-only, never shipped in the wheel — details in [docs/skillgen.md](docs/skillgen.md).
+
 ## What's new
 
-**Latest — v0.16.0:** Rule Proposer — the agent that wrote the code proposes the rules-with-why; you only ratify. `fux propose-rules --retro` (mine + git-history why) and a forward agent skill land drafts in the persistent `.fux/CANDIDATES.md`; `fux candidates accept|reject` triages. Nothing auto-active, nothing auto-constitutional; `$0`/stdlib harness.
+**Latest — v0.17.0:** Error-handling hardening — fux gets one CLI error boundary (terse `error: <msg>`, never a raw traceback), a documented exit-code contract (`0` ok · `1` error · `2` blocking · `130` interrupted), and genuinely **fail-open hooks** (a hook error never breaks an agent session; the strict `stop`→`2` is preserved). One thin `FuxError`; every swallowed exception surfaces under `FUX_DEBUG=1` (fail-open ≠ fail-silent). `$0`/stdlib, no behaviour change to checks or views.
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name

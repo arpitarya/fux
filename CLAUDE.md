@@ -39,6 +39,13 @@ affected doc reflect it. If you're unsure a doc is affected, check it.
 - **Python ≥ 3.11** (`tomllib`). Match the surrounding code's style and density.
 - **Deterministic.** Graph extraction, recall, check/fix, verify — all must be
   reproducible shell/AST/parse, never network or model calls.
+- **Error contract.** Catch + render errors only at the boundaries (CLI `main`,
+  hook entrypoints, MCP dispatch, installer); internals keep raising. Raise the one
+  `FuxError` (`fux/errors.py`) for expected user-facing failures — no subclass
+  hierarchy. CLI exit codes: `0` ok · `1` error · `2` blocking (strict) · `130`
+  interrupted. Hooks are **fail-open** (a hook error never breaks the session) —
+  but never fail-*silent*: every swallowed exception traces under `FUX_DEBUG=1`,
+  and the deliberate strict `stop`→`2` is never swallowed.
 
 ## Layout
 

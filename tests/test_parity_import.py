@@ -1,9 +1,9 @@
-"""Decommission-unblocking work: graph coverage, import, narrative, parity (§17.13–17)."""
+"""Decommission-unblocking work: graph coverage, import, narrative (§17.13–17)."""
 from __future__ import annotations
 
 import json
 
-from fux import build, importer, loader, narrative, parity, paths
+from fux import build, importer, loader, narrative, paths
 from fux.model import RuleSet
 from conftest import write_rule
 
@@ -72,42 +72,6 @@ def test_import_memory_from_home_dir(project):
     assert len(created) == 1
     text = created[0].read_text()
     assert "type: memory" in text and "scope: shared" in text and "brokers prime" in text
-    # Imported entry is now a known memory id → parity sees it.
-    p = parity.build(project)
-    assert p.mem_pending == []
-
-
-# ---- §17.17 parity gate -------------------------------------------------
-def test_parity_reports_not_ready_with_unmigrated_docs(project):
-    (project / "docs").mkdir()
-    (project / "docs" / "architecture.md").write_text("# Arch\n\nx\n")
-    (project / "docs" / "conventions.md").write_text("# Conv\n\nstays\n")  # STAY-listed
-    build.run(project)
-    p = parity.build(project)
-    assert "architecture.md" in p.docs_unmigrated
-    assert "conventions.md" not in p.docs_unmigrated   # excluded — seeds global
-    assert not p.docs_ok() and not p.ready()
-
-
-def test_parity_graph_measures_current_file_coverage(project):
-    (project / "src" / "app.py").write_text("def main():\n    return 1\n")
-    build.run(project)
-    p = parity.build(project)
-    assert p.graph_current >= 1 and p.graph_covered == p.graph_current  # 100% of current
-    assert p.legacy_nodes is None and p.graph_ok()
-
-
-def test_parity_stay_excludes_configured_docs(project):
-    cfg = project / ".fux" / "config.toml"
-    # Replace the scaffolded empty default rather than appending a duplicate key
-    # (TOML forbids duplicates — tomllib rightly rejects two `parity_stay =` lines).
-    cfg.write_text(cfg.read_text().replace("parity_stay = []",
-                                           'parity_stay = ["fux-plan"]'))
-    (project / "docs").mkdir()
-    (project / "docs" / "fux-plan.md").write_text("# Plan\n\nmeta\n")
-    build.run(project)
-    p = parity.build(project)
-    assert "fux-plan.md" not in p.docs_unmigrated      # excluded via parity_stay
 
 
 def test_home_memory_slug_hyphenates_underscores(tmp_path):

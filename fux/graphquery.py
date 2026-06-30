@@ -1,7 +1,7 @@
 """Graph traversal — query / path / explain over .fux/out/graph.json ($0, plan §7).
 
-The graphify-replacement query value: traverse EXTRACTED edges instead of
-grepping. Pure stdlib BFS over the merged code+knowledge graph.
+Traverse EXTRACTED edges instead of grepping. Pure stdlib BFS over the merged
+code+knowledge graph.
 """
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ def find(graph: dict, term: str) -> dict | None:
 
 
 def score_nodes(graph: dict, terms: list[str], types: set[str] | None = None) -> list[dict]:
-    """Score every node by query-term overlap, return best-first (mirrors graphify).
+    """Score every node by query-term overlap, return best-first.
 
     +1 per term found in the node label, +0.5 per term in its id/file path. This
     surfaces the *implementation* (`GrowwSource`) over an incidental shortest-id

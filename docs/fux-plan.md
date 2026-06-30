@@ -4,7 +4,7 @@
 > record; see [architecture.md](architecture.md) and [cli.md](cli.md) for what
 > shipped, and [implementation-notes.md](implementation-notes.md) for deltas.
 > A portable, Claude-aware knowledge engine that **unifies and replaces** three
-> things Anton runs separately today — the structural graph (graphify),
+> things Anton runs separately today — the structural code graph,
 > cross-session memory, and the narrative docs — and adds the business-rules
 > layer none of them held. One frontmatter-driven substrate with derived index,
 > graph, and memory views. Continuously referenced, cheaply maintained.
@@ -26,7 +26,7 @@ independently, and *still* leave business rules homeless:
 | `docs/WHAT/WHY/HOW.md` | Product narrative | Stable |
 | `docs/architecture.md` | Repo structure, tech | Stable |
 | `docs/conventions.md`, `guardrails.md` | Code style, project rules | Stable |
-| `graphify-out/` | Structural graph (who-calls-whom) | Auto, $0 |
+| legacy code-graph output | Structural graph (who-calls-whom) | Auto, $0 |
 | `~/.claude/.../memory/` | Claude's cross-session memory | Ephemeral/personal |
 
 The actual business rules live **only as inline comments** in code. Example —
@@ -47,7 +47,7 @@ truth — and it fills the business-rules gap none of the five covered (see §11
 
 ## 2. What Fux is
 
-A **portable tool shaped like graphify**: a global engine + a per-project
+A **portable, single-purpose tool**: a global engine + a per-project
 footprint + `$0` deterministic maintenance. One command (`fux init`) links it to
 any project, regardless of language.
 
@@ -64,7 +64,7 @@ fux init · fux build · fux check · fux context · fux why …   # links to an
 2. **Tiered, lazy reads.** Claude reads a tiny index first, then opens only the
    one relevant rule. Minimal tokens.
 3. **$0 deterministic maintenance.** Every update path is shell/AST/parse — no
-   LLM calls — exactly like graphify's AST-only model.
+   LLM calls — a strict AST-only model.
 4. **Portable & polyglot.** The engine parses frontmatter and checks file paths
    via git; it doesn't care if the project is Python, TS, or anything else.
 5. **Configurable enforcement.** Default is **`fix`** — Claude repairs drift
@@ -90,7 +90,7 @@ GLOBAL (install once, maintained once)          PER-PROJECT (fux init)
 
 `fux init` scaffolds the footprint, registers hooks into the project's
 `.claude/settings.json`, and drops a Tier-0 pointer into that project's
-`CLAUDE.md`. Same one-command adoption as `/graphify`.
+`CLAUDE.md`. One-command adoption, no per-project setup beyond `fux init`.
 
 ### Read tiers (the token-cost win)
 
@@ -328,11 +328,11 @@ loop (behind the `[critic]` extra) + the report-first coverage gate in Phase 5.
    natively; git diffs cleanly. *Source of truth.*
 2. **Index** — auto-generated `INDEX.md` (compact TOC, like `MEMORY.md`) +
    `rules.json` (programmatic lookup; lets a probe/backend assert invariants).
-3. **Graph** — `fux build` runs the AST extraction itself (the engine graphify
-   used, now **owned by Fux**) and merges code nodes with rule / memory /
+3. **Graph** — `fux build` runs the AST extraction itself (a **Fux-owned**
+   code-graph engine) and merges code nodes with rule / memory /
    narrative nodes via `code_refs` → one interactive `graph.html` (search,
    per-type color filters, click-through neighbors) + `graph.json`.
-   *Replaces `graphify-out/`.* **v0.1.0:** Python symbols + call edges via the
+   *Replaces the standalone code-graph output.* **v0.1.0:** Python symbols + call edges via the
    stdlib `ast`; JS/TS, Go, and Rust get declaration nodes plus **intra- and
    cross-file `calls` edges** via a brace-matched heuristic (symbol→symbol),
    with looser file→symbol `references` as a fallback. The viewer (§10 item 16)
@@ -380,6 +380,24 @@ stdout → guidance text / JSON additionalContext  (injected into context)
 exit 0 → OK   ·   exit 2 → block (only when project opts into strict mode)
 ```
 
+### Error handling & exit codes (decided — boundary discipline)
+
+Errors are caught and rendered at exactly **four boundaries** — the CLI `main()`,
+each hook entrypoint, the MCP dispatch, and the installer — and nowhere else;
+internals keep raising, which is correct. There is **one** typed error,
+`FuxError(Exception)` ([fux/errors.py](../fux/errors.py)), for expected user-facing
+failures (unknown rule id, missing `.fux/`, bad arg); everything else is unexpected.
+
+- **CLI exit codes:** `0` ok · `1` error (`FuxError` → terse `error: <msg>`;
+  unexpected → `error: <msg>` + a `FUX_DEBUG=1` hint, full traceback only under
+  `FUX_DEBUG=1`) · `2` blocking (strict `gate`/`stop`) · `130` interrupted (Ctrl-C).
+- **Hooks are fail-open:** a hook exception returns 0 — a broken `.fux/` never breaks
+  an agent session. The one exception is the deliberate strict `stop`→`2`, computed
+  before the fail-open wrapper and passed straight through. **Fail-open ≠ fail-silent:**
+  every swallowed hook exception is printed to stderr under `FUX_DEBUG=1`.
+- **`FUX_DEBUG`** is the single debug switch (parallel to cage's `CAGE_DEBUG`): it
+  governs both the CLI traceback and the hook-swallow trace.
+
 ### settings.json wiring (sketch — written by `fux init`, not hand-edited)
 
 ```jsonc
@@ -395,7 +413,7 @@ exit 0 → OK   ·   exit 2 → block (only when project opts into strict mode)
 
 ---
 
-## 9. CLI surface (mirrors graphify)
+## 9. CLI surface
 
 ```
 fux init           # scaffold footprint + register hooks in a project
@@ -425,8 +443,7 @@ fux ingest <srcs…> # agent batch-ingests URLs/files/globs → draft queue (ski
 fux fetch-rules <s># fetch URL/PDF/txt → extract durable rule entries (skill)
 ```
 
-Every command is deterministic — the same "no API cost" guarantee that made
-graphify trustworthy.
+Every command is deterministic — a genuine "no API cost" guarantee.
 
 **One command registry** ([fux/registry.py](../fux/registry.py)) is the single
 source of truth for the *help surface*: `fux --help` groups commands by group
@@ -647,7 +664,7 @@ store becomes a content type or a derived view of the one `.fux/` substrate:
 
 | Replaced system | Becomes, in Fux | How |
 |---|---|---|
-| **graphify** (`graphify-out/`) | `graph.html` / `graph.json` derived view | Fux owns the AST-extraction engine; code nodes ⊕ knowledge nodes in one graph |
+| **standalone code-graph tool** (legacy graph output) | `graph.html` / `graph.json` derived view | Fux owns the AST-extraction engine; code nodes ⊕ knowledge nodes in one graph |
 | **memory/** | `type: memory` entries (`user`/`feedback`/`project`/`reference`) | SessionStart hook injects them — same recall, now versioned & code-linked |
 | **docs/WHAT/WHY/HOW + architecture** | `type: narrative` entries | Long-form prose authored in `.fux/`, rendered to a browsable view |
 | **business rules** (inline comments) | `rule` / `formula` / `invariant` / … entries | The gap none of the above held — now first-class |
@@ -666,7 +683,7 @@ deterministic; none calls an LLM:
 | Action | Cost | Mechanism |
 |---|---|---|
 | Regenerate INDEX + json | $0 | parse frontmatter |
-| Rebuild graph | $0 | `fux build` — AST extraction (Fux-owned, was graphify) |
+| Rebuild graph | $0 | `fux build` — AST extraction (Fux-owned) |
 | Detect stale rules | $0 | `git log` on `code_refs` vs rule `updated` |
 | Detect dead refs / conflicts | $0 | path existence + id/edge checks |
 | Verify invariants/examples | $0 | run assertions via probes/pytest |
@@ -688,7 +705,7 @@ and why?"*:
 
 **Net:** Fux trades a one-time authoring cost per rule for lookups that are
 ~5–10× cheaper and more correct on every later session, plus `$0` ongoing
-maintenance. Folding graphify, memory, and the narrative docs into one substrate
+maintenance. Folding the code graph, memory, and the narrative docs into one substrate
 also removes three separate upkeep paths.
 
 **Break-even:** a rule takes a few minutes to write once and pays back the first
@@ -718,8 +735,8 @@ clears it. Still `$0`.)*
 ## 13. Rollout phases (when greenlit)
 
 1. **Engine** — global `fux` CLI (`init/build/check/context/touch`) + rule
-   schema + frontmatter validator + **AST graph backend** (the graphify engine,
-   now Fux's). Standalone, no project yet.
+   schema + frontmatter validator + **AST graph backend** (a Fux-owned
+   code-graph engine). Standalone, no project yet.
 2. **Hooks** — the 3 hook scripts in `~/.claude/fux/hooks/`; `fux init`
    registers them into a project's settings.
 3. **Global best-practices seed** — port Anton's "must-know rules" (≤100 lines,
@@ -732,9 +749,9 @@ clears it. Still `$0`.)*
 6. **Second project** — `fux init` in Wagner to validate portability + global
    inheritance.
 7. **Absorb & migrate** — fold the AST-graph engine into `fux build` (retiring
-   `graphify-out/`); import `memory/` files as `type: memory`; migrate
+   the legacy code-graph output); import `memory/` files as `type: memory`; migrate
    `WHAT/WHY/HOW` + `architecture` as `type: narrative`. Decommission the old
-   stores once parity is verified.
+   stores once coverage is verified.
 
 ---
 
@@ -748,7 +765,7 @@ clears it. Still `$0`.)*
 | **Per-project dir name** | **`.fux/`** — one hidden dir; source in `.fux/rules/`, generated in `.fux/out/` | §4 |
 | **Global rules home** | **`~/.claude/fux/global/` as its own git repo** (versioned, syncable, PR-reviewable) | [global-rules-home.compare.md](global-rules-home.compare.md) |
 | **Recall engine** | **Hybrid** (staged): lexical candidate-gen ships first, local embedding re-rank is the phase-2 upgrade of the same design | [recall-engine.compare.md](recall-engine.compare.md) |
-| **Scope / positioning** | Fux **replaces** graphify, memory, and the narrative docs — not a sixth store beside them | §11 |
+| **Scope / positioning** | Fux **replaces** the standalone code-graph tool, memory, and the narrative docs — not a sixth store beside them | §11 |
 
 ### Resolved in v0.1.0
 
@@ -769,7 +786,7 @@ implemented (see [implementation-notes.md](implementation-notes.md) §"Decisions
 - No mandatory LLM calls in any maintenance path.
 - Not a linter for code *style* (that's ruff/Biome, which Fux does **not**
   replace) — Fux governs *knowledge*: rules, memory, narrative, and the graph.
-- Not a new sixth store — it **subsumes** graphify, memory, and the narrative
+- Not a new sixth store — it **subsumes** the code-graph tool, memory, and the narrative
   docs rather than sitting beside them (§11).
 
 ---
@@ -821,7 +838,7 @@ This is the capstone: it closes the loop the rest of Fux only stores.
 |---|---|---|---|
 | `plan` | Request → requirements → design → tasks (above) | Spec-driven dev, code-linked & tracked | **Add (flagship)** |
 | `adr "<decision>"` | Capture an architecture decision as an `adr` entry | One-step durable *why*; `adr` type already exists (§6) | **Add** |
-| `trace "<feature>"` | Walk the graph to explain how a feature spans modules | The graphify-replacement query value, as a workflow | **Add** |
+| `trace "<feature>"` | Walk the graph to explain how a feature spans modules | Graph-query value delivered as a workflow | **Add** |
 | `savings ["<question>"]` | Interpret the measured token-cost report → a next action | Makes the §12 ROI auditable, not asserted; pure `$0` measurement | **Add** |
 | `distill ["<focus>"]` | Capture this session's decisions as `memory`/`adr` entries | Closes the memory-replacement loop; scoped + human-confirmed so it never orphans noise | **Add (shipped)** |
 | `review <diff>` | Check a diff against governing rules / invariants only | Useful, but overlaps `/code-review` — better as the `strict` hook (§8) | **Skip (fold into hook)** |
@@ -847,6 +864,23 @@ no other skill will.
 
 A `spec.guide.md` (using the [guide.guide.md](guide.guide.md) pattern) should
 define the plan artifact's required sections *before* `plan` is built.
+
+### Skill artifacts are rendered, not hand-authored (skillgen)
+
+Each skill ships a per-host body (the claude `SKILL.md`, the codex copy, the
+copilot prompt, and — going forward — generic `AGENTS.md` / `~/.agents/skills`
+targets). Hand-authoring these per surface lets them drift independently. The
+design of record is therefore: **per-host skill artifacts are *generated* from one
+human-edited fragment set by a build-time, stdlib-only renderer
+([tools/skillgen/](../tools/skillgen/)), and guarded against drift by
+`python -m tools.skillgen --check` in CI + pre-commit.** Fragments are the only
+source a human edits; the rendered files are committed, byte-diff-checked
+artifacts. Each host's `description` (the firing trigger) is preserved verbatim.
+The renderer is self-contained (no shared module with any other repo — that would
+break fux's zero-dependency guarantee) and never ships in the wheel. Foundation status: the
+flagship `fux` skill renders to `claude` / `agents` / `copilot` today (codex is
+served by the claude artifact); the remaining skills and hosts migrate onto the
+same renderer in follow-on work. Full design: [docs/skillgen.md](skillgen.md).
 
 ---
 
@@ -900,11 +934,11 @@ define the plan artifact's required sections *before* `plan` is built.
 8. ✅ **Graph hardening.** A stateful sanitizer ([astextract.py](../fux/astextract.py)
    `sanitize_lines`) makes the brace matcher block-comment- and
    multiline-template-aware before counting braces.
-9. ⬜ **Phase-7 decommission.** Retire `graphify-out/`, home-dir `memory/`, and the
-   migrated `docs/` in Anton once parity is signed off (§13.7). **Readiness checked
+9. ⬜ **Phase-7 decommission.** Retire the legacy code-graph output, home-dir `memory/`, and the
+   migrated `docs/` in Anton once coverage is signed off (§13.7). **Readiness checked
    2026-06-04 — not met; do not delete yet:**
-   - `graphify-out/` — **no graph parity**: Anton's Fux graph has 329 nodes vs
-     graphify's 1906 (Fux's `important_globs` cover a fraction of the repo). Widen
+   - legacy code graph — **coverage gap**: Anton's Fux graph has 329 nodes vs
+     the legacy graph's 1906 (Fux's `important_globs` cover a fraction of the repo). Widen
      Fux graph coverage to match before retiring.
    - `docs/` — only 1 of 18 tracked docs (`anton-overview`) migrated to a `narrative`
      entry; `WHAT/WHY/HOW/architecture/…` still authored only in `docs/`. And
@@ -912,8 +946,8 @@ define the plan artifact's required sections *before* `plan` is built.
    - home `memory/` — the 3 project memories *are* mirrored in `.fux/memory/shared/`,
      but they're personal/cross-project; import-then-retire deliberately, not bulk.
    **Gate:** widen graph coverage → migrate the narrative docs → then retire
-   `graphify-out/` + the migrated docs; handle memory last. The engine work that
-   makes each step possible (and the gate measurable) is **items 13–17 below**.
+   the legacy code graph + the migrated docs; handle memory last. The engine work that
+   makes each step possible (and the gate measurable) is **items 13–16 below**.
 
 ### Packaging & distribution (PyPI)
 
@@ -945,14 +979,14 @@ define the plan artifact's required sections *before* `plan` is built.
 > Anton pilot (item 7) so the README can lead with measured `fux savings`/`coverage`
 > from a real project, not a toy.
 
-### Unblocking decommission (parity engine work)
+### Unblocking decommission (coverage engine work)
 
 > The 2026-06-04 readiness check (§17.9) found the decommission isn't blocked by
 > *policy* but by **missing engine capability** — Fux can't yet *match* the stores
 > it claims to replace, so retiring them would lose data. Each blocker maps to a
-> concrete feature; with these built, "parity signed off" is now **measurable** via
-> `fux parity`. All `$0`, deterministic. **Status: shipped — the remaining work is
-> running them against Anton (item 7).**
+> concrete feature; with these built, coverage of the current sources is now
+> **measurable** via `fux coverage` + `fux build --full`. All `$0`, deterministic.
+> **Status: shipped — the remaining work is running them against Anton (item 7).**
 
 13. ✅ **Full-repo graph coverage.** `graph_globs` ([config.py](../fux/config.py)) is
     decoupled from `important_globs` — `fux build` graphs the broad set, `coverage`
@@ -966,17 +1000,13 @@ define the plan artifact's required sections *before* `plan` is built.
 16. ✅ **`fux import-memory`.** `importer.import_memory` mirrors home-dir
     `~/.claude/.../memory/*.md` into `.fux/memory/<scope>/`, normalising
     `subtype`/`scope` and skipping the `MEMORY.md` index.
-17. ✅ **`fux parity` (measurable gate).** [parity.py](../fux/parity.py) asks the
-    question that matters — *is any current source file invisible to the graph?*
-    (coverage of `graph_globs` files, not a node-count match against a possibly
-    **stale** `graphify-out/`) — plus `docs/` not yet `narrative` (excluding
-    `conventions`/`guardrails` and any `parity_stay`) and home-memory not yet
-    imported. `READY`/`NOT READY`, exit 1 until ready. It also flags a stale legacy
-    graph. **This is the gate that says when it is safe to delete.**
+The readiness signal these compose — *is any current source file invisible to the
+graph? are the docs migrated? is the home-memory imported?* — is read directly from
+`fux coverage` + `fux build --full` rather than a dedicated gate command.
 
 > **Order to retire Anton's stores (now tool-backed):** `fux build --full` until
-> `fux parity` graph ✓ → `fux import docs/` + rebuild until docs ✓ →
-> `fux import-memory` until memory ✓ → then §17.9's retirement is a green-light.
+> `fux coverage` shows the current sources graphed → `fux import docs/` + rebuild
+> until docs ✓ → `fux import-memory` until memory ✓ → then §17.9's retirement is a green-light.
 
 ### Best-in-class (the three pillars to SOTA — `$0`, high-ROI)
 

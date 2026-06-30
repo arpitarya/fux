@@ -1,4 +1,4 @@
-"""AST symbol/edge extraction — the graphify engine, now Fux-owned (plan §7).
+"""AST symbol/edge extraction — the code-graph engine, Fux-owned (plan §7).
 
 $0 and deterministic. Python uses the stdlib ``ast`` module for symbols + call
 edges; brace languages (JS/TS, Go, Rust) get declaration nodes via regex *and*

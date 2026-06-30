@@ -1,5 +1,5 @@
 """Edge confidence + weight: loose `references` are INFERRED and down-weighted in
-clustering/centrality, restoring the signal graphify carried as confidence labels."""
+clustering/centrality, restoring the per-edge confidence-label signal."""
 from __future__ import annotations
 
 import json

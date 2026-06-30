@@ -33,7 +33,6 @@ DEFAULTS = {
     "cost_tracking": False,    # opt-in: record each lookup's savings → cumulative cost.json (§12)
     "usd_per_mtok": 5.0,       # $/million input tokens for `fux savings` dollar figures (§12);
                                # default = Claude Opus 4.8 input price. Model-agnostic — override per project.
-    "parity_stay": [],        # docs that stay/are out-of-scope for `fux parity` (§17.17)
     "context_budget_tokens": 0,  # >0 ⇒ knapsack-pack the SessionStart INDEX (§17.25)
     "graph_editor": "vscode",  # editor URI scheme for clickable graph.html node links:
                                # vscode | vscode-insiders | cursor | windsurf (§7)
@@ -92,9 +91,6 @@ def default_toml() -> str:
         "# $/million input tokens used to price `fux savings` in dollars (model-agnostic).\n"
         "# Default = Claude Opus 4.8 input price; set to your model's rate.\n"
         "usd_per_mtok = 5.0\n\n"
-        "# Docs that stay / are out-of-scope for `fux parity` (beyond conventions,\n"
-        "# guardrails) — e.g. process docs that get deleted, not migrated to narrative.\n"
-        "parity_stay = []\n\n"
         "# Token budget for the SessionStart INDEX. 0 = inject everything; >0 picks\n"
         "# the optimal (knapsack) rule subset that fits — for very large corpora.\n"
         "context_budget_tokens = 0\n\n"

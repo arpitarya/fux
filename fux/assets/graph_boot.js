@@ -61,7 +61,7 @@ const ALPHA_MIN = 0.004, ALPHA_DECAY = 0.98, ALPHA_REHEAT = 0.55;
 function reheat(a){ alpha = Math.max(alpha, a==null ? ALPHA_REHEAT : a); running = true; }
 const REP = nodes.length > 1200 ? 0.020 : 0.032;
 const REP_RANGE = 420, GRAVITY = 0.0014, COMM_PULL = 0.028;
-// Community palette: the Tableau-10 categorical set (as used by Graphify) — cool,
+// Community palette: the Tableau-10 categorical set — cool,
 // distinct and cohesive on near-black. Three shade tiers extend the 10 colours so
 // neighbouring communities still separate across 100+ clusters. Knowledge nodes
 // stay incandescent amber regardless, so they still read as the special layer.
@@ -389,7 +389,7 @@ function drawMacro(){ const m = macroRollup();
     ctx.fillStyle=c.know?"#ffd27f":"#cdd3da"; ctx.fillText(txt, p.x, p.y+r+15); }
   ctx.textAlign="start"; }
 // In the Knowledge lens code is tiny "dust"; in Communities/Heat it's rendered as
-// bigger, solid, graphify-style nodes so the colours actually read.
+// bigger, solid nodes so the colours actually read.
 const baseR = n => isKnow(n) ? (3 + (n.centrality||0)*3.4 + Math.min((deg[n.id]||0)*0.12,2.4))
   : (lens === "know" ? (1.6 + (n.centrality||0)*5 + Math.min((deg[n.id]||0),30)*0.05)
                      : (2.6 + (n.centrality||0)*6 + Math.min((deg[n.id]||0),40)*0.07));

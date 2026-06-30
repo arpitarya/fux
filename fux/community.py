@@ -1,7 +1,7 @@
 """Community detection — deterministic label propagation, $0 stdlib (plan §7).
 
-Replaces graphify's clustering. Synchronous label propagation with sorted,
-tie-broken updates so the result is reproducible across runs (no randomness).
+Synchronous label propagation with sorted, tie-broken updates so the result is
+reproducible across runs (no randomness).
 Votes are **edge-weighted**: a low-confidence `references` edge (weight 0.25) pulls
 a node into a community far less than a precise `calls`/`contains` edge, so the
 loose whole-file xref can't over-fragment or mis-merge clusters by raw count.
