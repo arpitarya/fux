@@ -6,6 +6,7 @@ from fux import (candidates, capture, config, costledger, coverage, explain,
                  feedback, fetchrules, lint, loader, mine, paths, recall,
                  savings, scaffold, seal, stats, tour, verify)
 from fux.cliutil import root, scope_root
+from fux.errors import FuxError
 
 
 def cmd_feedback(args) -> int:
@@ -32,8 +33,7 @@ def cmd_why(args) -> int:
     here = root()
     r = explain.why(here, args.id)
     if r is None:
-        print(f"fux: no rule '{args.id}'")
-        return 1
+        raise FuxError(f"no rule '{args.id}'")   # terse `error:` on stderr, exit 1
     if getattr(args, "history", False):
         print(explain.render_history(here, r))
         return 0

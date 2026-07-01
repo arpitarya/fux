@@ -43,4 +43,11 @@ def _scalar(v) -> str:
     if isinstance(v, bool):
         return "true" if v else "false"
     s = str(v)
-    return f'"{s}"' if (":" in s or s.strip() != s) else s
+    # Quote when the bare token would round-trip through `scalars.scalar()` as a
+    # NON-string — bool (`true`/`false`), None (`null`/`~`/``), or a flow list
+    # (`[…]`) — or carries a YAML-significant char. Emitting such a string bare
+    # flips its parsed type on the next read, which (e.g. for a ratified rule's
+    # `expect: "true"` example) changes `content_seal` and raises a false
+    # `tampered`. Keep the writer's output a fixed point of the reader.
+    reparses_nonstring = s in ("true", "false", "null", "~", "") or s[:1] == "["
+    return f'"{s}"' if (reparses_nonstring or ":" in s or s.strip() != s) else s
