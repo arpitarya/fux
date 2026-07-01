@@ -173,7 +173,7 @@ The per-host skill artifacts — the Claude `SKILL.md`, the Codex copy, the Copi
 
 ## What's new
 
-**Latest — v0.17.0:** Error-handling hardening — fux gets one CLI error boundary (terse `error: <msg>`, never a raw traceback), a documented exit-code contract (`0` ok · `1` error · `2` blocking · `130` interrupted), and genuinely **fail-open hooks** (a hook error never breaks an agent session; the strict `stop`→`2` is preserved). One thin `FuxError`; every swallowed exception surfaces under `FUX_DEBUG=1` (fail-open ≠ fail-silent). `$0`/stdlib, no behaviour change to checks or views.
+**Latest — v0.17.1:** Harness-driven fixes — a new exhaustive, offline, `$0` end-to-end test harness (the `fux-lab` polyglot fixture + runner that drives *every* command) caught two real bugs, both fixed: `fux why <unknown>` now raises `FuxError` (terse `error:` on stderr, per the contract) instead of printing to stdout, and the frontmatter writer now quotes scalar-like strings so a ratified rule's quoted-boolean example can't flip its `content_seal` and raise a false `tampered`. Regression tests added; harness re-runs clean. `$0`/stdlib.
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name
