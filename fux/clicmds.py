@@ -57,7 +57,12 @@ def cmd_pii_scan(args) -> int:
     if given:
         targets = [Path(p) for p in given]
     else:
-        names = gitutil.tracked_files(here, ["*.py", "*.md"]) or \
+        # Scan the whole working tree: tracked ∪ untracked-not-ignored, so a stray
+        # PAN in a new file is caught *before* `git add` — PII must not enter the
+        # tree. Falls back to a raw walk when this isn't a git repo.
+        names = gitutil.tracked_files(here, ["*.py", "*.md"]) + \
+            gitutil.untracked_files(here, ["*.py", "*.md"])
+        names = list(dict.fromkeys(names)) or \
             [str(p) for p in here.rglob("*.py")] + [str(p) for p in here.rglob("*.md")]
         targets = [here / n for n in names]
     hits = piiscan.scan(targets)

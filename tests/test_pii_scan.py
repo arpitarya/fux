@@ -54,3 +54,20 @@ def test_exempt_file_is_skipped_even_with_a_hit(tmp_path):
     plan = tmp_path / "feature-plan.md"
     plan.write_text(f"example PAN {PAN}\n", encoding="utf-8")
     assert piiscan.scan_file(plan) == []        # exempt by the `-plan`/`plan.md` path rule
+
+
+def test_scans_untracked_and_respects_gitignore(tmp_path, monkeypatch, capsys):
+    """A no-args scan must cover the whole working tree — tracked ∪ untracked-not-
+    ignored — so a stray PAN in a new file is caught before `git add`, while a
+    gitignored file is skipped (fux-lab Cycle-3 finding)."""
+    import subprocess
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    (tmp_path / ".gitignore").write_text("secret_ignored.py\n", encoding="utf-8")
+    (tmp_path / "untracked_leak.py").write_text(f'CUSTOMER_PAN = "{PAN}"\n', encoding="utf-8")
+    (tmp_path / "secret_ignored.py").write_text(f'CUSTOMER_PAN = "{PAN}"\n', encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    rc = clicmds.cmd_pii_scan(SimpleNamespace(paths=None))
+    out = capsys.readouterr().out
+    # untracked-not-ignored file is caught; the gitignored one is not scanned.
+    assert rc == 2
+    assert "untracked_leak.py" in out and "secret_ignored.py" not in out

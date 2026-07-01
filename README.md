@@ -173,7 +173,7 @@ The per-host skill artifacts — the Claude `SKILL.md`, the Codex copy, the Copi
 
 ## What's new
 
-**Latest — v0.17.3:** Direction-honest `savings` — the `fux-lab` harness (Cycle 2, mutation/edge oracles) caught `fux savings` labelling a net *loss* as a win (`1.9× cheaper` / `you save: -377 tok` on a small corpus where Fux is actually costlier). It now says `cheaper` only when Fux costs less (else `costlier`) and prints `you spend: N extra` instead of a negative save. Regression test added. `$0`/stdlib.
+**Latest — v0.17.4:** Security + safety fixes — the `fux-lab` harness (Cycle 3) caught a **stored XSS** in `graph.html` (a rule's free-form `domain`, which can come from an untrusted `fux ingest` source, could break out of the embedded-data `<script>` tag with `</script>…`) — now hardened by `\uXXXX`-escaping `<`/`>`/`&` in the embedded JSON. Also: `fux pii-scan` no longer gives a false "all clear" on untracked files (it now scans the whole working tree, tracked ∪ untracked-not-ignored). Regression tests added. `$0`/stdlib.
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name
