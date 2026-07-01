@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from fux import graphquery, recall, report
 from fux.cliutil import root, scope_root
+from fux.errors import FuxError
 
 
 def cmd_query(args) -> int:
@@ -22,8 +23,7 @@ def cmd_query(args) -> int:
             anchors.append(node["id"])
             seen.add(node["id"])
     if not anchors:
-        print(f"fux: nothing in the graph matches '{args.query}'")
-        return 1
+        raise FuxError(f"nothing in the graph matches '{args.query}'")
     _GENERIC = {"main", "run", "test", "__init__", "setup", "teardown"}
     by_id = {n["id"]: n for n in graph["nodes"]}
     printed: set[str] = set()        # global dedup: each node emitted at most once
@@ -85,12 +85,12 @@ def cmd_path(args) -> int:
     graph = graphquery.load(scope_root(args))
     a, b = graphquery.find(graph, args.a), graphquery.find(graph, args.b)
     if not a or not b:
-        print("fux: could not resolve both endpoints in the graph")
-        return 1
+        raise FuxError("could not resolve both endpoints in the graph")
     p = graphquery.shortest_path(graph, a["id"], b["id"])
     if not p:
+        # endpoints are valid but disconnected — a legitimate empty result, not an error.
         print(f"no path between {a['label']} and {b['label']}")
-        return 1
+        return 0
     by_id = {n["id"]: n for n in graph["nodes"]}
     print(" → ".join(by_id[x].get("label", x) for x in p))
     return 0
@@ -100,8 +100,7 @@ def cmd_explain(args) -> int:
     graph = graphquery.load(scope_root(args))
     node = graphquery.find(graph, args.term)
     if not node:
-        print(f"fux: no node matches '{args.term}'")
-        return 1
+        raise FuxError(f"no node matches '{args.term}'")
     by_id = {n["id"]: n for n in graph["nodes"]}
     print(f"# {node.get('label', node['id'])} ({node['type']})")
     if node.get("file"):

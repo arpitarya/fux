@@ -48,8 +48,7 @@ def cmd_seal(args) -> int:
     if not getattr(args, "all", False):
         wanted = set(args.ids)
         if not wanted:
-            print("fux: pass rule ids or --all")
-            return 1
+            raise FuxError("pass rule ids or --all")
         rules = [r for r in rules if r.id in wanted]
         missing = wanted - {r.id for r in rules}
         for m in sorted(missing):
@@ -161,12 +160,12 @@ def cmd_candidates(args) -> int:
     action, cid = getattr(args, "action", None), getattr(args, "id", None)
     if action in ("accept", "reject"):
         if not cid:
-            print(f"fux: `fux candidates {action} <id>` needs a candidate id")
-            return 1
+            raise FuxError(f"`fux candidates {action} <id>` needs a candidate id")
         if action == "reject":
-            c = candidates.set_state(here, cid, "rejected")
-            print(f"✔ rejected {cid}" if c else f"fux: no candidate '{cid}'")
-            return 0 if c else 1
+            if not candidates.set_state(here, cid, "rejected"):
+                raise FuxError(f"no candidate '{cid}'")
+            print(f"✔ rejected {cid}")
+            return 0
         return _accept_candidate(here, cid)
     print(candidates.render(here, pending=getattr(args, "pending", False),
                             why_todo=getattr(args, "why_todo", False)))
@@ -181,8 +180,7 @@ def _accept_candidate(here, cid) -> int:
     from fux.model import TYPES
     c = next((x for x in candidates.read(here) if x.cid == cid), None)
     if c is None:
-        print(f"fux: no candidate '{cid}'")
-        return 1
+        raise FuxError(f"no candidate '{cid}'")
     rid, today = candidates._slug(c.title) or cid, _dt.date.today().isoformat()
     fm = {"id": rid, "type": c.kind if c.kind in TYPES else "rule", "status": "active",
           "tier": "standard", "created": today, "updated": today,
@@ -190,13 +188,11 @@ def _accept_candidate(here, cid) -> int:
     if c.why_source:
         fm["why_source"] = c.why_source
     if errs := schema.validate(fm):
-        print("fux: cannot accept — " + "; ".join(errs))
-        return 1
+        raise FuxError("cannot accept — " + "; ".join(errs))
     target = paths.Footprint(here).rules / f"{rid}.md"
     target.parent.mkdir(parents=True, exist_ok=True)
     if target.exists():
-        print(f"fux: rule '{rid}' already exists — reject the candidate or rename it")
-        return 1
+        raise FuxError(f"rule '{rid}' already exists — reject the candidate or rename it")
     target.write_text(fmwrite.dump(fm, f"**{c.kind.title()}:** {c.title}\n\n**Why:** {c.why}"),
                       encoding="utf-8")
     candidates.set_state(here, cid, "accepted")
@@ -249,8 +245,7 @@ def cmd_ingest(args) -> int:
                                       since=getattr(args, "since", None),
                                       max_items=getattr(args, "max", ingestconnector.DEFAULT_MAX))
         except ingestconnector.ConnectorError as e:
-            print(f"fux: {e}")
-            return 1
+            raise FuxError(str(e))
         print("fux ingest (connector) is an agent skill — the agent pulls server-side-filtered\n"
               "  structured data (MCP → REST+PAT → export/clone → CDP-JSON → DOM; GitHub first);\n"
               "  fux never builds a client or calls an API ($0). The engine only bounds + governs.\n"
@@ -299,12 +294,8 @@ def cmd_fetch_rules(args) -> int:
     source = args.source
     try:
         text = fetchrules.fetch_text(source)
-    except fetchrules.PDFDependencyError as exc:
-        print(f"fux: {exc}", file=sys.stderr)
-        return 1
-    except fetchrules.FetchError as exc:
-        print(f"fux: {exc}", file=sys.stderr)
-        return 1
+    except (fetchrules.PDFDependencyError, fetchrules.FetchError) as exc:
+        raise FuxError(str(exc))
     label = fetchrules.source_label(source)
     if not getattr(args, "raw", False):
         print(f"# Source: {label}  ({len(text):,} chars)\n")
