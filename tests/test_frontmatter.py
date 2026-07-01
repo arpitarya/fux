@@ -47,3 +47,21 @@ def test_no_frontmatter_returns_empty():
     fm, body = frontmatter.split("# just markdown\n")
     assert fm == {}
     assert body == "# just markdown\n"
+
+
+def test_string_that_looks_scalar_survives_roundtrip():
+    """A *string* value whose bare form would re-parse as bool/None/list must keep
+    its type across dump→split — else a ratified rule's content_seal drifts and
+    `fux check` raises a false `tampered` (fux-lab finding)."""
+    fm = {"id": "x", "type": "formula", "status": "active",
+          "examples": [{"given": "gross=1000, n=4", "expect": "true"},
+                       {"given": "n=0", "expect": "false"}],
+          "note_null": "null", "note_list": "[not, a, list]"}
+    again, _ = frontmatter.split(fmwrite.dump(fm, "body"))
+    assert again["examples"][0]["expect"] == "true"      # str, not bool True
+    assert again["examples"][1]["expect"] == "false"     # str, not bool False
+    assert again["note_null"] == "null"                  # str, not None
+    assert again["note_list"] == "[not, a, list]"        # str, not a parsed list
+    # idempotent: a second round-trip is a fixed point
+    twice, _ = frontmatter.split(fmwrite.dump(again, "body"))
+    assert twice == again

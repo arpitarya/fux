@@ -435,7 +435,28 @@ boundary + wheel/sdist exclusion** ([test_skillgen.py](tests/test_skillgen.py)),
 **error-handling contract — CLI exit codes (`FuxError`→1, Ctrl-C→130, unexpected→1 with
 traceback only under `FUX_DEBUG`), per-hook fail-open, strict `stop`→2 preserved, and the
 `FUX_DEBUG` swallowed-exception trace** ([test_errors.py](tests/test_errors.py)).
-Run with `python -m pytest` (Python ≥ 3.11).
+Run with `python -m pytest` (Python ≥ 3.11). Current: **364 passed, 2 skipped**.
+
+**Exhaustive end-to-end harness — `fux-lab` (external sibling repo).** Beyond the
+unit suite, an offline `$0` harness lives in a separate `fux-lab/` repo (polyglot
+fixture + stdlib-only `run_lab.py`). It drives **every** command in
+[fux/registry.py](registry.py) — a registry-generated coverage manifest proves
+**44/44 accounted for** (`fux-lab/test_coverage.py`) so exhaustiveness can't
+silently rot — diffs machine output against committed goldens, springs
+worktree-isolated traps (each must fire its finding), runs negative guards (each
+must stay quiet), proves `$0` with the network disabled, exercises the error
+contract, and writes a ranked `FINDINGS.md`. It **reports** engine bugs and never
+edits the engine to make a finding green. Its first sweep (93 checks) surfaced two
+real findings — **both since fixed** and re-verified by the harness (0 findings):
+
+1. **Error-contract gap** *(fixed)* — `fux why <unknown-id>` printed `fux: no rule
+   '…'` to *stdout* and exited 1; it now raises `FuxError` ([cliquery.py](cliquery.py)
+   `cmd_why`) → terse `error: …` on *stderr* ([test_errors.py](tests/test_errors.py)).
+2. **Seal-stability false positive** *(fixed)* — the frontmatter writer emitted a
+   *string* `"true"` as bare `true`, which the reader re-parsed as a bool, changing
+   a ratified rule's `content_seal` and raising a false `tampered`. The writer now
+   quotes any string whose bare form would re-parse as a non-string
+   ([fmwrite.py](fmwrite.py) `_scalar`, [test_frontmatter.py](tests/test_frontmatter.py)).
 
 ### 2.20a Command registry + `fux how` + scrape — ✅ (handoff A–D)
 

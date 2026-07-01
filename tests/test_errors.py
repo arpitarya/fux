@@ -79,6 +79,19 @@ def test_read_command_without_footprint_exits_1_clean(tmp_path, monkeypatch, cap
     assert "Traceback" not in err
 
 
+def test_why_unknown_rule_is_terse_error_on_stderr(project, monkeypatch, capsys):
+    """`fux why <unknown>` raises FuxError → terse `error:` on *stderr*, exit 1 —
+    not a `fux: …` line on stdout (fux-lab finding)."""
+    monkeypatch.chdir(project)
+    monkeypatch.delenv("FUX_DEBUG", raising=False)
+    rc = cli.main(["why", "no-such-rule-xyz"])
+    cap = capsys.readouterr()
+    assert rc == 1
+    assert cap.out == ""                                   # nothing on stdout
+    assert cap.err.strip() == "error: no rule 'no-such-rule-xyz'"
+    assert "Traceback" not in cap.err
+
+
 # ── hooks are fail-open (return 0 when the core raises) ─────────────────────
 def _no_stdin(monkeypatch):
     """Avoid reading pytest's captured stdin; hand each hook a fixed event."""
