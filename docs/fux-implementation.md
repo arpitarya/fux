@@ -48,7 +48,7 @@ All commands dispatch through [fux/cli.py](fux/cli.py); full reference in
 | Command | Status | Module |
 |---|---|---|
 | `fux init [--recall]` | ✅ | [fux/clicmds.py](fux/clicmds.py), [fux/initcmd.py](fux/initcmd.py), [fux/scaffold.py](fux/scaffold.py) |
-| `fux build [--full]` | ✅ | [fux/build.py](fux/build.py), [fux/graph.py](fux/graph.py) |
+| `fux build [--full] [--profile] [--no-xref]` | ✅ | [fux/build.py](fux/build.py), [fux/graph.py](fux/graph.py) |
 | `fux check [--fix] [--baseline-write FILE]` | ✅ | [fux/check.py](fux/check.py), [fux/fix.py](fux/fix.py), [fux/baseline.py](fux/baseline.py) |
 | `fux context` | ✅ | [fux/context.py](fux/context.py) |
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | ✅ | [fux/recall.py](fux/recall.py), [fux/hybrid.py](fux/hybrid.py) |
@@ -145,8 +145,21 @@ Implemented ([fux/graph.py](fux/graph.py), [fux/astextract.py](fux/astextract.py
 - File nodes + `governs` (rule→code), `contains` (file→symbol), `references`
   (cross-file/cross-language heuristic) edges; rule↔rule typed edges.
 - Deterministic **community detection** (label propagation) + `GRAPH_REPORT.md`
-  (god nodes by degree, communities).
-- Interactive `graph.html` with search + *color: type ⇄ community* toggle.
+  (god nodes by degree, communities). Graph output is **byte-identical across builds**
+  regardless of `PYTHONHASHSEED` — every set-iteration that emits edges (`_xref`,
+  `_generic_calls`, `_generic_externals`) sorts first. Covered by
+  [tests/test_graph_determinism.py](tests/test_graph_determinism.py) +
+  [tests/test_graph_lod_profile.py](tests/test_graph_lod_profile.py).
+- Interactive `graph.html` with search + *color: type ⇄ community* toggle. **Viewer
+  level-of-detail**: above `graph_lod_threshold` nodes (config, default 2500) the graph
+  opens community-collapsed (one blob per community), click-to-expand a community; and
+  an **ego-graph** focus view (double-click / ◎ Focus / `E`) renders a selectable **1–2
+  hop** neighbourhood — how a 20k-node graph stays navigable. The viewer never mutates
+  `graph.json` (LOD threshold injected into the HTML only).
+- **Build profiler** — `fux build --profile` prints a per-phase timing breakdown
+  (extraction · cross-file · `_xref` · community · pagerank · serialize), stdout-only.
+- **`fux build --no-xref`** — opt-in mode dropping the loose `references` pass for huge
+  repos (distinct from the default; changes graph content).
 - Traversals: `query` / `path` / `explain` / `report`.
 
 ### 2.7 Recall — ✅ (plan §10.11)
@@ -394,7 +407,7 @@ Covered by [tests/test_parity_import.py](tests/test_parity_import.py).
 - `[tool.setuptools.packages.find]` carries an explicit `exclude = ["tools*"]` so the
   build-time `tools/skillgen/` renderer never ships in the wheel/sdist (tested).
 
-### 2.20 Tests — ✅ (364 tests)
+### 2.20 Tests — ✅ (380 tests)
 
 [tests/](tests/): resolution, frontmatter, globs, check/fix, recall/build/verify,
 embed/rerank, schema/scaffold/init, cross-language + **cross-file** call edges
@@ -409,6 +422,8 @@ extended verify examples ([test_examples.py](tests/test_examples.py)), the
 expanded tools ([test_mcp.py](tests/test_mcp.py), [test_mcp_extra.py](tests/test_mcp_extra.py)),
 the graph-HTML render + **serve/sanitizer**
 ([test_graphhtml.py](tests/test_graphhtml.py), [test_serve_sanitize.py](tests/test_serve_sanitize.py)),
+the **viewer LOD + ego-graph + build profiler + `--no-xref` + cross-seed byte-determinism**
+([test_graph_lod_profile.py](tests/test_graph_lod_profile.py)),
 and **graph coverage / import / narrative / parity**
 ([test_parity_import.py](tests/test_parity_import.py)), plus the beyond-roadmap
 work: **PageRank centrality** ([test_centrality.py](tests/test_centrality.py)),

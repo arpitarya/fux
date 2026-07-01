@@ -51,6 +51,11 @@ let vTarget = null;           // when set, the camera eases toward it (smooth zo
 const VIEW_EASE = 0.2;        // per-frame approach fraction toward vTarget
 let selected = null, hover = null, query = "", lens = "know";
 let running = true, showLabels = true, focusSet = null;
+// Level-of-detail: above LOD_THRESHOLD nodes the graph opens community-collapsed
+// (macro blobs) instead of rendering every node — you drill into a community by
+// clicking its blob. Whole-graph render stays one zoom / "Detail" click away. The
+// flag holds only until the user takes control (drills in, zooms, or hits Detail).
+let startCollapsed = nodes.length > LOD_THRESHOLD;
 let pathMode = false, pathA = null, pathSet = null, pathEdge = new Set(), pathMD = null;
 let linkDist = 70, charge = 900;
 // Simulated-annealing cooling: forces scale with `alpha`, which decays every
@@ -174,6 +179,12 @@ function jumpTo(id){ const n=byId[id]; if(!n) return; selected=id; clearPath(); 
 $("bcopy").onclick = () => { if(pathSet && pathMD) copy(pathMD(), "path copied");
   else if(selected) copy(nodeMarkdown(byId[selected]), "node copied"); };
 $("bexport").onclick = () => copy(graphMarkdown(), "visible subgraph copied");
+$("bfocus").onclick = () => { if(selected) setFocus(selected); };
+// Ego-graph depth toggle (1 / 2 hop). Re-focuses live when a node is selected.
+document.querySelectorAll(".hopbtn").forEach(b => b.onclick = () => {
+  egoHops = +b.dataset.hop || 1;
+  document.querySelectorAll(".hopbtn").forEach(x => x.classList.toggle("on", x===b));
+  if(selected && focusSet) setFocus(selected); });
 $("bgov").onclick = () => copy(governedMarkdown(), "governed subgraph copied");
 $("bopen").onclick = () => toggleLens();
 $("ledhead").onclick = () => $("led").classList.toggle("collapsed");
@@ -184,10 +195,12 @@ $("railtab").onclick = () => { $("right").classList.toggle("collapsed"); applyRi
 applyRightState();   // honour the default-collapsed markup on load
 // Micro / Macro both show the real nodes — they just change zoom. Micro zooms in
 // (centred on the selection if any); Macro fits the whole graph as an overview.
-$("bmicro").onclick = () => { focusSet=null; invalidateVis(); const z=Math.max(view.k,1.3); const p=selected&&byId[selected];
+$("bmicro").onclick = () => { focusSet=null; startCollapsed=false; invalidateVis(); const z=Math.max(view.k,1.3); const p=selected&&byId[selected];
   if(p) flyTo(-p.x*z, -p.y*z, z); else zoomToCenter(z); };
 // Macro = the auto-framed overview; re-enable auto-fit so it stays framed on resize.
-$("bmacro").onclick = () => { focusSet=null; invalidateVis(); userMoved=false; query=""; $("q").value=""; updateHits(); clearPath(); fitAnimated(); };
+// At scale this re-collapses to the community view (the LOD default).
+$("bmacro").onclick = () => { focusSet=null; startCollapsed = nodes.length > LOD_THRESHOLD;
+  invalidateVis(); userMoved=false; query=""; $("q").value=""; updateHits(); clearPath(); fitAnimated(); };
 
 // ---- layout & geometry --------------------------------------------------
 let W=0, H=0;
@@ -401,13 +414,34 @@ function fitView(){ const vis = visList(); if(!vis.length) return null;
   const lo=i=>i[Math.floor(i.length*0.02)], hi=i=>i[Math.floor(i.length*0.98)];
   const minX=lo(xs),maxX=hi(xs),minY=lo(ys),maxY=hi(ys);
   const w=maxX-minX||1, h=maxY-minY||1;
-  const k = Math.max(0.2, Math.min(2.5, 0.85*Math.min(W/w, H/h)));
+  let k = Math.max(0.2, Math.min(2.5, 0.85*Math.min(W/w, H/h)));
+  // At scale, hold the auto-fit below MACRO_K so the graph opens community-collapsed
+  // (macro) rather than as an illegible hairball — until the user takes control.
+  if(startCollapsed && !userMoved) k = Math.min(k, MACRO_K*0.9);
   return { k, x:-(minX+maxX)/2*k, y:-(minY+maxY)/2*k }; }
 // fit() snaps (used by the settling physics loop); fitAnimated() glides (user-driven).
 function fit(){ const t=fitView(); if(t){ view.k=t.k; view.x=t.x; view.y=t.y; vTarget=null; } }
 function fitAnimated(){ const t=fitView(); if(t) vTarget={...t}; }
-function setFocus(id){ focusSet = new Set([id, ...neighbors(id)]); invalidateVis(); reheat(0.45); }
+function setFocus(id){ focusSet = egoSet(id, egoHops); invalidateVis(); reheat(0.45); }
 function clearFocus(){ focusSet = null; invalidateVis(); reheat(0.3); }
+// Ego-graph: the id plus its 1- or 2-hop neighbourhood (BFS over the same adjacency
+// the traversal/`explain` queries walk). `egoHops` is user-selectable (1 default, 2).
+let egoHops = 1;
+function egoSet(id, hops){ const seen=new Set([id]); let frontier=[id];
+  for(let h=0; h<Math.max(1,hops); h++){ const next=[];
+    for(const cur of frontier) for(const nb of neighbors(cur)) if(!seen.has(nb)){ seen.add(nb); next.push(nb); }
+    frontier=next; }
+  return seen; }
+// Macro blob → the community under a screen point (nearest centroid within its blob
+// radius), so clicking a collapsed blob drills into that community.
+function communityAtScreen(mx,my){ const m=macroRollup(); let best=null,bd=1e9;
+  for(const k in m){ const c=m[k]; const p=TC(c.cx,c.cy); const r=Math.max(6,Math.sqrt(c.n)*3.2);
+    const d=Math.hypot(mx-p.x,my-p.y); if(d<r+6 && d<bd){ bd=d; best=c.comm; } }
+  return best; }
+function expandCommunity(cid){ const co=comm[cid]; if(!co) return;
+  startCollapsed=false; userMoved=true;
+  focusSet=new Set(co.members); invalidateVis(); fitAnimated(); reheat(0.4);
+  toast(`community ${cid} — ${co.size} node${co.size===1?"":"s"} (Detail shows all · Overview to collapse)`); }
 function toggleLens(){ const knowOn = focusSet && focusSet._lens;
   if(knowOn){ focusSet=null; }
   else { const s=new Set(); s._lens=true; for(const n of nodes) if(isKnow(n)){ s.add(n.id);
@@ -666,6 +700,9 @@ function hit(mx,my){ let best=null,bd=1e9; for(const n of nodes){ if(!visible(n)
   const d=Math.hypot(mx-p.x,my-p.y); if(d < radius(n)+4 && d<bd){ bd=d; best=n; } } return best; }
 let drag=null, pan=false, last=null, downAt=null;
 cv.onmousedown = e => { vTarget=null; last={x:e.offsetX,y:e.offsetY}; downAt={x:e.offsetX,y:e.offsetY};
+  // Collapsed (macro) view: a click on a community blob drills into that community.
+  if(isMacro() && !pathMode){ const cid=communityAtScreen(e.offsetX,e.offsetY);
+    if(cid!=null){ expandCommunity(cid); return; } }
   const n=hit(e.offsetX,e.offsetY);
   if(pathMode){ if(n){ if(!pathA){ pathA=n.id; selected=n.id; showDetail(n); toast("now click the target node"); }
       else { setPath(shortestPath(pathA,n.id)); pathA=null; togglePath(); } } return; }

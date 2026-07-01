@@ -81,7 +81,7 @@ table* below). Use `fux help <command>` for usage + an example, or
 | Command | What it does | Cost |
 |---|---|---|
 | `fux init [--recall]` | Scaffold `.fux/` footprint, wire the 3 core hooks into `.claude/settings.json`, and drop Claude/Codex/Copilot pointers (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`). `--recall` also wires the optional UserPromptSubmit recall hook. | $0 |
-| `fux build [--full]` | Regenerate `INDEX.md` + `rules.json` + graph + `NARRATIVE.md`. Graphs files matching `graph_globs` (broader than `important_globs`); `--full` graphs every non-ignored file. | $0 |
+| `fux build [--full] [--profile] [--no-xref]` | Regenerate `INDEX.md` + `rules.json` + graph + `NARRATIVE.md`. Graphs files matching `graph_globs` (broader than `important_globs`); `--full` graphs every non-ignored file. `--profile` prints a per-phase timing breakdown (extraction · cross-file calls · `_xref` · community · pagerank · serialize) — timings are stdout-only and never touch `graph.json`, so the default build stays byte-identical. `--no-xref` is a **distinct opt-in mode** that skips the loose whole-file `references` pass for very large repos (those edges are already `INFERRED`, weight 0.25); it changes graph content (drops `references`), so it is never the default. | $0 |
 | `fux check [--fix] [--baseline-write FILE]` | Validate schema, dead `code_refs`, git-staleness, and conflicts; write `DRIFT.md`. Also raises a non-blocking `extractor-drift` advisory when `graph.json` was built with a different graph backend than is installed locally (the optional `[ast]` tree-sitter extra). `--fix` applies mechanical repairs (drop dead refs, bump `updated`). `--baseline-write FILE` snapshots current findings (canonical: kind, rule_id, message) for the §5b migration gate, then exits. Also recomputes constitutional **tamper-evidence** (`tampered`: a ratified rule's `content_seal` or `.fux/constitution.lock` no longer matches) and emits an advisory **`untagged-candidate`** for project rules that look like principles (a `check:`/`invariant`/`regulatory`) but carry no `principle`/`enforcement` tag — a backfill guide that never blocks. Exit 2 under `strict` mode with blocking findings. Output is canonically sorted. | $0 |
 | `fux context` | Emit the compact Tier-1 INDEX (global ⊕ packs ⊕ project) — the SessionStart injection. | $0 |
 | `fux recall "Q" [--top N] [--hybrid] [--expand]` | **BM25F** lexical retrieval (per-field length-normalised). `--hybrid` RRF-fuses lexical ⊕ local-semantic ⊕ graph proximity; `--expand` widens the query with glossary synonyms + 1-hop `related` neighbours. All `$0`. | $0 |
@@ -131,7 +131,13 @@ the governed code's structure — the same signal as `fux check`'s `unsealed`, $
 deterministic); the viewer pulses drifted rules red and crowns constitutional ones.
 The viewer stays smooth at thousands of nodes (Barnes–Hut layout + viewport culling
 + pre-rendered glow + idle substrate cache) and collapses each community to one
-labelled blob when zoomed out. In the `graph.html` inspector, a node's `file:line`
+labelled blob when zoomed out. **At scale (above `graph_lod_threshold` nodes in
+`.fux/config.toml`, default 2500) the graph opens in that community-collapsed view
+instead of rendering every node** — click a blob to drill into its community, or hit
+**Detail** to expand everything; **Overview** re-collapses. Any node is a focus
+entry point: **double-click** it (or select + **◎ Focus** / `E`) for its ego-graph —
+a **1- or 2-hop** neighbourhood (toggle in the inspector), the way you navigate a
+large graph without drawing the whole thing. In the `graph.html` inspector, a node's `file:line`
 is a clickable
 `<editor>://file/<abs>:<line>` deep link that opens the exact line in your editor
 — set `graph_editor` in `.fux/config.toml` (`vscode` (default) · `vscode-insiders`

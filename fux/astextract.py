@@ -144,7 +144,10 @@ def _generic_externals(text: str, rel: str) -> list[tuple[str, str]]:
             continue
         src = f"{rel}::{name}"
         for j in range(*_body_span(san, i)):
-            for callee in set(_CALL.findall(san[j])) - CALL_KEYWORDS:
+            # `findall` → set for dedup, but sort before emitting so the cross-file
+            # `calls` edge order (and thus graph.json) is reproducible across builds
+            # — no PYTHONHASHSEED churn (matches the `_xref` sort in graph.py).
+            for callee in sorted(set(_CALL.findall(san[j])) - CALL_KEYWORDS):
                 if callee not in defined:
                     out.append((src, callee))
     return out
@@ -211,7 +214,9 @@ def _generic_calls(san: list[str], decls: list[tuple[int, str, str]], rel: str
             continue
         src = defined[name]
         for j in range(*_body_span(san, i)):
-            for callee in set(_CALL.findall(san[j])) - CALL_KEYWORDS:
+            # sort the set before emitting so intra-file `calls` edge order (and thus
+            # graph.json) is reproducible across builds — no PYTHONHASHSEED churn.
+            for callee in sorted(set(_CALL.findall(san[j])) - CALL_KEYWORDS):
                 tid = defined.get(callee)
                 if tid and tid != src and (src, tid) not in seen:
                     seen.add((src, tid))
