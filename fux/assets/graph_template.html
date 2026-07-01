@@ -93,7 +93,12 @@
   .nb:hover{color:var(--amber)}
   .nb .sym{color:var(--faint);margin-right:5px}
   .nb.gov{box-shadow:inset 2px 0 0 var(--amber)}
-  .copy-row{display:flex;gap:6px;margin-top:14px}
+  .copy-row{display:flex;gap:6px;margin-top:14px;flex-wrap:wrap;align-items:center}
+  .hoptog{display:inline-flex;gap:3px;align-items:center;font-size:9.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--faint)}
+  .hopbtn{font-family:var(--mono);font-size:10px;padding:2px 6px;cursor:pointer;color:var(--muted);
+    background:var(--s-lowest);border:none;line-height:1}
+  .hopbtn.on{color:var(--amber);background:rgba(255,164,79,.14)}
   .btn{flex:1 1 auto;min-width:0;background:var(--s-cont);color:var(--fg);height:32px;padding:0 12px;
     font-size:11.5px;font-weight:500;cursor:pointer;display:flex;align-items:center;
     justify-content:center;gap:6px;border:none;letter-spacing:.02em}
@@ -250,6 +255,8 @@
       <div class="inspect" id="inspect">
         <div id="detail" class="ins-sub" style="margin:0">Click a node. Double-click to focus its neighbourhood.</div>
         <div class="copy-row" id="agentrow" style="display:none">
+          <button class="btn" id="bfocus" title="Show only this node's neighbourhood (E)">◎ Focus</button>
+          <span class="hoptog" title="Ego-graph depth">hops <button class="hopbtn on" data-hop="1">1</button><button class="hopbtn" data-hop="2">2</button></span>
           <button class="btn" id="bcopy">⧉ Copy node</button>
           <button class="btn ghost" id="bexport">Copy subgraph</button>
         </div>
@@ -307,6 +314,7 @@
 const DATA = __GRAPH_DATA__;
 const ROOT = __ROOT__;       // absolute project dir (for editor deep links)
 const EDITOR = __EDITOR__;   // vscode | vscode-insiders | cursor | windsurf
+const LOD_THRESHOLD = __LOD__;   // above this node count the viewer opens community-collapsed
 // node-type accent (used by community/heat lenses + meters); knowledge ignites amber.
 const COLORS = { "code-file":"#3e4750","function":"#4a5560","class":"#5a4f63",
   "rule":"#ffa44f","formula":"#ffd27f","glossary":"#ffce8a","invariant":"#ff7a5c",

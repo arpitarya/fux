@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 
 from fux import astextract, community, globs, graphquery, seal
@@ -47,12 +48,36 @@ def _iter_sources(root: Path, include: list[str], ignore: list[str]):
             yield path, rel
 
 
-def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
+class _Phaser:
+    """Per-phase stopwatch for ``fux build --profile``. A no-op unless ``sink`` is a
+    list — so the default build path pays only one ``perf_counter`` per phase and the
+    timings are never mixed into the graph dict (determinism stays intact)."""
+
+    def __init__(self, sink: list | None):
+        self.sink = sink
+        self.t0 = time.perf_counter() if sink is not None else 0.0
+
+    def mark(self, label: str) -> None:
+        if self.sink is None:
+            return
+        now = time.perf_counter()
+        self.sink.append((label, now - self.t0))
+        self.t0 = now
+
+
+def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False,
+          no_xref: bool = False, profile_out: list | None = None) -> dict:
     """Return a {nodes, edges, meta} graph dict (with community indices).
 
     Graphs the files matching ``graph_globs`` (broader than ``important_globs``);
     ``full=True`` widens to every non-ignored file — a whole-repo scan (plan §17.13).
+    ``no_xref=True`` skips the loose whole-file ``references`` pass — a distinct,
+    opt-in build *mode* (it drops INFERRED edges, so the output changes); the default
+    (``no_xref=False``) build output stays byte-identical. ``profile_out``, when a
+    list is passed, is filled with ``(phase, seconds)`` timings for ``--profile`` —
+    the timings never enter the returned dict, so ``graph.json`` is unaffected.
     """
+    tp = _Phaser(profile_out)
     nodes: dict[str, dict] = {}
     edges: list[dict] = []
     texts: dict[str, str] = {}
@@ -70,17 +95,23 @@ def build(root: Path, rs: RuleSet, cfg: dict, full: bool = False) -> dict:
             nodes[s["id"]] = s
             edges.append({"source": rel, "target": s["id"], "type": "contains"})
         edges += sym_edges
+    tp.mark("extraction")
     xcalls, covered = _crossfile_calls(nodes, texts, suffixes)
     edges += xcalls
-    edges += _xref(nodes, texts, covered)
+    tp.mark("cross-file calls")
+    if not no_xref:
+        edges += _xref(nodes, texts, covered)
+    tp.mark("_xref")
     _add_knowledge(nodes, edges, rs, root)
     _stamp_confidence(edges)            # weight-aware before clustering/centrality
     comm = community.detect(list(nodes.values()), edges)
     for nid, c in comm.items():
         nodes[nid]["community"] = c
+    tp.mark("community")
     pr = graphquery.pagerank({"nodes": list(nodes.values()), "edges": edges})
     for nid, score in pr.items():
         nodes[nid]["centrality"] = round(score, 6)
+    tp.mark("pagerank")
     return {"nodes": list(nodes.values()), "edges": edges,
             "meta": {"code_files": sum(n["type"] == "code-file" for n in nodes.values()),
                      "rules": len(rs.rules), "communities": len(set(comm.values())),

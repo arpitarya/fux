@@ -42,9 +42,18 @@ def cmd_hooks(args) -> int:
 
 
 def cmd_build(args) -> int:
-    s = build.run(root(), full=getattr(args, "full", False))
+    s = build.run(root(), full=getattr(args, "full", False),
+                  no_xref=getattr(args, "no_xref", False),
+                  profile=getattr(args, "profile", False))
     print(f"✔ Built: {s['active']} active rules · {s['code_files']} code files · "
           f"{s['edges']} edges · {s['communities']} communities → {s['out']}")
+    if s.get("profile"):
+        total = sum(secs for _, secs in s["profile"])
+        print("  phase timings:")
+        for phase, secs in s["profile"]:
+            pct = (secs / total * 100) if total else 0.0
+            print(f"    {phase:<18} {secs*1000:8.1f} ms  {pct:5.1f}%")
+        print(f"    {'total':<18} {total*1000:8.1f} ms")
     return 0
 
 

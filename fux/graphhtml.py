@@ -28,13 +28,19 @@ def _js_embed(obj) -> str:
     return s
 
 
-def render(graph: dict, root: Path | None = None, editor: str = "vscode") -> str:
+def render(graph: dict, root: Path | None = None, editor: str = "vscode",
+           lod_threshold: int = 2500) -> str:
     """Build the offline viewer. ``root`` (absolute project dir) + ``editor`` make
-    file:line node labels clickable as ``<editor>://file/<abs>:<line>`` deep links."""
+    file:line node labels clickable as ``<editor>://file/<abs>:<line>`` deep links.
+    ``lod_threshold`` is the node count above which the viewer opens in the
+    community-collapsed (macro) view instead of rendering every node — a pure
+    presentation knob, injected into the HTML, never written into ``graph.json``."""
     template = (_ASSETS / "graph_template.html").read_text(encoding="utf-8")
     boot = (_ASSETS / "graph_boot.js").read_text(encoding="utf-8")
     root_str = str(root.resolve()) if root is not None else ""
+    lod = int(lod_threshold) if lod_threshold and lod_threshold > 0 else 2500
     return (template.replace("__GRAPH_DATA__", _js_embed(graph))
             .replace("__BOOT__", boot)
             .replace("__ROOT__", _js_embed(root_str))
-            .replace("__EDITOR__", _js_embed(editor or "vscode")))
+            .replace("__EDITOR__", _js_embed(editor or "vscode"))
+            .replace("__LOD__", str(lod)))

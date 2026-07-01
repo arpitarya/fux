@@ -652,8 +652,19 @@ Beyond the core, these make Fux materially more useful:
     rules whose AST seal has drifted pulse red, constitutional-tier rules wear a
     crown (both stamped into `graph.json` from the `seal`/`check` pass, never a
     model) — all still offline, dependency-free, system-font, and
-    **agent-exportable as markdown**. *(Deferred: git-history playback — animating
-    rules + `governs` threads appearing over commits.)*
+    **agent-exportable as markdown**. **Level-of-detail at scale (§16a):** above
+    `graph_lod_threshold` nodes (config, default 2500) the viewer *opens* in that
+    macro community-collapsed state instead of rendering every node — click a blob to
+    drill into a community, **Detail** expands all, **Overview** re-collapses — and any
+    node is an **ego-graph** entry point (double-click / ◎ Focus / `E`) rendering a
+    selectable **1–2 hop** neighbourhood. This is the answer to "hard time at 23k
+    nodes": you navigate neighbourhoods, never the whole hairball. The LOD threshold is
+    injected into the HTML only — **the viewer never mutates `graph.json`**, and the
+    default `graph.json` is **byte-identical across builds** (every edge-emitting
+    set-iteration is sorted; `PYTHONHASHSEED`-independent). Build-side, `fux build
+    --profile` reports per-phase timings and `fux build --no-xref` is an opt-in mode
+    that drops the loose `references` pass for very large repos. *(Deferred: git-history
+    playback — animating rules + `governs` threads appearing over commits.)*
 
 ---
 

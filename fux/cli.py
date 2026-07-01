@@ -33,6 +33,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     bld = sub.add_parser("build", help="regenerate INDEX + rules.json + graph ($0)")
     bld.add_argument("--full", action="store_true", help="graph every non-ignored file (whole-repo)")
+    bld.add_argument("--profile", action="store_true", help="print a per-phase build timing breakdown")
+    bld.add_argument("--no-xref", action="store_true",
+                     help="skip the loose references pass (opt-in mode; drops INFERRED edges)")
     bld.set_defaults(fn=clicmds.cmd_build)
     chk = sub.add_parser("check", help="validate schema/refs/staleness/conflicts")
     chk.add_argument("--fix", action="store_true", help="apply mechanical $0 repairs")
