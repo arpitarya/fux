@@ -191,10 +191,10 @@ def render(rep: Report) -> str:
         L.append(f'Per lookup — "{lk.query}"')
         L.append(f"  matched rules:       {ids}")
         L.append(f"  without Fux:         {lk.without:>8,} tok  ≈ {money(lk.without):>9}   (read governed file(s))")
-        L.append(f"  with Fux (1st):      {lk.with_first:>8,} tok  ≈ {money(lk.with_first):>9}   → {_x(lk.ratio_first())} cheaper")
-        L.append(f"  with Fux (later):    {lk.with_later:>8,} tok  ≈ {money(lk.with_later):>9}   → {_x(lk.ratio_later())} cheaper "
+        L.append(f"  with Fux (1st):      {lk.with_first:>8,} tok  ≈ {money(lk.with_first):>9}   → {_compare(lk.without, lk.with_first)}")
+        L.append(f"  with Fux (later):    {lk.with_later:>8,} tok  ≈ {money(lk.with_later):>9}   → {_compare(lk.without, lk.with_later)} "
                  f"(INDEX already in context)")
-        L.append(f"  you save (later):    {saved:>8,} tok  ≈ {money(saved):>9}   per repeat lookup")
+        L.append("  " + _delta("you save (later)", "you spend (later)", saved, money) + "   per repeat lookup")
         if lk.missing:
             L.append(f"  · {lk.missing} referenced file(s) missing — excluded from the baseline")
         L.append("")
@@ -203,8 +203,8 @@ def render(rep: Report) -> str:
         avg_saved = rep.avg_without - rep.avg_rule
         L.append(f"Across {rep.topics} documented topic(s), per lookup (avg)")
         L.append(f"  without Fux:         {rep.avg_without:>8,.0f} tok  ≈ {money(rep.avg_without):>9}")
-        L.append(f"  with Fux (later):    {rep.avg_rule:>8,.0f} tok  ≈ {money(rep.avg_rule):>9}   → {_x(rep.avg_ratio())} cheaper")
-        L.append(f"  you save (avg):      {avg_saved:>8,.0f} tok  ≈ {money(avg_saved):>9}")
+        L.append(f"  with Fux (later):    {rep.avg_rule:>8,.0f} tok  ≈ {money(rep.avg_rule):>9}   → {_compare(rep.avg_without, rep.avg_rule)}")
+        L.append("  " + _delta("you save (avg)", "you spend (avg)", avg_saved, money))
     for n in rep.notes:
         L.append(f"· {n}")
     return "\n".join(L)
@@ -212,3 +212,23 @@ def render(rep: Report) -> str:
 
 def _x(ratio: float) -> str:
     return f"{ratio:.1f}×" if ratio else "—"
+
+
+def _compare(without: float, with_tok: float) -> str:
+    """Direction-honest comparison: `cheaper` only when Fux actually costs less.
+
+    On a tiny corpus Fux's per-lookup overhead can exceed reading the file, so the
+    ratio is < 1 — reporting that as `cheaper` (or `you save: -N`) was a real
+    labelling bug (fux-lab Cycle 2). The win grows with codebase size."""
+    if not with_tok or not without:
+        return "—"
+    if with_tok <= without:
+        return f"{without / with_tok:.1f}× cheaper"
+    return f"{with_tok / without:.1f}× costlier"
+
+
+def _delta(save_label: str, spend_label: str, saved: float, money) -> str:
+    """`you save: N` when saved ≥ 0, else `you spend: N extra` (never a negative save)."""
+    if saved >= 0:
+        return f"{save_label}:    {saved:>8,.0f} tok  ≈ {money(saved):>9}"
+    return f"{spend_label}:   {-saved:>8,.0f} tok  ≈ {money(-saved):>9}   extra"

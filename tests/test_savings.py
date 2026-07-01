@@ -60,6 +60,18 @@ def test_render_is_stringable(project):
     assert "fux savings" in text and "cheaper" in text
 
 
+def test_compare_and_delta_are_direction_honest():
+    """Never label a net loss as `cheaper`/`you save` (fux-lab Cycle-2 finding)."""
+    money = lambda t: savings.fmt_usd(savings.usd(t, 5.0))  # noqa: E731
+    # Fux costs less → cheaper + you save.
+    assert savings._compare(1000, 400) == "2.5× cheaper"
+    assert "you save" in savings._delta("you save", "you spend", 600, money)
+    # Fux costs MORE (tiny corpus) → costlier + you spend (positive magnitude).
+    assert savings._compare(400, 1000) == "2.5× costlier"
+    spend = savings._delta("you save", "you spend", -600, money)
+    assert "you spend" in spend and "extra" in spend and "-" not in spend
+
+
 def test_usd_conversion_math():
     assert savings.usd(1_000_000, 5.0) == 5.0
     assert savings.usd(500_000, 10.0) == 5.0
