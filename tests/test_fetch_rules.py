@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from fux import fetchrules
+from fux.errors import FuxError
 
 
 # ---------------------------------------------------------------------------
@@ -185,7 +186,7 @@ def test_cli_fetch_rules_missing_file(tmp_path, capsys):
     from fux.cli import build_parser
     parser = build_parser()
     args = parser.parse_args(["fetch-rules", str(tmp_path / "nope.txt")])
-    rc = args.fn(args)
-    assert rc == 1
-    err = capsys.readouterr().err
-    assert "path not found" in err
+    # A missing source is an expected failure → FuxError (terse `error:` on stderr
+    # at the CLI boundary), not a stdout/stderr print + return 1.
+    with pytest.raises(FuxError, match="path not found"):
+        args.fn(args)

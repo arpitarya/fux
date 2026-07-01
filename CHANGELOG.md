@@ -2,6 +2,24 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.17.2] — 2026-07-01 — error-contract consistency (fux-lab Cycle 1)
+
+The `fux-lab` harness's Cycle-1 pass (deepened with 20 behavioral oracles) showed
+the `why <unknown>` error-contract bug fixed in 0.17.1 was **systemic**: several
+commands printed `fux: <msg>` to **stdout** and returned 1, bypassing the
+`FuxError` boundary. All now raise `FuxError`, so `main()` renders the documented
+terse `error: …` on **stderr** (exit 1):
+
+- `explain <unknown-term>`, `path <unresolved-endpoint>`, `query <no-match>`
+- `seal` (no ids / no `--all`), `candidates accept|reject` (missing/unknown id,
+  cannot-accept, already-exists)
+- `fetch-rules` (missing file / fetch error), `ingest --connector` (unbounded query)
+
+Also: `path` with valid-but-disconnected endpoints is a legitimate empty result
+and now exits **0** (was 1). Regression tests parametrized over the affected
+commands; `test_ingest_connector.py` / `test_fetch_rules.py` updated. Full suite:
+371 passed. `$0`/stdlib, no behaviour change beyond the error channel/exit codes.
+
 ## [0.17.1] — 2026-07-01 — harness-driven fixes: error contract + seal stability
 
 Two real engine bugs surfaced by the new external `fux-lab` end-to-end harness

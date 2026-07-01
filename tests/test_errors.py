@@ -10,6 +10,7 @@ with a terse `error:` line; MCP reports `isError` on malformed input.
 from __future__ import annotations
 
 import argparse
+import pytest
 from pathlib import Path
 
 from fux import cli, hooks, mcpserver
@@ -89,6 +90,29 @@ def test_why_unknown_rule_is_terse_error_on_stderr(project, monkeypatch, capsys)
     assert rc == 1
     assert cap.out == ""                                   # nothing on stdout
     assert cap.err.strip() == "error: no rule 'no-such-rule-xyz'"
+    assert "Traceback" not in cap.err
+
+
+@pytest.mark.parametrize("argv, needle", [
+    (["explain", "zzz-nonexistent-node"], "no node matches"),
+    (["query", "zzzznothingmatches"], "nothing in the graph matches"),
+    (["seal"], "pass rule ids or --all"),
+    (["candidates", "accept"], "needs a candidate id"),
+    (["candidates", "reject", "no-such-candidate"], "no candidate"),
+])
+def test_expected_failures_are_terse_error_on_stderr(argv, needle, project, monkeypatch, capsys):
+    """Named-lookup / usage failures across commands must all obey the contract —
+    terse `error:` on stderr, exit 1, nothing on stdout (fux-lab Cycle-1 finding:
+    the `why` inconsistency was systemic across path/explain/query/seal/candidates)."""
+    monkeypatch.chdir(project)
+    monkeypatch.delenv("FUX_DEBUG", raising=False)
+    cli.main(["build"])
+    capsys.readouterr()
+    rc = cli.main(argv)
+    cap = capsys.readouterr()
+    assert rc == 1, f"{argv} exited {rc}, want 1"
+    assert cap.out == "", f"{argv} wrote to stdout: {cap.out!r}"
+    assert cap.err.startswith("error: ") and needle in cap.err
     assert "Traceback" not in cap.err
 
 

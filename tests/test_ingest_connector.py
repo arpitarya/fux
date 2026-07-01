@@ -10,6 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from fux import cliquery, ingestconnector
+from fux.errors import FuxError
 
 
 def test_plan_accepts_a_bounded_query():
@@ -52,5 +53,7 @@ def _args(**kw):
 def test_cli_connector_branch(capsys):
     assert cliquery.cmd_ingest(_args(connector="github", query="repo:me/app is:pr")) == 0
     assert "connector github" in capsys.readouterr().out
-    assert cliquery.cmd_ingest(_args(connector="jira", query="*")) == 1
-    assert "refusing an unbounded" in capsys.readouterr().out
+    # An unbounded connector query is a usage error → FuxError (terse `error:`
+    # on stderr, exit 1 at the CLI boundary), not a stdout print + return 1.
+    with pytest.raises(FuxError, match="refusing an unbounded"):
+        cliquery.cmd_ingest(_args(connector="jira", query="*"))

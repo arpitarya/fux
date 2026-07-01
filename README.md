@@ -173,7 +173,7 @@ The per-host skill artifacts — the Claude `SKILL.md`, the Codex copy, the Copi
 
 ## What's new
 
-**Latest — v0.17.1:** Harness-driven fixes — a new exhaustive, offline, `$0` end-to-end test harness (the `fux-lab` polyglot fixture + runner that drives *every* command) caught two real bugs, both fixed: `fux why <unknown>` now raises `FuxError` (terse `error:` on stderr, per the contract) instead of printing to stdout, and the frontmatter writer now quotes scalar-like strings so a ratified rule's quoted-boolean example can't flip its `content_seal` and raise a false `tampered`. Regression tests added; harness re-runs clean. `$0`/stdlib.
+**Latest — v0.17.2:** Error-contract consistency — the `fux-lab` harness (deepened with behavioral oracles) found the 0.17.1 `why <unknown>` fix was systemic: `explain`/`path`/`query`/`seal`/`candidates`/`fetch-rules`/`ingest --connector` all bypassed the `FuxError` boundary (printed to stdout, returned 1). All now render the documented terse `error:` on stderr (exit 1); `path` between disconnected-but-valid nodes is a legit exit-0 empty result. Regression tests added. `$0`/stdlib.
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name
