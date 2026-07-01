@@ -2,6 +2,17 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.17.3] — 2026-07-01 — direction-honest `savings` (fux-lab Cycle 2)
+
+`fux savings` hard-coded the word `cheaper` and could print a negative `you save`.
+On a small corpus Fux's per-lookup overhead legitimately exceeds reading the file,
+so it reported e.g. `1.9× cheaper` / `you save: -377 tok` for something that is
+actually **1.9× costlier**. For a tool named *savings*, labelling a loss as a win
+is a correctness bug. Now a direction-aware `_compare()` says `cheaper` only when
+Fux costs less (else `costlier`), and `_delta()` prints `you spend: N … extra`
+(positive magnitude) instead of a negative save. Regression test added; the
+net-positive render tests are unchanged. Full suite: 372 passed.
+
 ## [0.17.2] — 2026-07-01 — error-contract consistency (fux-lab Cycle 1)
 
 The `fux-lab` harness's Cycle-1 pass (deepened with 20 behavioral oracles) showed

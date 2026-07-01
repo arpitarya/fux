@@ -14,7 +14,7 @@
       "type": "code-file",
       "file": "fux/__main__.py",
       "community": 1,
-      "centrality": 0.000318
+      "centrality": 0.000317
     },
     {
       "id": "fux/astextract.py",
@@ -22,7 +22,7 @@
       "type": "code-file",
       "file": "fux/astextract.py",
       "community": 2,
-      "centrality": 0.005613
+      "centrality": 0.005597
     },
     {
       "id": "fux/astextract.py::sanitize_lines",
@@ -31,7 +31,7 @@
       "file": "fux/astextract.py",
       "line": 39,
       "community": 2,
-      "centrality": 0.00171
+      "centrality": 0.001706
     },
     {
       "id": "fux/astextract.py::extract",
@@ -40,7 +40,7 @@
       "file": "fux/astextract.py",
       "line": 80,
       "community": 2,
-      "centrality": 0.000696
+      "centrality": 0.000694
     },
     {
       "id": "fux/astextract.py::extract_text",
@@ -49,7 +49,7 @@
       "file": "fux/astextract.py",
       "line": 89,
       "community": 2,
-      "centrality": 0.002119
+      "centrality": 0.002114
     },
     {
       "id": "fux/astextract.py::call_names",
@@ -58,7 +58,7 @@
       "file": "fux/astextract.py",
       "line": 100,
       "community": 2,
-      "centrality": 0.000626
+      "centrality": 0.000625
     },
     {
       "id": "fux/astextract.py::external_call_sites",
@@ -67,7 +67,7 @@
       "file": "fux/astextract.py",
       "line": 105,
       "community": 2,
-      "centrality": 0.001619
+      "centrality": 0.001614
     },
     {
       "id": "fux/astextract.py::_py_externals",
@@ -76,7 +76,7 @@
       "file": "fux/astextract.py",
       "line": 118,
       "community": 2,
-      "centrality": 0.001811
+      "centrality": 0.001806
     },
     {
       "id": "fux/astextract.py::_generic_externals",
@@ -85,7 +85,7 @@
       "file": "fux/astextract.py",
       "line": 137,
       "community": 2,
-      "centrality": 0.001455
+      "centrality": 0.001451
     },
     {
       "id": "fux/astextract.py::_python",
@@ -94,7 +94,7 @@
       "file": "fux/astextract.py",
       "line": 153,
       "community": 2,
-      "centrality": 0.00181
+      "centrality": 0.001805
     },
     {
       "id": "fux/astextract.py::_callee",
@@ -103,7 +103,7 @@
       "file": "fux/astextract.py",
       "line": 177,
       "community": 2,
-      "centrality": 0.000817
+      "centrality": 0.000815
     },
     {
       "id": "fux/astextract.py::_scan_decls",
@@ -112,7 +112,7 @@
       "file": "fux/astextract.py",
       "line": 185,
       "community": 2,
-      "centrality": 0.001008
+      "centrality": 0.001005
     },
     {
       "id": "fux/astextract.py::_generic",
@@ -121,7 +121,7 @@
       "file": "fux/astextract.py",
       "line": 197,
       "community": 2,
-      "centrality": 0.001422
+      "centrality": 0.001418
     },
     {
       "id": "fux/astextract.py::_generic_calls",
@@ -130,7 +130,7 @@
       "file": "fux/astextract.py",
       "line": 204,
       "community": 2,
-      "centrality": 0.001186
+      "centrality": 0.001183
     },
     {
       "id": "fux/astextract.py::_body_span",
@@ -139,7 +139,7 @@
       "file": "fux/astextract.py",
       "line": 222,
       "community": 2,
-      "centrality": 0.00084
+      "centrality": 0.000838
     },
     {
       "id": "fux/astextract.py::_ts_parser",
@@ -148,7 +148,7 @@
       "file": "fux/astextract.py",
       "line": 268,
       "community": 2,
-      "centrality": 0.000829
+      "centrality": 0.000827
     },
     {
       "id": "fux/astextract.py::backend_fingerprint",
@@ -157,7 +157,7 @@
       "file": "fux/astextract.py",
       "line": 295,
       "community": 1,
-      "centrality": 0.000773
+      "centrality": 0.000771
     },
     {
       "id": "fux/astextract.py::_ts_text",
@@ -166,7 +166,7 @@
       "file": "fux/astextract.py",
       "line": 317,
       "community": 2,
-      "centrality": 0.000866
+      "centrality": 0.000863
     },
     {
       "id": "fux/astextract.py::_ts_name",
@@ -175,7 +175,7 @@
       "file": "fux/astextract.py",
       "line": 321,
       "community": 2,
-      "centrality": 0.00145
+      "centrality": 0.001445
     },
     {
       "id": "fux/astextract.py::_rightmost_ident",
@@ -184,7 +184,7 @@
       "file": "fux/astextract.py",
       "line": 326,
       "community": 2,
-      "centrality": 0.001072
+      "centrality": 0.001069
     },
     {
       "id": "fux/astextract.py::_ts_collect",
@@ -193,7 +193,7 @@
       "file": "fux/astextract.py",
       "line": 340,
       "community": 2,
-      "centrality": 0.002014
+      "centrality": 0.002008
     },
     {
       "id": "fux/astextract.py::_calls_in",
@@ -202,7 +202,7 @@
       "file": "fux/astextract.py",
       "line": 366,
       "community": 2,
-      "centrality": 0.001228
+      "centrality": 0.001224
     },
     {
       "id": "fux/astextract.py::_ts_edges",
@@ -211,7 +211,7 @@
       "file": "fux/astextract.py",
       "line": 381,
       "community": 2,
-      "centrality": 0.001387
+      "centrality": 0.001384
     },
     {
       "id": "fux/astextract.py::_treesitter",
@@ -220,7 +220,7 @@
       "file": "fux/astextract.py",
       "line": 400,
       "community": 2,
-      "centrality": 0.001019
+      "centrality": 0.001016
     },
     {
       "id": "fux/astextract.py::_treesitter_externals",
@@ -229,7 +229,7 @@
       "file": "fux/astextract.py",
       "line": 408,
       "community": 2,
-      "centrality": 0.001016
+      "centrality": 0.001013
     },
     {
       "id": "fux/astextract.py::visit",
@@ -238,7 +238,7 @@
       "file": "fux/astextract.py",
       "line": 346,
       "community": 2,
-      "centrality": 0.001382
+      "centrality": 0.001378
     },
     {
       "id": "fux/astextract.py::walk",
@@ -247,7 +247,7 @@
       "file": "fux/astextract.py",
       "line": 369,
       "community": 2,
-      "centrality": 0.00262
+      "centrality": 0.002612
     },
     {
       "id": "fux/baseline.py",
@@ -255,7 +255,7 @@
       "type": "code-file",
       "file": "fux/baseline.py",
       "community": 3,
-      "centrality": 0.001312
+      "centrality": 0.001309
     },
     {
       "id": "fux/baseline.py::_sig",
@@ -264,7 +264,7 @@
       "file": "fux/baseline.py",
       "line": 15,
       "community": 3,
-      "centrality": 0.000881
+      "centrality": 0.000878
     },
     {
       "id": "fux/baseline.py::write",
@@ -273,7 +273,7 @@
       "file": "fux/baseline.py",
       "line": 19,
       "community": 1,
-      "centrality": 0.001998
+      "centrality": 0.001994
     },
     {
       "id": "fux/baseline.py::_read",
@@ -282,7 +282,7 @@
       "file": "fux/baseline.py",
       "line": 26,
       "community": 3,
-      "centrality": 0.000723
+      "centrality": 0.000721
     },
     {
       "id": "fux/baseline.py::new_findings",
@@ -291,7 +291,7 @@
       "file": "fux/baseline.py",
       "line": 32,
       "community": 3,
-      "centrality": 0.00115
+      "centrality": 0.001147
     },
     {
       "id": "fux/bench.py",
@@ -299,7 +299,7 @@
       "type": "code-file",
       "file": "fux/bench.py",
       "community": 4,
-      "centrality": 0.00174
+      "centrality": 0.001734
     },
     {
       "id": "fux/bench.py::recall_at_k",
@@ -308,7 +308,7 @@
       "file": "fux/bench.py",
       "line": 13,
       "community": 4,
-      "centrality": 0.001207
+      "centrality": 0.001203
     },
     {
       "id": "fux/bench.py::mrr",
@@ -317,7 +317,7 @@
       "file": "fux/bench.py",
       "line": 20,
       "community": 4,
-      "centrality": 0.001207
+      "centrality": 0.001203
     },
     {
       "id": "fux/bench.py::report",
@@ -326,7 +326,7 @@
       "file": "fux/bench.py",
       "line": 30,
       "community": 4,
-      "centrality": 0.001799
+      "centrality": 0.001793
     },
     {
       "id": "fux/build.py",
@@ -334,7 +334,7 @@
       "type": "code-file",
       "file": "fux/build.py",
       "community": 1,
-      "centrality": 0.000678
+      "centrality": 0.000677
     },
     {
       "id": "fux/build.py::run",
@@ -343,7 +343,7 @@
       "file": "fux/build.py",
       "line": 9,
       "community": 1,
-      "centrality": 0.008419
+      "centrality": 0.008416
     },
     {
       "id": "fux/cage_receipt.py",
@@ -351,7 +351,7 @@
       "type": "code-file",
       "file": "fux/cage_receipt.py",
       "community": 1,
-      "centrality": 0.000833
+      "centrality": 0.00083
     },
     {
       "id": "fux/cage_receipt.py::toks",
@@ -360,7 +360,7 @@
       "file": "fux/cage_receipt.py",
       "line": 5,
       "community": 1,
-      "centrality": 0.000979
+      "centrality": 0.000976
     },
     {
       "id": "fux/cage_receipt.py::emit",
@@ -369,7 +369,7 @@
       "file": "fux/cage_receipt.py",
       "line": 9,
       "community": 1,
-      "centrality": 0.001015
+      "centrality": 0.001012
     },
     {
       "id": "fux/candidates.py",
@@ -377,7 +377,7 @@
       "type": "code-file",
       "file": "fux/candidates.py",
       "community": 1,
-      "centrality": 0.004804
+      "centrality": 0.004794
     },
     {
       "id": "fux/candidates.py::Candidate",
@@ -386,7 +386,7 @@
       "file": "fux/candidates.py",
       "line": 28,
       "community": 1,
-      "centrality": 0.000913
+      "centrality": 0.00091
     },
     {
       "id": "fux/candidates.py::path_of",
@@ -395,7 +395,7 @@
       "file": "fux/candidates.py",
       "line": 54,
       "community": 1,
-      "centrality": 0.001147
+      "centrality": 0.001145
     },
     {
       "id": "fux/candidates.py::read",
@@ -404,7 +404,7 @@
       "file": "fux/candidates.py",
       "line": 58,
       "community": 1,
-      "centrality": 0.00262
+      "centrality": 0.002615
     },
     {
       "id": "fux/candidates.py::write",
@@ -413,7 +413,7 @@
       "file": "fux/candidates.py",
       "line": 77,
       "community": 1,
-      "centrality": 0.002568
+      "centrality": 0.002562
     },
     {
       "id": "fux/candidates.py::add",
@@ -422,7 +422,7 @@
       "file": "fux/candidates.py",
       "line": 85,
       "community": 1,
-      "centrality": 0.005288
+      "centrality": 0.005289
     },
     {
       "id": "fux/candidates.py::set_state",
@@ -431,7 +431,7 @@
       "file": "fux/candidates.py",
       "line": 103,
       "community": 1,
-      "centrality": 0.000979
+      "centrality": 0.000977
     },
     {
       "id": "fux/candidates.py::render",
@@ -440,7 +440,7 @@
       "file": "fux/candidates.py",
       "line": 113,
       "community": 1,
-      "centrality": 0.003288
+      "centrality": 0.003289
     },
     {
       "id": "fux/candidates.py::pending_count",
@@ -449,7 +449,7 @@
       "file": "fux/candidates.py",
       "line": 129,
       "community": 1,
-      "centrality": 0.000899
+      "centrality": 0.000898
     },
     {
       "id": "fux/candidates.py::pointer",
@@ -458,7 +458,7 @@
       "file": "fux/candidates.py",
       "line": 133,
       "community": 1,
-      "centrality": 0.000786
+      "centrality": 0.000784
     },
     {
       "id": "fux/candidates.py::_rule_keys",
@@ -467,7 +467,7 @@
       "file": "fux/candidates.py",
       "line": 138,
       "community": 1,
-      "centrality": 0.001702
+      "centrality": 0.0017
     },
     {
       "id": "fux/candidates.py::_sorted",
@@ -476,7 +476,7 @@
       "file": "fux/candidates.py",
       "line": 144,
       "community": 1,
-      "centrality": 0.000878
+      "centrality": 0.000876
     },
     {
       "id": "fux/candidates.py::_key",
@@ -485,7 +485,7 @@
       "file": "fux/candidates.py",
       "line": 147,
       "community": 1,
-      "centrality": 0.00107
+      "centrality": 0.001068
     },
     {
       "id": "fux/candidates.py::_slug",
@@ -494,7 +494,7 @@
       "file": "fux/candidates.py",
       "line": 152,
       "community": 1,
-      "centrality": 0.000907
+      "centrality": 0.000905
     },
     {
       "id": "fux/candidates.py::_cell",
@@ -503,7 +503,7 @@
       "file": "fux/candidates.py",
       "line": 155,
       "community": 1,
-      "centrality": 0.000655
+      "centrality": 0.000653
     },
     {
       "id": "fux/candidates.py::_uncell",
@@ -512,7 +512,7 @@
       "file": "fux/candidates.py",
       "line": 158,
       "community": 1,
-      "centrality": 0.000598
+      "centrality": 0.000597
     },
     {
       "id": "fux/candidates.py::key",
@@ -521,7 +521,7 @@
       "file": "fux/candidates.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.001255
+      "centrality": 0.001253
     },
     {
       "id": "fux/candidates.py::with_id",
@@ -530,7 +530,7 @@
       "file": "fux/candidates.py",
       "line": 41,
       "community": 1,
-      "centrality": 0.000733
+      "centrality": 0.000732
     },
     {
       "id": "fux/candidates.py::has_why",
@@ -539,7 +539,7 @@
       "file": "fux/candidates.py",
       "line": 45,
       "community": 1,
-      "centrality": 0.000742
+      "centrality": 0.000741
     },
     {
       "id": "fux/candidates.py::row",
@@ -548,7 +548,7 @@
       "file": "fux/candidates.py",
       "line": 48,
       "community": 1,
-      "centrality": 0.000878
+      "centrality": 0.000875
     },
     {
       "id": "fux/capture.py",
@@ -556,7 +556,7 @@
       "type": "code-file",
       "file": "fux/capture.py",
       "community": 1,
-      "centrality": 0.002344
+      "centrality": 0.002339
     },
     {
       "id": "fux/capture.py::Observation",
@@ -565,7 +565,7 @@
       "file": "fux/capture.py",
       "line": 26,
       "community": 1,
-      "centrality": 0.0006
+      "centrality": 0.000598
     },
     {
       "id": "fux/capture.py::_dir",
@@ -574,7 +574,7 @@
       "file": "fux/capture.py",
       "line": 35,
       "community": 1,
-      "centrality": 0.001607
+      "centrality": 0.001603
     },
     {
       "id": "fux/capture.py::_seen",
@@ -583,7 +583,7 @@
       "file": "fux/capture.py",
       "line": 41,
       "community": 1,
-      "centrality": 0.000795
+      "centrality": 0.000793
     },
     {
       "id": "fux/capture.py::_save_seen",
@@ -592,7 +592,7 @@
       "file": "fux/capture.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.000795
+      "centrality": 0.000793
     },
     {
       "id": "fux/capture.py::observe",
@@ -601,7 +601,7 @@
       "file": "fux/capture.py",
       "line": 50,
       "community": 1,
-      "centrality": 0.003931
+      "centrality": 0.003922
     },
     {
       "id": "fux/capture.py::pending",
@@ -610,7 +610,7 @@
       "file": "fux/capture.py",
       "line": 74,
       "community": 1,
-      "centrality": 0.001042
+      "centrality": 0.00104
     },
     {
       "id": "fux/capture.py::clear",
@@ -619,7 +619,7 @@
       "file": "fux/capture.py",
       "line": 81,
       "community": 1,
-      "centrality": 0.000826
+      "centrality": 0.000824
     },
     {
       "id": "fux/capture.py::summary",
@@ -628,7 +628,7 @@
       "file": "fux/capture.py",
       "line": 86,
       "community": 1,
-      "centrality": 0.001072
+      "centrality": 0.001069
     },
     {
       "id": "fux/capture.py::as_dict",
@@ -637,7 +637,7 @@
       "file": "fux/capture.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.0006
+      "centrality": 0.000598
     },
     {
       "id": "fux/cdp_utils.py",
@@ -645,7 +645,7 @@
       "type": "code-file",
       "file": "fux/cdp_utils.py",
       "community": 1,
-      "centrality": 0.000845
+      "centrality": 0.000843
     },
     {
       "id": "fux/cdp_utils.py::_coerce_port",
@@ -654,7 +654,7 @@
       "file": "fux/cdp_utils.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.000862
+      "centrality": 0.000861
     },
     {
       "id": "fux/cdp_utils.py::resolve",
@@ -663,7 +663,7 @@
       "file": "fux/cdp_utils.py",
       "line": 24,
       "community": 1,
-      "centrality": 0.005188
+      "centrality": 0.005183
     },
     {
       "id": "fux/cdp_utils.py::endpoint",
@@ -672,7 +672,7 @@
       "file": "fux/cdp_utils.py",
       "line": 43,
       "community": 1,
-      "centrality": 0.000597
+      "centrality": 0.000596
     },
     {
       "id": "fux/check.py",
@@ -680,7 +680,7 @@
       "type": "code-file",
       "file": "fux/check.py",
       "community": 1,
-      "centrality": 0.002216
+      "centrality": 0.002211
     },
     {
       "id": "fux/check.py::run",
@@ -689,7 +689,7 @@
       "file": "fux/check.py",
       "line": 15,
       "community": 1,
-      "centrality": 0.007863
+      "centrality": 0.007851
     },
     {
       "id": "fux/check.py::_extractor_drift",
@@ -698,7 +698,7 @@
       "file": "fux/check.py",
       "line": 43,
       "community": 1,
-      "centrality": 0.00107
+      "centrality": 0.001068
     },
     {
       "id": "fux/check.py::_memory_decay",
@@ -707,7 +707,7 @@
       "file": "fux/check.py",
       "line": 69,
       "community": 1,
-      "centrality": 0.001158
+      "centrality": 0.001155
     },
     {
       "id": "fux/check.py::_schema",
@@ -716,7 +716,7 @@
       "file": "fux/check.py",
       "line": 76,
       "community": 1,
-      "centrality": 0.001099
+      "centrality": 0.001096
     },
     {
       "id": "fux/check.py::_seal",
@@ -725,7 +725,7 @@
       "file": "fux/check.py",
       "line": 80,
       "community": 1,
-      "centrality": 0.001052
+      "centrality": 0.001049
     },
     {
       "id": "fux/check.py::_refs",
@@ -734,7 +734,7 @@
       "file": "fux/check.py",
       "line": 96,
       "community": 1,
-      "centrality": 0.000692
+      "centrality": 0.000691
     },
     {
       "id": "fux/check.py::_stale",
@@ -743,7 +743,7 @@
       "file": "fux/check.py",
       "line": 106,
       "community": 1,
-      "centrality": 0.00119
+      "centrality": 0.001187
     },
     {
       "id": "fux/check.py::_conflicts",
@@ -752,7 +752,7 @@
       "file": "fux/check.py",
       "line": 128,
       "community": 1,
-      "centrality": 0.001022
+      "centrality": 0.00102
     },
     {
       "id": "fux/check.py::_write_drift",
@@ -761,7 +761,7 @@
       "file": "fux/check.py",
       "line": 144,
       "community": 1,
-      "centrality": 0.000915
+      "centrality": 0.000913
     },
     {
       "id": "fux/cli.py",
@@ -769,7 +769,7 @@
       "type": "code-file",
       "file": "fux/cli.py",
       "community": 1,
-      "centrality": 0.002079
+      "centrality": 0.002073
     },
     {
       "id": "fux/cli.py::_GroupedHelp",
@@ -778,7 +778,7 @@
       "file": "fux/cli.py",
       "line": 14,
       "community": 1,
-      "centrality": 0.000706
+      "centrality": 0.000704
     },
     {
       "id": "fux/cli.py::build_parser",
@@ -787,7 +787,7 @@
       "file": "fux/cli.py",
       "line": 21,
       "community": 1,
-      "centrality": 0.002225
+      "centrality": 0.002219
     },
     {
       "id": "fux/cli.py::cmd_help",
@@ -796,7 +796,7 @@
       "file": "fux/cli.py",
       "line": 291,
       "community": 1,
-      "centrality": 0.001048
+      "centrality": 0.001045
     },
     {
       "id": "fux/cli.py::main",
@@ -805,7 +805,7 @@
       "file": "fux/cli.py",
       "line": 299,
       "community": 1,
-      "centrality": 0.001135
+      "centrality": 0.001131
     },
     {
       "id": "fux/cli.py::format_help",
@@ -814,7 +814,7 @@
       "file": "fux/cli.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.000788
+      "centrality": 0.000786
     },
     {
       "id": "fux/clicmds.py",
@@ -822,7 +822,7 @@
       "type": "code-file",
       "file": "fux/clicmds.py",
       "community": 1,
-      "centrality": 0.002377
+      "centrality": 0.002373
     },
     {
       "id": "fux/clicmds.py::cmd_init",
@@ -831,7 +831,7 @@
       "file": "fux/clicmds.py",
       "line": 14,
       "community": 1,
-      "centrality": 0.001791
+      "centrality": 0.001788
     },
     {
       "id": "fux/clicmds.py::cmd_hooks",
@@ -840,7 +840,7 @@
       "file": "fux/clicmds.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.001014
+      "centrality": 0.001012
     },
     {
       "id": "fux/clicmds.py::cmd_build",
@@ -849,7 +849,7 @@
       "file": "fux/clicmds.py",
       "line": 44,
       "community": 1,
-      "centrality": 0.00192
+      "centrality": 0.001918
     },
     {
       "id": "fux/clicmds.py::cmd_pii_scan",
@@ -858,7 +858,7 @@
       "file": "fux/clicmds.py",
       "line": 51,
       "community": 1,
-      "centrality": 0.002571
+      "centrality": 0.002567
     },
     {
       "id": "fux/clicmds.py::cmd_self_build",
@@ -867,7 +867,7 @@
       "file": "fux/clicmds.py",
       "line": 68,
       "community": 1,
-      "centrality": 0.00095
+      "centrality": 0.000953
     },
     {
       "id": "fux/clicmds.py::cmd_check",
@@ -876,7 +876,7 @@
       "file": "fux/clicmds.py",
       "line": 76,
       "community": 1,
-      "centrality": 0.003898
+      "centrality": 0.003892
     },
     {
       "id": "fux/clicmds.py::cmd_context",
@@ -885,7 +885,7 @@
       "file": "fux/clicmds.py",
       "line": 95,
       "community": 1,
-      "centrality": 0.001954
+      "centrality": 0.001951
     },
     {
       "id": "fux/clicmds.py::cmd_gate",
@@ -894,7 +894,7 @@
       "file": "fux/clicmds.py",
       "line": 102,
       "community": 1,
-      "centrality": 0.002134
+      "centrality": 0.00213
     },
     {
       "id": "fux/clicmds.py::cmd_mcp",
@@ -903,7 +903,7 @@
       "file": "fux/clicmds.py",
       "line": 115,
       "community": 1,
-      "centrality": 0.000675
+      "centrality": 0.000673
     },
     {
       "id": "fux/clicmds.py::cmd_serve",
@@ -912,7 +912,7 @@
       "file": "fux/clicmds.py",
       "line": 119,
       "community": 1,
-      "centrality": 0.000805
+      "centrality": 0.000803
     },
     {
       "id": "fux/clicmds.py::cmd_import",
@@ -921,7 +921,7 @@
       "file": "fux/clicmds.py",
       "line": 123,
       "community": 1,
-      "centrality": 0.000709
+      "centrality": 0.000707
     },
     {
       "id": "fux/clicmds.py::cmd_import_memory",
@@ -930,7 +930,7 @@
       "file": "fux/clicmds.py",
       "line": 137,
       "community": 1,
-      "centrality": 0.000701
+      "centrality": 0.000699
     },
     {
       "id": "fux/clicmds.py::cmd_setup",
@@ -939,7 +939,7 @@
       "file": "fux/clicmds.py",
       "line": 148,
       "community": 1,
-      "centrality": 0.003023
+      "centrality": 0.003017
     },
     {
       "id": "fux/clicmds.py::_copy_skill",
@@ -948,7 +948,7 @@
       "file": "fux/clicmds.py",
       "line": 218,
       "community": 1,
-      "centrality": 0.000902
+      "centrality": 0.0009
     },
     {
       "id": "fux/cliconstitution.py",
@@ -956,7 +956,7 @@
       "type": "code-file",
       "file": "fux/cliconstitution.py",
       "community": 1,
-      "centrality": 0.001051
+      "centrality": 0.001049
     },
     {
       "id": "fux/cliconstitution.py::cmd_capture_decision",
@@ -965,7 +965,7 @@
       "file": "fux/cliconstitution.py",
       "line": 11,
       "community": 1,
-      "centrality": 0.000893
+      "centrality": 0.00089
     },
     {
       "id": "fux/cliconstitution.py::cmd_ratify",
@@ -974,7 +974,7 @@
       "file": "fux/cliconstitution.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.002402
+      "centrality": 0.002397
     },
     {
       "id": "fux/cliconstitution.py::_route_through_pr",
@@ -983,7 +983,7 @@
       "file": "fux/cliconstitution.py",
       "line": 83,
       "community": 1,
-      "centrality": 0.001599
+      "centrality": 0.001595
     },
     {
       "id": "fux/cliconstitution.py::cmd_constitution",
@@ -992,7 +992,7 @@
       "file": "fux/cliconstitution.py",
       "line": 121,
       "community": 1,
-      "centrality": 0.002318
+      "centrality": 0.002315
     },
     {
       "id": "fux/cliconstitution.py::cmd_critic",
@@ -1001,7 +1001,7 @@
       "file": "fux/cliconstitution.py",
       "line": 128,
       "community": 1,
-      "centrality": 0.001417
+      "centrality": 0.001415
     },
     {
       "id": "fux/cligraph.py",
@@ -1009,7 +1009,7 @@
       "type": "code-file",
       "file": "fux/cligraph.py",
       "community": 1,
-      "centrality": 0.001816
+      "centrality": 0.001812
     },
     {
       "id": "fux/cligraph.py::cmd_query",
@@ -1018,7 +1018,7 @@
       "file": "fux/cligraph.py",
       "line": 9,
       "community": 1,
-      "centrality": 0.004613
+      "centrality": 0.004605
     },
     {
       "id": "fux/cligraph.py::_dirname",
@@ -1027,7 +1027,7 @@
       "file": "fux/cligraph.py",
       "line": 70,
       "community": 1,
-      "centrality": 0.000643
+      "centrality": 0.000642
     },
     {
       "id": "fux/cligraph.py::_fmt",
@@ -1036,7 +1036,7 @@
       "file": "fux/cligraph.py",
       "line": 74,
       "community": 1,
-      "centrality": 0.000802
+      "centrality": 0.0008
     },
     {
       "id": "fux/cligraph.py::cmd_path",
@@ -1045,7 +1045,7 @@
       "file": "fux/cligraph.py",
       "line": 84,
       "community": 1,
-      "centrality": 0.001828
+      "centrality": 0.001824
     },
     {
       "id": "fux/cligraph.py::cmd_explain",
@@ -1054,7 +1054,7 @@
       "file": "fux/cligraph.py",
       "line": 99,
       "community": 1,
-      "centrality": 0.001777
+      "centrality": 0.001774
     },
     {
       "id": "fux/cligraph.py::cmd_impact",
@@ -1063,7 +1063,7 @@
       "file": "fux/cligraph.py",
       "line": 115,
       "community": 1,
-      "centrality": 0.003698
+      "centrality": 0.003694
     },
     {
       "id": "fux/cligraph.py::cmd_components",
@@ -1072,7 +1072,7 @@
       "file": "fux/cligraph.py",
       "line": 121,
       "community": 1,
-      "centrality": 0.002739
+      "centrality": 0.002736
     },
     {
       "id": "fux/cligraph.py::cmd_validate_spec",
@@ -1081,7 +1081,7 @@
       "file": "fux/cligraph.py",
       "line": 131,
       "community": 1,
-      "centrality": 0.003698
+      "centrality": 0.003694
     },
     {
       "id": "fux/cligraph.py::cmd_report",
@@ -1090,7 +1090,7 @@
       "file": "fux/cligraph.py",
       "line": 144,
       "community": 1,
-      "centrality": 0.003169
+      "centrality": 0.003165
     },
     {
       "id": "fux/cligraph.py::emit",
@@ -1099,7 +1099,7 @@
       "file": "fux/cligraph.py",
       "line": 36,
       "community": 1,
-      "centrality": 0.001143
+      "centrality": 0.00114
     },
     {
       "id": "fux/clihelp.py",
@@ -1107,7 +1107,7 @@
       "type": "code-file",
       "file": "fux/clihelp.py",
       "community": 5,
-      "centrality": 0.001842
+      "centrality": 0.001836
     },
     {
       "id": "fux/clihelp.py::grouped_help",
@@ -1116,7 +1116,7 @@
       "file": "fux/clihelp.py",
       "line": 18,
       "community": 1,
-      "centrality": 0.001721
+      "centrality": 0.001716
     },
     {
       "id": "fux/clihelp.py::command_help",
@@ -1125,7 +1125,7 @@
       "file": "fux/clihelp.py",
       "line": 34,
       "community": 1,
-      "centrality": 0.001222
+      "centrality": 0.001219
     },
     {
       "id": "fux/clihelp.py::registry_table",
@@ -1134,7 +1134,7 @@
       "file": "fux/clihelp.py",
       "line": 56,
       "community": 5,
-      "centrality": 0.00091
+      "centrality": 0.000908
     },
     {
       "id": "fux/clihelp.py::render_cli_md_block",
@@ -1143,7 +1143,7 @@
       "file": "fux/clihelp.py",
       "line": 65,
       "community": 5,
-      "centrality": 0.001249
+      "centrality": 0.001245
     },
     {
       "id": "fux/clihelp.py::sync_cli_md",
@@ -1152,7 +1152,7 @@
       "file": "fux/clihelp.py",
       "line": 70,
       "community": 5,
-      "centrality": 0.001078
+      "centrality": 0.001075
     },
     {
       "id": "fux/cliquery.py",
@@ -1160,7 +1160,7 @@
       "type": "code-file",
       "file": "fux/cliquery.py",
       "community": 1,
-      "centrality": 0.003363
+      "centrality": 0.003356
     },
     {
       "id": "fux/cliquery.py::cmd_feedback",
@@ -1169,7 +1169,7 @@
       "file": "fux/cliquery.py",
       "line": 12,
       "community": 1,
-      "centrality": 0.003749
+      "centrality": 0.003745
     },
     {
       "id": "fux/cliquery.py::cmd_recall",
@@ -1178,7 +1178,7 @@
       "file": "fux/cliquery.py",
       "line": 24,
       "community": 1,
-      "centrality": 0.001941
+      "centrality": 0.001938
     },
     {
       "id": "fux/cliquery.py::cmd_why",
@@ -1187,7 +1187,7 @@
       "file": "fux/cliquery.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.00114
+      "centrality": 0.001137
     },
     {
       "id": "fux/cliquery.py::cmd_seal",
@@ -1196,7 +1196,7 @@
       "file": "fux/cliquery.py",
       "line": 44,
       "community": 1,
-      "centrality": 0.001832
+      "centrality": 0.001829
     },
     {
       "id": "fux/cliquery.py::cmd_refs",
@@ -1205,7 +1205,7 @@
       "file": "fux/cliquery.py",
       "line": 64,
       "community": 1,
-      "centrality": 0.00064
+      "centrality": 0.000638
     },
     {
       "id": "fux/cliquery.py::cmd_new",
@@ -1214,7 +1214,7 @@
       "file": "fux/cliquery.py",
       "line": 71,
       "community": 1,
-      "centrality": 0.000694
+      "centrality": 0.000693
     },
     {
       "id": "fux/cliquery.py::cmd_coverage",
@@ -1223,7 +1223,7 @@
       "file": "fux/cliquery.py",
       "line": 77,
       "community": 1,
-      "centrality": 0.001911
+      "centrality": 0.001908
     },
     {
       "id": "fux/cliquery.py::cmd_verify",
@@ -1232,7 +1232,7 @@
       "file": "fux/cliquery.py",
       "line": 85,
       "community": 1,
-      "centrality": 0.001911
+      "centrality": 0.001908
     },
     {
       "id": "fux/cliquery.py::cmd_tour",
@@ -1241,7 +1241,7 @@
       "file": "fux/cliquery.py",
       "line": 94,
       "community": 1,
-      "centrality": 0.001105
+      "centrality": 0.001102
     },
     {
       "id": "fux/cliquery.py::cmd_savings",
@@ -1250,7 +1250,7 @@
       "file": "fux/cliquery.py",
       "line": 100,
       "community": 1,
-      "centrality": 0.003778
+      "centrality": 0.003779
     },
     {
       "id": "fux/cliquery.py::cmd_lint",
@@ -1259,7 +1259,7 @@
       "file": "fux/cliquery.py",
       "line": 112,
       "community": 1,
-      "centrality": 0.002076
+      "centrality": 0.002073
     },
     {
       "id": "fux/cliquery.py::cmd_stats",
@@ -1268,7 +1268,7 @@
       "file": "fux/cliquery.py",
       "line": 121,
       "community": 1,
-      "centrality": 0.002845
+      "centrality": 0.002846
     },
     {
       "id": "fux/cliquery.py::cmd_mine",
@@ -1277,7 +1277,7 @@
       "file": "fux/cliquery.py",
       "line": 126,
       "community": 1,
-      "centrality": 0.002418
+      "centrality": 0.002415
     },
     {
       "id": "fux/cliquery.py::cmd_propose_rules",
@@ -1286,7 +1286,7 @@
       "file": "fux/cliquery.py",
       "line": 131,
       "community": 1,
-      "centrality": 0.00147
+      "centrality": 0.001467
     },
     {
       "id": "fux/cliquery.py::cmd_candidates",
@@ -1295,7 +1295,7 @@
       "file": "fux/cliquery.py",
       "line": 158,
       "community": 1,
-      "centrality": 0.002766
+      "centrality": 0.002762
     },
     {
       "id": "fux/cliquery.py::_accept_candidate",
@@ -1304,7 +1304,7 @@
       "file": "fux/cliquery.py",
       "line": 175,
       "community": 1,
-      "centrality": 0.002398
+      "centrality": 0.002392
     },
     {
       "id": "fux/cliquery.py::cmd_capture",
@@ -1313,7 +1313,7 @@
       "file": "fux/cliquery.py",
       "line": 203,
       "community": 1,
-      "centrality": 0.001725
+      "centrality": 0.00172
     },
     {
       "id": "fux/cliquery.py::cmd_how",
@@ -1322,7 +1322,7 @@
       "file": "fux/cliquery.py",
       "line": 215,
       "community": 1,
-      "centrality": 0.002547
+      "centrality": 0.002543
     },
     {
       "id": "fux/cliquery.py::cmd_ingest",
@@ -1331,7 +1331,7 @@
       "file": "fux/cliquery.py",
       "line": 228,
       "community": 1,
-      "centrality": 0.003796
+      "centrality": 0.003789
     },
     {
       "id": "fux/cliquery.py::cmd_scrape_deprecated",
@@ -1340,7 +1340,7 @@
       "file": "fux/cliquery.py",
       "line": 281,
       "community": 1,
-      "centrality": 0.000512
+      "centrality": 0.000511
     },
     {
       "id": "fux/cliquery.py::cmd_fetch_rules",
@@ -1349,7 +1349,7 @@
       "file": "fux/cliquery.py",
       "line": 288,
       "community": 1,
-      "centrality": 0.001102
+      "centrality": 0.001099
     },
     {
       "id": "fux/cliutil.py",
@@ -1357,7 +1357,7 @@
       "type": "code-file",
       "file": "fux/cliutil.py",
       "community": 1,
-      "centrality": 0.000742
+      "centrality": 0.00074
     },
     {
       "id": "fux/cliutil.py::root",
@@ -1366,7 +1366,7 @@
       "file": "fux/cliutil.py",
       "line": 10,
       "community": 1,
-      "centrality": 0.005342
+      "centrality": 0.005331
     },
     {
       "id": "fux/cliutil.py::self_root",
@@ -1375,7 +1375,7 @@
       "file": "fux/cliutil.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.000983
+      "centrality": 0.000981
     },
     {
       "id": "fux/cliutil.py::scope_root",
@@ -1384,7 +1384,7 @@
       "file": "fux/cliutil.py",
       "line": 28,
       "community": 1,
-      "centrality": 0.001315
+      "centrality": 0.001312
     },
     {
       "id": "fux/community.py",
@@ -1392,7 +1392,7 @@
       "type": "code-file",
       "file": "fux/community.py",
       "community": 6,
-      "centrality": 0.001122
+      "centrality": 0.001119
     },
     {
       "id": "fux/community.py::_adjacency",
@@ -1401,7 +1401,7 @@
       "file": "fux/community.py",
       "line": 14,
       "community": 6,
-      "centrality": 0.000976
+      "centrality": 0.000973
     },
     {
       "id": "fux/community.py::detect",
@@ -1410,7 +1410,7 @@
       "file": "fux/community.py",
       "line": 26,
       "community": 6,
-      "centrality": 0.001502
+      "centrality": 0.001499
     },
     {
       "id": "fux/community.py::_compact",
@@ -1419,7 +1419,7 @@
       "file": "fux/community.py",
       "line": 50,
       "community": 6,
-      "centrality": 0.000817
+      "centrality": 0.000815
     },
     {
       "id": "fux/components.py",
@@ -1427,7 +1427,7 @@
       "type": "code-file",
       "file": "fux/components.py",
       "community": 1,
-      "centrality": 0.00128
+      "centrality": 0.001278
     },
     {
       "id": "fux/components.py::_props_of",
@@ -1436,7 +1436,7 @@
       "file": "fux/components.py",
       "line": 26,
       "community": 1,
-      "centrality": 0.000865
+      "centrality": 0.000863
     },
     {
       "id": "fux/components.py::registry",
@@ -1445,7 +1445,7 @@
       "file": "fux/components.py",
       "line": 51,
       "community": 1,
-      "centrality": 0.002092
+      "centrality": 0.002088
     },
     {
       "id": "fux/components.py::render",
@@ -1454,7 +1454,7 @@
       "file": "fux/components.py",
       "line": 79,
       "community": 1,
-      "centrality": 0.002777
+      "centrality": 0.002778
     },
     {
       "id": "fux/components.py::render_json",
@@ -1463,7 +1463,7 @@
       "file": "fux/components.py",
       "line": 97,
       "community": 1,
-      "centrality": 0.00093
+      "centrality": 0.000929
     },
     {
       "id": "fux/config.py",
@@ -1471,7 +1471,7 @@
       "type": "code-file",
       "file": "fux/config.py",
       "community": 1,
-      "centrality": 0.0009
+      "centrality": 0.000898
     },
     {
       "id": "fux/config.py::load",
@@ -1480,7 +1480,7 @@
       "file": "fux/config.py",
       "line": 47,
       "community": 1,
-      "centrality": 0.005605
+      "centrality": 0.0056
     },
     {
       "id": "fux/config.py::default_toml",
@@ -1489,7 +1489,7 @@
       "file": "fux/config.py",
       "line": 59,
       "community": 1,
-      "centrality": 0.000576
+      "centrality": 0.000575
     },
     {
       "id": "fux/constatus.py",
@@ -1497,7 +1497,7 @@
       "type": "code-file",
       "file": "fux/constatus.py",
       "community": 1,
-      "centrality": 0.001654
+      "centrality": 0.00165
     },
     {
       "id": "fux/constatus.py::_constitutional",
@@ -1506,7 +1506,7 @@
       "file": "fux/constatus.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.00073
+      "centrality": 0.000728
     },
     {
       "id": "fux/constatus.py::_governs",
@@ -1515,7 +1515,7 @@
       "file": "fux/constatus.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.000521
+      "centrality": 0.00052
     },
     {
       "id": "fux/constatus.py::_recent_debates",
@@ -1524,7 +1524,7 @@
       "file": "fux/constatus.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.000521
+      "centrality": 0.00052
     },
     {
       "id": "fux/constatus.py::render",
@@ -1533,7 +1533,7 @@
       "file": "fux/constatus.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.006672
+      "centrality": 0.006667
     },
     {
       "id": "fux/constatus.py::_violations_by_severity",
@@ -1542,7 +1542,7 @@
       "file": "fux/constatus.py",
       "line": 96,
       "community": 1,
-      "centrality": 0.000683
+      "centrality": 0.000682
     },
     {
       "id": "fux/constitution.py",
@@ -1550,7 +1550,7 @@
       "type": "code-file",
       "file": "fux/constitution.py",
       "community": 1,
-      "centrality": 0.00172
+      "centrality": 0.001715
     },
     {
       "id": "fux/constitution.py::content_seal",
@@ -1559,7 +1559,7 @@
       "file": "fux/constitution.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.001548
+      "centrality": 0.001544
     },
     {
       "id": "fux/constitution.py::_constitutional",
@@ -1568,7 +1568,7 @@
       "file": "fux/constitution.py",
       "line": 25,
       "community": 1,
-      "centrality": 0.001029
+      "centrality": 0.001026
     },
     {
       "id": "fux/constitution.py::check_tamper",
@@ -1577,7 +1577,7 @@
       "file": "fux/constitution.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.001289
+      "centrality": 0.001286
     },
     {
       "id": "fux/constitution.py::lock_manifest",
@@ -1586,7 +1586,7 @@
       "file": "fux/constitution.py",
       "line": 45,
       "community": 1,
-      "centrality": 0.001188
+      "centrality": 0.001185
     },
     {
       "id": "fux/constitution.py::_read_lock",
@@ -1595,7 +1595,7 @@
       "file": "fux/constitution.py",
       "line": 52,
       "community": 1,
-      "centrality": 0.000639
+      "centrality": 0.000637
     },
     {
       "id": "fux/constitution.py::check_lock",
@@ -1604,7 +1604,7 @@
       "file": "fux/constitution.py",
       "line": 62,
       "community": 1,
-      "centrality": 0.001369
+      "centrality": 0.001366
     },
     {
       "id": "fux/constitution.py::ratify",
@@ -1613,7 +1613,7 @@
       "file": "fux/constitution.py",
       "line": 78,
       "community": 1,
-      "centrality": 0.001521
+      "centrality": 0.001517
     },
     {
       "id": "fux/context.py",
@@ -1621,7 +1621,7 @@
       "type": "code-file",
       "file": "fux/context.py",
       "community": 1,
-      "centrality": 0.000683
+      "centrality": 0.000682
     },
     {
       "id": "fux/context.py::run",
@@ -1630,7 +1630,7 @@
       "file": "fux/context.py",
       "line": 10,
       "community": 1,
-      "centrality": 0.006116
+      "centrality": 0.006109
     },
     {
       "id": "fux/costledger.py",
@@ -1638,7 +1638,7 @@
       "type": "code-file",
       "file": "fux/costledger.py",
       "community": 1,
-      "centrality": 0.002594
+      "centrality": 0.002592
     },
     {
       "id": "fux/costledger.py::_file",
@@ -1647,7 +1647,7 @@
       "file": "fux/costledger.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.001053
+      "centrality": 0.001052
     },
     {
       "id": "fux/costledger.py::_empty",
@@ -1656,7 +1656,7 @@
       "file": "fux/costledger.py",
       "line": 35,
       "community": 1,
-      "centrality": 0.000755
+      "centrality": 0.000754
     },
     {
       "id": "fux/costledger.py::load",
@@ -1665,7 +1665,7 @@
       "file": "fux/costledger.py",
       "line": 40,
       "community": 1,
-      "centrality": 0.006199
+      "centrality": 0.006194
     },
     {
       "id": "fux/costledger.py::reset",
@@ -1674,7 +1674,7 @@
       "file": "fux/costledger.py",
       "line": 51,
       "community": 1,
-      "centrality": 0.000681
+      "centrality": 0.00068
     },
     {
       "id": "fux/costledger.py::record",
@@ -1683,7 +1683,7 @@
       "file": "fux/costledger.py",
       "line": 59,
       "community": 1,
-      "centrality": 0.002113
+      "centrality": 0.002126
     },
     {
       "id": "fux/costledger.py::overall_ratio",
@@ -1692,7 +1692,7 @@
       "file": "fux/costledger.py",
       "line": 108,
       "community": 1,
-      "centrality": 0.000723
+      "centrality": 0.000722
     },
     {
       "id": "fux/costledger.py::_date",
@@ -1701,7 +1701,7 @@
       "file": "fux/costledger.py",
       "line": 116,
       "community": 1,
-      "centrality": 0.00082
+      "centrality": 0.000819
     },
     {
       "id": "fux/costledger.py::span_days",
@@ -1710,7 +1710,7 @@
       "file": "fux/costledger.py",
       "line": 123,
       "community": 1,
-      "centrality": 0.001225
+      "centrality": 0.001223
     },
     {
       "id": "fux/costledger.py::rates",
@@ -1719,7 +1719,7 @@
       "file": "fux/costledger.py",
       "line": 130,
       "community": 1,
-      "centrality": 0.000931
+      "centrality": 0.00093
     },
     {
       "id": "fux/costledger.py::render_summary",
@@ -1728,7 +1728,7 @@
       "file": "fux/costledger.py",
       "line": 138,
       "community": 1,
-      "centrality": 0.002449
+      "centrality": 0.00246
     },
     {
       "id": "fux/costledger.py::row",
@@ -1737,7 +1737,7 @@
       "file": "fux/costledger.py",
       "line": 150,
       "community": 1,
-      "centrality": 0.001445
+      "centrality": 0.001449
     },
     {
       "id": "fux/coverage.py",
@@ -1745,7 +1745,7 @@
       "type": "code-file",
       "file": "fux/coverage.py",
       "community": 1,
-      "centrality": 0.001511
+      "centrality": 0.001507
     },
     {
       "id": "fux/coverage.py::Coverage",
@@ -1754,7 +1754,7 @@
       "file": "fux/coverage.py",
       "line": 11,
       "community": 1,
-      "centrality": 0.00055
+      "centrality": 0.000549
     },
     {
       "id": "fux/coverage.py::run",
@@ -1763,7 +1763,7 @@
       "file": "fux/coverage.py",
       "line": 21,
       "community": 1,
-      "centrality": 0.005611
+      "centrality": 0.005605
     },
     {
       "id": "fux/coverage.py::_important_files",
@@ -1772,7 +1772,7 @@
       "file": "fux/coverage.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.000801
+      "centrality": 0.000799
     },
     {
       "id": "fux/coverage.py::pct",
@@ -1781,7 +1781,7 @@
       "file": "fux/coverage.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.000434
+      "centrality": 0.000432
     },
     {
       "id": "fux/critic.py",
@@ -1789,7 +1789,7 @@
       "type": "code-file",
       "file": "fux/critic.py",
       "community": 1,
-      "centrality": 0.001042
+      "centrality": 0.001039
     },
     {
       "id": "fux/critic.py::is_principle",
@@ -1798,7 +1798,7 @@
       "file": "fux/critic.py",
       "line": 18,
       "community": 1,
-      "centrality": 0.001155
+      "centrality": 0.001152
     },
     {
       "id": "fux/critic.py::for_ai",
@@ -1807,7 +1807,7 @@
       "file": "fux/critic.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.000971
+      "centrality": 0.000968
     },
     {
       "id": "fux/critic.py::for_deterministic",
@@ -1816,7 +1816,7 @@
       "file": "fux/critic.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.000947
+      "centrality": 0.000944
     },
     {
       "id": "fux/critic.py::untagged_candidates",
@@ -1825,7 +1825,7 @@
       "file": "fux/critic.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.000916
+      "centrality": 0.000913
     },
     {
       "id": "fux/criticllm.py",
@@ -1833,7 +1833,7 @@
       "type": "code-file",
       "file": "fux/criticllm.py",
       "community": 1,
-      "centrality": 0.000494
+      "centrality": 0.000493
     },
     {
       "id": "fux/criticllm.py::judge",
@@ -1842,7 +1842,7 @@
       "file": "fux/criticllm.py",
       "line": 19,
       "community": 1,
-      "centrality": 0.001255
+      "centrality": 0.001251
     },
     {
       "id": "fux/criticloop.py",
@@ -1850,7 +1850,7 @@
       "type": "code-file",
       "file": "fux/criticloop.py",
       "community": 1,
-      "centrality": 0.002639
+      "centrality": 0.002632
     },
     {
       "id": "fux/criticloop.py::Verdict",
@@ -1859,7 +1859,7 @@
       "file": "fux/criticloop.py",
       "line": 23,
       "community": 1,
-      "centrality": 0.00093
+      "centrality": 0.000927
     },
     {
       "id": "fux/criticloop.py::CriticResult",
@@ -1868,7 +1868,7 @@
       "file": "fux/criticloop.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.00059
+      "centrality": 0.000588
     },
     {
       "id": "fux/criticloop.py::_escalated",
@@ -1877,7 +1877,7 @@
       "file": "fux/criticloop.py",
       "line": 54,
       "community": 1,
-      "centrality": 0.000748
+      "centrality": 0.000746
     },
     {
       "id": "fux/criticloop.py::gather",
@@ -1886,7 +1886,7 @@
       "file": "fux/criticloop.py",
       "line": 67,
       "community": 1,
-      "centrality": 0.002189
+      "centrality": 0.002185
     },
     {
       "id": "fux/criticloop.py::deterministic_pass",
@@ -1895,7 +1895,7 @@
       "file": "fux/criticloop.py",
       "line": 72,
       "community": 1,
-      "centrality": 0.002391
+      "centrality": 0.002387
     },
     {
       "id": "fux/criticloop.py::critique",
@@ -1904,7 +1904,7 @@
       "file": "fux/criticloop.py",
       "line": 81,
       "community": 1,
-      "centrality": 0.00271
+      "centrality": 0.002704
     },
     {
       "id": "fux/criticloop.py::record",
@@ -1913,7 +1913,7 @@
       "file": "fux/criticloop.py",
       "line": 100,
       "community": 1,
-      "centrality": 0.001953
+      "centrality": 0.001949
     },
     {
       "id": "fux/criticloop.py::blocked",
@@ -1922,7 +1922,7 @@
       "file": "fux/criticloop.py",
       "line": 36,
       "community": 1,
-      "centrality": 0.000438
+      "centrality": 0.000437
     },
     {
       "id": "fux/criticloop.py::suggestions",
@@ -1931,7 +1931,7 @@
       "file": "fux/criticloop.py",
       "line": 42,
       "community": 1,
-      "centrality": 0.000438
+      "centrality": 0.000437
     },
     {
       "id": "fux/criticloop.py::pending",
@@ -1940,7 +1940,7 @@
       "file": "fux/criticloop.py",
       "line": 47,
       "community": 1,
-      "centrality": 0.00084
+      "centrality": 0.000838
     },
     {
       "id": "fux/decisioncapture.py",
@@ -1948,7 +1948,7 @@
       "type": "code-file",
       "file": "fux/decisioncapture.py",
       "community": 1,
-      "centrality": 0.001225
+      "centrality": 0.001222
     },
     {
       "id": "fux/decisioncapture.py::build_adr",
@@ -1957,7 +1957,7 @@
       "file": "fux/decisioncapture.py",
       "line": 24,
       "community": 1,
-      "centrality": 0.001171
+      "centrality": 0.001167
     },
     {
       "id": "fux/decisioncapture.py::capture",
@@ -1966,7 +1966,7 @@
       "file": "fux/decisioncapture.py",
       "line": 36,
       "community": 1,
-      "centrality": 0.002524
+      "centrality": 0.002518
     },
     {
       "id": "fux/decisioncapture.py::_decisions",
@@ -1975,7 +1975,7 @@
       "file": "fux/decisioncapture.py",
       "line": 66,
       "community": 1,
-      "centrality": 0.000808
+      "centrality": 0.000806
     },
     {
       "id": "fux/decisioncapture.py::check_seals",
@@ -1984,7 +1984,7 @@
       "file": "fux/decisioncapture.py",
       "line": 71,
       "community": 1,
-      "centrality": 0.001161
+      "centrality": 0.001158
     },
     {
       "id": "fux/decisioncapture.py::check_firewall",
@@ -1993,7 +1993,7 @@
       "file": "fux/decisioncapture.py",
       "line": 82,
       "community": 1,
-      "centrality": 0.000902
+      "centrality": 0.0009
     },
     {
       "id": "fux/drift.py",
@@ -2001,7 +2001,7 @@
       "type": "code-file",
       "file": "fux/drift.py",
       "community": 1,
-      "centrality": 0.000463
+      "centrality": 0.000462
     },
     {
       "id": "fux/drift.py::scoped_prompt",
@@ -2010,7 +2010,7 @@
       "file": "fux/drift.py",
       "line": 16,
       "community": 1,
-      "centrality": 0.001294
+      "centrality": 0.001291
     },
     {
       "id": "fux/embed.py",
@@ -2018,7 +2018,7 @@
       "type": "code-file",
       "file": "fux/embed.py",
       "community": 7,
-      "centrality": 0.001711
+      "centrality": 0.001706
     },
     {
       "id": "fux/embed.py::rerank",
@@ -2027,7 +2027,7 @@
       "file": "fux/embed.py",
       "line": 18,
       "community": 1,
-      "centrality": 0.000992
+      "centrality": 0.000989
     },
     {
       "id": "fux/embed.py::_text",
@@ -2036,7 +2036,7 @@
       "file": "fux/embed.py",
       "line": 31,
       "community": 7,
-      "centrality": 0.001107
+      "centrality": 0.001104
     },
     {
       "id": "fux/embed.py::_semantic",
@@ -2045,7 +2045,7 @@
       "file": "fux/embed.py",
       "line": 36,
       "community": 7,
-      "centrality": 0.00245
+      "centrality": 0.002442
     },
     {
       "id": "fux/embed.py::_load_model",
@@ -2054,7 +2054,7 @@
       "file": "fux/embed.py",
       "line": 47,
       "community": 7,
-      "centrality": 0.000717
+      "centrality": 0.000715
     },
     {
       "id": "fux/embed.py::_ngrams",
@@ -2063,7 +2063,7 @@
       "file": "fux/embed.py",
       "line": 57,
       "community": 7,
-      "centrality": 0.001116
+      "centrality": 0.001113
     },
     {
       "id": "fux/embed.py::_cosine",
@@ -2072,7 +2072,7 @@
       "file": "fux/embed.py",
       "line": 62,
       "community": 7,
-      "centrality": 0.000876
+      "centrality": 0.000873
     },
     {
       "id": "fux/errors.py",
@@ -2080,7 +2080,7 @@
       "type": "code-file",
       "file": "fux/errors.py",
       "community": 1,
-      "centrality": 0.000404
+      "centrality": 0.000403
     },
     {
       "id": "fux/errors.py::FuxError",
@@ -2089,7 +2089,7 @@
       "file": "fux/errors.py",
       "line": 13,
       "community": 1,
-      "centrality": 0.002265
+      "centrality": 0.002259
     },
     {
       "id": "fux/explain.py",
@@ -2097,7 +2097,7 @@
       "type": "code-file",
       "file": "fux/explain.py",
       "community": 1,
-      "centrality": 0.000848
+      "centrality": 0.000845
     },
     {
       "id": "fux/explain.py::why",
@@ -2106,7 +2106,7 @@
       "file": "fux/explain.py",
       "line": 10,
       "community": 1,
-      "centrality": 0.002693
+      "centrality": 0.002689
     },
     {
       "id": "fux/explain.py::refs",
@@ -2115,7 +2115,7 @@
       "file": "fux/explain.py",
       "line": 19,
       "community": 1,
-      "centrality": 0.002335
+      "centrality": 0.002331
     },
     {
       "id": "fux/explain.py::render_why",
@@ -2124,7 +2124,7 @@
       "file": "fux/explain.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.001157
+      "centrality": 0.001154
     },
     {
       "id": "fux/explain.py::render_history",
@@ -2133,7 +2133,7 @@
       "file": "fux/explain.py",
       "line": 47,
       "community": 1,
-      "centrality": 0.00125
+      "centrality": 0.001247
     },
     {
       "id": "fux/feedback.py",
@@ -2141,7 +2141,7 @@
       "type": "code-file",
       "file": "fux/feedback.py",
       "community": 1,
-      "centrality": 0.001703
+      "centrality": 0.001701
     },
     {
       "id": "fux/feedback.py::_file",
@@ -2150,7 +2150,7 @@
       "file": "fux/feedback.py",
       "line": 20,
       "community": 1,
-      "centrality": 0.000838
+      "centrality": 0.000836
     },
     {
       "id": "fux/feedback.py::record",
@@ -2159,7 +2159,7 @@
       "file": "fux/feedback.py",
       "line": 26,
       "community": 1,
-      "centrality": 0.00193
+      "centrality": 0.001927
     },
     {
       "id": "fux/feedback.py::load",
@@ -2168,7 +2168,7 @@
       "file": "fux/feedback.py",
       "line": 41,
       "community": 1,
-      "centrality": 0.005553
+      "centrality": 0.005548
     },
     {
       "id": "fux/feedback.py::_reason",
@@ -2177,7 +2177,7 @@
       "file": "fux/feedback.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.000496
+      "centrality": 0.000495
     },
     {
       "id": "fux/feedback.py::render",
@@ -2186,7 +2186,7 @@
       "file": "fux/feedback.py",
       "line": 54,
       "community": 1,
-      "centrality": 0.002983
+      "centrality": 0.002984
     },
     {
       "id": "fux/fetchrules.py",
@@ -2194,7 +2194,7 @@
       "type": "code-file",
       "file": "fux/fetchrules.py",
       "community": 8,
-      "centrality": 0.003345
+      "centrality": 0.003335
     },
     {
       "id": "fux/fetchrules.py::FetchError",
@@ -2203,7 +2203,7 @@
       "file": "fux/fetchrules.py",
       "line": 20,
       "community": 8,
-      "centrality": 0.001003
+      "centrality": 0.001
     },
     {
       "id": "fux/fetchrules.py::PDFDependencyError",
@@ -2212,7 +2212,7 @@
       "file": "fux/fetchrules.py",
       "line": 24,
       "community": 8,
-      "centrality": 0.000789
+      "centrality": 0.000787
     },
     {
       "id": "fux/fetchrules.py::fetch_text",
@@ -2221,7 +2221,7 @@
       "file": "fux/fetchrules.py",
       "line": 34,
       "community": 8,
-      "centrality": 0.001694
+      "centrality": 0.001689
     },
     {
       "id": "fux/fetchrules.py::source_label",
@@ -2230,7 +2230,7 @@
       "file": "fux/fetchrules.py",
       "line": 52,
       "community": 1,
-      "centrality": 0.000762
+      "centrality": 0.00076
     },
     {
       "id": "fux/fetchrules.py::_fetch_url",
@@ -2239,7 +2239,7 @@
       "file": "fux/fetchrules.py",
       "line": 63,
       "community": 8,
-      "centrality": 0.002767
+      "centrality": 0.002759
     },
     {
       "id": "fux/fetchrules.py::_sniff_encoding",
@@ -2248,7 +2248,7 @@
       "file": "fux/fetchrules.py",
       "line": 87,
       "community": 8,
-      "centrality": 0.000763
+      "centrality": 0.000761
     },
     {
       "id": "fux/fetchrules.py::_looks_like_html",
@@ -2257,7 +2257,7 @@
       "file": "fux/fetchrules.py",
       "line": 92,
       "community": 8,
-      "centrality": 0.000763
+      "centrality": 0.000761
     },
     {
       "id": "fux/fetchrules.py::_strip_html",
@@ -2266,7 +2266,7 @@
       "file": "fux/fetchrules.py",
       "line": 96,
       "community": 8,
-      "centrality": 0.000763
+      "centrality": 0.000761
     },
     {
       "id": "fux/fetchrules.py::_read_pdf_bytes",
@@ -2275,7 +2275,7 @@
       "file": "fux/fetchrules.py",
       "line": 114,
       "community": 8,
-      "centrality": 0.001539
+      "centrality": 0.001534
     },
     {
       "id": "fux/fetchrules.py::__str__",
@@ -2284,7 +2284,7 @@
       "file": "fux/fetchrules.py",
       "line": 26,
       "community": 8,
-      "centrality": 0.000528
+      "centrality": 0.000526
     },
     {
       "id": "fux/findings.py",
@@ -2292,7 +2292,7 @@
       "type": "code-file",
       "file": "fux/findings.py",
       "community": 1,
-      "centrality": 0.000739
+      "centrality": 0.000738
     },
     {
       "id": "fux/findings.py::Finding",
@@ -2301,7 +2301,7 @@
       "file": "fux/findings.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.003564
+      "centrality": 0.003555
     },
     {
       "id": "fux/findings.py::blocking",
@@ -2310,7 +2310,7 @@
       "file": "fux/findings.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.001191
+      "centrality": 0.001189
     },
     {
       "id": "fux/findings.py::line",
@@ -2319,7 +2319,7 @@
       "file": "fux/findings.py",
       "line": 24,
       "community": 1,
-      "centrality": 0.001267
+      "centrality": 0.001264
     },
     {
       "id": "fux/fix.py",
@@ -2327,7 +2327,7 @@
       "type": "code-file",
       "file": "fux/fix.py",
       "community": 1,
-      "centrality": 0.000888
+      "centrality": 0.000886
     },
     {
       "id": "fux/fix.py::apply",
@@ -2336,7 +2336,7 @@
       "file": "fux/fix.py",
       "line": 16,
       "community": 1,
-      "centrality": 0.001556
+      "centrality": 0.001552
     },
     {
       "id": "fux/fix.py::_drop_dead_refs",
@@ -2345,7 +2345,7 @@
       "file": "fux/fix.py",
       "line": 39,
       "community": 1,
-      "centrality": 0.000852
+      "centrality": 0.000849
     },
     {
       "id": "fux/fix.py::_locate",
@@ -2354,7 +2354,7 @@
       "file": "fux/fix.py",
       "line": 48,
       "community": 1,
-      "centrality": 0.00101
+      "centrality": 0.001008
     },
     {
       "id": "fux/fmwrite.py",
@@ -2362,7 +2362,7 @@
       "type": "code-file",
       "file": "fux/fmwrite.py",
       "community": 9,
-      "centrality": 0.001057
+      "centrality": 0.001053
     },
     {
       "id": "fux/fmwrite.py::dump",
@@ -2371,7 +2371,7 @@
       "file": "fux/fmwrite.py",
       "line": 10,
       "community": 1,
-      "centrality": 0.002019
+      "centrality": 0.002014
     },
     {
       "id": "fux/fmwrite.py::_emit",
@@ -2380,7 +2380,7 @@
       "file": "fux/fmwrite.py",
       "line": 19,
       "community": 9,
-      "centrality": 0.001422
+      "centrality": 0.001417
     },
     {
       "id": "fux/fmwrite.py::_scalar",
@@ -2389,7 +2389,7 @@
       "file": "fux/fmwrite.py",
       "line": 40,
       "community": 9,
-      "centrality": 0.001673
+      "centrality": 0.001668
     },
     {
       "id": "fux/frontmatter.py",
@@ -2397,7 +2397,7 @@
       "type": "code-file",
       "file": "fux/frontmatter.py",
       "community": 10,
-      "centrality": 0.001439
+      "centrality": 0.001435
     },
     {
       "id": "fux/frontmatter.py::split",
@@ -2406,7 +2406,7 @@
       "file": "fux/frontmatter.py",
       "line": 14,
       "community": 1,
-      "centrality": 0.00818
+      "centrality": 0.008164
     },
     {
       "id": "fux/frontmatter.py::parse",
@@ -2415,7 +2415,7 @@
       "file": "fux/frontmatter.py",
       "line": 27,
       "community": 2,
-      "centrality": 0.001989
+      "centrality": 0.001983
     },
     {
       "id": "fux/frontmatter.py::_indent",
@@ -2424,7 +2424,7 @@
       "file": "fux/frontmatter.py",
       "line": 33,
       "community": 10,
-      "centrality": 0.001909
+      "centrality": 0.001903
     },
     {
       "id": "fux/frontmatter.py::_block",
@@ -2433,7 +2433,7 @@
       "file": "fux/frontmatter.py",
       "line": 37,
       "community": 10,
-      "centrality": 0.001474
+      "centrality": 0.00147
     },
     {
       "id": "fux/frontmatter.py::_mapping",
@@ -2442,7 +2442,7 @@
       "file": "fux/frontmatter.py",
       "line": 49,
       "community": 10,
-      "centrality": 0.00171
+      "centrality": 0.001705
     },
     {
       "id": "fux/frontmatter.py::_sequence",
@@ -2451,7 +2451,7 @@
       "file": "fux/frontmatter.py",
       "line": 70,
       "community": 10,
-      "centrality": 0.001299
+      "centrality": 0.001295
     },
     {
       "id": "fux/gate.py",
@@ -2459,7 +2459,7 @@
       "type": "code-file",
       "file": "fux/gate.py",
       "community": 1,
-      "centrality": 0.00094
+      "centrality": 0.000938
     },
     {
       "id": "fux/gate.py::run",
@@ -2468,7 +2468,7 @@
       "file": "fux/gate.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.005432
+      "centrality": 0.005427
     },
     {
       "id": "fux/gate.py::install_precommit",
@@ -2477,7 +2477,7 @@
       "file": "fux/gate.py",
       "line": 73,
       "community": 1,
-      "centrality": 0.000753
+      "centrality": 0.000751
     },
     {
       "id": "fux/gitutil.py",
@@ -2485,7 +2485,7 @@
       "type": "code-file",
       "file": "fux/gitutil.py",
       "community": 1,
-      "centrality": 0.002515
+      "centrality": 0.002509
     },
     {
       "id": "fux/gitutil.py::_run",
@@ -2494,7 +2494,7 @@
       "file": "fux/gitutil.py",
       "line": 8,
       "community": 1,
-      "centrality": 0.004529
+      "centrality": 0.00452
     },
     {
       "id": "fux/gitutil.py::is_repo",
@@ -2503,7 +2503,7 @@
       "file": "fux/gitutil.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.001232
+      "centrality": 0.001229
     },
     {
       "id": "fux/gitutil.py::tracked_files",
@@ -2512,7 +2512,7 @@
       "file": "fux/gitutil.py",
       "line": 21,
       "community": 1,
-      "centrality": 0.000662
+      "centrality": 0.00066
     },
     {
       "id": "fux/gitutil.py::user_name",
@@ -2521,7 +2521,7 @@
       "file": "fux/gitutil.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.000866
+      "centrality": 0.000864
     },
     {
       "id": "fux/gitutil.py::hooks_dir",
@@ -2530,7 +2530,7 @@
       "file": "fux/gitutil.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.001617
+      "centrality": 0.001612
     },
     {
       "id": "fux/gitutil.py::changed_files",
@@ -2539,7 +2539,7 @@
       "file": "fux/gitutil.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.000825
+      "centrality": 0.000823
     },
     {
       "id": "fux/gitutil.py::last_commit_date",
@@ -2548,7 +2548,7 @@
       "file": "fux/gitutil.py",
       "line": 50,
       "community": 1,
-      "centrality": 0.000968
+      "centrality": 0.000966
     },
     {
       "id": "fux/gitutil.py::file_history",
@@ -2557,7 +2557,7 @@
       "file": "fux/gitutil.py",
       "line": 57,
       "community": 1,
-      "centrality": 0.00132
+      "centrality": 0.001317
     },
     {
       "id": "fux/gitutil.py::current_branch",
@@ -2566,7 +2566,7 @@
       "file": "fux/gitutil.py",
       "line": 72,
       "community": 1,
-      "centrality": 0.000711
+      "centrality": 0.000709
     },
     {
       "id": "fux/gitutil.py::default_branch",
@@ -2575,7 +2575,7 @@
       "file": "fux/gitutil.py",
       "line": 78,
       "community": 1,
-      "centrality": 0.000831
+      "centrality": 0.000829
     },
     {
       "id": "fux/gitutil.py::has_remote",
@@ -2584,7 +2584,7 @@
       "file": "fux/gitutil.py",
       "line": 84,
       "community": 1,
-      "centrality": 0.000711
+      "centrality": 0.000709
     },
     {
       "id": "fux/gitutil.py::open_pr_branch",
@@ -2593,7 +2593,7 @@
       "file": "fux/gitutil.py",
       "line": 88,
       "community": 1,
-      "centrality": 0.002556
+      "centrality": 0.002551
     },
     {
       "id": "fux/gitutil.py::diff_since",
@@ -2602,7 +2602,7 @@
       "file": "fux/gitutil.py",
       "line": 120,
       "community": 1,
-      "centrality": 0.001152
+      "centrality": 0.00115
     },
     {
       "id": "fux/globs.py",
@@ -2610,7 +2610,7 @@
       "type": "code-file",
       "file": "fux/globs.py",
       "community": 11,
-      "centrality": 0.001256
+      "centrality": 0.001252
     },
     {
       "id": "fux/globs.py::_regex",
@@ -2619,7 +2619,7 @@
       "file": "fux/globs.py",
       "line": 12,
       "community": 11,
-      "centrality": 0.000955
+      "centrality": 0.000952
     },
     {
       "id": "fux/globs.py::match",
@@ -2628,7 +2628,7 @@
       "file": "fux/globs.py",
       "line": 33,
       "community": 11,
-      "centrality": 0.001256
+      "centrality": 0.001252
     },
     {
       "id": "fux/globs.py::match_any",
@@ -2637,7 +2637,7 @@
       "file": "fux/globs.py",
       "line": 37,
       "community": 1,
-      "centrality": 0.00177
+      "centrality": 0.001765
     },
     {
       "id": "fux/governance.py",
@@ -2645,7 +2645,7 @@
       "type": "code-file",
       "file": "fux/governance.py",
       "community": 1,
-      "centrality": 0.001174
+      "centrality": 0.001171
     },
     {
       "id": "fux/governance.py::_age_days",
@@ -2654,7 +2654,7 @@
       "file": "fux/governance.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.000887
+      "centrality": 0.000885
     },
     {
       "id": "fux/governance.py::ttl",
@@ -2663,7 +2663,7 @@
       "file": "fux/governance.py",
       "line": 25,
       "community": 1,
-      "centrality": 0.001084
+      "centrality": 0.001081
     },
     {
       "id": "fux/governance.py::is_decayed",
@@ -2672,7 +2672,7 @@
       "file": "fux/governance.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.001385
+      "centrality": 0.001381
     },
     {
       "id": "fux/governance.py::for_context",
@@ -2681,7 +2681,7 @@
       "file": "fux/governance.py",
       "line": 48,
       "community": 1,
-      "centrality": 0.001005
+      "centrality": 0.001003
     },
     {
       "id": "fux/graph.py",
@@ -2689,7 +2689,7 @@
       "type": "code-file",
       "file": "fux/graph.py",
       "community": 1,
-      "centrality": 0.002166
+      "centrality": 0.002163
     },
     {
       "id": "fux/graph.py::_stamp_confidence",
@@ -2698,7 +2698,7 @@
       "file": "fux/graph.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.000745
+      "centrality": 0.000743
     },
     {
       "id": "fux/graph.py::_iter_sources",
@@ -2707,7 +2707,7 @@
       "file": "fux/graph.py",
       "line": 37,
       "community": 1,
-      "centrality": 0.000837
+      "centrality": 0.000835
     },
     {
       "id": "fux/graph.py::build",
@@ -2725,7 +2725,7 @@
       "file": "fux/graph.py",
       "line": 90,
       "community": 1,
-      "centrality": 0.000958
+      "centrality": 0.000956
     },
     {
       "id": "fux/graph.py::_crossfile_calls",
@@ -2734,7 +2734,7 @@
       "file": "fux/graph.py",
       "line": 98,
       "community": 1,
-      "centrality": 0.001468
+      "centrality": 0.001465
     },
     {
       "id": "fux/graph.py::_xref",
@@ -2743,7 +2743,7 @@
       "file": "fux/graph.py",
       "line": 123,
       "community": 1,
-      "centrality": 0.00137
+      "centrality": 0.001367
     },
     {
       "id": "fux/graph.py::_drift_of",
@@ -2752,7 +2752,7 @@
       "file": "fux/graph.py",
       "line": 140,
       "community": 1,
-      "centrality": 0.000969
+      "centrality": 0.000967
     },
     {
       "id": "fux/graph.py::_add_knowledge",
@@ -2761,7 +2761,7 @@
       "file": "fux/graph.py",
       "line": 155,
       "community": 1,
-      "centrality": 0.00129
+      "centrality": 0.001287
     },
     {
       "id": "fux/graph.py::to_json",
@@ -2770,7 +2770,7 @@
       "file": "fux/graph.py",
       "line": 179,
       "community": 1,
-      "centrality": 0.000687
+      "centrality": 0.000686
     },
     {
       "id": "fux/graphhtml.py",
@@ -2778,7 +2778,7 @@
       "type": "code-file",
       "file": "fux/graphhtml.py",
       "community": 1,
-      "centrality": 0.000773
+      "centrality": 0.000772
     },
     {
       "id": "fux/graphhtml.py::render",
@@ -2787,7 +2787,7 @@
       "file": "fux/graphhtml.py",
       "line": 10,
       "community": 1,
-      "centrality": 0.00304
+      "centrality": 0.003041
     },
     {
       "id": "fux/graphquery.py",
@@ -2795,7 +2795,7 @@
       "type": "code-file",
       "file": "fux/graphquery.py",
       "community": 1,
-      "centrality": 0.002371
+      "centrality": 0.002366
     },
     {
       "id": "fux/graphquery.py::load",
@@ -2804,7 +2804,7 @@
       "file": "fux/graphquery.py",
       "line": 15,
       "community": 1,
-      "centrality": 0.005554
+      "centrality": 0.005549
     },
     {
       "id": "fux/graphquery.py::_adj",
@@ -2813,7 +2813,7 @@
       "file": "fux/graphquery.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.001104
+      "centrality": 0.001101
     },
     {
       "id": "fux/graphquery.py::_wadj",
@@ -2822,7 +2822,7 @@
       "file": "fux/graphquery.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.000784
+      "centrality": 0.000782
     },
     {
       "id": "fux/graphquery.py::find",
@@ -2831,7 +2831,7 @@
       "file": "fux/graphquery.py",
       "line": 44,
       "community": 1,
-      "centrality": 0.000975
+      "centrality": 0.000973
     },
     {
       "id": "fux/graphquery.py::score_nodes",
@@ -2840,7 +2840,7 @@
       "file": "fux/graphquery.py",
       "line": 55,
       "community": 1,
-      "centrality": 0.000708
+      "centrality": 0.000706
     },
     {
       "id": "fux/graphquery.py::neighbors",
@@ -2849,7 +2849,7 @@
       "file": "fux/graphquery.py",
       "line": 76,
       "community": 1,
-      "centrality": 0.001148
+      "centrality": 0.001145
     },
     {
       "id": "fux/graphquery.py::shortest_path",
@@ -2858,7 +2858,7 @@
       "file": "fux/graphquery.py",
       "line": 86,
       "community": 1,
-      "centrality": 0.000752
+      "centrality": 0.00075
     },
     {
       "id": "fux/graphquery.py::god_nodes",
@@ -2867,7 +2867,7 @@
       "file": "fux/graphquery.py",
       "line": 105,
       "community": 1,
-      "centrality": 0.000626
+      "centrality": 0.000624
     },
     {
       "id": "fux/graphquery.py::pagerank",
@@ -2876,7 +2876,7 @@
       "file": "fux/graphquery.py",
       "line": 115,
       "community": 1,
-      "centrality": 0.001195
+      "centrality": 0.001192
     },
     {
       "id": "fux/graphquery.py::chokepoints",
@@ -2885,7 +2885,7 @@
       "file": "fux/graphquery.py",
       "line": 144,
       "community": 1,
-      "centrality": 0.000822
+      "centrality": 0.00082
     },
     {
       "id": "fux/hookinstall.py",
@@ -2893,7 +2893,7 @@
       "type": "code-file",
       "file": "fux/hookinstall.py",
       "community": 1,
-      "centrality": 0.00148
+      "centrality": 0.001476
     },
     {
       "id": "fux/hookinstall.py::_install_git",
@@ -2902,7 +2902,7 @@
       "file": "fux/hookinstall.py",
       "line": 40,
       "community": 1,
-      "centrality": 0.001083
+      "centrality": 0.00108
     },
     {
       "id": "fux/hookinstall.py::install",
@@ -2911,7 +2911,7 @@
       "file": "fux/hookinstall.py",
       "line": 57,
       "community": 1,
-      "centrality": 0.001111
+      "centrality": 0.001108
     },
     {
       "id": "fux/hookinstall.py::uninstall",
@@ -2920,7 +2920,7 @@
       "file": "fux/hookinstall.py",
       "line": 68,
       "community": 1,
-      "centrality": 0.001043
+      "centrality": 0.00104
     },
     {
       "id": "fux/hookinstall.py::status",
@@ -2929,7 +2929,7 @@
       "file": "fux/hookinstall.py",
       "line": 86,
       "community": 1,
-      "centrality": 0.001302
+      "centrality": 0.001298
     },
     {
       "id": "fux/hookio.py",
@@ -2937,7 +2937,7 @@
       "type": "code-file",
       "file": "fux/hookio.py",
       "community": 1,
-      "centrality": 0.000859
+      "centrality": 0.000857
     },
     {
       "id": "fux/hookio.py::event",
@@ -2946,7 +2946,7 @@
       "file": "fux/hookio.py",
       "line": 11,
       "community": 1,
-      "centrality": 0.001433
+      "centrality": 0.00143
     },
     {
       "id": "fux/hookio.py::root_of",
@@ -2955,7 +2955,7 @@
       "file": "fux/hookio.py",
       "line": 18,
       "community": 1,
-      "centrality": 0.001433
+      "centrality": 0.00143
     },
     {
       "id": "fux/hookio.py::mode_of",
@@ -2964,7 +2964,7 @@
       "file": "fux/hookio.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.001465
+      "centrality": 0.001463
     },
     {
       "id": "fux/hookio.py::edited_rel",
@@ -2973,7 +2973,7 @@
       "file": "fux/hookio.py",
       "line": 26,
       "community": 1,
-      "centrality": 0.001018
+      "centrality": 0.001016
     },
     {
       "id": "fux/hooks.py",
@@ -2981,7 +2981,7 @@
       "type": "code-file",
       "file": "fux/hooks.py",
       "community": 1,
-      "centrality": 0.002009
+      "centrality": 0.002004
     },
     {
       "id": "fux/hooks.py::_debug_trace",
@@ -2990,7 +2990,7 @@
       "file": "fux/hooks.py",
       "line": 19,
       "community": 1,
-      "centrality": 0.002171
+      "centrality": 0.002166
     },
     {
       "id": "fux/hooks.py::session_start",
@@ -2999,7 +2999,7 @@
       "file": "fux/hooks.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.00226
+      "centrality": 0.002256
     },
     {
       "id": "fux/hooks.py::post_tool_use",
@@ -3008,7 +3008,7 @@
       "file": "fux/hooks.py",
       "line": 39,
       "community": 1,
-      "centrality": 0.000937
+      "centrality": 0.000935
     },
     {
       "id": "fux/hooks.py::_post_tool_use",
@@ -3017,7 +3017,7 @@
       "file": "fux/hooks.py",
       "line": 47,
       "community": 1,
-      "centrality": 0.002261
+      "centrality": 0.002256
     },
     {
       "id": "fux/hooks.py::stop",
@@ -3026,7 +3026,7 @@
       "file": "fux/hooks.py",
       "line": 68,
       "community": 1,
-      "centrality": 0.000891
+      "centrality": 0.000888
     },
     {
       "id": "fux/hooks.py::_stop",
@@ -3035,7 +3035,7 @@
       "file": "fux/hooks.py",
       "line": 79,
       "community": 1,
-      "centrality": 0.005424
+      "centrality": 0.005414
     },
     {
       "id": "fux/hooks.py::_emit_drift_prompts",
@@ -3044,7 +3044,7 @@
       "file": "fux/hooks.py",
       "line": 108,
       "community": 1,
-      "centrality": 0.001378
+      "centrality": 0.001375
     },
     {
       "id": "fux/hooks.py::session_end_propose",
@@ -3053,7 +3053,7 @@
       "file": "fux/hooks.py",
       "line": 120,
       "community": 1,
-      "centrality": 0.001932
+      "centrality": 0.001928
     },
     {
       "id": "fux/hooks.py::user_prompt_recall",
@@ -3062,7 +3062,7 @@
       "file": "fux/hooks.py",
       "line": 139,
       "community": 1,
-      "centrality": 0.000888
+      "centrality": 0.000886
     },
     {
       "id": "fux/hooks.py::_user_prompt_recall",
@@ -3071,7 +3071,7 @@
       "file": "fux/hooks.py",
       "line": 147,
       "community": 1,
-      "centrality": 0.0028
+      "centrality": 0.002795
     },
     {
       "id": "fux/hooks.py::_emit_recall_receipt",
@@ -3080,7 +3080,7 @@
       "file": "fux/hooks.py",
       "line": 165,
       "community": 1,
-      "centrality": 0.001719
+      "centrality": 0.001715
     },
     {
       "id": "fux/howto.py",
@@ -3088,7 +3088,7 @@
       "type": "code-file",
       "file": "fux/howto.py",
       "community": 1,
-      "centrality": 0.001474
+      "centrality": 0.001471
     },
     {
       "id": "fux/howto.py::_corpus",
@@ -3097,7 +3097,7 @@
       "file": "fux/howto.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.000948
+      "centrality": 0.000945
     },
     {
       "id": "fux/howto.py::answer",
@@ -3106,7 +3106,7 @@
       "file": "fux/howto.py",
       "line": 62,
       "community": 1,
-      "centrality": 0.001267
+      "centrality": 0.001264
     },
     {
       "id": "fux/howto.py::render",
@@ -3115,7 +3115,7 @@
       "file": "fux/howto.py",
       "line": 78,
       "community": 1,
-      "centrality": 0.002789
+      "centrality": 0.00279
     },
     {
       "id": "fux/howto.py::explain_prompt",
@@ -3124,7 +3124,7 @@
       "file": "fux/howto.py",
       "line": 92,
       "community": 1,
-      "centrality": 0.00052
+      "centrality": 0.000519
     },
     {
       "id": "fux/hybrid.py",
@@ -3132,7 +3132,7 @@
       "type": "code-file",
       "file": "fux/hybrid.py",
       "community": 1,
-      "centrality": 0.00108
+      "centrality": 0.001077
     },
     {
       "id": "fux/hybrid.py::fuse",
@@ -3141,7 +3141,7 @@
       "file": "fux/hybrid.py",
       "line": 20,
       "community": 1,
-      "centrality": 0.001386
+      "centrality": 0.001382
     },
     {
       "id": "fux/hybrid.py::_rrf",
@@ -3150,7 +3150,7 @@
       "file": "fux/hybrid.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.000828
+      "centrality": 0.000826
     },
     {
       "id": "fux/hybrid.py::_semantic_ranking",
@@ -3159,7 +3159,7 @@
       "file": "fux/hybrid.py",
       "line": 54,
       "community": 1,
-      "centrality": 0.000901
+      "centrality": 0.000898
     },
     {
       "id": "fux/hybrid.py::_graph_ranking",
@@ -3168,7 +3168,7 @@
       "file": "fux/hybrid.py",
       "line": 62,
       "community": 1,
-      "centrality": 0.001595
+      "centrality": 0.001592
     },
     {
       "id": "fux/impact.py",
@@ -3176,7 +3176,7 @@
       "type": "code-file",
       "file": "fux/impact.py",
       "community": 1,
-      "centrality": 0.002234
+      "centrality": 0.00223
     },
     {
       "id": "fux/impact.py::Impact",
@@ -3185,7 +3185,7 @@
       "file": "fux/impact.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.000509
+      "centrality": 0.000508
     },
     {
       "id": "fux/impact.py::_norm",
@@ -3194,7 +3194,7 @@
       "file": "fux/impact.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.000568
+      "centrality": 0.000566
     },
     {
       "id": "fux/impact.py::run",
@@ -3203,7 +3203,7 @@
       "file": "fux/impact.py",
       "line": 36,
       "community": 1,
-      "centrality": 0.005611
+      "centrality": 0.005606
     },
     {
       "id": "fux/impact.py::render",
@@ -3221,7 +3221,7 @@
       "file": "fux/impact.py",
       "line": 28,
       "community": 1,
-      "centrality": 0.000392
+      "centrality": 0.000391
     },
     {
       "id": "fux/impact.py::section",
@@ -3230,7 +3230,7 @@
       "file": "fux/impact.py",
       "line": 79,
       "community": 1,
-      "centrality": 0.000863
+      "centrality": 0.000862
     },
     {
       "id": "fux/importer.py",
@@ -3238,7 +3238,7 @@
       "type": "code-file",
       "file": "fux/importer.py",
       "community": 1,
-      "centrality": 0.00135
+      "centrality": 0.001346
     },
     {
       "id": "fux/importer.py::slugify",
@@ -3247,7 +3247,7 @@
       "file": "fux/importer.py",
       "line": 18,
       "community": 1,
-      "centrality": 0.000848
+      "centrality": 0.000846
     },
     {
       "id": "fux/importer.py::_today",
@@ -3256,7 +3256,7 @@
       "file": "fux/importer.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.001224
+      "centrality": 0.00122
     },
     {
       "id": "fux/importer.py::_iter_md",
@@ -3265,7 +3265,7 @@
       "file": "fux/importer.py",
       "line": 26,
       "community": 1,
-      "centrality": 0.000665
+      "centrality": 0.000663
     },
     {
       "id": "fux/importer.py::import_docs",
@@ -3274,7 +3274,7 @@
       "file": "fux/importer.py",
       "line": 35,
       "community": 1,
-      "centrality": 0.002256
+      "centrality": 0.00225
     },
     {
       "id": "fux/importer.py::import_memory",
@@ -3283,7 +3283,7 @@
       "file": "fux/importer.py",
       "line": 59,
       "community": 1,
-      "centrality": 0.002162
+      "centrality": 0.002156
     },
     {
       "id": "fux/index.py",
@@ -3291,7 +3291,7 @@
       "type": "code-file",
       "file": "fux/index.py",
       "community": 1,
-      "centrality": 0.000881
+      "centrality": 0.000879
     },
     {
       "id": "fux/index.py::render_index",
@@ -3300,7 +3300,7 @@
       "file": "fux/index.py",
       "line": 9,
       "community": 1,
-      "centrality": 0.001102
+      "centrality": 0.001103
     },
     {
       "id": "fux/index.py::render_json",
@@ -3309,7 +3309,7 @@
       "file": "fux/index.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.001189
+      "centrality": 0.001187
     },
     {
       "id": "fux/index.py::_entry",
@@ -3318,7 +3318,7 @@
       "file": "fux/index.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.001017
+      "centrality": 0.001014
     },
     {
       "id": "fux/ingest.py",
@@ -3326,7 +3326,7 @@
       "type": "code-file",
       "file": "fux/ingest.py",
       "community": 1,
-      "centrality": 0.000867
+      "centrality": 0.000864
     },
     {
       "id": "fux/ingest.py::source_hash",
@@ -3335,7 +3335,7 @@
       "file": "fux/ingest.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.00064
+      "centrality": 0.000639
     },
     {
       "id": "fux/ingest.py::recheck",
@@ -3344,7 +3344,7 @@
       "file": "fux/ingest.py",
       "line": 28,
       "community": 1,
-      "centrality": 0.002493
+      "centrality": 0.002487
     },
     {
       "id": "fux/ingest.py::recheck_cmd",
@@ -3353,7 +3353,7 @@
       "file": "fux/ingest.py",
       "line": 58,
       "community": 1,
-      "centrality": 0.00094
+      "centrality": 0.000938
     },
     {
       "id": "fux/ingestconnector.py",
@@ -3361,7 +3361,7 @@
       "type": "code-file",
       "file": "fux/ingestconnector.py",
       "community": 1,
-      "centrality": 0.001638
+      "centrality": 0.001633
     },
     {
       "id": "fux/ingestconnector.py::ConnectorError",
@@ -3370,7 +3370,7 @@
       "file": "fux/ingestconnector.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.001273
+      "centrality": 0.001269
     },
     {
       "id": "fux/ingestconnector.py::Plan",
@@ -3379,7 +3379,7 @@
       "file": "fux/ingestconnector.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.000772
+      "centrality": 0.00077
     },
     {
       "id": "fux/ingestconnector.py::_is_unbounded",
@@ -3388,7 +3388,7 @@
       "file": "fux/ingestconnector.py",
       "line": 40,
       "community": 1,
-      "centrality": 0.00094
+      "centrality": 0.000937
     },
     {
       "id": "fux/ingestconnector.py::plan",
@@ -3397,7 +3397,7 @@
       "file": "fux/ingestconnector.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.002063
+      "centrality": 0.002057
     },
     {
       "id": "fux/ingestconnector.py::describe",
@@ -3406,7 +3406,7 @@
       "file": "fux/ingestconnector.py",
       "line": 34,
       "community": 1,
-      "centrality": 0.000656
+      "centrality": 0.000654
     },
     {
       "id": "fux/ingestfollow.py",
@@ -3414,7 +3414,7 @@
       "type": "code-file",
       "file": "fux/ingestfollow.py",
       "community": 12,
-      "centrality": 0.001895
+      "centrality": 0.00189
     },
     {
       "id": "fux/ingestfollow.py::FollowError",
@@ -3423,7 +3423,7 @@
       "file": "fux/ingestfollow.py",
       "line": 29,
       "community": 12,
-      "centrality": 0.000837
+      "centrality": 0.000835
     },
     {
       "id": "fux/ingestfollow.py::is_direct_file",
@@ -3432,7 +3432,7 @@
       "file": "fux/ingestfollow.py",
       "line": 33,
       "community": 12,
-      "centrality": 0.001239
+      "centrality": 0.001235
     },
     {
       "id": "fux/ingestfollow.py::discover",
@@ -3441,7 +3441,7 @@
       "file": "fux/ingestfollow.py",
       "line": 39,
       "community": 12,
-      "centrality": 0.001917
+      "centrality": 0.001912
     },
     {
       "id": "fux/ingestfollow.py::_ext",
@@ -3450,7 +3450,7 @@
       "file": "fux/ingestfollow.py",
       "line": 63,
       "community": 12,
-      "centrality": 0.001188
+      "centrality": 0.001185
     },
     {
       "id": "fux/ingestfollow.py::_is_spec",
@@ -3459,7 +3459,7 @@
       "file": "fux/ingestfollow.py",
       "line": 68,
       "community": 12,
-      "centrality": 0.001188
+      "centrality": 0.001185
     },
     {
       "id": "fux/ingestqueue.py",
@@ -3467,7 +3467,7 @@
       "type": "code-file",
       "file": "fux/ingestqueue.py",
       "community": 1,
-      "centrality": 0.003472
+      "centrality": 0.003464
     },
     {
       "id": "fux/ingestqueue.py::Item",
@@ -3476,7 +3476,7 @@
       "file": "fux/ingestqueue.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.000576
+      "centrality": 0.000574
     },
     {
       "id": "fux/ingestqueue.py::classify_type",
@@ -3485,7 +3485,7 @@
       "file": "fux/ingestqueue.py",
       "line": 42,
       "community": 1,
-      "centrality": 0.000712
+      "centrality": 0.00071
     },
     {
       "id": "fux/ingestqueue.py::expand_sources",
@@ -3494,7 +3494,7 @@
       "file": "fux/ingestqueue.py",
       "line": 50,
       "community": 1,
-      "centrality": 0.00096
+      "centrality": 0.000958
     },
     {
       "id": "fux/ingestqueue.py::path_of",
@@ -3503,7 +3503,7 @@
       "file": "fux/ingestqueue.py",
       "line": 63,
       "community": 1,
-      "centrality": 0.001167
+      "centrality": 0.001164
     },
     {
       "id": "fux/ingestqueue.py::read",
@@ -3512,7 +3512,7 @@
       "file": "fux/ingestqueue.py",
       "line": 67,
       "community": 1,
-      "centrality": 0.00239
+      "centrality": 0.002385
     },
     {
       "id": "fux/ingestqueue.py::upsert",
@@ -3521,7 +3521,7 @@
       "file": "fux/ingestqueue.py",
       "line": 81,
       "community": 1,
-      "centrality": 0.000727
+      "centrality": 0.000726
     },
     {
       "id": "fux/ingestqueue.py::write",
@@ -3530,7 +3530,7 @@
       "file": "fux/ingestqueue.py",
       "line": 92,
       "community": 1,
-      "centrality": 0.002279
+      "centrality": 0.002274
     },
     {
       "id": "fux/ingestqueue.py::render",
@@ -3548,7 +3548,7 @@
       "file": "fux/ingestqueue.py",
       "line": 113,
       "community": 1,
-      "centrality": 0.000614
+      "centrality": 0.000612
     },
     {
       "id": "fux/ingestqueue.py::_cell",
@@ -3557,7 +3557,7 @@
       "file": "fux/ingestqueue.py",
       "line": 116,
       "community": 1,
-      "centrality": 0.000666
+      "centrality": 0.000664
     },
     {
       "id": "fux/ingestqueue.py::_uncell",
@@ -3566,7 +3566,7 @@
       "file": "fux/ingestqueue.py",
       "line": 119,
       "community": 1,
-      "centrality": 0.000615
+      "centrality": 0.000613
     },
     {
       "id": "fux/ingestqueue.py::row",
@@ -3575,7 +3575,7 @@
       "file": "fux/ingestqueue.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.000892
+      "centrality": 0.00089
     },
     {
       "id": "fux/ingestreduce.py",
@@ -3583,7 +3583,7 @@
       "type": "code-file",
       "file": "fux/ingestreduce.py",
       "community": 13,
-      "centrality": 0.002844
+      "centrality": 0.002835
     },
     {
       "id": "fux/ingestreduce.py::reduce",
@@ -3592,7 +3592,7 @@
       "file": "fux/ingestreduce.py",
       "line": 27,
       "community": 13,
-      "centrality": 0.0028
+      "centrality": 0.002792
     },
     {
       "id": "fux/ingestreduce.py::changed_sections",
@@ -3601,7 +3601,7 @@
       "file": "fux/ingestreduce.py",
       "line": 45,
       "community": 14,
-      "centrality": 0.00155
+      "centrality": 0.001546
     },
     {
       "id": "fux/ingestreduce.py::_slice_prose",
@@ -3610,7 +3610,7 @@
       "file": "fux/ingestreduce.py",
       "line": 53,
       "community": 13,
-      "centrality": 0.001426
+      "centrality": 0.001421
     },
     {
       "id": "fux/ingestreduce.py::_slice_grid",
@@ -3619,7 +3619,7 @@
       "file": "fux/ingestreduce.py",
       "line": 60,
       "community": 13,
-      "centrality": 0.001106
+      "centrality": 0.001103
     },
     {
       "id": "fux/ingestreduce.py::_slice_contract",
@@ -3628,7 +3628,7 @@
       "file": "fux/ingestreduce.py",
       "line": 74,
       "community": 13,
-      "centrality": 0.000951
+      "centrality": 0.000948
     },
     {
       "id": "fux/ingestreduce.py::_strip_boilerplate",
@@ -3637,7 +3637,7 @@
       "file": "fux/ingestreduce.py",
       "line": 87,
       "community": 13,
-      "centrality": 0.000717
+      "centrality": 0.000715
     },
     {
       "id": "fux/ingestreduce.py::_has_signal",
@@ -3646,7 +3646,7 @@
       "file": "fux/ingestreduce.py",
       "line": 103,
       "community": 13,
-      "centrality": 0.001377
+      "centrality": 0.001373
     },
     {
       "id": "fux/ingestreduce.py::_is_heading",
@@ -3655,7 +3655,7 @@
       "file": "fux/ingestreduce.py",
       "line": 107,
       "community": 13,
-      "centrality": 0.000722
+      "centrality": 0.000719
     },
     {
       "id": "fux/ingestreduce.py::_norm",
@@ -3664,7 +3664,7 @@
       "file": "fux/ingestreduce.py",
       "line": 112,
       "community": 14,
-      "centrality": 0.001395
+      "centrality": 0.001391
     },
     {
       "id": "fux/ingestreduce.py::_stats",
@@ -3673,7 +3673,7 @@
       "file": "fux/ingestreduce.py",
       "line": 116,
       "community": 13,
-      "centrality": 0.000955
+      "centrality": 0.000952
     },
     {
       "id": "fux/initcmd.py",
@@ -3681,7 +3681,7 @@
       "type": "code-file",
       "file": "fux/initcmd.py",
       "community": 1,
-      "centrality": 0.002133
+      "centrality": 0.002128
     },
     {
       "id": "fux/initcmd.py::run",
@@ -3690,7 +3690,7 @@
       "file": "fux/initcmd.py",
       "line": 48,
       "community": 1,
-      "centrality": 0.005759
+      "centrality": 0.005752
     },
     {
       "id": "fux/initcmd.py::_gitignore",
@@ -3699,7 +3699,7 @@
       "file": "fux/initcmd.py",
       "line": 67,
       "community": 1,
-      "centrality": 0.000554
+      "centrality": 0.000552
     },
     {
       "id": "fux/initcmd.py::_claude_pointer",
@@ -3708,7 +3708,7 @@
       "file": "fux/initcmd.py",
       "line": 80,
       "community": 1,
-      "centrality": 0.000786
+      "centrality": 0.000784
     },
     {
       "id": "fux/initcmd.py::_agents_pointer",
@@ -3717,7 +3717,7 @@
       "file": "fux/initcmd.py",
       "line": 86,
       "community": 1,
-      "centrality": 0.000786
+      "centrality": 0.000784
     },
     {
       "id": "fux/initcmd.py::_copilot_pointer",
@@ -3726,7 +3726,7 @@
       "file": "fux/initcmd.py",
       "line": 93,
       "community": 1,
-      "centrality": 0.000786
+      "centrality": 0.000784
     },
     {
       "id": "fux/initcmd.py::_copilot_prompts",
@@ -3735,7 +3735,7 @@
       "file": "fux/initcmd.py",
       "line": 101,
       "community": 1,
-      "centrality": 0.000763
+      "centrality": 0.000761
     },
     {
       "id": "fux/initcmd.py::_write_pointer",
@@ -3744,7 +3744,7 @@
       "file": "fux/initcmd.py",
       "line": 116,
       "community": 1,
-      "centrality": 0.001093
+      "centrality": 0.00109
     },
     {
       "id": "fux/lint.py",
@@ -3752,7 +3752,7 @@
       "type": "code-file",
       "file": "fux/lint.py",
       "community": 1,
-      "centrality": 0.001775
+      "centrality": 0.001771
     },
     {
       "id": "fux/lint.py::run",
@@ -3761,7 +3761,7 @@
       "file": "fux/lint.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.005644
+      "centrality": 0.005638
     },
     {
       "id": "fux/lint.py::_spans",
@@ -3770,7 +3770,7 @@
       "file": "fux/lint.py",
       "line": 44,
       "community": 1,
-      "centrality": 0.00079
+      "centrality": 0.000788
     },
     {
       "id": "fux/lint.py::_linked",
@@ -3779,7 +3779,7 @@
       "file": "fux/lint.py",
       "line": 57,
       "community": 1,
-      "centrality": 0.00077
+      "centrality": 0.000768
     },
     {
       "id": "fux/lint.py::_overlaps",
@@ -3788,7 +3788,7 @@
       "file": "fux/lint.py",
       "line": 64,
       "community": 1,
-      "centrality": 0.001355
+      "centrality": 0.001352
     },
     {
       "id": "fux/lint.py::_verify_source_candidates",
@@ -3797,7 +3797,7 @@
       "file": "fux/lint.py",
       "line": 84,
       "community": 1,
-      "centrality": 0.000848
+      "centrality": 0.000846
     },
     {
       "id": "fux/lint.py::_lint_one",
@@ -3806,7 +3806,7 @@
       "file": "fux/lint.py",
       "line": 102,
       "community": 1,
-      "centrality": 0.001019
+      "centrality": 0.001017
     },
     {
       "id": "fux/loader.py",
@@ -3814,7 +3814,7 @@
       "type": "code-file",
       "file": "fux/loader.py",
       "community": 1,
-      "centrality": 0.000882
+      "centrality": 0.00088
     },
     {
       "id": "fux/loader.py::load_dir",
@@ -3823,7 +3823,7 @@
       "file": "fux/loader.py",
       "line": 14,
       "community": 1,
-      "centrality": 0.001743
+      "centrality": 0.00174
     },
     {
       "id": "fux/loader.py::_source_dirs",
@@ -3832,7 +3832,7 @@
       "file": "fux/loader.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.000683
+      "centrality": 0.000681
     },
     {
       "id": "fux/loader.py::resolve",
@@ -3841,7 +3841,7 @@
       "file": "fux/loader.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.006268
+      "centrality": 0.006261
     },
     {
       "id": "fux/loader.py::load_all_layers",
@@ -3850,7 +3850,7 @@
       "file": "fux/loader.py",
       "line": 51,
       "community": 1,
-      "centrality": 0.00242
+      "centrality": 0.002416
     },
     {
       "id": "fux/mcpserver.py",
@@ -3858,7 +3858,7 @@
       "type": "code-file",
       "file": "fux/mcpserver.py",
       "community": 1,
-      "centrality": 0.001465
+      "centrality": 0.001462
     },
     {
       "id": "fux/mcpserver.py::_root",
@@ -3867,7 +3867,7 @@
       "file": "fux/mcpserver.py",
       "line": 83,
       "community": 1,
-      "centrality": 0.000695
+      "centrality": 0.000694
     },
     {
       "id": "fux/mcpserver.py::_call",
@@ -3876,7 +3876,7 @@
       "file": "fux/mcpserver.py",
       "line": 90,
       "community": 1,
-      "centrality": 0.006316
+      "centrality": 0.006311
     },
     {
       "id": "fux/mcpserver.py::_graph_query",
@@ -3885,7 +3885,7 @@
       "file": "fux/mcpserver.py",
       "line": 133,
       "community": 1,
-      "centrality": 0.003118
+      "centrality": 0.003114
     },
     {
       "id": "fux/mcpserver.py::_handle",
@@ -3894,7 +3894,7 @@
       "file": "fux/mcpserver.py",
       "line": 155,
       "community": 1,
-      "centrality": 0.002
+      "centrality": 0.001994
     },
     {
       "id": "fux/mcpserver.py::_ok",
@@ -3903,7 +3903,7 @@
       "file": "fux/mcpserver.py",
       "line": 180,
       "community": 1,
-      "centrality": 0.001265
+      "centrality": 0.001262
     },
     {
       "id": "fux/mcpserver.py::_err",
@@ -3912,7 +3912,7 @@
       "file": "fux/mcpserver.py",
       "line": 184,
       "community": 1,
-      "centrality": 0.000585
+      "centrality": 0.000584
     },
     {
       "id": "fux/mcpserver.py::serve",
@@ -3921,7 +3921,7 @@
       "file": "fux/mcpserver.py",
       "line": 188,
       "community": 1,
-      "centrality": 0.001594
+      "centrality": 0.00159
     },
     {
       "id": "fux/mine.py",
@@ -3929,7 +3929,7 @@
       "type": "code-file",
       "file": "fux/mine.py",
       "community": 1,
-      "centrality": 0.001708
+      "centrality": 0.001705
     },
     {
       "id": "fux/mine.py::Candidate",
@@ -3938,7 +3938,7 @@
       "file": "fux/mine.py",
       "line": 28,
       "community": 1,
-      "centrality": 0.000885
+      "centrality": 0.000883
     },
     {
       "id": "fux/mine.py::_iter",
@@ -3947,7 +3947,7 @@
       "file": "fux/mine.py",
       "line": 39,
       "community": 1,
-      "centrality": 0.000937
+      "centrality": 0.000935
     },
     {
       "id": "fux/mine.py::_numbers",
@@ -3956,7 +3956,7 @@
       "file": "fux/mine.py",
       "line": 55,
       "community": 2,
-      "centrality": 0.001083
+      "centrality": 0.00108
     },
     {
       "id": "fux/mine.py::mine",
@@ -3965,7 +3965,7 @@
       "file": "fux/mine.py",
       "line": 75,
       "community": 1,
-      "centrality": 0.001909
+      "centrality": 0.001905
     },
     {
       "id": "fux/mine.py::render",
@@ -3974,7 +3974,7 @@
       "file": "fux/mine.py",
       "line": 91,
       "community": 1,
-      "centrality": 0.002975
+      "centrality": 0.002976
     },
     {
       "id": "fux/mine.py::draft",
@@ -3983,7 +3983,7 @@
       "file": "fux/mine.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.00062
+      "centrality": 0.000618
     },
     {
       "id": "fux/model.py",
@@ -3991,7 +3991,7 @@
       "type": "code-file",
       "file": "fux/model.py",
       "community": 1,
-      "centrality": 0.00313
+      "centrality": 0.003122
     },
     {
       "id": "fux/model.py::Rule",
@@ -4000,7 +4000,7 @@
       "file": "fux/model.py",
       "line": 19,
       "community": 1,
-      "centrality": 0.001039
+      "centrality": 0.001036
     },
     {
       "id": "fux/model.py::RuleSet",
@@ -4009,7 +4009,7 @@
       "file": "fux/model.py",
       "line": 74,
       "community": 1,
-      "centrality": 0.000701
+      "centrality": 0.000699
     },
     {
       "id": "fux/model.py::status",
@@ -4018,7 +4018,7 @@
       "file": "fux/model.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.000904
+      "centrality": 0.000902
     },
     {
       "id": "fux/model.py::domain",
@@ -4027,7 +4027,7 @@
       "file": "fux/model.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.000615
+      "centrality": 0.000613
     },
     {
       "id": "fux/model.py::title",
@@ -4036,7 +4036,7 @@
       "file": "fux/model.py",
       "line": 37,
       "community": 1,
-      "centrality": 0.000812
+      "centrality": 0.00081
     },
     {
       "id": "fux/model.py::code_refs",
@@ -4045,7 +4045,7 @@
       "file": "fux/model.py",
       "line": 53,
       "community": 1,
-      "centrality": 0.000656
+      "centrality": 0.000654
     },
     {
       "id": "fux/model.py::related",
@@ -4054,7 +4054,7 @@
       "file": "fux/model.py",
       "line": 57,
       "community": 1,
-      "centrality": 0.000615
+      "centrality": 0.000613
     },
     {
       "id": "fux/model.py::edges",
@@ -4063,7 +4063,7 @@
       "file": "fux/model.py",
       "line": 60,
       "community": 1,
-      "centrality": 0.002116
+      "centrality": 0.002111
     },
     {
       "id": "fux/model.py::is_active",
@@ -4072,7 +4072,7 @@
       "file": "fux/model.py",
       "line": 65,
       "community": 1,
-      "centrality": 0.000456
+      "centrality": 0.000455
     },
     {
       "id": "fux/model.py::summary",
@@ -4081,7 +4081,7 @@
       "file": "fux/model.py",
       "line": 68,
       "community": 1,
-      "centrality": 0.001079
+      "centrality": 0.001076
     },
     {
       "id": "fux/model.py::by_id",
@@ -4090,7 +4090,7 @@
       "file": "fux/model.py",
       "line": 78,
       "community": 1,
-      "centrality": 0.000754
+      "centrality": 0.000752
     },
     {
       "id": "fux/model.py::active",
@@ -4099,7 +4099,7 @@
       "file": "fux/model.py",
       "line": 81,
       "community": 1,
-      "centrality": 0.001437
+      "centrality": 0.001439
     },
     {
       "id": "fux/narrative.py",
@@ -4107,7 +4107,7 @@
       "type": "code-file",
       "file": "fux/narrative.py",
       "community": 1,
-      "centrality": 0.000774
+      "centrality": 0.000773
     },
     {
       "id": "fux/narrative.py::render",
@@ -4116,7 +4116,7 @@
       "file": "fux/narrative.py",
       "line": 13,
       "community": 1,
-      "centrality": 0.002917
+      "centrality": 0.002919
     },
     {
       "id": "fux/pack.py",
@@ -4124,7 +4124,7 @@
       "type": "code-file",
       "file": "fux/pack.py",
       "community": 1,
-      "centrality": 0.001511
+      "centrality": 0.001506
     },
     {
       "id": "fux/pack.py::line_tokens",
@@ -4133,7 +4133,7 @@
       "file": "fux/pack.py",
       "line": 20,
       "community": 1,
-      "centrality": 0.001223
+      "centrality": 0.00122
     },
     {
       "id": "fux/pack.py::importance",
@@ -4142,7 +4142,7 @@
       "file": "fux/pack.py",
       "line": 25,
       "community": 1,
-      "centrality": 0.000687
+      "centrality": 0.000686
     },
     {
       "id": "fux/pack.py::select",
@@ -4151,7 +4151,7 @@
       "file": "fux/pack.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.001244
+      "centrality": 0.001241
     },
     {
       "id": "fux/pack.py::_knapsack",
@@ -4160,7 +4160,7 @@
       "file": "fux/pack.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.000793
+      "centrality": 0.000791
     },
     {
       "id": "fux/paths.py",
@@ -4168,7 +4168,7 @@
       "type": "code-file",
       "file": "fux/paths.py",
       "community": 1,
-      "centrality": 0.005203
+      "centrality": 0.005189
     },
     {
       "id": "fux/paths.py::claude_home",
@@ -4177,7 +4177,7 @@
       "file": "fux/paths.py",
       "line": 9,
       "community": 1,
-      "centrality": 0.00156
+      "centrality": 0.001556
     },
     {
       "id": "fux/paths.py::codex_home",
@@ -4186,7 +4186,7 @@
       "file": "fux/paths.py",
       "line": 13,
       "community": 1,
-      "centrality": 0.000776
+      "centrality": 0.000774
     },
     {
       "id": "fux/paths.py::global_dir",
@@ -4195,7 +4195,7 @@
       "file": "fux/paths.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.001101
+      "centrality": 0.001098
     },
     {
       "id": "fux/paths.py::packs_dir",
@@ -4204,7 +4204,7 @@
       "file": "fux/paths.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.001101
+      "centrality": 0.001098
     },
     {
       "id": "fux/paths.py::bundled_data_dir",
@@ -4213,7 +4213,7 @@
       "file": "fux/paths.py",
       "line": 26,
       "community": 1,
-      "centrality": 0.001726
+      "centrality": 0.001722
     },
     {
       "id": "fux/paths.py::schema_path",
@@ -4222,7 +4222,7 @@
       "file": "fux/paths.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.001289
+      "centrality": 0.001286
     },
     {
       "id": "fux/paths.py::home_memory_dir",
@@ -4231,7 +4231,7 @@
       "file": "fux/paths.py",
       "line": 41,
       "community": 1,
-      "centrality": 0.001121
+      "centrality": 0.001118
     },
     {
       "id": "fux/paths.py::find_project_root",
@@ -4240,7 +4240,7 @@
       "file": "fux/paths.py",
       "line": 51,
       "community": 1,
-      "centrality": 0.001346
+      "centrality": 0.001343
     },
     {
       "id": "fux/paths.py::Footprint",
@@ -4249,7 +4249,7 @@
       "file": "fux/paths.py",
       "line": 60,
       "community": 1,
-      "centrality": 0.007414
+      "centrality": 0.007405
     },
     {
       "id": "fux/paths.py::__init__",
@@ -4258,7 +4258,7 @@
       "file": "fux/paths.py",
       "line": 63,
       "community": 1,
-      "centrality": 0.000489
+      "centrality": 0.000488
     },
     {
       "id": "fux/paths.py::rules",
@@ -4267,7 +4267,7 @@
       "file": "fux/paths.py",
       "line": 68,
       "community": 1,
-      "centrality": 0.000851
+      "centrality": 0.000848
     },
     {
       "id": "fux/paths.py::glossary",
@@ -4276,7 +4276,7 @@
       "file": "fux/paths.py",
       "line": 72,
       "community": 1,
-      "centrality": 0.000489
+      "centrality": 0.000488
     },
     {
       "id": "fux/paths.py::memory",
@@ -4285,7 +4285,7 @@
       "file": "fux/paths.py",
       "line": 76,
       "community": 1,
-      "centrality": 0.000534
+      "centrality": 0.000533
     },
     {
       "id": "fux/paths.py::decisions",
@@ -4294,7 +4294,7 @@
       "file": "fux/paths.py",
       "line": 80,
       "community": 1,
-      "centrality": 0.000489
+      "centrality": 0.000488
     },
     {
       "id": "fux/paths.py::out",
@@ -4303,7 +4303,7 @@
       "file": "fux/paths.py",
       "line": 85,
       "community": 1,
-      "centrality": 0.000489
+      "centrality": 0.000488
     },
     {
       "id": "fux/paths.py::sessions",
@@ -4312,7 +4312,7 @@
       "file": "fux/paths.py",
       "line": 89,
       "community": 1,
-      "centrality": 0.000489
+      "centrality": 0.000488
     },
     {
       "id": "fux/paths.py::config",
@@ -4321,7 +4321,7 @@
       "file": "fux/paths.py",
       "line": 95,
       "community": 1,
-      "centrality": 0.00054
+      "centrality": 0.000539
     },
     {
       "id": "fux/paths.py::out_file",
@@ -4330,7 +4330,7 @@
       "file": "fux/paths.py",
       "line": 98,
       "community": 1,
-      "centrality": 0.001188
+      "centrality": 0.001185
     },
     {
       "id": "fux/piiscan.py",
@@ -4338,7 +4338,7 @@
       "type": "code-file",
       "file": "fux/piiscan.py",
       "community": 1,
-      "centrality": 0.001844
+      "centrality": 0.00184
     },
     {
       "id": "fux/piiscan.py::is_exempt",
@@ -4347,7 +4347,7 @@
       "file": "fux/piiscan.py",
       "line": 28,
       "community": 1,
-      "centrality": 0.00069
+      "centrality": 0.000688
     },
     {
       "id": "fux/piiscan.py::scan_text",
@@ -4356,7 +4356,7 @@
       "file": "fux/piiscan.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.00069
+      "centrality": 0.000688
     },
     {
       "id": "fux/piiscan.py::scan_file",
@@ -4365,7 +4365,7 @@
       "file": "fux/piiscan.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.001235
+      "centrality": 0.001231
     },
     {
       "id": "fux/piiscan.py::scan",
@@ -4374,7 +4374,7 @@
       "file": "fux/piiscan.py",
       "line": 56,
       "community": 1,
-      "centrality": 0.000972
+      "centrality": 0.000969
     },
     {
       "id": "fux/piiscan.py::render",
@@ -4383,7 +4383,7 @@
       "file": "fux/piiscan.py",
       "line": 65,
       "community": 1,
-      "centrality": 0.00281
+      "centrality": 0.002811
     },
     {
       "id": "fux/proposer.py",
@@ -4391,7 +4391,7 @@
       "type": "code-file",
       "file": "fux/proposer.py",
       "community": 1,
-      "centrality": 0.001311
+      "centrality": 0.001308
     },
     {
       "id": "fux/proposer.py::retro",
@@ -4400,7 +4400,7 @@
       "file": "fux/proposer.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.002085
+      "centrality": 0.002081
     },
     {
       "id": "fux/proposer.py::from_json",
@@ -4409,7 +4409,7 @@
       "file": "fux/proposer.py",
       "line": 36,
       "community": 1,
-      "centrality": 0.000891
+      "centrality": 0.000889
     },
     {
       "id": "fux/proposer.py::gate",
@@ -4418,7 +4418,7 @@
       "file": "fux/proposer.py",
       "line": 42,
       "community": 1,
-      "centrality": 0.00134
+      "centrality": 0.001336
     },
     {
       "id": "fux/proposer.py::_git_why",
@@ -4427,7 +4427,7 @@
       "file": "fux/proposer.py",
       "line": 59,
       "community": 1,
-      "centrality": 0.001036
+      "centrality": 0.001033
     },
     {
       "id": "fux/provenance.py",
@@ -4435,7 +4435,7 @@
       "type": "code-file",
       "file": "fux/provenance.py",
       "community": 1,
-      "centrality": 0.000778
+      "centrality": 0.000776
     },
     {
       "id": "fux/provenance.py::transcript_hash",
@@ -4444,7 +4444,7 @@
       "file": "fux/provenance.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.001062
+      "centrality": 0.001059
     },
     {
       "id": "fux/provenance.py::transcript_path",
@@ -4453,7 +4453,7 @@
       "file": "fux/provenance.py",
       "line": 22,
       "community": 1,
-      "centrality": 0.001232
+      "centrality": 0.001229
     },
     {
       "id": "fux/provenance.py::check_provenance",
@@ -4462,7 +4462,7 @@
       "file": "fux/provenance.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.00127
+      "centrality": 0.001267
     },
     {
       "id": "fux/recall.py",
@@ -4470,7 +4470,7 @@
       "type": "code-file",
       "file": "fux/recall.py",
       "community": 1,
-      "centrality": 0.001493
+      "centrality": 0.00149
     },
     {
       "id": "fux/recall.py::_tokens",
@@ -4479,7 +4479,7 @@
       "file": "fux/recall.py",
       "line": 28,
       "community": 15,
-      "centrality": 0.0023
+      "centrality": 0.002294
     },
     {
       "id": "fux/recall.py::_field_tokens",
@@ -4488,7 +4488,7 @@
       "file": "fux/recall.py",
       "line": 32,
       "community": 15,
-      "centrality": 0.001305
+      "centrality": 0.001302
     },
     {
       "id": "fux/recall.py::run",
@@ -4497,7 +4497,7 @@
       "file": "fux/recall.py",
       "line": 44,
       "community": 1,
-      "centrality": 0.006676
+      "centrality": 0.006669
     },
     {
       "id": "fux/recall.py::expand_terms",
@@ -4506,7 +4506,7 @@
       "file": "fux/recall.py",
       "line": 68,
       "community": 15,
-      "centrality": 0.001565
+      "centrality": 0.001561
     },
     {
       "id": "fux/recall.py::rank",
@@ -4515,7 +4515,7 @@
       "file": "fux/recall.py",
       "line": 91,
       "community": 1,
-      "centrality": 0.001656
+      "centrality": 0.001652
     },
     {
       "id": "fux/recall.py::_bm25f",
@@ -4524,7 +4524,7 @@
       "file": "fux/recall.py",
       "line": 113,
       "community": 1,
-      "centrality": 0.000704
+      "centrality": 0.000702
     },
     {
       "id": "fux/registry.py",
@@ -4532,7 +4532,7 @@
       "type": "code-file",
       "file": "fux/registry.py",
       "community": 1,
-      "centrality": 0.001715
+      "centrality": 0.00171
     },
     {
       "id": "fux/registry.py::Command",
@@ -4541,7 +4541,7 @@
       "file": "fux/registry.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.00102
+      "centrality": 0.001017
     },
     {
       "id": "fux/registry.py::_c",
@@ -4550,7 +4550,7 @@
       "file": "fux/registry.py",
       "line": 25,
       "community": 1,
-      "centrality": 0.00102
+      "centrality": 0.001017
     },
     {
       "id": "fux/registry.py::get",
@@ -4559,7 +4559,7 @@
       "file": "fux/registry.py",
       "line": 125,
       "community": 1,
-      "centrality": 0.027438
+      "centrality": 0.02738
     },
     {
       "id": "fux/registry.py::by_group",
@@ -4568,7 +4568,7 @@
       "file": "fux/registry.py",
       "line": 129,
       "community": 1,
-      "centrality": 0.000879
+      "centrality": 0.000876
     },
     {
       "id": "fux/report.py",
@@ -4576,7 +4576,7 @@
       "type": "code-file",
       "file": "fux/report.py",
       "community": 1,
-      "centrality": 0.001799
+      "centrality": 0.001796
     },
     {
       "id": "fux/report.py::render",
@@ -4585,7 +4585,7 @@
       "file": "fux/report.py",
       "line": 9,
       "community": 1,
-      "centrality": 0.003968
+      "centrality": 0.003966
     },
     {
       "id": "fux/report.py::_types",
@@ -4594,7 +4594,7 @@
       "file": "fux/report.py",
       "line": 25,
       "community": 1,
-      "centrality": 0.000532
+      "centrality": 0.000531
     },
     {
       "id": "fux/report.py::_edges",
@@ -4603,7 +4603,7 @@
       "file": "fux/report.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.00069
+      "centrality": 0.000689
     },
     {
       "id": "fux/report.py::_god",
@@ -4612,7 +4612,7 @@
       "file": "fux/report.py",
       "line": 42,
       "community": 1,
-      "centrality": 0.000956
+      "centrality": 0.000954
     },
     {
       "id": "fux/report.py::_chokepoints",
@@ -4621,7 +4621,7 @@
       "file": "fux/report.py",
       "line": 52,
       "community": 1,
-      "centrality": 0.000923
+      "centrality": 0.000921
     },
     {
       "id": "fux/report.py::_communities",
@@ -4630,7 +4630,7 @@
       "file": "fux/report.py",
       "line": 63,
       "community": 1,
-      "centrality": 0.00069
+      "centrality": 0.000689
     },
     {
       "id": "fux/savings.py",
@@ -4638,7 +4638,7 @@
       "type": "code-file",
       "file": "fux/savings.py",
       "community": 1,
-      "centrality": 0.003754
+      "centrality": 0.00466
     },
     {
       "id": "fux/savings.py::tok",
@@ -4647,7 +4647,7 @@
       "file": "fux/savings.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.000685
+      "centrality": 0.000712
     },
     {
       "id": "fux/savings.py::usd",
@@ -4656,7 +4656,7 @@
       "file": "fux/savings.py",
       "line": 35,
       "community": 1,
-      "centrality": 0.000682
+      "centrality": 0.0007
     },
     {
       "id": "fux/savings.py::fmt_usd",
@@ -4665,7 +4665,7 @@
       "file": "fux/savings.py",
       "line": 41,
       "community": 1,
-      "centrality": 0.000682
+      "centrality": 0.0007
     },
     {
       "id": "fux/savings.py::_read_tokens",
@@ -4674,7 +4674,7 @@
       "file": "fux/savings.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.001324
+      "centrality": 0.001367
     },
     {
       "id": "fux/savings.py::_ref_file",
@@ -4683,7 +4683,7 @@
       "file": "fux/savings.py",
       "line": 53,
       "community": 1,
-      "centrality": 0.001135
+      "centrality": 0.001164
     },
     {
       "id": "fux/savings.py::rule_tokens",
@@ -4692,7 +4692,7 @@
       "file": "fux/savings.py",
       "line": 58,
       "community": 1,
-      "centrality": 0.000957
+      "centrality": 0.000987
     },
     {
       "id": "fux/savings.py::governed",
@@ -4701,7 +4701,7 @@
       "file": "fux/savings.py",
       "line": 63,
       "community": 1,
-      "centrality": 0.001058
+      "centrality": 0.001089
     },
     {
       "id": "fux/savings.py::Lookup",
@@ -4710,7 +4710,7 @@
       "file": "fux/savings.py",
       "line": 80,
       "community": 1,
-      "centrality": 0.000519
+      "centrality": 0.00054
     },
     {
       "id": "fux/savings.py::Report",
@@ -4719,7 +4719,7 @@
       "file": "fux/savings.py",
       "line": 97,
       "community": 1,
-      "centrality": 0.00053
+      "centrality": 0.000552
     },
     {
       "id": "fux/savings.py::_ruleset",
@@ -4728,7 +4728,7 @@
       "file": "fux/savings.py",
       "line": 113,
       "community": 1,
-      "centrality": 0.001845
+      "centrality": 0.001874
     },
     {
       "id": "fux/savings.py::build",
@@ -4737,7 +4737,7 @@
       "file": "fux/savings.py",
       "line": 119,
       "community": 1,
-      "centrality": 0.002854
+      "centrality": 0.002906
     },
     {
       "id": "fux/savings.py::_lookup",
@@ -4746,7 +4746,7 @@
       "file": "fux/savings.py",
       "line": 154,
       "community": 1,
-      "centrality": 0.002793
+      "centrality": 0.002837
     },
     {
       "id": "fux/savings.py::render",
@@ -4755,7 +4755,7 @@
       "file": "fux/savings.py",
       "line": 174,
       "community": 1,
-      "centrality": 0.004291
+      "centrality": 0.004079
     },
     {
       "id": "fux/savings.py::_x",
@@ -4764,7 +4764,25 @@
       "file": "fux/savings.py",
       "line": 213,
       "community": 1,
-      "centrality": 0.000778
+      "centrality": 0.000413
+    },
+    {
+      "id": "fux/savings.py::_compare",
+      "label": "_compare",
+      "type": "function",
+      "file": "fux/savings.py",
+      "line": 217,
+      "community": 1,
+      "centrality": 0.000791
+    },
+    {
+      "id": "fux/savings.py::_delta",
+      "label": "_delta",
+      "type": "function",
+      "file": "fux/savings.py",
+      "line": 230,
+      "community": 1,
+      "centrality": 0.000665
     },
     {
       "id": "fux/savings.py::ratio_first",
@@ -4773,7 +4791,7 @@
       "file": "fux/savings.py",
       "line": 89,
       "community": 1,
-      "centrality": 0.000522
+      "centrality": 0.000413
     },
     {
       "id": "fux/savings.py::ratio_later",
@@ -4782,7 +4800,7 @@
       "file": "fux/savings.py",
       "line": 92,
       "community": 1,
-      "centrality": 0.000522
+      "centrality": 0.000413
     },
     {
       "id": "fux/savings.py::avg_ratio",
@@ -4791,7 +4809,7 @@
       "file": "fux/savings.py",
       "line": 109,
       "community": 1,
-      "centrality": 0.000641
+      "centrality": 0.000534
     },
     {
       "id": "fux/scaffold.py",
@@ -4799,7 +4817,7 @@
       "type": "code-file",
       "file": "fux/scaffold.py",
       "community": 1,
-      "centrality": 0.000716
+      "centrality": 0.000714
     },
     {
       "id": "fux/scaffold.py::make",
@@ -4808,7 +4826,7 @@
       "file": "fux/scaffold.py",
       "line": 31,
       "community": 1,
-      "centrality": 0.001758
+      "centrality": 0.001753
     },
     {
       "id": "fux/scaffold.py::_dir_for",
@@ -4817,7 +4835,7 @@
       "file": "fux/scaffold.py",
       "line": 52,
       "community": 1,
-      "centrality": 0.000827
+      "centrality": 0.000825
     },
     {
       "id": "fux/scalars.py",
@@ -4825,7 +4843,7 @@
       "type": "code-file",
       "file": "fux/scalars.py",
       "community": 16,
-      "centrality": 0.001424
+      "centrality": 0.001419
     },
     {
       "id": "fux/scalars.py::scalar",
@@ -4834,7 +4852,7 @@
       "file": "fux/scalars.py",
       "line": 5,
       "community": 16,
-      "centrality": 0.001523
+      "centrality": 0.001518
     },
     {
       "id": "fux/scalars.py::split_flow",
@@ -4843,7 +4861,7 @@
       "file": "fux/scalars.py",
       "line": 20,
       "community": 16,
-      "centrality": 0.001424
+      "centrality": 0.001419
     },
     {
       "id": "fux/schema.py",
@@ -4851,7 +4869,7 @@
       "type": "code-file",
       "file": "fux/schema.py",
       "community": 1,
-      "centrality": 0.000989
+      "centrality": 0.000987
     },
     {
       "id": "fux/schema.py::_schema",
@@ -4860,7 +4878,7 @@
       "file": "fux/schema.py",
       "line": 13,
       "community": 1,
-      "centrality": 0.000927
+      "centrality": 0.000924
     },
     {
       "id": "fux/schema.py::validate",
@@ -4869,7 +4887,7 @@
       "file": "fux/schema.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.00179
+      "centrality": 0.001785
     },
     {
       "id": "fux/schema.py::_check",
@@ -4878,7 +4896,7 @@
       "file": "fux/schema.py",
       "line": 32,
       "community": 1,
-      "centrality": 0.000827
+      "centrality": 0.000825
     },
     {
       "id": "fux/seal.py",
@@ -4886,7 +4904,7 @@
       "type": "code-file",
       "file": "fux/seal.py",
       "community": 17,
-      "centrality": 0.002198
+      "centrality": 0.002192
     },
     {
       "id": "fux/seal.py::_hash",
@@ -4895,7 +4913,7 @@
       "file": "fux/seal.py",
       "line": 28,
       "community": 17,
-      "centrality": 0.00145
+      "centrality": 0.001446
     },
     {
       "id": "fux/seal.py::_skeleton",
@@ -4904,7 +4922,7 @@
       "file": "fux/seal.py",
       "line": 32,
       "community": 17,
-      "centrality": 0.000859
+      "centrality": 0.000856
     },
     {
       "id": "fux/seal.py::_overlap",
@@ -4913,7 +4931,7 @@
       "file": "fux/seal.py",
       "line": 43,
       "community": 17,
-      "centrality": 0.000859
+      "centrality": 0.000856
     },
     {
       "id": "fux/seal.py::_py_fp",
@@ -4922,7 +4940,7 @@
       "file": "fux/seal.py",
       "line": 51,
       "community": 17,
-      "centrality": 0.002636
+      "centrality": 0.002629
     },
     {
       "id": "fux/seal.py::_brace_fp",
@@ -4931,7 +4949,7 @@
       "file": "fux/seal.py",
       "line": 68,
       "community": 17,
-      "centrality": 0.001434
+      "centrality": 0.00143
     },
     {
       "id": "fux/seal.py::fingerprint",
@@ -4940,7 +4958,7 @@
       "file": "fux/seal.py",
       "line": 75,
       "community": 17,
-      "centrality": 0.001058
+      "centrality": 0.001055
     },
     {
       "id": "fux/seal.py::current",
@@ -4949,7 +4967,7 @@
       "file": "fux/seal.py",
       "line": 80,
       "community": 1,
-      "centrality": 0.00165
+      "centrality": 0.001645
     },
     {
       "id": "fux/seal.py::_write_seal",
@@ -4958,7 +4976,7 @@
       "file": "fux/seal.py",
       "line": 108,
       "community": 1,
-      "centrality": 0.000818
+      "centrality": 0.000816
     },
     {
       "id": "fux/seal.py::stamp",
@@ -4967,7 +4985,7 @@
       "file": "fux/seal.py",
       "line": 129,
       "community": 1,
-      "centrality": 0.001172
+      "centrality": 0.001168
     },
     {
       "id": "fux/selfbuild.py",
@@ -4975,7 +4993,7 @@
       "type": "code-file",
       "file": "fux/selfbuild.py",
       "community": 1,
-      "centrality": 0.001218
+      "centrality": 0.001217
     },
     {
       "id": "fux/selfbuild.py::source_root",
@@ -4984,7 +5002,7 @@
       "file": "fux/selfbuild.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.000819
+      "centrality": 0.000818
     },
     {
       "id": "fux/selfbuild.py::bundle_root",
@@ -4993,7 +5011,7 @@
       "file": "fux/selfbuild.py",
       "line": 38,
       "community": 1,
-      "centrality": 0.000819
+      "centrality": 0.000818
     },
     {
       "id": "fux/selfbuild.py::_build_cfg",
@@ -5011,7 +5029,7 @@
       "file": "fux/selfbuild.py",
       "line": 51,
       "community": 1,
-      "centrality": 0.00309
+      "centrality": 0.003092
     },
     {
       "id": "fux/serve.py",
@@ -5019,7 +5037,7 @@
       "type": "code-file",
       "file": "fux/serve.py",
       "community": 1,
-      "centrality": 0.000524
+      "centrality": 0.000523
     },
     {
       "id": "fux/serve.py::dashboard_html",
@@ -5028,7 +5046,7 @@
       "file": "fux/serve.py",
       "line": 68,
       "community": 1,
-      "centrality": 0.003028
+      "centrality": 0.003029
     },
     {
       "id": "fux/serve.py::serve",
@@ -5037,7 +5055,7 @@
       "file": "fux/serve.py",
       "line": 78,
       "community": 1,
-      "centrality": 0.002493
+      "centrality": 0.002489
     },
     {
       "id": "fux/settings.py",
@@ -5045,7 +5063,7 @@
       "type": "code-file",
       "file": "fux/settings.py",
       "community": 1,
-      "centrality": 0.001669
+      "centrality": 0.001664
     },
     {
       "id": "fux/settings.py::_entry",
@@ -5054,7 +5072,7 @@
       "file": "fux/settings.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.000832
+      "centrality": 0.00083
     },
     {
       "id": "fux/settings.py::wire_file",
@@ -5063,7 +5081,7 @@
       "file": "fux/settings.py",
       "line": 40,
       "community": 1,
-      "centrality": 0.001559
+      "centrality": 0.001554
     },
     {
       "id": "fux/settings.py::wire",
@@ -5072,7 +5090,7 @@
       "file": "fux/settings.py",
       "line": 57,
       "community": 1,
-      "centrality": 0.000908
+      "centrality": 0.000905
     },
     {
       "id": "fux/settings.py::unwire_file",
@@ -5081,7 +5099,7 @@
       "file": "fux/settings.py",
       "line": 62,
       "community": 1,
-      "centrality": 0.000968
+      "centrality": 0.000965
     },
     {
       "id": "fux/settings.py::is_wired",
@@ -5090,7 +5108,7 @@
       "file": "fux/settings.py",
       "line": 82,
       "community": 1,
-      "centrality": 0.000933
+      "centrality": 0.00093
     },
     {
       "id": "fux/stats.py",
@@ -5116,7 +5134,7 @@
       "file": "fux/stats.py",
       "line": 40,
       "community": 1,
-      "centrality": 0.004878
+      "centrality": 0.004925
     },
     {
       "id": "fux/stats.py::_graph_shape",
@@ -5143,7 +5161,7 @@
       "file": "fux/stats.py",
       "line": 94,
       "community": 1,
-      "centrality": 0.000632
+      "centrality": 0.000631
     },
     {
       "id": "fux/stats.py::grade",
@@ -5152,7 +5170,7 @@
       "file": "fux/stats.py",
       "line": 99,
       "community": 1,
-      "centrality": 0.000511
+      "centrality": 0.00051
     },
     {
       "id": "fux/stats.py::render",
@@ -5170,7 +5188,7 @@
       "file": "fux/stats.py",
       "line": 135,
       "community": 1,
-      "centrality": 0.001114
+      "centrality": 0.001113
     },
     {
       "id": "fux/touch.py",
@@ -5178,7 +5196,7 @@
       "type": "code-file",
       "file": "fux/touch.py",
       "community": 1,
-      "centrality": 0.001262
+      "centrality": 0.001258
     },
     {
       "id": "fux/touch.py::_state_path",
@@ -5187,7 +5205,7 @@
       "file": "fux/touch.py",
       "line": 17,
       "community": 1,
-      "centrality": 0.001058
+      "centrality": 0.001055
     },
     {
       "id": "fux/touch.py::mark_rule_edited",
@@ -5196,7 +5214,7 @@
       "file": "fux/touch.py",
       "line": 23,
       "community": 1,
-      "centrality": 0.00105
+      "centrality": 0.001048
     },
     {
       "id": "fux/touch.py::affected",
@@ -5205,7 +5223,7 @@
       "file": "fux/touch.py",
       "line": 30,
       "community": 1,
-      "centrality": 0.001065
+      "centrality": 0.001062
     },
     {
       "id": "fux/touch.py::is_rule_file",
@@ -5214,7 +5232,7 @@
       "file": "fux/touch.py",
       "line": 37,
       "community": 1,
-      "centrality": 0.000671
+      "centrality": 0.000669
     },
     {
       "id": "fux/tour.py",
@@ -5222,7 +5240,7 @@
       "type": "code-file",
       "file": "fux/tour.py",
       "community": 1,
-      "centrality": 0.000931
+      "centrality": 0.00093
     },
     {
       "id": "fux/tour.py::run",
@@ -5231,7 +5249,7 @@
       "file": "fux/tour.py",
       "line": 14,
       "community": 1,
-      "centrality": 0.005382
+      "centrality": 0.005377
     },
     {
       "id": "fux/tour.py::write",
@@ -5240,7 +5258,7 @@
       "file": "fux/tour.py",
       "line": 30,
       "community": 1,
-      "centrality": 0.002087
+      "centrality": 0.002082
     },
     {
       "id": "fux/uispec.py",
@@ -5248,7 +5266,7 @@
       "type": "code-file",
       "file": "fux/uispec.py",
       "community": 1,
-      "centrality": 0.001614
+      "centrality": 0.001612
     },
     {
       "id": "fux/uispec.py::validate",
@@ -5257,7 +5275,7 @@
       "file": "fux/uispec.py",
       "line": 20,
       "community": 1,
-      "centrality": 0.001383
+      "centrality": 0.00138
     },
     {
       "id": "fux/uispec.py::_node",
@@ -5266,7 +5284,7 @@
       "file": "fux/uispec.py",
       "line": 29,
       "community": 1,
-      "centrality": 0.000695
+      "centrality": 0.000693
     },
     {
       "id": "fux/uispec.py::run",
@@ -5275,7 +5293,7 @@
       "file": "fux/uispec.py",
       "line": 55,
       "community": 1,
-      "centrality": 0.004268
+      "centrality": 0.004264
     },
     {
       "id": "fux/uispec.py::render",
@@ -5284,7 +5302,7 @@
       "file": "fux/uispec.py",
       "line": 61,
       "community": 1,
-      "centrality": 0.00277
+      "centrality": 0.002771
     },
     {
       "id": "fux/usage.py",
@@ -5292,7 +5310,7 @@
       "type": "code-file",
       "file": "fux/usage.py",
       "community": 1,
-      "centrality": 0.001134
+      "centrality": 0.001132
     },
     {
       "id": "fux/usage.py::_file",
@@ -5301,7 +5319,7 @@
       "file": "fux/usage.py",
       "line": 19,
       "community": 1,
-      "centrality": 0.000856
+      "centrality": 0.000855
     },
     {
       "id": "fux/usage.py::load",
@@ -5310,7 +5328,7 @@
       "file": "fux/usage.py",
       "line": 23,
       "community": 1,
-      "centrality": 0.005882
+      "centrality": 0.005876
     },
     {
       "id": "fux/usage.py::record",
@@ -5319,7 +5337,7 @@
       "file": "fux/usage.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.001468
+      "centrality": 0.001465
     },
     {
       "id": "fux/usage.py::last_served",
@@ -5328,7 +5346,7 @@
       "file": "fux/usage.py",
       "line": 52,
       "community": 1,
-      "centrality": 0.000791
+      "centrality": 0.000789
     },
     {
       "id": "fux/verify.py",
@@ -5336,7 +5354,7 @@
       "type": "code-file",
       "file": "fux/verify.py",
       "community": 1,
-      "centrality": 0.001224
+      "centrality": 0.001222
     },
     {
       "id": "fux/verify.py::VResult",
@@ -5345,7 +5363,7 @@
       "file": "fux/verify.py",
       "line": 27,
       "community": 1,
-      "centrality": 0.001121
+      "centrality": 0.001118
     },
     {
       "id": "fux/verify.py::run",
@@ -5354,7 +5372,7 @@
       "file": "fux/verify.py",
       "line": 33,
       "community": 1,
-      "centrality": 0.006208
+      "centrality": 0.006201
     },
     {
       "id": "fux/verify.py::_verify_one",
@@ -5363,7 +5381,7 @@
       "file": "fux/verify.py",
       "line": 46,
       "community": 1,
-      "centrality": 0.001163
+      "centrality": 0.00116
     },
     {
       "id": "fux/verify.py::_context",
@@ -5372,7 +5390,7 @@
       "file": "fux/verify.py",
       "line": 57,
       "community": 1,
-      "centrality": 0.000833
+      "centrality": 0.000831
     },
     {
       "id": "fux/vexamples.py",
@@ -5380,7 +5398,7 @@
       "type": "code-file",
       "file": "fux/vexamples.py",
       "community": 18,
-      "centrality": 0.002077
+      "centrality": 0.002071
     },
     {
       "id": "fux/vexamples.py::as_json",
@@ -5389,7 +5407,7 @@
       "file": "fux/vexamples.py",
       "line": 26,
       "community": 18,
-      "centrality": 0.001296
+      "centrality": 0.001292
     },
     {
       "id": "fux/vexamples.py::_coerce",
@@ -5398,7 +5416,7 @@
       "file": "fux/vexamples.py",
       "line": 35,
       "community": 18,
-      "centrality": 0.001296
+      "centrality": 0.001292
     },
     {
       "id": "fux/vexamples.py::as_bindings",
@@ -5407,7 +5425,7 @@
       "file": "fux/vexamples.py",
       "line": 54,
       "community": 18,
-      "centrality": 0.001804
+      "centrality": 0.001799
     },
     {
       "id": "fux/vexamples.py::_split_pairs",
@@ -5416,7 +5434,7 @@
       "file": "fux/vexamples.py",
       "line": 70,
       "community": 18,
-      "centrality": 0.000751
+      "centrality": 0.000749
     },
     {
       "id": "fux/vexamples.py::_expected",
@@ -5425,7 +5443,7 @@
       "file": "fux/vexamples.py",
       "line": 87,
       "community": 18,
-      "centrality": 0.001267
+      "centrality": 0.001263
     },
     {
       "id": "fux/vexamples.py::fuzz_examples",
@@ -5434,7 +5452,7 @@
       "file": "fux/vexamples.py",
       "line": 99,
       "community": 1,
-      "centrality": 0.001027
+      "centrality": 0.001024
     },
     {
       "id": "fux/vexamples.py::run_examples",
@@ -5443,7 +5461,7 @@
       "file": "fux/vexamples.py",
       "line": 127,
       "community": 18,
-      "centrality": 0.001296
+      "centrality": 0.001293
     },
     {
       "id": "rule:con-amendment-v2",
@@ -5455,7 +5473,7 @@
       "tier": "constitutional",
       "drift": false,
       "community": 19,
-      "centrality": 0.001623
+      "centrality": 0.001618
     },
     {
       "id": "rule:con-amendment",
@@ -5467,7 +5485,7 @@
       "tier": "constitutional",
       "drift": false,
       "community": 19,
-      "centrality": 0.001623
+      "centrality": 0.001618
     }
   ],
   "edges": [
@@ -11304,6 +11322,20 @@
     },
     {
       "source": "fux/savings.py",
+      "target": "fux/savings.py::_compare",
+      "type": "contains",
+      "confidence": "EXTRACTED",
+      "weight": 1.0
+    },
+    {
+      "source": "fux/savings.py",
+      "target": "fux/savings.py::_delta",
+      "type": "contains",
+      "confidence": "EXTRACTED",
+      "weight": 1.0
+    },
+    {
+      "source": "fux/savings.py",
       "target": "fux/savings.py::ratio_first",
       "type": "contains",
       "confidence": "EXTRACTED",
@@ -11451,42 +11483,35 @@
     },
     {
       "source": "fux/savings.py::render",
-      "target": "fux/savings.py::_x",
+      "target": "fux/savings.py::_delta",
       "type": "calls",
       "confidence": "EXTRACTED",
       "weight": 1.0
     },
     {
       "source": "fux/savings.py::render",
-      "target": "fux/savings.py::_x",
+      "target": "fux/savings.py::_compare",
       "type": "calls",
       "confidence": "EXTRACTED",
       "weight": 1.0
     },
     {
       "source": "fux/savings.py::render",
-      "target": "fux/savings.py::_x",
+      "target": "fux/savings.py::_compare",
       "type": "calls",
       "confidence": "EXTRACTED",
       "weight": 1.0
     },
     {
       "source": "fux/savings.py::render",
-      "target": "fux/savings.py::ratio_first",
+      "target": "fux/savings.py::_delta",
       "type": "calls",
       "confidence": "EXTRACTED",
       "weight": 1.0
     },
     {
       "source": "fux/savings.py::render",
-      "target": "fux/savings.py::ratio_later",
-      "type": "calls",
-      "confidence": "EXTRACTED",
-      "weight": 1.0
-    },
-    {
-      "source": "fux/savings.py::render",
-      "target": "fux/savings.py::avg_ratio",
+      "target": "fux/savings.py::_compare",
       "type": "calls",
       "confidence": "EXTRACTED",
       "weight": 1.0

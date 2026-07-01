@@ -173,7 +173,7 @@ The per-host skill artifacts — the Claude `SKILL.md`, the Codex copy, the Copi
 
 ## What's new
 
-**Latest — v0.17.2:** Error-contract consistency — the `fux-lab` harness (deepened with behavioral oracles) found the 0.17.1 `why <unknown>` fix was systemic: `explain`/`path`/`query`/`seal`/`candidates`/`fetch-rules`/`ingest --connector` all bypassed the `FuxError` boundary (printed to stdout, returned 1). All now render the documented terse `error:` on stderr (exit 1); `path` between disconnected-but-valid nodes is a legit exit-0 empty result. Regression tests added. `$0`/stdlib.
+**Latest — v0.17.3:** Direction-honest `savings` — the `fux-lab` harness (Cycle 2, mutation/edge oracles) caught `fux savings` labelling a net *loss* as a win (`1.9× cheaper` / `you save: -377 tok` on a small corpus where Fux is actually costlier). It now says `cheaper` only when Fux costs less (else `costlier`) and prints `you spend: N extra` instead of a negative save. Regression test added. `$0`/stdlib.
 Full release history → **[docs/whats-new.md](docs/whats-new.md)**.
 
 ## The name
