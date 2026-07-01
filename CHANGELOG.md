@@ -2,6 +2,24 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.17.1] — 2026-07-01 — harness-driven fixes: error contract + seal stability
+
+Two real engine bugs surfaced by the new external `fux-lab` end-to-end harness
+(exhaustive, offline, `$0` — drives every `fux/registry.py` command, diffs golden
+output, springs worktree-isolated traps + negative guards), both fixed with tests:
+
+- **Error contract** — `fux why <unknown-id>` printed `fux: no rule '…'` to stdout
+  and returned 1, bypassing the `FuxError` boundary. It now raises `FuxError`, so
+  `main()` renders the documented terse `error: …` on **stderr** (exit 1).
+- **Seal stability** — `fmwrite._scalar` emitted a *string* `"true"` as bare
+  `true`, which the reader re-parsed as a bool; for a ratified rule's
+  quoted-boolean example that changed `content_seal` and raised a **false
+  `tampered`**. The writer now quotes any string whose bare form would re-parse as
+  a non-string (bool/null/list), making `dump → split` a fixed point of the reader.
+
+Additive, `$0`/stdlib, no behaviour change beyond the two fixes. Full suite: 366
+passed. The `fux-lab` harness re-runs at 0 findings.
+
 ## [0.8.0] — 2026-06-21 — Solar Terminal viewer: fast, legible, governance-aware
 
 The interactive `graph.html` viewer was reworked end-to-end so it stays smooth at
