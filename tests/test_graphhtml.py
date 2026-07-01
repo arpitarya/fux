@@ -39,3 +39,20 @@ def test_render_substitutes_data_and_boot():
     for marker in ('data-lens="coverage"', "isGoverned", "governedCode",
                    "n.drift", 'n.tier==="constitutional"', "drawCrown"):
         assert marker in html
+
+
+def test_data_embedding_is_xss_safe():
+    """A free-form rule field (e.g. `domain`) may come from an untrusted `fux
+    ingest` source; a `</script>` in it must NOT break out of the DATA <script>
+    tag (stored XSS when graph.html is opened). fux-lab Cycle-3 finding."""
+    import json
+    payload = "</script><img src=x onerror=alert(1)>"
+    g = {"nodes": [{"id": "rule:x", "label": "x", "type": "convention",
+                    "domain": payload}],
+         "edges": [], "meta": {"code_files": 0, "rules": 1, "communities": 0}}
+    html = graphhtml.render(g)
+    assert "</script><img" not in html            # no raw tag-breakout
+    assert "\\u003c/script" in html               # escaped instead
+    # still valid data: the embedded JSON round-trips to the original value
+    blob = html.split("const DATA = ", 1)[1].split(";\n", 1)[0]
+    assert json.loads(blob)["nodes"][0]["domain"] == payload

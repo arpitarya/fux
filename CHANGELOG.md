@@ -2,6 +2,26 @@
 
 All notable changes to **fux-engine**. Dates are ISO; versions follow semver.
 
+## [0.17.4] — 2026-07-01 — stored-XSS fix + PII safety-net completeness (fux-lab Cycle 3)
+
+Two real bugs surfaced by the harness's Cycle-3 pass (security / dispatch /
+sanitization oracles):
+
+- **Stored XSS in `graph.html` (security).** The viewer embedded the graph as
+  `<script>const DATA = <json.dumps(…)>;</script>`, and `json.dumps` does not
+  escape `<`/`>`/`&`. A rule's free-form `domain` (which can originate from an
+  untrusted `fux ingest` source) containing `</script>…` broke out of the tag and
+  injected live markup — arbitrary JS when the local `graph.html` is opened. Now a
+  `_js_embed()` helper re-escapes `<`/`>`/`&` + U+2028/U+2029 as `\uXXXX` (valid
+  JSON, round-trips exactly, no literal `</script>` possible) for every embedded
+  blob. (`fux/graphhtml.py`)
+- **`pii-scan` false "all clear" on untracked files.** It scanned only git-tracked
+  files, so a stray PAN in a new file (before `git add`) passed. A no-args scan now
+  covers the whole working tree — tracked ∪ untracked-not-ignored — while still
+  honouring `.gitignore`. (`fux/gitutil.py`, `fux/clicmds.py`)
+
+Regression tests added for both. Full suite: 374 passed. `$0`/stdlib.
+
 ## [0.17.3] — 2026-07-01 — direction-honest `savings` (fux-lab Cycle 2)
 
 `fux savings` hard-coded the word `cheaper` and could print a negative `you save`.

@@ -24,6 +24,14 @@ def tracked_files(root: Path, patterns: list[str]) -> list[str]:
     return [ln.strip() for ln in out.splitlines() if ln.strip()]
 
 
+def untracked_files(root: Path, patterns: list[str]) -> list[str]:
+    """Untracked-but-not-ignored files matching the pathspec — files about to enter
+    the tree. Lets a safety scan catch a stray secret/PII *before* `git add`, while
+    still honouring `.gitignore` (so `.venv`, build output, etc. stay out)."""
+    out = _run(["ls-files", "--others", "--exclude-standard", "--", *patterns], root) or ""
+    return [ln.strip() for ln in out.splitlines() if ln.strip()]
+
+
 def user_name(root: Path) -> str | None:
     """The configured git author name — the default `fux ratify --by` ratifier."""
     return _run(["config", "user.name"], root) or None
