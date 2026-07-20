@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — Phase 1 · M3 ingest pipeline
-> (walk → converters → chunker → manifest → OKF cache).
+> *(building agent: keep this one line current)* — Phase 1 · M6 agent integration
+> (AGENTS.md/pointers/skills/hooks generator).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -36,9 +36,9 @@ happened per exchange"; keep both.*
 |-----------|--------|-------|-------|
 | M1 config + `fux setup` (wizard/flags/-y, idempotent) | ✅ | 21 | config load/validate, find_root, wizard+flags+-y, idempotent merge |
 | M2 frontmatter parser (load-bearing; unit-first) | ✅ | 13 | subset YAML: scalars/lists/nested/literal; permissive; round-trip |
-| M3 ingest inferred tier → OKF cache + manifest + chunker | ⬜ | — | |
-| M4 BM25F index + `ask`/`find` (+ --json/--explain) | ⬜ | — | |
-| M5 `answer` (extractive + TextRank + citations) | ⬜ | — | |
+| M3 ingest inferred tier → OKF cache + manifest + chunker | ✅ | 36 | converted_at = SOURCE_DATE_EPOCH/mtime (determinism; → ADR 0002 + Deviations) |
+| M4 BM25F index + `ask`/`find` (+ --json/--explain) | ✅ | 16 | JSON index (open Q1 resolved), incremental by sha |
+| M5 `answer` (extractive + TextRank + citations) | ✅ | 12 | passage × overlap × centrality; doc-order citations |
 | M6 `setup --agents --skills --hooks` | ⬜ | — | |
 | M7 `tests_e2e/` suite (corpus + goldens + determinism) | ⬜ | — | |
 | Close-out: ADRs 0001–0004, docs law, archive pair, bump | ⬜ | — | |
@@ -71,3 +71,8 @@ happened per exchange"; keep both.*
 
 *(record any deliberate deviation from a handoff here, with the why and the ADR
 that captures it — an empty section is the goal)*
+
+- **0001 / `converted_at`:** derived from `SOURCE_DATE_EPOCH` (reproducible-builds
+  convention) or the source file's mtime — never wall clock. The handoff lists
+  `converted_at` as provenance *and* requires byte-identical double-ingest; a wall
+  clock cannot satisfy both. Captured in ADR 0002.
