@@ -15,6 +15,7 @@ a `type`; this index gives progressive disclosure. (Repo-root `CLAUDE.md` and
 * [Worklog](worklog.md) - per-exchange session trail, newest first.
 * [Implementation tracker](implementation.md) - live milestone status of the build; agent-updated continuously.
 * [Doc registry](DOC-REGISTRY.md) - maintained docs, update triggers, last-verified dates.
+* [CLI examples](cli-examples.md) - input/output contract for every command; goldens derive from it.
 
 # Decisions
 

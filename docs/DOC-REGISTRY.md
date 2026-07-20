@@ -28,6 +28,7 @@ practice.
 | [`model-handoff-interview.md`](model-handoff-interview.md) | Direction/strategy/major decision changes | 2026-07-21 | Succession record; add yourself to maintainer line |
 | [`worklog.md`](worklog.md) | **Every substantive exchange** (append) | 2026-07-21 | Rolling session handoff |
 | [`implementation.md`](implementation.md) | Every milestone completion + regular intervals during builds | 2026-07-21 | Live build tracker; deviations logged |
+| [`cli-examples.md`](cli-examples.md) | Any command/flag/output-format/exit-code change | 2026-07-21 | UX contract; e2e goldens derive from it — update together |
 | [`compare/README.md`](compare/README.md) | A compare doc opens, closes, or changes status | 2026-07-21 | Decision index |
 | [`compare/*.compare.md`](compare/) | New evidence, verdict change, or reopen-trigger fires | 2026-07-21 | One per decided fork |
 | [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-20 | None yet — first ADRs come with v1 |

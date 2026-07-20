@@ -26,6 +26,21 @@ diary.*
 
 ---
 
+## 2026-07-21 — CLI examples doc: the input/output contract · Cowork
+- **Asked:** create examples of CLI input and output, link to necessary documents,
+  maintain it.
+- **Did:** created [`cli-examples.md`](cli-examples.md) (`type: Reference`) — worked
+  input/output for `fux setup` (wizard + flag forms), `fux ingest` (+ `--check`,
+  `--list-inferred`, `--advanced`, `--web`), `ask` (incl. honest no-confident-match
+  fallback), `find`, `answer` (extractive + citations), `--json` shape, `--explain`
+  breakdown (BM25F factors; RRF detail noted for v2), and the error/exit-code
+  contract in practice. Declared **normative**: e2e goldens derive from it;
+  deviations go through the implementation tracker. Linked from: bundle index,
+  cli-surface compare doc, handoff 0001 (formats normative), DOC-REGISTRY (trigger:
+  any command/flag/output/exit change — update doc + goldens together).
+- **Decided / open:** nothing open.
+- **Next:** paste `handoff/0000-master-prompt.md` into Claude Code.
+
 ## 2026-07-21 — Implementation tracker created + wired in · Cowork
 - **Asked:** an implementation file tracking everything the building agent
   implements, updated at regular intervals / task completion; update the docs.

@@ -72,7 +72,10 @@ A user (Arpit, in Anton) can:
 - **`fux ask` / `find` / `answer`:** per the accepted CLI surface; `answer` =
   extractive (sentence split → score = BM25F passage score × question-term overlap ×
   TextRank centrality → top `answer_max` sentences, ordered, cited). `--explain`
-  shows field hits + per-factor contributions. `--json` for all.
+  shows field hits + per-factor contributions. `--json` for all. **Output formats
+  are normative in [`../cli-examples.md`](../cli-examples.md)** — match them; the
+  e2e goldens derive from that contract; deviations go to the implementation
+  tracker with a reason.
 - **Agent files:** `fux setup --agents|--skills|--hooks` generating AGENTS.md
   (fux-managed block), CLAUDE.md/copilot-instructions/Kiro-steering pointers, one
   SKILL.md pair (`fux-query`, `fux-ingest`), Claude Code `UserPromptSubmit` +
