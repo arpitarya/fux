@@ -1,0 +1,25 @@
+{
+  "query": "telemetry",
+  "results": [
+    {
+      "file": "code/util.py",
+      "matching_passages": 1,
+      "score": 1.183
+    },
+    {
+      "file": "notes/todo.txt",
+      "matching_passages": 1,
+      "score": 0.915
+    },
+    {
+      "file": "docs/no-headings.md",
+      "matching_passages": 1,
+      "score": 0.773
+    },
+    {
+      "file": "docs/guide.md",
+      "matching_passages": 1,
+      "score": 0.556
+    }
+  ]
+}

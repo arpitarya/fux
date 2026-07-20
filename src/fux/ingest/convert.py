@@ -26,9 +26,25 @@ class ConvertResult:
     warnings: list[str] = field(default_factory=list)
 
 
-def convert(sf: SourceFile, data: bytes, max_kb: int) -> ConvertResult:
+_MARKITDOWN_MISSING = "requires the markitdown extra (pip install 'fux-engine[ingest]')"
+
+
+def skip_reason(sf: SourceFile, data: bytes) -> str | None:
+    """Cheap, convert-free skip determination (shared with drift checking)."""
     if sf.kind in ("md", "txt", "code", "json", "yaml") and b"\0" in data[:8192]:
-        return ConvertResult(skipped="binary content", converter="none")
+        return "binary content"
+    if sf.kind == "office":
+        try:
+            import markitdown  # noqa: F401
+        except ImportError:
+            return _MARKITDOWN_MISSING
+    return None
+
+
+def convert(sf: SourceFile, data: bytes, max_kb: int) -> ConvertResult:
+    reason = skip_reason(sf, data)
+    if reason:
+        return ConvertResult(skipped=reason, converter="none")
     handler = {
         "md": _convert_md,
         "txt": _convert_txt,
@@ -179,13 +195,8 @@ def _jpeg_dims(data: bytes) -> tuple[int, int] | None:
 
 
 def _convert_office(sf: SourceFile, data: bytes, max_kb: int) -> ConvertResult:
-    try:
-        from markitdown import MarkItDown  # optional extra, never a runtime dep
-    except ImportError:
-        return ConvertResult(
-            skipped="requires the markitdown extra (pip install 'fux-engine[ingest]')",
-            converter="markitdown",
-        )
+    from markitdown import MarkItDown  # presence guaranteed by skip_reason()
+
     try:
         text = MarkItDown().convert(str(sf.abspath)).text_content
     except Exception as exc:  # converter bugs must not kill the ingest run

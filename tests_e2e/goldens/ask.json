@@ -1,0 +1,52 @@
+{
+  "query": "how do I install the widget service",
+  "results": [
+    {
+      "file": "docs/guide.md",
+      "heading": "Widget Guide",
+      "lines": [
+        6,
+        35
+      ],
+      "score": 7.364,
+      "text": "# Widget Guide\nThe widget service converts raw telemetry into daily reports.\n## Install\nInstall the widget service with `pip install widget-service`.\nThe installer needs Python 3.11 or newer and about 50 MB of disk space.\n### Verify\nRun `widget --version` to verify the install succeeded.\n## Configure\nConfiguration lives in `widget.toml` next to the binary.\n| key  | meaning          |\n|------|------------------|\n| rate | polls per minute |\n| mode | live or replay   |\n## Deploy\nThe deploy uses a blue-green rollout with health checks before cutover.\nRollbacks complete within two minutes when a health check fails.\n```bash\nwidget deploy --env prod\n```"
+    },
+    {
+      "file": "notes/todo.txt",
+      "heading": "",
+      "lines": [
+        1,
+        4
+      ],
+      "score": 3.591,
+      "text": "TODO list for the widget service:\n- tune the rate key for the busy tenants\n- document the replay mode caveats\n- retire the legacy exporter once telemetry parity is confirmed"
+    },
+    {
+      "file": "docs/decisions/adr-001.md",
+      "heading": "ADR-001: Use SQLite for local storage",
+      "lines": [
+        7,
+        11
+      ],
+      "score": 1.379,
+      "text": "# ADR-001: Use SQLite for local storage\nWe chose SQLite because the service is single-node and embedded storage\nremoves an operational dependency. Postgres was rejected for the first\nversion because it requires a separate server process to operate."
+    },
+    {
+      "file": "docs/no-headings.md",
+      "heading": "",
+      "lines": [
+        1,
+        5
+      ],
+      "score": 0.665,
+      "text": "This document has no headings at all, only paragraphs of plain prose.\nIt exists to exercise the whole-file fallback path of the chunker.\nTelemetry batches are flushed every thirty seconds regardless of size.\nA second paragraph keeps the fallback honest about paragraph boundaries."
+    },
+    {
+      "file": "assets/logo.png",
+      "heading": "",
+      "lines": null,
+      "score": 0.516,
+      "text": "Image file `assets/logo.png`.\n- format: png\n- dimensions: 3×2\n- size: 71 bytes\n*(metadata stub — inferred tier; OCR/description is the advanced tier)*"
+    }
+  ]
+}

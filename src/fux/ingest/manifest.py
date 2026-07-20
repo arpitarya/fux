@@ -71,12 +71,16 @@ def check_drift(config: Config) -> Drift:
     """Full sha comparison of sources vs the manifest (`fux ingest --check`)."""
     entries = read(config.root)
     drift = Drift()
+    from .convert import skip_reason
+
     walked = {sf.rel: sf for sf in walk(config).files}
     for rel, sf in walked.items():
         entry = entries.get(rel)
+        data = sf.abspath.read_bytes()
         if entry is None:
-            drift.new.append(rel)
-        elif sha256_bytes(sf.abspath.read_bytes()) != entry.get("sha256"):
+            if skip_reason(sf, data) is None:  # skipped files are not drift
+                drift.new.append(rel)
+        elif sha256_bytes(data) != entry.get("sha256"):
             drift.changed.append(rel)
     drift.missing = sorted(set(entries) - set(walked))
     return drift

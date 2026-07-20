@@ -15,6 +15,15 @@ _SENT_SPLIT = re.compile(r"(?<=[.!?])\s+")
 _BULLET_RE = re.compile(r"^([-*+]|\d+\.)\s+")
 _MIN_WORDS = 4
 _CANDIDATE_CHUNKS = 10
+# Sentences scoring under this fraction of the best sentence are noise, not answer.
+_RELATIVE_KEEP = 0.35
+# Question-side stopwords: overlap must measure content terms, or "how are ..."
+# matches every sentence containing "are". Used only here, never in BM25F.
+_STOPWORDS = frozenset(
+    "a an and are as at be but by can did do does for from had has have how i if in "
+    "is it its me my of on or our so that the their then there these they this to "
+    "was we were what when where which who why will with would you your".split()
+)
 
 
 @dataclass
@@ -46,7 +55,7 @@ def build_answer(
     if not candidates:
         return []
 
-    q_terms = set(tokenize(query))
+    q_terms = set(tokenize(query)) - _STOPWORDS or set(tokenize(query))
     token_sets = [set(tokenize(s.text)) for s in candidates]
     centrality = _textrank(token_sets)
     for s, toks, cent in zip(candidates, token_sets, centrality):
@@ -60,9 +69,12 @@ def build_answer(
     ranked = sorted(
         candidates, key=lambda s: (-round(s.score, 9), s.file, s.line or 0, s.text)
     )
+    keep_floor = _RELATIVE_KEEP * ranked[0].score
     chosen: list[Sentence] = []
     seen: set[str] = set()
     for s in ranked:
+        if s.score < keep_floor:
+            break
         key = " ".join(tokenize(s.text))
         if key in seen:
             continue

@@ -55,6 +55,25 @@ def test_empty_results_empty_answer():
     assert build_answer([], "anything", 5) == []
 
 
+def test_low_relevance_noise_excluded():
+    results = [
+        chunk("a.md", "Rollbacks complete within two minutes when checks fail.", 5.0),
+        chunk("b.md", "The cafeteria menu rotates weekly with seasonal dishes.", 0.6),
+    ]
+    out = build_answer(results, "how fast are rollbacks", 5)
+    assert [s.file for s in out] == ["a.md"]  # noise falls under the keep floor
+
+
+def test_stopwords_do_not_create_overlap():
+    results = [
+        chunk("a.md", "Rollbacks complete within two minutes when checks fail.", 5.0),
+        chunk("b.md", "These are the things that are how they are.", 4.9),
+    ]
+    out = build_answer(results, "how fast are the rollbacks", 5)
+    assert out and out[0].file == "a.md"
+    assert all("cafeteria" not in s.text for s in out)
+
+
 def test_sentences_skip_fences_tables_headings():
     text = (
         "# Heading\n"
