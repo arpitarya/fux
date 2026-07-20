@@ -18,6 +18,12 @@ minimum:
 3. **[README.md](README.md)** — the public front door. Update it whenever the
    install/use surface, command list, guarantees, or the "what it does" summary
    change, so a newcomer never reads something the code no longer does.
+4. **[docs/model-handoff-interview.md](docs/model-handoff-interview.md)** — the
+   agent-succession handoff. **Read it before your first substantive change in this
+   repo.** Update its "state of play" whenever project direction, strategy, or a
+   major decision changes, and add yourself to its maintainer line when you do. The
+   strategic design of record it points to is
+   [docs/fux-fleet-vision.md](docs/fux-fleet-vision.md) — keep both true.
 
 Then update **any other file the change touches**, e.g.:
 

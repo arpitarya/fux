@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "Bash(xargs -I{} sh -c 'file \"{}\" | grep -q text && wc -l \"{}\"')",
+      "Bash(.venv/bin/python3 -m pytest -q)",
+      "Bash(git ls-tree *)",
+      "Bash(cp .fux/rules/con-amendment.md .fux/rules/con-amendment.md.backup)"
+    ],
+    "additionalDirectories": [
+      "/Users/arpitarya/my_programs/fux/.fux/rules"
+    ]
+  }
+}
