@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — Nothing in flight; awaiting the
-> master-prompt run.
+> *(building agent: keep this one line current)* — Phase 1 · M3 ingest pipeline
+> (walk → converters → chunker → manifest → OKF cache).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -34,8 +34,8 @@ happened per exchange"; keep both.*
 
 | Milestone | Status | Tests | Notes |
 |-----------|--------|-------|-------|
-| M1 config + `fux setup` (wizard/flags/-y, idempotent) | ⬜ | — | |
-| M2 frontmatter parser (load-bearing; unit-first) | ⬜ | — | |
+| M1 config + `fux setup` (wizard/flags/-y, idempotent) | ✅ | 21 | config load/validate, find_root, wizard+flags+-y, idempotent merge |
+| M2 frontmatter parser (load-bearing; unit-first) | ✅ | 13 | subset YAML: scalars/lists/nested/literal; permissive; round-trip |
 | M3 ingest inferred tier → OKF cache + manifest + chunker | ⬜ | — | |
 | M4 BM25F index + `ask`/`find` (+ --json/--explain) | ⬜ | — | |
 | M5 `answer` (extractive + TextRank + citations) | ⬜ | — | |
