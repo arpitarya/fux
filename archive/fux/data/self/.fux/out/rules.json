@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "count": 2,
+  "rules": [
+    {
+      "id": "con-amendment-v2",
+      "type": "rule",
+      "domain": "governance",
+      "status": "active",
+      "title": "A constitutional rule is created",
+      "layer": "project",
+      "path": "/Users/arpitarya/my_programs/fux/.fux/rules/con-amendment-v2.md",
+      "code_refs": [],
+      "related": [],
+      "edges": {
+        "supersedes": [
+          "con-amendment"
+        ]
+      },
+      "check": null,
+      "examples": [],
+      "created": "2026-06-18",
+      "updated": "2026-06-18"
+    },
+    {
+      "id": "con-amendment",
+      "type": "rule",
+      "domain": "governance",
+      "status": "deprecated",
+      "title": "A constitutional rule is created",
+      "layer": "project",
+      "path": "/Users/arpitarya/my_programs/fux/.fux/rules/con-amendment.md",
+      "code_refs": [],
+      "related": [],
+      "edges": {
+        "superseded-by": [
+          "con-amendment-v2"
+        ]
+      },
+      "check": null,
+      "examples": [],
+      "created": "2026-06-16",
+      "updated": "2026-06-18"
+    }
+  ]
+}
