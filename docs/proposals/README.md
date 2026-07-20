@@ -1,0 +1,31 @@
+# Proposals — parked ideas
+
+Ideas worth keeping that are **not being built now**. Same rigor as a compare doc
+(context, sketch, grounded references) but for future work rather than an active
+fork. Per OKF, every proposal carries frontmatter:
+
+```yaml
+---
+type: Proposal
+title: <idea>
+description: <one line>
+status: proposed        # proposed | graduated | rejected
+timestamp: <ISO 8601>
+---
+```
+
+Lifecycle: `proposed` → picked up → **graduates** into a compare doc (if there's a
+fork) or a plan entry (if not), and this file's status is updated with a link. Fully
+implemented proposals move to [`../archive/`](../archive/). Nothing here is a
+commitment; everything here is findable.
+
+# Index
+
+* [Research-to-Spec](research-to-spec.md) - evidence-backed specs; every claim cites the corpus at a commit.
+* [Knowledge diff & time-travel](knowledge-diff.md) - `fux diff`/`fux log`; ask questions of past knowledge.
+* [Audit evidence trail](audit-evidence-trail.md) - deterministic cited answers as an auditable chain; seed of the deferred Plane.
+
+*(The fourth idea from the 2026-07-21 ideation — the **product-memory corpus**,
+Arpit's own seed — was the winner and graduated straight into
+[`../fux-plan.md`](../fux-plan.md) §"Why the corpus lives in git" and the v1
+handoff, per the proposals lifecycle.)*

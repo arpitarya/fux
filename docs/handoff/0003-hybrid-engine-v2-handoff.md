@@ -1,0 +1,100 @@
+---
+type: Handoff
+title: Engine v2 — bundled ≤10 MB static-embedding model + RRF hybrid + eval harness
+description: Adds semantic recall to the deterministic engine — packaged model, pure-stdlib inference, RRF fusion — gated and measured by the Anton eval set.
+status: ready
+blocked_by: 0001-query-cli-v1-handoff.md
+timestamp: 2026-07-21T00:00:00Z
+---
+
+# Handoff 0003 — Hybrid engine v2
+
+## Context
+
+Builds on 0001 (0002 not required). Decisions closed in
+[`../compare/query-engine.compare.md`](../compare/query-engine.compare.md) and
+[`../compare/packaged-model.compare.md`](../compare/packaged-model.compare.md):
+bundled Model2Vec/Potion-class **static** embedding model, distilled offline,
+quantized to **≤10 MB**, **pure-stdlib inference** (no numpy — disproven), fused
+with BM25F via **RRF** (k≈60), **no reranker** (reopen only on eval evidence).
+**The eval harness comes first** — it is both the quality gate for v2 and the
+recorded reopen-instrument for the reranker/weights decisions.
+
+## Definition of done
+
+1. `tests_e2e/eval/` harness: ~15–20 committed "question → expected passage
+   (file + heading)" pairs from the fixture corpus (+ a doc explaining how to add
+   Anton pairs privately); `fux eval` (hidden/dev command or script) reports
+   hit@1/hit@5/MRR for lexical-only vs hybrid.
+2. A build-time distillation script (`tools/distill/`, dev-only, heavy deps allowed
+   there) produces the bundled artifact: quantized int8 token-embedding matrix +
+   vocab + norms, ≤10 MB on disk, license-cleared, with a reproducible recipe
+   (pinned teacher model + seed) documented in the ADR.
+3. Runtime loads the bundle lazily (`src/fux/embed/`): stdlib-only tokenize →
+   lookup → mean-pool; chunk vectors computed at ingest, stored beside the cache
+   (deterministic serialization); query embeds in-process.
+4. `fux ask/find/answer` become hybrid: BM25F candidates (top ~200) + dense
+   ranking over candidates → RRF fusion; `--explain` shows per-retriever ranks +
+   RRF contribution; `--lexical-only` flag preserves the pure-v1 path.
+5. Hybrid ≥ lexical on the eval set (hit@5 and MRR — the gate to ship); results
+   recorded in the ADR.
+6. Determinism holds: pinned model artifact (sha in repo), identical outputs across
+   runs/platforms; both suites green; e2e goldens updated deliberately.
+
+## In scope
+
+- `tools/distill/`: distillation pipeline (Model2Vec teacher → static vectors →
+  vocab trim to target size → int8 quantize + per-vector scale → pack with
+  `struct`), size assertion ≤10 MB, license check step, README with the exact
+  reproduce commands.
+- `src/fux/embed/model.py`: bundle loader (mmap-friendly `struct` format),
+  tokenizer (same subword vocab as the distilled model, stdlib implementation),
+  mean-pool, int8 dot-product with per-vector scales; `similarity(query_vec,
+  candidate_vecs)` over the BM25F candidate set only (keeps stdlib fast — see
+  packaged-model doc math).
+- `src/fux/embed/store.py`: chunk-vector cache keyed by chunk id + source sha
+  (invalidated with the manifest; re-embed only changed files).
+- `src/fux/index/fuse.py`: RRF (k configurable, default 60).
+- Config: `[engine.hybrid]` (enabled, rrf_k, candidate_pool); packaging: bundle
+  shipped in the wheel via hatanything build config; `answer` reuses hybrid
+  retrieval + question-similarity from the same model.
+- Eval harness + docs.
+
+## Out of scope
+
+Reranker (closed — reopen-trigger recorded); SPLADE; numpy anywhere at runtime;
+model downloads at runtime (bundle ships in the wheel, or v2 features cleanly
+report "model not bundled" in source installs without the artifact).
+
+## Constraints
+
+≤10 MB bundle, hard-asserted in CI. Pure-stdlib runtime inference. Wheel size
+watched (target ≤15 MB total). Embedding cache deterministic + git-friendly (though
+users may choose to gitignore vectors — document both modes; vectors are
+regenerable, provenance stays in the manifest). Lazy import: `fux ask` on a
+lexical-only config must not pay model-load cost.
+
+## Edge cases (tests must cover)
+
+Query with zero vocab overlap (all-OOV → dense contributes nothing → graceful
+lexical fallback); empty candidate set; model file missing/corrupt (clear FuxError,
+`--lexical-only` still works); mixed corpus where some chunks lack vectors (stale
+embed cache → warn + on-the-fly embed or skip, deterministic either way); very long
+chunks (truncation policy recorded); non-English text (model is English-biased —
+degrade gracefully, note limitation).
+
+## Open questions (answer during build, record in ADR)
+
+1. Ship `potion-base-8M` re-packed vs distill our own on a docs-flavored corpus —
+   decide by eval-set delta; document both numbers.
+2. Vector store format: single packed file vs per-source shards — pick by
+   incremental-update simplicity.
+3. Do vectors belong in the committed corpus by default, or gitignored +
+   regenerated? (Leaning: gitignore vectors, commit manifest hashes — keep the
+   corpus lean; decide with Arpit at review.)
+
+## Close-out
+
+ADR 0006 (bundled model + distillation recipe + eval numbers) and ADR 0007 (hybrid
+fusion). Archive this pair with `status: implemented`. Update plan/README/registry/
+worklog/model-handoff-interview (+ CLAUDE.md scope line: v2 shipped). Bump minor.

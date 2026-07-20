@@ -1,0 +1,47 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fux-engine"
+dynamic = ["version"]
+description = "Fux — a portable, agent-aware knowledge engine: rules bound to code, read by agents before they touch anything, checked deterministically."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
+keywords = ["knowledge", "rules", "graph", "claude", "agent", "frontmatter", "llm", "adr", "codebase"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+]
+# stdlib only — $0, deterministic, dependency-free runtime (see CLAUDE.md).
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/arpitarya/fux"
+Repository = "https://github.com/arpitarya/fux"
+"Bug Tracker" = "https://github.com/arpitarya/fux/issues"
+
+[project.scripts]
+fux = "fux.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.hatch.version]
+path = "src/fux/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fux"]
+
+[tool.ruff]
+line-length = 100
