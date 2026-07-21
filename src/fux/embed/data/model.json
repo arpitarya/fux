@@ -1,0 +1,10 @@
+{
+  "dim": 256,
+  "license": "MIT",
+  "quantization": "int8 per-vector symmetric, scale = max|v|/127",
+  "recipe": "tools/distill/distill.py (see tools/distill/README.md)",
+  "sha256": "21cbd6d15fae8b81892430e2744b1346faf16959859f12be83af99c693980711",
+  "size_bytes": 7926518,
+  "teacher": "minishlab/potion-base-8M",
+  "vocab_size": 29528
+}
