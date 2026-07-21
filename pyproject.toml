@@ -45,5 +45,10 @@ path = "src/fux/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/fux"]
 
+[tool.hatch.build.targets.sdist]
+# The sdist is the buildable source + its tests/docs — never the archived old
+# build, lockfile, or CI plumbing (found shipping in 0.22.0; fixed for 0.22.1+).
+exclude = ["/archive", "/uv.lock", "/.github", "/scripts", "/.DS_Store", "**/.DS_Store"]
+
 [tool.ruff]
 line-length = 100

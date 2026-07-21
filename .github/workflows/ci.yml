@@ -5,7 +5,46 @@ on:
     branches: [main]
   pull_request:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  build-check:
+    # Metadata validation BEFORE a release ever happens — twine check catches
+    # the class of bugs PyPI only reveals after publishing (README rendering,
+    # bad classifiers). The publish workflow re-checks; this fails PRs early.
+    name: Build & metadata
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Build sdist + wheel
+        run: pip install build && python -m build
+
+      - name: Validate distribution metadata
+        run: pip install twine && twine check --strict dist/*
+
+      - name: sdist must not ship the archived old build
+        run: |
+          python - <<'PY'
+          import glob, sys, tarfile
+          sdist = glob.glob("dist/*.tar.gz")[0]
+          # top-level archive/ is the old non-working build; docs/archive/ is fine
+          bad = [n for n in tarfile.open(sdist).getnames()
+                 if n.split("/")[1:2] in (["archive"], ["uv.lock"], [".github"])]
+          if bad:
+              print("✗ sdist ships excluded paths:", *bad[:5], sep="\n  ")
+              sys.exit(1)
+          print("✔ sdist clean")
+          PY
+
   test:
     name: Python ${{ matrix.python }}
     runs-on: ubuntu-latest

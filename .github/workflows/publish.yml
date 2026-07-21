@@ -4,13 +4,12 @@ on:
   release:
     types: [published]
 
-permissions:
-  id-token: write  # required for OIDC trusted publishing
-
 jobs:
   build:
     name: Build distribution
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -20,11 +19,26 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install build
-        run: pip install build
+      - name: Release tag must match the package version
+        # Guards the silent-failure mode: an unbumped __version__ would build
+        # the previous version and skip-existing would "publish" nothing, green.
+        run: |
+          pkg="$(python -c "import sys; sys.path.insert(0, 'src'); import fux; print(fux.__version__)")"
+          tag="${GITHUB_REF_NAME#v}"
+          if [ "$pkg" != "$tag" ]; then
+            echo "✗ release tag v$tag != fux.__version__ $pkg — bump src/fux/__init__.py first" >&2
+            exit 1
+          fi
+          echo "✔ tag v$tag matches __version__ $pkg"
+
+      - name: Install build tooling
+        run: pip install build twine
 
       - name: Build sdist + wheel
         run: python -m build
+
+      - name: Validate distribution metadata
+        run: twine check --strict dist/*
 
       - uses: actions/upload-artifact@v4
         with:
@@ -35,6 +49,8 @@ jobs:
     name: Publish to PyPI
     runs-on: ubuntu-latest
     needs: build
+    permissions:
+      id-token: write  # OIDC trusted publishing — only this job needs it
     environment:
       name: pypi
       url: https://pypi.org/project/fux-engine/

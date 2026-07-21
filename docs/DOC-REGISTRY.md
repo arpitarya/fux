@@ -1,10 +1,3 @@
----
-type: Registry
-title: Doc registry — the documentation freshness tracker
-description: One row per maintained doc — update trigger + last-verified date; the docs-in-sync law made checkable.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # Doc registry — the documentation freshness tracker
 
 *One row per maintained document. This is the separate tracking file Arpit asked for:
@@ -30,6 +23,7 @@ practice.
 | [`worklog.md`](worklog.md) | **Every substantive exchange** (append) | 2026-07-21 | Rolling session handoff |
 | [`implementation.md`](implementation.md) | Every milestone completion + regular intervals during builds | 2026-07-21 | Live build tracker; deviations logged |
 | [`cli-examples.md`](cli-examples.md) | Any command/flag/output-format/exit-code change | 2026-07-21 | UX contract; e2e goldens derive from it — update together |
+| [`GLOSSARY.md`](GLOSSARY.md) | A new recurring term enters the repo, or a defined term changes meaning | 2026-07-21 | Definitions link to owning docs; ALL-CAPS = no frontmatter |
 | [`compare/README.md`](compare/README.md) | A compare doc opens, closes, or changes status | 2026-07-21 | Decision index |
 | [`compare/*.compare.md`](compare/) | New evidence, verdict change, or reopen-trigger fires | 2026-07-21 | One per decided fork |
 | [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-21 | 0001–0007 (v1 + v1.1 + v2) |
