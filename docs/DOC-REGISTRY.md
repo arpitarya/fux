@@ -21,13 +21,13 @@ practice.
 | [`fux-plan.md`](fux-plan.md) | Any design decision, scope change, status change | 2026-07-21 | Design of record |
 | [`model-handoff-interview.md`](model-handoff-interview.md) | Direction/strategy/major decision changes | 2026-07-21 | Succession record; add yourself to maintainer line |
 | [`worklog.md`](worklog.md) | **Every substantive exchange** (append) | 2026-07-21 | Rolling session handoff |
-| [`implementation.md`](implementation.md) | Every milestone completion + regular intervals during builds | 2026-07-21 | Live build tracker; deviations logged |
-| [`cli-examples.md`](cli-examples.md) | Any command/flag/output-format/exit-code change | 2026-07-21 | UX contract; e2e goldens derive from it — update together |
-| [`GLOSSARY.md`](GLOSSARY.md) | A new recurring term enters the repo, or a defined term changes meaning | 2026-07-21 | Definitions link to owning docs; ALL-CAPS = no frontmatter |
-| [`fux-toml.md`](fux-toml.md) | Any config key added/renamed/re-defaulted | 2026-07-21 | Annotated example; proposed extensions fenced until shipped |
+| [`implementation.md`](implementation.md) | Every milestone completion + regular intervals during builds | 2026-07-22 | Live build tracker; deviations logged |
+| [`cli-examples.md`](cli-examples.md) | Any command/flag/output-format/exit-code change | 2026-07-22 | UX contract; e2e goldens derive from it — update together |
+| [`GLOSSARY.md`](GLOSSARY.md) | A new recurring term enters the repo, or a defined term changes meaning | 2026-07-22 | Definitions link to owning docs; ALL-CAPS = no frontmatter |
+| [`fux-toml.md`](fux-toml.md) | Any config key added/renamed/re-defaulted | 2026-07-22 | Annotated example; asserted against the parser by tests/test_config.py |
 | [`compare/README.md`](compare/README.md) | A compare doc opens, closes, or changes status | 2026-07-21 | Decision index |
 | [`compare/*.compare.md`](compare/) | New evidence, verdict change, or reopen-trigger fires | 2026-07-21 | One per decided fork |
-| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-21 | 0001–0007 (v1 + v1.1 + v2) |
+| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-22 | 0001–0011 (v1 + v1.1 + v2 + v3 substrate) |
 | `handoff/` | A feature enters build (handoff + prompt pair) | 2026-07-21 | **0004 (knowledge substrate v3) written + ready**; 0000–0003 archived |
 | [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-07-21 | `status:` frontmatter tracks lifecycle |
 | [`archive/`](archive/README.md) | A handoff/prompt/proposal is fully implemented | 2026-07-21 | 0000 master + 0001–0003 pairs archived with ADR links |

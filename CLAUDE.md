@@ -298,9 +298,33 @@ is the proof.
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`** (unchanged). Import package: **`fux`**.
-- Version: **`0.22.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
-  0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid). Bump in
+- Version: **`0.23.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
+  0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid → 0.23.0 v3 substrate). Bump in
   `src/fux/__init__.py` only.
+
+## Hard-won build knowledge (auto-folded, 2026-07-22 — phase 4)
+
+- **Git carries recipe *and* state.** `fux.toml` + `fux.lock` + `.fux/state/`
+  are committed; `.fux/index/` is derived and gitignored. A clone answers before
+  any ingest — and with the df sidecar it answers *exactly*, not approximately.
+- **The df sidecar is load-bearing, not redundant statistics.** Lean can
+  re-derive exact `tf` but never corpus-level `df`/`n`/`avg_wlen`. Without
+  `.fux/state/df/`, "identical rankings across profiles" silently becomes
+  "approximately identical". Never delete it to save bytes (it costs 9 B/doc).
+- **Keep the zero-candidate early return in `_passages`.** It looks like it
+  blocks FuxVec's rescue; it does not (the rescue case is *doc-side* zero
+  overlap, served by the third RRF list). Removing it makes "No confident
+  matches" unreachable, because a binary prefilter always has a nearest
+  neighbour — measured noise 0.23–0.26 cosine vs a true rescue's 0.34.
+- **Parity is scoped to `--lexical-only`.** The hybrid lists grow by design
+  (dense_global at M5, graph at M6), so hybrid goldens change *with eval
+  evidence*; the four lexical goldens must stay byte-identical forever.
+- **Storage at scale ≠ query at scale.** `postings` is populated and indexed but
+  not read at query time; a 100k query still loads the whole index (~10 s).
+  Scoped in ADR 0011 — the head of the next phase.
+- **Extrapolations from this repo's own docs are pessimistic** for the state
+  plane (long ids, wide vocabulary → signatures pinned at the 128 B cap):
+  projected 351 B/doc, measured 230 B/doc on the synthetic corpus.
 
 ## Hard-won build knowledge (auto-folded, 2026-07-21)
 

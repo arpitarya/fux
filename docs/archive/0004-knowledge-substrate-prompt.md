@@ -2,7 +2,9 @@
 type: Handoff Prompt
 title: Claude Code prompt — Knowledge substrate v3 (handoff 0004)
 description: Paste-ready prompt executing handoff 0004 — explore → plan → implement M1–M8 → eval gate → close out at v0.23.0.
-status: ready
+status: implemented
+implemented: 2026-07-22 (v0.23.0)
+adrs: [0008](../adr/0008-substrate-store-lock-state.md), [0009](../adr/0009-retrieval-kernel-graph-verbs.md), [0010](../adr/0010-fuxvec-binary-dense-search.md), [0011](../adr/0011-profiles-lean-state.md)
 timestamp: 2026-07-21T00:00:00Z
 ---
 

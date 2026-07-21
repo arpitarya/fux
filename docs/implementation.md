@@ -18,9 +18,9 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4: M1–M7 ✅ and
-> committed**; **M8** (100k benchmark + gate) next. Suites: 363 unit + 62 e2e ·
-> eval hit@5 1.000.
+> *(building agent: keep this one line current)* — **Phase 4 complete: v0.23.0
+> shipped** (M1–M8 + close-out ✅). Suites: 365 unit + 71 e2e · eval hit@5 1.000.
+> **Next phase's head: query-at-scale** — postings stored but unread (ADR 0011).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -84,37 +84,33 @@ row at EVERY milestone completion — no batching).*
 | M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ✅ | 16 | **eval gate beats v0.22 hybrid**: hit@1 .762→.810 · hit@5 .952→**1.000** · MRR .833→.873; ADR 0006's named zero-overlap miss rescued; `--lexical-only` still exactly .762/.952/.833 |
 | M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ✅ | 20 | constants as specced; seed-rank personalization; `[engine.graph] in_rrf` is the **open-question-2 instrument** — on the 9-doc fixture graph on/off both measure .810/1.000/.873 (too few edges to discriminate; M8's generator must carry real link structure) |
 | M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ✅ | 19 | mid-corpus switch (full→lean) keeps rankings *and* scores — mutation-verified non-vacuous; LRU counter-based (no wall clock); `auto` gated on `lean_threshold` (→ Deviations); `db pull` sha-verified, refuses mismatch |
-| M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ⬜ | — | |
-| Close-out: ADRs 0008–0011, docs law, archive pair, bump | ⬜ | — | target v0.23.0 |
+| M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ✅ | 9 | 100k measured: state **23 MB ≤30 ✓**, df **0.9 MB ≤5 ✓**, db 1081 MB (77% of §8b), FuxVec scan **54 ms < 150 → IVF not built**; gate beaten (1.000 hit@5); ⚠ **query latency 10.6 s @100k** — postings stored but not read at query time (→ ADR 0011, next phase) |
+| Close-out: ADRs 0008–0011, docs law, archive pair, bump | ✅ | — | **v0.23.0**; suites: 365 unit + 71 e2e (+1 gated skip); citations in 0010 verified at build time; 0004 pair archived |
 
-## Early size signal (state envelope — assert properly at M8)
+## Size envelope — MEASURED at 100k (M8)
 
-Measured on this repo's own `docs/` (40 docs · 140 chunks · 3,910 unique terms),
-per-document and per-term costs extrapolated to the 100k synthetic. **Not the
-M8 benchmark** — a prior, recorded now because one number is already close to
-its budget.
+The M3a extrapolation below was **wrong, and in the pessimistic direction** —
+recorded rather than deleted, because a prediction that missed is worth keeping
+next to the measurement that corrected it.
 
-| Component | Measured | Per unit | Projected @100k |
-|-----------|----------|----------|-----------------|
-| `df/` sidecar | 42.0 KB | ~10 B/term | **~2.1 MB** (Heaps' law b≈0.5) · 105 MB only if vocabulary grew linearly, which it does not |
-| `codes/` | 2.1 KB | 51 B/doc | ~5.1 MB |
-| `sigs/` | 5.8 KB | 144 B/doc | ~14.4 MB |
-| `meta/` | 6.2 KB | 156 B/doc | ~15.6 MB |
-| **Total state** | **56.0 KB** | **1,401 B/doc** | **~35 MB ⚠** |
+| component | M3a projection @100k | **measured @100k** | budget |
+|-----------|---------------------|--------------------|--------|
+| `state/df/` | ~2.1 MB | **0.92 MB** (9 B/doc) | ≤5 MB ✅ |
+| `state/codes/` | ~5.1 MB | **4.00 MB** (40 B/doc) | — |
+| `state/sigs/` | ~14.4 MB | **6.78 MB** (68 B/doc) | — |
+| `state/meta/` | ~15.6 MB | **11.25 MB** (112 B/doc) | — |
+| **state TOTAL** | ~35 MB ⚠ | **22.96 MB** (230 B/doc) | ≤30 MB ✅ |
+| `fux.db` | — | 1 081 MB | ~1 400 MB est (77 %) |
+| `fux.lock` | — | 21.5 MB | ~30 MB est (70 %) |
 
-Two readings:
+Why the projection missed: it extrapolated from *this repository's own docs*,
+which are adversarial for the state plane — very long doc ids
+(`docs/handoff/0004-knowledge-substrate-handoff.md`), long titles, and wide
+per-document vocabulary that pins Bloom signatures at the 128 B cap. 351 B/doc
+projected vs 230 B/doc actual.
 
-- **The df sidecar fits.** ~2 MB projected against a 5 MB budget. Delta-encoding
-  sparse u64 hashes buys little (deltas are ~7–8 byte varints either way), but
-  the absolute cost is small enough not to matter.
-- **⚠ `meta/` and `sigs/` are the envelope risk, not `df/`.** At 351 B/doc the
-  non-df plane alone projects to ~35 MB, over the 30 MB envelope. This corpus
-  is adversarial for both (long doc ids like
-  `docs/handoff/0004-knowledge-substrate-handoff.md`, long titles, wide
-  vocabulary per doc → signatures pinned at the 128 B cap), and per-record zlib
-  on ~100-byte payloads pays ~11 bytes of header for little compression. The
-  M8 synthetic corpus decides; if it confirms, the cheap fixes are a shared
-  zlib dictionary or dropping per-record compression for a per-bucket one.
+**Per Arpit's ruling, the per-bucket-zlib change was contingent on the synthetic
+confirming >30 MB. It did not, so nothing was changed.**
 
 ## Decisions taken during the build (→ ADRs)
 

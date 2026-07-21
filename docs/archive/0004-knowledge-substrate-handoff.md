@@ -2,9 +2,11 @@
 type: Handoff
 title: Knowledge substrate v3 — SQLite store, fux.lock, committed lean state, one-kernel retrieve(), FuxVec, profiles
 description: Full build spec for phase 4 — the accepted knowledge-substrate proposal turned into milestones, schemas, formats, algorithms, tests, and close-out.
-status: ready
+status: implemented
 blocked_by: none (0001–0003 shipped, v0.22.x)
 design_of_record: ../proposals/knowledge-substrate.md
+implemented: 2026-07-22 (v0.23.0)
+adrs: [0008](../adr/0008-substrate-store-lock-state.md), [0009](../adr/0009-retrieval-kernel-graph-verbs.md), [0010](../adr/0010-fuxvec-binary-dense-search.md), [0011](../adr/0011-profiles-lean-state.md)
 timestamp: 2026-07-21T00:00:00Z
 ---
 

@@ -76,10 +76,12 @@ pip install fux-engine         # zero runtime deps; ~7 MB wheel incl. the model
 
 cd your-project
 fux setup                      # wizard → fux.toml (every prompt has a flag; -y for defaults)
-fux ingest                     # folders → .fux/ corpus + manifest + index
+fux ingest                     # folders → .fux/ corpus + fux.lock + index
 fux ask "why did we pick X?"   # ranked, cited passages
 fux find "deploy runbook"      # which files
 fux answer "how do rollbacks work?"   # extractive, cited answer
+fux explain docs/adr/0007.md   # one doc deep: outline, edges, key passages
+fux path docs/adr/0007.md docs/runbooks/failover.md    # how two docs connect
 ```
 
 Optional Office/PDF converters (never on the query path):
@@ -119,18 +121,30 @@ Properties, not features:
   `fux setup --agents --skills --hooks` teaches Claude Code, Copilot, and Kiro to
   query the corpus before guessing — via AGENTS.md, the open SKILL.md standard,
   and fail-open hooks.
-- **A corpus, not a disposable index.** `.fux/cache/` + manifest are designed to be
-  *committed*: knowledge changes become reviewable diffs, and "what did we know in
-  March?" is a `git checkout` away.
+- **A corpus, not a disposable index.** `fux.toml` + `fux.lock` + `.fux/state/`
+  are *committed*: knowledge changes become reviewable diffs, and "what did we know
+  in March?" is a `git checkout` away.
+- **A clone is queryable before you ingest.** The committed state plane costs
+  ~240 bytes per document — small enough for git, complete enough to answer with
+  the *same rankings and scores* a full index gives, by re-deriving candidate text
+  and reading exact corpus statistics from the committed df sidecar.
 
 ## How it works
 
 ```
-sources (fux.toml) ──ingest──▶ .fux/cache/    OKF Markdown corpus + provenance   ← commit this
-                               .fux/manifest.jsonl   sha-keyed ground truth      ← commit this
-                               .fux/index/    BM25F postings + chunk vectors     ← derived; regenerable
-ask/find/answer ◀── BM25F candidates ⊕ dense ranks → RRF fusion → cited passages
+sources (fux.toml) ──ingest──▶ fux.lock       per-source sha/date ledger        ← commit this
+                               .fux/state/    codes + signatures + exact df     ← commit this
+                               .fux/cache/    OKF Markdown corpus + provenance  ← rebuilt on clone
+                               .fux/index/    fux.db: chunks, postings, vectors ← derived; gitignored
+every verb ◀── one retrieve() ── BM25F ⊕ dense ⊕ FuxVec global ⊕ graph → RRF
 ```
+
+**Git carries the recipe and the state, never the warehouse.** `fux.toml` says
+what to ingest, `fux.lock` records exactly what was ingested and when, and
+`.fux/state/` carries enough to answer immediately after a clone. The heavy
+runtime plane is one SQLite file, gitignored and rebuildable — and every rebuild
+is verified against the lock, so a sha match proves it is provably the same
+corpus.
 
 Ingest is **two-tier by design**: the fast *inferred* pass handles everything by
 default (markdown/txt/code natively, JSON flattened, YAML fenced, images as
@@ -163,6 +177,11 @@ fux ask "<question>"             # ranked cited passages   (--json --explain --t
 fux find "<topic>"               # ranked files
 fux answer "<question>"          # extractive cited answer (--answer-max)
 fux ask … --lexical-only         # pure BM25F, byte-identical to v1
+fux explain <doc-id>             # outline + edges + key passages for one document
+fux graph "<topic>"              # the nodes and edges around a topic
+fux path <doc-id> <doc-id>       # how two documents connect (or that they don't)
+fux cat <doc-id> [--out FILE]    # print one document, wherever it is stored
+fux db pull <url>                # fetch a CI-built index, sha-verified vs fux.lock
 fux hook prompt-submit|session-end    # fail-open agent-hook entrypoints
 ```
 </details>
@@ -195,9 +214,24 @@ use; the design of record is [docs/fux-plan.md](docs/fux-plan.md).
 
 ## Status
 
-**v0.22.x — the full staged engine is shipped**: v1 query CLI, v1.1 web/CDP/
-advanced ingest, v2 bundled-model hybrid — 170+ unit tests, 29 e2e goldens, eval
-gate green. Decisions live in [docs/compare/](docs/compare/) and
+**v0.23.x — the knowledge substrate is shipped**: v1 query CLI, v1.1 web/CDP/
+advanced ingest, v2 bundled-model hybrid, v3 substrate (SQLite store, committed
+`fux.lock` + state plane, one retrieval kernel, the FuxVec dense engine, graph
+verbs, lean/full profiles) — 360+ unit tests, 70+ e2e, eval gate beaten.
+
+Retrieval quality across the staged engines, on the committed 21-pair eval set:
+
+| engine | hit@1 | hit@5 | MRR |
+|--------|-------|-------|-----|
+| v1 lexical (BM25F) | 0.762 | 0.952 | 0.833 |
+| v2 hybrid (+ bundled model) | 0.762 | 0.952 | 0.833 |
+| **v3 + FuxVec dense-global** | **0.810** | **1.000** | **0.873** |
+
+v2's dense pass could only re-score what BM25F already found, so a document
+sharing no vocabulary with the question stayed unreachable — the miss
+[ADR 0006](docs/adr/0006-bundled-model.md) recorded and could not fix. FuxVec
+scans every document's 32-byte binary code (~27 M comparisons/sec, pure stdlib)
+and closes it. Decisions live in [docs/compare/](docs/compare/) and
 [docs/adr/](docs/adr/); the docs are an OKF v0.1 bundle rooted at
 [docs/index.md](docs/index.md); the old build is archived under
 [`archive/`](archive/). Now dogfooding ([DOGFOOD.md](DOGFOOD.md)).

@@ -2,15 +2,16 @@
 type: Proposal
 title: Knowledge substrate v2 — one store, one kernel, FuxVec dense search
 description: The single consolidated proposal for Fux beyond v0.22 — SQLite substrate (text + index + graph + vectors in one file), one retrieval kernel with six verb projections, FuxVec binary dense search, tiered git strategy, enterprise design inputs. Supersedes knowledge-substrate.compare.md and fuxvec.md.
-status: accepted
+status: implemented
 accepted: 2026-07-21 (Arpit) — graduated to handoff 0004
+implemented: 2026-07-22 (v0.23.0) — ADRs 0008–0011
 timestamp: 2026-07-21T00:00:00Z
 ---
 
 # Knowledge substrate v2 — the consolidated proposal
 
 > **✅ ACCEPTED (Arpit, 2026-07-21).** Design of record for phase 4; build spec:
-> [`../handoff/0004-knowledge-substrate-handoff.md`](../handoff/0004-knowledge-substrate-handoff.md).
+> [`../archive/0004-knowledge-substrate-handoff.md`](../archive/0004-knowledge-substrate-handoff.md).
 
 > **One build, five decisions.** Storage in one SQLite file (text for bulk docs
 > included — never 100k files on disk). The doc index IS the graph. One retrieval

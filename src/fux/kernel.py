@@ -140,7 +140,7 @@ def retrieve(
         )
 
     seeds = _seed_docs(passages)
-    edges = _edges_for(config, {s.doc_id for s in seeds})
+    edges = _edges_for(config, {s.doc_id for s in seeds}, expand_hops)
     expanded = _expanded(edges, seeds, config.graph) if expand_hops > 0 else []
 
     # The graph's own ranked list joins RRF: a document reached only by
@@ -388,15 +388,28 @@ def _seed_docs(passages: list[ScoredChunk]) -> list[SeedDoc]:
     ]
 
 
-def _edges_for(config: Config, doc_ids: set[str]) -> list[Edge]:
-    """Edges touching the seed set — the neighbourhood, sorted for reproducibility."""
+def _edges_for(config: Config, doc_ids: set[str], hops: int = 1) -> list[Edge]:
+    """Edges within ``hops`` of the seeds, sorted for reproducibility.
+
+    The frontier has to grow with the hop count: collecting only edges that
+    touch a *seed* leaves a two-hop walk with no second-level edges to follow,
+    so `path a b --hops 2` would report "no route" for a route that exists.
+    """
     if not doc_ids:
         return []
-    return [
-        Edge(src, kind, dst, grade)
-        for src, kind, dst, grade in load_edges(config)
-        if src in doc_ids or dst in doc_ids
-    ]
+    all_edges = load_edges(config)
+    reached = set(doc_ids)
+    collected: dict[tuple[str, str, str], Edge] = {}
+    for _ in range(max(hops, 1)):
+        frontier = set()
+        for src, kind, dst, grade in all_edges:
+            if src in reached or dst in reached:
+                collected[(src, kind, dst)] = Edge(src, kind, dst, grade)
+                frontier.update((src, dst))
+        if frontier <= reached:
+            break  # nothing new: the neighbourhood is closed
+        reached |= frontier
+    return [collected[key] for key in sorted(collected)]
 
 
 def ppr(

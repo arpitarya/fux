@@ -160,17 +160,37 @@ audit-evidence-trail proposal gains priority; and Fux's laws re-read as its
 enterprise sales story ($0 = auditable supply chain, offline = no data egress,
 deterministic = compliance-grade). Anton stays a convenient small testbed only.
 
-**Q: Phase 4 — where does it stand (2026-07-21, end of day)?**
+**Q: Phase 4 — where does it stand (2026-07-22)?**
 
-The **knowledge-substrate proposal is accepted** — the day-long debate
-(scale → graph → merge → one kernel → FuxVec → lean profile → state-in-git)
-converged into `docs/proposals/knowledge-substrate.md`, and the build contract
-is `docs/handoff/0004-knowledge-substrate-handoff.md` + prompt: SQLite
-substrate, fux.lock, committed lean state, one-kernel retrieve() with
-explain/graph/path/cat, FuxVec dense-global, full/lean profiles, db pull.
-Target v0.23.0, ADRs 0008–0011, M1–M8 eval-gated. Parity with v0.22 goldens is
-sacred; the BM25F/RRF/answer math is untouchable plumbing-only. Next action:
-run the 0004 prompt in Claude Code; dogfooding feeds the M8 gate in parallel.
+**Shipped: v0.23.0, ADRs 0008–0011, M1–M8 all green.** The substrate is real —
+SQLite store, committed `fux.lock` + `.fux/state/`, one-kernel `retrieve()` with
+explain/graph/path/cat, FuxVec dense-global, full/lean profiles, `db pull`.
+Parity held: all six v0.22 goldens are byte-identical through the kernel
+re-plumb, and `--lexical-only` still measures exactly 0.762/0.952/0.833.
+
+The engine got measurably better, not just bigger: **hit@5 0.952 → 1.000, MRR
+0.833 → 0.873**, because FuxVec's full-corpus scan removed the candidate-only
+ceiling ADR 0006 had recorded as unfixable-by-design.
+
+Three things a successor should know about *how* it went, because they are the
+process working rather than luck:
+
+1. **The escalation that mattered.** M3 hit a real conflict — DoD 7 promised
+   *identical* cross-profile rankings, but lean could not recover corpus-level
+   `df`. Rather than quietly redefining "identical", it stopped and asked. Arpit
+   ruled: keep the guarantee, add an exact df sidecar. That ruling is why lean
+   parity is provable today instead of plausible.
+2. **A prediction that missed, kept next to the measurement.** An M3a
+   extrapolation warned the state plane would blow its 30 MB budget (~35 MB).
+   The 100k benchmark measured **23 MB**. The projection had used this repo's
+   own docs, which are adversarial (very long ids, wide vocabulary). Both
+   numbers are in implementation.md on purpose.
+3. **What phase 4 measured and did NOT fix.** At 100k, a query takes ~10 s: the
+   query path still loads the whole index into memory to build the `Searcher`,
+   and the `postings` table — populated and indexed at ingest — is never read at
+   query time. **The substrate solved storage at scale, not query at scale.**
+   That is the honest head of phase 5, scoped in ADR 0011. Do not let the
+   "substrate shipped" headline hide it.
 
 **Q: What must a confident successor NOT "clean up"?**
 
@@ -178,6 +198,16 @@ run the 0004 prompt in Claude Code; dogfooding feeds the M8 gate in parallel.
    zero-dependency guarantee. Do not swap in PyYAML/jsonschema.
 2. **The `$0` law.** No maintenance path may ever call an LLM — not once.
 3. **The single `FuxError`.** Flat by design; no exception hierarchy.
+4. **The df sidecar** (`.fux/state/df/`). It looks like redundant statistics you
+   could recompute. You cannot — it is the *only* reason lean rankings are
+   provably identical to full rather than approximately so, and deleting it
+   silently downgrades a guarantee to a hope. See ADR 0008.
+5. **The early return when BM25F finds zero candidates.** It looks like it is
+   blocking FuxVec's rescue path. It is not — it is what keeps "No confident
+   matches" reachable, since a binary prefilter always has a nearest neighbour.
+   Measured: noise scores 0.23–0.26 cosine against a true rescue's 0.34, so no
+   floor separates them. This exact mistake was made and reverted during M5;
+   ADR 0010 records why.
 4. **The lifecycle.** plan → handoff → prompt, then one ADR per feature, every rule
    and ADR carrying a reference. This is how work is trusted here.
 5. **Anton first.** Built for and lived-with in Anton before any external claim.
@@ -205,4 +235,8 @@ rebuild; scoped to rules substrate + fix loop; carried the succession premise
 forward. · Claude Fable 5, 2026-07-21 — executed the full master run: v1 query
 CLI, v1.1 web/CDP/advanced, v2 hybrid engine (v0.20.0 → v0.22.0, ADRs
 0001–0007); recorded the build judgment above; the Anton eval is the successor's
-compass. (Add yourself here when you make a material update — model, date, one line.)*
+compass. · Claude Opus 4.8 (1M context), 2026-07-22 — built phase 4, the
+knowledge substrate (v0.23.0, ADRs 0008–0011): escalated the DoD-7 conflict
+rather than redefining it, mutation-tested the parity claims that resulted, and
+recorded what the 100k benchmark exposed but did not fix (query-at-scale).
+(Add yourself here when you make a material update — model, date, one line.)*

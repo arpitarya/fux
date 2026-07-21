@@ -60,6 +60,14 @@ same question → the same answer. No wall-clock output, no model in the mainten
 path, sorted walks, stable serialization. The property behind trust, goldens, and
 the audit story. See [CLAUDE.md](../CLAUDE.md).
 
+**df sidecar (`.fux/state/df/`)** — Committed, exact corpus statistics: per-term
+document frequency plus total chunk count and per-field token sums. It exists so
+the [lean profile](#lean-profile) is *provably* identical to full rather than
+approximately so — lean re-derives exact term frequencies but cannot see
+corpus-level numbers from a candidate slice. Sums are stored (not averages) so
+`avg_wlen` recomputes for any `[engine.bm25f]` weights without re-ingesting. See
+[ADR 0008](adr/0008-substrate-store-lock-state.md).
+
 **Distillation** — The dev-time-only pipeline (`tools/distill/`) that re-packs a
 teacher embedding model into Fux's bundled artifact: vocab-trimmed, int8-quantized,
 7.93 MB, sha-pinned. Heavy deps allowed there; never at runtime. See
@@ -103,6 +111,21 @@ the zero-dependency promise. OKF requires a `type` key on every knowledge doc.
 (Repo convention: ALL-CAPS docs — GLOSSARY.md, DOC-REGISTRY.md — are entry-point
 files exempt from frontmatter, like CLAUDE.md/README.md.)
 
+**`fux.lock`** — The committed sources ledger at the repo root: sorted JSONL, one
+line per source, recording sha, size and conversion provenance. Answers *what is
+in the corpus, when was it taken, is it stale?* Staleness is structural per kind —
+files compare sha, URLs compare age, because you cannot sha a page you have not
+re-fetched. `fux ingest --check` reads only this file, so it works on a fresh
+clone. Replaced the committed manifest in v0.23. See
+[ADR 0008](adr/0008-substrate-store-lock-state.md).
+
+**FuxVec** — Fux's from-scratch, stdlib binary vector engine. Sign-quantizes each
+256-dim int8 embedding into a **256-bit code** (32 B/doc), scans the whole corpus
+by Hamming distance (`(q ^ c).bit_count()` — measured ~27 M comparisons/sec), then
+re-scores the top 500 with exact int8 cosine. The codes only *select*; the final
+ordering is exact. Removed the candidate-only ceiling ADR 0006 recorded. See
+[ADR 0010](adr/0010-fuxvec-binary-dense-search.md).
+
 **Goldens** — Committed expected outputs (`tests_e2e/goldens/`, normalized JSON)
 that the real CLI's output must match byte-for-byte. Updated deliberately on
 intentional behaviour change, never regenerated blindly. Derive from
@@ -116,11 +139,24 @@ Claude Code **prompt**. Live in [`handoff/`](handoff/), archived on completion.
 md/txt/code, stdlib-flattened JSON, fenced YAML, image metadata stubs,
 MarkItDown-class office/PDF when the extra is present. See [fidelity](#fidelity).
 
-**Index (`.fux/index/`)** — The derived retrieval structures: BM25F postings +
+**Index (`.fux/index/`)** — The derived *runtime plane*, gitignored: BM25F postings +
 chunk vectors (`vectors.bin`). Regenerable from the cache; gitignore-able. Not the
 [corpus](#corpus).
 
-**Manifest (`.fux/manifest.jsonl`)** — One canonical JSON line per ingested file:
+**Kernel (`retrieve()`)** — The single retrieval path. Takes a seed (text or a
+node) and returns a [ResultGraph](#resultgraph); every verb is a projection of it
+rather than its own pipeline. `fux explain` is literally `ask` seeded by a node.
+See [ADR 0009](adr/0009-retrieval-kernel-graph-verbs.md).
+
+**Lean profile** — `[index] profile = lean`: the corpus persists only doc-level
+state (codes, signatures, metadata, df) and **re-derives** chunk text on demand,
+on the premise that deterministic converters reproduce exactly what was indexed
+(verified against [`fux.lock`](#fuxlock)). Trades cold-query latency for
+footprint. Rankings are identical to `full` by construction, not by sampling.
+`auto` chooses it only above `lean_threshold` documents, where the footprint win
+is real. See [ADR 0011](adr/0011-profiles-lean-state.md).
+
+**Manifest (`.fux/index/manifest.jsonl`)** — One canonical JSON line per ingested file:
 source path, sha256, fidelity, converter, cache path. The index's invalidation key
 and `--check`'s ground truth.
 
@@ -143,12 +179,24 @@ cache conform. See [CLAUDE.md](../CLAUDE.md) §OKF.
 **Passage** — What `fux ask` returns: a ranked chunk rendered with `path:line`,
 score, and heading context.
 
+**PPR-lite** — Personalized PageRank restricted to the seed neighbourhood, used to
+expand results along the document graph: damping 0.85, exactly 3 iterations,
+sorted traversal, top 10 above 0.01. A *fixed* iteration count rather than a
+convergence test, because reproducibility outranks precision here. See
+[ADR 0009](adr/0009-retrieval-kernel-graph-verbs.md).
+
 **Proposal** — A parked idea kept with compare-doc rigor (`proposals/`,
 `status: proposed`); graduates to a compare doc or plan entry when picked up.
 
 **Provenance** — The trail from any answer back to its origin: citation →
 cache frontmatter (source, sha256, converter, fidelity, url/parent/depth for web)
 → git history. What makes answers auditable.
+
+**ResultGraph** — What the [kernel](#kernel-retrieve) returns: `seeds` (ranked
+docs per retriever), `nodes`, `edges`, `paths` (reliability-scored trails) and
+`passages`. Each verb renders a different slice of the same object, which is what
+keeps `--explain` and `fux path` telling one story. See
+[ADR 0009](adr/0009-retrieval-kernel-graph-verbs.md).
 
 **RFC 6455** — The WebSocket protocol. Fux implements a minimal client on stdlib
 `socket`/`hashlib`/`base64` to speak [CDP](#cdp-chrome-devtools-protocol);
@@ -166,6 +214,13 @@ agent workflows, read by 32+ tools (Copilot, Kiro, Codex, Cursor…). Fux ships 
 skills — `fux-query` and `fux-ingest` — written once, placed by
 `fux setup --skills`. See [agent-integration](compare/agent-integration.compare.md).
 
+**State plane (`.fux/state/`)** — The **committed** lean plane: ~200 B/doc of
+FuxVec codes, Bloom term signatures and compressed metadata, sharded into 256
+buckets by doc-id hash so a commit touching 50 documents rewrites a few small
+files rather than one blob. Small enough to live in git, which is what makes a
+fresh clone queryable before any ingest. Measured 243 B/doc at 100k. See
+[ADR 0008](adr/0008-substrate-store-lock-state.md).
+
 **Static embeddings** — Embeddings from a fixed token→vector lookup table
 (Model2Vec/Potion family): no neural forward pass at inference, hence stdlib-fast
 on CPU. The only model class that fits Fux's ≤10 MB / zero-dep budget.
@@ -177,6 +232,12 @@ text.
 **TextRank** — PageRank over a sentence-similarity graph: sentences central to
 their passage score higher. One of the three factors selecting
 [extractive-answer](#extractive-answer) sentences — an algorithm, not a model.
+
+**Tier (curated / mirror)** — How a web source is stored. *Curated* writes one
+cache file per page (reviewable as diffs); *mirror* writes **no files at all** —
+converted text lives as rows in `fux.db`, because 100k documents-as-files is
+impractical whether or not git is involved. Commit the recipe, never the
+warehouse. See [ADR 0008](adr/0008-substrate-store-lock-state.md).
 
 **Worklog** — [`worklog.md`](worklog.md): the per-exchange rolling session
 handoff (OKF log.md style, newest first) so a new chat picks up cold. Distinct

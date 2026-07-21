@@ -8,12 +8,12 @@ timestamp: 2026-07-21T00:00:00Z
 # fux.toml — the annotated example
 
 *The **config contract**, maintained like [cli-examples.md](cli-examples.md): every
-key below matches the shipped `src/fux/config.py` (v0.22.x); when a config key is
+key below matches the shipped `src/fux/config.py` (v0.23.x); when a config key is
 added/renamed/re-defaulted, update this file in the same change (registry
 trigger). `fux setup` writes the `[sources]` section; everything else is
 hand-added, and unknown keys/sections survive re-runs of setup untouched.*
 
-## Complete as-shipped example (v0.22.x)
+## Complete as-shipped example (v0.23.x)
 
 ```toml
 # fux.toml — lives at the project root; find_root walks up to locate it.
@@ -47,6 +47,27 @@ candidate_pool = 200             # BM25F candidates the dense pass re-ranks
 [answer]
 max_sentences = 5                # extractive-answer length cap (--answer-max overrides)
 
+[engine.graph]                   # deterministic PPR-lite expansion (v3)
+damping          = 0.85          # PageRank damping
+iterations       = 3             # FIXED count, not a convergence test — reproducibility
+max_expanded     = 10            # most expanded nodes kept per query
+min_score        = 0.01          # ppr mass below this is noise
+extracted_weight = 1.0           # edges read from artifacts (links, citations, tags)
+inferred_weight  = 0.6           # semantic edges, if a host session ever writes them
+hop_decay        = 0.8           # path reliability decay per hop
+in_rrf           = true          # graph list joins fusion (open question 2 → ADR 0009)
+
+[index]                          # storage backend + footprint profile (v3)
+format           = "auto"        # json | sqlite | auto
+profile          = "auto"        # full | lean | auto
+sqlite_threshold = 25000         # chunks; above this, auto picks sqlite
+lean_threshold   = 10000         # docs; below this, auto stays on full (see ADR 0011)
+lean_cache_mb    = 200           # bounded LRU for re-derived chunks (lean only)
+prefilter_width  = 500           # FuxVec Hamming candidates re-scored exactly
+
+[git]
+commit_cache = false             # true = also commit .fux/cache (knowledge-as-diffs)
+
 [sources.web]                    # fenced network — only fetched by `fux ingest --web`
 urls         = []                # crawl roots; empty = --web does nothing
 max_depth    = 1                 # link levels below each root (0 = the page only)
@@ -59,7 +80,15 @@ max_fetch_kb = 2048              # per-fetch size cap
 render       = "off"             # "cdp" = capture rendered DOM via your own headless Chrome
 cdp_port     = 9222              # Chrome --remote-debugging-port to use
 settle_ms    = 500               # post-load settle before DOM capture (cdp only)
+max_age_days = 30                # url staleness horizon used by `fux ingest --check`
+tier         = "curated"         # "mirror" = no page files at all; text lives in fux.db
 ```
+
+**What git carries** (see [ADR 0008](adr/0008-substrate-store-lock-state.md)):
+`fux.toml` and `fux.lock` at the root, plus `.fux/state/` — together the recipe
+and enough state to answer immediately after a clone. `.fux/index/` is derived
+and gitignored (`fux setup` writes the rule). `.fux/cache/` is rebuilt on clone;
+committing it is opt-in via `[git] commit_cache`.
 
 ## Minimal real-world configs
 
@@ -85,18 +114,15 @@ budget    = 200
 
 ## Proposed extensions — NOT yet shipped
 
-*Fenced here so the example never lies. These are the
-[knowledge-substrate](proposals/knowledge-substrate.md) proposals awaiting
-Arpit's verdict; they move above this line only when implemented.*
+*Fenced here so the example never lies. `[index]`, `[engine.graph]`, `[git]` and
+`[sources.web] tier/max_age_days` moved **above** this line in v0.23 — they ship.
+What remains below is the source-spec work, still unimplemented.*
 
 ```toml
 [sources]
 docs  = ["docs", "notes/**/*.md", "!notes/private/**"]  # globs + ! excludes
 files = ["whitepaper.pdf"]                              # individual files, first-class
 lists = ["@sources-docs.txt"]                           # huge lists in @files (one entry/line)
-
-[index]
-format = "auto"                  # json | sqlite | auto — SQLite index v2 at scale
 ```
 
 ## Related
