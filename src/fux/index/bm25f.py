@@ -32,7 +32,9 @@ class ScoredChunk:
     start: int | None  # source line span; None for synthetic bodies
     end: int | None
     score: float
+    ordinal: int = 0  # chunk index within its file (vector-cache alignment)
     terms: dict = field(default_factory=dict)  # per-term explain detail
+    hybrid: dict | None = None  # rank/similarity/rrf detail when fused (v2)
 
 
 class Searcher:
@@ -47,7 +49,7 @@ class Searcher:
             meta = files[rel]
             ptoks = Counter(path_tokens(rel))
             title = meta.get("title", "")
-            for chunk in meta["chunks"]:
+            for ordinal, chunk in enumerate(meta["chunks"]):
                 htoks = Counter(tokenize(chunk["heading"]) + tokenize(title))
                 btoks = Counter(tokenize(chunk["text"]))
                 wlen = (
@@ -63,6 +65,7 @@ class Searcher:
                         "text": chunk["text"],
                         "start": chunk["start"],
                         "end": chunk["end"],
+                        "ordinal": ordinal,
                         "wlen": wlen,
                     }
                 )
@@ -109,6 +112,7 @@ class Searcher:
                     start=c["start"],
                     end=c["end"],
                     score=score,
+                    ordinal=c["ordinal"],
                     terms=detail[ix],
                 )
             )

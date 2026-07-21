@@ -50,6 +50,15 @@ class AnswerParams:
 
 
 @dataclass(frozen=True)
+class HybridParams:
+    """[engine.hybrid] — RRF fusion of BM25F + bundled dense (engine v2)."""
+
+    enabled: bool = True
+    rrf_k: int = 60
+    candidate_pool: int = 200
+
+
+@dataclass(frozen=True)
 class WebParams:
     """[sources.web] — the fenced network path (ingest-only, never query)."""
 
@@ -73,6 +82,7 @@ class Config:
     ingest: IngestParams = IngestParams()
     bm25f: BM25FParams = BM25FParams()
     answer: AnswerParams = AnswerParams()
+    hybrid: HybridParams = HybridParams()
     web: WebParams = WebParams()
     raw: dict = field(default_factory=dict)
 
@@ -133,6 +143,16 @@ def load(root: Path) -> Config:
     if params["b"] > 1:
         raise FuxError("[engine.bm25f] b must be between 0 and 1")
 
+    hyb = _table(_table(raw, "engine"), "hybrid")
+    enabled = hyb.get("enabled", True)
+    if not isinstance(enabled, bool):
+        raise FuxError("[engine.hybrid] enabled must be true or false")
+    rrf_k = hyb.get("rrf_k", 60)
+    candidate_pool = hyb.get("candidate_pool", 200)
+    for name, val in (("rrf_k", rrf_k), ("candidate_pool", candidate_pool)):
+        if not isinstance(val, int) or isinstance(val, bool) or val < 1:
+            raise FuxError(f"[engine.hybrid] {name} must be a positive integer")
+
     ans = _table(raw, "answer")
     max_sentences = ans.get("max_sentences", AnswerParams.max_sentences)
     if not isinstance(max_sentences, int) or isinstance(max_sentences, bool) or max_sentences <= 0:
@@ -144,6 +164,7 @@ def load(root: Path) -> Config:
         ingest=IngestParams(max_kb=max_kb, exclude=tuple(exclude)),
         bm25f=BM25FParams(**params),
         answer=AnswerParams(max_sentences=max_sentences),
+        hybrid=HybridParams(enabled=enabled, rrf_k=rrf_k, candidate_pool=candidate_pool),
         web=web,
         raw=raw,
     )

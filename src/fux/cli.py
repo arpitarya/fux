@@ -44,6 +44,10 @@ def _add_query_flags(sp: argparse.ArgumentParser, *, context: bool = False, answ
     sp.add_argument("--json", action="store_true", help="machine-readable output")
     sp.add_argument("--explain", action="store_true", help="show why each result ranked")
     sp.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
+    sp.add_argument(
+        "--lexical-only", action="store_true",
+        help="pure BM25F (skip the bundled model + RRF fusion)",
+    )
     if context:
         sp.add_argument(
             "-C", "--context", type=int, default=4, metavar="N",

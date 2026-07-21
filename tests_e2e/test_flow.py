@@ -32,31 +32,56 @@ def test_ingest_summary(project):
 
 
 @golden
-def test_ask_golden(ingested):
-    out = run_fux(ingested, "ask", "how do I install the widget service", "--json").stdout
+def test_ask_golden_lexical_v1_parity(ingested):
+    # the pre-v2 goldens, unchanged: --lexical-only must stay byte-equivalent to v1
+    out = run_fux(
+        ingested, "ask", "how do I install the widget service", "--json", "--lexical-only"
+    ).stdout
     assert_golden("ask.json", json.loads(out))
 
 
 @golden
 def test_ask_explain_golden(ingested):
     out = run_fux(
-        ingested, "ask", "how do I install the widget service", "--json", "--explain", "--top", "2"
+        ingested, "ask", "how do I install the widget service",
+        "--json", "--explain", "--top", "2", "--lexical-only",
     ).stdout
     assert_golden("ask-explain.json", json.loads(out))
 
 
 @golden
 def test_find_golden(ingested):
-    out = run_fux(ingested, "find", "telemetry", "--json").stdout
+    out = run_fux(ingested, "find", "telemetry", "--json", "--lexical-only").stdout
     assert_golden("find.json", json.loads(out))
 
 
 @golden
 def test_answer_golden(ingested):
     out = run_fux(
-        ingested, "answer", "how fast are rollbacks after failed health checks", "--json"
+        ingested, "answer", "how fast are rollbacks after failed health checks",
+        "--json", "--lexical-only",
     ).stdout
     assert_golden("answer.json", json.loads(out))
+
+
+@golden
+def test_ask_hybrid_golden(ingested):
+    out = run_fux(
+        ingested, "ask", "how quickly can we revert a failed release", "--json", "--top", "3"
+    ).stdout
+    payload = json.loads(out)
+    assert payload["engine"] == "hybrid"
+    assert_golden("ask-hybrid.json", payload)
+
+
+@golden
+def test_answer_hybrid_golden(ingested):
+    out = run_fux(
+        ingested, "answer", "how fast are rollbacks after failed health checks", "--json"
+    ).stdout
+    payload = json.loads(out)
+    assert payload["engine"] == "hybrid"
+    assert_golden("answer-hybrid.json", payload)
 
 
 def test_answer_human_cites(ingested):

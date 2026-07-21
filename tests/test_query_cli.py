@@ -60,7 +60,16 @@ def test_ask_json_with_explain(tmp_path, monkeypatch, capsys):
     assert top["line_start"] >= 1 and top["line_end"] >= top["line_start"]
     assert top["fidelity"] == "inferred"
     assert top["explain"][0]["term"] in ("deploy", "rollout")
-    assert payload["engine"] == "bm25f" and payload["corpus"]["docs"] == 2
+    assert payload["engine"] in ("bm25f", "hybrid") and payload["corpus"]["docs"] == 2
+    if payload["engine"] == "hybrid":
+        assert top["hybrid"]["bm25f_rank"] >= 1 and top["hybrid"]["rrf"] > 0
+
+    # --lexical-only always restores the pure-v1 engine
+    capsys.readouterr()
+    run(tmp_path, monkeypatch, "ask", "deploy rollout", "--json", "--lexical-only")
+    lex = json.loads(capsys.readouterr().out)
+    assert lex["engine"] == "bm25f"
+    assert "hybrid" not in lex["results"][0]
 
 
 def test_find_ranks_files(tmp_path, monkeypatch, capsys):

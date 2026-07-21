@@ -3,6 +3,11 @@
 Output formats follow docs/cli-examples.md — the committed UX contract; the
 e2e goldens derive from it. `--json` is the agent path and fully deterministic;
 human output may include timing.
+
+Engine v2: retrieval is hybrid by default — BM25F candidates, dense similarity
+from the bundled model over those candidates only, RRF fusion. `--lexical-only`
+(or a missing bundle, or an all-OOV query) preserves the pure-v1 path
+byte-for-byte. The model loads lazily: lexical paths never pay for it.
 """
 
 from __future__ import annotations
@@ -15,6 +20,7 @@ from collections import defaultdict
 from ..config import BM25FParams, Config, find_root, load
 from ..index import load_searcher
 from ..index.bm25f import ScoredChunk, Searcher
+from ..index.fuse import rrf
 from ..ingest.manifest import quick_drift, read as manifest_read
 from ..index.bm25f import tokenize
 from .answer import _STOPWORDS, Sentence, build_answer
@@ -48,12 +54,78 @@ class _Ctx:
         self.manifest = manifest
         self.corpus = corpus
         self.started = started
+        self.engine = "bm25f"
+        self.model = None  # set by _retrieve when the hybrid path is live
 
     def fidelity(self, rel: str) -> str:
         return self.manifest.get(rel, {}).get("fidelity", "inferred")
 
     def elapsed_ms(self) -> int:
         return max(1, round((time.perf_counter() - self.started) * 1000))
+
+
+def _retrieve(searcher: Searcher, ctx: _Ctx, args, pool: int) -> list[ScoredChunk]:
+    """Hybrid (BM25F ∪ dense over candidates → RRF) unless lexical is forced."""
+    if getattr(args, "lexical_only", False) or not ctx.config.hybrid.enabled:
+        return searcher.search(args.query, top=pool)
+    from ..embed import get_model
+
+    model = get_model()
+    if model is None:
+        return searcher.search(args.query, top=pool)
+    query_vec = model.embed(args.query)
+    if query_vec is None:  # all-OOV query: dense has nothing to say
+        return searcher.search(args.query, top=pool)
+    candidates = searcher.search(args.query, top=ctx.config.hybrid.candidate_pool)
+    if not candidates:
+        return []
+    from ..embed.store import load_vectors
+
+    vectors = load_vectors(ctx.config.root)
+    dense: list[tuple[ScoredChunk, float]] = []
+    missing = False
+    for r in candidates:
+        entry = vectors.get(r.file)
+        vec = None
+        if entry and r.ordinal < len(entry["vecs"]):
+            vec = entry["vecs"][r.ordinal]
+        elif entry is None:
+            missing = True
+        if vec is not None:
+            dense.append((r, model.similarity(query_vec, vec)))
+    if missing:
+        print(
+            "warning: some chunks lack semantic vectors — run `fux ingest` to refresh",
+            file=sys.stderr,
+        )
+    if not dense:
+        return candidates[:pool]
+    dense.sort(key=lambda t: (-t[1], t[0].file, t[0].ordinal))
+    similarity = {id(r): sim for r, sim in dense}
+    by_id = {id(r): r for r in candidates}
+    fused = rrf(
+        [[id(r) for r in candidates], [id(r) for r, _ in dense]], k=ctx.config.hybrid.rrf_k
+    )
+    ordered = sorted(
+        fused.items(), key=lambda kv: (-kv[1], by_id[kv[0]].file, by_id[kv[0]].ordinal)
+    )
+    lex_rank = {id(r): i for i, r in enumerate(candidates, start=1)}
+    dense_rank = {id(r): i for i, (r, _) in enumerate(dense, start=1)}
+    results = []
+    for key, score in ordered[:pool]:
+        r = by_id[key]
+        r.hybrid = {
+            "bm25f_rank": lex_rank[key],
+            "bm25f_score": round(r.score, 3),
+            "dense_rank": dense_rank.get(id(r)),
+            "similarity": round(similarity[id(r)], 4) if id(r) in similarity else None,
+            "rrf": round(score, 5),
+        }
+        r.score = score
+        results.append(r)
+    ctx.engine = "hybrid"
+    ctx.model = model
+    return results
 
 
 def _warn_if_stale(config: Config) -> None:
@@ -68,7 +140,7 @@ def _no_hits(args, ctx: _Ctx) -> int:
     if args.json:
         print(
             json.dumps(
-                {"query": args.query, "results": [], "corpus": ctx.corpus, "engine": "bm25f"},
+                {"query": args.query, "results": [], "corpus": ctx.corpus, "engine": ctx.engine},
                 ensure_ascii=False,
             )
         )
@@ -88,7 +160,7 @@ def _loc(file: str, line: int | None) -> str:
 
 
 def _run_ask(searcher: Searcher, ctx: _Ctx, args) -> int:
-    results = searcher.search(args.query, top=args.top)
+    results = _retrieve(searcher, ctx, args, pool=args.top)
     if not results:
         return _no_hits(args, ctx)
     if args.json:
@@ -96,7 +168,7 @@ def _run_ask(searcher: Searcher, ctx: _Ctx, args) -> int:
             "query": args.query,
             "results": [_chunk_json(r, ctx, args.explain) for r in results],
             "corpus": ctx.corpus,
-            "engine": "bm25f",
+            "engine": ctx.engine,
         }
         print(json.dumps(payload, ensure_ascii=False))
         return 0
@@ -112,6 +184,8 @@ def _run_ask(searcher: Searcher, ctx: _Ctx, args) -> int:
         if args.explain:
             for line in _explain_tree(r, ctx.config.bm25f):
                 print(f"  {line}")
+            if r.hybrid:
+                print(f"  {_hybrid_line(r.hybrid)}")
         print()
     plural = "passage" if len(results) == 1 else "passages"
     print(
@@ -125,14 +199,25 @@ def _chunk_json(r: ScoredChunk, ctx: _Ctx, explain: bool) -> dict:
         "path": r.file,
         "line_start": r.start,
         "line_end": r.end,
-        "score": round(r.score, 3),
+        "score": round(r.score, 5 if r.hybrid else 3),
         "heading_path": [p for p in r.heading.split(" > ") if p],
         "fidelity": ctx.fidelity(r.file),
         "text": r.text,
     }
+    if r.hybrid:
+        out["hybrid"] = r.hybrid
     if explain:
         out["explain"] = chunk_explain_json(r)
     return out
+
+
+def _hybrid_line(info: dict) -> str:
+    dense = (
+        f"dense rank {info['dense_rank']} (sim {info['similarity']})"
+        if info["dense_rank"] is not None
+        else "dense —"
+    )
+    return f"bm25f rank {info['bm25f_rank']} (score {info['bm25f_score']}) + {dense} → rrf {info['rrf']}"
 
 
 def _explain_tree(r: ScoredChunk, params: BM25FParams) -> list[str]:
@@ -164,7 +249,7 @@ def _explain_tree(r: ScoredChunk, params: BM25FParams) -> list[str]:
 
 
 def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
-    results = searcher.search(args.query, top=_FIND_POOL)
+    results = _retrieve(searcher, ctx, args, pool=_FIND_POOL)
     if not results:
         return _no_hits(args, ctx)
     per_file: dict[str, dict] = defaultdict(lambda: {"score": 0.0, "chunks": 0, "best": None})
@@ -175,29 +260,34 @@ def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
             agg["score"], agg["best"] = r.score, r
     ranked = sorted(per_file.items(), key=lambda kv: (-round(kv[1]["score"], 9), kv[0]))
     ranked = ranked[: args.top]
+    hybrid = ctx.engine == "hybrid"
     if args.json:
         payload = {
             "query": args.query,
             "results": [
                 {
                     "path": file,
-                    "score": round(agg["score"], 3),
+                    "score": round(agg["score"], 5 if hybrid else 3),
                     "matching_passages": agg["chunks"],
                     "fidelity": ctx.fidelity(file),
+                    **({"hybrid": agg["best"].hybrid} if agg["best"].hybrid else {}),
                     **({"explain": chunk_explain_json(agg["best"])} if args.explain else {}),
                 }
                 for file, agg in ranked
             ],
             "corpus": ctx.corpus,
-            "engine": "bm25f",
+            "engine": ctx.engine,
         }
         print(json.dumps(payload, ensure_ascii=False))
         return 0
     for i, (file, agg) in enumerate(ranked, start=1):
-        print(f"{i}.  {agg['score']:.3f}  {file}")
+        score = f"{agg['score']:.5f}" if hybrid else f"{agg['score']:.3f}"
+        print(f"{i}.  {score}  {file}")
         if args.explain:
             for line in _explain_tree(agg["best"], ctx.config.bm25f):
                 print(f"    {line}")
+            if agg["best"].hybrid:
+                print(f"    {_hybrid_line(agg['best'].hybrid)}")
     return 0
 
 
@@ -205,9 +295,20 @@ def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
 
 
 def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
-    results = searcher.search(args.query, top=_ANSWER_POOL)
+    results = _retrieve(searcher, ctx, args, pool=_ANSWER_POOL)
     max_sentences = args.answer_max or ctx.config.answer.max_sentences
-    sentences = build_answer(results, args.query, max_sentences)
+    qsim = None
+    if ctx.model is not None:  # hybrid live: question-similarity from the same model
+        model = ctx.model
+        query_vec = model.embed(args.query)
+
+        def qsim(text: str) -> float | None:
+            vec = model.embed(text)
+            if vec is None or query_vec is None:
+                return None
+            return model.similarity(query_vec, vec)
+
+    sentences = build_answer(results, args.query, max_sentences, qsim=qsim)
     if not sentences:
         if args.json:
             print(
@@ -218,7 +319,7 @@ def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
                         "sentences": [],
                         "sources": [],
                         "corpus": ctx.corpus,
-                        "engine": "bm25f",
+                        "engine": ctx.engine,
                     },
                     ensure_ascii=False,
                 )
@@ -239,7 +340,7 @@ def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
                 for (file, line), cid in citations.items()
             ],
             "corpus": ctx.corpus,
-            "engine": "bm25f",
+            "engine": ctx.engine,
         }
         print(json.dumps(payload, ensure_ascii=False))
         return 0

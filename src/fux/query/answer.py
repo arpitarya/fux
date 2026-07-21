@@ -36,7 +36,7 @@ class Sentence:
 
 
 def build_answer(
-    results: list[ScoredChunk], query: str, max_sentences: int
+    results: list[ScoredChunk], query: str, max_sentences: int, qsim=None
 ) -> list[Sentence]:
     candidates: list[Sentence] = []
     max_passage = max((r.score for r in results), default=0.0) or 1.0
@@ -65,6 +65,11 @@ def build_answer(
         # overlap smoothed so TextRank can rescue paraphrases; centrality floored
         # so a uniquely relevant sentence isn't crushed for being unlike its peers.
         s.score = s.factors["passage"] * (overlap + 0.05) * (0.5 + 0.5 * cent)
+        if qsim is not None:  # engine v2: question-similarity from the bundled model
+            sim = qsim(s.text)
+            if sim is not None:
+                s.factors["qsim"] = round(sim, 4)
+                s.score *= 0.5 + 0.5 * max(0.0, sim)
 
     ranked = sorted(
         candidates, key=lambda s: (-round(s.score, 9), s.file, s.line or 0, s.text)

@@ -1,0 +1,37 @@
+{
+  "answer": "The deploy uses a blue-green rollout with health checks before cutover. Rollbacks complete within two minutes when a health check fails.",
+  "corpus": {
+    "chunks": 9,
+    "docs": 9
+  },
+  "engine": "hybrid",
+  "query": "how fast are rollbacks after failed health checks",
+  "sentences": [
+    {
+      "citation": 1,
+      "line": 20,
+      "path": "docs/guide.md",
+      "score": 0.264,
+      "text": "The deploy uses a blue-green rollout with health checks before cutover."
+    },
+    {
+      "citation": 2,
+      "line": 21,
+      "path": "docs/guide.md",
+      "score": 0.229,
+      "text": "Rollbacks complete within two minutes when a health check fails."
+    }
+  ],
+  "sources": [
+    {
+      "id": 1,
+      "line": 20,
+      "path": "docs/guide.md"
+    },
+    {
+      "id": 2,
+      "line": 21,
+      "path": "docs/guide.md"
+    }
+  ]
+}

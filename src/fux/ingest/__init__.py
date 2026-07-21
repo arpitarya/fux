@@ -18,6 +18,7 @@ from pathlib import Path
 
 from .. import __version__
 from ..config import Config, find_root, load
+from ..errors import FuxError
 from ..frontmatter import dumps as fm_dumps
 from .convert import ConvertResult, convert
 from .manifest import MANIFEST_REL, Drift, check_drift, quick_drift, read as manifest_read
@@ -47,6 +48,7 @@ class IngestReport:
     removed: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     chunk_count: int = 0
+    embedded: int = 0
     source_roots: int = 0
 
     @property
@@ -116,6 +118,12 @@ def ingest_paths(config: Config, *, build_index: bool = True, web: bool = False)
         from ..index import build_index as _build
 
         report.chunk_count = _build(config, report.entries)
+        try:
+            from ..embed.store import build_vectors
+
+            report.embedded = build_vectors(config)
+        except FuxError as exc:  # a broken bundle must not block lexical ingest
+            report.warnings.append(f"semantic vectors skipped: {exc}")
     return report
 
 
@@ -450,7 +458,8 @@ def _print_summary(report: IngestReport, started: float) -> None:
         f"Manifest: {MANIFEST_REL}"
     )
     elapsed = time.perf_counter() - started
-    print(f"Index: {report.chunk_count} chunks (BM25F)   Elapsed: {elapsed:.1f}s")
+    vectors = f" · {report.embedded} chunks embedded" if report.embedded else ""
+    print(f"Index: {report.chunk_count} chunks (BM25F){vectors}   Elapsed: {elapsed:.1f}s")
     for warning in report.warnings:
         print(f"warning: {warning}")
 
