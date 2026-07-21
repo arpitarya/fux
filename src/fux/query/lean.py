@@ -78,6 +78,65 @@ class LeanCorpus:
                 scored.append((-hits, doc_id))
         return [doc_id for _, doc_id in sorted(scored)]
 
+    def scored_searcher(self, doc_ids: list[str]):
+        """Exact BM25F over a re-derived subset, scored with corpus statistics.
+
+        This is the whole lean guarantee in one method: **tf** comes from
+        re-deriving the candidate documents (deterministic converters make that
+        equal to what was indexed, verified by `fux.lock`), and **df / n /
+        avg_wlen** come from the committed sidecar. Both inputs are exact, so
+        the ranking equals the full profile's — by construction.
+
+        Returns ``None`` when no sidecar is committed; the caller then falls
+        back to doc-level ordering rather than scoring against a subset, which
+        would silently be a different ranking.
+        """
+        from ..index.bm25f import Searcher
+        from ..ingest.chunk import chunk_markdown
+        from ..query.cat import document_text
+        from ..state.df import load_df
+
+        from ..index import doc_id_for
+        from ..ingest.manifest import read as manifest_read
+
+        stats = load_df(self.config.root)
+        if stats is None:
+            return None
+        # The title is part of the *heading* field, so it must be the title the
+        # full profile indexed — the state plane carries it for exactly this.
+        # Line offsets are operational, so they exist only when the manifest
+        # does; without it, citations are body-relative (a fresh clone has no
+        # source-line mapping to be faithful to).
+        offsets = {
+            doc_id_for(e): e.get("line_offset") for e in manifest_read(self.config.root).values()
+        }
+        files: dict[str, dict] = {}
+        for doc_id in doc_ids:
+            try:
+                body = document_text(self.config, doc_id)
+            except Exception:
+                continue  # source absent in this clone: omit, never invent
+            entry = self.docs.get(doc_id)
+            offset = offsets.get(doc_id)
+            files[doc_id] = {
+                "sha256": entry.sha12 if entry else "",
+                "fidelity": "inferred",
+                "title": entry.title if entry else "",
+                "chunks": [
+                    {
+                        "heading": c.heading_path,
+                        "text": c.text,
+                        "start": c.start_line + offset if offset is not None else None,
+                        "end": c.end_line + offset if offset is not None else None,
+                        "words": c.words,
+                    }
+                    for c in chunk_markdown(body)
+                ],
+            }
+        if not files:
+            return None
+        return Searcher(files, self.config.bm25f, stats=stats)
+
     def _dense_ranking(self, query: str) -> list[str]:
         from ..embed import get_model
         from ..embed.fuxvec import hamming, quantize

@@ -18,8 +18,9 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4: M1–M3 ✅**; M4
-> (kernel + verbs) is next and not yet started. Suites: 262 unit + 55 e2e.
+> *(building agent: keep this one line current)* — **Phase 4: M1–M3 + the df
+> sidecar ✅ and committed**; starting **M4** (kernel + verbs).
+> Suites: 285 unit + 55 e2e.
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -78,12 +79,42 @@ row at EVERY milestone completion — no batching).*
 | M1 sqlite store + fux.lock (parity goldens; lock-only --check; migration) | ✅ | 33+12 | all 6 v0.22 goldens pass byte-for-byte on the sqlite backend; lock at root, manifest → runtime plane |
 | M2 bulk tier (docs_text) + `fux cat` + committed `.fux/state/` sharding + three-way check | ✅ | 35+13 | fresh clone answers doc-level from state; rebuild reproduces state byte-for-byte; Bloom sized 9.6 bits/term, k=4 (→ ADR 0008) |
 | M3 edges + nodes (deterministic extraction; thin-layer payloads) | ✅ | 22 | references/cites/crawled_from/tagged, all EXTRACTED; tag nodes (N not N² edges); on this repo's docs: 92 refs · 13 cites · 9 tagged |
+| M3a df sidecar (`state/df/`) — Arpit's DoD-7 amendment | ✅ | 23 | exact df/n/Σfield-lengths; lean == full proven over the *whole* vocabulary on a subset (mutation-tested: removing the injection fails the test) |
 | M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ⬜ | — | |
 | M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ⬜ | — | |
 | M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ⬜ | — | |
 | M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ⬜ | — | |
 | M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ⬜ | — | |
 | Close-out: ADRs 0008–0011, docs law, archive pair, bump | ⬜ | — | target v0.23.0 |
+
+## Early size signal (state envelope — assert properly at M8)
+
+Measured on this repo's own `docs/` (40 docs · 140 chunks · 3,910 unique terms),
+per-document and per-term costs extrapolated to the 100k synthetic. **Not the
+M8 benchmark** — a prior, recorded now because one number is already close to
+its budget.
+
+| Component | Measured | Per unit | Projected @100k |
+|-----------|----------|----------|-----------------|
+| `df/` sidecar | 42.0 KB | ~10 B/term | **~2.1 MB** (Heaps' law b≈0.5) · 105 MB only if vocabulary grew linearly, which it does not |
+| `codes/` | 2.1 KB | 51 B/doc | ~5.1 MB |
+| `sigs/` | 5.8 KB | 144 B/doc | ~14.4 MB |
+| `meta/` | 6.2 KB | 156 B/doc | ~15.6 MB |
+| **Total state** | **56.0 KB** | **1,401 B/doc** | **~35 MB ⚠** |
+
+Two readings:
+
+- **The df sidecar fits.** ~2 MB projected against a 5 MB budget. Delta-encoding
+  sparse u64 hashes buys little (deltas are ~7–8 byte varints either way), but
+  the absolute cost is small enough not to matter.
+- **⚠ `meta/` and `sigs/` are the envelope risk, not `df/`.** At 351 B/doc the
+  non-df plane alone projects to ~35 MB, over the 30 MB envelope. This corpus
+  is adversarial for both (long doc ids like
+  `docs/handoff/0004-knowledge-substrate-handoff.md`, long titles, wide
+  vocabulary per doc → signatures pinned at the 128 B cap), and per-record zlib
+  on ~100-byte payloads pays ~11 bytes of header for little compression. The
+  M8 synthetic corpus decides; if it confirms, the cheap fixes are a shared
+  zlib dictionary or dropping per-record compression for a per-bucket one.
 
 ## Deviations from spec
 
@@ -102,6 +133,32 @@ that captures it — an empty section is the goal)*
   the doc's normative shapes (`--check` advisory + `--strict`→2, JSON `path`/
   `line_start`/`line_end`/`heading_path`/`fidelity` keys, `[n]`+Sources answer
   citations, per-field explain tree, per-kind ingest summary).
+
+- **0004 / df sidecar — SPEC AMENDED BY ARPIT, not deviated from (2026-07-21).**
+  The M3 escalation found a real gap between two guarantees: DoD 7 promised
+  rankings *identical* across profiles, but lean could only recover exact `tf`
+  (by re-deriving text) — `df`, `n` and `avg_wlen` are corpus-level and were
+  unavailable, so Bloom-derived `df` would have made "identical" mean
+  "approximately". Arpit's call: **do not soften the guarantee; store the
+  missing inputs exactly.** Handoff §C now specifies `state/df/XX.bin` and
+  DoD 7 now requires a full-corpus lean-vs-full comparison test with the eval
+  set as a belt. Implemented in `src/fux/state/df.py`; captured in ADR 0008.
+
+  Two implementation choices inside that amendment, both recorded here:
+
+  - **Per-field *sums* are stored, not averages.** Integers round-trip exactly
+    (no float drift), and `avg_wlen = (h·ΣH + p·ΣP + b·ΣB) / n` can then be
+    recomputed for *any* `[engine.bm25f]` weights without re-ingesting.
+  - **Stats live in `df/_stats.bin`, not repeated per bucket.** The handoff says
+    "one header record"; writing it into all 256 buckets would dirty every
+    bucket whenever any document changed, defeating the sharding it exists for.
+  - **Recomputed per ingest rather than delta-maintained.** The spec describes
+    incremental upkeep (`df -= old, df += new`); the index is already fully
+    loaded when the plane is written, so one pass is the same cost and cannot
+    drift the way a running total can. Output bytes are identical either way.
+  - **Hash collisions fail loudly.** Two terms sharing a u64 hash would merge
+    their `df` and silently turn the exactness claim into an approximation, so
+    the builder detects it and raises rather than absorbing it.
 
 - **0004 / `web:` ids apply to *all* fetched pages, not just bulk-tier ones.**
   Handoff §B shows the `web:<slug>` id in the context of the bulk tier. Applying

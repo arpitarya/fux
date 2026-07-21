@@ -38,10 +38,23 @@ class ScoredChunk:
 
 
 class Searcher:
-    """In-memory postings over the stored chunks; built once per process."""
+    """In-memory postings over the stored chunks; built once per process.
 
-    def __init__(self, files: dict[str, dict], params: BM25FParams):
+    ``stats`` injects corpus-level BM25F inputs (total chunk count, average
+    weighted length, per-term document frequency) from the committed df
+    sidecar instead of deriving them from ``files``. The lean profile needs
+    that: it scores a re-derived *subset* of documents, so its local postings
+    know exact tf but would otherwise compute idf against the subset. With the
+    sidecar injected, lean and full pass the scorer identical numbers, which is
+    what makes their rankings provably — not approximately — the same.
+
+    The scoring math below is untouched either way; only the provenance of its
+    inputs differs.
+    """
+
+    def __init__(self, files: dict[str, dict], params: BM25FParams, stats=None):
         self.params = params
+        self.stats = stats
         self.chunks: list[dict] = []
         self.postings: dict[str, list[tuple[int, int, int, int]]] = defaultdict(list)
         total_wlen = 0.0
@@ -76,8 +89,11 @@ class Searcher:
 
     def search(self, query: str, top: int = 5) -> list[ScoredChunk]:
         p = self.params
-        n = len(self.chunks)
-        if n == 0:
+        # Corpus-level inputs: from the df sidecar when injected (lean), else
+        # from what we hold (full). Identical values, different provenance.
+        n = self.stats.total_chunks if self.stats else len(self.chunks)
+        avg_wlen = self.stats.avg_wlen(p) if self.stats else self.avg_wlen
+        if n == 0 or not self.chunks:
             return []
         scores: dict[int, float] = defaultdict(float)
         detail: dict[int, dict] = defaultdict(dict)
@@ -85,11 +101,11 @@ class Searcher:
             plist = self.postings.get(term)
             if not plist:
                 continue
-            df = len(plist)
+            df = self.stats.df_of(term) if self.stats else len(plist)
             idf = math.log((n - df + 0.5) / (df + 0.5) + 1)
             for ix, tf_h, tf_p, tf_b in plist:
                 wtf = p.heading * tf_h + p.path * tf_p + p.body * tf_b
-                denom = wtf + p.k1 * (1 - p.b + p.b * self.chunks[ix]["wlen"] / self.avg_wlen)
+                denom = wtf + p.k1 * (1 - p.b + p.b * self.chunks[ix]["wlen"] / avg_wlen)
                 contribution = idf * wtf * (p.k1 + 1) / denom
                 scores[ix] += contribution
                 detail[ix][term] = {

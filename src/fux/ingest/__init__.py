@@ -153,6 +153,7 @@ def _write_state_plane(config: Config, entries: list[dict]) -> int:
     from ..index import backend_for
     from ..index.bm25f import path_tokens, tokenize
     from ..state import DocState, bloom, write_state
+    from ..state.df import build as build_df, write_df
 
     files = backend_for(config).load(config.root)
     vectors = load_vectors(config.root)
@@ -178,6 +179,10 @@ def _write_state_plane(config: Config, entries: list[dict]) -> int:
                 sig=bloom.build(terms),
             )
         )
+    # The df sidecar: exact corpus statistics, so lean scoring is provably
+    # identical to full rather than approximately so (handoff §C, amended).
+    stats, buckets = build_df(files)
+    write_df(config.root, stats, buckets)
     return write_state(config.root, docs)
 
 
