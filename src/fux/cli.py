@@ -116,6 +116,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     """CLI boundary. Returns a process exit code; never raises FuxError."""
+    if sys.platform == "win32":  # console/pipes default to cp1252; output is UTF-8
+        for stream in (sys.stdout, sys.stderr):
+            try:
+                stream.reconfigure(encoding="utf-8", errors="replace")
+            except (AttributeError, ValueError):  # pragma: no cover
+                pass
     parser = build_parser()
     args = parser.parse_args(argv)
 

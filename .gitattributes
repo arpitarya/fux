@@ -1,0 +1,13 @@
+# LF everywhere, on every platform. The corpus/goldens/determinism guarantees
+# are byte-level; Windows CRLF checkout translation would silently change
+# fixture bytes (shas, goldens) per platform.
+* text=auto eol=lf
+
+# Explicit binary guards — never subject to any text handling.
+*.png binary
+*.gif binary
+*.jpg binary
+*.jpeg binary
+*.pdf binary
+*.docx binary
+*.bin binary
