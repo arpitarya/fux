@@ -54,9 +54,14 @@ diary.*
   goldens per platform; renormalize showed zero drift). pyproject gains the
   3.14 classifier.
 - **Decided / open:** publish stages unchanged (pure-py wheel = one build for
-  all OS). Windows suite runs for the first time in this PR — failures fix
-  forward there.
-- **Next:** merge; Anton dogfood continues.
+  all OS). **Result: all 11 checks green on first run — Windows and macOS
+  passed both suites with no further fixes needed.** Merged as PR #36.
+- **Bookkeeping note (honest):** the Cowork session's README rewrite was
+  uncommitted in the shared working tree and got swept into PR #36's commit
+  (`git add --renormalize .` staged it; the unstage didn't hold). The content
+  is intact and correct on main — only the commit message is wrong about it.
+  Main is protected, so the history stands as-is rather than being rewritten.
+- **Next:** Anton dogfood.
 
 ## 2026-07-21 — Agent commits now attributed + Verified on GitHub · Claude Code
 - **Asked:** commits showed "Unverified" — why, and fix by attributing agent
