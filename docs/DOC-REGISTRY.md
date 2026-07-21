@@ -34,7 +34,7 @@ practice.
 | `tests/` + e2e suite docs | Any behaviour change | 2026-07-21 | 172 unit + 29 e2e (+1 gated skip); goldens via FUX_UPDATE_GOLDENS=1 only |
 | [`../tests_e2e/eval/README.md`](../tests_e2e/eval/README.md) | Eval pairs/metrics/gate change | 2026-07-21 | The v2 gate + Anton private-eval workflow |
 | [`../tools/distill/README.md`](../tools/distill/README.md) | Model recipe, format, or teacher changes | 2026-07-21 | Pinned distillation recipe (ADR 0006) |
-| `../.github/` (ci/publish + branch-protection.json) | Required checks, release path, or the wall change | 2026-07-21 | "fux gate"+"ai-review" = suites + deterministic second pass; release → OIDC PyPI publish; scheduled audit removed (manual: scripts/audit-branch-protection.sh) |
+| `../.github/` (ci/publish + branch-protection.json) | Required checks, release path, or the wall change | 2026-07-22 | **No required checks as of 2026-07-22** (Arpit): "fux gate"+"ai-review" still run on every PR but no longer block merge; wall = enforce_admins + no force-push/deletion only. Release → OIDC PyPI publish |
 
 ## How agents use this file
 
