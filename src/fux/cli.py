@@ -33,6 +33,25 @@ def _cmd_query(args) -> int:
     return cmd_query(args)
 
 
+def _cmd_verb(args) -> int:
+    from .query import verbs
+
+    return {"explain": verbs.cmd_explain, "graph": verbs.cmd_graph,
+            "path": verbs.cmd_path}[args.command](args)
+
+
+def _cmd_cat(args) -> int:
+    from .query.cat import cmd_cat
+
+    return cmd_cat(args)
+
+
+def _cmd_db(args) -> int:
+    from .ingest.dbpull import cmd_db
+
+    return cmd_db(args)
+
+
 def _cmd_hook(args) -> int:
     from .hooks import cmd_hook
 
@@ -106,6 +125,36 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("answer", help="extractive, cited answer to a question")
     _add_query_flags(sp, answer=True)
     sp.set_defaults(_handler=_cmd_query, mode="answer")
+
+    sp = sub.add_parser("explain", help="one document deep: outline, edges, key passages")
+    sp.add_argument("doc", metavar="DOC-ID", help="document id to explain")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--top", type=int, default=5, metavar="N", help="key passages (default 5)")
+    sp.set_defaults(_handler=_cmd_verb)
+
+    sp = sub.add_parser("graph", help="nodes and edges around a topic")
+    sp.add_argument("query", help="topic to map")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--top", type=int, default=5, metavar="N", help="seed docs (default 5)")
+    sp.set_defaults(_handler=_cmd_verb)
+
+    sp = sub.add_parser("path", help="how two documents connect (or that they don't)")
+    sp.add_argument("source", metavar="FROM", help="starting document id")
+    sp.add_argument("target", metavar="TO", help="destination document id")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--hops", type=int, default=1, metavar="N", help="max hops (default 1)")
+    sp.set_defaults(_handler=_cmd_verb)
+
+    sp = sub.add_parser("cat", help="print one document (cache, db row, or re-derived)")
+    sp.add_argument("doc", metavar="DOC-ID", help="document id, e.g. docs/adr/0007.md")
+    sp.add_argument("--out", metavar="FILE", help="write to FILE instead of stdout")
+    sp.set_defaults(_handler=_cmd_cat)
+
+    sp = sub.add_parser("db", help="index artifacts (pull a CI-built fux.db)")
+    db_sub = sp.add_subparsers(dest="db_command", required=True)
+    pull = db_sub.add_parser("pull", help="fetch + sha-verify a prebuilt index")
+    pull.add_argument("url", help="http(s) URL of the published fux.db")
+    sp.set_defaults(_handler=_cmd_db)
 
     sp = sub.add_parser("hook", help="agent-hook entrypoints (fail-open; internal)")
     sp.add_argument("event", choices=["prompt-submit", "session-end"])

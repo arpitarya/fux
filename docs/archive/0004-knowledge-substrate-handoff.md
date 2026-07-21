@@ -1,0 +1,286 @@
+---
+type: Handoff
+title: Knowledge substrate v3 — SQLite store, fux.lock, committed lean state, one-kernel retrieve(), FuxVec, profiles
+description: Full build spec for phase 4 — the accepted knowledge-substrate proposal turned into milestones, schemas, formats, algorithms, tests, and close-out.
+status: implemented
+blocked_by: none (0001–0003 shipped, v0.22.x)
+design_of_record: ../proposals/knowledge-substrate.md
+implemented: 2026-07-22 (v0.23.0)
+adrs: [0008](../adr/0008-substrate-store-lock-state.md), [0009](../adr/0009-retrieval-kernel-graph-verbs.md), [0010](../adr/0010-fuxvec-binary-dense-search.md), [0011](../adr/0011-profiles-lean-state.md)
+timestamp: 2026-07-21T00:00:00Z
+---
+
+# Handoff 0004 — Knowledge substrate v3
+
+## Context (read first)
+
+The design was debated across one full day and **accepted** — every rationale,
+trade-off, size estimate, and reference lives in
+[`../proposals/knowledge-substrate.md`](../proposals/knowledge-substrate.md).
+**Do not relitigate design here; this handoff is the build contract.** Key
+framing you must hold:
+
+- Design point = enterprise mega-project (CLAUDE.md litmus): 10⁵–10⁶ docs is
+  normal, not exceptional.
+- The corpus is docs-and-links for agents; code is secondary.
+- `$0`, stdlib-only runtime, deterministic everything, no model in Fux's code —
+  unchanged and non-negotiable.
+- Git carries **recipe + state**: fux.toml, **fux.lock**, `@lists`,
+  **`.fux/state/`** (lean plane) committed; `.fux/index/` (runtime plane)
+  gitignored.
+
+## Definition of done (phase level)
+
+1. `fux ingest` produces: `fux.lock` (root, committed), `.fux/state/` (sharded
+   lean plane, committed), `.fux/index/fux.db` (runtime plane, gitignored) —
+   all deterministic (double-ingest = byte-identical everywhere).
+2. On a **fresh clone** (only fux.toml + fux.lock + state + sources):
+   `fux find`/`fux ask` answer at doc level immediately from state;
+   `fux ingest` restores full chunk-level behavior; every rebuild verified
+   against fux.lock.
+3. `fux ingest --check` runs lock-only (post-clone) and reports the three-way
+   **state ↔ lock ↔ sources** result: `DRIFT` (sha), `STALE` (web age),
+   `STATE-DESYNC` (state ≠ lock); `--strict` exits 2 on any.
+4. New verbs work end to end: `fux explain <doc>`, `fux graph "<topic>"`,
+   `fux path <a> <b>`, `fux cat <doc>`, `fux db pull <url>`.
+5. `ask`/`find`/`answer` are re-plumbed through the one kernel with **byte-parity
+   on the v0.22 goldens** for small-corpus JSON-profile runs (proven, not
+   asserted).
+6. FuxVec dense-global is live: binary codes, full-corpus Hamming scan, exact
+   int8 rerank; hybrid+global+graph **beats or ties v0.22 hybrid on the eval
+   set** (hit@5, MRR), and specifically rescues ≥1 of the recorded
+   zero-lexical-candidate misses.
+7. Profiles work: `[index] profile = full|lean|auto`; lean @100k synthetic ≈
+   ≤25–30 MB state incl. the df sidecar (measured, recorded); rankings
+   **provably identical** across profiles — same scoring inputs by construction
+   (exact df from the sidecar, exact tf from re-derived docs), asserted by a
+   full-corpus comparison test on the fixture corpus *and* the eval set (the
+   eval assertion is a belt, not the definition).
+8. Both suites + eval green; scale benchmark (synthetic 100k) numbers recorded
+   in the ADRs; docs law satisfied; ADRs 0008–0011 written; this pair archived;
+   version **0.23.0**.
+
+## In scope / out of scope
+
+**In:** everything in the DoD; migration from v0.22 layout (auto-detect old
+`index.json`/`vectors.bin` → rebuild into new layout on first ingest, old files
+removed); `.gitignore` management (`fux setup` writes `.fux/index/` line).
+
+**Out (do not build):** federation/multi-corpus fan-out; at-rest encryption;
+MCP; rules substrate/fix loop; standalone `fuxvec` package extraction; Parquet
+export (recorded as extra for a later phase unless trivially cheap at M7);
+host-session concept/`about` edges (the *schema* supports them; no generator).
+
+## Current state & key files (v0.22.1)
+
+```
+src/fux/
+  cli.py            add: explain, graph, path, cat, db subcommands
+  config.py         add: [index] profile/format, [git] commit_cache, tier=…
+  frontmatter.py    unchanged (used by cat/materialize)
+  ingest/           walk/convert/chunk/manifest/web/cdp/advanced — manifest.py
+                    becomes lock.py (see M1); ingest orchestrates state+db writes
+  index/bm25f.py    scoring math UNCHANGED (parity is sacred)
+  index/store.py    JSON store stays (small-corpus profile); new sqlite store beside it
+  index/fuse.py     RRF — gains a third (dense_global) and fourth (graph) list
+  embed/model.py    unchanged (tokenize/lookup/pool/int8 cosine)
+  embed/store.py    vectors move into fux.db (sqlite profile)
+  query/api.py      re-plumb through kernel; renderers per verb
+  query/answer.py   unchanged math; consumes kernel passages
+  query/explain.py  gains seeds/graph lines
+tests/  tests_e2e/  (172 unit · 29 e2e · eval harness in tests_e2e/eval/)
+```
+
+## Architecture spec (normative)
+
+### A. fux.db schema (format_version 2)
+
+```sql
+CREATE TABLE meta      (key TEXT PRIMARY KEY, value TEXT);          -- format_version=2, profile, model_sha
+CREATE TABLE docs      (doc_id TEXT PRIMARY KEY, kind TEXT, source TEXT, sha256 TEXT,
+                        fidelity TEXT, converter TEXT, title TEXT, outline TEXT,
+                        top_terms TEXT, converted_at TEXT, bytes INTEGER);
+CREATE TABLE docs_text (doc_id TEXT PRIMARY KEY REFERENCES docs, text BLOB);   -- bulk tier only
+CREATE TABLE chunks    (chunk_id TEXT PRIMARY KEY, doc_id TEXT, ordinal INTEGER,
+                        heading_path TEXT, line_start INTEGER, line_end INTEGER, text TEXT);
+CREATE TABLE postings  (term TEXT, chunk_id TEXT, tf_heading INTEGER, tf_path INTEGER,
+                        tf_body INTEGER, PRIMARY KEY (term, chunk_id));
+CREATE INDEX postings_term ON postings(term);
+CREATE TABLE vectors   (chunk_id TEXT PRIMARY KEY, v BLOB);          -- 256×int8
+CREATE TABLE doc_codes (doc_id TEXT PRIMARY KEY, code BLOB);         -- 32 B FuxVec
+CREATE TABLE edges     (src TEXT, kind TEXT, dst TEXT, grade TEXT,   -- EXTRACTED|INFERRED
+                        PRIMARY KEY (src, kind, dst));
+CREATE INDEX edges_src ON edges(src); CREATE INDEX edges_dst ON edges(dst);
+CREATE TABLE frontier  (url TEXT PRIMARY KEY, state TEXT, sha256 TEXT, fetched_at TEXT);
+```
+
+Rules: WAL mode; ingest = single writer holding `.fux/index/.lock` (second
+ingest → clear FuxError); queries read-only; canonical ordering on every write
+(sorted by primary key) so the db file is reproducible; `doc_id` = POSIX
+relative path (local) or `web:<slug>` (bulk web); `chunk_id` =
+`doc_id#<heading-slug>#<ordinal>` (citation-stable per §12 of the proposal).
+
+### B. fux.lock (root, committed, replaces .fux/manifest.jsonl)
+
+Sorted JSONL, canonical separators, one line per source:
+
+```jsonl
+{"id":"docs/adr/0007.md","kind":"file","sha256":"…","bytes":4812,"converted_at":"…","fidelity":"inferred","converter":"native-md"}
+{"id":"web:vendor-wiki/sla-appendix","kind":"url","url":"https://…","sha256":"…","fetched_at":"…","max_age_days":30,"depth":1,"parent":"web:vendor-wiki"}
+```
+
+- Staleness: `file` → live sha ≠ lock sha (plus new/missing); `url` →
+  `now − fetched_at > max_age_days` (default from `[sources.web] max_age_days
+  = 30`, per-source override allowed later).
+- `--check` must work with **only** fux.toml + fux.lock present.
+- `converted_at`/`fetched_at` derive from SOURCE_DATE_EPOCH/mtime/recorded
+  fetch — never wall clock at re-serialize (ADR 0002 discipline).
+
+### C. .fux/state/ (committed lean plane)
+
+- 256 buckets by `sha256(doc_id)[0]` byte: `state/codes/XX.bin`,
+  `state/sigs/XX.bin`, `state/meta/XX.bin` (XX = 00–ff, only non-empty buckets
+  exist).
+- Record layouts (little-endian, magic + version header per file:
+  `FUXSTATE1\0` + u16 format):
+  - codes: repeated (u64 doc_hash, 32 B code), sorted by doc_hash.
+  - sigs: repeated (u64 doc_hash, u16 sig_len, sig bytes) — Bloom filter,
+    k=4 hashes (sha256-derived, fixed seeds), m sized for ~1 % FPR at the doc's
+    unique-term count, capped 128 B.
+  - meta: repeated (u64 doc_hash, u16 rec_len, zlib(json{id,sha12,title,flags})).
+- **df sidecar (amended 2026-07-21, Arpit's call on the M3 escalation):**
+  `state/df/XX.bin` sharded by term-hash first byte — repeated (u64 term_hash
+  delta-encoded ascending, varint df) + one header record (total_docs,
+  total_chunks, avg lengths per field). Exact corpus-level document frequencies
+  so **lean BM25F is provably identical to full** (lean re-derives exact tf for
+  scored docs; df was the only missing exact input). Est. +2–5 MB @100k; state
+  envelope becomes ~25 MB @100k. Maintained incrementally: per changed doc,
+  df -= old term set, df += new term set — deterministic.
+- Determinism: same sources → byte-identical buckets. State writes happen in
+  the same ingest transaction scope as lock writes.
+
+### D. FuxVec (dense engine)
+
+- Quantize: code bit i = (v[i] > 0), 256 dims → 32 B, at ingest, alongside the
+  int8 vector.
+- Query: embed question → quantize → for each doc code: `(q ^ c).bit_count()`;
+  keep top `prefilter_width = 500` (config) by Hamming, ties broken by doc_id
+  ascending; exact int8 cosine (existing math) over those docs' chunk vectors →
+  `dense_global` ranked list.
+- IVF: **only if** the M8 benchmark shows full scan > 150 ms at 100k — then
+  deterministic k-means (fixed seed 0, sorted init by doc_id, 10 iterations,
+  √N centroids, scan nearest 8 lists). Otherwise record "not needed yet" in
+  ADR 0010.
+
+### E. The kernel
+
+```python
+@dataclass(frozen=True)
+class ResultGraph:
+    seeds: list[SeedDoc]          # per-retriever ranks: bm25f, dense_cand, dense_global
+    nodes: list[Node]             # seed + expanded docs (payload = docs row)
+    edges: list[Edge]
+    paths: list[Path]             # seed→…→node trails, reliability-scored
+    passages: list[Passage]       # chunk-level, RRF-fused (existing shape + graph signal)
+
+def retrieve(cfg, seed: str | NodeRef, *, k: int, lexical_only=False,
+             expand_hops: int = 1) -> ResultGraph: ...
+```
+
+- Expansion: PPR-lite — power iteration over the seed-restricted neighborhood,
+  damping 0.85, exactly 3 iterations, sorted adjacency traversal; keep top 10
+  expanded nodes ≥ threshold 0.01. Path reliability = product of per-edge
+  weights (EXTRACTED 1.0, INFERRED 0.6) × decay 0.8/hop. All constants in
+  `[engine.graph]` config with these defaults; all deterministic.
+- RRF fusion: existing k=60 over lists [bm25f, dense_candidates, dense_global,
+  graph-expansion(rank by ppr score)]. `--lexical-only` bypasses dense+graph =
+  byte-parity with v1 path.
+- Verb → projection mapping exactly per the proposal §5 table. `explain <doc>`
+  = retrieve(seed=NodeRef(doc)); `path a b` = retrieve(seed=a) filtered to
+  trails ending at b (if none within hops, honest "no recorded path").
+
+### F. CLI surface (added)
+
+```
+fux explain <doc-id>            [--json]
+fux graph  "<topic>"            [--json --top N]
+fux path   <doc-id> <doc-id>    [--json]
+fux cat    <doc-id>             [--out FILE]
+fux db pull <url>               (sha-verify vs fux.lock; env FUX_DB_AUTH header passthrough)
+```
+
+Output formats: extend `docs/cli-examples.md` **before implementing renderers**
+(the doc is normative; formats sketched in proposal §10 appendix).
+
+### G. Profiles
+
+- `full`: docs_text + chunks + postings + vectors in db (bulk); curated docs
+  read text from cache/sources.
+- `lean`: state plane only persists doc-level; chunk artifacts derived on
+  demand into a bounded LRU region of fux.db (`[index] lean_cache_mb = 200`),
+  evicted by last-touch, deterministic content.
+- `auto`: lean when every source in a tier is re-derivable (local file / repo
+  path); full for web-mirror tiers. Rankings must be identical across profiles
+  (eval-asserted).
+
+## Milestones (each = green suites before the next)
+
+- **M1 — sqlite store + fux.lock.** Schema A; store module with json/sqlite
+  parity (same query results, golden-proven); manifest.jsonl → fux.lock
+  (format B) at root; `--check` lock-only + three-way messages; migration from
+  v0.22 layout; `.gitignore` management.
+- **M2 — bulk tier + state plane.** docs_text; `fux cat`; `tier = "mirror"`
+  config; state sharding (format C) written with lock; clone simulation e2e
+  (delete .fux/index → doc-level find/ask from state alone).
+- **M3 — edges + nodes.** Deterministic edge extraction (references/cites/
+  crawled_from/tagged) at ingest; nodes payload (title/outline/top_terms).
+- **M4 — kernel + verbs.** retrieve() + ResultGraph; re-plumb ask/find/answer
+  (v0.22 golden byte-parity); new renderers explain/graph/path per
+  cli-examples; `--explain` seeds/graph lines.
+- **M5 — FuxVec.** Codes at ingest; Hamming scan + rerank; dense_global into
+  RRF; `--lexical-only` parity retained.
+- **M6 — expansion.** PPR-lite + paths + reliability; graph list into RRF.
+- **M7 — profiles + db pull.** full/lean/auto; LRU; `db pull` v1.
+- **M8 — scale + eval gate.** Synthetic 100k corpus generator (committed
+  script); measure: ingest time, db/state sizes vs §8b estimates, ask latency
+  full+lean, FuxVec scan time (decides IVF); extend eval harness with
+  relational pairs (question → expected path/neighbor) + profile-parity
+  assertions; **gate:** hybrid+global+graph ≥ v0.22 hybrid on hit@5 & MRR and
+  ≥1 zero-candidate rescue. Numbers → ADRs.
+- **Close-out.** ADRs **0008** (store/lock/state-in-git), **0009** (kernel +
+  graph verbs), **0010** (FuxVec — incl. build-time verification of the
+  binary-quantization citations flagged in the proposal), **0011** (profiles/
+  lean). Docs law full pass (plan, README, cli-examples, fux-toml, GLOSSARY
+  new terms, registry, worklog, interview, implementation.md phase-4 table —
+  add it at M1 start). Archive this pair. **v0.23.0.**
+
+## Edge cases (tests must cover)
+
+Fresh clone with state but stale sources (three-way messages exact); state
+bucket corruption (magic check → clear FuxError naming the bucket → re-ingest);
+concurrent ingest (lock file, second exits 1 with message); doc in lock but
+source gone (DRIFT missing); web doc past max_age (STALE, age shown); Bloom
+false positive (must not surface in results — exact scoring downstream;
+regression test with a crafted collision); zero-hop path request (a→a);
+path with no route (honest empty); `cat` on curated vs bulk vs missing doc;
+lean cold-doc query (derives, caches, second query fast); LRU eviction
+correctness; `db pull` sha mismatch (refuse, exit 1); migration from v0.22
+artifacts; empty corpus for every new verb; unicode doc-ids in state hashing;
+Windows paths in state/lock (POSIX normalization holds).
+
+## Open questions (answer during build, record in ADRs)
+
+1. Bloom m/k exact sizing table per unique-term bands — pick at M2, record in
+   ADR 0008.
+2. Does graph-expansion join RRF always, or only when lexical+dense agree
+   weakly? Decide on eval evidence at M8 (ADR 0009).
+3. `top_terms` count per doc (default 24?) — tune on eval at M8.
+4. Whether `fux graph`'s human rendering needs ASCII art or list form — pick
+   the simplest that reads well; cli-examples decides.
+
+## Close-out contract
+
+Per CLAUDE.md: docs law full pass; worklog phase report; implementation.md
+phase-4 table flipped ✅ only with green suites; interview state-of-play
+updated; this handoff + prompt → `docs/archive/` with `status: implemented` +
+ADR links; version 0.23.0.

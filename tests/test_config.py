@@ -87,3 +87,51 @@ def test_unknown_tables_ignored(tmp_path):
     cfg = load(tmp_path)
     assert isinstance(cfg, Config)
     assert cfg.raw["future_section"] == {"x": 1}
+
+
+# -- the config doc is a contract, not prose -------------------------------
+
+
+def test_documented_config_parses_and_matches_shipped_defaults(tmp_path):
+    """`docs/fux-toml.md` claims to show every shipped key with its default.
+
+    Parse the doc's own example and check it against the dataclass defaults, so
+    the file cannot quietly drift from the parser it documents.
+    """
+    from pathlib import Path
+
+    from fux.config import (
+        AnswerParams, BM25FParams, GitParams, GraphParams, HybridParams,
+        IndexParams, WebParams, load,
+    )
+
+    doc = (Path(__file__).parent.parent / "docs" / "fux-toml.md").read_text(encoding="utf-8")
+    section = doc.split("## Complete as-shipped example")[1]
+    block = section.split("```toml", 1)[1].split("```", 1)[0]
+    (tmp_path / "fux.toml").write_text(block, encoding="utf-8")
+
+    config = load(tmp_path)
+    assert config.bm25f == BM25FParams()
+    assert config.answer == AnswerParams()
+    assert config.hybrid == HybridParams()
+    assert config.graph == GraphParams()
+    assert config.index == IndexParams()
+    assert config.git == GitParams()
+    defaults = WebParams()
+    for field in ("max_depth", "same_domain", "attachments", "budget", "delay_s",
+                  "max_fetch_kb", "render", "cdp_port", "settle_ms",
+                  "max_age_days", "tier"):
+        assert getattr(config.web, field) == getattr(defaults, field), field
+
+
+def test_shipped_keys_are_not_still_in_the_proposed_fence():
+    """Keys that ship must sit above the "NOT yet shipped" line, or the doc lies."""
+    from pathlib import Path
+
+    doc = (Path(__file__).parent.parent / "docs" / "fux-toml.md").read_text(encoding="utf-8")
+    # The fenced *example*, not the prose around it — the prose legitimately
+    # names shipped tables when explaining that they moved out of the fence.
+    section = doc.split("## Proposed extensions — NOT yet shipped")[1]
+    example = section.split("```toml", 1)[1].split("```", 1)[0]
+    for shipped in ("[index]", "[engine.graph]", "[git]", "format =", "profile ="):
+        assert shipped not in example, f"{shipped} ships but is still fenced as proposed"

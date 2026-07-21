@@ -26,6 +26,128 @@ diary.*
 
 ---
 
+## 2026-07-22 — phase 4 complete: knowledge substrate shipped at v0.23.0 · Claude Code
+- **Asked:** three rulings (integer token-sums approved as amendment; early-return
+  judgment approved; state budget → measure at M8 before optimizing), then
+  M6 → M7 → M8 → close-out, with a discipline check first.
+- **Did:** discipline check passed (M1–M5 already committed as clean milestone
+  commits; tracker rows ✅ with counts) except one reconcile — `fux path`'s
+  renderer did not match the format cli-examples had specified first, so the
+  **code was changed to follow the doc**, and the multi-path form documented.
+  - **M6 PPR-lite:** constants as specced; seed-*rank* personalization; graph
+    joins RRF as a fourth list. Guard: fusion skipped for node seeds, since a
+    neighbour's passage among a document's own would misattribute it.
+  - **M7 profiles:** lean = a Searcher over re-derived candidates with the df
+    sidecar injected, so the kernel never learns its profile. Mid-corpus switch
+    (full→lean) keeps rankings **and** scores — **mutation-verified non-vacuous**
+    (making `lean_searcher` return None fails the test). LRU uses a monotonic
+    counter, never a clock. `db pull` sha-verifies and refuses mismatches.
+  - **M8:** committed generator + harness; 100k measured. **state 22.96 MB
+    (≤30 ✓), df 0.92 MB (≤5 ✓)**, db 1081 MB (77% of §8b), FuxVec scan **54 ms
+    < 150 → IVF not built**, ingest 566 s. Relational eval added for
+    explain/graph/path.
+  - **Close-out:** ADRs 0008–0011 (0010's flagged citations **verified**, not
+    asserted); full docs pass; 0004 pair archived; **v0.23.0**.
+  - Suites **172+29 → 365 unit + 71 e2e**; eval hit@5 **1.000**; `--lexical-only`
+    still exactly 0.762/0.952/0.833.
+- **Decided / open:** two behaviour changes recorded in Deviations — a fresh
+  clone now answers *exactly* (better than DoD 2's doc-level, so the docs were
+  corrected to match), and `auto` gained `lean_threshold` because §G read
+  literally would have flipped every small repo to lean silently.
+  **The M3a size warning was wrong and is kept next to the measurement that
+  corrected it** (351 B/doc projected from this repo's adversarial docs vs
+  230 B/doc actual); per the ruling, no zlib change was made.
+  **⚠ The honest finding:** at 100k a query takes ~10 s — `postings` is stored
+  and indexed but never read at query time, so the whole index still loads into
+  memory. Phase 4 solved *storage* at scale, not *query* at scale.
+- **Next:** **query-at-scale** — score from `postings` by term instead of
+  loading every row (table, index and exact corpus stats already exist).
+  Scoped in ADR 0011; it is the head of phase 5. Branch
+  `feat/phase4-knowledge-substrate` (10 commits) is ready for PR to main.
+
+## 2026-07-22 — phase 4 M3a–M5: df sidecar, kernel, FuxVec · Claude Code
+- **Asked:** Arpit's DoD-7 ruling (Option B — exact df sidecar, guarantee does **not**
+  soften), commit M1–M3 first, then continue M4→M8.
+- **Did:** committed the backlog as three clean commits (spec docs / M1–M3 / sidecar),
+  then landed M3a, M4, M5 — each green, each committed.
+  - **M3a df sidecar** (`state/df/`): term hashes sharded by hash low byte,
+    delta-encoded + varint df; `_stats.bin` holds total_docs/total_chunks and
+    per-field token **sums** (integers round-trip exactly, and `avg_wlen`
+    recomputes for any weights without re-ingesting). `Searcher` gained an
+    optional `stats` injection — scoring math untouched, only input provenance
+    changes. Parity is enforced, not asserted: every term in the vocabulary,
+    scored over a strict *subset* (where subset-derived idf would diverge),
+    matches full exactly — and **mutation-tested** (removing the injection fails
+    both parity tests). Collisions raise rather than silently merging df.
+  - **M4 kernel:** `retrieve() -> ResultGraph` is now the only retrieval path;
+    ask/find/answer are projections, and explain/graph/path are new ones.
+    `explain` = ask seeded by a node (its own `top_terms` become the query), so
+    there is genuinely one code path. Edges now persist in the JSON store too.
+  - **M5 FuxVec:** full-corpus Hamming prefilter → exact int8 rerank →
+    `dense_global` as a third RRF list. **Gate beats v0.22 hybrid:** hit@1
+    .762→.810 · hit@5 .952→**1.000** · MRR .833→.873, and ADR 0006's named
+    zero-overlap miss is rescued. `--lexical-only` still measures exactly
+    .762/.952/.833 with its four goldens byte-identical.
+- **Decided / open:** two judgment calls recorded (implementation.md → Decisions,
+  → ADR 0010). (1) **dense_global does not fire when BM25F returns zero
+  candidates** — removing that early return made "No confident matches"
+  unreachable, since a binary prefilter always has a nearest neighbour; measured
+  noise scores 0.23–0.26 cosine vs a true rescue's 0.34, so no floor separates
+  them as the corpus grows. Re-reading ADR 0006 settled it: "zero lexical
+  candidates" meant the correct *document* had no overlap, not the query.
+  (2) The two **hybrid goldens were updated deliberately**, with the eval table
+  as justification; the four `--lexical-only` goldens were not touched.
+  **⚠ Open (size):** early measurement projects the state envelope to ~35 MB
+  @100k against Arpit's 30 MB budget — `meta/` + `sigs/` are the risk, not
+  `df/` (~2 MB). M8 measures properly; cheap fixes noted if it confirms.
+- **Next:** **M6 — PPR-lite expansion** (damping 0.85, 3 iterations, top-10
+  ≥0.01, `[engine.graph]` config) + graph list into RRF. Then M7 (profiles +
+  `db pull`), M8 (100k benchmark + gate), ADRs 0008–0011, docs pass, v0.23.0.
+  Version still 0.22.1.
+
+## 2026-07-21 — phase 4 M1–M3: substrate, state plane, graph · Claude Code
+- **Asked:** execute handoff 0004 (knowledge substrate v3) — the full phase, M1 first,
+  milestone plan posted before any code.
+- **Did:** posted the M1–M8 plan with file-level breakdown, then built and landed
+  **M1–M3**, each green before the next.
+  - **M1** — `index/sqlstore.py` (schema A, format_version 2, WAL, single-writer
+    `.fux/index/.lock`, PK-sorted writes) beside the JSON store, with `[index] format
+    = json|sqlite|auto` dispatch; `ingest/lock.py` writes **`fux.lock`** at the repo
+    root (format B) and the operational manifest moves to `.fux/index/manifest.jsonl`;
+    `--check` is now lock-only and three-way (DRIFT/STALE/STATE-DESYNC); `fux setup`
+    writes `.fux/index/` to `.gitignore`. **Parity proven, not asserted:** all six
+    v0.22 goldens pass byte-for-byte on the sqlite backend (`tests_e2e/test_sqlite_parity.py`).
+  - **M2** — `fux/state/` committed lean plane (format C: 256 buckets ×
+    codes/sigs/meta, `FUXSTATE1\0` header, sorted records); Bloom signatures
+    (k=4, 9.6 bits/term, 8–128 B — handoff open question 1 **decided**);
+    `embed/fuxvec.py` sign-quantizer; bulk/mirror tier (`docs_text` rows, no files
+    on disk); `fux cat`; and the **fresh-clone query path** — `rm -rf .fux/index`
+    still answers `find`/`ask` at doc level from committed state, and `fux ingest`
+    rebuilds the state buckets byte-for-byte.
+  - **M3** — `fux/graph/` deterministic extraction: `references`, `cites` (links
+    under a citations heading, ranked as evidence), `crawled_from`, `tagged`
+    (tag *nodes*, so N docs sharing a tag cost N edges not N²), all EXTRACTED
+    grade; node payloads (outline, top_terms) into the `docs` row.
+  - Bugs the tests caught and fixed: vectors were hardcoded to the JSON store;
+    sqlite corruption escaped past the CLI error boundary; a local-only `fux ingest`
+    silently evicted mirror-tier `docs_text`; `fux cat` could not resolve on a
+    fresh clone (manifest is in the runtime plane — now falls back to the lock).
+  - Suites **172+29 → 262 unit + 55 e2e**, all green. cli-examples.md updated
+    *before* each new renderer, per the handoff.
+- **Decided / open:** three deviations recorded in implementation.md → Deviations
+  (all headed for ADRs 0008/0011): `web:<slug>` ids apply to **all** fetched pages,
+  not just bulk (otherwise every curated web doc reads as a permanent
+  STATE-DESYNC); the operational manifest survives, relocated, rather than being
+  replaced by the lock; `fux answer` has **no** state-only mode — it is extractive
+  *and cited*, and citations need line-anchored passages, so it declines with a
+  reason rather than citing lines the index never scored. **Open:** profile
+  ranking parity (DoD 7) needs corpus-level df to be exact — Bloom-derived df is
+  approximate; decide and record honestly at M7/M8.
+- **Next:** **M4 — the kernel** (`retrieve()` + `ResultGraph`, re-plumb
+  ask/find/answer under it with v0.22 golden byte-parity, then the
+  `explain`/`graph`/`path` renderers). M4–M8 + ADRs 0008–0011 + the docs pass +
+  the 0.23.0 bump are **not** started; version is still 0.22.1.
+
 ## 2026-07-21 — dummy playground repo for dogfooding · Claude Code
 - **Asked:** set up a sibling repo with dummy data to play with the fux package.
 - **Did:** created `~/my_programs/fux-playground` (git-initialized, initial commit) — fictional
@@ -95,6 +217,373 @@ diary.*
 - **Decided / open:** no scheduled tamper alarm on the wall anymore — re-add the
   workflow + a `BRANCH_PROTECTION_TOKEN` PAT if that guarantee is ever wanted back.
 - **Next:** Anton dogfood.
+
+## 2026-07-21 — M4+M5 reviewed; three rulings for the run-in · Cowork
+- **Asked:** agent reported M4 (kernel re-plumb, six goldens byte-parity) + M5
+  (FuxVec: hybrid+dense_global **0.810/1.000/0.873** vs v0.22's
+  0.762/0.952/0.833; ADR 0006's named zero-overlap miss now retrieved;
+  --lexical-only exactly preserved). Asked for the next-step prompt.
+- **Rulings (Arpit via Cowork):** (1) **integer token-sums df header approved**
+  — better than the spec'd averages (exact round-trip; avg_wlen recomputable
+  for any weights without re-ingest); record as approved amendment in ADR 0008.
+  (2) **Early-return judgment call approved** — correct reading of ADR 0006
+  (rescue = doc-side zero overlap, via the third RRF list; noise floor
+  0.23–0.26 vs 0.34 doesn't separate); record in ADR 0010 with those numbers.
+  (3) **Budget risk: measure at M8 before optimizing** — if the synthetic 100k
+  confirms >30 MB, apply per-bucket zlib first (simpler, no dictionary artifact
+  to version), shared dict only if that misses; honest numbers either way.
+- **Next:** continuation prompt → M6 (PPR-lite) → M7 → M8 → close-out at 0.23.0.
+
+## 2026-07-21 — M3 escalation resolved: exact df sidecar, guarantee stays provable · Cowork
+- **Asked:** the building agent escalated (correctly, per the no-silent-deviation
+  rule): lean-profile BM25F can't be *provably* identical to full without exact
+  corpus df — soften DoD 7 to eval-top-k, or grow the state plane?
+- **Did (Arpit's call, via Cowork):** **grow the state — `state/df/XX.bin`
+  sidecar** (delta-encoded term-hashes + varint df + corpus-stats header,
+  ~2–5 MB @100k; incremental per-doc maintenance). DoD 7 *strengthened*:
+  provably identical by construction (exact df sidecar + exact re-derived tf),
+  asserted by full-corpus comparison on fixtures + eval as belt. Rationale:
+  "identical rankings" is the brand promise (deterministic/compliance-grade) —
+  softening converts a proof into an eval-shaped empirical claim. State
+  envelope @100k: ~25–30 MB (still in Arpit's "around 10–20" band). Handoff
+  format C + DoD 7 amended; proposal size table noted. Build state per the
+  agent: M1–M3 done (uncommitted, suites green), M4–M8 pending, version 0.22.1.
+- **Decided / open:** df sidecar in; continuation prompt handed to Arpit.
+- **Next:** paste the continuation prompt into the running Claude Code session.
+
+## 2026-07-21 — Milestone tracking law: pre-register + update every milestone · Cowork
+- **Asked:** update the implementation file on every milestone, and put that in
+  CLAUDE.md so it applies to every plan.
+- **Did:** **Phase-4 table pre-registered** in `implementation.md` (M1–M8 +
+  close-out, all ⬜, with the pre-registration note); "Now working on" updated.
+  CLAUDE.md 4b split into its two binding halves: (1) every plan/handoff
+  **pre-registers** its milestone table in implementation.md in the same change;
+  (2) building agents update the row **at every single milestone completion**
+  (status + tests + note — per milestone, never batched at phase end). The 0004
+  prompt aligned: table already pre-registered, per-milestone updates binding.
+- **Decided / open:** standing law for all future plans.
+- **Next:** paste the 0004 prompt into Claude Code.
+
+## 2026-07-21 — Proposal FINALIZED; plan + handoff 0004 + prompt written · Cowork
+- **Asked:** finalize the proposal; create the plan, handoff, and prompt in as
+  much detail as possible.
+- **Did:** `proposals/knowledge-substrate.md` → **status: accepted** (graduated
+  per lifecycle; header links the build spec). fux-plan: 0004 row added to the
+  build queue (v3 — substrate; target v0.23.0, ADRs 0008–0011); §8 next-move
+  rewritten. Wrote **`handoff/0004-knowledge-substrate-handoff.md`** — the
+  build contract with normative specs: fux.db schema v2 (10 tables, WAL,
+  single-writer lock, canonical ordering, citation-stable chunk ids), fux.lock
+  format + staleness semantics, `.fux/state/` byte layouts (FUXSTATE1 magic,
+  256 hash buckets, Bloom k=4 ~1 % FPR ≤128 B), FuxVec algorithm (quantize →
+  Hamming top-500 fixed tie-breaks → exact rerank; IVF only if M8 shows
+  >150 ms), kernel `retrieve()`/ResultGraph + PPR-lite constants (damping .85,
+  3 iters, EXTRACTED 1.0/INFERRED 0.6, decay .8), CLI additions
+  (explain/graph/path/cat/db pull), profiles incl. lean LRU; **M1–M8
+  milestones** each with scope, plus DoD (8 phase-level criteria incl. v0.22
+  golden byte-parity and the eval gate with zero-candidate rescue), 17 edge
+  cases, 4 open questions routed to ADRs, close-out contract. Wrote the
+  paste-ready **0004 prompt** (explore order, hard rules — parity sacred, math
+  untouchable, cli-examples-before-renderers — verify gates, stop-clean
+  semantics). Registry bumped.
+- **Decided / open:** phase 4 fully specced. Nothing open in design.
+- **Next:** paste `handoff/0004-knowledge-substrate-prompt.md` into Claude Code.
+
+## 2026-07-21 — Git carries the state (committed lean plane) · Cowork
+- **Asked:** git should carry the state — and it should be maintained.
+- **Did:** the lean profile made this viable (~200 B/doc), so `.fux/state/` is
+  now **committed, versioned state**: sharded by doc-id hash into 256 buckets
+  (codes/sigs/meta, ~80 KB each @100k) so commits touching 50 docs change a few
+  buckets, not a 20 MB blob; deterministic bytes = zero diff noise. What it
+  buys: `git clone` → **instantly queryable** at doc level; `git log
+  .fux/state/` = history of what the corpus knew; `git checkout <rev> && fux
+  ask` = time-travel for free. **Maintained, enforced:** ingest rewrites
+  state + lock atomically; session-end hook prompts the commit; CI's
+  `--check --strict` becomes a **three-way state ↔ lock ↔ sources** gate —
+  stale committed state fails the build. Honest limits: binary state (humans
+  diff the lock), history growth (sharded deltas; high-churn/100k+ tiers switch
+  to db-pull artifacts). §8 table, §8c subsection, §8e summary, appendix tree,
+  M2 milestone all updated; gitignore narrows to `.fux/index/`.
+- **Decided / open:** state-in-git folded into the ⏳ proposal.
+- **Next:** Arpit's verdict → handoff 0004.
+
+## 2026-07-21 — Lean profile: 100k docs in ~20 MB · Cowork
+- **Asked:** can 100k docs land at ~10–20 MB total? Be creative; build from
+  scratch if needed.
+- **Did:** yes — by flipping the storage assumption. Entropy forbids compressing
+  600 MB of text to 20 MB, but **determinism means Fux need not store text at
+  all: sources are the storage; the index stores find + verify + re-derive**
+  (deterministic converters + fux.lock shas reproduce exact bytes on demand).
+  New §8c "lean profile" in the substrate proposal: **~200 B/doc persistent
+  plane** — 32 B FuxVec code + 96–128 B **Bloom term signature** (validated by
+  BitFunnel, Bing's production signature index, SIGIR'17 — fresh citation
+  pulled) + ~50 B metadata → **100k ≈ 18–21 MB ✓**, 1M ≈ 200 MB. Query path:
+  dense scan + signature prefilter → top ~50 docs → re-derive text → exact
+  chunk BM25F/rerank (false positives only add candidates — rankings identical
+  to full profile, eval-proven); bounded LRU keeps hot docs warm. Honest
+  trades: cold-doc re-conversion latency; source availability at query time
+  (web tiers may prefer full profile). Config `[index] profile = full|lean|
+  auto`. Section renumbering fixed (8c lean, 8e fresh-clone summary);
+  BitFunnel added to references.
+- **Decided / open:** lean profile added to the ⏳ proposal; fits M5/M8.
+- **Next:** Arpit's verdict on the proposal → handoff 0004.
+
+## 2026-07-21 — Substrate proposal hardened: git contract, fux.lock, sizes, gaps · Cowork
+- **Asked:** (1) exact git-committed file set — clone must rebuild from scratch;
+  (2) a separate sources file with hash/date for staleness; (3) .fux size
+  estimates at 1k/10k/100k/1M docs; (4) graphify as reference, not benchmark;
+  (5) review the doc for gaps.
+- **Did:** rewrote §8 as **the git contract** — invariant "clone rebuilds from
+  scratch"; committed set = fux.toml + **fux.lock** + @lists + agent files;
+  `.fux/` fully gitignored (curated-cache commit demoted to opt-in
+  `[git] commit_cache` — the invariant outranks the diffs bet). New **§8a
+  fux.lock**: committed root-level sorted-JSONL ledger (file kind: sha/bytes/
+  converted_at/fidelity; url kind: sha/fetched_at/**max_age_days**) — staleness
+  is structural (files by sha, web by age), `--check` works lock-only right
+  after clone; replaces manifest.jsonl. New **§8b size envelope** with stated
+  assumptions (~15 KB/doc bulk): 1k ≈ 15 MB · 10k ≈ 145 MB · 100k ≈ 1.4 GB ·
+  1M ≈ 14 GB (text+postings dominate; vectors+codes <11 % — semantic is nearly
+  free; lock sharding option >100k). §2 + references reworded: **graphify =
+  prior art to learn from, never a benchmark**. New **§12 gaps review**, each
+  resolved or ⚠ flagged: WAL concurrency, corruption=rebuild, chunk-id/citation
+  stability, schema versioning, own-postings-vs-FTS5 made explicit, streaming
+  ingest, ⚠ multi-corpus fan-out (federation's first requirement),
+  ⚠ at-rest encryption deferred, db-pull auth v1, Windows/AV notes, relational
+  eval pairs for graph/path. Appendix tree + M1 milestone aligned to the lock.
+- **Decided / open:** proposal hardened; still one ⏳ awaiting Arpit's verdict.
+- **Next:** Arpit's verdict → handoff 0004.
+
+## 2026-07-21 — One proposal: knowledge-substrate.md (substrate + FuxVec) · Cowork
+- **Asked:** merge the knowledge-substrate compare doc and the FuxVec proposal
+  into ONE proposal with details on the approach.
+- **Did:** created **`proposals/knowledge-substrate.md`** — the single
+  consolidated post-v0.22 proposal, 11 sections: context (enterprise litmus),
+  break analysis, SQLite store schema (incl. bulk `docs_text` + `codes`), the
+  graph (deterministic + semantic edge tiers), the one-kernel/six-projections
+  table, **FuxVec as §6 with the four-step approach detailed** (sign-quantize →
+  big-int XOR/bit_count full scan → exact int8 rerank → deterministic IVF;
+  storage verdicts incl. Parquet-as-export; standalone-package note; honest
+  limits), source spec, git tiers + fresh-clone/db-pull story, enterprise
+  inputs, the full sample-repo/CLI appendix (ask/answer/cat/explain/path with
+  FuxVec + graph lines in --explain), and **§11 build sequencing** (handoff 0004
+  milestones M1–M8, eval-gated). Deleted `compare/knowledge-substrate.compare.md`
+  + `proposals/fuxvec.md`; repointed all links (compare README, proposals
+  README, fux-plan, fux-toml ×2, cli-examples).
+- **Decided / open:** one ⏳ document now carries the entire next phase.
+- **Next:** Arpit's verdict on `proposals/knowledge-substrate.md` → handoff 0004.
+
+## 2026-07-21 — Fresh-clone story, FuxVec proposal, answer example · Cowork
+- **Asked:** (1) gitignored warehouse — what happens on a fresh clone? (2) build
+  a vector db from scratch on JSON/Parquet as a package concept — push
+  boundaries; (3) add a `fux answer` example.
+- **Did:** substrate doc gained **"Fresh clone"** section — curated tier works
+  immediately (cache is committed); bulk-local re-ingests to a byte-identical,
+  manifest-verified warehouse; bulk-web either re-crawls (drift visible per doc)
+  or uses the enterprise path: **warehouse as CI build artifact** + proposed
+  `fux db pull` (download + sha-verify vs committed manifest — the lockfile/
+  restore pattern). Wrote **`proposals/fuxvec.md`**: vector-db concept from
+  scratch — sign-quantize 256-dim int8 → 256-bit codes (32 MB per 1M chunks),
+  full-corpus scan via XOR + `int.bit_count()` (C-speed big-int popcount;
+  ~tens of ms at 100k), exact int8 rerank of top ~500, deterministic IVF above
+  ~100k, storage = packed shards/SQLite BLOBs (JSON for manifest/centroids;
+  **Parquet = opt-in export extra** for DuckDB/Spark interop — pyarrow can't be
+  a runtime dep); unlocks `dense_global` seeds → rescues ADR 0006's
+  zero-candidate miss class; standalone `fuxvec` package noted as its own
+  wedge. Substrate §3 vector-DB verdict updated ("adopting closed; building the
+  concept proposed"); §8 gained the `fux answer` example (bulk logical-id +
+  local file:line citations, graph-hop note). *Web quota blocked fresh cites —
+  binary-quantization numbers flagged for build-time verification.*
+- **Decided / open:** FuxVec = milestone inside the substrate handoff, eval-
+  gated; `db pull` = proposed command. Substrate verdict still awaits Arpit.
+- **Next:** Arpit's verdict on knowledge-substrate.compare.md → handoff 0004.
+
+## 2026-07-21 — Litmus change: enterprise mega-project, not Anton · Cowork
+- **Asked:** stop thinking of this project in reference to Anton; think from the
+  point of a very large-scale project in corporations.
+- **Did:** replaced the Anton litmus in CLAUDE.md with the **enterprise
+  mega-project litmus** (scale is the default; enterprise realities are design
+  inputs; the laws are the sales story: $0 = auditable supply chain, offline =
+  no data egress, deterministic = compliance-grade). fux-plan §6a re-scoped
+  (substrate = default forward path; standing proposals gain weight).
+  knowledge-substrate doc: build trigger re-scoped (corporate corpora *start*
+  past the breakpoint — substrate is the next phase, not a contingency) + new
+  **"Enterprise design inputs"** section (proxy/SSO ingest, Windows fleets,
+  air-gapped installs, corpus-per-boundary access model, audit priority).
+  model-handoff-interview: direction-change Q&A added. Anton demoted to
+  convenient small-scale testbed.
+- **Decided / open:** litmus changed ✅. Substrate verdict still awaits Arpit's
+  formal call, but its sequencing is now "next phase by default."
+- **Next:** Arpit's verdict on knowledge-substrate.compare.md → handoff → build.
+
+## 2026-07-21 — Documentation-style rule added to CLAUDE.md · Cowork
+- **Asked:** add to CLAUDE.md — no large paragraphs in documents; split into
+  points; make them roomier.
+- **Did:** new **"Documentation style (required)"** section in CLAUDE.md, placed
+  before the docs law: short points (one idea each), 3–4-line paragraph cap,
+  blank lines between points/sections, tables for comparisons, takeaway-first
+  bullets, and a fix-on-contact clause (splitting an existing wall of text is
+  part of touching the doc — form is covered by the same staleness law as facts).
+- **Decided / open:** binding for all future doc writing in the repo.
+- **Next:** Anton dogfood (unchanged).
+
+## 2026-07-21 — Correction accepted: bulk text lives IN the db, not as files · Cowork
+- **Asked:** "saving 100k documents in cache is impractical — try to understand."
+- **Did:** understood and fixed the real point — the previous tier design still
+  put bulk text in a *gitignored file mirror*; but 100k files are impractical
+  **as files** (walks, inodes, deletes, Windows/AV/sync), git or no git. Substrate
+  doc corrected end to end: storage verdict is now **tier-dependent** — curated
+  tier keeps per-file Markdown (review/git value at 10²–10⁴ docs); **bulk tier
+  has no file cache at all** — converted text = `docs_text` rows in fux.db (one
+  file on disk at any corpus size; SQLite reads small blobs ~35 % faster than
+  the filesystem per its own benchmark). New `fux cat <doc>` materializes any
+  single doc on demand; bulk citations use logical id + heading (no fabricated
+  file paths); break-analysis row corrected (cache breaks at ~10⁴ *as files*);
+  §7 tier table + §8 tree/CLI reworked ("never 100k files — your curated files
+  plus one database"). CLAUDE.md + fux-plan tier language corrected to match.
+- **Decided / open:** correction folded into the ⏳ substrate verdict (still
+  awaiting Arpit's overall call on the doc).
+- **Next:** Anton dogfood.
+
+## 2026-07-21 — Consolidated into knowledge-substrate.compare.md · Cowork
+- **Asked:** merge corpus-at-scale + document-knowledge-graph into ONE doc; show
+  sample CLI + folder structure for the implemented substrate.
+- **Did:** created **`compare/knowledge-substrate.compare.md`** — the single
+  design of record for post-v0.22 architecture: verdict block with four decisions
+  (SQLite substrate; doc-index-IS-the-graph; one kernel/six projections; git
+  tiers), break analysis, prior-art (graphify/vector-DBs) condensed, source-spec
+  extensions, research references, open build items — plus **§8 appendix**: the
+  implemented-substrate walkthrough (fux.toml with globs/@lists/mirror tier;
+  repo tree showing curated-committed vs mirror-gitignored vs one fux.db;
+  worked CLI: resumable `--web` crawl, `ask` rescued via graph hop, `explain`
+  node view, `path` with reliability + EXTRACTED tag, the new `--explain` graph
+  line). Deleted the two superseded docs; fixed every live link (compare README,
+  proposals README — graph marked *graduated*, fux-toml ×2, fux-plan,
+  cli-examples). Worklog history left intact.
+- **Decided / open:** one doc now carries the whole ⏳ decision; trigger
+  unchanged (Anton: scale pain or relational questions).
+- **Next:** Anton dogfood.
+
+## 2026-07-21 — One kernel, six projections; sample-repo walkthrough · Cowork
+- **Asked:** difference between ask/graph and explain/path — do they need to be
+  separate, can one algorithm serve them? Plus: CLI usage + dir-structure examples
+  for a sample repo.
+- **Did:** researched PathRAG (AAAI'25: node-retrieval → flow-pruned paths with
+  reliability scores → answers as ONE pipeline; paths are scored *byproducts*) and
+  GraphRAG local search (entity-seeded = query-by-node). Designed the **unified
+  kernel**: `retrieve(seed: text|node) → ResultGraph {seeds, expansion, paths,
+  passages}`; all six verbs become projections (ask=passages, find=seeds,
+  answer=synthesis, explain=node-seeded deep view, graph=nodes+edges, path=paths
+  slice). Key insights recorded: `explain` is `ask` seeded by a node; **paths are
+  retrieval provenance the PPR expansion already computes** — not a feature, a
+  kept trail; `--explain` and `fux path` converge into one trust story. Written
+  into corpus-at-scale §"One kernel, six projections" (engine implements one
+  kernel + thin renderers; friendly verbs stay). Added **"A sample repo, end to
+  end"** to cli-examples.md: acme-payments tree before/after, commit-vs-gitignore
+  split per tier, human + agent daily flows, substrate-v2 era marked as proposed.
+- **Decided / open:** one-kernel design folded into the substrate-v2 proposal;
+  trigger unchanged.
+- **Next:** Anton dogfood.
+
+## 2026-07-21 — The merge: graph + corpus-at-scale = one knowledge substrate · Cowork
+- **Asked:** is there an opportunity to merge the graph and corpus-at-scale?
+  Creative, outside the box, with research.
+- **Did:** found the unifying insight — **the level-1 doc index IS the graph's
+  node table** (a doc entry's payload = a node's payload; the thin layer was the
+  graph unrecognized). Designed "one substrate": single SQLite-v2 file with
+  nodes/edges/chunks/postings/vectors; `ask`/`explain`/`graph`/`path` are three
+  surfaces over the same tables; retrieval becomes seed (BM25F+dense on docs) →
+  **deterministic PPR-lite expansion over edges** (multi-hop recall, zero model
+  calls — the natural rescue for ADR 0006's zero-lexical-candidate miss class) →
+  per-doc chunk detail → RRF with graph as third signal. Research validation:
+  HippoRAG/LightRAG (PPR-from-seeds, 10–30× cheaper multi-hop; *operators beat
+  structure* — cheap deterministic edges suffice), LazyGraphRAG (0.1 % indexing
+  cost — defer expensive enrichment, exactly our host-session pattern),
+  LiteSemRAG (LLM-free graph retrieval is a recognized lane). Bonus surfaces:
+  community-detection → auto corpus map (OKF progressive disclosure, generated);
+  `--explain` traversal lines; eval-gated. Written into
+  `corpus-at-scale.compare.md` §"The merge"; graph proposal updated to point
+  there. Two ⏳ items are now one "knowledge substrate v2" phase.
+- **Decided / open:** merge proposed + recommended; trigger unchanged (Anton
+  dogfood: scale pain *or* relational questions) → then compare verdict →
+  handoff → ADR.
+- **Next:** Anton dogfood — now the single gate for the substrate phase.
+
+## 2026-07-21 — Document-knowledge-graph proposal parked · Cowork
+- **Asked:** "how about creating a knowledge graph on all these documents — just
+  a thought."
+- **Did:** wrote `proposals/document-knowledge-graph.md` — the sanctioned vehicle,
+  since CLAUDE.md bars graph resurrection without sign-off. Shape: a **document
+  graph, not a code graph**, strictly a **derived view over the corpus**. Nodes =
+  docs/URLs/tags (+ host-session concept nodes); edges in two tiers mirroring
+  ingest — deterministic ($0: markdown `references`, citations, web
+  `crawled_from` parent/depth, shared tags) and semantic (host-session skill,
+  frontmatter-reviewable). Storage = SQLite-v2 rows (never a 512 MiB blob —
+  graphify's ceiling). Surface: `fux graph` (neighborhood), `fux path` (how two
+  docs connect), `fux explain` gains Links. Parked with a concrete graduation
+  trigger: Anton dogfood surfaces a connects/depends/cites-shaped question that
+  ask/answer handles poorly → graduates to a compare doc + ADR.
+- **Decided / open:** parked, status: proposed. Nothing else open.
+- **Next:** Anton dogfood (unchanged — and it's also this proposal's trigger).
+
+## 2026-07-21 — Four course corrections from Arpit (purpose, $0 semantics, tiers, thin index) · Cowork
+- **Asked:** (1) host-session LLM pass keeps fux $0; (2) the point is agents
+  querying docs/links via Copilot/Claude extensions, not code; (3) vector-DB idea
+  reframed — a thin layer over a *document* index with a drill-down command like
+  `fux explain`; (4) millions of cache files in git is the wrong approach.
+- **Did:** recorded all four in `corpus-at-scale.compare.md` §"Arpit's
+  amendments": host-session semantic pass accepted as $0-legal (the old build's
+  proven skill-token pattern — authoring may be model-assisted, checking/retrieval
+  stay deterministic); docs-not-code focus accepted (sharpens wedge vs graphify;
+  new fux-plan §6a); **two-level retrieval proposed + recommended** — compact
+  doc-level index (entry + one vector per doc; 100k chunks → ~5k entries,
+  brute-force viable forever, no ANN) routing to per-doc chunk loads, plus new
+  `fux explain <doc>` drill-down verb; **git-tier correction accepted** — commit
+  the *curated* corpus (10²–10⁴ files), gitignore bulk mirrors, commit
+  fux.toml+manifest as the reproducible recipe ("git stores the recipe, not the
+  warehouse"). CLAUDE.md purpose+tier folds; fux-plan §6a/§6b amended.
+- **Decided / open:** 1, 2, 4 accepted; 3 recommended, folds into the SQLite-v2
+  build when the scale trigger fires (`fux explain` can ship earlier as UX).
+- **Next:** Anton dogfood on the shipped engine; scale work waits for its trigger.
+
+## 2026-07-21 — Prior art: Graphify reviewed in full; vector-DB question closed · Cowork
+- **Asked:** research how Graphify's index works; what about vector-DB-alikes?
+- **Did:** read the full Graphify README (91.8k★, YC S26): it's a **knowledge
+  graph, explicitly not a vector index** — tree-sitter AST locally for code (no
+  LLM), an **LLM semantic pass for docs/media** (breaks Fux's $0 law), one
+  graph.json (512 MiB cap — same single-blob pattern as our index.json, validating
+  the SQLite-v2 proposal), Leiden communities, query/path/explain traversal, MCP,
+  query-first hooks, committed graphify-out/ with a union-merge driver. Strategic
+  note recorded: graphify ≈ the *archived* Fux build's graph layer, now
+  market-validated — if the graph returns it's a view over the corpus. Vector DBs
+  (LanceDB/Chroma/FAISS/sqlite-vec/ANN libs): all third-party runtime deps, and
+  **ANN solves a problem Fux architected away** (candidates-first = ~200 exact dot
+  products; nothing to approximate). Recorded escalation ladder for the
+  zero-lexical-candidate miss class: SQLite-v2 brute-force → opt-in ANN extra.
+  Both analyses added to `corpus-at-scale.compare.md` with references.
+- **Decided / open:** no vector DB (closed with reasoning + reopen path); SQLite-v2
+  proposal reinforced. Corpus-at-scale verdicts still ⏳ Arpit.
+- **Next:** Arpit calls corpus-at-scale; Anton dogfood continues.
+
+## 2026-07-21 — Scale review: corpus-at-scale compare + fux.toml reference · Cowork
+- **Asked:** explain vectors.bin / index.json; is the cache scalable (thousands of
+  files, millions of links)?; create + maintain a fux.toml example; sources could
+  be folders/files/links at huge scale. Research it.
+- **Did:** read the shipped store code (index.json = versioned JSON, full-load,
+  postings derived in memory — ADR 0003; vectors.bin = single packed int8
+  chunk-vector cache, (sha,fidelity)-keyed — ADR 0006). Researched scale paths:
+  **stdlib `sqlite3`** (FTS5 ~3M rows/hr, snappy at 10k–100k docs; sqlite-vec
+  brute-force numbers; Fux's dense pass is candidate-only so vectors don't
+  bottleneck). Wrote `compare/corpus-at-scale.compare.md`: component-by-component
+  break analysis (index.json breaks first ~25–50k chunks; the *cache* itself
+  scales with sources and stays per-file Markdown forever — it's the product);
+  proposed verdicts — index format v2 = single SQLite db (Fux's scorer unchanged,
+  storage only; frontier solves million-link crawls) + `[sources]` globs/excludes,
+  first-class files, `@list` files. Created maintained `fux-toml.md` (every
+  shipped key + default from config.py; proposed extensions fenced). Registry +
+  index + compare README synced.
+- **Decided / open:** both scale verdicts ⏳ awaiting Arpit; build trigger = ~25k
+  chunks or an outsized crawl.
+- **Next:** Arpit reads corpus-at-scale; meanwhile Anton dogfood proceeds on the
+  shipped formats (they're right-sized for it).
 
 ## 2026-07-21 — README upgraded to the old build's story-first format · Cowork
 - **Asked:** review the README and upgrade it, referencing the older README's

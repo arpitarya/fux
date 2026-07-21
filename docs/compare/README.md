@@ -54,4 +54,10 @@ overridable in `fux.toml`.
 
 ## Open decisions
 
-- *(none — every fork and sub-decision is resolved; next is the v1 build spec)*
+- Knowledge substrate v2 — ⏳ moved to
+  [`../proposals/knowledge-substrate.md`](../proposals/knowledge-substrate.md)
+  (2026-07-21, Arpit: one consolidated proposal): SQLite substrate incl. bulk
+  `docs_text`, doc-index-IS-the-graph, one kernel / six verb projections,
+  **FuxVec** stdlib binary dense search, git tiers + fresh-clone story,
+  enterprise inputs, build milestones. Awaiting Arpit; default next phase per
+  the enterprise litmus.

@@ -21,11 +21,13 @@ from ..config import Config, find_root, load
 from ..errors import FuxError
 from ..frontmatter import dumps as fm_dumps
 from .convert import ConvertResult, convert
-from .manifest import MANIFEST_REL, Drift, check_drift, quick_drift, read as manifest_read
+from .lock import LOCK_NAME, Status, check
+from .lock import records_from_entries, write as lock_write
+from .manifest import Drift, quick_drift, read as manifest_read
 from .manifest import sha256_bytes, write as manifest_write
 from .walk import SourceFile, WalkResult, walk
 
-__all__ = ["ingest_paths", "check_drift", "quick_drift", "list_inferred", "cmd_ingest"]
+__all__ = ["ingest_paths", "check", "quick_drift", "list_inferred", "cmd_ingest"]
 
 CACHE_REL = ".fux/cache"
 
@@ -49,6 +51,7 @@ class IngestReport:
     warnings: list[str] = field(default_factory=list)
     chunk_count: int = 0
     embedded: int = 0
+    state_docs: int = 0
     source_roots: int = 0
 
     @property
@@ -60,6 +63,7 @@ def ingest_paths(config: Config, *, build_index: bool = True, web: bool = False)
     root = config.root
     cache_root = root / CACHE_REL
     report = IngestReport()
+    bulk_text: dict[str, str] = {}  # mirror-tier docs: text goes to fux.db, not disk
     result = walk(config)
     configured = [d for dirs in config.sources.values() for d in dirs]
     report.source_roots = len(configured) - len(result.missing_dirs)
@@ -103,33 +107,91 @@ def ingest_paths(config: Config, *, build_index: bool = True, web: bool = False)
         report.removed.append(rel)
 
     if web and config.web.urls:
-        _ingest_web(config, prev_web, report)
+        _ingest_web(config, prev_web, report, bulk_text)
     else:
         # web entries persist across local-only runs — refreshing them needs --web
         for url in sorted(prev_web):
             report.entries.append(prev_web[url])
             report.unchanged += 1
+            # Mirror-tier text exists only as db rows, and the index rewrite
+            # replaces that table wholesale: carry it forward, or a plain
+            # `fux ingest` would quietly delete the crawled corpus.
+            _carry_bulk_text(config, url, bulk_text)
 
     if cache_root.is_dir() or report.entries:
         _write_dir_indexes(cache_root, report.entries)
+    # Lock (committed) and manifest (runtime) are written together, in one scope,
+    # so the recipe and the state they describe can never drift apart.
     manifest_write(root, report.entries)
+    lock_write(
+        root, records_from_entries(report.entries, max_age_days=config.web.max_age_days)
+    )
 
     if build_index and report.entries:
         from ..index import build_index as _build
 
-        report.chunk_count = _build(config, report.entries)
+        report.chunk_count = _build(config, report.entries, bulk_text)
         try:
             from ..embed.store import build_vectors
 
             report.embedded = build_vectors(config)
         except FuxError as exc:  # a broken bundle must not block lexical ingest
             report.warnings.append(f"semantic vectors skipped: {exc}")
+        report.state_docs = _write_state_plane(config, report.entries)
     return report
 
 
-def _ingest_web(config: Config, prev_web: dict[str, dict], report: IngestReport) -> None:
+def _write_state_plane(config: Config, entries: list[dict]) -> int:
+    """Rewrite `.fux/state/` from the freshly built index — same scope as the lock.
+
+    Doing this here, rather than in a separate pass, is what makes the
+    three-way `--check` meaningful: state, lock and sources are written from
+    one view of the corpus, so a disagreement can only mean a stale commit.
+    """
+    from ..embed.fuxvec import doc_code
+    from ..embed.store import load_vectors
+    from ..index import backend_for
+    from ..index.bm25f import path_tokens, tokenize
+    from ..state import DocState, bloom, write_state
+    from ..state.df import build as build_df, write_df
+
+    files = backend_for(config).load(config.root)
+    vectors = load_vectors(config.root)
+    by_source = {e["source"]: e for e in entries}
+    docs = []
+    for doc_id in sorted(files):
+        meta = files[doc_id]
+        terms = set(path_tokens(doc_id)) | set(tokenize(meta.get("title", "")))
+        for chunk in meta["chunks"]:
+            terms |= set(tokenize(chunk["heading"])) | set(tokenize(chunk["text"]))
+        entry = by_source.get(doc_id, {})
+        flags = [meta.get("fidelity", "inferred")]
+        if entry.get("origin") in ("url", "attachment"):
+            flags.append("web")
+        vecs = (vectors.get(doc_id) or {}).get("vecs", [])
+        docs.append(
+            DocState(
+                doc_id=doc_id,
+                sha12=meta["sha256"][:12],
+                title=meta.get("title", ""),
+                flags=flags,
+                code=doc_code(vecs),
+                sig=bloom.build(terms),
+            )
+        )
+    # The df sidecar: exact corpus statistics, so lean scoring is provably
+    # identical to full rather than approximately so (handoff §C, amended).
+    stats, buckets = build_df(files)
+    write_df(config.root, stats, buckets)
+    return write_state(config.root, docs)
+
+
+def _ingest_web(
+    config: Config, prev_web: dict[str, dict], report: IngestReport, bulk_text: dict[str, str]
+) -> None:
     from . import web as webmod
 
+    mirror = config.web.tier == "mirror"
     renderer = None
     if config.web.render == "cdp":
         from .cdp import make_renderer
@@ -143,12 +205,17 @@ def _ingest_web(config: Config, prev_web: dict[str, dict], report: IngestReport)
             continue
         seen_urls.add(art.url)
         entry = prev_web.get(art.url)
-        cache_path = config.root / (entry["cache"] if entry else webmod.cache_rel_for_url(art.url))
+        cache_rel_prev = entry.get("cache") if entry else webmod.cache_rel_for_url(art.url)
+        cache_path = config.root / cache_rel_prev if cache_rel_prev else None
         if entry and entry.get("sha256") == art.sha256 and (
-            not entry.get("cache") or cache_path.is_file()
+            mirror or not entry.get("cache") or (cache_path and cache_path.is_file())
         ):
             report.entries.append(entry)  # unchanged page: byte-stable no-op
             report.unchanged += 1
+            if mirror:
+                # Text lives only in fux.db, and save() rewrites that table
+                # wholesale — carry the unchanged rows forward or they vanish.
+                _carry_bulk_text(config, art.url, bulk_text)
             continue
         fetched_at = webmod.fetched_at_now()
         if art.duplicate_of:
@@ -162,13 +229,23 @@ def _ingest_web(config: Config, prev_web: dict[str, dict], report: IngestReport)
         if conv.skipped:
             report.web_skipped.append((art.url, conv.skipped))
             continue
-        cache_rel = webmod.cache_rel_for_url(art.url)
         meta = _web_meta(art, conv, fetched_at)
-        text = fm_dumps(meta, conv.body)
-        target = config.root / cache_rel
-        target.parent.mkdir(parents=True, exist_ok=True)
-        if not target.is_file() or target.read_text(encoding="utf-8") != text:
-            target.write_text(text, encoding="utf-8")
+        if mirror:
+            # Bulk tier: no file on disk at any corpus size — commit the recipe,
+            # never the warehouse. The text becomes a docs_text row.
+            from ..index import doc_id_for
+
+            cache_rel = ""
+            bulk_text[doc_id_for(_web_entry(art, "", conv.converter, meta["title"], fetched_at))] = (
+                conv.body
+            )
+        else:
+            cache_rel = webmod.cache_rel_for_url(art.url)
+            text = fm_dumps(meta, conv.body)
+            target = config.root / cache_rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if not target.is_file() or target.read_text(encoding="utf-8") != text:
+                target.write_text(text, encoding="utf-8")
         report.entries.append(_web_entry(art, cache_rel, conv.converter, meta["title"], fetched_at))
         report.converted_by_kind["web"] += 1
         report.updated += 1 if entry else 0
@@ -178,6 +255,16 @@ def _ingest_web(config: Config, prev_web: dict[str, dict], report: IngestReport)
             (config.root / prev_web[url]["cache"]).unlink(missing_ok=True)
         report.removed.append(url)
     webmod.write_web_skips(config.root, report.web_skipped)
+
+
+def _carry_bulk_text(config: Config, url: str, bulk_text: dict[str, str]) -> None:
+    from ..index import sqlstore
+    from .lock import web_doc_id
+
+    doc_id = web_doc_id(url)
+    stored = sqlstore.load_text(config.root, doc_id)
+    if stored is not None:
+        bulk_text[doc_id] = stored
 
 
 def _web_meta(art, conv, fetched_at: str) -> dict:
@@ -378,19 +465,18 @@ def cmd_ingest(args) -> int:
     config = load(root)
 
     if args.check:
-        drift = check_drift(config)
-        tracked = len(manifest_read(root))
-        if drift.clean:
-            print(f"cache is fresh ({tracked} files tracked)")
+        # Three-way: committed state ↔ fux.lock ↔ sources. Reads the lock only,
+        # so this works on a fresh clone before anything has been built.
+        status = check(config)
+        if status.clean:
+            print(f"cache is fresh ({status.tracked} sources tracked)")
             return 0
-        for rel in drift.changed:
-            print(f"  DRIFT  {rel}  (sha mismatch — re-ingest)")
-        for rel in drift.new:
-            print(f"  DRIFT  {rel}  (new — not in manifest)")
-        for rel in drift.missing:
-            print(f"  DRIFT  {rel}  (missing — source deleted; cache orphan)")
-        stale = len(drift.changed) + len(drift.new) + len(drift.missing)
-        print(f"{stale} stale of {tracked} · run `fux ingest` to refresh")
+        for label, rows in (
+            ("DRIFT", status.drift), ("STALE", status.stale), ("STATE-DESYNC", status.desync)
+        ):
+            for doc_id, reason in rows:
+                print(f"  {label}  {doc_id}  ({reason})")
+        print(f"{status.count} stale of {status.tracked} · run `fux ingest` to refresh")
         # advisory by default; --strict makes drift blocking (exit 2, per contract)
         return 2 if args.strict else 0
 
@@ -454,8 +540,7 @@ def _print_summary(report: IngestReport, started: float) -> None:
     if report.removed:
         print(f"  removed  {len(report.removed):>4}            (sources gone; cache pruned)")
     print(
-        f"Cache: {CACHE_REL}  ({report.total} files, OKF bundle)   "
-        f"Manifest: {MANIFEST_REL}"
+        f"Cache: {CACHE_REL}  ({report.total} files, OKF bundle)   Lock: {LOCK_NAME}"
     )
     elapsed = time.perf_counter() - started
     vectors = f" · {report.embedded} chunks embedded" if report.embedded else ""

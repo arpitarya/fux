@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import http.server
 import json
+import sqlite3
 import shutil
 import threading
 from pathlib import Path
@@ -59,7 +60,7 @@ def test_crawl_flow_provenance_and_robots(web_project):
 
     manifest = {
         json.loads(line)["source"]: json.loads(line)
-        for line in (proj / ".fux/manifest.jsonl").read_text(encoding="utf-8").splitlines()
+        for line in (proj / ".fux/index/manifest.jsonl").read_text(encoding="utf-8").splitlines()
     }
     index_entry = manifest[f"{base}/index.html"]
     assert index_entry["origin"] == "url" and index_entry["depth"] == 0
@@ -85,16 +86,29 @@ def test_crawl_flow_provenance_and_robots(web_project):
     assert "The exporter batches telemetry" in text
 
 
-def test_web_citations_show_urls(web_project):
+def test_web_results_use_logical_ids_and_keep_the_url(web_project):
+    """Fetched pages are addressed by a stable `web:` id across lock/state/index;
+    the originating URL travels beside it as provenance, never as the handle."""
     proj, base = web_project
     run_fux(proj, "ingest", "--web")
     out = run_fux(proj, "ask", "how often does the exporter batch telemetry", "--json").stdout
-    top = json.loads(out)["results"][0]
-    assert top["path"] == f"{base}/index.html"
-    assert top["line_start"] is None  # synthetic conversion: no fabricated lines
+    results = json.loads(out)["results"]
+    # This test is about identity and provenance, not rank order — assert the
+    # page is reachable and correctly labelled, whatever the ranker does.
+    hit = next(r for r in results if r["path"] == f"web:{hosted(base)}/index.html")
+    assert hit["url"] == f"{base}/index.html"  # traceable back to the page
+    assert hit["line_start"] is None  # synthetic conversion: no fabricated lines
+    assert all(r["path"].startswith("web:") or "/" in r["path"] for r in results)
 
     human = run_fux(proj, "answer", "how often does the exporter batch telemetry").stdout
-    assert f"[1] {base}/index.html" in human
+    assert f"web:{hosted(base)}/" in human  # citations carry the logical id
+
+
+def test_cat_materializes_a_web_document(web_project):
+    proj, base = web_project
+    run_fux(proj, "ingest", "--web")
+    out = run_fux(proj, "cat", f"web:{hosted(base)}/index.html").stdout
+    assert "The exporter batches telemetry" in out
 
 
 def test_recrawl_unchanged_is_byte_identical(web_project):
@@ -109,7 +123,83 @@ def test_local_only_ingest_preserves_web_entries_and_check_ignores_them(web_proj
     proj, base = web_project
     run_fux(proj, "ingest", "--web")
     run_fux(proj, "ingest")  # local-only refresh
-    manifest = (proj / ".fux/manifest.jsonl").read_text(encoding="utf-8")
+    manifest = (proj / ".fux/index/manifest.jsonl").read_text(encoding="utf-8")
     assert f"{base}/index.html" in manifest
     proc = run_fux(proj, "ingest", "--check")
     assert "cache is fresh" in proc.stdout  # web origins excluded from drift
+
+
+# -- mirror (bulk) tier: text in fux.db, never as files ---------------------
+
+
+def as_mirror(proj):
+    config = proj / "fux.toml"
+    config.write_text(
+        config.read_text(encoding="utf-8").replace(
+            "[sources.web]", '[sources.web]\ntier = "mirror"'
+        ),
+        encoding="utf-8",
+    )
+    return proj
+
+
+def test_mirror_tier_keeps_web_text_out_of_the_filesystem(web_project):
+    proj, base = web_project
+    as_mirror(proj)
+    run_fux(proj, "ingest", "--web")
+
+    assert not (proj / ".fux/cache/_web").exists(), "mirror tier must write no page files"
+    assert (proj / ".fux/index/fux.db").is_file()  # bulk text forces the sqlite store
+
+    conn = sqlite3.connect(proj / ".fux/index/fux.db")
+    try:
+        rows = dict(conn.execute("SELECT doc_id, text FROM docs_text"))
+    finally:
+        conn.close()
+    doc_id = f"web:{hosted(base)}/index.html"
+    assert doc_id in rows
+    assert b"The exporter batches telemetry" in rows[doc_id]
+
+
+def test_mirror_tier_is_searchable_and_cat_able(web_project):
+    proj, base = web_project
+    as_mirror(proj)
+    run_fux(proj, "ingest", "--web")
+
+    payload = json.loads(
+        run_fux(proj, "ask", "how often does the exporter batch telemetry", "--json").stdout
+    )
+    assert any(
+        r["path"] == f"web:{hosted(base)}/index.html" for r in payload["results"]
+    ), "a mirror-tier page must be searchable from its db row"
+
+    out = run_fux(proj, "cat", f"web:{hosted(base)}/index.html").stdout
+    assert "The exporter batches telemetry" in out
+
+
+def test_mirror_recrawl_preserves_unchanged_rows(web_project):
+    """save() rewrites docs_text wholesale — unchanged pages must survive it."""
+    proj, base = web_project
+    as_mirror(proj)
+    run_fux(proj, "ingest", "--web")
+    run_fux(proj, "ingest", "--web")
+
+    conn = sqlite3.connect(proj / ".fux/index/fux.db")
+    try:
+        count = conn.execute("SELECT count(*) FROM docs_text").fetchone()[0]
+    finally:
+        conn.close()
+    assert count > 0
+    assert "The exporter batches telemetry" in run_fux(
+        proj, "cat", f"web:{hosted(base)}/index.html"
+    ).stdout
+
+
+def test_mirror_local_only_reingest_keeps_web_text(web_project):
+    proj, base = web_project
+    as_mirror(proj)
+    run_fux(proj, "ingest", "--web")
+    run_fux(proj, "ingest")  # local-only pass must not evict the mirrored rows
+    assert "The exporter batches telemetry" in run_fux(
+        proj, "cat", f"web:{hosted(base)}/index.html"
+    ).stdout

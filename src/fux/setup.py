@@ -48,6 +48,9 @@ def cmd_setup(args) -> int:
     )
     print(f"{'wrote' if changed else 'unchanged'} {CONFIG_NAME}  ({summary})")
 
+    if _ensure_gitignore(root):
+        print(f"   wrote  .gitignore  (+{_IGNORE_LINE} — derived runtime plane)")
+
     if getattr(args, "agents", False) or getattr(args, "skills", False) or getattr(args, "hooks", False):
         from .agents.generate import generate_agent_files
 
@@ -65,6 +68,29 @@ def cmd_setup(args) -> int:
     elif changed:
         print("next: run `fux ingest`")
     return 0
+
+
+_IGNORE_LINE = ".fux/index/"
+_IGNORE_HEADER = "# Fux — derived runtime plane (rebuild with `fux ingest`)"
+
+
+def _ensure_gitignore(root: Path) -> bool:
+    """Add `.fux/index/` to .gitignore. Returns True when the file changed.
+
+    Only the *runtime* plane is ignored: `fux.toml`, `fux.lock` and
+    `.fux/state/` are the committed recipe-and-state pair. Idempotent, and it
+    appends rather than rewrites — a user's own rules are theirs.
+    """
+    path = root / ".gitignore"
+    existing = path.read_text(encoding="utf-8") if path.is_file() else ""
+    lines = [line.strip() for line in existing.splitlines()]
+    if _IGNORE_LINE in lines or ".fux/" in lines or ".fux" in lines:
+        return False
+    block = f"{_IGNORE_HEADER}\n{_IGNORE_LINE}\n"
+    if existing and not existing.endswith("\n"):
+        existing += "\n"
+    path.write_text(f"{existing}\n{block}" if existing else block, encoding="utf-8")
+    return True
 
 
 def _resolve_sources(args, existing: dict, root: Path) -> dict[str, list[str]]:

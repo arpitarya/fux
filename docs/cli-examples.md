@@ -64,7 +64,7 @@ Scanning 2 source roots…
   converted    2 yaml       (fenced text)
   stubbed      4 images     (metadata only — advanced tier is v1.1)
   skipped      2            (see `fux ingest --list-skipped`)
-Cache: .fux/cache  (50 files, OKF bundle)   Manifest: .fux/manifest.jsonl
+Cache: .fux/cache  (50 files, OKF bundle)   Lock: fux.lock
 Index: 1204 chunks (BM25F)   Elapsed: 1.8s
 $ echo $?
 0
@@ -76,15 +76,30 @@ sources are pruned (`removed      1            (sources gone; cache pruned)`).
 Variants:
 
 ```
-$ fux ingest --check                 # drift: sources changed since conversion?
+$ fux ingest --check                 # three-way: state ↔ fux.lock ↔ sources
   DRIFT  notes/anton/decisions/db-indexing.md  (sha mismatch — re-ingest)
-  DRIFT  notes/anton/new-note.md  (new — not in manifest)
+  DRIFT  notes/anton/new-note.md  (new — not in fux.lock)
   DRIFT  notes/anton/old.md  (missing — source deleted; cache orphan)
 3 stale of 50 · run `fux ingest` to refresh
 $ echo $?                            # advisory by default
 0
 $ fux ingest --check --strict; echo $?     # blocking for CI/hooks
 2
+```
+
+`--check` reads **only `fux.toml` + `fux.lock`** — no index, no cache — so it
+works on a fresh clone, before any ingest. Staleness is structural per source
+kind:
+
+- **`DRIFT`** — a `kind: file` source whose live sha ≠ the lock's (or is
+  new/missing vs the lock).
+- **`STALE`** — a `kind: url` source past its `max_age_days`; you cannot sha a
+  page you have not re-fetched, so web freshness is age-based.
+
+```
+$ fux ingest --check
+  STALE  web:vendor-wiki/sla-appendix  (fetched 41d ago, max 30d — re-run `fux ingest --web`)
+1 stale of 50 · run `fux ingest` to refresh
 
 $ fux ingest --list-inferred         # every file at inferred fidelity
 notes/anton/decisions/db-indexing.md  (native-md)
@@ -162,6 +177,175 @@ Sources:
   [2] notes/anton/decisions/db-indexing.md:14
 
 (extractive — sentences are verbatim from sources)
+```
+
+## `fux explain` — one document, deep
+
+`ask` seeded by a node instead of a question: the document's own distinguishing
+terms become the query, so there is no second retrieval path to keep in sync.
+
+```
+$ fux explain docs/adr/0007-vendor-selection.md
+docs/adr/0007-vendor-selection.md   ADR 0007 — Vendor selection
+fidelity: inferred · 14 chunks
+
+Outline: Context › Decision › SLA terms › Consequences
+
+Edges:
+  ├─ cites       → web:vendor-wiki/sla-appendix        [EXTRACTED]
+  ├─ references  → docs/runbooks/failover.md           [EXTRACTED]
+  └─ tagged      → tag:vendor                          [EXTRACTED]
+
+Key passages:
+  docs/adr/0007-vendor-selection.md:41  (score 3.219)
+    Contractual failover must complete within 15 minutes of a declared outage.
+```
+
+`--json` returns `{node, outline, edges[], passages[]}`.
+
+## `fux graph` — the neighbourhood of a topic
+
+```
+$ fux graph "vendor failover"
+3 nodes · 4 edges
+
+  docs/adr/0007-vendor-selection.md      ADR 0007 — Vendor selection      (seed)
+  web:vendor-wiki/sla-appendix           SLA appendix                     (expanded)
+  docs/runbooks/failover.md              Failover runbook                 (expanded)
+
+  docs/adr/0007-vendor-selection.md ──cites──▶ web:vendor-wiki/sla-appendix
+  docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md
+```
+
+List form, not ASCII art: a rendered graph stops being readable past a handful
+of nodes, and the list stays greppable and diff-friendly (handoff open
+question 4).
+
+## `fux path` — how two documents connect
+
+```
+$ fux path docs/adr/0007-vendor-selection.md docs/runbooks/failover.md
+1 path (reliability 0.800):
+  docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
+```
+
+When several routes exist each carries its own reliability, best first, and
+`--hops N` widens the search (default 1):
+
+```
+$ fux path docs/adr/0007-vendor-selection.md docs/runbooks/failover.md --hops 2
+2 paths:
+  (reliability 0.800)
+    docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
+  (reliability 0.512)
+    docs/adr/0007-vendor-selection.md ──cites──▶ web:vendor-wiki/sla-appendix   [EXTRACTED]
+    web:vendor-wiki/sla-appendix ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
+```
+
+Reliability is the product of per-edge grade weights (EXTRACTED 1.0, INFERRED
+0.6) times a 0.8 decay per hop, so a long chain of inferences never outranks
+one recorded fact. When nothing connects them, it says so rather than
+manufacturing a route:
+
+```
+$ fux path docs/a.md docs/unrelated.md; echo $?
+no recorded path from docs/a.md to docs/unrelated.md (within 1 hop)
+0
+```
+
+## Fresh clone — queryable before you ingest
+
+`.fux/state/` is committed (~200 B/doc plus the df sidecar), so a clone answers
+immediately, with **no index, no cache and no network**:
+
+```
+$ git clone git@github.com:acme/payments.git && cd payments
+$ fux find "failover"
+1.  0.83104  web:vendor-wiki/sla-appendix
+2.  0.41220  docs/adr/0007-vendor-selection.md
+```
+
+Those are the **same rankings and the same scores** `fux ingest` would produce.
+Not an approximation: the clone re-derives its candidate documents from the
+sources (deterministic converters, verified against `fux.lock`) for exact term
+frequencies, and reads exact document frequencies and corpus statistics from
+the committed `state/df/` sidecar. Every input the scorer sees is the input the
+full profile would have handed it.
+
+`fux ingest` (or `fux db pull`) then builds the runtime plane, which changes
+speed, not answers.
+
+**When sources aren't there to re-derive** — a corpus of crawled pages, or a
+clone taken without its documents — the lean path cannot score, and Fux says so
+rather than guessing. It falls back to doc-level ranking from codes and Bloom
+signatures alone:
+
+```
+$ fux find "failover"
+1.  web:vendor-wiki/sla-appendix        SLA appendix
+2.  docs/adr/0007-vendor-selection.md   ADR 0007 — Vendor selection
+2 docs · doc-level (committed state; run `fux ingest` for ranked passages)
+```
+
+The trailing line is the honesty: those are documents, not scored passages.
+
+## `fux db pull` — fetch a prebuilt index
+
+Nobody should re-crawl 100k pages on a laptop. CI builds `fux.db` once, and
+everyone else pulls it — **sha-verified against `fux.lock`**, so a pulled index
+is provably the corpus the lock describes:
+
+```
+$ fux db pull https://artifacts.acme.internal/payments/fux.db
+  fetched  148.2 MB
+  verified sha256 9f2c… against fux.lock
+  wrote    .fux/index/fux.db
+```
+
+Auth is an env var, not a flag, so credentials stay out of shell history:
+
+```
+$ FUX_DB_AUTH="Bearer $CI_TOKEN" fux db pull https://…/fux.db
+```
+
+A mismatch is refused outright — a wrong index is worse than no index, because
+it answers confidently:
+
+```
+$ fux db pull https://…/stale.db; echo $?
+fux: sha256 mismatch — the artifact is not the corpus fux.lock describes
+     expected 9f2c…  got 41ab…
+     (run `fux ingest` to build locally, or ask for a rebuilt artifact)
+1
+```
+
+This is the one place besides ingest where Fux touches the network, and it is
+always an explicit user action — never a query.
+
+## `fux cat` — print one document
+
+Materializes any single document, wherever it lives: a curated cache file, a
+bulk-tier row in `fux.db`, or a source Fux can re-derive on demand. The caller
+does not need to know which — the doc id is the only handle.
+
+```
+$ fux cat web:vendor-wiki/sla-appendix
+# SLA appendix
+
+## Failover terms
+Contractual failover must complete within 15 minutes of a declared outage.
+…
+
+$ fux cat docs/adr/0007-vendor-selection.md --out /tmp/adr7.md
+wrote /tmp/adr7.md  (4812 bytes)
+```
+
+Unknown ids fail loudly rather than printing nothing, and suggest the locator:
+
+```
+$ fux cat docs/nope.md; echo $?
+fux: no document 'docs/nope.md' in the corpus — try `fux find "nope"`
+1
 ```
 
 ## Modifiers (all query verbs)
@@ -243,6 +427,90 @@ $ echo $?
 Staleness is also surfaced passively: any query against a drifted corpus prints
 `warning: sources changed since the last ingest — run `fux ingest` to refresh`
 on stderr (stat-only probe; `--check` does the full sha comparison).
+
+## A sample repo, end to end
+
+A team's product repo, before Fux:
+
+```
+acme-payments/
+├── src/                     # the service (agents read this natively — not fux's job)
+├── docs/
+│   ├── adr/0001-idempotency-keys.md
+│   ├── runbooks/rollback.md
+│   └── onboarding.md
+├── notes/
+│   ├── 2026-06-payments-postmortem.md
+│   └── competitor-stripe-fees.pdf
+└── README.md
+```
+
+**Day 0 — set up and build the corpus:**
+
+```
+$ cd acme-payments
+$ fux setup --docs docs,notes --agents --skills --hooks -y
+$ fux ingest
+  converted   14 markdown   (native)
+  skipped      1            (competitor-stripe-fees.pdf — install 'fux-engine[ingest]')
+$ pip install 'fux-engine[ingest]' && fux ingest      # picks up the PDF
+```
+
+**After ingest — what the repo looks like:**
+
+```
+acme-payments/
+├── src/  docs/  notes/  README.md          # untouched
+├── fux.toml                                # the recipe's head — commit
+├── fux.lock                                # sha/date ledger per source — commit
+├── .fux/
+│   ├── cache/                              # OKF corpus, mirrors sources
+│   │   ├── docs/adr/0001-idempotency-keys.md      # + provenance frontmatter
+│   │   ├── docs/runbooks/rollback.md
+│   │   ├── notes/competitor-stripe-fees.md        # ← converted from the PDF
+│   │   └── …/index.md                             # per-dir progressive disclosure
+│   └── index/                              # DERIVED — gitignored
+│       ├── manifest.jsonl                  # operational provenance (query joins)
+│       ├── index.json                      # BM25F chunks (fux.db at scale)
+│       └── vectors.bin                     # int8 chunk vectors
+├── AGENTS.md                               # + CLAUDE.md/copilot/kiro pointers
+└── .claude/skills/fux-query/  fux-ingest/  # one SKILL.md standard, all tools
+```
+
+**What git carries: the recipe, not the generated state.** `fux.toml` +
+`fux.lock` are the committed pair — together they say what is in the corpus,
+when it was taken, and whether it is stale. `.fux/index/` is derived and
+gitignored (`fux setup` writes the rule). `.fux/cache/` is rebuilt on clone;
+committing it is opt-in via `[git] commit_cache = true`, for teams that want
+knowledge changes reviewable as diffs.
+
+A fresh clone runs `fux ingest`, and every rebuilt source is verified against
+`fux.lock` — a sha match proves it is provably the same corpus.
+
+**Daily use — human:**
+
+```
+$ fux ask "do we retry failed captures?"          # → runbooks/rollback.md:31 cited
+$ fux answer "why idempotency keys?"              # extractive, [1][2] cited
+$ fux find "postmortem"                           # which files
+$ fux ingest --check                              # anything stale?
+```
+
+**Daily use — the agent (the real customer), inside Claude Code/Copilot:**
+
+```
+Claude Code (UserPromptSubmit hook fires) →
+  fux ask "capture retry policy" --json           # passages injected as context
+  fux ask … --explain                             # agent verifies why it ranked
+  fux ingest --list-inferred                      # sees the PDF is inferred-tier
+  fux ingest --advanced notes/competitor-stripe-fees.pdf   # upgrades, re-asks
+```
+
+**Substrate-v2 era (proposed — [knowledge-substrate](proposals/knowledge-substrate.md); not shipped):** same repo,
+`.fux/index/fux.db` replaces the two index files, and the one-kernel projections
+arrive: `fux explain docs/adr/0001-idempotency-keys.md` (node view),
+`fux graph "captures"` (map view), `fux path docs/adr/0001-… docs/runbooks/rollback.md`
+(how the ADR connects to the runbook).
 
 ## Maintenance
 

@@ -24,6 +24,7 @@ commitment; everything here is findable.
 * [Research-to-Spec](research-to-spec.md) - evidence-backed specs; every claim cites the corpus at a commit.
 * [Knowledge diff & time-travel](knowledge-diff.md) - `fux diff`/`fux log`; ask questions of past knowledge.
 * [Audit evidence trail](audit-evidence-trail.md) - deterministic cited answers as an auditable chain; seed of the deferred Plane.
+* [Knowledge substrate v2](knowledge-substrate.md) - **the** consolidated post-v0.22 proposal: SQLite substrate (bulk text in-db), doc-index-IS-the-graph, one kernel / six projections, FuxVec binary dense search, git tiers, enterprise inputs, build milestones. Absorbed the document-knowledge-graph, corpus-at-scale, and fuxvec docs.
 
 *(The fourth idea from the 2026-07-21 ideation — the **product-memory corpus**,
 Arpit's own seed — was the winner and graduated straight into

@@ -25,8 +25,10 @@ def test_ingest_summary(project):
     assert "Scanning" in out and "source roots" in out
     assert "converted" in out and "markdown" in out
     assert "Cache: .fux/cache" in out and "chunks (BM25F)" in out
+    assert "Lock: fux.lock" in out
     assert (project / ".fux/cache/docs/guide.md").is_file()
-    assert (project / ".fux/manifest.jsonl").is_file()
+    assert (project / "fux.lock").is_file()
+    assert (project / ".fux/index/manifest.jsonl").is_file()
     assert (project / ".fux/index/index.json").is_file()
     assert (project / ".fux/cache/index.md").is_file()
 
@@ -113,7 +115,7 @@ def test_list_inferred(ingested):
 
 @pytest.mark.skipif(not have_markitdown(), reason="markitdown extra not installed")
 def test_office_ingested_with_extra(ingested):
-    manifest = (ingested / ".fux/manifest.jsonl").read_text(encoding="utf-8")
+    manifest = (ingested / ".fux/index/manifest.jsonl").read_text(encoding="utf-8")
     assert "office/spec.docx" in manifest
 
 
@@ -122,3 +124,49 @@ def test_zero_hit_query_honest(ingested):
     assert "No confident matches" in out
     out = run_fux(ingested, "answer", "xyzzy plugh quux").stdout
     assert "No confident answer" in out
+
+
+# -- graph verbs (M4): projections of the same kernel call -------------------
+
+
+def test_explain_renders_a_document(ingested):
+    proc = run_fux(ingested, "explain", "docs/guide.md")
+    assert "docs/guide.md" in proc.stdout
+    assert "fidelity:" in proc.stdout and "chunks" in proc.stdout
+
+
+def test_explain_json_shape(ingested):
+    payload = json.loads(run_fux(ingested, "explain", "docs/guide.md", "--json").stdout)
+    assert payload["node"]["path"] == "docs/guide.md"
+    assert isinstance(payload["outline"], list)
+    assert isinstance(payload["edges"], list)
+    assert all(p["path"] == "docs/guide.md" for p in payload["passages"])
+
+
+def test_explain_unknown_doc_exits_one(ingested):
+    proc = run_fux(ingested, "explain", "docs/does-not-exist.md", check=False)
+    assert proc.returncode == 1
+    assert "no document" in proc.stderr
+
+
+def test_graph_lists_nodes_and_edges(ingested):
+    payload = json.loads(run_fux(ingested, "graph", "telemetry", "--json").stdout)
+    assert payload["nodes"]
+    assert {n["via"] for n in payload["nodes"]} <= {"seed", "expanded"}
+
+
+def test_path_between_unrelated_docs_is_honest(ingested):
+    proc = run_fux(ingested, "path", "docs/guide.md", "notes/todo.txt")
+    assert proc.returncode == 0
+    assert "no recorded path" in proc.stdout or "path" in proc.stdout
+
+
+def test_verbs_are_deterministic(ingested):
+    for args in (
+        ("explain", "docs/guide.md", "--json"),
+        ("graph", "telemetry", "--json"),
+        ("path", "docs/guide.md", "docs/adr-001.md", "--json"),
+    ):
+        first = run_fux(ingested, *args, check=False).stdout
+        second = run_fux(ingested, *args, check=False).stdout
+        assert first == second, f"{args[0]} is not deterministic"

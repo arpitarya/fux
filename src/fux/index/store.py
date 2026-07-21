@@ -22,11 +22,19 @@ def index_path(root: Path) -> Path:
     return root / INDEX_REL
 
 
-def save(root: Path, files: dict[str, dict]) -> None:
-    """``files``: source rel → {sha256, line_offset, title, chunks: [chunk dicts]}."""
+def save(root: Path, files: dict[str, dict], *, edges: list | None = None) -> None:
+    """``files``: source rel → {sha256, line_offset, title, chunks: [chunk dicts]}.
+
+    Edges ride along so the graph verbs work on the small-corpus backend too —
+    `fux explain` should not require opting into sqlite.
+    """
     path = index_path(root)
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {"format": FORMAT_VERSION, "files": {k: files[k] for k in sorted(files)}}
+    payload = {
+        "format": FORMAT_VERSION,
+        "files": {k: files[k] for k in sorted(files)},
+        "edges": sorted(e.as_row() for e in (edges or [])),
+    }
     text = json.dumps(payload, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
     if not path.is_file() or path.read_text(encoding="utf-8") != text:
         path.write_text(text, encoding="utf-8")
@@ -45,3 +53,14 @@ def load(root: Path) -> dict[str, dict]:
             f"index format {payload.get('format')!r} unsupported — re-run `fux ingest`"
         )
     return payload["files"]
+
+
+def load_edges(root: Path) -> list[tuple[str, str, str, str]]:
+    path = index_path(root)
+    if not path.is_file():
+        return []
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError:
+        return []
+    return [tuple(e) for e in payload.get("edges", [])]

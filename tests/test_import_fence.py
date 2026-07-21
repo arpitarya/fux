@@ -7,7 +7,9 @@ from pathlib import Path
 
 SRC = Path(__file__).parent.parent / "src" / "fux"
 NETWORK_MODULES = ("ingest.web", "ingest.cdp", "ingest.ws", "ingest .web")
-FENCED_PACKAGES = ("query", "index")
+# Every non-ingest package is fenced. `state` joins the list with handoff 0004;
+# `db pull` (M7) is the one sanctioned exception and lives under ingest.
+FENCED_PACKAGES = ("query", "index", "embed", "state")
 
 
 def test_query_and_index_never_import_network_modules():

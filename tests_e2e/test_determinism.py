@@ -31,8 +31,21 @@ def test_query_outputs_identical_across_runs(ingested):
     assert ans1 == ans2
 
 
+def test_lock_is_sorted_and_posix(ingested):
+    lines = (ingested / "fux.lock").read_text(encoding="utf-8").splitlines()
+    ids = [line.split('"id":"')[1].split('"')[0] for line in lines]
+    assert ids == sorted(ids)
+    assert not any("\\" in i for i in ids)
+
+
+def test_lock_is_byte_identical_across_runs(ingested):
+    first = (ingested / "fux.lock").read_bytes()
+    run_fux(ingested, "ingest")
+    assert (ingested / "fux.lock").read_bytes() == first
+
+
 def test_manifest_is_sorted_and_posix(ingested):
-    lines = (ingested / ".fux/manifest.jsonl").read_text(encoding="utf-8").splitlines()
+    lines = (ingested / ".fux/index/manifest.jsonl").read_text(encoding="utf-8").splitlines()
     sources = [line.split('"source":"')[1].split('"')[0] for line in lines]
     assert sources == sorted(sources)
     assert not any("\\" in s for s in sources)

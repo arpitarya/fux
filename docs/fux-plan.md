@@ -120,6 +120,35 @@ external deps. Full debate + references in [`compare/`](compare/).
   legal extensions). Fux's substrate was already OKF-shaped; conformance buys interop
   with every OKF consumer for free.
 
+## 6a. What Fux is for (sharpened 2026-07-21; re-scoped to enterprise same day)
+
+**The ultimate consumer is an agent inside Copilot/Claude/Kiro querying
+documentation, decisions, and links** — the context agents lack — not the code
+itself (agents read code natively; graphify-class tools map it). Code stays
+ingestable, but positioning, defaults, and priorities favor the docs corpus.
+
+Corollary (accepted): semantic enrichment may ride the **host session's model**
+(skill-directed, written back as reviewable frontmatter text) — Fux's own code
+still never calls a model, so `$0` holds; retrieval and checking stay
+deterministic.
+
+**Design point (Arpit, 2026-07-21): a very large-scale corporate project — not
+Anton.** Consequences:
+
+- **The knowledge substrate is the default forward path**, not a
+  wait-for-a-trigger contingency — enterprise corpora start at the scale where
+  `index.json` breaks.
+
+- **Enterprise inputs enter every design**: Windows fleets, proxy/SSO in front
+  of internal sites (web ingest must speak them), air-gapped installs, multi-team
+  corpora with access boundaries, audit demands.
+
+- **Standing proposals gain weight**: [audit-evidence-trail](proposals/audit-evidence-trail.md)
+  (compliance-grade answers) and, longer-term, multi-repo federation of corpora.
+
+- **The sales story writes itself from the laws**: no data egress, no vendor API
+  in the loop, auditable-by-reading supply chain, reproducible answers.
+
 ## 6b. Why the corpus lives in git (the product-memory bet, 2026-07-21)
 
 Arpit's framing, adopted as design: **the ingest cache is a long-term, git-versioned
@@ -137,6 +166,20 @@ held rule engine: agents developing *from* the corpus and never deviating.
 Differentiation vs the field (semtools/rlama/qmd/llm-search): they index documents;
 Fux *versions knowledge* — $0, offline, deterministic, cited, and git-historied.
 
+**Tier amendment (Arpit, 2026-07-21, twice-corrected):** the git bet applies to
+the **curated tier** (your docs/decisions/notes — 10²–10⁴ files, per-file
+Markdown, committed). **Bulk corpora** (large crawls, mass imports) get **no
+file cache at all** — 100k documents as files is impractical regardless of git;
+their converted text lives as `docs_text` rows inside the substrate db (one
+file on disk at any scale; `fux cat <doc>` materializes any single document on
+demand). Commit `fux.toml` + the compact manifest — the *recipe*, reproducible
+by re-ingest. Git stores the recipe; the db is the warehouse; the filesystem
+carries neither. Scale architecture (proposed): two-level
+doc index + `fux explain` drill-down — see
+[`proposals/knowledge-substrate.md`](proposals/knowledge-substrate.md)
+(the single consolidated proposal, 2026-07-21: one substrate incl. bulk text
+in-db, one kernel, six verb projections, FuxVec dense search).
+
 **Everything is decided, and every decided phase has its build spec** (handoff +
 paste-ready prompt in [`handoff/`](handoff/)):
 
@@ -145,6 +188,7 @@ paste-ready prompt in [`handoff/`](handoff/)):
 | [0001](archive/0001-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ✅ **implemented** (v0.20.0, 2026-07-21; ADRs 0001–0004) |
 | [0002](archive/0002-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ✅ **implemented** (v0.21.0, 2026-07-21; ADR 0005) |
 | [0003](archive/0003-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ✅ **implemented** (v0.22.0, 2026-07-21; ADRs 0006–0007; gate passed as tie → ships enabled) |
+| [0004](archive/0004-knowledge-substrate-handoff.md) | **v3 — knowledge substrate** | SQLite substrate (bulk text in-db) · fux.lock · committed lean state (`.fux/state/`) · one-kernel `retrieve()` + explain/graph/path/cat · FuxVec · full/lean profiles · db pull | ✅ **implemented** (v0.23.0, 2026-07-22; ADRs 0008–0011; eval hit@5 1.000) |
 
 Sequencing: 0001 → dogfood in Anton → then 0002 and/or 0003 in either order, each
 gated by the dogfood telling us which pain is real. **Arpit's call (2026-07-21): one
@@ -163,12 +207,25 @@ Claude Code.
 | Query CLI — **v1 build** (setup/ingest/BM25F/ask/find/answer/agents) | ✅ | **v0.20.0** (2026-07-21); ADRs 0001–0004; DOGFOOD.md emitted |
 | Ingest v1.1 (web/CDP/advanced — handoff 0002) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
 | Hybrid engine v2 (bundled model + RRF — handoff 0003) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
+| Knowledge substrate v3 (handoff 0004) | ✅ | **v0.23.0** (2026-07-22); ADRs 0008–0011; 365 unit + 71 e2e; eval hit@5 **1.000** (beats v0.22); 100k benchmark: state 23 MB, FuxVec scan 54 ms (no IVF) |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
 
 ## 8. Next move
 
-**The master run (0001 → 0002 → 0003) is complete at v0.22.0.** Next: dogfood
-in Anton via [DOGFOOD.md](../DOGFOOD.md) — build the private Anton eval set
-(tests_e2e/eval/README.md), let its numbers drive what's next (the reopen
-triggers live in the compare docs; the held rule engine remains the long arc).
+**Phase 4 shipped (v0.23.0, 2026-07-22)** — design of record
+[`proposals/knowledge-substrate.md`](proposals/knowledge-substrate.md), build
+spec archived at
+[`archive/0004-knowledge-substrate-handoff.md`](archive/0004-knowledge-substrate-handoff.md),
+decisions in ADRs [0008](adr/0008-substrate-store-lock-state.md)–[0011](adr/0011-profiles-lean-state.md).
+
+**The one thing phase 4 measured and did not fix** — and therefore the obvious
+head of the next phase: at 100k documents a query takes ~10 s, because the query
+path still loads the entire index into memory to build the `Searcher`. The
+`postings` table is populated and indexed at ingest but never read at query
+time. The substrate solved *storage* at scale; *query* at scale is scoped,
+unstarted work (numbers and the fix in
+[ADR 0011](adr/0011-profiles-lean-state.md)).
+
+Beyond that: dogfooding (DOGFOOD.md + the private eval set) continues, and the
+held rule engine remains the long arc.

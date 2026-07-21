@@ -1,0 +1,7 @@
+{"kind":"path","from":"docs/adr-storage.md","to":"docs/runbook-rollback.md","hops":1,"expect":"references"}
+{"kind":"path","from":"docs/adr-storage.md","to":"docs/study-capacity.md","hops":1,"expect":"cites"}
+{"kind":"path","from":"docs/adr-storage.md","to":"docs/rota-oncall.md","hops":2,"expect":"references"}
+{"kind":"nopath","from":"docs/adr-storage.md","to":"docs/unrelated.md","hops":2}
+{"kind":"neighbour","doc":"docs/adr-storage.md","expect":["docs/runbook-rollback.md","docs/study-capacity.md","tag:storage","tag:decisions"]}
+{"kind":"neighbour","doc":"docs/runbook-rollback.md","expect":["docs/rota-oncall.md","tag:operations"]}
+{"kind":"graph","query":"storage engine selection","expect_node":"docs/adr-storage.md"}

@@ -1,8 +1,13 @@
-"""Manifest read/write/check — one canonical JSON line per ingested file.
+"""Operational manifest — the runtime's private provenance copy.
 
-The manifest is machine provenance (the cache frontmatter is the human-facing
-copy): sorted by source path, canonical serialization, so two identical ingest
-runs are byte-identical and git diffs stay one-line-per-file.
+Since handoff 0004 the *committed* ledger is [`fux.lock`](lock.py) at the repo
+root. This file keeps the richer per-source record the runtime needs for
+query-time joins (cache path, line offset, title, fidelity) and lives inside
+the gitignored runtime plane at `.fux/index/manifest.jsonl`.
+
+The split is deliberate: git carries the recipe (`fux.toml` + `fux.lock`),
+never the generated state. Both are written in the same ingest scope, so they
+cannot disagree.
 """
 
 from __future__ import annotations
@@ -13,9 +18,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..config import Config
-from .walk import walk
 
-MANIFEST_REL = ".fux/manifest.jsonl"
+MANIFEST_REL = ".fux/index/manifest.jsonl"
+LEGACY_MANIFEST_REL = ".fux/manifest.jsonl"  # pre-0.23 location; migrated on ingest
 
 
 def manifest_path(root: Path) -> Path:
@@ -25,7 +30,9 @@ def manifest_path(root: Path) -> Path:
 def read(root: Path) -> dict[str, dict]:
     path = manifest_path(root)
     if not path.is_file():
-        return {}
+        path = root / LEGACY_MANIFEST_REL  # readable until the next ingest migrates it
+        if not path.is_file():
+            return {}
     entries: dict[str, dict] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
@@ -50,6 +57,7 @@ def write(root: Path, entries: list[dict]) -> None:
     text = "\n".join(lines) + ("\n" if lines else "")
     if not path.is_file() or path.read_text(encoding="utf-8") != text:
         path.write_text(text, encoding="utf-8")
+    (root / LEGACY_MANIFEST_REL).unlink(missing_ok=True)  # migration: one home only
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -60,45 +68,28 @@ def sha256_bytes(data: bytes) -> str:
 class Drift:
     changed: list[str] = field(default_factory=list)
     new: list[str] = field(default_factory=list)
-    missing: list[str] = field(default_factory=list)  # in manifest, gone on disk
+    missing: list[str] = field(default_factory=list)  # tracked, gone on disk
 
     @property
     def clean(self) -> bool:
         return not (self.changed or self.new or self.missing)
 
 
-def check_drift(config: Config) -> Drift:
-    """Full sha comparison of sources vs the manifest (`fux ingest --check`)."""
-    entries = read(config.root)
-    drift = Drift()
-    from .convert import skip_reason
-
-    # web-origin entries are excluded: freshness for those means a --web re-crawl,
-    # and the check path must never touch the network.
-    entries = {k: e for k, e in entries.items() if e.get("origin") not in ("url", "attachment")}
-    walked = {sf.rel: sf for sf in walk(config).files}
-    for rel, sf in walked.items():
-        entry = entries.get(rel)
-        data = sf.abspath.read_bytes()
-        if entry is None:
-            if skip_reason(sf, data) is None:  # skipped files are not drift
-                drift.new.append(rel)
-        elif sha256_bytes(data) != entry.get("sha256"):
-            drift.changed.append(rel)
-    drift.missing = sorted(set(entries) - set(walked))
-    return drift
-
-
 def quick_drift(config: Config) -> Drift:
-    """Stat-only staleness probe (size + existence) — cheap enough for every ask."""
-    entries = read(config.root)
+    """Stat-only staleness probe (size + existence) — cheap enough for every ask.
+
+    Reads `fux.lock`, so it stays correct on a fresh clone where the runtime
+    manifest does not exist yet.
+    """
+    from .lock import read as lock_read
+
     drift = Drift()
-    for rel, entry in entries.items():
-        if entry.get("origin") in ("url", "attachment"):
-            continue  # web freshness = re-crawl; never checked passively
-        path = config.root / rel
+    for doc_id, record in lock_read(config.root).items():
+        if record.get("kind") == "url":
+            continue  # web freshness = age vs re-crawl; never checked passively
+        path = config.root / doc_id
         if not path.is_file():
-            drift.missing.append(rel)
-        elif isinstance(entry.get("size"), int) and path.stat().st_size != entry["size"]:
-            drift.changed.append(rel)
+            drift.missing.append(doc_id)
+        elif isinstance(record.get("bytes"), int) and path.stat().st_size != record["bytes"]:
+            drift.changed.append(doc_id)
     return drift
