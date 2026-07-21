@@ -179,6 +179,22 @@ diary.*
   workflow + a `BRANCH_PROTECTION_TOKEN` PAT if that guarantee is ever wanted back.
 - **Next:** Anton dogfood.
 
+## 2026-07-21 — M4+M5 reviewed; three rulings for the run-in · Cowork
+- **Asked:** agent reported M4 (kernel re-plumb, six goldens byte-parity) + M5
+  (FuxVec: hybrid+dense_global **0.810/1.000/0.873** vs v0.22's
+  0.762/0.952/0.833; ADR 0006's named zero-overlap miss now retrieved;
+  --lexical-only exactly preserved). Asked for the next-step prompt.
+- **Rulings (Arpit via Cowork):** (1) **integer token-sums df header approved**
+  — better than the spec'd averages (exact round-trip; avg_wlen recomputable
+  for any weights without re-ingest); record as approved amendment in ADR 0008.
+  (2) **Early-return judgment call approved** — correct reading of ADR 0006
+  (rescue = doc-side zero overlap, via the third RRF list; noise floor
+  0.23–0.26 vs 0.34 doesn't separate); record in ADR 0010 with those numbers.
+  (3) **Budget risk: measure at M8 before optimizing** — if the synthetic 100k
+  confirms >30 MB, apply per-bucket zlib first (simpler, no dictionary artifact
+  to version), shared dict only if that misses; honest numbers either way.
+- **Next:** continuation prompt → M6 (PPR-lite) → M7 → M8 → close-out at 0.23.0.
+
 ## 2026-07-21 — M3 escalation resolved: exact df sidecar, guarantee stays provable · Cowork
 - **Asked:** the building agent escalated (correctly, per the no-silent-deviation
   rule): lean-profile BM25F can't be *provably* identical to full without exact
