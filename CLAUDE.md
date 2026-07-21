@@ -302,6 +302,20 @@ is the proof.
   0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid → 0.23.0 v3 substrate). Bump in
   `src/fux/__init__.py` only.
 
+## Merge wall — what actually blocks a merge (2026-07-22)
+
+**There are no required status checks on `main`.** `fux gate` and `ai-review`
+still run on every PR and their results are visible, but they do **not** block
+merging (removed at Arpit's instruction, 2026-07-22). What remains:
+`enforce_admins: true`, no force-push, no deletion — history is protected, the
+quality gate is not.
+
+Practical consequence for any agent working here: **CI green is now your
+responsibility to check, not something the wall guarantees.** Before merging,
+read `gh pr checks <n>` yourself and do not merge on red. The source of truth
+for protection is [`.github/branch-protection.json`](.github/branch-protection.json);
+restoring the wall means putting the two contexts back and re-applying.
+
 ## Hard-won build knowledge (auto-folded, 2026-07-22 — phase 4)
 
 - **Git carries recipe *and* state.** `fux.toml` + `fux.lock` + `.fux/state/`
