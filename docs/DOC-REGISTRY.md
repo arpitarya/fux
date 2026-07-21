@@ -16,7 +16,7 @@ practice.
 |----------|---------------|---------------|-------|
 | [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, or layout changes; new durable session learnings | 2026-07-21 | Binding; also auto-folded per the standing rule |
 | [`index.md`](index.md) | Bundle contents change (new/moved/removed docs) | 2026-07-21 | OKF bundle root; declares okf_version |
-| [`../README.md`](../README.md) | Install/use surface, commands, guarantees change | 2026-07-21 | Public front door; v1 command surface |
+| [`../README.md`](../README.md) | Install/use surface, commands, guarantees change | 2026-07-21 | Public front door; story-first format per the old build's README |
 | [`../DOGFOOD.md`](../DOGFOOD.md) | v1 use surface changes; dogfood learnings land | 2026-07-21 | 10-min Anton quickstart (master-prompt rule 6) |
 | [`fux-plan.md`](fux-plan.md) | Any design decision, scope change, status change | 2026-07-21 | Design of record |
 | [`model-handoff-interview.md`](model-handoff-interview.md) | Direction/strategy/major decision changes | 2026-07-21 | Succession record; add yourself to maintainer line |
@@ -33,7 +33,7 @@ practice.
 | `tests/` + e2e suite docs | Any behaviour change | 2026-07-21 | 172 unit + 29 e2e (+1 gated skip); goldens via FUX_UPDATE_GOLDENS=1 only |
 | [`../tests_e2e/eval/README.md`](../tests_e2e/eval/README.md) | Eval pairs/metrics/gate change | 2026-07-21 | The v2 gate + Anton private-eval workflow |
 | [`../tools/distill/README.md`](../tools/distill/README.md) | Model recipe, format, or teacher changes | 2026-07-21 | Pinned distillation recipe (ADR 0006) |
-| `../.github/` (ci/publish/audit + branch-protection.json) | Required checks, release path, or the wall change | 2026-07-21 | "fux gate"+"ai-review" = suites + deterministic second pass; release → OIDC PyPI publish |
+| `../.github/` (ci/publish + branch-protection.json) | Required checks, release path, or the wall change | 2026-07-21 | "fux gate"+"ai-review" = suites + deterministic second pass; release → OIDC PyPI publish; scheduled audit removed (manual: scripts/audit-branch-protection.sh) |
 
 ## How agents use this file
 

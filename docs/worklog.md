@@ -26,6 +26,38 @@ diary.*
 
 ---
 
+## 2026-07-21 — v0.22.1 published; scheduled protection audit removed · Claude Code
+- **Asked:** (1) what is audit-protection.yml, is it needed? (2) remove it.
+- **Did:** explained it (weekly drift alarm comparing live branch protection vs
+  `.github/branch-protection.json`; fails loudly, needed an admin PAT secret that
+  was never set). **Removed the workflow** at Arpit's call — the wall itself is
+  untouched (required checks + enforce_admins verified live); the JSON source of
+  truth + `scripts/audit-branch-protection.sh` / `apply-branch-protection.sh`
+  stay for manual audits (`./scripts/audit-branch-protection.sh arpitarya fux
+  main`). Also this exchange: **v0.22.1 released and verified on PyPI** — wheel
+  6.98 MB, sdist now 133 files with zero old-build/CI leaks (the 0.22.0 sdist
+  had shipped `archive/`); publish ran with the new tag↔version guard.
+- **Decided / open:** no scheduled tamper alarm on the wall anymore — re-add the
+  workflow + a `BRANCH_PROTECTION_TOKEN` PAT if that guarantee is ever wanted back.
+- **Next:** Anton dogfood.
+
+## 2026-07-21 — README upgraded to the old build's story-first format · Cowork
+- **Asked:** review the README and upgrade it, referencing the older README's
+  format.
+- **Did:** rebuilt README.md on `archive/README.md`'s skeleton — tagline
+  blockquote + badges, **The story** (the red-pipe narrative evolved for the
+  query engine: the note exists, it's the *finding* that fails), **See it** (real
+  as-shipped `fux ask`/`fux answer` output from cli-examples.md), Quickstart,
+  ELI5, **Why it's different** (properties: deterministic, cited-or-didn't-happen,
+  hybrid-offline, $0, agent-native, corpus-not-index), **How it works** (pipeline
+  diagram + two-tier ingest + fenced web/CDP), collapsible full command surface,
+  **The $0 guarantee** with honest limits (no synthesis, English-biased model,
+  eval tie disclosed w/ ADR 0006 link), **The name** (kept; notes the rule-engine
+  vision on hold), Status, closing CTA. Everything claims only shipped v0.22.x
+  behaviour. Registry row bumped.
+- **Decided / open:** nothing open.
+- **Next:** Anton dogfood.
+
 ## 2026-07-21 — GLOSSARY.md rename + ALL-CAPS-no-frontmatter convention · Cowork
 - **Asked:** rename glossary.md → GLOSSARY.md; ALL-CAPS markdown files need no
   YAML frontmatter.
