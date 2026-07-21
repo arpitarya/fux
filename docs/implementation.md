@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — Phase 1 complete (v0.20.0).
-> Next: Phase 2 (handoff 0002, web/CDP/advanced ingest).
+> *(building agent: keep this one line current)* — Phase 2 · M3 RFC 6455
+> WebSocket client + CDP capture.
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -47,8 +47,8 @@ happened per exchange"; keep both.*
 
 | Milestone | Status | Tests | Notes |
 |-----------|--------|-------|-------|
-| M1 HTML→Markdown converter (stdlib, goldens-first) | ⬜ | — | |
-| M2 urllib fetcher + crawl frontier + robots + `--web` e2e | ⬜ | — | |
+| M1 HTML→Markdown converter (stdlib, goldens-first) | ✅ | 12 | html.parser; deterministic; link/title extraction |
+| M2 urllib fetcher + crawl frontier + robots + `--web` e2e | 🟡 | 12 | frontier/robots/dedupe/config done; fixture-server e2e lands in M5 |
 | M3 RFC 6455 WebSocket client + CDP capture | ⬜ | — | |
 | M4 advanced tier (Docling/Tesseract, fidelity transitions) | ⬜ | — | |
 | M5 e2e additions + docs | ⬜ | — | |
