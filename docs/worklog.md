@@ -26,6 +26,33 @@ diary.*
 
 ---
 
+## 2026-07-21 — PHASE 2 REPORT: Ingest v1.1 shipped (v0.21.0) · Claude Code
+- **Asked:** master run, phase 2 — execute handoff 0002 (web, CDP, advanced tier).
+- **Did (shipped):** stdlib `html.parser` HTML→Markdown converter (deterministic;
+  link/title extraction); `[sources.web]` config + fenced crawl — urllib fetcher
+  (UA/timeouts/retries/size cap/redirect-final-URL), robots.txt obeyed, BFS
+  frontier with depth/budget/domain caps + URL and sha dedupe (dual provenance),
+  attachments through the 0001 converters, `url`/`parent`/`depth`/`fetched_at`
+  provenance, byte-stable re-crawl of unchanged pages, web entries persist across
+  local-only runs and are excluded from `--check`; hand-rolled RFC 6455 WebSocket
+  client (RFC-vector + fake-server tested) + minimal CDP capture (existing Chrome
+  only, settle delay, actionable errors, websocket-client extra as flagged
+  fallback) + `manual_cdp_smoke.py`; advanced tier `fux ingest --advanced` —
+  Docling/tesseract upgrades, (sha, fidelity)-keyed index reuse, upgrades survive
+  re-ingest and reset when the source changes; AGENTS contract + fux-ingest skill
+  teach judge-and-upgrade; import-fence test (query/index can never touch network
+  modules). ADR 0005; 0002 pair archived; README/plan/registry/cli-examples/
+  interview updated; v0.21.0.
+- **Test counts:** `tests/` 154 passed · `tests_e2e/` 24 passed + 1 gated skip,
+  incl. fixture-site crawl (robots/oversize/off-domain skips surfaced).
+- **Decided / open (in ADR 0005):** hand-rolled HTML→MD as the always-present
+  default (open Q1); CDP settle = fixed configurable delay, networkIdle deferred
+  to dogfood evidence (open Q2); crawl resumability deferred (open Q3).
+  **Open risks carried:** rendered capture depends on local Chrome; changed-page
+  re-ingests are not byte-reproducible (inherent to network sources); HTML
+  converter is good-enough, not pandoc.
+- **Next:** Phase 3 — execute `handoff/0003-hybrid-engine-v2-prompt.md`.
+
 ## 2026-07-21 — PHASE 1 REPORT: Query CLI v1 shipped (v0.20.0) · Claude Code
 - **Asked:** master prompt 0000 — execute handoffs 0001 → 0002 → 0003 in sequence
   with hard phase gates. This entry is the phase-1 gate report.

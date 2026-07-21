@@ -31,7 +31,20 @@ fux answer "how do rollbacks work?"   # extractive, cited answer — never gener
 
 Modifiers: `--json` (agent path) · `--explain` (why each result) · `--top N` ·
 `-C N` (passage lines) · `--answer-max N`. Maintenance: `fux ingest --check`
-(drift; exit 1 when stale) · `--list-skipped` · `--list-inferred`.
+(drift report; `--strict` exits 2) · `--list-skipped` · `--list-inferred`.
+
+Web + fidelity upgrades (v1.1):
+
+```bash
+fux ingest --web                    # crawl [sources.web] (fenced: robots.txt obeyed,
+                                    # depth/budget/domain caps — network never on the query path)
+fux ingest --advanced report.pdf    # re-convert one source with Docling / tesseract OCR
+                                    # → fidelity: advanced, better text, same citations
+```
+
+JS-rendered pages: set `render = "cdp"` under `[sources.web]` and Fux drives
+your own headless Chrome over a hand-rolled RFC 6455 WebSocket client — no
+bundled browser, no new dependencies.
 
 Agent integration:
 
@@ -46,9 +59,11 @@ See [DOGFOOD.md](DOGFOOD.md) for the 10-minute real-project quickstart.
 
 Markdown/txt natively (frontmatter preserved) · code fenced by language · JSON
 flattened · YAML fenced · images as metadata stubs (dimensions via stdlib) ·
-Office/PDF via the opt-in `ingest` extra. Two-tier by design: the fast inferred
-pass runs by default; the advanced pass (OCR/layout, web, rendered pages) is
-v1.1 — see `docs/handoff/`.
+Office/PDF via the opt-in `ingest` extra · web pages (stdlib HTML→Markdown,
+crawl with attachments, full `url`/`parent`/`depth` provenance) · rendered
+pages via CDP. Two-tier by design: the fast inferred pass runs by default; the
+advanced pass (Docling layout / tesseract OCR) upgrades exactly the files you
+ask for and persists until the source changes.
 
 ## Guarantees
 
@@ -63,8 +78,9 @@ v1.1 — see `docs/handoff/`.
 
 ## Status
 
-Rebuild in progress — **v1 (query CLI) shipped**; web/CDP/advanced ingest and
-the hybrid engine are next ([docs/fux-plan.md](docs/fux-plan.md), build specs in
+Rebuild in progress — **v1 (query CLI) and v1.1 (web/CDP/advanced ingest)
+shipped**; the hybrid engine (bundled ≤10 MB embeddings + RRF) is next
+([docs/fux-plan.md](docs/fux-plan.md), build specs in
 [docs/handoff/](docs/handoff/)). The previous implementation is archived under
 [`archive/`](archive/). Docs are an OKF v0.1 bundle rooted at
 [docs/index.md](docs/index.md).

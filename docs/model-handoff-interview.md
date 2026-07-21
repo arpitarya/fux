@@ -123,8 +123,17 @@ answers, AGENTS.md/skills/hooks generation. ADRs 0001–0004; 0001 pair archived
 Build judgment a successor should keep: determinism beat wall-clock provenance
 (`converted_at` = SOURCE_DATE_EPOCH/mtime); JSON index won by measurement (16 ms
 load at 5k chunks — postings build, not format, dominates); the e2e suite earned
-its keep immediately (caught skipped-files-as-drift and answer noise). Next:
-phase 2 (handoff 0002).
+its keep immediately (caught skipped-files-as-drift and answer noise).
+
+**Phase 2 shipped (2026-07-21, v0.21.0).** Web/CDP/advanced ingest per handoff
+0002 (ADR 0005): stdlib HTML→MD (hand-rolled wins the default for determinism),
+guardrailed crawl (robots non-negotiable, sha dedupe with dual provenance,
+byte-stable re-crawl), hand-rolled RFC 6455 + minimal CDP (user's Chrome only;
+settle = fixed delay, networkIdle deferred to dogfood), `--advanced` Docling/
+tesseract upgrades with (sha, fidelity)-keyed index reuse, and the network fence
+now *enforced by a test* (query/index cannot import web/cdp/ws). Suites at
+phase gate: 154 unit + 24 e2e (+1 gated skip). Next: phase 3 (handoff 0003 —
+eval harness first, then the bundled model + RRF).
 
 **Q: What must a confident successor NOT "clean up"?**
 

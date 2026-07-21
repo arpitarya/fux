@@ -32,11 +32,11 @@ practice.
 | [`cli-examples.md`](cli-examples.md) | Any command/flag/output-format/exit-code change | 2026-07-21 | UX contract; e2e goldens derive from it — update together |
 | [`compare/README.md`](compare/README.md) | A compare doc opens, closes, or changes status | 2026-07-21 | Decision index |
 | [`compare/*.compare.md`](compare/) | New evidence, verdict change, or reopen-trigger fires | 2026-07-21 | One per decided fork |
-| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-21 | 0001–0004 (v1 features) |
-| `handoff/` | A feature enters build (handoff + prompt pair) | 2026-07-21 | 0002 (v1.1 web/CDP/advanced) + 0003 (v2 hybrid) live; 0001 implemented → `archive/` |
+| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-21 | 0001–0005 (v1 + v1.1 features) |
+| `handoff/` | A feature enters build (handoff + prompt pair) | 2026-07-21 | 0003 (v2 hybrid) live; 0001+0002 implemented → `archive/` |
 | [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-07-21 | `status:` frontmatter tracks lifecycle |
-| [`archive/`](archive/README.md) | A handoff/prompt/proposal is fully implemented | 2026-07-21 | 0001 pair archived with ADR links |
-| `tests/` + e2e suite docs | Any behaviour change | 2026-07-21 | 108 unit + 21 e2e; goldens updated via FUX_UPDATE_GOLDENS=1 only |
+| [`archive/`](archive/README.md) | A handoff/prompt/proposal is fully implemented | 2026-07-21 | 0001 + 0002 pairs archived with ADR links |
+| `tests/` + e2e suite docs | Any behaviour change | 2026-07-21 | 154 unit + 25 e2e; goldens updated via FUX_UPDATE_GOLDENS=1 only |
 
 ## How agents use this file
 

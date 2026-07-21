@@ -2,7 +2,8 @@
 type: Handoff
 title: Ingest v1.1 — web crawling, CDP rendering, advanced tier (OCR)
 description: Extends 0001's local inferred-tier ingest with fenced web ingestion, rendered pages, and the agent-triggerable advanced fidelity tier.
-status: ready
+status: implemented
+adrs: [../adr/0005-web-cdp-advanced-tier.md]
 blocked_by: 0001-query-cli-v1-handoff.md
 timestamp: 2026-07-21T00:00:00Z
 ---

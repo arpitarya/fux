@@ -91,8 +91,21 @@ notes/anton/decisions/db-indexing.md  (native-md)
 $ fux ingest --list-skipped          # what didn't ingest, and why
 notes/anton/report.pdf  — requires the markitdown extra (pip install 'fux-engine[ingest]')
 
-$ fux ingest --advanced papers/spec.pdf      # layout/OCR converter — v1.1 (handoff 0002)
-$ fux ingest --web                           # fenced web ingestion — v1.1 (handoff 0002)
+$ fux ingest --advanced papers/spec.pdf      # one file → advanced fidelity (docling/tesseract)
+upgraded papers/spec.pdf → fidelity: advanced (docling); 1210 chunks indexed
+
+$ fux ingest --web                   # crawl [sources.web] as well (fenced network:
+                                     # robots.txt obeyed, depth/budget/domain caps)
+  converted    6 web        (fenced network — html→md + attachments)
+```
+
+Web-origin entries cite their URL (`https://…/runbook.html`), carry
+`url`/`parent`/`depth`/`fetched_at` provenance, persist across local-only
+ingests, and are excluded from `--check` (web freshness = a `--web` re-crawl).
+Rendered pages: `render = "cdp"` drives your own headless Chrome (hand-rolled
+RFC 6455 client; `websocket-client` extra only as a flagged fallback).
+
+```
 ```
 
 ## `fux ask` — ranked passages (the default intent)

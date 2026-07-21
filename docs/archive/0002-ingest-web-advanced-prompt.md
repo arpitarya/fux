@@ -2,7 +2,8 @@
 type: Handoff Prompt
 title: Claude Code prompt — Ingest v1.1 (web, CDP, advanced tier)
 description: Paste-ready prompt executing handoff 0002.
-status: ready
+status: implemented
+adrs: [../adr/0005-web-cdp-advanced-tier.md]
 blocked_by: 0001-query-cli-v1-handoff.md
 timestamp: 2026-07-21T00:00:00Z
 ---

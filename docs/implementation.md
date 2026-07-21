@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — Phase 2 · M3 RFC 6455
-> WebSocket client + CDP capture.
+> *(building agent: keep this one line current)* — Phase 2 complete (v0.21.0).
+> Next: Phase 3 (handoff 0003, hybrid engine v2).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -48,11 +48,11 @@ happened per exchange"; keep both.*
 | Milestone | Status | Tests | Notes |
 |-----------|--------|-------|-------|
 | M1 HTML→Markdown converter (stdlib, goldens-first) | ✅ | 12 | html.parser; deterministic; link/title extraction |
-| M2 urllib fetcher + crawl frontier + robots + `--web` e2e | 🟡 | 12 | frontier/robots/dedupe/config done; fixture-server e2e lands in M5 |
-| M3 RFC 6455 WebSocket client + CDP capture | ⬜ | — | |
-| M4 advanced tier (Docling/Tesseract, fidelity transitions) | ⬜ | — | |
-| M5 e2e additions + docs | ⬜ | — | |
-| Close-out: ADR 0005, docs law, archive pair, bump | ⬜ | — | |
+| M2 urllib fetcher + crawl frontier + robots + `--web` e2e | ✅ | 12+4 | frontier/robots/dedupe/config + fixture-server e2e (M5) |
+| M3 RFC 6455 WebSocket client + CDP capture | ✅ | 14 | RFC vectors + fake-server handshake; websocket-client = flagged fallback |
+| M4 advanced tier (Docling/Tesseract, fidelity transitions) | ✅ | 6 | (sha, fidelity)-keyed index reuse; upgrades survive re-ingest |
+| M5 e2e additions + docs | ✅ | 4+2 | fixture site (robots/oversize/off-domain), import-fence test, manual CDP smoke |
+| Close-out: ADR 0005, docs law, archive pair, bump | ✅ | — | v0.21.0; suites: 154 unit + 24 e2e (+1 gated skip) |
 
 ## Phase 3 — Hybrid engine v2 (handoff 0003) → v0.22.0
 
