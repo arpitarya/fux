@@ -56,11 +56,35 @@ development (specs, decisions, agent-driven builds — see fux-plan §6b). There
 deterministic, diff-friendly cache output (sorted walks, stable serialization, POSIX
 relative paths) is a hard requirement everywhere, and downstream corpus features
 (diff/log, research-to-spec, audit trail) live as proposals in
-[`docs/proposals/`](docs/proposals/).
+[`docs/proposals/`](docs/proposals/). **Two tiers (2026-07-21):** the *curated*
+corpus is per-file Markdown, committed; *bulk* corpora (big crawls/imports) get
+**no file cache at all** — converted text lives as rows inside the substrate db
+(one file on disk at any corpus size; 100k documents-as-files is impractical,
+git or not). Commit the recipe (fux.toml + manifest), never the warehouse.
 
-Litmus for any new work: **"is it relevant to Anton?"** (AlphaForge — Arpit's
-trading app, Fux's pilot / instance zero). If no, the priority is wrong. Everything
-built must be usable first-hand in Anton before any external claim.
+**Who Fux is for (2026-07-21):** an agent inside Copilot/Claude/Kiro querying
+**documentation, decisions, and links** — not the code itself. Semantic enrichment
+may ride the *host session's* model via skills (written back as reviewable
+frontmatter); Fux's own code never calls a model — `$0` holds either way.
+
+**Litmus for any new work (changed 2026-07-21, Arpit):** do **not** design in
+reference to Anton. The design point is a **very large-scale project inside a
+corporation** — think a 10k-engineer company's mega-project:
+
+- **Scale is the default, not the trigger** — 10⁵–10⁶ documents, sprawling
+  Confluence/SharePoint/wiki estates, thousands of repos, millions of links.
+
+- **Enterprise realities are design inputs** — Windows-first fleets, proxies and
+  SSO in front of every internal site, air-gapped/regulated environments,
+  multi-team corpora with access boundaries, audit and compliance demands.
+
+- **Fux's laws are enterprise features, not constraints** — `$0`/stdlib = a
+  trivially auditable supply chain and no procurement; offline/no-API = no data
+  ever leaves the tenant; deterministic = compliance-grade reproducibility.
+
+The question per feature: *"does this hold up in that corporation's
+mega-project?"* Anton remains a convenient small-scale testbed, but it is no
+longer the priority filter.
 
 ## Non-negotiable constraints
 
@@ -148,6 +172,24 @@ Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/b
 [annotated guide](https://okf.md/spec/). New features and their docs follow this
 pattern from birth.
 
+## Documentation style (required)
+
+**No large paragraphs — they are hard to read.** When writing or updating any doc
+in this repo:
+
+- Split dense prose into **short points** (bullets or numbered lists), one idea
+  per point.
+
+- Keep paragraphs to **3–4 lines max**; if it runs longer, it's two points.
+
+- Make it **roomy**: blank lines between points and sections; use tables for
+  option/field comparisons; use headings to break up long sections.
+
+- Lead each point with the takeaway (bold it when it helps scanning).
+
+- When you touch a doc that has a wall of text, split it in the same change —
+  the docs law's "fix stale docs on contact" applies to *form*, not just facts.
+
 ## Keep the docs in sync with the code (required)
 
 **Every task updates the documentation — no exceptions.** This holds whether the task
@@ -167,9 +209,17 @@ minimum, per task, check and update:
    is now this document's maintainer — you will retire too; leave it better.
 4. **[`docs/worklog.md`](docs/worklog.md)** — the running session handoff (see below).
 4b. **[`docs/implementation.md`](docs/implementation.md)** — the live build tracker:
-   milestone-level ✅/🟡/⬜ per phase. Building agents flip rows on milestone
-   completion, keep "Now working on" current at regular intervals, and log spec
-   deviations there. Never ✅ with failing tests.
+   milestone-level ✅/🟡/⬜ per phase. Two binding halves:
+
+   - **When a plan/handoff is written:** its milestone table is **pre-registered**
+     in implementation.md (all ⬜) in the same change — every plan arrives with
+     its tracker rows already in place.
+
+   - **When building:** the agent updates the row **at every single milestone
+     completion** (status + test count + one-line note) — per milestone, never
+     batched at phase end — keeps "Now working on" current at regular intervals,
+     and logs spec deviations in the Deviations section. Never ✅ with failing
+     tests.
 5. **[`docs/DOC-REGISTRY.md`](docs/DOC-REGISTRY.md)** — the doc freshness tracker:
    one row per maintained doc with its update trigger and last-verified date. If your
    change fires a trigger, update the doc *and* bump its row. New maintained doc →

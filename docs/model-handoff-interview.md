@@ -149,6 +149,29 @@ now *enforced by a test* (query/index cannot import web/cdp/ws). Suites at
 phase gate: 154 unit + 24 e2e (+1 gated skip). Next: phase 3 (handoff 0003 —
 eval harness first, then the bundled model + RRF).
 
+**Q: Late direction change (2026-07-21) — the design lens?**
+
+Arpit retired the Anton litmus: **do not design in reference to Anton — design
+for a very large-scale project inside a corporation.** Consequences: the
+knowledge substrate (SQLite, one-kernel, graph) is the default next phase, not a
+wait-for-pain contingency; enterprise inputs (proxy/SSO ingest, Windows fleets,
+air-gap installs, access boundaries, audit) are design requirements; the
+audit-evidence-trail proposal gains priority; and Fux's laws re-read as its
+enterprise sales story ($0 = auditable supply chain, offline = no data egress,
+deterministic = compliance-grade). Anton stays a convenient small testbed only.
+
+**Q: Phase 4 — where does it stand (2026-07-21, end of day)?**
+
+The **knowledge-substrate proposal is accepted** — the day-long debate
+(scale → graph → merge → one kernel → FuxVec → lean profile → state-in-git)
+converged into `docs/proposals/knowledge-substrate.md`, and the build contract
+is `docs/handoff/0004-knowledge-substrate-handoff.md` + prompt: SQLite
+substrate, fux.lock, committed lean state, one-kernel retrieve() with
+explain/graph/path/cat, FuxVec dense-global, full/lean profiles, db pull.
+Target v0.23.0, ADRs 0008–0011, M1–M8 eval-gated. Parity with v0.22 goldens is
+sacred; the BM25F/RRF/answer math is untouchable plumbing-only. Next action:
+run the 0004 prompt in Claude Code; dogfooding feeds the M8 gate in parallel.
+
 **Q: What must a confident successor NOT "clean up"?**
 
 1. **The hand-rolled frontmatter parser + validator** (once built) — that is the
