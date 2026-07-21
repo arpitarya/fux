@@ -22,7 +22,9 @@ def test_version_and_help(project):
 
 def test_ingest_summary(project):
     out = run_fux(project, "ingest").stdout
-    assert "ingested" in out and "chunks indexed" in out
+    assert "Scanning" in out and "source roots" in out
+    assert "converted" in out and "markdown" in out
+    assert "Cache: .fux/cache" in out and "chunks (BM25F)" in out
     assert (project / ".fux/cache/docs/guide.md").is_file()
     assert (project / ".fux/manifest.jsonl").is_file()
     assert (project / ".fux/index/index.json").is_file()
@@ -59,17 +61,16 @@ def test_answer_golden(ingested):
 
 def test_answer_human_cites(ingested):
     out = run_fux(ingested, "answer", "how fast are rollbacks").stdout
-    assert "two minutes" in out
-    assert "[docs/guide.md:" in out
-    assert "sources:" in out
+    assert "two minutes" in out and "[1]" in out
+    assert "Sources:" in out and "[1] docs/guide.md:" in out
 
 
 def test_no_headings_and_unicode_ingested(ingested):
     out = run_fux(ingested, "find", "telemetry batches flushed thirty seconds", "--json").stdout
-    files = [r["file"] for r in json.loads(out)["results"]]
+    files = [r["path"] for r in json.loads(out)["results"]]
     assert "docs/no-headings.md" in files
     out = run_fux(ingested, "ask", "café naming décisions", "--json").stdout
-    assert json.loads(out)["results"][0]["file"] == "docs/unicode-café.md"
+    assert json.loads(out)["results"][0]["path"] == "docs/unicode-café.md"
 
 
 def test_skipped_listing(ingested):
@@ -93,6 +94,6 @@ def test_office_ingested_with_extra(ingested):
 
 def test_zero_hit_query_honest(ingested):
     out = run_fux(ingested, "ask", "xyzzy plugh quux").stdout
-    assert "no matches" in out
+    assert "No confident matches" in out
     out = run_fux(ingested, "answer", "xyzzy plugh quux").stdout
-    assert "no confident answer" in out
+    assert "No confident answer" in out

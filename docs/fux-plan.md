@@ -142,7 +142,7 @@ paste-ready prompt in [`handoff/`](handoff/)):
 
 | # | Phase | Scope | Status |
 |---|-------|-------|--------|
-| [0001](handoff/0001-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ready — **build first** |
+| [0001](archive/0001-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ✅ **implemented** (v0.20.0, 2026-07-21; ADRs 0001–0004) |
 | [0002](handoff/0002-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ready, blocked by 0001 |
 | [0003](handoff/0003-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ready, blocked by 0001 (independent of 0002) |
 
@@ -158,15 +158,17 @@ Claude Code.
 
 | Area | Status | Notes |
 |------|--------|-------|
-| Package skeleton | ✅ | src/ layout, hatchling, v0.19.0, CLI + FuxError stubs, smoke tests |
+| Package skeleton | ✅ | src/ layout, hatchling, CLI + FuxError, smoke tests |
 | Query CLI — design decisions | ✅ | engine/output/ingest/model verdicts accepted; see `compare/` |
-| Query CLI — v1 build (BM25F + ingest + config) | ⬜ | next: plan → handoff → prompt |
+| Query CLI — **v1 build** (setup/ingest/BM25F/ask/find/answer/agents) | ✅ | **v0.20.0** (2026-07-21); ADRs 0001–0004; 108 unit + 20 e2e tests; DOGFOOD.md emitted |
+| Ingest v1.1 (web/CDP/advanced — handoff 0002) | ⬜ | next in the master run |
+| Hybrid engine v2 (handoff 0003) | ⬜ | after 0002 in the master run |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
 
 ## 8. Next move
 
-Resolve the open sub-decisions (chunking, field weights, the numpy question), then
-write plan → handoff → prompt for **query CLI v1**: `fux.toml` config, two-tier
-`fux ingest` (inferred), BM25F retrieval, `fux ask` with passages/`--files`/`--answer`.
-Build and live with it in Anton.
+Continue the master run ([archive/0000 →] handoff 0002): web crawling
+(urllib + robots), CDP rendered pages (hand-rolled RFC 6455), the advanced
+ingest tier — then handoff 0003 (eval harness → bundled model → RRF hybrid).
+Anton dogfooding proceeds in parallel via [DOGFOOD.md](../DOGFOOD.md).

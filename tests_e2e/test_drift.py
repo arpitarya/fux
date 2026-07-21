@@ -13,11 +13,14 @@ def test_check_clean_then_drift(ingested):
     (ingested / "docs/added.md").write_text("# Added\n\nbrand new\n", encoding="utf-8")
     (ingested / "notes/todo.txt").unlink()
 
-    proc = run_fux(ingested, "ingest", "--check", check=False)
-    assert proc.returncode == 1
-    assert "changed  docs/guide.md" in proc.stdout
-    assert "new      docs/added.md" in proc.stdout
-    assert "missing  notes/todo.txt" in proc.stdout
+    proc = run_fux(ingested, "ingest", "--check")
+    assert proc.returncode == 0  # advisory by default
+    assert "DRIFT  docs/guide.md  (sha mismatch — re-ingest)" in proc.stdout
+    assert "DRIFT  docs/added.md  (new — not in manifest)" in proc.stdout
+    assert "DRIFT  notes/todo.txt  (missing — source deleted; cache orphan)" in proc.stdout
+
+    proc = run_fux(ingested, "ingest", "--check", "--strict", check=False)
+    assert proc.returncode == 2  # blocking, per the error contract
 
 
 def test_ask_warns_when_stale(ingested):

@@ -10,6 +10,8 @@ clock), so two runs over the same sources are byte-identical.
 from __future__ import annotations
 
 import os
+import time
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,8 +20,8 @@ from .. import __version__
 from ..config import Config, find_root, load
 from ..frontmatter import dumps as fm_dumps
 from .convert import ConvertResult, convert
-from .manifest import Drift, check_drift, quick_drift, read as manifest_read, sha256_bytes
-from .manifest import write as manifest_write
+from .manifest import MANIFEST_REL, Drift, check_drift, quick_drift, read as manifest_read
+from .manifest import sha256_bytes, write as manifest_write
 from .walk import SourceFile, WalkResult, walk
 
 __all__ = ["ingest_paths", "check_drift", "quick_drift", "list_inferred", "cmd_ingest"]
@@ -39,10 +41,12 @@ class IngestReport:
     new: int = 0
     updated: int = 0
     unchanged: int = 0
+    converted_by_kind: Counter = field(default_factory=Counter)
     skipped: list[tuple[str, str]] = field(default_factory=list)
     removed: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     chunk_count: int = 0
+    source_roots: int = 0
 
     @property
     def total(self) -> int:
@@ -54,6 +58,8 @@ def ingest_paths(config: Config, *, build_index: bool = True) -> IngestReport:
     cache_root = root / CACHE_REL
     report = IngestReport()
     result = walk(config)
+    configured = [d for dirs in config.sources.values() for d in dirs]
+    report.source_roots = len(configured) - len(result.missing_dirs)
     report.warnings.extend(f"source folder not found: {d}" for d in result.missing_dirs)
     prev = manifest_read(root)
 
@@ -83,6 +89,7 @@ def ingest_paths(config: Config, *, build_index: bool = True) -> IngestReport:
         if not cache_path.is_file() or cache_path.read_text(encoding="utf-8") != text:
             cache_path.write_text(text, encoding="utf-8")
         report.entries.append(_manifest_entry(sf, conv, sha, len(data), cache_rel, title))
+        report.converted_by_kind[sf.kind] += 1
         report.updated += 1 if entry else 0
         report.new += 0 if entry else 1
 
@@ -231,22 +238,26 @@ def _write_dir_indexes(cache_root: Path, entries: list[dict]) -> None:
 
 
 def cmd_ingest(args) -> int:
+    started = time.perf_counter()
     root = find_root()
     config = load(root)
 
     if args.check:
         drift = check_drift(config)
+        tracked = len(manifest_read(root))
         if drift.clean:
-            print(f"cache is fresh ({len(manifest_read(root))} files tracked)")
+            print(f"cache is fresh ({tracked} files tracked)")
             return 0
         for rel in drift.changed:
-            print(f"changed  {rel}")
+            print(f"  DRIFT  {rel}  (sha mismatch — re-ingest)")
         for rel in drift.new:
-            print(f"new      {rel}")
+            print(f"  DRIFT  {rel}  (new — not in manifest)")
         for rel in drift.missing:
-            print(f"missing  {rel}  (source deleted; cache entry is an orphan)")
-        print("run `fux ingest` to refresh")
-        return 1
+            print(f"  DRIFT  {rel}  (missing — source deleted; cache orphan)")
+        stale = len(drift.changed) + len(drift.new) + len(drift.missing)
+        print(f"{stale} stale of {tracked} · run `fux ingest` to refresh")
+        # advisory by default; --strict makes drift blocking (exit 2, per contract)
+        return 2 if args.strict else 0
 
     if args.list_inferred:
         for entry in sorted(list_inferred(config), key=lambda e: e["source"]):
@@ -264,17 +275,43 @@ def cmd_ingest(args) -> int:
         for warning in report.warnings:
             print(f"warning: {warning}")
         return 0
-    print(
-        f"ingested {report.total} files ({report.new} new, {report.updated} updated, "
-        f"{report.unchanged} unchanged) → {CACHE_REL} ({report.chunk_count} chunks indexed)"
-    )
+    _print_summary(report, started)
+    return 0
+
+
+_KIND_LABELS = {
+    "md": ("markdown", "native"),
+    "txt": ("text", "native"),
+    "code": ("code", "fenced"),
+    "json": ("json", "flattened, stdlib"),
+    "yaml": ("yaml", "fenced text"),
+    "image": ("images", "metadata only — advanced tier is v1.1"),
+    "office": ("office", "markitdown extra"),
+}
+
+
+def _print_summary(report: IngestReport, started: float) -> None:
+    plural = "root" if report.source_roots == 1 else "roots"
+    print(f"Scanning {report.source_roots} source {plural}…")
+    for kind, (label, how) in _KIND_LABELS.items():
+        count = report.converted_by_kind.get(kind, 0)
+        if count:
+            verb = "stubbed" if kind == "image" else "converted"
+            print(f"  {verb:<9}{count:>4} {label:<10} ({how})")
+    if report.unchanged:
+        print(f"  unchanged{report.unchanged:>4}            (cache reuse)")
     if report.skipped:
-        print(f"skipped {len(report.skipped)} (see `fux ingest --list-skipped`)")
+        print(f"  skipped  {len(report.skipped):>4}            (see `fux ingest --list-skipped`)")
     if report.removed:
-        print(f"removed {len(report.removed)} stale cache entries")
+        print(f"  removed  {len(report.removed):>4}            (sources gone; cache pruned)")
+    print(
+        f"Cache: {CACHE_REL}  ({report.total} files, OKF bundle)   "
+        f"Manifest: {MANIFEST_REL}"
+    )
+    elapsed = time.perf_counter() - started
+    print(f"Index: {report.chunk_count} chunks (BM25F)   Elapsed: {elapsed:.1f}s")
     for warning in report.warnings:
         print(f"warning: {warning}")
-    return 0
 
 
 def _detect_skips(config: Config) -> list[tuple[str, str]]:

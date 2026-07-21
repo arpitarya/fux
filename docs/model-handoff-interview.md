@@ -111,9 +111,20 @@ has a ready build spec** in `docs/handoff/`: **0001** (v1 — local inferred-tie
 ingest, BM25F, ask/find/answer, agent files, both suites), **0002** (v1.1 — web
 crawl, CDP via hand-rolled RFC 6455, advanced tier/OCR; blocked by 0001), **0003**
 (v2 — eval harness first, distilled ≤10 MB bundled model, stdlib int8 inference,
-RRF hybrid; blocked by 0001, independent of 0002). Sequencing: 0001 → **dogfood in
-Anton** → let the dogfood pick between 0002/0003. Next action: execute the 0001
-prompt in Claude Code. The dogfood is the gate for everything else.
+RRF hybrid; blocked by 0001, independent of 0002). Arpit chose **one continuous
+run** (master prompt 0000) over the dogfood-gated sequence, with DOGFOOD.md
+emitted after phase 1 so Anton dogfooding runs in parallel.
+
+**Phase 1 shipped (2026-07-21, v0.20.0).** The full v1 surface exists and both
+suites are green (108 unit + 21 e2e incl. byte-determinism goldens): setup wizard,
+inferred ingest → OKF cache with provenance, heading chunker, true BM25F
+(weight-then-saturate), ask/find/answer with --json/--explain, extractive TextRank
+answers, AGENTS.md/skills/hooks generation. ADRs 0001–0004; 0001 pair archived.
+Build judgment a successor should keep: determinism beat wall-clock provenance
+(`converted_at` = SOURCE_DATE_EPOCH/mtime); JSON index won by measurement (16 ms
+load at 5k chunks — postings build, not format, dominates); the e2e suite earned
+its keep immediately (caught skipped-files-as-drift and answer noise). Next:
+phase 2 (handoff 0002).
 
 **Q: What must a confident successor NOT "clean up"?**
 
@@ -145,4 +156,6 @@ is not done until the docs are true. Every behaviour change ships with a test.
 
 *Maintained by: Claude Opus 4.8, July 2026 — reset the record for the from-scratch
 rebuild; scoped to rules substrate + fix loop; carried the succession premise
-forward. (Add yourself here when you make a material update — model, date, one line.)*
+forward. · Claude Fable 5, 2026-07-21 — executed the master run's phase 1: shipped
+query CLI v1 (v0.20.0, ADRs 0001–0004), recorded the build judgment above.
+(Add yourself here when you make a material update — model, date, one line.)*

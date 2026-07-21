@@ -42,7 +42,8 @@ def test_full_ingest_writes_cache_manifest_index(tmp_path, monkeypatch, capsys):
     make_project(tmp_path)
     assert run(tmp_path, monkeypatch, "ingest") == 0
     out = capsys.readouterr().out
-    assert "ingested 5 files (5 new" in out
+    assert "Cache: .fux/cache  (5 files, OKF bundle)" in out
+    assert "converted" in out and "chunks (BM25F)" in out
 
     cache_md = tmp_path / ".fux/cache/docs/guide.md"
     fm = fm_parse(cache_md.read_text(encoding="utf-8"))
@@ -90,7 +91,8 @@ def test_double_ingest_is_byte_identical(tmp_path, monkeypatch, capsys):
         if p.is_file()
     }
     assert snapshot == after
-    assert "5 unchanged" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "unchanged   5" in out
 
 
 def test_incremental_update_and_removal(tmp_path, monkeypatch, capsys):
@@ -101,7 +103,7 @@ def test_incremental_update_and_removal(tmp_path, monkeypatch, capsys):
     capsys.readouterr()
     assert run(tmp_path, monkeypatch, "ingest") == 0
     out = capsys.readouterr().out
-    assert "1 updated" in out and "removed 1" in out
+    assert "converted   1 markdown" in out and "removed     1" in out
     assert not (tmp_path / ".fux/cache/docs/sub").exists()  # pruned empty dir
     entries = manifest_read(tmp_path)
     assert "docs/sub/notes.txt" not in entries
@@ -117,11 +119,13 @@ def test_check_reports_drift(tmp_path, monkeypatch, capsys):
     (tmp_path / "docs" / "guide.md").write_text("drifted\n", encoding="utf-8")
     (tmp_path / "docs" / "extra.md").write_text("# extra\n", encoding="utf-8")
     (tmp_path / "img" / "logo.png").unlink()
-    assert run(tmp_path, monkeypatch, "ingest", "--check") == 1
+    assert run(tmp_path, monkeypatch, "ingest", "--check") == 0  # advisory by default
     out = capsys.readouterr().out
-    assert "changed  docs/guide.md" in out
-    assert "new      docs/extra.md" in out
-    assert "missing  img/logo.png" in out
+    assert "DRIFT  docs/guide.md  (sha mismatch — re-ingest)" in out
+    assert "DRIFT  docs/extra.md  (new — not in manifest)" in out
+    assert "DRIFT  img/logo.png  (missing — source deleted; cache orphan)" in out
+    assert "3 stale of 5" in out
+    assert run(tmp_path, monkeypatch, "ingest", "--check", "--strict") == 2  # blocking
 
     drift = check_drift(load(tmp_path))
     assert drift.changed == ["docs/guide.md"]

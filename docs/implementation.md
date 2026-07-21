@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — Phase 1 · M6 agent integration
-> (AGENTS.md/pointers/skills/hooks generator).
+> *(building agent: keep this one line current)* — Phase 1 complete (v0.20.0).
+> Next: Phase 2 (handoff 0002, web/CDP/advanced ingest).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -39,9 +39,9 @@ happened per exchange"; keep both.*
 | M3 ingest inferred tier → OKF cache + manifest + chunker | ✅ | 36 | converted_at = SOURCE_DATE_EPOCH/mtime (determinism; → ADR 0002 + Deviations) |
 | M4 BM25F index + `ask`/`find` (+ --json/--explain) | ✅ | 16 | JSON index (open Q1 resolved), incremental by sha |
 | M5 `answer` (extractive + TextRank + citations) | ✅ | 12 | passage × overlap × centrality; doc-order citations |
-| M6 `setup --agents --skills --hooks` | ⬜ | — | |
-| M7 `tests_e2e/` suite (corpus + goldens + determinism) | ⬜ | — | |
-| Close-out: ADRs 0001–0004, docs law, archive pair, bump | ⬜ | — | |
+| M6 `setup --agents --skills --hooks` | ✅ | 8 | managed blocks, skills pair, fail-open hooks, settings merge |
+| M7 `tests_e2e/` suite (corpus + goldens + determinism) | ✅ | 21 | found+fixed --check drift bug and answer noise; goldens pinned to no-extra corpus |
+| Close-out: ADRs 0001–0004, docs law, archive pair, bump | ✅ | — | v0.20.0; DOGFOOD.md emitted; suites: 108 unit + 20 e2e (+1 gated skip) |
 
 ## Phase 2 — Ingest v1.1: web/CDP/advanced (handoff 0002) → v0.21.0
 
@@ -76,3 +76,11 @@ that captures it — an empty section is the goal)*
   convention) or the source file's mtime — never wall clock. The handoff lists
   `converted_at` as provenance *and* requires byte-identical double-ingest; a wall
   clock cannot satisfy both. Captured in ADR 0002.
+- **0001 / cli-examples.md sketches:** the pre-build examples were aligned to
+  as-shipped v1 (2026-07-21): setup wizard = one prompt per source type (no
+  cache-location prompt — cache path is fixed in v1); ask/find scores are raw
+  BM25F magnitudes, not 0–1; `--check` gained explicit new/missing annotations;
+  answer JSON/citation shapes specified. The implementation was reworked to match
+  the doc's normative shapes (`--check` advisory + `--strict`→2, JSON `path`/
+  `line_start`/`line_end`/`heading_path`/`fidelity` keys, `[n]`+Sources answer
+  citations, per-field explain tree, per-kind ingest summary).

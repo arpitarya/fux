@@ -15,8 +15,8 @@ This file is binding. Read it before your first substantive change.
 
 ## What we are building (scope)
 
-**First deliverable (current): the document-query CLI — design fully decided
-2026-07-20/21** (every fork + sub-decision closed in [`docs/compare/`](docs/compare/);
+**First deliverable: the document-query CLI — design decided 2026-07-20/21,
+v1 shipped 2026-07-21 (v0.20.0, handoff 0001 → ADRs 0001–0004)** (every fork + sub-decision closed in [`docs/compare/`](docs/compare/);
 read those before proposing changes — each records its reopen-trigger). The shape:
 
 - **Engine:** v1 **BM25F** (stdlib; heading 3.0/path 2.0/body 1.0, k1=1.2, b=0.75) →
@@ -241,5 +241,21 @@ is the proof.
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`** (unchanged). Import package: **`fux`**.
-- Version: **`0.19.0`** — a fresh minor continuing the old line (old build ended at
-  0.18.0). Bump in `src/fux/__init__.py` only.
+- Version: **`0.20.0`** (v1 query CLI; the line continues 0.18.0 → 0.19.0 skeleton
+  → 0.20.0 v1 → 0.21.0 planned v1.1 → 0.22.0 planned v2). Bump in
+  `src/fux/__init__.py` only.
+
+## Hard-won build knowledge (auto-folded, 2026-07-21)
+
+- **No wall-clock output anywhere on the maintenance path.** `converted_at` and
+  cache `timestamp` derive from `SOURCE_DATE_EPOCH`/source mtime (ADR 0002) —
+  wall clocks break the byte-identical re-ingest guarantee.
+- **BM25F means weight-then-saturate once** — never sum per-field BM25 (ADR 0003).
+- **Skipped ≠ drift:** files that can't ingest (binary, missing extras) must not
+  surface as "new" in `--check` — `skip_reason()` is shared by convert and drift.
+- **Stopwords are stripped only in the answer-overlap factor**, never in the
+  index; and answer sentences under 35 % of the best score are dropped (both
+  earned from fixture-corpus smoke noise, ADR 0003).
+- **Goldens are pinned to the extra-less environment** — installing `[ingest]`
+  changes corpus size and therefore every idf/score; office coverage is a
+  separate `skipif` test.

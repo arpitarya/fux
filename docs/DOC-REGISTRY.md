@@ -23,7 +23,8 @@ practice.
 |----------|---------------|---------------|-------|
 | [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, or layout changes; new durable session learnings | 2026-07-21 | Binding; also auto-folded per the standing rule |
 | [`index.md`](index.md) | Bundle contents change (new/moved/removed docs) | 2026-07-21 | OKF bundle root; declares okf_version |
-| [`../README.md`](../README.md) | Install/use surface, commands, guarantees change | 2026-07-20 | Public front door |
+| [`../README.md`](../README.md) | Install/use surface, commands, guarantees change | 2026-07-21 | Public front door; v1 command surface |
+| [`../DOGFOOD.md`](../DOGFOOD.md) | v1 use surface changes; dogfood learnings land | 2026-07-21 | 10-min Anton quickstart (master-prompt rule 6) |
 | [`fux-plan.md`](fux-plan.md) | Any design decision, scope change, status change | 2026-07-21 | Design of record |
 | [`model-handoff-interview.md`](model-handoff-interview.md) | Direction/strategy/major decision changes | 2026-07-21 | Succession record; add yourself to maintainer line |
 | [`worklog.md`](worklog.md) | **Every substantive exchange** (append) | 2026-07-21 | Rolling session handoff |
@@ -31,11 +32,11 @@ practice.
 | [`cli-examples.md`](cli-examples.md) | Any command/flag/output-format/exit-code change | 2026-07-21 | UX contract; e2e goldens derive from it — update together |
 | [`compare/README.md`](compare/README.md) | A compare doc opens, closes, or changes status | 2026-07-21 | Decision index |
 | [`compare/*.compare.md`](compare/) | New evidence, verdict change, or reopen-trigger fires | 2026-07-21 | One per decided fork |
-| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-20 | None yet — first ADRs come with v1 |
-| `handoff/` | A feature enters build (handoff + prompt pair) | 2026-07-21 | 0001 (v1), 0002 (v1.1 web/CDP/advanced), 0003 (v2 hybrid) all written + ready; implemented pairs move to `archive/` |
+| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-21 | 0001–0004 (v1 features) |
+| `handoff/` | A feature enters build (handoff + prompt pair) | 2026-07-21 | 0002 (v1.1 web/CDP/advanced) + 0003 (v2 hybrid) live; 0001 implemented → `archive/` |
 | [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-07-21 | `status:` frontmatter tracks lifecycle |
-| [`archive/`](archive/README.md) | A handoff/prompt/proposal is fully implemented | 2026-07-21 | Move in the same change; `status: implemented` + ADR link |
-| `tests/` + e2e suite docs | Any behaviour change | 2026-07-20 | Suite is maintained, not disposable |
+| [`archive/`](archive/README.md) | A handoff/prompt/proposal is fully implemented | 2026-07-21 | 0001 pair archived with ADR links |
+| `tests/` + e2e suite docs | Any behaviour change | 2026-07-21 | 108 unit + 21 e2e; goldens updated via FUX_UPDATE_GOLDENS=1 only |
 
 ## How agents use this file
 

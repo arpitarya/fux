@@ -21,7 +21,7 @@ a `type`; this index gives progressive disclosure. (Repo-root `CLAUDE.md` and
 
 * [Compare docs](compare/) - every fork's debate + accepted verdict + reopen-trigger (all closed).
 * [Proposals](proposals/) - parked ideas with graduation triggers.
-* [ADRs](adr/) - one per completed feature (arrive with the v1 build).
+* [ADRs](adr/) - one per completed feature (0001–0004: config/setup, ingest+cache+chunker, BM25F+query, agent integration).
 
 # Build
 

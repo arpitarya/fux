@@ -2,7 +2,8 @@
 type: Handoff Prompt
 title: Claude Code prompt — Query CLI v1
 description: Paste-ready prompt that executes handoff 0001 (explore → plan → implement → verify).
-status: ready
+status: implemented
+adrs: [../adr/0001-config-and-setup.md, ../adr/0002-ingest-cache-chunker.md, ../adr/0003-bm25f-index-query-surface.md, ../adr/0004-agent-integration.md]
 timestamp: 2026-07-21T00:00:00Z
 ---
 

@@ -15,6 +15,12 @@ decides. Examples use the running fixture from
 [`compare/query-output.compare.md`](compare/query-output.compare.md) — a corpus at
 `~/notes/anton/` with `decisions/db-indexing.md`.*
 
+*Updated 2026-07-21 to the **as-shipped v1 formats** (the pre-build sketches
+deviated in places; each deviation is logged in
+[`implementation.md`](implementation.md) → Deviations). Scores shown are raw BM25F
+magnitudes, not 0–1 — the numbers in examples are illustrative, the shapes are
+normative.*
+
 Commands are decided in [`compare/cli-surface.compare.md`](compare/cli-surface.compare.md);
 output formats in [`compare/query-output.compare.md`](compare/query-output.compare.md);
 exit codes in [`../CLAUDE.md`](../CLAUDE.md) (0 ok · 1 error · 2 blocking · 130
@@ -22,22 +28,17 @@ interrupted).
 
 ## `fux setup` — first-time wizard
 
+One prompt per source type; every prompt has a flag; prior answers become the
+defaults on re-run; user-edited keys and unknown sections in `fux.toml` survive.
+
 ```
 $ fux setup
-fux setup — let's configure this project.
-
-Source folders (markdown/text) [./docs]: ~/notes/anton
-Add another source type? (pdf/docx/xlsx/pptx/code/none) [none]: code
-  Code folders: ~/projects/anton/src
-Cache location [.fux/cache]: ⏎
-Generate agent files (AGENTS.md, skills, hooks)? [Y/n]: y
-
-Wrote fux.toml
-Wrote AGENTS.md, .github/copilot-instructions.md, .kiro/steering/fux.md
-Wrote skills/fux-query/SKILL.md, skills/fux-ingest/SKILL.md
-Installed hooks: claude-code (UserPromptSubmit, Stop), kiro
-
-Next: fux ingest
+Docs folders (md/txt/office) [docs]: ~/notes/anton
+Code folders (py/js/…) [none]: src
+Data folders (json/yaml) [none]: ⏎
+Image folders (png/jpg) [none]: ⏎
+wrote fux.toml  (docs: ~/notes/anton · code: src · data: — · images: —)
+next: run `fux ingest`
 $ echo $?
 0
 ```
@@ -45,9 +46,12 @@ $ echo $?
 Non-interactive equivalents:
 
 ```
-$ fux setup -y                                  # all defaults
-$ fux setup --sources ~/notes/anton --code ~/projects/anton/src --agents --skills --hooks
-$ fux setup --agents        # re-run just the agent-file step (idempotent)
+$ fux setup -y                                   # all defaults, no prompts
+$ fux setup --docs docs,notes --code src -y      # flags (repeat or comma-separate)
+$ fux setup --agents --skills --hooks -y         # agent surfaces (idempotent):
+  created  AGENTS.md
+  created  .claude/skills/fux-query/SKILL.md
+  …
 ```
 
 ## `fux ingest` — build/refresh the corpus
@@ -55,27 +59,40 @@ $ fux setup --agents        # re-run just the agent-file step (idempotent)
 ```
 $ fux ingest
 Scanning 2 source roots…
-  converted  41 markdown   (native)
-  converted   3 json       (flattened, stdlib)
-  converted   2 yaml       (fenced text)
-  stubbed     4 images     (metadata only — run --advanced for OCR)
-  skipped     2 office     (markitdown extra not installed — see --list-skipped)
+  converted   41 markdown   (native)
+  converted    3 json       (flattened, stdlib)
+  converted    2 yaml       (fenced text)
+  stubbed      4 images     (metadata only — advanced tier is v1.1)
+  skipped      2            (see `fux ingest --list-skipped`)
 Cache: .fux/cache  (50 files, OKF bundle)   Manifest: .fux/manifest.jsonl
-Index: 1,204 chunks (BM25F)                 Elapsed: 1.8s
+Index: 1204 chunks (BM25F)   Elapsed: 1.8s
 $ echo $?
 0
 ```
+
+Re-runs are incremental (`unchanged   50            (cache reuse)`); removed
+sources are pruned (`removed      1            (sources gone; cache pruned)`).
 
 Variants:
 
 ```
 $ fux ingest --check                 # drift: sources changed since conversion?
   DRIFT  notes/anton/decisions/db-indexing.md  (sha mismatch — re-ingest)
-  1 stale of 50; exit 2 (blocking) when --strict, else exit 0 with report
+  DRIFT  notes/anton/new-note.md  (new — not in manifest)
+  DRIFT  notes/anton/old.md  (missing — source deleted; cache orphan)
+3 stale of 50 · run `fux ingest` to refresh
+$ echo $?                            # advisory by default
+0
+$ fux ingest --check --strict; echo $?     # blocking for CI/hooks
+2
 
-$ fux ingest --list-inferred         # upgrade candidates (fidelity: inferred)
-$ fux ingest --advanced papers/spec.pdf      # one file, layout/OCR converter (0002)
-$ fux ingest --web                   # fenced web ingestion ([sources.web]) (0002)
+$ fux ingest --list-inferred         # every file at inferred fidelity
+notes/anton/decisions/db-indexing.md  (native-md)
+$ fux ingest --list-skipped          # what didn't ingest, and why
+notes/anton/report.pdf  — requires the markitdown extra (pip install 'fux-engine[ingest]')
+
+$ fux ingest --advanced papers/spec.pdf      # layout/OCR converter — v1.1 (handoff 0002)
+$ fux ingest --web                           # fenced web ingestion — v1.1 (handoff 0002)
 ```
 
 ## `fux ask` — ranked passages (the default intent)
@@ -83,24 +100,28 @@ $ fux ingest --web                   # fenced web ingestion ([sources.web]) (000
 ```
 $ fux ask "why did we pick a composite index for trades?"
 
-notes/anton/decisions/db-indexing.md:12  (score 0.82)
+notes/anton/decisions/db-indexing.md:12  (score 7.412)
   ## 2026-05 — Indexing the trades table
   We chose a composite index on (symbol, ts) over per-column indexes because
   every hot query filters by symbol then range-scans time. Rejected a covering
   index — write amplification on the tick ingest path was too high.
 
-notes/anton/schema/trades.md:5  (score 0.32)
+notes/anton/schema/trades.md:5  (score 3.121)
   trades(symbol, ts, price, qty, status) — composite PK on (symbol, ts).
 
 2 passages · corpus 50 docs · 12ms
 ```
 
+Long passages truncate at 4 lines (`… (N more lines; use -C 0 for all)`);
+`-C N` controls it. Synthetic bodies (JSON, images, office) cite file-only —
+no fabricated line numbers.
+
 No confident hit (honest fallback, per query-output verdict):
 
 ```
 $ fux ask "what is our kubernetes strategy?"
-No confident matches (best score 0.04).
-Try: fux find "kubernetes" · broaden the question · fux ingest new sources
+No confident matches.
+Try: fux find "kubernetes strategy" · broaden the question · fux ingest new sources
 $ echo $?
 0
 ```
@@ -109,9 +130,9 @@ $ echo $?
 
 ```
 $ fux find "composite index decision"
-1.  0.82  notes/anton/decisions/db-indexing.md
-2.  0.32  notes/anton/schema/trades.md
-3.  0.19  notes/anton/perf/ingest-path.md
+1.  7.412  notes/anton/decisions/db-indexing.md
+2.  3.121  notes/anton/schema/trades.md
+3.  1.190  notes/anton/perf/ingest-path.md
 ```
 
 ## `fux answer` — extractive, cited answer
@@ -132,7 +153,8 @@ Sources:
 
 ## Modifiers (all query verbs)
 
-`--json` — machine-readable, the agent path:
+`--json` — machine-readable, the agent path. Emitted as one compact line;
+pretty-printed here for readability:
 
 ```
 $ fux ask "composite index" --json --top 1
@@ -143,10 +165,10 @@ $ fux ask "composite index" --json --top 1
       "path": "notes/anton/decisions/db-indexing.md",
       "line_start": 12,
       "line_end": 15,
-      "score": 0.82,
+      "score": 7.412,
       "heading_path": ["2026-05 — Indexing the trades table"],
       "fidelity": "inferred",
-      "text": "We chose a composite index on (symbol, ts) …"
+      "text": "## 2026-05 — Indexing the trades table\nWe chose a composite index …"
     }
   ],
   "corpus": {"docs": 50, "chunks": 1204},
@@ -154,16 +176,26 @@ $ fux ask "composite index" --json --top 1
 }
 ```
 
-`--explain` — why each result ranked (rendered under each passage):
+`fux find --json` results carry `path`/`score`/`matching_passages`/`fidelity`;
+`fux answer --json` carries `answer`, `sentences` (`text`/`path`/`line`/
+`citation`/`score`), and `sources` (`id`/`path`/`line`); all include
+`corpus` + `engine`.
+
+`--explain` — why each result ranked (rendered under each passage; contribution
+apportioned per field by its share of the weighted tf):
 
 ```
 $ fux ask "composite index" --explain
-notes/anton/decisions/db-indexing.md:12  (score 0.82)
+notes/anton/decisions/db-indexing.md:12  (score 7.412)
   …passage text…
-  ├─ heading match: "Indexing the trades table"  (weight 3.0 → +0.51)
-  ├─ path match:   "db-indexing.md"              (weight 2.0 → +0.19)
-  └─ body tf:      composite×2, index×3          (weight 1.0 → +0.12)
+  ├─ heading: index×1  (weight 3.0 → +0.512)
+  ├─ path: indexing×1  (weight 2.0 → +0.190)
+  └─ body: composite×2, index×3  (weight 1.0 → +0.121)
 ```
+
+In `--json`, `explain` is per-term: `{"term", "idf", "tf": {heading,path,body},
+"contribution"}`. `fux answer --explain` shows the per-sentence factor product
+(`passage × (overlap + 0.05) × (0.5 + 0.5·centrality)`).
 
 With hybrid (v2, handoff 0003) `--explain` adds RRF detail:
 `bm25f rank 1 + dense rank 2 → rrf 0.0325`; `--lexical-only` restores the pure-v1
@@ -173,7 +205,7 @@ path.
 
 ```
 $ fux ask "anything"                # no fux.toml in this tree
-fux: no fux.toml found — run `fux setup` first
+fux: no fux.toml found (searched from /path upward) — run `fux setup` first
 $ echo $?
 1
 
@@ -186,11 +218,15 @@ $ echo $?
 130
 ```
 
+Staleness is also surfaced passively: any query against a drifted corpus prints
+`warning: sources changed since the last ingest — run `fux ingest` to refresh`
+on stderr (stat-only probe; `--check` does the full sha comparison).
+
 ## Maintenance
 
 This doc rows in [`DOC-REGISTRY.md`](DOC-REGISTRY.md). Trigger: **any change to a
 command, flag, output format, or exit behaviour** — update the affected example, the
 e2e goldens, and (if the surface changed) `compare/cli-surface.compare.md`, all in
-the same change. Building agents (handoffs 0001–0003): treat these formats as
+the same change. Building agents (handoffs 0002–0003): treat these formats as
 normative; deviations go through the implementation tracker's Deviations section
 with a reason.

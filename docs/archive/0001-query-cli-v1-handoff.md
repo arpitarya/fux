@@ -2,7 +2,8 @@
 type: Handoff
 title: Query CLI v1 — setup, ingest (inferred), BM25F, ask/find/answer
 description: Self-contained build spec for the first shippable Fux deliverable, dogfoodable in Anton.
-status: ready
+status: implemented
+adrs: [../adr/0001-config-and-setup.md, ../adr/0002-ingest-cache-chunker.md, ../adr/0003-bm25f-index-query-surface.md, ../adr/0004-agent-integration.md]
 timestamp: 2026-07-21T00:00:00Z
 ---
 

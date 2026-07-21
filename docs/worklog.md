@@ -26,6 +26,39 @@ diary.*
 
 ---
 
+## 2026-07-21 — PHASE 1 REPORT: Query CLI v1 shipped (v0.20.0) · Claude Code
+- **Asked:** master prompt 0000 — execute handoffs 0001 → 0002 → 0003 in sequence
+  with hard phase gates. This entry is the phase-1 gate report.
+- **Did (shipped):** the complete v1 surface per handoff 0001 — `fux setup`
+  (wizard + full flags + `-y`, idempotent TOML merge), hand-rolled frontmatter
+  parser (subset YAML, permissive, unknown keys round-trip), inferred-tier ingest
+  (md/txt/code/json/yaml/image-stub; office via the `[ingest]` extra) → OKF cache
+  with provenance + per-dir index.md + canonical manifest.jsonl +
+  `--check`/`--strict`/`--list-inferred`/`--list-skipped`, heading chunker
+  (256–512 words, fences/tables atomic, source line spans), true BM25F
+  (weight-then-saturate; JSON index, incremental by sha), `fux ask`/`find`/
+  `answer` per the cli-examples.md contract (+ `--json`/`--explain`/`--top`/
+  `-C`/`--answer-max`; extractive TextRank answers with `[n]` citations),
+  `fux setup --agents --skills --hooks` (AGENTS.md managed block + CLAUDE.md/
+  copilot/Kiro pointers, fux-query/fux-ingest SKILL.md, fail-open hooks).
+  ADRs 0001–0004; 0001 pair archived (`status: implemented`); README rewritten;
+  DOGFOOD.md emitted (master rule 6); version 0.20.0.
+- **Test counts:** `tests/` 108 passed · `tests_e2e/` 20 passed + 1 gated skip
+  (office-with-extra). Byte-identical determinism proven for double-ingest AND
+  fresh re-ingest; goldens normalized (3 dp, volatile keys stripped), updated
+  only via `FUX_UPDATE_GOLDENS=1`.
+- **Decided / open:** `converted_at` = SOURCE_DATE_EPOCH/source-mtime, never wall
+  clock (determinism outranks the spec's letter — Deviations + ADR 0002); index
+  format JSON by measurement (16 ms load @5k chunks; postings build 525 ms
+  dominates — escape hatch: persist postings); token ≈ whitespace word validated;
+  answer noise guards (stopword-free overlap, 35 % keep floor) earned from smoke;
+  implementation reworked to match cli-examples.md as the normative UX contract
+  (--check advisory + --strict→2, JSON key shapes, [n]+Sources citations).
+  **Open risks carried:** postings-build cost at very large corpora; paraphrase
+  recall weak until v2 hybrid (by design); Cowork has no hook surface
+  (instruction files only).
+- **Next:** Phase 2 — execute `handoff/0002-ingest-web-advanced-prompt.md`.
+
 ## 2026-07-21 — CLI examples doc: the input/output contract · Cowork
 - **Asked:** create examples of CLI input and output, link to necessary documents,
   maintain it.

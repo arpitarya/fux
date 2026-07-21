@@ -1,24 +1,33 @@
 {
+  "corpus": {
+    "chunks": 9,
+    "docs": 9
+  },
+  "engine": "bm25f",
   "query": "telemetry",
   "results": [
     {
-      "file": "code/util.py",
+      "fidelity": "inferred",
       "matching_passages": 1,
+      "path": "code/util.py",
       "score": 1.183
     },
     {
-      "file": "notes/todo.txt",
+      "fidelity": "inferred",
       "matching_passages": 1,
+      "path": "notes/todo.txt",
       "score": 0.915
     },
     {
-      "file": "docs/no-headings.md",
+      "fidelity": "inferred",
       "matching_passages": 1,
+      "path": "docs/no-headings.md",
       "score": 0.773
     },
     {
-      "file": "docs/guide.md",
+      "fidelity": "inferred",
       "matching_passages": 1,
+      "path": "docs/guide.md",
       "score": 0.556
     }
   ]

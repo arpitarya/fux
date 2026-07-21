@@ -81,6 +81,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sp = sub.add_parser("ingest", help="convert configured sources into the .fux/ cache + index")
     sp.add_argument("--check", action="store_true", help="report drift vs the manifest (no writes)")
+    sp.add_argument("--strict", action="store_true", help="with --check: drift exits 2 (blocking)")
     sp.add_argument("--list-inferred", action="store_true", help="list files at inferred fidelity")
     sp.add_argument("--list-skipped", action="store_true", help="list skipped files and why")
     sp.set_defaults(_handler=_cmd_ingest)

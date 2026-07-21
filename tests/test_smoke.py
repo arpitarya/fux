@@ -8,7 +8,7 @@ from fux.errors import FuxError
 
 
 def test_version_is_set():
-    assert fux.__version__ == "0.19.0"
+    assert fux.__version__ == "0.20.0"
 
 
 def test_cli_version(capsys):
@@ -18,7 +18,7 @@ def test_cli_version(capsys):
     except SystemExit as exc:
         assert exc.code == 0
     out = capsys.readouterr().out
-    assert "0.19.0" in out
+    assert "0.20.0" in out
 
 
 def test_cli_no_args_prints_help():
