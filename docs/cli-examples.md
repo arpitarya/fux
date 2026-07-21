@@ -229,6 +229,19 @@ $ fux path docs/adr/0007-vendor-selection.md docs/runbooks/failover.md
   docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
 ```
 
+When several routes exist each carries its own reliability, best first, and
+`--hops N` widens the search (default 1):
+
+```
+$ fux path docs/adr/0007-vendor-selection.md docs/runbooks/failover.md --hops 2
+2 paths:
+  (reliability 0.800)
+    docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
+  (reliability 0.512)
+    docs/adr/0007-vendor-selection.md ──cites──▶ web:vendor-wiki/sla-appendix   [EXTRACTED]
+    web:vendor-wiki/sla-appendix ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
+```
+
 Reliability is the product of per-edge grade weights (EXTRACTED 1.0, INFERRED
 0.6) times a 0.8 decay per hop, so a long chain of inferences never outranks
 one recorded fact. When nothing connects them, it says so rather than

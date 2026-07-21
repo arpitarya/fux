@@ -59,6 +59,25 @@ class HybridParams:
 
 
 @dataclass(frozen=True)
+class GraphParams:
+    """[engine.graph] — deterministic PPR-lite expansion (handoff §E).
+
+    Every constant is fixed and configurable rather than tuned at runtime:
+    power iteration with a set iteration count and sorted traversal is
+    reproducible, where "run until convergence" would not be.
+    """
+
+    damping: float = 0.85
+    iterations: int = 3
+    max_expanded: int = 10
+    min_score: float = 0.01
+    extracted_weight: float = 1.0
+    inferred_weight: float = 0.6
+    hop_decay: float = 0.8
+    in_rrf: bool = True  # graph list joins fusion (open question 2; measured at M8)
+
+
+@dataclass(frozen=True)
 class IndexParams:
     """[index] — storage backend and footprint profile (handoff 0004).
 
@@ -112,6 +131,7 @@ class Config:
     answer: AnswerParams = AnswerParams()
     hybrid: HybridParams = HybridParams()
     index: IndexParams = IndexParams()
+    graph: GraphParams = GraphParams()
     git: GitParams = GitParams()
     web: WebParams = WebParams()
     raw: dict = field(default_factory=dict)
@@ -184,6 +204,7 @@ def load(root: Path) -> Config:
             raise FuxError(f"[engine.hybrid] {name} must be a positive integer")
 
     index_params = _parse_index(_table(raw, "index"))
+    graph_params = _parse_graph(_table(_table(raw, "engine"), "graph"))
     git_params = _parse_git(_table(raw, "git"))
 
     ans = _table(raw, "answer")
@@ -199,6 +220,7 @@ def load(root: Path) -> Config:
         answer=AnswerParams(max_sentences=max_sentences),
         hybrid=HybridParams(enabled=enabled, rrf_k=rrf_k, candidate_pool=candidate_pool),
         index=index_params,
+        graph=graph_params,
         git=git_params,
         web=web,
         raw=raw,
@@ -220,6 +242,25 @@ def _parse_index(table: dict) -> IndexParams:
             raise FuxError(f"[index] {name} must be a positive integer")
         out[name] = val
     return IndexParams(format=fmt, profile=profile, **out)
+
+
+def _parse_graph(table: dict) -> GraphParams:
+    defaults = GraphParams()
+    out = {}
+    for name in ("damping", "min_score", "extracted_weight", "inferred_weight", "hop_decay"):
+        val = table.get(name, getattr(defaults, name))
+        if not isinstance(val, (int, float)) or isinstance(val, bool) or not 0 <= val <= 1:
+            raise FuxError(f"[engine.graph] {name} must be a number between 0 and 1")
+        out[name] = float(val)
+    for name in ("iterations", "max_expanded"):
+        val = table.get(name, getattr(defaults, name))
+        if not isinstance(val, int) or isinstance(val, bool) or val < 1:
+            raise FuxError(f"[engine.graph] {name} must be a positive integer")
+        out[name] = val
+    in_rrf = table.get("in_rrf", defaults.in_rrf)
+    if not isinstance(in_rrf, bool):
+        raise FuxError("[engine.graph] in_rrf must be true or false")
+    return GraphParams(in_rrf=in_rrf, **out)
 
 
 def _parse_git(table: dict) -> GitParams:

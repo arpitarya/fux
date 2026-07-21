@@ -138,12 +138,70 @@ def retrieve(
 
     seeds = _seed_docs(passages)
     edges = _edges_for(config, {s.doc_id for s in seeds})
-    nodes = _nodes(files, seeds, edges, expand_hops)
+    expanded = _expanded(edges, seeds, config.graph) if expand_hops > 0 else []
+
+    # The graph's own ranked list joins RRF: a document reached only by
+    # traversal gets a voice, but through fusion rather than a score bonus, so
+    # it must still be corroborated to rank highly. `--lexical-only` and
+    # `[engine.graph] in_rrf = false` both bypass this entirely.
+    if (
+        expanded
+        and config.graph.in_rrf
+        and engine == "hybrid"
+        and not lexical_only
+        and pinned is None  # `explain` is one node deep: a neighbour's passage
+        # presented among this document's own would misattribute it
+    ):
+        passages = _fuse_graph(config, searcher, passages, expanded)
+
+    nodes = _nodes(files, seeds, edges, expand_hops, dict(expanded))
     paths = _paths(edges, {s.doc_id for s in seeds}, expand_hops)
     return ResultGraph(
         seeds=seeds, nodes=nodes, edges=edges, paths=paths,
         passages=passages, engine=engine, model=model,
     )
+
+
+def _fuse_graph(config, searcher, passages, expanded) -> list[ScoredChunk]:
+    """Refuse the passage list with graph-expansion as an additional RRF list."""
+    by_position = {(c["file"], c["ordinal"]): c for c in searcher.chunks}
+    existing = {(p.file, p.ordinal): p for p in passages}
+
+    graph_list: list[tuple[str, int]] = []
+    for doc_id, _score in expanded:  # already sorted by ppr desc, id asc
+        for (file, ordinal), chunk in sorted(by_position.items()):
+            if file != doc_id:
+                continue
+            key = (file, ordinal)
+            graph_list.append(key)
+            existing.setdefault(
+                key,
+                ScoredChunk(
+                    file=chunk["file"], heading=chunk["heading"], text=chunk["text"],
+                    start=chunk["start"], end=chunk["end"], score=0.0,
+                    ordinal=chunk["ordinal"],
+                ),
+            )
+    if not graph_list:
+        return passages
+
+    ppr_rank = {doc_id: i for i, (doc_id, _) in enumerate(expanded, start=1)}
+    prior = [(p.file, p.ordinal) for p in passages]
+    fused = rrf([prior, graph_list], k=config.hybrid.rrf_k)
+    ordered = sorted(fused.items(), key=lambda kv: (-kv[1], kv[0][0], kv[0][1]))
+
+    out = []
+    for key, score in ordered[: len(passages)]:
+        chunk = existing[key]
+        info = dict(chunk.hybrid or {})
+        info["rrf"] = round(score, 5)
+        if chunk.file in ppr_rank:
+            info["graph_rank"] = ppr_rank[chunk.file]
+            info["ppr"] = round(dict(expanded)[chunk.file], 5)
+        chunk.hybrid = info
+        chunk.score = score
+        out.append(chunk)
+    return out
 
 
 # -- passages: the v0.22 hybrid pipeline, moved verbatim -------------------
@@ -336,9 +394,79 @@ def _edges_for(config: Config, doc_ids: set[str]) -> list[Edge]:
     ]
 
 
-def _nodes(files: dict, seeds: list[SeedDoc], edges: list[Edge], hops: int) -> list[Node]:
+def ppr(
+    edges: list[Edge], seeds: list[SeedDoc], params
+) -> dict[str, float]:
+    """Personalized PageRank, lite: power iteration restricted to the seed
+    neighbourhood (HippoRAG/LightRAG's operator, minus the machinery).
+
+    Deterministic by construction, which is the whole reason it is written this
+    way rather than "iterate until convergence":
+
+    - a **fixed** iteration count (default 3), not a convergence test;
+    - **sorted** adjacency traversal, so float accumulation order is stable;
+    - edge weight by grade, so an inferred edge propagates less mass than a
+      recorded one.
+
+    Seeds are personalized by retrieval rank — the document BM25F liked most
+    starts with the most mass, so expansion inherits the ranker's opinion
+    instead of flattening it.
+    """
+    if not seeds or not edges:
+        return {}
+    # Personalization vector: 1/rank, normalized. Rank, not score, because
+    # scores are RRF values on one run and raw BM25F on another.
+    seed_mass = {s.doc_id: 1.0 / (i + 1) for i, s in enumerate(seeds)}
+    total = sum(seed_mass.values())
+    seed_mass = {k: v / total for k, v in seed_mass.items()}
+
+    adjacency: dict[str, list[tuple[str, float]]] = {}
+    for edge in sorted(edges, key=lambda e: (e.src, e.kind, e.dst)):
+        weight = (
+            params.extracted_weight if edge.grade == "EXTRACTED" else params.inferred_weight
+        )
+        adjacency.setdefault(edge.src, []).append((edge.dst, weight))
+        adjacency.setdefault(edge.dst, []).append((edge.src, weight))
+
+    scores = dict(seed_mass)
+    for _ in range(params.iterations):
+        nxt: dict[str, float] = {}
+        for node in sorted(scores):  # sorted: reproducible float accumulation
+            mass = scores[node]
+            neighbours = adjacency.get(node, [])
+            out_weight = sum(w for _, w in neighbours)
+            if not out_weight:
+                continue
+            for neighbour, weight in neighbours:
+                share = params.damping * mass * (weight / out_weight)
+                nxt[neighbour] = nxt.get(neighbour, 0.0) + share
+        for node, mass in seed_mass.items():  # restart probability
+            nxt[node] = nxt.get(node, 0.0) + (1 - params.damping) * mass
+        scores = nxt
+    return scores
+
+
+def _expanded(
+    edges: list[Edge], seeds: list[SeedDoc], params
+) -> list[tuple[str, float]]:
+    """Top expanded nodes by PPR score, above threshold, seeds excluded."""
+    seed_ids = {s.doc_id for s in seeds}
+    ranked = [
+        (doc_id, score)
+        for doc_id, score in ppr(edges, seeds, params).items()
+        if doc_id not in seed_ids and score >= params.min_score
+    ]
+    ranked.sort(key=lambda kv: (-kv[1], kv[0]))  # ties on id: reproducible
+    return ranked[: params.max_expanded]
+
+
+def _nodes(
+    files: dict, seeds: list[SeedDoc], edges: list[Edge], hops: int,
+    ppr_scores: dict[str, float] | None = None,
+) -> list[Node]:
     seed_ids = {s.doc_id for s in seeds}
     scores = {s.doc_id: s.score for s in seeds}
+    scores.update({k: v for k, v in (ppr_scores or {}).items() if k not in seed_ids})
     reached = set(seed_ids)
     if hops > 0:
         for edge in edges:

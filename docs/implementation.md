@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4: M1–M5 ✅ and
-> committed**; **M6** (PPR expansion) next. Suites: 324 unit + 61 e2e ·
+> *(building agent: keep this one line current)* — **Phase 4: M1–M6 ✅ and
+> committed**; **M7** (profiles + `db pull`) next. Suites: 344 unit + 61 e2e ·
 > eval hit@5 1.000.
 
 ## Baseline (pre-build, done in Cowork)
@@ -82,7 +82,7 @@ row at EVERY milestone completion — no batching).*
 | M3a df sidecar (`state/df/`) — Arpit's DoD-7 amendment | ✅ | 23 | exact df/n/Σfield-lengths; lean == full proven over the *whole* vocabulary on a subset (mutation-tested: removing the injection fails the test) |
 | M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ✅ | 23+6 | all 6 goldens byte-identical through the re-plumb; `explain` = ask seeded by a node (top_terms as query), so no second retrieval path; paths BFS + reliability (PPR at M6) |
 | M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ✅ | 16 | **eval gate beats v0.22 hybrid**: hit@1 .762→.810 · hit@5 .952→**1.000** · MRR .833→.873; ADR 0006's named zero-overlap miss rescued; `--lexical-only` still exactly .762/.952/.833 |
-| M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ⬜ | — | |
+| M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ✅ | 20 | constants as specced; seed-rank personalization; `[engine.graph] in_rrf` is the **open-question-2 instrument** — on the 9-doc fixture graph on/off both measure .810/1.000/.873 (too few edges to discriminate; M8's generator must carry real link structure) |
 | M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ⬜ | — | |
 | M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ⬜ | — | |
 | Close-out: ADRs 0008–0011, docs law, archive pair, bump | ⬜ | — | target v0.23.0 |

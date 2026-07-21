@@ -164,9 +164,16 @@ def cmd_path(args) -> int:
             f"(within {hops} hop{'' if hops == 1 else 's'})"
         )
         return 0
-    print(f"{len(found)} path{'' if len(found) == 1 else 's'}:")
+    # Single path folds its reliability into the header (the common case, and
+    # what cli-examples documents); several paths each carry their own.
+    if len(found) == 1:
+        print(f"1 path (reliability {found[0].reliability:.3f}):")
+        for hop in found[0].hops:
+            print(f"  {hop.src} ──{hop.kind}──▶ {hop.dst}   [{hop.grade}]")
+        return 0
+    print(f"{len(found)} paths:")
     for p in found:
-        print(f"  reliability {p.reliability:.3f}")
+        print(f"  (reliability {p.reliability:.3f})")
         for hop in p.hops:
             print(f"    {hop.src} ──{hop.kind}──▶ {hop.dst}   [{hop.grade}]")
     return 0
