@@ -11,14 +11,14 @@
       "citation": 1,
       "line": 20,
       "path": "docs/guide.md",
-      "score": 0.264,
+      "score": 0.252,
       "text": "The deploy uses a blue-green rollout with health checks before cutover."
     },
     {
       "citation": 2,
       "line": 21,
       "path": "docs/guide.md",
-      "score": 0.229,
+      "score": 0.223,
       "text": "Rollbacks complete within two minutes when a health check fails."
     }
   ],

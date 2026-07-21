@@ -18,8 +18,9 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4: M1–M4 ✅ and
-> committed**; starting **M5** (FuxVec search). Suites: 308 unit + 61 e2e.
+> *(building agent: keep this one line current)* — **Phase 4: M1–M5 ✅ and
+> committed**; **M6** (PPR expansion) next. Suites: 324 unit + 61 e2e ·
+> eval hit@5 1.000.
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -80,7 +81,7 @@ row at EVERY milestone completion — no batching).*
 | M3 edges + nodes (deterministic extraction; thin-layer payloads) | ✅ | 22 | references/cites/crawled_from/tagged, all EXTRACTED; tag nodes (N not N² edges); on this repo's docs: 92 refs · 13 cites · 9 tagged |
 | M3a df sidecar (`state/df/`) — Arpit's DoD-7 amendment | ✅ | 23 | exact df/n/Σfield-lengths; lean == full proven over the *whole* vocabulary on a subset (mutation-tested: removing the injection fails the test) |
 | M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ✅ | 23+6 | all 6 goldens byte-identical through the re-plumb; `explain` = ask seeded by a node (top_terms as query), so no second retrieval path; paths BFS + reliability (PPR at M6) |
-| M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ⬜ | — | |
+| M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ✅ | 16 | **eval gate beats v0.22 hybrid**: hit@1 .762→.810 · hit@5 .952→**1.000** · MRR .833→.873; ADR 0006's named zero-overlap miss rescued; `--lexical-only` still exactly .762/.952/.833 |
 | M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ⬜ | — | |
 | M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ⬜ | — | |
 | M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ⬜ | — | |
@@ -114,6 +115,21 @@ Two readings:
   on ~100-byte payloads pays ~11 bytes of header for little compression. The
   M8 synthetic corpus decides; if it confirms, the cheap fixes are a shared
   zlib dictionary or dropping per-record compression for a per-bucket one.
+
+## Decisions taken during the build (→ ADRs)
+
+- **M5 / dense_global does not fire when BM25F returns zero candidates.**
+  Removing that early return made the honest "No confident matches" answer
+  unreachable, because a binary prefilter always has a nearest neighbour.
+  Measured on the fixture corpus: pure-noise queries score **0.23–0.26** cosine
+  against a true rescue's **0.34** — the ranges overlap, so any absolute floor
+  separating them is a magic number that only degrades as the corpus grows.
+
+  Re-reading ADR 0006 settled it: *"zero lexical candidates"* there means the
+  **correct document** had no lexical overlap, not that the query matched
+  nothing at all (that query does return `docs/guide.md`). So the rescue path
+  is the third RRF list, which always has candidates — and honest emptiness is
+  preserved. → ADR 0010.
 
 ## Deviations from spec
 

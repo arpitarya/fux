@@ -9,37 +9,20 @@
     {
       "fidelity": "inferred",
       "heading_path": [
-        "ADR-001: Use SQLite for local storage"
-      ],
-      "hybrid": {
-        "bm25f_rank": 1,
-        "bm25f_score": 2.217,
-        "dense_rank": 3,
-        "rrf": 0.032,
-        "similarity": 0.235
-      },
-      "line_end": 11,
-      "line_start": 7,
-      "path": "docs/decisions/adr-001.md",
-      "score": 0.032,
-      "text": "# ADR-001: Use SQLite for local storage\nWe chose SQLite because the service is single-node and embedded storage\nremoves an operational dependency. Postgres was rejected for the first\nversion because it requires a separate server process to operate."
-    },
-    {
-      "fidelity": "inferred",
-      "heading_path": [
         "Widget Guide"
       ],
       "hybrid": {
         "bm25f_rank": 3,
         "bm25f_score": 0.844,
+        "dense_global_rank": 2,
         "dense_rank": 1,
-        "rrf": 0.032,
+        "rrf": 0.048,
         "similarity": 0.332
       },
       "line_end": 35,
       "line_start": 6,
       "path": "docs/guide.md",
-      "score": 0.032,
+      "score": 0.048,
       "text": "# Widget Guide\nThe widget service converts raw telemetry into daily reports.\n## Install\nInstall the widget service with `pip install widget-service`.\nThe installer needs Python 3.11 or newer and about 50 MB of disk space.\n### Verify\nRun `widget --version` to verify the install succeeded.\n## Configure\nConfiguration lives in `widget.toml` next to the binary.\n| key  | meaning          |\n|------|------------------|\n| rate | polls per minute |\n| mode | live or replay   |\n## Deploy\nThe deploy uses a blue-green rollout with health checks before cutover.\nRollbacks complete within two minutes when a health check fails.\n```bash\nwidget deploy --env prod\n```"
     },
     {
@@ -48,15 +31,35 @@
       "hybrid": {
         "bm25f_rank": 2,
         "bm25f_score": 0.891,
+        "dense_global_rank": 4,
         "dense_rank": 2,
-        "rrf": 0.032,
+        "rrf": 0.048,
         "similarity": 0.235
       },
       "line_end": 7,
       "line_start": 0,
       "path": "code/util.py",
-      "score": 0.032,
+      "score": 0.048,
       "text": "```python\n\"\"\"Utilities for parsing raw telemetry frames.\"\"\"\n\n\ndef parse_frame(raw: bytes) -> dict:\n    \"\"\"Parse one telemetry frame into a dict (little-endian, 16-byte header).\"\"\"\n    return {\"length\": len(raw), \"kind\": raw[:1]}\n```"
+    },
+    {
+      "fidelity": "inferred",
+      "heading_path": [
+        "ADR-001: Use SQLite for local storage"
+      ],
+      "hybrid": {
+        "bm25f_rank": 1,
+        "bm25f_score": 2.217,
+        "dense_global_rank": 5,
+        "dense_rank": 3,
+        "rrf": 0.048,
+        "similarity": 0.235
+      },
+      "line_end": 11,
+      "line_start": 7,
+      "path": "docs/decisions/adr-001.md",
+      "score": 0.048,
+      "text": "# ADR-001: Use SQLite for local storage\nWe chose SQLite because the service is single-node and embedded storage\nremoves an operational dependency. Postgres was rejected for the first\nversion because it requires a separate server process to operate."
     }
   ]
 }

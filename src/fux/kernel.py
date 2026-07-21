@@ -165,6 +165,15 @@ def _passages(
         return searcher.search(query, top=pool), "bm25f", None
     candidates = searcher.search(query, top=config.hybrid.candidate_pool)
     if not candidates:
+        # Nothing in the corpus shares a single term with the query. A binary
+        # prefilter would still return its nearest 500 documents — measured,
+        # pure noise scores 0.23–0.26 cosine against a true rescue's 0.34, so
+        # any floor separating them is a magic number that degrades as the
+        # corpus grows. "No confident matches" is the honest answer, and
+        # keeping it is worth more than rescuing a query the corpus cannot
+        # answer. dense_global's job is documents with no lexical overlap
+        # (ADR 0006's miss class), which it reaches via the third RRF list
+        # below — that case always has candidates.
         return [], "bm25f", None
     from .embed.store import load_vectors
 
@@ -187,30 +196,94 @@ def _passages(
         )
     if not dense:
         return candidates[:pool], "bm25f", None
+    global_hits = _dense_global(config, searcher, model, query_vec, vectors)
     dense.sort(key=lambda t: (-t[1], t[0].file, t[0].ordinal))
-    similarity = {id(r): sim for r, sim in dense}
-    by_id = {id(r): r for r in candidates}
-    fused = rrf(
-        [[id(r) for r in candidates], [id(r) for r, _ in dense]], k=config.hybrid.rrf_k
-    )
+
+    # Fusion is keyed on (file, ordinal), not object identity: dense_global can
+    # surface a chunk BM25F never scored, and two lists must agree on what
+    # "the same chunk" means for RRF to mean anything.
+    def key_of(r: ScoredChunk) -> tuple[str, int]:
+        return (r.file, r.ordinal)
+
+    by_key: dict[tuple[str, int], ScoredChunk] = {key_of(r): r for r in candidates}
+    similarity = {key_of(r): sim for r, sim in dense}
+    lists = [[key_of(r) for r in candidates], [key_of(r) for r, _ in dense]]
+
+    for r in global_hits:  # rescued chunks: no lexical score, so RRF is their only voice
+        by_key.setdefault(key_of(r), r)
+    if global_hits:
+        lists.append([key_of(r) for r in global_hits])
+        for r in global_hits:
+            similarity.setdefault(key_of(r), r.score)
+
+    fused = rrf(lists, k=config.hybrid.rrf_k)
     ordered = sorted(
-        fused.items(), key=lambda kv: (-kv[1], by_id[kv[0]].file, by_id[kv[0]].ordinal)
+        fused.items(), key=lambda kv: (-kv[1], by_key[kv[0]].file, by_key[kv[0]].ordinal)
     )
-    lex_rank = {id(r): i for i, r in enumerate(candidates, start=1)}
-    dense_rank = {id(r): i for i, (r, _) in enumerate(dense, start=1)}
+    lex_rank = {key_of(r): i for i, r in enumerate(candidates, start=1)}
+    dense_rank = {key_of(r): i for i, (r, _) in enumerate(dense, start=1)}
+    global_rank = {key_of(r): i for i, r in enumerate(global_hits, start=1)}
     results = []
     for key, score in ordered[:pool]:
-        r = by_id[key]
+        r = by_key[key]
+        lexical = lex_rank.get(key)
         r.hybrid = {
-            "bm25f_rank": lex_rank[key],
-            "bm25f_score": round(r.score, 3),
-            "dense_rank": dense_rank.get(id(r)),
-            "similarity": round(similarity[id(r)], 4) if id(r) in similarity else None,
+            "bm25f_rank": lexical,
+            "bm25f_score": round(r.score, 3) if lexical else None,
+            "dense_rank": dense_rank.get(key),
+            "similarity": round(similarity[key], 4) if key in similarity else None,
             "rrf": round(score, 5),
         }
+        if key in global_rank:
+            r.hybrid["dense_global_rank"] = global_rank[key]
         r.score = score
         results.append(r)
     return results, "hybrid", model
+
+
+def _dense_global(config, searcher, model, query_vec, vectors) -> list[ScoredChunk]:
+    """FuxVec: full-corpus binary prefilter, then exact int8 rerank.
+
+    The point is reach. The v0.22 dense pass only re-scored BM25F's candidates,
+    so a document with zero lexical overlap was unreachable no matter how close
+    it was semantically (the miss class ADR 0006 recorded). Scanning every
+    document's 32-byte code costs little and removes that ceiling.
+
+    The binary codes only *select*; the returned ordering is exact int8 cosine,
+    the same math the candidate pass uses.
+    """
+    from .embed.fuxvec import prefilter, quantize
+    from .state import load_state
+
+    state = load_state(config.root)
+    codes = {doc_id: e.code for doc_id, e in state.items() if e.code is not None}
+    if not codes:
+        return []
+    doc_ids = prefilter(quantize(query_vec), codes, config.index.prefilter_width)
+
+    by_position = {(c["file"], c["ordinal"]): c for c in searcher.chunks}
+    scored: list[tuple[float, str, int]] = []
+    for doc_id in doc_ids:
+        entry = vectors.get(doc_id)
+        if not entry:
+            continue
+        for ordinal, vec in enumerate(entry["vecs"]):
+            if vec is None or (doc_id, ordinal) not in by_position:
+                continue
+            scored.append((model.similarity(query_vec, vec), doc_id, ordinal))
+    scored.sort(key=lambda t: (-t[0], t[1], t[2]))
+
+    out = []
+    for sim, doc_id, ordinal in scored[: config.hybrid.candidate_pool]:
+        chunk = by_position[(doc_id, ordinal)]
+        out.append(
+            ScoredChunk(
+                file=chunk["file"], heading=chunk["heading"], text=chunk["text"],
+                start=chunk["start"], end=chunk["end"], score=sim,
+                ordinal=chunk["ordinal"],
+            )
+        )
+    return out
 
 
 def _own_chunks(searcher: Searcher, doc_id: str, k: int) -> list[ScoredChunk]:

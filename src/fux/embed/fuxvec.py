@@ -66,6 +66,26 @@ def hamming(a: bytes, b: bytes) -> int:
     return (int.from_bytes(a, "little") ^ int.from_bytes(b, "little")).bit_count()
 
 
+def prefilter(query_code: bytes, codes: dict[str, bytes], width: int) -> list[str]:
+    """The full-corpus scan: every document, ranked by Hamming distance.
+
+    No index structure and no approximation — 32 bytes per document makes a
+    linear scan affordable, and `int.bit_count()` keeps the inner loop in C.
+    That is the trade FuxVec exists to make: ANN-class reach with zero
+    dependencies and none of the recall anxiety an approximate index carries.
+
+    Ties break on doc id so the candidate set is reproducible; the prefilter
+    only decides *which* documents get exact scoring, never their final order.
+    """
+    q = int.from_bytes(query_code, "little")
+    scored = [
+        ((q ^ int.from_bytes(code, "little")).bit_count(), doc_id)
+        for doc_id, code in codes.items()
+    ]
+    scored.sort()
+    return [doc_id for _, doc_id in scored[:width]]
+
+
 def _width(dim: int) -> int:
     return max(CODE_BYTES, -(-dim // 8))
 
