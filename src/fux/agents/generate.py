@@ -31,9 +31,10 @@ or history:
    citations) over your own recall.
 2. Use `fux find "<topic>"` to locate documents; `fux answer "<question>"
    --explain` for a cited, extractive answer plus the reasoning behind it.
-3. Results carry `fidelity: inferred` provenance. If a cited source looks thin,
-   fix or extend the source document and re-run `fux ingest` (the advanced
-   re-ingest tier arrives in v1.1).
+3. Results carry `fidelity` provenance. If a cited source shows
+   `fidelity: inferred` and its text looks thin (a stubbed image, a mangled
+   PDF), run `fux ingest --advanced <file-or-url>` and re-ask — the advanced
+   tier re-converts with layout/OCR-aware tools.
 4. After adding or editing source folders, re-run `fux ingest` — the index
    updates incrementally — then re-ask.
 
@@ -91,14 +92,22 @@ Deterministic and incremental: unchanged files are never rewritten.
 - `fux ingest` — convert + index (incremental; safe to run any time).
 - `fux ingest --check` — drift report (exit 1 when sources changed).
 - `fux ingest --list-skipped` — what was skipped and why (binary, missing
-  extras, unrecognized extensions).
-- `fux ingest --list-inferred` — files at inferred fidelity.
+  extras, unrecognized extensions, web skips).
+- `fux ingest --list-inferred` — files at inferred fidelity (upgrade candidates).
+- `fux ingest --web` — also crawl `[sources.web]` (fenced network; robots.txt
+  obeyed; never on the query path).
+- `fux ingest --advanced <file-or-url>` — upgrade one source to
+  `fidelity: advanced` (Docling for office/PDF, tesseract OCR for images).
 
 ## Workflow
 
 1. After adding/editing docs: `fux ingest`, then re-run the question.
 2. Before trusting query results in a long session: `fux ingest --check`.
-3. Office/PDF need the opt-in extra: `pip install 'fux-engine[ingest]'`.
+3. **Judge and upgrade:** when a cited passage looks thin or garbled, check its
+   `fidelity` — if `inferred`, run `fux ingest --advanced <that source>` and
+   re-ask; the upgrade persists until the source itself changes.
+4. Office/PDF need the opt-in extra: `pip install 'fux-engine[ingest]'`;
+   the advanced tier needs docling and/or the tesseract binary.
 """,
 }
 

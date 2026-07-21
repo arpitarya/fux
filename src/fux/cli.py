@@ -83,6 +83,10 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("--check", action="store_true", help="report drift vs the manifest (no writes)")
     sp.add_argument("--strict", action="store_true", help="with --check: drift exits 2 (blocking)")
     sp.add_argument("--web", action="store_true", help="also crawl [sources.web] (fenced network)")
+    sp.add_argument(
+        "--advanced", metavar="TARGET",
+        help="upgrade one file/url to advanced fidelity (docling/tesseract)",
+    )
     sp.add_argument("--list-inferred", action="store_true", help="list files at inferred fidelity")
     sp.add_argument("--list-skipped", action="store_true", help="list skipped files and why")
     sp.set_defaults(_handler=_cmd_ingest)

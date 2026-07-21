@@ -25,7 +25,11 @@ def build_index(config: Config, entries: list[dict]) -> int:
             continue  # deduped web content: indexed once, under the first URL
         rel = entry["source"]
         cached = prev.get(rel)
-        if cached and cached.get("sha256") == entry["sha256"]:
+        if (
+            cached
+            and cached.get("sha256") == entry["sha256"]
+            and cached.get("fidelity") == entry.get("fidelity")
+        ):  # an --advanced upgrade changes cache text without changing the source sha
             files[rel] = cached
             total += len(cached["chunks"])
             continue
@@ -45,6 +49,7 @@ def build_index(config: Config, entries: list[dict]) -> int:
             )
         files[rel] = {
             "sha256": entry["sha256"],
+            "fidelity": entry.get("fidelity", "inferred"),
             "title": entry.get("title", ""),
             "chunks": chunks,
         }

@@ -386,6 +386,12 @@ def cmd_ingest(args) -> int:
         # advisory by default; --strict makes drift blocking (exit 2, per contract)
         return 2 if args.strict else 0
 
+    if getattr(args, "advanced", None):
+        from .advanced import upgrade
+
+        print(upgrade(config, args.advanced))
+        return 0
+
     if args.list_inferred:
         for entry in sorted(list_inferred(config), key=lambda e: e["source"]):
             print(f"{entry['source']}  ({entry['converter']})")
