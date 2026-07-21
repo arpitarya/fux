@@ -127,6 +127,10 @@ interoperability with every OKF consumer:
 - **The bundle is `docs/`** (plus the ingest cache once built) — root index at
   [`docs/index.md`](docs/index.md), which declares `okf_version: "0.1"`. Repo-root
   CLAUDE.md/README.md are tool entry points outside the bundle.
+  **Convention (Arpit, 2026-07-21): ALL-CAPS markdown files carry no YAML
+  frontmatter** — GLOSSARY.md, DOC-REGISTRY.md, DOGFOOD.md etc. are entry-point
+  files like CLAUDE.md/README.md, exempt from the `type` requirement. Lowercase
+  docs conform as before.
 - **Frontmatter `type` on every knowledge doc** (the only OKF-required field) —
   e.g. `type: Compare Doc`, `type: Proposal`, `type: ADR`, `type: Handoff`; ingest
   cache files get `type: Ingested Document`. Our provenance keys (source, sha256,

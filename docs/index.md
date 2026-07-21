@@ -16,6 +16,7 @@ a `type`; this index gives progressive disclosure. (Repo-root `CLAUDE.md` and
 * [Implementation tracker](implementation.md) - live milestone status of the build; agent-updated continuously.
 * [Doc registry](DOC-REGISTRY.md) - maintained docs, update triggers, last-verified dates.
 * [CLI examples](cli-examples.md) - input/output contract for every command; goldens derive from it.
+* [Glossary](GLOSSARY.md) - every recurring term, defined once, linked to its owning doc.
 
 # Decisions
 
