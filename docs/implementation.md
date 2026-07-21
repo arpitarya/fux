@@ -18,9 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4: M1–M3 + the df
-> sidecar ✅ and committed**; starting **M4** (kernel + verbs).
-> Suites: 285 unit + 55 e2e.
+> *(building agent: keep this one line current)* — **Phase 4: M1–M4 ✅ and
+> committed**; starting **M5** (FuxVec search). Suites: 308 unit + 61 e2e.
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -80,7 +79,7 @@ row at EVERY milestone completion — no batching).*
 | M2 bulk tier (docs_text) + `fux cat` + committed `.fux/state/` sharding + three-way check | ✅ | 35+13 | fresh clone answers doc-level from state; rebuild reproduces state byte-for-byte; Bloom sized 9.6 bits/term, k=4 (→ ADR 0008) |
 | M3 edges + nodes (deterministic extraction; thin-layer payloads) | ✅ | 22 | references/cites/crawled_from/tagged, all EXTRACTED; tag nodes (N not N² edges); on this repo's docs: 92 refs · 13 cites · 9 tagged |
 | M3a df sidecar (`state/df/`) — Arpit's DoD-7 amendment | ✅ | 23 | exact df/n/Σfield-lengths; lean == full proven over the *whole* vocabulary on a subset (mutation-tested: removing the injection fails the test) |
-| M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ⬜ | — | |
+| M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ✅ | 23+6 | all 6 goldens byte-identical through the re-plumb; `explain` = ask seeded by a node (top_terms as query), so no second retrieval path; paths BFS + reliability (PPR at M6) |
 | M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ⬜ | — | |
 | M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ⬜ | — | |
 | M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ⬜ | — | |

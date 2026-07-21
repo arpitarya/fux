@@ -33,6 +33,13 @@ def _cmd_query(args) -> int:
     return cmd_query(args)
 
 
+def _cmd_verb(args) -> int:
+    from .query import verbs
+
+    return {"explain": verbs.cmd_explain, "graph": verbs.cmd_graph,
+            "path": verbs.cmd_path}[args.command](args)
+
+
 def _cmd_cat(args) -> int:
     from .query.cat import cmd_cat
 
@@ -112,6 +119,25 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("answer", help="extractive, cited answer to a question")
     _add_query_flags(sp, answer=True)
     sp.set_defaults(_handler=_cmd_query, mode="answer")
+
+    sp = sub.add_parser("explain", help="one document deep: outline, edges, key passages")
+    sp.add_argument("doc", metavar="DOC-ID", help="document id to explain")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--top", type=int, default=5, metavar="N", help="key passages (default 5)")
+    sp.set_defaults(_handler=_cmd_verb)
+
+    sp = sub.add_parser("graph", help="nodes and edges around a topic")
+    sp.add_argument("query", help="topic to map")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--top", type=int, default=5, metavar="N", help="seed docs (default 5)")
+    sp.set_defaults(_handler=_cmd_verb)
+
+    sp = sub.add_parser("path", help="how two documents connect (or that they don't)")
+    sp.add_argument("source", metavar="FROM", help="starting document id")
+    sp.add_argument("target", metavar="TO", help="destination document id")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--hops", type=int, default=1, metavar="N", help="max hops (default 1)")
+    sp.set_defaults(_handler=_cmd_verb)
 
     sp = sub.add_parser("cat", help="print one document (cache, db row, or re-derived)")
     sp.add_argument("doc", metavar="DOC-ID", help="document id, e.g. docs/adr/0007.md")

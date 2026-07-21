@@ -124,3 +124,49 @@ def test_zero_hit_query_honest(ingested):
     assert "No confident matches" in out
     out = run_fux(ingested, "answer", "xyzzy plugh quux").stdout
     assert "No confident answer" in out
+
+
+# -- graph verbs (M4): projections of the same kernel call -------------------
+
+
+def test_explain_renders_a_document(ingested):
+    proc = run_fux(ingested, "explain", "docs/guide.md")
+    assert "docs/guide.md" in proc.stdout
+    assert "fidelity:" in proc.stdout and "chunks" in proc.stdout
+
+
+def test_explain_json_shape(ingested):
+    payload = json.loads(run_fux(ingested, "explain", "docs/guide.md", "--json").stdout)
+    assert payload["node"]["path"] == "docs/guide.md"
+    assert isinstance(payload["outline"], list)
+    assert isinstance(payload["edges"], list)
+    assert all(p["path"] == "docs/guide.md" for p in payload["passages"])
+
+
+def test_explain_unknown_doc_exits_one(ingested):
+    proc = run_fux(ingested, "explain", "docs/does-not-exist.md", check=False)
+    assert proc.returncode == 1
+    assert "no document" in proc.stderr
+
+
+def test_graph_lists_nodes_and_edges(ingested):
+    payload = json.loads(run_fux(ingested, "graph", "telemetry", "--json").stdout)
+    assert payload["nodes"]
+    assert {n["via"] for n in payload["nodes"]} <= {"seed", "expanded"}
+
+
+def test_path_between_unrelated_docs_is_honest(ingested):
+    proc = run_fux(ingested, "path", "docs/guide.md", "notes/todo.txt")
+    assert proc.returncode == 0
+    assert "no recorded path" in proc.stdout or "path" in proc.stdout
+
+
+def test_verbs_are_deterministic(ingested):
+    for args in (
+        ("explain", "docs/guide.md", "--json"),
+        ("graph", "telemetry", "--json"),
+        ("path", "docs/guide.md", "docs/adr-001.md", "--json"),
+    ):
+        first = run_fux(ingested, *args, check=False).stdout
+        second = run_fux(ingested, *args, check=False).stdout
+        assert first == second, f"{args[0]} is not deterministic"

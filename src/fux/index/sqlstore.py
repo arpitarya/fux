@@ -199,10 +199,14 @@ def load(root: Path) -> dict[str, dict]:
             )
         files: dict[str, dict] = {}
         for row in conn.execute(
-            "SELECT doc_id, sha256, fidelity, title FROM docs ORDER BY doc_id"
+            "SELECT doc_id, sha256, fidelity, title, outline, top_terms FROM docs "
+            "ORDER BY doc_id"
         ):
             files[row[0]] = {
-                "sha256": row[1], "fidelity": row[2], "title": row[3], "chunks": []
+                "sha256": row[1], "fidelity": row[2], "title": row[3],
+                # the thin doc-level layer: what `explain` and node-seeded
+                # retrieval read instead of re-opening the document
+                "outline": row[4], "top_terms": row[5], "chunks": [],
             }
         for row in conn.execute(
             "SELECT doc_id, heading_path, text, line_start, line_end, words "

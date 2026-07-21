@@ -32,17 +32,21 @@ FILES = {
 def test_round_trip_preserves_the_json_store_shape(tmp_path):
     sqlstore.save(tmp_path, FILES)
     loaded = sqlstore.load(tmp_path)
-    assert loaded == {
-        rel: {k: v for k, v in meta.items()} for rel, meta in FILES.items()
+    # outline/top_terms are the thin doc layer; absent from the input, so they
+    # come back empty rather than missing.
+    expected = {
+        rel: {**meta, "outline": "", "top_terms": ""} for rel, meta in FILES.items()
     }
+    assert loaded == expected
 
 
 def test_both_backends_load_identically(tmp_path):
     """The parity guarantee, at the store level: same dict in, same dict out."""
-    store.save(tmp_path, FILES)
+    files = {rel: {**meta, "outline": "", "top_terms": ""} for rel, meta in FILES.items()}
+    store.save(tmp_path, files)
     json_loaded = store.load(tmp_path)
     store.index_path(tmp_path).unlink()
-    sqlstore.save(tmp_path, FILES)
+    sqlstore.save(tmp_path, files)
     assert sqlstore.load(tmp_path) == json_loaded
 
 

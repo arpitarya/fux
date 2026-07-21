@@ -20,7 +20,6 @@ from collections import defaultdict
 from ..config import BM25FParams, Config, find_root, load
 from ..index import load_searcher
 from ..index.bm25f import ScoredChunk, Searcher
-from ..index.fuse import rrf
 from ..ingest.manifest import quick_drift, read as manifest_read
 from ..index.bm25f import tokenize
 from .answer import _STOPWORDS, Sentence, build_answer
@@ -43,6 +42,9 @@ def cmd_query(args) -> int:
         from .statequery import run_state_query
 
         return run_state_query(config, args, started)
+    from ..index import backend_for
+
+    files = backend_for(config).load(config.root)
     searcher = load_searcher(config)
     manifest = manifest_read(root)
     _warn_if_stale(config)
@@ -52,6 +54,7 @@ def cmd_query(args) -> int:
         corpus={"docs": len(manifest), "chunks": len(searcher.chunks)},
         started=started,
     )
+    ctx.files = files
     return {"ask": _run_ask, "find": _run_find, "answer": _run_answer}[args.mode](
         searcher, ctx, args
     )
@@ -65,6 +68,8 @@ class _Ctx:
         self.started = started
         self.engine = "bm25f"
         self.model = None  # set by _retrieve when the hybrid path is live
+        self.graph = None  # the kernel's ResultGraph, for --explain's graph lines
+        self.files: dict = {}
         # Documents are addressed by their corpus id (`web:host/path` for fetched
         # pages), so the originating URL travels beside it rather than as it.
         from ..index import doc_id_for
@@ -82,67 +87,26 @@ class _Ctx:
 
 
 def _retrieve(searcher: Searcher, ctx: _Ctx, args, pool: int) -> list[ScoredChunk]:
-    """Hybrid (BM25F ∪ dense over candidates → RRF) unless lexical is forced."""
-    if getattr(args, "lexical_only", False) or not ctx.config.hybrid.enabled:
-        return searcher.search(args.query, top=pool)
-    from ..embed import get_model
+    """The kernel's passage projection.
 
-    model = get_model()
-    if model is None:
-        return searcher.search(args.query, top=pool)
-    query_vec = model.embed(args.query)
-    if query_vec is None:  # all-OOV query: dense has nothing to say
-        return searcher.search(args.query, top=pool)
-    candidates = searcher.search(args.query, top=ctx.config.hybrid.candidate_pool)
-    if not candidates:
-        return []
-    from ..embed.store import load_vectors
+    Retrieval itself lives in :mod:`fux.kernel` now — every verb reads the same
+    ResultGraph. This wrapper keeps the renderers below unchanged, which is how
+    the v0.22 goldens stay byte-identical through the re-plumb.
+    """
+    from ..kernel import retrieve
 
-    vectors = load_vectors(ctx.config.root)
-    dense: list[tuple[ScoredChunk, float]] = []
-    missing = False
-    for r in candidates:
-        entry = vectors.get(r.file)
-        vec = None
-        if entry and r.ordinal < len(entry["vecs"]):
-            vec = entry["vecs"][r.ordinal]
-        elif entry is None:
-            missing = True
-        if vec is not None:
-            dense.append((r, model.similarity(query_vec, vec)))
-    if missing:
-        print(
-            "warning: some chunks lack semantic vectors — run `fux ingest` to refresh",
-            file=sys.stderr,
-        )
-    if not dense:
-        return candidates[:pool]
-    dense.sort(key=lambda t: (-t[1], t[0].file, t[0].ordinal))
-    similarity = {id(r): sim for r, sim in dense}
-    by_id = {id(r): r for r in candidates}
-    fused = rrf(
-        [[id(r) for r in candidates], [id(r) for r, _ in dense]], k=ctx.config.hybrid.rrf_k
+    graph = retrieve(
+        ctx.config,
+        args.query,
+        k=pool,
+        lexical_only=getattr(args, "lexical_only", False),
+        searcher=searcher,
+        files=ctx.files,
     )
-    ordered = sorted(
-        fused.items(), key=lambda kv: (-kv[1], by_id[kv[0]].file, by_id[kv[0]].ordinal)
-    )
-    lex_rank = {id(r): i for i, r in enumerate(candidates, start=1)}
-    dense_rank = {id(r): i for i, (r, _) in enumerate(dense, start=1)}
-    results = []
-    for key, score in ordered[:pool]:
-        r = by_id[key]
-        r.hybrid = {
-            "bm25f_rank": lex_rank[key],
-            "bm25f_score": round(r.score, 3),
-            "dense_rank": dense_rank.get(id(r)),
-            "similarity": round(similarity[id(r)], 4) if id(r) in similarity else None,
-            "rrf": round(score, 5),
-        }
-        r.score = score
-        results.append(r)
-    ctx.engine = "hybrid"
-    ctx.model = model
-    return results
+    ctx.engine = graph.engine
+    ctx.model = graph.model
+    ctx.graph = graph
+    return graph.passages
 
 
 def _warn_if_stale(config: Config) -> None:

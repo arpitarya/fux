@@ -113,7 +113,7 @@ def build_index(
     if backend is sqlstore:
         backend.save(root, files, bulk_text=bulk_text, edges=edges)
     else:
-        backend.save(root, files)
+        backend.save(root, files, edges=edges)
     _drop_other_backend(config, backend)
     return total
 
@@ -165,3 +165,8 @@ def _drop_other_backend(config: Config, chosen) -> None:
 
 def load_searcher(config: Config) -> Searcher:
     return Searcher(backend_for(config).load(config.root), config.bm25f)
+
+
+def load_edges(config: Config) -> list[tuple[str, str, str, str]]:
+    """The graph, from whichever backend holds it — sorted, so traversal is stable."""
+    return backend_for(config).load_edges(config.root)

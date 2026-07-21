@@ -179,6 +179,67 @@ Sources:
 (extractive — sentences are verbatim from sources)
 ```
 
+## `fux explain` — one document, deep
+
+`ask` seeded by a node instead of a question: the document's own distinguishing
+terms become the query, so there is no second retrieval path to keep in sync.
+
+```
+$ fux explain docs/adr/0007-vendor-selection.md
+docs/adr/0007-vendor-selection.md   ADR 0007 — Vendor selection
+fidelity: inferred · 14 chunks
+
+Outline: Context › Decision › SLA terms › Consequences
+
+Edges:
+  ├─ cites       → web:vendor-wiki/sla-appendix        [EXTRACTED]
+  ├─ references  → docs/runbooks/failover.md           [EXTRACTED]
+  └─ tagged      → tag:vendor                          [EXTRACTED]
+
+Key passages:
+  docs/adr/0007-vendor-selection.md:41  (score 3.219)
+    Contractual failover must complete within 15 minutes of a declared outage.
+```
+
+`--json` returns `{node, outline, edges[], passages[]}`.
+
+## `fux graph` — the neighbourhood of a topic
+
+```
+$ fux graph "vendor failover"
+3 nodes · 4 edges
+
+  docs/adr/0007-vendor-selection.md      ADR 0007 — Vendor selection      (seed)
+  web:vendor-wiki/sla-appendix           SLA appendix                     (expanded)
+  docs/runbooks/failover.md              Failover runbook                 (expanded)
+
+  docs/adr/0007-vendor-selection.md ──cites──▶ web:vendor-wiki/sla-appendix
+  docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md
+```
+
+List form, not ASCII art: a rendered graph stops being readable past a handful
+of nodes, and the list stays greppable and diff-friendly (handoff open
+question 4).
+
+## `fux path` — how two documents connect
+
+```
+$ fux path docs/adr/0007-vendor-selection.md docs/runbooks/failover.md
+1 path (reliability 0.800):
+  docs/adr/0007-vendor-selection.md ──references──▶ docs/runbooks/failover.md   [EXTRACTED]
+```
+
+Reliability is the product of per-edge grade weights (EXTRACTED 1.0, INFERRED
+0.6) times a 0.8 decay per hop, so a long chain of inferences never outranks
+one recorded fact. When nothing connects them, it says so rather than
+manufacturing a route:
+
+```
+$ fux path docs/a.md docs/unrelated.md; echo $?
+no recorded path from docs/a.md to docs/unrelated.md (within 1 hop)
+0
+```
+
 ## Fresh clone — queryable before you ingest
 
 `.fux/state/` is committed (~200 B/doc), so a clone can answer at **document
