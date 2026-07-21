@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4: M1–M6 ✅ and
-> committed**; **M7** (profiles + `db pull`) next. Suites: 344 unit + 61 e2e ·
+> *(building agent: keep this one line current)* — **Phase 4: M1–M7 ✅ and
+> committed**; **M8** (100k benchmark + gate) next. Suites: 363 unit + 62 e2e ·
 > eval hit@5 1.000.
 
 ## Baseline (pre-build, done in Cowork)
@@ -83,7 +83,7 @@ row at EVERY milestone completion — no batching).*
 | M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ✅ | 23+6 | all 6 goldens byte-identical through the re-plumb; `explain` = ask seeded by a node (top_terms as query), so no second retrieval path; paths BFS + reliability (PPR at M6) |
 | M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ✅ | 16 | **eval gate beats v0.22 hybrid**: hit@1 .762→.810 · hit@5 .952→**1.000** · MRR .833→.873; ADR 0006's named zero-overlap miss rescued; `--lexical-only` still exactly .762/.952/.833 |
 | M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ✅ | 20 | constants as specced; seed-rank personalization; `[engine.graph] in_rrf` is the **open-question-2 instrument** — on the 9-doc fixture graph on/off both measure .810/1.000/.873 (too few edges to discriminate; M8's generator must carry real link structure) |
-| M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ⬜ | — | |
+| M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ✅ | 19 | mid-corpus switch (full→lean) keeps rankings *and* scores — mutation-verified non-vacuous; LRU counter-based (no wall clock); `auto` gated on `lean_threshold` (→ Deviations); `db pull` sha-verified, refuses mismatch |
 | M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ⬜ | — | |
 | Close-out: ADRs 0008–0011, docs law, archive pair, bump | ⬜ | — | target v0.23.0 |
 
@@ -190,8 +190,26 @@ that captures it — an empty section is the goal)*
   the same scope as the lock. Git carries the recipe; the runtime keeps its
   joins. → ADR 0008.
 
-- **0004 / `fux answer` has no state-only mode.** On a fresh clone `find` and
-  `ask` answer at doc level, but `answer` is extractive *and cited*, and
-  citations need line-anchored passages. Synthesizing them from re-derived text
-  would risk citing lines the index never scored. It declines with a reason and
-  exits 0 rather than producing an unverifiable citation. → ADR 0011.
+- **0004 / `fux answer` has no state-only mode** *(superseded at M7 — kept for
+  the trail)*. This held while a clone could only answer at doc level. Once the
+  df sidecar landed, the lean path re-derives candidates and produces real
+  line-anchored passages, so `answer` works on a fresh clone with full
+  citations. The decline path survives only for the doc-level fallback, where
+  sources are genuinely absent. → ADR 0011.
+
+- **0004 / a fresh clone answers *exactly*, not at doc level (M7).** DoD 2 asks
+  for doc-level answers from committed state; the df sidecar makes something
+  strictly better possible, so a clone with its sources present now returns the
+  same rankings *and scores* as the full profile. Doc-level ranking became the
+  honest fallback for when sources cannot be re-derived (crawled corpora, or a
+  clone without its documents). Exceeding a DoD is still a change to committed
+  behaviour, so it is recorded here and reflected in cli-examples. → ADR 0011.
+
+- **0004 / `auto` requires a size threshold, not just re-derivability (M7).**
+  §G defines `auto` as "lean when every source in a tier is re-derivable". Taken
+  literally that makes lean the default for *every* local repo, silently
+  trading query latency for a footprint win that does not exist below a few
+  thousand documents — and changing behaviour for every existing small corpus.
+  `auto` now additionally requires `[index] lean_threshold` documents
+  (default 10 000); `profile = "lean"` remains available explicitly at any
+  size. → ADR 0011.

@@ -111,6 +111,7 @@ def retrieve(
     expand_hops: int = 1,
     searcher: Searcher | None = None,
     files: dict | None = None,
+    vectors: dict | None = None,
 ) -> ResultGraph:
     """The one retrieval path. Text or node in, a ResultGraph out."""
     from .index import backend_for
@@ -130,7 +131,9 @@ def retrieve(
     else:
         query, pinned = seed, None
 
-    passages, engine, model = _passages(config, searcher, query, k, lexical_only)
+    passages, engine, model = _passages(
+        config, searcher, query, k, lexical_only, vectors
+    )
     if pinned is not None:
         passages = [p for p in passages if p.file == pinned] or _own_chunks(
             searcher, pinned, k
@@ -208,7 +211,8 @@ def _fuse_graph(config, searcher, passages, expanded) -> list[ScoredChunk]:
 
 
 def _passages(
-    config: Config, searcher: Searcher, query: str, pool: int, lexical_only: bool
+    config: Config, searcher: Searcher, query: str, pool: int, lexical_only: bool,
+    supplied_vectors: dict | None = None,
 ) -> tuple[list[ScoredChunk], str, object | None]:
     """BM25F ∪ dense-over-candidates → RRF. Unchanged from v0.22 by contract."""
     if lexical_only or not config.hybrid.enabled:
@@ -235,7 +239,8 @@ def _passages(
         return [], "bm25f", None
     from .embed.store import load_vectors
 
-    vectors = load_vectors(config.root)
+    # Lean supplies re-embedded candidate vectors; full loads the stored ones.
+    vectors = supplied_vectors if supplied_vectors is not None else load_vectors(config.root)
     dense: list[tuple[ScoredChunk, float]] = []
     missing = False
     for r in candidates:

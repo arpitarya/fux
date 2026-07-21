@@ -255,39 +255,72 @@ no recorded path from docs/a.md to docs/unrelated.md (within 1 hop)
 
 ## Fresh clone — queryable before you ingest
 
-`.fux/state/` is committed (~200 B/doc), so a clone can answer at **document
-level** immediately, from codes and term signatures alone. No index, no cache,
-no network:
+`.fux/state/` is committed (~200 B/doc plus the df sidecar), so a clone answers
+immediately, with **no index, no cache and no network**:
 
 ```
 $ git clone git@github.com:acme/payments.git && cd payments
-$ fux find "failover"
-1.  web:vendor-wiki/sla-appendix        SLA appendix
-2.  docs/adr/0007-vendor-selection.md   ADR 0007 — Vendor selection
-2 docs · doc-level (committed state; run `fux ingest` for passages)
-```
-
-The trailing line is the honesty: these are documents, not passages, and the
-ranking came from the lean plane. `fux ingest` (or `fux db pull`) builds the
-runtime plane and restores full chunk-level behaviour:
-
-```
-$ fux ingest
 $ fux find "failover"
 1.  0.83104  web:vendor-wiki/sla-appendix
 2.  0.41220  docs/adr/0007-vendor-selection.md
 ```
 
-`fux ask` in state-only mode re-derives the top documents' text on demand
-(deterministic converters make that equal to what was indexed) and reports it:
+Those are the **same rankings and the same scores** `fux ingest` would produce.
+Not an approximation: the clone re-derives its candidate documents from the
+sources (deterministic converters, verified against `fux.lock`) for exact term
+frequencies, and reads exact document frequencies and corpus statistics from
+the committed `state/df/` sidecar. Every input the scorer sees is the input the
+full profile would have handed it.
+
+`fux ingest` (or `fux db pull`) then builds the runtime plane, which changes
+speed, not answers.
+
+**When sources aren't there to re-derive** — a corpus of crawled pages, or a
+clone taken without its documents — the lean path cannot score, and Fux says so
+rather than guessing. It falls back to doc-level ranking from codes and Bloom
+signatures alone:
 
 ```
-$ fux ask "what does the SLA say about failover?"
-docs/adr/0007-vendor-selection.md  (doc-level)
-  Contractual failover must complete within 15 minutes…
-
-1 doc · re-derived from source · run `fux ingest` for ranked passages
+$ fux find "failover"
+1.  web:vendor-wiki/sla-appendix        SLA appendix
+2.  docs/adr/0007-vendor-selection.md   ADR 0007 — Vendor selection
+2 docs · doc-level (committed state; run `fux ingest` for ranked passages)
 ```
+
+The trailing line is the honesty: those are documents, not scored passages.
+
+## `fux db pull` — fetch a prebuilt index
+
+Nobody should re-crawl 100k pages on a laptop. CI builds `fux.db` once, and
+everyone else pulls it — **sha-verified against `fux.lock`**, so a pulled index
+is provably the corpus the lock describes:
+
+```
+$ fux db pull https://artifacts.acme.internal/payments/fux.db
+  fetched  148.2 MB
+  verified sha256 9f2c… against fux.lock
+  wrote    .fux/index/fux.db
+```
+
+Auth is an env var, not a flag, so credentials stay out of shell history:
+
+```
+$ FUX_DB_AUTH="Bearer $CI_TOKEN" fux db pull https://…/fux.db
+```
+
+A mismatch is refused outright — a wrong index is worse than no index, because
+it answers confidently:
+
+```
+$ fux db pull https://…/stale.db; echo $?
+fux: sha256 mismatch — the artifact is not the corpus fux.lock describes
+     expected 9f2c…  got 41ab…
+     (run `fux ingest` to build locally, or ask for a rebuilt artifact)
+1
+```
+
+This is the one place besides ingest where Fux touches the network, and it is
+always an explicit user action — never a query.
 
 ## `fux cat` — print one document
 

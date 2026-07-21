@@ -89,6 +89,7 @@ class IndexParams:
     format: str = "auto"  # json | sqlite | auto
     profile: str = "auto"  # full | lean | auto
     sqlite_threshold: int = 25_000  # chunks; the JSON-load breakpoint (proposal §2)
+    lean_threshold: int = 10_000  # docs; below this, lean's trade is pure loss
     lean_cache_mb: int = 200
     prefilter_width: int = 500  # FuxVec Hamming prefilter (§6)
 
@@ -236,7 +237,7 @@ def _parse_index(table: dict) -> IndexParams:
     if profile not in ("full", "lean", "auto"):
         raise FuxError('[index] profile must be "full", "lean" or "auto"')
     out = {}
-    for name in ("sqlite_threshold", "lean_cache_mb", "prefilter_width"):
+    for name in ("sqlite_threshold", "lean_threshold", "lean_cache_mb", "prefilter_width"):
         val = table.get(name, getattr(defaults, name))
         if not isinstance(val, int) or isinstance(val, bool) or val < 1:
             raise FuxError(f"[index] {name} must be a positive integer")

@@ -34,27 +34,47 @@ def cmd_query(args) -> int:
     root = find_root()
     config = load(root)
     from .lean import has_state_only
+    from .profile import lean_searcher, resolve
 
-    if has_state_only(config):
-        # Fresh clone: `.fux/state/` is committed, `.fux/index/` is not. Answer
-        # at doc level from the lean plane rather than refusing — that is the
-        # whole point of committing state.
+    profile = resolve(config)
+    lean = None
+    if profile == "lean" or has_state_only(config):
+        # Lean profile, or a fresh clone where only `.fux/state/` was committed.
+        # With the df sidecar the lean path scores *exactly*, so this returns
+        # the same rankings the full profile would — not a degraded preview.
+        lean = lean_searcher(config, getattr(args, "query", ""))
+    if lean is None and has_state_only(config):
+        # No sidecar or no re-derivable sources: fall back to doc-level answers
+        # from codes and signatures alone rather than refusing outright.
         from .statequery import run_state_query
 
         return run_state_query(config, args, started)
+
     from ..index import backend_for
 
-    files = backend_for(config).load(config.root)
-    searcher = load_searcher(config)
+    if lean is not None:
+        files = {rel: dict(meta) for rel, meta in lean_files(lean).items()}
+        searcher = lean
+    else:
+        files = backend_for(config).load(config.root)
+        searcher = load_searcher(config)
     manifest = manifest_read(root)
     _warn_if_stale(config)
+    # A fresh clone has no runtime manifest, so corpus size comes from the
+    # committed sidecar — reporting 0 docs while answering would be a lie.
+    if searcher.stats:
+        docs, chunks = searcher.stats.total_docs, searcher.stats.total_chunks
+    else:
+        docs, chunks = len(manifest), len(searcher.chunks)
     ctx = _Ctx(
         config=config,
         manifest=manifest,
-        corpus={"docs": len(manifest), "chunks": len(searcher.chunks)},
+        corpus={"docs": docs, "chunks": chunks},
         started=started,
     )
     ctx.files = files
+    ctx.profile = profile
+    ctx.lean_vectors = lean is not None
     return {"ask": _run_ask, "find": _run_find, "answer": _run_answer}[args.mode](
         searcher, ctx, args
     )
@@ -70,6 +90,8 @@ class _Ctx:
         self.model = None  # set by _retrieve when the hybrid path is live
         self.graph = None  # the kernel's ResultGraph, for --explain's graph lines
         self.files: dict = {}
+        self.profile = "full"
+        self.lean_vectors = False
         # Documents are addressed by their corpus id (`web:host/path` for fetched
         # pages), so the originating URL travels beside it rather than as it.
         from ..index import doc_id_for
@@ -84,6 +106,17 @@ class _Ctx:
 
     def elapsed_ms(self) -> int:
         return max(1, round((time.perf_counter() - self.started) * 1000))
+
+
+def lean_files(searcher: Searcher) -> dict:
+    """Reconstruct the per-doc view the kernel expects from a lean Searcher."""
+    files: dict[str, dict] = {}
+    for chunk in searcher.chunks:
+        meta = files.setdefault(
+            chunk["file"], {"sha256": "", "fidelity": "inferred", "title": "", "chunks": []}
+        )
+        meta["chunks"].append(chunk)
+    return files
 
 
 def _retrieve(searcher: Searcher, ctx: _Ctx, args, pool: int) -> list[ScoredChunk]:
@@ -102,11 +135,19 @@ def _retrieve(searcher: Searcher, ctx: _Ctx, args, pool: int) -> list[ScoredChun
         lexical_only=getattr(args, "lexical_only", False),
         searcher=searcher,
         files=ctx.files,
+        vectors=_lean_vectors(ctx) if ctx.lean_vectors else None,
     )
     ctx.engine = graph.engine
     ctx.model = graph.model
     ctx.graph = graph
     return graph.passages
+
+
+def _lean_vectors(ctx: _Ctx) -> dict:
+    """Re-embed the lean candidates — deterministic, so identical to stored vectors."""
+    from .profile import lean_vectors
+
+    return lean_vectors(ctx.config, ctx.files)
 
 
 def _warn_if_stale(config: Config) -> None:

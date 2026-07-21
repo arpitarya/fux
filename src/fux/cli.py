@@ -46,6 +46,12 @@ def _cmd_cat(args) -> int:
     return cmd_cat(args)
 
 
+def _cmd_db(args) -> int:
+    from .ingest.dbpull import cmd_db
+
+    return cmd_db(args)
+
+
 def _cmd_hook(args) -> int:
     from .hooks import cmd_hook
 
@@ -143,6 +149,12 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("doc", metavar="DOC-ID", help="document id, e.g. docs/adr/0007.md")
     sp.add_argument("--out", metavar="FILE", help="write to FILE instead of stdout")
     sp.set_defaults(_handler=_cmd_cat)
+
+    sp = sub.add_parser("db", help="index artifacts (pull a CI-built fux.db)")
+    db_sub = sp.add_subparsers(dest="db_command", required=True)
+    pull = db_sub.add_parser("pull", help="fetch + sha-verify a prebuilt index")
+    pull.add_argument("url", help="http(s) URL of the published fux.db")
+    sp.set_defaults(_handler=_cmd_db)
 
     sp = sub.add_parser("hook", help="agent-hook entrypoints (fail-open; internal)")
     sp.add_argument("event", choices=["prompt-submit", "session-end"])

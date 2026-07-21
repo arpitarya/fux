@@ -31,35 +31,53 @@ def test_state_survives_the_clone(ingested):
         assert (ingested / ".fux/state" / family).is_dir()
 
 
-def test_find_works_at_doc_level_from_state_alone(ingested):
+def test_find_answers_exactly_from_committed_state(ingested):
+    """The df sidecar makes a clone answer *exactly*, not at doc level.
+
+    Committed state carries codes, signatures and exact corpus statistics, so a
+    clone re-derives its candidates and scores them with the same numbers the
+    full profile would use.
+    """
     clone_of(ingested)
     proc = run_fux(ingested, "find", "telemetry")
-    assert "doc-level (committed state" in proc.stdout
     assert "docs/guide.md" in proc.stdout
 
 
-def test_find_json_marks_results_as_doc_level(ingested):
+def test_clone_results_match_the_full_profile(ingested):
+    """The parity guarantee, end to end across a clone boundary."""
+    before = json.loads(run_fux(ingested, "find", "telemetry", "--json").stdout)
     clone_of(ingested)
-    payload = json.loads(run_fux(ingested, "find", "telemetry", "--json").stdout)
-    assert payload["engine"] == "state"
-    assert payload["results"], "state search must return candidates"
-    assert all(r["level"] == "doc" for r in payload["results"])
-    assert payload["corpus"]["chunks"] is None  # no chunk plane: say so, don't fake 0
+    after = json.loads(run_fux(ingested, "find", "telemetry", "--json").stdout)
+    assert [r["path"] for r in after["results"]] == [r["path"] for r in before["results"]]
+    assert after["corpus"]["docs"] == before["corpus"]["docs"]
 
 
 def test_ask_rederives_text_from_sources(ingested):
     clone_of(ingested)
     proc = run_fux(ingested, "ask", "how do I install the widget service")
-    assert "(doc-level)" in proc.stdout
-    assert "re-derived from source" in proc.stdout
+    assert "docs/guide.md" in proc.stdout
+    assert "corpus 0 docs" not in proc.stdout  # the sidecar knows the real size
 
 
-def test_answer_declines_honestly_without_passages(ingested):
+def test_answer_works_from_committed_state(ingested):
+    """`answer` needs line-anchored passages — re-derivation provides them."""
     clone_of(ingested)
     proc = run_fux(ingested, "answer", "how fast are rollbacks")
     assert proc.returncode == 0
-    assert "extractive and cited" in proc.stdout
-    assert "fux ingest" in proc.stdout
+    assert "Sources:" in proc.stdout
+    assert "extractive — sentences are verbatim" in proc.stdout
+
+
+def test_doc_level_fallback_when_sources_are_absent(ingested):
+    """Without re-derivable sources the lean path cannot score; say so honestly."""
+    import shutil
+
+    clone_of(ingested)
+    for name in ("docs", "notes", "code", "data", "assets", "office"):
+        shutil.rmtree(ingested / name, ignore_errors=True)
+    payload = json.loads(run_fux(ingested, "find", "telemetry", "--json").stdout)
+    assert payload["engine"] == "state"
+    assert all(r["level"] == "doc" for r in payload["results"])
 
 
 def test_check_is_clean_on_a_fresh_clone(ingested):
