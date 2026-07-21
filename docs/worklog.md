@@ -26,6 +26,24 @@ diary.*
 
 ---
 
+## 2026-07-21 — Release pipeline restored + v0.22.0 published via the wall · Claude Code
+- **Asked:** push and publish the new package; create the pipeline and always
+  publish it the right way.
+- **Did:** ported the merge wall's CI to the rebuild — `.github/workflows/ci.yml`
+  with the two required contexts: **"fux gate"** (both suites: determinism,
+  goldens, eval gate, packaging budgets) and **"ai-review"** (new
+  `scripts/ai-review.sh`: separation-of-duties refusal, $0-law probe on
+  pyproject dependencies, credential probe on the diff, suites on the merge
+  result — deterministic, model-free, per the old script's design) + a 3.11–3.13
+  matrix job. Restored `publish.yml` (release → OIDC trusted publishing, `pypi`
+  environment) and `audit-protection.yml` + `branch-protection.json` (note
+  refreshed) + audit/apply scripts unchanged. README install now `pip install
+  fux-engine`. Release path: PR through the protected branch → checks green →
+  merge → GitHub release v0.22.0 → publish workflow → PyPI.
+- **Decided / open:** the rebuild's "fux gate" IS the test suites until the rule
+  engine returns; the wall itself (contexts, enforce_admins) is unchanged.
+- **Next:** Anton dogfood (`pip install fux-engine` now works there).
+
 ## 2026-07-21 — MASTER RUN COMPLETE: all three phases shipped (v0.22.0) · Claude Code
 - **Asked:** the 0000 master prompt — 0001 → 0002 → 0003 with hard gates; this is
   the final close-out entry.

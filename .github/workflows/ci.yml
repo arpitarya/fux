@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.11", "3.12", "3.13"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
+
+      - name: Unit suite
+        run: pytest -q tests
+
+      - name: End-to-end suite (real CLI + fixture corpus + goldens + eval gate)
+        run: pytest -q tests_e2e
+
+  gate:
+    # The merge gate. This job's check context ("fux gate" — the bare job name,
+    # as the check-runs API reports it) is a REQUIRED status check on the
+    # protected branch — see .github/branch-protection.json. For the rebuild,
+    # the deterministic gate IS the two suites: determinism (byte-identical
+    # re-ingest), golden parity, the retrieval eval gate (hybrid ≥ lexical),
+    # and the packaging budgets (bundle ≤ 10 MB, wheel ≤ 15 MB).
+    name: fux gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
+
+      - name: Engine answers for itself
+        run: fux --version
+
+      - name: Gate — both suites green (determinism, goldens, eval, budgets)
+        run: |
+          pytest -q tests
+          pytest -q tests_e2e
+
+  ai-review:
+    # The second-set-of-eyes review. A solo author can't approve his own PR, so
+    # the missing human approval is enforced as a CHECK: a separate reviewer
+    # identity re-verifies the merge result and REFUSES (exit 3) if
+    # reviewer == PR author (separation of duties). Model-free by law
+    # (CLAUDE.md): the deterministic second pass, not an LLM. PRs only.
+    name: ai-review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # need base sha to diff the PR
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
+
+      - name: Deterministic review of the PR (separation of duties enforced)
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          REVIEWER: fux-ci-reviewer
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: ./scripts/ai-review.sh

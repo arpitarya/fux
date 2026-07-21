@@ -17,11 +17,12 @@ generated hooks/skills teach agents to query the corpus before guessing.
 ## Install
 
 ```bash
-uv sync                 # dev install (Python ≥ 3.11)
-uv run fux --version
+pip install fux-engine          # Python ≥ 3.11; zero runtime dependencies
+fux --version
 ```
 
-Optional Office/PDF converters (never on the query path): `uv sync --extra ingest`.
+Dev install: `uv sync && uv run fux --version`. Optional Office/PDF converters
+(never on the query path): `pip install 'fux-engine[ingest]'`.
 
 ## Use
 
