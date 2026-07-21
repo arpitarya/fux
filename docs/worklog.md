@@ -26,6 +26,45 @@ diary.*
 
 ---
 
+## 2026-07-22 — phase 4 complete: knowledge substrate shipped at v0.23.0 · Claude Code
+- **Asked:** three rulings (integer token-sums approved as amendment; early-return
+  judgment approved; state budget → measure at M8 before optimizing), then
+  M6 → M7 → M8 → close-out, with a discipline check first.
+- **Did:** discipline check passed (M1–M5 already committed as clean milestone
+  commits; tracker rows ✅ with counts) except one reconcile — `fux path`'s
+  renderer did not match the format cli-examples had specified first, so the
+  **code was changed to follow the doc**, and the multi-path form documented.
+  - **M6 PPR-lite:** constants as specced; seed-*rank* personalization; graph
+    joins RRF as a fourth list. Guard: fusion skipped for node seeds, since a
+    neighbour's passage among a document's own would misattribute it.
+  - **M7 profiles:** lean = a Searcher over re-derived candidates with the df
+    sidecar injected, so the kernel never learns its profile. Mid-corpus switch
+    (full→lean) keeps rankings **and** scores — **mutation-verified non-vacuous**
+    (making `lean_searcher` return None fails the test). LRU uses a monotonic
+    counter, never a clock. `db pull` sha-verifies and refuses mismatches.
+  - **M8:** committed generator + harness; 100k measured. **state 22.96 MB
+    (≤30 ✓), df 0.92 MB (≤5 ✓)**, db 1081 MB (77% of §8b), FuxVec scan **54 ms
+    < 150 → IVF not built**, ingest 566 s. Relational eval added for
+    explain/graph/path.
+  - **Close-out:** ADRs 0008–0011 (0010's flagged citations **verified**, not
+    asserted); full docs pass; 0004 pair archived; **v0.23.0**.
+  - Suites **172+29 → 365 unit + 71 e2e**; eval hit@5 **1.000**; `--lexical-only`
+    still exactly 0.762/0.952/0.833.
+- **Decided / open:** two behaviour changes recorded in Deviations — a fresh
+  clone now answers *exactly* (better than DoD 2's doc-level, so the docs were
+  corrected to match), and `auto` gained `lean_threshold` because §G read
+  literally would have flipped every small repo to lean silently.
+  **The M3a size warning was wrong and is kept next to the measurement that
+  corrected it** (351 B/doc projected from this repo's adversarial docs vs
+  230 B/doc actual); per the ruling, no zlib change was made.
+  **⚠ The honest finding:** at 100k a query takes ~10 s — `postings` is stored
+  and indexed but never read at query time, so the whole index still loads into
+  memory. Phase 4 solved *storage* at scale, not *query* at scale.
+- **Next:** **query-at-scale** — score from `postings` by term instead of
+  loading every row (table, index and exact corpus stats already exist).
+  Scoped in ADR 0011; it is the head of phase 5. Branch
+  `feat/phase4-knowledge-substrate` (10 commits) is ready for PR to main.
+
 ## 2026-07-22 — phase 4 M3a–M5: df sidecar, kernel, FuxVec · Claude Code
 - **Asked:** Arpit's DoD-7 ruling (Option B — exact df sidecar, guarantee does **not**
   soften), commit M1–M3 first, then continue M4→M8.
