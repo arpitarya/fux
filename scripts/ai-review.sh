@@ -10,10 +10,12 @@
 #   1. SEPARATION OF DUTIES. The reviewer identity must differ from the PR
 #      author. If author == reviewer this job REFUSES (exit 3).
 #   2. MODEL-FREE. Per the engine's non-negotiables ($0, stdlib-only, no LLM
-#      on the maintenance path) this is the deterministic second pass: both
-#      test suites on the merge result (they carry the determinism, golden,
-#      eval-gate, and packaging-budget assertions) plus hard-invariant probes
-#      on the PR diff. The judgment layer stays with the host agent in-session.
+#      on the maintenance path) this is the deterministic second pass:
+#      hard-invariant probes on the PR diff ($0 law, credentials). The test
+#      suites are NOT re-run here — they are deterministic and already required
+#      via the "fux gate" aggregator (full OS×Python matrix + packaging); this
+#      job's value is its distinct probes + the separation-of-duties refusal.
+#      The judgment layer stays with the host agent in-session.
 #
 # Env (provided by the workflow):
 #   PR_AUTHOR    — GitHub login of the PR author
@@ -67,11 +69,5 @@ PY
   echo "  ✔ no credential-shaped additions in the diff"
 fi
 
-# 3. Deterministic verification of the merge result.
 echo
-echo "  → both suites on the merge result"
-pytest -q tests
-pytest -q tests_e2e
-
-echo
-echo "✔ ai-review: deterministic second pass green"
+echo "✔ ai-review: deterministic second pass green (suites are required via the gate)"

@@ -38,6 +38,26 @@ diary.*
   (dumps the whole flattened lot list) — possible future chunking/answer tuning observation.
 - **Next:** play with queries in `fux-playground`; consider it a scratch dogfood corpus.
 
+## 2026-07-21 — Pipeline stages reviewed → full platform matrix (linux/macos/windows) · Claude Code
+- **Asked:** review all pipeline stages for necessity; the package must work on
+  Python ≥ 3.11 across unix/linux/mac — then "and windows as well".
+- **Did:** restructured CI — matrix now linux (3.11–3.14) + macos + windows
+  (3.11 + 3.14 boundaries); **"fux gate" became a strict aggregator**
+  (`if: always()` + explicit needs-result checks — a skipped required check
+  would otherwise count as satisfied), so the wall now transitively requires
+  every platform green; **ai-review no longer re-runs the suites** (they ran 3×
+  per PR with zero added signal — its value is the separation-of-duties refusal
+  + $0-law + credential probes, now ~10 s). Windows product fixes that CI made
+  necessary: CLI boundary reconfigures stdout/stderr to UTF-8 on win32 (cp1252
+  consoles crash on `·`/`→`), and `.gitattributes` forces LF everywhere with
+  explicit binary guards (CRLF checkout would silently break fixture shas +
+  goldens per platform; renormalize showed zero drift). pyproject gains the
+  3.14 classifier.
+- **Decided / open:** publish stages unchanged (pure-py wheel = one build for
+  all OS). Windows suite runs for the first time in this PR — failures fix
+  forward there.
+- **Next:** merge; Anton dogfood continues.
+
 ## 2026-07-21 — Agent commits now attributed + Verified on GitHub · Claude Code
 - **Asked:** commits showed "Unverified" — why, and fix by attributing agent
   commits to Arpit's account.

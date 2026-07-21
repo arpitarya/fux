@@ -10,6 +10,41 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  test:
+    # The support target: Python ≥ 3.11 on Linux, macOS, and Windows (the wheel
+    # is pure Python — one build covers all three; these runners prove it).
+    # Full Python spread on Linux; the version boundaries (oldest + newest) on
+    # macOS/Windows, where breakage is OS-shaped, not version-shaped.
+    name: ${{ matrix.os == 'ubuntu-latest' && 'linux' || matrix.os == 'macos-latest' && 'macos' || 'windows' }} · py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13", "3.14"]
+        exclude:
+          - { os: macos-latest, python: "3.12" }
+          - { os: macos-latest, python: "3.13" }
+          - { os: windows-latest, python: "3.12" }
+          - { os: windows-latest, python: "3.13" }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
+
+      - name: Unit suite
+        run: pytest -q tests
+
+      - name: End-to-end suite (real CLI + fixture corpus + goldens + eval gate)
+        run: pytest -q tests_e2e
+
   build-check:
     # Metadata validation BEFORE a release ever happens — twine check catches
     # the class of bugs PyPI only reveals after publishing (README rendering,
@@ -45,66 +80,37 @@ jobs:
           print("✔ sdist clean")
           PY
 
-  test:
-    name: Python ${{ matrix.python }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python: ["3.11", "3.12", "3.13"]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python }}
-          cache: pip
-
-      - name: Install (stdlib-only engine + dev tooling)
-        run: pip install -e ".[dev]" uv
-
-      - name: Unit suite
-        run: pytest -q tests
-
-      - name: End-to-end suite (real CLI + fixture corpus + goldens + eval gate)
-        run: pytest -q tests_e2e
-
   gate:
-    # The merge gate. This job's check context ("fux gate" — the bare job name,
-    # as the check-runs API reports it) is a REQUIRED status check on the
-    # protected branch — see .github/branch-protection.json. For the rebuild,
-    # the deterministic gate IS the two suites: determinism (byte-identical
-    # re-ingest), golden parity, the retrieval eval gate (hybrid ≥ lexical),
-    # and the packaging budgets (bundle ≤ 10 MB, wheel ≤ 15 MB).
+    # The merge gate. This job's check context ("fux gate" — the bare job name)
+    # is a REQUIRED status check on the protected branch — see
+    # .github/branch-protection.json. It is a strict aggregator: green only when
+    # the full OS×Python matrix AND the packaging check are green, so the wall
+    # transitively requires every supported platform. `if: always()` + explicit
+    # result checks matter: a skipped required check would count as satisfied.
     name: fux gate
     runs-on: ubuntu-latest
+    needs: [test, build-check]
+    if: always()
 
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - name: Install (stdlib-only engine + dev tooling)
-        run: pip install -e ".[dev]" uv
-
-      - name: Engine answers for itself
-        run: fux --version
-
-      - name: Gate — both suites green (determinism, goldens, eval, budgets)
+      - name: All required jobs must have succeeded
         run: |
-          pytest -q tests
-          pytest -q tests_e2e
+          echo "test:        ${{ needs.test.result }}"
+          echo "build-check: ${{ needs.build-check.result }}"
+          if [ "${{ needs.test.result }}" != "success" ] || \
+             [ "${{ needs.build-check.result }}" != "success" ]; then
+            echo "✗ gate: a required job did not succeed" >&2
+            exit 1
+          fi
+          echo "✔ gate green — matrix + packaging all succeeded"
 
   ai-review:
     # The second-set-of-eyes review. A solo author can't approve his own PR, so
     # the missing human approval is enforced as a CHECK: a separate reviewer
-    # identity re-verifies the merge result and REFUSES (exit 3) if
+    # identity runs the deterministic probes and REFUSES (exit 3) if
     # reviewer == PR author (separation of duties). Model-free by law
-    # (CLAUDE.md): the deterministic second pass, not an LLM. PRs only.
+    # (CLAUDE.md). The suites are NOT re-run here — they're deterministic and
+    # already required via the gate; this job's value is its distinct probes.
     name: ai-review
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -117,10 +123,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-
-      - name: Install (stdlib-only engine + dev tooling)
-        run: pip install -e ".[dev]" uv
 
       - name: Deterministic review of the PR (separation of duties enforced)
         env:
