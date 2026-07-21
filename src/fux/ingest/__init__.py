@@ -43,6 +43,7 @@ class IngestReport:
     unchanged: int = 0
     converted_by_kind: Counter = field(default_factory=Counter)
     skipped: list[tuple[str, str]] = field(default_factory=list)
+    web_skipped: list[tuple[str, str]] = field(default_factory=list)
     removed: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     chunk_count: int = 0
@@ -53,7 +54,7 @@ class IngestReport:
         return self.new + self.updated + self.unchanged
 
 
-def ingest_paths(config: Config, *, build_index: bool = True) -> IngestReport:
+def ingest_paths(config: Config, *, build_index: bool = True, web: bool = False) -> IngestReport:
     root = config.root
     cache_root = root / CACHE_REL
     report = IngestReport()
@@ -61,7 +62,9 @@ def ingest_paths(config: Config, *, build_index: bool = True) -> IngestReport:
     configured = [d for dirs in config.sources.values() for d in dirs]
     report.source_roots = len(configured) - len(result.missing_dirs)
     report.warnings.extend(f"source folder not found: {d}" for d in result.missing_dirs)
-    prev = manifest_read(root)
+    all_prev = manifest_read(root)
+    prev = {k: e for k, e in all_prev.items() if e.get("origin") not in ("url", "attachment")}
+    prev_web = {k: e for k, e in all_prev.items() if e.get("origin") in ("url", "attachment")}
 
     walked_rels = set()
     for sf in result.files:
@@ -94,8 +97,16 @@ def ingest_paths(config: Config, *, build_index: bool = True) -> IngestReport:
         report.new += 0 if entry else 1
 
     for rel in sorted(set(prev) - walked_rels):
-        (root / _cache_rel(rel)).unlink(missing_ok=True)
+        (root / prev[rel]["cache"]).unlink(missing_ok=True)
         report.removed.append(rel)
+
+    if web and config.web.urls:
+        _ingest_web(config, prev_web, report)
+    else:
+        # web entries persist across local-only runs — refreshing them needs --web
+        for url in sorted(prev_web):
+            report.entries.append(prev_web[url])
+            report.unchanged += 1
 
     if cache_root.is_dir() or report.entries:
         _write_dir_indexes(cache_root, report.entries)
@@ -106,6 +117,120 @@ def ingest_paths(config: Config, *, build_index: bool = True) -> IngestReport:
 
         report.chunk_count = _build(config, report.entries)
     return report
+
+
+def _ingest_web(config: Config, prev_web: dict[str, dict], report: IngestReport) -> None:
+    from . import web as webmod
+
+    renderer = None
+    if config.web.render == "cdp":
+        from .cdp import make_renderer
+
+        renderer = make_renderer(config.web)
+    crawl_report = webmod.crawl(config.web, renderer=renderer)
+    report.web_skipped = list(crawl_report.skipped)
+    seen_urls = set()
+    for art in crawl_report.artifacts:
+        if art.url in seen_urls:
+            continue
+        seen_urls.add(art.url)
+        entry = prev_web.get(art.url)
+        cache_path = config.root / (entry["cache"] if entry else webmod.cache_rel_for_url(art.url))
+        if entry and entry.get("sha256") == art.sha256 and (
+            not entry.get("cache") or cache_path.is_file()
+        ):
+            report.entries.append(entry)  # unchanged page: byte-stable no-op
+            report.unchanged += 1
+            continue
+        fetched_at = webmod.fetched_at_now()
+        if art.duplicate_of:
+            report.entries.append(_web_entry(art, "", "dedup", art.title, fetched_at))
+            report.converted_by_kind["web"] += 1
+            report.new += 0 if entry else 1
+            report.updated += 1 if entry else 0
+            continue
+        conv = webmod.convert_artifact(art, config.ingest.max_kb)
+        report.warnings.extend(conv.warnings)
+        if conv.skipped:
+            report.web_skipped.append((art.url, conv.skipped))
+            continue
+        cache_rel = webmod.cache_rel_for_url(art.url)
+        meta = _web_meta(art, conv, fetched_at)
+        text = fm_dumps(meta, conv.body)
+        target = config.root / cache_rel
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if not target.is_file() or target.read_text(encoding="utf-8") != text:
+            target.write_text(text, encoding="utf-8")
+        report.entries.append(_web_entry(art, cache_rel, conv.converter, meta["title"], fetched_at))
+        report.converted_by_kind["web"] += 1
+        report.updated += 1 if entry else 0
+        report.new += 0 if entry else 1
+    for url in sorted(set(prev_web) - seen_urls):
+        if prev_web[url].get("cache"):
+            (config.root / prev_web[url]["cache"]).unlink(missing_ok=True)
+        report.removed.append(url)
+    webmod.write_web_skips(config.root, report.web_skipped)
+
+
+def _web_meta(art, conv, fetched_at: str) -> dict:
+    title = art.title or Path(urlsplit_path(art.url)).stem or art.url
+    meta = {
+        "type": "Ingested Document",
+        "title": title,
+        "description": f"Ingested from {art.url} ({art.kind})",
+        "timestamp": fetched_at,
+        "source": art.url,
+        "source_sha256": art.sha256,
+        "origin": art.origin,
+        "fidelity": "inferred",
+        "converter": conv.converter,
+        "converted_at": fetched_at,
+        "fux_version": __version__,
+        "url": art.url,
+        "depth": art.depth,
+        "fetched_at": fetched_at,
+    }
+    if art.parent:
+        meta["parent"] = art.parent
+    if art.renderer:
+        meta["renderer"] = art.renderer
+    if conv.truncated:
+        meta["truncated"] = True
+    return meta
+
+
+def urlsplit_path(url: str) -> str:
+    from urllib.parse import urlsplit
+
+    return urlsplit(url).path
+
+
+def _web_entry(art, cache_rel: str, converter: str, title: str, fetched_at: str) -> dict:
+    entry = {
+        "source": art.url,
+        "cache": cache_rel,
+        "type": "web",
+        "kind": art.kind,
+        "sha256": art.sha256,
+        "size": len(art.data),
+        "fidelity": "inferred",
+        "converter": converter,
+        "converted_at": fetched_at,
+        "fetched_at": fetched_at,
+        "line_offset": None,
+        "fux_version": __version__,
+        "title": title,
+        "origin": art.origin,
+        "url": art.url,
+        "depth": art.depth,
+    }
+    if art.parent:
+        entry["parent"] = art.parent
+    if art.renderer:
+        entry["renderer"] = art.renderer
+    if art.duplicate_of:
+        entry["duplicate_of"] = art.duplicate_of
+    return entry
 
 
 def list_inferred(config: Config) -> list[dict]:
@@ -192,6 +317,8 @@ def _write_dir_indexes(cache_root: Path, entries: list[dict]) -> None:
     """Per-directory OKF `index.md` (progressive disclosure) + prune empty dirs."""
     dirs: dict[str, dict] = {"": {"files": [], "subdirs": set()}}
     for entry in entries:
+        if not entry.get("cache"):
+            continue  # sha-deduped web entry: provenance only, no cache file
         rel = Path(entry["cache"]).relative_to(CACHE_REL).as_posix()
         parent = str(Path(rel).parent).replace("\\", "/")
         parent = "" if parent == "." else parent
@@ -265,11 +392,17 @@ def cmd_ingest(args) -> int:
         return 0
 
     if args.list_skipped:
+        from .web import read_web_skips
+
         for rel, reason in _detect_skips(config):
             print(f"{rel}  — {reason}")
+        for url, reason in read_web_skips(root):
+            print(f"{url}  — {reason}")
         return 0
 
-    report = ingest_paths(config)
+    if args.web and not config.web.urls:
+        print("no [sources.web] urls configured in fux.toml — nothing to crawl")
+    report = ingest_paths(config, web=args.web)
     if report.total == 0 and not report.skipped:
         print("no source files found in the configured folders — check [sources] in fux.toml")
         for warning in report.warnings:
@@ -285,8 +418,9 @@ _KIND_LABELS = {
     "code": ("code", "fenced"),
     "json": ("json", "flattened, stdlib"),
     "yaml": ("yaml", "fenced text"),
-    "image": ("images", "metadata only — advanced tier is v1.1"),
+    "image": ("images", "metadata only — upgrade with --advanced"),
     "office": ("office", "markitdown extra"),
+    "web": ("web", "fenced network — html→md + attachments"),
 }
 
 
@@ -300,8 +434,9 @@ def _print_summary(report: IngestReport, started: float) -> None:
             print(f"  {verb:<9}{count:>4} {label:<10} ({how})")
     if report.unchanged:
         print(f"  unchanged{report.unchanged:>4}            (cache reuse)")
-    if report.skipped:
-        print(f"  skipped  {len(report.skipped):>4}            (see `fux ingest --list-skipped`)")
+    skipped_total = len(report.skipped) + len(report.web_skipped)
+    if skipped_total:
+        print(f"  skipped  {skipped_total:>4}            (see `fux ingest --list-skipped`)")
     if report.removed:
         print(f"  removed  {len(report.removed):>4}            (sources gone; cache pruned)")
     print(

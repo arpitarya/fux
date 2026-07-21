@@ -50,12 +50,30 @@ class AnswerParams:
 
 
 @dataclass(frozen=True)
+class WebParams:
+    """[sources.web] — the fenced network path (ingest-only, never query)."""
+
+    urls: tuple[str, ...] = ()
+    max_depth: int = 1
+    same_domain: bool = True
+    allow: tuple[str, ...] = ()  # extra allowed domains when same_domain
+    attachments: tuple[str, ...] = ("pdf", "docx", "xlsx", "pptx")
+    budget: int = 50  # pages+attachments fetched per run
+    delay_s: float = 1.0  # crawl politeness (between fetches)
+    max_fetch_kb: int = 2048
+    render: str = "off"  # off | cdp
+    cdp_port: int = 9222
+    settle_ms: int = 500  # post-load settle before DOM capture (cdp)
+
+
+@dataclass(frozen=True)
 class Config:
     root: Path
     sources: dict[str, tuple[str, ...]] = field(default_factory=dict)
     ingest: IngestParams = IngestParams()
     bm25f: BM25FParams = BM25FParams()
     answer: AnswerParams = AnswerParams()
+    web: WebParams = WebParams()
     raw: dict = field(default_factory=dict)
 
 
@@ -80,7 +98,9 @@ def load(root: Path) -> Config:
         raise FuxError(f"{CONFIG_NAME} is not valid TOML: {exc}") from exc
 
     sources: dict[str, tuple[str, ...]] = {}
-    for key, dirs in _table(raw, "sources").items():
+    sources_raw = dict(_table(raw, "sources"))
+    web = _parse_web(sources_raw.pop("web", {}))
+    for key, dirs in sources_raw.items():
         if key not in SOURCE_TYPES:
             raise FuxError(
                 f"unknown source type {key!r} in [sources] — valid: {', '.join(SOURCE_TYPES)}"
@@ -124,8 +144,45 @@ def load(root: Path) -> Config:
         ingest=IngestParams(max_kb=max_kb, exclude=tuple(exclude)),
         bm25f=BM25FParams(**params),
         answer=AnswerParams(max_sentences=max_sentences),
+        web=web,
         raw=raw,
     )
+
+
+def _parse_web(table) -> WebParams:
+    if not isinstance(table, dict):
+        raise FuxError("[sources.web] must be a table")
+    if not table:
+        return WebParams()
+    urls = table.get("urls", [])
+    if not isinstance(urls, list) or not all(
+        isinstance(u, str) and u.startswith(("http://", "https://")) for u in urls
+    ):
+        raise FuxError("[sources.web] urls must be a list of http(s) URLs")
+    defaults = WebParams()
+    out = {}
+    for name, kind, check in (
+        ("max_depth", int, lambda v: v >= 0),
+        ("same_domain", bool, lambda v: True),
+        ("budget", int, lambda v: v >= 1),
+        ("delay_s", (int, float), lambda v: v >= 0),
+        ("max_fetch_kb", int, lambda v: v >= 1),
+        ("cdp_port", int, lambda v: 0 < v < 65536),
+        ("settle_ms", int, lambda v: v >= 0),
+    ):
+        val = table.get(name, getattr(defaults, name))
+        if isinstance(val, bool) and kind is not bool or not isinstance(val, kind) or not check(val):
+            raise FuxError(f"[sources.web] {name} is invalid")
+        out[name] = val
+    for name in ("allow", "attachments"):
+        val = table.get(name, list(getattr(defaults, name)))
+        if not isinstance(val, list) or not all(isinstance(v, str) for v in val):
+            raise FuxError(f"[sources.web] {name} must be a list of strings")
+        out[name] = tuple(v.lstrip(".").lower() for v in val)
+    render = table.get("render", "off")
+    if render not in ("off", "cdp"):
+        raise FuxError('[sources.web] render must be "off" or "cdp"')
+    return WebParams(urls=tuple(urls), render=render, **out)
 
 
 def _table(raw: dict, name: str) -> dict:

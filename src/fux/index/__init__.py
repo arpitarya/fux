@@ -21,6 +21,8 @@ def build_index(config: Config, entries: list[dict]) -> int:
     files: dict[str, dict] = {}
     total = 0
     for entry in entries:
+        if entry.get("duplicate_of") or not entry.get("cache"):
+            continue  # deduped web content: indexed once, under the first URL
         rel = entry["source"]
         cached = prev.get(rel)
         if cached and cached.get("sha256") == entry["sha256"]:

@@ -73,6 +73,9 @@ def check_drift(config: Config) -> Drift:
     drift = Drift()
     from .convert import skip_reason
 
+    # web-origin entries are excluded: freshness for those means a --web re-crawl,
+    # and the check path must never touch the network.
+    entries = {k: e for k, e in entries.items() if e.get("origin") not in ("url", "attachment")}
     walked = {sf.rel: sf for sf in walk(config).files}
     for rel, sf in walked.items():
         entry = entries.get(rel)
@@ -91,6 +94,8 @@ def quick_drift(config: Config) -> Drift:
     entries = read(config.root)
     drift = Drift()
     for rel, entry in entries.items():
+        if entry.get("origin") in ("url", "attachment"):
+            continue  # web freshness = re-crawl; never checked passively
         path = config.root / rel
         if not path.is_file():
             drift.missing.append(rel)
