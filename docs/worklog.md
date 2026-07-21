@@ -26,6 +26,46 @@ diary.*
 
 ---
 
+## 2026-07-22 — phase 4 M3a–M5: df sidecar, kernel, FuxVec · Claude Code
+- **Asked:** Arpit's DoD-7 ruling (Option B — exact df sidecar, guarantee does **not**
+  soften), commit M1–M3 first, then continue M4→M8.
+- **Did:** committed the backlog as three clean commits (spec docs / M1–M3 / sidecar),
+  then landed M3a, M4, M5 — each green, each committed.
+  - **M3a df sidecar** (`state/df/`): term hashes sharded by hash low byte,
+    delta-encoded + varint df; `_stats.bin` holds total_docs/total_chunks and
+    per-field token **sums** (integers round-trip exactly, and `avg_wlen`
+    recomputes for any weights without re-ingesting). `Searcher` gained an
+    optional `stats` injection — scoring math untouched, only input provenance
+    changes. Parity is enforced, not asserted: every term in the vocabulary,
+    scored over a strict *subset* (where subset-derived idf would diverge),
+    matches full exactly — and **mutation-tested** (removing the injection fails
+    both parity tests). Collisions raise rather than silently merging df.
+  - **M4 kernel:** `retrieve() -> ResultGraph` is now the only retrieval path;
+    ask/find/answer are projections, and explain/graph/path are new ones.
+    `explain` = ask seeded by a node (its own `top_terms` become the query), so
+    there is genuinely one code path. Edges now persist in the JSON store too.
+  - **M5 FuxVec:** full-corpus Hamming prefilter → exact int8 rerank →
+    `dense_global` as a third RRF list. **Gate beats v0.22 hybrid:** hit@1
+    .762→.810 · hit@5 .952→**1.000** · MRR .833→.873, and ADR 0006's named
+    zero-overlap miss is rescued. `--lexical-only` still measures exactly
+    .762/.952/.833 with its four goldens byte-identical.
+- **Decided / open:** two judgment calls recorded (implementation.md → Decisions,
+  → ADR 0010). (1) **dense_global does not fire when BM25F returns zero
+  candidates** — removing that early return made "No confident matches"
+  unreachable, since a binary prefilter always has a nearest neighbour; measured
+  noise scores 0.23–0.26 cosine vs a true rescue's 0.34, so no floor separates
+  them as the corpus grows. Re-reading ADR 0006 settled it: "zero lexical
+  candidates" meant the correct *document* had no overlap, not the query.
+  (2) The two **hybrid goldens were updated deliberately**, with the eval table
+  as justification; the four `--lexical-only` goldens were not touched.
+  **⚠ Open (size):** early measurement projects the state envelope to ~35 MB
+  @100k against Arpit's 30 MB budget — `meta/` + `sigs/` are the risk, not
+  `df/` (~2 MB). M8 measures properly; cheap fixes noted if it confirms.
+- **Next:** **M6 — PPR-lite expansion** (damping 0.85, 3 iterations, top-10
+  ≥0.01, `[engine.graph]` config) + graph list into RRF. Then M7 (profiles +
+  `db pull`), M8 (100k benchmark + gate), ADRs 0008–0011, docs pass, v0.23.0.
+  Version still 0.22.1.
+
 ## 2026-07-21 — phase 4 M1–M3: substrate, state plane, graph · Claude Code
 - **Asked:** execute handoff 0004 (knowledge substrate v3) — the full phase, M1 first,
   milestone plan posted before any code.
