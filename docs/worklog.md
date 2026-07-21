@@ -26,6 +26,36 @@ diary.*
 
 ---
 
+## 2026-07-21 — dummy playground repo for dogfooding · Claude Code
+- **Asked:** set up a sibling repo with dummy data to play with the fux package.
+- **Did:** created `~/my_programs/fux-playground` (git-initialized, initial commit) — fictional
+  "Kestrel Coffee" roastery corpus: 3 md docs, 1 txt note, 2 py files, inventory.json,
+  suppliers.yaml. Ran `fux setup --docs docs,notes --code src --data data -y` + `fux ingest`
+  via fux's own .venv (fux 0.22.1): 8 files → 8 chunks, BM25F + embeddings. Verified
+  `ask`/`find`/`answer` all return sensible results; `.fux/` cache committed per convention.
+- **Decided / open:** nothing decided; playground is throwaway-adjacent but committed so
+  re-ingest determinism can be diffed. `answer` output for the JSON-flattened chunk is noisy
+  (dumps the whole flattened lot list) — possible future chunking/answer tuning observation.
+- **Next:** play with queries in `fux-playground`; consider it a scratch dogfood corpus.
+
+## 2026-07-21 — Agent commits now attributed + Verified on GitHub · Claude Code
+- **Asked:** commits showed "Unverified" — why, and fix by attributing agent
+  commits to Arpit's account.
+- **Did:** diagnosed via the commits API: commits were already GPG-signed with
+  Arpit's own key (`E38B58D8FDEF7698`), but the committer email
+  `claude-code@fux.local` belongs to no GitHub account → `reason: no_user`.
+  Fix (empirically converged): the noreply address gave `bad_email` — GitHub
+  also requires the committer email to appear in the signing key's identities —
+  so repo-local `user.email` is now `arpitarya.dev@gmail.com` (the key's UID,
+  verified on the account). Live result on this very commit:
+  `verified: true, reason: valid`, attributed to `arpitarya`, author name still
+  `Claude (agent)`, `Co-Authored-By: Claude` trailer intact — the agent trail
+  survives in metadata while GitHub verifies against Arpit's key.
+- **Decided / open:** nothing open — future agent commits in this repo are
+  Verified. (Historic commits keep their badge; rewriting history for a badge
+  is not worth it.)
+- **Next:** merge this PR; Anton dogfood continues.
+
 ## 2026-07-21 — v0.22.1 published; scheduled protection audit removed · Claude Code
 - **Asked:** (1) what is audit-protection.yml, is it needed? (2) remove it.
 - **Did:** explained it (weekly drift alarm comparing live branch protection vs
