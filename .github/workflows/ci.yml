@@ -6,24 +6,6 @@ on:
   pull_request:
 
 jobs:
-  skillgen-check:
-    # The skill artifacts under fux/data/skills/ + the copilot prompt are
-    # generated from the fragments in tools/skillgen/. This fails if someone
-    # hand-edited a generated file (or forgot to --bless after a fragment edit).
-    # Stdlib-only and build-time — no install needed.
-    name: skillgen --check
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Generated skill artifacts are up to date
-        run: python -m tools.skillgen --check
-
   test:
     name: Python ${{ matrix.python }}
     runs-on: ubuntu-latest
@@ -40,45 +22,22 @@ jobs:
           python-version: ${{ matrix.python }}
           cache: pip
 
-      - name: Install (stdlib-only engine + pytest)
-        run: pip install -e ".[dev]"
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
 
-      - name: Test
-        run: pytest -q
+      - name: Unit suite
+        run: pytest -q tests
 
-      - name: Self-check (dogfood — engine must init/build/check its own project)
-        run: |
-          fux --version
-          fux setup
-          mkdir -p /tmp/selfcheck && cd /tmp/selfcheck && git init -q
-          fux init
-          fux new formula sample --domain demo
-          fux build
-          fux check
-
-  build-check:
-    name: Build & metadata
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-
-      - name: Build sdist + wheel
-        run: pip install build && python -m build
-
-      - name: Check distribution metadata
-        run: pip install twine && twine check dist/*
+      - name: End-to-end suite (real CLI + fixture corpus + goldens + eval gate)
+        run: pytest -q tests_e2e
 
   gate:
-    # The constitutional merge gate. This job's check context ("fux gate" —
-    # the bare job name, as the check-runs API reports it) is the REQUIRED
-    # status check on the protected branch — see
-    # .github/branch-protection.json and docs/constitution-enforcement-handoff.md.
+    # The merge gate. This job's check context ("fux gate" — the bare job name,
+    # as the check-runs API reports it) is a REQUIRED status check on the
+    # protected branch — see .github/branch-protection.json. For the rebuild,
+    # the deterministic gate IS the two suites: determinism (byte-identical
+    # re-ingest), golden parity, the retrieval eval gate (hybrid ≥ lexical),
+    # and the packaging budgets (bundle ≤ 10 MB, wheel ≤ 15 MB).
     name: fux gate
     runs-on: ubuntu-latest
 
@@ -90,25 +49,23 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install (stdlib-only engine)
-        run: pip install -e .
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
 
-      - name: Seed agent home (schema + bundled rules)
-        run: fux setup
+      - name: Engine answers for itself
+        run: fux --version
 
-      - name: Gate — knowledge must be in sync with code (exit 2 blocks merge)
-        run: fux gate
-
-      - name: PII probe — no hard identifiers in non-plan .py/.md (exit 2 blocks merge)
-        run: fux pii-scan
+      - name: Gate — both suites green (determinism, goldens, eval, budgets)
+        run: |
+          pytest -q tests
+          pytest -q tests_e2e
 
   ai-review:
-    # The second-set-of-eyes review (§2R.1). A solo author can't approve his own
-    # PR, so the missing human approval is enforced as a CHECK: a separate
-    # reviewer identity reviews the PR diff against the constitution and exits
-    # non-zero on problems. REFUSES (exit 3) if reviewer == PR author
-    # (separation of duties). Required alongside `fux gate` — see
-    # .github/branch-protection.json. PRs only (needs an author to check against).
+    # The second-set-of-eyes review. A solo author can't approve his own PR, so
+    # the missing human approval is enforced as a CHECK: a separate reviewer
+    # identity re-verifies the merge result and REFUSES (exit 3) if
+    # reviewer == PR author (separation of duties). Model-free by law
+    # (CLAUDE.md): the deterministic second pass, not an LLM. PRs only.
     name: ai-review
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -123,13 +80,10 @@ jobs:
           python-version: "3.12"
           cache: pip
 
-      - name: Install (stdlib-only engine)
-        run: pip install -e .
+      - name: Install (stdlib-only engine + dev tooling)
+        run: pip install -e ".[dev]" uv
 
-      - name: Seed agent home (schema + bundled rules)
-        run: fux setup
-
-      - name: Constitutional review of the PR diff (separation of duties enforced)
+      - name: Deterministic review of the PR (separation of duties enforced)
         env:
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
           REVIEWER: fux-ci-reviewer

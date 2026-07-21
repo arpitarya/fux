@@ -1,0 +1,51 @@
+---
+type: Handoff Prompt
+title: Claude Code prompt — Ingest v1.1 (web, CDP, advanced tier)
+description: Paste-ready prompt executing handoff 0002.
+status: implemented
+adrs: [../adr/0005-web-cdp-advanced-tier.md]
+blocked_by: 0001-query-cli-v1-handoff.md
+timestamp: 2026-07-21T00:00:00Z
+---
+
+# Claude Code prompt — Ingest v1.1
+
+Paste below into Claude Code at the repo root. **Precondition: handoff 0001 is
+implemented and archived; both suites green.**
+
+---
+
+Build **Ingest v1.1** (web crawling, CDP rendering, advanced fidelity tier) for the
+Fux engine, executing the committed spec exactly.
+
+**Explore first:** read `CLAUDE.md` (binding), then
+`docs/handoff/0002-ingest-web-advanced-handoff.md` (the spec), then the verdict +
+web/CDP/file-type sections of `docs/compare/ingest-strategy.compare.md`. Inspect the
+implemented ingest package from 0001 (`src/fux/ingest/`) — extend it, don't fork it.
+
+**Plan milestones:** M1 HTML→Markdown converter (stdlib `html.parser`, goldens
+first); M2 urllib fetcher + crawl frontier (depth/budget/same-domain/robots/dedupe)
++ `--web` flow with fixture-server e2e; M3 hand-rolled RFC 6455 WebSocket client
+(unit-tested against a fake socket before touching Chrome) + CDP capture path; M4
+advanced tier (`--advanced`, Docling/Tesseract extras, fidelity transitions,
+SKILL.md update); M5 e2e suite additions + docs.
+
+**Hard rules:** network code lives only under `src/fux/ingest/`; the query path must
+not import it (add a unit test asserting no `fux.query`/`fux.index` module imports
+`fux.ingest.web`/`cdp`). Stdlib-only runtime (extras absent-safe). robots.txt
+respected — no exceptions. Deterministic cache output, byte-stable re-ingest of
+unchanged sources. FuxError + exit codes at the CLI boundary only. Tests use a local
+stdlib `http.server` fixture — never the real internet.
+
+**Verify:** both suites green; fixture-site crawl produces a git-clean, OKF-valid
+cache; `--advanced` upgrade flips fidelity end-to-end and improves the cached text
+on the fixture PDF; CDP manual smoke documented (auto-skipped in CI without Chrome).
+
+**Track as you go:** update `docs/implementation.md` (Phase 2 table) at every
+milestone completion; keep "Now working on" current.
+
+**Close out (per CLAUDE.md):** ADR 0005; archive this handoff+prompt pair with
+`status: implemented`; update fux-plan/README/DOC-REGISTRY/worklog/
+model-handoff-interview; bump minor version.
+
+Show the milestone plan before writing code.

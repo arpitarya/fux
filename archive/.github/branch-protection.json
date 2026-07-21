@@ -1,0 +1,12 @@
+{
+  "_note": "Source of truth for `main` branch protection. Apply with scripts/apply-branch-protection.sh arpitarya fux main. SOLO REPO: required_pull_request_reviews is null on purpose — a sole developer cannot approve their own PR, so a review requirement is unsatisfiable friction, not a control. Review is enforced as CHECKS not approvals (§2R): `fux gate` (constitution integrity) + `ai-review` (separate-reviewer constitutional second pass; refuses when reviewer==author). The real wall is: those two required checks + enforce_admins:true + no force-push/deletion. That still routes every change through a green-gate PR (no direct commit to main by anyone, incl. admins). enforce_admins MUST stay true; setting it false is a real weakening of the wall (see docs/constitution-enforcement-handoff.md §2f). If this repo gains a second maintainer, restore required_pull_request_reviews.required_approving_review_count=1 + require_code_owner_reviews:true.",
+  "required_status_checks": {
+    "strict": true,
+    "checks": [{ "context": "fux gate" }, { "context": "ai-review" }]
+  },
+  "enforce_admins": true,
+  "required_pull_request_reviews": null,
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}

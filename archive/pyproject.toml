@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fux-engine"
+dynamic = ["version"]
+description = "Fux — a portable agent-aware knowledge engine: rules, memory, narrative, and graph in one frontmatter substrate."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
+keywords = ["knowledge", "rules", "graph", "claude", "codex", "copilot", "frontmatter", "llm", "memory", "mcp"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []  # stdlib only — $0, deterministic, dependency-free (see docs/fux-plan.md §3)
+
+[project.urls]
+Homepage = "https://github.com/arpitarya/fux"
+Repository = "https://github.com/arpitarya/fux"
+Documentation = "https://github.com/arpitarya/fux/blob/main/docs/guide.md"
+"Bug Tracker" = "https://github.com/arpitarya/fux/issues"
+
+[project.scripts]
+fux = "fux.cli:main"
+
+[project.optional-dependencies]
+# Phase-2 opt-in local embedding re-rank (recall-engine.compare.md). Never required.
+embeddings = ["sentence-transformers>=2.2"]
+# Opt-in real ASTs for non-Python graph extraction (plan §19a). Default stays the
+# stdlib heuristic — this only upgrades JS/TS/Go/Rust call graphs. Never required;
+# `fux build` records which backend produced a graph so it stays reproducible.
+ast = ["tree-sitter>=0.23", "tree-sitter-language-pack>=0.7"]
+# PDF text extraction for `fux fetch-rules` with .pdf sources.
+pdf = ["pypdf>=4.0"]
+# Opt-in source re-verification for `/fux ingest`: `fux ingest <id> --recheck`
+# re-reads a drafted rule's `source` (URL or file) and flags `source-drift`. The
+# fetch itself is stdlib (urllib); this extra exists to fence the only
+# network/file-reading path behind an explicit opt-in; it is NEVER on the default
+# `fux check` path. (Extra name kept as `scrape` for back-compat with PR1.)
+scrape = []
+# Opt-in headless AI self-critique for the constitutional critic (plan §7d). The default
+# build-agent path uses the host session's tokens via the `critic` skill and needs nothing;
+# this is only for a no-session/runtime critic. The maintenance path never imports it.
+critic = ["anthropic>=0.40"]
+dev = ["pytest>=8", "build>=1.0", "twine>=5.0"]
+
+[tool.setuptools.dynamic]
+version = {attr = "fux.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fux*"]
+# tools/skillgen/ is build-time only — it renders the committed skill artifacts
+# and must never ship in the wheel or be importable at runtime. include=["fux*"]
+# already excludes it; this is the explicit, declarative guard (tested in
+# tests/test_skillgen.py).
+exclude = ["tools*"]
+
+[tool.setuptools.package-data]
+fux = [
+    "templates/*.md",
+    "assets/*",
+    "data/schema.json",
+    "data/global/README.md",
+    "data/global/rules/*.md",
+    "data/hooks/*.sh",
+    "data/packs/**/*",
+    "data/skills/**/*",
+    "data/copilot/**/*",
+    # The self-knowledge bundle (`fux self-build`) — a pre-built footprint mirror,
+    # shipped so `--self` works on a plain `pip install fux` with no project `.fux/`.
+    "data/self/.fux/config.toml",
+    "data/self/.fux/out/*",
+    "data/self/.fux/rules/*.md",
+]
+
+[tool.ruff]
+line-length = 100

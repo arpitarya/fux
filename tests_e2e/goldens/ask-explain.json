@@ -1,0 +1,104 @@
+{
+  "corpus": {
+    "chunks": 9,
+    "docs": 9
+  },
+  "engine": "bm25f",
+  "query": "how do I install the widget service",
+  "results": [
+    {
+      "explain": [
+        {
+          "contribution": 2.709,
+          "idf": 1.897,
+          "term": "install",
+          "tf": {
+            "body": 4,
+            "heading": 0,
+            "path": 0
+          }
+        },
+        {
+          "contribution": 2.615,
+          "idf": 1.386,
+          "term": "widget",
+          "tf": {
+            "body": 7,
+            "heading": 2,
+            "path": 0
+          }
+        },
+        {
+          "contribution": 1.342,
+          "idf": 1.05,
+          "term": "service",
+          "tf": {
+            "body": 3,
+            "heading": 0,
+            "path": 0
+          }
+        },
+        {
+          "contribution": 0.697,
+          "idf": 0.431,
+          "term": "the",
+          "tf": {
+            "body": 6,
+            "heading": 0,
+            "path": 0
+          }
+        }
+      ],
+      "fidelity": "inferred",
+      "heading_path": [
+        "Widget Guide"
+      ],
+      "line_end": 35,
+      "line_start": 6,
+      "path": "docs/guide.md",
+      "score": 7.364,
+      "text": "# Widget Guide\nThe widget service converts raw telemetry into daily reports.\n## Install\nInstall the widget service with `pip install widget-service`.\nThe installer needs Python 3.11 or newer and about 50 MB of disk space.\n### Verify\nRun `widget --version` to verify the install succeeded.\n## Configure\nConfiguration lives in `widget.toml` next to the binary.\n| key  | meaning          |\n|------|------------------|\n| rate | polls per minute |\n| mode | live or replay   |\n## Deploy\nThe deploy uses a blue-green rollout with health checks before cutover.\nRollbacks complete within two minutes when a health check fails.\n```bash\nwidget deploy --env prod\n```"
+    },
+    {
+      "explain": [
+        {
+          "contribution": 1.588,
+          "idf": 1.386,
+          "term": "widget",
+          "tf": {
+            "body": 1,
+            "heading": 0,
+            "path": 0
+          }
+        },
+        {
+          "contribution": 1.203,
+          "idf": 1.05,
+          "term": "service",
+          "tf": {
+            "body": 1,
+            "heading": 0,
+            "path": 0
+          }
+        },
+        {
+          "contribution": 0.8,
+          "idf": 0.431,
+          "term": "the",
+          "tf": {
+            "body": 5,
+            "heading": 0,
+            "path": 0
+          }
+        }
+      ],
+      "fidelity": "inferred",
+      "heading_path": [],
+      "line_end": 4,
+      "line_start": 1,
+      "path": "notes/todo.txt",
+      "score": 3.591,
+      "text": "TODO list for the widget service:\n- tune the rate key for the busy tenants\n- document the replay mode caveats\n- retire the legacy exporter once telemetry parity is confirmed"
+    }
+  ]
+}

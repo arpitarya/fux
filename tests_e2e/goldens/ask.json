@@ -1,0 +1,59 @@
+{
+  "corpus": {
+    "chunks": 9,
+    "docs": 9
+  },
+  "engine": "bm25f",
+  "query": "how do I install the widget service",
+  "results": [
+    {
+      "fidelity": "inferred",
+      "heading_path": [
+        "Widget Guide"
+      ],
+      "line_end": 35,
+      "line_start": 6,
+      "path": "docs/guide.md",
+      "score": 7.364,
+      "text": "# Widget Guide\nThe widget service converts raw telemetry into daily reports.\n## Install\nInstall the widget service with `pip install widget-service`.\nThe installer needs Python 3.11 or newer and about 50 MB of disk space.\n### Verify\nRun `widget --version` to verify the install succeeded.\n## Configure\nConfiguration lives in `widget.toml` next to the binary.\n| key  | meaning          |\n|------|------------------|\n| rate | polls per minute |\n| mode | live or replay   |\n## Deploy\nThe deploy uses a blue-green rollout with health checks before cutover.\nRollbacks complete within two minutes when a health check fails.\n```bash\nwidget deploy --env prod\n```"
+    },
+    {
+      "fidelity": "inferred",
+      "heading_path": [],
+      "line_end": 4,
+      "line_start": 1,
+      "path": "notes/todo.txt",
+      "score": 3.591,
+      "text": "TODO list for the widget service:\n- tune the rate key for the busy tenants\n- document the replay mode caveats\n- retire the legacy exporter once telemetry parity is confirmed"
+    },
+    {
+      "fidelity": "inferred",
+      "heading_path": [
+        "ADR-001: Use SQLite for local storage"
+      ],
+      "line_end": 11,
+      "line_start": 7,
+      "path": "docs/decisions/adr-001.md",
+      "score": 1.379,
+      "text": "# ADR-001: Use SQLite for local storage\nWe chose SQLite because the service is single-node and embedded storage\nremoves an operational dependency. Postgres was rejected for the first\nversion because it requires a separate server process to operate."
+    },
+    {
+      "fidelity": "inferred",
+      "heading_path": [],
+      "line_end": 5,
+      "line_start": 1,
+      "path": "docs/no-headings.md",
+      "score": 0.665,
+      "text": "This document has no headings at all, only paragraphs of plain prose.\nIt exists to exercise the whole-file fallback path of the chunker.\nTelemetry batches are flushed every thirty seconds regardless of size.\nA second paragraph keeps the fallback honest about paragraph boundaries."
+    },
+    {
+      "fidelity": "inferred",
+      "heading_path": [],
+      "line_end": null,
+      "line_start": null,
+      "path": "assets/logo.png",
+      "score": 0.516,
+      "text": "Image file `assets/logo.png`.\n- format: png\n- dimensions: 3×2\n- size: 71 bytes\n*(metadata stub — inferred tier; OCR/description is the advanced tier)*"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{"q": "how do I install the widget service", "file": "docs/guide.md", "heading": "Install"}
+{"q": "steps to set up the tool on a new machine", "file": "docs/guide.md", "heading": "Install"}
+{"q": "how much disk space does the installer need", "file": "docs/guide.md", "heading": "Install"}
+{"q": "how do I verify the installation worked", "file": "docs/guide.md", "heading": "Verify"}
+{"q": "where does configuration live", "file": "docs/guide.md", "heading": "Configure"}
+{"q": "what does the rate key mean", "file": "docs/guide.md", "heading": "Configure"}
+{"q": "how does the deploy rollout work", "file": "docs/guide.md", "heading": "Deploy"}
+{"q": "how quickly can we revert a failed release", "file": "docs/guide.md", "heading": "Deploy"}
+{"q": "which database did we settle on for local storage", "file": "docs/decisions/adr-001.md"}
+{"q": "why was postgres rejected", "file": "docs/decisions/adr-001.md"}
+{"q": "how often is measurement data flushed", "file": "docs/no-headings.md"}
+{"q": "telemetry batch interval", "file": "docs/no-headings.md"}
+{"q": "are accented file names supported", "file": "docs/unicode-café.md"}
+{"q": "what remains on the todo list for busy tenants", "file": "notes/todo.txt"}
+{"q": "when can the legacy exporter be retired", "file": "notes/todo.txt"}
+{"q": "how are raw telemetry frames parsed", "file": "code/util.py"}
+{"q": "what is the retry count in the config", "file": "data/config.json"}
+{"q": "what threshold fires the high error rate alert", "file": "data/settings.yaml"}
+{"q": "how long does reverting to the previous release take", "file": "docs/guide.md", "heading": "Deploy"}
+{"q": "cadence of pushing measurements downstream", "file": "docs/no-headings.md"}
+{"q": "what technology stores rows on disk", "file": "docs/decisions/adr-001.md"}

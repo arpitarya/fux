@@ -1,0 +1,4 @@
+TODO list for the widget service:
+- tune the rate key for the busy tenants
+- document the replay mode caveats
+- retire the legacy exporter once telemetry parity is confirmed
