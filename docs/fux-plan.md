@@ -162,7 +162,7 @@ Claude Code.
 | Query CLI — design decisions | ✅ | engine/output/ingest/model verdicts accepted; see `compare/` |
 | Query CLI — **v1 build** (setup/ingest/BM25F/ask/find/answer/agents) | ✅ | **v0.20.0** (2026-07-21); ADRs 0001–0004; DOGFOOD.md emitted |
 | Ingest v1.1 (web/CDP/advanced — handoff 0002) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
-| Hybrid engine v2 (bundled model + RRF — handoff 0003) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 173 unit + 28 e2e tests; eval numbers in ADR 0006 |
+| Hybrid engine v2 (bundled model + RRF — handoff 0003) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
 
