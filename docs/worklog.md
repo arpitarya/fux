@@ -26,6 +26,27 @@ diary.*
 
 ---
 
+## 2026-07-22 — v0.23.0 merged to main and published to PyPI · Claude Code
+- **Asked:** merge everything to main and publish.
+- **Did:** pre-flight (wheel builds 7.04 MB, model bundled, `twine check --strict`
+  passes, clean-install smoke test) → pushed `feat/phase4-knowledge-substrate` →
+  **PR #38** → full matrix green (linux 3.11–3.14, macOS 3.11/3.14, **Windows
+  3.11/3.14**) plus both required checks (`fux gate`, `ai-review`) → merged →
+  release **v0.23.0** → publish workflow uploaded both artifacts (200 OK).
+  Verified from PyPI on a clean Python 3.12 venv: install, ingest (writes
+  `fux.lock` + `.fux/state/`), `ask`, `path`, `explain`, **zero runtime deps**.
+- **Decided / open:** two verification stumbles worth remembering, neither a
+  product defect. (1) The first "clean install" check ran on the system Python
+  **3.9**, below the supported floor — a local wheel install succeeded there and
+  looked like a pass, so it proved less than it appeared; re-run on 3.12.
+  (2) `pypi.org/pypi/.../json` served a **cached** response reporting 0.22.1 as
+  latest for a minute after a successful upload — the publish job log (200 OK +
+  "View at" URL) is the authority, not the JSON API. Don't conclude a publish
+  failed from that endpoint alone.
+- **Next:** unchanged — **query-at-scale** is the head of phase 5: score from
+  `postings` by term instead of loading every row (~10 s at 100k today; table,
+  index and exact corpus stats already exist). Scoped in ADR 0011.
+
 ## 2026-07-22 — phase 4 complete: knowledge substrate shipped at v0.23.0 · Claude Code
 - **Asked:** three rulings (integer token-sums approved as amendment; early-return
   judgment approved; state budget → measure at M8 before optimizing), then
