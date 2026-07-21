@@ -70,6 +70,18 @@ def ingested(project: Path) -> Path:
     return project
 
 
+@pytest.fixture
+def ingested_sqlite(project: Path) -> Path:
+    """The same corpus on the SQLite backend — for proving store parity."""
+    config = project / "fux.toml"
+    config.write_text(
+        config.read_text(encoding="utf-8") + '\n[index]\nformat = "sqlite"\n',
+        encoding="utf-8",
+    )
+    run_fux(project, "ingest")
+    return project
+
+
 def normalize(obj):
     if isinstance(obj, float):
         return round(obj, 3)

@@ -32,9 +32,9 @@ def build_vectors(config: Config) -> int:
     model = get_model()
     if model is None:  # bundle not shipped: hybrid quietly unavailable
         return 0
-    from ..index import store as index_store
+    from ..index import backend_for
 
-    files = index_store.load(config.root)
+    files = backend_for(config).load(config.root)  # json or sqlite — same shape
     prev = load_vectors(config.root)
     out: dict[str, dict] = {}
     embedded = 0

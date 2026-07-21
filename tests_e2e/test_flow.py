@@ -25,8 +25,10 @@ def test_ingest_summary(project):
     assert "Scanning" in out and "source roots" in out
     assert "converted" in out and "markdown" in out
     assert "Cache: .fux/cache" in out and "chunks (BM25F)" in out
+    assert "Lock: fux.lock" in out
     assert (project / ".fux/cache/docs/guide.md").is_file()
-    assert (project / ".fux/manifest.jsonl").is_file()
+    assert (project / "fux.lock").is_file()
+    assert (project / ".fux/index/manifest.jsonl").is_file()
     assert (project / ".fux/index/index.json").is_file()
     assert (project / ".fux/cache/index.md").is_file()
 
@@ -113,7 +115,7 @@ def test_list_inferred(ingested):
 
 @pytest.mark.skipif(not have_markitdown(), reason="markitdown extra not installed")
 def test_office_ingested_with_extra(ingested):
-    manifest = (ingested / ".fux/manifest.jsonl").read_text(encoding="utf-8")
+    manifest = (ingested / ".fux/index/manifest.jsonl").read_text(encoding="utf-8")
     assert "office/spec.docx" in manifest
 
 

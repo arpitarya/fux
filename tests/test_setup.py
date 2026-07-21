@@ -76,3 +76,36 @@ def test_non_interactive_stdin_behaves_like_yes(tmp_path, monkeypatch):
     monkeypatch.setattr("builtins.input", eof)
     assert run_setup(tmp_path, monkeypatch) == 0
     assert (tmp_path / "fux.toml").is_file()
+
+
+# -- .gitignore management (handoff 0004: derived plane never gets committed) --
+
+
+def test_setup_gitignores_the_runtime_plane(tmp_path, monkeypatch):
+    run_setup(tmp_path, monkeypatch, "-y")
+    text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert ".fux/index/" in text
+    # the committed pair must NOT be ignored — git carries recipe and state
+    assert "fux.lock" not in text
+    assert ".fux/state" not in text
+
+
+def test_gitignore_write_is_idempotent(tmp_path, monkeypatch):
+    run_setup(tmp_path, monkeypatch, "-y")
+    first = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    run_setup(tmp_path, monkeypatch, "-y")
+    assert (tmp_path / ".gitignore").read_text(encoding="utf-8") == first
+
+
+def test_gitignore_appends_and_preserves_user_rules(tmp_path, monkeypatch):
+    (tmp_path / ".gitignore").write_text("*.log\nbuild/\n", encoding="utf-8")
+    run_setup(tmp_path, monkeypatch, "-y")
+    text = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+    assert text.startswith("*.log\nbuild/\n")
+    assert ".fux/index/" in text
+
+
+def test_gitignore_respects_a_broader_existing_rule(tmp_path, monkeypatch):
+    (tmp_path / ".gitignore").write_text(".fux/\n", encoding="utf-8")
+    run_setup(tmp_path, monkeypatch, "-y")
+    assert (tmp_path / ".gitignore").read_text(encoding="utf-8") == ".fux/\n"

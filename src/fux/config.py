@@ -59,10 +59,38 @@ class HybridParams:
 
 
 @dataclass(frozen=True)
+class IndexParams:
+    """[index] — storage backend and footprint profile (handoff 0004).
+
+    ``format`` selects the persistence backend; ``auto`` keeps the v1 JSON path
+    for small corpora and switches to sqlite past ``sqlite_threshold`` chunks,
+    so today's goldens stay byte-identical while big corpora get row lookups.
+    """
+
+    format: str = "auto"  # json | sqlite | auto
+    profile: str = "auto"  # full | lean | auto
+    sqlite_threshold: int = 25_000  # chunks; the JSON-load breakpoint (proposal §2)
+    lean_cache_mb: int = 200
+    prefilter_width: int = 500  # FuxVec Hamming prefilter (§6)
+
+
+@dataclass(frozen=True)
+class GitParams:
+    """[git] — what ingest commits. State + lock are always committed (§8)."""
+
+    commit_cache: bool = False
+
+
+@dataclass(frozen=True)
 class WebParams:
     """[sources.web] — the fenced network path (ingest-only, never query)."""
 
     urls: tuple[str, ...] = ()
+    max_age_days: int = 30  # url staleness horizon for fux.lock (§8a)
+    # curated: one cache file per page (reviewable as diffs).
+    # mirror:  no file cache at all — converted text lives in fux.db rows,
+    #          because 100k documents-as-files is impractical, git or not.
+    tier: str = "curated"
     max_depth: int = 1
     same_domain: bool = True
     allow: tuple[str, ...] = ()  # extra allowed domains when same_domain
@@ -83,6 +111,8 @@ class Config:
     bm25f: BM25FParams = BM25FParams()
     answer: AnswerParams = AnswerParams()
     hybrid: HybridParams = HybridParams()
+    index: IndexParams = IndexParams()
+    git: GitParams = GitParams()
     web: WebParams = WebParams()
     raw: dict = field(default_factory=dict)
 
@@ -153,6 +183,9 @@ def load(root: Path) -> Config:
         if not isinstance(val, int) or isinstance(val, bool) or val < 1:
             raise FuxError(f"[engine.hybrid] {name} must be a positive integer")
 
+    index_params = _parse_index(_table(raw, "index"))
+    git_params = _parse_git(_table(raw, "git"))
+
     ans = _table(raw, "answer")
     max_sentences = ans.get("max_sentences", AnswerParams.max_sentences)
     if not isinstance(max_sentences, int) or isinstance(max_sentences, bool) or max_sentences <= 0:
@@ -165,9 +198,35 @@ def load(root: Path) -> Config:
         bm25f=BM25FParams(**params),
         answer=AnswerParams(max_sentences=max_sentences),
         hybrid=HybridParams(enabled=enabled, rrf_k=rrf_k, candidate_pool=candidate_pool),
+        index=index_params,
+        git=git_params,
         web=web,
         raw=raw,
     )
+
+
+def _parse_index(table: dict) -> IndexParams:
+    defaults = IndexParams()
+    fmt = table.get("format", defaults.format)
+    if fmt not in ("json", "sqlite", "auto"):
+        raise FuxError('[index] format must be "json", "sqlite" or "auto"')
+    profile = table.get("profile", defaults.profile)
+    if profile not in ("full", "lean", "auto"):
+        raise FuxError('[index] profile must be "full", "lean" or "auto"')
+    out = {}
+    for name in ("sqlite_threshold", "lean_cache_mb", "prefilter_width"):
+        val = table.get(name, getattr(defaults, name))
+        if not isinstance(val, int) or isinstance(val, bool) or val < 1:
+            raise FuxError(f"[index] {name} must be a positive integer")
+        out[name] = val
+    return IndexParams(format=fmt, profile=profile, **out)
+
+
+def _parse_git(table: dict) -> GitParams:
+    commit_cache = table.get("commit_cache", GitParams.commit_cache)
+    if not isinstance(commit_cache, bool):
+        raise FuxError("[git] commit_cache must be true or false")
+    return GitParams(commit_cache=commit_cache)
 
 
 def _parse_web(table) -> WebParams:
@@ -190,6 +249,7 @@ def _parse_web(table) -> WebParams:
         ("max_fetch_kb", int, lambda v: v >= 1),
         ("cdp_port", int, lambda v: 0 < v < 65536),
         ("settle_ms", int, lambda v: v >= 0),
+        ("max_age_days", int, lambda v: v >= 1),
     ):
         val = table.get(name, getattr(defaults, name))
         if isinstance(val, bool) and kind is not bool or not isinstance(val, kind) or not check(val):
@@ -203,7 +263,10 @@ def _parse_web(table) -> WebParams:
     render = table.get("render", "off")
     if render not in ("off", "cdp"):
         raise FuxError('[sources.web] render must be "off" or "cdp"')
-    return WebParams(urls=tuple(urls), render=render, **out)
+    tier = table.get("tier", WebParams.tier)
+    if tier not in ("curated", "mirror"):
+        raise FuxError('[sources.web] tier must be "curated" or "mirror"')
+    return WebParams(urls=tuple(urls), render=render, tier=tier, **out)
 
 
 def _table(raw: dict, name: str) -> dict:

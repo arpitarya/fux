@@ -33,6 +33,12 @@ def _cmd_query(args) -> int:
     return cmd_query(args)
 
 
+def _cmd_cat(args) -> int:
+    from .query.cat import cmd_cat
+
+    return cmd_cat(args)
+
+
 def _cmd_hook(args) -> int:
     from .hooks import cmd_hook
 
@@ -106,6 +112,11 @@ def build_parser() -> argparse.ArgumentParser:
     sp = sub.add_parser("answer", help="extractive, cited answer to a question")
     _add_query_flags(sp, answer=True)
     sp.set_defaults(_handler=_cmd_query, mode="answer")
+
+    sp = sub.add_parser("cat", help="print one document (cache, db row, or re-derived)")
+    sp.add_argument("doc", metavar="DOC-ID", help="document id, e.g. docs/adr/0007.md")
+    sp.add_argument("--out", metavar="FILE", help="write to FILE instead of stdout")
+    sp.set_defaults(_handler=_cmd_cat)
 
     sp = sub.add_parser("hook", help="agent-hook entrypoints (fail-open; internal)")
     sp.add_argument("event", choices=["prompt-submit", "session-end"])

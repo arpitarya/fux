@@ -34,6 +34,15 @@ def cmd_query(args) -> int:
     started = time.perf_counter()
     root = find_root()
     config = load(root)
+    from .lean import has_state_only
+
+    if has_state_only(config):
+        # Fresh clone: `.fux/state/` is committed, `.fux/index/` is not. Answer
+        # at doc level from the lean plane rather than refusing — that is the
+        # whole point of committing state.
+        from .statequery import run_state_query
+
+        return run_state_query(config, args, started)
     searcher = load_searcher(config)
     manifest = manifest_read(root)
     _warn_if_stale(config)
@@ -56,9 +65,17 @@ class _Ctx:
         self.started = started
         self.engine = "bm25f"
         self.model = None  # set by _retrieve when the hybrid path is live
+        # Documents are addressed by their corpus id (`web:host/path` for fetched
+        # pages), so the originating URL travels beside it rather than as it.
+        from ..index import doc_id_for
+
+        self.by_doc: dict[str, dict] = {doc_id_for(e): e for e in manifest.values()}
 
     def fidelity(self, rel: str) -> str:
-        return self.manifest.get(rel, {}).get("fidelity", "inferred")
+        return self.by_doc.get(rel, {}).get("fidelity", "inferred")
+
+    def url(self, rel: str) -> str | None:
+        return self.by_doc.get(rel, {}).get("url")
 
     def elapsed_ms(self) -> int:
         return max(1, round((time.perf_counter() - self.started) * 1000))
@@ -204,6 +221,8 @@ def _chunk_json(r: ScoredChunk, ctx: _Ctx, explain: bool) -> dict:
         "fidelity": ctx.fidelity(r.file),
         "text": r.text,
     }
+    if ctx.url(r.file):
+        out["url"] = ctx.url(r.file)
     if r.hybrid:
         out["hybrid"] = r.hybrid
     if explain:
@@ -270,6 +289,7 @@ def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
                     "score": round(agg["score"], 5 if hybrid else 3),
                     "matching_passages": agg["chunks"],
                     "fidelity": ctx.fidelity(file),
+                    **({"url": ctx.url(file)} if ctx.url(file) else {}),
                     **({"hybrid": agg["best"].hybrid} if agg["best"].hybrid else {}),
                     **({"explain": chunk_explain_json(agg["best"])} if args.explain else {}),
                 }
@@ -336,7 +356,10 @@ def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
             "answer": " ".join(s.text for s in sentences),
             "sentences": [_sentence_json(s, citations, args.explain) for s in sentences],
             "sources": [
-                {"id": cid, "path": file, "line": line}
+                {
+                    "id": cid, "path": file, "line": line,
+                    **({"url": ctx.url(file)} if ctx.url(file) else {}),
+                }
                 for (file, line), cid in citations.items()
             ],
             "corpus": ctx.corpus,

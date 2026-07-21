@@ -16,7 +16,7 @@ def test_check_clean_then_drift(ingested):
     proc = run_fux(ingested, "ingest", "--check")
     assert proc.returncode == 0  # advisory by default
     assert "DRIFT  docs/guide.md  (sha mismatch — re-ingest)" in proc.stdout
-    assert "DRIFT  docs/added.md  (new — not in manifest)" in proc.stdout
+    assert "DRIFT  docs/added.md  (new — not in fux.lock)" in proc.stdout
     assert "DRIFT  notes/todo.txt  (missing — source deleted; cache orphan)" in proc.stdout
 
     proc = run_fux(ingested, "ingest", "--check", "--strict", check=False)

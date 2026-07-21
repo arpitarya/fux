@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **All three phases complete
-> (v0.22.0).** The master run is done; next is Anton dogfooding (DOGFOOD.md).
+> *(building agent: keep this one line current)* — **Phase 4: M1–M3 ✅**; M4
+> (kernel + verbs) is next and not yet started. Suites: 262 unit + 55 e2e.
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -67,6 +67,24 @@ happened per exchange"; keep both.*
 | M7 packaging (bundle in wheel, lazy load, size checks) | ✅ | 1 | wheel 6.98 MB ≤ 15; bundle ≤ 10 asserted; warm query 0.2 ms |
 | Close-out: ADRs 0006–0007, docs law, archive pair, bump | ✅ | — | v0.22.0; suites: 172 unit + 28 e2e (+1 gated skip) |
 
+## Phase 4 — Knowledge substrate v3 (handoff 0004) → v0.23.0
+
+*Pre-registered 2026-07-21 with the handoff (per the CLAUDE.md rule: every plan
+seeds its milestone table here before building; the building agent updates a
+row at EVERY milestone completion — no batching).*
+
+| Milestone | Status | Tests | Notes |
+|-----------|--------|-------|-------|
+| M1 sqlite store + fux.lock (parity goldens; lock-only --check; migration) | ✅ | 33+12 | all 6 v0.22 goldens pass byte-for-byte on the sqlite backend; lock at root, manifest → runtime plane |
+| M2 bulk tier (docs_text) + `fux cat` + committed `.fux/state/` sharding + three-way check | ✅ | 35+13 | fresh clone answers doc-level from state; rebuild reproduces state byte-for-byte; Bloom sized 9.6 bits/term, k=4 (→ ADR 0008) |
+| M3 edges + nodes (deterministic extraction; thin-layer payloads) | ✅ | 22 | references/cites/crawled_from/tagged, all EXTRACTED; tag nodes (N not N² edges); on this repo's docs: 92 refs · 13 cites · 9 tagged |
+| M4 kernel `retrieve()` + verb projections (explain/graph/path; v0.22 golden byte-parity) | ⬜ | — | |
+| M5 FuxVec (codes, Hamming scan, exact rerank, dense_global into RRF) | ⬜ | — | |
+| M6 expansion (PPR-lite, paths + reliability, graph list into RRF) | ⬜ | — | |
+| M7 profiles (full/lean/auto, LRU) + `db pull` v1 | ⬜ | — | |
+| M8 scale benchmark (synthetic 100k) + eval gate (≥ v0.22 hybrid + zero-candidate rescue) | ⬜ | — | |
+| Close-out: ADRs 0008–0011, docs law, archive pair, bump | ⬜ | — | target v0.23.0 |
+
 ## Deviations from spec
 
 *(record any deliberate deviation from a handoff here, with the why and the ADR
@@ -84,3 +102,24 @@ that captures it — an empty section is the goal)*
   the doc's normative shapes (`--check` advisory + `--strict`→2, JSON `path`/
   `line_start`/`line_end`/`heading_path`/`fidelity` keys, `[n]`+Sources answer
   citations, per-field explain tree, per-kind ingest summary).
+
+- **0004 / `web:` ids apply to *all* fetched pages, not just bulk-tier ones.**
+  Handoff §B shows the `web:<slug>` id in the context of the bulk tier. Applying
+  it only there breaks the three-way `--check`: state and index would key curated
+  web docs by URL while the lock keys them by `web:` id, so every curated web doc
+  would read as a permanent STATE-DESYNC. One id scheme everywhere; the URL rides
+  along as provenance (JSON `url` field). → ADR 0008.
+
+- **0004 / the operational manifest survives, relocated.** The handoff says
+  `manifest.py` becomes `lock.py`. The lock is the committed *ledger* and
+  deliberately carries only the fields §B lists — but ingest and query still need
+  cache path, line offset and title. Those live on in
+  `.fux/index/manifest.jsonl`, inside the gitignored runtime plane, written in
+  the same scope as the lock. Git carries the recipe; the runtime keeps its
+  joins. → ADR 0008.
+
+- **0004 / `fux answer` has no state-only mode.** On a fresh clone `find` and
+  `ask` answer at doc level, but `answer` is extractive *and cited*, and
+  citations need line-anchored passages. Synthesizing them from re-derived text
+  would risk citing lines the index never scored. It declines with a reason and
+  exits 0 rather than producing an unverifiable citation. → ADR 0011.

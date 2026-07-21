@@ -8,7 +8,8 @@ from pathlib import Path
 from fux.cli import main
 from fux.config import load
 from fux.frontmatter import parse as fm_parse
-from fux.ingest.manifest import check_drift, read as manifest_read
+from fux.ingest.lock import check
+from fux.ingest.manifest import read as manifest_read
 
 from test_convert import tiny_png
 
@@ -122,14 +123,15 @@ def test_check_reports_drift(tmp_path, monkeypatch, capsys):
     assert run(tmp_path, monkeypatch, "ingest", "--check") == 0  # advisory by default
     out = capsys.readouterr().out
     assert "DRIFT  docs/guide.md  (sha mismatch — re-ingest)" in out
-    assert "DRIFT  docs/extra.md  (new — not in manifest)" in out
+    assert "DRIFT  docs/extra.md  (new — not in fux.lock)" in out
     assert "DRIFT  img/logo.png  (missing — source deleted; cache orphan)" in out
     assert "3 stale of 5" in out
     assert run(tmp_path, monkeypatch, "ingest", "--check", "--strict") == 2  # blocking
 
-    drift = check_drift(load(tmp_path))
-    assert drift.changed == ["docs/guide.md"]
-    assert drift.missing == ["img/logo.png"]
+    status = check(load(tmp_path))
+    assert ("docs/guide.md", "sha mismatch — re-ingest") in status.drift
+    assert ("img/logo.png", "missing — source deleted; cache orphan") in status.drift
+    assert status.stale == [] and status.desync == []
 
 
 def test_list_inferred_and_skipped(tmp_path, monkeypatch, capsys):
@@ -186,3 +188,35 @@ def test_unicode_paths_and_content(tmp_path, monkeypatch):
     cache = tmp_path / ".fux/cache/docs/café.md"
     assert cache.is_file()
     assert "naïve ✓" in cache.read_text(encoding="utf-8")
+
+
+# -- migration from the v0.22 layout (handoff 0004 M1) ----------------------
+
+
+def test_migrates_legacy_manifest_location(tmp_path, monkeypatch):
+    """A v0.22 repo has `.fux/manifest.jsonl`; ingest moves it into the runtime plane."""
+    make_project(tmp_path)
+    run(tmp_path, monkeypatch, "ingest")
+    legacy = tmp_path / ".fux/manifest.jsonl"
+    current = tmp_path / ".fux/index/manifest.jsonl"
+    legacy.write_text(current.read_text(encoding="utf-8"), encoding="utf-8")
+    current.unlink()
+    (tmp_path / "fux.lock").unlink()
+
+    assert manifest_read(tmp_path)  # still readable from the old home
+    assert run(tmp_path, monkeypatch, "ingest") == 0
+    assert current.is_file() and not legacy.exists()
+    assert (tmp_path / "fux.lock").is_file()
+
+
+def test_legacy_ingest_reuses_cache_without_reconverting(tmp_path, monkeypatch, capsys):
+    """Migration must not look like a corpus change — unchanged files stay unchanged."""
+    make_project(tmp_path)
+    run(tmp_path, monkeypatch, "ingest")
+    (tmp_path / ".fux/manifest.jsonl").write_text(
+        (tmp_path / ".fux/index/manifest.jsonl").read_text(encoding="utf-8"), encoding="utf-8"
+    )
+    (tmp_path / ".fux/index/manifest.jsonl").unlink()
+    capsys.readouterr()
+    run(tmp_path, monkeypatch, "ingest")
+    assert "unchanged   5" in capsys.readouterr().out
