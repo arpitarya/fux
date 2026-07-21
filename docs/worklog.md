@@ -26,6 +26,34 @@ diary.*
 
 ---
 
+## 2026-07-21 — GLOSSARY.md rename + ALL-CAPS-no-frontmatter convention · Cowork
+- **Asked:** rename glossary.md → GLOSSARY.md; ALL-CAPS markdown files need no
+  YAML frontmatter.
+- **Did:** renamed to [`GLOSSARY.md`](GLOSSARY.md) and stripped its frontmatter;
+  stripped DOC-REGISTRY.md's frontmatter too (same rule); recorded the convention
+  in CLAUDE.md §OKF (ALL-CAPS docs = entry-point files, exempt from `type` like
+  CLAUDE.md/README.md; lowercase docs conform as before) and in the glossary's
+  own Frontmatter entry; updated links in bundle index + registry row.
+- **Decided / open:** convention adopted. Nothing open.
+- **Next:** Anton dogfood (per the completed master run's close-out).
+
+## 2026-07-21 — Pipeline review: sdist hygiene, publish guard, build-check → v0.22.1 · Claude Code
+- **Asked:** review the pipeline with the new changes — is everything needed?
+- **Did (review findings, all fixed except one):** (1) the 0.22.0 **sdist shipped
+  the archived old build** (2.43 MB `archive/`) + `uv.lock` + `.github` — added
+  hatch sdist excludes + a CI assertion that the sdist stays clean (root-level
+  `archive/` only; `docs/archive/` is intended content); (2) **publish.yml had a
+  silent-failure mode** — unbumped `__version__` + `skip-existing: true` = green
+  no-op publish — added a tag↔version guard + `twine check --strict`, and scoped
+  `id-token: write` to the publish job only; (3) restored the old CI's
+  **build-check job** (`python -m build` + `twine check`) so metadata bugs fail
+  PRs, not releases; added PR concurrency cancellation; `.DS_Store` gitignored.
+  Bumped to **v0.22.1** so the corrected sdist is the published one.
+- **Needs Arpit:** the `BRANCH_PROTECTION_TOKEN` secret is **missing** — the
+  weekly protection audit will fail loudly (default GITHUB_TOKEN can't read
+  protection). Create an admin-scoped PAT and `gh secret set BRANCH_PROTECTION_TOKEN`.
+- **Next:** merge via the wall, release v0.22.1, verify the sdist on PyPI.
+
 ## 2026-07-21 — Release pipeline restored + v0.22.0 published via the wall · Claude Code
 - **Asked:** push and publish the new package; create the pipeline and always
   publish it the right way.
@@ -145,6 +173,19 @@ diary.*
   recall weak until v2 hybrid (by design); Cowork has no hook surface
   (instruction files only).
 - **Next:** Phase 2 — execute `handoff/0002-ingest-web-advanced-prompt.md`.
+
+## 2026-07-21 — Glossary created · Cowork
+- **Asked:** create a glossary.
+- **Did:** created [`glossary.md`](glossary.md) (`type: Glossary`) — ~35
+  alphabetical entries covering engine terms (BM25F, RRF, static embeddings,
+  chunk/passage, extractive answer, TextRank, eval harness/MRR), ingest terms
+  (cache/corpus/manifest/index, fidelity inferred/advanced, Docling, Tesseract,
+  CDP, RFC 6455, drift, provenance), process terms (compare doc, proposal,
+  handoff, ADR, goldens, worklog, determinism, `$0`), and agent terms (AGENTS.md,
+  SKILL.md, fail-open, Anton). Each entry links to its owning doc. Registered in
+  DOC-REGISTRY (trigger: new recurring term or meaning change) + bundle index.
+- **Decided / open:** nothing open.
+- **Next:** Anton dogfooding (DOGFOOD.md) — the build is complete at v0.22.0.
 
 ## 2026-07-21 — CLI examples doc: the input/output contract · Cowork
 - **Asked:** create examples of CLI input and output, link to necessary documents,
