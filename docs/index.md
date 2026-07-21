@@ -25,5 +25,7 @@ a `type`; this index gives progressive disclosure. (Repo-root `CLAUDE.md` and
 
 # Build
 
-* [Handoffs](handoff/) - specs + paste-ready prompts: 0000 master, 0001 v1, 0002 v1.1, 0003 v2.
-* [Archive](archive/) - implemented artifacts land here.
+* [Handoffs](handoff/) - live build specs (empty — all three phases implemented; next plan starts here).
+* [Archive](archive/) - implemented artifacts: 0000 master + 0001 v1 + 0002 v1.1 + 0003 v2, each stamped with its ADRs.
+* [Eval harness](../tests_e2e/eval/README.md) - the retrieval quality gate + Anton private-eval workflow.
+* [Distillation recipe](../tools/distill/README.md) - how the bundled model is built (dev-only).

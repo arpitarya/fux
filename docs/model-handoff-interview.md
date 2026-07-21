@@ -125,6 +125,20 @@ Build judgment a successor should keep: determinism beat wall-clock provenance
 load at 5k chunks — postings build, not format, dominates); the e2e suite earned
 its keep immediately (caught skipped-files-as-drift and answer noise).
 
+**Phase 3 shipped — the master run is complete (2026-07-21, v0.22.0).** Engine
+v2 per handoff 0003 (ADRs 0006–0007): eval harness first (the gate and the
+reopen-instrument), re-packed potion-base-8M at 7.93 MB int8 (sha-pinned, MIT),
+stdlib inference with *exact* tokenizer parity, (sha, fidelity)-keyed vector
+cache, RRF k=60 over BM25F candidates only, `--lexical-only` byte-parity
+enforced by the pre-v2 goldens. The gate passed as a tie on the fixture set
+(0.762/0.952/0.833 both engines) — recorded honestly in ADR 0006 with the
+rank-level rescues and the zero-candidate limitation; hybrid ships enabled.
+What a successor should know: the fixture eval saturates at this corpus size —
+**the Anton private eval (tests_e2e/eval/README.md) is the real instrument**,
+and it is the recorded reopen trigger for both the reranker and
+distill-our-own decisions. Final state: 172 unit + 29 e2e tests, wheel 6.98 MB
+with the bundle. Next action: Anton dogfood via DOGFOOD.md.
+
 **Phase 2 shipped (2026-07-21, v0.21.0).** Web/CDP/advanced ingest per handoff
 0002 (ADR 0005): stdlib HTML→MD (hand-rolled wins the default for determinism),
 guardrailed crawl (robots non-negotiable, sha dedupe with dual provenance,
@@ -165,6 +179,7 @@ is not done until the docs are true. Every behaviour change ships with a test.
 
 *Maintained by: Claude Opus 4.8, July 2026 — reset the record for the from-scratch
 rebuild; scoped to rules substrate + fix loop; carried the succession premise
-forward. · Claude Fable 5, 2026-07-21 — executed the master run's phase 1: shipped
-query CLI v1 (v0.20.0, ADRs 0001–0004), recorded the build judgment above.
-(Add yourself here when you make a material update — model, date, one line.)*
+forward. · Claude Fable 5, 2026-07-21 — executed the full master run: v1 query
+CLI, v1.1 web/CDP/advanced, v2 hybrid engine (v0.20.0 → v0.22.0, ADRs
+0001–0007); recorded the build judgment above; the Anton eval is the successor's
+compass. (Add yourself here when you make a material update — model, date, one line.)*

@@ -26,6 +26,48 @@ diary.*
 
 ---
 
+## 2026-07-21 — MASTER RUN COMPLETE: all three phases shipped (v0.22.0) · Claude Code
+- **Asked:** the 0000 master prompt — 0001 → 0002 → 0003 with hard gates; this is
+  the final close-out entry.
+- **Did:** all three phases implemented, gated, and archived in one run:
+  **v1** query CLI (v0.20.0, ADRs 0001–0004), **v1.1** web/CDP/advanced ingest
+  (v0.21.0, ADR 0005), **v2** hybrid engine (v0.22.0, ADRs 0006–0007).
+  Full-suite final run: `tests/` **173 passed** · `tests_e2e/` **29 passed +
+  1 gated skip** (office-with-extra) · eval gate green. README tells the whole
+  story (install → setup → ingest → ask/find/answer → agent integration →
+  corpus-in-git); 0000 master prompt archived `status: implemented`;
+  DOGFOOD.md live for Anton.
+- **Decided / open:** hybrid ships **enabled** (gate passed as a tie on the
+  fixture set — honest reading + rank-level rescues in ADR 0006); vectors are
+  derived data (gitignore-able; corpus = cache + manifest); every open question
+  in the three handoffs is resolved and recorded in its ADR.
+- **Next:** dogfood in Anton (DOGFOOD.md): configure, ingest, live with
+  `fux ask`, build the private Anton eval pairs — those numbers pick what gets
+  built next (reopen triggers live in the compare docs).
+
+## 2026-07-21 — PHASE 3 REPORT: Hybrid engine v2 shipped (v0.22.0) · Claude Code
+- **Asked:** master run, phase 3 — execute handoff 0003 (eval-first hybrid v2).
+- **Did (shipped):** eval harness (21 committed Q→passage pairs incl. deliberate
+  zero-overlap paraphrases; hit@1/hit@5/MRR; `--project/--pairs` for private
+  Anton evals); `tools/distill/` (potion-base-8M → int8 per-vector → packed
+  7.93 MB `model.bin`, sha-pinned, MIT license-checked, recipe documented);
+  `fux.embed` stdlib runtime (BertNormalizer+WordPiece with exact token-id
+  parity, mean-pool folded into the scale, exact int8 cosine, lazy 10 ms load);
+  `.fux/index/vectors.bin` chunk-vector cache ((sha, fidelity)-keyed reuse);
+  RRF fusion (k=60) over BM25F candidates with full per-result hybrid detail;
+  `--lexical-only` byte-parity with v1 proven by unchanged pre-v2 goldens;
+  answer question-similarity factor; wheel ships the bundle (6.98 MB ≤ 15 MB).
+- **Eval (the gate, in ADR 0006):** lexical 0.762/0.952/0.833 vs hybrid
+  0.762/0.952/0.833 — a tie satisfies the ≥ gate → hybrid enabled. Rank-level
+  paraphrase rescues observed; the one remaining miss has zero lexical
+  candidates (the recorded candidate-only trade). Warm hybrid query 0.2 ms.
+- **Decided / open (ADRs 0006–0007):** re-packed potion over distill-our-own
+  (no in-domain corpus yet — Anton's is the reopen trigger); single vector
+  file over shards; vectors gitignore-able as derived data. Open risks:
+  English-biased model (non-English degrades toward lexical); zero-candidate
+  documents unreachable by dense (by design, measured).
+- **Next:** final master close-out (full suites, README story, archive 0000).
+
 ## 2026-07-21 — PHASE 2 REPORT: Ingest v1.1 shipped (v0.21.0) · Claude Code
 - **Asked:** master run, phase 2 — execute handoff 0002 (web, CDP, advanced tier).
 - **Did (shipped):** stdlib `html.parser` HTML→Markdown converter (deterministic;

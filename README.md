@@ -5,10 +5,14 @@
 Fux is a portable, agent-aware knowledge engine. `fux ingest` turns the folders
 you configure into a git-versionable markdown corpus with provenance; `fux ask`
 answers natural-language questions over it with ranked, `file:line`-cited
-passages — no network, no API keys, no model calls, same answer every time.
-Built for AI agents as much as humans: `--json` everywhere, `--explain` shows
-*why* every result ranked, and generated hooks/skills teach agents to query the
-corpus before guessing.
+passages — no network, no API keys, no external model, same answer every time.
+Retrieval is **hybrid**: BM25F lexical search fused (RRF) with a **bundled
+7.9 MB static-embedding model** inferred in pure stdlib — semantic recall for
+paraphrased questions, still fully offline and deterministic
+(`--lexical-only` preserves the pure-BM25F path byte-for-byte). Built for AI
+agents as much as humans: `--json` everywhere, `--explain` shows *why* every
+result ranked (per-term field hits, dense rank, RRF contribution), and
+generated hooks/skills teach agents to query the corpus before guessing.
 
 ## Install
 
@@ -65,10 +69,19 @@ pages via CDP. Two-tier by design: the fast inferred pass runs by default; the
 advanced pass (Docling layout / tesseract OCR) upgrades exactly the files you
 ask for and persists until the source changes.
 
+## The corpus and its derived artifacts
+
+Commit `.fux/cache/` + `.fux/manifest.jsonl` — that's the knowledge corpus,
+with provenance, meant to live in git. `.fux/index/` (BM25F index + semantic
+vectors) is derived and regenerable: gitignore it if you prefer a lean repo;
+`fux ingest` rebuilds it incrementally either way.
+
 ## Guarantees
 
 - **`$0`, stdlib-only runtime** — zero third-party runtime dependencies; the
-  frontmatter parser is hand-rolled on purpose.
+  frontmatter parser, WebSocket client, and embedding inference are hand-rolled
+  on purpose. The semantic model ships *inside* the wheel (≈7 MB) — nothing is
+  ever downloaded at runtime.
 - **Deterministic** — sorted walks, stable serialization, no wall-clock output:
   the same sources produce a byte-identical cache, index, and answers. No model
   ever sits in the maintenance path.
@@ -78,10 +91,11 @@ ask for and persists until the source changes.
 
 ## Status
 
-Rebuild in progress — **v1 (query CLI) and v1.1 (web/CDP/advanced ingest)
-shipped**; the hybrid engine (bundled ≤10 MB embeddings + RRF) is next
-([docs/fux-plan.md](docs/fux-plan.md), build specs in
-[docs/handoff/](docs/handoff/)). The previous implementation is archived under
+**v1 (query CLI), v1.1 (web/CDP/advanced ingest), and v2 (bundled-model hybrid
+engine) are shipped** — v0.22.0, with an eval harness gating retrieval quality
+([docs/fux-plan.md](docs/fux-plan.md), decisions in
+[docs/adr/](docs/adr/)). Next: dogfooding in a real project
+([DOGFOOD.md](DOGFOOD.md)). The previous implementation is archived under
 [`archive/`](archive/). Docs are an OKF v0.1 bundle rooted at
 [docs/index.md](docs/index.md).
 

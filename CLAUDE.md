@@ -15,8 +15,11 @@ This file is binding. Read it before your first substantive change.
 
 ## What we are building (scope)
 
-**First deliverable: the document-query CLI — design decided 2026-07-20/21,
-v1 shipped 2026-07-21 (v0.20.0, handoff 0001 → ADRs 0001–0004)** (every fork + sub-decision closed in [`docs/compare/`](docs/compare/);
+**First deliverable: the document-query CLI — design decided 2026-07-20/21;
+v1 shipped 2026-07-21 (v0.20.0, ADRs 0001–0004); v1.1 web/CDP/advanced shipped
+same day (v0.21.0, ADR 0005); v2 hybrid engine shipped same day (v0.22.0,
+ADRs 0006–0007 — bundled 7.93 MB model, stdlib inference, RRF; eval gate
+passed as a tie, hybrid enabled by default, `--lexical-only` preserves v1)** (every fork + sub-decision closed in [`docs/compare/`](docs/compare/);
 read those before proposing changes — each records its reopen-trigger). The shape:
 
 - **Engine:** v1 **BM25F** (stdlib; heading 3.0/path 2.0/body 1.0, k1=1.2, b=0.75) →
@@ -241,8 +244,8 @@ is the proof.
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`** (unchanged). Import package: **`fux`**.
-- Version: **`0.20.0`** (v1 query CLI; the line continues 0.18.0 → 0.19.0 skeleton
-  → 0.20.0 v1 → 0.21.0 planned v1.1 → 0.22.0 planned v2). Bump in
+- Version: **`0.22.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
+  0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid). Bump in
   `src/fux/__init__.py` only.
 
 ## Hard-won build knowledge (auto-folded, 2026-07-21)

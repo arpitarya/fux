@@ -144,7 +144,7 @@ paste-ready prompt in [`handoff/`](handoff/)):
 |---|-------|-------|--------|
 | [0001](archive/0001-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ✅ **implemented** (v0.20.0, 2026-07-21; ADRs 0001–0004) |
 | [0002](archive/0002-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ✅ **implemented** (v0.21.0, 2026-07-21; ADR 0005) |
-| [0003](handoff/0003-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ready, blocked by 0001 (independent of 0002) |
+| [0003](archive/0003-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ✅ **implemented** (v0.22.0, 2026-07-21; ADRs 0006–0007; gate passed as tie → ships enabled) |
 
 Sequencing: 0001 → dogfood in Anton → then 0002 and/or 0003 in either order, each
 gated by the dogfood telling us which pain is real. **Arpit's call (2026-07-21): one
@@ -161,13 +161,14 @@ Claude Code.
 | Package skeleton | ✅ | src/ layout, hatchling, CLI + FuxError, smoke tests |
 | Query CLI — design decisions | ✅ | engine/output/ingest/model verdicts accepted; see `compare/` |
 | Query CLI — **v1 build** (setup/ingest/BM25F/ask/find/answer/agents) | ✅ | **v0.20.0** (2026-07-21); ADRs 0001–0004; DOGFOOD.md emitted |
-| Ingest v1.1 (web/CDP/advanced — handoff 0002) | ✅ | **v0.21.0** (2026-07-21); ADR 0005; 154 unit + 24 e2e tests |
-| Hybrid engine v2 (handoff 0003) | ⬜ | next in the master run |
+| Ingest v1.1 (web/CDP/advanced — handoff 0002) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
+| Hybrid engine v2 (bundled model + RRF — handoff 0003) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 173 unit + 28 e2e tests; eval numbers in ADR 0006 |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
 
 ## 8. Next move
 
-Continue the master run: handoff 0003 (eval harness → distilled ≤10 MB bundled
-model → stdlib inference → RRF hybrid, gated by the eval numbers). Anton
-dogfooding proceeds in parallel via [DOGFOOD.md](../DOGFOOD.md).
+**The master run (0001 → 0002 → 0003) is complete at v0.22.0.** Next: dogfood
+in Anton via [DOGFOOD.md](../DOGFOOD.md) — build the private Anton eval set
+(tests_e2e/eval/README.md), let its numbers drive what's next (the reopen
+triggers live in the compare docs; the held rule engine remains the long arc).

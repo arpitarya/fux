@@ -18,8 +18,8 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — Phase 2 complete (v0.21.0).
-> Next: Phase 3 (handoff 0003, hybrid engine v2).
+> *(building agent: keep this one line current)* — **All three phases complete
+> (v0.22.0).** The master run is done; next is Anton dogfooding (DOGFOOD.md).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -58,14 +58,14 @@ happened per exchange"; keep both.*
 
 | Milestone | Status | Tests | Notes |
 |-----------|--------|-------|-------|
-| M1 eval harness + lexical baseline recorded | ⬜ | — | |
-| M2 distillation pipeline (`tools/distill/`, ≤10 MB asserted) | ⬜ | — | |
-| M3 stdlib inference (`fux.embed`, int8) | ⬜ | — | |
-| M4 chunk-vector cache (manifest-invalidated) | ⬜ | — | |
-| M5 RRF fusion + `--lexical-only` + explain | ⬜ | — | |
-| M6 eval gate: hybrid ≥ lexical (numbers → ADR) | ⬜ | — | |
-| M7 packaging (bundle in wheel, lazy load, size checks) | ⬜ | — | |
-| Close-out: ADRs 0006–0007, docs law, archive pair, bump | ⬜ | — | |
+| M1 eval harness + lexical baseline recorded | ✅ | 2 | 21 pairs; lexical: hit@1 0.762 · hit@5 0.952 · MRR 0.833 |
+| M2 distillation pipeline (`tools/distill/`, ≤10 MB asserted) | ✅ | — | potion-base-8M re-pack, int8, 7.93 MB, sha-pinned, MIT-checked |
+| M3 stdlib inference (`fux.embed`, int8) | ✅ | 10 | exact tokenizer parity; int8 dot; lazy load 10 ms |
+| M4 chunk-vector cache (manifest-invalidated) | ✅ | 4 | single vectors.bin; (sha, fidelity)-keyed reuse |
+| M5 RRF fusion + `--lexical-only` + explain | ✅ | 3 | k=60; v1 byte-parity proven by unchanged goldens |
+| M6 eval gate: hybrid ≥ lexical (numbers → ADR) | ✅ | 1 | tie (gate ≥ passes, ships enabled); rank-level rescues; ADR 0006 |
+| M7 packaging (bundle in wheel, lazy load, size checks) | ✅ | 1 | wheel 6.98 MB ≤ 15; bundle ≤ 10 asserted; warm query 0.2 ms |
+| Close-out: ADRs 0006–0007, docs law, archive pair, bump | ✅ | — | v0.22.0; suites: 172 unit + 28 e2e (+1 gated skip) |
 
 ## Deviations from spec
 

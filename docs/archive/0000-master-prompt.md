@@ -2,7 +2,7 @@
 type: Handoff Prompt
 title: Master prompt — execute handoffs 0001 → 0002 → 0003 sequentially
 description: One paste-ready prompt that builds all three specced phases in order, with hard gates between them.
-status: ready
+status: implemented
 timestamp: 2026-07-21T00:00:00Z
 ---
 

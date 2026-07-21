@@ -2,7 +2,8 @@
 type: Handoff
 title: Engine v2 — bundled ≤10 MB static-embedding model + RRF hybrid + eval harness
 description: Adds semantic recall to the deterministic engine — packaged model, pure-stdlib inference, RRF fusion — gated and measured by the Anton eval set.
-status: ready
+status: implemented
+adrs: [../adr/0006-bundled-model.md, ../adr/0007-rrf-hybrid-fusion.md]
 blocked_by: 0001-query-cli-v1-handoff.md
 timestamp: 2026-07-21T00:00:00Z
 ---

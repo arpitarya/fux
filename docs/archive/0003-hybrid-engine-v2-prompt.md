@@ -2,7 +2,8 @@
 type: Handoff Prompt
 title: Claude Code prompt — Engine v2 (bundled model + RRF hybrid)
 description: Paste-ready prompt executing handoff 0003.
-status: ready
+status: implemented
+adrs: [../adr/0006-bundled-model.md, ../adr/0007-rrf-hybrid-fusion.md]
 blocked_by: 0001-query-cli-v1-handoff.md
 timestamp: 2026-07-21T00:00:00Z
 ---

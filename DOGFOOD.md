@@ -67,10 +67,14 @@ Generates AGENTS.md (+ CLAUDE.md/copilot/Kiro pointers), the
 `fux-query`/`fux-ingest` skills, and Claude Code hooks that inject relevant
 passages on every prompt (fail-open — they can never break a session).
 
-## What to watch for (this gates 0002 vs 0003)
+## What to watch for (all three phases are now shipped)
 
-- **Paraphrase misses** — you ask in words the docs don't use, BM25F finds
-  nothing → evidence for engine v2 (hybrid embeddings, handoff 0003).
-- **Thin conversions** — a PDF/image stub answer is too shallow → evidence for
-  the advanced ingest tier (handoff 0002).
+- **Retrieval quality** — the engine is hybrid (BM25F + bundled embeddings,
+  RRF). Build the private Anton eval set (`tests_e2e/eval/README.md`) and run
+  it; those numbers are the reopen instrument for the engine decisions.
+  `--lexical-only` compares against pure v1 any time.
+- **Thin conversions** — a PDF/image citation looks shallow? Check its
+  `fidelity`; upgrade with `fux ingest --advanced <file>` (docling/tesseract).
+- **Web sources** — add `[sources.web]` urls to fux.toml and run
+  `fux ingest --web`; `render = "cdp"` for JS-rendered pages.
 - Anything confusing or slow: note it in `docs/worklog.md`.

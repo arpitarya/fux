@@ -210,9 +210,18 @@ In `--json`, `explain` is per-term: `{"term", "idf", "tf": {heading,path,body},
 "contribution"}`. `fux answer --explain` shows the per-sentence factor product
 (`passage × (overlap + 0.05) × (0.5 + 0.5·centrality)`).
 
-With hybrid (v2, handoff 0003) `--explain` adds RRF detail:
-`bm25f rank 1 + dense rank 2 → rrf 0.0325`; `--lexical-only` restores the pure-v1
-path.
+**Hybrid (v2, default when the bundled model ships):** the headline `score`
+becomes the RRF value, `"engine": "hybrid"`, and every result carries a
+`hybrid` object (`bm25f_rank`/`bm25f_score`/`dense_rank`/`similarity`/`rrf`).
+`--explain` renders it as:
+
+```
+  bm25f rank 1 (score 7.412) + dense rank 2 (sim 0.8341) → rrf 0.03252
+```
+
+`--lexical-only` restores the pure-v1 path byte-for-byte (enforced by the
+pre-v2 goldens); a missing bundle or an all-out-of-vocabulary query falls back
+to lexical automatically (`"engine": "bm25f"` tells you which you got).
 
 ## Errors (the contract in practice)
 
