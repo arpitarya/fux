@@ -14,18 +14,22 @@ import sys
 import traceback
 from pathlib import Path
 
+from . import debug
+
 _TOP = 3
 _SNIPPET_LINES = 3
 
 
 def cmd_hook(args) -> int:
     try:
+        debug.dbg("hooks", "info", "hook fired", event=args.event)
         if args.event == "prompt-submit":
             return _prompt_submit()
         return _session_end()
     except Exception:
         if os.environ.get("FUX_DEBUG"):
             traceback.print_exc()
+        debug.dbg("hooks", "debug", "hook error swallowed (fail-open)", event=args.event)
         return 0  # fail-open — never break the host session
 
 
@@ -34,12 +38,14 @@ def _prompt_submit() -> int:
     payload = json.loads(sys.stdin.read() or "{}")
     prompt = payload.get("prompt", "")
     if not isinstance(prompt, str) or len(prompt.split()) < 3:
+        debug.dbg("hooks", "debug", "prompt too short — no injection")
         return 0
     from .config import find_root, load
     from .index import load_searcher
 
     config = load(find_root(Path.cwd()))
     results = load_searcher(config).search(prompt, top=_TOP)
+    debug.dbg("hooks", "debug", "prompt-submit passages", results=len(results))
     if not results:
         return 0
     lines = ["Fux corpus passages relevant to this prompt (cite file:line):"]

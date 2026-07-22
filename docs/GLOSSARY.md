@@ -55,6 +55,13 @@ Arpit accepts or overrides, and a reopen-trigger. Lives in [`compare/`](compare/
 cache + manifest (committed) with the index derived from it. "A corpus, not a
 disposable index" — see [PLAN §6b](PLAN.md).
 
+**Debug (`fux.debug`, `[debug]`)** — The observability surface (v0.24):
+`dbg()`/`timer()` emit structured, stderr-or-file-only lines, gated by
+`[debug] level` (off/info/debug/trace) and `categories`. Precedence
+`--debug[=LEVEL]` > `FUX_DEBUG=<level|1>` > toml `level` > `off`. Never touches
+stdout, never branches behaviour, redacts document content by default. See
+[example/DEBUG.md](example/DEBUG.md), [ADR 0012](adr/0012-debug-observability.md).
+
 **Determinism** — Same sources → byte-identical cache, manifest, index — and the
 same question → the same answer. No wall-clock output, no model in the maintenance
 path, sorted walks, stable serialization. The property behind trust, goldens, and
@@ -111,6 +118,13 @@ the zero-dependency promise. OKF requires a `type` key on every knowledge doc.
 (Repo convention: ALL-CAPS docs — GLOSSARY.md, DOC-REGISTRY.md — are entry-point
 files exempt from frontmatter, like CLAUDE.md/README.md.)
 
+**`fux doctor`** — The whole-install/corpus diagnostic (v0.24): seven groups
+(environment, capabilities, config, corpus, consistency, agent surface,
+self-test), exit 0 healthy / 1 problems found, `--json` for agents. Every
+failing check names what's wrong, why it matters, and the exact fix command —
+the zero-match `[sources]` glob is its most prominent catch. See
+[example/DEBUG.md](example/DEBUG.md).
+
 **`fux.lock`** — The committed sources ledger at the repo root: sorted JSONL, one
 line per source, recording sha, size and conversion provenance. Answers *what is
 in the corpus, when was it taken, is it stale?* Staleness is structural per kind —
@@ -125,6 +139,11 @@ by Hamming distance (`(q ^ c).bit_count()` — measured ~27 M comparisons/sec), 
 re-scores the top 500 with exact int8 cosine. The codes only *select*; the final
 ordering is exact. Removed the candidate-only ceiling ADR 0006 recorded. See
 [ADR 0010](adr/0010-fuxvec-binary-dense-search.md).
+
+**`fux why`** — The negative-result explainer (v0.24): walks one named
+document through corpus-presence → chunks → lexical → dense → graph, ending in
+a single **verdict** sentence — the whole feature, since `--explain` only
+explains results that already appeared. See [example/DEBUG.md](example/DEBUG.md).
 
 **Goldens** — Committed expected outputs (`tests_e2e/goldens/`, normalized JSON)
 that the real CLI's output must match byte-for-byte. Updated deliberately on

@@ -58,6 +58,18 @@ def _cmd_hook(args) -> int:
     return cmd_hook(args)
 
 
+def _cmd_doctor(args) -> int:
+    from .doctor import cmd_doctor
+
+    return cmd_doctor(args)
+
+
+def _cmd_why(args) -> int:
+    from .query.why import cmd_why
+
+    return cmd_why(args)
+
+
 def _add_query_flags(sp: argparse.ArgumentParser, *, context: bool = False, answer: bool = False):
     sp.add_argument("query", help="natural-language question")
     sp.add_argument("--json", action="store_true", help="machine-readable output")
@@ -85,6 +97,11 @@ def build_parser() -> argparse.ArgumentParser:
         description="Fux — a $0, deterministic knowledge engine over your own documents.",
     )
     parser.add_argument("--version", action="version", version=f"fux {__version__}")
+    parser.add_argument(
+        "--debug", nargs="?", const="debug", default=None, metavar="LEVEL",
+        help="debug output to stderr/file (info|debug|trace; bare flag = debug); "
+        "never touches stdout — see docs/example/DEBUG.md",
+    )
     parser.set_defaults(_handler=None)
     sub = parser.add_subparsers(dest="command")
 
@@ -160,6 +177,20 @@ def build_parser() -> argparse.ArgumentParser:
     sp.add_argument("event", choices=["prompt-submit", "session-end"])
     sp.set_defaults(_handler=_cmd_hook)
 
+    sp = sub.add_parser("doctor", help="diagnose the whole install/corpus (exit 0 healthy, 1 problems)")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.set_defaults(_handler=_cmd_doctor)
+
+    sp = sub.add_parser("why", help="explain why a document did or didn't rank for a query")
+    sp.add_argument("query", help="the question to evaluate")
+    sp.add_argument("--doc", required=True, metavar="DOC-ID", help="document id to explain")
+    sp.add_argument("--json", action="store_true", help="machine-readable output")
+    sp.add_argument("--top", type=int, default=5, metavar="N", help="the --top a normal query would use (default 5)")
+    sp.add_argument(
+        "--lexical-only", action="store_true", help="evaluate the pure BM25F path only",
+    )
+    sp.set_defaults(_handler=_cmd_why)
+
     return parser
 
 
@@ -173,6 +204,12 @@ def main(argv: list[str] | None = None) -> int:
                 pass
     parser = build_parser()
     args = parser.parse_args(argv)
+
+    if args.debug is not None and args.debug not in ("info", "debug", "trace"):
+        parser.error(f"--debug: invalid LEVEL {args.debug!r} (choose info, debug or trace)")
+    from .debug import init_from_cli
+
+    init_from_cli(args.debug)
 
     handler = getattr(args, "_handler", None)
     if handler is None:

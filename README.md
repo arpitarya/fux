@@ -182,6 +182,8 @@ fux graph "<topic>"              # the nodes and edges around a topic
 fux path <doc-id> <doc-id>       # how two documents connect (or that they don't)
 fux cat <doc-id> [--out FILE]    # print one document, wherever it is stored
 fux db pull <url>                # fetch a CI-built index, sha-verified vs fux.lock
+fux doctor [--json]               # whole-install/corpus health, 7 groups, fix commands
+fux why "<query>" --doc <path>    # why a document did or didn't rank — one verdict line
 fux hook prompt-submit|session-end    # fail-open agent-hook entrypoints
 ```
 </details>
@@ -214,7 +216,16 @@ use; the design of record is [docs/PLAN.md](docs/PLAN.md).
 
 ## What's new
 
-**Latest — v0.23.1 (2026-07-22): docs & examples.** Documentation-only patch (no
+**Latest — v0.24.0 (2026-07-22): debug & observability.** Every stage is now
+inspectable without a debugger: `[debug]` in `fux.toml` (level/categories/
+output/timing/redact, `--debug=trace`/`FUX_DEBUG`), a stdout-safe emitter
+instrumenting the whole pipeline, **`fux doctor`** (seven-group whole-install
+diagnosis — every failing check names the exact fix command), **`fux why`**
+(explains why a document did or didn't rank for a query, ending in one
+verdict sentence), and a third skill, **`fux-debug`**, so an agent can
+self-diagnose. See [`docs/example/DEBUG.md`](docs/example/DEBUG.md).
+
+**v0.23.1 (2026-07-22): docs & examples.** Documentation-only patch (no
 engine change). The docs bundle was reorganized — core trackers promoted to
 ALL-CAPS entry-point files — and a new [`docs/example/`](docs/example/) bundle
 landed: worked, verified examples for the CLI, config, setup + hook installation,
@@ -230,10 +241,11 @@ Full release history → **[CHANGELOG.md](CHANGELOG.md)**.
 
 ## Status
 
-**v0.23.x — the knowledge substrate is shipped**: v1 query CLI, v1.1 web/CDP/
+**v0.24.x — debug & observability is shipped**: v1 query CLI, v1.1 web/CDP/
 advanced ingest, v2 bundled-model hybrid, v3 substrate (SQLite store, committed
 `fux.lock` + state plane, one retrieval kernel, the FuxVec dense engine, graph
-verbs, lean/full profiles) — 360+ unit tests, 70+ e2e, eval gate beaten.
+verbs, lean/full profiles), v4 debug (`[debug]` + emitter, `fux doctor`,
+`fux why`, `fux-debug` skill) — 417 unit tests, 100 e2e, eval gate beaten.
 
 Retrieval quality across the staged engines, on the committed 21-pair eval set:
 

@@ -12,6 +12,7 @@ one big JSON blob per CLI call stops being free.
 
 from __future__ import annotations
 
+from .. import debug
 from ..config import Config
 from ..frontmatter import parse as fm_parse
 from ..graph import edges_from_scans, scan_document
@@ -53,6 +54,8 @@ def build_index(
     prev = _load_any(config)
     files: dict[str, dict] = {}
     total = 0
+    reused = 0
+    rebuilt = 0
     for entry in entries:
         rel = doc_id_for(entry)
         if entry.get("duplicate_of") or not (entry.get("cache") or rel in bulk_text):
@@ -79,6 +82,8 @@ def build_index(
                 "scan": scan, **_doc_meta(entry),
             }
             total += len(cached["chunks"])
+            reused += 1
+            debug.dbg("index", "debug", "reused chunks", doc=rel, chunks=len(cached["chunks"]))
             continue
         offset = entry.get("line_offset")
         chunks = []
@@ -92,6 +97,8 @@ def build_index(
                     "words": c.words,
                 }
             )
+        rebuilt += 1
+        debug.dbg("chunk", "debug", "chunked", doc=rel, chunks=len(chunks))
         files[rel] = {
             "sha256": entry["sha256"],
             "fidelity": entry.get("fidelity", "inferred"),
@@ -106,15 +113,23 @@ def build_index(
 
     # Resolution needs the whole corpus: a newly added document can make an
     # existing link resolve, so edges are rebuilt every ingest from cached scans.
-    edges = edges_from_scans(
-        {rel: meta["scan"] for rel, meta in files.items() if meta.get("scan")}
-    )
+    with debug.timer("graph", "resolve edges"):
+        edges = edges_from_scans(
+            {rel: meta["scan"] for rel, meta in files.items() if meta.get("scan")}
+        )
+    debug.dbg("graph", "info", "edges resolved", edges=len(edges))
     backend = backend_for(config, total, bulk=bool(bulk_text))
-    if backend is sqlstore:
-        backend.save(root, files, bulk_text=bulk_text, edges=edges)
-    else:
-        backend.save(root, files, edges=edges)
+    with debug.timer("index", "write backend"):
+        if backend is sqlstore:
+            backend.save(root, files, bulk_text=bulk_text, edges=edges)
+        else:
+            backend.save(root, files, edges=edges)
     _drop_other_backend(config, backend)
+    debug.dbg(
+        "index", "info", "index built",
+        docs=len(files), chunks=total, reused=reused, rebuilt=rebuilt,
+        backend="sqlite" if backend is sqlstore else "json",
+    )
     return total
 
 

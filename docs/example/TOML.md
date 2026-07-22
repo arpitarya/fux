@@ -61,6 +61,15 @@ prefilter_width  = 500           # FuxVec Hamming candidates re-scored exactly
 [git]
 commit_cache = false             # true = also commit .fux/cache (knowledge-as-diffs)
 
+[debug]                           # observability (v3.1) — never touches stdout
+level      = "off"               # off | info | debug | trace
+categories = ["*"]                # subset of: config walk convert chunk index state
+                                  #   lock query lexical dense graph answer hooks web
+output     = "stderr"            # "stderr" or a file path (e.g. ".fux/debug.log")
+timing     = false               # per-stage wall time (non-deterministic — off by default)
+redact     = true                # log ids/paths/counts/scores; never document content
+max_bytes  = 5000000             # cap the log file; truncate-with-notice, never silently
+
 [sources.web]                    # fenced network — only fetched by `fux ingest --web`
 urls         = []                # crawl roots; empty = --web does nothing
 max_depth    = 1                 # link levels below each root (0 = the page only)
@@ -76,6 +85,12 @@ settle_ms    = 500               # post-load settle before DOM capture (cdp only
 max_age_days = 30                # url staleness horizon used by `fux ingest --check`
 tier         = "curated"         # "mirror" = no page files at all; text lives in fux.db
 ```
+
+**Precedence for `[debug] level`:** `--debug[=LEVEL]` (global CLI flag) >
+`FUX_DEBUG=<level|1>` (env; `1` means `debug`, for back-compat with the pre-v0.24
+hook contract) > `[debug] level` > `off`. The other `[debug]` keys
+(`categories`/`output`/`timing`/`redact`/`max_bytes`) have no flag/env override —
+`fux.toml` is their only source. See [DEBUG.md](DEBUG.md).
 
 **What git carries** (see [ADR 0008](../adr/0008-substrate-store-lock-state.md)):
 `fux.toml` and `fux.lock` at the root, plus `.fux/state/` — together the recipe

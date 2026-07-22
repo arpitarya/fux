@@ -16,7 +16,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .. import __version__
+from .. import __version__, debug
 from ..config import Config, find_root, load
 from ..errors import FuxError
 from ..frontmatter import dumps as fm_dumps
@@ -155,35 +155,38 @@ def _write_state_plane(config: Config, entries: list[dict]) -> int:
     from ..state import DocState, bloom, write_state
     from ..state.df import build as build_df, write_df
 
-    files = backend_for(config).load(config.root)
-    vectors = load_vectors(config.root)
-    by_source = {e["source"]: e for e in entries}
-    docs = []
-    for doc_id in sorted(files):
-        meta = files[doc_id]
-        terms = set(path_tokens(doc_id)) | set(tokenize(meta.get("title", "")))
-        for chunk in meta["chunks"]:
-            terms |= set(tokenize(chunk["heading"])) | set(tokenize(chunk["text"]))
-        entry = by_source.get(doc_id, {})
-        flags = [meta.get("fidelity", "inferred")]
-        if entry.get("origin") in ("url", "attachment"):
-            flags.append("web")
-        vecs = (vectors.get(doc_id) or {}).get("vecs", [])
-        docs.append(
-            DocState(
-                doc_id=doc_id,
-                sha12=meta["sha256"][:12],
-                title=meta.get("title", ""),
-                flags=flags,
-                code=doc_code(vecs),
-                sig=bloom.build(terms),
+    with debug.timer("state", "write state plane"):
+        files = backend_for(config).load(config.root)
+        vectors = load_vectors(config.root)
+        by_source = {e["source"]: e for e in entries}
+        docs = []
+        for doc_id in sorted(files):
+            meta = files[doc_id]
+            terms = set(path_tokens(doc_id)) | set(tokenize(meta.get("title", "")))
+            for chunk in meta["chunks"]:
+                terms |= set(tokenize(chunk["heading"])) | set(tokenize(chunk["text"]))
+            entry = by_source.get(doc_id, {})
+            flags = [meta.get("fidelity", "inferred")]
+            if entry.get("origin") in ("url", "attachment"):
+                flags.append("web")
+            vecs = (vectors.get(doc_id) or {}).get("vecs", [])
+            docs.append(
+                DocState(
+                    doc_id=doc_id,
+                    sha12=meta["sha256"][:12],
+                    title=meta.get("title", ""),
+                    flags=flags,
+                    code=doc_code(vecs),
+                    sig=bloom.build(terms),
+                )
             )
-        )
-    # The df sidecar: exact corpus statistics, so lean scoring is provably
-    # identical to full rather than approximately so (handoff §C, amended).
-    stats, buckets = build_df(files)
-    write_df(config.root, stats, buckets)
-    return write_state(config.root, docs)
+        # The df sidecar: exact corpus statistics, so lean scoring is provably
+        # identical to full rather than approximately so (handoff §C, amended).
+        stats, buckets = build_df(files)
+        write_df(config.root, stats, buckets)
+        written = write_state(config.root, docs)
+    debug.dbg("state", "info", "state plane written", docs=written)
+    return written
 
 
 def _ingest_web(

@@ -74,6 +74,8 @@ offline, deterministic, `$0`, with `file:line` citations.
 3. Zero hits ≠ "does not exist": try broader terms with `fux find`, and check
    the corpus is fresh (`fux ingest --check`).
 4. If sources changed, run `fux ingest` (incremental) and re-ask.
+5. If results look wrong, stale, or unexpectedly empty, use the **fux-debug**
+   skill instead of guessing.
 """,
     "fux-ingest": """\
 ---
@@ -108,6 +110,45 @@ Deterministic and incremental: unchanged files are never rewritten.
    re-ask; the upgrade persists until the source itself changes.
 4. Office/PDF need the opt-in extra: `pip install 'fux-engine[ingest]'`;
    the advanced tier needs docling and/or the tesseract binary.
+5. Files skipped or still stale after a re-ingest? Use the **fux-debug** skill
+   instead of guessing.
+""",
+    "fux-debug": """\
+---
+name: fux-debug
+description: Diagnose Fux itself — when queries return nothing or look stale or wrong, when ingest skipped files, or when a command errors. Runs fux doctor, fux ingest --check, and fux why to find the cause before changing anything.
+---
+
+# fux-debug
+
+Diagnose *Fux*, not the project it indexes: use this when `fux ask`/`find`/
+`answer` return nothing or look wrong, `fux ingest` skipped files, or any
+command errors unexpectedly.
+
+## Commands
+
+- `fux doctor --json` — whole-install/corpus health (7 groups; every failing
+  check names what's wrong, why it matters, and the exact fix command).
+- `fux ingest --check` — is the corpus stale vs. `fux.lock`?
+- `fux why "<question>" --doc <expected-file> --json` — why one document did
+  or didn't rank for a query, ending in a single verdict line.
+- `fux ingest --advanced <file>` — upgrade a thin/garbled passage's fidelity.
+- `--debug=debug` (or `--debug=trace` for per-chunk/per-term detail) on any
+  command — stderr-only structured trace, never touches the command's own
+  stdout/JSON.
+
+## Workflow (cheapest first)
+
+1. `fux doctor --json` — is the install/corpus healthy at all?
+2. `fux ingest --check` — is the corpus stale? If so, `fux ingest` then re-ask.
+3. `fux why "<question>" --doc <expected-file> --json` — why is the expected
+   document missing or ranking low? Read the `verdict` field first.
+4. If a returned passage looks thin or garbled: check its `fidelity` — if
+   `inferred`, `fux ingest --advanced <that source>` and re-ask.
+5. Still unexplained? Re-run the failing command with `--debug=debug` (or
+   `--debug=trace` for full detail) and report the stderr trace.
+6. **Report, don't guess** — surface the `doctor`/`why`/trace output to the
+   user rather than speculating about the cause.
 """,
 }
 

@@ -4,6 +4,41 @@ All notable changes to **fux-engine** (the rebuild line). Dates are ISO; version
 follow semver. The latest entry is mirrored in [README.md](README.md) § What's new.
 Maintained on every version bump (registry-tracked).
 
+## [0.24.0] — 2026-07-22 — debug & observability
+
+Phase 5 (handoff 0005, ADR 0012). Fux was deterministic and cited, but not
+*diagnosable* — this phase makes every stage inspectable without a debugger:
+
+- **`[debug]` in `fux.toml`** — `level` (off/info/debug/trace), `categories`,
+  `output` (stderr or a file), `timing`, `redact`, `max_bytes`. Precedence
+  `--debug[=LEVEL]` > `FUX_DEBUG=<level|1>` > toml `level` > `off`.
+- **`src/fux/debug.py`** — a hand-rolled, stdlib-only emitter (`dbg()`/
+  `timer()`/`is_enabled()`). **Never touches stdout** (proven by a
+  determinism test written before any instrumentation existed, and kept
+  green through every milestone); redacts document content by default; no
+  wall-clock unless `timing = true`; `off` costs nothing measurable.
+  Instrumented at every pipeline stage: walk, convert, chunk, index, state,
+  lock, query, lexical, dense, graph, answer, hooks, web.
+- **`fux doctor`** — whole-install/corpus diagnosis across seven groups
+  (environment, capabilities, config, corpus, consistency, agent surface,
+  self-test); exit 0 healthy / 1 problems; `--json` for agents. Every failing
+  check names what's wrong, why it matters, and the exact fix command — a
+  `[sources]` entry matching zero files (the #1 silent misconfig) is now
+  surfaced loudly instead of silently ingesting nothing.
+- **`fux why "<query>" --doc <path>`** — explains why one document did or
+  didn't rank, walking corpus-presence → chunks → lexical → dense → graph and
+  ending in a single verdict sentence. Reads its dense/graph evidence from the
+  same `kernel.retrieve()` a real query uses.
+- **`fux-debug` skill** (`fux setup --skills` now writes three skills) — runs
+  `doctor` → `ingest --check` → `why` → `--advanced` → `--debug=debug`, in
+  that order, and tells the agent to report findings rather than guess. The
+  existing `fux-query`/`fux-ingest` skills each gained a one-line escalation
+  pointer to it.
+- **New doc:** `docs/example/DEBUG.md` — worked failure → diagnosis → fix,
+  for all five questions debug exists to answer.
+
+Suites: 417 unit + 100 e2e (+1 gated skip).
+
 ## [0.23.1] — 2026-07-22 — docs & examples (no engine change)
 
 Documentation-only patch. The wheel is functionally identical to 0.23.0 — the

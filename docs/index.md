@@ -19,18 +19,18 @@ convention.)
 * [Worklog](WORKLOG.md) - per-exchange session trail, newest first.
 * [Implementation tracker](IMPLEMENTATION.md) - live milestone status; updated on EVERY execution, whatever the outcome.
 * [Doc registry](DOC-REGISTRY.md) - maintained docs, update triggers, last-verified dates.
-* [Examples bundle](example/) - copy-from contracts: [CLI.md](example/CLI.md) (command I/O; goldens derive from it), [TOML.md](example/TOML.md) (annotated config), [SETUP.md](example/SETUP.md) (setup variants + hooks install), [SKILLS.md](example/SKILLS.md) (skill usage), [API.md](example/API.md) (drive the engine from a script).
+* [Examples bundle](example/) - copy-from contracts: [CLI.md](example/CLI.md) (command I/O; goldens derive from it), [TOML.md](example/TOML.md) (annotated config), [SETUP.md](example/SETUP.md) (setup variants + hooks install), [SKILLS.md](example/SKILLS.md) (skill usage), [API.md](example/API.md) (drive the engine from a script), [DEBUG.md](example/DEBUG.md) (debug/observability worked failures).
 * [Glossary](GLOSSARY.md) - every recurring term, defined once, linked to its owning doc.
 
 # Decisions
 
 * [Compare docs](compare/) - every fork's debate + accepted verdict + reopen-trigger (all closed).
 * [Proposals](proposals/) - parked ideas with graduation triggers.
-* [ADRs](adr/) - one per completed feature (0001–0004: config/setup, ingest+cache+chunker, BM25F+query, agent integration).
+* [ADRs](adr/) - one per completed feature (0001–0012: config/setup through debug & observability).
 
 # Build
 
-* [Handoffs](handoff/) - live build specs (empty — all three phases implemented; next plan starts here).
-* [Archive](archive/) - implemented artifacts, version-named: master-prompt + v0.20.0 (v1) + v0.21.0 (v1.1) + v0.22.0 (v2) + v0.23.0 (substrate), each stamped with its ADRs.
+* [Handoffs](handoff/) - live build specs (empty — all five phases implemented; next plan starts here).
+* [Archive](archive/) - implemented artifacts, version-named: master-prompt + v0.20.0 (v1) + v0.21.0 (v1.1) + v0.22.0 (v2) + v0.23.0 (substrate) + v0.24.0 (debug & observability), each stamped with its ADRs.
 * [Eval harness](../tests_e2e/eval/README.md) - the retrieval quality gate + Anton private-eval workflow.
 * [Distillation recipe](../tools/distill/README.md) - how the bundled model is built (dev-only).

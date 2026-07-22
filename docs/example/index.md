@@ -1,7 +1,7 @@
 ---
 type: Index
 title: Examples — worked contracts you can copy from
-description: The example bundle — worked CLI I/O, the annotated fux.toml, setup + hooks installation, skill usage, and the Python API. Progressive-disclosure index (OKF) so agents see what exists before opening files.
+description: The example bundle — worked CLI I/O, the annotated fux.toml, setup + hooks installation, skill usage, debug/observability, and the Python API. Progressive-disclosure index (OKF) so agents see what exists before opening files.
 timestamp: 2026-07-22T00:00:00Z
 ---
 
@@ -15,8 +15,9 @@ the *why* lives in [`../PLAN.md`](../PLAN.md), the ADRs, and the compare docs.
 | [`CLI.md`](CLI.md) | Worked input/output for every `fux` command — the UX contract the e2e goldens must match | Any command/flag/output-format/exit-code change |
 | [`TOML.md`](TOML.md) | The annotated example `fux.toml` — a complete config (v0.23.x), every shipped key with its default plus prose per key | Any config key added/renamed/re-defaulted |
 | [`SETUP.md`](SETUP.md) | `fux setup` variants + what `--agents --skills --hooks` installs (real output, hook JSON, idempotency) | Any `fux setup` flag, generated file, or hook change |
-| [`SKILLS.md`](SKILLS.md) | The two shipped skills (`fux-query`/`fux-ingest`) verbatim + a worked agent usage flow | Any skill content or `fux ask --json` shape change |
+| [`SKILLS.md`](SKILLS.md) | The three shipped skills (`fux-query`/`fux-ingest`/`fux-debug`) verbatim + a worked agent usage flow | Any skill content or `fux ask --json` shape change |
 | [`API.md`](API.md) | Driving the engine from another script: create a file → ingest → query, with real output | Any change to `find_root`/`load`/`ingest_paths`/`load_searcher` |
+| [`DEBUG.md`](DEBUG.md) | `[debug]` config, the `dbg()`/`timer()` emitter, `fux doctor`'s seven groups, `fux why`'s verdict line — worked failures + fixes | Any change to `[debug]` semantics, doctor's checks, or why's evidence/verdict |
 
 These are **maintained contracts**, not snapshots — they must stay byte-true to the
 shipped surface (`TOML.md` is asserted against the parser by

@@ -22,7 +22,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from urllib.parse import urlsplit
 
-from .. import __version__
+from .. import __version__, debug
 from ..config import WebParams
 from .convert import ConvertResult, convert
 from .htmlmd import extract_links, extract_title, html_to_markdown
@@ -153,17 +153,21 @@ def crawl(
         seen_urls.add(url)
         if not _domain_allowed(url, root_hosts, web):
             report.skipped.append((url, "off-domain (same_domain; add to allow to include)"))
+            debug.dbg("web", "debug", "skipped", url=url, reason="off-domain")
             continue
         if not robots.allowed(url):
             report.skipped.append((url, "disallowed by robots.txt"))
+            debug.dbg("web", "debug", "skipped", url=url, reason="robots.txt")
             continue
         if fetched >= web.budget:
             report.skipped.append((url, f"page budget reached ({web.budget})"))
+            debug.dbg("web", "debug", "skipped", url=url, reason="budget reached")
             continue
         try:
             final_url, data, ctype = fetcher.fetch(url)
         except WebSkip as exc:
             report.skipped.append((url, str(exc)))
+            debug.dbg("web", "debug", "skipped", url=url, reason=str(exc))
             continue
         fetched += 1
         seen_urls.add(final_url)
@@ -203,6 +207,10 @@ def crawl(
             )
         )
         sha_first_url.setdefault(sha, final_url)
+    debug.dbg(
+        "web", "info", "crawl complete",
+        fetched=fetched, artifacts=len(report.artifacts), skipped=len(report.skipped),
+    )
     return report
 
 
