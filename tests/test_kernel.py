@@ -242,7 +242,7 @@ def test_path_reports_a_real_route(tmp_path, monkeypatch, capsys):
     capsys.readouterr()
     assert run(tmp_path, monkeypatch, "path", "docs/guide.md", "docs/runbook.md") == 0
     out = capsys.readouterr().out
-    # cli-examples.md is normative: single path folds reliability into the header
+    # example/CLI.md is normative: single path folds reliability into the header
     assert "1 path (reliability " in out
     assert "──references──▶" in out and "[EXTRACTED]" in out
 

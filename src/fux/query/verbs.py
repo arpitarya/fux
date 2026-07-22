@@ -1,7 +1,7 @@
 """Renderers for the graph verbs: `explain`, `graph`, `path`.
 
 Each is a projection of one :func:`fux.kernel.retrieve` call — none of them
-runs its own retrieval. Formats follow docs/cli-examples.md, which is the
+runs its own retrieval. Formats follow docs/example/CLI.md, which is the
 normative contract the goldens derive from.
 """
 
@@ -165,7 +165,7 @@ def cmd_path(args) -> int:
         )
         return 0
     # Single path folds its reliability into the header (the common case, and
-    # what cli-examples documents); several paths each carry their own.
+    # what example/CLI.md documents); several paths each carry their own.
     if len(found) == 1:
         print(f"1 path (reliability {found[0].reliability:.3f}):")
         for hop in found[0].hops:

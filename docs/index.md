@@ -4,20 +4,23 @@ okf_version: "0.1"
 
 # Fux docs — knowledge bundle root
 
-The `docs/` tree is an OKF v0.1 bundle: every knowledge doc carries frontmatter with
-a `type`; this index gives progressive disclosure. (Repo-root `CLAUDE.md` and
-`README.md` sit outside the bundle — they are tool/user entry points, not concepts.)
+The `docs/` tree is an OKF v0.1 bundle: every lowercase knowledge doc carries
+frontmatter with a `type`; this index gives progressive disclosure. (Repo-root
+`CLAUDE.md`/`README.md` and ALL-CAPS docs — `PLAN.md`, `INTERVIEW.md`, `WORKLOG.md`,
+`IMPLEMENTATION.md`, `GLOSSARY.md`, `DOC-REGISTRY.md`, and everything under
+`example/` (`CLI.md`, `TOML.md`, `SETUP.md`, `SKILLS.md`, `API.md`) — are
+entry-point/tracker files, exempt from the `type` requirement by repo
+convention.)
 
 # Core (read in this order)
 
-* [Design of record](fux-plan.md) - scope, decisions, status, build queue.
-* [Model handoff interview](model-handoff-interview.md) - succession judgment; read before substantive changes.
-* [Worklog](worklog.md) - per-exchange session trail, newest first.
-* [Implementation tracker](implementation.md) - live milestone status of the build; agent-updated continuously.
+* [Design of record](PLAN.md) - scope, decisions, status, build queue.
+* [Model handoff interview](INTERVIEW.md) - succession judgment; read before substantive changes.
+* [Worklog](WORKLOG.md) - per-exchange session trail, newest first.
+* [Implementation tracker](IMPLEMENTATION.md) - live milestone status; updated on EVERY execution, whatever the outcome.
 * [Doc registry](DOC-REGISTRY.md) - maintained docs, update triggers, last-verified dates.
-* [CLI examples](cli-examples.md) - input/output contract for every command; goldens derive from it.
+* [Examples bundle](example/) - copy-from contracts: [CLI.md](example/CLI.md) (command I/O; goldens derive from it), [TOML.md](example/TOML.md) (annotated config), [SETUP.md](example/SETUP.md) (setup variants + hooks install), [SKILLS.md](example/SKILLS.md) (skill usage), [API.md](example/API.md) (drive the engine from a script).
 * [Glossary](GLOSSARY.md) - every recurring term, defined once, linked to its owning doc.
-* [fux.toml example](fux-toml.md) - annotated config contract; every shipped key + default.
 
 # Decisions
 
@@ -28,6 +31,6 @@ a `type`; this index gives progressive disclosure. (Repo-root `CLAUDE.md` and
 # Build
 
 * [Handoffs](handoff/) - live build specs (empty — all three phases implemented; next plan starts here).
-* [Archive](archive/) - implemented artifacts: 0000 master + 0001 v1 + 0002 v1.1 + 0003 v2, each stamped with its ADRs.
+* [Archive](archive/) - implemented artifacts, version-named: master-prompt + v0.20.0 (v1) + v0.21.0 (v1.1) + v0.22.0 (v2) + v0.23.0 (substrate), each stamped with its ADRs.
 * [Eval harness](../tests_e2e/eval/README.md) - the retrieval quality gate + Anton private-eval workflow.
 * [Distillation recipe](../tools/distill/README.md) - how the bundled model is built (dev-only).

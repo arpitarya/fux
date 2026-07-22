@@ -77,4 +77,4 @@ passages on every prompt (fail-open — they can never break a session).
   `fidelity`; upgrade with `fux ingest --advanced <file>` (docling/tesseract).
 - **Web sources** — add `[sources.web]` urls to fux.toml and run
   `fux ingest --web`; `render = "cdp"` for JS-rendered pages.
-- Anything confusing or slow: note it in `docs/worklog.md`.
+- Anything confusing or slow: note it in `docs/WORKLOG.md`.

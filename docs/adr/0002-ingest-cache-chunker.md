@@ -13,7 +13,7 @@ timestamp: 2026-07-21T00:00:00Z
 
 ## Context
 
-The ingest cache is a **long-term, git-versioned corpus** (fux-plan §6b), so
+The ingest cache is a **long-term, git-versioned corpus** (PLAN.md §6b), so
 deterministic, diff-friendly output is a hard requirement, and every cached file
 must carry provenance (the frontmatter parser's first dogfood). The two-tier
 strategy (inferred now, advanced in v1.1) is decided in the ingest-strategy

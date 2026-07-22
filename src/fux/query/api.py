@@ -1,6 +1,6 @@
 """ask / find / answer over the index — the query surface (CLI + library).
 
-Output formats follow docs/cli-examples.md — the committed UX contract; the
+Output formats follow docs/example/CLI.md — the committed UX contract; the
 e2e goldens derive from it. `--json` is the agent path and fully deterministic;
 human output may include timing.
 
@@ -245,7 +245,7 @@ def _hybrid_line(info: dict) -> str:
 
 
 def _explain_tree(r: ScoredChunk, params: BM25FParams) -> list[str]:
-    """Per-field breakdown (cli-examples.md format): contribution apportioned to
+    """Per-field breakdown (example/CLI.md format): contribution apportioned to
     each field by its share of the weighted tf — truthful under joint saturation."""
     weights = {"heading": params.heading, "path": params.path, "body": params.body}
     terms: dict[str, list] = {f: [] for f in weights}

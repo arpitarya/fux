@@ -87,7 +87,7 @@ fux path docs/adr/0007.md docs/runbooks/failover.md    # how two docs connect
 Optional Office/PDF converters (never on the query path):
 `pip install 'fux-engine[ingest]'`. Ten-minute real-project walkthrough:
 [DOGFOOD.md](DOGFOOD.md) · worked input/output for every command:
-[docs/cli-examples.md](docs/cli-examples.md).
+[docs/example/CLI.md](docs/example/CLI.md).
 
 ## Explain it like I'm five
 
@@ -210,7 +210,23 @@ counterpoint treatise every composer learned the rules from. A tool built so the
 reasons survive the people, named for the man who wrote the rulebook. The long-term
 Fux vision — version-controlled **rules bound to code, checked deterministically**
 — is on hold, deliberately, until this query engine has earned its keep in daily
-use; the design of record is [docs/fux-plan.md](docs/fux-plan.md).
+use; the design of record is [docs/PLAN.md](docs/PLAN.md).
+
+## What's new
+
+**Latest — v0.23.1 (2026-07-22): docs & examples.** Documentation-only patch (no
+engine change). The docs bundle was reorganized — core trackers promoted to
+ALL-CAPS entry-point files — and a new [`docs/example/`](docs/example/) bundle
+landed: worked, verified examples for the CLI, config, setup + hook installation,
+skill usage, and the Python API.
+
+**v0.23.0 (2026-07-22): the knowledge substrate.** One SQLite runtime
+plane; committed `fux.lock` + lean state (a fresh clone answers with the *same
+rankings and scores* as a full index, ~230 B/doc); **FuxVec** from-scratch binary
+dense search (hit@5 → 1.000 on the eval set, ADR 0006's named miss rescued); one
+retrieval kernel behind every verb, with `explain`/`graph`/`path`/`cat`/`db pull`
+new; lean/full profiles measured at 23 MB per 100k docs.
+Full release history → **[CHANGELOG.md](CHANGELOG.md)**.
 
 ## Status
 

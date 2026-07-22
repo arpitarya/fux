@@ -1,10 +1,3 @@
----
-type: Plan
-title: Fux — design of record (rebuild)
-description: The living design of record — scope, decisions, status, and next moves for the Fux rebuild.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # Fux — design of record (rebuild)
 
 *This is the design of record. Keep it truthful: update it in the same change that
@@ -185,15 +178,16 @@ paste-ready prompt in [`handoff/`](handoff/)):
 
 | # | Phase | Scope | Status |
 |---|-------|-------|--------|
-| [0001](archive/0001-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ✅ **implemented** (v0.20.0, 2026-07-21; ADRs 0001–0004) |
-| [0002](archive/0002-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ✅ **implemented** (v0.21.0, 2026-07-21; ADR 0005) |
-| [0003](archive/0003-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ✅ **implemented** (v0.22.0, 2026-07-21; ADRs 0006–0007; gate passed as tie → ships enabled) |
-| [0004](archive/0004-knowledge-substrate-handoff.md) | **v3 — knowledge substrate** | SQLite substrate (bulk text in-db) · fux.lock · committed lean state (`.fux/state/`) · one-kernel `retrieve()` + explain/graph/path/cat · FuxVec · full/lean profiles · db pull | ✅ **implemented** (v0.23.0, 2026-07-22; ADRs 0008–0011; eval hit@5 1.000) |
+| [v0.20.0](archive/v0.20.0-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ✅ **implemented** (v0.20.0, 2026-07-21; ADRs 0001–0004) |
+| [v0.21.0](archive/v0.21.0-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ✅ **implemented** (v0.21.0, 2026-07-21; ADR 0005) |
+| [v0.22.0](archive/v0.22.0-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ✅ **implemented** (v0.22.0, 2026-07-21; ADRs 0006–0007; gate passed as tie → ships enabled) |
+| [v0.23.0](archive/v0.23.0-knowledge-substrate-handoff.md) | **v3 — knowledge substrate** | SQLite substrate (bulk text in-db) · fux.lock · committed lean state (`.fux/state/`) · one-kernel `retrieve()` + explain/graph/path/cat · FuxVec · full/lean profiles · db pull | ✅ **implemented** (v0.23.0, 2026-07-22; ADRs 0008–0011; eval hit@5 1.000) |
+| [0005](handoff/0005-debug-observability-handoff.md) | **v4 — debug & observability** | `[debug]` in fux.toml (level/categories/output/timing/redact) · stdout-pure emitter · `fux doctor` (install+corpus+consistency+self-test) · `fux why` (negative-result verdict) · **`fux-debug` skill** | 📋 **spec ready** (Arpit, 2026-07-22) — target v0.24.0, ADR 0012 |
 
-Sequencing: 0001 → dogfood in Anton → then 0002 and/or 0003 in either order, each
+Sequencing: v1 → dogfood in Anton → then v1.1 and/or v2 in either order, each
 gated by the dogfood telling us which pain is real. **Arpit's call (2026-07-21): one
-continuous run instead** — [`handoff/0000-master-prompt.md`](handoff/0000-master-prompt.md)
-executes 0001 → 0002 → 0003 sequentially with hard phase gates (DoD + suites + ADRs
+continuous run instead** — [`archive/master-prompt.md`](archive/master-prompt.md)
+executes v1 → v1.1 → v2 sequentially with hard phase gates (DoD + suites + ADRs
 + archive + version bump per phase), emitting a `DOGFOOD.md` quickstart after phase
 1 so Anton dogfooding runs in parallel. Next action: paste the master prompt into
 Claude Code.
@@ -205,9 +199,10 @@ Claude Code.
 | Package skeleton | ✅ | src/ layout, hatchling, CLI + FuxError, smoke tests |
 | Query CLI — design decisions | ✅ | engine/output/ingest/model verdicts accepted; see `compare/` |
 | Query CLI — **v1 build** (setup/ingest/BM25F/ask/find/answer/agents) | ✅ | **v0.20.0** (2026-07-21); ADRs 0001–0004; DOGFOOD.md emitted |
-| Ingest v1.1 (web/CDP/advanced — handoff 0002) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
-| Hybrid engine v2 (bundled model + RRF — handoff 0003) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
-| Knowledge substrate v3 (handoff 0004) | ✅ | **v0.23.0** (2026-07-22); ADRs 0008–0011; 365 unit + 71 e2e; eval hit@5 **1.000** (beats v0.22); 100k benchmark: state 23 MB, FuxVec scan 54 ms (no IVF) |
+| Ingest v1.1 (web/CDP/advanced — v0.21.0 handoff) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
+| Hybrid engine v2 (bundled model + RRF — v0.22.0 handoff) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
+| Knowledge substrate v3 (v0.23.0 handoff) | ✅ | **v0.23.0** (2026-07-22); ADRs 0008–0011; 365 unit + 71 e2e; eval hit@5 **1.000** (beats v0.22); 100k benchmark: state 23 MB, FuxVec scan 54 ms (no IVF) |
+| Debug & observability v4 (0005 handoff) | 📋 | spec ready 2026-07-22; `[debug]` toml + doctor/why + fux-debug skill; target v0.24.0 |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
 
@@ -216,7 +211,7 @@ Claude Code.
 **Phase 4 shipped (v0.23.0, 2026-07-22)** — design of record
 [`proposals/knowledge-substrate.md`](proposals/knowledge-substrate.md), build
 spec archived at
-[`archive/0004-knowledge-substrate-handoff.md`](archive/0004-knowledge-substrate-handoff.md),
+[`archive/v0.23.0-knowledge-substrate-handoff.md`](archive/v0.23.0-knowledge-substrate-handoff.md),
 decisions in ADRs [0008](adr/0008-substrate-store-lock-state.md)–[0011](adr/0011-profiles-lean-state.md).
 
 **The one thing phase 4 measured and did not fix** — and therefore the obvious

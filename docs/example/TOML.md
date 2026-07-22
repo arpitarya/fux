@@ -1,13 +1,6 @@
----
-type: Reference
-title: fux.toml — the annotated example
-description: A complete, maintained example of Fux's config file — every shipped key with its default and meaning, plus proposed extensions clearly fenced. Update in the same change as any config-surface change.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # fux.toml — the annotated example
 
-*The **config contract**, maintained like [cli-examples.md](cli-examples.md): every
+*The **config contract**, maintained like [CLI.md](CLI.md): every
 key below matches the shipped `src/fux/config.py` (v0.23.x); when a config key is
 added/renamed/re-defaulted, update this file in the same change (registry
 trigger). `fux setup` writes the `[sources]` section; everything else is
@@ -84,7 +77,7 @@ max_age_days = 30                # url staleness horizon used by `fux ingest --c
 tier         = "curated"         # "mirror" = no page files at all; text lives in fux.db
 ```
 
-**What git carries** (see [ADR 0008](adr/0008-substrate-store-lock-state.md)):
+**What git carries** (see [ADR 0008](../adr/0008-substrate-store-lock-state.md)):
 `fux.toml` and `fux.lock` at the root, plus `.fux/state/` — together the recipe
 and enough state to answer immediately after a clone. `.fux/index/` is derived
 and gitignored (`fux setup` writes the rule). `.fux/cache/` is rebuilt on clone;
@@ -127,7 +120,7 @@ lists = ["@sources-docs.txt"]                           # huge lists in @files (
 
 ## Related
 
-[cli-examples.md](cli-examples.md) (what the commands do with this config) ·
-[proposals/knowledge-substrate.md](proposals/knowledge-substrate.md)
-(scale + graph + FuxVec proposal) · [GLOSSARY.md](GLOSSARY.md) (terms) · shipped parser:
-[`src/fux/config.py`](../src/fux/config.py).
+[CLI.md](CLI.md) (what the commands do with this config) ·
+[proposals/knowledge-substrate.md](../proposals/knowledge-substrate.md)
+(scale + graph + FuxVec proposal) · [GLOSSARY.md](../GLOSSARY.md) (terms) · shipped parser:
+[`src/fux/config.py`](../../src/fux/config.py).

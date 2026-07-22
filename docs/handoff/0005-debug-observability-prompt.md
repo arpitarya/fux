@@ -1,0 +1,84 @@
+---
+type: Handoff Prompt
+title: Claude Code prompt — Debug & observability (handoff 0005)
+description: Paste-ready prompt executing handoff 0005 — [debug] config, emitter, fux doctor, fux why, fux-debug skill, at v0.24.0.
+status: ready
+timestamp: 2026-07-22T00:00:00Z
+---
+
+# Claude Code prompt — Debug & observability
+
+Paste below into Claude Code at the repo root. **Precondition: v0.23.x shipped,
+both suites + eval green.**
+
+---
+
+Build **phase 5 — debug & observability** for the Fux engine, executing the
+committed spec exactly.
+
+**Explore first, in this order:**
+1. `CLAUDE.md` — binding: `$0`/stdlib, determinism, docs law, doc style,
+   worklog duty, the IMPLEMENTATION.md every-execution rule.
+2. `docs/handoff/0005-debug-observability-handoff.md` — **the build contract**:
+   the five questions debug must answer, `[debug]` schema + precedence, the
+   emitter contract, `fux doctor` groups, `fux why` verdict, skills
+   integration, milestones M1–M6, edge cases, open questions.
+3. `docs/example/CLI.md`, `TOML.md`, `SETUP.md`, `SKILLS.md` — **normative**
+   surfaces you will extend. Update the doc *before* implementing each new
+   command or config key; goldens derive from these.
+4. The code you will instrument: `src/fux/config.py` (dataclass section
+   pattern), `src/fux/hooks.py` (the existing `FUX_DEBUG=1` contract — keep it
+   working), `src/fux/ingest/`, `src/fux/index/`, `src/fux/query/`,
+   `src/fux/agents/generate.py`.
+
+**Then plan:** post the M1–M6 breakdown with file-level detail before writing
+code. The phase-5 table is **already pre-registered** in
+`docs/IMPLEMENTATION.md` — update its row at **every milestone completion**
+(status + tests + note, never batched), keep "Now working on" current, and log
+any deviation in the Deviations section.
+
+**Hard rules:**
+- **Debug never writes to stdout.** This is the gate: every existing golden
+  must pass byte-identical with `--debug=trace` active. Write that test at M1,
+  before any instrumentation exists, and keep it green through M6.
+- **Debug never changes behaviour** — no code path branches on debug level
+  except to emit.
+- **Deterministic output**: no wall-clock in debug lines unless `timing = true`;
+  stable field order; two `trace` runs on the same corpus produce identical
+  stderr. Test it.
+- **Redaction on by default** — ids, paths, counts, scores; never document
+  text. Enterprises will email you these logs.
+- `off` must be free: guard every non-trivial format behind `is_enabled()`, and
+  assert no measurable regression in the perf check.
+- Zero new runtime dependencies.
+
+**Design judgement I want you to exercise:**
+- The **verdict line** in `fux why` is the whole feature ("not returned: rank
+  47 lexical, no dense candidate (cosine 0.19 < pool cut 0.31), no edge from
+  any seed"). Get that sentence right — everything above it is just evidence.
+- Every failing `doctor` check must print **what is wrong, why it matters, and
+  the exact fix command**. A check that only reports is half-built.
+- The **zero-match source glob** case in `doctor` deserves prominence: a
+  `[sources]` entry resolving to 0 files is the most common silent misconfig,
+  and today nothing surfaces it.
+
+**Verify:**
+- Both suites + eval green; goldens byte-identical at every debug level.
+- `fux doctor` on: a healthy corpus (exit 0), a directory with no fux.toml, a
+  corpus with drift, a source glob matching nothing, a missing model bundle.
+- `fux why` on: a document that ranks, one that ranks low, one skipped at
+  ingest, one absent from disk.
+- `fux setup --skills` produces three skills; existing two carry the escalation
+  pointer.
+
+**Close out (per CLAUDE.md):** ADR 0012 (record the open questions' answers —
+emitter choice, doctor JSON stability, `why --all`, timing's home); full docs
+pass (`docs/example/DEBUG.md` new, plus CLI/TOML/SETUP/SKILLS/GLOSSARY/
+DOC-REGISTRY/PLAN/INTERVIEW/WORKLOG/IMPLEMENTATION); CHANGELOG entry mirrored
+into README "What's new"; archive this pair as
+`docs/archive/v0.24.0-debug-observability-*.md`; bump **0.24.0**.
+
+If a milestone cannot land cleanly, stop there, leave the repo green at the
+last completed milestone, and write up the blocker in WORKLOG + IMPLEMENTATION.
+
+Begin with M1. Show the milestone plan first.

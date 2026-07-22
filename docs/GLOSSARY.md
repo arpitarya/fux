@@ -53,7 +53,7 @@ Arpit accepts or overrides, and a reopen-trigger. Lives in [`compare/`](compare/
 
 **Corpus** — The long-term, git-versioned knowledge asset Fux builds and queries:
 cache + manifest (committed) with the index derived from it. "A corpus, not a
-disposable index" — see [fux-plan §6b](fux-plan.md).
+disposable index" — see [PLAN §6b](PLAN.md).
 
 **Determinism** — Same sources → byte-identical cache, manifest, index — and the
 same question → the same answer. No wall-clock output, no model in the maintenance
@@ -129,7 +129,7 @@ ordering is exact. Removed the candidate-only ceiling ADR 0006 recorded. See
 **Goldens** — Committed expected outputs (`tests_e2e/goldens/`, normalized JSON)
 that the real CLI's output must match byte-for-byte. Updated deliberately on
 intentional behaviour change, never regenerated blindly. Derive from
-[cli-examples.md](cli-examples.md).
+[example/CLI.md](example/CLI.md).
 
 **Handoff** — A self-contained build spec (context, definition-of-done, scope
 in/out, constraints, edge cases, tests, open questions) paired with a paste-ready
@@ -239,10 +239,10 @@ converted text lives as rows in `fux.db`, because 100k documents-as-files is
 impractical whether or not git is involved. Commit the recipe, never the
 warehouse. See [ADR 0008](adr/0008-substrate-store-lock-state.md).
 
-**Worklog** — [`worklog.md`](worklog.md): the per-exchange rolling session
+**Worklog** — [`WORKLOG.md`](WORKLOG.md): the per-exchange rolling session
 handoff (OKF log.md style, newest first) so a new chat picks up cold. Distinct
-from [implementation.md](implementation.md) (live build board) and
-[model-handoff-interview.md](model-handoff-interview.md) (succession judgment).
+from [IMPLEMENTATION.md](IMPLEMENTATION.md) (live build board) and
+[INTERVIEW.md](INTERVIEW.md) (succession judgment).
 
 **`$0` (the zero-dollar law)** — Fux's founding constraint: no third-party runtime
 dependencies, no API spend, no model in the maintenance path — enforcement and

@@ -67,7 +67,7 @@ callers.
 `--top N` · `--answer-max N` (answer only) · `-C/--context N` lines (passages only).
 
 Worked input/output examples for every command live in
-[`../cli-examples.md`](../cli-examples.md) — the maintained UX contract the
+[`../example/CLI.md`](../example/CLI.md) — the maintained UX contract the
 implementation and goldens must match.
 
 ## `fux setup` — one setup command, interactive *and* flag-driven (accepted 2026-07-21)
