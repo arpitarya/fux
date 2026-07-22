@@ -52,7 +52,7 @@ server, memory capture/governance, federation/packs, the compliance Plane.
 
 **The corpus is a product asset, not a disposable index.** The ingest cache is
 designed to be committed to git and maintained long-term, ultimately feeding product
-development (specs, decisions, agent-driven builds — see fux-plan §6b). Therefore
+development (specs, decisions, agent-driven builds — see PLAN.md §6b). Therefore
 deterministic, diff-friendly cache output (sorted walks, stable serialization, POSIX
 relative paths) is a hard requirement everywhere, and downstream corpus features
 (diff/log, research-to-spec, audit trail) live as proposals in
@@ -115,7 +115,7 @@ committed:
    being built now gets a *proposal doc* in [`docs/proposals/`](docs/proposals/) —
    same rigor (context, sketch, references), `status: proposed`. Proposals are
    parked, not lost: when picked up they graduate into a compare doc or plan entry.
-1. **Plan** — the design of record. Update [`docs/fux-plan.md`](docs/fux-plan.md)
+1. **Plan** — the design of record. Update [`docs/PLAN.md`](docs/PLAN.md)
    before building: what, why, scope in/out, the decision.
 2. **Handoff** — a self-contained spec: context, definition-of-done, constraints,
    key files, edge cases, tests, open questions. Lives under
@@ -140,6 +140,12 @@ implemented and its ADR is written, move it to [`docs/archive/`](docs/archive/) 
 the same change, stamping `status: implemented` + the ADR link in its frontmatter.
 Active directories hold *live* work only; history stays greppable, not underfoot.
 (Repo-level `archive/` = the old build; `docs/archive/` = completed doc artifacts.)
+**Naming (Arpit, 2026-07-22): archived handoffs/prompts are prefixed by the
+release version they shipped, not their in-flight index** — e.g. an active
+`docs/handoff/NNNN-name.md` archives as `docs/archive/vX.Y.Z-name.md`. The `NNNN`
+index lives only in `docs/handoff/` while work is in flight; version is the
+durable, greppable key once shipped. Orchestrator/meta docs that map to no single
+release keep an unversioned name (e.g. `master-prompt.md`).
 
 ## Follow the OKF pattern (package and docs)
 
@@ -152,9 +158,9 @@ interoperability with every OKF consumer:
   [`docs/index.md`](docs/index.md), which declares `okf_version: "0.1"`. Repo-root
   CLAUDE.md/README.md are tool entry points outside the bundle.
   **Convention (Arpit, 2026-07-21): ALL-CAPS markdown files carry no YAML
-  frontmatter** — GLOSSARY.md, DOC-REGISTRY.md, DOGFOOD.md etc. are entry-point
-  files like CLAUDE.md/README.md, exempt from the `type` requirement. Lowercase
-  docs conform as before.
+  frontmatter** — GLOSSARY.md, DOC-REGISTRY.md, DOGFOOD.md, IMPLEMENTATION.md,
+  WORKLOG.md etc. are entry-point/tracker files like CLAUDE.md/README.md, exempt
+  from the `type` requirement. Lowercase docs conform as before.
 - **Frontmatter `type` on every knowledge doc** (the only OKF-required field) —
   e.g. `type: Compare Doc`, `type: Proposal`, `type: ADR`, `type: Handoff`; ingest
   cache files get `type: Ingested Document`. Our provenance keys (source, sha256,
@@ -163,8 +169,9 @@ interoperability with every OKF consumer:
 - **The ingest cache is an OKF bundle**: per-directory `index.md` (progressive
   disclosure — agents see what exists before opening files), bundle-relative links,
   `# Citations` sections where claims trace to sources.
-- **`log.md` semantics**: our `docs/worklog.md` follows OKF's log convention
-  (date-grouped, newest first).
+- **`log.md` semantics**: our `docs/WORKLOG.md` follows OKF's log convention
+  (date-grouped, newest first). It is ALL-CAPS, so per the convention above it
+  carries no frontmatter — the log.md semantics still hold.
 - Conformance bar (OKF §9): parseable frontmatter + non-empty `type` everywhere; be
   permissive when consuming (unknown types/keys/broken links are not errors).
 
@@ -198,28 +205,34 @@ task is not "done" until the docs are true. Documentation is maintained, not
 appended-to-and-abandoned — when a doc goes stale, fix it in the same change. At
 minimum, per task, check and update:
 
-1. **[`docs/fux-plan.md`](docs/fux-plan.md)** — design of record. Keep its status
+1. **[`docs/PLAN.md`](docs/PLAN.md)** — design of record. Keep its status
    notes truthful when behaviour or scope changes.
 2. **[`README.md`](README.md)** — the public front door. Update whenever the
    install/use surface, command list, or guarantees change.
-3. **[`docs/model-handoff-interview.md`](docs/model-handoff-interview.md)** — the
+2b. **[`CHANGELOG.md`](CHANGELOG.md)** — every version bump gets an entry, and
+   the latest entry is mirrored into README § What's new in the same change.
+3. **[`docs/INTERVIEW.md`](docs/INTERVIEW.md)** — the
    agent-succession handoff. **Read it before your first substantive change.**
    Update its "state of play" when direction, strategy, or a major decision changes,
    and add yourself to its maintainer line when you do. Every future model/session
    is now this document's maintainer — you will retire too; leave it better.
-4. **[`docs/worklog.md`](docs/worklog.md)** — the running session handoff (see below).
-4b. **[`docs/implementation.md`](docs/implementation.md)** — the live build tracker:
-   milestone-level ✅/🟡/⬜ per phase. Two binding halves:
+4. **[`docs/WORKLOG.md`](docs/WORKLOG.md)** — the running session handoff (see below).
+4b. **[`docs/IMPLEMENTATION.md`](docs/IMPLEMENTATION.md)** — the live build
+   tracker: milestone-level ✅/🟡/⬜ per phase. Three binding rules:
 
    - **When a plan/handoff is written:** its milestone table is **pre-registered**
-     in implementation.md (all ⬜) in the same change — every plan arrives with
+     in IMPLEMENTATION.md (all ⬜) in the same change — every plan arrives with
      its tracker rows already in place.
 
    - **When building:** the agent updates the row **at every single milestone
      completion** (status + test count + one-line note) — per milestone, never
-     batched at phase end — keeps "Now working on" current at regular intervals,
-     and logs spec deviations in the Deviations section. Never ✅ with failing
-     tests.
+     batched at phase end — and keeps "Now working on" current at regular
+     intervals. Never ✅ with failing tests.
+
+   - **On EVERY execution, whatever the case:** success, failure, blocked,
+     interrupted, or abandoned — the file is updated before the session ends.
+     A failed run sets 🟡/⛔ with a one-line why; there is no outcome that
+     skips the update.
 5. **[`docs/DOC-REGISTRY.md`](docs/DOC-REGISTRY.md)** — the doc freshness tracker:
    one row per maintained doc with its update trigger and last-verified date. If your
    change fires a trigger, update the doc *and* bump its row. New maintained doc →
@@ -236,11 +249,11 @@ differently knowing something, it belongs here or is linked from here.
 ## Session continuity — the running worklog (required)
 
 At the end of **every substantive exchange**, append an entry to
-[`docs/worklog.md`](docs/worklog.md): what was asked, what was done, what was
+[`docs/WORKLOG.md`](docs/WORKLOG.md): what was asked, what was done, what was
 decided or left open, and the single next step. This is a rolling exit-interview so a
 *new chat can pick up cold* without re-deriving context. **This applies in both Cowork
 and Claude Code** — the environment doesn't matter; the continuity does. Newest entry
-on top; keep entries short and true. Distinct from `model-handoff-interview.md` (the
+on top; keep entries short and true. Distinct from `INTERVIEW.md` (the
 strategic, cross-session succession record) — the worklog is the granular,
 per-exchange trail. Update both when the exchange changed direction.
 
@@ -252,19 +265,22 @@ src/fux/            the engine (import: `fux`); CLI entry `fux.cli:main`
   cli.py            argument dispatch; catch/render errors only at this boundary
   errors.py         the single FuxError — flat, no subclass hierarchy
 docs/
-  fux-plan.md       design of record
-  model-handoff-interview.md   agent-succession handoff (read first)
-  worklog.md        per-exchange session handoff (append every exchange; OKF log.md style)
-  implementation.md live build tracker (milestone ✅/🟡/⬜; agent-updated continuously)
+  PLAN.md           design of record
+  INTERVIEW.md      agent-succession handoff (read first)
+  WORKLOG.md        per-exchange session handoff (append every exchange; OKF log.md style)
+  IMPLEMENTATION.md live build tracker (milestone ✅/🟡/⬜; updated EVERY execution)
   DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
+  GLOSSARY.md       every recurring term, defined once
+  example/          copy-from contracts — CLI.md (I/O), TOML.md (config), SETUP.md (setup+hooks), SKILLS.md, API.md
   compare/          decision records — debate, matrix, verdict, reopen-triggers
   proposals/        parked ideas — same rigor, status: proposed; graduate to compare/plan
   handoff/          plan → handoff → prompt artifacts (live work only)
   adr/              one ADR per feature (+ TEMPLATE.md)
-  archive/          implemented handoffs/prompts/proposals (status: implemented + ADR link)
+  archive/          implemented handoffs/prompts/proposals (version-named vX.Y.Z-name.md)
 tests/              unit suite (fast)
 tests_e2e/          end-to-end suite: real CLI + fixture corpus + golden files
 archive/            the old, non-working build — reference only, do not import
+CHANGELOG.md        version history (repo root; latest entry mirrored in README)
 ```
 
 ## Error contract
@@ -298,9 +314,9 @@ is the proof.
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`** (unchanged). Import package: **`fux`**.
-- Version: **`0.23.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
-  0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid → 0.23.0 v3 substrate). Bump in
-  `src/fux/__init__.py` only.
+- Version: **`0.23.1`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
+  0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid → 0.23.0 v3 substrate →
+  0.23.1 docs & examples patch). Bump in `src/fux/__init__.py` only.
 
 ## Merge wall — what actually blocks a merge (2026-07-22)
 

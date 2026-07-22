@@ -93,7 +93,7 @@ def test_unknown_tables_ignored(tmp_path):
 
 
 def test_documented_config_parses_and_matches_shipped_defaults(tmp_path):
-    """`docs/fux-toml.md` claims to show every shipped key with its default.
+    """`docs/example/TOML.md` claims to show every shipped key with its default.
 
     Parse the doc's own example and check it against the dataclass defaults, so
     the file cannot quietly drift from the parser it documents.
@@ -105,7 +105,7 @@ def test_documented_config_parses_and_matches_shipped_defaults(tmp_path):
         IndexParams, WebParams, load,
     )
 
-    doc = (Path(__file__).parent.parent / "docs" / "fux-toml.md").read_text(encoding="utf-8")
+    doc = (Path(__file__).parent.parent / "docs" / "example" / "TOML.md").read_text(encoding="utf-8")
     section = doc.split("## Complete as-shipped example")[1]
     block = section.split("```toml", 1)[1].split("```", 1)[0]
     (tmp_path / "fux.toml").write_text(block, encoding="utf-8")
@@ -128,7 +128,7 @@ def test_shipped_keys_are_not_still_in_the_proposed_fence():
     """Keys that ship must sit above the "NOT yet shipped" line, or the doc lies."""
     from pathlib import Path
 
-    doc = (Path(__file__).parent.parent / "docs" / "fux-toml.md").read_text(encoding="utf-8")
+    doc = (Path(__file__).parent.parent / "docs" / "example" / "TOML.md").read_text(encoding="utf-8")
     # The fenced *example*, not the prose around it — the prose legitimately
     # names shipped tables when explaining that they moved out of the fence.
     section = doc.split("## Proposed extensions — NOT yet shipped")[1]

@@ -11,7 +11,7 @@ timestamp: 2026-07-21T00:00:00Z
 # Knowledge substrate v2 — the consolidated proposal
 
 > **✅ ACCEPTED (Arpit, 2026-07-21).** Design of record for phase 4; build spec:
-> [`../archive/0004-knowledge-substrate-handoff.md`](../archive/0004-knowledge-substrate-handoff.md).
+> [`../archive/v0.23.0-knowledge-substrate-handoff.md`](../archive/v0.23.0-knowledge-substrate-handoff.md).
 
 > **One build, five decisions.** Storage in one SQLite file (text for bulk docs
 > included — never 100k files on disk). The doc index IS the graph. One retrieval
@@ -544,7 +544,7 @@ gets a resolution or an honest ⚠ open flag:
 
 ## References
 
-- Internal: shipped stores (`src/fux/index/store.py` ADR 0003; vectors ADR 0006 incl. the zero-candidate miss class); [`../fux-plan.md`](../fux-plan.md) §6a/6b; [`../fux-toml.md`](../fux-toml.md); archived deterministic PageRank (reference only).
+- Internal: shipped stores (`src/fux/index/store.py` ADR 0003; vectors ADR 0006 incl. the zero-candidate miss class); [`../PLAN.md`](../PLAN.md) §6a/6b; [`../example/TOML.md`](../example/TOML.md); archived deterministic PageRank (reference only).
 - [SQLite FTS5 in practice](https://thelinuxcode.com/sqlite-full-text-search-fts5-in-practice-fast-search-ranking-and-real-world-patterns/) · [FTS5 guide](https://blog.sqlite.ai/fts5-sqlite-text-search-extension) — scale numbers (accessed 2026-07-21).
 - [sqlite-vec benchmarks](https://alexgarcia.xyz/blog/2024/sqlite-vec-stable-release/index.html) — the brute-force envelope FuxVec's codes beat (accessed 2026-07-21).
 - [Graphify](https://github.com/Graphify-Labs/graphify) — **reference/prior art, not a benchmark**: manifest portability, incremental update, single-blob lessons (README read in full, 2026-07-21).

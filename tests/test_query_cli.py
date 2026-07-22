@@ -46,7 +46,7 @@ def test_ask_human_output(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert "docs/deploy.md:1  (score " in out
     assert "blue-green" in out
-    assert "passage" in out and "corpus 2 docs" in out  # footer per cli-examples.md
+    assert "passage" in out and "corpus 2 docs" in out  # footer per example/CLI.md
 
 
 def test_ask_json_with_explain(tmp_path, monkeypatch, capsys):

@@ -15,4 +15,17 @@ Distinct from the repo-level [`../../archive/`](../../archive/) (the old,
 non-working build): this directory is the *completed-work trail* of the rebuild.
 Active directories (`../handoff/`, `../proposals/`) hold live work only.
 
-*Empty — first entries arrive when query CLI v1 ships.*
+**Naming.** Archived handoffs/prompts are keyed by the **release version they
+shipped**, not their in-flight `NNNN` index (CLAUDE.md law, 2026-07-22):
+`vX.Y.Z-name-{handoff,prompt}.md`. Orchestrator/meta docs that map to no single
+release stay unversioned.
+
+## Shipped artifacts
+
+| Version | Feature | Docs |
+|---------|---------|------|
+| **v0.20.0** | Query CLI v1 (setup/ingest/BM25F/ask/find/answer) | [handoff](v0.20.0-query-cli-v1-handoff.md) · [prompt](v0.20.0-query-cli-v1-prompt.md) |
+| **v0.21.0** | Ingest v1.1 (web/CDP/advanced tier) | [handoff](v0.21.0-ingest-web-advanced-handoff.md) · [prompt](v0.21.0-ingest-web-advanced-prompt.md) |
+| **v0.22.0** | Hybrid engine v2 (bundled model + RRF) | [handoff](v0.22.0-hybrid-engine-v2-handoff.md) · [prompt](v0.22.0-hybrid-engine-v2-prompt.md) |
+| **v0.23.0** | Knowledge substrate v3 | [handoff](v0.23.0-knowledge-substrate-handoff.md) · [prompt](v0.23.0-knowledge-substrate-prompt.md) |
+| *(spans v0.20–v0.22)* | Master orchestrator prompt | [master-prompt.md](master-prompt.md) |

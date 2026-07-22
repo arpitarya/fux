@@ -1,17 +1,19 @@
----
-type: Implementation Tracker
-title: Implementation tracker — live build status
-description: Milestone-level status of everything being implemented; the building agent updates it at every milestone completion and at regular intervals during long runs.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # Implementation tracker
 
-*The live, honest ✅/🟡/⬜ of the build. **Update contract (binding on the building
-agent):** flip a row the moment a milestone completes; during long milestones, bump
-the "Now working on" line at regular intervals (roughly every significant commit or
-~30 min of work) so an interrupted session loses nothing. Never mark ✅ with failing
-tests. This file answers "where exactly is the build?" — the worklog answers "what
+*The live, honest ✅/🟡/⬜ of the build. **Update contract (binding on EVERY
+execution, whatever the case):** this file is updated in **every session that
+executes anything** — milestone completed, milestone failed, run blocked, run
+interrupted, partial progress, or even "attempted and abandoned." There is no
+outcome that skips the update:*
+
+- *Milestone completes → flip the row (status + tests + note).*
+- *Long milestone in flight → bump "Now working on" at regular intervals
+  (every significant commit or ~30 min).*
+- *Blocked/failed/interrupted → set the row 🟡 or ⛔ with a one-line why, and
+  leave "Now working on" pointing at the exact stuck point.*
+- *Never ✅ with failing tests.*
+
+*This file answers "where exactly is the build?" — the worklog answers "what
 happened per exchange"; keep both.*
 
 **Legend:** ⬜ not started · 🟡 in progress · ✅ done (tests green) · ⛔ blocked
@@ -127,6 +129,22 @@ confirming >30 MB. It did not, so nothing was changed.**
   is the third RRF list, which always has candidates — and honest emptiness is
   preserved. → ADR 0010.
 
+## Phase 5 — Debug & observability (handoff 0005) → v0.24.0
+
+*Pre-registered 2026-07-22 with the handoff, per the CLAUDE.md rule: every plan
+seeds its milestone table here before building; the building agent updates a
+row at EVERY milestone completion — no batching.*
+
+| Milestone | Status | Tests | Notes |
+|-----------|--------|-------|-------|
+| M1 `[debug]` config + emitter (`debug.py`, precedence, redaction, **stdout-purity gate**) | ⬜ | — | write the goldens-unchanged-at-trace test first |
+| M2 instrument the pipeline (walk/convert/chunk/index/query/dense/graph/answer) | ⬜ | — | `off` must stay free; trace output reproducible |
+| M3 `fux doctor` (7 groups, text + `--json`, fix commands, self-test) | ⬜ | — | zero-match source globs surfaced loudly |
+| M4 `fux why` (pipeline walk + verdict line; in/out of corpus, ranked-low) | ⬜ | — | the verdict sentence is the feature |
+| M5 skills: `fux-debug` + escalation pointers in fux-query/fux-ingest | ⬜ | — | Arpit's "must work with skills" requirement |
+| M6 docs (`example/DEBUG.md` + CLI/TOML/SETUP/SKILLS/GLOSSARY) + suites | ⬜ | — | |
+| Close-out: ADR 0012, docs law, archive pair, CHANGELOG+README, bump | ⬜ | — | target v0.24.0 |
+
 ## Deviations from spec
 
 *(record any deliberate deviation from a handoff here, with the why and the ADR
@@ -136,7 +154,7 @@ that captures it — an empty section is the goal)*
   convention) or the source file's mtime — never wall clock. The handoff lists
   `converted_at` as provenance *and* requires byte-identical double-ingest; a wall
   clock cannot satisfy both. Captured in ADR 0002.
-- **0001 / cli-examples.md sketches:** the pre-build examples were aligned to
+- **0001 / example/CLI.md sketches:** the pre-build examples were aligned to
   as-shipped v1 (2026-07-21): setup wizard = one prompt per source type (no
   cache-location prompt — cache path is fixed in v1); ask/find scores are raw
   BM25F magnitudes, not 0–1; `--check` gained explicit new/missing annotations;
@@ -199,7 +217,7 @@ that captures it — an empty section is the goal)*
   same rankings *and scores* as the full profile. Doc-level ranking became the
   honest fallback for when sources cannot be re-derived (crawled corpora, or a
   clone without its documents). Exceeding a DoD is still a change to committed
-  behaviour, so it is recorded here and reflected in cli-examples. → ADR 0011.
+  behaviour, so it is recorded here and reflected in example/CLI.md. → ADR 0011.
 
 - **0004 / `auto` requires a size threshold, not just re-derivability (M7).**
   §G defines `auto` as "lean when every source in a tier is re-derivable". Taken

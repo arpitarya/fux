@@ -28,5 +28,5 @@ commitment; everything here is findable.
 
 *(The fourth idea from the 2026-07-21 ideation — the **product-memory corpus**,
 Arpit's own seed — was the winner and graduated straight into
-[`../fux-plan.md`](../fux-plan.md) §"Why the corpus lives in git" and the v1
+[`../PLAN.md`](../PLAN.md) §"Why the corpus lives in git" and the v1
 handoff, per the proposals lifecycle.)*

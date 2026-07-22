@@ -1,10 +1,3 @@
----
-type: Log
-title: Worklog — the running session handoff
-description: Per-exchange rolling record (OKF log.md convention, date-grouped, newest first) so a new chat picks up cold.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # Worklog — the running session handoff
 
 *A rolling, per-exchange record so a new chat can pick up cold. Think of each entry
@@ -23,6 +16,127 @@ diary.*
 - **Decided / open:** verdicts reached, and what's still awaiting a call.
 - **Next:** the single immediate next step.
 ```
+
+---
+
+## 2026-07-22 — release v0.23.1 (docs & examples) · Claude Code
+- **Asked:** commit, push, and publish.
+- **Did:** on main → branched `release/v0.23.1-docs-examples`. Confirmed all
+  changes since 0.23.0 are docs/comments/test-path only (no engine change), so
+  Arpit chose a **0.23.1 patch**. Bumped `__init__` → 0.23.1, added the CHANGELOG
+  entry, mirrored it into README § What's new, updated CLAUDE.md identity + the
+  smoke-test version assertions. Pre-flight green: **365 unit tests**, `python -m
+  build`, `twine check --strict` both artifacts PASSED as 0.23.1. Committed the
+  full working tree (this session's doc reorg + example bundle, plus pre-existing
+  README/CHANGELOG work and the untracked `handoff/0005` debug-observability
+  planning pair). Pushed → PR → merge → `gh release v0.23.1` → PyPI publish.
+- **Decided / open:** patch, not minor — the wheel is functionally identical to
+  0.23.0; the example bundle is docs, not a shipped feature. `handoff/0005` rode
+  along in the same commit (it was already in the tree, registry-referenced).
+- **Next:** none for this release; 0005 (debug & observability) is the next build.
+
+---
+
+## 2026-07-22 — three new example docs: SETUP / SKILLS / API · Claude Code
+- **Asked:** add examples for (1) CLI setup variants + hooks installation,
+  (2) skill usage, (3) the Python API creating a file in fux from another script.
+- **Did:** created `docs/example/{SETUP,SKILLS,API}.md` (ALL-CAPS, no
+  frontmatter). **Every block is verified against the real v0.23.x
+  implementation**, not invented — ran `fux setup -y --agents --skills --hooks`
+  on a scratch dir (captured the exact 8-file output + idempotent re-run),
+  dumped the real `.claude/settings.json` and `.kiro/*.hook`, exercised
+  `fux hook prompt-submit/session-end` I/O, and wrote+ran a real
+  `find_root → load → ingest_paths → load_searcher.search` script (create file →
+  `new=2…`, re-run → `unchanged`, `ingest --check` → `sha mismatch — re-ingest`).
+  Corrected the `fux ask --json` shape in SKILLS.md after checking live output
+  (`path`/`line_start`/`line_end`/`heading_path`/`fidelity`/`hybrid`, structured
+  `corpus`, `engine`). Wired all five into `example/index.md`, `docs/index.md`
+  (bundle line + OKF exemption), DOC-REGISTRY (3 rows), CLAUDE.md layout.
+- **Decided / open:** grounded the API doc on the CLI's own entrypoints
+  (`fux.config`/`fux.ingest`/`fux.index`) — no private path — so the example
+  can't drift from the shipped CLI. Nothing open.
+- **Next:** none — `example/` now has CLI, TOML, SETUP, SKILLS, API.
+
+---
+
+## 2026-07-22 — correction: fux-toml.md *is* the example → example/TOML.md · Claude Code
+- **Asked:** the separate `example/fux.toml` I created was wrong — `fux-toml.md`
+  itself is the example and should have been the thing moved into `example/`.
+- **Did:** `rm docs/example/fux.toml`; `git mv docs/fux-toml.md
+  docs/example/TOML.md` (name confirmed with Arpit — matches the ALL-CAPS
+  example-dir convention set by CLI.md); stripped its frontmatter; fixed its
+  now-deeper relative links (CLI.md became same-dir). **Updated the real code
+  dependency:** `tests/test_config.py` reads this doc to assert the fenced
+  example against the shipped dataclass defaults — repointed both paths to
+  `docs/example/TOML.md` (16 config tests green). Merged the two DOC-REGISTRY
+  rows into one; updated index.md (bundle line + OKF exemption list), CLAUDE.md
+  layout, `example/index.md`, and `proposals/knowledge-substrate.md`.
+- **Decided / open:** `example/` now holds exactly two maintained contracts —
+  `CLI.md` (command I/O) and `TOML.md` (annotated config). There is no separate
+  runnable `fux.toml` sample; the fenced block inside TOML.md is the copy source
+  and the parser-asserted one. Nothing open.
+- **Next:** none.
+
+---
+
+## 2026-07-22 — ALL-CAPS core docs + examples bundle · Claude Code
+- **Asked:** `worklog.md`→`WORKLOG.md`; `fux-plan.md`→`PLAN.md`;
+  `model-handoff-interview.md`→`INTERVIEW.md`; move `cli-examples.md` to a new
+  `docs/example/` dir as `CLI.md`; add an example `fux.toml` there too.
+- **Did:** `git mv` all four; **stripped YAML frontmatter** from WORKLOG/PLAN/
+  INTERVIEW/CLI per the ALL-CAPS = no-frontmatter convention (they join
+  IMPLEMENTATION/GLOSSARY/DOC-REGISTRY). Fixed CLI.md's six internal relative
+  links for the extra dir depth. Created `docs/example/fux.toml` (complete
+  copy-paste config, v0.23.x keys from `config.py`) + `docs/example/index.md`
+  (OKF per-dir index). Rewired **every** live reference — README, CLAUDE.md
+  (prose + layout block + convention list + log.md line), index.md, GLOSSARY,
+  DOC-REGISTRY (+2 new rows), INTERVIEW, `adr/0002`, `adr/0011`,
+  `compare/cli-surface`, `fux-toml.md`, `proposals/*`, and the doc-pointer
+  comments in `src/fux/query/{statequery,verbs,api}.py` + two tests. Verified
+  all relative `.md` links across docs/README/CLAUDE/DOGFOOD resolve.
+- **Decided / open:** ALL-CAPS files carry **no** frontmatter (documented rule) —
+  so promoting these four to ALL-CAPS dropped their OKF `type`; the convention
+  explicitly exempts entry-point/tracker files, and index.md's OKF note was
+  updated to say so. `fux-toml.md` stays the annotated *reference* (prose per
+  key); `example/fux.toml` is the runnable example — both maintained. Archive
+  prose naming old paths left as historical record; broken links I introduced
+  (WORKLOG hist + one archived handoff) repointed to resolve. Nothing open.
+- **Next:** none — new handoffs still use `NNNN-name.md` in flight.
+
+---
+
+## 2026-07-22 — archive docs renamed to release-version keys · Claude Code
+- **Asked:** archive documents should be named by release version, not the
+  in-flight `NNNN` index.
+- **Did:** `git mv` all 8 archived handoff/prompt pairs to `vX.Y.Z-name.md`
+  (0001→v0.20.0, 0002→v0.21.0, 0003→v0.22.0, 0004→v0.23.0); master-prompt kept
+  unversioned (spans v0.20–v0.22, per Arpit). Rewired every live-doc link
+  (`fux-plan.md` table + §7/§8, `adr/0008`, `proposals/knowledge-substrate.md`)
+  and the `blocked_by:` frontmatter inside the archived docs. Folded the naming
+  rule into CLAUDE.md (Archive section), refreshed `archive/README.md` with a
+  shipped-artifacts index, bumped DOC-REGISTRY rows (CLAUDE/fux-plan/handoff/
+  archive). Verified all `archive/*.md` markdown links resolve via a script.
+- **Decided / open:** left historical prose that names `docs/handoff/000X-…`
+  (worklog entries, archived-doc body instructions, IMPLEMENTATION.md:110's
+  measured doc id) untouched — those record the paths that existed at build time;
+  rewriting them would falsify the record. Nothing open.
+- **Next:** none — future handoffs use `NNNN-name.md` while in flight, archive as
+  `vX.Y.Z-name.md` on ship.
+
+---
+
+## 2026-07-22 — rename tracker to IMPLEMENTATION.md (git case fix) · Claude Code
+- **Asked:** convert implementation.md to IMPLEMENTATION.md and update wherever
+  necessary.
+- **Did:** the file on disk was already `IMPLEMENTATION.md` but git still tracked
+  it lowercase (case-preserving macOS FS) — `git mv -f docs/implementation.md
+  docs/IMPLEMENTATION.md` so git agrees. Fixed the one stale live prose reference
+  (`model-handoff-interview.md` §200k benchmark). Verified the maintained docs
+  already used the uppercase name: CLAUDE.md, `docs/index.md`, `DOC-REGISTRY.md`.
+- **Decided / open:** left lowercase refs in `archive/`, `docs/archive/`, ADR
+  0002, and prior worklog entries — those are immutable/historical records, not
+  live docs. Nothing open.
+- **Next:** none — casing is now consistent across the live doc set.
 
 ---
 
@@ -238,6 +352,244 @@ diary.*
 - **Decided / open:** no scheduled tamper alarm on the wall anymore — re-add the
   workflow + a `BRANCH_PROTECTION_TOKEN` PAT if that guarantee is ever wanted back.
 - **Next:** Anton dogfood.
+
+## 2026-07-22 — Phase 5 specced: debug & observability (0005) · Cowork
+- **Asked:** a debugging plan for fux *everything*; expose a value in the toml;
+  must work with skills too.
+- **Did:** wrote `handoff/0005-debug-observability-handoff.md` + prompt, framed
+  around **five questions debug must answer** (doc not in corpus · query didn't
+  return it · answer wrong/thin · install/corpus bad state · slow/big). Design:
+  **`[debug]` section in fux.toml** (`level` off/info/debug/trace, `categories`
+  = pipeline stages, `output` stderr|path, `timing`, `redact`, `max_bytes`),
+  precedence flag > `FUX_DEBUG` > toml > off, keeping `FUX_DEBUG=1` back-compat
+  with the existing hooks contract. New `src/fux/debug.py` emitter with a hard
+  invariant: **debug never writes to stdout** — so every golden must pass
+  byte-identical at `--debug=trace` (the gate, written at M1 before any
+  instrumentation). Redaction default-on (ids/paths/counts, never document
+  text — enterprises will email these logs); deterministic lines so two trace
+  runs diff clean. Two new commands: **`fux doctor`** (7 groups incl. a
+  self-test and — deliberately prominent — *source globs matching zero files*,
+  the commonest silent misconfig; every failing check prints what/why/**the fix
+  command**) and **`fux why "<q>" --doc <path>`** for the *negative* case
+  `--explain` can't cover, ending in a one-line verdict ("not returned: rank 47
+  lexical, no dense candidate (cosine 0.19 < pool cut 0.31), no edge from any
+  seed") — that sentence is the feature. **Skills requirement met:** new
+  `fux-debug` skill (doctor → check → why → fidelity → raise level → *report,
+  don't guess*) plus escalation pointers added to fux-query/fux-ingest.
+  M1–M6 pre-registered in IMPLEMENTATION.md per the every-execution law; PLAN
+  build queue + status rows added; registry bumped.
+- **Decided / open:** four open questions routed to ADR 0012 (hand-rolled vs
+  stdlib logging; whether `doctor --json` is CI-stable; `why --all`; whether
+  `timing` belongs in `[debug]` or its own `[profile]`).
+- **Next:** run `handoff/0005-debug-observability-prompt.md` in Claude Code
+  (→ v0.24.0), or the 1k regression prompt first — independent of each other.
+
+## 2026-07-22 — 1k regression prompt written · Cowork
+- **Asked:** a prompt to execute 1k and do regression testing.
+- **Did:** wrote `fux-lab/prompts/run-1k-regression.md` — five steps: (1) run
+  `./setup.sh`; (2) **hand-verify every verb's real `--json` shape before
+  trusting the suite** (the suite guesses `results[].path`, `sources[].path`
+  etc. and was written blind); (3) run `./run.sh` and triage each failure
+  against an explicit table — *suite guessed wrong* → fix the suite and record
+  the correction; *suite right, engine differs* → **leave it failing** and
+  record a finding; *environment problem* → fix and note whether setup.sh
+  should have caught it; (4) deepen thin assertions (honest-decline path,
+  whether fresh-clone parity actually exercises committed state or silently
+  skips, the three drift cases, making the determinism hashes visible so a
+  no-op can't masquerade as a pass, cold-vs-warm latency); (5) report the
+  metrics table, every suite↔CLI correction, genuine findings phrased for
+  upstream filing, and corpus gaps that feed the realistic-repo work.
+  Carries the independence ground rule (never read the engine's source to
+  explain behaviour). Indexed in lab README + TEST-PLAN §7.
+- **Framing that matters:** the prompt tells the agent to expect failures and
+  that *correcting the harness is the main work* — the suite has never met a
+  real binary, so the first run is its acceptance test.
+- **Next:** Arpit runs the prompt; findings feed back as engine observations.
+
+## 2026-07-22 — Clean 1k rebuild; scaffolder is now the single source of truth · Cowork
+- **Asked:** remove the 1k dir and do a clean setup.
+- **Found first:** `shared/new-env.sh`'s template had drifted from the
+  hand-improved `1k/setup.sh` — it still only generated a corpus, so a
+  scaffolded 10k/100k would have reproduced the exact "no .fux/" confusion.
+  Fixed before rebuilding: the scaffolder now emits the full flow (bootstrap →
+  generate → `fux setup --agents --skills --hooks` → `ingest` → `--check` →
+  the present/MISSING verification block with per-plane sizes), plus `run.sh`,
+  the `fux` shim, and a README whose first line answers "Where is `.fux/`?".
+  Template written from a quoted heredoc + sed substitution so the emitted
+  script stays readable. Added `--force` to replace an existing env.
+- **Did:** `rm -rf 1k` → `shared/new-env.sh 1k`. Verified by scaffolding a
+  throwaway 10k and diffing: **identical modulo tier name and the heavy gate**,
+  so all environments are now created the same way and cannot drift.
+  Also removed `uv init` leftovers (`main.py`, `pyproject.toml`) from
+  `playground/`, which had the same scaffolding noise.
+- **State:** `1k/` is bare — VERSION, setup.sh, run.sh, fux, README, baselines/
+  — awaiting its first `./setup.sh`. Playground keeps its ingested state.
+- **Next:** `cd fux-lab/1k && ./setup.sh` (clean run), then `./run.sh`.
+
+## 2026-07-22 — 1k setup confirmed working; discoverability fixed · Cowork
+- **Asked:** "i executed it but i don't see .fux folder in 1k dir."
+- **Found:** it ran correctly — `.fux/` is at **`1k/corpus/.fux/`**, not
+  `1k/.fux/`, because the corpus directory *is* the project (by design). On
+  disk: 935 sources in fux.lock, `.fux/` 9.9 MB (cache 4.0 · index 2.0 · state
+  4.0), 958 cache files, 1 012 state shards, index.json 1.3 MB, plus the agent
+  surface (AGENTS.md, CLAUDE.md, .claude/, .kiro/). So the **first real
+  end-to-end fux-lab run succeeded** — first time the harness has driven the
+  published 0.23.0 wheel.
+- **Real defect was discoverability, not function:** nothing told the user the
+  project lives one level down. Fixed: `setup.sh`'s closing block now prints an
+  explicit NOTE ("the corpus directory IS the project — .fux/ is inside
+  corpus/, NOT in the environment root") plus a present/MISSING table with
+  per-plane sizes and lock entry count; `1k/README.md` opens with a callout
+  answering "Where is .fux/?" before anything else.
+- **Worth noting for the engine:** this is the same confusion a first-time Fux
+  user could hit in a repo with a nested docs folder — a candidate line for
+  DOGFOOD.md or `fux setup`'s completion message ("wrote fux.toml and .fux/ in
+  <abs path>"). Recorded here as an observation, not yet a proposal.
+- **Next:** `cd fux-lab/1k && ./run.sh` — the suite's own first real exercise.
+
+## 2026-07-22 — 1k env fixed: corpus IS the project, setup now ingests · Cowork
+- **Asked:** "setup 1k the proper way — i don't see .fux dir."
+- **Diagnosed:** correct. The old `1k/setup.sh` stopped after generating the
+  corpus; `fux setup`/`fux ingest` only ran later, inside a *symlinked
+  workspace* the suite created — so the env looked empty and nothing was
+  hand-queryable. (Arpit's run had installed fux-engine 0.23.0 fine; the gap
+  was purely the missing configure+ingest steps.)
+- **Did:** made **the corpus directory the project** — `fux.toml`, `fux.lock`
+  and `.fux/` live *inside* `corpus/`, exactly as in a real repo; dropped the
+  symlinked workspace entirely (symlink traversal was its own confound).
+  `setup.sh` now: bootstrap → generate (skip if present, `--regen` to rebuild)
+  → `fux setup --docs docs,notes,reports --code src --data data --images assets
+  --agents --skills --hooks -y` → `fux ingest` → `--check` → **prints the
+  `.fux/` tree and sizes** so "is it there?" is answered on screen. Added a
+  `1k/fux` shim (runs the env's binary inside corpus/). Suite's
+  `setup_workspace` → `ensure_project` (idempotent fallback only).
+  **Made bootstrap uv-aware** — prefers `uv venv`/`uv pip` when available
+  (honours `.python-version`, which this env pins to 3.14), falls back to
+  stdlib venv+pip with a clear ≥3.11 message; verifies `fux --version` and
+  records the exact build to `.installed`. Removed stray `uv init` scaffolding
+  (`main.py`, `pyproject.toml`); kept `.python-version` and committed it.
+- **Could not verify here:** the venv's interpreter symlinks to a host pyenv
+  path invisible to the sandbox, and the sandbox is Python 3.10 — so `.fux/`
+  still gets created on Arpit's first `./setup.sh`, not by me.
+- **Next:** `cd fux-lab/1k && ./setup.sh` → then `./fux ask "…"` / `./run.sh`.
+
+## 2026-07-22 — fux-lab restructured: one directory per environment, own .venv · Cowork
+- **Asked:** inside fux-lab, one dir for playground with its own `.venv`,
+  another for 1k with its own, and 10k/100k set up later on his go-ahead.
+- **Did:** restructured to **environment directories, each self-contained**:
+  `playground/` and `1k/` each own a `.venv`, `VERSION` (its pinned
+  `fux-engine` build), `setup.sh`, corpus, workspace, results and baselines.
+  Shared tooling moved to `shared/` (`bootstrap.sh` — venv + version-pinned
+  install with a Python ≥3.11 guard; `generate/`; `regress/run.py`, now
+  **env-scoped** via `--env` with all paths resolved inside the env and the
+  binary defaulting to `<env>/.venv/bin/fux`). Reports now pin the version
+  under test. `shared/new-env.sh <name>` scaffolds 10k/100k on demand, wiring
+  the `--i-know-this-is-heavy` gate into their setup so the gate lives in a
+  readable file rather than muscle memory. Playground gained a `./fux` shim
+  (no venv activation) and a "try breaking it" section that feeds observations
+  back into the suite. README/TEST-PLAN/.gitignore rewritten for the layout;
+  shell + Python syntax verified; 19 tracked files, all venvs/corpora/results
+  ignored.
+- **Why per-env venvs:** each pins its own build, so 1k can test a release
+  candidate while 100k holds the last known-good — and no run can contaminate
+  another environment's baseline.
+- **Next:** `cd 1k && ./setup.sh && ./run.sh` on a Python ≥3.11 machine (first
+  real end-to-end run); 10k/100k await Arpit's go.
+
+## 2026-07-22 — fux-lab decoupled: independent conformance harness · Cowork
+- **Asked:** the lab must be a **separate entity, not linked to the local fux
+  repo at all**.
+- **Did:** fully decoupled `fux-lab` and reframed it as an **independent
+  conformance/regression harness for the published `fux-engine` package**.
+  Install is now `pip install fux-engine` (PyPI or a candidate wheel) — never an
+  editable install from a source tree; the suite drives the `fux` binary via
+  subprocess only and never imports fux. TEST-PLAN gained **§0 Independence**
+  as a standing rule; the CLI contract is now **derived from observation**
+  (`fux --help`, real `--json` output) rather than from the engine's docs; every
+  report pins `fux --version` + install method. The realistic-repo prompt gained
+  a hard ground rule: *do not read/clone/link any Fux source tree; if observed
+  behaviour looks wrong, record it as a finding rather than fixing the suite or
+  consulting the engine*. Removed all `../fux` references (verified: zero
+  remaining). `git init`'d as its own repo — 9 tracked files, all generated
+  content gitignored.
+- **Why it's better:** testing the artifact catches packaging faults an editable
+  install conceals — exactly the class that shipped in fux 0.22.0's sdist. The
+  harness is also now handable to anyone with just the package name.
+- **Decided / open:** harness is standalone; realistic generator still pending
+  (prompt ready). Suite still unrun end-to-end (Python 3.10 sandbox).
+- **Next:** Arpit runs the realistic-repo prompt from the lab.
+
+## 2026-07-22 — Realistic-repo test spec (acme-payments, 1k) · Cowork
+- **Asked:** a plan to execute like a *regular repo* — some source, some docs,
+  etc. — plus a prompt to set it up right for 1k docs.
+- **Did:** accepted the critique (the synthetic generator makes proportional
+  buckets, not a repo) and wrote
+  **`fux-lab/prompts/build-realistic-repo.md`** — the paste-ready build spec for
+  `generate/make_repo.py` producing **acme-payments**: real repo shape (src
+  across 5 services, ADRs/RFCs/runbooks/postmortems/meeting-noise, migrations,
+  configs, workflows, diagrams, vendor PDFs, wiki mirror), power-law sizes, a
+  genuine reference graph incl. deliberately broken links, and the headline
+  property — **~12 stale-vs-current contradictions** (superseded ADRs, inline
+  dated notes, and unmarked stale guides) where returning the *old* answer is
+  the failure the corpus exists to catch. Eval set ~50 questions typed by kind
+  (factual/why/how-to/cross-doc/**stale-vs-current**/zero-overlap/
+  **unanswerable** — the last verifying Fux still *declines* honestly). Suite
+  integration specified: per-kind quality breakdown (an aggregate 0.95 can hide
+  0.4 on staleness), a **staleness-precision metric** failing on any inversion,
+  and a decline check. TEST-PLAN gained §2b + the spec link; `.gitignore` +=
+  `repos/`. Synthetic generator retained for the 10k/100k scale tiers.
+- **Decided / open:** realistic repo is the *primary* 1k target; synthetic =
+  scale only. Generator not yet built (prompt handed to Arpit).
+- **Next:** run the prompt in Claude Code; expect suite↔CLI mismatches on its
+  first real end-to-end run (recorded as unverified in TEST-PLAN §6).
+
+## 2026-07-22 — fux-lab created: test plan, generator, regression suite, playground · Cowork
+- **Asked:** a testing plan + playground in a **sibling** dir; regression tiers
+  at 1k/10k/100k across all source types. Arpit's calls: sibling
+  `~/my_programs/fux-lab`; nothing generated committed; **start at 1k**, larger
+  tiers on his go; assert all four families (determinism, perf, size, quality)
+  and *document everything in detail to improve fux*; maintain the plan for
+  on-demand testing.
+- **Did:** requested access to `~/my_programs` (only `fux` was mounted) and
+  created **`fux-lab/`**: `TEST-PLAN.md` (the maintained spec — tier table,
+  required corpus composition, the four assertion families, the report contract
+  that phrases findings as candidate `docs/proposals/` entries, run
+  instructions, maintenance rules); `generate/make_corpus.py` (stdlib,
+  seeded/deterministic, 8 source types in fixed proportions, **planted link
+  graph + eval pairs incl. zero-overlap + lexical distractors + adversarial
+  shapes**, heavy-tier gate); `regress/run.py` (black-box CLI suite:
+  double-ingest byte-identity, `--check` clean + DRIFT + `--strict`→2,
+  fresh-clone parity, `--lexical-only` stability, citation resolution, all six
+  verbs with latencies, size metrics, eval hit@1/hit@5/MRR per mode with
+  zero-overlap rescue count, baseline diffing at ±15 %, dated markdown report);
+  seeded `playground/`; `.gitignore` (corpora/workspaces/results out).
+- **Verified:** 1k corpus builds — 1 008 files, 4.3 MB, 11 eval pairs — and
+  **re-generates byte-identically**; gate refuses 10k without the flag; both
+  scripts compile; missing-corpus path prints the exact fix.
+- **Not verified (recorded in TEST-PLAN §6):** the suite has **never run
+  end-to-end** — the sandbox is Python 3.10, fux needs ≥3.11. First real run is
+  on Arpit's machine and doubles as the suite's own acceptance test.
+- **Next:** Arpit runs the 1k suite locally; 10k/100k tiers await his go.
+
+## 2026-07-22 — IMPLEMENTATION.md (every-execution law) + CHANGELOG · Cowork
+- **Asked:** convert the implementation file to full caps; it must be updated on
+  EVERY execution whatever the case; maintain a changelog linked from README
+  with the latest change surfaced there.
+- **Did:** renamed `docs/implementation.md` → **`docs/IMPLEMENTATION.md`**
+  (two-step mv on the case-insensitive FS), frontmatter stripped per the
+  ALL-CAPS convention, update contract rewritten: **every execution updates the
+  file — completed, blocked, failed, interrupted, or abandoned** (🟡/⛔ + one-line
+  why; no outcome skips it). CLAUDE.md 4b gained the third binding rule; layout,
+  bundle index, registry, GLOSSARY, cli-examples links repointed (history left
+  as-is). Created root **`CHANGELOG.md`** (0.19.0 → 0.23.0, keep-a-changelog
+  style, from tracker data incl. the v0.23 eval table + known 10.6 s @100k
+  limit); README gained **§ What's new** mirroring the latest entry + the
+  CHANGELOG link; CLAUDE.md docs law gained 2b (changelog entry per bump,
+  mirrored to README in the same change); registry rows for both.
+- **Decided / open:** two new standing laws (every-execution tracker; changelog
+  per bump). Nothing open.
+- **Next:** next-phase head per the tracker: query-at-scale (postings unread at
+  query time — ADR 0011).
 
 ## 2026-07-21 — M4+M5 reviewed; three rulings for the run-in · Cowork
 - **Asked:** agent reported M4 (kernel re-plumb, six goldens byte-parity) + M5
@@ -787,7 +1139,7 @@ diary.*
 ## 2026-07-21 — CLI examples doc: the input/output contract · Cowork
 - **Asked:** create examples of CLI input and output, link to necessary documents,
   maintain it.
-- **Did:** created [`cli-examples.md`](cli-examples.md) (`type: Reference`) — worked
+- **Did:** created [`cli-examples.md`](example/CLI.md) (`type: Reference`) — worked
   input/output for `fux setup` (wizard + flag forms), `fux ingest` (+ `--check`,
   `--list-inferred`, `--advanced`, `--web`), `ask` (incl. honest no-confident-match
   fallback), `find`, `answer` (extractive + citations), `--json` shape, `--explain`
@@ -829,7 +1181,7 @@ diary.*
 
 ## 2026-07-21 — Master prompt: one run for all three phases · Cowork
 - **Asked:** one prompt to execute all of it, one by one.
-- **Did:** wrote [`handoff/0000-master-prompt.md`](handoff/0000-master-prompt.md) —
+- **Did:** wrote [`handoff/0000-master-prompt.md`](archive/master-prompt.md) —
   a single paste-ready prompt driving 0001 → 0002 → 0003 strictly in sequence with
   hard phase gates (DoD met + both suites green + ADRs + docs law + archive the
   pair + version bump before the next phase opens), phase reports appended to this

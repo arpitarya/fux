@@ -1,10 +1,3 @@
----
-type: Succession Record
-title: Model handoff — the agent-succession record
-description: The departing model's judgment, for whatever succeeds it; every future session is its maintainer.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # Model handoff — the agent-succession record
 
 *The premise: the departing model answers for the record, so whatever succeeds it —
@@ -184,7 +177,7 @@ process working rather than luck:
    extrapolation warned the state plane would blow its 30 MB budget (~35 MB).
    The 100k benchmark measured **23 MB**. The projection had used this repo's
    own docs, which are adversarial (very long ids, wide vocabulary). Both
-   numbers are in implementation.md on purpose.
+   numbers are in IMPLEMENTATION.md on purpose.
 3. **What phase 4 measured and did NOT fix.** At 100k, a query takes ~10 s: the
    query path still loads the whole index into memory to build the `Searcher`,
    and the `postings` table — populated and indexed at ingest — is never read at
@@ -223,7 +216,7 @@ reshapes the design. Litmus: "is it relevant to Anton?"
 
 **Q: What does the repo demand of you mechanically?**
 
-CLAUDE.md is binding: every code change updates fux-plan.md (design of record), the
+CLAUDE.md is binding: every code change updates PLAN.md (design of record), the
 README, this document, the relevant ADR, and every other doc it touches — a change
 is not done until the docs are true. Every behaviour change ships with a test.
 `uv run pytest -q` green. Python ≥ 3.11, match the surrounding style.

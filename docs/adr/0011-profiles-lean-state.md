@@ -61,7 +61,7 @@ and scores** as a full index, and `fux answer` works with real citations.
 Doc-level ranking from codes and signatures became the honest *fallback* for
 when sources cannot be re-derived — a crawled corpus, or a clone taken without
 its documents. Exceeding a DoD is still a change to committed behaviour, so it
-is recorded here and reflected in `cli-examples.md`.
+is recorded here and reflected in `example/CLI.md`.
 
 ## Measured — synthetic 100k corpus (M8)
 

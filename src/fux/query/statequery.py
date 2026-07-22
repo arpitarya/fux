@@ -1,6 +1,6 @@
 """Renderers for state-only mode — the fresh-clone query path.
 
-Output formats follow docs/cli-examples.md. Every rendering says *doc-level*
+Output formats follow docs/example/CLI.md. Every rendering says *doc-level*
 somewhere, because that is the honest description: without the runtime plane
 there are no chunk scores, and pretending otherwise would make a weaker result
 look like a stronger one.

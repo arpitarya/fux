@@ -147,5 +147,5 @@ because vocabulary grows sublinearly (Heaps' law) even as documents do not.
 - [pip requirements file format](https://pip.pypa.io/en/stable/reference/requirements-file-format/) —
   the `@list` precedent for keeping a committed recipe small at scale.
 - Internal: [`../proposals/knowledge-substrate.md`](../proposals/knowledge-substrate.md)
-  §3, §8, §8a, §8c · [`../handoff/0004-knowledge-substrate-handoff.md`](../archive/0004-knowledge-substrate-handoff.md)
+  §3, §8, §8a, §8c · [`../archive/v0.23.0-knowledge-substrate-handoff.md`](../archive/v0.23.0-knowledge-substrate-handoff.md)
   §A–§C (§C amended 2026-07-21).

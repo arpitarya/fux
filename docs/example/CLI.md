@@ -1,10 +1,3 @@
----
-type: Reference
-title: CLI examples — input and output contract
-description: Worked input/output examples for every fux command; the UX contract the implementation and e2e goldens must match. Maintained — update in the same change as any CLI surface or output-format change.
-timestamp: 2026-07-21T00:00:00Z
----
-
 # CLI examples — the input/output contract
 
 *This document is the **UX contract**: what a user types and exactly what they see.
@@ -12,18 +5,18 @@ The e2e goldens (`tests_e2e/goldens/`) derive from these formats — when behavi
 changes deliberately, update this doc and the goldens in the same change (registry
 trigger). Building agents: where a handoff is silent on output formatting, this doc
 decides. Examples use the running fixture from
-[`compare/query-output.compare.md`](compare/query-output.compare.md) — a corpus at
+[`compare/query-output.compare.md`](../compare/query-output.compare.md) — a corpus at
 `~/notes/anton/` with `decisions/db-indexing.md`.*
 
 *Updated 2026-07-21 to the **as-shipped v1 formats** (the pre-build sketches
 deviated in places; each deviation is logged in
-[`implementation.md`](implementation.md) → Deviations). Scores shown are raw BM25F
+[`IMPLEMENTATION.md`](../IMPLEMENTATION.md) → Deviations). Scores shown are raw BM25F
 magnitudes, not 0–1 — the numbers in examples are illustrative, the shapes are
 normative.*
 
-Commands are decided in [`compare/cli-surface.compare.md`](compare/cli-surface.compare.md);
-output formats in [`compare/query-output.compare.md`](compare/query-output.compare.md);
-exit codes in [`../CLAUDE.md`](../CLAUDE.md) (0 ok · 1 error · 2 blocking · 130
+Commands are decided in [`compare/cli-surface.compare.md`](../compare/cli-surface.compare.md);
+output formats in [`compare/query-output.compare.md`](../compare/query-output.compare.md);
+exit codes in [`../CLAUDE.md`](../../CLAUDE.md) (0 ok · 1 error · 2 blocking · 130
 interrupted).
 
 ## `fux setup` — first-time wizard
@@ -506,7 +499,7 @@ Claude Code (UserPromptSubmit hook fires) →
   fux ingest --advanced notes/competitor-stripe-fees.pdf   # upgrades, re-asks
 ```
 
-**Substrate-v2 era (proposed — [knowledge-substrate](proposals/knowledge-substrate.md); not shipped):** same repo,
+**Substrate-v2 era (proposed — [knowledge-substrate](../proposals/knowledge-substrate.md); not shipped):** same repo,
 `.fux/index/fux.db` replaces the two index files, and the one-kernel projections
 arrive: `fux explain docs/adr/0001-idempotency-keys.md` (node view),
 `fux graph "captures"` (map view), `fux path docs/adr/0001-… docs/runbooks/rollback.md`
@@ -514,7 +507,7 @@ arrive: `fux explain docs/adr/0001-idempotency-keys.md` (node view),
 
 ## Maintenance
 
-This doc rows in [`DOC-REGISTRY.md`](DOC-REGISTRY.md). Trigger: **any change to a
+This doc rows in [`DOC-REGISTRY.md`](../DOC-REGISTRY.md). Trigger: **any change to a
 command, flag, output format, or exit behaviour** — update the affected example, the
 e2e goldens, and (if the surface changed) `compare/cli-surface.compare.md`, all in
 the same change. Building agents (handoffs 0002–0003): treat these formats as
