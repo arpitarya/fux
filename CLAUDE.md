@@ -314,9 +314,10 @@ is the proof.
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`** (unchanged). Import package: **`fux`**.
-- Version: **`0.23.1`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
+- Version: **`0.24.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
   0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid → 0.23.0 v3 substrate →
-  0.23.1 docs & examples patch). Bump in `src/fux/__init__.py` only.
+  0.23.1 docs & examples patch → 0.24.0 debug & observability). Bump in
+  `src/fux/__init__.py` only.
 
 ## Merge wall — what actually blocks a merge (2026-07-22)
 
@@ -331,6 +332,30 @@ responsibility to check, not something the wall guarantees.** Before merging,
 read `gh pr checks <n>` yourself and do not merge on red. The source of truth
 for protection is [`.github/branch-protection.json`](.github/branch-protection.json);
 restoring the wall means putting the two contexts back and re-applying.
+
+## Hard-won build knowledge (auto-folded, 2026-07-22 — phase 5)
+
+- **Write the stdout-purity test before the instrumentation it will gate.**
+  M1 of the debug feature added the "goldens/`--debug=trace` stdout is
+  byte-identical to `off`" test *before any `dbg()` call site existed* — so it
+  was still exercising real code by M6, not trivially passing against an
+  empty emitter. The pattern generalizes: when a hard invariant gates a whole
+  feature, prove it can fail before you make it pass.
+- **One config-load wiring point, not one per command.** `config.load()` calls
+  `debug.apply_config()` itself, so every command (and every library caller)
+  gets `[debug]` wired automatically — no `cli.py` handler had to be touched.
+  `debug.init_from_cli()` (the `--debug` flag) is the one exception that must
+  be called explicitly, from `cli.main()`, before `load()` runs.
+- **The network-import fence applies to diagnostics too.** `fux doctor`
+  cannot live-probe a CDP port (`import socket`) because
+  `tests/test_import_fence.py` forbids network imports outside `ingest/` —
+  a standing rule, not negotiable per-feature. Capability checks that would
+  need the network stay binary-presence checks (`shutil.which`) instead.
+- **`off` must cost nothing, including argument evaluation.** `dbg()` checks
+  `is_enabled()` first and returns before formatting — but the *caller's*
+  arguments are still evaluated eagerly (Python has no lazy call args), so
+  call sites must keep those cheap (`len()`, not string-building) rather than
+  relying on the guard alone.
 
 ## Hard-won build knowledge (auto-folded, 2026-07-22 — phase 4)
 

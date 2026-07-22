@@ -83,6 +83,7 @@ wrote fux.toml  (docs: docs · code: — · data: — · images: —)
   created  .kiro/steering/fux.md
   created  .claude/skills/fux-query/SKILL.md
   created  .claude/skills/fux-ingest/SKILL.md
+  created  .claude/skills/fux-debug/SKILL.md
   created  .claude/settings.json
   created  .kiro/hooks/fux-query.kiro.hook
 next: run `fux ingest`
@@ -100,6 +101,7 @@ unchanged  .github/copilot-instructions.md
 unchanged  .kiro/steering/fux.md
 unchanged  .claude/skills/fux-query/SKILL.md
 unchanged  .claude/skills/fux-ingest/SKILL.md
+unchanged  .claude/skills/fux-debug/SKILL.md
 unchanged  .claude/settings.json
 unchanged  .kiro/hooks/fux-query.kiro.hook
 ```
@@ -109,7 +111,7 @@ unchanged  .kiro/hooks/fux-query.kiro.hook
 | Flag | Files | Notes |
 |------|-------|-------|
 | `--agents` | `AGENTS.md` · `CLAUDE.md` · `.github/copilot-instructions.md` · `.kiro/steering/fux.md` | `AGENTS.md` holds the **canonical** contract; the others get a thin pointer to it |
-| `--skills` | `.claude/skills/fux-query/SKILL.md` · `.claude/skills/fux-ingest/SKILL.md` | Agent Skills open standard — see [SKILLS.md](SKILLS.md) |
+| `--skills` | `.claude/skills/fux-query/SKILL.md` · `.claude/skills/fux-ingest/SKILL.md` · `.claude/skills/fux-debug/SKILL.md` | Agent Skills open standard — see [SKILLS.md](SKILLS.md) |
 | `--hooks` | `.claude/settings.json` · `.kiro/hooks/fux-query.kiro.hook` | Claude Code + Kiro auto-injection |
 
 - **Managed-block discipline.** `AGENTS.md`, `CLAUDE.md`, and the pointer files

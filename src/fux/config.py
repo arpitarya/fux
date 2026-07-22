@@ -11,6 +11,7 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from . import debug
 from .errors import FuxError
 
 CONFIG_NAME = "fux.toml"
@@ -101,6 +102,32 @@ class GitParams:
     commit_cache: bool = False
 
 
+DEBUG_LEVELS = ("off", "info", "debug", "trace")
+DEBUG_CATEGORIES = frozenset(
+    {
+        "config", "walk", "convert", "chunk", "index", "state", "lock",
+        "query", "lexical", "dense", "graph", "answer", "hooks", "web",
+    }
+)
+
+
+@dataclass(frozen=True)
+class DebugParams:
+    """[debug] — observability (handoff 0005). Never touches stdout.
+
+    Only ``level`` has a flag/env override (see ``fux.debug`` precedence); the
+    rest is toml-only, so a project's debug shape is reproducible from its
+    committed config.
+    """
+
+    level: str = "off"  # off | info | debug | trace
+    categories: tuple[str, ...] = ("*",)
+    output: str = "stderr"  # "stderr" or a file path
+    timing: bool = False
+    redact: bool = True
+    max_bytes: int = 5_000_000
+
+
 @dataclass(frozen=True)
 class WebParams:
     """[sources.web] — the fenced network path (ingest-only, never query)."""
@@ -135,6 +162,7 @@ class Config:
     graph: GraphParams = GraphParams()
     git: GitParams = GitParams()
     web: WebParams = WebParams()
+    debug: DebugParams = DebugParams()
     raw: dict = field(default_factory=dict)
 
 
@@ -207,6 +235,8 @@ def load(root: Path) -> Config:
     index_params = _parse_index(_table(raw, "index"))
     graph_params = _parse_graph(_table(_table(raw, "engine"), "graph"))
     git_params = _parse_git(_table(raw, "git"))
+    debug_params = _parse_debug(_table(raw, "debug"))
+    debug.apply_config(debug_params)
 
     ans = _table(raw, "answer")
     max_sentences = ans.get("max_sentences", AnswerParams.max_sentences)
@@ -224,6 +254,7 @@ def load(root: Path) -> Config:
         graph=graph_params,
         git=git_params,
         web=web,
+        debug=debug_params,
         raw=raw,
     )
 
@@ -269,6 +300,38 @@ def _parse_git(table: dict) -> GitParams:
     if not isinstance(commit_cache, bool):
         raise FuxError("[git] commit_cache must be true or false")
     return GitParams(commit_cache=commit_cache)
+
+
+def _parse_debug(table: dict) -> DebugParams:
+    defaults = DebugParams()
+    level = table.get("level", defaults.level)
+    if level not in DEBUG_LEVELS:
+        raise FuxError(f"[debug] level must be one of {', '.join(DEBUG_LEVELS)}")
+    categories = table.get("categories", list(defaults.categories))
+    if not isinstance(categories, list) or not all(isinstance(c, str) for c in categories):
+        raise FuxError("[debug] categories must be a list of strings")
+    for cat in categories:
+        if cat != "*" and cat not in DEBUG_CATEGORIES:
+            raise FuxError(
+                f"[debug] unknown category {cat!r} — valid: *, "
+                f"{', '.join(sorted(DEBUG_CATEGORIES))}"
+            )
+    output = table.get("output", defaults.output)
+    if not isinstance(output, str) or not output:
+        raise FuxError("[debug] output must be a non-empty string (\"stderr\" or a file path)")
+    timing = table.get("timing", defaults.timing)
+    if not isinstance(timing, bool):
+        raise FuxError("[debug] timing must be true or false")
+    redact = table.get("redact", defaults.redact)
+    if not isinstance(redact, bool):
+        raise FuxError("[debug] redact must be true or false")
+    max_bytes = table.get("max_bytes", defaults.max_bytes)
+    if not isinstance(max_bytes, int) or isinstance(max_bytes, bool) or max_bytes < 1:
+        raise FuxError("[debug] max_bytes must be a positive integer")
+    return DebugParams(
+        level=level, categories=tuple(categories), output=output,
+        timing=timing, redact=redact, max_bytes=max_bytes,
+    )
 
 
 def _parse_web(table) -> WebParams:

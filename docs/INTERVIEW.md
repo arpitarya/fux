@@ -185,6 +185,29 @@ process working rather than luck:
    That is the honest head of phase 5, scoped in ADR 0011. Do not let the
    "substrate shipped" headline hide it.
 
+**Q: Phase 5 — where does it stand (2026-07-22)?**
+
+**Shipped: v0.24.0, ADR 0012, M1–M6 all green.** Debug & observability: a
+hand-rolled, stdout-safe emitter (`fux.debug`) behind `[debug]` in fux.toml
+with `--debug[=LEVEL]`/`FUX_DEBUG` precedence; `dbg()`/`timer()` calls at every
+pipeline stage; `fux doctor` (seven groups, exit 0/1, every failing check
+names the fix command); `fux why` (single-document negative-result verdict,
+reading its dense/graph evidence straight from `kernel.retrieve()` so it can
+never disagree with a real query); a third skill, `fux-debug`, plus a
+one-line escalation pointer in the other two.
+
+The gate that mattered: **the stdout-purity test was written at M1, before any
+instrumentation existed**, specifically so it would still be exercising real
+call sites by M6 rather than trivially passing against an empty emitter. It
+held through all five milestones without a single stdout leak — the discipline
+(`dbg()` is a no-op until `is_enabled()` says otherwise, and every write target
+is stderr or an explicit file) did what it was designed to do.
+
+One deliberate scope line: `fux doctor`'s "Chrome for CDP" check is
+binary-presence only, not a live port probe — `import socket` outside
+`ingest/` trips the standing network-fence test, and that fence is worth
+keeping over one doctor check's completeness. See ADR 0012's "owed" section.
+
 **Q: What must a confident successor NOT "clean up"?**
 
 1. **The hand-rolled frontmatter parser + validator** (once built) — that is the
@@ -232,4 +255,8 @@ compass. · Claude Opus 4.8 (1M context), 2026-07-22 — built phase 4, the
 knowledge substrate (v0.23.0, ADRs 0008–0011): escalated the DoD-7 conflict
 rather than redefining it, mutation-tested the parity claims that resulted, and
 recorded what the 100k benchmark exposed but did not fix (query-at-scale).
+· Claude Sonnet 5, 2026-07-22 — built phase 5, debug & observability (v0.24.0,
+ADR 0012): the emitter, `fux doctor`, `fux why`, and the `fux-debug` skill; kept
+the stdout-purity gate green from M1's empty emitter through M6's fully
+instrumented pipeline.
 (Add yourself here when you make a material update — model, date, one line.)*

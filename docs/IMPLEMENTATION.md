@@ -20,9 +20,10 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 4 complete: v0.23.0
-> shipped** (M1–M8 + close-out ✅). Suites: 365 unit + 71 e2e · eval hit@5 1.000.
-> **Next phase's head: query-at-scale** — postings stored but unread (ADR 0011).
+> *(building agent: keep this one line current)* — **Phase 5 complete: v0.24.0
+> shipped** (M1–M6 + close-out ✅). Suites: 417 unit + 100 e2e (+1 gated skip).
+> **Next phase's head: query-at-scale** — postings stored but unread (ADR 0011,
+> unchanged since phase 4).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -137,18 +138,28 @@ row at EVERY milestone completion — no batching.*
 
 | Milestone | Status | Tests | Notes |
 |-----------|--------|-------|-------|
-| M1 `[debug]` config + emitter (`debug.py`, precedence, redaction, **stdout-purity gate**) | ⬜ | — | write the goldens-unchanged-at-trace test first |
-| M2 instrument the pipeline (walk/convert/chunk/index/query/dense/graph/answer) | ⬜ | — | `off` must stay free; trace output reproducible |
-| M3 `fux doctor` (7 groups, text + `--json`, fix commands, self-test) | ⬜ | — | zero-match source globs surfaced loudly |
-| M4 `fux why` (pipeline walk + verdict line; in/out of corpus, ranked-low) | ⬜ | — | the verdict sentence is the feature |
-| M5 skills: `fux-debug` + escalation pointers in fux-query/fux-ingest | ⬜ | — | Arpit's "must work with skills" requirement |
-| M6 docs (`example/DEBUG.md` + CLI/TOML/SETUP/SKILLS/GLOSSARY) + suites | ⬜ | — | |
-| Close-out: ADR 0012, docs law, archive pair, CHANGELOG+README, bump | ⬜ | — | target v0.24.0 |
+| M1 `[debug]` config + emitter (`debug.py`, precedence, redaction, **stdout-purity gate**) | ✅ | 44+5 | `DebugParams`/`_parse_debug` in config.py (calls `debug.apply_config` — the one wiring point every `load()` caller shares); hand-rolled emitter chosen over stdlib `logging` (simpler to keep the flag>env>toml precedence and max_bytes truncation deterministic — ADR 0012 open Q1); `tests/conftest.py` new (autouse debug-state reset — config.load()'s side effect needed isolating); e2e stdout-purity + stderr-reproducibility tests added to test_determinism.py |
+| M2 instrument the pipeline (walk/convert/chunk/index/query/dense/graph/answer) | ✅ | 394+80 (+1) | `dbg()`/`timer()` at walk/convert/chunk/index/lock/state/graph (ingest side) + query/lexical/dense/graph/answer/hooks/web (query side); trace-level per-chunk/per-sentence content previews gated on `redact=false`; found + fixed a latent flaky-test risk (ingest's own `Elapsed: N.Ns` stdout line is wall-clock, unrelated to debug — normalized in the new determinism test rather than in product code) |
+| M3 `fux doctor` (7 groups, text + `--json`, fix commands, self-test) | ✅ | 14+6 | environment/capabilities/config/corpus/consistency/agent-surface/self-test; capabilities group never fails health (optional paths only); zero-match `[sources]` globs surfaced loudly with fix command (the #1 silent misconfig); self-test ingests a canary doc in a scratch temp dir and proves ingest→index→query→citation end to end; **deviation**: no live CDP-port reachability probe — `import socket` outside `ingest/` trips the existing network-fence test (`test_import_fence.py`), so "Chrome for CDP" checks binary presence only (see Deviations) |
+| M4 `fux why` (pipeline walk + verdict line; in/out of corpus, ranked-low) | ✅ | 8+7 | corpus presence (cache/skip-reason/on-disk-but-excluded/absent) → chunks → lexical (full-corpus rank + per-term idf/tf via `Searcher.search(top=all)`) → dense (FuxVec hamming/prefilter/cosine) → graph (seed vs. expanded-via-edge) → one verdict sentence; reuses `kernel.retrieve()` for dense+graph so `why` can never disagree with what a real query would do |
+| M5 skills: `fux-debug` + escalation pointers in fux-query/fux-ingest | ✅ | 10+4 | third skill in `agents/generate.py::_SKILLS` (doctor→check→why→advanced→--debug=debug→report-don't-guess workflow); one-line escalation pointer added to both existing skills; `fux setup --skills` now writes 3 skill files, verified idempotent |
+| M6 docs (`example/DEBUG.md` + CLI/TOML/SETUP/SKILLS/GLOSSARY) + suites | ✅ | 417+100 (+1) | `example/DEBUG.md` new (worked failures × 7); CLI/TOML/SETUP/SKILLS/GLOSSARY/DOC-REGISTRY/PLAN/INTERVIEW updated; e2e doctor/why/debug-level coverage landed incrementally at M1/M3/M4, confirmed complete here |
+| Close-out: ADR 0012, docs law, archive pair, CHANGELOG+README, bump | ✅ | — | **v0.24.0**; ADR 0012 answers all 4 open questions; handoff+prompt archived as `v0.24.0-debug-observability-*.md`; CLAUDE.md hard-won-knowledge + version line updated |
 
 ## Deviations from spec
 
 *(record any deliberate deviation from a handoff here, with the why and the ADR
 that captures it — an empty section is the goal)*
+
+- **0005 / `fux doctor`'s "Chrome for CDP" capability check is binary-presence
+  only, not a live port probe.** The existing `tests/test_import_fence.py`
+  forbids `import socket` (and `urllib.request`) anywhere outside `ingest/` —
+  a standing rule that keeps the query/index/embed/state planes provably
+  network-free. A live `localhost:<cdp_port>` reachability check would violate
+  that fence from `src/fux/doctor.py`. `shutil.which()` over common Chrome/
+  Chromium binary names (plus the macOS `.app` path) is the check instead;
+  the actual CDP handshake is still only exercised at `fux ingest --web` with
+  `render = "cdp"`, inside the fence. → ADR 0012.
 
 - **0001 / `converted_at`:** derived from `SOURCE_DATE_EPOCH` (reproducible-builds
   convention) or the source file's mtime — never wall clock. The handoff lists

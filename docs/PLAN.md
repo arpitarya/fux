@@ -182,7 +182,7 @@ paste-ready prompt in [`handoff/`](handoff/)):
 | [v0.21.0](archive/v0.21.0-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ✅ **implemented** (v0.21.0, 2026-07-21; ADR 0005) |
 | [v0.22.0](archive/v0.22.0-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ✅ **implemented** (v0.22.0, 2026-07-21; ADRs 0006–0007; gate passed as tie → ships enabled) |
 | [v0.23.0](archive/v0.23.0-knowledge-substrate-handoff.md) | **v3 — knowledge substrate** | SQLite substrate (bulk text in-db) · fux.lock · committed lean state (`.fux/state/`) · one-kernel `retrieve()` + explain/graph/path/cat · FuxVec · full/lean profiles · db pull | ✅ **implemented** (v0.23.0, 2026-07-22; ADRs 0008–0011; eval hit@5 1.000) |
-| [0005](handoff/0005-debug-observability-handoff.md) | **v4 — debug & observability** | `[debug]` in fux.toml (level/categories/output/timing/redact) · stdout-pure emitter · `fux doctor` (install+corpus+consistency+self-test) · `fux why` (negative-result verdict) · **`fux-debug` skill** | 📋 **spec ready** (Arpit, 2026-07-22) — target v0.24.0, ADR 0012 |
+| [v0.24.0](archive/v0.24.0-debug-observability-handoff.md) | **v4 — debug & observability** | `[debug]` in fux.toml (level/categories/output/timing/redact) · stdout-pure emitter · `fux doctor` (install+corpus+consistency+self-test) · `fux why` (negative-result verdict) · **`fux-debug` skill** | ✅ **implemented** (v0.24.0, 2026-07-22; ADR 0012) |
 
 Sequencing: v1 → dogfood in Anton → then v1.1 and/or v2 in either order, each
 gated by the dogfood telling us which pain is real. **Arpit's call (2026-07-21): one
@@ -202,25 +202,26 @@ Claude Code.
 | Ingest v1.1 (web/CDP/advanced — v0.21.0 handoff) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
 | Hybrid engine v2 (bundled model + RRF — v0.22.0 handoff) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
 | Knowledge substrate v3 (v0.23.0 handoff) | ✅ | **v0.23.0** (2026-07-22); ADRs 0008–0011; 365 unit + 71 e2e; eval hit@5 **1.000** (beats v0.22); 100k benchmark: state 23 MB, FuxVec scan 54 ms (no IVF) |
-| Debug & observability v4 (0005 handoff) | 📋 | spec ready 2026-07-22; `[debug]` toml + doctor/why + fux-debug skill; target v0.24.0 |
+| Debug & observability v4 (v0.24.0 handoff) | ✅ | **v0.24.0** (2026-07-22); ADR 0012; 417 unit + 100 e2e; `[debug]` toml + emitter, `fux doctor`, `fux why`, `fux-debug` skill |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
 
 ## 8. Next move
 
-**Phase 4 shipped (v0.23.0, 2026-07-22)** — design of record
-[`proposals/knowledge-substrate.md`](proposals/knowledge-substrate.md), build
-spec archived at
-[`archive/v0.23.0-knowledge-substrate-handoff.md`](archive/v0.23.0-knowledge-substrate-handoff.md),
-decisions in ADRs [0008](adr/0008-substrate-store-lock-state.md)–[0011](adr/0011-profiles-lean-state.md).
+**Phase 5 shipped (v0.24.0, 2026-07-22)** — build spec archived at
+[`archive/v0.24.0-debug-observability-handoff.md`](archive/v0.24.0-debug-observability-handoff.md),
+decision in [ADR 0012](adr/0012-debug-observability.md). Every stage is now
+inspectable: `[debug]` toml + a stdout-safe emitter, `fux doctor` (seven-group
+install/corpus health), `fux why` (single-document negative-result verdict),
+and a third skill (`fux-debug`) so an agent self-diagnoses without a human
+reading logs.
 
-**The one thing phase 4 measured and did not fix** — and therefore the obvious
-head of the next phase: at 100k documents a query takes ~10 s, because the query
-path still loads the entire index into memory to build the `Searcher`. The
-`postings` table is populated and indexed at ingest but never read at query
-time. The substrate solved *storage* at scale; *query* at scale is scoped,
-unstarted work (numbers and the fix in
-[ADR 0011](adr/0011-profiles-lean-state.md)).
+**The head of the next phase remains what phase 4 measured and did not
+fix**: at 100k documents a query takes ~10 s, because the query path still
+loads the entire index into memory to build the `Searcher`. The `postings`
+table is populated and indexed at ingest but never read at query time. The
+substrate solved *storage* at scale; *query* at scale is scoped, unstarted
+work (numbers and the fix in [ADR 0011](adr/0011-profiles-lean-state.md)).
 
 Beyond that: dogfooding (DOGFOOD.md + the private eval set) continues, and the
 held rule engine remains the long arc.

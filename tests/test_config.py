@@ -68,12 +68,49 @@ def test_unknown_source_type_rejected(tmp_path):
         ("[engine.bm25f]\nk1 = -1\n", "k1"),
         ("[engine.bm25f]\nb = 2.0\n", "b must be between"),
         ("[answer]\nmax_sentences = 0\n", "max_sentences"),
+        ("[debug]\nlevel = \"loud\"\n", "level"),
+        ("[debug]\ncategories = [\"nonsense\"]\n", "unknown category"),
+        ("[debug]\noutput = \"\"\n", "output"),
+        ("[debug]\ntiming = \"yes\"\n", "timing"),
+        ("[debug]\nredact = 1\n", "redact"),
+        ("[debug]\nmax_bytes = 0\n", "max_bytes"),
     ],
 )
 def test_invalid_values_rejected(tmp_path, body, match):
     write(tmp_path, body)
     with pytest.raises(FuxError, match=match):
         load(tmp_path)
+
+
+def test_debug_defaults_and_overrides(tmp_path):
+    write(tmp_path, '[sources]\ndocs = ["docs"]\n')
+    cfg = load(tmp_path)
+    assert cfg.debug.level == "off"
+    assert cfg.debug.categories == ("*",)
+    assert cfg.debug.output == "stderr"
+    assert cfg.debug.timing is False
+    assert cfg.debug.redact is True
+    assert cfg.debug.max_bytes == 5_000_000
+
+    write(
+        tmp_path,
+        '[sources]\ndocs = ["docs"]\n'
+        '[debug]\nlevel = "trace"\ncategories = ["query", "dense"]\n'
+        'output = ".fux/debug.log"\ntiming = true\nredact = false\nmax_bytes = 1000\n',
+    )
+    cfg = load(tmp_path)
+    assert cfg.debug.level == "trace"
+    assert cfg.debug.categories == ("query", "dense")
+    assert cfg.debug.output == ".fux/debug.log"
+    assert cfg.debug.timing is True
+    assert cfg.debug.redact is False
+    assert cfg.debug.max_bytes == 1000
+
+
+def test_debug_wildcard_category_allowed(tmp_path):
+    write(tmp_path, '[sources]\ndocs = ["docs"]\n[debug]\ncategories = ["*"]\n')
+    cfg = load(tmp_path)
+    assert cfg.debug.categories == ("*",)
 
 
 def test_invalid_toml_rendered_clearly(tmp_path):
@@ -101,7 +138,7 @@ def test_documented_config_parses_and_matches_shipped_defaults(tmp_path):
     from pathlib import Path
 
     from fux.config import (
-        AnswerParams, BM25FParams, GitParams, GraphParams, HybridParams,
+        AnswerParams, BM25FParams, DebugParams, GitParams, GraphParams, HybridParams,
         IndexParams, WebParams, load,
     )
 
@@ -117,6 +154,7 @@ def test_documented_config_parses_and_matches_shipped_defaults(tmp_path):
     assert config.graph == GraphParams()
     assert config.index == IndexParams()
     assert config.git == GitParams()
+    assert config.debug == DebugParams()
     defaults = WebParams()
     for field in ("max_depth", "same_domain", "attachments", "budget", "delay_s",
                   "max_fetch_kb", "render", "cdp_port", "settle_ms",

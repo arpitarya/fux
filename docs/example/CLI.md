@@ -341,6 +341,118 @@ fux: no document 'docs/nope.md' in the corpus — try `fux find "nope"`
 1
 ```
 
+## `fux doctor` — diagnose the whole install/corpus
+
+Seven groups (environment, capabilities, config, corpus, consistency, agent
+surface, self-test); exit 0 healthy, 1 problems found. Every failing check
+prints **what is wrong, why it matters, and the exact fix command**:
+
+```
+$ fux doctor
+[✓] environment
+  ok  fux version: fux 0.24.0
+  ok  python version: 3.12.4
+  ok  install path: /…/site-packages/fux
+  ok  bundled model: present, sha256 verified (7926518 bytes)
+[✓] capabilities
+  ok  markitdown: not installed — pip install 'fux-engine[ingest]'
+  ok  docling: not installed — pip install docling
+  ok  tesseract: not installed — brew install tesseract (macOS) / apt install tesseract-ocr (Linux)
+  ok  Chrome for CDP: not installed — install Google Chrome/Chromium, …
+  ok  websocket-client (CDP fallback): not installed — pip install websocket-client (optional)
+[✗] config
+  ok  fux.toml: /repo/fux.toml
+  ok  [sources] docs = 'docs': 41 files
+  FAIL  [sources] docs = 'notes/private': directory exists but matches 0 files
+        why: the #1 silent misconfig — this entry contributes nothing, and `fux ingest` will not warn you
+        fix: check fux.toml — did you mean a different directory for [sources] docs?
+  ok  [ingest] exclude: .git, .fux, __pycache__, .venv, venv, node_modules, .pytest_cache, dist
+[✓] corpus
+  ok  manifest: 50 sources tracked
+  ok  fux.lock: present
+  ok  state plane (.fux/state/): present
+  ok  index: json · 50 docs · 1204 chunks
+  ok  cache (.fux/cache/): 812004 bytes
+  ok  index (.fux/index/): 2140812 bytes
+[✓] consistency
+  ok  drift (source ↔ lock): 0 drifted
+  ok  stale (web max_age_days): 0 stale
+  ok  desync (state ↔ lock): 0 desynced
+[✓] agent surface
+  ok  AGENTS.md: present
+  ok  skill: fux-query: present
+  ok  skill: fux-ingest: present
+  ok  skill: fux-debug: present
+  ok  hooks (.claude/settings.json): wired
+[✓] self-test
+  ok  ingest → index → query → citation: ok
+
+problems found — see FAIL rows above
+$ echo $?
+1
+```
+
+`--json` mirrors the same structure (`{"healthy": bool, "groups": [{"name",
+"ok", "checks": [{"name","ok","detail","why"?,"fix"?}]}]}`) — stable enough for
+CI gating (handoff 0005 open question 2 → ADR 0012). **Capabilities never fail
+health** (they're optional paths, reported for information); every other group
+can. A missing `fux.toml` short-circuits after the `config` group — there is no
+corpus to diagnose yet. The **self-test** group ingests a throwaway canary
+document in a scratch temp dir, queries it, and asserts its own citation
+resolves — proving ingest→index→query end to end without touching the real
+corpus.
+
+## `fux why` — negative-result explanation
+
+`--explain` only explains results that *appeared*; `why` walks the pipeline for
+**one named document** and reports the first place it fell out, ending in a
+single verdict sentence — everything above the verdict is evidence:
+
+```
+$ fux why "install the widget" --doc docs/guide.md
+docs/guide.md
+  in corpus: True  (cache=.fux/cache/docs/guide.md  fidelity=inferred)
+  chunks: 1
+    ✓ Widget Guide:6-35
+  lexical: rank=1 score=6.0213 in_pool=True (pool=200)
+    install: idf=1.8971 tf={'heading': 0, 'path': 0, 'body': 4} contribution=2.7095
+    …
+  dense: similarity=0.83 in_prefilter=True hamming=41 (width=500)
+  graph: reached=True as=seed via=None edge=None
+
+verdict: returned: rank 1 at --top 5
+```
+
+A document that ranks but falls outside the requested `--top`:
+
+```
+$ fux why "install the widget" --doc "docs/unicode-café.md" --top 1
+…
+verdict: not returned at --top 1: rank 6 overall (raise --top to 6 to see it)
+```
+
+A document skipped at ingest (never reaches the pipeline at all):
+
+```
+$ fux why "anything" --doc docs/binary.md
+docs/binary.md
+  in corpus: False  (binary content)
+
+verdict: not in corpus: binary content
+```
+
+The **full negative case** — no lexical overlap, no dense rescue, no graph edge:
+
+```
+verdict: not returned: no lexical overlap, no dense candidate (cosine 0.19, not
+among the 500 nearest FuxVec codes), no edge from any seed
+```
+
+`--json` mirrors the same walk (`{doc, in_corpus, corpus_detail, chunks[],
+lexical, dense, graph, verdict}`); `--lexical-only` evaluates the pure BM25F
+path and omits `dense` entirely. `--top N` matches the `--top` a normal query
+would use, so the verdict answers "would a normal call have shown me this?"
+
 ## Modifiers (all query verbs)
 
 `--json` — machine-readable, the agent path. Emitted as one compact line;

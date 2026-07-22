@@ -19,6 +19,51 @@ diary.*
 
 ---
 
+## 2026-07-22 — phase 5 built: debug & observability (v0.24.0) · Claude Code
+- **Asked:** execute handoff 0005 exactly — `[debug]` in fux.toml, a stdout-pure
+  emitter, `fux doctor`, `fux why`, the `fux-debug` skill, M1→M6 with the
+  stdout-purity gate written before any instrumentation existed.
+- **Did:** all six milestones, green throughout, IMPLEMENTATION.md updated per
+  milestone (never batched):
+  - **M1** `DebugParams`/`_parse_debug` in `config.py` (wired via
+    `debug.apply_config()` inside `load()` — one config-load call site, not one
+    per command); `src/fux/debug.py` (`dbg()`/`timer()`/`is_enabled()`,
+    flag>env>toml>off precedence, redaction, max_bytes truncation, unwritable-
+    output fallback); `--debug[=LEVEL]` global CLI flag; `tests/conftest.py`
+    (autouse debug-state reset — needed once `load()` had a global side effect);
+    e2e stdout-purity + stderr-reproducibility tests.
+  - **M2** `dbg()`/`timer()` at walk/convert/chunk/index/lock/state/graph
+    (ingest side) and query/lexical/dense/graph/answer/hooks/web (query side);
+    trace-level content previews gated on `redact=false`; caught and fixed a
+    latent flaky-test risk (ingest's own `Elapsed: N.Ns` stdout line is
+    wall-clock, unrelated to debug — normalized in the test, not the product).
+  - **M3** `src/fux/doctor.py` — 7 groups, `--json`, exit 0/1; zero-match
+    `[sources]` globs surfaced loudly; self-test ingests a canary doc in a
+    scratch temp dir and proves ingest→index→query→citation end to end.
+  - **M4** `src/fux/query/why.py` — corpus-presence → chunks → lexical → dense →
+    graph → one verdict sentence; dense/graph evidence read from
+    `kernel.retrieve()` itself so `why` can't disagree with a real query.
+  - **M5** `fux-debug` skill in `agents/generate.py::_SKILLS`; one-line
+    escalation pointer added to `fux-query`/`fux-ingest`; `fux setup --skills`
+    now writes 3 skills.
+  - **M6** `docs/example/DEBUG.md` new (7 worked failures); CLI/TOML/SETUP/
+    SKILLS/GLOSSARY/DOC-REGISTRY/PLAN/INTERVIEW updated.
+  - **Close-out:** ADR 0012 (answered all 4 open questions); CHANGELOG entry +
+    README mirror + command list; archived the handoff+prompt pair as
+    `docs/archive/v0.24.0-debug-observability-*.md` (status: implemented, ADR
+    linked); bumped `__version__` → 0.24.0. Suites: **417 unit + 100 e2e**
+    (+1 gated skip).
+- **Decided / open:** `fux doctor`'s "Chrome for CDP" check is binary-presence
+  only (`shutil.which`), not a live port probe — `import socket` outside
+  `ingest/` trips the standing `test_import_fence.py` rule, and keeping that
+  fence mattered more than one check's completeness (recorded in ADR 0012 and
+  IMPLEMENTATION.md's Deviations). `why --all` deliberately not built (single-
+  doc only, cost-scoped) — open for a future proposal if a real need appears.
+- **Next:** none pending for phase 5. Next phase's head is still query-at-scale
+  (ADR 0011) — the 100k-corpus ~10s query latency, unfixed.
+
+---
+
 ## 2026-07-22 — release v0.23.1 (docs & examples) · Claude Code
 - **Asked:** commit, push, and publish.
 - **Did:** on main → branched `release/v0.23.1-docs-examples`. Confirmed all
@@ -352,6 +397,47 @@ diary.*
 - **Decided / open:** no scheduled tamper alarm on the wall anymore — re-add the
   workflow + a `BRANCH_PROTECTION_TOKEN` PAT if that guarantee is ever wanted back.
 - **Next:** Anton dogfood.
+
+## 2026-07-22 — First external conformance run: hybrid degrades 4× at 1k · Cowork
+- **Asked:** what came out of the 1k test.
+- **Result:** the fux-lab suite ran against **fux-engine 0.23.0 from PyPI** —
+  52 checks, **51 pass, 1 fail**, plus two findings hidden in INFO rows.
+- **The headline (bad):** on 1 000 docs with 11 planted pairs,
+  **lexical-only hit@5 0.818 / MRR 0.576** vs **hybrid hit@5 0.182 / MRR
+  0.136** — lexical found 9/11, hybrid found 2/11. Opposite direction from the
+  engine's own gate (fixture-scale ADR 0006/0010, hit@5 1.000). **Hybrid is the
+  default path**, so if this generalizes the default is worse than the flag.
+  Fires the recorded reopen-trigger in `compare/query-engine.compare.md`.
+- **Cause NOT isolated — two readings, both plausible:** (A) RRF has no quality
+  floor, so a noise-carrying dense list demotes correct lexical hits; (B) the
+  synthetic corpus is adversarial for dense (450 notes from one paragraph
+  template → near-identical sign-quantized codes → arbitrary dense order).
+  Discriminating experiment named: **run the same suite on the realistic
+  acme-payments corpus**. Recovers → B (add a dense-quality guard); still
+  degrades → A (the default engine mode is wrong at scale).
+- **Secondary:** zero-overlap rescue **0/2 in both modes** — likely because the
+  planted sentence sits in a doc that is otherwise about something else, so the
+  *document* vector is dominated by surrounding text. If confirmed, a real
+  documentable limit of doc-level dense search (argues for chunk-level codes),
+  and ADR 0010's rescue claim holds only when the answer dominates its doc.
+- **Tertiary:** fresh-clone parity passed on **top-1 only** — "lower-rank scores
+  differ; state plane is quantized". README/CHANGELOG claim "same rankings *and
+  scores*". Either narrow the claim or close the gap — a docs-accuracy issue
+  at minimum.
+- **What passed:** byte-identical double-ingest; all three drift cases
+  distinguishable with correct `--strict` exits; honest decline in all three
+  verbs (`answer` → null, 0 sources, no fabrication); citations resolve;
+  `--lexical-only` stable; every size/latency within ±15 % of baseline.
+  Measured @1k: ingest 0.46 s · verbs ~0.12 s · state **200 B/doc** (vs 230
+  projected) · index 2 051 B/doc · cache 1 014 B/doc · lock 208 B/doc.
+- **Did:** filed `proposals/hybrid-degrades-at-scale.md` with all three
+  findings, both readings, the discriminating experiment, and candidate
+  mitigations (dense admission threshold · confidence-weighted RRF ·
+  size-aware default · `fux doctor` reporting which mode wins). Indexed in the
+  proposals README.
+- **Vindication of the harness:** an independent black-box suite on a
+  realistic-size corpus found in one run what a 21-pair fixture gate could not.
+- **Next:** build the acme-payments corpus and re-run — that decides A vs B.
 
 ## 2026-07-22 — Phase 5 specced: debug & observability (0005) · Cowork
 - **Asked:** a debugging plan for fux *everything*; expose a value in the toml;

@@ -11,6 +11,7 @@ import json
 import struct
 from dataclasses import dataclass, field
 
+from .. import debug
 from ..frontmatter import parse as fm_parse
 from .walk import SourceFile
 
@@ -44,6 +45,7 @@ def skip_reason(sf: SourceFile, data: bytes) -> str | None:
 def convert(sf: SourceFile, data: bytes, max_kb: int) -> ConvertResult:
     reason = skip_reason(sf, data)
     if reason:
+        debug.dbg("convert", "debug", "skipped", file=sf.rel, kind=sf.kind, reason=reason)
         return ConvertResult(skipped=reason, converter="none")
     handler = {
         "md": _convert_md,
@@ -57,6 +59,13 @@ def convert(sf: SourceFile, data: bytes, max_kb: int) -> ConvertResult:
     result = handler(sf, data, max_kb)
     if result.body and not result.body.endswith("\n"):
         result.body += "\n"
+    if result.skipped:
+        debug.dbg("convert", "debug", "skipped", file=sf.rel, kind=sf.kind, reason=result.skipped)
+    else:
+        debug.dbg(
+            "convert", "debug", "converted",
+            file=sf.rel, converter=result.converter, truncated=result.truncated,
+        )
     return result
 
 

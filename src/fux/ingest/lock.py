@@ -30,6 +30,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlsplit
 
+from .. import debug
 from ..config import Config
 
 LOCK_NAME = "fux.lock"
@@ -91,6 +92,9 @@ def write(root: Path, records: list[dict]) -> None:
     text = "\n".join(lines) + ("\n" if lines else "")
     if not path.is_file() or path.read_text(encoding="utf-8") != text:
         path.write_text(text, encoding="utf-8")
+        debug.dbg("lock", "info", "lock written", records=len(records))
+    else:
+        debug.dbg("lock", "debug", "lock unchanged", records=len(records))
 
 
 def records_from_entries(entries: list[dict], *, max_age_days: int = 30) -> list[dict]:
@@ -172,6 +176,11 @@ def check(config: Config) -> Status:
             )
 
     status.desync.extend(_state_desync(config, records))
+    debug.dbg(
+        "lock", "info", "check complete",
+        tracked=status.tracked, drift=len(status.drift),
+        stale=len(status.stale), desync=len(status.desync),
+    )
     return status
 
 

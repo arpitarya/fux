@@ -30,6 +30,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass, field
 
+from . import debug
 from .config import Config
 from .errors import FuxError
 from .index import load_edges, load_searcher
@@ -131,6 +132,8 @@ def retrieve(
     else:
         query, pinned = seed, None
 
+    debug.dbg("query", "info", "retrieve", seed="node" if pinned else "text", k=k,
+              lexical_only=lexical_only)
     passages, engine, model = _passages(
         config, searcher, query, k, lexical_only, vectors
     )
@@ -159,6 +162,11 @@ def retrieve(
 
     nodes = _nodes(files, seeds, edges, expand_hops, dict(expanded))
     paths = _paths(edges, {s.doc_id for s in seeds}, expand_hops)
+    debug.dbg(
+        "query", "info", "retrieve complete",
+        engine=engine, passages=len(passages), seeds=len(seeds),
+        nodes=len(nodes), edges=len(edges),
+    )
     return ResultGraph(
         seeds=seeds, nodes=nodes, edges=edges, paths=paths,
         passages=passages, engine=engine, model=model,
@@ -204,6 +212,7 @@ def _fuse_graph(config, searcher, passages, expanded) -> list[ScoredChunk]:
         chunk.hybrid = info
         chunk.score = score
         out.append(chunk)
+    debug.dbg("graph", "info", "graph list fused into rrf", expanded=len(expanded), fused=len(out))
     return out
 
 
@@ -216,16 +225,22 @@ def _passages(
 ) -> tuple[list[ScoredChunk], str, object | None]:
     """BM25F ∪ dense-over-candidates → RRF. Unchanged from v0.22 by contract."""
     if lexical_only or not config.hybrid.enabled:
-        return searcher.search(query, top=pool), "bm25f", None
+        results = searcher.search(query, top=pool)
+        debug.dbg("lexical", "debug", "lexical-only search", results=len(results))
+        return results, "bm25f", None
     from .embed import get_model
 
     model = get_model()
     if model is None:
+        debug.dbg("dense", "debug", "no bundled model — lexical fallback")
         return searcher.search(query, top=pool), "bm25f", None
     query_vec = model.embed(query)
     if query_vec is None:  # all-OOV query: dense has nothing to say
+        debug.dbg("dense", "debug", "all-OOV query — lexical fallback")
         return searcher.search(query, top=pool), "bm25f", None
     candidates = searcher.search(query, top=config.hybrid.candidate_pool)
+    debug.dbg("lexical", "debug", "bm25f candidates", pool=config.hybrid.candidate_pool,
+              candidates=len(candidates))
     if not candidates:
         # Nothing in the corpus shares a single term with the query. A binary
         # prefilter would still return its nearest 500 documents — measured,
@@ -236,6 +251,7 @@ def _passages(
         # answer. dense_global's job is documents with no lexical overlap
         # (ADR 0006's miss class), which it reaches via the third RRF list
         # below — that case always has candidates.
+        debug.dbg("lexical", "debug", "zero lexical candidates — no confident matches")
         return [], "bm25f", None
     from .embed.store import load_vectors
 
@@ -257,6 +273,7 @@ def _passages(
             "warning: some chunks lack semantic vectors — run `fux ingest` to refresh",
             file=sys.stderr,
         )
+    debug.dbg("dense", "debug", "candidate similarities scored", scored=len(dense), missing_vectors=missing)
     if not dense:
         return candidates[:pool], "bm25f", None
     global_hits = _dense_global(config, searcher, model, query_vec, vectors)
@@ -301,6 +318,14 @@ def _passages(
             r.hybrid["dense_global_rank"] = global_rank[key]
         r.score = score
         results.append(r)
+    debug.dbg("query", "info", "hybrid fusion", rrf_k=config.hybrid.rrf_k, results=len(results),
+              dense_global_rescues=len(global_hits))
+    if debug.is_enabled("lexical", "trace"):
+        for r in results:
+            fields = {"file": r.file, "ordinal": r.ordinal, "rrf": r.hybrid["rrf"]}
+            if not debug.redact_on():
+                fields["preview"] = r.text[:60].replace("\n", " ")
+            debug.dbg("lexical", "trace", "ranked chunk", **fields)
     return results, "hybrid", model
 
 
@@ -321,31 +346,38 @@ def _dense_global(config, searcher, model, query_vec, vectors) -> list[ScoredChu
     state = load_state(config.root)
     codes = {doc_id: e.code for doc_id, e in state.items() if e.code is not None}
     if not codes:
+        debug.dbg("dense", "debug", "no FuxVec codes committed — dense_global skipped")
         return []
-    doc_ids = prefilter(quantize(query_vec), codes, config.index.prefilter_width)
+    with debug.timer("dense", "prefilter + rerank"):
+        doc_ids = prefilter(quantize(query_vec), codes, config.index.prefilter_width)
 
-    by_position = {(c["file"], c["ordinal"]): c for c in searcher.chunks}
-    scored: list[tuple[float, str, int]] = []
-    for doc_id in doc_ids:
-        entry = vectors.get(doc_id)
-        if not entry:
-            continue
-        for ordinal, vec in enumerate(entry["vecs"]):
-            if vec is None or (doc_id, ordinal) not in by_position:
+        by_position = {(c["file"], c["ordinal"]): c for c in searcher.chunks}
+        scored: list[tuple[float, str, int]] = []
+        for doc_id in doc_ids:
+            entry = vectors.get(doc_id)
+            if not entry:
                 continue
-            scored.append((model.similarity(query_vec, vec), doc_id, ordinal))
-    scored.sort(key=lambda t: (-t[0], t[1], t[2]))
+            for ordinal, vec in enumerate(entry["vecs"]):
+                if vec is None or (doc_id, ordinal) not in by_position:
+                    continue
+                scored.append((model.similarity(query_vec, vec), doc_id, ordinal))
+        scored.sort(key=lambda t: (-t[0], t[1], t[2]))
 
-    out = []
-    for sim, doc_id, ordinal in scored[: config.hybrid.candidate_pool]:
-        chunk = by_position[(doc_id, ordinal)]
-        out.append(
-            ScoredChunk(
-                file=chunk["file"], heading=chunk["heading"], text=chunk["text"],
-                start=chunk["start"], end=chunk["end"], score=sim,
-                ordinal=chunk["ordinal"],
+        out = []
+        for sim, doc_id, ordinal in scored[: config.hybrid.candidate_pool]:
+            chunk = by_position[(doc_id, ordinal)]
+            out.append(
+                ScoredChunk(
+                    file=chunk["file"], heading=chunk["heading"], text=chunk["text"],
+                    start=chunk["start"], end=chunk["end"], score=sim,
+                    ordinal=chunk["ordinal"],
+                )
             )
-        )
+    debug.dbg(
+        "dense", "debug", "fuxvec prefilter",
+        codes=len(codes), width=config.index.prefilter_width,
+        scanned=len(doc_ids), rescued=len(out),
+    )
     return out
 
 
@@ -409,7 +441,9 @@ def _edges_for(config: Config, doc_ids: set[str], hops: int = 1) -> list[Edge]:
         if frontier <= reached:
             break  # nothing new: the neighbourhood is closed
         reached |= frontier
-    return [collected[key] for key in sorted(collected)]
+    out = [collected[key] for key in sorted(collected)]
+    debug.dbg("graph", "debug", "edges collected", seeds=len(doc_ids), hops=hops, edges=len(out))
+    return out
 
 
 def ppr(
@@ -475,7 +509,9 @@ def _expanded(
         if doc_id not in seed_ids and score >= params.min_score
     ]
     ranked.sort(key=lambda kv: (-kv[1], kv[0]))  # ties on id: reproducible
-    return ranked[: params.max_expanded]
+    out = ranked[: params.max_expanded]
+    debug.dbg("graph", "debug", "ppr expansion", candidates=len(ranked), kept=len(out))
+    return out
 
 
 def _nodes(

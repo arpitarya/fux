@@ -9,6 +9,7 @@ import math
 import re
 from dataclasses import dataclass, field
 
+from .. import debug
 from ..index.bm25f import ScoredChunk, tokenize
 
 _SENT_SPLIT = re.compile(r"(?<=[.!?])\s+")
@@ -53,6 +54,7 @@ def build_answer(
                 )
             )
     if not candidates:
+        debug.dbg("answer", "debug", "no sentence candidates")
         return []
 
     q_terms = set(tokenize(query)) - _STOPWORDS or set(tokenize(query))
@@ -88,6 +90,16 @@ def build_answer(
         if len(chosen) >= max_sentences:
             break
     chosen.sort(key=lambda s: (s.file, s.line or 0))
+    debug.dbg(
+        "answer", "debug", "sentences selected",
+        candidates=len(candidates), kept=len(chosen), keep_floor=round(keep_floor, 4),
+    )
+    if debug.is_enabled("answer", "trace"):
+        for s in chosen:
+            fields = {"file": s.file, "line": s.line, "score": round(s.score, 4)}
+            if not debug.redact_on():
+                fields["preview"] = s.text[:60]
+            debug.dbg("answer", "trace", "sentence chosen", **fields)
     return chosen
 
 

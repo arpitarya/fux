@@ -28,4 +28,5 @@ release stay unversioned.
 | **v0.21.0** | Ingest v1.1 (web/CDP/advanced tier) | [handoff](v0.21.0-ingest-web-advanced-handoff.md) · [prompt](v0.21.0-ingest-web-advanced-prompt.md) |
 | **v0.22.0** | Hybrid engine v2 (bundled model + RRF) | [handoff](v0.22.0-hybrid-engine-v2-handoff.md) · [prompt](v0.22.0-hybrid-engine-v2-prompt.md) |
 | **v0.23.0** | Knowledge substrate v3 | [handoff](v0.23.0-knowledge-substrate-handoff.md) · [prompt](v0.23.0-knowledge-substrate-prompt.md) |
+| **v0.24.0** | Debug & observability v4 | [handoff](v0.24.0-debug-observability-handoff.md) · [prompt](v0.24.0-debug-observability-prompt.md) |
 | *(spans v0.20–v0.22)* | Master orchestrator prompt | [master-prompt.md](master-prompt.md) |

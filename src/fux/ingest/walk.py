@@ -7,6 +7,7 @@ import os
 from dataclasses import dataclass
 from pathlib import Path
 
+from .. import debug
 from ..config import SOURCE_TYPES, Config
 
 # Extension → conversion kind, per source type. A dir configured under a type is
@@ -74,39 +75,59 @@ def walk(config: Config) -> WalkResult:
     unknown: list[str] = []
     missing: list[str] = []
 
-    for stype in SOURCE_TYPES:
-        ext_map = EXTENSIONS[stype]
-        for src_dir in config.sources.get(stype, ()):
-            base = (root / src_dir).resolve() if not os.path.isabs(src_dir) else Path(src_dir)
-            if not base.is_dir():
-                missing.append(src_dir)
-                continue
-            for dirpath, dirnames, filenames in os.walk(base):
-                dirnames[:] = sorted(
-                    d for d in dirnames if d not in exclude and not d.startswith(".")
+    with debug.timer("walk", "walk sources"):
+        for stype in SOURCE_TYPES:
+            ext_map = EXTENSIONS[stype]
+            for src_dir in config.sources.get(stype, ()):
+                base = (root / src_dir).resolve() if not os.path.isabs(src_dir) else Path(src_dir)
+                if not base.is_dir():
+                    missing.append(src_dir)
+                    debug.dbg("walk", "debug", "source dir missing", type=stype, dir=src_dir)
+                    continue
+                before = len(seen)
+                for dirpath, dirnames, filenames in os.walk(base):
+                    dirnames[:] = sorted(
+                        d for d in dirnames if d not in exclude and not d.startswith(".")
+                    )
+                    for name in sorted(filenames):
+                        if name.startswith("."):
+                            continue
+                        path = Path(dirpath) / name
+                        rel = _rel_to_root(path, base, root)
+                        ext = path.suffix.lower()
+                        kind = ext_map.get(ext)
+                        if kind is None:
+                            if not any(ext in EXTENSIONS[t] for t in SOURCE_TYPES):
+                                unknown.append(rel)
+                            continue
+                        if rel not in seen:
+                            seen[rel] = SourceFile(
+                                rel=rel,
+                                abspath=path,
+                                stype=stype,
+                                kind=kind,
+                                lang=CODE_LANGS.get(ext, "") if kind == "code" else "",
+                            )
+                matched = len(seen) - before
+                debug.dbg(
+                    "walk", "debug", "source dir scanned",
+                    type=stype, dir=src_dir, matched=matched,
                 )
-                for name in sorted(filenames):
-                    if name.startswith("."):
-                        continue
-                    path = Path(dirpath) / name
-                    rel = _rel_to_root(path, base, root)
-                    ext = path.suffix.lower()
-                    kind = ext_map.get(ext)
-                    if kind is None:
-                        if not any(ext in EXTENSIONS[t] for t in SOURCE_TYPES):
-                            unknown.append(rel)
-                        continue
-                    if rel not in seen:
-                        seen[rel] = SourceFile(
-                            rel=rel,
-                            abspath=path,
-                            stype=stype,
-                            kind=kind,
-                            lang=CODE_LANGS.get(ext, "") if kind == "code" else "",
-                        )
+                if matched == 0:
+                    # The #1 silent misconfig (handoff §C) — a glob/dir that
+                    # resolves to zero files never surfaces otherwise.
+                    debug.dbg(
+                        "walk", "info", "source dir matched zero files",
+                        type=stype, dir=src_dir,
+                    )
 
     files = [seen[r] for r in sorted(seen)]
-    return WalkResult(files=files, unknown=sorted(set(unknown)), missing_dirs=missing)
+    result = WalkResult(files=files, unknown=sorted(set(unknown)), missing_dirs=missing)
+    debug.dbg(
+        "walk", "info", "walk complete",
+        files=len(result.files), unknown=len(result.unknown), missing=len(result.missing_dirs),
+    )
+    return result
 
 
 def _rel_to_root(path: Path, base: Path, root: Path) -> str:

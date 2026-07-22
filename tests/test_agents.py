@@ -23,6 +23,7 @@ def test_setup_generates_all_surfaces(tmp_path, monkeypatch, capsys):
         ".kiro/steering/fux.md",
         ".claude/skills/fux-query/SKILL.md",
         ".claude/skills/fux-ingest/SKILL.md",
+        ".claude/skills/fux-debug/SKILL.md",
         ".claude/settings.json",
         ".kiro/hooks/fux-query.kiro.hook",
     ):
@@ -31,6 +32,16 @@ def test_setup_generates_all_surfaces(tmp_path, monkeypatch, capsys):
     assert MANAGED_START in agents and 'fux ask "<question>" --json' in agents
     out = capsys.readouterr().out
     assert "created" in out
+
+
+def test_skills_include_fux_debug_with_escalation_pointers(tmp_path):
+    generate_agent_files(tmp_path, skills=True)
+    debug_skill = (tmp_path / ".claude/skills/fux-debug/SKILL.md").read_text(encoding="utf-8")
+    assert "fux doctor" in debug_skill and "fux why" in debug_skill
+    query_skill = (tmp_path / ".claude/skills/fux-query/SKILL.md").read_text(encoding="utf-8")
+    assert "fux-debug" in query_skill
+    ingest_skill = (tmp_path / ".claude/skills/fux-ingest/SKILL.md").read_text(encoding="utf-8")
+    assert "fux-debug" in ingest_skill
 
 
 def test_second_run_all_unchanged(tmp_path, monkeypatch):
