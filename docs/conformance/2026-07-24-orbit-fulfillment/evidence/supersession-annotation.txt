@@ -1,0 +1,8 @@
+  rank 1  superseded=True  by=docs/adr/0021-wave-cap-200-lines.md  <- docs/adr/0009-wave-cap-500-lines.md
+  rank 1  superseded=True  by=docs/adr/0024-same-day-cutoff-1400.md  <- docs/adr/0012-same-day-cutoff-1200.md
+  rank 1  superseded=True  by=docs/guides/network-overview.md  <- docs/adr/0001-carrier-cologne.md
+  rank 7  superseded=True  by=docs/adr/0016-directed-putaway-by-velocity.md  <- docs/adr/0008-fixed-location-putaway.md
+  rank 1  superseded=True  by=docs/adr/0019-dynamic-dock-assignment.md  <- docs/adr/0004-fixed-dock-per-carrier.md
+  rank 1  superseded=True  by=docs/adr/0022-weekly-slotting-refresh.md  <- docs/adr/0013-quarterly-slotting.md
+
+annotation present on 6/6 frontmatter-reachable superseded docs when retrieved

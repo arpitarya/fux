@@ -19,6 +19,120 @@ diary.*
 
 ---
 
+## 2026-07-24 — phase 7 reviewed → release handoff (0008) packaged  ·  Cowork
+- **Asked:** one handoff+prompt for all pending items — first commit/push/publish
+  everything built, then the next steps.
+- **Did:** wrote handoff+prompt `0008-release-and-followups` (→ **Sonnet**, publish
+  human-gated). Grounded it in the real state: phase 7 is **staged uncommitted on
+  main**, `__version__` already 0.26.0, tags through v0.25.0, publish is
+  release-triggered (tag↔version guard + twine --strict + OIDC), and ~nothing since
+  0.23.0 is on PyPI. Sequenced so the two approved README honesty edits + the
+  CLAUDE.md fold land **before** the release is cut (PyPI must not render the old
+  "cannot hallucinate" claim). Part B = fix the `zero_overlap_rescued` suite
+  miscount. Part C (scoped, not executed) = the non-monotone fusion finding (Opus,
+  own handoff) + chunk-level dense codes.
+- **Decided / open:** Q1 — publish 0.26.0 only (recommended; supersedes 0.24/0.25,
+  carries corrected README) vs back-publish older versions. Q2 — the go/no-go on
+  the irreversible release (human-gated at M5).
+- **Next:** run 0008 in Claude Code; it pauses at M5 for Arpit's publish go.
+
+## 2026-07-24 — phase 7 built: supersession down-rank shipped enabled (v0.26.0)  ·  Claude Code
+- **Asked:** execute handoff 0007 — the default-off down-rank penalty, calibrate
+  it across four eval sets, re-measure the runner-up margin, gated on M1
+  (Arpit reopening Option B) and M5 (his sign-off before enabling).
+- **Did:**
+  - **M1** — Arpit reopened B. Amended the supersession compare-doc verdict
+    (A stands; B authorised default-off), updated INTERVIEW + IMPLEMENTATION.
+  - **M2** — `[engine.hybrid] supersession_penalty` as a **rank offset** in RRF
+    (`1/(k+rank+N)`), applied to the deterministic frontmatter-marked set only.
+    Lean honours it too (parity law). Landed at `0` with every golden unchanged.
+  - **M3** — swept fixture/acme/orbit/synthetic 1k/5k/10k. **Safe interval
+    `[11, ∞)`** to 500; zero hit@5 regression on any gate, any value, any kind;
+    hit@1 improves (orbit .566→.698, acme .491→.564). **100% of
+    frontmatter-reachable inversions recovered** (orbit 5/5, acme 3/3) — every
+    residual one is unmarked. Harness validated against orbit's published
+    numbers before sweeping.
+  - **M4** — re-measured the margin de-confounded. **Still empty.** The confound
+    was real (orbit's minimal `factual` question improved) but not the cause: a
+    `how-to` question sits at 1e-05 before *and* after; acme is identical, its
+    minimum a `cross-doc` question — the legitimate-consensus mode the compare
+    doc predicted years of reasoning ago.
+  - **M5** — surfaced both readings of the "majority" gate (all inversions:
+    orbit 62% ✅ / acme 33% ❌; reachable: 100% both). **Arpit chose enable at 15.**
+  - **M6** — ADR 0015, both compare docs closed out, conformance run filed,
+    README/CHANGELOG/PLAN/GLOSSARY/TOML/registry updated, handoff+prompt archived
+    as `v0.26.0-*`, version bumped. 470 unit + 100 e2e green.
+- **Decided / open:**
+  - **Fabrication is now a documented product boundary**, not an open defect —
+    three no-model discriminators refuted across two corpora, one de-confounded.
+    The decline-floor reopen-trigger is **retired**; no fourth mechanism proposed.
+  - **Two README honesty-claim edits are PROPOSED, not applied** (positioning is
+    Arpit's call): the "never generative, so it cannot hallucinate" line and the
+    "measured, unfixed limit" phrasing in § Honest limits, both of which M4
+    turned from provisional into permanent.
+  - **Open (Arpit, unchanged):** release to PyPI — 0.25.0 was never published and
+    0.26.0 now sits on top of it.
+- **Next:** Arpit rules on the two README wording proposals; then open the
+  v0.26.0 PR and read `gh pr checks` before merging (no required checks on main).
+
+## 2026-07-24 — orbit run reviewed → phase 7 packaged (down-rank)  ·  Cowork
+- **Asked:** review the second-corpus (orbit-fulfillment) output; what next.
+- **Did:** synthesized the generalization verdict — all three acme findings
+  reproduce on an independent domain (staleness 8/12 meeting the ≥8/12 gate;
+  fabrication 0/4 with **both** no-model mechanisms refuted; zero-overlap 1/6).
+  Surfaced the key coupling: the margin refutation is **confounded** — smallest
+  "answerable" margins come from superseded-twin ties, so Finding 1's fix is the
+  prerequisite to a fair Finding 2 verdict. Wrote handoff+prompt
+  `0007-supersession-downrank` (→ v0.26.0, **Opus**): default-off penalty knob,
+  four-eval-set calibration, and the margin re-measurement it unblocks.
+  Pre-registered phase 7 in IMPLEMENTATION.md; filed the two orbit engine/suite
+  findings (non-monotone fusion; zero_overlap_rescued miscount).
+- **Decided / open:** the anti-B argument weakened — the penalised set is
+  deterministic (author frontmatter, 6/6 surfaced), only the magnitude is tuned.
+  **M1 gate:** Arpit must reopen Option B before Claude Code starts.
+  Parallel Arpit calls: release v0.25.0 to PyPI (committed af374f0, unpublished);
+  reframe the "never fabricate" claim if M4 confirms the no-model boundary.
+- **Next:** Arpit reopens B (or not); phase 7 executes in Claude Code.
+
+## 2026-07-24 — second realistic corpus (orbit-fulfillment): all three findings generalize  ·  Claude Code
+
+- **Asked:** build a second realistic ~1k-doc corpus in a domain far from fintech and
+  determine whether the three acme findings generalize; measure the deferred
+  runner-up **margin check** directly.
+- **Did:**
+  - New generator `fux-lab/shared/generate/make_orbit.py` (warehouse/order-fulfillment,
+    944 files, 50 hand-written hero docs, 57 typed eval pairs, deterministic). Marker
+    split **known by construction**: 6/12 superseded docs carry `superseded_by:`.
+    Unanswerable vocabulary verified absent (0 files for crypto/drone/graphql/cafeteria).
+  - New measurement tooling: `shared/regress/margin.py` (top vs runner-up separability)
+    and `shared/regress/floor_sweep.py` (empirical `min_confidence` curve over the full
+    eval set).
+  - Filed `docs/conformance/2026-07-24-orbit-fulfillment/` (report + ANALYSIS + 10
+    evidence files); updated `conformance/README.md`, both reopen-triggered compare docs,
+    DOC-REGISTRY; updated `fux-lab/TEST-PLAN.md` §1/§7.
+- **Decided / open:**
+  - **Staleness generalizes: 8/12 inversions — the Option-B ≥8/12 gate is MET.** 6/6
+    frontmatter-reachable superseded docs carry the v0.25.0 annotation and **5 of 6
+    still outrank their replacement**. Mechanism: current doc wins BM25F outright in 6/8
+    cases and loses on a dense edge as thin as 0.0006 cosine, which RRF flips.
+    **The gate's second clause (a tunable penalty) is NOT tested — B stays deferred.**
+  - **Fabrication generalizes: 0/4.** Absolute floor **empty** (needs ≥0.121, false-declines
+    start at 0.105) and the **margin check is refuted — empty AND inverted** (unanswerable
+    margins exceed the smallest answerable ones; the smallest answerable margins come from
+    stale/current ties, so Finding 1 manufactures Finding 2's false-positive mode).
+    Recorded as a **documented product boundary**, not an open defect.
+  - **Zero-overlap generalizes: 1/6 clean dense rescues**; hybrid also *demoted* a lexical
+    rank-5 hit out of top-5 (fusion is not monotone).
+  - **v0.25.0 features confirmed on independent data:** annotation surfaces 6/6; the
+    permissive `min_confidence` default re-confirmed as the only zero-false-decline value.
+  - **Caveat, flagged prominently:** `fux-engine==0.25.0` **is not on PyPI** (merged as
+    `af374f0`, never released), so the run used a locally-built wheel driven strictly as a
+    black box. Numbers describe that commit, not a published artifact.
+- **Next:** run the **penalty-tuning experiment** for supersession down-ranking, gated
+  jointly on the fixture gate, acme, orbit and the synthetic tiers, graduating via an ADR.
+
+---
+
 ## 2026-07-23 — phase 6 built end-to-end, v0.25.0 shipped  ·  Claude Code
 - **Asked:** execute the `0006-trust-currency-prompt.md` paste-ready prompt
   (supersession awareness + `answer` confidence floor).

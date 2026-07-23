@@ -1,0 +1,172 @@
+{
+  "curve": [
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.0,
+      "shippable": false,
+      "unanswerable_declined": 0,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.05,
+      "shippable": false,
+      "unanswerable_declined": 2,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.08,
+      "shippable": false,
+      "unanswerable_declined": 2,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.09,
+      "shippable": false,
+      "unanswerable_declined": 2,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.095,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.1,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 0,
+      "answerable_total": 53,
+      "false_declined_by_kind": {},
+      "floor": 0.103,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 1,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "zero-overlap": 1
+      },
+      "floor": 0.105,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 1,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "zero-overlap": 1
+      },
+      "floor": 0.11,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 1,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "zero-overlap": 1
+      },
+      "floor": 0.115,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 1,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "zero-overlap": 1
+      },
+      "floor": 0.12,
+      "shippable": false,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 1,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "zero-overlap": 1
+      },
+      "floor": 0.121,
+      "shippable": false,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 2,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "stale-vs-current": 1,
+        "zero-overlap": 1
+      },
+      "floor": 0.125,
+      "shippable": false,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 2,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "stale-vs-current": 1,
+        "zero-overlap": 1
+      },
+      "floor": 0.13,
+      "shippable": false,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 2,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "stale-vs-current": 1,
+        "zero-overlap": 1
+      },
+      "floor": 0.15,
+      "shippable": false,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4
+    },
+    {
+      "answerable_false_declined": 2,
+      "answerable_total": 53,
+      "false_declined_by_kind": {
+        "stale-vs-current": 1,
+        "zero-overlap": 1
+      },
+      "floor": 0.2,
+      "shippable": false,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4
+    }
+  ],
+  "shippable_floors": [],
+  "verdict": "EMPTY \u2014 no floor declines all fabrications without false-declining a real answer"
+}

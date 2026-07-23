@@ -254,10 +254,21 @@ on CPU. The only model class that fits Fux's ≤10 MB / zero-dep budget.
 **Supersession** — A document's own frontmatter (`status: superseded` and/or
 `superseded_by: <doc-id>`) declaring itself retired in favor of another (v0.25).
 Parsed at index build, persisted with chain/cycle resolution, and annotated in
-`find`/`ask`/`why` — **never reorders ranking**; `answer` prefers the resolved
-successor when both are in its candidate pool. Only frontmatter-marked
-supersession is reachable (no model allowed); see
+`find`/`ask`/`why`; `answer` prefers the resolved successor when both are in its
+candidate pool. Since v0.26 it also **down-ranks** — see *Supersession penalty*.
+Only frontmatter-marked supersession is reachable (no model allowed); see
 [ADR 0013](adr/0013-supersession-awareness.md).
+
+**Supersession penalty (`[engine.hybrid] supersession_penalty`)** — The rank
+offset applied in RRF fusion to author-marked superseded documents (v0.26,
+default **15**): a penalised chunk contributes `1/(k + rank + 15)` instead of
+`1/(k + rank)`. The unit is *ranks* because that is scale-free — independent of
+`rrf_k`, corpus size, and list count — so one calibrated magnitude transfers
+across corpus scales. **A penalty, not a filter:** the retired document stays
+retrievable for questions about the old decision. `0` restores pre-0.26 ranking
+exactly; `--lexical-only` never reaches it. The default is a measurement — safe
+interval `[11, ∞)` across all four eval sets, zero hit@5 regression anywhere; see
+[ADR 0015](adr/0015-supersession-downrank-penalty.md).
 
 **Tesseract** — The leading open-source OCR engine (offline, 100+ languages),
 called as a subprocess in the advanced tier to turn images/scans into searchable

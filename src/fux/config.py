@@ -60,6 +60,29 @@ class HybridParams:
     enabled: bool = True
     rrf_k: int = 60
     candidate_pool: int = 200
+    # Rank offset applied in fusion to documents whose *author* marked them
+    # superseded (frontmatter only — never inferred). A penalised chunk
+    # contributes 1/(k + rank + penalty) instead of 1/(k + rank).
+    #
+    # 0 = off, and off is exact identity: the arithmetic is untouched, so
+    # every ranking is byte-identical to v0.25.0. That property is what let the
+    # knob land before calibration proved it safe to enable (ADR 0015).
+    #
+    # The unit is *ranks* rather than raw score because it is scale-free —
+    # independent of rrf_k, corpus size, and how many lists fire — so a
+    # magnitude calibrated on one corpus means the same thing on a 100k one.
+    #
+    # 15 is MEASURED, not chosen (docs/conformance/
+    # 2026-07-24-supersession-penalty-calibration/). The safe interval is
+    # [11, ∞), swept to 500 across all four eval sets: it recovers 100% of the
+    # frontmatter-reachable inversions on two independent realistic corpora
+    # (orbit 5/5, acme 3/3), with zero hit@5 regression on any gate and no
+    # regression in any question kind. 15 sits inside the plateau, clear of the
+    # 11 boundary. Enabled by default at Arpit's M5 sign-off, 2026-07-24.
+    #
+    # Do NOT move this on intuition — it is a measurement. Changing it means
+    # re-running the four-eval-set sweep.
+    supersession_penalty: int = 15
 
 
 @dataclass(frozen=True)
@@ -234,6 +257,12 @@ def load(root: Path) -> Config:
     for name, val in (("rrf_k", rrf_k), ("candidate_pool", candidate_pool)):
         if not isinstance(val, int) or isinstance(val, bool) or val < 1:
             raise FuxError(f"[engine.hybrid] {name} must be a positive integer")
+    penalty = hyb.get("supersession_penalty", HybridParams.supersession_penalty)
+    if not isinstance(penalty, int) or isinstance(penalty, bool) or penalty < 0:
+        raise FuxError(
+            "[engine.hybrid] supersession_penalty must be a non-negative integer "
+            "(rank offset; 0 disables)"
+        )
 
     index_params = _parse_index(_table(raw, "index"))
     graph_params = _parse_graph(_table(_table(raw, "engine"), "graph"))
@@ -257,7 +286,10 @@ def load(root: Path) -> Config:
         ingest=IngestParams(max_kb=max_kb, exclude=tuple(exclude)),
         bm25f=BM25FParams(**params),
         answer=AnswerParams(max_sentences=max_sentences, min_confidence=float(min_confidence)),
-        hybrid=HybridParams(enabled=enabled, rrf_k=rrf_k, candidate_pool=candidate_pool),
+        hybrid=HybridParams(
+            enabled=enabled, rrf_k=rrf_k, candidate_pool=candidate_pool,
+            supersession_penalty=penalty,
+        ),
         index=index_params,
         graph=graph_params,
         git=git_params,

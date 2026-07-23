@@ -1,0 +1,374 @@
+{
+  "eval_by_kind": {
+    "cross-doc": 4,
+    "factual": 17,
+    "how-to": 6,
+    "stale-vs-current": 12,
+    "unanswerable": 4,
+    "why": 8,
+    "zero-overlap": 6
+  },
+  "eval_pairs": [
+    {
+      "doc": "docs/adr/0002-goods-to-person-amrs.md",
+      "kind": "why",
+      "note": "ADR 0002 \u2014 travel cost collapse",
+      "q": "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?"
+    },
+    {
+      "doc": "docs/adr/0002-goods-to-person-amrs.md",
+      "kind": "factual",
+      "note": "answer: autonomous mobile robots (AMRs)",
+      "q": "What carries movable racks to the pick stations?"
+    },
+    {
+      "doc": "docs/adr/0005-store-dimensions-in-millimeters.md",
+      "kind": "factual",
+      "note": "answer: integer millimeters (never floats)",
+      "q": "In what unit are item and carton dimensions stored?"
+    },
+    {
+      "doc": "docs/adr/0005-store-dimensions-in-millimeters.md",
+      "kind": "why",
+      "note": "answer: exact fit comparisons, no rounding drift",
+      "q": "Why are dimensions stored as integer millimeters rather than floating-point centimeters?"
+    },
+    {
+      "doc": "docs/adr/0007-zone-picking-with-putwall.md",
+      "kind": "why",
+      "note": "ADR 0007 \u2014 bounded travel, batched picks",
+      "q": "Why do we use zone picking into a putwall instead of discrete order picking?"
+    },
+    {
+      "doc": "docs/adr/0007-zone-picking-with-putwall.md",
+      "kind": "factual",
+      "note": "answer: the putwall",
+      "q": "Where are picked items sorted back into individual customer orders?"
+    },
+    {
+      "doc": "docs/adr/0015-reserve-bulk-forward-pick-split.md",
+      "kind": "why",
+      "note": "ADR 0015 \u2014 dense reserve, short pick faces",
+      "q": "Why is storage split into deep reserve and a shallow forward pick face?"
+    },
+    {
+      "doc": "docs/adr/0025-cross-dock-flagged-inbound.md",
+      "kind": "why",
+      "note": "ADR 0025 \u2014 one touch for already-ordered stock",
+      "q": "Why do we cross-dock some inbound cartons straight to the pack lane?"
+    },
+    {
+      "doc": "docs/adr/0025-cross-dock-flagged-inbound.md",
+      "kind": "factual",
+      "note": "answer: cross-docked to the outbound pack lane, not storage",
+      "q": "When an inbound carton already matches an open order, where does it go?"
+    },
+    {
+      "doc": "docs/adr/0028-single-writer-per-sorter-lane.md",
+      "kind": "why",
+      "note": "ADR 0028 \u2014 manifest and physical divert must agree",
+      "q": "Why does each outbound sorter lane have a single writer?"
+    },
+    {
+      "doc": "docs/adr/0021-wave-cap-200-lines.md",
+      "kind": "stale-vs-current",
+      "note": "current 200 supersedes 500",
+      "q": "What is the maximum number of order lines in a single pick wave today?",
+      "stale_doc": "docs/adr/0009-wave-cap-500-lines.md"
+    },
+    {
+      "doc": "docs/adr/0021-wave-cap-200-lines.md",
+      "kind": "factual",
+      "note": "answer: 200 lines",
+      "q": "How many order lines can one pick wave contain?"
+    },
+    {
+      "doc": "docs/adr/0024-same-day-cutoff-1400.md",
+      "kind": "stale-vs-current",
+      "note": "current 14:00 supersedes 12:00",
+      "q": "What is the same-day dispatch order cutoff time?",
+      "stale_doc": "docs/adr/0012-same-day-cutoff-1200.md"
+    },
+    {
+      "doc": "docs/adr/0024-same-day-cutoff-1400.md",
+      "kind": "factual",
+      "note": "answer: 14:00 local",
+      "q": "By what local time must an order be placed to ship the same day?"
+    },
+    {
+      "doc": "docs/guides/network-overview.md",
+      "kind": "stale-vs-current",
+      "note": "current Vanta Freight supersedes Cologne Carriers",
+      "q": "Who is orbit's primary parcel carrier?",
+      "stale_doc": "docs/adr/0001-carrier-cologne.md"
+    },
+    {
+      "doc": "docs/guides/network-overview.md",
+      "kind": "factual",
+      "note": "answer: Vanta Freight",
+      "q": "Which carrier does most outbound volume route to?"
+    },
+    {
+      "doc": "docs/guides/network-overview.md",
+      "kind": "why",
+      "note": "answer: later manifest cutoff + cleaner scan feed enabled 14:00 cutoff",
+      "q": "Why did we move the primary parcel lane to Vanta Freight?"
+    },
+    {
+      "doc": "docs/adr/0016-directed-putaway-by-velocity.md",
+      "kind": "stale-vs-current",
+      "note": "current directed-by-velocity supersedes fixed-location",
+      "q": "How are received goods assigned to storage locations today?",
+      "stale_doc": "docs/adr/0008-fixed-location-putaway.md"
+    },
+    {
+      "doc": "docs/adr/0016-directed-putaway-by-velocity.md",
+      "kind": "factual",
+      "note": "answer: SKU velocity (directed putaway), no fixed home",
+      "q": "What determines where a received SKU is put away now?"
+    },
+    {
+      "doc": "docs/adr/0019-dynamic-dock-assignment.md",
+      "kind": "stale-vs-current",
+      "note": "current dynamic-per-wave supersedes fixed-per-carrier",
+      "q": "How are outbound dock doors assigned to carriers now?",
+      "stale_doc": "docs/adr/0004-fixed-dock-per-carrier.md"
+    },
+    {
+      "doc": "docs/adr/0022-weekly-slotting-refresh.md",
+      "kind": "stale-vs-current",
+      "note": "current weekly supersedes quarterly",
+      "q": "How often is slotting recomputed now?",
+      "stale_doc": "docs/adr/0013-quarterly-slotting.md"
+    },
+    {
+      "doc": "docs/adr/0022-weekly-slotting-refresh.md",
+      "kind": "factual",
+      "note": "answer: weekly",
+      "q": "On what cadence is the slotting plan recomputed?"
+    },
+    {
+      "doc": "docs/guides/replenishment.md",
+      "kind": "stale-vs-current",
+      "note": "current 25%; legacy runbook says 10% (inline-dated)",
+      "q": "At what pick-face fill level does replenishment trigger now?",
+      "stale_doc": "docs/runbooks/legacy-replenishment-10pct.md"
+    },
+    {
+      "doc": "docs/guides/replenishment.md",
+      "kind": "factual",
+      "note": "answer: 25% of face capacity",
+      "q": "What percent-full triggers a forward-pick replenishment?"
+    },
+    {
+      "doc": "docs/guides/cycle-counting.md",
+      "kind": "stale-vs-current",
+      "note": "current A weekly; legacy says monthly (inline-dated)",
+      "q": "How often are A-class SKUs cycle-counted currently?",
+      "stale_doc": "docs/runbooks/legacy-cycle-count-monthly.md"
+    },
+    {
+      "doc": "docs/guides/cycle-counting.md",
+      "kind": "factual",
+      "note": "answer: weekly",
+      "q": "What is the cycle-count frequency for fast-moving A-class SKUs?"
+    },
+    {
+      "doc": "docs/runbooks/short-pick-handling.md",
+      "kind": "stale-vs-current",
+      "note": "current partial-ship + reslot; legacy holds whole order (inline-dated)",
+      "q": "What happens to an order when a line is short-picked today?",
+      "stale_doc": "docs/runbooks/legacy-short-pick-hold.md"
+    },
+    {
+      "doc": "docs/guides/batch-picking.md",
+      "kind": "stale-vs-current",
+      "note": "current 12; legacy says 6 (no marker)",
+      "q": "How many orders does a pick tote batch today?",
+      "stale_doc": "docs/guides/legacy-tote-capacity.md"
+    },
+    {
+      "doc": "docs/guides/batch-picking.md",
+      "kind": "factual",
+      "note": "answer: 12",
+      "q": "How many compartments (orders) does a pick tote carry?"
+    },
+    {
+      "doc": "docs/guides/returns.md",
+      "kind": "stale-vs-current",
+      "note": "current 90 days; legacy says 30 (no marker)",
+      "q": "How many days does a customer have to start a return?",
+      "stale_doc": "docs/guides/legacy-returns-30day.md"
+    },
+    {
+      "doc": "docs/guides/returns.md",
+      "kind": "factual",
+      "note": "answer: 90 days",
+      "q": "What is the returns window from delivery?"
+    },
+    {
+      "doc": "docs/guides/carrier-cutoffs.md",
+      "kind": "stale-vs-current",
+      "note": "current 17:30; legacy says 16:00 (no marker)",
+      "q": "What time does the final carrier manifest close?",
+      "stale_doc": "docs/runbooks/legacy-manifest-cutoff-1600.md"
+    },
+    {
+      "doc": "docs/api/asn-receiving.md",
+      "kind": "factual",
+      "note": "answer: sku, expected_qty, carton_count",
+      "q": "What fields are required on an inbound ASN line?"
+    },
+    {
+      "doc": "docs/api/asn-receiving.md",
+      "kind": "factual",
+      "note": "answer: a line names an unknown SKU",
+      "q": "What causes an inbound ASN to be rejected at receipt?"
+    },
+    {
+      "doc": "docs/api/wave-release.md",
+      "kind": "factual",
+      "note": "answer: no \u2014 cancel and re-release",
+      "q": "Can a released pick wave be edited?"
+    },
+    {
+      "doc": "docs/runbooks/recover-a-stuck-wave.md",
+      "kind": "how-to",
+      "note": "runbook \u2014 stuck wave",
+      "q": "How do I recover a pick wave that is stuck at the putwall?"
+    },
+    {
+      "doc": "docs/runbooks/fix-a-misslotted-sku.md",
+      "kind": "how-to",
+      "note": "runbook \u2014 mis-slot",
+      "q": "What is the procedure to correct a mis-slotted SKU?"
+    },
+    {
+      "doc": "docs/runbooks/onboard-a-new-sku.md",
+      "kind": "how-to",
+      "note": "runbook \u2014 SKU onboarding",
+      "q": "How do I onboard a new SKU into the warehouse?"
+    },
+    {
+      "doc": "docs/runbooks/clear-a-jammed-sorter-lane.md",
+      "kind": "how-to",
+      "note": "runbook \u2014 jammed lane",
+      "q": "How do I clear a jammed outbound sorter lane?"
+    },
+    {
+      "doc": "docs/guides/local-simulator.md",
+      "kind": "how-to",
+      "note": "guide \u2014 local sim",
+      "q": "How do I run the warehouse simulator on my machine?"
+    },
+    {
+      "doc": "docs/runbooks/receive-an-inbound-asn.md",
+      "kind": "how-to",
+      "note": "runbook \u2014 receiving",
+      "q": "How do I receive an inbound ASN at the dock?"
+    },
+    {
+      "doc": "docs/guides/carrier-cutoffs.md",
+      "kind": "cross-doc",
+      "note": "needs network-overview (Vanta) + carrier-cutoffs (17:30)",
+      "q": "Which carrier do we primarily ship with, and what time does its final manifest close?"
+    },
+    {
+      "doc": "docs/postmortems/2026-01-peak-putwall-backup.md",
+      "kind": "cross-doc",
+      "note": "postmortem links slotting cadence + short-pick policy",
+      "q": "What caused the January putwall backup and what changed after it?"
+    },
+    {
+      "doc": "docs/postmortems/2026-01-peak-putwall-backup.md",
+      "kind": "why",
+      "note": "answer: quarterly slotting + short-pick hold policy cascaded",
+      "q": "Why did whole orders freeze at the putwall during the January peak?"
+    },
+    {
+      "doc": "docs/postmortems/2025-12-manifest-mismatch.md",
+      "kind": "cross-doc",
+      "note": "postmortem links single-writer ADR + jammed-lane runbook",
+      "q": "Why did our carrier manifest disagree with the carrier's scan in December?"
+    },
+    {
+      "doc": "docs/guides/order-lifecycle.md",
+      "kind": "factual",
+      "note": "answer: eligible, waved, picking, consolidating, packing, sorted, manifested, shipped",
+      "q": "What are the stages an order passes through from eligible to shipped?"
+    },
+    {
+      "doc": "docs/guides/order-lifecycle.md",
+      "kind": "cross-doc",
+      "note": "needs lifecycle (consolidating) + putwall concept",
+      "q": "At which stage do a wave's picked items get sorted back into individual orders?"
+    },
+    {
+      "doc": "docs/notes/never-a-bare-shelf.md",
+      "kind": "zero-overlap",
+      "note": "concept: replenishment",
+      "q": "How do we make sure a picker is not routed to an empty location?"
+    },
+    {
+      "doc": "docs/notes/counting-without-closing.md",
+      "kind": "zero-overlap",
+      "note": "concept: cycle counting",
+      "q": "How is inventory accuracy verified without shutting the warehouse?"
+    },
+    {
+      "doc": "docs/notes/straight-through.md",
+      "kind": "zero-overlap",
+      "note": "concept: cross-docking",
+      "q": "What do we do with received goods that already have a waiting order?"
+    },
+    {
+      "doc": "docs/notes/fast-things-close.md",
+      "kind": "zero-overlap",
+      "note": "concept: velocity slotting",
+      "q": "Why are frequently ordered products stored near the shipping area?"
+    },
+    {
+      "doc": "docs/notes/gather-together.md",
+      "kind": "zero-overlap",
+      "note": "concept: wave/batch release",
+      "q": "How do we avoid walking the same aisle repeatedly for separate requests?"
+    },
+    {
+      "doc": "docs/notes/right-sized-box.md",
+      "kind": "zero-overlap",
+      "note": "concept: cartonization",
+      "q": "How is the best-fitting shipping box picked for an order?"
+    },
+    {
+      "doc": "",
+      "kind": "unanswerable",
+      "note": "no crypto / payroll content in corpus",
+      "q": "What is orbit's policy on paying warehouse staff in cryptocurrency?"
+    },
+    {
+      "doc": "",
+      "kind": "unanswerable",
+      "note": "no drone / aerial / last-mile-delivery content",
+      "q": "What is the uptime SLA percentage for the autonomous drone last-mile delivery fleet?"
+    },
+    {
+      "doc": "",
+      "kind": "unanswerable",
+      "note": "no GraphQL / mobile-app content",
+      "q": "How do I configure the GraphQL subscription API for the customer mobile app?"
+    },
+    {
+      "doc": "",
+      "kind": "unanswerable",
+      "note": "no cafeteria / catering content",
+      "q": "Which vendor supplies the on-site staff cafeteria catering?"
+    }
+  ],
+  "hero_docs": 50,
+  "note": "realistic corpus #2 \u2014 warehouse/fulfillment domain, disjoint from fintech; marker split known by construction (6/12 frontmatter-reachable)",
+  "repo": "orbit-fulfillment",
+  "seed": 20260723,
+  "stale_pairs": 12,
+  "supersession_frontmatter_reachable": 6,
+  "total_docs": 944
+}

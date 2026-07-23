@@ -1,0 +1,33 @@
+question                                     doc      lex_rank lex_score dense_sim hamming
+--------------------------------------------------------------------------------------------
+What is the same-day dispatch order cutoff   CURRENT         1    35.647    0.6738      61
+What is the same-day dispatch order cutoff   stale           2    34.997    0.7016      59
+
+Who is orbit's primary parcel carrier?       CURRENT         1    19.798    0.5932      85
+Who is orbit's primary parcel carrier?       stale           2    15.072    0.7625      65
+
+How are received goods assigned to storage   CURRENT       100     3.663    0.3646      98
+How are received goods assigned to storage   stale           9     6.440    0.4176     104
+
+How are outbound dock doors assigned to car  CURRENT         1    32.099    0.7667      78
+How are outbound dock doors assigned to car  stale           2    16.577    0.7673      81
+
+How often is slotting recomputed now?        CURRENT         2     8.741    0.6182      91
+How often is slotting recomputed now?        stale           1    10.440    0.7018      80
+
+At what pick-face fill level does replenish  CURRENT         1    23.036    0.7279      70
+At what pick-face fill level does replenish  stale           2    22.056    0.7368      65
+
+How many days does a customer have to start  CURRENT         2    21.081    0.6625      59
+How many days does a customer have to start  stale           1    25.248    0.6770      62
+
+What time does the final carrier manifest c  CURRENT         2    14.511    0.6512      67
+What time does the final carrier manifest c  stale           1    15.937    0.6618      67
+
+
+=== ZERO-OVERLAP MISSES ===
+question                                           lex_rank lex_score dense_sim  in_prefilter
+How do we make sure a picker is not routed to an        100     6.804    0.3556          True
+How is inventory accuracy verified without shutti         5     8.200    0.3297          True
+Why are frequently ordered products stored near t       201     2.909    0.5273          True
+How do we avoid walking the same aisle repeatedly         1    19.429    0.5132          True

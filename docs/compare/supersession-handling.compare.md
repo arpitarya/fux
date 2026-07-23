@@ -1,9 +1,9 @@
 ---
 type: Compare Doc
 title: Supersession Handling
-description: How Fux should treat a document its author marked superseded — annotate and let answer prefer the current doc, versus down-ranking superseded chunks in fusion. Proposed verdict is annotate-first; the fusion penalty stays deferred.
+description: How Fux should treat a document its author marked superseded — annotate and let answer prefer the current doc, versus down-ranking superseded chunks in fusion. Verdict is annotate-first (shipped v0.25.0); the fusion penalty was reopened 2026-07-24 for a default-off calibrated test (phase 7).
 status: accepted
-timestamp: 2026-07-23T00:00:00Z
+timestamp: 2026-07-24T00:00:00Z
 tags: [retrieval, staleness, ranking]
 ---
 
@@ -17,6 +17,15 @@ tags: [retrieval, staleness, ranking]
 > **Honest caveat:** annotation does not change `find` ordering, so an agent
 > that reads only the top result *and ignores the annotation* still gets the
 > stale document. That residual is real, stated, and measurable.
+>
+> **⟳ Amended (2026-07-24, Arpit) — Option B is REOPENED for a calibrated test.**
+> The caveat above was measured and it holds: orbit shows the engine emitting
+> "this is superseded, here is the replacement" *about the document it ranked
+> first*, in 5 of 6 frontmatter-reachable pairs. **A stands and is not being
+> reverted** — B is additive on top of it. What is authorised is **building the
+> penalty default-off and calibrating it**, not shipping it enabled: the default
+> flips only on a proven safe interval plus a separate Arpit sign-off (phase 7,
+> M5). See *Reopen — Option B, 2026-07-24* below.
 
 ## Context
 
@@ -136,9 +145,121 @@ Revisit and ship **B** when *either*:
 2. post-ship measurement shows consumers demonstrably ignore the annotation and
    the rank-1 harm persists.
 
+### Second data point — orbit-fulfillment, 2026-07-24 (condition 1: HALF met)
+
+Measured on an independently-authored corpus in a domain deliberately disjoint
+from acme's (`docs/conformance/2026-07-24-orbit-fulfillment/`):
+
+- **Inversion rate 8/12 — the ≥ 8/12-equivalent bar is MET.** Not "roughly"; it
+  lands exactly on the threshold.
+- **The marker split was known by construction this time** (acme's 5/12 was
+  accidental): 6 of 12 superseded docs carry `superseded_by:`.
+- **The annotation works and does not help ranking.** 6/6 frontmatter-reachable
+  superseded docs surface `superseded` + `superseded_by` in `find --json`, and
+  **5 of those 6 still outrank their current replacement**, most at rank 1. The
+  engine emits "this is superseded, here is the replacement" about the document
+  it just ranked first.
+- **Mechanism:** in 6 of 8 inversions the current doc **wins BM25F outright**
+  (sometimes 2× the score) and loses on a dense-similarity edge as thin as
+  **0.0006 cosine**, which RRF converts into a rank flip. A penalty would usually
+  need to overcome only a very small fusion gap.
+- **Cost of the defect is now visible in aggregate quality:** hybrid
+  `stale-vs-current` hit@1 is **0.333 vs lexical 0.583** on orbit.
+
+**Status of the trigger: condition 1's first clause is satisfied; its second
+clause is NOT.** No penalty magnitude has been tuned or tested — this run
+deliberately changed no ranking behaviour, and nothing in it supports a specific
+penalty value.
+
+**Named next step:** a penalty-tuning experiment gated jointly on the fixture
+gate, acme, orbit, and the synthetic tiers, graduating through an ADR.
+
+## Reopen — Option B, 2026-07-24 (Arpit)
+
+**Decision: test B via a default-off, calibrated penalty.** This supersedes the
+"B stays deferred" line above; it does **not** supersede the accepted verdict's
+Option A, which ships and stands.
+
+**What changed since the deferral** — each of the three arguments that defeated B
+in the original debate:
+
+| original objection | status on 2026-07-24 |
+|---|---|
+| *"B is a heuristic"* | **weakened.** The penalised set is **deterministic** — exactly the docs whose author wrote `superseded_by:`/`status: superseded` (orbit: 6/6 surfaced in `--json`). Only the *magnitude* is tuned. |
+| *"tuned on one corpus"* | **cleared.** acme 9/12 + orbit 8/12, independent domains. The trigger's ≥8/12 bar is met exactly. |
+| *"can regress what works"* | **removed by construction.** Default `0.0` is byte-identical to v0.25.0; the penalty ships enabled only if calibration proves a safe interval across fixture + acme + orbit + synthetic. |
+
+**What is authorised, precisely:**
+
+- **Build** the knob (`[engine.hybrid] supersession_penalty`, default `0.0`) and
+  **calibrate** it across all four eval sets.
+- **Not** authorised: enabling it by default. That needs a magnitude recovering a
+  majority of inversions with **zero** hit@5 regression on any gate, **and** a
+  separate Arpit sign-off — because B changes `find` ordering, which is the one
+  thing A deliberately avoided.
+- **"No safe interval exists" is a valid outcome.** Then the knob ships
+  default-off with the measured trade-off curve — the same honest-permissive rule
+  the confidence floor settled on.
+
+**Penalty form (decided 2026-07-24):** a **rank offset applied before fusion** —
+a superseded chunk contributes `1/(k + rank + N)` instead of `1/(k + rank)`.
+Chosen over an absolute RRF subtraction because the sweep unit ("ranks") is
+scale-free: independent of `rrf_k`, corpus size, and how many lists fire, so a
+magnitude calibrated on orbit means the same thing on a 100k corpus. `N = 0` is
+exact identity.
+
+**Penalty, not filter.** Superseded docs stay retrievable — they rank lower, so a
+question genuinely *about the retired decision* still reaches them.
+
+**Second reason this phase exists:** the penalty de-confounds the
+[decline-floor](answer-decline-floor.compare.md) margin refutation. Orbit's
+smallest "answerable" margins (1e-05) came from a doc tying with its own
+superseded twin — Finding 1 is manufacturing Finding 2's false-positive mode, so
+fixing the first is the prerequisite to a fair verdict on the second.
+
+Executed as **phase 7** → `docs/handoff/0007-supersession-downrank-handoff.md`.
+
+### Result — B SHIPPED ENABLED, v0.26.0 (2026-07-24)
+
+**The second clause of the reopen-trigger is now satisfied: a penalty magnitude
+*was* tuned without regressing hit@5 anywhere.** Full evidence:
+[`../conformance/2026-07-24-supersession-penalty-calibration/ANALYSIS.md`](../conformance/2026-07-24-supersession-penalty-calibration/ANALYSIS.md) ·
+decision: [`../adr/0015-supersession-downrank-penalty.md`](../adr/0015-supersession-downrank-penalty.md).
+
+| eval set | inversions | hit@5 | hit@1 |
+|---|---|---|---|
+| orbit | **8 → 3** | 0.887 → 0.887 | 0.566 → **0.698** |
+| acme | **9 → 6** | 0.855 → 0.855 | 0.491 → **0.564** |
+| fixture · synthetic 1k/5k/10k | no markers | unchanged | unchanged |
+
+- **Safe interval `[11, ∞)`**, swept to 500 — zero hit@5 regression on any gate,
+  at any value, in any question kind. Shipped default **15**.
+- **100% of frontmatter-reachable inversions recovered** (orbit 5/5, acme 3/3).
+  Every residual inversion is **unmarked**.
+- **The matrix row "requires a tuned magic number → yes" was the right worry and
+  the wrong prediction.** The number turned out to have a wide plateau, not a
+  sharp optimum — every value from 11 to 500 performs identically. A knob with a
+  broad safe basin is not the fragile magic number the debate feared.
+- **"Can regress existing evals" — measured false.** Not one kind regressed on
+  either corpus. `why`/`how-to`/`cross-doc`, the classes the debate worried
+  about, are untouched.
+
+**What the debate got right, and keep:** the insistence that B needed a second
+corpus *and* a tuning experiment before shipping. Had B shipped with the original
+proposal, it would have been a guessed magnitude justified by one corpus. The
+delay cost one release and bought a measured interval.
+
+**The known limit is unchanged and now quantified.** Only frontmatter-marked
+supersession is reachable: 3/12 (orbit) and 6/12 (acme) inversions carry no
+machine-readable marker and are permanently unfixable without a model.
+**`superseded_by:` is the contract Fux can act on** — that line in "Known limits"
+is now the single highest-leverage thing a corpus author can do, and the docs
+should keep saying so.
+
 ## References
 
 - Measured: [`../conformance/2026-07-22-acme-payments/report.md`](../conformance/2026-07-22-acme-payments/report.md) §Finding 1.
+- Second corpus: [`../conformance/2026-07-24-orbit-fulfillment/ANALYSIS.md`](../conformance/2026-07-24-orbit-fulfillment/ANALYSIS.md) §Finding 1.
 - Supersession as a docs-as-code convention: Nygard, *Documenting Architecture
   Decisions* (2011) — `superseded_by` is the established machine-readable marker,
   which is why leaning on frontmatter is a convention Fux can adopt rather than

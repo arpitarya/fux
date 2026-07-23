@@ -249,6 +249,43 @@ then a follow-up resumed via the same agent for the supersession
 re-measurement) rather than three separate setups — worth doing again when a
 build needs real-corpus evidence at this scale.
 
+**Q: Phase 7 — what changed on 2026-07-24?**
+
+**Option B (the fusion down-rank) was reopened by Arpit, and the second corpus
+is why.** The orbit-fulfillment run (an independently-authored
+warehouse/fulfillment corpus, deliberately disjoint from acme's fintech
+vocabulary) reproduced every acme finding — and sharpened the supersession one
+into something the annotate-only verdict could not absorb:
+
+- **8/12 inversions** (acme 9/12) — the reopen-trigger's ≥8/12 bar, met exactly.
+- **The engine annotates the document it ranks first.** 6/6
+  frontmatter-reachable superseded docs carry `superseded`/`superseded_by` in
+  `find --json`, and **5 of those 6 still outrank their replacement.** Option A
+  works precisely as designed and does not move the number.
+- **Mechanism:** in 6 of 8 inversions the current doc **wins BM25F outright**
+  (up to 2×) and loses on a dense edge as thin as **0.0006 cosine** that RRF
+  flips. Dense systematically prefers terse obsolete docs — a long current doc's
+  embedding is diluted. So a penalty usually needs to overcome a very small gap.
+
+**What reopening does and does not authorise.** It authorises *building the
+penalty default-off and calibrating it across four eval sets* — not shipping it
+on. Default `0` stays byte-identical to v0.25.0, and flipping it needs a proven
+safe interval plus a separate Arpit sign-off, because B changes `find` ordering,
+which is the one thing A deliberately avoided. **"No safe interval exists" is a
+valid, valuable outcome** — the same rule that made the confidence floor ship
+disabled. A successor who finds the knob at `0` and "helpfully" tunes it to a
+plausible value has broken the phase's central discipline.
+
+**The two defects are coupled — that is the other half of the phase.** Orbit
+also refuted the runner-up *margin* check (every unanswerable margin exceeded the
+six smallest answerable ones — inverted, not merely empty). But the smallest
+answerable margins came from documents tying with **their own superseded twins**.
+Finding 1 was manufacturing Finding 2's false-positive mode, so the penalty
+de-confounds the margin and earns it one clean re-measurement. If it still fails
+after that, fabrication is a **documented permanent no-model boundary**, not an
+open defect — and the honest move is to write it down, not to invent a third
+mechanism.
+
 **Q: What must a confident successor NOT "clean up"?**
 
 1. **The hand-rolled frontmatter parser + validator** (once built) — that is the
@@ -324,4 +361,11 @@ recovery) to one resumed background agent sharing an editable-install acme
 environment rather than three cold setups. Both proposals graduated to
 `archive/` with their ADRs; the honest finding that the fabrication defect is
 *not* fixed in this release is recorded here and in ADR 0014 on purpose.
+· Claude Opus 4.8, 2026-07-24 — phase 7 M1: Arpit **reopened Option B** on the
+orbit corpus's evidence (8/12 inversions; 5 of 6 annotated docs still outranking
+their replacement). Amended the supersession compare-doc verdict — A stands, B
+authorised **default-off only**, default flip gated on a proven safe interval +
+separate sign-off. Penalty form decided as a **rank offset before fusion**
+(scale-free sweep unit) in `[engine.hybrid]`; both deviations from the handoff's
+letter recorded in IMPLEMENTATION.md.
 (Add yourself here when you make a material update — model, date, one line.)*

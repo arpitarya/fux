@@ -1,0 +1,159 @@
+{
+  "env": "1k",
+  "values": [
+    0,
+    5,
+    50,
+    500
+  ],
+  "results": {
+    "0": {
+      "all": {
+        "n": 11,
+        "hit@1": 0.091,
+        "hit@5": 0.182,
+        "MRR": 0.145
+      },
+      "by_kind": {
+        "overlap": {
+          "n": 9,
+          "hit@1": 0.111,
+          "hit@5": 0.222,
+          "MRR": 0.178
+        },
+        "zero-overlap": {
+          "n": 2,
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "MRR": 0.0
+        }
+      },
+      "staleness": {
+        "pairs": 0,
+        "inversions": 0,
+        "current_in_top5": 0,
+        "inverted_questions": [],
+        "detail": []
+      },
+      "ranks": {
+        "why did we choose the composite index for indexing?": 1,
+        "what technology stores rows on disk?": null,
+        "why did we choose the session token for auth?": null,
+        "why did we choose the backpressure for ingest?": null,
+        "why did we choose the tokenizer for search?": 10,
+        "how do we stop people getting in?": null
+      }
+    },
+    "5": {
+      "all": {
+        "n": 11,
+        "hit@1": 0.091,
+        "hit@5": 0.182,
+        "MRR": 0.145
+      },
+      "by_kind": {
+        "overlap": {
+          "n": 9,
+          "hit@1": 0.111,
+          "hit@5": 0.222,
+          "MRR": 0.178
+        },
+        "zero-overlap": {
+          "n": 2,
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "MRR": 0.0
+        }
+      },
+      "staleness": {
+        "pairs": 0,
+        "inversions": 0,
+        "current_in_top5": 0,
+        "inverted_questions": [],
+        "detail": []
+      },
+      "ranks": {
+        "why did we choose the composite index for indexing?": 1,
+        "what technology stores rows on disk?": null,
+        "why did we choose the session token for auth?": null,
+        "why did we choose the backpressure for ingest?": null,
+        "why did we choose the tokenizer for search?": 10,
+        "how do we stop people getting in?": null
+      }
+    },
+    "50": {
+      "all": {
+        "n": 11,
+        "hit@1": 0.091,
+        "hit@5": 0.182,
+        "MRR": 0.145
+      },
+      "by_kind": {
+        "overlap": {
+          "n": 9,
+          "hit@1": 0.111,
+          "hit@5": 0.222,
+          "MRR": 0.178
+        },
+        "zero-overlap": {
+          "n": 2,
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "MRR": 0.0
+        }
+      },
+      "staleness": {
+        "pairs": 0,
+        "inversions": 0,
+        "current_in_top5": 0,
+        "inverted_questions": [],
+        "detail": []
+      },
+      "ranks": {
+        "why did we choose the composite index for indexing?": 1,
+        "what technology stores rows on disk?": null,
+        "why did we choose the session token for auth?": null,
+        "why did we choose the backpressure for ingest?": null,
+        "why did we choose the tokenizer for search?": 10,
+        "how do we stop people getting in?": null
+      }
+    },
+    "500": {
+      "all": {
+        "n": 11,
+        "hit@1": 0.091,
+        "hit@5": 0.182,
+        "MRR": 0.145
+      },
+      "by_kind": {
+        "overlap": {
+          "n": 9,
+          "hit@1": 0.111,
+          "hit@5": 0.222,
+          "MRR": 0.178
+        },
+        "zero-overlap": {
+          "n": 2,
+          "hit@1": 0.0,
+          "hit@5": 0.0,
+          "MRR": 0.0
+        }
+      },
+      "staleness": {
+        "pairs": 0,
+        "inversions": 0,
+        "current_in_top5": 0,
+        "inverted_questions": [],
+        "detail": []
+      },
+      "ranks": {
+        "why did we choose the composite index for indexing?": 1,
+        "what technology stores rows on disk?": null,
+        "why did we choose the session token for auth?": null,
+        "why did we choose the backpressure for ingest?": null,
+        "why did we choose the tokenizer for search?": 10,
+        "how do we stop people getting in?": null
+      }
+    }
+  }
+}
