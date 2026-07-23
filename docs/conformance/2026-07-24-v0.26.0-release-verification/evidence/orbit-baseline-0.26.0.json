@@ -1,0 +1,102 @@
+{
+  "eval_hybrid": {
+    "MRR": 0.783,
+    "hit@1": 0.698,
+    "hit@5": 0.887
+  },
+  "eval_hybrid_cross-doc": {
+    "MRR": 0.833,
+    "hit@1": 0.75,
+    "hit@5": 1.0
+  },
+  "eval_hybrid_factual": {
+    "MRR": 0.784,
+    "hit@1": 0.647,
+    "hit@5": 0.941
+  },
+  "eval_hybrid_how-to": {
+    "MRR": 1.0,
+    "hit@1": 1.0,
+    "hit@5": 1.0
+  },
+  "eval_hybrid_stale-vs-current": {
+    "MRR": 0.792,
+    "hit@1": 0.667,
+    "hit@5": 0.917
+  },
+  "eval_hybrid_why": {
+    "MRR": 0.917,
+    "hit@1": 0.875,
+    "hit@5": 1.0
+  },
+  "eval_hybrid_zero-overlap": {
+    "MRR": 0.333,
+    "hit@1": 0.333,
+    "hit@5": 0.333
+  },
+  "eval_lexical-only": {
+    "MRR": 0.744,
+    "hit@1": 0.642,
+    "hit@5": 0.887
+  },
+  "eval_lexical-only_cross-doc": {
+    "MRR": 0.688,
+    "hit@1": 0.5,
+    "hit@5": 1.0
+  },
+  "eval_lexical-only_factual": {
+    "MRR": 0.775,
+    "hit@1": 0.647,
+    "hit@5": 0.941
+  },
+  "eval_lexical-only_how-to": {
+    "MRR": 1.0,
+    "hit@1": 1.0,
+    "hit@5": 1.0
+  },
+  "eval_lexical-only_stale-vs-current": {
+    "MRR": 0.736,
+    "hit@1": 0.583,
+    "hit@5": 0.917
+  },
+  "eval_lexical-only_why": {
+    "MRR": 0.938,
+    "hit@1": 0.875,
+    "hit@5": 1.0
+  },
+  "eval_lexical-only_zero-overlap": {
+    "MRR": 0.2,
+    "hit@1": 0.167,
+    "hit@5": 0.333
+  },
+  "ingest_seconds": 0.49,
+  "latency_answer_cold_seconds": 0.128,
+  "latency_answer_warm_seconds": 0.131,
+  "latency_ask_cold_seconds": 0.127,
+  "latency_ask_warm_seconds": 0.137,
+  "latency_cat_cold_seconds": 0.035,
+  "latency_cat_warm_seconds": 0.034,
+  "latency_explain_cold_seconds": 0.11,
+  "latency_explain_warm_seconds": 0.108,
+  "latency_find_cold_seconds": 0.129,
+  "latency_find_warm_seconds": 0.121,
+  "latency_graph_cold_seconds": 0.108,
+  "latency_graph_warm_seconds": 0.108,
+  "lock_hash": "30209b0b9d8d5cc6",
+  "reingest_seconds": 0.31,
+  "size_cache_bytes": 800335,
+  "size_index_bytes": 1831383,
+  "size_lock_bytes": 201243,
+  "size_state_bytes": 249936,
+  "staleness_current_in_top5": 11,
+  "staleness_inversions": 3,
+  "staleness_pairs": 12,
+  "state_hash": "db9f8ddfe38825bc",
+  "unanswerable_fabricated": 4,
+  "unanswerable_find_nonempty": 4,
+  "unanswerable_pairs": 4,
+  "zero_overlap_demoted": 1,
+  "zero_overlap_in_top5": 2,
+  "zero_overlap_rescued": 1,
+  "zero_overlap_total": 6
+}

@@ -36,6 +36,23 @@ unrelated domains produce the same three defects.
 
 ## Environment caveat — read this before citing the numbers
 
+> **⚠ CORRECTION (2026-07-24, phase 8): the premise of this section was wrong.**
+> **`fux-engine==0.25.0` *was* on PyPI**, published 2026-07-23T08:17 from the
+> `v0.25.0` release — as was 0.24.0. The frozen-wheel workaround below was
+> therefore unnecessary.
+>
+> **The likely cause, worth knowing because it will recur:** `pip install
+> fux-engine==0.25.0` fails with *"No matching distribution found"* on Python
+> **< 3.11**, because the package requires `>=3.11`. That error is easily
+> misread as "not published." Reproduced exactly during phase 8: the same
+> command failed under Python 3.9.6 and succeeded under 3.12.
+>
+> **The measurements below are unaffected.** The frozen wheel was built from
+> `af374f0`, the same commit released as v0.25.0, so the engine under test was
+> the intended one. Only the *justification* for building it was mistaken.
+> **Check `python -V` against `requires-python` before concluding a version is
+> unpublished.**
+
 **`fux-engine==0.25.0` is not on PyPI.** v0.25.0 is committed and merged to
 `main` (`af374f0`, PR #43) but was never released. The harness's independence
 rule says "install the published package from PyPI"; that was impossible.

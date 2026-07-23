@@ -19,6 +19,45 @@ diary.*
 
 ---
 
+## 2026-07-24 — v0.26.0 PUBLISHED to PyPI + Part B closed  ·  Claude Code
+- **Asked:** execute handoff 0008 — apply the pending honesty edits, land phase 7
+  by PR, publish, verify, close the follow-ups. Publish human-gated at M5.
+- **Did:**
+  - **M1** — both README honesty edits + the CLAUDE.md fold applied, *before* the
+    release was cut. Verified the 0.26.0 CHANGELOG entry and its README mirror.
+  - **M2/M3** — phase 7 moved off `main` onto `feat/phase7-supersession-downrank`
+    (commit `2455469`), PR **#44**, **11/11 CI checks green**, merged `5ccd0a6`.
+    470 unit + 100 e2e green locally too.
+  - **M4** — **§10 Q1 is moot: 0.24.0 and 0.25.0 were already on PyPI.** Nothing
+    to back-publish; only 0.26.0 was missing.
+  - **M5** — Arpit gave the go. Tagged `v0.26.0`, cut the Release; tag↔version
+    guard + `twine --strict` + OIDC all passed. **Live on PyPI.**
+  - **M6** — clean-venv `pip install fux-engine==0.26.0`; setup→ingest→
+    find/ask/why all work; the penalty is active in the published build; the
+    **PyPI page renders both corrected claims** and neither old one.
+  - **M7** — trackers updated; orbit now installs from PyPI (frozen-wheel
+    workaround retired in TEST-PLAN + the orbit ANALYSIS).
+  - **M8** — `zero_overlap_rescued` fixed to count *clean* rescues only (2 → 1);
+    added `zero_overlap_in_top5` and `zero_overlap_demoted`. Orbit re-baselined
+    deliberately; run filed as a conformance record.
+- **Decided / open:**
+  - **Two corrections worth keeping.** (1) *"0.25.0 is not on PyPI"* was wrong —
+    `pip install` fails with "no matching distribution" on Python **<3.11**
+    because of `requires-python`, and that was misread as unpublished. (2) *A
+    version string is not a build identity* — the first orbit re-baseline used a
+    `0.26.0` wheel built before the M5 default flip and would have pinned
+    pre-release behaviour; caught by reading the baseline diff.
+  - **One deviation from the approved wording, flagged in PR #44:** approved Edit
+    2 listed the third refuted discriminator as "empty-pool". Empty-pool was never
+    refuted — it correctly declines gibberish. Shipped **"margin ratio"**, matching
+    ADR 0015 and the compare doc. Revert if Arpit disagrees.
+  - **Independent confirmation:** orbit re-baselined on the *published* package
+    reproduces phase 7 exactly — inversions **8 → 3**, hit@1 **.566 → .698**,
+    hit@5 flat. The calibration holds black-box, not just in-tree.
+- **Next:** **Part C** — the non-monotone fusion finding, now auto-detected by the
+  suite (`zero_overlap_demoted` = 1). Needs its own Opus handoff + ADR; fusion was
+  deliberately untouched during the release.
+
 ## 2026-07-24 — phase 7 reviewed → release handoff (0008) packaged  ·  Cowork
 - **Asked:** one handoff+prompt for all pending items — first commit/push/publish
   everything built, then the next steps.
