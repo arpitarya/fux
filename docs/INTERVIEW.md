@@ -286,6 +286,31 @@ after that, fabrication is a **documented permanent no-model boundary**, not an
 open defect — and the honest move is to write it down, not to invent a third
 mechanism.
 
+**Outcome (phase 8, same day): it failed. Fabrication is now written down as a
+permanent boundary, and v0.26.0 is live on PyPI.** The penalty shipped enabled at
+15, and the calibration was confirmed **black-box from the published package**
+(orbit inversions 8→3, hit@1 .566→.698, hit@5 flat) — not just in-tree.
+
+**Q: What did phase 8 teach that isn't in the code?**
+
+Two mistakes worth inheriting, because both were *confident and wrong*:
+
+- **"0.25.0 is not on PyPI" was false, and it reached a filed conformance
+  document.** `pip install` fails with *"no matching distribution found"* on
+  Python **< 3.11** because the package declares `requires-python >=3.11`. That
+  reads exactly like "never published." An entire frozen-wheel workaround was
+  built on the misreading. **Check `python -V` against `requires-python` before
+  concluding anything about a package's existence.**
+- **A version string is not a build identity.** The first orbit re-baseline ran a
+  wheel that said `0.26.0` but was built *before* the default flipped to 15 — so
+  it recorded pre-release behaviour as the reference, silently and green. What
+  caught it was reading the baseline diff and asking why a number that *should*
+  have moved hadn't. **Assert the behaviour you changed, not the version.**
+
+The general lesson under both: a green run that agrees with your expectations is
+the easiest place to hide a wrong premise. Diff against what you predicted, and
+investigate the metric that *didn't* move.
+
 **Q: What must a confident successor NOT "clean up"?**
 
 1. **The hand-rolled frontmatter parser + validator** (once built) — that is the
@@ -368,4 +393,14 @@ authorised **default-off only**, default flip gated on a proven safe interval +
 separate sign-off. Penalty form decided as a **rank offset before fusion**
 (scale-free sweep unit) in `[engine.hybrid]`; both deviations from the handoff's
 letter recorded in IMPLEMENTATION.md.
+· Claude Opus 4.8, 2026-07-24 — phase 8: **published v0.26.0 to PyPI** (PR #44,
+merge `5ccd0a6`, 11/11 CI green), with both README honesty edits landing *before*
+the release so the published page never carried the old "cannot hallucinate"
+claim. Verified black-box from PyPI: the phase-7 penalty reproduces exactly
+(orbit inversions 8→3, hit@1 .566→.698). Corrected two filed mistakes — 0.25.0
+*was* on PyPI (a Python-<3.11 install failure had been misread as unpublished),
+and a `0.26.0` wheel predating the M5 default flip nearly pinned pre-release
+behaviour into orbit's baseline. Fixed the `zero_overlap_rescued` miscount
+(clean rescues only) and left **Part C — non-monotone fusion — untouched and
+scoped**, as its own Opus handoff.
 (Add yourself here when you make a material update — model, date, one line.)*

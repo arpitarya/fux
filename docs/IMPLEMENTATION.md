@@ -20,20 +20,18 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 7 in flight
-> (→ v0.26.0). M1 ✅ 2026-07-24:** Arpit reopened Option B; the supersession
-> compare-doc verdict is amended (A stands, B authorised **default-off only**).
-> Penalty form decided: **rank offset before fusion**, knob in
-> `[engine.hybrid]` (not `[retrieval]` — both deviations recorded below).
-> *(building agent: keep this one line current)* — **Phase 7 COMPLETE, M1–M6 ✅
-> → v0.26.0.** Supersession penalty shipped **enabled at 15** (safe interval
-> `[11, ∞)`; 100% of frontmatter-reachable inversions recovered on two corpora;
-> zero hit@5 regression anywhere). Margin re-measured de-confounded and **still
-> empty → fabrication closed as a documented no-model boundary.** 470 unit +
-> 100 e2e green. **Awaiting Arpit:** two README honesty-claim wordings (proposed,
-> not applied) and the PyPI release call (0.25.0 was never published). **No next
-> phase pre-registered** — candidates: chunk-level dense codes (zero-overlap
-> still 1/6), query-at-scale (ADR 0011).
+> *(building agent: keep this one line current)* — **Phase 8 COMPLETE:
+> v0.26.0 is LIVE on PyPI** (`pip install fux-engine==0.26.0`), published
+> 2026-07-24 from merge `5ccd0a6` (PR #44). Phase 7's supersession penalty
+> shipped **enabled at 15**, with both README honesty edits landing *before*
+> the release was cut. Verified black-box from the published package: orbit
+> staleness inversions **8 → 3**, hybrid hit@1 **.566 → .698**, hit@5 flat.
+> Part B done (`zero_overlap_rescued` 2 → 1, clean rescues only). **Correction:
+> 0.24.0 and 0.25.0 were already on PyPI** — the earlier "not published" claim
+> was a Python-<3.11 install failure misread; orbit's frozen-wheel workaround is
+> retired. **Next, unstarted:** Part C — the non-monotone fusion finding, now
+> auto-detected by the suite (`zero_overlap_demoted` = 1), needs its own Opus
+> handoff + ADR; then chunk-level dense codes (zero-overlap still 1/6).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -203,16 +201,47 @@ this phase tests the second clause (a tunable penalty).
 | M5 ship gate — enable only with clean interval + Arpit sign-off | ✅ | 470 unit / 100 e2e | **Arpit approved: default 15.** Both "majority" framings surfaced first (all: orbit 62%/acme 33%; reachable: 100% both) |
 | M6 ADR 0015, docs, archive `v0.26.0-*`, bump | ✅ | 470 unit / 100 e2e | ADR 0015; both compare docs closed; conformance run filed; version 0.26.0; **2 README honesty-claim edits proposed, NOT applied** |
 
-**Parallel, Arpit-owned (not in this phase):** release v0.25.0 to PyPI (committed
-af374f0, unpublished); reframe the "never fabricate" README claim if M4 confirms
-the no-model boundary. **Deferred:** chunk-level dense codes (zero-overlap 1/6).
+**Both parallel items are now CLOSED by phase 8** — the README honesty claims are
+applied and published, and the PyPI question resolved (0.24.0/0.25.0 were already
+live; 0.26.0 is now too). **Deferred:** chunk-level dense codes (zero-overlap 1/6).
 
-## Two engine/suite findings filed by the orbit run (fix opportunistically)
+## Phase 8 — release v0.26.0 + follow-ups (handoff 0008) → shipped 2026-07-24
+
+*Model: Sonnet (executed by Opus). The one irreversible step — the publish — was
+human-gated and taken only on Arpit's explicit go.*
+
+| Milestone | Status | Tests | Notes |
+|-----------|--------|-------|-------|
+| M1 honesty edits + CLAUDE.md fold | ✅ | — | applied **before** the release was cut, so PyPI never rendered the old claim |
+| M2 land phase 7 on a branch | ✅ | — | `feat/phase7-supersession-downrank`, commit `2455469`; nothing left loose on `main` |
+| M3 PR + CI + merge | ✅ | 470 unit / 100 e2e | PR #44, **11/11 checks green** (linux·macos·windows × py3.11–3.14), merged `5ccd0a6` |
+| M4 verify PyPI state | ✅ | — | **§10 Q1 moot** — 0.24.0 + 0.25.0 already live; nothing to back-publish |
+| M5 publish (human gate) | ✅ | — | tag `v0.26.0` + Release on `5ccd0a6`; tag↔version guard + `twine --strict` + OIDC all passed |
+| M6 verify the publish | ✅ | — | clean-venv `pip install fux-engine==0.26.0`; setup→ingest→find/ask/why all work; **PyPI README carries both corrected claims** |
+| M7 trackers + retire frozen-wheel note | ✅ | — | orbit env now installs from PyPI; TEST-PLAN + orbit ANALYSIS corrected |
+| M8 Part B — `zero_overlap_rescued` fix | ✅ | — | clean rescues only (**2 → 1**); new `zero_overlap_demoted` auto-detects the non-monotone case; orbit re-baselined deliberately |
+
+**Two corrections this phase produced, both worth keeping:**
+
+- **"0.25.0 is not on PyPI" was wrong.** `pip install` fails with *"no matching
+  distribution"* on Python **< 3.11** because the package requires `>=3.11` — that
+  error was misread as unpublished. Check `python -V` against `requires-python`
+  first. The orbit numbers stand (same commit), only the justification was wrong.
+- **A version string is not a build identity.** The first orbit re-baseline used a
+  `0.26.0` wheel built *before* the M5 default flip (penalty still `0`) and would
+  have pinned pre-release behaviour as the reference. Caught by reading the
+  baseline diff and asking why a metric that should have moved did not.
+
+## Two engine/suite findings filed by the orbit run
 
 - **Non-monotone fusion** — a lexical rank-5 hit was demoted out of top-5 by RRF.
-  A real correctness finding, not a harness bug; worth its own small fix/ADR note.
-- **`zero_overlap_rescued` miscount** — the suite counts lexical hits as dense
-  rescues (reported 2, actual clean 1). fux-lab suite fix.
+  A real correctness finding, not a harness bug. **Now auto-detected** by the
+  suite's new `zero_overlap_demoted` metric (fires at 1 on orbit). **Part C —
+  needs its own Opus handoff + ADR; deliberately not touched during the release.**
+- ~~**`zero_overlap_rescued` miscount**~~ — **FIXED 2026-07-24 (phase 8, M8).**
+  The metric counted lexical hits as dense rescues (reported 2, actual clean 1).
+  A clean rescue is now the *delta* — absent from lexical's top-5, present in
+  hybrid's. `zero_overlap_in_top5` keeps the old looser number so nothing is lost.
 
 ## Deviations from spec
 
