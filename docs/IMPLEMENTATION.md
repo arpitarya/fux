@@ -20,13 +20,20 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 6 complete: v0.25.0
-> shipped** (M1–M6 ✅). Suites: 444 unit + 100 e2e (+1 gated skip). Supersession
-> annotated (partial recovery, measured: 1/9 fully corrected); confidence floor
-> calibrated and **shipped disabled** — no value clears all 5 gates. **No next
-> phase pre-registered yet** — candidates: an absolute cross-query confidence
-> signal for `answer` (ADR 0014 F1/F2), or Finding 2's deferred chunk-level
-> dense codes (zero-overlap rescue, its own phase — see PLAN.md §8).
+> *(building agent: keep this one line current)* — **Phase 7 in flight
+> (→ v0.26.0). M1 ✅ 2026-07-24:** Arpit reopened Option B; the supersession
+> compare-doc verdict is amended (A stands, B authorised **default-off only**).
+> Penalty form decided: **rank offset before fusion**, knob in
+> `[engine.hybrid]` (not `[retrieval]` — both deviations recorded below).
+> *(building agent: keep this one line current)* — **Phase 7 COMPLETE, M1–M6 ✅
+> → v0.26.0.** Supersession penalty shipped **enabled at 15** (safe interval
+> `[11, ∞)`; 100% of frontmatter-reachable inversions recovered on two corpora;
+> zero hit@5 regression anywhere). Margin re-measured de-confounded and **still
+> empty → fabrication closed as a documented no-model boundary.** 470 unit +
+> 100 e2e green. **Awaiting Arpit:** two README honesty-claim wordings (proposed,
+> not applied) and the PyPI release call (0.25.0 was never published). **No next
+> phase pre-registered** — candidates: chunk-level dense codes (zero-overlap
+> still 1/6), query-at-scale (ADR 0011).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -173,10 +180,60 @@ evidence): fusion down-ranking of superseded docs · the runner-up margin check 
 chunk-level dense codes for the zero-overlap class (0/6, structural, risks the
 ~200 B/doc committed-state guarantee).
 
+## Phase 7 — Supersession down-rank + margin re-measure (handoff 0007) → v0.26.0
+
+*Pre-registered 2026-07-24 with the handoff. **M1 cleared 2026-07-24** — Arpit
+reopened Option B for a default-off calibrated test; the compare-doc verdict is
+amended. Enabling the default still requires a separate M5 sign-off.*
+
+**Model: Opus** (M3/M4 calibration + margin re-read are judgment; "no safe
+interval" is a valid outcome).
+
+Driver: two independent realistic corpora — acme 9/12, **orbit 8/12** — show the
+retired doc ranking #1 *with the v0.25.0 annotation attached* (orbit 5/6
+frontmatter-reachable still invert). The reopen-trigger's ≥8/12 clause is met;
+this phase tests the second clause (a tunable penalty).
+
+| Milestone | Status | Tests | Notes |
+|-----------|--------|-------|-------|
+| M1 reopen Option B (compare-doc verdict) | ✅ | — | reopened 2026-07-24; verdict amended, A stands, B authorised default-off only |
+| M2 `[engine.hybrid] supersession_penalty`, default 0 = byte-identical | ✅ | 469 unit (+25) / 100 e2e | rank offset in fusion; **all goldens unchanged** — identity proven, not asserted; lean honours it too (parity law) |
+| M3 calibrate across fixture+acme+orbit+synthetic | ✅ | 4 eval sets swept | **safe interval `[11, ∞)`** — 100% of *reachable* inversions recovered both corpora, zero hit@5 regression anywhere, hit@1 improves |
+| M4 clean margin re-measure (Finding 2 unblock) | ✅ | orbit+acme, p0 vs p15 | **still empty after de-confounding** — confound was real but not the cause; fabrication = permanent no-model boundary |
+| M5 ship gate — enable only with clean interval + Arpit sign-off | ✅ | 470 unit / 100 e2e | **Arpit approved: default 15.** Both "majority" framings surfaced first (all: orbit 62%/acme 33%; reachable: 100% both) |
+| M6 ADR 0015, docs, archive `v0.26.0-*`, bump | ✅ | 470 unit / 100 e2e | ADR 0015; both compare docs closed; conformance run filed; version 0.26.0; **2 README honesty-claim edits proposed, NOT applied** |
+
+**Parallel, Arpit-owned (not in this phase):** release v0.25.0 to PyPI (committed
+af374f0, unpublished); reframe the "never fabricate" README claim if M4 confirms
+the no-model boundary. **Deferred:** chunk-level dense codes (zero-overlap 1/6).
+
+## Two engine/suite findings filed by the orbit run (fix opportunistically)
+
+- **Non-monotone fusion** — a lexical rank-5 hit was demoted out of top-5 by RRF.
+  A real correctness finding, not a harness bug; worth its own small fix/ADR note.
+- **`zero_overlap_rescued` miscount** — the suite counts lexical hits as dense
+  rescues (reported 2, actual clean 1). fux-lab suite fix.
+
 ## Deviations from spec
 
 *(record any deliberate deviation from a handoff here, with the why and the ADR
 that captures it — an empty section is the goal)*
+
+- **0007 / the penalty knob lives in `[engine.hybrid]`, not a new `[retrieval]`
+  table.** The handoff names `[retrieval] supersession_penalty`, but no
+  `[retrieval]` section exists in `config.py` — every fusion parameter
+  (`rrf_k`, `candidate_pool`) is already under `[engine.hybrid]`. A second
+  top-level table would split ranking config across two places *and* imply the
+  knob affects lexical retrieval, which it cannot (the penalty lives in fusion,
+  so `--lexical-only` never reaches it). Approved by Arpit at M1. → ADR 0015.
+
+- **0007 / the penalty is a rank offset, not an absolute RRF subtraction.** The
+  handoff's `why` wording (`rrf penalised −X`) reads as a subtraction from the
+  fused score. Chosen instead: a superseded chunk contributes
+  `1/(k + rank + N)`. Rationale — the sweep unit ("ranks") is scale-free, so a
+  magnitude calibrated on orbit carries to a 100k corpus, whereas a raw-score
+  subtraction is entangled with `rrf_k` and the number of lists that fire.
+  `N = 0` is exact identity either way. Approved by Arpit at M1. → ADR 0015.
 
 - **0005 / `fux doctor`'s "Chrome for CDP" capability check is binary-presence
   only, not a live port probe.** The existing `tests/test_import_fence.py`

@@ -382,6 +382,13 @@ read `gh pr checks <n>` yourself and do not merge on red. The source of truth
 for protection is [`.github/branch-protection.json`](.github/branch-protection.json);
 restoring the wall means putting the two contexts back and re-applying.
 
+## Hard-won build knowledge (auto-folded, 2026-07-24 — phase 7)
+
+- **The supersession penalty set is deterministic (author frontmatter); only the
+  magnitude is calibrated.** That asymmetry is why Option B became shippable where
+  a content heuristic never would — the engine penalises documents their own
+  author retired, not documents it *guesses* are stale. → ADR 0015.
+
 ## Hard-won build knowledge (auto-folded, 2026-07-23 — phase 6)
 
 - **"No value satisfies the calibration rule" is a valid, correct finding —

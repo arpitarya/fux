@@ -1,0 +1,20 @@
+docs/adr/0012-same-day-cutoff-1200.md
+  in corpus: True  (cache=.fux/cache/docs/adr/0012-same-day-cutoff-1200.md  fidelity=inferred)
+  superseded: true → docs/adr/0024-same-day-cutoff-1400.md
+  superseded → rrf penalised by 15 ranks (rank 1→17)
+  chunks: 1
+    ✓ ADR 0012 — Same-day dispatch cutoff is 12:00:9-13
+  lexical: rank=2 score=34.9969 in_pool=True (pool=200)
+    cutoff: idf=3.4191 tf={'heading': 2, 'path': 1, 'body': 1} contribution=6.4384
+    day: idf=2.8427 tf={'heading': 2, 'path': 1, 'body': 4} contribution=5.553
+    dispatch: idf=5.5507 tf={'heading': 2, 'path': 0, 'body': 1} contribution=10.0392
+    is: idf=1.1148 tf={'heading': 2, 'path': 0, 'body': 3} contribution=2.0993
+    order: idf=2.0036 tf={'heading': 0, 'path': 0, 'body': 1} contribution=1.7528
+    same: idf=2.3205 tf={'heading': 2, 'path': 1, 'body': 3} contribution=4.4872
+    the: idf=0.4041 tf={'heading': 0, 'path': 0, 'body': 4} contribution=0.6448
+    time: idf=4.5522 tf={'heading': 0, 'path': 0, 'body': 1} contribution=3.9824
+  dense: similarity=0.7016 in_prefilter=True hamming=59 (width=500)
+  graph: reached=True as=seed via=None edge=None
+
+verdict: not returned at --top 5: rank 17 overall (raise --top to 17 to see it)
+{"doc": "docs/adr/0012-same-day-cutoff-1200.md", "in_corpus": true, "corpus_detail": "cache=.fux/cache/docs/adr/0012-same-day-cutoff-1200.md  fidelity=inferred", "chunks": [{"heading": "ADR 0012 — Same-day dispatch cutoff is 12:00", "start": 9, "end": 13, "matches_query_terms": true}], "verdict": "not returned at --top 5: rank 17 overall (raise --top to 17 to see it)", "superseded": true, "superseded_by": "docs/adr/0024-same-day-cutoff-1400.md", "supersession_penalty": {"offset": 15, "rank_before": 1, "rank_after": 17}, "lexical": {"rank": 2, "score": 34.9969, "in_candidate_pool": true, "candidate_pool": 200, "terms": {"is": {"idf": 1.1148, "tf": {"heading": 2, "path": 0, "body": 3}, "contribution": 2.0993}, "the": {"idf": 0.4041, "tf": {"heading": 0, "path": 0, "body": 4}, "contribution": 0.6448}, "same": {"idf": 2.3205, "tf": {"heading": 2, "path": 1, "body": 3}, "contribution": 4.4872}, "day": {"idf": 2.8427, "tf": {"heading": 2, "path": 1, "body": 4}, "contribution": 5.553}, "dispatch": {"idf": 5.5507, "tf": {"heading": 2, "path": 0, "body": 1}, "contribution": 10.0392}, "order": {"idf": 2.0036, "tf": {"heading": 0, "path": 0, "body": 1}, "contribution": 1.7528}, "cutoff": {"idf": 3.4191, "tf": {"heading": 2, "path": 1, "body": 1}, "contribution": 6.4384}, "time": {"idf": 4.5522, "tf": {"heading": 0, "path": 0, "body": 1}, "contribution": 3.9824}}}, "dense": {"available": true, "similarity": 0.7016, "has_code": true, "hamming_distance": 59, "in_prefilter": true, "prefilter_width": 500}, "graph": {"reached": true, "as": "seed", "via_seed": null, "edge_kind": null}, "answer_decline": {"declined": false, "best_score": 0.466, "min_confidence": 0.0}}

@@ -1,0 +1,37 @@
+=== ZERO-OVERLAP (hybrid, rank of expected doc) ===
+  rank None  MISS  How do we make sure a picker is not routed to an empty locat
+  rank None  MISS  How is inventory accuracy verified without shutting the ware
+  rank 6     MISS  What do we do with received goods that already have a waitin
+  rank None  MISS  Why are frequently ordered products stored near the shipping
+  rank 1     HIT   How do we avoid walking the same aisle repeatedly for separa
+  rank 1     HIT   How is the best-fitting shipping box picked for an order?
+
+=== STALE-VS-CURRENT (current rank vs stale rank) ===
+  current 1     stale 3     ok         What is the maximum number of order lines in a singl
+  current 2     stale 1     INVERSION  What is the same-day dispatch order cutoff time?
+  current 2     stale 1     INVERSION  Who is orbit's primary parcel carrier?
+  current None  stale 7     INVERSION  How are received goods assigned to storage locations
+  current 2     stale 1     INVERSION  How are outbound dock doors assigned to carriers now
+  current 2     stale 1     INVERSION  How often is slotting recomputed now?
+  current 2     stale 1     INVERSION  At what pick-face fill level does replenishment trig
+  current 1     stale 2     ok         How often are A-class SKUs cycle-counted currently?
+  current 1     stale 2     ok         What happens to an order when a line is short-picked
+  current 1     stale 2     ok         How many orders does a pick tote batch today?
+  current 2     stale 1     INVERSION  How many days does a customer have to start a return
+  current 2     stale 1     INVERSION  What time does the final carrier manifest close?
+
+  inversions: 8/12
+
+=== UNANSWERABLE (confidence + margin) ===
+  conf 0.121   margin 0.00411    answered=True srcs=5  What is orbit's policy on paying warehouse staff
+  conf 0.094   margin 0.00287    answered=True srcs=3  What is the uptime SLA percentage for the autono
+  conf 0.029   margin 0.00052    answered=True srcs=5  How do I configure the GraphQL subscription API 
+  conf 0.03    margin 0.00192    answered=True srcs=4  Which vendor supplies the on-site staff cafeteri
+
+=== smallest answerable margins (the margin check's false-positive mode) ===
+  margin 1e-05       conf 0.508   [factual] How many order lines can one pick wave contain?
+  margin 1e-05       conf 0.655   [how-to] How do I receive an inbound ASN at the dock?
+  margin 7e-05       conf 0.22    [zero-overlap] How is the best-fitting shipping box picked for 
+  margin 0.00025     conf 0.598   [factual] Where are picked items sorted back into individu
+  margin 0.00025     conf 0.663   [factual] By what local time must an order be placed to sh
+  margin 0.00027     conf 0.469   [stale-vs-current] What is the same-day dispatch order cutoff time?

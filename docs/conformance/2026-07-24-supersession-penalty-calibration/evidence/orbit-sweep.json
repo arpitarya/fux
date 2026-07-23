@@ -1,0 +1,2621 @@
+{
+  "env": "orbit",
+  "values": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    8,
+    10,
+    15,
+    20,
+    30,
+    50,
+    100,
+    200,
+    500
+  ],
+  "results": {
+    "0": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.566,
+        "hit@5": 0.887,
+        "MRR": 0.723
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.471,
+          "hit@5": 0.941,
+          "MRR": 0.706
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.917,
+          "MRR": 0.625
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 8,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "What is the same-day dispatch order cutoff time?",
+          "Who is orbit's primary parcel carrier?",
+          "How are received goods assigned to storage locations today?",
+          "How are outbound dock doors assigned to carriers now?",
+          "How often is slotting recomputed now?",
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": 7,
+            "inverted": true
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 2,
+        "What is the same-day dispatch order cutoff time?": 2,
+        "By what local time must an order be placed to ship the same day?": 2,
+        "Who is orbit's primary parcel carrier?": 2,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 2,
+        "How often is slotting recomputed now?": 2,
+        "On what cadence is the slotting plan recomputed?": 2,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "1": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.66,
+        "hit@5": 0.887,
+        "MRR": 0.77
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.588,
+          "hit@5": 0.941,
+          "MRR": 0.765
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.583,
+          "hit@5": 0.917,
+          "MRR": 0.75
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 5,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "How are received goods assigned to storage locations today?",
+          "How often is slotting recomputed now?",
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": 7,
+            "inverted": true
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 2,
+        "On what cadence is the slotting plan recomputed?": 2,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "2": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 4,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "How are received goods assigned to storage locations today?",
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": 8,
+            "inverted": true
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "3": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 4,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "How are received goods assigned to storage locations today?",
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": 8,
+            "inverted": true
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "5": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 4,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "How are received goods assigned to storage locations today?",
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": 9,
+            "inverted": true
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "8": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 5,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": 7,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 5,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": 5,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "10": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": 6,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": 10,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 6,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": 6,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "15": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": 10,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 6,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "20": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": 10,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "30": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "50": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "100": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "200": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    },
+    "500": {
+      "all": {
+        "n": 53,
+        "hit@1": 0.698,
+        "hit@5": 0.887,
+        "MRR": 0.789
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 4,
+          "hit@1": 0.75,
+          "hit@5": 1.0,
+          "MRR": 0.833
+        },
+        "factual": {
+          "n": 17,
+          "hit@1": 0.647,
+          "hit@5": 0.941,
+          "MRR": 0.794
+        },
+        "how-to": {
+          "n": 6,
+          "hit@1": 1.0,
+          "hit@5": 1.0,
+          "MRR": 1.0
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.667,
+          "hit@5": 0.917,
+          "MRR": 0.792
+        },
+        "why": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.917
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.333,
+          "hit@5": 0.333,
+          "MRR": 0.361
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 3,
+        "current_in_top5": 11,
+        "inverted_questions": [
+          "At what pick-face fill level does replenishment trigger now?",
+          "How many days does a customer have to start a return?",
+          "What time does the final carrier manifest close?"
+        ],
+        "detail": [
+          {
+            "q": "What is the maximum number of order lines in a single pick wave today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the same-day dispatch order cutoff time?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "Who is orbit's primary parcel carrier?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are received goods assigned to storage locations today?",
+            "current_rank": null,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How are outbound dock doors assigned to carriers now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How often is slotting recomputed now?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "At what pick-face fill level does replenishment trigger now?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How often are A-class SKUs cycle-counted currently?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What happens to an order when a line is short-picked today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many orders does a pick tote batch today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How many days does a customer have to start a return?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What time does the final carrier manifest close?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why did we choose goods-to-person AMRs instead of a fixed conveyor loop?": 1,
+        "What carries movable racks to the pick stations?": 2,
+        "In what unit are item and carton dimensions stored?": 1,
+        "Why are dimensions stored as integer millimeters rather than floating-point centimeters?": 1,
+        "Why do we use zone picking into a putwall instead of discrete order picking?": 1,
+        "Where are picked items sorted back into individual customer orders?": 2,
+        "Why is storage split into deep reserve and a shallow forward pick face?": 1,
+        "Why do we cross-dock some inbound cartons straight to the pack lane?": 3,
+        "When an inbound carton already matches an open order, where does it go?": 1,
+        "Why does each outbound sorter lane have a single writer?": 1,
+        "What is the maximum number of order lines in a single pick wave today?": 1,
+        "How many order lines can one pick wave contain?": 1,
+        "What is the same-day dispatch order cutoff time?": 1,
+        "By what local time must an order be placed to ship the same day?": 1,
+        "Who is orbit's primary parcel carrier?": 1,
+        "Which carrier does most outbound volume route to?": 1,
+        "Why did we move the primary parcel lane to Vanta Freight?": 1,
+        "How are received goods assigned to storage locations today?": null,
+        "What determines where a received SKU is put away now?": 3,
+        "How are outbound dock doors assigned to carriers now?": 1,
+        "How often is slotting recomputed now?": 1,
+        "On what cadence is the slotting plan recomputed?": 1,
+        "At what pick-face fill level does replenishment trigger now?": 2,
+        "What percent-full triggers a forward-pick replenishment?": 1,
+        "How often are A-class SKUs cycle-counted currently?": 1,
+        "What is the cycle-count frequency for fast-moving A-class SKUs?": 1,
+        "What happens to an order when a line is short-picked today?": 1,
+        "How many orders does a pick tote batch today?": 1,
+        "How many compartments (orders) does a pick tote carry?": 2,
+        "How many days does a customer have to start a return?": 2,
+        "What is the returns window from delivery?": 1,
+        "What time does the final carrier manifest close?": 2,
+        "What fields are required on an inbound ASN line?": 1,
+        "What causes an inbound ASN to be rejected at receipt?": 6,
+        "Can a released pick wave be edited?": 1,
+        "How do I recover a pick wave that is stuck at the putwall?": 1,
+        "What is the procedure to correct a mis-slotted SKU?": 1,
+        "How do I onboard a new SKU into the warehouse?": 1,
+        "How do I clear a jammed outbound sorter lane?": 1,
+        "How do I run the warehouse simulator on my machine?": 1,
+        "How do I receive an inbound ASN at the dock?": 1,
+        "Which carrier do we primarily ship with, and what time does its final manifest close?": 1,
+        "What caused the January putwall backup and what changed after it?": 1,
+        "Why did whole orders freeze at the putwall during the January peak?": 1,
+        "Why did our carrier manifest disagree with the carrier's scan in December?": 1,
+        "What are the stages an order passes through from eligible to shipped?": 2,
+        "At which stage do a wave's picked items get sorted back into individual orders?": 3,
+        "How do we make sure a picker is not routed to an empty location?": null,
+        "How is inventory accuracy verified without shutting the warehouse?": null,
+        "What do we do with received goods that already have a waiting order?": 6,
+        "Why are frequently ordered products stored near the shipping area?": null,
+        "How do we avoid walking the same aisle repeatedly for separate requests?": 1,
+        "How is the best-fitting shipping box picked for an order?": 1
+      }
+    }
+  }
+}

@@ -263,12 +263,37 @@ partial results, not two clean fixes:
   release**; the knob and its calibration evidence exist for a future
   cross-query-comparable signal (e.g. dense cosine) to use.
 
-**Next:** no phase is pre-registered yet. Candidates surfaced by phase 6's own
-measurement: an absolute, cross-query-comparable confidence signal for
-`answer` (ADR 0014's F1/F2), and Finding 2's deferred chunk-level dense codes
-(zero-overlap rescue, 0/6 — its own phase, gated on the ~200 B/doc
-committed-state budget). Neither is scoped yet; both need their own compare
-doc.
+### Phase 7 (v0.26.0) — supersession down-ranks, fabrication is closed
+
+**Option B shipped, on measurement.** The annotate-only verdict was reopened
+after two independent corpora showed the engine annotating "this is superseded"
+about the document it ranked **first** (acme 9/12, orbit 8/12 inversions).
+
+- **`[engine.hybrid] supersession_penalty` (default 15)** — a rank offset in RRF
+  fusion for author-marked superseded documents. A **penalty, not a filter**: the
+  retired document stays reachable (measured rank 1 → 17, still returned). `0`
+  restores pre-0.26 ranking exactly; `--lexical-only` never reaches it.
+- **The default is a measurement.** Swept across all four eval sets: safe
+  interval **`[11, ∞)`** to 500, **zero hit@5 regression on any gate at any value
+  in any question kind**, recovering **100% of frontmatter-reachable inversions**
+  (orbit 5/5, acme 3/3) while hit@1 improves. See
+  [`conformance/2026-07-24-supersession-penalty-calibration/`](conformance/2026-07-24-supersession-penalty-calibration/).
+- **The ceiling is the marked set**, permanently: 3/12 (orbit) and 6/12 (acme)
+  inversions carry no marker. The remaining lever is **documentation, not
+  engineering** — `superseded_by:` is the contract Fux acts on.
+- **Fabrication is now a documented product boundary, not an open defect.** The
+  runner-up margin check was re-measured on a corpus de-confounded by the very
+  penalty above, and is **still empty** — a `how-to` question sits at margin
+  1e-05 before and after; acme's minimum is a `cross-doc` question that never
+  involved supersession. Three no-model discriminators are refuted across two
+  corpora. **No fourth mechanism is proposed.**
+
+**Next:** no phase is pre-registered yet. Candidates: an absolute,
+cross-query-comparable confidence signal for `answer` (ADR 0014's F1/F2 — though
+phase 7 makes the *decline* line itself closed, so this is now about confidence
+reporting rather than a fix), and the deferred chunk-level dense codes
+(zero-overlap rescue, still 1/6 — its own phase, gated on the ~200 B/doc
+committed-state budget). Neither is scoped; both need their own compare doc.
 
 **Query-at-scale is deferred, not dropped** — at 100k documents a query takes
 ~10 s, because the query path still loads the entire index to build the

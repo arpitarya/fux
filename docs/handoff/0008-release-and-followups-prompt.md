@@ -1,0 +1,108 @@
+---
+type: Prompt
+title: Release v0.26.0 + pending follow-ups (phase 8) — Claude Code prompt
+description: Paste-ready prompt executing handoff 0008 — apply the approved honesty edits, land staged phase-7 work, publish v0.26.0 to PyPI (human-gated), verify the install, and do the small orbit follow-ups.
+status: ready
+timestamp: 2026-07-24T00:00:00Z
+tags: [release, pypi, docs]
+---
+
+# Claude Code prompt — Release v0.26.0 + follow-ups (phase 8)
+
+**Model: Sonnet.** Well-specified; the wording and version decisions are pre-made.
+It stays Sonnet because the one irreversible step — the PyPI publish — is
+**human-gated**, not model-decided. The non-monotone-fusion diagnosis (Part C) is
+Opus and is **scoped, not executed** here.
+
+---
+
+You are landing and publishing everything built so far, then closing two small
+follow-ups. Full spec: `docs/handoff/0008-release-and-followups-handoff.md` — read
+it first; its Definition of Done and Non-negotiables are binding.
+
+## The situation (then go read)
+
+`main` has **phase-7 work staged but uncommitted**, `__version__` is already
+`0.26.0`, and **nothing since ~0.23.0 is on PyPI**. Two approved README honesty
+edits are pending — and they **must be committed before the release is cut**, so
+PyPI never renders the old misleading "cannot hallucinate" claim.
+
+## Context to load first
+
+1. `docs/handoff/0008-release-and-followups-handoff.md` — the spec (binding), incl.
+   the **exact edit text in §5** and the **open version decision in §10**.
+2. `.github/workflows/publish.yml` — release-triggered; tag↔version guard;
+   `twine --strict`; OIDC (no tokens — do not add any).
+3. `CHANGELOG.md` / README § What's new — confirm the 0.26.0 entry is present and
+   mirrored (add if the phase-7 close-out missed it).
+4. `CLAUDE.md` — read before your first change; the fold in §5/Edit 3 is *proposed*
+   in the PR body, applied to the file.
+
+## Required workflow — order matters, do not resequence
+
+1. **Explore** `git status`, the staged diff, and the release workflow before acting.
+2. **M1 — Apply the pending edits** (handoff §5): README Edit 1 + Edit 2, CLAUDE.md
+   Edit 3. Match on the quoted phrases, not line numbers. Confirm CHANGELOG/README
+   "what's new" carry a complete 0.26.0 entry.
+3. **M2 — Land phase 7 cleanly.** Move the staged work + these edits onto a feature
+   branch (match the repo's PR pattern — do not leave changes loose on `main`),
+   commit with a clear message, push.
+4. **M3 — PR + verify.** Open the PR (put the CLAUDE.md fold in the description for
+   review). Run `uv run pytest -q tests` and `tests_e2e`; read `gh pr checks <n>`
+   explicitly. **CI is not a blocking wall here — confirm green yourself.** Merge.
+5. **M4 — Verify PyPI state.** `pip index versions fux-engine` (or the JSON). Record
+   what's live. **Surface the §10 Q1 decision to me** (publish 0.26.0 only vs also
+   back-publish) — default 0.26.0-only + git tags for the rest.
+6. **M5 — [HUMAN GATE] Publish.** **STOP and get my explicit go** before creating
+   the GitHub Release `v0.26.0` on the merge commit. This triggers `publish.yml`
+   and is irreversible for that version. Do not proceed on your own judgment.
+7. **M6 — Verify the publish.** Fresh venv: `pip install fux-engine==0.26.0`,
+   `fux --version`, one real query against a scratch corpus. Confirm the PyPI page
+   renders the corrected README.
+8. **M7 — Trackers.** WORKLOG, IMPLEMENTATION ("now working on"), DOC-REGISTRY,
+   INTERVIEW; retire the fux-lab frozen-wheel note (package now installable).
+9. **M8 — Part B follow-up.** Fix the `zero_overlap_rescued` miscount in
+   `fux-lab/shared/regress/run.py` (it counts lexical hits as dense rescues);
+   re-baseline the affected env deliberately, and say so.
+
+## Constraints (hard)
+
+- **Honesty edits committed before the release is cut.** This ordering is the whole
+  point — do not publish first.
+- **Do not create the GitHub Release until I say go** (M5). Irreversible.
+- **Do not re-bump the version** (already 0.26.0). Do not touch fusion, BM25F,
+  FuxVec, the confidence floor, or the supersession penalty.
+- **Do NOT diagnose or patch the non-monotone fusion bug here** (Part C — its own
+  Opus handoff). Do not touch the fusion code in this release.
+- No PyPI tokens — trusted publishing via OIDC is already set up.
+- `$0`/stdlib/deterministic/no-model unaffected — this is a release.
+- Read `gh pr checks`; never merge red.
+- Docs style: short points, roomy.
+
+## Acceptance criteria (self-check)
+
+- [ ] README Edit 1 + 2 applied (match on phrase); CLAUDE.md fold applied + in PR body
+- [ ] CHANGELOG/README "what's new" complete for 0.26.0
+- [ ] Phase 7 on a feature branch, committed, pushed; nothing loose on `main`
+- [ ] `gh pr checks` green; merged
+- [ ] PyPI state verified; §10 Q1 decision recorded
+- [ ] v0.26.0 released **only after my explicit go**; tag↔version + `twine --strict` pass
+- [ ] Clean-venv `pip install fux-engine==0.26.0` + smoke test pass; PyPI README correct
+- [ ] Trackers updated; frozen-wheel note retired
+- [ ] `zero_overlap_rescued` miscount fixed; env re-baselined deliberately
+
+## Guardrails
+
+- **Ask before:** creating the release (M5), back-publishing older versions,
+  editing anything under `src/`, or re-baselining a lab env.
+- **If CI is red, fix it — do not merge to unblock the release.**
+- **Do not "quickly fix" the fusion bug** because you noticed it — it is Part C,
+  needs its own diagnosis, and touching fusion mid-release is exactly the risk this
+  handoff isolates.
+- If a requirement is ambiguous or conflicts with the code, STOP and ask.
+
+## What's next after this (not in scope — for the record)
+
+- **Part C — non-monotone fusion** (Opus): is RRF's contribution monotone in
+  per-list rank, and does the supersession offset interact with it? Own handoff + ADR.
+- **Chunk-level dense codes** — the zero-overlap structural fix; own phase.

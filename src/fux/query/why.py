@@ -28,6 +28,7 @@ class WhyResult:
     graph: dict | None = None
     superseded: bool = False
     superseded_by: str | None = None
+    penalty: dict | None = None
     answer_decline: dict | None = None
     verdict: str = ""
 
@@ -43,6 +44,8 @@ class WhyResult:
             out["superseded"] = True
             if self.superseded_by:
                 out["superseded_by"] = self.superseded_by
+        if self.penalty is not None:
+            out["supersession_penalty"] = self.penalty
         if self.lexical is not None:
             out["lexical"] = self.lexical
         if self.dense is not None:
@@ -102,9 +105,11 @@ def why(config: Config, query: str, doc_id: str, *, lexical_only: bool = False, 
         searcher=searcher, files=files,
     )
     fused_rank = None
+    penalty = None
     for i, p in enumerate(graph_result.passages, start=1):
         if p.file == doc_id:
             fused_rank = i
+            penalty = _penalty_detail(p)
             break
     graph_detail = _graph_detail(graph_result, doc_id)
 
@@ -114,9 +119,25 @@ def why(config: Config, query: str, doc_id: str, *, lexical_only: bool = False, 
     return WhyResult(
         doc_id=doc_id, in_corpus=True, corpus_detail=corpus_detail, chunks=chunks,
         lexical=lexical, dense=dense, graph=graph_detail,
-        superseded=superseded, superseded_by=superseded_by, answer_decline=answer_decline,
-        verdict=verdict,
+        superseded=superseded, superseded_by=superseded_by, penalty=penalty,
+        answer_decline=answer_decline, verdict=verdict,
     )
+
+
+def _penalty_detail(passage) -> dict | None:
+    """The supersession down-rank, as it actually applied to this passage.
+
+    `None` whenever the knob is off, so `why` output is unchanged at the
+    default — the same identity property the goldens pin (ADR 0015).
+    """
+    info = passage.hybrid or {}
+    if "supersession_penalty" not in info:
+        return None
+    return {
+        "offset": info["supersession_penalty"],
+        "rank_before": info.get("rank_before_penalty"),
+        "rank_after": info.get("rank_after_penalty"),
+    }
 
 
 def _answer_decline(config: Config, query: str, files: dict, *, lexical_only: bool) -> dict:
@@ -314,6 +335,10 @@ def cmd_why(args) -> int:
     if result.superseded:
         successor = f" → {result.superseded_by}" if result.superseded_by else " (successor unresolved)"
         print(f"  superseded: true{successor}")
+    if result.penalty:
+        before, after = result.penalty["rank_before"], result.penalty["rank_after"]
+        shift = f" (rank {before}→{after})" if before and after else ""
+        print(f"  superseded → rrf penalised by {result.penalty['offset']} ranks{shift}")
     if result.chunks:
         print(f"  chunks: {len(result.chunks)}")
         for c in result.chunks:

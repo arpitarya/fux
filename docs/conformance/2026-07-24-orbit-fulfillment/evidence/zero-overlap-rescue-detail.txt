@@ -1,0 +1,10 @@
+question                                               lex   hyb  verdict
+----------------------------------------------------------------------------------
+How do we make sure a picker is not routed to an em   None  None  MISS
+How is inventory accuracy verified without shutting      5  None  MISS
+What do we do with received goods that already have      8     6  MISS
+Why are frequently ordered products stored near the   None  None  MISS
+How do we avoid walking the same aisle repeatedly f      1     1  top-5 via LEXICAL (not a rescue)
+How is the best-fitting shipping box picked for an       7     1  CLEAN DENSE RESCUE
+
+clean dense rescues: 1/6

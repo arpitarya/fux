@@ -36,6 +36,16 @@ b       = 0.75                   # BM25 length normalization (must be ≤ 1)
 enabled        = true            # false = lexical-only engine, no model load
 rrf_k          = 60              # Reciprocal Rank Fusion constant
 candidate_pool = 200             # BM25F candidates the dense pass re-ranks
+supersession_penalty = 15        # down-rank author-marked superseded docs (ADR 0015)
+                                 # a superseded chunk fuses as if it ranked 15 places
+                                 # lower. 0 = off (exact pre-0.26 identity).
+                                 # Demotes, never filters — the retired doc stays
+                                 # reachable for questions about the old decision.
+                                 # Only frontmatter-marked docs are touched, never prose.
+                                 # No effect under --lexical-only (the penalty is in fusion).
+                                 # 15 is measured, not chosen: safe interval [11, ∞) across
+                                 # all four eval sets — see docs/conformance/
+                                 # 2026-07-24-supersession-penalty-calibration/.
 
 [answer]
 max_sentences   = 5              # extractive-answer length cap (--answer-max overrides)

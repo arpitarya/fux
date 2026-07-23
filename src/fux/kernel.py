@@ -135,7 +135,7 @@ def retrieve(
     debug.dbg("query", "info", "retrieve", seed="node" if pinned else "text", k=k,
               lexical_only=lexical_only)
     passages, engine, model = _passages(
-        config, searcher, query, k, lexical_only, vectors
+        config, searcher, query, k, lexical_only, vectors, files
     )
     if pinned is not None:
         passages = [p for p in passages if p.file == pinned] or _own_chunks(
@@ -174,7 +174,20 @@ def retrieve(
 
 
 def _fuse_graph(config, searcher, passages, expanded) -> list[ScoredChunk]:
-    """Refuse the passage list with graph-expansion as an additional RRF list."""
+    """Refuse the passage list with graph-expansion as an additional RRF list.
+
+    **The supersession penalty is deliberately not re-applied here** (ADR 0015).
+    `prior` is already the penalised ordering, so offsetting again would demote
+    the same document twice, by an amount that varies with whether graph
+    expansion happened to fire — which would make the M3 calibration curve
+    non-comparable across queries. One application, one meaning, one sweep unit.
+
+    The accepted consequence: a superseded document reached *only* by graph
+    expansion is not penalised, and one already in `prior` can be partly
+    re-promoted by a strong graph signal. Measured, not assumed — if that path
+    turns out to matter on a real corpus, it is evidence for extending the
+    penalty, not a reason to guess now.
+    """
     by_position = {(c["file"], c["ordinal"]): c for c in searcher.chunks}
     existing = {(p.file, p.ordinal): p for p in passages}
 
@@ -219,9 +232,27 @@ def _fuse_graph(config, searcher, passages, expanded) -> list[ScoredChunk]:
 # -- passages: the v0.22 hybrid pipeline, moved verbatim -------------------
 
 
+def _supersession_offsets(config: Config, files: dict | None, keys) -> dict:
+    """Rank offsets for the author-marked superseded set (ADR 0015).
+
+    The set is *deterministic*: exactly the documents whose frontmatter carries
+    `status: superseded` / `superseded_by:`, resolved at ingest. Nothing is
+    inferred from prose — that is what made this penalty shippable where a
+    content heuristic never would be.
+
+    Returns `{}` when the knob is off, so fusion takes its untouched path.
+    """
+    penalty = config.hybrid.supersession_penalty
+    if penalty <= 0 or not files:
+        return {}
+    return {
+        key: penalty for key in keys if files.get(key[0], {}).get("superseded")
+    }
+
+
 def _passages(
     config: Config, searcher: Searcher, query: str, pool: int, lexical_only: bool,
-    supplied_vectors: dict | None = None,
+    supplied_vectors: dict | None = None, files: dict | None = None,
 ) -> tuple[list[ScoredChunk], str, object | None]:
     """BM25F ∪ dense-over-candidates → RRF. Unchanged from v0.22 by contract."""
     if lexical_only or not config.hybrid.enabled:
@@ -296,10 +327,23 @@ def _passages(
         for r in global_hits:
             similarity.setdefault(key_of(r), r.score)
 
-    fused = rrf(lists, k=config.hybrid.rrf_k)
-    ordered = sorted(
-        fused.items(), key=lambda kv: (-kv[1], by_key[kv[0]].file, by_key[kv[0]].ordinal)
-    )
+    def order(scores: dict) -> list:
+        return sorted(
+            scores.items(), key=lambda kv: (-kv[1], by_key[kv[0]].file, by_key[kv[0]].ordinal)
+        )
+
+    offsets = _supersession_offsets(config, files, by_key)
+    fused = rrf(lists, k=config.hybrid.rrf_k, offsets=offsets)
+    ordered = order(fused)
+    # The rank a penalised chunk *would* have held, so `why` can show the shift
+    # the penalty caused rather than asserting one. Computed only when the knob
+    # is on — off costs nothing, not even this second sort.
+    baseline_rank: dict = {}
+    if offsets:
+        baseline_rank = {
+            key: i for i, (key, _) in enumerate(order(rrf(lists, k=config.hybrid.rrf_k)), start=1)
+        }
+    penalised_rank = {key: i for i, (key, _) in enumerate(ordered, start=1)}
     lex_rank = {key_of(r): i for i, r in enumerate(candidates, start=1)}
     dense_rank = {key_of(r): i for i, (r, _) in enumerate(dense, start=1)}
     global_rank = {key_of(r): i for i, r in enumerate(global_hits, start=1)}
@@ -316,10 +360,17 @@ def _passages(
         }
         if key in global_rank:
             r.hybrid["dense_global_rank"] = global_rank[key]
+        if key in offsets:
+            r.hybrid["supersession_penalty"] = offsets[key]
+            r.hybrid["rank_before_penalty"] = baseline_rank.get(key)
+            r.hybrid["rank_after_penalty"] = penalised_rank.get(key)
         r.score = score
         results.append(r)
     debug.dbg("query", "info", "hybrid fusion", rrf_k=config.hybrid.rrf_k, results=len(results),
               dense_global_rescues=len(global_hits))
+    if offsets:
+        debug.dbg("query", "info", "supersession penalty applied",
+                  penalty=config.hybrid.supersession_penalty, chunks=len(offsets))
     if debug.is_enabled("lexical", "trace"):
         for r in results:
             fields = {"file": r.file, "ordinal": r.ordinal, "rrf": r.hybrid["rrf"]}

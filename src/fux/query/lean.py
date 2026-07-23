@@ -48,7 +48,16 @@ class LeanCorpus:
         if not lexical and not dense:
             return []
         lists = [lst for lst in (lexical, dense) if lst]
-        fused = rrf(lists, k=self.config.hybrid.rrf_k)
+        # The same supersession down-rank the full engine applies (ADR 0015).
+        # Lean carries the marker in its committed state flags, so honouring it
+        # here is what keeps lean and full rankings *provably* the same rather
+        # than same-until-the-knob-is-on. 0 = identity, as everywhere.
+        penalty = self.config.hybrid.supersession_penalty
+        offsets = (
+            {doc_id: penalty for doc_id, e in self.docs.items() if "superseded" in e.flags}
+            if penalty > 0 else {}
+        )
+        fused = rrf(lists, k=self.config.hybrid.rrf_k, offsets=offsets)
         lex_rank = {doc: i for i, doc in enumerate(lexical, start=1)}
         dense_rank = {doc: i for i, doc in enumerate(dense, start=1)}
         ordered = sorted(fused.items(), key=lambda kv: (-kv[1], kv[0]))

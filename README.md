@@ -106,8 +106,10 @@ Properties, not features:
   model in the maintenance path. Same sources → byte-identical corpus and index;
   same question → same answer. Proven by golden-file tests on every commit.
 - **Cited or it didn't happen.** Every passage carries `file:line`; `answer` is
-  extractive — verbatim source sentences, ordered and cited — never generative, so
-  it cannot hallucinate.
+  extractive — verbatim source sentences, ordered and cited — never generative —
+  every sentence is verbatim from a source. It cannot invent text, but see
+  **§ Honest limits**: it can still cite a real, irrelevant passage confidently
+  for a question the corpus can't address.
 - **Hybrid retrieval, still offline.** BM25F field-weighted lexical search fused
   (RRF) with a **bundled 7.9 MB static-embedding model** inferred in pure stdlib —
   semantic recall for paraphrased questions with zero downloads, zero services.
@@ -290,8 +292,11 @@ quality is measured, not promised: the committed eval harness gates changes, and
 the current hybrid ships on a tie-with-rescues over lexical — the honest numbers
 live in [ADR 0006](docs/adr/). **`answer` cannot invent text** (every sentence
 is verbatim from a source), but it **can cite a real, irrelevant passage
-confidently** for a well-formed out-of-scope question — a measured, unfixed
-limit, not a hallucination in the generative sense. An absolute confidence
+confidently** for a well-formed out-of-scope question — a **documented, permanent
+boundary** of extractive answering without a model — established across two
+independent realistic corpora, with all three no-model discriminators (absolute
+floor, runner-up margin, margin ratio) refuted. "Unfixed" would imply a fix is
+pending; it is not. An absolute confidence
 floor exists (`[answer] min_confidence`) but ships **disabled**: calibration
 found no threshold that catches those cases without also declining real
 answers ([ADR 0014](docs/adr/0014-answer-confidence-floor.md)). Verify
@@ -308,7 +313,28 @@ use; the design of record is [docs/PLAN.md](docs/PLAN.md).
 
 ## What's new
 
-**Latest — v0.25.0 (2026-07-23): trust & currency.** Two honest, partial
+**Latest — v0.26.0 (2026-07-24): supersession down-rank.** v0.25.0 taught the
+engine to *recognise* a retired document but not to *act* on it — so it
+annotated "this is superseded, here is the replacement" about the document it
+had just ranked **first** (measured on two independent realistic corpora: 9/12
+and 8/12 inversions). **`[engine.hybrid] supersession_penalty` (default `15`)**
+now down-ranks author-marked superseded documents in RRF fusion — a penalty, not
+a filter, so the retired document stays reachable for questions about the old
+decision (measured: rank 1 → rank 17, still returned). **The default is a
+measurement, not a preference:** swept across all four eval sets, the safe
+interval is `[11, ∞)` with **zero hit@5 regression on any gate, at any value, in
+any question kind**, recovering **100% of the frontmatter-reachable inversions**
+on both corpora while hit@1 *improves*. `0` restores pre-0.26 ranking exactly;
+`--lexical-only` is structurally unaffected. **Known limit:** only
+frontmatter-marked supersession is reachable — 3/12 and 6/12 inversions carry no
+marker and cannot be fixed without a model, so **`superseded_by:` is the contract
+Fux acts on.** Separately, the runner-up **margin check was re-measured on a
+de-confounded corpus and is still empty** — fabrication on well-formed
+out-of-scope questions is now recorded as a **documented product boundary** of
+extractive answering without a model, not an open defect. See
+[`docs/adr/0015-supersession-downrank-penalty.md`](docs/adr/0015-supersession-downrank-penalty.md).
+
+**v0.25.0 (2026-07-23): trust & currency.** Two honest, partial
 fixes for a realistic-corpus conformance run that measured Fux confidently
 serving retired and fabricated answers. **Supersession** — `status:
 superseded` / `superseded_by:` frontmatter is now parsed, persisted, and

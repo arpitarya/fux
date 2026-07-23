@@ -4,6 +4,54 @@ All notable changes to **fux-engine** (the rebuild line). Dates are ISO; version
 follow semver. The latest entry is mirrored in [README.md](README.md) § What's new.
 Maintained on every version bump (registry-tracked).
 
+## [0.26.0] — 2026-07-24 — supersession down-rank
+
+Phase 7 (handoff 0007, ADR 0015). v0.25.0 taught the engine to *recognise* a
+retired document but not to *act* on it — so it annotated "this is superseded,
+here is the replacement" about the document it had just ranked **first**. Two
+independent realistic corpora measured that (acme 9/12, orbit 8/12 inversions),
+and this release fixes it on measured evidence rather than a guess.
+
+- **`[engine.hybrid] supersession_penalty` (default `15`)** — author-marked
+  superseded documents are down-ranked in RRF fusion: a penalised chunk
+  contributes `1/(k + rank + 15)` instead of `1/(k + rank)`. The unit is
+  **ranks**, which is scale-free — a magnitude calibrated on a 900-document
+  corpus means the same thing on a 100k one.
+  - **A penalty, never a filter.** The retired document stays retrievable, so
+    "what did we used to do?" still finds its answer. Measured: rank 1 → rank 17,
+    still in the result set.
+  - **The penalised set is deterministic** — exactly the documents whose
+    frontmatter carries `status: superseded` / `superseded_by:`, chains resolved
+    at ingest. Prose is never consulted; nothing is inferred.
+  - **`0` restores pre-0.26 ranking exactly** — the escape hatch is tested, so a
+    field revert needs no release.
+  - **`--lexical-only` is structurally unaffected** — the penalty lives in
+    fusion, which that path never reaches.
+- **The default is a measurement, not a preference.** Swept across all four eval
+  sets (fixture-21, acme-55, orbit-53, synthetic 1k/5k/10k): the safe interval is
+  **`[11, ∞)`**, verified to 500, with **zero hit@5 regression on any gate at any
+  value in any question kind**. It recovers **100% of the frontmatter-reachable
+  inversions on both corpora** (orbit 5/5, acme 3/3); hit@1 improves (orbit
+  0.566 → **0.698**, acme 0.491 → **0.564**). The knob shipped default-`0` first
+  and the default moved only after calibration plus explicit sign-off
+  (`docs/conformance/2026-07-24-supersession-penalty-calibration/`).
+- **`fux why` explains the demotion** —
+  `superseded → rrf penalised by 15 ranks (rank 1→17)`, in human and `--json`.
+- **Lean honours the penalty too**, reading the marker from committed state, so
+  lean and full rankings stay *provably* identical rather than
+  identical-while-the-knob-is-off.
+- **Known limit, now quantified:** only frontmatter-marked supersession is
+  reachable. 3/12 (orbit) and 6/12 (acme) inversions carry no marker and cannot
+  be fixed without a model. **`superseded_by:` is the contract Fux acts on.**
+- **Fabrication closed as a documented product boundary.** The runner-up margin
+  check was re-measured on a de-confounded corpus — the superseded-twin ties that
+  made the earlier refutation ambiguous are gone. It is **still empty**: a
+  `how-to` question sits at margin 1e-05 before and after, and acme's minimum is
+  a `cross-doc` question that never involved supersession. Three no-model
+  discriminators (absolute floor, margin, ratio) are now refuted across two
+  independent corpora. `[answer] min_confidence` stays permissive at `0.0`; no
+  fourth mechanism is proposed.
+
 ## [0.25.0] — 2026-07-23 — trust & currency
 
 Phase 6 (handoff 0006, ADRs 0013–0014). The acme-payments realistic corpus

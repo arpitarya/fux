@@ -1,0 +1,2118 @@
+{
+  "env": "acme",
+  "values": [
+    0,
+    1,
+    2,
+    3,
+    5,
+    8,
+    10,
+    20,
+    50,
+    100,
+    500
+  ],
+  "results": {
+    "0": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.491,
+        "hit@5": 0.855,
+        "MRR": 0.665
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 1.0,
+          "MRR": 0.628
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.167,
+          "hit@5": 0.833,
+          "MRR": 0.503
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 9,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "What is the card settlement window today?",
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?",
+          "Does reconciliation run in real time or as a daily batch?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 5,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 2,
+        "How many business days after capture do funds settle to the merchant?": 2,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 2,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 2,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "1": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.509,
+        "hit@5": 0.855,
+        "MRR": 0.674
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 1.0,
+          "MRR": 0.628
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.25,
+          "hit@5": 0.833,
+          "MRR": 0.544
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 8,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "What is the card settlement window today?",
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 5,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 2,
+        "How many business days after capture do funds settle to the merchant?": 2,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 2,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "2": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.545,
+        "hit@5": 0.855,
+        "MRR": 0.692
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.417,
+          "hit@5": 1.0,
+          "MRR": 0.669
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.586
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 7,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 2,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 3,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 5,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 2,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "3": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.545,
+        "hit@5": 0.855,
+        "MRR": 0.692
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.417,
+          "hit@5": 1.0,
+          "MRR": 0.669
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.586
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 7,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 5,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 2,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 5,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 2,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "5": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.701
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.711
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.586
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 7,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 5,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 2,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 5,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "8": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.702
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.715
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.586
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 7,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": 4,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 7,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 3,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 5,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 4,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "10": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.702
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.715
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.586
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 7,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How does the API authenticate requests today?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": 7,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": 7,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 5,
+            "stale_rank": 4,
+            "inverted": true
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 6,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 4,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 5,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "20": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.703
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.715
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.59
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 6,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 4,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": 10,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 4,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 4,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "50": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.703
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.715
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.59
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 6,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 4,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 4,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 4,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "100": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.703
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.715
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.59
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 6,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 4,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 4,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 4,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    },
+    "500": {
+      "all": {
+        "n": 55,
+        "hit@1": 0.564,
+        "hit@5": 0.855,
+        "MRR": 0.703
+      },
+      "by_kind": {
+        "cross-doc": {
+          "n": 6,
+          "hit@1": 0.5,
+          "hit@5": 0.833,
+          "MRR": 0.667
+        },
+        "factual": {
+          "n": 12,
+          "hit@1": 0.5,
+          "hit@5": 1.0,
+          "MRR": 0.715
+        },
+        "how-to": {
+          "n": 8,
+          "hit@1": 0.875,
+          "hit@5": 1.0,
+          "MRR": 0.938
+        },
+        "stale-vs-current": {
+          "n": 12,
+          "hit@1": 0.333,
+          "hit@5": 0.833,
+          "MRR": 0.59
+        },
+        "why": {
+          "n": 11,
+          "hit@1": 0.909,
+          "hit@5": 1.0,
+          "MRR": 0.955
+        },
+        "zero-overlap": {
+          "n": 6,
+          "hit@1": 0.167,
+          "hit@5": 0.167,
+          "MRR": 0.167
+        }
+      },
+      "staleness": {
+        "pairs": 12,
+        "inversions": 6,
+        "current_in_top5": 10,
+        "inverted_questions": [
+          "How long is an idempotency key valid?",
+          "What is the current API rate limit per key?",
+          "How many days after a charge can a refund still be issued?",
+          "Are raw card numbers stored, and if so for how long?",
+          "How many days do we have to respond to a chargeback dispute?",
+          "For how long does Acme retry a failed webhook before giving up?"
+        ],
+        "detail": [
+          {
+            "q": "What is the card settlement window today?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How long is an idempotency key valid?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Who is Acme's primary card acquirer (PSP)?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "What is the current dunning retry schedule for a failed subscription charge?",
+            "current_rank": 1,
+            "stale_rank": 2,
+            "inverted": false
+          },
+          {
+            "q": "What is the current API rate limit per key?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How does the API authenticate requests today?",
+            "current_rank": 4,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "How many days after a charge can a refund still be issued?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Are raw card numbers stored, and if so for how long?",
+            "current_rank": 6,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "How many days do we have to respond to a chargeback dispute?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "What algorithm should I use to verify a webhook signature?",
+            "current_rank": 6,
+            "stale_rank": null,
+            "inverted": false
+          },
+          {
+            "q": "For how long does Acme retry a failed webhook before giving up?",
+            "current_rank": 2,
+            "stale_rank": 1,
+            "inverted": true
+          },
+          {
+            "q": "Does reconciliation run in real time or as a daily batch?",
+            "current_rank": 1,
+            "stale_rank": null,
+            "inverted": false
+          }
+        ]
+      },
+      "ranks": {
+        "Why do we tokenize card numbers at the edge instead of inside the core services?": 1,
+        "How long does Acme retain raw card numbers (PANs)?": 2,
+        "Why does the ledger use double-entry accounting instead of a single mutable balance column?": 1,
+        "Why are monetary amounts stored as integer minor units rather than decimals or floats?": 1,
+        "In what numeric form does the ledger store monetary amounts?": 1,
+        "Why did we choose client-supplied idempotency keys over server-side request hashing?": 1,
+        "Why did we add jitter to the webhook retry backoff instead of using a fixed doubling schedule?": 2,
+        "Why did we adopt a transactional outbox for publishing domain events?": 1,
+        "Why did we move dunning off the synchronous charge path?": 1,
+        "Why do we reconcile against the PSP feed daily rather than in real time?": 1,
+        "Which HTTP header carries the idempotency key when creating a payment?": 1,
+        "What status code does the payments API return for a duplicate idempotent request?": 1,
+        "What is the maximum window over which a failed webhook is retried before it is dead-lettered?": 3,
+        "Which HMAC algorithm signs outbound Acme webhooks?": 4,
+        "What is the maximum age of a payment that can still be refunded through the API?": 2,
+        "How do I recover a settlement batch that is stuck in PENDING?": 1,
+        "How do I rotate a webhook signing secret without dropping in-flight deliveries?": 1,
+        "How do I run reconciliation for a single specific date?": 1,
+        "What is the maximum number of settlement lines the reconciliation job processes in one run?": 2,
+        "How do I drain the payments service before a deploy so no in-flight capture is lost?": 1,
+        "How do I contest a chargeback dispute?": 1,
+        "The outbox relay lag alert is firing \u2014 what do I check, and which ADR explains why the outbox exists?": 1,
+        "How do I set up the acme-payments project locally for development?": 1,
+        "How do I issue a partial refund from the command line?": 2,
+        "How do I add a new PSP connector to the platform?": 1,
+        "Which incident led to adding jitter to webhook retries, and what was its root cause?": 1,
+        "What incident caused the move to client-supplied idempotency keys?": null,
+        "Which incident drove the decision to store amounts in integer minor units?": 2,
+        "Which RFC preceded the double-entry ledger and what model did it propose?": 1,
+        "Which runbook recovers a stuck settlement batch, and what does replay rely on to stay safe?": 2,
+        "What is the card settlement window today?": 1,
+        "How many business days after capture do funds settle to the merchant?": 1,
+        "How long is an idempotency key valid?": 2,
+        "Who is Acme's primary card acquirer (PSP)?": 1,
+        "Which company is the primary card acquirer that most volume routes through?": 1,
+        "Why did we switch the primary acquirer to Meridian?": 1,
+        "What is the current dunning retry schedule for a failed subscription charge?": 1,
+        "How many times does dunning retry a failed subscription charge?": 1,
+        "What is the current API rate limit per key?": 2,
+        "How many requests per second per key does the API allow?": 2,
+        "How does the API authenticate requests today?": 4,
+        "Why did we move from static API keys to OAuth2 client credentials?": 1,
+        "How many days after a charge can a refund still be issued?": 2,
+        "Are raw card numbers stored, and if so for how long?": 6,
+        "How many days do we have to respond to a chargeback dispute?": 2,
+        "What algorithm should I use to verify a webhook signature?": 6,
+        "For how long does Acme retry a failed webhook before giving up?": 2,
+        "Does reconciliation run in real time or as a daily batch?": 1,
+        "Why did we choose symmetric HMAC-SHA256 for webhook signing rather than asymmetric signatures?": 1,
+        "How do we stop strangers from draining an account?": null,
+        "What technology keeps information after the power goes off?": 1,
+        "What happens when the amounts do not match?": null,
+        "What do we do when a message will not go through?": null,
+        "How is the same instruction kept from running twice?": null,
+        "Why can nobody quietly change the record afterwards?": null
+      }
+    }
+  }
+}

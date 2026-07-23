@@ -1,0 +1,209 @@
+---
+type: Handoff
+title: Release v0.26.0 + pending follow-ups (phase 8)
+description: Land everything built so far — apply the two approved README honesty edits + the CLAUDE.md fold, commit/push the staged phase-7 work, PR→merge, and publish to PyPI (0.24.0–0.26.0 gap closed) — then the two orbit-run follow-ups. The publish is irreversible; it is human-gated.
+status: ready
+timestamp: 2026-07-24T00:00:00Z
+tags: [release, pypi, docs, honesty]
+---
+
+# Handoff: Release v0.26.0 + pending follow-ups (phase 8)
+
+**Model: Sonnet.** The work is well-specified and the judgment calls are already
+made (wording drafted, version decisions below). It stays Sonnet *because* the one
+irreversible action — the PyPI publish — is **human-gated** (M5), not left to the
+model. **Exception:** Part C's non-monotone-fusion diagnosis is Opus work and is
+**scoped here, not executed** — it gets its own handoff.
+
+**One-liner:** Three built versions (0.24.0, 0.25.0, 0.26.0) are committed-or-staged
+but not on PyPI, and two approved README honesty edits are pending. Apply the edits,
+land phase 7, publish, and close the two small orbit follow-ups.
+
+**Owner / executor:** Claude Code
+**Status:** Ready — no blockers. The publish step (M5) pauses for Arpit's explicit go.
+
+**Stress-tested (pre-mortem — this ships to the public and cannot be un-shipped):**
+
+- *"We published the misleading 'cannot hallucinate' claim."* → Mitigated: the two
+  README edits are a **hard prerequisite** (M1) that must be committed **before**
+  the release is cut (M5). The corrected README is what PyPI renders.
+- *"We published a broken wheel / wrong version."* → Mitigated: the publish
+  workflow already guards tag↔`__version__` and runs `twine check --strict`;
+  M6 additionally installs from PyPI in a clean venv and smoke-tests before "done."
+- *"We 'fixed' the non-monotone fusion bug blind, inside a release."* → Mitigated:
+  it is **explicitly out of this handoff's build scope** (Part C) — a real engine
+  correctness finding needs its own diagnostic pass, not a rushed release-time patch.
+- *"Staging directly on `main` bypassed the PR pattern."* → Mitigated: M2 moves the
+  staged work onto a feature branch and lands it by PR, matching every prior phase.
+- **Residual risk:** PyPI publishes are permanent per version. M5's human gate and
+  M6's post-publish install are the backstop.
+
+## 1. Context & background
+
+- `main` is at `ff4b966` (phase-6 merge, v0.25.0). **Phase-7 work is staged but
+  uncommitted on `main`**, and `src/fux/__init__.py` already reads `0.26.0`.
+- Tags exist through `v0.25.0`; **`v0.26.0` is not cut.** The orbit run confirmed
+  `fux-engine==0.25.0` is not installable from PyPI (it built a frozen wheel).
+  0.24.0's PyPI status is unverified — **M4 verifies before deciding**.
+- Phase 7 left two README honesty claims *proposed, not applied* — now due, because
+  M4 turned both from provisional into permanent findings across two corpora.
+- Phase 7 also surfaced two smaller items (a suite miscount; a real engine fusion
+  finding) — the follow-ups in Part B / Part C.
+
+## 2. Definition of done
+
+- [ ] **DoD 1 — Honesty edits applied** (exact text in §5).
+- [ ] **DoD 2 — CLAUDE.md fold applied** (the deterministic-penalty-set note),
+      surfaced for Arpit in the PR description, not silently buried.
+- [ ] **DoD 3 — Phase-7 work committed on a feature branch, pushed, PR opened.**
+      No staged changes left loose on `main`.
+- [ ] **DoD 4 — CI green and merged.** `gh pr checks` read explicitly; `ci.yml`
+      passing (it does not *block*, so it is the executor's job to confirm). Merged
+      to `main`.
+- [ ] **DoD 5 — PyPI state verified and the publish decision recorded** (§10 Q1).
+- [ ] **DoD 6 — v0.26.0 published to PyPI** via a GitHub Release, **after Arpit's
+      explicit go** (M5). Tag↔version guard passes; `twine --strict` passes.
+- [ ] **DoD 7 — Post-publish verified.** Clean venv `pip install fux-engine==0.26.0`
+      succeeds; `fux --version` and one real query work; the PyPI project page
+      renders the corrected README.
+- [ ] **DoD 8 — Trackers updated:** WORKLOG, IMPLEMENTATION, DOC-REGISTRY,
+      INTERVIEW state-of-play; note that fux-lab can now install the published
+      package (the frozen-wheel workaround is retired).
+- [ ] **DoD 9 — Part B follow-ups done** (the suite miscount fix), or filed with a
+      one-line reason if deferred.
+
+## 3. Scope
+
+**In scope (Part A — the release):** the two README edits, the CLAUDE.md fold,
+committing/pushing/PR/merging phase 7, publishing v0.26.0, verifying the install,
+updating trackers.
+
+**In scope (Part B — small follow-ups, same session, own small PR is fine):**
+
+- **Fix the `zero_overlap_rescued` miscount** in `fux-lab/shared/regress/run.py` —
+  it counts lexical hits as dense rescues (reported 2, actual clean 1). A lab fix,
+  not an engine change. Re-baseline the affected envs deliberately.
+
+**Out of scope (Part C — scoped here, NOT executed; needs its own Opus handoff):**
+
+- **The non-monotone fusion finding** — a lexical rank-5 hit demoted out of top-5
+  by RRF. A genuine engine correctness question (is RRF's contribution monotone in
+  per-list rank?), possibly interacting with the new supersession offset. Diagnose,
+  don't patch, and give it an ADR. **Do not touch fusion in this release.**
+- **Chunk-level dense codes** (the zero-overlap 1/6 structural fix) — its own phase.
+- **Back-publishing 0.24.0/0.25.0 to PyPI** beyond git tags — see §10 Q1; default is
+  not to.
+- Any retroactive edit to the v0.25.0 tag (it is history; 0.26.0 supersedes it).
+
+## 4. Current state
+
+- Repo `~/my_programs/fux`, `main` @ `ff4b966`, `__version__ = "0.26.0"`, phase-7
+  staged (see `git status`).
+- **Read first:** `docs/conformance/2026-07-24-orbit-fulfillment/` (esp. `ANALYSIS.md`)
+  and `.../2026-07-24-supersession-penalty-calibration/` — the evidence behind the
+  honesty edits and the shipped penalty; `docs/adr/0015-…`; both compare docs.
+- **Release plumbing:** `.github/workflows/publish.yml` — triggers on a **published
+  GitHub Release**, checks `v<tag> == fux.__version__`, builds sdist+wheel, runs
+  `twine check --strict`, publishes via OIDC trusted publishing with `skip-existing`.
+- `CHANGELOG.md` already carries entries through 0.26.0 (verify the 0.26.0 entry is
+  present and mirrored into README § What's new; add if missing — CLAUDE.md law 2b).
+
+## 5. The exact edits (wording pre-approved by Arpit)
+
+**Edit 1 — README §"Why it's different", the "Cited or it didn't happen" bullet
+(~line 108-110).** Replace:
+
+> …never generative, so it cannot hallucinate.
+
+with:
+
+> …never generative — every sentence is verbatim from a source. It cannot invent
+> text, but see **§ Honest limits**: it can still cite a real, irrelevant passage
+> confidently for a question the corpus can't address.
+
+**Edit 2 — README §"Honest limits" (~line 291-294).** Replace the phrase
+
+> a measured, unfixed limit, not a hallucination in the generative sense.
+
+with:
+
+> a **documented, permanent boundary** of extractive answering without a model —
+> established across two independent realistic corpora, with all three no-model
+> discriminators (absolute floor, runner-up margin, empty-pool) refuted. "Unfixed"
+> would imply a fix is pending; it is not.
+
+(Confirm the exact surrounding text at edit time — line numbers drift. Match on the
+quoted phrases, not the numbers. Keep the `[answer] min_confidence` sentence that
+follows; it is still accurate.)
+
+**Edit 3 — CLAUDE.md fold** (propose in the PR body; apply):
+
+> - **The supersession penalty set is deterministic (author frontmatter); only the
+>   magnitude is calibrated.** That asymmetry is why Option B became shippable where
+>   a content heuristic never would — the engine penalises documents their own
+>   author retired, not documents it *guesses* are stale. → ADR 0015.
+
+## 6. Non-negotiables
+
+- **The honesty edits ship in the published version.** Publishing before they are
+  committed is the one sequencing error that matters — order is M1 → … → M5.
+- **The publish is human-gated.** Do not create the GitHub Release until Arpit says
+  go. It cannot be undone for that version.
+- **Do not re-bump the version** — it is already `0.26.0`. Do not touch fusion,
+  BM25F, FuxVec, the confidence-floor logic, or the supersession penalty in this
+  handoff.
+- `$0`/stdlib-only, deterministic, no-model — unchanged and unaffected (this is a
+  release, not an engine change).
+- `main` has no required checks — **read `gh pr checks` yourself; never merge red.**
+- Docs style: short points, roomy.
+
+## 7. Dependencies & prerequisites
+
+- Push access + permission to create a GitHub Release (Arpit's, exercised at M5).
+- PyPI trusted publishing is already configured (OIDC in `publish.yml`); **no token
+  handling** — do not introduce one.
+- `gh` CLI authenticated.
+
+## 8. Edge cases & risks
+
+- **`__version__` already 0.26.0 but no matching CHANGELOG/README "what's new"** →
+  fix in M1 before releasing, or the tag↔version guard passes while the docs lie.
+- **CI red on the PR** → fix before merge; do not merge to unblock the release.
+- **PyPI already has 0.26.0** (e.g. a prior partial attempt) → `skip-existing` makes
+  the publish a no-op; verify the live version is the intended artifact in M7.
+- **0.24.0 turns out unpublished too** → note it; default is still to publish only
+  0.26.0 (it supersedes), with git tags preserving the history. Q1.
+- **A follow-up (Part B) re-baselines a lab env** → do it deliberately and say so;
+  never regenerate baselines blind.
+
+## 9. Testing & validation
+
+- Pre-merge: `uv run pytest -q tests` · `uv run pytest -q tests_e2e` ·
+  `uv run fux --version` → `0.26.0`. `gh pr checks <n>` green.
+- Post-publish (M6, the real proof): in a fresh venv,
+  `pip install fux-engine==0.26.0 && fux --version && fux setup -y && fux ingest &&
+  fux ask "<q>"` against a tiny scratch corpus. Confirm the PyPI page README is the
+  corrected one.
+
+## 9.5 Documentation impact
+
+- [x] **README** — the two edits (§5); confirm § What's new mirrors the 0.26.0
+      CHANGELOG entry.
+- [x] **CHANGELOG** — ensure a complete 0.26.0 entry exists (add if the phase-7
+      close-out didn't).
+- [x] **CLAUDE.md** — the fold (§5, Edit 3), proposed in the PR body.
+- [x] **WORKLOG / IMPLEMENTATION / DOC-REGISTRY / INTERVIEW** — release recorded;
+      IMPLEMENTATION's "Now working on" advanced; the fux-lab frozen-wheel note
+      retired (published package now installable).
+- [x] **fux-lab TEST-PLAN** — envs may switch from frozen wheel to
+      `fux-engine==0.26.0`; note it. (Lab commits nothing, but the plan is maintained.)
+- [ ] **ADR** — none for the release itself; Part C's fusion diagnosis will get one.
+
+## 10. Open questions
+
+- **OPEN Q1 (Arpit, at M4/M5):** publish **0.26.0 only** to PyPI (recommended —
+  it supersedes 0.24.0/0.25.0 and carries the corrected README), and create git
+  tags for any missing versions for history? Or also back-publish 0.24.0/0.25.0 as
+  their own releases? Default if silent: **0.26.0 only**, tags for the rest.
+- **OPEN Q2 (Arpit, at M5):** the go/no-go on cutting the release — the one
+  irreversible action. The executor pauses here regardless.

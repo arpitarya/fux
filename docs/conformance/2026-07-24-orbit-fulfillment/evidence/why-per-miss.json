@@ -1,0 +1,1750 @@
+[
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/adr/0024-same-day-cutoff-1400.md",
+    "q": "What is the same-day dispatch order cutoff time?",
+    "stale_doc": "docs/adr/0012-same-day-cutoff-1200.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.4689,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 14,
+          "heading": "ADR 0024 \u2014 Same-day dispatch cutoff is 14:00 local",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0024-same-day-cutoff-1400.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 61,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.6738
+      },
+      "doc": "docs/adr/0024-same-day-cutoff-1400.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 35.6473,
+        "terms": {
+          "cutoff": {
+            "contribution": 6.4096,
+            "idf": 3.4191,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "day": {
+            "contribution": 5.4016,
+            "idf": 2.8427,
+            "tf": {
+              "body": 3,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "dispatch": {
+            "contribution": 9.7853,
+            "idf": 5.5507,
+            "tf": {
+              "body": 1,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "is": {
+            "contribution": 2.0154,
+            "idf": 1.1148,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "order": {
+            "contribution": 1.6113,
+            "idf": 2.0036,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "same": {
+            "contribution": 4.3501,
+            "idf": 2.3205,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "the": {
+            "contribution": 0.7123,
+            "idf": 0.4041,
+            "tf": {
+              "body": 7,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "time": {
+            "contribution": 5.3618,
+            "idf": 4.5522,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.4689,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 13,
+          "heading": "ADR 0012 \u2014 Same-day dispatch cutoff is 12:00",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0012-same-day-cutoff-1200.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 59,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7016
+      },
+      "doc": "docs/adr/0012-same-day-cutoff-1200.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 34.9969,
+        "terms": {
+          "cutoff": {
+            "contribution": 6.4384,
+            "idf": 3.4191,
+            "tf": {
+              "body": 1,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "day": {
+            "contribution": 5.553,
+            "idf": 2.8427,
+            "tf": {
+              "body": 4,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "dispatch": {
+            "contribution": 10.0392,
+            "idf": 5.5507,
+            "tf": {
+              "body": 1,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "is": {
+            "contribution": 2.0993,
+            "idf": 1.1148,
+            "tf": {
+              "body": 3,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "order": {
+            "contribution": 1.7528,
+            "idf": 2.0036,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "same": {
+            "contribution": 4.4872,
+            "idf": 2.3205,
+            "tf": {
+              "body": 3,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "the": {
+            "contribution": 0.6448,
+            "idf": 0.4041,
+            "tf": {
+              "body": 4,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "time": {
+            "contribution": 3.9824,
+            "idf": 4.5522,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "superseded": true,
+      "superseded_by": "docs/adr/0024-same-day-cutoff-1400.md",
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/guides/network-overview.md",
+    "q": "Who is orbit's primary parcel carrier?",
+    "stale_doc": "docs/adr/0001-carrier-cologne.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.4753,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 26,
+          "heading": "orbit-fulfillment carrier network",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/guides/network-overview.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 85,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.5932
+      },
+      "doc": "docs/guides/network-overview.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 19.7982,
+        "terms": {
+          "carrier": {
+            "contribution": 3.3627,
+            "idf": 1.7962,
+            "tf": {
+              "body": 5,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "is": {
+            "contribution": 0.8381,
+            "idf": 1.1148,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "orbit": {
+            "contribution": 9.3961,
+            "idf": 5.2994,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "parcel": {
+            "contribution": 1.7032,
+            "idf": 2.2655,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "primary": {
+            "contribution": 3.2977,
+            "idf": 2.9428,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "s": {
+            "contribution": 1.2004,
+            "idf": 1.5968,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.4753,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 12,
+          "heading": "ADR 0001 \u2014 Cologne Carriers as primary parcel carrier",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0001-carrier-cologne.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 65,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7625
+      },
+      "doc": "docs/adr/0001-carrier-cologne.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 15.0716,
+        "terms": {
+          "carrier": {
+            "contribution": 3.5649,
+            "idf": 1.7962,
+            "tf": {
+              "body": 3,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "is": {
+            "contribution": 1.536,
+            "idf": 1.1148,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "parcel": {
+            "contribution": 4.3371,
+            "idf": 2.2655,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "primary": {
+            "contribution": 5.6336,
+            "idf": 2.9428,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          }
+        }
+      },
+      "superseded": true,
+      "superseded_by": "docs/guides/network-overview.md",
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/adr/0016-directed-putaway-by-velocity.md",
+    "q": "How are received goods assigned to storage locations today?",
+    "stale_doc": "docs/adr/0008-fixed-location-putaway.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.1244,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 35,
+          "heading": "ADR 0016 \u2014 Directed putaway by SKU velocity",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0016-directed-putaway-by-velocity.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 98,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.3646
+      },
+      "doc": "docs/adr/0016-directed-putaway-by-velocity.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 100,
+        "score": 3.6635,
+        "terms": {
+          "storage": {
+            "contribution": 2.3386,
+            "idf": 3.7831,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 1.325,
+            "idf": 0.9105,
+            "tf": {
+              "body": 5,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "not returned at --top 10: rank 46 overall (raise --top to 46 to see it)"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.1244,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 12,
+          "heading": "ADR 0008 \u2014 Fixed-location putaway",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0008-fixed-location-putaway.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 104,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.4176
+      },
+      "doc": "docs/adr/0008-fixed-location-putaway.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 9,
+        "score": 6.4396,
+        "terms": {
+          "assigned": {
+            "contribution": 5.4639,
+            "idf": 5.0988,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 0.9757,
+            "idf": 0.9105,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "superseded": true,
+      "superseded_by": "docs/adr/0016-directed-putaway-by-velocity.md",
+      "verdict": "returned: rank 7 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/adr/0019-dynamic-dock-assignment.md",
+    "q": "How are outbound dock doors assigned to carriers now?",
+    "stale_doc": "docs/adr/0004-fixed-dock-per-carrier.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.7317,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 16,
+          "heading": "ADR 0019 \u2014 Assign outbound dock doors dynamically per wave",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0019-dynamic-dock-assignment.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 78,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7667
+      },
+      "doc": "docs/adr/0019-dynamic-dock-assignment.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 32.0988,
+        "terms": {
+          "are": {
+            "contribution": 1.5002,
+            "idf": 1.9476,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "assigned": {
+            "contribution": 3.9274,
+            "idf": 5.0988,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "carriers": {
+            "contribution": 6.3336,
+            "idf": 5.5507,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "dock": {
+            "contribution": 4.0373,
+            "idf": 2.1448,
+            "tf": {
+              "body": 3,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "doors": {
+            "contribution": 6.3444,
+            "idf": 3.4191,
+            "tf": {
+              "body": 4,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "now": {
+            "contribution": 3.2358,
+            "idf": 4.2008,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "outbound": {
+            "contribution": 5.352,
+            "idf": 3.0778,
+            "tf": {
+              "body": 1,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 1.3682,
+            "idf": 0.9105,
+            "tf": {
+              "body": 4,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.7317,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 12,
+          "heading": "ADR 0004 \u2014 One dock door per carrier",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0004-fixed-dock-per-carrier.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 81,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7673
+      },
+      "doc": "docs/adr/0004-fixed-dock-per-carrier.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 16.5773,
+        "terms": {
+          "assigned": {
+            "contribution": 5.0445,
+            "idf": 5.0988,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "dock": {
+            "contribution": 4.2041,
+            "idf": 2.1448,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "doors": {
+            "contribution": 3.3828,
+            "idf": 3.4191,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "outbound": {
+            "contribution": 3.0451,
+            "idf": 3.0778,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 0.9008,
+            "idf": 0.9105,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "superseded": true,
+      "superseded_by": "docs/adr/0019-dynamic-dock-assignment.md",
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/adr/0022-weekly-slotting-refresh.md",
+    "q": "How often is slotting recomputed now?",
+    "stale_doc": "docs/adr/0013-quarterly-slotting.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.414,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 16,
+          "heading": "ADR 0022 \u2014 Recompute slotting weekly",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0022-weekly-slotting-refresh.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 91,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.6182
+      },
+      "doc": "docs/adr/0022-weekly-slotting-refresh.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 8.7407,
+        "terms": {
+          "is": {
+            "contribution": 0.9753,
+            "idf": 1.1148,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "recomputed": {
+            "contribution": 4.8559,
+            "idf": 5.5507,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "slotting": {
+            "contribution": 2.9095,
+            "idf": 1.5228,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.414,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 13,
+          "heading": "ADR 0013 \u2014 Recompute slotting quarterly",
+          "matches_query_terms": true,
+          "start": 9
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/adr/0013-quarterly-slotting.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 80,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7018
+      },
+      "doc": "docs/adr/0013-quarterly-slotting.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 10.4401,
+        "terms": {
+          "is": {
+            "contribution": 1.5859,
+            "idf": 1.1148,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "recomputed": {
+            "contribution": 5.8341,
+            "idf": 5.5507,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "slotting": {
+            "contribution": 3.0201,
+            "idf": 1.5228,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          }
+        }
+      },
+      "superseded": true,
+      "superseded_by": "docs/adr/0022-weekly-slotting-refresh.md",
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/guides/replenishment.md",
+    "q": "At what pick-face fill level does replenishment trigger now?",
+    "stale_doc": "docs/runbooks/legacy-replenishment-10pct.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.582,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 22,
+          "heading": "Forward-pick replenishment",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/guides/replenishment.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 70,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7279
+      },
+      "doc": "docs/guides/replenishment.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 23.0361,
+        "terms": {
+          "at": {
+            "contribution": 2.3988,
+            "idf": 2.0202,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "face": {
+            "contribution": 4.2269,
+            "idf": 2.5767,
+            "tf": {
+              "body": 5,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "level": {
+            "contribution": 3.1168,
+            "idf": 3.8331,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "pick": {
+            "contribution": 3.9783,
+            "idf": 2.1168,
+            "tf": {
+              "body": 4,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "replenishment": {
+            "contribution": 5.0823,
+            "idf": 2.6683,
+            "tf": {
+              "body": 3,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "trigger": {
+            "contribution": 4.2329,
+            "idf": 3.5648,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.582,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 14,
+          "heading": "Replenishment trigger (legacy)",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/runbooks/legacy-replenishment-10pct.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 65,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.7368
+      },
+      "doc": "docs/runbooks/legacy-replenishment-10pct.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 22.0565,
+        "terms": {
+          "face": {
+            "contribution": 3.6535,
+            "idf": 2.5767,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "level": {
+            "contribution": 4.0096,
+            "idf": 3.8331,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "pick": {
+            "contribution": 2.2142,
+            "idf": 2.1168,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "replenishment": {
+            "contribution": 5.2871,
+            "idf": 2.6683,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "trigger": {
+            "contribution": 6.8922,
+            "idf": 3.5648,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/guides/returns.md",
+    "q": "How many days does a customer have to start a return?",
+    "stale_doc": "docs/guides/legacy-returns-30day.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.5261,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 20,
+          "heading": "Returns",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/guides/returns.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 59,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.6625
+      },
+      "doc": "docs/guides/returns.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 21.0813,
+        "terms": {
+          "a": {
+            "contribution": 1.6762,
+            "idf": 0.979,
+            "tf": {
+              "body": 5,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "customer": {
+            "contribution": 3.526,
+            "idf": 3.8857,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "days": {
+            "contribution": 7.5644,
+            "idf": 5.8872,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "return": {
+            "contribution": 1.6143,
+            "idf": 1.2564,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "start": {
+            "contribution": 5.3422,
+            "idf": 5.8872,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 1.3582,
+            "idf": 0.9105,
+            "tf": {
+              "body": 3,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.5261,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 12,
+          "heading": "Return policy",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/guides/legacy-returns-30day.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 62,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.677
+      },
+      "doc": "docs/guides/legacy-returns-30day.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 25.2478,
+        "terms": {
+          "a": {
+            "contribution": 1.4841,
+            "idf": 0.979,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "customer": {
+            "contribution": 4.4936,
+            "idf": 3.8857,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "days": {
+            "contribution": 8.925,
+            "idf": 5.8872,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "return": {
+            "contribution": 2.4839,
+            "idf": 1.2564,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "start": {
+            "contribution": 6.8082,
+            "idf": 5.8872,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 1.0529,
+            "idf": 0.9105,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "staleness-inversion",
+    "expected_doc": "docs/guides/carrier-cutoffs.md",
+    "q": "What time does the final carrier manifest close?",
+    "stale_doc": "docs/runbooks/legacy-manifest-cutoff-1600.md",
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.6185,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 20,
+          "heading": "Carrier manifest cutoffs",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/guides/carrier-cutoffs.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 67,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.6512
+      },
+      "doc": "docs/guides/carrier-cutoffs.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 2,
+        "score": 14.5113,
+        "terms": {
+          "carrier": {
+            "contribution": 3.4958,
+            "idf": 1.7962,
+            "tf": {
+              "body": 4,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "close": {
+            "contribution": 2.275,
+            "idf": 2.6525,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "final": {
+            "contribution": 4.5453,
+            "idf": 5.2994,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "manifest": {
+            "contribution": 3.4169,
+            "idf": 1.7962,
+            "tf": {
+              "body": 4,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "the": {
+            "contribution": 0.7782,
+            "idf": 0.4041,
+            "tf": {
+              "body": 11,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 2 at --top 10"
+    },
+    "why_stale": {
+      "answer_decline": {
+        "best_score": 0.6185,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 12,
+          "heading": "Closing the carrier manifest",
+          "matches_query_terms": true,
+          "start": 8
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/runbooks/legacy-manifest-cutoff-1600.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 67,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.6618
+      },
+      "doc": "docs/runbooks/legacy-manifest-cutoff-1600.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 15.9374,
+        "terms": {
+          "carrier": {
+            "contribution": 3.4537,
+            "idf": 1.7962,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 0
+            }
+          },
+          "close": {
+            "contribution": 2.7099,
+            "idf": 2.6525,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "final": {
+            "contribution": 5.4142,
+            "idf": 5.2994,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "manifest": {
+            "contribution": 3.543,
+            "idf": 1.7962,
+            "tf": {
+              "body": 2,
+              "heading": 2,
+              "path": 1
+            }
+          },
+          "the": {
+            "contribution": 0.8165,
+            "idf": 0.4041,
+            "tf": {
+              "body": 7,
+              "heading": 2,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  },
+  {
+    "class": "zero-overlap-miss",
+    "expected_doc": "docs/notes/never-a-bare-shelf.md",
+    "q": "How do we make sure a picker is not routed to an empty location?",
+    "stale_doc": null,
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.2128,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 4,
+          "heading": "Keeping stock in reach",
+          "matches_query_terms": true,
+          "start": 1
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/notes/never-a-bare-shelf.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 109,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.3556
+      },
+      "doc": "docs/notes/never-a-bare-shelf.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 100,
+        "score": 6.8038,
+        "terms": {
+          "a": {
+            "contribution": 1.7221,
+            "idf": 0.979,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 1
+            }
+          },
+          "an": {
+            "contribution": 2.114,
+            "idf": 1.9245,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "is": {
+            "contribution": 1.6336,
+            "idf": 1.1148,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "to": {
+            "contribution": 1.3341,
+            "idf": 0.9105,
+            "tf": {
+              "body": 2,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "not returned at --top 10: rank 101 overall (raise --top to 101 to see it)"
+    }
+  },
+  {
+    "class": "zero-overlap-miss",
+    "expected_doc": "docs/notes/counting-without-closing.md",
+    "q": "How is inventory accuracy verified without shutting the warehouse?",
+    "stale_doc": null,
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.2589,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 4,
+          "heading": "Checking figures while running",
+          "matches_query_terms": true,
+          "start": 1
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/notes/counting-without-closing.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 108,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.3297
+      },
+      "doc": "docs/notes/counting-without-closing.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 5,
+        "score": 8.1997,
+        "terms": {
+          "is": {
+            "contribution": 1.2433,
+            "idf": 1.1148,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "the": {
+            "contribution": 0.6713,
+            "idf": 0.4041,
+            "tf": {
+              "body": 3,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "without": {
+            "contribution": 6.285,
+            "idf": 3.7831,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 1
+            }
+          }
+        }
+      },
+      "verdict": "not returned at --top 10: rank 23 overall (raise --top to 23 to see it)"
+    }
+  },
+  {
+    "class": "zero-overlap-miss",
+    "expected_doc": "docs/notes/fast-things-close.md",
+    "q": "Why are frequently ordered products stored near the shipping area?",
+    "stale_doc": null,
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.1032,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 4,
+          "heading": "Placing popular items well",
+          "matches_query_terms": true,
+          "start": 1
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/notes/fast-things-close.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 87,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.5273
+      },
+      "doc": "docs/notes/fast-things-close.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": false,
+        "rank": 201,
+        "score": 2.9087,
+        "terms": {
+          "are": {
+            "contribution": 2.2287,
+            "idf": 1.9476,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "the": {
+            "contribution": 0.6799,
+            "idf": 0.4041,
+            "tf": {
+              "body": 3,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "not returned at --top 10: rank 96 overall (raise --top to 96 to see it)"
+    }
+  },
+  {
+    "class": "zero-overlap-miss",
+    "expected_doc": "docs/notes/gather-together.md",
+    "q": "How do we avoid walking the same aisle repeatedly for separate requests?",
+    "stale_doc": null,
+    "why_current": {
+      "answer_decline": {
+        "best_score": 0.2795,
+        "declined": false,
+        "min_confidence": 0.0
+      },
+      "chunks": [
+        {
+          "end": 4,
+          "heading": "Grouping work",
+          "matches_query_terms": true,
+          "start": 1
+        }
+      ],
+      "corpus_detail": "cache=.fux/cache/docs/notes/gather-together.md  fidelity=inferred",
+      "dense": {
+        "available": true,
+        "hamming_distance": 80,
+        "has_code": true,
+        "in_prefilter": true,
+        "prefilter_width": 500,
+        "similarity": 0.5132
+      },
+      "doc": "docs/notes/gather-together.md",
+      "graph": {
+        "as": "seed",
+        "edge_kind": null,
+        "reached": true,
+        "via_seed": null
+      },
+      "in_corpus": true,
+      "lexical": {
+        "candidate_pool": 200,
+        "in_candidate_pool": true,
+        "rank": 1,
+        "score": 19.4286,
+        "terms": {
+          "aisle": {
+            "contribution": 3.8927,
+            "idf": 3.2062,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "requests": {
+            "contribution": 7.7679,
+            "idf": 6.398,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          },
+          "walking": {
+            "contribution": 7.7679,
+            "idf": 6.398,
+            "tf": {
+              "body": 1,
+              "heading": 0,
+              "path": 0
+            }
+          }
+        }
+      },
+      "verdict": "returned: rank 1 at --top 10"
+    }
+  }
+]
