@@ -32,16 +32,20 @@ __all__ = [
 class DocState:
     """One document as the committed plane knows it."""
 
-    __slots__ = ("doc_id", "sha12", "title", "flags", "code", "sig")
+    __slots__ = ("doc_id", "sha12", "title", "flags", "code", "sig", "superseded_by")
 
     def __init__(self, doc_id: str, sha12: str, title: str, flags: list[str],
-                 code: bytes | None, sig: bytes):
+                 code: bytes | None, sig: bytes, superseded_by: str | None = None):
         self.doc_id = doc_id
         self.sha12 = sha12
         self.title = title
         self.flags = flags
         self.code = code
         self.sig = sig
+        # The *resolved terminal* doc id in a supersession chain — absent for
+        # every document that isn't marked superseded (zero-cost: an optional
+        # key in an already-arbitrary JSON meta payload, not a fixed field).
+        self.superseded_by = superseded_by
 
     def __repr__(self) -> str:  # pragma: no cover - debugging aid
         return f"DocState({self.doc_id!r}, sha12={self.sha12!r})"
@@ -72,10 +76,11 @@ def write_state(root: Path, docs: list[DocState]) -> int:
         if doc.code is not None:  # no vector → no code; never a fake all-zero one
             codes.setdefault(bucket, []).append((dh, doc.code))
         sigs.setdefault(bucket, []).append((dh, doc.sig))
-        metas.setdefault(bucket, []).append(
-            (dh, {"id": doc.doc_id, "sha12": doc.sha12, "title": doc.title,
-                  "flags": sorted(doc.flags)})
-        )
+        payload = {"id": doc.doc_id, "sha12": doc.sha12, "title": doc.title,
+                   "flags": sorted(doc.flags)}
+        if doc.superseded_by:
+            payload["superseded_by"] = doc.superseded_by
+        metas.setdefault(bucket, []).append((dh, payload))
 
     for family, groups, pack in (
         ("codes", codes, fmt.pack_codes),
@@ -114,12 +119,13 @@ def load_state(root: Path) -> dict[str, DocState]:
                 flags=list(payload.get("flags", [])),
                 code=by_hash_code.get(dh),
                 sig=by_hash_sig.get(dh, b""),
+                superseded_by=payload.get("superseded_by"),
             )
     return out
 
 
 def doc_state_from(doc_id: str, sha256: str, title: str, flags: list[str],
-                   terms, code: bytes | None) -> DocState:
+                   terms, code: bytes | None, superseded_by: str | None = None) -> DocState:
     return DocState(
         doc_id=doc_id,
         sha12=sha256[:12],
@@ -127,6 +133,7 @@ def doc_state_from(doc_id: str, sha256: str, title: str, flags: list[str],
         flags=flags,
         code=code,
         sig=bloom.build(terms),
+        superseded_by=superseded_by,
     )
 
 

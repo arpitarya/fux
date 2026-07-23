@@ -1,0 +1,35 @@
+{
+  "kind": "zero-overlap (hybrid mode)",
+  "pairs": [
+    {
+      "q": "what technology stores rows on disk?",
+      "doc": "docs/indexing/note-000000.md",
+      "verdict": "not returned: no lexical overlap, no dense candidate (cosine 0.17, not among the 500 nearest FuxVec codes), no edge from any seed",
+      "dense_cosine": 0.1737,
+      "hamming": 126,
+      "in_prefilter": false,
+      "prefilter_width": 500,
+      "lexical_in_pool": false
+    },
+    {
+      "q": "how do we stop people getting in?",
+      "doc": "docs/billing/note-000331.md",
+      "verdict": "not returned: no lexical overlap, no dense candidate (cosine 0.27, not among the 500 nearest FuxVec codes), no edge from any seed",
+      "dense_cosine": 0.2719,
+      "hamming": 110,
+      "in_prefilter": false,
+      "prefilter_width": 500,
+      "lexical_in_pool": false
+    },
+    {
+      "q": "what happens when the money is wrong?",
+      "doc": "docs/search/note-000662.md",
+      "verdict": "not returned: rank 3648 lexical (outside the top 200 candidates), no dense candidate (cosine 0.20, not among the 500 nearest FuxVec codes), no edge from any seed",
+      "dense_cosine": 0.201,
+      "hamming": 110,
+      "in_prefilter": false,
+      "prefilter_width": 500,
+      "lexical_in_pool": false
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "class": "zero-overlap (answer dominates a SHORT doc \u2014 dilution excuse removed)",
+  "rescued_top5": 1,
+  "total": 6,
+  "detail": [
+    {
+      "q": "How do we stop strangers from draining an account?",
+      "answer_doc": "docs/notes/access-revocation.md",
+      "hybrid_rank": null,
+      "lexical_rank": null,
+      "hybrid_top": {
+        "path": "docs/runbooks/drain-payments-for-deploy.md",
+        "hybrid": {
+          "bm25f_rank": 16,
+          "bm25f_score": 6.279,
+          "dense_rank": 1,
+          "similarity": 0.5392,
+          "rrf": 0.04594,
+          "dense_global_rank": 1
+        }
+      }
+    },
+    {
+      "q": "What technology keeps information after the power goes off?",
+      "answer_doc": "docs/notes/durable-storage.md",
+      "hybrid_rank": 1,
+      "lexical_rank": 4,
+      "hybrid_top": {
+        "path": "docs/notes/durable-storage.md",
+        "hybrid": {
+          "bm25f_rank": 4,
+          "bm25f_score": 6.745,
+          "dense_rank": 1,
+          "similarity": 0.4769,
+          "rrf": 0.04841,
+          "dense_global_rank": 1
+        }
+      }
+    },
+    {
+      "q": "What happens when the amounts do not match?",
+      "answer_doc": "docs/notes/discrepancy-sweep.md",
+      "hybrid_rank": null,
+      "lexical_rank": null,
+      "hybrid_top": {
+        "path": "src/reconciliation/handle_match_0379.sql",
+        "hybrid": {
+          "bm25f_rank": 6,
+          "bm25f_score": 7.757,
+          "dense_rank": 1,
+          "similarity": 0.47,
+          "rrf": 0.04767,
+          "dense_global_rank": 2
+        }
+      }
+    },
+    {
+      "q": "What do we do when a message will not go through?",
+      "answer_doc": "docs/notes/delayed-delivery.md",
+      "hybrid_rank": null,
+      "lexical_rank": null,
+      "hybrid_top": {
+        "path": "docs/runbooks/chargeback-deadline-approaching.md",
+        "hybrid": {
+          "bm25f_rank": 17,
+          "bm25f_score": 5.339,
+          "dense_rank": 1,
+          "similarity": 0.4257,
+          "rrf": 0.04577,
+          "dense_global_rank": 1
+        }
+      }
+    },
+    {
+      "q": "How is the same instruction kept from running twice?",
+      "answer_doc": "docs/notes/repeat-suppression.md",
+      "hybrid_rank": null,
+      "lexical_rank": null,
+      "hybrid_top": {
+        "path": "docs/reference/platform-architecture.md",
+        "hybrid": {
+          "bm25f_rank": 5,
+          "bm25f_score": 7.18,
+          "dense_rank": 2,
+          "similarity": 0.446,
+          "rrf": 0.04764,
+          "dense_global_rank": 2
+        }
+      }
+    },
+    {
+      "q": "Why can nobody quietly change the record afterwards?",
+      "answer_doc": "docs/notes/tamper-evidence.md",
+      "hybrid_rank": null,
+      "lexical_rank": null,
+      "hybrid_top": {
+        "path": "docs/meetings/2025-01-01-settlement-window-change.md",
+        "hybrid": {
+          "bm25f_rank": 5,
+          "bm25f_score": 7.327,
+          "dense_rank": 4,
+          "similarity": 0.3153,
+          "rrf": 0.04663,
+          "dense_global_rank": 4
+        }
+      }
+    }
+  ]
+}

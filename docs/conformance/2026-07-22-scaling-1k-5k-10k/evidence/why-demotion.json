@@ -1,0 +1,25 @@
+{
+  "kind": "hybrid demotion (lexical finds it, RRF drops it)",
+  "pairs": [
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "doc": "docs/indexing/note-000800.md",
+      "hybrid_verdict": "not returned at --top 5: rank 6 overall (raise --top to 6 to see it)",
+      "lexical_only_verdict": "returned: rank 3 at --top 5",
+      "lexical_rank": 3,
+      "lexical_score": 15.4466,
+      "dense_cosine": 0.5488,
+      "dense_hamming": 80
+    },
+    {
+      "q": "why did we choose the session token for auth?",
+      "doc": "docs/auth/note-000450.md",
+      "hybrid_verdict": "not returned at --top 5: rank 10 overall (raise --top to 10 to see it)",
+      "lexical_only_verdict": "returned: rank 5 at --top 5",
+      "lexical_rank": 5,
+      "lexical_score": 15.3322,
+      "dense_cosine": 0.4697,
+      "dense_hamming": 84
+    }
+  ]
+}

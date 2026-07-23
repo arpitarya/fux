@@ -124,6 +124,30 @@ committed:
    (explore → plan → implement → verify). Lives under [`docs/handoff/`](docs/handoff/)
    alongside its handoff.
 
+**Every handoff and prompt names the model that should execute it** (Arpit,
+2026-07-23) — a `**Model: <name>**` line at the top, plus one sentence of *why*.
+State it when handing the prompt over, too, not only in the file. The reason to
+be explicit: model choice is a silent failure mode. An under-powered model on a
+judgment-heavy task does not error — it returns confident, plausible, wrong
+work, and the cost lands later.
+
+The heuristic:
+
+- **Opus** — the output quality *is* the deliverable and no test can catch a bad
+  one: design, architecture, debate, ambiguous diagnosis, generating realistic
+  content, interpreting a confusing measurement, anything touching the
+  non-negotiable constraints.
+
+- **Sonnet** — well-specified implementation against a written definition-of-done
+  with tests to verify it, and mechanical runs of an existing suite. Most
+  handoffs in this repo are Sonnet work *because* the handoff did the thinking.
+
+- **Haiku** — mechanical bulk edits with an exact, unambiguous rule.
+
+When it is genuinely borderline, say Opus and say why it was close. A handoff
+detailed enough to be Sonnet-executable is itself the signal that the design
+phase was done properly.
+
 Then, on completion:
 
 4. **One feature → one ADR.** Every feature ships with exactly one Architecture
@@ -257,6 +281,29 @@ on top; keep entries short and true. Distinct from `INTERVIEW.md` (the
 strategic, cross-session succession record) — the worklog is the granular,
 per-exchange trail. Update both when the exchange changed direction.
 
+## Conformance runs — file every one (required)
+
+The fux-lab conformance harness is scratch (it commits nothing). Its **evidence
+is not** — every run's report + diagnosis + raw evidence is filed into
+[`docs/conformance/`](docs/conformance/), so engine fixes are made from measured
+data, not memory. Binding, like the docs-in-sync law.
+
+Per run, in the same change that records it:
+
+1. Create `docs/conformance/<date>-<run>/` (e.g. `2026-07-22-scaling-1k-5k-10k/`).
+2. Drop the suite's own report(s) there (`report.md`, per-tier `<tier>.md`).
+3. Write `ANALYSIS.md` — the diagnosis turned into **specific fux improvements**,
+   each with a repro command; state unresolved causes as unresolved.
+4. Save the primary data under `evidence/` (`fux why --json` for misses,
+   `fux --debug=trace` output, `fux doctor --json`).
+5. Add the run to the index in `docs/conformance/README.md` and bump the
+   `docs/conformance/` row in DOC-REGISTRY.
+
+Findings that warrant an engine change still **graduate** to `docs/proposals/`
+and, when accepted, an ADR — `docs/conformance/` stays the evidence behind them.
+Never ship a ranking/behaviour change off a single synthetic corpus; gate it on
+the named discriminating experiment.
+
 ## Layout
 
 ```
@@ -277,6 +324,7 @@ docs/
   handoff/          plan → handoff → prompt artifacts (live work only)
   adr/              one ADR per feature (+ TEMPLATE.md)
   archive/          implemented handoffs/prompts/proposals (version-named vX.Y.Z-name.md)
+  conformance/      test-evidence & analysis (one folder per run; drives fixes)
 tests/              unit suite (fast)
 tests_e2e/          end-to-end suite: real CLI + fixture corpus + golden files
 archive/            the old, non-working build — reference only, do not import
@@ -314,9 +362,10 @@ is the proof.
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`** (unchanged). Import package: **`fux`**.
-- Version: **`0.24.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
+- Version: **`0.25.0`** (0.18.0 old build → 0.19.0 skeleton → 0.20.0 v1 →
   0.21.0 v1.1 web/CDP/advanced → 0.22.0 v2 hybrid → 0.23.0 v3 substrate →
-  0.23.1 docs & examples patch → 0.24.0 debug & observability). Bump in
+  0.23.1 docs & examples patch → 0.24.0 debug & observability → 0.25.0
+  trust & currency). Bump in
   `src/fux/__init__.py` only.
 
 ## Merge wall — what actually blocks a merge (2026-07-22)
@@ -332,6 +381,41 @@ responsibility to check, not something the wall guarantees.** Before merging,
 read `gh pr checks <n>` yourself and do not merge on red. The source of truth
 for protection is [`.github/branch-protection.json`](.github/branch-protection.json);
 restoring the wall means putting the two contexts back and re-applying.
+
+## Hard-won build knowledge (auto-folded, 2026-07-23 — phase 6)
+
+- **"No value satisfies the calibration rule" is a valid, correct finding —
+  ship it, don't paper over it with a guess.** The `[answer] min_confidence`
+  floor was built and swept against all 5 eval gates; the unanswerable and
+  answerable score distributions interleave with no separating threshold.
+  Shipping any tested non-zero default would have declined real answers to
+  catch fabrications. The honest ship is the permissive default (`0.0`) plus
+  the measured trade-off curve, not a plausible-looking number — see ADR 0014.
+- **Frontmatter is the supersession contract; prose markers are deliberately
+  out of reach.** `status: superseded` / `superseded_by:` is the only signal
+  acted on — no NLP, ever, per the no-model constraint. This is a reason to
+  prefer the frontmatter convention in docs, not a gap to "improve" with
+  heuristics.
+- **When a new field needs to persist per-document, both index backends need
+  it, not just the JSON store.** `store.py` (JSON) round-trips arbitrary dict
+  keys for free; `sqlstore.py` has a fixed `docs` table schema and silently
+  drops anything not in it. Adding `superseded`/`superseded_by` required new
+  sqlite columns *and* a `format_version` bump (2→3) — forgetting the sqlite
+  side would have made supersession invisible on any corpus large enough to
+  use that backend, with no error to catch it.
+- **A cached per-doc dict can carry a stale flag forward across re-ingest.**
+  `index.build_index`'s reused-chunks branch spreads a previous run's cached
+  entry (`**cached`) before merging fresh values — if a document's frontmatter
+  *removes* a marker, the fresh computation returning `{}` does not erase the
+  old key already in `cached` unless it's explicitly stripped first
+  (`_SUPERSESSION_KEYS`). Any future per-doc flag added the same way needs the
+  same explicit-strip pattern, not just a merge.
+- **One resumed background agent, reused environment, beats three cold
+  setups for sequential real-corpus measurements.** The confidence-floor
+  calibration and the supersession recovery re-measurement both needed the
+  same editable-install acme environment; resuming the same agent via
+  SendMessage (rather than spawning a fresh one) reused its already-ingested
+  corpus instead of paying setup cost twice.
 
 ## Hard-won build knowledge (auto-folded, 2026-07-22 — phase 5)
 

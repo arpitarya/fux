@@ -169,6 +169,10 @@ def _write_state_plane(config: Config, entries: list[dict]) -> int:
             flags = [meta.get("fidelity", "inferred")]
             if entry.get("origin") in ("url", "attachment"):
                 flags.append("web")
+            if meta.get("superseded"):
+                flags.append("superseded")
+            if meta.get("superseded_unresolved"):
+                flags.append("superseded-unresolved")
             vecs = (vectors.get(doc_id) or {}).get("vecs", [])
             docs.append(
                 DocState(
@@ -178,6 +182,7 @@ def _write_state_plane(config: Config, entries: list[dict]) -> int:
                     flags=flags,
                     code=doc_code(vecs),
                     sig=bloom.build(terms),
+                    superseded_by=meta.get("superseded_by_resolved"),
                 )
             )
         # The df sidecar: exact corpus statistics, so lean scoring is provably

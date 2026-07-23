@@ -19,6 +19,128 @@ diary.*
 
 ---
 
+## 2026-07-23 — phase 6 built end-to-end, v0.25.0 shipped  ·  Claude Code
+- **Asked:** execute the `0006-trust-currency-prompt.md` paste-ready prompt
+  (supersession awareness + `answer` confidence floor).
+- **Did:** confirmed M1's gate directly with Arpit (both compare docs were
+  still `status: proposed` on disk despite an earlier Cowork worklog entry
+  assuming acceptance) — accepted Option A on both, plus the `fux-query` skill
+  update, via explicit questions. Built M2–M5 incrementally, both suites green
+  at every milestone: supersession parsing/persistence/resolution
+  (`index.build_index::_supersession_meta`/`_resolve_supersession`,
+  `state.DocState.superseded_by`, sqlite `format_version` 2→3), `find`/`ask`
+  annotation (ordering + all 4 lexical goldens unchanged), `[answer]
+  min_confidence` mechanism, `answer.prefer_current`/`best_confidence` shared
+  with `why`'s new decline explanation. Delegated the two judgment-heavy
+  real-corpus measurements to a background Opus subagent, resumed once to
+  reuse its editable-install acme environment rather than rebuild it: (1)
+  confidence-floor calibration against all 5 gates — **no value clears both
+  the unanswerable and answerable gates; shipped `min_confidence = 0.0`**; (2)
+  supersession recovery re-measurement — **5/12 markers, 3/9 inversions
+  marked, 1 fully corrected + 1 de-cited at the `answer` level, 6
+  unmarked/unreachable**. Wrote ADR 0013 + 0014, filed both conformance runs,
+  graduated both source proposals to `docs/archive/`, archived the
+  handoff+prompt as `v0.25.0-trust-currency-*`, updated CHANGELOG/README
+  (What's new + Status + Honest limits)/PLAN §7-8/INTERVIEW/GLOSSARY/
+  DOC-REGISTRY, bumped version 0.24.0→0.25.0. 444 unit + 100 e2e green
+  throughout.
+- **Decided / open:** both the supersession recovery and the confidence-floor
+  fix are honestly **partial** — recorded plainly in every doc touched, not
+  papered over. The CLAUDE.md edit (version line + phase-6 hard-won-knowledge
+  section) was proposed for review per the handoff's explicit instruction, and
+  Arpit approved it in-session — applied. No phase 7 is pre-registered.
+- **Next:** phase 6 is fully closed. Candidates for phase 7 (not yet scoped):
+  an absolute cross-query confidence signal for `answer` (ADR 0014 F1/F2), or
+  Finding 2's deferred chunk-level dense codes (zero-overlap rescue).
+
+## 2026-07-23 — phase 6 packaged + architecture diagram  ·  Cowork
+- **Asked:** review the acme run in plain language; then plan/handoff/prompt the
+  fixes; then a flow diagram of how Fux works, linked into the README.
+- **Did:** wrote two compare docs (`supersession-handling`, `answer-decline-floor`)
+  — both **accepted** by Arpit (annotate-not-down-rank; absolute floor, no margin).
+  Wrote handoff+prompt `0006-trust-currency` (→ v0.25.0, **Model: Opus**),
+  pre-registered phase-6 rows in IMPLEMENTATION.md, updated PLAN §7/§7a/§8.
+  Added `docs/architecture-flow.mermaid` (validated: parses clean via mermaid+jsdom)
+  and embedded it as a fenced `mermaid` block in README § How it works (renders on
+  GitHub; ASCII sketch kept in a `<details>`). Bumped DOC-REGISTRY.
+- **Decided / open:** M1 gate cleared. Skill-update open question → **yes**, update
+  `fux-query` skill to read the `superseded` field (descriptive, not prescriptive).
+  M4 calibration may legitimately return "no value satisfies all five gates."
+- **Next:** phase 6 is executing in Claude Code (M2 in progress — parse+persist,
+  with the `superseded` flag required in `.fux/state/`, not just the gitignored index).
+
+## 2026-07-22 — acme-payments realistic run settles A vs B → B  ·  Cowork
+- **Asked:** build a ~1 000-doc corpus with genuine prose diversity and run the
+  conformance suite to settle whether the hybrid degradation is an engine defect
+  (A) or a synthetic-corpus artifact (B). New environment inside fux-lab; pin 0.23.0.
+- **Did:** authored `fux-lab/shared/generate/make_repo.py` (deterministic, stdlib,
+  bespoke ADRs/runbooks/postmortems/RFCs/guides/API refs + 59 typed eval pairs +
+  12 stale-vs-current pairs w/ 3 marker styles + 6 zero-overlap + 4 unanswerable);
+  scaffolded `fux-lab/acme/` (VERSION 0.23.0); extended `shared/regress/run.py`
+  with **additive, data-guarded** staleness-precision + typed-unanswerable-decline
+  checks (no-op on synthetic tiers). Filed
+  `docs/conformance/2026-07-22-acme-payments/` (report + ANALYSIS + evidence),
+  indexed it, updated the proposal to **resolved**, split two new proposals,
+  corrected the README/CHANGELOG "same rankings *and scores*" wording.
+- **Decided / open:** **B — the 4× hybrid collapse is a corpus artifact.** On
+  realistic prose hybrid hit@5 recovers .182→.855 (parity with lexical .873). The
+  RRF reopen-trigger is answered: no fusion/reranker change warranted. **Three new
+  real findings** the fixture gate missed: staleness 9/12 inversions (superseded
+  doc outranks current), zero-overlap dense rescue 0/6 clean (even undiluted),
+  honest-decline 0/4 on well-formed unanswerables (fabricates with sources).
+  why/how-to/factual hit@5 = 1.00. Scorer matcher hand-verified before trusting
+  numbers. No engine behaviour change shipped (one corpus = evidence, not proof).
+- **Next:** graduate `staleness-ranking-ignores-supersession` (ingest-time
+  supersession flag) and `honest-decline-well-formed-queries` (absolute-confidence
+  floor) via compare docs + ADRs, each confirmed on a second realistic corpus.
+
+## 2026-07-22 — conformance evidence gets a durable home (docs/conformance/)  ·  Cowork
+- **Asked:** capture every test run's report + evidence into the fux repo in a
+  dedicated place for analysis and improvement, and put the practice in CLAUDE.md
+  so it is never missed.
+- **Did:** created `docs/conformance/` with a README (the convention) and this
+  run's folder `2026-07-22-scaling-1k-5k-10k/` (report.md, 5k.md, 10k.md,
+  ANALYSIS.md, evidence/). ANALYSIS.md turns the numbers into two **measured**
+  failure mechanisms + ranked fux improvements. Added a binding CLAUDE.md section
+  "Conformance runs — file every one", a Layout entry, and a DOC-REGISTRY row.
+- **Decided / open:** diagnosis (via 0.24.0 `fux why`/`--debug=trace`, retrieval
+  byte-identical to 0.23.0): (1) zero-overlap miss = doc-vector dilution — correct
+  doc at dense cosine 0.17-0.27, hamming ~110-126/256, outside the 500-prefilter
+  → chunk-level dense codes is the structural fix; (2) hybrid demotion = RRF has
+  no dense-quality floor — lexical rank 3/5 pushed to fused rank 6/10 because
+  `dense_global_rescues=200` injects a near-random full list over near-identical
+  prose. fux's trace is strong but mislabels fused lines `[lexical]` and omits
+  per-doc source ranks — top observability win is a fusion trace. Ranking changes
+  (admission threshold, confidence-weighted RRF, size-aware default) stay proposal
+  candidates gated on the acme-payments run.
+- **Next:** wire the capture into `fux-lab/shared/regress/run.py` (archive `fux why`
+  + trace + doctor per run automatically); then run acme-payments (A-vs-B discriminator).
+
+## 2026-07-22 — conformance scaling curve: 5k + 10k tiers run  ·  Cowork
+- **Asked:** run the fux-lab conformance suite at 5k and 10k, compare against the
+  1k baseline, produce a scaling curve, and file it per CLAUDE.md.
+- **Did:** ran 5k and 10k (fux-engine 0.23.0, `--accept-baseline`) plus a
+  same-machine 1k timing anchor. All in the cloud sandbox — the device VM has no
+  network and Python 3.10 (< 3.11), so the pinned engine cannot install there;
+  byte-budget and quality metrics are deterministic (a cloud 1k re-run was
+  byte-identical to the Mac baseline), only wall-clock differs by machine. Wrote
+  `fux-lab/{5k,10k}/results` + `baselines` and
+  `fux-lab/results/2026-07-22-scaling-1k-5k-10k.md`; updated
+  `docs/proposals/hybrid-degrades-at-scale.md`, `docs/DOC-REGISTRY.md`, `docs/INTERVIEW.md`.
+- **Decided / open:** the 1k "hybrid 4x worse" gap is NOT stable — it CLOSES with
+  scale (hit@5 lexical/hybrid 4.49x -> 2.00x -> 1.54x) because lexical collapses
+  toward hybrid (.818 -> .385 -> .192) while hybrid stays flat (~.13-.19). Leans
+  reading B (corpus artifact) but does NOT settle A vs B — same generator.
+  Zero-overlap rescue 0 at every tier, now well-powered (0/14 at 10k) -> narrows
+  ADR 0010's rescue claim. Per-doc budgets flat/declining (no superlinear term).
+  Query latency linear from the start (~0.20s + 0.16s per 1k docs), no flat
+  regime -> corroborates ADR 0011. Fresh-clone tail-score divergence reproduces at
+  all scales (README/CHANGELOG "same rankings and scores" still inaccurate). Only
+  FAIL is the known zero-overlap rescue. No engine change made — mitigations stay
+  candidates until the A-vs-B experiment resolves.
+- **Next:** run the acme-payments realistic corpus
+  (`fux-lab/prompts/build-realistic-repo.md`) — the discriminator for A vs B.
+
 ## 2026-07-22 — phase 5 built: debug & observability (v0.24.0) · Claude Code
 - **Asked:** execute handoff 0005 exactly — `[debug]` in fux.toml, a stdout-pure
   emitter, `fux doctor`, `fux why`, the `fux-debug` skill, M1→M6 with the

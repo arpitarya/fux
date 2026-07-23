@@ -1,0 +1,403 @@
+{
+  "mode": "hybrid (default)",
+  "pairs": 12,
+  "inversions": 9,
+  "detail": [
+    {
+      "q": "What is the card settlement window today?",
+      "current_doc": "docs/adr/0018-settlement-window-t-plus-two.md",
+      "stale_doc": "docs/adr/0006-settlement-window-t-plus-three.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/adr/0006-settlement-window-t-plus-three.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 12.936,
+            "dense_rank": 1,
+            "similarity": 0.5461,
+            "rrf": 0.04892,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/adr/0018-settlement-window-t-plus-two.md",
+          "hybrid": {
+            "bm25f_rank": 3,
+            "bm25f_score": 12.831,
+            "dense_rank": 2,
+            "similarity": 0.509,
+            "rrf": 0.04813,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    },
+    {
+      "q": "How long is an idempotency key valid?",
+      "current_doc": "docs/guides/idempotency-keys.md",
+      "stale_doc": "docs/guides/legacy-idempotency-notes.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/guides/legacy-idempotency-notes.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 13.163,
+            "dense_rank": 1,
+            "similarity": 0.7958,
+            "rrf": 0.04892,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/guides/idempotency-keys.md",
+          "hybrid": {
+            "bm25f_rank": 3,
+            "bm25f_score": 12.763,
+            "dense_rank": 2,
+            "similarity": 0.7825,
+            "rrf": 0.04813,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    },
+    {
+      "q": "Who is Acme's primary card acquirer (PSP)?",
+      "current_doc": "docs/guides/architecture-overview.md",
+      "stale_doc": "docs/adr/0001-acquirer-northwind.md",
+      "current_rank": 1,
+      "stale_rank": 4,
+      "inversion": false,
+      "provenance": {
+        "current": {
+          "rank": 1,
+          "path": "docs/guides/architecture-overview.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 23.198,
+            "dense_rank": 1,
+            "similarity": 0.5219,
+            "rrf": 0.04918,
+            "dense_global_rank": 1
+          }
+        },
+        "stale": {
+          "rank": 4,
+          "path": "docs/adr/0001-acquirer-northwind.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 23.065,
+            "dense_rank": 4,
+            "similarity": 0.3946,
+            "rrf": 0.04738,
+            "dense_global_rank": 4
+          }
+        }
+      }
+    },
+    {
+      "q": "What is the current dunning retry schedule for a failed subscription charge?",
+      "current_doc": "docs/guides/dunning-and-retries.md",
+      "stale_doc": "docs/runbooks/legacy-dunning.md",
+      "current_rank": 1,
+      "stale_rank": 2,
+      "inversion": false,
+      "provenance": {
+        "current": {
+          "rank": 1,
+          "path": "docs/guides/dunning-and-retries.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 33.072,
+            "dense_rank": 1,
+            "similarity": 0.7584,
+            "rrf": 0.04892,
+            "dense_global_rank": 1
+          }
+        },
+        "stale": {
+          "rank": 2,
+          "path": "docs/runbooks/legacy-dunning.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 36.365,
+            "dense_rank": 3,
+            "similarity": 0.6996,
+            "rrf": 0.04814,
+            "dense_global_rank": 3
+          }
+        }
+      }
+    },
+    {
+      "q": "What is the current API rate limit per key?",
+      "current_doc": "docs/api/rate-limits.md",
+      "stale_doc": "docs/api/legacy-rate-limits.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/api/legacy-rate-limits.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 25.157,
+            "dense_rank": 1,
+            "similarity": 0.7602,
+            "rrf": 0.04892,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/api/rate-limits.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 27.892,
+            "dense_rank": 2,
+            "similarity": 0.7511,
+            "rrf": 0.04865,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    },
+    {
+      "q": "How does the API authenticate requests today?",
+      "current_doc": "docs/guides/authentication.md",
+      "stale_doc": "docs/guides/legacy-api-keys.md",
+      "current_rank": 5,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/guides/legacy-api-keys.md",
+          "hybrid": {
+            "bm25f_rank": 8,
+            "bm25f_score": 4.976,
+            "dense_rank": 1,
+            "similarity": 0.7022,
+            "rrf": 0.04749,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 5,
+          "path": "docs/guides/authentication.md",
+          "hybrid": {
+            "bm25f_rank": 60,
+            "bm25f_score": 3.432,
+            "dense_rank": 2,
+            "similarity": 0.6197,
+            "rrf": 0.04059,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    },
+    {
+      "q": "How many days after a charge can a refund still be issued?",
+      "current_doc": "docs/api/refunds.md",
+      "stale_doc": "docs/guides/legacy-refund-policy.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/guides/legacy-refund-policy.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 32.249,
+            "dense_rank": 1,
+            "similarity": 0.8297,
+            "rrf": 0.04918,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/api/refunds.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 18.833,
+            "dense_rank": 2,
+            "similarity": 0.7467,
+            "rrf": 0.04839,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    },
+    {
+      "q": "Are raw card numbers stored, and if so for how long?",
+      "current_doc": "docs/adr/0002-tokenize-pan-at-the-edge.md",
+      "stale_doc": "docs/guides/legacy-card-storage.md",
+      "current_rank": 6,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/guides/legacy-card-storage.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 23.765,
+            "dense_rank": 1,
+            "similarity": 0.5979,
+            "rrf": 0.04918,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 6,
+          "path": "docs/adr/0002-tokenize-pan-at-the-edge.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 13.585,
+            "dense_rank": 16,
+            "similarity": 0.373,
+            "rrf": 0.04148,
+            "dense_global_rank": 22
+          }
+        }
+      }
+    },
+    {
+      "q": "How many days do we have to respond to a chargeback dispute?",
+      "current_doc": "docs/runbooks/chargeback-dispute-response.md",
+      "stale_doc": "docs/runbooks/legacy-dispute-7day.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/runbooks/legacy-dispute-7day.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 29.621,
+            "dense_rank": 1,
+            "similarity": 0.7615,
+            "rrf": 0.04892,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/runbooks/chargeback-dispute-response.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 38.753,
+            "dense_rank": 2,
+            "similarity": 0.6789,
+            "rrf": 0.04865,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    },
+    {
+      "q": "What algorithm should I use to verify a webhook signature?",
+      "current_doc": "docs/api/webhooks.md",
+      "stale_doc": "docs/adr/0004-webhook-signing-sha1.md",
+      "current_rank": 6,
+      "stale_rank": null,
+      "inversion": false,
+      "provenance": {
+        "current": {
+          "rank": 6,
+          "path": "docs/api/webhooks.md",
+          "hybrid": {
+            "bm25f_rank": 9,
+            "bm25f_score": 9.198,
+            "dense_rank": 17,
+            "similarity": 0.5749,
+            "rrf": 0.04047,
+            "dense_global_rank": 17
+          }
+        }
+      }
+    },
+    {
+      "q": "For how long does Acme retry a failed webhook before giving up?",
+      "current_doc": "docs/api/webhooks.md",
+      "stale_doc": "docs/api/legacy-webhooks-v1.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/api/legacy-webhooks-v1.md",
+          "hybrid": {
+            "bm25f_rank": 1,
+            "bm25f_score": 16.792,
+            "dense_rank": 1,
+            "similarity": 0.6855,
+            "rrf": 0.04918,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/api/webhooks.md",
+          "hybrid": {
+            "bm25f_rank": 3,
+            "bm25f_score": 14.835,
+            "dense_rank": 3,
+            "similarity": 0.6202,
+            "rrf": 0.04762,
+            "dense_global_rank": 3
+          }
+        }
+      }
+    },
+    {
+      "q": "Does reconciliation run in real time or as a daily batch?",
+      "current_doc": "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+      "stale_doc": "docs/adr/0010-realtime-reconciliation.md",
+      "current_rank": 2,
+      "stale_rank": 1,
+      "inversion": true,
+      "provenance": {
+        "stale": {
+          "rank": 1,
+          "path": "docs/adr/0010-realtime-reconciliation.md",
+          "hybrid": {
+            "bm25f_rank": 3,
+            "bm25f_score": 20.549,
+            "dense_rank": 1,
+            "similarity": 0.5419,
+            "rrf": 0.04866,
+            "dense_global_rank": 1
+          }
+        },
+        "current": {
+          "rank": 2,
+          "path": "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+          "hybrid": {
+            "bm25f_rank": 2,
+            "bm25f_score": 20.805,
+            "dense_rank": 2,
+            "similarity": 0.5252,
+            "rrf": 0.04839,
+            "dense_global_rank": 2
+          }
+        }
+      }
+    }
+  ]
+}

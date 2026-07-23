@@ -1,0 +1,12 @@
+{
+  "gate": "#2 keep declining gibberish",
+  "note": "best_confidence=null => empty candidate pool => declines via the pre-existing zero-candidate early return at ANY floor (including 0.0). A higher floor only makes decline more certain, never less. Gate #2 is satisfied unconditionally.",
+  "control": [
+    {
+      "q": "xyzzy plugh frobnicate quux zork blorptang wibblesnarf",
+      "kind": "gibberish",
+      "best_confidence": null,
+      "n_sentences": 0
+    }
+  ]
+}

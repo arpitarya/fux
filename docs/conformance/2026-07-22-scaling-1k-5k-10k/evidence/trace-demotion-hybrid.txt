@@ -1,0 +1,21 @@
+[query] info: retrieve seed=text k=200 lexical_only=False
+[lexical] debug: bm25f candidates pool=200 candidates=200
+[dense] debug: candidate similarities scored scored=200 missing_vectors=False
+[dense] debug: fuxvec prefilter codes=9304 width=500 scanned=500 rescued=200
+[query] info: hybrid fusion rrf_k=60 results=200 dense_global_rescues=200
+[graph] debug: edges collected seeds=200 hops=1 edges=83
+[graph] debug: ppr expansion candidates=1 kept=1
+[query] info: retrieve complete engine=hybrid passages=200 seeds=200 nodes=201 edges=83
+  ... (fused ranking, top 12 of 200; note the razor-thin band) ...
+[lexical] trace: ranked chunk file=docs/indexing/note-000400.md ordinal=0 rrf=0.04918
+[lexical] trace: ranked chunk file=docs/indexing/note-002800.md ordinal=0 rrf=0.04839
+[lexical] trace: ranked chunk file=docs/indexing/note-001000.md ordinal=0 rrf=0.03758
+[lexical] trace: ranked chunk file=docs/indexing/note-004000.md ordinal=0 rrf=0.03659
+[lexical] trace: ranked chunk file=docs/indexing/note-001800.md ordinal=0 rrf=0.03596
+[lexical] trace: ranked chunk file=docs/indexing/note-000800.md ordinal=0 rrf=0.0335
+[lexical] trace: ranked chunk file=docs/indexing/note-000280.md ordinal=0 rrf=0.03348
+[lexical] trace: ranked chunk file=docs/indexing/note-003800.md ordinal=0 rrf=0.03324
+[lexical] trace: ranked chunk file=docs/indexing/note-003600.md ordinal=0 rrf=0.03217
+[lexical] trace: ranked chunk file=docs/indexing/note-003200.md ordinal=0 rrf=0.03081
+[lexical] trace: ranked chunk file=docs/indexing/note-002600.md ordinal=0 rrf=0.0305
+[lexical] trace: ranked chunk file=docs/indexing/note-002928.md ordinal=0 rrf=0.03021

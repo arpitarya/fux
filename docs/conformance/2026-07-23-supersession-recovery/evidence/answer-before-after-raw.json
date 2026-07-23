@@ -1,0 +1,417 @@
+{
+  "engine": "hybrid",
+  "pairs": [
+    {
+      "q": "What is the card settlement window today?",
+      "current_doc": "docs/adr/0018-settlement-window-t-plus-two.md",
+      "stale_doc": "docs/adr/0006-settlement-window-t-plus-three.md",
+      "stale_superseded_flag": true,
+      "superseded_by_target": "docs/adr/0018-settlement-window-t-plus-two.md",
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": true,
+      "pool_order": [
+        "docs/adr/0006-settlement-window-t-plus-three.md",
+        "docs/adr/0018-settlement-window-t-plus-two.md",
+        "docs/guides/architecture-overview.md",
+        "docs/meetings/2025-01-01-settlement-window-change.md",
+        "src/payments/sign_card_0040.py",
+        "docs/meetings/2025-07-27-settlement-window-change.md",
+        "docs/adr/0031-refuse-payments.md",
+        "docs/meetings/2025-04-26-settlement-window-change.md",
+        "tests/payments/test_retry_card_0000.py",
+        "tests/payments/test_apply_card_0145.py"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0006-settlement-window-t-plus-three.md",
+        "docs/adr/0018-settlement-window-t-plus-two.md",
+        "docs/guides/architecture-overview.md",
+        "docs/meetings/2025-01-01-settlement-window-change.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0018-settlement-window-t-plus-two.md",
+        "docs/guides/architecture-overview.md",
+        "docs/meetings/2025-01-01-settlement-window-change.md"
+      ],
+      "before_top": "docs/adr/0006-settlement-window-t-plus-three.md",
+      "after_top": "docs/adr/0018-settlement-window-t-plus-two.md"
+    },
+    {
+      "q": "How long is an idempotency key valid?",
+      "current_doc": "docs/guides/idempotency-keys.md",
+      "stale_doc": "docs/guides/legacy-idempotency-notes.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/guides/legacy-idempotency-notes.md",
+        "docs/guides/idempotency-keys.md",
+        "docs/adr/0007-client-supplied-idempotency-keys.md",
+        "docs/api/payments-create.md",
+        "docs/meetings/2025-01-21-idempotency-key-retention.md",
+        "docs/meetings/2025-04-22-idempotency-key-retention.md",
+        "docs/adr/0036-require-payments.md",
+        "docs/guides/writing-an-idempotent-consumer.md",
+        "migrations/0004_idempotency_keys.sql",
+        "docs/meetings/2025-07-23-idempotency-key-retention.md"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0007-client-supplied-idempotency-keys.md",
+        "docs/api/payments-create.md",
+        "docs/guides/idempotency-keys.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0007-client-supplied-idempotency-keys.md",
+        "docs/api/payments-create.md",
+        "docs/guides/idempotency-keys.md"
+      ],
+      "before_top": "docs/adr/0007-client-supplied-idempotency-keys.md",
+      "after_top": "docs/adr/0007-client-supplied-idempotency-keys.md"
+    },
+    {
+      "q": "Who is Acme's primary card acquirer (PSP)?",
+      "current_doc": "docs/guides/architecture-overview.md",
+      "stale_doc": "docs/adr/0001-acquirer-northwind.md",
+      "stale_superseded_flag": true,
+      "superseded_by_target": "docs/guides/architecture-overview.md",
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": true,
+      "pool_order": [
+        "docs/guides/architecture-overview.md",
+        "docs/guides/local-development-setup.md",
+        "docs/guides/psp-connector-onboarding.md",
+        "docs/adr/0001-acquirer-northwind.md",
+        "docs/runbooks/manual-reconciliation.md",
+        "docs/guides/using-the-acme-cli.md",
+        "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+        "docs/adr/0002-tokenize-pan-at-the-edge.md",
+        "docs/api/v1-payments-id.md",
+        "docs/meetings/2025-11-07-auth-scope-split.md"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0001-acquirer-northwind.md",
+        "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+        "docs/guides/architecture-overview.md",
+        "docs/guides/psp-connector-onboarding.md",
+        "docs/runbooks/manual-reconciliation.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+        "docs/guides/architecture-overview.md",
+        "docs/guides/psp-connector-onboarding.md",
+        "docs/runbooks/manual-reconciliation.md"
+      ],
+      "before_top": "docs/adr/0001-acquirer-northwind.md",
+      "after_top": "docs/adr/0016-reconcile-against-psp-feed-daily.md"
+    },
+    {
+      "q": "What is the current dunning retry schedule for a failed subscription charge?",
+      "current_doc": "docs/guides/dunning-and-retries.md",
+      "stale_doc": "docs/runbooks/legacy-dunning.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/guides/dunning-and-retries.md",
+        "docs/runbooks/legacy-dunning.md",
+        "docs/adr/0014-move-dunning-off-the-charge-path.md",
+        "docs/adr/0032-lock-ledger.md",
+        "docs/adr/0035-emit-notifications.md",
+        "docs/guides/auditing-a-refund.md",
+        "docs/adr/0021-use-notifications.md",
+        "docs/adr/0024-represent-ledger.md",
+        "docs/meetings/2025-06-24-dunning-schedule-review.md",
+        "docs/guides/handling-multi-currency.md"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0014-move-dunning-off-the-charge-path.md",
+        "docs/guides/dunning-and-retries.md",
+        "docs/runbooks/legacy-dunning.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0014-move-dunning-off-the-charge-path.md",
+        "docs/guides/dunning-and-retries.md",
+        "docs/runbooks/legacy-dunning.md"
+      ],
+      "before_top": "docs/adr/0014-move-dunning-off-the-charge-path.md",
+      "after_top": "docs/adr/0014-move-dunning-off-the-charge-path.md"
+    },
+    {
+      "q": "What is the current API rate limit per key?",
+      "current_doc": "docs/api/rate-limits.md",
+      "stale_doc": "docs/api/legacy-rate-limits.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/api/legacy-rate-limits.md",
+        "docs/api/rate-limits.md",
+        "docs/reference/platform-architecture.md",
+        "docs/adr/0033-cache-reconciliation.md",
+        "docs/rfcs/102-ledger-snapshotting.md",
+        "docs/guides/legacy-api-keys.md",
+        "docs/rfcs/105-idempotency-store.md",
+        "docs/api/payments-create.md",
+        "docs/rfcs/109-proxy-HA.md",
+        "docs/adr/0038-health-gate-payments.md"
+      ],
+      "answer_before_sources": [
+        "docs/api/legacy-rate-limits.md",
+        "docs/api/rate-limits.md",
+        "docs/guides/legacy-api-keys.md",
+        "docs/reference/platform-architecture.md"
+      ],
+      "answer_after_sources": [
+        "docs/api/legacy-rate-limits.md",
+        "docs/api/rate-limits.md",
+        "docs/guides/legacy-api-keys.md",
+        "docs/reference/platform-architecture.md"
+      ],
+      "before_top": "docs/api/legacy-rate-limits.md",
+      "after_top": "docs/api/legacy-rate-limits.md"
+    },
+    {
+      "q": "How does the API authenticate requests today?",
+      "current_doc": "docs/guides/authentication.md",
+      "stale_doc": "docs/guides/legacy-api-keys.md",
+      "stale_superseded_flag": true,
+      "superseded_by_target": "docs/guides/authentication.md",
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": true,
+      "pool_order": [
+        "docs/guides/legacy-api-keys.md",
+        "docs/api/payments-create.md",
+        "docs/api/webhooks.md",
+        "docs/api/v1-settlements.md",
+        "docs/guides/authentication.md",
+        "docs/api/legacy-rate-limits.md",
+        "docs/api/v1-events-id-replay.md",
+        "docs/postmortems/2025-09-03-double-charge.md",
+        "docs/api/v1-events.md",
+        "docs/adr/0007-client-supplied-idempotency-keys.md"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0007-client-supplied-idempotency-keys.md",
+        "docs/api/legacy-rate-limits.md",
+        "docs/api/payments-create.md",
+        "docs/guides/authentication.md",
+        "docs/guides/legacy-api-keys.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0007-client-supplied-idempotency-keys.md",
+        "docs/api/legacy-rate-limits.md",
+        "docs/api/payments-create.md",
+        "docs/guides/authentication.md",
+        "docs/postmortems/2025-09-03-double-charge.md"
+      ],
+      "before_top": "docs/adr/0007-client-supplied-idempotency-keys.md",
+      "after_top": "docs/adr/0007-client-supplied-idempotency-keys.md"
+    },
+    {
+      "q": "How many days after a charge can a refund still be issued?",
+      "current_doc": "docs/api/refunds.md",
+      "stale_doc": "docs/guides/legacy-refund-policy.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/guides/legacy-refund-policy.md",
+        "docs/api/refunds.md",
+        "docs/guides/issuing-refunds.md",
+        "docs/guides/auditing-a-refund.md",
+        "docs/reference/platform-architecture.md",
+        "docs/adr/0032-lock-ledger.md",
+        "docs/rfcs/107-dispute-tracking.md",
+        "docs/reference/platform-architecture.md",
+        "docs/guides/interpreting-a-decline-code.md",
+        "docs/reference/platform-architecture.md"
+      ],
+      "answer_before_sources": [
+        "docs/guides/auditing-a-refund.md",
+        "docs/guides/issuing-refunds.md",
+        "docs/guides/legacy-refund-policy.md",
+        "docs/rfcs/107-dispute-tracking.md"
+      ],
+      "answer_after_sources": [
+        "docs/guides/auditing-a-refund.md",
+        "docs/guides/issuing-refunds.md",
+        "docs/guides/legacy-refund-policy.md",
+        "docs/rfcs/107-dispute-tracking.md"
+      ],
+      "before_top": "docs/guides/auditing-a-refund.md",
+      "after_top": "docs/guides/auditing-a-refund.md"
+    },
+    {
+      "q": "Are raw card numbers stored, and if so for how long?",
+      "current_doc": "docs/adr/0002-tokenize-pan-at-the-edge.md",
+      "stale_doc": "docs/guides/legacy-card-storage.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/guides/legacy-card-storage.md",
+        "src/payments/sign_card_0040.py",
+        "docs/reference/platform-architecture.md",
+        "docs/reference/platform-architecture.md",
+        "docs/rfcs/102-ledger-snapshotting.md",
+        "docs/guides/reading-a-settlement-file.md",
+        "docs/adr/0002-tokenize-pan-at-the-edge.md",
+        "docs/reference/platform-architecture.md",
+        "docs/adr/0003-double-entry-ledger.md",
+        "docs/reference/platform-architecture.md"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0002-tokenize-pan-at-the-edge.md",
+        "docs/guides/legacy-card-storage.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0002-tokenize-pan-at-the-edge.md",
+        "docs/guides/legacy-card-storage.md"
+      ],
+      "before_top": "docs/adr/0002-tokenize-pan-at-the-edge.md",
+      "after_top": "docs/adr/0002-tokenize-pan-at-the-edge.md"
+    },
+    {
+      "q": "How many days do we have to respond to a chargeback dispute?",
+      "current_doc": "docs/runbooks/chargeback-dispute-response.md",
+      "stale_doc": "docs/runbooks/legacy-dispute-7day.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/runbooks/legacy-dispute-7day.md",
+        "docs/runbooks/chargeback-dispute-response.md",
+        "docs/rfcs/107-dispute-tracking.md",
+        "docs/guides/legacy-refund-policy.md",
+        "docs/guides/auditing-a-refund.md",
+        "src/reconciliation/apply_chargeback_0174.sql",
+        "src/reconciliation/emit_chargeback_0219.sql",
+        "docs/meetings/2025-11-23-chargeback-SLA.md",
+        "src/reconciliation/load_chargeback_0294.sql",
+        "src/reconciliation/retry_chargeback_0259.sql"
+      ],
+      "answer_before_sources": [
+        "docs/rfcs/107-dispute-tracking.md",
+        "docs/runbooks/chargeback-dispute-response.md",
+        "docs/runbooks/legacy-dispute-7day.md"
+      ],
+      "answer_after_sources": [
+        "docs/rfcs/107-dispute-tracking.md",
+        "docs/runbooks/chargeback-dispute-response.md",
+        "docs/runbooks/legacy-dispute-7day.md"
+      ],
+      "before_top": "docs/rfcs/107-dispute-tracking.md",
+      "after_top": "docs/rfcs/107-dispute-tracking.md"
+    },
+    {
+      "q": "What algorithm should I use to verify a webhook signature?",
+      "current_doc": "docs/api/webhooks.md",
+      "stale_doc": "docs/adr/0004-webhook-signing-sha1.md",
+      "stale_superseded_flag": true,
+      "superseded_by_target": "docs/adr/0011-hmac-sha256-webhook-signing.md",
+      "stale_in_pool": false,
+      "current_in_pool": true,
+      "target_in_pool": true,
+      "pool_order": [
+        "docs/api/legacy-webhooks-v1.md",
+        "docs/runbooks/rotate-webhook-signing-secret.md",
+        "src/notifications/verify_webhook_0063.ts",
+        "docs/guides/verifying-a-webhook-signature.md",
+        "docs/meetings/2025-04-10-webhook-reliability.md",
+        "docs/api/webhooks.md",
+        "docs/adr/0011-hmac-sha256-webhook-signing.md",
+        "docs/runbooks/webhook-endpoint-returning-5xx.md",
+        "tests/notifications/test_match_webhook_0138.py",
+        "tests/notifications/test_match_webhook_0113.py"
+      ],
+      "answer_before_sources": [
+        "docs/api/legacy-webhooks-v1.md",
+        "docs/runbooks/rotate-webhook-signing-secret.md"
+      ],
+      "answer_after_sources": [
+        "docs/api/legacy-webhooks-v1.md",
+        "docs/runbooks/rotate-webhook-signing-secret.md"
+      ],
+      "before_top": "docs/api/legacy-webhooks-v1.md",
+      "after_top": "docs/api/legacy-webhooks-v1.md"
+    },
+    {
+      "q": "For how long does Acme retry a failed webhook before giving up?",
+      "current_doc": "docs/api/webhooks.md",
+      "stale_doc": "docs/api/legacy-webhooks-v1.md",
+      "stale_superseded_flag": false,
+      "superseded_by_target": null,
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": null,
+      "pool_order": [
+        "docs/api/legacy-webhooks-v1.md",
+        "docs/api/webhooks.md",
+        "docs/runbooks/rotate-webhook-signing-secret.md",
+        "docs/postmortems/2025-11-14-webhook-thundering-herd.md",
+        "tests/notifications/test_retry_webhook_0078.py",
+        "docs/rfcs/104-webhook-delivery.md",
+        "docs/runbooks/webhook-endpoint-returning-5xx.md",
+        "docs/guides/verifying-a-webhook-signature.md",
+        "docs/adr/0009-webhook-retry-backoff-with-jitter.md",
+        "src/notifications/parse_webhook_0033.ts"
+      ],
+      "answer_before_sources": [
+        "docs/api/legacy-webhooks-v1.md",
+        "docs/runbooks/rotate-webhook-signing-secret.md"
+      ],
+      "answer_after_sources": [
+        "docs/api/legacy-webhooks-v1.md",
+        "docs/runbooks/rotate-webhook-signing-secret.md"
+      ],
+      "before_top": "docs/api/legacy-webhooks-v1.md",
+      "after_top": "docs/api/legacy-webhooks-v1.md"
+    },
+    {
+      "q": "Does reconciliation run in real time or as a daily batch?",
+      "current_doc": "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+      "stale_doc": "docs/adr/0010-realtime-reconciliation.md",
+      "stale_superseded_flag": true,
+      "superseded_by_target": "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+      "stale_in_pool": true,
+      "current_in_pool": true,
+      "target_in_pool": true,
+      "pool_order": [
+        "docs/adr/0010-realtime-reconciliation.md",
+        "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+        "docs/runbooks/manual-reconciliation.md",
+        "docs/runbooks/settlement-batch-stuck.md",
+        "docs/meetings/2025-06-24-dunning-schedule-review.md",
+        "docs/guides/replaying-dead-letter-events.md",
+        "docs/meetings/2025-01-05-reconciliation-mismatch-backlog.md",
+        "docs/meetings/2025-07-15-tokenization-proxy-HA.md",
+        "docs/runbooks/refund-stuck-in-pending.md",
+        "docs/meetings/2025-06-08-ledger-snapshot-performance.md"
+      ],
+      "answer_before_sources": [
+        "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+        "docs/runbooks/manual-reconciliation.md"
+      ],
+      "answer_after_sources": [
+        "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+        "docs/runbooks/manual-reconciliation.md"
+      ],
+      "before_top": "docs/adr/0016-reconcile-against-psp-feed-daily.md",
+      "after_top": "docs/adr/0016-reconcile-against-psp-feed-daily.md"
+    }
+  ]
+}

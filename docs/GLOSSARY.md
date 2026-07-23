@@ -51,6 +51,13 @@ source `file:line` span. See [query-engine](compare/query-engine.compare.md).
 multiple viable options: debate, matrix, grounded references, proposed verdict
 Arpit accepts or overrides, and a reopen-trigger. Lives in [`compare/`](compare/).
 
+**Confidence floor (`[answer] min_confidence`)** — The absolute honest-decline
+threshold (v0.25): `answer` declines when its best selected sentence's score
+falls below the floor, sitting *above* the pre-existing empty-pool decline.
+Calibrated against 5 eval gates and shipped **disabled (0.0)** — the acme
+corpus's unanswerable and answerable score distributions interleave with no
+separating value; see [ADR 0014](adr/0014-answer-confidence-floor.md).
+
 **Corpus** — The long-term, git-versioned knowledge asset Fux builds and queries:
 cache + manifest (committed) with the index derived from it. "A corpus, not a
 disposable index" — see [PLAN §6b](PLAN.md).
@@ -243,6 +250,14 @@ fresh clone queryable before any ingest. Measured 243 B/doc at 100k. See
 **Static embeddings** — Embeddings from a fixed token→vector lookup table
 (Model2Vec/Potion family): no neural forward pass at inference, hence stdlib-fast
 on CPU. The only model class that fits Fux's ≤10 MB / zero-dep budget.
+
+**Supersession** — A document's own frontmatter (`status: superseded` and/or
+`superseded_by: <doc-id>`) declaring itself retired in favor of another (v0.25).
+Parsed at index build, persisted with chain/cycle resolution, and annotated in
+`find`/`ask`/`why` — **never reorders ranking**; `answer` prefers the resolved
+successor when both are in its candidate pool. Only frontmatter-marked
+supersession is reachable (no model allowed); see
+[ADR 0013](adr/0013-supersession-awareness.md).
 
 **Tesseract** — The leading open-source OCR engine (offline, 100+ languages),
 called as a subprocess in the advanced tier to turn images/scans into searchable

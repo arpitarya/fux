@@ -203,8 +203,32 @@ Claude Code.
 | Hybrid engine v2 (bundled model + RRF — v0.22.0 handoff) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
 | Knowledge substrate v3 (v0.23.0 handoff) | ✅ | **v0.23.0** (2026-07-22); ADRs 0008–0011; 365 unit + 71 e2e; eval hit@5 **1.000** (beats v0.22); 100k benchmark: state 23 MB, FuxVec scan 54 ms (no IVF) |
 | Debug & observability v4 (v0.24.0 handoff) | ✅ | **v0.24.0** (2026-07-22); ADR 0012; 417 unit + 100 e2e; `[debug]` toml + emitter, `fux doctor`, `fux why`, `fux-debug` skill |
+| Trust & currency v5 (v0.25.0 handoff 0006) | ✅ | **v0.25.0** (2026-07-23); ADRs 0013–0014; 444 unit + 100 e2e; supersession annotated (not reordered), `answer` prefers current when both in pool; confidence floor built + calibrated, **shipped disabled (0.0)** — no value clears all 5 gates |
 | Rules substrate | ⏸️ | held |
 | Fix loop | ⏸️ | held |
+
+## 7a. What the conformance runs changed (2026-07-22/23)
+
+An independent black-box harness (`fux-lab`) measured the published package at
+1k/5k/10k synthetic and ~1k **realistic** (acme-payments) scale. It retired one
+scare and found three real defects — none of which the 21-pair fixture gate
+could see.
+
+- **Retired:** "hybrid degrades vs `--lexical-only` at scale." A synthetic-corpus
+  artifact — near-identical template prose made dense ordering arbitrary. On
+  realistic text hybrid ≈ lexical (hit@5 .855 vs .873). Four planned mitigations
+  lost their justification.
+- **Real — staleness (9/12).** The superseded document outranks the still-true
+  one. Ranking has no currency signal at all. → phase 6.
+- **Real — fabrication (0/4).** `answer` declines gibberish but invents confident,
+  cited answers for well-formed out-of-scope questions. → phase 6.
+- **Real — zero-overlap dense rescue (0/6 clean).** Fails *even when the answer is
+  the whole document*, so the earlier "document-vector dilution" explanation was
+  wrong. Points at chunk-level dense codes. → deferred, own phase.
+
+**The standing lesson:** a fixture-scale eval gate cannot protect retrieval
+quality. Realistic-corpus conformance is now the gate that matters, and its
+evidence lives in [`conformance/`](conformance/).
 
 ## 8. Next move
 
@@ -216,12 +240,42 @@ install/corpus health), `fux why` (single-document negative-result verdict),
 and a third skill (`fux-debug`) so an agent self-diagnoses without a human
 reading logs.
 
-**The head of the next phase remains what phase 4 measured and did not
-fix**: at 100k documents a query takes ~10 s, because the query path still
-loads the entire index into memory to build the `Searcher`. The `postings`
-table is populated and indexed at ingest but never read at query time. The
-substrate solved *storage* at scale; *query* at scale is scoped, unstarted
-work (numbers and the fix in [ADR 0011](adr/0011-profiles-lean-state.md)).
+**Phase 6 — trust & currency — shipped (v0.25.0, 2026-07-23)** — build spec
+archived at
+[`archive/v0.25.0-trust-currency-handoff.md`](archive/v0.25.0-trust-currency-handoff.md),
+decisions in [ADR 0013](adr/0013-supersession-awareness.md) (supersession) and
+[ADR 0014](adr/0014-answer-confidence-floor.md) (confidence floor). Two honest,
+partial results, not two clean fixes:
+
+- **Supersession is annotated, not reordered** (the accepted verdict): `find`
+  ranking is unchanged; `answer` prefers the current document when both are in
+  its retrieved pool. Measured recovery on acme's 9/12 inversions: only **5 of
+  12** stale docs carry a machine-readable marker, only **3 of the 9** original
+  inversions do, and at the `answer` level the fix **fully corrects 1** and
+  de-cites the retired doc in a 2nd — the rest are unmarked and
+  deterministically unreachable. See
+  [`conformance/2026-07-23-supersession-recovery/`](conformance/2026-07-23-supersession-recovery/).
+- **The confidence floor was built and calibrated, then shipped disabled.**
+  `docs/conformance/2026-07-23-min-confidence-calibration/` found the acme
+  corpus's unanswerable and answerable score distributions interleave — no
+  `min_confidence` value declines all 4 fabrications without also declining
+  real answers. **The measured 0/4 fabrication defect is not fixed in this
+  release**; the knob and its calibration evidence exist for a future
+  cross-query-comparable signal (e.g. dense cosine) to use.
+
+**Next:** no phase is pre-registered yet. Candidates surfaced by phase 6's own
+measurement: an absolute, cross-query-comparable confidence signal for
+`answer` (ADR 0014's F1/F2), and Finding 2's deferred chunk-level dense codes
+(zero-overlap rescue, 0/6 — its own phase, gated on the ~200 B/doc
+committed-state budget). Neither is scoped yet; both need their own compare
+doc.
+
+**Query-at-scale is deferred, not dropped** — at 100k documents a query takes
+~10 s, because the query path still loads the entire index to build the
+`Searcher`. `postings` is populated and indexed at ingest but never read at query
+time. The substrate solved *storage* at scale; *query* at scale stays scoped and
+unstarted (numbers and the fix in [ADR 0011](adr/0011-profiles-lean-state.md)),
+alongside chunk-level dense codes for the zero-overlap class.
 
 Beyond that: dogfooding (DOGFOOD.md + the private eval set) continues, and the
 held rule engine remains the long arc.

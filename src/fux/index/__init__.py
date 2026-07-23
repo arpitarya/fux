@@ -78,8 +78,9 @@ def build_index(
             and cached.get("fidelity") == entry.get("fidelity")
         ):  # an --advanced upgrade changes cache text without changing the source sha
             files[rel] = {
-                **cached, "outline": scan["outline"], "top_terms": scan["top_terms"],
-                "scan": scan, **_doc_meta(entry),
+                **{k: v for k, v in cached.items() if k not in _SUPERSESSION_KEYS},
+                "outline": scan["outline"], "top_terms": scan["top_terms"],
+                "scan": scan, **_doc_meta(entry), **_supersession_meta(meta),
             }
             total += len(cached["chunks"])
             reused += 1
@@ -108,6 +109,7 @@ def build_index(
             "top_terms": scan["top_terms"],
             "scan": scan,
             **_doc_meta(entry),
+            **_supersession_meta(meta),
         }
         total += len(chunks)
 
@@ -118,6 +120,7 @@ def build_index(
             {rel: meta["scan"] for rel, meta in files.items() if meta.get("scan")}
         )
     debug.dbg("graph", "info", "edges resolved", edges=len(edges))
+    _resolve_supersession(files)
     backend = backend_for(config, total, bulk=bool(bulk_text))
     with debug.timer("index", "write backend"):
         if backend is sqlstore:
@@ -157,6 +160,54 @@ def _doc_meta(entry: dict) -> dict:
         "converted_at": entry.get("converted_at", ""),
         "bytes": entry.get("size", 0),
     }
+
+
+# -- supersession (handoff 0006): frontmatter is the only contract acted on --
+
+_SUPERSESSION_KEYS = {
+    "superseded", "superseded_by", "superseded_by_resolved", "superseded_unresolved",
+}
+
+
+def _supersession_meta(meta: dict) -> dict:
+    """`status: superseded` and/or `superseded_by: <doc-id>` → a persisted flag.
+
+    Near-misses stay unflagged: any other `status` value, and prose mentions of
+    "superseded" in the body (never consulted — only frontmatter is read).
+    """
+    superseded_by = meta.get("superseded_by")
+    superseded_by = superseded_by.strip() if isinstance(superseded_by, str) else None
+    if meta.get("status") != "superseded" and not superseded_by:
+        return {}
+    out = {"superseded": True}
+    if superseded_by:
+        out["superseded_by"] = superseded_by
+    return out
+
+
+def _resolve_supersession(files: dict[str, dict]) -> None:
+    """Follow `superseded_by` chains to their terminal (non-superseded) doc.
+
+    A target that doesn't exist in the corpus, or a cycle, is recorded as
+    unresolved rather than crashing or looping — the raw `superseded_by`
+    stays on the document either way, so `why`/`--json` can still show it.
+    """
+    for doc_id, meta in files.items():
+        target = meta.get("superseded_by")
+        if not target:
+            continue
+        seen = {doc_id}
+        cur = target
+        while True:
+            if cur not in files or cur in seen:
+                meta["superseded_unresolved"] = True
+                break
+            seen.add(cur)
+            nxt = files[cur].get("superseded_by")
+            if not nxt:
+                meta["superseded_by_resolved"] = cur
+                break
+            cur = nxt
 
 
 def _load_any(config: Config) -> dict[str, dict]:
