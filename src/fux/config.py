@@ -48,6 +48,9 @@ class IngestParams:
 @dataclass(frozen=True)
 class AnswerParams:
     max_sentences: int = 5
+    # Absolute confidence floor (handoff 0006 M4) — 0.0 disables it (pre-0.25
+    # behaviour). Sits above the existing empty-pool early return, never below.
+    min_confidence: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -242,13 +245,18 @@ def load(root: Path) -> Config:
     max_sentences = ans.get("max_sentences", AnswerParams.max_sentences)
     if not isinstance(max_sentences, int) or isinstance(max_sentences, bool) or max_sentences <= 0:
         raise FuxError("[answer] max_sentences must be a positive integer")
+    min_confidence = ans.get("min_confidence", AnswerParams.min_confidence)
+    if not isinstance(min_confidence, (int, float)) or isinstance(min_confidence, bool):
+        raise FuxError("[answer] min_confidence must be a number")
+    if not 0.0 <= min_confidence <= 1.0:
+        raise FuxError("[answer] min_confidence must be between 0.0 and 1.0")
 
     return Config(
         root=root,
         sources=sources,
         ingest=IngestParams(max_kb=max_kb, exclude=tuple(exclude)),
         bm25f=BM25FParams(**params),
-        answer=AnswerParams(max_sentences=max_sentences),
+        answer=AnswerParams(max_sentences=max_sentences, min_confidence=float(min_confidence)),
         hybrid=HybridParams(enabled=enabled, rrf_k=rrf_k, candidate_pool=candidate_pool),
         index=index_params,
         graph=graph_params,

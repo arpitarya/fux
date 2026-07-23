@@ -156,6 +156,22 @@ $ fux find "composite index decision"
 3.  1.190  notes/anton/perf/ingest-path.md
 ```
 
+**Supersession (handoff 0006).** A document whose frontmatter carries
+`status: superseded` / `superseded_by: <doc-id>` is annotated, never
+reordered — `find`/`ask` ranking is unaffected:
+
+```
+$ fux find "settlement window"
+1.  5.612  docs/legacy.md  [superseded → docs/current.md]
+2.  4.980  docs/current.md
+```
+
+`--json` adds `"superseded": true, "superseded_by": "<doc-id>"` to the
+result (the field points at the resolved chain terminal when known, or the
+raw named target when it can't be resolved — a dangling or cyclic pointer
+is still shown, never silently dropped). Unmarked documents carry neither
+key. `fux ask --json` annotates the same way, per matching chunk.
+
 ## `fux answer` — extractive, cited answer
 
 ```
@@ -350,7 +366,7 @@ prints **what is wrong, why it matters, and the exact fix command**:
 ```
 $ fux doctor
 [✓] environment
-  ok  fux version: fux 0.24.0
+  ok  fux version: fux 0.25.0
   ok  python version: 3.12.4
   ok  install path: /…/site-packages/fux
   ok  bundled model: present, sha256 verified (7926518 bytes)
@@ -452,6 +468,32 @@ among the 500 nearest FuxVec codes), no edge from any seed
 lexical, dense, graph, verdict}`); `--lexical-only` evaluates the pure BM25F
 path and omits `dense` entirely. `--top N` matches the `--top` a normal query
 would use, so the verdict answers "would a normal call have shown me this?"
+
+**Supersession + answer decline (handoff 0006).** A superseded document
+carries `superseded: true` (+ `superseded_by`, human output too); every call
+also reports whether `fux answer` would decline the same query, with the
+numbers behind it:
+
+```
+$ fux why "settlement window" --doc docs/legacy.md
+docs/legacy.md
+  in corpus: True  (cache=.fux/cache/docs/legacy.md  fidelity=inferred)
+  superseded: true → docs/current.md
+  …
+
+verdict: returned: rank 1 at --top 5
+```
+
+```
+$ fux why "cryptocurrency settlement policy" --doc docs/adr/0005-....md --json
+{"superseded": false, ..., "answer_decline": {"declined": true,
+  "reason": "below_confidence_floor", "best_score": 0.11, "min_confidence": 0.2},
+  "verdict": "answer declines: best score 0.11 < min_confidence 0.2 · not returned: …"}
+```
+
+`answer_decline` is always present once the doc is in-corpus (`declined:
+false` on a normal call); the verdict line only mentions it when `declined`
+is true.
 
 ## Modifiers (all query verbs)
 

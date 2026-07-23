@@ -14,6 +14,8 @@ from dataclasses import dataclass, field
 from ..config import Config, find_root, load
 from ..index.bm25f import tokenize
 
+_ANSWER_POOL = 10  # must match query/api.py's _ANSWER_POOL — the pool `answer` retrieves
+
 
 @dataclass
 class WhyResult:
@@ -24,6 +26,9 @@ class WhyResult:
     lexical: dict | None = None
     dense: dict | None = None
     graph: dict | None = None
+    superseded: bool = False
+    superseded_by: str | None = None
+    answer_decline: dict | None = None
     verdict: str = ""
 
     def to_json(self) -> dict:
@@ -34,12 +39,18 @@ class WhyResult:
             "chunks": self.chunks,
             "verdict": self.verdict,
         }
+        if self.superseded:
+            out["superseded"] = True
+            if self.superseded_by:
+                out["superseded_by"] = self.superseded_by
         if self.lexical is not None:
             out["lexical"] = self.lexical
         if self.dense is not None:
             out["dense"] = self.dense
         if self.graph is not None:
             out["graph"] = self.graph
+        if self.answer_decline is not None:
+            out["answer_decline"] = self.answer_decline
         return out
 
 
@@ -55,6 +66,10 @@ def why(config: Config, query: str, doc_id: str, *, lexical_only: bool = False, 
 
     files = backend_for(config).load(config.root)
     meta = files.get(doc_id, {})
+    superseded = bool(meta.get("superseded"))
+    superseded_by = (meta.get("superseded_by_resolved") or meta.get("superseded_by")) if superseded else None
+    answer_decline = _answer_decline(config, query, files, lexical_only=lexical_only)
+
     q_terms = set(tokenize(query))
     chunks = [
         {
@@ -66,9 +81,13 @@ def why(config: Config, query: str, doc_id: str, *, lexical_only: bool = False, 
         for c in meta.get("chunks", [])
     ]
     if not chunks:
+        zero_chunk_verdict = "not returned: document is in the corpus but produced zero chunks"
+        if answer_decline.get("declined"):
+            zero_chunk_verdict = f"{_answer_decline_line(answer_decline)} · {zero_chunk_verdict}"
         return WhyResult(
             doc_id=doc_id, in_corpus=True, corpus_detail=corpus_detail, chunks=[],
-            verdict="not returned: document is in the corpus but produced zero chunks",
+            superseded=superseded, superseded_by=superseded_by, answer_decline=answer_decline,
+            verdict=zero_chunk_verdict,
         )
 
     from ..index import load_searcher
@@ -90,10 +109,56 @@ def why(config: Config, query: str, doc_id: str, *, lexical_only: bool = False, 
     graph_detail = _graph_detail(graph_result, doc_id)
 
     verdict = _verdict(doc_id, fused_rank, top, lexical, dense, graph_detail, config)
+    if answer_decline.get("declined"):
+        verdict = f"{_answer_decline_line(answer_decline)} · {verdict}"
     return WhyResult(
         doc_id=doc_id, in_corpus=True, corpus_detail=corpus_detail, chunks=chunks,
-        lexical=lexical, dense=dense, graph=graph_detail, verdict=verdict,
+        lexical=lexical, dense=dense, graph=graph_detail,
+        superseded=superseded, superseded_by=superseded_by, answer_decline=answer_decline,
+        verdict=verdict,
     )
+
+
+def _answer_decline(config: Config, query: str, files: dict, *, lexical_only: bool) -> dict:
+    """Would `fux answer` decline this exact query? Mirrors `_run_answer`'s pool
+    size and successor-preference so the two never disagree (handoff 0006 DoD7)."""
+    from ..index import load_searcher
+    from ..kernel import retrieve
+    from .answer import best_confidence, build_answer, prefer_current
+
+    searcher = load_searcher(config)
+    graph = retrieve(
+        config, query, k=_ANSWER_POOL, lexical_only=lexical_only, searcher=searcher, files=files,
+    )
+    passages = prefer_current(graph.passages, files)
+    qsim = None
+    if graph.model is not None:
+        model = graph.model
+        query_vec = model.embed(query)
+
+        def qsim(text: str) -> float | None:
+            vec = model.embed(text)
+            if vec is None or query_vec is None:
+                return None
+            return model.similarity(query_vec, vec)
+
+    sentences = build_answer(passages, query, config.answer.max_sentences, qsim=qsim)
+    confidence = best_confidence(sentences)
+    floor = config.answer.min_confidence
+    if not sentences:
+        return {"declined": True, "reason": "empty_pool", "best_score": 0.0, "min_confidence": floor}
+    if floor > 0.0 and confidence < floor:
+        return {
+            "declined": True, "reason": "below_confidence_floor",
+            "best_score": round(confidence, 4), "min_confidence": floor,
+        }
+    return {"declined": False, "best_score": round(confidence, 4), "min_confidence": floor}
+
+
+def _answer_decline_line(ad: dict) -> str:
+    if ad.get("reason") == "below_confidence_floor":
+        return f"answer declines: best score {ad['best_score']} < min_confidence {ad['min_confidence']}"
+    return "answer declines: no confident candidates for this query"
 
 
 def _presence(config: Config, doc_id: str) -> tuple[bool, str]:
@@ -246,6 +311,9 @@ def cmd_why(args) -> int:
         return 0
     print(f"{result.doc_id}")
     print(f"  in corpus: {result.in_corpus}  ({result.corpus_detail})")
+    if result.superseded:
+        successor = f" → {result.superseded_by}" if result.superseded_by else " (successor unresolved)"
+        print(f"  superseded: true{successor}")
     if result.chunks:
         print(f"  chunks: {len(result.chunks)}")
         for c in result.chunks:

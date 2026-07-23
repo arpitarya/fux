@@ -1,0 +1,37 @@
+{
+  "gate": "handoff 0006 DoD 8 — supersession recovery, answer level",
+  "build": "editable local checkout of ~/my_programs/fux (v0.24.0 tree + supersession); acme corpus regenerated seed 20260722, 929 docs, 885 chunks, hybrid engine",
+  "markers": {
+    "stale_docs_total": 12,
+    "stale_docs_with_superseded_by": 5,
+    "marked_pairs": [0, 2, 5, 9, 11],
+    "note": "Real count is 5 of 12, not 'roughly a third' (=4). Each marker parses and resolves; 4 of 5 point at the eval's designated current doc; pair 9's marker points at docs/adr/0011-hmac-sha256-webhook-signing.md, a different doc than the eval's current (docs/api/webhooks.md)."
+  },
+  "find_inversions": {
+    "total_from_original_run": 9,
+    "marked_and_reachable": [0, 5, 11],
+    "unmarked_residual": [1, 4, 6, 7, 8, 10],
+    "note": "Only 3 of the 9 find-inversions carry a machine-readable marker. The other 6 use dated inline prose or no marker — deterministically unreachable (no model allowed)."
+  },
+  "find_ask_annotation": {
+    "ranking_unchanged": true,
+    "detail": "All 5 marked pairs: stale/current ranks byte-identical to the 2026-07-22 evidence. superseded:true + superseded_by present on the stale doc's result wherever it appears (pairs 0,2,5,11; pair 9's stale doc is not in top-6, so not annotated there). Annotation only — no reorder, as the accepted compare-doc verdict requires."
+  },
+  "answer_recovery": {
+    "pair_0_settlement": "FULLY RESOLVED — before: answer led with stale 0006 (T+3); after: stale dropped, leads with current 0018 (T+2).",
+    "pair_5_authentication": "PARTIAL — before: stale legacy-api-keys cited as 5th source; after: stale dropped from citations, but the answer lead is unchanged (unrelated 0007-client-supplied-idempotency-keys); current authentication.md stays mid-list, not promoted.",
+    "pair_11_reconciliation": "NO-OP at answer level — answer already led with current 0016 before the fix; stale 0010 was never a source (a find-only inversion).",
+    "pair_2_acquirer_noninv": "IMPROVED but not an inversion — before: answer led with stale 0001-northwind; after: stale dropped. Not among the 9.",
+    "pair_9_webhook_noninv": "NO EFFECT — stale 0004 not retrieved; answer serves a different UNMARKED stale doc (legacy-webhooks-v1). Not among the 9.",
+    "unmarked_inversions_1_4_6_7_8_10": "UNCHANGED before==after — no marker, unreachable. Documented residual."
+  },
+  "before_after_headline": {
+    "find_inversions_before": "9 of 12",
+    "answer_fully_corrected_after": 1,
+    "answer_retired_source_de_cited_after": 2,
+    "of_which_also_promote_current_to_lead": 1,
+    "already_answer_correct_before_fix": 1,
+    "unmarked_unreachable_residual": 6,
+    "statement": "Of the 9 find-inversions, 1 (pair 0) is fully corrected at the answer level (retired doc gone AND current doc now leads); a 2nd (pair 5) has the retired doc removed from citations but the answer lead is unchanged; 1 (pair 11) was already answer-correct; the remaining 6 are unmarked and unreachable. This is partial recovery, not a fix of all 9."
+  }
+}

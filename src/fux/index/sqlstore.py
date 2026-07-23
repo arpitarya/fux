@@ -30,7 +30,7 @@ from ..errors import FuxError
 
 DB_REL = ".fux/index/fux.db"
 LOCKFILE_REL = ".fux/index/.lock"
-FORMAT_VERSION = 2
+FORMAT_VERSION = 3  # v3: docs gains supersession columns (handoff 0006)
 
 _SLUG_RE = re.compile(r"[^a-z0-9]+")
 
@@ -38,7 +38,9 @@ SCHEMA = """
 CREATE TABLE IF NOT EXISTS meta      (key TEXT PRIMARY KEY, value TEXT);
 CREATE TABLE IF NOT EXISTS docs      (doc_id TEXT PRIMARY KEY, kind TEXT, source TEXT, sha256 TEXT,
                                       fidelity TEXT, converter TEXT, title TEXT, outline TEXT,
-                                      top_terms TEXT, converted_at TEXT, bytes INTEGER);
+                                      top_terms TEXT, converted_at TEXT, bytes INTEGER,
+                                      superseded INTEGER, superseded_by TEXT,
+                                      superseded_by_resolved TEXT, superseded_unresolved INTEGER);
 CREATE TABLE IF NOT EXISTS docs_text (doc_id TEXT PRIMARY KEY REFERENCES docs, text BLOB);
 CREATE TABLE IF NOT EXISTS chunks    (chunk_id TEXT PRIMARY KEY, doc_id TEXT, ordinal INTEGER,
                                       heading_path TEXT, line_start INTEGER, line_end INTEGER,
@@ -163,6 +165,9 @@ def save(
                     meta.get("converter", ""), meta.get("title", ""),
                     meta.get("outline", ""), meta.get("top_terms", ""),
                     meta.get("converted_at", ""), meta.get("bytes", 0),
+                    int(bool(meta.get("superseded"))), meta.get("superseded_by"),
+                    meta.get("superseded_by_resolved"),
+                    int(bool(meta.get("superseded_unresolved"))),
                 )
             )
             ptoks = Counter(path_tokens(doc_id))
@@ -181,7 +186,7 @@ def save(
                     posting_rows.append(
                         (term, cid, htoks[term], ptoks[term], btoks[term])
                     )
-        conn.executemany("INSERT INTO docs VALUES (?,?,?,?,?,?,?,?,?,?,?)", doc_rows)
+        conn.executemany("INSERT INTO docs VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", doc_rows)
         conn.executemany("INSERT INTO chunks VALUES (?,?,?,?,?,?,?,?)", chunk_rows)
         conn.executemany(
             "INSERT INTO postings VALUES (?,?,?,?,?)", sorted(posting_rows)
@@ -199,8 +204,9 @@ def load(root: Path) -> dict[str, dict]:
             )
         files: dict[str, dict] = {}
         for row in conn.execute(
-            "SELECT doc_id, sha256, fidelity, title, outline, top_terms FROM docs "
-            "ORDER BY doc_id"
+            "SELECT doc_id, sha256, fidelity, title, outline, top_terms, "
+            "superseded, superseded_by, superseded_by_resolved, superseded_unresolved "
+            "FROM docs ORDER BY doc_id"
         ):
             files[row[0]] = {
                 "sha256": row[1], "fidelity": row[2], "title": row[3],
@@ -208,6 +214,16 @@ def load(root: Path) -> dict[str, dict]:
                 # retrieval read instead of re-opening the document
                 "outline": row[4], "top_terms": row[5], "chunks": [],
             }
+            # Only present when true — matches the JSON store's shape, where an
+            # unmarked document carries no supersession keys at all.
+            if row[6]:
+                files[row[0]]["superseded"] = True
+            if row[7]:
+                files[row[0]]["superseded_by"] = row[7]
+            if row[8]:
+                files[row[0]]["superseded_by_resolved"] = row[8]
+            if row[9]:
+                files[row[0]]["superseded_unresolved"] = True
         for row in conn.execute(
             "SELECT doc_id, heading_path, text, line_start, line_end, words "
             "FROM chunks ORDER BY doc_id, ordinal"

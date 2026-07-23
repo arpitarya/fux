@@ -125,11 +125,95 @@ Properties, not features:
   are *committed*: knowledge changes become reviewable diffs, and "what did we know
   in March?" is a `git checkout` away.
 - **A clone is queryable before you ingest.** The committed state plane costs
-  ~240 bytes per document — small enough for git, complete enough to answer with
-  the *same rankings and scores* a full index gives, by re-deriving candidate text
-  and reading exact corpus statistics from the committed df sidecar.
+  ~240 bytes per document — small enough for git, complete enough to return the
+  **same top-ranked result** a full index gives, by re-deriving candidate text and
+  reading exact corpus statistics from the committed df sidecar. (The tail order
+  and scores are approximate — the state plane is quantized; measured "top-1
+  stable, tail re-ranked" in `docs/conformance/`.)
 
 ## How it works
+
+The whole pipeline on one page — sources → two-tier ingest → what git carries →
+the one `retrieve()` kernel → every verb. (Source:
+[docs/architecture-flow.mermaid](docs/architecture-flow.mermaid).)
+
+```mermaid
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart TB
+    subgraph SRC[" 1 · SOURCES — fux.toml says what to ingest "]
+        direction LR
+        S1["docs · code · data<br/>md · txt · json · yaml"]
+        S2["office · pdf · images<br/>(opt-in converters)"]
+        S3["web · CDP pages<br/>(fenced: robots, caps)"]
+    end
+
+    subgraph ING[" 2 · INGEST — two-tier, deterministic, no model "]
+        direction TB
+        I1["inferred pass<br/>convert · flatten · fence"]
+        I2["advanced pass — on demand<br/>Docling layout · Tesseract OCR"]
+        I3["structure-aware chunker<br/>heading-based 256–512 tokens"]
+        I1 --> I3
+        I2 --> I3
+    end
+
+    subgraph GIT[" 3 · WHAT GIT CARRIES — recipe + state, never the warehouse "]
+        direction LR
+        G1["fux.lock<br/>per-source sha / date ledger"]
+        G2[".fux/state/<br/>codes · signatures · exact df"]
+        G3[".fux/cache/<br/>OKF Markdown + provenance"]
+    end
+
+    IDX[".fux/index/ — fux.db<br/>chunks · postings · vectors · edges<br/>derived · gitignored · rebuilt from lock"]
+
+    subgraph KRN[" 4 · ONE retrieve() KERNEL "]
+        direction LR
+        K1["BM25F<br/>lexical"]
+        K2["dense<br/>bundled 7.9 MB model"]
+        K3["FuxVec<br/>256-bit binary"]
+        K4["graph<br/>PPR-lite edges"]
+        RRF{{"RRF fusion<br/>k = 60"}}
+        K1 --> RRF
+        K2 --> RRF
+        K3 --> RRF
+        K4 --> RRF
+    end
+
+    subgraph VERB[" 5 · EVERY VERB IS A PROJECTION "]
+        direction LR
+        V1["ask · find<br/>ranked cited passages"]
+        V2["answer<br/>extractive · cited · never generative"]
+        V3["explain · graph · path<br/>cat · why · doctor"]
+    end
+
+    SRC --> ING
+    ING --> G1
+    ING --> G2
+    ING --> G3
+    G3 --> IDX
+    G2 -. "fresh clone answers from state alone<br/>(same top result; tail approximate)" .-> KRN
+    IDX --> KRN
+    RRF --> VERB
+
+    CLONE(["git clone → fux ingest<br/>rebuild verified by sha vs fux.lock"])
+    G1 -.-> CLONE
+    CLONE -.-> IDX
+
+    classDef src fill:#e8f0fe,stroke:#4285f4,color:#111;
+    classDef ing fill:#fef7e0,stroke:#f9ab00,color:#111;
+    classDef git fill:#e6f4ea,stroke:#34a853,color:#111;
+    classDef idx fill:#f1f3f4,stroke:#9aa0a6,color:#111,stroke-dasharray:4 3;
+    classDef krn fill:#fce8e6,stroke:#ea4335,color:#111;
+    classDef verb fill:#f3e8fd,stroke:#a142f4,color:#111;
+    class S1,S2,S3 src;
+    class I1,I2,I3 ing;
+    class G1,G2,G3 git;
+    class IDX,CLONE idx;
+    class K1,K2,K3,K4,RRF krn;
+    class V1,V2,V3 verb;
+```
+
+<details>
+<summary><strong>The same thing as a text sketch</strong></summary>
 
 ```
 sources (fux.toml) ──ingest──▶ fux.lock       per-source sha/date ledger        ← commit this
@@ -138,6 +222,7 @@ sources (fux.toml) ──ingest──▶ fux.lock       per-source sha/date ledg
                                .fux/index/    fux.db: chunks, postings, vectors ← derived; gitignored
 every verb ◀── one retrieve() ── BM25F ⊕ dense ⊕ FuxVec global ⊕ graph → RRF
 ```
+</details>
 
 **Git carries the recipe and the state, never the warehouse.** `fux.toml` says
 what to ingest, `fux.lock` records exactly what was ingested and when, and
@@ -203,7 +288,14 @@ point, but means no synthesis beyond what's written. The bundled model is
 English-biased (other languages degrade gracefully toward lexical). And retrieval
 quality is measured, not promised: the committed eval harness gates changes, and
 the current hybrid ships on a tie-with-rescues over lexical — the honest numbers
-live in [ADR 0006](docs/adr/).
+live in [ADR 0006](docs/adr/). **`answer` cannot invent text** (every sentence
+is verbatim from a source), but it **can cite a real, irrelevant passage
+confidently** for a well-formed out-of-scope question — a measured, unfixed
+limit, not a hallucination in the generative sense. An absolute confidence
+floor exists (`[answer] min_confidence`) but ships **disabled**: calibration
+found no threshold that catches those cases without also declining real
+answers ([ADR 0014](docs/adr/0014-answer-confidence-floor.md)). Verify
+citations on out-of-scope-adjacent questions.
 
 ## The name
 
@@ -216,7 +308,23 @@ use; the design of record is [docs/PLAN.md](docs/PLAN.md).
 
 ## What's new
 
-**Latest — v0.24.0 (2026-07-22): debug & observability.** Every stage is now
+**Latest — v0.25.0 (2026-07-23): trust & currency.** Two honest, partial
+fixes for a realistic-corpus conformance run that measured Fux confidently
+serving retired and fabricated answers. **Supersession** — `status:
+superseded` / `superseded_by:` frontmatter is now parsed, persisted, and
+annotated in `find`/`ask`/`why` (ranking unchanged); `answer` prefers the
+current document when both it and a superseded one are in its retrieved
+pool. Measured recovery is partial: only documents with the machine-readable
+marker are reachable (5 of the acme corpus's 12 planted pairs), and among
+those the `answer`-level fix is 1 full correction of 9 original inversions,
+not a clean sweep. **`[answer] min_confidence`** — an absolute confidence
+floor, built and calibrated against five eval gates; **no value clears
+both** the fabrication and correct-answer gates on the measured corpus, so it
+ships **disabled by default** rather than a guessed threshold that would
+decline real answers. See [`docs/adr/0013-supersession-awareness.md`](docs/adr/0013-supersession-awareness.md)
+and [`docs/adr/0014-answer-confidence-floor.md`](docs/adr/0014-answer-confidence-floor.md).
+
+**v0.24.0 (2026-07-22): debug & observability.** Every stage is now
 inspectable without a debugger: `[debug]` in `fux.toml` (level/categories/
 output/timing/redact, `--debug=trace`/`FUX_DEBUG`), a stdout-safe emitter
 instrumenting the whole pipeline, **`fux doctor`** (seven-group whole-install
@@ -233,7 +341,7 @@ skill usage, and the Python API.
 
 **v0.23.0 (2026-07-22): the knowledge substrate.** One SQLite runtime
 plane; committed `fux.lock` + lean state (a fresh clone answers with the *same
-rankings and scores* as a full index, ~230 B/doc); **FuxVec** from-scratch binary
+top-ranked result* as a full index — tail approximate, ~230 B/doc); **FuxVec** from-scratch binary
 dense search (hit@5 → 1.000 on the eval set, ADR 0006's named miss rescued); one
 retrieval kernel behind every verb, with `explain`/`graph`/`path`/`cat`/`db pull`
 new; lean/full profiles measured at 23 MB per 100k docs.
@@ -241,11 +349,13 @@ Full release history → **[CHANGELOG.md](CHANGELOG.md)**.
 
 ## Status
 
-**v0.24.x — debug & observability is shipped**: v1 query CLI, v1.1 web/CDP/
+**v0.25.x — trust & currency is shipped**: v1 query CLI, v1.1 web/CDP/
 advanced ingest, v2 bundled-model hybrid, v3 substrate (SQLite store, committed
 `fux.lock` + state plane, one retrieval kernel, the FuxVec dense engine, graph
 verbs, lean/full profiles), v4 debug (`[debug]` + emitter, `fux doctor`,
-`fux why`, `fux-debug` skill) — 417 unit tests, 100 e2e, eval gate beaten.
+`fux why`, `fux-debug` skill), v5 trust & currency (supersession annotation,
+`answer` confidence floor calibrated and shipped disabled) — 444 unit tests,
+100 e2e, eval gate beaten.
 
 Retrieval quality across the staged engines, on the committed 21-pair eval set:
 

@@ -1,0 +1,133 @@
+{
+  "gate": "combined — the trade-off curve",
+  "clears_all_5": "none",
+  "note": "To decline 4/4 unanswerable needs floor >= 0.25; at 0.25 it false-declines 11/55 correct answers. The classes overlap with no separating threshold.",
+  "sweep": [
+    {
+      "floor": 0.0,
+      "unanswerable_declined": 0,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 0,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.05,
+      "unanswerable_declined": 0,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 0,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.1,
+      "unanswerable_declined": 1,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 1,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.12,
+      "unanswerable_declined": 2,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 1,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.15,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 3,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.18,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 4,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.2,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 7,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.22,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 8,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.24,
+      "unanswerable_declined": 3,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 10,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.25,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 11,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.26,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 13,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.28,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 16,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.3,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 17,
+      "answerable_total": 55
+    },
+    {
+      "floor": 0.35,
+      "unanswerable_declined": 4,
+      "unanswerable_total": 4,
+      "gibberish_declined": 1,
+      "gibberish_total": 1,
+      "answerable_false_declines": 23,
+      "answerable_total": 55
+    }
+  ]
+}

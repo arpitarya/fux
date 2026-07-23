@@ -91,7 +91,7 @@ def test_schema_and_rows_are_populated(ingested_sqlite):
             "meta", "docs", "docs_text", "chunks", "postings",
             "vectors", "doc_codes", "edges", "frontier",
         } <= tables
-        assert conn.execute("SELECT value FROM meta WHERE key='format_version'").fetchone()[0] == "2"
+        assert conn.execute("SELECT value FROM meta WHERE key='format_version'").fetchone()[0] == "3"
         assert conn.execute("SELECT count(*) FROM docs").fetchone()[0] > 0
         assert conn.execute("SELECT count(*) FROM chunks").fetchone()[0] > 0
         assert conn.execute("SELECT count(*) FROM postings").fetchone()[0] > 0

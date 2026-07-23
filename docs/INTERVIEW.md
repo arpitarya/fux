@@ -208,6 +208,47 @@ binary-presence only, not a live port probe — `import socket` outside
 `ingest/` trips the standing network-fence test, and that fence is worth
 keeping over one doctor check's completeness. See ADR 0012's "owed" section.
 
+**Q: Phase 6 — where does it stand (2026-07-23)?**
+
+**Shipped: v0.25.0, ADRs 0013–0014, M1–M6 all green — but read the "owed"
+paragraph before calling this "fixed."** The acme-payments run measured two
+real defects: the superseded document outranks the current one in 9/12
+planted pairs, and `answer` fabricates confidently on all 4 well-formed
+out-of-scope questions. Both got a deterministic, no-model mechanism this
+phase. Neither is a clean fix, and both compare docs' calibration/measurement
+rules are why that's the *correct* outcome, not a shortfall:
+
+- **Supersession: annotate, never reorder** (Option A, accepted over the
+  fusion-down-rank alternative). `find`/`ask` carry `superseded`/
+  `superseded_by`, ranking is byte-identical to before; `answer` prefers the
+  resolved successor when both are in its retrieved pool. Measured recovery,
+  not assumed: **5 of 12** stale docs actually carry a machine-readable
+  marker, **3 of the 9** original inversions do, and at the `answer` level the
+  fix **fully corrects 1** (settlement) and de-cites the retired doc in a 2nd
+  without promoting the current one (a retrieval limit, not a supersession
+  one) — the other 6 are unmarked and permanently unreachable without a
+  model. See `conformance/2026-07-23-supersession-recovery/`.
+- **The confidence floor was built, calibrated, and shipped *disabled*.** The
+  compare doc's calibration rule required a `min_confidence` value clearing
+  all five eval gates or an honest report that none does. None does: the
+  acme corpus's unanswerable and answerable score distributions interleave
+  (declining all 4 fabrications needs floor ≥0.25; zero false declines on the
+  55 answerable pairs needs floor ≤0.087 — the interval is empty). Shipping
+  any tested non-zero default would have declined real answers. **The
+  measured 0/4-decline defect this phase set out to fix is not fixed in
+  v0.25.0** — say that plainly to anyone who asks, rather than letting the
+  phase's existence imply it was. See
+  `conformance/2026-07-23-min-confidence-calibration/` and ADR 0014's F1/F2
+  follow-up (an absolute, cross-query-comparable signal — e.g. dense cosine —
+  is the real path to a working floor; this phase's sentence score is
+  pool-relative and cannot separate the two populations).
+
+Both measurements were delegated to a background Opus subagent reusing one
+editable-install acme environment across three passes (calibration sweep,
+then a follow-up resumed via the same agent for the supersession
+re-measurement) rather than three separate setups — worth doing again when a
+build needs real-corpus evidence at this scale.
+
 **Q: What must a confident successor NOT "clean up"?**
 
 1. **The hand-rolled frontmatter parser + validator** (once built) — that is the
@@ -226,6 +267,13 @@ keeping over one doctor check's completeness. See ADR 0012's "owed" section.
    ADR 0010 records why.
 4. **The lifecycle.** plan → handoff → prompt, then one ADR per feature, every rule
    and ADR carrying a reference. This is how work is trusted here.
+6. **`[answer] min_confidence`'s default of `0.0`.** It looks unfinished — a
+   knob nobody turned on. It is not: v0.25.0's calibration measured that
+   every tested non-zero value declines real answers on the corpus used to
+   justify it (the unanswerable and answerable score distributions
+   interleave). Do not "fix" this by picking a plausible-looking default
+   without new calibration evidence — that is the exact failure this phase
+   exists to prevent. See ADR 0014.
 5. **Anton first.** Built for and lived-with in Anton before any external claim.
 
 **Q: How does Arpit like to work with a model?**
@@ -259,4 +307,21 @@ recorded what the 100k benchmark exposed but did not fix (query-at-scale).
 ADR 0012): the emitter, `fux doctor`, `fux why`, and the `fux-debug` skill; kept
 the stdout-purity gate green from M1's empty emitter through M6's fully
 instrumented pipeline.
+· Claude Opus 4.8 (Cowork), 2026-07-22 — ran the fux-lab conformance scaling
+curve (1k→5k→10k, 0.23.0) and filed it into `docs/proposals/hybrid-degrades-at-scale.md`.
+Finding: the 1k "hybrid 4× worse" gap is not stable — it closes with scale as
+lexical collapses toward hybrid; leans corpus-artifact (B) but does not settle
+A vs B (same generator). Query latency is linear from the start, corroborating
+ADR 0011's query-at-scale limit. No engine change made; acme-payments remains
+the discriminating next run. Direction unchanged.
+· Claude Sonnet 5, 2026-07-23 — built phase 6, trust & currency (v0.25.0,
+ADRs 0013–0014): supersession parsed/persisted/annotated (never reorders;
+`answer` prefers current when both are in pool); confidence floor built,
+calibrated against all five gates via a background Opus subagent, and shipped
+disabled — no value clears both the unanswerable and answerable gates.
+Delegated both real-corpus measurements (calibration sweep, then supersession
+recovery) to one resumed background agent sharing an editable-install acme
+environment rather than three cold setups. Both proposals graduated to
+`archive/` with their ADRs; the honest finding that the fabrication defect is
+*not* fixed in this release is recorded here and in ADR 0014 on purpose.
 (Add yourself here when you make a material update — model, date, one line.)*

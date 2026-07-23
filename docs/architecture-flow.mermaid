@@ -1,0 +1,72 @@
+%%{init: {'flowchart': {'curve': 'basis'}}}%%
+flowchart TB
+    subgraph SRC[" 1 · SOURCES — fux.toml says what to ingest "]
+        direction LR
+        S1["docs · code · data<br/>md · txt · json · yaml"]
+        S2["office · pdf · images<br/>(opt-in converters)"]
+        S3["web · CDP pages<br/>(fenced: robots, caps)"]
+    end
+
+    subgraph ING[" 2 · INGEST — two-tier, deterministic, no model "]
+        direction TB
+        I1["inferred pass<br/>convert · flatten · fence"]
+        I2["advanced pass — on demand<br/>Docling layout · Tesseract OCR"]
+        I3["structure-aware chunker<br/>heading-based 256–512 tokens"]
+        I1 --> I3
+        I2 --> I3
+    end
+
+    subgraph GIT[" 3 · WHAT GIT CARRIES — recipe + state, never the warehouse "]
+        direction LR
+        G1["fux.lock<br/>per-source sha / date ledger"]
+        G2[".fux/state/<br/>codes · signatures · exact df"]
+        G3[".fux/cache/<br/>OKF Markdown + provenance"]
+    end
+
+    IDX[".fux/index/ — fux.db<br/>chunks · postings · vectors · edges<br/>derived · gitignored · rebuilt from lock"]
+
+    subgraph KRN[" 4 · ONE retrieve() KERNEL "]
+        direction LR
+        K1["BM25F<br/>lexical"]
+        K2["dense<br/>bundled 7.9 MB model"]
+        K3["FuxVec<br/>256-bit binary"]
+        K4["graph<br/>PPR-lite edges"]
+        RRF{{"RRF fusion<br/>k = 60"}}
+        K1 --> RRF
+        K2 --> RRF
+        K3 --> RRF
+        K4 --> RRF
+    end
+
+    subgraph VERB[" 5 · EVERY VERB IS A PROJECTION "]
+        direction LR
+        V1["ask · find<br/>ranked cited passages"]
+        V2["answer<br/>extractive · cited · never generative"]
+        V3["explain · graph · path<br/>cat · why · doctor"]
+    end
+
+    SRC --> ING
+    ING --> G1
+    ING --> G2
+    ING --> G3
+    G3 --> IDX
+    G2 -. "fresh clone answers from state alone<br/>(same top result; tail approximate)" .-> KRN
+    IDX --> KRN
+    RRF --> VERB
+
+    CLONE(["git clone → fux ingest<br/>rebuild verified by sha vs fux.lock"])
+    G1 -.-> CLONE
+    CLONE -.-> IDX
+
+    classDef src fill:#e8f0fe,stroke:#4285f4,color:#111;
+    classDef ing fill:#fef7e0,stroke:#f9ab00,color:#111;
+    classDef git fill:#e6f4ea,stroke:#34a853,color:#111;
+    classDef idx fill:#f1f3f4,stroke:#9aa0a6,color:#111,stroke-dasharray:4 3;
+    classDef krn fill:#fce8e6,stroke:#ea4335,color:#111;
+    classDef verb fill:#f3e8fd,stroke:#a142f4,color:#111;
+    class S1,S2,S3 src;
+    class I1,I2,I3 ing;
+    class G1,G2,G3 git;
+    class IDX,CLONE idx;
+    class K1,K2,K3,K4,RRF krn;
+    class V1,V2,V3 verb;

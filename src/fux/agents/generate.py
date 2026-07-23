@@ -74,7 +74,11 @@ offline, deterministic, `$0`, with `file:line` citations.
 3. Zero hits ≠ "does not exist": try broader terms with `fux find`, and check
    the corpus is fresh (`fux ingest --check`).
 4. If sources changed, run `fux ingest` (incremental) and re-ask.
-5. If results look wrong, stale, or unexpectedly empty, use the **fux-debug**
+5. Check each result's `superseded` field. When `true`, its `superseded_by`
+   names the current document — prefer that one instead, even if it ranked
+   lower. Ranking never demotes a superseded result on its own; you are the
+   consumer this annotation is for.
+6. If results look wrong, stale, or unexpectedly empty, use the **fux-debug**
    skill instead of guessing.
 """,
     "fux-ingest": """\

@@ -36,6 +36,31 @@ class Sentence:
     factors: dict = field(default_factory=dict)
 
 
+def prefer_current(results: list[ScoredChunk], files: dict) -> list[ScoredChunk]:
+    """Drop chunks from a superseded document when its resolved successor is
+    *also* present among these candidates (handoff 0006 M5) — `answer` should
+    source from the current document, not the retired one, whenever both are
+    in the pool it actually retrieved. When the successor is absent, the
+    superseded chunk stays (there is nothing better to answer from), and the
+    caller is expected to annotate it as superseded rather than hide the gap.
+    """
+    present = {r.file for r in results}
+
+    def dominated(r: ScoredChunk) -> bool:
+        meta = files.get(r.file, {})
+        if not meta.get("superseded"):
+            return False
+        target = meta.get("superseded_by_resolved") or meta.get("superseded_by")
+        return target in present
+
+    filtered = [r for r in results if not dominated(r)]
+    return filtered or results  # never empty the pool outright over this
+
+
+def best_confidence(sentences: list[Sentence]) -> float:
+    return max((s.score for s in sentences), default=0.0)
+
+
 def build_answer(
     results: list[ScoredChunk], query: str, max_sentences: int, qsim=None
 ) -> list[Sentence]:

@@ -29,4 +29,5 @@ release stay unversioned.
 | **v0.22.0** | Hybrid engine v2 (bundled model + RRF) | [handoff](v0.22.0-hybrid-engine-v2-handoff.md) · [prompt](v0.22.0-hybrid-engine-v2-prompt.md) |
 | **v0.23.0** | Knowledge substrate v3 | [handoff](v0.23.0-knowledge-substrate-handoff.md) · [prompt](v0.23.0-knowledge-substrate-prompt.md) |
 | **v0.24.0** | Debug & observability v4 | [handoff](v0.24.0-debug-observability-handoff.md) · [prompt](v0.24.0-debug-observability-prompt.md) |
+| **v0.25.0** | Trust & currency (supersession + answer confidence floor) | [handoff](v0.25.0-trust-currency-handoff.md) · [prompt](v0.25.0-trust-currency-prompt.md) · proposals: [staleness](v0.25.0-staleness-ranking-ignores-supersession.md), [honest-decline](v0.25.0-honest-decline-well-formed-queries.md) |
 | *(spans v0.20–v0.22)* | Master orchestrator prompt | [master-prompt.md](master-prompt.md) |

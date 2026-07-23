@@ -1,0 +1,32 @@
+{
+  "gate": "#1 decline all 4 typed-unanswerable",
+  "engine": "bm25f",
+  "note": "best_confidence = max(sentence.score) from build_answer, the exact value the floor compares. Measured on the LOCAL editable checkout (v0.24.0 tree + floor mechanism).",
+  "floor_to_decline_all_4": "> 0.2488 (the crypto question)",
+  "questions": [
+    {
+      "q": "What is Acme's policy on cryptocurrency and stablecoin settlement?",
+      "kind": "unanswerable",
+      "best_confidence": 0.2487807006369516,
+      "n_sentences": 5
+    },
+    {
+      "q": "How do I configure the Kubernetes horizontal pod autoscaler for the mobile app?",
+      "kind": "unanswerable",
+      "best_confidence": 0.10809082082172937,
+      "n_sentences": 1
+    },
+    {
+      "q": "What is the uptime SLA percentage for Acme's GraphQL API?",
+      "kind": "unanswerable",
+      "best_confidence": 0.14831272416767943,
+      "n_sentences": 5
+    },
+    {
+      "q": "Which third-party vendor supplies our SMS one-time-password delivery?",
+      "kind": "unanswerable",
+      "best_confidence": 0.09583845773242822,
+      "n_sentences": 5
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "class": "unanswerable \u2014 engine must decline; observed: fabricates",
+  "declined": 0,
+  "total": 4,
+  "detail": [
+    {
+      "q": "What is Acme's policy on cryptocurrency and stablecoin settlement?",
+      "answer": "A rounding bug in the proration engine paid out fractional cents that did not reconcile against the PSP settlement file. **Every monetary amount is stored as a signed 64-bit integer in the currency's minor unit** \u2014 cents for USD, pence for GBP, yen for JPY (which has no minor unit, so the scale is zero). acme-payments is five services around an append-only ledger: **payments** (authorize/capture), **ledger** (double-entry postings), **auth** (OAuth2 + webhook signing), **notifications** (webhooks, email, dunning), and **reconciliation** (settlement matching against the PSP feed). We switched to Meridian from the previous acquirer for its next-day clearing and cleaner settlement file, which is what made the T+2 window possible. Edge tokenization proxy -> payments -> ledger postings -> outbox -> notifications; reconciliation reads the PSP settlement file daily and matches it to postings.",
+      "n_sources": 5,
+      "source_paths": [
+        "docs/adr/0005-store-amounts-in-minor-units.md",
+        "docs/adr/0005-store-amounts-in-minor-units.md",
+        "docs/guides/architecture-overview.md",
+        "docs/guides/architecture-overview.md",
+        "docs/guides/architecture-overview.md"
+      ],
+      "find_candidates": [
+        {
+          "path": "docs/guides/architecture-overview.md",
+          "score": 0.04501
+        },
+        {
+          "path": "docs/guides/local-development-setup.md",
+          "score": 0.04249
+        },
+        {
+          "path": "docs/guides/configuring-feature-flags.md",
+          "score": 0.03888
+        }
+      ]
+    },
+    {
+      "q": "How do I configure the Kubernetes horizontal pod autoscaler for the mobile app?",
+      "answer": "Retries frequently cross process and even device boundaries (a mobile client retrying on a new connection), and the PSP webhook can arrive *before* our own commit, so the dedupe identity has to be stable independent of byte-for-byte request equality.",
+      "n_sources": 1,
+      "source_paths": [
+        "docs/adr/0007-client-supplied-idempotency-keys.md"
+      ],
+      "find_candidates": [
+        {
+          "path": "docs/guides/debugging-a-mismatch.md",
+          "score": 0.04487
+        },
+        {
+          "path": "docs/adr/0033-cache-reconciliation.md",
+          "score": 0.0429
+        },
+        {
+          "path": "src/auth/handle_client_0167.py",
+          "score": 0.04063
+        }
+      ]
+    },
+    {
+      "q": "What is the uptime SLA percentage for Acme's GraphQL API?",
+      "answer": "acme-payments is five services around an append-only ledger: **payments** (authorize/capture), **ledger** (double-entry postings), **auth** (OAuth2 + webhook signing), **notifications** (webhooks, email, dunning), and **reconciliation** (settlement matching against the PSP feed). Python 3.11+, Docker, and the `acme-cli` (`pipx install acme-cli`). A PSP (payment service provider) connector adapts one acquirer's API to our internal capture/settle/refund interface. Lock the charge row for the duration of a refund so the dashboard and API cannot race. Ensure the PSP settlement file for the date is present: `acme-cli psp feed status --date <YYYY-MM-DD>`.",
+      "n_sources": 5,
+      "source_paths": [
+        "docs/guides/architecture-overview.md",
+        "docs/guides/local-development-setup.md",
+        "docs/guides/psp-connector-onboarding.md",
+        "docs/meetings/2025-11-23-chargeback-SLA.md",
+        "docs/runbooks/manual-reconciliation.md"
+      ],
+      "find_candidates": [
+        {
+          "path": "docs/meetings/2025-11-23-chargeback-SLA.md",
+          "score": 0.0474
+        },
+        {
+          "path": "docs/guides/using-the-acme-cli.md",
+          "score": 0.04696
+        },
+        {
+          "path": "docs/api/webhooks.md",
+          "score": 0.04688
+        }
+      ]
+    },
+    {
+      "q": "Which third-party vendor supplies our SMS one-time-password delivery?",
+      "answer": "Two designs were on the table \u2014 the server hashes the request body and dedupes on that hash, or the client supplies an explicit `Idempotency-Key`. Add a dead-letter queue per partition so one poison event cannot stall the rest. Consumers dedupe on the event id, so at-least-once delivery is no longer a hazard. Make every consumer idempotent on the event id and stop pretending delivery is exactly-once. Delivery is at-least-once; every consumer must dedupe on the event id.",
+      "n_sources": 4,
+      "source_paths": [
+        "docs/adr/0007-client-supplied-idempotency-keys.md",
+        "docs/reference/platform-architecture.md",
+        "docs/reference/platform-architecture.md",
+        "docs/rfcs/0008-event-delivery.md"
+      ],
+      "find_candidates": [
+        {
+          "path": "src/notifications/verify_delivery_0268.ts",
+          "score": 0.04354
+        },
+        {
+          "path": "src/notifications/build_delivery_0098.ts",
+          "score": 0.04313
+        },
+        {
+          "path": "src/notifications/apply_delivery_0078.ts",
+          "score": 0.04274
+        }
+      ]
+    }
+  ]
+}

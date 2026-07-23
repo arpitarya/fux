@@ -4,6 +4,47 @@ All notable changes to **fux-engine** (the rebuild line). Dates are ISO; version
 follow semver. The latest entry is mirrored in [README.md](README.md) § What's new.
 Maintained on every version bump (registry-tracked).
 
+## [0.25.0] — 2026-07-23 — trust & currency
+
+Phase 6 (handoff 0006, ADRs 0013–0014). The acme-payments realistic corpus
+measured Fux confidently serving **retired** and **fabricated** answers — two
+honest, partial fixes, not two clean ones:
+
+- **Supersession — annotated, never reordered.** `status: superseded` /
+  `superseded_by: <doc-id>` frontmatter is parsed at index build, persisted in
+  the substrate and `.fux/state/` (chains resolved to their terminal document,
+  cycles detected and marked unresolved rather than looping), and surfaced in
+  `find`/`ask --json` (`"superseded": true, "superseded_by": "<doc-id>"`) and
+  human output — **ranking is unchanged; all four `--lexical-only` goldens
+  stay byte-identical.** `answer` prefers the resolved successor's chunks when
+  both are in the pool it retrieved for a query; when the successor is
+  absent, it still answers and annotates the source as superseded. `fux why`
+  surfaces the flag plus a query-level `answer` decline explanation with
+  numbers. Measured recovery on acme's 9/12 planted inversions: only **5 of
+  12** stale docs carry a machine-readable marker at all, only **3 of the 9**
+  inversions do, and at the `answer` level the fix **fully corrects 1** and
+  de-cites the retired doc in a 2nd — partial by design, not a full fix
+  (`docs/conformance/2026-07-23-supersession-recovery/`).
+- **`[answer] min_confidence`** — an absolute confidence floor, above the
+  pre-existing empty-pool decline. Calibrated against all five eval gates
+  (acme's 4 unanswerable + 55 answerable, the gibberish control, the 21-pair
+  fixture gate, and the synthetic 1k/5k/10k baselines):
+  **no single value clears both the unanswerable and answerable gates** — the
+  score distributions interleave (decline-all-4 needs floor ≥0.25;
+  zero-false-decline needs floor ≤0.087). **Shipped disabled (`0.0`)** per the
+  compare doc's calibration rule — do not ship a default that declines a
+  correct answer. The measured 0/4-decline defect is **not fixed** in this
+  release; the knob and its evidence exist for a future cross-query-comparable
+  signal (e.g. dense cosine) to use
+  (`docs/conformance/2026-07-23-min-confidence-calibration/`).
+- Sqlite backend `docs` table gained four columns (`superseded`,
+  `superseded_by`, `superseded_by_resolved`, `superseded_unresolved`);
+  `format_version` bumped 2→3 (an incompatible schema rebuilds on next
+  `fux ingest`, per its existing recovery contract).
+- Both source proposals graduated to `docs/archive/` with their ADRs.
+
+Suites: 444 unit + 100 e2e (+1 gated skip).
+
 ## [0.24.0] — 2026-07-22 — debug & observability
 
 Phase 5 (handoff 0005, ADR 0012). Fux was deterministic and cited, but not
@@ -68,8 +109,11 @@ to "carry a corpus":
   sha, URLs stale by age); `--check` works on a fresh clone, lock-only.
 - **Committed lean state** (`.fux/state/`, ~230 B/doc measured): FuxVec codes +
   Bloom signatures + metadata + the **exact-df sidecar** — a fresh clone answers
-  with the *same rankings and scores* as a full index (provable, not
-  approximate; mutation-tested).
+  with the **same top-ranked result** as a full index; the tail order and scores
+  are approximate, because the state plane is quantized (codes/signatures).
+  Measured "top-1 stable, tail re-ranked" across the 1k/5k/10k and acme
+  conformance runs (`docs/conformance/`); the earlier "same rankings *and scores*"
+  wording was inaccurate.
 - **FuxVec** — from-scratch stdlib binary dense search (256-bit sign codes,
   XOR + `bit_count()` at ~27 M cmp/s, exact int8 rerank). Eval: hit@1
   .762→.810 · hit@5 .952→**1.000** · MRR .833→.873; ADR 0006's named

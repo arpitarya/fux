@@ -20,10 +20,13 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 5 complete: v0.24.0
-> shipped** (M1–M6 + close-out ✅). Suites: 417 unit + 100 e2e (+1 gated skip).
-> **Next phase's head: query-at-scale** — postings stored but unread (ADR 0011,
-> unchanged since phase 4).
+> *(building agent: keep this one line current)* — **Phase 6 complete: v0.25.0
+> shipped** (M1–M6 ✅). Suites: 444 unit + 100 e2e (+1 gated skip). Supersession
+> annotated (partial recovery, measured: 1/9 fully corrected); confidence floor
+> calibrated and **shipped disabled** — no value clears all 5 gates. **No next
+> phase pre-registered yet** — candidates: an absolute cross-query confidence
+> signal for `answer` (ADR 0014 F1/F2), or Finding 2's deferred chunk-level
+> dense codes (zero-overlap rescue, its own phase — see PLAN.md §8).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -145,6 +148,30 @@ row at EVERY milestone completion — no batching.*
 | M5 skills: `fux-debug` + escalation pointers in fux-query/fux-ingest | ✅ | 10+4 | third skill in `agents/generate.py::_SKILLS` (doctor→check→why→advanced→--debug=debug→report-don't-guess workflow); one-line escalation pointer added to both existing skills; `fux setup --skills` now writes 3 skill files, verified idempotent |
 | M6 docs (`example/DEBUG.md` + CLI/TOML/SETUP/SKILLS/GLOSSARY) + suites | ✅ | 417+100 (+1) | `example/DEBUG.md` new (worked failures × 7); CLI/TOML/SETUP/SKILLS/GLOSSARY/DOC-REGISTRY/PLAN/INTERVIEW updated; e2e doctor/why/debug-level coverage landed incrementally at M1/M3/M4, confirmed complete here |
 | Close-out: ADR 0012, docs law, archive pair, CHANGELOG+README, bump | ✅ | — | **v0.24.0**; ADR 0012 answers all 4 open questions; handoff+prompt archived as `v0.24.0-debug-observability-*.md`; CLAUDE.md hard-won-knowledge + version line updated |
+
+## Phase 6 — Trust & currency (handoff 0006) → v0.25.0
+
+*Pre-registered 2026-07-23 with the handoff, per the CLAUDE.md rule.*
+
+**Model: Opus** (M4's calibration is judgment that fails silently — see the handoff).
+
+Driver: the acme-payments realistic run — staleness inversions **9/12** and
+unanswerable fabrication **0/4**, both missed by the synthetic tiers *and* the
+21-pair fixture gate.
+
+| Milestone | Status | Tests | Notes |
+|-----------|--------|-------|-------|
+| M1 accept forks (2 compare docs → `accepted`) | ✅ | — | both accepted 2026-07-23 (Option A each); fux-query skill update also approved for M3 |
+| M2 parse + persist supersession (frontmatter → substrate/state; chains, cycles, near-misses) | ✅ | 426 (+9) | `status`/`superseded_by` already round-trip via `_RESERVED` passthrough; new `index.build_index::_supersession_meta`/`_resolve_supersession` extract+resolve chains/cycles into `files[rel]`; `state.DocState` gained `superseded_by`; sqlite backend bumped to format_version 3 (4 new `docs` columns) — JSON/sqlite parity preserved |
+| M3 annotate output (`--json` + human; **ordering unchanged, lexical goldens byte-identical**) | ✅ | 530 total (+4) | `_Ctx.supersession()` in `query/api.py` reads `ctx.files`, merged into `_chunk_json`/find's result dict + human markers; `fux-query` skill gained step 5 (prefer `superseded_by`); `example/CLI.md` documented; all four `--lexical-only` goldens confirmed byte-identical |
+| M4 `[answer] min_confidence` floor + calibration against **all five** gates | ✅ | 544 total (+9) | mechanism: `AnswerParams.min_confidence` (validated `[0,1]`), `_run_answer` declines when `max(sentence.score) < floor` and `floor > 0.0`. **Calibrated** (background Opus agent, full acme sweep — `docs/conformance/2026-07-23-min-confidence-calibration/`): **no value clears all 5 gates** — gate 1 (4/4 unanswerable) needs floor ≥0.25, gate 4 (0 false declines/55 answerable) needs floor ≤0.087, empty interval. Shipped default stays **0.0 (disabled)** per the compare doc's rule; trade-off curve + follow-up (F1/F2: floor an absolute signal like dense cosine, not the pool-relative sentence score) filed in ANALYSIS.md |
+| M5 `answer` prefers current + `fux why` explains both | ✅ | 544 total (+5) | `query/answer.py::prefer_current`/`best_confidence` shared by `_run_answer` and `why._answer_decline` (never disagree by construction); `answer`'s `sources` annotate `superseded`/`superseded_by` when the successor is absent; `WhyResult` gained `superseded`/`superseded_by`/`answer_decline`, verdict line prepends `answer declines: best score X < min_confidence Y` when applicable; `example/CLI.md`/`TOML.md` updated |
+| M6 re-measure acme, ADRs 0013/0014, docs, archive, bump | ✅ | 444 unit + 100 e2e | supersession recovery measured (`docs/conformance/2026-07-23-supersession-recovery/`): 5/12 markers, 3/9 inversions marked, 1 fully corrected + 1 de-cited at `answer` level, 6 unmarked/unreachable; ADRs 0013 (supersession) + 0014 (confidence floor, shipped disabled) written; both proposals → `implemented` and moved to `docs/archive/`; handoff+prompt archived as `v0.25.0-trust-currency-*`; CHANGELOG/README/PLAN/INTERVIEW/GLOSSARY/DOC-REGISTRY updated; version bumped 0.24.0→0.25.0; CLAUDE.md edit proposed (not applied) pending Arpit's review |
+
+**Deliberately out of scope** (each its own future phase, each gated on
+evidence): fusion down-ranking of superseded docs · the runner-up margin check ·
+chunk-level dense codes for the zero-overlap class (0/6, structural, risks the
+~200 B/doc committed-state guarantee).
 
 ## Deviations from spec
 

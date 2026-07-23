@@ -38,7 +38,10 @@ rrf_k          = 60              # Reciprocal Rank Fusion constant
 candidate_pool = 200             # BM25F candidates the dense pass re-ranks
 
 [answer]
-max_sentences = 5                # extractive-answer length cap (--answer-max overrides)
+max_sentences   = 5              # extractive-answer length cap (--answer-max overrides)
+min_confidence  = 0.0            # honest-decline floor (handoff 0006); 0.0 = disabled (default)
+                                  # decline when the best sentence score is below this — sits
+                                  # above the empty-pool decline, which always stays active
 
 [engine.graph]                   # deterministic PPR-lite expansion (v3)
 damping          = 0.85          # PageRank damping

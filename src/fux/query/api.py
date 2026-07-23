@@ -17,12 +17,13 @@ import sys
 import time
 from collections import defaultdict
 
+from .. import debug
 from ..config import BM25FParams, Config, find_root, load
 from ..index import load_searcher
 from ..index.bm25f import ScoredChunk, Searcher
 from ..ingest.manifest import quick_drift, read as manifest_read
 from ..index.bm25f import tokenize
-from .answer import _STOPWORDS, Sentence, build_answer
+from .answer import _STOPWORDS, Sentence, best_confidence, build_answer, prefer_current
 from .explain import chunk_explain_json, sentence_explain_line
 
 _FIND_POOL = 200  # chunks scored before per-file aggregation
@@ -100,6 +101,20 @@ class _Ctx:
 
     def fidelity(self, rel: str) -> str:
         return self.by_doc.get(rel, {}).get("fidelity", "inferred")
+
+    def supersession(self, rel: str) -> dict:
+        """`{"superseded": True, "superseded_by": <doc-id>}` when flagged, else
+        `{}` — annotation only, never touches ranking or ordering (handoff 0006).
+        The resolved chain terminal is shown when known; an unresolved target
+        (dangling or cyclic) falls back to the raw named successor."""
+        meta = self.files.get(rel, {})
+        if not meta.get("superseded"):
+            return {}
+        out = {"superseded": True}
+        target = meta.get("superseded_by_resolved") or meta.get("superseded_by")
+        if target:
+            out["superseded_by"] = target
+        return out
 
     def url(self, rel: str) -> str | None:
         return self.by_doc.get(rel, {}).get("url")
@@ -197,6 +212,9 @@ def _run_ask(searcher: Searcher, ctx: _Ctx, args) -> int:
     print()
     for r in results:
         print(f"{_loc(r.file, r.start)}  (score {r.score:.3f})")
+        superseded = ctx.supersession(r.file)
+        if superseded:
+            print(f"  superseded → {superseded.get('superseded_by', '(no named successor)')}")
         lines = r.text.split("\n")
         shown = lines if args.context == 0 else lines[: args.context]
         for line in shown:
@@ -225,6 +243,7 @@ def _chunk_json(r: ScoredChunk, ctx: _Ctx, explain: bool) -> dict:
         "heading_path": [p for p in r.heading.split(" > ") if p],
         "fidelity": ctx.fidelity(r.file),
         "text": r.text,
+        **ctx.supersession(r.file),
     }
     if ctx.url(r.file):
         out["url"] = ctx.url(r.file)
@@ -294,6 +313,7 @@ def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
                     "score": round(agg["score"], 5 if hybrid else 3),
                     "matching_passages": agg["chunks"],
                     "fidelity": ctx.fidelity(file),
+                    **ctx.supersession(file),
                     **({"url": ctx.url(file)} if ctx.url(file) else {}),
                     **({"hybrid": agg["best"].hybrid} if agg["best"].hybrid else {}),
                     **({"explain": chunk_explain_json(agg["best"])} if args.explain else {}),
@@ -307,7 +327,9 @@ def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
         return 0
     for i, (file, agg) in enumerate(ranked, start=1):
         score = f"{agg['score']:.5f}" if hybrid else f"{agg['score']:.3f}"
-        print(f"{i}.  {score}  {file}")
+        superseded = ctx.supersession(file)
+        marker = f"  [superseded → {superseded['superseded_by']}]" if superseded.get("superseded_by") else ("  [superseded]" if superseded else "")
+        print(f"{i}.  {score}  {file}{marker}")
         if args.explain:
             for line in _explain_tree(agg["best"], ctx.config.bm25f):
                 print(f"    {line}")
@@ -319,8 +341,33 @@ def _run_find(searcher: Searcher, ctx: _Ctx, args) -> int:
 # -- answer ----------------------------------------------------------------
 
 
+def _no_answer(args, ctx: _Ctx) -> int:
+    if args.json:
+        print(
+            json.dumps(
+                {
+                    "query": args.query,
+                    "answer": None,
+                    "sentences": [],
+                    "sources": [],
+                    "corpus": ctx.corpus,
+                    "engine": ctx.engine,
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
+    print("No confident answer — the corpus may not cover this.")
+    print('Try: fux find "…" to locate related files · fux ingest new sources')
+    return 0
+
+
 def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
     results = _retrieve(searcher, ctx, args, pool=_ANSWER_POOL)
+    # Prefer the current document over a superseded one when both are in the
+    # pool this query actually retrieved (handoff 0006 M5) — annotation-only
+    # elsewhere; this is the one place ranking-adjacent behaviour changes.
+    results = prefer_current(results, ctx.files)
     max_sentences = args.answer_max or ctx.config.answer.max_sentences
     qsim = None
     if ctx.model is not None:  # hybrid live: question-similarity from the same model
@@ -335,24 +382,21 @@ def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
 
     sentences = build_answer(results, args.query, max_sentences, qsim=qsim)
     if not sentences:
-        if args.json:
-            print(
-                json.dumps(
-                    {
-                        "query": args.query,
-                        "answer": None,
-                        "sentences": [],
-                        "sources": [],
-                        "corpus": ctx.corpus,
-                        "engine": ctx.engine,
-                    },
-                    ensure_ascii=False,
-                )
-            )
-            return 0
-        print("No confident answer — the corpus may not cover this.")
-        print('Try: fux find "…" to locate related files · fux ingest new sources')
-        return 0
+        return _no_answer(args, ctx)
+
+    # The absolute floor (handoff 0006 M4): sits above the zero-candidate
+    # return above, which stays — it is what keeps "No confident matches"
+    # reachable at all (CLAUDE.md, phase-4 note). This one catches a
+    # non-empty but weak pool: a fluent out-of-scope question that shares
+    # just enough vocabulary to survive relative admission.
+    confidence = best_confidence(sentences)
+    floor = ctx.config.answer.min_confidence
+    if floor > 0.0 and confidence < floor:
+        debug.dbg(
+            "answer", "info", "declined: below confidence floor",
+            best=round(confidence, 4), floor=floor,
+        )
+        return _no_answer(args, ctx)
 
     citations = _assign_citations(sentences)
     if args.json:
@@ -363,6 +407,7 @@ def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
             "sources": [
                 {
                     "id": cid, "path": file, "line": line,
+                    **ctx.supersession(file),
                     **({"url": ctx.url(file)} if ctx.url(file) else {}),
                 }
                 for (file, line), cid in citations.items()
@@ -380,7 +425,9 @@ def _run_answer(searcher: Searcher, ctx: _Ctx, args) -> int:
             print(f"  [{citations[(s.file, s.line)]}] {sentence_explain_line(s)}")
     print("\nSources:")
     for (file, line), cid in citations.items():
-        print(f"  [{cid}] {_loc(file, line)}")
+        superseded = ctx.supersession(file)
+        marker = f"  [superseded → {superseded['superseded_by']}]" if superseded.get("superseded_by") else ("  [superseded]" if superseded else "")
+        print(f"  [{cid}] {_loc(file, line)}{marker}")
     print("\n(extractive — sentences are verbatim from sources)")
     return 0
 
