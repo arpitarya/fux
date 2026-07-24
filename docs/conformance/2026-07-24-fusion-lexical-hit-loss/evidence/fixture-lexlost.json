@@ -1,0 +1,17 @@
+{
+  "env": "fixture",
+  "n_scorable": 21,
+  "penalty": "default",
+  "lexical_top5_lost": 0,
+  "lost_detail": [],
+  "hybrid_gained": 1,
+  "gained_detail": [
+    {
+      "q": "what technology stores rows on disk",
+      "lexical_rank": null,
+      "hybrid_rank": 2
+    }
+  ],
+  "both_found": 20,
+  "neither_found": 0
+}

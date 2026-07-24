@@ -2,9 +2,11 @@
 type: Prompt
 title: Fusion loses lexical top-5 hits (phase 9) — Claude Code prompt
 description: Paste-ready prompt executing handoff 0009 — correct the misdiagnosed "non-monotone fusion" finding, measure how often hybrid loses a lexical top-5 hit across all four eval sets, and take the guard-vs-accept-vs-fix-the-input fork through a compare doc. "No engine change" is a valid outcome.
-status: ready
+status: implemented
 timestamp: 2026-07-24T00:00:00Z
 tags: [fusion, retrieval, rrf, correctness]
+decision: compare/hybrid-losing-lexical-hits.compare.md
+shipped: none (accept verdict — no engine change)
 ---
 
 # Prompt — phase 9: fusion loses lexical top-5 hits

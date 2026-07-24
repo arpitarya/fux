@@ -89,16 +89,20 @@ present in hybrid's.
 - `zero_overlap_rescued`: **2 → 1**, matching the orbit run's hand analysis.
 - `zero_overlap_in_top5` retains the old, looser number so nothing is lost.
 - **`zero_overlap_demoted` is new and fires immediately at 1.** The same
-  per-question comparison that fixes the miscount also names the non-monotone
-  fusion regression automatically, instead of leaving it to be spotted by hand.
+  per-question comparison that fixes the miscount also names the
+  lexical-hit-lost regression automatically, instead of leaving it to be spotted
+  by hand. *(Filed at the time as "non-monotone fusion"; phase 9 corrected that
+  diagnosis — RRF is monotone, the cause is a near-noise dense signal.)*
 
 ## Unresolved — stated as unresolved
 
-- **The non-monotone fusion finding is now *measured*, not diagnosed.** Hybrid
-  demoted a lexical rank-5 hit out of top-5. Whether RRF's contribution is
-  monotone in per-list rank, and whether the new supersession offset interacts
-  with it, is **Part C** — deliberately not touched in a release. Own handoff,
-  own ADR.
+- **The lexical-hit-lost finding is now *measured*, not anecdotal.** Hybrid
+  demoted a lexical rank-5 hit out of top-5. **Phase 9 has since settled the
+  mechanism:** RRF *is* monotone in per-list rank (160/160 fused results
+  reconcile to the formula with zero delta), and the demotion is correct
+  arithmetic over a near-noise dense signal — the supersession offset is not
+  implicated. What remains open is the product question of whether hybrid should
+  be barred from losing a lexical top-5 hit.
 - **3 residual staleness inversions remain**, all unmarked documents. Permanent
   without a model; the lever is the `superseded_by:` convention.
 - **Zero-overlap is unchanged at 1/6 clean.** The penalty was never expected to
