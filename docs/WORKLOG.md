@@ -19,6 +19,33 @@ diary.*
 
 ---
 
+## 2026-07-24 — phase 9 packaged: the "non-monotone fusion" finding is a misdiagnosis  ·  Claude Code
+- **Asked:** write the Part C handoff for the non-monotone fusion finding.
+- **Did:** diagnosed it first, and the filed framing does not survive contact.
+  - **RRF *is* monotone in per-list rank** — `1/(k + rank)` is strictly
+    decreasing. The filed claim conflates "monotone in per-list rank" (true) with
+    "rank-preserving w.r.t. one input list" (false, and inherent to fusion).
+  - **The reported case reconciles to the exact specified arithmetic**, to five
+    decimals, across all three lists (`bm25f`, `dense`, `dense_global`). Two-list
+    sums do not reconcile — `dense_global` is easy to forget.
+  - **The real defect is dense quality:** the correct doc's similarity is
+    **0.3297**, barely above ADR 0010's 0.23–0.26 noise band (dense_rank 56,
+    dense_global_rank 117). Two of three lists voted against it. The doc that
+    beat it had *worse* lexical (13 vs 5) and much better dense (0.4895).
+  - **The supersession penalty is not implicated** — the doc is not superseded,
+    and the finding predates v0.26.0.
+  - Wrote handoff+prompt `0009-fusion-loses-lexical-hits` (**Opus** — the code is
+    easy, the deliverable is a judgment about a guarantee), pre-registered the
+    milestone table, updated PLAN.
+- **Decided / open:** the phase is no longer a bug hunt. The open question is a
+  product one — **should hybrid be barred from dropping a document
+  `--lexical-only` would have returned in top-5?** Guard vs accept vs
+  fix-the-input, headed for a compare doc. **"No engine change" is an expected,
+  valid outcome**; this may be the zero-overlap/dense-quality finding seen from
+  the fusion side. Named risk: manufacturing a fix because a phase was opened.
+- **Next:** run 0009 in Claude Code with Opus; it reproduces the arithmetic
+  itself first, then measures how big the population actually is (n=1 today).
+
 ## 2026-07-24 — v0.26.0 PUBLISHED to PyPI + Part B closed  ·  Claude Code
 - **Asked:** execute handoff 0008 — apply the pending honesty edits, land phase 7
   by PR, publish, verify, close the follow-ups. Publish human-gated at M5.
