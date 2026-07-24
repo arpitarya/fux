@@ -19,6 +19,40 @@ diary.*
 
 ---
 
+## 2026-07-24 — phase 9 executed: fusion finding was a misdiagnosis → ACCEPT  ·  Claude Code
+- **Asked:** run handoff 0009 (the non-monotone fusion finding).
+- **Did:**
+  - **M0** — reproduced the arithmetic before trusting the pre-work: **160/160
+    fused results reconcile to `Σ 1/(k + rank)` with zero delta**, including the
+    penalised superseded doc. RRF *is* monotone; the filed finding is a
+    misdiagnosis. (My checker first flagged 1/160 — it had omitted the penalty
+    term, not the engine.)
+  - **M1** — corrected "non-monotone" in place (marked) across the orbit
+    ANALYSIS, the release-verification ANALYSIS, the conformance index, and the
+    lab harness's check label.
+  - **M2** — measured the real population across all four eval sets. Hybrid loses
+    a lexical top-5 hit **~4% on realistic corpora** (acme 2/55, orbit 2/53),
+    roughly offset by gains; four kinds affected, worst an orbit `factual`
+    question lost from **lexical rank 1**. Synthetic 9–64%, **unexplained** (a
+    near-duplicate/compressed-spread hypothesis was tested and rejected).
+    **Supersession penalty not implicated** — identical at penalty 0 and 15.
+  - **M3** — compare doc `hybrid-losing-lexical-hits`, three-way fork.
+  - **M4** — Arpit **accepted ACCEPT** (no fusion change). Generalised the lab
+    demotion check from zero-overlap-only to **all kinds** (INFO, gains beside
+    losses); filed `proposals/chunk-level-dense-codes` as the finding's owner.
+    No ADR (no engine change), no version bump.
+  - **M5** — trackers, archives (belatedly archived the v0.26.0 release pair 0008
+    too; phase-9 pair archived unversioned, as it shipped no release).
+- **Decided / open:** the guard question is **closed as ACCEPT**, with a
+  reopen-trigger (LOST exceeding gained by ≥3 on a realistic corpus, or the loss
+  persisting after chunk-level dense codes ship). The `factual`-lost-from-rank-1
+  case is the named case any future reopen is judged against.
+- **Lesson kept:** a reconciliation script that models fewer terms than the
+  engine manufactures the bug it was written to disprove. Model every term.
+- **Next:** **chunk-level dense codes** — now the named owner of both the
+  zero-overlap reach failure (1/6) and this ranking failure. Its own phase, own
+  compare doc, gated on the ~200 B/doc committed-state budget.
+
 ## 2026-07-24 — phase 9 packaged: the "non-monotone fusion" finding is a misdiagnosis  ·  Claude Code
 - **Asked:** write the Part C handoff for the non-monotone fusion finding.
 - **Did:** diagnosed it first, and the filed framing does not survive contact.

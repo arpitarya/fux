@@ -2,9 +2,11 @@
 type: Handoff
 title: Fusion loses lexical top-5 hits — diagnose, then decide (phase 9)
 description: The "non-monotone fusion" finding is a misdiagnosis — RRF is provably monotone in per-list rank, and the reported demotion reconciles to the exact specified arithmetic. The real question is a product one: should hybrid be allowed to lose a document lexical alone would have returned? Diagnose the population, then take the fork through a compare doc.
-status: ready
+status: implemented
 timestamp: 2026-07-24T00:00:00Z
 tags: [fusion, retrieval, rrf, correctness]
+decision: compare/hybrid-losing-lexical-hits.compare.md
+shipped: none (accept verdict — no engine change)
 ---
 
 # Handoff: Fusion loses lexical top-5 hits (phase 9)

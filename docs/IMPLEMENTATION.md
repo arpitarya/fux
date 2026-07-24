@@ -20,24 +20,17 @@ happened per exchange"; keep both.*
 
 ## Now working on
 
-> *(building agent: keep this one line current)* — **Phase 8 COMPLETE:
-> v0.26.0 is LIVE on PyPI** (`pip install fux-engine==0.26.0`), published
-> 2026-07-24 from merge `5ccd0a6` (PR #44). Phase 7's supersession penalty
-> shipped **enabled at 15**, with both README honesty edits landing *before*
-> the release was cut. Verified black-box from the published package: orbit
-> staleness inversions **8 → 3**, hybrid hit@1 **.566 → .698**, hit@5 flat.
-> Part B done (`zero_overlap_rescued` 2 → 1, clean rescues only). **Correction:
-> 0.24.0 and 0.25.0 were already on PyPI** — the earlier "not published" claim
-> was a Python-<3.11 install failure misread; orbit's frozen-wheel workaround is
-> retired.
->
-> **Next: phase 9 pre-registered, unstarted** (handoff 0009, Opus) — and its
-> premise is already disproven: **"non-monotone fusion" is a misdiagnosis.** RRF
-> *is* monotone per-list, and the case reconciles to the exact arithmetic; the
-> real defect is a near-noise dense signal (0.3297). What is left is a product
-> question — should hybrid be barred from losing a lexical top-5 hit? — which
-> goes through a compare doc. **"No engine change" is a valid outcome.** After
-> that: chunk-level dense codes (zero-overlap still 1/6).
+> *(building agent: keep this one line current)* — **Phase 9 COMPLETE (M0–M5).**
+> The filed "non-monotone fusion" finding was a **misdiagnosis**: RRF is monotone
+> and 160/160 fused results reconcile to the formula with zero delta. Measured the
+> real population — hybrid loses a lexical top-5 hit **~4% on realistic corpora**
+> (~offset by gains), spanning four kinds incl. a `factual` case lost from rank 1;
+> synthetic 9–64% unexplained; **supersession penalty not implicated.** Arpit
+> **accepted** it — no fusion change (`compare/hybrid-losing-lexical-hits`); the
+> lab demotion check now covers all kinds, and `proposals/chunk-level-dense-codes`
+> is filed as the finding's real owner. **No version bump** (docs/investigation
+> only). **Next, unstarted:** chunk-level dense codes (own phase), query-at-scale
+> (ADR 0011).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -238,12 +231,13 @@ human-gated and taken only on Arpit's explicit go.*
   have pinned pre-release behaviour as the reference. Caught by reading the
   baseline diff and asking why a metric that should have moved did not.
 
-## Phase 9 — fusion loses lexical top-5 hits (handoff 0009) → unstarted
+## Phase 9 — fusion loses lexical top-5 hits (handoff 0009) → COMPLETE, no version bump
 
-*Pre-registered 2026-07-24 with the handoff. **Model: Opus** — the code is easy;
-the deliverable is a judgment about a guarantee.*
+*Executed 2026-07-24 (Opus). **Outcome: ACCEPT — no engine change.** Docs +
+investigation only; no version bump. The finding graduated to
+`proposals/chunk-level-dense-codes.md`.*
 
-**The filed framing is already disproven.** "Fusion is not monotone" is a
+**The filed framing was disproven** (M0). "Fusion is not monotone" is a
 misdiagnosis: `1/(k + rank)` is strictly decreasing, so RRF **is** monotone in
 per-list rank. The reported case reconciles to the exact specified arithmetic
 (three lists — `bm25f`, `dense`, `dense_global`):
@@ -264,15 +258,19 @@ penalty is **not** implicated (doc is not superseded; the finding predates 0.26.
 | M0 independently reconcile the RRF arithmetic | ✅ | 160/160, zero delta | reconciles incl. the penalty term — pre-work confirmed, phase proceeds |
 | M1 correct the filed "non-monotone" wording | ✅ | — | orbit ANALYSIS + release-verification ANALYSIS + conformance index + harness label, all marked in place |
 | M2 measure lexical-top-5-lost, all kinds × 4 eval sets | ✅ | 6 eval sets | **~4% realistic** (acme 2/55, orbit 2/53), ~offset by gains; synthetic 9–64% **unexplained**; 4 kinds affected, worst a `factual` lost from **lexical rank 1**; **penalty NOT implicated** (identical at 0 and 15) |
-| M3 compare doc — guard vs accept vs fix-the-input | 🟡 | — | written, **proposed verdict = ACCEPT (no fusion change)**; awaiting Arpit |
-| M4 execute the verdict | ⬜ | — | implementation + ADR, **or** documented close-out into the dense-codes phase |
-| M5 close out | ⬜ | — | docs, archive `v0.X.Y-*`, trackers |
+| M3 compare doc — guard vs accept vs fix-the-input | ✅ | — | written; **Arpit accepted ACCEPT** — no fusion change |
+| M4 execute the verdict | ✅ | — | no ADR (no engine change); generalised the lab demotion check to all kinds (INFO, gains beside losses); filed `chunk-level-dense-codes` proposal as the finding's real owner |
+| M5 close out | ✅ | 470 unit / 100 e2e | docs, archives (v0.26.0 release pair + phase9 pair), trackers |
 
-**"No engine change" is an expected and valid outcome** — this may be the
-zero-overlap/dense-quality finding seen from the fusion side. The named risk is
-manufacturing a fix because a phase was opened.
+**Outcome (M3/M4): ACCEPT.** It was indeed the zero-overlap/dense-quality finding
+seen from the fusion side — measured, not asserted (see M2). No fusion change; the
+finding now lives in `proposals/chunk-level-dense-codes.md`.
 
-## One engine/suite finding filed by the orbit run
+## Both orbit-run engine/suite findings — CLOSED
+- ~~**Non-monotone fusion**~~ — **DISPROVEN 2026-07-24 (phase 9).** RRF is
+  monotone; the demotion is correct arithmetic over a near-noise dense signal.
+  The product question it raised (guard hybrid?) was **accepted** — no change;
+  graduated to `proposals/chunk-level-dense-codes.md`.
 - ~~**`zero_overlap_rescued` miscount**~~ — **FIXED 2026-07-24 (phase 8, M8).**
   The metric counted lexical hits as dense rescues (reported 2, actual clean 1).
   A clean rescue is now the *delta* — absent from lexical's top-5, present in

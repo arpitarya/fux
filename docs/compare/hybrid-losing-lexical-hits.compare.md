@@ -9,15 +9,16 @@ tags: [fusion, retrieval, rrf, ranking]
 
 # Hybrid Losing Lexical Hits — Comparison
 
-> **Proposed verdict (awaiting Arpit):** **Accept it. Do not add a guard, do not
-> change fusion.** Keep the `zero_overlap_demoted` instrumentation, extend it to
-> all question kinds, and let the **chunk-level dense codes** phase own the
+> **Verdict (accepted 2026-07-24, Arpit):** **Accept it. Do not add a guard, do
+> not change fusion.** Keep the demotion instrumentation, extend it to all
+> question kinds, and let the **chunk-level dense codes** phase own the
 > underlying signal-quality problem.
-> **Status:** 🟡 Proposed · **Confidence:** High that no guard should ship *now*,
+> **Status:** ✅ Accepted · **Confidence:** High that no guard should ship *now*,
 > Medium on whether it should ship *ever* (one case is genuinely bad).
 > **Honest caveat:** on orbit, a `factual` question whose answer lexical ranked
 > **#1** is dropped out of hybrid's top-5 entirely. That is a real user-visible
-> harm, and "accept" means accepting it.
+> harm, and "accept" means accepting it — it is the case any future reopen
+> (trigger 3 below) should be judged against.
 
 ## Context
 

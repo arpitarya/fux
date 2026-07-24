@@ -302,26 +302,35 @@ first orbit run installed from PyPI rather than a locally-built wheel.
 - **Part B:** `zero_overlap_rescued` now counts *clean* rescues only (2 → 1); the
   new `zero_overlap_demoted` auto-detects the fusion demotion case.
 
-### Phase 9 (pre-registered, unstarted) — fusion loses lexical top-5 hits
+### Phase 9 (2026-07-24) — fusion loses lexical top-5 hits → ACCEPT, no change
 
-**The filed "non-monotone fusion" finding is a misdiagnosis.** `1/(k + rank)` is
-strictly decreasing, so RRF *is* monotone in per-list rank, and the reported case
-reconciles to the exact specified arithmetic across all three lists. The correct
-document lost because its dense similarity (**0.3297**) sits barely above ADR
-0010's 0.23–0.26 noise band — a **dense-quality** defect that fusion faithfully
-propagates. The supersession penalty is not implicated.
+**The filed "non-monotone fusion" finding was a misdiagnosis.** `1/(k + rank)` is
+strictly decreasing, so RRF *is* monotone in per-list rank — verified: **160/160
+fused results reconcile to the formula with zero delta**. The demotion is correct
+arithmetic over a near-noise dense signal (**0.3297**, barely above ADR 0010's
+0.23–0.26 band). A **dense-quality** defect fusion faithfully propagates; the
+supersession penalty is not implicated (identical lost-sets at penalty 0 and 15).
 
-What remains is a product question, headed for a compare doc: **should hybrid be
-barred from dropping a document `--lexical-only` would have returned in top-5?**
-Guard, accept, or fix-the-input (chunk-level dense codes may simply own this).
-**"No engine change" is an expected, valid outcome.** → handoff 0009.
+**Measured population** (`conformance/2026-07-24-fusion-lexical-hit-loss/`):
+hybrid loses a lexical top-5 hit **~4% on realistic corpora** (acme 2/55, orbit
+2/53), roughly offset by gains; spans four kinds, worst an orbit `factual`
+question lost from **lexical rank 1**; synthetic 9–64% **unexplained**.
 
-**Then:** the deferred **chunk-level dense codes** (zero-overlap rescue, still
-1/6 — gated on the ~200 B/doc committed-state budget) and **query-at-scale**
-(ADR 0011 — a 100k query still loads the whole index). Also parked: an absolute,
-cross-query-comparable confidence signal for `answer` (ADR 0014's F1/F2), now
-about confidence *reporting* rather than a fix, since phase 7 closed the decline
-line. None is scoped; each needs its own compare doc.
+**Verdict (Arpit): ACCEPT — no fusion change.** A guard would displace the gained
+results and would *protect* superseded documents at lexical rank ≤5, partly
+undoing the v0.26.0 penalty. The real cause is dense quality, and guarding the
+output to hide a bad input is the wrong layer. The lab demotion check now covers
+all kinds (INFO, gains beside losses); the finding graduated to
+`proposals/chunk-level-dense-codes.md`. Compare doc:
+`compare/hybrid-losing-lexical-hits.compare.md`. **No version bump.**
+
+**Then (unstarted):** **chunk-level dense codes** — now the named owner of both
+the zero-overlap reach failure (1/6) *and* this ranking failure, gated on the
+~200 B/doc committed-state budget; and **query-at-scale** (ADR 0011 — a 100k query
+still loads the whole index). Also parked: an absolute, cross-query-comparable
+confidence signal for `answer` (ADR 0014's F1/F2), now about confidence
+*reporting* rather than a fix, since phase 7 closed the decline line. Each needs
+its own compare doc.
 
 **Query-at-scale is deferred, not dropped** — at 100k documents a query takes
 ~10 s, because the query path still loads the entire index to build the

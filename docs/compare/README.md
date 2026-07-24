@@ -52,6 +52,25 @@ structure-aware, heading-based**, 256–512 tokens, heading-path context, code/t
 atomic; **BM25F weights = heading 3.0 / path 2.0 / body 1.0**, k1=1.2, b=0.75 — all
 overridable in `fux.toml`.
 
+## Decided (2026-07-23/24) — retrieval-quality forks from the conformance runs
+
+- [`supersession-handling.compare.md`](supersession-handling.compare.md) — ✅
+  **Annotate first (v0.25.0); down-rank penalty reopened and SHIPPED (v0.26.0).**
+  `status: superseded`/`superseded_by:` parsed, persisted, annotated; then a
+  calibrated fusion rank-offset penalty (default 15, safe interval `[11, ∞)`,
+  100% of frontmatter-reachable inversions recovered). → ADRs 0013, 0015.
+- [`answer-decline-floor.compare.md`](answer-decline-floor.compare.md) — ✅
+  **Absolute floor shipped disabled; margin check REFUTED and closed.** No
+  `min_confidence` value clears all gates; the runner-up margin was re-measured
+  de-confounded and stays empty. Fabrication is a **documented no-model
+  boundary**, not an open defect. → ADR 0014.
+- [`hybrid-losing-lexical-hits.compare.md`](hybrid-losing-lexical-hits.compare.md)
+  — ✅ **ACCEPT — no fusion change (2026-07-24).** The filed "non-monotone
+  fusion" finding was a misdiagnosis (RRF is monotone; 160/160 reconcile). Hybrid
+  loses a lexical top-5 hit ~4% on realistic corpora, ~offset by gains; a guard
+  would displace fused results and protect superseded docs at lexical rank ≤5.
+  Graduated to [`../proposals/chunk-level-dense-codes.md`](../proposals/chunk-level-dense-codes.md).
+
 ## Open decisions
 
 - Knowledge substrate v2 — ⏳ moved to
