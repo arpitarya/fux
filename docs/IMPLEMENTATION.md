@@ -29,9 +29,15 @@ happened per exchange"; keep both.*
 > Part B done (`zero_overlap_rescued` 2 → 1, clean rescues only). **Correction:
 > 0.24.0 and 0.25.0 were already on PyPI** — the earlier "not published" claim
 > was a Python-<3.11 install failure misread; orbit's frozen-wheel workaround is
-> retired. **Next, unstarted:** Part C — the non-monotone fusion finding, now
-> auto-detected by the suite (`zero_overlap_demoted` = 1), needs its own Opus
-> handoff + ADR; then chunk-level dense codes (zero-overlap still 1/6).
+> retired.
+>
+> **Next: phase 9 pre-registered, unstarted** (handoff 0009, Opus) — and its
+> premise is already disproven: **"non-monotone fusion" is a misdiagnosis.** RRF
+> *is* monotone per-list, and the case reconciles to the exact arithmetic; the
+> real defect is a near-noise dense signal (0.3297). What is left is a product
+> question — should hybrid be barred from losing a lexical top-5 hit? — which
+> goes through a compare doc. **"No engine change" is a valid outcome.** After
+> that: chunk-level dense codes (zero-overlap still 1/6).
 
 ## Baseline (pre-build, done in Cowork)
 
@@ -232,12 +238,40 @@ human-gated and taken only on Arpit's explicit go.*
   have pinned pre-release behaviour as the reference. Caught by reading the
   baseline diff and asking why a metric that should have moved did not.
 
-## Two engine/suite findings filed by the orbit run
+## Phase 9 — fusion loses lexical top-5 hits (handoff 0009) → unstarted
 
-- **Non-monotone fusion** — a lexical rank-5 hit was demoted out of top-5 by RRF.
-  A real correctness finding, not a harness bug. **Now auto-detected** by the
-  suite's new `zero_overlap_demoted` metric (fires at 1 on orbit). **Part C —
-  needs its own Opus handoff + ADR; deliberately not touched during the release.**
+*Pre-registered 2026-07-24 with the handoff. **Model: Opus** — the code is easy;
+the deliverable is a judgment about a guarantee.*
+
+**The filed framing is already disproven.** "Fusion is not monotone" is a
+misdiagnosis: `1/(k + rank)` is strictly decreasing, so RRF **is** monotone in
+per-list rank. The reported case reconciles to the exact specified arithmetic
+(three lists — `bm25f`, `dense`, `dense_global`):
+
+| doc | bm25f | dense | dense_global | computed | reported |
+|---|---|---|---|---|---|
+| hybrid #1 | 2 | 2 | 2 | 0.048387 | 0.04839 |
+| hybrid #2 | 13 | 1 | 1 | 0.046485 | 0.04649 |
+| **expected doc, #23** | **5** | **56** | **117** | **0.029655** | **0.02966** |
+
+The correct document lost because its dense signal (**0.3297**) sits barely above
+ADR 0010's **0.23–0.26 noise band** — two of three lists voted against it. That
+is a *dense-quality* defect, faithfully propagated by fusion. The supersession
+penalty is **not** implicated (doc is not superseded; the finding predates 0.26.0).
+
+| Milestone | Status | Tests | Notes |
+|-----------|--------|-------|-------|
+| M1 correct the filed "non-monotone" wording | ⬜ | — | in place + marked; no code |
+| M2 measure lexical-top-5-lost, all kinds × 4 eval sets | ⬜ | — | + does a penalty offset ever *create* one? file to `conformance/` |
+| M3 compare doc — guard vs accept vs fix-the-input | ⬜ | — | pause for Arpit's verdict |
+| M4 execute the verdict | ⬜ | — | implementation + ADR, **or** documented close-out into the dense-codes phase |
+| M5 close out | ⬜ | — | docs, archive `v0.X.Y-*`, trackers |
+
+**"No engine change" is an expected and valid outcome** — this may be the
+zero-overlap/dense-quality finding seen from the fusion side. The named risk is
+manufacturing a fix because a phase was opened.
+
+## One engine/suite finding filed by the orbit run
 - ~~**`zero_overlap_rescued` miscount**~~ — **FIXED 2026-07-24 (phase 8, M8).**
   The metric counted lexical hits as dense rescues (reported 2, actual clean 1).
   A clean rescue is now the *delta* — absent from lexical's top-5, present in

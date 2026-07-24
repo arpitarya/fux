@@ -288,12 +288,40 @@ about the document it ranked **first** (acme 9/12, orbit 8/12 inversions).
   involved supersession. Three no-model discriminators are refuted across two
   corpora. **No fourth mechanism is proposed.**
 
-**Next:** no phase is pre-registered yet. Candidates: an absolute,
-cross-query-comparable confidence signal for `answer` (ADR 0014's F1/F2 — though
-phase 7 makes the *decline* line itself closed, so this is now about confidence
-reporting rather than a fix), and the deferred chunk-level dense codes
-(zero-overlap rescue, still 1/6 — its own phase, gated on the ~200 B/doc
-committed-state budget). Neither is scoped; both need their own compare doc.
+### Phase 8 (2026-07-24) — v0.26.0 published
+
+**v0.26.0 is live on PyPI**, with both README honesty edits landing *before* the
+release was cut. The phase-7 calibration was re-confirmed **black-box from the
+published package** (orbit inversions 8→3, hit@1 .566→.698, hit@5 flat) — the
+first orbit run installed from PyPI rather than a locally-built wheel.
+
+- **Correction:** 0.24.0 and 0.25.0 were already published. `pip install` fails
+  with *"no matching distribution"* on Python **< 3.11** (the package requires
+  `>=3.11`), and that was misread as unpublished. The frozen-wheel workaround is
+  retired.
+- **Part B:** `zero_overlap_rescued` now counts *clean* rescues only (2 → 1); the
+  new `zero_overlap_demoted` auto-detects the fusion demotion case.
+
+### Phase 9 (pre-registered, unstarted) — fusion loses lexical top-5 hits
+
+**The filed "non-monotone fusion" finding is a misdiagnosis.** `1/(k + rank)` is
+strictly decreasing, so RRF *is* monotone in per-list rank, and the reported case
+reconciles to the exact specified arithmetic across all three lists. The correct
+document lost because its dense similarity (**0.3297**) sits barely above ADR
+0010's 0.23–0.26 noise band — a **dense-quality** defect that fusion faithfully
+propagates. The supersession penalty is not implicated.
+
+What remains is a product question, headed for a compare doc: **should hybrid be
+barred from dropping a document `--lexical-only` would have returned in top-5?**
+Guard, accept, or fix-the-input (chunk-level dense codes may simply own this).
+**"No engine change" is an expected, valid outcome.** → handoff 0009.
+
+**Then:** the deferred **chunk-level dense codes** (zero-overlap rescue, still
+1/6 — gated on the ~200 B/doc committed-state budget) and **query-at-scale**
+(ADR 0011 — a 100k query still loads the whole index). Also parked: an absolute,
+cross-query-comparable confidence signal for `answer` (ADR 0014's F1/F2), now
+about confidence *reporting* rather than a fix, since phase 7 closed the decline
+line. None is scoped; each needs its own compare doc.
 
 **Query-at-scale is deferred, not dropped** — at 100k documents a query takes
 ~10 s, because the query path still loads the entire index to build the
