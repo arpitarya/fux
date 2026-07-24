@@ -1,0 +1,73 @@
+{
+  "n_scorable": 11,
+  "lexical_top5_lost": 7,
+  "lost_detail": [
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-000000.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-000050.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-000100.md",
+      "lexical_rank": 1,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-000200.md",
+      "lexical_rank": 3,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-000250.md",
+      "lexical_rank": 1,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-000300.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-000350.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    }
+  ],
+  "hybrid_gained": 0,
+  "gained_detail": [],
+  "both_found": 2,
+  "neither_found": 2,
+  "by_kind": {
+    "overlap": {
+      "n": 9,
+      "lost": 7,
+      "gained": 0
+    },
+    "zero-overlap": {
+      "n": 2,
+      "lost": 0,
+      "gained": 0
+    }
+  },
+  "env": "1k",
+  "penalty": "default"
+}

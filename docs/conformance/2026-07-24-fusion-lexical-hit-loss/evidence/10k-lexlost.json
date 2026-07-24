@@ -1,0 +1,102 @@
+{
+  "n_scorable": 104,
+  "lexical_top5_lost": 9,
+  "lost_detail": [
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-000450.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-000800.md",
+      "lexical_rank": 3,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-001550.md",
+      "lexical_rank": 3,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-002500.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-002750.md",
+      "lexical_rank": 4,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-002850.md",
+      "lexical_rank": 4,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-003100.md",
+      "lexical_rank": 4,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-003800.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-004150.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    }
+  ],
+  "hybrid_gained": 2,
+  "gained_detail": [
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-001000.md",
+      "lexical_rank": null,
+      "hybrid_rank": 3
+    },
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-001800.md",
+      "lexical_rank": null,
+      "hybrid_rank": 5
+    }
+  ],
+  "both_found": 11,
+  "neither_found": 82,
+  "by_kind": {
+    "overlap": {
+      "n": 90,
+      "lost": 9,
+      "gained": 2
+    },
+    "zero-overlap": {
+      "n": 14,
+      "lost": 0,
+      "gained": 0
+    }
+  },
+  "env": "10k",
+  "penalty": "default"
+}

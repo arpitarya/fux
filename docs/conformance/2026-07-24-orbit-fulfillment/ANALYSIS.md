@@ -255,7 +255,22 @@ Separating true rescues from lexical hits (`evidence/zero-overlap-rescue-detail.
 - The aggregate metric (`zero_overlap_rescued: 2`) **overstates** it — one of the
   two was already a lexical rank-1 hit. Report the clean-rescue number.
 - **One active regression:** hybrid pushed a lexical rank-5 hit *out* of top-5.
-  Fusion is not monotone — it can lose a document lexical alone would have found.
+  ~~Fusion is not monotone — it can lose a document lexical alone would have found.~~
+
+  > **⚠ CORRECTION (2026-07-24, phase 9): the "not monotone" diagnosis is wrong.**
+  > `RRF(d) = Σ 1/(k + rank)` and `1/(k + rank)` is **strictly decreasing**, so RRF
+  > *is* monotone in per-list rank. Verified empirically too: **160/160 fused
+  > results across 4 orbit queries reconcile to the formula with zero delta**
+  > (including a penalised superseded doc). The accurate statement is that fusion
+  > is **not rank-*preserving* with respect to a single input list** — which is
+  > inherent to fusion, not a defect.
+  >
+  > **The real cause is a weak dense signal.** The demoted document scores
+  > similarity **0.3297**, barely above ADR 0010's 0.23–0.26 noise band
+  > (`dense_rank` 56, `dense_global_rank` 117), so two of three lists voted
+  > against it. The doc that beat it had *worse* lexical (rank 13 vs 5) and much
+  > better dense (0.4895). This is the same dense-quality defect as the rest of
+  > Finding 3 — see phase 9 (`docs/handoff/0009-fusion-loses-lexical-hits-*`).
 - All four misses were **inside the dense prefilter** (`in_prefilter: true`) with
   similarity 0.33–0.53. The candidates are reachable; the ranking is what fails.
 
@@ -324,8 +339,13 @@ no fix.
 3. **Report clean dense rescues, not top-5 appearances.** The suite's
    `zero_overlap_rescued` metric counts lexical hits and overstates dense
    performance. Worth correcting in `shared/regress/run.py`.
-4. **Fusion is not monotone.** Hybrid demoted a document lexical alone ranked 5th.
-   Worth a named regression check — hybrid should not lose a lexical top-5 hit.
+4. ~~**Fusion is not monotone.**~~ **CORRECTED (phase 9) — it is monotone.**
+   Hybrid demoted a document lexical alone ranked 5th, but that is correct RRF
+   arithmetic over a near-noise dense signal (0.3297), not a fusion defect; see
+   the correction under Finding 3. The **named regression check is still worth
+   having** and now exists (`zero_overlap_demoted`, phase 8). Whether hybrid
+   *should* be barred from losing a lexical top-5 hit is a product question, not
+   a bug — taken up in phase 9.
 
 ## Files
 

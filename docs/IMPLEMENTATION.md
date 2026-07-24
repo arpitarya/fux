@@ -225,7 +225,7 @@ human-gated and taken only on Arpit's explicit go.*
 | M5 publish (human gate) | ✅ | — | tag `v0.26.0` + Release on `5ccd0a6`; tag↔version guard + `twine --strict` + OIDC all passed |
 | M6 verify the publish | ✅ | — | clean-venv `pip install fux-engine==0.26.0`; setup→ingest→find/ask/why all work; **PyPI README carries both corrected claims** |
 | M7 trackers + retire frozen-wheel note | ✅ | — | orbit env now installs from PyPI; TEST-PLAN + orbit ANALYSIS corrected |
-| M8 Part B — `zero_overlap_rescued` fix | ✅ | — | clean rescues only (**2 → 1**); new `zero_overlap_demoted` auto-detects the non-monotone case; orbit re-baselined deliberately |
+| M8 Part B — `zero_overlap_rescued` fix | ✅ | — | clean rescues only (**2 → 1**); new `zero_overlap_demoted` auto-detects the lexical-hit-lost case; orbit re-baselined deliberately |
 
 **Two corrections this phase produced, both worth keeping:**
 
@@ -261,9 +261,10 @@ penalty is **not** implicated (doc is not superseded; the finding predates 0.26.
 
 | Milestone | Status | Tests | Notes |
 |-----------|--------|-------|-------|
-| M1 correct the filed "non-monotone" wording | ⬜ | — | in place + marked; no code |
-| M2 measure lexical-top-5-lost, all kinds × 4 eval sets | ⬜ | — | + does a penalty offset ever *create* one? file to `conformance/` |
-| M3 compare doc — guard vs accept vs fix-the-input | ⬜ | — | pause for Arpit's verdict |
+| M0 independently reconcile the RRF arithmetic | ✅ | 160/160, zero delta | reconciles incl. the penalty term — pre-work confirmed, phase proceeds |
+| M1 correct the filed "non-monotone" wording | ✅ | — | orbit ANALYSIS + release-verification ANALYSIS + conformance index + harness label, all marked in place |
+| M2 measure lexical-top-5-lost, all kinds × 4 eval sets | ✅ | 6 eval sets | **~4% realistic** (acme 2/55, orbit 2/53), ~offset by gains; synthetic 9–64% **unexplained**; 4 kinds affected, worst a `factual` lost from **lexical rank 1**; **penalty NOT implicated** (identical at 0 and 15) |
+| M3 compare doc — guard vs accept vs fix-the-input | 🟡 | — | written, **proposed verdict = ACCEPT (no fusion change)**; awaiting Arpit |
 | M4 execute the verdict | ⬜ | — | implementation + ADR, **or** documented close-out into the dense-codes phase |
 | M5 close out | ⬜ | — | docs, archive `v0.X.Y-*`, trackers |
 

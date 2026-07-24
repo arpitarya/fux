@@ -1,0 +1,94 @@
+{
+  "n_scorable": 52,
+  "lexical_top5_lost": 10,
+  "lost_detail": [
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-000450.md",
+      "lexical_rank": 3,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-000650.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-000750.md",
+      "lexical_rank": 3,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-001100.md",
+      "lexical_rank": 3,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-001150.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the tokenizer for search?",
+      "kind": "overlap",
+      "doc": "docs/search/note-001550.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-001700.md",
+      "lexical_rank": 4,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the composite index for indexing?",
+      "kind": "overlap",
+      "doc": "docs/indexing/note-002000.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the session token for auth?",
+      "kind": "overlap",
+      "doc": "docs/auth/note-002050.md",
+      "lexical_rank": 4,
+      "hybrid_rank": null
+    },
+    {
+      "q": "why did we choose the backpressure for ingest?",
+      "kind": "overlap",
+      "doc": "docs/ingest/note-002100.md",
+      "lexical_rank": 5,
+      "hybrid_rank": null
+    }
+  ],
+  "hybrid_gained": 0,
+  "gained_detail": [],
+  "both_found": 10,
+  "neither_found": 32,
+  "by_kind": {
+    "overlap": {
+      "n": 45,
+      "lost": 10,
+      "gained": 0
+    },
+    "zero-overlap": {
+      "n": 7,
+      "lost": 0,
+      "gained": 0
+    }
+  },
+  "env": "5k",
+  "penalty": "default"
+}

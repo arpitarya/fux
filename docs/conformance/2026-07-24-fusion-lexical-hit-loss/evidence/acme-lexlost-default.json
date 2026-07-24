@@ -1,0 +1,66 @@
+{
+  "n_scorable": 55,
+  "lexical_top5_lost": 2,
+  "lost_detail": [
+    {
+      "q": "What incident caused the move to client-supplied idempotency keys?",
+      "kind": "cross-doc",
+      "doc": "docs/postmortems/2025-09-03-double-charge.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    },
+    {
+      "q": "Are raw card numbers stored, and if so for how long?",
+      "kind": "stale-vs-current",
+      "doc": "docs/adr/0002-tokenize-pan-at-the-edge.md",
+      "lexical_rank": 2,
+      "hybrid_rank": null
+    }
+  ],
+  "hybrid_gained": 1,
+  "gained_detail": [
+    {
+      "q": "How does the API authenticate requests today?",
+      "kind": "stale-vs-current",
+      "doc": "docs/guides/authentication.md",
+      "lexical_rank": null,
+      "hybrid_rank": 4
+    }
+  ],
+  "both_found": 46,
+  "neither_found": 6,
+  "by_kind": {
+    "cross-doc": {
+      "n": 6,
+      "lost": 1,
+      "gained": 0
+    },
+    "factual": {
+      "n": 12,
+      "lost": 0,
+      "gained": 0
+    },
+    "how-to": {
+      "n": 8,
+      "lost": 0,
+      "gained": 0
+    },
+    "stale-vs-current": {
+      "n": 12,
+      "lost": 1,
+      "gained": 1
+    },
+    "why": {
+      "n": 11,
+      "lost": 0,
+      "gained": 0
+    },
+    "zero-overlap": {
+      "n": 6,
+      "lost": 0,
+      "gained": 0
+    }
+  },
+  "env": "acme",
+  "penalty": "default"
+}
