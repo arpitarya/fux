@@ -11,7 +11,12 @@ timestamp: 2026-08-09T00:00:00Z
 > **Verdict (proposed): `inferred` (no-AI default) + `enriched` (AI
 > opt-in).** Keeps `inferred` aligned with the existing fidelity vocabulary
 > and avoids inverting the archived edge-grade meaning of "extracted".
-> **Status:** ⏳ proposed — awaiting Arpit's ratification (M0's ADR-0016).
+> **Status:** ⏳ proposed — awaiting Arpit's ratification.
+> **ADR-0016 is written** ([`../adr/0016-ingest-mode-naming.md`](../adr/0016-ingest-mode-naming.md))
+> and also carries `status: proposed`: per the M0/M1 handoff §7 the ADR was
+> drafted with the recommendation rather than blocking M1 on a human gate.
+> Ratifying flips **both** to accepted; choosing option B supersedes the ADR
+> and adds the edge-grade rename as its own ADR.
 > **Confidence:** medium — this is a taste call with one hard constraint.
 
 ## Context

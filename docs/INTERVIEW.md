@@ -11,6 +11,103 @@ too. Leave it better.**
 
 ---
 
+## ⚠ Read this first — the second reset (2026-08-09)
+
+**Everything below this section describes the v0.19–0.26 engine. That engine
+is archived.** It is history worth having — the judgment in it is real — but
+it is no longer the state of play. Read this block, then read the rest as
+*background*.
+
+**Q: What changed?**
+
+- The substrate engine (v0.19 → v0.26, ADRs 0001–0015) is **archived at
+  [`../archive/v0.26/`](../archive/v0.26/)**, runnable but reference-only. Its
+  docs are at [`archive/v0.26-docs/`](archive/v0.26-docs/); the old plan at
+  [`archive/PLAN-v0.26.md`](archive/PLAN-v0.26.md).
+
+- The replacement architecture is **index-and-refer**, specified in
+  [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md): rank from a
+  small index committed to git; fetch content from the systems that own it;
+  verify at answer time.
+
+- **There is no `src/` on `main` by design.** The package scaffold is
+  deliberately deferred until M1's pruning eval passes — see below.
+
+**Q: Why reset a working, published engine?**
+
+Because the thing it was good at was not the thing the design point needs. The
+v0.26 engine's committed artifact grew with *content* (cache + state plane).
+At a 10-engineer repo that is fine; at a 10k-engineer corporation's
+mega-project — the litmus since 2026-07-21 — it is a copy of the company's
+knowledge in a git repo, with the staleness, duplication and ACL-drift
+problems that implies. Index-and-refer commits **statistics only**, so the
+artifact stops scaling with content.
+
+Two other facts pushed it: archived ADR-0011 recorded query-at-scale as
+unfixed (postings stored but not read at query time — a 100k query loads the
+whole index), and the substrate's storage/profile/state machinery had become
+the majority of the code for a minority of the value.
+
+**Q: What must a successor NOT re-litigate?**
+
+1. **The reset itself, and the archive.** Do not port the substrate, the lean
+   profile, the state plane, or the per-file cache back. The port list in
+   [`PLAN.md`](PLAN.md) §"What survives" is the whole of what comes forward,
+   and it comes forward *with its tests*.
+
+2. **"Index", not "db".** A council ruling. What Fux commits is an index —
+   statistics that make documents findable. It does not hold content.
+
+3. **Content is never durable outside its source** except under explicit
+   per-source `snapshot` policy. This is the new law and the reason the
+   architecture works.
+
+4. **Hashed meta is the default** for non-git sources, enforced at write time.
+   It closes an ACL leak; it is not a configuration preference.
+
+5. **Six compare docs are closed** ([`compare/`](compare/README.md)):
+   architecture, wire/runtime split, one MST keyspace, hashed meta, ARC cache,
+   storage. Each carries its own reopen-trigger — fire the trigger or leave it
+   alone.
+
+6. **The adapter cap (git + HTTP + Confluence) is a decision.** MCP is the
+   endgame and is [a proposal](proposals/mcp-adapters.md), not a backlog item.
+
+**Q: What is the one thing that gates everything?**
+
+**P1 — does KL top-k pruning preserve ranking quality?** If it fails, the
+committed index cannot be small and the architecture is falsified. So M1 runs
+*before* anything is built on it, including the package scaffold, against a
+threshold pre-registered in the [handoff](handoff/v0.30.0-m0-m1-gate-handoff.md)
+§5.4 and [paper §8](paper/the-fux-index-paper.md).
+
+**Moving that threshold after seeing the numbers is the single worst thing a
+successor can do here.** A recorded negative that saves months of building is
+a *successful* outcome of M1, not a failure of it. The verdict lives in
+[ADR-0017](adr/0017-pruning-eval-gate.md).
+
+**Q: Where is the state of play, mechanically?**
+
+[`OPEN-WORK.md`](OPEN-WORK.md) §2 — the single live tracker (`W-nn` items +
+P1–P7 statuses). It replaced the archived IMPLEMENTATION.md. `PLAN.md` is the
+*spec* per milestone id; OPEN-WORK is the *state*. Pick work there.
+
+**Q: What of the old answers below still holds?**
+
+The **process** and the **person**: compare-doc-before-building, one ADR per
+feature with references, docs true in the same change, worklog every exchange,
+name the model on every handoff. Arpit's working style (concise, recommendation
+first, debate culture, minority reports preserved) is unchanged and is the most
+useful thing in the rest of this document. The **design lens** is also
+unchanged and still binding: *design for a very large-scale project inside a
+corporation*, not for Anton — Anton is a convenient small testbed, not the
+priority filter.
+
+What does **not** hold: every module, command, config key and ADR number
+mentioned below. Treat them as archived history.
+
+---
+
 **Q: In one breath — what is this repo?**
 
 Fux. A `$0`, stdlib-only, deterministic knowledge engine: the *why* behind code,
@@ -386,6 +483,14 @@ recovery) to one resumed background agent sharing an editable-install acme
 environment rather than three cold setups. Both proposals graduated to
 `archive/` with their ADRs; the honest finding that the fabrication defect is
 *not* fixed in this release is recorded here and in ADR 0014 on purpose.
+· Claude Opus 5 (1M context), 2026-08-09 — wrote the reset block at the top of
+this document and gave GLOSSARY its v0.30 vocabulary; committed the archive
+move as its own commit so the reset and the work on top of it stay separable.
+Executed M0a/M0-ADR and built M1's gate (the KL selector + eval harness) with
+the threshold pre-registered before any number existed. The judgment worth
+inheriting: the harness recomputes `df`/`n`/field lengths **from the pruned
+postings**, because borrowing the baseline's statistics would have measured a
+system nobody is going to ship.
 · Claude Opus 4.8, 2026-07-24 — phase 7 M1: Arpit **reopened Option B** on the
 orbit corpus's evidence (8/12 inversions; 5 of 6 annotated docs still outranking
 their replacement). Amended the supersession compare-doc verdict — A stands, B
