@@ -106,6 +106,33 @@ def document_term_frequencies(files: dict[str, dict]) -> dict[str, dict[str, int
     return doc_tf
 
 
+def document_field_counts(files: dict[str, dict]) -> dict[str, object]:
+    """Per-document, per-field term counts — the selector's view of the corpus.
+
+    Aggregates each document's chunks into one field triple, because production
+    prunes a *document's* index entry, not a chunk's. Path tokens are counted
+    once per document for the same reason they are in
+    ``document_term_frequencies``: they describe the document, not each of its
+    slices.
+    """
+    from .selector import FieldCounts
+
+    out: dict[str, object] = {}
+    for rel in sorted(files):
+        meta = files[rel]
+        heading: dict[str, int] = {}
+        body: dict[str, int] = {}
+        path = dict(Counter(path_tokens(rel)))
+        title = meta.get("title", "")
+        for chunk in meta["chunks"]:
+            for term, count in Counter(tokenize(chunk["heading"]) + tokenize(title)).items():
+                heading[term] = heading.get(term, 0) + count
+            for term, count in Counter(tokenize(chunk["text"])).items():
+                body[term] = body.get(term, 0) + count
+        out[rel] = FieldCounts(heading, path, body)
+    return out
+
+
 def collection_model_for(doc_tf: dict[str, dict[str, int]]) -> CollectionModel:
     """``P(t|C)`` over the **unpruned** corpus, in deterministic document order."""
     return build_collection_model(doc_tf[rel] for rel in sorted(doc_tf))

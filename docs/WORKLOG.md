@@ -19,6 +19,43 @@ diary.*
 
 ---
 
+## 2026-08-09 — pruning-criterion research → compare doc + M1-rerun package  ·  Cowork
+- **Asked:** explain ADR-0017 in plain terms and propose what to do; then
+  "is there a better way than just picking 128 words"; then "why not a
+  combination / multiple properties in the index"; then write it and give
+  the prompt; then worked before/after examples of the index rows.
+- **Also did (same exchange):** added **§7a Worked examples** to
+  `compare/pruning-criterion.compare.md` — three before/after index views
+  in the committed-row format: (1) `webhooks.md` at k=64 losing `webhook`
+  from its own postings vs A+B+C keeping it at *tighter* retention,
+  (2) a 1 850-term document showing fixed-k ≈ retention on long docs (the
+  budget only matters on short ones) and Rule C legitimately exceeding the
+  budget — hence the δ-matching requirement, (3) the **term-major** view,
+  where the postings list for `webhook` has lost every document actually
+  about webhooks until the sweep restores them, with `df` recomputed after.
+  Marked illustrative-not-measured; intended as a shape the executing agent
+  can check its output against.
+- **Did:** researched the criterion question (Carmel term-centric; Bilkent
+  TOIS combination study; Mackenzie SIGIR '24 on re-rank pipelines;
+  BitFunnel space numbers; learned-sparse). Wrote
+  `compare/pruning-criterion.compare.md` (§humans + §agents, verdict-first,
+  implementation contract in §7), `proposals/query-log-pruning.md`, and the
+  **M1-rerun handoff + prompt**. Synced compare/proposals/handoff READMEs,
+  OPEN-WORK (W-13 respecified, W-14 added).
+- **Decided / open (proposed, measured by W-13):** three amendments —
+  **(1) gate on recall@20**, not index hit@5: the index is a candidate
+  generator feeding fetch-and-re-score, and published work says re-rank
+  pipelines absorb pruning's recall loss; **(2) combined selector A+B+C** —
+  heading spine ∪ impact budget ∪ per-term backstop — because KL penalises
+  terms common across a homogeneous collection (the `webhook`/`webhooks.md`
+  failure) and combinations measure ~2× single criteria; **(3) adaptive
+  retention budget**, not fixed k. Ruled out on arithmetic: a Bloom
+  "recall insurance" plane (~2.4 GB @1M — BitFunnel's own numbers).
+  Fallback if pruning fails entirely: index ≈ 0.6–1.5 GB, partial clone +
+  external-shards-only become mandatory.
+- **Next:** Arpit rules on W-05, then run the M1-rerun prompt (**Opus
+  throughout** — the last run failed at measurement design, not coding).
+
 ## 2026-08-09 — M0a + ADR-0016 + M1 executed: the gate ran  ·  Claude Code
 - **Asked:** execute the M0/M1 handoff phase by phase without pausing.
 - **Did:**

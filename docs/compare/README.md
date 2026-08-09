@@ -14,6 +14,7 @@ debate without archaeology. v0.26-era compare docs are archived at
 | [meta-privacy](meta-privacy.compare.md) | plain vs hashed-default vs hashed-only meta | **hashed-by-default for external sources** | ✅ accepted (council) |
 | [cache-policy](cache-policy.compare.md) | LRU vs ARC | **ARC** | ✅ accepted |
 | [ingest-mode-naming](ingest-mode-naming.compare.md) | "extracted" vs "enriched" vs "advanced" for the AI tier | **enriched** (proposed) | ⏳ awaiting Arpit |
+| [pruning-criterion](pruning-criterion.compare.md) | KL vs impact vs term-centric vs combined; fixed k vs adaptive retention; index-hit@5 vs candidate-recall as the gate | **combined A+B+C, adaptive budget, recall@20 gate** (proposed) | ⏳ decided by the M1 re-run |
 
 Convention: `> **Verdict:**` blockquote first, then Context → Options →
 Matrix → Consequences → References → Reopen-trigger. Docs here are compact;

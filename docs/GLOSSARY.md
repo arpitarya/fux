@@ -83,9 +83,10 @@ size model assumes (paper Figure 4).
 
 **Edge grade (EXTRACTED / INFERRED)** — The archived link-graph vocabulary,
 ported at [M3](PLAN.md): `EXTRACTED` = deterministically parsed from the
-document, `INFERRED` = model- or heuristic-derived and ranked below it. **Note
-the collision:** these grades map *opposite* to the ingest-mode words, which
-is exactly what [ADR-0016](adr/0016-ingest-mode-naming.md) exists to resolve.
+document, `INFERRED` = model- or heuristic-derived and ranked below it. Since
+[ADR-0016](adr/0016-ingest-mode-naming.md)'s amendment these **agree** with the
+[ingest modes](#extracted-mode) rather than contradicting them: `extracted`
+means "no model" on both sides, and `enriched` sits with `INFERRED`.
 
 **Elias-Fano** — Quasi-succinct encoding of a monotone integer sequence; used
 for the `D/` dictionary's offset array. Ottaviano & Venturini, SIGIR 2014
@@ -96,8 +97,21 @@ expansion, model-inferred edges, summaries. Two rules keep the laws intact —
 outputs are **pinned** into the index with provenance and re-read forever
 (never re-generated on a query path), and they carry a grade below
 deterministic signal wherever they compete. Contrast
-[inferred mode](#inferred-mode). Named by
+[extracted mode](#extracted-mode). Named by
 [ADR-0016](adr/0016-ingest-mode-naming.md); deferred to [M8](PLAN.md).
+
+**Extracted mode** — The **default** ingest tier: `$0`, offline, stdlib,
+deterministic — conversion, chunking, term selection, static-table embedding
+codes, edge extraction. Everything is *taken from* the document; nothing is
+invented. Byte-reproducible, and the mode every guarantee in the paper is
+stated for. Contrast [enriched mode](#enriched-mode). ⏳ *Name proposed, not
+yet ratified.*
+
+**Renamed from `inferred`** by [ADR-0016](adr/0016-ingest-mode-naming.md)'s
+amendment: `INFERRED` is the [edge grade](#edge-grade-extracted--inferred) for
+*model-derived*, so calling the no-model tier `inferred` reproduced the exact
+collision the ADR existed to remove. `inferred` survives only in the frozen
+archived *fidelity* vocabulary and is **not** a valid v0.30 mode value.
 
 **Eval corpora (the three)** — What [P1](#p-predictions-p1p7) is measured on:
 **acme** (929 docs, 59 committed Q→doc pairs, payments domain), **orbit**
@@ -138,12 +152,6 @@ approximation for a large size win and a cheaper query loop.
 commits is an **index** — statistics that make documents *findable*. It is not
 a database, because it does not hold the content. Say "index"; do not say
 "db", "store", or "substrate" for the committed artifact.
-
-**Inferred mode** — The **default** ingest tier: `$0`, offline, stdlib,
-deterministic — [KL term selection](#kl-term-selection), YAKE-class phrases,
-static-table embedding codes, edge extraction. Byte-reproducible, and the mode
-every guarantee in the paper is stated for. Contrast
-[enriched mode](#enriched-mode).
 
 **Inflation** — The one-time wire → runtime conversion run by git hooks after
 clone/merge/checkout: decodes the committed [wire format](#wire-format) into

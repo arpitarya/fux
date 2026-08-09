@@ -30,6 +30,19 @@ P1, but it is an extrapolation, not a measurement, and it is labelled as one.
 overrule and proceed. The scaffold (W-01) stays blocked either way until he
 rules.
 
+**The re-run is designed and packaged** (2026-08-09), and it changed more
+than the corpus. Research into the criterion produced three amendments, held
+in [`compare/pruning-criterion.compare.md`](compare/pruning-criterion.compare.md):
+*(a)* the gate metric moves from the index's own hit@5 to **recall@20 of the
+candidate set**, because the index feeds a fetch-and-re-score stage and is a
+candidate generator, not the final ranker — published work finds re-rank
+pipelines absorb pruning's recall loss; *(b)* the criterion opens to five
+arms, since KL divergence structurally deletes a homogeneous corpus's subject
+terms (it dropped `webhook` from `webhooks.md`) and a per-term backstop fixes
+that by construction; *(c)* the budget becomes **retention-based**, so "keep
+the top k" stops meaning different things on short and long documents.
+Handoff and prompt are ready under [`handoff/`](handoff/README.md).
+
 **Decided and closed** (see [`compare/`](compare/README.md)): the
 architecture (index-and-refer), the wire/runtime format split (BIC +
 byte-aligned mmap), one MST keyspace, hashed-by-default meta, ARC cache.
@@ -78,7 +91,8 @@ table + WORKLOG in every change; never start M2+ while `P1.status != PASS`.
 | W-02 | M0-ADR 0016: ingest-mode naming | **DONE (proposed)** · human-gate open | W-00 | ADR written; `status: proposed` recommending `enriched` — Arpit has not ratified, so both ADR and compare doc stay ⏳ | [ADR-0016](adr/0016-ingest-mode-naming.md) |
 | W-04 | M1 KL selector + eval harness (archived engine = baseline; `tools/pruning-eval/`) | **DONE** 2026-08-09 | W-03 | 23 tests green; fixture+acme+orbit+synth-100k run; k=∞≡baseline and byte-identical re-run both verified | [tools/pruning-eval/](../tools/pruning-eval/README.md) |
 | W-05 | M1 ADR-0017: P1 numbers + ship/kill verdict + conformance filing | **MEASURED · verdict = INCONCLUSIVE** · awaiting Arpit | W-04 | verdict vs **pre-registered** threshold; evidence reproduces | [ADR-0017](adr/0017-pruning-eval-gate.md) |
-| W-13 | **Re-run P1 on a long-document corpus** with a fresh pre-registration (retention-based, not absolute k) | OPEN·**next** | W-05 | a corpus reaching ~6 % term retention; P1 answered in some direction | [ANALYSIS §changes 3–4](conformance/2026-08-09-pruning-eval/ANALYSIS.md) |
+| W-13 | **M1-rerun: make P1 decidable** — long-doc corpus (RFCs + repo docs), 5 selector arms (KL / impact / A+B / **A+B+C** / none) at matched retention 6·15·30 %, **recall@20** as the gate | OPEN·**next** · handoff ready | W-05 | corpus gate (median ≥ 500 distinct terms) passes; retention matched ±1 pt; ADR-0018 states PASS/PARTIAL/FAIL/VOID against a frozen pre-registration | [handoff](handoff/v0.30.0-m1-rerun-handoff.md) · [prompt](handoff/v0.30.0-m1-rerun-prompt.md) · [compare](compare/pruning-criterion.compare.md) |
+| W-14 | Ratify or amend `compare/pruning-criterion.compare.md` after W-13 | OPEN | W-13 | verdict block reflects measured outcome | compare/pruning-criterion |
 | W-01 | M0b scaffold: src skeleton, pyproject 0.30.0.dev0, CHANGELOG, CI paths | **BLOCKED** | **W-05 = PASS** (not granted) | `fux --version` runs | PLAN §M0b |
 | W-06 | M2 MST store + ledger + join | OPEN | W-05=PASS | order-independence ×1000; join CAI props; ≤12 MB @100k | PLAN §M2 |
 | W-07 | M3 wire planes P/D/V/E/M + hashed-meta enforcement + `mode=skip` | OPEN | W-06 | round-trips; ≤30 MB @100k (P2/10) | PLAN §M3, compare/meta-privacy |

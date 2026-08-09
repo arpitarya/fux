@@ -75,7 +75,7 @@ carried:
 | module | used by | port in |
 |---|---|---|
 | frontmatter parser | ledger, snapshot mode | M2 |
-| converters (inferred/advanced tiers) | ingest (transient now) | M1 |
+| converters (archived `fidelity: inferred/advanced` tiers) | ingest (transient now) | M1 |
 | chunker (heading-aware) | passage re-score | M5 |
 | BM25F scoring math + exact-df discipline (ADR-0008) | kernel | M4 |
 | RRF fusion (k=60, ADR-0007) | kernel | M4 |
@@ -121,9 +121,11 @@ gate) → M0b (scaffold, only on PASS)**. The live spec for all of it is
 (proposed as a diff, never auto-applied); GLOSSARY given the v0.30
 vocabulary; INTERVIEW gains a reset entry; DOC-REGISTRY's two ⚠ rows
 cleared; OPEN-WORK statuses updated. **ADR-0016: the ingest-mode naming
-decision** ("inferred" stays; the AI tier named — resolve the
-EXTRACTED/INFERRED edge-grade collision by Arpit's call;
-`enriched` recommended).
+decision** — resolve the EXTRACTED/INFERRED edge-grade collision by Arpit's
+call. **Amended 2026-08-09:** both tiers are renamed, not one —
+`extracted` (no model) + `enriched` (model-assisted), which makes the mode
+words *agree* with the ported edge grades instead of merely avoiding them.
+`inferred` is retired as a mode word.
 
 **M0b deliverables (only if P1 = PASS).** New `src/fux/` skeleton (`cli.py`, `errors.py`, package
 layout mirroring the five planes: `keyspace/`, `wire/`, `runtime/`,

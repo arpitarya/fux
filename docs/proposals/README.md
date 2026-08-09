@@ -26,6 +26,7 @@ commitment; everything here is findable.
 * [MCP as the adapter endgame](mcp-adapters.md) - one protocol instead of per-app adapters; org's own auth. Graduates on the first MCP-gateway design partner or a fourth adapter request.
 * [Knowledge CI](knowledge-ci.md) - PRs fail when the index is stale; decisions the diff contradicts surface as cited review comments. Graduates after M6 dogfoods green two weeks.
 * [Wavelet-tree self-index](wavelet-self-index.md) - research note preserving the rejected option C of the keyspace compare; reopens only on a law change or a P5 bottleneck.
+* [Query-log-informed pruning](query-log-pruning.md) - "query views" were the strongest strategy in the pruning literature (+44–127 %); a per-repo agent query log is an asset Fux gets for free. Graduates post-M7, once real usage exists. Carries a privacy decision (committed vs local).
 
 **Carried over — architecture-agnostic survivors:**
 

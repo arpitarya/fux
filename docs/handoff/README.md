@@ -11,10 +11,18 @@ with their ADRs linked.
 
 | pair | milestone | model | status |
 |------|-----------|-------|--------|
-| [handoff](v0.30.0-m0-m1-gate-handoff.md) · [prompt](v0.30.0-m0-m1-gate-prompt.md) | M0 hygiene + ADR-0016 + **M1 the pruning gate** (+ M0b scaffold on PASS) | Sonnet build · **Opus verdict** | ready |
+| [handoff](v0.30.0-m0-m1-gate-handoff.md) · [prompt](v0.30.0-m0-m1-gate-prompt.md) | M0 hygiene + ADR-0016 + M1 the pruning gate | Sonnet build · Opus verdict | **executed** 2026-08-09 → [ADR-0016](../adr/0016-ingest-mode-naming.md), [ADR-0017](../adr/0017-pruning-eval-gate.md) (INCONCLUSIVE) |
+| [handoff](v0.30.0-m1-rerun-handoff.md) · [prompt](v0.30.0-m1-rerun-prompt.md) | **M1-rerun — make P1 decidable** (long-doc corpus, 5 selector arms, retention-matched, recall@20 gate) | **Opus throughout** | ready · **next** |
 
-**Note on this pair:** its debate gate amended `PLAN.md`'s sequencing —
+**Note on the first pair:** its debate gate amended `PLAN.md`'s sequencing —
 the package scaffold moved *after* the M1 gate, because scaffolding an
 architecture that P1 may falsify is the failure the council's pre-mortem
-seat named. PLAN §M0/§M1 and OPEN-WORK W-01…W-05 reflect the corrected
-order.
+seat named. That call paid: P1 came back INCONCLUSIVE and no orphan
+scaffold exists.
+
+**Note on the second pair:** its gate found that a naive re-run would have
+repeated the same design on a better corpus — measuring the index's own
+hit@5, when the index is a candidate generator feeding a re-score stage.
+The metric moved to recall@20, the criterion opened to five arms, and the
+budget became retention-based. See
+[`../compare/pruning-criterion.compare.md`](../compare/pruning-criterion.compare.md).

@@ -222,7 +222,99 @@ def prepare(name: str, work: Path, *, synth_docs: int = 100_000, seed: int = 0) 
                       note=f"{synth_docs} generated documents; no human relevance "
                            "judgments — gold is the baseline arm's top-1 (fidelity)")
 
+    if name == "rfc":
+        return _prepare_rfc(root)
+
+    if name == "repodocs":
+        return _prepare_repodocs(root)
+
     raise SystemExit(f"unknown corpus {name!r}")
 
 
-CORPORA = ("fixture", "acme", "orbit", "synth")
+# -- the long-document corpora (M1-rerun) ----------------------------------
+
+RFC_LAB = LAB / "rfc"
+
+
+def _prepare_rfc(root: Path) -> Corpus:
+    """The RFC corpus — acquired once by `fetch_rfc.py`, verified by manifest.
+
+    Nothing here touches the network: acquisition is a separate, explicit lab
+    step, and this function fails loudly rather than silently fetching or
+    silently substituting.
+    """
+    src = RFC_LAB / "corpus"
+    manifest_path = RFC_LAB / "manifest.json"
+    if not manifest_path.is_file():
+        raise SystemExit(
+            f"no RFC corpus at {RFC_LAB} — acquire it first:\n"
+            f"  archive/v0.26/.venv/bin/python tools/pruning-eval/fetch_rfc.py "
+            f"--out {RFC_LAB}"
+        )
+    manifest = json.loads(manifest_path.read_text())
+    if not (root / ".fux").exists():
+        _copy_corpus(src, root)
+        _run_cli(root, "setup", "-y", "--docs", "docs")
+        _run_cli(root, "ingest")
+    return Corpus("rfc", root, [], gating=True, gold_source="eval-set",
+                  note=f"{len(manifest)} RFCs, manifest-pinned; long technical prose")
+
+
+def verify_rfc_manifest(sample: int = 0) -> tuple[int, int]:
+    """``(checked, mismatched)`` — the corpus is what the manifest says it is."""
+    import hashlib
+
+    manifest = json.loads((RFC_LAB / "manifest.json").read_text())
+    keys = sorted(manifest)
+    if sample:
+        keys = keys[:: max(1, len(keys) // sample)]
+    bad = 0
+    for key in keys:
+        path = RFC_LAB / "corpus" / "docs" / f"{key}.txt"
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != manifest[key]:
+            bad += 1
+    return len(keys), bad
+
+
+# The repo's own long-form documentation — the actual target domain. Small, but
+# a disagreement between it and the RFCs is itself a finding (register and
+# homogeneity differ in exactly the way that matters).
+_REPODOC_ROOTS = (
+    ("docs", "docs"),
+    ("archive/v0.26/archive/v0.26-docs", "v026docs"),
+    ("archive/v0.26/archive", "v026handoffs"),
+    ("archive/v0.26/conformance", "v026conformance"),
+    ("archive/v0.26/proposals", "v026proposals"),
+    ("archive/v0.1/docs", "v01docs"),
+)
+
+
+def _prepare_repodocs(root: Path) -> Corpus:
+    if not (root / ".fux").exists():
+        if root.exists():
+            shutil.rmtree(root)
+        docs = root / "docs"
+        docs.mkdir(parents=True)
+        seen = 0
+        for rel, prefix in _REPODOC_ROOTS:
+            base = REPO / rel
+            if not base.is_dir():
+                continue
+            for path in sorted(base.rglob("*.md")):
+                # Flatten, keeping provenance in the name so a gold label is
+                # traceable back to the source document.
+                flat = f"{prefix}__{path.relative_to(base).as_posix().replace('/', '__')}"
+                target = docs / flat
+                if target.exists():
+                    continue
+                target.write_bytes(path.read_bytes())
+                seen += 1
+        if not seen:
+            raise SystemExit("no repo docs found — check _REPODOC_ROOTS")
+        _run_cli(root, "setup", "-y", "--docs", "docs")
+        _run_cli(root, "ingest")
+    return Corpus("repodocs", root, [], gating=True, gold_source="eval-set",
+                  note="the repo's own long-form docs — small, but the actual target domain")
+
+
+CORPORA = ("fixture", "acme", "orbit", "synth", "rfc", "repodocs")
