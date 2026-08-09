@@ -35,10 +35,16 @@ Measured **before** any arm ran (`corpus_gate.py`):
 
 | corpus | documents | median | p90 | p99 | max | terms kept @6 % (median doc) | gate |
 |---|---|---|---|---|---|---|---|
-| **rfc** | ~9 500 | *(measured at run time; documents are 10³–10⁴ words)* | | | | | **gating** |
+| **rfc** | **8 872** | **967** | 1 850 | 3 236 | 28 461 | 58 | **PASS — the gating corpus** |
 | repodocs | 201 | **425** | 867 | 1 917 | 3 140 | 26 | **FAIL — not gating** |
 | acme | 877 | 32 | 81 | 156 | 407 | 8 | FAIL — not gating |
 | orbit | 892 | 36 | 89 | 150 | 432 | 8 | FAIL — not gating |
+
+**The RFC corpus clears the gate with room to spare** and sits in the regime the
+paper's size model assumes: a median document carries 967 distinct terms, so a
+6 % budget keeps 58 of them and discards 94 %. That is a real treatment — the
+thing ADR-0017's corpora could not deliver. Corpus integrity verified: 8 872
+documents, 0 sha256 mismatches against the manifest.
 
 **This resolves handoff §10's open question mechanically, not by preference.**
 "Both must pass" was the recommended weighting; `repodocs` fails the corpus

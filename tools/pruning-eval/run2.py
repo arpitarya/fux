@@ -78,7 +78,13 @@ def measure(searcher, queries, golds) -> dict[str, int | None]:
 
 def slice_metrics(ranks: dict[str, int | None], keys: list[str]) -> dict:
     values = [ranks[k] for k in keys]
-    body = {f"recall@{GATE_DEPTH}": recall_at(values, GATE_DEPTH), "n": len(values)}
+    gate = recall_at(values, GATE_DEPTH)
+    # Binomial standard error, in points. The gate is a 2-pt threshold, so a
+    # reader must be able to see whether 2 pts is distinguishable from noise at
+    # this sample size. Reported, never used to move the threshold.
+    n = len(values)
+    se = round(100 * ((gate * (1 - gate) / n) ** 0.5), 3) if n else 0.0
+    body = {f"recall@{GATE_DEPTH}": gate, "n": n, "se_pts": se}
     for d in DIAGNOSTIC_DEPTHS:
         body[f"recall@{d}"] = recall_at(values, d)
     body.update({k: v for k, v in metrics.score_queries(values).items() if k != "n"})

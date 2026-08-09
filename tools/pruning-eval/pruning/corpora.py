@@ -255,6 +255,12 @@ def _prepare_rfc(root: Path) -> Corpus:
     if not (root / ".fux").exists():
         _copy_corpus(src, root)
         _run_cli(root, "setup", "-y", "--docs", "docs")
+        # The archived converter truncates at `[ingest] max_kb` (default 256).
+        # This corpus exists precisely because its documents are long, so
+        # truncating them would cap the vocabulary the experiment is about.
+        cfg = root / "fux.toml"
+        cfg.write_text(cfg.read_text().replace("max_kb = 256", "max_kb = 4096"),
+                       encoding="utf-8")
         _run_cli(root, "ingest")
     return Corpus("rfc", root, [], gating=True, gold_source="eval-set",
                   note=f"{len(manifest)} RFCs, manifest-pinned; long technical prose")

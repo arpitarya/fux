@@ -1,0 +1,74 @@
+[
+  {
+    "corpus": "rfc",
+    "docs_below_gate_pct": 9.9,
+    "documents": 8872,
+    "median_gate": 500,
+    "note": "8872 RFCs, manifest-pinned; long technical prose",
+    "passes_gate": true,
+    "terms_kept_at_6pct_median": 58,
+    "vocabulary": {
+      "max": 28461,
+      "mean": 1113.09,
+      "median": 967,
+      "min": 18,
+      "n": 8872,
+      "p90": 1850,
+      "p99": 3236
+    }
+  },
+  {
+    "corpus": "repodocs",
+    "docs_below_gate_pct": 58.7,
+    "documents": 201,
+    "median_gate": 500,
+    "note": "the repo's own long-form docs \u2014 small, but the actual target domain",
+    "passes_gate": false,
+    "terms_kept_at_6pct_median": 26,
+    "vocabulary": {
+      "max": 3140,
+      "mean": 507.75,
+      "median": 425,
+      "min": 70,
+      "n": 201,
+      "p90": 867,
+      "p99": 1917
+    }
+  },
+  {
+    "corpus": "acme",
+    "docs_below_gate_pct": 100.0,
+    "documents": 877,
+    "median_gate": 500,
+    "note": "realistic generated repo; committed human-authored pairs",
+    "passes_gate": false,
+    "terms_kept_at_6pct_median": 8,
+    "vocabulary": {
+      "max": 407,
+      "mean": 41.95,
+      "median": 32,
+      "min": 4,
+      "n": 877,
+      "p90": 81,
+      "p99": 156
+    }
+  },
+  {
+    "corpus": "orbit",
+    "docs_below_gate_pct": 100.0,
+    "documents": 892,
+    "median_gate": 500,
+    "note": "realistic generated repo; committed human-authored pairs",
+    "passes_gate": false,
+    "terms_kept_at_6pct_median": 8,
+    "vocabulary": {
+      "max": 432,
+      "mean": 42.63,
+      "median": 36,
+      "min": 4,
+      "n": 892,
+      "p90": 89,
+      "p99": 150
+    }
+  }
+]

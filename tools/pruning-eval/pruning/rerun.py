@@ -146,7 +146,8 @@ def prepare_models(
     # Every δ up to the requested one, so a cell can step down when the sweep
     # alone would blow the retention rung. Nested by construction: the top-δ
     # documents for δ=1 are a prefix of those for δ=3.
-    sweep_by_delta = {d: _sweep_additions(impact_by_doc, d) for d in range(0, delta + 1)}
+    sweep_by_delta = _sweep_additions_upto(impact_by_doc, delta)
+    del impact_by_doc  # ~1 GB at 10⁴ long documents; the sweeps are what we keep
     return PreparedCorpus(docs, collection, spine, order, vocab, total_postings,
                           sweep_by_delta, delta)
 
@@ -179,25 +180,36 @@ def _raw_count(doc: DocumentModel, term: str) -> int:
     return f.heading.get(term, 0) + f.path.get(term, 0) + f.body.get(term, 0)
 
 
-def _sweep_additions(impact_by_doc: dict[str, dict[str, float]], delta: int) -> dict[str, set[str]]:
-    """**Rule C**, precomputed: each term's top-δ documents by impact.
+def _sweep_additions_upto(
+    impact_by_doc: dict[str, dict[str, float]], max_delta: int
+) -> dict[int, dict[str, set[str]]]:
+    """**Rule C**, precomputed for every δ ≤ ``max_delta`` in a single pass.
 
-    Independent of any budget — a term's best documents are a property of the
-    corpus — so this is computed once and reused across every rung. Ordering is
-    ``(-impact, doc_id)``, which is what makes the sweep order-independent.
+    A term's best documents are a property of the corpus, not of any budget, so
+    this is computed once and reused across every rung. The δ=1 sweep is a
+    prefix of the δ=2 sweep and so on, which is why one ranking serves them all
+    — recomputing per δ would quadruple the cost on a 10⁴-document corpus for
+    no new information.
+
+    Ordering is ``(-impact, doc_id)``: that tie-break is what makes the sweep
+    order-independent, and it is asserted by a test rather than assumed.
     """
-    if delta <= 0:
-        return {}
+    if max_delta <= 0:
+        return {0: {}}
     by_term: dict[str, list[tuple[float, str]]] = {}
     for doc_id in sorted(impact_by_doc):
         for term, score in impact_by_doc[doc_id].items():
-            bucket = by_term.setdefault(term, [])
-            bucket.append((score, doc_id))
-    out: dict[str, set[str]] = {}
+            by_term.setdefault(term, []).append((score, doc_id))
+
+    out: dict[int, dict[str, set[str]]] = {d: {} for d in range(max_delta + 1)}
     for term in sorted(by_term):
-        ranked = sorted(by_term[term], key=lambda si: (-si[0], si[1]))
-        for _score, doc_id in ranked[:delta]:
-            out.setdefault(doc_id, set()).add(term)
+        bucket = by_term[term]
+        # Only the top max_delta matter; a full sort of a long posting list is
+        # wasted work when max_delta is 3.
+        top = sorted(bucket, key=lambda si: (-si[0], si[1]))[:max_delta]
+        for rank, (_score, doc_id) in enumerate(top, start=1):
+            for d in range(rank, max_delta + 1):
+                out[d].setdefault(doc_id, set()).add(term)
     return out
 
 
