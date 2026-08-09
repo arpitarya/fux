@@ -1,0 +1,43 @@
+{
+  "corpus": "rfc",
+  "documents": 8872,
+  "impact_top6pct_composition": {
+    "body_only_terms": 125630,
+    "documents_sampled": 2000,
+    "heading_field_terms": 2112,
+    "heading_share": 0.0165
+  },
+  "kl_top6pct_composition": {
+    "body_only_terms": 125120,
+    "heading_field_terms": 2622,
+    "heading_share": 0.0205
+  },
+  "rungs": {
+    "0.06": {
+      "calibrated_share": 0.058594,
+      "documents_whose_spine_fills_the_budget": 1,
+      "pct": 0.01,
+      "spine_share_of_budget": 0.0223
+    },
+    "0.15": {
+      "calibrated_share": 0.148438,
+      "documents_whose_spine_fills_the_budget": 0,
+      "pct": 0.0,
+      "spine_share_of_budget": 0.0089
+    },
+    "0.3": {
+      "calibrated_share": 0.300781,
+      "documents_whose_spine_fills_the_budget": 0,
+      "pct": 0.0,
+      "spine_share_of_budget": 0.0044
+    }
+  },
+  "spine_share_of_vocabulary": 0.0013,
+  "spine_size": {
+    "max": 113,
+    "mean": 1.47,
+    "median": 1,
+    "p90": 1,
+    "p99": 13
+  }
+}

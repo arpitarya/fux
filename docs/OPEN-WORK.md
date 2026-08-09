@@ -11,37 +11,34 @@ humans first, agents second.*
 ## §1 · For humans — where the rebuild stands
 
 **One paragraph.** The v0.26 engine is archived; the index-and-refer
-architecture is decided through six compare docs; nothing of v0.30 is built,
-**and the plan is paused at its first gate.** M0a (doc hygiene) and ADR-0016
-(naming, proposed) are done. **M1 — the pruning eval the whole architecture is
-gated on — ran, and came back INCONCLUSIVE:** the pre-registered bar was met
-(Δ hit@5 = 0.00 pts at k=128 on all three corpora), but top-128 pruning touched
-only 0–2.5 % of documents and left 96–100 % of postings in place, because these
-corpora's documents hold 32–46 distinct terms where the size model assumes
-~2 000. Nothing was actually tested. **Nothing further gets built until P1 is
-re-run on a long-document corpus** — see
-[ADR-0017](adr/0017-pruning-eval-gate.md).
+architecture is decided through seven compare docs; nothing of v0.30 is built,
+**and the plan is stopped at its first gate.** M0a (doc hygiene) and ADR-0016
+(naming, proposed) are done. **P1 — the pruning claim the whole size story rests
+on — has now been measured properly, and it FAILED.**
 
-**The one number that is real:** at k=64 — still ten times milder than the
-production setting — acme loses **9.1 points** of hit@5. That points against
-P1, but it is an extrapolation, not a measurement, and it is labelled as one.
+On 8 872 RFCs (median 967 distinct terms per document — the regime the paper
+assumes), the best of four pruning selectors reaches **recall@20 = 0.627**
+against an unpruned ceiling of **0.986** at the 6 % retention the size model
+needs. That is **35.9 points** short of a **2-point** bar, and still 12.7 points
+short at 30 % retention. Every validity check passed, so the run is evidence.
+→ [ADR-0018](adr/0018-pruning-criterion-rerun.md).
 
-**Arpit's call, pending:** accept INCONCLUSIVE and fund the re-run (W-13), or
-overrule and proceed. The scaffold (W-01) stays blocked either way until he
-rules.
+**What this does and does not kill.** Index-and-refer is *not* falsified —
+ranking from a committed index and fetching content from the systems that own it
+is untouched. What is falsified is that the index can be made ~16× smaller **by
+discarding postings**. The committed footprint goes from ~250 MB to **0.6–1.5 GB**
+at 10⁶ documents, and partial clone plus external-shards-only committing stop
+being optional. Whether it is still worth building at that size is Arpit's call.
 
-**The re-run is designed and packaged** (2026-08-09), and it changed more
-than the corpus. Research into the criterion produced three amendments, held
-in [`compare/pruning-criterion.compare.md`](compare/pruning-criterion.compare.md):
-*(a)* the gate metric moves from the index's own hit@5 to **recall@20 of the
-candidate set**, because the index feeds a fetch-and-re-score stage and is a
-candidate generator, not the final ranker — published work finds re-rank
-pipelines absorb pruning's recall loss; *(b)* the criterion opens to five
-arms, since KL divergence structurally deletes a homogeneous corpus's subject
-terms (it dropped `webhook` from `webhooks.md`) and a per-term backstop fixes
-that by construction; *(c)* the budget becomes **retention-based**, so "keep
-the top k" stops meaning different things on short and long documents.
-Handoff and prompt are ready under [`handoff/`](handoff/README.md).
+**The best remaining argument that this is too harsh** is the query workload:
+the eval asks the index to find a document from a verbatim 8–16 token sentence
+out of it, which is close to a worst case. Real agent queries are short and
+salient — made of exactly the terms pruning keeps. Testing that is **W-15**, the
+next move, and it is the one thing that could reasonably overturn the verdict.
+
+**Arpit's call, pending:** accept the FAIL and fund W-15, or overrule. **W-01
+(the scaffold) stays blocked** either way — the pre-registered PASS condition
+was not met.
 
 **Decided and closed** (see [`compare/`](compare/README.md)): the
 architecture (index-and-refer), the wire/runtime format split (BIC +
@@ -49,16 +46,18 @@ byte-aligned mmap), one MST keyspace, hashed-by-default meta, ARC cache.
 
 **Open decisions** (need Arpit):
 
-1. **P1's INCONCLUSIVE verdict** — accept and fund the long-document re-run
-   (W-13), or overrule. [ADR-0017](adr/0017-pruning-eval-gate.md) states the
-   case; the threshold was **not** moved.
+1. **P1's FAIL** ([ADR-0018](adr/0018-pruning-criterion-rerun.md)) — accept and
+   fund the realistic-query re-measurement (W-15), or overrule. The threshold
+   was **not** moved. The earlier INCONCLUSIVE run
+   ([ADR-0017](adr/0017-pruning-eval-gate.md)) stands as the record of the
+   refusal that produced this one.
 2. **Ingest-mode naming** — `enriched` recommended over his original
    `extracted` ([why](compare/ingest-mode-naming.compare.md));
    [ADR-0016](adr/0016-ingest-mode-naming.md) is written and waiting to flip
    from `proposed` to `accepted`.
-3. **CLAUDE.md rewrite** — [`../CLAUDE.md.proposed`](../CLAUDE.md.proposed) +
-   [diff](handoff/v0.30.0-claude-md.diff), proposed not applied. Adopt with
-   `git mv`.
+3. ~~**CLAUDE.md rewrite**~~ — **adopted** (the [diff](handoff/v0.30.0-claude-md.diff)
+   is kept for the record); ingest-mode names since synced to ADR-0016's
+   amendment.
 
 **Closed since the last revision:** ~~top-64 vs top-128~~ — **decided negative**
 by M1 (acme −9.09 pts at k=64, 3× the hard bar); ~~git commit of the reset~~ —
@@ -91,9 +90,12 @@ table + WORKLOG in every change; never start M2+ while `P1.status != PASS`.
 | W-02 | M0-ADR 0016: ingest-mode naming | **DONE (proposed)** · human-gate open | W-00 | ADR written; `status: proposed` recommending `enriched` — Arpit has not ratified, so both ADR and compare doc stay ⏳ | [ADR-0016](adr/0016-ingest-mode-naming.md) |
 | W-04 | M1 KL selector + eval harness (archived engine = baseline; `tools/pruning-eval/`) | **DONE** 2026-08-09 | W-03 | 23 tests green; fixture+acme+orbit+synth-100k run; k=∞≡baseline and byte-identical re-run both verified | [tools/pruning-eval/](../tools/pruning-eval/README.md) |
 | W-05 | M1 ADR-0017: P1 numbers + ship/kill verdict + conformance filing | **MEASURED · verdict = INCONCLUSIVE** · awaiting Arpit | W-04 | verdict vs **pre-registered** threshold; evidence reproduces | [ADR-0017](adr/0017-pruning-eval-gate.md) |
-| W-13 | **M1-rerun: make P1 decidable** — long-doc corpus (RFCs + repo docs), 5 selector arms (KL / impact / A+B / **A+B+C** / none) at matched retention 6·15·30 %, **recall@20** as the gate | OPEN·**next** · handoff ready | W-05 | corpus gate (median ≥ 500 distinct terms) passes; retention matched ±1 pt; ADR-0018 states PASS/PARTIAL/FAIL/VOID against a frozen pre-registration | [handoff](handoff/v0.30.0-m1-rerun-handoff.md) · [prompt](handoff/v0.30.0-m1-rerun-prompt.md) · [compare](compare/pruning-criterion.compare.md) |
-| W-14 | Ratify or amend `compare/pruning-criterion.compare.md` after W-13 | OPEN | W-13 | verdict block reflects measured outcome | compare/pruning-criterion |
-| W-01 | M0b scaffold: src skeleton, pyproject 0.30.0.dev0, CHANGELOG, CI paths | **BLOCKED** | **W-05 = PASS** (not granted) | `fux --version` runs | PLAN §M0b |
+| W-13 | ~~M1-rerun: make P1 decidable~~ **DONE 2026-08-09 → FAIL** — long-doc corpus (RFCs + repo docs), 5 selector arms (KL / impact / A+B / **A+B+C** / none) at matched retention 6·15·30 %, **recall@20** as the gate | **DONE** | W-05 | corpus gate passed (967); retention matched ±0.12 pts; verdict **FAIL** | [handoff](handoff/v0.30.0-m1-rerun-handoff.md) · [prompt](handoff/v0.30.0-m1-rerun-prompt.md) · [compare](compare/pruning-criterion.compare.md) |
+| W-14 | ~~Ratify or amend `compare/pruning-criterion.compare.md`~~ | **DONE (amended)** 2026-08-09 | W-13 | verdict marked ❌ falsified; the metric reframe survives, the selector is untested | compare/pruning-criterion |
+| W-15 | **Re-measure P1 with a realistic query workload** (short, salient, keyword-style — what an agent actually sends), fresh pre-registration | OPEN·**next** | W-13 | the strongest remaining argument that the FAIL is too harsh, tested or refuted | [ADR-0018 §Limitations 1](adr/0018-pruning-criterion-rerun.md) |
+| W-16 | Re-derive paper §5's size model at a retention that holds quality, or at no pruning | OPEN | W-15 | §5 states a measured footprint, not the falsified 6 % assumption | [ADR-0018 §Consequences](adr/0018-pruning-criterion-rerun.md) |
+| W-17 | Test Rule A on a corpus with real headings, judged corpus-wide | OPEN | W-15 | the heading spine accepted or rejected on evidence (RFCs gave it a 1-term spine) | [ADR-0018](adr/0018-pruning-criterion-rerun.md) |
+| W-01 | M0b scaffold: src skeleton, pyproject 0.30.0.dev0, CHANGELOG, CI paths | **BLOCKED** | **P1 = PASS** (measured FAIL) | `fux --version` runs | PLAN §M0b |
 | W-06 | M2 MST store + ledger + join | OPEN | W-05=PASS | order-independence ×1000; join CAI props; ≤12 MB @100k | PLAN §M2 |
 | W-07 | M3 wire planes P/D/V/E/M + hashed-meta enforcement + `mode=skip` | OPEN | W-06 | round-trips; ≤30 MB @100k (P2/10) | PLAN §M3, compare/meta-privacy |
 | W-08 | M4 inflator + segments + MaxScore/Hamming/PPR/RRF kernel + 6 verbs | OPEN | W-07 | ≤150 ms warm rank @100k; new goldens; skip-vs-exhaustive parity | PLAN §M4 |
@@ -106,7 +108,7 @@ table + WORKLOG in every change; never start M2+ while `P1.status != PASS`.
 
 | id | prediction | threshold | status |
 |----|-----------|-----------|--------|
-| P1 | pruning holds quality | Δhit@5 ≤ 2–3 pts @k=128 | **INCONCLUSIVE** (2026-08-09) — Δ = +0.00 pts on all three corpora, i.e. the rule's letter is met, **but** top-128 pruned 2.5 % / 1.6 % / **0.0 %** of documents and retained 96–100 % of postings, so nothing was tested. At k=64, where it bites, acme loses **9.09 pts**. → [ADR-0017](adr/0017-pruning-eval-gate.md) |
+| P1 | pruning holds quality | recall@20 within 2 pts of unpruned @6 % retention | **FAIL** (2026-08-09, re-run) — on 8 872 RFCs (median 967 distinct terms/doc) the best of four selectors is **35.9 pts** below the unpruned index at 6 % retention, and **12.7 pts** below at 30 %. No arm within 2 pts at any rung. The compare doc's prediction was falsified in both halves. → [ADR-0018](adr/0018-pruning-criterion-rerun.md); the earlier INCONCLUSIVE run is [ADR-0017](adr/0017-pruning-eval-gate.md) |
 | P2 | wire ≤ 300 MB @1M | measured | UNMEASURED |
 | P3 | warm answer ≤ 300 ms @1M | measured | UNMEASURED |
 | P4 | cold ≤ 3 s (k=10) | mock bench | UNMEASURED |

@@ -27,6 +27,23 @@ timestamp: 2026-08-09T00:00:00Z
 > 9.09 pts. **Annotated, not reopened**; the verdict holds pending the
 > long-document re-run (W-13). See
 > [ADR-0017](../adr/0017-pruning-eval-gate.md).
+>
+> **⚠ SIZE AMENDMENT (2026-08-09, [ADR-0018](../adr/0018-pruning-criterion-rerun.md)).**
+> The re-run measured P1 properly and it **FAILED**: no pruning criterion came
+> within 2 points of the unpruned index at any retention rung (best: −35.9 pts
+> at 6 %, −12.7 pts at 30 %). **Index-and-refer is not what failed** — ranking
+> from a committed index and fetching content from source systems is untouched.
+> What failed is the claim that the index can be made ~16× smaller *by
+> discarding postings*. This is therefore an **amendment, not a reopen**:
+>
+> - the committed index is **0.6–1.5 GB** at 10⁶ documents, not 220–290 MB;
+> - **partial clone** and **external-shards-only committing** stop being
+>   optional levers and become mandatory;
+> - the paper's §5 size model must be re-derived at a retention that holds
+>   quality, or at no pruning.
+>
+> Whether the architecture is still worth building at that footprint is Arpit's
+> call, not the measurement's.
 
 ## Context
 

@@ -16,12 +16,30 @@ timestamp: 2026-08-09T00:00:00Z
 > not a constant k. Gate metric = **recall@20 of the candidate set**, because
 > the index feeds a fetch-and-re-score stage and is a candidate generator,
 > not the final ranker.
-> **Status:** ⏳ proposed — decided by the M1-rerun measurement, not by this
-> document. Arms and thresholds pre-registered before the run.
-> **Confidence:** medium-high on the direction (published combinations beat
-> single criteria ~2×), unmeasured on Fux's corpora.
-> **Reopen when:** the re-run shows arm 4 outside noise of arm 5 (no
-> pruning) at 6 % retention — then the fallback in §Consequences applies.
+> **Status:** ❌ **AMENDED — the verdict above is falsified. Do not implement
+> it.** Measured 2026-08-09 on 8 872 RFCs (median 967 distinct terms/doc):
+> at 6 % retention the proposed selector (arm 4) scores **0.208** recall@20
+> against an unpruned ceiling of **0.986** — 77.8 points down, where the
+> pre-registered bar was 2. **No arm came within 2 points at any retention
+> rung**, so the fallback in §Consequences ("if it fails at 6 %") applies in
+> full: option E. See [ADR-0018](../adr/0018-pruning-criterion-rerun.md).
+>
+> **The prediction failed in both halves.** Arm 4 was predicted to land within
+> noise of no-pruning; it was the worst arm. Arm 1 (KL) was predicted to be the
+> outlier; it was the **best** arm at every rung. KL divergence is not the
+> defect this document diagnosed it as.
+>
+> **What survives:** the *reframe* was right and is kept — recall@20 of the
+> candidate set is the correct metric for an index that feeds a re-score stage,
+> and matched retention is the correct axis. Both are carried into any
+> follow-up.
+>
+> **What is untested rather than disproven:** Rule A had a *one-term* spine on
+> RFCs (plain text has no headings), so the three-rule selector was never
+> exercised as designed. It is nonetheless *implicated* — see ADR-0018's
+> competition finding.
+> **Reopen when:** a realistic (short, keyword-style) query workload is
+> measured — the strongest remaining argument that the verdict is too harsh.
 
 ---
 

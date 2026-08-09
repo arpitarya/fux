@@ -56,6 +56,49 @@ diary.*
 - **Next:** Arpit rules on W-05, then run the M1-rerun prompt (**Opus
   throughout** — the last run failed at measurement design, not coding).
 
+## 2026-08-09 — P1 re-run: the gate FAILED, on a corpus that could test it  ·  Claude Code
+- **Asked:** amend ADR-0016 with a better name for `inferred`; then execute the
+  M1-rerun prompt (make the pruning gate decidable).
+- **Did:**
+  - **ADR-0016 amended.** Arpit's instinct found a real defect: the first draft
+    fixed one half of the collision and reproduced the other — `INFERRED` is the
+    edge grade for *model-derived*, so the no-model tier could not be
+    `inferred`. Naming the AI tier `enriched` vacates `extracted`; giving it to
+    the deterministic tier makes the two vocabularies **agree** for zero
+    migration. Decision now `extracted`/`enriched` (runner-up `derived`), still
+    proposed.
+  - **Corpus acquired:** 8 872 RFCs, sha256-manifest-pinned, 0 mismatches
+    (`fetch_rfc.py`, a lab tool — network is lab-only).
+  - **Corpus gate:** rfc median **967** distinct terms → PASS. repodocs (425),
+    acme (32), orbit (36) → FAIL, demoted to secondary. That resolved the
+    handoff's "which corpus gates" question mechanically.
+  - **PRE-REGISTRATION-v2 committed before any gating number** (`3892c55`):
+    recall@20 on the abstract-derived slice, matched retention, PASS/PARTIAL/
+    FAIL/VOID.
+  - **Ran** 5 arms × 3 rungs (~2 h 15 m), plus three diagnostics. 50 tests green.
+- **Decided / open:**
+  - **FAIL.** Best arm 0.627 vs unpruned 0.986 at 6 % retention (−35.9 pts vs a
+    2-pt bar); −12.7 pts even at 30 %. All validity checks passed; gaps are
+    7–27× the standard error. → [ADR-0018](adr/0018-pruning-criterion-rerun.md).
+  - **The compare doc's prediction was falsified in both halves** — arm 4 was
+    predicted to match no-pruning and was the *worst*; arm 1 (KL), predicted to
+    be the outlier, was the *best*. The counter-signal recorded in the
+    pre-registration reproduced on a second corpus.
+  - **New mechanism found:** a rule that forces heavily-weighted postings into a
+    minority of documents degrades the **whole** index. Proved by restricting to
+    the 372/400 queries whose gold document was byte-identical across two arms:
+    recall still fell 0.441 → 0.298. A per-document evaluation would never see
+    this.
+  - **Consequence:** index-and-refer is *not* falsified; the "small index by
+    pruning" claim is. Footprint 0.6–1.5 GB at 10⁶ docs; partial clone +
+    external-shards-only become mandatory. `storage-architecture` took a size
+    amendment (not a reopen); `pruning-criterion` marked ❌ falsified; ADR-0017
+    gained a forward pointer and was otherwise left intact.
+  - **W-01 stays blocked.** Biggest threat to the verdict, stated in the ADR: the
+    eval's verbatim-sentence queries are close to a worst case for pruning.
+- **Next:** W-15 — re-measure with a realistic short/keyword query workload,
+  fresh pre-registration. It is the one thing that could reasonably overturn this.
+
 ## 2026-08-09 — M0a + ADR-0016 + M1 executed: the gate ran  ·  Claude Code
 - **Asked:** execute the M0/M1 handoff phase by phase without pausing.
 - **Did:**

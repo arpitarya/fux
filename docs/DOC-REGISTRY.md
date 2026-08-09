@@ -14,8 +14,7 @@ Docs large enough to carry §humans + §agents sections update both.
 
 | Document | Update trigger | Last verified | Notes |
 |----------|---------------|---------------|-------|
-| [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, layout changes | 2026-08-09 | Rewrite **proposed, not applied** — [`../CLAUDE.md.proposed`](../CLAUDE.md.proposed) + [diff](handoff/v0.30.0-claude-md.diff). Agent-steering files are never auto-applied; the live file remains binding until Arpit adopts it |
-| [`../CLAUDE.md.proposed`](../CLAUDE.md.proposed) | Awaiting Arpit's review; deleted on adoption or rejection | 2026-08-09 | The M0a rewrite (W-03). Adopt with `git mv`, then bump the CLAUDE.md row |
+| [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, layout changes | 2026-08-09 | M0a rewrite **adopted by Arpit** (the proposed file is gone; [diff](handoff/v0.30.0-claude-md.diff) kept for the record). Ingest-mode names synced to ADR-0016's amendment |
 | [`../README.md`](../README.md) | Status, guarantees, reading order change | 2026-08-09 | Rebuild-status stub until M4 |
 | [`index.md`](index.md) | Bundle contents change | 2026-08-09 | OKF bundle root |
 | [`PLAN.md`](PLAN.md) | Any design/scope/status change | 2026-08-09 | The build of record; agent quick-ref section at top |
@@ -26,14 +25,14 @@ Docs large enough to carry §humans + §agents sections update both.
 | [`INTERVIEW.md`](INTERVIEW.md) | Direction/strategy/major decision changes | 2026-08-09 | Succession record; the reset is a mandatory entry |
 | [`WORKLOG.md`](WORKLOG.md) | **Every substantive exchange** (append) | 2026-08-09 | Rolling session handoff |
 | [`GLOSSARY.md`](GLOSSARY.md) | New recurring term, or a term changes meaning | 2026-08-09 | Rewritten for v0.30 (index vs db, ledger, keyspace, wire/runtime, refer/snapshot, inferred/enriched, pruning, ARC); archived v0.26 terms marked not-current |
-| [`compare/README.md`](compare/README.md) | A compare doc opens, closes, changes status | 2026-08-09 | Six v0.30 forks; verdict-first convention |
-| [`compare/*.compare.md`](compare/) | New evidence, verdict change, reopen-trigger fires | 2026-08-09 | `ingest-mode-naming` is ⏳ (closes via ADR-0016) |
-| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-08-09 | 0016 (naming, **proposed** — awaiting ratification) + 0017 (the P1 verdict); 0001–0015 archived |
-| [`handoff/`](handoff/) | A feature enters build (handoff + prompt pair) | 2026-08-09 | M0/M1 pair live + the CLAUDE.md review diff |
+| [`compare/README.md`](compare/README.md) | A compare doc opens, closes, changes status | 2026-08-09 | Seven v0.30 forks; verdict-first convention |
+| [`compare/*.compare.md`](compare/) | New evidence, verdict change, reopen-trigger fires | 2026-08-09 | `ingest-mode-naming` ⏳ (ADR-0016) · `pruning-criterion` ❌ **falsified** by ADR-0018 · `storage-architecture` carries a **size amendment** |
+| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-08-09 | 0016 (naming, amended → `extracted`/`enriched`, **proposed**) · 0017 (P1 INCONCLUSIVE) · 0018 (**P1 FAIL**, the live verdict); 0001–0015 archived |
+| [`handoff/`](handoff/) | A feature enters build (handoff + prompt pair) | 2026-08-09 | M0/M1 pair + M1-rerun pair (both executed) + the CLAUDE.md review diff |
 | [`INTERVIEW.md`](INTERVIEW.md) *(reset block)* | The reset block leads the doc; update on direction change | 2026-08-09 | Everything below the block is archived history and says so |
 | [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-08-09 | 3 new (mcp-adapters, knowledge-ci, wavelet-self-index) + 3 carried; v0.26-era moved to archive |
-| [`conformance/`](conformance/README.md) | Every measurement run — report + ANALYSIS + evidence | 2026-08-09 | README (re)created at the reset; M1's pruning-eval run filed |
-| [`../tools/pruning-eval/`](../tools/pruning-eval/README.md) | The gate's definitions change (they must not) or the selector is ported at M2 | 2026-08-09 | `PRE-REGISTRATION.md` is **frozen** — committed before the first number |
+| [`conformance/`](conformance/README.md) | Every measurement run — report + ANALYSIS + evidence | 2026-08-09 | Two runs filed: `2026-08-09-pruning-eval` (INCONCLUSIVE) and `2026-08-09-pruning-rerun` (**FAIL**) |
+| [`../tools/pruning-eval/`](../tools/pruning-eval/README.md) | The gate's definitions change (they must not) or a selector is ported | 2026-08-09 | Two **frozen** pre-registrations (v1, v2), both committed before their first number; 50 tests; corpus acquisition + 3 diagnostics |
 | [`archive/`](archive/README.md) | Something is implemented or superseded | 2026-08-09 | Empty; its README records **where the v0.26 doc set actually lives** (`archive/v0.26/archive/v0.26-docs/`) — a reset discrepancy left for Arpit to resolve |
 | `../.github/` | Required checks, release path change | 2026-07-22 | Unchanged by the reset; CI will need new paths at M0 (W-01 checks this) |
 
@@ -44,6 +43,5 @@ Docs large enough to carry §humans + §agents sections update both.
 2. **Adding a doc:** new maintained doc → new row, in the same change that
    creates it. Archiving a doc → retire its row, same change.
 3. **No ⚠ rows remain** — the two stale rows (CLAUDE.md, GLOSSARY.md) were
-   cleared by W-03 on 2026-08-09. GLOSSARY was rewritten; CLAUDE.md's rewrite
-   is *proposed* rather than applied, which is the correct end state for an
-   agent-steering file and is recorded in its row, not left as a warning.
+   cleared by W-03 on 2026-08-09; GLOSSARY was rewritten and CLAUDE.md's
+   rewrite was proposed for review and then adopted.

@@ -1,0 +1,34 @@
+{
+  "corpus": "rfc",
+  "documents": 8872,
+  "pairs": {
+    "1v2": {
+      "documents_identical": 0,
+      "documents_identical_pct": 0.0,
+      "max_symmetric_difference": 458,
+      "mean_kept_size": 65.719,
+      "mean_symmetric_difference": 85.039
+    },
+    "2v3": {
+      "documents_identical": 8285,
+      "documents_identical_pct": 93.38,
+      "max_symmetric_difference": 154,
+      "mean_kept_size": 65.719,
+      "mean_symmetric_difference": 0.877
+    },
+    "3v4": {
+      "documents_identical": 5,
+      "documents_identical_pct": 0.06,
+      "max_symmetric_difference": 24611,
+      "mean_kept_size": 65.719,
+      "mean_symmetric_difference": 48.844
+    }
+  },
+  "rung": 0.06,
+  "spine": {
+    "documents_with_empty_spine_pct": 0.14,
+    "max": 113,
+    "mean": 1.468,
+    "median": 1
+  }
+}

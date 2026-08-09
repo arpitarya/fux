@@ -12,12 +12,14 @@ timestamp: 2026-08-09T00:00:00Z
 
 - **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) §2 — pick work there,
   not here; this file is the *spec* for each milestone id.
-- **Hard gate — currently CLOSED.** No M2+ work while P1 is unmeasured or
-  failed. **P1 ran 2026-08-09 and returned INCONCLUSIVE**: the pre-registered
-  bar was met (Δ hit@5 = 0.00 pts at k=128 on all three corpora) but top-128
-  pruning reached only 0–2.5 % of documents, so nothing was tested.
-  **Do not start M0b or M2** — read
-  [`adr/0017-pruning-eval-gate.md`](adr/0017-pruning-eval-gate.md) first.
+- **Hard gate — CLOSED, and P1 has now FAILED.** Re-run 2026-08-09 on 8 872
+  RFCs (median 967 distinct terms/doc): the best of four pruning selectors is
+  **35.9 pts** below the unpruned index on recall@20 at 6 % retention, against
+  a 2-pt bar; still 12.7 pts short at 30 %. **Do not start M0b or M2** — read
+  [`adr/0018-pruning-criterion-rerun.md`](adr/0018-pruning-criterion-rerun.md)
+  (and [`0017`](adr/0017-pruning-eval-gate.md), the INCONCLUSIVE run that
+  produced it). Index-and-refer is not falsified; the *small-by-pruning* claim
+  is, and the committed footprint becomes 0.6–1.5 GB at 10⁶ docs.
 - **Decisions:** verdict-first in [`compare/`](compare/README.md); one
   still open (ingest-mode naming → ADR-0016, Arpit's call).
 - **Laws:** $0 · stdlib · deterministic · offline-default · 1 feature =

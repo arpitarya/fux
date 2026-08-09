@@ -1,0 +1,87 @@
+{
+  "arms": {
+    "1": {
+      "actual_retention": 0.05904,
+      "by_kind": {
+        "abstract": 0.6084,
+        "heading": 0.6848
+      },
+      "label": "KL only",
+      "recall@20": 0.6575
+    },
+    "2": {
+      "actual_retention": 0.05904,
+      "by_kind": {
+        "abstract": 0.5175,
+        "heading": 0.4047
+      },
+      "label": "impact only",
+      "recall@20": 0.445
+    },
+    "3": {
+      "actual_retention": 0.05904,
+      "by_kind": {
+        "abstract": 0.2448,
+        "heading": 0.3346
+      },
+      "label": "A + B",
+      "recall@20": 0.3025
+    },
+    "4": {
+      "actual_retention": 0.06044,
+      "by_kind": {
+        "abstract": 0.2238,
+        "heading": 0.2724
+      },
+      "label": "A + B + C",
+      "recall@20": 0.255
+    },
+    "5": {
+      "actual_retention": 1.0,
+      "by_kind": {
+        "abstract": 0.993,
+        "heading": 0.8988
+      },
+      "label": "no pruning",
+      "recall@20": 0.9325
+    }
+  },
+  "corpus": "rfc",
+  "kept_set_overlap": {
+    "1v2": {
+      "identical_pct": 0.0,
+      "mean_size_a": 65.72,
+      "mean_size_b": 65.72,
+      "mean_symmetric_difference": 85.039
+    },
+    "2v3": {
+      "identical_pct": 93.38,
+      "mean_size_a": 65.72,
+      "mean_size_b": 65.72,
+      "mean_symmetric_difference": 0.877
+    },
+    "2v3_gold_documents_differing": {
+      "differing": 28,
+      "gold_documents": 393,
+      "pct": 7.12
+    },
+    "3v4": {
+      "identical_pct": 0.06,
+      "mean_size_a": 65.72,
+      "mean_size_b": 67.28,
+      "mean_symmetric_difference": 48.844
+    }
+  },
+  "queries": 400,
+  "rung": 0.06,
+  "unchanged_gold_slice": {
+    "2": {
+      "n": 372,
+      "recall@20": 0.4409
+    },
+    "3": {
+      "n": 372,
+      "recall@20": 0.2984
+    }
+  }
+}

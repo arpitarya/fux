@@ -14,6 +14,10 @@ timestamp: 2026-08-09T00:00:00Z
 - **Feature:** M1, the pruning-quality gate (P1) — the measurement the whole
   index-and-refer plan is sequenced behind.
 - **Evidence:** [`../conformance/2026-08-09-pruning-eval/`](../conformance/2026-08-09-pruning-eval/)
+- **Superseded as the P1 measurement by
+  [ADR-0018](0018-pruning-criterion-rerun.md)** (2026-08-09) — the re-run this
+  ADR asked for. It found **FAIL**. This document is unmodified: it is the
+  record of a correct refusal, and the refusal is what produced the re-run.
 - **Pre-registration (frozen before the first number):**
   [`../../tools/pruning-eval/PRE-REGISTRATION.md`](../../tools/pruning-eval/PRE-REGISTRATION.md)
 

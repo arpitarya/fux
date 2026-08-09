@@ -31,7 +31,8 @@ be regenerated is an anecdote.
 
 | date | run | corpus | what it established |
 |---|---|---|---|
-| 2026-08-09 | [`2026-08-09-pruning-eval`](2026-08-09-pruning-eval/) | acme · orbit · synth-100k | **M1, the P1 gate** — KL top-*k* pruning quality; see [ADR-0017](../adr/0017-pruning-eval-gate.md) |
+| 2026-08-09 | [`2026-08-09-pruning-rerun`](2026-08-09-pruning-rerun/) | **rfc** (8 872 docs) · repodocs | **P1 re-run → FAIL.** 5 selectors at matched retention, gated on recall@20: best arm 35.9 pts below unpruned at 6 % retention. [ADR-0018](../adr/0018-pruning-criterion-rerun.md) |
+| 2026-08-09 | [`2026-08-09-pruning-eval`](2026-08-09-pruning-eval/) | acme · orbit · synth-100k | **M1, the P1 gate → INCONCLUSIVE.** The corpora's documents were too short for top-128 to prune anything. [ADR-0017](../adr/0017-pruning-eval-gate.md) |
 
 ### Archived runs (v0.19–0.26 engine)
 
