@@ -1,0 +1,963 @@
+[
+  {
+    "arms": {
+      "128": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.65,
+          "P@10": 0.1,
+          "hit@5": 1.0,
+          "n": 5
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.67202,
+            "P@10": 0.089091,
+            "hit@5": 0.872727,
+            "n": 55
+          },
+          "bites_posthoc": {
+            "MRR": 0.65,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 5
+          },
+          "rare": {
+            "MRR": 0.663158,
+            "P@10": 0.078947,
+            "hit@5": 0.789474,
+            "n": 19
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.67202,
+            "P@10": 0.089091,
+            "hit@5": 0.872727,
+            "n": 55
+          },
+          "bites_posthoc": {
+            "MRR": 0.65,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 5
+          },
+          "rare": {
+            "MRR": 0.663158,
+            "P@10": 0.078947,
+            "hit@5": 0.789474,
+            "n": 19
+          }
+        }
+      },
+      "64": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.789153,
+          "P@10": 0.097619,
+          "hit@5": 0.952381,
+          "n": 42
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.650693,
+            "P@10": 0.081818,
+            "hit@5": 0.818182,
+            "n": 55
+          },
+          "bites_posthoc": {
+            "MRR": 0.761111,
+            "P@10": 0.088095,
+            "hit@5": 0.880952,
+            "n": 42
+          },
+          "rare": {
+            "MRR": 0.626566,
+            "P@10": 0.073684,
+            "hit@5": 0.736842,
+            "n": 19
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.642256,
+            "P@10": 0.081818,
+            "hit@5": 0.781818,
+            "n": 55
+          },
+          "bites_posthoc": {
+            "MRR": 0.752047,
+            "P@10": 0.088095,
+            "hit@5": 0.857143,
+            "n": 42
+          },
+          "rare": {
+            "MRR": 0.626566,
+            "P@10": 0.073684,
+            "hit@5": 0.736842,
+            "n": 19
+          }
+        }
+      },
+      "inf": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.0,
+          "P@10": 0.0,
+          "hit@5": 0.0,
+          "n": 0
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.67202,
+            "P@10": 0.089091,
+            "hit@5": 0.872727,
+            "n": 55
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "rare": {
+            "MRR": 0.663158,
+            "P@10": 0.078947,
+            "hit@5": 0.789474,
+            "n": 19
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.67202,
+            "P@10": 0.089091,
+            "hit@5": 0.872727,
+            "n": 55
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "rare": {
+            "MRR": 0.663158,
+            "P@10": 0.078947,
+            "hit@5": 0.789474,
+            "n": 19
+          }
+        }
+      }
+    },
+    "baseline": {
+      "all": {
+        "MRR": 0.67202,
+        "P@10": 0.089091,
+        "hit@5": 0.872727,
+        "n": 55
+      },
+      "avg_wlen": 80.824859,
+      "postings": 37987,
+      "rare": {
+        "MRR": 0.663158,
+        "P@10": 0.078947,
+        "hit@5": 0.789474,
+        "n": 19
+      }
+    },
+    "chunks": 885,
+    "corpus": "acme",
+    "coverage": {
+      "128": {
+        "avg_wlen": 78.903955,
+        "documents_pruned": 22,
+        "documents_pruned_pct": 2.509,
+        "documents_total": 877,
+        "postings_baseline": 37987,
+        "postings_kept": 36633,
+        "postings_ratio": 0.964356
+      },
+      "64": {
+        "avg_wlen": 72.651977,
+        "documents_pruned": 155,
+        "documents_pruned_pct": 17.674,
+        "documents_total": 877,
+        "postings_baseline": 37987,
+        "postings_kept": 32290,
+        "postings_ratio": 0.850028
+      },
+      "inf": {
+        "avg_wlen": 80.824859,
+        "documents_pruned": 0,
+        "documents_pruned_pct": 0.0,
+        "documents_total": 877,
+        "postings_baseline": 37987,
+        "postings_kept": 37987,
+        "postings_ratio": 1.0
+      }
+    },
+    "documents": 877,
+    "failures": {
+      "128": [],
+      "64": [
+        {
+          "attribution": "shifted-statistics",
+          "baseline_rank": 2,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "are",
+            "raw",
+            "card",
+            "numbers",
+            "and",
+            "so",
+            "for"
+          ],
+          "diag_rank": 2,
+          "gold": "docs/adr/0002-tokenize-pan-at-the-edge.md",
+          "kind": "stale-vs-current",
+          "pruned_out_terms": [
+            "are",
+            "numbers",
+            "so",
+            "for"
+          ],
+          "pruned_rank": 6,
+          "query": "Are raw card numbers stored, and if so for how long?",
+          "query_terms": [
+            "are",
+            "raw",
+            "card",
+            "numbers",
+            "stored",
+            "and",
+            "if",
+            "so",
+            "for",
+            "how",
+            "long"
+          ]
+        },
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 2,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "the",
+            "move",
+            "to",
+            "client",
+            "supplied",
+            "idempotency",
+            "keys"
+          ],
+          "diag_rank": 54,
+          "gold": "docs/postmortems/2025-09-03-double-charge.md",
+          "kind": "cross-doc",
+          "pruned_out_terms": [
+            "the",
+            "move",
+            "to",
+            "keys"
+          ],
+          "pruned_rank": 60,
+          "query": "What incident caused the move to client-supplied idempotency keys?",
+          "query_terms": [
+            "what",
+            "incident",
+            "caused",
+            "the",
+            "move",
+            "to",
+            "client",
+            "supplied",
+            "idempotency",
+            "keys"
+          ]
+        },
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 5,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "is",
+            "the",
+            "window",
+            "over",
+            "which",
+            "a",
+            "webhook",
+            "it",
+            "dead"
+          ],
+          "diag_rank": 87,
+          "gold": "docs/api/webhooks.md",
+          "kind": "factual",
+          "pruned_out_terms": [
+            "window",
+            "over",
+            "which",
+            "a",
+            "webhook",
+            "it"
+          ],
+          "pruned_rank": 88,
+          "query": "What is the maximum window over which a failed webhook is retried before it is dead-lettered?",
+          "query_terms": [
+            "what",
+            "is",
+            "the",
+            "maximum",
+            "window",
+            "over",
+            "which",
+            "a",
+            "failed",
+            "webhook",
+            "retried",
+            "before",
+            "it",
+            "dead",
+            "lettered"
+          ]
+        },
+        {
+          "attribution": "shifted-statistics",
+          "baseline_rank": 4,
+          "cause": "score-compressed",
+          "contributing_terms": [
+            "what"
+          ],
+          "diag_rank": 4,
+          "gold": "docs/notes/durable-storage.md",
+          "kind": "zero-overlap",
+          "pruned_out_terms": [],
+          "pruned_rank": 6,
+          "query": "What technology keeps information after the power goes off?",
+          "query_terms": [
+            "what",
+            "technology",
+            "keeps",
+            "information",
+            "after",
+            "the",
+            "power",
+            "goes",
+            "off"
+          ]
+        },
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 4,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "the",
+            "store",
+            "amounts",
+            "in",
+            "integer",
+            "minor",
+            "units"
+          ],
+          "diag_rank": 79,
+          "gold": "docs/postmortems/2025-04-10-fractional-cent-drift.md",
+          "kind": "cross-doc",
+          "pruned_out_terms": [
+            "the",
+            "store",
+            "units"
+          ],
+          "pruned_rank": 80,
+          "query": "Which incident drove the decision to store amounts in integer minor units?",
+          "query_terms": [
+            "which",
+            "incident",
+            "drove",
+            "the",
+            "decision",
+            "to",
+            "store",
+            "amounts",
+            "in",
+            "integer",
+            "minor",
+            "units"
+          ]
+        }
+      ],
+      "inf": []
+    },
+    "gating": true,
+    "gold_source": "committed-pairs",
+    "note": "realistic generated repo; committed human-authored pairs",
+    "queries_scored": 55,
+    "queries_total": 55,
+    "rare_slice_degenerate": false,
+    "rare_slice_size": 19,
+    "vocabulary_profile": {
+      "max": 407,
+      "mean": 41.95,
+      "median": 32,
+      "min": 4,
+      "n": 877,
+      "p90": 81,
+      "p99": 156
+    }
+  },
+  {
+    "arms": {
+      "128": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.75,
+          "P@10": 0.1,
+          "hit@5": 1.0,
+          "n": 2
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.751078,
+            "P@10": 0.092453,
+            "hit@5": 0.886792,
+            "n": 53
+          },
+          "bites_posthoc": {
+            "MRR": 0.75,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 2
+          },
+          "rare": {
+            "MRR": 0.638757,
+            "P@10": 0.083333,
+            "hit@5": 0.777778,
+            "n": 18
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.750741,
+            "P@10": 0.092453,
+            "hit@5": 0.886792,
+            "n": 53
+          },
+          "bites_posthoc": {
+            "MRR": 0.75,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 2
+          },
+          "rare": {
+            "MRR": 0.637765,
+            "P@10": 0.083333,
+            "hit@5": 0.777778,
+            "n": 18
+          }
+        }
+      },
+      "64": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.841892,
+          "P@10": 0.094595,
+          "hit@5": 0.945946,
+          "n": 37
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.744396,
+            "P@10": 0.092453,
+            "hit@5": 0.867925,
+            "n": 53
+          },
+          "bites_posthoc": {
+            "MRR": 0.825499,
+            "P@10": 0.094595,
+            "hit@5": 0.945946,
+            "n": 37
+          },
+          "rare": {
+            "MRR": 0.636278,
+            "P@10": 0.083333,
+            "hit@5": 0.722222,
+            "n": 18
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.757413,
+            "P@10": 0.090566,
+            "hit@5": 0.886792,
+            "n": 53
+          },
+          "bites_posthoc": {
+            "MRR": 0.830631,
+            "P@10": 0.094595,
+            "hit@5": 0.945946,
+            "n": 37
+          },
+          "rare": {
+            "MRR": 0.639153,
+            "P@10": 0.077778,
+            "hit@5": 0.777778,
+            "n": 18
+          }
+        }
+      },
+      "inf": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.0,
+          "P@10": 0.0,
+          "hit@5": 0.0,
+          "n": 0
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.750651,
+            "P@10": 0.092453,
+            "hit@5": 0.886792,
+            "n": 53
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "rare": {
+            "MRR": 0.6375,
+            "P@10": 0.083333,
+            "hit@5": 0.777778,
+            "n": 18
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.750651,
+            "P@10": 0.092453,
+            "hit@5": 0.886792,
+            "n": 53
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "rare": {
+            "MRR": 0.6375,
+            "P@10": 0.083333,
+            "hit@5": 0.777778,
+            "n": 18
+          }
+        }
+      }
+    },
+    "baseline": {
+      "all": {
+        "MRR": 0.750651,
+        "P@10": 0.092453,
+        "hit@5": 0.886792,
+        "n": 53
+      },
+      "avg_wlen": 89.644444,
+      "postings": 39316,
+      "rare": {
+        "MRR": 0.6375,
+        "P@10": 0.083333,
+        "hit@5": 0.777778,
+        "n": 18
+      }
+    },
+    "chunks": 900,
+    "corpus": "orbit",
+    "coverage": {
+      "128": {
+        "avg_wlen": 87.857778,
+        "documents_pruned": 14,
+        "documents_pruned_pct": 1.57,
+        "documents_total": 892,
+        "postings_baseline": 39316,
+        "postings_kept": 38101,
+        "postings_ratio": 0.969097
+      },
+      "64": {
+        "avg_wlen": 81.762222,
+        "documents_pruned": 120,
+        "documents_pruned_pct": 13.453,
+        "documents_total": 892,
+        "postings_baseline": 39316,
+        "postings_kept": 33813,
+        "postings_ratio": 0.860032
+      },
+      "inf": {
+        "avg_wlen": 89.644444,
+        "documents_pruned": 0,
+        "documents_pruned_pct": 0.0,
+        "documents_total": 892,
+        "postings_baseline": 39316,
+        "postings_kept": 39316,
+        "postings_ratio": 1.0
+      }
+    },
+    "documents": 892,
+    "failures": {
+      "128": [],
+      "64": [],
+      "inf": []
+    },
+    "gating": true,
+    "gold_source": "committed-pairs",
+    "note": "realistic generated repo; committed human-authored pairs",
+    "queries_scored": 53,
+    "queries_total": 53,
+    "rare_slice_degenerate": false,
+    "rare_slice_size": 18,
+    "vocabulary_profile": {
+      "max": 432,
+      "mean": 42.63,
+      "median": 36,
+      "min": 4,
+      "n": 892,
+      "p90": 89,
+      "p99": 150
+    }
+  },
+  {
+    "arms": {
+      "128": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.0,
+          "P@10": 0.0,
+          "hit@5": 0.0,
+          "n": 0
+        },
+        "diag": {
+          "all": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 200
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "rare": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 67
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 200
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "known_item_secondary": {
+            "MRR": 0.250135,
+            "P@10": 0.025,
+            "hit@5": 0.25,
+            "n": 200
+          },
+          "rare": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 67
+          }
+        }
+      },
+      "64": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 1.0,
+          "P@10": 0.1,
+          "hit@5": 1.0,
+          "n": 27
+        },
+        "diag": {
+          "all": {
+            "MRR": 0.928131,
+            "P@10": 0.0985,
+            "hit@5": 0.98,
+            "n": 200
+          },
+          "bites_posthoc": {
+            "MRR": 0.87284,
+            "P@10": 0.088889,
+            "hit@5": 0.888889,
+            "n": 27
+          },
+          "rare": {
+            "MRR": 0.982587,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 67
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 0.920609,
+            "P@10": 0.0985,
+            "hit@5": 0.98,
+            "n": 200
+          },
+          "bites_posthoc": {
+            "MRR": 0.871795,
+            "P@10": 0.088889,
+            "hit@5": 0.888889,
+            "n": 27
+          },
+          "known_item_secondary": {
+            "MRR": 0.250152,
+            "P@10": 0.025,
+            "hit@5": 0.25,
+            "n": 200
+          },
+          "rare": {
+            "MRR": 0.982587,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 67
+          }
+        }
+      },
+      "inf": {
+        "baseline_on_bites_posthoc": {
+          "MRR": 0.0,
+          "P@10": 0.0,
+          "hit@5": 0.0,
+          "n": 0
+        },
+        "diag": {
+          "all": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 200
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "rare": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 67
+          }
+        },
+        "pruned": {
+          "all": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 200
+          },
+          "bites_posthoc": {
+            "MRR": 0.0,
+            "P@10": 0.0,
+            "hit@5": 0.0,
+            "n": 0
+          },
+          "known_item_secondary": {
+            "MRR": 0.250135,
+            "P@10": 0.025,
+            "hit@5": 0.25,
+            "n": 200
+          },
+          "rare": {
+            "MRR": 1.0,
+            "P@10": 0.1,
+            "hit@5": 1.0,
+            "n": 67
+          }
+        }
+      }
+    },
+    "baseline": {
+      "all": {
+        "MRR": 1.0,
+        "P@10": 0.1,
+        "hit@5": 1.0,
+        "n": 200
+      },
+      "avg_wlen": 183.256244,
+      "known_item_secondary": {
+        "MRR": 0.250135,
+        "P@10": 0.025,
+        "hit@5": 0.25,
+        "n": 200
+      },
+      "postings": 5131715,
+      "rare": {
+        "MRR": 1.0,
+        "P@10": 0.1,
+        "hit@5": 1.0,
+        "n": 67
+      }
+    },
+    "chunks": 116756,
+    "corpus": "synth",
+    "coverage": {
+      "128": {
+        "avg_wlen": 183.256244,
+        "documents_pruned": 0,
+        "documents_pruned_pct": 0.0,
+        "documents_total": 100000,
+        "postings_baseline": 5131715,
+        "postings_kept": 5131715,
+        "postings_ratio": 1.0
+      },
+      "64": {
+        "avg_wlen": 182.503537,
+        "documents_pruned": 4554,
+        "documents_pruned_pct": 4.554,
+        "documents_total": 100000,
+        "postings_baseline": 5131715,
+        "postings_kept": 5113822,
+        "postings_ratio": 0.996513
+      },
+      "inf": {
+        "avg_wlen": 183.256244,
+        "documents_pruned": 0,
+        "documents_pruned_pct": 0.0,
+        "documents_total": 100000,
+        "postings_baseline": 5131715,
+        "postings_kept": 5131715,
+        "postings_ratio": 1.0
+      }
+    },
+    "documents": 100000,
+    "failures": {
+      "128": [],
+      "64": [
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 1,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "every",
+            "worker",
+            "the",
+            "shard",
+            "service"
+          ],
+          "diag_rank": 67,
+          "gold": "docs/doc-025420.md",
+          "kind": "phrase",
+          "pruned_out_terms": [
+            "service"
+          ],
+          "pruned_rank": 172,
+          "query": "every worker the shard service",
+          "query_terms": [
+            "every",
+            "worker",
+            "the",
+            "shard",
+            "service"
+          ]
+        },
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 1,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "idempotency",
+            "payments",
+            "shard"
+          ],
+          "diag_rank": 15,
+          "gold": "docs/doc-077530.md",
+          "kind": "topical",
+          "pruned_out_terms": [
+            "payments"
+          ],
+          "pruned_rank": 26,
+          "query": "idempotency payments shard",
+          "query_terms": [
+            "idempotency",
+            "payments",
+            "shard"
+          ]
+        },
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 1,
+          "cause": "score-compressed",
+          "contributing_terms": [
+            "retry",
+            "across",
+            "every",
+            "pipeline",
+            "the"
+          ],
+          "diag_rank": 7,
+          "gold": "docs/doc-043026.md",
+          "kind": "phrase",
+          "pruned_out_terms": [],
+          "pruned_rank": 6,
+          "query": "retry across every pipeline the",
+          "query_terms": [
+            "retry",
+            "across",
+            "every",
+            "pipeline",
+            "the"
+          ]
+        },
+        {
+          "attribution": "missing-postings",
+          "baseline_rank": 1,
+          "cause": "term-pruned",
+          "contributing_terms": [
+            "service",
+            "the",
+            "payments",
+            "validates"
+          ],
+          "diag_rank": 106,
+          "gold": "docs/doc-060583.md",
+          "kind": "phrase",
+          "pruned_out_terms": [
+            "payments"
+          ],
+          "pruned_rank": null,
+          "query": "service the payments service validates",
+          "query_terms": [
+            "service",
+            "the",
+            "payments",
+            "validates"
+          ]
+        }
+      ],
+      "inf": []
+    },
+    "gating": true,
+    "gold_source": "baseline-top1",
+    "note": "100000 generated documents; no human relevance judgments — gold is the baseline arm's top-1 (fidelity)",
+    "queries_scored": 200,
+    "queries_total": 200,
+    "rare_slice_degenerate": false,
+    "rare_slice_size": 67,
+    "vocabulary_profile": {
+      "max": 72,
+      "mean": 47.84,
+      "median": 46,
+      "min": 29,
+      "n": 100000,
+      "p90": 62,
+      "p99": 67
+    }
+  }
+]

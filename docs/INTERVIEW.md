@@ -22,8 +22,8 @@ it is no longer the state of play. Read this block, then read the rest as
 
 - The substrate engine (v0.19 → v0.26, ADRs 0001–0015) is **archived at
   [`../archive/v0.26/`](../archive/v0.26/)**, runnable but reference-only. Its
-  docs are at [`archive/v0.26-docs/`](archive/v0.26-docs/); the old plan at
-  [`archive/PLAN-v0.26.md`](archive/PLAN-v0.26.md).
+  docs are at [`archive/v0.26/archive/v0.26-docs/`](../archive/v0.26/archive/v0.26-docs/); the old plan at
+  [`archive/v0.26/archive/PLAN-v0.26.md`](../archive/v0.26/archive/PLAN-v0.26.md).
 
 - The replacement architecture is **index-and-refer**, specified in
   [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md): rank from a

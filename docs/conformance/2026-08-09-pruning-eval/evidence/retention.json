@@ -1,0 +1,56 @@
+[
+  {
+    "corpus": "acme",
+    "documents": 877,
+    "k": {
+      "128": {
+        "documents_pruned": 22,
+        "term_retention_corpus": 0.9791,
+        "term_retention_pruned_docs": 0.7857,
+        "worst_case_retention": 0.3145
+      },
+      "64": {
+        "documents_pruned": 155,
+        "term_retention_corpus": 0.8675,
+        "term_retention_pruned_docs": 0.6705,
+        "worst_case_retention": 0.1572
+      }
+    },
+    "vocabulary": {
+      "max": 407,
+      "mean": 41.95,
+      "median": 32,
+      "min": 4,
+      "n": 877,
+      "p90": 81,
+      "p99": 156
+    }
+  },
+  {
+    "corpus": "orbit",
+    "documents": 892,
+    "k": {
+      "128": {
+        "documents_pruned": 14,
+        "term_retention_corpus": 0.984,
+        "term_retention_pruned_docs": 0.747,
+        "worst_case_retention": 0.2963
+      },
+      "64": {
+        "documents_pruned": 120,
+        "term_retention_corpus": 0.8785,
+        "term_retention_pruned_docs": 0.6243,
+        "worst_case_retention": 0.1481
+      }
+    },
+    "vocabulary": {
+      "max": 432,
+      "mean": 42.63,
+      "median": 36,
+      "min": 4,
+      "n": 892,
+      "p90": 89,
+      "p99": 150
+    }
+  }
+]

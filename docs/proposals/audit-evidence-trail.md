@@ -38,4 +38,4 @@ Ameriprise-adjacent use) materializes.
 # Citations
 
 [1] [Knowledge as Code](https://knowledge-as-code.com/) — automated verification / drift detection as a core pattern (accessed 2026-07-21).
-[2] Internal: [`../compare/packaged-model.compare.md`](../compare/packaged-model.compare.md) — determinism/extractiveness that makes answers reproducible evidence.
+[2] Internal: `compare/packaged-model.compare.md` (archived with the v0.26 engine) — determinism/extractiveness that makes answers reproducible evidence.

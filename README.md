@@ -6,11 +6,20 @@ at answer time.**
 
 > **Status (2026-08-09): rebuild in progress.** The v0.26 engine and its
 > docs are archived under [`archive/v0.26/`](archive/v0.26/) and
-> [`docs/archive/v0.26-docs/`](docs/archive/v0.26-docs/), reference-only.
+> [`archive/v0.26/archive/v0.26-docs/`](archive/v0.26/archive/v0.26-docs/), reference-only.
 > The new architecture is specified in
 > [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md)
 > and built against [`docs/PLAN.md`](docs/PLAN.md). Nothing on `main` is
 > usable until milestone M4 of that plan.
+>
+> **The build is paused at its first gate (2026-08-09).** The architecture
+> rests on one measurable claim — that keeping only each document's top-*k*
+> terms preserves ranking quality. It was measured before anything was built
+> on it, and the result is **inconclusive**: the pre-registered bar was met,
+> but the eval corpora's documents proved far too small for top-128 pruning to
+> do anything at all (0–2.5 % of documents affected). Nothing further is built
+> until that is re-run properly —
+> [ADR-0017](docs/adr/0017-pruning-eval-gate.md).
 
 ## The idea
 

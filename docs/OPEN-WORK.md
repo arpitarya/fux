@@ -11,11 +11,24 @@ humans first, agents second.*
 ## §1 · For humans — where the rebuild stands
 
 **One paragraph.** The v0.26 engine is archived; the index-and-refer
-architecture (paper + component diagram) is decided through six compare
-docs; nothing of v0.30 is built yet. The next two moves are M0 (scaffold +
-the one open naming decision) and M1 — the pruning eval that the entire
-architecture is gated on. If M1's numbers fail, the plan terminates
-honestly at M1 and the storage-architecture compare doc reopens.
+architecture is decided through six compare docs; nothing of v0.30 is built,
+**and the plan is paused at its first gate.** M0a (doc hygiene) and ADR-0016
+(naming, proposed) are done. **M1 — the pruning eval the whole architecture is
+gated on — ran, and came back INCONCLUSIVE:** the pre-registered bar was met
+(Δ hit@5 = 0.00 pts at k=128 on all three corpora), but top-128 pruning touched
+only 0–2.5 % of documents and left 96–100 % of postings in place, because these
+corpora's documents hold 32–46 distinct terms where the size model assumes
+~2 000. Nothing was actually tested. **Nothing further gets built until P1 is
+re-run on a long-document corpus** — see
+[ADR-0017](adr/0017-pruning-eval-gate.md).
+
+**The one number that is real:** at k=64 — still ten times milder than the
+production setting — acme loses **9.1 points** of hit@5. That points against
+P1, but it is an extrapolation, not a measurement, and it is labelled as one.
+
+**Arpit's call, pending:** accept INCONCLUSIVE and fund the re-run (W-13), or
+overrule and proceed. The scaffold (W-01) stays blocked either way until he
+rules.
 
 **Decided and closed** (see [`compare/`](compare/README.md)): the
 architecture (index-and-refer), the wire/runtime format split (BIC +
@@ -23,12 +36,20 @@ byte-aligned mmap), one MST keyspace, hashed-by-default meta, ARC cache.
 
 **Open decisions** (need Arpit):
 
-1. **Ingest-mode naming** — "enriched" proposed over his original
-   "extracted" ([why](compare/ingest-mode-naming.compare.md)); closes as
-   ADR-0016 in M0.
-2. **top-64 vs top-128** default — decided by M1's k=64 numbers, not taste.
-3. **git commit of the reset** — the archive moves + new docs sit
-   uncommitted in the working tree until Arpit reviews and commits.
+1. **P1's INCONCLUSIVE verdict** — accept and fund the long-document re-run
+   (W-13), or overrule. [ADR-0017](adr/0017-pruning-eval-gate.md) states the
+   case; the threshold was **not** moved.
+2. **Ingest-mode naming** — `enriched` recommended over his original
+   `extracted` ([why](compare/ingest-mode-naming.compare.md));
+   [ADR-0016](adr/0016-ingest-mode-naming.md) is written and waiting to flip
+   from `proposed` to `accepted`.
+3. **CLAUDE.md rewrite** — [`../CLAUDE.md.proposed`](../CLAUDE.md.proposed) +
+   [diff](handoff/v0.30.0-claude-md.diff), proposed not applied. Adopt with
+   `git mv`.
+
+**Closed since the last revision:** ~~top-64 vs top-128~~ — **decided negative**
+by M1 (acme −9.09 pts at k=64, 3× the hard bar); ~~git commit of the reset~~ —
+done, commit `7fb81a8`.
 
 **The build queue** is PLAN.md's M0→M8; nothing runs out of order; every
 milestone's DoD includes its P-prediction. **Sequencing amended
@@ -52,12 +73,13 @@ table + WORKLOG in every change; never start M2+ while `P1.status != PASS`.
 
 | id | item | status | blocked_by | DoD (short) | spec |
 |----|------|--------|-----------|-------------|------|
-| W-00 | git-commit the reset (Arpit) | OPEN·human | — | repo history has the archive commit | WORKLOG 2026-08-09 |
-| W-03 | M0a doc hygiene: CLAUDE.md (as a **diff for review**), GLOSSARY, INTERVIEW, registry | OPEN | W-00 | no doc names a path that doesn't exist | handoff §DoD, PLAN §M0 |
-| W-02 | M0-ADR 0016: ingest-mode naming | OPEN·human-gate | W-00 | ADR written (accepted if Arpit answered, else proposed) | compare/ingest-mode-naming |
-| W-04 | M1 KL selector + eval harness (archived engine = baseline; `tools/pruning-eval/`) | OPEN | W-03 | runs on fixture+acme+orbit+100k; sanity checks pass | handoff §5.2–5.3 |
-| W-05 | M1 ADR-0017: P1 numbers + ship/kill verdict + conformance filing | OPEN·gate | W-04 | verdict vs **pre-registered** threshold; evidence reproduces | handoff §5.4, paper §8 |
-| W-01 | M0b scaffold: src skeleton, pyproject 0.30.0.dev0, CHANGELOG, CI paths | OPEN | **W-05 = PASS** | `fux --version` runs | PLAN §M0b |
+| W-00 | git-commit the reset | **DONE** 2026-08-09 | — | repo history has the archive commit | commit `7fb81a8` |
+| W-03 | M0a doc hygiene: CLAUDE.md (as a **diff for review**), GLOSSARY, INTERVIEW, registry | **DONE** 2026-08-09 | W-00 | no doc names a path that doesn't exist | handoff §DoD, PLAN §M0 |
+| W-02 | M0-ADR 0016: ingest-mode naming | **DONE (proposed)** · human-gate open | W-00 | ADR written; `status: proposed` recommending `enriched` — Arpit has not ratified, so both ADR and compare doc stay ⏳ | [ADR-0016](adr/0016-ingest-mode-naming.md) |
+| W-04 | M1 KL selector + eval harness (archived engine = baseline; `tools/pruning-eval/`) | **DONE** 2026-08-09 | W-03 | 23 tests green; fixture+acme+orbit+synth-100k run; k=∞≡baseline and byte-identical re-run both verified | [tools/pruning-eval/](../tools/pruning-eval/README.md) |
+| W-05 | M1 ADR-0017: P1 numbers + ship/kill verdict + conformance filing | **MEASURED · verdict = INCONCLUSIVE** · awaiting Arpit | W-04 | verdict vs **pre-registered** threshold; evidence reproduces | [ADR-0017](adr/0017-pruning-eval-gate.md) |
+| W-13 | **Re-run P1 on a long-document corpus** with a fresh pre-registration (retention-based, not absolute k) | OPEN·**next** | W-05 | a corpus reaching ~6 % term retention; P1 answered in some direction | [ANALYSIS §changes 3–4](conformance/2026-08-09-pruning-eval/ANALYSIS.md) |
+| W-01 | M0b scaffold: src skeleton, pyproject 0.30.0.dev0, CHANGELOG, CI paths | **BLOCKED** | **W-05 = PASS** (not granted) | `fux --version` runs | PLAN §M0b |
 | W-06 | M2 MST store + ledger + join | OPEN | W-05=PASS | order-independence ×1000; join CAI props; ≤12 MB @100k | PLAN §M2 |
 | W-07 | M3 wire planes P/D/V/E/M + hashed-meta enforcement + `mode=skip` | OPEN | W-06 | round-trips; ≤30 MB @100k (P2/10) | PLAN §M3, compare/meta-privacy |
 | W-08 | M4 inflator + segments + MaxScore/Hamming/PPR/RRF kernel + 6 verbs | OPEN | W-07 | ≤150 ms warm rank @100k; new goldens; skip-vs-exhaustive parity | PLAN §M4 |
@@ -70,7 +92,7 @@ table + WORKLOG in every change; never start M2+ while `P1.status != PASS`.
 
 | id | prediction | threshold | status |
 |----|-----------|-----------|--------|
-| P1 | pruning holds quality | Δhit@5 ≤ 2–3 pts @k=128 | UNMEASURED — **the gate** |
+| P1 | pruning holds quality | Δhit@5 ≤ 2–3 pts @k=128 | **INCONCLUSIVE** (2026-08-09) — Δ = +0.00 pts on all three corpora, i.e. the rule's letter is met, **but** top-128 pruned 2.5 % / 1.6 % / **0.0 %** of documents and retained 96–100 % of postings, so nothing was tested. At k=64, where it bites, acme loses **9.09 pts**. → [ADR-0017](adr/0017-pruning-eval-gate.md) |
 | P2 | wire ≤ 300 MB @1M | measured | UNMEASURED |
 | P3 | warm answer ≤ 300 ms @1M | measured | UNMEASURED |
 | P4 | cold ≤ 3 s (k=10) | mock bench | UNMEASURED |

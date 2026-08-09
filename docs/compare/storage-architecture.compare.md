@@ -17,6 +17,16 @@ timestamp: 2026-08-09T00:00:00Z
 > **Reopen when:** P1 (pruning quality) fails at k=128; or an enterprise
 > design partner rejects any committed index even hashed; or live-fetch
 > auth friction measurably kills adoption (DA's attack #3).
+>
+> **⚠ P1 was measured 2026-08-09 and is INCONCLUSIVE — this verdict now
+> stands on an untested premise.** The reopen-trigger has **not** fired:
+> P1 did not fail. But it did not pass either — top-128 pruning reached
+> 0–2.5 % of documents on the three eval corpora (whose documents hold
+> 32–46 distinct terms against the size model's ~2 000), so the run could
+> not test the claim. At k=64, the only setting where pruning bit, acme lost
+> 9.09 pts. **Annotated, not reopened**; the verdict holds pending the
+> long-document re-run (W-13). See
+> [ADR-0017](../adr/0017-pruning-eval-gate.md).
 
 ## Context
 

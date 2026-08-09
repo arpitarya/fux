@@ -16,7 +16,7 @@ timestamp: <ISO 8601>
 
 Lifecycle: `proposed` → picked up → **graduates** into a compare doc (if there's a
 fork) or a plan entry (if not), and this file's status is updated with a link. Fully
-implemented proposals move to [`../archive/`](../archive/). Nothing here is a
+implemented proposals move to [`../archive/`](../archive/README.md). Nothing here is a
 commitment; everything here is findable.
 
 # Index
@@ -38,11 +38,11 @@ the audit trail their substrate natively — see [`../PLAN.md`](../PLAN.md) M8+)
 * [Audit evidence trail](audit-evidence-trail.md) - deterministic cited answers as an auditable chain; seed of the deferred Plane. The ledger's sha@index + fresh-sha citations are its raw material.
 
 **v0.26-era proposals** (tied to the archived substrate engine) moved to
-[`../archive/v0.26-docs/proposals/`](../archive/v0.26-docs/proposals/):
+[`archive/v0.26/proposals/`](../../archive/v0.26/proposals/):
 knowledge-substrate (the SQLite substrate — superseded by the index-and-refer
 architecture), chunk-level-dense-codes, hybrid-degrades-at-scale (✅ resolved
 2026-07-22 as a corpus artifact). Earlier implemented proposals remain in
-[`../archive/`](../archive/) as before.
+[`../archive/`](../archive/README.md) as before.
 
 *(The fourth idea from the 2026-07-21 ideation — the **product-memory corpus**,
 Arpit's own seed — graduated into the v0.26 plan; its successor concept lives on

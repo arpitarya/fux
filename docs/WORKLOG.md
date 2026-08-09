@@ -19,6 +19,42 @@ diary.*
 
 ---
 
+## 2026-08-09 — M0a + ADR-0016 + M1 executed: the gate ran  ·  Claude Code
+- **Asked:** execute the M0/M1 handoff phase by phase without pausing.
+- **Did:**
+  - **W-00** — committed the reset as its own commit (`7fb81a8`) so the archive
+    move and the work on top of it stay separable.
+  - **W-03 (hygiene)** — GLOSSARY rewritten for the v0.30 vocabulary (archived
+    v0.26 terms explicitly marked not-current); INTERVIEW gained a reset block
+    at the top (what changed, why, the five things not to re-litigate);
+    DOC-REGISTRY's two ⚠ rows cleared; `docs/conformance/README.md` created
+    (the registry pointed at a path that did not exist).
+    **CLAUDE.md rewritten as `CLAUDE.md.proposed` + a diff — proposed, never
+    applied**, per the agent-steering-file rule.
+  - **W-02** — [ADR-0016](adr/0016-ingest-mode-naming.md) written as
+    `status: proposed` recommending `inferred`/`enriched`; not blocked on
+    Arpit's ratification, per handoff §7.
+  - **W-04** — `tools/pruning-eval/`: the KL selector as a pure, stdlib-only,
+    tested function written for portability into the engine unchanged; a
+    three-arm harness (baseline · pruned-with-recomputed-stats · diagnostic)
+    over the archived BM25F scorer; 23 tests green. **PRE-REGISTRATION.md was
+    committed before any gating corpus ran** (`f5300fc`).
+- **Decided / open:**
+  - **Harness validated externally**: the fixture baseline reproduces the
+    archived engine's recorded lexical eval exactly (hit@5 0.952 / MRR 0.833)
+    and orbit reproduces the lab's filed 0.887 (n=53). Re-runs are
+    byte-identical; k=∞ ≡ baseline.
+  - **The finding that matters is prune coverage.** At k=128 the treatment
+    barely touches the population — acme 2.5 % of documents, orbit 1.6 %,
+    synth 0 % — because these corpora's documents have a median of 32–46
+    distinct terms while the paper's size model assumes ~10⁴-word documents.
+    A zero delta over an untreated population is not evidence.
+  - At k=64, where pruning does bite, acme loses **9.1 pts** hit@5.
+  - **Verdict is therefore not a clean PASS** and is written up for Arpit
+    rather than adjudicated — see [ADR-0017](adr/0017-pruning-eval-gate.md).
+    **W-01 (scaffold) stays blocked.**
+- **Next:** Arpit rules on ADR-0017 (and ratifies ADR-0016's naming).
+
 ## 2026-08-09 — M0+M1 handoff & prompt; debate gate re-ordered the plan  ·  Cowork
 - **Asked:** create the handoff and prompt (first build package).
 - **Did:** `docs/handoff/v0.30.0-m0-m1-gate-handoff.md` + `-prompt.md` +
@@ -1699,7 +1735,7 @@ diary.*
 ## 2026-07-21 — CLI examples doc: the input/output contract · Cowork
 - **Asked:** create examples of CLI input and output, link to necessary documents,
   maintain it.
-- **Did:** created [`cli-examples.md`](example/CLI.md) (`type: Reference`) — worked
+- **Did:** created `docs/example/CLI.md` (archived) (`type: Reference`) — worked
   input/output for `fux setup` (wizard + flag forms), `fux ingest` (+ `--check`,
   `--list-inferred`, `--advanced`, `--web`), `ask` (incl. honest no-confident-match
   fallback), `find`, `answer` (extractive + citations), `--json` shape, `--explain`
@@ -1714,7 +1750,7 @@ diary.*
 ## 2026-07-21 — Implementation tracker created + wired in · Cowork
 - **Asked:** an implementation file tracking everything the building agent
   implements, updated at regular intervals / task completion; update the docs.
-- **Did:** created [`implementation.md`](implementation.md) (`type: Implementation
+- **Did:** created `docs/implementation.md` (archived) (`type: Implementation
   Tracker`): baseline table (✅ pre-build work), milestone tables for phases 1–3
   mirroring the handoffs (all ⬜, with per-row test counts + notes), a "Now working
   on" line the agent keeps current at regular intervals, a Deviations-from-spec
@@ -1741,7 +1777,7 @@ diary.*
 
 ## 2026-07-21 — Master prompt: one run for all three phases · Cowork
 - **Asked:** one prompt to execute all of it, one by one.
-- **Did:** wrote [`handoff/0000-master-prompt.md`](archive/master-prompt.md) —
+- **Did:** wrote `docs/handoff/0000-master-prompt.md` (archived) —
   a single paste-ready prompt driving 0001 → 0002 → 0003 strictly in sequence with
   hard phase gates (DoD met + both suites green + ADRs + docs law + archive the
   pair + version bump before the next phase opens), phase reports appended to this

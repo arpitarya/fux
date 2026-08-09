@@ -258,6 +258,34 @@ def prune_coverage(doc_tf: dict[str, dict[str, int]], k: int | None) -> tuple[in
     return sum(1 for tf in doc_tf.values() if len(tf) > k), total
 
 
+def vocabulary_profile(doc_tf: dict[str, dict[str, int]]) -> dict[str, float]:
+    """Distinct-term counts per document: min / median / p90 / p99 / max / mean.
+
+    This is the number that decides whether a corpus can test top-*k* pruning at
+    all. The paper's size model assumes ~10⁴-word documents, whose vocabularies
+    run into the thousands; a corpus of short documents is simply *below* the
+    operating point and will report a delta of zero for the uninteresting reason
+    that nothing was dropped.
+    """
+    sizes = sorted(len(tf) for tf in doc_tf.values())
+    if not sizes:
+        return {"n": 0}
+
+    def pct(p: float) -> int:
+        idx = min(len(sizes) - 1, int(p * (len(sizes) - 1)))
+        return sizes[idx]
+
+    return {
+        "n": len(sizes),
+        "min": sizes[0],
+        "median": pct(0.5),
+        "p90": pct(0.9),
+        "p99": pct(0.99),
+        "max": sizes[-1],
+        "mean": round(sum(sizes) / len(sizes), 2),
+    }
+
+
 def baseline_df(searcher: Searcher) -> dict[str, int]:
     """Per-term document (chunk) frequency of a built arm — the ``diag`` input."""
     return {term: len(plist) for term, plist in searcher.postings.items()}

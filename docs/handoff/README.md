@@ -6,7 +6,7 @@ questions) and a **prompt** (paste-ready, points Claude Code at the
 handoff and sets its behavior). Both are written *after* a debate gate;
 the gate can and does change the plan.
 
-Fully executed pairs move to [`../archive/`](../archive/), version-named,
+Fully executed pairs move to [`../archive/`](../archive/README.md), version-named,
 with their ADRs linked.
 
 | pair | milestone | model | status |

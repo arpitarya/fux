@@ -1,0 +1,29 @@
+[
+  {
+    "corpus": "synth",
+    "documents": 100000,
+    "k": {
+      "128": {
+        "documents_pruned": 0,
+        "term_retention_corpus": 1.0,
+        "term_retention_pruned_docs": null,
+        "worst_case_retention": 1.7778
+      },
+      "64": {
+        "documents_pruned": 4554,
+        "term_retention_corpus": 0.9981,
+        "term_retention_pruned_docs": 0.9691,
+        "worst_case_retention": 0.8889
+      }
+    },
+    "vocabulary": {
+      "max": 72,
+      "mean": 47.84,
+      "median": 46,
+      "min": 29,
+      "n": 100000,
+      "p90": 62,
+      "p99": 67
+    }
+  }
+]

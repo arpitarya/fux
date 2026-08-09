@@ -12,14 +12,19 @@ timestamp: 2026-08-09T00:00:00Z
 
 - **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) §2 — pick work there,
   not here; this file is the *spec* for each milestone id.
-- **Hard gate:** no M2+ work while P1 is unmeasured or failed (W-05).
+- **Hard gate — currently CLOSED.** No M2+ work while P1 is unmeasured or
+  failed. **P1 ran 2026-08-09 and returned INCONCLUSIVE**: the pre-registered
+  bar was met (Δ hit@5 = 0.00 pts at k=128 on all three corpora) but top-128
+  pruning reached only 0–2.5 % of documents, so nothing was tested.
+  **Do not start M0b or M2** — read
+  [`adr/0017-pruning-eval-gate.md`](adr/0017-pruning-eval-gate.md) first.
 - **Decisions:** verdict-first in [`compare/`](compare/README.md); one
   still open (ingest-mode naming → ADR-0016, Arpit's call).
 - **Laws:** $0 · stdlib · deterministic · offline-default · 1 feature =
   1 ADR (from 0016) · every rule referenced · WORKLOG every exchange ·
   OPEN-WORK + DOC-REGISTRY rows updated in the same change as the work.
 - **Old world:** engine `../archive/v0.26/` (runnable, reference-only,
-  M1's baseline); its docs `archive/v0.26-docs/`; port list below —
+  M1's baseline); its docs `archive/v0.26/archive/v0.26-docs/`; port list below —
   port with tests, don't rewrite.
 - **Handoffs:** every milestone ships as handoff doc + Claude Code prompt,
   model named per the milestone table (wrong model fails silently).
@@ -30,8 +35,8 @@ timestamp: 2026-08-09T00:00:00Z
 [`../archive/v0.26/`](../archive/v0.26/) — reference-only, kept runnable
 because M1 uses it as the quality baseline. Its documentation (ADRs
 0001–0015, compare docs, example docs, tracker, old flow diagram) is at
-[`archive/v0.26-docs/`](archive/v0.26-docs/); the previous plan is at
-[`archive/PLAN-v0.26.md`](archive/PLAN-v0.26.md). ADR numbering continues
+[`archive/v0.26/archive/v0.26-docs/`](../archive/v0.26/archive/v0.26-docs/); the previous plan is at
+[`archive/v0.26/archive/PLAN-v0.26.md`](../archive/v0.26/archive/PLAN-v0.26.md). ADR numbering continues
 from 0016 in a fresh [`adr/`](adr/); archived ADRs are cited by their old
 numbers with the archive path.*
 
@@ -146,6 +151,31 @@ Thresholds (pre-registered, paper §8): within 2–3 pts hit@5 of baseline at
 k=128 → proceed; worse → the architecture is falsified, return to snapshot
 designs, this plan terminates at M1 and says so honestly.
 
+**STATUS: ran 2026-08-09 → INCONCLUSIVE.**
+[ADR-0017](adr/0017-pruning-eval-gate.md) ·
+[evidence](conformance/2026-08-09-pruning-eval/ANALYSIS.md)
+
+- **Δ hit@5 = +0.00 pts at k=128 on all three corpora** — the letter of the
+  rule is met, and the threshold was **not** moved.
+- **But top-128 pruned 2.5 % (acme) / 1.6 % (orbit) / 0.0 % (synth) of
+  documents**, retaining 96–100 % of postings. On synth the "pruned" index is
+  byte-identical to the baseline. The corpora's documents hold 32–46 distinct
+  terms; the size model assumes ~2 000. **k=128 is a no-op here, so the run
+  cannot license the inference.**
+- **k=64 — still 10× milder than production — costs acme 9.09 pts.** The M8
+  "top-64 default" item is therefore **closed negative**.
+- Rare-term loss was ~0, so the Bloom mitigation (M8) is **not** what stands
+  between this architecture and working — do not build it on this evidence.
+- **Next: W-13** — re-run P1 against a long-document corpus (10³–10⁴
+  words/doc) with a fresh pre-registration written against *term retention*
+  rather than an absolute k. Needs its own handoff (**Opus** — measurement
+  design). `tools/synth_corpus.py` cannot be tuned into that corpus: its closed
+  ~50-word vocabulary caps document vocabulary at 72 terms by construction.
+- **Reusable from this run:** the KL selector (production-ready, ported as-is),
+  the three-arm harness, and the pre-registration discipline — which is what
+  caught this. The re-run is a new corpus and a new threshold file, not new
+  machinery.
+
 **Notes.** Uses the archived engine as a *baseline generator only* —
 reference-use, permitted by the archive's charter. Rare-term losses are
 expected and measured, not hidden; the Bloom-signature mitigation is
@@ -243,10 +273,20 @@ threshold edit.
 
 ### M8 — Deferred (each needs its own ADR + Arpit sign-off)
 
-AI-assisted ingest mode (pinning + grading contract per paper §3.2) · MPH
-dictionary upgrade (~15 MB saving) · top-64 default (pending M1's k=64
-numbers) · external-shards-only committing · Bloom-signature rare-term
-mitigation · MCP adapter strategy.
+AI-assisted ingest mode (pinning + grading contract per paper §3.2; named
+`enriched` by [ADR-0016](adr/0016-ingest-mode-naming.md)) · MPH dictionary
+upgrade (~15 MB saving) · external-shards-only committing · MCP adapter
+strategy.
+
+**Closed by M1's measurement, 2026-08-09:**
+
+- ~~**top-64 default**~~ — **rejected.** acme loses 9.09 pts hit@5 at k=64,
+  three times the pre-registered hard bar. No further work.
+- ~~**Bloom-signature rare-term mitigation**~~ — **not justified by evidence.**
+  M1's rare-term slice moved 0.00 / 0.00 / −5.26 pts. The failure mode M1 did
+  find is different (frequent-topical terms pruned out of their own document)
+  and Bloom signatures do not address it. Do not build this without new
+  evidence that names it.
 
 ---
 

@@ -4,7 +4,7 @@ One doc per genuine fork in the v0.30 design. **The verdict block sits at the
 top of every doc** — status, the call, confidence, and the reopen-trigger —
 so a reader (human or agent) gets the decision without the debate, and the
 debate without archaeology. v0.26-era compare docs are archived at
-[`../archive/v0.26-docs/compare/`](../archive/v0.26-docs/compare/).
+[`archive/v0.26/archive/v0.26-docs/compare/`](../../archive/v0.26/archive/v0.26-docs/compare/).
 
 | doc | fork | verdict | status |
 |-----|------|---------|--------|

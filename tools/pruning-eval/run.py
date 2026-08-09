@@ -32,6 +32,15 @@ K_VALUES = (128, 64)
 TIE_EPSILON = 1e-9
 
 
+def _gold_key(gold: str | None, doc_tf: dict) -> str:
+    """Resolve a (possibly suffix-matched) gold label to its index key."""
+    if not gold:
+        return ""
+    if gold in doc_tf:
+        return gold
+    return next((rel for rel in doc_tf if rel.endswith(gold)), "")
+
+
 def _ranks(searcher, queries, golds) -> tuple[dict[str, int | None], dict[str, list]]:
     ranks: dict[str, int | None] = {}
     ranked_lists: dict[str, list] = {}
@@ -147,6 +156,7 @@ def run_corpus(name: str, work: Path, *, synth_docs: int, sanity: bool) -> dict:
             "postings": base_stats.postings,
             "avg_wlen": round(base_avg, 6),
         },
+        "vocabulary_profile": arms.vocabulary_profile(doc_tf),
         "arms": {},
         "failures": {},
         "coverage": {},
@@ -165,11 +175,23 @@ def run_corpus(name: str, work: Path, *, synth_docs: int, sanity: bool) -> dict:
         kept = arms.kept_terms_by_doc(doc_tf, model, k)
         pruned_docs, total_docs = arms.prune_coverage(doc_tf, k)
 
+        # POST-HOC diagnostic (declared as such — it is not part of the
+        # pre-registered verdict): the queries whose gold document actually lost
+        # vocabulary at this k. On a corpus of short documents this is the only
+        # slice where pruning did anything at all, so an aggregate delta of zero
+        # can be an artefact of the corpus rather than evidence about pruning.
+        bites_keys = [
+            q.text for q in scored
+            if k is not None
+            and len(doc_tf.get(_gold_key(golds[q.text], doc_tf), {})) > k
+        ]
+
         pruned, pruned_stats = arms.build_arm(files, params, kept=kept)
         pruned_ranks, pruned_lists = _ranks(pruned, scored, golds)
         pruned_metrics = {
             "all": metrics.score_queries([pruned_ranks[q.text] for q in scored]),
             "rare": metrics.aggregate(pruned_ranks, rare_keys),
+            "bites_posthoc": metrics.aggregate(pruned_ranks, bites_keys),
         }
         if source_golds:
             src_ranks, _ = _ranks(
@@ -189,6 +211,7 @@ def run_corpus(name: str, work: Path, *, synth_docs: int, sanity: bool) -> dict:
         diag_metrics = {
             "all": metrics.score_queries([diag_ranks[q.text] for q in scored]),
             "rare": metrics.aggregate(diag_ranks, rare_keys),
+            "bites_posthoc": metrics.aggregate(diag_ranks, bites_keys),
         }
         del diag
         gc.collect()
@@ -202,7 +225,11 @@ def run_corpus(name: str, work: Path, *, synth_docs: int, sanity: bool) -> dict:
                     doc_tf, kept, diag_ranks[q.text],
                 ))
 
-        result["arms"][label] = {"pruned": pruned_metrics, "diag": diag_metrics}
+        result["arms"][label] = {
+            "pruned": pruned_metrics,
+            "diag": diag_metrics,
+            "baseline_on_bites_posthoc": metrics.aggregate(base_ranks, bites_keys),
+        }
         result["failures"][label] = sorted(catalogue, key=lambda f: f["query"])
         result["coverage"][label] = {
             "documents_pruned": pruned_docs,
@@ -244,7 +271,12 @@ def render(results: list[dict]) -> str:
                    f"{r['queries_scored']}/{r['queries_total']} queries scored")
         out.append(f"- gold labels: `{r['gold_source']}` — {r['note']}")
         slice_note = " · **slice degenerate**" if r["rare_slice_degenerate"] else ""
-        out.append(f"- rare-term slice: {r['rare_slice_size']} queries{slice_note}\n")
+        out.append(f"- rare-term slice: {r['rare_slice_size']} queries{slice_note}")
+        v = r["vocabulary_profile"]
+        out.append(f"- distinct terms per document: median **{v['median']}** · "
+                   f"p90 {v['p90']} · p99 {v['p99']} · max {v['max']} · mean {v['mean']}")
+        out.append("  *(top-k is a no-op for every document below k — compare against "
+                   "the paper's ~10⁴-word document assumption)*\n")
 
         b = r["baseline"]["all"]
         out.append("| arm | hit@5 | Δ hit@5 (pts) | P@10 | MRR | rare hit@5 | Δ rare (pts) |")
@@ -274,6 +306,22 @@ def render(results: list[dict]) -> str:
                 f"({c['documents_pruned_pct']:.1f}%) | {c['postings_kept']:,} "
                 f"| {c['postings_ratio']:.3f}× |"
             )
+        out.append("")
+
+        out.append("**POST-HOC diagnostic — queries whose gold document was actually")
+        out.append("pruned.** Declared post-hoc: this slice is *not* part of the")
+        out.append("pre-registered verdict. It exists because an aggregate delta of zero")
+        out.append("on a corpus of short documents says nothing about pruning.\n")
+        out.append("| k | queries in slice | baseline hit@5 | pruned hit@5 | Δ (pts) |")
+        out.append("|---|---|---|---|---|")
+        for label in sorted(r["arms"], key=lambda s: (s != "inf", s)):
+            bb = r["arms"][label]["baseline_on_bites_posthoc"]
+            pb = r["arms"][label]["pruned"]["bites_posthoc"]
+            if bb["n"] == 0:
+                out.append(f"| {label} | 0 | — | — | **slice empty — nothing measured** |")
+                continue
+            out.append(f"| {label} | {bb['n']} | {bb['hit@5']:.3f} | {pb['hit@5']:.3f} "
+                       f"| {_pts(bb['hit@5'], pb['hit@5']):+.2f} |")
         out.append("")
 
         for label in sorted(r["failures"], key=lambda s: (s != "inf", s)):

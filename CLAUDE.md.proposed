@@ -1,0 +1,397 @@
+# CLAUDE.md — coding-agent guide for the Fux engine (v0.30 rebuild)
+
+> **PROPOSED — not in force.** This file is the M0a rewrite of `CLAUDE.md`,
+> delivered as a diff for Arpit's review (see
+> [`docs/handoff/v0.30.0-claude-md.diff`](docs/handoff/v0.30.0-claude-md.diff)).
+> Agent-steering files are proposed, never auto-applied. To adopt: `git mv
+> CLAUDE.md.proposed CLAUDE.md`, delete this block, and bump the DOC-REGISTRY
+> row. **Until then, the live `CLAUDE.md` is the binding one.**
+
+Fux ranks organizational knowledge — documentation, decisions, runbooks — from
+a **small index committed to git**, fetches content from the systems that own
+it, and verifies freshness at answer time. Agents get ranked, cited answers;
+nothing about the corpus is copied, and no model sits anywhere in the
+maintenance path.
+
+**This is the second from-scratch rebuild.** The v0.19–0.26 substrate engine
+is archived at [`archive/v0.26/`](archive/v0.26/) — runnable, reference-only,
+never imported by new code. The architecture being built is **index-and-refer**,
+specified in [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md).
+
+This file is binding. Read it, then
+[`docs/INTERVIEW.md`](docs/INTERVIEW.md) (start at the reset block), before
+your first substantive change.
+
+## Where the state of play lives
+
+| you want | read |
+|---|---|
+| what to work on next | [`docs/OPEN-WORK.md`](docs/OPEN-WORK.md) §2 — **the single live tracker** |
+| the spec for a milestone id | [`docs/PLAN.md`](docs/PLAN.md) |
+| why the architecture is this shape | [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md) |
+| a closed decision + its reopen-trigger | [`docs/compare/`](docs/compare/README.md) |
+| the judgment behind the reset | [`docs/INTERVIEW.md`](docs/INTERVIEW.md) |
+| a word you don't recognise | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) |
+
+**`OPEN-WORK.md` replaced the archived `IMPLEMENTATION.md`.** Any work item or
+prediction that starts, finishes, blocks, or is descoped updates it **in the
+same change as the work**. PLAN is the spec; OPEN-WORK is the state.
+
+## What we are building (scope)
+
+**One sentence:** rank from a small committed index; fetch content from the
+systems that own it; verify at answer time.
+
+- **The index is committed; content never is.** One content-addressed MST
+  keyspace in git, six planes: `L/` ledger · `P/` postings · `D/` dictionary+df
+  · `V/` dense codes · `E/` edges · `M/` doc meta.
+- **Wire vs runtime.** The committed **wire format** (BIC postings, 4-bit
+  impacts, front-coded ledger) is optimized for size and diffability and
+  decoded **once**; git hooks inflate it into gitignored, mmap'd **runtime
+  segments** optimized for query speed. Neither pays the other's tax.
+- **The refer plane.** Answers rank in the index, fetch the cited documents
+  from their source (git dir / HTTP / Confluence — **that cap is a decision**),
+  re-score passages on the fetched bytes, and cite a fresh sha.
+- **Two ingest modes.** `inferred` (default: `$0`, offline, deterministic) and
+  the model-assisted tier — named in
+  [ADR-0016](docs/adr/0016-ingest-mode-naming.md), deferred to M8.
+
+**The build is gated on falsifiable predictions P1–P7** (paper §8). **No M2+
+work while P1 is unmeasured or failed.** That is a hard sequencing rule, not a
+preference — see [`docs/adr/0017-pruning-eval-gate.md`](docs/adr/0017-pruning-eval-gate.md).
+
+**Out of scope until it has an ADR and Arpit's sign-off:** anything from the
+archived build (the SQLite substrate, per-file cache, lean profile, state
+plane, `fux.lock`), further adapters beyond the capped three, MCP (it is
+[a proposal](docs/proposals/mcp-adapters.md), not a backlog item), and every
+M8 item.
+
+**Do not port the archived engine.** [`PLAN.md`](docs/PLAN.md) §"What survives"
+is the complete port list; each entry comes forward **with its tests**, when
+its milestone needs it. Nothing else comes back.
+
+## Non-negotiable constraints
+
+- **`$0`, stdlib-only runtime.** No third-party *runtime* dependencies. The
+  frontmatter parser and every codec are hand-rolled on purpose — that is the
+  zero-dependency guarantee and the product's central promise. Dev/test tooling
+  may use extras; the runtime path may not. No numpy, pandas, or scipy
+  anywhere, including in measurement harnesses.
+- **Content is never durable outside its source system.** The index holds
+  statistics, never content. The single exception is explicit per-source
+  `snapshot` policy. This is the law the whole architecture rests on.
+- **Deterministic — no model in the maintenance path.** Same sources →
+  byte-identical index and root hash. No wall-clock output, no unseeded
+  randomness, no set-iteration-order dependence. No maintenance path may ever
+  call a model — not to be "smarter" at ingest, not to summarize, not once.
+- **Offline by default.** Network access only inside explicit, fenced,
+  opt-in paths. An import fence test enforces it.
+- **Hashed meta is the default** for non-git sources, enforced at write time.
+  It closes an ACL-mismatch leak, so it is not a configuration preference.
+- **Say "index", not "db".** What Fux commits is an index — statistics that
+  make documents findable. A council ruling, and it is load-bearing vocabulary.
+- **Python ≥ 3.11** (`tomllib`, modern typing). Match the surrounding style.
+
+## Litmus for any new work
+
+**Do not design in reference to Anton.** The design point is a **very
+large-scale project inside a corporation** — a 10k-engineer company's
+mega-project:
+
+- **Scale is the default, not the trigger** — 10⁵–10⁶ documents, sprawling
+  Confluence/SharePoint/wiki estates, thousands of repos, millions of links.
+
+- **Enterprise realities are design inputs** — Windows-first fleets, proxies
+  and SSO in front of every internal site, air-gapped/regulated environments,
+  multi-team corpora with access boundaries, audit and compliance demands.
+
+- **Fux's laws are enterprise features, not constraints** — `$0`/stdlib = a
+  trivially auditable supply chain and no procurement; offline/no-API = no data
+  ever leaves the tenant; deterministic = compliance-grade reproducibility.
+
+The question per feature: *"does this hold up in that corporation's
+mega-project?"* Anton remains a convenient small-scale testbed, not the
+priority filter.
+
+## How work happens here (the lifecycle)
+
+Every non-trivial feature moves through this pipeline, and the artifacts are
+committed:
+
+0. **Compare (when there's a fork).** Whenever a decision has multiple viable
+   options, write a *compare doc* in [`docs/compare/`](docs/compare/) first —
+   debate, matrix, grounded references, a proposed verdict Arpit accepts or
+   overrides, and a **reopen-trigger**. Standing rule.
+   **Proposals (when it's an idea, not a fork).** An idea worth keeping but not
+   being built now gets a *proposal doc* in
+   [`docs/proposals/`](docs/proposals/) — same rigor, `status: proposed`.
+   Parked, not lost: when picked up they graduate to a compare doc or plan entry.
+1. **Plan** — the design of record. Update [`docs/PLAN.md`](docs/PLAN.md)
+   before building: what, why, scope in/out, the decision.
+2. **Handoff** — a self-contained spec: context, definition-of-done,
+   constraints, key files, edge cases, tests, open questions. Under
+   [`docs/handoff/`](docs/handoff/).
+3. **Prompt** — the paste-ready Claude Code prompt that executes the handoff
+   (explore → plan → implement → verify), alongside its handoff.
+
+**Every handoff and prompt names the model that should execute it** — a
+`**Model: <name>**` line at the top, plus one sentence of *why*. State it when
+handing the prompt over, too. Model choice is a silent failure mode: an
+under-powered model on a judgment-heavy task does not error, it returns
+confident, plausible, wrong work, and the cost lands later.
+
+- **Opus** — the output quality *is* the deliverable and no test can catch a
+  bad one: design, architecture, debate, ambiguous diagnosis, interpreting a
+  confusing measurement, **calling a gate**, anything touching the
+  non-negotiable constraints.
+- **Sonnet** — well-specified implementation against a written
+  definition-of-done with tests to verify it; mechanical suite runs.
+- **Haiku** — mechanical bulk edits with an exact, unambiguous rule.
+
+When borderline, say Opus and say why it was close. A handoff detailed enough
+to be Sonnet-executable is itself the signal that the design phase was done.
+
+Then, on completion:
+
+4. **One feature → one ADR** in [`docs/adr/`](docs/adr/) (see
+   [`TEMPLATE.md`](docs/adr/TEMPLATE.md)): decision, context, alternatives,
+   consequences. **Numbering continues at 0016**; ADRs 0001–0015 belong to the
+   archived engine and are cited by their archive path.
+
+**Every rule, ADR, and material decision must carry a reference** — a paper, a
+blog post, or a concrete example link. A rule or ADR with no reference is
+incomplete. Ground the claim; don't assert it.
+
+**Archive implemented docs.** When a handoff/prompt pair (or a proposal) is
+fully implemented and its ADR is written, move it to
+[`docs/archive/`](docs/archive/README.md) in the same change, stamping
+`status: implemented` + the ADR link. Active directories hold *live* work only.
+Archived handoffs/prompts are named by the release version they shipped
+(`docs/archive/vX.Y.Z-name.md`), not their in-flight index. (Repo-level
+`archive/` = old builds; `docs/archive/` = completed doc artifacts.)
+
+## A pre-registered threshold may never move
+
+When a decision is gated on a measurement, **write the threshold, the metric
+definitions, and the slice definitions down before producing a number**, and
+commit that file first. Then measure against it.
+
+- A recorded **negative** that stops months of building is a *successful*
+  outcome, not a failed task. Report it plainly.
+- If a result lands between "clearly passes" and "clearly fails", write it up
+  as **ambiguous and hand it to Arpit**. Do not adjudicate it, and do not
+  restate the threshold in looser words.
+- Post-hoc analysis is allowed and often valuable — but label it **post-hoc**
+  and keep it out of the verdict.
+- If the measurement turns out not to test what the threshold assumed, say
+  *that*, rather than reporting the number as if it did.
+
+See [`tools/pruning-eval/PRE-REGISTRATION.md`](tools/pruning-eval/PRE-REGISTRATION.md)
+for the worked example.
+
+## Follow the OKF pattern (docs)
+
+Fux follows Google's **Open Knowledge Format** (OKF v0.1) — an open spec for
+knowledge as a directory of Markdown files with YAML frontmatter:
+
+- **The bundle is `docs/`** — root index at
+  [`docs/index.md`](docs/index.md), which declares `okf_version: "0.1"`.
+  Repo-root CLAUDE.md/README.md are tool entry points outside the bundle.
+  **Convention: ALL-CAPS markdown files carry no YAML frontmatter** —
+  GLOSSARY.md, DOC-REGISTRY.md, OPEN-WORK.md, WORKLOG.md are entry-point/tracker
+  files, exempt from the `type` requirement. Lowercase docs conform.
+- **Frontmatter `type` on every knowledge doc** (the only OKF-required field) —
+  `type: Compare Doc`, `type: Proposal`, `type: ADR`, `type: Handoff`,
+  `type: Paper`. Provenance keys are legal OKF extensions; consumers must
+  preserve unknown keys.
+- **`log.md` semantics**: `docs/WORKLOG.md` follows OKF's log convention
+  (date-grouped, newest first).
+- Conformance bar (OKF §9): parseable frontmatter + non-empty `type`
+  everywhere; be permissive when consuming.
+
+Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) ·
+[annotated guide](https://okf.md/spec/).
+
+## Documentation style (required)
+
+**No large paragraphs — they are hard to read.**
+
+- Split dense prose into **short points** (bullets or numbered lists), one idea
+  per point.
+- Keep paragraphs to **3–4 lines max**; if it runs longer, it's two points.
+- Make it **roomy**: blank lines between points and sections; tables for
+  option/field comparisons; headings to break up long sections.
+- Lead each point with the takeaway (bold it when it helps scanning).
+- When you touch a doc that has a wall of text, split it in the same change —
+  "fix stale docs on contact" applies to *form*, not just facts.
+- **Chat responses too.** Answers in Cowork / Claude Code follow the same rule:
+  precise, short paragraphs, lead with the takeaway.
+
+## Keep the docs in sync (required)
+
+**Every task updates the documentation — no exceptions.** This holds whether or
+not the task touched code: a decision, a scope change, or a plan is also
+documentation. A task is not "done" until the docs are true. At minimum:
+
+1. **[`docs/OPEN-WORK.md`](docs/OPEN-WORK.md)** — the live tracker. **On every
+   execution, whatever the outcome** — success, failure, blocked, interrupted,
+   abandoned — the affected `W-nn` rows and prediction rows are updated before
+   the session ends. A failed run records the failure with a one-line why.
+   Never mark an item DONE with failing tests.
+2. **[`docs/PLAN.md`](docs/PLAN.md)** — design of record; keep milestone status
+   truthful when behaviour or scope changes.
+3. **[`docs/WORKLOG.md`](docs/WORKLOG.md)** — an entry per substantive exchange
+   (see below).
+4. **[`docs/INTERVIEW.md`](docs/INTERVIEW.md)** — the agent-succession handoff.
+   Read it before your first substantive change; update it when direction,
+   strategy, or a major decision changes, and add yourself to its maintainer
+   line when you do. You will retire too; leave it better.
+5. **[`docs/DOC-REGISTRY.md`](docs/DOC-REGISTRY.md)** — bump the row for any doc
+   you touched; new maintained doc → new row, same change.
+6. **[`README.md`](README.md)** — the public front door: status, guarantees,
+   reading order. **`CHANGELOG.md`** once a package exists.
+7. **The relevant ADR**, [`docs/GLOSSARY.md`](docs/GLOSSARY.md) for any new
+   recurring term, and every test the behaviour change needs.
+
+**Auto-fold useful information into this file.** When a session produces
+durable, repo-wide knowledge — a decision, a constraint, a disproven idea, a
+pattern worth keeping — fold it in here concisely (details live in the linked
+docs), in the same change. If a future agent would act differently knowing
+something, it belongs here or is linked from here.
+
+## Session continuity — the running worklog (required)
+
+At the end of **every substantive exchange**, append an entry to
+[`docs/WORKLOG.md`](docs/WORKLOG.md): what was asked, what was done, what was
+decided or left open, and the single next step. A rolling exit-interview so a
+*new chat can pick up cold*. **Applies in Cowork and Claude Code alike.** Newest
+entry on top; short and true. Distinct from `INTERVIEW.md` (strategic,
+cross-session succession) — the worklog is the granular, per-exchange trail.
+
+## Conformance runs — file every one (required)
+
+The fux-lab environment (`~/my_programs/fux-lab/`) is scratch and commits
+nothing. Its **evidence is not** — every run's report + diagnosis + raw
+evidence is filed into [`docs/conformance/`](docs/conformance/), so engine
+changes are made from measured data, not memory. Binding, like the docs law.
+
+Per run, in the same change:
+
+1. Create `docs/conformance/<date>-<run>/`.
+2. Drop the run's own report(s) there.
+3. Write `ANALYSIS.md` — the diagnosis turned into **specific improvements**,
+   each with a repro command; state unresolved causes as unresolved.
+4. Save the primary data under `evidence/`.
+5. Add the run to [`docs/conformance/README.md`](docs/conformance/README.md)
+   and bump the DOC-REGISTRY row.
+
+**The reproduce command must actually reproduce.** Findings that warrant a
+change graduate to `docs/proposals/` and, when accepted, an ADR. Never ship a
+ranking/behaviour change off a single synthetic corpus.
+
+## Layout
+
+```
+docs/
+  PLAN.md           design of record — milestones M0–M8, each gated by a prediction
+  OPEN-WORK.md      THE LIVE TRACKER — W-items + P1–P7 status (replaces IMPLEMENTATION.md)
+  INTERVIEW.md      agent-succession handoff (read the reset block first)
+  WORKLOG.md        per-exchange session handoff (append every exchange; OKF log.md)
+  DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
+  GLOSSARY.md       every recurring term, defined once
+  paper/            the architecture of record + figures + predictions P1–P7
+  compare/          closed decisions — debate, matrix, verdict, reopen-trigger
+  proposals/        parked ideas — same rigor, status: proposed
+  handoff/          handoff + prompt pairs (live work only)
+  adr/              one ADR per feature, numbering continues at 0016 (+ TEMPLATE.md)
+  archive/          v0.26-docs/ (frozen), PLAN-v0.26.md, implemented handoffs
+  conformance/      measurement evidence & analysis (one folder per run)
+tools/
+  pruning-eval/     M1's gate — pre-registration, KL selector, eval harness
+archive/
+  v0.26/            the previous engine — runnable, REFERENCE ONLY, never modified
+  v0.1/             the first build
+```
+
+**`src/fux/` does not exist yet, by design.** The package scaffold is M0b and
+lands **only if P1 passes** — scaffolding a package for an architecture a
+measurement may falsify is the "build the fun part first" failure the plan
+exists to avoid. When it lands: five-plane layout (`keyspace/`, `wire/`,
+`runtime/`, `refer/`, `ingest/`), `cli.py`, `errors.py`.
+
+## Error contract (applies once `src/` exists)
+
+Catch and render errors only at the boundaries (CLI `main`, hook entrypoints).
+Internals keep raising. Raise the single `FuxError` for expected user-facing
+failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
+`2` blocking (strict) · `130` interrupted.
+
+## Build & test
+
+There is **no package on `main` yet**. What runs today:
+
+```bash
+# the archived engine (reference + M1's baseline) — do not modify it
+cd archive/v0.26 && uv sync --extra dev && uv run pytest -q tests
+
+# M1's gate: the KL selector's contract + the harness self-checks
+archive/v0.26/.venv/bin/python -m pytest tools/pruning-eval/tests -q
+
+# M1's gate: the experiment itself
+archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit synth
+```
+
+**Two suites, both maintained, once `src/` exists** — `tests/` (fast unit) and
+`tests_e2e/` (the package as a user: real CLI via `subprocess`, fixture corpus,
+golden files updated deliberately and never regenerated blindly). A feature is
+not done until both cover it and pass.
+
+## Package identity (do not change casually)
+
+- Distribution name: **`fux-engine`**. Import package: **`fux`**.
+- Version: **`0.30.0.dev0`** at M0b (0.26.0 archived → reset → 0.30.0).
+  Bumped in `src/fux/__init__.py` only, once it exists.
+
+## Merge wall — what actually blocks a merge
+
+**There are no required status checks on `main`.** What remains:
+`enforce_admins: true`, no force-push, no deletion — history is protected, the
+quality gate is not.
+
+Practical consequence: **CI green is your responsibility to check, not
+something the wall guarantees.** Read `gh pr checks <n>` yourself and do not
+merge on red. Source of truth:
+[`.github/branch-protection.json`](.github/branch-protection.json).
+
+## Hard-won build knowledge (auto-folded)
+
+**2026-08-09 — M1, the pruning gate**
+
+- **A pre-registered threshold is only as good as the corpus that tests it.**
+  M1's k=128 arm returned a zero delta on all three eval corpora — and prune
+  coverage showed why: their documents' median vocabulary is 32–46 distinct
+  terms, so top-128 was a **no-op for 97 %+ of documents**. Always report the
+  fraction of the population a treatment actually touched; an aggregate delta
+  of zero over an untreated population is not evidence.
+- **Recompute statistics over the pruned index, never borrow them.** `df`, `n`
+  and field lengths must come from the surviving postings, because that is what
+  production holds. Borrowing the baseline's statistics makes scores line up
+  and measures a system nobody will ship. Keep a diagnostic arm that *does*
+  borrow — it is how a loss gets attributed to missing postings vs shifted
+  statistics.
+- **Wrap the archive; never edit it.** The archived `Searcher` exposed a
+  `stats` seam (built for the lean profile) that turned out to be exactly the
+  hook the diagnostic arm needed. Look for an existing seam before concluding
+  an archived module has to change.
+- **The archived engine's own recorded numbers are a free correctness check.**
+  The harness's fixture baseline reproduced the archived lexical eval exactly
+  (hit@5 0.952 / MRR 0.833) and orbit's lab number (0.887) — which is what
+  makes "we varied only the index" a verified fact rather than an intention.
+
+**Earlier knowledge (v0.19–0.26)** is preserved in the archived CLAUDE.md at
+git history (`git show 6473987:CLAUDE.md`). Two items still bind
+because their code is on the port list:
+
+- **BM25F means weight-then-saturate once** — never sum per-field BM25.
+- **No wall-clock output anywhere on the maintenance path** — timestamps derive
+  from `SOURCE_DATE_EPOCH`/source mtime, or the byte-identical guarantee breaks.

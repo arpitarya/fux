@@ -28,10 +28,13 @@ agents* — update both or neither.
 * [Compare docs](compare/) - six v0.30 forks, verdict at the top of each; one still ⏳ (ingest-mode naming).
 * [Proposals](proposals/) - parked ideas with graduation triggers (3 new for v0.30 + 3 carried).
 * [ADRs](adr/) - numbering continues from 0016; 0001–0015 are archived with the v0.26 engine.
+  * [ADR-0016](adr/0016-ingest-mode-naming.md) - ingest-mode naming (`inferred`/`enriched`); ⏳ proposed, awaiting ratification.
+  * **[ADR-0017](adr/0017-pruning-eval-gate.md) - P1, the pruning gate: INCONCLUSIVE. Read before starting any milestone.**
 
 # Build
 
-* [Handoffs](handoff/) - live build specs (empty until M0's handoff+prompt pair).
-* [Conformance](conformance/) - fux-lab evidence home (persists across rebuilds).
-* [Archive](archive/) - implemented v0.26-era artifacts · [v0.26 docs](archive/v0.26-docs/) (ADRs 0001–0015, compare, example, tracker) · [old plan](archive/PLAN-v0.26.md).
+* [Handoffs](handoff/) - live build specs: the [M0/M1 pair](handoff/v0.30.0-m0-m1-gate-handoff.md) + the [CLAUDE.md review diff](handoff/v0.30.0-claude-md.diff).
+* [Conformance](conformance/README.md) - measurement evidence home (persists across rebuilds); latest: [the pruning eval](conformance/2026-08-09-pruning-eval/ANALYSIS.md).
+* [`tools/pruning-eval/`](../tools/pruning-eval/README.md) - M1's gate: the frozen [pre-registration](../tools/pruning-eval/PRE-REGISTRATION.md), the KL selector, the harness.
+* [Archive](archive/) - implemented v0.26-era artifacts · [v0.26 docs](../archive/v0.26/archive/v0.26-docs/) (ADRs 0001–0015, compare, example, tracker) · [old plan](../archive/v0.26/archive/PLAN-v0.26.md).
 * Engine archive: [`../archive/v0.26/`](../archive/v0.26/) - the full prior build, reference-only, runnable for M1's baseline.
