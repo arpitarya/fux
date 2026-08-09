@@ -221,6 +221,10 @@ in this repo:
 - When you touch a doc that has a wall of text, split it in the same change —
   the docs law's "fix stale docs on contact" applies to *form*, not just facts.
 
+- **Chat responses too (Arpit, 2026-08-08).** Answers in Cowork / Claude Code
+  conversations follow the same rule: be precise, short paragraphs (3–4 lines
+  max), lead with the takeaway — no walls of text in replies, not just in docs.
+
 ## Keep the docs in sync with the code (required)
 
 **Every task updates the documentation — no exceptions.** This holds whether the task

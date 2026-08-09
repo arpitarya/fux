@@ -1,0 +1,173 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 800" font-family="ui-monospace, 'SF Mono', Menlo, monospace">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#5f6b7a" stroke-width="1.6" stroke-linecap="round"/>
+    </marker>
+    <marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#3d6df2" stroke-width="1.6" stroke-linecap="round"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#0f9d58" stroke-width="1.6" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1080" height="800" fill="#fafafa"/>
+  <text x="36" y="40" font-size="18" fill="#1a1f27" font-weight="600">Fux index-and-refer — component architecture (v2, 2026-08-09)</text>
+  <text x="36" y="58" font-size="10.5" fill="#8a93a0">blue = committed (git) · gray = local/derived · green = maintenance · amber = council-flagged · sources own all content</text>
+
+  <!-- SOURCES -->
+  <rect x="36" y="76" width="230" height="186" rx="10" fill="#fff" stroke="#c9cfd8"/>
+  <text x="52" y="98" font-size="11.5" fill="#1a1f27" font-weight="600">SOURCE SYSTEMS</text>
+  <rect x="52" y="110" width="198" height="38" rx="6" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="60" y="126" font-size="10" fill="#1a1f27">repo dirs — docs/ adr/ code refs</text>
+  <text x="60" y="140" font-size="9" fill="#8a93a0">local read · index re-derivable!</text>
+  <rect x="52" y="154" width="198" height="38" rx="6" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="60" y="170" font-size="10" fill="#1a1f27">apps — confluence · sharepoint</text>
+  <text x="60" y="184" font-size="9" fill="#8a93a0">adapters capped · MCP endgame</text>
+  <rect x="52" y="198" width="198" height="50" rx="6" fill="#eef3fd" stroke="#3d6df2" stroke-dasharray="4 3"/>
+  <text x="60" y="214" font-size="10" fill="#1a1f27">snapshot (opt-in, per source)</text>
+  <text x="60" y="228" font-size="9" fill="#8a93a0">air-gap / audit / PR-reviewed</text>
+  <text x="60" y="241" font-size="9" fill="#8a93a0">change tracking</text>
+
+  <!-- INGEST -->
+  <line x1="266" y1="165" x2="304" y2="165" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
+  <rect x="308" y="76" width="252" height="330" rx="10" fill="#fff" stroke="#c9cfd8"/>
+  <text x="324" y="98" font-size="11.5" fill="#1a1f27" font-weight="600">INGEST — extract, then discard</text>
+
+  <rect x="324" y="110" width="220" height="128" rx="6" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="332" y="126" font-size="10" fill="#1a1f27" font-weight="600">inferred mode · default · $0</text>
+  <text x="332" y="140" font-size="8.5" fill="#8a93a0">deterministic · offline · stdlib only</text>
+  <text x="340" y="157" font-size="9.5" fill="#1a1f27">adapters → transient convert →</text>
+  <text x="340" y="172" font-size="9.5" fill="#1a1f27">KL top-k terms · YAKE phrases</text>
+  <text x="340" y="187" font-size="9.5" fill="#1a1f27">32 B code (static table) · edges:</text>
+  <text x="340" y="202" font-size="9.5" fill="#1a1f27">refs · cites · tags · doc→code</text>
+  <text x="332" y="222" font-size="8.5" fill="#8a93a0">EXTRACTED grade · text never kept</text>
+
+  <rect x="324" y="246" width="220" height="100" rx="6" fill="#fdf6e8" stroke="#e0a800"/>
+  <text x="332" y="262" font-size="10" fill="#1a1f27" font-weight="600">enriched mode · opt-in · AI model</text>
+  <text x="340" y="279" font-size="9.5" fill="#1a1f27">semantic term expansion ·</text>
+  <text x="340" y="294" font-size="9.5" fill="#1a1f27">INFERRED-grade edges (wt 0.6) ·</text>
+  <text x="340" y="309" font-size="9.5" fill="#1a1f27">summaries</text>
+  <text x="332" y="328" font-size="8.5" fill="#8a93a0">outputs PINNED into index w/ provenance</text>
+  <text x="332" y="340" font-size="8.5" fill="#8a93a0">— re-read forever, never re-generated</text>
+
+  <rect x="324" y="358" width="220" height="36" rx="6" fill="#e8f5ee" stroke="#0f9d58"/>
+  <text x="332" y="373" font-size="9.5" fill="#1a1f27">triggers: git hooks (delta) · schedule</text>
+  <text x="332" y="386" font-size="8.5" fill="#8a93a0">merge = one CRDT join → re-derive</text>
+
+  <!-- THE INDEX -->
+  <line x1="560" y1="240" x2="598" y2="240" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#b)"/>
+  <rect x="602" y="76" width="252" height="330" rx="10" fill="#eef3fd" stroke="#3d6df2"/>
+  <text x="618" y="98" font-size="11.5" fill="#3d6df2" font-weight="600">THE INDEX · one MST keyspace</text>
+  <text x="618" y="112" font-size="8.5" fill="#8a93a0">single container · one root hash = corpus state</text>
+  <text x="618" y="124" font-size="8.5" fill="#8a93a0">committed wire format (decode-once, bit-packed)</text>
+
+  <rect x="618" y="134" width="220" height="34" rx="5" fill="#fff" stroke="#c9cfd8"/>
+  <text x="626" y="148" font-size="9.5" fill="#1a1f27">L/ ledger — locator · sha · policies</text>
+  <text x="626" y="161" font-size="8.5" fill="#8a93a0">front-coded columnar · ~45–60 MB</text>
+
+  <rect x="618" y="172" width="220" height="34" rx="5" fill="#fff" stroke="#c9cfd8"/>
+  <text x="626" y="186" font-size="9.5" fill="#1a1f27">P/ postings — top-k terms/doc, hashed</text>
+  <text x="626" y="199" font-size="8.5" fill="#8a93a0">BIC &lt;1–2 bits/id + 4-bit impacts · ~90–140 MB</text>
+
+  <rect x="618" y="210" width="220" height="34" rx="5" fill="#fff" stroke="#c9cfd8"/>
+  <text x="626" y="224" font-size="9.5" fill="#1a1f27">D/ dictionary + exact df</text>
+  <text x="626" y="237" font-size="8.5" fill="#8a93a0">MPH ~2 bits/key + EF offsets · ~15–25 MB</text>
+
+  <rect x="618" y="248" width="220" height="34" rx="5" fill="#fff" stroke="#c9cfd8"/>
+  <text x="626" y="262" font-size="9.5" fill="#1a1f27">V/ dense codes — 32 B/doc</text>
+  <text x="626" y="275" font-size="8.5" fill="#8a93a0">entropy floor · 32 MB</text>
+
+  <rect x="618" y="286" width="220" height="34" rx="5" fill="#fff" stroke="#c9cfd8"/>
+  <text x="626" y="300" font-size="9.5" fill="#1a1f27">E/ edges — typed, sparse, extracted</text>
+  <text x="626" y="313" font-size="8.5" fill="#8a93a0">delta-varint adjacency · ~20 MB</text>
+
+  <rect x="618" y="324" width="220" height="34" rx="5" fill="#fff" stroke="#e0a800"/>
+  <text x="626" y="338" font-size="9.5" fill="#1a1f27">M/ meta ⚠ — titles · phrases</text>
+  <text x="626" y="351" font-size="8.5" fill="#8a93a0">hashed by default for external · ~15 MB</text>
+
+  <text x="618" y="374" font-size="9" fill="#3d6df2" font-weight="600">total ~220–290 MB @1M · top-64: ~160–200 MB</text>
+  <text x="618" y="388" font-size="8.5" fill="#8a93a0">levers: partial clone · commit external shards only</text>
+  <text x="618" y="400" font-size="8.5" fill="#8a93a0">(repo-source shards re-derived locally by hooks)</text>
+
+  <!-- LOCAL -->
+  <rect x="872" y="76" width="172" height="330" rx="10" fill="#f4f4f6" stroke="#9aa3af" stroke-dasharray="5 4"/>
+  <text x="888" y="98" font-size="11.5" fill="#5f6b7a" font-weight="600">LOCAL · derived</text>
+
+  <rect x="886" y="110" width="144" height="64" rx="6" fill="#fff" stroke="#c9cfd8"/>
+  <text x="894" y="125" font-size="9.5" fill="#1a1f27">query segments</text>
+  <text x="894" y="138" font-size="8.5" fill="#8a93a0">wire → inflated once:</text>
+  <text x="894" y="150" font-size="8.5" fill="#8a93a0">byte-aligned · mmap ·</text>
+  <text x="894" y="162" font-size="8.5" fill="#8a93a0">block-max · ~2.5 GB</text>
+
+  <rect x="886" y="182" width="144" height="56" rx="6" fill="#fff" stroke="#c9cfd8"/>
+  <text x="894" y="197" font-size="9.5" fill="#1a1f27">ARC cache</text>
+  <text x="894" y="210" font-size="8.5" fill="#8a93a0">(locator, sha) → text</text>
+  <text x="894" y="222" font-size="8.5" fill="#8a93a0">scan-resistant · bounded</text>
+
+  <rect x="886" y="246" width="144" height="56" rx="6" fill="#fff" stroke="#e0a800"/>
+  <text x="894" y="261" font-size="9.5" fill="#1a1f27">eval harness</text>
+  <text x="894" y="274" font-size="8.5" fill="#1a1f27">= MILESTONE 1 gate</text>
+  <text x="894" y="286" font-size="8.5" fill="#8a93a0">pruned-vs-full is the DoD</text>
+
+  <text x="888" y="324" font-size="8.5" fill="#8a93a0">query RSS ~50–150 MB</text>
+  <text x="888" y="338" font-size="8.5" fill="#8a93a0">all deletable — cost =</text>
+  <text x="888" y="350" font-size="8.5" fill="#8a93a0">one rebuild / re-fetch</text>
+  <text x="888" y="372" font-size="8.5" fill="#8a93a0">theory note: wavelet-tree</text>
+  <text x="888" y="384" font-size="8.5" fill="#8a93a0">self-index = 1 structure;</text>
+  <text x="888" y="396" font-size="8.5" fill="#8a93a0">rejected: decode cost</text>
+
+  <!-- ANSWER PATH -->
+  <rect x="36" y="436" width="1008" height="212" rx="12" fill="#fff" stroke="#c9cfd8"/>
+  <text x="52" y="460" font-size="11.5" fill="#1a1f27" font-weight="600">ANSWER PATH</text>
+
+  <rect x="52" y="474" width="120" height="54" rx="7" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="112" y="496" font-size="10.5" fill="#1a1f27" text-anchor="middle">question</text>
+  <text x="112" y="511" font-size="8.5" fill="#8a93a0" text-anchor="middle">ask·find·answer·</text>
+  <text x="112" y="522" font-size="8.5" fill="#8a93a0" text-anchor="middle">explain·graph·path</text>
+
+  <line x1="172" y1="501" x2="210" y2="501" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <rect x="214" y="474" width="204" height="54" rx="7" fill="#eef3fd" stroke="#3d6df2"/>
+  <text x="316" y="492" font-size="10.5" fill="#1a1f27" text-anchor="middle">query kernel — rank only</text>
+  <text x="316" y="506" font-size="8.5" fill="#8a93a0" text-anchor="middle">BM25F MaxScore + hamming + PPR → RRF</text>
+  <text x="316" y="519" font-size="8.5" fill="#8a93a0" text-anchor="middle">reads local segments · never content</text>
+
+  <line x1="418" y1="501" x2="456" y2="501" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
+  <text x="437" y="492" font-size="8.5" fill="#5f6b7a" text-anchor="middle">top-k</text>
+
+  <rect x="460" y="474" width="168" height="54" rx="7" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="544" y="492" font-size="10.5" fill="#1a1f27" text-anchor="middle">fetch layer</text>
+  <text x="544" y="506" font-size="8.5" fill="#8a93a0" text-anchor="middle">cache → adapter read-through</text>
+  <text x="544" y="519" font-size="8.5" fill="#8a93a0" text-anchor="middle">hit ~ms · live miss 0.5–2 s</text>
+
+  <line x1="628" y1="501" x2="666" y2="501" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
+
+  <rect x="670" y="474" width="184" height="54" rx="7" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="762" y="492" font-size="10.5" fill="#1a1f27" text-anchor="middle">answer assembler</text>
+  <text x="762" y="506" font-size="8.5" fill="#8a93a0" text-anchor="middle">passage re-score on fetched text</text>
+  <text x="762" y="519" font-size="8.5" fill="#8a93a0" text-anchor="middle">extractive · confidence floor</text>
+
+  <line x1="854" y1="501" x2="892" y2="501" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#b)"/>
+
+  <rect x="896" y="474" width="132" height="54" rx="7" fill="#eef3fd" stroke="#3d6df2"/>
+  <text x="962" y="496" font-size="10.5" fill="#1a1f27" text-anchor="middle">answer</text>
+  <text x="962" y="511" font-size="8.5" fill="#8a93a0" text-anchor="middle">cited · fresh sha ·</text>
+  <text x="962" y="522" font-size="8.5" fill="#8a93a0" text-anchor="middle">or honest decline</text>
+
+  <path d="M 544 528 L 544 560 L 950 560 L 950 534" fill="none" stroke="#9aa3af" stroke-width="1.1" stroke-dasharray="3 3"/>
+  <text x="747" y="573" font-size="8.5" fill="#8a93a0" text-anchor="middle">fetched text cached · version drift found at answer time re-indexes that doc</text>
+
+  <text x="52" y="598" font-size="9" fill="#8a93a0">warm ~150–300 ms · cold external ~1.5–3 s (first ask) · offline: repo sources full function; external → declared staleness</text>
+  <text x="52" y="616" font-size="9" fill="#8a93a0">freshness = read-time contract: answers stamp staleness; cited-set version check (opt-in network) upgrades to verified</text>
+  <text x="52" y="634" font-size="9" fill="#8a93a0">clone flow: git clone (~200 MB wire) → hooks inflate query segments + re-derive repo-source shards locally → first answer immediately</text>
+
+  <!-- maintenance loop -->
+  <path d="M 728 406 L 728 424 L 434 424 L 434 410" fill="none" stroke="#0f9d58" stroke-width="1.2" stroke-dasharray="4 3" marker-end="url(#g)"/>
+  <text x="580" y="434" font-size="8.5" fill="#0f9d58" text-anchor="middle">maintenance: commit/schedule → delta ingest → join ∘ rebuild</text>
+
+  <text x="36" y="672" font-size="9.5" fill="#8a93a0">grounding — pruning: Büttcher–Clarke KL top-k · postings: Binary Interpolative Coding (Moffat–Stuiver) · dict: RecSplit/PtrHash MPH · ledger: Merkle Search Trees</text>
+  <text x="36" y="688" font-size="9.5" fill="#8a93a0">(Auvolat–Taïani) · skipping: Block-Max WAND · cache: ARC (Megiddo–Modha) · freshness: RFC 5861 + Dynamo read repair · maintenance: DBSP · frame: cooperative federated search</text>
+  <text x="36" y="710" font-size="9.5" fill="#b8860b">council 2026-08-09: "index" not "db" · hashed meta default (ACL leak) · adapters capped, MCP endgame · eval gates all build · v0.26 substrate untouched until dogfood</text>
+  <text x="36" y="726" font-size="9.5" fill="#b8860b">open: "enriched" vs "extracted" naming for the AI ingest tier (collides with ADR-0009 edge grades — needs Arpit's call + one ADR if renamed)</text>
+</svg>

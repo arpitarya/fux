@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="720" height="360" fill="#fcfcfb"/>
+  <text x="24" y="30" font-size="14" fill="#0b0b0b" font-weight="600">Figure 2 — Committed index composition at 1M documents (wire format, top-128)</text>
+  <text x="24" y="47" font-size="11" fill="#52514e">Midpoint estimates; one MST keyspace, six prefixes. Total ≈ 254 MB.</text>
+
+  <!-- horizontal bars, x scale 0..120MB → 0..500px ; bars x0=200 -->
+  <g stroke="#e1e0d9" stroke-width="1">
+    <line x1="200" y1="70" x2="200" y2="300"/>
+    <line x1="325" y1="70" x2="325" y2="300"/>
+    <line x1="450" y1="70" x2="450" y2="300"/>
+    <line x1="575" y1="70" x2="575" y2="300"/>
+    <line x1="700" y1="70" x2="700" y2="300"/>
+  </g>
+  <g font-size="10" fill="#898781" text-anchor="middle">
+    <text x="200" y="316">0</text>
+    <text x="325" y="316">30 MB</text>
+    <text x="450" y="316">60 MB</text>
+    <text x="575" y="316">90 MB</text>
+    <text x="700" y="316">120 MB</text>
+  </g>
+
+  <!-- rows: P/115, L/52, V/32, D/20, E/20, M/15  ; px = MB*(500/120)=MB*4.1667 -->
+  <g font-size="11" fill="#0b0b0b" text-anchor="end">
+    <text x="190" y="92">P/ postings</text>
+    <text x="190" y="130">L/ ledger</text>
+    <text x="190" y="168">V/ dense codes</text>
+    <text x="190" y="206">D/ dict + df</text>
+    <text x="190" y="244">E/ edges</text>
+    <text x="190" y="282">M/ meta</text>
+  </g>
+  <g fill="#2a78d6">
+    <rect x="200" y="78" width="479" height="20" rx="4"/>
+    <rect x="200" y="116" width="217" height="20" rx="4"/>
+    <rect x="200" y="154" width="133" height="20" rx="4"/>
+    <rect x="200" y="192" width="83" height="20" rx="4"/>
+    <rect x="200" y="230" width="83" height="20" rx="4"/>
+    <rect x="200" y="268" width="63" height="20" rx="4"/>
+  </g>
+  <g font-size="10.5" fill="#52514e">
+    <text x="685" y="92" text-anchor="end" fill="#fcfcfb">115 MB · BIC &lt;2 bits/id + 4-bit impacts</text>
+    <text x="423" y="130">52 MB · front-coded columnar</text>
+    <text x="339" y="168">32 MB · 32 B/doc (entropy floor)</text>
+    <text x="289" y="206">20 MB · MPH ~2 bits/key + EF offsets</text>
+    <text x="289" y="244">20 MB · delta-varint adjacency</text>
+    <text x="269" y="282">15 MB · hashed-default titles/phrases</text>
+  </g>
+
+  <text x="24" y="344" font-size="10" fill="#898781">Postings dominate — every further reduction lever (top-64, external-shards-only) acts on the largest block first.</text>
+</svg>

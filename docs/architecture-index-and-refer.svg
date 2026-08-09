@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 640" font-family="ui-monospace, 'SF Mono', Menlo, monospace">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#5f6b7a" stroke-width="1.6" stroke-linecap="round"/>
+    </marker>
+    <marker id="arrAcc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9" fill="none" stroke="#3d6df2" stroke-width="1.6" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <rect width="960" height="640" fill="#fafafa"/>
+  <text x="40" y="44" font-size="19" fill="#1a1f27" font-weight="600">Fux — index-and-refer</text>
+  <text x="40" y="64" font-size="11.5" fill="#8a93a0">sources own the content · Fux keeps only how to find, verify and fetch it</text>
+
+  <!-- SOURCE SYSTEMS -->
+  <rect x="40" y="92" width="880" height="96" rx="12" fill="#fff" stroke="#c9cfd8"/>
+  <text x="56" y="116" font-size="12" fill="#1a1f27" font-weight="600">source systems — the only owners of content</text>
+
+  <rect x="56" y="128" width="264" height="44" rx="8" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="188" y="147" font-size="11.5" fill="#1a1f27" text-anchor="middle">git dirs</text>
+  <text x="188" y="163" font-size="9.5" fill="#8a93a0" text-anchor="middle">docs/ · adr/ · README · code</text>
+
+  <rect x="336" y="128" width="300" height="44" rx="8" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="486" y="147" font-size="11.5" fill="#1a1f27" text-anchor="middle">apps &amp; urls</text>
+  <text x="486" y="163" font-size="9.5" fill="#8a93a0" text-anchor="middle">confluence · sharepoint · bloomreach · web</text>
+
+  <rect x="652" y="128" width="252" height="44" rx="8" fill="#eef3fd" stroke="#3d6df2" stroke-dasharray="4 3"/>
+  <text x="778" y="147" font-size="11.5" fill="#1a1f27" text-anchor="middle">snapshot (opt-in, per source)</text>
+  <text x="778" y="163" font-size="9.5" fill="#8a93a0" text-anchor="middle">only for air-gap / audit / review</text>
+
+  <!-- ingest arrow -->
+  <line x1="300" y1="188" x2="300" y2="232" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#arr)"/>
+  <text x="312" y="214" font-size="10.5" fill="#5f6b7a">ingest = extract only (git hooks / schedule) · text discarded</text>
+
+  <!-- KEYWORD DB -->
+  <rect x="40" y="240" width="520" height="130" rx="12" fill="#eef3fd" stroke="#3d6df2"/>
+  <text x="56" y="264" font-size="12" fill="#3d6df2" font-weight="600">keyword db + ledger · committed in git · ~230 B/doc</text>
+
+  <rect x="56" y="278" width="238" height="74" rx="8" fill="#fff" stroke="#c9cfd8"/>
+  <text x="175" y="300" font-size="11.5" fill="#1a1f27" text-anchor="middle" font-weight="600">finding structure</text>
+  <text x="175" y="317" font-size="9.5" fill="#8a93a0" text-anchor="middle">terms &amp; phrases · tf/df · 32 B codes</text>
+  <text x="175" y="332" font-size="9.5" fill="#8a93a0" text-anchor="middle">link edges</text>
+
+  <rect x="308" y="278" width="238" height="74" rx="8" fill="#fff" stroke="#c9cfd8"/>
+  <text x="427" y="300" font-size="11.5" fill="#1a1f27" text-anchor="middle" font-weight="600">ledger</text>
+  <text x="427" y="317" font-size="9.5" fill="#8a93a0" text-anchor="middle">source · locator · sha@index</text>
+  <text x="427" y="332" font-size="9.5" fill="#8a93a0" text-anchor="middle">merge = deterministic join</text>
+
+  <!-- CACHE -->
+  <rect x="620" y="240" width="300" height="130" rx="12" fill="#f4f4f6" stroke="#9aa3af" stroke-dasharray="5 4"/>
+  <text x="636" y="264" font-size="12" fill="#5f6b7a" font-weight="600">cache · local, bounded LRU</text>
+  <text x="636" y="288" font-size="10.5" fill="#5f6b7a">keyed (locator, sha) → self-revalidating</text>
+  <text x="636" y="306" font-size="10.5" fill="#5f6b7a">holds recently answered docs' text</text>
+  <text x="636" y="324" font-size="10.5" fill="#5f6b7a">changes speed, never results</text>
+  <text x="636" y="352" font-size="9.5" fill="#8a93a0">(+ rebuilt index segments live here too)</text>
+
+  <!-- ANSWER PATH -->
+  <rect x="40" y="412" width="880" height="150" rx="12" fill="#fff" stroke="#c9cfd8"/>
+  <text x="56" y="438" font-size="12" fill="#1a1f27" font-weight="600">answer path</text>
+
+  <rect x="56" y="454" width="130" height="52" rx="8" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="121" y="476" font-size="11.5" fill="#1a1f27" text-anchor="middle">question</text>
+  <text x="121" y="492" font-size="9.5" fill="#8a93a0" text-anchor="middle">agent / human</text>
+
+  <line x1="186" y1="480" x2="240" y2="480" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#arr)"/>
+
+  <rect x="244" y="454" width="170" height="52" rx="8" fill="#eef3fd" stroke="#3d6df2"/>
+  <text x="329" y="476" font-size="11.5" fill="#1a1f27" text-anchor="middle">rank in keyword db</text>
+  <text x="329" y="492" font-size="9.5" fill="#8a93a0" text-anchor="middle">no source access needed</text>
+
+  <line x1="414" y1="480" x2="468" y2="480" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#arr)"/>
+  <text x="441" y="470" font-size="9" fill="#5f6b7a" text-anchor="middle">top-k</text>
+
+  <rect x="472" y="454" width="150" height="52" rx="8" fill="#f4f4f6" stroke="#c9cfd8"/>
+  <text x="547" y="476" font-size="11.5" fill="#1a1f27" text-anchor="middle">cache hit?</text>
+  <text x="547" y="492" font-size="9.5" fill="#8a93a0" text-anchor="middle">version-checked</text>
+
+  <line x1="622" y1="480" x2="676" y2="480" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#arrAcc)"/>
+  <text x="649" y="470" font-size="9" fill="#3d6df2" text-anchor="middle">miss</text>
+
+  <rect x="680" y="454" width="180" height="52" rx="8" fill="#eef3fd" stroke="#3d6df2"/>
+  <text x="770" y="476" font-size="11.5" fill="#1a1f27" text-anchor="middle">fetch from source</text>
+  <text x="770" y="492" font-size="9.5" fill="#8a93a0" text-anchor="middle">git read · live API/GET</text>
+
+  <path d="M 770 506 L 770 528 L 547 528 L 547 510" fill="none" stroke="#5f6b7a" stroke-width="1.2" marker-end="url(#arr)"/>
+  <text x="660" y="542" font-size="9.5" fill="#8a93a0" text-anchor="middle">cache it, then answer</text>
+
+  <text x="56" y="546" font-size="10" fill="#8a93a0">answer cites fresh sha + timestamp · source unreachable → doc-level answer or honest decline</text>
+
+  <text x="40" y="606" font-size="10" fill="#8a93a0">committed: keyword db + ledger only (~450 MB @1M docs) · everything else local · freshness automatic — content never stored long enough to go stale</text>
+</svg>

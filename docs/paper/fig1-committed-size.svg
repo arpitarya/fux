@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif">
+  <rect width="720" height="400" fill="#fcfcfb"/>
+  <text x="24" y="30" font-size="14" fill="#0b0b0b" font-weight="600">Figure 1 — Committed footprint vs corpus size, by design</text>
+  <text x="24" y="47" font-size="11" fill="#52514e">Analytical projections anchored at the 100k measured point (ADR-0011). Log scale.</text>
+
+  <!-- plot area x:90..680  y:70..330 ; y log scale MB: 1MB..1TB (6 decades: 10^0..10^6 MB) -->
+  <!-- gridlines each decade -->
+  <g stroke="#e1e0d9" stroke-width="1">
+    <line x1="90" y1="330" x2="680" y2="330"/>
+    <line x1="90" y1="286.7" x2="680" y2="286.7"/>
+    <line x1="90" y1="243.3" x2="680" y2="243.3"/>
+    <line x1="90" y1="200" x2="680" y2="200"/>
+    <line x1="90" y1="156.7" x2="680" y2="156.7"/>
+    <line x1="90" y1="113.3" x2="680" y2="113.3"/>
+    <line x1="90" y1="70" x2="680" y2="70"/>
+  </g>
+  <g font-size="10" fill="#898781" text-anchor="end">
+    <text x="84" y="334">1 MB</text>
+    <text x="84" y="290.7">10 MB</text>
+    <text x="84" y="247.3">100 MB</text>
+    <text x="84" y="204">1 GB</text>
+    <text x="84" y="160.7">10 GB</text>
+    <text x="84" y="117.3">100 GB</text>
+    <text x="84" y="74">1 TB</text>
+  </g>
+  <!-- x: 10k=170, 100k=385, 1M=600 (log spacing) -->
+  <g font-size="10" fill="#898781" text-anchor="middle">
+    <text x="170" y="348">10k docs</text>
+    <text x="385" y="348">100k docs</text>
+    <text x="600" y="348">1M docs</text>
+  </g>
+  <line x1="90" y1="330" x2="680" y2="330" stroke="#c3c2b7" stroke-width="1"/>
+
+  <!-- y(v) = 330 - 43.33*log10(MB) -->
+  <!-- full-copy (5x source of 65KB docs): 10k=3.25GB y=178.8 ; 100k=32.5GB y=135.5 ; 1M=325GB y=92.2 -->
+  <polyline points="170,178.8 385,135.5 600,92.2" fill="none" stroke="#e34948" stroke-width="2"/>
+  <circle cx="170" cy="178.8" r="4" fill="#e34948"/><circle cx="385" cy="135.5" r="4" fill="#e34948"/><circle cx="600" cy="92.2" r="4" fill="#e34948"/>
+  <text x="592" y="88" font-size="10.5" fill="#52514e" text-anchor="end">325 GB</text>
+
+  <!-- v1 byte-aligned committed 700B/doc: 10k=7MB y=293.4; 100k=70MB y=250.1; 1M=700MB y=206.8 -->
+  <polyline points="170,293.4 385,250.1 600,206.8" fill="none" stroke="#eb6834" stroke-width="2"/>
+  <circle cx="170" cy="293.4" r="4" fill="#eb6834"/><circle cx="385" cy="250.1" r="4" fill="#eb6834"/><circle cx="600" cy="206.8" r="4" fill="#eb6834"/>
+  <text x="592" y="202" font-size="10.5" fill="#52514e" text-anchor="end">700 MB</text>
+
+  <!-- v2 wire top-128 ~255B/doc: 10k=2.55MB y=312.4; 100k=25.5MB y=269.1; 1M=255MB y=225.7 -->
+  <polyline points="170,312.4 385,269.1 600,225.7" fill="none" stroke="#2a78d6" stroke-width="2"/>
+  <circle cx="170" cy="312.4" r="4" fill="#2a78d6"/><circle cx="385" cy="269.1" r="4" fill="#2a78d6"/><circle cx="600" cy="225.7" r="4" fill="#2a78d6"/>
+  <text x="612" y="222" font-size="10.5" fill="#52514e">255 MB</text>
+
+  <!-- v2 wire top-64 ~180B/doc: 10k=1.8MB y=318.9; 100k=18MB y=275.6; 1M=180MB y=232.3 -->
+  <polyline points="170,318.9 385,275.6 600,232.3" fill="none" stroke="#1baf7a" stroke-width="2" stroke-dasharray="6 3"/>
+  <circle cx="170" cy="318.9" r="4" fill="#1baf7a"/><circle cx="385" cy="275.6" r="4" fill="#1baf7a"/><circle cx="600" cy="232.3" r="4" fill="#1baf7a"/>
+  <text x="612" y="242" font-size="10.5" fill="#52514e">180 MB</text>
+
+  <!-- measured anchor -->
+  <circle cx="385" cy="135.5" r="7" fill="none" stroke="#0b0b0b" stroke-width="1.2"/>
+  <text x="385" y="124" font-size="9.5" fill="#52514e" text-anchor="middle">measured region (100k)</text>
+
+  <!-- legend -->
+  <g font-size="10.5" fill="#52514e">
+    <line x1="100" y1="378" x2="118" y2="378" stroke="#e34948" stroke-width="2"/><text x="124" y="382">full-copy (rejected)</text>
+    <line x1="248" y1="378" x2="266" y2="378" stroke="#eb6834" stroke-width="2"/><text x="272" y="382">byte-aligned committed (v1)</text>
+    <line x1="446" y1="378" x2="464" y2="378" stroke="#2a78d6" stroke-width="2"/><text x="470" y="382">wire top-128 (v2)</text>
+    <line x1="586" y1="378" x2="604" y2="378" stroke="#1baf7a" stroke-width="2" stroke-dasharray="6 3"/><text x="610" y="382">wire top-64</text>
+  </g>
+</svg>

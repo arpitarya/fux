@@ -1,54 +1,44 @@
 # Doc registry — the documentation freshness tracker
 
-*One row per maintained document. This is the separate tracking file Arpit asked for:
-agents (Cowork, Claude Code, any hook) check it to know **which docs exist, what
-triggers an update to each, and when each was last verified true**. The docs-in-sync
-law in CLAUDE.md says update docs with every task; this file makes that checkable
-instead of remembered — the same instinct as the held rule engine, applied to docs.*
+*One row per maintained document. Agents (Cowork, Claude Code, any hook)
+check it to know **which docs exist, what triggers an update to each, and
+when each was last verified true**. The docs-in-sync law in CLAUDE.md says
+update docs with every task; this file makes that checkable. Rows for the
+archived v0.26 docs were retired 2026-08-09 with the reset — archived docs
+are frozen and never update.*
 
-**Contract (research-grounded):** every maintained doc has an update **trigger**
-("what change makes this stale?") and a **last-verified** date. A task that fires a
-trigger updates the doc *and* its row. A row older than ~30 days is a review prompt,
-not a crisis. Docs update in the same change as the work — atomic, per docs-as-code
-practice.
+**Contract:** every maintained doc has an update **trigger** and a
+**last-verified** date. A task that fires a trigger updates the doc *and*
+its row, in the same change. A row older than ~30 days is a review prompt.
+Docs large enough to carry §humans + §agents sections update both.
 
 | Document | Update trigger | Last verified | Notes |
 |----------|---------------|---------------|-------|
-| [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, or layout changes; new durable session learnings | 2026-07-22 | Binding; also auto-folded per the standing rule |
-| [`index.md`](index.md) | Bundle contents change (new/moved/removed docs) | 2026-07-22 | OKF bundle root; declares okf_version |
-| [`example/index.md`](example/index.md) | A doc is added/removed under `example/` | 2026-07-22 | Per-dir OKF index for the examples bundle |
-| [`../README.md`](../README.md) | Install/use surface, commands, guarantees change | 2026-07-24 | Public front door; story-first format per the old build's README. § How it works now carries the Mermaid pipeline diagram |
-| [`architecture-flow.mermaid`](architecture-flow.mermaid) | Pipeline shape changes (ingest tiers, git planes, kernel, verbs) | 2026-07-23 | Source of the README § How it works diagram; keep the two in sync |
-| [`../DOGFOOD.md`](../DOGFOOD.md) | v1 use surface changes; dogfood learnings land | 2026-07-21 | 10-min Anton quickstart (master-prompt rule 6) |
-| [`PLAN.md`](PLAN.md) | Any design decision, scope change, status change | 2026-07-24 | Design of record |
-| [`INTERVIEW.md`](INTERVIEW.md) | Direction/strategy/major decision changes | 2026-07-24 | Succession record; add yourself to maintainer line |
-| [`WORKLOG.md`](WORKLOG.md) | **Every substantive exchange** (append) | 2026-07-24 | Rolling session handoff; ALL-CAPS = no frontmatter |
-| [`IMPLEMENTATION.md`](IMPLEMENTATION.md) | **Every execution, whatever the outcome** (complete/blocked/failed/interrupted) | 2026-07-24 | Live build tracker; ALL-CAPS = no frontmatter; deviations logged |
-| [`../CHANGELOG.md`](../CHANGELOG.md) | Every version bump; latest entry mirrored into README | 2026-07-24 | Root file; keep-a-changelog style |
-| [`example/CLI.md`](example/CLI.md) | Any command/flag/output-format/exit-code change | 2026-07-23 | UX contract; e2e goldens derive from it — update together; ALL-CAPS = no frontmatter |
-| [`GLOSSARY.md`](GLOSSARY.md) | A new recurring term enters the repo, or a defined term changes meaning | 2026-07-24 | Definitions link to owning docs; ALL-CAPS = no frontmatter |
-| [`example/TOML.md`](example/TOML.md) | Any config key added/renamed/re-defaulted | 2026-07-24 | The annotated example config (fenced example + prose per key); asserted against the parser by tests/test_config.py; ALL-CAPS = no frontmatter |
-| [`example/SETUP.md`](example/SETUP.md) | Any `fux setup` flag, generated agent/skill/hook file, or hook I/O change | 2026-07-22 | Setup variants + hooks install; quotes real output; ALL-CAPS = no frontmatter |
-| [`example/SKILLS.md`](example/SKILLS.md) | Skill content (`agents/generate.py`) or `fux ask --json` shape change | 2026-07-22 | The two shipped skills verbatim + usage flow; ALL-CAPS = no frontmatter |
-| [`example/API.md`](example/API.md) | Any change to `find_root`/`load`/`ingest_paths`/`load_searcher` or `IngestReport`/`ScoredChunk` fields | 2026-07-22 | Programmatic create-file → ingest → query; real output; ALL-CAPS = no frontmatter |
-| [`example/DEBUG.md`](example/DEBUG.md) | `[debug]` semantics, `fux doctor` checks, or `fux why` evidence/verdict change | 2026-07-22 | Worked failures + fixes for the five debug questions; new v0.24.0 |
-| [`compare/README.md`](compare/README.md) | A compare doc opens, closes, or changes status | 2026-07-21 | Decision index |
-| [`compare/*.compare.md`](compare/) | New evidence, verdict change, or reopen-trigger fires | 2026-07-24 | One per decided fork. 2026-07-24 (phase 7): `supersession-handling` **verdict amended — Option B reopened, calibrated, and SHIPPED ENABLED** (default 15, safe interval `[11, ∞)`); `answer-decline-floor` margin refutation **re-measured de-confounded, still empty → closed as a product boundary, reopen-trigger retired** · 2026-07-24 (phase 9): **`hybrid-losing-lexical-hits` accepted — no fusion change** (the "non-monotone" finding was a misdiagnosis; graduated to `proposals/chunk-level-dense-codes`) |
-| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-07-24 | 0001–0015 (v1 + v1.1 + v2 + v3 substrate + v3.1 debug & observability + v0.25.0 trust & currency + **0015 v0.26.0 supersession down-rank penalty**) |
-| [`handoff/`](handoff/) | A feature enters build (handoff + prompt pair) | 2026-07-24 | empty — v0.20–0.26 + phase 9 all archived (0008→v0.26.0, 0009→phase9-*) |
-| [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-07-23 | `status:` frontmatter tracks lifecycle; `hybrid-degrades-at-scale.md` **resolved** (corpus artifact) by the acme-payments run; `staleness-ranking-ignores-supersession.md` and `honest-decline-well-formed-queries.md` **implemented** (v0.25.0) and moved to `archive/`; **`chunk-level-dense-codes` filed 2026-07-24** (owns both the zero-overlap reach failure and the hybrid-loses-lexical-hit ranking failure) |
-| [`archive/`](archive/README.md) | A handoff/prompt/proposal is fully implemented | 2026-07-24 | Version-named (`vX.Y.Z-name.md`) per CLAUDE.md; master-prompt unversioned; ADR links in frontmatter; **v0.26.0 supersession-downrank handoff+prompt added**; **2026-07-24: v0.26.0 release pair + phase9 fusion pair added** (phase 9 unversioned — no release) |
-| [`conformance/`](conformance/README.md) | Every fux-lab conformance run — file report + ANALYSIS + evidence | 2026-07-24 | Durable test-evidence home; drives engine fixes; findings graduate to proposals/ADR. Runs: `2026-07-22-scaling-1k-5k-10k`, `2026-07-22-acme-payments` (A-vs-B discriminator → B), `2026-07-23-min-confidence-calibration` (no floor value clears all 5 gates → shipped 0.0), `2026-07-23-supersession-recovery` (5/12 markers, 1/9 fully corrected), `2026-07-24-orbit-fulfillment` (2nd realistic corpus — all 3 findings generalize; staleness 8/12 meets Option-B gate; **margin check refuted**), **`2026-07-24-supersession-penalty-calibration`** (4-eval-set sweep → safe interval `[11, ∞)`, 100% of reachable inversions recovered, zero hit@5 regression; margin re-measured de-confounded → still empty), **`2026-07-24-v0.26.0-release-verification`** (published-package verification: phase-7 calibration reproduces black-box, inversions 8→3; `zero_overlap_rescued` miscount fixed 2→1) |
-| `tests/` + e2e suite docs | Any behaviour change | 2026-07-23 | 444 unit + 100 e2e (+1 gated skip); goldens via FUX_UPDATE_GOLDENS=1 only |
-| [`../tests_e2e/eval/README.md`](../tests_e2e/eval/README.md) | Eval pairs/metrics/gate change | 2026-07-21 | The v2 gate + Anton private-eval workflow |
-| [`../tools/distill/README.md`](../tools/distill/README.md) | Model recipe, format, or teacher changes | 2026-07-21 | Pinned distillation recipe (ADR 0006) |
-| `../.github/` (ci/publish + branch-protection.json) | Required checks, release path, or the wall change | 2026-07-22 | **No required checks as of 2026-07-22** (Arpit): "fux gate"+"ai-review" still run on every PR but no longer block merge; wall = enforce_admins + no force-push/deletion only. Release → OIDC PyPI publish |
+| [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, layout changes | 2026-08-09 | ⚠ still describes v0.26 in places — sync is M0 scope (W-03) |
+| [`../README.md`](../README.md) | Status, guarantees, reading order change | 2026-08-09 | Rebuild-status stub until M4 |
+| [`index.md`](index.md) | Bundle contents change | 2026-08-09 | OKF bundle root |
+| [`PLAN.md`](PLAN.md) | Any design/scope/status change | 2026-08-09 | The build of record; agent quick-ref section at top |
+| [`OPEN-WORK.md`](OPEN-WORK.md) | **Any work item or prediction changes state** | 2026-08-09 | The live tracker (replaces archived IMPLEMENTATION.md); §humans + §agents |
+| [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md) | Architecture changes; a P-prediction gets measured (M7 updates §5–6 to measured) | 2026-08-09 | Architecture of record + figures |
+| [`architecture-components.svg`](architecture-components.svg) | Any component/plane/policy change | 2026-08-09 | v2 map; council annotations in footer |
+| [`architecture-index-and-refer.svg`](architecture-index-and-refer.svg) | High-level flow changes | 2026-08-09 | |
+| [`INTERVIEW.md`](INTERVIEW.md) | Direction/strategy/major decision changes | 2026-08-09 | Succession record; the reset is a mandatory entry |
+| [`WORKLOG.md`](WORKLOG.md) | **Every substantive exchange** (append) | 2026-08-09 | Rolling session handoff |
+| [`GLOSSARY.md`](GLOSSARY.md) | New recurring term, or a term changes meaning | 2026-07-24 | ⚠ needs v0.30 pass (index, ledger, wire/runtime, refer, enriched…) — W-03 scope |
+| [`compare/README.md`](compare/README.md) | A compare doc opens, closes, changes status | 2026-08-09 | Six v0.30 forks; verdict-first convention |
+| [`compare/*.compare.md`](compare/) | New evidence, verdict change, reopen-trigger fires | 2026-08-09 | `ingest-mode-naming` is ⏳ (closes via ADR-0016) |
+| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-08-09 | Empty + TEMPLATE; numbering continues at 0016; 0001–0015 archived |
+| [`handoff/`](handoff/) | A feature enters build (handoff + prompt pair) | 2026-08-09 | Empty; M0 pair is next |
+| [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-08-09 | 3 new (mcp-adapters, knowledge-ci, wavelet-self-index) + 3 carried; v0.26-era moved to archive |
+| [`conformance/`](conformance/README.md) | Every fux-lab run — report + ANALYSIS + evidence | 2026-07-24 | Persists across rebuilds; M1's eval run files here |
+| [`archive/`](archive/README.md) | Something is implemented or superseded | 2026-08-09 | + `v0.26-docs/` (frozen) + `PLAN-v0.26.md` |
+| `../.github/` | Required checks, release path change | 2026-07-22 | Unchanged by the reset; CI will need new paths at M0 (W-01 checks this) |
 
 ## How agents use this file
 
-1. **At task end:** scan the trigger column; if your change fired a trigger, update
-   that doc and bump its row. CLAUDE.md binds you to this.
-2. **Hook prompt (once wired):** the session-end hook reads this table, diffs changed
-   files against triggers, and *prompts* "these docs look affected — update them?"
-   Fail-open, advisory: the hook nags, it never blocks.
-3. **Adding a doc:** new maintained doc → new row, in the same change that creates it.
+1. **At task end:** scan the trigger column; if your change fired a
+   trigger, update that doc and bump its row. CLAUDE.md binds you to this.
+2. **Adding a doc:** new maintained doc → new row, in the same change that
+   creates it. Archiving a doc → retire its row, same change.
+3. **The two ⚠ rows are open work items** (W-03) — they are stale
+   knowingly, tracked in OPEN-WORK, not silently.

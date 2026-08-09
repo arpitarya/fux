@@ -21,15 +21,29 @@ commitment; everything here is findable.
 
 # Index
 
+**Filed 2026-08-09 for the v0.30 architecture:**
+
+* [MCP as the adapter endgame](mcp-adapters.md) - one protocol instead of per-app adapters; org's own auth. Graduates on the first MCP-gateway design partner or a fourth adapter request.
+* [Knowledge CI](knowledge-ci.md) - PRs fail when the index is stale; decisions the diff contradicts surface as cited review comments. Graduates after M6 dogfoods green two weeks.
+* [Wavelet-tree self-index](wavelet-self-index.md) - research note preserving the rejected option C of the keyspace compare; reopens only on a law change or a P5 bottleneck.
+
+**Carried over — architecture-agnostic survivors:**
+
+All three survivors are architecture-agnostic and, if anything, *strengthened*
+by the v0.30 index-and-refer rebuild (the MST keyspace gives knowledge-diff and
+the audit trail their substrate natively — see [`../PLAN.md`](../PLAN.md) M8+):
+
 * [Research-to-Spec](research-to-spec.md) - evidence-backed specs; every claim cites the corpus at a commit.
-* [Knowledge diff & time-travel](knowledge-diff.md) - `fux diff`/`fux log`; ask questions of past knowledge.
-* [Hybrid degrades at scale](hybrid-degrades-at-scale.md) - ✅ **RESOLVED (2026-07-22)**: the acme-payments realistic run settles it — the hybrid collapse was a **corpus artifact** (hybrid hit@5 .182→.855, parity with lexical). RRF reopen-trigger answered: no fusion/reranker change warranted. Residual threads split to the two proposals below.
-* [Staleness — retrieval ignores supersession](../archive/v0.25.0-staleness-ranking-ignores-supersession.md) - ✅ **implemented (v0.25.0)**: annotate-not-down-rank ([ADR-0013](../adr/0013-supersession-awareness.md)) — moved to `../archive/`.
-* [Honest-decline too permissive](../archive/v0.25.0-honest-decline-well-formed-queries.md) - ✅ **implemented (v0.25.0)**: absolute floor built + calibrated, shipped disabled — no value clears all five gates ([ADR-0014](../adr/0014-answer-confidence-floor.md)) — moved to `../archive/`.
-* [Audit evidence trail](audit-evidence-trail.md) - deterministic cited answers as an auditable chain; seed of the deferred Plane.
-* [Knowledge substrate v2](knowledge-substrate.md) - **the** consolidated post-v0.22 proposal: SQLite substrate (bulk text in-db), doc-index-IS-the-graph, one kernel / six projections, FuxVec binary dense search, git tiers, enterprise inputs, build milestones. Absorbed the document-knowledge-graph, corpus-at-scale, and fuxvec docs.
+* [Knowledge diff & time-travel](knowledge-diff.md) - `fux diff`/`fux log`; ask questions of past knowledge. Natural fit for the one-root-hash keyspace.
+* [Audit evidence trail](audit-evidence-trail.md) - deterministic cited answers as an auditable chain; seed of the deferred Plane. The ledger's sha@index + fresh-sha citations are its raw material.
+
+**v0.26-era proposals** (tied to the archived substrate engine) moved to
+[`../archive/v0.26-docs/proposals/`](../archive/v0.26-docs/proposals/):
+knowledge-substrate (the SQLite substrate — superseded by the index-and-refer
+architecture), chunk-level-dense-codes, hybrid-degrades-at-scale (✅ resolved
+2026-07-22 as a corpus artifact). Earlier implemented proposals remain in
+[`../archive/`](../archive/) as before.
 
 *(The fourth idea from the 2026-07-21 ideation — the **product-memory corpus**,
-Arpit's own seed — was the winner and graduated straight into
-[`../PLAN.md`](../PLAN.md) §"Why the corpus lives in git" and the v1
-handoff, per the proposals lifecycle.)*
+Arpit's own seed — graduated into the v0.26 plan; its successor concept lives on
+as the committed index + ledger of the current architecture.)*

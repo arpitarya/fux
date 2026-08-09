@@ -19,6 +19,144 @@ diary.*
 
 ---
 
+## 2026-08-09 — M0+M1 handoff & prompt; debate gate re-ordered the plan  ·  Cowork
+- **Asked:** create the handoff and prompt (first build package).
+- **Did:** `docs/handoff/v0.30.0-m0-m1-gate-handoff.md` + `-prompt.md` +
+  handoff README. Handoff covers M0a hygiene, ADR-0016, M1 (the gate), and
+  M0b scaffold-on-PASS, with: the KL selector spec (pure/stdlib/portable),
+  the harness spec, the **pre-registered** PASS/FAIL table, the failure
+  catalogue + rare-term slice requirement, and per-phase model calls.
+- **Decided / open:** **the debate gate blocked and amended the plan** —
+  original M0(scaffold)→M1 would build a package P1 might falsify; corrected
+  to M0a → ADR-0016 → M1 → M0b. PLAN.md milestone table + §M0 and OPEN-WORK
+  W-01…W-05 updated to the new order (W-01 now blocked_by W-05=PASS).
+  Hard spec point recorded: df/n/field-lengths must be recomputed from
+  *pruned* postings — reusing baseline stats would measure a system nobody
+  ships. Still open: W-00 (Arpit's commit), ADR-0016 naming answer, and the
+  non-blocking question of whether the three eval corpora weigh equally.
+- **Next:** Arpit answers naming (or not — the prompt proceeds either way),
+  then run the prompt with Sonnet; verdict phase on Opus.
+
+## 2026-08-09 — decision docs + OPEN-WORK tracker for the v0.30 build  ·  Cowork
+- **Asked:** detailed build plan; compare docs (verdict at top) for every
+  real fork; proposals for out-of-plan ideas; an OPEN-WORK doc for all
+  unbuilt work; big docs get §humans + §agents sections; maintain
+  everything (registry, index).
+- **Did:**
+  - `docs/compare/` (fresh): storage-architecture, wire-format,
+    keyspace-unification, meta-privacy, cache-policy — all ✅ accepted with
+    reopen-triggers — and ingest-mode-naming ⏳ (Arpit ratifies via
+    ADR-0016). README with verdict table. v0.26-era proposals moved to
+    archive earlier this session.
+  - `docs/proposals/`: +mcp-adapters, +knowledge-ci, +wavelet-self-index
+    (each with graduation trigger); README updated.
+  - `docs/OPEN-WORK.md`: §1 humans (status, open decisions W-00/0016/
+    top-64) + §2 agents (W-00…W-12 ledger with blocked_by/DoD, P1–P7
+    status table, standing obligations). Replaces archived IMPLEMENTATION.md.
+  - PLAN.md gained a "For AI agents" quick-reference block; index.md and
+    DOC-REGISTRY.md rewritten for the new tree (two knowingly-stale ⚠ rows
+    — CLAUDE.md, GLOSSARY — tracked as W-03, not hidden).
+- **Decided / open:** two-section (§humans/§agents) convention adopted for
+  large docs. Open: W-00 (Arpit git-commits the reset), ADR-0016 naming,
+  top-64-vs-128 (M1 decides).
+- **Next:** Arpit reviews + commits; then M0 handoff (Sonnet).
+
+## 2026-08-09 — THE SECOND RESET: v0.26 archived, index-and-refer plan active  ·  Cowork
+- **Asked:** write the design paper (v0.2, with figures + estimated numbers);
+  then archive the existing code AND the old-system docs, and write a
+  from-scratch implementation plan for the new architecture.
+- **Did:**
+  - **Paper:** `docs/paper/the-fux-index-paper.md` + 4 SVG figures — 20
+    refs, analytical size/latency models anchored on ADR-0011 measurements,
+    falsifiable predictions P1–P7.
+  - **Archive:** `src/ tests/ tests_e2e/ tools/ scripts/ pyproject.toml
+    uv.lock CHANGELOG DOGFOOD README` → `archive/v0.26/` (reference-only,
+    kept runnable — M1 uses it as the quality baseline). Old docs (ADRs
+    0001–0015, compare/, example/, IMPLEMENTATION.md, flow diagram) →
+    `docs/archive/v0.26-docs/`; old plan → `docs/archive/PLAN-v0.26.md`.
+    Kept live: WORKLOG, INTERVIEW, DOC-REGISTRY, GLOSSARY, proposals/,
+    conformance/, handoff/, new SVGs, paper/.
+  - **New plan:** `docs/PLAN.md` — M0 scaffold → M1 pruning-eval GATE (P1,
+    kill-capable, numbers-as-DoD) → M2 MST keyspace → M3 wire index → M4
+    runtime+kernel → M5 refer plane → M6 maintenance → M7 1M scale → M8
+    deferred. Port-don't-rewrite list from v0.26 (frontmatter, BM25F, RRF,
+    FuxVec, chunker, converters, PPR, eval sets). New root README stub.
+- **Decided / open:** version line 0.30.0.dev0. ADR numbering continues
+  from 0016 (fresh docs/adr/, TEMPLATE kept). Open at M0: ingest-mode
+  naming ADR (Arpit's call); CLAUDE.md sync is M0 scope, not done in this
+  exchange — CLAUDE.md still describes v0.26 in places until M0 lands.
+- **Next:** M0 handoff + prompt (Sonnet), then the M1 gate.
+
+## 2026-08-09 — council debate + index shrink + one-keyspace + ingest modes  ·  Cowork
+- **Asked:** define all components (samples of ledger/postings/dict/codes/CSR/
+  meta shown in chat); council-debate the architecture with a visionary seat;
+  shrink the 700 MB committed index; can components merge into one; split
+  ingest into no-AI vs AI modes. Commit the v2 diagram.
+- **Did:** committed `docs/architecture-components.svg` (v2). Research: BIC
+  postings (<1–2 bits/id), RecSplit/PtrHash MPH dict (~2 bits/key), wavelet-
+  tree self-index (noted, rejected for decode cost). Council verdicts folded
+  into the diagram.
+- **Decided / open (chat-level, no ADR yet):** term is "index", not "db".
+  Wire/runtime format split → committed ~220–290 MB @1M (top-64 ~160–200 MB);
+  repo-source shards need not be committed (re-derived by hooks). All index
+  components = ONE MST keyspace (L/P/D/V/E/M prefixes, one root hash, one
+  join). Council: hashed meta default (ACL-mismatch leak — DA's strongest
+  attack); adapters capped git+HTTP+Confluence, MCP endgame; pruning eval =
+  milestone-1 DoD; v0.26 substrate untouched until dogfood; DA minority
+  report: ship postings-by-term on current substrate first. Ingest modes:
+  inferred (default, $0) + AI tier — naming open ("extracted" collides with
+  ADR-0009 edge grades; "enriched" proposed, Arpit's call).
+- **Next:** compare doc for the storage architecture, then the pruning-eval
+  spike as milestone 1.
+
+## 2026-08-09 — pivot: index-and-refer supersedes the FuxDB paper  ·  Cowork
+- **Asked:** Arpit reshaped the design in debate: keyword/phrase db committed;
+  content stays in source systems (git dirs, Confluence/SharePoint/Bloomreach);
+  answer = rank from db → fetch cited docs live → cache. Then: remove the
+  paper, commit the diagram, plan the build with 1M-doc numbers.
+- **Did:** paper removed (Arpit deleted the file; index line dropped from
+  proposals README). Committed `docs/architecture-index-and-refer.svg`.
+  Researched the build basis: document-centric static index pruning
+  (Büttcher–Clarke KL top-k), federated-search broker frame (cooperative,
+  single-scorer), ARC cache, YAKE phrases. Build plan + budgets in chat.
+- **Decided / open:** direction is index-and-refer (chat-level, no ADR yet);
+  per-source policy refer|snapshot; step-1 gate = pruned-vs-full quality eval
+  on the 100k synthetic. Open: compare doc before any build.
+- **Next:** pruning eval spike (KL top-k into state, measure hit@5/P@10 vs
+  full index).
+
+## 2026-08-09 — storage-at-1M research arc → FuxDB design paper  ·  Cowork
+- **Asked:** re-imagine storage for 1M docs × ~1k lines (research-driven); then:
+  git-clone concern, dependency question, "new kind of database?", merge
+  conflicts, freshness compromise (hooks + stale-ok + live check on final
+  answer), better existing DB/graph?, papers?, finally: write the paper.
+- **Did:** researched segments/PEF/BMW, prolly trees/Dolt, CRDTs/MST, ForkBase,
+  TerminusDB, SWR/read-repair/DBSP, embedded-graph landscape (Kùzu archived —
+  supply-chain lesson). Wrote **`docs/proposals/fuxdb-paper.md`** (draft v0.1,
+  19 refs, ADR-0011 numbers as baseline) + indexed it in proposals README.
+- **Decided / open:** chat-level direction only, nothing accepted as ADR: merge
+  = join ∘ rebuild; freshness as read-time contract (bends the network fence —
+  needs explicit opt-in design); deps rejected (B "never"); FuxDB = MST ledger
+  + immutable segments. Open: compare doc + spike before any build.
+- **Next:** Arpit reviews the paper; if direction holds → storage-at-scale
+  compare doc, then a narrow MST-ledger spike measured on the 100k synthetic.
+
+## 2026-08-08 — design-rationale Q&A; response-style rule folded into CLAUDE.md  ·  Cowork
+- **Asked:** why ingest copies docs instead of index-only; why a DB not a graph;
+  can the db/graph live in git. Then: answers too long-winded — be precise, and
+  bind that in CLAUDE.md. Follow-ups: millions-of-files concern (→ bulk tier,
+  no file cache) and fresh-clone behaviour (→ local sources rebuild offline;
+  bulk web warehouse must be re-crawled — not in git by design); why curated
+  files aren't db rows (→ git review + agent/OKF readability); fux.db at 1M
+  docs × 1000 lines (→ ~250–450 GB full profile extrapolated from ADR-0011's
+  10.8 KB/doc; lean ≈ 230 MB state — the designed answer at that scale).
+- **Did:** answered from ADR-0002/0008/0009 + ingest-strategy compare (no code
+  changed). Extended CLAUDE.md § Documentation style: chat responses follow the
+  same short-paragraph, lead-with-takeaway rule.
+- **Decided / open:** still open from the compare doc: whether `.fux/cache/` is
+  ever committed (needs an ADR to flip).
+- **Next:** none — docs-only exchange.
+
 ## 2026-07-24 — phase 9 executed: fusion finding was a misdiagnosis → ACCEPT  ·  Claude Code
 - **Asked:** run handoff 0009 (the non-monotone fusion finding).
 - **Did:**

@@ -1,343 +1,271 @@
-# Fux — design of record (rebuild)
+---
+type: Plan
+title: "Fux v0.30 — the index-and-refer rebuild"
+description: From-scratch implementation plan for the architecture in docs/paper/the-fux-index-paper.md and docs/architecture-components.svg — milestones M0–M8, each gated by falsifiable predictions P1–P7.
+status: active
+timestamp: 2026-08-09T00:00:00Z
+---
 
-*This is the design of record. Keep it truthful: update it in the same change that
-alters behaviour, scope, or a resolved decision (CLAUDE.md binds you to this).*
+# Fux v0.30 — the index-and-refer rebuild
 
-## 1. What Fux is
+## For AI agents — quick reference (read this block, then jump)
 
-A portable, agent-aware knowledge engine. The reason behind code is written as
-version-controlled **rules** bound to the exact lines they explain, read by agents
-before they act, and checked **deterministically** — never by a model.
+- **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) §2 — pick work there,
+  not here; this file is the *spec* for each milestone id.
+- **Hard gate:** no M2+ work while P1 is unmeasured or failed (W-05).
+- **Decisions:** verdict-first in [`compare/`](compare/README.md); one
+  still open (ingest-mode naming → ADR-0016, Arpit's call).
+- **Laws:** $0 · stdlib · deterministic · offline-default · 1 feature =
+  1 ADR (from 0016) · every rule referenced · WORKLOG every exchange ·
+  OPEN-WORK + DOC-REGISTRY rows updated in the same change as the work.
+- **Old world:** engine `../archive/v0.26/` (runnable, reference-only,
+  M1's baseline); its docs `archive/v0.26-docs/`; port list below —
+  port with tests, don't rewrite.
+- **Handoffs:** every milestone ships as handoff doc + Claude Code prompt,
+  model named per the milestone table (wrong model fails silently).
 
-## 2. Why the rebuild
+---
 
-The prior build (in [`archive/`](../archive/)) reached ~0.18.0 and pursued the full
-vision at once — graph, recall, verify, MCP, memory, federation. It did not work as
-a whole. The rebuild resets scope to the smallest thing that delivers the core
-promise and can be dogfooded in Anton.
+*The second reset. The v0.19–0.26 substrate engine is archived at
+[`../archive/v0.26/`](../archive/v0.26/) — reference-only, kept runnable
+because M1 uses it as the quality baseline. Its documentation (ADRs
+0001–0015, compare docs, example docs, tracker, old flow diagram) is at
+[`archive/v0.26-docs/`](archive/v0.26-docs/); the previous plan is at
+[`archive/PLAN-v0.26.md`](archive/PLAN-v0.26.md). ADR numbering continues
+from 0016 in a fresh [`adr/`](adr/); archived ADRs are cited by their old
+numbers with the archive path.*
 
-## 3. Constraints (non-negotiable)
+## What this build is
 
-`$0` stdlib-only runtime · deterministic, no LLM in the maintenance path ·
-Python ≥ 3.11 · small and per-repo. See CLAUDE.md for the full contract.
+**One sentence:** rank from a small committed index; fetch content from the
+systems that own it; verify at answer time.
 
-## 4. Scope
+Authority for every design decision, in order:
 
-**First deliverable (current):** a **CLI that answers natural-language questions over
-documents in a defined set of folders.** The rule engine is *held* (kept as the
-long-term core). Design forks are being settled in [`compare/`](compare/) before
-building — see §5.
+1. [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md) — the
+   architecture, size/latency models, predictions P1–P7.
+2. [`architecture-components.svg`](architecture-components.svg) — the v2
+   component map (one MST keyspace, wire/runtime split, two ingest modes).
+3. [`architecture-index-and-refer.svg`](architecture-index-and-refer.svg) —
+   the high-level flow.
+4. The council rulings (WORKLOG 2026-08-09): "index" not "db"; hashed meta
+   default; adapters capped git + HTTP + Confluence (MCP is the endgame);
+   the pruning eval gates all build; DA minority report noted.
 
-**Held (long-term core, not being built yet):** (1) the rules substrate — frontmatter
-rules bound to code, hand-rolled stdlib parser + validator; (2) the fix loop —
-`check` findings are repair instructions, not just verdicts.
+## Laws (unchanged from the engine's founding)
 
-**Out (for now, needs an ADR to revive):** graph, recall/embeddings, MCP server,
-memory capture/governance, federation/packs, compliance Plane.
+$0 default · stdlib-only runtime · deterministic to the byte · offline by
+default (network only inside explicit fences) · git is the transport ·
+1 feature = 1 ADR · every rule carries a reference · worklog every exchange.
 
-## 5. Lifecycle
+New law from this architecture: **content is never durable outside its
+source system** except under explicit `snapshot` policy.
 
-Compare (when there's a fork) → Plan → Handoff → Prompt → build → **one ADR per
-feature**. Every rule and ADR carries a reference (paper, blog, or example link).
-See CLAUDE.md.
+## What survives from v0.26 (port, don't rewrite)
 
-## 6. Decisions (accepted 2026-07-20)
+These modules are law-hardened and keep their tests; they are *ported* from
+`archive/v0.26/` when their milestone needs them, imports rewritten, tests
+carried:
 
-The query CLI is a **staged hybrid, entirely `$0` and with no external model** — any
-"smart" component is built and packaged inside this package at ≤10 MB with no required
-external deps. Full debate + references in [`compare/`](compare/).
+| module | used by | port in |
+|---|---|---|
+| frontmatter parser | ledger, snapshot mode | M2 |
+| converters (inferred/advanced tiers) | ingest (transient now) | M1 |
+| chunker (heading-aware) | passage re-score | M5 |
+| BM25F scoring math + exact-df discipline (ADR-0008) | kernel | M4 |
+| RRF fusion (k=60, ADR-0007) | kernel | M4 |
+| FuxVec embed + 32 B codes (ADR-0010) | V/ plane | M3 |
+| PPR-lite + edge extraction (ADR-0009) | E/ plane, kernel | M3–M4 |
+| synth corpus generator + bench + eval sets + goldens | M1 gate, M7 | M1 |
+| CLI surface & verbs (ask/find/answer/explain/graph/path) | UX contract | M4 |
 
-- **Engine:** v1 **BM25F** (stdlib lexical) → v2 add a **bundled static-embedding
-  model** and fuse lexical+semantic with **Reciprocal Rank Fusion** → v3 **agent
-  surface** (ask / reply / explain). SPLADE and cross-encoder rerankers deferred (out of
-  the size budget).
-- **Output:** ranked **passages** by default; `--files` locator; `--answer` =
-  **extractive** synthesis (bundled embeddings + TextRank) with citations — no external
-  LLM, deterministic, hallucination-free. (Generation in ≤10 MB is not feasible; we
-  select/order source sentences, we don't generate.)
-- **Ingest:** two-tier **`fux ingest`** — fast **inferred** conversion by default,
-  **advanced** (layout/table/OCR) on demand or agent-triggered; a **manifest** tracks
-  inferred files; **config file** (`fux.toml`) maps each file type to its source dirs.
-  Extensions (accepted 2026-07-20): every cached file carries **traceability
-  frontmatter** (source, sha256, fidelity, converter, origin/url/parent/depth) — the
-  hand-rolled frontmatter parser's first dogfood; ingest is **library-first**
-  (`fux.ingest` public API, CLI wrapper, agent **skill**); and it ingests **links +
-  their attachments multiple levels deep** behind a fenced `--web` path (depth-capped,
-  same-domain default, network never on the query path).
-- **Packaged model:** Model2Vec/Potion-class static embeddings, distilled offline,
-  quantized to ≤10 MB; **pure-stdlib inference — numpy resolved: not used** (candidate-
-  only ranking makes stdlib single-digit-ms; see the compare doc's math).
+Everything else — storage, the SQLite substrate, per-file cache, lock,
+state plane, profiles — is superseded and stays archived.
 
-- **CLI surface (accepted 2026-07-21):** verb per intent — **`fux ask`** (passages,
-  default), **`fux find`** (file locator), **`fux answer`** (extractive cited answer);
-  `--json`/`--explain` modifiers for the agent path.
-- **Ingest, rendered pages (accepted 2026-07-21):** CDP mode (`render = "cdp"`) —
-  drives the user's own headless Chrome over the DevTools Protocol via a hand-rolled
-  stdlib WebSocket client (RFC 6455); `urllib` remains the default fetcher.
-- **numpy follow-up (resolved 2026-07-21):** vendoring numpy as internal files is not
-  possible — its core is platform-compiled C extensions, not copyable Python (proof in
-  [`compare/packaged-model.compare.md`](compare/packaged-model.compare.md)).
-  Pure-stdlib inference stands.
+## Milestones
 
-- **Agent integration (accepted 2026-07-21):** files + hooks from one generator —
-  AGENTS.md canonical + CLAUDE.md/copilot-instructions/Kiro-steering pointers;
-  Claude Code `UserPromptSubmit` + Kiro hooks for enforced injection; MCP deferred
-  behind an ADR. **Skills: one `SKILL.md`** (Agent Skills open standard — read by
-  32+ tools incl. Copilot, Kiro, Codex, Cursor) instead of per-tool variants; ship
-  `fux-query` + `fux-ingest` skills. Obsoletes the old build's per-platform skillgen.
-- **Setup (accepted 2026-07-21):** single **`fux setup`** (renamed from `fux init`) —
-  interactive wizard by default, every prompt has a flag, `-y` for defaults,
-  idempotent re-runs; `--agents --skills --hooks` covers agent integration.
-- **Sub-decisions (resolved 2026-07-21, research-grounded):** **no bundled reranker**
-  — RRF only (cross-attention rerankers start ~80 MB, 8× over budget; revisit on eval
-  evidence); **chunking = structure-aware, heading-based**, 256–512 tokens,
-  heading-path context, code/tables atomic, `file:line` boundaries; **BM25F defaults**
-  heading 3.0 / path 2.0 / body 1.0, k1=1.2, b=0.75 — overridable under
-  `[engine.bm25f]` in `fux.toml`.
+| # | name | proves | est. size | model for handoff |
+|---|------|--------|-----------|-------------------|
+| M0a | doc hygiene + ADR-0016 naming | — | small | Sonnet |
+| M1 | **THE GATE: pruning eval** | P1 | ~200 LOC + harness | Sonnet build, Opus analysis |
+| M0b | package scaffold — **only on P1 = PASS** | — | small | Sonnet |
+| M2 | MST keyspace + ledger | P6 (join) | ~800 LOC | Opus |
+| M3 | wire index (P/D/V/E/M) | P2 | ~1.2k LOC | Opus |
+| M4 | runtime segments + kernel | P3 | ~1.5k LOC | Opus |
+| M5 | refer plane (adapters/fetch/ARC/assembler) | P4 | ~1k LOC | Sonnet |
+| M6 | maintenance (hooks, merge driver, snapshot) | P6, P7 | ~500 LOC | Sonnet |
+| M7 | scale run @1M | P2, P3, P5 | bench work | Sonnet |
+| M8 | deferred: AI-assisted mode · MPH dict · top-64 | — | — | — |
 
-- **Additions (accepted 2026-07-21):** ingest covers **images (metadata stub →
-  OCR advanced tier via Tesseract/Docling), JSON (stdlib-flattened), YAML (fenced
-  text v1), txt**; a maintained **e2e test suite** in `tests_e2e/` (real CLI +
-  fixture corpus + golden files) alongside unit `tests/`; a **doc registry**
-  ([`DOC-REGISTRY.md`](DOC-REGISTRY.md)) tracking every maintained doc's update
-  trigger + last-verified date, wired into hooks (session-end prompt) and the
-  generated agent instructions; and a standing CLAUDE.md rule to **auto-fold durable
-  session knowledge into CLAUDE.md**.
+**Sequencing is a hard rule (council, pre-mortem seat): no milestone starts
+before the previous one's DoD is met, and M1's DoD is *numbers in an ADR*,
+not code merged.** M2+ exist in this plan conditionally on P1 passing.
 
-- **Process + format additions (accepted 2026-07-21):** **proposal docs**
-  (`docs/proposals/`, `status: proposed`, graduate to compare/plan when picked up);
-  **archive implemented docs** (`docs/archive/`, moved in the completing change with
-  `status: implemented` + ADR link); and **OKF conformance** — Fux's docs and ingest
-  cache follow Google's Open Knowledge Format v0.1 (frontmatter `type` everywhere,
-  per-dir `index.md`, log.md-style worklog, citations sections; provenance keys as
-  legal extensions). Fux's substrate was already OKF-shaped; conformance buys interop
-  with every OKF consumer for free.
+---
 
-## 6a. What Fux is for (sharpened 2026-07-21; re-scoped to enterprise same day)
+### M0 — Repo hygiene, the naming ADR, and (conditionally) the scaffold
 
-**The ultimate consumer is an agent inside Copilot/Claude/Kiro querying
-documentation, decisions, and links** — the context agents lack — not the code
-itself (agents read code natively; graphify-class tools map it). Code stays
-ingestable, but positioning, defaults, and priorities favor the docs corpus.
+**Split amended 2026-08-09 by the M0/M1 handoff's debate gate.** The
+original order scaffolded a package before P1 could falsify the
+architecture it exists for — the pre-mortem seat's "build the fun part
+first" failure. Corrected: **M0a (hygiene) → M0-ADR (naming) → M1 (the
+gate) → M0b (scaffold, only on PASS)**. The live spec for all of it is
+[`handoff/v0.30.0-m0-m1-gate-handoff.md`](handoff/v0.30.0-m0-m1-gate-handoff.md).
 
-Corollary (accepted): semantic enrichment may ride the **host session's model**
-(skill-directed, written back as reviewable frontmatter text) — Fux's own code
-still never calls a model, so `$0` holds; retrieval and checking stay
-deterministic.
+**M0a deliverables (unconditional).** CLAUDE.md synced to this plan
+(proposed as a diff, never auto-applied); GLOSSARY given the v0.30
+vocabulary; INTERVIEW gains a reset entry; DOC-REGISTRY's two ⚠ rows
+cleared; OPEN-WORK statuses updated. **ADR-0016: the ingest-mode naming
+decision** ("inferred" stays; the AI tier named — resolve the
+EXTRACTED/INFERRED edge-grade collision by Arpit's call;
+`enriched` recommended).
 
-**Design point (Arpit, 2026-07-21): a very large-scale corporate project — not
-Anton.** Consequences:
+**M0b deliverables (only if P1 = PASS).** New `src/fux/` skeleton (`cli.py`, `errors.py`, package
+layout mirroring the five planes: `keyspace/`, `wire/`, `runtime/`,
+`refer/`, `ingest/`); `pyproject.toml` at `0.30.0.dev0` (hatchling, stdlib
+runtime, extras for converters); CLAUDE.md synced to this plan (build
+section replaced, laws restated, archive pointer); fresh CHANGELOG;
+`.github/` workflow paths updated for the new tree.
 
-- **The knowledge substrate is the default forward path**, not a
-  wait-for-a-trigger contingency — enterprise corpora start at the scale where
-  `index.json` breaks.
+**DoD.** M0a: no doc names a path that doesn't exist; ADR-0016 written.
+M0b: `uv run fux --version` prints 0.30.0.dev0; `fux doctor` stub runs.
 
-- **Enterprise inputs enter every design**: Windows fleets, proxy/SSO in front
-  of internal sites (web ingest must speak them), air-gapped installs, multi-team
-  corpora with access boundaries, audit demands.
+### M1 — THE GATE: document-centric pruning eval  *(P1)*
 
-- **Standing proposals gain weight**: [audit-evidence-trail](proposals/audit-evidence-trail.md)
-  (compliance-grade answers) and, longer-term, multi-repo federation of corpora.
+**Question.** Does KL top-k pruning hold ranking quality on Fux's corpora?
 
-- **The sales story writes itself from the laws**: no data egress, no vendor API
-  in the loop, auditable-by-reading supply chain, reproducible answers.
+**Deliverables.** KL term selector (Büttcher–Clarke document-centric
+scoring; ~200 LOC, stdlib); an eval harness that (a) runs the **archived
+v0.26 engine** to produce full-index baseline rankings on the 100k
+synthetic + acme + orbit corpora, (b) produces pruned-index rankings at
+k = 128 and k = 64 through the same scorer, (c) reports hit@5, P@10, and a
+rare-term recall slice, per corpus per k.
 
-## 6b. Why the corpus lives in git (the product-memory bet, 2026-07-21)
+**DoD.** **ADR-0017 records the numbers and the ship/kill verdict.**
+Thresholds (pre-registered, paper §8): within 2–3 pts hit@5 of baseline at
+k=128 → proceed; worse → the architecture is falsified, return to snapshot
+designs, this plan terminates at M1 and says so honestly.
 
-Arpit's framing, adopted as design: **the ingest cache is a long-term, git-versioned
-knowledge corpus that ultimately feeds product development** — not a disposable
-index. Independent signals validate the bet: the *Knowledge as Code* pattern (git-
-native, zero-dependency, plain-text canonical knowledge, Jan 2026) and Karpathy's
-LLM-Wiki paradigm (compile raw material into a persistent Markdown wiki; query the
-wiki). Consequences already in scope: deterministic, diff-friendly cache output is a
-v1 *requirement*; the cache is an OKF bundle so any consumer can read it; knowledge
-changes become reviewable in PRs like code. Downstream uses are parked as proposals
-([research-to-spec](proposals/research-to-spec.md),
-[knowledge-diff](proposals/knowledge-diff.md),
-[audit-evidence-trail](proposals/audit-evidence-trail.md)) — and the long arc is the
-held rule engine: agents developing *from* the corpus and never deviating.
-Differentiation vs the field (semtools/rlama/qmd/llm-search): they index documents;
-Fux *versions knowledge* — $0, offline, deterministic, cited, and git-historied.
+**Notes.** Uses the archived engine as a *baseline generator only* —
+reference-use, permitted by the archive's charter. Rare-term losses are
+expected and measured, not hidden; the Bloom-signature mitigation is
+designed but NOT built unless numbers demand it.
 
-**Tier amendment (Arpit, 2026-07-21, twice-corrected):** the git bet applies to
-the **curated tier** (your docs/decisions/notes — 10²–10⁴ files, per-file
-Markdown, committed). **Bulk corpora** (large crawls, mass imports) get **no
-file cache at all** — 100k documents as files is impractical regardless of git;
-their converted text lives as `docs_text` rows inside the substrate db (one
-file on disk at any scale; `fux cat <doc>` materializes any single document on
-demand). Commit `fux.toml` + the compact manifest — the *recipe*, reproducible
-by re-ingest. Git stores the recipe; the db is the warehouse; the filesystem
-carries neither. Scale architecture (proposed): two-level
-doc index + `fux explain` drill-down — see
-[`proposals/knowledge-substrate.md`](proposals/knowledge-substrate.md)
-(the single consolidated proposal, 2026-07-21: one substrate incl. bulk text
-in-db, one kernel, six verb projections, FuxVec dense search).
+### M2 — The keyspace: MST store + ledger  *(P6 join half)*
 
-**Everything is decided, and every decided phase has its build spec** (handoff +
-paste-ready prompt in [`handoff/`](handoff/)):
+**Deliverables.** Content-defined chunker (rolling hash, ~4 KB target,
+fixed seed); content-addressed chunk files under `.fux/index/`; tree
+builder with **unique-representation invariant**; root-hash computation;
+reader (mmap, binary search within chunks); the **join** (per-entry LWW
+register on (version ordinal, sha tie-break); observed-remove set for
+membership); `L/` schema (locator, sha@index, `mode = refer|snapshot`,
+`meta = hashed|plain`, version info); front-coded columnar wire encoding.
 
-| # | Phase | Scope | Status |
-|---|-------|-------|--------|
-| [v0.20.0](archive/v0.20.0-query-cli-v1-handoff.md) | **v1** | setup wizard, inferred-tier local ingest → OKF cache, heading chunker, BM25F, ask/find/answer, agent files, both suites | ✅ **implemented** (v0.20.0, 2026-07-21; ADRs 0001–0004) |
-| [v0.21.0](archive/v0.21.0-ingest-web-advanced-handoff.md) | **v1.1** | web crawling (urllib+robots), CDP rendered pages (hand-rolled RFC 6455), advanced tier (Docling/Tesseract), agent-triggered upgrades | ✅ **implemented** (v0.21.0, 2026-07-21; ADR 0005) |
-| [v0.22.0](archive/v0.22.0-hybrid-engine-v2-handoff.md) | **v2** | eval harness first, then distilled ≤10 MB bundled model, stdlib inference, chunk-vector cache, RRF hybrid | ✅ **implemented** (v0.22.0, 2026-07-21; ADRs 0006–0007; gate passed as tie → ships enabled) |
-| [v0.23.0](archive/v0.23.0-knowledge-substrate-handoff.md) | **v3 — knowledge substrate** | SQLite substrate (bulk text in-db) · fux.lock · committed lean state (`.fux/state/`) · one-kernel `retrieve()` + explain/graph/path/cat · FuxVec · full/lean profiles · db pull | ✅ **implemented** (v0.23.0, 2026-07-22; ADRs 0008–0011; eval hit@5 1.000) |
-| [v0.24.0](archive/v0.24.0-debug-observability-handoff.md) | **v4 — debug & observability** | `[debug]` in fux.toml (level/categories/output/timing/redact) · stdout-pure emitter · `fux doctor` (install+corpus+consistency+self-test) · `fux why` (negative-result verdict) · **`fux-debug` skill** | ✅ **implemented** (v0.24.0, 2026-07-22; ADR 0012) |
+**DoD.** Property tests: same entries in any insertion order → byte-identical
+chunks and root (the MST invariant, 1 000 random orders); join is
+commutative + associative + idempotent (hypothesis-style randomized check,
+stdlib-only harness); ledger for the 100k synthetic ≤ 12 MB. ADR-0018.
 
-Sequencing: v1 → dogfood in Anton → then v1.1 and/or v2 in either order, each
-gated by the dogfood telling us which pain is real. **Arpit's call (2026-07-21): one
-continuous run instead** — [`archive/master-prompt.md`](archive/master-prompt.md)
-executes v1 → v1.1 → v2 sequentially with hard phase gates (DoD + suites + ADRs
-+ archive + version bump per phase), emitting a `DOGFOOD.md` quickstart after phase
-1 so Anton dogfooding runs in parallel. Next action: paste the master prompt into
-Claude Code.
+### M3 — The wire index: P/ D/ V/ E/ M/  *(P2)*
 
-## 7. Status
+**Deliverables.** BIC encoder/decoder (pure Python — decode-once, speed
+non-critical on the wire path); 4-bit impact quantization (global scale,
+recorded in header); doc-id assignment = ledger sort order (clustering
+lever, Figure 4); `D/` = sorted u64-hash array + Elias-Fano offsets + varint
+df (MPH deferred to M8 as a pure-win upgrade); `V/` raw codes; `E/`
+delta-varint typed adjacency; `M/` with `hashed|plain` enforcement at write
+time — **hashed is the default for every non-git source; plain requires
+explicit config** (council ruling).
 
-| Area | Status | Notes |
-|------|--------|-------|
-| Package skeleton | ✅ | src/ layout, hatchling, CLI + FuxError, smoke tests |
-| Query CLI — design decisions | ✅ | engine/output/ingest/model verdicts accepted; see `compare/` |
-| Query CLI — **v1 build** (setup/ingest/BM25F/ask/find/answer/agents) | ✅ | **v0.20.0** (2026-07-21); ADRs 0001–0004; DOGFOOD.md emitted |
-| Ingest v1.1 (web/CDP/advanced — v0.21.0 handoff) | ✅ | **v0.21.0** (2026-07-21); ADR 0005 |
-| Hybrid engine v2 (bundled model + RRF — v0.22.0 handoff) | ✅ | **v0.22.0** (2026-07-21); ADRs 0006–0007; 172 unit + 29 e2e tests; eval numbers in ADR 0006 |
-| Knowledge substrate v3 (v0.23.0 handoff) | ✅ | **v0.23.0** (2026-07-22); ADRs 0008–0011; 365 unit + 71 e2e; eval hit@5 **1.000** (beats v0.22); 100k benchmark: state 23 MB, FuxVec scan 54 ms (no IVF) |
-| Debug & observability v4 (v0.24.0 handoff) | ✅ | **v0.24.0** (2026-07-22); ADR 0012; 417 unit + 100 e2e; `[debug]` toml + emitter, `fux doctor`, `fux why`, `fux-debug` skill |
-| Trust & currency v5 (v0.25.0 handoff 0006) | ✅ | **v0.25.0** (2026-07-23); ADRs 0013–0014; 444 unit + 100 e2e; supersession annotated (not reordered), `answer` prefers current when both in pool; confidence floor built + calibrated, **shipped disabled (0.0)** — no value clears all 5 gates |
-| Rules substrate | ⏸️ | held |
-| Fix loop | ⏸️ | held |
+**DoD.** Round-trip property tests on every encoder; wire size for the 100k
+synthetic **≤ 30 MB** (P2 scaled: 300 MB / 10); collision detection on term
+hashes raises at build (ADR-0008 discipline carried forward). ADR-0019.
 
-## 7a. What the conformance runs changed (2026-07-22/23)
+### M4 — Runtime segments + the query kernel  *(P3)*
 
-An independent black-box harness (`fux-lab`) measured the published package at
-1k/5k/10k synthetic and ~1k **realistic** (acme-payments) scale. It retired one
-scare and found three real defects — none of which the 21-pair fixture gate
-could see.
+**Deliverables.** Inflator: wire → byte-aligned mmap segments (128-entry
+posting blocks, per-block max-impact + skip, `memoryview.cast` decode);
+MaxScore evaluation (block-max skipping; deterministic traversal, doc-id
+ties); int-cached Hamming scan; CSR PPR (fixed 3 iterations, ported
+constants); RRF fusion; the six verbs re-plumbed onto `retrieve()` over the
+new kernel (ADR-0009's projection table unchanged).
 
-- **Retired:** "hybrid degrades vs `--lexical-only` at scale." A synthetic-corpus
-  artifact — near-identical template prose made dense ordering arbitrary. On
-  realistic text hybrid ≈ lexical (hit@5 .855 vs .873). Four planned mitigations
-  lost their justification.
-- **Real — staleness (9/12).** The superseded document outranks the still-true
-  one. Ranking has no currency signal at all. → phase 6.
-- **Real — fabrication (0/4).** `answer` declines gibberish but invents confident,
-  cited answers for well-formed out-of-scope questions. → phase 6.
-- **Real — zero-overlap dense rescue (0/6 clean).** Fails *even when the answer is
-  the whole document*, so the earlier "document-vector dilution" explanation was
-  wrong. Points at chunk-level dense codes. → deferred, own phase.
+**DoD.** P3 scaled: warm rank ≤ 150 ms at 100k on the bench machine;
+relational eval passes; **new goldens baselined and committed** (rankings
+legitimately differ from v0.26 — pruning changes the index; the goldens
+that carry over unchanged are the *relational* and *decline* behaviors);
+`--lexical-only` parity between MaxScore result set and exhaustive scoring
+on the pruned index (correctness check: pruning may drop docs, skipping may
+not). ADR-0020.
 
-**The standing lesson:** a fixture-scale eval gate cannot protect retrieval
-quality. Realistic-corpus conformance is now the gate that matters, and its
-evidence lives in [`conformance/`](conformance/).
+### M5 — The refer plane  *(P4)*
 
-## 8. Next move
+**Deliverables.** Adapters: git-dir (path+blob-sha read), generic HTTP
+(conditional GET, ETag/Last-Modified), Confluence REST (bearer token from
+env; page-version check). **Cap enforced: no further adapters in v0.30**
+(council; MCP is the endgame and gets a proposal doc, not code). Fetch
+layer (cache → adapter read-through); ARC cache keyed (locator, sha),
+byte-budgeted, results-neutral by construction; answer assembler: transient
+convert of fetched bytes → chunker → passage re-score → extractive answer +
+confidence floor (ported ADR-0014 semantics) → citation carries fresh sha +
+staleness stamp; freshness verification of the cited set behind
+`[freshness] verify = true` (fenced network, off by default).
 
-**Phase 5 shipped (v0.24.0, 2026-07-22)** — build spec archived at
-[`archive/v0.24.0-debug-observability-handoff.md`](archive/v0.24.0-debug-observability-handoff.md),
-decision in [ADR 0012](adr/0012-debug-observability.md). Every stage is now
-inspectable: `[debug]` toml + a stdout-safe emitter, `fux doctor` (seven-group
-install/corpus health), `fux why` (single-document negative-result verdict),
-and a third skill (`fux-debug`) so an agent self-diagnoses without a human
-reading logs.
+**DoD.** P4 on a local mock server: cold k=10 ≤ 3 s, warm ≤ 300 ms
+end-to-end at 100k; offline test: external sources degrade to doc-level
+answer + declared staleness, git sources fully functional; ARC never
+changes a result (differential test vs cache-off). ADR-0021.
 
-**Phase 6 — trust & currency — shipped (v0.25.0, 2026-07-23)** — build spec
-archived at
-[`archive/v0.25.0-trust-currency-handoff.md`](archive/v0.25.0-trust-currency-handoff.md),
-decisions in [ADR 0013](adr/0013-supersession-awareness.md) (supersession) and
-[ADR 0014](adr/0014-answer-confidence-floor.md) (confidence floor). Two honest,
-partial results, not two clean fixes:
+### M6 — Maintenance  *(P6 full, P7)*
 
-- **Supersession is annotated, not reordered** (the accepted verdict): `find`
-  ranking is unchanged; `answer` prefers the current document when both are in
-  its retrieved pool. Measured recovery on acme's 9/12 inversions: only **5 of
-  12** stale docs carry a machine-readable marker, only **3 of the 9** original
-  inversions do, and at the `answer` level the fix **fully corrects 1** and
-  de-cites the retired doc in a 2nd — the rest are unmarked and
-  deterministically unreachable. See
-  [`conformance/2026-07-23-supersession-recovery/`](conformance/2026-07-23-supersession-recovery/).
-- **The confidence floor was built and calibrated, then shipped disabled.**
-  `docs/conformance/2026-07-23-min-confidence-calibration/` found the acme
-  corpus's unanswerable and answerable score distributions interleave — no
-  `min_confidence` value declines all 4 fabrications without also declining
-  real answers. **The measured 0/4 fabrication defect is not fixed in this
-  release**; the knob and its calibration evidence exist for a future
-  cross-query-comparable signal (e.g. dense cosine) to use.
+**Deliverables.** `fux setup --hooks` (post-commit/merge/checkout → delta
+ingest from ledger sha-diff); the merge driver: `fux merge-driver` wired
+via gitattributes for keyspace paths — join `L/`, re-derive the rest;
+snapshot mode (per-source: machine-made Markdown copy committed with
+provenance frontmatter — the ported parser's home).
 
-### Phase 7 (v0.26.0) — supersession down-ranks, fabrication is closed
+**DoD.** P7: 20-doc commit re-indexes < 1 s. P6: branch-merge harness —
+concurrent same-doc ingest merges clean (tier 1), divergent-version merges
+resolve identically on both sides (tier 2), snapshot-file human edits
+conflict normally (tier 3, asserted *present*). ADR-0022.
 
-**Option B shipped, on measurement.** The annotate-only verdict was reopened
-after two independent corpora showed the engine annotating "this is superseded"
-about the document it ranked **first** (acme 9/12, orbit 8/12 inversions).
+### M7 — Scale  *(P2, P3, P5 at 10⁶)*
 
-- **`[engine.hybrid] supersession_penalty` (default 15)** — a rank offset in RRF
-  fusion for author-marked superseded documents. A **penalty, not a filter**: the
-  retired document stays reachable (measured rank 1 → 17, still returned). `0`
-  restores pre-0.26 ranking exactly; `--lexical-only` never reaches it.
-- **The default is a measurement.** Swept across all four eval sets: safe
-  interval **`[11, ∞)`** to 500, **zero hit@5 regression on any gate at any value
-  in any question kind**, recovering **100% of frontmatter-reachable inversions**
-  (orbit 5/5, acme 3/3) while hit@1 improves. See
-  [`conformance/2026-07-24-supersession-penalty-calibration/`](conformance/2026-07-24-supersession-penalty-calibration/).
-- **The ceiling is the marked set**, permanently: 3/12 (orbit) and 6/12 (acme)
-  inversions carry no marker. The remaining lever is **documentation, not
-  engineering** — `superseded_by:` is the contract Fux acts on.
-- **Fabrication is now a documented product boundary, not an open defect.** The
-  runner-up margin check was re-measured on a corpus de-confounded by the very
-  penalty above, and is **still empty** — a `how-to` question sits at margin
-  1e-05 before and after; acme's minimum is a `cross-doc` question that never
-  involved supersession. Three no-model discriminators are refuted across two
-  corpora. **No fourth mechanism is proposed.**
+**Deliverables.** Synth generator extended to 1M docs (deterministic,
+link-structured); full P-series measurement run; clone→first-answer bench
+(P5: ≤ 5 min including inflation + repo-shard re-derivation); cache-warming
+at setup (`fux setup --warm` prefetches top-N central docs); partial-clone
+deployment note in docs.
 
-### Phase 8 (2026-07-24) — v0.26.0 published
+**DoD.** The paper's §5–§6 tables updated from *projection* to *measured*,
+deltas recorded; any prediction that failed gets an honest ADR, not a
+threshold edit.
 
-**v0.26.0 is live on PyPI**, with both README honesty edits landing *before* the
-release was cut. The phase-7 calibration was re-confirmed **black-box from the
-published package** (orbit inversions 8→3, hit@1 .566→.698, hit@5 flat) — the
-first orbit run installed from PyPI rather than a locally-built wheel.
+### M8 — Deferred (each needs its own ADR + Arpit sign-off)
 
-- **Correction:** 0.24.0 and 0.25.0 were already published. `pip install` fails
-  with *"no matching distribution"* on Python **< 3.11** (the package requires
-  `>=3.11`), and that was misread as unpublished. The frozen-wheel workaround is
-  retired.
-- **Part B:** `zero_overlap_rescued` now counts *clean* rescues only (2 → 1); the
-  new `zero_overlap_demoted` auto-detects the fusion demotion case.
+AI-assisted ingest mode (pinning + grading contract per paper §3.2) · MPH
+dictionary upgrade (~15 MB saving) · top-64 default (pending M1's k=64
+numbers) · external-shards-only committing · Bloom-signature rare-term
+mitigation · MCP adapter strategy.
 
-### Phase 9 (2026-07-24) — fusion loses lexical top-5 hits → ACCEPT, no change
+---
 
-**The filed "non-monotone fusion" finding was a misdiagnosis.** `1/(k + rank)` is
-strictly decreasing, so RRF *is* monotone in per-list rank — verified: **160/160
-fused results reconcile to the formula with zero delta**. The demotion is correct
-arithmetic over a near-noise dense signal (**0.3297**, barely above ADR 0010's
-0.23–0.26 band). A **dense-quality** defect fusion faithfully propagates; the
-supersession penalty is not implicated (identical lost-sets at penalty 0 and 15).
+## Risks (from the council + paper §9, with owners in the plan)
 
-**Measured population** (`conformance/2026-07-24-fusion-lexical-hit-loss/`):
-hybrid loses a lexical top-5 hit **~4% on realistic corpora** (acme 2/55, orbit
-2/53), roughly offset by gains; spans four kinds, worst an orbit `factual`
-question lost from **lexical rank 1**; synthetic 9–64% **unexplained**.
+- **Pruning quality** → M1 is first, pre-registered, kill-capable.
+- **Interpreted-Python constants** → every latency DoD measured at 100k
+  before 1M; signature prefilter held in reserve (M8).
+- **ACL leak via meta** → hashed default enforced at write time (M3), not
+  in documentation.
+- **Cold-fetch demo pain** → `--warm` in M7; mock-server bench in M5 keeps
+  the number visible from the start.
+- **Adapter sprawl** → hard cap in M5; MCP proposal instead of code.
+- **DA minority report** (postings-by-term on v0.26 first) → superseded by
+  the reset decision, recorded here so the road not taken stays visible.
 
-**Verdict (Arpit): ACCEPT — no fusion change.** A guard would displace the gained
-results and would *protect* superseded documents at lexical rank ≤5, partly
-undoing the v0.26.0 penalty. The real cause is dense quality, and guarding the
-output to hide a bad input is the wrong layer. The lab demotion check now covers
-all kinds (INFO, gains beside losses); the finding graduated to
-`proposals/chunk-level-dense-codes.md`. Compare doc:
-`compare/hybrid-losing-lexical-hits.compare.md`. **No version bump.**
+## Process contract (per CLAUDE.md)
 
-**Then (unstarted):** **chunk-level dense codes** — now the named owner of both
-the zero-overlap reach failure (1/6) *and* this ranking failure, gated on the
-~200 B/doc committed-state budget; and **query-at-scale** (ADR 0011 — a 100k query
-still loads the whole index). Also parked: an absolute, cross-query-comparable
-confidence signal for `answer` (ADR 0014's F1/F2), now about confidence
-*reporting* rather than a fix, since phase 7 closed the decline line. Each needs
-its own compare doc.
-
-**Query-at-scale is deferred, not dropped** — at 100k documents a query takes
-~10 s, because the query path still loads the entire index to build the
-`Searcher`. `postings` is populated and indexed at ingest but never read at query
-time. The substrate solved *storage* at scale; *query* at scale stays scoped and
-unstarted (numbers and the fix in [ADR 0011](adr/0011-profiles-lean-state.md)),
-alongside chunk-level dense codes for the zero-overlap class.
-
-Beyond that: dogfooding (DOGFOOD.md + the private eval set) continues, and the
-held rule engine remains the long arc.
+Every milestone: plan → handoff doc → Claude Code prompt (name the model —
+see table above; wrong model fails silently), 1 ADR per feature with
+references, worklog entry per exchange, docs synced in the same change.
+The lab environment persists; new scale runs are new environments inside it.

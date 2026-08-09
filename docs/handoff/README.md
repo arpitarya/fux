@@ -1,12 +1,20 @@
-# Handoffs
+# Handoffs — live build specs
 
-The **plan → handoff → prompt** lifecycle artifacts live here (CLAUDE.md).
+One pair per milestone entering build: a **handoff doc** (the contract —
+context, definition of done, scope, non-negotiables, tests, open
+questions) and a **prompt** (paste-ready, points Claude Code at the
+handoff and sets its behavior). Both are written *after* a debate gate;
+the gate can and does change the plan.
 
-For each non-trivial feature, commit two files named for the feature:
+Fully executed pairs move to [`../archive/`](../archive/), version-named,
+with their ADRs linked.
 
-- `NNNN-<feature>-handoff.md` — self-contained spec: context, definition-of-done,
-  scope in/out, key files, constraints, edge cases, tests, open questions.
-- `NNNN-<feature>-prompt.md` — the paste-ready Claude Code prompt that executes the
-  handoff (explore → plan → implement → verify).
+| pair | milestone | model | status |
+|------|-----------|-------|--------|
+| [handoff](v0.30.0-m0-m1-gate-handoff.md) · [prompt](v0.30.0-m0-m1-gate-prompt.md) | M0 hygiene + ADR-0016 + **M1 the pruning gate** (+ M0b scaffold on PASS) | Sonnet build · **Opus verdict** | ready |
 
-On completion, the feature also gets exactly one ADR in [`../adr/`](../adr/).
+**Note on this pair:** its debate gate amended `PLAN.md`'s sequencing —
+the package scaffold moved *after* the M1 gate, because scaffolding an
+architecture that P1 may falsify is the failure the council's pre-mortem
+seat named. PLAN §M0/§M1 and OPEN-WORK W-01…W-05 reflect the corrected
+order.
