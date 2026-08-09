@@ -20,7 +20,7 @@ timestamp: 2026-08-09T00:00:00Z
 > grade — for zero migration. Runner-up: `derived`/`enriched`, if the visual
 > similarity of `extracted`/`enriched` proves annoying.
 > **Status:** ⏳ proposed — awaiting Arpit's ratification.
-> **ADR-0016 is written** ([`../adr/0016-ingest-mode-naming.md`](../adr/0016-ingest-mode-naming.md))
+> **ADR-0001 is written** ([`../adr/0001-ingest-mode-naming.md`](../adr/0001-ingest-mode-naming.md))
 > and also carries `status: proposed`: per the M0/M1 handoff §7 the ADR was
 > drafted with the recommendation rather than blocking M1 on a human gate.
 > Ratifying flips **both** to accepted; choosing option B supersedes the ADR
@@ -70,7 +70,7 @@ mean opposite things in adjacent code.
 Whichever wins: config surface is `[ingest] mode = <no-model> | <model>`, the
 AI tier's outputs are pinned with provenance and re-read (never
 re-generated), and its signal is graded below deterministic signal
-everywhere it competes. ADR-0016 records the call; GLOSSARY gains both
+everywhere it competes. ADR-0001 records the call; GLOSSARY gains both
 terms.
 
 ## References
@@ -80,7 +80,7 @@ compare (fidelity: inferred | advanced) · WORKLOG 2026-08-09.
 
 ## Reopen-trigger
 
-None — a naming call, closed permanently by ADR-0016. *(It reopened once, on
+None — a naming call, closed permanently by ADR-0001. *(It reopened once, on
 2026-08-09, because the first verdict named only one tier and left the other
 colliding. That is the class of trigger that applies: a collision surviving the
 decision, not a change of taste.)*

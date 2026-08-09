@@ -84,7 +84,7 @@ threshold pre-registered in the [handoff](handoff/v0.30.0-m0-m1-gate-handoff.md)
 **Moving that threshold after seeing the numbers is the single worst thing a
 successor can do here.** A recorded negative that saves months of building is
 a *successful* outcome of M1, not a failure of it. The verdict lives in
-[ADR-0017](adr/0017-pruning-eval-gate.md).
+[ADR-0002](adr/0002-pruning-eval-gate.md).
 
 **Q: Where is the state of play, mechanically?**
 

@@ -1,12 +1,12 @@
 ---
 type: ADR
-title: "ADR-0018: P1 re-run — FAIL. Static pruning does not preserve candidate recall."
+title: "ADR-0003: P1 re-run — FAIL. Static pruning does not preserve candidate recall."
 description: The pruning gate, re-run on a corpus that can actually test it (8872 RFCs, median 967 distinct terms/doc), gated on recall@20 at matched retention. No selector comes within 2 points of the unpruned index at any retention rung; the best is 35.9 points short at 6 %. The compare doc's central prediction is falsified. Option E applies.
 status: proposed
 timestamp: 2026-08-09T00:00:00Z
 ---
 
-# ADR-0018: P1 re-run — **FAIL**
+# ADR-0003: P1 re-run — **FAIL**
 
 - **Status:** **proposed — awaiting Arpit's ruling.** The measurement is
   unambiguous; the consequences for the architecture are his call.
@@ -16,7 +16,7 @@ timestamp: 2026-08-09T00:00:00Z
   [`PRE-REGISTRATION-v2.md`](../../tools/pruning-eval/PRE-REGISTRATION-v2.md)
   (commit `3892c55`)
 - **Evidence:** [`../conformance/2026-08-09-pruning-rerun/`](../conformance/2026-08-09-pruning-rerun/)
-- **Supersedes as the P1 measurement:** [ADR-0017](0017-pruning-eval-gate.md) —
+- **Supersedes as the P1 measurement:** [ADR-0002](0002-pruning-eval-gate.md) —
   which is **not** modified. It was a correct refusal, and this run is the one
   it asked for.
 
@@ -43,7 +43,7 @@ This is not a marginal call. The gaps are 7–27× the sampling standard error
 
 ## Context
 
-[ADR-0017](0017-pruning-eval-gate.md) returned INCONCLUSIVE: its corpora had
+[ADR-0002](0002-pruning-eval-gate.md) returned INCONCLUSIVE: its corpora had
 32–46 distinct terms per document, so "keep the top 128" removed nothing and
 the threshold was met by a treatment that never happened. It asked for three
 things, and this run delivers all three:
@@ -56,7 +56,7 @@ things, and this run delivers all three:
    falling from rank 1 to rank 8 costs nothing, so the gate is **recall@20**,
    not the index's own hit@5.
 3. **The right comparison.** Five arms at **matched retention**, because
-   comparing criteria at a fixed *k* would repeat ADR-0017's error one level up.
+   comparing criteria at a fixed *k* would repeat ADR-0002's error one level up.
 
 ## What was measured
 
@@ -101,7 +101,7 @@ Recorded before the run, from
 > the outlier."*
 
 **Measured: arm 4 is 77.8 points below arm 5, and arm 1 — the criterion
-ADR-0017 implicated — is the best of the four at every rung.** Both secondary
+ADR-0002 implicated — is the best of the four at every rung.** Both secondary
 expectations also failed: impact did *not* beat KL, and the heading spine did
 not help.
 
@@ -111,7 +111,7 @@ completely different corpus**. That it was written down in advance is why it
 counts as evidence rather than hindsight.
 
 **The compare doc's central hypothesis is falsified.** KL divergence is not the
-defect; if anything it is the least-bad of the criteria tested. ADR-0017's
+defect; if anything it is the least-bad of the criteria tested. ADR-0002's
 `webhook`-out-of-`webhooks.md` observation was a real symptom, but the
 inference drawn from it — that a better criterion would recover the loss — does
 not survive measurement.
@@ -204,12 +204,12 @@ not a consequence the measurement licenses on its own.
 - The paper's **§5 size model must be re-derived** at a retention that holds
   quality, or at no pruning. Its ~6 % assumption is now *measured as
   quality-destroying* on the one corpus able to test it — a stronger statement
-  than ADR-0017's "unvalidated". Paper edits are M7's, but the flag is owed now.
+  than ADR-0002's "unvalidated". Paper edits are M7's, but the flag is owed now.
 - **`storage-architecture.compare.md` takes a size amendment.** Its reopen
   trigger ("P1 fails at k=128") has technically fired; the verdict itself
   (index-and-refer) is not what failed, so the honest action is an amendment
   recording the larger committed footprint.
-- ADR-0017 gains a one-line forward pointer and is otherwise **unmodified**.
+- ADR-0002 gains a one-line forward pointer and is otherwise **unmodified**.
 
 **What we now owe, in priority order:**
 
@@ -261,7 +261,7 @@ new query set and a new threshold file.
 
 - **The pre-registration**, frozen before the first gating number —
   [`tools/pruning-eval/PRE-REGISTRATION-v2.md`](../../tools/pruning-eval/PRE-REGISTRATION-v2.md).
-- **The prior refusal this run answers** — [ADR-0017](0017-pruning-eval-gate.md).
+- **The prior refusal this run answers** — [ADR-0002](0002-pruning-eval-gate.md).
 - **The design under test** —
   [`../compare/pruning-criterion.compare.md`](../compare/pruning-criterion.compare.md).
 - **Corpus:** RFC Editor, `https://www.rfc-editor.org/rfc-index.txt` and

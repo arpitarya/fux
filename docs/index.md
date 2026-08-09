@@ -27,9 +27,10 @@ agents* — update both or neither.
 
 * [Compare docs](compare/) - six v0.30 forks, verdict at the top of each; one still ⏳ (ingest-mode naming).
 * [Proposals](proposals/) - parked ideas with graduation triggers (3 new for v0.30 + 3 carried).
-* [ADRs](adr/) - numbering continues from 0016; 0001–0015 are archived with the v0.26 engine.
-  * [ADR-0016](adr/0016-ingest-mode-naming.md) - ingest-mode naming (`extracted`/`enriched`, amended); ⏳ proposed, awaiting ratification.
-  * **[ADR-0017](adr/0017-pruning-eval-gate.md) - P1, the pruning gate: INCONCLUSIVE. Read before starting any milestone.**
+* [ADRs](adr/) - **numbered from 0001 for the v0.30 line** ([policy](adr/README.md)); "archived ADR-NNNN" always means the v0.26 set under archive.
+  * [ADR-0001](adr/0001-ingest-mode-naming.md) - ingest-mode naming (`extracted`/`enriched`); ⏳ proposed, awaiting ratification.
+  * [ADR-0002](adr/0002-pruning-eval-gate.md) - P1 first run: INCONCLUSIVE (the correct refusal).
+  * **[ADR-0003](adr/0003-pruning-criterion-rerun.md) - P1 re-run: FAIL → option E, full postings. The decision the whole build now rests on.**
 
 # Build
 

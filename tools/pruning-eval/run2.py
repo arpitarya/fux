@@ -7,13 +7,13 @@
 Definitions are frozen in `PRE-REGISTRATION-v2.md`, committed before the first
 gating number. This script measures; the verdict is a human-reviewed ADR.
 
-Three things differ from `run.py` (the run ADR-0017 voided):
+Three things differ from `run.py` (the run ADR-0002 voided):
 
 * **recall@20 is the gate**, not the index's own hit@5 — the index is a
   candidate generator feeding a fetch-and-re-score stage, so a document moving
   from rank 1 to rank 8 costs nothing.
 * **Retention is matched across arms**, not `k` — comparing criteria at a fixed
-  `k` would repeat ADR-0017's error one level up.
+  `k` would repeat ADR-0002's error one level up.
 * **Five arms**, because the failure catalogue implicated the *criterion*, not
   pruning as such.
 """
@@ -313,7 +313,7 @@ def render(results: list[dict]) -> str:
             o.append(f"| {r['corpus']} | {rung:.0%} | {best.key} {best.label} "
                      f"| {best_v:.3f} | {ceil_abs:.3f} | {100*(ceil_abs-best_v):+.2f} |")
     o.append("")
-    o.append("*The call belongs in ADR-0018, reviewed by a human. This table states")
+    o.append("*The call belongs in ADR-0003, reviewed by a human. This table states")
     o.append("the inputs; it does not adjudicate.*")
     return "\n".join(o) + "\n"
 

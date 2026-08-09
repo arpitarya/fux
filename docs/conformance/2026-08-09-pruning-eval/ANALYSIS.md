@@ -1,7 +1,7 @@
 # ANALYSIS — M1, the pruning-quality gate (P1)
 
 **Run date:** 2026-08-09 · **Verdict:** **INCONCLUSIVE** →
-[ADR-0017](../../adr/0017-pruning-eval-gate.md) ·
+[ADR-0002](../../adr/0002-pruning-eval-gate.md) ·
 **Pre-registration:** [`PRE-REGISTRATION.md`](../../../tools/pruning-eval/PRE-REGISTRATION.md)
 (committed in `f5300fc`, **before** the first gating corpus ran)
 
@@ -146,12 +146,12 @@ terms pruned from their own document) has no mitigation designed.
 
 | # | change | why | status |
 |---|---|---|---|
-| 1 | **Do not scaffold; do not start M2.** W-01 and W-06…W-11 stay blocked. | The premise is untested, not confirmed. | **done** — [ADR-0017](../../adr/0017-pruning-eval-gate.md); OPEN-WORK P1 = INCONCLUSIVE |
-| 2 | **Close M8's "top-64 default" negative.** | acme −9.09 pts is 3× the hard bar; no further work needed. | **done** — recorded in ADR-0017 + PLAN §M8 |
+| 1 | **Do not scaffold; do not start M2.** W-01 and W-06…W-11 stay blocked. | The premise is untested, not confirmed. | **done** — [ADR-0002](../../adr/0002-pruning-eval-gate.md); OPEN-WORK P1 = INCONCLUSIVE |
+| 2 | **Close M8's "top-64 default" negative.** | acme −9.09 pts is 3× the hard bar; no further work needed. | **done** — recorded in ADR-0002 + PLAN §M8 |
 | 3 | **Re-run P1 against a long-document corpus** (10³–10⁴ words/doc), with a *fresh* pre-registration. | Only a corpus with real vocabulary can reach ~6 % retention. `synth_corpus.py` **cannot** be tuned into this — its closed ~50-word vocabulary caps document vocabulary at 72 terms by construction. | **open** — needs its own handoff (Opus: measurement design) |
 | 4 | **Re-register against *term retention*, not absolute k.** | Makes the treatment comparable across corpora; "k=128" is meaningless without document size. | **open** — belongs to change 3's pre-registration, *not* to this run |
-| 5 | **Annotate paper §5** that the 6 %-retention assumption is *unvalidated*, not merely unmeasured. | A reader today would otherwise take it as pending-measurement rather than untested. | **open** — M7 owns §5's numbers; flagged in ADR-0017 |
-| 6 | **Do not build Bloom rare-term mitigation on this run.** | The measured rare-term loss is ~0; the real failure mode is different and unmitigated. | **done** — recorded in ADR-0017 |
+| 5 | **Annotate paper §5** that the 6 %-retention assumption is *unvalidated*, not merely unmeasured. | A reader today would otherwise take it as pending-measurement rather than untested. | **open** — M7 owns §5's numbers; flagged in ADR-0002 |
+| 6 | **Do not build Bloom rare-term mitigation on this run.** | The measured rare-term loss is ~0; the real failure mode is different and unmitigated. | **done** — recorded in ADR-0002 |
 
 ## Unresolved
 

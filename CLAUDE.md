@@ -54,13 +54,13 @@ systems that own it; verify at answer time.
   re-score passages on the fetched bytes, and cite a fresh sha.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic) and
   `enriched` (opt-in, model-assisted; deferred to M8). Both names are ⏳
-  *proposed* in [ADR-0016](docs/adr/0016-ingest-mode-naming.md) pending
+  *proposed* in [ADR-0001](docs/adr/0001-ingest-mode-naming.md) pending
   ratification — **`inferred` is retired**, because `INFERRED` is the edge
   grade for *model-derived* and the collision is the whole point of that ADR.
 
 **The build is gated on falsifiable predictions P1–P7** (paper §8). **No M2+
 work while P1 is unmeasured or failed.** That is a hard sequencing rule, not a
-preference — see [`docs/adr/0017-pruning-eval-gate.md`](docs/adr/0017-pruning-eval-gate.md).
+preference — see [`docs/adr/0002-pruning-eval-gate.md`](docs/adr/0002-pruning-eval-gate.md).
 
 **Out of scope until it has an ADR and Arpit's sign-off:** anything from the
 archived build (the SQLite substrate, per-file cache, lean profile, state

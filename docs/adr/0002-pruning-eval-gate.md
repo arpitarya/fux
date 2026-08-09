@@ -1,12 +1,12 @@
 ---
 type: ADR
-title: "ADR-0017: P1, the pruning-quality gate — INCONCLUSIVE, do not proceed"
+title: "ADR-0002: P1, the pruning-quality gate — INCONCLUSIVE, do not proceed"
 description: M1's measured result. The pre-registered numeric condition is met on all three corpora (Δ hit@5 = 0.00 pts at k=128), but prune coverage shows the treatment reached 0–2.5% of documents and retained 96–100% of postings, so the experiment cannot license the inference the threshold was written to license. The scaffold stays blocked; the decision is Arpit's.
 status: proposed
 timestamp: 2026-08-09T00:00:00Z
 ---
 
-# ADR-0017: P1, the pruning-quality gate — **INCONCLUSIVE**
+# ADR-0002: P1, the pruning-quality gate — **INCONCLUSIVE**
 
 - **Status:** **proposed — awaiting Arpit's ruling.** The executing agent
   deliberately does not adjudicate this one; see §Decision.
@@ -15,7 +15,7 @@ timestamp: 2026-08-09T00:00:00Z
   index-and-refer plan is sequenced behind.
 - **Evidence:** [`../conformance/2026-08-09-pruning-eval/`](../conformance/2026-08-09-pruning-eval/)
 - **Superseded as the P1 measurement by
-  [ADR-0018](0018-pruning-criterion-rerun.md)** (2026-08-09) — the re-run this
+  [ADR-0003](0003-pruning-criterion-rerun.md)** (2026-08-09) — the re-run this
   ADR asked for. It found **FAIL**. This document is unmodified: it is the
   record of a correct refusal, and the refusal is what produced the re-run.
 - **Pre-registration (frozen before the first number):**

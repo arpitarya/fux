@@ -1,10 +1,10 @@
 """The five-arm, retention-matched experiment.
 
-ADR-0017 failed because "k=128" meant different things on different documents.
+ADR-0002 failed because "k=128" meant different things on different documents.
 This module fixes the *treatment strength* instead: every arm is calibrated to
 keep the same fraction of postings, so a difference between arms is a
 difference between **criteria** and nothing else. Comparing criteria at a fixed
-k would repeat ADR-0017's error one level up.
+k would repeat ADR-0002's error one level up.
 
 Retention is measured as kept `(document, term)` pairs over total pairs —
 the quantity the paper's §5 size model is denominated in.
@@ -53,7 +53,7 @@ class ArmSpec:
 
 ARMS = (
     ArmSpec("1", "KL only", "—", use_spine=False, ranker="kl", use_sweep=False,
-            question="continuity with ADR-0017"),
+            question="continuity with ADR-0002"),
     ArmSpec("2", "impact only", "B", use_spine=False, ranker="impact", use_sweep=False,
             question="is KL the defect, or pruning itself?"),
     ArmSpec("3", "A + B", "A+B", use_spine=True, ranker="impact", use_sweep=False,

@@ -1,6 +1,6 @@
 """The combined pruning selector — Rules A, B and C of `pruning-criterion` §7.
 
-The criterion ADR-0017 measured (KL divergence) rewards terms that are *rare
+The criterion ADR-0002 measured (KL divergence) rewards terms that are *rare
 across the collection*, so in a corpus where every document is about payments
 the word `payments` looks uninformative. The run literally dropped `webhook`
 from `docs/api/webhooks.md`. Three rules answer that:
@@ -17,7 +17,7 @@ from `docs/api/webhooks.md`. Three rules answer that:
 
 Budget is `max(floor, ceil(share × |vocab(d)|))` — a *share*, not a constant k,
 so the treatment means the same thing on a short note and a long specification.
-Fixed k is exactly what made ADR-0017's run untestable.
+Fixed k is exactly what made ADR-0002's run untestable.
 
 Two properties the experiment depends on, both tested:
 
@@ -26,7 +26,7 @@ Two properties the experiment depends on, both tested:
 * **Selection uses the *unpruned* collection model.** It must: you cannot rank
   terms by impact against statistics that depend on the ranking's own output.
   The final index then recomputes `df`/`n`/lengths over the kept postings. That
-  is a deliberate two-pass build, not an inconsistency — see ADR-0018.
+  is a deliberate two-pass build, not an inconsistency — see ADR-0003.
 
 Pure functions, stdlib only, written to port into `src/fux/ingest/` unchanged.
 """

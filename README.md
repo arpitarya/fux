@@ -19,7 +19,7 @@ at answer time.**
 > but the eval corpora's documents proved far too small for top-128 pruning to
 > do anything at all (0–2.5 % of documents affected). Nothing further is built
 > until that is re-run properly —
-> [ADR-0017](docs/adr/0017-pruning-eval-gate.md).
+> [ADR-0002](docs/adr/0002-pruning-eval-gate.md).
 
 ## The idea
 

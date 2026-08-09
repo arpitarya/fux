@@ -26,9 +26,9 @@ timestamp: 2026-08-09T00:00:00Z
 > not test the claim. At k=64, the only setting where pruning bit, acme lost
 > 9.09 pts. **Annotated, not reopened**; the verdict holds pending the
 > long-document re-run (W-13). See
-> [ADR-0017](../adr/0017-pruning-eval-gate.md).
+> [ADR-0002](../adr/0002-pruning-eval-gate.md).
 >
-> **⚠ SIZE AMENDMENT (2026-08-09, [ADR-0018](../adr/0018-pruning-criterion-rerun.md)).**
+> **⚠ SIZE AMENDMENT (2026-08-09, [ADR-0003](../adr/0003-pruning-criterion-rerun.md)).**
 > The re-run measured P1 properly and it **FAILED**: no pruning criterion came
 > within 2 points of the unpruned index at any retention rung (best: −35.9 pts
 > at 6 %, −12.7 pts at 30 %). **Index-and-refer is not what failed** — ranking

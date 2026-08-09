@@ -1,12 +1,12 @@
 ---
 type: ADR
-title: "ADR-0016: ingest-mode naming — extracted / enriched"
+title: "ADR-0001: ingest-mode naming — extracted / enriched"
 description: Names both ingest tiers. The model-assisted tier is `enriched`; the deterministic default is renamed from `inferred` to `extracted`, which aligns it with the ported edge grade EXTRACTED (= deterministic) and removes the residual half of the collision the first draft left behind.
 status: proposed
 timestamp: 2026-08-09T00:00:00Z
 ---
 
-# ADR-0016: ingest-mode naming — `extracted` / `enriched`
+# ADR-0001: ingest-mode naming — `extracted` / `enriched`
 
 - **Status:** **proposed** — awaiting Arpit's ratification. Written now, not
   blocked on, per the M0/M1 handoff §7 ("if he has not answered when you reach
@@ -54,7 +54,7 @@ A reader meeting `mode = inferred` next to `grade: INFERRED` gets the opposite
 meaning in adjacent config and code. That is the whole failure this ADR exists
 to prevent.
 
-**The fix is free, and it is Arpit's own word on the other side.** ADR-0016
+**The fix is free, and it is Arpit's own word on the other side.** ADR-0001
 already moved the AI tier to `enriched`, which *vacates* `extracted`. Assigning
 it to the deterministic tier makes the two vocabularies agree exactly:
 

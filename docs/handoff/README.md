@@ -11,8 +11,9 @@ with their ADRs linked.
 
 | pair | milestone | model | status |
 |------|-----------|-------|--------|
-| [handoff](v0.30.0-m0-m1-gate-handoff.md) · [prompt](v0.30.0-m0-m1-gate-prompt.md) | M0 hygiene + ADR-0016 + M1 the pruning gate | Sonnet build · Opus verdict | **executed** 2026-08-09 → [ADR-0016](../adr/0016-ingest-mode-naming.md), [ADR-0017](../adr/0017-pruning-eval-gate.md) (INCONCLUSIVE) |
-| [handoff](v0.30.0-m1-rerun-handoff.md) · [prompt](v0.30.0-m1-rerun-prompt.md) | **M1-rerun — make P1 decidable** (long-doc corpus, 5 selector arms, retention-matched, recall@20 gate) | **Opus throughout** | ready · **next** |
+| [handoff](v0.30.0-m0-m1-gate-handoff.md) · [prompt](v0.30.0-m0-m1-gate-prompt.md) | M0 hygiene + ADR-0001 + M1 the pruning gate | Sonnet build · Opus verdict | **executed** 2026-08-09 → [ADR-0001](../adr/0001-ingest-mode-naming.md), [ADR-0002](../adr/0002-pruning-eval-gate.md) (INCONCLUSIVE) |
+| [handoff](v0.30.0-m1-rerun-handoff.md) · [prompt](v0.30.0-m1-rerun-prompt.md) | M1-rerun — make P1 decidable (RFC corpus, 5 arms, retention-matched, recall@20) | Opus throughout | **executed** 2026-08-09 → [ADR-0003](../adr/0003-pruning-criterion-rerun.md) (**FAIL** — option E accepted) |
+| [handoff](v0.30.0-m1-t0-slice-handoff.md) · [prompt](v0.30.0-m1-t0-slice-prompt.md) | **M0 scaffold + M1 T0 slice** — canonical JSONL store, git-dir ingest, scan `ask`, dogfood on this repo | **Sonnet** · one Opus review checkpoint (the canonical writer) | ready · **next** |
 
 **Note on the first pair:** its debate gate amended `PLAN.md`'s sequencing —
 the package scaffold moved *after* the M1 gate, because scaffolding an

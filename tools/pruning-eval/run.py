@@ -366,7 +366,7 @@ def render(results: list[dict]) -> str:
         out.append(f"| {r['corpus']} | {d128:+.2f} | {d64:+.2f} "
                    f"| {'yes' if d128 <= 2 else 'NO'} | {'yes' if d128 <= 3 else 'NO'} |")
     out.append("")
-    out.append("*The call itself belongs in ADR-0017, reviewed by a human. This table")
+    out.append("*The call itself belongs in ADR-0002, reviewed by a human. This table")
     out.append("states the inputs; it does not adjudicate an ambiguous result.*")
     return "\n".join(out) + "\n"
 

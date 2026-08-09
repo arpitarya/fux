@@ -14,7 +14,7 @@ Docs large enough to carry §humans + §agents sections update both.
 
 | Document | Update trigger | Last verified | Notes |
 |----------|---------------|---------------|-------|
-| [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, layout changes | 2026-08-09 | M0a rewrite **adopted by Arpit** (the proposed file is gone; [diff](handoff/v0.30.0-claude-md.diff) kept for the record). Ingest-mode names synced to ADR-0016's amendment |
+| [`../CLAUDE.md`](../CLAUDE.md) | Scope, constraints, lifecycle, layout changes | 2026-08-09 | M0a rewrite **adopted by Arpit** (the proposed file is gone; [diff](handoff/v0.30.0-claude-md.diff) kept for the record). Ingest-mode names synced to ADR-0001's amendment |
 | [`../README.md`](../README.md) | Status, guarantees, reading order change | 2026-08-09 | Rebuild-status stub until M4 |
 | [`index.md`](index.md) | Bundle contents change | 2026-08-09 | OKF bundle root |
 | [`PLAN.md`](PLAN.md) | Any design/scope/status change | 2026-08-09 | The build of record; agent quick-ref section at top |
@@ -26,8 +26,8 @@ Docs large enough to carry §humans + §agents sections update both.
 | [`WORKLOG.md`](WORKLOG.md) | **Every substantive exchange** (append) | 2026-08-09 | Rolling session handoff |
 | [`GLOSSARY.md`](GLOSSARY.md) | New recurring term, or a term changes meaning | 2026-08-09 | Rewritten for v0.30 (index vs db, ledger, keyspace, wire/runtime, refer/snapshot, inferred/enriched, pruning, ARC); archived v0.26 terms marked not-current |
 | [`compare/README.md`](compare/README.md) | A compare doc opens, closes, changes status | 2026-08-09 | Seven v0.30 forks; verdict-first convention |
-| [`compare/*.compare.md`](compare/) | New evidence, verdict change, reopen-trigger fires | 2026-08-09 | `ingest-mode-naming` ⏳ (ADR-0016) · `pruning-criterion` ❌ **falsified** by ADR-0018 · `storage-architecture` carries a **size amendment** |
-| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-08-09 | 0016 (naming, amended → `extracted`/`enriched`, **proposed**) · 0017 (P1 INCONCLUSIVE) · 0018 (**P1 FAIL**, the live verdict); 0001–0015 archived |
+| [`compare/*.compare.md`](compare/) | New evidence, verdict change, reopen-trigger fires | 2026-08-09 | `ingest-mode-naming` ⏳ (ADR-0001) · `pruning-criterion` ❌ **falsified** by ADR-0003 · `storage-architecture` carries a **size amendment** |
+| [`adr/`](adr/) | A feature completes (one ADR per feature) | 2026-08-09 | **Renumbered from 0001 for v0.30** (README has the policy): 0001 naming (proposed) · 0002 P1 INCONCLUSIVE · 0003 **P1 FAIL / option E** · 0004+ planned per PLAN rev 2. Archived v0.26 ADRs cited as "archived ADR-NNNN" |
 | [`handoff/`](handoff/) | A feature enters build (handoff + prompt pair) | 2026-08-09 | M0/M1 pair + M1-rerun pair (both executed) + the CLAUDE.md review diff |
 | [`INTERVIEW.md`](INTERVIEW.md) *(reset block)* | The reset block leads the doc; update on direction change | 2026-08-09 | Everything below the block is archived history and says so |
 | [`proposals/`](proposals/README.md) | An idea is parked, graduates, or is rejected | 2026-08-09 | 3 new (mcp-adapters, knowledge-ci, wavelet-self-index) + 3 carried; v0.26-era moved to archive |

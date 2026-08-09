@@ -1,315 +1,205 @@
 ---
 type: Plan
-title: "Fux v0.30 — the index-and-refer rebuild"
-description: From-scratch implementation plan for the architecture in docs/paper/the-fux-index-paper.md and docs/architecture-components.svg — milestones M0–M8, each gated by falsifiable predictions P1–P7.
+title: "Fux v0.30 — the index-and-refer build, revision 2"
+description: The post-gate plan. P1 measured FAIL; Arpit accepted option E (full postings); the index pivoted to tiered JSONL with git as the Merkle tree. Milestones M0–M8, ADRs from 0001, first slice packaged as a handoff.
 status: active
 timestamp: 2026-08-09T00:00:00Z
 ---
 
-# Fux v0.30 — the index-and-refer rebuild
+# Fux v0.30 — the index-and-refer build (revision 2)
 
 ## For AI agents — quick reference (read this block, then jump)
 
-- **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) §2 — pick work there,
-  not here; this file is the *spec* for each milestone id.
-- **Hard gate — CLOSED, and P1 has now FAILED.** Re-run 2026-08-09 on 8 872
-  RFCs (median 967 distinct terms/doc): the best of four pruning selectors is
-  **35.9 pts** below the unpruned index on recall@20 at 6 % retention, against
-  a 2-pt bar; still 12.7 pts short at 30 %. **Do not start M0b or M2** — read
-  [`adr/0018-pruning-criterion-rerun.md`](adr/0018-pruning-criterion-rerun.md)
-  (and [`0017`](adr/0017-pruning-eval-gate.md), the INCONCLUSIVE run that
-  produced it). Index-and-refer is not falsified; the *small-by-pruning* claim
-  is, and the committed footprint becomes 0.6–1.5 GB at 10⁶ docs.
-- **Decisions:** verdict-first in [`compare/`](compare/README.md); one
-  still open (ingest-mode naming → ADR-0016, Arpit's call).
-- **Laws:** $0 · stdlib · deterministic · offline-default · 1 feature =
-  1 ADR (from 0016) · every rule referenced · WORKLOG every exchange ·
-  OPEN-WORK + DOC-REGISTRY rows updated in the same change as the work.
-- **Old world:** engine `../archive/v0.26/` (runnable, reference-only,
-  M1's baseline); its docs `archive/v0.26/archive/v0.26-docs/`; port list below —
-  port with tests, don't rewrite.
-- **Handoffs:** every milestone ships as handoff doc + Claude Code prompt,
-  model named per the milestone table (wrong model fails silently).
+- **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) §2 — pick work there;
+  this file is the *spec* for each milestone id.
+- **The gate is closed.** P1 was measured twice ([ADR-0002](adr/0002-pruning-eval-gate.md)
+  INCONCLUSIVE → [ADR-0003](adr/0003-pruning-criterion-rerun.md) **FAIL**),
+  and Arpit accepted option E: **full postings, no pruning anywhere in the
+  build**. Do not re-introduce pruning; it survives only as an M8
+  optimization experiment.
+- **Format of record:** [`compare/index-format.compare.md`](compare/index-format.compare.md)
+  — tiered JSONL, doc-major committed, blocked term-major derived, binary
+  only as record properties (`code`, `tpack`). ADR numbering starts at
+  0001 ([`adr/README.md`](adr/README.md)); "archived ADR-NNNN" always
+  means the v0.26 line.
+- **Laws:** $0 · stdlib · deterministic (no floats, no wall-clock in
+  committed bytes) · offline-default · 1 feature = 1 ADR, referenced ·
+  WORKLOG every exchange · OPEN-WORK + DOC-REGISTRY in the same change.
+- **Old world:** engine `../archive/v0.26/` (runnable, reference-only);
+  port with tests, don't rewrite (list below). The RFC corpus
+  (manifest-pinned, in the lab) and `tools/pruning-eval/` are reusable
+  bench infrastructure.
+- **Handoffs:** every milestone ships as handoff + prompt with the model
+  named. The live pair is in [`handoff/`](handoff/README.md).
 
 ---
 
-*The second reset. The v0.19–0.26 substrate engine is archived at
-[`../archive/v0.26/`](../archive/v0.26/) — reference-only, kept runnable
-because M1 uses it as the quality baseline. Its documentation (ADRs
-0001–0015, compare docs, example docs, tracker, old flow diagram) is at
-[`archive/v0.26/archive/v0.26-docs/`](../archive/v0.26/archive/v0.26-docs/); the previous plan is at
-[`archive/v0.26/archive/PLAN-v0.26.md`](../archive/v0.26/archive/PLAN-v0.26.md). ADR numbering continues
-from 0016 in a fresh [`adr/`](adr/); archived ADRs are cited by their old
-numbers with the archive path.*
+## What changed since revision 1 (the honest delta)
 
-## What this build is
+1. **The pruning premise died in measurement.** Two pre-registered runs;
+   the second, on a corpus that could actually test it (8 872 RFCs, median
+   967 distinct terms/doc), put the best selector **35.9 pts** short of a
+   2-pt bar at the 6 % budget. Option E accepted: the committed index
+   carries **full postings**.
+2. **The format pivoted to tiered JSONL** (Arpit's push, then measured):
+   sorted JSONL *is* an index (0.035 ms bisect); git *is* the Merkle tree
+   (a one-line edit in a 138 MB shard commits in 2.5 s and deltas to
+   ~nothing); the common-term trap closes via 128-posting block lines with
+   integer `mx` skipping (397 → 44 ms). The MST substrate and BIC wire are
+   **superseded for the committed plane** and survive only inside tier T2.
+3. **M2 shrank ~500 LOC** (no custom Merkle tree); codec work moved to the
+   T2 tier most repos never reach; the clone story improved — a fresh
+   clone answers via scan before any build step.
+4. **ADRs renumbered from 0001** for the v0.30 line (0016–0018 → 0001–0003;
+   frozen artifacts keep old numbers, see `adr/README.md`).
 
-**One sentence:** rank from a small committed index; fetch content from the
-systems that own it; verify at answer time.
+Design authority, in order: the index-format compare doc · the paper
+(`paper/the-fux-index-paper.md` — §4/§5 pending amendment, flagged in M6) ·
+the other compare docs · council + session rulings in WORKLOG.
 
-Authority for every design decision, in order:
-
-1. [`paper/the-fux-index-paper.md`](paper/the-fux-index-paper.md) — the
-   architecture, size/latency models, predictions P1–P7.
-2. [`architecture-components.svg`](architecture-components.svg) — the v2
-   component map (one MST keyspace, wire/runtime split, two ingest modes).
-3. [`architecture-index-and-refer.svg`](architecture-index-and-refer.svg) —
-   the high-level flow.
-4. The council rulings (WORKLOG 2026-08-09): "index" not "db"; hashed meta
-   default; adapters capped git + HTTP + Confluence (MCP is the endgame);
-   the pruning eval gates all build; DA minority report noted.
-
-## Laws (unchanged from the engine's founding)
-
-$0 default · stdlib-only runtime · deterministic to the byte · offline by
-default (network only inside explicit fences) · git is the transport ·
-1 feature = 1 ADR · every rule carries a reference · worklog every exchange.
-
-New law from this architecture: **content is never durable outside its
-source system** except under explicit `snapshot` policy.
-
-## What survives from v0.26 (port, don't rewrite)
-
-These modules are law-hardened and keep their tests; they are *ported* from
-`archive/v0.26/` when their milestone needs them, imports rewritten, tests
-carried:
+## Port-don't-rewrite (from `archive/v0.26/`, with their tests)
 
 | module | used by | port in |
 |---|---|---|
-| frontmatter parser | ledger, snapshot mode | M2 |
-| converters (archived `fidelity: inferred/advanced` tiers) | ingest (transient now) | M1 |
-| chunker (heading-aware) | passage re-score | M5 |
-| BM25F scoring math + exact-df discipline (ADR-0008) | kernel | M4 |
-| RRF fusion (k=60, ADR-0007) | kernel | M4 |
-| FuxVec embed + 32 B codes (ADR-0010) | V/ plane | M3 |
-| PPR-lite + edge extraction (ADR-0009) | E/ plane, kernel | M3–M4 |
-| synth corpus generator + bench + eval sets + goldens | M1 gate, M7 | M1 |
-| CLI surface & verbs (ask/find/answer/explain/graph/path) | UX contract | M4 |
-
-Everything else — storage, the SQLite substrate, per-file cache, lock,
-state plane, profiles — is superseded and stays archived.
+| frontmatter parser | ingest, snapshot mode | M1 |
+| tokenizer + analyzer chain | ingest, query | M1 |
+| BM25F scoring math + exact-df discipline | kernel | M1 (scan) / M2 (accelerated) |
+| FuxVec embed + 32 B codes | `code` property, dense lane | M1 / M2 |
+| converters (fidelity tiers) | transient convert | M4 |
+| RRF fusion (k=60) | kernel | M2 |
+| PPR-lite + edge extraction | graph lane | M3 |
+| chunker (heading-aware) | passage re-score | M4 |
+| CLI verb surface (ask/find/answer/explain/graph/path) | UX contract | M2–M4 |
 
 ## Milestones
 
-| # | name | proves | est. size | model for handoff |
-|---|------|--------|-----------|-------------------|
-| M0a | doc hygiene + ADR-0016 naming | — | small | Sonnet |
-| M1 | **THE GATE: pruning eval** | P1 | ~200 LOC + harness | Sonnet build, Opus analysis |
-| M0b | package scaffold — **only on P1 = PASS** | — | small | Sonnet |
-| M2 | MST keyspace + ledger | P6 (join) | ~800 LOC | Opus |
-| M3 | wire index (P/D/V/E/M) | P2 | ~1.2k LOC | Opus |
-| M4 | runtime segments + kernel | P3 | ~1.5k LOC | Opus |
-| M5 | refer plane (adapters/fetch/ARC/assembler) | P4 | ~1k LOC | Sonnet |
-| M6 | maintenance (hooks, merge driver, snapshot) | P6, P7 | ~500 LOC | Sonnet |
-| M7 | scale run @1M | P2, P3, P5 | bench work | Sonnet |
-| M8 | deferred: AI-assisted mode · MPH dict · top-64 | — | — | — |
+| # | name | proves | est. size | model |
+|---|---|---|---|---|
+| M0 | scaffold (0.30.0.dev0) | — | small | Sonnet |
+| M1 | **T0 vertical slice**: committed store + git-dir ingest + scan `ask`, dogfooded on this repo | R1, R2 | ~900 LOC | Sonnet build · Opus review of the canonical writer |
+| M2 | T1 accelerator + full lexical/dense kernel | R3 | ~800 LOC | Opus |
+| M3 | graph lane: edges, community, explain/graph/path | — | ~400 LOC | Sonnet |
+| M4 | refer plane: HTTP+Confluence adapters, ARC, assembler, freshness fence | R4 | ~900 LOC | Sonnet |
+| M5 | maintenance: hooks, line-wise merge driver, snapshot mode, hashed-meta enforcement | R5, R6 | ~500 LOC | Sonnet |
+| M6 | scale: T2 (`tpack` + mmap segments), partial clone, 100k/1M bench, paper §4–§6 updated to measured | R7 | bench + ~600 LOC | Sonnet bench · Opus analysis |
+| M7 | dogfood & release gate: Anton + fux daily use, DOGFOOD.md, real README | — | docs + fixes | Sonnet |
+| M8 | deferred experiments (each = ADR + Arpit sign-off) | — | — | — |
 
-**Sequencing is a hard rule (council, pre-mortem seat): no milestone starts
-before the previous one's DoD is met, and M1's DoD is *numbers in an ADR*,
-not code merged.** M2+ exist in this plan conditionally on P1 passing.
+**Sequencing:** M0→M1→M2 strict; M3/M4 may interleave after M2; M5 before
+M6; M7 gates any release. No milestone starts before the previous DoD.
 
----
+### M0 — scaffold
 
-### M0 — Repo hygiene, the naming ADR, and (conditionally) the scaffold
+`src/fux/` skeleton (`store/`, `derive/`, `query/`, `ingest/`, `refer/`,
+`cli.py`, `errors.py`), `pyproject.toml` 0.30.0.dev0 (hatchling, stdlib
+runtime, converter extras), fresh CHANGELOG, `fux --version` + `fux doctor`
+stub, `.github/` paths fixed. **DoD:** both commands run; CI green on the
+empty package.
 
-**Split amended 2026-08-09 by the M0/M1 handoff's debate gate.** The
-original order scaffolded a package before P1 could falsify the
-architecture it exists for — the pre-mortem seat's "build the fun part
-first" failure. Corrected: **M0a (hygiene) → M0-ADR (naming) → M1 (the
-gate) → M0b (scaffold, only on PASS)**. The live spec for all of it is
-[`handoff/v0.30.0-m0-m1-gate-handoff.md`](handoff/v0.30.0-m0-m1-gate-handoff.md).
+### M1 — the T0 vertical slice
 
-**M0a deliverables (unconditional).** CLAUDE.md synced to this plan
-(proposed as a diff, never auto-applied); GLOSSARY given the v0.30
-vocabulary; INTERVIEW gains a reset entry; DOC-REGISTRY's two ⚠ rows
-cleared; OPEN-WORK statuses updated. **ADR-0016: the ingest-mode naming
-decision** — resolve the EXTRACTED/INFERRED edge-grade collision by Arpit's
-call. **Amended 2026-08-09:** both tiers are renamed, not one —
-`extracted` (no model) + `enriched` (model-assisted), which makes the mode
-words *agree* with the ported edge grades instead of merely avoiding them.
-`inferred` is retired as a mode word.
+*(the live handoff:
+[`handoff/v0.30.0-m1-t0-slice-handoff.md`](handoff/v0.30.0-m1-t0-slice-handoff.md))*
 
-**M0b deliverables (only if P1 = PASS).** New `src/fux/` skeleton (`cli.py`, `errors.py`, package
-layout mirroring the five planes: `keyspace/`, `wire/`, `runtime/`,
-`refer/`, `ingest/`); `pyproject.toml` at `0.30.0.dev0` (hatchling, stdlib
-runtime, extras for converters); CLAUDE.md synced to this plan (build
-section replaced, laws restated, archive pointer); fresh CHANGELOG;
-`.github/` workflow paths updated for the new tree.
+Committed store exactly per the index-format spec: canonical writer/reader,
+256 shards, `_format` header, 16-hex term hashes with build-time collision
+check. Git-dir adapter + `extracted`-mode ingest: tokenize → `terms`/`wlen`;
+`title` + heading-derived `phrases`; `ref`/`tag`/`code` edges; FuxVec
+`code`. `fux ingest` and `fux ask` (B2 prefilter scan + ported BM25F —
+correct first, fast at M2). Dogfood on this repo's own docs. **DoD:** R1
+byte-identical double-ingest (asserted cross-machine in CI); R2
+`fux ask` answers a real question about this repo with citations from a
+cold clone; ADR-0004 accepted; goldens started.
 
-**DoD.** M0a: no doc names a path that doesn't exist; ADR-0016 written.
-M0b: `uv run fux --version` prints 0.30.0.dev0; `fux doctor` stub runs.
+### M2 — the T1 accelerator
 
-### M1 — THE GATE: document-centric pruning eval  *(P1)*
+Derived blocked term-major JSONL + offset table; integer `mx` skipping;
+**the differential law** — accelerator results ≡ scan results, asserted
+byte-for-byte as a test, the same discipline the ARC cache carries.
+Int-cached Hamming lane; RRF fusion; `find`/`answer` verbs. **DoD:** R3 on
+the RFC corpus (8 872 docs): warm `ask` ≤ 150 ms including worst-case
+common terms; differential suite green; ADR-0005.
 
-**Question.** Does KL top-k pruning hold ranking quality on Fux's corpora?
+### M3 — the graph lane
 
-**Deliverables.** KL term selector (Büttcher–Clarke document-centric
-scoring; ~200 LOC, stdlib); an eval harness that (a) runs the **archived
-v0.26 engine** to produce full-index baseline rankings on the 100k
-synthetic + acme + orbit corpora, (b) produces pruned-index rankings at
-k = 128 and k = 64 through the same scorer, (c) reports hit@5, P@10, and a
-rare-term recall slice, per corpus per k.
+Edge extraction ported; `community` assignment (deterministic
+label-propagation or Leiden-class with fixed seed — decided in ADR-0006);
+PPR-lite; `explain`/`graph`/`path` verbs. **DoD:** the archived relational
+eval passes on the new kernel; ADR-0006.
 
-**DoD.** **ADR-0017 records the numbers and the ship/kill verdict.**
-Thresholds (pre-registered, paper §8): within 2–3 pts hit@5 of baseline at
-k=128 → proceed; worse → the architecture is falsified, return to snapshot
-designs, this plan terminates at M1 and says so honestly.
+### M4 — the refer plane
 
-**STATUS: ran 2026-08-09 → INCONCLUSIVE.**
-[ADR-0017](adr/0017-pruning-eval-gate.md) ·
-[evidence](conformance/2026-08-09-pruning-eval/ANALYSIS.md)
+HTTP (conditional GET) + Confluence adapters — **the cap holds**; more
+systems arrive via [`proposals/mcp-adapters.md`](proposals/mcp-adapters.md),
+not code. ARC cache keyed `(loc, sha)`, results-neutral by construction.
+Transient convert + chunker + passage re-score on fetched bytes. Freshness:
+every answer stamped; live verification behind `[freshness] verify`
+(fenced network, default off). **DoD:** R4 mock-server bench (cold k=10
+≤ 3 s, warm ≤ 300 ms); ARC differential test; offline degradation honest
+(git sources full function, external → declared staleness); ADR-0007.
 
-- **Δ hit@5 = +0.00 pts at k=128 on all three corpora** — the letter of the
-  rule is met, and the threshold was **not** moved.
-- **But top-128 pruned 2.5 % (acme) / 1.6 % (orbit) / 0.0 % (synth) of
-  documents**, retaining 96–100 % of postings. On synth the "pruned" index is
-  byte-identical to the baseline. The corpora's documents hold 32–46 distinct
-  terms; the size model assumes ~2 000. **k=128 is a no-op here, so the run
-  cannot license the inference.**
-- **k=64 — still 10× milder than production — costs acme 9.09 pts.** The M8
-  "top-64 default" item is therefore **closed negative**.
-- Rare-term loss was ~0, so the Bloom mitigation (M8) is **not** what stands
-  between this architecture and working — do not build it on this evidence.
-- **Next: W-13** — re-run P1 against a long-document corpus (10³–10⁴
-  words/doc) with a fresh pre-registration written against *term retention*
-  rather than an absolute k. Needs its own handoff (**Opus** — measurement
-  design). `tools/synth_corpus.py` cannot be tuned into that corpus: its closed
-  ~50-word vocabulary caps document vocabulary at 72 terms by construction.
-- **Reusable from this run:** the KL selector (production-ready, ported as-is),
-  the three-arm harness, and the pre-registration discipline — which is what
-  caught this. The re-run is a new corpus and a new threshold file, not new
-  machinery.
+### M5 — maintenance
 
-**Notes.** Uses the archived engine as a *baseline generator only* —
-reference-use, permitted by the archive's charter. Rare-term losses are
-expected and measured, not hidden; the Bloom-signature mitigation is
-designed but NOT built unless numbers demand it.
+Hooks (post-commit/merge/checkout → delta ingest = re-emit changed lines);
+merge driver via gitattributes: line-wise LWW on `(ver, sha)`, machine
+planes never conflict, snapshot-mode human files conflict normally **on
+purpose**; `meta: hashed` enforced at write time for every non-git source
+(the council's ACL ruling, as code not docs). **DoD:** R5 (20-doc commit
+< 1 s); R6 three-tier merge harness; ADR-0008.
 
-### M2 — The keyspace: MST store + ledger  *(P6 join half)*
+### M6 — scale and T2
 
-**Deliverables.** Content-defined chunker (rolling hash, ~4 KB target,
-fixed seed); content-addressed chunk files under `.fux/index/`; tree
-builder with **unique-representation invariant**; root-hash computation;
-reader (mmap, binary search within chunks); the **join** (per-entry LWW
-register on (version ordinal, sha tie-break); observed-remove set for
-membership); `L/` schema (locator, sha@index, `mode = refer|snapshot`,
-`meta = hashed|plain`, version info); front-coded columnar wire encoding.
+`tpack` writer/reader (same records, one property swaps); mmap byte-aligned
+segments as the T2 accelerator; partial-clone deployment doc;
+external-shards-only committing; bench at 100k synthetic + RFC + 1M
+synthetic if feasible. **The paper's §4 (keyspace) and §5–§6 (size,
+latency) are rewritten from projection to measurement here.** **DoD:** R7;
+tier-auto flips by measurement; every R has a measured value or an honest
+failure ADR; ADR-0009.
 
-**DoD.** Property tests: same entries in any insertion order → byte-identical
-chunks and root (the MST invariant, 1 000 random orders); join is
-commutative + associative + idempotent (hypothesis-style randomized check,
-stdlib-only harness); ledger for the 100k synthetic ≤ 12 MB. ADR-0018.
+### M7 — dogfood & release gate
 
-### M3 — The wire index: P/ D/ V/ E/ M/  *(P2)*
+Fux answering real questions daily in the fux and Anton repos for two
+weeks; DOGFOOD.md refreshed; README becomes a real front door; CHANGELOG
+current. Launch work (product-gtm) starts only after this gate. **DoD:**
+Arpit ships a release he has been using himself.
 
-**Deliverables.** BIC encoder/decoder (pure Python — decode-once, speed
-non-critical on the wire path); 4-bit impact quantization (global scale,
-recorded in header); doc-id assignment = ledger sort order (clustering
-lever, Figure 4); `D/` = sorted u64-hash array + Elias-Fano offsets + varint
-df (MPH deferred to M8 as a pure-win upgrade); `V/` raw codes; `E/`
-delta-varint typed adjacency; `M/` with `hashed|plain` enforcement at write
-time — **hashed is the default for every non-git source; plain requires
-explicit config** (council ruling).
+### M8 — deferred (parked with triggers, never ambient)
 
-**DoD.** Round-trip property tests on every encoder; wire size for the 100k
-synthetic **≤ 30 MB** (P2 scaled: 300 MB / 10); collision detection on term
-hashes raises at build (ADR-0008 discipline carried forward). ADR-0019.
+Realistic-query-workload pruning experiment — now purely an *optimization*
+study (could shrink T1/T2; cannot block anything) · sentence-unit selection
++ the format-aware structure extractor (spine retest, Graphify-inspired) ·
+query-log views · the `enriched` AI ingest tier (pinning contract) · BIC
+codec inside T2 · MCP adapters · knowledge-CI · wavelet self-index note.
 
-### M4 — Runtime segments + the query kernel  *(P3)*
+## Predictions, re-registered (R-series; the P-series is closed by ADR-0002/0003)
 
-**Deliverables.** Inflator: wire → byte-aligned mmap segments (128-entry
-posting blocks, per-block max-impact + skip, `memoryview.cast` decode);
-MaxScore evaluation (block-max skipping; deterministic traversal, doc-id
-ties); int-cached Hamming scan; CSR PPR (fixed 3 iterations, ported
-constants); RRF fusion; the six verbs re-plumbed onto `retrieve()` over the
-new kernel (ADR-0009's projection table unchanged).
+| id | prediction | threshold | measured at |
+|---|---|---|---|
+| R1 | canonical writer is byte-deterministic | double-ingest sha-identical, two environments | M1 |
+| R2 | T0 slice answers real questions on this repo | cited answer from a cold clone, no accelerator | M1 |
+| R3 | warm `ask` ≤ 150 ms on the RFC corpus, worst-case terms included | bench | M2 |
+| R4 | refer plane: cold k=10 ≤ 3 s, warm ≤ 300 ms | mock bench | M4 |
+| R5 | 20-doc commit re-indexes < 1 s via hooks | bench | M5 |
+| R6 | machine planes merge conflict-free; human conflicts preserved | harness | M5 |
+| R7 | committed @100k target-density ≤ 250 MB git-packed; tier-auto correct | measured | M6 |
 
-**DoD.** P3 scaled: warm rank ≤ 150 ms at 100k on the bench machine;
-relational eval passes; **new goldens baselined and committed** (rankings
-legitimately differ from v0.26 — pruning changes the index; the goldens
-that carry over unchanged are the *relational* and *decline* behaviors);
-`--lexical-only` parity between MaxScore result set and exhaustive scoring
-on the pruned index (correctness check: pruning may drop docs, skipping may
-not). ADR-0020.
+## Risks
 
-### M5 — The refer plane  *(P4)*
+- **Canonical-JSON reproducibility across environments** — the design's
+  foundation; R1 exists to catch it first. Mitigations pinned in the
+  handoff: no floats, sort_keys, explicit separators, unicode
+  normalization decided in ADR-0004, analyzer version in the header.
+- **JSONL parse tax worse on real shapes than benched** — R3 is the
+  tripwire; T2 is the designed escape.
+- **Shard churn at high edit rates** — measured fine at 138 MB; shard
+  count is a knob (256 → 1024) if real usage disagrees.
+- **Scope creep back toward pruning or extra adapters** — both forbidden
+  here; M8 or MCP proposal respectively.
 
-**Deliverables.** Adapters: git-dir (path+blob-sha read), generic HTTP
-(conditional GET, ETag/Last-Modified), Confluence REST (bearer token from
-env; page-version check). **Cap enforced: no further adapters in v0.30**
-(council; MCP is the endgame and gets a proposal doc, not code). Fetch
-layer (cache → adapter read-through); ARC cache keyed (locator, sha),
-byte-budgeted, results-neutral by construction; answer assembler: transient
-convert of fetched bytes → chunker → passage re-score → extractive answer +
-confidence floor (ported ADR-0014 semantics) → citation carries fresh sha +
-staleness stamp; freshness verification of the cited set behind
-`[freshness] verify = true` (fenced network, off by default).
+## Process contract (unchanged)
 
-**DoD.** P4 on a local mock server: cold k=10 ≤ 3 s, warm ≤ 300 ms
-end-to-end at 100k; offline test: external sources degrade to doc-level
-answer + declared staleness, git sources fully functional; ARC never
-changes a result (differential test vs cache-off). ADR-0021.
-
-### M6 — Maintenance  *(P6 full, P7)*
-
-**Deliverables.** `fux setup --hooks` (post-commit/merge/checkout → delta
-ingest from ledger sha-diff); the merge driver: `fux merge-driver` wired
-via gitattributes for keyspace paths — join `L/`, re-derive the rest;
-snapshot mode (per-source: machine-made Markdown copy committed with
-provenance frontmatter — the ported parser's home).
-
-**DoD.** P7: 20-doc commit re-indexes < 1 s. P6: branch-merge harness —
-concurrent same-doc ingest merges clean (tier 1), divergent-version merges
-resolve identically on both sides (tier 2), snapshot-file human edits
-conflict normally (tier 3, asserted *present*). ADR-0022.
-
-### M7 — Scale  *(P2, P3, P5 at 10⁶)*
-
-**Deliverables.** Synth generator extended to 1M docs (deterministic,
-link-structured); full P-series measurement run; clone→first-answer bench
-(P5: ≤ 5 min including inflation + repo-shard re-derivation); cache-warming
-at setup (`fux setup --warm` prefetches top-N central docs); partial-clone
-deployment note in docs.
-
-**DoD.** The paper's §5–§6 tables updated from *projection* to *measured*,
-deltas recorded; any prediction that failed gets an honest ADR, not a
-threshold edit.
-
-### M8 — Deferred (each needs its own ADR + Arpit sign-off)
-
-AI-assisted ingest mode (pinning + grading contract per paper §3.2; named
-`enriched` by [ADR-0016](adr/0016-ingest-mode-naming.md)) · MPH dictionary
-upgrade (~15 MB saving) · external-shards-only committing · MCP adapter
-strategy.
-
-**Closed by M1's measurement, 2026-08-09:**
-
-- ~~**top-64 default**~~ — **rejected.** acme loses 9.09 pts hit@5 at k=64,
-  three times the pre-registered hard bar. No further work.
-- ~~**Bloom-signature rare-term mitigation**~~ — **not justified by evidence.**
-  M1's rare-term slice moved 0.00 / 0.00 / −5.26 pts. The failure mode M1 did
-  find is different (frequent-topical terms pruned out of their own document)
-  and Bloom signatures do not address it. Do not build this without new
-  evidence that names it.
-
----
-
-## Risks (from the council + paper §9, with owners in the plan)
-
-- **Pruning quality** → M1 is first, pre-registered, kill-capable.
-- **Interpreted-Python constants** → every latency DoD measured at 100k
-  before 1M; signature prefilter held in reserve (M8).
-- **ACL leak via meta** → hashed default enforced at write time (M3), not
-  in documentation.
-- **Cold-fetch demo pain** → `--warm` in M7; mock-server bench in M5 keeps
-  the number visible from the start.
-- **Adapter sprawl** → hard cap in M5; MCP proposal instead of code.
-- **DA minority report** (postings-by-term on v0.26 first) → superseded by
-  the reset decision, recorded here so the road not taken stays visible.
-
-## Process contract (per CLAUDE.md)
-
-Every milestone: plan → handoff doc → Claude Code prompt (name the model —
-see table above; wrong model fails silently), 1 ADR per feature with
-references, worklog entry per exchange, docs synced in the same change.
-The lab environment persists; new scale runs are new environments inside it.
+Plan → handoff → prompt per milestone, model named (wrong model fails
+silently); 1 feature = 1 ADR with references; worklog every exchange;
+OPEN-WORK + DOC-REGISTRY updated in the same change as the work; the lab
+(`fux-lab`, RFC corpus) persists — new runs are new directories inside it.

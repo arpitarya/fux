@@ -7,7 +7,7 @@ corpora, with Fux's scorer?**
 Read [`PRE-REGISTRATION.md`](PRE-REGISTRATION.md) first — metrics, slices, gold
 labels and the pass/fail threshold are frozen there, and it was committed
 before the first number existed (`git log` is the evidence). The verdict lives
-in [`../../docs/adr/0017-pruning-eval-gate.md`](../../docs/adr/0017-pruning-eval-gate.md).
+in [`../../docs/adr/0002-pruning-eval-gate.md`](../../docs/adr/0002-pruning-eval-gate.md).
 
 ## Design in one line
 
@@ -56,4 +56,4 @@ delete that directory to force a rebuild.
 `kl_select.py` is written as production code — pure, deterministic, tested,
 documented — because it gets ported into the engine at M2. Everything else here
 is a measuring instrument for one question and is deleted or promoted once
-ADR-0017 lands.
+ADR-0002 lands.

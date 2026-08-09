@@ -22,7 +22,7 @@ timestamp: 2026-08-09T00:00:00Z
 > against an unpruned ceiling of **0.986** — 77.8 points down, where the
 > pre-registered bar was 2. **No arm came within 2 points at any retention
 > rung**, so the fallback in §Consequences ("if it fails at 6 %") applies in
-> full: option E. See [ADR-0018](../adr/0018-pruning-criterion-rerun.md).
+> full: option E. See [ADR-0003](../adr/0003-pruning-criterion-rerun.md).
 >
 > **The prediction failed in both halves.** Arm 4 was predicted to land within
 > noise of no-pruning; it was the worst arm. Arm 1 (KL) was predicted to be the
@@ -36,7 +36,7 @@ timestamp: 2026-08-09T00:00:00Z
 >
 > **What is untested rather than disproven:** Rule A had a *one-term* spine on
 > RFCs (plain text has no headings), so the three-rule selector was never
-> exercised as designed. It is nonetheless *implicated* — see ADR-0018's
+> exercised as designed. It is nonetheless *implicated* — see ADR-0003's
 > competition finding.
 > **Reopen when:** a realistic (short, keyword-style) query workload is
 > measured — the strongest remaining argument that the verdict is too harsh.
@@ -46,7 +46,7 @@ timestamp: 2026-08-09T00:00:00Z
 ## §1 · For humans — the short version
 
 The first attempt kept "each document's best 128 terms by KL divergence."
-[ADR-0017](../adr/0017-pruning-eval-gate.md) found the measurement couldn't
+[ADR-0002](../adr/0002-pruning-eval-gate.md) found the measurement couldn't
 test that claim — the eval documents have 32–46 distinct terms, so keeping
 128 removed nothing. But the one setting that *did* bite (k=64) exposed a
 real defect in the criterion itself: KL divergence rewards terms that are
@@ -135,7 +135,7 @@ corpus, pre-registered before the first number:
 
 | arm | rules | question it answers |
 |---|---|---|
-| 1 | KL only | continuity with ADR-0017 |
+| 1 | KL only | continuity with ADR-0002 |
 | 2 | impact only | is KL the defect, or pruning itself? |
 | 3 | A + B | does the heading floor alone fix it? |
 | 4 | **A + B + C** | the proposed selector |
@@ -164,7 +164,7 @@ mandatory, and
 [`storage-architecture.compare.md`](storage-architecture.compare.md) takes
 a size amendment rather than a reopen.
 
-**Either way**, ADR-0017's settled findings stand: k=64 as a global constant
+**Either way**, ADR-0002's settled findings stand: k=64 as a global constant
 is refused, and rare-term loss is not the dominant failure mode.
 
 ## §7 · For AI agents — implementation contract
@@ -183,7 +183,7 @@ Rule C      for each term t: for each of the top-δ documents by
                        # global sweep, runs AFTER every document's pass
 ```
 
-Binding constraints, carried from ADR-0017 and repo law:
+Binding constraints, carried from ADR-0002 and repo law:
 
 - **Corpus statistics (`df`, `n`, field-length sums) are recomputed over the
   final kept postings**, after Rule C. Rule C changes df, so the sweep runs
@@ -193,7 +193,7 @@ Binding constraints, carried from ADR-0017 and repo law:
   impact ties on doc id. Same corpus → identical kept set.
 - **Retention is reported, not assumed**: every run emits actual retention
   and prune coverage per corpus. A run where coverage is near zero is void
-  by construction (the ADR-0017 lesson, now a harness invariant).
+  by construction (the ADR-0002 lesson, now a harness invariant).
 - **Impact uses the pruned index's own statistics** in the final build, but
   the *selection* pass necessarily uses the unpruned collection model —
   document this as a two-pass build, not as an inconsistency.
@@ -201,7 +201,7 @@ Binding constraints, carried from ADR-0017 and repo law:
 
 ## §7a · Worked examples — what the index actually looks like
 
-*Illustrative reconstructions of the failure [ADR-0017](../adr/0017-pruning-eval-gate.md)
+*Illustrative reconstructions of the failure [ADR-0002](../adr/0002-pruning-eval-gate.md)
 recorded, in the committed-index row format (`L/ P/ D/ V/ E/ M/`). The
 failure itself is measured; the surrounding term scores are plausible
 fill, not measured output. An executing agent should be able to check its
@@ -344,7 +344,7 @@ its real text. Only rank 88 is a failure.
   2017 — https://dl.acm.org/doi/10.1145/3077136.3080789 ·
   https://danluu.com/bitfunnel-sigir.pdf (signatures priced out as a
   recall-insurance plane: 11.69 vs 6.15 bits/posting).
-- Internal: [ADR-0017](../adr/0017-pruning-eval-gate.md) (the inconclusive
+- Internal: [ADR-0002](../adr/0002-pruning-eval-gate.md) (the inconclusive
   result and the failure catalogue this doc responds to) ·
   [paper §5, §8](../paper/the-fux-index-paper.md) ·
   [`storage-architecture.compare.md`](storage-architecture.compare.md).

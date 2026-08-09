@@ -1,0 +1,8 @@
+# AcmePay playground — a 20-document corpus for playing with Fux.
+# From this directory:   fux ingest   →   fux ask "why exponential backoff"
+
+[sources]
+dirs = ["docs"]
+
+[index]
+shards = 16          # tiny corpus — 16 shards keeps the demo readable

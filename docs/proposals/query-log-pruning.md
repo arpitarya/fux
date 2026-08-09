@@ -52,4 +52,4 @@ counter.
 Search Engines: Combining Term and Document Popularities with Query Views*,
 TOIS 30(1), 2011 — https://dl.acm.org/doi/10.1145/2094072.2094074 ·
 [`../compare/pruning-criterion.compare.md`](../compare/pruning-criterion.compare.md)
-(the selector this extends) · [ADR-0017](../adr/0017-pruning-eval-gate.md).
+(the selector this extends) · [ADR-0002](../adr/0002-pruning-eval-gate.md).

@@ -84,7 +84,7 @@ size model assumes (paper Figure 4).
 **Edge grade (EXTRACTED / INFERRED)** — The archived link-graph vocabulary,
 ported at [M3](PLAN.md): `EXTRACTED` = deterministically parsed from the
 document, `INFERRED` = model- or heuristic-derived and ranked below it. Since
-[ADR-0016](adr/0016-ingest-mode-naming.md)'s amendment these **agree** with the
+[ADR-0001](adr/0001-ingest-mode-naming.md)'s amendment these **agree** with the
 [ingest modes](#extracted-mode) rather than contradicting them: `extracted`
 means "no model" on both sides, and `enriched` sits with `INFERRED`.
 
@@ -98,7 +98,7 @@ outputs are **pinned** into the index with provenance and re-read forever
 (never re-generated on a query path), and they carry a grade below
 deterministic signal wherever they compete. Contrast
 [extracted mode](#extracted-mode). Named by
-[ADR-0016](adr/0016-ingest-mode-naming.md); deferred to [M8](PLAN.md).
+[ADR-0001](adr/0001-ingest-mode-naming.md); deferred to [M8](PLAN.md).
 
 **Extracted mode** — The **default** ingest tier: `$0`, offline, stdlib,
 deterministic — conversion, chunking, term selection, static-table embedding
@@ -107,7 +107,7 @@ invented. Byte-reproducible, and the mode every guarantee in the paper is
 stated for. Contrast [enriched mode](#enriched-mode). ⏳ *Name proposed, not
 yet ratified.*
 
-**Renamed from `inferred`** by [ADR-0016](adr/0016-ingest-mode-naming.md)'s
+**Renamed from `inferred`** by [ADR-0001](adr/0001-ingest-mode-naming.md)'s
 amendment: `INFERRED` is the [edge grade](#edge-grade-extracted--inferred) for
 *model-derived*, so calling the no-model tier `inferred` reproduced the exact
 collision the ADR existed to remove. `inferred` survives only in the frozen
@@ -232,7 +232,7 @@ and rare-term recall is the slice expected to suffer. Distinct from
 **Pruning eval (THE GATE)** — [M1](PLAN.md): the pre-registered experiment
 that measures [P1](#p-predictions-p1p7) before any of M2–M6 is built. One
 scorer ([BM25F](#bm25f)), three corpora, k ∈ {baseline, 128, 64}, varying
-**only the index**. Its verdict is [ADR-0017](adr/0017-pruning-eval-gate.md);
+**only the index**. Its verdict is [ADR-0002](adr/0002-pruning-eval-gate.md);
 a FAIL terminates the plan and reopens
 [storage-architecture](compare/storage-architecture.compare.md).
 

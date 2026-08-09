@@ -34,7 +34,7 @@ def doc(doc_id: str, heading=None, path=None, body=None) -> DocumentModel:
 
 
 # A small homogeneous corpus: every document is "about payments", which is the
-# condition that broke KL selection in ADR-0017.
+# condition that broke KL selection in ADR-0002.
 CORPUS = [
     doc("webhooks.md", heading={"webhook": 2, "retry": 1}, path={"api": 1},
         body={"webhook": 9, "payments": 4, "retry": 3, "backoff": 2, "jitter": 1}),

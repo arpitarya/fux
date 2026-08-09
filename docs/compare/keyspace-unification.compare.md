@@ -13,10 +13,16 @@ timestamp: 2026-08-09T00:00:00Z
 > one physical format, one CRDT join, one O(diff) diff, **one root hash
 > naming the entire corpus state**. The wavelet-tree self-index is recorded
 > as a research note, not built.
-> **Status:** ✅ accepted 2026-08-09 · **Confidence:** high ·
-> **Reopen when:** MST chunk-turnover per commit measures worse than the
-> sharded-files baseline it replaces, or join complexity exceeds M2's
-> property-test budget.
+> **Status:** ⚠ **SUPERSEDED 2026-08-09 (same day)** by
+> [`index-format.compare.md`](index-format.compare.md): the committed plane
+> became sharded canonical JSONL, where **git itself supplies the Merkle
+> tree** — content addressing, O(diff) history, and a single tree hash —
+> so the custom MST substrate is not built. Every goal in this verdict
+> (one format, one merge, one corpus-state hash) is still met, by git.
+> The MST idea survives as tier-T2 internals if ever needed.
+> *(Original status: ✅ accepted 2026-08-09 · Confidence: high.)*
+> **Reopen when:** T2 needs a content-defined chunk store that git blobs
+> cannot provide.
 
 ## Context
 

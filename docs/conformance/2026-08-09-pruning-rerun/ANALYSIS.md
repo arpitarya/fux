@@ -1,11 +1,11 @@
 # ANALYSIS — M1-rerun, the pruning gate made decidable
 
 **Run date:** 2026-08-09 · **Verdict:** **FAIL** →
-[ADR-0018](../../adr/0018-pruning-criterion-rerun.md) ·
+[ADR-0003](../../adr/0003-pruning-criterion-rerun.md) ·
 **Pre-registration:** [`PRE-REGISTRATION-v2.md`](../../../tools/pruning-eval/PRE-REGISTRATION-v2.md)
 (commit `3892c55`, **before** the first gating number)
 
-This run answers the one [ADR-0017](../../adr/0017-pruning-eval-gate.md) asked
+This run answers the one [ADR-0002](../../adr/0002-pruning-eval-gate.md) asked
 for: a corpus whose documents are long enough that pruning is a real treatment.
 
 ---
@@ -146,7 +146,7 @@ test.
 
 | # | change | why | status |
 |---|---|---|---|
-| 1 | **Do not build on aggressive static pruning.** Option E: committed index 0.6–1.5 GB; partial clone + external-shards-only become mandatory. | No arm within 2 pts at any rung. | **done** — [ADR-0018](../../adr/0018-pruning-criterion-rerun.md) |
+| 1 | **Do not build on aggressive static pruning.** Option E: committed index 0.6–1.5 GB; partial clone + external-shards-only become mandatory. | No arm within 2 pts at any rung. | **done** — [ADR-0003](../../adr/0003-pruning-criterion-rerun.md) |
 | 2 | **`pruning-criterion.compare.md` → amended, not accepted.** Prediction falsified; the three-rule selector remains *untested* (Rule A inert here). | Honesty about what was and was not measured. | **done** |
 | 3 | **Re-measure with a realistic query workload** (short, salient, keyword-style — what an agent actually sends), with a fresh pre-registration. | The single most likely way this verdict is too harsh. | **open — highest priority** |
 | 4 | **Re-derive paper §5's size model** at a retention that holds quality, or at no pruning. | Its ~6 % assumption is now *measured as quality-destroying*, not merely unvalidated. | **open** (M7 owns the numbers; flag owed now) |

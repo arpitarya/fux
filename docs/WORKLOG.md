@@ -19,8 +19,63 @@ diary.*
 
 ---
 
+## 2026-08-09 — REVISION 2: JSONL format decided, ADRs renumbered, plan rewritten, first build packaged  ·  Cowork
+- **Asked:** (across the evening) will the JSONL index work — verify against
+  the paper; sample index block with per-property explanation; then: create
+  a detailed plan, a handoff + prompt, and restart ADRs from 0001.
+- **Did:**
+  - **Benched the format live** (cloud sandbox): naive scan 653 ms@5k;
+    prefilter 191 ms; sorted term-major bisect **0.035 ms**; common-term
+    trap measured (df=400k line = 5.1 MB, 397 ms) and closed with
+    128-posting block lines + integer `mx` skip (**44 ms**, 12 % parsed);
+    git delta test: one-line edit in a 138 MB shard commits 2.5 s, repo
+    52 MB after two commits (0.38× pack). Schema samples produced
+    (doc-major record with binary-as-property `code`/`tpack`; derived
+    block line).
+  - **`compare/index-format.compare.md`** (accepted): tiered JSONL T0/T1/T2,
+    git-as-Merkle-tree, supersedes MST keyspace + BIC wire for the
+    committed plane (amendment notes added there); benches B1–B6 recorded.
+  - **ADRs renumbered 0016/0017/0018 → 0001/0002/0003** (Arpit's call);
+    32 live files rewritten; frozen artifacts (PRE-REGISTRATION*, conformance
+    evidence/) untouched by policy; `adr/README.md` records the policy and
+    the "archived ADR-NNNN" disambiguation rule.
+  - **PLAN.md rewritten to revision 2**: gate closed (P1 FAIL, option E
+    accepted by Arpit — full postings, pruning forbidden outside M8);
+    milestones M0–M8 rebuilt around the T0/T1/T2 tiers; **R-series
+    predictions** replace the closed P-series; port list updated (MST
+    dropped, BIC → T2).
+  - **First build handoff + prompt**: `handoff/v0.30.0-m1-t0-slice-*` —
+    M0 scaffold + M1 T0 vertical slice (canonical store, git-dir ingest,
+    scan `ask`, dogfood on this repo). Debate gate shaped it: R1
+    cross-platform byte-determinism named the riskiest assumption (NFC
+    rule, ubuntu+macos CI matrix); accelerator explicitly fenced to M2;
+    three R2 questions frozen in the handoff so they can't drift. Sonnet
+    with one Opus review checkpoint on the canonical writer.
+  - OPEN-WORK rewritten (W-20…W-38 ledger, R-table); handoff/compare
+    READMEs updated; DOC-REGISTRY bumped; keyspace-unification carries its
+    superseded-note.
+- **Decided / open:** run the M0+M1 prompt (Arpit); ratify ADR-0001
+  naming (non-blocking); paper §4–§6 stale-by-design until M6.
+- **Next:** paste `handoff/v0.30.0-m1-t0-slice-prompt.md` into Claude Code
+  (Sonnet).
+
+## 2026-08-09 — AcmePay playground corpus added to the M1 slice  ·  Cowork
+- **Asked:** a small 10–50 doc set to *play* with — see how Fux and its
+  index actually look — in parallel to the formal test cases.
+- **Did:** authored `examples/playground/` — 20 fictional AcmePay docs
+  (ADRs incl. a superseded 0002→0005 pair, runbooks, API docs with the
+  session's webhook/retry vocabulary, postmortems, cross-links, tags),
+  `fux.toml` (16 shards), and `PLAYGROUND.md` (walkthrough: ingest, read a
+  record, grep a term hash, one-line-diff demo, three questions). Wired
+  into the M1 handoff/prompt/OPEN-WORK as a fixture: the corpus is never
+  edited by the executing agent; its `.fux/index/` gets committed as the
+  format's visible demo.
+- **Decided / open:** playground is demo + smoke surface, not a quality
+  gate (R-series unchanged).
+- **Next:** unchanged — run the M1 prompt.
+
 ## 2026-08-09 — pruning-criterion research → compare doc + M1-rerun package  ·  Cowork
-- **Asked:** explain ADR-0017 in plain terms and propose what to do; then
+- **Asked:** explain ADR-0002 in plain terms and propose what to do; then
   "is there a better way than just picking 128 words"; then "why not a
   combination / multiple properties in the index"; then write it and give
   the prompt; then worked before/after examples of the index rows.
@@ -57,10 +112,10 @@ diary.*
   throughout** — the last run failed at measurement design, not coding).
 
 ## 2026-08-09 — P1 re-run: the gate FAILED, on a corpus that could test it  ·  Claude Code
-- **Asked:** amend ADR-0016 with a better name for `inferred`; then execute the
+- **Asked:** amend ADR-0001 with a better name for `inferred`; then execute the
   M1-rerun prompt (make the pruning gate decidable).
 - **Did:**
-  - **ADR-0016 amended.** Arpit's instinct found a real defect: the first draft
+  - **ADR-0001 amended.** Arpit's instinct found a real defect: the first draft
     fixed one half of the collision and reproduced the other — `INFERRED` is the
     edge grade for *model-derived*, so the no-model tier could not be
     `inferred`. Naming the AI tier `enriched` vacates `extracted`; giving it to
@@ -79,7 +134,7 @@ diary.*
 - **Decided / open:**
   - **FAIL.** Best arm 0.627 vs unpruned 0.986 at 6 % retention (−35.9 pts vs a
     2-pt bar); −12.7 pts even at 30 %. All validity checks passed; gaps are
-    7–27× the standard error. → [ADR-0018](adr/0018-pruning-criterion-rerun.md).
+    7–27× the standard error. → [ADR-0003](adr/0003-pruning-criterion-rerun.md).
   - **The compare doc's prediction was falsified in both halves** — arm 4 was
     predicted to match no-pruning and was the *worst*; arm 1 (KL), predicted to
     be the outlier, was the *best*. The counter-signal recorded in the
@@ -92,14 +147,14 @@ diary.*
   - **Consequence:** index-and-refer is *not* falsified; the "small index by
     pruning" claim is. Footprint 0.6–1.5 GB at 10⁶ docs; partial clone +
     external-shards-only become mandatory. `storage-architecture` took a size
-    amendment (not a reopen); `pruning-criterion` marked ❌ falsified; ADR-0017
+    amendment (not a reopen); `pruning-criterion` marked ❌ falsified; ADR-0002
     gained a forward pointer and was otherwise left intact.
   - **W-01 stays blocked.** Biggest threat to the verdict, stated in the ADR: the
     eval's verbatim-sentence queries are close to a worst case for pruning.
 - **Next:** W-15 — re-measure with a realistic short/keyword query workload,
   fresh pre-registration. It is the one thing that could reasonably overturn this.
 
-## 2026-08-09 — M0a + ADR-0016 + M1 executed: the gate ran  ·  Claude Code
+## 2026-08-09 — M0a + ADR-0001 + M1 executed: the gate ran  ·  Claude Code
 - **Asked:** execute the M0/M1 handoff phase by phase without pausing.
 - **Did:**
   - **W-00** — committed the reset as its own commit (`7fb81a8`) so the archive
@@ -111,7 +166,7 @@ diary.*
     (the registry pointed at a path that did not exist).
     **CLAUDE.md rewritten as `CLAUDE.md.proposed` + a diff — proposed, never
     applied**, per the agent-steering-file rule.
-  - **W-02** — [ADR-0016](adr/0016-ingest-mode-naming.md) written as
+  - **W-02** — [ADR-0001](adr/0001-ingest-mode-naming.md) written as
     `status: proposed` recommending `inferred`/`enriched`; not blocked on
     Arpit's ratification, per handoff §7.
   - **W-04** — `tools/pruning-eval/`: the KL selector as a pure, stdlib-only,
@@ -131,24 +186,24 @@ diary.*
     A zero delta over an untreated population is not evidence.
   - At k=64, where pruning does bite, acme loses **9.1 pts** hit@5.
   - **Verdict is therefore not a clean PASS** and is written up for Arpit
-    rather than adjudicated — see [ADR-0017](adr/0017-pruning-eval-gate.md).
+    rather than adjudicated — see [ADR-0002](adr/0002-pruning-eval-gate.md).
     **W-01 (scaffold) stays blocked.**
-- **Next:** Arpit rules on ADR-0017 (and ratifies ADR-0016's naming).
+- **Next:** Arpit rules on ADR-0002 (and ratifies ADR-0001's naming).
 
 ## 2026-08-09 — M0+M1 handoff & prompt; debate gate re-ordered the plan  ·  Cowork
 - **Asked:** create the handoff and prompt (first build package).
 - **Did:** `docs/handoff/v0.30.0-m0-m1-gate-handoff.md` + `-prompt.md` +
-  handoff README. Handoff covers M0a hygiene, ADR-0016, M1 (the gate), and
+  handoff README. Handoff covers M0a hygiene, ADR-0001, M1 (the gate), and
   M0b scaffold-on-PASS, with: the KL selector spec (pure/stdlib/portable),
   the harness spec, the **pre-registered** PASS/FAIL table, the failure
   catalogue + rare-term slice requirement, and per-phase model calls.
 - **Decided / open:** **the debate gate blocked and amended the plan** —
   original M0(scaffold)→M1 would build a package P1 might falsify; corrected
-  to M0a → ADR-0016 → M1 → M0b. PLAN.md milestone table + §M0 and OPEN-WORK
+  to M0a → ADR-0001 → M1 → M0b. PLAN.md milestone table + §M0 and OPEN-WORK
   W-01…W-05 updated to the new order (W-01 now blocked_by W-05=PASS).
   Hard spec point recorded: df/n/field-lengths must be recomputed from
   *pruned* postings — reusing baseline stats would measure a system nobody
-  ships. Still open: W-00 (Arpit's commit), ADR-0016 naming answer, and the
+  ships. Still open: W-00 (Arpit's commit), ADR-0001 naming answer, and the
   non-blocking question of whether the three eval corpora weigh equally.
 - **Next:** Arpit answers naming (or not — the prompt proceeds either way),
   then run the prompt with Sonnet; verdict phase on Opus.
@@ -162,7 +217,7 @@ diary.*
   - `docs/compare/` (fresh): storage-architecture, wire-format,
     keyspace-unification, meta-privacy, cache-policy — all ✅ accepted with
     reopen-triggers — and ingest-mode-naming ⏳ (Arpit ratifies via
-    ADR-0016). README with verdict table. v0.26-era proposals moved to
+    ADR-0001). README with verdict table. v0.26-era proposals moved to
     archive earlier this session.
   - `docs/proposals/`: +mcp-adapters, +knowledge-ci, +wavelet-self-index
     (each with graduation trigger); README updated.
@@ -173,7 +228,7 @@ diary.*
     DOC-REGISTRY.md rewritten for the new tree (two knowingly-stale ⚠ rows
     — CLAUDE.md, GLOSSARY — tracked as W-03, not hidden).
 - **Decided / open:** two-section (§humans/§agents) convention adopted for
-  large docs. Open: W-00 (Arpit git-commits the reset), ADR-0016 naming,
+  large docs. Open: W-00 (Arpit git-commits the reset), ADR-0001 naming,
   top-64-vs-128 (M1 decides).
 - **Next:** Arpit reviews + commits; then M0 handoff (Sonnet).
 
