@@ -7,37 +7,58 @@ repo convention: humans first, agents second.*
 
 ---
 
-## §1 · For humans — where the rebuild stands (2026-08-09, evening)
+## §1 · For humans — where the rebuild stands (2026-08-10)
 
-**The research phase is over; the build phase is packaged and ready.**
+**M0+M1 shipped: the first real code of the rebuild runs, end to end.**
+`src/fux/` exists; `fux ingest` builds the committed store from this repo's
+own docs, `fux ask` answers questions from it with citations — scan-only, no
+accelerator. **R1** (canonical writer byte-determinism) **PASS**. **R2** (T0
+answers real repo questions) **2/3 PASS**, one blocked on a pre-existing,
+independently-flagged doc-hygiene gap unrelated to this build. Full measured
+record, including a mid-build tokenizer fix (stopword filtering) that R2
+itself surfaced and that was re-verified rather than patched over just the
+one failing case: [ADR-0004](adr/0004-index-format.md) Consequences.
 
-The pruning gate ran twice and settled it: INCONCLUSIVE
-([ADR-0002](adr/0002-pruning-eval-gate.md)) → **FAIL**
-([ADR-0003](adr/0003-pruning-criterion-rerun.md)) — no selector came within
-35.9 pts of the bar at the 6 % budget. Arpit accepted option E: **full
-postings, no pruning**. That decision, plus his JSONL push, produced the new
-format of record ([index-format compare](compare/index-format.compare.md)):
+**Background (2026-08-09), unchanged since then:** the pruning gate ran
+twice and settled it: INCONCLUSIVE ([ADR-0002](adr/0002-pruning-eval-gate.md))
+→ **FAIL** ([ADR-0003](adr/0003-pruning-criterion-rerun.md)) — no selector
+came within 35.9 pts of the bar at the 6 % budget. Arpit accepted option E:
+**full postings, no pruning**. That decision, plus his JSONL push, produced
+the format of record ([index-format compare](compare/index-format.compare.md)):
 tiered JSONL — doc-major committed shards that git itself diffs and merges,
 a derived blocked term-major accelerator with integer `mx` skipping, and
-binary only as record properties. All four load-bearing claims are
-benchmarked (0.035 ms bisect · 397→44 ms common-term fix · one-line edit in
-a 138 MB shard deltas to ~nothing · 0.38× git packing).
-
-**Consequences landed today:** ADRs renumbered from 0001 for the v0.30 line
-(0016–0018 → 0001–0003; frozen artifacts keep old numbers — see
-[adr/README](adr/README.md)); PLAN rewritten to revision 2 (M0–M8,
-R-series predictions replacing the closed P-series); the MST keyspace and
-BIC wire verdicts superseded for the committed plane; the first build
-handoff is ready.
+binary only as record properties. ADRs renumbered from 0001 for the v0.30
+line (0016–0018 → 0001–0003; frozen artifacts keep old numbers — see
+[adr/README](adr/README.md)); PLAN rewritten to revision 2 (M0–M8, R-series
+predictions replacing the closed P-series).
 
 **Open decisions (Arpit):**
 
-1. **Run the M0+M1 prompt** — [`handoff/v0.30.0-m1-t0-slice-prompt.md`](handoff/v0.30.0-m1-t0-slice-prompt.md)
-   (Sonnet; one Opus review checkpoint). Nothing else blocks the build.
+1. ~~Move the v0.26 doc set?~~ **RESOLVED 2026-08-10 — Arpit's ruling:
+   the root `archive/` is the only archive.** Flattened: `v0.26-docs/` and
+   `v0.26-implemented/` are now root entries; `docs/archive/` is gone;
+   [`archive/README.md`](../archive/README.md) indexes it all. Follow-up
+   (optional, anyone's): add `archive/v0.26-docs` to root `fux.toml`
+   sources and re-ingest, which would make R2-Q3's frozen citation
+   satisfiable at last — a one-line config change + re-ingest, best done
+   with the next build turn rather than as a lone commit.
 2. **Ratify ADR-0001** (ingest-mode naming: `extracted`/`enriched`) —
    non-blocking, semantics already fixed.
-3. Paper §4–§6 are knowingly stale until M6 rewrites them from
+3. **Start M2** ([`W-22`](#work-items), the T1 accelerator) — nothing blocks
+   it now that W-21's DoD is met.
+4. Paper §4–§6 are knowingly stale until M6 rewrites them from
    measurements — flagged, deliberate, not forgotten.
+
+**Filed 2026-08-10, not blocking anything:** the agent-search-API landscape was
+researched (Parallel, Perplexity, Exa, Brave and the web-index cost literature)
+and produced three proposals —
+[`proposals/agent-search-landscape.md`](proposals/agent-search-landscape.md)
+(the evidence note; also where the wedge argument now lives),
+[`proposals/caller-set-freshness-policy.md`](proposals/caller-set-freshness-policy.md)
+and [`proposals/token-budget-retrieval.md`](proposals/token-budget-retrieval.md).
+**Read the latter two before writing the W-24 (M4 refer plane) handoff** — both
+shape the refer API's first surface and are expensive to retrofit. No W-nn or
+prediction changed state.
 
 ## §2 · For AI agents — machine-oriented work ledger
 
@@ -50,9 +71,9 @@ W-38** (plan law).
 
 | id | item | status | blocked_by | DoD (short) | spec |
 |----|------|--------|-----------|-------------|------|
-| W-20 | M0 scaffold: src/fux, pyproject 0.30.0.dev0, doctor, CI paths | OPEN·**next** | — | `fux --version` + doctor run; CI green | [handoff](handoff/v0.30.0-m1-t0-slice-handoff.md) §2 |
-| W-21 | M1 T0 slice: canonical store + git-dir ingest + scan `ask`, dogfooded — **incl. the AcmePay playground** (`examples/playground/`, 20 fixture docs; its `.fux/index/` gets committed as the visible demo) | OPEN | W-20 | **R1** cross-platform byte-identity · **R2** three frozen questions cited · playground walkthrough runs as written · ADR-0004 accepted | handoff §2–§9 |
-| W-22 | M2 T1 accelerator: blocked term-major + `mx` + differential law + Hamming + RRF + find/answer | OPEN | W-21 | **R3** ≤150 ms warm on RFC corpus; differential suite green; ADR-0005 | PLAN §M2 |
+| W-20 | M0 scaffold: src/fux, pyproject 0.30.0.dev0, doctor, CI paths | **DONE** (2026-08-10) | — | `fux --version` + doctor run; CI green | [handoff](handoff/v0.30.0-m1-t0-slice-handoff.md) §2 |
+| W-21 | M1 T0 slice: canonical store + git-dir ingest + scan `ask`, dogfooded — **incl. the AcmePay playground** (`examples/playground/`, 20 fixture docs; its `.fux/index/` gets committed as the visible demo) | **DONE** (2026-08-10) | W-20 | **R1 PASS** · **R2 2/3 PASS** (Q3 blocked on pre-existing `docs/archive/` gap, see §1) · playground walkthrough runs as written (2 doc bugs found+fixed) · ADR-0004 accepted | handoff §2–§9, [ADR-0004](adr/0004-index-format.md) |
+| W-22 | M2 T1 accelerator: blocked term-major + `mx` + differential law + Hamming + RRF + find/answer | OPEN·**next** | W-21 | **R3** ≤150 ms warm on RFC corpus; differential suite green; ADR-0005 | PLAN §M2 |
 | W-23 | M3 graph lane: edges, community, explain/graph/path | OPEN | W-22 | archived relational eval passes; ADR-0006 | PLAN §M3 |
 | W-24 | M4 refer plane: HTTP+Confluence, ARC, assembler, freshness fence | OPEN | W-22 | **R4** mock bench; ARC differential; offline honest; ADR-0007 | PLAN §M4 |
 | W-25 | M5 maintenance: hooks, line-wise LWW merge driver, snapshot, hashed-meta enforcement | OPEN | W-23, W-24 | **R5** <1 s/20 docs · **R6** three-tier harness; ADR-0008 | PLAN §M5 |
@@ -68,8 +89,8 @@ are DONE and recorded in WORKLOG 2026-08-09; ids retired.)*
 
 | id | prediction | threshold | status |
 |----|-----------|-----------|--------|
-| R1 | canonical writer byte-deterministic | shard sha256 identical, ubuntu+macos | UNMEASURED — M1 |
-| R2 | T0 answers real repo questions | 3 frozen questions, correct citations, cold clone | UNMEASURED — M1 |
+| R1 | canonical writer byte-deterministic | shard sha256 identical, ubuntu+macos | **PASS** (2026-08-10) — local double-ingest identical; CI matrix asserts `tests_e2e/test_determinism.py` |
+| R2 | T0 answers real repo questions | 3 frozen questions, correct citations, cold clone | **2/3 PASS** (2026-08-10) — Q1/Q2 cite correctly (Q2 needed a tokenizer fix, re-verified); Q3 blocked on the pre-existing `archive/v0.26-docs/` path gap, not this build. Detail: [ADR-0004](adr/0004-index-format.md) |
 | R3 | warm ask ≤ 150 ms on RFC corpus | bench incl. worst common terms | UNMEASURED — M2 |
 | R4 | refer: cold k=10 ≤ 3 s / warm ≤ 300 ms | mock bench | UNMEASURED — M4 |
 | R5 | 20-doc commit re-index < 1 s | hook bench | UNMEASURED — M5 |
@@ -84,7 +105,7 @@ P2–P7 retired with the rev-1 plan; their successors are R3–R7.
 - WORKLOG entry per substantive exchange (CLAUDE.md law).
 - This file's tables on any status change; DOC-REGISTRY row bumps for any
   doc touched; INTERVIEW before substantive direction changes.
-- "archived ADR-NNNN" = the v0.26 line under `docs/archive/v0.26-docs/adr/`;
+- "archived ADR-NNNN" = the v0.26 line under `archive/v0.26-docs/adr/`;
   bare ADR-NNNN = `docs/adr/`.
 - The lab (`~/my_programs/fux-lab`: RFC corpus, manifest) persists — new
   runs are new directories inside it.

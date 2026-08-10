@@ -19,9 +19,12 @@ uv run fux ask "can a settlement batch be rerun"
 ## Look at the index
 
 ```bash
-ls .fux/index/                          # 16 shards + header lines
-head -2 .fux/index/03.jsonl             # the _format header, then a record
-python3 -m json.tool <(sed -n '2p' .fux/index/03.jsonl)   # one doc, pretty
+ls .fux/index/                          # up to 256 shards (00..ff); most are
+                                         # empty at 20 docs — only the ones
+                                         # with content exist as files
+shard=$(ls .fux/index/*.jsonl | head -1)
+head -2 "$shard"                        # the _format header, then a record
+python3 -m json.tool <(sed -n '2p' "$shard")   # one doc, pretty
 ```
 
 Things worth noticing in a record:

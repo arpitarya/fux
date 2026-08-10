@@ -1,0 +1,53 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fux-engine"
+dynamic = ["version"]
+description = "Fux — rank organizational knowledge from a small index committed to git; fetch content from the systems that own it; verify freshness at answer time."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "arpit arya", email = "arpitarya.me@gmail.com" }]
+keywords = ["knowledge", "index", "search", "claude", "agent", "frontmatter", "llm", "adr", "codebase"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Software Development :: Quality Assurance",
+]
+# stdlib only — $0, deterministic, dependency-free runtime (see CLAUDE.md).
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/arpitarya/fux"
+Repository = "https://github.com/arpitarya/fux"
+"Bug Tracker" = "https://github.com/arpitarya/fux/issues"
+
+[project.scripts]
+fux = "fux.cli:main"
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.hatch.version]
+path = "src/fux/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fux"]
+
+[tool.hatch.build.targets.sdist]
+# The sdist is the buildable source + its tests/docs — never the archived old
+# build, lockfile, or CI plumbing.
+exclude = ["/archive", "/uv.lock", "/.github", "/scripts", "/.DS_Store", "**/.DS_Store"]
+
+[tool.ruff]
+line-length = 100

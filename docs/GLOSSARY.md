@@ -7,7 +7,7 @@ trigger).*
 > **Scope: v0.30, the index-and-refer rebuild.** The v0.19–0.26 substrate
 > engine's vocabulary (cache, lean profile, state plane, df sidecar, fidelity
 > tiers, `fux.lock`, mirror tier…) is **archived, not current** — it is
-> defined in [`archive/v0.26/archive/v0.26-docs/`](../archive/v0.26/archive/v0.26-docs/) and survives here
+> defined in [`archive/v0.26-docs/`](../archive/v0.26-docs/) and survives here
 > only where v0.30 still uses the word. When an archived term and a v0.30
 > term collide, the v0.30 meaning wins and the entry says so.
 

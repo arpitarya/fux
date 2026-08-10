@@ -9,3 +9,12 @@ venv/
 
 # macOS
 .DS_Store
+
+# Fux's own working dir — .fux/index/ is the committed artifact (unignore it
+# explicitly); everything else (derive/, refer/ cache, …) is gitignored from
+# day one so M2's accelerator can't leak in.
+.fux/*
+!.fux/index/
+.pytest_cache/
+*.egg-info/
+

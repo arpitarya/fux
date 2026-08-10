@@ -5,4 +5,7 @@
 dirs = ["docs"]
 
 [index]
-shards = 16          # tiny corpus — 16 shards keeps the demo readable
+# Fixed at 256 for M1 (shard = blake2b(id, digest_size=1) → 00..ff) — not yet
+# configurable; this key documents the value rather than setting it. A small
+# corpus like this one just leaves most of the 256 buckets empty (ADR-0004).
+shards = 256

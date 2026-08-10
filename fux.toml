@@ -1,0 +1,10 @@
+# Fux dogfooding on its own repo — the M1 T0 slice.
+# From this directory:   fux ingest   →   fux ask "why did pruning fail"
+
+[sources]
+dirs = ["docs", "README.md", "CLAUDE.md"]
+
+[index]
+# Fixed at 256 for M1 (shard = blake2b(id, digest_size=1) → 00..ff) — not yet
+# configurable; this key documents the value rather than setting it (ADR-0004).
+shards = 256

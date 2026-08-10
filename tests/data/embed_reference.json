@@ -1,0 +1,312 @@
+{
+ "meta": {
+  "vocab_size": 29528,
+  "dim": 256,
+  "sha256": "21cbd6d15fae8b81892430e2744b1346faf16959859f12be83af99c693980711"
+ },
+ "token_samples": [
+  {
+   "text": "Hello, composite index!",
+   "ids": [
+    6598,
+    16,
+    11496,
+    4956,
+    5
+   ]
+  },
+  {
+   "text": "Héllo — naïve API_v2 costs $3.50!",
+   "ids": [
+    6598,
+    523,
+    14749,
+    16934,
+    41,
+    64,
+    1481,
+    4372,
+    8,
+    23,
+    18,
+    1759,
+    5
+   ]
+  },
+  {
+   "text": "The exporter batches telemetry every thirty seconds.",
+   "ids": [
+    1002,
+    8173,
+    1127,
+    13114,
+    1235,
+    9099,
+    20388,
+    10135,
+    1302,
+    3234,
+    2829,
+    18
+   ]
+  },
+  {
+   "text": "rollbacks complete within two minutes",
+   "ids": [
+    3903,
+    11227,
+    2149,
+    1312,
+    1054,
+    1787
+   ]
+  },
+  {
+   "text": "café décisions über straße",
+   "ids": [
+    6674,
+    5573,
+    18175,
+    1364,
+    26813
+   ]
+  },
+  {
+   "text": "snake_case and CamelCase and kebab-case",
+   "ids": [
+    6494,
+    41,
+    1559,
+    1004,
+    18136,
+    17388,
+    1004,
+    16716,
+    2682,
+    1503,
+    17,
+    1559
+   ]
+  },
+  {
+   "text": "line\nbreaks\tand   extra   spaces",
+   "ids": [
+    1246,
+    6813,
+    1004,
+    3475,
+    6264
+   ]
+  },
+  {
+   "text": "emoji 🎯 survives?",
+   "ids": [
+    6867,
+    28153,
+    1078,
+    1,
+    12661,
+    35
+   ]
+  },
+  {
+   "text": "12345 3.14159 0xdeadbeef",
+   "ids": [
+    12144,
+    18967,
+    23,
+    18,
+    14477,
+    27160,
+    20,
+    1601,
+    2213,
+    3221,
+    10312,
+    1552
+   ]
+  },
+  {
+   "text": "",
+   "ids": []
+  },
+  {
+   "text": "a",
+   "ids": [
+    43
+   ]
+  },
+  {
+   "text": "supercalifragilisticexpialidocious antidisestablishmentarianism",
+   "ids": [
+    2571,
+    8295,
+    9134,
+    28187,
+    23417,
+    3594,
+    9294,
+    18318,
+    20279,
+    9091,
+    5319,
+    2430,
+    9527,
+    3361,
+    6881,
+    12608,
+    2678,
+    11205,
+    1970
+   ]
+  },
+  {
+   "text": "SQL SELECT * FROM trades WHERE symbol = 'AAPL'",
+   "ids": [
+    28302,
+    6282,
+    14,
+    1019,
+    13285,
+    1079,
+    5460,
+    33,
+    11,
+    8785,
+    23765,
+    11
+   ]
+  },
+  {
+   "text": "中文字符 mixed with english",
+   "ids": [
+    752,
+    867,
+    1,
+    1,
+    2822,
+    1013,
+    1400
+   ]
+  },
+  {
+   "text": "[CLS] literal special text [SEP]",
+   "ids": [
+    2,
+    17210,
+    1575,
+    2799,
+    3
+   ]
+  }
+ ],
+ "vocab_spot": [
+  {
+   "id": 0,
+   "token": "[PAD]",
+   "scale": 0.024848459288477898,
+   "first8": [
+    -19,
+    2,
+    -21,
+    0,
+    9,
+    20,
+    9,
+    -5
+   ]
+  },
+  {
+   "id": 1,
+   "token": "[UNK]",
+   "scale": 0.022963665425777435,
+   "first8": [
+    36,
+    -117,
+    -69,
+    -6,
+    58,
+    84,
+    60,
+    -75
+   ]
+  },
+  {
+   "id": 100,
+   "token": "¿",
+   "scale": 0.10104728490114212,
+   "first8": [
+    -55,
+    -44,
+    -59,
+    4,
+    127,
+    18,
+    43,
+    -43
+   ]
+  },
+  {
+   "id": 1000,
+   "token": "？",
+   "scale": 0.14156097173690796,
+   "first8": [
+    -15,
+    -32,
+    -127,
+    30,
+    61,
+    32,
+    41,
+    -34
+   ]
+  },
+  {
+   "id": 14764,
+   "token": "##ntal",
+   "scale": 0.15069539844989777,
+   "first8": [
+    33,
+    -54,
+    -4,
+    -13,
+    0,
+    -10,
+    35,
+    23
+   ]
+  },
+  {
+   "id": 29527,
+   "token": "##～",
+   "scale": 0.25454625487327576,
+   "first8": [
+    -35,
+    -73,
+    -127,
+    28,
+    88,
+    67,
+    51,
+    -50
+   ]
+  }
+ ],
+ "neighbor_triples": [
+  {
+   "anchor": "how fast can we revert a bad deployment",
+   "closer": "rollbacks complete within two minutes",
+   "farther": "lunch is served at noon"
+  },
+  {
+   "anchor": "database storage engine choice",
+   "closer": "we chose sqlite for local embedded storage",
+   "farther": "the cafeteria menu rotates weekly"
+  },
+  {
+   "anchor": "telemetry flush cadence",
+   "closer": "batches are flushed every thirty seconds",
+   "farther": "accented names are supported"
+  }
+ ]
+}

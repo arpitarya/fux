@@ -184,7 +184,7 @@ repo makes one hop; this ADR is that hop.
   (two ingest modes; the pinning + grading contract), which itself flags this
   collision as an open decision.
 - **The colliding vocabulary:** archived ADR-0009 (retrieval kernel + edge
-  grades) — [`archive/v0.26/archive/v0.26-docs/adr/0009-…`](../../archive/v0.26/archive/v0.26-docs/adr/0009-retrieval-kernel-graph-verbs.md).
+  grades) — [`archive/v0.26-docs/adr/0009-…`](../../archive/v0.26-docs/adr/0009-retrieval-kernel-graph-verbs.md).
 - **Prior art for the distinction being drawn** (deterministic extraction vs
   model-derived enrichment, graded separately): Campos, R. et al., *YAKE!
   Keyword Extraction from Single Documents Using Multiple Local Features*,

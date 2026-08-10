@@ -1,0 +1,51 @@
+diff --git a/CLAUDE.md b/CLAUDE.md.proposed
+index f15cb4df4a51828ff746ce8cc189299ba4c3307d..0000000 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md.proposed
+@@ -330,29 +330,34 @@
+ 
+ ## Build & test
+ 
+-There is **no package on `main` yet**. What runs today:
++**`src/fux/` exists as of M0+M1** (ADR-0004). What runs today:
+ 
+ ```bash
+-# the archived engine (reference + M1's baseline) — do not modify it
++# the new package — dogfood it on this repo
++uv run fux ingest              # builds .fux/index/*.jsonl from fux.toml's sources
++uv run fux ask "your question" # scan + BM25F, cites the source file
++
++# the two maintained suites
++uv run pytest -q tests         # fast unit
++uv run pytest -q tests_e2e     # the package as a user: real CLI via subprocess
++
++# the archived engine (reference only) — do not modify it
+ cd archive/v0.26 && uv sync --extra dev && uv run pytest -q tests
+ 
+-# M1's gate: the KL selector's contract + the harness self-checks
++# M1's now-closed pruning gate — kept runnable for the record, not re-run
+ archive/v0.26/.venv/bin/python -m pytest tools/pruning-eval/tests -q
+-
+-# M1's gate: the experiment itself
+-archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit synth
+ ```
+ 
+-**Two suites, both maintained, once `src/` exists** — `tests/` (fast unit) and
+-`tests_e2e/` (the package as a user: real CLI via `subprocess`, fixture corpus,
+-golden files updated deliberately and never regenerated blindly). A feature is
+-not done until both cover it and pass.
++**Two suites, both maintained** — `tests/` (fast unit) and `tests_e2e/` (the
++package as a user: real CLI via `subprocess`, fixture corpus, golden files
++updated deliberately and never regenerated blindly). A feature is not done
++until both cover it and pass. M1 shipped 164 tests across both.
+ 
+ ## Package identity (do not change casually)
+ 
+ - Distribution name: **`fux-engine`**. Import package: **`fux`**.
+-- Version: **`0.30.0.dev0`** at M0b (0.26.0 archived → reset → 0.30.0).
+-  Bumped in `src/fux/__init__.py` only, once it exists.
++- Version: **`0.30.0.dev0`** as of M0+M1 (0.26.0 archived → reset → 0.30.0).
++  Bumped in `src/fux/__init__.py` only.
+ 
+ ## Merge wall — what actually blocks a merge
+ 

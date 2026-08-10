@@ -287,8 +287,8 @@ def verify_rfc_manifest(sample: int = 0) -> tuple[int, int]:
 # homogeneity differ in exactly the way that matters).
 _REPODOC_ROOTS = (
     ("docs", "docs"),
-    ("archive/v0.26/archive/v0.26-docs", "v026docs"),
-    ("archive/v0.26/archive", "v026handoffs"),
+    ("archive/v0.26-docs", "v026docs"),
+    ("archive/v0.26-implemented", "v026handoffs"),
     ("archive/v0.26/conformance", "v026conformance"),
     ("archive/v0.26/proposals", "v026proposals"),
     ("archive/v0.1/docs", "v01docs"),

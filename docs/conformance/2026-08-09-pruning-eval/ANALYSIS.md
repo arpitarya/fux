@@ -40,7 +40,7 @@ ingest + ≈ 20 min eval, peak RSS ≈ 2.2 GB.
 **Environment caveat — the archived engine's own suite is 468 passed / 2
 failed.** Both failures are `tests/test_config.py`, and both are the *reset*:
 they read `docs/example/TOML.md`, which moved into
-`archive/v0.26/archive/v0.26-docs/` with everything else. Neither touches
+`archive/v0.26-docs/` with everything else. Neither touches
 tokenization, indexing or scoring, and fixing them would mean editing the
 archive — which the handoff forbids. Recorded here rather than worked around.
 

@@ -12,7 +12,7 @@ live doc means this directory.
 | [0001](0001-ingest-mode-naming.md) | Ingest-mode naming — `extracted` / `enriched` | ⏳ proposed (Arpit ratifies) |
 | [0002](0002-pruning-eval-gate.md) | P1 gate, first run — INCONCLUSIVE (a correct refusal; unmodified record) | accepted as record |
 | [0003](0003-pruning-criterion-rerun.md) | P1 re-run — **FAIL**; option E (full postings) accepted by Arpit in session | accepted |
-| 0004 | Index format & committed store (written at M1; spec: [`../compare/index-format.compare.md`](../compare/index-format.compare.md)) | planned |
+| [0004](0004-index-format.md) | Index format & committed store — schema, canonical rules, unicode policy frozen | accepted |
 | 0005 | Derived accelerator & differential law (M2) | planned |
 
 Renumbering note (2026-08-09): these files previously carried numbers

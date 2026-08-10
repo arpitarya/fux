@@ -19,6 +19,157 @@ diary.*
 
 ---
 
+## 2026-08-11 — M0+M1 committed, pushed, and released as v0.30.0  ·  Claude Code
+- **Asked:** commit everything from the M0+M1 build session, push, and
+  publish a new version.
+- **Did:** synced with concurrent doc changes (Arpit's archive-convention
+  ruling — root `archive/` only, `docs/archive/` retired — already landed
+  in `OPEN-WORK.md`/handoff docs/ADR-0004 by the time this ran); re-ran the
+  full suite (164 green) and re-ingested this repo's dogfood index to
+  reflect it; bumped `__version__` to `0.30.0` (dropping `.dev0` — the
+  project's established per-milestone release cadence, matching how
+  `0.22.0` shipped "the rebuild ships"); dated the CHANGELOG entry;
+  committed the whole M0+M1 build; pushed to `main`; cut `v0.30.0` via
+  `gh release create`, which fired the PyPI publish workflow.
+- **Decided / open:** the archive-convention follow-up (adding
+  `archive/v0.26-docs` to `fux.toml` sources so R2-Q3 becomes literally
+  satisfiable) is explicitly deferred to the next build turn, per
+  `OPEN-WORK.md`'s own note — not done here.
+- **Next:** M2 (W-22, the T1 accelerator) is unblocked. See `OPEN-WORK.md` §2.
+
+## 2026-08-10 — Agent search-API landscape researched; three proposals filed  ·  Cowork
+- **Asked:** how [platform.parallel.ai](https://platform.parallel.ai) works
+  engineering-wise — both the retrieval engine and the platform/tenancy layer —
+  "because we are also trying to build something along the same lines." Then:
+  save the research into the repo.
+- **Did:**
+  - Researched Parallel Web Systems end to end (own crawler `ShapBot`, own
+    index, no federation; $230M raised / $2B valuation) plus the peer set —
+    Perplexity, Exa, Brave, Tavily, Linkup, Firecrawl, Jina — and the web-index
+    cost literature (Wilson Lin, turbopuffer, Quickwit, Common Crawl,
+    Cloudflare Pay Per Crawl). Every claim traced to a public source; vendor
+    claims, third-party reports and inference kept separate.
+  - Filed **three proposals**, all `status: proposed`, none built:
+    - [`proposals/agent-search-landscape.md`](proposals/agent-search-landscape.md)
+      — the research note and evidence base (a preserved note, in the same
+      spirit as `wavelet-self-index.md`).
+    - [`proposals/caller-set-freshness-policy.md`](proposals/caller-set-freshness-policy.md)
+      — `fetch_policy`-style per-query staleness tolerance for the refer plane.
+    - [`proposals/token-budget-retrieval.md`](proposals/token-budget-retrieval.md)
+      — byte budget as the answer limit instead of `k`.
+  - Updated `proposals/README.md` (index), `DOC-REGISTRY.md` (proposals row),
+    and `OPEN-WORK.md` §1 (pointer so the M4 handoff picks both up).
+- **Decided / open:**
+  - **Three convergences confirmed, independently arrived at:** (1) the index
+    is a cache with a caller-set TTL, not the source of truth — literally the
+    refer plane; (2) the retrieval unit is a token budget, not a result count;
+    (3) the retrieval unit is the *passage*, not the document — four
+    independent arrivals (Parallel, Perplexity, Exa, Wilson Lin).
+  - **The wedge is now written down and referenced:** Parallel's own FAQ says
+    they crawl "only publicly available web content **without login
+    credentials**." The whole funded peer set is locked out of the corpus the
+    CLAUDE.md litmus is about. Cloudflare Pay Per Crawl (HTTP 402 +
+    `crawler-price`) is an existential cost risk for them and a non-event for
+    an inside-the-firewall index.
+  - **Two external supports for decisions already taken:** Exa shipped a Rust
+    BM25 inverted index *after* saying "we were neural all the way" — support
+    for the full-postings lexical core of ADR-0004. And the hyperscaler markup
+    on search primitives is 20–30× (Wilson Lin's cost table) — the `$0`/stdlib
+    law is the economically correct architecture, not an ascetic one.
+  - **Open (Arpit):** whether the two API-shape proposals get folded into the
+    M4 handoff when W-24 starts, or stay parked. Nothing here changes a W-nn
+    state or a prediction; no code touched.
+- **Next:** unchanged — **W-22 (M2, the T1 accelerator)** is still the next
+  build item. When W-24 (M4) is spec'd, read both API proposals before writing
+  the handoff.
+
+## 2026-08-10 — M0+M1 built: scaffold, canonical store, ingest, ask — R1 PASS, R2 2/3 PASS  ·  Claude Code
+- **Asked:** execute the M0+M1 T0-slice handoff/prompt — build `src/fux/`,
+  the canonical committed store, git-dir ingest, and scan-based `fux ask`,
+  dogfooded on this repo, ending in ADR-0004 and measured R1/R2.
+- **Did:**
+  - **Phase 0:** found the tree dirty (60 files staged from an earlier
+    unfinished prep session — ADR renumbering, the index-format compare doc,
+    the AcmePay playground fixture, a proposed CLAUDE.md rewrite). Asked;
+    committed it (`6960237`) before starting, per the handoff's own "stop if
+    dirty" instruction.
+  - **M0 scaffold:** `src/fux/` (`store/`, `derive/` stub, `query/`,
+    `ingest/`, `refer/` stub, `cli.py`, `errors.py`, `config.py`,
+    `doctor.py`); `pyproject.toml` at `0.30.0.dev0`, zero runtime deps;
+    restored `scripts/ai-review.sh`/`apply-branch-protection.sh` (present in
+    live CI config, missing from the tree since the v0.26 archive move);
+    fresh `CHANGELOG.md`. `fux --version`/`doctor` clean; build/twine/sdist
+    checks clean.
+  - **Canonical store** (`store/`): writer/reader for sharded doc-major
+    JSONL, collision tracker, canonicalization boundary (no floats/nulls,
+    NFC-enforced). Three schema fields the compare doc named but didn't
+    fully specify — `sha` (hash algorithm), `ver` (semantics), `meta`
+    (shape) — resolved by asking, not guessing (handoff §guardrails).
+  - **Opus review checkpoint** on `store/` (handoff §11, before building on
+    top of it): 2 blockers (dict keys never NFC-validated; the reader's
+    `str.splitlines()` breaks on U+2028/2029/0085 the writer legally emits,
+    so the store couldn't read its own output) + 10 should-fix/nit findings,
+    all fixed — golden-vector tests, atomic writes, header field validation,
+    cross-shard duplicate detection, shared-tracker collision test added.
+  - **Ingest** (`ingest/`): git-dir adapter (sorted walk, skip-with-reason);
+    ported tokenizer/frontmatter/FuxVec (incl. the 7.9 MB bundled model,
+    asked and decided to bundle now rather than defer); new `ref`/`tag`/
+    `code` edge extraction (not a direct port — new grade-int scheme).
+    Asked and resolved a real spec conflict: the handoff fixes shard count
+    at 256, but the already-committed `examples/playground/fux.toml` set
+    `shards = 16` — kept the store's fixed-256 design (already
+    Opus-reviewed), corrected the playground config instead.
+  - **Query** (`query/`): B2 byte-prefilter scan + ported BM25F (2-field,
+    `path` dropped per ADR-0004), corpus stats derived in-pass, never
+    stored.
+  - **Dogfood + R2:** ran the three frozen questions against this repo's own
+    docs. Q1 passed; Q2 initially missed top-5 (a glossary's dictionary-style
+    term repetition outranked the focused answer) — traced to the tokenizer
+    having no stopword filtering (neither the archive nor the handoff spec'd
+    one); asked, added it, re-verified Q1+Q2 (not just the one that had been
+    failing). Q3's citation target (`archive/v0.26-docs/…`) doesn't
+    exist — a pre-existing, independently-flagged discrepancy
+    (`docs/archive/README.md`, 2026-08-09, predates this session); asked,
+    reported as testing a stale assumption rather than moving `archive/`
+    content as a side effect of this ADR.
+  - **Playground walkthrough:** all three questions + the superseded-pair
+    check pass with real citations; double-ingest is a no-op; a one-doc edit
+    changes exactly one shard file. Fixed two doc bugs in `PLAYGROUND.md`
+    itself (never the fixture, per the handoff's rule): a stale "16 shards"
+    comment and a hardcoded example shard filename that doesn't exist under
+    the real sparse assignment.
+  - **R1:** double-ingest byte-identical, verified locally; wired into CI as
+    `tests_e2e/test_determinism.py` (already runs on the existing
+    ubuntu+macos+windows matrix).
+  - **ADR-0004** written and accepted — freezes the schema, canonical rules,
+    unicode policy, and every build-time decision above.
+  - Tests: 164 passing (unit + e2e), up from 0 at session start.
+- **Decided / open:** ADR-0004 accepted. Open for Arpit: whether to move
+  `archive/v0.26-docs/` into `docs/archive/` (resolves R2 Q3
+  for real, pre-existing call, not created by this session); ratify
+  ADR-0001. Nothing blocks M2.
+- **Next:** start W-22 (M2 T1 accelerator) — see PLAN §M2. This session's
+  changes are built and tested but **not yet committed**; confirm commit
+  scope/message with Arpit before landing.
+
+## 2026-08-10 — one archive, at root (Arpit's ruling) ·  Cowork
+- **Asked:** everything which needs to be archived should be in the root
+  archive dir.
+- **Did:** flattened the double-nesting — `archive/v0.26/archive/v0.26-docs`
+  → **`archive/v0.26-docs/`**, remaining nested collection →
+  **`archive/v0.26-implemented/`** (master-prompt, PLAN-v0.26, executed
+  v0.20–v0.26 handoff pairs); `archive/v0.26/` is engine-only again.
+  Removed `docs/archive/` (README parked in `_to_delete/` — device cannot
+  delete; empty dir invisible to git). Wrote `archive/README.md` as the
+  root-archive index + the standing convention. Re-pointed 12 live files;
+  recorded dated resolutions in ADR-0004, OPEN-WORK, and the M1 handoff
+  banner (the R2-Q3 discrepancy is now CLOSED; making Q3 satisfiable is a
+  one-line fux.toml follow-up, parked for the M2 turn).
+- **Decided / open:** standing rule — archived v0.30 artifacts get
+  version-named root entries (`v0.30-…`); no doc-level archives ever.
+- **Next:** Arpit reviews + commits (this sits alongside the staged M1
+  work); then M2.
+
 ## 2026-08-09 — REVISION 2: JSONL format decided, ADRs renumbered, plan rewritten, first build packaged  ·  Cowork
 - **Asked:** (across the evening) will the JSONL index work — verify against
   the paper; sample index block with per-property explanation; then: create
@@ -58,6 +209,20 @@ diary.*
   naming (non-blocking); paper §4–§6 stale-by-design until M6.
 - **Next:** paste `handoff/v0.30.0-m1-t0-slice-prompt.md` into Claude Code
   (Sonnet).
+
+## 2026-08-09 — rev-1 planning artifacts archived to root archive  ·  Cowork
+- **Asked:** archive the older plan docs in the root archive.
+- **Did:** created `archive/v0.30-rev1-planning/` (with README) and moved:
+  both executed handoff pairs (m0-m1-gate → ADR-0001/0002; m1-rerun →
+  ADR-0003) per the handoff lifecycle, plus the two revision-1 design
+  diagrams (`architecture-components.svg`, `architecture-index-and-refer.svg`
+  — they depict the superseded MST/BIC design). Links fixed in handoff
+  README, index.md, DOC-REGISTRY, WORKLOG, INTERVIEW.
+- **Decided / open:** the paper stays in place (M6 rewrites it from
+  measurements — flagged, not stale-by-accident). `docs/handoff/` now
+  holds only the live t0-slice pair.
+- **Next:** unchanged — run the M1 prompt.
+- **Addendum:** new `docs/architecture-overview.svg` (five components, README-ready) and `docs/architecture.svg` committed — the rev-2 working diagram (tiers T0/T1/T2, real record shapes, query path, measured numbers); index.md + DOC-REGISTRY updated.
 
 ## 2026-08-09 — AcmePay playground corpus added to the M1 slice  ·  Cowork
 - **Asked:** a small 10–50 doc set to *play* with — see how Fux and its
@@ -192,7 +357,7 @@ diary.*
 
 ## 2026-08-09 — M0+M1 handoff & prompt; debate gate re-ordered the plan  ·  Cowork
 - **Asked:** create the handoff and prompt (first build package).
-- **Did:** `docs/handoff/v0.30.0-m0-m1-gate-handoff.md` + `-prompt.md` +
+- **Did:** `docs/../archive/v0.30-rev1-planning/v0.30.0-m0-m1-gate-handoff.md` + `-prompt.md` +
   handoff README. Handoff covers M0a hygiene, ADR-0001, M1 (the gate), and
   M0b scaffold-on-PASS, with: the KL selector spec (pure/stdlib/portable),
   the harness spec, the **pre-registered** PASS/FAIL table, the failure
@@ -244,7 +409,7 @@ diary.*
     uv.lock CHANGELOG DOGFOOD README` → `archive/v0.26/` (reference-only,
     kept runnable — M1 uses it as the quality baseline). Old docs (ADRs
     0001–0015, compare/, example/, IMPLEMENTATION.md, flow diagram) →
-    `docs/archive/v0.26-docs/`; old plan → `docs/archive/PLAN-v0.26.md`.
+    `archive/v0.26-docs/`; old plan → `archive/v0.26-implemented/PLAN-v0.26.md`.
     Kept live: WORKLOG, INTERVIEW, DOC-REGISTRY, GLOSSARY, proposals/,
     conformance/, handoff/, new SVGs, paper/.
   - **New plan:** `docs/PLAN.md` — M0 scaffold → M1 pruning-eval GATE (P1,
@@ -263,7 +428,7 @@ diary.*
   meta shown in chat); council-debate the architecture with a visionary seat;
   shrink the 700 MB committed index; can components merge into one; split
   ingest into no-AI vs AI modes. Commit the v2 diagram.
-- **Did:** committed `docs/architecture-components.svg` (v2). Research: BIC
+- **Did:** committed `docs/../archive/v0.30-rev1-planning/architecture-components.svg` (v2). Research: BIC
   postings (<1–2 bits/id), RecSplit/PtrHash MPH dict (~2 bits/key), wavelet-
   tree self-index (noted, rejected for decode cost). Council verdicts folded
   into the diagram.
@@ -286,7 +451,7 @@ diary.*
   answer = rank from db → fetch cited docs live → cache. Then: remove the
   paper, commit the diagram, plan the build with 1M-doc numbers.
 - **Did:** paper removed (Arpit deleted the file; index line dropped from
-  proposals README). Committed `docs/architecture-index-and-refer.svg`.
+  proposals README). Committed `docs/../archive/v0.30-rev1-planning/architecture-index-and-refer.svg`.
   Researched the build basis: document-centric static index pruning
   (Büttcher–Clarke KL top-k), federated-search broker frame (cooperative,
   single-scorer), ARC cache, YAKE phrases. Build plan + budgets in chat.

@@ -17,7 +17,7 @@ agents* — update both or neither.
 * [Plan](PLAN.md) - the v0.30 build: milestones M0–M8, gates, port list.
 * [Open work](OPEN-WORK.md) - everything not yet built: human summary + agent work ledger + prediction status. **The live tracker.**
 * [The paper](paper/the-fux-index-paper.md) - the architecture of record, with figures and falsifiable predictions P1–P7.
-* [Component diagram](architecture-components.svg) - the v2 map · [high-level flow](architecture-index-and-refer.svg).
+* [Overview diagram](architecture-overview.svg) - five components, one glance · [detailed diagram](architecture.svg) - tiers, record shapes, query path. Rev-1 diagrams archived.
 * [Model handoff interview](INTERVIEW.md) - succession judgment; read before substantive changes.
 * [Worklog](WORKLOG.md) - per-exchange session trail, newest first.
 * [Doc registry](DOC-REGISTRY.md) - maintained docs, update triggers, last-verified dates.
@@ -34,8 +34,8 @@ agents* — update both or neither.
 
 # Build
 
-* [Handoffs](handoff/) - live build specs: the [M0/M1 pair](handoff/v0.30.0-m0-m1-gate-handoff.md) + the [CLAUDE.md review diff](handoff/v0.30.0-claude-md.diff).
+* [Handoffs](handoff/) - live build specs: the [M0/M1 pair](../archive/v0.30-rev1-planning/v0.30.0-m0-m1-gate-handoff.md) + the [CLAUDE.md review diff](handoff/v0.30.0-claude-md.diff).
 * [Conformance](conformance/README.md) - measurement evidence home (persists across rebuilds); latest: [the pruning eval](conformance/2026-08-09-pruning-eval/ANALYSIS.md).
 * [`tools/pruning-eval/`](../tools/pruning-eval/README.md) - M1's gate: the frozen [pre-registration](../tools/pruning-eval/PRE-REGISTRATION.md), the KL selector, the harness.
-* [Archive](archive/) - implemented v0.26-era artifacts · [v0.26 docs](../archive/v0.26/archive/v0.26-docs/) (ADRs 0001–0015, compare, example, tracker) · [old plan](../archive/v0.26/archive/PLAN-v0.26.md).
+* [Archive](../archive/) - **everything archived lives in the root archive** (Arpit's ruling, 2026-08-10): [v0.1](../archive/v0.1/) · [v0.26 engine](../archive/v0.26/) · [v0.26 docs](../archive/v0.26-docs/) · [v0.26 implemented artifacts](../archive/v0.26-implemented/) · [v0.30 rev-1 planning](../archive/v0.30-rev1-planning/).
 * Engine archive: [`../archive/v0.26/`](../archive/v0.26/) - the full prior build, reference-only, runnable for M1's baseline.

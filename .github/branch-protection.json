@@ -1,5 +1,4 @@
 {
-  "_note": "Source of truth for `main` branch protection. Apply with scripts/apply-branch-protection.sh arpitarya fux main. REQUIRED STATUS CHECKS REMOVED 2026-07-22 at Arpit's instruction: `fux gate` and `ai-review` are no longer required to merge. Both still RUN on every PR (see .github/workflows/ci.yml) and their results are visible \u2014 they are simply not blocking. Be clear-eyed about what this costs: with no required checks and required_pull_request_reviews:null, nothing prevents merging a red PR, and a change can reach main without CI having passed. What remains of the wall is enforce_admins:true plus no force-push and no deletion \u2014 history is still protected, the quality gate is not. To restore the wall, put {\"context\": \"fux gate\"} and {\"context\": \"ai-review\"} back in required_status_checks.checks and re-apply. If this repo gains a second maintainer, also restore required_pull_request_reviews.required_approving_review_count=1 + require_code_owner_reviews:true.",
   "required_status_checks": {
     "strict": true,
     "checks": []
