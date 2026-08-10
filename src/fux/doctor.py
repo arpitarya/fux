@@ -58,6 +58,9 @@ def _repo_root(start: Path | None) -> list[Check]:
 def cmd_doctor(args) -> int:
     checks = run()
     for check in checks:
-        mark = "✔" if check.ok else "✗"
-        print(f"{mark} {check.name}: {check.detail}")
+        # ASCII only — Windows' default console codepage (cp1252/"charmap")
+        # can't encode U+2714/U+2717 and the process crashes on print()
+        # rather than degrading; caught by CI's windows runners.
+        mark = "OK" if check.ok else "FAIL"
+        print(f"[{mark}] {check.name}: {check.detail}")
     return 0 if all(c.ok for c in checks) else 1
