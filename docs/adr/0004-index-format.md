@@ -157,12 +157,19 @@ cat-file`).
 
 **What R1/R2 measured, this build:**
 
-- **R1 — PASS.** Double-ingest on this repo produces byte-identical shard
-  sha256s (verified locally: `shasum -a 256 .fux/index/*.jsonl` unchanged
-  across two runs, second run reports `0 shards written`). Asserted in CI on
-  the existing ubuntu+macos+windows matrix via
-  `tests_e2e/test_determinism.py` (double-ingest through the real CLI,
-  compares shard sha256s).
+- **R1 — PASS**, confirmed live on the full ubuntu+macos+windows CI matrix
+  at the `v0.30.0` push (not just asserted locally). Double-ingest on this
+  repo produces byte-identical shard sha256s (verified locally: `shasum -a
+  256 .fux/index/*.jsonl` unchanged across two runs, second run reports `0
+  shards written`); `tests_e2e/test_determinism.py` asserts the same
+  through the real CLI. **The matrix earned its keep**: the first push
+  (`c52948b`) was red on both `windows·py3.11` and `windows·py3.14` — not
+  an R1 failure, but a real bug R1's own CI wiring caught: `fux doctor`
+  printed a Unicode checkmark (U+2714) that crashes on Windows' default
+  console codepage (`cp1252`/"charmap" can't encode it), so the process
+  exited 1 with a raw `UnicodeEncodeError` instead of printing. Fixed
+  (`83c1888`, ASCII `[OK]`/`[FAIL]` markers) with a regression test that
+  forces `PYTHONIOENCODING=ascii` on any platform, not just Windows.
 - **R2 — 2 of 3 PASS, 1 blocked on a pre-existing gap:**
   1. `"why did pruning fail"` → cites `docs/adr/0003-…` in the top 2. **PASS.**
   2. `"what format is the committed index"` → initially missed the top 5
