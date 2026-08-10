@@ -42,6 +42,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
     p_ingest.add_argument("--list-skipped", action="store_true", help="print skipped files and why, then exit")
+    p_ingest.add_argument(
+        "--refresh-urls",
+        action="store_true",
+        help="fetch [sources.url] urls through the consumer middleware (the ONLY networked ingest path; off by default)",
+    )
     p_ingest.set_defaults(func=_cmd_ingest)
 
     p_ask = sub.add_parser("ask", help="answer a question by scanning the committed index")

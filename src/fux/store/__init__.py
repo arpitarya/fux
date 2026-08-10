@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
+from .fuxdir import COMMITTED, DECLARED, DERIVED, FUX_DIR, derived_dir, ensure_layout, fux_dir
 from .format import (
     ANALYZER_VERSION,
     HEADER,
@@ -24,6 +25,10 @@ from .writer import HEADER_LINE, hash_terms, write_index
 
 __all__ = [
     "ANALYZER_VERSION",
+    "COMMITTED",
+    "DECLARED",
+    "DERIVED",
+    "FUX_DIR",
     "HEADER",
     "HEADER_LINE",
     "INDEX_DIR",
@@ -32,6 +37,9 @@ __all__ = [
     "CollisionTracker",
     "canonical_dumps",
     "content_sha",
+    "derived_dir",
+    "ensure_layout",
+    "fux_dir",
     "hash_terms",
     "index_dir",
     "iter_shard_paths",

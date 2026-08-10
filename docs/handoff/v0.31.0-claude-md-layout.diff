@@ -1,0 +1,15 @@
+diff --git a/CLAUDE.md b/CLAUDE.md
+index f15cb4d..734e855 100644
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -313,6 +313,10 @@ tools/
+ archive/
+   v0.26/            the previous engine — runnable, REFERENCE ONLY, never modified
+   v0.1/             the first build
++.fux/               fux's own dir in the repo — EVERY child declared committed or
++                    derived (ADR-0011): index/ sources/ middleware/ committed ·
++                    runtime/ cache/ derived (gitignored, CACHEDIR.TAG). Never
++                    blanket-ignore `.fux/*`.
+ ```
+ 
+ **`src/fux/` does not exist yet, by design.** The package scaffold is M0b and

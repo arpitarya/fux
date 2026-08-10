@@ -129,6 +129,12 @@ eval passes on the new kernel; ADR-0006.
 
 ### M4 — the refer plane
 
+> Scope note (2026-08-10): a `url` *source* landed early via a consumer-owned
+> middleware file — [ADR-0010](adr/0010-url-source-consumer-middleware.md)
+> (⏳ proposed). The adapter cap below is untouched (core ships no URL
+> adapter; all network lives in the consumer's file), but this milestone's
+> refer plane must decide the verify-time fetch path for `src:"url"` docs.
+
 HTTP (conditional GET) + Confluence adapters — **the cap holds**; more
 systems arrive via [`proposals/mcp-adapters.md`](proposals/mcp-adapters.md),
 not code. ARC cache keyed `(loc, sha)`, results-neutral by construction.

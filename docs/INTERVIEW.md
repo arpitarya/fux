@@ -18,6 +18,32 @@ is archived.** It is history worth having — the judgment in it is real — but
 it is no longer the state of play. Read this block, then read the rest as
 *background*.
 
+**Update (2026-08-10, Cowork/Claude):** one post-M1 capability landed at
+Arpit's direction — URL ingestion through a **consumer-owned middleware
+file** ([ADR-0010](adr/0010-url-source-consumer-middleware.md), ⏳ proposed;
+a CDP template ported from the archived `render="cdp"` path, now at
+`.fux/middleware/cdp.py`). The judgment worth inheriting: the adapter cap
+survives by making URL fetch *configuration plus consumer code*, never core
+code — `src/fux/` still has zero network lines; hashed meta got its first
+real exercise; offline ingest carries `url:` records forward byte-identically
+because the writer's implicit-deletion rule would otherwise eat them.
+
+**Update (2026-08-11, Claude Code):** `.fux/` is now a **declared layout**
+([ADR-0011](adr/0011-fux-dir-layout.md), ⏳ proposed) — every child is
+committed or derived, and the URL source moved fully inside it. Two pieces of
+judgment to inherit. First, **an ignore rule is the silent failure mode** of
+putting committed and derived planes under one dotdir; the repo's own
+`.gitignore` already carried a `.fux/*` blanket that would have eaten
+`sources/` and `middleware/` with no error, which is why `fux doctor` now
+asserts `git check-ignore` on the index. Second, **middleware tunables are an
+opaque table**: typing `cdp_port`/`settle_ms` into `config.py` would have put
+one middleware's vocabulary into fux's schema and breached the adapter cap
+through the back door. `[sources.url.config]` is passed verbatim and never
+read — the PEP 518 `[tool.*]` discipline. Hold that line for every future
+middleware. Maintainers of this doc so
+far: each session's model, per the standing instruction above — this entry
+by Claude (Cowork, claude-fable-5).
+
 **Q: What changed?**
 
 - The substrate engine (v0.19 → v0.26, ADRs 0001–0015) is **archived at

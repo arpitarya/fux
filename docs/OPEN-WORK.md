@@ -60,6 +60,30 @@ and [`proposals/token-budget-retrieval.md`](proposals/token-budget-retrieval.md)
 shape the refer API's first surface and are expensive to retrofit. No W-nn or
 prediction changed state.
 
+**Built 2026-08-10 (Cowork), awaiting ratification:** URL ingestion via a
+consumer-owned middleware file —
+[ADR-0010](adr/0010-url-source-consumer-middleware.md) (⏳ proposed).
+`[sources.url]` + `fux ingest --refresh-urls`; a CDP template (hand-rolled
+RFC 6455, ported from the archived v0.26 path). Core gains no adapter and no
+network code; hashed meta default; offline ingest carries `url:` records
+forward byte-identically. **Amended in place 2026-08-11** by
+[ADR-0011](adr/0011-fux-dir-layout.md) — the URL list is now
+`.fux/sources/urls`, the middleware `.fux/middleware/cdp.py`, and its
+tunables an opaque `[sources.url.config]` table. GLOSSARY debt **paid**
+(4 terms). Still owed: W-24's refer plane needs a fetch path for `src:"url"`
+docs.
+
+**Built 2026-08-11 (Claude Code), awaiting ratification:** the `.fux/`
+directory as a declared layout — [ADR-0011](adr/0011-fux-dir-layout.md)
+(⏳ proposed). Committed planes (`index/`, `sources/`, `middleware/`) vs
+derived (`runtime/`, `cache/`, `CACHEDIR.TAG`-tagged), a self-describing
+`.fux/README.md`, a narrow `.fux/.gitignore` that never uses `*`, and two
+`fux doctor` checks. **Two things for Arpit:** ADR-0011 §Alternatives closes
+the handoff's open question (README generated at ingest time, not by `doctor
+--fix`) — reversible; and the one-line CLAUDE.md layout addition is
+*proposed, not applied* at
+[handoff/v0.31.0-claude-md-layout.diff](handoff/v0.31.0-claude-md-layout.diff).
+
 ## §2 · For AI agents — machine-oriented work ledger
 
 Rules: pick the lowest OPEN item whose `blocked_by` is satisfied; specs
@@ -80,6 +104,7 @@ W-38** (plan law).
 | W-26 | M6 scale/T2: tpack, mmap segments, partial clone, 100k/1M bench, **paper §4–§6 rewritten to measured** | OPEN | W-25 | **R7**; every R measured or honest failure ADR; ADR-0009 | PLAN §M6 |
 | W-27 | M7 dogfood & release gate (fux + Anton, two weeks) | OPEN | W-26 | Arpit ships a release he uses | PLAN §M7 |
 | W-30 | Ratify ADR-0001 naming | OPEN·human | — | status → accepted | adr/0001 |
+| W-40 | Execute the .fux layout + URL-source-move handoff (urls → `.fux/sources/urls`, middleware → `.fux/middleware/cdp.py`, opaque `[sources.url.config]`, layout module + doctor checks, ADR-0011 + ADR-0010 amendment) | **DONE** (2026-08-11) | — | every §2 DoD box true; 217 tests green; triple-ingest byte-identical on this repo; `ask` still cites; docs synced | [ADR-0011](adr/0011-fux-dir-layout.md) · [handoff](archive/v0.31.0-fux-dir-layout-handoff.md) · [prompt](archive/v0.31.0-fux-dir-layout-prompt.md) |
 | W-38 | M8 deferred set: realistic-workload pruning *(optimization only)* · sentence/structure selection · query-views · enriched tier · BIC-in-T2 · MCP · knowledge-CI | PARKED | W-26 | one ADR + Arpit sign-off each | PLAN §M8 |
 
 *(W-00…W-14 — the reset, hygiene, both gate runs, and their doc syncs —

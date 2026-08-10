@@ -19,6 +19,103 @@ diary.*
 
 ---
 
+## 2026-08-11 — v0.31.0 executed: `.fux/` declared, URL source moved in  ·  Claude Code
+- **Asked:** execute the v0.31.0 handoff + prompt (W-40) — systematize
+  `.fux/`, move the URL list and middleware into it, move the CDP tunables
+  into `fux.toml`.
+- **Did:** new `store/fuxdir.py` (`ensure_layout` write-if-missing README +
+  narrow `.gitignore`; `derived_dir` with spec-exact `CACHEDIR.TAG`), called
+  at ingest start. `[sources.url]` now takes `urls_file` (default
+  `.fux/sources/urls`) and an opaque `[sources.url.config]` table; inline
+  `urls` is a hard error. New `urlsrc.read_urls` (comments/blanks, `file:lineno`
+  scheme errors, missing-file loud only under `--refresh-urls`, empty valid,
+  dedupe+sort) and a `configure(config)` hook called once before `connect()`.
+  `git mv`'d the middleware to `.fux/middleware/cdp.py`; its constants became
+  defaults `configure` overrides. `fux doctor` gained the `git check-ignore`
+  assertion on `.fux/index` (error) and an undeclared-entry warning — `Check`
+  grew a `level` field so warnings don't fail the exit code. **Root
+  `.gitignore` had a `.fux/*` blanket that would have eaten `sources/` and
+  `middleware/`; removed.** ADR-0011 written, ADR-0010 amended in place, +4
+  GLOSSARY terms, README/CHANGELOG/fux.toml/registry/OPEN-WORK/INTERVIEW
+  updated; handoff + prompt archived as `implemented`.
+- **Decided / open:** the handoff's §10 open question closed **as built** —
+  `.fux/README.md` is generated at ingest, not by `doctor --fix` (reversible;
+  ADR-0011 §Alternatives records it). **For Arpit:** ratify ADR-0011 (and
+  ADR-0010); the one-line CLAUDE.md layout addition is **proposed, not
+  applied** at `docs/handoff/v0.31.0-claude-md-layout.diff` (verified to apply
+  cleanly). Note `git log --follow .fux/middleware/cdp.py` shows no pre-move
+  history — the root file was staged but never committed, so there was none.
+- **Verified:** 217 tests green (`.venv/bin/python -m pytest tests -q`);
+  triple ingest on this repo byte-identical (0 shards written on runs 2–3);
+  `fux ask` still cites; `git check-ignore` confirms committed planes tracked
+  and `runtime/`/`cache/` ignored.
+- **Next:** W-22 — M2's T1 accelerator (nothing blocks it).
+
+## 2026-08-10 — .fux layout decided; v0.31.0 handoff + prompt written  ·  Cowork
+- **Asked:** (1) URL list out of `fux.toml` into a separate file under
+  `.fux/` (the list could be huge); (2) move `cdp_middleware.py` into
+  `.fux/` too; (3) define `.fux/` systematically; (4) move the CDP
+  tunables into `fux.toml`. Research it, then produce a handoff + prompt
+  (not a direct build).
+- **Did:** researched the grounding conventions — CACHEDIR.TAG spec
+  (bford.info/cachedir), pytest/mypy self-tagging cache dirs (.gitignore +
+  CACHEDIR.TAG written into their own dir), Husky's committed `.husky/`
+  (consumer-edited code in a committed dotdir), PEP 518's `[tool.*]`
+  opaque-table pattern. Ran the debate gate: the naive "typed CDP keys in
+  config.py" design was BLOCKED (couples core to one middleware's
+  vocabulary, against the adapter cap's spirit) and replaced with an
+  opaque `[sources.url.config]` table passed verbatim to a new optional
+  `configure(config)` hook. Decided layout: committed planes `index/`,
+  `sources/`, `middleware/` vs derived `runtime/`, `cache/` (reserved for
+  M2/M4, CACHEDIR.TAG-tagged), self-describing write-if-missing
+  `.fux/README.md`, `.fux/.gitignore` that lists ONLY derived dirs, and
+  two new doctor checks. Wrote the pair:
+  `handoff/v0.31.0-fux-dir-layout-handoff.md` +
+  `…-prompt.md` (**Sonnet** — closed design, test-verifiable DoD).
+  A working reference implementation of the urls-file half exists in this
+  session (all tests green) but was deliberately NOT committed — the
+  handoff is the spec of record and Claude Code executes it clean.
+- **Decided / open:** urls file = `.fux/sources/urls`, one per line,
+  line-numbered loud errors; middleware = `.fux/middleware/cdp.py`
+  (git mv); no back-compat for the hours-old root placement. ADR-0011
+  will record the layout; ADR-0010 gets amended in place (still
+  proposed). Open (non-blocking): reserved dir names `runtime/`/`cache/`
+  are M2/M4's to rename; README generation at ingest vs doctor --fix.
+- **Next:** Arpit pastes the prompt into Claude Code (Sonnet) and runs
+  the build; ratifies ADR-0010 + ADR-0011 after.
+
+## 2026-08-10 — URL source via consumer middleware (CDP template); ADR-0010 proposed  ·  Cowork
+- **Asked:** (1) a file the package consumer can edit to connect to Chrome
+  DevTools Protocol, used by fux to ingest URLs — "something like a
+  middleware"; (2) why the committed index is many small JSONL files
+  (answered in-chat: fixed-256 id-hash sharding per ADR-0004; ~60 docs →
+  ~60 occupied shards of header + 1 record; by design, amortizes at scale).
+- **Did:** built the consumer-middleware URL source, fully wired.
+  `fux.toml [sources.url] middleware/urls/meta` → `ingest/urlsrc.py` loads
+  the consumer's file (`fetch(url)->str` required, `connect`/`close`
+  optional) — **only** under the new `fux ingest --refresh-urls`; a plain
+  ingest carries `url:` records forward byte-identically (offline law +
+  the writer's implicit-deletion rule). Records: `src:"url"`,
+  `meta:"hashed"` **default** (first exercise of the non-git law;
+  `title_h = term_hash(title)`, decided here), `"plain"` per-source
+  opt-in. Failed fetch keeps the prior record; deconfigured URLs
+  reconcile only on refresh. Edges: absolute http(s) links now resolve to
+  in-corpus `url:` docs; `code`-span basenames stay file-only. Shipped
+  `cdp_middleware.py` (repo root, consumer-owned): CDP over hand-rolled
+  RFC 6455 WebSocket + deterministic HTML→markdown, ported from
+  `archive/v0.26/src/fux/ingest/{ws,cdp,htmlmd}.py` (the accepted
+  2026-07-21 `render="cdp"` path). Core still has zero network code/deps.
+  Tests: `tests/ingest/test_urlsrc.py` (15, all offline via fake
+  middleware) + `test_cdp_middleware.py` (9: RFC 6455 vectors/round-trips,
+  html→md) — suite green.
+- **Decided / open:** ADR-0010 **proposed** (Arpit directed the build in
+  session; he ratifies). Numbered 0010 because OPEN-WORK DoDs already cite
+  0005–0009 for M2–M6. Adapter cap intact — core ships a generic
+  middleware hook, not a URL adapter; all network lives in the consumer's
+  file. Owed: GLOSSARY terms, M4 refer-plane fetch path for `src:"url"`.
+- **Next:** Arpit ratifies ADR-0010; optionally uncomment `[sources.url]`
+  in `fux.toml` and dogfood a real page via `fux ingest --refresh-urls`.
+
 ## 2026-08-11 — M0+M1 committed, pushed, and released as v0.30.0  ·  Claude Code
 - **Asked:** commit everything from the M0+M1 build session, push, and
   publish a new version.

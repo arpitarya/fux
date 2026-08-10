@@ -10,6 +10,10 @@ at answer time.**
 > fux ingest              # builds the committed .fux/index/*.jsonl
 > fux ask "your question" # scans it, ranks with BM25F, cites the source file
 > ```
+> URLs can join the corpus through a consumer-owned middleware file
+> (`.fux/middleware/cdp.py`, Chrome DevTools Protocol on pure stdlib) —
+> list them one per line in `.fux/sources/urls`, then
+> `fux ingest --refresh-urls`. ADR-0010 + ADR-0011 (both proposed).
 > No accelerator yet (scan-only, ~100–200 ms class queries — correct M1
 > behavior, not a bug) and no dense/graph query lanes (M2/M3). The v0.26
 > engine and its docs are archived under
@@ -41,6 +45,24 @@ at answer time.**
   cites straight from the committed index.)
 - **Laws:** $0 default · stdlib-only · byte-deterministic · offline by
   default · one ADR per feature, every rule referenced.
+
+## The `.fux/` directory
+
+Everything fux puts in your repo lives here, and every child is declared as
+**committed** or **derived** ([ADR-0011](docs/adr/0011-fux-dir-layout.md)):
+
+| entry | kind | what it is |
+|---|---|---|
+| `index/` | committed | the sharded JSONL index |
+| `sources/` | committed | line-oriented source lists (`urls`) |
+| `middleware/` | committed | **your** code (`cdp.py`) — fux never rewrites it |
+| `runtime/` | derived | M2's accelerator segments (gitignored, `CACHEDIR.TAG`) |
+| `cache/` | derived | M4's fetch cache (gitignored, `CACHEDIR.TAG`) |
+
+Fux writes `.fux/README.md` and a narrow `.fux/.gitignore` (derived names
+only, never `*`) if they are missing, and never touches them again. `fux
+doctor` fails if the index has been git-ignored and warns about anything
+undeclared.
 
 ## Reading order
 

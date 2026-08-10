@@ -1,5 +1,5 @@
-"""The ingest plane — git-dir adapter, `extracted`-mode extractors, and the
-`fux ingest` CLI handler. See `run.py` for the orchestration."""
+"""The ingest plane — git-dir adapter, consumer URL middleware, `extracted`-mode
+extractors, and the `fux ingest` CLI handler. See `run.py` for the orchestration."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ def cmd_ingest(args) -> int:
             print(f"{s.rel_path}: {s.reason}")
         return 0
 
-    report = run(root)
+    report = run(root, refresh_urls=getattr(args, "refresh_urls", False))
     print(
         f"ingested {report.doc_count} docs ({report.changed_count} changed), "
         f"{len(report.skipped)} skipped, {len(report.written_shards)} shards written"

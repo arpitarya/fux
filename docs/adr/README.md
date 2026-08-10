@@ -14,6 +14,9 @@ live doc means this directory.
 | [0003](0003-pruning-criterion-rerun.md) | P1 re-run — **FAIL**; option E (full postings) accepted by Arpit in session | accepted |
 | [0004](0004-index-format.md) | Index format & committed store — schema, canonical rules, unicode policy frozen | accepted |
 | 0005 | Derived accelerator & differential law (M2) | planned |
+| 0006–0009 | Reserved: M3 graph · M4 refer · M5 maintenance · M6 scale (numbers already cited by OPEN-WORK DoDs) | planned |
+| [0010](0010-url-source-consumer-middleware.md) | URL source via consumer-owned middleware (CDP template) — `src:"url"`, hashed-meta default, offline carry-forward · **amended by 0011** | ⏳ proposed (Arpit ratifies) |
+| [0011](0011-fux-dir-layout.md) | The `.fux/` directory — declared committed vs derived planes, `.fux/sources/urls`, `.fux/middleware/cdp.py`, opaque `[sources.url.config]`, doctor checks | ⏳ proposed (Arpit ratifies) |
 
 Renumbering note (2026-08-09): these files previously carried numbers
 0016–0018 continuing the v0.26 sequence; all live references were rewritten

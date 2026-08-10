@@ -6,6 +6,51 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
+## [Unreleased]
+
+### Added
+
+- **The `.fux/` directory is a declared layout**
+  ([ADR-0011](docs/adr/0011-fux-dir-layout.md), ⏳ proposed): every child is
+  committed (`index/`, `sources/`, `middleware/`) or derived (`runtime/`,
+  `cache/`). Ingest writes a self-describing `.fux/README.md` and a narrow
+  `.fux/.gitignore` — derived names only, **never `*`** — both
+  write-if-missing so consumer edits survive. `derived_dir()` drops a
+  spec-exact `CACHEDIR.TAG` for M2/M4 to use. `fux doctor` gains two checks:
+  the committed index must not be git-ignored (error), and undeclared
+  top-level `.fux/` entries are reported (warning).
+- **URL source via consumer-owned middleware**
+  ([ADR-0010](docs/adr/0010-url-source-consumer-middleware.md), ⏳ proposed):
+  `fux.toml [sources.url]` names a consumer-editable Python file
+  (`middleware`, `urls_file`, `meta`); `fux ingest --refresh-urls` — the only
+  networked ingest path — calls its `fetch(url) -> str` and indexes the
+  result as `src:"url"`. Hashed meta by default (`title_h`, the non-git
+  law's first exercise); plain ingest stays offline and carries `url:`
+  records forward byte-identically; a failed fetch keeps the prior record.
+  Absolute http(s) links now resolve to in-corpus `url:` docs as `ref`
+  edges. Core gains no network code and no dependencies.
+- `.fux/middleware/cdp.py` — the shipped, consumer-owned template: Chrome
+  DevTools Protocol capture over a hand-rolled RFC 6455 WebSocket +
+  deterministic HTML→markdown, pure stdlib, ported from the archived
+  v0.26 `render = "cdp"` path (never bundles a browser). Its constants are
+  defaults, overridable from `fux.toml` via the new optional
+  `configure(config)` hook.
+
+### Changed
+
+- The URL list moved out of `fux.toml` into **`.fux/sources/urls`** — one URL
+  per line, `#` comments allowed, deduped and sorted before fetching, with
+  line-numbered errors on a bad scheme. An inline `urls = [...]` key is now a
+  hard error pointing at the file. The middleware moved from the repo root to
+  `.fux/middleware/cdp.py`. Both are breaking changes against an unreleased,
+  hours-old surface, so no shims exist ([ADR-0011](docs/adr/0011-fux-dir-layout.md)).
+- Middleware tunables now live in an optional **`[sources.url.config]`** table
+  passed verbatim to `configure(config)`. Fux validates only that it is a
+  table and never reads a key inside it — the PEP 518 `[tool.*]` discipline,
+  which keeps one middleware's vocabulary out of fux's config schema.
+- The repo's own `.gitignore` no longer blanket-ignores `.fux/*`; the narrow
+  `.fux/.gitignore` carries the derived names instead.
+
 ## [0.30.0] - 2026-08-11
 
 M0 scaffold + M1 T0 slice — the first real code of the v0.30 rebuild.

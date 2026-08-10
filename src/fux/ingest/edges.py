@@ -76,8 +76,16 @@ def resolve(doc_id: str, doc_scan: DocScan, known_ids: set[str], by_basename: di
 
 def _resolve_ref(doc_id: str, target: str, known_ids: set[str]) -> str | None:
     target = target.split("#", 1)[0].strip()
-    if not target or target.startswith(("http://", "https://", "mailto:", "tel:")):
+    if not target or target.startswith(("mailto:", "tel:")):
         return None
+    if target.startswith(("http://", "https://")):
+        # An absolute link resolves iff that exact URL is itself an ingested
+        # doc (ADR-0010); anything else is dangling and dropped, same rule
+        # as an unresolved path.
+        candidate_id = f"url:{target}"
+        return candidate_id if candidate_id in known_ids else None
+    if doc_id.startswith("url:"):
+        return None  # relative links inside fetched pages are not repo paths
     rel = doc_id.removeprefix("file:")
     if target.startswith("/"):
         candidate = target.lstrip("/")

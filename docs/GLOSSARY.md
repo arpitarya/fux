@@ -21,8 +21,10 @@ and the cap is a decision, not a backlog. MCP is the endgame and is parked as
 
 **ADR** — Architecture Decision Record. One per completed feature, in
 [`adr/`](adr/): decision, context, alternatives, consequences, references
-(required). Numbering **continues at 0016**; 0001–0015 belong to the archived
-engine and are cited by their archive path. See [CLAUDE.md](../CLAUDE.md).
+(required). Numbering **restarted at 0001** for the v0.30 rebuild (Arpit,
+2026-08-09); the archived engine's ADRs 0001–0015 live at
+[`archive/v0.26-docs/adr/`](../archive/v0.26-docs/adr/) and are always cited
+as "archived ADR-NNNN". See [CLAUDE.md](../CLAUDE.md), [adr/README](adr/README.md).
 
 **AI-assisted mode** — See [enriched mode](#enriched-mode).
 
@@ -76,6 +78,14 @@ question → same answer. No wall-clock output, no model in the maintenance
 path, sorted walks, stable serialization, no set-iteration-order dependence.
 The property behind goldens, merge safety, and the audit story.
 
+**Derived plane** — A child of the [`.fux` directory](#fux-directory) that is
+**rebuildable and gitignored**: `runtime/` (M2's accelerator segments) and
+`cache/` (M4's fetch cache). Each is created through `derived_dir()`, which
+drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/) so backup tools skip
+it, and each is named explicitly in `.fux/.gitignore`. Opposite of a
+*committed plane* (`index/`, `sources/`, `middleware/`). See
+[ADR-0011](adr/0011-fux-dir-layout.md).
+
 **Doc-id** — A document's integer identity inside the wire index, assigned in
 **ledger sort order**. Not an arbitrary counter: sort order clusters related
 documents, which is the compression lever the [BIC](#bic-binary-interpolative-coding)
@@ -120,6 +130,14 @@ archived *fidelity* vocabulary and is **not** a valid v0.30 mode value.
 structure, **no human relevance judgments** — see
 [pruning eval](#pruning-eval-the-gate) for how that is handled). The realistic
 two live in the fux-lab environment, generated deterministically from a seed.
+
+**`.fux` directory** — Fux's directory inside the consumer's repo. Every
+child is **declared** as committed or [derived](#derived-plane): `index/`
+(the wire index), `sources/` (line-oriented lists such as `urls`),
+`middleware/` (consumer-owned code) and two generated files — a
+self-describing `README.md` and a `.gitignore` naming **only** the derived
+dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
+doctor` warning. See [ADR-0011](adr/0011-fux-dir-layout.md).
 
 **Fux-lab** — The scratch measurement environment (`~/my_programs/fux-lab/`),
 one directory per corpus, each with its own venv, corpus and baselines. It
@@ -182,6 +200,16 @@ at which version* without holding any content, and its sort order defines
 **Locator** — The stable, source-system-native address of a document: a repo
 path + blob sha for git, a URL for HTTP, a page id + version for Confluence.
 What an [adapter](#adapter) needs to fetch the bytes back.
+
+**Middleware (URL)** — The **consumer's own** Python file, committed at
+`.fux/middleware/cdp.py`, that turns a URL into markdown. Fux imports it by
+path — only under `fux ingest --refresh-urls` — and calls
+`configure(config)` / `connect()` / `fetch(url)` / `close()`. Every socket in
+the system lives here, outside `src/fux/`, which is how the
+[`$0`](#0-the-zero-dollar-law) offline-by-default laws survive URL ingestion.
+Tunables arrive through the opaque `[sources.url.config]` table, never as
+typed keys in fux's schema. See [ADR-0010](adr/0010-url-source-consumer-middleware.md),
+[ADR-0011](adr/0011-fux-dir-layout.md).
 
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
 bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs).
@@ -263,6 +291,15 @@ the [wire format](#wire-format). See
 commits a machine-made Markdown copy with provenance frontmatter, for
 air-gap availability, PR-reviewed change tracking, or audit retention. The
 archived frontmatter parser's home in v0.30. Built at [M6](PLAN.md).
+
+**URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
+read from the committed `.fux/sources/urls` (one per line), fetched through
+the consumer's [middleware](#middleware-url), and indexed exactly like repo
+files with [hashed meta](#hashed-meta-meta--hashed) by default. Fux ships
+**no** URL adapter — the adapter cap is untouched, because the fetching code
+is the consumer's. Fetching happens only under `--refresh-urls`; a plain
+ingest carries every `url:` record forward byte-identically. See
+[ADR-0010](adr/0010-url-source-consumer-middleware.md).
 
 **Wire format** — The **committed** encoding of the index: BIC postings,
 4-bit impacts, front-coded columnar ledger, Elias-Fano offsets, delta-varint

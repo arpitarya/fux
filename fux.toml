@@ -4,6 +4,30 @@
 [sources]
 dirs = ["docs", "README.md", "CLAUDE.md"]
 
+# URL ingestion via YOUR middleware file (ADR-0010, relocated by ADR-0011).
+# Uncomment to use. Fetching only ever happens under `fux ingest
+# --refresh-urls` (offline by default), and `meta = "hashed"` (the non-git
+# default) applies unless you opt into "plain" for public content.
+#
+# The URL list is a FILE, one URL per line (`#` comments and blanks ignored) —
+# not a TOML array, so 5k entries diff and merge line by line. Both paths
+# below are the defaults; the keys are here to be seen, not to be required.
+#[sources.url]
+#middleware = ".fux/middleware/cdp.py"   # yours, committed, edit freely
+#urls_file  = ".fux/sources/urls"        # one URL per line
+#meta       = "hashed"
+
+# Middleware tunables. Fux passes this table to the middleware's optional
+# `configure(config)` VERBATIM and never reads a key inside it — the keys
+# below mean something to .fux/middleware/cdp.py, nothing to fux. Same
+# discipline as PEP 518's [tool.*] tables; it is what keeps one middleware's
+# vocabulary out of fux's config schema.
+#[sources.url.config]
+#cdp_port       = 9222
+#settle_ms      = 500
+#load_timeout_s = 30
+#launch_chrome  = true
+
 [index]
 # Fixed at 256 for M1 (shard = blake2b(id, digest_size=1) → 00..ff) — not yet
 # configurable; this key documents the value rather than setting it (ADR-0004).

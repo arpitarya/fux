@@ -10,11 +10,11 @@ venv/
 # macOS
 .DS_Store
 
-# Fux's own working dir — .fux/index/ is the committed artifact (unignore it
-# explicitly); everything else (derive/, refer/ cache, …) is gitignored from
-# day one so M2's accelerator can't leak in.
-.fux/*
-!.fux/index/
+# Fux's own directory is NOT blanket-ignored: index/, sources/, middleware/,
+# README.md and .gitignore are all committed (ADR-0011). The derived planes
+# are listed by name in .fux/.gitignore, which fux writes for us — a `.fux/*`
+# blanket here would silently drop a committed plane, which is exactly what
+# `fux doctor`'s check-ignore assertion exists to catch.
 .pytest_cache/
 *.egg-info/
 
