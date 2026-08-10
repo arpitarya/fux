@@ -29,8 +29,17 @@ diary.*
   reflect it; bumped `__version__` to `0.30.0` (dropping `.dev0` — the
   project's established per-milestone release cadence, matching how
   `0.22.0` shipped "the rebuild ships"); dated the CHANGELOG entry;
-  committed the whole M0+M1 build; pushed to `main`; cut `v0.30.0` via
-  `gh release create`, which fired the PyPI publish workflow.
+  committed the whole M0+M1 build (`c52948b`); pushed straight to `main`
+  (no PR gate — required status checks were removed 2026-07-22).
+  **CI caught a real bug**: `windows·py3.11`/`py3.14` went red —
+  `fux doctor` printed a Unicode checkmark that crashes on Windows'
+  default console codepage (`UnicodeEncodeError`, process exits 1 instead
+  of printing). Fixed (`83c1888`, ASCII `[OK]`/`[FAIL]` markers + a
+  `PYTHONIOENCODING=ascii` regression test), documented the catch in
+  ADR-0004 (`87543b1`), re-verified the full ubuntu+macos+windows matrix
+  green, then cut `v0.30.0` via `gh release create` → PyPI publish fired
+  and landed (confirmed live on the first poll — 165 tests, 3 commits
+  total this session).
 - **Decided / open:** the archive-convention follow-up (adding
   `archive/v0.26-docs` to `fux.toml` sources so R2-Q3 becomes literally
   satisfiable) is explicitly deferred to the next build turn, per
