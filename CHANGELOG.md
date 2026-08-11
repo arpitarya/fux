@@ -8,6 +8,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- **The frozen v0.19–0.26 documentation set is now an indexed source.**
+  `archive/v0.26-docs` joined `fux.toml`'s `[sources].dirs` (W-42). No engine
+  code changed. This closes **prediction R2 at 3/3 PASS** — the third frozen
+  question's citation target had never been reachable from configured
+  sources. Frozen means never *edited*; it does not mean unindexed.
+  - The committed index grows **+45.1 %** (942,479 → 1,367,888 raw bytes;
+    416,899 → 602,825 zlib) for +34 documents. Determinism holds: double
+    ingest is byte-identical.
+  - **Known consequence:** retired v0.26 documents now rank for questions
+    about the *current* engine — *"what is the ingest cache"* returns five
+    archived results describing a deleted subsystem. Measured post-hoc,
+    filed as [W-44](docs/open/W-44-archived-content-signalling.md), and
+    deliberately **not** fixed here; the mechanism is Arpit's call.
+    Full run: [`docs/conformance/2026-08-12-r2-close/`](docs/conformance/2026-08-12-r2-close/report.md).
+
 ### Removed
 
 - **`examples/` is gone** ([ADR-0012](docs/adr/0012-playground-sibling-repo.md)).

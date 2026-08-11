@@ -1,0 +1,108 @@
+### Q: why did pruning fail
+{
+  "results": [
+    {
+      "id": "file:docs/adr/0002-pruning-eval-gate.md",
+      "title": "ADR-0002: P1, the pruning-quality gate \u2014 INCONCLUSIVE, do not proceed",
+      "loc": "docs/adr/0002-pruning-eval-gate.md",
+      "score": 5.832804614974506
+    },
+    {
+      "id": "file:docs/adr/0003-pruning-criterion-rerun.md",
+      "title": "ADR-0003: P1 re-run \u2014 FAIL. Static pruning does not preserve candidate recall.",
+      "loc": "docs/adr/0003-pruning-criterion-rerun.md",
+      "score": 5.736421305631813
+    },
+    {
+      "id": "file:docs/conformance/2026-08-09-pruning-rerun/ANALYSIS.md",
+      "title": "ANALYSIS \u2014 M1-rerun, the pruning gate made decidable",
+      "loc": "docs/conformance/2026-08-09-pruning-rerun/ANALYSIS.md",
+      "score": 5.683948109501887
+    },
+    {
+      "id": "file:docs/compare/storage-architecture.compare.md",
+      "title": "Storage Architecture",
+      "loc": "docs/compare/storage-architecture.compare.md",
+      "score": 5.122514968095959
+    },
+    {
+      "id": "file:docs/WORKLOG.md",
+      "title": "Worklog \u2014 the running session handoff",
+      "loc": "docs/WORKLOG.md",
+      "score": 4.924336086551901
+    }
+  ]
+}
+
+### Q: what format is the committed index
+{
+  "results": [
+    {
+      "id": "file:README.md",
+      "title": "Fux",
+      "loc": "README.md",
+      "score": 3.4460449268756848
+    },
+    {
+      "id": "file:docs/compare/index-format.compare.md",
+      "title": "Index Format",
+      "loc": "docs/compare/index-format.compare.md",
+      "score": 3.4085294754318105
+    },
+    {
+      "id": "file:docs/handoff/v0.30.0-m1-t0-slice-handoff.md",
+      "title": "v0.30.0 M0+M1 \u2014 scaffold and the T0 vertical slice",
+      "loc": "docs/handoff/v0.30.0-m1-t0-slice-handoff.md",
+      "score": 3.3863377128646817
+    },
+    {
+      "id": "file:docs/GLOSSARY.md",
+      "title": "Glossary",
+      "loc": "docs/GLOSSARY.md",
+      "score": 3.319673490586429
+    },
+    {
+      "id": "file:docs/adr/0004-index-format.md",
+      "title": "ADR-0004: Index format & committed store \u2014 schema, canonical rules, unicode policy frozen",
+      "loc": "docs/adr/0004-index-format.md",
+      "score": 3.3191558100390948
+    }
+  ]
+}
+
+### Q: supersession penalty safe interval
+{
+  "results": [
+    {
+      "id": "file:docs/conformance/README.md",
+      "title": "Conformance runs \u2014 the measurement evidence index",
+      "loc": "docs/conformance/README.md",
+      "score": 14.122931880608432
+    },
+    {
+      "id": "file:docs/INTERVIEW.md",
+      "title": "Model handoff \u2014 the agent-succession record",
+      "loc": "docs/INTERVIEW.md",
+      "score": 13.279713439660505
+    },
+    {
+      "id": "file:docs/adr/0004-index-format.md",
+      "title": "ADR-0004: Index format & committed store \u2014 schema, canonical rules, unicode policy frozen",
+      "loc": "docs/adr/0004-index-format.md",
+      "score": 11.75053208451166
+    },
+    {
+      "id": "file:docs/handoff/v0.30.0-m1-t0-slice-handoff.md",
+      "title": "v0.30.0 M0+M1 \u2014 scaffold and the T0 vertical slice",
+      "loc": "docs/handoff/v0.30.0-m1-t0-slice-handoff.md",
+      "score": 9.05172805614833
+    },
+    {
+      "id": "file:docs/WORKLOG.md",
+      "title": "Worklog \u2014 the running session handoff",
+      "loc": "docs/WORKLOG.md",
+      "score": 5.2982640570863175
+    }
+  ]
+}
+

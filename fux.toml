@@ -2,7 +2,12 @@
 # From this directory:   fux ingest   →   fux ask "why did pruning fail"
 
 [sources]
-dirs = ["docs", "README.md", "CLAUDE.md"]
+# `archive/v0.26-docs` is the FROZEN v0.19–0.26 documentation set. It is in
+# scope on purpose (W-42): R2's third frozen question cites it, and the
+# retired engine's decisions are still the answer to real questions about
+# why this build looks the way it does. Frozen means never *edited* — it
+# does not mean unindexed. See ADR-0004 §Consequences.
+dirs = ["docs", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 
 # URL ingestion via YOUR middleware file (ADR-0010, relocated by ADR-0011).
 # Uncomment to use. Fetching only ever happens under `fux ingest

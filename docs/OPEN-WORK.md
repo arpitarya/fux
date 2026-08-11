@@ -10,8 +10,9 @@ blocking, or descoping ANY item updates this file **and** its detail file in
 the same change as the work.*
 
 **Where the build stands (2026-08-12):** M0+M1 shipped — `fux ingest` and
-`fux ask` work end to end on this repo, scan-only. R1 **PASS**, R2 **2/3
-PASS** ([W-42](open/W-42-close-r2-q3.md) closes the third). The pruning gate
+`fux ask` work end to end on this repo, scan-only. **R1 PASS · R2 3/3 PASS**
+(the third closed by W-42 on 2026-08-12 —
+[the run](conformance/2026-08-12-r2-close/report.md)). The pruning gate
 closed **FAIL**; the committed index carries full postings, permanently
 ([ADR-0003](adr/0003-pruning-criterion-rerun.md)). **[W-22](open/W-22-m2-t1-accelerator.md)
 (M2, the T1 accelerator) is next and nothing blocks it.**
@@ -35,22 +36,22 @@ is the spec; the detail file is the state.
 | W-31 | Ratify ADR-0010 + ADR-0011 — both built and shipped, still ⏳ proposed | OPEN·human | — | [W-31](open/W-31-ratify-adr-0010-0011.md) |
 | W-32 | Adopt or reject the CLAUDE.md rewrite; apply the `.fux/` layout line | OPEN·human | — | [W-32](open/W-32-claude-md-adoption.md) |
 | W-33 | Resolve the ADR-numbering contradiction (CLAUDE.md "0016" vs adr/README "0001") | OPEN·human | — | [W-33](open/W-33-adr-numbering-contradiction.md) |
-| W-42 | Close R2-Q3 — add `archive/v0.26-docs` to `fux.toml` sources, re-ingest, re-run the frozen questions | OPEN | — | [W-42](open/W-42-close-r2-q3.md) |
+| W-44 | Decide how retired content is signalled — the v0.26 doc set now answers questions about the *current* engine | OPEN·human | — | [W-44](open/W-44-archived-content-signalling.md) |
 | W-38 | M8 · the deferred set — one ADR + Arpit sign-off each; **pruning work is forbidden outside this item** | PARKED | W-26 | [W-38](open/W-38-m8-deferred.md) |
 
 ## Predictions still unmeasured
 
 | id | prediction | threshold | measured at |
 |----|-----------|-----------|-------------|
-| R2 | T0 answers real repo questions | 3 frozen questions, correct citations, cold clone | **2/3** — third closes with [W-42](open/W-42-close-r2-q3.md) |
 | R3 | warm `ask` on the RFC corpus | ≤ 150 ms, worst common terms included | W-22 |
 | R4 | refer plane | cold k=10 ≤ 3 s / warm ≤ 300 ms | W-24 |
 | R5 | 20-doc commit re-index | < 1 s via hook | W-25 |
 | R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
 | R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
 
-R1 **PASS**. P1 **FAIL** (option E, full postings); P2–P7 retired with plan
-revision 1 — their successors are R3–R7.
+R1 **PASS**. **R2 PASS 3/3** (2026-08-12, cold tree — [run](conformance/2026-08-12-r2-close/report.md)).
+P1 **FAIL** (option E, full postings); P2–P7 retired with plan revision 1 —
+their successors are R3–R7.
 
 ## Standing obligations (every session)
 

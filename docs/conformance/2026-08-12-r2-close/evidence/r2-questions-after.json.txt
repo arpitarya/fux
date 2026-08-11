@@ -1,0 +1,108 @@
+### Q: why did pruning fail
+{
+  "results": [
+    {
+      "id": "file:docs/adr/0002-pruning-eval-gate.md",
+      "title": "ADR-0002: P1, the pruning-quality gate \u2014 INCONCLUSIVE, do not proceed",
+      "loc": "docs/adr/0002-pruning-eval-gate.md",
+      "score": 6.8445526140772195
+    },
+    {
+      "id": "file:docs/adr/0003-pruning-criterion-rerun.md",
+      "title": "ADR-0003: P1 re-run \u2014 FAIL. Static pruning does not preserve candidate recall.",
+      "loc": "docs/adr/0003-pruning-criterion-rerun.md",
+      "score": 6.756458601062429
+    },
+    {
+      "id": "file:docs/conformance/2026-08-09-pruning-rerun/ANALYSIS.md",
+      "title": "ANALYSIS \u2014 M1-rerun, the pruning gate made decidable",
+      "loc": "docs/conformance/2026-08-09-pruning-rerun/ANALYSIS.md",
+      "score": 6.63343881155538
+    },
+    {
+      "id": "file:docs/compare/storage-architecture.compare.md",
+      "title": "Storage Architecture",
+      "loc": "docs/compare/storage-architecture.compare.md",
+      "score": 6.007254185567184
+    },
+    {
+      "id": "file:docs/archive/v0.30.0-m1-t0-slice-handoff.md",
+      "title": "v0.30.0 M0+M1 \u2014 scaffold and the T0 vertical slice",
+      "loc": "docs/archive/v0.30.0-m1-t0-slice-handoff.md",
+      "score": 5.412677792627763
+    }
+  ]
+}
+
+### Q: what format is the committed index
+{
+  "results": [
+    {
+      "id": "file:README.md",
+      "title": "Fux",
+      "loc": "README.md",
+      "score": 3.8130558804024584
+    },
+    {
+      "id": "file:docs/compare/index-format.compare.md",
+      "title": "Index Format",
+      "loc": "docs/compare/index-format.compare.md",
+      "score": 3.752206178313533
+    },
+    {
+      "id": "file:docs/archive/v0.30.0-m1-t0-slice-handoff.md",
+      "title": "v0.30.0 M0+M1 \u2014 scaffold and the T0 vertical slice",
+      "loc": "docs/archive/v0.30.0-m1-t0-slice-handoff.md",
+      "score": 3.713901084956129
+    },
+    {
+      "id": "file:docs/adr/0004-index-format.md",
+      "title": "ADR-0004: Index format & committed store \u2014 schema, canonical rules, unicode policy frozen",
+      "loc": "docs/adr/0004-index-format.md",
+      "score": 3.6325013582113406
+    },
+    {
+      "id": "file:docs/GLOSSARY.md",
+      "title": "Glossary",
+      "loc": "docs/GLOSSARY.md",
+      "score": 3.6310071322829462
+    }
+  ]
+}
+
+### Q: supersession penalty safe interval
+{
+  "results": [
+    {
+      "id": "file:archive/v0.26-docs/compare/supersession-handling.compare.md",
+      "title": "Supersession Handling",
+      "loc": "archive/v0.26-docs/compare/supersession-handling.compare.md",
+      "score": 14.903746325756156
+    },
+    {
+      "id": "file:archive/v0.26-docs/adr/0015-supersession-downrank-penalty.md",
+      "title": "Supersession down-rank penalty",
+      "loc": "archive/v0.26-docs/adr/0015-supersession-downrank-penalty.md",
+      "score": 12.787121692379078
+    },
+    {
+      "id": "file:docs/conformance/README.md",
+      "title": "Conformance runs \u2014 the measurement evidence index",
+      "loc": "docs/conformance/README.md",
+      "score": 11.916661091352738
+    },
+    {
+      "id": "file:archive/v0.26-docs/compare/README.md",
+      "title": "Compare docs",
+      "loc": "archive/v0.26-docs/compare/README.md",
+      "score": 11.302967996417662
+    },
+    {
+      "id": "file:archive/v0.26-docs/compare/answer-decline-floor.compare.md",
+      "title": "Answer Decline Floor",
+      "loc": "archive/v0.26-docs/compare/answer-decline-floor.compare.md",
+      "score": 10.942093410196497
+    }
+  ]
+}
+

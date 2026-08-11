@@ -184,7 +184,14 @@ cat-file`).
      (`docs/compare/index-format.compare.md` ranked #9, behind
      `docs/GLOSSARY.md`'s dictionary-style term repetition). Fixed by adding
      stopword filtering to the tokenizer (see Decision); re-verified after
-     the fix — now #1. **PASS, after a measured fix.**
+     the fix — **#1 as of 2026-08-10**. **PASS, after a measured fix.**
+     **Re-measured 2026-08-12: #2**, behind `README.md`, which gained a
+     `.fux/` layout table in the interim (ADR-0011). Still a PASS — the
+     frozen bar is that the answer cites the document, and the recorded
+     failure mode was falling out of the top 5. A recorded rank is a
+     snapshot of a corpus at a date, not a property of the engine; read it
+     with its date attached. See
+     [`../conformance/2026-08-12-r2-close/`](../conformance/2026-08-12-r2-close/report.md).
   3. `"supersession penalty safe interval"` → the frozen citation target,
      `archive/v0.26-docs/…`, **does not exist**. This is not a defect
      introduced by this build: the (since-removed) `docs/archive/README.md`
@@ -200,6 +207,17 @@ cat-file`).
      set as part of this change — that move was Arpit's open call, out of
      scope for a schema-and-store ADR to resolve unilaterally.
      **[Resolved 2026-08-10 — Arpit's ruling: everything archived lives in the root `archive/`; there is no `docs/archive/`. The v0.26 doc set now sits at `archive/v0.26-docs/`, the nested double-archive is flattened, and the flagged discrepancy is closed.]**
+
+     **[CLOSED 2026-08-12 — W-42. PASS.]** `archive/v0.26-docs` was added to
+     `fux.toml`'s `[sources].dirs`; nothing in `src/fux/` changed. Re-run from
+     a cold tree, the frozen target now ranks **#2**, behind
+     `archive/v0.26-docs/compare/supersession-handling.compare.md` — also from
+     the archived-docs shard, and carrying the same `[11, ∞)` interval.
+     **R2 is 3/3 PASS.** R1 re-asserted (double-ingest byte-identical); the
+     committed index grew **+45.1 %** (942,479 → 1,367,888 raw bytes) for
+     +34 documents. A post-hoc probe found retired v0.26 docs also answering
+     questions about the *current* engine — filed as W-44, not fixed here.
+     Full run: [`../conformance/2026-08-12-r2-close/`](../conformance/2026-08-12-r2-close/report.md).
 - **Playground walkthrough** (`examples/playground/`): all three
   `PLAYGROUND.md` questions answer with on-topic citations from the real
   index; the retry-budget superseded pair (ADR-0002/ADR-0005) both surface

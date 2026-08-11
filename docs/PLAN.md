@@ -198,7 +198,7 @@ codec inside T2 · MCP adapters · knowledge-CI · wavelet self-index note.
 | id | prediction | threshold | measured at |
 |---|---|---|---|
 | R1 | canonical writer is byte-deterministic | double-ingest sha-identical, two environments | M1 |
-| R2 | T0 slice answers real questions on this repo | cited answer from a cold clone, no accelerator | M1 |
+| R2 | T0 slice answers real questions on this repo | cited answer from a cold clone, no accelerator | M1 — **3/3 PASS** 2026-08-12 ([run](conformance/2026-08-12-r2-close/report.md)) |
 | R3 | warm `ask` ≤ 150 ms on the RFC corpus, worst-case terms included | bench | M2 |
 | R4 | refer plane: cold k=10 ≤ 3 s, warm ≤ 300 ms | mock bench | M4 |
 | R5 | 20-doc commit re-indexes < 1 s via hooks | bench | M5 |

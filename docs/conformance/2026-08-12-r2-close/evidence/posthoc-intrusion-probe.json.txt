@@ -1,0 +1,180 @@
+### Q: how do I configure sources
+{
+  "results": [
+    {
+      "id": "file:docs/archive/v0.31.0-fux-dir-layout-handoff.md",
+      "title": "v0.31.0 \u2014 the .fux directory defined + URL source moves in",
+      "loc": "docs/archive/v0.31.0-fux-dir-layout-handoff.md",
+      "score": 8.278104985710605
+    },
+    {
+      "id": "file:docs/archive/v0.31.0-fux-dir-layout-prompt.md",
+      "title": "v0.31.0 \u2014 Claude Code prompt (.fux layout + URL source move)",
+      "loc": "docs/archive/v0.31.0-fux-dir-layout-prompt.md",
+      "score": 7.774694411302166
+    },
+    {
+      "id": "file:docs/adr/0010-url-source-consumer-middleware.md",
+      "title": "ADR-0010: URL source via consumer-owned middleware (CDP template)",
+      "loc": "docs/adr/0010-url-source-consumer-middleware.md",
+      "score": 5.577772295408442
+    },
+    {
+      "id": "file:archive/v0.26-docs/compare/answer-decline-floor.compare.md",
+      "title": "Answer Decline Floor",
+      "loc": "archive/v0.26-docs/compare/answer-decline-floor.compare.md",
+      "score": 5.283795818956678
+    },
+    {
+      "id": "file:docs/adr/0011-fux-dir-layout.md",
+      "title": "ADR-0011: the .fux directory \u2014 declared layout, committed vs derived",
+      "loc": "docs/adr/0011-fux-dir-layout.md",
+      "score": 4.541803087646203
+    }
+  ]
+}
+
+### Q: what does fux doctor check
+{
+  "results": [
+    {
+      "id": "file:archive/v0.26-docs/adr/0012-debug-observability.md",
+      "title": "ADR-0012 \u2014 Debug & observability ([debug], fux doctor, fux why, fux-debug skill)",
+      "loc": "archive/v0.26-docs/adr/0012-debug-observability.md",
+      "score": 6.724966925932192
+    },
+    {
+      "id": "file:archive/v0.26-docs/example/SKILLS.md",
+      "title": "Skill usage \u2014 worked examples",
+      "loc": "archive/v0.26-docs/example/SKILLS.md",
+      "score": 6.514415399898816
+    },
+    {
+      "id": "file:archive/v0.26-docs/example/DEBUG.md",
+      "title": "Debug & observability \u2014 worked failures, diagnosis, fixes",
+      "loc": "archive/v0.26-docs/example/DEBUG.md",
+      "score": 6.425997516921285
+    },
+    {
+      "id": "file:docs/archive/v0.30.0-m1-t0-slice-prompt.md",
+      "title": "v0.30.0 M0+M1 \u2014 Claude Code prompt (scaffold + T0 slice)",
+      "loc": "docs/archive/v0.30.0-m1-t0-slice-prompt.md",
+      "score": 5.631088017033616
+    },
+    {
+      "id": "file:docs/archive/v0.31.0-fux-dir-layout-handoff.md",
+      "title": "v0.31.0 \u2014 the .fux directory defined + URL source moves in",
+      "loc": "docs/archive/v0.31.0-fux-dir-layout-handoff.md",
+      "score": 5.6200004567642985
+    }
+  ]
+}
+
+### Q: how does BM25F weighting work
+{
+  "results": [
+    {
+      "id": "file:archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+      "title": "ADR-0008 \u2014 SQLite substrate, fux.lock, and the committed state plane",
+      "loc": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+      "score": 7.881680506594707
+    },
+    {
+      "id": "file:archive/v0.26-docs/compare/query-engine.compare.md",
+      "title": "Query Engine",
+      "loc": "archive/v0.26-docs/compare/query-engine.compare.md",
+      "score": 6.62633549012555
+    },
+    {
+      "id": "file:docs/archive/v0.31.0-fux-playground-extraction-handoff.md",
+      "title": "v0.31.0 \u2014 extract the playground into a sibling repo (fux-playground)",
+      "loc": "docs/archive/v0.31.0-fux-playground-extraction-handoff.md",
+      "score": 5.710785228870213
+    },
+    {
+      "id": "file:docs/compare/pruning-criterion.compare.md",
+      "title": "Pruning Criterion",
+      "loc": "docs/compare/pruning-criterion.compare.md",
+      "score": 5.3056029680920025
+    },
+    {
+      "id": "file:docs/INTERVIEW.md",
+      "title": "Model handoff \u2014 the agent-succession record",
+      "loc": "docs/INTERVIEW.md",
+      "score": 4.4910745177519695
+    }
+  ]
+}
+
+### Q: what is the committed index layout
+{
+  "results": [
+    {
+      "id": "file:docs/adr/0011-fux-dir-layout.md",
+      "title": "ADR-0011: the .fux directory \u2014 declared layout, committed vs derived",
+      "loc": "docs/adr/0011-fux-dir-layout.md",
+      "score": 4.764001610219742
+    },
+    {
+      "id": "file:docs/archive/v0.31.0-fux-dir-layout-handoff.md",
+      "title": "v0.31.0 \u2014 the .fux directory defined + URL source moves in",
+      "loc": "docs/archive/v0.31.0-fux-dir-layout-handoff.md",
+      "score": 4.648165237191894
+    },
+    {
+      "id": "file:docs/handoff/v0.31.0-claude-md-layout.diff",
+      "title": "v0.31.0-claude-md-layout.diff",
+      "loc": "docs/handoff/v0.31.0-claude-md-layout.diff",
+      "score": 4.565474000024879
+    },
+    {
+      "id": "file:docs/open/W-31-ratify-adr-0010-0011.md",
+      "title": "W-31 \u2014 Ratify ADR-0010 and ADR-0011",
+      "loc": "docs/open/W-31-ratify-adr-0010-0011.md",
+      "score": 4.378568143217408
+    },
+    {
+      "id": "file:docs/archive/README.md",
+      "title": "`docs/archive/` \u2014 completed doc artifacts",
+      "loc": "docs/archive/README.md",
+      "score": 4.336907036129134
+    }
+  ]
+}
+
+### Q: what is the ingest cache
+{
+  "results": [
+    {
+      "id": "file:archive/v0.26-docs/adr/0002-ingest-cache-chunker.md",
+      "title": "ADR-0002 \u2014 inferred-tier ingest, OKF cache, deterministic provenance, heading chunker",
+      "loc": "archive/v0.26-docs/adr/0002-ingest-cache-chunker.md",
+      "score": 2.9670337753516476
+    },
+    {
+      "id": "file:archive/v0.26-docs/example/SKILLS.md",
+      "title": "Skill usage \u2014 worked examples",
+      "loc": "archive/v0.26-docs/example/SKILLS.md",
+      "score": 2.924487117048857
+    },
+    {
+      "id": "file:archive/v0.26-docs/compare/ingest-strategy.compare.md",
+      "title": "Ingest Strategy",
+      "loc": "archive/v0.26-docs/compare/ingest-strategy.compare.md",
+      "score": 2.905444296266204
+    },
+    {
+      "id": "file:archive/v0.26-docs/example/API.md",
+      "title": "Python API \u2014 create a file in the corpus from a script",
+      "loc": "archive/v0.26-docs/example/API.md",
+      "score": 2.8672705434013577
+    },
+    {
+      "id": "file:archive/v0.26-docs/example/CLI.md",
+      "title": "CLI examples \u2014 the input/output contract",
+      "loc": "archive/v0.26-docs/example/CLI.md",
+      "score": 2.807602070973874
+    }
+  ]
+}
+

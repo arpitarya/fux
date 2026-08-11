@@ -31,6 +31,7 @@ be regenerated is an anecdote.
 
 | date | run | corpus | what it established |
 |---|---|---|---|
+| 2026-08-12 | [`2026-08-12-r2-close`](2026-08-12-r2-close/report.md) | **this repo** (119 docs) | **R2 → 3/3 PASS.** The third frozen question's citation became reachable by adding `archive/v0.26-docs` to configured sources; R1 re-asserted; index +45.1 %. Post-hoc: retired v0.26 docs now answer questions about the *current* engine ([W-44](../open/W-44-archived-content-signalling.md)) |
 | 2026-08-09 | [`2026-08-09-pruning-rerun`](2026-08-09-pruning-rerun/) | **rfc** (8 872 docs) · repodocs | **P1 re-run → FAIL.** 5 selectors at matched retention, gated on recall@20: best arm 35.9 pts below unpruned at 6 % retention. [ADR-0003](../adr/0003-pruning-criterion-rerun.md) |
 | 2026-08-09 | [`2026-08-09-pruning-eval`](2026-08-09-pruning-eval/) | acme · orbit · synth-100k | **M1, the P1 gate → INCONCLUSIVE.** The corpora's documents were too short for top-128 to prune anything. [ADR-0002](../adr/0002-pruning-eval-gate.md) |
 
