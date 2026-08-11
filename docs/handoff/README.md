@@ -28,9 +28,13 @@ Root `archive/` is a different archive: it holds **old builds** (`v0.26/`,
 | [`v0.30.0-claude-md.diff`](v0.30.0-claude-md.diff) | the M0a `CLAUDE.md` rewrite (48 KB) | [W-32](../open/W-32-claude-md-adoption.md) |
 | [`v0.30.0-m1-claude-md-build-test.diff`](v0.30.0-m1-claude-md-build-test.diff) | `CLAUDE.md` §Build & test, once `src/` existed | [W-32](../open/W-32-claude-md-adoption.md) |
 | [`v0.31.0-claude-md-layout.diff`](v0.31.0-claude-md-layout.diff) | the four-line `.fux/` addition to §Layout | [W-31](../open/W-31-ratify-adr-0010-0011.md) · [W-32](../open/W-32-claude-md-adoption.md) |
+| [`v0.32.0-adr-numbering.diff`](v0.32.0-adr-numbering.diff) | `adr/README.md` becomes the single owner of the numbering policy; `CLAUDE.md` points at it instead of restating "0016" | [W-33](../open/W-33-adr-numbering-contradiction.md) |
 
-All four decisions are packaged for a single sitting in
-[`v0.32.0-ratification-package.md`](v0.32.0-ratification-package.md).
+All five decisions are packaged for a single sitting in
+[`v0.32.0-ratification-package.md`](v0.32.0-ratification-package.md) —
+which also corrects two things the tracker had wrong: there is no
+`CLAUDE.md.proposed` (the rewrite is already the live file), and ADR-0010 /
+ADR-0011 are **shipped code** sitting under unratified decisions.
 
 ## Executed pairs — where they went
 

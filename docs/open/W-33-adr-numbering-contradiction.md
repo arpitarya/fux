@@ -18,6 +18,18 @@ ADR-0012 took the next free number under that policy. `CLAUDE.md` was
 deliberately **not** edited to match a choice recorded elsewhere, because a
 convention is Arpit's to set, not a builder's to assume.
 
+## Prepared (2026-08-12) — the fix is a diff, waiting on the call
+
+Both readings, their consequences, and a **recommendation of A** (restart at
+0001) are written up in
+[`handoff/v0.32.0-ratification-package.md`](../handoff/v0.32.0-ratification-package.md)
+§Decision 5. The change itself is
+[`handoff/v0.32.0-adr-numbering.diff`](../handoff/v0.32.0-adr-numbering.diff)
+— verified to apply cleanly to the live tree. It covers both `CLAUDE.md`
+lines and replaces this file's "Unresolved for Arpit" block.
+
+`CLAUDE.md` was not edited in place: law 7.
+
 ## Definition of done
 
 - [ ] One policy stated in one place; the other document references it

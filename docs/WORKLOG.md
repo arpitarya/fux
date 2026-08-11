@@ -19,6 +19,45 @@ diary.*
 
 ---
 
+## 2026-08-12 — Phase 0 of the open-items program: the backlog clears  ·  Claude Code
+- **Asked:** execute Phase 0 of `handoff/v0.32.0-open-items-handoff.md` — W-43,
+  W-33, W-42, and the W-30/31/32 ratification package — then stop before M2.
+- **Did:** four commits.
+  1. Committed the prior session's uncommitted restructure as its own unit
+     (a stale zero-byte `.git/index.lock` with no owning process had to be
+     removed first).
+  2. **W-43 closed.** Both executed pairs moved to `docs/archive/` stamped
+     `status: implemented` + ADR link (the fux-playground pair still said
+     "proposed"). Both READMEs reconciled; the two-archives distinction is now
+     a table. Fixed the third stale claim: the M1-T0-slice banner asserted
+     Arpit's ruling sent executed pairs to the *root* archive — that ruling
+     scoped the v0.26 doc set. `docs/handoff/` now lists live work only.
+  3. **W-42 closed — R2 is 3/3 PASS.** One line of `fux.toml`; no engine code.
+     Q3's frozen target ranks #2 from a cold tree behind another archived hit
+     carrying the same `[11, ∞)` interval. R1 re-asserted (double-ingest
+     byte-identical). Index +45.1 % (942,479 → 1,367,888 raw) for +34 docs.
+     Filed as `conformance/2026-08-12-r2-close/`.
+  4. **W-33 + the ratification package.** `handoff/v0.32.0-adr-numbering.diff`
+     (verified to apply) plus `handoff/v0.32.0-ratification-package.md` —
+     five decisions, each answerable without reading anything else.
+- **Decided / open:** three findings the handoff did not anticipate.
+  **(a)** A post-hoc probe shows the newly-indexed v0.26 doc set answering
+  questions about the *current* engine — *"what is the ingest cache"* returns
+  5/5 archived results describing a subsystem CLAUDE.md forbids porting back.
+  Filed as **W-44** with three options and a recommended *shape* (annotate,
+  never reorder); **not fixed** — five hand-picked probes on one corpus is not
+  grounds to ship a ranking change. **(b)** `CLAUDE.md.proposed` does not
+  exist; the rewrite has been the live file since `3892c55`, so "adopt" means
+  deleting a header and "reject" means reverting ~800 lines every session has
+  followed. W-32's DoD was corrected. **(c)** ADR-0004's recorded "#1" for
+  R2-Q2 is "#2" today, caused by README.md growing a `.fux/` table — the ADR
+  now dates its ranks. **Recommendation on W-33: reading A** (restart at
+  0001); the defect is that the policy is written in two places, not which
+  policy it is.
+- **Next:** Arpit reads the Phase 0 report and the ratification package. Phase 1
+  (W-22 / M2, the T1 accelerator) starts only after the R2 verdict is seen —
+  §B of `handoff/v0.32.0-open-items-prompt.md`.
+
 ## 2026-08-12 — OPEN-WORK becomes an index; the v0.32.0 open-items handoff  ·  Cowork
 - **Asked:** reduce `OPEN-WORK.md` to one line per open item with detail in
   individual files, purge everything done, and produce a handoff + prompt to

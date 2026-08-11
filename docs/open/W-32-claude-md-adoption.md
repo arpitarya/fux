@@ -17,14 +17,37 @@ first is in an undecided state, and has been since M0.
 This is the highest-leverage open item on the list, and the cheapest: every
 session that starts, starts by reading a document nobody has ratified.
 
+## Correction (2026-08-12) — there is no `CLAUDE.md.proposed`
+
+**The rewrite is already the live file.** It was written straight into
+`CLAUDE.md` with a header declaring itself not in force, and has been there
+since `3892c55` (2026-08-09). Verified: the diff is
+`a/CLAUDE.md → b/CLAUDE.md.proposed`, its a-side blob `4f52859` is the
+*pre-rewrite* file, and the live `CLAUDE.md` is the b-side content;
+`git log --follow -- CLAUDE.md` shows no move.
+
+So the decision is asymmetric, and the DoD below is corrected for it:
+
+- **Yes** → delete the eight-line PROPOSED header. Nothing moves.
+- **No** → revert ~800 lines of the file every session reads first, which
+  every session since 2026-08-09 has followed as binding.
+
+Packaged for decision in
+[`handoff/v0.32.0-ratification-package.md`](../handoff/v0.32.0-ratification-package.md)
+§Decision 4.
+
 ## Definition of done
 
-- [ ] Arpit adopts or rejects the M0a rewrite. Adoption is mechanical:
-      `git mv CLAUDE.md.proposed CLAUDE.md`, delete the PROPOSED block, bump
-      the DOC-REGISTRY row.
+- [ ] Arpit adopts or rejects the M0a rewrite. Adoption is deleting the
+      PROPOSED header block and bumping the DOC-REGISTRY row — **not** a
+      `git mv`; see the correction above.
 - [ ] The `.fux/` layout diff is applied (or folded into the adoption, if
       the rewrite lands first) so the Layout section describes the tree that
       actually exists.
+- [ ] The §Layout `archive/` line is fixed — it says `docs/archive/` holds
+      `v0.26-docs/ (frozen)`, which is false; that set is at **root**
+      `archive/v0.26-docs/`. *(Found closing W-43, 2026-08-12; left in place
+      under law 7.)*
 - [ ] The stale `src/fux/ does not exist yet, by design` passage goes — it
       has been false since 2026-08-10.
 - [ ] The ADR-numbering line is fixed as part of

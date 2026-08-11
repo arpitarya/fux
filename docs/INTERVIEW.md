@@ -44,6 +44,25 @@ middleware. Maintainers of this doc so
 far: each session's model, per the standing instruction above — this entry
 by Claude (Cowork, claude-fable-5).
 
+**Update (2026-08-12, Claude Code):** Phase 0 of the v0.32.0 open-items
+program cleared the backlog; **R2 is 3/3 PASS**. Three pieces of judgment to
+inherit. First, **an unindexed source is not a ranking failure** — R2-Q3 had
+been "failing" since M1 for want of one line in `fux.toml`, and ADR-0004 was
+right to diagnose it and *decline to fix it*, because moving the archived doc
+set was Arpit's call; the restraint is why the eventual fix was one line
+instead of an argument. Second, **the fix bought a new problem and it was
+filed, not solved**: the retired v0.26 docs now answer questions about the
+current engine (*"what is the ingest cache"* → 5/5 archived results
+describing a deleted subsystem), found post-hoc, filed as W-44 with a
+recommended *shape* and no mechanism — five hand-picked probes on one corpus
+is not grounds to ship a ranking change, and the v0.26 line already paid to
+learn that. Third, **a recorded rank is a snapshot of a corpus, not a
+property of the engine**: ADR-0004's Q2 "#1" became "#2" because `README.md`
+grew a relevant table two days later, so recorded ranks now carry their date.
+Also worth knowing: **`CLAUDE.md.proposed` does not exist** — the M0a rewrite
+has been the live `CLAUDE.md` since `3892c55`, which makes "reject" a
+~800-line revert rather than a no-op. Entry by Claude Opus 5 (1M context).
+
 **Q: What changed?**
 
 - The substrate engine (v0.19 → v0.26, ADRs 0001–0015) is **archived at
@@ -535,4 +554,9 @@ and a `0.26.0` wheel predating the M5 default flip nearly pinned pre-release
 behaviour into orbit's baseline. Fixed the `zero_overlap_rescued` miscount
 (clean rescues only) and left **Part C — non-monotone fusion — untouched and
 scoped**, as its own Opus handoff.
+· Claude Opus 5 (1M context), 2026-08-12 — Phase 0 of the v0.32.0 open-items
+program: paid the archive-law debt, **closed R2 at 3/3 PASS**, and packaged
+five ratification decisions. Recorded the post-hoc retired-content finding as
+W-44 rather than fixing it, and corrected two things the tracker had wrong
+(`CLAUDE.md.proposed` never existed; ADR-0004's recorded rank had drifted).
 (Add yourself here when you make a material update — model, date, one line.)*
