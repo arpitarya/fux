@@ -70,7 +70,7 @@ undeclared.
 2. [`docs/compare/index-format.compare.md`](docs/compare/index-format.compare.md) — the committed format, measured
 3. [`docs/PLAN.md`](docs/PLAN.md) — milestones M0–M8
 4. [`docs/adr/0004-index-format.md`](docs/adr/0004-index-format.md) — the frozen M1 schema
-5. [`examples/playground/PLAYGROUND.md`](examples/playground/PLAYGROUND.md) — a 20-doc fixture corpus to try it on
+5. [`../fux-playground/PLAYGROUND.md`](../fux-playground/PLAYGROUND.md) — a graded 10-doc corpus to try it on, in a **separate sibling repository** (clone it next to this one)
 6. [`docs/WORKLOG.md`](docs/WORKLOG.md) — the running build log
 
 License: MIT.

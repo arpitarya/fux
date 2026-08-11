@@ -114,7 +114,7 @@
   <text x="52" y="640" font-size="9.5" fill="#1a1f27" font-weight="600">tiers: T0 ≤~20k docs — scan only · T1 ≤~200k — blocked accelerator · T2 beyond — terms→tpack, mmap segments, partial clone, external-shards-only</text>
 
   <!-- footer -->
-  <text x="36" y="688" font-size="9.5" fill="#8a93a0">build order: M0 scaffold → M1 T0 slice (committed store + scan ask, dogfood + AcmePay playground) → M2 T1 accelerator → M3 graph → M4 refer → M5 maintenance → M6 scale/T2 → M7 dogfood gate</text>
+  <text x="36" y="688" font-size="9.5" fill="#8a93a0">build order: M0 scaffold → M1 T0 slice (committed store + scan ask, dogfood + graded sibling corpus) → M2 T1 accelerator → M3 graph → M4 refer → M5 maintenance → M6 scale/T2 → M7 dogfood gate</text>
   <text x="36" y="706" font-size="9.5" fill="#8a93a0">measured basis: bisect 0.035 ms · worst common term 44 ms (mx-skip) · 1-line edit in 138 MB shard deltas ≈ 0 · git pack ×0.38 · pruning FAIL → full postings (ADR-0003)</text>
   <text x="36" y="724" font-size="9.5" fill="#b8860b">predictions R1–R7 in PLAN rev 2 · rev-1 diagrams archived at archive/v0.30-rev1-planning/</text>
 </svg>
