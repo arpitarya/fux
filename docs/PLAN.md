@@ -101,7 +101,7 @@ empty package.
 ### M1 — the T0 vertical slice
 
 *(the live handoff:
-[`handoff/v0.30.0-m1-t0-slice-handoff.md`](handoff/v0.30.0-m1-t0-slice-handoff.md))*
+[`archive/v0.30.0-m1-t0-slice-handoff.md`](archive/v0.30.0-m1-t0-slice-handoff.md))*
 
 Committed store exactly per the index-format spec: canonical writer/reader,
 256 shards, `_format` header, 16-hex term hashes with build-time collision

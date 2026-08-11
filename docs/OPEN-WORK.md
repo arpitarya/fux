@@ -36,7 +36,6 @@ is the spec; the detail file is the state.
 | W-32 | Adopt or reject the CLAUDE.md rewrite; apply the `.fux/` layout line | OPEN·human | — | [W-32](open/W-32-claude-md-adoption.md) |
 | W-33 | Resolve the ADR-numbering contradiction (CLAUDE.md "0016" vs adr/README "0001") | OPEN·human | — | [W-33](open/W-33-adr-numbering-contradiction.md) |
 | W-42 | Close R2-Q3 — add `archive/v0.26-docs` to `fux.toml` sources, re-ingest, re-run the frozen questions | OPEN | — | [W-42](open/W-42-close-r2-q3.md) |
-| W-43 | Pay the archive-law debt — move two executed handoff pairs, fix three stale claims | OPEN | — | [W-43](open/W-43-archive-law-debt.md) |
 | W-38 | M8 · the deferred set — one ADR + Arpit sign-off each; **pruning work is forbidden outside this item** | PARKED | W-26 | [W-38](open/W-38-m8-deferred.md) |
 
 ## Predictions still unmeasured

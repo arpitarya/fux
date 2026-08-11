@@ -12,7 +12,7 @@ timestamp: 2026-08-10T00:00:00Z
 - **Date:** 2026-08-10
 - **Feature:** M1 — the T0 vertical slice (canonical store, git-dir ingest,
   scan-based `fux ask`), per
-  [`../handoff/v0.30.0-m1-t0-slice-handoff.md`](../handoff/v0.30.0-m1-t0-slice-handoff.md).
+  [`../archive/v0.30.0-m1-t0-slice-handoff.md`](../archive/v0.30.0-m1-t0-slice-handoff.md).
 
 ## Context
 
@@ -229,7 +229,7 @@ remain unqueried until M2/M3, per the handoff's scope fence.
 
 - [`docs/compare/index-format.compare.md`](../compare/index-format.compare.md)
   §5/§7 — the schema of record this ADR fills in and freezes.
-- [`docs/handoff/v0.30.0-m1-t0-slice-handoff.md`](../handoff/v0.30.0-m1-t0-slice-handoff.md)
+- [`docs/archive/v0.30.0-m1-t0-slice-handoff.md`](../archive/v0.30.0-m1-t0-slice-handoff.md)
   — the binding contract this ADR closes out.
 - [`archive/README.md`](../../archive/README.md) — the root-archive index;
   the discrepancy behind R2 question 3, since resolved (2026-08-10).
