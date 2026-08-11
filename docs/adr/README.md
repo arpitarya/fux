@@ -3,7 +3,7 @@
 One ADR per completed feature or ruled measurement; every rule carries a
 reference. **Numbering restarted at 0001 for the v0.30 rebuild** (Arpit,
 2026-08-09). The v0.26 engine's ADRs 0001–0015 are frozen at
-[`../archive/v0.26-docs/adr/`](../archive/v0.26-docs/adr/) and are always
+[`../archive/v0.26-docs/adr/`](../../archive/v0.26-docs/adr/) and are always
 cited as **"archived ADR-NNNN"** with that path — a bare "ADR-NNNN" in any
 live doc means this directory.
 

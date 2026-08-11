@@ -1,137 +1,65 @@
-# OPEN-WORK — everything not yet built
+# OPEN-WORK — the index of what is still open
 
-*The single tracker for outstanding work in the v0.30 rebuild. Maintained by
-every session (Cowork and Claude Code): finishing, starting, blocking, or
-descoping ANY item updates this file in the same change. Two sections by
-repo convention: humans first, agents second.*
+*One line per open item. **Detail lives in [`open/W-nn-*.md`](open/README.md)**,
+one file per item. Nothing done is recorded here — a closed item's row and
+its detail file are deleted in the same change that closes it, and its
+durable record is its ADR plus the [WORKLOG](WORKLOG.md) entry.*
+
+*Maintained by every session (Cowork and Claude Code): finishing, starting,
+blocking, or descoping ANY item updates this file **and** its detail file in
+the same change as the work.*
+
+**Where the build stands (2026-08-12):** M0+M1 shipped — `fux ingest` and
+`fux ask` work end to end on this repo, scan-only. R1 **PASS**, R2 **2/3
+PASS** ([W-42](open/W-42-close-r2-q3.md) closes the third). The pruning gate
+closed **FAIL**; the committed index carries full postings, permanently
+([ADR-0003](adr/0003-pruning-criterion-rerun.md)). **[W-22](open/W-22-m2-t1-accelerator.md)
+(M2, the T1 accelerator) is next and nothing blocks it.**
 
 ---
 
-## §1 · For humans — where the rebuild stands (2026-08-10)
+## Open items
 
-**M0+M1 shipped: the first real code of the rebuild runs, end to end.**
-`src/fux/` exists; `fux ingest` builds the committed store from this repo's
-own docs, `fux ask` answers questions from it with citations — scan-only, no
-accelerator. **R1** (canonical writer byte-determinism) **PASS**. **R2** (T0
-answers real repo questions) **2/3 PASS**, one blocked on a pre-existing,
-independently-flagged doc-hygiene gap unrelated to this build. Full measured
-record, including a mid-build tokenizer fix (stopword filtering) that R2
-itself surfaced and that was re-verified rather than patched over just the
-one failing case: [ADR-0004](adr/0004-index-format.md) Consequences.
+Rule: pick the lowest OPEN item whose `blocked_by` is satisfied. `PLAN.md`
+is the spec; the detail file is the state.
 
-**Background (2026-08-09), unchanged since then:** the pruning gate ran
-twice and settled it: INCONCLUSIVE ([ADR-0002](adr/0002-pruning-eval-gate.md))
-→ **FAIL** ([ADR-0003](adr/0003-pruning-criterion-rerun.md)) — no selector
-came within 35.9 pts of the bar at the 6 % budget. Arpit accepted option E:
-**full postings, no pruning**. That decision, plus his JSONL push, produced
-the format of record ([index-format compare](compare/index-format.compare.md)):
-tiered JSONL — doc-major committed shards that git itself diffs and merges,
-a derived blocked term-major accelerator with integer `mx` skipping, and
-binary only as record properties. ADRs renumbered from 0001 for the v0.30
-line (0016–0018 → 0001–0003; frozen artifacts keep old numbers — see
-[adr/README](adr/README.md)); PLAN rewritten to revision 2 (M0–M8, R-series
-predictions replacing the closed P-series).
+| id | item | status | blocked_by | detail |
+|----|------|--------|-----------|--------|
+| W-22 | M2 · T1 accelerator — blocked term-major, `mx` skipping, differential law, Hamming, RRF, `find`/`answer` | OPEN·**next** | — | [W-22](open/W-22-m2-t1-accelerator.md) |
+| W-23 | M3 · graph lane — edges, community, `explain`/`graph`/`path` | OPEN | W-22 | [W-23](open/W-23-m3-graph-lane.md) |
+| W-24 | M4 · refer plane — HTTP+Confluence, ARC, assembler, freshness fence | OPEN | W-22 | [W-24](open/W-24-m4-refer-plane.md) |
+| W-25 | M5 · maintenance — hooks, line-wise LWW merge driver, hashed-meta enforcement | OPEN | W-23, W-24 | [W-25](open/W-25-m5-maintenance.md) |
+| W-26 | M6 · scale & T2 — `tpack`, mmap segments, 100k/1M bench, **paper §4–§6 rewritten to measured** | OPEN | W-25 | [W-26](open/W-26-m6-scale-t2.md) |
+| W-27 | M7 · dogfood & release gate — fux + Anton, two weeks | OPEN | W-26 | [W-27](open/W-27-m7-dogfood-release-gate.md) |
+| W-30 | Ratify ADR-0001 (ingest-mode naming) | OPEN·human | — | [W-30](open/W-30-ratify-adr-0001.md) |
+| W-31 | Ratify ADR-0010 + ADR-0011 — both built and shipped, still ⏳ proposed | OPEN·human | — | [W-31](open/W-31-ratify-adr-0010-0011.md) |
+| W-32 | Adopt or reject the CLAUDE.md rewrite; apply the `.fux/` layout line | OPEN·human | — | [W-32](open/W-32-claude-md-adoption.md) |
+| W-33 | Resolve the ADR-numbering contradiction (CLAUDE.md "0016" vs adr/README "0001") | OPEN·human | — | [W-33](open/W-33-adr-numbering-contradiction.md) |
+| W-42 | Close R2-Q3 — add `archive/v0.26-docs` to `fux.toml` sources, re-ingest, re-run the frozen questions | OPEN | — | [W-42](open/W-42-close-r2-q3.md) |
+| W-43 | Pay the archive-law debt — move two executed handoff pairs, fix three stale claims | OPEN | — | [W-43](open/W-43-archive-law-debt.md) |
+| W-38 | M8 · the deferred set — one ADR + Arpit sign-off each; **pruning work is forbidden outside this item** | PARKED | W-26 | [W-38](open/W-38-m8-deferred.md) |
 
-**Open decisions (Arpit):**
+## Predictions still unmeasured
 
-1. ~~Move the v0.26 doc set?~~ **RESOLVED 2026-08-10 — Arpit's ruling:
-   the root `archive/` is the only archive.** Flattened: `v0.26-docs/` and
-   `v0.26-implemented/` are now root entries; `docs/archive/` is gone;
-   [`archive/README.md`](../archive/README.md) indexes it all. Follow-up
-   (optional, anyone's): add `archive/v0.26-docs` to root `fux.toml`
-   sources and re-ingest, which would make R2-Q3's frozen citation
-   satisfiable at last — a one-line config change + re-ingest, best done
-   with the next build turn rather than as a lone commit.
-2. **Ratify ADR-0001** (ingest-mode naming: `extracted`/`enriched`) —
-   non-blocking, semantics already fixed.
-3. **Start M2** ([`W-22`](#work-items), the T1 accelerator) — nothing blocks
-   it now that W-21's DoD is met.
-4. Paper §4–§6 are knowingly stale until M6 rewrites them from
-   measurements — flagged, deliberate, not forgotten.
+| id | prediction | threshold | measured at |
+|----|-----------|-----------|-------------|
+| R2 | T0 answers real repo questions | 3 frozen questions, correct citations, cold clone | **2/3** — third closes with [W-42](open/W-42-close-r2-q3.md) |
+| R3 | warm `ask` on the RFC corpus | ≤ 150 ms, worst common terms included | W-22 |
+| R4 | refer plane | cold k=10 ≤ 3 s / warm ≤ 300 ms | W-24 |
+| R5 | 20-doc commit re-index | < 1 s via hook | W-25 |
+| R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
+| R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
 
-**Filed 2026-08-10, not blocking anything:** the agent-search-API landscape was
-researched (Parallel, Perplexity, Exa, Brave and the web-index cost literature)
-and produced three proposals —
-[`proposals/agent-search-landscape.md`](proposals/agent-search-landscape.md)
-(the evidence note; also where the wedge argument now lives),
-[`proposals/caller-set-freshness-policy.md`](proposals/caller-set-freshness-policy.md)
-and [`proposals/token-budget-retrieval.md`](proposals/token-budget-retrieval.md).
-**Read the latter two before writing the W-24 (M4 refer plane) handoff** — both
-shape the refer API's first surface and are expensive to retrofit. No W-nn or
-prediction changed state.
+R1 **PASS**. P1 **FAIL** (option E, full postings); P2–P7 retired with plan
+revision 1 — their successors are R3–R7.
 
-**Built 2026-08-10 (Cowork), awaiting ratification:** URL ingestion via a
-consumer-owned middleware file —
-[ADR-0010](adr/0010-url-source-consumer-middleware.md) (⏳ proposed).
-`[sources.url]` + `fux ingest --refresh-urls`; a CDP template (hand-rolled
-RFC 6455, ported from the archived v0.26 path). Core gains no adapter and no
-network code; hashed meta default; offline ingest carries `url:` records
-forward byte-identically. **Amended in place 2026-08-11** by
-[ADR-0011](adr/0011-fux-dir-layout.md) — the URL list is now
-`.fux/sources/urls`, the middleware `.fux/middleware/cdp.py`, and its
-tunables an opaque `[sources.url.config]` table. GLOSSARY debt **paid**
-(4 terms). Still owed: W-24's refer plane needs a fetch path for `src:"url"`
-docs.
-
-**Built 2026-08-11 (Claude Code), awaiting ratification:** the `.fux/`
-directory as a declared layout — [ADR-0011](adr/0011-fux-dir-layout.md)
-(⏳ proposed). Committed planes (`index/`, `sources/`, `middleware/`) vs
-derived (`runtime/`, `cache/`, `CACHEDIR.TAG`-tagged), a self-describing
-`.fux/README.md`, a narrow `.fux/.gitignore` that never uses `*`, and two
-`fux doctor` checks. **Two things for Arpit:** ADR-0011 §Alternatives closes
-the handoff's open question (README generated at ingest time, not by `doctor
---fix`) — reversible; and the one-line CLAUDE.md layout addition is
-*proposed, not applied* at
-[handoff/v0.31.0-claude-md-layout.diff](handoff/v0.31.0-claude-md-layout.diff).
-
-## §2 · For AI agents — machine-oriented work ledger
-
-Rules: pick the lowest OPEN item whose `blocked_by` is satisfied; specs
-live in PLAN.md (revision 2) under the same milestone id; update this
-table + WORKLOG in every change; **pruning work is forbidden outside
-W-38** (plan law).
-
-### Work items
-
-| id | item | status | blocked_by | DoD (short) | spec |
-|----|------|--------|-----------|-------------|------|
-| W-20 | M0 scaffold: src/fux, pyproject 0.30.0.dev0, doctor, CI paths | **DONE** (2026-08-10) | — | `fux --version` + doctor run; CI green | [handoff](handoff/v0.30.0-m1-t0-slice-handoff.md) §2 |
-| W-21 | M1 T0 slice: canonical store + git-dir ingest + scan `ask`, dogfooded — incl. a 20-doc fixture playground under `examples/` (its `.fux/index/` committed as the visible demo) | **DONE** (2026-08-10) | W-20 | **R1 PASS** · **R2 2/3 PASS** (Q3 blocked on pre-existing `docs/archive/` gap, see §1) · playground walkthrough runs as written (2 doc bugs found+fixed) · ADR-0004 accepted · *fixture superseded 2026-08-12 by W-41* | handoff §2–§9, [ADR-0004](adr/0004-index-format.md) |
-| W-22 | M2 T1 accelerator: blocked term-major + `mx` + differential law + Hamming + RRF + find/answer | OPEN·**next** | W-21 | **R3** ≤150 ms warm on RFC corpus; differential suite green; ADR-0005 | PLAN §M2 |
-| W-23 | M3 graph lane: edges, community, explain/graph/path | OPEN | W-22 | archived relational eval passes; ADR-0006 | PLAN §M3 |
-| W-24 | M4 refer plane: HTTP+Confluence, ARC, assembler, freshness fence | OPEN | W-22 | **R4** mock bench; ARC differential; offline honest; ADR-0007 | PLAN §M4 |
-| W-25 | M5 maintenance: hooks, line-wise LWW merge driver, snapshot, hashed-meta enforcement | OPEN | W-23, W-24 | **R5** <1 s/20 docs · **R6** three-tier harness; ADR-0008 | PLAN §M5 |
-| W-26 | M6 scale/T2: tpack, mmap segments, partial clone, 100k/1M bench, **paper §4–§6 rewritten to measured** | OPEN | W-25 | **R7**; every R measured or honest failure ADR; ADR-0009 | PLAN §M6 |
-| W-27 | M7 dogfood & release gate (fux + Anton, two weeks) | OPEN | W-26 | Arpit ships a release he uses | PLAN §M7 |
-| W-30 | Ratify ADR-0001 naming | OPEN·human | — | status → accepted | adr/0001 |
-| W-40 | Execute the .fux layout + URL-source-move handoff (urls → `.fux/sources/urls`, middleware → `.fux/middleware/cdp.py`, opaque `[sources.url.config]`, layout module + doctor checks, ADR-0011 + ADR-0010 amendment) | **DONE** (2026-08-11) | — | every §2 DoD box true; 217 tests green; triple-ingest byte-identical on this repo; `ask` still cites; docs synced | [ADR-0011](adr/0011-fux-dir-layout.md) · [handoff](archive/v0.31.0-fux-dir-layout-handoff.md) · [prompt](archive/v0.31.0-fux-dir-layout-prompt.md) |
-| W-41 | Extract the demo fixture into the graded sibling repo `fux-playground` (10 IDP docs, 50 goldens, 10 URLs, file-only committed index + staleness guard); delete `examples/` from this repo | **DONE** (2026-08-12) | — | `examples/` gone, no live refs · sibling repo built + one local commit (no remote) · `check.py --all` 41 pass / 9 named xfail / 0 unexplained · guard demonstrated failing and clean · 10/10 URLs fetched through real Chrome, index restored · ADR-0012 | [ADR-0012](adr/0012-playground-sibling-repo.md) · [handoff](handoff/v0.31.0-fux-playground-extraction-handoff.md) · [prompt](handoff/v0.31.0-fux-playground-extraction-prompt.md) |
-| W-38 | M8 deferred set: realistic-workload pruning *(optimization only)* · sentence/structure selection · query-views · enriched tier · BIC-in-T2 · MCP · knowledge-CI | PARKED | W-26 | one ADR + Arpit sign-off each | PLAN §M8 |
-
-*(W-00…W-14 — the reset, hygiene, both gate runs, and their doc syncs —
-are DONE and recorded in WORKLOG 2026-08-09; ids retired.)*
-
-### Predictions (R-series, re-registered in PLAN rev 2; P-series closed)
-
-| id | prediction | threshold | status |
-|----|-----------|-----------|--------|
-| R1 | canonical writer byte-deterministic | shard sha256 identical, ubuntu+macos | **PASS** (2026-08-10) — local double-ingest identical; CI matrix asserts `tests_e2e/test_determinism.py` |
-| R2 | T0 answers real repo questions | 3 frozen questions, correct citations, cold clone | **2/3 PASS** (2026-08-10) — Q1/Q2 cite correctly (Q2 needed a tokenizer fix, re-verified); Q3 blocked on the pre-existing `archive/v0.26-docs/` path gap, not this build. Detail: [ADR-0004](adr/0004-index-format.md) |
-| R3 | warm ask ≤ 150 ms on RFC corpus | bench incl. worst common terms | UNMEASURED — M2 |
-| R4 | refer: cold k=10 ≤ 3 s / warm ≤ 300 ms | mock bench | UNMEASURED — M4 |
-| R5 | 20-doc commit re-index < 1 s | hook bench | UNMEASURED — M5 |
-| R6 | machine planes conflict-free; human conflicts preserved | harness | UNMEASURED — M5 |
-| R7 | committed @100k target-density ≤ 250 MB packed; tier-auto correct | measured | UNMEASURED — M6 |
-
-Closed: **P1 = FAIL** (ADR-0003; option E accepted — full postings).
-P2–P7 retired with the rev-1 plan; their successors are R3–R7.
-
-### Standing maintenance obligations (every session)
+## Standing obligations (every session)
 
 - WORKLOG entry per substantive exchange (CLAUDE.md law).
-- This file's tables on any status change; DOC-REGISTRY row bumps for any
-  doc touched; INTERVIEW before substantive direction changes.
+- This index **and** the item's detail file, on any status change;
+  DOC-REGISTRY row bumps for any doc touched; INTERVIEW before substantive
+  direction changes.
 - "archived ADR-NNNN" = the v0.26 line under `archive/v0.26-docs/adr/`;
-  bare ADR-NNNN = `docs/adr/`.
-- The lab (`~/my_programs/fux-lab`: RFC corpus, manifest) persists — new
-  runs are new directories inside it.
+  a bare ADR-NNNN = `docs/adr/`.
+- The lab (`~/my_programs/fux-lab`: RFC corpus, manifest) **persists** — new
+  runs are new directories inside it, never a rebuild.

@@ -10,8 +10,10 @@ timestamp: 2026-08-09T00:00:00Z
 
 ## For AI agents — quick reference (read this block, then jump)
 
-- **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) §2 — pick work there;
-  this file is the *spec* for each milestone id.
+- **Live tracker:** [`OPEN-WORK.md`](OPEN-WORK.md) — an **index** of open
+  items (restructured 2026-08-12); pick work there, then read the item's
+  detail file in [`open/`](open/README.md). This file is the *spec* for
+  each milestone id; the detail file is the *state*.
 - **The gate is closed.** P1 was measured twice ([ADR-0002](adr/0002-pruning-eval-gate.md)
   INCONCLUSIVE → [ADR-0003](adr/0003-pruning-criterion-rerun.md) **FAIL**),
   and Arpit accepted option E: **full postings, no pruning anywhere in the

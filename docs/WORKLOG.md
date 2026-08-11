@@ -19,6 +19,37 @@ diary.*
 
 ---
 
+## 2026-08-12 — OPEN-WORK becomes an index; the v0.32.0 open-items handoff  ·  Cowork
+- **Asked:** reduce `OPEN-WORK.md` to one line per open item with detail in
+  individual files, purge everything done, and produce a handoff + prompt to
+  implement all the open items.
+- **Did:** `docs/OPEN-WORK.md` rewritten as an index (10.5 KB → 4.4 KB): one row
+  per open item, no narrative, **every DONE item deleted** (W-20/W-21/W-40/W-41
+  rows gone — their record is the ADR + this log). New `docs/open/` with a README
+  stating the contract and **13 detail files**, one per open item. Three items that
+  were only prose before are now tracked ids: **W-31** (ADR-0010/0011 ratification),
+  **W-32** (CLAUDE.md adoption), **W-33** (the ADR-numbering contradiction), plus
+  **W-42** (close R2-Q3) and **W-43** (the archive-law debt). Wrote
+  `handoff/v0.32.0-open-items-{handoff,prompt}.md`. Repointed `PLAN.md` and
+  `INTERVIEW.md` off the dead `OPEN-WORK §2` anchor; fixed a broken relative link in
+  `adr/README.md` (`../` → `../../` for the archived ADR path); DOC-REGISTRY +
+  handoff/README rows updated.
+- **Decided / open:** the closure rule is now explicit — **an item's detail file and
+  its index row are deleted together when it closes**; `docs/open/` holds open work
+  only, which is what makes the index trustworthy. The handoff **refuses** to
+  package M2–M7 as one buildable unit: that would break the repo's own
+  plan→handoff→prompt-per-milestone law and produce confident slop across ~3 500
+  LOC. It carries a full build spec for **M2 only**; each later milestone is entered
+  through its own pair, written at the end of the phase before it. M4 is sequenced
+  **before** M3 (both are legal after M2) because two filed proposals graduate into
+  M4 and its API shape is the expensive thing to retrofit. `CLAUDE.md`'s stale
+  `OPEN-WORK §2` pointer was **deliberately left in place** and added to W-32 — law
+  7, agent-steering files are proposed, never auto-applied, even for a pointer.
+- **Next:** run Phase 0 of `handoff/v0.32.0-open-items-prompt.md` §A (Opus) — W-43,
+  W-33, W-42 and the W-30/31/32 ratification package — then stop for Arpit's R2
+  verdict before Phase 1 (M2).
+
+
 ## 2026-08-12 — the playground leaves the repo and becomes graded  ·  Claude Code
 - **Asked:** execute the v0.31.0 fux-playground handoff + prompt (W-41) —
   delete `examples/` from this repo, and build `~/my_programs/fux-playground`

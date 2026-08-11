@@ -114,7 +114,8 @@ a *successful* outcome of M1, not a failure of it. The verdict lives in
 
 **Q: Where is the state of play, mechanically?**
 
-[`OPEN-WORK.md`](OPEN-WORK.md) §2 — the single live tracker (`W-nn` items +
+[`OPEN-WORK.md`](OPEN-WORK.md) — the single live tracker, an **index** of
+open items since 2026-08-12 with detail in [`open/`](open/README.md) (`W-nn` items +
 P1–P7 statuses). It replaced the archived IMPLEMENTATION.md. `PLAN.md` is the
 *spec* per milestone id; OPEN-WORK is the *state*. Pick work there.
 
