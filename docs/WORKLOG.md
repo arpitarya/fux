@@ -19,6 +19,42 @@ diary.*
 
 ---
 
+## 2026-08-12 — the playground leaves the repo and becomes graded  ·  Claude Code
+- **Asked:** execute the v0.31.0 fux-playground handoff + prompt (W-41) —
+  delete `examples/` from this repo, and build `~/my_programs/fux-playground`
+  as a graded sibling: 10 internal-developer-platform documents, 10 URLs,
+  ~50 golden queries, a committed file-only index with a staleness guard.
+- **Did:** built the sibling repo (35 files, one local commit, **no remote**):
+  ten Calder Group / Helix documents (107–297 lines, real frontmatter tags and
+  cross-links — 88 edges resolve), `goldens/queries.jsonl` with 50 ranked
+  queries across seven hazard classes, stdlib-only `tools/check.py`
+  (`--goldens` / `--index-guard` / `--all` / `--verbose` / `--report`, and
+  deliberately no `--update-goldens`) and `tools/smoke_urls.py` (restores
+  `.fux/index/` on every exit path). In this repo: `examples/` deleted, every
+  live reference repaired (README item 5 → the sibling; DOC-REGISTRY row
+  retired; architecture.svg caption), **ADR-0012** written, OPEN-WORK W-41,
+  PLAN status lines, GLOSSARY +3 terms, handoff README row.
+- **Verified (all four, real output):** `check.py --all` → **41 pass, 9 xfail,
+  0 unexplained**, guard clean. Guard *proven to fail*: perturbed one ADR-0003
+  heading → exit 1 naming the record and the moved fields (`sha`, `ver`,
+  `wlen`), reverted → clean. **10/10 URLs fetched through real Chrome 151 on
+  port 9299**, zero substitutions, index restored (`git status` clean). fux's
+  own suites: **221 passed** (`uv run pytest -q tests tests_e2e`).
+- **Decided / open:** goldens assert **ranks, never scores**; URL docs are a
+  runtime smoke test and are **not graded**; the committed index is
+  **file-only** (the `--refresh-urls` carry-forward trap is the reason).
+  Introduced `known_failure` (pytest-style `xfail`) so the 9 real engine gaps
+  are *named with a mechanism* rather than leaving a permanently red suite —
+  an `XPASS` fails the run when a gap closes. **Two engine findings recorded,
+  not fixed** (out of scope): markdown **link targets are tokenized into the
+  linking doc's body** (`glossary` `df=9` as indexed vs `df=1` in prose), and
+  small-corpus `df` + BM25 `tf` saturation make term *presence* beat
+  *aboutness*. **For Arpit:** the ADR numbering contradiction (took 0012;
+  CLAUDE.md still says 0016), and fux-playground's long-term home (no remote
+  by design).
+- **Next:** Arpit's call on the two open questions; then W-22 (M2 accelerator),
+  where five of the nine named gaps are the acceptance targets.
+
 ## 2026-08-11 — v0.31.0 executed: `.fux/` declared, URL source moved in  ·  Claude Code
 - **Asked:** execute the v0.31.0 handoff + prompt (W-40) — systematize
   `.fux/`, move the URL list and middleware into it, move the CDP tunables

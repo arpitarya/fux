@@ -155,6 +155,15 @@ paste-ready Claude Code **prompt**. **Every pair names the model that should
 execute it**, with one sentence of why — model choice is a silent failure
 mode. Lives in [`handoff/`](handoff/README.md).
 
+**Golden query** — One line of `goldens/queries.jsonl` in the
+[playground](#playground-fux-playground): a question, the documents that must
+appear at or above a given **rank**, and optionally documents that must not
+outrank them. Ranks are the contract; scores are never asserted, because a
+score is an implementation detail and a rank is what a user experiences. A
+golden is written by reading the corpus and **never** derived from what fux
+returned — the TREC `qrels` discipline. See
+[ADR-0012](adr/0012-playground-sibling-repo.md).
+
 **Hashed meta (`meta = hashed`)** — The **default** for every non-git source:
 `M/` stores term and phrase *hashes*, never readable text. Closes the
 ACL-mismatch leak where a repo-cloner without source access could read
@@ -248,6 +257,23 @@ file or store.
 (damping 0.85, exactly 3 iterations, sorted traversal). A *fixed* iteration
 count because reproducibility outranks precision here. Ported to the kernel at
 [M4](PLAN.md) from archived ADR-0009.
+
+**Known failure (`xfail`)** — A [golden query](#golden-query) marked
+`known_failure: "<reason>"` because the engine does not yet satisfy it. The
+expectation is **unchanged** — it still states what a correct engine should
+do — but a named, understood gap does not redden the suite. A known failure
+that starts passing is reported as **XPASS** and *fails* the run, so a closed
+gap gets recorded deliberately instead of drifting. Borrowed from pytest.
+See [ADR-0012](adr/0012-playground-sibling-repo.md).
+
+**Playground (`fux-playground`)** — The graded corpus in a **separate sibling
+repository**: ten fictional internal-developer-platform documents, fifty
+[golden queries](#golden-query), ten URLs that exercise the CDP
+[middleware](#middleware-url), and a committed index holding **file documents
+only**. It is a real consumer of fux — it depends on the sibling working tree
+— which makes it a regression net for the code being edited, not for a
+released wheel. Replaced `examples/playground/`, deleted 2026-08-12. See
+[ADR-0012](adr/0012-playground-sibling-repo.md).
 
 **Pruning (static, top-k)** — Permanently dropping low-value postings at index
 build time so the committed index is small. v0.30 uses **document-centric**

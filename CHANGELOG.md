@@ -8,8 +8,27 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Removed
+
+- **`examples/` is gone** ([ADR-0012](docs/adr/0012-playground-sibling-repo.md)).
+  The 20-document AcmePay fixture that shipped inside this repository was
+  deleted. It contaminated the engine's own dogfood corpus, it entered the
+  sdist by accident of layout rather than by decision, and — having no
+  expected answers — it could not notice a ranking regression.
+
 ### Added
 
+- **A graded corpus, in a sibling repository** (`fux-playground`,
+  [ADR-0012](docs/adr/0012-playground-sibling-repo.md)). Ten
+  internal-developer-platform documents, **fifty golden queries asserting
+  ranks** across seven hazard classes (supersession, near-duplicate,
+  attractor, collision, precision, edges, no-answer), and ten URLs that
+  exercise the CDP middleware. Its committed index holds **file documents
+  only**, and a staleness guard re-ingests and asserts `git diff --exit-code`
+  on every run — the byte-determinism law, checked continuously. Goldens are
+  hand-written from the corpus and never derived from engine output; there is
+  no `--update-goldens` flag. Standing status: 41 pass, 9 named engine gaps.
+  README reading-order item 5 now points there.
 - **The `.fux/` directory is a declared layout**
   ([ADR-0011](docs/adr/0011-fux-dir-layout.md), ⏳ proposed): every child is
   committed (`index/`, `sources/`, `middleware/`) or derived (`runtime/`,

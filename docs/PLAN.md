@@ -111,6 +111,13 @@ byte-identical double-ingest (asserted cross-machine in CI); R2
 `fux ask` answers a real question about this repo with citations from a
 cold clone; ADR-0004 accepted; goldens started.
 
+**Where the goldens live (2026-08-12).** The graded corpus was extracted
+into the sibling repository `fux-playground` and `examples/` was deleted
+from this tree ([ADR-0012](adr/0012-playground-sibling-repo.md)). Fifty
+ranked golden queries over ten documents; **41 pass, 9 are named engine
+gaps** carrying a written mechanism. Scope is unchanged — this is where
+M1's "goldens started" now points.
+
 ### M2 — the T1 accelerator
 
 Derived blocked term-major JSONL + offset table; integer `mx` skipping;
@@ -118,14 +125,20 @@ Derived blocked term-major JSONL + offset table; integer `mx` skipping;
 byte-for-byte as a test, the same discipline the ARC cache carries.
 Int-cached Hamming lane; RRF fusion; `find`/`answer` verbs. **DoD:** R3 on
 the RFC corpus (8 872 docs): warm `ask` ≤ 150 ms including worst-case
-common terms; differential suite green; ADR-0005.
+common terms; differential suite green; ADR-0005. **Also:** the
+playground's `known_failure` class 3 (term presence beating aboutness —
+`q008`/`q017`/`q030`/`q031`/`q036`) is a named acceptance target for the
+dense lane; each is an `XPASS` when it closes.
 
 ### M3 — the graph lane
 
 Edge extraction ported; `community` assignment (deterministic
 label-propagation or Leiden-class with fixed seed — decided in ADR-0006);
 PPR-lite; `explain`/`graph`/`path` verbs. **DoD:** the archived relational
-eval passes on the new kernel; ADR-0006.
+eval passes on the new kernel; ADR-0006. **Also:** the playground's
+supersession and near-duplicate gaps (`q005`, `q009`, `q011`, `q015`)
+are named acceptance targets for this lane — they are precisely the
+queries no amount of term statistics can answer.
 
 ### M4 — the refer plane
 

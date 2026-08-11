@@ -101,6 +101,14 @@ cat-file`).
 - Lone UTF-16 surrogates raise `FuxError` at the write boundary instead of a
   raw `UnicodeEncodeError` (reachable via `os.fsdecode` of an undecodable
   filename on Linux).
+> **Path note (2026-08-12, added without altering this record):** every
+> `examples/playground/` path below refers to the fixture that was deleted
+> and rebuilt as the sibling repo `fux-playground`
+> ([ADR-0012](0012-playground-sibling-repo.md)). The evidence this ADR
+> cites was measured against that fixture as it stood; the text is left
+> unedited because an accepted ADR is a record of what was decided and on
+> what basis.
+
 - **Sharding is fixed at 256, not configurable this milestone**:
   `shard = blake2b(id_bytes, digest_size=1).hexdigest()` → `.fux/index/{00..ff}.jsonl`.
   `fux.toml`'s `[index] shards` key is accepted but must equal `256` — it

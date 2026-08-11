@@ -17,6 +17,14 @@ live doc means this directory.
 | 0006–0009 | Reserved: M3 graph · M4 refer · M5 maintenance · M6 scale (numbers already cited by OPEN-WORK DoDs) | planned |
 | [0010](0010-url-source-consumer-middleware.md) | URL source via consumer-owned middleware (CDP template) — `src:"url"`, hashed-meta default, offline carry-forward · **amended by 0011** | ⏳ proposed (Arpit ratifies) |
 | [0011](0011-fux-dir-layout.md) | The `.fux/` directory — declared committed vs derived planes, `.fux/sources/urls`, `.fux/middleware/cdp.py`, opaque `[sources.url.config]`, doctor checks | ⏳ proposed (Arpit ratifies) |
+| [0012](0012-playground-sibling-repo.md) | Demo corpus leaves the engine repo — `examples/` deleted, graded `fux-playground` sibling, file-only committed index, 50 ranked goldens with named `xfail` gaps | accepted |
+
+**Unresolved for Arpit (2026-08-12):** the live `CLAUDE.md` §"How work
+happens here" still says *"Numbering continues at 0016"*, which contradicts
+this file's restart-at-0001 policy and the numbers actually on disk. ADR-0012
+took the next free number under *this* file's policy. The two documents need
+reconciling by whoever owns the convention; `CLAUDE.md` was deliberately not
+edited to match a choice made here.
 
 Renumbering note (2026-08-09): these files previously carried numbers
 0016–0018 continuing the v0.26 sequence; all live references were rewritten
