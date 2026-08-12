@@ -38,8 +38,14 @@ from .scan import ask as scan_ask
 __all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
 
 
-def run_query(root: Path, query: str, top: int, *, force_scan: bool = False) -> tuple[list[AskResult], str]:
+def run_query(
+    root: Path, query: str, top: int, *, force_scan: bool = False, use_hybrid: bool = False
+) -> tuple[list[AskResult], str]:
     """Answer via the accelerator when it is usable; return `(results, path)`."""
+    if use_hybrid:
+        from .hybrid import hybrid_ask
+
+        return hybrid_ask(root, query, top=top), "hybrid"
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
@@ -57,7 +63,13 @@ def _root() -> Path:
 
 def cmd_ask(args) -> int:
     root = _root()
-    results, path = run_query(root, args.query, args.top, force_scan=getattr(args, "scan", False))
+    results, path = run_query(
+        root,
+        args.query,
+        args.top,
+        force_scan=getattr(args, "scan", False),
+        use_hybrid=getattr(args, "hybrid", False),
+    )
 
     if args.json:
         print(json_mod.dumps({"results": [r.__dict__ for r in results]}, indent=2))

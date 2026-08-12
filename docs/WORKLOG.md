@@ -19,6 +19,23 @@ diary.*
 
 ---
 
+## 2026-08-12 — Worklog mining: inbox, filed dates, two-strikes, Cost line  ·  Cowork
+- **Asked:** what more can the worklog teach so time/money isn't wasted and open
+  items close on time.
+- **Did (Arpit's explicit go):** OPEN-WORK header gains a **Blocked on Arpit inbox**
+  (the ratification package + W-44, dated) and every row a **`filed` date**, with
+  the 5-day rule: an aging `OPEN·human` row is named, with its age, in every
+  session's first output. CLAUDE.md's Triage section gains **two strikes → a gate**
+  (a twice-recorded lesson is gated in the same change that records it) and the
+  mandatory worklog **`Cost:` line**. Mirrored in cage (plus its new MACHINE.md)
+  and milo. DOC-REGISTRY rows bumped.
+- **Decided / open:** unchanged — the inbox holds five decisions in one sitting;
+  W-22/M2 starts after Arpit reads the R2 verdict.
+- **Next:** Arpit reads the Phase 0 report + ratification package (inbox, day 0).
+- **Cost:** unmeasured — Cowork cloud session, outside cage capture.
+
+---
+
 ## 2026-08-12 — Triage-first stop-rule added to CLAUDE.md  ·  Cowork
 - **Asked:** Arpit asked why hours of sessions closed no open items, then directed:
   the agent should have said sooner that everything was blocked on him — "money,

@@ -35,6 +35,16 @@ right now?*
   buried at the end of a long session is the failure this rule exists to
   prevent; said upfront, it is the rule followed.
 - His time and tokens are money. Applies to Cowork and Claude Code alike.
+- **The inbox:** OPEN-WORK's header carries a *Blocked on Arpit* block and the
+  open-items table carries a `filed` date per row. Every session keeps both
+  current, and any `OPEN·human` row older than **5 days** is named, with its
+  age, in the session's first output.
+- **Two strikes → a gate (2026-08-12).** A failure class the WORKLOG records
+  twice becomes a test or mechanical check in the same change that records
+  the second occurrence — recurring lessons are gated, not re-learned.
+- **Every WORKLOG entry ends with a `Cost:` line** — the session's spend from
+  `cage report` where capture reaches this repo; otherwise
+  `Cost: unmeasured — <why>`. Unpriced waste repeats.
 
 ## Where the state of play lives
 

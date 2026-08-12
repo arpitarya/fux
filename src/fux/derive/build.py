@@ -35,6 +35,7 @@ from .. import store as store_mod
 from ..errors import FuxError
 from ..query.bm25f import BODY_WEIGHT, HEADING_WEIGHT
 from ..store import fuxdir
+from . import dense
 from . import format as fmt
 
 _QUOTED_HASH_RE = re.compile(rb'"([0-9a-f]{16})"')
@@ -60,7 +61,7 @@ class BuildReport:
 
 def build(root: Path) -> BuildReport:
     """Materialize `.fux/runtime/` from the committed index."""
-    docs, postings, stats, shard_stamp = _read_committed(root)
+    docs, codes, postings, stats, shard_stamp = _read_committed(root)
 
     directory = fuxdir.derived_dir(root, fmt.RUNTIME_DIR)
     postings_directory = directory / fmt.POSTINGS_DIR
@@ -70,6 +71,7 @@ def build(root: Path) -> BuildReport:
     written = 0
     written += _write_docs(directory, docs)
     written += _write_json(directory / fmt.STATS_NAME, stats)
+    written += dense.build_codes(directory, docs, codes)
 
     blocks, postings_count = _write_postings(root, postings, [d["wlen"] for d in docs])
 
@@ -105,9 +107,11 @@ def build(root: Path) -> BuildReport:
 def _read_committed(root: Path):
     """One pass over the committed shards: doc table, postings, statistics.
 
-    Returns `(docs, postings, stats, shard_stamp)` where `docs` is sorted by
-    id (so a document's index is stable across builds) and `postings` maps a
-    term hash to its `(docidx, tf_heading, tf_body)` list in docidx order.
+    Returns `(docs, codes, postings, stats, shard_stamp)`. `docs` is sorted by
+    id, so a document's index is stable across builds; `codes` is parallel to
+    it (the dense lane's table, `None` where a record has no `code`); and
+    `postings` maps a term hash to its `(docidx, tf_heading, tf_body)` list in
+    docidx order.
     """
     records: list[dict] = []
     total_docs = 0
@@ -142,13 +146,15 @@ def _read_committed(root: Path):
         for r in records
     ]
 
+    codes = [r.get("code") for r in records]
+
     postings: dict[str, list[tuple[int, int, int]]] = {}
     for docidx, record in enumerate(records):
         for term, tf in record.get("terms", {}).items():
             postings.setdefault(term, []).append((docidx, tf[0], tf[1]))
 
     stats = {"n": total_docs, "total_wlen": total_wlen}
-    return docs, postings, stats, shard_stamp
+    return docs, codes, postings, stats, shard_stamp
 
 
 def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> None:
