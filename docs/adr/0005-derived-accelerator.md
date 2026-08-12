@@ -129,8 +129,15 @@ in. The default is set by the measurement in Consequences, not by preference.
 
 - **5,536 comparisons** on this repo (692 generated queries × 4 `top` values ×
   2 skipping modes): byte-identical.
+- **552 comparisons on the RFC corpus** (92 queries × 3 `top` × 2 modes):
+  byte-identical. **This is the run that matters** — it is the only one where
+  block skipping is genuinely load-bearing, so it exercises the bound and
+  checks correctness simultaneously. Aggregate: scan 768.3 s, accelerator
+  14.6 s — **52× with zero byte changed**.
 - **50/50 playground goldens**: the accelerator's pass/fail set is identical
   to the scan's.
+- **The shipped CLI**: `ask` and `ask --scan` emit identical `--json` bytes
+  across four queries and three `top` values (`tests_e2e/test_verbs.py`).
 - The unit suite carries a hermetic differential over synthetic corpora built
   for ties, missing `wlen`, `title_h`, and terms spanning many blocks.
 

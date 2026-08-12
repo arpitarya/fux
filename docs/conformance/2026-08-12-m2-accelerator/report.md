@@ -1,7 +1,7 @@
 ---
 type: Conformance Report
 title: "2026-08-12 — M2: the T1 accelerator, R3, and the hybrid measurement"
-description: R3 measured PASS on the RFC corpus (worst-case p95 27.2 ms against a 150 ms bar). The differential law holds byte-for-byte across 5,536 generated comparisons and all 50 playground goldens. Hybrid fusion measured net -6 on the graded corpus and ships default-off.
+description: R3 measured PASS on the RFC corpus (worst-case p95 27.2 ms against a 150 ms bar). The differential law holds byte-for-byte across 6,088 comparisons on two corpora plus all 50 playground goldens. Hybrid fusion measured net -6 on the graded corpus and ships default-off.
 status: final
 timestamp: 2026-08-12T00:00:00Z
 ---
@@ -13,7 +13,7 @@ timestamp: 2026-08-12T00:00:00Z
 | what | instrument | result |
 |---|---|---|
 | **R3** — warm `ask` ≤ 150 ms incl. worst-case terms | RFC corpus, 8,870 docs, in the lab | **PASS** — worst-case p95 **27.2 ms** |
-| **The differential law** — accelerator ≡ scan | 5,536 generated comparisons + 50 graded goldens | **HOLDS**, byte-for-byte |
+| **The differential law** — accelerator ≡ scan | 6,088 generated comparisons on two corpora + 50 graded goldens | **HOLDS**, byte-for-byte |
 | **Hybrid fusion default** | playground's 50 graded goldens | **net −6** → ships **off** |
 
 ## 1 · R3 — PASS
@@ -68,8 +68,16 @@ serialized `fux ask --json` payload, not on ids or on the top 5.
 | sweep | comparisons | result |
 |---|---|---|
 | this repo, 692 generated queries × 4 `top` × 2 skipping modes | **5,536** | byte-identical |
+| **the RFC corpus, 92 generated queries × 3 `top` × 2 modes** | **552** | **byte-identical** |
 | fux-playground, 50 graded goldens | 50 | accelerator's pass/fail set **identical** to scan's |
 | unit suite, synthetic corpora (ties, missing `wlen`, `title_h`, multi-block terms) | — | green |
+| e2e, the shipped CLI (`ask` vs `ask --scan`, 4 queries × 3 `top`) | 12 | byte-identical |
+
+**The RFC row is the one that matters most.** On this repo's 124-document
+corpus the block bound is never load-bearing; at RFC scale it is (skipping
+halves worst-case p95). So the RFC differential is the only run that exercises
+skipping *and* checks correctness at the same time. Aggregate cost there:
+scan 768.3 s, accelerator 14.6 s — a **52× speedup with zero byte changed**.
 
 ### Mutation testing found the harness blind, and changed it
 
@@ -143,6 +151,10 @@ python tools/differential/bench_r3.py --root ~/my_programs/fux-lab/2026-08-12-m2
 # the differential, this repo
 python tools/differential/run.py --root .
 
+# the differential where skipping is actually load-bearing (slow: the scan
+# oracle re-reads a 230 MB index per query)
+python tools/differential/run.py --root ~/my_programs/fux-lab/2026-08-12-m2-r3 --tops 1 5 20
+
 # the graded corpus, all three modes
 python tools/differential/playground_grade.py
 
@@ -151,6 +163,6 @@ python tools/differential/playground_grade.py
 ```
 
 Raw output: [`.evidence/`](.evidence/) — `r3-bench.txt`, `r3.json`,
-`differential-repo.txt`, `playground-grade.txt`. *(Dot-prefixed so the dumps
+`differential-repo.txt`, `differential-rfc.txt`, `playground-grade.txt`. *(Dot-prefixed so the dumps
 stay out of the indexed corpus — see the 2026-08-12 R2 run's Finding 3 and
 [W-45](../../open/W-45-source-exclusion.md).)*

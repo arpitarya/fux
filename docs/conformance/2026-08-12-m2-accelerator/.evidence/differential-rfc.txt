@@ -1,0 +1,5 @@
+92 queries on the RFC corpus
+comparisons: 552
+scan     768.3s
+accel     14.6s
+DIFFERENTIAL GREEN
