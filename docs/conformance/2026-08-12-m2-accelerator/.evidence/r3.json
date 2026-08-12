@@ -1,0 +1,87 @@
+{
+  "budget_ms": 150.0,
+  "verdict": "PASS",
+  "measurements": [
+    {
+      "population": "worst (highest df)",
+      "path": "scan",
+      "queries": 25,
+      "median_ms": 2869.21,
+      "p95_ms": 4248.786,
+      "max_ms": 4492.026,
+      "slowest_query": "references"
+    },
+    {
+      "population": "worst (highest df)",
+      "path": "accel (skip off)",
+      "queries": 25,
+      "median_ms": 32.122,
+      "p95_ms": 53.648,
+      "max_ms": 59.693,
+      "slowest_query": "comments"
+    },
+    {
+      "population": "worst (highest df)",
+      "path": "accel (skip on)",
+      "queries": 25,
+      "median_ms": 25.209,
+      "p95_ms": 27.198,
+      "max_ms": 29.061,
+      "slowest_query": "community"
+    },
+    {
+      "population": "typical (median df)",
+      "path": "scan",
+      "queries": 25,
+      "median_ms": 274.296,
+      "p95_ms": 324.011,
+      "max_ms": 346.077,
+      "slowest_query": "a552ef89"
+    },
+    {
+      "population": "typical (median df)",
+      "path": "accel (skip off)",
+      "queries": 25,
+      "median_ms": 10.755,
+      "p95_ms": 11.192,
+      "max_ms": 11.419,
+      "slowest_query": "a54a"
+    },
+    {
+      "population": "typical (median df)",
+      "path": "accel (skip on)",
+      "queries": 25,
+      "median_ms": 11.107,
+      "p95_ms": 11.551,
+      "max_ms": 11.886,
+      "slowest_query": "a549"
+    },
+    {
+      "population": "multi-term",
+      "path": "scan",
+      "queries": 25,
+      "median_ms": 2981.606,
+      "p95_ms": 4604.498,
+      "max_ms": 5833.618,
+      "slowest_query": "zz554l status"
+    },
+    {
+      "population": "multi-term",
+      "path": "accel (skip off)",
+      "queries": 25,
+      "median_ms": 23.343,
+      "p95_ms": 24.81,
+      "max_ms": 44.161,
+      "slowest_query": "zz1j2wv 1"
+    },
+    {
+      "population": "multi-term",
+      "path": "accel (skip on)",
+      "queries": 25,
+      "median_ms": 24.134,
+      "p95_ms": 27.682,
+      "max_ms": 28.03,
+      "slowest_query": "zzo 6"
+    }
+  ]
+}

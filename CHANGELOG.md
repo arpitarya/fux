@@ -8,6 +8,46 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **The derived T1 accelerator — M2** ([ADR-0005](docs/adr/0005-derived-accelerator.md),
+  ⏳ proposed). Term-major blocked postings and a fixed-width binary offset
+  table under `.fux/runtime/` (derived, gitignored, `CACHEDIR.TAG`-tagged),
+  rebuilt from the committed shards alone. **Prediction R3 PASS:** warm `ask`
+  worst-case p95 **27.2 ms** against a 150 ms bar on 8 870 RFC documents,
+  where the reference scan takes 4 248.8 ms.
+  - **The differential law.** Accelerator results are **byte-identical** to
+    the reference scan — asserted over 5 536 generated comparisons and every
+    one of the playground's 50 graded goldens, in both skipping modes, at four
+    `top` values. `ask --scan` forces the reference path.
+  - Block skipping is **loss-free by construction**: terms open rarest-first
+    and unopened blocks are skipped only when their combined upper bound
+    provably cannot reach the k-th best score. Never by dropping postings —
+    pruning stays forbidden (ADR-0003).
+- **`fux build`** — rebuild the derived accelerator from the committed index.
+  `fux ingest` now builds it too; `--no-accelerator` opts out.
+- **`fux find`** (ranked locations, one per line) and **`fux answer`** (the
+  single best answer the index can give). `answer` is deliberately bounded to
+  the index's own structure and says so — passage-level answers arrive with
+  the refer plane at M4, upgrading the verb rather than adding one.
+- **`fux doctor`** reports the accelerator: missing or stale is a **warning**
+  (it is disposable and `ask` is correct without it); tracked-by-git is an
+  error.
+- **The dense lane and RRF fusion (k=60), behind `ask --hybrid`, OFF by
+  default.** Int-cached Hamming over the FuxVec `code` property M1 has been
+  writing; RRF ported from `archive/v0.26/` with its tests. The default is a
+  measurement, not caution: on the playground's graded goldens hybrid closes
+  three named gaps and breaks nine passing queries — **net −6**, including
+  every no-answer query. Flipping it needs new evidence and a separate
+  sign-off.
+
+### Fixed
+
+- `fux doctor` could crash on Windows consoles (`cp1252`) when a check
+  **failed** — two failure-branch messages carried em-dashes. The existing
+  ASCII guard only ever exercised the healthy path; a new test drives every
+  branch.
+
 ### Changed
 
 - **The frozen v0.19–0.26 documentation set is now an indexed source.**

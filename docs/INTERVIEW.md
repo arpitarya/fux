@@ -63,6 +63,42 @@ Also worth knowing: **`CLAUDE.md.proposed` does not exist** — the M0a rewrite
 has been the live `CLAUDE.md` since `3892c55`, which makes "reject" a
 ~800-line revert rather than a no-op. Entry by Claude Opus 5 (1M context).
 
+**Update (2026-08-12, Claude Code — M2):** the T1 accelerator shipped and
+**R3 PASSED** (worst-case p95 27.2 ms vs a 150 ms bar). Four pieces of
+judgment to inherit.
+
+**First, the differential law is a property of the candidate set, not of the
+arithmetic — make it so structurally.** Float addition is not associative, so
+a term-major accelerator that accumulates scores term-by-term produces
+different low-order bits than the doc-major scan and a different `--json`
+payload while being *logically correct*. `query/rank.py` exists so both paths
+share one scorer and one sort. Do not "optimize" scoring back into the
+accelerator; that is the whole design.
+
+**Second, a green safety test can be measuring the corpus rather than the
+code.** The differential harness was written before the accelerator, as
+required — and it was blind: replacing the block bound with a constant **zero**
+still produced byte-identical output at `top=5`, because on a 124-document
+corpus the rarest query term already decides the answer. Sweeping
+`top ∈ {1,5,20,50}` caught it instantly. **Every safety mechanism here now
+needs a test that fails when the mechanism is disabled.** This is M1's pruning
+lesson in a new costume: an aggregate result over an untreated population is
+not evidence.
+
+**Third, the archive's warnings are worth reading before building, not after.**
+The dense lane closed three named gaps and broke nine queries — including all
+five no-answer queries. INTERVIEW item 5 below already states the mechanism: a
+binary prefilter always has a nearest neighbour, so "No confident matches"
+stops being reachable, and the archived calibration measured that no score
+floor separates noise from a true rescue. Hybrid ships **default-off** on that
+evidence. Do not flip it without a lane that can decline.
+
+**Fourth, dogfooding has a self-reference trap.** Filing a conformance run's
+raw CLI output into `docs/` put the query strings into the indexed corpus, and
+all three frozen R2 questions were promptly topped by their own evidence
+files. Dot-prefixing the dumps fixed it; the general gap is W-45. Entry by
+Claude Opus 5 (1M context).
+
 **Q: What changed?**
 
 - The substrate engine (v0.19 → v0.26, ADRs 0001–0015) is **archived at
@@ -559,4 +595,9 @@ program: paid the archive-law debt, **closed R2 at 3/3 PASS**, and packaged
 five ratification decisions. Recorded the post-hoc retired-content finding as
 W-44 rather than fixing it, and corrected two things the tracker had wrong
 (`CLAUDE.md.proposed` never existed; ADR-0004's recorded rank had drifted).
+· Claude Opus 5 (1M context), 2026-08-12 — built M2: the T1 accelerator,
+the differential law, bounded skipping, the dense lane and RRF (default-off on
+measured evidence). **R3 PASS.** Mutation-tested the differential harness and
+found it blind at the default `top`; fixed the harness rather than trusting
+the green run.
 (Add yourself here when you make a material update — model, date, one line.)*

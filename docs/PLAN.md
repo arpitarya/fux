@@ -79,7 +79,7 @@ the other compare docs · council + session rulings in WORKLOG.
 |---|---|---|---|---|
 | M0 | scaffold (0.30.0.dev0) | — | small | Sonnet |
 | M1 | **T0 vertical slice**: committed store + git-dir ingest + scan `ask`, dogfooded on this repo | R1, R2 | ~900 LOC | Sonnet build · Opus review of the canonical writer |
-| M2 | T1 accelerator + full lexical/dense kernel | R3 | ~800 LOC | Opus |
+| M2 | T1 accelerator + full lexical/dense kernel ✅ **shipped 2026-08-12** | R3 **PASS** | ~800 LOC | Opus |
 | M3 | graph lane: edges, community, explain/graph/path | — | ~400 LOC | Sonnet |
 | M4 | refer plane: HTTP+Confluence adapters, ARC, assembler, freshness fence | R4 | ~900 LOC | Sonnet |
 | M5 | maintenance: hooks, line-wise merge driver, snapshot mode, hashed-meta enforcement | R5, R6 | ~500 LOC | Sonnet |
@@ -120,17 +120,33 @@ ranked golden queries over ten documents; **41 pass, 9 are named engine
 gaps** carrying a written mechanism. Scope is unchanged — this is where
 M1's "goldens started" now points.
 
-### M2 — the T1 accelerator
+### M2 — the T1 accelerator ✅ **SHIPPED 2026-08-12** ([ADR-0005](adr/0005-derived-accelerator.md))
 
 Derived blocked term-major JSONL + offset table; integer `mx` skipping;
 **the differential law** — accelerator results ≡ scan results, asserted
 byte-for-byte as a test, the same discipline the ARC cache carries.
 Int-cached Hamming lane; RRF fusion; `find`/`answer` verbs. **DoD:** R3 on
 the RFC corpus (8 872 docs): warm `ask` ≤ 150 ms including worst-case
-common terms; differential suite green; ADR-0005. **Also:** the
-playground's `known_failure` class 3 (term presence beating aboutness —
-`q008`/`q017`/`q030`/`q031`/`q036`) is a named acceptance target for the
-dense lane; each is an `XPASS` when it closes.
+common terms; differential suite green; ADR-0005.
+
+**Measured** ([the run](conformance/2026-08-12-m2-accelerator/report.md)):
+
+- **R3 PASS** — worst-case p95 **27.2 ms** against the 150 ms bar, on 8 870
+  ingested RFCs. Scan on the same population: 4 248.8 ms.
+- **Differential holds** — 5 536 generated comparisons plus all 50 graded
+  goldens, byte-identical, in both skipping modes.
+- **Hybrid ships default-off**: net **−6** on the graded corpus (3 gaps
+  closed, 9 queries broken, including every no-answer query). Flipping it
+  needs new evidence and a separate sign-off.
+- **T2 stays unbuilt** — R3's tripwire did not fire.
+
+**Correction (2026-08-12).** This section previously named the dense lane's
+acceptance targets as `q008`/`q017`/`q030`/`q031`/`q036`. **`q008` and `q017`
+are not `known_failure` queries** — they pass today and appear always to have.
+The playground's actual known-failure set is `q005`, `q009`, `q011`, `q015`,
+`q030`, `q031`, `q036`, `q040`, `q041`; of these, hybrid closes `q009`,
+`q030`, `q036`. The remaining supersession and near-duplicate gaps are M3's
+targets, as already stated below.
 
 ### M3 — the graph lane
 
@@ -199,7 +215,7 @@ codec inside T2 · MCP adapters · knowledge-CI · wavelet self-index note.
 |---|---|---|---|
 | R1 | canonical writer is byte-deterministic | double-ingest sha-identical, two environments | M1 |
 | R2 | T0 slice answers real questions on this repo | cited answer from a cold clone, no accelerator | M1 — **3/3 PASS** 2026-08-12 ([run](conformance/2026-08-12-r2-close/report.md)) |
-| R3 | warm `ask` ≤ 150 ms on the RFC corpus, worst-case terms included | bench | M2 |
+| R3 | warm `ask` ≤ 150 ms on the RFC corpus, worst-case terms included | bench | M2 — **PASS** 2026-08-12, worst-case p95 **27.2 ms** ([run](conformance/2026-08-12-m2-accelerator/report.md)) |
 | R4 | refer plane: cold k=10 ≤ 3 s, warm ≤ 300 ms | mock bench | M4 |
 | R5 | 20-doc commit re-indexes < 1 s via hooks | bench | M5 |
 | R6 | machine planes merge conflict-free; human conflicts preserved | harness | M5 |

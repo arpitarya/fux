@@ -36,6 +36,35 @@ diary.*
 
 ---
 
+## 2026-08-12 — M2 ships: the T1 accelerator, R3 PASS  ·  Claude Code
+- **Asked:** Phase 1 of the v0.32.0 program — W-22 / M2, the T1 accelerator —
+  after Arpit said "go" twice (once for Phase 0, once for the M2 design plan).
+- **Did:** design plan first, as the prompt required, then built it.
+  **`query/rank.py` is the load-bearing decision**: the accelerator generates
+  candidates and statistics only, and one shared scorer sorts for both paths,
+  because float addition is not associative and a term-major accumulation
+  would break byte-identity while being logically correct. Derived plane under
+  `.fux/runtime/`: 128-posting block lines plus a 40-byte fixed-width binary
+  offset table carrying `mx`/`mnw`/`first_doc`/`last_doc` — cheaper than B5's
+  string-slicing and it keeps the block line valid JSON. Skipping is
+  rarest-term-first with a rounding-aware bound. Two build-time invariants
+  refuse to build an accelerator that could disagree with scan. Also: `fux
+  build`, `find`, `answer`, `--scan`, `--hybrid`, a doctor check, the dense
+  lane, and RRF ported with its archived tests.
+- **Decided / open:** **R3 PASS — worst-case p95 27.2 ms vs a 150 ms bar**
+  (scan: 4 248.8 ms) on 8 870 RFCs. Differential green over 5 536 comparisons
+  and all 50 graded goldens. **Hybrid ships default-off on measurement:** net
+  −6 on the graded corpus, and it breaks every no-answer query — the exact
+  mechanism INTERVIEW item 5 already warned about. Three findings worth
+  keeping: (a) **the differential harness was blind** until mutation testing
+  forced a `top` sweep — a zero bound passed at `top=5`; (b) **PLAN's class-3
+  list is wrong** (`q008`/`q017` are not known failures); (c) **filing Phase
+  0's evidence into `docs/` contaminated the corpus it measured** — fixed by
+  dot-prefixing, filed as W-45. ADR-0005 written, ⏳ proposed. T2 stays
+  unbuilt: R3's tripwire did not fire.
+- **Next:** Arpit ratifies ADR-0005 (M2's code is shipped under it) and the
+  four-item package. Then M4 or M3 — both unblocked, handoff §5 recommends M4.
+
 ## 2026-08-12 — Triage-first stop-rule added to CLAUDE.md  ·  Cowork
 - **Asked:** Arpit asked why hours of sessions closed no open items, then directed:
   the agent should have said sooner that everything was blocked on him — "money,

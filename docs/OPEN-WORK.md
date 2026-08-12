@@ -9,19 +9,26 @@ durable record is its ADR plus the [WORKLOG](WORKLOG.md) entry.*
 blocking, or descoping ANY item updates this file **and** its detail file in
 the same change as the work.*
 
-**Where the build stands (2026-08-12):** M0+M1 shipped — `fux ingest` and
-`fux ask` work end to end on this repo, scan-only. **R1 PASS · R2 3/3 PASS**
-(the third closed by W-42 on 2026-08-12 —
-[the run](conformance/2026-08-12-r2-close/report.md)). The pruning gate
-closed **FAIL**; the committed index carries full postings, permanently
-([ADR-0003](adr/0003-pruning-criterion-rerun.md)). **[W-22](open/W-22-m2-t1-accelerator.md)
-(M2, the T1 accelerator) is next and nothing blocks it.**
+**Where the build stands (2026-08-12):** **M0, M1 and M2 shipped.**
+`fux ingest` / `build` / `ask` / `find` / `answer` work end to end, with the
+derived T1 accelerator answering warm queries.
+
+- **R1 PASS** · **R2 3/3 PASS** ([run](conformance/2026-08-12-r2-close/report.md))
+  · **R3 PASS** — worst-case p95 **27.2 ms** vs a 150 ms bar on 8 870 RFCs
+  ([run](conformance/2026-08-12-m2-accelerator/report.md), [ADR-0005](adr/0005-derived-accelerator.md)).
+- The pruning gate closed **FAIL**; the committed index carries full postings,
+  permanently ([ADR-0003](adr/0003-pruning-criterion-rerun.md)).
+- Hybrid fusion is built and **default-off** on measured evidence (net −6 on
+  the graded corpus). Flipping it needs new evidence **and** a separate sign-off.
+- **W-23 (M3) and W-24 (M4) are both unblocked.** The v0.32.0 handoff §5
+  recommends **M4 first** — it is where two filed proposals graduate and its
+  API shape is the expensive thing to retrofit.
 
 **Blocked on Arpit — the inbox (every session updates this, dated):** read the
 Phase 0 report and the [ratification package](handoff/v0.32.0-ratification-package.md)
-— five decisions in one sitting, clearing **W-30 · W-31 · W-32 · W-33** and
-releasing the W-22/M2 start gate (waiting since 2026-08-12) · decide **W-44**
-(retired-content signalling, filed 2026-08-12). Any row here older than **5 days**
+— five decisions in one sitting, clearing **W-30 · W-31 · W-32 · W-33** ·
+decide **W-44** (retired-content signalling, filed 2026-08-12) · **ADR-0005
+is ⏳ proposed** and M2's code is shipped under it (filed 2026-08-12). Any row here older than **5 days**
 is named, with its age, in every session's first output (CLAUDE.md, *Triage first*).
 
 ---
@@ -33,9 +40,8 @@ is the spec; the detail file is the state.
 
 | id | item | status | filed | blocked_by | detail |
 |----|------|--------|-------|-----------|--------|
-| W-22 | M2 · T1 accelerator — blocked term-major, `mx` skipping, differential law, Hamming, RRF, `find`/`answer` | OPEN·**next** | ≤2026-08-11 | — | [W-22](open/W-22-m2-t1-accelerator.md) |
-| W-23 | M3 · graph lane — edges, community, `explain`/`graph`/`path` | OPEN | ≤2026-08-11 | W-22 | [W-23](open/W-23-m3-graph-lane.md) |
-| W-24 | M4 · refer plane — HTTP+Confluence, ARC, assembler, freshness fence | OPEN | ≤2026-08-11 | W-22 | [W-24](open/W-24-m4-refer-plane.md) |
+| W-23 | M3 · graph lane — edges, community, `explain`/`graph`/`path` | OPEN·**next** | ≤2026-08-11 | — | [W-23](open/W-23-m3-graph-lane.md) |
+| W-24 | M4 · refer plane — HTTP+Confluence, ARC, assembler, freshness fence | OPEN·**next** | ≤2026-08-11 | — | [W-24](open/W-24-m4-refer-plane.md) |
 | W-25 | M5 · maintenance — hooks, line-wise LWW merge driver, hashed-meta enforcement | OPEN | ≤2026-08-11 | W-23, W-24 | [W-25](open/W-25-m5-maintenance.md) |
 | W-26 | M6 · scale & T2 — `tpack`, mmap segments, 100k/1M bench, **paper §4–§6 rewritten to measured** | OPEN | ≤2026-08-11 | W-25 | [W-26](open/W-26-m6-scale-t2.md) |
 | W-27 | M7 · dogfood & release gate — fux + Anton, two weeks | OPEN | ≤2026-08-11 | W-26 | [W-27](open/W-27-m7-dogfood-release-gate.md) |
@@ -51,13 +57,14 @@ is the spec; the detail file is the state.
 
 | id | prediction | threshold | measured at |
 |----|-----------|-----------|-------------|
-| R3 | warm `ask` on the RFC corpus | ≤ 150 ms, worst common terms included | W-22 |
 | R4 | refer plane | cold k=10 ≤ 3 s / warm ≤ 300 ms | W-24 |
 | R5 | 20-doc commit re-index | < 1 s via hook | W-25 |
 | R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
 | R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
 
 R1 **PASS**. **R2 PASS 3/3** (2026-08-12, cold tree — [run](conformance/2026-08-12-r2-close/report.md)).
+**R3 PASS** (2026-08-12 — worst-case p95 **27.2 ms** vs a 150 ms bar, 8 870 RFCs;
+[run](conformance/2026-08-12-m2-accelerator/report.md)).
 P1 **FAIL** (option E, full postings); P2–P7 retired with plan revision 1 —
 their successors are R3–R7.
 

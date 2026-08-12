@@ -1,0 +1,12 @@
+50 goldens from /Users/arpitarya/my_programs/fux-playground
+
+mode            pass  fail  xfail  XPASS  REGRESSIONS
+------------------------------------------------------
+scan              41     0      9      0            0
+accelerator       41     0      9      0            0
+hybrid            35     9      6      3            9
+
+hybrid XPASS (a named gap closed): q009, q030, q036
+hybrid REGRESSIONS (passed under scan, fails here): q018, q019, q023, q025, q046, q047, q048, q049, q050
+
+accelerator == scan on every golden: True

@@ -1,0 +1,19 @@
+corpus vocabulary: 419627 distinct terms
+highest df: 8866  median df: 1
+
+population             path                  median       p95       max   R3
+----------------------------------------------------------------------------------
+worst (highest df)     scan                 2869.2ms   4248.8ms   4492.0ms   
+worst (highest df)     accel (skip off)       32.1ms     53.6ms     59.7ms   
+worst (highest df)     accel (skip on)        25.2ms     27.2ms     29.1ms   PASS
+
+typical (median df)    scan                  274.3ms    324.0ms    346.1ms   
+typical (median df)    accel (skip off)       10.8ms     11.2ms     11.4ms   
+typical (median df)    accel (skip on)        11.1ms     11.6ms     11.9ms   PASS
+
+multi-term             scan                 2981.6ms   4604.5ms   5833.6ms   
+multi-term             accel (skip off)       23.3ms     24.8ms     44.2ms   
+multi-term             accel (skip on)        24.1ms     27.7ms     28.0ms   PASS
+
+R3 (bar: p95 <= 150 ms on the WORST-CASE population): PASS
+  worst-case p95 = 27.2 ms;  slowest single query 'community' at 29.1 ms

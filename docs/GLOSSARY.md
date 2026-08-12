@@ -78,6 +78,53 @@ question → same answer. No wall-clock output, no model in the maintenance
 path, sorted walks, stable serialization, no set-iteration-order dependence.
 The property behind goldens, merge safety, and the audit story.
 
+**Accelerator (T1)** — The **derived** term-major index under
+`.fux/runtime/`, built from the committed shards alone and never committed.
+Blocked postings (128 per line) plus a fixed-width binary
+[offset table](#offset-table); it makes warm `ask` fast and is bound by the
+[differential law](#differential-law). Deleting it costs a `fux build` and
+nothing else. Tier T1 in the [index-format compare doc](compare/index-format.compare.md)
+§3. See [ADR-0005](adr/0005-derived-accelerator.md).
+
+**Block / block line** — One line of the accelerator's postings file, holding
+up to 128 `(docidx, tf_heading, tf_body)` entries for a single term, in
+ascending docidx order. Splitting a term's postings into blocks is what closes
+the *common-term trap*: a `df`-400k term is a 5 MB JSON line that costs 397 ms
+to parse (measurement B4), and blocking with [`mx`](#mx-block-max) skipping
+brought that to 44 ms (B5).
+
+**Differential law** — **Accelerator results equal reference-scan results,
+byte for byte.** Asserted on the serialized `ask --json` payload over
+generated sweeps and every graded golden, in both skipping modes, at several
+`top` values — not spot-checked and not tolerance-based. The invariant the
+whole tiering story rests on: a 99 %-equivalent accelerator produces a fast
+system whose every downstream measurement is quietly untrustworthy, and
+nothing ever errors. M4's [ARC cache](#arc-cache) carries the same discipline.
+See [ADR-0005](adr/0005-derived-accelerator.md), `tools/differential/`.
+
+**`mx` (block max)** — The largest **weighted term frequency**
+(`3*tf_heading + tf_body`) in a [block](#block--block-line), stored as an
+integer in the [offset table](#offset-table). With `mnw` (the block's smallest
+`wlen`) it bounds the largest BM25F contribution any posting in that block can
+make, because the contribution is increasing in weighted tf and *decreasing*
+in document length. `mx` alone is a valid but loose bound. Named for
+Block-Max WAND (Ding & Suel, SIGIR 2011).
+
+**Offset table** — The accelerator's `*.idx` sidecar: 40-byte fixed-width
+entries (`term, block_no, offset, length, mx, mnw, first_doc, last_doc,
+count`) sorted by term, bisected to find a term's blocks. Binary and derived,
+so no committed-bytes law applies. It lets a skip decision be made with one
+`struct.unpack` and **without touching the block line at all** — cheaper than
+string-slicing the line, and it keeps the line valid JSON.
+
+**Skipping (bounded deferred-term admission)** — The accelerator's loss-free
+shortcut. Query terms open rarest-first; once every candidate has an exact
+score, an unseen document can only match the *deferred* terms, so its ceiling
+is the sum of their best block bounds. If that ceiling cannot reach the k-th
+best score, every unopened block is skipped. **Never by dropping postings** —
+pruning is forbidden ([ADR-0003](adr/0003-pruning-criterion-rerun.md)); the
+worst case is doing the scan's work, never a wrong answer.
+
 **Derived plane** — A child of the [`.fux` directory](#fux-directory) that is
 **rebuildable and gitignored**: `runtime/` (M2's accelerator segments) and
 `cache/` (M4's fetch cache). Each is created through `derived_dir()`, which

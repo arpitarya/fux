@@ -4,18 +4,34 @@
 small git-carried index, fetch content from the systems that own it, verify
 at answer time.**
 
-> **Status (2026-08-10): T0 slice — `ingest` + `ask` work on this repo.**
+> **Status (2026-08-12): M2 shipped — the accelerator is in.**
 > `src/fux/` exists. From a configured directory:
 > ```bash
-> fux ingest              # builds the committed .fux/index/*.jsonl
-> fux ask "your question" # scans it, ranks with BM25F, cites the source file
+> fux ingest               # builds the committed .fux/index/*.jsonl (+ the accelerator)
+> fux ask "your question"  # ranks with BM25F, cites the source file
+> fux find "your question" # ranked locations, one per line
+> fux answer "a question"  # the single best answer the index can give
 > ```
+> **Warm `ask` is measured at a worst-case p95 of 27.2 ms on 8 870 RFC
+> documents** — against a pre-registered 150 ms bar, where the reference
+> scan takes 4.2 s (prediction **R3 PASS**,
+> [the run](docs/conformance/2026-08-12-m2-accelerator/report.md)).
+>
+> The speed comes from a **derived** index under `.fux/runtime/` — never
+> committed, rebuilt from the committed shards by `fux build`. It is bound by
+> a **differential law**: its results are *byte-identical* to the reference
+> scan's, asserted over thousands of comparisons rather than spot-checked.
+> `fux ask --scan` forces the reference path.
+>
+> A dense lane exists behind `ask --hybrid` and is **off by default** — on the
+> graded corpus it closes three known gaps and breaks nine working queries,
+> so the default is a measurement rather than a preference.
+>
 > URLs can join the corpus through a consumer-owned middleware file
 > (`.fux/middleware/cdp.py`, Chrome DevTools Protocol on pure stdlib) —
 > list them one per line in `.fux/sources/urls`, then
 > `fux ingest --refresh-urls`. ADR-0010 + ADR-0011 (both proposed).
-> No accelerator yet (scan-only, ~100–200 ms class queries — correct M1
-> behavior, not a bug) and no dense/graph query lanes (M2/M3). The v0.26
+> No graph query lane yet (M3). The v0.26
 > engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
 > is specified in
