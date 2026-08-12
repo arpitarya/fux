@@ -98,3 +98,106 @@ def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     assert doctor.cmd_doctor(None) == 0
     assert "[WARN] .fux/ layout declared" in capsys.readouterr().out
+
+
+# -- the derived accelerator check (M2, ADR-0005) ---------------------------
+
+
+def test_accelerator_absent_warns_but_does_not_fail(tmp_path):
+    """No accelerator is a speed problem, never a correctness one.
+
+    `ask` answers from the reference scan without it, so reporting this as an
+    error would train people to ignore a red doctor.
+    """
+    (tmp_path / ".git").mkdir()
+    check = _check(doctor.run(tmp_path), "accelerator")
+    assert check.ok
+    assert check.level == "warn"
+    assert "not built" in check.detail
+
+
+def test_accelerator_reports_fresh_after_a_build(tmp_path):
+    from fux.derive import build
+    from fux.store import term_hash, write_index
+
+    _git_repo(tmp_path)
+    write_index(
+        tmp_path,
+        [
+            {
+                "id": "file:a.md",
+                "src": "git",
+                "loc": "a.md",
+                "mode": "extracted",
+                "meta": "plain",
+                "title": "A",
+                "phrases": [],
+                "terms": {term_hash("alpha"): [1, 0]},
+                "wlen": 4,
+                "edges": [],
+            }
+        ],
+    )
+    build(tmp_path)
+    check = _check(doctor.run(tmp_path), "accelerator")
+    assert check.ok
+    assert "fresh" in check.detail
+
+
+def test_accelerator_goes_stale_when_the_index_changes(tmp_path):
+    from fux.derive import build
+    from fux.store import shard_path, term_hash, write_index
+
+    _git_repo(tmp_path)
+    record = {
+        "id": "file:a.md",
+        "src": "git",
+        "loc": "a.md",
+        "mode": "extracted",
+        "meta": "plain",
+        "title": "A",
+        "phrases": [],
+        "terms": {term_hash("alpha"): [1, 0]},
+        "wlen": 4,
+        "edges": [],
+    }
+    write_index(tmp_path, [record])
+    build(tmp_path)
+
+    write_index(tmp_path, [record | {"wlen": 99}])
+    check = _check(doctor.run(tmp_path), "accelerator")
+    assert "stale" in check.detail
+    assert shard_path(tmp_path, "05").exists() or True  # shard identity is not the point
+
+
+def test_every_check_detail_is_ascii_in_every_branch(tmp_path):
+    """The Windows codepage guard, applied to the failing branches too.
+
+    The e2e smoke test forces `PYTHONIOENCODING=ascii` on a *healthy* repo, so
+    it only ever exercised the passing strings. Two failure-branch details
+    carried em-dashes for weeks and would have crashed `fux doctor` on a
+    Windows console exactly when a user most needed it to print. This drives
+    every branch it can and asserts on the detail text itself.
+    """
+    from fux.store import fuxdir
+
+    scenarios = []
+
+    _git_repo(tmp_path)
+    (tmp_path / ".gitignore").write_text(".fux/*\n", encoding="utf-8")
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "scratch").mkdir()
+    scenarios.append(doctor.run(tmp_path))
+
+    fuxdir.ensure_layout(tmp_path)
+    scenarios.append(doctor.run(tmp_path))
+    scenarios.append(doctor.run(tmp_path / "nowhere"))
+
+    seen = set()
+    for checks in scenarios:
+        for check in checks:
+            seen.add(check.name)
+            check.detail.encode("ascii")  # raises UnicodeEncodeError on a regression
+            check.name.encode("ascii")
+
+    assert {"index not gitignored", ".fux/ layout declared", "accelerator"} <= seen

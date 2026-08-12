@@ -33,6 +33,24 @@ def _cmd_ask(args) -> int:
     return cmd_ask(args)
 
 
+def _cmd_find(args) -> int:
+    from .query import cmd_find
+
+    return cmd_find(args)
+
+
+def _cmd_answer(args) -> int:
+    from .query import cmd_answer
+
+    return cmd_answer(args)
+
+
+def _cmd_build(args) -> int:
+    from .ingest import cmd_build
+
+    return cmd_build(args)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fux", description="rank, fetch, verify — an index over the systems that own your docs")
     parser.add_argument("--version", action="version", version=f"fux {__version__}")
@@ -47,13 +65,37 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="fetch [sources.url] urls through the consumer middleware (the ONLY networked ingest path; off by default)",
     )
+    p_ingest.add_argument(
+        "--no-accelerator",
+        action="store_true",
+        help="skip building the derived accelerator (results are unaffected either way)",
+    )
     p_ingest.set_defaults(func=_cmd_ingest)
 
-    p_ask = sub.add_parser("ask", help="answer a question by scanning the committed index")
-    p_ask.add_argument("query", help="natural-language question")
+    sub.add_parser(
+        "build", help="rebuild the derived accelerator from the committed index"
+    ).set_defaults(func=_cmd_build)
+
+    def _query_parser(name: str, help_text: str):
+        p = sub.add_parser(name, help=help_text)
+        p.add_argument("query", help="natural-language question")
+        p.add_argument("--json", action="store_true", help="machine-readable output")
+        # The accelerator is asserted byte-identical to the scan, so this flag
+        # only ever changes speed. It exists to reproduce a bug against the
+        # reference path.
+        p.add_argument("--scan", action="store_true", help="force the reference scan path")
+        return p
+
+    p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
     p_ask.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
-    p_ask.add_argument("--json", action="store_true", help="machine-readable output")
+    p_ask.add_argument("--explain", action="store_true", help="report which path answered")
     p_ask.set_defaults(func=_cmd_ask)
+
+    p_find = _query_parser("find", "ranked document locations, one per line")
+    p_find.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
+    p_find.set_defaults(func=_cmd_find)
+
+    _query_parser("answer", "the single best answer the index can give").set_defaults(func=_cmd_answer)
 
     return parser
 

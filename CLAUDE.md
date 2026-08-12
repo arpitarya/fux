@@ -22,6 +22,20 @@ This file is binding. Read it, then
 [`docs/INTERVIEW.md`](docs/INTERVIEW.md) (start at the reset block), before
 your first substantive change.
 
+## Triage first — a human-blocked queue stops the session
+
+**Standing directive (Arpit, 2026-08-12).** Before any work, read
+[`docs/OPEN-WORK.md`](docs/OPEN-WORK.md) and ask: *is any item agent-closable
+right now?*
+
+- **If not** — every remaining item is `OPEN·human`, gated on a verdict Arpit
+  hasn't read, or waiting on his hands — the session's **first** output is the
+  blocked-on-Arpit list in ≤3 lines, then it **stops**.
+- No invented scope, no doc polishing to fill the hours. "Next: Arpit reads…"
+  buried at the end of a long session is the failure this rule exists to
+  prevent; said upfront, it is the rule followed.
+- His time and tokens are money. Applies to Cowork and Claude Code alike.
+
 ## Where the state of play lives
 
 | you want | read |

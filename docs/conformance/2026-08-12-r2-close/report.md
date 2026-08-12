@@ -50,8 +50,8 @@ It is at #2, and the compare doc that ranks above it carries the same
 interval (`[11, ∞)`, both files, verified by grep). Neither was reachable
 before.
 
-**Raw output:** [`evidence/r2-questions-after.json.txt`](evidence/r2-questions-after.json.txt)
-· before: [`evidence/r2-questions-before.json.txt`](evidence/r2-questions-before.json.txt)
+**Raw output:** [`evidence/r2-questions-after.json.txt`](.evidence/r2-questions-after.json.txt)
+· before: [`evidence/r2-questions-before.json.txt`](.evidence/r2-questions-before.json.txt)
 
 ### R1 — asserted, not assumed
 
@@ -115,12 +115,47 @@ well-written documents about a deleted subsystem, and the only signal that
 they are retired is the `archive/v0.26-docs/` prefix on the `loc` — easy to
 miss inside a context window.
 
-**Raw output:** [`evidence/posthoc-intrusion-probe.json.txt`](evidence/posthoc-intrusion-probe.json.txt)
+**Raw output:** [`evidence/posthoc-intrusion-probe.json.txt`](.evidence/posthoc-intrusion-probe.json.txt)
 
 This is not a reason to revert. The archived set is genuinely the right
 answer to historical questions, and Q3 exists precisely because it is. It is
 a reason to decide, deliberately, how retired content is signalled. See
 [`ANALYSIS.md`](ANALYSIS.md).
+
+### Finding 3 — filing this evidence contaminated the corpus it measured
+
+Found while building M2, hours after this run was committed, and worth
+recording as a caught mistake rather than a quietly-fixed one.
+
+Committing the raw output above into `docs/` put it in `fux.toml`'s
+configured sources. The dumps **echo the query strings and the titles of
+every document they returned**, which makes them near-perfect lexical twins
+of the very questions R2 measures. Re-running the three frozen questions
+afterwards:
+
+```
+why did pruning fail                -> #1, #2 are this run's own evidence files
+what format is the committed index  -> #1, #3 are this run's own evidence files
+supersession penalty safe interval  -> #1, #3 are this run's own evidence files
+```
+
+All three still **PASS** — every required citation stayed inside the top 5 —
+so the verdict above stands unchanged. But a repo that indexes its own
+measurement evidence ranks the evidence above the answer, and the effect
+compounds with every run filed.
+
+**Remedy applied here:** the raw dumps moved to `.evidence/` (dot-prefixed).
+The git-dir walker already skips dot-prefixed paths, so this needs no new
+config, no schema change, and no engine change — and the evidence stays
+committed, linked and reproducible exactly as the conformance law requires.
+
+**What it does not fix:** `report.md` and `ANALYSIS.md` are themselves
+documents *about* these questions and legitimately match them. That is
+correct behaviour, not contamination — the distinction is between a written
+analysis and a mechanical dump of tool output.
+
+The general gap — a source tree with no way to exclude mechanical artifacts —
+is [W-45](../../open/W-45-source-exclusion.md).
 
 ## Reproduce
 

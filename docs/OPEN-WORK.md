@@ -37,6 +37,7 @@ is the spec; the detail file is the state.
 | W-32 | Adopt or reject the CLAUDE.md rewrite; apply the `.fux/` layout line | OPEN·human | — | [W-32](open/W-32-claude-md-adoption.md) |
 | W-33 | Resolve the ADR-numbering contradiction (CLAUDE.md "0016" vs adr/README "0001") | OPEN·human | — | [W-33](open/W-33-adr-numbering-contradiction.md) |
 | W-44 | Decide how retired content is signalled — the v0.26 doc set now answers questions about the *current* engine | OPEN·human | — | [W-44](open/W-44-archived-content-signalling.md) |
+| W-45 | Source exclusion — `[sources] dirs` is include-only, so committed measurement evidence contaminates the corpus it measures | OPEN | — | [W-45](open/W-45-source-exclusion.md) |
 | W-38 | M8 · the deferred set — one ADR + Arpit sign-off each; **pruning work is forbidden outside this item** | PARKED | W-26 | [W-38](open/W-38-m8-deferred.md) |
 
 ## Predictions still unmeasured

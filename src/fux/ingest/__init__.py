@@ -28,4 +28,37 @@ def cmd_ingest(args) -> int:
     )
     for s in report.skipped:
         print(f"  skip {s.rel_path}: {s.reason}")
+
+    # Build the derived accelerator here, where the committed shards were just
+    # written: `ask` should never pay for a build, and a stale accelerator that
+    # silently falls back to scan would hide a real slowdown.
+    if not getattr(args, "no_accelerator", False):
+        from ..derive import build as build_accelerator
+
+        accel_report = build_accelerator(root)
+        print(
+            f"accelerator: {accel_report.terms} terms, {accel_report.blocks} blocks, "
+            f"{accel_report.postings} postings (derived, not committed)"
+        )
+    return 0
+
+
+def cmd_build(args) -> int:
+    """`fux build` — rebuild the derived accelerator from the committed index.
+
+    Exists because the derived plane is disposable by design: deleting
+    `.fux/runtime/` must always be safe, and this is how it comes back without
+    re-walking the source tree.
+    """
+    root = find_root()
+    if root is None:
+        raise FuxError("no fux.toml or .git found — run from inside a configured repo")
+
+    from ..derive import build as build_accelerator
+
+    report = build_accelerator(root)
+    print(
+        f"accelerator rebuilt from the committed index: {report.docs} docs, "
+        f"{report.terms} terms, {report.blocks} blocks, {report.postings} postings"
+    )
     return 0

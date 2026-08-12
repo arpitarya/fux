@@ -76,7 +76,7 @@ def _layout(root: Path) -> list[Check]:
             Check(
                 "index not gitignored",
                 not ignored,
-                ".fux/index is committed, not derived — remove the ignore rule "
+                ".fux/index is committed, not derived - remove the ignore rule "
                 "(a `.fux/*` blanket is the usual cause)"
                 if ignored
                 else "the committed index is tracked",
@@ -89,13 +89,67 @@ def _layout(root: Path) -> list[Check]:
         Check(
             ".fux/ layout declared",
             not extras,
-            f"undeclared entries: {', '.join(extras)} — see .fux/README.md and ADR-0011"
+            f"undeclared entries: {', '.join(extras)} - see .fux/README.md and ADR-0011"
             if extras
             else "every entry is declared",
             level="warn",
         )
     )
+    checks.append(_accelerator(root))
     return checks
+
+
+def _accelerator(root: Path) -> Check:
+    """The derived accelerator: present, fresh, and genuinely not committed.
+
+    A **warning**, never an error. The accelerator is disposable by design —
+    `ask` answers correctly from the scan without it — so a missing or stale
+    one costs speed, not correctness. Reporting it as a failure would train
+    people to ignore a red doctor.
+    """
+    from .derive import format as derive_fmt
+    from .derive.accel import is_fresh
+
+    directory = derive_fmt.runtime_dir(root)
+    if not (directory / derive_fmt.STATS_NAME).exists():
+        return Check(
+            "accelerator",
+            True,
+            "not built - `ask` uses the reference scan; run `fux build` for the fast path",
+            level="warn",
+        )
+
+    tracked = _is_git_tracked(root, directory)
+    if tracked:
+        return Check(
+            "accelerator",
+            False,
+            ".fux/runtime/ is TRACKED by git - it is a derived plane and must not be "
+            "committed; check .fux/.gitignore lists `runtime/` (ADR-0011)",
+            level="warn",
+        )
+
+    if not is_fresh(root):
+        return Check(
+            "accelerator",
+            True,
+            "stale (the committed index changed since it was built) - `ask` falls back "
+            "to the scan; run `fux build`",
+            level="warn",
+        )
+    return Check("accelerator", True, f"fresh, derived, untracked ({directory})", level="warn")
+
+
+def _is_git_tracked(root: Path, path: Path) -> bool:
+    try:
+        result = subprocess.run(
+            ["git", "ls-files", "--error-unmatch", "--", str(path)],
+            cwd=root,
+            capture_output=True,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+    return result.returncode == 0
 
 
 def _is_git_ignored(root: Path, path: Path) -> bool | None:

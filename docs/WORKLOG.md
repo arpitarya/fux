@@ -19,6 +19,22 @@ diary.*
 
 ---
 
+## 2026-08-12 — Triage-first stop-rule added to CLAUDE.md  ·  Cowork
+- **Asked:** Arpit asked why hours of sessions closed no open items, then directed:
+  the agent should have said sooner that everything was blocked on him — "money,
+  time, everything is being wasted."
+- **Did:** on his explicit instruction, added a **Triage first** section to
+  CLAUDE.md (also to cage and milo): if every open item is `OPEN·human` or gated on
+  a verdict he hasn't read, the session's first output is the blocked-on-Arpit list
+  in ≤3 lines, then it stops — no invented scope. DOC-REGISTRY row bumped. Note:
+  fux *was* closing items (W-42, W-43 today); the defect was burying "Next: Arpit
+  reads…" at the end of long sessions instead of leading with it.
+- **Decided / open:** unchanged — W-30/31/32/33/44 await Arpit; W-22/M2 starts only
+  after he reads the Phase 0 report + ratification package.
+- **Next:** Arpit reads the Phase 0 report and the ratification package.
+
+---
+
 ## 2026-08-12 — Phase 0 of the open-items program: the backlog clears  ·  Claude Code
 - **Asked:** execute Phase 0 of `handoff/v0.32.0-open-items-handoff.md` — W-43,
   W-33, W-42, and the W-30/31/32 ratification package — then stop before M2.

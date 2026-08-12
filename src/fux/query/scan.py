@@ -10,34 +10,40 @@ never stored: `n`/`avg_wlen` need every document's `wlen`, which is pulled
 via a cheap byte-level regex (not a full parse) so non-candidate lines still
 never pay for `json.loads`; `df` falls out of the same substring check that
 finds candidates, at no extra cost.
+
+**This is the reference implementation of `ask`.** It answers a fresh clone
+with no build step, and it is the oracle the derived accelerator
+(`fux.derive`) is asserted byte-for-byte against. When the two disagree, this
+one is right by definition — which is why scoring and sorting live in
+`rank.py` and are shared rather than duplicated here.
 """
 
 from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
 from pathlib import Path
 
 from .. import store as store_mod
-from .bm25f import score_record
+from .rank import AskResult, Corpus, rank
 from .tokenize import tokenize
 
 _WLEN_RE = re.compile(rb'"wlen":(\d+)')
 
-
-@dataclass(frozen=True)
-class AskResult:
-    id: str
-    title: str
-    loc: str
-    score: float
+__all__ = ["AskResult", "ask", "query_term_hashes", "scan_candidates"]
 
 
-def ask(root: Path, query: str, top: int = 5) -> list[AskResult]:
-    query_hashes = list(dict.fromkeys(store_mod.term_hash(t) for t in tokenize(query)))
-    if not query_hashes:
-        return []
+def query_term_hashes(query: str) -> list[str]:
+    """Query terms as index hashes, deduped, order preserved.
+
+    Order is load-bearing: `rank()` sums BM25F contributions in this order, so
+    both candidate generators must derive it identically from the same string.
+    """
+    return list(dict.fromkeys(store_mod.term_hash(t) for t in tokenize(query)))
+
+
+def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], dict[str, int], Corpus]:
+    """The B2 pass: candidate records, `df`, and the corpus statistics."""
     patterns = {h: f'"{h}"'.encode("ascii") for h in query_hashes}
 
     total_docs = 0
@@ -59,20 +65,12 @@ def ask(root: Path, query: str, top: int = 5) -> list[AskResult]:
                 df[h] += 1
             candidates.append(json.loads(line))
 
-    if total_docs == 0:
+    return candidates, df, Corpus(n=total_docs, total_wlen=total_wlen)
+
+
+def ask(root: Path, query: str, top: int = 5) -> list[AskResult]:
+    query_hashes = query_term_hashes(query)
+    if not query_hashes:
         return []
-    avg_wlen = total_wlen / total_docs
-
-    scored = []
-    for record in candidates:
-        s = score_record(record.get("terms", {}), record.get("wlen", 0), query_hashes, df, total_docs, avg_wlen)
-        if s > 0:
-            scored.append((record, s))
-
-    # Deterministic tie-break on id — a score tie must never depend on scan order.
-    scored.sort(key=lambda pair: (-round(pair[1], 9), pair[0]["id"]))
-
-    return [
-        AskResult(id=record["id"], title=record.get("title", record.get("title_h", "")), loc=record["loc"], score=s)
-        for record, s in scored[:top]
-    ]
+    candidates, df, corpus = scan_candidates(root, query_hashes)
+    return rank(candidates, query_hashes, df, corpus, top)
