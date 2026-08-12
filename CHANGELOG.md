@@ -8,6 +8,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [0.32.0] - 2026-08-12
+
+**M2 — the query engine gets fast without changing a single answer.**
+
+Warm `ask` is measured at a **worst-case p95 of 27.2 ms on 8 870 RFC
+documents**, against a pre-registered 150 ms bar, where the reference scan
+takes 4 248.8 ms (prediction **R3 PASS**). The speed comes from a *derived*
+index that is never committed, and it is bound by a **differential law**: its
+results are byte-identical to the scan's, asserted over 6 088 comparisons on
+two corpora, every one of the playground's 50 graded goldens, and the shipped
+CLI itself.
+
+Also in this release: the `.fux/` directory becomes a declared layout, URL
+ingestion arrives through consumer-owned middleware, the demo corpus moves to
+a graded sibling repo, and **R2 closes at 3/3**.
+
+Versions 0.31.x were never published; their work ships here.
+
 ### Added
 
 - **The derived T1 accelerator — M2** ([ADR-0005](docs/adr/0005-derived-accelerator.md),

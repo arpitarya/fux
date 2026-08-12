@@ -48,6 +48,9 @@ Packaged for decision in
       `v0.26-docs/ (frozen)`, which is false; that set is at **root**
       `archive/v0.26-docs/`. *(Found closing W-43, 2026-08-12; left in place
       under law 7.)*
+- [ ] §"Package identity" says the version is **`0.30.0.dev0` at M0b**.
+      **`0.32.0` is released.** *(Found at the 0.32.0 release, 2026-08-12;
+      left in place under law 7 like the rest.)*
 - [ ] The stale `src/fux/ does not exist yet, by design` passage goes — it
       has been false since 2026-08-10.
 - [ ] The ADR-numbering line is fixed as part of
