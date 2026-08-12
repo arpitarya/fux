@@ -19,7 +19,8 @@ Root `archive/` is a different archive: it holds **old builds** (`v0.26/`,
 
 | pair | milestone | model | status |
 |------|-----------|-------|--------|
-| [handoff](v0.32.0-open-items-handoff.md) · [prompt](v0.32.0-open-items-prompt.md) | **v0.32.0 open-items program** — Phase 0 clears the backlog (W-43, W-33, W-42, the W-30/31/32 ratification package); Phase 1 builds M2 (W-22); M3–M7 gated on their own pairs | **Opus** throughout, two named Sonnet windows — the differential law is the invariant the tiering story rests on, and Phase 0 holds three silent-failure judgment calls | **live** (proposed) |
+| [handoff](v0.33.0-m4-refer-plane-handoff.md) · [prompt](v0.33.0-m4-refer-plane-prompt.md) | **M4 · the refer plane** — HTTP + Confluence, the ARC cache under the differential law, transient convert + passage re-score, the freshness fence; both filed proposals graduate into the API's first shape | **Opus** for the API shape and the ARC differential · one named **Sonnet** window for the adapters and the bench | **live** (proposed) — do not start until ADR-0005 is ratified |
+| [handoff](v0.32.0-open-items-handoff.md) · [prompt](v0.32.0-open-items-prompt.md) | **v0.32.0 open-items program** — Phase 0 (W-43, W-33, W-42, the ratification package) and Phase 1 (W-22 / M2) are **both closed**; M3–M7 gated on their own pairs | **Opus** throughout, two named Sonnet windows | **live** — Phases 0 and 1 done 2026-08-12; §5's remaining chain is still the sequencing of record |
 
 ## Proposed diffs (awaiting Arpit — agent-steering files are never auto-applied)
 
