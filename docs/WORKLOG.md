@@ -36,6 +36,38 @@ diary.*
 
 ---
 
+## 2026-08-13 — v0.32.0 released to PyPI; branches cleaned  ·  Claude Code
+- **Asked:** commit everything, merge to main, delete stale branches, publish a
+  new version.
+- **Did:** fast-forwarded `main` to the M2 branch (13 commits, **no merge
+  commit** — zero divergence). Bumped `0.30.0 -> 0.32.0` and cut the CHANGELOG
+  section; **0.31.x was never published, so its work ships here**. Pushed,
+  waited for CI, and confirmed **all 10 matrix jobs green** (linux/macos/windows
+  x py3.11-3.14 + build + gate) before releasing — the merge wall has no
+  required checks, so that check is the session's job. Tagged `v0.32.0`,
+  published the GitHub release, and the PyPI workflow succeeded.
+- **Verified black-box from PyPI, not from the green workflow.** Both archived
+  release mistakes were re-run as checks: the first `pip install` failed with
+  *"no matching distribution found"* on **Python 3.9.6** against
+  `requires-python >=3.11` — the exact false signal that once reached a filed
+  conformance doc — so it was re-run on 3.14 and installed fine. Then the
+  *behaviour* was asserted rather than the version string: the published wheel
+  exposes `build`/`find`/`answer`, builds the accelerator on ingest, and
+  **`ask` == `ask --scan` byte-identically**. The differential law holds in the
+  shipped artifact.
+- **Branches:** 6 remote branches were already deleted upstream (stale
+  tracking refs, pruned). Of the rest, **three local branches were UNMERGED**
+  (v0.6.0/v0.7.0/v0.18.0 era, 5 commits reachable from nowhere else). Rather
+  than destroy them, their tips were tagged `archive/pre-reset/*` and pushed
+  **before** deletion. `main` is now the only branch, local and remote.
+- **Decided / open:** shipped with **ADR-0005, 0001, 0010 and 0011 all still
+  ⏳ proposed** — the release does not ratify them. CLAUDE.md's "Package
+  identity" section now says `0.30.0.dev0` against a released `0.32.0`; it is
+  an agent-steering file, so that is logged as W-32's fourth stale passage
+  rather than silently corrected.
+- **Next:** Arpit reads the ratification package (5 decisions), then W-44/W-45.
+  M3 and M4 are both unblocked; the M4 pair is written and waiting.
+
 ## 2026-08-12 — M2 ships: the T1 accelerator, R3 PASS  ·  Claude Code
 - **Asked:** Phase 1 of the v0.32.0 program — W-22 / M2, the T1 accelerator —
   after Arpit said "go" twice (once for Phase 0, once for the M2 design plan).
