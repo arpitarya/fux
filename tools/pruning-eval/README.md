@@ -7,7 +7,7 @@ corpora, with Fux's scorer?**
 Read [`PRE-REGISTRATION.md`](PRE-REGISTRATION.md) first — metrics, slices, gold
 labels and the pass/fail threshold are frozen there, and it was committed
 before the first number existed (`git log` is the evidence). The verdict lives
-in [`../../docs/adr/0002-pruning-eval-gate.md`](../../docs/adr/0002-pruning-eval-gate.md).
+in [`../../work/adr/0002_pruning-eval-gate.md`](../../work/regression/2026-08-09-pruning-eval/VERDICT.md).
 
 ## Design in one line
 
@@ -29,7 +29,7 @@ archive/v0.26/.venv/bin/python -m pytest tools/pruning-eval/tests -q
 
 # the gate
 archive/v0.26/.venv/bin/python tools/pruning-eval/run.py \
-    --corpus acme orbit synth --out docs/conformance/<date>-pruning-eval/evidence
+    --corpus acme orbit synth --out work/regression/<date>-pruning-eval/evidence
 ```
 
 `--corpus fixture` is the 9-document development corpus; it is **not** a gating
@@ -56,4 +56,4 @@ delete that directory to force a rebuild.
 `kl_select.py` is written as production code — pure, deterministic, tested,
 documented — because it gets ported into the engine at M2. Everything else here
 is a measuring instrument for one question and is deleted or promoted once
-ADR-0002 lands.
+P1-GATE lands.

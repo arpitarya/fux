@@ -15,7 +15,7 @@ from pathlib import Path
 from .errors import FuxError
 
 CONFIG_NAME = "fux.toml"
-FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1); see ADR-0004
+FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1); see ADR-RECORD
 
 
 def find_root(start: Path | None = None) -> Path | None:
@@ -32,7 +32,7 @@ DEFAULT_URLS_FILE = ".fux/sources/urls"
 
 @dataclass
 class UrlSource:
-    """`[sources.url]` — consumer-middleware URL ingestion (ADR-0010/0011).
+    """`[sources.url]` — consumer-middleware URL ingestion (ADR-URL-INGEST/0011).
 
     - `middleware` — repo-root-relative path to a consumer-owned Python file;
       the shipped template lives at `.fux/middleware/cdp.py`.

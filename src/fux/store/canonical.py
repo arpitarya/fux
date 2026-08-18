@@ -1,5 +1,5 @@
 """The canonical byte encoding — the one function every committed line goes
-through. `docs/compare/index-format.compare.md` §7 binding rules: sorted
+through. `work/compare/index-format.compare.md` §7 binding rules: sorted
 keys, `(",",":")` separators, `ensure_ascii=False`, no floats, no nulls, NFC
 text. Enforced here, not trusted of callers — a bug in `ingest/` should fail
 loudly at the write boundary, not silently corrupt committed bytes.

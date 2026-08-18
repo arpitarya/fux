@@ -11,7 +11,7 @@ stdlib-only. Fetching runs ONLY under `fux ingest --refresh-urls` (the
 offline-by-default law); a plain ingest never imports the middleware.
 
 The URL list itself is a committed *file* — `.fux/sources/urls`, one URL per
-line — not a TOML array (ADR-0011): it is the shape git diffs and merges at
+line — not a TOML array (ADR-DOTFUX): it is the shape git diffs and merges at
 enterprise scale.
 
 Contract (documented in the template's docstring too):

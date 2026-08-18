@@ -28,7 +28,7 @@ Versions 0.31.x were never published; their work ships here.
 
 ### Added
 
-- **The derived T1 accelerator — M2** ([ADR-0005](docs/adr/0005-derived-accelerator.md),
+- **The derived T1 accelerator — M2** ([ADR-T1-ACCELERATOR](archive/adr/0005_derived-accelerator.md),
   ⏳ proposed). Term-major blocked postings and a fixed-width binary offset
   table under `.fux/runtime/` (derived, gitignored, `CACHEDIR.TAG`-tagged),
   rebuilt from the committed shards alone. **Prediction R3 PASS:** warm `ask`
@@ -41,7 +41,7 @@ Versions 0.31.x were never published; their work ships here.
   - Block skipping is **loss-free by construction**: terms open rarest-first
     and unopened blocks are skipped only when their combined upper bound
     provably cannot reach the k-th best score. Never by dropping postings —
-    pruning stays forbidden (ADR-0003).
+    pruning stays forbidden (P1-RERUN).
 - **`fux build`** — rebuild the derived accelerator from the committed index.
   `fux ingest` now builds it too; `--no-accelerator` opts out.
 - **`fux find`** (ranked locations, one per line) and **`fux answer`** (the
@@ -79,13 +79,13 @@ Versions 0.31.x were never published; their work ships here.
   - **Known consequence:** retired v0.26 documents now rank for questions
     about the *current* engine — *"what is the ingest cache"* returns five
     archived results describing a deleted subsystem. Measured post-hoc,
-    filed as [W-44](docs/open/W-44-archived-content-signalling.md), and
+    filed as [W-44](work/open/W-44-archived-content-signalling.md), and
     deliberately **not** fixed here; the mechanism is Arpit's call.
-    Full run: [`docs/conformance/2026-08-12-r2-close/`](docs/conformance/2026-08-12-r2-close/report.md).
+    Full run: [`work/regression/2026-08-12-r2-close/`](work/regression/2026-08-12-r2-close/report.md).
 
 ### Removed
 
-- **`examples/` is gone** ([ADR-0012](docs/adr/0012-playground-sibling-repo.md)).
+- **`examples/` is gone** ([SETUP-PLAYGROUND](work/setup/fux-playground.md)).
   The 20-document AcmePay fixture that shipped inside this repository was
   deleted. It contaminated the engine's own dogfood corpus, it entered the
   sdist by accident of layout rather than by decision, and — having no
@@ -94,7 +94,7 @@ Versions 0.31.x were never published; their work ships here.
 ### Added
 
 - **A graded corpus, in a sibling repository** (`fux-playground`,
-  [ADR-0012](docs/adr/0012-playground-sibling-repo.md)). Ten
+  [SETUP-PLAYGROUND](work/setup/fux-playground.md)). Ten
   internal-developer-platform documents, **fifty golden queries asserting
   ranks** across seven hazard classes (supersession, near-duplicate,
   attractor, collision, precision, edges, no-answer), and ten URLs that
@@ -105,7 +105,7 @@ Versions 0.31.x were never published; their work ships here.
   no `--update-goldens` flag. Standing status: 41 pass, 9 named engine gaps.
   README reading-order item 5 now points there.
 - **The `.fux/` directory is a declared layout**
-  ([ADR-0011](docs/adr/0011-fux-dir-layout.md), ⏳ proposed): every child is
+  ([ADR-DOTFUX](archive/adr/0011_fux-dir-layout.md), ⏳ proposed): every child is
   committed (`index/`, `sources/`, `middleware/`) or derived (`runtime/`,
   `cache/`). Ingest writes a self-describing `.fux/README.md` and a narrow
   `.fux/.gitignore` — derived names only, **never `*`** — both
@@ -114,7 +114,7 @@ Versions 0.31.x were never published; their work ships here.
   the committed index must not be git-ignored (error), and undeclared
   top-level `.fux/` entries are reported (warning).
 - **URL source via consumer-owned middleware**
-  ([ADR-0010](docs/adr/0010-url-source-consumer-middleware.md), ⏳ proposed):
+  ([ADR-URL-INGEST](archive/adr/0010_url-source-consumer-middleware.md), ⏳ proposed):
   `fux.toml [sources.url]` names a consumer-editable Python file
   (`middleware`, `urls_file`, `meta`); `fux ingest --refresh-urls` — the only
   networked ingest path — calls its `fetch(url) -> str` and indexes the
@@ -137,7 +137,7 @@ Versions 0.31.x were never published; their work ships here.
   line-numbered errors on a bad scheme. An inline `urls = [...]` key is now a
   hard error pointing at the file. The middleware moved from the repo root to
   `.fux/middleware/cdp.py`. Both are breaking changes against an unreleased,
-  hours-old surface, so no shims exist ([ADR-0011](docs/adr/0011-fux-dir-layout.md)).
+  hours-old surface, so no shims exist ([ADR-DOTFUX](archive/adr/0011_fux-dir-layout.md)).
 - Middleware tunables now live in an optional **`[sources.url.config]`** table
   passed verbatim to `configure(config)`. Fux validates only that it is a
   table and never reads a key inside it — the PEP 518 `[tool.*]` discipline,
@@ -148,7 +148,7 @@ Versions 0.31.x were never published; their work ships here.
 ## [0.30.0] - 2026-08-11
 
 M0 scaffold + M1 T0 slice — the first real code of the v0.30 rebuild.
-[ADR-0004](docs/adr/0004-index-format.md); R1 PASS, R2 2/3 PASS.
+[ADR-RECORD](archive/adr/0004_index-format.md); R1 PASS, R2 2/3 PASS.
 
 ### Added
 
@@ -157,11 +157,11 @@ M0 scaffold + M1 T0 slice — the first real code of the v0.30 rebuild.
   `doctor.py`.
 - `fux --version`, `fux doctor` (python version, repo root, `.fux/` writable).
 - Canonical committed store (`store/`): sharded doc-major JSONL under
-  `.fux/index/`, exactly per [`docs/compare/index-format.compare.md`](docs/compare/index-format.compare.md) §5/§7.
+  `.fux/index/`, exactly per [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md) §5/§7.
 - Git-dir ingest adapter and `extracted`-mode extractors (tokenizer, heading
   phrases, `ref`/`tag`/`code` edges, FuxVec `code`); `fux ingest` is
   incremental by sha.
 - `fux ask`: bytes-level prefilter scan over shards + ported BM25F, with
   citations.
-- [`docs/adr/0004-index-format.md`](docs/adr/0004-index-format.md) — the
+- [`work/adr/0004_index-format.md`](archive/adr/0004_index-format.md) — the
   schema, canonical rules, unicode policy, and analyzer version frozen.

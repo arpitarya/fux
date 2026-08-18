@@ -12,7 +12,7 @@ The archived engine shipped hybrid **enabled**, but only after an eval gate
 ran on a real graded set (archived ADR-0006). This build has one available —
 the fifty ranked goldens in the sibling `fux-playground`, whose
 `known_failure` class 3 (`q008`, `q017`, `q030`, `q031`, `q036`) is *named* in
-PLAN.md §M2 as the dense lane's target set. So the default is a measurement to
+ADR-T1-ACCELERATOR named it as the dense lane's target set. So the default is a measurement to
 be taken and reported, not a preference to be exercised at build time; and
 flipping it is Arpit's call on that evidence, exactly as the v0.26 line's
 Option B was authorised default-off and gated on a separate sign-off.

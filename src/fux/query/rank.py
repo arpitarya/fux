@@ -12,7 +12,7 @@ The differential law then reduces to a claim that can actually be tested:
 **the candidate set and the corpus statistics are identical.** Everything
 downstream is one code path.
 
-See `docs/adr/0005-derived-accelerator.md`.
+See `work/adr/0005_derived-accelerator.md`.
 """
 
 from __future__ import annotations

@@ -1,4 +1,4 @@
-"""The `.fux/` layout (ADR-0011): idempotent creation, never-overwrite,
+"""The `.fux/` layout (ADR-DOTFUX): idempotent creation, never-overwrite,
 and the two invariants that keep committed planes safe under one dotdir —
 the ignore file lists only derived dirs, derived dirs carry CACHEDIR.TAG.
 """

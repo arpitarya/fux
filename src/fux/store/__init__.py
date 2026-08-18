@@ -1,6 +1,6 @@
 """The canonical committed store — sharded doc-major JSONL under
-`.fux/index/`. See `docs/compare/index-format.compare.md` §5/§7 and
-`docs/adr/0004-index-format.md` for the frozen schema.
+`.fux/index/`. See `work/compare/index-format.compare.md` §5/§7 and
+`work/adr/0004_index-format.md` for the frozen schema.
 """
 
 from __future__ import annotations

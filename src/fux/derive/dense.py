@@ -1,6 +1,6 @@
 """The dense lane — an int-cached Hamming scan over the committed `code` codes.
 
-Every record already carries a 32-byte FuxVec sign-quantized code (ADR-0004,
+Every record already carries a 32-byte FuxVec sign-quantized code (ADR-RECORD,
 written at M1, unqueried until now). This module makes it searchable, at the
 one cost that matters: **decoding base64 into a Python `int` once per build**
 instead of once per query.

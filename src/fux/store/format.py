@@ -1,7 +1,7 @@
 """Constants and address functions for the committed store.
 
 Everything here is pure and dependency-free: shard/term hashing and the
-`_format` header shape. See `docs/compare/index-format.compare.md` §5/§7.
+`_format` header shape. See `work/compare/index-format.compare.md` §5/§7.
 """
 
 from __future__ import annotations
@@ -33,7 +33,7 @@ def content_sha(content: bytes) -> str:
     """40-hex (20-byte) blake2b digest of raw file bytes — the ledger `sha`.
 
     Same hash family as `term_hash`/`shard_for`, deliberately not a literal
-    git blob sha1 (decided during M1 build; see ADR-0004).
+    git blob sha1 (decided during M1 build; see ADR-RECORD).
     """
     return hashlib.blake2b(content, digest_size=20).hexdigest()
 

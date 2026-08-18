@@ -1,0 +1,306 @@
+---
+type: ADR
+name: ADR-INDEX-LIFECYCLE
+title: ADR-INDEX-LIFECYCLE (0009) — how the index is generated and updated
+description: One canonical encoder, sharded doc-major JSONL, write-if-different; a derived accelerator bound by the differential law and detected stale by per-shard shas.
+status: accepted
+timestamp: 2026-08-18T00:00:00Z
+---
+
+# ADR-INDEX-LIFECYCLE — how the index is generated and updated
+
+- **Name:** `ADR-INDEX-LIFECYCLE` — cite this everywhere; never cite the number
+- **Status:** accepted
+- **Supersedes:** `ADR-INDEX-FORMAT` — **archived 2026-08-18** at
+  [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
+- **Owns:** `src/fux/store/`, `src/fux/derive/`
+- **Laws:** L1, L2, L3, L6 — see [ADR-LAWS](0001_laws.md); never restated here
+- **Date:** 2026-08-18
+- **Feature:** generation and update of the committed index and its derived
+  accelerator
+- **Evidence:** [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §§2–5
+
+---
+
+## §1 — For humans
+
+There are two indexes, and confusing them is the source of most questions.
+
+The **committed index** is the product: `.fux/index/*.jsonl`, sharded, one
+document per line, in git. It is what a colleague gets when they clone. It is
+written through a single canonical encoder, so the same sources always produce
+the same bytes — that is what makes it diffable and mergeable at all.
+
+The **derived accelerator** is a cache: `.fux/runtime/`, gitignored, rebuilt by
+`fux build`. It exists purely to make queries fast, and it is bound by a law —
+its answers must be **byte-identical** to the reference scan's. If it cannot
+guarantee that, it refuses to build rather than shipping a faster wrong answer.
+
+Updates are cheap because writes are conditional: a shard whose bytes come out
+identical is not touched. And staleness is not a guess — the runtime manifest
+pins a sha of each committed shard, so the engine knows when its cache is
+behind and falls back to the scan on its own.
+
+**Diagram — Mermaid and its ASCII twin. Update both, always, together.**
+
+```mermaid
+flowchart TD
+    R["records"] --> C["canonical encoder<br/>sorted keys · no floats · no nulls · NFC"]
+    C --> S["shard = blake2b(id, 1 byte)<br/>256 shards"]
+    S --> WD{"bytes identical?"}
+    WD -->|yes| N["leave the file alone"]
+    WD -->|no| WW[".fux/index/xx.jsonl — COMMITTED"]
+    WW --> B["fux build"]
+    B --> INV{"invariants hold?"}
+    INV -->|no| ERR["refuse — exit 1"]
+    INV -->|yes| A[".fux/runtime/ — DERIVED<br/>manifest pins per-shard sha"]
+    A --> Q{"manifest matches?"}
+    Q -->|yes| FAST["accelerator answers"]
+    Q -->|no| SCAN["stale → scan answers"]
+```
+
+<details>
+<summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
+
+```text
+   records
+      |
+      v
+  canonical encoder   sorted keys · no floats · no nulls · NFC
+      |
+      v
+  shard = blake2b(id, 1 byte)  ->  256 shards
+      |
+      +-- bytes identical? --yes--> leave the file alone
+      |
+      no
+      v
+  .fux/index/xx.jsonl   COMMITTED  (in git)
+      |
+      | fux build
+      v
+  invariants hold? --no--> refuse, exit 1 (never a divergent accelerator)
+      |
+     yes
+      v
+  .fux/runtime/   DERIVED  (gitignored; manifest pins a sha per shard)
+      |
+      +-- manifest matches committed shas? --yes--> accelerator answers
+      |
+      no --> STALE: the scan answers, and doctor/--explain say so
+```
+
+</details>
+
+### Examples
+
+The committed side — a header line, then one document per line:
+
+```console
+$ head -c 140 .fux/index/2e.jsonl
+{"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}
+{"code":"MlLhv73WJJYbpS…","edges":[],"id":"file:docs/refer.md",…
+```
+
+The derived side refuses rather than diverging, and says so when it is stale:
+
+```console
+$ fux build
+error: .fux/index/aa.jsonl:2: … Refusing to build a divergent accelerator.
+# exit 1
+
+$ fux doctor
+[OK] accelerator: stale (the committed index changed since it was built) - `ask` falls back to the scan; run `fux build`
+```
+
+---
+
+## §2 — For agents
+
+### Context
+
+The committed index has to be three things at once: **small** enough to live in
+git, **diffable** so a review shows what changed, and **mergeable** so two
+branches touching different documents do not conflict. Those constraints, not
+query speed, chose the format.
+
+Query speed is then bought back with a derived structure — which introduces the
+real risk. A cache that answers *differently* from the reference path is worse
+than no cache, because the disagreement is invisible: both return results, and
+only one is right.
+
+### Decision
+
+**1. Sharded doc-major JSONL.** One document per line; shard =
+`blake2b(id, digest_size=1)` → `00.jsonl`…`ff.jsonl`, fixed at 256. Doc-major
+means one document's change touches one line in one file, which is what makes
+merges land.
+
+**2. One canonical encoder, enforced at the write boundary.** Sorted keys,
+`(",", ":")` separators, `ensure_ascii=False`, no floats, no nulls, NFC text.
+Enforced in `store/canonical.py` rather than trusted of callers: a bug in
+`ingest/` must fail loudly at the boundary, not silently corrupt committed
+bytes.
+
+**3. Every shard file opens with a `_format` header line** —
+`{"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}` —
+so a reader knows the schema and analyzer version without a side channel.
+
+**4. Write-if-different.** A shard whose bytes come out identical is left
+untouched, so `git status` stays clean and re-ingest is free to run on a hook.
+
+**5. The derived plane is disposable and never committed.** `.fux/runtime/` is
+a pure function of `.fux/index/` — nothing else is an input. That is what makes
+`rm -rf` on it always safe.
+
+**6. The build refuses rather than diverging.** Two invariants are asserted at
+build time, from the raw committed bytes: no quoted 16-hex token appears
+outside `terms`, and `"wlen":N` is found where the scan's regex finds it. If
+either fails the build errors out, because `scan.py` derives its statistics
+from raw bytes while the accelerator derives them from parsed records, and the
+two must agree by construction.
+
+**7. Staleness is detected, not assumed.** The runtime manifest pins a sha per
+committed shard. On drift, `ask` falls back to the scan and says so under
+`--explain`; `fux doctor` reports it.
+
+**8. Term-hash collisions fail the build**, tracked across the whole run by a
+single shared tracker — two distinct terms sharing an 8-byte digest would
+silently merge their postings.
+
+### What it looks like
+
+Verbatim from [the capture](../../work/regression/2026-08-18-ingest-and-index/report.md).
+
+**A shard, header line then documents:**
+
+```console
+$ head -c 240 .fux/index/2e.jsonl
+{"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}
+{"code":"MlLhv73WJJYbpSiyUpUqGlZkY-rXcOv3D1-yqmU5txU","edges":[],"id":"file:docs/refer.md","loc":"docs/refer.md","meta":"plain","mode":"extracted","phrases":["The ref
+```
+
+**Shard addressing, verified against the files on disk:**
+
+```console
+file:docs/refer.md        -> 2e.jsonl
+file:docs/pruning.md      -> 88.jsonl
+file:docs/index-format.md -> e6.jsonl
+```
+
+**The derived manifest — note the per-shard shas, which are the staleness
+mechanism:**
+
+```json
+{
+  "analyzer": "v1",
+  "block_size": 128,
+  "blocks": 78,
+  "docs": 3,
+  "index_schema": "fux.index.v1",
+  "schema": "fux.runtime.v1",
+  "shards": {
+    "2e.jsonl": "2d4f19bcd8f8af905da1103648c3df21007d3255",
+    "88.jsonl": "61abfc1c7540bf7b0626fbb9de360a42496b5908",
+    "e6.jsonl": "c7c7b09f882e30a96612927a3d1921c79f4e57b2"
+  },
+  "terms": 78
+}
+```
+
+**Staleness, handled honestly** — this was checked precisely because a silent
+stale read would be a serious defect:
+
+```console
+$ fux ask "who carries the pager" --explain
+3.0934  30aef0c52cf11116  (https://example.invalid/handbook/oncall)
+
+[scan]
+
+$ fux doctor
+[OK] accelerator: stale (the committed index changed since it was built) - `ask` falls back to the scan; run `fux build`
+```
+
+**A refused build** — the invariant doing its job, exit 1:
+
+```console
+$ fux build
+error: .fux/index/aa.jsonl:2: the quoted 16-hex token '30aef0c52cf11116' appears
+outside `terms` in record 'url:…/oncall'. `query/scan.py` counts it toward that
+term's df from the raw bytes, and the accelerator counts from the postings, so
+the two paths would score this corpus differently. Refusing to build a divergent
+accelerator.
+```
+
+### Consequences
+
+- **The committed index is reviewable.** A document change is one line in one
+  shard, and `git diff` shows it.
+- **Merges land per document.** Two branches editing different documents touch
+  different lines and usually different shards.
+- **The accelerator can be deleted at any moment** without loss, which is what
+  lets it be rebuilt aggressively.
+- **The invariant can refuse a build the user did not knowingly cause.** That is
+  the correct trade — but it has now bitten: hashed URL records always trip it
+  ([W-47](../../work/open/W-47-hashed-meta-blocks-accelerator.md)). The
+  invariant is not the bug; the field shape is. Recorded here because the
+  refusal *looks* like an accelerator defect and is not.
+- **256 shards is fixed, not configurable.** `[index] shards` documents the
+  value rather than setting it. Changing it rewrites every path in the tree.
+- **This record does not retire its predecessors**, which remain ⏳ *proposed*
+  and unratified.
+
+### Alternatives considered
+
+- **SQLite.** Rejected: a binary file does not diff or merge, which forfeits
+  the entire premise of committing the index to git.
+- **Term-major postings in the committed plane.** Rejected: one document's edit
+  would touch every term it contains, spraying the diff across the tree.
+  Term-major is exactly right for the *derived* plane, which is where it lives.
+- **Pruned postings** to shrink the committed index. Rejected on measurement:
+  the gate failed — the best selector was 35.9 points below unpruned recall@20
+  at 6 % retention. Full postings, permanently.
+- **Commit the accelerator too**, to skip a build step on clone. Rejected: it
+  changes on every ingest and is a pure function of bytes already committed.
+- **Trust the accelerator and reconcile later.** Rejected outright: a wrong
+  answer that arrives fast is the failure this engine is built to refuse.
+
+### Reference (required)
+
+- The encoder — [`src/fux/store/canonical.py`](../../src/fux/store/canonical.py);
+  addressing — [`format.py`](../../src/fux/store/format.py); conditional writes
+  — [`writer.py`](../../src/fux/store/writer.py); collisions —
+  [`collisions.py`](../../src/fux/store/collisions.py).
+- The build and its invariants —
+  [`src/fux/derive/build.py`](../../src/fux/derive/build.py) (the module
+  docstring states why raw-byte and parsed statistics must agree).
+- Artifacts and staleness behaviour, captured —
+  [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §§2–5.
+- The measured basis for the accelerator and the differential law —
+  [`work/regression/2026-08-12-m2-accelerator/`](../../work/regression/2026-08-12-m2-accelerator/report.md).
+- Canonical JSON, the prior art this follows — RFC 8785 (JCS):
+  https://www.rfc-editor.org/rfc/rfc8785
+
+### Veto condition
+
+**Reopen this decision if** the committed index stops being byte-reproducible,
+if the accelerator is ever observed disagreeing with the scan, or if committed
+density exceeds the M6 budget on a measured corpus.
+
+**How to check it:**
+
+```bash
+# 1. byte-reproducibility — the property everything else rests on
+sha1sum .fux/index/*.jsonl > /tmp/a && fux ingest >/dev/null \
+  && sha1sum .fux/index/*.jsonl > /tmp/b && diff /tmp/a /tmp/b && echo OK
+
+# 2. the two paths still agree, on this corpus
+diff <(fux ask "any query" --json) <(fux ask "any query" --scan --json) && echo IDENTICAL
+
+# 3. the invariants are still asserted at build time
+grep -n '_assert_invariants' src/fux/derive/build.py
+# expect: defined and called per record — removing the call is the veto
+
+# 4. density against the M6 budget (<= 250 MB packed @100k docs)
+du -sh .fux/index/
+```

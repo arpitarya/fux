@@ -17,7 +17,7 @@ from .parse import ParsedDoc
 HEADING_WEIGHT = 3
 BODY_WEIGHT = 1
 MAX_PHRASES = 12  # headings only, not headings + first-sentence — the simpler
-# of the handoff's two open options (§10), picked and recorded here / ADR-0004.
+# of the handoff's two open options (§10), picked and recorded here / ADR-RECORD.
 
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
 

@@ -128,7 +128,7 @@ def test_answer_declines_when_nothing_matches(tmp_path):
 
 
 def test_derived_plane_is_gitignored(tmp_path):
-    """ADR-0011's ignore rule, checked end to end rather than assumed."""
+    """ADR-DOTFUX's ignore rule, checked end to end rather than assumed."""
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, capture_output=True)
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")

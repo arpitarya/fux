@@ -10,7 +10,7 @@ identical is left untouched on disk. `ver` bumps strictly on this record's
 own `sha` changing, independent of edges (the M1 build-time decision on
 `ver` semantics).
 
-URL docs (ADR-0010) obey the offline-by-default law: a plain `fux ingest`
+URL docs (ADR-URL-INGEST) obey the offline-by-default law: a plain `fux ingest`
 never touches the network — every existing `url:` record is carried forward
 byte-identically. Only `--refresh-urls` loads the consumer middleware and
 fetches; on a refresh, a configured URL whose fetch fails keeps its prior
@@ -20,7 +20,7 @@ on the run that opted into the network.
 
 Every run calls `ensure_layout` first, so a fresh clone gets its `.fux/`
 README and narrow `.gitignore` before anything is written into the directory
-(ADR-0011). Both are write-if-missing; a consumer's edits survive.
+(ADR-DOTFUX). Both are write-if-missing; a consumer's edits survive.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ class IngestReport:
 
 def run(root: Path, *, refresh_urls: bool = False) -> IngestReport:
     config = load_config(root)
-    store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (ADR-0011)
+    store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (ADR-DOTFUX)
     files, skipped = walk_sources(root, config.source_dirs)
     existing = store_mod.read_index(root)
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}

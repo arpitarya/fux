@@ -1,7 +1,7 @@
 """BM25F scoring — weighted-tf-then-saturate once, never per-field BM25
 summed (CLAUDE.md law). Ported from `archive/v0.26/src/fux/index/bm25f.py`,
 adapted to the M1 schema: two fields (`heading`, `body`) — the archived
-third `path` field is dropped (ADR-0004). Defaults: heading=3.0, body=1.0,
+third `path` field is dropped (ADR-RECORD). Defaults: heading=3.0, body=1.0,
 k1=1.2, b=0.75, matching the archived non-path weights.
 
 Corpus statistics (`df`, `n`, `avg_wlen`) are inputs here, never derived

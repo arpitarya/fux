@@ -2,18 +2,18 @@
 """M1-rerun — the pruning gate, made decidable. Five arms at matched retention.
 
     archive/v0.26/.venv/bin/python tools/pruning-eval/run2.py \
-        --corpus rfc repodocs --out docs/conformance/<date>-pruning-rerun/evidence
+        --corpus rfc repodocs --out work/regression/<date>-pruning-rerun/evidence
 
 Definitions are frozen in `PRE-REGISTRATION-v2.md`, committed before the first
 gating number. This script measures; the verdict is a human-reviewed ADR.
 
-Three things differ from `run.py` (the run ADR-0002 voided):
+Three things differ from `run.py` (the run P1-GATE voided):
 
 * **recall@20 is the gate**, not the index's own hit@5 — the index is a
   candidate generator feeding a fetch-and-re-score stage, so a document moving
   from rank 1 to rank 8 costs nothing.
 * **Retention is matched across arms**, not `k` — comparing criteria at a fixed
-  `k` would repeat ADR-0002's error one level up.
+  `k` would repeat P1-GATE's error one level up.
 * **Five arms**, because the failure catalogue implicated the *criterion*, not
   pruning as such.
 """
@@ -313,7 +313,7 @@ def render(results: list[dict]) -> str:
             o.append(f"| {r['corpus']} | {rung:.0%} | {best.key} {best.label} "
                      f"| {best_v:.3f} | {ceil_abs:.3f} | {100*(ceil_abs-best_v):+.2f} |")
     o.append("")
-    o.append("*The call belongs in ADR-0003, reviewed by a human. This table states")
+    o.append("*The call belongs in P1-RERUN, reviewed by a human. This table states")
     o.append("the inputs; it does not adjudicate.*")
     return "\n".join(o) + "\n"
 

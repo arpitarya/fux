@@ -1,7 +1,7 @@
 """`fux doctor` — install/environment health check.
 
 Checks today: python version, repo root found, `.fux/` writable, and the two
-layout assertions from ADR-0011 — the committed index is not git-ignored, and
+layout assertions from ADR-DOTFUX — the committed index is not git-ignored, and
 nothing undeclared sits at the top level of `.fux/`.
 
 The index check exists because the failure it catches is silent: a `.fux/*`
@@ -66,7 +66,7 @@ def _repo_root(start: Path | None) -> list[Check]:
 
 
 def _layout(root: Path) -> list[Check]:
-    """ADR-0011: the index must not be ignored; `.fux/` holds only declared entries."""
+    """ADR-DOTFUX: the index must not be ignored; `.fux/` holds only declared entries."""
     checks: list[Check] = []
     ignored = _is_git_ignored(root, root / fuxdir.FUX_DIR / "index")
     if ignored is None:
@@ -89,7 +89,7 @@ def _layout(root: Path) -> list[Check]:
         Check(
             ".fux/ layout declared",
             not extras,
-            f"undeclared entries: {', '.join(extras)} - see .fux/README.md and ADR-0011"
+            f"undeclared entries: {', '.join(extras)} - see .fux/README.md and ADR-DOTFUX"
             if extras
             else "every entry is declared",
             level="warn",
@@ -125,7 +125,7 @@ def _accelerator(root: Path) -> Check:
             "accelerator",
             False,
             ".fux/runtime/ is TRACKED by git - it is a derived plane and must not be "
-            "committed; check .fux/.gitignore lists `runtime/` (ADR-0011)",
+            "committed; check .fux/.gitignore lists `runtime/` (ADR-DOTFUX)",
             level="warn",
         )
 

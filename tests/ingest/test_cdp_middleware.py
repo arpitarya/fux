@@ -1,7 +1,7 @@
 """The shipped `.fux/middleware/cdp.py` template — offline unit tests only.
 
 The template is consumer-owned code committed under `.fux/middleware/`
-(ADR-0011), not part of the `fux` package; these tests import it by path and
+(ADR-DOTFUX), not part of the `fux` package; these tests import it by path and
 exercise the pure parts (RFC 6455 framing, handshake key, HTML→markdown, the
 contract surface, the `configure` hook). Nothing here opens a socket or needs
 Chrome — the CDP session itself is the consumer's to run.
@@ -30,7 +30,7 @@ def mw():
 
 
 def test_template_lives_in_the_declared_middleware_plane():
-    assert _TEMPLATE.is_file()  # ADR-0011's path; the loader's default points here
+    assert _TEMPLATE.is_file()  # ADR-DOTFUX's path; the loader's default points here
 
 
 def test_contract_surface(mw):

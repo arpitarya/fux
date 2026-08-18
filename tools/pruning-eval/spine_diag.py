@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Why did the spine arms collapse? — the diagnostic behind ADR-0003.
+"""Why did the spine arms collapse? — the diagnostic behind P1-RERUN.
 
     archive/v0.26/.venv/bin/python tools/pruning-eval/spine_diag.py --corpus rfc
 

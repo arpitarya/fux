@@ -6,10 +6,13 @@
 # scope on purpose (W-42): R2's third frozen question cites it, and the
 # retired engine's decisions are still the answer to real questions about
 # why this build looks the way it does. Frozen means never *edited* — it
-# does not mean unindexed. See ADR-0004 §Consequences.
-dirs = ["docs", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
+# does not mean unindexed. See ADR-RECORD §Consequences.
+# `work/` joined the sources on 2026-08-18, when the session memory moved out of
+# `docs/`. Leaving it out would make the engine unable to answer questions about
+# its own state of play — which is the first thing anyone asks it.
+dirs = ["docs", "work", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 
-# URL ingestion via YOUR middleware file (ADR-0010, relocated by ADR-0011).
+# URL ingestion via YOUR middleware file (ADR-URL-INGEST, relocated by ADR-DOTFUX).
 # Uncomment to use. Fetching only ever happens under `fux ingest
 # --refresh-urls` (offline by default), and `meta = "hashed"` (the non-git
 # default) applies unless you opt into "plain" for public content.
@@ -35,5 +38,5 @@ dirs = ["docs", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 
 [index]
 # Fixed at 256 for M1 (shard = blake2b(id, digest_size=1) → 00..ff) — not yet
-# configurable; this key documents the value rather than setting it (ADR-0004).
+# configurable; this key documents the value rather than setting it (ADR-RECORD).
 shards = 256

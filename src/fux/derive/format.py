@@ -1,8 +1,8 @@
 """On-disk shapes for the derived T1 accelerator.
 
 Everything here lives under `.fux/runtime/` — derived, gitignored,
-`CACHEDIR.TAG`-tagged (ADR-0011), and rebuildable from the committed shards
-alone. **The committed format is untouched**; ADR-0004 is frozen and this
+`CACHEDIR.TAG`-tagged (ADR-DOTFUX), and rebuildable from the committed shards
+alone. **The committed format is untouched**; ADR-RECORD is frozen and this
 milestone does not go near it.
 
 ## Why the offset table is binary, and why that is not a JSONL retreat
@@ -42,7 +42,7 @@ which is the exact cost the accelerator is built to avoid.
 `mx` and `mnw` are both needed because a term's BM25F contribution is
 increasing in weighted tf *and decreasing in `wlen`* — an upper bound over a
 block requires the maximum of the first and the minimum of the second. `mx`
-alone would be a valid but loose bound. See `docs/adr/0005-*` and the proof
+alone would be a valid but loose bound. See ADR-T1-ACCELERATOR and the proof
 in `accel.block_bound`.
 """
 

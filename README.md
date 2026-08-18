@@ -15,7 +15,7 @@ at answer time.**
 > **Warm `ask` is measured at a worst-case p95 of 27.2 ms on 8 870 RFC
 > documents** — against a pre-registered 150 ms bar, where the reference
 > scan takes 4.2 s (prediction **R3 PASS**,
-> [the run](docs/conformance/2026-08-12-m2-accelerator/report.md)).
+> [the run](work/regression/2026-08-12-m2-accelerator/report.md)).
 >
 > The speed comes from a **derived** index under `.fux/runtime/` — never
 > committed, rebuilt from the committed shards by `fux build`. It is bound by
@@ -30,20 +30,20 @@ at answer time.**
 > URLs can join the corpus through a consumer-owned middleware file
 > (`.fux/middleware/cdp.py`, Chrome DevTools Protocol on pure stdlib) —
 > list them one per line in `.fux/sources/urls`, then
-> `fux ingest --refresh-urls`. ADR-0010 + ADR-0011 (both proposed).
+> `fux ingest --refresh-urls`. ADR-URL-INGEST + ADR-DOTFUX (both proposed).
 > No graph query lane yet (M3). The v0.26
 > engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
 > is specified in
-> [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md)
+> [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md)
 > (§4–§6 knowingly stale until M6) and built against
-> [`docs/PLAN.md`](docs/PLAN.md).
+> [the ADR register](docs/adr/README.md).
 >
 > **The pruning gate closed (2026-08-09): FAIL.** Keeping only each
 > document's top-*k* terms was measured, twice, against a corpus that could
 > actually test it — no selector came within 35.9 points of preserving
 > candidate recall at a 6 % budget. The committed index carries **full
-> postings**, permanently — [ADR-0003](docs/adr/0003-pruning-criterion-rerun.md).
+> postings**, permanently — [P1-RERUN](work/regression/2026-08-09-pruning-rerun/VERDICT.md).
 
 ## The idea
 
@@ -54,7 +54,7 @@ at answer time.**
   full per-document postings, dense binary codes, an extracted link graph,
   and a source ledger, one line per document, sorted and content-sharded so
   git itself diffs and merges it —
-  [`docs/compare/index-format.compare.md`](docs/compare/index-format.compare.md).
+  [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md).
 - **Answers verify themselves.** Rank in the index, fetch the cited
   documents live (through a version-keyed cache), re-score passages on the
   fetched bytes, cite the fresh sha. (The refer plane is M4; M1's `ask`
@@ -65,7 +65,7 @@ at answer time.**
 ## The `.fux/` directory
 
 Everything fux puts in your repo lives here, and every child is declared as
-**committed** or **derived** ([ADR-0011](docs/adr/0011-fux-dir-layout.md)):
+**committed** or **derived** ([ADR-DOTFUX](archive/adr/0011_fux-dir-layout.md)):
 
 | entry | kind | what it is |
 |---|---|---|
@@ -82,11 +82,11 @@ undeclared.
 
 ## Reading order
 
-1. [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md) — architecture + falsifiable predictions
-2. [`docs/compare/index-format.compare.md`](docs/compare/index-format.compare.md) — the committed format, measured
-3. [`docs/PLAN.md`](docs/PLAN.md) — milestones M0–M8
-4. [`docs/adr/0004-index-format.md`](docs/adr/0004-index-format.md) — the frozen M1 schema
+1. [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) — architecture + falsifiable predictions
+2. [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md) — the committed format, measured
+3. [the ADR register](docs/adr/README.md) — milestones M0–M8
+4. [`work/adr/0004_index-format.md`](archive/adr/0004_index-format.md) — the frozen M1 schema
 5. [`../fux-playground/PLAYGROUND.md`](../fux-playground/PLAYGROUND.md) — a graded 10-doc corpus to try it on, in a **separate sibling repository** (clone it next to this one)
-6. [`docs/WORKLOG.md`](docs/WORKLOG.md) — the running build log
+6. [`work/WORKLOG.md`](work/WORKLOG.md) — the running build log
 
 License: MIT.

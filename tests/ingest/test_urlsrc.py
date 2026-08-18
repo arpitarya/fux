@@ -1,4 +1,4 @@
-"""URL source (ADR-0010, relocated by ADR-0011): the consumer-middleware
+"""URL source (ADR-URL-INGEST, relocated by ADR-DOTFUX): the consumer-middleware
 contract, the committed line-oriented URL list, the opaque config table,
 offline-by-default carry-forward, hashed-meta default, and determinism. No
 test here touches the network — the middleware under test is a fake written

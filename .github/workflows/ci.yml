@@ -71,7 +71,7 @@ jobs:
           python - <<'PY'
           import glob, sys, tarfile
           sdist = glob.glob("dist/*.tar.gz")[0]
-          # top-level archive/ is the old non-working build; docs/archive/ is fine
+          # top-level archive/ is the old non-working build; work/archive/ is fine
           bad = [n for n in tarfile.open(sdist).getnames()
                  if n.split("/")[1:2] in (["archive"], ["uv.lock"], [".github"])]
           if bad:

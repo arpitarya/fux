@@ -2,7 +2,7 @@
 
 > **PROPOSED — not in force.** This file is the M0a rewrite of `CLAUDE.md`,
 > delivered as a diff for Arpit's review (see
-> [`docs/handoff/v0.30.0-claude-md.diff`](docs/handoff/v0.30.0-claude-md.diff)).
+> [`archive/handoff/v0.30.0-claude-md.diff`](archive/handoff/v0.30.0-claude-md.diff)).
 > Agent-steering files are proposed, never auto-applied. To adopt: `git mv
 > CLAUDE.md.proposed CLAUDE.md`, delete this block, and bump the DOC-REGISTRY
 > row. **Until then, the live `CLAUDE.md` is the binding one.**
@@ -16,16 +16,46 @@ maintenance path.
 **This is the second from-scratch rebuild.** The v0.19–0.26 substrate engine
 is archived at [`archive/v0.26/`](archive/v0.26/) — runnable, reference-only,
 never imported by new code. The architecture being built is **index-and-refer**,
-specified in [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md).
+specified in [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md).
 
 This file is binding. Read it, then
-[`docs/INTERVIEW.md`](docs/INTERVIEW.md) (start at the reset block), before
+[`work/INTERVIEW.md`](work/INTERVIEW.md) (start at the reset block), before
 your first substantive change.
+
+## Law zero — the ADRs are always up to date
+
+**Arpit, 2026-08-18, emphatic and standing: *always* make sure the ADRs are up
+to date.** Not at the end of the milestone, not when someone asks — in the
+change that makes them wrong.
+
+Three things follow, and none of them is optional:
+
+1. **No behaviour change lands without its ADR updated in the same change.**
+   Same commit, not the next one.
+2. **If a change genuinely touches no recorded decision, say so out loud** —
+   `no ADR affected`, in the commit message. That is a claim under your name in
+   git history, which is the point. Silence is not an answer.
+3. **Before you finish a session, re-read the records you touched code under.**
+   A record that describes behaviour the code no longer has is worse than no
+   record: it reads as authority.
+
+**This is enforced, not trusted.** `tests/test_adr_freshness.py` runs in CI on
+every push and fails a commit that changed an ADR-owned component without
+touching a record. `scripts/adr-guard.sh` is the same check as a pre-commit
+hook — install it once:
+
+```bash
+ln -sf ../../scripts/adr-guard.sh .git/hooks/pre-commit
+```
+
+**Why it is enforced.** Replayed over the 25 commits before the check existed,
+**13 of them** changed an owned component and updated no record. The prose rule
+was already in this file the whole time. That is the measured case for a check.
 
 ## Triage first — a human-blocked queue stops the session
 
 **Standing directive (Arpit, 2026-08-12).** Before any work, read
-[`docs/OPEN-WORK.md`](docs/OPEN-WORK.md) and ask: *is any item agent-closable
+[`work/OPEN-WORK.md`](work/OPEN-WORK.md) and ask: *is any item agent-closable
 right now?*
 
 - **If not** — every remaining item is `OPEN·human`, gated on a verdict Arpit
@@ -50,16 +80,21 @@ right now?*
 
 | you want | read |
 |---|---|
-| what to work on next | [`docs/OPEN-WORK.md`](docs/OPEN-WORK.md) §2 — **the single live tracker** |
-| the spec for a milestone id | [`docs/PLAN.md`](docs/PLAN.md) |
-| why the architecture is this shape | [`docs/paper/the-fux-index-paper.md`](docs/paper/the-fux-index-paper.md) |
-| a closed decision + its reopen-trigger | [`docs/compare/`](docs/compare/README.md) |
-| the judgment behind the reset | [`docs/INTERVIEW.md`](docs/INTERVIEW.md) |
+| what to work on next | [`work/OPEN-WORK.md`](work/OPEN-WORK.md) — **the single live queue**, two lanes |
+| the spec for a milestone id | [the ADR register](docs/adr/README.md) |
+| why the architecture is this shape | [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) |
+| a closed decision + its reopen-trigger | [`work/compare/`](work/compare/README.md) |
+| the judgment behind the reset | [`work/INTERVIEW.md`](work/INTERVIEW.md) |
 | a word you don't recognise | [`docs/GLOSSARY.md`](docs/GLOSSARY.md) |
+| what has actually shipped | [`work/IMPLEMENTATION.md`](work/IMPLEMENTATION.md) |
+| the measured evidence behind a claim | [`work/regression/`](work/regression/README.md) |
+| why a command fails on *this* surface | [`work/MACHINE.md`](work/MACHINE.md) |
+| which record owns a module | [`docs/adr/README.md`](docs/adr/README.md) §Ownership |
 
-**`OPEN-WORK.md` replaced the archived `IMPLEMENTATION.md`.** Any work item or
-prediction that starts, finishes, blocks, or is descoped updates it **in the
-same change as the work**. PLAN is the spec; OPEN-WORK is the state.
+Any work item or prediction that starts, finishes, blocks, or is descoped
+updates `OPEN-WORK.md` **in the same change as the work**. PLAN is the spec;
+OPEN-WORK is the state; `IMPLEMENTATION.md` is the record of what landed, and
+is what OPEN-WORK reconciles against before an item may be deleted.
 
 ## What we are building (scope)
 
@@ -78,45 +113,51 @@ systems that own it; verify at answer time.
   re-score passages on the fetched bytes, and cite a fresh sha.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic) and
   `enriched` (opt-in, model-assisted; deferred to M8). Both names are ⏳
-  *proposed* in [ADR-0001](docs/adr/0001-ingest-mode-naming.md) pending
+  *proposed* in [ADR-INGEST](archive/adr/0001_ingest-mode-naming.md) pending
   ratification — **`inferred` is retired**, because `INFERRED` is the edge
   grade for *model-derived* and the collision is the whole point of that ADR.
 
 **The build is gated on falsifiable predictions P1–P7** (paper §8). **No M2+
 work while P1 is unmeasured or failed.** That is a hard sequencing rule, not a
-preference — see [`docs/adr/0002-pruning-eval-gate.md`](docs/adr/0002-pruning-eval-gate.md).
+preference — see [`work/adr/0002_pruning-eval-gate.md`](work/regression/2026-08-09-pruning-eval/VERDICT.md).
 
 **Out of scope until it has an ADR and Arpit's sign-off:** anything from the
 archived build (the SQLite substrate, per-file cache, lean profile, state
 plane, `fux.lock`), further adapters beyond the capped three, MCP (it is
-[a proposal](docs/proposals/mcp-adapters.md), not a backlog item), and every
+[a proposal](work/proposals/mcp-adapters.md), not a backlog item), and every
 M8 item.
 
-**Do not port the archived engine.** [`PLAN.md`](docs/PLAN.md) §"What survives"
+**Do not port the archived engine.** [the ADR register](docs/adr/README.md) §"What survives"
 is the complete port list; each entry comes forward **with its tests**, when
 its milestone needs it. Nothing else comes back.
 
 ## Non-negotiable constraints
 
-- **`$0`, stdlib-only runtime.** No third-party *runtime* dependencies. The
+**This section is the only normative statement of the laws.** They are named
+**L1–L7** by [ADR-LAWS](docs/adr/0001_laws.md) so a record can cite one without
+restating it — and no record may restate one. Changing a law changes this
+section *and* ADR-LAWS' table, in the same commit.
+
+
+- **L1** · **`$0`, stdlib-only runtime.** No third-party *runtime* dependencies. The
   frontmatter parser and every codec are hand-rolled on purpose — that is the
   zero-dependency guarantee and the product's central promise. Dev/test tooling
   may use extras; the runtime path may not. No numpy, pandas, or scipy
   anywhere, including in measurement harnesses.
-- **Content is never durable outside its source system.** The index holds
+- **L2** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The single exception is explicit per-source
   `snapshot` policy. This is the law the whole architecture rests on.
-- **Deterministic — no model in the maintenance path.** Same sources →
+- **L3** · **Deterministic — no model in the maintenance path.** Same sources →
   byte-identical index and root hash. No wall-clock output, no unseeded
   randomness, no set-iteration-order dependence. No maintenance path may ever
   call a model — not to be "smarter" at ingest, not to summarize, not once.
-- **Offline by default.** Network access only inside explicit, fenced,
+- **L4** · **Offline by default.** Network access only inside explicit, fenced,
   opt-in paths. An import fence test enforces it.
-- **Hashed meta is the default** for non-git sources, enforced at write time.
+- **L5** · **Hashed meta is the default** for non-git sources, enforced at write time.
   It closes an ACL-mismatch leak, so it is not a configuration preference.
-- **Say "index", not "db".** What Fux commits is an index — statistics that
+- **L6** · **Say "index", not "db".** What Fux commits is an index — statistics that
   make documents findable. A council ruling, and it is load-bearing vocabulary.
-- **Python ≥ 3.11** (`tomllib`, modern typing). Match the surrounding style.
+- **L7** · **Python ≥ 3.11** (`tomllib`, modern typing). Match the surrounding style.
 
 ## Litmus for any new work
 
@@ -145,18 +186,21 @@ Every non-trivial feature moves through this pipeline, and the artifacts are
 committed:
 
 0. **Compare (when there's a fork).** Whenever a decision has multiple viable
-   options, write a *compare doc* in [`docs/compare/`](docs/compare/) first —
+   options, write a *compare doc* in [`work/compare/`](work/compare) first —
    debate, matrix, grounded references, a proposed verdict Arpit accepts or
    overrides, and a **reopen-trigger**. Standing rule.
    **Proposals (when it's an idea, not a fork).** An idea worth keeping but not
    being built now gets a *proposal doc* in
-   [`docs/proposals/`](docs/proposals/) — same rigor, `status: proposed`.
+   [`work/proposals/`](work/proposals) — same rigor, `status: proposed`.
    Parked, not lost: when picked up they graduate to a compare doc or plan entry.
-1. **Plan** — the design of record. Update [`docs/PLAN.md`](docs/PLAN.md)
+1. **Plan** — the design of record. Update [the ADR register](docs/adr/README.md)
    before building: what, why, scope in/out, the decision.
 2. **Handoff** — a self-contained spec: context, definition-of-done,
-   constraints, key files, edge cases, tests, open questions. Under
-   [`docs/handoff/`](docs/handoff/).
+   constraints, key files, edge cases, tests, open questions. **It lives in the
+   item's own detail file under [`work/open/`](work/open/README.md)**, not in a
+   separate directory: the handoff directory was retired on 2026-08-18 and its
+   contents moved to [`archive/handoff/`](archive/README.md). One item, one
+   file, spec and state together.
 3. **Prompt** — the paste-ready Claude Code prompt that executes the handoff
    (explore → plan → implement → verify), alongside its handoff.
 
@@ -179,22 +223,30 @@ to be Sonnet-executable is itself the signal that the design phase was done.
 
 Then, on completion:
 
-4. **One feature → one ADR** in [`docs/adr/`](docs/adr/) (see
-   [`TEMPLATE.md`](docs/adr/TEMPLATE.md)): decision, context, alternatives,
-   consequences. **Numbering continues at 0016**; ADRs 0001–0015 belong to the
-   archived engine and are cited by their archive path.
+4. **One feature → one ADR** in [`docs/adr/`](docs/adr/), from
+   [`docs/adr/TEMPLATE.md`](docs/adr/TEMPLATE.md): §1 for humans (one screen,
+   Mermaid + its ASCII twin), §2 for agents (context · decision · consequences ·
+   alternatives · reference · veto condition). Give it a **NAME** and cite that
+   name everywhere; the file number is an ordinal, not an identity. Add its
+   components to the ownership table and update
+   [`tests/test_adr_ownership.py`](tests/test_adr_ownership.py) in the same
+   change. Full convention: [`docs/adr/README.md`](docs/adr/README.md). ADRs
+   0001–0015 belong to the archived engine and are cited as "archived
+   ADR-NNNN" with their archive path.
 
 **Every rule, ADR, and material decision must carry a reference** — a paper, a
 blog post, or a concrete example link. A rule or ADR with no reference is
 incomplete. Ground the claim; don't assert it.
 
-**Archive implemented docs.** When a handoff/prompt pair (or a proposal) is
-fully implemented and its ADR is written, move it to
-[`docs/archive/`](docs/archive/README.md) in the same change, stamping
-`status: implemented` + the ADR link. Active directories hold *live* work only.
-Archived handoffs/prompts are named by the release version they shipped
-(`docs/archive/vX.Y.Z-name.md`), not their in-flight index. (Repo-level
-`archive/` = old builds; `docs/archive/` = completed doc artifacts.)
+**Archive implemented docs — into the ONE archive.** When a proposal is fully
+implemented and its ADR is written, move it to [`archive/`](archive/README.md)
+in the same change, stamping `status: implemented` + the ADR link, and add its
+row to `archive/README.md` naming its live successor. Active directories hold
+*live* work only.
+
+**There is no handoff directory.** It was retired on 2026-08-18; a spec for
+open work lives in that item's detail file under
+[`work/open/`](work/open/README.md), spec and state in one place.
 
 ## A pre-registered threshold may never move
 
@@ -220,9 +272,12 @@ for the worked example.
 Fux follows Google's **Open Knowledge Format** (OKF v0.1) — an open spec for
 knowledge as a directory of Markdown files with YAML frontmatter:
 
-- **The bundle is `docs/`** — root index at
-  [`docs/index.md`](docs/index.md), which declares `okf_version: "0.1"`.
-  Repo-root CLAUDE.md/README.md are tool entry points outside the bundle.
+- **The bundle is `docs/` + `work/`** — root index at
+  [`docs/index.md`](docs/index.md), which declares `okf_version: "0.1"` and
+  indexes both trees. (It spanned one tree until 2026-08-18; the split into
+  *what the project is* / *what is happening to it* did not change the bundle,
+  only its shape.) Repo-root CLAUDE.md/README.md are tool entry points outside
+  the bundle.
   **Convention: ALL-CAPS markdown files carry no YAML frontmatter** —
   GLOSSARY.md, DOC-REGISTRY.md, OPEN-WORK.md, WORKLOG.md are entry-point/tracker
   files, exempt from the `type` requirement. Lowercase docs conform.
@@ -230,7 +285,7 @@ knowledge as a directory of Markdown files with YAML frontmatter:
   `type: Compare Doc`, `type: Proposal`, `type: ADR`, `type: Handoff`,
   `type: Paper`. Provenance keys are legal OKF extensions; consumers must
   preserve unknown keys.
-- **`log.md` semantics**: `docs/WORKLOG.md` follows OKF's log convention
+- **`log.md` semantics**: `work/WORKLOG.md` follows OKF's log convention
   (date-grouped, newest first).
 - Conformance bar (OKF §9): parseable frontmatter + non-empty `type`
   everywhere; be permissive when consuming.
@@ -253,27 +308,160 @@ Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/b
 - **Chat responses too.** Answers in Cowork / Claude Code follow the same rule:
   precise, short paragraphs, lead with the takeaway.
 
+## Documentation discipline (required)
+
+**The shared memory between sessions is [`work/`](work/README.md).** `docs/`
+holds what the project *is* — plan, paper, glossary, decision records. `work/`
+holds what is *happening to it*. Read
+[`work/README.md`](work/README.md) once; it is the map.
+
+### The three-file session discipline
+
+Every session, without exception — **including a chat-only session where no
+code moved**:
+
+1. **[`work/WORKLOG.md`](work/WORKLOG.md)** — append **one entry before the
+   session ends**: what was asked, what got done, what was decided or left
+   open, what's next, and a mandatory **`Cost:`** line (time and/or tokens; if
+   it was not measured, write `unmeasured` and why — never omit the line).
+   **Never edit a past entry.** Append only, newest on top. A wrong old entry
+   is corrected by a new entry, not by a rewrite.
+2. **[`work/INTERVIEW.md`](work/INTERVIEW.md)** — the state-of-play doc, kept
+   current **during** the session, not in a wrap-up pass. Four maintained
+   sections: state of play · in-flight work + the immediate next step ·
+   standing constraints · lessons learned. Write it for a **different model
+   arriving mid-task with zero other context**. **A stale INTERVIEW at handoff
+   is as serious as a missing changelog entry.**
+3. **[`work/IMPLEMENTATION.md`](work/IMPLEMENTATION.md)** — the milestone log:
+   what shipped, when, and the outcome. This is the evidence store
+   `OPEN-WORK` reconciles against before anything is called done. A row is
+   earned by landing, never by being planned.
+
+### OPEN-WORK — the single live queue
+
+[`work/OPEN-WORK.md`](work/OPEN-WORK.md) is the *only* queue. Its length is the
+signal of how much is actually pending.
+
+1. **Updated in the same change as the work**, never afterwards — an item
+   finishes, a defect appears, scope moves, something blocks or unblocks: the
+   index row **and** the item's detail file change in that edit.
+2. **Completed items are removed, never ticked.** Deletion is legal only once
+   the outcome is in `IMPLEMENTATION.md` and any evidence is in
+   `work/regression/`. No tombstones, no DONE rows, no `closed/`.
+3. **Its markers are assertions, not evidence — re-derive, do not read.**
+   Reconcile against `work/regression/`, `IMPLEMENTATION.md` and the repo
+   itself (`git log`, `git tag`, the code) before believing any status. A stale
+   ✅ overstates progress; a stale pending row that an unrelated commit already
+   closed understates it — **same class of defect**.
+4. **Two lanes, ordered independently.** `arpit` needs a human's hands;
+   `agent` an agent can execute alone. They run concurrently — never force one
+   priority order across both, and never idle behind a decision you were never
+   going to make.
+   **Items are grouped by the record each one will have to update** — Law zero
+   made visible. If you cannot name the record an item belongs to, that is the
+   "no ADR affected" claim, said out loud.
+5. **Priority is damage that accrues with elapsed time**, above damage that is
+   merely present-but-static. Only the former gets worse by waiting.
+6. **No separate prioritization or sequencing doc.** Ordering lives inside
+   OPEN-WORK. A second document naming what to do next is always the stale one.
+
+### Archive is not evidence
+
+A doc under **any** `archive/` may be *named* ("superseded by X"). It may
+**never be cited as backing a live claim** — nothing guarantees an archived
+file was not overwritten after retirement.
+
+When repointing a citation away from an archived doc, **point it at the live
+successor**, don't just delete the link: a deleted link leaves the claim
+ungrounded, and nobody can see that anything is missing. If an archived doc was
+a claim's only support, the claim needs new grounding — code, a live doc, or a
+measured run under [`work/regression/`](work/regression/README.md).
+
+**There is exactly ONE archive, and it is [`archive/`](archive/README.md) at
+the repo root** (Arpit, 2026-08-10, restated 2026-08-18). Nothing under `docs/`
+or `work/` is an archive. **Anything that gets archived is moved there**, into a
+directory mirroring where it came from — `work/adr/` retires into
+`archive/adr/`, and the handoff directory retired wholesale into
+`archive/handoff/` — and gets a row in `archive/README.md` naming its live
+successor, or saying plainly that it has none. Enforced by
+`tests/test_archive_law.py`, which fails on a second `archive` directory
+anywhere and on a live doc still pointing at one.
+
+### Two hazards that bite silently
+
+- **Concurrent sessions are real.** Cowork, Claude Code and scheduled tasks all
+  touch these files. **Re-stage and re-apply your changes to `work/*.md` right
+  before committing** — another session may have landed an entry in between.
+- **Ground truth over prose.** Before writing any status claim — release state,
+  test counts, "nothing pending", "X is done" — check it against the actual
+  source of truth: `git log`/`status`/`tag`, the code, a command that
+  reproduces. A doc repeating another doc is not a second source.
+
+### The ADR standing rules
+
+The register, the convention and the ownership table are in
+[`docs/adr/README.md`](docs/adr/README.md). What binds every session:
+
+- **No behaviour change lands without its ADR updated in the same change.**
+  See §Law zero. If a change genuinely touches no recorded decision, **say so
+  explicitly — `no ADR affected` in the commit message** — rather than silently
+  skipping the check. Enforced by `tests/test_adr_freshness.py` (CI) and
+  `scripts/adr-guard.sh` (pre-commit); neither can be satisfied by intending to
+  update the record later.
+- **Cite records by name, never by number.** `ADR-RECORD`, not
+  "ADR-0004". Numbers exist only so the archive can map a retired record to its
+  successor. A live doc citing a number is a defect; fix it on contact.
+  ("archived ADR-NNNN" *with its path* still means the frozen v0.26 line.)
+- **Ownership is a table, not a judgement call.** Every `src/`/`tools/`
+  component is claimed by exactly one record in `docs/adr/README.md`. **When
+  the table changes, edit [`tests/test_adr_ownership.py`](tests/test_adr_ownership.py)
+  in the same change** — they drift silently otherwise, which is why the
+  executable twin exists.
+- **A record that restates a cross-cutting principle is a bug, not
+  redundancy.** The non-negotiable constraints have exactly one home — this
+  file — and are named L1–L7 by
+  [ADR-LAWS](docs/adr/0001_laws.md). Every other record cites `ADR-LAWS` and
+  the number; none paraphrases. Paraphrases drift, and a drifted paraphrase in
+  an accepted record reads as authority.
+- **Veto conditions are conditions to check, never events to await.** State
+  what would have to become *true* to reopen the decision, so it can be checked
+  mechanically today. An event never fires, because nobody is waiting.
+- **§1 is for humans (one screen, with a Mermaid diagram and its hand-paired
+  ASCII twin — both updated together, the twin collapsed in a `<details>`
+  block); §2 is for agents** (context · decision ·
+  consequences · alternatives · reference · veto). The reference is grounded in
+  code, a live doc, or measured evidence — **never an archived doc**.
+- **Records live in `docs/adr/`, and nowhere else.** A superseded record moves
+  to [`archive/adr/`](archive/adr/README.md) — where archive-is-not-evidence
+  applies from that moment — in the same change that accepts its successor, and
+  `archive/adr/README.md` maps its old number to that successor's name.
+
 ## Keep the docs in sync (required)
 
 **Every task updates the documentation — no exceptions.** This holds whether or
 not the task touched code: a decision, a scope change, or a plan is also
 documentation. A task is not "done" until the docs are true. At minimum:
 
-1. **[`docs/OPEN-WORK.md`](docs/OPEN-WORK.md)** — the live tracker. **On every
+1. **[`work/OPEN-WORK.md`](work/OPEN-WORK.md)** — the live tracker. **On every
    execution, whatever the outcome** — success, failure, blocked, interrupted,
    abandoned — the affected `W-nn` rows and prediction rows are updated before
    the session ends. A failed run records the failure with a one-line why.
    Never mark an item DONE with failing tests.
-2. **[`docs/PLAN.md`](docs/PLAN.md)** — design of record; keep milestone status
+2. **[the ADR register](docs/adr/README.md)** — design of record; keep milestone status
    truthful when behaviour or scope changes.
-3. **[`docs/WORKLOG.md`](docs/WORKLOG.md)** — an entry per substantive exchange
+3. **[`work/WORKLOG.md`](work/WORKLOG.md)** — an entry per substantive exchange
    (see below).
-4. **[`docs/INTERVIEW.md`](docs/INTERVIEW.md)** — the agent-succession handoff.
+4. **[`work/INTERVIEW.md`](work/INTERVIEW.md)** — the agent-succession handoff.
    Read it before your first substantive change; update it when direction,
    strategy, or a major decision changes, and add yourself to its maintainer
    line when you do. You will retire too; leave it better.
-5. **[`docs/DOC-REGISTRY.md`](docs/DOC-REGISTRY.md)** — bump the row for any doc
-   you touched; new maintained doc → new row, same change.
+5. **[`work/DOC-REGISTRY.md`](work/DOC-REGISTRY.md)** — bump the row for any doc
+   you touched; new maintained doc → new row, same change. **It lists live
+   documents only:** an archived doc's row is **deleted** in the change that
+   archives it — not struck through, not annotated "retired" — the same
+   discipline OPEN-WORK applies to closed items. No row may point into
+   `archive/`, every row's target must exist, and one document gets one row.
+   Enforced by `tests/test_doc_registry.py`.
 6. **[`README.md`](README.md)** — the public front door: status, guarantees,
    reading order. **`CHANGELOG.md`** once a package exists.
 7. **The relevant ADR**, [`docs/GLOSSARY.md`](docs/GLOSSARY.md) for any new
@@ -288,7 +476,7 @@ something, it belongs here or is linked from here.
 ## Session continuity — the running worklog (required)
 
 At the end of **every substantive exchange**, append an entry to
-[`docs/WORKLOG.md`](docs/WORKLOG.md): what was asked, what was done, what was
+[`work/WORKLOG.md`](work/WORKLOG.md): what was asked, what was done, what was
 decided or left open, and the single next step. A rolling exit-interview so a
 *new chat can pick up cold*. **Applies in Cowork and Claude Code alike.** Newest
 entry on top; short and true. Distinct from `INTERVIEW.md` (strategic,
@@ -298,52 +486,77 @@ cross-session succession) — the worklog is the granular, per-exchange trail.
 
 The fux-lab environment (`~/my_programs/fux-lab/`) is scratch and commits
 nothing. Its **evidence is not** — every run's report + diagnosis + raw
-evidence is filed into [`docs/conformance/`](docs/conformance/), so engine
+evidence is filed into [`work/regression/`](work/regression), so engine
 changes are made from measured data, not memory. Binding, like the docs law.
 
 Per run, in the same change:
 
-1. Create `docs/conformance/<date>-<run>/`.
+1. Create `work/regression/<date>-<run>/`.
 2. Drop the run's own report(s) there.
 3. Write `ANALYSIS.md` — the diagnosis turned into **specific improvements**,
    each with a repro command; state unresolved causes as unresolved.
 4. Save the primary data under `evidence/`.
-5. Add the run to [`docs/conformance/README.md`](docs/conformance/README.md)
+5. Add the run to [`work/regression/README.md`](work/regression/README.md)
    and bump the DOC-REGISTRY row.
 
+**A verdict is not an ADR.** When a run adjudicates a pre-registered
+prediction, the ruling is a `VERDICT.md` beside its evidence — `type: Verdict`,
+with the prediction id and the frozen pre-registration path. An ADR records a
+decision someone can supersede; **nothing supersedes a measurement except a
+better measurement**, which is a new run with its own verdict. The *decisions*
+that rest on a verdict live in `docs/adr/` and cite it. Enforced by
+`tests/test_regression_runs.py`.
+
 **The reproduce command must actually reproduce.** Findings that warrant a
-change graduate to `docs/proposals/` and, when accepted, an ADR. Never ship a
+change graduate to `work/proposals/` and, when accepted, an ADR. Never ship a
 ranking/behaviour change off a single synthetic corpus.
 
 ## Layout
 
 ```
-docs/
-  PLAN.md           design of record — milestones M0–M8, each gated by a prediction
-  OPEN-WORK.md      THE LIVE TRACKER — W-items + P1–P7 status (replaces IMPLEMENTATION.md)
-  INTERVIEW.md      agent-succession handoff (read the reset block first)
-  WORKLOG.md        per-exchange session handoff (append every exchange; OKF log.md)
+work/               THE SHARED MEMORY between sessions — start at work/README.md
+  WORKLOG.md        append-only session log (an entry every session, with Cost:)
+  INTERVIEW.md      state of play, kept current DURING the session
+  IMPLEMENTATION.md milestone log — what shipped, when, outcome (the evidence store)
+  OPEN-WORK.md      THE single live queue — two lanes; finished items are DELETED
+  MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
   DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
+  paper/            the architecture of record + figures + predictions
+  architecture.svg  the detailed diagram · architecture-overview.svg (5 components)
+  open/             one detail file per open W-nn; deleted with its row
+  setup/            fux-playground (grades) and fux-lab (measures) — outside this repo
+  regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules
+  compare/          live forks — verdict + explicit reopen-trigger
+  proposals/        parked ideas, not yet decided
+docs/               WHAT THE PROJECT IS
   GLOSSARY.md       every recurring term, defined once
-  paper/            the architecture of record + figures + predictions P1–P7
-  compare/          closed decisions — debate, matrix, verdict, reopen-trigger
-  proposals/        parked ideas — same rigor, status: proposed
-  handoff/          handoff + prompt pairs (live work only)
-  adr/              one ADR per feature, numbering continues at 0016 (+ TEMPLATE.md)
-  archive/          v0.26-docs/ (frozen), PLAN-v0.26.md, implemented handoffs
-  conformance/      measurement evidence & analysis (one folder per run)
+  adr/              THE REGISTER + TEMPLATE.md + ADR-LAWS; new records land here
+  index.md          the OKF bundle root
+src/fux/            the engine — every component claimed in docs/adr/README.md
+tests/              the suite, incl. test_adr_ownership.py (the ownership twin)
 tools/
-  pruning-eval/     M1's gate — pre-registration, KL selector, eval harness
-archive/
-  v0.26/            the previous engine — runnable, REFERENCE ONLY, never modified
-  v0.1/             the first build
+  pruning-eval/     the gate — frozen pre-registrations, KL selector, eval harness
+  differential/     the differential-law harness and the R3 bench
+archive/            THE ONE ARCHIVE — everything retired, mirroring the live tree
+  README.md         the map: every archived doc and its live successor
+  adr/              superseded records; maps old number -> successor NAME
+  handoff/          the retired handoff directory (executed pairs + unresolved specs)
+  v0.26/            build: the previous engine — runnable, REFERENCE ONLY
+  v0.26-docs/       build: the frozen v0.19–0.26 doc set ("archived ADR-NNNN")
+  v0.26-implemented/ · v0.30-rev1-planning/   frozen build artifacts
+  v0.1/             build: the first one
 ```
 
-**`src/fux/` does not exist yet, by design.** The package scaffold is M0b and
-lands **only if P1 passes** — scaffolding a package for an architecture a
-measurement may falsify is the "build the fun part first" failure the plan
-exists to avoid. When it lands: five-plane layout (`keyspace/`, `wire/`,
-`runtime/`, `refer/`, `ingest/`), `cli.py`, `errors.py`.
+**Records live in `docs/adr/`.** A superseded one moves to `archive/adr/` in
+the same change that accepts its successor, and the archive maps its number to
+that successor's name. The v0.30 set was archived wholesale on 2026-08-18;
+`work/adr/` no longer exists.
+
+**`src/fux/` was gated behind P1, and now exists.** The package scaffold was
+M0b and landed only once the pruning gate had been decided — scaffolding a
+package for an architecture a measurement might falsify is the "build the fun
+part first" failure the plan exists to avoid. It shipped in `v0.30.0`; the
+gating rule stands for every milestone after it.
 
 ## Error contract (applies once `src/` exists)
 

@@ -4,14 +4,14 @@
     archive/v0.26/.venv/bin/python tools/pruning-eval/corpus_gate.py \
         --corpus rfc repodocs acme orbit
 
-ADR-0002's lesson, promoted to a gate. The previous run reported a delta of
+P1-GATE's lesson, promoted to a gate. The previous run reported a delta of
 0.00 points because top-128 pruning removed nothing: the eval documents held
 32–46 distinct terms. A corpus cannot exercise 6 % retention unless its
 documents have enough vocabulary to lose.
 
 **Threshold: median ≥ 500 distinct terms per document.** Below it, STOP — the
 run would be void, and reporting it as a result would repeat exactly the
-mistake ADR-0002 caught. This runs *before* any arm, and its output goes into
+mistake P1-GATE caught. This runs *before* any arm, and its output goes into
 the pre-registration.
 """
 
@@ -75,7 +75,7 @@ def main() -> int:
               f"{v['p90']:>8,} {v['p99']:>8,} {v['max']:>8,}  "
               f"{r['terms_kept_at_6pct_median']:>6}  {verdict}")
     print(f"\nGate: median ≥ {MEDIAN_GATE} distinct terms per document "
-          f"(ADR-0002's lesson). '@6%' = terms a 6 % budget keeps for the "
+          f"(P1-GATE's lesson). '@6%' = terms a 6 % budget keeps for the "
           f"median document.")
 
     if args.out:

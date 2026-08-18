@@ -43,7 +43,7 @@ def test_no_root_reports_single_failing_check(tmp_path):
     assert not checks[1].ok
 
 
-# -- the .fux layout checks (ADR-0011) -------------------------------------
+# -- the .fux layout checks (ADR-DOTFUX) -------------------------------------
 
 
 def _check(checks, name):
@@ -100,7 +100,7 @@ def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     assert "[WARN] .fux/ layout declared" in capsys.readouterr().out
 
 
-# -- the derived accelerator check (M2, ADR-0005) ---------------------------
+# -- the derived accelerator check (M2, ADR-T1-ACCELERATOR) ---------------------------
 
 
 def test_accelerator_absent_warns_but_does_not_fail(tmp_path):
