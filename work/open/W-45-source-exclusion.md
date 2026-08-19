@@ -1,6 +1,6 @@
 # W-45 — A source tree needs a way to exclude mechanical artifacts
 
-**Status:** OPEN · small, needs a decision on config surface
+**Status:** OPEN · the config-surface question is **answered** ([ADR-DIR-LIST](../../docs/adr/0023_dir-list.md): an attribute on a directory line); the fork itself is not, and still owes a compare doc
 **Blocked by:** —
 **Evidence:** [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)
 §Finding 3
@@ -33,6 +33,14 @@ But it is a convention riding on an implementation detail:
 - It does not generalize. A consumer with generated API docs, vendored
   fixtures, or a `build/` directory inside a documentation tree has the same
   problem and no dot-prefix to reach for.
+
+> **2026-08-19 — this item now has a home, and still no verdict.**
+> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) moves source directories into
+> a line-oriented committed file with per-entry attributes, so "index this
+> directory, except the generated parts" is an attribute on a line rather than a
+> new config shape. **The schema question is answered; the fork is not.** The
+> attribute set is closed at one (`archived`), so adding an exclusion is a change
+> to that record, and this item still owes its compare doc.
 
 ## The options
 

@@ -1,6 +1,6 @@
 # Derived planes only: rebuildable from the committed index and the
 # source systems. NEVER add `*` here: `.fux/index/`, `.fux/sources/` and
-# `.fux/middleware/` are committed, and a blanket ignore would drop them
+# `.fux/fetchers/` are committed, and a blanket ignore would drop them
 # from git silently. `fux doctor` checks exactly that.
 runtime/
 cache/

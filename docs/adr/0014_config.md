@@ -43,8 +43,8 @@ misconfigured source that quietly indexes nothing looks exactly like a ranking
 problem, and costs a day to diagnose.
 
 **Exactly one table is deliberately *not* read: `[sources.url.config]`.** It is
-handed to your middleware verbatim and fux never looks inside it. That is what
-stops one middleware's vocabulary — `cdp_port`, `settle_ms` — from leaking into
+handed to your fetcher verbatim and fux never looks inside it. That is what
+stops one fetcher's vocabulary — `cdp_port`, `settle_ms` — from leaking into
 fux's schema and turning the adapter cap into a formality. Same discipline as
 PEP 518's `[tool.*]` tables.
 
@@ -55,12 +55,12 @@ flowchart TD
     F["fux.toml"] --> S["[sources]"]
     S --> D["dirs — REQUIRED<br/>non-empty list of strings"]
     S --> U["[sources.url] — optional"]
-    U --> M["middleware · urls_file<br/>paths, defaulted"]
+    U --> M["fetcher · urls_file<br/>paths, defaulted"]
     U --> ME["meta — hashed | plain"]
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
     F --> I["[index]"]
     I --> SH["shards = 256<br/>documents the value, cannot set it"]
-    CF -.->|"verbatim"| MW["your middleware's configure()"]
+    CF -.->|"verbatim"| MW["your fetcher's configure()"]
 ```
 
 <details>
@@ -73,13 +73,13 @@ flowchart TD
      |     +-- dirs            REQUIRED  non-empty list of strings
      |     |
      |     +-- [sources.url]   optional -- the whole URL source
-     |           +-- middleware   path, default .fux/middleware/cdp.py
+     |           +-- fetcher   path, default .fux/fetchers/cdp.py
      |           +-- urls_file    path, default .fux/sources/urls
      |           +-- meta         "hashed" (default) | "plain"
      |           +-- [sources.url.config]
      |                 PASSED THROUGH VERBATIM -- fux never reads a key
      |                        |
-     |                        +--> your middleware's configure(config)
+     |                        +--> your fetcher's configure(config)
      |
      +-- [index]
            +-- shards = 256   documents the value; cannot change it
@@ -103,12 +103,12 @@ Everything, annotated — from the fixture behind the capture:
 dirs = ["docs", "work", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 
 [sources.url]
-middleware = ".fux/middleware/demo.py"   # YOUR code; fux loads it by path
+fetcher = ".fux/fetchers/demo.py"   # YOUR code; fux loads it by path
 urls_file  = ".fux/sources/urls"         # one URL per line, a file not an array
 meta       = "hashed"                    # the default; "plain" for public content
 
 [sources.url.config]
-greeting = "hello"                       # the middleware's vocabulary, never fux's
+greeting = "hello"                       # the fetcher's vocabulary, never fux's
 
 [index]
 shards = 256                             # documents the value, cannot set it
@@ -155,7 +155,7 @@ tree. The key exists so the number is *visible* rather than folklore.
 **4. `[sources.url]` is entirely optional.** Absent means no URL source, and
 `--refresh-urls` has nothing to do.
 
-**5. `middleware` and `urls_file` default to `.fux/middleware/cdp.py` and
+**5. `fetcher` and `urls_file` default to `.fux/fetchers/cdp.py` and
 `.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the
 declared `.fux/` layout ([ADR-DOTFUX](0003_fux-directory.md)).
 
@@ -168,7 +168,7 @@ TOML array — now raises telling you to put one URL per line in the urls file. 
 retired key that silently does nothing is worse than one that stops the run.
 
 **8. `[sources.url.config]` is validated as *a table* and nothing more.** It is
-passed to the middleware's `configure()` verbatim. Fux never reads a key inside
+passed to the fetcher's `configure()` verbatim. Fux never reads a key inside
 it, and must never gain a reason to.
 
 **9. Validation errors name the file and the offending value.** `FuxError` at
@@ -177,7 +177,7 @@ the boundary, rendered by the CLI, exit 1.
 ### Consequences
 
 - **The config fits on a screen**, so a new consumer reads all of it.
-- **The adapter cap holds at the schema level.** Adding a middleware needs no
+- **The adapter cap holds at the schema level.** Adding a fetcher needs no
   fux change at all — which is the property that makes "three adapters" a
   decision rather than a queue.
 - **`shards` is a documentation-only key**, which is unusual and mildly
@@ -196,7 +196,7 @@ the boundary, rendered by the CLI, exit 1.
   repositories that are not Python projects, and half of them have no
   `pyproject.toml`.
 - **Read `cdp_port` and friends directly**, so the CDP template needs no
-  `configure()`. Rejected explicitly: it puts one middleware's vocabulary in
+  `configure()`. Rejected explicitly: it puts one fetcher's vocabulary in
   fux's schema and breaches the adapter cap through the back door.
 - **Make `shards` configurable.** Rejected until measured. It is a
   format-affecting constant; M6 is where a different value could be justified.
@@ -234,7 +234,7 @@ grep -rn 'config\[' src/fux/ | grep -v 'test'
 
 # 2. the config surface has not grown
 grep -oE '\braw\.get\("[a-z_]+"\)|data\.get\("[a-z]+"' src/fux/config.py | sort -u
-# expect: sources, index, middleware, urls_file, meta, config — and nothing else
+# expect: sources, index, fetcher, urls_file, meta, config — and nothing else
 
 # 3. every rejected value still names the file and the value
 fux ingest 2>&1 | head -1

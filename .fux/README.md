@@ -10,13 +10,13 @@ tagged with [`CACHEDIR.TAG`](https://bford.info/cachedir/)).
 | `.gitignore` | committed | lists only the derived directories, never `*` |
 | `index/` | committed | the wire-format index (ADR-0004) |
 | `sources/` | committed | large line-oriented source lists (`urls`; M4 may add more) |
-| `middleware/` | committed | consumer-owned code (`cdp.py`), edit freely |
+| `fetchers/` | committed | consumer-owned code (`cdp.py`), edit freely |
 | `runtime/` | derived | reserved for M2 accelerator segments; carries `CACHEDIR.TAG` |
 | `cache/` | derived | reserved for M4 ARC fetch cache; carries `CACHEDIR.TAG` |
 
-## The middleware is yours
+## The fetcher is yours
 
-`middleware/cdp.py` is **your** code, committed to **your** repo. Fux
+`fetchers/cdp.py` is **your** code, committed to **your** repo. Fux
 loads it by path under `fux ingest --refresh-urls` and never rewrites
 it. Change the port, the transport, the extraction, anything.
 

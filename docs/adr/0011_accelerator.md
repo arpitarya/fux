@@ -221,7 +221,7 @@ reproducible by construction.
   field, a different saturation — invalidates `block_bound` and the skipping
   argument with it. That is the veto below.
 - **A corpus with hashed URL records has no accelerator at all**
-  ([W-47](../../work/open/W-47-hashed-meta-blocks-accelerator.md)), so it pays
+  ([W-54](../../work/open/W-54-sources-rewrite.md)), so it pays
   the scan's 4 248.8 ms rather than 27.2 ms.
 
 ### Alternatives considered

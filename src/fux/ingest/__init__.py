@@ -1,4 +1,4 @@
-"""The ingest plane — git-dir adapter, consumer URL middleware, `extracted`-mode
+"""The ingest plane — git-dir adapter, consumer URL fetcher, `extracted`-mode
 extractors, and the `fux ingest` CLI handler. See `run.py` for the orchestration."""
 
 from __future__ import annotations

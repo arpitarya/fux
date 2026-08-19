@@ -1,6 +1,6 @@
-"""The shipped `.fux/middleware/cdp.py` template — offline unit tests only.
+"""The shipped `.fux/fetchers/cdp.py` template — offline unit tests only.
 
-The template is consumer-owned code committed under `.fux/middleware/`
+The template is consumer-owned code committed under `.fux/fetchers/`
 (ADR-DOTFUX), not part of the `fux` package; these tests import it by path and
 exercise the pure parts (RFC 6455 framing, handshake key, HTML→markdown, the
 contract surface, the `configure` hook). Nothing here opens a socket or needs
@@ -14,11 +14,11 @@ from pathlib import Path
 
 import pytest
 
-_TEMPLATE = Path(__file__).resolve().parents[2] / ".fux" / "middleware" / "cdp.py"
+_TEMPLATE = Path(__file__).resolve().parents[2] / ".fux" / "fetchers" / "cdp.py"
 
 
 def _load():
-    spec = importlib.util.spec_from_file_location("cdp_middleware_under_test", _TEMPLATE)
+    spec = importlib.util.spec_from_file_location("cdp_fetcher_under_test", _TEMPLATE)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
@@ -29,7 +29,7 @@ def mw():
     return _load()
 
 
-def test_template_lives_in_the_declared_middleware_plane():
+def test_template_lives_in_the_declared_fetcher_plane():
     assert _TEMPLATE.is_file()  # ADR-DOTFUX's path; the loader's default points here
 
 
@@ -52,7 +52,7 @@ def test_configure_overrides_the_defaults():
 
 def test_configure_rejects_an_unknown_key():
     module = _load()
-    with pytest.raises(module.MiddlewareError, match="unknown key"):
+    with pytest.raises(module.FetcherError, match="unknown key"):
         module.configure({"cdp_prot": 9333})
 
 

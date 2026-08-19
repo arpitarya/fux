@@ -11,53 +11,41 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — the inbox
 
-*Five decisions, one sitting. Stated here and in each detail file, because the
-package that used to hold them was archived on 2026-08-18. Any row older than
-**5 days** is named, with its age, in every session's first output.*
-
-| id | the decision | filed | detail |
-|---|---|---|---|
-| **W-30** | Ratify the ingest-mode naming, `extracted` / `enriched` | 2026-08-12 | [W-30](open/W-30-ratify-adr-0001.md) |
-| **W-31** | Ratify the `.fux/` layout and the URL middleware — **shipped code under unratified decisions since 2026-08-12** | 2026-08-12 | [W-31](open/W-31-ratify-adr-0010-0011.md) |
-| **W-32** | Adopt or reject the `CLAUDE.md` rewrite — its stale passages were fixed, so "reject" no longer means reverting to a file that misinforms | 2026-08-12 | [W-32](open/W-32-claude-md-adoption.md) |
-| **W-33** | Confirm restart-at-0001 + cite-by-name — a confirmation, not a decision | 2026-08-12 | [W-33](open/W-33-adr-numbering-contradiction.md) |
-| **W-44** | Decide how retired content is signalled | 2026-08-12 | [W-44](open/W-44-archived-content-signalling.md) |
+**Empty.**
 
 ---
 
 ## Open items, by record
 
-### [ADR-INGEST](../docs/adr/0007_ingest.md)
+### [ADR-URL-LIST](../docs/adr/0018_url-list.md) · [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-HTTP-FETCHER](../docs/adr/0021_http-fetcher.md)
 
-- **W-30** · `arpit` · the ingest-mode naming this record holds is still unratified — [detail](open/W-30-ratify-adr-0001.md)
-
-### [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) · [ADR-CONFIG](../docs/adr/0014_config.md) · [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md)
-
-- **W-31** · `arpit` · the `.fux/` layout and the URL middleware are shipped under unratified decisions — [detail](open/W-31-ratify-adr-0010-0011.md)
-- **W-45** · `agent` · `[sources] dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — [detail](open/W-45-source-exclusion.md)
-- **W-47** · `agent` · **hashed meta makes the accelerator unbuildable** — the default URL path writes an index no `fux build` will ever accept (27.2 ms → 4 248.8 ms at RFC scale) — [detail](open/W-47-hashed-meta-blocks-accelerator.md)
+- **W-54** · `agent` · **Opus** · **next** · the sources rewrite — one parser, two files, the URL path made to work. **Merged from W-47 · W-49 · W-50 · W-51 · W-53** (2026-08-19): they share a parser and a generated set, and five DoDs for one change is the drift each of them warned about — [detail](open/W-54-sources-rewrite.md)
 
 ### [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-FIND](../docs/adr/0005_find.md) · [ADR-ANSWER](../docs/adr/0006_answer.md)
 
-- **W-46** · `agent` · `ask --hybrid` crashes on a source install — the missing-model guard catches the wrong exceptions — [detail](open/W-46-hybrid-missing-model-crash.md)
-- **W-48** · `agent` · **low** · three output-contract inconsistencies across the three verbs — [detail](open/W-48-query-output-contract.md)
+- **W-46** · `agent` · Sonnet · `ask --hybrid` crashes on a source install — the missing-model guard catches the wrong exceptions — [detail](open/W-46-hybrid-missing-model-crash.md)
+- **W-48** · `agent` · Sonnet · **low** · three output-contract inconsistencies across the three verbs — [detail](open/W-48-query-output-contract.md)
 
-### [ADR-LAWS](../docs/adr/0001_laws.md)
+### [ADR-CONFIG](../docs/adr/0014_config.md)
 
-- **W-32** · `arpit` · adopt or reject the `CLAUDE.md` rewrite — the laws' only normative home — [detail](open/W-32-claude-md-adoption.md)
+- **W-45** · `agent` · `[sources] dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** by ADR-DIR-LIST — an exclusion attribute on a directory line — and the fork still owes a compare doc — [detail](open/W-45-source-exclusion.md)
 
-### [The ADR register](../docs/adr/README.md)
+### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
 
-- **W-33** · `arpit` · confirm restart-at-0001 + cite-by-name — [detail](open/W-33-adr-numbering-contradiction.md)
-- **W-44** · `arpit` · decide how retired content is signalled — the v0.26 doc set answers questions about the *current* engine — [detail](open/W-44-archived-content-signalling.md)
+*Both are gated on a pre-registered instrument that does not exist, is not an
+item, and has no owner. **Parked with a trigger, not scheduled**: they resume
+when the pre-registration is written, and not because they look ready.*
+
+- **W-44** · **PARKED** · annotate archived results, never reorder — decided ([ADR-DIR-LIST](../docs/adr/0023_dir-list.md)); **trigger: a frozen query set with expected live-vs-archived answers exists** — [detail](open/W-44-archived-content-signalling.md)
+- **W-52** · **PARKED** · `df` is computed over the union — **42% of live terms carry an inflated `df`**; **trigger: the same pre-registration, plus a second corpus** — [detail](open/W-52-df-over-the-union.md)
 
 ### No record yet — the unbuilt milestones
 
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-23** · `agent` · **next** · M3 graph lane — edges, community, `explain`/`graph`/`path` — [detail](open/W-23-m3-graph-lane.md)
-- **W-24** · `agent` · **next** · M4 refer plane — HTTP+Confluence, ARC, assembler, freshness fence · *no live spec; write one first* — [detail](open/W-24-m4-refer-plane.md)
+- **W-23** · `agent` · **next, and unblocked** · M3 graph lane — edges, community, `explain`/`graph`/`path`; none of the three verbs exists in `cli.py` — [detail](open/W-23-m3-graph-lane.md)
+- **W-24** · `agent` · **next, and unblocked** · M4 refer plane — HTTP+Confluence, ARC, assembler, freshness fence; `src/fux/refer/` is a 7-line stub · *no live spec; write one first* — [detail](open/W-24-m4-refer-plane.md)
 - **W-25** · `agent` · blocked by W-23, W-24 · M5 maintenance — hooks, line-wise LWW merge driver, hashed-meta enforcement — [detail](open/W-25-m5-maintenance.md)
 - **W-26** · `agent` · blocked by W-25 · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured — [detail](open/W-26-m6-scale-t2.md)
 - **W-27** · `agent` · blocked by W-26 · M7 dogfood & release gate — fux + Anton, two weeks — [detail](open/W-27-m7-dogfood-release-gate.md)
@@ -96,11 +84,14 @@ session needs first.*
    finishes, a defect is found, scope moves, something blocks or unblocks: this
    file and the item's detail file change in that same edit. A session that
    updates the queue "at the end" has already lied to the one after it.
-2. **Completed items are removed, never ticked.** Deletion is legal only once
+2. **Completed items are removed, never ticked.** Closing is legal only once
    the outcome is recorded in [`IMPLEMENTATION.md`](IMPLEMENTATION.md) and any
-   evidence is filed under [`regression/`](regression/README.md). Row and detail
-   file are deleted together; the durable record is the ADR plus the
-   [WORKLOG](WORKLOG.md) entry. No tombstones, no DONE rows, no `closed/`.
+   evidence is filed under [`regression/`](regression/README.md). **The row is
+   deleted; the detail file moves to [`archive/open/`](../archive/open/)**
+   (Arpit, 2026-08-19) — the reasoning that produced a call is worth keeping,
+   the queue entry is not. The durable record is still the ADR plus the
+   [WORKLOG](WORKLOG.md) entry; an archived file may be named, never cited. No
+   tombstones, no DONE rows, no `closed/` inside `work/`.
    **The length of this file is the signal of how much is actually pending.**
 3. **The markers here are assertions, not evidence. Re-derive, do not read.**
    Before treating anything as pending or done, reconcile against

@@ -200,7 +200,7 @@ meaning from position:
   designed, and a real usability cost.
 - **`title_h` breaks rule 2 today.** It is a bare 16-hex token outside `terms`,
   so the accelerator refuses to build over any corpus containing one —
-  [W-47](../../work/open/W-47-hashed-meta-blocks-accelerator.md). The rule is
+  [W-54](../../work/open/W-54-sources-rewrite.md). The rule is
   right; the field's shape is the defect.
 - **Adding a property is a schema change**, requiring an `_format` bump and a
   re-ingest of every corpus. That cost is the point: it is what keeps the

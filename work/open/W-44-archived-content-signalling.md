@@ -1,6 +1,11 @@
 # W-44 — Decide how retired content is signalled in results
 
-**Status:** OPEN · **human** (Arpit picks the option; the build follows)
+**Status:** **PARKED** (2026-08-19, Arpit) — the option is chosen and recorded;
+the work is gated on an instrument that does not exist and has no owner.
+**Trigger:** a frozen query set with expected live-vs-archived answers exists.
+Parked with a trigger, never ambient — it does not resume because it looks
+ready.
+**Model:** **Opus** for the pre-registration, Sonnet to build it once frozen
 **Blocked by:** — (nothing waits on it; it degrades answers every day it is open)
 **Evidence:** [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)
 §Finding 2 + [`ANALYSIS.md`](../regression/2026-08-12-r2-close/ANALYSIS.md) §2
@@ -25,6 +30,55 @@ hypothesis, not a measurement):
 | *how does BM25F weighting work* | 2/5 | `archive/v0.26-docs/adr/0008-…` |
 | *how do I configure sources* | 1/5 | `archive/v0.31.0-fux-dir-layout-handoff.md` |
 | *what is the committed index layout* | 0/5 | `work/adr/0011_fux-dir-layout.md` |
+
+> **2026-08-19 — the finding moved; re-derived against the repo.** Three
+> things changed on 2026-08-18 and none is reflected below.
+> **(1) The problem is wider than `archive/`.** `work/` joined
+> `[sources] dirs`, so the corpus now carries `WORKLOG.md` (1 400+ lines,
+> including decisions later reversed) and `compare/` docs that argue *rejected*
+> options at length. Option B annotates a *source*; it cannot reach retired
+> claims inside a live document.
+> **(2) The problem is also narrower.** Everything under `archive/` is already
+> out of the corpus — `dirs` names exactly one archive path,
+> `archive/v0.26-docs`, deliberately (W-42). **Archiving is already the
+> retirement signal** for everything else; closed work items left the index by
+> being moved. That strengthens **A**, and makes **C** a narrowing of one
+> deliberate exception rather than the arbitrary line this file calls it.
+> **(3) The probe is not reproducible as written.** It ran against an index
+> whose records still point at `docs/open/…`, `docs/conformance/…`,
+> `work/adr/0011_fux-dir-layout.md` — paths the restructure removed. The
+> committed index has not been re-ingested since. Any instrument built for the
+> DoD below has to be built against a corpus the probe never saw.
+> **(4) The config surface is shared with [W-45](W-45-source-exclusion.md).**
+> `[sources] dirs` is a flat list of strings; declaring a source `archived`
+> needs the same schema change W-45 needs for exclusion. Decided apart, the
+> second re-litigates the first.
+
+> **2026-08-19 — DECIDED: option B.** Arpit chose *annotate, never reorder*.
+> The decision is recorded in
+> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), which is
+> **accepted and unbuilt**: a record under `archive/` carries `archived: true`,
+> every verb surfaces it, and **the ranking is byte-identical**.
+>
+> **Two things changed on the way in.** *(1)* B needs **no config key** — the
+> one-archive law makes `loc.startswith("archive/")` a complete test, so this is
+> decoupled from [W-45](W-45-source-exclusion.md) after all. *(2)* The `df`
+> contamination is **not** part of B and is filed separately as
+> [W-52](W-52-df-over-the-union.md), because excluding archived documents from
+> `df` moves 42% of live terms and that is a ranking change requiring its own
+> pre-registration.
+>
+> **Superseded record, 2026-08-19.** ADR-ARCHIVED-SIGNAL was archived the same
+> day it was written: Arpit moved source directories into their own committed
+> file, which made `archived` a **declaration on a line** rather than something
+> derived from `loc.startswith("archive/")`. That fixes the weak point the
+> original recorded — the derivation was exact for this repo and a silent
+> convention for anyone else. The live record is
+> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md); the file itself is
+> [W-54](W-54-sources-rewrite.md).
+>
+> **This item stays open in the agent lane**: the decision is made, the
+> instrument and the build are not.
 
 ## Why it matters
 
@@ -53,14 +107,18 @@ never reorder*). It still needs its own measurement and its own ADR.
 
 ## Definition of done
 
-- [ ] Arpit picks A, B or C.
-- [ ] If B or C: an instrument that can actually measure the intrusion
-      exists **before** the mechanism ships — five hand-picked probes is not
-      a measurement, and the playground goldens live in a sibling repo over
-      a different corpus and cannot see this.
-- [ ] If A: recorded as a decision with its reasoning, and this item closes.
-      "Accepted" is a verdict, not a non-answer.
-- [ ] Whichever way: an ADR, with a reference.
+- [x] ~~Arpit picks A, B or C~~ — **B**, 2026-08-19.
+- [x] ~~An ADR, with a reference~~ —
+      [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), accepted.
+- [ ] **The instrument, before the mechanism** — a pre-registered query set with
+      expected live-vs-archived answers, frozen first. Five hand-picked probes
+      is not a measurement, and the playground goldens are a different corpus
+      and cannot see this. This is ADR-DIR-LIST decision 10's gate.
+- [ ] Build it: the property at ingest, the three verbs agreeing, and a test
+      asserting **no archived document is ever returned unmarked**.
+- [ ] Assert the ranking did not move — scores and order identical with and
+      without the property (decision 4).
+- [ ] `CHANGELOG.md` under `[Unreleased] → Added`.
 
 ## Hazard
 

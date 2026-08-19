@@ -3,7 +3,7 @@
 **Status:** OPEN
 **Blocked by:** W-23, W-24
 **Spec:** this file — see §Scope below (migrated from the retired `PLAN.md`, 2026-08-18)
-**Closes with:** ADR-0008 (reserved) · predictions **R5**, **R6**
+**Closes with:** **`ADR-MAINTENANCE`** (reserved) · predictions **R5**, **R6**. **Reserved by NAME, never by number** — a number is a filename ordinal assigned when the record is written (Arpit, 2026-08-19, closing W-33).
 **Model:** **Sonnet** — well-specified against two measured DoDs.
 
 ## Goal
@@ -29,7 +29,7 @@ commit, conflict-free on merge, and honest about what it stores.
       conflict-free and human conflicts preserved.
 - [ ] Hashed-meta enforcement is unbypassable from config for a non-git
       source, and has a test that tries to bypass it.
-- [ ] ADR-0008 written and accepted.
+- [ ] `ADR-MAINTENANCE` written and accepted.
 
 ## Hazards
 

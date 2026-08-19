@@ -218,6 +218,12 @@ query time ([ADR-RANKING](0012_ranking.md)).
 - Inverted-index organisation, doc-major vs term-major — Zobel & Moffat,
   *Inverted Files for Text Search Engines* (ACM Computing Surveys, 2006):
   https://dl.acm.org/doi/10.1145/1132956.1132959
+- The other generated files the derived plane writes alongside `postings/`,
+  each with its own record — [ADR-CACHEDIR-TAG](0024_cachedir-tag.md),
+  [ADR-DOCS-TABLE](0025_docs-table.md), [ADR-CODES-TABLE](0026_codes-table.md),
+  [ADR-RUNTIME-MANIFEST](0027_runtime-manifest.md),
+  [ADR-RUNTIME-STAMP](0028_runtime-stamp.md),
+  [ADR-RUNTIME-STATS](0029_runtime-stats.md).
 
 ### Veto condition
 

@@ -1,9 +1,9 @@
 # W-23 — M3: the graph lane
 
 **Status:** OPEN
-**Blocked by:** W-22
+**Blocked by:** — (W-22 was M2, the T1 accelerator; it **shipped as `v0.32.0`** on 2026-08-12. Stale blocker cleared 2026-08-19)
 **Spec:** this file — see §Scope below (migrated from the retired `PLAN.md`, 2026-08-18)
-**Closes with:** ADR-0006 (reserved)
+**Closes with:** **`ADR-GRAPH`** (reserved). **Reserved by NAME, never by number** — a number is a filename ordinal assigned when the record is written (Arpit, 2026-08-19, closing W-33).
 **Model:** **Sonnet** — the port is well-specified and the archived
 relational eval is the test that catches a bad one.
 
@@ -16,7 +16,7 @@ lane: `explain`, `graph`, `path`.
 
 - Edge extraction ported from `archive/v0.26/` **with its tests**.
 - `community` assignment — deterministic label-propagation or a
-  Leiden-class algorithm with a **fixed seed**; the choice is ADR-0006's
+  Leiden-class algorithm with a **fixed seed**; the choice is `ADR-GRAPH`'s
   decision, not an implementation detail to be made silently.
 - PPR-lite (ported).
 - `explain` / `graph` / `path` verbs.
@@ -26,7 +26,7 @@ lane: `explain`, `graph`, `path`.
 - [ ] The **archived relational eval passes** on the new kernel.
 - [ ] Community assignment is byte-deterministic across two runs and two
       machines (the R1 discipline, applied to a new artifact).
-- [ ] ADR-0006 written and accepted, carrying the algorithm choice and a
+- [ ] `ADR-GRAPH` written and accepted, carrying the algorithm choice and a
       reference for it.
 
 ## Named acceptance targets (from `fux-playground`)

@@ -7,7 +7,7 @@
 # W-33 — Resolve the ADR-numbering contradiction
 
 **Status:** OPEN · **human** (Arpit owns the convention)
-**Blocked by:** — (settle before or with [W-32](W-32-claude-md-adoption.md))
+**Blocked by:** — (W-32 closed 2026-08-19: the `CLAUDE.md` rewrite was adopted, and the numbering line it carried is already fixed)
 **Flagged in:** [`../../docs/adr/README.md`](../../docs/adr/README.md) §"Unresolved for Arpit"
 
 ## The contradiction
@@ -38,14 +38,26 @@ lines and replaces this file's "Unresolved for Arpit" block.
 
 ## Definition of done
 
-- [ ] One policy stated in one place; the other document references it
-      rather than restating it. (Restating a convention in two files is how
-      this happened.)
-- [ ] Both `CLAUDE.md` lines fixed — §"How work happens here" **and**
-      §Layout.
-- [ ] `adr/README.md` drops its "Unresolved for Arpit" block.
-- [ ] If the restart-at-0001 policy stands (it matches disk, so it almost
-      certainly does), no ADR files move — this is a documentation fix only.
+**Every mechanical item below is already satisfied.** Verified against the
+repo on 2026-08-19. **Only Arpit's confirmation remains** — this item is a
+signature, and has been since 2026-08-18.
+
+- [x] ~~One policy stated in one place~~ — `CLAUDE.md` points at
+      [`docs/adr/README.md`](../../docs/adr/README.md) rather than restating it.
+- [x] ~~Both `CLAUDE.md` lines fixed~~ — done 2026-08-18.
+- [x] ~~`adr/README.md` drops its "Unresolved for Arpit" block~~ — the block no
+      longer exists anywhere; the only occurrences of that phrase left in the
+      repo are in *this file*.
+- [x] ~~No ADR files move~~ — none did. The policy matches disk.
+
+**What is left, and it grew.** Four open items reserve ADR *numbers* that are
+already taken by accepted records — W-23→`0006` (ADR-ANSWER), W-24→`0007`
+(ADR-INGEST), W-25→`0008` (ADR-URL-INGEST), W-26→`0009`
+(ADR-INDEX-LIFECYCLE). Each DoD says "ADR-000N written and accepted", so a
+session closing one of them would collide. **This is the concrete version of
+the risk this item was filed for**, and it is not fixed here because the fix
+depends on the confirmation: under cite-by-name a milestone should reserve a
+**name** (`ADR-GRAPH`, `ADR-REFER`), never a number.
 
 ## Why it is not cosmetic
 

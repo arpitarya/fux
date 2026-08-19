@@ -51,6 +51,7 @@ archive/
   README.md              this map
   adr/                   superseded decision records — old number -> successor NAME
   handoff/               executed handoff + prompt pairs of the current build
+  open/                  closed work items — the detail file, once its row left the queue
   v0.1/                  build: the first one, pre-reset #1
   v0.26/                 build: the v0.19-0.26 substrate engine, runnable
   v0.26-docs/            build: that engine's frozen doc set
@@ -79,9 +80,9 @@ live successors and are safe to be named from anywhere.
 
 | artifact | shipped | live successor |
 |---|---|---|
-| [`v0.30.0-m1-t0-slice-handoff.md`](handoff/v0.30.0-m1-t0-slice-handoff.md) · [prompt](handoff/v0.30.0-m1-t0-slice-prompt.md) | 2026-08-10 | [ADR-INDEX-FORMAT](../work/adr/0004_index-format.md) |
-| [`v0.31.0-fux-dir-layout-handoff.md`](handoff/v0.31.0-fux-dir-layout-handoff.md) · [prompt](handoff/v0.31.0-fux-dir-layout-prompt.md) | 2026-08-11 | [ADR-FUX-DIR](../work/adr/0011_fux-dir-layout.md) |
-| [`v0.31.0-fux-playground-extraction-handoff.md`](handoff/v0.31.0-fux-playground-extraction-handoff.md) · [prompt](handoff/v0.31.0-fux-playground-extraction-prompt.md) | 2026-08-12 | [ADR-PLAYGROUND](../work/adr/0012_playground-sibling-repo.md) |
+| [`v0.30.0-m1-t0-slice-handoff.md`](handoff/v0.30.0-m1-t0-slice-handoff.md) · [prompt](handoff/v0.30.0-m1-t0-slice-prompt.md) | 2026-08-10 | [ADR-RECORD](../docs/adr/0010_index-record.md) |
+| [`v0.31.0-fux-dir-layout-handoff.md`](handoff/v0.31.0-fux-dir-layout-handoff.md) · [prompt](handoff/v0.31.0-fux-dir-layout-prompt.md) | 2026-08-11 | [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) |
+| [`v0.31.0-fux-playground-extraction-handoff.md`](handoff/v0.31.0-fux-playground-extraction-handoff.md) · [prompt](handoff/v0.31.0-fux-playground-extraction-prompt.md) | 2026-08-12 | [SETUP-PLAYGROUND](../work/setup/fux-playground.md) |
 | [`v0.32.0-open-items-handoff.md`](handoff/v0.32.0-open-items-handoff.md) · [prompt](handoff/v0.32.0-open-items-prompt.md) | Phases 0 and 1 closed 2026-08-12 | [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — the M2 and R2-close rows |
 
 **Retired while still unresolved — no live successor.** These were archived by
@@ -90,13 +91,40 @@ open items they relate to have to carry their own content from here on.
 
 | artifact | what it was | the open item that outlived it |
 |---|---|---|
-| [`v0.32.0-ratification-package.md`](handoff/v0.32.0-ratification-package.md) | the five Lane B decisions packaged for one sitting | [W-30](../work/open/W-30-ratify-adr-0001.md) · [W-31](../work/open/W-31-ratify-adr-0010-0011.md) · [W-32](../work/open/W-32-claude-md-adoption.md) · [W-33](../work/open/W-33-adr-numbering-contradiction.md) · [W-44](../work/open/W-44-archived-content-signalling.md) — **each states its own decision now** |
-| [`v0.30.0-claude-md.diff`](handoff/v0.30.0-claude-md.diff) · [`v0.30.0-m1-claude-md-build-test.diff`](handoff/v0.30.0-m1-claude-md-build-test.diff) · [`v0.31.0-claude-md-layout.diff`](handoff/v0.31.0-claude-md-layout.diff) | prepared `CLAUDE.md` diffs awaiting review | [W-32](../work/open/W-32-claude-md-adoption.md) — the live `CLAUDE.md` has since moved on; treat the diffs as history, not as a patch to apply |
-| [`v0.32.0-adr-numbering.diff`](handoff/v0.32.0-adr-numbering.diff) | the numbering-contradiction fix | [W-33](../work/open/W-33-adr-numbering-contradiction.md) — **superseded**: the contradiction was resolved directly on 2026-08-18 |
+| [`v0.32.0-ratification-package.md`](handoff/v0.32.0-ratification-package.md) | the five Lane B decisions packaged for one sitting | [W-31](open/W-31-ratify-adr-0010-0011.md) · [W-33](open/W-33-adr-numbering-contradiction.md) · [W-44](../work/open/W-44-archived-content-signalling.md) — **each states its own decision now**. W-30 and W-32 closed 2026-08-19; their files are in [`open/`](open/) |
+| [`v0.30.0-claude-md.diff`](handoff/v0.30.0-claude-md.diff) · [`v0.30.0-m1-claude-md-build-test.diff`](handoff/v0.30.0-m1-claude-md-build-test.diff) · [`v0.31.0-claude-md-layout.diff`](handoff/v0.31.0-claude-md-layout.diff) | prepared `CLAUDE.md` diffs awaiting review | [W-32](open/W-32-claude-md-adoption.md) — **closed 2026-08-19, the rewrite adopted**; the diffs were already history and remain so |
+| [`v0.32.0-adr-numbering.diff`](handoff/v0.32.0-adr-numbering.diff) | the numbering-contradiction fix | [W-33](open/W-33-adr-numbering-contradiction.md) — **superseded**: the contradiction was resolved directly on 2026-08-18 |
 | [`v0.33.0-m4-refer-plane-handoff.md`](handoff/v0.33.0-m4-refer-plane-handoff.md) · [prompt](handoff/v0.33.0-m4-refer-plane-prompt.md) | the M4 build spec, written but never executed | [W-24](../work/open/W-24-m4-refer-plane.md) — **M4 has no live spec.** Whoever starts it writes a fresh one; this pair may be read for ideas but not cited |
 
 **Handoffs are no longer a live directory.** A spec for open work belongs in
 that item's detail file under [`work/open/`](../work/open/README.md).
+
+## `open/` — closed work items
+
+A work item's detail file retires here when its row leaves
+[`work/OPEN-WORK.md`](../work/OPEN-WORK.md). **The row is still deleted, never
+ticked** — the length of the queue stays the signal of what is pending — but
+the file that argued the decision is kept, because the reasoning that produced
+a call is worth more than the call alone.
+
+**These are not evidence.** The durable record of a closed item is its ADR plus
+the [`WORKLOG`](../work/WORKLOG.md) entry; a file here may be named, never
+cited. Several also contain claims that were *wrong* — which is part of why
+they are worth keeping.
+
+| item | closed | outcome and live successor |
+|---|---|---|
+| [`W-30-ratify-adr-0001.md`](open/W-30-ratify-adr-0001.md) | 2026-08-19 | Arpit ratified the ingest-mode naming → [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-ENRICHED](../docs/adr/0017_enriched-mode.md), both accepted. The file's own "**Non-blocking**" note was **wrong**: `mode` is a committed wire-format value, so the *reversal* cost rises with every index written |
+| [`W-32-claude-md-adoption.md`](open/W-32-claude-md-adoption.md) | 2026-08-19 | Arpit adopted the M0a rewrite → the live [`CLAUDE.md`](../CLAUDE.md), PROPOSED header deleted. The file's "Correction (2026-08-12): there is no `CLAUDE.md.proposed`" was **wrong as history** — the file existed at `bed2186` and was implemented into `CLAUDE.md` at `3892c55`; `git log --follow` cannot see a delete-plus-overwrite, so a *verified* claim rested on evidence that could not show it |
+
+| [`W-31-ratify-adr-0010-0011.md`](open/W-31-ratify-adr-0010-0011.md) | 2026-08-19 | Arpit ratified all three as-is → [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) · [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md) · [ADR-CONFIG](../docs/adr/0014_config.md), and confirmed `.fux/README.md` is generated at **ingest** time. Two of its three DoD items had already been satisfied by unrelated changes; the third named the wrong section of `CHANGELOG.md` |
+
+| [`W-33-adr-numbering-contradiction.md`](open/W-33-adr-numbering-contradiction.md) | 2026-08-19 | Arpit confirmed the convention: **`docs/adr/` is the live set and starts at 0001; the records under `archive/` are archived.** Every mechanical item had already been satisfied by other changes. Its live consequence — four items reserving numbers that accepted records already held — was swept to **names** in the same change |
+
+| [`W-47`](open/W-47-hashed-meta-blocks-accelerator.md) · [`W-49`](open/W-49-url-fragment-truncation.md) · [`W-50`](open/W-50-url-fetch-mechanism.md) · [`W-51`](open/W-51-fetcher-template-not-shipped.md) · [`W-53`](open/W-53-dirs-file.md) | 2026-08-19 | **Merged, not completed**, into [W-54](../work/open/W-54-sources-rewrite.md) on Arpit's call. All five rewrite one parser and one generated set, and each carried a hazard saying *land it with the others* — five definitions of done for one change. **They are still five defects**; their analysis lives here and W-54 is the work order |
+
+Every outcome is recorded in
+[`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §Ratified decisions.
 
 ## Retired planning documents
 
@@ -136,5 +164,5 @@ anything archived moves here** — and `work/archive/` was dissolved into this
 directory. There is no longer a second place to look.
 
 The 2026-08-10 discrepancy is recorded rather than deleted because
-[ADR-INDEX-FORMAT](../work/adr/0004_index-format.md) §Consequences cites it as
+[ADR-RECORD](../docs/adr/0010_index-record.md) §Consequences cites it as
 the reason R2 question 3 could not be answered at M1.

@@ -7,7 +7,7 @@ nothing undeclared sits at the top level of `.fux/`.
 The index check exists because the failure it catches is silent: a `.fux/*`
 line in any `.gitignore` up the tree, or a consumer-edited `.fux/.gitignore`,
 drops the committed index out of git with no error anywhere. Doctor stays
-offline — it never touches the middleware or the network.
+offline — it never touches the fetcher or the network.
 """
 
 from __future__ import annotations

@@ -1,14 +1,14 @@
-"""URL source — fux's half of the consumer-middleware contract.
+"""URL source — fux's half of the consumer-fetcher contract.
 
-Fux never fetches a URL itself: the repo names a consumer-owned middleware
-file in `fux.toml` (`[sources.url] middleware`, defaulting to the shipped
-`.fux/middleware/cdp.py` template) and this module loads it, calls its
+Fux never fetches a URL itself: the repo names a consumer-owned fetcher
+file in `fux.toml` (`[sources.url] fetcher`, defaulting to the shipped
+`.fux/fetchers/cdp.py` template) and this module loads it, calls its
 `fetch(url) -> str` per configured URL, and normalizes the result into
 ingestable bytes. All
 network code — transport, browser, auth, retries — lives in that file, on
 the consumer's side of the boundary; `src/fux/` stays offline and
 stdlib-only. Fetching runs ONLY under `fux ingest --refresh-urls` (the
-offline-by-default law); a plain ingest never imports the middleware.
+offline-by-default law); a plain ingest never imports the fetcher.
 
 The URL list itself is a committed *file* — `.fux/sources/urls`, one URL per
 line — not a TOML array (ADR-DOTFUX): it is the shape git diffs and merges at
@@ -20,9 +20,9 @@ Contract (documented in the template's docstring too):
   - optional `connect()` / `close()` — called once around the whole batch.
   - optional `configure(config: dict) -> None` — called once after import,
     before `connect()`, with `[sources.url.config]` verbatim. Fux never reads
-    a key inside that table; it is the middleware's vocabulary, not fux's.
+    a key inside that table; it is the fetcher's vocabulary, not fux's.
 
-Normalization here, not trusted of middlewares: NFC happens later in
+Normalization here, not trusted of fetchers: NFC happens later in
 `parse()` as for every document, but U+2028/U+2029/U+0085 (legal in JSON,
 hostile to every line-oriented tool downstream — see `store/canonical.py`)
 are replaced with spaces, and CRLF becomes LF, before the text ever
@@ -47,21 +47,21 @@ class FetchedUrl:
     content: bytes
 
 
-def load_middleware(root: Path, rel_path: str):
-    """Import the consumer's middleware file; fail loudly if it's unusable."""
+def load_fetcher(root: Path, rel_path: str):
+    """Import the consumer's fetcher file; fail loudly if it's unusable."""
     path = root / rel_path
     if not path.is_file():
-        raise FuxError(f"[sources.url] middleware not found: {rel_path} (looked in {path})")
-    spec = importlib.util.spec_from_file_location("fux_url_middleware", path)
+        raise FuxError(f"[sources.url] fetcher not found: {rel_path} (looked in {path})")
+    spec = importlib.util.spec_from_file_location("fux_url_fetcher", path)
     if spec is None or spec.loader is None:
-        raise FuxError(f"[sources.url] middleware could not be loaded: {rel_path}")
+        raise FuxError(f"[sources.url] fetcher could not be loaded: {rel_path}")
     module = importlib.util.module_from_spec(spec)
     try:
         spec.loader.exec_module(module)
     except Exception as exc:
-        raise FuxError(f"[sources.url] middleware failed to import: {rel_path} ({exc})") from exc
+        raise FuxError(f"[sources.url] fetcher failed to import: {rel_path} ({exc})") from exc
     if not callable(getattr(module, "fetch", None)):
-        raise FuxError(f"[sources.url] middleware defines no fetch(url) callable: {rel_path}")
+        raise FuxError(f"[sources.url] fetcher defines no fetch(url) callable: {rel_path}")
     return module
 
 
@@ -91,8 +91,8 @@ def read_urls(root: Path, rel_path: str) -> list[str]:
     return sorted(urls)
 
 
-def configure_middleware(module, config: dict) -> None:
-    """Hand `[sources.url.config]` to the middleware's optional `configure`.
+def configure_fetcher(module, config: dict) -> None:
+    """Hand `[sources.url.config]` to the fetcher's optional `configure`.
 
     The table is passed verbatim — fux never inspects a key. A `configure`
     that raises is a misconfiguration, not a per-URL failure, so it stops the
@@ -104,13 +104,13 @@ def configure_middleware(module, config: dict) -> None:
     try:
         hook(dict(config))
     except Exception as exc:
-        raise FuxError(f"[sources.url] middleware configure() failed: {exc}") from exc
+        raise FuxError(f"[sources.url] fetcher configure() failed: {exc}") from exc
 
 
 def fetch_all(
-    root: Path, middleware_path: str, urls: list[str], config: dict | None = None
+    root: Path, fetcher_path: str, urls: list[str], config: dict | None = None
 ) -> tuple[list[FetchedUrl], list[Skipped]]:
-    """Fetch every configured URL through the middleware.
+    """Fetch every configured URL through the fetcher.
 
     URLs are deduplicated and sorted (the same determinism `walk_sources`
     gives files — config order must not change committed bytes). A `fetch`
@@ -118,8 +118,8 @@ def fetch_all(
     continues. `configure` runs once after import, then `connect`/`close`
     once around the whole batch, `close` even when a fetch raised.
     """
-    module = load_middleware(root, middleware_path)
-    configure_middleware(module, config or {})
+    module = load_fetcher(root, fetcher_path)
+    configure_fetcher(module, config or {})
     fetched: list[FetchedUrl] = []
     skipped: list[Skipped] = []
 
@@ -129,7 +129,7 @@ def fetch_all(
         try:
             connect()
         except Exception as exc:
-            raise FuxError(f"[sources.url] middleware connect() failed: {exc}") from exc
+            raise FuxError(f"[sources.url] fetcher connect() failed: {exc}") from exc
     try:
         for url in sorted(set(urls)):
             try:
@@ -138,7 +138,7 @@ def fetch_all(
                 skipped.append(Skipped(rel_path=url, reason=f"fetch failed: {exc}"))
                 continue
             if not isinstance(text, str) or not text.strip():
-                skipped.append(Skipped(rel_path=url, reason="middleware returned no text"))
+                skipped.append(Skipped(rel_path=url, reason="fetcher returned no text"))
                 continue
             fetched.append(FetchedUrl(url=url, content=_sanitize(text)))
     finally:

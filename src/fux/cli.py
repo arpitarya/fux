@@ -63,7 +63,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_ingest.add_argument(
         "--refresh-urls",
         action="store_true",
-        help="fetch [sources.url] urls through the consumer middleware (the ONLY networked ingest path; off by default)",
+        help="fetch [sources.url] urls through the consumer fetcher (the ONLY networked ingest path; off by default)",
     )
     p_ingest.add_argument(
         "--no-accelerator",

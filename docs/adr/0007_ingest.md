@@ -141,7 +141,7 @@ before the first byte lands.
 
 **8. Ingest is offline.** The single exception is `--refresh-urls`
 ([ADR-URL-INGEST](0008_url-ingest.md)); a plain run never imports the
-middleware.
+fetcher.
 
 ### What it looks like
 
@@ -196,9 +196,10 @@ docs/logo.png: binary
 - **`0 shards written` can accompany a deletion**, since removing a shard is
   not a write. True, and mildly under-informative when reading a run log.
 - **Re-ingest is safe to run on a hook**, which is what M5 depends on.
-- **This record does not retire its predecessors.** ADR-INGEST is ⏳
-  *proposed* ([W-30](../../work/open/W-30-ratify-adr-0001.md)); retirement
-  happens in the change that accepts this one.
+- **The ingest-mode naming left this record.** What `extracted` promises is
+  now [ADR-EXTRACTED](0016_extracted-mode.md), which also takes
+  `ingest/extract.py`; this record keeps how ingest *runs*. Both were ratified
+  by Arpit on 2026-08-19, closing W-30.
 
 ### Alternatives considered
 

@@ -46,7 +46,7 @@ flowchart TD
     F[".fux/"]
     F --> C1["index/ — committed<br/>the product"]
     F --> C2["sources/ — committed<br/>urls, one per line"]
-    F --> C3["middleware/ — committed<br/>YOUR code"]
+    F --> C3["fetcher/ — committed<br/>YOUR code"]
     F --> C4["README.md · .gitignore<br/>committed, write-if-missing"]
     F --> D1["runtime/ — derived<br/>CACHEDIR.TAG"]
     F --> D2["cache/ — derived (M4)<br/>CACHEDIR.TAG"]
@@ -62,7 +62,7 @@ flowchart TD
     |
     +-- index/        COMMITTED   the product; not rebuildable from anything
     +-- sources/      COMMITTED   urls, one per line
-    +-- middleware/   COMMITTED   your code, fux never rewrites it
+    +-- fetcher/   COMMITTED   your code, fux never rewrites it
     +-- README.md     COMMITTED   the declaration table (write-if-missing)
     +-- .gitignore    COMMITTED   names derived dirs; NEVER `*`
     |
@@ -82,7 +82,7 @@ What `fux ingest` generates, and the two files that make the layout checkable:
 $ find .fux -maxdepth 2 -type d | sort
 .fux
 .fux/index
-.fux/middleware
+.fux/fetcher
 .fux/runtime
 .fux/runtime/postings
 .fux/sources
@@ -108,13 +108,13 @@ $ fux doctor
 ### Context
 
 `.fux/` accumulated planes as milestones landed: the committed index at M1, the
-URL source and consumer middleware at 0.31.x, the runtime accelerator at M2, an
+URL source and consumer fetcher at 0.31.x, the runtime accelerator at M2, an
 ARC cache reserved for M4. Nothing declared which of them git should carry.
 
 The hazard is asymmetric. A derived directory accidentally committed is noise
 someone notices. A **committed directory accidentally ignored is silent data
 loss** — and the repo's own `.gitignore` already carried a `.fux/*` blanket
-that would have eaten `sources/` and `middleware/` without a word.
+that would have eaten `sources/` and `fetchers/` without a word.
 
 An ignore rule is also the kind of thing a reviewer's eye slides over. It has to
 be a machine's job.
@@ -126,7 +126,7 @@ the generated `.fux/README.md`. Undeclared entries are a `fux doctor` warning,
 not a shrug.
 
 **2. Committed:** `index/` (the product), `sources/` (line-oriented lists, e.g.
-`urls`), `middleware/` (consumer code), `README.md`, `.gitignore`.
+`urls`), `fetchers/` (consumer code), `README.md`, `.gitignore`.
 **Derived:** `runtime/`, `cache/`.
 
 **3. The generated `.gitignore` names derived directories and never a
@@ -145,7 +145,7 @@ per-tool configuration.
 runs at the head of every ingest so a fresh clone is correct before anything is
 written; it never overwrites. A consumer's annotations survive every run.
 
-**7. `middleware/` is consumer code and fux never rewrites it.** It is loaded
+**7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded
 by path, and only under `--refresh-urls`. One known consequence, accepted:
 linters that skip hidden directories by default (ruff does) will not lint it.
 
@@ -158,7 +158,7 @@ linters that skip hidden directories by default (ruff does) will not lint it.
 - **`doctor` gains a hard dependency on git** for the ignore check. Acceptable:
   the committed index's premise is that git carries it.
 - **This record does not retire ADR-DOTFUX.** That record is ⏳ *proposed* and
-  unratified ([W-31](../../work/open/W-31-ratify-adr-0010-0011.md)), and
+  unratified ([W-31](../../work/IMPLEMENTATION.md) *(ratified 2026-08-19)*), and
   replacing an unratified decision inherits its ambiguity. Retirement happens in
   the change that accepts this one, once W-31 is called.
 

@@ -233,7 +233,7 @@ error: --refresh-urls: no [sources.url] configured in /root/fuxlab/demo/fux.toml
 | flag | effect |
 |---|---|
 | `--list-skipped` | print skipped files and why, then exit — no writes |
-| `--refresh-urls` | fetch `[sources.url]` through the consumer middleware. Off by default; the only networked path |
+| `--refresh-urls` | fetch `[sources.url]` through the consumer fetcher. Off by default; the only networked path |
 | `--no-accelerator` | skip the derived build. **Results are unaffected** — only speed |
 
 #### `fux build` — committed index → derived accelerator

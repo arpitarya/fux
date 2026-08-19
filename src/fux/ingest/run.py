@@ -1,4 +1,4 @@
-"""`fux ingest` — orchestrates the git-dir adapter, the URL middleware,
+"""`fux ingest` — orchestrates the git-dir adapter, the URL fetcher,
 extractors, and the canonical store into one incremental build.
 
 Every document is re-extracted and every edge re-resolved on every run, even
@@ -12,7 +12,7 @@ own `sha` changing, independent of edges (the M1 build-time decision on
 
 URL docs (ADR-URL-INGEST) obey the offline-by-default law: a plain `fux ingest`
 never touches the network — every existing `url:` record is carried forward
-byte-identically. Only `--refresh-urls` loads the consumer middleware and
+byte-identically. Only `--refresh-urls` loads the consumer fetcher and
 fetches; on a refresh, a configured URL whose fetch fails keeps its prior
 record (a transient network failure must never delete a document), while a
 URL no longer in `.fux/sources/urls` disappears — reconciliation happens only
@@ -59,7 +59,7 @@ def run(root: Path, *, refresh_urls: bool = False) -> IngestReport:
         if config.url is None:
             raise FuxError(f"--refresh-urls: no [sources.url] configured in {root / 'fux.toml'}")
         urls = urlsrc.read_urls(root, config.url.urls_file)
-        fetched, url_skipped = urlsrc.fetch_all(root, config.url.middleware, urls, config.url.config)
+        fetched, url_skipped = urlsrc.fetch_all(root, config.url.fetcher, urls, config.url.config)
         skipped = skipped + url_skipped
         fresh = {f"url:{fu.url}": fu.content for fu in fetched}
         for url in urls:

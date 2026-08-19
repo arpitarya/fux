@@ -1,7 +1,7 @@
 # W-24 — M4: the refer plane
 
 **Status:** OPEN
-**Blocked by:** W-22
+**Blocked by:** — (W-22 was M2, the T1 accelerator; it **shipped as `v0.32.0`** on 2026-08-12. Stale blocker cleared 2026-08-19)
 
 > **2026-08-18 — M4 has no live build spec.** The `v0.33.0` handoff/prompt pair
 > written for it was archived with the whole handoff directory, and an archived
@@ -10,7 +10,7 @@
 > (`archive/handoff/v0.33.0-m4-refer-plane-*.md`) may be read for ideas and
 > named, never cited. The Opus-writes-the-spec rule below still holds.
 **Spec:** this file — see §Scope below (migrated from the retired `PLAN.md`, 2026-08-18)
-**Closes with:** ADR-0007 (reserved) · prediction **R4**
+**Closes with:** **`ADR-REFER`** (reserved) · prediction **R4**. **Reserved by NAME, never by number** — a number is a filename ordinal assigned when the record is written (Arpit, 2026-08-19, closing W-33).
 **Model:** **Sonnet** to build against this spec — *but the handoff itself
 must be written by Opus*, because two proposals graduate into it and the
 API shape they set is expensive to retrofit.
@@ -47,7 +47,7 @@ the same time.
   `[freshness] verify`, fenced network, **default off**.
 - **A fetch path for `src:"url"` documents** — this is the debt
   [ADR-URL-INGEST](../../archive/adr/0010_url-source-consumer-middleware.md) recorded when
-  the URL source landed early. Verify-time fetch for a middleware-sourced
+  the URL source landed early. Verify-time fetch for a fetcher-sourced
   doc is undecided and must be decided here.
 
 ## Definition of done
@@ -66,7 +66,7 @@ the same time.
 - [ ] The budget sweep reports answer-quality-per-byte. Flat across
       budgets ⇒ the greedy assembler is not earning its complexity and
       plain top-k with truncation wins.
-- [ ] ADR-0007 written and accepted.
+- [ ] `ADR-REFER` written and accepted.
 
 ## Open design calls to make deliberately (not silently)
 
@@ -99,7 +99,7 @@ the same time.
 that document was archived. **This file is now the spec**; there is no other.*
 
 > **Scope note (2026-08-10):** a `url` *source* landed early via a
-> consumer-owned middleware file (ADR-URL-INGEST). The adapter cap below is
+> consumer-owned fetcher file (ADR-URL-INGEST). The adapter cap below is
 > untouched — core ships no URL adapter, all network lives in the consumer's
 > file — but this milestone's refer plane must decide the verify-time fetch
 > path for `src:"url"` documents.

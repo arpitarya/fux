@@ -242,7 +242,7 @@ accelerator.
   lets it be rebuilt aggressively.
 - **The invariant can refuse a build the user did not knowingly cause.** That is
   the correct trade — but it has now bitten: hashed URL records always trip it
-  ([W-47](../../work/open/W-47-hashed-meta-blocks-accelerator.md)). The
+  ([W-54](../../work/open/W-54-sources-rewrite.md)). The
   invariant is not the bug; the field shape is. Recorded here because the
   refusal *looks* like an accelerator defect and is not.
 - **256 shards is fixed, not configurable.** `[index] shards` documents the

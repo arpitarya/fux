@@ -1,9 +1,9 @@
-"""Consumer-owned URL middleware — Chrome DevTools Protocol, pure stdlib.
+"""Consumer-owned URL fetcher — Chrome DevTools Protocol, pure stdlib.
 
 **This file belongs to you, not to fux. It is committed to your repo, at
-`.fux/middleware/cdp.py`, and fux will never rewrite it.** Fux writes it once
+`.fux/fetchers/cdp.py`, and fux will never rewrite it.** Fux writes it once
 if it is missing and reads it by path from `fux.toml`
-(`[sources.url] middleware`) under `fux ingest --refresh-urls`, calls it to
+(`[sources.url] fetcher`) under `fux ingest --refresh-urls`, calls it to
 turn each URL into markdown, and indexes the result exactly like a repo file.
 Edit anything — port, launch flags, wait strategy, extraction, even the whole
 transport (swap in `websockets` or Playwright if you'd rather carry a
@@ -88,7 +88,7 @@ _WS_GUID = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
 OP_CONT, OP_TEXT, OP_BINARY, OP_CLOSE, OP_PING, OP_PONG = 0x0, 0x1, 0x2, 0x8, 0x9, 0xA
 
 
-class MiddlewareError(RuntimeError):
+class FetcherError(RuntimeError):
     """Raised for every expected failure; fux records it as the skip reason."""
 
 
@@ -164,7 +164,7 @@ class WebSocket:
     def __init__(self, url: str, timeout: float = 30.0):
         parts = urlsplit(url)
         if parts.scheme != "ws":
-            raise MiddlewareError(f"unsupported WebSocket scheme {parts.scheme!r} (CDP uses ws://)")
+            raise FetcherError(f"unsupported WebSocket scheme {parts.scheme!r} (CDP uses ws://)")
         self.host = parts.hostname or "127.0.0.1"
         self.port = parts.port or 80
         self.resource = parts.path + (f"?{parts.query}" if parts.query else "") or "/"
@@ -188,18 +188,18 @@ class WebSocket:
         while b"\r\n\r\n" not in response:
             chunk = self.sock.recv(4096)
             if not chunk:
-                raise MiddlewareError("WebSocket handshake failed: connection closed")
+                raise FetcherError("WebSocket handshake failed: connection closed")
             response += chunk
         head, _, rest = response.partition(b"\r\n\r\n")
         lines = head.decode("latin-1").split("\r\n")
         if "101" not in lines[0]:
-            raise MiddlewareError(f"WebSocket handshake rejected: {lines[0]}")
+            raise FetcherError(f"WebSocket handshake rejected: {lines[0]}")
         headers = {
             k.strip().lower(): v.strip()
             for k, _, v in (line.partition(":") for line in lines[1:])
         }
         if headers.get("sec-websocket-accept") != accept_key_for(key):
-            raise MiddlewareError("WebSocket handshake failed: bad Sec-WebSocket-Accept")
+            raise FetcherError("WebSocket handshake failed: bad Sec-WebSocket-Accept")
         self._buffer = rest
 
     def _recv_exact(self, n: int) -> bytes:
@@ -208,7 +208,7 @@ class WebSocket:
         while len(data) < n:
             chunk = self.sock.recv(n - len(data))
             if not chunk:
-                raise MiddlewareError("WebSocket closed mid-frame")
+                raise FetcherError("WebSocket closed mid-frame")
             data += chunk
         return data
 
@@ -218,7 +218,7 @@ class WebSocket:
     def recv_text(self) -> str:
         opcode, payload = self.reader.read_message(self._pong)
         if opcode == OP_CLOSE:
-            raise MiddlewareError("WebSocket closed by peer")
+            raise FetcherError("WebSocket closed by peer")
         return payload.decode("utf-8", errors="replace")
 
     def _pong(self, payload: bytes) -> None:
@@ -490,13 +490,13 @@ class CdpSession:
         except Exception:
             pass
         if not LAUNCH_CHROME:
-            raise MiddlewareError(
+            raise FetcherError(
                 f"nothing listening on {self._endpoint()} and LAUNCH_CHROME is False — "
                 f"start Chrome yourself: chrome --headless=new --remote-debugging-port={CDP_PORT}"
             )
         binary = next((c for c in CHROME_BINARIES if shutil.which(c) or os.path.isfile(c)), None)
         if binary is None:
-            raise MiddlewareError(
+            raise FetcherError(
                 "CDP rendering needs Chrome/Chromium. Install Chrome, or start it "
                 f"yourself: chrome --headless=new --remote-debugging-port={CDP_PORT}"
             )
@@ -520,7 +520,7 @@ class CdpSession:
                 return
             except Exception:
                 time.sleep(0.25)
-        raise MiddlewareError(
+        raise FetcherError(
             f"Chrome did not open the CDP port {CDP_PORT} within 15s — "
             "is the port in use? Edit CDP_PORT in this file."
         )
@@ -544,7 +544,7 @@ class CdpSession:
             )
             html = result.get("result", {}).get("value", "")
             if not isinstance(html, str) or not html:
-                raise MiddlewareError(f"CDP returned no DOM for {url}")
+                raise FetcherError(f"CDP returned no DOM for {url}")
             return html
         finally:
             ws.close()
@@ -569,9 +569,9 @@ class CdpSession:
             message = json.loads(ws.recv_text())
             if message.get("id") == msg_id:
                 if "error" in message:
-                    raise MiddlewareError(f"CDP {method} failed: {message['error'].get('message')}")
+                    raise FetcherError(f"CDP {method} failed: {message['error'].get('message')}")
                 return message.get("result", {})
-        raise MiddlewareError(f"CDP {method}: no response within {LOAD_TIMEOUT_S}s")
+        raise FetcherError(f"CDP {method}: no response within {LOAD_TIMEOUT_S}s")
 
     def _wait_event(self, ws: WebSocket, event: str, timeout: float, url: str) -> None:
         deadline = time.monotonic() + timeout
@@ -579,7 +579,7 @@ class CdpSession:
             message = json.loads(ws.recv_text())
             if message.get("method") == event:
                 return
-        raise MiddlewareError(
+        raise FetcherError(
             f"page never fired {event} for {url} within {timeout:.0f}s — "
             "the site may block headless Chrome, or needs a longer LOAD_TIMEOUT_S"
         )
@@ -619,7 +619,7 @@ def configure(config: dict) -> None:
     """
     unknown = sorted(set(config) - set(_SETTINGS))
     if unknown:
-        raise MiddlewareError(
+        raise FetcherError(
             f"[sources.url.config] unknown key(s): {', '.join(unknown)} — "
             f"known keys: {', '.join(sorted(_SETTINGS))}"
         )
@@ -628,7 +628,7 @@ def configure(config: dict) -> None:
         try:
             globals()[name] = coerce(value)
         except (TypeError, ValueError) as exc:
-            raise MiddlewareError(f"[sources.url.config] {key}: {exc}") from exc
+            raise FetcherError(f"[sources.url.config] {key}: {exc}") from exc
 
 
 def connect() -> None:
@@ -647,7 +647,7 @@ def fetch(url: str) -> str:
     if PREPEND_TITLE_HEADING and title and not markdown.startswith(f"# {title}\n"):
         markdown = f"# {title}\n\n{markdown}"
     if not markdown.strip():
-        raise MiddlewareError(f"nothing extractable at {url}")
+        raise FetcherError(f"nothing extractable at {url}")
     return markdown
 
 

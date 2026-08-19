@@ -8,12 +8,16 @@ detail. The detail lives here, one file per `W-nn`, named
 
 1. An item's file is created in the same change that opens the item, and
    its one-line row is added to `OPEN-WORK.md` in that same change.
-2. When an item closes, **delete its file and its index row** in the same
-   change as the work. Deletion is legal only once the outcome is recorded in
+2. When an item closes, **delete its index row and move its file to
+   [`archive/open/`](../../archive/open/)** — in the same change as the work.
+   *(Arpit, 2026-08-19: archive the file rather than delete it. The row still
+   goes, so the queue's length keeps meaning what it meant; what is kept is the
+   argument that produced the call, which outlives the call.)* Closing is legal
+   only once the outcome is recorded in
    [`../IMPLEMENTATION.md`](../IMPLEMENTATION.md) and any evidence is filed
    under [`../regression/`](../regression/README.md). The durable record of a
-   closed item is its ADR plus the [`WORKLOG`](../WORKLOG.md) entry — not a
-   tombstone here.
+   closed item is still its ADR plus the [`WORKLOG`](../WORKLOG.md) entry — the
+   archived file is history, and **archive is not evidence**.
 3. A file carries only what a builder needs to start: goal, definition of
    done, blockers, the spec it implements, hazards, and the model that
    should execute it. Anything longer belongs in an ADR or a

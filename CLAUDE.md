@@ -1,12 +1,5 @@
 # CLAUDE.md — coding-agent guide for the Fux engine (v0.30 rebuild)
 
-> **PROPOSED — not in force.** This file is the M0a rewrite of `CLAUDE.md`,
-> delivered as a diff for Arpit's review (see
-> [`archive/handoff/v0.30.0-claude-md.diff`](archive/handoff/v0.30.0-claude-md.diff)).
-> Agent-steering files are proposed, never auto-applied. To adopt: `git mv
-> CLAUDE.md.proposed CLAUDE.md`, delete this block, and bump the DOC-REGISTRY
-> row. **Until then, the live `CLAUDE.md` is the binding one.**
-
 Fux ranks organizational knowledge — documentation, decisions, runbooks — from
 a **small index committed to git**, fetches content from the systems that own
 it, and verifies freshness at answer time. Agents get ranked, cited answers;
@@ -111,15 +104,26 @@ systems that own it; verify at answer time.
 - **The refer plane.** Answers rank in the index, fetch the cited documents
   from their source (git dir / HTTP / Confluence — **that cap is a decision**),
   re-score passages on the fetched bytes, and cite a fresh sha.
-- **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic) and
-  `enriched` (opt-in, model-assisted; deferred to M8). Both names are ⏳
-  *proposed* in [ADR-INGEST](archive/adr/0001_ingest-mode-naming.md) pending
-  ratification — **`inferred` is retired**, because `INFERRED` is the edge
-  grade for *model-derived* and the collision is the whole point of that ADR.
+- **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic,
+  [ADR-EXTRACTED](docs/adr/0016_extracted-mode.md) — **accepted**) and
+  `enriched` (opt-in, model-assisted,
+  [ADR-ENRICHED](docs/adr/0017_enriched-mode.md) — **accepted**: the name, the
+  boundary and the record shape are ratified; **the build is not** — it stays
+  behind W-38's M8 gate). Both ratified by Arpit 2026-08-19.
+  **`inferred` is retired**, because `INFERRED` is the edge grade for
+  *model-derived* and the collision is the whole point of those records.
+  **Enrichment never runs inside `fux ingest`** — it is its own command, its
+  output pinned and then ingested deterministically. That boundary is what
+  keeps L3 true.
 
-**The build is gated on falsifiable predictions P1–P7** (paper §8). **No M2+
-work while P1 is unmeasured or failed.** That is a hard sequencing rule, not a
-preference — see [`work/adr/0002_pruning-eval-gate.md`](work/regression/2026-08-09-pruning-eval/VERDICT.md).
+**The build is gated on falsifiable predictions** (paper §8): a milestone does
+not start while its gating prediction is unmeasured or failed. That is a hard
+sequencing rule, not a preference. **P1 closed FAIL on 2026-08-09** — full
+postings, permanently; the pruned-index design is dead, not deferred
+([verdict](work/regression/2026-08-09-pruning-rerun/VERDICT.md)). P2–P7 were
+retired with plan revision 1; their successors **R1–R7**, and which milestone
+measures each, are in [`work/OPEN-WORK.md`](work/OPEN-WORK.md) §"Predictions
+still unmeasured".
 
 **Out of scope until it has an ADR and Arpit's sign-off:** anything from the
 archived build (the SQLite substrate, per-file cache, lean profile, state
@@ -309,6 +313,19 @@ Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/b
   precise, short paragraphs, lead with the takeaway.
 
 ## Documentation discipline (required)
+
+**Agent-steering files are proposed, never auto-applied.** `CLAUDE.md` and any
+other file that steers a session are Arpit's to ratify: an agent proposes a
+change as a named diff and does not apply it to itself. This rule is why this
+file carried a PROPOSED header from 2026-08-09 until Arpit adopted the rewrite
+on 2026-08-19.
+
+**Statements of fact about the repo are exempt.** A version number, a path, a
+"does not exist yet" that now exists — fixed on contact, in the change that
+notices it, with a DOC-REGISTRY bump. The rule protects what this file
+*instructs*, never what it *claims*: three sessions read "there is no package on
+`main` yet" while `fux-engine` was on PyPI, because a rule meant for normative
+content was applied to a fact.
 
 **The shared memory between sessions is [`work/`](work/README.md).** `docs/`
 holds what the project *is* — plan, paper, glossary, decision records. `work/`
@@ -558,7 +575,7 @@ package for an architecture a measurement might falsify is the "build the fun
 part first" failure the plan exists to avoid. It shipped in `v0.30.0`; the
 gating rule stands for every milestone after it.
 
-## Error contract (applies once `src/` exists)
+## Error contract
 
 Catch and render errors only at the boundaries (CLI `main`, hook entrypoints).
 Internals keep raising. Raise the single `FuxError` for expected user-facing
@@ -567,10 +584,23 @@ failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
 
 ## Build & test
 
-There is **no package on `main` yet**. What runs today:
+**`fux-engine` 0.32.0 is released and on PyPI**; `src/fux/` is the live tree.
 
 ```bash
-# the archived engine (reference + M1's baseline) — do not modify it
+uv sync --extra dev
+uv run pytest -q tests        # fast unit
+uv run pytest -q tests_e2e    # the package as a user
+```
+
+**Two suites, both maintained** — `tests/` (fast unit) and `tests_e2e/` (the
+package as a user: real CLI via `subprocess`, fixture corpus, golden files
+updated deliberately and never regenerated blindly). A feature is not done
+until both cover it and pass.
+
+The archived engine still runs — reference, and M1's baseline. **Do not modify
+it:**
+
+```bash
 cd archive/v0.26 && uv sync --extra dev && uv run pytest -q tests
 
 # M1's gate: the KL selector's contract + the harness self-checks
@@ -580,16 +610,12 @@ archive/v0.26/.venv/bin/python -m pytest tools/pruning-eval/tests -q
 archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit synth
 ```
 
-**Two suites, both maintained, once `src/` exists** — `tests/` (fast unit) and
-`tests_e2e/` (the package as a user: real CLI via `subprocess`, fixture corpus,
-golden files updated deliberately and never regenerated blindly). A feature is
-not done until both cover it and pass.
-
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`**. Import package: **`fux`**.
-- Version: **`0.30.0.dev0`** at M0b (0.26.0 archived → reset → 0.30.0).
-  Bumped in `src/fux/__init__.py` only, once it exists.
+- Version: **`0.32.0`**, released (0.26.0 archived → reset → 0.30.0 → M2 at
+  0.32.0). Bumped in `src/fux/__init__.py` only — it is the single source, read
+  dynamically by `pyproject.toml`.
 
 ## Merge wall — what actually blocks a merge
 

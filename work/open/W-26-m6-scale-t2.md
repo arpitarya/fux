@@ -3,7 +3,7 @@
 **Status:** OPEN
 **Blocked by:** W-25
 **Spec:** this file — see §Scope below (migrated from the retired `PLAN.md`, 2026-08-18)
-**Closes with:** ADR-0009 (reserved) · prediction **R7**
+**Closes with:** **`ADR-T2-SEGMENTS`** (reserved) · prediction **R7**. **Reserved by NAME, never by number** — a number is a filename ordinal assigned when the record is written (Arpit, 2026-08-19, closing W-33).
 **Model:** **Sonnet** for the bench harness · **Opus** for the analysis and
 the paper rewrite — interpreting a scaling measurement is exactly the
 "confidently wrong" failure mode.
@@ -33,7 +33,7 @@ paper's projections with measurements**.
       from projection to measurement.** They have been knowingly stale
       since 2026-08-09; this is where that debt is paid, and it is a DoD
       box, not a nice-to-have.
-- [ ] ADR-0009 written and accepted.
+- [ ] `ADR-T2-SEGMENTS` written and accepted.
 
 ## Hazards
 

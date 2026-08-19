@@ -27,8 +27,8 @@ at answer time.**
 > graded corpus it closes three known gaps and breaks nine working queries,
 > so the default is a measurement rather than a preference.
 >
-> URLs can join the corpus through a consumer-owned middleware file
-> (`.fux/middleware/cdp.py`, Chrome DevTools Protocol on pure stdlib) —
+> URLs can join the corpus through a consumer-owned fetcher file
+> (`.fux/fetchers/cdp.py`, Chrome DevTools Protocol on pure stdlib) —
 > list them one per line in `.fux/sources/urls`, then
 > `fux ingest --refresh-urls`. ADR-URL-INGEST + ADR-DOTFUX (both proposed).
 > No graph query lane yet (M3). The v0.26
@@ -71,7 +71,7 @@ Everything fux puts in your repo lives here, and every child is declared as
 |---|---|---|
 | `index/` | committed | the sharded JSONL index |
 | `sources/` | committed | line-oriented source lists (`urls`) |
-| `middleware/` | committed | **your** code (`cdp.py`) — fux never rewrites it |
+| `fetchers/` | committed | **your** code (`cdp.py`) — fux never rewrites it |
 | `runtime/` | derived | M2's accelerator segments (gitignored, `CACHEDIR.TAG`) |
 | `cache/` | derived | M4's fetch cache (gitignored, `CACHEDIR.TAG`) |
 

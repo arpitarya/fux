@@ -13,7 +13,7 @@ it is interesting.
 | realistic-workload pruning | **Optimization only.** Could shrink T1/T2; **cannot block anything.** [P1-RERUN](../regression/2026-08-09-pruning-rerun/VERDICT.md) killed it as a premise |
 | sentence-unit selection + format-aware structure extractor | spine retest, Graphify-inspired |
 | query-log views | [`../proposals/query-log-pruning.md`](../proposals/query-log-pruning.md) |
-| the `enriched` AI ingest tier | needs the pinning contract; naming is [ADR-INGEST](../../archive/adr/0001_ingest-mode-naming.md) |
+| the `enriched` AI ingest tier | **named and fenced** by [ADR-ENRICHED](../../docs/adr/0017_enriched-mode.md) (**accepted** 2026-08-19) — it carries the pinning contract, the four candidate enrichments, and the L2 exclusion of prose summaries. That record explicitly does **not** authorize this work; this gate does |
 | BIC codec inside T2 | superseded for the committed plane; survives only here |
 | MCP adapters | [`../proposals/mcp-adapters.md`](../proposals/mcp-adapters.md) — the escape valve that keeps the M4 adapter cap honest |
 | knowledge-CI | [`../proposals/knowledge-ci.md`](../proposals/knowledge-ci.md) |

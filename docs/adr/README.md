@@ -124,36 +124,63 @@ set is being replaced wholesale. This is the third restart: the v0.26 line ran
 0001–0015, the v0.30 line restarted at 0001 on 2026-08-09, and this one starts
 again here.
 
-| # | name | title | status |
-|---|------|-------|--------|
-| [0001](0001_laws.md) | **ADR-LAWS** | The non-negotiable constraints have exactly one home, and records cite it | accepted |
-| [0002](0002_cli-surface.md) | **ADR-CLI** | The command-line surface — six verbs, one boundary, three output modes; every command captured verbatim | accepted |
-| [0003](0003_fux-directory.md) | **ADR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git | ⏳ proposed |
-| [0004](0004_ask.md) | **ADR-ASK** | The `ask` verb — one scorer, one sort; the path that answers can never change the answer | ⏳ proposed |
-| [0005](0005_find.md) | **ADR-FIND** | The `find` verb — one line per hit, for pipes; a projection of `ask`, not a second strategy | ⏳ proposed |
-| [0006](0006_answer.md) | **ADR-ANSWER** | The `answer` verb — the single best answer the index can give, with its ceiling stated in every response | ⏳ proposed |
-| [0007](0007_ingest.md) | **ADR-INGEST** | How ingest works — re-extract everything, re-resolve every edge, write only shards whose bytes changed | ⏳ proposed |
-| [0008](0008_url-ingest.md) | **ADR-URL-INGEST** | URL ingestion through consumer-owned middleware — four functions, `--refresh-urls` only, a committed URL file | ⏳ proposed |
-| [0009](0009_index-lifecycle.md) | **ADR-INDEX-LIFECYCLE** | Index generation and update — one canonical encoder, write-if-different, a derived plane that refuses to diverge | ⏳ proposed |
-| [0010](0010_index-record.md) | **ADR-RECORD** | One line of the committed index, property by property — including the two that are conditional on privacy | ⏳ proposed |
-| [0011](0011_accelerator.md) | **ADR-T1-ACCELERATOR** | The derived T1 accelerator — disposable, term-major, and forbidden from changing an answer | ⏳ proposed |
-| [0012](0012_ranking.md) | **ADR-RANKING** | How documents are scored and ordered — BM25F, weight-then-saturate once, one scorer and one rounded sort | ⏳ proposed |
-| [0013](0013_postings.md) | **ADR-POSTINGS** | The postings in two shapes — doc-major in git for diffs, term-major in the runtime plane for queries | ⏳ proposed |
-| [0014](0014_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — including the one table fux passes through unread | ⏳ proposed |
-| [0015](0015_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — nine named modules from the archived engine, each with its tests, and the list is closed | ⏳ proposed |
-| 0016+ | — | unwritten | planned |
+| # | name | title | status | built |
+|---|------|-------|--------|-------|
+| [0001](0001_laws.md) | **ADR-LAWS** | The non-negotiable constraints have exactly one home, and records cite it | accepted | yes |
+| [0002](0002_cli-surface.md) | **ADR-CLI** | The command-line surface — six verbs, one boundary, three output modes; every command captured verbatim | accepted | yes |
+| [0003](0003_fux-directory.md) | **ADR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git | accepted | yes |
+| [0004](0004_ask.md) | **ADR-ASK** | The `ask` verb — one scorer, one sort; the path that answers can never change the answer | accepted | yes |
+| [0005](0005_find.md) | **ADR-FIND** | The `find` verb — one line per hit, for pipes; a projection of `ask`, not a second strategy | ⏳ proposed | yes |
+| [0006](0006_answer.md) | **ADR-ANSWER** | The `answer` verb — the single best answer the index can give, with its ceiling stated in every response | ⏳ proposed | yes |
+| [0007](0007_ingest.md) | **ADR-INGEST** | How ingest works — re-extract everything, re-resolve every edge, write only shards whose bytes changed | accepted | yes |
+| [0008](0008_url-ingest.md) | **ADR-URL-INGEST** | URL ingestion behaviour — `--refresh-urls` only, a failed fetch is a skip not a deletion, and what comes back is normalized | accepted | yes |
+| [0009](0009_index-lifecycle.md) | **ADR-INDEX-LIFECYCLE** | Index generation and update — one canonical encoder, write-if-different, a derived plane that refuses to diverge | accepted | yes |
+| [0010](0010_index-record.md) | **ADR-RECORD** | One line of the committed index, property by property — including the two that are conditional on privacy | accepted | yes |
+| [0011](0011_accelerator.md) | **ADR-T1-ACCELERATOR** | The derived T1 accelerator — disposable, term-major, and forbidden from changing an answer | accepted | yes |
+| [0012](0012_ranking.md) | **ADR-RANKING** | How documents are scored and ordered — BM25F, weight-then-saturate once, one scorer and one rounded sort | ⏳ proposed | yes |
+| [0013](0013_postings.md) | **ADR-POSTINGS** | The postings in two shapes — doc-major in git for diffs, term-major in the runtime plane for queries | ⏳ proposed | yes |
+| [0014](0014_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — including the one table fux passes through unread | accepted | yes |
+| [0015](0015_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — nine named modules from the archived engine, each with its tests, and the list is closed | ⏳ proposed | partial |
+| [0016](0016_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
+| [0017](0017_enriched-mode.md) | **ADR-ENRICHED** | The `enriched` ingest mode — a coding agent as a source, never a step; pinned, graded, and fenced out of the maintenance path | accepted | **no** |
+| [0018](0018_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes | accepted | partial |
+| [0019](0019_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, and nothing composes | accepted | yes |
+| [0020](0020_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — drives your existing Chrome over CDP on a hand-rolled stdlib WebSocket; never escalated to | accepted | yes |
+| [0021](0021_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET, generated into your repo so core keeps zero network lines. Decided, unbuilt | accepted | **no** |
+| [0023](0023_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — source dirs leave `fux.toml`; a directory may be declared `archived=true`, its records say so, and the ranking is byte-identical | accepted | **no** |
+| [0024](0024_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | ⏳ proposed | yes |
+| [0025](0025_docs-table.md) | **ADR-DOCS-TABLE** | `docs.jsonl` — the docidx-ordered doc table every other derived structure joins against | ⏳ proposed | yes |
+| [0026](0026_codes-table.md) | **ADR-CODES-TABLE** | `codes.jsonl` — the dense lane's per-document FuxVec codes, decoded once per process | ⏳ proposed | yes |
+| [0027](0027_runtime-manifest.md) | **ADR-RUNTIME-MANIFEST** | `manifest.json` — the per-shard content-sha fingerprint that detects a stale accelerator | ⏳ proposed | yes |
+| [0028](0028_runtime-stamp.md) | **ADR-RUNTIME-STAMP** | `stamp.json` — the cheap, non-reproducible size/mtime pre-check ahead of the manifest's real one | ⏳ proposed | yes |
+| [0029](0029_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide `n` and `total_wlen` that BM25F length normalization reads | ⏳ proposed | yes |
+| 0030+ | — | unwritten | planned | — |
+
+**`status` and `built` are two different questions, and conflating them is how
+the `CLAUDE.md` PROPOSED header survived ten days.** `status: accepted` means
+**Arpit ratified the decision**. `built` means **the engine does it**. A record
+can be accepted and unbuilt — that is a decision made ahead of the code, which
+is legitimate and is how ADR-ENRICHED, ADR-HTTP-FETCHER and ADR-DIR-LIST exist
+today. What is *not* legitimate is a reader having to open the record to find
+out.
+
+**A row with `built: no` or `partial` must be claimed by an open item in
+[`work/OPEN-WORK.md`](../../work/OPEN-WORK.md)** — otherwise it is a decision
+nobody is going to act on, which is a wish. Today: ADR-ENRICHED → W-38 ·
+ADR-URL-LIST, ADR-HTTP-FETCHER, ADR-DIR-LIST → W-54 · ADR-PORT-LIST → W-23/W-24
+(its M3 and M4 rows).
 
 **Eight of these are successors, and none has retired its predecessor yet.**
 ADR-DOTFUX, ADR-ASK, ADR-INGEST, ADR-URL-INGEST, ADR-INDEX-LIFECYCLE,
 ADR-RECORD, ADR-T1-ACCELERATOR and ADR-CONFIG each name what they supersede
 (ADR-FIND, ADR-ANSWER, ADR-RANKING and ADR-POSTINGS supersede nothing — those
-subjects never had a record), and each is ⏳ *proposed*. **Retirement happens in the change
-that accepts them** — and three of the predecessors are themselves unratified
-([W-30](../../work/open/W-30-ratify-adr-0001.md),
-[W-31](../../work/open/W-31-ratify-adr-0010-0011.md)), so the ratifications come
-first: replacing an unratified decision inherits its ambiguity. Until then the
-predecessors keep their entries in the ownership table, and the successors carry
-an **`Owns (on acceptance)`** line instead of `Owns`.
+subjects never had a record), and each is now **accepted** (2026-08-18). **Retirement happens in the change
+that accepts them.** One predecessor decision remains unratified —
+[W-31](../../work/IMPLEMENTATION.md) *(ratified 2026-08-19)*, the `.fux/` layout and the
+URL fetcher; **W-30 closed on 2026-08-19** when Arpit ratified the
+ingest-mode naming, which now has its own two records,
+[ADR-EXTRACTED](0016_extracted-mode.md) and [ADR-ENRICHED](0017_enriched-mode.md),
+both accepted.
 
 **Numbers collide across the two directories, and that is fine.** `0001` here
 is ADR-LAWS; `0001` in `work/adr/` is ADR-INGEST, retiring. Nothing reads
@@ -174,12 +201,22 @@ Two consequences, recorded rather than left to be discovered:
   **accepted** — a record cannot own the engine and be a proposal at the same
   time.
 - **The ratification items survive.** W-30 and W-31 were never about *which
-  record* holds a decision; they are Arpit's calls on the ingest-mode naming,
-  the `.fux/` layout and the URL middleware themselves, and they now point at
-  the successors.
+  record* holds a decision; they are Arpit's calls on the decisions themselves.
+  **W-30 closed 2026-08-19** — the ingest-mode naming is ratified and now has
+  its own pair of records. **W-31 is still open**: the `.fux/` layout and the
+  URL fetcher.
 
 Records that supersede nothing — ADR-FIND, ADR-ANSWER, ADR-RANKING,
-ADR-POSTINGS, ADR-PORT-LIST — **stay ⏳ proposed**. Nothing forced their hand.
+ADR-POSTINGS, ADR-PORT-LIST, and the six single-file companion records added
+2026-08-19 (ADR-CACHEDIR-TAG, ADR-DOCS-TABLE, ADR-CODES-TABLE,
+ADR-RUNTIME-MANIFEST, ADR-RUNTIME-STAMP, ADR-RUNTIME-STATS) — **stay ⏳
+proposed**. Nothing forced their hand.
+
+**One accepted record owns nothing, on purpose.** ADR-ENRICHED decides a
+contract for a mode that is not built: the name, the boundary that keeps it
+outside the maintenance path, and the record shape. Acceptance is not
+permission to build it — [W-38](../../work/open/W-38-m8-deferred.md)'s M8 gate
+is, and it has not been given.
 
 The v0.26 engine's ADRs 0001–0015 are frozen at
 [`archive/v0.26-docs/adr/`](../../archive/v0.26-docs/adr/) and are always cited
@@ -205,6 +242,16 @@ deliberately more specific than a sibling's claim: ADR-RANKING takes
 specific wins, exactly as the table already resolves `store/fuxdir.py` against
 `store/`. **Nothing changes in the table below until acceptance.**
 
+**Six 2026-08-19 records own nothing at all, on purpose.**
+ADR-CACHEDIR-TAG, ADR-DOCS-TABLE, ADR-CODES-TABLE, ADR-RUNTIME-MANIFEST,
+ADR-RUNTIME-STAMP and ADR-RUNTIME-STATS each specify one file
+[ADR-T1-ACCELERATOR](0011_accelerator.md) already generates from
+`src/fux/derive/`. They do not appear in the table below, and never will —
+`src/fux/derive/` stays claimed exactly once, by ADR-T1-ACCELERATOR, the same
+"most specific wins" rule notwithstanding, because these six are not more
+specific ownership claims, they are companion records documenting one file
+each of an already-owned component.
+
 **Both change together.** When this table changes, edit
 [`../../tests/test_adr_ownership.py`](../../tests/test_adr_ownership.py) in the
 same change. They drift silently otherwise — that is the entire reason the
@@ -228,7 +275,8 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator |
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |
-| `src/fux/ingest/urlsrc.py` | ADR-URL-INGEST | the URL source and its consumer-owned middleware |
+| `src/fux/ingest/extract.py` | ADR-EXTRACTED | what extraction *promises* — title, phrases, terms, wlen, taken from the bytes and nothing else |
+| `src/fux/ingest/urlsrc.py` | ADR-FETCHER | fux's half of the fetch contract — load, configure, call, normalize |
 | `src/fux/derive/` | ADR-T1-ACCELERATOR | T1 build, block maxima, skipping, dense lane |
 | `src/fux/query/` | ADR-ASK | BM25F, scan, rank, fusion — bound by the differential law |
 | `src/fux/embed/` | ADR-T1-ACCELERATOR | `fuxvec` codes; ships default-off on measured evidence |

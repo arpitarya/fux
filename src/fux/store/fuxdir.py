@@ -1,7 +1,7 @@
 """The `.fux/` directory — one declared layout, committed vs derived.
 
 Every child of `.fux/` is declared here as **committed** (belongs in git —
-the index, the source lists, the consumer's middleware) or **derived**
+the index, the source lists, the consumer's fetcher) or **derived**
 (rebuildable, gitignored, self-tagged). Nothing else should appear there;
 `fux doctor` warns on anything undeclared, which is how a plane added by
 accident gets noticed before it is committed.
@@ -35,7 +35,7 @@ FUX_DIR = ".fux"
 COMMITTED: dict[str, str] = {
     "index": "the wire-format index (ADR-RECORD)",
     "sources": "large line-oriented source lists (`urls`; M4 may add more)",
-    "middleware": "consumer-owned code (`cdp.py`), edit freely",
+    "fetchers": "consumer-owned code (`cdp.py`, `http.py`), edit freely",
 }
 
 DERIVED: dict[str, str] = {
@@ -60,7 +60,7 @@ CACHEDIR_TAG = (
 _GITIGNORE = (
     "# Derived planes only: rebuildable from the committed index and the\n"
     "# source systems. NEVER add `*` here: `.fux/index/`, `.fux/sources/` and\n"
-    "# `.fux/middleware/` are committed, and a blanket ignore would drop them\n"
+    "# `.fux/fetchers/` are committed, and a blanket ignore would drop them\n"
     "# from git silently. `fux doctor` checks exactly that.\n"
     + "".join(f"{name}/\n" for name in DERIVED)
 )
@@ -85,9 +85,9 @@ def _readme() -> str:
     rows += [f"| `{name}/` | derived | {desc}; carries `CACHEDIR.TAG` |" for name, desc in DERIVED.items()]
     rows += [
         "",
-        "## The middleware is yours",
+        "## The fetcher is yours",
         "",
-        "`middleware/cdp.py` is **your** code, committed to **your** repo. Fux",
+        "`fetchers/cdp.py` is **your** code, committed to **your** repo. Fux",
         "loads it by path under `fux ingest --refresh-urls` and never rewrites",
         "it. Change the port, the transport, the extraction, anything.",
         "",

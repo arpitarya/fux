@@ -130,7 +130,7 @@ worst case is doing the scan's work, never a wrong answer.
 `cache/` (M4's fetch cache). Each is created through `derived_dir()`, which
 drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/) so backup tools skip
 it, and each is named explicitly in `.fux/.gitignore`. Opposite of a
-*committed plane* (`index/`, `sources/`, `middleware/`). See
+*committed plane* (`index/`, `sources/`, `fetchers/`). See
 [ADR-DOTFUX](../archive/adr/0011_fux-dir-layout.md).
 
 **Doc-id** — A document's integer identity inside the wire index, assigned in
@@ -141,7 +141,7 @@ size model assumes (paper Figure 4).
 **Edge grade (EXTRACTED / INFERRED)** — The archived link-graph vocabulary,
 ported at [M3](../work/open/W-23-m3-graph-lane.md): `EXTRACTED` = deterministically parsed from the
 document, `INFERRED` = model- or heuristic-derived and ranked below it. Since
-[ADR-INGEST](../archive/adr/0001_ingest-mode-naming.md)'s amendment these **agree** with the
+[ADR-EXTRACTED](adr/0016_extracted-mode.md) these **agree** with the
 [ingest modes](#extracted-mode) rather than contradicting them: `extracted`
 means "no model" on both sides, and `enriched` sits with `INFERRED`.
 
@@ -153,19 +153,21 @@ for the `D/` dictionary's offset array. Ottaviano & Venturini, SIGIR 2014
 expansion, model-inferred edges, summaries. Two rules keep the laws intact —
 outputs are **pinned** into the index with provenance and re-read forever
 (never re-generated on a query path), and they carry a grade below
-deterministic signal wherever they compete. Contrast
-[extracted mode](#extracted-mode). Named by
-[ADR-INGEST](../archive/adr/0001_ingest-mode-naming.md); deferred to [M8](../work/open/W-38-m8-deferred.md).
+deterministic signal wherever they compete, and **enrichment never runs inside
+`fux ingest`** — it is its own command, pinned then ingested. Contrast
+[extracted mode](#extracted-mode). Named and fenced by
+[ADR-ENRICHED](adr/0017_enriched-mode.md) (accepted 2026-08-19 — the contract,
+not permission to build); deferred to [M8](../work/open/W-38-m8-deferred.md).
 
 **Extracted mode** — The **default** ingest tier: `$0`, offline, stdlib,
 deterministic — conversion, chunking, term selection, static-table embedding
 codes, edge extraction. Everything is *taken from* the document; nothing is
 invented. Byte-reproducible, and the mode every guarantee in the paper is
-stated for. Contrast [enriched mode](#enriched-mode). ⏳ *Name proposed, not
-yet ratified.*
+stated for. Contrast [enriched mode](#enriched-mode). Ratified by
+[ADR-EXTRACTED](adr/0016_extracted-mode.md), Arpit 2026-08-19.
 
-**Renamed from `inferred`** by [ADR-INGEST](../archive/adr/0001_ingest-mode-naming.md)'s
-amendment: `INFERRED` is the [edge grade](#edge-grade-extracted--inferred) for
+**Renamed from `inferred`** by [ADR-EXTRACTED](adr/0016_extracted-mode.md):
+`INFERRED` is the [edge grade](#edge-grade-extracted--inferred) for
 *model-derived*, so calling the no-model tier `inferred` reproduced the exact
 collision the ADR existed to remove. `inferred` survives only in the frozen
 archived *fidelity* vocabulary and is **not** a valid v0.30 mode value.
@@ -181,7 +183,7 @@ two live in the fux-lab environment, generated deterministically from a seed.
 **`.fux` directory** — Fux's directory inside the consumer's repo. Every
 child is **declared** as committed or [derived](#derived-plane): `index/`
 (the wire index), `sources/` (line-oriented lists such as `urls`),
-`middleware/` (consumer-owned code) and two generated files — a
+`fetchers/` (consumer-owned code) and two generated files — a
 self-describing `README.md` and a `.gitignore` naming **only** the derived
 dirs, never `*`. Both are write-if-missing; anything undeclared is a `fux
 doctor` warning. See [ADR-DOTFUX](../archive/adr/0011_fux-dir-layout.md).
@@ -257,8 +259,8 @@ at which version* without holding any content, and its sort order defines
 path + blob sha for git, a URL for HTTP, a page id + version for Confluence.
 What an [adapter](#adapter) needs to fetch the bytes back.
 
-**Middleware (URL)** — The **consumer's own** Python file, committed at
-`.fux/middleware/cdp.py`, that turns a URL into markdown. Fux imports it by
+**Fetcher (URL)** — The **consumer's own** Python file, committed at
+`.fux/fetchers/cdp.py`, that turns a URL into markdown. Fux imports it by
 path — only under `fux ingest --refresh-urls` — and calls
 `configure(config)` / `connect()` / `fetch(url)` / `close()`. Every socket in
 the system lives here, outside `src/fux/`, which is how the
@@ -316,7 +318,7 @@ See [SETUP-PLAYGROUND](../work/setup/fux-playground.md).
 **Playground (`fux-playground`)** — The graded corpus in a **separate sibling
 repository**: ten fictional internal-developer-platform documents, fifty
 [golden queries](#golden-query), ten URLs that exercise the CDP
-[middleware](#middleware-url), and a committed index holding **file documents
+[fetcher](#fetcher-url), and a committed index holding **file documents
 only**. It is a real consumer of fux — it depends on the sibling working tree
 — which makes it a regression net for the code being edited, not for a
 released wheel. Replaced `examples/playground/`, deleted 2026-08-12. See
@@ -367,7 +369,7 @@ archived frontmatter parser's home in v0.30. Built at [M6](../work/open/W-26-m6-
 
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
 read from the committed `.fux/sources/urls` (one per line), fetched through
-the consumer's [middleware](#middleware-url), and indexed exactly like repo
+the consumer's [fetcher](#fetcher-url), and indexed exactly like repo
 files with [hashed meta](#hashed-meta-meta--hashed) by default. Fux ships
 **no** URL adapter — the adapter cap is untouched, because the fetching code
 is the consumer's. Fetching happens only under `--refresh-urls`; a plain

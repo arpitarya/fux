@@ -1,7 +1,7 @@
-"""URL source (ADR-URL-INGEST, relocated by ADR-DOTFUX): the consumer-middleware
+"""URL source (ADR-URL-INGEST, relocated by ADR-DOTFUX): the consumer-fetcher
 contract, the committed line-oriented URL list, the opaque config table,
 offline-by-default carry-forward, hashed-meta default, and determinism. No
-test here touches the network — the middleware under test is a fake written
+test here touches the network — the fetcher under test is a fake written
 into the tmp repo, which is exactly the trust boundary the design draws."""
 
 from __future__ import annotations
@@ -12,10 +12,10 @@ from fux import store
 from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
-from fux.ingest.urlsrc import fetch_all, load_middleware, read_urls
+from fux.ingest.urlsrc import fetch_all, load_fetcher, read_urls
 from fux.store.format import term_hash
 
-FAKE_MIDDLEWARE = '''\
+FAKE_FETCHER = '''\
 CALLS = {"connect": 0, "close": 0, "fetch": []}
 
 def connect():
@@ -41,15 +41,15 @@ def _write_urls(tmp_path, lines):
     path.write_text("".join(f"{line}\n" for line in lines), encoding="utf-8")
 
 
-def _init(tmp_path, *, urls, meta=None, files=None, middleware=FAKE_MIDDLEWARE, config=None):
+def _init(tmp_path, *, urls, meta=None, files=None, fetcher=FAKE_FETCHER, config=None):
     files = files if files is not None else {"docs/a.md": "# Doc A\n\nrepo body\n"}
-    url_lines = '[sources.url]\nmiddleware = "mw.py"\n'
+    url_lines = '[sources.url]\nfetcher = "mw.py"\n'
     if meta is not None:
         url_lines += f'meta = "{meta}"\n'
     if config is not None:
         url_lines += "[sources.url.config]\n" + config
     (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n' + url_lines, encoding="utf-8")
-    (tmp_path / "mw.py").write_text(middleware, encoding="utf-8")
+    (tmp_path / "mw.py").write_text(fetcher, encoding="utf-8")
     _write_urls(tmp_path, urls)
     for rel, text in files.items():
         path = tmp_path / rel
@@ -63,7 +63,7 @@ def _init(tmp_path, *, urls, meta=None, files=None, middleware=FAKE_MIDDLEWARE, 
 def test_config_parses_url_source(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"], meta="plain")
     cfg = load_config(tmp_path)
-    assert cfg.url.middleware == "mw.py"
+    assert cfg.url.fetcher == "mw.py"
     assert cfg.url.urls_file == ".fux/sources/urls"
     assert cfg.url.meta == "plain"
     assert cfg.url.config == {}
@@ -77,13 +77,13 @@ def test_config_meta_defaults_to_hashed(tmp_path):
 def test_config_paths_default_into_the_fux_dir(tmp_path):
     (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n[sources.url]\n', encoding="utf-8")
     cfg = load_config(tmp_path)
-    assert cfg.url.middleware == ".fux/middleware/cdp.py"
+    assert cfg.url.fetcher == ".fux/fetchers/cdp.py"
     assert cfg.url.urls_file == ".fux/sources/urls"
 
 
 def test_config_rejects_bad_meta(tmp_path):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs = ["docs"]\n[sources.url]\nmiddleware = "mw.py"\nmeta = "cleartext"\n',
+        '[sources]\ndirs = ["docs"]\n[sources.url]\nfetcher = "mw.py"\nmeta = "cleartext"\n',
         encoding="utf-8",
     )
     with pytest.raises(FuxError, match="meta must be"):
@@ -103,7 +103,7 @@ def test_config_table_is_opaque_but_must_be_a_table(tmp_path):
     assert load_config(tmp_path).url.config == {"cdp_port": 9333, "anything_at_all": "fux never reads this"}
 
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs = ["docs"]\n[sources.url]\nmiddleware = "mw.py"\nconfig = 9222\n', encoding="utf-8"
+        '[sources]\ndirs = ["docs"]\n[sources.url]\nfetcher = "mw.py"\nconfig = 9222\n', encoding="utf-8"
     )
     with pytest.raises(FuxError, match=r"\[sources.url.config\] must be a table"):
         load_config(tmp_path)
@@ -149,33 +149,33 @@ def test_missing_urls_file_only_matters_on_refresh(tmp_path):
         run(tmp_path, refresh_urls=True)
 
 
-# -- middleware loading ----------------------------------------------------
+# -- fetcher loading ----------------------------------------------------
 
 
-def test_missing_middleware_file_fails_loudly(tmp_path):
-    with pytest.raises(FuxError, match="middleware not found"):
-        load_middleware(tmp_path, "nope.py")
+def test_missing_fetcher_file_fails_loudly(tmp_path):
+    with pytest.raises(FuxError, match="fetcher not found"):
+        load_fetcher(tmp_path, "nope.py")
 
 
-def test_middleware_without_fetch_fails_loudly(tmp_path):
+def test_fetcher_without_fetch_fails_loudly(tmp_path):
     (tmp_path / "mw.py").write_text("x = 1\n", encoding="utf-8")
     with pytest.raises(FuxError, match="no fetch"):
-        load_middleware(tmp_path, "mw.py")
+        load_fetcher(tmp_path, "mw.py")
 
 
 def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
-    (tmp_path / "mw.py").write_text(FAKE_MIDDLEWARE, encoding="utf-8")
+    (tmp_path / "mw.py").write_text(FAKE_FETCHER, encoding="utf-8")
     fetched, skipped = fetch_all(
         tmp_path, "mw.py", ["https://x.test/b", "https://x.test/boom", "https://x.test/a"]
     )
     assert [f.url for f in fetched] == ["https://x.test/a", "https://x.test/b"]  # sorted, deterministic
     assert [s.rel_path for s in skipped] == ["https://x.test/boom"]
     assert "no such page" in skipped[0].reason
-    module = load_middleware(tmp_path, "mw.py")  # fresh module: counters reset
+    module = load_fetcher(tmp_path, "mw.py")  # fresh module: counters reset
     assert callable(module.connect) and callable(module.close)
 
 
-# A fake middleware records what it saw next to itself — `fetch_all` imports
+# A fake fetcher records what it saw next to itself — `fetch_all` imports
 # the module privately, so its state is only observable through the filesystem.
 _RECORDER = 'import pathlib\n_LOG = pathlib.Path(__file__).with_name("log.txt")\n'
 
@@ -279,7 +279,7 @@ def test_plain_ingest_is_offline_and_carries_urls_forward(tmp_path):
     before = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
 
     (tmp_path / "mw.py").write_text("def fetch(url):\n    raise AssertionError('network on offline run')\n", encoding="utf-8")
-    report = run(tmp_path)  # no flag: must not import or call the middleware
+    report = run(tmp_path)  # no flag: must not import or call the fetcher
     after = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
     assert before == after
     assert report.changed_count == 0

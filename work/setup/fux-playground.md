@@ -61,7 +61,7 @@ running at once.
 | **corpus** | 10 documents, mixed types, 100–400 lines. A fictional 10k-engineer company's internal developer platform (Calder Group / Helix) — chosen over a trading domain **specifically** to satisfy the do-not-design-in-reference-to-Anton litmus |
 | **goldens** | ~50 queries in `goldens/queries.jsonl`, graded on **rank**, never score. **Written from the corpus, never from what fux returns** — there is no `--update-goldens` flag, by design |
 | **committed index** | **file documents only. Zero `url:` records.** |
-| **URLs** | 10, deliberately mixed to stress the CDP middleware. A **runtime smoke test only** — never graded on ranking |
+| **URLs** | 10, deliberately mixed to stress the CDP fetcher. A **runtime smoke test only** — never graded on ranking |
 | **staleness guard** | a fresh `fux ingest` must reproduce the committed index byte for byte or `check.py --index-guard` fails |
 | **known failures** | a query may carry `known_failure: "<reason>"`. The expectation is unchanged; a named gap does not redden the suite, and a known failure that starts **passing** is reported `XPASS` and **fails the run** |
 
@@ -123,12 +123,12 @@ Four parts to the decision.
    edited next door rather than a released wheel.
 
 2. **The committed index is file documents only.** Zero `url:` records. URLs
-   remain in the corpus as a *runtime smoke test* of the CDP middleware, run
+   remain in the corpus as a *runtime smoke test* of the CDP fetcher, run
    deliberately and never committed.
 
 3. **URL documents are not graded on ranking.** Their content is owned by
    third parties and changes without notice; a golden over it would be a test
-   of the internet. They exist to exercise the middleware, which is the
+   of the internet. They exist to exercise the fetcher, which is the
    engine's only networked path and otherwise has no test surface.
 
 4. **The golden queries are the regression contract.** Fifty hand-written
@@ -175,7 +175,7 @@ the M2 dense lane and M3 graph lane.
   hazard classes before it can land quietly.
 - The committed index is verified byte-for-byte on every run, so the
   determinism law is checked continuously rather than asserted.
-- The CDP middleware finally has an exercise: ten pages including a
+- The CDP fetcher finally has an exercise: ten pages including a
   client-rendered SPA, a redirect chain, and the same document over two
   transports.
 
@@ -184,7 +184,7 @@ the M2 dense lane and M3 graph lane.
 - Two repositories to keep in step. The playground's `check.py --index-guard`
   fails loudly when the engine's output changes, which is the intended
   coupling, but it does mean an engine change can require a playground commit.
-- `.fux/middleware/cdp.py` exists in both repos as a verbatim copy. The
+- `.fux/fetchers/cdp.py` exists in both repos as a verbatim copy. The
   playground records the provenance commit (`43ba631`) and its sha256; a
   drift is currently caught by a human, not a test.
 - The nine known failures are a standing debt. Each must be revisited when

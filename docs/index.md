@@ -52,7 +52,7 @@ superseded-pending (in force, citable, replacement planned) ·
 * [ADR-CONFIG](adr/0014_config.md) - `fux.toml` and every property in it. ⏳ proposed.
 * [ADR-DOTFUX](adr/0003_fux-directory.md) - the `.fux/` directory: every child declared committed or derived, the ignore rule asserted against git. ⏳ proposed.
 * [ADR-INGEST](adr/0007_ingest.md) - how ingest works: re-extract everything, re-resolve every edge, write only what changed. ⏳ proposed.
-* [ADR-URL-INGEST](adr/0008_url-ingest.md) - URL ingestion through consumer-owned middleware; fux never fetches. ⏳ proposed.
+* [ADR-URL-INGEST](adr/0008_url-ingest.md) - URL ingestion through consumer-owned fetcher; fux never fetches. ⏳ proposed.
 * [ADR-INDEX-LIFECYCLE](adr/0009_index-lifecycle.md) - index generation and update, and the derived plane that refuses to diverge. ⏳ proposed.
 * [The retired v0.30 set](../archive/adr/README.md) - five records, archived 2026-08-18, each mapped to its live successor. **Named, never cited** — archive is not evidence.
 * [Compare docs](../work/compare/README.md) - the v0.30 forks, verdict at the top of each, every one with a reopen-trigger.

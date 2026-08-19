@@ -176,7 +176,7 @@ when a session produces a lesson; do not let it become a changelog.
   ADR-owned component and updated no record. The fix was not better wording; it
   was `tests/test_adr_freshness.py`. **When a rule matters, ship the check in
   the same change as the rule.**
-- **Features that are individually correct can be mutually exclusive** (2026-08-18). Hashed meta writes a 16-hex `title_h`; the accelerator refuses any index with a 16-hex token outside `terms`. Both decisions are right; together they mean the **default** URL path can never build an accelerator ([W-47](open/W-47-hashed-meta-blocks-accelerator.md)). Each shipped in a different release with its own tests, and nothing exercised the intersection. **Test the seam between two features, not just each feature.**
+- **Features that are individually correct can be mutually exclusive** (2026-08-18). Hashed meta writes a 16-hex `title_h`; the accelerator refuses any index with a 16-hex token outside `terms`. Both decisions are right; together they mean the **default** URL path can never build an accelerator ([W-54](open/W-54-sources-rewrite.md)). Each shipped in a different release with its own tests, and nothing exercised the intersection. **Test the seam between two features, not just each feature.**
 - **Documenting a surface walks paths nobody walks** (2026-08-18). Writing
   ADR-CLI meant running every verb and flag, which immediately surfaced W-46 —
   `ask --hybrid` crashing on a source install. The guard for that exact case
@@ -199,12 +199,12 @@ when a session produces a lesson; do not let it become a changelog.
   a bad bulk edit is fixed by editing forward. Details in [`MACHINE.md`](MACHINE.md).
 - **An ignore rule is the silent failure mode** of putting committed and derived
   planes under one dotdir. The repo's own `.gitignore` carried a `.fux/*`
-  blanket that would have eaten `sources/` and `middleware/` with no error —
+  blanket that would have eaten `sources/` and `fetchers/` with no error —
   which is why `fux doctor` now asserts `git check-ignore` on the index.
-- **Middleware tunables are an opaque table.** Typing `cdp_port`/`settle_ms`
+- **Fetcher tunables are an opaque table.** Typing `cdp_port`/`settle_ms`
   into `config.py` would have breached the adapter cap through the back door.
   `[sources.url.config]` is passed verbatim and never read — PEP 518 `[tool.*]`
-  discipline. Hold that line for every future middleware.
+  discipline. Hold that line for every future fetcher.
 - **A recorded rank is a snapshot of a corpus at a date**, not a property of the
   engine. Read every recorded rank with its date attached.
 - **An unindexed source is not a ranking failure.** R2's third question failed
@@ -236,10 +236,10 @@ it is no longer the state of play. Read this block, then read the rest as
 *background*.
 
 **Update (2026-08-10, Cowork/Claude):** one post-M1 capability landed at
-Arpit's direction — URL ingestion through a **consumer-owned middleware
+Arpit's direction — URL ingestion through a **consumer-owned fetcher
 file** ([ADR-URL-INGEST](../archive/adr/0010_url-source-consumer-middleware.md), ⏳ proposed;
 a CDP template ported from the archived `render="cdp"` path, now at
-`.fux/middleware/cdp.py`). The judgment worth inheriting: the adapter cap
+`.fux/fetchers/cdp.py`). The judgment worth inheriting: the adapter cap
 survives by making URL fetch *configuration plus consumer code*, never core
 code — `src/fux/` still has zero network lines; hashed meta got its first
 real exercise; offline ingest carries `url:` records forward byte-identically
@@ -251,13 +251,13 @@ committed or derived, and the URL source moved fully inside it. Two pieces of
 judgment to inherit. First, **an ignore rule is the silent failure mode** of
 putting committed and derived planes under one dotdir; the repo's own
 `.gitignore` already carried a `.fux/*` blanket that would have eaten
-`sources/` and `middleware/` with no error, which is why `fux doctor` now
-asserts `git check-ignore` on the index. Second, **middleware tunables are an
+`sources/` and `fetchers/` with no error, which is why `fux doctor` now
+asserts `git check-ignore` on the index. Second, **fetcher tunables are an
 opaque table**: typing `cdp_port`/`settle_ms` into `config.py` would have put
-one middleware's vocabulary into fux's schema and breached the adapter cap
+one fetcher's vocabulary into fux's schema and breached the adapter cap
 through the back door. `[sources.url.config]` is passed verbatim and never
 read — the PEP 518 `[tool.*]` discipline. Hold that line for every future
-middleware. Maintainers of this doc so
+fetcher. Maintainers of this doc so
 far: each session's model, per the standing instruction above — this entry
 by Claude (Cowork, claude-fable-5).
 

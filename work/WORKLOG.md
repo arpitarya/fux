@@ -28,6 +28,582 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-19 — six single-file companion ADRs for the `.fux/runtime/` files  ·  Cowork
+- **Asked:** explained what's inside `.fux/runtime/postings/` and the six other
+  generated runtime files (`CACHEDIR.TAG`, `docs.jsonl`, `codes.jsonl`,
+  `manifest.json`, `stamp.json`, `stats.json`) in chat, then Arpit asked for
+  "independent ADRs for each of these."
+- **Did:** flagged first that `src/fux/derive/` is already claimed once by
+  ADR-T1-ACCELERATOR (0011, accepted) and ADR-POSTINGS (0013, proposed), and
+  that one-record-per-file would fragment an already-decided feature — Arpit
+  confirmed he wanted it anyway. Wrote **six new proposed records**, none
+  owning a module (`Owns (on acceptance): no module`, same pattern
+  ADR-POSTINGS already uses), so the ownership table in
+  [`docs/adr/README.md`](adr/README.md) needed no edit: **ADR-CACHEDIR-TAG**
+  (0024), **ADR-DOCS-TABLE** (0025), **ADR-CODES-TABLE** (0026),
+  **ADR-RUNTIME-MANIFEST** (0027), **ADR-RUNTIME-STAMP** (0028),
+  **ADR-RUNTIME-STATS** (0029). Added register rows for all six, a prose note
+  explaining why they own nothing, and cross-referenced all six from
+  ADR-POSTINGS' Reference section as requested. Verified against the repo's
+  own suite in a throwaway sandbox (copied `docs/adr/`, `fux/__init__.py`,
+  `fux/frontmatter.py`, the two test files, and `OPEN-WORK.md`) — caught and
+  fixed one real defect this way: 0024's Examples section used a bare
+  ` ```text ` fence for a raw file dump, which `test_adr_ownership.py`'s
+  mermaid-twin check requires to live inside a collapsed `<details>` block;
+  switched it to a ` ```console ` block instead. `tests/test_adr_ownership.py`
+  + `tests/test_adr_frontmatter.py` pass in full against the real register
+  (148/149 in the sandbox; the one failure was the sandbox missing most of
+  `src/fux/`, not a real defect). Bumped the `docs/adr/` row in
+  [`DOC-REGISTRY.md`](DOC-REGISTRY.md).
+- **Decided / open:** these six records stay **⏳ proposed** — Arpit has not
+  ratified them, only asked for them to be written. `test_adr_freshness.py`
+  (git-diff based) and `scripts/adr-guard.sh` were not run this session — no
+  `src/` change was made, so they should be unaffected, but neither was
+  verified directly.
+- **Next:** none filed — this was a documentation-only exchange, not a
+  `W-nn` item. If Arpit wants these ratified, that's a status flip on each
+  frontmatter block plus the two-sentence prose that goes with acceptance
+  elsewhere in the register.
+- **Cost:** unmeasured — no `cage report` capture reaches this Cowork session.
+
+---
+
+## 2026-08-19 — `fux setup` answers the fetcher-delivery question  ·  Cowork
+- **Asked:** where does a consumer's `cdp.py` come from — **at setup time,
+  `fux setup`.**
+- **Did:** recorded it in [W-54](open/W-54-sources-rewrite.md) §3. Both fetchers
+  ship in the wheel as **package data** — bytes, never imported, so the adapter
+  cap holds — and `fux setup` writes them **write-if-missing**. That closes what
+  W-51 could not: `DEFAULT_FETCHER` names a file that will exist, without 28 KB
+  of WebSocket code appearing unasked-for on a first ingest, and without telling
+  an air-gapped consumer to fetch a file from GitHub.
+- **Decided / open:** scaffolding now has **two moments, and the split is
+  load-bearing**: `fux setup` is optional, explicit and once per repo, and it
+  writes the fetchers; `ensure_layout` stays mandatory and idempotent at ingest
+  and writes the layout — **and must never write a fetcher**, or ingest puts code
+  into a repo that only wanted an index. That preserves ADR-DOTFUX decision 6
+  exactly as Arpit ratified it in W-31 this morning. **The cost is a record
+  change nobody has priced yet**: ADR-CLI opens with *"six verbs and no
+  subcommand tree — three build the index and three query it, and the split is
+  the whole mental model,"* and W-54 now adds **two** verbs. The sentence stops
+  being true, and the fix is not to recount but to find the grouping the surface
+  actually has — proposed in W-54 as lifecycle (`setup`, `doctor`) · write
+  (`ingest`, `build`) · sources (the URL manager) · read (`ask`, `find`,
+  `answer`), to be settled **in** the amendment rather than after it.
+  **"No subcommand tree" is the constraint that survives**, and it is why the URL
+  manager takes flags instead of becoming `fux url add`.
+- **Next:** start **W-54**.
+- **Cost:** unmeasured — no per-session token count available. One item updated;
+  no code changed.
+
+## 2026-08-19 — The register gains a `built` axis; five items merge into W-54  ·  Cowork
+- **Asked:** add the built axis · merge the five sources items · keep the URL
+  work even though this repo does not use it · park the two that are gated.
+- **Did:** **the register gains a `built` column** — `yes` / `partial` / `no`,
+  and a paragraph saying why the two questions are different: `status: accepted`
+  means *Arpit ratified the decision*, `built` means *the engine does it*. Four
+  records were accepted-and-unbuilt with nothing in the index saying so, which is
+  the `CLAUDE.md` PROPOSED defect in a new place — one word meaning one thing to
+  the writer and another to the reader. **A row with `no` or `partial` must be
+  claimed by an open item**, or it is a wish; the mapping is stated. **W-54
+  filed**, merging W-47 · W-49 · W-50 · W-51 · W-53, whose files moved to
+  `archive/open/` marked **merged, not completed** — they are still five defects,
+  they are one change. Twelve live docs repointed to the successor. W-44 and
+  W-52 **PARKED with triggers**. Queue regrouped; every link resolves.
+- **Decided / open:** the URL subsystem is fixed **even though this repo never
+  exercises it** — no `.fux/sources/urls`, `[sources.url]` commented out, so all
+  five defects are latent, shipped, and victimless until the first consumer hits
+  every one of them on day one on the documented default. That is Arpit's call
+  and the reasoning is in W-54's §Note, together with the consequence nobody
+  should have to rediscover: **this repo's own corpus cannot catch a regression
+  here** — the 2026-08-18 fixture is the only thing that exercises the path, so
+  extend it rather than trusting `pytest -q tests`. W-44 and W-52 are parked
+  rather than ordered, because both were gated on a pre-registered instrument
+  that does not exist, is not an item, and has no owner — a gate whose
+  precondition nobody owns is *"revisit when we scale"* with better manners.
+- **Next:** **W-54**, and the first question in it is `cdp.py`'s fate.
+- **Cost:** unmeasured — no per-session token count available. One column, one
+  merge, two parks; no code changed.
+
+## 2026-08-19 — Inbox section reduced; full review of the queue and the register  ·  Cowork
+- **Asked:** the inbox section should carry open items or say **Empty.** and
+  nothing else. Then review all open work and the ADRs, find what is pending,
+  and grill so implementation can start.
+- **Did:** reduced §Blocked on Arpit to two words when there is nothing in it —
+  the prose that had accumulated there was explaining an absence, which is the
+  same defect as a tombstone row. Re-derived the register and the queue against
+  the tree.
+- **Found:** **four accepted records describe code that does not exist** —
+  ADR-ENRICHED, ADR-HTTP-FETCHER, ADR-DIR-LIST, and ADR-URL-LIST decisions 7–13.
+  Each says so in its own body; **the register's status column does not**, and
+  that column is what a session reads first. `accepted` currently means "the
+  decision is ratified" to the writer and "this is how the engine works" to the
+  reader — the same two-meanings-one-word defect the `CLAUDE.md` PROPOSED header
+  was. Also: **five open items concern a subsystem this repo does not use** —
+  there is no `.fux/sources/urls` and `[sources.url]` is commented out in
+  `fux.toml`, so URL ingestion has never run here outside a fixture. And the
+  milestone chain has not moved since `v0.32.0` on 2026-08-12.
+- **Decided / open:** nothing decided; put to Arpit as a sequencing question.
+- **Next:** his call on scope and order, then build.
+- **Cost:** unmeasured — no per-session token count available. One structural
+  edit; no code changed.
+
+## 2026-08-19 — Source dirs get their own file; ADR-ARCHIVED-SIGNAL superseded the day it was written  ·  Cowork
+- **Asked:** give directories a separate file the way URLs have one, with an
+  attribute saying whether the directory is archived — no attribute means not
+  archived. New record; merge ADR-ARCHIVED-SIGNAL into it and archive that one.
+- **Did:** wrote **ADR-DIR-LIST (0023)**, accepted and unbuilt: source
+  directories move out of `fux.toml` into `.fux/sources/dirs`, the grammar is
+  [ADR-URL-LIST](../docs/adr/0018_url-list.md)'s **by reference and not
+  restated**, the attribute set is one (`archived`, absent means false), and
+  everything ADR-ARCHIVED-SIGNAL decided is carried in. **ADR-ARCHIVED-SIGNAL
+  moved to `archive/adr/` in the same change that accepted its successor**, per
+  the register's rule, marked `superseded`, with a row in the archive map naming
+  what changed. Every live reference repointed — archive is not evidence. Filed
+  **W-53** for the build.
+- **Decided / open:** **one decision changed, and it is the reason the record was
+  replaced rather than amended.** ADR-ARCHIVED-SIGNAL *derived* `archived` from
+  `loc.startswith("archive/")`, which is exact **here** — the one-archive law is
+  enforced by `tests/test_archive_law.py` — and a silent convention for a
+  consumer whose retired documents sit in `old/` or `deprecated/`.
+  **Correct-for-the-author, quietly-wrong-for-everyone-else** is the failure mode
+  this project keeps writing tests against, and it does not belong in a record
+  written for a corporate design point. `archived` is now **declared on a line,
+  never derived**, and the record's veto asserts no `archive/` path special-case
+  exists in `src/`. The trade is stated: a derived signal cannot be forgotten, a
+  declared one can. Two side-effects worth having: `fux.toml` stops being where
+  the corpus is defined — it keeps *policy*, the source lists hold *what to look
+  at*; and **[W-45](open/W-45-source-exclusion.md) now has an obvious home**, an
+  exclusion attribute on a directory line, which is noted in both records and
+  **not decided** — the set is closed at one and W-45 still owes its compare doc.
+- **Also fixed:** nine broken links, six of them mine — the `middleware→fetcher`
+  sweep had walked into the **archived** filename
+  `archive/adr/0010_url-source-consumer-middleware.md` in five live docs, which
+  is the same class of defect as the global rename that once substituted a name
+  for a number inside eight ADR titles. Archived filenames are history and must
+  not be renamed. The rest were paths to items closed earlier today.
+- **Next:** the agent lane. **W-47** first — damage that accrues.
+- **Cost:** unmeasured — no per-session token count available. One record
+  written, one superseded, one item filed; no code changed.
+
+## 2026-08-19 — W-44 decided: annotate, never reorder. The inbox is empty  ·  Cowork
+- **Asked:** explain W-44 with examples and suggest something; then: option **B**.
+- **Did:** measured the actual contamination off the committed index rather than
+  re-reading the finding — **34 of 128 records (26.6%) are archived**, 974
+  distinct terms (11.4%) exist only in archived documents, and **3 174 of 7 533
+  live terms (42.1%) carry a `df` inflated by them**. Wrote
+  **ADR-ARCHIVED-SIGNAL (0022)**, accepted and unbuilt: a record under
+  `archive/` carries `archived: true`, derived at ingest and recorded per record
+  the way `mode` and `meta` already are; every verb surfaces it; **decision 4
+  forbids it from changing an order**. W-44 keeps its evidence and **moves to the
+  agent lane**, gated on the instrument its own DoD always demanded. Filed
+  **W-52** for the `df` half. Register, IMPLEMENTATION and DOC-REGISTRY updated.
+- **Decided / open:** two things changed while writing it, both worth having.
+  **B needs no config key** — I had said it required `[sources] dirs` to stop
+  being a list of strings, and that was wrong: the one-archive law makes
+  `loc.startswith("archive/")` a complete and *enforced* test, so W-44 and W-45
+  are independent after all. And **the `df` contamination is not part of B** —
+  excluding archived documents from `df` moves 42% of live terms, which is a
+  ranking change on one corpus and is exactly what the no-single-corpus rule
+  forbids; it is W-52, behind its own pre-registration, with the hazard recorded
+  that **a `df` shift is not a rank shift** — BM25F saturates, and the 42%
+  motivates the measurement rather than being its result. **The weak point of
+  decision 3 is stated in the record rather than discovered later**: the
+  one-archive law is *this* repo's, enforced by *this* repo's test, so for a
+  consumer repo `archive/` is a documented convention and not a guarantee —
+  someone with `old/` or `deprecated/` needs the declared source attribute,
+  which is W-45's schema change.
+- **The inbox is empty.** Every human-blocked decision — W-30, W-31, W-32, W-33,
+  W-44, W-50 — was made on 2026-08-19. Nothing waits on Arpit.
+- **Next:** the agent lane, in damage-over-time order: **W-47** (the default URL
+  path writes an index no `fux build` will ever accept) before anything else.
+- **Cost:** unmeasured — no per-session token count available. One record, one
+  new item, one item re-laned; no code changed.
+
+## 2026-08-19 — Every written line states every attribute; the inbox is one  ·  Cowork
+- **Asked:** in the sources file every attribute should be defined — if nothing
+  is passed on the CLI it should still say `meta=plain`. Does that help?
+- **Did:** it removed the fork rather than picking a side, so **L5 is untouched**
+  and no law changed. Recorded as
+  [ADR-URL-LIST](../docs/adr/0018_url-list.md) **decisions 12–13**: a fux-written
+  line carries every attribute explicitly, default or not; and the reader stays
+  lenient (a missing attribute takes its default, so hand-made and older lists
+  still load) while the writer is strict. W-50's L5 section rewritten as the
+  answer, its DoD item struck, and the item **moved from the Arpit lane to the
+  agent lane** — every decision in it is now made and what remains is building.
+  **The inbox is one: W-44.**
+- **Decided / open:** the point that made it work: **there is no such thing as
+  an undeclared line in a generated file**, so L5 stops being "the default for
+  URLs" and becomes "what a *missing* attribute means" — a hand-added line, a
+  merge that dropped a key, a file from an older fux. Strict is the right
+  reading of a line nobody authored, and a correct file never exercises it. Two
+  consequences worth having: a generated file holds **no implicit state**, which
+  is the property [ADR-RECORD](../docs/adr/0010_index-record.md) already gives
+  `meta` *inside* a record and the source list now has too; and **a line missing
+  an attribute was not written by fux**, so `fux doctor` can report it — which
+  turns *"the list is not edited manually"* from a policy into an observation,
+  the same move this repo already made by asserting `git check-ignore` rather
+  than reading `.gitignore`'s text. Residual exposure recorded once and
+  accepted: the command defaulting to `plain` still means an internal page gets
+  readable display text unless `--hash` is passed — but visibly, on the line it
+  wrote.
+- **Next:** **W-44** — the last row in the inbox, and the archive ruling of
+  2026-08-19 sharpened rather than softened it.
+- **Cost:** unmeasured — no per-session token count available. One record
+  amended, one item re-laned; no code changed.
+
+## 2026-08-19 — W-33 closed; the URL list becomes a lockfile  ·  Cowork
+- **Asked:** W-33 — `docs/adr/` is the live set and starts at 0001, the ones
+  under `archive/` are archived. W-50 — `plain` should be default; a CLI command
+  fetches URLs and writes the URL plus its flags into the sources file, which is
+  never edited manually.
+- **Did:** **W-33 closed.** The convention is confirmed, and its live
+  consequence swept in the same change: four items were reserving `ADR-0006`–
+  `ADR-0009`, numbers that accepted records already hold, so **milestone items
+  now reserve a NAME** — `ADR-GRAPH` (W-23), `ADR-REFER` (W-24),
+  `ADR-MAINTENANCE` (W-25), `ADR-T2-SEGMENTS` (W-26). A number is a filename
+  ordinal assigned when the record is written; reserving one in advance is the
+  habit that created the contradiction this item existed to close. Row deleted,
+  file archived, `IMPLEMENTATION.md` and `archive/README.md` updated. **W-50
+  rewritten** around the ruling, with a revised DoD: four of its six items are
+  now struck.
+- **Decided / open:** **the URL list becomes tool-managed** — a CLI command
+  writes the URL and its attributes, and the file is never hand-edited. That
+  makes it a **lockfile**: generated, committed, reviewed in a diff. It also
+  **dissolves the objection to CLI flags** — a flag no longer decides a fetch at
+  ingest time, it decides what gets *written down*, and what is written is
+  reviewed, so the same list can never produce different committed bytes on
+  different invocations. The shift reaches three records
+  ([ADR-URL-LIST](../docs/adr/0018_url-list.md) is written for a file a human
+  maintains, [ADR-CLI](../docs/adr/0002_cli-surface.md) gains a seventh verb,
+  [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md) decision 3 gains a second
+  networked path) and each is amended **in the change that builds the command**,
+  not before. **`plain` by default is held on one clarification**: it is either
+  a change to **L5** (the engine's default for an undeclared line) or only the
+  writer's default (the CLI writes `meta=plain` unless `--hash`). **B is
+  recommended and needs no law change** — under a tool-managed file every line
+  carries an explicit `meta=`, so the engine's default governs only lines nobody
+  wrote, and the safe reading of an unwritten line should stay strict. Not
+  applied until answered; a law is not changed on an inference.
+- **Next:** the L5 reading, then **W-44** — the only seven-day row left.
+- **Cost:** unmeasured — no per-session token count available. One item closed,
+  four reservations swept, one item rewritten; no code changed.
+
+## 2026-08-19 — W-31 ratified; the inbox is three  ·  Cowork
+- **Asked:** ratify W-31. Plus two proposed rulings offered as answers to other
+  items (archive-may-be-named-not-built-from; url defaults + CLI flags).
+- **Did:** **W-31 closed.** ADR-DOTFUX, ADR-URL-INGEST and ADR-CONFIG ratified
+  as-is; the builder-made call the item flagged — `.fux/README.md` generated at
+  **ingest** time rather than by `doctor --fix` — stands. Row deleted, detail
+  file archived to `archive/open/` with its outcome, `IMPLEMENTATION.md`
+  §Ratified decisions row added, `archive/README.md` mapped. **The `CHANGELOG`
+  DoD item was answered the conservative way**: the `⏳ proposed` qualifiers sit
+  in the shipped `[0.32.0]` entry, not `[Unreleased]`, so the released text is
+  left as written and `[Unreleased] → Changed` records that they are stale and
+  that the register is the live statement of status. Editing shipped changelog
+  prose is the same class as editing a past entry here.
+- **Decided / open:** ratification arrived **after** the records already read
+  `accepted` on disk — which is the pattern W-31 existed to make visible, and it
+  is now recorded rather than smoothed over. The two other rulings **were not
+  taken as ratifications**: the archive ruling restates a rule the repo already
+  has (archive-is-not-evidence) and does not answer W-33's numbering convention
+  nor W-44's question about what the *engine* does at query time; the URL ruling
+  conflicts with **L5** (hashed is a law default, not a preference) and with
+  ADR-URL-LIST's per-URL grammar (a CLI flag is per-run, so the same list
+  produces different committed bytes on different invocations). Both put back to
+  Arpit with the conflict stated. Inbox: **W-33, W-44, W-50**.
+- **Next:** W-33 — still the cheapest, and it unlocks the reservation sweep.
+- **Cost:** unmeasured — no per-session token count available. One item closed;
+  no code changed.
+
+## 2026-08-19 — The attribute set, defined and closed; worked examples in both fetcher records  ·  Cowork
+- **Asked:** define all attributes in the URL-list ADR; add examples to the CDP
+  and HTTP fetcher records.
+- **Did:** **ADR-URL-LIST** gains §*The attribute set* — a complete table of
+  `fetch` and `meta` (values, defaults, defining record, and **whether each
+  changes committed bytes**), an interaction table for the four line shapes, and
+  decision 11 rewritten: **the set is closed and adding to it is a change to this
+  record**. That is what makes decision 9's unknown-key error safe to be strict
+  about — the error can never be wrong, because there is nothing legitimate for
+  it to reject. **ADR-CDP-FETCHER** gains five examples (declare per URL · tune
+  from `fux.toml` · the four entry points · a captured run showing the lifecycle
+  and a 404-as-skip · the resulting record). **ADR-HTTP-FETCHER** gains four,
+  marked specimen: before/after, the **whole generated fetcher** (~20 lines of
+  stdlib), and the shell-page failure.
+- **Decided / open:** two attribute classes are excluded **on principle, not
+  pending**. **Fetcher tunables** (`wait=`, `settle=`, `port=`) belong to
+  `[sources.url.config]`; a `settle=500` in this grammar is fux knowing what
+  Chrome is, which is the adapter cap breached through the back door rather than
+  the front. **Content overrides** (`title=`) because the document owns its
+  content — a title supplied by the list would be the one field in the index no
+  document said. Three candidates the grammar *could* hold are named and left
+  undecided so nobody re-argues them from scratch: `snapshot` (M4/L2), `tag`
+  (URL documents have no frontmatter, so their `tag` edges are always empty — a
+  real gap, but it invents corpus structure in a config file), `max_age`
+  (freshness is R4's, and deciding it here would fix a number no one has
+  measured). **`meta` only ever loosens per URL** — the source-wide setting is
+  the floor, and there is deliberately no way to make one line stricter, because
+  per-line strictness invites leaving one line off. **A browser-fetched record is
+  still `mode: extracted`** — the fetcher returns bytes and everything after is
+  the same extraction a repo file gets. Rendering is not enrichment; that
+  sentence is now in the record.
+- **Amended in the same session, on Arpit's instruction:** *§1 states it at a
+  high level; §2 carries the detail.* The attribute block in ADR-URL-LIST §1 is
+  now a four-column table and one example — what each attribute decides, and
+  that an unmarked line takes every default; the values-and-consequences
+  treatment, the interaction table and the excluded candidates stay in §2. Both
+  fetcher records were over the template's *"two or three at most"* for §1
+  Examples, so each keeps two and the rest moved into a **§2 "What it looks
+  like"** section, the shape [ADR-INGEST](../docs/adr/0007_ingest.md) already
+  uses. §1 is back to roughly one screen in all three.
+- **Next:** W-31 — the ratification.
+- **Cost:** unmeasured — no per-session token count available. Three records
+  amended; no code changed.
+
+## 2026-08-19 — middleware -> fetcher, and three fetcher records  ·  Cowork
+- **Asked:** rename `middleware` to `fetcher`, and create an ADR for the fetcher,
+  for CDP, and for HTTP.
+- **Did:** renamed across code, tests, `fux.toml`, `.fux/` and every live doc —
+  `[sources.url] fetcher`, `.fux/fetchers/`, `load_fetcher`, `configure_fetcher`,
+  `DEFAULT_FETCHER`, `tests/ingest/test_cdp_fetcher.py`. `middleware` is now a
+  **retired key that errors with instructions** (the ADR-CONFIG decision 7
+  pattern), so an existing consumer gets a stopped run naming both the new key
+  and the directory move rather than a silent wrong fetch. **Verified**: staged
+  `src/` and the ingest/config/doctor/cli/store tests into the cloud container
+  and ran them on 3.11 — **104 passed, 1 failed**, the failure being
+  `test_code_field_present_when_embeddable`, which needs the 7.9 MB `model.bin`
+  I deliberately did not stage. Every `test_urlsrc.py` and `test_cdp_fetcher.py`
+  assertion passes. Wrote **ADR-FETCHER (0019)**, **ADR-CDP-FETCHER (0020)** and
+  **ADR-HTTP-FETCHER (0021)**, all accepted; ADR-FETCHER takes `urlsrc.py` in the
+  ownership table and ADR-URL-INGEST's decisions 1/2/7 now *point* at it rather
+  than paraphrase it.
+- **Decided / open:** **the name.** Middleware names a pattern whose defining
+  property is composition — Django, Express, Rack, Scrapy all chain — and nothing
+  here chains: one file, one `fetch(url)`, exactly one running per URL.
+  `adapter` was the tempting alternative and is unavailable:
+  [ADR-RECORD](../docs/adr/0010_index-record.md) already defines `src` as *which
+  adapter owns this document*, so it would be the `extracted`/`INFERRED`
+  collision again. `fetcher` makes the file, the function, the config key and
+  ADR-URL-LIST's `fetch=` attribute one word. **ADR-FETCHER decision 4 — exactly
+  one fetcher per URL — is what keeps the name true**, and it now constrains
+  W-50: the chained-fetcher option contradicts an accepted record rather than
+  merely losing an argument. **ADR-HTTP-FETCHER answers W-50's real question**:
+  a plain stdlib GET is the default, **generated write-if-missing into the
+  consumer's repo** (the mechanism ADR-DOTFUX decision 6 already uses) rather
+  than placed in `src/` — so the out-of-the-box behaviour arrives and core still
+  holds zero network lines. **No automatic escalation, ever**: a shell page
+  indexes as a shell page and a human writes `fetch=cdp`, because the
+  alternative is committed bytes that depend on how a server felt that
+  afternoon.
+- **Found while writing it:** **URL ingestion has never worked out of the box.**
+  `DEFAULT_FETCHER` names `.fux/fetchers/cdp.py`; `GENERATED_FILES` is
+  `("README.md", ".gitignore")`; the wheel packages `src/fux` only. So the
+  documented default names a file that exists in *this* repo and nowhere else,
+  and a fresh consumer gets `fetcher not found`. Two live docstrings claimed the
+  opposite, which is why it survived a release. **W-51** — and it is the reason
+  ADR-HTTP-FETCHER *generates* rather than assumes.
+- **Next:** W-31 — the ratification, now with three of its surfaces renamed under
+  it.
+- **Cost:** unmeasured — no per-session token count available. Code rename +
+  three records + one item; unit tests run in the cloud container, not on the
+  device (its python is 3.10 and L7 requires 3.11).
+
+## 2026-08-19 — Per-URL attributes decided into ADR-URL-LIST (unbuilt)  ·  Cowork
+- **Asked:** add the attributes to the URL-list ADR — we implement later.
+- **Did:** decisions **7–11** written into
+  [ADR-URL-LIST](../docs/adr/0018_url-list.md), with a before/after specimen
+  marked as such. `<url> key=value …`; **`key=value` is the only form** (the four
+  `.gitattributes` states exist to resolve overlapping *patterns*, and exact URLs
+  never overlap, so three of them would be spelling variants of the fourth);
+  **an unknown key is a loud `file:lineno` error** (a silently-ignored
+  `mata=plain` ships a private document to a public index); **a line attribute
+  beats the source-wide setting** for that URL only, so L5's strict default stays
+  and opting out is per-document and visible in a diff; **a duplicate URL with
+  conflicting attributes is an error**, not last-wins — `.gitattributes` uses
+  last-wins because later lines are deliberate overrides, but decision 4 already
+  says a duplicate here is a *merge artefact*, and letting a merge artefact
+  decide a privacy policy is the worst available outcome. `fetch=` is **reserved
+  by the grammar and defined by W-50**.
+- **Decided / open:** the grammar is **decided and unbuilt** — the state
+  [ADR-ENRICHED](../docs/adr/0017_enriched-mode.md) set the precedent for, and
+  §Consequences names the misread to guard against. **Every list valid today
+  stays valid forever**: a line with no attributes means what it means now.
+  Two items narrowed as a result: **W-50** loses the grammar and keeps only the
+  fetch semantics (what `fetch=` may take, where a default fetcher lives, what
+  "doesn't work" means checkably); **W-49**'s option A is now *forced* rather
+  than recommended — under a whitespace-delimited line, `#` must start a comment
+  only at line start or after whitespace, or `<url>#frag meta=plain` cannot parse
+  at all. The two land together.
+- **Next:** Arpit's read on whether `middleware` is the right name for the
+  consumer fetch file — raised in the same exchange, not yet an item.
+- **Cost:** unmeasured — no per-session token count available. One record
+  amended, two items narrowed; no code changed.
+
+## 2026-08-19 — ADR-URL-LIST, and the URL fetch-mechanism fork  ·  Cowork
+- **Asked:** whether a URL is fetched through the middleware should be optional —
+  default to a plain fetch, fall back to CDP only when that fails, and keep the
+  choice explicit per URL. Research how it should work and what the sources file
+  would look like. Then: create a new ADR for the sources URL file.
+- **Did:** researched the prior art. `scrapy-playwright` — the most-used version
+  of this exact problem — uses an **explicit per-request opt-in and has no
+  automatic fallback at all**; the crawler-vendor consensus is static-first with
+  heuristic escalation (empty app root, hydration payload with no prose, low
+  extraction quality), which exists because open-web crawlers **cannot enumerate
+  their corpus**. Fux's list is committed and enumerable, so declaration beats
+  detection. Wrote **ADR-URL-LIST (0018, accepted)** for the file format as it
+  ships — split from ADR-URL-INGEST decisions 5–6, owning no `src/` component
+  because it decides a *file format*, not a module. Filed **W-49** and **W-50**.
+- **Decided / open:** the ask contains two mechanisms that conflict — *"fall back
+  when it doesn't work"* is **non-deterministic** (same URL, two runs, different
+  bytes), *"explicitly maintained"* is **declarative**. They reconcile only if
+  fallback is a **discovery step that writes its verdict back into the file**, so
+  detection happens once per URL and every later run reads a declaration. The
+  real decision is **where the default fetcher lives**: in core (spends the
+  adapter cap, which has kept `src/fux/` dependency-free through two rebuilds),
+  or as a **generated write-if-missing `.fux/middleware/http.py`** — the
+  mechanism ADR-DOTFUX decision 6 already uses for `README.md`/`.gitignore` —
+  which gives the out-of-the-box behaviour with core still holding zero network
+  lines. Recommended shape, not a verdict: **W-50 is Arpit's**, and it needs a
+  *checkable* definition of "doesn't work" (non-2xx, or `wlen` below a bar —
+  anything richer is a classifier that can index a nav bar as a runbook).
+- **Found while writing it:** `read_urls` splits on the **first `#` anywhere**,
+  so `https://x/a#section` loads as `https://x/a`; two URLs differing only by
+  fragment dedupe into one and **a document leaves the corpus with no error and
+  no skip line** — the failure ADR-URL-LIST decision 5 exists to prevent,
+  reached by another route. **W-49**, with the hazard that W-50 rewrites the same
+  parser and the two rules must be decided together.
+- **Next:** Arpit's call on W-31 (ratify, and open W-50 alongside — its own DoD
+  says a change request becomes a new item rather than blocking ratification).
+- **Cost:** unmeasured — no per-session token count available. One new record,
+  two new items; no code changed.
+
+## 2026-08-19 — Re-derived the whole queue against the repo; nothing was secretly done  ·  Cowork
+- **Asked:** review the open work and remove anything already implemented.
+- **Did:** verified all eleven items against code rather than against their own
+  markers (rule 3). **Nothing in the queue is already implemented** — every
+  defect reproduces in the current tree: W-46's guard is still
+  `except (FuxError, ImportError, FileNotFoundError)` with `get_model().embed()`
+  above it, so `AttributeError` still escapes; W-47's `run.py:135` still writes a
+  bare `title_h` that `_assert_invariants` still rejects; W-48's `cmd_ask`
+  still returns on `if args.json:` before the explain block, and `cmd_answer`'s
+  no-match branch still emits `{"answer": None, "citation": None}` with no
+  `"source"`; `config.py` has no exclusion for W-45 and no compare doc exists;
+  `cli.py` has six verbs and none of W-23's three; `src/fux/refer/` is a 7-line
+  stub. **What *was* stale is inside the items** — DoD checkboxes already
+  satisfied by unrelated changes. Struck through, dated, with what actually
+  remains: **W-31** (two of three done; the third was wrong about *where* — the
+  "⏳ proposed" qualifiers sit in the shipped `[0.32.0]` entry, not
+  `[Unreleased]`, and cite `archive/adr/` paths) and **W-33** (**all four**
+  done; only the signature is left). **W-44 re-derived** — the finding moved in
+  four ways and its probe is no longer reproducible.
+- **Decided / open:** **W-33 is now purely a signature**, and its stakes moved
+  from hypothetical to live: four items reserve ADR numbers that collide with
+  accepted records, which is exactly the failure the item was filed to prevent.
+  Not fixed here — the fix depends on the confirmation, since under cite-by-name
+  a milestone should reserve a **name**, never a number. Still open: **W-31**,
+  **W-33**, **W-44** (Arpit) · W-45, W-46, W-47, W-48, W-23, W-24 (agent).
+- **Next:** W-33 — it is the cheapest of the three and unlocks the reservation
+  sweep.
+- **Cost:** unmeasured — no per-session token count available. Docs only; no
+  code changed.
+
+## 2026-08-19 — Closed items are archived, not deleted  ·  Cowork
+- **Asked:** archive the orphan files (W-30, W-32) rather than delete them.
+- **Did:** created `archive/open/` — the one archive mirroring the live tree, so
+  `work/open/` retires there — and moved both files in. `archive/README.md`
+  gains an **`open/` section** whose rows name each item's live successor *and*
+  the claim each file got **wrong** (W-30's "non-blocking"; W-32's "there is no
+  `CLAUDE.md.proposed`"), because a kept file that reads as authoritative is
+  worse than no file. Repointed the two rows elsewhere in that map that still
+  pointed into `work/open/`. Amended the closing contract in **three** places
+  that stated it — `work/open/README.md` rule 2, `OPEN-WORK.md` rule 2, and the
+  DOC-REGISTRY `open/` row — since a rule restated in three files is how the
+  ADR-numbering contradiction happened.
+- **Decided / open:** **closing now archives the detail file, deletes the row**
+  (Arpit, 2026-08-19). The row still goes, so the queue's length keeps meaning
+  what it meant; what survives is the argument that produced the call. The
+  archive-is-not-evidence rule applies from the moment it lands — an archived
+  item may be named, never cited. Still open: **W-31**, **W-33**, **W-44**.
+- **Next:** W-31 — ratify the `.fux/` layout and the URL middleware.
+- **Cost:** unmeasured — no per-session token count available. Docs only.
+
+## 2026-08-19 — ADR-ENRICHED accepted; both mode records gain worked index examples  ·  Cowork
+- **Asked:** add an example to both ingest-mode ADRs showing what the
+  `.fux/index/*.jsonl` record actually looks like — **before and after** for
+  `enriched` — and ratify the enriched item.
+- **Did:** **ADR-EXTRACTED** gains a verbatim capture from this repo's own
+  committed index (`c0.jsonl`, `docs/index.md`), pretty-printed with `terms`
+  truncated 215→3 and `edges` 27→3 and marked where, plus the shard's
+  `_format`/`analyzer`/`tf_fields` header line — read as the contract, property
+  by property, ending on the observation that **grade `6` cannot appear on an
+  extracted record**, which `edges.py` already states. Its veto gains that as a
+  checkable condition. **ADR-ENRICHED** gains a **before/after specimen**,
+  explicitly labelled *hand-written, not a capture* — the only non-captured
+  example in the record set — and **accepted** on Arpit's instruction. The
+  specimen forced four design commitments into the record: `terms` stays
+  byte-identical and enriched vocabulary goes in a separate `terms_e` (so an
+  enrichment run cannot move the score of a document it never touched); the new
+  edge carries grade **6 = `INFERRED_GRADE`**, a slot
+  [`ingest/edges.py`](../../src/fux/ingest/edges.py) already reserves as "unused
+  until the enriched tier"; an `enrich` block pins `by` / `at_sha` / `run`, so
+  `sha != at_sha` makes a stale enrichment **detectable rather than silently
+  trusted**; and no prose key exists, which is decision 5 visible in the bytes.
+  The shape costs an `_format` `v1`→`v2` bump plus a re-ingest, now stated in
+  §Consequences rather than discovered at M8. Register, CLAUDE.md, GLOSSARY,
+  compare doc and W-38 all repointed to `accepted`. Checks green.
+- **Decided / open:** **ADR-ENRICHED accepted** (Arpit, 2026-08-19). Acceptance
+  ratifies the name, the boundary and the record shape — **not** the build:
+  decision 6 and a new register paragraph both say so, because this is the first
+  **accepted record in the set that owns no component**, and the obvious misread
+  is a session treating it as permission to write `src/fux/enrich/`.
+  [W-38](open/W-38-m8-deferred.md)'s M8 gate is the permission and has not been
+  given. Still open: **W-31**, **W-33**, **W-44**.
+- **Noticed, not fixed:** the **committed index is stale**. Most records still
+  carry pre-restructure locators (`docs/open/…`, `docs/conformance/…`) that no
+  longer exist — `.fux/index/` has not been re-ingested since the 2026-08-18
+  `work/` move. Worth an item; not filed this session.
+- **Next:** W-31 — ratify the `.fux/` layout and the URL middleware.
+- **Cost:** unmeasured — Cowork surfaces no per-session token count. Docs and
+  records only; no code changed.
+
+## 2026-08-19 — Blocker triage: W-32 adopted, W-30 ratified into two records  ·  Cowork
+- **Asked:** review the items blocked on Arpit one by one, and grill him on each.
+  Then: create one ADR for `extracted` mode and another for `enriched` mode.
+- **Did:** reconciled the inbox against the repo before starting (rule 3), which
+  found two defects the queue itself was hiding. **(1)** The register's status
+  column printed `⏳ proposed` for **eight records whose frontmatter on disk said
+  `accepted`** — and contradicted its own prose two paragraphs below. Corrected.
+  **(2)** W-32's "Correction (2026-08-12): there is no `CLAUDE.md.proposed`" was
+  false as history: the file was added at `bed2186` and deleted at `3892c55`, the
+  same commit that wrote its content into `CLAUDE.md`. It cited
+  `git log --follow` as verification — which structurally cannot see a
+  delete-plus-overwrite. **W-32 adopted:** header deleted, and five factual
+  passages fixed (`no package on main yet` → 0.32.0 released; `0.30.0.dev0` →
+  `0.32.0`; `Error contract (applies once src/ exists)`; an archived-ADR citation
+  for the ingest modes; and §Scope's *"No M2+ work while P1 is unmeasured or
+  failed"*, which forbade the milestone released as `v0.32.0`). The deleted header
+  carried the **only** statement of *agent-steering files are proposed, never
+  auto-applied*, so it was preserved into §Documentation discipline — with a
+  carve-out that **statements of fact are fixed on contact**, which is the rule
+  whose absence let five passages rot. **W-30 ratified**, and written up as one
+  record per mode rather than a status flip: **ADR-EXTRACTED** (0016, accepted)
+  and **ADR-ENRICHED** (0017, ⏳ proposed). GLOSSARY, CLAUDE.md, the compare doc
+  and W-38 repointed off three archived-ADR citations that were backing live
+  claims. ADR checks re-run green (frontmatter · ownership · twins · laws).
+- **Decided / open:** **`extracted` / `enriched` ratified** (Arpit, 2026-08-19).
+  Arpit's definition of `enriched` — the index generated or refined by a chat
+  agent (Claude Code, Copilot, Codex, Kiro) — forced the L3 question and settled
+  it: **enrichment never runs inside `fux ingest`**; it is its own command, its
+  output pinned with provenance and then ingested deterministically, graded below
+  deterministic signal, prose summaries excluded under L2. ADR-ENRICHED records
+  the four candidate enrichments (semantic expansion · inferred edges ·
+  retirement flags · richer embeddings) and **does not authorize any of them** —
+  W-38's M8 gate is unchanged. Still open: **W-31**, **W-33**, **W-44**.
+- **Next:** W-31 — ratify the `.fux/` layout and the URL middleware.
+- **Cost:** unmeasured — Cowork does not surface a per-session token count; one
+  long interactive session, ~40 tool calls, no code changed (docs and records
+  only).
+
 ## 2026-08-18 — OPEN-WORK restructured: items first, grouped by record  ·  Cowork
 - **Asked:** keep only the open items at the top of OPEN-WORK — one line each,
   grouped by ADR — and move the rules and standing obligations to the foot.

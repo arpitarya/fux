@@ -1,13 +1,13 @@
 ---
 type: ADR
 name: ADR-URL-INGEST
-title: ADR-URL-INGEST (0008) — URL ingestion through consumer-owned middleware
+title: ADR-URL-INGEST (0008) — URL ingestion through consumer-owned fetcher
 description: Fux never fetches. A consumer-owned file does, behind a four-function contract, only under --refresh-urls, with the URL list as a committed line-oriented file.
 status: accepted
 timestamp: 2026-08-18T00:00:00Z
 ---
 
-# ADR-URL-INGEST — URL ingestion through consumer-owned middleware
+# ADR-URL-INGEST — URL ingestion through consumer-owned fetcher
 
 - **Name:** `ADR-URL-INGEST` — cite this everywhere; never cite the number
 - **Status:** accepted
@@ -16,7 +16,7 @@ timestamp: 2026-08-18T00:00:00Z
 - **Owns:** `src/fux/ingest/urlsrc.py`
 - **Laws:** L2, L4, L5 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
-- **Feature:** the `url:` source and its middleware boundary
+- **Feature:** the `url:` source and its fetcher boundary
 - **Evidence:** [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6
 
 ---
@@ -25,7 +25,7 @@ timestamp: 2026-08-18T00:00:00Z
 
 **Fux does not fetch URLs. Your code does.**
 
-You write a file — `.fux/middleware/cdp.py` by default, from a shipped template
+You write a file — `.fux/fetchers/cdp.py` by default, from a shipped template
 — that knows how to get a page: your browser, your proxy, your SSO, your
 retries. Fux imports it by path, hands it one URL at a time, and takes back
 markdown. Every line of network code lives on your side of that boundary, in
@@ -52,7 +52,7 @@ flowchart LR
         W["records src:url"]
     end
     subgraph yours ["your repo, your code"]
-        M[".fux/middleware/cdp.py<br/>fetch · configure · connect · close"]
+        M[".fux/fetchers/cdp.py<br/>fetch · configure · connect · close"]
     end
     U --> R
     R -->|"one URL at a time"| M
@@ -67,7 +67,7 @@ flowchart LR
 ```text
    fux  (no network code)                 your repo, your code
   +--------------------------+           +------------------------------+
-  | .fux/sources/urls        |           | .fux/middleware/cdp.py       |
+  | .fux/sources/urls        |           | .fux/fetchers/cdp.py       |
   |   committed, 1 per line  |           |   fetch(url) -> str  REQUIRED|
   |            |             |  one URL  |   configure(cfg)    optional |
   |  ingest --refresh-urls --+---------->|   connect() / close()        |
@@ -79,14 +79,14 @@ flowchart LR
   |   records with src:"url"
   +--------------------------+
 
-   A plain `fux ingest` never imports the middleware at all.
+   A plain `fux ingest` never imports the fetcher at all.
 ```
 
 </details>
 
 ### Examples
 
-Offline is the default — a plain ingest never imports your middleware:
+Offline is the default — a plain ingest never imports your fetcher:
 
 ```console
 $ fux ingest
@@ -98,9 +98,9 @@ crash:
 
 ```console
 $ fux ingest --refresh-urls
-  [middleware] configure({'greeting': 'hello'})
-  [middleware] connect()
-  [middleware] close()
+  [fetcher] configure({'greeting': 'hello'})
+  [fetcher] connect()
+  [fetcher] close()
 ingested 4 docs (2 changed), 3 skipped, 2 shards written
   skip https://example.invalid/gone: fetch failed: 404 not found
 ```
@@ -122,21 +122,17 @@ question was never "which adapters", it was "where is the boundary".
 
 ### Decision
 
-**1. Fux never fetches. A consumer-owned middleware file does.** It is named in
-`fux.toml`, loaded by path, and fux never rewrites it.
-
-**2. The contract is four functions, one required:**
-
-| function | required | called |
-|---|---|---|
-| `fetch(url: str) -> str` | **yes** | once per URL; returns one markdown document, or raises |
-| `configure(config: dict)` | no | once after import, before `connect` |
-| `connect()` | no | once, before the batch |
-| `close()` | no | once, after the batch — **even if a fetch raised** |
+**1–2. The fetch contract left this record on 2026-08-19.** *Fux never
+fetches; a consumer-owned fetcher does*, and the four-function contract that
+states it, are now [ADR-FETCHER](0019_fetcher.md) decisions 1 and 2 — including
+the rename from *middleware*, the `.fux/fetchers/` location, and the rule that
+exactly one fetcher runs per URL. **They are not restated here**: a record that
+paraphrases another is the paraphrase that drifts. What follows is what this
+record still owns — how URL ingestion *behaves* around that contract.
 
 **3. Fetching happens only under `--refresh-urls`.** A plain ingest carries
 every existing `url:` record forward byte-identically and never imports the
-middleware.
+fetcher.
 
 **4. A failed fetch keeps the prior record.** It is reported as a skip. Only a
 URL *removed from the list* removes a document, and reconciliation happens only
@@ -153,10 +149,8 @@ conflict.
 **6. A non-`http(s)` line is a loud error naming `file:lineno`**, not a silent
 skip. A typo'd scheme that quietly fetches nothing is worse than a stopped run.
 
-**7. `[sources.url.config]` is passed to `configure` verbatim, and fux never
-reads a key inside it.** The keys are the middleware's vocabulary. Typing
-`cdp_port` into fux's schema would breach the adapter cap through the back
-door — the same discipline as PEP 518's `[tool.*]` tables.
+**7. `[sources.url.config]` is passed to `configure` verbatim** — moved to
+[ADR-FETCHER](0019_fetcher.md) decision 8, where the contract lives.
 
 **8. Fux normalizes what comes back**, rather than trusting it: CRLF to LF,
 U+2028/U+2029/U+0085 to spaces, NUL stripped. Those are legal in JSON and
@@ -169,10 +163,10 @@ default currently does not work.**
 ### What it looks like
 
 Verbatim from [the capture](../../work/regression/2026-08-18-ingest-and-index/report.md) §6,
-using the no-network middleware in
-[`evidence/demo-middleware.py`](../../work/regression/2026-08-18-ingest-and-index/evidence/demo-middleware.py).
+using the no-network fetcher in
+[`evidence/demo-fetcher.py`](../../work/regression/2026-08-18-ingest-and-index/evidence/demo-fetcher.py).
 
-**Offline is the default — the middleware is not even imported:**
+**Offline is the default — the fetcher is not even imported:**
 
 ```console
 $ fux ingest
@@ -183,9 +177,9 @@ ingested 2 docs (0 changed), 2 skipped, 0 shards written
 
 ```console
 $ fux ingest --refresh-urls
-  [middleware] configure({'greeting': 'hello'})
-  [middleware] connect()
-  [middleware] close()
+  [fetcher] configure({'greeting': 'hello'})
+  [fetcher] connect()
+  [fetcher] close()
 ingested 4 docs (2 changed), 3 skipped, 2 shards written
   skip docs/empty.md: empty
   skip docs/logo.png: binary
@@ -216,7 +210,7 @@ the batch, and the 404 becomes a skip while the other two documents land.
 
 - **`src/fux/` still contains zero network lines**, which is the property the
   adapter cap rests on.
-- **Middleware is not linted by default.** It lives in a dotdir and ruff skips
+- **Fetcher is not linted by default.** It lives in a dotdir and ruff skips
   those. Accepted: it is consumer code, not a CI target.
 - **Hashed results are unreadable by design** — `fux ask` prints
   `30aef0c52cf11116` where a title would be. That is the mode working, and it
@@ -227,13 +221,13 @@ the batch, and the 404 becomes a skip while the other two documents land.
   16-hex `title_h` trips the invariant that keeps the scan and the accelerator
   in agreement. A corpus with one hashed URL record is stuck on the reference
   scan permanently. Filed as
-  [W-47](../../work/open/W-47-hashed-meta-blocks-accelerator.md); diagnosis and
+  [W-54](../../work/open/W-54-sources-rewrite.md); diagnosis and
   the recommended one-line fix in
   [ANALYSIS.md](../../work/regression/2026-08-18-ingest-and-index/ANALYSIS.md).
   **This record documents the intended contract; W-47 is what makes the default
   match it.**
 - **This record does not retire ADR-URL-INGEST**, which is ⏳ *proposed*
-  ([W-31](../../work/open/W-31-ratify-adr-0010-0011.md)).
+  ([W-31](../../work/IMPLEMENTATION.md) *(ratified 2026-08-19)*).
 
 ### Alternatives considered
 
@@ -258,7 +252,7 @@ the batch, and the 404 becomes a skip while the other two documents land.
   is the normative statement of the four functions).
 - The carry-forward rule — [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
   module docstring.
-- A working no-network middleware, and the captured session —
+- A working no-network fetcher, and the captured session —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6.
 - The opaque-config-table discipline this copies — PEP 518 `[tool.*]`:
   https://peps.python.org/pep-0518/#tool-table
@@ -268,7 +262,7 @@ the batch, and the 404 becomes a skip while the other two documents land.
 ### Veto condition
 
 **Reopen this decision if** engine code acquires a network call, or if the
-middleware boundary stops being sufficient — concretely, if a consumer cannot
+fetcher boundary stops being sufficient — concretely, if a consumer cannot
 express a needed source without changing `src/fux/`.
 
 **How to check it:**
@@ -280,7 +274,7 @@ grep -rnE '^\s*(import|from)\s+(socket|http|urllib|ssl|asyncio|requests|httpx)' 
 
 # 2. fetching is still gated on the flag
 grep -n 'refresh_urls' src/fux/ingest/run.py
-# expect: the middleware load sits behind it, with no other call site
+# expect: the fetcher load sits behind it, with no other call site
 
 # 3. the config table is still opaque — fux must never read a key inside it
 grep -rn 'url.config\[' src/fux/

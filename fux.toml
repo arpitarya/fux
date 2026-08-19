@@ -12,7 +12,7 @@
 # its own state of play — which is the first thing anyone asks it.
 dirs = ["docs", "work", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 
-# URL ingestion via YOUR middleware file (ADR-URL-INGEST, relocated by ADR-DOTFUX).
+# URL ingestion via YOUR fetcher file (ADR-URL-INGEST, relocated by ADR-DOTFUX).
 # Uncomment to use. Fetching only ever happens under `fux ingest
 # --refresh-urls` (offline by default), and `meta = "hashed"` (the non-git
 # default) applies unless you opt into "plain" for public content.
@@ -21,14 +21,14 @@ dirs = ["docs", "work", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 # not a TOML array, so 5k entries diff and merge line by line. Both paths
 # below are the defaults; the keys are here to be seen, not to be required.
 #[sources.url]
-#middleware = ".fux/middleware/cdp.py"   # yours, committed, edit freely
+#fetcher = ".fux/fetchers/cdp.py"   # yours, committed, edit freely
 #urls_file  = ".fux/sources/urls"        # one URL per line
 #meta       = "hashed"
 
-# Middleware tunables. Fux passes this table to the middleware's optional
+# Fetcher tunables. Fux passes this table to the fetcher's optional
 # `configure(config)` VERBATIM and never reads a key inside it — the keys
-# below mean something to .fux/middleware/cdp.py, nothing to fux. Same
-# discipline as PEP 518's [tool.*] tables; it is what keeps one middleware's
+# below mean something to .fux/fetchers/cdp.py, nothing to fux. Same
+# discipline as PEP 518's [tool.*] tables; it is what keeps one fetcher's
 # vocabulary out of fux's config schema.
 #[sources.url.config]
 #cdp_port       = 9222

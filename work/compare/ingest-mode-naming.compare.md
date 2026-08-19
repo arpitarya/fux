@@ -8,8 +8,12 @@ timestamp: 2026-08-09T00:00:00Z
 
 # Ingest-mode naming — Comparison
 
-> **Verdict (proposed, amended 2026-08-09): `extracted` (no-AI default) +
-> `enriched` (AI opt-in).**
+> **Verdict: DECIDED — `extracted` (no-AI default) + `enriched` (AI opt-in).**
+> **Ratified by Arpit 2026-08-19**, closing W-30. The records are
+> [ADR-EXTRACTED](../../docs/adr/0016_extracted-mode.md) (accepted) and
+> [ADR-ENRICHED](../../docs/adr/0017_enriched-mode.md) (accepted — named and
+> fenced; acceptance ratifies the contract, not permission to build). **Reopen trigger:** a `mode` value other
+> than these two appearing in a committed record.
 >
 > **Amended at Arpit's prompt** — the original verdict (`inferred`/`enriched`)
 > fixed only half the collision it diagnosed: `INFERRED` is the ported edge
