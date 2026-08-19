@@ -240,7 +240,9 @@ the boundary, rendered by the CLI, exit 1.
   dataclass docstring is the normative statement of the opaque-table rule.
 - A real config and the errors it produces —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6
-  and its [fixture](../../work/regression/2026-08-18-ingest-and-index/evidence/fixture.sh).
+  and its [fixture](../../work/regression/2026-08-19-w54/evidence/fixture.sh),
+  which builds a repo from nothing with `fux setup` and runs the whole URL
+  path offline.
 - The opaque-table discipline this copies — PEP 518 `[tool.*]`:
   https://peps.python.org/pep-0518/#tool-table
 - TOML, the format: https://toml.io/en/v1.0.0

@@ -1,4 +1,14 @@
 #!/usr/bin/env bash
+# SUPERSEDED 2026-08-19 by ../../2026-08-19-w54/evidence/fixture.sh.
+#
+# This script reproduces the PRE-W-54 surface -- `[sources.url] middleware`
+# and `[sources] dirs`, both of which are now retired keys that stop the run
+# with instructions. It is kept unedited because it is this run's evidence,
+# and rewriting a filed run's evidence so it no longer reproduces that run's
+# numbers falsifies the run. A measurement is superseded by a newer
+# measurement, never by an edit.
+#
+# For a fixture that runs against the current engine, use the successor above.
 # The fixture behind ADR-DOTFUX / ADR-INGEST / ADR-URL-INGEST /
 # ADR-INDEX-LIFECYCLE. Three local documents plus three URLs served by a
 # no-network middleware, so every example reproduces offline.

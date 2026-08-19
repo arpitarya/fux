@@ -110,7 +110,7 @@ different committed bytes on different invocations.
 - [x] The managing verb, writing every attribute explicitly. `fux url`,
       2026-08-19 — flags, not a subcommand tree; edits one line so a
       human's grouping comments survive; **never fetches**.
-- [ ] **Tests, per defect** — not one integration test standing in for five:
+- [x] **Tests, per defect** — not one integration test standing in for five:
       a fragment survives round-trip and two fragment-differing URLs make two
       records · an unknown key errors at `file:lineno` · a duplicate with
       conflicting attributes errors · the two retired keys error · file order

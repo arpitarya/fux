@@ -91,22 +91,29 @@ flowchart LR
 ### Examples
 
 Captured from the filed fixture,
-[`evidence/fixture.sh`](../../work/regression/2026-08-18-ingest-and-index/evidence/fixture.sh):
+[`2026-08-19-w54/evidence/fixture.sh`](../../work/regression/2026-08-19-w54/evidence/fixture.sh):
 
 ```console
 $ cat .fux/sources/urls
-# one URL per line; `#` comments and blank lines are ignored
+# one URL per line. `#` is a comment at line start or after whitespace --
+# NOT inside a URL, which is the whole of W-49.
+https://example.invalid/handbook#oncall    fetch=http meta=hashed
+https://example.invalid/handbook#deploys   fetch=http meta=hashed
 https://example.invalid/handbook/oncall
-https://example.invalid/handbook/deploys
+https://example.invalid/public/api          fetch=http meta=plain
 https://example.invalid/gone
 ```
+
+**The two `#`-bearing lines are two documents**, which is decision 3's narrow
+comment rule doing the only job it exists for. The bare line takes every
+default; the `meta=plain` line loosens the L5 floor for one public page.
 
 A URL that fails to fetch is a **skip**, not a deletion — the list is the
 statement of intent, and only removing a line removes a document:
 
 ```console
 $ fux ingest --refresh-urls
-ingested 4 docs (2 changed), 3 skipped, 2 shards written
+ingested 7 docs (5 changed), 1 skipped, 5 shards written
   skip https://example.invalid/gone: fetch failed: 404 not found
 ```
 
@@ -372,10 +379,12 @@ which is the point of decision 11.
 
 - The loader and its rules — [`read_urls`](../../src/fux/ingest/urlsrc.py),
   whose docstring states the sort-and-dedupe guarantee.
-- A real list, and the fetch behaviour it drives —
-  [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md)
-  §6, with its committed fixture at
-  [`evidence/fixture.sh`](../../work/regression/2026-08-18-ingest-and-index/evidence/fixture.sh).
+- A real list, every attribute exercised, and the fetch behaviour it drives —
+  [`work/regression/2026-08-19-w54/`](../../work/regression/2026-08-19-w54/report.md),
+  with its committed fixture at
+  [`evidence/fixture.sh`](../../work/regression/2026-08-19-w54/evidence/fixture.sh).
+  It is the run that closed the fragment defect, and the first that ever
+  exercised the URL path end to end.
 - The fetch contract this record is split from —
   [ADR-URL-INGEST](0008_url-ingest.md) decisions 4, 5 and 6.
 - Prior art for per-entry attributes on a line-oriented committed file —
