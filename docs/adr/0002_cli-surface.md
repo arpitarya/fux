@@ -14,7 +14,7 @@ timestamp: 2026-08-18T00:00:00Z
 - **Owns:** `src/fux/cli.py`
 - **Laws:** L1, L4, L7 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
-- **Feature:** the `fux` command-line interface as shipped in `v0.32.0`
+- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`
 - **Evidence:** [`work/regression/2026-08-18-cli-surface/`](../../work/regression/2026-08-18-cli-surface/report.md)
   — every example below is a verbatim capture, not an illustration
 

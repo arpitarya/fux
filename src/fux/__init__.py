@@ -5,4 +5,4 @@ answer time; nothing about a corpus is copied wholesale. $0, stdlib-only
 runtime. See CLAUDE.md.
 """
 
-__version__ = "0.32.0"
+__version__ = "0.33.0"

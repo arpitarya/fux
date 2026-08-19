@@ -6,7 +6,27 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
-## [Unreleased]
+## [0.33.0] - 2026-08-19
+
+**The sources rewrite — what fux indexes becomes two committed files, and the
+URL path works for the first time.**
+
+Five defects closed. Every one of them was **latent**: this repo does not use
+URL ingest, so nothing in its own corpus reached four of the five, and a green
+test suite said nothing about them. They were fixed anyway, because the first
+consumer hits all five on day one, on the documented default. The evidence is
+[`work/regression/2026-08-19-w54/`](work/regression/2026-08-19-w54/report.md),
+a fixture that builds a repo from nothing and runs the whole path offline.
+
+**Two breaking changes**, both retired config keys, both a stopped run with the
+migration in the message. Both are cheapest now.
+
+**The honest limits.** Nothing here exercises real HTTP — `http.py`'s transport
+is covered by reading it, and the first consumer to point `fetch=http` at a
+real server is its first real exercise. The `archived=` declaration parses and
+is deliberately **not read**: changing what a verb says about a document needs
+an instrument, and that instrument does not exist yet. And seven documents
+measures nothing about speed, so this release reports no new timing.
 
 ### Added
 
