@@ -155,9 +155,19 @@ tree. The key exists so the number is *visible* rather than folklore.
 **4. `[sources.url]` is entirely optional.** Absent means no URL source, and
 `--refresh-urls` has nothing to do.
 
-**5. `fetcher` and `urls_file` default to `.fux/fetchers/cdp.py` and
+**5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
 `.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the
-declared `.fux/` layout ([ADR-DOTFUX](0003_fux-directory.md)).
+declared `.fux/` layout ([ADR-DOTFUX](0003_fux-directory.md)). **Amended
+2026-08-19:** the default was `.fux/fetchers/cdp.py` and is now the plain-GET
+fetcher, because a URL line carrying no `fetch=` means `fetch=http`
+([ADR-HTTP-FETCHER](0021_http-fetcher.md) decision 1).
+
+**`fetcher` carries two things, deliberately.** It is the file used by a line
+that declares no `fetch=`, **and** its directory is where a `fetch=<name>`
+resolves — `<parent of fetcher>/<name>.py`. One key, so a consumer who keeps
+their fetchers somewhere other than `.fux/fetchers/` moves all of them at
+once and no line has to know. A second key naming the directory would be two
+values that must agree.
 
 **6. `meta` is `"hashed"` by default, `"plain"` by explicit opt-in.** Hashed
 closes an ACL-mismatch leak, so the default is a safety property rather than a

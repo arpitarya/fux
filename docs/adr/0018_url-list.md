@@ -144,9 +144,13 @@ content.
 makes the file merge line-by-line at any size, and it is the reason the file
 exists rather than an array — the same reasoning that shards the index.
 
-**3. `#` starts a comment**, and the rest of the line is discarded. Groups,
-owners, and *why this URL is here* are the reason a human can maintain the
-file at all. **See §Consequences for the fragment defect this creates.**
+**3. `#` starts a comment at the start of a line or after whitespace**, and
+the rest of the line is discarded. Groups, owners, and *why this URL is here*
+are the reason a human can maintain the file at all. **`#` anywhere else is
+part of the entry** — a URL fragment is not a comment. Under decision 7 this
+is forced rather than chosen: `https://x/a#frag meta=plain` cannot be parsed
+at all if `#` means a comment everywhere. Built 2026-08-19 in
+[`sourcelist.strip_comment`](../../src/fux/ingest/sourcelist.py).
 
 **4. The loader dedupes and sorts.** File order is presentation only. A
 duplicate line is not an error — it is a merge artefact, and failing the run
@@ -164,10 +168,13 @@ skip; only removing the line removes the document
 fetch outcomes.
 
 **7. A line may carry attributes after the URL**, separated by whitespace:
-`<url> key=value [key=value ...]`. **Decided here, built later** — no code
-reads them yet, and this record does not authorize the parser. A line with no
-attributes means every default applies, so **every list that is valid today
-stays valid forever**.
+`<url> key=value [key=value ...]`. A line with no attributes means every
+default applies, so **every list that is valid today stays valid forever**.
+Built 2026-08-19 by [W-54](../../work/OPEN-WORK.md) in
+[`sourcelist.py`](../../src/fux/ingest/sourcelist.py) — **one parser, shared
+with `.fux/sources/dirs`** ([ADR-DIR-LIST](0023_dir-list.md) decision 2). Two
+parsers for one grammar is how `#`-handling, sorting and the unknown-key error
+end up disagreeing.
 
 **8. `key=value` is the only form.** No bare flags, no `-key` unset, no `!key`
 revert — `.gitattributes` needs four states because its entries are *patterns*
@@ -226,11 +233,20 @@ correctly generated file, never happens.
 | **`fetch`** | `http` · `cdp` | `http` | [ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-CDP-FETCHER](0020_cdp-fetcher.md) | **no** — it selects *who* retrieves the document, not what the record says. A record does not carry which fetcher produced it |
 | **`meta`** | `plain` · `hashed` | `hashed` (L5) | [ADR-CONFIG](0014_config.md) · [ADR-RECORD](0010_index-record.md) | **yes** — `plain` writes `title` + `phrases`, `hashed` writes `title_h` instead. The value is recorded per record, so a record read years later still says which rule wrote it |
 
-**`fetch` is a routing decision.** It picks which file under `.fux/fetchers/`
-is called for this URL. Exactly one runs ([ADR-FETCHER](0019_fetcher.md)
-decision 4), and nothing escalates from one to another
-([ADR-HTTP-FETCHER](0021_http-fetcher.md) decision 3) — so the value on the
-line is the whole story, every run.
+**`fetch` is a routing decision.** A name resolves to
+`<fetchers dir>/<name>.py`, the directory being the parent of
+`[sources.url] fetcher` ([ADR-CONFIG](0014_config.md) decision 5) — so
+relocating a repo's fetchers is a one-key change and never a per-line edit.
+Exactly one runs ([ADR-FETCHER](0019_fetcher.md) decision 4), and nothing
+escalates from one to another ([ADR-HTTP-FETCHER](0021_http-fetcher.md)
+decision 3) — so the value on the line is the whole story, every run.
+
+**Three layers, one order, for both attributes.** The built-in default in the
+table above, then the source-wide `[sources.url]` setting, then the line.
+`[sources.url] fetcher`'s stem is the source-wide value of `fetch`;
+`[sources.url] meta` is the source-wide value of `meta`. A line beats both,
+for its own URL only — which is decision 10 stated as a resolution order
+rather than as one attribute's special case.
 
 **`meta` is a privacy decision, and it only ever loosens per URL.** The
 source-wide setting is the floor; a line may opt one document *out* of hashing
@@ -294,22 +310,19 @@ which is the point of decision 11.
   split exists because they are about to diverge —
   [W-54](../../work/open/W-54-sources-rewrite.md) changes this grammar and
   nothing about the fetcher contract.
-- **A URL fragment is silently truncated, until decision 7 is built.**
-  Decision 3 strips from the first `#` anywhere on the line, so
-  `https://x/page#section` loads as `https://x/page`. Two lines differing only
-  by fragment collapse into one under decision 4, and a document disappears
-  with no error — exactly the failure decision 5 exists to prevent, reached by
-  a different route. **Filed as
-  [W-54](../../work/open/W-54-sources-rewrite.md).** Decision 7 forces
-  the fix rather than merely permitting it: once a line is
-  whitespace-delimited, `#` **must** mean a comment only at line start or after
-  whitespace, or `<url>#frag meta=plain` cannot be parsed at all. The two land
-  together.
-- **Attributes are decided and unbuilt**, which is a state this repo now has a
-  precedent for ([ADR-ENRICHED](0017_enriched-mode.md)). The risk is a session
-  reading decisions 7–11 as permission to write the parser. It is not: the
-  grammar is fixed so that W-49 and W-50 build against one rule instead of
-  three, and the parser lands with whichever of them lands first.
+- **The fragment truncation is fixed, and it was fixed by decision 7, not
+  around it.** The old rule stripped from the first `#` anywhere on the line,
+  so `https://x/page#section` loaded as `https://x/page`, two lines differing
+  only by fragment collapsed into one under decision 4, and a document
+  disappeared with no error — the failure decision 5 exists to prevent,
+  reached by a different route. Making the line whitespace-delimited made the
+  narrow comment rule the only parseable one. **Both landed together,
+  2026-08-19.**
+- **The grammar is built, and it has exactly one implementation.**
+  [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) holds the comment rule,
+  the attribute parse, the dedupe-and-sort and the two error classes; `urls`
+  and `dirs` differ only in a closed attribute set and one entry validator.
+  Adding a third list is a `ListSpec`, not a parser.
 - **An attribute that changes committed bytes needs a home in the record.**
   `meta=plain` does — it decides `title`/`phrases` versus `title_h`. Today
   `meta` is already a record property, so per-URL `meta` needs no schema
@@ -384,7 +397,7 @@ grep -nE '[a-z]+="|[a-z]+=[^ ]* [^ ]*=' .fux/sources/urls 2>/dev/null
 awk '!/^ *#/ && NF {print $1}' .fux/sources/urls 2>/dev/null | sort | uniq -d
 # expect: no output; a hit must be an error, per decision 10
 
-# 3. is the parser built yet? (decisions 7-11 are decided, not authorized)
-grep -c "key=value\|attrs\|attributes" src/fux/ingest/urlsrc.py
-# 0 means unbuilt, which is the current and expected state
+# 3. is there still exactly ONE parser for the two lists?
+grep -rln "def parse(" src/fux/ingest/sourcelist.py src/fux/ingest/urlsrc.py
+# expect: only sourcelist.py — a second parser is the drift this record forbids
 ```

@@ -12,11 +12,16 @@ own `sha` changing, independent of edges (the M1 build-time decision on
 
 URL docs (ADR-URL-INGEST) obey the offline-by-default law: a plain `fux ingest`
 never touches the network — every existing `url:` record is carried forward
-byte-identically. Only `--refresh-urls` loads the consumer fetcher and
-fetches; on a refresh, a configured URL whose fetch fails keeps its prior
-record (a transient network failure must never delete a document), while a
-URL no longer in `.fux/sources/urls` disappears — reconciliation happens only
-on the run that opted into the network.
+byte-identically. Only `--refresh-urls` loads a consumer fetcher and fetches;
+on a refresh, a configured URL whose fetch fails keeps its prior record (a
+transient network failure must never delete a document), while a URL no longer
+in `.fux/sources/urls` disappears — reconciliation happens only on the run that
+opted into the network.
+
+Which fetcher runs, and whether a URL's display fields are hashed, are both
+**per line** (ADR-URL-LIST decision 10): `urlsrc.resolve_urls` layers the
+built-in default, the source-wide `[sources.url]` setting and the line, and
+everything below it reads one already-resolved answer.
 
 Every run calls `ensure_layout` first, so a fresh clone gets its `.fux/`
 README and narrow `.gitignore` before anything is written into the directory
@@ -55,15 +60,16 @@ def run(root: Path, *, refresh_urls: bool = False) -> IngestReport:
 
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
     carried: dict[str, dict] = {}  # url doc_id -> prior record, reused verbatim
+    url_meta: dict[str, str] = {}  # url doc_id -> the `meta` policy its line resolved to
     if refresh_urls:
         if config.url is None:
             raise FuxError(f"--refresh-urls: no [sources.url] configured in {root / 'fux.toml'}")
-        urls = urlsrc.read_urls(root, config.url.urls_file)
-        fetched, url_skipped = urlsrc.fetch_all(root, config.url.fetcher, urls, config.url.config)
+        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+        url_meta = {f"url:{entry.url}": entry.meta for entry in resolved}
+        fetched, url_skipped = urlsrc.fetch_all(root, resolved, config.url.config)
         skipped = skipped + url_skipped
         fresh = {f"url:{fu.url}": fu.content for fu in fetched}
-        for url in urls:
-            doc_id = f"url:{url}"
+        for doc_id in url_meta:
             if doc_id not in fresh and doc_id in existing_urls:
                 carried[doc_id] = existing_urls[doc_id]  # failed fetch keeps the prior record
     else:
@@ -126,11 +132,13 @@ def run(root: Path, *, refresh_urls: bool = False) -> IngestReport:
             "edges": edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
         }
         record["ver"] = ver_for(doc_id, record["sha"])
-        if config.url is not None and config.url.meta == "plain":
+        # Per-URL, not per-source: a line may opt one public document out of
+        # hashing (ADR-URL-LIST decision 10). It only ever loosens.
+        if url_meta.get(doc_id) == "plain":
             record["meta"] = "plain"
             record["title"] = fields.title
             record["phrases"] = fields.phrases
-        else:  # hashed meta — the non-git default (ACL law); no display text leaks
+        else:  # hashed meta — the non-git default (L5); no display text leaks
             record["meta"] = "hashed"
             record["title_h"] = store_mod.term_hash(fields.title)
         if fields.code is not None:

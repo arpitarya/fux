@@ -93,7 +93,8 @@ different committed bytes on different invocations.
 
 ## Definition of done
 
-- [ ] One parser, both files, the comment rule fixed.
+- [x] One parser, both files, the comment rule fixed. `ingest/sourcelist.py`,
+      2026-08-19 — `urls` built on it; `dirs` follows in the next change.
 - [ ] `dirs` migrated; the old key errors with instructions.
 - [ ] `fux setup` writes both fetchers write-if-missing from wheel package
       data; `ensure_layout` writes **no** fetcher; `DEFAULT_FETCHER` resolves to

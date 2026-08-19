@@ -21,7 +21,8 @@ dirs = ["docs", "work", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
 # not a TOML array, so 5k entries diff and merge line by line. Both paths
 # below are the defaults; the keys are here to be seen, not to be required.
 #[sources.url]
-#fetcher = ".fux/fetchers/cdp.py"   # yours, committed, edit freely
+#fetcher = ".fux/fetchers/http.py"  # yours, committed, edit freely; its directory
+#                                   # is where `fetch=cdp` resolves to cdp.py
 #urls_file  = ".fux/sources/urls"        # one URL per line
 #meta       = "hashed"
 

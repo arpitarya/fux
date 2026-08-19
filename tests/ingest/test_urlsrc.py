@@ -12,7 +12,7 @@ from fux import store
 from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
-from fux.ingest.urlsrc import fetch_all, load_fetcher, read_urls
+from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
 from fux.store.format import term_hash
 
 FAKE_FETCHER = '''\
@@ -33,6 +33,16 @@ def fetch(url):
 '''
 
 URLS_FILE = ".fux/sources/urls"
+
+
+def _urls(tmp_path, rel=URLS_FILE):
+    """The URL strings a list parses to — the entries carry attributes now."""
+    return [e.value for e in read_urls(tmp_path, rel)]
+
+
+def _entries(urls, fetcher="mw.py", meta="hashed"):
+    """Hand-resolved entries, so `fetch_all` can be exercised without a config."""
+    return [UrlEntry(url=u, fetch="mw", meta=meta, fetcher_path=fetcher) for u in urls]
 
 
 def _write_urls(tmp_path, lines):
@@ -77,7 +87,10 @@ def test_config_meta_defaults_to_hashed(tmp_path):
 def test_config_paths_default_into_the_fux_dir(tmp_path):
     (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n[sources.url]\n', encoding="utf-8")
     cfg = load_config(tmp_path)
-    assert cfg.url.fetcher == ".fux/fetchers/cdp.py"
+    # The default is the plain-GET fetcher: a line with no `fetch=` means
+    # `fetch=http` (ADR-HTTP-FETCHER decision 1), and this key is the
+    # source-wide setting for that attribute.
+    assert cfg.url.fetcher == ".fux/fetchers/http.py"
     assert cfg.url.urls_file == ".fux/sources/urls"
 
 
@@ -117,12 +130,12 @@ def test_read_urls_ignores_comments_and_blanks(tmp_path):
         tmp_path,
         ["# a heading comment", "", "https://x.test/a  ", "   ", "https://x.test/b # trailing note", "# end"],
     )
-    assert read_urls(tmp_path, URLS_FILE) == ["https://x.test/a", "https://x.test/b"]
+    assert _urls(tmp_path) == ["https://x.test/a", "https://x.test/b"]
 
 
 def test_read_urls_dedupes_and_sorts(tmp_path):
     _write_urls(tmp_path, ["https://x.test/b", "https://x.test/a", "https://x.test/b"])
-    assert read_urls(tmp_path, URLS_FILE) == ["https://x.test/a", "https://x.test/b"]
+    assert _urls(tmp_path) == ["https://x.test/a", "https://x.test/b"]
 
 
 def test_read_urls_rejects_a_non_http_line_with_its_line_number(tmp_path):
@@ -133,11 +146,11 @@ def test_read_urls_rejects_a_non_http_line_with_its_line_number(tmp_path):
 
 def test_read_urls_empty_file_is_a_valid_zero_url_state(tmp_path):
     _write_urls(tmp_path, [])
-    assert read_urls(tmp_path, URLS_FILE) == []
+    assert _urls(tmp_path) == []
 
 
 def test_read_urls_missing_file_fails_loudly(tmp_path):
-    with pytest.raises(FuxError, match="urls_file not found"):
+    with pytest.raises(FuxError, match=r"\.fux/sources/urls not found"):
         read_urls(tmp_path, URLS_FILE)
 
 
@@ -145,7 +158,7 @@ def test_missing_urls_file_only_matters_on_refresh(tmp_path):
     _init(tmp_path, urls=["https://x.test/a"])
     (tmp_path / URLS_FILE).unlink()
     run(tmp_path)  # offline ingest must not care that the list is gone
-    with pytest.raises(FuxError, match="urls_file not found"):
+    with pytest.raises(FuxError, match=r"\.fux/sources/urls not found"):
         run(tmp_path, refresh_urls=True)
 
 
@@ -166,7 +179,7 @@ def test_fetcher_without_fetch_fails_loudly(tmp_path):
 def test_fetch_all_calls_hooks_once_and_skips_failures(tmp_path):
     (tmp_path / "mw.py").write_text(FAKE_FETCHER, encoding="utf-8")
     fetched, skipped = fetch_all(
-        tmp_path, "mw.py", ["https://x.test/b", "https://x.test/boom", "https://x.test/a"]
+        tmp_path, _entries(["https://x.test/b", "https://x.test/boom", "https://x.test/a"])
     )
     assert [f.url for f in fetched] == ["https://x.test/a", "https://x.test/b"]  # sorted, deterministic
     assert [s.rel_path for s in skipped] == ["https://x.test/boom"]
@@ -190,7 +203,7 @@ def test_config_table_reaches_configure_verbatim(tmp_path):
         encoding="utf-8",
     )
     table = {"cdp_port": 9333, "nested": {"deep": [1, 2]}, "flag": True}
-    fetch_all(tmp_path, "mw.py", ["https://x.test/a"], table)
+    fetch_all(tmp_path, _entries(["https://x.test/a"]), table)
     assert (tmp_path / "log.txt").read_text(encoding="utf-8") == repr(sorted(table.items()))
 
 
@@ -203,11 +216,11 @@ def test_configure_is_optional_and_absent_table_is_empty(tmp_path):
         '    return "# T\\n\\nbody\\n"\n',
         encoding="utf-8",
     )
-    fetch_all(tmp_path, "mw.py", ["https://x.test/a"])  # no table passed at all
+    fetch_all(tmp_path, _entries(["https://x.test/a"]))  # no table passed at all
     assert (tmp_path / "log.txt").read_text(encoding="utf-8") == "{}"
 
     (tmp_path / "mw.py").write_text('def fetch(url):\n    return "# T\\n\\nbody\\n"\n', encoding="utf-8")
-    fetched, _ = fetch_all(tmp_path, "mw.py", ["https://x.test/a"], {"k": 1})  # no configure defined
+    fetched, _ = fetch_all(tmp_path, _entries(["https://x.test/a"]), {"k": 1})  # no configure defined
     assert len(fetched) == 1
 
 
@@ -224,7 +237,7 @@ def test_configure_runs_before_connect(tmp_path):
         '    return "# T\\n\\nbody\\n"\n',
         encoding="utf-8",
     )
-    fetch_all(tmp_path, "mw.py", ["https://x.test/a"], {})
+    fetch_all(tmp_path, _entries(["https://x.test/a"]), {})
     assert (tmp_path / "log.txt").read_text(encoding="utf-8") == "configure,connect"
 
 
@@ -235,7 +248,7 @@ def test_configure_raising_is_a_loud_failure_not_a_skip(tmp_path):
         encoding="utf-8",
     )
     with pytest.raises(FuxError, match="configure\\(\\) failed: unknown key"):
-        fetch_all(tmp_path, "mw.py", ["https://x.test/a"], {"prot": 1})
+        fetch_all(tmp_path, _entries(["https://x.test/a"]), {"prot": 1})
 
 
 def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
@@ -243,7 +256,7 @@ def test_fetch_all_sanitizes_hostile_line_separators(tmp_path):
         'def fetch(url):\n    return "# T\\n\\nbefore\\u2028after \\u2029 \\u0085 end\\n"\n',
         encoding="utf-8",
     )
-    fetched, skipped = fetch_all(tmp_path, "mw.py", ["https://x.test/a"])
+    fetched, skipped = fetch_all(tmp_path, _entries(["https://x.test/a"]))
     assert skipped == []
     assert b"\xe2\x80\xa8" not in fetched[0].content  # U+2028 gone before the canonical writer
 
@@ -345,3 +358,93 @@ def test_file_doc_gets_ref_edge_to_ingested_url(tmp_path):
     edges = store.read_index(tmp_path)["file:docs/a.md"]["edges"]
     assert {"kind": "ref", "dst": "url:https://x.test/a", "grade": 10} in edges
     assert not any(e["dst"] == "url:https://x.test/other" for e in edges)  # dangling stays dropped
+
+
+# -- the attribute grammar, per URL (ADR-URL-LIST decisions 7-13) ----------
+
+
+def test_a_fragment_survives_the_round_trip(tmp_path):
+    """W-49: `#` is a comment only at line start or after whitespace."""
+    _write_urls(tmp_path, ["https://x.test/page#section"])
+    assert _urls(tmp_path) == ["https://x.test/page#section"]
+
+
+def test_two_urls_differing_only_by_fragment_are_two_entries(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/p#a", "https://x.test/p#b", "https://x.test/p"])
+    assert _urls(tmp_path) == ["https://x.test/p", "https://x.test/p#a", "https://x.test/p#b"]
+
+
+def test_a_fragment_bearing_line_can_still_carry_attributes(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/p#frag meta=plain  # public"])
+    (entry,) = read_urls(tmp_path, URLS_FILE)
+    assert entry.value == "https://x.test/p#frag"
+    assert entry.attrs["meta"] == "plain"
+
+
+def test_an_unknown_attribute_errors_at_file_lineno(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/a", "https://x.test/b mata=plain"])
+    with pytest.raises(FuxError, match=r"urls:2: unknown attribute 'mata'"):
+        read_urls(tmp_path, URLS_FILE)
+
+
+def test_an_unknown_attribute_value_errors_at_file_lineno(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/a meta=cleartext"])
+    with pytest.raises(FuxError, match=r"urls:1: meta='cleartext' is not one of"):
+        read_urls(tmp_path, URLS_FILE)
+
+
+def test_a_duplicate_with_conflicting_attributes_names_both_lines(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/a meta=plain", "# note", "https://x.test/a fetch=cdp"])
+    with pytest.raises(FuxError, match=r"urls:1 and .*urls:3"):
+        read_urls(tmp_path, URLS_FILE)
+
+
+def test_a_duplicate_that_agrees_is_a_merge_artefact_not_an_error(tmp_path):
+    _write_urls(tmp_path, ["https://x.test/a meta=hashed", "https://x.test/a"])
+    (entry,) = read_urls(tmp_path, URLS_FILE)
+    assert entry.attrs["meta"] == "hashed"  # absent means the default; they agree
+
+
+def test_file_order_does_not_change_the_parsed_set(tmp_path):
+    lines = ["https://x.test/c fetch=cdp", "https://x.test/a", "https://x.test/b meta=plain"]
+    _write_urls(tmp_path, lines)
+    forward = read_urls(tmp_path, URLS_FILE)
+    _write_urls(tmp_path, list(reversed(lines)))
+    assert [(e.value, e.attrs) for e in forward] == [
+        (e.value, e.attrs) for e in read_urls(tmp_path, URLS_FILE)
+    ]
+
+
+def test_a_line_attribute_beats_the_source_wide_setting(tmp_path):
+    """Decision 10: `meta` only ever loosens, and only for its own URL."""
+    _init(tmp_path, urls=["https://x.test/a meta=plain", "https://x.test/b"])
+    run(tmp_path, refresh_urls=True)
+    index = store.read_index(tmp_path)
+    assert index["url:https://x.test/a"]["meta"] == "plain"
+    assert index["url:https://x.test/a"]["title"] == "Page a"
+    assert index["url:https://x.test/b"]["meta"] == "hashed"  # the source-wide floor holds
+
+CDP_FETCHER = """
+def fetch(url):
+    return "# Rendered" + chr(10) * 2 + "browser fetcher body" + chr(10)
+"""
+
+
+def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
+    """`fetch=` picks a file in the fetcher directory; nothing else is imported."""
+    _init(tmp_path, urls=["https://x.test/a", "https://x.test/b fetch=cdp"])
+    (tmp_path / "cdp.py").write_text(CDP_FETCHER, encoding="utf-8")
+    (tmp_path / "http.py").write_text(  # named by no line: must never be imported
+        "raise AssertionError('a fetcher no line names must never be imported')",
+        encoding="utf-8",
+    )
+    run(tmp_path, refresh_urls=True)
+    index = store.read_index(tmp_path)
+    assert index["url:https://x.test/a"]["title_h"] == term_hash("Page a")
+    assert index["url:https://x.test/b"]["title_h"] == term_hash("Rendered")
+
+
+def test_a_missing_fetcher_names_setup(tmp_path):
+    _init(tmp_path, urls=["https://x.test/a fetch=cdp"])
+    with pytest.raises(FuxError, match=r"fetcher not found: cdp\.py.*fux setup"):
+        run(tmp_path, refresh_urls=True)

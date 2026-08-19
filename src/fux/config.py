@@ -26,7 +26,7 @@ def find_root(start: Path | None = None) -> Path | None:
     return None
 
 
-DEFAULT_FETCHER = ".fux/fetchers/cdp.py"
+DEFAULT_FETCHER = ".fux/fetchers/http.py"
 DEFAULT_URLS_FILE = ".fux/sources/urls"
 
 
@@ -34,14 +34,20 @@ DEFAULT_URLS_FILE = ".fux/sources/urls"
 class UrlSource:
     """`[sources.url]` — consumer-fetcher URL ingestion (ADR-URL-INGEST/0011).
 
-    - `fetcher` — repo-root-relative path to a consumer-owned Python file;
-      the default path is `.fux/fetchers/cdp.py` (ADR-FETCHER).
+    - `fetcher` — repo-root-relative path to a consumer-owned Python file, and
+      the **source-wide setting for `fetch`**: a URL line that declares no
+      `fetch=` uses this file, and a line that declares `fetch=<name>` uses
+      `<this file's directory>/<name>.py`. One key carries both, so relocating
+      your fetchers is a one-line change (ADR-FETCHER decision 5). The default
+      is `.fux/fetchers/http.py` — a plain GET, which is what a URL with no
+      attributes means (ADR-HTTP-FETCHER decision 1).
     - `urls_file` — repo-root-relative path to the line-oriented URL list. The
       list is a *file*, not a TOML array: a 5k-entry inline array is one diff
       hunk and one merge conflict, the same argument that sharded the index.
-    - `meta` — privacy policy for display fields; `"hashed"` by default (the
-      non-git default, a CLAUDE.md non-negotiable), `"plain"` an explicit
-      per-source opt-in for public content.
+    - `meta` — privacy policy for display fields; `"hashed"` by default (L5),
+      `"plain"` an explicit per-source opt-in for public content. It is the
+      source-wide *floor*: a URL line may loosen it to `plain` for one public
+      document, and there is deliberately no way to make one line stricter.
     - `config` — the `[sources.url.config]` table, passed **verbatim** to the
       fetcher's optional `configure(config)` hook. Fux validates that it is
       a table and never reads a key inside it: core knows there *is* config,

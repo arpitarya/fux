@@ -145,7 +145,11 @@ returns a document or raises. **This is the decision that keeps decision 3
 true** — the day a chain lands, the name is wrong again.
 
 **5. Which fetcher a URL uses is declared, never detected.** Via
-[ADR-URL-LIST](0018_url-list.md)'s `fetch=` attribute. Automatic escalation
+[ADR-URL-LIST](0018_url-list.md)'s `fetch=` attribute, which resolves to
+`<fetchers dir>/<name>.py` — the directory being the parent of
+`[sources.url] fetcher` ([ADR-CONFIG](0014_config.md) decision 5). **A fetcher
+no line names is never imported**, which is what keeps a repo that only wants
+plain HTTP from loading 28 KB of WebSocket code. Automatic escalation
 from one fetcher to another makes the committed bytes a function of network
 conditions at that instant, which is L3 lost on the one path that is already
 the exception. This follows `scrapy-playwright`, which makes browser rendering

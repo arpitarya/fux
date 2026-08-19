@@ -139,15 +139,16 @@ URL *removed from the list* removes a document, and reconciliation happens only
 on the run that opted into the network. A transient failure must never present
 as a deletion.
 
-**5. The URL list is a committed file**, `.fux/sources/urls`, one per line,
-`#` comments and blanks ignored, deduped and **sorted by the loader** — file
-order is presentation only, because config order must never change committed
-bytes. It is a file rather than a TOML array for the same reason the index is
-sharded: 5 000 entries in an inline array is one diff hunk and one merge
-conflict.
-
-**6. A non-`http(s)` line is a loud error naming `file:lineno`**, not a silent
-skip. A typo'd scheme that quietly fetches nothing is worse than a stopped run.
+**5–6. The file format left this record on 2026-08-19 too.** The committed
+list, its grammar, its comment rule, the dedupe-and-sort, the closed attribute
+set and the `file:lineno` errors are [ADR-URL-LIST](0018_url-list.md)
+decisions 2–13, built in
+[`sourcelist.py`](../../src/fux/ingest/sourcelist.py) and shared with
+`.fux/sources/dirs`. **Not restated here.** What this record keeps is the
+`read_urls` → `resolve_urls` → `fetch_all` pipeline in
+[`urlsrc.py`](../../src/fux/ingest/urlsrc.py): parse, layer the source-wide
+policy under the line, then fetch each URL through the fetcher its line
+declared, importing only the fetchers some line actually names.
 
 **7. `[sources.url.config]` is passed to `configure` verbatim** — moved to
 [ADR-FETCHER](0019_fetcher.md) decision 8, where the contract lives.
