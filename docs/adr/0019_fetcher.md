@@ -159,6 +159,15 @@ a per-request opt-in and has no automatic fallback at all.
 [ADR-DOTFUX](0003_fux-directory.md). Plural, because decision 5 presumes more
 than one can exist in a repo at once.
 
+**Fux ships two of them and imports neither.** `http.py` and `cdp.py` live in
+the wheel as package data under `src/fux/templates/`, with an extension
+Python's import machinery cannot resolve, and `fux setup` copies them out
+write-if-missing. That is decision 1 made **structural**: a `.py` in the
+package could be imported by a later edit, a `.py.txt` cannot be. It also
+answers the question a shipped default otherwise raises — how an air-gapped
+consumer gets a working fetcher without being told to copy a file from
+GitHub.
+
 **7. `[sources.url] middleware` is a retired key that errors with
 instructions**, naming both the new key and the directory move — the pattern
 [ADR-CONFIG](0014_config.md) decision 7 already establishes. A retired key that

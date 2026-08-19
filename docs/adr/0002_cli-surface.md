@@ -22,9 +22,18 @@ timestamp: 2026-08-18T00:00:00Z
 
 ## §1 — For humans
 
-`fux` has **six verbs and no subcommand tree**. Three of them build the index
-and three of them query it, and the split is the whole mental model: *ingest
-writes, build derives, ask/find/answer read.*
+`fux` has **flat verbs and no subcommand tree**, in groups:
+
+| group | verbs | |
+|---|---|---|
+| **lifecycle** | `setup` · `doctor` | set the repo up, then check it |
+| **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
+| **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
+
+The grouping replaced *"three build the index and three query it"* on
+2026-08-19, when `setup` took the surface past six. **The count was never the
+mental model** — what a verb does to the two planes is, and that survives a
+seventh verb where a count does not.
 
 The three query verbs differ only in **how much they commit to**. `find` gives
 you locations and stays out of the way. `ask` gives you a ranked list with
@@ -121,9 +130,18 @@ teeth for this project specifically —
 
 ### Decision
 
-**1. Six verbs, flat.** `doctor` · `ingest` · `build` · `ask` · `find` ·
-`answer`. No nesting. A seventh verb needs its own record; M3's `explain` /
-`graph` / `path` and M4's refer verbs are not covered here.
+**1. Flat verbs, grouped by what they touch.** `setup` · `doctor` (lifecycle)
+· `ingest` · `build` (write) · `ask` · `find` · `answer` (read). **No nesting,
+ever** — that is the constraint, and it is what the count was standing in for.
+A new verb takes flags, never a subcommand tree, and lands in one of the groups
+or argues for a new one in this record. M3's `explain` / `graph` / `path` and
+M4's refer verbs are not covered here.
+
+**1b. `setup` writes the files a consumer owns, write-if-missing** — `fux.toml`,
+both source lists, both fetchers. It is the only verb that may run before a
+repo root exists, because it is what creates one
+([ADR-DOTFUX](0003_fux-directory.md) decision 6). Everything it writes is the
+consumer's from that moment, and no later run rewrites any of it.
 
 **2. The three query verbs share one parser.** Every one of them takes a
 positional `query`, `--json`, and `--scan`. `ask` and `find` add `--top N`
@@ -165,6 +183,39 @@ Every block below is verbatim from
 corpus is the three-document fixture in
 [`evidence/fixture.sh`](../../work/regression/2026-08-18-cli-surface/evidence/fixture.sh)
 — **scores are properties of that fixture, not of the engine.**
+
+#### `fux setup` — write what is mine, once
+
+Optional and explicit. Everything is write-if-missing, so a second run is a
+no-op and an edited file is never clobbered.
+
+```console
+$ fux setup
+  wrote .fux/README.md
+  wrote .fux/.gitignore
+  wrote .fux/fetchers/http.py
+  wrote .fux/fetchers/cdp.py
+  wrote .fux/sources/dirs
+  wrote .fux/sources/urls
+  wrote fux.toml
+setup: 7 file(s) written. They are yours: commit them, edit them, fux will not rewrite them.
+next: add entries to .fux/sources/dirs, then `fux ingest`
+# exit 0
+
+$ fux setup
+  kept  .fux/fetchers/http.py (yours; never rewritten)
+  kept  .fux/fetchers/cdp.py (yours; never rewritten)
+  kept  .fux/sources/dirs (yours; never rewritten)
+  kept  .fux/sources/urls (yours; never rewritten)
+  kept  fux.toml (yours; never rewritten)
+setup: nothing to do - every consumer-owned file is already here
+next: add entries to .fux/sources/dirs, then `fux ingest`
+# exit 0
+```
+
+**`fux ingest` writes none of that.** `ensure_layout` writes only
+`.fux/README.md` and `.fux/.gitignore`, so a repo that wanted an index never
+receives code it did not ask for.
 
 #### `fux doctor` — is this repo in a fit state?
 

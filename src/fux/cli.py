@@ -15,6 +15,12 @@ from . import __version__
 from .errors import FuxError
 
 
+def _cmd_setup(args) -> int:
+    from .setup import cmd_setup
+
+    return cmd_setup(args)
+
+
 def _cmd_doctor(args) -> int:
     from .doctor import cmd_doctor
 
@@ -55,6 +61,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fux", description="rank, fetch, verify — an index over the systems that own your docs")
     parser.add_argument("--version", action="version", version=f"fux {__version__}")
     sub = parser.add_subparsers(dest="command")
+
+    sub.add_parser(
+        "setup", help="write the consumer-owned files into .fux/ (write-if-missing)"
+    ).set_defaults(func=_cmd_setup)
 
     sub.add_parser("doctor", help="check environment and repo health").set_defaults(func=_cmd_doctor)
 

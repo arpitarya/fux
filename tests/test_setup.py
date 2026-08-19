@@ -1,0 +1,194 @@
+"""`fux setup` — the second scaffolding moment (ADR-DOTFUX decision 6).
+
+Two rules carry the whole design and both are cheap to break silently:
+**`ensure_layout` never writes a fetcher**, so a plain `fux ingest` cannot put
+code into a repo that only wanted an index; and **everything setup writes is
+write-if-missing**, so an edited fetcher survives every later run.
+"""
+
+from __future__ import annotations
+
+import importlib.util
+from importlib.machinery import SourceFileLoader
+from pathlib import Path
+
+import pytest
+
+from fux import setup as setup_mod
+from fux.store import fuxdir
+
+TEMPLATES = Path(__file__).resolve().parents[1] / "src" / "fux" / "templates"
+
+
+def _load(path: Path, name: str):
+    loader = SourceFileLoader(name, str(path))
+    spec = importlib.util.spec_from_loader(name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
+
+
+# -- what ships ------------------------------------------------------------
+
+
+def test_both_fetchers_ship_as_package_data_never_as_modules():
+    for template in setup_mod.FETCHERS.values():
+        path = TEMPLATES / template
+        assert path.is_file(), f"{template} is missing from the wheel's package data"
+        assert path.suffix == ".txt"
+    assert not (TEMPLATES / "__init__.py").exists()  # not a package; nothing here imports
+
+
+def test_the_engine_never_imports_a_fetcher():
+    """ADR-FETCHER decision 1 — a fetcher fux imports is a fetcher fux owns."""
+    offenders = []
+    for path in (Path(__file__).resolve().parents[1] / "src" / "fux").rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        for line in text.splitlines():
+            stripped = line.strip()
+            if stripped.startswith(("import ", "from ")) and "templates" in stripped:
+                offenders.append(f"{path.name}: {stripped}")
+    assert not offenders, offenders
+
+
+def test_template_bytes_reads_out_of_the_installed_package():
+    assert setup_mod.template_bytes("http.py.txt").startswith(b'"""Consumer-owned URL fetcher')
+
+
+def test_both_fetchers_satisfy_the_contract():
+    for name, template in setup_mod.FETCHERS.items():
+        module = _load(TEMPLATES / template, f"fetcher_{name.replace('.', '_')}")
+        assert callable(module.fetch), f"{name} defines no fetch(url)"
+        assert callable(module.configure)
+
+
+def test_the_two_fetchers_convert_html_identically():
+    """`fetch=` is routing, not a property of the document (ADR-URL-LIST).
+
+    If the two passes diverged, which fetcher retrieved a page would change the
+    committed index — and a record does not record which fetcher produced it.
+    """
+    http = _load(TEMPLATES / "http.py.txt", "http_fetcher")
+    cdp = _load(TEMPLATES / "cdp.py.txt", "cdp_fetcher")
+    html = (
+        "<html><head><title>Oncall</title></head><body>"
+        "<h1>Oncall</h1><p>Ring the <b>pager</b>.</p>"
+        "<ul><li>one</li><li>two</li></ul>"
+        "<pre><code>fux ask</code></pre>"
+        "<table><tr><th>a</th></tr><tr><td>b</td></tr></table>"
+        "<script>ignored()</script></body></html>"
+    )
+    assert http.html_to_markdown(html) == cdp.html_to_markdown(html)
+    assert http.extract_title(html) == cdp.extract_title(html) == "Oncall"
+
+
+def test_the_http_fetcher_rejects_an_unknown_config_key():
+    module = _load(TEMPLATES / "http.py.txt", "http_fetcher_cfg")
+    module.configure({"timeout_s": 5, "user_agent": "x"})
+    assert module.TIMEOUT_S == 5.0
+    with pytest.raises(module.FetcherError, match="unknown key"):
+        module.configure({"timout_s": 5})
+
+
+# -- what setup does -------------------------------------------------------
+
+
+def test_setup_writes_both_fetchers_and_both_source_lists(tmp_path):
+    report = setup_mod.run(tmp_path)
+    assert (tmp_path / ".fux" / "fetchers" / "http.py").is_file()
+    assert (tmp_path / ".fux" / "fetchers" / "cdp.py").is_file()
+    assert (tmp_path / ".fux" / "sources" / "dirs").is_file()
+    assert (tmp_path / ".fux" / "sources" / "urls").is_file()
+    assert ".fux/fetchers/http.py" in report.written
+    assert report.kept == []
+
+
+def test_the_default_fetcher_path_resolves_to_a_file_after_setup(tmp_path):
+    """W-51: `DEFAULT_FETCHER` named a file that did not exist."""
+    from fux.config import DEFAULT_FETCHER
+
+    setup_mod.run(tmp_path)
+    assert (tmp_path / DEFAULT_FETCHER).is_file()
+
+
+def test_setup_never_overwrites_an_edited_fetcher(tmp_path):
+    setup_mod.run(tmp_path)
+    edited = tmp_path / ".fux" / "fetchers" / "http.py"
+    edited.write_text("# mine now\n", encoding="utf-8")
+    report = setup_mod.run(tmp_path)
+    assert edited.read_text(encoding="utf-8") == "# mine now\n"
+    assert ".fux/fetchers/http.py" in report.kept
+    assert report.written == []
+
+
+def test_setup_never_overwrites_an_edited_source_list(tmp_path):
+    setup_mod.run(tmp_path)
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.write_text("handbook\n", encoding="utf-8")
+    setup_mod.run(tmp_path)
+    assert listing.read_text(encoding="utf-8") == "handbook\n"
+
+
+def test_setup_seeds_the_dirs_list_from_what_the_repo_actually_has(tmp_path):
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "README.md").write_text("# r\n", encoding="utf-8")
+    setup_mod.run(tmp_path)
+    lines = (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8").splitlines()
+    assert [line for line in lines if line and not line.startswith("#")] == ["README.md", "docs"]
+
+
+def test_setup_seeds_nothing_it_cannot_see(tmp_path):
+    setup_mod.run(tmp_path)
+    lines = (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8").splitlines()
+    assert [line for line in lines if line and not line.startswith("#")] == []
+
+
+def test_setup_bootstraps_a_bare_directory(tmp_path, monkeypatch, capsys):
+    """The one verb that may run before a root exists — it *creates* the marker."""
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("fux.setup.find_root", lambda: None)
+    assert setup_mod.cmd_setup(object()) == 0
+    assert (tmp_path / "fux.toml").is_file()
+    assert "wrote fux.toml" in capsys.readouterr().out
+
+
+def test_setup_never_overwrites_an_edited_config(tmp_path):
+    (tmp_path / "fux.toml").write_text('[sources]\ndirs_file = "mine"\n', encoding="utf-8")
+    report = setup_mod.run(tmp_path)
+    assert (tmp_path / "fux.toml").read_text(encoding="utf-8").endswith('dirs_file = "mine"\n')
+    assert "fux.toml" in report.kept
+
+
+def test_the_generated_config_loads(tmp_path):
+    from fux.config import load
+
+    setup_mod.run(tmp_path)
+    config = load(tmp_path)
+    assert config.dirs_file == ".fux/sources/dirs"
+    assert config.shards == 256
+    assert config.url is None  # [sources.url] ships commented out: offline by default
+
+
+# -- the rule that keeps ingest out of the code business -------------------
+
+
+def test_ensure_layout_writes_no_fetcher_and_no_source_list(tmp_path):
+    """The whole reason `fux setup` exists as a separate verb."""
+    fuxdir.ensure_layout(tmp_path)
+    assert not (tmp_path / ".fux" / "fetchers").exists()
+    assert not (tmp_path / ".fux" / "sources").exists()
+    assert sorted(p.name for p in (tmp_path / ".fux").iterdir()) == [".gitignore", "README.md"]
+
+
+def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
+    from fux.ingest.run import run as ingest
+
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text("docs\n", encoding="utf-8")
+
+    ingest(tmp_path)
+    assert not (tmp_path / ".fux" / "fetchers").exists()

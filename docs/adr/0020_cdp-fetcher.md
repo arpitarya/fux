@@ -162,10 +162,19 @@ part of it — port, wait strategy, extraction, even the transport — is editab
 Swapping in Playwright is a supported outcome; fux imports none of it, only the
 four entry points.
 
+**8. It reaches your repo through `fux setup`, and only then.** Amended
+2026-08-19: the file ships in the wheel as package data
+([`src/fux/templates/cdp.py.txt`](../../src/fux/templates/cdp.py.txt)) with an
+extension Python cannot import, and `fux setup` copies it into
+`.fux/fetchers/cdp.py` write-if-missing. **Ingest never writes it** — a repo
+that indexes only local files never sees a byte of WebSocket code, which is
+what decision 1's "never bundle a browser" is worth nothing without.
+
 ### What it looks like
 
 **The four entry points, as this file implements them**
-([`.fux/fetchers/cdp.py`](../../.fux/fetchers/cdp.py)):
+([`src/fux/templates/cdp.py.txt`](../../src/fux/templates/cdp.py.txt), copied
+to `.fux/fetchers/cdp.py` by `fux setup`):
 
 ```python
 def configure(config: dict) -> None: ...   # [sources.url.config], verbatim;

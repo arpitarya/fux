@@ -19,12 +19,29 @@ def test_no_command_prints_help_and_exits_1(capsys):
 
 
 def test_parser_has_the_verb_surface():
-    """The CLI contract: doctor/ingest/build maintain, ask/find/answer query.
+    """The CLI contract, in four groups and no subcommand tree (ADR-CLI).
 
-    `build` is the derived accelerator's rebuild path (M2); `find` and `answer`
-    complete the verb surface the archived engine established, so M4's refer
-    plane upgrades `answer` rather than introducing a new command.
+    lifecycle `setup`/`doctor` set the repo up and check it · write
+    `ingest`/`build` — one writes the committed plane, one derives from it ·
+    read `ask`/`find`/`answer` differ only in how much they commit to.
     """
     parser = build_parser()
     sub_actions = [a for a in parser._subparsers._group_actions if a.dest == "command"]
-    assert set(sub_actions[0].choices) == {"doctor", "ingest", "build", "ask", "find", "answer"}
+    assert set(sub_actions[0].choices) == {
+        "setup",
+        "doctor",
+        "ingest",
+        "build",
+        "ask",
+        "find",
+        "answer",
+    }
+
+
+def test_no_verb_grows_a_subcommand_tree():
+    """Flat verbs, however many there are — that is the constraint that survives."""
+    parser = build_parser()
+    (command,) = [a for a in parser._subparsers._group_actions if a.dest == "command"]
+    for name, sub in command.choices.items():
+        nested = [a for a in sub._subparsers._group_actions] if sub._subparsers else []
+        assert not nested, f"`fux {name}` grew a subcommand tree"

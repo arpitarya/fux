@@ -145,3 +145,24 @@ def test_derived_plane_is_gitignored(tmp_path):
         ["git", "check-ignore", "-q", "--", ".fux/index"], cwd=tmp_path, capture_output=True
     )
     assert tracked.returncode == 1, ".fux/index is committed and must NOT be ignored"
+
+
+def test_setup_writes_the_consumer_owned_files_and_never_rewrites_them(tmp_path):
+    """`fux setup` as a user runs it — and the second run must change nothing."""
+    (tmp_path / "docs").mkdir()
+    first = _run(tmp_path, "setup")
+    assert "wrote .fux/fetchers/http.py" in first.stdout
+    assert (tmp_path / ".fux" / "fetchers" / "cdp.py").is_file()
+
+    edited = tmp_path / ".fux" / "fetchers" / "http.py"
+    edited.write_text("# my proxy lives here\n", encoding="utf-8")
+    second = _run(tmp_path, "setup")
+    assert "nothing to do" in second.stdout
+    assert edited.read_text(encoding="utf-8") == "# my proxy lives here\n"
+
+
+def test_ingest_puts_no_fetcher_in_a_repo_that_only_wanted_an_index(tmp_path):
+    """ensure_layout writes the layout; only `fux setup` writes code."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    assert not (tmp_path / ".fux" / "fetchers").exists()

@@ -1,26 +1,32 @@
-"""The shipped `.fux/fetchers/cdp.py` template — offline unit tests only.
+"""The shipped `cdp.py` fetcher — offline unit tests only.
 
-The template is consumer-owned code committed under `.fux/fetchers/`
-(ADR-DOTFUX), not part of the `fux` package; these tests import it by path and
-exercise the pure parts (RFC 6455 framing, handshake key, HTML→markdown, the
-contract surface, the `configure` hook). Nothing here opens a socket or needs
-Chrome — the CDP session itself is the consumer's to run.
+The file ships in the wheel as **package data** (`src/fux/templates/cdp.py.txt`)
+and `fux setup` copies it into the consumer's `.fux/fetchers/cdp.py`, where it
+becomes their code (ADR-CDP-FETCHER decision 7). It is never imported by fux —
+which is why the extension is one Python's import machinery cannot resolve, and
+why these tests have to load it explicitly.
+
+They exercise the pure parts (RFC 6455 framing, handshake key, HTML→markdown,
+the contract surface, the `configure` hook). Nothing here opens a socket or
+needs Chrome — the CDP session itself is the consumer's to run.
 """
 
 from __future__ import annotations
 
 import importlib.util
+from importlib.machinery import SourceFileLoader
 from pathlib import Path
 
 import pytest
 
-_TEMPLATE = Path(__file__).resolve().parents[2] / ".fux" / "fetchers" / "cdp.py"
+_TEMPLATE = Path(__file__).resolve().parents[2] / "src" / "fux" / "templates" / "cdp.py.txt"
 
 
 def _load():
-    spec = importlib.util.spec_from_file_location("cdp_fetcher_under_test", _TEMPLATE)
+    loader = SourceFileLoader("cdp_fetcher_under_test", str(_TEMPLATE))
+    spec = importlib.util.spec_from_loader(loader.name, loader)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    loader.exec_module(module)
     return module
 
 
@@ -29,8 +35,10 @@ def mw():
     return _load()
 
 
-def test_template_lives_in_the_declared_fetcher_plane():
-    assert _TEMPLATE.is_file()  # ADR-DOTFUX's path; the loader's default points here
+def test_the_fetcher_ships_as_package_data_and_is_never_imported():
+    """ADR-FETCHER's adapter cap, made structural rather than remembered."""
+    assert _TEMPLATE.is_file()
+    assert _TEMPLATE.suffix == ".txt"  # `import fux.templates.cdp` must not resolve
 
 
 def test_contract_surface(mw):

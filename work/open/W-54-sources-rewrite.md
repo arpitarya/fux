@@ -97,9 +97,10 @@ different committed bytes on different invocations.
       2026-08-19 — `urls` built on it; `dirs` follows in the next change.
 - [x] `dirs` migrated; the old key errors with instructions (whatever its
       value). This repo's list is `.fux/sources/dirs`, 2026-08-19.
-- [ ] `fux setup` writes both fetchers write-if-missing from wheel package
+- [x] `fux setup` writes both fetchers write-if-missing from wheel package
       data; `ensure_layout` writes **no** fetcher; `DEFAULT_FETCHER` resolves to
-      a file that exists after setup.
+      a file that exists after setup. Verified from an installed wheel, not
+      just the source tree, 2026-08-19.
 - [ ] `title_h` prefixed; the differential harness sees a hashed record for the
       first time; ingest-then-build exits 0 on the `meta = "hashed"` default.
 - [ ] The managing verb, writing every attribute explicitly.

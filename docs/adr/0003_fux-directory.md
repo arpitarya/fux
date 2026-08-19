@@ -143,13 +143,27 @@ state, which is the only state that matters.
 so backup tools, `tar --exclude-caches` and IDE indexers skip them without
 per-tool configuration.
 
-**6. `README.md` and `.gitignore` are write-if-missing, forever.** `ensure_layout`
-runs at the head of every ingest so a fresh clone is correct before anything is
-written; it never overwrites. A consumer's annotations survive every run.
+**6. Scaffolding has two moments, and everything in both is write-if-missing.**
+Amended 2026-08-19 (Arpit, in [W-54](../../work/OPEN-WORK.md)), because one
+generator doing both jobs is how a repo that wanted an index ends up holding
+code.
+
+| moment | writes | why |
+|---|---|---|
+| **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `fetchers/http.py`, `fetchers/cdp.py` | **optional, explicit, once per repo** — a consumer asked for it |
+
+**`ensure_layout` must never write a fetcher**, and nothing in either column is
+ever overwritten: a consumer's annotations and edits survive every run.
+`fux setup` is also the one verb permitted to run before a repo root exists,
+because it is what writes the `fux.toml` that makes a directory a root.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded
-by path, and only under `--refresh-urls`. One known consequence, accepted:
-linters that skip hidden directories by default (ruff does) will not lint it.
+by path, and only under `--refresh-urls`. The two files fux can put there ship
+as package data with an extension Python's import machinery cannot resolve, so
+**fux copies them and never imports them** ([ADR-FETCHER](0019_fetcher.md)
+decision 1). One known consequence, accepted: linters that skip hidden
+directories by default (ruff does) will not lint them.
 
 ### Consequences
 

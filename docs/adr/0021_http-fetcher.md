@@ -137,11 +137,21 @@ response decoded, converted with the same deterministic HTML→markdown pass
 [ADR-CDP-FETCHER](0020_cdp-fetcher.md) uses.
 
 **2. It is generated into the consumer's repo, write-if-missing** — never
-placed in `src/fux/`. `ensure_layout` writes `.fux/fetchers/http.py` if absent
-and never overwrites it, exactly as it already does for `.fux/README.md` and
-`.fux/.gitignore` ([ADR-DOTFUX](0003_fux-directory.md) decision 6). **Core
-keeps zero network lines**; what core gains is one more entry in a generated
-set.
+imported from `src/fux/`. **Amended 2026-08-19 (Arpit):** the writer is
+**`fux setup`**, not `ensure_layout`. This record originally said ingest would
+write it, and that is wrong for a reason worth stating: `ensure_layout` runs at
+the head of *every* ingest, so putting a fetcher there means a repo that only
+wanted an index gets 28 KB of code it never asked for, on its first run. Setup
+is optional, explicit, and once per repo — a consumer asked for it.
+
+The file itself ships in the wheel as **package data** with an extension
+Python's import machinery cannot resolve (`templates/http.py.txt`), so it is
+copied out and never imported. **Core keeps zero network lines and zero network
+imports**, and the adapter cap is structural rather than remembered.
+
+`ensure_layout` still writes `.fux/README.md` and `.fux/.gitignore` at every
+ingest, and still never overwrites ([ADR-DOTFUX](0003_fux-directory.md)
+decision 6) — the two moments are now a table in that record.
 
 **3. There is no automatic escalation to another fetcher, ever.** Not on
 non-2xx, not on an empty body, not on a rendered-shell heuristic. A plain GET
@@ -158,12 +168,15 @@ transport, and a default fetcher does not make a URL public. Per-URL
 editable, never rewritten. Fux writing the first version does not make it fux's
 file — the same relationship `.fux/README.md` already has.
 
-**6. This record is accepted and unbuilt.** It ratifies the default, the
-placement and the no-escalation rule. It does not authorize a session to write
-`http.py` outside the item that carries it —
-[W-54](../../work/open/W-54-sources-rewrite.md), which also carries the
-`fetch=` value set and lands with
-[W-54](../../work/open/W-54-sources-rewrite.md).
+**6. Built 2026-08-19** by [W-54](../../work/OPEN-WORK.md), together with the
+`fetch=` value set it selects on. The generated file is at
+[`src/fux/templates/http.py.txt`](../../src/fux/templates/http.py.txt).
+
+**7. Its HTML→markdown pass is byte-identical to `cdp.py`'s.** Not "the same
+approach" — the same code, and a test asserts the two agree on the same input.
+`fetch=` is a routing decision and a record does not say which fetcher produced
+it ([ADR-URL-LIST](0018_url-list.md) §The attribute set), so two converters
+that drifted would make the committed index a function of which fetcher ran.
 
 ### What it looks like
 
