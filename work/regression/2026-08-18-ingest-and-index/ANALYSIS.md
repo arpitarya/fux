@@ -79,7 +79,7 @@ final shape — that is a decision for the fix, not for this capture.
 manifest; assert `scan` and `accelerator` return identical scores on a corpus
 containing one. The differential harness never sees a hashed record today.
 
-**Filed as [W-47](../../open/W-47-hashed-meta-blocks-accelerator.md).** Not
+**Filed as [W-47](../../../archive/open/W-47-hashed-meta-blocks-accelerator.md)** (merged into W-54 and closed 2026-08-19; see [`2026-08-19-w54`](../2026-08-19-w54/report.md)). Not
 fixed here — this session's mandate is documentation, and a fix that changes
 committed bytes needs its own commit, its own tests, and a call on migration.
 

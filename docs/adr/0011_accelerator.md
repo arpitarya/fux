@@ -220,9 +220,12 @@ reproducible by construction.
 - **The bound must stay an upper bound.** Any future scoring change — a third
   field, a different saturation — invalidates `block_bound` and the skipping
   argument with it. That is the veto below.
-- **A corpus with hashed URL records has no accelerator at all**
-  ([W-54](../../work/open/W-54-sources-rewrite.md)), so it pays
-  the scan's 4 248.8 ms rather than 27.2 ms.
+- **A corpus with hashed URL records had no accelerator at all** and paid the
+  scan's 4 248.8 ms rather than 27.2 ms — the whole M2 result forfeited by
+  following the documentation. Fixed 2026-08-19 in the *field shape*, never in
+  this record's invariant ([ADR-RECORD](0010_index-record.md) rule 2); the
+  differential harness now carries a hashed record, which it never had
+  ([run](../../work/regression/2026-08-19-w54/report.md)).
 
 ### Alternatives considered
 

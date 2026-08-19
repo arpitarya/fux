@@ -167,14 +167,14 @@ documents only is a ranking change across 42% of live terms and belongs to
 not what the scorer computes.
 
 **9. The two source files differ in who writes them, and that is deliberate.**
-The URL list is **tool-written** ([W-54](../../work/open/W-54-sources-rewrite.md)):
-a command records the URL and every attribute explicitly. This file is
+The URL list is **tool-written**: `fux url` records the URL and every attribute
+explicitly ([ADR-URL-LIST](0018_url-list.md) decision 12). This file is
 **human-written** — you add a directory because you decided to — so absence
 carries meaning here (decision 3) in a way it does not there. Same grammar,
 different authorship, and the reader is lenient for both.
 
 **10. The file ships now; the *signal* waits for its instrument.** Amended
-2026-08-19 (Arpit, in [W-54](../../work/OPEN-WORK.md)), because the two halves
+2026-08-19 (Arpit), because the two halves
 of this record turned out to have different risk:
 
 | half | decisions | state |

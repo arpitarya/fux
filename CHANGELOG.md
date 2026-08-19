@@ -8,19 +8,110 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`fux setup`** — writes the files you own into your repo, **write-if-missing**:
+  `fux.toml`, `.fux/sources/dirs`, `.fux/sources/urls`, and both fetchers
+  ([ADR-DOTFUX](docs/adr/0003_fux-directory.md) decision 6). Optional, explicit,
+  once per repo, and a second run is a no-op that never clobbers an edit. It is
+  the only verb that may run before a repo root exists — it is what creates one.
+- **Two fetchers ship in the wheel**, `http.py` and `cdp.py`
+  ([ADR-HTTP-FETCHER](docs/adr/0021_http-fetcher.md),
+  [ADR-CDP-FETCHER](docs/adr/0020_cdp-fetcher.md)). They travel as **package
+  data with an extension Python cannot import**, so fux copies them and never
+  imports them — the adapter cap is structural, not remembered. `http.py` is a
+  plain stdlib GET and is what a URL with no `fetch=` attribute gets; it never
+  escalates to the browser on its own.
+- **`fux url`** — records a URL in the committed list, writing **every**
+  attribute explicitly ([ADR-URL-LIST](docs/adr/0018_url-list.md) decisions 12
+  and 13). Flags, not a subcommand tree: `--cdp`/`--http`, `--plain`/`--hashed`,
+  `--remove`; no argument lists what the loader sees. **It never fetches** —
+  `fux ingest --refresh-urls` remains the only networked path in the engine.
+- **Per-URL attributes in `.fux/sources/urls`** — `fetch=http|cdp` routes to a
+  file under `.fux/fetchers/`, `meta=plain|hashed` decides whether the index may
+  hold readable display text for that one document. A line beats the source-wide
+  `[sources.url]` setting, which beats the built-in default. `meta` only ever
+  *loosens* per line: there is deliberately no way to make one URL stricter.
+- **`.fux/sources/dirs`** — the committed directory list, on the same grammar
+  ([ADR-DIR-LIST](docs/adr/0023_dir-list.md)). A line may declare
+  `archived=true`; it is parsed and validated today and **not yet read** — the
+  marker in results is gated on a pre-registered query set.
+
 ### Changed
 
-- **`[sources.url] middleware` is now `fetcher`**, and `.fux/middleware/` is
-  `.fux/fetchers/` ([ADR-FETCHER](docs/adr/0019_fetcher.md)). Middleware names a
-  pattern whose defining property is composition, and nothing here composes: one
-  file, one `fetch(url)`, exactly one running per URL. **The old key is a hard
-  error with instructions**, not a silent fallback — rename the key and move the
-  directory.
+**Two breaking changes, both retired keys, both a stopped run with
+instructions.** A retired key that silently does nothing is worse than one that
+stops the run — here "silently does nothing" would mean indexing the wrong
+corpus or fetching through the wrong file.
+
+- **BREAKING — `[sources] dirs` is retired.** The corpus moves to
+  `.fux/sources/dirs`, one entry per line, so a 5 000-entry list diffs and
+  merges line by line instead of colliding in a single TOML array.
+
+  ```diff
+  # fux.toml
+   [sources]
+  -dirs = ["docs", "work", "README.md", "archive/v0.26-docs"]
+
+  # .fux/sources/dirs
+  +docs
+  +work
+  +README.md
+  +archive/v0.26-docs        archived=true
+  ```
+
+  `[sources] dirs_file` points elsewhere if you want. **The key errors whatever
+  its value** — `dirs = []` stops the run exactly as a populated list does.
+
+- **BREAKING — `[sources.url] middleware` is retired, renamed `fetcher`**, and
+  `.fux/middleware/` is `.fux/fetchers/`
+  ([ADR-FETCHER](docs/adr/0019_fetcher.md)). Middleware names a pattern whose
+  defining property is composition, and nothing here composes: one file, one
+  `fetch(url)`, exactly one running per URL.
+
+  ```diff
+   [sources.url]
+  -middleware = ".fux/middleware/cdp.py"
+  +fetcher    = ".fux/fetchers/cdp.py"
+  ```
+
+  ```console
+  $ git mv .fux/middleware .fux/fetchers
+  ```
+
+- **`[sources.url] fetcher` defaults to `.fux/fetchers/http.py`** (was
+  `cdp.py`), because a URL line with no `fetch=` means `fetch=http`. The key
+  now carries two things: the file an unattributed line uses, **and** the
+  directory a `fetch=<name>` resolves in.
+- **`fux.toml` has no required keys.** It holds policy; the source lists hold
+  the corpus.
 - **ADR-DOTFUX, ADR-URL-INGEST and ADR-CONFIG are ratified** (Arpit,
   2026-08-19), closing W-31. Their `⏳ proposed` qualifiers in the `0.32.0`
   entry below are stale as of that date; the register
   ([`docs/adr/README.md`](docs/adr/README.md)) is the live statement of every
   record's status, and released entries are left as written.
+
+### Fixed
+
+- **`meta = "hashed"` produced an index no `fux build` would accept** — and it
+  is the default, and an L5 safety default. A bare 16-hex `title_h` is a quoted
+  16-hex token outside `terms`, which the build refuses because the scan would
+  count it toward that term's `df` and the accelerator would not. Any corpus
+  with one hashed URL record was stuck on the reference scan permanently: 27.2 ms
+  becomes 4 248.8 ms at RFC scale. **Fixed in the field's shape, not the check** —
+  `title_h` is now `"h:" + <hash>` and the two paths agree by construction.
+  **Migration: re-run `fux ingest --refresh-urls`.** No `_format` or `analyzer`
+  bump ([ADR-INDEX-LIFECYCLE](docs/adr/0009_index-lifecycle.md) decision 9), and
+  the build's refusal names the migration.
+- **A URL fragment was silently truncated.** `#` began a comment anywhere on a
+  line, so `https://x/page#section` loaded as `https://x/page`, two URLs
+  differing only by fragment collapsed into one, and **a document disappeared
+  with no error**. `#` now begins a comment only at the start of a line or after
+  whitespace.
+- **`[sources.url] fetcher`'s default named a file that did not exist.** Nothing
+  in fux wrote it and nothing shipped it, so a consumer following the documented
+  default got *"fetcher not found"*. `fux setup` writes it.
+- **Two docstrings claimed fux shipped a fetcher when it did not.** Now true.
 
 ## [0.32.0] - 2026-08-12
 

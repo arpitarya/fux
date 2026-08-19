@@ -28,6 +28,65 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-19 — W-54: the sources rewrite, five defects, five commits  ·  Claude Code
+- **Asked:** execute W-54 end to end — commit the uncommitted documentation
+  session first, then build the five sections in order, verify, close the item,
+  and release `v0.33.0`.
+- **Did:**
+  - **Step 0.** The working tree's ~73 files were *fully staged and clean* —
+    the prompt's warning about files appearing both staged and unstaged did not
+    reproduce, and `git diff` was empty. Suite green (446 + 12) before the
+    baseline commit `4c7dd5e`.
+  - **§1** `ingest/sourcelist.py` — **one parser for both committed lists**.
+    `#` is a comment only at line start or after whitespace, which fixes the
+    silent fragment truncation and is *forced* by the whitespace-delimited
+    attribute grammar rather than chosen. Built ADR-URL-LIST decisions 7–13:
+    the closed attribute sets, the `file:lineno` errors, the
+    duplicate-with-conflict error, reader-lenient/writer-strict. `fetch=` now
+    routes to `<fetchers dir>/<name>.py`; `meta` resolves in three layers
+    (built-in → source-wide → line).
+  - **§2** `[sources] dirs` retired; the corpus lives in `.fux/sources/dirs`
+    with `archived=` **parsed and not read**. Amended ADR-DIR-LIST decision 10
+    to split the file from the signal, with the reason the line falls there.
+  - **§3** `fux setup` + both fetchers as **package data with an extension
+    Python cannot import** (`templates/*.py.txt`), so the adapter cap is
+    structural. Wrote `http.py`, generating its HTML→markdown pass *from*
+    `cdp.py` so a test can assert the two are identical. Verified from a real
+    installed wheel, not just the source tree.
+  - **§4** `title_h` → `"h:" + term_hash(...)`. Decided the migration: **no
+    `_format` or `analyzer` bump** (ADR-INDEX-LIFECYCLE **decision 9**, three
+    conditions plus the asymmetric-cost argument), and the build's refusal now
+    names `fux ingest --refresh-urls` instead of reporting the symptom.
+  - **§5** `fux url` — flags not a subcommand tree, writes every attribute,
+    edits **one line** so a human's grouping comments survive.
+  - **Verification.** Filed [`2026-08-19-w54`](regression/2026-08-19-w54/report.md)
+    with a new fixture that builds a repo from nothing and runs the whole URL
+    path offline. `fux ingest --refresh-urls && fux build` exits 0 on the L5
+    default; a fragment survives; two fragment-differing URLs are two records;
+    the differential holds over a corpus containing hashed records.
+- **Decided / open:**
+  - **Two places the work order lost to a record**, both stated in the commits:
+    §5 describes a verb that *fetches*, and ADR-CLI's captured surface makes
+    `--refresh-urls` the only networked path (L4) — `fux url` records and never
+    fetches. And Step 2 said to extend the 2026-08-18 fixture; that fixture is
+    a filed run's evidence and reproduces the pre-W-54 surface, so it got a
+    forward pointer and a **new** fixture instead. A measurement is superseded
+    by a newer measurement, never by an edit.
+  - **ADR-HTTP-FETCHER decision 2 was wrong** and was amended: it said
+    `ensure_layout` writes `http.py`, which would put 28 KB of code into every
+    repo on its first ingest. Arpit's `fux setup` ruling is the fix.
+  - **Three findings filed in ANALYSIS.md, not as items:** `fux doctor` should
+    check the source lists (should ride with W-44), the generated
+    `.fux/README.md` does not mention `dirs`, and the duplicated HTML→markdown
+    pass is accepted rather than a defect.
+  - **Nothing here exercises real HTTP.** Stated as unresolved.
+- **Next:** release `v0.33.0` — bump `src/fux/__init__.py`, move
+  `[Unreleased]` (already written, with both breaking migrations) into the
+  release section, tag, and let the GitHub Release trigger the PyPI publish.
+- **Cost:** unmeasured — `cage report` was removed in Cage v0.50 (SURFACE-CUT)
+  and `cage insights chats` reports "No chats recorded yet" for this repo, so
+  capture does not reach it. One long Claude Code session, ~7 commits.
+
 ## 2026-08-19 — six single-file companion ADRs for the `.fux/runtime/` files  ·  Cowork
 - **Asked:** explained what's inside `.fux/runtime/postings/` and the six other
   generated runtime files (`CACHEDIR.TAG`, `docs.jsonl`, `codes.jsonl`,

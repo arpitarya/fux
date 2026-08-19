@@ -17,10 +17,6 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-URL-LIST](../docs/adr/0018_url-list.md) · [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-HTTP-FETCHER](../docs/adr/0021_http-fetcher.md)
-
-- **W-54** · `agent` · **Opus** · **next** · the sources rewrite — one parser, two files, the URL path made to work. **Merged from W-47 · W-49 · W-50 · W-51 · W-53** (2026-08-19): they share a parser and a generated set, and five DoDs for one change is the drift each of them warned about — [detail](open/W-54-sources-rewrite.md)
-
 ### [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-FIND](../docs/adr/0005_find.md) · [ADR-ANSWER](../docs/adr/0006_answer.md)
 
 - **W-46** · `agent` · Sonnet · `ask --hybrid` crashes on a source install — the missing-model guard catches the wrong exceptions — [detail](open/W-46-hybrid-missing-model-crash.md)
@@ -28,7 +24,7 @@ The two run **concurrently**; never order one against the other.
 
 ### [ADR-CONFIG](../docs/adr/0014_config.md)
 
-- **W-45** · `agent` · `[sources] dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** by ADR-DIR-LIST — an exclusion attribute on a directory line — and the fork still owes a compare doc — [detail](open/W-45-source-exclusion.md)
+- **W-45** · `agent` · `[sources] dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** by ADR-DIR-LIST — an exclusion attribute on a directory line, and `.fux/sources/dirs` now exists to carry one (W-54, 2026-08-19) — and the fork still owes a compare doc — [detail](open/W-45-source-exclusion.md)
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
 

@@ -109,8 +109,8 @@ Two things forced this record, and only one of them is the name.
 
 **The name was actively misleading.** The closest neighbour in the field —
 Scrapy — uses "downloader middleware" for something that genuinely composes,
-and [W-54](../../work/open/W-54-sources-rewrite.md) has a chained-list
-option on the table. A reader who knows the pattern would reasonably assume
+and a chained-list option was on the table when the rename was decided. A
+reader who knows the pattern would reasonably assume
 chaining works here. It does not, and the decision below says so out loud so
 that assumption cannot survive contact.
 
@@ -188,11 +188,12 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
   today** — `v0.32.0`, no external consumers — and it only ever rises.
 - **The default fetcher path points at a file fux does not write and does not
   ship.** `DEFAULT_FETCHER` is `.fux/fetchers/cdp.py`, `GENERATED_FILES` is
-  `("README.md", ".gitignore")`, and the wheel packages only `src/fux` — so a
-  fresh consumer following the documented default gets *"fetcher not found"*.
-  Two live docstrings claimed otherwise. **Filed as
-  [W-54](../../work/open/W-54-sources-rewrite.md)**; it is the
-  reason [ADR-HTTP-FETCHER](0021_http-fetcher.md) generates rather than assumes.
+  `("README.md", ".gitignore")`, and the wheel packaged no fetcher at all — so a
+  fresh consumer following the documented default got *"fetcher not found"*, and
+  two live docstrings claimed otherwise. **Closed 2026-08-19** by decision 6
+  above: both fetchers ship as package data and `fux setup` copies them out. It
+  is the reason [ADR-HTTP-FETCHER](0021_http-fetcher.md) generates rather than
+  assumes ([run](../../work/regression/2026-08-19-w54/report.md)).
 - **Fetchers are not linted.** They live in a dotdir, and ruff skips those by
   default. Accepted, and inherited from
   [ADR-DOTFUX](0003_fux-directory.md) decision 7 — it is consumer code, not a

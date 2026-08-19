@@ -11,7 +11,7 @@ described output.
 - **Corpus:** the fixture from
   [`../2026-08-18-ingest-and-index/evidence/fixture.sh`](../2026-08-18-ingest-and-index/evidence/fixture.sh)
   with `meta = "plain"`, so the accelerator builds (see
-  [W-47](../../open/W-47-hashed-meta-blocks-accelerator.md) for why `hashed`
+  [W-47](../../../archive/open/W-47-hashed-meta-blocks-accelerator.md) for why `hashed`
   cannot). Five records: three local documents, two URL documents.
 - **Reproduce:** run the fixture, `fux ingest --refresh-urls`, then the commands
   below in order.

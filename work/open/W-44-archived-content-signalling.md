@@ -74,11 +74,15 @@ hypothesis, not a measurement):
 > derived from `loc.startswith("archive/")`. That fixes the weak point the
 > original recorded — the derivation was exact for this repo and a silent
 > convention for anyone else. The live record is
-> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md); the file itself is
-> [W-54](W-54-sources-rewrite.md).
+> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), and **the file itself now
+> exists**: `.fux/sources/dirs` shipped 2026-08-19, and `archived=` is parsed
+> and validated — see the [run](../regression/2026-08-19-w54/report.md).
 >
-> **This item stays open in the agent lane**: the decision is made, the
-> instrument and the build are not.
+> **This item stays open in the agent lane, and it got narrower.** The
+> declaration is built; what is left is exactly the half ADR-DIR-LIST decision
+> 10 gates — the record property, the marker in every verb, and the
+> pre-registered query set that has to exist before either lands. Nothing in
+> `src/` reads `archived` today, on purpose.
 
 ## Why it matters
 

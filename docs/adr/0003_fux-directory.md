@@ -144,7 +144,7 @@ so backup tools, `tar --exclude-caches` and IDE indexers skip them without
 per-tool configuration.
 
 **6. Scaffolding has two moments, and everything in both is write-if-missing.**
-Amended 2026-08-19 (Arpit, in [W-54](../../work/OPEN-WORK.md)), because one
+Amended 2026-08-19 (Arpit), because one
 generator doing both jobs is how a repo that wanted an index ends up holding
 code.
 

@@ -177,7 +177,7 @@ fetch outcomes.
 **7. A line may carry attributes after the URL**, separated by whitespace:
 `<url> key=value [key=value ...]`. A line with no attributes means every
 default applies, so **every list that is valid today stays valid forever**.
-Built 2026-08-19 by [W-54](../../work/OPEN-WORK.md) in
+Built 2026-08-19 in
 [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) — **one parser, shared
 with `.fux/sources/dirs`** ([ADR-DIR-LIST](0023_dir-list.md) decision 2). Two
 parsers for one grammar is how `#`-handling, sorting and the unknown-key error
@@ -321,11 +321,10 @@ which is the point of decision 11.
   validated a URL by requesting it would make the committed list a function of
   whether the network was up when someone typed the command.
 
-- **Two files now describe one subsystem**, deliberately: this record for the
+- **Two files describe one subsystem**, deliberately: this record for the
   format, [ADR-URL-INGEST](0008_url-ingest.md) for the fetch contract. The
-  split exists because they are about to diverge —
-  [W-54](../../work/open/W-54-sources-rewrite.md) changes this grammar and
-  nothing about the fetcher contract.
+  split earned itself immediately — the 2026-08-19 rewrite changed this grammar
+  and nothing about the fetcher contract.
 - **The fragment truncation is fixed, and it was fixed by decision 7, not
   around it.** The old rule stripped from the first `#` anywhere on the line,
   so `https://x/page#section` loaded as `https://x/page`, two lines differing

@@ -27,8 +27,37 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated 2026-08-18.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated 2026-08-19.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### The most recent change: W-54, the sources rewrite (2026-08-19)
+
+- **The URL path works for the first time.** Five latent defects — shipped,
+  real, and with no current victim because this repo does not use URL ingest —
+  closed in five commits, each with its records. Evidence:
+  [`regression/2026-08-19-w54/`](regression/2026-08-19-w54/report.md).
+- **Both source lists are files now.** `.fux/sources/dirs` and
+  `.fux/sources/urls`, one entry per line, **one parser**
+  ([`ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py)). `[sources] dirs`
+  and `[sources.url] middleware` are retired keys that stop the run with
+  instructions — **two breaking changes**, both cheapest now.
+- **Two new verbs, eight in total.** `fux setup` writes the files a consumer
+  owns (write-if-missing, from wheel package data); `fux url` records a URL with
+  every attribute stated and **never fetches**. ADR-CLI's mental model is now
+  four groups — lifecycle / write / sources / read — because the *count* was
+  never the model. **"No subcommand tree" is the constraint that survived.**
+- **`title_h` carries an `h:` prefix.** That was the defect with a measured
+  cost: the L5 `hashed` default wrote an index no `fux build` would accept, so
+  27.2 ms became 4 248.8 ms. **Fixed in the field's shape, never in the
+  accelerator invariant.** No `_format` or `analyzer` bump — the reasoning is
+  [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) decision 9, and
+  the migration is `fux ingest --refresh-urls`.
+- **`archived=` is parsed and deliberately unread.** ADR-DIR-LIST decision 10
+  was amended to split the file from the signal: parsing a declaration nothing
+  reads cannot be wrong, and changing what a verb says about a document needs
+  an instrument. [W-44](open/W-44-archived-content-signalling.md) still owns it.
+
+### Before that
 
 - **M0, M1 and M2 have shipped.** `v0.32.0` is on PyPI (2026-08-13, verified
   black-box from the published wheel). `fux ingest` / `build` / `ask` / `find`
@@ -93,26 +122,37 @@ valuable judgement, but not the state of play.
 
 ## 2 · In flight, and the immediate next step
 
-- **Nothing is half-built in `src/`.** The tree is at a clean milestone
-  boundary; there is no partially-landed feature to finish.
-- **The ADR rewrite is declared but not started.** `work/adr/` holds eight
-  superseded-pending records and `docs/adr/` holds only ADR-LAWS; no successor
-  has been drafted. Four of the eight are still ⏳ proposed (W-30, W-31), so
-  **ratify before replacing** — a successor to an unratified record inherits
-  its ambiguity.
-- **Both M3 (W-23) and M4 (W-24) are unblocked.** The v0.32.0 handoff §5
-  recommends **M4 first** — it is where two filed proposals graduate, and its
-  API shape is the expensive thing to retrofit later. Its handoff + prompt
-  pair is already written and live at
-  [`handoff/v0.33.0-m4-refer-plane-handoff.md`](../archive/handoff/v0.33.0-m4-refer-plane-handoff.md).
-- **M4's build spec is gone.** The `v0.33.0` pair was archived unexecuted, so
-  whoever starts W-24 writes a fresh spec into its detail file first — by Opus,
-  because two proposals graduate into the API shape.
-- **The immediate next step is Arpit's, not an agent's:** the Lane B inbox in
-  [`OPEN-WORK.md`](OPEN-WORK.md) — five decisions in one sitting (W-30 · W-31 ·
-  W-32 · W-33 · W-44). Two shipped records are still ⏳ proposed, and code has
-  been landing under them since 2026-08-12.
-- **An agent arriving now should take Lane A**, not wait on Lane B.
+*Updated 2026-08-19.*
+
+- **Nothing is half-built in `src/`.** W-54 landed complete — five sections,
+  five commits, both suites green, `scripts/adr-guard.sh` exit 0. There is no
+  partially-landed feature to finish.
+- **The ADR rewrite is done.** `work/adr/` no longer exists; `docs/adr/` holds
+  the live set, ADR-LAWS at 0001, and every archived record maps to a successor
+  by **name** in [`../archive/adr/README.md`](../archive/adr/README.md).
+- **The Lane B inbox is empty.** W-30, W-31, W-32, W-33 and W-44's decision
+  were all ratified by Arpit on 2026-08-19 and their outcomes are in
+  [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §Ratified decisions.
+- **The immediate next step is a release.** `main` carries the two breaking
+  retired keys and two new verbs against a published `0.32.0`; `CHANGELOG.md`
+  `[Unreleased]` is written and the version in `src/fux/__init__.py` has not
+  been bumped yet. **That is the next thing to do, and it is an agent's.**
+- **After the release: M3 (W-23) or M4 (W-24), both unblocked.** M4 first is
+  the standing recommendation — it is where two filed proposals graduate, and
+  its API shape is the expensive thing to retrofit later. **M4 has no live
+  spec**: the `v0.33.0` handoff pair was archived unexecuted, so whoever starts
+  W-24 writes a fresh spec into its detail file first, **by Opus**, because two
+  proposals graduate into the API shape.
+- **Two items are PARKED behind one missing instrument** —
+  [W-44](open/W-44-archived-content-signalling.md) and
+  [W-52](open/W-52-df-over-the-union.md) both wait on a pre-registered query
+  set with expected live-vs-archived answers. Nobody owns writing it. They
+  resume when it exists, **not because they look ready**.
+- **Three findings from W-54's run are not filed as items** and are named in
+  its [ANALYSIS.md](regression/2026-08-19-w54/ANALYSIS.md): `fux doctor` should
+  check the source lists, the generated `.fux/README.md` does not mention
+  `dirs`, and the duplicated HTML→markdown pass is accepted rather than a
+  defect. The first should ride with W-44.
 
 ## 3 · Standing constraints
 
@@ -159,6 +199,34 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **A law enforced over the wrong corpus is not enforced** (2026-08-19). The
+  differential harness had asserted scan-vs-accelerator equality for a whole
+  milestone and had **never once run against a hashed record** — the exact
+  shape that broke the invariant. The law was right, the check was right, and
+  the corpus it ran on could not reach the bug. **When you add a record shape,
+  add it to the harness in the same change**, or the harness certifies a system
+  nobody ships.
+- **Fix the shape, not the check** (2026-08-19). `title_h` tripped the
+  accelerator's build invariant, and the cheap fix was to relax the invariant.
+  That invariant is the only thing between the engine and a *fast wrong answer*.
+  Prefixing the field so the check cannot fire made the two paths agree **by
+  construction** — strictly better than agreeing by assertion, and it cost one
+  character. **When a check keeps firing on legitimate data, suspect the data's
+  shape before the check.**
+- **Do not edit a filed run's evidence** (2026-08-19). W-54's work order said to
+  extend the 2026-08-18 fixture; that fixture reproduces the *pre*-W-54 surface
+  and is what that run measured. Rewriting it would have made the run's own
+  numbers unreproducible — a measurement is superseded by a **newer
+  measurement**, never by an edit. The new fixture is a new run, the old one got
+  a forward pointer, and the live citations were repointed so no claim was left
+  ungrounded.
+- **The count was never the mental model** (2026-08-19). ADR-CLI opened with
+  *"six verbs — three build the index and three query it"*, and two new verbs
+  made the sentence false. The temptation is to re-count. The fix was to find
+  the grouping the surface actually had (lifecycle / write / sources / read) and
+  notice that **"no subcommand tree" was the real constraint** all along. **A
+  record that states an arithmetic fact about itself will go stale; state the
+  invariant instead.**
 - **A reorganisation can silently undo a ruling** (2026-08-18). The
   one-archive rule was decided on 2026-08-10 and written in `archive/README.md`;
   the `work/` restructure eight days later recreated a second archive inside
@@ -176,7 +244,7 @@ when a session produces a lesson; do not let it become a changelog.
   ADR-owned component and updated no record. The fix was not better wording; it
   was `tests/test_adr_freshness.py`. **When a rule matters, ship the check in
   the same change as the rule.**
-- **Features that are individually correct can be mutually exclusive** (2026-08-18). Hashed meta writes a 16-hex `title_h`; the accelerator refuses any index with a 16-hex token outside `terms`. Both decisions are right; together they mean the **default** URL path can never build an accelerator ([W-54](open/W-54-sources-rewrite.md)). Each shipped in a different release with its own tests, and nothing exercised the intersection. **Test the seam between two features, not just each feature.**
+- **Features that are individually correct can be mutually exclusive** (2026-08-18). Hashed meta writes a 16-hex `title_h`; the accelerator refuses any index with a 16-hex token outside `terms`. Both decisions were right; together they meant the **default** URL path could never build an accelerator ([closed 2026-08-19](regression/2026-08-19-w54/report.md)). Each shipped in a different release with its own tests, and nothing exercised the intersection. **Test the seam between two features, not just each feature.**
 - **Documenting a surface walks paths nobody walks** (2026-08-18). Writing
   ADR-CLI meant running every verb and flag, which immediately surfaced W-46 —
   `ask --hybrid` crashing on a source install. The guard for that exact case

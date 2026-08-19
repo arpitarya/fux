@@ -15,7 +15,7 @@ timestamp: 2026-08-19T00:00:00Z
 - **Feature:** `.fux/fetchers/http.py` — the fetcher a URL gets when its line says nothing
 - **Owns (on build):** nothing in `src/` — like every fetcher it is consumer code. What lands in `src/` is one entry in `fuxdir.py`'s generated set
 - **Laws:** L1, L4, L5 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Implements:** [ADR-FETCHER](0019_fetcher.md) · **Closes the core question of** [W-54](../../work/open/W-54-sources-rewrite.md)
+- **Implements:** [ADR-FETCHER](0019_fetcher.md) · **Answers *where the default fetcher lives*** — built 2026-08-19, [run](../../work/regression/2026-08-19-w54/report.md)
 
 ---
 
@@ -125,9 +125,8 @@ it survives review, it diffs, and it produces the same bytes every run.
 
 That left one genuinely open question — *where does the default fetcher live* —
 and one defect that answered it. The default fetcher path already pointed at a
-file fux neither writes nor ships
-([W-54](../../work/open/W-54-sources-rewrite.md)), so "generate it"
-was already the missing behaviour, not a new one.
+file fux neither wrote nor shipped, so "ship it and write it at setup" was
+already the missing behaviour, not a new one.
 
 ### Decision
 
@@ -168,7 +167,7 @@ transport, and a default fetcher does not make a URL public. Per-URL
 editable, never rewritten. Fux writing the first version does not make it fux's
 file — the same relationship `.fux/README.md` already has.
 
-**6. Built 2026-08-19** by [W-54](../../work/OPEN-WORK.md), together with the
+**6. Built 2026-08-19**, together with the
 `fetch=` value set it selects on. The generated file is at
 [`src/fux/templates/http.py.txt`](../../src/fux/templates/http.py.txt).
 
@@ -287,8 +286,8 @@ bar gets indexed as a runbook.
 - The generation mechanism it reuses, already shipped —
   [`src/fux/store/fuxdir.py`](../../src/fux/store/fuxdir.py) `ensure_layout` /
   `GENERATED_FILES`, and [ADR-DOTFUX](0003_fux-directory.md) decision 6.
-- The defect that made "generate it" the answer —
-  [W-54](../../work/open/W-54-sources-rewrite.md).
+- The defect that made "generate it" the answer, and the capture that closed
+  it — [`2026-08-19-w54`](../../work/regression/2026-08-19-w54/report.md) §1.
 - The per-URL attribute that selects a non-default fetcher —
   [ADR-URL-LIST](0018_url-list.md) decisions 7–11.
 - Prior art: explicit per-request opt-in, no automatic fallback —

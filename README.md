@@ -4,14 +4,18 @@
 small git-carried index, fetch content from the systems that own it, verify
 at answer time.**
 
-> **Status (2026-08-12): M2 shipped — the accelerator is in.**
-> `src/fux/` exists. From a configured directory:
+> **Status (2026-08-19): M2 shipped — the accelerator is in.** From any repo:
 > ```bash
+> fux setup                # writes the files you own, write-if-missing
 > fux ingest               # builds the committed .fux/index/*.jsonl (+ the accelerator)
 > fux ask "your question"  # ranks with BM25F, cites the source file
 > fux find "your question" # ranked locations, one per line
 > fux answer "a question"  # the single best answer the index can give
 > ```
+> **What fux indexes is two committed files, not config.**
+> `.fux/sources/dirs` and `.fux/sources/urls`, one entry per line, on one
+> grammar — so a 5 000-entry corpus diffs and merges line by line, and the
+> loader sorts so file order can never change a committed byte.
 > **Warm `ask` is measured at a worst-case p95 of 27.2 ms on 8 870 RFC
 > documents** — against a pre-registered 150 ms bar, where the reference
 > scan takes 4.2 s (prediction **R3 PASS**,
@@ -27,10 +31,14 @@ at answer time.**
 > graded corpus it closes three known gaps and breaks nine working queries,
 > so the default is a measurement rather than a preference.
 >
-> URLs can join the corpus through a consumer-owned fetcher file
-> (`.fux/fetchers/cdp.py`, Chrome DevTools Protocol on pure stdlib) —
-> list them one per line in `.fux/sources/urls`, then
-> `fux ingest --refresh-urls`. ADR-URL-INGEST + ADR-DOTFUX (both proposed).
+> URLs join the corpus through a consumer-owned fetcher file. `fux setup`
+> writes two — `http.py` (a plain stdlib GET, the default) and `cdp.py`
+> (Chrome DevTools Protocol, also pure stdlib) — into `.fux/fetchers/`, where
+> they become **your** code and fux never rewrites them. Record a URL with
+> `fux url <URL> [--cdp] [--plain]`, then `fux ingest --refresh-urls` — the
+> **only** networked path in the engine. A line picks its own fetcher; nothing
+> escalates automatically ([ADR-URL-LIST](docs/adr/0018_url-list.md) ·
+> [ADR-FETCHER](docs/adr/0019_fetcher.md)).
 > No graph query lane yet (M3). The v0.26
 > engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
@@ -65,19 +73,24 @@ at answer time.**
 ## The `.fux/` directory
 
 Everything fux puts in your repo lives here, and every child is declared as
-**committed** or **derived** ([ADR-DOTFUX](archive/adr/0011_fux-dir-layout.md)):
+**committed** or **derived** ([ADR-DOTFUX](docs/adr/0003_fux-directory.md)):
 
 | entry | kind | what it is |
 |---|---|---|
 | `index/` | committed | the sharded JSONL index |
-| `sources/` | committed | line-oriented source lists (`urls`) |
-| `fetchers/` | committed | **your** code (`cdp.py`) — fux never rewrites it |
+| `sources/` | committed | the source lists — `dirs` and `urls`, one entry per line |
+| `fetchers/` | committed | **your** code (`http.py`, `cdp.py`) — written by `fux setup`, never rewritten |
 | `runtime/` | derived | M2's accelerator segments (gitignored, `CACHEDIR.TAG`) |
 | `cache/` | derived | M4's fetch cache (gitignored, `CACHEDIR.TAG`) |
 
-Fux writes `.fux/README.md` and a narrow `.fux/.gitignore` (derived names
-only, never `*`) if they are missing, and never touches them again. `fux
-doctor` fails if the index has been git-ignored and warns about anything
+**Scaffolding has two moments.** Every `fux ingest` writes `.fux/README.md`
+and a narrow `.fux/.gitignore` (derived names only, never `*`) if they are
+missing, and never touches them again — a fresh clone has to be correct before
+a byte is written. `fux setup` is the one that writes *code*: the fetchers and
+the source lists, explicitly, once. **Ingest never puts a fetcher in a repo
+that only wanted an index.**
+
+`fux doctor` fails if the index has been git-ignored and warns about anything
 undeclared.
 
 ## Reading order

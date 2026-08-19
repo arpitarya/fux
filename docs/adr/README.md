@@ -143,11 +143,11 @@ again here.
 | [0015](0015_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — nine named modules from the archived engine, each with its tests, and the list is closed | ⏳ proposed | partial |
 | [0016](0016_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
 | [0017](0017_enriched-mode.md) | **ADR-ENRICHED** | The `enriched` ingest mode — a coding agent as a source, never a step; pinned, graded, and fenced out of the maintenance path | accepted | **no** |
-| [0018](0018_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes | accepted | partial |
+| [0018](0018_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar, shared with `dirs` | accepted | yes |
 | [0019](0019_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, and nothing composes | accepted | yes |
 | [0020](0020_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — drives your existing Chrome over CDP on a hand-rolled stdlib WebSocket; never escalated to | accepted | yes |
-| [0021](0021_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET, generated into your repo so core keeps zero network lines. Decided, unbuilt | accepted | **no** |
-| [0023](0023_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — source dirs leave `fux.toml`; a directory may be declared `archived=true`, its records say so, and the ranking is byte-identical | accepted | **no** |
+| [0021](0021_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET, written into your repo by `fux setup` so core keeps zero network lines and zero network imports | accepted | yes |
+| [0023](0023_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — source dirs leave `fux.toml`; a directory may be declared `archived=true`. **The file and the declaration are built; the *signal* is gated on W-44's instrument** (decision 10) | accepted | partial |
 | [0024](0024_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | ⏳ proposed | yes |
 | [0025](0025_docs-table.md) | **ADR-DOCS-TABLE** | `docs.jsonl` — the docidx-ordered doc table every other derived structure joins against | ⏳ proposed | yes |
 | [0026](0026_codes-table.md) | **ADR-CODES-TABLE** | `codes.jsonl` — the dense lane's per-document FuxVec codes, decoded once per process | ⏳ proposed | yes |

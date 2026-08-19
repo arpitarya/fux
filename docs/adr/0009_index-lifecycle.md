@@ -280,10 +280,12 @@ and the differential harness now carries a hashed record to prove it.
 - **The accelerator can be deleted at any moment** without loss, which is what
   lets it be rebuilt aggressively.
 - **The invariant can refuse a build the user did not knowingly cause.** That is
-  the correct trade — but it has now bitten: hashed URL records always trip it
-  ([W-54](../../work/open/W-54-sources-rewrite.md)). The
-  invariant is not the bug; the field shape is. Recorded here because the
-  refusal *looks* like an accelerator defect and is not.
+  the correct trade, and it bit once: hashed URL records always tripped it, so
+  the L5 default shipped an index no build would accept. **The invariant was not
+  the bug; the field shape was**, and decision 9 above is the fix and its
+  migration. Recorded here because the refusal *looks* like an accelerator
+  defect and is not. Closed 2026-08-19 —
+  [run](../../work/regression/2026-08-19-w54/report.md).
 - **256 shards is fixed, not configurable.** `[index] shards` documents the
   value rather than setting it. Changing it rewrites every path in the tree.
 - **This record does not retire its predecessors**, which remain ⏳ *proposed*

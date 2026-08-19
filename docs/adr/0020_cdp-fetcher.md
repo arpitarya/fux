@@ -241,9 +241,13 @@ the same extraction any repo file gets ([ADR-EXTRACTED](0016_extracted-mode.md))
 - **It is not linted** ([ADR-FETCHER](0019_fetcher.md) §Consequences) and it is
   ~600 lines of consumer code carrying a protocol implementation. Its test
   exists precisely because nothing else guards it.
-- **It is not shipped, though two docstrings said it was.** The wheel packages
-  `src/fux` only, and `GENERATED_FILES` does not include it, so this file exists
-  in *this* repo and nowhere else — [W-54](../../work/open/W-54-sources-rewrite.md).
+- **It is shipped now, and for a while two docstrings said so before it was
+  true.** The wheel packaged `src/fux` only and `GENERATED_FILES` did not
+  include it, so the file existed in *this* repo and nowhere else. Closed
+  2026-08-19 by decision 8: it lives in the wheel as
+  [`src/fux/templates/cdp.py.txt`](../../src/fux/templates/cdp.py.txt) and
+  `fux setup` copies it out
+  ([run](../../work/regression/2026-08-19-w54/report.md) §1).
 
 ### Alternatives considered
 
