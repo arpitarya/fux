@@ -133,11 +133,11 @@ valuable judgement, but not the state of play.
 - **The Lane B inbox is empty.** W-30, W-31, W-32, W-33 and W-44's decision
   were all ratified by Arpit on 2026-08-19 and their outcomes are in
   [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §Ratified decisions.
-- **The immediate next step is a release.** `main` carries the two breaking
-  retired keys and two new verbs against a published `0.32.0`; `CHANGELOG.md`
-  `[Unreleased]` is written and the version in `src/fux/__init__.py` has not
-  been bumped yet. **That is the next thing to do, and it is an agent's.**
-- **After the release: M3 (W-23) or M4 (W-24), both unblocked.** M4 first is
+- **`v0.33.0` is released and on PyPI** (2026-08-19), verified black-box from
+  the published wheel: `fux setup` → `fux url` → `fux ingest` → `fux ask` in a
+  fresh repo, from the installed package. CI and the publish workflow both
+  green. **`CHANGELOG.md` `[Unreleased]` is empty.**
+- **The immediate next step is M3 (W-23) or M4 (W-24), both unblocked.** M4 first is
   the standing recommendation — it is where two filed proposals graduate, and
   its API shape is the expensive thing to retrofit later. **M4 has no live
   spec**: the `v0.33.0` handoff pair was archived unexecuted, so whoever starts

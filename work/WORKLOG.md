@@ -28,6 +28,33 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-19 — v0.33.0 released to PyPI  ·  Claude Code
+- **Asked:** step 4 of the W-54 prompt — release, only if everything above was
+  green. It was.
+- **Did:** bumped `src/fux/__init__.py` to `0.33.0`, cut `[Unreleased]` into
+  `## [0.33.0] - 2026-08-19` with both breaking migrations shown as diffs,
+  fixed the version facts in `CLAUDE.md` and ADR-CLI's Feature line (statements
+  of fact, fixed on contact), tagged, pushed, and created the GitHub Release —
+  which is what triggers `publish.yml` and its OIDC trusted publishing. **CI
+  green (12 jobs) and the publish workflow green**, both checked rather than
+  assumed. `fux-engine 0.33.0` is on PyPI, verified black-box: installed the
+  published wheel into a clean venv and ran `fux setup` → `fux url` →
+  `fux ingest` → `fux ask` in a fresh repo.
+- **Decided / open:** the release notes state the honest limits in the same
+  breath as the claim — **nothing in this release exercises real HTTP**, the
+  `archived=` declaration parses and is deliberately unread, and no new timing
+  was measured (the 27.2 ms / 4 248.8 ms figures are cited from the M2 run, not
+  re-derived on a seven-document fixture).
+- **Next:** M3 ([W-23](open/W-23-m3-graph-lane.md)) or M4
+  ([W-24](open/W-24-m4-refer-plane.md)), both unblocked. **M4 first is the
+  standing recommendation and it has no live spec** — write one into its detail
+  file, by Opus, before any code.
+- **Cost:** unmeasured — `cage report` was removed in Cage v0.50 (SURFACE-CUT)
+  and `cage insights chats` reports nothing for this repo, so capture does not
+  reach it.
+
+---
+
 ## 2026-08-19 — W-54: the sources rewrite, five defects, five commits  ·  Claude Code
 - **Asked:** execute W-54 end to end — commit the uncommitted documentation
   session first, then build the five sections in order, verify, close the item,
