@@ -168,6 +168,38 @@ committed shard. On drift, `ask` falls back to the scan and says so under
 single shared tracker — two distinct terms sharing an 8-byte digest would
 silently merge their postings.
 
+**9. A value-encoding change does not bump `_format` or `analyzer`; a property
+change does.** Decided 2026-08-19, when `title_h` changed from a bare 16-hex
+digest to `"h:" + digest` to satisfy decision 6's first invariant by shape
+rather than by check ([ADR-RECORD](0010_index-record.md) rule 2). Three
+conditions, all of which must hold:
+
+1. **The property set is unchanged.** Nothing appeared, nothing left. Adding or
+   removing a property is still a schema change and still bumps `_format`,
+   because a reader cannot know what it is missing.
+2. **`analyzer` is untouched by construction.** It versions how text becomes
+   *terms*, and `title_h` is not a term — it never enters `terms`, never enters
+   the postings, and never participates in scoring
+   ([ADR-RANKING](0012_ranking.md)). A display field cannot make a corpus's
+   statistics mean something different.
+3. **The old shape is already refused, per record, with the migration named.**
+   `fux build` asserts decision 6 on every record and stops on a bare
+   `title_h`, saying re-run `fux ingest --refresh-urls`. A `_format` bump would
+   add a second, *coarser* refusal that says strictly less than the one that
+   already fires.
+
+**And the cost is asymmetric.** `_format` sits in the header line of every
+shard, so bumping it rewrites all 256 headers in every consumer's index — a
+whole-corpus diff — for a change that touches only URL records under the
+`hashed` meta. Meanwhile an old reader meeting a new record gets `h:…` where it
+expected a hash: an opaque display string either way, which is the mode working
+as designed. **Loud where it matters, nil where it does not** is what makes the
+bump unnecessary rather than merely expensive.
+
+**The migration is `fux ingest --refresh-urls`.** A committed index holding a
+bare `title_h` is *old*, not corrupt, and re-ingesting rewrites it. Nothing
+else in the index is affected, because nothing else was ever hashed this way.
+
 ### What it looks like
 
 Verbatim from [the capture](../../work/regression/2026-08-18-ingest-and-index/report.md).
@@ -221,7 +253,9 @@ $ fux doctor
 [OK] accelerator: stale (the committed index changed since it was built) - `ask` falls back to the scan; run `fux build`
 ```
 
-**A refused build** — the invariant doing its job, exit 1:
+**A refused build** — the invariant doing its job, exit 1. This is what an
+index written before the 2026-08-19 `title_h` change looks like, and decision 9
+is why the message names a re-ingest rather than a version bump:
 
 ```console
 $ fux build
@@ -229,8 +263,13 @@ error: .fux/index/aa.jsonl:2: the quoted 16-hex token '30aef0c52cf11116' appears
 outside `terms` in record 'url:…/oncall'. `query/scan.py` counts it toward that
 term's df from the raw bytes, and the accelerator counts from the postings, so
 the two paths would score this corpus differently. Refusing to build a divergent
-accelerator.
+accelerator. This record's `title_h` predates the `h:` prefix
+(ADR-INDEX-LIFECYCLE): re-run `fux ingest --refresh-urls` to rewrite it.
 ```
+
+**A corpus written today builds clean**, because the prefix means the scan's
+pattern cannot match `title_h` at all — the two paths agree by construction,
+and the differential harness now carries a hashed record to prove it.
 
 ### Consequences
 

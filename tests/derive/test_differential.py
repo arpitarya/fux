@@ -19,7 +19,7 @@ import pytest
 
 from fux.derive import accel, build
 from fux.query import scan
-from fux.store import term_hash, write_index
+from fux.store import term_hash, title_hash, write_index
 
 TOPS = (1, 5, 20, 50)
 
@@ -126,16 +126,56 @@ def test_document_without_wlen(tmp_path):
     assert_identical(tmp_path, ["solo"], tops=(1, 5))
 
 
+def _hashed(doc_id, title, wlen, terms) -> dict:
+    """A `meta: hashed` record, the shape `--refresh-urls` actually writes."""
+    record = _rec(doc_id, title, wlen, terms)
+    del record["title"], record["phrases"]
+    record["src"] = "url"
+    record["loc"] = doc_id.removeprefix("url:")
+    record["meta"] = "hashed"
+    record["title_h"] = title_hash(title)
+    return record
+
+
 def test_hashed_meta_titles(tmp_path):
     """`title_h` records must resolve the same display title on both paths."""
-    record = _rec("file:a.md", "", 10, {term_hash("solo"): [1, 1]})
-    del record["title"]
-    record["title_h"] = "abc123"
-    record["meta"] = "hashed"
-    write_index(tmp_path, [record])
+    write_index(tmp_path, [_hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]})])
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1,))
-    assert accel.ask(tmp_path, "solo", top=1)[0].title == "abc123"
+    # The prefix is storage. What a verb shows is the hash, opaque either way.
+    assert accel.ask(tmp_path, "solo", top=1)[0].title == term_hash("Page A")
+
+
+def test_a_corpus_holding_a_hashed_record_builds_and_agrees(tmp_path):
+    """W-47: this harness had never seen a hashed record, so it never saw the bug.
+
+    A bare 16-hex `title_h` is a quoted 16-hex token outside `terms`. The scan
+    counts it toward that term's df from the raw bytes; the accelerator counts
+    from the postings. The build refused the index rather than diverge — so the
+    L5 default shipped an index no `fux build` would accept, and the only thing
+    standing between the engine and a fast wrong answer was a stopped run.
+    """
+    records = [
+        _rec("file:a.md", "A", 12, {term_hash("oncall"): [1, 2], term_hash("rotation"): [0, 1]}),
+        _rec("file:b.md", "B", 30, {term_hash("oncall"): [0, 1]}),
+        _hashed("url:https://x/handbook", "Oncall handbook", 11,
+                {term_hash("oncall"): [1, 3], term_hash("pager"): [0, 2]}),
+        _hashed("url:https://x/deploys", "Deploy runbook", 20, {term_hash("rotation"): [0, 1]}),
+    ]
+    write_index(tmp_path, records)
+    build(tmp_path)  # must not raise: the invariant holds by field shape
+    assert_identical(tmp_path, ["oncall", "rotation", "pager", "oncall rotation"])
+
+
+def test_a_pre_prefix_title_h_still_stops_the_build_and_names_the_migration(tmp_path):
+    """An index written before the prefix is old, not corrupt. Say which."""
+    from fux.errors import FuxError
+
+    record = _hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]})
+    record["title_h"] = term_hash("Page A")  # the bare, pre-2026-08-19 shape
+    write_index(tmp_path, [record])
+    with pytest.raises(FuxError, match="predates the `h:` prefix"):
+        build(tmp_path)
 
 
 def test_a_term_spanning_many_blocks(tmp_path):

@@ -111,7 +111,7 @@ And a `hashed` record — **no `title`, no `phrases`**:
   "mode": "extracted",
   "sha": "2643f1afb68339f2f808d85f67aad193b820dd86",
   "src": "url",
-  "title_h": "30aef0c52cf11116",
+  "title_h": "h:30aef0c52cf11116",
   "ver": 1,
   "wlen": 11
 }
@@ -171,7 +171,7 @@ meaning from position:
 |---|---|
 | `title` | shown in results. **Present only when `meta` is `"plain"`** |
 | `phrases` | heading-derived phrases — what [ADR-ANSWER](0006_answer.md) returns. **`"plain"` only** |
-| `title_h` | the term hash of the title, **instead of** `title`/`phrases` when `meta` is `"hashed"`. Enough to rank, not enough to read |
+| `title_h` | `"h:"` + the term hash of the title, **instead of** `title`/`phrases` when `meta` is `"hashed"`. Enough to identify, not enough to read. The prefix is storage and is stripped for display; it exists to keep rule 2 above true |
 
 **Graph and policy:**
 
@@ -188,8 +188,10 @@ meaning from position:
    the write boundary, not trusted of callers.
 2. **No quoted 16-hex token may appear outside `terms`.** `query/scan.py`
    derives `df` from raw bytes, so any other 16-hex string would be counted as
-   a term by one query path and not the other. This is currently violated by
-   `title_h` — see §Consequences.
+   a term by one query path and not the other. **`title_h` is written as
+   `"h:" + <16 hex>`** for exactly this reason (2026-08-19): a character
+   between the opening quote and the hex makes the scan's pattern unable to
+   match, so the two paths agree by construction rather than by check.
 
 ### Consequences
 
@@ -198,10 +200,13 @@ meaning from position:
 - **Hashed records rank but do not read.** `fux ask` prints
   `30aef0c52cf11116` where a title would be. That is the mode working as
   designed, and a real usability cost.
-- **`title_h` breaks rule 2 today.** It is a bare 16-hex token outside `terms`,
-  so the accelerator refuses to build over any corpus containing one —
-  [W-54](../../work/open/W-54-sources-rewrite.md). The rule is
-  right; the field's shape is the defect.
+- **`title_h` used to break rule 2, and the fix was the field, not the rule.**
+  A bare 16-hex token outside `terms` made the accelerator refuse to build over
+  any corpus containing one — so the `hashed` default, an L5 default, shipped
+  an index no `fux build` would accept. Fixed 2026-08-19 by prefixing the value
+  rather than relaxing the invariant: the invariant is what stands between the
+  engine and a fast wrong answer, and a check that has to be remembered is
+  worse than a shape that cannot be got wrong.
 - **Adding a property is a schema change**, requiring an `_format` bump and a
   re-ingest of every corpus. That cost is the point: it is what keeps the
   committed plane from accumulating conveniences.
@@ -253,6 +258,8 @@ for f in glob.glob('.fux/index/*.jsonl'):
     for ln in open(f): seen |= set(json.loads(ln))
 print('undocumented properties:', sorted(seen - known) or 'none')"
 
-# 3. rule 2 — no bare 16-hex token outside terms (fails today on title_h, W-47)
+# 3. rule 2 - no bare 16-hex token outside terms. The build asserts it per
+#    record and refuses rather than diverging; a pre-2026-08-19 `title_h` is
+#    named as a migration, not as corruption.
 fux build >/dev/null && echo "rule 2 holds on this corpus"
 ```

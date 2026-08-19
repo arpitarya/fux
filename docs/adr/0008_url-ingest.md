@@ -201,7 +201,7 @@ the batch, and the 404 becomes a skip while the other two documents land.
   "mode": "extracted",
   "sha": "2643f1afb68339f2f808d85f67aad193b820dd86",
   "src": "url",
-  "title_h": "30aef0c52cf11116",
+  "title_h": "h:30aef0c52cf11116",
   "ver": 1,
   "wlen": 11
 }
@@ -216,17 +216,18 @@ the batch, and the 404 becomes a skip while the other two documents land.
 - **Hashed results are unreadable by design** — `fux ask` prints
   `30aef0c52cf11116` where a title would be. That is the mode working, and it
   is a real usability cost worth stating rather than discovering.
-- **The default is currently broken.** With `meta = "hashed"`,
-  `fux ingest --refresh-urls` writes the committed index and then **fails at
-  the accelerator build, exit 1**, and every later `fux build` fails too: the
-  16-hex `title_h` trips the invariant that keeps the scan and the accelerator
-  in agreement. A corpus with one hashed URL record is stuck on the reference
-  scan permanently. Filed as
-  [W-54](../../work/open/W-54-sources-rewrite.md); diagnosis and
-  the recommended one-line fix in
+- **The default was broken, and is fixed (2026-08-19).** With
+  `meta = "hashed"`, `fux ingest --refresh-urls` wrote the committed index and
+  then **failed at the accelerator build, exit 1**, and every later `fux build`
+  failed too: the bare 16-hex `title_h` tripped the invariant that keeps the
+  scan and the accelerator in agreement, so a corpus with one hashed URL record
+  was stuck on the reference scan permanently — 27.2 ms against 4 248.8 ms at
+  RFC scale, the whole M2 result forfeited by following the documentation.
+  Diagnosis in
   [ANALYSIS.md](../../work/regression/2026-08-18-ingest-and-index/ANALYSIS.md).
-  **This record documents the intended contract; W-47 is what makes the default
-  match it.**
+  **The fix was the field's shape**, `"h:" + term_hash(...)`
+  ([ADR-RECORD](0010_index-record.md) rule 2), not the check — and the
+  differential harness now carries a hashed record, which it never had.
 - **This record does not retire ADR-URL-INGEST**, which is ⏳ *proposed*
   ([W-31](../../work/IMPLEMENTATION.md) *(ratified 2026-08-19)*).
 

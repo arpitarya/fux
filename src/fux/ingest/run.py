@@ -140,7 +140,7 @@ def run(root: Path, *, refresh_urls: bool = False) -> IngestReport:
             record["phrases"] = fields.phrases
         else:  # hashed meta — the non-git default (L5); no display text leaks
             record["meta"] = "hashed"
-            record["title_h"] = store_mod.term_hash(fields.title)
+            record["title_h"] = store_mod.title_hash(fields.title)
         if fields.code is not None:
             record["code"] = fields.code
         records.append(record)

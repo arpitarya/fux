@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .. import store as store_mod
 from .bm25f import score_record
 
 
@@ -87,7 +88,7 @@ def rank(
     return [
         AskResult(
             id=record["id"],
-            title=record.get("title", record.get("title_h", "")),
+            title=store_mod.display_title(record),
             loc=record["loc"],
             score=s,
         )

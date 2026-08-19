@@ -207,7 +207,9 @@ deletion.
 **What lands in the index.** Nothing in the record says a browser was involved:
 `fetch=` is a routing decision, not a property of the document
 ([ADR-URL-LIST](0018_url-list.md) §The attribute set). Captured, `meta` left at
-its `hashed` default — note `title_h` and the absence of `title`/`phrases`:
+its `hashed` default — note `title_h`, its `h:` prefix
+([ADR-RECORD](0010_index-record.md) rule 2), and the absence of
+`title`/`phrases`:
 
 ```json
 {
@@ -217,7 +219,7 @@ its `hashed` default — note `title_h` and the absence of `title`/`phrases`:
   "meta":    "hashed",
   "mode":    "extracted",
   "sha":     "2643f1afb68339f2f808d85f67aad193b820dd86",
-  "title_h": "30aef0c52cf11116",
+  "title_h": "h:30aef0c52cf11116",
   "ver":     1,
   "wlen":    11
 }

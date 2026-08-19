@@ -140,7 +140,7 @@ def _read_committed(root: Path):
         {
             "id": r["id"],
             "loc": r["loc"],
-            "title": r.get("title", r.get("title_h", "")),
+            "title": store_mod.display_title(r),
             "wlen": r.get("wlen", 0),
         }
         for r in records
@@ -168,11 +168,21 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
     stray = quoted - term_keys
     if stray:
         example = sorted(stray)[0].decode("ascii")
+        # The one shape this ever legitimately had: a `title_h` written before
+        # the prefix landed. Name the migration rather than the symptom — the
+        # record is not corrupt, it is old, and re-ingesting fixes it.
+        migration = ""
+        if record.get("title_h") == example:
+            migration = (
+                " This record's `title_h` predates the `h:` prefix "
+                "(ADR-INDEX-LIFECYCLE): re-run `fux ingest --refresh-urls` to rewrite it."
+            )
         raise FuxError(
             f"{path}:{lineno}: the quoted 16-hex token {example!r} appears outside `terms` in "
             f"record {record.get('id')!r}. `query/scan.py` counts it toward that term's df from "
             f"the raw bytes, and the accelerator counts from the postings, so the two paths would "
             f"score this corpus differently. Refusing to build a divergent accelerator."
+            + migration
         )
 
     m = _WLEN_RE.search(line)

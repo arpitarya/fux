@@ -101,8 +101,12 @@ different committed bytes on different invocations.
       data; `ensure_layout` writes **no** fetcher; `DEFAULT_FETCHER` resolves to
       a file that exists after setup. Verified from an installed wheel, not
       just the source tree, 2026-08-19.
-- [ ] `title_h` prefixed; the differential harness sees a hashed record for the
+- [x] `title_h` prefixed; the differential harness sees a hashed record for the
       first time; ingest-then-build exits 0 on the `meta = "hashed"` default.
+      **Migration decided:** no `analyzer` or `_format` bump —
+      ADR-INDEX-LIFECYCLE decision 9 carries the three conditions and the
+      asymmetric-cost argument; the migration is `fux ingest --refresh-urls`
+      and the build names it.
 - [ ] The managing verb, writing every attribute explicitly.
 - [ ] **Tests, per defect** — not one integration test standing in for five:
       a fragment survives round-trip and two fragment-differing URLs make two

@@ -14,11 +14,14 @@ from .format import (
     INDEX_DIR,
     SCHEMA_ID,
     TF_FIELDS,
+    TITLE_HASH_PREFIX,
     content_sha,
+    display_title,
     index_dir,
     shard_for,
     shard_path,
     term_hash,
+    title_hash,
 )
 from .reader import iter_shard_paths, raw_record_lines, read_index, read_shard
 from .writer import HEADER_LINE, hash_terms, write_index
@@ -34,9 +37,11 @@ __all__ = [
     "INDEX_DIR",
     "SCHEMA_ID",
     "TF_FIELDS",
+    "TITLE_HASH_PREFIX",
     "CollisionTracker",
     "canonical_dumps",
     "content_sha",
+    "display_title",
     "derived_dir",
     "ensure_layout",
     "fux_dir",
@@ -49,5 +54,6 @@ __all__ = [
     "shard_for",
     "shard_path",
     "term_hash",
+    "title_hash",
     "write_index",
 ]

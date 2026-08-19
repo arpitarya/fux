@@ -13,7 +13,7 @@ from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
 from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
-from fux.store.format import term_hash
+from fux.store.format import term_hash, title_hash
 
 FAKE_FETCHER = '''\
 CALLS = {"connect": 0, "close": 0, "fetch": []}
@@ -279,7 +279,7 @@ def test_refresh_ingests_urls_with_hashed_meta_default(tmp_path):
     assert record["src"] == "url"
     assert record["loc"] == "https://x.test/a"
     assert record["meta"] == "hashed"
-    assert record["title_h"] == term_hash("Page a")
+    assert record["title_h"] == title_hash("Page a")
     assert "title" not in record and "phrases" not in record  # no display text leaks
     assert term_hash("rendered") in record["terms"]
 
@@ -447,11 +447,55 @@ def test_fetch_routes_per_line_and_only_loads_what_it_needs(tmp_path):
     )
     run(tmp_path, refresh_urls=True)
     index = store.read_index(tmp_path)
-    assert index["url:https://x.test/a"]["title_h"] == term_hash("Page a")
-    assert index["url:https://x.test/b"]["title_h"] == term_hash("Rendered")
+    assert index["url:https://x.test/a"]["title_h"] == title_hash("Page a")
+    assert index["url:https://x.test/b"]["title_h"] == title_hash("Rendered")
 
 
 def test_a_missing_fetcher_names_setup(tmp_path):
     _init(tmp_path, urls=["https://x.test/a fetch=cdp"])
     with pytest.raises(FuxError, match=r"fetcher not found: cdp\.py.*fux setup"):
         run(tmp_path, refresh_urls=True)
+
+
+# -- the hashed-meta defect (W-47): ingest-then-build on the L5 default -----
+
+
+def test_the_hashed_default_produces_an_index_the_build_accepts(tmp_path):
+    """The measured defect: `meta = "hashed"` wrote an index no build took.
+
+    27.2 ms became 4 248.8 ms at RFC scale, the whole M2 result forfeited by
+    following the documentation. The fix is the field shape, not the check.
+    """
+    from fux.derive import build
+
+    _init(tmp_path, urls=["https://x.test/a", "https://x.test/b"])
+    run(tmp_path, refresh_urls=True)
+    report = build(tmp_path)  # must not raise
+    assert report.docs == 3
+
+
+def test_title_h_is_not_a_bare_16_hex_token(tmp_path):
+    """The scan finds df by looking for `"<16 hex>"` in the raw record bytes."""
+    import re
+
+    _init(tmp_path, urls=["https://x.test/a"])
+    run(tmp_path, refresh_urls=True)
+    for path in store.iter_shard_paths(tmp_path):
+        for line in path.read_bytes().split(chr(10).encode()):
+            record = line.decode("utf-8") if line else ""
+            if '"src":"url"' not in record:
+                continue
+            quoted = set(re.findall(r'"([0-9a-f]{16})"', record))
+            import json
+
+            assert quoted <= set(json.loads(record)["terms"])
+
+
+def test_a_hashed_record_still_shows_its_opaque_title(tmp_path):
+    """Enough to identify a document across two answers, never enough to read."""
+    from fux.query import scan
+
+    _init(tmp_path, urls=["https://x.test/a"])
+    run(tmp_path, refresh_urls=True)
+    (result,) = [r for r in scan.ask(tmp_path, "rendered", top=5) if r.id.startswith("url:")]
+    assert result.title == term_hash("Page a")  # the prefix is storage, not display
