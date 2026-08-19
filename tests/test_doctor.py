@@ -66,7 +66,10 @@ def test_index_not_ignored_passes(tmp_path):
 
 
 def test_check_ignore_is_skipped_outside_a_git_checkout(tmp_path):
-    (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n', encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    dirs = tmp_path / ".fux" / "sources" / "dirs"
+    dirs.parent.mkdir(parents=True, exist_ok=True)
+    dirs.write_text("docs\n", encoding="utf-8")
     check = _check(doctor.run(tmp_path), "index not gitignored")
     assert check.ok and "skipped" in check.detail
 

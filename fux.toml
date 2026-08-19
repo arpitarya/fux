@@ -2,15 +2,12 @@
 # From this directory:   fux ingest   →   fux ask "why did pruning fail"
 
 [sources]
-# `archive/v0.26-docs` is the FROZEN v0.19–0.26 documentation set. It is in
-# scope on purpose (W-42): R2's third frozen question cites it, and the
-# retired engine's decisions are still the answer to real questions about
-# why this build looks the way it does. Frozen means never *edited* — it
-# does not mean unindexed. See ADR-RECORD §Consequences.
-# `work/` joined the sources on 2026-08-18, when the session memory moved out of
-# `docs/`. Leaving it out would make the engine unable to answer questions about
-# its own state of play — which is the first thing anyone asks it.
-dirs = ["docs", "work", "README.md", "CLAUDE.md", "archive/v0.26-docs"]
+# WHAT is indexed is NOT here — it is `.fux/sources/dirs`, one entry per line,
+# so a 5k-entry corpus diffs and merges line by line and a directory can carry
+# `archived=true` (ADR-DIR-LIST). `[sources] dirs` is a retired key and errors
+# with instructions. This key only says where that file is; the default is the
+# value shown, so it is here to be seen rather than to be required.
+#dirs_file = ".fux/sources/dirs"
 
 # URL ingestion via YOUR fetcher file (ADR-URL-INGEST, relocated by ADR-DOTFUX).
 # Uncomment to use. Fetching only ever happens under `fux ingest

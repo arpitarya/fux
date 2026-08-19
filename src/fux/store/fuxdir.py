@@ -34,7 +34,7 @@ FUX_DIR = ".fux"
 #: Declared children of `.fux/` — name -> one-line description for the README.
 COMMITTED: dict[str, str] = {
     "index": "the wire-format index (ADR-RECORD)",
-    "sources": "large line-oriented source lists (`urls`; M4 may add more)",
+    "sources": "the committed source lists (`dirs`, `urls`), one entry per line",
     "fetchers": "consumer-owned code (`cdp.py`, `http.py`), edit freely",
 }
 

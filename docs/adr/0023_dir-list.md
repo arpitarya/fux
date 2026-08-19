@@ -10,10 +10,10 @@ timestamp: 2026-08-19T00:00:00Z
 # ADR-DIR-LIST — the committed directory list
 
 - **Name:** `ADR-DIR-LIST` — cite this everywhere; never cite the number
-- **Status:** accepted — **the decision is ratified; it is not built**
+- **Status:** accepted — **the file and the declaration are built** (2026-08-19, W-54); the *signal* is gated, see decision 10
 - **Date:** 2026-08-19
 - **Feature:** `.fux/sources/dirs` — what the engine indexes, and which of it is retired
-- **Owns (on build):** nothing new in `src/` — it moves a key out of `config.py` and adds a reader beside `read_urls`
+- **Owns:** nothing new in `src/` — it moved a key out of `config.py` and added `read_dirs`/`source_dirs` to `ingest/gitdir.py`, on the one parser in `ingest/sourcelist.py`
 - **Laws:** L3, L6 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Supersedes:** `ADR-ARCHIVED-SIGNAL` (0022) — **archived 2026-08-19** at [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited. Its decisions are carried below, one of them changed
 - **Amends:** [ADR-CONFIG](0014_config.md) decision 2 · [ADR-DOTFUX](0003_fux-directory.md) decision 2
@@ -42,8 +42,8 @@ committed bytes.
 
 **The new part is `archived=true`.** A directory declared archived is still
 indexed — its documents are the honest answer to *"why does this look the way
-it does"* — but every record from it carries `archived: true`, and every verb
-says so:
+it does"* — and the plan is that every record from it carries `archived: true`
+and every verb says so:
 
 ```console
 $ fux ask "what is the ingest cache"
@@ -57,6 +57,12 @@ whether a reader notices a path prefix inside a context window is a rule with no
 mechanism; this is the mechanism.
 
 **No attribute means not archived.** Every list that exists today stays correct.
+
+**What ships today is the declaration, not the marker.** `.fux/sources/dirs` is
+read and `archived=` is parsed and validated; the record property and the
+`[archived]` prefix above wait for a pre-registered query set, because changing
+what a verb says about a document is a claim that needs an instrument. Decision
+10 says why the split falls exactly there.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -167,10 +173,22 @@ a command records the URL and every attribute explicitly. This file is
 carries meaning here (decision 3) in a way it does not there. Same grammar,
 different authorship, and the reader is lenient for both.
 
-**10. It is not built until the archived signal's instrument exists.** A
-pre-registered query set with expected live-vs-archived answers, frozen before
-the mechanism ships. Five hand-picked probes is not a measurement, and the
-playground goldens are a different corpus and cannot see this.
+**10. The file ships now; the *signal* waits for its instrument.** Amended
+2026-08-19 (Arpit, in [W-54](../../work/OPEN-WORK.md)), because the two halves
+of this record turned out to have different risk:
+
+| half | decisions | state |
+|---|---|---|
+| the file, the grammar, the **declaration** | 1, 2, 3, 4, 9 | **built** — `.fux/sources/dirs` is read, `archived=` is parsed and validated |
+| the **signal** — a record property, and a marker in every verb | 5, 7 | **gated**, on a pre-registered query set with expected live-vs-archived answers, frozen before the mechanism ships ([W-44](../../work/open/W-44-archived-content-signalling.md)) |
+
+The split is safe in exactly one direction. Parsing a declaration nothing reads
+changes no committed byte and no score, so it cannot be wrong; **changing what a
+verb says about a document is a claim that needs an instrument**, and five
+hand-picked probes is not a measurement — the playground goldens are a different
+corpus and cannot see this. Building the declaration first also means W-44
+arrives to a corpus that has already declared itself, rather than having to
+invent the declaration and the measurement at once.
 
 ### Consequences
 
@@ -252,6 +270,7 @@ print([r['loc'] for r in rs if r.get('archived') is None and 'archive' in r['loc
 grep -rn "archive/" src/fux/ --include=*.py
 # expect: no output
 
-# 3. built yet? (accepted, unbuilt — the file does not exist)
-test -f .fux/sources/dirs && echo BUILT || echo "not built, as expected"
+# 3. the file is built; the SIGNAL is not. `archived` must be parsed and unread.
+grep -rn "archived" src/fux/ --include=*.py | grep -v sourcelist.py | grep -v "not yet read"
+# expect: no output — decisions 5 and 7 are W-44's, not this change's
 ```

@@ -44,7 +44,7 @@ binary, whatever the reason, with the reason.
 
 ```mermaid
 flowchart LR
-    S["sources<br/>fux.toml dirs"] --> W["walk<br/>skips reported"]
+    S[".fux/sources/dirs<br/>one entry per line"] --> W["walk<br/>skips reported"]
     W --> P["parse<br/>frontmatter + NFC"]
     P --> X["extract<br/>title · phrases · terms · wlen"]
     X --> E["resolve edges<br/>corpus-wide, every run"]
@@ -58,9 +58,10 @@ flowchart LR
 
 ```text
   sources  ->  walk  ->  parse  ->  extract  ->  resolve  ->  write
- (fux.toml)   skips    frontmatter  title       edges      identical bytes
-              reported   + NFC      phrases   (corpus-wide,   = no write
-                                    terms      every run)        |
+ (.fux/       skips    frontmatter  title       edges      identical bytes
+  sources/    reported   + NFC      phrases   (corpus-wide,   = no write
+  dirs)                                        every run)
+                                    terms                        |
                                     wlen                         v
                                                         .fux/index/*.jsonl
                                                                  |

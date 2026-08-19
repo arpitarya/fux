@@ -21,7 +21,10 @@ def _run(cwd: Path, *args: str) -> subprocess.CompletedProcess:
 
 
 def _write_fixture(root: Path) -> None:
-    (root / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n', encoding="utf-8")
+    (root / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    dirs = root / ".fux" / "sources" / "dirs"
+    dirs.parent.mkdir(parents=True, exist_ok=True)
+    dirs.write_text("docs\n", encoding="utf-8")
     docs = root / "docs"
     docs.mkdir()
     (docs / "a.md").write_text(

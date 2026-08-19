@@ -45,6 +45,14 @@ def _entries(urls, fetcher="mw.py", meta="hashed"):
     return [UrlEntry(url=u, fetch="mw", meta=meta, fetcher_path=fetcher) for u in urls]
 
 
+def _write_toml(tmp_path, text, dirs=("docs",)):
+    """Write `fux.toml` and the committed directory list it now implies."""
+    (tmp_path / "fux.toml").write_text(text, encoding="utf-8")
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text("".join(f"{d}{chr(10)}" for d in dirs), encoding="utf-8")
+
+
 def _write_urls(tmp_path, lines):
     path = tmp_path / URLS_FILE
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -58,7 +66,7 @@ def _init(tmp_path, *, urls, meta=None, files=None, fetcher=FAKE_FETCHER, config
         url_lines += f'meta = "{meta}"\n'
     if config is not None:
         url_lines += "[sources.url.config]\n" + config
-    (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n' + url_lines, encoding="utf-8")
+    _write_toml(tmp_path, "[sources]\n" + url_lines)
     (tmp_path / "mw.py").write_text(fetcher, encoding="utf-8")
     _write_urls(tmp_path, urls)
     for rel, text in files.items():
@@ -85,7 +93,7 @@ def test_config_meta_defaults_to_hashed(tmp_path):
 
 
 def test_config_paths_default_into_the_fux_dir(tmp_path):
-    (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n[sources.url]\n', encoding="utf-8")
+    _write_toml(tmp_path, "[sources]\n[sources.url]\n")
     cfg = load_config(tmp_path)
     # The default is the plain-GET fetcher: a line with no `fetch=` means
     # `fetch=http` (ADR-HTTP-FETCHER decision 1), and this key is the
@@ -96,8 +104,7 @@ def test_config_paths_default_into_the_fux_dir(tmp_path):
 
 def test_config_rejects_bad_meta(tmp_path):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs = ["docs"]\n[sources.url]\nfetcher = "mw.py"\nmeta = "cleartext"\n',
-        encoding="utf-8",
+        '[sources]\n[sources.url]\nfetcher = "mw.py"\nmeta = "cleartext"\n'
     )
     with pytest.raises(FuxError, match="meta must be"):
         load_config(tmp_path)
@@ -105,7 +112,7 @@ def test_config_rejects_bad_meta(tmp_path):
 
 def test_config_rejects_an_inline_urls_list_and_names_the_file(tmp_path):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs = ["docs"]\n[sources.url]\nurls = ["https://x.test/a"]\n', encoding="utf-8"
+        '[sources]\n[sources.url]\nurls = ["https://x.test/a"]\n'
     )
     with pytest.raises(FuxError, match=r"\.fux/sources/urls"):
         load_config(tmp_path)
@@ -116,7 +123,7 @@ def test_config_table_is_opaque_but_must_be_a_table(tmp_path):
     assert load_config(tmp_path).url.config == {"cdp_port": 9333, "anything_at_all": "fux never reads this"}
 
     (tmp_path / "fux.toml").write_text(
-        '[sources]\ndirs = ["docs"]\n[sources.url]\nfetcher = "mw.py"\nconfig = 9222\n', encoding="utf-8"
+        '[sources]\n[sources.url]\nfetcher = "mw.py"\nconfig = 9222\n'
     )
     with pytest.raises(FuxError, match=r"\[sources.url.config\] must be a table"):
         load_config(tmp_path)
@@ -341,7 +348,7 @@ def test_ver_bumps_when_fetched_content_changes(tmp_path):
 
 
 def test_refresh_without_url_config_fails_loudly(tmp_path):
-    (tmp_path / "fux.toml").write_text('[sources]\ndirs = ["docs"]\n', encoding="utf-8")
+    _write_toml(tmp_path, "[sources]\n")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     with pytest.raises(FuxError, match="no \\[sources.url\\]"):

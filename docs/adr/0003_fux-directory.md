@@ -45,7 +45,7 @@ itself that the index is not ignored.
 flowchart TD
     F[".fux/"]
     F --> C1["index/ — committed<br/>the product"]
-    F --> C2["sources/ — committed<br/>urls, one per line"]
+    F --> C2["sources/ — committed<br/>dirs · urls, one per line"]
     F --> C3["fetcher/ — committed<br/>YOUR code"]
     F --> C4["README.md · .gitignore<br/>committed, write-if-missing"]
     F --> D1["runtime/ — derived<br/>CACHEDIR.TAG"]
@@ -61,7 +61,7 @@ flowchart TD
   .fux/
     |
     +-- index/        COMMITTED   the product; not rebuildable from anything
-    +-- sources/      COMMITTED   urls, one per line
+    +-- sources/      COMMITTED   dirs . urls, one per line
     +-- fetcher/   COMMITTED   your code, fux never rewrites it
     +-- README.md     COMMITTED   the declaration table (write-if-missing)
     +-- .gitignore    COMMITTED   names derived dirs; NEVER `*`
@@ -125,8 +125,10 @@ be a machine's job.
 the generated `.fux/README.md`. Undeclared entries are a `fux doctor` warning,
 not a shrug.
 
-**2. Committed:** `index/` (the product), `sources/` (line-oriented lists, e.g.
-`urls`), `fetchers/` (consumer code), `README.md`, `.gitignore`.
+**2. Committed:** `index/` (the product), `sources/` (the line-oriented source
+lists — `dirs` and `urls`, both on the one grammar in
+[ADR-URL-LIST](0018_url-list.md)), `fetchers/` (consumer code), `README.md`,
+`.gitignore`.
 **Derived:** `runtime/`, `cache/`.
 
 **3. The generated `.gitignore` names derived directories and never a

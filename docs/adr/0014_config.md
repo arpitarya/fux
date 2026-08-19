@@ -143,9 +143,13 @@ extending it is visibly a decision rather than a convenience.
 error in the loader — the caller decides whether it is fatal, which is why
 `fux doctor` can report on a directory that `fux ask` refuses.
 
-**2. `[sources] dirs` is the only required key.** A non-empty list of strings,
-each a repo-relative directory or file. Anything else is a `FuxError` naming
-the file.
+**2. There are no required keys.** Amended 2026-08-19: `[sources] dirs` was
+the one required key and is now **retired** — the corpus lives in
+`.fux/sources/dirs`, one entry per line ([ADR-DIR-LIST](0023_dir-list.md)
+decision 1). `[sources] dirs_file` says where that file is and defaults to it,
+so a `fux.toml` holding nothing but `[index] shards` is valid. **`fux.toml` is
+policy; the source lists are the corpus**, and that is the whole reason the key
+moved.
 
 **3. `[index] shards` documents 256 and cannot change it.** Supplying any other
 value is an error, not a silent override: the shard function is
@@ -173,9 +177,20 @@ values that must agree.
 closes an ACL-mismatch leak, so the default is a safety property rather than a
 preference. Any other value is an error.
 
-**7. A retired key errors with instructions.** `[sources.url] urls` — once a
-TOML array — now raises telling you to put one URL per line in the urls file. A
-retired key that silently does nothing is worse than one that stops the run.
+**7. A retired key errors with instructions.** Three of them now, and the
+pattern is the same each time — a retired key that silently does nothing is
+worse than one that stops the run, because "silently does nothing" here means
+indexing the wrong corpus or fetching through the wrong file.
+
+| retired key | says | since |
+|---|---|---|
+| `[sources.url] urls` | put one URL per line in `.fux/sources/urls` | 0.31.x |
+| `[sources.url] middleware` | renamed to `fetcher`; move the file to `.fux/fetchers/` | 2026-08-19, [ADR-FETCHER](0019_fetcher.md) decision 7 |
+| `[sources] dirs` | put one directory per line in `.fux/sources/dirs`; a line may carry `archived=true` | 2026-08-19, [ADR-DIR-LIST](0023_dir-list.md) decision 1 |
+
+**A retired key errors whatever its value.** `dirs = []` stops the run exactly
+as `dirs = ["docs"]` does: the key is retired, not merely unused, and a reader
+that tolerates the empty form teaches people the key still exists.
 
 **8. `[sources.url.config]` is validated as *a table* and nothing more.** It is
 passed to the fetcher's `configure()` verbatim. Fux never reads a key inside

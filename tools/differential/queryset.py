@@ -34,7 +34,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from fux.config import load
-from fux.ingest.gitdir import walk_sources
+from fux.ingest.gitdir import source_dirs, walk_sources
 from fux.query.tokenize import tokenize
 
 #: The three questions frozen in the M1 handoff §9, before the engine existed.
@@ -79,7 +79,7 @@ class Vocabulary:
 def vocabulary(root: Path) -> Vocabulary:
     """Tokenize the configured sources and count document frequency per term."""
     config = load(root)
-    walked, _ = walk_sources(root, config.source_dirs)
+    walked, _ = walk_sources(root, source_dirs(root, config.dirs_file))
     df: dict[str, int] = {}
     for walked_file in walked:
         for term in set(tokenize(walked_file.content.decode("utf-8"))):

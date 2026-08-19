@@ -39,7 +39,7 @@ from ..errors import FuxError
 from . import edges as edges_mod
 from . import extract as extract_mod
 from . import urlsrc
-from .gitdir import Skipped, walk_sources
+from .gitdir import Skipped, source_dirs, walk_sources
 from .parse import parse
 
 
@@ -54,7 +54,7 @@ class IngestReport:
 def run(root: Path, *, refresh_urls: bool = False) -> IngestReport:
     config = load_config(root)
     store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (ADR-DOTFUX)
-    files, skipped = walk_sources(root, config.source_dirs)
+    files, skipped = walk_sources(root, source_dirs(root, config.dirs_file))
     existing = store_mod.read_index(root)
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}
 

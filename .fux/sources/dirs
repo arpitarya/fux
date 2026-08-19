@@ -1,0 +1,21 @@
+# What fux indexes in this repo. One entry per line: a directory (walked
+# recursively) or a single file, relative to the repo root. `#` starts a
+# comment at the start of a line or after whitespace. The loader dedupes and
+# sorts, so the order below is for humans only and cannot change a committed
+# byte. See ADR-DIR-LIST.
+#
+# Attributes: `archived=true` marks a directory whose documents are history.
+# It is DECLARED here, never derived from a path — `archive/` is this repo's
+# convention and nobody else's. Parsed today, surfaced when W-44's instrument
+# exists; the ranking is byte-identical either way.
+
+CLAUDE.md
+README.md
+docs
+work
+
+# The FROZEN v0.19-0.26 documentation set. In scope on purpose (W-42): R2's
+# third frozen question cites it, and the retired engine's decisions are still
+# the answer to real questions about why this build looks the way it does.
+# Frozen means never *edited* — it does not mean unindexed.
+archive/v0.26-docs        archived=true

@@ -9,7 +9,7 @@ tagged with [`CACHEDIR.TAG`](https://bford.info/cachedir/)).
 | `README.md` | committed | this file: written once by fux, yours to annotate |
 | `.gitignore` | committed | lists only the derived directories, never `*` |
 | `index/` | committed | the wire-format index (ADR-0004) |
-| `sources/` | committed | large line-oriented source lists (`urls`; M4 may add more) |
+| `sources/` | committed | the committed source lists (`dirs`, `urls`), one entry per line |
 | `fetchers/` | committed | consumer-owned code (`cdp.py`), edit freely |
 | `runtime/` | derived | reserved for M2 accelerator segments; carries `CACHEDIR.TAG` |
 | `cache/` | derived | reserved for M4 ARC fetch cache; carries `CACHEDIR.TAG` |

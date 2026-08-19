@@ -73,11 +73,11 @@ def corpus_terms(root: Path) -> list[tuple[str, int]]:
 def source_vocabulary(root: Path) -> list[tuple[str, int]]:
     """Plaintext terms with df, from the sources — hashes are not queryable."""
     from fux.config import load
-    from fux.ingest.gitdir import walk_sources
+    from fux.ingest.gitdir import source_dirs, walk_sources
     from fux.query.tokenize import tokenize
 
     config = load(root)
-    walked, _ = walk_sources(root, config.source_dirs)
+    walked, _ = walk_sources(root, source_dirs(root, config.dirs_file))
     df: dict[str, int] = {}
     for f in walked:
         for term in set(tokenize(f.content.decode("utf-8", errors="replace"))):

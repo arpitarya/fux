@@ -5,7 +5,7 @@ from __future__ import annotations
 
 from ..config import find_root, load as load_config
 from ..errors import FuxError
-from .gitdir import walk_sources
+from .gitdir import source_dirs, walk_sources
 from .run import run
 
 
@@ -16,7 +16,7 @@ def cmd_ingest(args) -> int:
 
     if getattr(args, "list_skipped", False):
         config = load_config(root)
-        _, skipped = walk_sources(root, config.source_dirs)
+        _, skipped = walk_sources(root, source_dirs(root, config.dirs_file))
         for s in skipped:
             print(f"{s.rel_path}: {s.reason}")
         return 0

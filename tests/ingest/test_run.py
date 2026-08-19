@@ -4,7 +4,10 @@ from fux import store
 from fux.ingest.run import run
 
 
-def _init(tmp_path, files: dict[str, str], toml: str = '[sources]\ndirs = ["docs"]\n'):
+def _init(tmp_path, files: dict[str, str], toml: str = "[sources]\n", dirs=("docs",)):
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text("".join(f"{d}\n" for d in dirs), encoding="utf-8")
     (tmp_path / "fux.toml").write_text(toml, encoding="utf-8")
     for rel, text in files.items():
         path = tmp_path / rel

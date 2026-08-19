@@ -28,6 +28,7 @@ def find_root(start: Path | None = None) -> Path | None:
 
 DEFAULT_FETCHER = ".fux/fetchers/http.py"
 DEFAULT_URLS_FILE = ".fux/sources/urls"
+DEFAULT_DIRS_FILE = ".fux/sources/dirs"
 
 
 @dataclass
@@ -64,14 +65,23 @@ class UrlSource:
 
 @dataclass
 class Config:
+    """What `fux.toml` says — **policy, not corpus**.
+
+    The two source lists live in committed files under `.fux/sources/`
+    (ADR-DIR-LIST decision 1, ADR-URL-LIST decision 1); this object carries
+    only where they are. Reading them belongs to the plane that walks them,
+    which is why there is no `source_dirs` here any more: config is how the
+    engine behaves, the source lists are what it looks at.
+    """
+
     root: Path
-    source_dirs: list[str]
+    dirs_file: str
     shards: int
     url: UrlSource | None = None
 
 
 def load(root: Path) -> Config:
-    """Parse `fux.toml`: `[sources] dirs`, optional `[sources.url]`, `[index] shards`."""
+    """Parse `fux.toml`: `[sources] dirs_file`, optional `[sources.url]`, `[index] shards`."""
     path = root / CONFIG_NAME
     if not path.is_file():
         raise FuxError(f"no {CONFIG_NAME} at {root} — run from a configured repo")
@@ -81,15 +91,26 @@ def load(root: Path) -> Config:
         raise FuxError(f"{path}: invalid TOML ({exc})") from exc
 
     sources = data.get("sources", {})
-    dirs = sources.get("dirs")
-    if not isinstance(dirs, list) or not dirs or not all(isinstance(d, str) for d in dirs):
-        raise FuxError(f"{path}: [sources] dirs must be a non-empty list of strings")
+    if "dirs" in sources:
+        raise FuxError(
+            f"{path}: [sources] dirs is not a TOML key any more — put one directory per line in "
+            f"{DEFAULT_DIRS_FILE} (or point dirs_file elsewhere). A line may carry "
+            "`archived=true`. See ADR-DIR-LIST"
+        )
+    dirs_file = sources.get("dirs_file", DEFAULT_DIRS_FILE)
+    if not isinstance(dirs_file, str) or not dirs_file.strip():
+        raise FuxError(f"{path}: [sources] dirs_file must be a path to a line-oriented directory list")
 
     shards = data.get("index", {}).get("shards", FIXED_SHARDS)
     if shards != FIXED_SHARDS:
         raise FuxError(f"{path}: [index] shards must be {FIXED_SHARDS} this milestone (got {shards!r})")
 
-    return Config(root=root, source_dirs=dirs, shards=shards, url=_load_url_source(path, sources.get("url")))
+    return Config(
+        root=root,
+        dirs_file=dirs_file.strip(),
+        shards=shards,
+        url=_load_url_source(path, sources.get("url")),
+    )
 
 
 def _load_url_source(path: Path, raw) -> UrlSource | None:

@@ -95,7 +95,8 @@ different committed bytes on different invocations.
 
 - [x] One parser, both files, the comment rule fixed. `ingest/sourcelist.py`,
       2026-08-19 — `urls` built on it; `dirs` follows in the next change.
-- [ ] `dirs` migrated; the old key errors with instructions.
+- [x] `dirs` migrated; the old key errors with instructions (whatever its
+      value). This repo's list is `.fux/sources/dirs`, 2026-08-19.
 - [ ] `fux setup` writes both fetchers write-if-missing from wheel package
       data; `ensure_layout` writes **no** fetcher; `DEFAULT_FETCHER` resolves to
       a file that exists after setup.
