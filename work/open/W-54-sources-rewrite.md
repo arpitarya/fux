@@ -107,7 +107,9 @@ different committed bytes on different invocations.
       ADR-INDEX-LIFECYCLE decision 9 carries the three conditions and the
       asymmetric-cost argument; the migration is `fux ingest --refresh-urls`
       and the build names it.
-- [ ] The managing verb, writing every attribute explicitly.
+- [x] The managing verb, writing every attribute explicitly. `fux url`,
+      2026-08-19 — flags, not a subcommand tree; edits one line so a
+      human's grouping comments survive; **never fetches**.
 - [ ] **Tests, per defect** — not one integration test standing in for five:
       a fragment survives round-trip and two fragment-differing URLs make two
       records · an unknown key errors at `file:lineno` · a duplicate with

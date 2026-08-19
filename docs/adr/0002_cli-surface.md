@@ -28,12 +28,17 @@ timestamp: 2026-08-18T00:00:00Z
 |---|---|---|
 | **lifecycle** | `setup` · `doctor` | set the repo up, then check it |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
+| **sources** | `url` | records what to index; it never fetches |
 | **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
 
 The grouping replaced *"three build the index and three query it"* on
-2026-08-19, when `setup` took the surface past six. **The count was never the
-mental model** — what a verb does to the two planes is, and that survives a
-seventh verb where a count does not.
+2026-08-19, when `setup` and `url` took the surface from six to eight. **The
+count was never the mental model** — what a verb does to the two planes is, and
+that survives a new verb where a count does not.
+
+**Eight flat verbs is still not a tree.** `url` takes flags rather than
+becoming `fux url add`, and that is the constraint the regrouping had to
+preserve: nesting is the thing this record refuses, not arithmetic.
 
 The three query verbs differ only in **how much they commit to**. `find` gives
 you locations and stays out of the way. `ask` gives you a ranked list with
@@ -131,11 +136,19 @@ teeth for this project specifically —
 ### Decision
 
 **1. Flat verbs, grouped by what they touch.** `setup` · `doctor` (lifecycle)
-· `ingest` · `build` (write) · `ask` · `find` · `answer` (read). **No nesting,
+· `ingest` · `build` (write) · `url` (sources) · `ask` · `find` · `answer`
+(read). **No nesting,
 ever** — that is the constraint, and it is what the count was standing in for.
 A new verb takes flags, never a subcommand tree, and lands in one of the groups
 or argues for a new one in this record. M3's `explain` / `graph` / `path` and
 M4's refer verbs are not covered here.
+
+**1a. `url` records a URL in the committed list, and never fetches it.** It
+takes flags — `--cdp`, `--plain`, `--remove` — because "no subcommand tree" is
+the constraint decision 1 is really about. It writes every attribute explicitly
+([ADR-URL-LIST](0018_url-list.md) decision 12) and edits one line, so a human's
+grouping comments survive. **`--refresh-urls` remains the only networked path
+in the engine.**
 
 **1b. `setup` writes the files a consumer owns, write-if-missing** — `fux.toml`,
 both source lists, both fetchers. It is the only verb that may run before a
@@ -297,6 +310,45 @@ $ fux build
 accelerator rebuilt from the committed index: 3 docs, 78 terms, 78 blocks, 82 postings
 # exit 0
 ```
+
+#### `fux url` — record what to index
+
+Writes the committed list. **Never fetches** — the flags decide what is
+*recorded*, so the same list cannot produce different committed bytes on
+different invocations.
+
+```console
+$ fux url https://example.com/handbook/oncall
+added     https://example.com/handbook/oncall fetch=http meta=hashed
+  in .fux/sources/urls - commit it; `fux ingest --refresh-urls` fetches
+# exit 0
+
+$ fux url https://example.com/handbook/oncall --cdp --plain
+updated   https://example.com/handbook/oncall fetch=cdp meta=plain
+      was https://example.com/handbook/oncall fetch=http meta=hashed
+  in .fux/sources/urls - commit it; `fux ingest --refresh-urls` fetches
+# exit 0
+
+$ fux url
+  https://example.com/handbook/oncall fetch=cdp meta=plain
+* https://wiki.corp/runbook fetch=http meta=hashed
+
+* 1 line(s) do not state every attribute, so fux did not write them. They load
+fine (the reader is lenient); `fux url <URL>` rewrites one in full.
+# exit 0
+```
+
+The `*` is [ADR-URL-LIST](0018_url-list.md) decision 13 made visible: the
+reader is lenient so a hand-made or merged list still loads, and a line missing
+an attribute **was not written by fux** — worth reporting, never worth
+refusing.
+
+| flag | effect |
+|---|---|
+| `--cdp` / `--http` | record `fetch=`. Both at once is an error, not a silent pick |
+| `--plain` / `--hashed` | record `meta=`. Same rule |
+| `--remove` | delete this URL's line; every other byte untouched |
+| *(no URL)* | list what the loader sees — sorted, deduped, fully resolved |
 
 #### `fux ask` — ranked results with scores
 

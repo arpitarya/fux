@@ -273,11 +273,13 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, incl. `git check-ignore` |
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/templates/` | ADR-FETCHER | the two shipped fetchers as package data; **bytes, never imported** |
+| `src/fux/sources.py` | ADR-URL-LIST | `fux url` — the writer that makes the list tool-managed |
 | `src/fux/cli.py` | ADR-CLI | the flat verb surface, the boundary error contract, and the `--json` shape |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator |
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |
 | `src/fux/ingest/extract.py` | ADR-EXTRACTED | what extraction *promises* — title, phrases, terms, wlen, taken from the bytes and nothing else |
+| `src/fux/ingest/sourcelist.py` | ADR-URL-LIST | the one grammar both committed source lists are parsed by |
 | `src/fux/ingest/urlsrc.py` | ADR-FETCHER | fux's half of the fetch contract — load, configure, call, normalize |
 | `src/fux/derive/` | ADR-T1-ACCELERATOR | T1 build, block maxima, skipping, dense lane |
 | `src/fux/query/` | ADR-ASK | BM25F, scan, rank, fusion — bound by the differential law |

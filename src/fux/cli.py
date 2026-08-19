@@ -51,6 +51,12 @@ def _cmd_answer(args) -> int:
     return cmd_answer(args)
 
 
+def _cmd_url(args) -> int:
+    from .sources import cmd_url
+
+    return cmd_url(args)
+
+
 def _cmd_build(args) -> int:
     from .ingest import cmd_build
 
@@ -85,6 +91,17 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser(
         "build", help="rebuild the derived accelerator from the committed index"
     ).set_defaults(func=_cmd_build)
+
+    # Flags, not a subcommand tree: `fux url add` would be the first nesting on
+    # the surface, and "no subcommand tree" is the constraint ADR-CLI keeps.
+    p_url = sub.add_parser("url", help="record a URL in the committed list (never fetches)")
+    p_url.add_argument("url", nargs="?", help="the URL to add or update; omit to list")
+    p_url.add_argument("--cdp", action="store_true", help="record fetch=cdp for this URL")
+    p_url.add_argument("--http", action="store_true", help="record fetch=http (the default)")
+    p_url.add_argument("--plain", action="store_true", help="record meta=plain — readable display text in the index")
+    p_url.add_argument("--hashed", action="store_true", help="record meta=hashed (the default)")
+    p_url.add_argument("--remove", action="store_true", help="delete this URL's line")
+    p_url.set_defaults(func=_cmd_url)
 
     def _query_parser(name: str, help_text: str):
         p = sub.add_parser(name, help=help_text)

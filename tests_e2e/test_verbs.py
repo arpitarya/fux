@@ -166,3 +166,18 @@ def test_ingest_puts_no_fetcher_in_a_repo_that_only_wanted_an_index(tmp_path):
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
     assert not (tmp_path / ".fux" / "fetchers").exists()
+
+
+def test_url_records_a_line_and_never_fetches(tmp_path):
+    """`fux url` writes the list; only `--refresh-urls` touches the network."""
+    _write_fixture(tmp_path)
+    added = _run(tmp_path, "url", "https://example.invalid/handbook#oncall", "--cdp")
+    assert "fetch=cdp meta=hashed" in added.stdout
+
+    listed = _run(tmp_path, "url")
+    assert "https://example.invalid/handbook#oncall fetch=cdp meta=hashed" in listed.stdout
+
+    # A plain ingest stays offline and the URL is not indexed until a refresh.
+    _run(tmp_path, "ingest")
+    found = _run(tmp_path, "find", "handbook", "--json")
+    assert "example.invalid" not in found.stdout

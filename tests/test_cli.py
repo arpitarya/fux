@@ -23,7 +23,8 @@ def test_parser_has_the_verb_surface():
 
     lifecycle `setup`/`doctor` set the repo up and check it · write
     `ingest`/`build` — one writes the committed plane, one derives from it ·
-    read `ask`/`find`/`answer` differ only in how much they commit to.
+    sources `url` records what to index · read `ask`/`find`/`answer` differ
+    only in how much they commit to.
     """
     parser = build_parser()
     sub_actions = [a for a in parser._subparsers._group_actions if a.dest == "command"]
@@ -32,6 +33,7 @@ def test_parser_has_the_verb_surface():
         "doctor",
         "ingest",
         "build",
+        "url",
         "ask",
         "find",
         "answer",

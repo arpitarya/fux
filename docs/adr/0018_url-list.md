@@ -13,7 +13,7 @@ timestamp: 2026-08-19T00:00:00Z
 - **Status:** accepted
 - **Date:** 2026-08-19
 - **Feature:** `.fux/sources/urls` — the file format itself, as distinct from what fetches its entries
-- **Owns:** nothing in `src/` — this record decides a committed *file format*, not a component. The loader (`read_urls`) stays with [ADR-URL-INGEST](0008_url-ingest.md), which owns `ingest/urlsrc.py`
+- **Owns:** `src/fux/ingest/sourcelist.py` (the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0023_dir-list.md) decision 2) and `src/fux/sources.py` (`fux url`, the writer). Both added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-URL-INGEST](0008_url-ingest.md) / [ADR-FETCHER](0019_fetcher.md), which own `ingest/urlsrc.py`
 - **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Split from:** [ADR-URL-INGEST](0008_url-ingest.md) decisions 5 and 6, which shipped in 0.31.x and are restated nowhere
 
@@ -202,9 +202,9 @@ below. **Adding one is a change to this record**, not a config addition — whic
 is what makes decision 9's unknown-key error safe to be strict about: the error
 is never wrong, because there is nothing legitimate it can reject.
 
-**12. A fux-written line carries every attribute, explicitly.** When the
-managing command writes a line it emits the complete set — `fetch=… meta=…` —
-even where the value equals the default. **A generated file holds no implicit
+**12. A fux-written line carries every attribute, explicitly.** `fux url`
+emits the complete set — `fetch=… meta=…` — even where the value equals the
+default. **A generated file holds no implicit
 state**: the line says what it means, and changing a policy is a one-word diff
 rather than the appearance or disappearance of a key. This is the property
 [ADR-RECORD](0010_index-record.md) already gives `meta` inside a record ("*a
@@ -292,18 +292,27 @@ which is the point of decision 11.
 
 ### Consequences
 
-- **The file is becoming tool-managed** (Arpit, 2026-08-19 —
-  [W-54](../../work/open/W-54-sources-rewrite.md)): a CLI command will write
-  the URL and its attributes, and the list is *"not to be edited manually"*.
-  That turns it into a **lockfile** — generated, committed, reviewed in a diff —
-  and it changes what three decisions above are *for*, without changing what
-  they say. Decision 3's comments stop being how a human annotates and become
-  what a writer must preserve; decision 4's "a duplicate is a merge artefact"
-  becomes "a writer must not emit one"; and the canonical ordering decision 4
-  gives the loader is better done once by the writer. **This record is amended
-  in the change that builds that command**, not before — the grammar it fixes is
-  unaffected, which is why the amendment can wait for something to amend
-  against.
+- **The file is tool-managed, and the writer edits one line rather than
+  regenerating the file** (built 2026-08-19). That is the amendment this
+  record's earlier consequence promised, and it fell the way it did because the
+  obvious alternative loses something real:
+
+  | decision | what tool-management changes about it | how `fux url` answers |
+  |---|---|---|
+  | 3, comments | they stop being how a human annotates and become what a writer must **preserve** | a grouping comment and a line's own trailing comment both survive an edit; a regenerating writer would eat both |
+  | 4, duplicates | "a merge artefact" becomes "a writer must not emit one" | an add to a URL already listed is an **update in place**, never a second line |
+  | 4, ordering | the loader's canonical sort could be done once by the writer | a new line lands at its sorted position — a courtesy to the reader, since the loader still sorts and correctness does not depend on it |
+
+  **It still is not a lockfile.** A lockfile is generated whole from a
+  manifest; this file *is* the manifest, and `fux url` is a careful editor of
+  it. Which is why a hand-written line stays legal (decision 13) and
+  `fux url` marks it rather than rewriting it.
+
+- **`fux url` never fetches.** `--cdp` and `--plain` decide what is *recorded*;
+  `fux ingest --refresh-urls` stays the only networked path in the engine
+  (L4, [ADR-CLI](0002_cli-surface.md) decision 1). A managing command that
+  validated a URL by requesting it would make the committed list a function of
+  whether the network was up when someone typed the command.
 
 - **Two files now describe one subsystem**, deliberately: this record for the
   format, [ADR-URL-INGEST](0008_url-ingest.md) for the fetch contract. The
