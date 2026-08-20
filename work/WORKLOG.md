@@ -28,6 +28,89 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — closed the queue's agent lane: W-46, W-48, M3 and M4's core  ·  Claude Code
+
+- **Asked:** review everything in OPEN-WORK and build the items to closure.
+
+- **Did:** four commits. Triage first — the inbox was empty and five items were
+  agent-closable, so the session proceeded.
+
+  - **W-46 closed** (`9a8074f`). `get_model()` returns `None` on a source
+    install and `None.embed(...)` raises `AttributeError`, which the guard's
+    narrow tuple did not list — **the fallback written for exactly this case
+    was dead from the day it was written**. Fixed with an explicit `None`
+    check, not a wider `except`, and both halves are asserted.
+  - **W-48 closed** (same commit). `ask --json --explain` now carries `"path"`;
+    `answer --json` carries `"source"` on both branches — which makes
+    ADR-ANSWER's own veto check true for the first time. **Item 3 was examined
+    and deliberately left alone**, and is now pinned by a test so the decision
+    is visible rather than remembered.
+  - **W-45's compare doc written** (`d26e8fe`), from a fresh measurement rather
+    than the item's prior write-up. Options C and D are **eliminated by
+    measurement**: every contaminating file is git-*tracked*, and the
+    dot-prefix convention was followed by 2 of 7 filed runs and dropped by the
+    other 5. Proposed verdict is an exclusion **entry**, not the attribute
+    ADR-DIR-LIST anticipated.
+  - **W-23 / M3 shipped** (`a7b224a`) — `explain`/`graph`/`path`, unseeded
+    label-propagation communities in a derived plane, PPR-lite. **The archived
+    relational eval passes on the new kernel, 11/11.**
+  - **W-24 / M4's core shipped** (`9238d4b`) — source · freshness · ARC ·
+    chunk · rescore · assemble, 73 tests. Its spec was written into the item
+    first (it had none), then the item was closed.
+
+  Suites: **681 passing** across `tests` + `tests_e2e`, up from 547.
+
+- **Decided / open:**
+
+  - **Three things were refused rather than built, each on a fact:**
+    (1) `max_age_seconds` — the record carries **no ingest time**, so the knob
+    could not have been honoured and shipping it would have shipped one that
+    silently does nothing (**W-58**); (2) a *seeded* community algorithm —
+    removing the randomness is the stronger guarantee, asserted by parsing the
+    module's AST; (3) wiring the refer plane into any verb — its gate has not
+    run.
+  - **Two defects were found by measuring rather than reading.** The archived
+    PPR walk, truncated at 3 iterations, **ranks by parity** — seeded at `a` on
+    a path `a-b-c-d` it scores `d` (3 hops) above `c` (2 hops). Fixed with a
+    lazy walk. And greedy score-per-byte is **systematically biased toward
+    short passages**, so the assembler grew a floor.
+  - **The ARC differential caught a live defect while being written** — the
+    cache-hit path leaked cache state into the answer's `note`.
+  - **The biggest finding is not code: `fux-lab` and `fux-playground` are both
+    gone from this machine** (**W-56**). The lab is the one the standing
+    obligation says is never deleted; the playground held 50 graded goldens
+    with **one local commit and no remote**. Between them they are the
+    instrument for **R4, R5, R6 and R7** — every unmeasured prediction left —
+    and M2's own filed reproduce commands point into the lab and no longer run.
+  - **Nothing about M3 or M4 is claimed as measured.** ADR-GRAPH is accepted
+    but names its two unmeasured gaps (**W-57**); **ADR-REFER is `proposed`,
+    not accepted**, because R4 has not run (**W-59**).
+  - **Also filed:** W-55 (the walker has **no file-type filter** — 14 % of this
+    repo's index is `.json`/`.svg`/`.sh`/`.py`), found while measuring W-45. A
+    concurrent session picked it up and wrote its compare doc.
+  - **Two deviations from a written DoD, stated rather than hidden:** W-46's
+    regression test landed beside the other hybrid tests instead of in
+    `tests/query/` (duplicating a corpus fixture costs more than the path
+    documents), and W-23's "two machines" determinism check ran on one.
+  - **Concurrent sessions were live throughout** — three other Claude Code
+    processes. `.fux/` was being rewritten by one of them and was left
+    untouched; every commit used explicit paths rather than `git add -A`; the
+    queue was re-read and re-reconciled before each write.
+  - **Stale fact noticed, not fixed:** `CLAUDE.md` tells every session to get
+    its cost from `cage report`, and **`cage report` was removed in cage v0.50**
+    (`SURFACE-CUT`). Left alone because a concurrent session had `CLAUDE.md`
+    staged; it is a one-line fix for whoever touches that file next.
+
+- **Next:** **Arpit reads the inbox — W-56 first.** It blocks W-57 and W-59 and
+  every remaining prediction, and an agent cannot fix it. Then W-58. On the
+  agent lane, W-45 and W-55 are both decided and land as **one** grammar
+  change; after that, **W-25 (M5) is next and unblocked** — its build is, its
+  R5/R6 gates are not.
+
+- **Cost:** `unmeasured` — this repo has no `.cage/` ledger, so capture does not
+  reach it (`cage insights chats` → "No chats recorded yet"). Wall-clock: one
+  long session; four commits, +134 tests.
+
 ## 2026-08-20 — reconciled OPEN-WORK; nothing was removable  ·  Claude Code
 - **Asked:** review `OPEN-WORK.md` and remove whatever is done.
 - **Did:** re-derived all ten rows against the code rather than reading their

@@ -27,10 +27,50 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated 2026-08-19.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated 2026-08-20.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: W-54, the sources rewrite (2026-08-19)
+### The most recent change: M3 and M4's core landed (2026-08-20)
+
+**Read this first: the engine grew two milestones and neither is measured, and
+the reason is that the measuring environments are gone.**
+
+- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0030_graph-lane.md),
+  accepted). `explain` / `graph` / `path`; communities by **unseeded** label
+  propagation in a **derived** plane (`.fux/runtime/graph.json`); PPR-lite with
+  a **lazy** walk. The archived relational eval passes on the new kernel,
+  11/11, its corpus copied live into `tests_e2e/eval/`.
+- **M4's core shipped** ([ADR-REFER](../docs/adr/0031_refer-plane.md),
+  **⏳ proposed, not accepted**). `source` · `freshness` · `arc` · `chunk` ·
+  `rescore` · `assemble`. **No verb exposes it** — deliberately.
+- **`fux-lab` and `fux-playground` do not exist on this machine**
+  ([W-56](open/W-56-sibling-environments-missing.md)). The lab is the one the
+  standing obligation says is never deleted; the playground held **50 graded
+  goldens with one local commit and no remote**. Between them they are the
+  instrument for **R4, R5, R6 and R7 — every unmeasured prediction left in the
+  plan** — and M2's own filed reproduce commands point into the lab and no
+  longer run. **This is the single most consequential open item.**
+- **Three things were deliberately not built, each on a fact:**
+  - **`max_age_seconds`** — the committed record carries **no ingest time**
+    (`ver` is a revision counter), so the bound could not have been honoured.
+    Freshness is a mode plus **content verification** — comparing shas, which
+    answers the question exactly rather than approximately.
+    [W-58](open/W-58-no-recorded-ingest-time.md).
+  - **A seeded community algorithm** — the randomness was *removed* instead,
+    which is the stronger guarantee, and a test parses the module's AST to keep
+    it that way.
+  - **Wiring the refer plane into `ask`/`answer`** — its gate has not run, and
+    putting an unmeasured plane on the default surface is how an unproven thing
+    becomes load-bearing.
+- **Two defects were found by measuring code rather than reading it.** The
+  archived PPR walk truncated at three iterations **ranks by parity** (`d` at 3
+  hops scored above `c` at 2); and greedy score-per-byte is **systematically
+  biased toward short passages**, so a 50-byte fragment crowds out the 400-byte
+  passage that answers the question. Both are fixed and both have tests that
+  fail without the fix.
+- **Suites: 681 green** (`tests` + `tests_e2e`), up from 547.
+
+### Before that: W-54, the sources rewrite (2026-08-19)
 
 - **The URL path works for the first time.** Five latent defects — shipped,
   real, and with no current victim because this repo does not use URL ingest —
@@ -122,11 +162,25 @@ valuable judgement, but not the state of play.
 
 ## 2 · In flight, and the immediate next step
 
-*Updated 2026-08-19.*
+*Updated 2026-08-20.*
 
-- **Nothing is half-built in `src/`.** W-54 landed complete — five sections,
-  five commits, both suites green, `scripts/adr-guard.sh` exit 0. There is no
-  partially-landed feature to finish.
+- **The immediate next step is Arpit's, not an agent's: read the inbox, and
+  read [W-56](open/W-56-sibling-environments-missing.md) first.** It blocks
+  W-57 and W-59 and every remaining prediction, and no agent can fix a missing
+  directory. W-58 is the second.
+- **On the agent lane: W-45 and W-55 are both decided and land as ONE change**
+  — they modify the same grammar in `.fux/sources/dirs`, and splitting them
+  means touching the parser twice. After that, **W-25 (M5) is next and
+  unblocked** — its *build* is; its R5/R6 gates need the lab.
+- **Nothing is half-built in `src/`, but two things are built-and-unproven.**
+  M3 and M4's core both landed complete and green; what is missing is their
+  *measurements*, carried by [W-57](open/W-57-graph-lane-acceptance.md) and
+  [W-59](open/W-59-refer-plane-measurement.md). **Do not read "landed" as
+  "validated"** — that distinction is the whole reason ADR-REFER says
+  `proposed`.
+- **W-59 carries a standing instruction worth knowing before you run it:** if
+  the budget sweep comes back flat, the greedy assembler **gets deleted**, not
+  kept. It is written and it is unproven, and those are different things.
 - **The ADR rewrite is done.** `work/adr/` no longer exists; `docs/adr/` holds
   the live set, ADR-LAWS at 0001, and every archived record maps to a successor
   by **name** in [`../archive/adr/README.md`](../archive/adr/README.md).
@@ -134,15 +188,12 @@ valuable judgement, but not the state of play.
   were all ratified by Arpit on 2026-08-19 and their outcomes are in
   [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §Ratified decisions.
 - **`v0.33.0` is released and on PyPI** (2026-08-19), verified black-box from
-  the published wheel: `fux setup` → `fux url` → `fux ingest` → `fux ask` in a
-  fresh repo, from the installed package. CI and the publish workflow both
-  green. **`CHANGELOG.md` `[Unreleased]` is empty.**
-- **The immediate next step is M3 (W-23) or M4 (W-24), both unblocked.** M4 first is
-  the standing recommendation — it is where two filed proposals graduate, and
-  its API shape is the expensive thing to retrofit later. **M4 has no live
-  spec**: the `v0.33.0` handoff pair was archived unexecuted, so whoever starts
-  W-24 writes a fresh spec into its detail file first, **by Opus**, because two
-  proposals graduate into the API shape.
+  the published wheel. **`CHANGELOG.md` `[Unreleased]` is no longer empty** —
+  it holds W-46, W-48, M3 and M4's core, none of which is released.
+- **M3 and M4 are done as of 2026-08-20** — the paragraph that used to sit here
+  said they were the next step. Both proposals that were to graduate into M4
+  have graduated and are archived; one of them shipped **with its central knob
+  refused**, and the refusal is the interesting part (W-58).
 - **Two items are PARKED behind one missing instrument** —
   [W-44](open/W-44-archived-content-signalling.md) and
   [W-52](open/W-52-df-over-the-union.md) both wait on a pre-registered query
@@ -198,6 +249,49 @@ which are not laws:
 
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
+
+- **Port the code, but measure it before you trust it** (2026-08-20). M3's PPR
+  came off the archived kernel with its determinism discipline intact, and the
+  discipline was right. The *algorithm* was not: moving all of a node's mass
+  each step and stopping after a fixed three iterations makes a bipartite-ish
+  graph **rank by parity** — seeded at `a` on the path `a-b-c-d` it scored `d`
+  (3 hops) at 0.154 above `c` (2 hops) at 0.054. It had shipped that way. The
+  artefact is purely from truncation, and the truncation is what makes the
+  result deterministic, so the fix was a lazy walk rather than more iterations.
+  **A port that passes its old tests can still be wrong; the old tests were
+  written by someone who did not know either.**
+
+- **A knob that cannot work is worse than a missing knob** (2026-08-20). M4's
+  freshness policy was specified as `max_age_seconds`, with age read from "the
+  ledger's recorded provenance". **There is no recorded time in a record** —
+  `ver` is a revision counter, and `stamp.json`'s mtimes are excluded from
+  byte-identity precisely because they are not reproducible. Building it anyway
+  would have shipped a parameter that silently did nothing while a caller
+  believed they had bounded their staleness. **Check that the input your design
+  assumes actually exists before you implement the thing that consumes it** —
+  and when it does not, say so in the record rather than approximating.
+
+- **Removing randomness beats seeding it** (2026-08-20). Label propagation is
+  random twice over and the reflex is `random.seed(0)`. A fixed seed makes one
+  implementation reproducible; it does not survive a Python version that
+  reorders a set, and it hides that the output depends on a number nobody
+  chose. Sorting the visit order and breaking ties on the smallest label costs
+  the same and needs no seed — and the test asserts the **absence of the
+  import**, by parsing the AST, so the claim is checked rather than trusted.
+
+- **A differential test earns its keep while you are writing it** (2026-08-20).
+  The ARC cache's cached-vs-uncached assertion failed on its first run — not on
+  the citations, but on a `"note": "cache hit"` string that leaked cache state
+  into the answer. Nobody would have filed that as a bug and every caller
+  diffing two runs would have hit it. **Write the byte-identity test before you
+  believe the optimisation is neutral.**
+
+- **A convention that is invisible decays, and you can measure the decay**
+  (2026-08-20). W-45 argued that dot-prefixing `.evidence/` was "a convention
+  riding on an implementation detail". It was possible to do better than argue:
+  **2 of 7 filed runs use it and 5 do not**, and the 5 include every run filed
+  after the item was opened. **When a doc says a convention is fragile, count
+  how often it was actually followed** — the count is the argument.
 
 - **A law enforced over the wrong corpus is not enforced** (2026-08-19). The
   differential harness had asserted scan-vs-accelerator equality for a whole
