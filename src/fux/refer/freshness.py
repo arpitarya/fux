@@ -59,7 +59,9 @@ from dataclasses import dataclass
 
 from ..errors import FuxError
 
-__all__ = ["Policy", "Decision", "Verdict", "NEVER", "ALWAYS", "MODES", "decide", "verify"]
+__all__ = [
+    "Policy", "Decision", "Verdict", "NEVER", "ALWAYS", "MODES", "decide", "verify", "cached",
+]
 
 #: Do not fetch. The index at this commit is the answer.
 NEVER = "never"
@@ -76,6 +78,14 @@ class Policy:
 
     mode: str = NEVER
     timeout_seconds: int = 5
+    #: Serve a previously fetched copy for this many seconds before going out
+    #: again. **0 disables the cache**, and that is the default: a caller who
+    #: never opted in can never be served a cached byte (W-60, verdict F).
+    cache_ttl_seconds: int = 0
+    #: Never cache this source's bytes at all, whatever the TTL says. The
+    #: escape hatch for access-controlled and regulated documents, where a
+    #: local copy outliving the reader's permission is the risk L5 exists for.
+    no_cache: bool = False
 
     def __post_init__(self) -> None:
         if self.mode not in MODES:
@@ -88,10 +98,19 @@ class Policy:
             raise FuxError(f"timeout_seconds must be an integer, got {self.timeout_seconds!r}")
         if self.timeout_seconds <= 0:
             raise FuxError(f"timeout_seconds must be positive, got {self.timeout_seconds}")
+        if not isinstance(self.cache_ttl_seconds, int) or isinstance(self.cache_ttl_seconds, bool):
+            raise FuxError(f"cache_ttl_seconds must be an integer, got {self.cache_ttl_seconds!r}")
+        if self.cache_ttl_seconds < 0:
+            raise FuxError("cache_ttl_seconds must be >= 0 (0 disables the cache)")
 
     @property
     def forbids_fetch(self) -> bool:
         return self.mode == NEVER
+
+    @property
+    def caches(self) -> bool:
+        """True when a cached copy may be served. `no_cache` always wins."""
+        return self.cache_ttl_seconds > 0 and not self.no_cache
 
     def as_record(self) -> dict:
         """The policy as it is stamped into the answer bundle.
@@ -100,7 +119,12 @@ class Policy:
         exists to close, so the policy travels **with** the answer rather than
         being remembered by whoever ran the query.
         """
-        return {"mode": self.mode, "timeout_seconds": self.timeout_seconds}
+        return {
+            "mode": self.mode,
+            "timeout_seconds": self.timeout_seconds,
+            "cache_ttl_seconds": self.cache_ttl_seconds,
+            "no_cache": self.no_cache,
+        }
 
 
 @dataclass(frozen=True)
@@ -134,12 +158,41 @@ class Verdict:
     indexed_sha: str
     fetched_sha: str | None
     note: str
+    #: Set only on a TTL cache hit. Its presence is what makes `label` say
+    #: `cached` — see the class docstring.
+    age_seconds: int | None = None
 
     @property
     def label(self) -> str:
+        """`current` · `stale` · `unverified` · `cached`.
+
+        **`cached` is never folded into `current`.** A TTL hit says *we looked
+        recently*, which is a different claim from *we just looked*, and
+        collapsing the two is decision 4's "knob that lies" reappearing in a
+        new place. A caller that wants to treat them alike may; the engine
+        will not do it on their behalf.
+        """
+        if self.age_seconds is not None:
+            return "cached"
         if self.current is None:
             return "unverified"
         return "current" if self.current else "stale"
+
+
+def cached(indexed_sha: str, fetched_sha: str, age_seconds: int, ttl: int) -> Verdict:
+    """A TTL cache hit. `current` still records whether the shas agreed.
+
+    Both facts are kept: whether the cached bytes match the index, *and* that
+    they were not fetched just now. Dropping either would make the verdict a
+    smaller claim than the truth.
+    """
+    return Verdict(
+        current=fetched_sha == indexed_sha,
+        indexed_sha=indexed_sha,
+        fetched_sha=fetched_sha,
+        note=f"served from the local fetch cache, {age_seconds}s old (ttl {ttl}s)",
+        age_seconds=age_seconds,
+    )
 
 
 def verify(indexed_sha: str, fetched_sha: str | None, note: str = "") -> Verdict:

@@ -106,6 +106,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="fetch [sources.url] urls through the consumer fetcher (the ONLY networked ingest path; off by default)",
     )
     p_ingest.add_argument(
+        "--full",
+        action="store_true",
+        help="re-extract every document instead of carrying unchanged ones forward (same bytes, slower; the complete term-collision check)",
+    )
+    p_ingest.add_argument(
         "--no-accelerator",
         action="store_true",
         help="skip building the derived accelerator (results are unaffected either way)",

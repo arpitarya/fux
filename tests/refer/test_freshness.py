@@ -46,6 +46,8 @@ def test_the_policy_travels_with_the_answer():
     assert Policy(mode=ALWAYS, timeout_seconds=9).as_record() == {
         "mode": "always",
         "timeout_seconds": 9,
+        "cache_ttl_seconds": 0,
+        "no_cache": False,
     }
 
 

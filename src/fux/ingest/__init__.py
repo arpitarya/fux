@@ -26,9 +26,14 @@ def cmd_ingest(args) -> int:
             print(f"{s.rel_path}: {s.reason}")
         return 0
 
-    report = run(root, refresh_urls=getattr(args, "refresh_urls", False))
+    report = run(
+        root,
+        refresh_urls=getattr(args, "refresh_urls", False),
+        full=getattr(args, "full", False),
+    )
     print(
-        f"ingested {report.doc_count} docs ({report.changed_count} changed), "
+        f"ingested {report.doc_count} docs ({report.changed_count} changed, "
+        f"{report.reused_count} carried forward), "
         f"{len(report.skipped)} skipped, {len(report.written_shards)} shards written"
     )
     for s in report.skipped:

@@ -22,6 +22,7 @@ Six modules, one each:
 |---|---|
 | `source` | where do this document's bytes come from? |
 | `freshness` | may I fetch at all, and was the index still right? |
+| `fetchcache` | do I need to go out at all, or did I look recently? |
 | `arc` | have I already got these bytes? |
 | `chunk` | which spans of this document are citable? |
 | `rescore` | which of those spans answer *this* query? |
@@ -57,10 +58,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import arc as arc_mod
+from . import fetchcache as fetchcache_mod
 from . import freshness as freshness_mod
 from .assemble import DEFAULT_BUDGET, Assembled, assemble
 from .chunk import chunk
-from .freshness import Policy, Verdict, verify
+from .freshness import Policy, Verdict, cached as cached_verdict, verify
 from .rescore import ScoredPassage, rescore
 from .source import FetchError, Fetched, fetch_document
 
@@ -137,6 +139,7 @@ def refer(
     k: int | None = None,
     cache: arc_mod.ARC | None = None,
     fetcher=None,
+    fetch_cache: fetchcache_mod.FetchCache | None = None,
 ) -> Bundle:
     """Fetch, verify, re-score and assemble. `candidates` is `(id, loc, sha)`.
 
@@ -150,8 +153,13 @@ def refer(
     documents: list[Cited] = []
     fetched: list[tuple[str, str, str, list]] = []
 
+    if fetch_cache is None and policy.caches:
+        fetch_cache = fetchcache_mod.FetchCache(root)
+
     for doc_id, loc, indexed_sha in candidates:
-        result, cited = _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher)
+        result, cited = _obtain(
+            root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache
+        )
         documents.append(cited)
         if result is None:
             continue
@@ -163,7 +171,7 @@ def refer(
     return Bundle(assembled=assembled, documents=documents, policy=policy.as_record())
 
 
-def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher):
+def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache):
     """Get one document's bytes, and record honestly what happened.
 
     **The `never` branch still reads a `file:` document.** Reading the local
@@ -176,6 +184,22 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher):
     strategy = resolve(doc_id)
     if strategy != GIT and not decision.fetch:
         return None, Cited(doc_id, loc, verify(indexed_sha, None, decision.reason), strategy)
+
+    # The TTL cache, before the network and **only for external sources**. A
+    # `file:` read is free and always available, so caching it would add a
+    # staleness window in exchange for nothing.
+    if strategy != GIT and policy.caches and fetch_cache is not None:
+        entry = fetch_cache.get(loc, policy.cache_ttl_seconds)
+        if entry is not None:
+            age = entry.age_seconds(fetch_cache.now())
+            return (
+                Fetched(doc_id, loc, entry.content, entry.fetched_sha, strategy),
+                Cited(
+                    doc_id, loc,
+                    cached_verdict(indexed_sha, entry.fetched_sha, age, policy.cache_ttl_seconds),
+                    strategy,
+                ),
+            )
 
     key = (loc, indexed_sha)
     if cache is not None:
@@ -204,4 +228,6 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher):
 
     if cache is not None:
         cache.put((loc, result.sha), result.content)
+    if strategy != GIT and policy.caches and fetch_cache is not None:
+        fetch_cache.put(loc, result.sha, result.content)
     return result, Cited(doc_id, loc, verify(indexed_sha, result.sha), strategy)

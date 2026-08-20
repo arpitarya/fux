@@ -10,6 +10,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **A TTL-bounded local fetch cache for the refer plane** (W-60,
+  [ADR-REFER](docs/adr/0031_refer-plane.md) 5a-5c). `cache_ttl_seconds`
+  (**default 0 — off**) and `no_cache` on the freshness policy; entries live in
+  the gitignored `.fux/runtime/fetch-cache/`. Motivated by rate limits rather
+  than latency: an agent asking ten questions about one runbook must not fetch
+  it ten times, because at enterprise scale that is throttling, not slowness.
+- **A fourth freshness verdict, `cached`**, carrying `age_seconds`. It is
+  **never folded into `current`** — "we looked recently" is a different claim
+  from "we just looked", and it still records whether the cached bytes matched
+  the index.
+
 - **`fux hooks` — the maintenance plane** (M5,
   [ADR-MAINTENANCE](docs/adr/0033_maintenance.md), **proposed, not accepted**).
   Installs `post-commit` / `post-merge` / `post-checkout` and registers a merge

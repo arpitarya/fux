@@ -147,10 +147,50 @@ compares the fetched bytes' sha against the recorded sha. This answers *"is the
 index still right"* exactly, where an age only ever answered *"is it probably
 still right"* — and it reads no clock, so it costs L3 nothing.
 
-**6. The verdict is three-state: `current` / `stale` / `unverified`.**
-`unverified` is not `stale` and is emphatically not `current`. The three states
-exist so nothing downstream can collapse *"we did not look"* into *"we looked
-and it was fine"*.
+**5a. A TTL-bounded local fetch cache** (added 2026-08-20, W-60, Arpit's
+verdict **F**). External fetches may be served from
+`.fux/runtime/fetch-cache/` for `cache_ttl_seconds`, default **0 — off**, and
+opt-in per caller. `no_cache` refuses caching outright whatever the TTL says:
+the escape hatch for access-controlled and regulated sources, where a local
+copy outliving the reader's permission is exactly the risk L5 exists for.
+
+> **This is not a latency optimisation and it did not wait for R4.** Confluence
+> Cloud's REST API is rate-limited against a shared hourly point budget, and
+> Atlassian's own guidance is to cache stable responses. An agent asking ten
+> questions about one runbook must not fetch it ten times: at enterprise scale
+> that is not slow, it is **throttled** — and a throttled fetch degrades to
+> `unverified` for reasons that have nothing to do with the document.
+
+**5b. The TTL store is NOT ARC's store, and the separation is load-bearing.**
+ARC is keyed `(loc, sha)`, so a hit is byte-identical to what a fetch would
+have returned **or it is not a hit** — that is the entire proof behind decision
+9. A TTL entry is served *before* the sha is confirmed; that is what a TTL is.
+Putting it in ARC's keyspace would serve bytes under a key that no longer
+proves anything, and the proof would be gone with no test to notice.
+
+**5c. Wall clock lives in the TTL cache and nowhere else.** It gets the same
+treatment `runtime/stamp.json` already has: derived, per-machine,
+non-reproducible, gitignored, and it never reaches a committed record.
+**Decision 4 is untouched** — the record still carries no ingest time, and
+[W-58](../../work/open/W-58-no-recorded-ingest-time.md) with
+[`record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)
+remains a separate open question. A reader should not conflate the two: one is
+a local note about *when we last looked*, the other would be a committed claim
+about *when a document was ingested*.
+
+**6. The verdict is four-state: `current` / `stale` / `unverified` /
+`cached`.**
+`unverified` is not `stale` and is emphatically not `current`. The states exist
+so nothing downstream can collapse *"we did not look"* into *"we looked and it
+was fine"*.
+
+**`cached` was added by W-60 and is never folded into `current`.** It is a
+distinct epistemic position — *we looked recently* — and it carries its
+`age_seconds` so a caller can decide for itself. It also still records whether
+the cached bytes matched the index, because dropping that would make the
+verdict a smaller claim than the truth. Collapsing `cached` into `current`
+anywhere downstream would be decision 4's "knob that lies" reappearing in a new
+location, and it is refused for the same reason.
 
 **7. `never` still reads a `file:` document.** Reading the local checkout is
 not a fetch — no network, no cost, no policy question — and forbidding it would
@@ -220,6 +260,13 @@ the caller's window. `dropped` is reported so truncation is never silent.
   it ever exists); and the budget sweep reporting answer-quality-per-byte,
   which needs a graded corpus and therefore `fux-playground`, also W-56. Filed
   as **W-59**.
+- **`Policy` grew two fields and the bundle's `policy` object grew two keys**
+  (`cache_ttl_seconds`, `no_cache`). Additive, and both travel in the bundle
+  under decision 8 — a replay that silently used a different cache policy would
+  be as invisible as one that used a different freshness mode.
+- **A `git:` document is never TTL-cached.** A local read is free and always
+  available, so caching it would buy a staleness window in exchange for
+  nothing.
 - **No verb exposes this yet.** `ask`/`answer` are unchanged, deliberately:
   wiring a plane whose gate has not run into the default surface is how an
   unmeasured thing becomes load-bearing. The CLI surface is a separate change
@@ -247,6 +294,12 @@ the caller's window. `dropped` is reported so truncation is never silent.
   misquote with a sha attached. Citations are whole passages or absent.
 - **Wiring the plane into `ask` in this change.** Rejected: see the last
   consequence.
+- **Putting the TTL cache inside ARC.** Rejected: decision 5b. It would cost
+  ARC's correctness proof and nothing would notice.
+- **A committed `fetched_at` on the record.** Rejected: it is exactly what
+  decision 4 refused, and W-58 is where that question lives. A local, derived,
+  gitignored timestamp answers "should I go out again" without making any
+  committed claim.
 
 ### Reference (required)
 
@@ -281,6 +334,17 @@ the caller's window. `dropped` is reported so truncation is never silent.
    the proposal originally said so.
 4. **`src/fux/` imports a network library anywhere.** That is decision 1 broken,
    and it is checkable in one command.
+5. **A cached copy is served for a document the reader has since lost access
+   to.** The TTL cache holds external bytes on local disk, so a permission
+   revoked at the source is not observed until the entry expires — a window of
+   at most `cache_ttl_seconds`, and unbounded for as long as an entry is
+   re-served. `no_cache` exists for sources where that window is unacceptable,
+   **but nothing currently detects the case**: it is a policy the operator sets
+   in advance, not something the engine notices. If a regulated deployment
+   needs it noticed, the TTL cache needs a revalidation path and this decision
+   reopens.
+6. **Anything downstream renders a `cached` verdict as `current`.** That is the
+   one collapse decisions 5a-6 exist to prevent.
 
 **How to check them:**
 
@@ -293,4 +357,10 @@ uv run python -c "import json,pathlib; print(sorted(json.loads([l for l in pathl
 
 # 4 — the fence
 uv run pytest -q tests/refer/test_refer_plane.py tests/refer/test_source.py
+
+# 5 — which sources opted out of caching
+grep -rn 'no_cache' .fux/ fux.toml 2>/dev/null
+
+# 6 — the four verdict labels, and that `cached` stays its own
+uv run pytest -q tests/refer/test_fetchcache.py
 ```

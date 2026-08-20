@@ -145,6 +145,8 @@ they are worth keeping.
 
 | [`W-25-m5-maintenance.md`](open/W-25-m5-maintenance.md) | 2026-08-20 | **Completed — the build; both gates unrun.** Live successors: [`src/fux/maintain/`](../src/fux/maintain/) and `assert_meta_policy` in [`store/writer.py`](../src/fux/store/writer.py); the decision is [ADR-MAINTENANCE](../docs/adr/0033_maintenance.md), **`proposed` not accepted** because R5 and R6 have not run. Its DoD's measurement half is [W-61](../work/open/W-61-maintenance-measurement.md). The mechanism was Arpit's call in [`maintenance-trigger.compare.md`](../work/compare/maintenance-trigger.compare.md); what the record decided is everything that verdict left open, including the `post-commit`-not-`pre-commit` argument |
 
+| [`W-60-refer-fetch-cache.md`](open/W-60-refer-fetch-cache.md) | 2026-08-20 | **Completed — verdict F built.** Live successors: [`refer/fetchcache.py`](../src/fux/refer/fetchcache.py) and the `cached` verdict in [`refer/freshness.py`](../src/fux/refer/freshness.py); the decision is [ADR-REFER](../docs/adr/0031_refer-plane.md) 5a-5c and 6, amended in the same change per Law zero. Both hazards it named are honoured and tested: `cached` never renders as `current`, and the TTL store is provably separate from ARC's keyspace |
+
 Every outcome is recorded in
 [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
 the human calls, §Defects closed outside a milestone for the rest, and the

@@ -65,7 +65,12 @@ def test_a_git_source_keeps_full_function_with_the_never_policy(repo):
 
 def test_the_policy_is_recorded_in_the_bundle(repo):
     bundle = refer(repo, "telemetry", _candidates(), policy=Policy(mode=ALWAYS, timeout_seconds=3))
-    assert bundle.as_record()["policy"] == {"mode": "always", "timeout_seconds": 3}
+    assert bundle.as_record()["policy"] == {
+        "mode": "always",
+        "timeout_seconds": 3,
+        "cache_ttl_seconds": 0,
+        "no_cache": False,
+    }
 
 
 # -- freshness, by content ------------------------------------------------
