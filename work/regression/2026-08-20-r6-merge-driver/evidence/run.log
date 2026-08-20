@@ -1,0 +1,15 @@
+R5 — a 20-doc commit, re-indexed by the post-commit hook
+  R5    1000 docs · edit: median 0.6474s  max 0.6508s  PASS
+  R5    1000 docs · add : median 0.6859s  max 0.6997s  PASS  (unjudged)
+  R5   10000 docs · edit: median 3.2984s  max 3.5231s  FAIL
+  R5   10000 docs · add : median 3.4444s  max 3.4767s  FAIL  (unjudged)
+  R5  100000 docs · edit: median 43.1668s  max 44.3795s  FAIL
+  R5  100000 docs · add : median 44.3392s  max 46.4901s  FAIL  (unjudged)
+  R5 verdict: FAIL
+R6 — the three-tier merge harness, with a control arm
+  R6 tier 1 · machine, disjoint adds: treatment conflicted=False · control conflicted=False · UNINFORMATIVE · FAIL
+  R6 tier 1b · machine, disjoint adds, one shard: treatment conflicted=False · control conflicted=True · informative · PASS
+  R6 tier 2 · machine, one shard, two lines: treatment conflicted=False · control conflicted=True · informative · PASS
+  R6 tier 3 · the same document, both sides: treatment conflicted=True · control conflicted=True · n/a · PASS
+  R6 verdict: AMBIGUOUS — every tier matches; some but not all are informative
+wrote /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/3edca543-f732-4dcb-b025-b1ff2cce36b4/scratchpad/r5r6-final/report.json

@@ -27,6 +27,7 @@ debate without archaeology. v0.26-era compare docs are archived at
 
 | doc | fork | verdict | status |
 |-----|------|---------|--------|
+| [hook-at-scale](hook-at-scale.compare.md) | what `post-commit` does when the corpus is large — ceiling vs defer vs pre-push vs incremental | proposed **B — the hook defers**: commit cost becomes git's cost (0.34 s at 100k, constant), and it is the only option that reaches the 1 s bound at every size | ⏳ awaiting Arpit (2026-08-20) |
 | [index-format](index-format.compare.md) | tiered JSONL vs MST+BIC wire vs pure scan vs SQLite | **tiered JSONL (T0/T1/T2), git as the Merkle tree** — benches B1–B6 | ✅ accepted (2026-08-09) |
 | [storage-architecture](storage-architecture.compare.md) | index-and-refer vs snapshot substrate vs full-copy | **index-and-refer** (size amended by P1-RERUN: full postings) | ✅ accepted (council 2026-08-09) |
 | [wire-format](wire-format.compare.md) | one format vs wire/runtime split; codec choice | split; BIC wire — **superseded for the committed plane by index-format; survives inside tier T2** | ⚠ superseded |

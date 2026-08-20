@@ -30,7 +30,37 @@ valuable judgement, but not the state of play.
 *Updated 2026-08-20.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: delta ingest, and a veto that fired (2026-08-20)
+### The most recent change: three gates ran, and two did not pass (2026-08-20)
+
+**Arpit lifted the hold on prediction runs, and R4, R5 and R6 all ran the same
+day** against thresholds frozen and committed first.
+
+| | verdict | the number |
+|---|---|---|
+| **R4** | **PASS** | cold k=10 p95 **1.113 s** / 3 s · warm **0.016 s** / 300 ms |
+| **R5** | **FAIL** | **44.4 s** at 100 000 docs / **1 s** · **0.651 s at 1 000, where it passes** |
+| **R6** | **INCONCLUSIVE** | every tier matched; tier 1 matched *without the driver too* |
+
+**Read R5 as the useful kind of negative.** A 20-document commit costs whatever
+touching the whole corpus costs, and the attribution says why: git is
+~constant, and two O(corpus) passes are the entire 44 s. **A 10× speedup still
+misses the bound by 4.5×** — which rules out "just optimise it" arithmetically
+rather than by opinion. Only removing the work from the commit path reaches 1 s,
+and that is an architectural call, so it is a compare doc awaiting Arpit
+([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md), proposed
+**B — the hook defers**).
+
+**Read R6 as an instrument finding.** The engine did everything R6 says it
+does. What failed is one third of the harness: tier 1 merges cleanly with the
+driver removed, so it could never have failed. **The control arm — added while
+writing the pre-registration — caught that on its first execution**, and
+without it tier 1 would have been recorded as a pass that proved nothing.
+
+⚠ **Both records stay `proposed`.** ADR-MAINTENANCE now for the *opposite*
+reason to before: not unmeasured, but measured and failing. ADR-REFER because
+one gate passing is not W-59's whole DoD.
+
+### Before that: delta ingest, and a veto that fired (2026-08-20)
 
 **`fux ingest` no longer re-extracts what did not change.** ADR-INGEST
 decision **1b**: an unchanged content `sha` keeps its `title`, `phrases`,
@@ -218,8 +248,17 @@ the reason is that the measuring environments are gone.**
 
 *Updated 2026-08-20.*
 
-- **The agent lane is empty. Every remaining item needs Arpit**, in one of
-  three ways:
+- **W-26 (M6) is the agent lane, and it is startable.** Its DoD wants every R
+  prediction to carry *a measured value or an honest failure record*, and all
+  three now do. R7 is M6's own measurement, not a precondition for it. **What it
+  inherits: 47.6 % of R5's failing 44 s is `fux build`** — the derived plane M6
+  is about to add a third tier to. Measure a tier's rebuild cost before choosing
+  its default.
+- **Two calls sit with Arpit**, both opened by R5: the fork
+  ([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md)) and R6's
+  arithmetic, where the pre-registration's own §3.1 and §3.2 disagree about the
+  result it produced.
+- **Everything else needs Arpit**, in one of three ways:
   1. **Lift the hold** on prediction runs — then W-59 (R4) and W-61 (R5, R6)
      run immediately and two records can stop being `proposed`.
   2. **Give W-58 a verdict** — the compare doc proposes *D, no age bound*.
@@ -313,6 +352,18 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **A control arm is not optional in a harness whose job is to prove a feature
+  works** (2026-08-20). R6's tier 1 passed and was worthless: it merges cleanly
+  with the merge driver *uninstalled*, because two documents added on two
+  branches land in different shard files and git has always handled that. The
+  control arm was written into the pre-registration on principle and earned its
+  place on the first run. **Before believing a green tier, ask what it would
+  look like if the feature were absent.**
+- **Attribute a failing number before anyone proposes a fix** (2026-08-20).
+  "The hook takes 44 s" invites optimisation; the split — git ~constant, two
+  O(corpus) passes at ~50/50 — proves optimisation cannot reach the bound, and
+  turns a vague slowness into a specific architectural choice. Same lesson M1
+  paid for once already.
 - **Two sessions on one repository will collide, and the collision is silent**
   (2026-08-20). A concurrent session shipped W-25 as `621c83c` while this one
   was mid-edit on the same milestone, sweeping three of its files into that

@@ -1,0 +1,33 @@
+{
+  "parts": [
+    {
+      "corpus_docs": 1000,
+      "repeats": 3,
+      "git_median_s": 0.1831,
+      "ingest_median_s": 0.2306,
+      "derive_median_s": 0.2703,
+      "spawn_median_s": 0.0266,
+      "sum_median_s": 0.7106
+    },
+    {
+      "corpus_docs": 10000,
+      "repeats": 3,
+      "git_median_s": 0.1896,
+      "ingest_median_s": 1.3183,
+      "derive_median_s": 1.7849,
+      "spawn_median_s": 0.0264,
+      "sum_median_s": 3.3192
+    },
+    {
+      "corpus_docs": 100000,
+      "repeats": 3,
+      "git_median_s": 0.3401,
+      "ingest_median_s": 21.3245,
+      "derive_median_s": 19.7256,
+      "spawn_median_s": 0.0384,
+      "sum_median_s": 41.4286
+    }
+  ],
+  "commit_docs": 20,
+  "fux": "/Users/arpitarya/my_programs/fux/.venv/bin/fux"
+}

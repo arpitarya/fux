@@ -28,6 +28,80 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — the prediction series reopened: R4 passes, R5 fails, R6 cannot say  ·  Claude Code
+
+- **Asked:** implement the predictions measurement so the rest can proceed;
+  then, mid-session, clear closed items out of OPEN-WORK and report where R5
+  stood.
+- **Read as:** Arpit lifting the hold on prediction runs (W-61 DoD box 1). Said
+  so before starting rather than after.
+- **Did — pre-registrations first, committed before any number existed**
+  (`d98874d`): `tools/refer-bench/PRE-REGISTRATION.md` (R4) and
+  `tools/maintenance-bench/PRE-REGISTRATION.md` (R5, R6). The second opens with
+  a disclosure, because the harness had already been run once before the hold
+  was visible on disk; those numbers were never filed and describe a build that
+  no longer exists. R5's judged corpus size is fixed there by an argument that
+  never mentions the data.
+- **R4 — PASS.** Cold k=10 p95 **1.113 s** / 3 s, warm **0.016 s** / 300 ms,
+  through the *shipped* consumer fetcher against a real loopback server. The
+  verdict carries its own boundary: the plane fetches **serially**, so cold cost
+  is `k ×` the source's latency; the 500 ms arm breaches at 5.069 s, and paper
+  §8's "(k=10, parallel)" is not built. Two harness defects are recorded rather
+  than quietly fixed — a fetcher passed as a module (every fetch degraded to
+  `unverified`; **1.9 ms and a triumphant-looking pass**) and markdown served as
+  `text/plain` to an HTML→markdown fetcher (whitespace collapsed, zero
+  citations). Both are now guarded by fields in every report.
+- **R5 — FAIL.** **44.4 s** at the judged 100 000 documents against a **1 s**
+  bound; **0.651 s at 1 000**, where it passes. Attributed rather than left as
+  *it is slow*: git is ~constant (0.34 s at 100k) and two O(corpus) passes are
+  the whole cost, 51.5 % ingest / 47.6 % derive. **A 10× speedup still misses by
+  4.5×** — only taking the work off the commit path reaches the bound.
+- **R6 — INCONCLUSIVE, and the engine is not the reason.** Every tier matched;
+  tiers 2 and 3 are informative against a **control arm** run with the driver
+  unregistered. Tier 1 merged cleanly *without* the driver, so it proves
+  nothing, and the frozen table does not cover "all match, some informative".
+  The control arm was added while writing the pre-registration and justified
+  itself on its first execution.
+- **Decided / open:** **two calls now sit with Arpit** — the fork R5 opened
+  (`work/compare/hook-at-scale.compare.md`, proposed **B, the hook defers**),
+  and whether R6 reads as PASS under its own §3.1 or not-yet under §3.2, which
+  disagree about this exact result. **ADR-MAINTENANCE stays `proposed`**, now
+  for the opposite reason to before: not unmeasured, but measured and failing.
+  ADR-REFER also stays `proposed` — one gate is not W-59's DoD.
+- **Also:** OPEN-WORK reconciled — it already had 7 rows / 7 detail files, but
+  carried three closed items' fingerprints (R5/R6 "measured at W-25"; "fux-lab
+  is gone (W-56)"; M3/M4 "behind W-56"). All corrected. W-26 is now the only
+  agent-closable item on the queue.
+- **Not done, deliberately:** the hook was not tuned to pass — `src/` last
+  changed in `3a9aabc`, before the pre-registrations — and tier 1 was not
+  re-specified in the same change that files its verdict.
+- **Next:** Arpit rules on `hook-at-scale.compare.md` and on R6's arithmetic.
+  W-26 (M6) is startable meanwhile.
+- **Cost:** **unmeasured, and now known to be unmeasurable retroactively** —
+  `cage.toml` has no `[sources]`, so the ledger captured nothing this session
+  and `cage import` pulls 0 calls. Roughly three hours wall-clock, most of it in
+  100 000-document corpus builds.
+
+## 2026-08-20 — queue review: one startable item, and a status that said the opposite of the repo  ·  Claude Code
+
+- **Asked:** which OPEN-WORK items are unblocked and workable.
+- **Did:** re-derived every row against `git log`, the detail files and the
+  repo (rule 4). **W-61 is the only agent-startable item** — and its markers
+  were stale: the row read `held — Arpit's word required` and the detail file's
+  `Blocked by:` line named the hold, but Arpit lifted it on 2026-08-20 and
+  `d98874d` committed the R5/R6 pre-registration the DoD asked for. Corrected
+  both, ticked the two DoD boxes that are actually met, and fixed the
+  predictions table, which claimed R5/R6 were *running* when they are
+  pre-registered and **unrun**. DOC-REGISTRY rows bumped. No code changed —
+  **no ADR affected**.
+- **Decided / open:** W-26 stays gated behind R5/R6 filing. W-59's remainder
+  (budget sweep) and W-57 are `arpit` — the goldens are human work. W-44/W-52/
+  W-38 remain parked on triggers that have not fired. The inbox is empty, so
+  nothing is aging against the 5-day rule.
+- **Next:** run W-61 — R5 per corpus size and R6's three tiers with their
+  control arms, against the frozen pre-registration, filed as a conformance run.
+- **Cost:** unmeasured — short review session, no token tracking enabled.
+
 ## 2026-08-20 — W-58 closed: option D, no age bound  ·  Cowork
 - **Asked:** what's blocking W-58; then, mid-discussion, Arpit ratified option
   D (no age bound) from `record-freshness.compare.md`.

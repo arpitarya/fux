@@ -11,7 +11,21 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — the inbox
 
-**None currently.**
+**Two, both filed 2026-08-20, both opened by R5's failure.**
+
+- **W-61 · the fork** — [`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md).
+  R5 failed at 100 000 documents (44.4 s vs a 1 s bound) and
+  [ADR-MAINTENANCE](../docs/adr/0033_hooks.md) veto 1 fired. Proposed
+  **B — the hook defers**: commit cost becomes git's cost (**0.34 s at 100k,
+  constant**), and it is the only option that reaches the bound at every size.
+  The measured attribution rules out the obvious alternative — two O(corpus)
+  passes are the whole cost, so even **10× faster still misses by 4.5×**.
+- **W-61 · R6's arithmetic** — every tier matched, tiers 2 and 3 informatively,
+  but tier 1 also merged cleanly with the driver removed. **The
+  pre-registration's §3.1 and §3.2 disagree about this exact result** ("does
+  not count toward the pass" vs "tiers 1 and 2 must be informative"), so the
+  runner did not adjudicate it. The instrument, not the threshold, is what
+  should change — and not in the same change that files the verdict.
 
 ---
 
@@ -19,7 +33,7 @@ The two run **concurrently**; never order one against the other.
 
 ### [ADR-GRAPH](../docs/adr/0030_graph.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
 
-- **W-61** · `agent` · **held — Arpit's word required** · **M5 is built and its two gates are unrun.** [ADR-MAINTENANCE](../docs/adr/0033_hooks.md) is **`proposed`, not accepted**, because of it. The harness is already written ([`tools/maintenance-bench/`](../tools/maintenance-bench/run.py)); **and the thing it measures changed on 2026-08-20** — delta ingest ([ADR-INGEST](../docs/adr/0007_ingest.md) decision 1b) made a re-ingest 22.7×/26.4× faster, so any R5 number taken before it is about a build that no longer exists. What stands in its place is a *behaviour* test — the same merge conflicting without the driver and clean with it — which is **not R6**, and the record says so — [detail](open/W-61-maintenance-measurement.md)
+- **W-61** · `arpit` · **both gates ran 2026-08-20. R5 **FAIL** ([R5-HOOK](regression/2026-08-20-r5-hook-latency/VERDICT.md)) — 44.4 s at the judged 100 000 documents against a **1 s** bound, and **0.651 s at 1 000, where it passes**. R6 **INCONCLUSIVE** ([R6-MERGE](regression/2026-08-20-r6-merge-driver/VERDICT.md)) — every tier matched, but tier 1 matched with the driver *removed* too, so it proves nothing.** The cost is two O(corpus) passes, and **a 10× speedup still misses the bound by 4.5×** — only taking the work off the commit path reaches it. **Two calls now sit with Arpit**: the fork ([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md), proposed **B — the hook defers**), and whether R6 reads as PASS under its own §3.1 or not-yet under §3.2 — [detail](open/W-61-maintenance-measurement.md)
 - **W-59** · `agent`+`arpit` · **R4 ran 2026-08-20 and PASSED** ([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)) — cold p95 **1.113 s** / 3 s, warm **0.016 s** / 300 ms, **with a boundary**: the plane fetches serially, so cold cost is `k ×` the source's latency and anything slower than ~295 ms breaches the bound at k=10. [ADR-REFER](../docs/adr/0031_refer-plane.md) is still **`proposed`** — one gate passing is not the whole DoD. **What keeps it open:** the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**), which needs goldens a human must write (W-57); and ARC-vs-LRU, which was measured but **post-hoc** — the metric changed after seeing a number it reversed — so the cache compare doc's trigger is Arpit's to call — [detail](open/W-59-refer-plane-measurement.md)
 - **W-57** · `arpit` · **blocked on the goldens — a human must write them** · the graph lane's acceptance measurement is unrun, and **re-scoped 2026-08-20**: `q005`/`q009`/`q011`/`q015` were ids in the lost golden set and cannot be recovered, so the targets are now **phenomena** (supersession · near-duplication · staleness≠wrongness), all three built deliberately into the rebuilt corpus. **The supersession gap already reproduces** — `what replaced helix mesh` returns the superseded doc above the ADR that replaced it — [detail](open/W-57-graph-lane-acceptance.md)
 
@@ -37,7 +51,7 @@ when the pre-registration is written, and not because they look ready.*
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-26** · `agent` · **W-25 is done, but this cannot honestly start while prediction runs are held** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. **Its DoD requires *every* R prediction to have a measured value or an honest failure record**, and R4/R5/R6/R7 are all unrun (W-59 · W-61, held 2026-08-20). Building `tpack` and a T2 tier now would mean picking the tier-auto threshold by hand — which is the one thing the DoD forbids — and is the *build the fun part first* failure the gating rule exists to prevent — [detail](open/W-26-m6-scale-t2.md)
+- **W-26** · `agent` · **STARTABLE — the only agent-closable item on this queue** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. Its DoD wants *every* R prediction to carry **a measured value or an honest failure record**, and all three now do: R4 ✅ · R5 ❌ · R6 ⚠. **R7 is this milestone's own measurement**, not a precondition for it. **What it inherits from R5's failure:** 47.6 % of that 44 s is `fux build`, the derived plane M6 is about to add a *third tier* to — so measure any tier's rebuild cost before choosing its default. **Unchanged:** tier-auto flips **by measurement, never by hand** — [detail](open/W-26-m6-scale-t2.md)
 - **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
 
 ---
@@ -46,17 +60,27 @@ when the pre-registration is written, and not because they look ready.*
 
 | id | prediction | threshold | measured at |
 |----|-----------|-----------|-------------|
+| R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | [W-26](open/W-26-m6-scale-t2.md) — **M6 measures it by building it** |
 
-| R5 | 20-doc commit re-index | < 1 s via hook | W-25 |
-| R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
-| R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
+**One row left.** The hold was lifted by Arpit on 2026-08-20 and **R4, R5 and
+R6 all ran that day** — their results are below, with the failures stated as
+plainly as the pass.
 
-**All four run in `fux-lab`, and `fux-lab` is gone** ([W-56](open/W-56-sibling-environments-missing.md),
-2026-08-20). No prediction in this table can be measured until it is back.
+**R7 is the exception in this table**: it is not a gate M6 must pass *before*
+starting, it is the measurement M6 *is*, which is why its tier-auto half cannot
+exist before the tier does.
+
+**The lab was never the blocker it was recorded as.** Its environments install
+the published `0.33.0` wheel, which predates every unreleased plane, so all
+three benches measure the working tree by path and record its sha.
 
 **R4 PASS** — cold p95 **1.113 s** vs a 3 s bar, warm **0.016 s** vs 300 ms, on a 100 ms mock source
 ([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)); the plane fetches **serially**, so the bound is a
 statement about the source's latency at k=10, not about fux.
+**R5 FAIL** — **44.4 s** at 100 000 documents vs a **1 s** bar
+([R5-HOOK](regression/2026-08-20-r5-hook-latency/VERDICT.md)); it **passes at 1 000** (0.651 s), and the boundary
+is near ~1 500. **R6 INCONCLUSIVE** ([R6-MERGE](regression/2026-08-20-r6-merge-driver/VERDICT.md)) — the engine
+behaved; one of three tiers could not have failed, so the frozen table does not cover the result.
 R1 **PASS** · **R2 3/3 PASS** ([run](regression/2026-08-12-r2-close/report.md)) ·
 **R3 PASS** — worst-case p95 **27.2 ms** vs a 150 ms bar on 8 870 RFCs
 ([run](regression/2026-08-12-m2-accelerator/report.md)).
@@ -67,10 +91,12 @@ plan revision 1, their successors R3–R7.
 **Where the build stands** is [`IMPLEMENTATION.md`](IMPLEMENTATION.md), not this
 file. M0, M1, M2, **M3** and **M4's core** have shipped; **`v0.33.0` is on
 PyPI** (2026-08-19, the sources rewrite — verified black-box from the published
-wheel). M3 and M4 are **landed but unreleased and unmeasured**: their
-acceptance runs are [W-57](open/W-57-graph-lane-acceptance.md) and
-[W-59](open/W-59-refer-plane-measurement.md), both behind
-[W-56](open/W-56-sibling-environments-missing.md).
+wheel). M3 and M4 are **landed and unreleased**; M5 is landed, unreleased, and being
+measured now. **M4 is no longer unmeasured** — R4 passed 2026-08-20 — but
+[ADR-REFER](../docs/adr/0031_refer-plane.md) stays `proposed` until the budget
+sweep runs, and that needs goldens a human must write
+([W-57](open/W-57-graph-lane-acceptance.md)). M3's acceptance run is behind the
+same goldens.
 
 ---
 ---

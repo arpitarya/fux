@@ -1,0 +1,212 @@
+{
+  "fux": "/Users/arpitarya/my_programs/fux/.venv/bin/fux",
+  "engine_sha": "d98874d+dirty",
+  "python": "3.14.2",
+  "platform": "Darwin 25.3.0 arm64",
+  "r5_budget_s": 1.0,
+  "r5_commit_docs": 20,
+  "r5_judged_docs": 100000,
+  "pre_registration": "tools/maintenance-bench/PRE-REGISTRATION.md",
+  "r5": [
+    {
+      "corpus_docs": 1000,
+      "arm": "edit",
+      "judged": true,
+      "commit_docs": 20,
+      "runs": 5,
+      "median_s": 0.6474,
+      "max_s": 0.6508,
+      "samples_s": [
+        0.637,
+        0.6423,
+        0.6474,
+        0.6476,
+        0.6508
+      ],
+      "passes": true
+    },
+    {
+      "corpus_docs": 1000,
+      "arm": "add",
+      "judged": false,
+      "commit_docs": 20,
+      "runs": 5,
+      "median_s": 0.6859,
+      "max_s": 0.6997,
+      "samples_s": [
+        0.671,
+        0.6714,
+        0.6859,
+        0.6918,
+        0.6997
+      ],
+      "passes": true
+    },
+    {
+      "corpus_docs": 10000,
+      "arm": "edit",
+      "judged": true,
+      "commit_docs": 20,
+      "runs": 5,
+      "median_s": 3.2984,
+      "max_s": 3.5231,
+      "samples_s": [
+        3.2734,
+        3.2974,
+        3.2984,
+        3.3536,
+        3.5231
+      ],
+      "passes": false
+    },
+    {
+      "corpus_docs": 10000,
+      "arm": "add",
+      "judged": false,
+      "commit_docs": 20,
+      "runs": 5,
+      "median_s": 3.4444,
+      "max_s": 3.4767,
+      "samples_s": [
+        3.3802,
+        3.3855,
+        3.4444,
+        3.4547,
+        3.4767
+      ],
+      "passes": false
+    },
+    {
+      "corpus_docs": 100000,
+      "arm": "edit",
+      "judged": true,
+      "commit_docs": 20,
+      "runs": 5,
+      "median_s": 43.1668,
+      "max_s": 44.3795,
+      "samples_s": [
+        41.8979,
+        41.9609,
+        43.1668,
+        44.1285,
+        44.3795
+      ],
+      "passes": false
+    },
+    {
+      "corpus_docs": 100000,
+      "arm": "add",
+      "judged": false,
+      "commit_docs": 20,
+      "runs": 5,
+      "median_s": 44.3392,
+      "max_s": 46.4901,
+      "samples_s": [
+        43.0752,
+        43.6137,
+        44.3392,
+        44.7679,
+        46.4901
+      ],
+      "passes": false
+    }
+  ],
+  "r5_verdict": "FAIL",
+  "r6": [
+    {
+      "tier": "1 \u00b7 machine, disjoint adds",
+      "description": "both sides add documents",
+      "expected_conflict": false,
+      "treatment": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "control": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "informative": false,
+      "passes": false,
+      "matches_expectation": true,
+      "post_hoc": false
+    },
+    {
+      "tier": "1b \u00b7 machine, disjoint adds, one shard",
+      "description": "POST-HOC \u2014 outside the verdict",
+      "expected_conflict": false,
+      "treatment": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "control": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/08.jsonl"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/08.jsonl"
+        ]
+      },
+      "informative": true,
+      "passes": true,
+      "matches_expectation": true,
+      "post_hoc": true
+    },
+    {
+      "tier": "2 \u00b7 machine, one shard, two lines",
+      "description": "adjacency is not a disagreement",
+      "expected_conflict": false,
+      "treatment": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "control": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/16.jsonl"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/16.jsonl"
+        ]
+      },
+      "informative": true,
+      "passes": true,
+      "matches_expectation": true,
+      "post_hoc": false
+    },
+    {
+      "tier": "3 \u00b7 the same document, both sides",
+      "description": "human conflict preserved; machine plane refuses",
+      "expected_conflict": true,
+      "treatment": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/08.jsonl",
+          "docs/doc-0.md"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/08.jsonl"
+        ]
+      },
+      "control": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/08.jsonl",
+          "docs/doc-0.md"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/08.jsonl"
+        ]
+      },
+      "informative": null,
+      "passes": true,
+      "matches_expectation": true,
+      "post_hoc": false
+    }
+  ],
+  "r6_verdict": "AMBIGUOUS \u2014 every tier matches; some but not all are informative"
+}

@@ -10,7 +10,10 @@ timestamp: 2026-08-20T00:00:00Z
 # ADR-MAINTENANCE: keeping the index in step
 
 - **Name:** `ADR-MAINTENANCE` — cite this everywhere; never cite the number
-- **Status:** proposed — **accepted requires R5 and R6**, both held (below)
+- **Status:** proposed — **R5 measured 2026-08-20 and FAILED**; R6 INCONCLUSIVE.
+  Acceptance is not a formality away: veto condition 1 has fired, and what
+  replaces the automatic hook is an open fork
+  ([`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md))
 - **Date:** 2026-08-20
 - **Feature:** M5 — maintenance
 - **Owns:** `src/fux/maintain/` · `tools/maintenance-bench/`
@@ -230,15 +233,29 @@ legal, explicit, per-document opt-out
   driver already prints — re-run `fux ingest`, which regenerates the shard from
   merged content. Observed, not assumed.
 - **`fux` gains a twelfth verb** and ADR-CLI a sixth group. Flat, as ever.
-- **R5 AND R6 ARE NOT MEASURED, and this record is `proposed` because of it.**
-  R5 (a 20-doc commit re-indexes in < 1 s via the hook) and R6 (the three-tier
-  merge harness) both need the lab, and **Arpit has held all prediction runs
-  until he says otherwise (2026-08-20)**. What exists instead is a *functional*
-  demonstration in `tests_e2e/test_maintenance.py`: the same merge run twice,
-  conflicting without the driver and clean with it. **That is a behaviour test,
-  not R6** — R6 is a three-tier harness with a pre-registered threshold, and
-  calling this it would be exactly the looser restatement the threshold rule
-  forbids. Filed as **W-61**.
+- **R5 FAILED, measured 2026-08-20** —
+  [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md).
+  **44.4 s at 100 000 documents against a 1 s bound**, and **0.651 s at 1 000**,
+  where it passes. Cost tracks the corpus, not the commit: a 20-document commit
+  costs whatever touching the whole corpus costs, because parse, edge
+  resolution, the shard write and the derived rebuild are each O(corpus).
+  **Veto condition 1 has fired**, and its own words are what happens next —
+  *"`post-commit` is too slow to be automatic and the hook becomes opt-in or
+  incremental in a way it currently is not."* Which of those is a fork with
+  several viable answers, so it is
+  [`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md) and
+  Arpit's verdict, not this record's to assume.
+- **R6 is INCONCLUSIVE, and the engine is not the reason** —
+  [R6-MERGE](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md). All
+  three tiers matched their expected outcome; tiers 2 and 3 are informative
+  against a control arm with the driver unregistered. **Tier 1 merged cleanly
+  without the driver too**, so it proves nothing, and the frozen verdict table
+  does not cover "all match, some informative". The substance holds — adjacency
+  does not conflict, and a same-`ver` disagreement is refused with both sides
+  left in the file. Filed as **W-61**.
+- **The behaviour test in `tests_e2e/test_maintenance.py` is still not R6**,
+  and is now superseded as evidence by the run above rather than standing in
+  for it.
 
 ### Alternatives considered
 
@@ -297,7 +314,13 @@ legal, explicit, per-document opt-out
 **How to check them:**
 
 ```bash
-# 1, 2 — held pending Arpit's word; see work/open/W-61-maintenance-measurement.md
+# 1 — FIRED 2026-08-20 (R5-HOOK). Re-check after any change to the commit path:
+work/regression/2026-08-20-r5-hook-latency/evidence/reproduce.sh
+# 0.651 s @ 1k (passes) · 3.523 s @ 10k · 44.380 s @ 100k (judged, fails)
+
+# 2 — INCONCLUSIVE 2026-08-20 (R6-MERGE): every tier matched, but tier 1 also
+#     matched with the driver REMOVED, so it is uninformative. Same harness:
+.venv/bin/python tools/maintenance-bench/run.py --only r6
 
 # 3 — is the committed index behind the working tree?
 fux doctor

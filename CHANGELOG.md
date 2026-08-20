@@ -10,6 +10,20 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **The prediction series is measured again** — R4, R5 and R6 all ran on
+  2026-08-20, against thresholds frozen and committed first.
+  **[R4 PASS](work/regression/2026-08-20-refer-plane-r4/VERDICT.md)** ·
+  **[R5 FAIL](work/regression/2026-08-20-r5-hook-latency/VERDICT.md)** ·
+  **[R6 INCONCLUSIVE](work/regression/2026-08-20-r6-merge-driver/VERDICT.md)**.
+- **`fux hooks` has a measured ceiling.** A 20-document commit re-indexes in
+  **0.651 s at 1 000 documents** and **44.4 s at 100 000** — the hook is
+  automatic on a small repository and not on a large one. Nothing was changed
+  to make that number better; what changed is that it is now written down, with
+  an attribution showing two O(corpus) passes are the whole cost.
+- **`tools/refer-bench/` and `tools/maintenance-bench/attribute.py`** — the R4
+  harness (a real loopback HTTP server behind the *shipped* consumer fetcher)
+  and the cost attribution that turns "it is slow" into "here is where."
+
 - **Delta ingest — unchanged documents keep their extraction** (ADR-INGEST
   decision 1b). A filed [cost profile](work/regression/2026-08-20-ingest-cost-profile/report.md)
   put **92 % of a full ingest inside the dense embedding**, so a document whose

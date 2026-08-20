@@ -1,20 +1,37 @@
-# W-61 — M5 is built and its two gates are unrun
+# W-61 — M5's two gates: R5 failed, R6 is inconclusive
 
-**Status:** OPEN · **Filed:** 2026-08-20
-**Blocked by:** **Arpit's hold on prediction runs** (2026-08-20 — they run only
-when he says so explicitly). Not blocked on tooling: the lab exists again
-(W-56) and the harness is written.
-**Closes with:** [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) moving
-`proposed` → `accepted`, and a filed run under [`../regression/`](../regression/README.md)
+**Status:** OPEN · **Filed:** 2026-08-20 — **both gates ran the same day.**
+
+- **R5 FAIL** ([R5-HOOK](../regression/2026-08-20-r5-hook-latency/VERDICT.md)) —
+  **44.4 s** at the judged 100 000 documents against a **1 s** bound; **0.651 s
+  at 1 000**, where it passes. [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)
+  veto condition 1 has fired.
+- **R6 INCONCLUSIVE** ([R6-MERGE](../regression/2026-08-20-r6-merge-driver/VERDICT.md))
+  — every tier matched its expected outcome, but tier 1 also matched with the
+  driver **removed**, so the frozen table's "tiers 1 and 2 informative" clause
+  is unmet. The engine is not the reason.
+
+**Blocked by:** **Arpit**, on two calls — the fork R5's failure opens
+([`hook-at-scale.compare.md`](../compare/hook-at-scale.compare.md), proposed
+verdict **B, the hook defers**), and whether R6 reads as PASS under its
+pre-registration §3.1 or as not-yet under §3.2. Those two sections disagree
+about this exact result.
+**Closes with:** [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)'s status
+resolved — **not** by a pass, but by whatever replaces the automatic hook
 **Model:** **Sonnet** to run and file it; **Opus** for the verdict — R5 and R6
 are pre-registered gates, and a gate call is Opus work.
 
 ## Why this exists
 
 M5's core landed on 2026-08-20: hooks, the merge driver, and L5 enforced at
-write time. **ADR-MAINTENANCE is `proposed`, not `accepted`**, because its two
-predictions have not been measured — and an accepted record for an unmeasured
-plane is how an unproven thing becomes load-bearing.
+write time. **ADR-MAINTENANCE was `proposed`, not `accepted`**, because its two
+predictions had not been measured — an accepted record for an unmeasured plane
+is how an unproven thing becomes load-bearing.
+
+**They are measured now, and the record is still `proposed`** — for the
+opposite reason. R5 failed at the size the plan is designed for, so acceptance
+is not a formality away: it waits on a decision about what the hook should do,
+not on another measurement.
 
 The harness is **already written**: [`tools/maintenance-bench/run.py`](../../tools/maintenance-bench/run.py),
 which builds throwaway git repositories, wires them with `fux hooks`, and
@@ -54,20 +71,38 @@ ADR-MAINTENANCE says so in its own consequences.
 
 ## Definition of done
 
-- [ ] **Arpit lifts the hold.** Nothing here starts before that.
-- [ ] A **pre-registration** committed *before* any number exists: metric
-      definitions, corpus sizes, and R5's threshold restated verbatim.
-- [ ] R5 measured and reported per corpus size, including the sizes where it
-      fails. A failure is a shipped result about where the hook stops being
-      usable, not a failed task.
-- [ ] R6's three tiers run, **tier 3 included and reported as prominently as
-      the other two**.
-- [ ] Filed as a conformance run: `work/regression/<date>-maintenance/` with
-      report, `ANALYSIS.md`, `evidence/`, a README row and a DOC-REGISTRY bump.
-- [ ] ADR-MAINTENANCE's status resolved — `accepted` on a pass, amended on a
-      fail.
+- [x] **Arpit lifts the hold** — done 2026-08-20.
+- [x] A **pre-registration** committed *before* any number exists: metric
+      definitions, corpus sizes, and R5's threshold restated verbatim —
+      [`tools/maintenance-bench/PRE-REGISTRATION.md`](../../tools/maintenance-bench/PRE-REGISTRATION.md)
+      (`d98874d`).
+- [x] **R5 measured, per corpus size — FAIL at the judged size.** 0.651 s @ 1k
+      (passes) · 3.523 s @ 10k · **44.380 s @ 100k**. Attributed rather than
+      left as "it is slow": git is ~constant (0.34 s at 100k) and two O(corpus)
+      passes are the whole cost, 51.5 % ingest / 47.6 % derive. **A 10× speedup
+      still misses the bound by 4.5×.** The hook was **not** tuned to pass —
+      `src/` last changed in `3a9aabc`, before the pre-registration.
+- [x] **R6's three tiers run, with a control arm the original harness lacked.**
+      Tier 3 is reported as prominently as the others and passes: the human file
+      conflicts and the shard is left carrying both sides with ordinary markers,
+      asserted rather than inferred. **Tier 1 is uninformative** — it merges
+      cleanly with the driver removed — which is why the verdict is
+      INCONCLUSIVE. A post-hoc tier 1b shows concurrent adds *are* covered when
+      the two documents share a shard.
+- [x] Filed as **two** conformance runs — one verdict per prediction:
+      [`2026-08-20-r5-hook-latency`](../regression/2026-08-20-r5-hook-latency/report.md)
+      and [`2026-08-20-r6-merge-driver`](../regression/2026-08-20-r6-merge-driver/report.md).
+- [ ] **ADR-MAINTENANCE's status resolved.** Amended with both verdicts and
+      **still `proposed`** — acceptance is not one edit away, because veto
+      condition 1 has fired and what replaces the automatic hook is an open
+      fork. **This box closes when Arpit rules on
+      [`hook-at-scale.compare.md`](../compare/hook-at-scale.compare.md).**
 
 ## Hazard
+
+**Honoured, and worth recording as honoured.** Nothing in `src/` changed
+between the pre-registration and the run, and the verdict states the failure at
+the judged size in the same breath as the pass at 1 000.
 
 **Do not tune the hook to make R5 pass.** If a 20-doc commit does not re-index
 in a second, the honest outcome is that `post-commit` is too slow to be
