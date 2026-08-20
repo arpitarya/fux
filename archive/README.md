@@ -129,9 +129,12 @@ they are worth keeping.
 
 | [`W-48-query-output-contract.md`](open/W-48-query-output-contract.md) | 2026-08-20 | **Completed — two of three fixed, the third decided.** Live successors: `cmd_ask` and `cmd_answer` in [`query/__init__.py`](../src/fux/query/__init__.py), pinned by [`tests_e2e/test_verbs.py`](../tests_e2e/test_verbs.py); the decisions are [ADR-ASK](../docs/adr/0004_ask.md) and [ADR-ANSWER](../docs/adr/0006_answer.md). Item 3 — `find`'s prose no-match line — was **left alone deliberately** and is now pinned by a test, so the call is visible rather than remembered |
 
+| [`W-23-m3-graph-lane.md`](open/W-23-m3-graph-lane.md) | 2026-08-20 | **Completed — with two of its definition-of-done items carried forward rather than claimed.** Live successors: the code is [`src/fux/graph/`](../src/fux/graph/); the decision is [ADR-GRAPH](../docs/adr/0030_graph-lane.md); the eval is [`tests_e2e/test_relational.py`](../tests_e2e/test_relational.py) with its corpus at [`tests_e2e/eval/`](../tests_e2e/eval/). **What it did not deliver**, both now [W-57](../work/open/W-57-graph-lane-acceptance.md): the playground acceptance targets `q005`/`q009`/`q011`/`q015` are unmeasured because `fux-playground` does not exist on this machine ([W-56](../work/open/W-56-sibling-environments-missing.md)), and community determinism is verified on one machine rather than the two it asked for |
+
 Every outcome is recorded in
 [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
-the human calls, §Defects closed outside a milestone for the rest.
+the human calls, §Defects closed outside a milestone for the rest, and the
+milestone table for the milestones.
 
 ## Retired planning documents
 

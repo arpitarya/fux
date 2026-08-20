@@ -72,7 +72,7 @@ POSTINGS_DIR = "postings"
 #: Files whose bytes must be identical across two builds of the same index.
 #: `stamp.json` is deliberately excluded — it carries filesystem mtimes, which
 #: are the fast staleness check and are not reproducible by construction.
-DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MANIFEST_NAME, "codes.jsonl")
+DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MANIFEST_NAME, "codes.jsonl", "graph.json")
 
 
 def runtime_dir(root: Path) -> Path:

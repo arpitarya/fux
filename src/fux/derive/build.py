@@ -35,6 +35,7 @@ from .. import store as store_mod
 from ..errors import FuxError
 from ..query.bm25f import BODY_WEIGHT, HEADING_WEIGHT
 from ..store import fuxdir
+from ..graph import plane as graph_plane
 from . import dense
 from . import format as fmt
 
@@ -61,7 +62,7 @@ class BuildReport:
 
 def build(root: Path) -> BuildReport:
     """Materialize `.fux/runtime/` from the committed index."""
-    docs, codes, postings, stats, shard_stamp = _read_committed(root)
+    docs, codes, postings, stats, shard_stamp, records = _read_committed(root)
 
     directory = fuxdir.derived_dir(root, fmt.RUNTIME_DIR)
     postings_directory = directory / fmt.POSTINGS_DIR
@@ -72,6 +73,10 @@ def build(root: Path) -> BuildReport:
     written += _write_docs(directory, docs)
     written += _write_json(directory / fmt.STATS_NAME, stats)
     written += dense.build_codes(directory, docs, codes)
+    # The graph lane's plane, from the same single pass over the shards. It is
+    # derived for the reason `plane.py` gives: a community label is global, so
+    # committing one would turn a one-file commit into a corpus-wide diff.
+    written += graph_plane.build_plane(directory, records)
 
     blocks, postings_count = _write_postings(root, postings, [d["wlen"] for d in docs])
 
@@ -107,7 +112,7 @@ def build(root: Path) -> BuildReport:
 def _read_committed(root: Path):
     """One pass over the committed shards: doc table, postings, statistics.
 
-    Returns `(docs, codes, postings, stats, shard_stamp)`. `docs` is sorted by
+    Returns `(docs, codes, postings, stats, shard_stamp, records)`. `docs` is sorted by
     id, so a document's index is stable across builds; `codes` is parallel to
     it (the dense lane's table, `None` where a record has no `code`); and
     `postings` maps a term hash to its `(docidx, tf_heading, tf_body)` list in
@@ -154,7 +159,9 @@ def _read_committed(root: Path):
             postings.setdefault(term, []).append((docidx, tf[0], tf[1]))
 
     stats = {"n": total_docs, "total_wlen": total_wlen}
-    return docs, codes, postings, stats, shard_stamp
+    # `records` rides along so the graph plane needs no second pass over the
+    # shards; it is already sorted by id, which is what makes it usable.
+    return docs, codes, postings, stats, shard_stamp, records
 
 
 def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> None:

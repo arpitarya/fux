@@ -35,6 +35,7 @@ Rules:
 | **R2 closes** | 2026-08-12 | — | [ADR-RECORD](../archive/adr/0004_index-format.md) §Consequences | **3/3 PASS** on this repo's own corpus, after adding `archive/v0.26-docs` to configured sources; index +45.1 %. Post-hoc finding filed as [W-44](open/W-44-archived-content-signalling.md), not solved. [Run](regression/2026-08-12-r2-close/report.md) |
 | **M2 — the T1 accelerator** | 2026-08-12 | `v0.32.0` (PyPI 2026-08-13) | [ADR-T1-ACCELERATOR](../archive/adr/0005_derived-accelerator.md) | **R3 PASS** — worst-case warm p95 **27.2 ms** on 8 870 RFCs against a pre-registered 150 ms bar, where the reference scan takes 4 248.8 ms. Differential law byte-identical over 6 088 comparisons plus all 50 goldens. **Hybrid fusion measured net −6 and ships default-off.** [Run](regression/2026-08-12-m2-accelerator/report.md) |
 | **W-54 — the sources rewrite** | 2026-08-19 | `v0.33.0` (PyPI 2026-08-19, verified black-box from the published wheel) | [ADR-URL-LIST](../docs/adr/0018_url-list.md) · [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-HTTP-FETCHER](../docs/adr/0021_http-fetcher.md) · [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) 9 | **Five latent defects closed in five commits.** One parser for both committed source lists; `#` is a comment only at line start or after whitespace, so a URL fragment survives and two fragment-differing URLs are two documents rather than one silent deletion. `[sources] dirs` retired into `.fux/sources/dirs` with a declared `archived=` (parsed, not read — the *signal* stays gated on W-44). `fux setup` writes both fetchers from wheel package data, so `DEFAULT_FETCHER` names a file that exists and `ensure_layout` never puts code in a repo that wanted an index. **`title_h` gained an `h:` prefix**, which is the one with measured cost: under the L5 `hashed` default, ingest wrote an index no `fux build` would accept — 27.2 ms became 4 248.8 ms at RFC scale. `fux url` makes the list tool-managed and **never fetches**. [Run](regression/2026-08-19-w54/report.md) — the differential now holds over a corpus containing hashed records, **which the harness had never seen**, and that gap is why the defect survived |
+| **M3 — the graph lane** | 2026-08-20 | *(unreleased)* | [ADR-GRAPH](../docs/adr/0030_graph-lane.md) | **Landed, with two named gaps it does not paper over.** `explain`/`graph`/`path`; edges lifted into two adjacency views (directed for routes, undirected for relatedness, **tag nodes are sinks** so a route cannot launder through a shared label); communities by **unseeded** label propagation — the randomness is *removed*, not seeded, and a test parses the module's AST to assert no `random` import — canonicalised to `c0`, `c1`, … by (size, smallest member) so adding a document cannot rename an unchanged partition; communities live in a **derived** plane because a label is global and committing it would turn a one-file commit into a corpus-wide diff. **The archived relational eval passes on the new kernel, 11/11**, its corpus copied into `tests_e2e/eval/` as a live fixture with its one vocabulary adaptation stated. **`ask` is byte-identical and asserted so through the CLI.** One deliberate correction to the port: the PPR walk is **lazy**, because the archived walk truncated at 3 iterations ranks by *parity* — seeded at `a` on a path `a-b-c-d` it scored `d` (3 hops) at 0.154 above `c` (2 hops) at 0.054. **The two gaps: the playground acceptance targets are unmeasured and determinism is verified on one machine, not two** — both carried by [W-57](open/W-57-graph-lane-acceptance.md), blocked by [W-56](open/W-56-sibling-environments-missing.md) |
 
 ## Defects closed outside a milestone
 
@@ -65,11 +66,12 @@ milestone row to live in. One line each, with the record that now holds it.
 
 ## Not yet shipped
 
-`M3` graph lane · `M4` refer plane · `M5` maintenance · `M6` scale & T2 ·
+`M4` refer plane · `M5` maintenance · `M6` scale & T2 ·
 `M7` dogfood & release gate · `M8` deferred. Their state is in
 [`OPEN-WORK.md`](OPEN-WORK.md), their spec in [the ADR register](../docs/adr/README.md).
-**Nothing above `M2` has a row here, and that is the honest position** — a
-milestone earns its row by landing, not by being planned.
+**Nothing above `M3` has a row here, and that is the honest position** — a
+milestone earns its row by landing, not by being planned. M3's own row names
+the two things it did **not** measure, for the same reason.
 
 ## Predictions
 

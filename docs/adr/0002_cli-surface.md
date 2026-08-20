@@ -14,7 +14,7 @@ timestamp: 2026-08-18T00:00:00Z
 - **Owns:** `src/fux/cli.py`
 - **Laws:** L1, L4, L7 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
-- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`
+- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`, **eleven since the M3 graph lane** (2026-08-20)
 - **Evidence:** [`work/regression/2026-08-18-cli-surface/`](../../work/regression/2026-08-18-cli-surface/report.md)
   — every example below is a verbatim capture, not an illustration
 
@@ -30,15 +30,24 @@ timestamp: 2026-08-18T00:00:00Z
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
 | **sources** | `url` | records what to index; it never fetches |
 | **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
+| **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 
 The grouping replaced *"three build the index and three query it"* on
 2026-08-19, when `setup` and `url` took the surface from six to eight. **The
 count was never the mental model** — what a verb does to the two planes is, and
-that survives a new verb where a count does not.
+that survives a new verb where a count does not. It survived again on
+2026-08-20: the graph lane added three verbs and cost this table one row, which
+is the whole argument for grouping by effect.
 
-**Eight flat verbs is still not a tree.** `url` takes flags rather than
-becoming `fux url add`, and that is the constraint the regrouping had to
-preserve: nesting is the thing this record refuses, not arithmetic.
+**Eleven flat verbs is still not a tree.** `url` takes flags rather than
+becoming `fux url add`, and `path` takes two positionals and `--hops` rather
+than becoming `fux graph path`; that is the constraint every addition has to
+preserve. Nesting is the thing this record refuses, not arithmetic.
+
+**The graph group is the first that does not rank.** `ask`/`find`/`answer`
+return documents ordered by relevance; `explain`/`graph`/`path` return
+relationships the documents themselves stated. That is why they are a group
+rather than three more read verbs — see [ADR-GRAPH](0030_graph-lane.md).
 
 The three query verbs differ only in **how much they commit to**. `find` gives
 you locations and stays out of the way. `ask` gives you a ranked list with
@@ -137,11 +146,22 @@ teeth for this project specifically —
 
 **1. Flat verbs, grouped by what they touch.** `setup` · `doctor` (lifecycle)
 · `ingest` · `build` (write) · `url` (sources) · `ask` · `find` · `answer`
-(read). **No nesting,
+(read) · `explain` · `graph` · `path` (graph). **No nesting,
 ever** — that is the constraint, and it is what the count was standing in for.
 A new verb takes flags, never a subcommand tree, and lands in one of the groups
-or argues for a new one in this record. M3's `explain` / `graph` / `path` and
-M4's refer verbs are not covered here.
+or argues for a new one in this record. M4's refer verbs are still not covered
+here.
+
+**1b. The graph group arrived on 2026-08-20 and argued for itself, per the
+rule above.** `explain <doc>`, `graph <query>` and `path <from> <to> --hops N`
+are flat: `fux graph path` would have been the first subcommand tree on this
+surface. They form a group rather than joining `read` because **they do not
+rank** — they return relationships, and a caller reaching for them wants a
+different kind of answer. The verbs, their payloads and the reasoning are
+[ADR-GRAPH](0030_graph-lane.md)'s; what binds here is the flatness, the shared
+`--json` flag, and that `path`'s no-route case prints prose and exits 0 exactly
+as `find`'s no-match case does — the three-verbs-agree property W-48 examined
+and kept.
 
 **1a. `url` records a URL in the committed list, and never fetches it.** It
 takes flags — `--cdp`, `--plain`, `--remove` — because "no subcommand tree" is
@@ -555,8 +575,15 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
   `{id, title, loc, score}` for `ask`/`find`; `{answer, citation, source}` for
   `answer`. Changing a key is a breaking change and needs this record updated
   in the same commit.
-- **Adding a verb costs a record.** M3 and M4 both add verbs, and each owes an
-  update here or a successor record — not a silent `add_parser` call.
+- **Adding a verb costs a record.** M3 did add three, and it cost this record
+  a group row, a decision (1b) and a feature-line bump — paid in the same
+  change, which is what the rule is for. M4 still owes the same.
+- **Eleven verbs, and the `--json` contract now has three shapes**, not one:
+  `{results[]}` for `ask`/`find`, `{answer, citation, source}` for `answer`,
+  and the graph payloads (`{doc, edges[], community}` · `{nodes[]}` ·
+  `{from, to, paths[]}`). They do not converge and should not: a route is not a
+  ranked hit, and flattening the two would lose the hop list that is the whole
+  point of `path`.
 - **One defect surfaced by writing this down** — `ask --hybrid` crashed on a
   source install; fixed 2026-08-20. It had gone unnoticed because it cannot
   reproduce on a machine with the model bundle present, which is every machine

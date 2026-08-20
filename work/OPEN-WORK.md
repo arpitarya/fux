@@ -11,18 +11,22 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — the inbox
 
-**Two, both filed 2026-08-20 — neither is aging yet.** They are one decision
-or two, and that is itself Arpit's call.
+**Two, both filed 2026-08-20 — neither is aging.** Read **W-56** first: it is
+the one that blocks other work.
 
-- **W-45** · *filed 2026-08-20* · **the compare doc is written and awaits a
-  verdict** — [`source-exclusion.compare.md`](compare/source-exclusion.compare.md).
-  Proposed: an exclusion **entry** (`!path/glob`) in `.fux/sources/dirs`, not
-  the attribute [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) anticipated.
-  Options C and D are eliminated by measurement.
-- **W-55** · *filed 2026-08-20* · **the walker has no file-type filter** —
-  14 % of this repo's index is `.json`/`.svg`/`.sh`/`.py`. Found while
-  measuring W-45; the compare doc recommends **deciding this one first or
-  together**, because 14 of W-45's 16 motivating files are non-prose.
+- **W-55** · **the compare doc is written and awaits a verdict** —
+  [`file-type-filter.compare.md`](compare/file-type-filter.compare.md). The
+  walker has **no file-type filter at all**: 21 of 150 records (14 %) and 15 %
+  of the tokens are `.json`/`.svg`/`.sh`/`.py`/`.mermaid`. Proposed **G — a
+  built-in default allowlist, overridable by `.fux/sources/types`**.
+
+*W-45 was decided 2026-08-20 — verdict **E**, an exclusion entry — and left the
+inbox. Its build waits on this one: they are one grammar change, not two.*
+- **W-56** · *filed 2026-08-20* · **`fux-lab` and `fux-playground` are both
+  gone from this machine.** The lab is the one CLAUDE.md says never goes; the
+  playground held **50 graded goldens with no remote**. Between them they are
+  the instrument for **R4, R5, R6 and R7** — every unmeasured prediction left
+  in the plan — and for ever flipping `--hybrid` on. **Read this one first.**
 
 ---
 
@@ -30,8 +34,13 @@ or two, and that is itself Arpit's call.
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-INGEST](../docs/adr/0007_ingest.md)
 
-- **W-45** · `arpit` · **the compare doc is written; the verdict is the only thing left** · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — **measured 2026-08-20: 33 of 150 documents (22.0 %) come from `work/regression/`, 16 of them raw evidence, and a `fixture.sh` outranks the record it illustrates.** Proposed verdict is an exclusion *entry*, not the anticipated attribute — [compare](compare/source-exclusion.compare.md) · [detail](open/W-45-source-exclusion.md)
-- **W-55** · `arpit` · **new, 2026-08-20** · the walker applies **no file-type filter** — anything UTF-8-decodable is a document, so **21 of 150 indexed documents (14 %) are `.json`, `.svg`, `.sh`, `.py` or `.mermaid`**, and a raw JSON blob ranks #2 on a plain query. Unbounded at the design point, not 14 %: a consumer pointing fux at a repo root indexes their lockfiles. **Decide with or before W-45** — [detail](open/W-55-no-file-type-filter.md)
+- **W-45** · `agent` · **decided (verdict E, 2026-08-20) — the build waits on W-55**, because both change the same grammar and land as one change · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — **measured 2026-08-20: 33 of 150 documents (22.0 %) come from `work/regression/`, 16 of them raw evidence, and a `fixture.sh` outranks the record it illustrates.** Proposed verdict is an exclusion *entry*, not the anticipated attribute — [compare](compare/source-exclusion.compare.md) · [detail](open/W-45-source-exclusion.md)
+- **W-55** · `arpit` · **awaiting the verdict — see the inbox** · the walker applies **no file-type filter**: anything UTF-8-decodable is a document, so **21 of 150 indexed documents (14 %) are `.json`, `.svg`, `.sh`, `.py` or `.mermaid`**, and a raw JSON blob ranks #2 on a plain query. Unbounded at the design point rather than 14 %: a consumer pointing fux at a repo root indexes their lockfiles — [compare](compare/file-type-filter.compare.md) · [detail](open/W-55-no-file-type-filter.md)
+
+### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · no record — the measuring environments
+
+- **W-56** · `arpit` · **new, 2026-08-20** · **both sibling environments are missing** — `~/my_programs/fux-lab` (which the standing obligation says is *never* deleted) and `~/my_programs/fux-playground` (50 graded goldens, **one local commit, no remote**). M2's own filed reproduce commands point into the lab and no longer run, so *"the reproduce command must actually reproduce"* is failing silently. Blocks W-57 and every remaining prediction — [detail](open/W-56-sibling-environments-missing.md)
+- **W-57** · `agent` · blocked by W-56 · **the graph lane's acceptance measurement is unrun** — M3 shipped, but `q005`/`q009`/`q011`/`q015` (the supersession and near-duplicate gaps that are the lane's whole argument) are unmeasured, and community determinism is verified on one machine rather than two. [ADR-GRAPH](../docs/adr/0030_graph-lane.md) deliberately does not claim otherwise — [detail](open/W-57-graph-lane-acceptance.md)
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
 
@@ -47,9 +56,8 @@ when the pre-registration is written, and not because they look ready.*
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-23** · `agent` · **next, and unblocked** · M3 graph lane — edges, community, `explain`/`graph`/`path`; none of the three verbs exists in `cli.py` — [detail](open/W-23-m3-graph-lane.md)
-- **W-24** · `agent` · **next, and unblocked** · M4 refer plane — HTTP+Confluence, ARC, assembler, freshness fence; `src/fux/refer/` is a 7-line stub · *no live spec; write one first* — [detail](open/W-24-m4-refer-plane.md)
-- **W-25** · `agent` · blocked by W-23, W-24 · M5 maintenance — hooks, line-wise LWW merge driver, hashed-meta enforcement — [detail](open/W-25-m5-maintenance.md)
+- **W-24** · `agent` · **next, and unblocked** · M4 refer plane — HTTP+Confluence, ARC, assembler, freshness fence; `src/fux/refer/` is a 7-line stub · *no live spec; write one first* · **R4 needs the lab (W-56)** — [detail](open/W-24-m4-refer-plane.md)
+- **W-25** · `agent` · blocked by W-24 — hooks, line-wise LWW merge driver, hashed-meta enforcement — [detail](open/W-25-m5-maintenance.md)
 - **W-26** · `agent` · blocked by W-25 · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured — [detail](open/W-26-m6-scale-t2.md)
 - **W-27** · `agent` · blocked by W-26 · M7 dogfood & release gate — fux + Anton, two weeks — [detail](open/W-27-m7-dogfood-release-gate.md)
 - **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
@@ -65,6 +73,9 @@ when the pre-registration is written, and not because they look ready.*
 | R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
 | R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
 
+**All four run in `fux-lab`, and `fux-lab` is gone** ([W-56](open/W-56-sibling-environments-missing.md),
+2026-08-20). No prediction in this table can be measured until it is back.
+
 R1 **PASS** · **R2 3/3 PASS** ([run](regression/2026-08-12-r2-close/report.md)) ·
 **R3 PASS** — worst-case p95 **27.2 ms** vs a 150 ms bar on 8 870 RFCs
 ([run](regression/2026-08-12-m2-accelerator/report.md)).
@@ -73,8 +84,10 @@ P1 **FAIL** — full postings, permanently
 plan revision 1, their successors R3–R7.
 
 **Where the build stands** is [`IMPLEMENTATION.md`](IMPLEMENTATION.md), not this
-file. M0, M1 and M2 have shipped; **`v0.33.0` is on PyPI** (2026-08-19, the
-sources rewrite — verified black-box from the published wheel).
+file. M0, M1, M2 and **M3** have shipped; **`v0.33.0` is on PyPI** (2026-08-19,
+the sources rewrite — verified black-box from the published wheel). M3 is
+**landed but unreleased**, and its acceptance measurement is
+[W-57](open/W-57-graph-lane-acceptance.md).
 
 ---
 ---

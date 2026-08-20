@@ -8,6 +8,33 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **The graph lane — `fux explain`, `fux graph`, `fux path`** (M3,
+  [ADR-GRAPH](docs/adr/0030_graph-lane.md)). The `ref`/`tag`/`code` edges
+  ingest has extracted since M1 become answerable. `explain` lists a
+  document's outbound edges and its community; `graph` returns the
+  neighbourhood around a query's best answers, PPR-expanded; `path` returns
+  every simple directed route between two documents with a reliability that
+  decays per hop. Flat verbs, as ever — `fux graph path` would have been the
+  first subcommand tree on this surface.
+- **Communities, assigned deterministically and without a seed.** Label
+  propagation with sorted visit order, ties broken on the smallest label, and
+  a fixed sweep cap — there is no `random` import in the module and a test
+  parses its AST to keep it that way. A fixed seed would have been the weaker
+  guarantee. Labels are canonicalised (`c0`, `c1`, …) by size, so adding one
+  document cannot rename a partition that did not change.
+- **`.fux/runtime/graph.json`** — the derived graph plane, written by
+  `fux build`, gitignored, and part of the byte-identity assertion. Communities
+  are derived rather than committed because a community label is *global*:
+  committing it would turn a one-file commit into a corpus-wide diff.
+
+### Changed
+
+- **`ask` is untouched, and now asserted so from the graph fixture too.** The
+  graph plane is built by the same `fux build` as the accelerator, so a leak
+  into the lexical path is a live possibility rather than a theoretical one.
+
 ### Fixed
 
 - **`fux ask --hybrid` no longer crashes on a source install.** `get_model()`

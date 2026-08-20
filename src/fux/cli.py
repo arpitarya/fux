@@ -63,6 +63,24 @@ def _cmd_build(args) -> int:
     return cmd_build(args)
 
 
+def _cmd_explain(args) -> int:
+    from .graph import cmd_explain
+
+    return cmd_explain(args)
+
+
+def _cmd_graph(args) -> int:
+    from .graph import cmd_graph
+
+    return cmd_graph(args)
+
+
+def _cmd_path(args) -> int:
+    from .graph import cmd_path
+
+    return cmd_path(args)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="fux", description="rank, fetch, verify — an index over the systems that own your docs")
     parser.add_argument("--version", action="version", version=f"fux {__version__}")
@@ -129,6 +147,27 @@ def build_parser() -> argparse.ArgumentParser:
     p_find.set_defaults(func=_cmd_find)
 
     _query_parser("answer", "the single best answer the index can give").set_defaults(func=_cmd_answer)
+
+    # The graph group. Flat, like every other verb — `fux graph path` would be
+    # the first subcommand tree on this surface, and "no subcommand tree" is
+    # the constraint ADR-CLI keeps.
+    p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
+    p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
+    p_explain.add_argument("--json", action="store_true", help="machine-readable output")
+    p_explain.set_defaults(func=_cmd_explain)
+
+    p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")
+    p_graph.add_argument("query", help="natural-language question")
+    p_graph.add_argument("--json", action="store_true", help="machine-readable output")
+    p_graph.add_argument("--scan", action="store_true", help="force the reference scan path for the seeds")
+    p_graph.set_defaults(func=_cmd_graph)
+
+    p_path = sub.add_parser("path", help="how two documents are connected, most reliable route first")
+    p_path.add_argument("src", metavar="FROM", help="the document the route starts at")
+    p_path.add_argument("dst", metavar="TO", help="the document the route ends at")
+    p_path.add_argument("--hops", type=int, default=2, metavar="N", help="max edges in a route (default 2)")
+    p_path.add_argument("--json", action="store_true", help="machine-readable output")
+    p_path.set_defaults(func=_cmd_path)
 
     return parser
 
