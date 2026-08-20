@@ -429,10 +429,14 @@ quantity, and any tooling that thresholds on score must know which path
 produced it. And hybrid pulled two unrelated documents into a result set the
 lexical path answered with one, which is the shape of the measured net −6.
 
-**Known defect:** on a source install without the model bundle this command
-crashes with an `AttributeError` traceback instead of falling back to lexical.
-Filed as [W-46](../../work/open/W-46-hybrid-missing-model-crash.md); diagnosis
-in [ANALYSIS.md](../../work/regression/2026-08-18-cli-surface/ANALYSIS.md).
+**Fixed 2026-08-20.** On a source install without the model bundle this
+command used to crash with an `AttributeError` traceback instead of falling
+back to lexical: `get_model()` returns `None` there, and `None.embed(...)`
+raises an exception the guard's narrow tuple did not list. It now degrades to
+the lexical answer at exit 0. The fix is an explicit `None` check rather than a
+widened `except`, so a real bug inside `embed()` still propagates —
+`tests/derive/test_dense_and_hybrid.py` asserts both halves. Diagnosis in
+[ANALYSIS.md](../../work/regression/2026-08-18-cli-surface/ANALYSIS.md).
 
 #### `fux find` — locations, one per line
 
@@ -553,16 +557,20 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
   in the same commit.
 - **Adding a verb costs a record.** M3 and M4 both add verbs, and each owes an
   update here or a successor record — not a silent `add_parser` call.
-- **One defect surfaced by writing this down** — `ask --hybrid` crashes on a
-  source install ([W-46](../../work/open/W-46-hybrid-missing-model-crash.md)).
-  It had gone unnoticed because it cannot reproduce on a machine with the model
-  bundle present, which is every machine this engine is developed on. Documenting
-  a surface is a cheap way to walk paths nobody walks.
+- **One defect surfaced by writing this down** — `ask --hybrid` crashed on a
+  source install; fixed 2026-08-20. It had gone unnoticed because it cannot
+  reproduce on a machine with the model bundle present, which is every machine
+  this engine is developed on. Documenting a surface is a cheap way to walk
+  paths nobody walks.
 - **`2` stays in the contract unused.** A reader could reasonably call that
   dead API; the alternative — removing it and re-adding it at M5 — is worse,
   because exit codes are what scripts branch on.
-- **We now owe a regression test** for the missing-bundle path. `tests/query/`
-  has no coverage for it.
+- **The missing-bundle path is now covered.** `tests/derive/test_dense_and_hybrid.py`
+  monkeypatches `get_model` to `None` and asserts the lexical fallback at exit 0,
+  and separately asserts that a present-but-broken model still raises. It lives
+  beside the other hybrid tests rather than in `tests/query/`, because splitting
+  hybrid coverage across two directories to duplicate a corpus fixture costs more
+  than it documents.
 
 ### Alternatives considered
 

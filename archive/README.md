@@ -125,8 +125,13 @@ they are worth keeping.
 
 | [`W-54-sources-rewrite.md`](open/W-54-sources-rewrite.md) | 2026-08-19 | **Completed.** All five merged defects closed in five commits, each with its records. Live successors: the code is [`ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) · [`setup.py`](../src/fux/setup.py) · [`sources.py`](../src/fux/sources.py) · [`templates/`](../src/fux/templates/); the decisions are [ADR-URL-LIST](../docs/adr/0018_url-list.md) · [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-HTTP-FETCHER](../docs/adr/0021_http-fetcher.md) · [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) decision 9; the evidence is [`2026-08-19-w54`](../work/regression/2026-08-19-w54/report.md). **One section was overruled by a record**: §5 describes a verb that fetches, and ADR-CLI's captured surface makes `--refresh-urls` the only networked path (L4) — `fux url` records and never fetches |
 
+| [`W-46-hybrid-missing-model-crash.md`](open/W-46-hybrid-missing-model-crash.md) | 2026-08-20 | **Completed.** Live successor: the `None` guard in [`query/hybrid.py`](../src/fux/query/hybrid.py) and its two tests in [`tests/derive/test_dense_and_hybrid.py`](../tests/derive/test_dense_and_hybrid.py); the decision is [ADR-CLI](../docs/adr/0002_cli-surface.md). **One deviation from its definition of done**: the regression test landed beside the other hybrid tests rather than in `tests/query/`, because duplicating the corpus fixture into a second directory costs more than the path documents |
+
+| [`W-48-query-output-contract.md`](open/W-48-query-output-contract.md) | 2026-08-20 | **Completed — two of three fixed, the third decided.** Live successors: `cmd_ask` and `cmd_answer` in [`query/__init__.py`](../src/fux/query/__init__.py), pinned by [`tests_e2e/test_verbs.py`](../tests_e2e/test_verbs.py); the decisions are [ADR-ASK](../docs/adr/0004_ask.md) and [ADR-ANSWER](../docs/adr/0006_answer.md). Item 3 — `find`'s prose no-match line — was **left alone deliberately** and is now pinned by a test, so the call is visible rather than remembered |
+
 Every outcome is recorded in
-[`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) §Ratified decisions.
+[`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
+the human calls, §Defects closed outside a milestone for the rest.
 
 ## Retired planning documents
 

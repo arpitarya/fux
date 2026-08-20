@@ -94,9 +94,12 @@ def _dense_ids(root: Path, query: str) -> list[str]:
     try:
         from ..embed import get_model, quantize
 
-        vec = get_model().embed(query)
+        model = get_model()
     except (FuxError, ImportError, FileNotFoundError):
         return []  # no bundled model in this install; lexical still answers
+    if model is None:
+        return []  # source install without the bundle: same case, signalled by return
+    vec = model.embed(query)
     if vec is None:
         return []  # nothing embeddable in the query itself
 

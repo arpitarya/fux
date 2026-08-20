@@ -17,11 +17,6 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-FIND](../docs/adr/0005_find.md) · [ADR-ANSWER](../docs/adr/0006_answer.md)
-
-- **W-46** · `agent` · Sonnet · `ask --hybrid` crashes on a source install — the missing-model guard catches the wrong exceptions — [detail](open/W-46-hybrid-missing-model-crash.md)
-- **W-48** · `agent` · Sonnet · **low** · three output-contract inconsistencies across the three verbs — [detail](open/W-48-query-output-contract.md)
-
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md)
 
 - **W-45** · `agent` · **Opus** to decide, Sonnet to build · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** — an exclusion attribute on a directory line, and the file now exists to carry one (W-54, 2026-08-19). **The fork itself still owes a compare doc**, and the attribute set is closed at one until this record changes — [detail](open/W-45-source-exclusion.md)

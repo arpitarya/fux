@@ -130,6 +130,53 @@ def test_answer_declines_when_nothing_matches(tmp_path):
     assert payload["answer"] is None
 
 
+def test_answer_json_carries_source_on_both_branches(tmp_path):
+    """W-48: ADR-ANSWER tells callers to key on `"source"` to detect the M4
+    upgrade, so a branch that omits it is a trap rather than a signal.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    hit = json.loads(_run(tmp_path, "answer", "why did pruning fail", "--json").stdout)
+    miss = json.loads(_run(tmp_path, "answer", "zzzz nothing", "--json").stdout)
+    assert hit["source"] == miss["source"] == "index"
+    assert miss["answer"] is None and miss["citation"] is None
+
+
+def test_ask_json_reports_which_path_answered_when_explain_is_set(tmp_path):
+    """W-48: `--explain` used to be text-only, so the one thing worth logging
+    about a slow query was the one thing a caller could not read.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    plain = json.loads(_run(tmp_path, "ask", "pruning", "--json").stdout)
+    assert "path" not in plain  # additive: silence unless asked
+
+    explained = json.loads(_run(tmp_path, "ask", "pruning", "--json", "--explain").stdout)
+    assert explained["path"] == "accelerator"
+    assert explained["results"] == plain["results"]
+
+    scanned = json.loads(_run(tmp_path, "ask", "pruning", "--json", "--explain", "--scan").stdout)
+    assert scanned["path"] == "scan"
+
+
+def test_find_still_prints_prose_on_the_no_match_path(tmp_path):
+    """W-48 item 3, decided and left alone — pinned so the decision is visible.
+
+    All three verbs say the same thing for the same condition; `--json` is the
+    machine-readable form. ADR-FIND ties reopening this to a real script
+    observed breaking on it, and no such script has been observed.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    result = _run(tmp_path, "find", "zzzz nothing")
+    assert result.returncode == 0
+    assert result.stdout.strip() == "No confident matches."
+    assert result.stderr == ""
+
+
 def test_derived_plane_is_gitignored(tmp_path):
     """ADR-DOTFUX's ignore rule, checked end to end rather than assumed."""
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, capture_output=True)

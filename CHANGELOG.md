@@ -6,6 +6,31 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
+## [Unreleased]
+
+### Fixed
+
+- **`fux ask --hybrid` no longer crashes on a source install.** `get_model()`
+  returns `None` when the embedding bundle is not shipped, and `None.embed(...)`
+  raised an `AttributeError` that the guard written for exactly this case did
+  not list — so a documented, supported state printed a traceback instead of
+  falling back. It now returns the lexical answer at exit 0. Fixed with an
+  explicit `None` check rather than a wider `except`, so a real bug inside
+  `embed()` still propagates; both halves are asserted
+  ([ADR-CLI](docs/adr/0002_cli-surface.md)).
+
+### Changed
+
+- **`ask --json --explain` now carries `"path"`** — `"accelerator"`, `"scan"`
+  or `"hybrid"`. `--explain` was text-only, so the one fact worth logging about
+  a slow query was the one a caller could not read. The key appears only when
+  `--explain` is passed, so the default payload is unchanged
+  ([ADR-ASK](docs/adr/0004_ask.md)).
+- **`answer --json` now carries `"source"` on the no-match branch too.**
+  [ADR-ANSWER](docs/adr/0006_answer.md) tells callers to key on `"source"` to
+  detect the M4 upgrade, so its absence on one branch was a trap. The payload
+  is now `{"answer": null, "citation": null, "source": "index"}`.
+
 ## [0.33.0] - 2026-08-19
 
 **The sources rewrite — what fux indexes becomes two committed files, and the

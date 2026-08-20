@@ -72,7 +72,14 @@ def cmd_ask(args) -> int:
     )
 
     if args.json:
-        print(json_mod.dumps({"results": [r.__dict__ for r in results]}, indent=2))
+        # `--explain` is not text-only: a caller that wants to log which path
+        # answered a slow query needs it in the machine-readable form too. The
+        # key is additive and appears only when asked for, so no existing
+        # consumer's parse changes (W-48).
+        payload: dict = {"results": [r.__dict__ for r in results]}
+        if getattr(args, "explain", False):
+            payload["path"] = path
+        print(json_mod.dumps(payload, indent=2))
         return 0
 
     if not results:
@@ -117,7 +124,14 @@ def cmd_answer(args) -> int:
 
     if not results:
         if args.json:
-            print(json_mod.dumps({"answer": None, "citation": None}, indent=2))
+            # `"source"` is the key ADR-ANSWER tells callers to switch on when
+            # the refer plane lands, so it must be present on the no-match
+            # branch too — an absent key is a trap, not a signal (W-48).
+            print(
+                json_mod.dumps(
+                    {"answer": None, "citation": None, "source": "index"}, indent=2
+                )
+            )
         else:
             print("No confident matches.")
         return 0

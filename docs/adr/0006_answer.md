@@ -155,7 +155,8 @@ a second strategy.
 corpus pass. One document's answer costs one shard read.
 
 **7. No confident match prints `No confident matches.` and exits 0**;
-`--json` emits `{"answer": null, "citation": null}`.
+`--json` emits `{"answer": null, "citation": null, "source": "index"}` —
+`"source"` on every branch, because it is the key callers switch on.
 
 **8. The verb ships now so that M4 is an upgrade, not a new command.** That is
 the whole reason it exists in this shape.
@@ -214,7 +215,8 @@ No confident matches.
 $ fux answer "zzz nonexistent term" --json
 {
   "answer": null,
-  "citation": null
+  "citation": null,
+  "source": "index"
 }
 # exit 0
 ```
@@ -226,10 +228,12 @@ $ fux answer "zzz nonexistent term" --json
   about a three-line document, not a bug — and it is exactly what M4 fixes.
 - **A caller can detect the ceiling programmatically** via `"source"`, without
   parsing prose.
-- **`"source"` is missing from the no-match JSON.** `{"answer": null,
-  "citation": null}` has no `"source"` key, so a consumer keying on it must
-  handle absence. A small inconsistency, recorded rather than tidied, because
-  changing an output shape is a contract change and belongs in its own item.
+- **`"source"` is present on every `--json` branch** (since 2026-08-20). The
+  no-match payload is `{"answer": null, "citation": null, "source": "index"}`,
+  so the key this record tells callers to switch on is never absent. It was
+  recorded as an inconsistency rather than tidied on the spot, because changing
+  an output shape is a contract change and belonged in its own item — which is
+  the item that made this change.
 - **M4 upgrades this verb in place.** Callers written today keep working; the
   disclaimer line and the `"source"` value change.
 - **`answer` is not a summariser and will never become one.** A future request

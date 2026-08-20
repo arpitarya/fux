@@ -135,3 +135,55 @@ def test_a_real_dense_lane_bug_is_not_swallowed(corpus, monkeypatch):
     monkeypatch.setattr("fux.derive.dense.load_codes", boom)
     with pytest.raises(RuntimeError, match="dense lane is broken"):
         hybrid_ask(corpus, "alpha", top=5)
+
+
+def test_a_source_install_without_the_bundle_degrades_instead_of_crashing(corpus, monkeypatch):
+    """W-46: `get_model()` returns `None` on a source install, and `None.embed`
+    raised `AttributeError` — which was not in the guard's exception tuple, so
+    the guard written for exactly this case was dead.
+
+    The fix is an explicit `None` check, **not** a widened `except`: widening
+    to `AttributeError` would swallow every real bug inside `embed()` and
+    reintroduce the silent degradation the narrow tuple exists to prevent.
+    """
+    import fux.embed as embed_mod
+
+    monkeypatch.setattr(embed_mod, "get_model", lambda: None)
+    from fux.query.hybrid import _dense_ids
+
+    assert _dense_ids(corpus, "alpha") == []
+
+    fused = [r.id for r in hybrid_ask(corpus, "alpha", top=5)]
+    assert fused == [r.id for r in scan.ask(corpus, "alpha", top=5)]
+
+
+def test_the_none_guard_does_not_swallow_a_bug_inside_embed(corpus, monkeypatch):
+    """The other half of W-46: a present-but-broken model must still raise."""
+    import fux.embed as embed_mod
+
+    class Broken:
+        def embed(self, query):
+            raise AttributeError("a real bug inside embed()")
+
+    monkeypatch.setattr(embed_mod, "get_model", lambda: Broken())
+    from fux.query.hybrid import _dense_ids
+
+    with pytest.raises(AttributeError, match="a real bug inside embed"):
+        _dense_ids(corpus, "alpha")
+
+
+def test_ask_hybrid_exits_zero_on_a_source_install(corpus, monkeypatch, capsys):
+    """The user-visible half of W-46: a traceback must never reach the user."""
+    import argparse
+
+    import fux.embed as embed_mod
+    from fux.query import cmd_ask
+
+    monkeypatch.setattr(embed_mod, "get_model", lambda: None)
+    monkeypatch.setattr("fux.query.find_root", lambda: corpus)
+
+    args = argparse.Namespace(
+        query="alpha", top=5, json=False, scan=False, explain=False, hybrid=True
+    )
+    assert cmd_ask(args) == 0
+    assert "Traceback" not in capsys.readouterr().out
