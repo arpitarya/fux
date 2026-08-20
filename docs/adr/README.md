@@ -155,6 +155,7 @@ again here.
 | [0028](0028_runtime-stamp.md) | **ADR-RUNTIME-STAMP** | `stamp.json` — the cheap, non-reproducible size/mtime pre-check ahead of the manifest's real one | ⏳ proposed | yes |
 | [0029](0029_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide `n` and `total_wlen` that BM25F length normalization reads | ⏳ proposed | yes |
 | [0030](0030_graph-lane.md) | **ADR-GRAPH** | M3 — `explain`/`graph`/`path`, unseeded label-propagation communities in a derived plane, and PPR-lite with a **lazy** walk | ✅ accepted | yes |
+| [0033](0033_maintenance.md) | **ADR-MAINTENANCE** | M5 — `post-commit` (never `pre-commit`), a line-wise last-writer-wins merge driver that **refuses** rather than guesses, and L5 moved into `write_index` where nothing can skip it | ⏳ proposed | partial |
 | [0032](0032_types-list.md) | **ADR-TYPES** | which files are documents — a compiled-in prose allowlist, replaced (not extended) by `.fux/sources/types`; absent means the default, never "everything" | ✅ accepted | yes |
 | [0031](0031_refer-plane.md) | **ADR-REFER** | M4 core — fetch through the *consumer's* fetcher, verify by content sha (there is no recorded ingest time), ARC keyed `(loc, sha)`, and a **byte** budget with a floor | ⏳ proposed | partial |
 | 0030+ | — | unwritten | planned | — |
@@ -288,8 +289,10 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/query/` | ADR-ASK | BM25F, scan, rank, fusion — bound by the differential law |
 | `src/fux/embed/` | ADR-T1-ACCELERATOR | `fuxvec` codes; ships default-off on measured evidence |
 | `src/fux/graph/` | ADR-GRAPH | the M3 lane — edges lifted into adjacency, unseeded label-propagation communities, PPR-lite, and the `explain`/`graph`/`path` verbs. Owns `.fux/runtime/graph.json` |
+| `src/fux/maintain/` | ADR-MAINTENANCE | the git hooks, their installer, and the index merge driver. **L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
 | `src/fux/refer/` | ADR-REFER | M4's core — source · freshness · ARC · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
 | `tools/pruning-eval/` | W-38 | the gate harness and its frozen pre-registrations. **Owned by an open item, not a record** — the verdicts that used it ([P1-GATE](../../work/regression/2026-08-09-pruning-eval/VERDICT.md) · [P1-RERUN](../../work/regression/2026-08-09-pruning-rerun/VERDICT.md)) are no longer ADRs, and W-38 is the only live item permitted to touch pruning work |
+| `tools/maintenance-bench/` | ADR-MAINTENANCE | the R5 and R6 harness. **Written, not run** — Arpit held prediction runs on 2026-08-20, and the record is `proposed` until they are |
 | `tools/differential/` | ADR-T1-ACCELERATOR | the differential-law harness and the R3 bench |
 
 <!-- OWNERSHIP-TABLE-END -->

@@ -14,7 +14,7 @@ timestamp: 2026-08-18T00:00:00Z
 - **Owns:** `src/fux/cli.py`
 - **Laws:** L1, L4, L7 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
-- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`, **eleven since the M3 graph lane** (2026-08-20)
+- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`, **twelve since M3 and M5** (2026-08-20)
 - **Evidence:** [`work/regression/2026-08-18-cli-surface/`](../../work/regression/2026-08-18-cli-surface/report.md)
   — every example below is a verbatim capture, not an illustration
 
@@ -31,6 +31,7 @@ timestamp: 2026-08-18T00:00:00Z
 | **sources** | `url` | records what to index; it never fetches |
 | **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
+| **maintenance** | `hooks` | wires the repository to keep its own index in step; installs nothing it did not write |
 
 The grouping replaced *"three build the index and three query it"* on
 2026-08-19, when `setup` and `url` took the surface from six to eight. **The
@@ -39,7 +40,7 @@ that survives a new verb where a count does not. It survived again on
 2026-08-20: the graph lane added three verbs and cost this table one row, which
 is the whole argument for grouping by effect.
 
-**Eleven flat verbs is still not a tree.** `url` takes flags rather than
+**Twelve flat verbs is still not a tree.** `url` takes flags rather than
 becoming `fux url add`, and `path` takes two positionals and `--hops` rather
 than becoming `fux graph path`; that is the constraint every addition has to
 preserve. Nesting is the thing this record refuses, not arithmetic.
@@ -151,6 +152,17 @@ ever** — that is the constraint, and it is what the count was standing in for.
 A new verb takes flags, never a subcommand tree, and lands in one of the groups
 or argues for a new one in this record. M4's refer verbs are still not covered
 here.
+
+**1c. `hooks` arrived on 2026-08-20** and is a sixth group of one. It takes
+flags — `--install` (the default), `--status`, `--uninstall`, `--json` — rather
+than becoming `fux hooks install`, for the same reason `url` did. It is the
+first verb that **writes outside `.fux/`** (into `.git/hooks/` and
+`.gitattributes`), which is why it refuses to overwrite anything it did not
+write and says so. The reasoning is [ADR-MAINTENANCE](0033_maintenance.md)'s.
+
+> **`fux-merge-index` is a separate console script, not a verb**, and that is
+> not a surface inconsistency: git invokes a merge driver as a bare command
+> with positional arguments and offers no way to pass a subcommand.
 
 **1b. The graph group arrived on 2026-08-20 and argued for itself, per the
 rule above.** `explain <doc>`, `graph <query>` and `path <from> <to> --hops N`

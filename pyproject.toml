@@ -34,6 +34,9 @@ Repository = "https://github.com/arpitarya/fux"
 
 [project.scripts]
 fux = "fux.cli:main"
+# A separate entry point, not a `fux` subcommand: git invokes a merge driver as
+# a bare command with positional arguments and no way to pass a verb.
+fux-merge-index = "fux.maintain.mergedriver:main"
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]

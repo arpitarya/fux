@@ -1,5 +1,32 @@
 """The canonical writer: records in, deterministic shard files out.
 
+## L5 is enforced here, at write time, and that placement is the point
+
+**Hashed meta is the default for non-git sources, enforced at write time**
+(L5). Until M5 that enforcement lived in `ingest/run.py`, which is to say it
+lived in *one caller* — so it was a convention that happened to hold rather
+than a property of the index. Any second writer (an enrichment pass, a
+migration script, a test fixture, a consumer using the library) could write a
+record carrying a private document's title into a committed file, and nothing
+would have said no.
+
+It closes an **ACL-mismatch leak**: a document readable by fifty people inside
+Confluence becomes a title readable by everyone with the repo. That is why L5
+is a law rather than a configuration preference, and why the check is here
+rather than in the path that happens to be used today.
+
+The rule, in full:
+
+- A `git` record may say what it likes; the repo already holds its bytes.
+- A **non-git** record must state `meta` explicitly. A missing value means
+  something bypassed the resolution layer, and guessing on its behalf is
+  exactly the failure this prevents.
+- `meta: "hashed"` must carry **no display text** — no `title`, no `phrases` —
+  and must carry `title_h`.
+- `meta: "plain"` is legal and is an explicit, per-document opt-out
+  (ADR-URL-LIST decision 10). It has to be *said*.
+
+
 Always a full, deterministic rewrite of every shard implied by the given
 record set — never an in-place patch (§6 non-negotiable). "Incremental" is an
 emergent property: a record whose fields haven't changed serializes to the
@@ -44,6 +71,7 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
         if doc_id in seen_ids:
             raise FuxError(f"duplicate id in index write: {doc_id!r}")
         seen_ids.add(doc_id)
+        assert_meta_policy(record)
         by_shard.setdefault(shard_for(doc_id), []).append(record)
 
     directory = index_dir(root)
@@ -66,6 +94,49 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
         path.unlink(missing_ok=True)
 
     return written
+
+
+#: Fields that carry text a human can read. A `hashed` record may hold none of
+#: them: the whole point is that the index reveals nothing the source system
+#: would not have shown this reader.
+DISPLAY_FIELDS = ("title", "phrases")
+
+
+def assert_meta_policy(record: dict) -> None:
+    """Refuse to write a non-git record that leaks display text (L5).
+
+    Raises `FuxError` naming the document and the fix. Called per record by
+    `write_index`, so **there is no path into a committed shard that skips
+    it** — which is the difference between a law and a habit.
+    """
+    if record.get("src") == "git":
+        return
+
+    doc_id = record.get("id", "<no id>")
+    meta = record.get("meta")
+    if meta is None:
+        raise FuxError(
+            f"{doc_id}: a non-git record must state `meta` explicitly. Its absence means the "
+            "policy layer was bypassed, and the default (`hashed`, L5) is not applied here on "
+            "purpose — guessing on a caller's behalf is the leak this check exists to stop"
+        )
+    if meta not in ("plain", "hashed"):
+        raise FuxError(f"{doc_id}: meta must be 'plain' or 'hashed', got {meta!r}")
+
+    if meta == "hashed":
+        leaked = [f for f in DISPLAY_FIELDS if f in record]
+        if leaked:
+            raise FuxError(
+                f"{doc_id}: meta is 'hashed' but the record carries {', '.join(leaked)}. "
+                "A hashed record holds `title_h` and no readable text — this is the "
+                "ACL-mismatch leak L5 exists to close. Either drop the field, or declare "
+                "`meta=plain` on that source line if the document really is public"
+            )
+        if "title_h" not in record:
+            raise FuxError(
+                f"{doc_id}: meta is 'hashed' but there is no `title_h`. A record with neither "
+                "a title nor a title hash cannot be cited by any verb"
+            )
 
 
 def _atomic_write(path: Path, data: bytes) -> None:

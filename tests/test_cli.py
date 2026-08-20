@@ -25,7 +25,8 @@ def test_parser_has_the_verb_surface():
     `ingest`/`build` — one writes the committed plane, one derives from it ·
     sources `url` records what to index · read `ask`/`find`/`answer` differ
     only in how much they commit to · **graph `explain`/`graph`/`path` answer
-    with relationships rather than with rankings** (M3).
+    with relationships rather than with rankings** (M3) · maintenance `hooks`
+    wires the repository up to keep its own index in step (M5).
 
     Five groups, not four, since the graph lane landed — and the count was
     never the mental model, which is why adding one costs a line here and a
@@ -45,6 +46,7 @@ def test_parser_has_the_verb_surface():
         "explain",
         "graph",
         "path",
+        "hooks",
     }
 
 

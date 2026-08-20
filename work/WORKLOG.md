@@ -108,6 +108,39 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — W-27 closed by Arpit's direct ratification, not the retired gate  ·  Claude Code
+
+- **Asked:** review `work/open/` and archive whatever is complete; separately,
+  Arpit then stated directly that W-27 is implemented and should close, with
+  one ongoing requirement — dogfood tracking updated on every fux version
+  upgrade.
+
+- **Did:** first pass found nothing in `work/open/` complete against
+  `IMPLEMENTATION.md`/repo state (all 9 items genuinely open — W-56's lab and
+  playground scaffolding was mid-build by a concurrent session, goldens
+  correctly not yet fabricated). On Arpit's explicit instruction, closed
+  **W-27** (M7 dogfood & release gate) directly: its retired DoD (two weeks of
+  logged daily use in fux + Anton, ending in a release Arpit had used) was
+  never measured, and W-27 was still `blocked by W-26` (M6, unstarted) under
+  that gate. Arpit overrode both and ratified closure on the fact that fux
+  already dogfoods itself in this repo (`.fux/` self-indexed). Row deleted
+  from `OPEN-WORK.md`; detail file moved to
+  [`archive/open/W-27-m7-dogfood-release-gate.md`](../archive/open/W-27-m7-dogfood-release-gate.md);
+  outcome recorded in `IMPLEMENTATION.md`'s Ratified decisions table; new
+  [`DOGFOOD.md`](../DOGFOOD.md) created as the standing artifact for the
+  replacement obligation; `DOC-REGISTRY.md` bumped for all four touched docs.
+
+- **Decided / open:** **W-27's original DoD is not met and was not
+  re-verified** — this is a human call recorded as such, not a measured
+  closure. The replacement obligation (`DOGFOOD.md` refreshed on every version
+  bump) has no log entries yet; nothing has shipped since `0.33.0`.
+
+- **Next:** the agent lane's live blocker is [W-57](open/W-57-graph-lane-acceptance.md)
+  (goldens need hand-grading) per the current inbox — W-56 already closed by a
+  concurrent session during this exchange.
+
+- **Cost:** unmeasured — no per-session token meter was read.
+
 ## 2026-08-20 — W-45 and W-55 were already closed; verified rather than rebuilt  ·  Claude Code
 
 - **Asked:** implement W-45 and W-55 so they can be closed.

@@ -8,7 +8,32 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`fux hooks` — the maintenance plane** (M5,
+  [ADR-MAINTENANCE](docs/adr/0033_maintenance.md), **proposed, not accepted**).
+  Installs `post-commit` / `post-merge` / `post-checkout` and registers a merge
+  driver for `.fux/index/*.jsonl`. Every hook is best-effort and **cannot block
+  a commit**; installation **refuses rather than overwrites** a hook fux did
+  not write, and `--uninstall` removes only what it wrote.
+- **`fux-merge-index` — a line-wise merge driver for the committed index.**
+  Two people working at once no longer get a textual conflict in a
+  machine-written file: it resolves last-writer-wins on `(ver, sha)`, sorts its
+  output by id so two machines merge to the same bytes, and **refuses** on the
+  four cases it cannot resolve — writing ordinary conflict markers that keep
+  both sides and naming the fix. It never picks a side.
+  A separate console script rather than a `fux` verb, because git invokes a
+  merge driver as a bare command with positional arguments.
+
 ### Changed — **breaking**
+
+- **L5 is enforced when a record is written, not when it is ingested.** The
+  hashed-meta rule for non-git sources moved from `ingest/run.py` — one caller
+  — into `write_index`, the only way bytes reach a committed shard. A non-git
+  record must now **state** `meta` (a missing value is refused rather than
+  defaulted), and a `hashed` record carrying `title` or `phrases` is rejected.
+  **Breaking only for a caller writing records directly**; every record this
+  repo already holds complied, so nothing changed on disk.
 
 - **Only prose files are indexed now** ([ADR-TYPES](docs/adr/0032_types-list.md),
   W-55 verdict G). The git-dir walker had **no file-type filter at all**:

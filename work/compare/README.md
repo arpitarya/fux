@@ -38,6 +38,7 @@ debate without archaeology. v0.26-era compare docs are archived at
 | [pruning-criterion](pruning-criterion.compare.md) | KL vs impact vs term-centric vs combined; the gate metric | prediction **falsified** by the re-run (P1-RERUN); pruning removed from the design — full postings | ❌ closed (M8 experiment only) |
 | [record-freshness](record-freshness.compare.md) | Does a committed record need a timestamp so an age bound can be honoured | **D — no age bound** (proposed) | ⏳ awaiting Arpit |
 | [refer-fetch-cache](refer-fetch-cache.compare.md) | Should the refer plane cache `url:` fetches locally with a wall-clock TTL, and how, without touching the committed record | **F — gitignored TTL cache, `cached` as a 4th verdict state, 300s default** | ✅ accepted (2026-08-20) |
+| [maintenance-trigger](maintenance-trigger.compare.md) | git hooks + delta ingest vs CI rebuild vs local watch daemon vs manual | **git hooks + delta ingest** (W-25, as scoped) | ✅ accepted (2026-08-20) |
 
 Convention: `> **Verdict:**` blockquote first, then Context → Options →
 Matrix → Consequences → References → Reopen-trigger. Docs here are compact;

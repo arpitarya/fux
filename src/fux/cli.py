@@ -63,6 +63,12 @@ def _cmd_build(args) -> int:
     return cmd_build(args)
 
 
+def _cmd_hooks(args) -> int:
+    from .maintain import cmd_hooks
+
+    return cmd_hooks(args)
+
+
 def _cmd_explain(args) -> int:
     from .graph import cmd_explain
 
@@ -147,6 +153,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_find.set_defaults(func=_cmd_find)
 
     _query_parser("answer", "the single best answer the index can give").set_defaults(func=_cmd_answer)
+
+    p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
+    p_hooks.add_argument("--install", action="store_true", help="write them (the default)")
+    p_hooks.add_argument("--status", action="store_true", help="report what is wired")
+    p_hooks.add_argument("--uninstall", action="store_true", help="remove only what fux wrote")
+    p_hooks.add_argument("--json", action="store_true", help="machine-readable status")
+    p_hooks.set_defaults(func=_cmd_hooks)
 
     # The graph group. Flat, like every other verb — `fux graph path` would be
     # the first subcommand tree on this surface, and "no subcommand tree" is
