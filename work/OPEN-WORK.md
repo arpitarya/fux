@@ -11,15 +11,27 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — the inbox
 
-**Empty.**
+**Two, both filed 2026-08-20 — neither is aging yet.** They are one decision
+or two, and that is itself Arpit's call.
+
+- **W-45** · *filed 2026-08-20* · **the compare doc is written and awaits a
+  verdict** — [`source-exclusion.compare.md`](compare/source-exclusion.compare.md).
+  Proposed: an exclusion **entry** (`!path/glob`) in `.fux/sources/dirs`, not
+  the attribute [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) anticipated.
+  Options C and D are eliminated by measurement.
+- **W-55** · *filed 2026-08-20* · **the walker has no file-type filter** —
+  14 % of this repo's index is `.json`/`.svg`/`.sh`/`.py`. Found while
+  measuring W-45; the compare doc recommends **deciding this one first or
+  together**, because 14 of W-45's 16 motivating files are non-prose.
 
 ---
 
 ## Open items, by record
 
-### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md)
+### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-INGEST](../docs/adr/0007_ingest.md)
 
-- **W-45** · `agent` · **Opus** to decide, Sonnet to build · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** — an exclusion attribute on a directory line, and the file now exists to carry one (W-54, 2026-08-19). **The fork itself still owes a compare doc**, and the attribute set is closed at one until this record changes — [detail](open/W-45-source-exclusion.md)
+- **W-45** · `arpit` · **the compare doc is written; the verdict is the only thing left** · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — **measured 2026-08-20: 33 of 150 documents (22.0 %) come from `work/regression/`, 16 of them raw evidence, and a `fixture.sh` outranks the record it illustrates.** Proposed verdict is an exclusion *entry*, not the anticipated attribute — [compare](compare/source-exclusion.compare.md) · [detail](open/W-45-source-exclusion.md)
+- **W-55** · `arpit` · **new, 2026-08-20** · the walker applies **no file-type filter** — anything UTF-8-decodable is a document, so **21 of 150 indexed documents (14 %) are `.json`, `.svg`, `.sh`, `.py` or `.mermaid`**, and a raw JSON blob ranks #2 on a plain query. Unbounded at the design point, not 14 %: a consumer pointing fux at a repo root indexes their lockfiles. **Decide with or before W-45** — [detail](open/W-55-no-file-type-filter.md)
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
 

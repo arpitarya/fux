@@ -1,6 +1,6 @@
 # W-45 — A source tree needs a way to exclude mechanical artifacts
 
-**Status:** OPEN · the config-surface question is **answered** ([ADR-DIR-LIST](../../docs/adr/0023_dir-list.md): an attribute on a directory line); the fork itself is not, and still owes a compare doc
+**Status:** OPEN·human — **the compare doc is written and the verdict is Arpit's** ([`source-exclusion.compare.md`](../compare/source-exclusion.compare.md), 2026-08-20). Nothing further is agent-closable here
 **Blocked by:** —
 **Evidence:** [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)
 §Finding 3
@@ -47,26 +47,71 @@ But it is a convention riding on an implementation detail:
 > attribute set is closed at one (`archived`), so adding an exclusion is a change
 > to that record, and this item still owes its compare doc.
 
+## 2026-08-20 — the compare doc is written, and it changed the shape of the answer
+
+[`work/compare/source-exclusion.compare.md`](../compare/source-exclusion.compare.md)
+is the fork's doc. Three things came out of writing it that this file did not
+know:
+
+1. **Options C and D are eliminated by measurement, not argument.** C
+   (`.gitignore`) solves nothing — every contaminating file is git-*tracked*.
+   D (document the dot-prefix) is **measurably decayed**: of seven filed runs,
+   **two use `.evidence/` and five use plain `evidence/`**, and the five
+   include every run filed after this item was opened.
+
+2. **The proposed verdict is *not* the attribute ADR-DIR-LIST anticipated.**
+   It is an exclusion **entry** (`!work/regression/*/evidence`), because the
+   attribute grammar describes properties of the thing on the line, and
+   attribute values carry no whitespace and no quoting — so two exclusions
+   would need a comma sub-grammar the format has never had. This is a
+   judgment, it is argued in the doc, and it is Arpit's to override.
+
+3. **A larger, unrecorded cause was found underneath it.** The walker has **no
+   file-type filter**: 21 of 150 indexed documents (14 %) are `.json`, `.svg`,
+   `.sh`, `.py` or `.mermaid`. Filed as
+   [W-55](W-55-no-file-type-filter.md). **14 of the 16 files this item was
+   opened about are non-prose**, so a type filter alone would close most of
+   the motivating case. The compare doc recommends deciding W-55 first or
+   together — buying a path-exclusion system to solve a problem an extension
+   allowlist mostly closes is the wrong purchase.
+
+The measured contamination, re-derived rather than read: **150 indexed
+documents · 33 (22.0 %) from `work/regression/` · 16 under `evidence/`**, and
+a `fixture.sh` outranks the very record it illustrates.
+
 ## The options
 
-| option | shape | cost |
-|---|---|---|
-| **A · `[sources] exclude`** | a list of repo-root-relative globs, applied after the walk | small; one config key, one schema line, an ADR |
-| **B · a `.fuxignore` file** | gitignore-syntax, per-directory | familiar to users, but a second ignore language in a repo that already has `.gitignore` |
-| **C · honour `.gitignore` only** | index nothing git ignores | free and already true (untracked files are walked, though — this would be a change) |
-| **D · document the dot-prefix rule** | make the implementation detail an explicit contract | free, but does not generalize past this repo |
+*Superseded by the compare doc's option set — kept because it is what the
+options looked like before they were measured.* Option A read
+`[sources] exclude`, a config key that **no longer exists**: `[sources] dirs`
+was retired on 2026-08-19 and the list is now `.fux/sources/dirs`, so A became
+"an attribute on a directory line" and, after the argument above, an exclusion
+**entry** instead.
 
-**No recommendation.** This is a config-surface decision on a `$0`,
+| option | shape | measured outcome |
+|---|---|---|
+| **A · an exclusion on the directory line** | an attribute, or (proposed) a `!`-prefixed entry | **live** — the two shapes are the real fork |
+| **B · a `.fuxignore` file** | gitignore-syntax, per-directory | **rejected** — a second ignore language, and gitignore's negation/`**`/precedence rules are what a stdlib reimplementation would owe |
+| **C · honour `.gitignore` only** | index nothing git ignores | **eliminated by measurement** — every contaminating file is git-*tracked*; this solves nothing |
+| **D · document the dot-prefix rule** | make the implementation detail an explicit contract | **eliminated by measurement** — followed by 2 of 7 filed runs and dropped by the other 5 |
+
+**No recommendation from this file** — the compare doc carries the proposed
+verdict, and the call is Arpit's. This is a config-surface decision on a `$0`,
 stdlib-only tool where every added key is permanent, and the adapter-cap
-discipline says config surface is not free. Worth one compare doc rather than
-a builder's guess.
+discipline says config surface is not free.
 
 ## Definition of done
 
-- [ ] A compare doc, per the standing rule — this is a fork with real options.
-- [ ] Arpit's verdict, then an ADR.
-- [ ] `CLAUDE.md`'s conformance-law wording reconciled with whatever wins
-      (it currently says `evidence/`; this repo now writes `.evidence/`).
+- [x] A compare doc, per the standing rule — this is a fork with real options.
+      **Done 2026-08-20:** [`source-exclusion.compare.md`](../compare/source-exclusion.compare.md).
+- [ ] **Arpit's verdict**, then an ADR. *This is the only thing standing
+      between this item and a build.*
+- [ ] Decided with or after [W-55](W-55-no-file-type-filter.md), per the
+      compare doc's sequencing recommendation.
+- [ ] `CLAUDE.md`'s conformance-law wording reconciled with whatever wins.
+      **Corrected 2026-08-20:** this line used to say "this repo now writes
+      `.evidence/`". It does not — it writes **both**, `.evidence/` in 2 runs
+      and `evidence/` in 5, which is the decay that killed option D.
 - [ ] The three frozen R2 questions re-run afterwards, since this changes what
       is in the corpus.
 

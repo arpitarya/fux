@@ -34,6 +34,7 @@ debate without archaeology. v0.26-era compare docs are archived at
 | [meta-privacy](meta-privacy.compare.md) | plain vs hashed-default vs hashed-only meta | **hashed-by-default for external sources** | ✅ accepted (council) |
 | [cache-policy](cache-policy.compare.md) | LRU vs ARC | **ARC** | ✅ accepted |
 | [ingest-mode-naming](ingest-mode-naming.compare.md) | "extracted" vs "enriched" vs "advanced" for the AI tier | **enriched** (proposed) | ⏳ awaiting Arpit |
+| [source-exclusion](source-exclusion.compare.md) | exclusion attribute vs exclusion *entry* vs `.fuxignore` vs `.gitignore` vs the dot-prefix convention | **an exclusion entry `!path/glob` in `.fux/sources/dirs`** (proposed); C and D eliminated by measurement | ⏳ awaiting Arpit |
 | [pruning-criterion](pruning-criterion.compare.md) | KL vs impact vs term-centric vs combined; the gate metric | prediction **falsified** by the re-run (P1-RERUN); pruning removed from the design — full postings | ❌ closed (M8 experiment only) |
 
 Convention: `> **Verdict:**` blockquote first, then Context → Options →
