@@ -48,7 +48,6 @@ when the pre-registration is written, and not because they look ready.*
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-25** · `agent` · **next, and unblocked** · M5 maintenance — hooks, line-wise LWW merge driver, hashed-meta enforcement. **R5 and R6 need the lab (W-56)**: the build is unblocked, the gate is not — [detail](open/W-25-m5-maintenance.md)
 - **W-26** · `agent` · **W-25 is done, but this cannot honestly start while prediction runs are held** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. **Its DoD requires *every* R prediction to have a measured value or an honest failure record**, and R4/R5/R6/R7 are all unrun (W-59 · W-61, held 2026-08-20). Building `tpack` and a T2 tier now would mean picking the tier-auto threshold by hand — which is the one thing the DoD forbids — and is the *build the fun part first* failure the gating rule exists to prevent — [detail](open/W-26-m6-scale-t2.md)
 - **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
 
