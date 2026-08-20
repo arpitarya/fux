@@ -28,6 +28,29 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — W-58 closed: option D, no age bound  ·  Cowork
+- **Asked:** what's blocking W-58; then, mid-discussion, Arpit ratified option
+  D (no age bound) from `record-freshness.compare.md`.
+- **Did:** compare doc flipped to `status: accepted` with the decided verdict;
+  [ADR-REFER](../docs/adr/0031_refer-plane.md) decision 4 and veto condition 3
+  amended to record the closure; `work/open/W-58-no-recorded-ingest-time.md`
+  marked CLOSED and copied to `archive/open/` (the original in `work/open/`
+  could not be `git mv`'d/removed from this session — no git access over the
+  device bridge; still needs `git rm`); `OPEN-WORK.md`'s inbox and open-items
+  row for W-58 removed.
+- **Decided / open:** **D is final** — no ingest time is added to the
+  committed record; content-sha verification is the answer, and
+  `max_age_seconds` stays struck. Reopen trigger unchanged: R4 shows warm-path
+  fetch cost dominating and a caller willing to trade staleness for latency,
+  at which point build E (corpus-level stamp), not A/B/C.
+- **Next:** a git-capable session should `git rm work/open/W-58-no-recorded-ingest-time.md`
+  (superseded by the `archive/open/` copy) and bump the `DOC-REGISTRY.md` rows
+  this touched (`docs/adr/`, `OPEN-WORK.md`, `compare/*.compare.md`, `open/`) —
+  skipped this session to avoid colliding with the concurrently active local
+  session editing those same rows.
+- **Cost:** unmeasured — interactive Cowork session, no token/time tracking
+  enabled.
+
 ## 2026-08-20 — delta ingest: a veto condition fired, and W-25/W-60 were taken by a concurrent session  ·  Claude Code
 
 - **Asked:** implement W-25 and W-26, and W-60 too, as fast as possible.

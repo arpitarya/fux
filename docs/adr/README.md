@@ -293,6 +293,7 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/refer/` | ADR-REFER | M4's core — source · freshness · ARC · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
 | `tools/pruning-eval/` | W-38 | the gate harness and its frozen pre-registrations. **Owned by an open item, not a record** — the verdicts that used it ([P1-GATE](../../work/regression/2026-08-09-pruning-eval/VERDICT.md) · [P1-RERUN](../../work/regression/2026-08-09-pruning-rerun/VERDICT.md)) are no longer ADRs, and W-38 is the only live item permitted to touch pruning work |
 | `tools/maintenance-bench/` | ADR-MAINTENANCE | the R5 and R6 harness. **Written, not run** — Arpit held prediction runs on 2026-08-20, and the record is `proposed` until they are |
+| `tools/refer-bench/` | ADR-REFER | the R4 harness and its frozen pre-registration — a real `http.server` behind the **consumer's own generated fetcher**, so the measured path is the shipped one |
 | `tools/differential/` | ADR-T1-ACCELERATOR | the differential-law harness and the R3 bench |
 
 <!-- OWNERSHIP-TABLE-END -->

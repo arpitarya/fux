@@ -2,14 +2,14 @@
 type: Compare Doc
 title: Record Freshness
 description: Whether a committed record needs a timestamp so an age bound can be honoured — and if so, where a deterministic one comes from.
-status: proposed
+status: accepted
 timestamp: 2026-08-20T00:00:00Z
 ---
 
 # Bounding staleness without a clock — Comparison
 
-> **Proposed verdict: D — no age bound. Content verification is the answer,
-> and `max_age_seconds` is struck from the proposal.**
+> **Verdict: D — no age bound. Content verification is the answer, and
+> `max_age_seconds` is struck from the proposal.**
 > The engine already ships **both endpoints of the freshness axis** —
 > `never` (don't revalidate) and `always` (revalidate every time). `max_age` is
 > the *middle*, and in HTTP — where this whole vocabulary comes from — the
@@ -17,9 +17,9 @@ timestamp: 2026-08-20T00:00:00Z
 > Nobody has measured that fetch cost yet: **R4 is unmeasured**
 > ([W-59](../open/W-59-refer-plane-measurement.md)). Deciding a cost
 > optimisation before measuring the cost is backwards.
-> **Status:** ⏳ awaiting Arpit · **Confidence:** high on rejecting B (mtimes),
-> high on A/C collapsing into one option, medium on D over E — D is a bet that
-> the cost never bites.
+> **Status:** ✅ decided 2026-08-20 — Arpit: **D**. **Confidence:** high on
+> rejecting B (mtimes), high on A/C collapsing into one option, medium on D
+> over E — D is a bet that the cost never bites.
 > **Reopen when:** R4's measurement shows warm-path fetch cost dominating and a
 > caller willing to trade staleness for latency. Then build **E**, not A/B/C.
 

@@ -13,7 +13,7 @@ timestamp: 2026-08-20T00:00:00Z
 - **Status:** proposed — **accepted requires R5 and R6**, both held (below)
 - **Date:** 2026-08-20
 - **Feature:** M5 — maintenance
-- **Owns:** `src/fux/maintain/`
+- **Owns:** `src/fux/maintain/` · `tools/maintenance-bench/`
 - **Amends:** [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
   [ADR-CLI](0002_cli-surface.md)
 - **Laws:** L3, L5, L7

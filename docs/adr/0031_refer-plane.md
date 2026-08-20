@@ -13,7 +13,7 @@ timestamp: 2026-08-20T00:00:00Z
 - **Status:** proposed — **accepted requires R4**, which cannot run yet (below)
 - **Date:** 2026-08-20
 - **Feature:** M4 — the refer plane (core; adapters and the R4 bench outstanding)
-- **Owns:** `src/fux/refer/`
+- **Owns:** `src/fux/refer/` · `tools/refer-bench/`
 - **Laws:** L1, L2, L3, L4
 
 ---
@@ -141,6 +141,12 @@ the byte-identity assertion because mtimes are not reproducible.
 > bounded their staleness. **The policy is a mode — `never` | `always` — plus
 > `timeout_seconds`.** Adding a recorded ingest time is a change to ADR-RECORD
 > with a real determinism question attached; filed as **W-58**.
+
+> **W-58 closed 2026-08-20 — Arpit: option D.** No ingest time is added to the
+> record. Content verification (comparing the fetched sha against the recorded
+> one) is the answer; `max_age_seconds` is struck from the proposal for good,
+> not deferred. Decision 4 stands permanently on this ground — see
+> [`work/compare/record-freshness.compare.md`](../../work/compare/record-freshness.compare.md).
 
 **5. Freshness is verified by content, and that is stronger than age.** A fetch
 compares the fetched bytes' sha against the recorded sha. This answers *"is the
@@ -328,10 +334,14 @@ the caller's window. `dropped` is reported so truncation is never silent.
 2. **The budget sweep is flat across budgets.** If answer-quality-per-byte does
    not move, the greedy assembler is not earning its complexity and plain top-k
    with truncation wins. Say so rather than keeping it.
-3. **A record gains a reproducible ingest time** (W-58). Then decision 4's
-   premise is gone and an age-based mode becomes implementable — at which point
-   it must be argued on merit against content verification, not adopted because
-   the proposal originally said so.
+3. **A record gains a reproducible ingest time.** Then decision 4's premise is
+   gone and an age-based mode becomes implementable — at which point it must be
+   argued on merit against content verification, not adopted because the
+   proposal originally said so. **Checked 2026-08-20 (W-58) — did not fire:**
+   Arpit decided against adding one (option D); see
+   [`work/compare/record-freshness.compare.md`](../../work/compare/record-freshness.compare.md).
+   Reopen trigger there: R4 shows warm-path fetch cost dominating and a caller
+   willing to trade staleness for latency.
 4. **`src/fux/` imports a network library anywhere.** That is decision 1 broken,
    and it is checkable in one command.
 5. **A cached copy is served for a document the reader has since lost access
