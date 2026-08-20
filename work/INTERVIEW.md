@@ -30,7 +30,37 @@ valuable judgement, but not the state of play.
 *Updated 2026-08-20.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: M3 and M4's core landed (2026-08-20)
+### The most recent change: the agent lane is empty (2026-08-20)
+
+**Every item an agent could close alone is closed.** What remains needs Arpit:
+a verdict, a hold lifted, or fifty goldens written by hand.
+
+| shipped 2026-08-20 | record | measured? |
+|---|---|---|
+| W-46 · W-48 — two query defects | ADR-CLI · ADR-ASK · ADR-ANSWER | n/a |
+| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0030_graph-lane.md) ✅ | **no** — W-57 |
+| **M4 core** the refer plane | [ADR-REFER](../docs/adr/0031_refer-plane.md) ⏳ | **no** — W-59 |
+| W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-TYPES](../docs/adr/0032_types-list.md) ✅ | **no** — rides with W-52 |
+| W-56 — both lab environments | SETUP-LAB · SETUP-PLAYGROUND | rebuilt, under git |
+| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0033_maintenance.md) ⏳ | **no** — W-61 |
+| W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0031_refer-plane.md) 5a-5c ✅ | n/a |
+
+**Two records are `proposed` rather than `accepted` on purpose** — ADR-REFER
+and ADR-MAINTENANCE — because their gates have not run. **Do not promote them
+without the measurement**; that is the whole reason the status field is being
+used this way.
+
+**Arpit held all prediction runs on 2026-08-20**: R4, R5, R6 and R7 run only
+when he says so explicitly. Both harnesses exist
+([`tools/maintenance-bench/`](../tools/maintenance-bench/run.py), the rebuilt
+lab), so this is a decision, not a blocker.
+
+**`fux` is twelve flat verbs now** — `setup` `doctor` `ingest` `build` `url`
+`ask` `find` `answer` `explain` `graph` `path` `hooks` — plus a separate
+`fux-merge-index` console script, because git invokes a merge driver as a bare
+command. **Still no subcommand tree.**
+
+### Before that: M3 and M4's core landed (2026-08-20)
 
 **Read this first: the engine grew two milestones and neither is measured, and
 the reason is that the measuring environments are gone.**
@@ -164,14 +194,18 @@ the reason is that the measuring environments are gone.**
 
 *Updated 2026-08-20.*
 
-- **The immediate next step is Arpit's, not an agent's: read the inbox, and
-  read [W-56](open/W-56-sibling-environments-missing.md) first.** It blocks
-  W-57 and W-59 and every remaining prediction, and no agent can fix a missing
-  directory. W-58 is the second.
-- **On the agent lane: W-45 and W-55 are both decided and land as ONE change**
-  — they modify the same grammar in `.fux/sources/dirs`, and splitting them
-  means touching the parser twice. After that, **W-25 (M5) is next and
-  unblocked** — its *build* is; its R5/R6 gates need the lab.
+- **The agent lane is empty. Every remaining item needs Arpit**, in one of
+  three ways:
+  1. **Lift the hold** on prediction runs — then W-59 (R4) and W-61 (R5, R6)
+     run immediately and two records can stop being `proposed`.
+  2. **Give W-58 a verdict** — the compare doc proposes *D, no age bound*.
+  3. **Write the playground's ~50 goldens** (W-57). No agent should do this:
+     a golden derived from the engine's own output passes forever, including
+     on the day ranking breaks.
+- **W-26 (M6) looks available and is not.** Its DoD requires *every* R
+  prediction measured, and building `tpack` + T2 early would mean hand-picking
+  the tier-auto threshold the DoD explicitly forbids hardcoding. It is recorded
+  that way in its own detail file so the next session does not re-derive it.
 - **Nothing is half-built in `src/`, but two things are built-and-unproven.**
   M3 and M4's core both landed complete and green; what is missing is their
   *measurements*, carried by [W-57](open/W-57-graph-lane-acceptance.md) and
@@ -249,6 +283,22 @@ which are not laws:
 
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
+
+- **Run it; do not read it** (2026-08-20). Four defects in one session came
+  from *executing* code that looked correct: the merge driver treated a
+  one-sided **add** as a delete-vs-modify, so every disjoint addition — the
+  common case — would have conflicted; `read -r A B < <(...)` returns non-zero
+  at EOF without a trailing newline, so `set -e` killed a setup script with no
+  output whatsoever; a bench reported **its own** interpreter beside a latency
+  instead of the engine's; and an ARC differential caught cache state leaking
+  into an answer. **None was visible by reading**, and three of the four would
+  have passed a review.
+
+- **A control is what makes a test mean something** (2026-08-20). The merge
+  driver's test runs the same merge twice — once without the driver, once with
+  — and asserts git conflicts in the first case. Without that arm the driver
+  could have been doing nothing at all and the test would still have been
+  green. **When you test that something helps, prove the harm exists first.**
 
 - **Port the code, but measure it before you trust it** (2026-08-20). M3's PPR
   came off the archived kernel with its determinism discipline intact, and the

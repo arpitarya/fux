@@ -171,6 +171,80 @@ play: the worklog is the granular, per-exchange trail.
 - **Cost:** unmeasured — a verification exchange; no per-session token meter was
   read.
 
+## 2026-08-20 (later) — the rest of the agent lane: W-45+W-55, W-56, M5, W-60  ·  Claude Code
+
+- **Asked:** commit everything; **hold prediction runs until told explicitly**;
+  review the rest of OPEN-WORK and implement every non-blocked item so it can
+  be closed.
+
+- **Did:** five commits, `773 → 804` tests, `adr-guard` exit 0 throughout.
+
+  - **Committed the working tree** (`9dcf878`), most of it three concurrent
+    sessions' work, with provenance recorded rather than implied. **The tree
+    was red** — `work/NOW.md` had no DOC-REGISTRY row — and that one-line fix
+    is the only content of mine in it.
+  - **W-45 + W-55 closed as ONE grammar change** (`9ba02b1`). `!` exclusion
+    entries in `.fux/sources/dirs`, and a compiled-in prose allowlist
+    replaceable by `.fux/sources/types`. **`fnmatch` is not used** and that is
+    load-bearing: its `*` crosses `/`, so `work/regression/*/evidence` would
+    also have matched `.../a/b/evidence`.
+  - **W-56 closed** (`ab1f673`) — **both sibling environments rebuilt and now
+    under git**, which neither was.
+  - **M5 shipped** (`621c83c`) — hooks, the merge driver, L5 at write time.
+  - **W-60 shipped** (`3a9aabc`) — the TTL fetch cache, verdict F.
+
+- **Decided / open:**
+
+  - **The hold is honoured.** R4, R5, R6 and R7 are all unrun. Two records —
+    ADR-REFER and ADR-MAINTENANCE — are **`proposed`, not accepted**, precisely
+    because of it, and each says so in its own consequences.
+  - **`post-commit`, not `pre-commit`,** and the argument is recorded:
+    pre-commit reads the *working* tree, so with `git add -p` it indexes bytes
+    nobody committed and writes them into the commit. **Wrong beats late**, so
+    the index lags one commit and the lag is visible.
+  - **The merge driver refuses in four cases** and never picks a side. Verified
+    by **control and treatment**: the same merge conflicts without it and
+    merges cleanly with it. Without the control it could have been doing
+    nothing and the test would still have passed.
+  - **A real bug found by running rather than reading**, in the driver's own
+    branch order: a one-sided *add* was being treated as a delete-vs-modify, so
+    every disjoint addition would have conflicted. That is the common case.
+  - **Three bugs in the rebuilt lab, all found by running it**: `read -r` under
+    `set -e` exiting silently with no output at all; the system `python3` being
+    3.9 against fux's ≥3.11, which surfaces as a pip error listing every
+    version ever published; and the harness printing **its own** interpreter
+    beside the latency rather than the engine's.
+  - **The playground's ~50 goldens were deliberately not rebuilt.** A golden
+    derived from the engine's own output passes forever, including on the day
+    ranking breaks. The corpus was written instead to make re-grading possible,
+    and the phenomena verified to reproduce — *"what replaced helix mesh"*
+    returns the superseded doc above the ADR that replaced it.
+  - **W-57 had to be re-scoped**: `q005`/`q009`/`q011`/`q015` were ids in the
+    lost golden set and cannot be recovered, so its targets are now phenomena.
+  - **Every prior lab number is unreproducible**, including R3's 27.2 ms — the
+    `rfc` corpus is gone. The M2 report's Reproduce block is **annotated, not
+    edited**, because editing a filed run's evidence is itself forbidden.
+  - **W-26 (M6) is NOT startable**, and I did not start it. Its DoD requires
+    every R measured, and building `tpack` + T2 now would mean **hand-picking
+    the tier-auto threshold the DoD forbids hardcoding**. Recorded in the item
+    rather than left looking available.
+  - **Two things landed that a concurrent session had already decided**, and I
+    checked before assuming: `maintenance-trigger.compare.md` had ruled hooks
+    (matching what I built) and left one sub-decision open, which
+    ADR-MAINTENANCE now answers.
+  - **Noticed, not acted on:** `CLAUDE.md` was edited directly by a concurrent
+    session, and its own §Documentation discipline says agent-steering files
+    are "proposed, never auto-applied — Arpit's to ratify". Presumably he
+    directed it; nothing in the file records who ratified it.
+
+- **Next:** **Arpit's, in three places.** Lift the hold when ready — the
+  harnesses and both environments are now in place, so W-59 and W-61 can run
+  the moment he says. Give W-58 its verdict. And **write the playground's
+  goldens** (W-57), which is the only step here no agent should take.
+
+- **Cost:** `unmeasured` — no `.cage/` ledger in this repo, so capture does not
+  reach it. Five commits; +31 tests on top of the earlier session's +134.
+
 ## 2026-08-20 — closed the queue's agent lane: W-46, W-48, M3 and M4's core  ·  Claude Code
 
 - **Asked:** review everything in OPEN-WORK and build the items to closure.

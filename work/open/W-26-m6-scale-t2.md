@@ -1,7 +1,21 @@
 # W-26 — M6: scale and the T2 tier
 
-**Status:** OPEN
-**Blocked by:** W-25
+**Status:** OPEN — **W-25 shipped 2026-08-20, so the stale blocker is cleared;
+this is still not startable.** Its definition of done requires *every* R
+prediction to carry a measured value or an honest failure record, and
+**R4 · R5 · R6 · R7 are all unrun** ([W-59](W-59-refer-plane-measurement.md),
+[W-61](W-61-maintenance-measurement.md)) — Arpit held prediction runs on
+2026-08-20.
+
+> **Why the build half cannot be started early either.** The DoD says tier-auto
+> must flip **by measurement, not by a hardcoded threshold**. Building `tpack`
+> and the T2 segments now means choosing that threshold by hand and then
+> looking for evidence to justify it — which is the exact inversion the
+> pre-registration rule exists to stop, and the *build the fun part first*
+> failure the milestone gating exists to prevent. There is nothing to
+> falsify a T2 tier against until the corpora and the numbers exist.
+
+**Blocked by:** the held prediction runs — not by another item
 **Spec:** this file — see §Scope below (migrated from the retired `PLAN.md`, 2026-08-18)
 **Closes with:** **`ADR-T2-SEGMENTS`** (reserved) · prediction **R7**. **Reserved by NAME, never by number** — a number is a filename ordinal assigned when the record is written (Arpit, 2026-08-19, closing W-33).
 **Model:** **Sonnet** for the bench harness · **Opus** for the analysis and
