@@ -28,6 +28,41 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — reconciled OPEN-WORK; nothing was removable  ·  Claude Code
+- **Asked:** review `OPEN-WORK.md` and remove whatever is done.
+- **Did:** re-derived all ten rows against the code rather than reading their
+  markers (rule 3), and **removed nothing, because nothing is done**:
+  - **W-46** — `query/hybrid.py:97` is still `get_model().embed(query)` with an
+    `except` tuple that omits `AttributeError`. The `None` guard the DoD asks
+    for is absent. Real, unfixed.
+  - **W-48** — `cmd_ask` still returns at the `--json` branch before the
+    `--explain` block, and `cmd_answer`'s no-match `--json` is still
+    `{"answer": null, "citation": null}` with no `"source"`. Both open.
+  - **W-45** — no `source-exclusion.compare.md` in `work/compare/`.
+  - **W-44 · W-52** — the only pre-registrations in the tree are the two
+    pruning ones; no live-vs-archived query set exists, so both stay PARKED.
+  - **W-23 · W-24** — no `explain`/`graph`/`path` verb in `cli.py`;
+    `src/fux/refer/` is still the 7-line stub.
+  - **W-25 · W-26 · W-27 · W-38** — blocked downstream, unchanged.
+  - Also verified W-46's and W-48's DoDs still describe reality: ADR-CLI still
+    carries the "we now owe a regression test" line and the `ask --hybrid`
+    known-defect note, so neither item's spec has rotted under it.
+- **Decided / open:** **two stale facts fixed on contact**, which is the other
+  half of rule 3 — a stale row understates as badly as a stale ✅ overstates.
+  The footer claimed `v0.32.0` is on PyPI (it is `0.33.0` since yesterday), and
+  **W-45 was grouped under ADR-CONFIG and led with the retired `[sources] dirs`
+  key**. Regrouped under **ADR-DIR-LIST** — rule 7 says an item's group is the
+  record its change will have to update, and an exclusion attribute on a
+  directory line is that record's now, not ADR-CONFIG's. Its detail file was
+  repointed at `.fux/sources/dirs` in the same edit; the finding is unchanged.
+- **Next:** the queue's own recommendation stands — **M4 ([W-24](open/W-24-m4-refer-plane.md))
+  first, and it has no live spec**, so write one into its detail file by Opus
+  before any code. W-46 is the cheapest real fix on the board if a short
+  session wants one.
+- **Cost:** unmeasured — `cage report` was removed in Cage v0.50 (SURFACE-CUT)
+  and `cage insights chats` reports nothing for this repo, so capture does not
+  reach it. A read-and-verify session; no code changed.
+
 ## 2026-08-19 — v0.33.0 released to PyPI  ·  Claude Code
 - **Asked:** step 4 of the W-54 prompt — release, only if everything above was
   green. It was.

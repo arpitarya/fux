@@ -22,9 +22,9 @@ The two run **concurrently**; never order one against the other.
 - **W-46** · `agent` · Sonnet · `ask --hybrid` crashes on a source install — the missing-model guard catches the wrong exceptions — [detail](open/W-46-hybrid-missing-model-crash.md)
 - **W-48** · `agent` · Sonnet · **low** · three output-contract inconsistencies across the three verbs — [detail](open/W-48-query-output-contract.md)
 
-### [ADR-CONFIG](../docs/adr/0014_config.md)
+### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md)
 
-- **W-45** · `agent` · `[sources] dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** by ADR-DIR-LIST — an exclusion attribute on a directory line, and `.fux/sources/dirs` now exists to carry one (W-54, 2026-08-19) — and the fork still owes a compare doc — [detail](open/W-45-source-exclusion.md)
+- **W-45** · `agent` · **Opus** to decide, Sonnet to build · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures. **Its schema question is answered** — an exclusion attribute on a directory line, and the file now exists to carry one (W-54, 2026-08-19). **The fork itself still owes a compare doc**, and the attribute set is closed at one until this record changes — [detail](open/W-45-source-exclusion.md)
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
 
@@ -66,7 +66,8 @@ P1 **FAIL** — full postings, permanently
 plan revision 1, their successors R3–R7.
 
 **Where the build stands** is [`IMPLEMENTATION.md`](IMPLEMENTATION.md), not this
-file. M0, M1 and M2 have shipped; `v0.32.0` is on PyPI.
+file. M0, M1 and M2 have shipped; **`v0.33.0` is on PyPI** (2026-08-19, the
+sources rewrite — verified black-box from the published wheel).
 
 ---
 ---

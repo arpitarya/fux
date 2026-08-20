@@ -9,8 +9,13 @@
 
 ## The finding
 
-`[sources] dirs` is an include-only whitelist. There is no way to say *"index
+The source list is an include-only whitelist. There is no way to say *"index
 this directory, except the machine-generated parts."*
+
+**The list moved on 2026-08-19** — it is `.fux/sources/dirs`, not
+`[sources] dirs`, which is now a retired key ([ADR-DIR-LIST](../../docs/adr/0023_dir-list.md)
+decision 1). Nothing about the finding below changed; only where the whitelist
+lives, and the fact that a line can now carry an attribute.
 
 That bit immediately, in this repo, in the most self-referential way
 possible: committing a conformance run's **raw CLI output** into `docs/` put
@@ -68,6 +73,6 @@ a builder's guess.
 ## Hazard
 
 **Do not let this quietly widen into a general ignore system.** The whole
-point of `[sources] dirs` being a short whitelist is that a reader can tell
-what is indexed by reading five lines of `fux.toml`. An exclusion mechanism
+point of the whitelist being short is that a reader can tell what is indexed
+by reading five lines of `.fux/sources/dirs`. An exclusion mechanism
 that needs its own mental model has cost more than it saved.
