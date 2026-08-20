@@ -28,6 +28,116 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — W-60 ratified: option F  ·  Cowork
+
+- **Asked:** "Let's go with option F" for the refer-plane fetch cache; then,
+  "does this unlock W-58?"
+
+- **Did:** marked `refer-fetch-cache.compare.md` **accepted** as proposed
+  (default `cache_ttl_seconds = 300 s`, build proceeds without waiting on R4,
+  on the Confluence-rate-limit rationale). Updated
+  [`compare/README.md`](compare/README.md), W-60's detail file (DECIDED
+  header, DoD's ratification item checked), and
+  [`OPEN-WORK.md`](OPEN-WORK.md) — W-60 out of the Blocked-on-Arpit inbox
+  (back to one: W-58) and into the `agent` lane, build-ready, Model: Opus.
+
+- **Decided / open:** **W-58 is not unlocked.** record-freshness's verdict D
+  (does the *committed record* need a timestamp — no) and W-60's verdict F
+  (should the *runtime cache* carry a wall-clock timestamp — yes) are
+  independent forks answering different questions; ratifying one carries no
+  information about the other, and both compare docs say so explicitly.
+  W-58/record-freshness stays ⏳ awaiting Arpit on its own terms — the inbox
+  still shows it, alone.
+
+- **Next:** W-60 is build-ready — a Claude Code session can execute it
+  (Opus), amending ADR-REFER in the same change per Law zero. Separately,
+  W-58/record-freshness still needs its own verdict whenever Arpit wants to
+  take it.
+
+- **Cost:** unmeasured — a short ratification exchange; no per-session token
+  meter was read.
+
+---
+
+## 2026-08-20 — refer-plane fetch cache researched and filed as W-60  ·  Cowork
+
+- **Asked:** what's blocked on W-58 (answered from the repo); then, separately,
+  Arpit described an idea — cache non-git-sourced documents locally with a
+  fetch timestamp, expose an age/freshness property, refetch-and-update the
+  cache when it's stale, then answer — and asked for research on whether it's
+  sound, followed by a document to implement it.
+
+- **Did:** read [record-freshness](compare/record-freshness.compare.md),
+  [ADR-REFER](../docs/adr/0031_refer-plane.md), and
+  [ADR-RUNTIME-STAMP](../docs/adr/0028_runtime-stamp.md) to place the idea
+  against what's already decided. Researched `stale-while-revalidate` (RFC
+  5861) and Confluence Cloud's REST API rate limits (65,000-point/hour shared
+  pool; Atlassian's own guidance is "cache stable responses" and "use ETags
+  and conditional headers"). Wrote
+  [`refer-fetch-cache.compare.md`](compare/refer-fetch-cache.compare.md)
+  (proposed verdict F) and its item,
+  [W-60](open/W-60-refer-fetch-cache.md); added both to
+  [`OPEN-WORK.md`](OPEN-WORK.md)'s inbox (now two) and its
+  ADR-GRAPH/ADR-REFER/ADR-RECORD group, and to
+  [`compare/README.md`](compare/README.md)'s table.
+
+- **Decided / open:** the *shape* is sound and reuses an already-accepted
+  pattern rather than inventing one — a gitignored, wall-clock cache-entry
+  timestamp (same treatment `stamp.json` already gets under
+  ADR-RUNTIME-STAMP) never touches the committed record, so it does **not**
+  reopen [W-58](open/W-58-no-recorded-ingest-time.md) or
+  [record-freshness](compare/record-freshness.compare.md)'s verdict D — those
+  stay exactly as they were. It **does** need a new, explicitly separate
+  fourth verdict state (`cached`) so [ADR-REFER](../docs/adr/0031_refer-plane.md)
+  decision 6's "never collapse 'we did not look' into 'we looked and it was
+  fine'" guarantee survives, and it must live in its own store, never inside
+  ARC's keyspace, because ARC's "cannot change the answer" proof depends on
+  being keyed by an already-known-correct sha. **Two numbers are still
+  Arpit's call**, both left open in the compare doc: the default
+  `cache_ttl_seconds` (300 s proposed) and whether to build now on the
+  Confluence-rate-limit rationale rather than wait for R4 — record-freshness's
+  own reopen-trigger wanted R4 first, but the rate-limit case is a second,
+  independent justification that document never had in view.
+
+- **Next:** Arpit ratifies (or amends) `refer-fetch-cache.compare.md`'s
+  verdict; once ratified, W-60 is build-ready (Model: Opus, per its own
+  detail file) and ADR-REFER gets amended in the same change that builds it.
+
+- **Cost:** unmeasured — a research-and-drafting exchange; no per-session
+  token meter was read.
+
+---
+
+## 2026-08-20 — W-45 and W-55 were already closed; verified rather than rebuilt  ·  Claude Code
+
+- **Asked:** implement W-45 and W-55 so they can be closed.
+
+- **Did:** nothing to build. Both landed earlier the same day in `9ba02b1`
+  ("what fux indexes, decided and built as one change"), and the closure is
+  complete on every axis the rules require — no rows in
+  [`OPEN-WORK.md`](OPEN-WORK.md), detail files moved to
+  [`archive/open/`](../archive/open/), the outcome row in
+  [`IMPLEMENTATION.md`](IMPLEMENTATION.md) line 50,
+  [ADR-TYPES](../docs/adr/0032_types-list.md) accepted in the register, working
+  tree clean. Re-derived per OPEN-WORK rule 4 rather than read off a marker:
+  `git show --stat 9ba02b1`, the archive listing, and a full suite run —
+  **719 passed** (`tests` + `tests_e2e`), matching the number that commit
+  claims.
+
+- **Decided / open:** no new decision. The ⚠ that rode with `9ba02b1` still
+  stands and is *not* part of W-45/W-55: the type filter is a ranking change
+  and this repo's committed index was deliberately not re-ingested, so the
+  corpus change remains a separate measured step alongside
+  [W-52](open/W-52-df-over-the-union.md) — which is **PARKED** on a
+  pre-registration that does not exist.
+
+- **Next:** the agent lane's `next` is [W-56](open/W-56-sibling-environments-missing.md)
+  — rebuild `fux-lab` and the playground corpus; all four unmeasured
+  predictions (R4–R7) are behind it.
+
+- **Cost:** unmeasured — a verification exchange; no per-session token meter was
+  read.
+
 ## 2026-08-20 — closed the queue's agent lane: W-46, W-48, M3 and M4's core  ·  Claude Code
 
 - **Asked:** review everything in OPEN-WORK and build the items to closure.

@@ -19,7 +19,9 @@ The two run **concurrently**; never order one against the other.
   axis (`never` / `always`), and in HTTP — where the vocabulary comes from —
   `max-age` exists to **avoid the fetch**, not to make the answer more correct.
   That cost is unmeasured: **R4 has not run**. Deciding a cost optimisation
-  before measuring the cost is backwards.
+  before measuring the cost is backwards. **Not answered by W-60's verdict**
+  (below) — that decision is scoped to a runtime cache, not the committed
+  record.
 
 ---
 
@@ -28,6 +30,7 @@ The two run **concurrently**; never order one against the other.
 ### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
 
 - **W-58** · `arpit` · **the compare doc is written and awaits a verdict** — [`record-freshness.compare.md`](compare/record-freshness.compare.md). Proposed **D — no age bound**; `max_age_seconds` struck, content verification is the answer — [detail](open/W-58-no-recorded-ingest-time.md)
+- **W-60** · `agent` · **Opus** · **decided 2026-08-20 — Arpit: option F**, a gitignored TTL cache for `url:` fetches (300 s default), `cached` as a fourth verdict state; ADR-REFER amended in the same change it's built. Does not reopen W-58 — [detail](open/W-60-refer-fetch-cache.md)
 - **W-56** · `agent` · **Opus** · **next** · **decided 2026-08-20 — build both if they do not exist**; verified neither is on disk. Lab from [SETUP-LAB](setup/fux-lab.md) is scaffolding; the playground's **50 goldens are authorship and cannot be restored, only re-graded** — build the corpus and harness, stop at the goldens — [detail](open/W-56-sibling-environments-missing.md)
 - **W-59** · `agent` · blocked by W-56 · **the refer plane is built and unmeasured** — M4's core landed with 73 tests, and [ADR-REFER](../docs/adr/0031_refer-plane.md) is **`proposed`, not accepted**, because R4 has not run. Also unmeasured: the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**) and ARC-vs-LRU against the cache compare doc's own reopen-trigger — [detail](open/W-59-refer-plane-measurement.md)
 - **W-57** · `agent` · blocked by W-56 · **the graph lane's acceptance measurement is unrun** — M3 shipped, but `q005`/`q009`/`q011`/`q015` (the supersession and near-duplicate gaps that are the lane's whole argument) are unmeasured, and community determinism is verified on one machine rather than two. [ADR-GRAPH](../docs/adr/0030_graph-lane.md) deliberately does not claim otherwise — [detail](open/W-57-graph-lane-acceptance.md)

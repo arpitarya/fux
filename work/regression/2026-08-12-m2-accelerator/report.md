@@ -144,6 +144,34 @@ the DoD's list. The plan needs correcting.
 
 ## Reproduce
 
+> **⚠ 2026-08-20: three of the five commands below no longer reproduce, and
+> that is a defect in this filing rather than a fact about the past.**
+>
+> `~/my_programs/fux-lab/2026-08-12-m2-r3` **does not exist** — the entire lab
+> was found missing on 2026-08-20 ([W-56](../../open/W-56-sibling-environments-missing.md)),
+> taking `rfc` (8 872 RFCs, the corpus **R3's 27.2 ms p95 was measured on**) and
+> every other baseline with it. `fux-playground` was missing too, so
+> `playground_grade.py` has no graded corpus to read.
+>
+> | command | status |
+> |---|---|
+> | `bench_r3.py --root ~/my_programs/fux-lab/2026-08-12-m2-r3` | **cannot run** — corpus gone |
+> | `run.py --root .` | runs |
+> | `run.py --root ~/my_programs/fux-lab/...` | **cannot run** — corpus gone |
+> | `playground_grade.py` | **cannot run** — the graded corpus was rebuilt with new documents and has no goldens yet |
+> | `pytest tests/derive -q` | runs |
+>
+> **The numbers in this report are not withdrawn.** They were measured and they
+> are recorded. What is withdrawn is the claim that they can be regenerated:
+> under the conformance law *"the reproduce command must actually reproduce"*,
+> and these three do not. Both environments were rebuilt on 2026-08-20 and are
+> now under git, but a rebuilt corpus is a **different** corpus — so re-running
+> R3 produces a new baseline, not a confirmation of this one.
+>
+> This annotation is added rather than the commands being edited, because
+> editing a filed run's evidence is itself forbidden: a measurement is
+> superseded by a newer measurement, never by a rewrite.
+
 ```bash
 # R3 (the lab run persists at ~/my_programs/fux-lab/2026-08-12-m2-r3)
 python tools/differential/bench_r3.py --root ~/my_programs/fux-lab/2026-08-12-m2-r3

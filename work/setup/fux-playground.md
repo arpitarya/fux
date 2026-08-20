@@ -54,6 +54,41 @@ python check.py --index-guard
 this repo's commented `fux.toml`. That difference is deliberate: the two can be
 running at once.
 
+## ⚠ Rebuilt 2026-08-20 — corpus and harness yes, goldens NO
+
+**The repository was missing from disk on 2026-08-20** (W-56). It had one local
+commit and no remote, so there was nothing to restore from.
+
+| part | state |
+|---|---|
+| corpus — 10 documents, Calder Group / Helix | **rebuilt** (new documents, same brief) |
+| `check.py`, rank-graded, no `--update-goldens`, XPASS fails | **rebuilt** |
+| `--index-guard` staleness + determinism check | **rebuilt, and passing** |
+| committed index, file documents only | **rebuilt** |
+| **~50 ranked goldens (41 pass · 9 `xfail`)** | **NOT rebuilt** |
+
+**The goldens were deliberately not regenerated.** A golden says "query X
+should return document Y at rank ≤ N", and that claim has to come from a person
+who read the corpus. Derived from fux's own output it tests that fux still does
+what fux does — passing forever, including on the day ranking breaks. A
+playground whose goldens were invented by the engine under test produces a
+green tick that means nothing. `check.py` exits non-zero with that explanation
+until `goldens/queries.jsonl` exists.
+
+**The rebuilt corpus was written to make re-grading possible**, and the
+phenomena were verified to reproduce: a deliberate supersession pair
+(ADR-0007 → ADR-0019), a deliberate near-duplicate pair (two rollback runbooks,
+~80 % identical, differing at step 3), and cross-document routing. On the first
+query anyone would type — *"what replaced helix mesh"* — the **superseded**
+material outranks the ADR that replaced it, which is precisely the gap the
+graph lane exists to close.
+
+**It is now a git repository**, which it was not before.
+
+> **This invalidates W-57's named targets.** `q005`, `q009`, `q011` and `q015`
+> were ids in the old golden set. They cannot be recovered, and any new set
+> renumbers, so **W-57 is re-scoped to phenomena rather than ids**.
+
 ## The contract
 
 | part | rule |

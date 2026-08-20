@@ -141,6 +141,8 @@ they are worth keeping.
 
 | [`W-55-no-file-type-filter.md`](open/W-55-no-file-type-filter.md) | 2026-08-20 | **Completed — verdict G built.** Live successor: [ADR-TYPES](../docs/adr/0032_types-list.md), and `DEFAULT_TYPES` / `read_types` in [`ingest/gitdir.py`](../src/fux/ingest/gitdir.py). Landed **in the same change as W-45** because both change one file format. ⚠ **the ranking half is unmeasured and this repo was deliberately not re-ingested** — that step rides with [W-52](../work/open/W-52-df-over-the-union.md) |
 
+| [`W-56-sibling-environments-missing.md`](open/W-56-sibling-environments-missing.md) | 2026-08-20 | **Completed — both environments rebuilt, and both now under git, which neither was before.** Live successors: [SETUP-LAB](../work/setup/fux-lab.md) and [SETUP-PLAYGROUND](../work/setup/fux-playground.md), each carrying a *rebuilt* section naming what could not be restored. **The goldens were deliberately not rebuilt** and that obligation moved to [W-57](../work/open/W-57-graph-lane-acceptance.md), which was re-scoped in the same change because its named query ids belonged to the lost set. Every prior baseline and corpus is unrecoverable; the M2 report is annotated rather than edited |
+
 Every outcome is recorded in
 [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
 the human calls, §Defects closed outside a milestone for the rest, and the

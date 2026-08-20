@@ -107,7 +107,31 @@ matcher against one known-good hit before believing it.
 `shared/regress/run.py` is accumulated tooling, corrected against four runs of
 real observed CLI output. It is worth more than it looks.
 
-## Environments that exist
+## ⚠ Rebuilt 2026-08-20 — the environments below are GONE
+
+**The whole directory was missing on 2026-08-20** (W-56), taking every baseline
+with it. It has been rebuilt as scaffolding — `TEST-PLAN.md`,
+`shared/new-env.sh`, `shared/generate/make_corpus.py` (seeded, byte-identical
+for the same seed), `shared/regress/run.py`, and a `smoke/` environment run end
+to end. **It is now a git repository, which it was not before** — that is
+exactly why it was lost.
+
+**What could not be rebuilt is every baseline and every corpus behind them.**
+The table below is a record of what existed, not of what is there now. A corpus
+generated today is a *different* corpus, so a number taken now is a **new
+baseline, not a comparison**, and every prior lab number is an unreproducible
+historical record.
+
+Two consequences that bite immediately:
+
+- **R3's 27.2 ms p95 was measured on `rfc`**, 8 872 documents, which no longer
+  exists. The number stands as a record; it cannot be re-run.
+- **`tools/pruning-eval/` hard-codes `LAB = Path.home() / "my_programs" /
+  "fux-lab"` and reads `acme` and `orbit` from it.** Both are gone, so that
+  harness cannot run until someone generates replacements — and replacements
+  are not the same corpora.
+
+## Environments that existed before 2026-08-20
 
 | environment | what it is |
 |---|---|
@@ -116,6 +140,7 @@ real observed CLI output. It is worth more than it looks.
 | `orbit` | warehouse / order-fulfilment, from `shared/generate/make_orbit.py` — the second corpus that generalised the supersession finding |
 | `rfc` | 8 872 RFCs, median 967 distinct terms/doc — the corpus that made the pruning gate decidable |
 | `2026-08-12-m2-r3` | the R3 accelerator bench root |
+| **`smoke`** | **the only one that exists now** — 60 documents, seed 3, hit@5 1.0, created by the rebuild as proof the scaffolding runs |
 
 `acme` and `orbit` are read from the lab by
 [`tools/pruning-eval/`](../../tools/pruning-eval/README.md), which hard-codes
