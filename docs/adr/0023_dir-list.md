@@ -135,6 +135,36 @@ and sorts, `<entry> key=value …` attributes, **an unknown key is a loud
 `file:lineno` error**, and a duplicate entry with conflicting attributes is an
 error rather than a last-wins merge. One grammar, two files.
 
+**2a. A `!` prefix subtracts a path from the walk** (added 2026-08-20, W-45
+verdict **E**, decided by Arpit). `!work/regression/*/evidence` is a
+repo-relative glob that removes matching paths — and **anything beneath
+them** — from every included root.
+
+> **It is an entry, not an attribute, and that was the fork.** This record
+> originally anticipated an exclusion *attribute* on a directory line. The
+> attribute grammar describes properties of the thing on the line — `fetch=`,
+> `meta=`, `archived=` each say something about *that* URL or *that* directory
+> — whereas an exclusion is a statement about a **different** path that happens
+> to sit underneath. Encoding one path inside another's attribute value is the
+> mismatch, and the symptom is that attribute values carry no whitespace and no
+> quoting ([ADR-URL-LIST](0018_url-list.md) decision 8) while a repeated key is
+> an error (decision 10) — so two exclusions would have needed a comma
+> sub-grammar the format has never had. Argued in
+> [`work/compare/source-exclusion.compare.md`](../../work/compare/source-exclusion.compare.md).
+
+**2b. Exclusions are order-independent, and there is no un-exclude.** The
+loader sorts, so file order cannot change a committed byte — L3 applied to
+config. `!` subtracts and nothing adds back, which means there is **no
+precedence order to remember and none to get wrong**; `!!` is an error rather
+than a negation. An exclusion also carries **no attributes**: `archived=true`
+describes a directory whose documents are history, and means nothing about a
+path being removed.
+
+**2c. `*` does not cross a `/`.** `fnmatch` is not used, because its `*` would
+make `work/regression/*/evidence` also match `work/regression/a/b/evidence` —
+not what anyone writing that line means. `**` is the explicit any-depth form,
+and the matcher is hand-rolled like every other codec here (L1).
+
 **3. The attribute set for this file is one: `archived`.** Values `true` /
 `false`; **absent means `false`**. Closed, exactly as the URL list's set is
 closed — adding to it is a change to this record.
@@ -191,6 +221,23 @@ arrives to a corpus that has already declared itself, rather than having to
 invent the declaration and the measurement at once.
 
 ### Consequences
+
+- **The include-only whitelist ended on 2026-08-20** (W-45). It was measured
+  first: **33 of 150 documents (22.0 %) came from `work/regression/`, 16 of
+  them raw evidence**, and a committed `fixture.sh` outranked the very record
+  it was written to illustrate. The prior remedy — dot-prefixing `.evidence/`
+  so the walker's dotfile skip caught it — was **measurably decaying**: 2 of 7
+  filed runs used it and 5 did not, including every run filed after the item
+  was opened. An invisible convention is followed until it is not.
+- **`fux ingest --list-skipped` now reports exclusions by the pattern that
+  removed them** (`excluded by !work/regression/*/evidence`). A filter nobody
+  can see is the failure this item was opened about, so silence was not an
+  option.
+- **This file is now one of three, not one of two.**
+  [ADR-TYPES](0032_types-list.md) adds `.fux/sources/types`: `dirs` says
+  *where*, `types` says *what*, `urls` says *what else*. The three conditions
+  are a **conjunction** — no rule overrides another — so there is no precedence
+  between the files either.
 
 - **`fux.toml` stops being where the corpus is defined.** It keeps policy —
   `[index] shards`, `[sources.url]` — and the *what* moves to two files under

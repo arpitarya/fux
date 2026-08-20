@@ -29,6 +29,8 @@ def find_root(start: Path | None = None) -> Path | None:
 DEFAULT_FETCHER = ".fux/fetchers/http.py"
 DEFAULT_URLS_FILE = ".fux/sources/urls"
 DEFAULT_DIRS_FILE = ".fux/sources/dirs"
+#: Optional. Absent means the built-in allowlist in `gitdir.DEFAULT_TYPES`.
+DEFAULT_TYPES_FILE = ".fux/sources/types"
 
 
 @dataclass

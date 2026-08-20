@@ -8,6 +8,33 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed — **breaking**
+
+- **Only prose files are indexed now** ([ADR-TYPES](docs/adr/0032_types-list.md),
+  W-55 verdict G). The git-dir walker had **no file-type filter at all**:
+  anything UTF-8-decodable was a document, which on this repo meant 21 of 150
+  records (14 %, and 15 % of the tokens) were `.json`, `.svg`, `.sh`, `.py` or
+  `.mermaid`. A compiled-in allowlist — `*.md`, `*.markdown`, `*.txt`, `*.rst`,
+  `*.adoc`, `*.org` — now applies, replaceable by committing
+  `.fux/sources/types`. **Absent means the default**, never "index everything"
+  and never "index nothing".
+  **Migration:** re-run `fux ingest`. Records for non-prose files disappear and
+  `df` moves for every surviving document, so **this changes rankings** — it is
+  not claimed to improve them, and nothing has measured it.
+- **`.fux/sources/dirs` accepts `!` exclusions**
+  ([ADR-DIR-LIST](docs/adr/0023_dir-list.md), W-45 verdict E).
+  `!work/regression/*/evidence` removes matching paths, and everything beneath
+  them, from every included root. Order-independent, no un-exclude, no
+  attributes. `*` does not cross a `/`; `**` is the any-depth form.
+  Not breaking on its own — a file with no `!` line behaves exactly as before.
+- **`fux ingest --list-skipped` names the reason for every rejection** —
+  `not an indexed file type`, or `excluded by !<pattern>` with the pattern that
+  did it. A filter nobody can see is what both of these items were opened
+  about.
+- **`fux setup` writes `.fux/sources/types`** with the default spelled out in
+  comments, so a consumer can see what fux considers a document without reading
+  its source.
+
 ### Added
 
 - **The refer plane's core — `fux.refer`** (M4,

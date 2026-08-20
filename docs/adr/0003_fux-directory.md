@@ -167,6 +167,13 @@ directories by default (ruff does) will not lint them.
 
 ### Consequences
 
+- **`fux setup` writes a fourth consumer-owned file** (2026-08-20):
+  `.fux/sources/types`, write-if-missing like the rest, **with the built-in
+  default spelled out in comments**. Writing it rather than leaving it absent
+  is a deliberate cost — an absent file already behaves correctly — paid so a
+  consumer can see what fux considers a document without reading its source.
+  [ADR-TYPES](0032_types-list.md) decision 10.
+
 - **The dotdir is safe to explain in one table.** A newcomer's first question —
   "what do I commit?" — is answered by a file fux generates.
 - **Derived planes are disposable by contract.** `rm -rf .fux/runtime` is

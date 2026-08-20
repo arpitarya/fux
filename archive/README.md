@@ -137,6 +137,10 @@ they are worth keeping.
 
 | [`W-24`'s two graduating proposals](proposals/) | — | Both successors sit in a record that is **`proposed`, not accepted**: R4 has not run ([W-59](../work/open/W-59-refer-plane-measurement.md)). Named here so a reader does not take archival as ratification |
 
+| [`W-45-source-exclusion.md`](open/W-45-source-exclusion.md) | 2026-08-20 | **Completed — verdict E built.** Live successors: [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) decisions 2a-2c, and the `!` grammar in [`ingest/sourcelist.py`](../src/fux/ingest/sourcelist.py) with `_excluded_by` in [`ingest/gitdir.py`](../src/fux/ingest/gitdir.py). The verdict **overrode the record's own anticipation** — an exclusion is an *entry*, not the attribute ADR-DIR-LIST expected. The measurement that killed the dot-prefix alternative (2 of 7 runs followed it) is in [`source-exclusion.compare.md`](../work/compare/source-exclusion.compare.md), which is live |
+
+| [`W-55-no-file-type-filter.md`](open/W-55-no-file-type-filter.md) | 2026-08-20 | **Completed — verdict G built.** Live successor: [ADR-TYPES](../docs/adr/0032_types-list.md), and `DEFAULT_TYPES` / `read_types` in [`ingest/gitdir.py`](../src/fux/ingest/gitdir.py). Landed **in the same change as W-45** because both change one file format. ⚠ **the ranking half is unmeasured and this repo was deliberately not re-ingested** — that step rides with [W-52](../work/open/W-52-df-over-the-union.md) |
+
 Every outcome is recorded in
 [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
 the human calls, §Defects closed outside a milestone for the rest, and the

@@ -201,6 +201,14 @@ the boundary, rendered by the CLI, exit 1.
 
 ### Consequences
 
+- **A third source-list path constant, and still no required key**
+  (2026-08-20). `DEFAULT_TYPES_FILE = ".fux/sources/types"` joins `dirs_file`
+  and `urls_file` here because paths have one home — but unlike those two it
+  has **no `fux.toml` key at all**, and deliberately: the types list is
+  optional, its absence is meaningful (the built-in default applies), and a key
+  whose only job is to relocate an optional file is surface nobody asked for.
+  Decided in [ADR-TYPES](0032_types-list.md).
+
 - **The config fits on a screen**, so a new consumer reads all of it.
 - **The adapter cap holds at the schema level.** Adding a fetcher needs no
   fux change at all — which is the property that makes "three adapters" a

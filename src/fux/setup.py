@@ -33,7 +33,14 @@ from dataclasses import dataclass, field
 from importlib import resources
 from pathlib import Path
 
-from .config import CONFIG_NAME, DEFAULT_DIRS_FILE, DEFAULT_URLS_FILE, find_root, load
+from .config import (
+    CONFIG_NAME,
+    DEFAULT_DIRS_FILE,
+    DEFAULT_TYPES_FILE,
+    DEFAULT_URLS_FILE,
+    find_root,
+    load,
+)
 from .errors import FuxError
 from .store import fuxdir
 
@@ -55,7 +62,41 @@ _DIRS_HEADER = """\
 #   handbook/runbooks
 #   old/2023-platform        archived=true
 #
+# A `!` line SUBTRACTS from the walk -- a repo-relative glob, applied whatever
+# order it appears in, matching a path or any directory above it. There is no
+# un-exclude, so there is no precedence to remember:
+#
+#   !work/regression/*/evidence
+#   !**/node_modules
+#
 # See ADR-DIR-LIST.
+"""
+
+_TYPES_HEADER = """\
+# Which files are documents. One glob per line; `!` subtracts. A pattern with
+# no `/` matches the file NAME anywhere, so `*.md` means every markdown file.
+#
+# THIS FILE IS OPTIONAL. Delete it and the built-in default below applies --
+# an absent file never means "index everything" and never means "index
+# nothing". If the file IS here, it replaces the default entirely.
+#
+# The built-in default, written out so you can see what you are getting:
+*.md
+*.markdown
+*.txt
+*.rst
+*.adoc
+*.org
+#
+# Prose only. No .json, .svg, .sh, .py or .mermaid -- machine data and diagram
+# source are not documents, and indexing them inflates `df` for exactly the
+# terms your real documents are trying to be found by. No extensionless files
+# either: those are LICENSE, Makefile and Dockerfile far more often than they
+# are prose.
+#
+#   !*.min.md          # subtract a generated flavour
+#
+# See ADR-TYPES.
 """
 
 _CONFIG = """\
@@ -154,6 +195,10 @@ def run(root: Path) -> SetupReport:
         _write_if_missing(directory / FETCHERS_DIR / name, template_bytes(template), report, root)
 
     _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
+    # Written with the default spelled out rather than left implicit: a
+    # consumer should be able to see what fux considers a document without
+    # reading its source (ADR-TYPES).
+    _write_if_missing(root / DEFAULT_TYPES_FILE, _TYPES_HEADER.encode("utf-8"), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _URLS_HEADER.encode("utf-8"), report, root)
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
     return report

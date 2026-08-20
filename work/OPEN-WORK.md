@@ -25,11 +25,6 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-INGEST](../docs/adr/0007_ingest.md)
-
-- **W-45** · `agent` · **Opus** · **decided — verdict E, 2026-08-20; ready to build with W-55** as one grammar change · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — **measured 2026-08-20: 33 of 150 documents (22.0 %) come from `work/regression/`, 16 of them raw evidence, and a `fixture.sh` outranks the record it illustrates.** Proposed verdict is an exclusion *entry*, not the anticipated attribute — [compare](compare/source-exclusion.compare.md) · [detail](open/W-45-source-exclusion.md)
-- **W-55** · `agent` · **Opus** · **decided — verdict G, 2026-08-20; ready to build with W-45** · the walker applies **no file-type filter**: anything UTF-8-decodable is a document, so **21 of 150 indexed documents (14 %) are `.json`, `.svg`, `.sh`, `.py` or `.mermaid`**, and a raw JSON blob ranks #2 on a plain query. Unbounded at the design point rather than 14 %: a consumer pointing fux at a repo root indexes their lockfiles — [compare](compare/file-type-filter.compare.md) · [detail](open/W-55-no-file-type-filter.md)
-
 ### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
 
 - **W-58** · `arpit` · **the compare doc is written and awaits a verdict** — [`record-freshness.compare.md`](compare/record-freshness.compare.md). Proposed **D — no age bound**; `max_age_seconds` struck, content verification is the answer — [detail](open/W-58-no-recorded-ingest-time.md)

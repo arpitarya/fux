@@ -208,6 +208,63 @@ def test_setup_writes_the_consumer_owned_files_and_never_rewrites_them(tmp_path)
     assert edited.read_text(encoding="utf-8") == "# my proxy lives here\n"
 
 
+def test_machine_data_beside_a_document_is_not_indexed(tmp_path):
+    """W-55 end to end: the walker has a type allowlist, and it is on by default.
+
+    Before this, anything UTF-8-decodable was a document — 14% of this repo's
+    own index was `.json`/`.svg`/`.sh`/`.py`, and a raw JSON blob ranked #2 on a
+    plain query.
+    """
+    _write_fixture(tmp_path)
+    (tmp_path / "docs" / "results.json").write_text(
+        '{"pruning": "gate", "recall": 0.42}', encoding="utf-8"
+    )
+    (tmp_path / "docs" / "run.sh").write_text("#!/bin/sh\necho pruning\n", encoding="utf-8")
+
+    out = _run(tmp_path, "ingest").stdout
+    assert "not an indexed file type" in out
+
+    found = _run(tmp_path, "find", "pruning", "--json").stdout
+    assert "results.json" not in found and "run.sh" not in found
+
+
+def test_a_types_file_replaces_the_default(tmp_path):
+    _write_fixture(tmp_path)
+    (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
+    (tmp_path / ".fux" / "sources" / "types").write_text("*.rst\n", encoding="utf-8")
+
+    _run(tmp_path, "ingest")
+    found = _run(tmp_path, "find", "pruning", "--json").stdout
+    assert "note.rst" in found
+    assert "pruning.md" not in found  # the default no longer applies
+
+
+def test_an_exclusion_line_removes_a_tree_from_the_walk(tmp_path):
+    """W-45 end to end: committed evidence stops contaminating its own corpus."""
+    _write_fixture(tmp_path)
+    evidence = tmp_path / "docs" / "runs" / "r1" / "evidence"
+    evidence.mkdir(parents=True)
+    (evidence / "dump.md").write_text(
+        "# Why pruning failed\n\nraw output: why did pruning fail\n", encoding="utf-8"
+    )
+    (tmp_path / ".fux" / "sources" / "dirs").write_text(
+        "docs\n!docs/runs/*/evidence\n", encoding="utf-8"
+    )
+
+    out = _run(tmp_path, "ingest").stdout
+    assert "excluded by !docs/runs/*/evidence" in out
+    assert "dump.md" not in _run(tmp_path, "find", "pruning", "--json").stdout
+
+
+def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
+    """A consumer should not have to read fux's source to learn what a document is."""
+    (tmp_path / "docs").mkdir()
+    _run(tmp_path, "setup")
+    types = (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8")
+    assert "*.md" in types and "*.adoc" in types
+    assert "No .json" in types  # it says what it excludes, and why
+
+
 def test_ingest_puts_no_fetcher_in_a_repo_that_only_wanted_an_index(tmp_path):
     """ensure_layout writes the layout; only `fux setup` writes code."""
     _write_fixture(tmp_path)
