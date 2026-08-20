@@ -1,0 +1,24 @@
+# Which files are documents. One glob per line; `!` subtracts. A pattern with
+# no `/` matches the file NAME anywhere, so `*.md` means every markdown file.
+#
+# THIS FILE IS OPTIONAL. Delete it and the built-in default below applies --
+# an absent file never means "index everything" and never means "index
+# nothing". If the file IS here, it replaces the default entirely.
+#
+# The built-in default, written out so you can see what you are getting:
+*.md
+*.markdown
+*.txt
+*.rst
+*.adoc
+*.org
+#
+# Prose only. No .json, .svg, .sh, .py or .mermaid -- machine data and diagram
+# source are not documents, and indexing them inflates `df` for exactly the
+# terms your real documents are trying to be found by. No extensionless files
+# either: those are LICENSE, Makefile and Dockerfile far more often than they
+# are prose.
+#
+#   !*.min.md          # subtract a generated flavour
+#
+# See ADR-TYPES.

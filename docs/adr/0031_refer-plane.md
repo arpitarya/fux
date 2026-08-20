@@ -359,8 +359,15 @@ the caller's window. `dropped` is reported so truncation is never silent.
 **How to check them:**
 
 ```bash
-# 1, 2 — the bench; needs fux-lab, which does not exist yet (W-56)
-#        see work/open/W-59-refer-plane-measurement.md
+# 1 — R4 ran 2026-08-20 and PASSED on the judged arm; the bench is the check
+work/regression/2026-08-20-refer-plane-r4/evidence/reproduce.sh
+# cold p95 1.113 s / 3 s, warm p95 0.016 s / 300 ms   -> R4-REFER
+# The boundary the verdict names: cold latency is k x the source's latency, so
+# a source slower than ~295 ms breaches the bound at k=10. Re-check on any
+# change to how refer() iterates candidates.
+
+# 2 — the budget sweep is STILL unmeasured: it needs a graded corpus, and the
+#     playground's goldens are unwritten by design (W-57). W-59 stays open.
 
 # 3 — has the record gained a temporal field?
 uv run python -c "import json,pathlib; print(sorted(json.loads([l for l in pathlib.Path(sorted(pathlib.Path('.fux/index').glob('*.jsonl'))[0]).read_text().splitlines() if '\"_format\"' not in l][0])))"

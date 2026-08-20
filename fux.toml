@@ -1,40 +1,27 @@
-# Fux dogfooding on its own repo — the M1 T0 slice.
-# From this directory:   fux ingest   →   fux ask "why did pruning fail"
+# fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs`
+# and `.fux/sources/urls`, one entry per line, so a 5k-entry corpus diffs and
+# merges line by line. Every key below has a default; they are here to be seen
+# rather than to be required.
 
 [sources]
-# WHAT is indexed is NOT here — it is `.fux/sources/dirs`, one entry per line,
-# so a 5k-entry corpus diffs and merges line by line and a directory can carry
-# `archived=true` (ADR-DIR-LIST). `[sources] dirs` is a retired key and errors
-# with instructions. This key only says where that file is; the default is the
-# value shown, so it is here to be seen rather than to be required.
-#dirs_file = ".fux/sources/dirs"
+dirs_file = ".fux/sources/dirs"
 
-# URL ingestion via YOUR fetcher file (ADR-URL-INGEST, relocated by ADR-DOTFUX).
-# Uncomment to use. Fetching only ever happens under `fux ingest
-# --refresh-urls` (offline by default), and `meta = "hashed"` (the non-git
-# default) applies unless you opt into "plain" for public content.
-#
-# The URL list is a FILE, one URL per line (`#` comments and blanks ignored) —
-# not a TOML array, so 5k entries diff and merge line by line. Both paths
-# below are the defaults; the keys are here to be seen, not to be required.
+# URL ingestion through YOUR fetcher files. Uncomment to enable. Fetching only
+# ever happens under `fux ingest --refresh-urls` -- fux is offline by default.
 #[sources.url]
-#fetcher = ".fux/fetchers/http.py"  # yours, committed, edit freely; its directory
-#                                   # is where `fetch=cdp` resolves to cdp.py
-#urls_file  = ".fux/sources/urls"        # one URL per line
-#meta       = "hashed"
+#fetcher   = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
+#                                     # and the directory `fetch=cdp` resolves in
+urls_file = ".fux/sources/urls"
+#meta      = "hashed"                 # the floor; a line may loosen it to plain
 
 # Fetcher tunables. Fux passes this table to the fetcher's optional
-# `configure(config)` VERBATIM and never reads a key inside it — the keys
-# below mean something to .fux/fetchers/cdp.py, nothing to fux. Same
-# discipline as PEP 518's [tool.*] tables; it is what keeps one fetcher's
-# vocabulary out of fux's config schema.
+# `configure(config)` VERBATIM and never reads a key inside it -- the keys mean
+# something to your fetcher, nothing to fux.
 #[sources.url.config]
-#cdp_port       = 9222
-#settle_ms      = 500
-#load_timeout_s = 30
-#launch_chrome  = true
+#cdp_port  = 9222
+#timeout_s = 30
 
 [index]
-# Fixed at 256 for M1 (shard = blake2b(id, digest_size=1) → 00..ff) — not yet
-# configurable; this key documents the value rather than setting it (ADR-RECORD).
+# Fixed at 256 (shard = blake2b(id, digest_size=1) -> 00..ff); this key
+# documents the value rather than setting it.
 shards = 256

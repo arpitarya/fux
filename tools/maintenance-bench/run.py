@@ -1,25 +1,44 @@
-"""R5 and R6 — the maintenance plane's two pre-registered gates, measured.
+"""R5 and R6 — M5's two pre-registered gates, measured.
+
+**The threshold, the arms and the verdict rules live in
+[`PRE-REGISTRATION.md`](PRE-REGISTRATION.md), not here.** This file is the
+instrument; that file is the contract, and it was committed first. Nothing in
+this module may restate a threshold in looser words — the constants below are
+copied from it and are not to be edited to make a run pass.
 
 Both predictions are about a *real repository*, not about a function, so this
 harness builds throwaway git repositories, wires them with `fux hooks`, and
 drives git itself. Nothing is mocked: the hooks that run are the hooks that
 ship, and the merge driver is invoked by git's own merge machinery.
 
-## R5 — a 20-doc commit re-indexes in < 1 s via the hook
+## R5 — a 20-document commit re-indexes in < 1 s via the hook
 
-Reported **per corpus size**, never as a single number. M1's lesson, paid for:
-an aggregate that hides which population a treatment reached is not evidence.
-A 20-doc commit costs whatever a re-ingest of the whole corpus costs, so the
-prediction is really a statement about the corpus sizes at which the hook is
-usable, and that is what the table says.
+Judged at **100 000 documents** (pre-registration §2), with 1 000 and 10 000
+reported alongside as the population curve and never blended into the verdict.
+What is timed is the wall-clock of **`git commit` itself** — the hook's process
+spawn, the interpreter start, the ingest and the derived build are all inside
+the number, because the prediction says *via the hook* and a library-call
+timing would measure something no user experiences.
 
-## R6 — the three-tier merge harness
+Two arms per size. **`edit`** rewrites twenty existing documents and is the
+judged one: it is the steady state a repository is in almost all of the time.
+**`add`** creates twenty new ones, changing the corpus id set, and is reported
+unjudged because it is the more expensive case and hiding it would flatter the
+result.
+
+## R6 — the three-tier merge harness, with a control arm
 
 | tier | what merges | expected |
 |---|---|---|
-| 1 · machine, disjoint | both sides add documents | **no conflict** — the union |
-| 2 · machine, one shard, two lines | two documents that share a shard file | **no conflict** — adjacency is not a disagreement |
-| 3 · the same document, both sides | a genuine disagreement | **conflict preserved** — the prose conflicts, and the shard is left with both sides |
+| 1 · machine, disjoint adds | both sides add documents | **no conflict** — the union |
+| 2 · machine, one shard, two lines | two documents sharing a shard file | **no conflict** — adjacency is not a disagreement |
+| 3 · the same document, both sides | a genuine disagreement | **conflict preserved**, both sides left |
+
+**Every tier runs twice — with the driver registered and without it.** Without
+the control, a tier that passes proves nothing: the driver could be doing
+nothing at all and git's textual merge could be succeeding by luck. A tier that
+merges cleanly in *both* arms is reported as **uninformative** and does not
+count toward the pass (pre-registration §3.1).
 
 Tier 3 carries the asymmetry that is the whole design: the machine plane
 refuses rather than picking, and human-authored files conflict exactly as they
@@ -52,6 +71,8 @@ R5_COMMIT_DOCS = 20
 #: **The repo's own venv first.** `shutil.which` on this machine finds a pyenv
 #: shim belonging to a different project, and measuring a different build than
 #: the one under test is the silent way to file a wrong number.
+MERGE_DRIVER = "fux-index"  # mirrors maintain.hooks.MERGE_DRIVER_NAME
+
 _LOCAL = ROOT / ".venv" / "bin" / "fux"
 FUX = str(_LOCAL) if _LOCAL.exists() else (shutil.which("fux") or str(_LOCAL))
 
@@ -109,35 +130,68 @@ def make_repo(directory: Path, docs: int) -> Path:
 # ---------------------------------------------------------------- R5
 
 
+def _commit_and_time(repo: Path, message: str) -> float:
+    """Stage, commit, and return the wall-clock of the commit itself.
+
+    The `git add` is deliberately *outside* the timer. Staging is the
+    developer's own action and happens whether or not fux is installed; what
+    the prediction is about is the cost the hook adds to the moment they press
+    enter on `git commit`.
+    """
+    git(repo, "add", "-A")
+    start = time.perf_counter()
+    git(repo, "commit", "-qm", message)
+    elapsed = time.perf_counter() - start
+    # The hook re-indexed after the commit, so the index is now dirty. Commit
+    # it separately and untimed: that second commit is not what R5 is about,
+    # and folding it in would double-count the same work.
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", f"{message} (index)", check=False)
+    return elapsed
+
+
+def _arm(repo: Path, arm: str, round_no: int) -> None:
+    """Make the edit this arm is named for. Twenty documents either way."""
+    for i in range(R5_COMMIT_DOCS):
+        if arm == "edit":
+            (repo / "docs" / f"doc-{i}.md").write_text(_doc(i, round_no + 1), encoding="utf-8")
+        else:  # add — changes the corpus id set, which is the expensive case
+            (repo / "docs" / f"new-{round_no}-{i}.md").write_text(
+                _doc(900_000 + round_no * 1000 + i), encoding="utf-8"
+            )
+
+
 def measure_r5(sizes: list[int], repeats: int) -> list[dict]:
     rows = []
     for size in sizes:
         with tempfile.TemporaryDirectory() as tmp:
             repo = make_repo(Path(tmp) / "repo", size)
             fux(repo, "hooks", "--install")
-            samples = []
-            for run in range(repeats):
-                for i in range(R5_COMMIT_DOCS):
-                    (repo / "docs" / f"doc-{i}.md").write_text(_doc(i, run + 1), encoding="utf-8")
-                git(repo, "add", "-A")
-                start = time.perf_counter()
-                # What the post-commit hook runs, run the way the hook runs it.
-                git(repo, "commit", "-qm", f"edit {run}")
-                samples.append(time.perf_counter() - start)
-                git(repo, "add", "-A")
-                git(repo, "commit", "-qm", f"index {run}", check=False)
-            samples.sort()
-            rows.append(
-                {
+            _commit_and_time(repo, "wire the hooks")  # discarded warm-up
+
+            for arm in ("edit", "add"):
+                samples = []
+                for round_no in range(repeats):
+                    _arm(repo, arm, round_no)
+                    samples.append(_commit_and_time(repo, f"{arm} {round_no}"))
+                samples.sort()
+                row = {
                     "corpus_docs": size,
+                    "arm": arm,
+                    "judged": arm == "edit",
                     "commit_docs": R5_COMMIT_DOCS,
                     "runs": repeats,
                     "median_s": round(samples[len(samples) // 2], 4),
                     "max_s": round(samples[-1], 4),
-                    "passes": samples[-1] < R5_BUDGET_S,
+                    "samples_s": [round(x, 4) for x in samples],
+                    "passes": samples[-1] <= R5_BUDGET_S,
                 }
-            )
-            print(f"  R5 {size:>6} docs: median {rows[-1]['median_s']}s  max {rows[-1]['max_s']}s")
+                rows.append(row)
+                print(
+                    f"  R5 {size:>7} docs · {arm:<4}: median {row['median_s']}s  "
+                    f"max {row['max_s']}s  {'PASS' if row['passes'] else 'FAIL'}"
+                    f"{'' if row['judged'] else '  (unjudged)'}"
+                )
     return rows
 
 
@@ -164,28 +218,62 @@ def _merge(repo: Path, branch: str) -> tuple[bool, list[str]]:
     return conflicted, sorted(paths)
 
 
-def _tier(name: str, description: str, expect_conflict: bool, build) -> dict:
+def _make_wired_repo(tmp: str, treatment: bool) -> Path:
+    """A repo with the hooks installed, and the merge driver on or off.
+
+    In the **control** arm the driver is unregistered while `.gitattributes`
+    still names it. git then falls back to its ordinary text merge — which is
+    exactly the world this feature exists to improve on, and the only baseline
+    against which "no conflict" means anything.
+    """
+    repo = make_repo(Path(tmp) / "repo", 100)
+    fux(repo, "hooks", "--install")
+    if not treatment:
+        git(repo, "config", "--local", "--remove-section", f"merge.{MERGE_DRIVER}", check=False)
+    # `fux hooks` writes .gitattributes; it must be committed for git to consult
+    # it during a merge at all.
+    git(repo, "add", "-A")
+    git(repo, "commit", "-qm", "wire the merge driver", check=False)
+    return repo
+
+
+def _run_tier(build, treatment: bool) -> dict:
     with tempfile.TemporaryDirectory() as tmp:
-        repo = make_repo(Path(tmp) / "repo", 100)
-        fux(repo, "hooks", "--install")
-        # `fux hooks` writes .gitattributes; it must be committed for git to
-        # honour the driver during a merge.
-        git(repo, "add", "-A")
-        git(repo, "commit", "-qm", "wire the merge driver", check=False)
-        conflicted, paths = build(repo)
-        index_paths = [p for p in paths if p.startswith(".fux/index")]
+        repo = _make_wired_repo(tmp, treatment)
+        conflicted, paths = build(repo, treatment)
         return {
-            "tier": name,
-            "description": description,
-            "expected_conflict": expect_conflict,
             "conflicted": conflicted,
             "conflicting_paths": paths,
-            "machine_plane_conflicts": index_paths,
-            "passes": conflicted == expect_conflict and (expect_conflict or not index_paths),
+            "machine_plane_conflicts": [p for p in paths if p.startswith(".fux/index")],
         }
 
 
-def tier1(repo: Path):
+def _tier(name: str, description: str, expect_conflict: bool, build) -> dict:
+    """One tier, both arms, and the informativeness test between them."""
+    treatment = _run_tier(build, treatment=True)
+    control = _run_tier(build, treatment=False)
+
+    matches = treatment["conflicted"] == expect_conflict and (
+        expect_conflict or not treatment["machine_plane_conflicts"]
+    )
+    # Informative means: without the driver this merge does NOT come out the way
+    # the treatment did. For the two clean tiers that is a control conflict; for
+    # tier 3 informativeness is not claimed — a genuine disagreement conflicts
+    # in both arms by design, and that is the point rather than a weakness.
+    informative = control["machine_plane_conflicts"] != [] if not expect_conflict else None
+    return {
+        "tier": name,
+        "description": description,
+        "expected_conflict": expect_conflict,
+        "treatment": treatment,
+        "control": control,
+        "informative": informative,
+        "passes": matches and (informative is not False),
+        "matches_expectation": matches,
+    }
+
+
+def tier1(repo: Path, treatment: bool):
     """Both sides add different documents — the everyday case."""
     _branch_edit(repo, "left", {"docs/left.md": _doc(500)})
     _branch_edit(repo, "right", {"docs/right.md": _doc(600)})
@@ -212,23 +300,17 @@ def _same_shard_pair(repo: Path) -> tuple[str, str]:
     raise SystemExit("no two documents share a shard — raise the corpus size")
 
 
-def tier2(repo: Path):
-    """One shard, one line changed on each side. The case the driver is for.
-
-    Two people edit two different documents that happen to hash into the same
-    shard. The file changes on both sides; the *lines* do not overlap. A
-    textual three-way merge sees neighbouring lines and can conflict on
-    adjacency alone — this asserts the driver does not.
-    """
+def tier2(repo: Path, treatment: bool):
+    """One shard, one line changed on each side. The case the driver is for."""
     first, second = _same_shard_pair(repo)
-    left = first.removeprefix("file:")
-    right = second.removeprefix("file:")
-    _branch_edit(repo, "left", {left: _doc(700, 1)})
-    _branch_edit(repo, "right", {right: _doc(800, 2)})
+    _branch_edit(repo, "left", {first.removeprefix("file:"): _doc(700, 1)})
+    _branch_edit(repo, "right", {second.removeprefix("file:"): _doc(800, 2)})
     git(repo, "checkout", "-q", "left")
     conflicted, paths = _merge(repo, "right")
-    if not conflicted:
-        # Both edits must survive: LWW picked the higher ver per line, not per file.
+    if treatment and not conflicted:
+        # Both edits must survive: LWW picked the higher ver per line, not per
+        # file. A "clean merge" that silently dropped one side would otherwise
+        # read as a pass.
         from fux.store.reader import read_index
 
         index = read_index(repo)
@@ -236,62 +318,147 @@ def tier2(repo: Path):
     return conflicted, paths
 
 
-def tier3(repo: Path):
+def tier3(repo: Path, treatment: bool):
     """A genuine disagreement — and both halves of the asymmetry at once.
 
     Both sides edit the *same* document differently. The human file conflicts,
     exactly as it always did; and the machine plane, facing two records at the
     same `ver` with different bytes, **refuses and leaves both sides** rather
-    than silently publishing one. A harness that only proved "no conflicts"
-    would be proving the merge driver is dangerous.
+    than silently publishing one.
     """
     _branch_edit(repo, "left", {"docs/doc-0.md": _doc(0, 1)})
     _branch_edit(repo, "right", {"docs/doc-0.md": _doc(0, 2)})
     git(repo, "checkout", "-q", "left")
     conflicted, paths = _merge(repo, "right")
-    shards = [repo / p for p in paths if p.startswith(".fux/index")]
-    for shard in shards:
-        text = shard.read_text(encoding="utf-8", errors="replace")
-        assert "<<<<<<< ours" in text and ">>>>>>> theirs" in text, "the driver picked a side"
+    if treatment:
+        for shard in (repo / p for p in paths if p.startswith(".fux/index")):
+            text = shard.read_text(encoding="utf-8", errors="replace")
+            assert "<<<<<<< ours" in text and ">>>>>>> theirs" in text, "the driver picked a side"
     return conflicted, paths
+
+
+def tier1b(repo: Path, treatment: bool):
+    """**Post-hoc, and labelled as such.** Disjoint adds into ONE shard.
+
+    Tier 1 as pre-registered turned out uninformative: two documents added on
+    two branches usually hash into two different shard files, and git's textual
+    merge handles two different files without help. That is a real finding
+    about tier 1, not a defect to be hidden — so tier 1 is reported unchanged
+    and this arm is added beside it, **outside the verdict**, to answer the
+    question tier 1 was meant to answer: what happens when two people add
+    documents that land in the *same* shard?
+
+    The pair is found by hashing candidate names at run time, so nothing here
+    depends on the corpus generator's ordering.
+    """
+    from fux.store.format import shard_for
+
+    target = shard_for("file:docs/doc-0.md")
+    names = [
+        f"docs/extra-{i}.md" for i in range(4000) if shard_for(f"file:docs/extra-{i}.md") == target
+    ][:2]
+    if len(names) < 2:  # pragma: no cover - 256 shards, 4000 candidates
+        raise SystemExit("could not find two names sharing a shard")
+    _branch_edit(repo, "left", {names[0]: _doc(500)})
+    _branch_edit(repo, "right", {names[1]: _doc(600)})
+    git(repo, "checkout", "-q", "left")
+    return _merge(repo, "right")
 
 
 def measure_r6() -> list[dict]:
     tiers = [
-        ("1 · machine, disjoint adds", "both sides add documents", False, tier1),
-        ("2 · machine, one shard, two lines", "adjacency is not a disagreement", False, tier2),
-        ("3 · the same document, both sides", "human conflict preserved; machine plane refuses", True, tier3),
+        ("1 · machine, disjoint adds", "both sides add documents", False, tier1, False),
+        ("1b · machine, disjoint adds, one shard", "POST-HOC — outside the verdict", False, tier1b, True),
+        ("2 · machine, one shard, two lines", "adjacency is not a disagreement", False, tier2, False),
+        ("3 · the same document, both sides", "human conflict preserved; machine plane refuses", True, tier3, False),
     ]
     rows = []
-    for name, description, expect, build in tiers:
+    for name, description, expect, build, post_hoc in tiers:
         row = _tier(name, description, expect, build)
+        row["post_hoc"] = post_hoc
         rows.append(row)
-        print(f"  R6 tier {name}: conflicted={row['conflicted']} passes={row['passes']}")
+        info = {True: "informative", False: "UNINFORMATIVE", None: "n/a"}[row["informative"]]
+        print(
+            f"  R6 tier {name}: treatment conflicted={row['treatment']['conflicted']} · "
+            f"control conflicted={row['control']['conflicted']} · {info} · "
+            f"{'PASS' if row['passes'] else 'FAIL'}"
+        )
     return rows
 
 
 # ----------------------------------------------------------------
 
 
+#: The judged corpus size, from PRE-REGISTRATION.md §2. Not a default to be
+#: overridden into a friendlier number: `--sizes` exists to add rows to the
+#: population curve, and the verdict is read from this one.
+R5_JUDGED_DOCS = 100_000
+
+
+def _engine_sha() -> str:
+    out = subprocess.run(
+        ["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True, text=True
+    )
+    dirty = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True)
+    return out.stdout.strip() + ("+dirty" if dirty.stdout.strip() else "")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, help="directory to write report.json into")
-    parser.add_argument("--sizes", type=int, nargs="+", default=[100, 1000, 5000])
-    parser.add_argument("--repeats", type=int, default=3)
+    parser.add_argument(
+        "--sizes", type=int, nargs="+", default=[1_000, 10_000, R5_JUDGED_DOCS],
+        help="the population curve; the verdict is still read from the judged size",
+    )
+    parser.add_argument("--repeats", type=int, default=5)
     parser.add_argument("--only", choices=["r5", "r6"], help="run one prediction")
     args = parser.parse_args(argv)
 
-    report: dict = {"fux": FUX, "r5_budget_s": R5_BUDGET_S, "r5_commit_docs": R5_COMMIT_DOCS}
+    report: dict = {
+        "fux": FUX,
+        "engine_sha": _engine_sha(),
+        "python": sys.version.split()[0],
+        "platform": f"{os.uname().sysname} {os.uname().release} {os.uname().machine}",
+        "r5_budget_s": R5_BUDGET_S,
+        "r5_commit_docs": R5_COMMIT_DOCS,
+        "r5_judged_docs": R5_JUDGED_DOCS,
+        "pre_registration": "tools/maintenance-bench/PRE-REGISTRATION.md",
+    }
 
     if args.only != "r6":
         print("R5 — a 20-doc commit, re-indexed by the post-commit hook")
         report["r5"] = measure_r5(args.sizes, args.repeats)
-        report["r5_passes"] = all(r["passes"] for r in report["r5"])
+        judged = [r for r in report["r5"] if r["judged"] and r["corpus_docs"] == R5_JUDGED_DOCS]
+        if judged:
+            report["r5_verdict"] = "PASS" if judged[0]["passes"] else "FAIL"
+        else:
+            # Refusing to rule is the correct behaviour, not a gap: the judged
+            # size is pre-registered, and a verdict read off a different one
+            # would be the threshold moving under another name.
+            report["r5_verdict"] = "NOT RULED — the judged size was not run"
+        print(f"  R5 verdict: {report['r5_verdict']}")
 
     if args.only != "r5":
-        print("R6 — the three-tier merge harness")
+        print("R6 — the three-tier merge harness, with a control arm")
         report["r6"] = measure_r6()
-        report["r6_passes"] = all(r["passes"] for r in report["r6"])
+        judged = [r for r in report["r6"] if not r.get("post_hoc")]
+        matches = all(r["matches_expectation"] for r in judged)
+        clean_tiers = [r for r in judged if r["informative"] is not None]
+        all_informative = all(r["informative"] for r in clean_tiers)
+        none_informative = not any(r["informative"] for r in clean_tiers)
+        # PRE-REGISTRATION.md §3.2, applied literally. The `AMBIGUOUS` branch is
+        # not a fourth outcome invented here — it is what the frozen table does
+        # NOT cover, and CLAUDE.md says a result between the defined rows is
+        # written up and handed to Arpit rather than adjudicated by the runner.
+        if not matches:
+            report["r6_verdict"] = "FAIL"
+        elif all_informative:
+            report["r6_verdict"] = "PASS"
+        elif none_informative:
+            report["r6_verdict"] = "INCONCLUSIVE"
+        else:
+            report["r6_verdict"] = "AMBIGUOUS — every tier matches; some but not all are informative"
+        print(f"  R6 verdict: {report['r6_verdict']}")
 
     if args.out:
         args.out.mkdir(parents=True, exist_ok=True)

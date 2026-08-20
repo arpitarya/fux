@@ -37,7 +37,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   the index.
 
 - **`fux hooks` — the maintenance plane** (M5,
-  [ADR-MAINTENANCE](docs/adr/0033_maintenance.md), **proposed, not accepted**).
+  [ADR-MAINTENANCE](docs/adr/0033_hooks.md), **proposed, not accepted**).
   Installs `post-commit` / `post-merge` / `post-checkout` and registers a merge
   driver for `.fux/index/*.jsonl`. Every hook is best-effort and **cannot block
   a commit**; installation **refuses rather than overwrites** a hook fux did
@@ -112,7 +112,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   returned — asserted by a differential test.
 
 - **The graph lane — `fux explain`, `fux graph`, `fux path`** (M3,
-  [ADR-GRAPH](docs/adr/0030_graph-lane.md)). The `ref`/`tag`/`code` edges
+  [ADR-GRAPH](docs/adr/0030_graph.md)). The `ref`/`tag`/`code` edges
   ingest has extracted since M1 become answerable. `explain` lists a
   document's outbound edges and its community; `graph` returns the
   neighbourhood around a query's best answers, PPR-expanded; `path` returns

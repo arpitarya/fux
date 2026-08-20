@@ -17,10 +17,10 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
+### [ADR-GRAPH](../docs/adr/0030_graph.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
 
-- **W-61** · `agent` · **held — Arpit's word required** · **M5 is built and its two gates are unrun.** [ADR-MAINTENANCE](../docs/adr/0033_maintenance.md) is **`proposed`, not accepted**, because of it. The harness is already written ([`tools/maintenance-bench/`](../tools/maintenance-bench/run.py)); **and the thing it measures changed on 2026-08-20** — delta ingest ([ADR-INGEST](../docs/adr/0007_ingest.md) decision 1b) made a re-ingest 22.7×/26.4× faster, so any R5 number taken before it is about a build that no longer exists. What stands in its place is a *behaviour* test — the same merge conflicting without the driver and clean with it — which is **not R6**, and the record says so — [detail](open/W-61-maintenance-measurement.md)
-- **W-59** · `agent` · **unblocked (the lab is back); held pending Arpit's word on prediction runs** · **the refer plane is built and unmeasured** — M4's core landed with 73 tests, and [ADR-REFER](../docs/adr/0031_refer-plane.md) is **`proposed`, not accepted**, because R4 has not run. Also unmeasured: the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**) and ARC-vs-LRU against the cache compare doc's own reopen-trigger — [detail](open/W-59-refer-plane-measurement.md)
+- **W-61** · `agent` · **held — Arpit's word required** · **M5 is built and its two gates are unrun.** [ADR-MAINTENANCE](../docs/adr/0033_hooks.md) is **`proposed`, not accepted**, because of it. The harness is already written ([`tools/maintenance-bench/`](../tools/maintenance-bench/run.py)); **and the thing it measures changed on 2026-08-20** — delta ingest ([ADR-INGEST](../docs/adr/0007_ingest.md) decision 1b) made a re-ingest 22.7×/26.4× faster, so any R5 number taken before it is about a build that no longer exists. What stands in its place is a *behaviour* test — the same merge conflicting without the driver and clean with it — which is **not R6**, and the record says so — [detail](open/W-61-maintenance-measurement.md)
+- **W-59** · `agent`+`arpit` · **R4 ran 2026-08-20 and PASSED** ([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)) — cold p95 **1.113 s** / 3 s, warm **0.016 s** / 300 ms, **with a boundary**: the plane fetches serially, so cold cost is `k ×` the source's latency and anything slower than ~295 ms breaches the bound at k=10. [ADR-REFER](../docs/adr/0031_refer-plane.md) is still **`proposed`** — one gate passing is not the whole DoD. **What keeps it open:** the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**), which needs goldens a human must write (W-57); and ARC-vs-LRU, which was measured but **post-hoc** — the metric changed after seeing a number it reversed — so the cache compare doc's trigger is Arpit's to call — [detail](open/W-59-refer-plane-measurement.md)
 - **W-57** · `arpit` · **blocked on the goldens — a human must write them** · the graph lane's acceptance measurement is unrun, and **re-scoped 2026-08-20**: `q005`/`q009`/`q011`/`q015` were ids in the lost golden set and cannot be recovered, so the targets are now **phenomena** (supersession · near-duplication · staleness≠wrongness), all three built deliberately into the rebuilt corpus. **The supersession gap already reproduces** — `what replaced helix mesh` returns the superseded doc above the ADR that replaced it — [detail](open/W-57-graph-lane-acceptance.md)
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
@@ -46,7 +46,7 @@ when the pre-registration is written, and not because they look ready.*
 
 | id | prediction | threshold | measured at |
 |----|-----------|-----------|-------------|
-| R4 | refer plane | cold k=10 ≤ 3 s / warm ≤ 300 ms | **W-59** — the plane is built; the gate has not run |
+
 | R5 | 20-doc commit re-index | < 1 s via hook | W-25 |
 | R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
 | R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
@@ -54,6 +54,9 @@ when the pre-registration is written, and not because they look ready.*
 **All four run in `fux-lab`, and `fux-lab` is gone** ([W-56](open/W-56-sibling-environments-missing.md),
 2026-08-20). No prediction in this table can be measured until it is back.
 
+**R4 PASS** — cold p95 **1.113 s** vs a 3 s bar, warm **0.016 s** vs 300 ms, on a 100 ms mock source
+([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)); the plane fetches **serially**, so the bound is a
+statement about the source's latency at k=10, not about fux.
 R1 **PASS** · **R2 3/3 PASS** ([run](regression/2026-08-12-r2-close/report.md)) ·
 **R3 PASS** — worst-case p95 **27.2 ms** vs a 150 ms bar on 8 870 RFCs
 ([run](regression/2026-08-12-m2-accelerator/report.md)).

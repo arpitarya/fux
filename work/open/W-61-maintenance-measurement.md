@@ -4,7 +4,7 @@
 **Blocked by:** **Arpit's hold on prediction runs** (2026-08-20 — they run only
 when he says so explicitly). Not blocked on tooling: the lab exists again
 (W-56) and the harness is written.
-**Closes with:** [ADR-MAINTENANCE](../../docs/adr/0033_maintenance.md) moving
+**Closes with:** [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) moving
 `proposed` → `accepted`, and a filed run under [`../regression/`](../regression/README.md)
 **Model:** **Sonnet** to run and file it; **Opus** for the verdict — R5 and R6
 are pre-registered gates, and a gate call is Opus work.
@@ -72,12 +72,12 @@ ADR-MAINTENANCE says so in its own consequences.
 **Do not tune the hook to make R5 pass.** If a 20-doc commit does not re-index
 in a second, the honest outcome is that `post-commit` is too slow to be
 automatic at that corpus size — which is a finding about the design, and
-[ADR-MAINTENANCE](../../docs/adr/0033_maintenance.md)'s veto condition 1 says
+[ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)'s veto condition 1 says
 exactly what changes if it fires.
 
 ## Reference
 
-- [ADR-MAINTENANCE](../../docs/adr/0033_maintenance.md) — the plane and its
+- [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) — the plane and its
   four veto conditions.
 - [`maintenance-trigger.compare.md`](../compare/maintenance-trigger.compare.md)
   — the accepted verdict, whose own reopen-trigger is R5 or R6 failing.

@@ -101,7 +101,7 @@ is anything the run reveals about the threshold's own construction — for
 instance, if the number is dominated by a component the prediction plainly did
 not have in mind.
 
-**A FAIL is a shipped result.** [ADR-MAINTENANCE](../../docs/adr/0033_maintenance.md)
+**A FAIL is a shipped result.** [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)
 veto condition 1 already states what changes: *"`post-commit` is too slow to be
 automatic and the hook becomes opt-in or incremental in a way it currently is
 not."* Tuning the hook to pass is explicitly forbidden by

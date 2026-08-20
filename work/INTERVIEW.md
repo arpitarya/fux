@@ -62,11 +62,11 @@ a verdict, a hold lifted, or fifty goldens written by hand.
 | shipped 2026-08-20 | record | measured? |
 |---|---|---|
 | W-46 · W-48 — two query defects | ADR-CLI · ADR-ASK · ADR-ANSWER | n/a |
-| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0030_graph-lane.md) ✅ | **no** — W-57 |
+| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0030_graph.md) ✅ | **no** — W-57 |
 | **M4 core** the refer plane | [ADR-REFER](../docs/adr/0031_refer-plane.md) ⏳ | **no** — W-59 |
 | W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-TYPES](../docs/adr/0032_types-list.md) ✅ | **no** — rides with W-52 |
 | W-56 — both lab environments | SETUP-LAB · SETUP-PLAYGROUND | rebuilt, under git |
-| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0033_maintenance.md) ⏳ | **no** — W-61 |
+| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0033_hooks.md) ⏳ | **no** — W-61 |
 | W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0031_refer-plane.md) 5a-5c ✅ | n/a |
 
 **Two records are `proposed` rather than `accepted` on purpose** — ADR-REFER
@@ -89,7 +89,7 @@ command. **Still no subcommand tree.**
 **Read this first: the engine grew two milestones and neither is measured, and
 the reason is that the measuring environments are gone.**
 
-- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0030_graph-lane.md),
+- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0030_graph.md),
   accepted). `explain` / `graph` / `path`; communities by **unseeded** label
   propagation in a **derived** plane (`.fux/runtime/graph.json`); PPR-lite with
   a **lazy** walk. The archived relational eval passes on the new kernel,

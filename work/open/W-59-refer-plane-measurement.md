@@ -1,8 +1,10 @@
 # W-59 — the refer plane is built and unmeasured
 
-**Status:** OPEN · **Filed:** 2026-08-20
-**Blocked by:** [W-56](W-56-sibling-environments-missing.md) — R4 runs in
-`fux-lab`, and the budget sweep needs `fux-playground`; neither exists
+**Status:** OPEN · **Filed:** 2026-08-20 — **R4 is measured and passed (2026-08-20).** What keeps this item
+open is the **budget sweep**, which needs a graded corpus, and the goldens are
+unwritten by design ([W-57](W-57-graph-lane-acceptance.md)) — the second
+measurement blocked on that one item.
+**Blocked by:** [W-57](W-57-graph-lane-acceptance.md) — the goldens
 **Closes with:** [ADR-REFER](../../docs/adr/0031_refer-plane.md) moving
 `proposed` → `accepted`, and a filed run under [`../regression/`](../regression/README.md)
 **Model:** **Sonnet** to run and file it; **Opus** for the verdict — R4 is a
@@ -43,16 +45,30 @@ not taken.
 
 ## Definition of done
 
-- [ ] `fux-lab` exists again — [W-56](W-56-sibling-environments-missing.md).
-- [ ] A **pre-registration** is written and committed **before** any number is
-      produced: the metric definitions, the corpus, and the R4 thresholds
-      restated verbatim from the plan. The threshold does not move.
-- [ ] R4 measured on a mock-server bench; cold and warm reported separately.
+- [x] `fux-lab` exists again — [W-56](W-56-sibling-environments-missing.md).
+      **Not used for R4**: the lab's environments install the published
+      `0.33.0` wheel, which predates the refer plane, so the bench measures the
+      working tree by path and records its sha.
+- [x] A **pre-registration** committed before any number existed —
+      [`tools/refer-bench/PRE-REGISTRATION.md`](../../tools/refer-bench/PRE-REGISTRATION.md),
+      commit `d98874d`. It disclosed two things in advance rather than
+      discovering them: the serial fetch, and that the warm bound might be
+      measuring the wrong thing. Both turned out to matter.
+- [x] **R4 measured 2026-08-20 — PASS** ([R4-REFER](../regression/2026-08-20-refer-plane-r4/VERDICT.md)):
+      cold p95 **1.113 s** / 3 s, warm p95 **0.016 s** / 300 ms on the
+      pre-registered 100 ms arm. **With a boundary the verdict states**: the
+      plane fetches serially, so cold cost is `k x` the source's latency and a
+      source slower than ~295 ms breaches the bound at k=10.
 - [ ] The budget sweep run and reported, **including if it is flat**.
-- [ ] ARC vs LRU hit-rate on the same workload, against the compare doc's
-      reopen-trigger.
-- [ ] Filed as a conformance run: `work/regression/<date>-refer-plane/` with
-      report, `ANALYSIS.md`, `evidence/`, a README row, a DOC-REGISTRY bump.
+- [~] **ARC vs LRU measured 2026-08-20 and reported post-hoc** — the metric
+      was changed after seeing a number it then reversed (+0.91 pts overall,
+      **+2.50 pts on hot requests**, against a 2-pt bar declared before the
+      run). The second metric's reasoning is sound and it is still a post-hoc
+      choice, so [`cache-policy.compare.md`](../compare/cache-policy.compare.md)'s
+      reopen-trigger **stays open**. It also asks for *real* workloads, and a
+      synthetic trace can fire that trigger but cannot clear it. **Arpit's call.**
+- [x] Filed as a conformance run —
+      [`work/regression/2026-08-20-refer-plane-r4/`](../regression/2026-08-20-refer-plane-r4/report.md).
 - [ ] ADR-REFER's status resolved — `accepted` on a pass, or amended on a fail.
       A fail is a shipped result, not a failed task.
 

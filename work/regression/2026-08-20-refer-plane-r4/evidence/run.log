@@ -1,0 +1,5 @@
+  R4 local    (  0 ms): cold p95 0.042s  warm p95 0.0099s
+  R4 internal (100 ms): cold p95 1.113s  warm p95 0.0159s   <- judged
+  R4 slow     (500 ms): cold p95 5.069s  warm p95 0.0099s
+  R4 verdict: PASS
+wrote /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/3edca543-f732-4dcb-b025-b1ff2cce36b4/scratchpad/r4/report.json

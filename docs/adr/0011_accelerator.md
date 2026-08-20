@@ -222,7 +222,7 @@ reproducible by construction.
   argument with it. That is the veto below.
 - **`fux build` is a two-lane build since 2026-08-20**, and the second lane is
   not this record's. The M3 graph lane's derived plane
-  ([ADR-GRAPH](0030_graph-lane.md)) is written by the same `build()` call,
+  ([ADR-GRAPH](0030_graph.md)) is written by the same `build()` call,
   from the same single pass over the committed shards — `_read_committed` now
   returns the parsed records alongside the doc table so the graph plane costs
   no second read. `DETERMINISTIC_FILES` gains `graph.json`, so the

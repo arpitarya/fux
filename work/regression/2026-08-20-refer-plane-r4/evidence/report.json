@@ -1,0 +1,64 @@
+{
+  "engine_sha": "d98874d+dirty",
+  "fux": "/Users/arpitarya/my_programs/fux/.venv/bin/fux",
+  "python": "3.14.2",
+  "platform": "Darwin 25.3.0 arm64",
+  "pre_registration": "tools/refer-bench/PRE-REGISTRATION.md",
+  "cold_budget_s": 3.0,
+  "warm_budget_s": 0.3,
+  "judged_arm": "internal",
+  "arms": [
+    {
+      "arm": "local",
+      "delay_ms": 0,
+      "judged": false,
+      "pairs": 20,
+      "k": 10,
+      "cold_median_s": 0.0153,
+      "cold_p95_s": 0.0416,
+      "warm_median_s": 0.0088,
+      "warm_p95_s": 0.0099,
+      "cold_passes": true,
+      "warm_passes": true,
+      "verdict_labels_on_last_cold_call": [
+        "current"
+      ],
+      "citations_on_last_cold_call": 6
+    },
+    {
+      "arm": "internal",
+      "delay_ms": 100,
+      "judged": true,
+      "pairs": 20,
+      "k": 10,
+      "cold_median_s": 1.0673,
+      "cold_p95_s": 1.1129,
+      "warm_median_s": 0.009,
+      "warm_p95_s": 0.0159,
+      "cold_passes": true,
+      "warm_passes": true,
+      "verdict_labels_on_last_cold_call": [
+        "current"
+      ],
+      "citations_on_last_cold_call": 6
+    },
+    {
+      "arm": "slow",
+      "delay_ms": 500,
+      "judged": false,
+      "pairs": 20,
+      "k": 10,
+      "cold_median_s": 5.0439,
+      "cold_p95_s": 5.0691,
+      "warm_median_s": 0.0088,
+      "warm_p95_s": 0.0099,
+      "cold_passes": false,
+      "warm_passes": true,
+      "verdict_labels_on_last_cold_call": [
+        "current"
+      ],
+      "citations_on_last_cold_call": 6
+    }
+  ],
+  "r4_verdict": "PASS"
+}

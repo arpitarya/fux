@@ -1,0 +1,32 @@
+{
+  "budget_bytes": 327680,
+  "docs": 500,
+  "hot_set": 20,
+  "advantage_threshold_pts": 2.0,
+  "advantage_read_from": "hot_advantage_pts on the scan workload",
+  "workloads": [
+    {
+      "workload": "hot",
+      "requests": 800,
+      "hot_requests": 800,
+      "arc_hit_rate_pct": 97.5,
+      "lru_hit_rate_pct": 97.5,
+      "advantage_pts": 0.0,
+      "arc_hot_hit_rate_pct": 97.5,
+      "lru_hot_hit_rate_pct": 97.5,
+      "hot_advantage_pts": 0.0
+    },
+    {
+      "workload": "scan",
+      "requests": 3300,
+      "hot_requests": 800,
+      "arc_hit_rate_pct": 25.15,
+      "lru_hit_rate_pct": 24.24,
+      "advantage_pts": 0.91,
+      "arc_hot_hit_rate_pct": 90.0,
+      "lru_hot_hit_rate_pct": 87.5,
+      "hot_advantage_pts": 2.5
+    }
+  ],
+  "compare_doc_trigger": "does not fire \u2014 ARC behaves as advertised on the scan workload it was chosen for. Note the limit: this is a synthetic trace, so it cannot CLEAR a trigger whose wording says 'real Fux workloads'"
+}

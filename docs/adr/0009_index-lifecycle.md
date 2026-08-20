@@ -274,7 +274,7 @@ and the differential harness now carries a hashed record to prove it.
 ### Consequences
 
 - **L5 is now enforced inside `write_index`** (2026-08-20,
-  [ADR-MAINTENANCE](0033_maintenance.md) decision 10). Until M5 the hashed-meta
+  [ADR-MAINTENANCE](0033_hooks.md) decision 10). Until M5 the hashed-meta
   rule for non-git sources lived in `ingest/run.py` — in *one caller* — so any
   second writer could have put a private document's title into a committed
   shard and nothing would have refused. The check now runs per record, **before
@@ -285,7 +285,7 @@ and the differential harness now carries a hashed record to prove it.
   to close. **The existing corpus already complied**, so this landed without
   changing a committed byte.
 - **`.fux/index/*.jsonl` now merges through a custom driver** rather than
-  textually ([ADR-MAINTENANCE](0033_maintenance.md) decisions 6-9). Decision
+  textually ([ADR-MAINTENANCE](0033_hooks.md) decisions 6-9). Decision
   7's write-if-different discipline is what makes that safe: the driver's
   output is sorted by id, so two machines merging the same three inputs produce
   the same bytes.

@@ -48,7 +48,7 @@ preserve. Nesting is the thing this record refuses, not arithmetic.
 **The graph group is the first that does not rank.** `ask`/`find`/`answer`
 return documents ordered by relevance; `explain`/`graph`/`path` return
 relationships the documents themselves stated. That is why they are a group
-rather than three more read verbs — see [ADR-GRAPH](0030_graph-lane.md).
+rather than three more read verbs — see [ADR-GRAPH](0030_graph.md).
 
 The three query verbs differ only in **how much they commit to**. `find` gives
 you locations and stays out of the way. `ask` gives you a ranked list with
@@ -158,7 +158,7 @@ flags — `--install` (the default), `--status`, `--uninstall`, `--json` — rat
 than becoming `fux hooks install`, for the same reason `url` did. It is the
 first verb that **writes outside `.fux/`** (into `.git/hooks/` and
 `.gitattributes`), which is why it refuses to overwrite anything it did not
-write and says so. The reasoning is [ADR-MAINTENANCE](0033_maintenance.md)'s.
+write and says so. The reasoning is [ADR-MAINTENANCE](0033_hooks.md)'s.
 
 > **`fux-merge-index` is a separate console script, not a verb**, and that is
 > not a surface inconsistency: git invokes a merge driver as a bare command
@@ -170,7 +170,7 @@ are flat: `fux graph path` would have been the first subcommand tree on this
 surface. They form a group rather than joining `read` because **they do not
 rank** — they return relationships, and a caller reaching for them wants a
 different kind of answer. The verbs, their payloads and the reasoning are
-[ADR-GRAPH](0030_graph-lane.md)'s; what binds here is the flatness, the shared
+[ADR-GRAPH](0030_graph.md)'s; what binds here is the flatness, the shared
 `--json` flag, and that `path`'s no-route case prints prose and exits 0 exactly
 as `find`'s no-match case does — the three-verbs-agree property W-48 examined
 and kept.
