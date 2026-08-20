@@ -10,6 +10,21 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **Delta ingest — unchanged documents keep their extraction** (ADR-INGEST
+  decision 1b). A filed [cost profile](work/regression/2026-08-20-ingest-cost-profile/report.md)
+  put **92 % of a full ingest inside the dense embedding**, so a document whose
+  content `sha` is unchanged now keeps its `title`, `phrases`, `terms`, `wlen`
+  and `code`. **Edges still re-resolve on every run** — they are corpus-wide,
+  and skipping them would leave a link dangling forever with nothing to notice.
+  Measured **22.7× at 1 000 documents and 26.4× at 5 000, byte-identical** to a
+  full run.
+- **`fux ingest --full`** — re-extract every document regardless. It is the
+  complete term-hash collision check, and the way to retro-fit `code` after an
+  embedding bundle becomes available; both are consequences of the reuse and
+  are recorded in ADR-INGEST rather than left to be discovered.
+- The ingest summary now reports what was carried forward:
+  `ingested 3 docs (1 changed, 2 carried forward), 2 skipped, 1 shards written`.
+
 - **A TTL-bounded local fetch cache for the refer plane** (W-60,
   [ADR-REFER](docs/adr/0031_refer-plane.md) 5a-5c). `cache_ttl_seconds`
   (**default 0 — off**) and `no_cache` on the freshness policy; entries live in

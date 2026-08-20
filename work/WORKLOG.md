@@ -28,6 +28,46 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-20 — delta ingest: a veto condition fired, and W-25/W-60 were taken by a concurrent session  ·  Claude Code
+
+- **Asked:** implement W-25 and W-26, and W-60 too, as fast as possible.
+- **Found first, and it changes the entry:** a **concurrent session shipped W-25
+  as `621c83c` mid-session** (ADR-MAINTENANCE, `tests_e2e/test_maintenance.py`,
+  W-61 filed) and swept in this session's `tools/maintenance-bench/run.py`,
+  `tests/maintain/*` and `tests/store/test_meta_policy.py`, which it says
+  plainly in its own commit message. It then began **W-60** —
+  `src/fux/refer/fetchcache.py` and the amended `freshness.py` appeared on disk
+  while this session was mid-edit. **W-60 was therefore not touched here**;
+  racing a live build would have corrupted both.
+- **Ran R5/R6 before the hold was visible.** The maintenance harness was run at
+  ~11:05, and the hold on prediction runs was recorded in W-61 at ~11:13. The
+  numbers exist and are **not filed as a verdict**: R6's three tiers passed;
+  R5 measured 3.4 s at 1 000 documents and 17.2 s at 5 000 against a 1 s bar,
+  which is a *failing* number for a build that no longer exists.
+- **Did — the session's own contribution, and the reason that number moved:**
+  **delta ingest.** ADR-INGEST's veto condition named "full re-extraction
+  becomes the measured bottleneck at scale" as the thing that would reopen
+  decision 1. A filed cost profile
+  (`work/regression/2026-08-20-ingest-cost-profile/`) supplied it: **92 % of a
+  full ingest is `_fuxvec_code`**, the dense embedding, at 1 k and 5 k alike.
+  So extraction is now carried forward for an unchanged `sha` (decision **1b**)
+  while **edges re-resolve every run** — 22.7× / 26.4× faster, **byte-identical**,
+  with `fux ingest --full` as the escape hatch. ADR-INGEST and ADR-CLI amended
+  in the same change; `tests/ingest/test_delta.py` asserts byte-identity after
+  an edit, an addition and a deletion. 806 tests pass across both suites.
+- **Decided / open:** **W-26 was not started, and should not be.** Its DoD
+  requires every R prediction to carry a measured value or an honest failure
+  record, and R4/R5/R6/R7 are all unrun under Arpit's hold. Building `tpack`
+  and a T2 tier now means choosing the tier-auto threshold by hand and then
+  looking for evidence for it — the inversion the pre-registration rule exists
+  to stop. Two guarantees were **narrowed and written down** rather than
+  glossed: term-hash collision detection is complete only under `--full`, and a
+  newly available embedding bundle does not retro-fit `code`.
+- **Next:** Arpit's word on lifting the hold on prediction runs — R5 is now
+  worth re-running, because it is measuring a different engine.
+- **Cost:** unmeasured (no token counter wired into this surface); roughly one
+  hour of wall-clock, most of it in the corpus builds the profile needed.
+
 ## 2026-08-20 — W-60 ratified: option F  ·  Cowork
 
 - **Asked:** "Let's go with option F" for the refer-plane fetch cache; then,

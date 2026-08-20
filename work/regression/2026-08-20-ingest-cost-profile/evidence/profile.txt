@@ -1,0 +1,50 @@
+== corpus 1000: cProfile of a FULL ingest ==
+         15600554 function calls (15432551 primitive calls) in 4.382 seconds
+
+   Ordered by: cumulative time
+   List reduced from 323 to 12 due to restriction <12>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.003    0.003    4.383    4.383 /Users/arpitarya/my_programs/fux/src/fux/ingest/run.py:81(run)
+     1000    0.007    0.000    4.031    0.004 /Users/arpitarya/my_programs/fux/src/fux/ingest/extract.py:34(extract_fields)
+     1000    0.003    0.000    3.996    0.004 /Users/arpitarya/my_programs/fux/src/fux/ingest/extract.py:67(_fuxvec_code)
+     1000    2.318    0.002    3.962    0.004 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:121(embed)
+     1000    0.014    0.000    1.477    0.001 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:87(tokenize)
+     1000    0.415    0.000    0.989    0.001 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:157(_normalize)
+    61000    0.147    0.000    0.247    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:98(_wordpiece)
+     1000    0.050    0.000    0.222    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:175(_pre_tokenize)
+  4006458    0.175    0.000    0.175    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:165(<genexpr>)
+        1    0.001    0.001    0.173    0.173 /Users/arpitarya/my_programs/fux/src/fux/store/writer.py:53(write_index)
+   445162    0.102    0.000    0.166    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:202(_is_punct)
+      253    0.000    0.000    0.162    0.001 {method 'join' of 'bytes' objects}
+
+
+
+== corpus 1000: full vs delta, and byte-identity ==
+full 2.879s  delta 0.127s  speedup 22.7x  reused 1000
+byte-identical: True
+== corpus 5000: cProfile of a FULL ingest ==
+         82465465 function calls (81625585 primitive calls) in 23.297 seconds
+
+   Ordered by: cumulative time
+   List reduced from 321 to 12 due to restriction <12>
+
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+        1    0.016    0.016   23.305   23.305 /Users/arpitarya/my_programs/fux/src/fux/ingest/run.py:81(run)
+     5000    0.035    0.000   21.583    0.004 /Users/arpitarya/my_programs/fux/src/fux/ingest/extract.py:34(extract_fields)
+     5000    0.013    0.000   21.405    0.004 /Users/arpitarya/my_programs/fux/src/fux/ingest/extract.py:67(_fuxvec_code)
+     5000   12.516    0.003   21.305    0.004 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:121(embed)
+     5000    0.071    0.000    7.960    0.002 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:87(tokenize)
+     5000    2.227    0.000    5.283    0.001 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:157(_normalize)
+   305000    0.837    0.000    1.394    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:98(_wordpiece)
+     5000    0.263    0.000    1.184    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:175(_pre_tokenize)
+ 21711078    0.935    0.000    0.935    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:165(<genexpr>)
+  2412342    0.543    0.000    0.894    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:202(_is_punct)
+  2677342    0.520    0.000    0.825    0.000 /Users/arpitarya/my_programs/fux/src/fux/embed/model.py:192(_is_control)
+        1    0.004    0.004    0.824    0.824 /Users/arpitarya/my_programs/fux/src/fux/store/writer.py:53(write_index)
+
+
+
+== corpus 5000: full vs delta, and byte-identity ==
+full 15.733s  delta 0.596s  speedup 26.4x  reused 5000
+byte-identical: True

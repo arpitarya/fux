@@ -2,9 +2,9 @@
 type: ADR
 name: ADR-INGEST
 title: ADR-INGEST (0007) — how ingest works
-description: Re-extract everything, re-resolve every edge, write only shards whose bytes changed. Skips are reported, deletions are honoured, output is byte-identical.
+description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported, deletions honoured, output byte-identical."
 status: accepted
-timestamp: 2026-08-18T00:00:00Z
+timestamp: 2026-08-20T00:00:00Z
 ---
 
 # ADR-INGEST — how ingest works
@@ -15,7 +15,7 @@ timestamp: 2026-08-18T00:00:00Z
   [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
 - **Owns:** `src/fux/ingest/`
 - **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-18
+- **Date:** 2026-08-18 · **amended 2026-08-20** — the veto condition fired; decision 1 is now a two-pass split (decision 1b)
 - **Feature:** the `fux ingest` pipeline — sources to committed records
 - **Evidence:** [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §4
 
@@ -27,15 +27,26 @@ Ingest turns whatever your `fux.toml` points at into committed records. It runs
 in five steps — walk, parse, extract, resolve edges, write — and the interesting
 design is in the last one.
 
-**"Incremental" here does not mean "skip unchanged files."** It cannot: an edge
-can point at a document elsewhere in the corpus, so adding one file can resolve
-a link that was dangling in another. Every document is re-extracted and every
-edge re-resolved on every run. What is incremental is the **write**: a shard
-whose bytes come out identical is left untouched on disk, so git sees nothing.
+**Every edge is re-resolved on every run. Extraction is not.** An edge can point
+at a document elsewhere in the corpus, so adding one file can resolve a link
+that was dangling in another — edges cannot be carried forward. Extraction
+cannot depend on anything *but* one document's own bytes, which is what
+`extracted` mode means, so a file whose `sha` is unchanged keeps the `title`,
+`phrases`, `terms`, `wlen` and `code` it already had.
 
-That is why re-running ingest on an unchanged corpus produces byte-identical
-shards and an empty `git status`, while editing one document rewrites exactly
-one shard.
+**That split was a measurement, not a preference.** This record originally
+re-extracted everything and said so; its veto condition named "full
+re-extraction becomes the measured bottleneck at scale" as the thing that would
+reopen it. On 2026-08-20 it did:
+[the cost profile](../../work/regression/2026-08-20-ingest-cost-profile/report.md)
+puts **92 % of a full ingest inside `_fuxvec_code`**, the dense embedding, and
+parse-plus-edge-resolution under 5 %. Carrying extraction forward makes a
+re-ingest of an unchanged 1 000-document corpus **23× faster** and byte-identical.
+
+The **write** is still incremental too: a shard whose bytes come out identical
+is left untouched on disk, so git sees nothing. Re-running ingest on an
+unchanged corpus produces byte-identical shards and an empty `git status`,
+while editing one document rewrites exactly one shard.
 
 Files that cannot be indexed are **reported, never silently dropped** — empty,
 binary, whatever the reason, with the reason.
@@ -46,7 +57,7 @@ binary, whatever the reason, with the reason.
 flowchart LR
     S[".fux/sources/dirs<br/>one entry per line"] --> W["walk<br/>skips reported"]
     W --> P["parse<br/>frontmatter + NFC"]
-    P --> X["extract<br/>title · phrases · terms · wlen"]
+    P --> X["extract<br/>title · phrases · terms · wlen<br/><i>skipped when sha is unchanged</i>"]
     X --> E["resolve edges<br/>corpus-wide, every run"]
     E --> WR["write<br/>identical bytes = no write"]
     WR --> I[".fux/index/*.jsonl"]
@@ -58,9 +69,11 @@ flowchart LR
 
 ```text
   sources  ->  walk  ->  parse  ->  extract  ->  resolve  ->  write
- (.fux/       skips    frontmatter  title       edges      identical bytes
+ (.fux/       skips    frontmatter  title      edges       identical bytes
   sources/    reported   + NFC      phrases   (corpus-wide,   = no write
-  dirs)                                        every run)
+  dirs)                            SKIPPED     every run)
+                                   when sha
+                                  unchanged
                                     terms                        |
                                     wlen                         v
                                                         .fux/index/*.jsonl
@@ -82,14 +95,16 @@ $ sha1sum .fux/index/*.jsonl > /tmp/a && fux ingest >/dev/null \
 IDENTICAL
 ```
 
-One document edited — one shard written, `ver` bumped, skips reported:
+One document edited — one shard written, two carried forward, skips reported.
+Captured 2026-08-20 on a five-file fixture, after decision 1b:
 
 ```console
+$ printf '\nA sentence added.\n' >> docs/refer.md
 $ fux ingest
-ingested 3 docs (1 changed), 2 skipped, 1 shards written
+ingested 3 docs (1 changed, 2 carried forward), 2 skipped, 1 shards written
   skip docs/empty.md: empty
-  skip docs/logo.png: binary
-accelerator: 85 terms, 85 blocks, 89 postings (derived, not committed)
+  skip docs/logo.png: not an indexed file type
+accelerator: 13 terms, 13 blocks, 13 postings (derived, not committed)
 ```
 
 ---
@@ -109,10 +124,28 @@ produces a plausible index rather than an error.
 
 ### Decision
 
-**1. Re-extract every document and re-resolve every edge, every run.** Edges are
-corpus-wide: a newly added document can resolve a link that was dangling in an
-untouched one. Skipping unchanged files at this layer would leave that edge
-dangling forever, with no error and no way to notice.
+**1. Re-resolve every edge, every run.** Edges are corpus-wide: a newly added
+document can resolve a link that was dangling in an untouched one. Skipping
+that at this layer would leave the edge dangling forever, with no error and no
+way to notice.
+
+**1b. Carry an unchanged document's extraction forward** — `title`, `phrases`,
+`terms`, `wlen`, `code` — when its content `sha` matches the record already in
+the index, it is a `file:` record with `meta: plain`, and the shard header
+still equals `store.HEADER`. **`fux ingest --full` re-extracts regardless.**
+
+The gate is those three conditions together, and each is load-bearing:
+
+| condition | what it stops |
+|---|---|
+| the content `sha` matches | reusing fields derived from bytes that changed |
+| `file:` and `meta: plain` | a `url:` record, which only reappears on `--refresh-urls`, and a hashed record whose display fields were deliberately never stored reusably |
+| the header equals `store.HEADER` | **two analyzers inside one index** — undetectable afterwards, and a silent differential-law break |
+
+**The output is byte-identical to a full run, and that is the property under
+test** — asserted after an edit, an addition and a deletion in
+[`tests/ingest/test_delta.py`](../../tests/ingest/test_delta.py), each against
+the full run's own bytes rather than a hand-written expectation.
 
 **2. Incremental means incremental *writes*.** `write_index` leaves a shard
 untouched when its bytes come out identical. This is what keeps `git status`
@@ -159,6 +192,10 @@ IDENTICAL
 
 **One document edited — one shard written, `ver` bumped:**
 
+> The capture predates decision 1b (2026-08-20), so its summary line has no
+> `carried forward` count. Left verbatim rather than edited: a capture that is
+> quietly rewritten to match today's code is no longer evidence of anything.
+
 ```console
 $ printf '\nA sentence added.\n' >> docs/refer.md
 $ fux ingest
@@ -190,10 +227,18 @@ docs/logo.png: binary
 
 ### Consequences
 
-- **Ingest cost is O(corpus), not O(changed).** Accepted deliberately: edge
-  correctness is worth it, and the expensive part downstream — writing and
-  diffing — is still O(changed). If this becomes the bottleneck at M6 scale it
-  is a *measurement*, not a hunch, that reopens it (see §Veto).
+- **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in
+  extraction.** The expensive half is now proportional to the change; the cheap
+  half still is not, and at very large corpora that residue is what remains to
+  attack. Writing and diffing were already O(changed).
+- **Term-hash collision detection is complete only on a full run.** The tracker
+  sees the raw terms of documents it extracted; a carried-forward document
+  contributes hashes it cannot un-hash, so a cross-document collision involving
+  one of them is not detected on a delta run. `fux ingest --full` is the
+  complete check. This is a real narrowing of archived ADR-0008's "fails
+  loudly" guarantee and is written down rather than hoped about.
+- **A newly available embedding bundle does not retro-fit `code`** onto
+  documents that have not changed since. `--full` fixes it; nothing else will.
 - **`0 shards written` can accompany a deletion**, since removing a shard is
   not a write. True, and mildly under-informative when reading a run log.
 - **Re-ingest is safe to run on a hook**, which is what M5 depends on.
@@ -204,12 +249,18 @@ docs/logo.png: binary
 
 ### Alternatives considered
 
-- **Skip unchanged files by `sha`.** Rejected: breaks corpus-wide edge
-  resolution silently. The failure is a *stale* index, not a broken one, which
-  is worse — nothing surfaces it.
-- **Two-pass: cheap pass for unchanged, full pass on demand.** Rejected for now
-  as complexity with no measured need. It is the natural answer if the veto
-  condition below ever fires.
+- **Skip unchanged files entirely, by `sha`.** Still rejected, and this is the
+  distinction decision 1b turns on: skipping a document skips its *edges*, and
+  the failure is a **stale** index rather than a broken one — nothing surfaces
+  it. Skipping only its extraction cannot go stale, because extraction has no
+  input beyond the bytes the sha pins.
+- **Two-pass: cheap pass for unchanged, full pass on demand.** **Adopted
+  2026-08-20** as decision 1b — this record predicted it would be "the natural
+  answer if the veto condition below ever fires," and it fired.
+- **Carry edges forward when the corpus id set is unchanged.** Rejected:
+  correct, and a second gate to keep true forever for a slice of the ~5 % that
+  edge resolution costs. The measurement said the embedding was the cost; the
+  cheap thing is not worth a second invariant.
 - **Bump `ver` on edge changes too.** Rejected: makes `ver` a property of the
   corpus rather than the document, and every document churns whenever any
   document moves.
@@ -230,12 +281,17 @@ docs/logo.png: binary
 - Prior art for corpus-wide link resolution as a separate pass — Sphinx's
   two-phase read/resolve build:
   https://www.sphinx-doc.org/en/master/extdev/appapi.html#build-phases
+- **The cost profile that fired the veto** —
+  [`work/regression/2026-08-20-ingest-cost-profile/`](../../work/regression/2026-08-20-ingest-cost-profile/report.md).
+- Prior art for content-addressed reuse of a pure derivation, with an explicit
+  full-rebuild escape hatch — Bazel's action cache keyed on the action's inputs:
+  https://bazel.build/basics/hermeticity
 
 ### Veto condition
 
-**Reopen this decision if** re-ingesting an unchanged corpus stops being
-byte-identical, or if full re-extraction becomes the measured bottleneck at
-scale.
+**Reopen this decision if** a delta run stops being byte-identical to
+`--full`, or if parse-plus-edge-resolution — the half that is still O(corpus) —
+becomes the measured bottleneck at scale.
 
 **How to check it:**
 
@@ -248,7 +304,12 @@ sha1sum .fux/index/*.jsonl > /tmp/a && fux ingest >/dev/null \
 fux ingest | grep -o '[0-9]* shards written'
 # expect: 0 shards written
 
-# 3. the bottleneck claim, when someone makes it, must be a filed run
+# 3. a delta run and a --full run agree, byte for byte
+fux ingest --full >/dev/null && sha1sum .fux/index/*.jsonl > /tmp/f \
+  && fux ingest >/dev/null && sha1sum .fux/index/*.jsonl > /tmp/d \
+  && diff /tmp/f /tmp/d && echo IDENTICAL
+
+# 4. the residual-bottleneck claim, when someone makes it, must be a filed run
 ls work/regression/*-m6-* 2>/dev/null
-# a full-re-extraction cost above the M6 budget, measured and filed, reopens this
+# a parse/edge cost above the M6 budget, measured and filed, reopens this
 ```

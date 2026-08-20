@@ -30,7 +30,31 @@ valuable judgement, but not the state of play.
 *Updated 2026-08-20.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: the agent lane is empty (2026-08-20)
+### The most recent change: delta ingest, and a veto that fired (2026-08-20)
+
+**`fux ingest` no longer re-extracts what did not change.** ADR-INGEST
+decision **1b**: an unchanged content `sha` keeps its `title`, `phrases`,
+`terms`, `wlen` and `code`; **edges still re-resolve every run**, because they
+are the one field the rest of the corpus can change without this document
+changing. **22.7× at 1 000 documents, 26.4× at 5 000, byte-identical** to a
+full run; `fux ingest --full` re-extracts regardless.
+
+**Read this as a worked example of how a veto condition is supposed to work.**
+The record said re-extraction happens every run *and named the measurement that
+would reopen it*. That measurement was taken, filed
+([the cost profile](regression/2026-08-20-ingest-cost-profile/report.md) —
+92 % of an ingest is the dense embedding), and the decision changed in the same
+change. Nobody had to argue about it.
+
+**Two guarantees are narrower now, and both are written down**: term-hash
+collision detection is complete only under `--full`, and a newly available
+embedding bundle does not retro-fit `code` onto unchanged documents. Neither is
+hidden in a docstring; both are in ADR-INGEST's Consequences.
+
+⚠ **It is not R5.** It makes R5 *reachable* at corpus sizes where the old build
+could not have passed it. The gate itself is still held.
+
+### Before that: the agent lane is empty (2026-08-20)
 
 **Every item an agent could close alone is closed.** What remains needs Arpit:
 a verdict, a hold lifted, or fifty goldens written by hand.
@@ -206,6 +230,11 @@ the reason is that the measuring environments are gone.**
   prediction measured, and building `tpack` + T2 early would mean hand-picking
   the tier-auto threshold the DoD explicitly forbids hardcoding. It is recorded
   that way in its own detail file so the next session does not re-derive it.
+  **Asked for directly on 2026-08-20 and still not started** — the answer to
+  "implement M6" is this paragraph, not a `tpack` writer.
+- **Any R5 number taken before 2026-08-20 measures an engine that no longer
+  exists.** Delta ingest changed ingest cost by more than an order of
+  magnitude. When the hold lifts, re-run; do not reason from the old figure.
 - **Nothing is half-built in `src/`, but two things are built-and-unproven.**
   M3 and M4's core both landed complete and green; what is missing is their
   *measurements*, carried by [W-57](open/W-57-graph-lane-acceptance.md) and
@@ -284,6 +313,15 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **Two sessions on one repository will collide, and the collision is silent**
+  (2026-08-20). A concurrent session shipped W-25 as `621c83c` while this one
+  was mid-edit on the same milestone, sweeping three of its files into that
+  commit, and began W-60 minutes later — visible only because the harness
+  reported files changing on disk underneath. **Check `git log` before starting
+  an item, not only `OPEN-WORK.md`**: the queue is written at the end of a
+  session and the commit exists before that. When you find a live build in
+  flight, take a different item; re-applying your own version of it is how both
+  copies get worse.
 - **Run it; do not read it** (2026-08-20). Four defects in one session came
   from *executing* code that looked correct: the merge driver treated a
   one-sided **add** as a delete-vs-modify, so every disjoint addition — the
