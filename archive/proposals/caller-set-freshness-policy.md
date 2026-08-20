@@ -2,10 +2,20 @@
 type: Proposal
 title: Caller-set freshness policy — staleness tolerance as a per-query parameter
 description: Make the refer plane's index-vs-live-fetch decision a caller-supplied bound (max_age + timeout) rather than a system-wide policy. Parallel ships exactly this shape; it costs Fux nothing architecturally and turns an implicit rule into a contract.
-status: proposed
+status: implemented
 timestamp: 2026-08-10T00:00:00Z
 tags: [refer-plane, m4, api-surface]
 ---
+
+> **Implemented 2026-08-20, with its central knob deliberately refused.**
+> Successor: [ADR-REFER](../../docs/adr/0031_refer-plane.md) — *still
+> `proposed`; its gate R4 has not run.* The `never` sentinel and the
+> caller-owned policy shipped; `max_age_seconds` did **not**, because the
+> committed record carries no ingest time and the knob could not have been
+> honoured (ADR-REFER decision 4, and [W-58](../../work/open/W-58-no-recorded-ingest-time.md)).
+> Content verification — comparing shas — replaced it and is strictly more
+> precise.
+
 
 # Caller-set freshness policy
 

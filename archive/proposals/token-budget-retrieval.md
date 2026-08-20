@@ -2,10 +2,18 @@
 type: Proposal
 title: Token-budget retrieval — the answer limit is a byte budget, not k
 description: Agents do not want ten results, they want the most answer that fits. Replace top-k as the primary limit with a caller-supplied byte/token budget the assembler fills. Parallel makes context-window efficiency a ranking signal; k=10 is a human-browsing artifact.
-status: proposed
+status: implemented
 timestamp: 2026-08-10T00:00:00Z
 tags: [refer-plane, query-api, m2, m4]
 ---
+
+> **Implemented 2026-08-20.** Successor:
+> [ADR-REFER](../../docs/adr/0031_refer-plane.md) decisions 10-13 — *still
+> `proposed`; its gate R4 has not run.* Byte budget primary, `k` demoted to
+> a secondary cap, deterministic ties, a per-document cap, and a floor the
+> proposal did not anticipate: greedy score-per-byte is systematically
+> biased toward short passages, so the best answer is seated first.
+
 
 # Token-budget retrieval
 

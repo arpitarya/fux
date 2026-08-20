@@ -35,8 +35,12 @@ commitment; everything here is findable.
 **Filed 2026-08-10 — from the agent-search-API landscape research:**
 
 * [Agent search-API landscape](agent-search-landscape.md) - research note, not a build item: Parallel/Perplexity/Exa/Brave independently arrived at three index-and-refer decisions, and the corpus they *cannot* reach names Fux's wedge. The evidence base the next two cite.
-* [Caller-set freshness policy](caller-set-freshness-policy.md) - staleness tolerance (`max_age` + `timeout`) as a per-query parameter, not a system-wide rule; a `never` bound is what makes a replayed answer reproducible. Graduates into the M4 handoff (W-24).
-* [Token-budget retrieval](token-budget-retrieval.md) - the answer limit is a byte budget the assembler fills, not `k`; `k=10` is a human-browsing artifact. Graduates into the M4 handoff alongside the above; measurable as an R4 budget sweep.
+*Both of the 2026-08-10 refer-plane proposals **graduated and were archived on
+2026-08-20**, when M4's core landed — their live successor is
+[ADR-REFER](../../docs/adr/0031_refer-plane.md), which is still `proposed`
+because R4 has not run. One of the two shipped with its central knob
+deliberately refused; the reasoning is in the record and the open question is
+[W-58](../open/W-58-no-recorded-ingest-time.md).*
 
 **Filed 2026-08-09 for the v0.30 architecture:**
 

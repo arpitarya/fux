@@ -194,7 +194,7 @@ def fetch_all(
                 if not isinstance(text, str) or not text.strip():
                     skipped.append(Skipped(rel_path=url, reason="fetcher returned no text"))
                     continue
-                fetched.append(FetchedUrl(url=url, content=_sanitize(text)))
+                fetched.append(FetchedUrl(url=url, content=sanitize(text)))
         finally:
             if callable(close):
                 try:
@@ -207,7 +207,15 @@ def fetch_all(
     return fetched, skipped
 
 
-def _sanitize(text: str) -> bytes:
+def sanitize(text: str) -> bytes:
+    """Fetched text -> ingestable bytes.
+
+    **Public because the refer plane must call the exact same function.** A
+    verify-time sha is compared against an ingest-time sha, so if the two
+    normalizations ever diverge by one character every URL document reports as
+    permanently stale — a bug that looks like a working freshness feature.
+    Sharing the function makes that divergence impossible rather than unlikely.
+    """
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     for ch in _HOSTILE_LINE_BREAKS:
         text = text.replace(ch, " ")

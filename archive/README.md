@@ -131,6 +131,12 @@ they are worth keeping.
 
 | [`W-23-m3-graph-lane.md`](open/W-23-m3-graph-lane.md) | 2026-08-20 | **Completed — with two of its definition-of-done items carried forward rather than claimed.** Live successors: the code is [`src/fux/graph/`](../src/fux/graph/); the decision is [ADR-GRAPH](../docs/adr/0030_graph-lane.md); the eval is [`tests_e2e/test_relational.py`](../tests_e2e/test_relational.py) with its corpus at [`tests_e2e/eval/`](../tests_e2e/eval/). **What it did not deliver**, both now [W-57](../work/open/W-57-graph-lane-acceptance.md): the playground acceptance targets `q005`/`q009`/`q011`/`q015` are unmeasured because `fux-playground` does not exist on this machine ([W-56](../work/open/W-56-sibling-environments-missing.md)), and community determinism is verified on one machine rather than the two it asked for |
 
+| [`proposals/caller-set-freshness-policy.md`](proposals/caller-set-freshness-policy.md) | 2026-08-20 | **Implemented, with its central knob refused.** Live successor: [ADR-REFER](../docs/adr/0031_refer-plane.md) decisions 4-8 and [`src/fux/refer/freshness.py`](../src/fux/refer/freshness.py). The caller-owned policy and the `never` sentinel shipped; **`max_age_seconds` did not** — the committed record carries no ingest time, so the bound could not have been honoured, and a knob that lies is worse than a missing one. Content verification replaced it. The open question it leaves is [W-58](../work/open/W-58-no-recorded-ingest-time.md) |
+
+| [`proposals/token-budget-retrieval.md`](proposals/token-budget-retrieval.md) | 2026-08-20 | **Implemented.** Live successor: [ADR-REFER](../docs/adr/0031_refer-plane.md) decisions 10-13 and [`src/fux/refer/assemble.py`](../src/fux/refer/assemble.py). Byte budget primary, `k` secondary, deterministic ties, per-document cap — plus a floor the proposal did not anticipate, because greedy score-per-byte is systematically biased toward short passages |
+
+| [`W-24`'s two graduating proposals](proposals/) | — | Both successors sit in a record that is **`proposed`, not accepted**: R4 has not run ([W-59](../work/open/W-59-refer-plane-measurement.md)). Named here so a reader does not take archival as ratification |
+
 Every outcome is recorded in
 [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — §Ratified decisions for
 the human calls, §Defects closed outside a milestone for the rest, and the

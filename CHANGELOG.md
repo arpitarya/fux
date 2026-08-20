@@ -10,6 +10,29 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **The refer plane's core — `fux.refer`** (M4,
+  [ADR-REFER](docs/adr/0031_refer-plane.md), **proposed, not accepted**).
+  Fetches a cited document from the system that owns it, verifies it still says
+  what the index thinks, cuts it into heading-delimited passages, re-scores
+  those against the query, and assembles as much as fits a **byte** budget.
+  **No verb exposes it yet** — its gate has not run, and wiring an unmeasured
+  plane into the default surface is how it becomes load-bearing before anyone
+  knows whether it works.
+- **Fux still does not fetch.** The plane reuses the consumer-owned fetcher
+  contract ([ADR-FETCHER](docs/adr/0019_fetcher.md)) rather than adding a
+  second fetch mechanism; the callable is injected, never imported, and an AST
+  test asserts no network import anywhere in the plane.
+- **Freshness is verified by content, not by age.** `never` (the default,
+  offline) and `always`, plus a timeout — and a three-state verdict
+  `current`/`stale`/`unverified`, so nothing can collapse "we did not look"
+  into "we looked and it was fine". **`max_age_seconds` was deliberately not
+  built**: the committed record carries no ingest time, so the bound could not
+  have been honoured, and a knob that silently does nothing is worse than a
+  missing one.
+- **ARC content cache**, keyed `(loc, sha)` and byte-budgeted. The content
+  address is in the key, so a hit is byte-identical to what a fetch would have
+  returned — asserted by a differential test.
+
 - **The graph lane — `fux explain`, `fux graph`, `fux path`** (M3,
   [ADR-GRAPH](docs/adr/0030_graph-lane.md)). The `ref`/`tag`/`code` edges
   ingest has extracted since M1 become answerable. `explain` lists a

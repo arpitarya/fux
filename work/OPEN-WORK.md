@@ -14,19 +14,19 @@ The two run **concurrently**; never order one against the other.
 **Two, both filed 2026-08-20 — neither is aging.** Read **W-56** first: it is
 the one that blocks other work.
 
-- **W-55** · **the compare doc is written and awaits a verdict** —
-  [`file-type-filter.compare.md`](compare/file-type-filter.compare.md). The
-  walker has **no file-type filter at all**: 21 of 150 records (14 %) and 15 %
-  of the tokens are `.json`/`.svg`/`.sh`/`.py`/`.mermaid`. Proposed **G — a
-  built-in default allowlist, overridable by `.fux/sources/types`**.
-
-*W-45 was decided 2026-08-20 — verdict **E**, an exclusion entry — and left the
-inbox. Its build waits on this one: they are one grammar change, not two.*
-- **W-56** · *filed 2026-08-20* · **`fux-lab` and `fux-playground` are both
-  gone from this machine.** The lab is the one CLAUDE.md says never goes; the
-  playground held **50 graded goldens with no remote**. Between them they are
-  the instrument for **R4, R5, R6 and R7** — every unmeasured prediction left
-  in the plan — and for ever flipping `--hybrid` on. **Read this one first.**
+- **W-58** · **a committed record carries no ingest time**, so the freshness
+  `max_age` knob the graduating proposal specified could not be honoured and
+  **was deliberately not built** (ADR-REFER decision 4). The first question is
+  whether an age bound is wanted at all, now that content verification exists
+  and is strictly more precise. ⚠ the intuitive option — source mtime — is the
+  broken one: **mtimes do not survive a clone**.
+- **W-56** · **`fux-lab` needs rebuilding.** Deleted deliberately;
+  `fux-playground` is already recreated. The lab is where **R4, R5, R6 and R7**
+  are measured — every unmeasured prediction left in the plan — and the M2
+  run's own reproduce commands point into it and no longer run. Rebuild from
+  [SETUP-LAB](setup/fux-lab.md). **An agent cannot do this.**
+  *Unverified: whether the recreated playground still carries the 50 ranked
+  goldens, or only the fixture corpus.*
 
 ---
 
@@ -34,12 +34,13 @@ inbox. Its build waits on this one: they are one grammar change, not two.*
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-INGEST](../docs/adr/0007_ingest.md)
 
-- **W-45** · `agent` · **decided (verdict E, 2026-08-20) — the build waits on W-55**, because both change the same grammar and land as one change · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — **measured 2026-08-20: 33 of 150 documents (22.0 %) come from `work/regression/`, 16 of them raw evidence, and a `fixture.sh` outranks the record it illustrates.** Proposed verdict is an exclusion *entry*, not the anticipated attribute — [compare](compare/source-exclusion.compare.md) · [detail](open/W-45-source-exclusion.md)
-- **W-55** · `arpit` · **awaiting the verdict — see the inbox** · the walker applies **no file-type filter**: anything UTF-8-decodable is a document, so **21 of 150 indexed documents (14 %) are `.json`, `.svg`, `.sh`, `.py` or `.mermaid`**, and a raw JSON blob ranks #2 on a plain query. Unbounded at the design point rather than 14 %: a consumer pointing fux at a repo root indexes their lockfiles — [compare](compare/file-type-filter.compare.md) · [detail](open/W-55-no-file-type-filter.md)
+- **W-45** · `agent` · **Opus** · **decided — verdict E, 2026-08-20; ready to build with W-55** as one grammar change · `.fux/sources/dirs` is include-only, so committed measurement evidence contaminates the corpus it measures — **measured 2026-08-20: 33 of 150 documents (22.0 %) come from `work/regression/`, 16 of them raw evidence, and a `fixture.sh` outranks the record it illustrates.** Proposed verdict is an exclusion *entry*, not the anticipated attribute — [compare](compare/source-exclusion.compare.md) · [detail](open/W-45-source-exclusion.md)
+- **W-55** · `agent` · **Opus** · **decided — verdict G, 2026-08-20; ready to build with W-45** · the walker applies **no file-type filter**: anything UTF-8-decodable is a document, so **21 of 150 indexed documents (14 %) are `.json`, `.svg`, `.sh`, `.py` or `.mermaid`**, and a raw JSON blob ranks #2 on a plain query. Unbounded at the design point rather than 14 %: a consumer pointing fux at a repo root indexes their lockfiles — [compare](compare/file-type-filter.compare.md) · [detail](open/W-55-no-file-type-filter.md)
 
-### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · no record — the measuring environments
+### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
 
 - **W-56** · `arpit` · **new, 2026-08-20** · **both sibling environments are missing** — `~/my_programs/fux-lab` (which the standing obligation says is *never* deleted) and `~/my_programs/fux-playground` (50 graded goldens, **one local commit, no remote**). M2's own filed reproduce commands point into the lab and no longer run, so *"the reproduce command must actually reproduce"* is failing silently. Blocks W-57 and every remaining prediction — [detail](open/W-56-sibling-environments-missing.md)
+- **W-59** · `agent` · blocked by W-56 · **the refer plane is built and unmeasured** — M4's core landed with 73 tests, and [ADR-REFER](../docs/adr/0031_refer-plane.md) is **`proposed`, not accepted**, because R4 has not run. Also unmeasured: the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**) and ARC-vs-LRU against the cache compare doc's own reopen-trigger — [detail](open/W-59-refer-plane-measurement.md)
 - **W-57** · `agent` · blocked by W-56 · **the graph lane's acceptance measurement is unrun** — M3 shipped, but `q005`/`q009`/`q011`/`q015` (the supersession and near-duplicate gaps that are the lane's whole argument) are unmeasured, and community determinism is verified on one machine rather than two. [ADR-GRAPH](../docs/adr/0030_graph-lane.md) deliberately does not claim otherwise — [detail](open/W-57-graph-lane-acceptance.md)
 
 ### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
@@ -56,8 +57,7 @@ when the pre-registration is written, and not because they look ready.*
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-24** · `agent` · **next, and unblocked** · M4 refer plane — HTTP+Confluence, ARC, assembler, freshness fence; `src/fux/refer/` is a 7-line stub · *no live spec; write one first* · **R4 needs the lab (W-56)** — [detail](open/W-24-m4-refer-plane.md)
-- **W-25** · `agent` · blocked by W-24 — hooks, line-wise LWW merge driver, hashed-meta enforcement — [detail](open/W-25-m5-maintenance.md)
+- **W-25** · `agent` · **next, and unblocked** · M5 maintenance — hooks, line-wise LWW merge driver, hashed-meta enforcement. **R5 and R6 need the lab (W-56)**: the build is unblocked, the gate is not — [detail](open/W-25-m5-maintenance.md)
 - **W-26** · `agent` · blocked by W-25 · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured — [detail](open/W-26-m6-scale-t2.md)
 - **W-27** · `agent` · blocked by W-26 · M7 dogfood & release gate — fux + Anton, two weeks — [detail](open/W-27-m7-dogfood-release-gate.md)
 - **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
@@ -68,7 +68,7 @@ when the pre-registration is written, and not because they look ready.*
 
 | id | prediction | threshold | measured at |
 |----|-----------|-----------|-------------|
-| R4 | refer plane | cold k=10 ≤ 3 s / warm ≤ 300 ms | W-24 |
+| R4 | refer plane | cold k=10 ≤ 3 s / warm ≤ 300 ms | **W-59** — the plane is built; the gate has not run |
 | R5 | 20-doc commit re-index | < 1 s via hook | W-25 |
 | R6 | machine planes conflict-free, human conflicts preserved | three-tier harness | W-25 |
 | R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | W-26 |
@@ -84,10 +84,12 @@ P1 **FAIL** — full postings, permanently
 plan revision 1, their successors R3–R7.
 
 **Where the build stands** is [`IMPLEMENTATION.md`](IMPLEMENTATION.md), not this
-file. M0, M1, M2 and **M3** have shipped; **`v0.33.0` is on PyPI** (2026-08-19,
-the sources rewrite — verified black-box from the published wheel). M3 is
-**landed but unreleased**, and its acceptance measurement is
-[W-57](open/W-57-graph-lane-acceptance.md).
+file. M0, M1, M2, **M3** and **M4's core** have shipped; **`v0.33.0` is on
+PyPI** (2026-08-19, the sources rewrite — verified black-box from the published
+wheel). M3 and M4 are **landed but unreleased and unmeasured**: their
+acceptance runs are [W-57](open/W-57-graph-lane-acceptance.md) and
+[W-59](open/W-59-refer-plane-measurement.md), both behind
+[W-56](open/W-56-sibling-environments-missing.md).
 
 ---
 ---
@@ -101,7 +103,15 @@ session needs first.*
    finishes, a defect is found, scope moves, something blocks or unblocks: this
    file and the item's detail file change in that same edit. A session that
    updates the queue "at the end" has already lied to the one after it.
-2. **Completed items are removed, never ticked.** Closing is legal only once
+2. **A resolved thing leaves this file entirely — including the sentence saying
+   it resolved.** No "X was decided and left the inbox", no "closed on the
+   12th", no note explaining an absence. **A row that is still here is still
+   open**, and that is the only thing this file says. An item's own row may
+   state that its *decision* is made and its build is not — that is its status,
+   not a tombstone. Everything else about a closed item lives in
+   [`IMPLEMENTATION.md`](IMPLEMENTATION.md), the [WORKLOG](WORKLOG.md), and the
+   archived detail file.
+3. **Completed items are removed, never ticked.** Closing is legal only once
    the outcome is recorded in [`IMPLEMENTATION.md`](IMPLEMENTATION.md) and any
    evidence is filed under [`regression/`](regression/README.md). **The row is
    deleted; the detail file moves to [`archive/open/`](../archive/open/)**
@@ -110,23 +120,23 @@ session needs first.*
    [WORKLOG](WORKLOG.md) entry; an archived file may be named, never cited. No
    tombstones, no DONE rows, no `closed/` inside `work/`.
    **The length of this file is the signal of how much is actually pending.**
-3. **The markers here are assertions, not evidence. Re-derive, do not read.**
+4. **The markers here are assertions, not evidence. Re-derive, do not read.**
    Before treating anything as pending or done, reconcile against
    `regression/`, `IMPLEMENTATION.md`, and the repo itself (`git log`,
    `git tag`, the code). A stale ✅ overstates progress; a stale pending row
    that an unrelated commit already closed understates it — **both are the same
    class of defect**.
-4. **Two lanes, ordered independently — they run concurrently.** `arpit` needs
+5. **Two lanes, ordered independently — they run concurrently.** `arpit` needs
    a human's hands; `agent` an agent can execute alone. Forcing one priority
    order across both is what makes a session sit idle behind a decision it was
    never going to make. Order **within** a lane; never across them.
-5. **Priority is damage that accrues with elapsed time**, above damage that is
+6. **Priority is damage that accrues with elapsed time**, above damage that is
    merely present-but-static. A wrong constant that is the same size next month
    can wait; an unratified record that more code ships under every day cannot.
    Only the former gets worse by waiting.
-6. **No separate prioritization or sequencing document.** Ordering lives here.
+7. **No separate prioritization or sequencing document.** Ordering lives here.
    A second document naming what to do next is always the stale one.
-7. **Grouped by record, because that is where the work lands.** An item's group
+8. **Grouped by record, because that is where the work lands.** An item's group
    is the record its change will have to update — which is Law zero made
    visible: if you cannot name the record, say **"no ADR affected"** out loud.
 
@@ -136,7 +146,7 @@ session needs first.*
   chat-only session counts.
 - **This file and the item's detail file** on any status change; a DOC-REGISTRY
   row bump for any doc touched; INTERVIEW kept current *during* the session.
-- **Reconcile before you report** (rule 3).
+- **Reconcile before you report** (rule 4).
 - **Records are cited by name** — `ADR-RECORD`, never a number. "archived
   ADR-NNNN" *with its path* means the frozen v0.26 line under
   `archive/v0.26-docs/adr/`; a bare `ADR-<NAME>` means `docs/adr/`.

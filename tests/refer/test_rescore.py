@@ -1,0 +1,69 @@
+"""Passage scoring — one scorer, and it is the index's."""
+
+from __future__ import annotations
+
+import ast
+import inspect
+import sys
+
+from fux.refer.chunk import Passage, chunk
+from fux.refer.rescore import rescore
+
+# `fux.refer` re-exports the `rescore` *function*, which shadows the submodule
+# of the same name on the package, so the module is taken from the registry.
+import fux.refer.rescore  # noqa: E402  (imported for the registry entry below)
+
+rescore_mod = sys.modules["fux.refer.rescore"]
+
+
+def _doc(text: str):
+    return [("file:a.md", "a.md", "sha", chunk(text))]
+
+
+def test_the_passage_that_matches_scores_highest():
+    body = lambda w: (w + " ") * 40
+    text = f"# Storage\n\n{body('storage')}\n\n## Capacity\n\n{body('capacity throughput')}"
+    scored = rescore("capacity throughput", _doc(text))
+    assert scored[0].passage.heading == "Capacity"
+
+
+def test_a_nonmatching_passage_scores_zero():
+    body = lambda w: (w + " ") * 40
+    text = f"# Storage\n\n{body('storage')}\n\n## Catering\n\n{body('espresso')}"
+    scored = rescore("espresso", _doc(text))
+    assert scored[0].passage.heading == "Catering"
+    assert scored[-1].score == 0.0
+
+
+def test_results_are_sorted_and_tie_break_on_the_locator():
+    body = lambda w: (w + " ") * 40
+    text = f"# A\n\n{body('same')}\n\n## B\n\n{body('same')}"
+    scored = rescore("same", _doc(text))
+    assert [s.score for s in scored] == sorted((s.score for s in scored), reverse=True)
+    ties = [s.locator for s in scored if s.score == scored[0].score]
+    assert ties == sorted(ties)
+
+
+def test_the_locator_addresses_the_passage_not_just_the_document():
+    scored = rescore("storage", _doc("# Storage\n\n" + ("storage " * 40)))
+    assert scored[0].locator == "a.md#p0"
+
+
+def test_an_empty_query_scores_nothing():
+    assert rescore("", _doc("# A\n\n" + ("alpha " * 40))) == []
+
+
+def test_it_reuses_the_index_scorer_rather_than_defining_a_second():
+    """Two scorers is how the index and the refer plane end up disagreeing
+    about what 'relevant' means — and the disagreement shows up as an answer
+    whose top citation is not from the top document."""
+    from fux.query import bm25f
+
+    # Identity, not a string match: this is the actual property — the passage
+    # scorer and the index scorer are the same function object.
+    assert rescore_mod.score_record is bm25f.score_record
+
+    # And no local reimplementation slipped in beside it.
+    tree = ast.parse(inspect.getsource(rescore_mod))
+    defined = {n.name for n in ast.walk(tree) if isinstance(n, ast.FunctionDef)}
+    assert not {"score", "bm25", "idf", "score_record"} & defined, defined

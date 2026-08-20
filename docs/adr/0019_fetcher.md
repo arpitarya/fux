@@ -182,6 +182,18 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
 
 ### Consequences
 
+- **`_sanitize` became `sanitize`, and the refer plane calls it** (2026-08-20,
+  [ADR-REFER](0031_refer-plane.md) decision 3). Fetched-text normalization is
+  now shared rather than duplicated, because a verify-time sha is compared
+  against an ingest-time sha: a one-character divergence between two copies
+  would mark **every** URL document permanently stale — a defect that presents
+  as a working freshness feature. Asserted by function identity in
+  `tests/refer/test_source.py`, not by a string match.
+- **The contract now has a second caller, and it did not change.** That is the
+  evidence for decision 1's shape: verify-time fetch needed `fetch(url) -> str`
+  and nothing more, so the refer plane reuses this contract instead of adding a
+  second fetch mechanism to the engine.
+
 - **This is a breaking change for anyone with a `[sources.url]` block.** Rename
   the key, move the directory. Decision 7 makes it a stopped run with
   instructions rather than a silent wrong fetch. **The cost is near zero
