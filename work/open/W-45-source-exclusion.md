@@ -1,6 +1,6 @@
 # W-45 — A source tree needs a way to exclude mechanical artifacts
 
-**Status:** OPEN·human — **the compare doc is written and the verdict is Arpit's** ([`source-exclusion.compare.md`](../compare/source-exclusion.compare.md), 2026-08-20). Nothing further is agent-closable here
+**Status:** OPEN (Lane A) — **verdict E ratified by Arpit, 2026-08-20** ([`source-exclusion.compare.md`](../compare/source-exclusion.compare.md)): an exclusion **entry** (`!path/glob`) in `.fux/sources/dirs`, not an attribute. What remains is the build, and **it lands with [W-55](W-55-no-file-type-filter.md)** — one grammar change, not two
 **Blocked by:** —
 **Evidence:** [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)
 §Finding 3

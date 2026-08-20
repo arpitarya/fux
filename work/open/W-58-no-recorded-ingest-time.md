@@ -1,9 +1,19 @@
 # W-58 — a committed record carries no ingest time, so no age bound can be honoured
 
-**Status:** OPEN·human — a config/schema decision · **Filed:** 2026-08-20
+**Status:** OPEN · **human** (Arpit) — **the compare doc is written and awaits
+a verdict**: [`record-freshness.compare.md`](../compare/record-freshness.compare.md),
+2026-08-20. Proposed **D — no age bound**; `max_age_seconds` is struck and
+content verification is the answer. **A and C turned out to be the same
+option** (the reproducible-builds convention for a deterministic stamp in a git
+repo *is* the commit date), and a fifth — **E, one corpus-level stamp** — is
+the shape to build if an age is ever wanted. · **Filed:** 2026-08-20
 **Blocked by:** — · **unblocks** an age-based freshness mode, if one is wanted
-**Model:** **Opus** to decide — it changes ADR-RECORD and has a determinism
-question attached; Sonnet to build once decided.
+**Model:** **Opus** — it changes ADR-RECORD and carries a determinism question.
+**Research the field before proposing**: how other content-addressed and
+document-index systems bound staleness without a wall-clock, and whether any
+bound is wanted at all once content verification exists. **`mtime` is the
+trap** — it does not survive a clone, so the intuitive option is the broken
+one, and the compare doc must say why rather than omit it.
 
 ## The finding
 

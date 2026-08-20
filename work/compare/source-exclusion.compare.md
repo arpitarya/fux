@@ -8,10 +8,12 @@ timestamp: 2026-08-20T00:00:00Z
 
 # Excluding part of a source tree — Comparison
 
-> **Proposed verdict: E — an exclusion *entry* in `.fux/sources/dirs`**, one
+> **VERDICT: E — DECIDED by Arpit, 2026-08-20.** An exclusion *entry* in `.fux/sources/dirs`, one
 > per line, `!` prefix, repo-relative glob, applied to the whole walk and
 > order-independent. **Not** an attribute on a directory line.
-> **Status:** ⏳ awaiting Arpit · **Confidence:** medium-high on eliminating
+> **Status:** **decided** — the build is [W-45](../open/W-45-source-exclusion.md), which stays open until
+> it lands, and **lands with [W-55](../open/W-55-no-file-type-filter.md)**: one
+> grammar change, not two. · **Confidence at the time of the call:** medium-high on eliminating
 > B/C/D (measured), medium on E over A (a grammar-shape judgment, not a
 > measurement) · **Reopen when:** a consumer needs an exclusion that must
 > apply to one include root and *not* another — that is the one thing the

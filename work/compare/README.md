@@ -36,6 +36,7 @@ debate without archaeology. v0.26-era compare docs are archived at
 | [ingest-mode-naming](ingest-mode-naming.compare.md) | "extracted" vs "enriched" vs "advanced" for the AI tier | **enriched** (proposed) | ⏳ awaiting Arpit |
 | [source-exclusion](source-exclusion.compare.md) | exclusion attribute vs exclusion *entry* vs `.fuxignore` vs `.gitignore` vs the dot-prefix convention | **an exclusion entry `!path/glob` in `.fux/sources/dirs`** (proposed); C and D eliminated by measurement | ⏳ awaiting Arpit |
 | [pruning-criterion](pruning-criterion.compare.md) | KL vs impact vs term-centric vs combined; the gate metric | prediction **falsified** by the re-run (P1-RERUN); pruning removed from the design — full postings | ❌ closed (M8 experiment only) |
+| [record-freshness](record-freshness.compare.md) | Does a committed record need a timestamp so an age bound can be honoured | **D — no age bound** (proposed) | ⏳ awaiting Arpit |
 
 Convention: `> **Verdict:**` blockquote first, then Context → Options →
 Matrix → Consequences → References → Reopen-trigger. Docs here are compact;

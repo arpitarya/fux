@@ -65,9 +65,6 @@ right now?*
 - **Two strikes → a gate (2026-08-12).** A failure class the WORKLOG records
   twice becomes a test or mechanical check in the same change that records
   the second occurrence — recurring lessons are gated, not re-learned.
-- **Every WORKLOG entry ends with a `Cost:` line** — the session's spend from
-  `cage report` where capture reaches this repo; otherwise
-  `Cost: unmeasured — <why>`. Unpriced waste repeats.
 
 ## Where the state of play lives
 
@@ -661,3 +658,64 @@ because their code is on the port list:
 - **BM25F means weight-then-saturate once** — never sum per-field BM25.
 - **No wall-clock output anywhere on the maintenance path** — timestamps derive
   from `SOURCE_DATE_EPOCH`/source mtime, or the byte-identical guarantee breaks.
+
+## Blockers stop the session (required)
+
+**A blocker is a file, not a remark.** The moment you cannot proceed without
+Arpit, write `work/BLOCKED.json` and stop:
+
+```json
+{"decision":"ASK","reason":"one line","questions":["the minimum question"],
+ "safe_alternative":"what you can do meanwhile, or \"\"","surfaced":false,"filed":"YYYY-MM-DD"}
+```
+
+`decision` is `ASK` (he can unblock you) · `REFUSE` (disallowed or unsafe) ·
+`UNKNOWN` (out of scope to answer reliably) · `PROCEED` (nothing is blocked).
+
+**Do not work around a blocker.** Choosing a plausible default and continuing is
+how a week of work lands on the wrong side of a decision nobody made. Say it,
+set `surfaced: true`, stop.
+
+Three hooks enforce this rather than trusting anyone to remember —
+`.claude/settings.json`:
+
+| hook | does |
+|---|---|
+| `UserPromptSubmit` | prepends `work/BLOCKED.json` and the OPEN-WORK inbox to every prompt, so a pending decision cannot go unmentioned |
+| `Stop` | refuses to end a turn while a blocker is unsurfaced, three times, then relents |
+| `PreToolUse` | one writer at a time — two sessions editing `work/OPEN-WORK.md` is how the queue starts lying |
+
+## Answer length (required)
+
+**Ten lines or fewer unless asked for more.** Lead with the answer.
+
+**Never summarise work you just did** — the diff showed it. Reasoning only when
+asked or when the answer depends on it. No closing offers: ask a real question
+or stop. Tables and code over prose. **Length follows the work, not the
+effort**; a four-hour change can be three lines. `/output-style terse` carries
+the same rules session-wide.
+
+## Say what you are doing (required)
+
+**Announce every transition, in one line, always.** Not a summary — a marker.
+
+```
+→ W-56: building fux-lab from SETUP-LAB
+✓ W-56 lab environment · → W-56 playground corpus
+✓ W-56 · → W-59: the R4 measurement
+```
+
+Rules:
+
+- **Before starting**, name the item id and what you are about to do. One line.
+- **On finishing**, `✓ <id>` and immediately what starts next. One line for
+  both — a finish with no next is a stop, and a stop is its own sentence.
+- **Use `TodoWrite`** for anything with more than two steps, and keep it
+  current *during* the work. A todo list updated at the end is a report, not a
+  plan.
+- **Write the current line to [`work/NOW.md`](work/NOW.md)** — one line,
+  overwritten. It is read back into the next session, so a session that dies
+  mid-task leaves a note rather than a mystery.
+- **This is not a recap.** §Answer length still holds: never restate what a
+  diff already shows. A transition marker is a pointer, a summary is a
+  substitute for reading — the first is required, the second is banned.

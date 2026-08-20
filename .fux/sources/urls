@@ -1,0 +1,12 @@
+# The URLs fux indexes. One per line. `#` starts a comment at the start of a
+# line or after whitespace -- NOT inside a URL, so a fragment survives.
+#
+# Two attributes, and the set is closed:
+#   fetch=http|cdp    which file under .fux/fetchers/ retrieves this URL
+#   meta=hashed|plain whether the index may hold readable display text
+#
+#   https://example.com/handbook/oncall    fetch=http meta=hashed
+#   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed
+#
+# `fux url <URL>` writes a line here with every attribute stated. Fetching only
+# ever happens under `fux ingest --refresh-urls`. See ADR-URL-LIST.

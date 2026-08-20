@@ -1,9 +1,15 @@
 # W-55 — the walker has no file-type filter, so machine data is indexed as documents
 
-**Status:** OPEN (Lane B — needs Arpit's verdict on the config surface, then
-an agent builds it) · **Filed:** 2026-08-20
-**Blocked by:** — · interacts with [W-45](W-45-source-exclusion.md), and the
-two should be decided together
+**Status:** OPEN (Lane A) — **verdict G ratified by Arpit, 2026-08-20**
+([`file-type-filter.compare.md`](../compare/file-type-filter.compare.md)): a
+built-in default allowlist, overridable by `.fux/sources/types` — one glob per
+line, `dirs` grammar, `!` subtracts, **absent means the default applies**.
+Built-in: `*.md` `*.markdown` `*.txt` `*.rst` `*.adoc` `*.org`. What remains is
+the build, and **it lands with [W-45](W-45-source-exclusion.md)** (verdict E) —
+one grammar change to `.fux/sources/`, not two. · **Filed:** 2026-08-20
+**Blocked by:** — · **[W-45](W-45-source-exclusion.md) was decided 2026-08-20
+(verdict E) and now waits on this one**: both change the same grammar, so they
+land as one change
 **Model:** **Opus** to decide (it is a permanent config-surface question on a
 `$0` tool), Sonnet to build once decided.
 

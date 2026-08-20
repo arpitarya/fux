@@ -11,22 +11,15 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — the inbox
 
-**Two, both filed 2026-08-20 — neither is aging.** Read **W-56** first: it is
-the one that blocks other work.
+**One, filed 2026-08-20.**
 
-- **W-58** · **a committed record carries no ingest time**, so the freshness
-  `max_age` knob the graduating proposal specified could not be honoured and
-  **was deliberately not built** (ADR-REFER decision 4). The first question is
-  whether an age bound is wanted at all, now that content verification exists
-  and is strictly more precise. ⚠ the intuitive option — source mtime — is the
-  broken one: **mtimes do not survive a clone**.
-- **W-56** · **`fux-lab` needs rebuilding.** Deleted deliberately;
-  `fux-playground` is already recreated. The lab is where **R4, R5, R6 and R7**
-  are measured — every unmeasured prediction left in the plan — and the M2
-  run's own reproduce commands point into it and no longer run. Rebuild from
-  [SETUP-LAB](setup/fux-lab.md). **An agent cannot do this.**
-  *Unverified: whether the recreated playground still carries the 50 ranked
-  goldens, or only the fixture corpus.*
+- **W-58** · **the compare doc is written and awaits a verdict** —
+  [`record-freshness.compare.md`](compare/record-freshness.compare.md). Proposed
+  **D — no age bound**: the engine already ships both endpoints of the freshness
+  axis (`never` / `always`), and in HTTP — where the vocabulary comes from —
+  `max-age` exists to **avoid the fetch**, not to make the answer more correct.
+  That cost is unmeasured: **R4 has not run**. Deciding a cost optimisation
+  before measuring the cost is backwards.
 
 ---
 
@@ -39,7 +32,8 @@ the one that blocks other work.
 
 ### [ADR-GRAPH](../docs/adr/0030_graph-lane.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
 
-- **W-56** · `arpit` · **new, 2026-08-20** · **both sibling environments are missing** — `~/my_programs/fux-lab` (which the standing obligation says is *never* deleted) and `~/my_programs/fux-playground` (50 graded goldens, **one local commit, no remote**). M2's own filed reproduce commands point into the lab and no longer run, so *"the reproduce command must actually reproduce"* is failing silently. Blocks W-57 and every remaining prediction — [detail](open/W-56-sibling-environments-missing.md)
+- **W-58** · `arpit` · **the compare doc is written and awaits a verdict** — [`record-freshness.compare.md`](compare/record-freshness.compare.md). Proposed **D — no age bound**; `max_age_seconds` struck, content verification is the answer — [detail](open/W-58-no-recorded-ingest-time.md)
+- **W-56** · `agent` · **Opus** · **next** · **decided 2026-08-20 — build both if they do not exist**; verified neither is on disk. Lab from [SETUP-LAB](setup/fux-lab.md) is scaffolding; the playground's **50 goldens are authorship and cannot be restored, only re-graded** — build the corpus and harness, stop at the goldens — [detail](open/W-56-sibling-environments-missing.md)
 - **W-59** · `agent` · blocked by W-56 · **the refer plane is built and unmeasured** — M4's core landed with 73 tests, and [ADR-REFER](../docs/adr/0031_refer-plane.md) is **`proposed`, not accepted**, because R4 has not run. Also unmeasured: the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**) and ARC-vs-LRU against the cache compare doc's own reopen-trigger — [detail](open/W-59-refer-plane-measurement.md)
 - **W-57** · `agent` · blocked by W-56 · **the graph lane's acceptance measurement is unrun** — M3 shipped, but `q005`/`q009`/`q011`/`q015` (the supersession and near-duplicate gaps that are the lane's whole argument) are unmeasured, and community determinism is verified on one machine rather than two. [ADR-GRAPH](../docs/adr/0030_graph-lane.md) deliberately does not claim otherwise — [detail](open/W-57-graph-lane-acceptance.md)
 

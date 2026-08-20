@@ -1,8 +1,26 @@
-# W-56 — both sibling environments are gone from this machine
+# W-56 — `fux-lab` needs rebuilding
 
-**Status:** OPEN·human — **an agent cannot fix this** · **Filed:** 2026-08-20
-**Blocked by:** — · **blocks** W-57, and every future conformance run
-**Model:** n/a — this needs Arpit's hands and Arpit's disks, not a model.
+**Status:** OPEN (Lane A) — **DECIDED 2026-08-20, Arpit: build both if they do
+not exist.** No longer human-only: `~/my_programs` is reachable, so an agent can
+stand them up from the setup docs. · **Filed:** 2026-08-20
+**Blocked by:** — · **blocks** W-57, W-59, and R4 · R5 · R6 · R7
+**Model:** **Opus** — the scaffolding is mechanical; **the playground's goldens
+are not**, and knowing the difference is the whole risk.
+**Spec:** [SETUP-LAB](../setup/fux-lab.md) · [SETUP-PLAYGROUND](../setup/fux-playground.md)
+
+> **Verified 2026-08-20: neither exists.** `~/my_programs` holds anton · bach ·
+> barrel-loader · cage · dante · elgar · fux · graphify · milo · sentenel ·
+> stock-prediction-patterns · wagner. **`fux-playground` is not there** — it was
+> reported recreated, and it is not on disk under that name.
+>
+> **Build both, and do not conflate the two halves.** The lab is scaffolding:
+> directory layout, `shared/new-env.sh`, `TEST-PLAN.md` with standing rule §0b,
+> one environment per corpus. The playground is **authorship** — it had no
+> remote, so its **50 ranked goldens (41 pass · 9 named `xfail`) cannot be
+> restored, only re-graded by hand**. A generated golden is not a golden, and a
+> playground whose goldens were invented by the engine under test is worse than
+> no playground. **Rebuild the corpus and the harness; stop at the goldens and
+> say so.**
 
 ## The finding
 
@@ -24,12 +42,13 @@ fux · graphify · milo · sentenel · stock-prediction-patterns · wagner. No
 
 ## Why each one matters, and how bad it is
 
-### `fux-playground` — the graded corpus. **Possibly unrecoverable.**
+### `fux-playground` — **recreated 2026-08-20.** Kept below for the record of what it is *for*, since that is what a rebuild has to satisfy.
 
 [SETUP-PLAYGROUND](../setup/fux-playground.md) describes it as a **sibling git
 repository with one local commit and no remote**, holding **50 ranked goldens**
-(41 pass · 9 named `xfail` at creation). If the directory is gone and there was
-never a remote, **the corpus is gone** — not stale, gone.
+(41 pass · 9 named `xfail` at creation). It had **no remote**, so a rebuild is authorship, not a clone: the goldens have
+to be re-graded by hand against the fixture corpus, and a golden nobody graded
+is not a golden.
 
 It is the instrument for:
 
@@ -40,14 +59,19 @@ It is the instrument for:
   ([`query/hybrid.py`](../../src/fux/query/hybrid.py) says so in its docstring);
 - any future claim that a ranking change helped.
 
-### `fux-lab` — the measurement environment. **CLAUDE.md says it never goes.**
+### `fux-lab` — **still missing. This is the item.**
 
 The standing obligation in [`OPEN-WORK.md`](../OPEN-WORK.md) reads: *"**The lab
 persists.** `~/my_programs/fux-lab` is never deleted or rebuilt — new runs are
 new environments inside it ([SETUP-LAB](../setup/fux-lab.md))."*
 
-It is gone. The M2 run's own reproduce commands point into it and no longer
-run:
+Rebuild it from [SETUP-LAB](../setup/fux-lab.md). **The standing obligation now
+needs amending in the same change**: "never deleted or rebuilt" was written to
+stop an agent clearing it, and it now reads as a rule the repo itself has
+broken. It should say what it means — *an agent never deletes or rebuilds it;
+Arpit may.*
+
+The M2 run's own reproduce commands point into it and no longer run:
 
 ```bash
 # work/regression/2026-08-12-m2-accelerator/report.md:148
@@ -61,8 +85,8 @@ and it fails silently — the report still reads as if it were reproducible.
 
 | item | needs | status |
 |---|---|---|
-| [W-57](W-57-graph-lane-acceptance.md) | playground | blocked |
-| flipping `--hybrid` on | playground | blocked, and was already |
+| [W-57](W-57-graph-lane-acceptance.md) | playground | **unblocked if the goldens survived** — verify first |
+| flipping `--hybrid` on | playground | same: needs the named target set, not just the corpus |
 | **R4** (refer plane, W-24) | lab | will block |
 | **R5 / R6** (maintenance, W-25) | lab | will block |
 | **R7** (100k density, W-26) | lab | will block |
