@@ -10,6 +10,9 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **The `PreToolUse` write lock is per-asset, not repo-wide.** Two Claude
+  sessions editing different files now run in parallel; only a genuine
+  same-file conflict is denied (`.claude/hooks/session-lock.sh`).
 - **The prediction series is measured again** — R4, R5 and R6 all ran on
   2026-08-20, against thresholds frozen and committed first.
   **[R4 PASS](work/regression/2026-08-20-refer-plane-r4/VERDICT.md)** ·

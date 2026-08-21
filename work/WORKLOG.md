@@ -28,6 +28,39 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — the session-lock hook: per-asset, not repo-wide  ·  Claude Code
+
+- **Asked:** two Claude sessions were running concurrently; the old
+  `PreToolUse` hook took one repo-wide lock, so the second session was denied
+  *every* write for up to 15 minutes even when it wanted a file the first
+  session never touched. Arpit asked for per-asset locking with enough detail
+  in the lock to see what's conflicting, so non-conflicting sessions run in
+  parallel.
+- **Did:** rewrote `.claude/hooks/session-lock.sh` — the mutex is now
+  `mkdir .claude/.locks/<sha256(relpath)[:16]>/` (atomic: only one process
+  wins the `mkdir`), holding an `owner` file `SESSION TIMESTAMP PATH`. Same
+  session re-entering its own lock refreshes it; a different session on the
+  same asset within the 900s TTL is denied, naming the file and the age; a
+  different session on a *different* asset proceeds with no denial at all. A
+  stale (TTL-expired) lock is silently reclaimed. `.claude/.locks/` added to
+  `.gitignore`; the old single-file `.claude/.session-lock` deleted (superseded,
+  was already gitignored). Manually verified all four paths (same-asset deny,
+  cross-asset parallel, re-entrant, stale reclaim) by driving the hook script
+  directly with `CLAUDE_SESSION_ID` set to two synthetic session ids.
+  Updated the one place this was documented as a fact —
+  [`CLAUDE.md`](../CLAUDE.md)'s Blockers-section hook table — to say
+  "per asset" instead of "one writer at a time." **No ADR affected**: this is
+  session tooling under `.claude/`, not an `src/`/`tools/` component the
+  ownership table claims.
+- **Decided / open:** nothing else changed about the lock's shape (still
+  time-based staleness, still 900s TTL, no explicit release step) — only the
+  granularity of what it keys on.
+- **Next:** none pending from this change. PRIORITY.md still names P5 as the
+  next queue item once this interrupt is done.
+- **Cost:** unmeasured — a live-conversation tooling fix, not tracked
+  separately from the turn.
+
+
 ## 2026-08-21 — ADR-CACHE (0035): the refer plane's two caches carved out of ADR-REFER  ·  Cowork
 
 - **Asked:** "create a new ADR named cache — present how cache is going to

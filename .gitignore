@@ -19,5 +19,6 @@ venv/
 *.egg-info/
 
 .session-lock
+.locks/
 .progress-nudged
 

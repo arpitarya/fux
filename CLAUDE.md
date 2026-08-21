@@ -689,7 +689,7 @@ Three hooks enforce this rather than trusting anyone to remember —
 |---|---|
 | `UserPromptSubmit` | prepends `work/BLOCKED.json` and the OPEN-WORK inbox to every prompt, so a pending decision cannot go unmentioned |
 | `Stop` | refuses to end a turn while a blocker is unsurfaced, three times, then relents |
-| `PreToolUse` | one writer at a time — two sessions editing `work/OPEN-WORK.md` is how the queue starts lying |
+| `PreToolUse` | one writer **per asset** — a `Write`/`Edit`/`MultiEdit`/`NotebookEdit` locks only the file it targets (`.claude/.locks/<hash>/owner`, TTL 900s), so two sessions editing `work/OPEN-WORK.md` at once is still blocked, but two sessions editing different files run in parallel |
 
 ## Answer length (required)
 
