@@ -71,8 +71,21 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
   plural; what was wrong was every record that narrowed it to one, and those
   were corrected. **Nothing is committed**, on Arpit's instruction, so
   W-63's OPEN-WORK row stays and `IMPLEMENTATION.md` gets no row yet.
-- **Next:** Arpit decides whether to land the three stacked changes; W-61's
-  two calls are still the only blocked-on-Arpit items, now 1 day old.
+- **Then Arpit said: commit everything and publish.** Landed all four stacked
+  changes as one commit and cut **v0.35.0**. **CI caught a Windows crash the
+  moment it was pushed** — `fux add` printed a `→` on a file the type
+  allowlist rejects, and `cp1252` cannot encode it, so `print()` raised and
+  the verb exited non-zero on both Windows arms while every POSIX arm was
+  green. **Second occurrence of that class** (v0.30.0's `fux doctor`
+  checkmarks), so per the two-strikes rule it became
+  `tests/test_windows_console_safe.py` in the same change — an AST check over
+  every string reaching `print()`/`FuxError()`/`.write()`. The check found two
+  false positives on its first run (`canonical.py` and `urlsrc.py` hold the
+  hostile line-break characters as data they *strip*), which is why its scope
+  is streaming calls rather than all literals. Also skipped the peer's new
+  interrupt test on Windows, which has no SIGINT to deliver to a pid.
+- **Next:** W-61's two calls are still the only blocked-on-Arpit items, now
+  1 day old.
 
 ## 2026-08-21 — scan-by-default, `--fast` opts into the accelerator  ·  Cowork
 

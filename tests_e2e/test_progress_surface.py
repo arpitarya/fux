@@ -180,6 +180,17 @@ def test_the_bar_carries_no_clock(repo: Path):
         assert forbidden not in painted, f"the bar printed a clock: {forbidden!r}"
 
 
+@pytest.mark.skipif(
+    sys.platform == "win32",
+    reason=(
+        "Windows has no SIGINT to deliver to another process — `send_signal(2)` "
+        "raises `ValueError: Unsupported signal: 2`, because a console Ctrl-C is "
+        "a control event sent to a process *group*, not a signal to a pid. The "
+        "behaviour under test (a phase's __exit__ never leaving a half-painted "
+        "line) is platform-independent and is covered on every other arm; only "
+        "the way to trigger it is missing here."
+    ),
+)
 def test_an_interrupted_ingest_leaves_no_partial_line(repo: Path):
     """Ctrl-C exits 130 and must not leave a half-painted bar on the terminal."""
     process = subprocess.Popen(

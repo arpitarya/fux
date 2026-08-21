@@ -60,6 +60,16 @@ verbatim in [`work/regression/2026-08-21-source-verbs/`](work/regression/2026-08
   it exists, so creating it with one pattern silently un-indexed every
   markdown document. `add` now seeds the defaults when it creates the file.
 
+### Fixed
+
+- **`fux add` no longer crashes on a Windows console.** The explanation it
+  prints when the type allowlist rejects a file used an arrow (`→`), which is
+  outside `cp1252` — so `print()` raised `UnicodeEncodeError` and the command
+  exited non-zero instead of rendering badly. It is ASCII now, and a check
+  (`tests/test_windows_console_safe.py`) refuses any non-`cp1252` character in
+  anything the CLI prints. Second occurrence of this class; `fux doctor`'s
+  checkmarks did it at 0.30.0.
+
 ### Removed
 
 - **`fux url` is gone.** Use `fux add <URL>` and `fux remove <URL>`. It is

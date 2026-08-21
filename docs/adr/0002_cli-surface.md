@@ -751,6 +751,29 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 - **Adding a verb costs a record.** M3 did add three, and it cost this record
   a group row, a decision (1b) and a feature-line bump — paid in the same
   change, which is what the rule is for. M4 still owes the same.
+- **Everything the CLI prints must encode on a Windows console, and that is a
+  test now (2026-08-21).** `sys.stdout` there defaults to the active codepage
+  — `cp1252` on a Western install — so a character outside it makes `print()`
+  raise `UnicodeEncodeError`: the command **crashes and exits non-zero**
+  rather than rendering badly. `fux add` on a file the type allowlist rejects
+  printed a `→` and took both Windows CI arms down on the v0.35.0 release
+  commit, while every POSIX arm and every local run stayed green.
+
+  **This is the second occurrence of the failure class** — `fux doctor`'s
+  Unicode checkmarks did the same at v0.30.0 — so under CLAUDE.md's
+  two-strikes rule it became a mechanical check in the change that recorded
+  it: [`tests/test_windows_console_safe.py`](../../tests/test_windows_console_safe.py)
+  parses every module under `src/fux/` and refuses a non-`cp1252` character in
+  any string reaching `print()`, `FuxError()` or `.write()`. Docstrings are
+  exempt (never encoded), as is `progress.py`'s bar (stderr, TTY-gated). Use
+  `->` and `[OK]`, not `→` and `✓`.
+
+  **The check found its own false positives immediately**, which is why its
+  scope is calls rather than literals: `store/canonical.py` and
+  `ingest/urlsrc.py` hold U+2028/U+2029/U+0085 as the sentinels they *strip*,
+  and a guard that flags the code defending against a character is one people
+  learn to switch off.
+
 - **The corpus finally has a command** (W-63). Before it, `.fux/sources/dirs`
   and `types` were hand-edited and only `urls` had a verb — so the one thing
   the whole engine is about was the one part of it with no CLI.

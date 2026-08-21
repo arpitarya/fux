@@ -471,8 +471,12 @@ def cmd_add(args) -> int:
     # conditions rejected the file. Exiting 1 here said "the fetch failed"
     # about a PDF nobody tried to fetch — found by running the verb.
     if skipped.reason == "not an indexed file type":
+        # ASCII only: a Windows console runs cp1252 and `→` (U+2192) is not in
+        # it, so this line crashed `fux add` on both Windows arms of CI. See
+        # `tests/test_windows_console_safe.py` — second occurrence of this
+        # failure class, so it is a check now rather than a lesson.
         print(
-            "  → the line is listed, and the type allowlist rejects it. "
+            "  -> the line is listed, and the type allowlist rejects it. "
             f"`fux add '*{Path(entry).suffix}' --types` allows it; "
             "adding a file never overrides the allowlist"
         )
