@@ -48,12 +48,20 @@ when the pre-registration is written, and not because they look ready.*
 - **W-44** · **PARKED** · annotate archived results, never reorder — decided ([ADR-DIR-LIST](../docs/adr/0023_dir-list.md)); **trigger: a frozen query set with expected live-vs-archived answers exists** — [detail](open/W-44-archived-content-signalling.md)
 - **W-52** · **PARKED** · `df` is computed over the union — **42% of live terms carry an inflated `df`**; **trigger: the same pre-registration, plus a second corpus** — [detail](open/W-52-df-over-the-union.md)
 
+### No record — external validation
+
+*Fux has never been measured against anything outside its own corpus or
+fixtures. Owns no `src/`/`tools/` component — this is a measurement item,
+not a build.*
+
+- **W-62** · `agent`+`arpit` · **the README-fix half is agent-startable now; the three-way measurement and the five external installs are not** · moved here from PRIORITY.md's P8 row when that file was archived, 2026-08-21 — 50 real org-doc questions (Fux BM25F vs `rg` vs one commercial baseline, metric = agent task success and tokens, not p95) plus five external users' first-failure reports. **Why it matters**: 0 stars, a download pattern that looks like mirrors, and an industry converged on grep for local code — the wedge (private, off-disk enterprise docs) has never been tested against real docs or a real stranger's first fifteen minutes — [detail](open/W-62-measure-against-the-outside-world.md)
+
 ### No record yet — the unbuilt milestones
 
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-26** · `agent` · **STARTABLE — the only agent-closable item on this queue** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. Its DoD wants *every* R prediction to carry **a measured value or an honest failure record**, and all four now do: R4 ✅ · R5 ❌ · R6 ⚠ · **R7 CLOSED unmeasured 2026-08-21** — [analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md); tier-auto correctness (R7's other half) stays unmeasurable until T2 exists — **still this milestone's own measurement to make, not a precondition for starting it.** **What it inherits from R5's failure:** 47.6 % of that 44 s is `fux build`, the derived plane M6 is about to add a *third tier* to — so measure any tier's rebuild cost before choosing its default. **What it inherits from R7's preliminary read:** the current committed index runs ~2× over a 250 MB@100k budget on real data — `ADR-POSTINGS`'s compact encoding (BIC/MPH, unbuilt) is the planned fix and is now better-motivated, not optional. **Unchanged:** tier-auto flips **by measurement, never by hand** — [detail](open/W-26-m6-scale-t2.md)
+- **W-26** · `agent` · **STARTABLE — the only agent-closable item requiring no external setup** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. Its DoD wants *every* R prediction to carry **a measured value or an honest failure record**, and all four now do: R4 ✅ · R5 ❌ · R6 ⚠ · **R7 CLOSED unmeasured 2026-08-21** — [analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md); tier-auto correctness (R7's other half) stays unmeasurable until T2 exists — **still this milestone's own measurement to make, not a precondition for starting it.** **What it inherits from R5's failure:** 47.6 % of that 44 s is `fux build`, the derived plane M6 is about to add a *third tier* to — so measure any tier's rebuild cost before choosing its default. **What it inherits from R7's preliminary read:** the current committed index runs ~2× over a 250 MB@100k budget on real data — `ADR-POSTINGS`'s compact encoding (BIC/MPH, unbuilt) is the planned fix and is now better-motivated, not optional. **Unchanged:** tier-auto flips **by measurement, never by hand** — [detail](open/W-26-m6-scale-t2.md)
 - **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
 
 ---
@@ -106,8 +114,9 @@ session needs first.*
 
 ## Standing obligations (every session)
 
-- **WORKLOG entry per substantive exchange**, with its `Cost:` line — a
-  chat-only session counts.
+- **WORKLOG entry per substantive exchange** — a chat-only session counts.
+  (The `Cost:` line was mandatory here until 2026-08-21 — dropped, PRIORITY
+  P7: 58/58 entries had said `unmeasured`.)
 - **This file and the item's detail file** on any status change; a DOC-REGISTRY
   row bump for any doc touched; INTERVIEW kept current *during* the session.
 - **Reconcile before you report** (rule 4).

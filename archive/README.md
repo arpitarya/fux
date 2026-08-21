@@ -157,11 +157,13 @@ milestone table for the milestones.
 | artifact | retired | live successors |
 |---|---|---|
 | [`PLAN-v0.30.md`](PLAN-v0.30.md) | 2026-08-18, on Arpit's instruction | **Milestone scope** → the item's own detail file under [`work/open/`](../work/open/README.md) (M3→W-23 … M8→W-38), migrated verbatim · **what shipped** → [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) · **predictions** → [`work/OPEN-WORK.md`](../work/OPEN-WORK.md) · **the port list** → [ADR-PORT-LIST](../docs/adr/0015_port-list.md) · **risks and the process contract** → [`CLAUDE.md`](../CLAUDE.md) and [`work/INTERVIEW.md`](../work/INTERVIEW.md) §standing constraints |
+| [`PRIORITY.md`](PRIORITY.md) | 2026-08-21, on Arpit's instruction — every row (P1–P8) resolved | **The ranked P1–P8 list** → [`work/OPEN-WORK.md`](../work/OPEN-WORK.md), which it was always a temporary, Arpit-ordered override *of* (CLAUDE.md's own text calls `OPEN-WORK.md` "the single live queue"; `PRIORITY.md` existed for one audit-driven pass, 2026-08-20–2026-08-21). **P1–P7's outcomes** → [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) (one row each, with commit shas). **P8** → carried forward as [`work/open/W-62-measure-against-the-outside-world.md`](../work/open/W-62-measure-against-the-outside-world.md), not resolved, just rehomed. **P7's process-diet candidates** → [`work/proposals/process-diet.md`](../work/proposals/process-diet.md), Arpit's verdict on each. |
 
-Its content was migrated **before** it moved, so no live item was left citing
-an archived document. The design of record is now the ADR register plus the
-open queue: decisions in [`docs/adr/`](../docs/adr/README.md), scope in the
-item that will build it.
+Both retired documents' content was migrated **before** each moved, so no
+live item was left citing an archived one. The design of record is now the
+ADR register plus the open queue: decisions in
+[`docs/adr/`](../docs/adr/README.md), scope in
+[`work/OPEN-WORK.md`](../work/OPEN-WORK.md) and the item that will build it.
 
 ## Old builds
 

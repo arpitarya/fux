@@ -14,11 +14,10 @@ are all mid-rewrite, and a doc being rewritten is work.
 
 | file | what it is | when it changes |
 |---|---|---|
-| [`PRIORITY.md`](PRIORITY.md) | **read first** — the one ranked order of work and the gate: work the first non-DONE row or block | Arpit reorders; a row is marked DONE with its commit sha |
+| [`OPEN-WORK.md`](OPEN-WORK.md) | **read first** — the single live queue, **items first, grouped by record**; rules at the foot | in the **same change** as the work that affects it |
 | [`WORKLOG.md`](WORKLOG.md) | append-only session log, newest first | **every** session, before it ends — chat-only ones too |
 | [`INTERVIEW.md`](INTERVIEW.md) | the state-of-play doc a cold successor reads | **during** the session, not at the end |
 | [`IMPLEMENTATION.md`](IMPLEMENTATION.md) | milestone log — what shipped, when, and how it turned out | a milestone or release lands |
-| [`OPEN-WORK.md`](OPEN-WORK.md) | the single live queue — **items first, grouped by record**; rules at the foot | in the **same change** as the work that affects it |
 | [`MACHINE.md`](MACHINE.md) | environment and tooling quirks of wherever this runs | a surface breaks in a way the code did not cause |
 | [`DOC-REGISTRY.md`](DOC-REGISTRY.md) | per-doc freshness table, **live documents only** | any doc in it is touched; an archived doc's row is deleted, not annotated |
 | [`open/`](open/README.md) | one detail file per open `W-nn` | opened with the item, **deleted with it** |
@@ -74,5 +73,4 @@ command that reproduces. A doc repeating another doc is not a second source.
    [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md)
    and the repo itself before believing any of its status markers.
 4. Do the work, updating `OPEN-WORK.md` and `INTERVIEW.md` as you go.
-5. Append to [`WORKLOG.md`](WORKLOG.md) — including the mandatory `Cost:` line —
-   before you finish.
+5. Append to [`WORKLOG.md`](WORKLOG.md) before you finish.

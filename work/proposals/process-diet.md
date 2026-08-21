@@ -104,6 +104,18 @@ Candidate 1 only. `CLAUDE.md` §The three-file session discipline and
 `work/WORKLOG.md`'s entry-format template both drop the `Cost:` requirement,
 in the same commit that files this proposal as `graduated`.
 
+## Found after this round, not litigated here
+
+A concurrent Cowork session filed [`work/governance.md`](../governance.md) —
+a governance map of ~90 process files — the same day, independently, and
+raised two further diet ideas this proposal's four candidates did not cover:
+a yearly (or v-major) archive-and-truncate for `WORKLOG.md` (305 KB and
+growing forever, nothing reads old entries back); and scoping
+`DOC-REGISTRY.md` to only the docs nothing else already tests. Neither was
+put to Arpit in this round — recorded here so they are findable, not lost,
+rather than folded silently into this already-decided change. Either would
+graduate into its own proposal if picked up.
+
 ## Reference
 
 - The audit PRIORITY.md was built from — cited in PRIORITY.md's own

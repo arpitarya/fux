@@ -30,6 +30,45 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-21 — P8 moved to W-62; PRIORITY.md archived  ·  Claude Code
+
+- **Asked:** "then commit then move P8 into open work and archive priority
+  file" — the second half of the same message that asked for P7.
+- **Did:** filed [W-62](open/W-62-measure-against-the-outside-world.md)
+  (measure against the outside world) as a proper `OPEN-WORK.md` item —
+  `agent`+`arpit` lane, new group "No record — external validation" since
+  it owns no `src/`/`tools/` component. Noted the README-fix half is
+  agent-startable now, so narrowed W-26's "the only agent-closable item on
+  this queue" claim to "requiring no external setup" rather than leave two
+  contradictory STARTABLE claims. `PRIORITY.md` itself moved to
+  `archive/PRIORITY.md` (`git mv`), with an archival note at its top and
+  its P8 row marked `MOVED → W-62` before the move, so the frozen copy is
+  self-consistent. `archive/README.md` gained its row, naming
+  `OPEN-WORK.md` as the live successor — which is what CLAUDE.md's own text
+  already called it; `PRIORITY.md` was always a temporary, Arpit-ordered
+  override of that queue for one audit-driven pass (P1–P8), not a
+  replacement for it. `work/DOC-REGISTRY.md`'s `PRIORITY.md` row deleted
+  (archived docs lose their row, not annotated). `work/README.md`'s map
+  restores `OPEN-WORK.md` as "read first" and drops its stale `Cost:`-line
+  mention.
+- **Found while touching these files**: `work/governance.md` (filed by a
+  concurrent Cowork session the same day) had written its own "diet"
+  analysis *as input to* P7 while P7 was still open — citing `PRIORITY.md`
+  as live and framing itself as "a proposal, not an executed change." Since
+  P7 has since landed with a different, narrower outcome than that
+  analysis assumed (only the `Cost:` line accepted; `NOW.md` explicitly
+  kept separate, not merged), the section was rewritten as a post-mortem:
+  which of its 7 items match what Arpit actually decided, and which two
+  (a `WORKLOG.md` archive-and-truncate; scoping `DOC-REGISTRY.md` to only
+  untested docs) were never put to him and stay parked — noted in
+  `process-diet.md` too, so they are findable rather than lost.
+- **Decided / open:** nothing further decided this round — the two parked
+  ideas from `governance.md` are explicitly not litigated, waiting on
+  their own proposal if picked up. W-62 itself is open, blocked on
+  `fux-lab` getting a Confluence-shaped export corpus it does not have yet.
+- **Next:** none pending from this specific change. `uv run pytest -q
+  tests tests_e2e`: 877 passed.
+
 ## 2026-08-21 — PRIORITY P7: put the process on a diet  ·  Claude Code
 
 - **Asked:** "implement P7, then commit then move P8 into open work and
