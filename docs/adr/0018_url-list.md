@@ -299,12 +299,20 @@ which is the point of decision 11.
 
 ### Consequences
 
-- **The writer commits LF only, regardless of host OS (PRIORITY.md P4,
-  2026-08-21).** `sources.py`'s `_write` used `write_text`'s platform-default
-  newline translation, which would commit CRLF on a Windows checkout and LF
-  everywhere else — breaking L3's byte-identical guarantee the moment two
-  contributors on different OSes both ran `fux url`. Now writes with
-  `newline="\n"` explicitly.
+- **The writer commits LF only on disk, regardless of host OS (PRIORITY.md
+  P4, 2026-08-21) — belt, alongside an existing suspenders.** `sources.py`'s
+  `_write` used `write_text`'s platform-default newline translation, which
+  would write CRLF into the working-tree file on Windows. **Correction,
+  2026-08-21, same day:** this was written up as closing a real gap in L3's
+  byte-identical guarantee, which overstated it — `.gitattributes`' `*
+  text=auto eol=lf` (repo root) already normalizes any CRLF to LF at `git
+  add` time for every tracked file, `.fux/sources/urls` included; verified
+  empirically in a scratch repo. Committed bytes were never actually at
+  risk. The Python-level fix (`newline="\n"` now, explicit) is still correct
+  defense-in-depth — it does not depend on `.gitattributes` staying present
+  or correctly matching the path, and it means the working-tree file is
+  right immediately rather than only after the next `git add` — but it is
+  not the fix that was closing an open guarantee gap.
 - **The file is tool-managed, and the writer edits one line rather than
   regenerating the file** (built 2026-08-19). That is the amendment this
   record's earlier consequence promised, and it fell the way it did because the

@@ -28,6 +28,56 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — correction: the P4 CRLF fix to sources.py was defense-in-depth, not a closed gap  ·  Claude Code
+
+- **Asked:** "is everything up to date in the ADR" — an audit of the six
+  records touched by P4.
+- **Did:** re-read all six against current code (`uv run pytest -q
+  tests/test_adr_*` + manual diff, 187 passed, no structural drift). Found
+  one overstated claim: `ADR-URL-LIST`'s Consequences note for the
+  `sources.py` CRLF fix said it "was breaking L3's byte-identical guarantee"
+  — checked `.gitattributes` (repo root: `* text=auto eol=lf`) and verified
+  empirically in a scratch repo that `git add` already normalizes CRLF to
+  LF for any tracked file matching that pattern, `.fux/sources/urls`
+  included. Committed bytes were never actually at risk for that file; the
+  Python-level fix is still correct (working-tree-immediate, not dependent
+  on `.gitattributes`), just not the closed-gap it was described as.
+  Corrected in place in `docs/adr/0018_url-list.md` (ADRs are corrected in
+  place; WORKLOG is append-only, hence this entry rather than an edit to
+  the original P4 entry above). `mergedriver.py`'s CRLF fix stays
+  necessary — merge-driver output is not re-run through git's clean filter
+  (documented git behavior, not independently re-verified here).
+  `graph/plane.py`'s stays necessary — gitignored, so `.gitattributes`
+  never applies to it at all.
+- **Decided / open:** none. The other five records (ADR-MERGE-DRIVER,
+  ADR-INGEST, ADR-ASK, ADR-GRAPH, ADR-REFER) checked clean against current
+  code.
+- **Next:** none from this check; P5 is still next per `PRIORITY.md`.
+- **Cost:** unmeasured; one empirical git test plus a re-read of six records,
+  well under ten minutes.
+
+---
+
+## 2026-08-21 — OPEN-WORK.md: drop the Predictions block, reconcile the queue  ·  Cowork
+
+- **Asked:** remove the whole Predictions block from `OPEN-WORK.md`, and review
+  every open item for anything closed or done that should be removed.
+- **Did:** deleted the `## Predictions` section (the R1–R7 status recap and the
+  "where the build stands" paragraph) — it duplicated `IMPLEMENTATION.md`'s
+  milestone table and predates R7 closing unmeasured. Re-derived the item list
+  against rule 4 (`IMPLEMENTATION.md`, `regression/`, and each item's own
+  detail file) rather than trusting the markers: checked all seven live items —
+  W-26, W-38, W-44, W-52, W-57, W-59, W-61 — and every one still carries at
+  least one unchecked DoD box, so **none is closed and nothing was removed**
+  from the item list or the Arpit inbox.
+- **Decided / open:** no state changes. Noted but not acted on: a new,
+  unreferenced run — `regression/2026-08-21-graph-plane-profile/` — exists
+  and opens a fork (`compare/graph-plane-format.compare.md`) that no W-nn item
+  or OPEN-WORK row names yet; out of scope for this pass, flagged for whoever
+  picks it up next.
+- **Next:** none from this session.
+- **Cost:** unmeasured — a short editorial/reconciliation pass, not timed.
+
 ## 2026-08-21 — PRIORITY P4: all six reproduced defects fixed  ·  Claude Code
 
 - **Asked:** implement P4 (the six reproduced engine defects PRIORITY.md
