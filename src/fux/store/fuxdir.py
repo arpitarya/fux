@@ -39,8 +39,7 @@ COMMITTED: dict[str, str] = {
 }
 
 DERIVED: dict[str, str] = {
-    "runtime": "reserved for M2 accelerator segments",
-    "cache": "reserved for M4 ARC fetch cache",
+    "runtime": "M2 accelerator segments, and M4's fetch cache nested at `runtime/fetch-cache/`",
 }
 
 #: Files fux generates at the top level of `.fux/` (write-if-missing).
@@ -134,8 +133,9 @@ def ensure_layout(root: Path) -> list[Path]:
 def derived_dir(root: Path, name: str) -> Path:
     """Return `.fux/<name>/`, created and tagged as a cache directory.
 
-    For M2/M4 to call when they materialize `runtime/` and `cache/`. The tag
-    is written once and never overwritten.
+    For M2 to call when it materializes `runtime/` (M4's fetch cache nests
+    inside it, at `runtime/fetch-cache/`, and does not call this directly).
+    The tag is written once and never overwritten.
     """
     path = fux_dir(root) / name
     path.mkdir(parents=True, exist_ok=True)

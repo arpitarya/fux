@@ -141,7 +141,7 @@ teeth for this project specifically —
 - **The defaults are decisions, not conveniences.** `--hybrid` is off because a
   measurement said so; `--scan` exists only to reproduce a bug against the
   reference path. Both read as ordinary flags to anyone who has not read
-  [ADR-T1-ACCELERATOR](../../archive/adr/0005_derived-accelerator.md).
+  [ADR-T1-ACCELERATOR](0011_accelerator.md).
 
 ### Decision
 
@@ -278,7 +278,7 @@ $ fux doctor
 ```
 
 The gitignore check is not decoration: a `.fux/*` blanket silently eating the
-committed index is the failure mode [ADR-DOTFUX](../../archive/adr/0011_fux-dir-layout.md)
+committed index is the failure mode [ADR-DOTFUX](0003_fux-directory.md)
 was written around.
 
 #### `fux ingest` — sources → committed index
@@ -591,7 +591,7 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 - **Adding a verb costs a record.** M3 did add three, and it cost this record
   a group row, a decision (1b) and a feature-line bump — paid in the same
   change, which is what the rule is for. M4 still owes the same.
-- **Eleven verbs, and the `--json` contract now has three shapes**, not one:
+- **Twelve verbs, and the `--json` contract now has three shapes**, not one:
   `{results[]}` for `ask`/`find`, `{answer, citation, source}` for `answer`,
   and the graph payloads (`{doc, edges[], community}` · `{nodes[]}` ·
   `{from, to, paths[]}`). They do not converge and should not: a route is not a
@@ -640,7 +640,7 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 - Existing end-to-end coverage of the verbs —
   [`tests_e2e/test_verbs.py`](../../tests_e2e/test_verbs.py).
 - The measured basis for the two off-by-default flags —
-  [ADR-T1-ACCELERATOR](../../archive/adr/0005_derived-accelerator.md) and the
+  [ADR-T1-ACCELERATOR](0011_accelerator.md) and the
   [M2 run](../../work/regression/2026-08-12-m2-accelerator/report.md).
 - Python's own guidance on the boundary pattern this follows —
   https://docs.python.org/3/library/argparse.html#exiting-methods

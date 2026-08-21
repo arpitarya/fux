@@ -13,9 +13,9 @@ timestamp: 2026-08-18T00:00:00Z
 - **Status:** accepted
 - **Supersedes:** `ADR-FUX-DIR` — **archived 2026-08-18** at
   [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** `src/fux/store/fuxdir.py`, `src/fux/config.py`,
-  `src/fux/doctor.py` — the ownership table still names ADR-DOTFUX until this
-  record is accepted
+- **Owns:** `src/fux/store/fuxdir.py`, `src/fux/doctor.py` — `src/fux/config.py`
+  moved to [ADR-CONFIG](0014_config.md) when that record was split out and
+  accepted
 - **Laws:** L2, L3, L5 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
 - **Feature:** the layout of `.fux/` and the invariants that keep it honest
@@ -46,10 +46,9 @@ flowchart TD
     F[".fux/"]
     F --> C1["index/ — committed<br/>the product"]
     F --> C2["sources/ — committed<br/>dirs · urls, one per line"]
-    F --> C3["fetcher/ — committed<br/>YOUR code"]
+    F --> C3["fetchers/ — committed<br/>YOUR code"]
     F --> C4["README.md · .gitignore<br/>committed, write-if-missing"]
-    F --> D1["runtime/ — derived<br/>CACHEDIR.TAG"]
-    F --> D2["cache/ — derived (M4)<br/>CACHEDIR.TAG"]
+    F --> D1["runtime/ — derived<br/>CACHEDIR.TAG<br/>(nests fetch-cache/, M4)"]
     D1 -.->|"git check-ignore<br/>asserted by doctor"| G["ignored"]
     C1 -.->|"must NOT be ignored"| G
 ```
@@ -62,12 +61,12 @@ flowchart TD
     |
     +-- index/        COMMITTED   the product; not rebuildable from anything
     +-- sources/      COMMITTED   dirs . urls, one per line
-    +-- fetcher/   COMMITTED   your code, fux never rewrites it
+    +-- fetchers/     COMMITTED   your code, fux never rewrites it
     +-- README.md     COMMITTED   the declaration table (write-if-missing)
     +-- .gitignore    COMMITTED   names derived dirs; NEVER `*`
     |
     +-- runtime/      derived     accelerator segments  [CACHEDIR.TAG]
-    +-- cache/        derived     ARC fetch cache (M4)  [CACHEDIR.TAG]
+        +-- fetch-cache/          the TTL fetch cache (M4), nested here
 
    `fux doctor` runs `git check-ignore` and fails if index/ is ignored.
 ```
@@ -82,7 +81,7 @@ What `fux ingest` generates, and the two files that make the layout checkable:
 $ find .fux -maxdepth 2 -type d | sort
 .fux
 .fux/index
-.fux/fetcher
+.fux/fetchers
 .fux/runtime
 .fux/runtime/postings
 .fux/sources
@@ -90,7 +89,6 @@ $ find .fux -maxdepth 2 -type d | sort
 $ cat .fux/.gitignore
 # Derived planes only: … NEVER add `*` here …
 runtime/
-cache/
 ```
 
 The check that matters is against git itself, not the file's text:
@@ -108,8 +106,9 @@ $ fux doctor
 ### Context
 
 `.fux/` accumulated planes as milestones landed: the committed index at M1, the
-URL source and consumer fetcher at 0.31.x, the runtime accelerator at M2, an
-ARC cache reserved for M4. Nothing declared which of them git should carry.
+URL source and consumer fetcher at 0.31.x, the runtime accelerator at M2, a TTL
+fetch cache nested inside `runtime/` at M4. Nothing declared which of them git
+should carry.
 
 The hazard is asymmetric. A derived directory accidentally committed is noise
 someone notices. A **committed directory accidentally ignored is silent data
@@ -129,10 +128,12 @@ not a shrug.
 lists — `dirs` and `urls`, both on the one grammar in
 [ADR-URL-LIST](0018_url-list.md)), `fetchers/` (consumer code), `README.md`,
 `.gitignore`.
-**Derived:** `runtime/`, `cache/`.
+**Derived:** `runtime/` — M2's accelerator segments, and M4's TTL fetch cache
+nested inside it at `runtime/fetch-cache/` (no separate top-level directory
+was reserved for it in the end).
 
 **3. The generated `.gitignore` names derived directories and never a
-wildcard.** `runtime/` and `cache/`, one per line. A `*` in that file is a
+wildcard.** `runtime/`, one line. A `*` in that file is a
 defect regardless of what follows it.
 
 **4. `fux doctor` asserts the ignore rule against git**, not against the file's

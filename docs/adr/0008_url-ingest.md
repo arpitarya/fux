@@ -13,7 +13,10 @@ timestamp: 2026-08-18T00:00:00Z
 - **Status:** accepted
 - **Supersedes:** `ADR-URL-MIDDLEWARE` — **archived 2026-08-18** at
   [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** `src/fux/ingest/urlsrc.py`
+- **Owns:** nothing of its own — `src/fux/ingest/urlsrc.py` (fux's half of the
+  fetch contract) moved to [ADR-FETCHER](0019_fetcher.md) when the contract
+  split out; this record governs the `url:` source and the committed URL list
+  format, enforced by [ADR-URL-LIST](0018_url-list.md)
 - **Laws:** L2, L4, L5 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
 - **Feature:** the `url:` source and its fetcher boundary
@@ -165,7 +168,7 @@ default currently does not work.**
 
 Verbatim from [the capture](../../work/regression/2026-08-18-ingest-and-index/report.md) §6,
 using the no-network fetcher in
-[`evidence/demo-fetcher.py`](../../work/regression/2026-08-18-ingest-and-index/evidence/demo-fetcher.py).
+[`evidence/demo-fetcher.py`](../../work/regression/2026-08-19-w54/evidence/demo-fetcher.py).
 
 **Offline is the default — the fetcher is not even imported:**
 
@@ -228,8 +231,8 @@ the batch, and the 404 becomes a skip while the other two documents land.
   **The fix was the field's shape**, `"h:" + term_hash(...)`
   ([ADR-RECORD](0010_index-record.md) rule 2), not the check — and the
   differential harness now carries a hashed record, which it never had.
-- **This record does not retire ADR-URL-INGEST**, which is ⏳ *proposed*
-  ([W-31](../../work/IMPLEMENTATION.md) *(ratified 2026-08-19)*).
+- **This record is itself accepted, not proposed** — ratified as-is by W-31
+  ([IMPLEMENTATION.md](../../work/IMPLEMENTATION.md), 2026-08-19).
 
 ### Alternatives considered
 

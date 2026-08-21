@@ -33,12 +33,16 @@ Three things follow, and none of them is optional:
    record: it reads as authority.
 
 **This is enforced, not trusted.** `tests/test_adr_freshness.py` runs in CI on
-every push and fails a commit that changed an ADR-owned component without
-touching a record. `scripts/adr-guard.sh` is the same check as a pre-commit
-hook — install it once:
+every push (with `fetch-depth: 0`, so the runner can see the history it
+audits) and fails a commit that changed an ADR-owned component without
+touching that component's **owning** record specifically — touching some
+other record does not satisfy it. `scripts/adr-guard.sh` is the same check as
+a `commit-msg` hook (not `pre-commit`: it has to read the commit message to
+honor the `no ADR affected` escape hatch, and `pre-commit` runs before that
+message exists) — install it once:
 
 ```bash
-ln -sf ../../scripts/adr-guard.sh .git/hooks/pre-commit
+ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg
 ```
 
 **Why it is enforced.** Replayed over the 25 commits before the check existed,
@@ -231,9 +235,11 @@ Then, on completion:
    name everywhere; the file number is an ordinal, not an identity. Add its
    components to the ownership table and update
    [`tests/test_adr_ownership.py`](tests/test_adr_ownership.py) in the same
-   change. Full convention: [`docs/adr/README.md`](docs/adr/README.md). ADRs
-   0001–0015 belong to the archived engine and are cited as "archived
-   ADR-NNNN" with their archive path.
+   change. Full convention: [`docs/adr/README.md`](docs/adr/README.md).
+   `archive/v0.26-docs/adr/0001`–`0015` are the **archived** engine's records —
+   a distinct numbering from today's live `docs/adr/0001`–`0015`
+   (ADR-LAWS…ADR-PORT-LIST) — and are cited as "archived ADR-NNNN" with that
+   archive path, never bare "ADR-NNNN".
 
 **Every rule, ADR, and material decision must carry a reference** — a paper, a
 blog post, or a concrete example link. A rule or ADR with no reference is
@@ -420,8 +426,8 @@ The register, the convention and the ownership table are in
   See §Law zero. If a change genuinely touches no recorded decision, **say so
   explicitly — `no ADR affected` in the commit message** — rather than silently
   skipping the check. Enforced by `tests/test_adr_freshness.py` (CI) and
-  `scripts/adr-guard.sh` (pre-commit); neither can be satisfied by intending to
-  update the record later.
+  `scripts/adr-guard.sh` (`commit-msg` hook); neither can be satisfied by
+  intending to update the record later.
 - **Cite records by name, never by number.** `ADR-RECORD`, not
   "ADR-0004". Numbers exist only so the archive can map a retired record to its
   successor. A live doc citing a number is a defect; fix it on contact.

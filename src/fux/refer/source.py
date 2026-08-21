@@ -53,20 +53,10 @@ from .. import store as store_mod
 from ..errors import FuxError
 from ..ingest.urlsrc import sanitize
 
-__all__ = ["Fetched", "FetchError", "resolve", "fetch_document", "GIT", "URL"]
+__all__ = ["Fetched", "resolve", "fetch_document", "GIT", "URL"]
 
 GIT = "git"
 URL = "url"
-
-
-class FetchError(FuxError):
-    """A fetch that failed or timed out. Caught by the plane, never fatal.
-
-    It subclasses `FuxError` rather than starting a hierarchy: the error
-    contract says one flat user-facing error, and this exists only so the plane
-    can tell a fetch failure from a programming mistake while still rendering
-    as one.
-    """
 
 
 @dataclass(frozen=True)
@@ -106,21 +96,21 @@ def _read_local(root: Path, doc_id: str, loc: str) -> Fetched:
     if not path.is_file():
         # Indexed once, gone now. That is a real answer about the corpus — the
         # citation is dead — and not an engine failure.
-        raise FetchError(f"{loc}: cited document is no longer in the working tree")
+        raise FuxError(f"{loc}: cited document is no longer in the working tree")
     content = path.read_bytes()
     return Fetched(doc_id, loc, content, store_mod.content_sha(content), GIT)
 
 
 def _fetch_url(doc_id: str, loc: str, fetcher) -> Fetched:
     if fetcher is None:
-        raise FetchError(
+        raise FuxError(
             f"{loc}: no fetcher loaded - a url: document cannot be verified without one"
         )
     try:
         text = fetcher(loc)
     except Exception as exc:  # consumer code: never let it crash the query
-        raise FetchError(f"{loc}: fetcher raised {type(exc).__name__}: {exc}") from exc
+        raise FuxError(f"{loc}: fetcher raised {type(exc).__name__}: {exc}") from exc
     if not isinstance(text, str):
-        raise FetchError(f"{loc}: fetcher returned {type(text).__name__}, expected str")
+        raise FuxError(f"{loc}: fetcher returned {type(text).__name__}, expected str")
     content = sanitize(text)
     return Fetched(doc_id, loc, content, store_mod.content_sha(content), URL)

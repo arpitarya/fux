@@ -9,7 +9,7 @@ import sys
 import pytest
 
 from fux.errors import FuxError
-from fux.refer.source import GIT, URL, FetchError, fetch_document, resolve
+from fux.refer.source import GIT, URL, fetch_document, resolve
 
 import fux.refer.source  # for the registry lookup below
 
@@ -33,26 +33,26 @@ def test_a_git_document_is_read_from_the_checkout(tmp_path):
 
 
 def test_a_missing_git_document_is_a_dead_citation(tmp_path):
-    with pytest.raises(FetchError, match="no longer in the working tree"):
+    with pytest.raises(FuxError, match="no longer in the working tree"):
         fetch_document(tmp_path, "file:gone.md", "gone.md")
 
 
 def test_a_url_document_needs_a_fetcher_and_says_so(tmp_path):
-    with pytest.raises(FetchError, match="no fetcher loaded"):
+    with pytest.raises(FuxError, match="no fetcher loaded"):
         fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p")
 
 
-def test_a_fetcher_that_raises_becomes_a_fetch_error_not_a_crash(tmp_path):
+def test_a_fetcher_that_raises_becomes_a_fux_error_not_a_crash(tmp_path):
     """Consumer code runs here. It must never take the query down with it."""
     def boom(url):
         raise ZeroDivisionError("consumer bug")
 
-    with pytest.raises(FetchError, match="ZeroDivisionError"):
+    with pytest.raises(FuxError, match="ZeroDivisionError"):
         fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=boom)
 
 
 def test_a_fetcher_returning_the_wrong_type_is_refused(tmp_path):
-    with pytest.raises(FetchError, match="expected str"):
+    with pytest.raises(FuxError, match="expected str"):
         fetch_document(tmp_path, "url:https://x.test/p", "https://x.test/p", fetcher=lambda u: b"bytes")
 
 

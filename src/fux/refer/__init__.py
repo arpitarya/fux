@@ -64,7 +64,8 @@ from .assemble import DEFAULT_BUDGET, Assembled, assemble
 from .chunk import chunk
 from .freshness import Policy, Verdict, cached as cached_verdict, verify
 from .rescore import ScoredPassage, rescore
-from .source import FetchError, Fetched, fetch_document
+from ..errors import FuxError
+from .source import Fetched, fetch_document
 
 __all__ = [
     "Bundle",
@@ -222,7 +223,7 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
 
     try:
         result = fetch_document(root, doc_id, loc, fetcher=fetcher)
-    except FetchError as exc:
+    except FuxError as exc:
         # Honest degradation: declared unverified, never stale-as-fresh.
         return None, Cited(doc_id, loc, verify(indexed_sha, None, str(exc)), strategy, str(exc))
 

@@ -13,7 +13,7 @@ timestamp: 2026-08-19T00:00:00Z
 - **Status:** accepted
 - **Date:** 2026-08-19
 - **Feature:** `.fux/sources/urls` — the file format itself, as distinct from what fetches its entries
-- **Owns:** `src/fux/ingest/sourcelist.py` (the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0023_dir-list.md) decision 2) and `src/fux/sources.py` (`fux url`, the writer). Both added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-URL-INGEST](0008_url-ingest.md) / [ADR-FETCHER](0019_fetcher.md), which own `ingest/urlsrc.py`
+- **Owns:** `src/fux/ingest/sourcelist.py` (the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0023_dir-list.md) decision 2) and `src/fux/sources.py` (`fux url`, the writer). Both added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-FETCHER](0019_fetcher.md), which owns `ingest/urlsrc.py`
 - **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Split from:** [ADR-URL-INGEST](0008_url-ingest.md) decisions 5 and 6, which shipped in 0.31.x and are restated nowhere
 
@@ -290,7 +290,7 @@ so nobody re-argues them from scratch, and so nobody adds one quietly:
 
 | candidate | what it would do | why not here |
 |---|---|---|
-| `snapshot` | commit a machine-made copy of the content, per URL | the `refer`/`snapshot` policy is per *source* today and belongs to the M4 refer plane ([W-24](../../work/open/W-24-m4-refer-plane.md)); a per-URL form is an L2 decision, not a grammar one |
+| `snapshot` | commit a machine-made copy of the content, per URL | the `refer`/`snapshot` policy is per *source* today and belongs to the M4 refer plane ([W-24](../../archive/open/W-24-m4-refer-plane.md)); a per-URL form is an L2 decision, not a grammar one |
 | `tag` | give a URL document the frontmatter tags a repo file has | URL documents have no frontmatter, so their `tag` edges are always empty — a real gap. But it invents corpus structure in a config file, which needs its own record |
 | `max_age` | per-URL freshness bound at answer time | freshness is the refer plane's, and its threshold is prediction **R4**. Deciding it here would fix a number no one has measured |
 

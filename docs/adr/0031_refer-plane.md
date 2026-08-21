@@ -10,9 +10,11 @@ timestamp: 2026-08-20T00:00:00Z
 # ADR-REFER: the refer plane
 
 - **Name:** `ADR-REFER` — cite this everywhere; never cite the number
-- **Status:** proposed — **accepted requires R4**, which cannot run yet (below)
+- **Status:** proposed — **R4 ran 2026-08-20 and PASSED**
+  ([R4-REFER](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md));
+  acceptance still waits on the budget sweep (W-59, unmeasured — below)
 - **Date:** 2026-08-20
-- **Feature:** M4 — the refer plane (core; adapters and the R4 bench outstanding)
+- **Feature:** M4 — the refer plane (core landed, R4 bench run; adapters and the budget sweep outstanding)
 - **Owns:** `src/fux/refer/` · `tools/refer-bench/`
 - **Laws:** L1, L2, L3, L4
 
@@ -99,12 +101,15 @@ An unreachable source degrades honestly — declared, never stale-as-fresh:
 
 M4 was specified before three things were true that are true now: the fetcher
 contract exists and is shipped (ADR-FETCHER, ADR-HTTP-FETCHER, ADR-CDP-FETCHER);
-`fux-lab` — where R4 was to be measured — does not exist (W-56); and the
-committed record's field set is settled and contains no timestamp (ADR-RECORD).
+`fux-lab` — where R4 was to be measured — did not exist yet (W-56, since
+resolved: R4 ran there 2026-08-20); and the committed record's field set is
+settled and contains no timestamp (ADR-RECORD).
 
-Two proposals graduate here:
-`work/proposals/caller-set-freshness-policy.md` and
-`work/proposals/token-budget-retrieval.md`.
+Two proposals graduated here, and have since been archived with their live
+successor named as this record:
+[`archive/proposals/caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md)
+and
+[`archive/proposals/token-budget-retrieval.md`](../../archive/proposals/token-budget-retrieval.md).
 
 ### Decision
 
@@ -159,6 +164,11 @@ verdict **F**). External fetches may be served from
 opt-in per caller. `no_cache` refuses caching outright whatever the TTL says:
 the escape hatch for access-controlled and regulated sources, where a local
 copy outliving the reader's permission is exactly the risk L5 exists for.
+**This does not touch L2's single exception (per-source `snapshot` policy)**,
+because L2 forbids *durable* content and this cache is deliberately the
+opposite: unindexed, gitignored, TTL-bounded (default **0 — off**), and
+confined to one machine (5c) — nothing here is ever committed, so there is
+nothing for L2 to except.
 
 > **This is not a latency optimisation and it did not wait for R4.** Confluence
 > Cloud's REST API is rate-limited against a shared hourly point budget, and
@@ -178,7 +188,7 @@ proves anything, and the proof would be gone with no test to notice.
 treatment `runtime/stamp.json` already has: derived, per-machine,
 non-reproducible, gitignored, and it never reaches a committed record.
 **Decision 4 is untouched** — the record still carries no ingest time, and
-[W-58](../../work/open/W-58-no-recorded-ingest-time.md) with
+[W-58](../../archive/open/W-58-no-recorded-ingest-time.md) with
 [`record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)
 remains a separate open question. A reader should not conflate the two: one is
 a local note about *when we last looked*, the other would be a committed claim
@@ -255,17 +265,17 @@ the caller's window. `dropped` is reported so truncation is never silent.
   `urllib`/`socket`/`http`/`ssl` import anywhere in the plane.
 - **`urlsrc._sanitize` became `urlsrc.sanitize`** — a rename in ADR-FETCHER's
   territory, recorded in that record in the same change.
-- **R4 IS NOT MEASURED, and this record is `proposed` because of it.** The
-  cold/warm latency prediction runs in `fux-lab`, which does not exist
-  ([W-56](../../work/open/W-56-sibling-environments-missing.md)). Under the
-  plan's sequencing rule a milestone does not start while its *gating*
-  prediction is unmeasured — R4 gates M5, not M4 — so building this was legal
-  and **calling it accepted is not**.
-- **Three DoD items are outstanding and are not claimed**: R4 itself; the
-  `max_age` sweep (moot — decision 4 removed the knob, so W-58 decides whether
-  it ever exists); and the budget sweep reporting answer-quality-per-byte,
-  which needs a graded corpus and therefore `fux-playground`, also W-56. Filed
-  as **W-59**.
+- **R4 PASSED, measured 2026-08-20** —
+  [R4-REFER](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md): cold
+  p95 1.113 s vs a 3 s bar, warm p95 0.016 s vs 300 ms, on a 100 ms mock
+  source. The plane fetches **serially**, so the bound is a statement about
+  the source's latency at k=10, not about fux. The record stays `proposed`
+  because one gate passing is not the whole DoD.
+- **Two DoD items are still outstanding and are not claimed**: the `max_age`
+  sweep (moot — decision 4 removed the knob, so W-58 decides whether it ever
+  exists); and the budget sweep reporting answer-quality-per-byte, which needs
+  a graded corpus and therefore `fux-playground`, also W-56. Filed as
+  **W-59**.
 - **`Policy` grew two fields and the bundle's `policy` object grew two keys**
   (`cache_ttl_seconds`, `no_cache`). Additive, and both travel in the bundle
   under decision 8 — a replay that silently used a different cache policy would
@@ -318,8 +328,8 @@ the caller's window. `dropped` is reported so truncation is never silent.
 - The record's field set, which is why decision 4 exists:
   [ADR-RECORD](0010_index-record.md)
 - The two graduating proposals:
-  [`work/proposals/caller-set-freshness-policy.md`](../../work/proposals/caller-set-freshness-policy.md) ·
-  [`work/proposals/token-budget-retrieval.md`](../../work/proposals/token-budget-retrieval.md)
+  [`work/proposals/caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md) ·
+  [`work/proposals/token-budget-retrieval.md`](../../archive/proposals/token-budget-retrieval.md)
 - The cache decision this builds:
   [`work/compare/cache-policy.compare.md`](../../work/compare/cache-policy.compare.md)
 - The plane and its tests: [`src/fux/refer/`](../../src/fux/refer/) ·

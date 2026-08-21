@@ -264,8 +264,8 @@ $ fux answer "zzz nonexistent term" --json
 - The ranking it projects — [ADR-ASK](0004_ask.md).
 - Captured behaviour, both modes and the empty case —
   [`work/regression/2026-08-18-query-verbs/`](../../work/regression/2026-08-18-query-verbs/report.md).
-- What M4 will make it — [`work/open/W-24-m4-refer-plane.md`](../../work/open/W-24-m4-refer-plane.md)
-  and [W-24](../../work/open/W-24-m4-refer-plane.md).
+- What M4 will make it — [`work/open/W-24-m4-refer-plane.md`](../../archive/open/W-24-m4-refer-plane.md)
+  and [W-24](../../archive/open/W-24-m4-refer-plane.md).
 - Why a confident wrong answer is the expensive failure — Ji et al., *Survey of
   Hallucination in Natural Language Generation* (2022):
   https://arxiv.org/abs/2202.03629

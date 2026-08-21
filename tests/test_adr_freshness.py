@@ -5,22 +5,25 @@ rule that gets forgotten at 2am. This is the same rule as a check.
 
 **What it does.** For every commit since the rule took effect, if the commit
 touched a component that the ownership table in `docs/adr/README.md` assigns to
-a record, then the commit must also touch a record — or say, in its own message,
-that no record was affected.
+a record, then that commit must also touch **that record specifically** —
+touching some other, unrelated record does not satisfy it — or say, in its own
+message, that no record was affected.
 
-**The escape hatch is deliberate and deliberately loud.** Put
-`no ADR affected` (or `[no-adr]`) in the commit message. It is not a silent
-skip: it is a claim, written into git history under your name, that you checked.
-That is exactly what `CLAUDE.md` asks for — say so explicitly rather than
-skipping the check quietly.
+**The escape hatch is deliberate and deliberately loud.** Put a line reading
+exactly `no ADR affected` (or `[no-adr]`) in the commit message — its own line,
+nothing else on it. It is not a silent skip: it is a claim, written into git
+history under your name, that you checked. That is exactly what `CLAUDE.md`
+asks for — say so explicitly rather than skipping the check quietly.
 
 **Bootstrapping.** The baseline is the commit that added this file, so the rule
 applies from the moment the check landed and never retroactively. To move the
 baseline forward after a bulk review, write a commit sha into
 `docs/adr/RULE-SINCE`.
 
-**Where it runs.** `pytest -q tests` in CI, on every push. For the same check
-before you commit, install `scripts/adr-guard.sh` as a pre-commit hook.
+**Where it runs.** `pytest -q tests` in CI, on every push, with `fetch-depth: 0`
+so the runner can see the history it audits. For the same check before you
+commit, install `scripts/adr-guard.sh` as a `commit-msg` hook — it needs the
+message to check the escape hatch, and `pre-commit` runs too early to see it.
 """
 
 from __future__ import annotations
@@ -31,12 +34,15 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
-REGISTER = ROOT / "docs" / "adr" / "README.md"
-RULE_SINCE_FILE = ROOT / "docs" / "adr" / "RULE-SINCE"
+from adr_lib import ADR_DIR, ROOT, owner_of, ownership_table, record_path_for
 
-_RECORD_RE = re.compile(r"^(docs|work)/adr/\d{4}_[^/]+\.md$")
-_EXEMPT_RE = re.compile(r"no[ -]adr[ -]affected|\[no-adr\]", re.I)
+RULE_SINCE_FILE = ADR_DIR / "RULE-SINCE"
+
+# Anchored to a whole line, deliberately: the escape hatch is a loud, standalone
+# claim ("I checked, nothing applies"), not a substring that can appear inside
+# unrelated prose ("note: no ADR affected the parser, only the tests" would
+# have matched the old unanchored pattern and silently exempted the commit).
+_EXEMPT_RE = re.compile(r"(?m)^\s*(no[ -]adr[ -]affected|\[no-adr\])\s*$", re.I)
 
 
 def _git(*args: str) -> str:
@@ -62,28 +68,19 @@ def _git_available() -> bool:
         return False
 
 
-def owned_paths() -> list[str]:
-    """Component paths from the ownership table, longest first (most specific wins)."""
-    text = REGISTER.read_text(encoding="utf-8")
-    body = text.split("<!-- OWNERSHIP-TABLE-START -->", 1)[1]
-    body = body.split("<!-- OWNERSHIP-TABLE-END -->", 1)[0]
-    paths = []
-    for line in body.splitlines():
-        line = line.strip()
-        if not line.startswith("|") or set(line) <= set("|- :"):
-            continue
-        cell = [c.strip() for c in line.strip("|").split("|")][0].strip("`")
-        if cell.lower() == "component":
-            continue
-        paths.append(cell.rstrip("/"))
-    return sorted(paths, key=len, reverse=True)
+def owning_records(files: list[str], table: dict[str, str]) -> dict[str, Path | None]:
+    """owner name -> that owner's record path, for every owner touched by `files`.
 
-
-def owner_of(changed: str, paths: list[str]) -> str | None:
-    for p in paths:
-        if changed == p or changed.startswith(p + "/"):
-            return p
-    return None
+    Deliberately the *owning* record per file, not "any record was touched" —
+    a commit that changes `src/fux/query/` and updates `docs/adr/0001_laws.md`
+    (ADR-LAWS, which owns none of it) must not pass just because *a* record
+    moved. `record_path_for` returns `None` for an owner that does not resolve
+    to a file; that is `test_adr_ownership.py`'s `test_every_owner_resolves` to
+    catch, not this test's — an unresolved owner is skipped here rather than
+    reported as a false freshness violation.
+    """
+    owners = {o for o in (owner_of(f, table) for f in files) if o is not None}
+    return {owner: record_path_for(owner) for owner in owners}
 
 
 def baseline() -> str | None:
@@ -116,7 +113,7 @@ def test_no_behaviour_change_landed_without_its_adr() -> None:
             "It starts enforcing from the commit that adds it."
         )
 
-    paths = owned_paths()
+    table = ownership_table()
     shas = _git("log", "--format=%H", f"{since}..HEAD").split()
     offenders = []
 
@@ -125,23 +122,28 @@ def test_no_behaviour_change_landed_without_its_adr() -> None:
         if _EXEMPT_RE.search(subject):
             continue
         files = _git("show", "--name-only", "--format=", sha).split()
-        touched_record = any(_RECORD_RE.match(f) for f in files)
-        if touched_record:
-            continue
-        hits = sorted({owner_of(f, paths) or "" for f in files} - {""})
-        if hits:
+        owned = {
+            owner: path.relative_to(ROOT).as_posix()
+            for owner, path in owning_records(files, table).items()
+            if path is not None
+        }
+        missing = sorted(
+            f"{owner} ({rel})" for owner, rel in owned.items() if rel not in files
+        )
+        if missing:
             offenders.append(
                 f"  {sha[:9]}  {subject.splitlines()[0]}\n"
-                f"      changed: {', '.join(hits)}\n"
-                f"      but no docs/adr/NNNN_*.md or work/adr/NNNN_*.md was touched"
+                f"      touches a component owned by: {', '.join(missing)}\n"
+                f"      but that record was not touched in the same commit"
             )
 
     assert not offenders, (
-        "these commits changed an ADR-owned component without updating any record:\n"
+        "these commits changed an ADR-owned component without updating its OWNING "
+        "record (touching some other record does not count):\n"
         + "\n".join(offenders)
-        + "\n\nEither update the record in the same change, or state it in the commit "
-        "message: 'no ADR affected'. Saying so explicitly is the rule; skipping "
-        "silently is not."
+        + "\n\nEither update the owning record in the same change, or state it in "
+        "the commit message on its own line: 'no ADR affected'. Saying so "
+        "explicitly is the rule; skipping silently is not."
     )
 
 
@@ -157,13 +159,16 @@ def test_working_tree_is_not_mid_violation() -> None:
     changed = _git("diff", "--name-only", "HEAD").split()
     if not changed:
         return
-    if any(_RECORD_RE.match(f) for f in changed):
-        return
-    paths = owned_paths()
-    hits = sorted({owner_of(f, paths) or "" for f in changed} - {""})
-    assert not hits, (
-        "the working tree changes an ADR-owned component with no record edited:\n  "
-        + "\n  ".join(hits)
+    table = ownership_table()
+    owned = {
+        owner: path.relative_to(ROOT).as_posix()
+        for owner, path in owning_records(changed, table).items()
+        if path is not None
+    }
+    missing = sorted(f"{owner} ({rel})" for owner, rel in owned.items() if rel not in changed)
+    assert not missing, (
+        "the working tree changes an ADR-owned component without its OWNING record:\n  "
+        + "\n  ".join(missing)
         + "\n\nUpdate the owning record before committing, or commit with "
-        "'no ADR affected' in the message if it genuinely touches no recorded decision."
+        "'no ADR affected' on its own line if it genuinely touches no recorded decision."
     )

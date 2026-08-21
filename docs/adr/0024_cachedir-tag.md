@@ -26,8 +26,9 @@ timestamp: 2026-08-19T00:00:00Z
 
 ## §1 — For humans
 
-Every derived directory under `.fux/` — today `.fux/runtime/`, reserved for
-`.fux/cache/` at M4 — carries a small marker file, `CACHEDIR.TAG`, the first
+Every derived directory under `.fux/` — today `.fux/runtime/`, which nests
+M4's fetch cache at `.fux/runtime/fetch-cache/` rather than a separate
+top-level directory — carries a small marker file, `CACHEDIR.TAG`, the first
 time it is created. It is not Fux's own invention: it is a fixed, published
 convention that backup tools, archivers, and IDE indexers already know how to
 read, so the directory is skipped by every one of them without a single line
@@ -98,8 +99,9 @@ configuration line; a *published, adopted* convention needs none.
 lines — with no interpolated value of any kind.
 
 **2. Written once, by `derived_dir()`.** The same function that creates
-`.fux/runtime/` (and will create `.fux/cache/` at M4) writes the tag
-immediately if it is absent, and never overwrites it once present.
+`.fux/runtime/` writes the tag immediately if it is absent, and never
+overwrites it once present. M4's fetch cache does not call it directly — it
+nests inside the already-tagged `runtime/` at `runtime/fetch-cache/`.
 
 **3. ASCII, explicit `\n`.** Consistent with every other file `fux` generates
 at the top level of `.fux/` — no locale dependency, no console-encoding

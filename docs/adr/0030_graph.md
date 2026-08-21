@@ -135,9 +135,12 @@ a backtick-quoted path that names another ingested document (`code`) — graded
 `EXTRACTED` 10 · `AMBIG` 8 · `INFERRED` 6, with dangling targets dropped. Those
 edges have been committed on every record since, and **nothing read them**.
 
-The playground's supersession and near-duplicate gaps (`q005`, `q009`, `q011`,
-`q015`) are the named acceptance targets for this lane precisely because they
-are the queries no amount of term statistics can answer.
+The playground's supersession, near-duplication and staleness≠wrongness gaps
+are the named acceptance targets for this lane precisely because they are the
+phenomena no amount of term statistics can answer. (The original named query
+ids — `q005`, `q009`, `q011`, `q015` — were in a golden set later lost; the
+targets are now these three phenomena, re-scoped 2026-08-20; see
+[W-57](../../work/open/W-57-graph-lane-acceptance.md).)
 
 ### Decision
 
@@ -226,12 +229,14 @@ fallback.
   `expect` values changed. **Restoring the distinction would be a new edge
   kind**, which is a decision needing its own record — not something a port may
   smuggle in. Documented in `tests_e2e/eval/README-relational.md`.
-- **We now owe the named acceptance measurement.** W-23 names `q005`, `q009`,
-  `q011`, `q015` in `fux-playground` as this lane's targets and asks for the
-  XPASS count. **That is not measured here, and it could not be**:
-  `fux-playground` does not exist on this machine, and per SETUP-PLAYGROUND it
-  had one local commit and no remote. The missing environments are **W-56**;
-  the measurement they block is **W-57**. This record does not claim the gap is
+- **We now owe the named acceptance measurement.** W-23 named `q005`, `q009`,
+  `q011`, `q015` in `fux-playground` as this lane's targets and asked for the
+  XPASS count. **That was not measured here, and at the time could not be**:
+  `fux-playground` did not exist on this machine (W-56, since resolved — the
+  environment was rebuilt), and its goldens, including those four query ids,
+  were lost in the process. W-57 re-scoped the targets to three phenomena
+  (supersession, near-duplication, staleness≠wrongness) instead of retired
+  ids; that measurement is still unrun. This record does not claim the gap is
   closed, and veto condition 3 is exactly that measurement.
 - **Determinism is verified on one machine, not two.** W-23 asked for
   byte-identical community assignment across two runs *and two machines*. Two
@@ -293,10 +298,13 @@ fallback.
    a nearer one.** That is the defect laziness was added to remove; its return
    means three iterations is too few for real structure, and `ITERATIONS`
    becomes a measured constant rather than an inherited one.
-3. **The playground's `q005`/`q009`/`q011`/`q015` do not improve** once W-57
-   measures them. The lane's whole argument is that these are the queries term
-   statistics cannot answer; if the graph cannot answer them either, the lane
-   needs a different shape, not a bigger `EXPAND_LIMIT`.
+3. **The playground's three re-scoped acceptance phenomena** (supersession,
+   near-duplication, staleness≠wrongness — the original `q005`/`q009`/`q011`/
+   `q015` ids were lost with the old golden set; see
+   [W-57](../../work/open/W-57-graph-lane-acceptance.md)) **do not improve**
+   once W-57 measures them. The lane's whole argument is that these are
+   phenomena term statistics cannot answer; if the graph cannot answer them
+   either, the lane needs a different shape, not a bigger `EXPAND_LIMIT`.
 
 **How to check them:**
 
@@ -308,6 +316,6 @@ fux build && shasum -a 256 .fux/runtime/graph.json
 # 2 — monotonicity by distance
 uv run pytest -q tests/graph/test_walk.py
 
-# 3 — the named targets (W-57, not yet run; blocked on W-56, a missing repo)
-#     see work/open/W-57-graph-lane-acceptance.md
+# 3 — the re-scoped targets (W-57, not yet run; the goldens need a human —
+#     see work/open/W-57-graph-lane-acceptance.md)
 ```

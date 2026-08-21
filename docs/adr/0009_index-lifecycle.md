@@ -13,7 +13,8 @@ timestamp: 2026-08-18T00:00:00Z
 - **Status:** accepted
 - **Supersedes:** `ADR-INDEX-FORMAT` — **archived 2026-08-18** at
   [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** `src/fux/store/`, `src/fux/derive/`
+- **Owns:** `src/fux/store/` — `src/fux/derive/` belongs to
+  [ADR-T1-ACCELERATOR](0011_accelerator.md), the derived plane's own record
 - **Laws:** L1, L2, L3, L6 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
 - **Feature:** generation and update of the committed index and its derived

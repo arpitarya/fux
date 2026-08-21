@@ -20,15 +20,7 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
-ADR_DIR = ROOT / "docs" / "adr"
-REGISTER = ADR_DIR / "README.md"
-OPEN_WORK = ROOT / "work" / "OPEN-WORK.md"
-
-# A record's directory is its state. `docs/adr/` is live; `work/adr/` is
-# superseded-pending (still in force, replacement planned); `archive/adr/`
-# is superseded and may not back a live claim, so it is NOT scanned here.
-RECORD_DIRS = (ADR_DIR, ROOT / "work" / "adr")
+from adr_lib import ADR_DIR, RECORD_DIRS, ROOT, open_work_ids, ownership_table, register_names
 
 # Roots whose components must every one be claimed.
 CLAIMED_ROOTS = (ROOT / "src" / "fux", ROOT / "tools")
@@ -45,59 +37,11 @@ def _rel(p: Path) -> str:
 # parsing
 
 
-def _table_rows(text: str, start: str, end: str) -> list[list[str]]:
-    body = text.split(start, 1)[1].split(end, 1)[0]
-    rows = []
-    for line in body.splitlines():
-        line = line.strip()
-        if not line.startswith("|") or set(line) <= set("|- :"):
-            continue
-        cells = [c.strip() for c in line.strip("|").split("|")]
-        if cells and cells[0].lower() in {"component", "#"}:
-            continue
-        rows.append(cells)
-    return rows
-
-
-def ownership_table() -> dict[str, str]:
-    rows = _table_rows(
-        REGISTER.read_text(encoding="utf-8"),
-        "<!-- OWNERSHIP-TABLE-START -->",
-        "<!-- OWNERSHIP-TABLE-END -->",
-    )
-    table: dict[str, str] = {}
-    for cells in rows:
-        component = cells[0].strip("`").rstrip("/")
-        owner = cells[1].strip().strip("*").strip("`")
-        assert component not in table, f"{component} is claimed twice in the ownership table"
-        table[component] = owner
-    return table
-
-
 def records_on_disk() -> set[Path]:
     found: set[Path] = set()
     for d in RECORD_DIRS:
         found |= set(d.glob("[0-9][0-9][0-9][0-9]_*.md"))
     return found
-
-
-def register_names() -> dict[str, Path]:
-    """ADR-NAME -> the record's file, from the register table.
-
-    The link may point into `docs/adr/` or `work/adr/`; it is resolved
-    relative to the register, so the table stays the single source of both
-    a record's name and its current state.
-    """
-    text = REGISTER.read_text(encoding="utf-8")
-    names: dict[str, Path] = {}
-    pattern = r"\[(\d{4})\]\(([^)]*\d{4}_[^)]+\.md)\)\s*\|\s*\*\*(ADR-[A-Z0-9-]+)\*\*"
-    for m in re.finditer(pattern, text):
-        names[m.group(3)] = (ADR_DIR / m.group(2)).resolve()
-    return names
-
-
-def open_work_ids() -> set[str]:
-    return set(re.findall(r"\bW-\d{2}\b", OPEN_WORK.read_text(encoding="utf-8")))
 
 
 # --------------------------------------------------------------------------

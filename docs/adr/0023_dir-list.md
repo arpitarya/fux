@@ -246,7 +246,7 @@ invent the declaration and the measurement at once.
 - **This is a breaking change**, and a second one in the same area after the
   `middleware` → `fetcher` rename. Both are stopped runs with instructions, and
   both are cheapest now — `v0.32.0`, no external consumers.
-- **[W-45](../../work/open/W-45-source-exclusion.md) now has an obvious home.**
+- **[W-45](../../archive/open/W-45-source-exclusion.md) now has an obvious home.**
   It wants to exclude machine-generated subtrees from an indexed directory, and
   an attribute on a directory line is the natural shape. **Not decided here** —
   the set is closed at one, and W-45 is a fork with real options that deserves

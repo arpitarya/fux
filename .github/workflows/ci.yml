@@ -30,6 +30,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # test_adr_freshness.py audits every commit since docs/adr/RULE-SINCE
+          # (or since this test file was added) — a shallow clone would give it
+          # zero commits to look at, which is a silent pass, not a check.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:

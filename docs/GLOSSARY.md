@@ -126,12 +126,12 @@ pruning is forbidden ([P1-RERUN](../work/regression/2026-08-09-pruning-rerun/VER
 worst case is doing the scan's work, never a wrong answer.
 
 **Derived plane** — A child of the [`.fux` directory](#fux-directory) that is
-**rebuildable and gitignored**: `runtime/` (M2's accelerator segments) and
-`cache/` (M4's fetch cache). Each is created through `derived_dir()`, which
-drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/) so backup tools skip
-it, and each is named explicitly in `.fux/.gitignore`. Opposite of a
-*committed plane* (`index/`, `sources/`, `fetchers/`). See
-[ADR-DOTFUX](../archive/adr/0011_fux-dir-layout.md).
+**rebuildable and gitignored**: `runtime/` (M2's accelerator segments, and
+M4's fetch cache nested inside it at `runtime/fetch-cache/`). Created through
+`derived_dir()`, which drops a [`CACHEDIR.TAG`](https://bford.info/cachedir/)
+so backup tools skip it, and named explicitly in `.fux/.gitignore`. Opposite
+of a *committed plane* (`index/`, `sources/`, `fetchers/`). See
+[ADR-DOTFUX](adr/0003_fux-directory.md).
 
 **Doc-id** — A document's integer identity inside the wire index, assigned in
 **ledger sort order**. Not an arbitrary counter: sort order clusters related

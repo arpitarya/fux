@@ -221,7 +221,7 @@ the boundary, rendered by the CLI, exit 1.
   of play. An include-only source list makes that an easy thing to forget.
 - **`dirs` is include-only, with no exclusions** — so committed measurement
   evidence under `work/regression/` contaminates the corpus it measures. Filed
-  as [W-45](../../work/open/W-45-source-exclusion.md).
+  as [W-45](../../archive/open/W-45-source-exclusion.md).
 
 ### Alternatives considered
 

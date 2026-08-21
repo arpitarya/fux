@@ -2,7 +2,7 @@
 type: ADR
 name: ADR-HTTP-FETCHER
 title: "ADR-HTTP-FETCHER (0021) — the default HTTP fetcher"
-description: "A plain stdlib GET is the default fetcher, generated write-if-missing into the consumer's repo so core still holds zero network lines. Decided 2026-08-19; not yet built."
+description: "A plain stdlib GET is the default fetcher, generated write-if-missing into the consumer's repo so core still holds zero network lines. Decided and built 2026-08-19."
 status: accepted
 timestamp: 2026-08-19T00:00:00Z
 ---
@@ -10,7 +10,7 @@ timestamp: 2026-08-19T00:00:00Z
 # ADR-HTTP-FETCHER — the default fetcher
 
 - **Name:** `ADR-HTTP-FETCHER` — cite this everywhere; never cite the number
-- **Status:** accepted — **the decision is ratified; the file is not written yet**
+- **Status:** accepted — **built 2026-08-19**, the same day it was decided
 - **Date:** 2026-08-19
 - **Feature:** `.fux/fetchers/http.py` — the fetcher a URL gets when its line says nothing
 - **Owns (on build):** nothing in `src/` — like every fetcher it is consumer code. What lands in `src/` is one entry in `fuxdir.py`'s generated set
@@ -79,7 +79,8 @@ flowchart LR
 
 ### Examples
 
-**Specimen, not a capture** — the file is not written yet.
+**Captured from the 2026-08-19 build run** —
+[`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md).
 
 *Before:* a URL source needs a browser, or a hand-written fetcher, for a page a
 plain GET would have served.

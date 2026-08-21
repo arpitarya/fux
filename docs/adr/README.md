@@ -7,7 +7,7 @@ ADR, before citing one, and before adding a module to `src/`.
 One ADR per completed feature or ruled measurement. Every ADR carries a
 reference. Every record is **cited by name** in prose.
 
-## Two directories, three states
+## Two directories, two states
 
 **This file is the register for both.** A record's directory *is* its state:
 
@@ -16,15 +16,12 @@ reference. Every record is **cited by name** in prose.
 | **live** | `docs/adr/` (here) | yes |
 | **superseded** | [`archive/adr/`](../../archive/adr/README.md) | **no** — archive is not evidence |
 
-As of **2026-08-18** the entire v0.30 set is **superseded-pending** in
-`work/adr/`: those eight records are live and cited normally, and a replacement
-set is being written here. Only **ADR-LAWS** lives in `docs/adr/`, because it
-names the project's foundational rules rather than deciding a feature and is not
-being replaced.
-
-A record moves from `work/adr/` to `archive/adr/` **in the same change that
-accepts its successor** — never before, so no claim is ever left ungrounded.
-New records are written here, from [`TEMPLATE.md`](TEMPLATE.md).
+**The v0.30 set finished migrating into `docs/adr/` on 2026-08-18–19** — every
+live record is here now, and `work/adr/` (the transient superseded-pending tier
+the migration passed through) no longer exists. A record moves straight from
+`docs/adr/` to `archive/adr/` **in the same change that accepts its
+successor** — never before, so no claim is ever left ungrounded. New records
+are written here, from [`TEMPLATE.md`](TEMPLATE.md).
 
 ---
 
@@ -97,13 +94,13 @@ a record; the paraphrase is what drifts.
 
 | where | what it does |
 |---|---|
-| `tests/test_adr_freshness.py` | runs in CI (`pytest -q tests`). Fails any commit since the rule landed that changed an ADR-owned component without touching a record — and fails a working tree that is mid-violation |
-| [`scripts/adr-guard.sh`](../../scripts/adr-guard.sh) | the same check as a pre-commit hook: `ln -sf ../../scripts/adr-guard.sh .git/hooks/pre-commit` |
+| `tests/test_adr_freshness.py` | runs in CI (`pytest -q tests`, with `fetch-depth: 0` so the runner can see the history it audits). Fails any commit since the rule landed that changed an ADR-owned component without touching **that component's owning record specifically** — touching some other record does not count — and fails a working tree that is mid-violation |
+| [`scripts/adr-guard.sh`](../../scripts/adr-guard.sh) | the same check as a `commit-msg` hook (not `pre-commit` — it has to read the message, which does not exist yet at `pre-commit` time): `ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg` |
 
-**The escape hatch is `no ADR affected` in the commit message** (or `[no-adr]`).
-It is not a silent skip — it is a claim, in git history, under your name, that
-you checked and there was nothing to update. That is exactly what the rule asks
-for.
+**The escape hatch is a line reading exactly `no ADR affected` in the commit
+message** (or `[no-adr]`), on its own line. It is not a silent skip — it is a
+claim, in git history, under your name, that you checked and there was nothing
+to update. That is exactly what the rule asks for.
 
 **The baseline is self-bootstrapping**: the check applies from the commit that
 added it, never retroactively. After a bulk review you can move the baseline
@@ -310,8 +307,10 @@ OPEN-WORK,DOC-REGISTRY}.md` → `work/…`. ADR filenames also went from
 
 A second move the same day took `docs/paper/`, `docs/handoff/` and the two
 architecture SVGs into `work/`, and the eight v0.30 records into `work/adr/` as
-superseded-pending. `docs/` now holds only `GLOSSARY.md`,
-`index.md`, and this register with `TEMPLATE.md` and ADR-LAWS.
+superseded-pending. **As of that day**, `docs/` held only `GLOSSARY.md`,
+`index.md`, and this register with `TEMPLATE.md` and ADR-LAWS — the v0.30
+records finished migrating into `docs/adr/` over the following day, and
+`work/adr/` no longer exists (see "Two directories, two states" above).
 
 **ADR-LAWS was renumbered `0013` → `0001`** in the same change, opening the new
 sequence. Anything written before 2026-08-18 that says "0013" means ADR-LAWS.

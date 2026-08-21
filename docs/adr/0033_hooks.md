@@ -10,7 +10,10 @@ timestamp: 2026-08-20T00:00:00Z
 # ADR-MAINTENANCE: keeping the index in step
 
 - **Name:** `ADR-MAINTENANCE` — cite this everywhere; never cite the number
-- **Status:** proposed — **R5 measured 2026-08-20 and FAILED**; R6 INCONCLUSIVE.
+- **Status:** proposed — **R5 measured 2026-08-20 and FAILED**; R6 reads as
+  INCONCLUSIVE, but whether it is PASS (pre-registration §3.1) or not-yet
+  (§3.2) is itself an open call for Arpit
+  ([W-61](../../work/open/W-61-maintenance-measurement.md)).
   Acceptance is not a formality away: veto condition 1 has fired, and what
   replaces the automatic hook is an open fork
   ([`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md))
@@ -245,7 +248,8 @@ legal, explicit, per-document opt-out
   several viable answers, so it is
   [`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md) and
   Arpit's verdict, not this record's to assume.
-- **R6 is INCONCLUSIVE, and the engine is not the reason** —
+- **R6 is read as INCONCLUSIVE, pending Arpit's call on §3.1 vs §3.2, and the
+  engine is not the reason** —
   [R6-MERGE](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md). All
   three tiers matched their expected outcome; tiers 2 and 3 are informative
   against a control arm with the driver unregistered. **Tier 1 merged cleanly

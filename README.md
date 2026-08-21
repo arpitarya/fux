@@ -39,8 +39,12 @@ at answer time.**
 > **only** networked path in the engine. A line picks its own fetcher; nothing
 > escalates automatically ([ADR-URL-LIST](docs/adr/0018_url-list.md) ·
 > [ADR-FETCHER](docs/adr/0019_fetcher.md)).
-> No graph query lane yet (M3). The v0.26
-> engine and its docs are archived under
+> **The graph lane has landed (M3, unreleased)** — `explain`/`graph`/`path`,
+> unseeded label-propagation communities, a lazy PPR walk
+> ([ADR-GRAPH](docs/adr/0030_graph.md)) — with two named gaps still open: its
+> playground acceptance targets are unmeasured and determinism is verified on
+> one machine, not two ([W-57](work/open/W-57-graph-lane-acceptance.md)). The
+> v0.26 engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
 > is specified in
 > [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md)
@@ -80,8 +84,7 @@ Everything fux puts in your repo lives here, and every child is declared as
 | `index/` | committed | the sharded JSONL index |
 | `sources/` | committed | the source lists — `dirs` and `urls`, one entry per line |
 | `fetchers/` | committed | **your** code (`http.py`, `cdp.py`) — written by `fux setup`, never rewritten |
-| `runtime/` | derived | M2's accelerator segments (gitignored, `CACHEDIR.TAG`) |
-| `cache/` | derived | M4's fetch cache (gitignored, `CACHEDIR.TAG`) |
+| `runtime/` | derived | M2's accelerator segments, and M4's TTL fetch cache nested at `runtime/fetch-cache/` (gitignored, `CACHEDIR.TAG`) |
 
 **Scaffolding has two moments.** Every `fux ingest` writes `.fux/README.md`
 and a narrow `.fux/.gitignore` (derived names only, never `*`) if they are
@@ -98,7 +101,7 @@ undeclared.
 1. [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) — architecture + falsifiable predictions
 2. [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md) — the committed format, measured
 3. [the ADR register](docs/adr/README.md) — milestones M0–M8
-4. [`work/adr/0004_index-format.md`](archive/adr/0004_index-format.md) — the frozen M1 schema
+4. [`archive/adr/0004_index-format.md`](archive/adr/0004_index-format.md) — the frozen M1 schema, named here for orientation only (archive is not evidence — see [`archive/README.md`](archive/README.md))
 5. [`../fux-playground/PLAYGROUND.md`](../fux-playground/PLAYGROUND.md) — a graded 10-doc corpus to try it on, in a **separate sibling repository** (clone it next to this one)
 6. [`work/WORKLOG.md`](work/WORKLOG.md) — the running build log
 
