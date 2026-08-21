@@ -10,6 +10,7 @@ from __future__ import annotations
 import pytest
 
 from fux.errors import FuxError
+from fux.store.displaycache import DisplayCache
 from fux.store.reader import read_index
 from fux.store.writer import assert_meta_policy, write_index
 
@@ -18,8 +19,13 @@ def _git(doc_id="file:a.md", **extra) -> dict:
     return {"id": doc_id, "src": "git", "loc": "a.md", "mode": "extracted", **extra}
 
 
-def _url(doc_id="url:https://x/1", **extra) -> dict:
-    return {"id": doc_id, "src": "url", "loc": "https://x/1", "mode": "extracted", **extra}
+def _url(doc_id="url:https://x/1", sha="deadbeef", **extra) -> dict:
+    return {"id": doc_id, "src": "url", "loc": "https://x/1", "mode": "extracted", "sha": sha, **extra}
+
+
+def _warm(tmp_path, sha="deadbeef", doc_id="url:https://x/1", title="T") -> None:
+    """Pre-populate the P5 display cache for `sha`, as ingest would before a commit."""
+    DisplayCache(tmp_path).put(sha, doc_id, title)
 
 
 # -- git sources are exempt, and that is the whole asymmetry ---------------
@@ -32,7 +38,7 @@ def test_a_git_record_may_carry_a_title(tmp_path):
 
 
 def test_a_git_record_needs_no_meta_at_all(tmp_path):
-    assert_meta_policy(_git())
+    assert_meta_policy(_git(), tmp_path)
 
 
 # -- non-git records must say what they are --------------------------------
@@ -63,8 +69,28 @@ def test_hashed_without_a_title_hash_is_refused(tmp_path):
 
 
 def test_hashed_and_clean_is_written(tmp_path):
+    _warm(tmp_path)
     write_index(tmp_path, [_url(meta="hashed", title_h="abc")])
     assert read_index(tmp_path)["url:https://x/1"]["title_h"] == "abc"
+
+
+# -- P5: materialise-first — a hashed record needs cache-backed display -----
+
+
+def test_hashed_without_a_display_cache_entry_is_refused(tmp_path):
+    """`title_h` alone is not enough — P5's whole point is that something
+    readable must exist for a reader, and that something is this cache."""
+    with pytest.raises(FuxError, match="no display-cache entry"):
+        write_index(tmp_path, [_url(meta="hashed", title_h="abc")])
+    assert not (tmp_path / ".fux" / "index").exists()
+
+
+def test_hashed_with_a_display_cache_entry_for_a_different_sha_is_refused(tmp_path):
+    """The cache is keyed by *this* record's sha — a warm cache for some
+    other document's content does not satisfy the invariant."""
+    _warm(tmp_path, sha="unrelated-sha")
+    with pytest.raises(FuxError, match="no display-cache entry"):
+        write_index(tmp_path, [_url(meta="hashed", title_h="abc", sha="deadbeef")])
 
 
 def test_plain_is_a_legal_explicit_opt_out(tmp_path):
@@ -90,6 +116,7 @@ def test_the_leak_cannot_be_smuggled_past_by_a_second_writer(tmp_path):
     `ingest/run.py`, so any caller that did not go through ingest wrote
     whatever it liked into a committed shard.
     """
+    _warm(tmp_path)
     write_index(tmp_path, [_url(meta="hashed", title_h="abc")])       # a clean index
     with pytest.raises(FuxError, match="ACL-mismatch leak"):
         write_index(tmp_path, [_url(meta="hashed", title_h="abc", title="now with a title")])

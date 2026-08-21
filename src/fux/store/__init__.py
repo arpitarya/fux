@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
+from .displaycache import DisplayCache
 from .fuxdir import COMMITTED, DECLARED, DERIVED, FUX_DIR, derived_dir, ensure_layout, fux_dir
 from .format import (
     ANALYZER_VERSION,
@@ -39,6 +40,7 @@ __all__ = [
     "TF_FIELDS",
     "TITLE_HASH_PREFIX",
     "CollisionTracker",
+    "DisplayCache",
     "canonical_dumps",
     "content_sha",
     "display_title",

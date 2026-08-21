@@ -193,6 +193,10 @@ def run(root: Path, *, refresh_urls: bool = False, full: bool = False) -> Ingest
         else:  # hashed meta — the non-git default (L5); no display text leaks
             record["meta"] = "hashed"
             record["title_h"] = store_mod.title_hash(fields.title)
+            # Materialise-first (P5): the bytes are already in hand this run,
+            # so this costs a write, not a fetch. `write_index` refuses to
+            # commit this record without it (`store/writer.py`).
+            store_mod.DisplayCache(root).put(record["sha"], doc_id, fields.title)
         if fields.code is not None:
             record["code"] = fields.code
         records.append(record)

@@ -10,6 +10,25 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`hashed` records now show a real title when their source's bytes are
+  reachable, and a labelled hash — never a bare, indistinguishable-from-
+  working one — when they are not** (PRIORITY.md P5, 2026-08-21,
+  `meta-privacy.compare.md` reopened). Ingest already holds a non-git
+  document's bytes before writing its record, so it now also writes the
+  title to a new local, gitignored, content-addressed cache
+  (`.fux/runtime/display-cache/`) before the record is allowed to commit —
+  `store/writer.py` refuses a `hashed` record with no cache entry for its
+  `sha`. `ask`/`find`/`answer` (text and `--json`) resolve through it. The
+  committed record is unchanged — still `title_h` only — and so is ranking:
+  the differential law is untouched, since `rank()` never consults the
+  cache. Two of the row's three sub-questions were also decided: term-hash
+  salting was researched and **not built** (a committed salt is not a salt);
+  `code` (the dense embedding) **stays** on hashed records despite a
+  demonstrated inversion risk, traded against `--hybrid`'s ranking quality,
+  documented rather than closed. The third (`loc`/`id`) turned out to need
+  no decision — the refer plane fetches through `loc` directly, and it is
+  already committed in plaintext via the separate URL source list, so
+  hashing it would cost function for no privacy gained.
 - **The `PreToolUse` write lock is per-asset, not repo-wide.** Two Claude
   sessions editing different files now run in parallel; only a genuine
   same-file conflict is denied (`.claude/hooks/session-lock.sh`).

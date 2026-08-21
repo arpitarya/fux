@@ -308,6 +308,17 @@ and the differential harness now carries a hashed record to prove it.
   value rather than setting it. Changing it rewrites every path in the tree.
 - **This record does not retire its predecessors**, which remain ⏳ *proposed*
   and unratified.
+- **`write_index` gained a second per-record refusal (P5, 2026-08-21):** a
+  `hashed` record with no matching entry in `.fux/runtime/display-cache/`
+  (keyed by `sha`) is refused alongside the existing L5 leak check, in the
+  same `assert_meta_policy` call — one door, one lock, extended rather than
+  duplicated. The cache itself is gitignored runtime state, same tier as the
+  accelerator: this decision's own "derived plane is disposable" (5) already
+  covers it, so nothing here changed shape, only grew a second store next to
+  the existing one. Full rationale — why the cache, why content-addressed, why
+  no clock — lives on [ADR-RECORD](0010_index-record.md), which owns the
+  privacy shape this exists for; this record owns only that the write refuses
+  correctly.
 
 ### Alternatives considered
 
@@ -333,6 +344,9 @@ and the differential harness now carries a hashed record to prove it.
 - The build and its invariants —
   [`src/fux/derive/build.py`](../../src/fux/derive/build.py) (the module
   docstring states why raw-byte and parsed statistics must agree).
+- The P5 write-time refusal —
+  [`assert_meta_policy`](../../src/fux/store/writer.py); the cache it checks —
+  [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py).
 - Artifacts and staleness behaviour, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §§2–5.
 - The measured basis for the accelerator and the differential law —

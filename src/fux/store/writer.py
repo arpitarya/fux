@@ -45,6 +45,7 @@ from pathlib import Path
 from ..errors import FuxError
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
+from .displaycache import DisplayCache
 from .format import HEADER, index_dir, shard_for, shard_path
 
 HEADER_LINE = canonical_dumps(HEADER)
@@ -71,7 +72,7 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
         if doc_id in seen_ids:
             raise FuxError(f"duplicate id in index write: {doc_id!r}")
         seen_ids.add(doc_id)
-        assert_meta_policy(record)
+        assert_meta_policy(record, root)
         by_shard.setdefault(shard_for(doc_id), []).append(record)
 
     directory = index_dir(root)
@@ -102,7 +103,7 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
 DISPLAY_FIELDS = ("title", "phrases")
 
 
-def assert_meta_policy(record: dict) -> None:
+def assert_meta_policy(record: dict, root: Path) -> None:
     """Refuse to write a non-git record that leaks display text (L5).
 
     Raises `FuxError` naming the document and the fix. Called per record by
@@ -136,6 +137,15 @@ def assert_meta_policy(record: dict) -> None:
             raise FuxError(
                 f"{doc_id}: meta is 'hashed' but there is no `title_h`. A record with neither "
                 "a title nor a title hash cannot be cited by any verb"
+            )
+        sha = record.get("sha")
+        if sha is None or DisplayCache(root).get(sha) is None:
+            raise FuxError(
+                f"{doc_id}: meta is 'hashed' but no display-cache entry exists for its sha "
+                f"({sha!r}). A hashed record's bytes must be materialised into the local "
+                "display cache before the record is committed — `title_h` alone leaves no "
+                "reader-facing surface able to show a real title (P5, materialise-first). "
+                "Re-run ingest with a live fetch for this document to repopulate it"
             )
 
 

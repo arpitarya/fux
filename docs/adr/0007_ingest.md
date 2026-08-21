@@ -259,6 +259,19 @@ docs/logo.png: binary
   now [ADR-EXTRACTED](0016_extracted-mode.md), which also takes
   `ingest/extract.py`; this record keeps how ingest *runs*. Both were ratified
   by Arpit on 2026-08-19, closing W-30.
+- **A `hashed` URL record now writes a second thing before it is eligible to
+  commit (P5, 2026-08-21).** The fresh-fetch loop already holds the bytes in
+  `fresh[doc_id]` this run, so it also writes the extracted title to
+  `.fux/runtime/display-cache/`, keyed by `sha` — a write, not a fetch, so
+  this changes ingest's cost by nothing measurable. The offline-by-default law
+  above is untouched by construction: nothing here adds a network call: a
+  *carried-forward* `hashed` record (this run made no fetch for it) whose
+  cache has gone cold is not silently accepted either — `store/writer.py`
+  refuses it, naming the fix as `fux ingest --refresh-urls`. A plain run
+  still makes zero network calls; it can now also fail loudly, on a corpus
+  that predates P5 or whose cache was evicted, rather than commit a hashed
+  record no reader can ever show a title for. Full rationale on
+  [ADR-RECORD](0010_index-record.md).
 
 ### Alternatives considered
 
@@ -291,6 +304,10 @@ docs/logo.png: binary
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §4.
 - The write-if-identical guarantee —
   [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md).
+- P5's materialise-first write —
+  [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py),
+  called from the fresh-fetch loop in
+  [`ingest/run.py`](../../src/fux/ingest/run.py).
 - Prior art for corpus-wide link resolution as a separate pass — Sphinx's
   two-phase read/resolve build:
   https://www.sphinx-doc.org/en/master/extdev/appapi.html#build-phases

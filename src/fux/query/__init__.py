@@ -76,7 +76,7 @@ def cmd_ask(args) -> int:
         # answered a slow query needs it in the machine-readable form too. The
         # key is additive and appears only when asked for, so no existing
         # consumer's parse changes (W-48).
-        payload: dict = {"results": [r.__dict__ for r in results]}
+        payload: dict = {"results": [_as_dict(root, r) for r in results]}
         if getattr(args, "explain", False):
             payload["path"] = path
         print(json_mod.dumps(payload, indent=2))
@@ -87,7 +87,7 @@ def cmd_ask(args) -> int:
         return 0
 
     for r in results:
-        print(f"{r.score:.4f}  {r.title}  ({r.loc})")
+        print(f"{r.score:.4f}  {_resolve_title(root, r.id, r.title)}  ({r.loc})")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
     return 0
@@ -99,7 +99,7 @@ def cmd_find(args) -> int:
     results, _ = run_query(root, args.query, args.top, force_scan=getattr(args, "scan", False))
 
     if args.json:
-        print(json_mod.dumps({"results": [r.__dict__ for r in results]}, indent=2))
+        print(json_mod.dumps({"results": [_as_dict(root, r) for r in results]}, indent=2))
         return 0
 
     if not results:
@@ -138,12 +138,13 @@ def cmd_answer(args) -> int:
 
     best = results[0]
     phrases = _phrases_for(root, best.id)
+    title = _resolve_title(root, best.id, best.title)
 
     if args.json:
         print(
             json_mod.dumps(
                 {
-                    "answer": {"title": best.title, "phrases": phrases},
+                    "answer": {"title": title, "phrases": phrases},
                     "citation": {"id": best.id, "loc": best.loc, "score": best.score},
                     "source": "index",
                 },
@@ -152,7 +153,7 @@ def cmd_answer(args) -> int:
         )
         return 0
 
-    print(best.title)
+    print(title)
     for phrase in phrases:
         print(f"  - {phrase}")
     print(f"\n  -- {best.loc}")
@@ -162,13 +163,46 @@ def cmd_answer(args) -> int:
 
 def _phrases_for(root: Path, doc_id: str) -> list[str]:
     """The winning record's heading-derived phrases, read from its shard alone."""
+    record = _record_for(root, doc_id)
+    return list(record.get("phrases", [])) if record is not None else []
+
+
+def _record_for(root: Path, doc_id: str) -> dict | None:
+    """`doc_id`'s own committed record, read from its shard alone — one shard,
+    not the corpus, the same shape as `_phrases_for`."""
     from .. import store as store_mod
 
     path = store_mod.shard_path(root, store_mod.shard_for(doc_id))
     if not path.exists():
-        return []
+        return None
     _, records = store_mod.read_shard(path)
     for record in records:
         if record["id"] == doc_id:
-            return list(record.get("phrases", []))
-    return []
+            return record
+    return None
+
+
+def _resolve_title(root: Path, doc_id: str, fallback_title: str) -> str:
+    """P5: the best title to show for `doc_id`.
+
+    `rank()` already computed `fallback_title` with no cache access — it must
+    stay a pure function of the record for the differential law
+    (`store.display_title`'s docstring). This is a *second*, display-only
+    lookup, after the accelerator and scan paths have already produced
+    byte-identical results, so applying it uniformly here can never make the
+    two paths disagree. Re-reads one shard rather than trusting
+    `fallback_title`'s shape to reveal whether the record is hashed.
+    """
+    from .. import store as store_mod
+
+    record = _record_for(root, doc_id)
+    if record is None:
+        return fallback_title
+    return store_mod.display_title(record, cache=store_mod.DisplayCache(root))
+
+
+def _as_dict(root: Path, result: AskResult) -> dict:
+    """`AskResult` as JSON, with `title` upgraded through the P5 display cache."""
+    payload = dict(result.__dict__)
+    payload["title"] = _resolve_title(root, result.id, result.title)
+    return payload

@@ -171,7 +171,7 @@ meaning from position:
 |---|---|
 | `title` | shown in results. **Present only when `meta` is `"plain"`** |
 | `phrases` | heading-derived phrases — what [ADR-ANSWER](0006_answer.md) returns. **`"plain"` only** |
-| `title_h` | `"h:"` + the term hash of the title, **instead of** `title`/`phrases` when `meta` is `"hashed"`. Enough to identify, not enough to read. The prefix is storage and is stripped for display; it exists to keep rule 2 above true |
+| `title_h` | `"h:"` + the term hash of the title, **instead of** `title`/`phrases` when `meta` is `"hashed"`. Enough to identify, not enough to read *from the committed bytes* — since P5 (2026-08-21) a reader is not limited to the committed bytes; see Consequences |
 
 **Graph and policy:**
 
@@ -197,9 +197,28 @@ meaning from position:
 
 - **A document's change is one line in one shard**, so `git diff` is readable
   and merges land per document.
-- **Hashed records rank but do not read.** `fux ask` prints
-  `30aef0c52cf11116` where a title would be. That is the mode working as
-  designed, and a real usability cost.
+- **Hashed records rank but do not read *from the committed line alone* — no
+  longer the whole story since P5 (2026-08-21, `meta-privacy.compare.md`
+  reopened).** The line above was true through M5: `fux ask` printed
+  `30aef0c52cf11116` where a title would be, full stop. It is no longer the
+  whole story. Ingest already holds a non-git document's bytes in memory
+  before it writes the record (`fresh` in `ingest/run.py`), so it now also
+  writes the title to `.fux/runtime/display-cache/` — gitignored, keyed by
+  `sha`, never committed — **before** `store/writer.py` will accept the
+  record (`assert_meta_policy` refuses a `hashed` record with no cache entry
+  for its `sha`). `store.display_title(record, cache=...)` is the one place
+  every reader-facing surface (`ask`/`find`/`answer` — `explain`, `--json`,
+  and text, all four) resolves the title from: the committed line still
+  carries only `title_h`, and a warm cache is what turns that back into text
+  a reader sees. A **cold** cache (evicted, or a pre-P5 record whose ingest
+  predates this feature) still degrades to the hash — but now labelled
+  `"<hash> (uncached — title unavailable)"` rather than a bare hash a reader
+  cannot tell from a working system. `phrases` is **not** materialised — the
+  cache holds only `title`, so `fux answer` on a hashed document now shows a
+  real title with an empty phrase list, not a full parity restoration.
+  Ranking itself is untouched: `rank()`'s two call sites pass no `cache`, so a
+  score is still a pure function of the committed record, exactly as before —
+  this is a display-layer fix, not a scoring one.
 - **`title_h` used to break rule 2, and the fix was the field, not the rule.**
   A bare 16-hex token outside `terms` made the accelerator refuse to build over
   any corpus containing one — so the `hashed` default, an L5 default, shipped
@@ -210,6 +229,16 @@ meaning from position:
 - **Adding a property is a schema change**, requiring an `_format` bump and a
   re-ingest of every corpus. That cost is the point: it is what keeps the
   committed plane from accumulating conveniences.
+- **`terms` is not salted, and `code` is not excluded from `hashed` records —
+  both examined and ruled at P5, not overlooked.** A committed, per-index
+  salt is not a salt (a cloner gets it too — `meta-privacy.compare.md`); a
+  genuine per-deployment salt was considered and rejected as real added
+  complexity (an out-of-band provisioning story for every query client) for a
+  narrower gain than it looks like, since volume leakage (`terms`' tf,
+  `wlen`) reconstructs regardless of how the term keys were hashed. `code`
+  keeps its demonstrated risk (embedding inversion, Morris et al. EMNLP
+  2023) documented rather than closed, on the same footing `title_h` was on
+  before P5 — accepted for now, not settled forever.
 
 ### Alternatives considered
 
@@ -231,6 +260,13 @@ meaning from position:
   [`src/fux/store/format.py`](../../src/fux/store/format.py); the encoder —
   [`canonical.py`](../../src/fux/store/canonical.py); record construction —
   [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py).
+- **P5's materialise-first cache** —
+  [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py) (the
+  store); the write-time refusal —
+  [`assert_meta_policy`](../../src/fux/store/writer.py); the display
+  resolution every verb shares —
+  [`display_title`](../../src/fux/store/format.py); the verdicts —
+  [`work/compare/meta-privacy.compare.md`](../../work/compare/meta-privacy.compare.md).
 - Real records, both `plain` and `hashed` —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §2 and §6.
 - Canonical JSON, the prior art the encoder follows — RFC 8785:

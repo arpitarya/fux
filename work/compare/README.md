@@ -32,7 +32,7 @@ debate without archaeology. v0.26-era compare docs are archived at
 | [storage-architecture](storage-architecture.compare.md) | index-and-refer vs snapshot substrate vs full-copy | **index-and-refer** (size amended by P1-RERUN: full postings) | ✅ accepted (council 2026-08-09) |
 | [wire-format](wire-format.compare.md) | one format vs wire/runtime split; codec choice | split; BIC wire — **superseded for the committed plane by index-format; survives inside tier T2** | ⚠ superseded |
 | [keyspace-unification](keyspace-unification.compare.md) | six planes vs one MST keyspace vs wavelet self-index | one MST keyspace — **superseded: git itself now provides the Merkle tree (index-format)** | ⚠ superseded |
-| [meta-privacy](meta-privacy.compare.md) | plain vs hashed-default vs hashed-only meta | **hashed-by-default for external sources** | ✅ accepted (council) |
+| [meta-privacy](meta-privacy.compare.md) | plain vs hashed-default vs hashed-only meta; reopened for materialise-first display + its forks | **hashed-by-default** (2026-08-09) + **D — materialise first, then index** (2026-08-21): L2 exception not needed, cache-miss forces a re-fetch, salt not built, `loc`/`id` unchanged (architecture), `code` kept | ✅ accepted (both halves) |
 | [cache-policy](cache-policy.compare.md) | LRU vs ARC | **ARC** | ✅ accepted |
 | [ingest-mode-naming](ingest-mode-naming.compare.md) | "extracted" vs "enriched" vs "advanced" for the AI tier | **enriched** (proposed) | ⏳ awaiting Arpit |
 | [source-exclusion](source-exclusion.compare.md) | exclusion attribute vs exclusion *entry* vs `.fuxignore` vs `.gitignore` vs the dot-prefix convention | **an exclusion entry `!path/glob` in `.fux/sources/dirs`** (proposed); C and D eliminated by measurement | ⏳ awaiting Arpit |

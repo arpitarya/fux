@@ -19,7 +19,7 @@ import pytest
 
 from fux.derive import accel, build
 from fux.query import scan
-from fux.store import term_hash, title_hash, write_index
+from fux.store import DisplayCache, content_sha, term_hash, title_hash, write_index
 
 TOPS = (1, 5, 20, 50)
 
@@ -134,12 +134,24 @@ def _hashed(doc_id, title, wlen, terms) -> dict:
     record["loc"] = doc_id.removeprefix("url:")
     record["meta"] = "hashed"
     record["title_h"] = title_hash(title)
+    # A real `sha` is `content_sha()`-shaped (40-hex): a `term_hash()`-shaped
+    # (16-hex) value here would itself trip `_assert_invariants`' stray-quoted-
+    # hash tripwire, the exact bug this fixture module exists to catch.
+    record["sha"] = content_sha(doc_id.encode("utf-8"))
+    return record
+
+
+def _warm(root, record) -> dict:
+    """Pre-populate P5's display cache for a `_hashed()` record, the way
+    `ingest/run.py` does before `write_index` will accept it. Returns the
+    record unchanged, so a call can be inlined into a `records = [...]` list."""
+    DisplayCache(root).put(record["sha"], record["id"], record["title_h"])
     return record
 
 
 def test_hashed_meta_titles(tmp_path):
     """`title_h` records must resolve the same display title on both paths."""
-    write_index(tmp_path, [_hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]})])
+    write_index(tmp_path, [_warm(tmp_path, _hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]}))])
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1,))
     # The prefix is storage. What a verb shows is the hash, opaque either way.
@@ -158,9 +170,9 @@ def test_a_corpus_holding_a_hashed_record_builds_and_agrees(tmp_path):
     records = [
         _rec("file:a.md", "A", 12, {term_hash("oncall"): [1, 2], term_hash("rotation"): [0, 1]}),
         _rec("file:b.md", "B", 30, {term_hash("oncall"): [0, 1]}),
-        _hashed("url:https://x/handbook", "Oncall handbook", 11,
-                {term_hash("oncall"): [1, 3], term_hash("pager"): [0, 2]}),
-        _hashed("url:https://x/deploys", "Deploy runbook", 20, {term_hash("rotation"): [0, 1]}),
+        _warm(tmp_path, _hashed("url:https://x/handbook", "Oncall handbook", 11,
+                {term_hash("oncall"): [1, 3], term_hash("pager"): [0, 2]})),
+        _warm(tmp_path, _hashed("url:https://x/deploys", "Deploy runbook", 20, {term_hash("rotation"): [0, 1]})),
     ]
     write_index(tmp_path, records)
     build(tmp_path)  # must not raise: the invariant holds by field shape
@@ -173,7 +185,7 @@ def test_a_pre_prefix_title_h_still_stops_the_build_and_names_the_migration(tmp_
 
     record = _hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]})
     record["title_h"] = term_hash("Page A")  # the bare, pre-2026-08-19 shape
-    write_index(tmp_path, [record])
+    write_index(tmp_path, [_warm(tmp_path, record)])
     with pytest.raises(FuxError, match="predates the `h:` prefix"):
         build(tmp_path)
 

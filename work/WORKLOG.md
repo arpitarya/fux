@@ -28,6 +28,73 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — PRIORITY P5: materialise-first display for hashed records  ·  Claude Code
+
+- **Asked:** "implement p five" — PRIORITY.md's next-ranked item, closing the
+  L5 leak by making `hashed` records readable through a local cache rather
+  than by weakening what gets committed. The row itself named two forks and
+  three sub-questions as Arpit's to rule on, not an agent's, so the session
+  put all five to him via `AskUserQuestion` before writing any code, with
+  grounding gathered from the actual codebase first (not guessed options).
+- **Decided (Arpit, live):** L2 — the mandatory cache needs **no exception**,
+  citing `ADR-CACHE`'s two-day-old identical ruling on gitignored/never-
+  committed caches. Delta path — **force a re-fetch** to repopulate a cold
+  cache rather than degrade silently (turned out already true in spirit:
+  `_reusable()` never carries a `hashed` record forward without a fetch
+  attempt, so this ruling changed no live behaviour, only made the
+  write-time refusal absolute). Salt — **not built** (a committed salt is
+  not a salt; volume leakage reconstructs regardless). `code` — **kept**
+  despite a demonstrated inversion risk, traded against `--hybrid` ranking
+  quality. `loc`/`id` — turned out not to be a real choice: grounding showed
+  `loc` is the refer plane's only fetch address and is already committed in
+  plaintext via the separate URL source list, so hashing it would cost
+  function for zero privacy gained. This corrects the row's own
+  "reveals neither title tokens nor URL slug" done-when clause, stated
+  explicitly rather than quietly dropped.
+- **Did:** `src/fux/store/displaycache.py` (new) — a `sha`-keyed, gitignored,
+  size-capped cache under `.fux/runtime/display-cache/`, no wall clock
+  (monotonic `seq`, matching `ADR-CACHE` decision 8's "clock lives in the TTL
+  store and nowhere else"). `ingest/run.py`'s fresh-fetch loop writes it
+  before the record. `store/writer.py`'s `assert_meta_policy` refuses a
+  `hashed` record with no cache entry for its `sha` — same door as the
+  existing L5 leak check, extended not duplicated. `store/format.py`'s
+  `display_title` gained an optional `cache` parameter (both `rank()` call
+  sites pass none — ranking stays a pure function of the record, so the
+  differential law is untouched by construction); `query/__init__.py` gained
+  `_resolve_title`/`_as_dict`, a **second**, display-only lookup that runs on
+  the already-unified `results` list after `run_query` returns, so scan and
+  accelerator can never disagree through it (proved directly, not just
+  argued — `test_the_scan_and_accelerator_paths_agree_on_a_cold_hashed_
+  title`). Reopened `meta-privacy.compare.md` with all five rulings and a new
+  reopen-trigger. Updated every ADR Law zero and PRIORITY.md's row require:
+  ADR-RECORD (full rationale), ADR-INDEX-LIFECYCLE, ADR-INGEST, ADR-ASK (each
+  their own touched component), ADR-REFER (a clarifying note that this is
+  not the refer plane). CLAUDE.md §L2/ADR-LAWS **deliberately untouched**,
+  per the L2 ruling. New tests: `tests/store/test_displaycache.py`,
+  `tests/store/test_meta_policy.py` additions,
+  `tests/query/test_display_title.py` (8 tests, warm/cold/JSON/text/
+  differential-agreement). Fixed three now-stale differential fixtures
+  (`_hashed()` needed a `sha`, shaped so it does not itself trip the
+  stray-16-hex-token tripwire it exists to guard).
+- **Also in this session (interrupt, before P5):** the `PreToolUse`
+  session-lock hook was rewritten from one repo-wide lock to a per-asset
+  lock — logged separately below (same date, prior entry) since it was a
+  distinct, user-requested change, not part of P5.
+- **Decided / open:** PRIORITY.md's P5 row marked **"OPEN — implemented,
+  uncommitted"** rather than DONE — this repo's convention ties DONE to a
+  landed commit sha, and nothing in this session has been committed (never
+  commits without being asked). `uv run pytest -q tests tests_e2e` green,
+  866 passed. IMPLEMENTATION.md's row is intentionally not added yet, for
+  the same reason.
+- **Next:** ask whether to commit. Once landed: flip PRIORITY.md P5 to DONE
+  with the sha, add its IMPLEMENTATION.md row, and check whether P6 is next
+  or whether W-61 (still blocked on Arpit, unrelated to P5) should be
+  addressed first.
+- **Cost:** unmeasured — a long single-turn session (five code files, one new
+  module, five ADRs, one compare doc, three test files, ~900 test-suite
+  assertions run twice). Not tracked in tokens or wall-clock.
+
+
 ## 2026-08-21 — the session-lock hook: per-asset, not repo-wide  ·  Claude Code
 
 - **Asked:** two Claude sessions were running concurrently; the old

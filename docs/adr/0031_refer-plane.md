@@ -15,7 +15,10 @@ timestamp: 2026-08-20T00:00:00Z
   acceptance still waits on the budget sweep (W-59, unmeasured — below)
 - **Date:** 2026-08-20
 - **Feature:** M4 — the refer plane (core landed, R4 bench run; adapters and the budget sweep outstanding)
-- **Owns:** `src/fux/refer/` · `tools/refer-bench/`
+- **Owns:** `src/fux/refer/` · `tools/refer-bench/` — **except `arc.py` and
+  `fetchcache.py`**, carved out to [ADR-CACHE](0035_cache.md) on 2026-08-21
+  (most specific wins). The bench stays here: `tools/refer-bench/` runs R4 for
+  the whole plane, and a component is owned once
 - **Laws:** L1, L2, L3, L4
 
 ---
@@ -158,41 +161,13 @@ compares the fetched bytes' sha against the recorded sha. This answers *"is the
 index still right"* exactly, where an age only ever answered *"is it probably
 still right"* — and it reads no clock, so it costs L3 nothing.
 
-**5a. A TTL-bounded local fetch cache** (added 2026-08-20, W-60, Arpit's
-verdict **F**). External fetches may be served from
-`.fux/runtime/fetch-cache/` for `cache_ttl_seconds`, default **0 — off**, and
-opt-in per caller. `no_cache` refuses caching outright whatever the TTL says:
-the escape hatch for access-controlled and regulated sources, where a local
-copy outliving the reader's permission is exactly the risk L5 exists for.
-**This does not touch L2's single exception (per-source `snapshot` policy)**,
-because L2 forbids *durable* content and this cache is deliberately the
-opposite: unindexed, gitignored, TTL-bounded (default **0 — off**), and
-confined to one machine (5c) — nothing here is ever committed, so there is
-nothing for L2 to except.
-
-> **This is not a latency optimisation and it did not wait for R4.** Confluence
-> Cloud's REST API is rate-limited against a shared hourly point budget, and
-> Atlassian's own guidance is to cache stable responses. An agent asking ten
-> questions about one runbook must not fetch it ten times: at enterprise scale
-> that is not slow, it is **throttled** — and a throttled fetch degrades to
-> `unverified` for reasons that have nothing to do with the document.
-
-**5b. The TTL store is NOT ARC's store, and the separation is load-bearing.**
-ARC is keyed `(loc, sha)`, so a hit is byte-identical to what a fetch would
-have returned **or it is not a hit** — that is the entire proof behind decision
-9. A TTL entry is served *before* the sha is confirmed; that is what a TTL is.
-Putting it in ARC's keyspace would serve bytes under a key that no longer
-proves anything, and the proof would be gone with no test to notice.
-
-**5c. Wall clock lives in the TTL cache and nowhere else.** It gets the same
-treatment `runtime/stamp.json` already has: derived, per-machine,
-non-reproducible, gitignored, and it never reaches a committed record.
-**Decision 4 is untouched** — the record still carries no ingest time, and
-[W-58](../../archive/open/W-58-no-recorded-ingest-time.md) with
-[`record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)
-remains a separate open question. A reader should not conflate the two: one is
-a local note about *when we last looked*, the other would be a committed claim
-about *when a document was ingested*.
+**5a–5c. The TTL-bounded local fetch cache moved to
+[ADR-CACHE](0035_cache.md) on 2026-08-21** (decisions 6–11 there), together
+with the store separation and the rule that the wall clock lives in that
+cache and nowhere else. **These numbers are retired, not reused.** What
+stays here: decision 4 is untouched — the committed record still carries no
+ingest time — and the `cached` verdict that the TTL cache produces is
+decision 6 below, because a verdict belongs to the plane that reports it.
 
 **6. The verdict is four-state: `current` / `stale` / `unverified` /
 `cached`.**
@@ -216,14 +191,13 @@ forbids is going *out*.
 **8. The policy travels in the bundle.** A replay that silently used a
 different policy is indistinguishable from a replay that reproduced.
 
-**9. ARC, keyed `(loc, sha)`, and it cannot change an answer.** The content
-address is *in the key*, so a hit is byte-identical to what a fetch would have
-returned or it is not a hit. Recency is a monotonic ordering, never a
-timestamp. Scan resistance is the reason it is not an LRU: a hook re-indexing
-after a large merge is exactly the bulk scan that flushes an LRU's hot set, and
-here a miss costs a network fetch. Decided in
-[`work/compare/cache-policy.compare.md`](../../work/compare/cache-policy.compare.md);
-built here.
+**9. The content cache moved to [ADR-CACHE](0035_cache.md) on 2026-08-21**
+(decisions 1–5 there): ARC keyed `(loc, sha)`, so a hit is byte-identical to
+what a fetch would have returned or it is not a hit, and it therefore cannot
+change an answer. **This number is retired, not reused** — a doc citing
+"ADR-REFER decision 9" still resolves to the cache, which is now a record of
+its own. Decided in
+[`work/compare/cache-policy.compare.md`](../../work/compare/cache-policy.compare.md).
 
 **10. The answer limit is a byte budget; `k` is a secondary cap.** Bytes, never
 tokens — carrying a tokenizer per model family violates L1, and an approximate
@@ -250,14 +224,11 @@ the caller's window. `dropped` is reported so truncation is never silent.
 
 ### Consequences
 
-- **The TTL fetch cache now has a size cap (PRIORITY.md P4, 2026-08-21).**
-  `FetchCache.put()` was unbounded — an entry only stopped counting toward
-  `get()` once its TTL passed, and nothing ever deleted the file, so a
-  long-lived process caching many documents grew `runtime/fetch-cache/`
-  without limit. `max_bytes` (default 500 MB, chosen here — no number was
-  specified) now bounds total size on disk; `put()` evicts the oldest
-  entries by `fetched_at` first to make room, and refuses a single entry
-  that alone exceeds the cap rather than evicting everything else for it.
+- **Both caches, and their consequences, are now
+  [ADR-CACHE](0035_cache.md)'s** — the TTL store's disk cap (PRIORITY.md P4,
+  2026-08-21) and the ARC differential that keeps a cached bundle
+  byte-identical to an uncached one. They are named here because a reader of
+  this record needs to know they exist, not re-argued.
 - **Offline degradation is honest, and tested.** `file:` sources keep full
   function with no network; an unreachable external source yields `unverified`
   with the reason attached and **zero citations**, so nothing is invented from
@@ -295,6 +266,19 @@ the caller's window. `dropped` is reported so truncation is never silent.
   wiring a plane whose gate has not run into the default surface is how an
   unmeasured thing becomes load-bearing. The CLI surface is a separate change
   once R4 has a number.
+- **P5 (2026-08-21) makes `ask`/`find`/`answer` show real titles for `hashed`
+  records — this is not that wiring, and does not reopen the line above.**
+  The materialise-first display cache
+  ([`store/displaycache.py`](../../src/fux/store/displaycache.py)) is a third
+  store, unrelated to ARC or the TTL fetch cache this record owns: it is
+  populated at **ingest** time (not query time), keyed on `sha` (not `loc`),
+  holds only a title (never verified against a live fetch), and answers a
+  narrower question — *what did this document's title say*, not *is this
+  citation's content still current*. A hashed document's title showing up in
+  `ask` carries **no** freshness verdict and is not a citation; the refer
+  plane's fetch-verify-cite contract is exactly as unbuilt-into-the-default-
+  surface as the bullet above states. Full rationale on
+  [ADR-RECORD](0010_index-record.md).
 
 ### Alternatives considered
 
@@ -318,8 +302,9 @@ the caller's window. `dropped` is reported so truncation is never silent.
   misquote with a sha attached. Citations are whole passages or absent.
 - **Wiring the plane into `ask` in this change.** Rejected: see the last
   consequence.
-- **Putting the TTL cache inside ARC.** Rejected: decision 5b. It would cost
-  ARC's correctness proof and nothing would notice.
+- **Putting the TTL cache inside ARC.** Rejected, and the argument moved with
+  the decision — [ADR-CACHE](0035_cache.md) decision 1. It would cost ARC's
+  correctness proof and nothing would notice.
 - **A committed `fetched_at` on the record.** Rejected: it is exactly what
   decision 4 refused, and W-58 is where that question lives. A local, derived,
   gitignored timestamp answers "should I go out again" without making any
@@ -338,7 +323,8 @@ the caller's window. `dropped` is reported so truncation is never silent.
 - The two graduating proposals:
   [`work/proposals/caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md) ·
   [`work/proposals/token-budget-retrieval.md`](../../archive/proposals/token-budget-retrieval.md)
-- The cache decision this builds:
+- The caches, carved out 2026-08-21: [ADR-CACHE](0035_cache.md), and the fork
+  it settles:
   [`work/compare/cache-policy.compare.md`](../../work/compare/cache-policy.compare.md)
 - The plane and its tests: [`src/fux/refer/`](../../src/fux/refer/) ·
   [`tests/refer/`](../../tests/refer/)

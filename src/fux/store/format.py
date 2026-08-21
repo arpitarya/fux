@@ -51,17 +51,30 @@ def title_hash(title: str) -> str:
     return TITLE_HASH_PREFIX + term_hash(title)
 
 
-def display_title(record: dict) -> str:
-    """The title a verb shows: `title` when plain, the opaque hash when hashed.
+def display_title(record: dict, cache=None) -> str:
+    """The title a verb shows: `title` when plain, else the P5 display cache's
+    materialised title when hashed and warm, else a labelled opaque hash.
 
     One definition on purpose. Both candidate generators feed the same
     `rank()`, so a display fallback implemented twice is a differential-law
-    failure waiting for the two copies to drift.
+    failure waiting for the two copies to drift. `rank()`'s two call sites
+    pass no `cache` — ranking must stay a pure function of the record, so
+    that path always returns the bare hash, exactly as before P5. `cache`
+    (anything with `.get(sha) -> str | None`, i.e. `store.displaycache.
+    DisplayCache` — duck-typed so this module stays import-free of it) is
+    for a second, later call on the *same* record, purely for what a reader
+    sees, after the accelerator and scan paths have already agreed.
     """
     title = record.get("title")
     if title is not None:
         return title
-    return record.get("title_h", "").removeprefix(TITLE_HASH_PREFIX)
+    hexpart = record.get("title_h", "").removeprefix(TITLE_HASH_PREFIX)
+    if cache is None:
+        return hexpart
+    materialised = cache.get(record.get("sha", ""))
+    if materialised is not None:
+        return materialised
+    return f"{hexpart} (uncached — title unavailable)"
 
 
 def content_sha(content: bytes) -> str:
