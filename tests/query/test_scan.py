@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fux.query.scan import ask
+from fux.query.scan import ask, scan_candidates
 from fux.store import term_hash, write_index
 
 
@@ -90,6 +90,35 @@ def test_results_are_deterministic_across_repeated_calls(tmp_path):
     first = ask(tmp_path, "pruning")
     second = ask(tmp_path, "pruning")
     assert first == second
+
+
+def test_df_is_not_inflated_by_a_hash_quoted_outside_terms(tmp_path):
+    """A 16-hex term hash can appear quoted in a field other than `terms`
+    (a title, an id, a sha) without that document actually containing the
+    term. The substring prefilter that finds candidate lines is deliberately
+    imprecise — that's the whole B2 speed trick — but `df` must not inherit
+    that imprecision: it has to come from the parsed record's real `terms`
+    keys, not from the raw substring match, or the accelerator (which is
+    exact by construction) silently disagrees with this reference scan and
+    derive/build.py's tripwire refuses to build.
+    """
+    stray_hash = term_hash("deadbeefdeadbeef")
+    write_index(
+        tmp_path,
+        [
+            # The hash string is literally quoted in `title`, not a key of `terms`.
+            _rec("file:stray.md", stray_hash, 10, {}),
+            _rec("file:real.md", "Real", 10, {stray_hash: [0, 1]}),
+        ],
+    )
+    query_hashes = [stray_hash]
+    candidates, df, corpus = scan_candidates(tmp_path, query_hashes)
+    assert df[stray_hash] == 1  # only file:real.md actually has the term
+    # Both lines matched the cheap substring prefilter (so both were parsed),
+    # but only the real match should ever score above zero and be returned.
+    assert {c["id"] for c in candidates} == {"file:stray.md", "file:real.md"}
+    results = ask(tmp_path, "deadbeefdeadbeef")
+    assert [r.id for r in results] == ["file:real.md"]
 
 
 def test_scan_never_parses_non_candidate_lines(tmp_path, monkeypatch):

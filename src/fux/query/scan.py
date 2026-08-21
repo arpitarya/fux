@@ -58,12 +58,23 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
             m = _WLEN_RE.search(line)
             if m:
                 total_wlen += int(m.group(1))
-            matched = [h for h, pattern in patterns.items() if pattern in line]
-            if not matched:
+            # The substring check is a prefilter only: a query hash can appear
+            # as a literal 16-hex string somewhere outside `terms` (a title,
+            # an id, a sha — anything quoted) without the document actually
+            # containing that term. Once a line is worth parsing at all, `df`
+            # is counted from the parsed record's own `terms` keys, which is
+            # exact, rather than from the raw substring match, which is not.
+            # Getting this wrong is exactly the class of bug derive/build.py's
+            # `_assert_invariants` tripwire exists to catch on the accelerator
+            # side — this is the same fix on the scan side, at the root.
+            if not any(pattern in line for pattern in patterns.values()):
                 continue
-            for h in matched:
-                df[h] += 1
-            candidates.append(json.loads(line))
+            record = json.loads(line)
+            record_terms = record.get("terms", {})
+            for h in query_hashes:
+                if h in record_terms:
+                    df[h] += 1
+            candidates.append(record)
 
     return candidates, df, Corpus(n=total_docs, total_wlen=total_wlen)
 
