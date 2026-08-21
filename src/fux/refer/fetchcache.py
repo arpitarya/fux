@@ -52,13 +52,18 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
-__all__ = ["FetchCache", "CacheEntry", "CACHE_DIR", "DEFAULT_TTL_SECONDS"]
+__all__ = ["FetchCache", "CacheEntry", "CACHE_DIR", "DEFAULT_TTL_SECONDS", "DEFAULT_MAX_BYTES"]
 
 CACHE_DIR = "fetch-cache"
 
 #: Arpit's number, 2026-08-20. Only in force when a caller opts in — the
 #: `Policy` default is 0, which disables the cache entirely.
 DEFAULT_TTL_SECONDS = 300
+
+#: No number was specified for this (PRIORITY.md P4, 2026-08-21) — chosen to
+#: bound a per-machine disposable cache without requiring active management.
+#: Tune it via the `FetchCache(..., max_bytes=...)` constructor argument.
+DEFAULT_MAX_BYTES = 500 * 1024 * 1024
 
 
 @dataclass(frozen=True)
@@ -81,13 +86,14 @@ class FetchCache:
     always safe: the next query fetches.
     """
 
-    def __init__(self, root: Path, *, clock=time.time) -> None:
+    def __init__(self, root: Path, *, clock=time.time, max_bytes: int = DEFAULT_MAX_BYTES) -> None:
         from ..derive import format as fmt
 
         self.directory = fmt.runtime_dir(root) / CACHE_DIR
         # Injected so a test can pin it. The engine's *answers* never read the
         # clock; only the decision of whether to re-fetch does.
         self._clock = clock
+        self.max_bytes = max_bytes
 
     def _path(self, loc: str) -> Path:
         # Hashed filename: a `loc` is a URL and contains `/`, `?` and `:`.
@@ -125,6 +131,15 @@ class FetchCache:
         return entry if entry.age_seconds(self.now()) < ttl_seconds else None
 
     def put(self, loc: str, sha: str, content: bytes) -> None:
+        """Write an entry, evicting the oldest others first if it would not fit.
+
+        Unbounded before this: an entry only ever stopped counting toward
+        `get()` once its TTL passed, and nothing ever deleted the file — a
+        long-lived process caching many large documents grew this directory
+        without limit. `max_bytes` bounds total size on disk; a single entry
+        that alone exceeds it is refused rather than evicting everything else
+        to make room for it.
+        """
         self.directory.mkdir(parents=True, exist_ok=True)
         payload = {
             "loc": loc,
@@ -132,10 +147,38 @@ class FetchCache:
             "fetched_sha": sha,
             "content": content.hex(),
         }
+        body = json.dumps(payload)
+        incoming = len(body.encode("utf-8"))
+        if incoming > self.max_bytes:
+            return
         path = self._path(loc)
+        self._evict_to_fit(incoming, keep=path)
         tmp = path.with_suffix(".tmp")
-        tmp.write_text(json.dumps(payload), encoding="utf-8")
+        tmp.write_text(body, encoding="utf-8")
         tmp.replace(path)
+
+    def _evict_to_fit(self, incoming: int, *, keep: Path) -> None:
+        """Delete entries, oldest `fetched_at` first, until `incoming` more
+        bytes fit under `max_bytes`. `keep` is about to be overwritten by the
+        caller, so its current size is freed without deleting the file out
+        from under the write that follows.
+        """
+        sizes = {p: p.stat().st_size for p in self.directory.glob("*.json")}
+        total = sum(sizes.values()) - sizes.get(keep, 0)
+        if total + incoming <= self.max_bytes:
+            return
+
+        def fetched_at(path: Path) -> int:
+            try:
+                return int(json.loads(path.read_text(encoding="utf-8"))["fetched_at"])
+            except (json.JSONDecodeError, KeyError, ValueError, OSError):
+                return -1  # unreadable entries are evicted first
+
+        for path in sorted((p for p in sizes if p != keep), key=fetched_at):
+            if total + incoming <= self.max_bytes:
+                break
+            total -= sizes[path]
+            path.unlink(missing_ok=True)
 
     def clear(self) -> None:
         for path in self.directory.glob("*.json"):

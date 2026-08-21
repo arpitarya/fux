@@ -250,6 +250,14 @@ the caller's window. `dropped` is reported so truncation is never silent.
 
 ### Consequences
 
+- **The TTL fetch cache now has a size cap (PRIORITY.md P4, 2026-08-21).**
+  `FetchCache.put()` was unbounded — an entry only stopped counting toward
+  `get()` once its TTL passed, and nothing ever deleted the file, so a
+  long-lived process caching many documents grew `runtime/fetch-cache/`
+  without limit. `max_bytes` (default 500 MB, chosen here — no number was
+  specified) now bounds total size on disk; `put()` evicts the oldest
+  entries by `fetched_at` first to make room, and refuses a single entry
+  that alone exceeds the cap rather than evicting everything else for it.
 - **Offline degradation is honest, and tested.** `file:` sources keep full
   function with no network; an unreachable external source yields `unverified`
   with the reason attached and **zero citations**, so nothing is invented from

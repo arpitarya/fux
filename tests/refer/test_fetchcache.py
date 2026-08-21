@@ -98,6 +98,84 @@ def test_a_backwards_clock_cannot_make_an_entry_look_fresh_forever(tmp_path):
     assert entry is None or entry.age_seconds(cache.now()) >= 0
 
 
+# -- the size cap ------------------------------------------------------------
+
+
+def test_unbounded_growth_is_capped(tmp_path):
+    """Before this, an entry only stopped counting toward `get()` once its
+    TTL passed — nothing ever deleted the file. A long-lived process caching
+    many documents grew this directory without limit.
+    """
+    clock = Clock()
+    cache = FetchCache(tmp_path, clock=clock, max_bytes=1000)
+    for i in range(20):
+        clock.advance(1)
+        cache.put(f"https://x.test/{i}", "sha", b"x" * 100)
+    total = sum(p.stat().st_size for p in cache.directory.glob("*.json"))
+    assert total <= 1000
+
+
+def _entry_size(loc: str, content_len: int) -> int:
+    """The exact on-disk size of one entry, measured rather than guessed —
+    JSON overhead plus hex-doubling the content makes hand-estimating fragile.
+    `fetched_at` uses a value the same digit-width as `Clock()`'s default
+    (`1_000_000.0`), which is what the real write's `int(self.now())` produces.
+    """
+    return len(
+        json.dumps(
+            {
+                "loc": loc,
+                "fetched_at": 1_000_000,
+                "fetched_sha": "s" * 64,
+                "content": ("00" * content_len),
+            }
+        )
+    )
+
+
+def test_eviction_is_oldest_first(tmp_path):
+    # Same-length locs so every entry is exactly the same size on disk —
+    # the eviction math only has to reason about count, not byte drift.
+    locs = ["https://x.test/aaa", "https://x.test/bbb", "https://x.test/ccc"]
+    one = _entry_size(locs[0], 400)
+    clock = Clock()
+    # Room for two entries but not three.
+    cache = FetchCache(tmp_path, clock=clock, max_bytes=one * 2 + 10)
+    for loc in locs:
+        clock.advance(1)
+        cache.put(loc, "s" * 64, b"x" * 400)
+
+    assert cache.get(locs[0], 10_000) is None       # oldest, evicted
+    assert cache.get(locs[1], 10_000) is not None   # survives
+    assert cache.get(locs[2], 10_000) is not None   # newest
+
+
+def test_a_single_entry_larger_than_the_cap_is_refused_not_a_wipeout(tmp_path):
+    """Refusing one oversized entry beats evicting everything else to fit it."""
+    kept_size = _entry_size("https://x.test/kept", 20)
+    clock = Clock()
+    cache = FetchCache(tmp_path, clock=clock, max_bytes=kept_size + 50)
+    cache.put("https://x.test/kept", "s" * 64, b"x" * 20)
+    clock.advance(1)
+    cache.put("https://x.test/toobig", "s" * 64, b"x" * 10_000)
+    assert cache.get("https://x.test/kept", 10_000) is not None
+    assert cache.get("https://x.test/toobig", 10_000) is None
+
+
+def test_updating_an_existing_entry_does_not_evict_itself(tmp_path):
+    """Overwriting a loc's own entry must not count its old bytes as
+    something else that needs to be evicted to make room for its new bytes.
+    """
+    one = _entry_size("https://x.test/p", 100)
+    clock = Clock()
+    cache = FetchCache(tmp_path, clock=clock, max_bytes=one + 20)
+    cache.put("https://x.test/p", "s" * 64, b"x" * 100)
+    clock.advance(1)
+    cache.put("https://x.test/p", "t" * 64, b"y" * 100)  # same loc, re-fetched
+    entry = cache.get("https://x.test/p", 10_000)
+    assert entry is not None and entry.fetched_sha == "t" * 64
+
+
 def test_the_cache_lives_under_the_gitignored_runtime_plane(tmp_path):
     """Wall clock is allowed here for the same reason `stamp.json` allows it:
     derived, per-machine, and it never reaches a committed record."""
