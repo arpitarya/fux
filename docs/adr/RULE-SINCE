@@ -1,0 +1,10 @@
+# The freshness gate's baseline.
+#
+# test_adr_freshness.py audits every commit after this one for "changed an
+# ADR-owned component without touching its owning record." History before
+# this sha was written under the OLD, looser rule (any record touched, not
+# necessarily the owning one) — auditing it retroactively under the new rule
+# would flag work that was compliant at the time it landed. This line moves
+# the baseline forward past PRIORITY.md's P1+P2 reconciliation commit, the
+# first commit written under (and enforcing) the stricter rule.
+1fc51a7257efeb943c512809bc531c7817dbc753

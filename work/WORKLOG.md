@@ -28,6 +28,53 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — PRIORITY P1+P2: Law zero enforces the owning record; bulk reconciliation  ·  Claude Code
+
+- **Asked:** "in priority file implement P1 and P2" — `work/PRIORITY.md`'s two
+  top rows.
+- **Did — P1** (`tests/adr_lib.py` new, shared table/owner parsing so the
+  freshness gate and the ownership twin can't disagree): `ci.yml` gets
+  `fetch-depth: 0`; `test_adr_freshness.py` now requires the **owning** record,
+  not any record touched; its escape hatch is anchored to a whole line;
+  `scripts/adr-guard.sh` moved from `pre-commit` (which reads the previous
+  commit's leftover message) to `commit-msg`, rewritten portably (macOS's `awk`
+  lacks gawk's 3-arg `match()`); new `test_adr_owns_consistency.py` checks each
+  record's own `Owns:` line against the register. Verified live: staged
+  `src/fux/query/` + an unrelated record, confirmed both the pytest check and
+  the bash hook refuse it, confirmed the escape hatch and the owning-record
+  case both pass, then reverted before committing anything.
+- **Did — P2:** fixed the drifts P1's stricter check surfaced plus the audit's
+  named list — three overlapping `Owns:` claims; ADR-MAINTENANCE/ADR-REFER's
+  stale R4/R5/R6 status lines; ADR-CLI's verb count; ADR-DOTFUX's
+  `fetcher/`→`fetchers/` and `cache/`→`runtime/fetch-cache/` (source fixed to
+  match — `fuxdir.py`'s `DERIVED` dict dropped the unused top-level `cache`
+  reservation); the `FetchError` subclass CLAUDE.md's error contract forbids,
+  replaced with plain `FuxError` in `src/fux/refer/` + its tests; two
+  self-contradicting records; ADR-REFER 5a's L2 relationship stated
+  explicitly; ADR-GRAPH's veto repointed off retired query ids; the register's
+  stale `work/adr/` header; 10 dead links; 4 archive-as-reference citations;
+  stale CLAUDE.md/README facts. R4–R6/regression-README/r5-ANALYSIS.md were
+  already reconciled in `a8adb22` — checked, not redone. `docs/adr/RULE-SINCE`
+  written naming the reconciliation commit (`1fc51a7`), in a follow-up commit
+  since it names its own sha.
+- **Decided / open:** both flipped `DONE` in `PRIORITY.md`, evidence `1fc51a7`.
+  `sources/types` and ADR-ANSWER's `"source"` field were checked and found
+  **not** drifted — noted, not silently skipped. Two remaining test failures
+  are **pre-existing and not mine**: `tools/graph-bench` (untracked, no owning
+  record) and its own new regression run missing a README row — both belong to
+  a concurrent session actively working in this repo during mine (confirmed:
+  new untracked files and a fresh `work/regression/2026-08-21-*/` run appeared
+  mid-session, and the shared git index got broadly `git add`-ed by that
+  session partway through — my commit used explicit pathspecs, listing only
+  my 28 files, to avoid capturing or disturbing that other work). Left
+  entirely alone.
+- **Next:** P3 (measure R7 on a real 10⁵-doc corpus) is next in `PRIORITY.md`
+  order but was not asked for this session and was not started.
+- **Cost:** unmeasured precisely; three parallel research agents plus this
+  session's own edits/tests, order of tens of minutes wall-clock.
+
+---
+
 ## 2026-08-20 — the prediction series reopened: R4 passes, R5 fails, R6 cannot say  ·  Claude Code
 
 - **Asked:** implement the predictions measurement so the rest can proceed;
