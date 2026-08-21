@@ -61,6 +61,18 @@ def _resolve_doc(root: Path, given: str) -> str:
     return f"file:{given}"
 
 
+def _committed_ids(root: Path) -> set[str]:
+    """The ids the committed index holds — the corpus, not the graph.
+
+    Read from the shards rather than the plane, because a document with no
+    edges is absent from the graph and present in the corpus, and that is
+    exactly the distinction being drawn.
+    """
+    from .. import store as store_mod
+
+    return set(store_mod.read_index(root))
+
+
 def cmd_explain(args) -> int:
     """One document's outbound edges and its community."""
     root = _root()
@@ -71,7 +83,16 @@ def cmd_explain(args) -> int:
     label = plane.community_of(doc_id)
 
     if not edges and label is None:
-        # Not in the graph at all — which is different from "has no edges".
+        # **Three states, not two** (W-63). This used to print "has no
+        # recorded relationships" and exit 0 for a document that is not in
+        # the corpus at all — its own comment said the two were different and
+        # then treated them the same. A `fux remove`d document answering as
+        # though it were still indexed is the case that made it visible.
+        if not doc_id.startswith(TAG_PREFIX) and doc_id not in _committed_ids(root):
+            raise FuxError(
+                f"{doc_id} is not in the index. `fux find` locates a document; "
+                "`fux add` puts one in"
+            )
         if args.json:
             print(json_mod.dumps({"doc": doc_id, "edges": [], "community": None}, indent=2))
         else:
@@ -109,7 +130,9 @@ def cmd_graph(args) -> int:
     root = _root()
     plane = plane_mod.load(root)
 
-    results, _ = run_query(root, args.query, SEED_DEPTH, force_scan=getattr(args, "scan", False))
+    # Scan by default, `--fast` opts into the accelerator for the seed query
+    # — same choice and same mutually-exclusive `--scan` as `ask` (ADR-ASK).
+    results, _ = run_query(root, args.query, SEED_DEPTH, force_scan=not getattr(args, "fast", False))
     seeds = [r.id for r in results]
     expanded = expand(plane.graph, seeds, limit=EXPAND_LIMIT)
 

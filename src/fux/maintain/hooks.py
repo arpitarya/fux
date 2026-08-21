@@ -62,6 +62,13 @@ _PREAMBLE = f"""#!/bin/sh
 # merge or a checkout. It reports and gets out of the way.
 set -u
 command -v fux >/dev/null 2>&1 || exit 0
+# W-64: show the progress bar during a hook, explicitly rather than by
+# accident of TTY detection — R5's 44.4 s of silence on the commit path is
+# the exact failure this exists to fix. Revisit if W-61's fork resolves to
+# option B (the hook defers): commit cost becomes ~0.3 s and constant, and a
+# bar that flashes that briefly is noise the ~200-doc threshold mostly
+# suppresses anyway.
+export FUX_NO_PROGRESS=0
 """
 
 HOOKS: dict[str, str] = {

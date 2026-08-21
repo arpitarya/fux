@@ -89,7 +89,7 @@ def _readme() -> str:
         "`fetchers/http.py` and `fetchers/cdp.py` are **your** code, committed",
         "to **your** repo. `fux setup` writes them once if they are missing;",
         "`fux ingest` never writes a fetcher at all. Fux loads one by path",
-        "under `fux ingest --refresh-urls` and never rewrites it. Change the",
+        "under `fux add <URL>` or `fux update`, and never rewrites it. Change the",
         "port, the transport, the extraction, anything.",
         "",
         "One consequence of living in a dotdir: linters that skip hidden",

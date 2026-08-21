@@ -217,6 +217,13 @@ reproducible by construction.
 - **Two formats to keep in step.** The offset table's struct is a binary
   contract; `RUNTIME_SCHEMA` exists so a mismatch triggers a rebuild rather
   than a misread.
+- **`build()` takes an optional `progress`** (W-64, 2026-08-21), reporting
+  `read` · `codes` · `graph` · `postings`. R5 attributed **47.6 % of a
+  100 000-document commit-path run to `fux build`**, so this is half of the
+  silence the plane exists to break. `progress=None` is the default and means
+  silent, so nothing about an existing caller — or about the bytes this
+  module writes — changed. The plane's rules are
+  [ADR-CLI](0002_cli-surface.md) decision 9's.
 - **The bound must stay an upper bound.** Any future scoring change — a third
   field, a different saturation — invalidates `block_bound` and the skipping
   argument with it. That is the veto below.
@@ -238,6 +245,11 @@ reproducible by construction.
   this record's invariant ([ADR-RECORD](0010_index-record.md) rule 2); the
   differential harness now carries a hashed record, which it never had
   ([run](../../work/regression/2026-08-19-w54/report.md)).
+- **`build()` takes the same `progress=` seam `ingest.run()` does** (W-64,
+  2026-08-21) and reports its passes through it. It changes no output: the
+  bar is stderr-only and `None` means silent, so `DETERMINISTIC_FILES` and
+  every byte-identity assertion in this record are untouched by construction.
+  The rules are [ADR-CLI](0002_cli-surface.md) decision 9.
 
 ### Alternatives considered
 
@@ -279,7 +291,8 @@ invalidates the block bound.
 
 ```bash
 # 1. the differential law, the property the whole design rests on
-diff <(fux ask "any query" --json --top 5) <(fux ask "any query" --json --top 5 --scan) \
+# (scan is the default since 2026-08-21; --fast is what exercises this file)
+diff <(fux ask "any query" --json --top 5) <(fux ask "any query" --json --top 5 --fast) \
   && echo IDENTICAL
 
 # 2. the bound is still an upper bound over every posting

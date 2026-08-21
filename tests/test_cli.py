@@ -23,14 +23,21 @@ def test_parser_has_the_verb_surface():
 
     lifecycle `setup`/`doctor` set the repo up and check it · write
     `ingest`/`build` — one writes the committed plane, one derives from it ·
-    sources `url` records what to index · read `ask`/`find`/`answer` differ
-    only in how much they commit to · **graph `explain`/`graph`/`path` answer
-    with relationships rather than with rankings** (M3) · maintenance `hooks`
-    wires the repository up to keep its own index in step (M5).
+    sources **`add`/`remove`/`update`** maintain what is indexed (W-63,
+    replacing `url`) · read `ask`/`find`/`answer` differ only in how much they
+    commit to · **graph `explain`/`graph`/`path` answer with relationships
+    rather than with rankings** (M3) · maintenance `hooks` wires the
+    repository up to keep its own index in step (M5).
 
     Five groups, not four, since the graph lane landed — and the count was
     never the mental model, which is why adding one costs a line here and a
     line in ADR-CLI rather than a redesign.
+
+    **`url` is gone, not deprecated** (W-63). It was four days old, pre-1.0,
+    and its whole surface is `fux add <URL>` / `fux remove <URL>`. The flag
+    `ingest --refresh-urls` was the opposite call — older, likelier to be in
+    someone's CI — and survives one release as a hidden alias for
+    `fux update`, which is asserted below.
     """
     parser = build_parser()
     sub_actions = [a for a in parser._subparsers._group_actions if a.dest == "command"]
@@ -39,7 +46,9 @@ def test_parser_has_the_verb_surface():
         "doctor",
         "ingest",
         "build",
-        "url",
+        "add",
+        "remove",
+        "update",
         "ask",
         "find",
         "answer",

@@ -26,10 +26,25 @@ def cmd_ingest(args) -> int:
             print(f"{s.rel_path}: {s.reason}")
         return 0
 
+    ingest_and_report(root, args, refresh_urls=getattr(args, "refresh_urls", False))
+    return 0
+
+
+def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=None):
+    """Run one ingest and print its summary. **The only ingest the verbs call.**
+
+    `fux add`, `fux remove` and `fux update` all end here rather than each
+    printing their own version of the same three numbers — one format, so a
+    person reading two different verbs' output is reading the same thing, and
+    one write path into the index, which is what L3 needs (W-63).
+    """
+    progress = getattr(args, "progress", None)
     report = run(
-        root,
-        refresh_urls=getattr(args, "refresh_urls", False),
+        args_root,
+        refresh_urls=refresh_urls,
+        only_urls=only_urls,
         full=getattr(args, "full", False),
+        progress=progress,
     )
     print(
         f"ingested {report.doc_count} docs ({report.changed_count} changed, "
@@ -45,12 +60,12 @@ def cmd_ingest(args) -> int:
     if not getattr(args, "no_accelerator", False):
         from ..derive import build as build_accelerator
 
-        accel_report = build_accelerator(root)
+        accel_report = build_accelerator(args_root, progress=progress)
         print(
             f"accelerator: {accel_report.terms} terms, {accel_report.blocks} blocks, "
             f"{accel_report.postings} postings (derived, not committed)"
         )
-    return 0
+    return report
 
 
 def cmd_build(args) -> int:
@@ -66,7 +81,7 @@ def cmd_build(args) -> int:
 
     from ..derive import build as build_accelerator
 
-    report = build_accelerator(root)
+    report = build_accelerator(root, progress=getattr(args, "progress", None))
     print(
         f"accelerator rebuilt from the committed index: {report.docs} docs, "
         f"{report.terms} terms, {report.blocks} blocks, {report.postings} postings"

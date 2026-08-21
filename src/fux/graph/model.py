@@ -22,9 +22,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-__all__ = ["Edge", "Graph", "TAG_PREFIX"]
+from ..ingest.edges import TAG_PREFIX
 
-TAG_PREFIX = "tag:"
+#: Re-exported, not redefined: `ingest/edges.py` mints every tag node, so it
+#: owns the namespace. This package consumes the vocabulary and does not
+#: re-decide it — the same rule this module's docstring already states for
+#: the edge kinds and grades.
+__all__ = ["Edge", "Graph", "TAG_PREFIX"]
 
 
 @dataclass(frozen=True, order=True)

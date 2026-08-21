@@ -3,4 +3,3 @@
 # `.fux/fetchers/` are committed, and a blanket ignore would drop them
 # from git silently. `fux doctor` checks exactly that.
 runtime/
-cache/

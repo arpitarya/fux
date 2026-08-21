@@ -1,0 +1,105 @@
+$ fux ingest
+ingested 2 docs (2 changed, 0 carried forward), 1 skipped, 2 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 17 terms, 17 blocks, 18 postings (derived, not committed)
+# exit 0
+
+$ fux add handbook
+added     handbook archived=false
+  in .fux/sources/dirs
+ingested 3 docs (1 changed, 2 carried forward), 1 skipped, 1 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
+# exit 0
+
+$ fux add docs/architecture.pdf
+added     docs/architecture.pdf archived=false
+  in .fux/sources/dirs
+ingested 3 docs (0 changed, 3 carried forward), 1 skipped, 0 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
+  → the line is listed, and the type allowlist rejects it. `fux add '*.pdf' --types` allows it; adding a file never overrides the allowlist
+# exit 0
+
+$ fux add https://wiki.corp/runbook --cdp --plain
+added     https://wiki.corp/runbook fetch=cdp meta=plain
+  in .fux/sources/urls
+ingested 4 docs (1 changed, 3 carried forward), 1 skipped, 1 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 26 terms, 26 blocks, 27 postings (derived, not committed)
+[stderr] fetching  https://wiki.corp/runbook (network — this URL only)
+# exit 0
+
+$ fux add *.pdf --types
+added     *.pdf
+  in .fux/sources/types
+ingested 5 docs (1 changed, 3 carried forward), 0 skipped, 1 shards written
+accelerator: 31 terms, 31 blocks, 32 postings (derived, not committed)
+# exit 0
+
+$ fux add docs --dry-run
+would add docs archived=false
+  in .fux/sources/dirs
+  then: ingest (no network)
+# exit 0
+
+$ fux add
+.fux/sources/dirs:
+* docs archived=false
+  docs/architecture.pdf archived=false
+  handbook archived=false
+
+* 1 line(s) do not state every attribute, so fux did not write them. They load fine (the reader is lenient); `fux add <entry>` rewrites one in full.
+.fux/sources/types:
+  *.adoc
+  *.markdown
+  *.md
+  *.org
+  *.pdf
+  *.rst
+  *.txt
+.fux/sources/urls:
+  https://wiki.corp/runbook fetch=cdp meta=plain
+# exit 0
+
+$ fux remove handbook
+removed   handbook archived=false
+  in .fux/sources/dirs
+ingested 4 docs (0 changed, 3 carried forward), 0 skipped, 0 shards written
+accelerator: 28 terms, 28 blocks, 29 postings (derived, not committed)
+  dropped file:handbook/rota.md from the index
+# exit 0
+
+$ fux remove docs/onboarding.md
+excluded  !docs/onboarding.md
+  in .fux/sources/dirs — docs still listed; this path is subtracted from it
+ingested 3 docs (0 changed, 2 carried forward), 1 skipped, 0 shards written
+  skip docs/onboarding.md: excluded by !docs/onboarding.md
+accelerator: 21 terms, 21 blocks, 21 postings (derived, not committed)
+  dropped file:docs/onboarding.md from the index
+# exit 0
+
+$ fux remove https://wiki.corp/runbook
+removed   https://wiki.corp/runbook fetch=cdp meta=plain
+  in .fux/sources/urls
+ingested 2 docs (0 changed, 2 carried forward), 1 skipped, 0 shards written
+  skip docs/onboarding.md: excluded by !docs/onboarding.md
+accelerator: 15 terms, 15 blocks, 15 postings (derived, not committed)
+  dropped url:https://wiki.corp/runbook from the index
+# exit 0
+
+$ fux remove elsewhere/nope.md
+[stderr] error: elsewhere/nope.md is not in /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/d4806003-3e85-4ffa-9ab4-3cd7495f894e/scratchpad/sv/.fux/sources/dirs: it has no line of its own, and no listed entry covers it. Both were checked. `fux add elsewhere/nope.md` would list it; nothing needs removing
+# exit 1
+
+$ fux update --check
+  fresh  2 others
+nothing has drifted.
+# exit 0
+
+$ fux update
+ingested 2 docs (0 changed, 2 carried forward), 1 skipped, 0 shards written
+  skip docs/onboarding.md: excluded by !docs/onboarding.md
+accelerator: 15 terms, 15 blocks, 15 postings (derived, not committed)
+# exit 0
+

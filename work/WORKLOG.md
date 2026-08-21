@@ -30,6 +30,285 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-21 — W-63: the source verbs, and four defects found by building them  ·  Claude Code
+
+- **Asked:** implement `work/open/W-63-source-verbs.md` — `fux add` /
+  `fux remove` / `fux update` over dirs, single documents and URLs.
+- **Blocked first, and said so.** A **live peer session** held
+  `src/fux/ingest/run.py`, `src/fux/cli.py` and `src/fux/progress.py` — W-63's
+  Phase 1 and Phase 3 seams — mid-W-64. Stopped rather than overwrite it,
+  messaged it, and waited. Worth recording as a pattern: the per-asset lock
+  did its job, and `SendMessage` resolved a mutual "you commit first"
+  deadlock that neither session could see from its own side.
+- **Found three unfinished changes stacked in one uncommitted tree**: the
+  design-point reconciliation, W-64, and a **scan-by-default flip** that
+  belonged to neither session. That third one had no records and two red e2e
+  tests, and it was blocking W-63's definition of done, so it got closed
+  first: ADR-ASK decision 4 inverted (diagram + ASCII twin repaired, veto
+  check fixed), ADR-GRAPH given the seed-query consequence, and **five** e2e
+  tests corrected — two were failing, and **three more were passing
+  vacuously**, driving the accelerator through a bare `ask` that now scans,
+  so the differential law's only end-to-end check was comparing the scan with
+  itself.
+- **Did (W-63):** all four phases. Phase 1's two `run.py` defects — a
+  de-listed URL now leaves the index on an **offline** run (deletion never
+  needed the network), and a carried record's edges are re-checked against the
+  run's own id set rather than trusted. Phase 2/3: `sources.py` generalised
+  over all three lists, remove-by-coverage, the three verbs, `fux url`
+  deleted, `--refresh-urls` hidden for one release. Phase 4: nine records, an
+  ownership move, and a **surface capture**.
+- **The capture earned its rule.** Writing the transcript down found **four
+  defects the unit tests did not**, three of them in W-63 itself: an L4
+  announcement that fired against an empty URL list; `add '*.pdf' --types`
+  silently un-indexing every markdown document (W-55's invisible filter, new
+  direction); a type-allowlist skip reported as "the fetch failed"; and
+  `explain` answering for a document not in the corpus. Each did something
+  defensible and *said* something false — the class a behaviour test does not
+  catch and a reader does.
+- **Decided / open:** both of W-63's open calls taken on their pre-authorised
+  defaults (`fux url` deleted outright; `--refresh-urls` hidden one release).
+  **L4's text was deliberately not changed** — it already reads "paths",
+  plural; what was wrong was every record that narrowed it to one, and those
+  were corrected. **Nothing is committed**, on Arpit's instruction, so
+  W-63's OPEN-WORK row stays and `IMPLEMENTATION.md` gets no row yet.
+- **Next:** Arpit decides whether to land the three stacked changes; W-61's
+  two calls are still the only blocked-on-Arpit items, now 1 day old.
+
+## 2026-08-21 — scan-by-default, `--fast` opts into the accelerator  ·  Cowork
+
+- **Asked:** direct request outside OPEN-WORK — "by default i want
+  no-accelerator and if we add a flag `--fast` then only use the
+  accelerator." Not queued in `work/OPEN-WORK.md`; the inbox's only
+  `OPEN·human` items (W-61's hook-at-scale fork, the R6 arithmetic question)
+  were unrelated, so triage-first did not block proceeding.
+
+- **Did:** flipped the default candidate path on `ask`/`find`/`answer`/`graph`
+  from accelerator-when-fresh to scan-always; added `--fast` as the opt-in,
+  mutually exclusive with the existing `--scan` (now redundant with the
+  default, kept for explicit bug reproduction). Code:
+  `src/fux/cli.py` (`_query_parser()`, both mutually-exclusive groups),
+  `src/fux/query/__init__.py` (`run_query`'s default flipped, new
+  `_force_scan()` helper), `src/fux/graph/__init__.py` (`cmd_graph`). Tests:
+  `tests_e2e/test_verbs.py`, `tests_e2e/test_relational.py` rewritten around
+  the new default. Docs, same change per Law Zero: `docs/adr/0002_cli-surface.md`
+  (ADR-CLI, owns `cli.py`), `docs/adr/0004_ask.md` (ADR-ASK, owns `query/`) —
+  both diagrams flipped, both frozen "verbatim from the capture" blocks
+  annotated rather than rewritten (archive-is-not-evidence), live examples
+  and differential-law demo commands updated to actually contrast the two
+  paths under the new default; `docs/adr/0005_find.md`,
+  `docs/adr/0006_answer.md` (usage lines); `docs/adr/0011_accelerator.md`
+  (ADR-T1-ACCELERATOR's veto-check now runs `--fast` to exercise the
+  accelerator, since `--scan` no longer contrasts with default); `README.md`.
+  `CHANGELOG.md` got an `### Changed` entry under `[Unreleased]`.
+  Verified with a hand-rolled check script mirroring the pytest assertions
+  (pytest itself unavailable in the local sandbox used to test this) — default
+  scan / `--fast` accelerator / mutual exclusivity / differential law /
+  stale-accelerator fallback / `--json` `"path"` reporting all passed.
+
+- **Decided / open:** `src/fux/doctor.py`'s accelerator-status prose left
+  unedited — still accurate under the new default, editing it risked
+  invalidating an unrelated historical capture with no fresh regression run
+  to back it. Open: whether the real `tests_e2e` suite has actually been run
+  against these changes (only the manual mirror script ran, in a Python 3.10
+  sandbox with a `tomllib` shim, not the repo's own `.venv`/pytest) — this
+  session's local device sandbox had no network and no matching interpreter
+  to run the real suite. Also open: whether to `git commit` — not yet
+  requested by Arpit.
+
+- **Next:** run the real `uv run pytest -q tests_e2e` (and `tests`) once on a
+  surface that actually has the venv, to confirm the manual mirror didn't
+  miss anything; then ask Arpit whether to commit.
+
+---
+
+## 2026-08-21 — W-64: a progress plane for the write verbs  ·  Claude Code
+
+- **Asked:** `implement` — with `work/open/W-64-progress-plane.md` open in the
+  editor. W-64 was taken rather than W-63 (the last session's stated next step)
+  because its own spec says it is independent and worth building alone, and a
+  peer session turned out to be starting W-63.
+
+- **Did:** built the plane end to end. `src/fux/progress.py` — stdlib,
+  stderr-only, TTY-gated, count-based, threshold-gated at ~200, **clock-free**
+  (no `time` import anywhere). `progress=None` keywords on `ingest.run()` and
+  `derive.build()` meaning silent, so **no existing caller or test changed**;
+  seven phases reported (`walk`/`extract`/`edges`/`write` ·
+  `read`/`codes`/`graph`/`postings`); `main` constructs **one** `Progress` and
+  hands it to both, so `ingest`-then-build is one continuous sequence.
+  `--no-progress` / `--progress` / `FUX_NO_PROGRESS`. Records updated in the
+  same change per Law zero: **ADR-CLI decision 9** (plus the ownership row,
+  `test_adr_ownership.py`, and veto conditions 5 and 6), ADR-INGEST,
+  ADR-T1-ACCELERATOR, ADR-MAINTENANCE. Surface captured at
+  [`regression/2026-08-21-progress-plane/`](regression/2026-08-21-progress-plane/report.md);
+  W-64's row deleted and its detail file archived.
+
+- **Decided / open:** **the git hooks show the bar** — the handoff's stated
+  default, applied rather than stalling the build: `_PREAMBLE` exports
+  `FUX_NO_PROGRESS=0`, so it is a decision and not an accident of TTY
+  detection. Reversible in one line if [W-61](open/W-61-maintenance-measurement.md)'s
+  fork lands on B. **Found while capturing and fixed in the same change:** a
+  phase whose total is not documents must name its unit — `write`'s `252/252`
+  under `edges`' `1203/1203` reads as losing 950 documents. **Not claimed:**
+  repaint cost at R5's 100 000 documents; this ran at 1 203, and W-26 owns
+  that. **Two hazards worth recording.** (1) `src/fux/cli.py` was overwritten
+  mid-session by a concurrent session's scan-by-default/`--fast` change and
+  W-64's wiring vanished; it was re-applied on top rather than reverted.
+  (2) A peer session (`fux-d5`) messaged to say it had stopped on W-63 rather
+  than fight for the locks — the two items were kept apart by talking, and
+  three of its four review points were real and fixed.
+
+- **One more fix after the capture, and it mattered.** `\r` returns to the
+  start of the *terminal* line, so a line that **wrapped** leaves a tail no
+  later `\r` can erase — and `extract` appends an unbounded document path.
+  The DoD's "Ctrl-C leaves no partial line" was therefore true only for short
+  paths. Lines are now capped at 80 columns with the detail truncated from the
+  left (the tail names the document), and non-printables stripped, because a
+  `\n` or `\x1b` in a filename is legal on POSIX. Three tests; re-captured at a
+  widest line of 60 columns.
+
+- **Later the same day, after W-63 landed in the tree:** verified W-64 survived
+  the peer's edits to `run.py`/`cli.py` (all three CLI seams intact, all seven
+  phases in place, the `write` phase still below `records.extend(carried…)`),
+  then **extended the invariant to the three new write verbs** — and found the
+  extension would have been vacuous two ways. `remove docs` empties the corpus
+  so neither arm paints; and the mutating verbs are not each other's inverse
+  (`add` refuses to un-exclude by design), so an `add`-as-reset fails. `remove`
+  now takes a single document and each arm rewrites `.fux/sources/dirs` to a
+  known state. **Two guards added, not just the fix:** the parametrize list is
+  asserted equal to `cli.py`'s `_PROGRESS_COMMANDS`, and each arm asserts the
+  bar actually painted. **889 unit / 64 e2e.**
+
+- **Nothing was committed — Arpit's call** ("no need to commit anything yet").
+  The tree carries W-64 plus a peer session's scan-by-default work plus an
+  earlier session's 10 000-document design-point change, ~2 500 lines in all,
+  interleaved inside six shared tracker files. **855 unit / 49 e2e green.**
+  `run.py` and `cli.py` released to the peer for W-63.
+
+- **Next:** W-63 is the peer session's, not this one's.
+
+---
+
+## 2026-08-21 — the design point moves to 10 000 documents; and the graph plane profiled  ·  Cowork
+
+- **Asked:** two things, in one session. First: *"since the graph index will be
+  continuously maintained by hooks, should we commit the graph as well?"* Then,
+  after the profile that question produced: *"for now fux should work with just
+  10k documents, later we will build for 50k and 100k — update the necessary
+  documents and cancel any task dependent on those."*
+- **Did (first half):** answered **no** on ADR-GRAPH decision 7's own grounds
+  (a community label is global; committing turns a one-file commit into a
+  corpus-wide diff — hooks make that worse, not better) and then **measured the
+  thing nobody had**. Filed
+  [GRAPH-PLANE-PROFILE](regression/2026-08-21-graph-plane-profile/report.md)
+  with its harness at `tools/graph-bench/profile.py` and raw two-run evidence,
+  and [`compare/graph-plane-format.compare.md`](compare/graph-plane-format.compare.md).
+  **Headline: at 100 000 documents a graph verb spends 9.34 s in
+  `plane.load()` and 0.20 s answering** — the algorithms were never the
+  problem, the plane's format is. Also produced a first estimate of the split
+  R5's own ANALYSIS said it could not make: **~5.6 s of R5's 19.7 s `derive` is
+  the graph half.**
+- **Did (second half):** rewrote **CLAUDE.md §Litmus** — the design point is
+  now **10 000 documents**, with 50k and 100k as staged later targets. Kept the
+  enterprise deployment filter explicitly unchanged, and added the rule that a
+  gate judged at a deferred size **stands as measured** and is re-judged by a
+  new pre-registration, never by editing a frozen one. Re-scoped **W-26** (10k
+  + RFC bench; 100k and 1M struck; R7 re-derived at 10k rather than divided by
+  ten; **T2 must now first justify that it earns its place at 10k**, where R3
+  already measured 27.2 ms p95 on 8 870 RFCs). Re-scoped **W-61** to open-at-
+  lower-urgency. **Ruled the graph-plane fork A** and recorded in its §0 that
+  the numbers did not change — the design point did. Filed **W-65**. Bumped
+  five DOC-REGISTRY rows and NOW.
+- **Decided / open:** **Decided by Arpit:** the design point is 10 000
+  documents; W-61 stays open at lower urgency; W-26 shrinks rather than parks
+  or cancels. **Ruled:** `graph-plane-format` → **A**, reopen when the 50k
+  target is taken up. **Still open:** W-61's two calls — and note the new fact
+  that **the design-point change did not close it**, because R5 fails at 10k
+  too (3.523 s against the same 1 s bound). What it *did* change is the option
+  set: at 10k the fixed cost is 0.216 s and **a 4× speedup of the two O(corpus)
+  passes reaches the bound**, where at 100k nothing under 100× did — so option
+  **D is live again** and the matrix, which still weights `holds at 10⁶ (×3)`,
+  needs re-weighting by whoever rules.
+- **Caveat carried forward, deliberately:** every number in the graph profile
+  is **synthetic-corpus, cloud-container, two runs, no medians**. The device VM
+  has Python 3.10 and no network, so the committed harness could not run there.
+  **Nothing here is a gate**, and the profile says so in its own header.
+- **Next:** W-63 Phase 1 — the two `ingest/run.py` defects, alone, with tests.
+
+
+## 2026-08-21 — the dead `work/PRIORITY.md` links removed  ·  Cowork
+
+- **Asked:** "remove work/PRIORITY.md reference", after the prior exchange
+  noticed the file is archived but still pointed at.
+- **Did:** sweep of the live tree. **Four broken links** — three in
+  [ADR-MERGE-DRIVER](../docs/adr/0034_merge-driver.md) and one in
+  [`compare/graph-plane-format.compare.md`](compare/graph-plane-format.compare.md)
+  — repointed to the naming form ("the 2026-08-20 audit's P4") rather than
+  deleted, so provenance survives without a dead target. The compare doc's
+  "Against" bullet also asserted W-26 *sits behind* P1–P3; all three are closed
+  and the queue archived, so its schedule half is marked lapsed and its scope
+  half kept. **Verdict unchanged.** Two DOC-REGISTRY rows bumped.
+  `scripts/inject-inbox.sh` turned out to carry no reference at all.
+- **Decided / open:** **the string cannot be fully removed, and should not be.**
+  Thirty live files still name `PRIORITY.md` as bare provenance ("PRIORITY.md
+  P4"), which the archive law permits — an archived doc may be *named*, only
+  never cited as evidence. Two of those places are **immutable by this repo's
+  own rules**: `WORKLOG.md` is append-only, and `work/regression/` is filed
+  evidence that is annotated, never edited. What remains sweepable, if Arpit
+  wants it, is ADRs, `CHANGELOG.md`, four `src/` docstrings, four test
+  docstrings and the live `work/` docs — a mechanical, exact-rule edit
+  (Haiku's tier), and worth about nothing on its own.
+- **Also noted, not fixed:** the live tree carries **85 broken markdown links**,
+  of which the four PRIORITY ones were a small share. Most are live docs
+  pointing at `work/open/W-nn` files that closed and moved to `archive/open/` —
+  `docs/GLOSSARY.md` alone has eight. That is the archive-is-not-evidence rule
+  failing in the direction nobody checks, and no test covers it today.
+  `.claude/.locks/2a5671d7edd905ba/owner` also still names `work/PRIORITY.md`;
+  it is 41 477 s old against a 900 s TTL and can be deleted.
+- **Next:** unchanged — W-63 Phase 1, the two `ingest/run.py` defects.
+
+## 2026-08-21 — `fux add`/`remove`/`update` designed; W-63 + W-64 filed  ·  Cowork
+
+- **Asked:** "i want fux add and remove in cli rather than url do some research
+  and provide me examples and when add is ran ingest it by default / when remove
+  is ran remove it from the index and the graph", then, across the same session:
+  add/remove must cover **dirs and single documents** too, add an **`update`**
+  verb, and **show a progress bar** — first for the three source verbs, then for
+  `ingest` and `build` as well. Finished with "yes" to drafting the ADR edits and
+  the Claude Code handoff.
+- **Did:** no code moved. Read the CLI, sources and ingest planes; surveyed CLI
+  precedent (`uv add`, `helm repo add`, `cargo add`, `git remote add`, `dvc add`,
+  `apt remove`/`purge`). Filed **[W-63](open/W-63-source-verbs.md)** (the three
+  verbs, over dirs / single documents / URLs) and
+  **[W-64](open/W-64-progress-plane.md)** (the progress plane), each a
+  self-contained spec carrying its own paste-ready Claude Code prompt, its
+  model, an ADR edit plan with draft text, edge-case table, tests and DoD. New
+  OPEN-WORK group under ADR-CLI/ADR-DIR-LIST/ADR-URL-LIST/ADR-INGEST; inbox
+  header and two DOC-REGISTRY rows updated.
+- **Decided / open:** **Arpit's call, 2026-08-21 — `fux add <URL>` fetches that
+  one URL**, over record-only (`git remote add`) and a required `--fetch`;
+  rationale is that ingesting a URL without fetching it is a no-op, so any other
+  option means "ingest by default" silently excludes URLs. **This edits L4** —
+  the engine goes from one named networked path to two (`fux add <url>` and
+  `fux update`), and `fux update` subsumes `fux ingest --refresh-urls` so the
+  count does not reach three. Second decision: **`add` and `remove` write lines;
+  `update` never touches one** — the sentence that keeps the three from
+  overlapping. Third: **remove-by-coverage** — an own line is deleted, a path
+  covered by a listed ancestor gets a `!` exclusion, and the verb says which.
+  **Two defects found while scoping, both real independent of the item:**
+  (1) `run.py`'s offline branch does `carried = dict(existing_urls)`, so a
+  de-listed URL only leaves the index on a networked run — deletion needs no
+  network; (2) carried `url:` records keep stale `edges` that
+  `graph/model.edges_from_records` lifts unvalidated, so a removed document can
+  survive as an edge target in the derived plane. Both are Phase 1 of W-63.
+  **Three non-blocking calls left for Arpit**, each with a default written into
+  its detail file: `fux url`'s deprecation, `--refresh-urls`' deprecation, and
+  whether the git hooks paint the progress bar (which turns on W-61's fork —
+  option B makes the commit path 0.34 s and a bar there becomes noise).
+  **Noted, not fixed:** `work/PRIORITY.md` is referenced by project memory and
+  no longer exists in the tree.
+- **Next:** W-63 Phase 1 — the two `run.py` defects, alone, with tests, before
+  any CLI work.
+
 ## 2026-08-21 — v0.34.0 pushed, released, and verified live on PyPI  ·  Claude Code
 
 - **Asked:** "push everything and publish a new version make sure cicd is

@@ -165,9 +165,45 @@ make `work/regression/*/evidence` also match `work/regression/a/b/evidence` —
 not what anyone writing that line means. `**` is the explicit any-depth form,
 and the matcher is hand-rolled like every other codec here (L1).
 
+**2d. Removal reuses `!`, and which branch it took is stated** (2026-08-21,
+W-63). `fux remove <path>` has two cases and they are not interchangeable:
+
+| the path | how it leaves | why |
+|---|---|---|
+| has its own line | the line is deleted | it is there because someone listed it |
+| is covered by a listed ancestor | `!<path>` is written | it is there because an ancestor is listed, and the ancestor should stay |
+
+**The grammar already had subtraction, so nothing was invented.** The
+alternative — deleting the ancestor's line and re-adding its siblings — is a
+many-line diff for a one-document change, and it silently changes what happens
+when a new sibling appears later: the re-added list would not include it, so
+removing one document would quietly stop indexing every future one.
+
+A path that is neither listed nor covered is an **error naming both checks**,
+not a no-op. "Nothing to remove" and "you typed the wrong path" look identical
+otherwise, and only one of them is fine.
+
+**2e. `docs` and `docs/` are one entry.** The parser dedupes on the exact
+string and therefore cannot see that duplicate, so the verbs normalise a
+trailing slash away before writing. Found by running `fux add docs/` against a
+list already holding `docs`: it wrote a second line for the same directory,
+which makes this file say two things where the corpus has one. URLs are
+exempt — a trailing slash there is the server's business, not ours.
+
 **3. The attribute set for this file is one: `archived`.** Values `true` /
 `false`; **absent means `false`**. Closed, exactly as the URL list's set is
 closed — adding to it is a change to this record.
+
+**3a. An explicitly added file does not outrank the type allowlist**
+(2026-08-21, W-63). `fux add docs/architecture.pdf` writes the line, and the
+document is still skipped if `.fux/sources/types` does not admit it — the verb
+says so, and says which command would change it.
+
+This follows from the three conditions being a **conjunction with no
+precedence** (§1), and is not a new rule; what is new is a command that could
+plausibly have been read as an override. Making an `add` win would be W-55's
+invisible filter arriving from the opposite direction — a document indexed for
+a reason nobody could see in either list.
 
 **4. `archived` is declared, never derived.** No path heuristic, no `archive/`
 special case in code. **This is the one decision that changed on the way in from
@@ -197,7 +233,7 @@ documents only is a ranking change across 42% of live terms and belongs to
 not what the scorer computes.
 
 **9. The two source files differ in who writes them, and that is deliberate.**
-The URL list is **tool-written**: `fux url` records the URL and every attribute
+The URL list is **tool-written**: `fux add` records the URL and every attribute
 explicitly ([ADR-URL-LIST](0018_url-list.md) decision 12). This file is
 **human-written** — you add a directory because you decided to — so absence
 carries meaning here (decision 3) in a way it does not there. Same grammar,
@@ -222,6 +258,15 @@ invent the declaration and the measurement at once.
 
 ### Consequences
 
+- **A single file was always a legal entry; the CLI is new, the grammar is
+  not.** `_candidate_paths` has branched on `base.is_file()` since this record
+  was written, so `fux add docs/onboarding.md` needed no list, no attribute
+  and no parser change — which is most of why W-63 was small.
+- **`fux add --types` seeds the built-in allowlist when it creates the file**
+  ([ADR-TYPES](0032_types-list.md)'s "absent means the default"), because the
+  file replaces that default rather than extending it. Without the seed,
+  adding one pattern un-indexed every document already in the corpus —
+  measured, in [the capture](../../work/regression/2026-08-21-source-verbs/ANALYSIS.md).
 - **The include-only whitelist ended on 2026-08-20** (W-45). It was measured
   first: **33 of 150 documents (22.0 %) came from `work/regression/`, 16 of
   them raw evidence**, and a committed `fixture.sh` outranked the very record

@@ -188,7 +188,7 @@ def build_repo(directory: Path, port: int) -> Path:
     (directory / "fux.toml").write_text(
         '[sources]\n\n[sources.url]\nmeta = "plain"\n', encoding="utf-8"
     )
-    _run([FUX, "ingest", "--refresh-urls"], directory)
+    _run([FUX, "update"], directory)  # W-63: `--refresh-urls` retired into this
     return directory
 
 

@@ -166,24 +166,41 @@ section *and* ADR-LAWS' table, in the same commit.
 
 ## Litmus for any new work
 
-**Do not design in reference to Anton.** The design point is a **very
-large-scale project inside a corporation** — a 10k-engineer company's
-mega-project:
+**The design point is 10 000 documents** (Arpit, 2026-08-21). Fux is built,
+measured and judged at that size. **50 000 and then 100 000 are staged later
+targets, not the filter.**
 
-- **Scale is the default, not the trigger** — 10⁵–10⁶ documents, sprawling
-  Confluence/SharePoint/wiki estates, thousands of repos, millions of links.
+This replaced a 10⁵–10⁶ design point on 2026-08-21. **What changed is the
+scale filter. What did not change is the deployment filter** — a
+10 000-document corpus inside a corporation is still inside that corporation.
 
-- **Enterprise realities are design inputs** — Windows-first fleets, proxies
-  and SSO in front of every internal site, air-gapped/regulated environments,
-  multi-team corpora with access boundaries, audit and compliance demands.
+- **Scale is a staged target, not the default.** 10k now; 50k next; 100k
+  after that. An argument that turns on 10⁵–10⁶ documents describes where the
+  design is heading and **may not gate work today**. A feature is not blocked,
+  and a measurement is not owed, because of a size Fux is not yet built for.
+
+- **Enterprise realities are still design inputs** — Windows-first fleets,
+  proxies and SSO in front of every internal site, air-gapped/regulated
+  environments, multi-team corpora with access boundaries, audit and
+  compliance demands. None of these got cheaper when the corpus got smaller.
 
 - **Fux's laws are enterprise features, not constraints** — `$0`/stdlib = a
   trivially auditable supply chain and no procurement; offline/no-API = no data
   ever leaves the tenant; deterministic = compliance-grade reproducibility.
 
-The question per feature: *"does this hold up in that corporation's
-mega-project?"* Anton remains a convenient small-scale testbed, not the
-priority filter.
+The question per feature: *"does this hold up on a 10 000-document corpus
+inside that corporation, and does it foreclose 50k later?"* **The second
+clause is a check against painting into a corner — not a licence to build for
+a size nobody is measuring.**
+
+Anton remains a convenient testbed. **Do not design in reference to it.**
+
+> **A gate judged at a deferred size is not a blocker.** A pre-registered
+> threshold may never move (§the lifecycle), so a verdict measured at 100 000
+> documents stands as measured — it is **re-judged at 10 000 by a new
+> pre-registration**, never by editing the old one. Records and compare docs
+> that argue from the old design point are stale until reconciled, and that
+> reconciliation is an item, not a silent edit.
 
 ## How work happens here (the lifecycle)
 
@@ -588,7 +605,7 @@ failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
 
 ## Build & test
 
-**`fux-engine` 0.34.0 is released and on PyPI**; `src/fux/` is the live tree.
+**`fux-engine` 0.35.0 is released and on PyPI**; `src/fux/` is the live tree.
 
 ```bash
 uv sync --extra dev
@@ -617,10 +634,11 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`**. Import package: **`fux`**.
-- Version: **`0.34.0`**, released (0.26.0 archived → reset → 0.30.0 → M2 at
+- Version: **`0.35.0`**, released (0.26.0 archived → reset → 0.30.0 → M2 at
   0.32.0 → the sources rewrite at 0.33.0 → the graph/refer/maintenance planes
-  at 0.34.0). Bumped in `src/fux/__init__.py` only — it is the single source,
-  read dynamically by `pyproject.toml`.
+  at 0.34.0 → the source verbs and the progress plane at 0.35.0). Bumped in
+  `src/fux/__init__.py` only — it is the single source, read dynamically by
+  `pyproject.toml`.
 
 ## Merge wall — what actually blocks a merge
 

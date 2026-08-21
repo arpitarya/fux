@@ -157,7 +157,7 @@ value is an error, not a silent override: the shard function is
 tree. The key exists so the number is *visible* rather than folklore.
 
 **4. `[sources.url]` is entirely optional.** Absent means no URL source, and
-`--refresh-urls` has nothing to do.
+`fux update` has nothing to do.
 
 **5. `fetcher` and `urls_file` default to `.fux/fetchers/http.py` and
 `.fux/sources/urls`.** Both are repo-relative paths, and both defaults are the

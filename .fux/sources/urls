@@ -8,5 +8,6 @@
 #   https://example.com/handbook/oncall    fetch=http meta=hashed
 #   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed
 #
-# `fux url <URL>` writes a line here with every attribute stated. Fetching only
-# ever happens under `fux ingest --refresh-urls`. See ADR-URL-LIST.
+# `fux add <URL>` writes a line here with every attribute stated, and fetches
+# that one URL. `fux update` re-fetches every line. Those are the engine's two
+# networked paths; every other command is offline. See ADR-URL-LIST.

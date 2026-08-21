@@ -268,7 +268,7 @@ What an [adapter](#adapter) needs to fetch the bytes back.
 
 **Fetcher (URL)** — The **consumer's own** Python file, committed at
 `.fux/fetchers/cdp.py`, that turns a URL into markdown. Fux imports it by
-path — only under `fux ingest --refresh-urls` — and calls
+path — only under `fux add <URL>` or `fux update` — and calls
 `configure(config)` / `connect()` / `fetch(url)` / `close()`. Every socket in
 the system lives here, outside `src/fux/`, which is how the
 [`$0`](#0-the-zero-dollar-law) offline-by-default laws survive URL ingestion.
@@ -404,7 +404,7 @@ read from the committed `.fux/sources/urls` (one per line), fetched through
 the consumer's [fetcher](#fetcher-url), and indexed exactly like repo
 files with [hashed meta](#hashed-meta-meta--hashed) by default. Fux ships
 **no** URL adapter — the adapter cap is untouched, because the fetching code
-is the consumer's. Fetching happens only under `--refresh-urls`; a plain
+is the consumer's. Fetching happens only under `fux add <URL>` or `fux update`; a plain
 ingest carries every `url:` record forward byte-identically. See
 [ADR-URL-INGEST](../archive/adr/0010_url-source-consumer-middleware.md).
 

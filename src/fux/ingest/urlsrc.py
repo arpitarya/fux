@@ -5,8 +5,9 @@ fetcher files under `.fux/fetchers/`, this module loads one by path, calls its
 `fetch(url) -> str` per URL, and normalizes the result into ingestable bytes.
 All network code — transport, browser, auth, retries — lives on the consumer's
 side of that boundary; `src/fux/` stays offline and stdlib-only. Fetching runs
-ONLY under `fux ingest --refresh-urls` (law L4); a plain ingest never imports a
-fetcher.
+only under the engine's two named fenced paths — `fux add <URL>`, scoped to the
+one URL, and `fux update` (law L4, [ADR-CLI](../../docs/adr/0002_cli-surface.md)
+decision 1e). A plain ingest never imports a fetcher.
 
 The URL list is a committed *file*, `.fux/sources/urls`, parsed by the one
 shared grammar in `sourcelist.py` (ADR-URL-LIST).
@@ -103,7 +104,7 @@ def read_urls(root: Path, rel_path: str) -> list[sourcelist.Entry]:
         rel_path,
         sourcelist.URLS,
         missing_hint=(
-            "create it with one URL per line (`fux url <URL>` writes one for you), "
+            "create it with one URL per line (`fux add <URL>` writes one for you), "
             "or remove [sources.url] from fux.toml"
         ),
     )

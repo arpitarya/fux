@@ -120,8 +120,8 @@ def test_the_graph_lane_does_not_move_ask(linked):
     lexical path.
     """
     for query in ("storage engine selection", "rollback", "catering"):
-        accelerated = _run(linked, "ask", query, "--json").stdout
-        scanned = _run(linked, "ask", query, "--json", "--scan").stdout
+        scanned = _run(linked, "ask", query, "--json").stdout
+        accelerated = _run(linked, "ask", query, "--json", "--fast").stdout
         assert accelerated == scanned
 
 

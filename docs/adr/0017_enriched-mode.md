@@ -272,7 +272,7 @@ Recorded so M8 designs against a list rather than a mood. **None is approved.**
 
 **Reopen this decision if** any of the following becomes true: `src/fux/`
 gains a model or network call reachable from `fux ingest` without
-`--refresh-urls`; a committed record carries `"mode":"enriched"` before
+the networked fetch paths; a committed record carries `"mode":"enriched"` before
 `src/fux/enrich/` exists and W-38's gate has been given; or M6's measured
 results show the deterministic
 lexical+dense lanes already meet the recall the enrichment was meant to buy —

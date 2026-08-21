@@ -130,7 +130,7 @@ again here.
 | [0005](0005_find.md) | **ADR-FIND** | The `find` verb — one line per hit, for pipes; a projection of `ask`, not a second strategy | ⏳ proposed | yes |
 | [0006](0006_answer.md) | **ADR-ANSWER** | The `answer` verb — the single best answer the index can give, with its ceiling stated in every response | ⏳ proposed | yes |
 | [0007](0007_ingest.md) | **ADR-INGEST** | How ingest works — re-extract everything, re-resolve every edge, write only shards whose bytes changed | accepted | yes |
-| [0008](0008_url-ingest.md) | **ADR-URL-INGEST** | URL ingestion behaviour — `--refresh-urls` only, a failed fetch is a skip not a deletion, and what comes back is normalized | accepted | yes |
+| [0008](0008_url-ingest.md) | **ADR-URL-INGEST** | URL ingestion behaviour — fetching only inside a named fenced path, a failed fetch is a skip not a deletion, de-listing needs no network, and what comes back is normalized | accepted | yes |
 | [0009](0009_index-lifecycle.md) | **ADR-INDEX-LIFECYCLE** | Index generation and update — one canonical encoder, write-if-different, a derived plane that refuses to diverge | accepted | yes |
 | [0010](0010_index-record.md) | **ADR-RECORD** | One line of the committed index, property by property — including the two that are conditional on privacy | accepted | yes |
 | [0011](0011_accelerator.md) | **ADR-T1-ACCELERATOR** | The derived T1 accelerator — disposable, term-major, and forbidden from changing an answer | accepted | yes |
@@ -288,8 +288,9 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, incl. `git check-ignore` |
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/templates/` | ADR-FETCHER | the two shipped fetchers as package data; **bytes, never imported** |
-| `src/fux/sources.py` | ADR-URL-LIST | `fux url` — the writer that makes the list tool-managed |
+| `src/fux/sources.py` | ADR-CLI | `add`/`remove`/`update` — the writer for **all three** source lists, and the verbs over them (W-63, 2026-08-21; was ADR-URL-LIST while it was `fux url` alone) |
 | `src/fux/cli.py` | ADR-CLI | the flat verb surface, the boundary error contract, and the `--json` shape |
+| `src/fux/progress.py` | ADR-CLI | the progress plane on `ingest.run()`/`derive.build()` — stderr-only, TTY-gated, counts not clocks (W-64, 2026-08-21) |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator |
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |

@@ -160,13 +160,22 @@ ever overwritten: a consumer's annotations and edits survive every run.
 because it is what writes the `fux.toml` that makes a directory a root.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded
-by path, and only under `--refresh-urls`. The two files fux can put there ship
+by path, and only under the two fenced paths — `fux add <URL>` and
+`fux update` (2026-08-21, W-63; it was `--refresh-urls` alone until then). The two files fux can put there ship
 as package data with an extension Python's import machinery cannot resolve, so
 **fux copies them and never imports them** ([ADR-FETCHER](0019_fetcher.md)
 decision 1). One known consequence, accepted: linters that skip hidden
 directories by default (ruff does) will not lint them.
 
 ### Consequences
+
+- **The generated headers name the two networked paths** (2026-08-21, W-63).
+  `.fux/README.md` and `.fux/sources/urls` are written by `setup` from
+  templates this record owns, and both said fetching happened only under
+  `--refresh-urls`. That flag retired into `fux update`, and `fux add <URL>`
+  joined it — so the generated text said something false about L4 to every
+  consumer who ran `fux setup`. Corrected in the templates, and in this
+  repo's own copies, in the same change.
 
 - **`fux setup` writes a fourth consumer-owned file** (2026-08-20):
   `.fux/sources/types`, write-if-missing like the rest, **with the built-in

@@ -22,7 +22,8 @@ timestamp: 2026-08-19T00:00:00Z
 ## §1 — For humans
 
 **Fux never fetches. Your fetcher does.** A Python file in your repo, named in
-`fux.toml`, loaded by path, called once per URL under `--refresh-urls`. Core
+`fux.toml`, loaded by path, called once per URL under either fenced path —
+`fux add <URL>` (that URL only) or `fux update` (all of them). Core
 holds **zero network lines**, and that is the property this record exists to
 keep true.
 
@@ -52,7 +53,7 @@ say one word.
 
 ```mermaid
 flowchart LR
-    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux ingest --refresh-urls"]
+    L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux update"]
     R --> P["load by path<br/>fux.toml [sources.url] fetcher"]
     P --> F[".fux/fetchers/*.py<br/>YOUR code"]
     F --> M["markdown"]
@@ -64,7 +65,7 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  .fux/sources/urls          fux ingest --refresh-urls
+  .fux/sources/urls          fux add <URL> · fux update
   (fetch= declares which) -->  |  load by path from fux.toml
                                v
                      .fux/fetchers/*.py   <-- YOUR code, fux never rewrites it
@@ -92,7 +93,7 @@ close() -> None                  # optional; once, after the last fetch — even
 The retired key stops the run and says what to do:
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
 error: fux.toml: [sources.url] middleware was renamed to fetcher — rename the
 key, and move the file from .fux/middleware/ to .fux/fetchers/ (ADR-FETCHER,
 2026-08-19)
@@ -181,6 +182,16 @@ decision 7 because it is the back door through which the adapter cap would
 otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
 
 ### Consequences
+
+- **The contract is unchanged; the commands that invoke it are not**
+  (2026-08-21, W-63). `fetch(url)` / `connect()` / `close()` / `configure()`
+  are exactly as they were. What changed is that a fetcher is now reached
+  from **two** named paths rather than one, and that `fux add <URL>` calls it
+  for a **single** URL — `ingest.run(only_urls=…)` narrows which listed URLs
+  are fetched, and every other listed URL is carried forward exactly as a
+  failed fetch would be. A fetcher cannot tell the difference and does not
+  need to: it is still called once per URL, in sorted order, inside one
+  `connect`/`close` bracket.
 
 - **`_sanitize` became `sanitize`, and the refer plane calls it** (2026-08-20,
   [ADR-REFER](0031_refer-plane.md) decision 3). Fetched-text normalization is

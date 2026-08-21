@@ -1,32 +1,53 @@
 ---
 type: Compare Doc
 title: The Graph Plane's Format — What a Graph Verb Should Have to Read
-description: "A profile puts 9.34 s of a 9.54 s `fux graph` at 100 000 documents in `plane.load()` and 0.20 s in the answer. Four responses — accept a ceiling, make the plane node-major and seekable, drop the copied edges entirely, or wait for ADR-T2-SEGMENTS — compared against the measured attribution."
-status: proposed
+description: "Filed against a 10⁵ design point; RULED at a 10k one. At 10 000 documents the plane loads in 0.37 s and the fork does not bite — verdict A, accept the current format, with the reopen trigger set at the 50k target. The measured case for B is kept in full because that is what 50k will need."
+status: accepted
 timestamp: 2026-08-21T00:00:00Z
 ---
 
 # The graph plane's format — Comparison
 
-> **Proposed verdict: B — the plane becomes node-major and seekable.** One
-> record per node carrying its outbound edges and its community label, plus an
-> id → (offset, length) index; `plane.load()` stops being a parse of the whole
-> corpus and becomes an open plus one seek. Measured at 100 000 documents:
-> **`explain` 0.21 s and `graph` 0.45 s, against a 9.34 s load today** — 44×
-> and 21×. The file it produces is also the shape `ADR-T2-SEGMENTS` would
-> later mmap, so B is a step toward D rather than a detour around it.
-> **Rejected:** **A — accept a documented ceiling** (honest, and it retires
-> three verbs at the corpus size CLAUDE.md calls the design point); **C — drop
-> the copied edges and read them from the committed shards** (**the more
-> principled shape, and the only reason it is not proposed is that its cost is
-> unmeasured** — §5 names the afternoon that would settle it); **D — wait for
-> `ADR-T2-SEGMENTS`** (right end state, wrong schedule — it lives inside
-> [W-26](../open/W-26-m6-scale-t2.md), which sits behind P1–P3, and its scope
-> is the accelerator, not this plane).
-> **Status:** ⏳ **awaiting Arpit.** **Filed:** 2026-08-21.
-> **Reopen when:** a measured `fux graph` at 100 000 documents exceeds the
-> bound set per §6 under whichever option is taken, or `ADR-T2-SEGMENTS` lands
-> with a segment format that subsumes the chosen layout.
+> **Verdict: A — accept the current format at the 10 000-document design
+> point.** `.fux/runtime/graph.json` stays as it is. At 10k the whole
+> objection evaporates: the plane is **6.4 MB and loads in 0.37 s**, and a
+> `fux graph` costs **0.45 s** end to end. **No work is done here now.**
+> **Ruled by Arpit, 2026-08-21**, in the same call that moved the design point
+> from 10⁵–10⁶ to 10 000 documents (CLAUDE.md §Litmus). **The fork was filed
+> against the old design point and is answered by the new one, not by a
+> counter-argument** — §0 records exactly that, because a verdict that hides
+> why it changed is worse than the fork it closed.
+> **Not rejected — deferred:** **B — node-major and seekable** is still the
+> right answer the moment 50 000 is taken up (**3.74 s** load there, already
+> past tolerable), and its measured case is kept below in full so the next
+> session does not re-derive it. **C — communities-only** is still the better
+> *shape* and still unmeasured; §5's experiment stands. **D — wait for
+> `ADR-T2-SEGMENTS`** is still the end state.
+> **Filed:** 2026-08-21. **Ruled:** 2026-08-21.
+> **Reopen when:** **the 50 000-document target is taken up** — that is the
+> trigger, not a latency observation, because the latency at 50k is already
+> measured and known (§The measurement). Also reopen if a real 10k corpus
+> loads slower than ~1 s, which would mean the synthetic edge density in the
+> profile understates reality.
+
+## §0 — Why this verdict is A and what that does not mean
+
+This document argued B on the numbers and **the numbers did not change** —
+the design point did. Filed 2026-08-21 against a 10⁵–10⁶ litmus, where a
+9.34 s load is disqualifying; ruled hours later under a 10 000-document
+litmus, where a 0.37 s load is not a problem at all.
+
+**Three things this verdict does not say.** It does not say B was wrong — B
+is measured, it works, and it is what 50k needs. It does not say the plane
+scales — it does not, and §The measurement is the evidence. And it does not
+retire the graph verbs at any size: **at 10k they are fine**, which is a
+different sentence from option A's original one, and the reason A is
+acceptable now when it was not this morning.
+
+**What is deliberately not done:** nothing is documented as a "ceiling" in
+the user-facing docs. A ceiling at 10k is the design point, not a caveat, and
+writing it into the README would be documenting a limitation that CLAUDE.md
+already states as scope.
 
 ## Context — what fired this
 
@@ -87,23 +108,42 @@ Fact 4 is what makes this a real fork rather than a foregone one. The obvious
 objection to any seekable plane is that a graph walk touches everything;
 measured, it does not.
 
+**And the fifth fact, which is the one the verdict turns on** — the same
+profile at the sizes that are now the roadmap:
+
+| corpus | plane | load | `fux graph` end to end | verdict |
+|---|---|---|---|---|
+| **10 000 — the design point** | **6.4 MB** | **0.37 s** | **0.45 s** | **fine; A** |
+| 50 000 — next target | 32.2 MB | 3.74 s | 3.88 s | **B, and reopen here** |
+| 100 000 — deferred | 64.4 MB | 9.34 s | 9.54 s | B or C |
+
+The cost is roughly linear in edges, so there is no cliff to be surprised by
+between 10k and 50k — but there is also no headroom: **the plane is 10× worse
+at the very next target on the list.**
+
 ## The options
 
-### A — Accept a documented ceiling
+### A — Accept the format as it stands ✅ **RULED**
 
-`graph.json` stays as it is. The documentation states that `explain` / `graph`
-/ `path` are for repositories up to ~10 000 documents (load **0.37 s**), and
-above that the verbs are not used.
+`graph.json` stays as it is. At the 10 000-document design point it loads in
+**0.37 s** and a `fux graph` costs **0.45 s** end to end.
 
-- **For:** zero work; the honest reading of a measured limit; and the ceiling
-  is higher than it sounds, since most repositories are under 10 000 documents.
-- **Against:** it retires a whole milestone's verbs at 10⁵–10⁶ documents, which
-  CLAUDE.md's litmus calls **the design point, not a stretch goal**. It is also
-  the second time this answer has been offered for the same corpus size —
-  [`hook-at-scale.compare.md`](hook-at-scale.compare.md) option A — and taking
-  it twice is how "enterprise scale by default" quietly becomes a slogan.
+- **For:** zero work, and — under the design point set on 2026-08-21 — **not a
+  compromise at all.** This is not "a ceiling we accept"; 10k *is* the target,
+  and the plane meets it with room.
+- **Against, as argued when this was filed:** it retired a whole milestone's
+  verbs at 10⁵–10⁶ documents, which CLAUDE.md's litmus then called *the design
+  point, not a stretch goal* — and it would have been the second time this
+  answer was taken for the same corpus size
+  ([`hook-at-scale.compare.md`](hook-at-scale.compare.md) option A).
+- **Why that objection no longer holds:** the litmus changed in the same call
+  that ruled this. **The objection was never to the option — it was to the
+  scope it implied**, and the scope is now the stated one rather than an
+  unstated retreat. *(This is exactly the reasoning that must be re-checked
+  when 50k is taken up: at 50 000 documents A means a 3.74 s `explain`, and
+  there it is a retreat again.)*
 
-### B — The plane becomes node-major and seekable *(proposed)*
+### B — The plane becomes node-major and seekable ⏸ **DEFERRED TO 50k**
 
 One record per node — `{"n": id, "e": [[kind, dst, grade], …], "c": label}` —
 written in `graph.nodes` order, with a sidecar id → (offset, length) index.
@@ -157,13 +197,26 @@ The graph plane becomes an mmap byte-aligned segment when
   every runtime artefact instead of two. The name is already reserved and the
   milestone is already scoped to build exactly this.
 - **Against:** **schedule and scope.** W-26 is the only agent-startable item on
-  OPEN-WORK but sits behind **P1, P2 and P3** in [PRIORITY.md](../PRIORITY.md),
-  and P3 can kill the wire format outright — so the graph plane's read cost
-  stays at 9.34 s across an unbounded number of sessions. W-26's DoD is already
+  [OPEN-WORK](../OPEN-WORK.md). **The schedule half of this objection has since
+  lapsed** (noted 2026-08-21): it was written when W-26 sat behind P1, P2 and P3
+  in the 2026-08-20 audit's ranked queue; all three closed and that queue was
+  archived, so nothing is ahead of W-26 any more. **The scope half stands**, and
+  P3's risk did not resolve the way this bullet assumed — R7 closed *unmeasured*
+  rather than killing the wire format
+  ([the preliminary analysis](../regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)),
+  so the format is neither vindicated nor dead. Either way the graph plane's
+  read cost stays at 9.34 s across an unbounded number of sessions. W-26's DoD is already
   four boxes including a paper rewrite, and its own file warns that T2 *"lands
   on the maintenance path this milestone's sibling gate just failed"*. Adding a
   second plane to it makes a large milestone larger. **D is where this ends up;
   it is not how it gets fixed now.**
+
+- **Re-scoped again, 2026-08-21:** W-26 is now itself a **10 000-document**
+  milestone, and its first question is whether T2 earns its place at that size
+  at all. **If the answer is no, option D has no vehicle** — there would be no
+  segment format for the graph plane to join. That does not change this
+  verdict (A needs no vehicle), but it means **B, not D, is what the 50k
+  target inherits.**
 
 ## §5 — Why C is not proposed, and the experiment that would settle it
 
@@ -201,7 +254,16 @@ than from anything measured here.
 
 ## Matrix
 
-| criterion (weight) | A ceiling | **B node-major** | C communities-only | D wait for T2 |
+> **Left as filed, deliberately.** These weights were set under the 10⁵–10⁶
+> litmus, and the top two rows — worth ×3 each — are the ones that made B win.
+> **Re-weighting them at 10 000 documents is what produces verdict A**: both
+> criteria become `✓` for every option including the do-nothing one, the two
+> heaviest rows stop discriminating, and what is left is implementation cost
+> and formats-to-maintain, where A wins outright. The table is kept unedited
+> so that arithmetic is visible rather than asserted. **Read `100k` as
+> `the deferred target` throughout.**
+
+| criterion (weight) | A as-is | **B node-major** | C communities-only | D wait for T2 |
 |---|---|---|---|---|
 | `explain` under 1 s at 100k (×3) | ✗ | **✓ 0.21 s** | likely, unmeasured | ✓ eventually |
 | `graph` under 1 s at 100k (×3) | ✗ | **✓ 0.45 s** | unmeasured | ✓ eventually |

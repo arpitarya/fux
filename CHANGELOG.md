@@ -6,6 +6,102 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
+## [Unreleased]
+
+## [0.35.0] - 2026-08-21
+
+The corpus becomes a first-class verb, and two defects that made removing a
+document harder than adding one are fixed.
+[ADR-CLI](docs/adr/0002_cli-surface.md) 1a–1e ·
+[ADR-INGEST](docs/adr/0007_ingest.md) 9–10 ·
+[ADR-DIR-LIST](docs/adr/0023_dir-list.md) 2d–2e, 3a. Surface captured
+verbatim in [`work/regression/2026-08-21-source-verbs/`](work/regression/2026-08-21-source-verbs/report.md).
+
+### Added
+
+- **`fux add` / `fux remove` / `fux update` — the corpus is a first-class
+  verb now.** They work over `.fux/sources/dirs`, `urls` and `types` alike,
+  dispatching on the entry: anything with a `scheme://` is a URL, `--types`
+  says type pattern, everything else is a path — and a path may be a directory
+  **or a single document**, which the list always accepted and no command ever
+  wrote.
+
+  - **`add` records and then does the work.** It ingests by default
+    (`--no-ingest` opts out), and for a URL it **fetches that one URL**
+    (`--no-fetch` opts out), announcing on stderr that it went to the network.
+  - **`remove` has two branches and says which it took.** An entry with its own
+    line loses the line; a path held only by a listed ancestor is subtracted
+    with `!`, leaving the ancestor listed. It reports what left the index and
+    how many inbound graph edges went with it.
+  - **`update` re-reads what is listed and never writes a line.** With no
+    entry it re-reads everything; with one it re-reads that. `--check` is
+    read-only and offline for files.
+  - `--dry-run` on `add`/`remove` prints the line and the plan and writes
+    nothing.
+
+### Changed
+
+- **A de-listed URL now leaves the index on an *offline* run.** Removing a URL
+  from `.fux/sources/urls` used to have no effect until someone ran
+  `--refresh-urls` — so **deleting a document required the network**, which it
+  never needed. Reconciliation reads a committed file; only *fetching* is
+  fenced. A URL that is still listed and whose fetch fails still keeps its
+  prior record, unchanged: that guarantee is about the fetch, not the list.
+- **A carried-forward record no longer keeps edges to documents that are
+  gone.** `url:` records are reused whole on an offline run, edges included,
+  and those edges were resolved against a previous run's corpus — so a removed
+  document could survive as an edge target in the derived graph. Every carried
+  record's edges are now re-checked against the run's own id set.
+- **`fux explain` distinguishes "no relationships" from "not in the index".**
+  It answered the same way for both, and exited 0 for a document the corpus
+  does not hold.
+- **`fux add '<pattern>' --types` extends the built-in file-type allowlist
+  instead of replacing it.** `.fux/sources/types` *replaces* the default when
+  it exists, so creating it with one pattern silently un-indexed every
+  markdown document. `add` now seeds the defaults when it creates the file.
+
+### Removed
+
+- **`fux url` is gone.** Use `fux add <URL>` and `fux remove <URL>`. It is
+  deleted rather than deprecated: it shipped four days ago, this is pre-1.0,
+  and the replacement is a rename plus a fetch. `--cdp`, `--http`, `--plain`
+  and `--hashed` mean exactly what they meant.
+- **`fux ingest --refresh-urls` is retired into `fux update`** and hidden from
+  `--help`. **It still parses for one release** — it is a flag rather than a
+  verb and more likely to be in a pipeline. `fux update` differs in one way,
+  and it is a fix: a repo with no `[sources.url]` is not an error there.
+
+- **`fux ingest` and `fux build` show progress.** A bar on **stderr**, painted
+  only when stderr is a terminal, reporting **counts and no clock** — no
+  elapsed, no ETA, no rate. It engages per phase once that phase has more than
+  ~200 items, so a run where everything carries forward stays quiet.
+  `--no-progress` and `--progress` force it off and on; `FUX_NO_PROGRESS=1`
+  disables it from the environment. The installed git hooks turn it **on**
+  explicitly, because a slow commit is where silence is most alarming.
+
+  **Your pipelines are unaffected, by construction.** stdout is byte-identical
+  with the bar on or off — `--json`, `| tee`, and every captured transcript
+  produce exactly the bytes they did before. That is asserted per verb in the
+  test suite, not merely intended.
+
+  Motivated by a measured 44.4 s of total silence when re-indexing 100 000
+  documents on the commit path
+  ([R5](work/regression/2026-08-20-r5-hook-latency/VERDICT.md)).
+  Surface captured verbatim at
+  [`2026-08-21-progress-plane`](work/regression/2026-08-21-progress-plane/report.md).
+
+### Changed
+
+- **`ask`/`find`/`answer`/`graph` scan by default; `--fast` opts into the
+  accelerator** (Arpit, 2026-08-21). Previously the reverse: the accelerator
+  answered whenever a fresh build existed, and `--scan` forced the reference
+  path. `--scan` is unchanged in behaviour and now redundant with the
+  default — kept because it is what a bug report reproduces against
+  explicitly. `--fast` and `--scan` are mutually exclusive. The differential
+  law (ADR-ASK) makes this a pure speed choice: results are byte-identical
+  either way. See [ADR-CLI](docs/adr/0002_cli-surface.md) and
+  [ADR-ASK](docs/adr/0004_ask.md).
+
 ## [0.34.0] - 2026-08-21
 
 **Four milestones in one release — the graph lane, the refer plane, the

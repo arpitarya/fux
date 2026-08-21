@@ -139,7 +139,7 @@ The gate is those three conditions together, and each is load-bearing:
 | condition | what it stops |
 |---|---|
 | the content `sha` matches | reusing fields derived from bytes that changed |
-| `file:` and `meta: plain` | a `url:` record, which only reappears on `--refresh-urls`, and a hashed record whose display fields were deliberately never stored reusably |
+| `file:` and `meta: plain` | a `url:` record, which only reappears on a fenced networked run, and a hashed record whose display fields were deliberately never stored reusably |
 | the header equals `store.HEADER` | **two analyzers inside one index** — undetectable afterwards, and a silent differential-law break |
 
 **The output is byte-identical to a full run, and that is the property under
@@ -173,9 +173,36 @@ accelerator is bound by the differential law
 ([ADR-DOTFUX](0003_fux-directory.md)), so a fresh clone is correctly laid out
 before the first byte lands.
 
-**8. Ingest is offline.** The single exception is `--refresh-urls`
-([ADR-URL-INGEST](0008_url-ingest.md)); a plain run never imports the
-fetcher.
+**8. Ingest is offline.** The exceptions are the named fenced paths
+([ADR-URL-INGEST](0008_url-ingest.md)); a plain run never imports the fetcher.
+
+**9. De-listing is honoured on every run; only *fetching* needs the fenced
+path** (2026-08-21, W-63). A `url:` record is carried forward for exactly as
+long as its line exists in `.fux/sources/urls`. Reading that file is not a
+network call, so removing a document never was a networked operation — and
+requiring the network for it meant `fux remove <URL>` could not work offline.
+
+**This is a behaviour change, and the prior sentence described a defect.**
+This record and `ingest/run.py`'s docstring both used to say reconciliation
+*"happens only on the run that opted into the network"*, stated as design.
+The transient-failure guarantee is untouched and is a separate rule: a URL
+**still listed** whose fetch fails keeps its prior record, because a network
+blip must never delete a document. Reconciliation keys on the list; carry-
+forward keys on the fetch. Conflating the two is what produced the defect.
+
+A missing list with surviving `url:` records is a **loud error**, not a mass
+deletion — the same way a missing `dirs` file is. The two silent readings are
+both worse: emptying every URL document because a file went missing, or
+carrying them forever.
+
+**10. A carried record's edges are re-checked against this run's id set**
+(2026-08-21, W-63). Decision 1's split says extraction may be carried forward
+and edges may not — but a *carried* record was exempt from that in practice,
+because it was reused whole. Its edges were resolved against a **previous**
+run's corpus, so a document removed since survived as an edge target.
+`tag:` targets are exempt: a tag node is minted by the edge and is never a
+document, so it cannot dangle. A record whose edges all still resolve is
+returned uncopied, so an unchanged run still writes byte-identical shards.
 
 ### What it looks like
 
@@ -244,6 +271,14 @@ docs/logo.png: binary
   extraction.** The expensive half is now proportional to the change; the cheap
   half still is not, and at very large corpora that residue is what remains to
   attack. Writing and diffing were already O(changed).
+- **`run()` takes an optional `progress`, and that cost is now visible**
+  (W-64, 2026-08-21). Four phases report counts — `walk`, `extract`, `edges`,
+  `write` — with `extract` the one that matters, since it is the 92 % this
+  record's decision 1b was measured against. The plane and its four rules
+  belong to [ADR-CLI](0002_cli-surface.md) decision 9; what binds here is
+  that **`progress=None` is the default and means silent**, so no existing
+  caller changed, and that the phases report *counts*, never elapsed time —
+  ingest is a maintenance path and a wall clock has no business on it.
 - **Term-hash collision detection is complete only on a full run.** The tracker
   sees the raw terms of documents it extracted; a carried-forward document
   contributes hashes it cannot un-hash, so a cross-document collision involving
@@ -255,6 +290,26 @@ docs/logo.png: binary
 - **`0 shards written` can accompany a deletion**, since removing a shard is
   not a write. True, and mildly under-informative when reading a run log.
 - **Re-ingest is safe to run on a hook**, which is what M5 depends on.
+- **`fux remove` became possible** (W-63). Decision 9 is its precondition:
+  a verb that deletes a document could not otherwise do so without the
+  network, which is the wrong shape for a deletion.
+- **The graph plane can no longer be handed a dangling edge by ingest**
+  (decision 10). [ADR-GRAPH](0030_graph.md)'s `edges_from_records` lifts
+  edges with no validation on the strength of that, which was true only for
+  re-resolved records before this.
+- **An offline run now reads one more committed file** — `.fux/sources/urls`
+  — but only in a repo that actually holds `url:` records. A directory-only
+  corpus, which is every corpus in this repo's own tests bar one module,
+  never touches it.
+- **`run()` takes a `progress=` and reports four phases through it** (W-64,
+  2026-08-21) — walk, extract, edges, write. The seam is optional and
+  `None` means silent, so every existing caller is unaffected; the rules it
+  obeys, and the invariant that stdout is byte-identical with the bar on or
+  off, are [ADR-CLI](0002_cli-surface.md) decision 9 and are not restated
+  here. **The bar reports counts ingest already knew** — no phase computes
+  anything for the sake of a total, and `write` is a bookend around
+  `write_index` rather than a live count, because that function offers no
+  per-shard hook and interpolating one would be a clock in disguise.
 - **The ingest-mode naming left this record.** What `extracted` promises is
   now [ADR-EXTRACTED](0016_extracted-mode.md), which also takes
   `ingest/extract.py`; this record keeps how ingest *runs*. Both were ratified
@@ -267,7 +322,7 @@ docs/logo.png: binary
   above is untouched by construction: nothing here adds a network call: a
   *carried-forward* `hashed` record (this run made no fetch for it) whose
   cache has gone cold is not silently accepted either — `store/writer.py`
-  refuses it, naming the fix as `fux ingest --refresh-urls`. A plain run
+  refuses it, naming the fix as `fux update`. A plain run
   still makes zero network calls; it can now also fail loudly, on a corpus
   that predates P5 or whose cache was evicted, rather than commit a hashed
   record no reader can ever show a title for. Full rationale on

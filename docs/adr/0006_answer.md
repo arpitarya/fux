@@ -199,7 +199,7 @@ that configuration choice, not invented by `answer` deciding to fetch.
 
 ```console
 $ fux answer --help
-usage: fux answer [-h] [--json] [--scan] [--no-refer] query
+usage: fux answer [-h] [--json] [--fast | --scan] [--no-refer] query
 ```
 
 No `--top` (forced to 1), no `--explain`, no `--hybrid`.

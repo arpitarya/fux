@@ -7,8 +7,8 @@
 dirs_file = ".fux/sources/dirs"
 
 # URL ingestion through YOUR fetcher files. Uncomment to enable. Fetching only
-# ever happens under `fux ingest --refresh-urls` -- fux is offline by default.
-#[sources.url]
+# ever happens under `fux add <URL>` or `fux update` -- fux is offline by default.
+[sources.url]
 #fetcher   = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
 #                                     # and the directory `fetch=cdp` resolves in
 urls_file = ".fux/sources/urls"
@@ -17,8 +17,8 @@ urls_file = ".fux/sources/urls"
 # Fetcher tunables. Fux passes this table to the fetcher's optional
 # `configure(config)` VERBATIM and never reads a key inside it -- the keys mean
 # something to your fetcher, nothing to fux.
-#[sources.url.config]
-#cdp_port  = 9222
+[sources.url.config]
+cdp_port  = 9299
 #timeout_s = 30
 
 [index]

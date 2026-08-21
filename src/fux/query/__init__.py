@@ -18,11 +18,14 @@ expensive thing to retrofit.
 
 ## Which path answers
 
-`ask` uses the derived accelerator when one is present and fresh, and the B2
-scan otherwise. **That choice can never change a result** — the differential
-law (`tools/differential/`, `tests/derive/test_differential.py`) asserts the
-two are byte-identical — so it is purely a speed decision. `--scan` forces the
-reference path, which is what a bug report should be reproduced against.
+`ask` uses the B2 scan by default, and the derived accelerator only when
+`--fast` is passed and a build is present and fresh (Arpit, 2026-08-21 —
+scan needs no build step, so it is the conservative default). **That choice
+can never change a result** — the differential law (`tools/differential/`,
+`tests/derive/test_differential.py`) asserts the two are byte-identical — so
+it is purely a speed decision. `--scan` forces the reference path explicitly
+(redundant with the default; kept for bug reproduction), and `--fast` and
+`--scan` are mutually exclusive.
 """
 
 from __future__ import annotations
@@ -39,9 +42,10 @@ __all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
 
 
 def run_query(
-    root: Path, query: str, top: int, *, force_scan: bool = False, use_hybrid: bool = False
+    root: Path, query: str, top: int, *, force_scan: bool = True, use_hybrid: bool = False
 ) -> tuple[list[AskResult], str]:
-    """Answer via the accelerator when it is usable; return `(results, path)`."""
+    """Scan by default; use the accelerator only when `force_scan` is False
+    and a fresh build exists. Return `(results, path)`."""
     if use_hybrid:
         from .hybrid import hybrid_ask
 
@@ -61,13 +65,21 @@ def _root() -> Path:
     return root
 
 
+def _force_scan(args) -> bool:
+    """Scan by default; `--fast` is the only thing that opts into the
+    accelerator. `--scan` is accepted too — it is already the default, kept
+    for explicit bug reproduction — and argparse's mutually exclusive group
+    guarantees the two are never both set."""
+    return not getattr(args, "fast", False)
+
+
 def cmd_ask(args) -> int:
     root = _root()
     results, path = run_query(
         root,
         args.query,
         args.top,
-        force_scan=getattr(args, "scan", False),
+        force_scan=_force_scan(args),
         use_hybrid=getattr(args, "hybrid", False),
     )
 
@@ -96,7 +108,7 @@ def cmd_ask(args) -> int:
 def cmd_find(args) -> int:
     """Ranked documents, one per line — the terse listing verb."""
     root = _root()
-    results, _ = run_query(root, args.query, args.top, force_scan=getattr(args, "scan", False))
+    results, _ = run_query(root, args.query, args.top, force_scan=_force_scan(args))
 
     if args.json:
         print(json_mod.dumps({"results": [_as_dict(root, r) for r in results]}, indent=2))
@@ -124,7 +136,7 @@ def cmd_answer(args) -> int:
     `"source": "index"` — never silence.
     """
     root = _root()
-    results, _ = run_query(root, args.query, 1, force_scan=getattr(args, "scan", False))
+    results, _ = run_query(root, args.query, 1, force_scan=_force_scan(args))
 
     if not results:
         if args.json:

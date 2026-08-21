@@ -86,7 +86,7 @@ flowchart LR
 plain GET would have served.
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
 error: [sources.url] fetcher not found: .fux/fetchers/cdp.py
 # exit 1
 ```
@@ -99,7 +99,7 @@ $ cat .fux/sources/urls
 https://example.com/docs/api
 https://wiki.corp/display/ENG/runbook    fetch=cdp
 
-$ fux ingest --refresh-urls
+$ fux update
 wrote .fux/fetchers/http.py
 ingested 2 docs (2 changed), 0 skipped, 2 shards written
 ```
@@ -216,7 +216,7 @@ bracket ([ADR-FETCHER](0019_fetcher.md) decision 2).
 a shell, and fux indexes the shell:
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
 ingested 3 docs (3 changed), 0 skipped, 3 shards written
 
 $ fux find "oncall rotation" --json | head -4
@@ -259,7 +259,7 @@ bar gets indexed as a runbook.
 ### Alternatives considered
 
 - **`urllib` inside `src/fux/`.** The obvious placement; L1 and L4 both survive
-  (`urllib` is stdlib, and it would sit inside the `--refresh-urls` fence).
+  (`urllib` is stdlib, and it would sit inside the same fence).
   Rejected because it spends the **adapter cap**, which is the thing that has
   kept `src/fux/` dependency-free across two rebuilds and is what makes M4's
   source list a design choice rather than a dependency budget. Once core fetches

@@ -3,7 +3,7 @@
 **This file belongs to you, not to fux. It is committed to your repo, at
 `.fux/fetchers/cdp.py`, and fux will never rewrite it.** Fux writes it once
 if it is missing and reads it by path from `fux.toml`
-(`[sources.url] fetcher`) under `fux ingest --refresh-urls`, calls it to
+(`[sources.url] fetcher`) under `fux add <URL>` or `fux update`, calls it to
 turn each URL into markdown, and indexes the result exactly like a repo file.
 Edit anything — port, launch flags, wait strategy, extraction, even the whole
 transport (swap in `websockets` or Playwright if you'd rather carry a

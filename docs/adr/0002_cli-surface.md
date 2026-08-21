@@ -14,7 +14,7 @@ timestamp: 2026-08-18T00:00:00Z
 - **Owns:** `src/fux/cli.py`
 - **Laws:** L1, L4, L7 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Date:** 2026-08-18
-- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`, **twelve since M3 and M5** (2026-08-20)
+- **Feature:** the `fux` command-line interface — six verbs as shipped in `v0.32.0`, eight as of `v0.33.0`, twelve since M3 and M5 (2026-08-20), **fourteen since W-63** (2026-08-21: `url` → `add`/`remove`/`update`)
 - **Evidence:** [`work/regression/2026-08-18-cli-surface/`](../../work/regression/2026-08-18-cli-surface/report.md)
   — every example below is a verbatim capture, not an illustration
 
@@ -28,7 +28,7 @@ timestamp: 2026-08-18T00:00:00Z
 |---|---|---|
 | **lifecycle** | `setup` · `doctor` | set the repo up, then check it |
 | **write** | `ingest` · `build` | one writes the committed plane, one derives from it |
-| **sources** | `url` | records what to index; it never fetches |
+| **sources** | `add` · `remove` · `update` | maintain what is indexed — `add` and `remove` write lines, `update` never touches one |
 | **read** | `ask` · `find` · `answer` | differ only in how much they commit to |
 | **graph** | `explain` · `graph` · `path` | answer with **relationships**, never with a ranking |
 | **maintenance** | `hooks` | wires the repository to keep its own index in step; installs nothing it did not write |
@@ -40,10 +40,14 @@ that survives a new verb where a count does not. It survived again on
 2026-08-20: the graph lane added three verbs and cost this table one row, which
 is the whole argument for grouping by effect.
 
-**Twelve flat verbs is still not a tree.** `url` takes flags rather than
-becoming `fux url add`, and `path` takes two positionals and `--hops` rather
-than becoming `fux graph path`; that is the constraint every addition has to
-preserve. Nesting is the thing this record refuses, not arithmetic.
+It survived a third time on 2026-08-21, when W-63 replaced `url` with three
+verbs: the **sources** row changed and no other did.
+
+**Fourteen flat verbs is still not a tree.** `add` dispatches on its entry
+rather than becoming `fux source add`, `path` takes two positionals and
+`--hops` rather than becoming `fux graph path`; that is the constraint every
+addition has to preserve. Nesting is the thing this record refuses, not
+arithmetic.
 
 **The graph group is the first that does not rank.** `ask`/`find`/`answer`
 return documents ordered by relevance; `explain`/`graph`/`path` return
@@ -55,7 +59,7 @@ you locations and stays out of the way. `ask` gives you a ranked list with
 scores, which is what you want when you are judging the engine. `answer`
 commits to one result, which is what an agent wants when it needs a value, not
 a menu. All three take the same query, the same `--json`, and the same
-`--scan`.
+`--fast`/`--scan` pair.
 
 Everything that can fail renders as `error: <message>` on stderr and exits
 non-zero. **`main` is the only place that catches** — internals raise, and a
@@ -67,8 +71,8 @@ traceback reaching a user is a bug, not a diagnostic.
 flowchart LR
     S["sources<br/>(fux.toml)"] -->|ingest| C["committed index<br/>.fux/index/ — in git"]
     C -->|build| D["derived accelerator<br/>gitignored, rebuildable"]
-    C -.->|"--scan (reference)"| Q
-    D -->|default| Q["ask · find · answer"]
+    C -->|default| Q["ask · find · answer"]
+    D -.->|"--fast"| Q
     Q --> O["text · --json"]
 ```
 
@@ -80,8 +84,8 @@ flowchart LR
   (fux.toml)  --> .fux/index/ (in git) -->  (gitignored, rebuildable)
                ingest                build          |
                           |                         |
-                          | --scan                  | default
-                          |    (reference path)     |
+                          | default                 | --fast
+                          |    (reference scan)     |
                           v                         v
                      +-------------------------------+
                      |    ask   ·   find   ·  answer |
@@ -139,8 +143,10 @@ teeth for this project specifically —
 - **Exit codes are API.** CLAUDE.md's error contract names four, and nothing
   recorded which are actually produced.
 - **The defaults are decisions, not conveniences.** `--hybrid` is off because a
-  measurement said so; `--scan` exists only to reproduce a bug against the
-  reference path. Both read as ordinary flags to anyone who has not read
+  measurement said so; the scan is the default query path because it needs no
+  build step (Arpit, 2026-08-21 — reversing the earlier accelerator-by-default
+  choice), and `--fast` is what opts into the accelerator. Both read as
+  ordinary flags to anyone who has not read
   [ADR-T1-ACCELERATOR](0011_accelerator.md).
 
 ### Decision
@@ -175,23 +181,83 @@ different kind of answer. The verbs, their payloads and the reasoning are
 as `find`'s no-match case does — the three-verbs-agree property W-48 examined
 and kept.
 
-**1a. `url` records a URL in the committed list, and never fetches it.** It
-takes flags — `--cdp`, `--plain`, `--remove` — because "no subcommand tree" is
-the constraint decision 1 is really about. It writes every attribute explicitly
-([ADR-URL-LIST](0018_url-list.md) decision 12) and edits one line, so a human's
-grouping comments survive. **`--refresh-urls` remains the only networked path
-in the engine.**
+**1a. `add` / `remove` / `update` maintain the corpus, over all three source
+lists** (2026-08-21, W-63). They replace `url`, which wrote one of the three
+and never fetched.
 
-**1b. `setup` writes the files a consumer owns, write-if-missing** — `fux.toml`,
+**They are flat, and `fux source add` is the tree being refused.** The entry
+picks the list — anything with a `scheme://` is a URL, `--types` says type
+pattern, everything else is `dirs`, which already accepts a directory *or* a
+single file. So the common cases need no flag at all, which is what makes a
+flat verb sufficient here rather than merely mandated.
+
+They still write every attribute explicitly
+([ADR-URL-LIST](0018_url-list.md) decision 12) and still edit one line, so a
+human's grouping comments survive.
+
+**`url` was deleted outright, not deprecated.** It was four days old, pre-1.0,
+and every use of it is spelled `fux add <URL>` or `fux remove <URL>`.
+`ingest --refresh-urls` got the opposite call — older, a flag rather than a
+verb, likelier to be sitting in someone's CI — and survives **one release** as
+a hidden alias for `fux update`.
+
+**1c. `add` and `remove` write lines; `update` never touches one.** One
+sentence, and it is the whole reason three verbs do not overlap. Attribute
+edits belong to `add`, which is already an upsert. Re-reading a source belongs
+to `update`, which is why `fux update <entry>` can take an entry without that
+meaning "create it" — an entry nobody listed is a loud error, because an
+`update` that silently created lines would be a second `add`.
+
+It also settles where `--refresh-urls` went: re-fetching is re-reading, so it
+is `update`'s, not `add`'s.
+
+**1d. `fux add <URL>` fetches that one URL.** Scoped to the URL just added,
+announced on stderr, `--no-fetch` to opt out. Recording a URL without fetching
+it is a no-op, so any other default would mean "`add` ingests by default"
+silently did not apply to the one entry kind where it costs something.
+
+| rejected alternative | why not |
+|---|---|
+| **record-only, like `git remote add`** | right for a manifest something else reads later; wrong for an index whose whole value is being current. The URL would sit listed and unindexed until an unrelated command ran |
+| **a required `--fetch` flag** | makes the useful case the long one, and makes the short one a trap that looks like it worked |
+| **fetch the whole list** | a scoped fetch is the point: adding one URL should not re-request every other page in the corpus |
+
+Precedent surveyed: [`uv add`](https://docs.astral.sh/uv/reference/cli/) locks
+and syncs by default (`--no-sync` opts out) and
+[`helm repo add`](https://helm.sh/docs/helm/helm_repo/) records *and* fetches.
+The rejected pole is
+[`cargo add`](https://doc.rust-lang.org/cargo/commands/cargo-add.html) and
+`git remote add`.
+
+**The fetch does not gate the write.** A URL whose fetch fails keeps its line
+and exits 1 — recording and fetching are separate outcomes, and deleting the
+line because a site was down would make the committed list a function of
+network weather.
+
+**1e. The engine has exactly two named networked paths, and this record names
+them**: `fux add <URL>` and `fux update`. Both are fenced, both are opt-in per
+invocation, both announce on stderr that they went out.
+
+**L4's text does not change, and must not.** It reads *"network access only
+inside explicit, fenced, opt-in paths"* — already plural, already satisfied.
+What was wrong was never the law but the **records and docstrings that
+narrowed it to one path**, `--refresh-urls`, as though the count were part of
+it. Those are corrected on contact. Restating L4 here would be the defect
+[ADR-LAWS](0001_laws.md) decision 3 exists to prevent, so this decision names
+the paths and cites the law rather than paraphrasing it.
+
+**1f. `setup` writes the files a consumer owns, write-if-missing** — `fux.toml`,
 both source lists, both fetchers. It is the only verb that may run before a
 repo root exists, because it is what creates one
 ([ADR-DOTFUX](0003_fux-directory.md) decision 6). Everything it writes is the
 consumer's from that moment, and no later run rewrites any of it.
 
 **2. The three query verbs share one parser.** Every one of them takes a
-positional `query`, `--json`, and `--scan`. `ask` and `find` add `--top N`
-(default 5); `answer` does not, because committing to one result is its whole
-job. Divergence between them is a defect.
+positional `query`, `--json`, and a mutually exclusive `--fast`/`--scan` pair
+(`--scan`, the default, is redundant with it but kept for explicit bug
+reproduction). `ask` and `find` add `--top N` (default 5); `answer` does not,
+because committing to one result is its whole job. Divergence between them is
+a defect.
 
 **3. `main` is the only boundary.** It catches `FuxError` → `error: <msg>` on
 stderr, exit `exc.exit_code`; and `KeyboardInterrupt` → exit 130. Internals
@@ -208,9 +274,11 @@ emptiness — `--json` is the reliable way to do that.
 
 **6. Off-by-default flags are decisions.** `--hybrid` fuses the dense lane via
 RRF and is **off on measured evidence** (net −6 on the graded corpus);
-`--scan` forces the reference path and exists only to reproduce a bug, because
-the accelerator is asserted byte-identical to it. Neither default may flip
-without new evidence and a separate sign-off.
+`--fast` opts into the derived accelerator and is off by default (Arpit,
+2026-08-21) — the scan needs no build step and the accelerator is asserted
+byte-identical to it, so the only cost of defaulting to scan is speed.
+`--scan` forces the same reference path explicitly, for bug reproduction.
+Neither default may flip without new evidence and a separate sign-off.
 
 **7. `fux --version` stays instant.** Handlers import their modules lazily
 inside the dispatch functions. Adding a module-level import to `cli.py` breaks
@@ -317,19 +385,17 @@ accelerator: 78 terms, 78 blocks, 82 postings (derived, not committed)
 # exit 0
 ```
 
-`--refresh-urls` is **the only networked path in the entire engine** (law L4)
-and errors rather than guessing when no URL source is configured:
-
-```console
-$ fux ingest --refresh-urls
-error: --refresh-urls: no [sources.url] configured in /root/fuxlab/demo/fux.toml
-# exit 1
-```
+`--refresh-urls` **retired into `fux update` on 2026-08-21** (W-63, decision
+1a) and is hidden from `--help`. It still parses for one release. What it did
+is now `fux update`, which differs in one way that is a fix rather than a
+rename: a repo with no `[sources.url]` is **not an error** there, because
+`update` means "re-read my sources" and a repo with only directories has
+sources to re-read.
 
 | flag | effect |
 |---|---|
 | `--list-skipped` | print skipped files and why, then exit — no writes |
-| `--refresh-urls` | fetch `[sources.url]` through the consumer fetcher. Off by default; the only networked path |
+| `--refresh-urls` | **retired** into `fux update` (W-63); hidden, parses for one release |
 | `--no-accelerator` | skip the derived build. **Results are unaffected** — only speed |
 | `--full` | re-extract every document instead of carrying unchanged ones forward. **Bytes are unaffected** — only speed, and it is the complete term-collision check ([ADR-INGEST](0007_ingest.md) decision 1b) |
 
@@ -344,32 +410,118 @@ accelerator rebuilt from the committed index: 3 docs, 78 terms, 78 blocks, 82 po
 # exit 0
 ```
 
-#### `fux url` — record what to index
+#### `fux add` / `fux remove` / `fux update` — maintain what is indexed
 
-Writes the committed list. **Never fetches** — the flags decide what is
-*recorded*, so the same list cannot produce different committed bytes on
-different invocations.
+Verbatim from
+[the capture](../../work/regression/2026-08-21-source-verbs/report.md).
+
+**`add` records and then does the work** — one of the engine's two named
+networked paths when the entry is a URL, and it says so on stderr:
 
 ```console
-$ fux url https://example.com/handbook/oncall
-added     https://example.com/handbook/oncall fetch=http meta=hashed
-  in .fux/sources/urls - commit it; `fux ingest --refresh-urls` fetches
+$ fux add handbook
+added     handbook archived=false
+  in .fux/sources/dirs
+ingested 3 docs (1 changed, 2 carried forward), 1 skipped, 1 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
 # exit 0
 
-$ fux url https://example.com/handbook/oncall --cdp --plain
-updated   https://example.com/handbook/oncall fetch=cdp meta=plain
-      was https://example.com/handbook/oncall fetch=http meta=hashed
-  in .fux/sources/urls - commit it; `fux ingest --refresh-urls` fetches
-# exit 0
-
-$ fux url
-  https://example.com/handbook/oncall fetch=cdp meta=plain
-* https://wiki.corp/runbook fetch=http meta=hashed
-
-* 1 line(s) do not state every attribute, so fux did not write them. They load
-fine (the reader is lenient); `fux url <URL>` rewrites one in full.
+$ fux add https://wiki.corp/runbook --cdp --plain
+added     https://wiki.corp/runbook fetch=cdp meta=plain
+  in .fux/sources/urls
+ingested 4 docs (1 changed, 3 carried forward), 1 skipped, 1 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 26 terms, 26 blocks, 27 postings (derived, not committed)
+[stderr] fetching  https://wiki.corp/runbook (network — this URL only)
 # exit 0
 ```
+
+**Adding a file never overrides the type allowlist** — inclusion is a
+conjunction with no precedence ([ADR-DIR-LIST](0023_dir-list.md) /
+[ADR-TYPES](0032_types-list.md)), so the line is written, the check still runs, and
+the verb says how to change it. Exit 0: this is a fact about the corpus, not
+an error.
+
+```console
+$ fux add docs/architecture.pdf
+added     docs/architecture.pdf archived=false
+  in .fux/sources/dirs
+ingested 3 docs (0 changed, 3 carried forward), 1 skipped, 0 shards written
+  skip docs/architecture.pdf: not an indexed file type
+accelerator: 20 terms, 20 blocks, 21 postings (derived, not committed)
+  → the line is listed, and the type allowlist rejects it. `fux add '*.pdf' --types` allows it; adding a file never overrides the allowlist
+# exit 0
+```
+
+**`remove` states which branch it took.** Its own line is deleted; a path held
+only by a listed ancestor is subtracted with the `!` the grammar already has:
+
+```console
+$ fux remove handbook
+removed   handbook archived=false
+  in .fux/sources/dirs
+ingested 3 docs (0 changed, 3 carried forward), 0 skipped, 0 shards written
+accelerator: 22 terms, 22 blocks, 23 postings (derived, not committed)
+  dropped file:handbook/rota.md from the index
+# exit 0
+
+$ fux remove docs/onboarding.md
+excluded  !docs/onboarding.md
+  in .fux/sources/dirs — docs still listed; this path is subtracted from it
+ingested 2 docs (0 changed, 2 carried forward), 1 skipped, 0 shards written
+  skip docs/onboarding.md: excluded by !docs/onboarding.md
+accelerator: 15 terms, 15 blocks, 15 postings (derived, not committed)
+  dropped file:docs/onboarding.md from the index
+# exit 0
+
+$ fux remove elsewhere/nope.md
+[stderr] error: elsewhere/nope.md is not in <root>/.fux/sources/dirs: it has no line of its own, and no listed entry covers it. Both were checked. `fux add elsewhere/nope.md` would list it; nothing needs removing
+# exit 1
+```
+
+**`update` re-reads; `--check` writes nothing** and is offline for files:
+
+```console
+$ fux update --check
+  fresh  2 others
+nothing has drifted.
+# exit 0
+```
+
+**Bare `fux add` lists all three, as the loader sees them** — sorted, deduped,
+every attribute resolved, and a `*` on any line fux did not write:
+
+```console
+$ fux add
+.fux/sources/dirs:
+* docs archived=false
+  docs/architecture.pdf archived=false
+  handbook archived=false
+
+* 1 line(s) do not state every attribute, so fux did not write them. They load fine (the reader is lenient); `fux add <entry>` rewrites one in full.
+.fux/sources/types:
+  *.adoc
+  *.markdown
+  *.md
+  *.org
+  *.pdf
+  *.rst
+  *.txt
+.fux/sources/urls:
+  https://wiki.corp/runbook fetch=cdp meta=plain
+# exit 0
+```
+
+| flag | verb | effect |
+|---|---|---|
+| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path |
+| `--cdp` / `--http` · `--plain` / `--hashed` | `add` | URLs: what the line **records** |
+| `--archived` | `add` | dirs: record `archived=true` |
+| `--no-ingest` | `add` · `remove` | edit the line only — the `git remote add` behaviour, on request |
+| `--no-fetch` | `add` | URLs: record and ingest offline |
+| `--dry-run` | `add` · `remove` | print the line and the plan; write nothing |
+| `--check` | `update` | read-only drift report; does not fetch |
 
 The `*` is [ADR-URL-LIST](0018_url-list.md) decision 13 made visible: the
 reader is lenient so a hand-made or merged list still loads, and a line missing
@@ -599,7 +751,25 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 - **Adding a verb costs a record.** M3 did add three, and it cost this record
   a group row, a decision (1b) and a feature-line bump — paid in the same
   change, which is what the rule is for. M4 still owes the same.
-- **Twelve verbs, and the `--json` contract now has three shapes**, not one:
+- **The corpus finally has a command** (W-63). Before it, `.fux/sources/dirs`
+  and `types` were hand-edited and only `urls` had a verb — so the one thing
+  the whole engine is about was the one part of it with no CLI.
+- **`--json` is untouched, and that is deliberate.** These three verbs
+  **write**; `--json` is the read surface. A machine-readable `add` is a
+  reasonable thing to want and is not free — it would need a shape for
+  "recorded, fetched, ingested, and here is what left the index" — so it waits
+  for a caller who needs it rather than being guessed at now.
+- **Exit codes are unchanged.** `add` exits 1 only when a fetch it announced
+  failed; a listed file the type allowlist rejects exits 0, because that is a
+  fact about the corpus rather than a failure of the command.
+- **Four defects came out of capturing the surface rather than testing it** —
+  three of them in W-63 itself. An L4 announcement that fired against an empty
+  URL list; `add --types` silently replacing the built-in allowlist; a skip
+  reported as a failed fetch; and `explain` answering for a document not in
+  the corpus. Each did something defensible and *said* something false, which
+  is the class of defect a behaviour test does not catch and a reader does.
+  [ANALYSIS](../../work/regression/2026-08-21-source-verbs/ANALYSIS.md).
+- **Fourteen verbs, and the `--json` contract has three shapes**, not one:
   `{results[]}` for `ask`/`find`, `{answer, citation, source}` for `answer`,
   and the graph payloads (`{doc, edges[], community}` · `{nodes[]}` ·
   `{from, to, paths[]}`). They do not converge and should not: a route is not a
@@ -641,7 +811,7 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 
 ### Reference (required)
 
-- The implementation — [`src/fux/cli.py`](../../src/fux/cli.py) (125 lines;
+- The implementation — [`src/fux/cli.py`](../../src/fux/cli.py) (270 lines;
   the parser is the whole surface).
 - The captured transcript, with its reproduce fixture —
   [`work/regression/2026-08-18-cli-surface/`](../../work/regression/2026-08-18-cli-surface/report.md).
@@ -658,10 +828,16 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 **Reopen this decision if any of the following becomes true.** Each is a check,
 not a wait:
 
-1. **A seventh verb exists.** M3 (`explain`/`graph`/`path`) or M4 lands one.
+1. **A verb takes a subcommand** — `fux <verb> <subverb>` parses anywhere on
+   the surface. *This replaced "a seventh verb exists" on 2026-08-21.* That
+   was a count, and it had silently fired three times (M3's graph group, M5's
+   `hooks`, W-63's source verbs) without reopening anything, because a count
+   is not a condition anyone checks. Nesting is what this record actually
+   refuses, so nesting is what the veto now names.
 2. **The two off-by-default flags no longer match the evidence** — a new run
    under `work/regression/` shows hybrid net-positive on a graded corpus, or
-   the accelerator/scan differential fails.
+   the accelerator/scan differential fails. (`--fast` replaced `--scan` as the
+   off-by-default one of the pair on 2026-08-21 — see decision 6.)
 3. **`--version` stops being instant**, i.e. `cli.py` grows a module-level
    import of anything under `fux.` beyond `__version__` and `errors`.
 4. **Exit code `2` starts being produced**, which makes the reserved-vs-live
@@ -670,17 +846,22 @@ not a wait:
 **How to check it:**
 
 ```bash
-# 1. the verb list this record froze
-python3 -c "import sys; sys.path.insert(0,'src'); from fux.cli import build_parser; \
-  print(sorted(build_parser()._subparsers._group_actions[0].choices))"
-# expect: ['answer', 'ask', 'build', 'doctor', 'find', 'ingest']
+# 1. no verb has grown a subcommand tree — the thing this record refuses
+python3 -c "import sys; sys.path.insert(0,'src'); from fux.cli import build_parser
+sub = build_parser()._subparsers._group_actions[0]
+print(sorted(sub.choices))
+nested = [n for n, p in sub.choices.items() if p._subparsers is not None]
+print('nested:', nested)"
+# expect: ['add', 'answer', 'ask', 'build', 'doctor', 'explain', 'find', 'graph',
+#          'hooks', 'ingest', 'path', 'remove', 'setup', 'update']
+# expect: nested: []   <- this is the veto; the list above is informational
 
 # 2. the defaults are still off
 python3 -c "import sys; sys.path.insert(0,'src'); from fux.cli import build_parser
 ask = build_parser()._subparsers._group_actions[0].choices['ask']
 d = {a.dest: a.default for a in ask._actions}
-print({k: d[k] for k in ('hybrid','scan')})"
-# expect: {'hybrid': False, 'scan': False}
+print({k: d[k] for k in ('hybrid','fast')})"
+# expect: {'hybrid': False, 'fast': False}
 
 # 3. --version is still lazy
 grep -n '^from \.\|^import ' src/fux/cli.py

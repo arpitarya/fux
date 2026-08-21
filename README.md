@@ -25,19 +25,32 @@ at answer time.**
 > committed, rebuilt from the committed shards by `fux build`. It is bound by
 > a **differential law**: its results are *byte-identical* to the reference
 > scan's, asserted over thousands of comparisons rather than spot-checked.
-> `fux ask --scan` forces the reference path.
+> **`ask`/`find`/`answer` scan by default** (no build step needed); pass
+> `--fast` to opt into the accelerator when one exists and is fresh — same
+> results, faster (Arpit, 2026-08-21). `--scan` still forces the reference
+> path explicitly, for bug reproduction.
 >
 > A dense lane exists behind `ask --hybrid` and is **off by default** — on the
 > graded corpus it closes three known gaps and breaks nine working queries,
 > so the default is a measurement rather than a preference.
 >
+> **The corpus is maintained with `fux add` / `fux remove` / `fux update`**
+> (2026-08-21), over directories, single documents and URLs alike — the entry
+> picks the list. `add` ingests by default; `remove` takes a document out of
+> the index *and* the graph, deleting its line or subtracting it from a listed
+> ancestor; `update` re-reads what is listed and never writes a line. They
+> replace `fux url` and `fux ingest --refresh-urls`
+> ([ADR-CLI](docs/adr/0002_cli-surface.md)).
+>
 > URLs join the corpus through a consumer-owned fetcher file. `fux setup`
 > writes two — `http.py` (a plain stdlib GET, the default) and `cdp.py`
 > (Chrome DevTools Protocol, also pure stdlib) — into `.fux/fetchers/`, where
-> they become **your** code and fux never rewrites them. Record a URL with
-> `fux url <URL> [--cdp] [--plain]`, then `fux ingest --refresh-urls` — the
-> **only** networked path in the engine. A line picks its own fetcher; nothing
-> escalates automatically ([ADR-URL-LIST](docs/adr/0018_url-list.md) ·
+> they become **your** code and fux never rewrites them. Add one with
+> `fux add <URL> [--cdp] [--plain]`, which records the line **and fetches that
+> one URL**. That and `fux update` are the engine's **two** networked paths;
+> both say on stderr that they went out, and everything else is offline. A
+> line picks its own fetcher; nothing escalates automatically
+> ([ADR-URL-LIST](docs/adr/0018_url-list.md) ·
 > [ADR-FETCHER](docs/adr/0019_fetcher.md)).
 > **The graph lane has landed (M3, unreleased)** — `explain`/`graph`/`path`,
 > unseeded label-propagation communities, a lazy PPR walk

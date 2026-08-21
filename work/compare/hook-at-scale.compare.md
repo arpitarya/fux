@@ -27,6 +27,48 @@ timestamp: 2026-08-20T00:00:00Z
 > is observed answering a query from an index the checked-out commit does not
 > match.
 
+## §0 — Re-scoped 2026-08-21: the design point moved, the fork did not close
+
+**Arpit moved the design point to 10 000 documents** (CLAUDE.md §Litmus) and
+ruled that **this fork stays open at lower urgency**. Three things follow, and
+the third changes the option set.
+
+**1. R5 still fails.** At 10 000 documents a 20-document commit costs
+**3.523 s against the 1 s bound** — 3.5× over. It passes only near ~1 500.
+Shrinking the target did not close this; it made it a 3.5 s problem instead of
+a 44 s one.
+
+**2. The frozen instrument is not edited.** R5's pre-registration judges at
+100 000 documents and **a pre-registered threshold may never move**. The
+100 000-document FAIL stands as measured. If the bound is to be re-judged at
+10 000, that is a *new* pre-registration and a *new* verdict — never a rewrite
+of this one. Nothing in this document restates a measurement.
+
+**3. §4's arithmetic no longer rules D out — this is the real change.**
+That table was computed at 100 000 documents, where the two O(corpus) passes
+are 41.1 s of a 41.4 s commit and a 100× speedup is the only thing that
+reaches the bound. **At 10 000 documents the fixed cost is 0.216 s** (git
+0.190 + spawn 0.026) **and the two passes are 3.103 s**:
+
+| hypothetical, judged at **10 000** | commit | vs the 1 s bound |
+|---|---|---|
+| today | 3.32 s | 3.3× over |
+| both passes 2× faster | 1.77 s | 1.8× over |
+| both passes **4× faster** | **0.99 s** | **passes, barely** |
+| both passes 10× faster | 0.53 s | passes |
+| both passes off the commit path (B) | 0.22 s | passes |
+
+**A 4× improvement in two stdlib passes is a plan; a 100× one was not.** So at
+the new design point **D — make the corpus-wide passes incremental — becomes a
+live option**, where at 100 000 it was arithmetically dead. B still wins on
+holding at every size and on not needing the speedup at all; D now competes on
+keeping the index/tree agreement window tight, which is B's one real cost.
+
+**What this section does not do:** it does not change the proposed verdict, and
+it does not re-run the matrix. **The verdict is still Arpit's**, and the matrix
+below still weights `holds at 10⁶ (×3)` — a criterion the new litmus demotes.
+Whoever takes this up re-weights it there, in the same change as the ruling.
+
 ## Context — what fired this
 
 [R5-HOOK](../regression/2026-08-20-r5-hook-latency/VERDICT.md), 2026-08-20:

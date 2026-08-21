@@ -1,9 +1,10 @@
 """The M2 verb surface, exercised as a user through the real CLI.
 
 The unit suite proves the differential law over synthetic corpora in-process.
-This suite proves the *shipped commands* behave: that `ask` and `ask --scan`
-agree byte-for-byte on their `--json` payloads, that `fux build` rebuilds a
-deleted derived plane, and that the derived plane stays out of git.
+This suite proves the *shipped commands* behave: that `ask` (the scan, by
+default) and `ask --fast` (the accelerator) agree byte-for-byte on their
+`--json` payloads, that `fux build` rebuilds a deleted derived plane, and that
+the derived plane stays out of git.
 
 Both suites are maintained; a feature is not done until both cover it
 (CLAUDE.md §Build & test).
@@ -45,14 +46,17 @@ def _write_fixture(root: Path) -> None:
     )
 
 
-def test_ingest_builds_the_accelerator_and_ask_uses_it(tmp_path):
+def test_ask_scans_by_default_and_fast_uses_the_accelerator(tmp_path):
     _write_fixture(tmp_path)
     out = _run(tmp_path, "ingest").stdout
     assert "accelerator:" in out
     assert (tmp_path / ".fux" / "runtime" / "stats.json").exists()
 
-    explained = _run(tmp_path, "ask", "why did pruning fail", "--explain").stdout
-    assert "[accelerator]" in explained
+    by_default = _run(tmp_path, "ask", "why did pruning fail", "--explain").stdout
+    assert "[scan]" in by_default
+
+    fast = _run(tmp_path, "ask", "why did pruning fail", "--explain", "--fast").stdout
+    assert "[accelerator]" in fast
 
 
 def test_accelerator_and_scan_payloads_are_byte_identical(tmp_path):
@@ -66,8 +70,8 @@ def test_accelerator_and_scan_payloads_are_byte_identical(tmp_path):
 
     for query in ("why did pruning fail", "committed index format", "espresso", "nothing matches here"):
         for top in ("1", "5", "20"):
-            accelerated = _run(tmp_path, "ask", query, "--json", "--top", top).stdout
-            scanned = _run(tmp_path, "ask", query, "--json", "--top", top, "--scan").stdout
+            scanned = _run(tmp_path, "ask", query, "--json", "--top", top).stdout
+            accelerated = _run(tmp_path, "ask", query, "--json", "--top", top, "--fast").stdout
             assert accelerated == scanned, f"differential broken via CLI: {query!r} top={top}"
 
 
@@ -77,14 +81,15 @@ def test_build_rebuilds_a_deleted_derived_plane(tmp_path):
 
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
-    before = _run(tmp_path, "ask", "pruning", "--json").stdout
+    before = _run(tmp_path, "ask", "pruning", "--json", "--fast").stdout
 
     shutil.rmtree(tmp_path / ".fux" / "runtime")
-    # With no accelerator, `ask` must still answer — from the reference scan.
+    # With no accelerator, `ask` must still answer — from the reference scan,
+    # which is the default now regardless.
     assert _run(tmp_path, "ask", "pruning", "--json").stdout == before
 
     assert "rebuilt" in _run(tmp_path, "build").stdout
-    assert _run(tmp_path, "ask", "pruning", "--json").stdout == before
+    assert _run(tmp_path, "ask", "pruning", "--json", "--fast").stdout == before
 
 
 def test_stale_accelerator_falls_back_rather_than_answering_wrongly(tmp_path):
@@ -95,10 +100,12 @@ def test_stale_accelerator_falls_back_rather_than_answering_wrongly(tmp_path):
     (tmp_path / "docs" / "new.md").write_text("# Pruning again\n\npruning pruning pruning\n", encoding="utf-8")
     _run(tmp_path, "ingest", "--no-accelerator")
 
-    explained = _run(tmp_path, "ask", "pruning", "--explain").stdout
+    # `--fast` is what actually reaches for the (now stale) accelerator; it
+    # must fall back to the scan rather than answer from stale postings.
+    explained = _run(tmp_path, "ask", "pruning", "--explain", "--fast").stdout
     assert "[scan]" in explained
     assert _run(tmp_path, "ask", "pruning", "--json").stdout == _run(
-        tmp_path, "ask", "pruning", "--json", "--scan"
+        tmp_path, "ask", "pruning", "--json", "--fast"
     ).stdout
 
 
@@ -202,11 +209,11 @@ def test_ask_json_reports_which_path_answered_when_explain_is_set(tmp_path):
     assert "path" not in plain  # additive: silence unless asked
 
     explained = json.loads(_run(tmp_path, "ask", "pruning", "--json", "--explain").stdout)
-    assert explained["path"] == "accelerator"
+    assert explained["path"] == "scan"  # the default
     assert explained["results"] == plain["results"]
 
-    scanned = json.loads(_run(tmp_path, "ask", "pruning", "--json", "--explain", "--scan").stdout)
-    assert scanned["path"] == "scan"
+    fast = json.loads(_run(tmp_path, "ask", "pruning", "--json", "--explain", "--fast").stdout)
+    assert fast["path"] == "accelerator"
 
 
 def test_find_still_prints_prose_on_the_no_match_path(tmp_path):
@@ -320,16 +327,192 @@ def test_ingest_puts_no_fetcher_in_a_repo_that_only_wanted_an_index(tmp_path):
     assert not (tmp_path / ".fux" / "fetchers").exists()
 
 
-def test_url_records_a_line_and_never_fetches(tmp_path):
-    """`fux url` writes the list; only `--refresh-urls` touches the network."""
-    _write_fixture(tmp_path)
-    added = _run(tmp_path, "url", "https://example.invalid/handbook#oncall", "--cdp")
-    assert "fetch=cdp meta=hashed" in added.stdout
+def test_add_records_a_url_line_and_no_fetch_keeps_it_offline(tmp_path):
+    """Successor to the `fux url` surface test, which W-63 retired.
 
-    listed = _run(tmp_path, "url")
+    `fux url` recorded and never fetched. `fux add <URL>` records **and**
+    fetches that one URL — so the offline half of the old assertion now needs
+    `--no-fetch`, which is exactly the flag that exists to ask for it.
+    """
+    _write_fixture(tmp_path)
+    added = _run(
+        tmp_path, "add", "https://example.invalid/handbook#oncall", "--cdp", "--no-fetch"
+    )
+    assert "fetch=cdp meta=hashed" in added.stdout
+    assert "fetching" not in added.stderr  # --no-fetch means no network, and says nothing
+
+    listed = _run(tmp_path, "add")
     assert "https://example.invalid/handbook#oncall fetch=cdp meta=hashed" in listed.stdout
 
-    # A plain ingest stays offline and the URL is not indexed until a refresh.
-    _run(tmp_path, "ingest")
+    # The line is recorded; with no fetch there is nothing to index yet.
     found = _run(tmp_path, "find", "handbook", "--json")
     assert "example.invalid" not in found.stdout
+
+
+def test_url_is_gone(tmp_path):
+    """Deleted outright, not deprecated: four days old and pre-1.0 (W-63)."""
+    _write_fixture(tmp_path)
+    gone = _run(tmp_path, "url", "https://example.invalid/x", check=False)
+    assert gone.returncode == 2  # argparse: not a choice
+
+
+def test_refresh_urls_survives_one_release_as_a_hidden_alias(tmp_path):
+    """The opposite call to `fux url`, and for a stated reason.
+
+    It is a flag rather than a verb, it is older, and it is likelier to be in
+    somebody's CI — so it keeps working, hidden from `--help`, for one
+    release. `fux update` is what it now means.
+    """
+    _write_fixture(tmp_path)
+    assert "--refresh-urls" not in _run(tmp_path, "ingest", "--help").stdout
+    # No [sources.url] configured, so it fails the same way it always did —
+    # what is asserted is that argparse still accepts the flag at all.
+    still_parses = _run(tmp_path, "ingest", "--refresh-urls", check=False)
+    assert still_parses.returncode != 2
+
+
+# -- W-63: the source verbs, as a user --------------------------------------
+
+
+def _shards(root: Path) -> dict[str, bytes]:
+    return {p.name: p.read_bytes() for p in sorted((root / ".fux" / "index").glob("*.jsonl"))}
+
+
+def test_add_ingests_by_default(tmp_path):
+    """`add` does the work — the whole reason it is not `git remote add`."""
+    _write_fixture(tmp_path)
+    (tmp_path / "handbook").mkdir()
+    (tmp_path / "handbook" / "oncall.md").write_text(
+        "---\ntitle: The oncall rota\n---\n# The oncall rota\n\nwho carries the pager\n",
+        encoding="utf-8",
+    )
+
+    out = _run(tmp_path, "add", "handbook").stdout
+    assert "added     handbook archived=false" in out
+    assert "ingested" in out  # not a record-only verb
+
+    assert "handbook/oncall.md" in _run(tmp_path, "find", "oncall rota").stdout
+
+
+def test_add_then_ingest_produces_the_same_bytes(tmp_path):
+    """The L3 assertion that matters most here.
+
+    `add` must not be a second write path into the index. If it were, the
+    bytes it produced and the bytes a plain `fux ingest` produces from the
+    same list would differ — and nothing else in the suite would notice,
+    because both would be internally consistent.
+    """
+    _write_fixture(tmp_path)
+    (tmp_path / "handbook").mkdir()
+    (tmp_path / "handbook" / "oncall.md").write_text("# Oncall\n\nthe pager\n", encoding="utf-8")
+
+    _run(tmp_path, "add", "handbook")
+    after_add = _shards(tmp_path)
+
+    _run(tmp_path, "ingest")
+    assert _shards(tmp_path) == after_add
+
+    _run(tmp_path, "ingest", "--full")
+    assert _shards(tmp_path) == after_add  # and a full run agrees with both
+
+
+def test_remove_takes_the_document_out_of_the_index_and_the_graph(tmp_path):
+    """The definition of done, asserted through the shipped verbs."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    assert "pruning.md" in _run(tmp_path, "find", "pruning").stdout
+
+    out = _run(tmp_path, "remove", "docs/pruning.md").stdout
+    assert "excluded  !docs/pruning.md" in out  # covered by `docs`, so an exclusion
+    assert "dropped file:docs/pruning.md from the index" in out
+
+    assert "pruning.md" not in _run(tmp_path, "find", "pruning").stdout
+    assert "No confident matches." in _run(tmp_path, "ask", "why did pruning fail").stdout
+
+    gone = _run(tmp_path, "explain", "docs/pruning.md", check=False)
+    assert gone.returncode != 0
+
+
+def test_remove_of_a_listed_entry_deletes_the_line(tmp_path):
+    """The other branch of remove-by-coverage, through the CLI."""
+    _write_fixture(tmp_path)
+    (tmp_path / "handbook").mkdir()
+    (tmp_path / "handbook" / "oncall.md").write_text("# Oncall\n\nthe pager\n", encoding="utf-8")
+    _run(tmp_path, "add", "handbook")
+
+    out = _run(tmp_path, "remove", "handbook").stdout
+    assert "removed   handbook archived=false" in out
+    assert "handbook" not in (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8")
+    assert "dropped file:handbook/oncall.md from the index" in out
+
+
+def test_the_differential_law_survives_an_add_and_a_remove(tmp_path):
+    """Neither verb may move a ranking — they change the corpus, not the scorer."""
+    _write_fixture(tmp_path)
+    (tmp_path / "handbook").mkdir()
+    (tmp_path / "handbook" / "oncall.md").write_text("# Oncall\n\nthe pager rota\n", encoding="utf-8")
+
+    for step in (("add", "handbook"), ("remove", "docs/unrelated.md")):
+        _run(tmp_path, *step)
+        for query in ("pruning", "committed index format", "pager"):
+            scanned = _run(tmp_path, "ask", query, "--json", "--top", "5").stdout
+            accelerated = _run(tmp_path, "ask", query, "--json", "--top", "5", "--fast").stdout
+            assert scanned == accelerated, f"differential broken after {step}: {query!r}"
+
+
+def test_update_reingests_and_check_is_read_only(tmp_path):
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    (tmp_path / "docs" / "pruning.md").write_text(
+        "---\ntitle: Why pruning failed\n---\n# Why pruning failed\n\n"
+        "The gate measured static pruning twice. A third run confirmed it.\n",
+        encoding="utf-8",
+    )
+
+    before = _shards(tmp_path)
+    check = _run(tmp_path, "update", "--check")
+    assert "stale" in check.stdout and "docs/pruning.md" in check.stdout
+    assert _shards(tmp_path) == before  # --check wrote nothing
+
+    _run(tmp_path, "update")
+    assert _shards(tmp_path) != before
+    assert "nothing has drifted" in _run(tmp_path, "update", "--check").stdout
+
+
+def test_update_refuses_to_create_a_line(tmp_path):
+    """`add` and `remove` write lines; `update` never touches one."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    refused = _run(tmp_path, "update", "docs/does-not-exist.md", check=False)
+    assert refused.returncode == 1
+    assert "never creates a line" in refused.stderr
+
+
+def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
+    """Inclusion is a conjunction with no precedence (ADR-DIR-LIST/ADR-TYPES).
+
+    Promoting an explicitly-added file past the allowlist would be the W-55
+    defect arriving from a new direction, so the line is written, the type
+    check still runs, and the skip is reported with its reason.
+    """
+    _write_fixture(tmp_path)
+    (tmp_path / "docs" / "architecture.pdf").write_bytes(b"%PDF-1.4 not really a pdf\n")
+
+    out = _run(tmp_path, "add", "docs/architecture.pdf").stdout
+    assert "added     docs/architecture.pdf archived=false" in out
+    assert "skip docs/architecture.pdf: not an indexed file type" in out
+    assert "architecture" not in _run(tmp_path, "find", "architecture").stdout
+
+
+def test_dry_run_writes_no_bytes_anywhere(tmp_path):
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    dirs = tmp_path / ".fux" / "sources" / "dirs"
+    before_list, before_shards = dirs.read_bytes(), _shards(tmp_path)
+
+    _run(tmp_path, "add", "docs/format.md", "--dry-run")
+    _run(tmp_path, "remove", "docs/format.md", "--dry-run")
+
+    assert dirs.read_bytes() == before_list
+    assert _shards(tmp_path) == before_shards

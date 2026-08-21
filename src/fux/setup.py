@@ -109,7 +109,7 @@ _CONFIG = """\
 #dirs_file = ".fux/sources/dirs"
 
 # URL ingestion through YOUR fetcher files. Uncomment to enable. Fetching only
-# ever happens under `fux ingest --refresh-urls` -- fux is offline by default.
+# ever happens under `fux add <URL>` or `fux update` -- fux is offline by default.
 #[sources.url]
 #fetcher   = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
 #                                     # and the directory `fetch=cdp` resolves in
@@ -140,8 +140,9 @@ _URLS_HEADER = """\
 #   https://example.com/handbook/oncall    fetch=http meta=hashed
 #   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed
 #
-# `fux url <URL>` writes a line here with every attribute stated. Fetching only
-# ever happens under `fux ingest --refresh-urls`. See ADR-URL-LIST.
+# `fux add <URL>` writes a line here with every attribute stated, and fetches
+# that one URL. `fux update` re-fetches every line. Those are the engine's two
+# networked paths; every other command is offline. See ADR-URL-LIST.
 """
 
 

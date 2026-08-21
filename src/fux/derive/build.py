@@ -33,6 +33,7 @@ from pathlib import Path
 
 from .. import store as store_mod
 from ..errors import FuxError
+from ..progress import NULL as _NULL_PROGRESS
 from ..query.bm25f import BODY_WEIGHT, HEADING_WEIGHT
 from ..store import fuxdir
 from ..graph import plane as graph_plane
@@ -60,9 +61,10 @@ class BuildReport:
     bytes_written: int
 
 
-def build(root: Path) -> BuildReport:
+def build(root: Path, *, progress=None) -> BuildReport:
     """Materialize `.fux/runtime/` from the committed index."""
-    docs, codes, postings, stats, shard_stamp, records = _read_committed(root)
+    progress = progress or _NULL_PROGRESS
+    docs, codes, postings, stats, shard_stamp, records = _read_committed(root, progress)
 
     directory = fuxdir.derived_dir(root, fmt.RUNTIME_DIR)
     postings_directory = directory / fmt.POSTINGS_DIR
@@ -72,13 +74,21 @@ def build(root: Path) -> BuildReport:
     written = 0
     written += _write_docs(directory, docs)
     written += _write_json(directory / fmt.STATS_NAME, stats)
-    written += dense.build_codes(directory, docs, codes)
+    # `dense.build_codes` and `graph_plane.build_plane` offer no per-item
+    # hook, so these two are bookends around the call rather than a live
+    # count — the same honesty tradeoff as the `write` phase in ingest.run.
+    with progress.phase("codes", len(docs)) as p:
+        written += dense.build_codes(directory, docs, codes)
+        p.update(len(docs))
     # The graph lane's plane, from the same single pass over the shards. It is
     # derived for the reason `plane.py` gives: a community label is global, so
     # committing one would turn a one-file commit into a corpus-wide diff.
-    written += graph_plane.build_plane(directory, records)
+    edge_total = sum(len(r.get("edges", [])) for r in records)
+    with progress.phase("graph", edge_total, "edges") as p:
+        written += graph_plane.build_plane(directory, records)
+        p.update(edge_total)
 
-    blocks, postings_count = _write_postings(root, postings, [d["wlen"] for d in docs])
+    blocks, postings_count = _write_postings(root, postings, [d["wlen"] for d in docs], progress)
 
     written += _write_json(
         directory / fmt.MANIFEST_NAME,
@@ -109,7 +119,7 @@ def build(root: Path) -> BuildReport:
     )
 
 
-def _read_committed(root: Path):
+def _read_committed(root: Path, progress=None):
     """One pass over the committed shards: doc table, postings, statistics.
 
     Returns `(docs, codes, postings, stats, shard_stamp, records)`. `docs` is sorted by
@@ -118,26 +128,30 @@ def _read_committed(root: Path):
     `postings` maps a term hash to its `(docidx, tf_heading, tf_body)` list in
     docidx order.
     """
+    progress = progress or _NULL_PROGRESS
     records: list[dict] = []
     total_docs = 0
     total_wlen = 0
     shard_stamp: list[tuple[str, str, int, int]] = []
 
-    for path in store_mod.iter_shard_paths(root):
-        raw = path.read_bytes()
-        stat = path.stat()
-        shard_stamp.append(
-            (path.name, store_mod.content_sha(raw), stat.st_size, stat.st_mtime_ns)
-        )
-        _, lines = store_mod.raw_record_lines(path)
-        for lineno, line in enumerate(lines, start=2):
-            total_docs += 1
-            record = json.loads(line)
-            _assert_invariants(path, lineno, line, record)
-            m = _WLEN_RE.search(line)
-            if m:
-                total_wlen += int(m.group(1))
-            records.append(record)
+    paths = list(store_mod.iter_shard_paths(root))
+    with progress.phase("read", len(paths), "shards") as p:
+        for path in paths:
+            raw = path.read_bytes()
+            stat = path.stat()
+            shard_stamp.append(
+                (path.name, store_mod.content_sha(raw), stat.st_size, stat.st_mtime_ns)
+            )
+            _, lines = store_mod.raw_record_lines(path)
+            for lineno, line in enumerate(lines, start=2):
+                total_docs += 1
+                record = json.loads(line)
+                _assert_invariants(path, lineno, line, record)
+                m = _WLEN_RE.search(line)
+                if m:
+                    total_wlen += int(m.group(1))
+                records.append(record)
+            p.update(1)
 
     records.sort(key=lambda r: r["id"])
 
@@ -207,6 +221,7 @@ def _write_postings(
     root: Path,
     postings: dict[str, list[tuple[int, int, int]]],
     wlens: list[int],
+    progress=None,
 ) -> tuple[int, int]:
     """Write term-major block lines plus the fixed-width offset table.
 
@@ -214,6 +229,7 @@ def _write_postings(
     layout) and written in sorted hash order, so the offset table is sorted by
     construction and a term's blocks are one bisect away.
     """
+    progress = progress or _NULL_PROGRESS
     by_prefix: dict[str, list[str]] = {}
     for term in sorted(postings):
         by_prefix.setdefault(fmt.term_prefix(term), []).append(term)
@@ -221,41 +237,44 @@ def _write_postings(
     total_blocks = 0
     total_postings = 0
 
-    for prefix, terms in by_prefix.items():
-        lines: list[bytes] = []
-        entries: list[bytes] = []
-        offset = 0
-        for term in terms:
-            entries_for_term = postings[term]  # already docidx-ascending
-            total_postings += len(entries_for_term)
-            for block_no, start in enumerate(range(0, len(entries_for_term), fmt.BLOCK_SIZE)):
-                block = entries_for_term[start : start + fmt.BLOCK_SIZE]
-                line = json.dumps(
-                    [term, [list(p) for p in block]],
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                ).encode("utf-8")
-                mx = max(_HEADING_W * tf_h + _BODY_W * tf_b for _, tf_h, tf_b in block)
-                mnw = min(wlens[docidx] for docidx, _, _ in block)
-                entries.append(
-                    fmt.pack_entry(
-                        bytes.fromhex(term),
-                        block_no,
-                        offset,
-                        len(line),
-                        mx,
-                        mnw,
-                        block[0][0],
-                        block[-1][0],
-                        len(block),
+    with progress.phase("postings", len(postings), "terms") as p:
+        for prefix, terms in by_prefix.items():
+            lines: list[bytes] = []
+            entries: list[bytes] = []
+            offset = 0
+            for term in terms:
+                entries_for_term = postings[term]  # already docidx-ascending
+                total_postings += len(entries_for_term)
+                for block_no, start in enumerate(range(0, len(entries_for_term), fmt.BLOCK_SIZE)):
+                    block = entries_for_term[start : start + fmt.BLOCK_SIZE]
+                    line = json.dumps(
+                        [term, [list(p) for p in block]],
+                        ensure_ascii=False,
+                        separators=(",", ":"),
+                    ).encode("utf-8")
+                    mx = max(_HEADING_W * tf_h + _BODY_W * tf_b for _, tf_h, tf_b in block)
+                    mnw = min(wlens[docidx] for docidx, _, _ in block)
+                    entries.append(
+                        fmt.pack_entry(
+                            bytes.fromhex(term),
+                            block_no,
+                            offset,
+                            len(line),
+                            mx,
+                            mnw,
+                            block[0][0],
+                            block[-1][0],
+                            len(block),
+                        )
                     )
-                )
-                lines.append(line)
-                offset += len(line) + 1
-                total_blocks += 1
+                    lines.append(line)
+                    offset += len(line) + 1
+                    total_blocks += 1
 
-        fmt.postings_path(root, prefix).write_bytes(b"\n".join(lines) + b"\n")
-        fmt.offsets_path(root, prefix).write_bytes(b"".join(entries))
+                p.update(1)
+
+            fmt.postings_path(root, prefix).write_bytes(b"\n".join(lines) + b"\n")
+            fmt.offsets_path(root, prefix).write_bytes(b"".join(entries))
 
     return total_blocks, total_postings
 

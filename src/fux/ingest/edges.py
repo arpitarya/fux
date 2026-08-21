@@ -20,6 +20,12 @@ from pathlib import PurePosixPath
 
 from .parse import ParsedDoc
 
+#: The namespace a tag node lives in. Minted here because this is the only
+#: place a tag edge is created; `graph/model.py` imports it rather than
+#: keeping a second copy, because two spellings of `"tag:"` that drift apart
+#: would silently split the graph into documents and orphaned labels.
+TAG_PREFIX = "tag:"
+
 EXTRACTED_GRADE = 10
 AMBIG_GRADE = 8
 INFERRED_GRADE = 6
@@ -63,7 +69,7 @@ def resolve(doc_id: str, doc_scan: DocScan, known_ids: set[str], by_basename: di
             edges[("ref", dst)] = EXTRACTED_GRADE
 
     for tag in doc_scan.tags:
-        edges[("tag", f"tag:{tag}")] = EXTRACTED_GRADE
+        edges[("tag", f"{TAG_PREFIX}{tag}")] = EXTRACTED_GRADE
 
     for span in doc_scan.code_spans:
         resolved = _resolve_code(span, known_ids, by_basename)

@@ -3,7 +3,7 @@
 **This file belongs to you, not to fux. It is committed to your repo, at
 `.fux/fetchers/http.py`, and fux will never rewrite it.** `fux setup` writes it
 once if it is missing; after that it is yours. Fux reads it by path under
-`fux ingest --refresh-urls`, calls it to turn each URL into markdown, and
+`fux add <URL>` or `fux update`, calls it to turn each URL into markdown, and
 indexes the result exactly like a repo file. Edit anything — add headers, a
 proxy, an auth token from your environment, a retry, a different HTML
 converter. Fux imports none of that, only this file's entry points.

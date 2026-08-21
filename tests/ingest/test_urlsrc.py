@@ -161,10 +161,19 @@ def test_read_urls_missing_file_fails_loudly(tmp_path):
         read_urls(tmp_path, URLS_FILE)
 
 
-def test_missing_urls_file_only_matters_on_refresh(tmp_path):
+def test_a_missing_urls_file_is_ignored_while_there_is_nothing_to_reconcile(tmp_path):
+    """Narrowed 2026-08-21 (W-63), and the narrowing is the point.
+
+    This used to read "only matters on refresh" and pass because an offline
+    run never looked at the list at all. It now passes for a *different*
+    reason: reconciliation reads the list on every run, but only when the
+    index actually holds `url:` records to reconcile — and here nothing has
+    been ingested yet. The loud-error case is
+    `test_an_offline_run_with_url_records_and_no_list_fails_loudly`.
+    """
     _init(tmp_path, urls=["https://x.test/a"])
     (tmp_path / URLS_FILE).unlink()
-    run(tmp_path)  # offline ingest must not care that the list is gone
+    run(tmp_path)  # no url: records exist, so no list is needed or read
     with pytest.raises(FuxError, match=r"\.fux/sources/urls not found"):
         run(tmp_path, refresh_urls=True)
 
@@ -326,15 +335,78 @@ def test_failed_refresh_keeps_prior_record(tmp_path):
     assert any("site down" in s.reason for s in report.skipped)
 
 
-def test_deconfigured_url_disappears_on_refresh_only(tmp_path):
+def test_a_delisted_url_disappears_on_an_offline_run(tmp_path):
+    """W-63 defect 1. **Deletion needs no network.**
+
+    This test asserted the opposite until 2026-08-21 — that a de-listed URL
+    survived until someone ran `--refresh-urls` — and the module docstring
+    stated that as the design. It was a defect either way: it made removing a
+    document require the one capability removal has no use for, and it is why
+    `fux remove <URL>` could not have worked offline.
+
+    The fetcher is replaced with one that raises on call, so "offline" here is
+    asserted rather than assumed.
+    """
     _init(tmp_path, urls=["https://x.test/a", "https://x.test/b"])
     run(tmp_path, refresh_urls=True)
-
-    _init(tmp_path, urls=["https://x.test/a"])  # b removed from config
-    run(tmp_path)  # offline run: b survives
     assert "url:https://x.test/b" in store.read_index(tmp_path)
-    run(tmp_path, refresh_urls=True)  # reconciling run: b is gone
-    assert "url:https://x.test/b" not in store.read_index(tmp_path)
+
+    _write_urls(tmp_path, ["https://x.test/a"])  # b de-listed; nothing else changes
+    (tmp_path / "mw.py").write_text(
+        "def fetch(url):\n    raise AssertionError('network on an offline run')\n", encoding="utf-8"
+    )
+    run(tmp_path)  # no flag, no fetcher call
+
+    index = store.read_index(tmp_path)
+    assert "url:https://x.test/b" not in index
+    assert "url:https://x.test/a" in index  # a is still listed and untouched
+
+
+def test_a_still_listed_url_whose_fetch_fails_keeps_its_record(tmp_path):
+    """The other half of defect 1, and the half that must NOT change.
+
+    Reconciliation keys on **the list**, never on whether a fetch succeeded.
+    A transient network failure deleting a document is the failure mode the
+    carry-forward exists to prevent, and tightening de-listing must not
+    tighten this with it.
+    """
+    _init(tmp_path, urls=["https://x.test/a"])
+    run(tmp_path, refresh_urls=True)
+    prior = store.read_index(tmp_path)["url:https://x.test/a"]
+
+    (tmp_path / "mw.py").write_text(
+        "def fetch(url):\n    raise RuntimeError('site down')\n", encoding="utf-8"
+    )
+    run(tmp_path, refresh_urls=True)  # networked, and the fetch fails
+    assert store.read_index(tmp_path)["url:https://x.test/a"] == prior
+
+    run(tmp_path)  # offline, still listed
+    assert store.read_index(tmp_path)["url:https://x.test/a"] == prior
+
+
+def test_an_offline_run_with_url_records_and_no_list_fails_loudly(tmp_path):
+    """A missing list is not "nothing is listed".
+
+    Both silent readings are worse than an error: emptying every URL document
+    because a file went missing, or carrying them forever, which is the defect
+    above. `dirs` already fails loudly on exactly this condition.
+    """
+    _init(tmp_path, urls=["https://x.test/a"])
+    run(tmp_path, refresh_urls=True)
+
+    (tmp_path / URLS_FILE).unlink()
+    with pytest.raises(FuxError, match="which URLs belong"):
+        run(tmp_path)
+
+
+def test_a_repo_with_no_url_records_never_reads_the_list(tmp_path):
+    """The common case pays nothing — a corpus of directories is untouched."""
+    _write_toml(tmp_path, "[sources]\n")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
+
+    run(tmp_path)  # no urls file exists at all, and none is looked for
+    assert set(store.read_index(tmp_path)) == {"file:docs/a.md"}
 
 
 def test_ver_bumps_when_fetched_content_changes(tmp_path):
@@ -499,3 +571,83 @@ def test_a_hashed_record_still_shows_its_opaque_title(tmp_path):
     run(tmp_path, refresh_urls=True)
     (result,) = [r for r in scan.ask(tmp_path, "rendered", top=5) if r.id.startswith("url:")]
     assert result.title == term_hash("Page a")  # the prefix is storage, not display
+
+
+# -- W-63 defect 2: a carried record's edges are re-checked, never trusted ---
+
+#: Page `a` points at the other URL and at a repo file; every other page is
+#: inert. Two edge kinds on one carried record, which is what makes the
+#: assertions below distinguish "dropped the stale one" from "dropped them all".
+LINKING_FETCHER = '''\
+def fetch(url):
+    if url.endswith("/a"):
+        return "# Page a\\n\\nsee [b](https://x.test/b) and `docs/keep.md`\\n"
+    return "# Page\\n\\nplain body\\n"
+'''
+
+
+def test_a_carried_url_record_drops_its_edge_to_a_delisted_document(tmp_path):
+    """W-63 defect 2.
+
+    `graph/model.edges_from_records` lifts `edges` with no validation, on the
+    promise that `ingest/edges.py` already dropped the dangling ones. That
+    promise holds only for records **re-resolved this run** — and a `url:`
+    record is carried forward on every offline run, edges included. So a
+    document removed from the corpus survived as an edge target in the derived
+    graph plane: an edge into a node no verb can explain.
+    """
+    _init(
+        tmp_path,
+        urls=["https://x.test/a", "https://x.test/b"],
+        files={"docs/keep.md": "# Keep\n\nbody\n"},
+        fetcher=LINKING_FETCHER,
+    )
+    run(tmp_path, refresh_urls=True)
+    edges = store.read_index(tmp_path)["url:https://x.test/a"]["edges"]
+    assert {e["dst"] for e in edges} == {"url:https://x.test/b", "file:docs/keep.md"}
+
+    _write_urls(tmp_path, ["https://x.test/a"])  # b de-listed
+    run(tmp_path)  # offline: a is carried, but its edges are not trusted
+
+    index = store.read_index(tmp_path)
+    assert "url:https://x.test/b" not in index
+    carried_edges = index["url:https://x.test/a"]["edges"]
+    assert {e["dst"] for e in carried_edges} == {"file:docs/keep.md"}
+
+
+def test_no_surviving_record_points_at_an_id_this_run_does_not_hold(tmp_path):
+    """The invariant, stated over the whole record set rather than one record.
+
+    This is the assertion that would catch defect 2 wherever it came from, so
+    it is written against the committed index and not against the code path
+    that fixes it. `tag:` targets are exempt: a tag node is minted by the edge
+    itself and is never a document, so it cannot dangle.
+    """
+    _init(
+        tmp_path,
+        urls=["https://x.test/a", "https://x.test/b"],
+        files={
+            "docs/keep.md": "---\ntags: [ops]\n---\n# Keep\n\nsee `docs/gone.md`\n",
+            "docs/gone.md": "# Gone\n\nbody\n",
+        },
+        fetcher=LINKING_FETCHER,
+    )
+    run(tmp_path, refresh_urls=True)
+
+    (tmp_path / "docs" / "gone.md").unlink()
+    _write_urls(tmp_path, ["https://x.test/a"])
+    run(tmp_path)
+
+    index = store.read_index(tmp_path)
+    assert "url:https://x.test/b" not in index and "file:docs/gone.md" not in index
+
+    dangling = [
+        (record["id"], edge["dst"])
+        for record in index.values()
+        for edge in record.get("edges", ())
+        if not edge["dst"].startswith("tag:") and edge["dst"] not in index
+    ]
+    assert dangling == []
+    # The tag edge survived, which is what makes the exemption a real one and
+    # not just an untested clause.
+    assert {"kind": "tag", "dst": "tag:ops", "grade": 10} in index["file:docs/keep.md"]["edges"]

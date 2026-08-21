@@ -149,7 +149,7 @@ keeps a consumer's `fux.toml` diff small and their fetcher file mergeable, and
 it is [ADR-FETCHER](0019_fetcher.md) decision 8 in use.
 
 **5. HTML→markdown is deterministic** — same bytes in, same markdown out, no
-model, no heuristic scoring. It runs inside `--refresh-urls`, but what it
+model, no heuristic scoring. It runs inside `fux update` (and `fux add <URL>`), but what it
 produces has to be as reproducible as a repo file or the index stops being
 byte-reproducible for URL documents.
 
@@ -192,7 +192,7 @@ in [the filed fixture](../../work/regression/2026-08-18-ingest-and-index/report.
 The lifecycle is the real thing; only the transport differs:
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()

@@ -1,1 +1,1 @@
-✓ v0.34.0 pushed, CI green, released, PyPI live · next: OPEN-WORK.md — W-61 (fork + R6 arithmetic) waits on Arpit
+→ releasing v0.35.0: four stacked changes landing in one commit — design-point reconciliation, W-64 progress plane, scan-by-default, W-63 source verbs · 889 unit / 64 e2e green · next: push main, watch CI, `gh release create v0.35.0` (fires publish.yml -> PyPI)

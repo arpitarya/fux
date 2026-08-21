@@ -232,6 +232,14 @@ legal, explicit, per-document opt-out
 - **The behaviour test in `tests_e2e/test_maintenance.py` is still not R6**,
   and is now superseded as evidence by the runs above rather than standing in
   for them.
+- **The installed hooks export `FUX_NO_PROGRESS=0`** (W-64, 2026-08-21), so the
+  progress bar paints during a hook by decision rather than by accident of TTY
+  detection. R5's 44.4 s of silence above is the symptom; the bar's rules are
+  [ADR-CLI](0002_cli-surface.md) decision 9. **`fux-merge-index` stays silent
+  regardless** — git owns the merge driver's stdio contract, and the driver is
+  per-shard fast. Revisit if W-61's fork resolves to option B: a deferred hook
+  costs ~0.3 s and constant, which the bar's count threshold mostly suppresses
+  anyway.
 
 ### Alternatives considered
 

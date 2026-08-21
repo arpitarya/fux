@@ -14,7 +14,7 @@ timestamp: 2026-08-21T00:00:00Z
   gate [R6-MERGE](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md)
   read **INCONCLUSIVE** and the §3.1-vs-§3.2 call is Arpit's
   ([W-61](../../work/open/W-61-maintenance-measurement.md)); the false-refusal
-  defect [`work/PRIORITY.md`](../../work/PRIORITY.md) **P4** ranked is fixed
+  defect ranked **P4** by the 2026-08-20 audit is fixed
   (Consequences, 2026-08-21)
 - **Date:** 2026-08-21
 - **Feature:** M5 — maintenance, the merge half
@@ -165,7 +165,7 @@ take the union.
 2026-08-21.** It was carved out on Arpit's instruction because the driver is a
 separate mechanism from the hooks — different failure mode, different gate
 (R6, not R5), different blast radius — and it is the component with a
-reproduced defect ranked in [`work/PRIORITY.md`](../../work/PRIORITY.md). Under
+reproduced defect the 2026-08-20 audit ranked **P4**. Under
 Law zero the change that fixes that defect must touch the record that owns the
 file, and this is now that record. Nothing here is a new decision; what changed
 is which file the decisions live in and who owns `mergedriver.py`.
@@ -255,7 +255,7 @@ announces it.
   only implementing half of it. Verified:
   `uv run pytest -q tests/maintain/test_mergedriver.py -k ancestor` — see
   `test_a_side_unchanged_from_the_ancestor_never_blocks_the_other_sides_edit`.
-  Ranked **P4** in [`work/PRIORITY.md`](../../work/PRIORITY.md), which called
+  Ranked **P4** by the 2026-08-20 audit, which called
   it the defect that "fires on most merges in a multi-author repo, which is
   the design point". It was a defect in this record's code, **not** a defect
   in decision 1 — the fix makes the driver do what decision 4 already said.

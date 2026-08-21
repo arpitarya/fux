@@ -149,7 +149,7 @@ the committed value of the `mode` property. Ratified by Arpit, 2026-08-19.
 **2. `extracted` asserts a contract, not a label.** A record in this mode
 guarantees: every property is a pure function of the document's bytes and the
 corpus's link structure; no model was consulted at any point; no network was
-touched (L4's single fenced exception, `--refresh-urls`, fetches *bytes* and
+touched (L4's fenced exceptions — `fux add <URL>` and `fux update` — fetch *bytes* and
 still extracts from them deterministically); the run is byte-reproducible.
 
 **3. It is the default, and today it is the only mode that exists.** A record

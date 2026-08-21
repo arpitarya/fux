@@ -215,6 +215,24 @@ fallback.
   runs the differential through the CLI on the graph fixture. The graph plane
   is built by the same `fux build` as the accelerator, so a leak into the
   lexical path is a live possibility and needs a test, not a promise.
+- **`edges_from_records` lifts without validating, and that is now actually
+  safe (2026-08-21, W-63).** Its docstring claimed dangling edges "were
+  already dropped by `ingest/edges.py`" — true only for records **re-resolved
+  this run**, and a carried `url:` record is not one. A document removed from
+  the corpus therefore survived here as an edge target: a node in the plane
+  that no verb could explain, with a community label computed partly from it.
+  Fixed in ingest, not here ([ADR-INGEST](0007_ingest.md) decision 10) —
+  validating on lift would have made every graph read pay for a defect in the
+  write, and would have hidden a wrong committed record rather than fixing it.
+- **`fux graph`'s seed query scans by default too (2026-08-21).** The seed is
+  an ordinary `run_query`, so it inherits `ask`'s path choice and takes it
+  with the same flags — `--fast` to use the accelerator, `--scan` for the
+  explicit reference path, mutually exclusive. Deliberately not a separate
+  policy: one verb reaching for the accelerator while its sibling does not is
+  the kind of divergence [ADR-ASK](0004_ask.md) decision 4 exists to prevent,
+  and the seed query is the same query by any other name. **The plane itself
+  is unaffected** — it is required for every graph verb regardless of which
+  path produced the seeds, and `plane.load()` still refuses a stale one.
 - **`fux build` now writes one more file** and `DETERMINISTIC_FILES` gains
   `graph.json`, so two builds of the same index are asserted byte-identical
   including the communities. **This makes ADR-T1-ACCELERATOR's build a

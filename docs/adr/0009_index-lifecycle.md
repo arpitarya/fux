@@ -185,7 +185,7 @@ conditions, all of which must hold:
    statistics mean something different.
 3. **The old shape is already refused, per record, with the migration named.**
    `fux build` asserts decision 6 on every record and stops on a bare
-   `title_h`, saying re-run `fux ingest --refresh-urls`. A `_format` bump would
+   `title_h`, saying re-run `fux update`. A `_format` bump would
    add a second, *coarser* refusal that says strictly less than the one that
    already fires.
 
@@ -197,7 +197,7 @@ expected a hash: an opaque display string either way, which is the mode working
 as designed. **Loud where it matters, nil where it does not** is what makes the
 bump unnecessary rather than merely expensive.
 
-**The migration is `fux ingest --refresh-urls`.** A committed index holding a
+**The migration is `fux update`.** A committed index holding a
 bare `title_h` is *old*, not corrupt, and re-ingesting rewrites it. Nothing
 else in the index is affected, because nothing else was ever hashed this way.
 
@@ -265,7 +265,7 @@ outside `terms` in record 'url:…/oncall'. `query/scan.py` counts it toward tha
 term's df from the raw bytes, and the accelerator counts from the postings, so
 the two paths would score this corpus differently. Refusing to build a divergent
 accelerator. This record's `title_h` predates the `h:` prefix
-(ADR-INDEX-LIFECYCLE): re-run `fux ingest --refresh-urls` to rewrite it.
+(ADR-INDEX-LIFECYCLE): re-run `fux update` to rewrite it.
 ```
 
 **A corpus written today builds clean**, because the prefix means the scan's

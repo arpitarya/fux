@@ -13,7 +13,7 @@ timestamp: 2026-08-19T00:00:00Z
 - **Status:** accepted
 - **Date:** 2026-08-19
 - **Feature:** `.fux/sources/urls` — the file format itself, as distinct from what fetches its entries
-- **Owns:** `src/fux/ingest/sourcelist.py` (the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0023_dir-list.md) decision 2) and `src/fux/sources.py` (`fux url`, the writer). Both added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-FETCHER](0019_fetcher.md), which owns `ingest/urlsrc.py`
+- **Owns:** `src/fux/ingest/sourcelist.py` — the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0023_dir-list.md) decision 2. Added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-FETCHER](0019_fetcher.md), which owns `ingest/urlsrc.py`; **the *writer* moved to [ADR-CLI](0002_cli-surface.md) on 2026-08-21** (W-63), when `src/fux/sources.py` stopped being `fux url` and became `add`/`remove`/`update` over all three lists. This record still decides what a URL line **means**; ADR-CLI decides what the command does
 - **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Split from:** [ADR-URL-INGEST](0008_url-ingest.md) decisions 5 and 6, which shipped in 0.31.x and are restated nowhere
 
@@ -112,7 +112,7 @@ A URL that fails to fetch is a **skip**, not a deletion — the list is the
 statement of intent, and only removing a line removes a document:
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
 ingested 7 docs (5 changed), 1 skipped, 5 shards written
   skip https://example.invalid/gone: fetch failed: 404 not found
 ```
@@ -209,7 +209,7 @@ below. **Adding one is a change to this record**, not a config addition — whic
 is what makes decision 9's unknown-key error safe to be strict about: the error
 is never wrong, because there is nothing legitimate it can reject.
 
-**12. A fux-written line carries every attribute, explicitly.** `fux url`
+**12. A fux-written line carries every attribute, explicitly.** `fux add`
 emits the complete set — `fetch=… meta=…` — even where the value equals the
 default. **A generated file holds no implicit
 state**: the line says what it means, and changing a policy is a one-word diff
@@ -318,22 +318,31 @@ which is the point of decision 11.
   record's earlier consequence promised, and it fell the way it did because the
   obvious alternative loses something real:
 
-  | decision | what tool-management changes about it | how `fux url` answers |
+  | decision | what tool-management changes about it | how `fux add` answers |
   |---|---|---|
   | 3, comments | they stop being how a human annotates and become what a writer must **preserve** | a grouping comment and a line's own trailing comment both survive an edit; a regenerating writer would eat both |
   | 4, duplicates | "a merge artefact" becomes "a writer must not emit one" | an add to a URL already listed is an **update in place**, never a second line |
   | 4, ordering | the loader's canonical sort could be done once by the writer | a new line lands at its sorted position — a courtesy to the reader, since the loader still sorts and correctness does not depend on it |
 
   **It still is not a lockfile.** A lockfile is generated whole from a
-  manifest; this file *is* the manifest, and `fux url` is a careful editor of
+  manifest; this file *is* the manifest, and `fux add` is a careful editor of
   it. Which is why a hand-written line stays legal (decision 13) and
-  `fux url` marks it rather than rewriting it.
+  `fux add` marks it rather than rewriting it.
 
-- **`fux url` never fetches.** `--cdp` and `--plain` decide what is *recorded*;
-  `fux ingest --refresh-urls` stays the only networked path in the engine
-  (L4, [ADR-CLI](0002_cli-surface.md) decision 1). A managing command that
-  validated a URL by requesting it would make the committed list a function of
-  whether the network was up when someone typed the command.
+- **`fux url` was retired into `fux add` / `fux remove` on 2026-08-21**
+  (W-63). Decisions 12 and 13 are unchanged and were the reason the swap was
+  cheap: the writer still emits every attribute and still marks a line it did
+  not write, so only the command's *name* moved. `--cdp` and `--plain` still
+  decide what is **recorded**.
+
+  What did change: **`fux add <URL>` fetches that one URL**, where `fux url`
+  fetched nothing. The old note here said a managing command that validated a
+  URL by requesting it would make the committed list a function of network
+  weather — and that argument still stands, which is why the fetch does not
+  gate the write. The line is recorded first and stays recorded even when the
+  fetch fails; the failure is reported and exits 1. So the *list* is still not
+  a function of whether the network was up. The *index* is, and always was.
+  Full rationale and the rejected alternatives: [ADR-CLI](0002_cli-surface.md).
 
 - **Two files describe one subsystem**, deliberately: this record for the
   format, [ADR-URL-INGEST](0008_url-ingest.md) for the fetch contract. The

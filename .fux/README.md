@@ -11,15 +11,14 @@ tagged with [`CACHEDIR.TAG`](https://bford.info/cachedir/)).
 | `index/` | committed | the wire-format index (ADR-RECORD) |
 | `sources/` | committed | the committed source lists (`dirs`, `urls`), one entry per line |
 | `fetchers/` | committed | consumer-owned code (`cdp.py`, `http.py`), edit freely |
-| `runtime/` | derived | reserved for M2 accelerator segments; carries `CACHEDIR.TAG` |
-| `cache/` | derived | reserved for M4 ARC fetch cache; carries `CACHEDIR.TAG` |
+| `runtime/` | derived | M2 accelerator segments, and M4's fetch cache nested at `runtime/fetch-cache/`; carries `CACHEDIR.TAG` |
 
 ## The fetchers are yours
 
 `fetchers/http.py` and `fetchers/cdp.py` are **your** code, committed
 to **your** repo. `fux setup` writes them once if they are missing;
 `fux ingest` never writes a fetcher at all. Fux loads one by path
-under `fux ingest --refresh-urls` and never rewrites it. Change the
+under `fux add <URL>` or `fux update`, and never rewrites it. Change the
 port, the transport, the extraction, anything.
 
 One consequence of living in a dotdir: linters that skip hidden

@@ -2,7 +2,7 @@
 type: ADR
 name: ADR-URL-INGEST
 title: ADR-URL-INGEST (0008) — URL ingestion through consumer-owned fetcher
-description: Fux never fetches. A consumer-owned file does, behind a four-function contract, only under --refresh-urls, with the URL list as a committed line-oriented file.
+description: Fux never fetches. A consumer-owned file does, behind a four-function contract, only under the two named fenced paths (fux add <URL> and fux update), with the URL list as a committed line-oriented file.
 status: accepted
 timestamp: 2026-08-18T00:00:00Z
 ---
@@ -39,17 +39,17 @@ SSO" stops being a feature request against fux and becomes fifteen lines in a
 file you already own.
 
 Two rules make it safe rather than merely clever. Fetching happens **only**
-under `fux ingest --refresh-urls` — a plain ingest never even imports your file.
-And a page that fails to fetch is recorded as a skip; it does **not** delete the
-document you already have, because a flaky network must never look like a
-deletion.
+under the two named fenced paths — `fux add <URL>` and `fux update` — and a
+plain ingest never even imports your file. And a page that fails to fetch is
+recorded as a skip; it does **not** delete the document you already have,
+because a flaky network must never look like a deletion.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
 ```mermaid
 flowchart LR
     subgraph fux ["fux — no network code"]
-        R["ingest --refresh-urls"]
+        R["fux add &lt;URL&gt; · fux update"]
         U[".fux/sources/urls<br/>committed, one per line"]
         N["normalize<br/>CRLF · U+2028/9/85 · NUL"]
         W["records src:url"]
@@ -73,7 +73,7 @@ flowchart LR
   | .fux/sources/urls        |           | .fux/fetchers/cdp.py       |
   |   committed, 1 per line  |           |   fetch(url) -> str  REQUIRED|
   |            |             |  one URL  |   configure(cfg)    optional |
-  |  ingest --refresh-urls --+---------->|   connect() / close()        |
+  |  add <URL> · update -----+---------->|   connect() / close()        |
   |            ^             |           +---------------+--------------+
   |            |  markdown, or raises                    |
   |     normalize (CRLF, U+2028/9/85, NUL)               v
@@ -96,11 +96,11 @@ $ fux ingest
 ingested 2 docs (0 changed), 2 skipped, 0 shards written
 ```
 
-`--refresh-urls` runs the whole contract, and a dead page is a **skip**, not a
+Either fenced path runs the whole contract, and a dead page is a **skip**, not a
 crash:
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()
@@ -133,14 +133,23 @@ exactly one fetcher runs per URL. **They are not restated here**: a record that
 paraphrases another is the paraphrase that drifts. What follows is what this
 record still owns — how URL ingestion *behaves* around that contract.
 
-**3. Fetching happens only under `--refresh-urls`.** A plain ingest carries
-every existing `url:` record forward byte-identically and never imports the
-fetcher.
+**3. Fetching happens only under a named fenced path.** Since 2026-08-21
+(W-63) there are **two** — `fux add <URL>`, scoped to the URL just added, and
+`fux update`, which is what `--refresh-urls` retired into. A plain ingest
+carries every listed `url:` record forward byte-identically and never imports
+the fetcher. The count is not the rule; being named, fenced and opt-in is
+(L4, [ADR-CLI](0002_cli-surface.md) decision 1e).
 
-**4. A failed fetch keeps the prior record.** It is reported as a skip. Only a
-URL *removed from the list* removes a document, and reconciliation happens only
-on the run that opted into the network. A transient failure must never present
-as a deletion.
+**4. A failed fetch keeps the prior record.** It is reported as a skip. A
+transient failure must never present as a deletion.
+
+**4a. Reconciliation is not fetching, and does not wait for it** (2026-08-21,
+W-63). Only a URL *removed from the list* removes a document — and it does so
+on the **next run, networked or not**. This decision used to end "and
+reconciliation happens only on the run that opted into the network", which
+made deleting a document require the one capability deletion has no use for.
+That was a defect, not a design; it is [ADR-INGEST](0007_ingest.md)
+decision 9, and it is what `fux remove <URL>` rests on.
 
 **5–6. The file format left this record on 2026-08-19 too.** The committed
 list, its grammar, its comment rule, the dedupe-and-sort, the closed attribute
@@ -177,10 +186,10 @@ $ fux ingest
 ingested 2 docs (0 changed), 2 skipped, 0 shards written
 ```
 
-**`--refresh-urls` runs the whole contract:**
+**A fenced path runs the whole contract:**
 
 ```console
-$ fux ingest --refresh-urls
+$ fux update
   [fetcher] configure({'greeting': 'hello'})
   [fetcher] connect()
   [fetcher] close()
@@ -220,7 +229,7 @@ the batch, and the 404 becomes a skip while the other two documents land.
   `30aef0c52cf11116` where a title would be. That is the mode working, and it
   is a real usability cost worth stating rather than discovering.
 - **The default was broken, and is fixed (2026-08-19).** With
-  `meta = "hashed"`, `fux ingest --refresh-urls` wrote the committed index and
+  `meta = "hashed"`, the networked path wrote the committed index and
   then **failed at the accelerator build, exit 1**, and every later `fux build`
   failed too: the bare 16-hex `title_h` tripped the invariant that keeps the
   scan and the accelerator in agreement, so a corpus with one hashed URL record
@@ -277,9 +286,14 @@ express a needed source without changing `src/fux/`.
 grep -rnE '^\s*(import|from)\s+(socket|http|urllib|ssl|asyncio|requests|httpx)' src/fux/
 # expect: no output
 
-# 2. fetching is still gated on the flag
-grep -n 'refresh_urls' src/fux/ingest/run.py
-# expect: the fetcher load sits behind it, with no other call site
+# 2. fetching is still gated — one branch, reached only by the two fenced paths
+grep -n 'refresh_urls\|only_urls' src/fux/ingest/run.py
+# expect: the fetcher load sits inside the `if refresh_urls:` branch and nowhere
+#         else; `only_urls` narrows WHICH listed URLs it fetches, never whether
+
+# 2b. removal does NOT need the network (W-63) — this must have no gate at all
+grep -n '_listed_url_ids' src/fux/ingest/run.py
+# expect: called on the offline branch; reading a committed file is not a fetch
 
 # 3. the config table is still opaque — fux must never read a key inside it
 grep -rn 'url.config\[' src/fux/

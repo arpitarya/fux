@@ -246,7 +246,56 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated 2026-08-20.*
+*Updated 2026-08-21.*
+
+- **W-63 and W-64 are both BUILT and NEITHER IS COMMITTED (2026-08-21).**
+  Read that twice before you do anything: `HEAD` is `b76300c`, and the working
+  tree carries **three** separate finished changes stacked on top of it — the
+  design-point reconciliation, W-64's progress plane, and W-63's source verbs
+  (which swept in a fourth, an orphan scan-by-default flip nobody had
+  recorded). **Arpit's instruction on 2026-08-21 was "no need to commit
+  anything yet."** Do not commit on your own initiative; do not assume a
+  `git log` tells you what exists.
+- **What W-63 delivered.** `fux add` / `fux remove` / `fux update` over all
+  three source lists, dispatching on the entry. `fux url` deleted;
+  `ingest --refresh-urls` hidden for one release. Both `ingest/run.py`
+  defects fixed: **a de-listed URL now leaves the index on an offline run**
+  (deletion never needed the network) and a carried record's edges are
+  re-checked rather than trusted. 889 unit / 60 e2e green; nine records
+  updated; surface captured at
+  [`regression/2026-08-21-source-verbs`](regression/2026-08-21-source-verbs/report.md).
+  Its OPEN-WORK row **stays** until it lands, and `IMPLEMENTATION.md` gets no
+  row until then — a row is earned by landing.
+- **L4 now has two named networked paths, and its text did not change.**
+  `fux add <URL>` (scoped to that URL) and `fux update`. The law already read
+  *"paths"*, plural; what was wrong was the eleven records and docstrings that
+  narrowed it to `--refresh-urls`, and those were corrected. **If you are
+  tempted to edit CLAUDE.md's L4, don't** — it is agent-steering text, it is
+  Arpit's to ratify, and in this case it was already right.
+- **Concurrent sessions are not hypothetical here — they bit twice on
+  2026-08-21.** First `src/fux/cli.py` was overwritten by another session and
+  W-64's wiring vanished from it. Then a peer session and this one **deadlocked
+  over who committed first**, each waiting for the other, neither able to see
+  it from its own side. Both were resolved by `SendMessage`. **Re-read a
+  shared file immediately before editing it**, prefer `Edit` over `Write` under
+  `src/fux/` and `work/*.md`, and check `.claude/.locks/*/owner` before
+  concluding a file is free.
+- **Capturing a surface is not paperwork — it found four defects here.** Three
+  were in the change being captured, and every one did something defensible
+  while *saying* something false: an L4 announcement that fired with nothing
+  fetched, `add --types` silently replacing the built-in allowlist, a skip
+  reported as a failed fetch, `explain` answering for a document not in the
+  index. Unit tests were green throughout.
+  [ANALYSIS](regression/2026-08-21-source-verbs/ANALYSIS.md).
+- **A test can pass for the wrong reason, and a default flip is how.** When
+  `ask` flipped to scan-by-default, **three** e2e tests kept passing while
+  silently ceasing to test anything — they drove the accelerator through a
+  bare `ask`, which now scans, so they compared the scan with itself. If you
+  change a default, grep for every test that depended on the old one.
+
+- **`work/PRIORITY.md` does not exist.** It was archived; project memory and any
+  prompt still pointing at it are stale. Ordering lives in
+  [`OPEN-WORK.md`](OPEN-WORK.md), which is the rule anyway.
 
 - **W-26 (M6) is the agent lane, and it is startable.** Its DoD wants every R
   prediction to carry *a measured value or an honest failure record*, and all

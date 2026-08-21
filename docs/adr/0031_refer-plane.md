@@ -229,6 +229,14 @@ the caller's window. `dropped` is reported so truncation is never silent.
 
 ### Consequences
 
+- **The R4 bench calls `fux update`, not `fux ingest --refresh-urls`**
+  (2026-08-21, W-63). A rename of the command it shells out to, with no
+  change to what it measures: `update` runs the same fetch through the same
+  consumer-fetcher contract and ends in the same `ingest.run`. Recorded here
+  rather than left silent because a bench that stops reproducing is
+  indistinguishable from a regression, and the flag it used is hidden from
+  `--help` from this release.
+
 - **Both caches, and their consequences, are now
   [ADR-CACHE](0035_cache.md)'s** — the TTL store's disk cap (PRIORITY.md P4,
   2026-08-21) and the ARC differential that keeps a cached bundle
