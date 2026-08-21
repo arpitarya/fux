@@ -35,6 +35,7 @@ both of those items were opened about.
 
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -150,7 +151,13 @@ def walk_sources(
         if not base.exists():
             raise FuxError(f"configured source not found: {entry!r} (looked in {base})")
         for path in _candidate_paths(base):
-            rel = path.relative_to(root).as_posix()
+            # NFC, the same normalization `parse.py` applies to file content
+            # (the R1/macOS-checkout hazard): a filesystem may return a path
+            # in NFD even when the file was created and committed as NFC, so
+            # the same document's `rel_path`/`loc` would differ by checkout
+            # machine without this — a byte-identical-index guarantee (L3)
+            # that a path string, not just content, has to hold too.
+            rel = unicodedata.normalize("NFC", path.relative_to(root).as_posix())
             if rel in files or rel in skipped:
                 continue  # already covered by an earlier, overlapping entry
 

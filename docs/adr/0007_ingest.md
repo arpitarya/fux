@@ -227,6 +227,19 @@ docs/logo.png: binary
 
 ### Consequences
 
+- **Two reproduced defects fixed (PRIORITY.md P4, 2026-08-21).**
+  `ingest/parse.py` decoded content with `"utf-8"`, which leaves a leading
+  BOM as a literal `U+FEFF` character rather than stripping it — corrupting
+  the frontmatter delimiter or the first term of any document saved with one.
+  Now decodes with `"utf-8-sig"` (identical to `"utf-8"` when no BOM is
+  present). Separately, `ingest/gitdir.py`'s `walk_sources` built `rel_path`
+  from the filesystem's `Path.relative_to().as_posix()` with no Unicode
+  normalization — a path can come back NFD even when committed as NFC (the
+  same R1/macOS-checkout hazard `parse.py` already normalizes document
+  *content* for), which would make the same document's `rel_path`/`loc`
+  differ by checkout machine. Now NFC-normalized alongside content, closing
+  the one place L3's byte-identical guarantee held for content but not for
+  the path string naming it.
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in
   extraction.** The expensive half is now proportional to the change; the cheap
   half still is not, and at very large corpora that residue is what remains to

@@ -178,11 +178,16 @@ with the same bytes means they agree. `ver` increments exactly when a
 document's own `sha` changes ([ADR-RECORD](0010_index-record.md)), which is
 what makes "higher" mean "later" rather than "noisier".
 
+**`ver` is the tiebreak of last resort, not the first test.** The ancestor is
+consulted first (decision 4): *"this side is byte-identical to what we both
+started from"* is certain in a way `ver` is not — it holds even when the
+writer on the other side failed to increment.
+
 **2. Refuse in four cases, and refusing is the feature.**
 
 | case | why it cannot be resolved |
 |---|---|
-| same `ver`, different bytes | two branches derived different records at the same revision — one ingested content the other did not have |
+| same `ver`, different bytes, **and neither side matches the ancestor** | two branches derived different records at the same revision — one ingested content the other did not have. The ancestor clause is decision 4: if either side is unchanged there is no disagreement to refuse |
 | a deletion racing a modification | one side says gone, the other says changed |
 | both sides added the same id, differently | the same disagreement, with no ancestor to appeal to |
 | the header differs | a format change is a migration, not a merge |
@@ -198,10 +203,19 @@ comment saying so, because reversing them made every disjoint add look like a
 delete-vs-modify race. The everyday case in a multi-author repo is two people
 documenting different things, and it must cost nothing.
 
-**4. A deletion beats an untouched other side.** An id in the ancestor and gone
-from one side was deleted there. If the surviving side is byte-identical to the
-ancestor, nobody disagreed — the deletion stands. If it changed, that is a real
-disagreement and case 2 applies.
+**4. A side byte-identical to the ancestor never wins and never blocks.** It
+provably did not touch the document, so the other side's bytes are taken
+outright. This arises in both branches, and the rule is the same in each:
+
+- **one side deleted the id.** If the surviving side equals the ancestor,
+  nobody disagreed and the deletion stands; if it changed, that is a real
+  disagreement and case 2 applies.
+- **both sides still have the id.** If either equals the ancestor, the other
+  wins — *without consulting `ver`*. Testing `ver` first refuses this as "same
+  `ver`, different bytes" whenever the changed side failed to increment (a
+  hand repair, an external edit, an ingest edge case), which is a refusal
+  where there is nothing to disagree about. That was the defect ranked P4;
+  see Consequences.
 
 **5. The merged output is sorted by id.** Two machines merging the same three
 inputs produce the same bytes. Order is *rebuilt*, never carried over from
@@ -279,9 +293,11 @@ announces it.
   the conflict markers are not valid JSONL. That is the same contract a human
   merge conflict has, and it is why the message names the one command that
   resolves it correctly.
-- **`ver` is now load-bearing outside the writer.** Anything that changes a
-  record's bytes without incrementing `ver` turns a resolvable merge into a
-  refusal — see veto condition 3.
+- **`ver` is load-bearing outside the writer, but no longer alone.** A writer
+  that changes a record's bytes without incrementing `ver` still costs a
+  refusal — but only when **both** sides changed, since decision 4 catches
+  every case where one of them didn't. That is the difference between a
+  latent correctness bug and a rare one. See veto condition 3.
 
 ### Alternatives considered
 
@@ -331,8 +347,9 @@ announces it.
 
 **Reopen this decision if any of these becomes true:**
 
-1. **The driver picks a side on a tie.** Same `ver`, different bytes, exit 0.
-   It must never.
+1. **The driver picks a side on a tie.** Same `ver`, different bytes, *neither
+   side matching the ancestor*, exit 0. It must never — the ancestor clause is
+   decision 4 resolving a non-tie, not a tie being broken.
 2. **A re-specified R6 fails** — tier 1 rebuilt so its two added documents
    share a shard, and either a machine plane conflicts in the treatment arm or
    a human conflict is silently resolved. Either direction invalidates
@@ -340,9 +357,9 @@ announces it.
 3. **`ver` stops being monotone in a document's own `sha`** — any writer that
    changes a record's bytes without incrementing it. Then "higher `ver`" no
    longer means "later work" and last-writer-wins is unfounded.
-4. **A refusal is observed where one side never touched the document.** After
-   P4's fix, that case must resolve; if it still refuses, the ancestor rule is
-   not implemented and decision 4 is prose.
+4. **A refusal is observed where one side is byte-identical to the ancestor.**
+   Decision 4 says that case resolves. A refusal there is a regression, and
+   the named test below is its tripwire.
 
 **How to check them:**
 

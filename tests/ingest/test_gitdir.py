@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import unicodedata
+
 import pytest
 
 from fux.errors import FuxError
@@ -15,6 +17,23 @@ def test_walks_a_directory_recursively_sorted(tmp_path):
     files, skipped = walk_sources(tmp_path, ["docs"])
     assert [f.rel_path for f in files] == ["docs/a.md", "docs/b.md", "docs/sub/c.md"]
     assert skipped == []
+
+
+def test_rel_path_is_nfc_normalized(tmp_path):
+    """A filesystem may return a path in NFD even when the file was created
+    and committed as NFC (the R1/macOS-checkout hazard `parse.py` already
+    normalizes content for) — without normalizing the path string too, the
+    same document's `rel_path`/`loc` would differ by checkout machine, which
+    is a hole in L3's byte-identical-index guarantee.
+    """
+    decomposed_name = "café.md"  # "café.md" as e + combining acute accent
+    composed_name = unicodedata.normalize("NFC", decomposed_name)
+    assert decomposed_name != composed_name  # sanity: the two forms differ as strings
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / decomposed_name).write_text("body", encoding="utf-8")
+    files, _ = walk_sources(tmp_path, ["docs"])
+    assert [f.rel_path for f in files] == [f"docs/{composed_name}"]
 
 
 def test_single_file_entry(tmp_path):
