@@ -244,6 +244,14 @@ deliberately more specific than a sibling's claim: ADR-RANKING takes
 specific wins, exactly as the table already resolves `store/fuxdir.py` against
 `store/`. **Nothing changes in the table below until acceptance.**
 
+**A live carve-out, 2026-08-21.** ADR-MERGE-DRIVER takes
+`src/fux/maintain/mergedriver.py` out of ADR-MAINTENANCE's claim on
+`src/fux/maintain/`. Unlike the six companion records below, this one **is** in
+the table: it is a genuine ownership claim, and the freshness gate has to be
+able to name one owner for that file. Its harness is deliberately **not**
+split — `tools/maintenance-bench/` runs R5 and R6 from one file, and a
+component is owned once.
+
 **Six 2026-08-19 records own nothing at all, on purpose.**
 ADR-CACHEDIR-TAG, ADR-DOCS-TABLE, ADR-CODES-TABLE, ADR-RUNTIME-MANIFEST,
 ADR-RUNTIME-STAMP and ADR-RUNTIME-STATS each specify one file
@@ -291,7 +299,7 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/maintain/mergedriver.py` | ADR-MERGE-DRIVER | the merge driver itself — carved out of ADR-MAINTENANCE's directory-level claim 2026-08-21, most specific wins |
 | `src/fux/refer/` | ADR-REFER | M4's core — source · freshness · ARC · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
 | `tools/pruning-eval/` | W-38 | the gate harness and its frozen pre-registrations. **Owned by an open item, not a record** — the verdicts that used it ([P1-GATE](../../work/regression/2026-08-09-pruning-eval/VERDICT.md) · [P1-RERUN](../../work/regression/2026-08-09-pruning-rerun/VERDICT.md)) are no longer ADRs, and W-38 is the only live item permitted to touch pruning work |
-| `tools/maintenance-bench/` | ADR-MAINTENANCE | the R5 and R6 harness. **Written, not run** — Arpit held prediction runs on 2026-08-20, and the record is `proposed` until they are |
+| `tools/maintenance-bench/` | ADR-MAINTENANCE | the R5 and R6 harness. **Both ran 2026-08-20** — [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md) FAIL, [R6-MERGE](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md) INCONCLUSIVE (W-61). **R6's verdict belongs to ADR-MERGE-DRIVER; the harness does not** — one file runs both, and a component is owned once |
 | `tools/refer-bench/` | ADR-REFER | the R4 harness and its frozen pre-registration — a real `http.server` behind the **consumer's own generated fetcher**, so the measured path is the shipped one |
 | `tools/differential/` | ADR-T1-ACCELERATOR | the differential-law harness and the R3 bench |
 | `tools/graph-bench/` | ADR-GRAPH | cost-attribution profiler for the M3 lane — not a gate; feeds `graph-plane-format.compare.md` |
