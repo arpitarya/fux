@@ -130,6 +130,21 @@ def merge_shards(ancestor: str, ours: str, theirs: str) -> str:
             conflicts.append(doc_id)                  # deleted here, changed there
             continue
 
+        # Ancestor check first, `ver` second. If one side is byte-identical to
+        # the ancestor, the other side's bytes win outright — this is exactly
+        # as certain as the delete-vs-unmodified case above, and it does not
+        # depend on `ver` having been bumped correctly. Relying on `ver`
+        # alone means a document whose `ver` was not incremented (a hand
+        # repair, an external edit, an ingest edge case) reads as "same
+        # ver, different bytes" and gets refused as an unresolvable
+        # conflict — even though one side provably did not touch it.
+        if in_ours == in_base:
+            merged[doc_id] = in_theirs
+            continue
+        if in_theirs == in_base:
+            merged[doc_id] = in_ours
+            continue
+
         our_ver, their_ver = _ver(in_ours), _ver(in_theirs)
         if our_ver > their_ver:
             merged[doc_id] = in_ours
@@ -160,15 +175,26 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     ancestor, ours, theirs = (Path(a) for a in argv[:3])
+    # Reading with the default `newline=None` is deliberate: universal-newline
+    # translation normalizes CRLF/CR/LF alike to `\n`, so a file checked out
+    # with CRLF (Windows) parses identically to one checked out with LF. The
+    # write side needs the opposite instinct — `newline="\n"` below disables
+    # the platform-default translation there, so this driver never commits
+    # CRLF on Windows while committing LF everywhere else, which would break
+    # L3's byte-identical guarantee across machines.
     base_text = ancestor.read_text(encoding="utf-8") if ancestor.exists() else ""
     our_text = ours.read_text(encoding="utf-8")
     their_text = theirs.read_text(encoding="utf-8")
 
     try:
-        ours.write_text(merge_shards(base_text, our_text, their_text), encoding="utf-8")
+        ours.write_text(
+            merge_shards(base_text, our_text, their_text), encoding="utf-8", newline="\n"
+        )
     except MergeConflict as exc:
         # Refuse loudly and leave both sides. Never pick one.
-        ours.write_text(_conflict_text(our_text, their_text, exc.ids), encoding="utf-8")
+        ours.write_text(
+            _conflict_text(our_text, their_text, exc.ids), encoding="utf-8", newline="\n"
+        )
         print(
             f"fux: cannot merge {ours.name} — {len(exc.ids)} document(s) changed on both sides "
             f"at the same revision: {', '.join(exc.ids[:5])}\n"

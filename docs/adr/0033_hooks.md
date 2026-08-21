@@ -1,8 +1,8 @@
 ---
 type: ADR
 name: ADR-MAINTENANCE
-title: "ADR-MAINTENANCE (0033) — hooks, the index merge driver, and L5 enforced at write time"
-description: "M5. post-commit re-indexes (not pre-commit, which would index bytes nobody committed); a line-wise last-writer-wins merge driver that refuses rather than guesses; and the hashed-meta law moved from one caller into the writer, where nothing can skip it."
+title: "ADR-MAINTENANCE (0033) — the git hooks that keep a committed index in step, and L5 enforced at write time"
+description: "M5, the hooks half. post-commit re-indexes (not pre-commit, which would index bytes nobody committed), post-merge re-ingests, post-checkout only rebuilds; every hook is best-effort and refuses to clobber; and the hashed-meta law moved from one caller into the writer, where nothing can skip it. The merge driver was carved out to ADR-MERGE-DRIVER on 2026-08-21."
 status: proposed
 timestamp: 2026-08-20T00:00:00Z
 ---
@@ -10,16 +10,21 @@ timestamp: 2026-08-20T00:00:00Z
 # ADR-MAINTENANCE: keeping the index in step
 
 - **Name:** `ADR-MAINTENANCE` — cite this everywhere; never cite the number
-- **Status:** proposed — **R5 measured 2026-08-20 and FAILED**; R6 reads as
-  INCONCLUSIVE, but whether it is PASS (pre-registration §3.1) or not-yet
-  (§3.2) is itself an open call for Arpit
-  ([W-61](../../work/open/W-61-maintenance-measurement.md)).
-  Acceptance is not a formality away: veto condition 1 has fired, and what
-  replaces the automatic hook is an open fork
-  ([`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md))
+- **Status:** proposed — **R5 measured 2026-08-20 and FAILED**
+  ([W-61](../../work/open/W-61-maintenance-measurement.md)). Acceptance is not
+  a formality away: veto condition 1 has fired, and what replaces the automatic
+  hook is an open fork
+  ([`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md)).
+  R6 and the merge driver's own status moved to
+  [ADR-MERGE-DRIVER](0034_merge-driver.md) on 2026-08-21
 - **Date:** 2026-08-20
-- **Feature:** M5 — maintenance
-- **Owns:** `src/fux/maintain/` · `tools/maintenance-bench/`
+- **Feature:** M5 — maintenance, the hooks half
+- **Owns:** `src/fux/maintain/` · `tools/maintenance-bench/` — **except
+  `mergedriver.py`**, carved out to [ADR-MERGE-DRIVER](0034_merge-driver.md) on
+  2026-08-21 (most specific wins). The harness stays here: one file runs both
+  R5 and R6, and a component is owned once
+- **Split to:** [ADR-MERGE-DRIVER](0034_merge-driver.md) — decisions 6–9, the
+  refusal table, R6, and the add/add limitation
 - **Amends:** [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
   [ADR-CLI](0002_cli-surface.md)
 - **Laws:** L3, L5, L7
@@ -28,15 +33,17 @@ timestamp: 2026-08-20T00:00:00Z
 
 ## §1 — For humans
 
-Three pieces that let a committed index survive a real repository with real
-people in it.
+Three pieces let a committed index survive a real repository with real people
+in it. **Two of them are this record**; the third, the merge driver, is
+[ADR-MERGE-DRIVER](0034_merge-driver.md) since 2026-08-21.
 
 **Hooks.** `post-commit` and `post-merge` re-index; `post-checkout` rebuilds
 the derived plane. All three are best-effort and **cannot block a commit**.
 
-**A merge driver**, so two people working at once do not get a textual conflict
-in a machine-written file. It resolves by last-writer-wins on `(ver, sha)` and
-**refuses, loudly, whenever it cannot** — leaving both sides for a human.
+**A merge driver**, registered by the same installer and decided elsewhere:
+`fux hooks` writes `merge.fux-index.driver` into the repository's local git
+config and the `.fux/index/*.jsonl merge=fux-index` line into `.gitattributes`.
+What the driver then *does* is [ADR-MERGE-DRIVER](0034_merge-driver.md).
 
 **L5 moved into the writer.** Hashed meta for non-git sources was enforced in
 `ingest/run.py`, which is to say in *one caller*. It now lives in
@@ -46,7 +53,7 @@ in a machine-written file. It resolves by last-writer-wins on `(ver, sha)` and
 flowchart LR
     C["git commit"] --> PC["post-commit<br/>fux ingest"]
     PC --> N["index changed?<br/>say so"]
-    M["git merge"] --> MD["merge driver<br/>LWW on (ver, sha)"]
+    M["git merge"] --> MD["merge driver<br/>(ADR-MERGE-DRIVER)"]
     MD -->|resolved| PM["post-merge<br/>fux ingest"]
     MD -->|"cannot"| R["REFUSE:<br/>both sides kept"]
     K["git checkout"] --> PK["post-checkout<br/>fux build"]
@@ -59,7 +66,7 @@ flowchart LR
 ```text
   git commit  --> post-commit (fux ingest) --> "the index changed - commit it"
 
-  git merge   --> merge driver, LWW on (ver, sha)
+  git merge   --> merge driver (ADR-MERGE-DRIVER)
                      |-- resolved --> post-merge (fux ingest)
                      +-- cannot   --> REFUSE, both sides left in place
 
@@ -88,18 +95,8 @@ $ fux hooks
   kept   post-merge (already current)
 ```
 
-The measured control-and-treatment for the driver — the same merge, twice:
-
-```console
-# without the driver
-$ git merge x
-CONFLICT (content): Merge conflict in .fux/index/ad.jsonl
-
-# with it
-$ git merge x
-Auto-merging .fux/index/ad.jsonl
-Merge made by the 'ort' strategy.
-```
+> The driver's own captures moved with it, to
+> [ADR-MERGE-DRIVER](0034_merge-driver.md) §1.
 
 ---
 
@@ -109,8 +106,10 @@ Merge made by the 'ort' strategy.
 
 The index is committed, so it inherits every problem a generated file in git
 has: it goes stale the moment content changes, and it conflicts whenever two
-people touch the same shard. Meanwhile L5 — hashed meta for non-git sources —
-was a rule enforced by the one code path that happened to implement it.
+people touch the same shard. The staleness half is this record; the conflict
+half is [ADR-MERGE-DRIVER](0034_merge-driver.md). Meanwhile L5 — hashed meta
+for non-git sources — was a rule enforced by the one code path that happened to
+implement it.
 
 ### Decision
 
@@ -183,32 +182,15 @@ respect rather than route around, because a tool that installed itself on
 clone would execute code no reviewer saw. `fux doctor` can report their
 absence; installing stays a decision.
 
-**6. The merge driver resolves by last-writer-wins on `(ver, sha)`.** A shard
-is a header plus one JSON line per document sorted by `id`, so the union of two
-line sets is usually the right answer and a textual merge cannot see it.
-`ver` increments exactly when a document's own `sha` changes, so a higher `ver`
-is strictly later work.
-
-**7. The driver refuses in four cases, and refusing is the feature.**
-
-| case | why it cannot be resolved |
-|---|---|
-| same `ver`, different bytes | two branches derived different records at the same revision — one ingested content the other did not have |
-| delete racing a modification | one side says gone, the other says changed |
-| both added the same id, differently | same as the first, with no ancestor |
-| the header differs | a format change is a migration, not a merge |
-
-On refusal it writes **ordinary conflict markers** keeping both sides, exits
-non-zero, and names the fix (`fux ingest`, which derives from merged content
-rather than from either copy). It never picks a side.
-
-**8. The merged output is sorted by id.** Two machines merging the same three
-inputs produce the same bytes. Without this the driver would be a hole in L3
-the size of every collaborative repository.
-
-**9. `fux-merge-index` is its own entry point, not a `fux` subcommand.** Git
-invokes a merge driver as a bare command with positional arguments and offers
-no way to pass a verb.
+**6–9. The merge driver moved out on 2026-08-21.** Last-writer-wins on
+`(ver, sha)`, the four refusal cases and their table, the sorted deterministic
+output, and `fux-merge-index` as its own entry point are now
+[ADR-MERGE-DRIVER](0034_merge-driver.md), which owns
+`src/fux/maintain/mergedriver.py`. **The numbers are retired, not reused** —
+decision 10 keeps its number so every doc that cites it stays true. What
+remains here is the wiring: `fux hooks` registers the driver in the
+repository's local git config and appends the `.gitattributes` line, under
+decisions 4 and 5's refuse-rather-than-clobber policy.
 
 **10. L5 is enforced in `write_index`, per record, before any shard is
 touched.** A non-git record must **state** `meta`; a missing value means the
@@ -229,12 +211,6 @@ legal, explicit, per-document opt-out
 - **The existing corpus already complied**, so this landed without changing a
   single committed byte. That is evidence the rule was right, not evidence it
   was unnecessary.
-- **git does not invoke a content merge driver for an add/add**, where a shard
-  file is created on both branches with no ancestor. Git resolves that at the
-  tree level before content merging, and reports `CONFLICT (add/add)`. **This
-  is a real limitation and it is not worked around**: the fix is the one the
-  driver already prints — re-run `fux ingest`, which regenerates the shard from
-  merged content. Observed, not assumed.
 - **`fux` gains a twelfth verb** and ADR-CLI a sixth group. Flat, as ever.
 - **R5 FAILED, measured 2026-08-20** —
   [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md).
@@ -248,18 +224,14 @@ legal, explicit, per-document opt-out
   several viable answers, so it is
   [`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md) and
   Arpit's verdict, not this record's to assume.
-- **R6 is read as INCONCLUSIVE, pending Arpit's call on §3.1 vs §3.2, and the
-  engine is not the reason** —
-  [R6-MERGE](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md). All
-  three tiers matched their expected outcome; tiers 2 and 3 are informative
-  against a control arm with the driver unregistered. **Tier 1 merged cleanly
-  without the driver too**, so it proves nothing, and the frozen verdict table
-  does not cover "all match, some informative". The substance holds — adjacency
-  does not conflict, and a same-`ver` disagreement is refused with both sides
-  left in the file. Filed as **W-61**.
+- **R6 and everything that follows from it moved to
+  [ADR-MERGE-DRIVER](0034_merge-driver.md)** on 2026-08-21 — the INCONCLUSIVE
+  verdict, the add/add limitation, and the reproduced false-refusal defect
+  ranked P4. **W-61 still carries both gates**, because one open item covers
+  M5's measurement whichever record owns the code.
 - **The behaviour test in `tests_e2e/test_maintenance.py` is still not R6**,
-  and is now superseded as evidence by the run above rather than standing in
-  for it.
+  and is now superseded as evidence by the runs above rather than standing in
+  for them.
 
 ### Alternatives considered
 
@@ -271,12 +243,9 @@ legal, explicit, per-document opt-out
 - **Committing the hooks into `.fux/hooks/` and symlinking.** Rejected: it
   makes `git clone` install executable code, which is the thing decision 5
   refuses.
-- **A merge driver that always takes the higher `ver`, including on ties.**
-  Rejected: on a tie there is no later writer, so "last-writer-wins" has no
-  answer and picking one publishes a record nobody produced.
-- **Union-merging the shard and letting `fux ingest` clean up.** Rejected: a
-  union leaves two records with the same `id`, which `write_index` rejects — so
-  the repository would be left in a state its own writer refuses to load.
+- **The merge-driver alternatives** — always taking the higher `ver` including
+  on ties, and union-merging the shard — moved with decisions 6–9 to
+  [ADR-MERGE-DRIVER](0034_merge-driver.md).
 - **Leaving L5 in `ingest/run.py` and documenting the rule.** Rejected on the
   observation that this is what it already was.
 - **CI-triggered rebuild · a watch daemon · staying manual.** All three were
@@ -285,9 +254,11 @@ legal, explicit, per-document opt-out
 
 ### Reference (required)
 
-- `gitattributes(5)` §"Defining a custom merge driver" — the `%O %A %B`
-  contract and the exit-code semantics —
+- `gitattributes(5)` §"Defining a custom merge driver" — what `fux hooks` has
+  to write for git to call the driver at all —
   <https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver>
+  (the driver's own half of that contract is
+  [ADR-MERGE-DRIVER](0034_merge-driver.md))
 - `githooks(5)` — that `post-commit` cannot affect the commit's outcome, which
   is why decision 3 is safe —
   <https://git-scm.com/docs/githooks>
@@ -308,12 +279,14 @@ legal, explicit, per-document opt-out
 1. **R5 fails** — a 20-document commit does not re-index in under 1 s through
    the hook. Then `post-commit` is too slow to be automatic and the hook
    becomes opt-in or incremental in a way it currently is not.
-2. **R6 fails** — the three-tier harness shows a machine plane conflicting, or
-   a human conflict silently resolved. Either direction invalidates decision 6.
+2. **Moved** — R6's condition went to
+   [ADR-MERGE-DRIVER](0034_merge-driver.md) with decisions 6–9 on 2026-08-21.
+   The number is retired, not reused.
 3. **The one-commit lag is observed causing a wrong answer in practice** — an
    `ask` answered from content that the checked-out commit does not contain.
    That is decision 1's whole bet.
-4. **The driver is observed picking a side on a tie.** It must never.
+4. **Moved** — the tie condition went to
+   [ADR-MERGE-DRIVER](0034_merge-driver.md) on 2026-08-21.
 
 **How to check them:**
 
@@ -322,13 +295,11 @@ legal, explicit, per-document opt-out
 work/regression/2026-08-20-r5-hook-latency/evidence/reproduce.sh
 # 0.651 s @ 1k (passes) · 3.523 s @ 10k · 44.380 s @ 100k (judged, fails)
 
-# 2 — INCONCLUSIVE 2026-08-20 (R6-MERGE): every tier matched, but tier 1 also
-#     matched with the driver REMOVED, so it is uninformative. Same harness:
-.venv/bin/python tools/maintenance-bench/run.py --only r6
+# 2 and 4 — moved to ADR-MERGE-DRIVER; check them there.
 
 # 3 — is the committed index behind the working tree?
 fux doctor
 
-# 4 — the refusal cases, all four
-uv run pytest -q tests/maintain/test_mergedriver.py
+# the hooks' own behaviour — install, refuse-to-clobber, uninstall
+uv run pytest -q tests/maintain/test_hooks.py
 ```

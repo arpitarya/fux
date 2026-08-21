@@ -95,6 +95,23 @@ def test_both_added_the_same_id_differently_is_refused():
         merge_shards("", _shard(_line("file:a.md", sha="x")), _shard(_line("file:a.md", sha="y")))
 
 
+def test_a_side_unchanged_from_the_ancestor_never_blocks_the_other_sides_edit():
+    """`ver` is how the common case is decided, not the only way it can be.
+
+    If `ver` was not bumped on the changed side (a hand repair, an ingest
+    edge case), comparing `ver` alone reads this as "same ver, different
+    bytes" and refuses it — even though one side provably touched nothing.
+    The fix compares against the ancestor first: a side byte-identical to
+    `in_base` cannot be the one that changed, so the other side wins outright.
+    """
+    base = _shard(_line("file:a.md", ver=1, sha="orig"))
+    ours = _shard(_line("file:a.md", ver=1, sha="orig"))               # untouched
+    theirs = _shard(_line("file:a.md", ver=1, sha="changed"))          # edited, ver NOT bumped
+    assert json.loads(merge_shards(base, ours, theirs).split("\n")[1])["sha"] == "changed"
+    # and symmetrically
+    assert json.loads(merge_shards(base, theirs, ours).split("\n")[1])["sha"] == "changed"
+
+
 # -- deletions --------------------------------------------------------------
 
 
@@ -174,3 +191,22 @@ def test_main_with_a_missing_ancestor_is_the_add_add_case(tmp_path):
 
 def test_main_without_three_arguments_is_a_usage_error(tmp_path):
     assert main([str(tmp_path)]) == 2
+
+
+def test_crlf_input_merges_and_output_is_lf_only(tmp_path):
+    """A file checked out with CRLF (Windows) must not corrupt the merge, and
+    the result must be LF-only regardless of host OS — L3's byte-identical
+    guarantee has no OS exception.
+    """
+    crlf_shard = _shard(_line("file:a.md"), _line("file:b.md")).replace("\n", "\r\n")
+    base = tmp_path / "O"
+    base.write_bytes(_shard(_line("file:a.md")).encode("utf-8"))
+    ours = tmp_path / "A"
+    ours.write_bytes(crlf_shard.encode("utf-8"))
+    theirs = tmp_path / "B"
+    theirs.write_bytes(_shard(_line("file:a.md"), _line("file:c.md")).encode("utf-8"))
+
+    assert main([str(base), str(ours), str(theirs)]) == 0
+    raw = ours.read_bytes()
+    assert b"\r" not in raw
+    assert _ids(raw.decode("utf-8")) == ["file:a.md", "file:b.md", "file:c.md"]
