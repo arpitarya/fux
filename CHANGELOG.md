@@ -6,7 +6,38 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
-## [Unreleased]
+## [0.34.0] - 2026-08-21
+
+**Four milestones in one release — the graph lane, the refer plane, the
+maintenance plane, and delta ingest — plus the prediction series that
+measures three of them against pre-registered thresholds.**
+
+M3 makes the edges ingest already extracts answerable: `explain`, `graph`,
+`path`, and deterministic seedless community detection. M4 builds the refer
+plane — fetch a citation from the system that owns it, verify it still says
+what the index thinks, re-score on the fetched bytes — and P6 wires it into
+`answer` by default, making it load-bearing for the first time
+([ADR-REFER](docs/adr/0031_refer-plane.md) accepted,
+[R4 PASS](work/regression/2026-08-20-refer-plane-r4/VERDICT.md)). M5 adds
+`fux hooks` and a merge driver for the committed index, but
+[R5 FAIL](work/regression/2026-08-20-r5-hook-latency/VERDICT.md) (44.4 s at
+100 000 documents against a 1 s bound) and
+[R6 INCONCLUSIVE](work/regression/2026-08-20-r6-merge-driver/VERDICT.md) mean
+[ADR-MAINTENANCE](docs/adr/0033_hooks.md) stays **proposed, not accepted** —
+the hook ships, its accept gate has not cleared. Delta ingest reuses
+extraction for byte-unchanged documents (22.7×–26.4× measured, byte-identical
+to a full run). Only prose files are indexed by default now — a 14 % non-prose
+slice this repo carried silently is excluded
+([ADR-TYPES](docs/adr/0032_types-list.md)) — and L5's hashed-meta rule moved
+from ingest to `write_index`, so it can no longer be skipped by a caller that
+bypasses ingest.
+
+**Three breaking changes**, each with a stated migration below: `answer
+--json`'s `"source"` key now branches on refer vs index; a non-git record with
+no stated `meta` is refused at write time instead of defaulted; and the
+prose-only filter changes `df` for every surviving document, so rankings
+shift (`fux ingest` to migrate; not claimed to improve, and unmeasured either
+way).
 
 ### Added
 

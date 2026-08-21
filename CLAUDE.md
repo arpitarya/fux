@@ -588,7 +588,7 @@ failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
 
 ## Build & test
 
-**`fux-engine` 0.33.0 is released and on PyPI**; `src/fux/` is the live tree.
+**`fux-engine` 0.34.0 is released and on PyPI**; `src/fux/` is the live tree.
 
 ```bash
 uv sync --extra dev
@@ -617,10 +617,10 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`**. Import package: **`fux`**.
-- Version: **`0.33.0`**, released (0.26.0 archived → reset → 0.30.0 → M2 at
-  0.32.0 → the sources rewrite at 0.33.0). Bumped in `src/fux/__init__.py` only
-  — it is the single source, read
-  dynamically by `pyproject.toml`.
+- Version: **`0.34.0`**, released (0.26.0 archived → reset → 0.30.0 → M2 at
+  0.32.0 → the sources rewrite at 0.33.0 → the graph/refer/maintenance planes
+  at 0.34.0). Bumped in `src/fux/__init__.py` only — it is the single source,
+  read dynamically by `pyproject.toml`.
 
 ## Merge wall — what actually blocks a merge
 
