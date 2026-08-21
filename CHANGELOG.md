@@ -65,6 +65,34 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   A separate console script rather than a `fux` verb, because git invokes a
   merge driver as a bare command with positional arguments.
 
+### Fixed
+
+- **Six reproduced defects** (PRIORITY.md P4, 2026-08-21), each with a
+  regression test:
+  - The merge driver's modify/modify branch relied solely on `ver`, so a
+    document whose `ver` was not bumped on the changed side read as an
+    unresolvable conflict even when the other side provably touched nothing.
+    Now checks each side against the ancestor first, matching the delete
+    branch's existing logic.
+  - `ingest/parse.py` decoded content as plain `"utf-8"`, leaving a leading
+    BOM as a literal `U+FEFF` character instead of stripping it. Now decodes
+    `"utf-8-sig"`.
+  - `ingest/gitdir.py` built `rel_path` from the filesystem with no Unicode
+    normalization — a path can come back NFD even when committed as NFC.
+    Now NFC-normalized, matching `parse.py`'s existing content normalization.
+  - `query/scan.py`'s `df` count was inflated by a 16-hex term hash quoted
+    outside `terms` (a title, id, or sha) — the substring prefilter that
+    finds candidate lines is deliberately imprecise, but `df` leaked that
+    imprecision. Now counted from the parsed record's actual `terms` keys.
+  - `mergedriver.py`, `sources.py` and `graph/plane.py` all used
+    `write_text`'s platform-default newline translation, which would commit
+    CRLF on Windows and LF everywhere else. All three now write with
+    `newline="\n"` explicitly.
+  - `refer/fetchcache.py`'s TTL cache was unbounded on disk — an entry only
+    stopped counting toward `get()` once its TTL passed, and nothing ever
+    deleted the file. Now size-capped (`max_bytes`, default 500 MB) with
+    oldest-first eviction.
+
 ### Changed — **breaking**
 
 - **L5 is enforced when a record is written, not when it is ingested.** The

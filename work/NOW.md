@@ -1,1 +1,1 @@
-✓ PRIORITY P3: R7 closed unmeasured (analysis, no VERDICT) · W-61 still filed; next is Arpit's call on ADR-POSTINGS vs. P4
+✓ PRIORITY P4: all six defects fixed (4eb269f 7e1fee1 6d8f1f9 4175fb8 0264510) · next: check current PRIORITY.md before starting P5

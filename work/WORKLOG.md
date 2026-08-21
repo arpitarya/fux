@@ -28,6 +28,86 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — PRIORITY P4: all six reproduced defects fixed  ·  Claude Code
+
+- **Asked:** implement P4 (the six reproduced engine defects PRIORITY.md
+  ranked, each wanting a regression test).
+- **Did:** every cited `file:line` was stale — the audited files had moved
+  since the audit — so each defect was relocated by content, then fixed with
+  a regression test, then its owning record updated, one commit per fix:
+  - `4eb269f` — merge driver's modify/modify branch relied solely on `ver`,
+    so a document whose `ver` was not bumped on the changed side read as an
+    unresolvable conflict even though the other side provably touched
+    nothing; now checks each side against the ancestor first. Also fixed
+    CRLF in `mergedriver.py`'s `main()`. **Discovered mid-fix: a concurrent
+    Cowork session had already carved `ADR-MERGE-DRIVER` (0034) out of
+    `ADR-MAINTENANCE` for this exact file, including a veto condition
+    anticipating this fix** — reconciled onto the new record instead of the
+    old one, and registered 0034 in `docs/adr/README.md`, which the split
+    hadn't reached yet.
+  - `7e1fee1` — `ingest/parse.py` decoded `"utf-8"`, leaving a BOM as a
+    literal character; now `"utf-8-sig"`. `ingest/gitdir.py` built
+    `rel_path` with no Unicode normalization (NFD vs NFC across checkout
+    machines); now NFC-normalized alongside content.
+  - `6d8f1f9` — `query/scan.py`'s `df` count was inflated by a 16-hex hash
+    quoted outside `terms` (the root cause of `derive/build.py`'s tripwire);
+    now counted from the parsed record's real `terms` keys.
+  - `4175fb8` — `sources.py` and `graph/plane.py` both used `write_text`'s
+    platform-default newline translation (CRLF on Windows); now
+    `newline="\n"` explicitly, matching the merge-driver fix.
+  - `0264510` — `refer/fetchcache.py`'s TTL cache was unbounded on disk; now
+    size-capped (`max_bytes`, default 500 MB — no number was specified,
+    chosen here) with oldest-first eviction.
+  `CHANGELOG.md [Unreleased]` gained a `### Fixed` section; `PRIORITY.md`'s
+  P4 row flipped DONE with all five commit shas.
+- **Decided / open:** none of the six turned out to need a design call — all
+  were mechanical once located. The concurrent-session collision on the
+  merge driver was real (confirmed by a live `.git/index.lock`, not just
+  inference) and cost extra reconciliation but no rework.
+- **Next:** P5 (the L5/meta-privacy leak) — a concurrent session has already
+  rewritten that row's scope on Arpit's instruction ("materialise first,
+  then index"); read the current `PRIORITY.md` before starting it, not this
+  entry.
+- **Cost:** unmeasured precisely; six fix-test-record cycles plus concurrent-
+  session reconciliation, order of an hour wall-clock.
+
+---
+
+## 2026-08-21 — ADR-MERGE-DRIVER split out of ADR-MAINTENANCE  ·  Cowork
+
+- **Asked:** "create a new adr for merge driver."
+- **Did:** wrote [ADR-MERGE-DRIVER](../docs/adr/0034_merge-driver.md) (0034,
+  ⏳ proposed) — decisions 6–9 of ADR-MAINTENANCE, carved out with the
+  ownership of `src/fux/maintain/mergedriver.py` (most specific wins; the
+  harness stays with ADR-MAINTENANCE, one file runs R5 and R6). ADR-MAINTENANCE
+  amended: title, description, `Owns`, §1, the diagram **and** its ASCII twin,
+  decisions 6–9 replaced by a pointer with the numbers retired not reused,
+  vetoes 2 and 4 moved. Register + ownership table updated; the
+  `tools/maintenance-bench/` row said "written, not run" and was fixed on
+  contact (both ran 2026-08-20). W-61 and its OPEN-WORK rows now say **R5
+  decides ADR-MAINTENANCE, R6 decides ADR-MERGE-DRIVER**. Examples are real
+  captures taken by running `merge_shards`' own `main()`.
+- **Decided / open:** three calls put to Arpit up front — carve-out **with**
+  ownership (vs a companion record owning nothing), status **proposed**, and
+  record-current-then-name-the-defect. All three taken as recommended.
+- **Concurrency, and it is the entry's main finding:** a Claude Code session
+  was working PRIORITY **P4** in this tree at the same minute. It fixed the
+  merge driver's ancestor check and CRLF handling with regression tests, picked
+  up this record while it was still untracked, and committed the whole split as
+  `4eb269f` + `4fc7a55` — including edits this session had not finished. Both
+  sessions converged rather than clobbered, but only because every write
+  re-read the file first. **The Decision section is what drift looks like when
+  that fails**: P4's fix landed in Consequences while decisions 1, 2 and 4 still
+  described the pre-fix rule. Reconciled here — `ver` is now stated as the
+  tiebreak of last resort, decision 4 covers modify/modify as well as delete,
+  and veto 1 carries the ancestor clause so it does not read as fired.
+- **Next:** Arpit's §3.1-vs-§3.2 call on R6 (W-61) is what moves
+  ADR-MERGE-DRIVER off `proposed`. **P4 has no CHANGELOG row yet** — its
+  done-when asks for one, and the session that landed the fix did not add it.
+- **Cost:** unmeasured — Cowork does not report tokens back to the session.
+
+---
+
 ## 2026-08-21 — PRIORITY P3: R7 closed unmeasured, on Arpit's call  ·  Claude Code
 
 - **Asked:** execute P3 (measure R7 for real, pre-registered, in fux-lab).
