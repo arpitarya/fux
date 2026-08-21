@@ -54,7 +54,10 @@ def _write(path: Path, lines: list[str]) -> None:
     for.
     """
     text = "\n".join(lines).rstrip("\n")
-    path.write_text(text + "\n" if text else "", encoding="utf-8")
+    # `newline="\n"` disables the platform-default translation write_text()
+    # otherwise applies — without it this would commit CRLF on Windows and LF
+    # everywhere else, breaking L3's byte-identical guarantee across machines.
+    path.write_text(text + "\n" if text else "", encoding="utf-8", newline="\n")
 
 
 def _split(raw: str) -> tuple[str, str]:

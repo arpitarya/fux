@@ -299,6 +299,12 @@ which is the point of decision 11.
 
 ### Consequences
 
+- **The writer commits LF only, regardless of host OS (PRIORITY.md P4,
+  2026-08-21).** `sources.py`'s `_write` used `write_text`'s platform-default
+  newline translation, which would commit CRLF on a Windows checkout and LF
+  everywhere else — breaking L3's byte-identical guarantee the moment two
+  contributors on different OSes both ran `fux url`. Now writes with
+  `newline="\n"` explicitly.
 - **The file is tool-managed, and the writer edits one line rather than
   regenerating the file** (built 2026-08-19). That is the amendment this
   record's earlier consequence promised, and it fell the way it did because the

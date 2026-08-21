@@ -66,7 +66,12 @@ def build_plane(directory: Path, records: list[dict]) -> int:
     }
     text = json.dumps(payload, indent=None, sort_keys=False, separators=(",", ":")) + "\n"
     path = directory / GRAPH_NAME
-    path.write_text(text, encoding="utf-8")
+    # `newline="\n"` disables the platform-default translation write_text()
+    # otherwise applies. This file is asserted byte-identical across two
+    # builds on two machines (ADR-GRAPH); a Windows build would otherwise
+    # commit CRLF where a POSIX build commits LF, breaking that assertion
+    # on the one axis it is actually checked across.
+    path.write_text(text, encoding="utf-8", newline="\n")
     return len(text.encode("utf-8"))
 
 

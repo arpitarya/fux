@@ -219,6 +219,12 @@ fallback.
   `graph.json`, so two builds of the same index are asserted byte-identical
   including the communities. **This makes ADR-T1-ACCELERATOR's build a
   two-lane build**; `derive/build.py` gained one call and one return value.
+- **`graph.json` is written LF only, regardless of host OS (PRIORITY.md P4,
+  2026-08-21).** The write used `write_text`'s platform-default newline
+  translation, which would commit CRLF on a Windows build and LF everywhere
+  else — the one axis this file's byte-identical assertion is actually
+  checked across (two builds, two machines). Now writes with `newline="\n"`
+  explicitly.
 - **The archived relational eval passes on the new kernel** — 7 cases plus 4
   behavioural assertions, 11/11. Its corpus is copied into `tests_e2e/eval/`
   as a live fixture: a test that read out of `archive/` would make the archive

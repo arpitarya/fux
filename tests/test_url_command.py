@@ -105,6 +105,17 @@ def test_the_file_always_ends_in_exactly_one_newline(repo, monkeypatch):
     assert text.endswith("\n") and not text.endswith("\n\n")
 
 
+def test_the_file_is_written_lf_only_regardless_of_host_os(repo, monkeypatch):
+    """`write_text`'s platform-default newline translation would commit CRLF
+    on Windows and LF everywhere else, breaking L3's byte-identical
+    guarantee across machines. `newline="\\n"` disables it.
+    """
+    _run(repo, monkeypatch, _args("https://x.test/a"))
+    _run(repo, monkeypatch, _args("https://x.test/b"))
+    raw = (repo / ".fux" / "sources" / "urls").read_bytes()
+    assert b"\r" not in raw
+
+
 def test_removing_a_url_deletes_its_line_and_nothing_else(repo, monkeypatch):
     _run(repo, monkeypatch, _args("https://x.test/a"))
     _run(repo, monkeypatch, _args("https://x.test/b"))
