@@ -30,6 +30,37 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-21 — v0.34.0 pushed, released, and verified live on PyPI  ·  Claude Code
+
+- **Asked:** "push everything and publish a new version make sure cicd is
+  successful" — 38 unpushed local commits (M3, M4, M5, W-60, P4–P8) sat on
+  `main`, untagged.
+- **Did:** ran both suites locally first (836 unit + 41 e2e, green), bumped
+  `__version__` to `0.34.0`, closed `[Unreleased]` in `CHANGELOG.md` with a
+  summary of the four milestones and their three breaking changes, fixed the
+  two version-fact lines in `CLAUDE.md` (Build & test · Package identity),
+  pushed (`231d310`). **CI's Windows leg then failed 7 tests** — not a
+  release-commit regression, a **pre-existing bug in the M3–M5 test batch**:
+  `Path.write_text(..., encoding="utf-8")` with no `newline="\n"` writes CRLF
+  on Windows, so `tests/refer/{test_source,test_refer_plane,test_fetchcache}.py`
+  fixtures diverged from the LF-based sha their assertions expected — same
+  class of bug P4 already fixed in the production writers, missed in these
+  four fixture spots. Fixed those, plus `tests/maintain/test_hooks.py`'s
+  executable-bit assertion (NTFS has no POSIX exec bit; `chmod` is a
+  documented no-op there) — skipped on `win32` only, other assertions
+  untouched. Pushed (`7676d3f`); full OS×Python matrix + packaging green.
+  Tagged and released `v0.34.0` via `gh release create`; `publish.yml` ran
+  clean; confirmed live via PyPI's JSON API (`"version": "0.34.0"`).
+- **Decided / open:** the two Windows fixes are test-only — no production
+  code changed, `no ADR affected` on that commit. The standing inbox (W-61's
+  hook-at-scale fork and R6's arithmetic ambiguity, both filed 2026-08-20)
+  is untouched by this session and still waits on Arpit.
+- **Next:** Arpit reads the W-61 inbox (`hook-at-scale.compare.md` verdict +
+  R6's §3.1/§3.2 pre-registration disagreement) — nothing else is
+  agent-closable ahead of it.
+
+---
+
 ## 2026-08-21 — P8 moved to W-62; PRIORITY.md archived  ·  Claude Code
 
 - **Asked:** "then commit then move P8 into open work and archive priority

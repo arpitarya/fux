@@ -1,1 +1,1 @@
-✓ P7 landed (e598aea) · ✓ P8 moved to W-62, PRIORITY.md archived · next: OPEN-WORK.md is the live queue again
+✓ v0.34.0 pushed, CI green, released, PyPI live · next: OPEN-WORK.md — W-61 (fork + R6 arithmetic) waits on Arpit
