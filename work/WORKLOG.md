@@ -14,7 +14,7 @@ in a single change; the entry that does it says so explicitly.)
 Distinct from [`INTERVIEW.md`](INTERVIEW.md), which is the *current* state of
 play: the worklog is the granular, per-exchange trail.
 
-**Entry format** — the `Cost:` line is mandatory.
+**Entry format:**
 
 ```
 ## YYYY-MM-DD — <one-line title>  ·  <Cowork | Claude Code>
@@ -22,11 +22,42 @@ play: the worklog is the granular, per-exchange trail.
 - **Did:** what actually changed (files, decisions).
 - **Decided / open:** verdicts reached, and what's still awaiting a call.
 - **Next:** the single immediate next step.
-- **Cost:** time and/or tokens this session spent. If it was not measured, say
-  `unmeasured` and why — never omit the line.
 ```
 
+(The `Cost:` line was mandatory here until 2026-08-21 — dropped, PRIORITY.md
+P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
+[`work/proposals/process-diet.md`](proposals/process-diet.md).)
+
 ---
+
+## 2026-08-21 — PRIORITY P7: put the process on a diet  ·  Claude Code
+
+- **Asked:** "implement P7, then commit then move P8 into open work and
+  archive priority file" — P7's row is structured differently from P5/P6:
+  "Arpit decides scope; agent proposes the diff, does not apply." Put all
+  four candidates to him directly rather than deciding unilaterally, since
+  that is exactly what the row's own text asks for.
+- **Did:** filed [`work/proposals/process-diet.md`](proposals/process-diet.md)
+  with all four candidates, grounded in fresh numbers rather than the
+  original audit's — the `Cost:` line count had grown from 49/49 to 58/58
+  unmeasured, and the "~30% of tests guard prose" figure did not reproduce
+  at file granularity (≈4%, 35/836, once `test_frontmatter.py`'s 14 tests
+  — the stdlib parser's own tests, not a governance check — were excluded).
+- **Decided (Arpit, live):** drop the `Cost:` line (applied — CLAUDE.md and
+  `WORKLOG.md`'s own template both updated in the same change, and this is
+  the first entry written under the new template). Keep `NOW.md`/
+  `INTERVIEW.md` separate (not applied — different read patterns, not just
+  different sizes). Audit the doc-meta test suite rather than trust the 30%
+  figure — audited all 35 tests across 8 files in full; **found nothing
+  purely decorative** (several caught real historical bugs, per their own
+  docstrings), so **nothing was cut**, and the stale 30% claim is corrected
+  in the proposal doc rather than acted on. Skip a no-same-day-supersession
+  rule — every same-day supersession this session produced (ADR-CACHE,
+  ADR-ANSWER) was a genuine new fact surfacing while building, which a
+  blanket rule would have blocked along with real churn.
+- **Next:** commit P7, then move P8 into `work/OPEN-WORK.md` as a proper
+  item and archive `work/PRIORITY.md` (both explicitly asked for in the
+  same message) — separate change from P7's diff.
 
 ## 2026-08-21 — PRIORITY P6: wire the refer plane into `answer`  ·  Claude Code
 

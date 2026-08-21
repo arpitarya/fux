@@ -342,10 +342,11 @@ code moved**:
 
 1. **[`work/WORKLOG.md`](work/WORKLOG.md)** — append **one entry before the
    session ends**: what was asked, what got done, what was decided or left
-   open, what's next, and a mandatory **`Cost:`** line (time and/or tokens; if
-   it was not measured, write `unmeasured` and why — never omit the line).
-   **Never edit a past entry.** Append only, newest on top. A wrong old entry
-   is corrected by a new entry, not by a rewrite.
+   open, and what's next. **Never edit a past entry.** Append only, newest on
+   top. A wrong old entry is corrected by a new entry, not by a rewrite.
+   (The mandatory `Cost:` line was dropped 2026-08-21, PRIORITY.md P7 —
+   58 of 58 entries had said `unmeasured`; see
+   [`work/proposals/process-diet.md`](work/proposals/process-diet.md).)
 2. **[`work/INTERVIEW.md`](work/INTERVIEW.md)** — the state-of-play doc, kept
    current **during** the session, not in a wrap-up pass. Four maintained
    sections: state of play · in-flight work + the immediate next step ·
@@ -535,7 +536,7 @@ ranking/behaviour change off a single synthetic corpus.
 
 ```
 work/               THE SHARED MEMORY between sessions — start at work/README.md
-  WORKLOG.md        append-only session log (an entry every session, with Cost:)
+  WORKLOG.md        append-only session log (an entry every session)
   INTERVIEW.md      state of play, kept current DURING the session
   IMPLEMENTATION.md milestone log — what shipped, when, outcome (the evidence store)
   OPEN-WORK.md      THE single live queue — two lanes; finished items are DELETED

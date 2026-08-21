@@ -32,6 +32,18 @@ commitment; everything here is findable.
 
 # Index
 
+**Filed and graduated 2026-08-21 — PRIORITY.md P7:**
+
+* [Put the process on a diet](process-diet.md) - **graduated same-session** —
+  four candidate governance cuts, each put to Arpit for a direct verdict.
+  Accepted: drop the WORKLOG `Cost:` line (58/58 entries had said
+  `unmeasured`). Rejected: merging `NOW.md` into `INTERVIEW.md`; a
+  no-same-day-supersession rule. Audited and found nothing to cut: capping
+  the doc-meta test suite — all 35 tests across 8 files guard a real,
+  mechanical property, several having caught genuine historical bugs; the
+  original audit's "~30% of tests guard prose" does not reproduce at file
+  granularity (≈4%), corrected on contact rather than acted on unverified.
+
 **Filed 2026-08-10 — from the agent-search-API landscape research:**
 
 * [Agent search-API landscape](agent-search-landscape.md) - research note, not a build item: Parallel/Perplexity/Exa/Brave independently arrived at three index-and-refer decisions, and the corpus they *cannot* reach names Fux's wedge. The evidence base the next two cite.
