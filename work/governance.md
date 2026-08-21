@@ -47,6 +47,16 @@ none of them currently is.
 | `docs/adr/TEMPLATE.md` | the shape new ADRs must follow | agent (author) | none | convention changes |
 | `docs/adr/RULE-SINCE` | the freshness gate's audit baseline | agent (tooling) | read by `test_adr_freshness.py` | the gate's rule tightens |
 
+**ADR maintenance is remitted to the ADR hooks, not to prose.** Law zero —
+"ADRs are always up to date" — is enforced by `scripts/adr-guard.sh` running
+as a `commit-msg` hook (`ln -sf ../../scripts/adr-guard.sh
+.git/hooks/commit-msg` — **not** `pre-commit`, because the `no ADR affected`
+escape hatch needs the commit message, which doesn't exist yet at
+`pre-commit` time) plus `tests/test_adr_freshness.py` running the identical
+check in CI. A commit that touches an ADR-owned path without touching that
+path's owning record is rejected. Nobody has to remember to reconcile a
+record by discipline — the gate remembers for them.
+
 ## 4. `archive/` — retired, not evidence
 
 One archive at the repo root, mirroring the live tree (`archive/adr/`,
@@ -91,13 +101,18 @@ executed change.
    be read faster than a full file. Fold its one line into the top of
    `INTERVIEW.md` or `PRIORITY.md` itself; delete the file. P7 already names
    this exact merge.
-2. **`IMPLEMENTATION.md` (28 KB) and `OPEN-WORK.md` overlap by design** — an
-   item's outcome is supposed to land in one, its queue-row deleted from the
-   other, in the same change. P7 proposes merging `IMPLEMENTATION.md`'s
-   content into `OPEN-WORK.md`'s deleted-row commit messages instead of a
-   separate file. That removes one 28 KB file and one synchronization
-   obligation (rule "reconcile OPEN-WORK against IMPLEMENTATION" in
-   `work/README.md` disappears with it).
+2. **`IMPLEMENTATION.md` and `OPEN-WORK.md` are *not* a merge candidate —
+   Arpit's call, 2026-08-21, reflected in `PRIORITY.md` P7.** They read as
+   overlapping (an item's outcome lands in one, its row dies in the other) but
+   they serve different objectives: `IMPLEMENTATION.md` is the **permanent
+   milestone log** — what shipped, when, how it turned out — that is never
+   pruned and is the thing a later session reads to learn history.
+   `OPEN-WORK.md` is the **live queue** — rows die on completion, by design,
+   because a closed item has no reason to still occupy the queue. Folding the
+   milestone log into `OPEN-WORK.md`'s deleted-row commit messages would move
+   permanent history into `git log`, which is not a readable doc — a real
+   loss, not a redundancy removed. Both files stay. This item is withdrawn
+   from the diet list below.
 3. **`WORKLOG.md` is 305 KB and append-only, growing every session forever.**
    It is the audit trail, so it should not be deleted — but it is also the
    single largest file in the repo and nothing reads old entries back. A
@@ -120,6 +135,21 @@ executed change.
    evidence layer CLAUDE.md's own rule 3 requires, and each is small,
    self-contained, and dated. The volume there is a symptom of doing a lot of
    measured work, not of process bloat.
+7. **ADR maintenance itself is remitted to the ADR hooks — it is not a
+   candidate for the diet at all.** Law zero ("ADRs are always up to date") is
+   the one governance rule in this repo that is not trusted to prose or
+   memory: `scripts/adr-guard.sh` runs as the `commit-msg` hook
+   (`ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg` — **not**
+   `pre-commit`, because the escape hatch reads the commit message, which
+   doesn't exist yet at `pre-commit` time) and `tests/test_adr_freshness.py`
+   runs the same check in CI. A commit that touches an ADR-owned path without
+   touching that path's owning record is rejected unless it says
+   `no ADR affected`. Neither an agent nor Arpit has to remember to reconcile
+   a record by discipline — the gate remembers for them. That is why the ADR
+   register (33 live records, `docs/adr/README.md`, four dedicated tests)
+   stays out of items 1–6: it is the one part of this file's "smaller set of
+   files" question that is already solved, not by having fewer files but by
+   making staleness un-committable.
 
 **On audience split:** almost nothing here is agent-only or human-only —
 `CLAUDE.md`, `PRIORITY.md`, `BLOCKED.json`, and the `open/W-nn` specs skew
@@ -129,13 +159,14 @@ against a diagram). Everything else — ADRs, `compare/`, `proposals/`,
 `regression/`, `WORKLOG.md`, `INTERVIEW.md` — is written for both by design
 (the "§1 for humans / §2 for agents" split inside each ADR is the same idea
 applied per-file). That mixed audience is not itself the bloat; the bloat is
-in the trackers that duplicate each other's state (`NOW`↔`PRIORITY`,
-`IMPLEMENTATION`↔`OPEN-WORK`) and the ones that grow forever with no archive
-cut (`WORKLOG.md`).
+in the one tracker that genuinely duplicates another's state (`NOW`↔`PRIORITY`)
+and the one that grows forever with no archive cut (`WORKLOG.md`).
+`IMPLEMENTATION.md`/`OPEN-WORK.md` looked like a second duplicate pair but
+are not — different objective, same as noted above.
 
-**Net effect if items 1–4 land:** two files deleted (`NOW.md`,
-`IMPLEMENTATION.md`), one synchronization rule removed from `work/README.md`,
-one dead-weight field removed from every future worklog entry, and a template
-for keeping `WORKLOG.md` from becoming the second-largest cost in the repo. It
-does not touch the ADR register, `compare/`, `proposals/`, or `regression/` —
-those are the parts of the process that are actually earning their keep.
+**Net effect if items 1, 3 and 4 land:** one file deleted (`NOW.md`), one
+dead-weight field removed from every future worklog entry, and a template for
+keeping `WORKLOG.md` from becoming the second-largest cost in the repo. It
+does not touch `IMPLEMENTATION.md`, `OPEN-WORK.md`, the ADR register,
+`compare/`, `proposals/`, or `regression/` — those are the parts of the
+process that are actually earning their keep.

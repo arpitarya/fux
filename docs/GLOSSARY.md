@@ -32,7 +32,14 @@ as "archived ADR-NNNN". See [CLAUDE.md](../CLAUDE.md), [adr/README](adr/README.m
 content cache on the [refer](#refer-mode) path: byte-budgeted, keyed on
 `(locator, sha)`, and **results-neutral by construction** — a cache hit and a
 cache miss must produce the identical answer, which is asserted by a
-differential test. Megiddo & Modha, FAST 2003 (paper ref [11]). See
+differential test. Four lists: recent-once, recent-often, and two *ghost* lists
+holding only the keys of evicted entries, whose hits are what re-tune the
+recency/frequency split with **no knob**. Chosen over LRU for **scan
+resistance**: a re-index after a large merge is the bulk scan that flushes an
+LRU's hot set, and here a miss costs a network fetch. In-memory and
+per-process — distinct from the [TTL fetch cache](#ttl-fetch-cache), which is
+on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
+[ADR-CACHE](adr/0035_cache.md) decisions 2–5,
 [cache-policy](../work/compare/cache-policy.compare.md).
 
 **BIC (Binary Interpolative Coding)** — The posting-list codec for the
@@ -366,6 +373,31 @@ the [wire format](#wire-format). See
 commits a machine-made Markdown copy with provenance frontmatter, for
 air-gap availability, PR-reviewed change tracking, or audit retention. The
 archived frontmatter parser's home in v0.30. Built at [M6](../work/open/W-26-m6-scale-t2.md).
+
+**TTL fetch cache** — *Time-to-live.* The on-disk, **gitignored**, per-machine
+store at `.fux/runtime/fetch-cache/` that answers *"do I need to fetch this at
+all?"*: an entry fetched less than `cache_ttl_seconds` ago is served without
+going out to the source. Keyed on `locator` **alone** — unlike
+[ARC](#arc-adaptive-replacement-cache), whose key carries the content sha — so
+a TTL hit is served *before* its sha is confirmed. That difference is why the
+two are separate stores and why a TTL hit is labelled
+[`cached`](#cached-the-fourth-verdict), never `current`. **Opt-in**:
+`cache_ttl_seconds` defaults to **0 (disabled)**, and `no_cache` refuses
+caching whatever the TTL says. Disk-bounded, oldest-`fetched_at` evicted first.
+**The only place in the engine that reads a wall clock.** Its existence is a
+rate-limit answer, not a latency one — an agent asking ten questions about one
+runbook must not fetch it ten times. See [ADR-CACHE](adr/0035_cache.md)
+decisions 6–11, [refer-fetch-cache](../work/compare/refer-fetch-cache.compare.md).
+
+**`cached` (the fourth verdict)** — One of the four freshness labels the
+[refer](#refer-mode) path reports: `current` · `stale` · `unverified` ·
+`cached`. It means *we looked recently* — the bytes came from the
+[TTL fetch cache](#ttl-fetch-cache) rather than from the source this call — and
+it carries `age_seconds` so a caller can judge for itself. **Never folded into
+`current`**, which is reserved for "verified against the source this call".
+Collapsing them anywhere downstream is the "knob that lies" failure in a new
+location. See [ADR-CACHE](adr/0035_cache.md) decision 7,
+[ADR-REFER](adr/0031_refer-plane.md) decision 6.
 
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
 read from the committed `.fux/sources/urls` (one per line), fetched through

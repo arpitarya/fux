@@ -156,6 +156,7 @@ again here.
 | [0034](0034_merge-driver.md) | **ADR-MERGE-DRIVER** | The committed index merges line by line, last-writer-wins on `(ver, sha)`, refuses rather than guesses — carved out of ADR-MAINTENANCE 2026-08-21 | ⏳ proposed | yes |
 | [0032](0032_types-list.md) | **ADR-TYPES** | which files are documents — a compiled-in prose allowlist, replaced (not extended) by `.fux/sources/types`; absent means the default, never "everything" | ✅ accepted | yes |
 | [0031](0031_refer-plane.md) | **ADR-REFER** | M4 core — fetch through the *consumer's* fetcher, verify by content sha (there is no recorded ingest time), ARC keyed `(loc, sha)`, and a **byte** budget with a floor | ⏳ proposed | partial |
+| [0035](0035_cache.md) | **ADR-CACHE** | The refer plane's two caches — ARC keyed `(loc, sha)` cannot change an answer; the TTL fetch store is opt-in, disk-bounded, and answers `cached`, never `current`. Carved out of ADR-REFER 2026-08-21 | ⏳ proposed | yes |
 | 0030+ | — | unwritten | planned | — |
 
 **`status` and `built` are two different questions, and conflating them is how
@@ -244,7 +245,11 @@ deliberately more specific than a sibling's claim: ADR-RANKING takes
 specific wins, exactly as the table already resolves `store/fuxdir.py` against
 `store/`. **Nothing changes in the table below until acceptance.**
 
-**A live carve-out, 2026-08-21.** ADR-MERGE-DRIVER takes
+**Two live carve-outs, both 2026-08-21.** ADR-CACHE takes
+`src/fux/refer/arc.py` and `src/fux/refer/fetchcache.py` out of ADR-REFER's
+claim on `src/fux/refer/`; `tools/refer-bench/` is deliberately **not** split,
+because one harness runs R4 for the whole plane and a component is owned once.
+And ADR-MERGE-DRIVER takes
 `src/fux/maintain/mergedriver.py` out of ADR-MAINTENANCE's claim on
 `src/fux/maintain/`. Unlike the six companion records below, this one **is** in
 the table: it is a genuine ownership claim, and the freshness gate has to be
@@ -298,6 +303,8 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/maintain/` | ADR-MAINTENANCE | the git hooks and their installer. **L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
 | `src/fux/maintain/mergedriver.py` | ADR-MERGE-DRIVER | the merge driver itself — carved out of ADR-MAINTENANCE's directory-level claim 2026-08-21, most specific wins |
 | `src/fux/refer/` | ADR-REFER | M4's core — source · freshness · ARC · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
+| `src/fux/refer/arc.py` | ADR-CACHE | the content cache — carved out of ADR-REFER's directory-level claim 2026-08-21, most specific wins |
+| `src/fux/refer/fetchcache.py` | ADR-CACHE | the TTL fetch store — the only place in the engine that reads a wall clock |
 | `tools/pruning-eval/` | W-38 | the gate harness and its frozen pre-registrations. **Owned by an open item, not a record** — the verdicts that used it ([P1-GATE](../../work/regression/2026-08-09-pruning-eval/VERDICT.md) · [P1-RERUN](../../work/regression/2026-08-09-pruning-rerun/VERDICT.md)) are no longer ADRs, and W-38 is the only live item permitted to touch pruning work |
 | `tools/maintenance-bench/` | ADR-MAINTENANCE | the R5 and R6 harness. **Both ran 2026-08-20** — [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md) FAIL, [R6-MERGE](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md) INCONCLUSIVE (W-61). **R6's verdict belongs to ADR-MERGE-DRIVER; the harness does not** — one file runs both, and a component is owned once |
 | `tools/refer-bench/` | ADR-REFER | the R4 harness and its frozen pre-registration — a real `http.server` behind the **consumer's own generated fetcher**, so the measured path is the shipped one |

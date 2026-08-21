@@ -11,13 +11,23 @@
   driver **removed**, so the frozen table's "tiers 1 and 2 informative" clause
   is unmet. The engine is not the reason.
 
+**One item, two records, since 2026-08-21.** The merge driver was carved out of
+ADR-MAINTENANCE into [ADR-MERGE-DRIVER](../../docs/adr/0034_merge-driver.md),
+so **R5 decides ADR-MAINTENANCE's status and R6 decides ADR-MERGE-DRIVER's**.
+This item still carries both, because one open item covers M5's measurement
+whichever record owns the code. `tools/maintenance-bench/` was deliberately not
+split — one file runs both gates.
+
 **Blocked by:** **Arpit**, on two calls — the fork R5's failure opens
 ([`hook-at-scale.compare.md`](../compare/hook-at-scale.compare.md), proposed
 verdict **B, the hook defers**), and whether R6 reads as PASS under its
 pre-registration §3.1 or as not-yet under §3.2. Those two sections disagree
 about this exact result.
-**Closes with:** [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)'s status
-resolved — **not** by a pass, but by whatever replaces the automatic hook
+**Closes with:** both records' statuses resolved —
+[ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)'s **not** by a pass but by
+whatever replaces the automatic hook, and
+[ADR-MERGE-DRIVER](../../docs/adr/0034_merge-driver.md)'s by Arpit's §3.1-vs-§3.2
+call on R6
 **Model:** **Sonnet** to run and file it; **Opus** for the verdict — R5 and R6
 are pre-registered gates, and a gate call is Opus work.
 
@@ -112,8 +122,10 @@ exactly what changes if it fires.
 
 ## Reference
 
-- [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) — the plane and its
-  four veto conditions.
+- [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) — the hooks half, and R5's
+  veto condition.
+- [ADR-MERGE-DRIVER](../../docs/adr/0034_merge-driver.md) — the merge half,
+  split out 2026-08-21, and R6's veto condition.
 - [`maintenance-trigger.compare.md`](../compare/maintenance-trigger.compare.md)
   — the accepted verdict, whose own reopen-trigger is R5 or R6 failing.
 - [`../../archive/open/W-25-m5-maintenance.md`](../../archive/open/W-25-m5-maintenance.md)

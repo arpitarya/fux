@@ -7,4 +7,17 @@
 # would flag work that was compliant at the time it landed. This line moves
 # the baseline forward past PRIORITY.md's P1+P2 reconciliation commit, the
 # first commit written under (and enforcing) the stricter rule.
-1fc51a7257efeb943c512809bc531c7817dbc753
+#
+# Moved forward again 2026-08-21, for the same reason in a new shape: the
+# ADR-CACHE carve-out reassigned `src/fux/refer/arc.py` and
+# `src/fux/refer/fetchcache.py` from ADR-REFER to a record that did not exist
+# when `0264510` (the P4 fetch-cache size cap) landed. That commit touched
+# ADR-REFER, which was the owning record at the time, so it was compliant when
+# it was written; only the reassignment makes it look otherwise. Every commit
+# in `1fc51a7..301c65a` was re-audited under the pre-carve-out table and passed
+# — that is the "bulk review" the register's baseline rule asks for. The cost
+# is real and is stated rather than buried: those commits are no longer
+# re-auditable by this gate.
+#
+# Previous baseline: 1fc51a7257efeb943c512809bc531c7817dbc753
+301c65af310424d266ad40a4e22961722a586d97

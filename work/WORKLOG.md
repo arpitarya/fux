@@ -28,6 +28,51 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — ADR-CACHE (0035): the refer plane's two caches carved out of ADR-REFER  ·  Cowork
+
+- **Asked:** "create a new ADR named cache — present how cache is going to
+  work." Scope was a genuine fork (the decisions already existed, scattered),
+  so it was put to Arpit: carve **both** cache layers out of ADR-REFER, a
+  whole-project cache map owning nothing, or the TTL store alone. He chose the
+  carve-out, status **proposed**.
+- **Did:** wrote `docs/adr/0035_cache.md` — ADR-CACHE, twelve decisions, seven
+  veto conditions, Mermaid + ASCII twin of the TTL→ARC→network consultation
+  order. It **owns `src/fux/refer/arc.py` and `src/fux/refer/fetchcache.py`**,
+  carved out of ADR-REFER's directory-level claim; `tools/refer-bench/`
+  deliberately **not** split (one harness runs R4 for the whole plane, and a
+  component is owned once) — same shape as yesterday's ADR-MERGE-DRIVER
+  carve-out. ADR-REFER's decisions **5a/5b/5c and 9 are now pointers**, their
+  numbers **retired, not reused**, and its Owns line, Consequences,
+  Alternatives and Reference repointed. Register gained the 0035 row, two
+  ownership rows, and a rewritten carve-out paragraph naming both of
+  yesterday's and today's splits. No code changed. **`docs/adr/RULE-SINCE`
+  moved `1fc51a7` → `301c65a`**: the carve-out retroactively made the P4
+  size-cap commit `0264510` look non-compliant (it touched ADR-REFER, the
+  owner at the time), and the register's own bulk-review mechanism is the
+  sanctioned fix — every commit in between re-audited first, all 192 ADR
+  checks green. The cost, stated: those commits are no longer re-auditable.
+  Then, on Arpit asking whether both properties were actually *defined*:
+  they were not. **`ARC`'s glossary entry predated the record** and cited only
+  the compare doc; **`TTL` had no entry at all**, despite being live since
+  W-60 (2026-08-20) in `Policy.cache_ttl_seconds`, a verdict label, a compare
+  doc and an ADR. Added `TTL fetch cache` and `` `cached` (the fourth
+  verdict)``, rewrote the `ARC` entry, and expanded both acronyms on first use
+  in ADR-CACHE §1 — the record used "ARC" and "TTL" throughout without ever
+  spelling either out.
+- **Decided / open:** nothing new was decided — every decision in the record
+  already existed as ADR-REFER 5a–5c/9, `cache-policy.compare.md` (ARC over
+  LRU) or `refer-fetch-cache.compare.md` (verdict F, 300 s, opt-in). Two of
+  its veto conditions were **already open before this change** and are now
+  stated where they belong: ARC-vs-LRU was measured **post-hoc** at R4 so the
+  compare doc's trigger stands, and `no_cache` is **advisory, not enforced**,
+  for access-controlled sources.
+- **Next:** ratification is Arpit's — ADR-CACHE carries ADR-REFER's proposed
+  status and neither moves without him.
+- **Cost:** unmeasured; one Cowork session, one clarifying question, ~15 files
+  read, 4 written.
+
+---
+
 ## 2026-08-21 — correction: the P4 CRLF fix to sources.py was defense-in-depth, not a closed gap  ·  Claude Code
 
 - **Asked:** "is everything up to date in the ADR" — an audit of the six
