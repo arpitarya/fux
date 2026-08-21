@@ -235,7 +235,7 @@ def test_cached_carries_its_age():
 
 @pytest.fixture
 def repo(tmp_path):
-    (tmp_path / "runbook.md").write_text("# R\n\nlocal content\n", encoding="utf-8")
+    (tmp_path / "runbook.md").write_text("# R\n\nlocal content\n", encoding="utf-8", newline="\n")
     return tmp_path
 
 

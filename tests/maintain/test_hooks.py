@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 
 import pytest
 
@@ -30,7 +31,11 @@ def test_install_writes_all_three_hooks_executable(repo):
     assert sorted(report.installed) == ["post-checkout", "post-commit", "post-merge"]
     for name in hooks.HOOKS:
         path = repo / ".git" / "hooks" / name
-        assert path.exists() and path.stat().st_mode & 0o111, name
+        assert path.exists(), name
+        # NTFS has no POSIX execute bit — chmod is a no-op for it on Windows,
+        # and git-for-windows runs a hook via its shebang regardless.
+        if sys.platform != "win32":
+            assert path.stat().st_mode & 0o111, name
         assert hooks.MARKER in path.read_text(encoding="utf-8")
 
 

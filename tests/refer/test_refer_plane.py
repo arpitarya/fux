@@ -30,7 +30,7 @@ every Monday morning and the handover notes live beside this runbook.
 
 @pytest.fixture
 def repo(tmp_path):
-    (tmp_path / "runbook.md").write_text(DOC, encoding="utf-8")
+    (tmp_path / "runbook.md").write_text(DOC, encoding="utf-8", newline="\n")
     return tmp_path
 
 
@@ -165,7 +165,7 @@ def test_the_cache_is_keyed_by_content_so_a_changed_source_is_never_served_stale
     refer(repo, "telemetry", _candidates(), cache=cache)
 
     changed = DOC.replace("Monday", "Thursday")
-    (repo / "runbook.md").write_text(changed, encoding="utf-8")
+    (repo / "runbook.md").write_text(changed, encoding="utf-8", newline="\n")
     bundle = refer(repo, "telemetry", _candidates(changed), cache=cache)
 
     assert bundle.documents[0].verdict.label == "current"

@@ -27,7 +27,7 @@ def test_an_unknown_scheme_is_refused_rather_than_guessed():
 
 
 def test_a_git_document_is_read_from_the_checkout(tmp_path):
-    (tmp_path / "a.md").write_text("# A\n", encoding="utf-8")
+    (tmp_path / "a.md").write_text("# A\n", encoding="utf-8", newline="\n")
     fetched = fetch_document(tmp_path, "file:a.md", "a.md")
     assert fetched.content == b"# A\n" and fetched.strategy == GIT
 
