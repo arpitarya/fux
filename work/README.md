@@ -14,6 +14,7 @@ are all mid-rewrite, and a doc being rewritten is work.
 
 | file | what it is | when it changes |
 |---|---|---|
+| [`PRIORITY.md`](PRIORITY.md) | **read first** — the one ranked order of work and the gate: work the first non-DONE row or block | Arpit reorders; a row is marked DONE with its commit sha |
 | [`WORKLOG.md`](WORKLOG.md) | append-only session log, newest first | **every** session, before it ends — chat-only ones too |
 | [`INTERVIEW.md`](INTERVIEW.md) | the state-of-play doc a cold successor reads | **during** the session, not at the end |
 | [`IMPLEMENTATION.md`](IMPLEMENTATION.md) | milestone log — what shipped, when, and how it turned out | a milestone or release lands |

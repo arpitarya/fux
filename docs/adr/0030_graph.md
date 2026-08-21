@@ -247,6 +247,16 @@ fallback.
   archived choice; `LAZINESS = 0.5` is the conventional lazy chain. Only the
   *need* for laziness is measured. They are honest defaults, not tuned values,
   and the veto condition below is what would force them to be earned.
+- **`graph.json`'s cost is now profiled, and it is the plane, not the
+  algorithms.** [`2026-08-21-graph-plane-profile`](../../work/regression/2026-08-21-graph-plane-profile/report.md)
+  puts **9.34 s of a 9.54 s `fux graph` at 100 000 docs (98 %) in
+  `plane.load()`**; PPR-lite itself is 0.197 s and `path` sub-millisecond.
+  This does not reopen decision 8 by itself — the profile is explicitly not a
+  gate, no threshold was pre-registered — but it is real evidence the format
+  question is worth arguing with numbers, filed as
+  [`graph-plane-format.compare.md`](../../work/compare/graph-plane-format.compare.md).
+  Decisions 5 and 7 (unseeded propagation; derived not committed) are
+  untouched by this finding.
 
 ### Alternatives considered
 

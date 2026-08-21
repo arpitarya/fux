@@ -10,6 +10,13 @@
 #   handbook/runbooks
 #   old/2023-platform        archived=true
 #
+# A `!` line SUBTRACTS from the walk -- a repo-relative glob, applied whatever
+# order it appears in, matching a path or any directory above it. There is no
+# un-exclude, so there is no precedence to remember:
+#
+#   !work/regression/*/evidence
+#   !**/node_modules
+#
 # See ADR-DIR-LIST.
 
 CLAUDE.md
@@ -17,4 +24,4 @@ README.md
 docs
 work
 
-archive/v0.26-docs        archived=true
+archive                   archived=true

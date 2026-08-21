@@ -1,0 +1,66 @@
+Graph-plane cost profile — raw harness output
+=============================================
+
+provenance
+  host              : Anthropic cloud container (NOT the device VM, NOT fux-lab)
+  python            : 3.11.15
+  modules under test: src/fux/graph/{model,community,walk}.py — byte-identical, `cmp` clean
+  stubbed           : fux/graph/__init__.py (empty; the real one pulls config/errors the
+                      profile does not use) and fux/ingest/edges.py (EXTRACTED_GRADE = 10
+                      only — the single constant walk.py imports from it)
+  harness           : tools/graph-bench/profile.py
+  repeats           : two independent runs, below. report.md cites RUN 1.
+
+=== RUN 1 — cited in report.md ===
+python 3.11.15 · output /tmp/fux-graph-bench
+
+=== 10,000 documents · 109,880 edges ===
+BUILD (today)   adjacency   0.19s  LPA   0.12s  serialize   0.15s  total   0.47s  file    6.4 MB
+LOAD  (today)   read   0.01s  json.loads   0.10s  Edge()   0.13s  Graph()   0.14s  TOTAL   0.37s  <- paid per CLI invocation
+ANSWER          explain   0.01ms  PPR  0.080s (touched 10,050)  path(3)   0.87ms
+REACH           a seek-based PPR needs 6,649 adjacency fetches; the walk lands on 10,050 nodes (100.0% of corpus)
+OPTION B        write   0.14s  file    4.0 MB + idx   0.4 MB   explain   0.09s  graph   0.20s (6,649 seeks in 0.03s)
+OPTION C        serialize   0.01s  file    0.3 MB  load   0.00s   (edges then come from the committed shards — unmeasured here)
+
+=== 50,000 documents · 549,465 edges ===
+BUILD (today)   adjacency   1.09s  LPA   0.88s  serialize   1.19s  total   3.16s  file   32.2 MB
+LOAD  (today)   read   0.04s  json.loads   0.98s  Edge()   0.92s  Graph()   1.81s  TOTAL   3.74s  <- paid per CLI invocation
+ANSWER          explain   0.00ms  PPR  0.142s (touched 49,897)  path(3)   0.79ms
+REACH           a seek-based PPR needs 8,200 adjacency fetches; the walk lands on 49,897 nodes (99.3% of corpus)
+OPTION B        write   0.82s  file   19.8 MB + idx   1.9 MB   explain   0.06s  graph   0.24s (8,200 seeks in 0.04s)
+OPTION C        serialize   0.06s  file    1.5 MB  load   0.04s   (edges then come from the committed shards — unmeasured here)
+
+=== 100,000 documents · 1,098,955 edges ===
+BUILD (today)   adjacency   2.27s  LPA   1.59s  serialize   1.72s  total   5.57s  file   64.4 MB
+LOAD  (today)   read   0.08s  json.loads   3.27s  Edge()   2.96s  Graph()   3.03s  TOTAL   9.34s  <- paid per CLI invocation
+ANSWER          explain   0.00ms  PPR  0.197s (touched 94,833)  path(3)   0.54ms
+REACH           a seek-based PPR needs 9,639 adjacency fetches; the walk lands on 94,833 nodes (94.4% of corpus)
+OPTION B        write   1.75s  file   39.7 MB + idx   3.9 MB   explain   0.21s  graph   0.45s (9,639 seeks in 0.04s)
+OPTION C        serialize   0.10s  file    2.9 MB  load   0.10s   (edges then come from the committed shards — unmeasured here)
+
+=== RUN 2 — repeat, to show run-to-run spread ===
+python 3.11.15 · output /tmp/fux-graph-bench
+
+=== 10,000 documents · 109,880 edges ===
+BUILD (today)   adjacency   0.20s  LPA   0.13s  serialize   0.15s  total   0.48s  file    6.4 MB
+LOAD  (today)   read   0.00s  json.loads   0.10s  Edge()   0.12s  Graph()   0.12s  TOTAL   0.34s  <- paid per CLI invocation
+ANSWER          explain   0.01ms  PPR  0.056s (touched 10,050)  path(3)   0.46ms
+REACH           a seek-based PPR needs 6,649 adjacency fetches; the walk lands on 10,050 nodes (100.0% of corpus)
+OPTION B        write   0.12s  file    4.0 MB + idx   0.4 MB   explain   0.09s  graph   0.18s (6,649 seeks in 0.04s)
+OPTION C        serialize   0.00s  file    0.3 MB  load   0.00s   (edges then come from the committed shards — unmeasured here)
+
+=== 50,000 documents · 549,465 edges ===
+BUILD (today)   adjacency   0.98s  LPA   0.76s  serialize   1.11s  total   2.86s  file   32.2 MB
+LOAD  (today)   read   0.03s  json.loads   0.82s  Edge()   0.75s  Graph()   1.25s  TOTAL   2.85s  <- paid per CLI invocation
+ANSWER          explain   0.00ms  PPR  0.122s (touched 49,897)  path(3)   0.60ms
+REACH           a seek-based PPR needs 8,200 adjacency fetches; the walk lands on 49,897 nodes (99.3% of corpus)
+OPTION B        write   0.66s  file   19.8 MB + idx   1.9 MB   explain   0.04s  graph   0.20s (8,200 seeks in 0.04s)
+OPTION C        serialize   0.03s  file    1.5 MB  load   0.02s   (edges then come from the committed shards — unmeasured here)
+
+=== 100,000 documents · 1,098,955 edges ===
+BUILD (today)   adjacency   2.33s  LPA   1.71s  serialize   1.78s  total   5.82s  file   64.4 MB
+LOAD  (today)   read   0.08s  json.loads   2.76s  Edge()   3.02s  Graph()   2.85s  TOTAL   8.71s  <- paid per CLI invocation
+ANSWER          explain   0.00ms  PPR  0.198s (touched 94,833)  path(3)   0.68ms
+REACH           a seek-based PPR needs 9,639 adjacency fetches; the walk lands on 94,833 nodes (94.4% of corpus)
+OPTION B        write   1.61s  file   39.7 MB + idx   3.9 MB   explain   0.20s  graph   0.44s (9,639 seeks in 0.05s)
+OPTION C        serialize   0.12s  file    2.9 MB  load   0.09s   (edges then come from the committed shards — unmeasured here)

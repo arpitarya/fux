@@ -292,6 +292,7 @@ the check, so a component cannot stay unowned by accident.
 | `tools/maintenance-bench/` | ADR-MAINTENANCE | the R5 and R6 harness. **Written, not run** — Arpit held prediction runs on 2026-08-20, and the record is `proposed` until they are |
 | `tools/refer-bench/` | ADR-REFER | the R4 harness and its frozen pre-registration — a real `http.server` behind the **consumer's own generated fetcher**, so the measured path is the shipped one |
 | `tools/differential/` | ADR-T1-ACCELERATOR | the differential-law harness and the R3 bench |
+| `tools/graph-bench/` | ADR-GRAPH | cost-attribution profiler for the M3 lane — not a gate; feeds `graph-plane-format.compare.md` |
 
 <!-- OWNERSHIP-TABLE-END -->
 
