@@ -1,1 +1,1 @@
-✓ P5 implemented (materialise-first display, tests green, uncommitted) · next: ask about committing, then P6
+✓ P5 landed (1ba9be1) · → P6: wire the refer plane into ask/answer
