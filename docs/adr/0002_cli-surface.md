@@ -586,8 +586,16 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 
 - **The `--json` shape is now a contract.** `results[]` of
   `{id, title, loc, score}` for `ask`/`find`; `{answer, citation, source}` for
-  `answer`. Changing a key is a breaking change and needs this record updated
-  in the same commit.
+  `answer`, where `source` selects the sub-shape (`"index"`:
+  `answer={title, phrases}`, `citation={id, loc, score}`; `"refer"`:
+  `answer={passages: [{heading, text, score}]}`,
+  `citation={id, loc, sha, freshness}` — PRIORITY.md P6, 2026-08-21, full
+  decision on [ADR-ANSWER](0006_answer.md)). Changing a key is a breaking
+  change and needs this record updated in the same commit.
+- **`answer` gained `--no-refer`** (P6) — the only flag any verb has for
+  opting *out* of a default-on behaviour rather than into one. `p_answer`'s
+  help text changed from "the single best answer the index can give" to
+  name the fetch it now does by default.
 - **Adding a verb costs a record.** M3 did add three, and it cost this record
   a group row, a decision (1b) and a feature-line bump — paid in the same
   change, which is what the rule is for. M4 still owes the same.

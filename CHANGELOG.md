@@ -117,6 +117,18 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed — **breaking**
 
+- **`answer` fetches, verifies and re-scores by default now** (PRIORITY.md
+  P6, 2026-08-21, ADR-REFER **accepted** — R4 passed, and the plane is now
+  load-bearing in a shipped verb; ADR-ANSWER **accepted**). A citation whose
+  source can be reached returns a verbatim passage re-scored on the fetched
+  bytes, cited with a fresh `sha` and a freshness verdict — `"source":
+  "refer"` in `--json`. `--no-refer` keeps the exact M2 shape
+  (`"source": "index"`, `{title, phrases}`). **Breaking for a caller that
+  assumed `--json`'s `"source"` was always `"index"`, or that `"answer"`
+  was always `{title, phrases}`** — W-48 (2026-08-20) put `"source"` on
+  every branch specifically so this could be detected, not silently missed.
+  `ask`/`find` and ranking are untouched — only `answer`, and only how its
+  winning citation is produced.
 - **L5 is enforced when a record is written, not when it is ingested.** The
   hashed-meta rule for non-git sources moved from `ingest/run.py` — one caller
   — into `write_index`, the only way bytes reach a committed shard. A non-git

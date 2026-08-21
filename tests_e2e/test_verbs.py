@@ -110,17 +110,63 @@ def test_find_prints_locations_one_per_line(tmp_path):
     assert all(l.endswith(".md") for l in lines)
 
 
-def test_answer_is_bounded_and_says_so(tmp_path):
-    """`answer` must not imply it read the document's body — M4 does that."""
+def test_answer_fetches_and_re_scores_by_default(tmp_path):
+    """PRIORITY.md P6: refer is the default path — a `file:` citation needs no
+    fetcher (local checkout), so this never touches the network, but it does
+    fetch fresh bytes, cite a fresh sha, and re-score a passage from them."""
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
 
-    human = _run(tmp_path, "answer", "why did pruning fail").stdout
-    assert "refer plane" in human  # the honesty line about its own ceiling
-
     payload = json.loads(_run(tmp_path, "answer", "why did pruning fail", "--json").stdout)
+    assert payload["source"] == "refer"
+    assert ".md" in payload["citation"]["loc"]  # a passage locator, e.g. "docs/pruning.md#p0"
+    assert payload["citation"]["sha"]  # a fresh sha, not the indexed one's absence
+    assert payload["citation"]["freshness"] == "current"
+    assert payload["answer"]["passages"]
+    assert payload["answer"]["passages"][0]["text"]
+
+    human = _run(tmp_path, "answer", "why did pruning fail").stdout
+    assert "sha " in human and "current" in human
+
+
+def test_answer_sha_changes_when_the_source_file_changes(tmp_path):
+    """PRIORITY.md P6's literal done-when: a passage + a sha that changes when
+    the source changes — proving refer re-fetches rather than echoing the
+    committed record's own (unchanged-until-ingest) sha."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+    before = json.loads(_run(tmp_path, "answer", "why did pruning fail", "--json").stdout)
+
+    (tmp_path / "docs" / "pruning.md").write_text(
+        "---\ntitle: Why pruning failed\n---\n# Why pruning failed\n\n"
+        "The gate measured static pruning twice and it did not preserve candidate recall. "
+        "A third run confirmed the same failure.\n",
+        encoding="utf-8",
+    )
+    # Deliberately NOT re-ingested — refer fetches the working tree directly,
+    # so this must see the edit before the next `fux ingest` ever would.
+    after = json.loads(_run(tmp_path, "answer", "why did pruning fail", "--json").stdout)
+
+    assert after["source"] == "refer"
+    assert after["citation"]["sha"] != before["citation"]["sha"]
+    assert any("third run" in p["text"] for p in after["answer"]["passages"])
+
+
+def test_answer_no_refer_keeps_the_index_only_path(tmp_path):
+    """`--no-refer` must not imply refer ever ran — M2's bounded honesty line
+    stays available on request."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    human = _run(tmp_path, "answer", "why did pruning fail", "--no-refer").stdout
+    assert "--no-refer was passed" in human
+
+    payload = json.loads(
+        _run(tmp_path, "answer", "why did pruning fail", "--json", "--no-refer").stdout
+    )
     assert payload["source"] == "index"
     assert payload["citation"]["loc"].endswith(".md")
+    assert "sha" not in payload["citation"]  # the M2 shape, unchanged
 
 
 def test_answer_declines_when_nothing_matches(tmp_path):
@@ -132,14 +178,16 @@ def test_answer_declines_when_nothing_matches(tmp_path):
 
 def test_answer_json_carries_source_on_both_branches(tmp_path):
     """W-48: ADR-ANSWER tells callers to key on `"source"` to detect the M4
-    upgrade, so a branch that omits it is a trap rather than a signal.
+    upgrade, so a branch that omits it is a trap rather than a signal. A hit
+    now answers via refer; a miss has nothing to refer to and stays index.
     """
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")
 
     hit = json.loads(_run(tmp_path, "answer", "why did pruning fail", "--json").stdout)
     miss = json.loads(_run(tmp_path, "answer", "zzzz nothing", "--json").stdout)
-    assert hit["source"] == miss["source"] == "index"
+    assert hit["source"] == "refer"
+    assert miss["source"] == "index"
     assert miss["answer"] is None and miss["citation"] is None
 
 

@@ -1,1 +1,1 @@
-✓ P5 landed (1ba9be1) · → P6: wire the refer plane into ask/answer
+✓ P6 implemented (refer wired into answer, tests green, uncommitted) · next: commit, then check P7

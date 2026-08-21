@@ -157,7 +157,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_find.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
     p_find.set_defaults(func=_cmd_find)
 
-    _query_parser("answer", "the single best answer the index can give").set_defaults(func=_cmd_answer)
+    p_answer = _query_parser(
+        "answer", "the single best answer — a fetched, re-scored passage when the source is reachable"
+    )
+    p_answer.add_argument(
+        "--no-refer",
+        action="store_true",
+        help="skip the refer plane; answer from the index's own structure alone",
+    )
+    p_answer.set_defaults(func=_cmd_answer)
 
     p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
     p_hooks.add_argument("--install", action="store_true", help="write them (the default)")

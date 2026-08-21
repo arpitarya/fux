@@ -3,18 +3,23 @@ type: ADR
 name: ADR-REFER
 title: "ADR-REFER (0031) — the refer plane: fetch from the source, verify by content, assemble under a byte budget"
 description: "M4's core. Fux still does not fetch — the refer plane reuses the consumer-fetcher contract. Freshness is verified by content sha rather than by age, because the index records no time. The answer limit is a byte budget, not k."
-status: proposed
-timestamp: 2026-08-20T00:00:00Z
+status: accepted
+timestamp: 2026-08-21T00:00:00Z
 ---
 
 # ADR-REFER: the refer plane
 
 - **Name:** `ADR-REFER` — cite this everywhere; never cite the number
-- **Status:** proposed — **R4 ran 2026-08-20 and PASSED**
-  ([R4-REFER](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md));
-  acceptance still waits on the budget sweep (W-59, unmeasured — below)
-- **Date:** 2026-08-20
-- **Feature:** M4 — the refer plane (core landed, R4 bench run; adapters and the budget sweep outstanding)
+- **Status:** accepted (2026-08-21, PRIORITY.md P6) — **R4 ran 2026-08-20 and
+  PASSED** ([R4-REFER](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md))
+  and the plane is now load-bearing in a shipped verb (`fux answer`, default
+  path). **Accepted with an open veto condition, not a closed one**: the
+  budget sweep (W-59, still unmeasured — condition 2 below) stays exactly as
+  checkable as it was under `proposed`, and reopens this record the moment it
+  runs flat. Arpit's call, put to him directly rather than assumed, given the
+  record's own text tied acceptance to that sweep specifically
+- **Date:** 2026-08-20 (accepted 2026-08-21)
+- **Feature:** M4 — the refer plane (core landed, R4 bench run, wired into `answer` — the budget sweep is outstanding and reopens acceptance if it fails)
 - **Owns:** `src/fux/refer/` · `tools/refer-bench/` — **except `arc.py` and
   `fetchcache.py`**, carved out to [ADR-CACHE](0035_cache.md) on 2026-08-21
   (most specific wins). The bench stays here: `tools/refer-bench/` runs R4 for

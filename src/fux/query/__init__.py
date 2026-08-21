@@ -112,12 +112,16 @@ def cmd_find(args) -> int:
 
 
 def cmd_answer(args) -> int:
-    """The single best answer the *index* can give — deliberately bounded.
+    """The single best answer — a fetched, re-scored passage when the source
+    is reachable (PRIORITY.md P6); the index's own structure otherwise.
 
     No model is involved and none ever will be on this path (the `$0` law).
-    Until M4's refer plane can fetch the document's bytes, the honest answer is
-    the winning document's own extracted structure plus its citation — not a
-    fabricated sentence, and not silence.
+    Refer is the **default**: the winning document's citation is fetched
+    through the consumer's fetcher, re-scored on the fetched bytes, and cited
+    with a fresh `sha` — `"source": "refer"`. `--no-refer` (or refer
+    producing nothing usable — unreachable source, no fetcher, a citation
+    deleted from the working tree) falls back to the M2 index-only path —
+    `"source": "index"` — never silence.
     """
     root = _root()
     results, _ = run_query(root, args.query, 1, force_scan=getattr(args, "scan", False))
@@ -137,10 +141,74 @@ def cmd_answer(args) -> int:
         return 0
 
     best = results[0]
+    no_refer_flag = getattr(args, "no_refer", False)
+
+    if not no_refer_flag:
+        referred = _answer_via_refer(root, args.query, best)
+        if referred is not None:
+            _print_refer_answer(referred, args.json)
+            return 0
+
+    return _print_index_answer(root, best, args.json, requested=no_refer_flag)
+
+
+def _answer_via_refer(root: Path, query: str, best: AskResult):
+    """`None` on any failure to produce a usable citation — never raises."""
+    from .refer_answer import answer_via_refer
+
+    record = _record_for(root, best.id)
+    if record is None:
+        return None
+    return answer_via_refer(root, query, best.id, best.loc, record["sha"])
+
+
+def _print_refer_answer(bundle, as_json: bool) -> None:
+    citations = bundle.assembled.citations
+    cited = bundle.documents[0] if bundle.documents else None
+    freshness = cited.verdict.label if cited is not None else "unverified"
+
+    if as_json:
+        print(
+            json_mod.dumps(
+                {
+                    "answer": {
+                        "passages": [
+                            {"heading": c.heading, "text": c.text, "score": c.score}
+                            for c in citations
+                        ]
+                    },
+                    "citation": {
+                        "id": citations[0].doc_id,
+                        "loc": citations[0].locator,
+                        "sha": citations[0].sha,
+                        "freshness": freshness,
+                    },
+                    "source": "refer",
+                },
+                indent=2,
+            )
+        )
+        return
+
+    for c in citations:
+        if c.heading:
+            print(f"# {c.heading}\n")
+        print(c.text)
+        print()
+    print(f"  -- {citations[0].locator} (sha {citations[0].sha[:12]}, {freshness})")
+
+
+def _print_index_answer(root: Path, best: AskResult, as_json: bool, *, requested: bool) -> int:
+    """The M2 path: the winning record's own extracted structure — no fetch.
+
+    `requested` distinguishes why: the caller passed `--no-refer`, versus
+    refer being tried and producing nothing usable (unreachable source, no
+    fetcher configured, a citation deleted from the working tree).
+    """
     phrases = _phrases_for(root, best.id)
     title = _resolve_title(root, best.id, best.title)
 
-    if args.json:
+    if as_json:
         print(
             json_mod.dumps(
                 {
@@ -157,7 +225,8 @@ def cmd_answer(args) -> int:
     for phrase in phrases:
         print(f"  - {phrase}")
     print(f"\n  -- {best.loc}")
-    print("\n(from the index's own structure; passage-level answers arrive with the refer plane, M4)")
+    reason = "--no-refer was passed" if requested else "the source could not be reached or verified"
+    print(f"\n(from the index's own structure — {reason})")
     return 0
 
 

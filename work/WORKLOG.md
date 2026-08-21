@@ -28,6 +28,70 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — PRIORITY P6: wire the refer plane into `answer`  ·  Claude Code
+
+- **Asked:** "commit everything then implement p6" — PRIORITY.md's
+  next-ranked item after P5, following the same commit split (P5 landed as
+  three separate commits: the pre-existing ADR-CACHE bucket, the session-lock
+  fix, and P5 itself — none of P6 depended on any of them).
+- **Did:** grounded the refer plane's actual API first (`refer()`'s
+  signature, `Policy`, the fetcher contract, `Bundle`/`Citation` shapes,
+  ADR-ANSWER's existing commitments) via an Explore agent before writing
+  code. Added `src/fux/query/refer_answer.py` — `answer_via_refer` calls
+  `refer(root, query, [(id, loc, sha)], policy=Policy(mode=ALWAYS),
+  fetcher=...)` for the single winning citation; `_load_fetcher` resolves
+  and connects the *same* fetcher a `url:` document was ingested with
+  (mirroring `ingest/urlsrc.py`'s own resolution exactly — a document
+  verified through a different fetcher than it was ingested with compares a
+  rendered page against a shell and reports false staleness, per
+  `refer/source.py`'s own module docstring), returning `(None, noop)`
+  gracefully rather than crashing when nothing can be resolved (`refer()`'s
+  own `_fetch_url` already guards `fetcher=None` and degrades to an
+  `unverified` verdict — found by reading the code, not assumed). Wired into
+  `cmd_answer`: refer is the **default** path (`"source": "refer"`), with a
+  new `--no-refer` flag falling back to the exact M2 index-only shape
+  (`"source": "index"`) — matching PRIORITY.md's row text literally
+  ("`--no-refer` keeps the index-only path" implies default-on, which the
+  row itself had already decided, not a fork to re-litigate).
+- **Decided (Arpit, live):** one genuine tension found while implementing —
+  P6's done-when literally says "ADR-REFER status: accepted", but
+  ADR-REFER's own text ties acceptance to a *second*, still-unmeasured gate
+  (W-59's budget sweep, itself blocked on W-57's human-written goldens),
+  separate from R4 which already passed. Put to Arpit rather than silently
+  resolved either way: **accept now**, with the budget sweep kept as a
+  named, checkable veto condition rather than hidden — real usage in a
+  shipped verb is itself signal, and nothing about the open gate is
+  papered over.
+- **Also found while capturing real output for the ADR rewrite**: a refer
+  passage on a document with YAML frontmatter includes the frontmatter
+  block verbatim — `refer/chunk.py` chunks fetched bytes as fetched, unlike
+  `ingest/extract.py`'s title/phrase extraction which strips it. Consistent
+  with ADR-REFER's "it cannot invent" (a genuine verbatim span), but a real
+  readability cost, recorded in ADR-ANSWER's Consequences rather than fixed
+  — out of P6's scope, `chunk.py`'s call to make.
+- **ADR-RECORD**: none touched beyond ADR-ASK, ADR-CLI (Law zero, both own
+  touched components), ADR-ANSWER and ADR-REFER (both substantially
+  rewritten — ADR-ANSWER's §1/§2, decisions, examples and veto condition
+  all described the pre-P6 M2 shape and needed rewriting, not just a status
+  flip; ADR-REFER's status line and Feature line).
+- **Tests**: `tests/query/test_refer_answer.py` (9 new — file: needs no
+  fetcher, missing file degrades to `None`, url: fetcher resolution mirrors
+  ingest, connect/close bracket, `configure()` receives the opaque table,
+  three distinct "nothing configured/resolved/found" degrade-to-`None`
+  cases, the full `answer_via_refer` path degrading on a missing fetcher).
+  `tests_e2e/test_verbs.py` rewritten for the new default (real CLI,
+  real fixture): the literal done-when (a passage + a sha that changes when
+  the source file changes, without re-ingesting), `--no-refer`'s fallback,
+  and `"source"` on both branches. `uv run pytest -q tests tests_e2e`: 877
+  passed.
+- **Next:** commit (three logical pieces this time is not needed — P6 has
+  no unrelated pre-existing work mixed in, unlike P5's session). Ask
+  whether to continue to P7, or whether W-61 (still blocked on Arpit,
+  unrelated to both P5 and P6, filed 2026-08-20) should be surfaced again.
+- **Cost:** unmeasured — a long single-turn session continuing directly from
+  P5's, five files touched, two ADRs substantially rewritten, ~880 assertions
+  run repeatedly.
+
 ## 2026-08-21 — PRIORITY P5: materialise-first display for hashed records  ·  Claude Code
 
 - **Asked:** "implement p five" — PRIORITY.md's next-ranked item, closing the
