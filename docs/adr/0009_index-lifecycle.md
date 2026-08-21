@@ -360,6 +360,17 @@ diff <(fux ask "any query" --json) <(fux ask "any query" --scan --json) && echo 
 grep -n '_assert_invariants' src/fux/derive/build.py
 # expect: defined and called per record — removing the call is the veto
 
-# 4. density against the M6 budget (<= 250 MB packed @100k docs)
-du -sh .fux/index/
+# 4. density against the M6 budget (<= 250 MB packed @100k docs).
+#    `du -sh` is working-tree size, not "packed" — isolate the index in a
+#    scratch repo and measure the real pack, the way the 2026-08-21
+#    preliminary analysis did (see below, and its evidence/pack_compression.sh)
+bash work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.sh
 ```
+
+**R7 preliminary read (2026-08-21, not a measured verdict — no
+pre-registration exists):** real git-pack compression on this repo's own
+committed index measures **2.429×**, extrapolating to **~470 MB at 100k
+docs — ~2× over budget**. That number is against today's plain-JSON
+placeholder, not `ADR-POSTINGS`'s designed encoding, which is still unbuilt —
+see [the analysis](../../work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)
+before treating this as evidence the design itself is too big.

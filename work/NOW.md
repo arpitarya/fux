@@ -1,1 +1,1 @@
-✓ PRIORITY P1+P2 (1fc51a7 + RULE-SINCE) · W-61 still filed; W-26 is the startable item
+✓ PRIORITY P3: R7 closed unmeasured (analysis, no VERDICT) · W-61 still filed; next is Arpit's call on ADR-POSTINGS vs. P4

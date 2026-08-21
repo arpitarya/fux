@@ -51,24 +51,31 @@ when the pre-registration is written, and not because they look ready.*
 *Each writes its own record when it lands. **The detail file is the spec** —
 `PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
 
-- **W-26** · `agent` · **STARTABLE — the only agent-closable item on this queue** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. Its DoD wants *every* R prediction to carry **a measured value or an honest failure record**, and all three now do: R4 ✅ · R5 ❌ · R6 ⚠. **R7 is this milestone's own measurement**, not a precondition for it. **What it inherits from R5's failure:** 47.6 % of that 44 s is `fux build`, the derived plane M6 is about to add a *third tier* to — so measure any tier's rebuild cost before choosing its default. **Unchanged:** tier-auto flips **by measurement, never by hand** — [detail](open/W-26-m6-scale-t2.md)
+- **W-26** · `agent` · **STARTABLE — the only agent-closable item on this queue** · M6 scale & T2 — `tpack`, mmap segments, 100k/1M bench, paper §4–§6 rewritten to measured. Its DoD wants *every* R prediction to carry **a measured value or an honest failure record**, and all four now do: R4 ✅ · R5 ❌ · R6 ⚠ · **R7 CLOSED unmeasured 2026-08-21** — [analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md); tier-auto correctness (R7's other half) stays unmeasurable until T2 exists — **still this milestone's own measurement to make, not a precondition for starting it.** **What it inherits from R5's failure:** 47.6 % of that 44 s is `fux build`, the derived plane M6 is about to add a *third tier* to — so measure any tier's rebuild cost before choosing its default. **What it inherits from R7's preliminary read:** the current committed index runs ~2× over a 250 MB@100k budget on real data — `ADR-POSTINGS`'s compact encoding (BIC/MPH, unbuilt) is the planned fix and is now better-motivated, not optional. **Unchanged:** tier-auto flips **by measurement, never by hand** — [detail](open/W-26-m6-scale-t2.md)
 - **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
 
 ---
 
-## Predictions still unmeasured
+## Predictions
 
-| id | prediction | threshold | measured at |
-|----|-----------|-----------|-------------|
-| R7 | committed @100k target density | ≤ 250 MB packed; tier-auto correct | [W-26](open/W-26-m6-scale-t2.md) — **M6 measures it by building it** |
+**No rows left in "still unmeasured" — R7 closed 2026-08-21, unmeasured, on
+Arpit's call.** No
+pre-registration was written and no formal run happened; preliminary analysis
+against this repo's own committed index (real git-pack compression, measured:
+2.429×) extrapolates to **≈470 MB at 100k docs — ~2× over the 250 MB
+budget** — [analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md).
+**This is not the "wire format is dead" FAIL** PRIORITY.md's P3 row names for
+a measured result: the format that analysis measured is today's plain-JSON
+placeholder, not `ADR-POSTINGS`'s designed BIC/MPH encoding (⏳ proposed,
+unbuilt) the threshold was actually sized against, and the shortfall tracks
+closely with a known, closeable representation cost (hex-string keys vs.
+packed binary). R7 stays formally unmeasured until that encoding exists;
+tier-auto correctness remains unmeasurable regardless, since T2 doesn't
+exist yet either (W-26).
 
-**One row left.** The hold was lifted by Arpit on 2026-08-20 and **R4, R5 and
-R6 all ran that day** — their results are below, with the failures stated as
-plainly as the pass.
-
-**R7 is the exception in this table**: it is not a gate M6 must pass *before*
-starting, it is the measurement M6 *is*, which is why its tier-auto half cannot
-exist before the tier does.
+**The hold was lifted by Arpit on 2026-08-20** and **R4, R5 and R6 all ran
+that day** — their results are below, with the failures stated as plainly as
+the pass.
 
 **The lab was never the blocker it was recorded as.** Its environments install
 the published `0.33.0` wheel, which predates every unreleased plane, so all
@@ -81,6 +88,9 @@ statement about the source's latency at k=10, not about fux.
 ([R5-HOOK](regression/2026-08-20-r5-hook-latency/VERDICT.md)); it **passes at 1 000** (0.651 s), and the boundary
 is near ~1 500. **R6 INCONCLUSIVE** ([R6-MERGE](regression/2026-08-20-r6-merge-driver/VERDICT.md)) — the engine
 behaved; one of three tiers could not have failed, so the frozen table does not cover the result.
+**R7 CLOSED, unmeasured** — ~2× over budget extrapolated from real data, but
+against the wrong (unbuilt-encoding) format;
+[analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md).
 R1 **PASS** · **R2 3/3 PASS** ([run](regression/2026-08-12-r2-close/report.md)) ·
 **R3 PASS** — worst-case p95 **27.2 ms** vs a 150 ms bar on 8 870 RFCs
 ([run](regression/2026-08-12-m2-accelerator/report.md)).

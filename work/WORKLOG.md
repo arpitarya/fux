@@ -28,6 +28,46 @@ play: the worklog is the granular, per-exchange trail.
 
 ---
 
+## 2026-08-21 — PRIORITY P3: R7 closed unmeasured, on Arpit's call  ·  Claude Code
+
+- **Asked:** execute P3 (measure R7 for real, pre-registered, in fux-lab).
+  Mid-recon, Arpit asked the purpose and the odds; a cheap preliminary check
+  (this repo's own committed index) put FAIL at ~70–80 % and Arpit chose to
+  cancel the full ~1–2 hour run and close R7 on that signal instead.
+- **Did:** measured this repo's own `.fux/index/` (345 real docs) two ways —
+  per-field byte composition (`terms`/postings = 91.3 % of bytes, `code`/dense
+  vector only 0.4 % — the earlier compression-risk hypothesis was wrong) and
+  real git-pack compression in an isolated scratch repo (**2.429×**, measured,
+  not assumed). Extrapolated linearly to 100k docs: **~470 MB, ~1.97× over the
+  250 MB budget**. Found the threshold was sized against `ADR-POSTINGS`'s
+  designed BIC/MPH encoding (⏳ proposed, unbuilt) — what's actually committed
+  today is plain JSON (hex-string keys, no delta/quantization), so the number
+  measures the wrong artifact. Filed
+  `work/regression/2026-08-21-r7-preliminary-analysis/` (`report.md` +
+  `ANALYSIS.md` + reproducible `evidence/`, **no `VERDICT.md`** — none is
+  claimed, since no pre-registration exists to rule against). Reconciled
+  `OPEN-WORK.md` (R7 row, W-26's inherited note), `PRIORITY.md` (P3 → DONE,
+  cancelled not measured), `regression/README.md`'s index, and the two ADRs
+  (`0009`, `0013`) whose veto checks cited `du -sh` (working-tree size) as
+  "packed" — corrected to the real isolated-pack method, with the caveat
+  inline.
+- **Decided / open:** explicitly **not** treated as triggering P3's
+  "wire format is dead" consequence — that was written for a measured FAIL
+  against the real intended encoding, and this analysis measured neither a
+  pre-registered run nor the real encoding. Left open: whether to prioritize
+  building `ADR-POSTINGS`'s compact encoding now (plausibly closes the gap —
+  a raw 8 B binary key alone roughly halves the dominant `terms` field's
+  bloat) — flagged as the natural next step, not started. Corpus
+  representativeness (this repo's docs vs. R7's intended synthetic corpus)
+  is stated as unresolved, not glossed over.
+- **Next:** Arpit's call on whether `ADR-POSTINGS` gets built next, or
+  something else in `PRIORITY.md` takes priority (P4 onward).
+- **Cost:** unmeasured precisely; one background recon agent plus this
+  session's own analysis/edits, order of 30–40 minutes wall-clock — far under
+  the ~1–2 hours the cancelled full run would have cost.
+
+---
+
 ## 2026-08-21 — PRIORITY P1+P2: Law zero enforces the owning record; bulk reconciliation  ·  Claude Code
 
 - **Asked:** "in priority file implement P1 and P2" — `work/PRIORITY.md`'s two
