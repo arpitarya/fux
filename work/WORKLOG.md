@@ -30,6 +30,34 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-21 — v0.35.0 pushed, released, and verified live on PyPI  ·  Claude Code
+
+- **Asked:** "commit and everything then publish in one commit."
+- **Did:** landed all four stacked changes as **one** commit (`e5f6b9a`) —
+  design-point reconciliation, W-64's progress plane, scan-by-default, and
+  W-63's source verbs. They interleave in `cli.py` and could not be split
+  without a broken intermediate commit, which is why one commit was also the
+  correct shape and not just the requested one.
+- **CI caught a real bug on the release push, and this is the second time that
+  has happened at a release.** Both Windows arms went red: `fux add` on a file
+  the type allowlist rejects printed a `→`, `cp1252` cannot encode it, and
+  `print()` raised rather than rendering badly. Every POSIX arm and every local
+  run was green. **Same class as v0.30.0's `fux doctor` checkmarks**, so under
+  the two-strikes rule it became `tests/test_windows_console_safe.py` in the
+  fixing commit (`35eeae0`) — an AST check over every string reaching
+  `print()`/`FuxError()`/`.write()`, with ADR-CLI gaining veto condition 7.
+  The check found two false positives on its first run, which is why its scope
+  is streaming calls and not all literals.
+- **Released and verified.** `gh release create v0.35.0` fired `publish.yml`;
+  both jobs green; PyPI showed `0.35.0` within ~10 s. **Verified black-box
+  from the published wheel**, not the repo: a clean venv, `pip install
+  fux-engine==0.35.0`, then `fux add` / `fux remove` (the coverage branch,
+  writing `!docs/onboarding.md` and dropping the document) / `fux update
+  --check` / `fux ask`. `fux url` correctly reports `invalid choice`.
+- **Decided / open:** nothing new. **947 unit / 64 e2e** green on nine CI arms.
+- **Next:** W-61's two calls are the only blocked-on-Arpit items, now 1 day
+  old — the hook-at-scale fork, and R6's contradictory pre-registration.
+
 ## 2026-08-21 — W-63: the source verbs, and four defects found by building them  ·  Claude Code
 
 - **Asked:** implement `work/open/W-63-source-verbs.md` — `fux add` /
