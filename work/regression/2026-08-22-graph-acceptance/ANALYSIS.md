@@ -76,7 +76,13 @@ twice into separate directories and `diff -rq` them.
   is still the more direct test of the original target.
 - **Veto condition 1 (two machines)** stays open. Nothing in this run
   resolves it; a second machine is needed, not a bigger corpus.
-- **W-52**: this corpus is available as its required "second corpus" if and
-  when W-44's shared instrument (the frozen live-vs-archived query set) is
-  built — noted, not acted on here, since building that instrument was not
-  part of what was asked this session.
+- **W-52**: ~~this corpus is available as its required "second corpus"~~ —
+  **struck 2026-08-22, wrong.** `graph-acceptance` declares one source dir
+  (`docs`), no `archived=true`, and **0 of 66 records carry `archived`**. W-52
+  asks what `df` over live-plus-archived does to live scoring; a corpus with no
+  archived half cannot measure it. Two separate things were conflated here — a
+  *second corpus* and a *corpus with an archived population* — and only the
+  first was checked. W-44's instrument has since been built and **is** reusable
+  for W-52's query set; the corpus half is not, and W-52's trigger stays unmet.
+  **Also corrected in the report's opening section**, which made the same claim.
+  Both struck rather than deleted, so the error stays visible.

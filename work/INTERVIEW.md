@@ -429,9 +429,13 @@ staged alongside everything below.*
      a golden derived from the engine's own output passes forever, including
      on the day ranking breaks. **W-59's budget sweep is blocked behind it**,
      so one human afternoon unblocks two items.
-  2. **The external-validation half of [W-62](open/W-62-measure-against-the-outside-world.md)** —
-     five strangers' first fifteen minutes cannot be simulated by an agent. Its
-     README half is agent-startable today.
+  2. ~~**The external-validation half of W-62**~~ — **withdrawn 2026-08-22 by
+     Arpit**, who took parts 1 and 2 personally (*"that's on me, I'll own it"*).
+     Its README half was completed the same day. **The question it asked is
+     still unanswered** — whether Fux wins on private organisational documents
+     is untested — so a future reader should not read this closure as evidence
+     either way. See [`archive/open/`](../archive/open/W-62-measure-against-the-outside-world.md),
+     named and not cited.
 - **The old "W-26 looks available and is not" paragraph is retired, and this
   replaces it.** It rested on a DoD clause requiring *every* R prediction
   measured. All four now carry a measured value or an honest failure record —

@@ -6,9 +6,20 @@ fux-playground's ~50 hand-written goldens, which were never rebuilt after the
 stands separately (the playground's own 2026-08-22 planned-redesign note
 means it may never be graded again). Rather than wait on that, this run
 grades the graph lane against a **new second corpus, built in fux-lab**
-(satisfying [W-52](../../open/W-52-df-over-the-union.md)'s "plus a second
-corpus" requirement in passing), sized well past playground's 10 documents so
-the lane is tested against real background noise, not a hand-tuned toy.
+(~~satisfying [W-52](../../../archive/open/W-52-df-over-the-union.md)'s "plus a
+second corpus" requirement in passing~~ — **struck 2026-08-22, this claim was
+wrong**: see the correction below), sized well past playground's 10 documents
+so the lane is tested against real background noise, not a hand-tuned toy.
+
+> **Correction, 2026-08-22 — the W-52 claim above is false and is struck rather
+> than deleted.** `graph-acceptance` declares **one** source directory (`docs`)
+> with **no `archived=true` attribute**, and **0 of its 66 records** carry
+> `archived`. W-52 asks whether `df` computed over live-plus-archived distorts
+> live scoring; a corpus with no archived half **cannot measure that at all**,
+> so this run does nothing for W-52's second-corpus requirement, in passing or
+> otherwise. The claim was written from the fact that a second corpus now
+> existed, without checking that it had the one property W-52 needs. Checked
+> and disproved on contact; W-52's own trigger is unchanged and still unmet.
 
 - **Engine:** `github.com/arpitarya/fux` @ `fa3ba30` (origin/main). The
   working tree on the machine driving this session carries uncommitted

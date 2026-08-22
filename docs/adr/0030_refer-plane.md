@@ -379,6 +379,22 @@ the caller's window. `dropped` is reported so truncation is never silent.
    defect in a constant's scope, not in the plane's shape, and the assembler's
    two corrections (deterministic ties, the best-answer floor) were never
    implicated.
+
+   > **Output — before and after the fix, same query, same 8 000-byte budget,
+   > captured 2026-08-22 on this repo's corpus.**
+
+   ```console
+   $ fux answer "what does the extracted ingest mode promise" --json   # before
+   passages=3  bytes=3492
+
+   $ fux answer "what does the extracted ingest mode promise" --json   # after
+   passages=6  bytes=6991
+   ```
+
+   Exactly the wasted half, recovered. The unit test asserts the same shape
+   directly — under the old cap a single document could seat only **2 of a
+   possible 4** passages, which is what
+   `test_one_document_may_use_the_whole_budget` fails on if the fix is reverted.
 3. **A record gains a reproducible ingest time.** Then decision 4's premise is
    gone and an age-based mode becomes implementable — at which point it must be
    argued on merit against content verification, not adopted because the

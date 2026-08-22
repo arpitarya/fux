@@ -289,7 +289,7 @@ theirs and stays; a file three versions behind is at least **identifiable**, and
   [`src/fux/setup.py`](../../src/fux/setup.py) `run()` / `_write_if_missing` /
   `template_bytes`.
 - The measured failure it addresses — the 5/5-archived probe in
-  [W-44](../../work/open/W-44-archived-content-signalling.md).
+  [W-44](../../archive/open/W-44-archived-content-signalling.md).
 - The proposal this graduated from, with the research —
   [`archive/proposals/consumer-intent-policy.md`](../../archive/proposals/consumer-intent-policy.md)
   and the drafts in

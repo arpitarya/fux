@@ -121,7 +121,7 @@ The measurement that opened it, from the committed index on 2026-08-19: **34 of
 archived documents; **3 174 of 7 533 live terms (42.1%)** carry a `df` inflated
 by them. (What those numbers imply for ranking is
 [ADR-ARCHIVED-CONTENT](0037_archived-content.md)'s decision 4 and
-[W-52](../../work/open/W-52-df-over-the-union.md) — not decided here.)
+[W-52](../../archive/open/W-52-df-over-the-union.md) — not decided here.)
 
 ### Decision
 

@@ -1,12 +1,35 @@
 # W-62 — measure against the outside world
 
+> ## WITHDRAWN 2026-08-22 — Arpit's call, and he owns it
+>
+> **Verbatim:** *"Part one and part two, the whole w sixty two, remove it,
+> cancel it out. That's on me. I'll own it."*
+>
+> **Part 3 (the public README) was completed** earlier the same day and is not
+> withdrawn — see its checked box below.
+>
+> **Parts 1 and 2 are cancelled, not deferred and not failed.** The three-way
+> comparison needed a Confluence-shaped export corpus that does not exist and
+> cannot be synthesised without defeating its own purpose; the cold-start half
+> needed five external people. Both are Arpit's personally from this date, and
+> **no agent should re-file them** as a queue item.
+>
+> **What this does NOT do.** It does not answer the question. The wedge —
+> whether Fux wins on private, off-disk organisational documents — remains
+> **untested**, and this item's own Hazard section said an item left open
+> forever is itself information. Withdrawing it changes who holds that
+> question, not whether it is open. **The id is retired and not reused.**
+
 **Status:** OPEN · **Filed:** 2026-08-21 — moved from PRIORITY.md's P8 row
 into the standing queue when PRIORITY.md (the P1–P8 ranked list, 2026-08-20)
 was archived, its ordering role fully absorbed and its every row either DONE
 or, for this one, carried forward as a normal `OPEN-WORK.md` item.
-**Blocked by:** nothing structurally, but every measured half needs
-`fux-lab` set up with a real, Confluence-shaped export corpus — that setup
-work has not started.
+**Blocked by:** nothing structurally. **The README half is DONE (2026-08-22).**
+What remains is blocked on two things no agent can supply from here: a real,
+**Confluence-shaped export corpus** in `fux-lab` (not started, and it cannot be
+synthesised — the whole point is that it is not our own fixtures), and **five
+external humans** who will install Fux and report their first failure.
+**Picking the commercial baseline is also still open** and is part of the item.
 **Closes with:** a filed [`work/regression/`](../regression/README.md) run
 carrying the three-way numbers (Fux BM25F vs `rg` vs one commercial
 baseline); five named first-failure reports; the public README on GitHub
@@ -52,9 +75,19 @@ five minutes with the project, before asking anyone to try it.
 
 ## Definition of done
 
-- [ ] The public README fixed first — confirmed `origin/main` matches this
-      repo's `main`, and what GitHub renders read back and checked, not
-      assumed from the source file.
+- [x] The public README fixed first — **done 2026-08-22.** `git ls-remote`
+      puts `refs/heads/main` at `fa3ba30`, matching this tree, so the
+      *"17 commits behind"* condition at filing no longer holds and origin is
+      current. The raw README served at `main` was read back and matches this
+      tree. **What was stale was the content, not the push:** the status line
+      claimed *"M2 shipped"* on a repo that has since shipped M3, M4 and M5
+      across five releases, and the graph lane was labelled *unreleased* when
+      it went out in `0.34.0`. Both fixed on contact, with a DOC-REGISTRY bump.
+      ⚠ **Recorded for whoever checks this next:** the rendered GitHub HTML
+      page fetched at the same moment reported **v0.25.x and 134 commits** — a
+      cached rendering, contradicted by `ls-remote` and by the raw file. A
+      future check that reads only the HTML page will see it too and must not
+      conclude the push is missing.
 - [ ] A pre-registration for the three-way comparison, written and
       committed before any number exists — metric definitions (task
       success, tokens), the judged corpus (50 questions, Confluence-shaped

@@ -17,26 +17,6 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-RANKING](../docs/adr/0012_ranking.md) · [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) — **parked**
-
-*W-52 is gated on a pre-registered instrument **plus a second corpus**. The
-instrument now exists — [`tools/archived-signal-eval/`](../tools/archived-signal-eval/PRE-REGISTRATION.md),
-frozen and run 2026-08-22 ([W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md)) —
-so **half of W-52's trigger is met and the other half is not.** Still parked
-with a trigger, not scheduled: a second corpus is a real prerequisite, because
-moving `df` or the demotion default is a ranking change and CLAUDE.md forbids
-shipping one off a single corpus.*
-
-- **W-52** · **PARKED** · `df` is computed over the union — **42% of live terms carry an inflated `df`**; **trigger: the same pre-registration, plus a second corpus** — [detail](open/W-52-df-over-the-union.md)
-
-### No record — external validation
-
-*Fux has never been measured against anything outside its own corpus or
-fixtures. Owns no `src/`/`tools/` component — this is a measurement item,
-not a build.*
-
-- **W-62** · `agent`+`arpit` · **the README-fix half is agent-startable now; the three-way measurement and the five external installs are not** · moved here from PRIORITY.md's P8 row when that file was archived, 2026-08-21 — 50 real org-doc questions (Fux BM25F vs `rg` vs one commercial baseline, metric = agent task success and tokens, not p95) plus five external users' first-failure reports. **Why it matters**: 0 stars, a download pattern that looks like mirrors, and an industry converged on grep for local code — the wedge (private, off-disk enterprise docs) has never been tested against real docs or a real stranger's first fifteen minutes — [detail](open/W-62-measure-against-the-outside-world.md)
-
 ---
 
 # The rules

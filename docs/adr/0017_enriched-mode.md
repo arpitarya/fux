@@ -214,7 +214,7 @@ Recorded so M8 designs against a list rather than a mood. **None is approved.**
 |---|---|---|
 | **semantic term expansion** | KL selection and YAKE-class phrases see only literal page vocabulary — a query for "OOM" never reaches a doc that says "memory exhaustion" | dilutes `df`; needs a graded, separable term set or it contaminates the statistics every document is scored against |
 | **inferred edges** | links two documents mean to have but never wrote — "this design implements that decision", with no hyperlink | must carry `INFERRED`; a wrong edge is worse than a missing one because it is invisible |
-| **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one — this is [W-44](../../work/open/W-44-archived-content-signalling.md) open right now | if it reorders rather than annotates, it violates the ruling W-44 already reached |
+| **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one — this is [W-44](../../archive/open/W-44-archived-content-signalling.md) open right now | if it reorders rather than annotates, it violates the ruling W-44 already reached |
 | **richer embeddings** | the bundled distilled model is 256-dim, stdlib, deliberately small | **L1 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime. Note the existing dense lane is already measured and **ships default-off** (net −6) |
 
 ### Consequences

@@ -4,7 +4,9 @@
 small git-carried index, fetch content from the systems that own it, verify
 at answer time.**
 
-> **Status (2026-08-19): M2 shipped — the accelerator is in.** From any repo:
+> **Status (2026-08-22): `fux-engine` 0.37.0 on PyPI — M2 through M5 shipped.**
+> The accelerator (M2), the graph lane (M3), the refer plane (M4) and the
+> maintenance hooks (M5) are all in. From any repo:
 > ```bash
 > fux setup                # writes the files you own, write-if-missing
 > fux ingest               # builds the committed .fux/index/*.jsonl (+ the accelerator)
@@ -52,12 +54,21 @@ at answer time.**
 > line picks its own fetcher; nothing escalates automatically
 > ([ADR-URL-LIST](docs/adr/0018_url-list.md) ·
 > [ADR-FETCHER](docs/adr/0019_fetcher.md)).
-> **The graph lane has landed (M3, unreleased)** — `explain`/`graph`/`path`,
+> **The graph lane has landed (M3, released in `0.34.0`)** — `explain`/`graph`/`path`,
 > unseeded label-propagation communities, a lazy PPR walk
-> ([ADR-GRAPH](docs/adr/0029_graph.md)) — with two named gaps still open: its
-> playground acceptance targets are unmeasured and determinism is verified on
-> one machine, not two ([W-57](work/open/W-57-graph-lane-acceptance.md)). The
-> v0.26 engine and its docs are archived under
+> ([ADR-GRAPH](docs/adr/0029_graph.md)). **Both acceptance gaps are closed**
+> (2026-08-22): 24/24 on a graded 66-document corpus, and the derived
+> `graph.json` hashes identically across two independent architectures
+> ([the run](work/regression/2026-08-22-graph-acceptance/report.md)).
+>
+> **Archived content says so, and the ranking does not move.** A source
+> declared `archived=true` carries `archived: true` on every verb, an
+> `[archived]` marker in `ask`'s text, and a stderr disclaimer — while
+> results stay byte-identical unless `[ranking] archived_weight` is set
+> below its `1.0` default
+> ([ADR-ARCHIVED-CONTENT](docs/adr/0037_archived-content.md)).
+>
+> The v0.26 engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
 > is specified in
 > [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md)

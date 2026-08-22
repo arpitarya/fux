@@ -182,7 +182,7 @@ its source.
   21 records disappear on the next ingest and `df` moves for every surviving
   document. **It is therefore also a ranking change**, and this record does
   **not** claim it is an improvement: nothing has been measured.
-  [W-52](../../work/open/W-52-df-over-the-union.md)'s pre-registration
+  [W-52](../../archive/open/W-52-df-over-the-union.md)'s pre-registration
   discipline applies, and the two `df` changes should be measured in one run.
   **This repo's committed index was deliberately not re-ingested** in the
   change that landed the mechanism, so the corpus change is a separate,

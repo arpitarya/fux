@@ -119,6 +119,38 @@ xychart-beta
 
 ## §2 — For agents
 
+> ## Worked output — *optional in every section below*
+>
+> **Any section in §2 may carry a `**Output —**` block showing what the thing
+> actually prints.** It is optional everywhere and mandatory nowhere; add one
+> wherever it would settle a question faster than prose does, and leave it out
+> where it would be decoration.
+>
+> **Three rules, and the first is not negotiable:**
+>
+> 1. **Real, captured, never invented.** Paste what a command printed. If you
+>    have not run it, you do not have an output block — write the sentence
+>    instead. An invented transcript is worse than no transcript, because a
+>    reader cannot tell the difference and will act on it.
+> 2. **Trim, never edit.** Cut irrelevant lines and say you cut them
+>    (`… 12 lines omitted …`). Never retype a value, reorder results, or tidy a
+>    number. A transcript that has been improved is a fabrication with extra
+>    steps.
+> 3. **Say where it came from** when it is not obvious — the command, and the
+>    corpus or commit it ran against. Output without provenance ages into a
+>    claim nobody can check.
+>
+> **What earns a block, section by section:**
+>
+> | section | the output worth showing |
+> |---|---|
+> | **Context** | the failure as it actually appears — the wrong answer, the crash, the surprising ranking. The reason the record exists, in the reader's own terminal |
+> | **Decision** | **before and after**, same command, same corpus. This is the highest-value block in the record and the one most worth the effort |
+> | **Consequences** | what got better or worse, shown rather than asserted — especially a cost, which prose tends to soften |
+> | **Alternatives considered** | **the output of the option that lost.** The sharpest block in the whole template: a rejected design that visibly fails is an argument nobody has to re-litigate. A prototype's output counts, and should say it was a prototype |
+> | **Reference** | rarely. A reference is a pointer; if it needs a transcript, that transcript probably belongs in a regression run |
+> | **Veto condition** | **the check's output today, showing it has not fired.** A reader who has never seen the check pass cannot tell a passing check from a broken one |
+
 ### Context
 
 What forces are at play? What problem does this feature solve? Why now?
@@ -127,16 +159,36 @@ What forces are at play? What problem does this feature solve? Why now?
 
 The decision, stated plainly. Present tense, imperative where it binds.
 
+> **Output — *optional, and this is the one to reach for first*.** Before and
+> after, same command, same corpus. A record whose decision changed observable
+> behaviour and shows no before/after is making the reader take it on trust.
+
+```console
+$ <command>              # before
+<output, verbatim>
+
+$ <command>              # after
+<output, verbatim>
+```
+
 ### Consequences
 
 What becomes easier, what becomes harder, what we now owe. Name the debt and
 file it in [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md) if it is real.
+
+> **Output — *optional*.** Show a cost rather than describing it; prose softens
+> costs and a transcript does not.
 
 ### Alternatives considered
 
 What else was on the table, and why each lost. One line per option minimum; if
 the fork was genuine, link its
 [`work/compare/`](../../work/compare/README.md) doc rather than re-arguing it.
+
+> **Output — *optional, and undervalued*.** If a rejected option was ever built
+> far enough to run, **paste what it printed**. A losing design that visibly
+> fails ends the argument; a paragraph explaining why it would fail invites it
+> back. Label a throwaway as a prototype and say it was not committed.
 
 ### Reference (required)
 
@@ -160,3 +212,13 @@ reference is incomplete.
 **Reopen this decision if:** <the checkable condition>
 
 **How to check it:** `<command or the exact place to look>`
+
+> **Output — *optional, and strongly encouraged here*.** Paste what the check
+> prints **today**, with the date. A reader who has never seen it pass cannot
+> distinguish a check that is not firing from a check that is broken — which is
+> the failure mode this repo has already paid for more than once.
+
+```console
+$ <the check command>
+<output, verbatim>          # <date> — not fired
+```

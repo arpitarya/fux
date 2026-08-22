@@ -247,7 +247,7 @@ the boundary, rendered by the CLI, exit 1.
   nothing here stops a session from setting it to something other than `1.0`,
   but [ADR-ARCHIVED-CONTENT](0037_archived-content.md)'s veto condition still fires if that
   ships without the pre-registered query set and second corpus
-  ([W-52](../../work/open/W-52-df-over-the-union.md)).
+  ([W-52](../../archive/open/W-52-df-over-the-union.md)).
 
 ### Alternatives considered
 

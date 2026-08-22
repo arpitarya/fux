@@ -238,11 +238,30 @@ true`; text output prefixes the title with `[archived]`. `find` and `ask`
 show the same marker, because [ADR-FIND](0005_find.md) makes `find` a
 projection of `ask` rather than a second strategy.
 
-**4. `df` stays out of scope, deliberately.** Computing it over non-archived
-documents only is a ranking change across 42% of live terms and belongs to
-[W-52](../../work/open/W-52-df-over-the-union.md), behind a pre-registration.
-**This record is honest about being partial**: it fixes what a reader is
-told, not what the scorer computes.
+**4. `df` is computed over the union, and that is now a decision rather than a
+deferral.** It was scoped out here and handed to
+[W-52](../../archive/open/W-52-df-over-the-union.md), which **Arpit decided on
+2026-08-22: option A + D — leave `df` alone, and treat currency as a
+ranking-time concern served by decision 6's `archived_weight`.**
+
+> **Why it is not a defect.** Lucene keeps *deleted* documents in term
+> statistics until segment merge and calls the impact minor unless the excluded
+> population's statistics are **divergent**. Measured on this corpus, the
+> Jensen-Shannon divergence between the live and archived `df` shapes is
+> **0.1514** on a 0–1 scale — the condition does not fire. Elasticsearch ships
+> global-statistics merging as a discouraged opt-in and tells small corpora to
+> use one statistical universe. Temporal IR puts recency at re-ranking time.
+> Full argument and references:
+> [`work/compare/df-over-the-union.compare.md`](../../work/compare/df-over-the-union.compare.md).
+
+**The distinction this record now rests on:** a demotion weight states a
+currency judgment openly; changing `df` would perform the same reordering while
+disguising it as arithmetic about rarity. **Both move rankings — only one
+explains itself.**
+
+**Still true: this record fixes what a reader is told, not what the scorer
+computes.** What changed is that the scorer's behaviour is now *ratified* rather
+than *pending*.
 
 **5. The signal waits for its instrument; the file does not.** Amended
 2026-08-19 (Arpit), because what became this record and what stayed
@@ -253,7 +272,7 @@ told, not what the scorer computes.
 | the file, the grammar, the declaration | [ADR-DIR-LIST](0022_dir-list.md) decisions 1-4, 9 | **built** — `.fux/sources/dirs` is read, `archived=` is parsed and validated |
 | the **signal** — a record property, and a marker in every verb | this record's decisions 1, 3 | **BUILT 2026-08-22.** The gate was met the way it was written — the query set was frozen first ([`tools/archived-signal-eval/`](../../tools/archived-signal-eval/PRE-REGISTRATION.md), 45 queries, three slices) — **and then lifted by Arpit's direct instruction** in the same session. Either alone would have sufficed; both happened, in that order |
 | the **disclaimer** — a response-level note when any archived document is returned | this record's decision 7 | **BUILT 2026-08-22.** *"The gate is lifted for W-44 - Arpit order."* The call this row said was his to make, made. It ships on **stderr only**, so stdout stays byte-identical and `find` stays pipeable — the shape ADR-CLI's staleness declaration already set |
-| the **demotion weight** — a configurable multiplier | this record's decision 6 | **ungated at the default**, because `1.0` reorders nothing and this record's veto still guards it. **Moving the default is a ranking change** and stays behind [W-52](../../work/open/W-52-df-over-the-union.md)'s pre-registration *plus a second corpus* |
+| the **demotion weight** — a configurable multiplier | this record's decision 6 | **ungated at the default**, because `1.0` reorders nothing and this record's veto still guards it. **Moving the default is a ranking change** and stays behind [W-52](../../archive/open/W-52-df-over-the-union.md)'s pre-registration *plus a second corpus* |
 
 The split is safe in exactly one direction. Parsing a declaration nothing
 reads changes no committed byte and no score, so it cannot be wrong;
@@ -270,7 +289,7 @@ Ruled by Arpit, 2026-08-22, reversing the "never reorder" half of decision 2.
   rule is not engaged. **What ships is the capability, not the change.**
 - **Moving that default IS a ranking change** and is gated — on the
   pre-registered query set *and* a second corpus, per
-  [W-52](../../work/open/W-52-df-over-the-union.md)'s trigger. No session may
+  [W-52](../../archive/open/W-52-df-over-the-union.md)'s trigger. No session may
   move it because a number looked good on this repo.
 - **It keys off the declaration, never a path.**
   [ADR-DIR-LIST](0022_dir-list.md) decision 4 stands:
@@ -288,7 +307,7 @@ Ruled by Arpit, 2026-08-22, reversing the "never reorder" half of decision 2.
   that is acceptable: the behaviour announces itself at the point of use.
 - **This is not `df`.** A score multiplier on a finished score is a
   different mechanism from computing `df` over a different population —
-  decision 4 stands and [W-52](../../work/open/W-52-df-over-the-union.md) is
+  decision 4 stands and [W-52](../../archive/open/W-52-df-over-the-union.md) is
   untouched by this.
 
 **7. When any archived document is returned, the response carries a
@@ -403,9 +422,59 @@ disclaimer.** Ruled by Arpit, 2026-08-22.
 | option | why not |
 |---|---|
 | Down-rank archived documents by default | Rejected under decision 2 as originally written, and it is the ruling the v0.26 line already reached for this failure mode — *annotate, never reorder*. A rank change needs the measurement W-52 is gated on. |
-| Filter archived results out by default | Rejected: it makes the historical question unanswerable, which is the reason the set is indexed at all, and trades a visible wrong answer for an invisible missing one. |
+| Filter archived results out by default | Rejected: it makes the historical question unanswerable, which is the reason the set is indexed at all, and trades a visible wrong answer for an invisible missing one. **Re-proposed by Arpit 2026-08-22 and set aside after seeing it run** — see the output below. |
 | Two attributes, `archived` and `retired`, for different flavours of not-current | Rejected: one word, one meaning. L6 discipline. |
 | Carry the split inside ADR-DIR-LIST forever, as one record with two moods | Rejected 2026-08-22, Arpit's call: the document had grown two audiences (a reader standing up the source-list file; a reader asking what a marked document does) and one citation vocabulary for both was already producing exactly the kind of ambiguity CLAUDE.md's cite-by-name rule exists to prevent. |
+
+> **Output — the rejected option, prototyped 2026-08-22.** Arpit proposed
+> excluding archived documents by default behind a flag. A throwaway prototype
+> was built to see it rather than argue it; **it was never committed**. Two
+> results ended the discussion faster than the paragraph above had.
+>
+> **First: filtering after ranking returns nothing at all.** For a question
+> about the *current* CLI, all five top results are archived, so excluding them
+> leaves an empty answer:
+
+```console
+$ FUX_PROTO_E=1 fux ask "what commands does the fux command line have" --top 5
+                                            # stdout: empty
+note: 5 archived result(s) hidden - pass --archived to include them.
+```
+
+> That is a design constraint, not a bug in the prototype: **exclusion cannot be
+> a display filter.** It has to drop candidates inside `rank()` *before*
+> truncation, or `--top 5` silently means "however many of the top 5 happened to
+> be live". Done correctly it surfaces the right answer — `ADR-CLI`, which sits
+> at **rank 8** under the shipped behaviour and is otherwise never seen:
+
+```console
+$ fux ask "what commands does the fux command line have" --top 8   # shipped behaviour
+1. 8.1544 [ARCH] archive/v0.26-docs/example/SKILLS.md
+2. 7.5620 [ARCH] archive/v0.1/docs/scrape-howto-cli-handoff.md
+   … 5 lines omitted, all archived …
+8. 6.4341 [live] docs/adr/0002_cli-surface.md          <-- the actual answer
+```
+
+> **Second, and why it was still set aside: the same mechanism destroys the
+> historical question.** For *"what was the per-file ingest cache"* the correct
+> answer is archived, and exclusion replaces it with live documents that do not
+> answer it:
+
+```console
+$ fux ask "what was the per file ingest cache" --top 5        # excluded-by-default
+1. 4.5537 [live] docs/adr/0037_archived-content.md
+2. 4.5423 [live] work/regression/2026-08-18-ingest-and-index/report.md
+   … 3 more live results, none of which answer the question …
+note: 25 archived hidden - the actual answer is among them
+```
+
+> Measured across the frozen instrument, that is **14 of 15 historical
+> questions** losing their answer
+> ([W44-SIGNAL](../../work/regression/2026-08-22-archived-signal/VERDICT.md)).
+> The original rejection said this option *"trades a visible wrong answer for an
+> invisible missing one"* — the prototype's `note:` line would have fixed the
+> *invisible* half. **It does not fix the missing half**, and that is what
+> settled it.
 
 ### Reference (required)
 
@@ -421,9 +490,9 @@ disclaimer.** Ruled by Arpit, 2026-08-22.
 - [ADR-REFER](0030_refer-plane.md) — the `current`/`stale`/`unverified`
   precedent for stating a fact and refusing to interpret it, behind
   decision 7.
-- [W-44](../../work/open/W-44-archived-content-signalling.md) — the open
+- [W-44](../../archive/open/W-44-archived-content-signalling.md) — the open
   item that owns building the gated half (decisions 1, 3, 7).
-- [W-52](../../work/open/W-52-df-over-the-union.md) — the gate on moving the
+- [W-52](../../archive/open/W-52-df-over-the-union.md) — the gate on moving the
   demotion default or computing `df` over the live population only.
 - [`archive/proposals/consumer-intent-policy.md`](../../archive/proposals/consumer-intent-policy.md)
   — named, never cited as grounding (archive is not evidence): the rejected
@@ -457,4 +526,21 @@ diff /tmp/a.json <(fux ask "<same query>" --top 5 --json)
 # 3. the weight lives only in fux.toml
 grep -rn "archived_weight" src/fux/ --include=*.py
 # expect: read only in config.py and consumed only in query/rank.py
+```
+
+> **Output — run 2026-08-22 against this repo's own corpus (409 documents, 253
+> archived). Not fired.**
+
+```console
+$ fux find "ingest cache" --json | python3 -c "...archived is None..."
+[]                                        # 1 - nothing returned unmarked
+
+$ diff /tmp/a.json <(fux ask "what is the ingest cache" --top 5 --json)
+                                          # 2 - empty; byte-identical at the default
+
+$ grep -rn "archived_weight" src/fux/ --include=*.py
+src/fux/config.py: ...          # read here
+src/fux/query/__init__.py: ...  # passed through
+src/fux/query/rank.py: ...      # consumed here
+                                          # 3 - three files, no fourth reader
 ```

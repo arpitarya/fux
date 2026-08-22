@@ -140,7 +140,7 @@ are the named acceptance targets for this lane precisely because they are the
 phenomena no amount of term statistics can answer. (The original named query
 ids — `q005`, `q009`, `q011`, `q015` — were in a golden set later lost; the
 targets are now these three phenomena, re-scoped 2026-08-20; see
-[W-57](../../work/open/W-57-graph-lane-acceptance.md).)
+[W-57](../../archive/open/W-57-graph-lane-acceptance.md).)
 
 ### Decision
 
@@ -350,8 +350,23 @@ fallback.
    for.** It was written to catch set-iteration order and unseeded randomness,
    which two runs on one machine cannot see; a matching hash across x86-64 and
    arm64 also rules out float-width and byte-order dependence in the label
-   propagation. **Repro:** `cd fux-lab/graph-acceptance && ./setup.sh &&
-   shasum -a 256 .fux/runtime/graph.json`.
+   propagation.
+
+   > **Output — both machines, 2026-08-22. Not fired.**
+
+   ```console
+   # x86-64 Linux, cloud sandbox
+   $ ./setup.sh && shasum -a 256 .fux/runtime/graph.json
+   3ede58638eca67857fd9919e21632c8ce0964b3c6ce273de73d11daf1ca30a53
+
+   # arm64 macOS, Arpit's own machine - independent run, corpus regenerated
+   $ ./setup.sh && shasum -a 256 .fux/runtime/graph.json
+   ingested 66 docs (66 changed, 0 carried forward), 0 skipped, 59 shards written
+   accelerator rebuilt from the committed index: 66 docs, 433 terms, 3696 postings
+   3ede58638eca67857fd9919e21632c8ce0964b3c6ce273de73d11daf1ca30a53
+   ```
+
+   **Repro:** `cd fux-lab/graph-acceptance && ./setup.sh && shasum -a 256 .fux/runtime/graph.json`.
 2. **A corpus exists where `fux graph` ranks a node farther from the seed above
    a nearer one.** That is the defect laziness was added to remove; its return
    means three iterations is too few for real structure, and `ITERATIONS`
@@ -359,7 +374,7 @@ fallback.
 3. **The playground's three re-scoped acceptance phenomena** (supersession,
    near-duplication, staleness≠wrongness — the original `q005`/`q009`/`q011`/
    `q015` ids were lost with the old golden set; see
-   [W-57](../../work/open/W-57-graph-lane-acceptance.md)) **do not improve**
+   [W-57](../../archive/open/W-57-graph-lane-acceptance.md)) **do not improve**
    once W-57 measures them. The lane's whole argument is that these are
    phenomena term statistics cannot answer; if the graph cannot answer them
    either, the lane needs a different shape, not a bigger `EXPAND_LIMIT`.
@@ -389,5 +404,5 @@ fux build && shasum -a 256 .fux/runtime/graph.json
 uv run pytest -q tests/graph/test_walk.py
 
 # 3 — the re-scoped targets (W-57, not yet run; the goldens need a human —
-#     see work/open/W-57-graph-lane-acceptance.md)
+#     see archive/open/W-57-graph-lane-acceptance.md)
 ```
