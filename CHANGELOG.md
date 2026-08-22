@@ -8,6 +8,38 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-08-22
+
+**The first major release of the v0.30 index-and-refer rebuild.** M2 through
+M5 are shipped: the derived accelerator (`ask --fast`, byte-identical to the
+reference scan under the differential law), the graph lane (`explain` /
+`graph` / `path`, unseeded communities, lazy PPR — both acceptance gaps
+closed 2026-08-22), the refer plane (`answer` fetches, verifies and re-scores
+cited documents live), and the maintenance hooks (post-commit/post-merge
+re-ingest, a conflict-refusing merge driver for `.fux/index/*.jsonl`).
+Archived content is signalled without moving the ranking; the corpus is
+maintained with `fux add` / `remove` / `update` over directories, single
+documents and URLs alike.
+
+No `src/` behaviour changed in this release beyond the version string — it
+marks the milestone `v0.37.1` already reached, not new code.
+
+### Added
+
+- Every ADR gains a `References` bibliography, generated from the citations
+  already in its own body — 465 links, nothing invented.
+- Two research proposals on ranking/pruning tuning, filed but not built:
+  a committed `.fux/tune.toml` and per-source query-time priority.
+
+### Known limitation
+
+- **[W-73](https://github.com/arpitarya/fux/blob/main/work/open/W-73-weighted-scores-vs-pruning-bound.md):**
+  the accelerator's differential law — `ask --fast` and `ask --scan` return
+  identical results — holds only at the `archived_weight` default (`1.0`).
+  The pruning bound is computed unweighted; a configured weight can make the
+  two paths disagree. Default behaviour is unaffected; tracked openly rather
+  than fixed silently before this release.
+
 ## [0.37.1] - 2026-08-22
 
 ### Changed
