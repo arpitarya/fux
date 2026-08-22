@@ -8,6 +8,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [0.36.0] - 2026-08-22
+
+**Committing stops waiting for a re-index, and fux now ships the policy its
+readers need to read it correctly.**
+
+The headline is a latency change you will feel on every commit in a large
+repository, and a scaffolding change you should read before upgrading: `fux
+setup` writes outside `.fux/` for the first time, into directories GitHub, AWS
+and Anthropic own. It announces every one of them and both ways to turn them
+off.
+
+[ADR-MAINTENANCE](docs/adr/0032_hooks.md) 1a–1d ·
+[ADR-AGENT-POLICY](docs/adr/0035_agent-policy.md) ·
+[ADR-DIR-LIST](docs/adr/0022_dir-list.md) 11. Measured evidence:
+[R6 re-run](work/regression/2026-08-22-r6-rerun/VERDICT.md) (PASS) ·
+[R9](work/regression/2026-08-22-r9-t2-at-10k/VERDICT.md) (PASS).
+
 ### Added
 
 - **`fux setup` now installs agent policy — and writes outside `.fux/` for the

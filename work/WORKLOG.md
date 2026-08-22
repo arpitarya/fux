@@ -30,6 +30,36 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-22 — two setup handoffs filed: playground redefined, lab tiered  ·  Cowork
+
+- **Asked:** document (not implement) two setups: `fux-playground` becoming a
+  personal try-it-out sandbox with no testing/goldens; a sibling repo of five
+  document-count tiers, each its own independent git repo with its own fux
+  setup, for agent-driven testing/benchmarking.
+- **Did:** filed **W-70** (retire `fux-playground`'s graded/goldens contract)
+  and **W-71** (`fux-lab` restructured into five independent per-tier repos:
+  10, 100, 1000, 5000, 10000 docs), both under `work/open/`, both explicitly
+  **planning only — nothing executed, no repo touched**. Added both to
+  `OPEN-WORK.md` under a new group keyed to the Setup docs they'll update
+  ([SETUP-PLAYGROUND](setup/fux-playground.md) /
+  [SETUP-LAB](setup/fux-lab.md)), since neither is ADR-owned. Two clarifying
+  questions asked and answered in-session: the tier list (confirmed
+  10/100/1000/5000/10000, not the garbled six-item list as first stated), and
+  whether the playground change redefines `fux-playground` itself vs. spinning
+  up a separate repo (confirmed: redefine it).
+- **Decided / open:** the reversal of `fux-playground`'s grading contract is
+  confirmed by Arpit, but **where the graded phenomena (supersession,
+  near-duplication, staleness) go, if anywhere, once the playground stops
+  grading them is NOT decided** — W-57 and W-59 currently point at that
+  corpus and both handoffs flag this explicitly as a hazard, not a detail to
+  improvise at execution time. For W-71: `shared/` tooling's reuse strategy
+  across five independent repos, and whether the outer directory needs its
+  own protection against a repeat of the 2026-08-20 loss, are both open and
+  named as Arpit's calls in the detail file.
+- **Next:** Arpit reviews both handoffs (`open/W-70-*.md`, `open/W-71-*.md`);
+  neither should be executed until the open questions inside each are
+  resolved, especially W-70's re-homing question for W-57/W-59.
+
 ## 2026-08-22 — proposals, compare and open swept; four stale statuses found  ·  Cowork
 
 - **Asked:** what is `proposals/consumer-policy/` for, is there an open item,
