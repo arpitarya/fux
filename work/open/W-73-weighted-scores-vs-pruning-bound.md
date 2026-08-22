@@ -81,9 +81,14 @@ computed on the weighted scores*. Neither holds today.
 
 Ranked in [the proposal](../proposals/tune-file-and-source-priority.md) §6.3.
 The cheap fallback is **demotion-only by contract** — validate `w ∈ (0, 1]` at
-load, which is provably safe with **no accelerator change at all**. It costs
-expressiveness: *"prefer `docs/`"* has to be written as *"demote the other
-nine"*.
+load. ⚠ **It is cheaper, not free**: it removes the need to scale the ceiling,
+but the weighted `theta` is still required, because demoting the current top-k
+lowers the real threshold. And promotion and demotion are the **same ranking**
+(`docs/=1.5, rest=1.0` ≡ `docs/=1.0, rest=0.667`), so demotion-only buys no
+pruning headroom either — what costs pruning is the **spread**, not the
+direction. What it does cost is that *"prefer `docs/`"* must be written as
+*"demote the other nine"*, and every source added later arrives at **maximum
+priority** by default. See the proposal's §6.4.
 
 ## Hazards
 

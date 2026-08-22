@@ -418,6 +418,54 @@ essentially never generate.
 
 ---
 
+### §6.4 — Up vs down is not the fork it looks like
+
+**Added 2026-08-22, after working the arithmetic.** An earlier draft of this
+file said demotion-only needs *"no accelerator change at all"*. **That is
+wrong, and the correction sharpens the fork.**
+
+**Two facts, both provable in one line each.**
+
+**1. Demotion-only still needs the weighted `theta`.** With `w ≤ 1`, domination
+survives (`w·S ≤ S ≤ UB`), so the *ceiling* needs no scaling. But `theta` is
+the k-th best **weighted** score, and demoting the current top-k **lowers** it.
+An unweighted `theta` is therefore too high, and skips blocks it may not skip.
+Demotion-only is **one** of the two fixes, not neither.
+
+**2. Promotion and demotion are the same ranking.** Dividing every weight by
+the largest one is order-preserving:
+
+```
+docs/ = 1.5, everything else = 1.0        ≡        docs/ = 1.0, everything else = 0.667
+```
+
+Both produce the identical order; every score in the second is the first's
+divided by 1.5. And the skip test is algebraically identical too —
+`ceiling × w_max < theta` is the same inequality as `ceiling < theta / w_max`.
+**Normalising at load and scaling the bound are the same arithmetic with the
+constant in a different place.**
+
+**What actually costs pruning is the SPREAD** — largest weight ÷ smallest —
+not the direction. `0.1 … 1.0` is a spread of 10 and is "demotion only".
+`1.0 … 1.5` is a spread of 1.5 and is "promotion". The second is the cheaper
+one.
+
+**So the real fork is ergonomic, not mathematical:**
+
+| | write it forwards | write it backwards |
+|---|---|---|
+| to prefer one of ten sources | one line — `docs/ = 1.5` | nine lines demoting the rest |
+| a source added next month | arrives at `1.0`, **below** the preferred one | arrives at `1.0`, **above** everything you demoted — it silently becomes top priority |
+| accelerator work | weighted `theta` + `ceiling × w_max` | weighted `theta` |
+| displayed scores | unchanged in scale | unchanged in scale |
+
+**The second row is the one that decides it.** Under demotion-only the default
+is maximum priority, so the file rots every time the corpus grows — and it rots
+*silently*, in the direction of preferring whatever was added most recently.
+
+**Revised recommendation:** allow weights above `1.0` in the file, and take
+both accelerator changes. The extra one is a single multiply.
+
 ## §7 — Forks, with proposed verdicts
 
 | # | fork | proposed | needs |
@@ -430,7 +478,7 @@ essentially never generate.
 | 6 | priority: config table or source-line attribute | **config table** (§3.3) | ADR-URL-LIST, ADR-DIR-LIST |
 | 7 | multiplicative or additive-saturating | **multiplicative v1**, saturating named as the graduation path | ADR-RANKING |
 | 8 | overlap resolution | **longest match wins** (§3.4) | ADR-RANKING |
-| 9 | may a weight exceed 1.0? | **yes, once W-73 is fixed**; band + `doctor` warning outside it | ADR-RANKING, ADR-T1-ACCELERATOR |
+| 9 | may a weight exceed 1.0? | **yes** — see §6.4: demotion-only does not avoid the fix, and it makes every newly added source top priority by default. Band + `doctor` warning outside it | ADR-RANKING, ADR-T1-ACCELERATOR |
 | 10 | does `--hybrid` apply it twice? | **no** — lexical lane only | ADR-RANKING |
 
 Fork 9 is the one that must be answered **first**, because forks 6–8 are
@@ -465,9 +513,10 @@ unbuildable while it is open.
 **This graduates when Arpit rules on fork 9** — whether a source weight may
 exceed `1.0`.
 
-Everything else follows from it. A yes makes W-73 a prerequisite and the
-accelerator's bound the first change; a no makes the whole feature a
-load-time validation and a multiply, with no accelerator work at all.
+Everything else follows from it. **A yes** takes both accelerator changes and
+gives the ergonomics he described — *"priority for just one"* is one line.
+**A no** still takes the weighted `theta` (§6.4), saves only the bound multiply,
+and accepts that every source added later arrives at maximum priority.
 
 ---
 

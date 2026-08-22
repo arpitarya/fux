@@ -30,6 +30,13 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-22 — v1.0.0 published, the first major release  ·  Claude Code
+
+- **Asked:** *"commit all the changes, and publish the first major release."* A concurrent Cowork session had left 47 files staged/unstaged: a References bibliography generated for all 37 live ADRs, two tuning proposals, and W-73 — a real defect the tuning research surfaced (the accelerator's differential law holds only at `archived_weight == 1.0`) — all explicitly left uncommitted, "Arpit's call."
+- **Did:** re-staged the working-tree-only edit to `OPEN-WORK.md` that had landed after the rest was staged (the concurrent-session hazard CLAUDE.md names), ran the full suite (1171 passed) and the ADR/doc-registry checks (205 assertions) before committing, then committed the changeset (`cdf52ca`). Before bumping to `1.0.0`, surfaced W-73 to Arpit rather than shipping a "major/stable" release silently carrying a known correctness boundary — confirmed: ship now, W-73 stays open, config-gated (default unaffected). Bumped `__init__.py` to `1.0.0`, wrote its CHANGELOG entry naming W-73 explicitly, updated the README status line, pushed (`b834c33`), watched CI green, cut `gh release create v1.0.0`, watched `publish.yml` succeed, and polled PyPI until `fux-engine` read `1.0.0`.
+- **Decided / open:** **W-73 stays open on the queue** — both the fix and fork 9 of `tune-file-and-source-priority.md` (may a source weight exceed 1.0?) are Arpit's/agent's to pick up, unchanged by this release. No `src/` behaviour changed in this release beyond the version string.
+- **Next:** none from this exchange. W-73 is the queue's one open item.
+
 ## 2026-08-22 — `--hybrid` explained, and a parked proposal for agent policy on it  ·  Cowork
 
 - **Asked:** what `--hybrid` is and how to use it (walked through ADR-CLI-SURFACE/ADR-ASK, the off-by-default net −6 evidence, the semantic-lane compare doc's failure classes); then whether the shipped agent policy (Claude skill / Copilot agent+instructions / Kiro steering, ADR-AGENT-POLICY) mentions it, and whether it should; then to write that up as a parked proposal with explicit graduation conditions.
