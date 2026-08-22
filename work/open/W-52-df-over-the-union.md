@@ -6,8 +6,8 @@ change measured on one corpus is what CLAUDE.md forbids, so one trigger is not
 enough here.
 **Blocked by:** — · **Model:** **Opus.** It is a ranking change on a corpus
 where 42% of live terms move; the analysis is the work, the code is one line.
-**Opened by:** [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md)
-decision 6
+**Opened by:** [ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md)
+decision 2
 
 ## The finding
 
@@ -30,7 +30,7 @@ the shape does not.)*
 
 ## Why it is not the same item as the annotation
 
-[ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) fixes **what a
+[ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) fixes **what a
 reader is told** and is explicitly forbidden from changing an order. This is
 **what the scorer computes**, and changing it moves rankings — on one corpus,
 which is exactly what CLAUDE.md's *never ship a ranking change off a single

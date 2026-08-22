@@ -1,0 +1,3 @@
+corpus at measurement time: 409 documents, 253 declared archived (61.9%)
+declaration source: the `archive` line in .fux/sources/dirs, archived=true
+engine: working tree on top of fa3ba30 (the W-44 marker/disclaimer build)

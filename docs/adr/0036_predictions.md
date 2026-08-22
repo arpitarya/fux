@@ -3,7 +3,7 @@ type: ADR
 name: ADR-RS
 title: "ADR-RS (0036) — the R predictions: what a frozen claim is, and the four ways one can end"
 description: "The prediction system had governed every gate in this project without a record of its own. An R is a claim frozen before measurement; its threshold may never move; its verdict is never edited; an ambiguous result goes to Arpit rather than being adjudicated by whoever ran it; and it can end in exactly four ways — PASS, FAIL, INCONCLUSIVE, RETIRED — of which FAIL is a success and RETIRED is not a failure."
-status: proposed
+status: accepted
 timestamp: 2026-08-22T00:00:00Z
 ---
 
@@ -14,10 +14,15 @@ timestamp: 2026-08-22T00:00:00Z
   [`tests/test_adr_frontmatter.py`](../../tests/test_adr_frontmatter.py) matches
   `ADR-[A-Z0-9-]+` on the Name line and would reject a lowercase letter. Same
   name, inside the convention it has to live in
-- **Status:** **proposed** — it codifies a discipline already in force and
-  changes none of it. It becomes `accepted` when the register check in veto 4
-  exists, because a record whose central claim is *"the register is complete"*
-  should not be accepted while nothing checks that
+- **Status:** **accepted** (2026-08-22) — it codifies a discipline already in
+  force and changes none of it. It was held at `proposed` until the register
+  check in veto 4 existed, because a record whose central claim is *"the
+  register is complete"* should not be accepted while nothing checks that.
+  **That check now exists** —
+  [`tests/test_prediction_register.py`](../../tests/test_prediction_register.py)
+  (W-69), 13 assertions — so the condition this record set for its own
+  acceptance is met, and it was met by building the check rather than by
+  deciding the check was unnecessary
 - **Date:** 2026-08-22
 - **Feature:** the prediction system — the R ids, their register, and the rules
   that make a frozen claim mean something
@@ -224,7 +229,16 @@ its feature's record the moment one exists.
 3. **A `VERDICT.md` is edited rather than added to**, or a `verdict:` field is
    changed to reflect a ruling instead of a re-measurement.
 4. **A filed verdict has no row in the register** — the R9 case, and the one
-   this record most wants made mechanical.
+   this record most wants made mechanical. **Built 2026-08-22** as
+   [`tests/test_prediction_register.py`](../../tests/test_prediction_register.py),
+   and this record's acceptance gate is therefore discharged.
+
+   Building it forced one refinement worth recording: the first verdict that is
+   **not an `R` prediction** (`W44-SIGNAL`, a feature gate) arrived in the same
+   session. Rather than give it an `R` number it never earned — inventing an
+   architectural prediction nobody made — `IMPLEMENTATION.md` grew a second
+   **feature-gate** table, and the check reads **both**. The completeness claim
+   is unchanged and now covers a class the R series was never meant to hold.
 5. **A prediction is registered with a threshold above the design-point
    ceiling** (CLAUDE.md §Litmus).
 6. **A session adjudicates its own ambiguous result** rather than handing it to
@@ -241,13 +255,15 @@ grep -rn "^prediction:" work/regression/*/VERDICT.md | sort | uniq -d
 git log --oneline -- 'tools/**/PRE-REGISTRATION*.md'
 # expect: one commit each, before the run that used it
 
-# 3 and 4 — the per-run contract, and the register cross-check (veto 4 is
-#           UNBUILT and is this record's acceptance gate)
+# 3 — the per-run contract
 uv run pytest -q tests/test_regression_runs.py
 
-# 4 — until that check exists, by hand:
-grep -h "^prediction:" work/regression/*/VERDICT.md | sed 's/prediction: *//' | sort -u
-# every id here must have a row in work/IMPLEMENTATION.md's prediction table
+# 4 — the register cross-check, BUILT 2026-08-22 (this record's acceptance gate)
+uv run pytest -q tests/test_prediction_register.py
+# every filed verdict's `prediction:` id must have a row in one of
+# work/IMPLEMENTATION.md's two registers. NOT the reverse: a RETIRED id (R7, R8)
+# has no verdict and must pass, and there is a test asserting that direction so
+# it cannot be silently inverted.
 
 # 5 — no live threshold names a size above the ceiling
 grep -rn "100 000\|50 000" tools/*/PRE-REGISTRATION*.md

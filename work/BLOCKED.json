@@ -1,10 +1,8 @@
 {
-  "decision": "ASK",
-  "reason": "R7's budget question is DISSOLVED -- Arpit retired R7 outright on 2026-08-22 rather than re-deriving it. One question remains: W-26's paper box, and W-26 itself is now closed, so even that is a documentation scope call rather than a blocker.",
-  "questions": [
-    "W-26's paper box: is SS4's staleness in scope? The item contradicts itself \u2014 its re-scope box says SS4 is unaffected by size, its DoD says rewrite it. SS4 has no numbers; what is stale is that it describes an MST keyspace index-format.compare.md superseded. That is an architecture rewrite, not a measurement, so it was left alone."
-  ],
-  "safe_alternative": "Everything else across W-26, W-65, W-66, W-67 and W-68 is done and green (1137 tests). W-26's remaining work is this decision and nothing else \u2014 no build is waiting on it. If you would rather not decide now, the compare doc is filed with a reopen trigger and the two accepted records whose veto scripts still reference the retired 250 MB @100k budget already say it is retired with no successor, so nothing reads a false pass off them.",
+  "decision": "PROCEED",
+  "reason": "Resolved 2026-08-22 (Cowork session): Arpit ruled SS4's staleness is NOT in scope for a rewrite -- the-fux-index-paper.md SS4 stays as historical/architectural description of the superseded MST keyspace. W-26 has no remaining boxes; nothing pending.",
+  "questions": [],
+  "safe_alternative": "",
   "surfaced": true,
   "filed": "2026-08-22"
 }

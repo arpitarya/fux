@@ -110,7 +110,7 @@ def test_stale_accelerator_falls_back_rather_than_answering_wrongly(tmp_path):
 
 
 def test_archived_weight_demotes_only_when_configured(tmp_path):
-    """ADR-DIR-LIST decision 11, through the shipped CLI: byte-identical at
+    """ADR-ARCHIVED-CONTENT decision 6, through the shipped CLI: byte-identical at
     the default, and a live document overtakes an archived one once a weight
     is set — both via `fux.toml`, never a CLI flag."""
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")

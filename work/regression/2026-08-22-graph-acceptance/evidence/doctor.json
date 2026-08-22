@@ -1,0 +1,56 @@
+{
+  "checks": [
+    {
+      "detail": "3.11, fux 0.36.0",
+      "level": "error",
+      "name": "python version",
+      "ok": true
+    },
+    {
+      "detail": "/root/work/env",
+      "level": "error",
+      "name": "repo root",
+      "ok": true
+    },
+    {
+      "detail": "/root/work/env/.fux",
+      "level": "error",
+      "name": ".fux/ writable",
+      "ok": true
+    },
+    {
+      "detail": "skipped (not a git checkout)",
+      "level": "error",
+      "name": "index not gitignored",
+      "ok": true
+    },
+    {
+      "detail": "every entry is declared",
+      "level": "warn",
+      "name": ".fux/ layout declared",
+      "ok": true
+    },
+    {
+      "detail": "fresh, derived, untracked (/root/work/env/.fux/runtime)",
+      "level": "warn",
+      "name": "accelerator",
+      "ok": true
+    },
+    {
+      "detail": "idle, nothing pending",
+      "level": "warn",
+      "name": "background runner",
+      "ok": true
+    }
+  ],
+  "ok": true,
+  "runner": {
+    "last_run": null,
+    "lock": "free",
+    "lock_path": "/root/work/env/.fux/runtime/runner.lock",
+    "pending": 0,
+    "pid": null,
+    "running": false
+  },
+  "version": "0.36.0"
+}

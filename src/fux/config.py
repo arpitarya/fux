@@ -80,7 +80,7 @@ class Config:
     dirs_file: str
     shards: int
     #: `[ranking] archived_weight` — a score multiplier for documents under a
-    #: directory declared `archived=true` (ADR-DIR-LIST decision 11). `1.0` is
+    #: directory declared `archived=true` (ADR-ARCHIVED-CONTENT decision 6). `1.0` is
     #: the shipped default and a no-op: at it, scoring and order are
     #: byte-identical to a corpus with no archived declarations at all.
     #: Moving it off `1.0` is a ranking change and stays behind W-52's gate —

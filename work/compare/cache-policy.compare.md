@@ -56,3 +56,15 @@ Megiddo & Modha, FAST '03 · ARC overview (Wikipedia) · archived ADR-0011
 ## Reopen-trigger
 
 See verdict block; measured at M5.
+
+> **2026-08-22 — evaluated against R4, not fired.** R4 (2026-08-20) measured
+> ARC vs LRU on a synthetic trace. Against the pre-registered 2-pt bar, the
+> original metric did not clearly clear it, so a second metric was chosen
+> **after** seeing that number — post-hoc by definition — and showed +0.91
+> pts overall / +2.50 pts on hot requests. The trigger's own text asks for a
+> *real* Fux workload; this was synthetic. **Arpit reviewed the post-hoc
+> reasoning directly and ruled: ARC wins, ship it as-is.** This closes the
+> question against R4 specifically — it does not retire the trigger itself.
+> A future measurement on real traffic showing no advantage over LRU would
+> still reopen this record (see [ADR-CACHE](../../docs/adr/0034_cache.md)
+> veto condition 6, the owning record since 2026-08-21).

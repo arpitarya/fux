@@ -111,7 +111,7 @@ def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
         source_dirs(tmp_path, load(tmp_path).dirs_file)
 
 
-# -- ranking: the archived demotion weight (ADR-DIR-LIST decision 11) ------
+# -- ranking: the archived demotion weight (ADR-ARCHIVED-CONTENT decision 6) ------
 
 
 def test_archived_weight_defaults_to_1(tmp_path):
@@ -143,7 +143,7 @@ def test_archived_weight_rejects_a_bool(tmp_path):
         load(tmp_path)
 
 
-# -- the archived directory set (ADR-DIR-LIST decision 11's input) ---------
+# -- the archived directory set (ADR-ARCHIVED-CONTENT decision 6's input) ---------
 
 
 def test_archived_dirs_is_only_the_declared_ones(tmp_path):

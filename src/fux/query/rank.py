@@ -20,6 +20,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .. import store as store_mod
+from ..ingest.gitdir import is_archived_loc
 from .bm25f import score_record
 
 
@@ -29,6 +30,11 @@ class AskResult:
     title: str
     loc: str
     score: float
+    #: The document is retired (ADR-ARCHIVED-CONTENT decisions 1 and 3).
+    #: **Never part of the sort key** — decision 2 fixes the order as
+    #: byte-identical at the default weight, and this field is what a reader is
+    #: told, not what the scorer computes.
+    archived: bool = False
 
 
 @dataclass(frozen=True)
@@ -49,11 +55,23 @@ class Corpus:
         return self.total_wlen / self.n
 
 
-def _is_archived_loc(loc: str, archived_dirs: frozenset[str]) -> bool:
-    """`loc` falls under one of `archived_dirs` — a directory entry or an
-    exact single-file entry, mirroring how `gitdir.walk_sources` resolves an
-    entry against the filesystem."""
-    return any(loc == d or loc.startswith(f"{d}/") for d in archived_dirs)
+def _record_is_archived(record: dict, archived_dirs: frozenset[str]) -> bool:
+    """Is this document retired?
+
+    **The record property wins** (ADR-ARCHIVED-CONTENT decision 1): a record
+    states the rule it was written under, which is the whole reason the property
+    exists rather than being recomputed by every reader.
+
+    **The declaration is the fallback**, for one specific and temporary case: an
+    index committed before the property shipped carries no `archived` key, and
+    re-ingesting the world is not a precondition for the marker being correct.
+    Both inputs are *declarations* — the record's own, or the `archived=true`
+    line in `.fux/sources/dirs` — so neither path ever derives currency from a
+    path convention, which is what ADR-DIR-LIST forbids.
+    """
+    if record.get("archived"):
+        return True
+    return bool(archived_dirs) and is_archived_loc(record["loc"], archived_dirs)
 
 
 def rank(
@@ -73,16 +91,23 @@ def rank(
     are dropped rather than ranked — `ask` says "no confident matches" instead
     of listing a document it scored at zero.
 
-    `archived_weight`/`archived_dirs` are ADR-DIR-LIST decision 11's demotion:
-    a document under a declared-archived directory has its score multiplied by
-    the weight. At the shipped default (`1.0`) this is skipped outright, so a
-    corpus with no configured weight scores and orders byte-identically to one
-    with the property computed at all — decision 6's veto, held.
+    `archived_weight`/`archived_dirs` are ADR-ARCHIVED-CONTENT decision 6's demotion:
+    a document declared archived has its score multiplied by the weight. **At the
+    shipped default (`1.0`) the multiply is skipped outright**, so a corpus with
+    no configured weight scores and orders byte-identically — ADR-ARCHIVED-CONTENT
+    decision 2's veto, held, and asserted by
+    `tests/query/test_scan.py::test_the_marker_does_not_move_the_ranking`.
+
+    **Every result carries `archived` regardless of the weight** (decision 3).
+    The flag is computed for all candidates, never enters the sort key, and is
+    what the marker and the disclaimer read. Telling a reader a document is
+    retired and reordering because it is retired are two different decisions,
+    and only the second one is configurable.
     """
     if corpus.n == 0:
         return []
     avg_wlen = corpus.avg_wlen
-    demote = archived_weight != 1.0 and archived_dirs
+    demote = archived_weight != 1.0
 
     scored = []
     for record in candidates:
@@ -94,10 +119,11 @@ def rank(
             corpus.n,
             avg_wlen,
         )
-        if demote and _is_archived_loc(record["loc"], archived_dirs):
+        archived = _record_is_archived(record, archived_dirs)
+        if demote and archived:
             s *= archived_weight
         if s > 0:
-            scored.append((record, s))
+            scored.append((record, s, archived))
 
     # Deterministic tie-break on id — a score tie must never depend on the order
     # candidates were generated in, which is the one thing the two paths differ
@@ -110,6 +136,7 @@ def rank(
             title=store_mod.display_title(record),
             loc=record["loc"],
             score=s,
+            archived=archived,
         )
-        for record, s in scored[:top]
+        for record, s, archived in scored[:top]
     ]

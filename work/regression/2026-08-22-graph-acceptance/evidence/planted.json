@@ -1,0 +1,36 @@
+{
+  "near_duplicate": [
+    {
+      "current": "runbooks/gateway-rollback-current-fleet.md",
+      "legacy": "runbooks/gateway-rollback-legacy-fleet.md"
+    },
+    {
+      "current": "runbooks/auth-proxy-restart-current-fleet.md",
+      "legacy": "runbooks/auth-proxy-restart-legacy-fleet.md"
+    }
+  ],
+  "stale_not_wrong": [
+    {
+      "legacy": "guides/config-rollout-pre-migration-fleets.md",
+      "new": "guides/config-rollout-post-migration-fleets.md"
+    },
+    {
+      "legacy": "guides/index-refresh-unsharded-search.md",
+      "new": "guides/index-refresh-sharded-search.md"
+    }
+  ],
+  "supersession": [
+    {
+      "new": "adr/0201-queue-partitioning-by-tenant.md",
+      "old": "adr/0101-queue-partitioning-by-hash.md"
+    },
+    {
+      "new": "adr/0202-asynchronous-webhook-delivery-with-retry-ledger.md",
+      "old": "adr/0102-synchronous-webhook-delivery.md"
+    },
+    {
+      "new": "adr/0203-multi-region-billing-ledger-with-reconciliation.md",
+      "old": "adr/0103-single-region-billing-ledger.md"
+    }
+  ]
+}

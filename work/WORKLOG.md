@@ -30,35 +30,93 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
-## 2026-08-22 — new record: ADR-ONE-ARCHIVE (0037)  ·  Cowork
+## 2026-08-22 — W-44's gate lifted and built; W-69 closes ADR-RS; W-72 fixed  ·  Cowork
 
-- **Asked:** create a new ADR just for how the archive works, linking to
-  ADR-DIR-LIST if needed. (Clarified from an earlier exchange this session:
-  ADR-DIR-LIST governs ranking of *archived source directories* in a
-  customer's ingested corpus — a different "archive" from this repo's own
-  `archive/` convention, which is what this ADR is actually about; the two
-  are related only by name and are cross-referenced, not merged.)
-- **Did:** wrote [`docs/adr/0037_one-archive.md`](../docs/adr/0037_one-archive.md)
-  (**ADR-ONE-ARCHIVE**, `status: accepted`) — the first decision record for
-  the standing "exactly one `archive/`, at the repo root" rule (Arpit,
-  2026-08-10, restated 2026-08-18), which previously existed only as
-  `CLAUDE.md` prose and `tests/test_archive_law.py`. Owns no `src/`/`tools/`
-  component, per the same "companion record, owns nothing" pattern
-  ADR-CACHEDIR-TAG and its siblings use. Added its register row to
-  [`docs/adr/README.md`](../docs/adr/README.md) (0037, accepted, built: yes).
-  Does not edit `CLAUDE.md` — that file is Arpit's to ratify — but the ADR's
-  Reference section notes a future session may propose repointing
-  `CLAUDE.md`'s "Archive is not evidence" section to cite it by name.
-- **Decided / open:** nothing left open by this record — it formalizes an
-  already-ratified, already-enforced rule. One debt named rather than
-  claimed-covered: `tests/test_archive_law.py` checks that `archive/README.md`
-  *exists*, not that every archived item has a row in it or that every row's
-  named successor still exists — flagged in the ADR's Consequences as a gap
-  the way `tests/test_doc_registry.py` closes it for the live registry, with
-  no claim that anything already checks it.
-- **Next:** none required; a future session could file a small mechanical
-  item for the archive/README.md row-completeness check named above, if
-  Arpit wants it.
+- **Asked:** review open work, then — *"The gate is lifted for W-44 - Arpit order, implement W-69, and whatever is pending or can be done in open works."*
+- **Did:** Built W-44's instrument **first** (`tools/archived-signal-eval/` — 45 frozen queries in three slices, threshold and query set committed before any number), then built the mechanism after Arpit lifted the gate. **Shipped:** `archived: true` at ingest, `[archived]` on `ask`'s text, the flag in both verbs' `--json`, a response-level note on stderr; `find`'s stdout stays bare so it still pipes. **Measured WARRANTED** — 32.00 pts live-intent contamination@5 vs a 25 pt bar, findability guard 93.33 % vs 60 — filed as `regression/2026-08-22-archived-signal/` with [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md). **W-69:** `tests/test_prediction_register.py` (13 assertions, mutation-tested), **ADR-RS ⏳ → ✅ accepted**. **W-72:** the refer per-doc cap no longer applies to a single candidate document — `fux answer` goes from 3 passages/3 492 bytes to 6/6 991 on the same 8 000-byte budget. Five records updated, 1 098 unit + 73 e2e green.
+- **Decided / open:** **The `R` register got a sibling.** W44-SIGNAL is the first verdict that is not an architectural prediction, so rather than give it an `R` id it never earned, `IMPLEMENTATION.md` grew a **feature-gate** table and W-69's check reads both registers — a small extension to W-69's written spec, recorded here because it was not in the item. **The diagnosis worth carrying:** the ambiguous slice contaminates at 66 pts, the corpus's own archived share, so **the scorer has no currency signal at all** — the live slice only looks better because present-tense vocabulary correlates with live documents. That is why the answer is a signal and not a scoring change.
+- **Three defects found by the repo's own checks, not by me:** `tools/refer-budget-sweep/` had landed this morning **unclaimed in the ownership table** (caught by `test_adr_ownership`); Law zero's freshness check caught `src/fux/ingest/` changing without ADR-INGEST; and one test compared whole `AskResult` objects, which **silently asserted the marker could never exist** — sharpened to compare the ranking instead. **Also found:** an id collision — `W-70` was claimed both by a committed file under `work/open/_to_delete/` and by the item I filed this morning. Renumbered mine to **W-72**; the contested id was not reused.
+- **⚠ For Arpit, two things:** (1) `work/open/_to_delete/` holds **W-70 and W-71, both tracked and committed in `e11ca74`** — a previous entry says they were "never committed", which is wrong; they are in the v0.36.0 release and still in the indexed corpus. They need a real decision (delete, or give them rows). (2) **Nothing in this session is committed**; `HEAD` is still `fa3ba30`.
+- **Next:** `work/open/` is down to W-52, W-57, W-62 — all needing Arpit's hands or a second corpus. The agent lane is empty.
+
+---
+
+## 2026-08-22 — W-57 unblocked with a new fux-lab corpus; W-59 closed; W-72 filed  ·  Cowork
+
+- **Asked:** "For W-57, use fux-lab" — then, on discovering fux-lab's own `acme`/`orbit` corpora were ALSO wiped in the 2026-08-20 loss (same as fux-playground's goldens): "First option, rebuild the acme style corpus. Once done, implement W-59."
+- **Did:** Built a new, independently-authored graded corpus (`fux-lab/graph-acceptance/`, 66 docs) from scratch via a deterministic generator (`shared/generate/make_graph_corpus.py`), targeting the three phenomena W-57 names — supersession, near-duplication, staleness-not-wrongness — with goldens derived from construction ground truth (not from the engine's own output), documented as an explicit deviation from "no agent should write goldens" since Arpit directed it. Ran the graph lane against it: 24/24 goldens pass. Filed the run at `work/regression/2026-08-22-graph-acceptance/`, updated [ADR-GRAPH](../docs/adr/0029_graph.md) veto condition 3, and rewrote `W-57-graph-lane-acceptance.md` to MEASURED — only the two-machine determinism check remains, and it needs Arpit's own hardware. Then ran W-59's now-unblocked budget sweep (`tools/refer-budget-sweep/`, pre-registered before any number existed): result is NOT FLAT by the numeric rule (mean |Δ| 12.55%) but every delta favors the assembler over greedy-only — reported as measured rather than force-fit to either side of the rule. Root cause: the per-document cap binds even with a single candidate, which is the exact shape `answer_via_refer()` ships in production. Updated [ADR-REFER](../docs/adr/0030_refer-plane.md) veto condition 2, closed all three of W-59's DoD items, moved its detail file to `archive/open/`, and filed `W-72-refer-per-doc-cap-single-candidate.md` for the discovered defect (agent-startable, Sonnet). Updated `OPEN-WORK.md` (W-59 row deleted, W-72 row added, W-57 row narrowed), `IMPLEMENTATION.md`, `regression/README.md`, and DOC-REGISTRY rows for `open/`, `OPEN-WORK.md`, `../docs/adr/`, `regression/`.
+- **Decided / open:** W-57 — measured on a substitute corpus (fux-lab, not the still-ungraded playground); the two-machine determinism half is still open and blocked on hardware Cowork doesn't have. W-59 — fully closed. W-72 — filed, open, not yet acted on. The fux-playground goldens-vs-redesign question from the previous entry is bypassed for W-57 (fux-lab substituted) but still unresolved in its own right.
+- **Next:** W-72's fix (the per-doc cap defect) is unstarted and agent-startable. W-57's two-machine determinism check needs Arpit to run it on a second machine himself. W-62 (external validation) is still open and still needs more detail from Arpit before it can be scoped.
+
+---
+
+## 2026-08-22 — ARC-vs-LRU ruled: ARC wins, W-59's cache question closed  ·  Cowork
+
+- **Asked:** explained the ARC-vs-LRU post-hoc/synthetic-trace problem in plain terms; Arpit ruled — "ARC wins. Let's go with that." — then asked what's next.
+- **Did:** Closed this against R4 in every place it was recorded, not just the queue row. Updated [ADR-CACHE](../docs/adr/0034_cache.md) §Consequences and veto condition 6 (the trigger no longer reads as open against R4; a future real-workload measurement can still fire it). Updated [`cache-policy.compare.md`](compare/cache-policy.compare.md) with a dated ruling note. Updated `W-59`'s detail file (checkbox now `[x]`) and its `OPEN-WORK.md` row. Bumped DOC-REGISTRY rows for `open/`, `OPEN-WORK.md`, `compare/*.compare.md` and `../docs/adr/`.
+- **Decided / open:** ARC-vs-LRU — decided, closed against R4. W-59 stays open on the budget sweep alone (still chained on W-57's goldens). The playground-goldens-vs-redesign conflict from earlier this session is still unresolved and is next.
+- **Next:** get Arpit's call on the fux-playground goldens question (graded vs. the 2026-08-22 personal-sandbox redesign) — that decides whether W-57/W-59's remaining half gets built at all, and how.
+
+---
+
+## 2026-08-22 — BLOCKED.json resolved: SS4 stays as-is, no rewrite  ·  Cowork
+
+- **Asked:** "review open work and tell me what all I need to do to unblock all the items. Let's go one by one." — first exchange of a session walking OPEN-WORK's remaining items with Arpit.
+- **Did:** Read BLOCKED.json, OPEN-WORK.md and the open/ detail files (W-44, W-52, W-57, W-59, W-62, W-69) and presented what each needs from Arpit. On the paper-box question ("is the-fux-index-paper.md SS4's staleness in scope for a rewrite?") Arpit answered **no** — SS4 stays as historical/architectural description of the superseded MST keyspace, not rewritten. `work/BLOCKED.json` updated to `decision: PROCEED`, reason recorded, questions cleared.
+- **Decided / open:** SS4 rewrite — decided, not in scope. W-26 has no remaining boxes. Still open from this pass: W-57's goldens (Arpit says he cannot author them and wants the agent to, which collides with SETUP-PLAYGROUND's 2026-08-22 planned-redesign note that fux-playground goes personal-sandbox-only with **no** goldens — surfaced back to Arpit rather than built past); W-59's ARC-vs-LRU reopen call; W-44's disclaimer/marker gate-lift; W-62's three-way measurement and external installs.
+- **Next:** Arpit to resolve the fux-playground goldens-vs-redesign conflict before W-57 goldens get written by anyone.
+
+---
+
+## 2026-08-22 — ADR-DIR-LIST split; ADR-ARCHIVED-CONTENT carved out (0037)  ·  Cowork
+
+- **Asked:** "how do archive folders work in Fux — meaning, if a doc is marked
+  `archived=true`, how does that work?" — a codebase question. **First
+  attempt wrong:** read as the repo's own `archive/` directory convention and
+  drafted `ADR-ONE-ARCHIVE` (0037); Arpit corrected — he meant the
+  `archived=true` **content-signalling** mechanism, which already lived
+  inside ADR-DIR-LIST. `ADR-ONE-ARCHIVE` was reverted in full (file moved to
+  `docs/adr/_to_delete/`, the register row, `DOC-REGISTRY.md` and
+  `WORKLOG.md` bumps all reverted) before this entry's work began. Arpit then
+  asked for a dedicated ADR for the signalling behaviour, chose the **full
+  carve-out** (edit ADR-DIR-LIST itself, not a non-invasive pointer-only
+  option), and, once told the carve-out would leave `WORKLOG.md`'s past
+  entries and two frozen `work/regression/2026-08-19-w54/` reports citing
+  decision numbers that no longer resolve on the live record, confirmed
+  **"do the full renumbering anyway"** — the same class of cost the
+  2026-08-22 global ADR renumber already accepted for four other frozen
+  files.
+- **Did:** split ADR-DIR-LIST (0022) into itself — narrowed to the committed
+  file and its grammar (old decisions 1-4, 9, renumbered 1-5) — and a new
+  record, **ADR-ARCHIVED-CONTENT (0037)**, owning what an `archived=true`
+  declaration does once it exists: the record property, ranking invariance
+  **at the default**, the verb marker, `df` staying out of scope, the
+  built/gated status split, the configurable demotion weight
+  (`archived_weight`, default `1.0`), and the response-level disclaimer (old
+  decisions 5, 6, 7, 8, 10, 11, 12 → new 1-7, same substance). Repointed
+  every live citation found by repo-wide grep: shipped source comments
+  (`src/fux/config.py`, `src/fux/ingest/gitdir.py`, `src/fux/query/rank.py`,
+  `src/fux/query/__init__.py`), the shipped agent-policy template
+  (`src/fux/templates/agents/POLICY.md`), tests (`tests/test_config.py`,
+  `tests/query/test_scan.py`, `tests_e2e/test_verbs.py`), other ADRs
+  (`0004_ask.md`, `0014_config.md`, `0035_agent-policy.md`), and the live
+  `work/` tracking docs (`IMPLEMENTATION.md`, `INTERVIEW.md`,
+  `OPEN-WORK.md`, `open/W-44-archived-content-signalling.md`,
+  `open/W-52-df-over-the-union.md`). Added ADR-ARCHIVED-CONTENT's register
+  row and narrowed ADR-DIR-LIST's (its `built` cell flips **partial → yes**,
+  since the gating was entirely on the half that moved out).
+- **Decided / open:** **left deliberately stale, by design, per Arpit's
+  "do the full renumbering anyway":** `WORKLOG.md`'s own past entries citing
+  the old numbering (append-only, never edited — this file's own rule) and
+  the two frozen `work/regression/2026-08-19-w54/report.md` /
+  `ANALYSIS.md` citations. **A judgment call, not explicitly confirmed by
+  Arpit:** `CHANGELOG.md`'s two already-released `[0.36.0]` citations
+  (lines citing "ADR-DIR-LIST … decision 11" and "decisions 5/7/12") were
+  treated the same way — a released version section as historical/frozen —
+  and left untouched; flagged here rather than assumed settled.
+- **Next:** none pending on this change. If Arpit wants `CHANGELOG.md`'s two
+  citations repointed rather than left as historical record, that is a
+  one-line follow-up.
 
 ## 2026-08-22 — SETUP-PLAYGROUND and SETUP-LAB rewritten for the planned redesign  ·  Cowork
 

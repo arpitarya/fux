@@ -240,7 +240,7 @@ the reason is that the measuring environments are gone.**
   accelerator invariant.** No `_format` or `analyzer` bump — the reasoning is
   [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) decision 9, and
   the migration is `fux ingest --refresh-urls`.
-- **`archived=` is parsed and deliberately unread.** ADR-DIR-LIST decision 10
+- **`archived=` is parsed and deliberately unread.** ADR-ARCHIVED-CONTENT decision 5
   was amended to split the file from the signal: parsing a declaration nothing
   reads cannot be wrong, and changing what a verb says about a document needs
   an instrument. [W-44](open/W-44-archived-content-signalling.md) still owns it.

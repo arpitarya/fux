@@ -78,7 +78,15 @@ from . import edges as edges_mod
 from . import extract as extract_mod
 from . import sourcelist, urlsrc
 from .edges import TAG_PREFIX
-from .gitdir import Skipped, read_types, source_dirs, source_excludes, walk_sources
+from .gitdir import (
+    Skipped,
+    archived_dirs,
+    is_archived_loc,
+    read_types,
+    source_dirs,
+    source_excludes,
+    walk_sources,
+)
 from .parse import parse
 
 
@@ -210,6 +218,12 @@ def run(
     tracker = store_mod.CollisionTracker()
     records: list[dict] = []
     changed = 0
+    # ADR-ARCHIVED-CONTENT decision 1: a record from a declared-archived source
+    # says so on the record, the way `mode` and `meta` already do, so a record
+    # read years later states the rule it was written under instead of having it
+    # re-derived by whoever reads it. **Declared, never a path convention** —
+    # this reads the same `.fux/sources/dirs` line the grammar parses.
+    archived_srcs = frozenset(archived_dirs(root, config.dirs_file))
 
     def ver_for(doc_id: str, sha: str) -> int:
         nonlocal changed
@@ -230,6 +244,10 @@ def run(
             "mode": "extracted",
             "meta": "plain",
         }
+        # Absent when false, so a live record's shape is unchanged and no
+        # existing consumer's parse breaks (decision 1).
+        if archived_srcs and is_archived_loc(wf.rel_path, archived_srcs):
+            record["archived"] = True
         prior = reusable.get(doc_id)
         if prior is not None:
             # Carried forward: pure functions of bytes that have not changed.

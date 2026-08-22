@@ -8,6 +8,42 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **Archived documents now say so, in every verb.** A document from a source
+  declared `archived=true` carries `archived: true` on its record, `ask` prefixes
+  its title with `[archived]` in text output, both `ask` and `find` carry the
+  flag in `--json`, and a response-level note goes to **stderr** whenever any
+  archived document is returned. **The ranking does not move**: the demotion
+  weight stays at its `1.0` default and a test asserts scores and order are
+  byte-identical with the marker present.
+  [ADR-ARCHIVED-CONTENT](docs/adr/0037_archived-content.md) decisions 1, 3 and 7.
+
+  Measured before shipping, on a frozen 45-query instrument:
+  **[W44-SIGNAL](work/regression/2026-08-22-archived-signal/VERDICT.md) —
+  WARRANTED**. On this repo's own corpus, 32.00 % of the top-5 for a
+  present-tense question about the current engine was retired material, against
+  a pre-registered 25-point bar, while archived documents stayed findable when
+  actually wanted (93.33 % recall). `fux ask "what commands does the fux command
+  line have"` returned five retired documents and no current one.
+
+  **`fux find`'s stdout is unchanged** — bare paths, so it still pipes; the flag
+  is in `--json` and the note on stderr.
+
+### Fixed
+
+- **`fux answer` no longer discards half its byte budget.** The refer plane's
+  per-document cap applied even when there was only one candidate document —
+  which is every `fux answer` call, since `refer()` is passed exactly one. The
+  cap exists to stop one document dominating a field of several; with a field of
+  one it only truncated the answer. On a real query the assembled answer goes
+  from **3 passages / 3 492 bytes to 6 passages / 6 991 bytes** against the same
+  8 000-byte budget. Found by
+  [the budget sweep](work/regression/2026-08-22-budget-sweep/report.md), fixed
+  as W-72; the cap still binds the moment a second document competes, with a
+  test for each direction.
+  [ADR-REFER](docs/adr/0030_refer-plane.md) veto condition 2.
+
 ## [0.36.0] - 2026-08-22
 
 **Committing stops waiting for a re-index, and fux now ships the policy its

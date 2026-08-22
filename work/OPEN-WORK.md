@@ -17,33 +17,20 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-RS](../docs/adr/0036_predictions.md) — the prediction system, now owned
-
-- **W-69** · `agent` · **STARTABLE** · build ADR-RS **veto 4's register check**,
-  which is that record's **acceptance gate**. A test that walks
-  `work/regression/*/VERDICT.md`, reads each `prediction:` id, and asserts a
-  matching row in `IMPLEMENTATION.md`'s prediction table — **it would have
-  caught R9**, which ran, passed and was cited in six documents while having no
-  row, with nothing in the repo positioned to notice. **Small and mechanical**;
-  the care is in the direction: *every filed verdict has a row*, not *every row
-  has a verdict* (a RETIRED id has no verdict and must not fail). ⚠ **Accepting
-  ADR-RS before this exists would mean accepting a record whose central claim is
-  "the register is complete" while nothing verifies completeness** — the same
-  class of error as an unmeasured gate. **Model: Sonnet** — decided design,
-  assertable invariant — [detail](open/W-69-prediction-register-check.md)
-
 ### [ADR-GRAPH](../docs/adr/0029_graph.md) · [ADR-REFER](../docs/adr/0030_refer-plane.md) — the two planes that shipped ahead of their acceptance measurement
 
-- **W-59** · `agent`+`arpit` · **R4 ran 2026-08-20 and PASSED** ([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)) — cold p95 **1.113 s** / 3 s, warm **0.016 s** / 300 ms, **with a boundary**: the plane fetches serially, so cold cost is `k ×` the source's latency and anything slower than ~295 ms breaches the bound at k=10. [ADR-REFER](../docs/adr/0030_refer-plane.md) went **`accepted` on 2026-08-21** (`9f8366e`, Arpit's call) — **with veto condition 2 left open, not closed**: the budget sweep reopens the record the moment it runs flat. **The stakes rose in the same change**: the plane is the default path in `fux answer` as of `v0.35.0`, so the assembler this item may delete is shipped code, not a spare part. **What keeps it open:** the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**), which needs goldens a human must write (W-57); and ARC-vs-LRU, which was measured but **post-hoc** — the metric changed after seeing a number it reversed — so the cache compare doc's trigger is Arpit's to call — [detail](open/W-59-refer-plane-measurement.md)
-- **W-57** · `arpit` · **blocked on the goldens — a human must write them** · the graph lane's acceptance measurement is unrun, and **re-scoped 2026-08-20**: `q005`/`q009`/`q011`/`q015` were ids in the lost golden set and cannot be recovered, so the targets are now **phenomena** (supersession · near-duplication · staleness≠wrongness), all three built deliberately into the rebuilt corpus. **The supersession gap already reproduces** — `what replaced helix mesh` returns the superseded doc above the ADR that replaced it — [detail](open/W-57-graph-lane-acceptance.md)
+- **W-57** · `arpit` · **measured 2026-08-22 on a new corpus — one thing left, and only Arpit's hands can do it** · the three re-scoped phenomena (supersession · near-duplication · staleness≠wrongness) were graded against a new 66-doc fux-lab corpus (`graph-acceptance`), goldens agent-authored at Arpit's direct instruction (a recorded departure from the original DoD). **24/24 pass** ([run](regression/2026-08-22-graph-acceptance/report.md)). fux-playground itself is still ungraded — separate, unresolved. **All that remains: community assignment reproduced byte-identically on a *second machine*** — only one machine (the cloud sandbox) was available this session; needs Arpit to run `fux build && shasum -a 256 .fux/runtime/graph.json` in the `graph-acceptance` env on his own machine and compare against `3ede5863…` — [detail](open/W-57-graph-lane-acceptance.md)
 
-### [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
+### [ADR-RANKING](../docs/adr/0012_ranking.md) · [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) — **parked**
 
-*Both are gated on a pre-registered instrument that does not exist, is not an
-item, and has no owner. **Parked with a trigger, not scheduled**: they resume
-when the pre-registration is written, and not because they look ready.*
+*W-52 is gated on a pre-registered instrument **plus a second corpus**. The
+instrument now exists — [`tools/archived-signal-eval/`](../tools/archived-signal-eval/PRE-REGISTRATION.md),
+frozen and run 2026-08-22 ([W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md)) —
+so **half of W-52's trigger is met and the other half is not.** Still parked
+with a trigger, not scheduled: a second corpus is a real prerequisite, because
+moving `df` or the demotion default is a ranking change and CLAUDE.md forbids
+shipping one off a single corpus.*
 
-- **W-44** · `agent`+`arpit` · **the demotion weight landed 2026-08-22; the marker and disclaimer stay gated** · archived results — **scored normally, demotable, disclaimed**. **Landed:** the demotion weight ([ADR-DIR-LIST](../docs/adr/0022_dir-list.md) decision 11) — `[ranking] archived_weight` in `fux.toml`, **default `1.0`**, `fux.ingest.gitdir.archived_dirs()` reading the declaration (never a path), applied in the one shared `rank()` so the differential law carries it down both the scan and accelerator paths for free. Two tests, not one, per the ⚠ below: `tests/query/test_scan.py` asserts byte-identical results at the default **and** a live document overtaking an archived one once a weight is set; `tests_e2e/test_verbs.py` proves the same through the shipped CLI. **Still gated: the disclaimer** (decision 12, response-level, conditional) and the per-result `[archived]` marker — decision 10 says *"changing what a verb says about a document is a claim that needs an instrument"*, and the disclaimer says **more** than the marker, so it cannot be less gated. **Lifting that gate for the disclaimer alone is Arpit's call and is not assumed.** — [detail](open/W-44-archived-content-signalling.md)
 - **W-52** · **PARKED** · `df` is computed over the union — **42% of live terms carry an inflated `df`**; **trigger: the same pre-registration, plus a second corpus** — [detail](open/W-52-df-over-the-union.md)
 
 ### No record — external validation

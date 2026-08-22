@@ -72,7 +72,7 @@ def test_top_limits_results(tmp_path):
     assert len(ask(tmp_path, "x", top=3)) == 3
 
 
-# -- ADR-DIR-LIST decision 11: the archived demotion weight ----------------
+# -- ADR-ARCHIVED-CONTENT decision 6: the archived demotion weight ----------------
 
 
 def _archived_setup(tmp_path):
@@ -85,11 +85,63 @@ def _archived_setup(tmp_path):
     )
 
 
+def _ranking(results):
+    """What decision 2 fixes: which documents, in what order, at what score.
+
+    Deliberately **not** the whole `AskResult`. Since 2026-08-22 the marker
+    rides on the result (decision 3) and is present whatever the weight, so
+    comparing the objects would assert the marker away — which is how a test
+    written for a gated feature quietly forbids the feature once it ships.
+    """
+    return [(r.id, r.loc, r.score) for r in results]
+
+
 def test_default_weight_is_byte_identical_to_no_archived_dirs(tmp_path):
+    """Decision 2's veto: at the shipped default, nothing reorders."""
     _archived_setup(tmp_path)
     plain = ask(tmp_path, "cache")
     with_dirs_at_default = ask(tmp_path, "cache", archived_weight=1.0, archived_dirs=frozenset({"archive"}))
-    assert plain == with_dirs_at_default
+    assert _ranking(plain) == _ranking(with_dirs_at_default)
+
+
+def test_the_marker_does_not_move_the_ranking(tmp_path):
+    """Decisions 2 and 3 together — the sharp version of the veto.
+
+    The marker is *present* and the order is *unchanged*, asserted as a pair. A
+    change that demoted archived content while claiming only to annotate it
+    would satisfy the first assertion and fail the second.
+    """
+    _archived_setup(tmp_path)
+    marked = ask(tmp_path, "cache", archived_weight=1.0, archived_dirs=frozenset({"archive"}))
+    assert _ranking(marked) == _ranking(ask(tmp_path, "cache"))
+    assert {r.loc: r.archived for r in marked} == {"archive/old.md": True, "docs/new.md": False}
+
+
+def test_no_archived_document_is_ever_returned_unmarked(tmp_path):
+    """W-44's definition-of-done, as an assertion.
+
+    Every returned document under a declared-archived source carries the flag.
+    This is the box the whole item exists to close, so it is its own test rather
+    than a clause inside a broader one.
+    """
+    _archived_setup(tmp_path)
+    for r in ask(tmp_path, "cache", archived_dirs=frozenset({"archive"})):
+        assert r.archived == r.loc.startswith("archive/"), r.loc
+
+
+def test_the_record_property_marks_without_any_dirs_declaration(tmp_path):
+    """Decision 1: the record states the rule it was written under.
+
+    An index whose records carry `archived: true` marks correctly even when the
+    query-time dirs list is empty — a corpus ingested elsewhere, or read after
+    its source list changed. This is why the property exists at all rather than
+    being recomputed by every reader.
+    """
+    rec = _rec("file:old/legacy.md", "Legacy", 10, {term_hash("cache"): [1, 0]})
+    rec["archived"] = True
+    write_index(tmp_path, [rec])
+    (result,) = ask(tmp_path, "cache")
+    assert result.archived is True
 
 
 def test_weight_below_one_demotes_the_archived_document(tmp_path):

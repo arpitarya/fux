@@ -5,9 +5,9 @@ startable now; the signal half is still gated.
 
 | half | state |
 |---|---|
-| **the demotion weight** — configurable, **default `1.0`** ([ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) decision 11) | **LANDED 2026-08-22.** `[ranking] archived_weight` in `fux.toml`, applied in the one shared `rank()`. At the default nothing reorders (asserted); the actual default stays `1.0` — moving it is still W-52's gate, unchanged by landing the capability |
-| **the disclaimer** — response-level, fires when any archived document is returned (decision 12) | **gated** by decision 10's sentence — *"changing what a verb says about a document is a claim that needs an instrument"*. It says **more** than the marker, so it cannot be less gated. **Arpit's to lift** |
-| **the marker** — `[archived]` per result (decisions 5, 7) | **gated**, unchanged |
+| **the demotion weight** — configurable, **default `1.0`** ([ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) decision 6) | **LANDED 2026-08-22.** `[ranking] archived_weight` in `fux.toml`, applied in the one shared `rank()`. At the default nothing reorders (asserted); the actual default stays `1.0` — moving it is still W-52's gate, unchanged by landing the capability |
+| **the disclaimer** — response-level, fires when any archived document is returned (ADR-ARCHIVED-CONTENT decision 7) | **gated** by ADR-ARCHIVED-CONTENT decision 5's sentence — *"changing what a verb says about a document is a claim that needs an instrument"*. It says **more** than the marker, so it cannot be less gated. **Arpit's to lift** |
+| **the marker** — `[archived]` per result (ADR-ARCHIVED-CONTENT decisions 1, 3) | **gated**, unchanged |
 | **moving the default off `1.0`** | **gated harder** — the query set **plus a second corpus**, per [W-52](W-52-df-over-the-union.md) |
 
 **Trigger (for the gated halves):** a frozen query set with expected
@@ -72,7 +72,7 @@ hypothesis, not a measurement):
 
 > **2026-08-19 — DECIDED: option B.** Arpit chose *annotate, never reorder*.
 > The decision is recorded in
-> [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md), which is
+> [ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md), which is
 > **accepted and unbuilt**: a record under `archive/` carries `archived: true`,
 > every verb surfaces it, and **the ranking is byte-identical**.
 >
@@ -95,8 +95,8 @@ hypothesis, not a measurement):
 > and validated — see the [run](../regression/2026-08-19-w54/report.md).
 >
 > **This item stays open in the agent lane, and it got narrower.** The
-> declaration is built; what is left is exactly the half ADR-DIR-LIST decision
-> 10 gates — the record property, the marker in every verb, and the
+> declaration is built; what is left is exactly the half ADR-ARCHIVED-CONTENT decision
+> 5 gates — the record property, the marker in every verb, and the
 > pre-registered query set that has to exist before either lands. Nothing in
 > `src/` reads `archived` today, on purpose.
 
@@ -129,11 +129,11 @@ never reorder*). It still needs its own measurement and its own ADR.
 
 - [x] ~~Arpit picks A, B or C~~ — **B**, 2026-08-19.
 - [x] ~~An ADR, with a reference~~ —
-      [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md), accepted.
+      [ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md), accepted.
 - [ ] **The instrument, before the mechanism** — a pre-registered query set with
       expected live-vs-archived answers, frozen first. Five hand-picked probes
       is not a measurement, and the playground goldens are a different corpus
-      and cannot see this. This is ADR-DIR-LIST decision 10's gate.
+      and cannot see this. This is ADR-ARCHIVED-CONTENT decision 5's gate.
 - [ ] Build it: the property at ingest, the three verbs agreeing, and a test
       asserting **no archived document is ever returned unmarked**.
 - [x] **The demotion weight** — `fux.toml`, default `1.0`, keyed off the

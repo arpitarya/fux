@@ -39,7 +39,7 @@ systematically misread is an engine that does not work**, however correct its
 index. Correctness that does not survive the reader is not correctness.
 
 The concrete case is archived documents.
-[ADR-DIR-LIST](0022_dir-list.md) decision 12 makes Fux state a **fact** — *this
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 7 makes Fux state a **fact** — *this
 document is retired* — and deliberately **states no conclusion**, because the
 right conclusion depends on why the question was asked. That is the honest
 design, and it leaves a gap: *somebody* has to supply the conclusion.
@@ -114,14 +114,14 @@ $ fux setup --no-agents
 
 Fux indexes retired documentation deliberately — it is the honest answer to
 *"why does this look the way it does"* — and marks it rather than hiding it.
-[ADR-DIR-LIST](0022_dir-list.md) decision 12, amended 2026-08-22, makes the
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 7, amended 2026-08-22, makes the
 disclaimer **intent-neutral**: it says what archived *is* and stops, because the
 same document is **the answer** to a history question, **misleading** to an
 architecture question, and **dangerous** to a build task. Arpit's observation
 that opened this: *"the question could be from a business point of view, an
 architecture point of view, or an agent building something — and maybe more."*
 
-**The engine must not carry that taxonomy** (ADR-DIR-LIST decision 12 rejects
+**The engine must not carry that taxonomy** (ADR-ARCHIVED-CONTENT decision 7 rejects
 `--intent=`): the list of stances is open, and a provably incomplete enum invites
 callers to squeeze a fourth stance into the closest of three. The
 [refer plane](0030_refer-plane.md) set the precedent — it returns
@@ -271,7 +271,7 @@ theirs and stays; a file three versions behind is at least **identifiable**, and
 | | why not |
 |---|---|
 | **Document the policy, ship nothing** | every user writes their own, most write none, and the failure is silent — an agent confidently citing a deleted design |
-| **`fux ask --intent=build`** | rejected in [ADR-DIR-LIST](0022_dir-list.md) decision 12: the stance list is open, and it puts policy inside an engine whose argument is that it ships facts |
+| **`fux ask --intent=build`** | rejected in [ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 7: the stance list is open, and it puts policy inside an engine whose argument is that it ships facts |
 | **One file for all agents (`AGENTS.md`)** | a real convention and worth watching, but Claude skills and Kiro steering both need their own frontmatter to load at all. A shared file that no tool loads natively is a file nobody reads |
 | **Detect installed agents and write accordingly** | derivation, not declaration — decision 5. Exact for the repo it was written against, a silent convention everywhere else |
 | **Opt-in behind `--agents`** | **drafted this way, then overruled by Arpit on 2026-08-22.** A flag nobody knows about means the policy layer exists in the product and in no repository, and the failure it prevents is *silent* — an agent citing a deleted design with a correct-looking citation. The trust concern the flag answered is instead met by decision 6's mandatory announcement plus `--no-agents` |
@@ -279,8 +279,8 @@ theirs and stays; a file three versions behind is at least **identifiable**, and
 
 ### Reference (required)
 
-- The fact this policy interprets — [ADR-DIR-LIST](0022_dir-list.md) decisions
-  11 and 12, and its §1 worked before/after output.
+- The fact this policy interprets — [ADR-ARCHIVED-CONTENT](0037_archived-content.md) decisions
+  6 and 7, and its §1 worked before/after output.
 - The precedent for caller-owned policy — [ADR-REFER](0030_refer-plane.md) and
   [`src/fux/refer/freshness.py`](../../src/fux/refer/freshness.py): *"three
   callers want three different answers from the same index, and no single

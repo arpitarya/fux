@@ -1,0 +1,1 @@
+committed sha of fux measured: fa3ba30 (origin/main == working tree HEAD; no relevant local diff — see report)

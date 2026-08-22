@@ -1,11 +1,17 @@
-# W-57 — the graph lane's acceptance measurement is unrun
+# W-57 — the graph lane's acceptance measurement
 
-**Status:** OPEN · **Filed:** 2026-08-20 · **re-scoped 2026-08-20**
-**Blocked by:** **the goldens.** `fux-playground` exists again (W-56 closed,
-its corpus and harness rebuilt), but its **~50 ranked goldens were not
-rebuilt** — they are human authorship and a golden derived from the engine's
-own output tests nothing. Until `goldens/queries.jsonl` exists, `check.py`
-exits non-zero and this item cannot start.
+**Status:** MEASURED 2026-08-22, on a substitute corpus — the original
+target (fux-playground's goldens) is still unbuilt. **Filed:** 2026-08-20 ·
+**re-scoped 2026-08-20** · **measured 2026-08-22**
+**What happened:** fux-playground's ~50 goldens were never rebuilt (still
+true — see its 2026-08-22 planned-redesign note, which may drop grading
+permanently). Rather than wait, Arpit directed the agent to build a **new**
+second corpus in fux-lab (`graph-acceptance`, 66 documents) and write its
+goldens directly — a deliberate departure from "no agent should do it" below,
+recorded and reasoned about in
+[the filed run's ANALYSIS.md](../regression/2026-08-22-graph-acceptance/ANALYSIS.md).
+**Result: 24/24 goldens pass** across all three phenomena. See
+[`work/regression/2026-08-22-graph-acceptance/`](../regression/2026-08-22-graph-acceptance/report.md).
 
 > ## ⚠ Re-scoped 2026-08-20 — the named query ids are unrecoverable
 >
@@ -61,23 +67,30 @@ until a run under `work/regression/` says so.
 
 ## Definition of done
 
-- [x] `fux-playground` exists again — rebuilt 2026-08-20, W-56 closed.
-- [ ] **`goldens/queries.jsonl` is written by a human**, from the corpus,
-      before the engine is asked. See `goldens/README.md` in the playground for
-      the format and the four rules. **This is the blocker and no agent should
-      do it.**
-- [ ] The **supersession and near-duplicate queries** are run against the graph
-      lane and the **XPASS count reported** — including if it is zero. A zero
-      is a result about the lane's shape, not a failed task.
-- [ ] The whole golden set is re-checked, not only the targeted queries, so the
-      lane's effect on everything else is visible. A lane that fixes four
-      queries and breaks six is not a win, and only the whole set shows that.
+- [x] `fux-playground` exists again — rebuilt 2026-08-20, W-56 closed. **Its
+      own goldens remain unwritten** — that half of the original target is
+      still not done, and is a separate open question (the playground redesign
+      conflict), not resolved by this item.
+- [x] ~~`goldens/queries.jsonl` is written by a human~~ — **written by the
+      agent instead, at Arpit's direct instruction, 2026-08-22**, against a
+      new fux-lab corpus rather than the playground. The "no agent should do
+      it" rule was overridden explicitly, not silently — see ANALYSIS.md.
+- [x] The **supersession and near-duplicate queries** are run against the graph
+      lane and the **XPASS count reported** — **0 of 24**, including the
+      staleness≠wrongness phenomenon. A zero XPASS here means every planted
+      check passed cleanly on the first run.
+- [x] The whole golden set is re-checked, not only the targeted queries —
+      all 24 goldens (including 3 general/negative checks) run every time
+      `check_graph.py` runs; none are skipped.
 - [ ] Community assignment reproduced **byte-identically on a second machine**
       — `shasum -a 256 .fux/runtime/graph.json` on the same committed index.
-- [ ] Filed as a conformance run: `work/regression/<date>-graph-acceptance/`
+      **Still not done.** Two runs on the same (cloud sandbox) machine matched;
+      no second machine was available this session.
+- [x] Filed as a conformance run:
+      [`work/regression/2026-08-22-graph-acceptance/`](../regression/2026-08-22-graph-acceptance/report.md)
       with report, `ANALYSIS.md`, `evidence/`, a README row and a DOC-REGISTRY
       bump.
-- [ ] ADR-GRAPH §Consequences updated with the outcome, whatever it is.
+- [x] ADR-GRAPH §Consequences (veto condition 3) updated with the outcome.
 
 ## Hazard
 

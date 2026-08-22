@@ -350,6 +350,20 @@ fallback.
    phenomena term statistics cannot answer; if the graph cannot answer them
    either, the lane needs a different shape, not a bigger `EXPAND_LIMIT`.
 
+   **Measured 2026-08-22 — improved, on a second corpus, not the original
+   target.** fux-playground was never regraded after 2026-08-20 and its
+   2026-08-22 planned redesign may drop goldens permanently, so this was
+   checked instead against a new 66-document corpus built in fux-lab
+   (`graph-acceptance`, distinct fictional content from the playground's).
+   24/24 goldens passed across `graph`/`path`/`explain` for all three
+   phenomena — `ask` reproducibly ranks the superseded/legacy document above
+   the current one on every planted pair, and `graph` surfaces the correct
+   one regardless. See
+   [`work/regression/2026-08-22-graph-acceptance/`](../../work/regression/2026-08-22-graph-acceptance/report.md).
+   **This condition is not being treated as permanently closed** — a future
+   playground regrade against the original target is still the more direct
+   test and would supersede this evidence, not duplicate it.
+
 **How to check them:**
 
 ```bash

@@ -52,7 +52,7 @@ representations, one asserted to match.
 - **Never encode an opinion about a particular document.** Every rule here is
   about *how to read the flag*. The moment a rendering says which document is
   right, Fux has smuggled a reader-intent taxonomy back in through the policy
-  layer — which [ADR-DIR-LIST](../../../../docs/adr/0022_dir-list.md) decision
-  12 refused on purpose. This is veto condition 5.
+  layer — which [ADR-ARCHIVED-CONTENT](../../../../docs/adr/0037_archived-content.md) decision
+  7 refused on purpose. This is veto condition 5.
 
 <!-- policy-version: 1 -->

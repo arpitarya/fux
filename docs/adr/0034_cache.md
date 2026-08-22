@@ -264,12 +264,19 @@ comparison against a live source.
   is **advisory today** — a caller must set it. Veto condition 7 is what turns
   it mandatory, and the short default TTL is what bounds the exposure
   meanwhile.
-- **ARC-vs-LRU was measured post-hoc at R4 and therefore proves nothing yet.**
-  The metric changed after seeing a number that reversed it, so
+- **ARC-vs-LRU was measured post-hoc at R4, and Arpit ruled on it directly,
+  2026-08-22.** The metric changed after seeing a number that reversed it
+  (+0.91 pts overall / +2.50 on hot requests against a 2-pt bar set before
+  the run) — post-hoc by definition, and on a synthetic trace where the
+  compare doc's trigger asked for a real workload. **Arpit reviewed that
+  reasoning directly and ruled it stands: ARC wins.**
   [`cache-policy.compare.md`](../../work/compare/cache-policy.compare.md)'s
-  reopen trigger stays open. Decision 3 rests on the published result and on
-  the scan-resistance argument, not on a Fux measurement — stated plainly
-  rather than left for a reader to assume.
+  reopen trigger is therefore closed against R4 — it does **not** un-fire on
+  its own; a future measurement on real Fux workloads showing no advantage
+  over LRU would still reopen this (veto condition 6). Decision 3 rests on
+  the published result, the scan-resistance argument, and now this ruling —
+  not on a from-scratch Fux measurement, stated plainly rather than left for
+  a reader to assume.
 - **The size cap on the TTL store landed 2026-08-21** (PRIORITY.md P4).
   `put()` was unbounded: an entry only stopped counting toward `get()` once its
   TTL passed, and nothing ever deleted the file, so a long-lived process
@@ -366,8 +373,10 @@ comparison against a live source.
    eviction is what stands between a disposable cache and a full disk.
 6. **A measured hit-rate on real Fux workloads shows ARC no better than LRU.**
    Then take the simpler code — the interface is identical and the downgrade is
-   a drop-in. This is the compare doc's own trigger, still open because R4
-   measured it post-hoc.
+   a drop-in. This is the compare doc's own trigger. R4's post-hoc result does
+   **not** count as this happening — Arpit reviewed it 2026-08-22 and ruled ARC
+   wins — so this condition still checks only against a future real-workload
+   measurement, not against R4.
 7. **A real workflow shows the ACL-staleness window produced a wrong-access
    answer** — a caller saw content from a source they had since lost access to,
    inside the TTL. At that point `no_cache` stops being advisory for

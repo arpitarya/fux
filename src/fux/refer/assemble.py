@@ -47,6 +47,12 @@ means the number the caller passed was a suggestion.
    excludes the best answer for a reason the caller never asked for. So **a
    document's first citation is exempt from the per-document cap** and bounded
    only by the total budget.
+4. **The cap does not apply when there is only one candidate document.**
+   Dominating a field of one is not a failure mode, and capping it silently
+   returns half an answer in the caller's own budget. This is the shape
+   `fux answer` ships — `query/refer_answer.py` passes exactly one document —
+   so the default path was paying a cost designed for a case it never hits
+   (W-72, from [the budget sweep](../../../work/regression/2026-08-22-budget-sweep/report.md)).
 """
 
 from __future__ import annotations
@@ -135,7 +141,20 @@ def assemble(
     rest = [s for s in candidates if s is not best]
     rest.sort(key=lambda s: (-(s.score / max(s.nbytes, 1)), s.sha, s.locator))
 
-    per_doc_cap = int(budget * PER_DOC_FRACTION)
+    # **The cap protects against competition, so with no competition there is
+    # nothing to protect** (W-72). `query/refer_answer.py` passes `refer()`
+    # exactly one candidate document, which is the shape `fux answer` ships
+    # today: capping it discards up to half the caller's budget to stop a
+    # document dominating a field of one. Measured before it was fixed — the
+    # greedy assembler lost to plain top-k by up to 35.5% at 500-2000 byte
+    # budgets, and converged exactly with it above 4000 bytes, which is where
+    # the cap stops binding.
+    #
+    # Keyed on the candidates' own documents, not on `k` or the caller's
+    # intent, so a caller that passes many chunks of one document still gets
+    # the un-capped behaviour it asked for by passing one document.
+    single_document = len({s.doc_id for s in candidates}) <= 1
+    per_doc_cap = budget if single_document else int(budget * PER_DOC_FRACTION)
     used = overhead
     per_doc: dict[str, int] = {}
     chosen: list[Citation] = []

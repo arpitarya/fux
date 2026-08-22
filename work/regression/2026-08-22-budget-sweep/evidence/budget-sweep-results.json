@@ -1,0 +1,96 @@
+{
+  "single": {
+    "condition": "SINGLE (matches shipped `answer`)",
+    "budgets": {
+      "500": {
+        "greedy_value": 2.961,
+        "naive_value": 3.858,
+        "greedy_dropped": 11,
+        "naive_dropped": 9,
+        "delta_pct": -23.25
+      },
+      "1000": {
+        "greedy_value": 4.816,
+        "naive_value": 7.468,
+        "greedy_dropped": 9,
+        "naive_dropped": 4,
+        "delta_pct": -35.51
+      },
+      "2000": {
+        "greedy_value": 7.383,
+        "naive_value": 8.848,
+        "greedy_dropped": 4,
+        "naive_dropped": 0,
+        "delta_pct": -16.56
+      },
+      "4000": {
+        "greedy_value": 8.848,
+        "naive_value": 8.848,
+        "greedy_dropped": 0,
+        "naive_dropped": 0,
+        "delta_pct": 0.0
+      },
+      "8000": {
+        "greedy_value": 8.848,
+        "naive_value": 8.848,
+        "greedy_dropped": 0,
+        "naive_dropped": 0,
+        "delta_pct": 0.0
+      },
+      "16000": {
+        "greedy_value": 8.848,
+        "naive_value": 8.848,
+        "greedy_dropped": 0,
+        "naive_dropped": 0,
+        "delta_pct": 0.0
+      }
+    }
+  },
+  "multi": {
+    "condition": "MULTI (general assemble() API)",
+    "budgets": {
+      "500": {
+        "greedy_value": 7.427,
+        "naive_value": 8.064,
+        "greedy_dropped": 19,
+        "naive_dropped": 20,
+        "delta_pct": -7.9
+      },
+      "1000": {
+        "greedy_value": 10.877,
+        "naive_value": 15.69,
+        "greedy_dropped": 16,
+        "naive_dropped": 16,
+        "delta_pct": -30.68
+      },
+      "2000": {
+        "greedy_value": 20.803,
+        "naive_value": 23.568,
+        "greedy_dropped": 8,
+        "naive_dropped": 9,
+        "delta_pct": -11.73
+      },
+      "4000": {
+        "greedy_value": 26.184,
+        "naive_value": 26.184,
+        "greedy_dropped": 0,
+        "naive_dropped": 0,
+        "delta_pct": 0.0
+      },
+      "8000": {
+        "greedy_value": 26.184,
+        "naive_value": 26.184,
+        "greedy_dropped": 0,
+        "naive_dropped": 0,
+        "delta_pct": 0.0
+      },
+      "16000": {
+        "greedy_value": 26.184,
+        "naive_value": 26.184,
+        "greedy_dropped": 0,
+        "naive_dropped": 0,
+        "delta_pct": 0.0
+      }
+    }
+  }
+}

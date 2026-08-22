@@ -240,12 +240,12 @@ the boundary, rendered by the CLI, exit 1.
   only"*.
 - **`[ranking] archived_weight` joined the schema, 2026-08-22 (W-44).** A
   score multiplier for documents under a directory declared `archived=true`
-  ([ADR-DIR-LIST](0022_dir-list.md) decision 11). Default `1.0`, validated as
+  ([ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 6). Default `1.0`, validated as
   a non-negative number — a bool is rejected explicitly, since `bool` is an
   `int` subclass in Python and `archived_weight = true` would otherwise parse
   silently as `1`. **This loader enforces the type, not the process rule**:
   nothing here stops a session from setting it to something other than `1.0`,
-  but [ADR-DIR-LIST](0022_dir-list.md)'s veto condition still fires if that
+  but [ADR-ARCHIVED-CONTENT](0037_archived-content.md)'s veto condition still fires if that
   ships without the pre-registered query set and second corpus
   ([W-52](../../work/open/W-52-df-over-the-union.md)).
 

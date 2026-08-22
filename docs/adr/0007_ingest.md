@@ -254,6 +254,25 @@ docs/logo.png: binary
 
 ### Consequences
 
+- **Ingest stamps `archived: true` on records from a declared-archived
+  source** (2026-08-22, [ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+  decision 1). It reads `archived_dirs()` — the same `.fux/sources/dirs`
+  declaration the grammar already parses — and never a path convention.
+  Three properties matter and each is deliberate:
+
+  - **Absent when false**, so a live record's shape is unchanged and no
+    existing consumer's parse breaks. `_format` is **not** bumped: the
+    property set grows by an optional key that older readers ignore, which
+    is the same reasoning [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)
+    decision 9 applied to `title_h`.
+  - **Git records only.** A `url:` record has no directory entry to fall
+    under, so the question does not arise.
+  - **It changes committed bytes for the archived population** — 252 of
+    this repo's 401 records — so the change that ships it re-ingests, and
+    that diff is expected rather than a determinism failure. L3 still
+    holds: same sources, same declaration, same bytes.
+
+
 - **`fux ingest` gained `--stop` and a takeover, 2026-08-22 (W-66).** The verb
   this record owns is now also how a background re-indexer is halted: a manual
   `fux ingest` stops a live runner and then runs, and `--stop` is that takeover

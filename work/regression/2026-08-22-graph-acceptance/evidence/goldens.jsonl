@@ -1,0 +1,24 @@
+{"kind":"graph","query":"what replaced queue partitioning by hash","expect_node":"docs/adr/0201-queue-partitioning-by-tenant.md","phenomenon":"supersession"}
+{"kind":"graph","query":"what replaced synchronous webhook delivery","expect_node":"docs/adr/0202-asynchronous-webhook-delivery-with-retry-ledger.md","phenomenon":"supersession"}
+{"kind":"graph","query":"what replaced single-region billing ledger","expect_node":"docs/adr/0203-multi-region-billing-ledger-with-reconciliation.md","phenomenon":"supersession"}
+{"kind":"graph","query":"gateway rollback procedure","expect_node":"docs/runbooks/gateway-rollback-legacy-fleet.md","phenomenon":"near_duplicate"}
+{"kind":"graph","query":"auth proxy restart procedure","expect_node":"docs/runbooks/auth-proxy-restart-current-fleet.md","phenomenon":"near_duplicate"}
+{"kind":"graph","query":"config rollout for migrated fleets","expect_node":"docs/guides/config-rollout-pre-migration-fleets.md","phenomenon":"staleness_not_wrongness"}
+{"kind":"graph","query":"index refresh for sharded search","expect_node":"docs/guides/index-refresh-unsharded-search.md","phenomenon":"staleness_not_wrongness"}
+{"kind":"path","from":"docs/adr/0201-queue-partitioning-by-tenant.md","to":"docs/adr/0101-queue-partitioning-by-hash.md","hops":1,"expect":"ref","phenomenon":"supersession"}
+{"kind":"path","from":"docs/adr/0202-asynchronous-webhook-delivery-with-retry-ledger.md","to":"docs/adr/0102-synchronous-webhook-delivery.md","hops":1,"expect":"ref","phenomenon":"supersession"}
+{"kind":"path","from":"docs/adr/0203-multi-region-billing-ledger-with-reconciliation.md","to":"docs/adr/0103-single-region-billing-ledger.md","hops":1,"expect":"ref","phenomenon":"supersession"}
+{"kind":"path","from":"docs/runbooks/gateway-rollback-current-fleet.md","to":"docs/runbooks/gateway-rollback-legacy-fleet.md","hops":1,"expect":"ref","phenomenon":"near_duplicate"}
+{"kind":"path","from":"docs/runbooks/auth-proxy-restart-current-fleet.md","to":"docs/runbooks/auth-proxy-restart-legacy-fleet.md","hops":1,"expect":"ref","phenomenon":"near_duplicate"}
+{"kind":"path","from":"docs/guides/config-rollout-post-migration-fleets.md","to":"docs/guides/config-rollout-pre-migration-fleets.md","hops":1,"expect":"ref","phenomenon":"staleness_not_wrongness"}
+{"kind":"path","from":"docs/guides/index-refresh-sharded-search.md","to":"docs/guides/index-refresh-unsharded-search.md","hops":1,"expect":"ref","phenomenon":"staleness_not_wrongness"}
+{"kind":"neighbour","doc":"docs/adr/0201-queue-partitioning-by-tenant.md","expect":["file:docs/adr/0101-queue-partitioning-by-hash.md","tag:team:platform","tag:type:adr"],"phenomenon":"supersession"}
+{"kind":"neighbour","doc":"docs/adr/0202-asynchronous-webhook-delivery-with-retry-ledger.md","expect":["file:docs/adr/0102-synchronous-webhook-delivery.md","tag:team:growth","tag:type:adr"],"phenomenon":"supersession"}
+{"kind":"neighbour","doc":"docs/adr/0203-multi-region-billing-ledger-with-reconciliation.md","expect":["file:docs/adr/0103-single-region-billing-ledger.md","tag:team:payments-rails","tag:type:adr"],"phenomenon":"supersession"}
+{"kind":"neighbour","doc":"docs/runbooks/gateway-rollback-current-fleet.md","expect":["file:docs/runbooks/gateway-rollback-legacy-fleet.md","tag:status:current","tag:team:edge","tag:type:runbook"],"phenomenon":"near_duplicate"}
+{"kind":"neighbour","doc":"docs/runbooks/auth-proxy-restart-current-fleet.md","expect":["file:docs/runbooks/auth-proxy-restart-legacy-fleet.md","tag:status:current","tag:team:identity","tag:type:runbook"],"phenomenon":"near_duplicate"}
+{"kind":"neighbour","doc":"docs/guides/config-rollout-post-migration-fleets.md","expect":["file:docs/guides/config-rollout-pre-migration-fleets.md","tag:status:current","tag:team:mobile-core","tag:type:guide"],"phenomenon":"staleness_not_wrongness"}
+{"kind":"neighbour","doc":"docs/guides/index-refresh-sharded-search.md","expect":["file:docs/guides/index-refresh-unsharded-search.md","tag:status:current","tag:team:search","tag:type:guide"],"phenomenon":"staleness_not_wrongness"}
+{"kind":"nopath","from":"docs/adr/0201-queue-partitioning-by-tenant.md","to":"docs/guides/rotating-a-leaked-credential.md","hops":2,"phenomenon":"general"}
+{"kind":"nopath","from":"docs/postmortems/0002-billing-double-charge-incident.md","to":"docs/adr/0009-job-scheduler-priority-classes.md","hops":2,"phenomenon":"general"}
+{"kind":"neighbour","doc":"docs/runbooks/quota-gateway-restart.md","expect":["tag:team:platform","tag:type:runbook"],"phenomenon":"general"}

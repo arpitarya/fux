@@ -351,6 +351,34 @@ the caller's window. `dropped` is reported so truncation is never silent.
 2. **The budget sweep is flat across budgets.** If answer-quality-per-byte does
    not move, the greedy assembler is not earning its complexity and plain top-k
    with truncation wins. Say so rather than keeping it.
+
+   **Measured 2026-08-22 — neither branch, exactly.** Mean |delta| was 12.55%
+   (SINGLE condition, the one `fux answer` ships), so by the letter this is
+   **not** flat. But every measured delta was negative or zero — the greedy
+   assembler never once beat plain top-k, losing by up to 35.5% at realistic
+   budgets (500–2000 bytes) and tying only once the per-document cap stops
+   binding (≥4000 bytes). **Root cause identified, not this run's to fix**:
+   the per-document cap (`PER_DOC_FRACTION = 0.5`) binds even with a single
+   candidate document, which is every real `fux answer` call today
+   (`query/refer_answer.py` passes exactly one). The score-per-byte packing
+   itself is not implicated — it is byte-identical to naive truncation
+   whenever the cap isn't the constraint. See
+   [`work/regression/2026-08-22-budget-sweep/`](../../work/regression/2026-08-22-budget-sweep/report.md).
+
+   **FIXED 2026-08-22 (W-72), in a separate change with its own tests.** The
+   cap no longer applies when the candidate set spans one document —
+   dominating a field of one is not a failure mode, and capping it only
+   truncated the answer inside the caller's own budget. On a real query
+   `fux answer` now assembles **6 passages / 6 991 bytes** where it assembled
+   **3 / 3 492** against the same 8 000-byte budget. **The fix is scoped, not a
+   removal:** the cap binds again the moment a second document competes, and
+   `tests/refer/test_assemble.py` asserts both directions — the exemption is
+   keyed on the candidates' own documents, never on `k` or on caller intent.
+
+   **This condition does not reopen acceptance.** The sweep's finding was a
+   defect in a constant's scope, not in the plane's shape, and the assembler's
+   two corrections (deterministic ties, the best-answer floor) were never
+   implicated.
 3. **A record gains a reproducible ingest time.** Then decision 4's premise is
    gone and an age-based mode becomes implementable — at which point it must be
    argued on merit against content verification, not adopted because the

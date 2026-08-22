@@ -43,9 +43,9 @@ __all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
 
 
 def _archived_ranking(root: Path) -> tuple[float, frozenset[str]]:
-    """The demotion weight and the directories it applies to (ADR-DIR-LIST
-    decision 11) — read fresh per query, from `fux.toml` and the committed
-    dirs list, never from the record (decision 5 is gated; this is not).
+    """The demotion weight and the directories it applies to (ADR-ARCHIVED-CONTENT
+    decision 6) — read fresh per query, from `fux.toml` and the committed
+    dirs list, never from the record (ADR-ARCHIVED-CONTENT decision 1 is gated; this is not).
 
     Degrades to the no-op default when config or the dirs list can't be read,
     so `ask`/`find` never fail because ranking metadata is missing — the same
@@ -110,6 +110,41 @@ def _declare_pending(root: Path) -> None:
         print(f"fux: {len(pending)} changed path(s) pending re-index", file=sys.stderr)
 
 
+#: ADR-ARCHIVED-CONTENT decision 3 — the per-result marker in text output.
+ARCHIVED_MARKER = "[archived]"
+
+
+def _declare_archived(results, weight: float) -> None:
+    """ADR-ARCHIVED-CONTENT decision 7: a response-level note when any archived
+    document is returned. **stderr, never stdout.**
+
+    Three reasons it cannot go on stdout, each sufficient alone:
+
+    - `fux find` prints bare paths so it can pipe. A note on stdout is read by
+      `xargs` as a filename.
+    - `--json` is a contract, and the ADR surface captures compare stdout bytes.
+    - It declares; it never gates. Same contract as `_declare_pending` above,
+      and the same one ADR-CLI's staleness declaration took.
+
+    ASCII only: a Windows console's default codepage cannot encode a fancy dash
+    and the process crashes on `print()` rather than degrading (v0.35.0).
+
+    The note carries **the rule, not a hedge** — it says what an archived
+    document *is* and does not tell the reader what to conclude from it.
+    Intent-neutral by ADR-DIR-LIST decision 12: Fux ships facts, not policy.
+    """
+    n = sum(1 for r in results if r.archived)
+    if not n:
+        return
+    demoted = f" (demoted, weight {weight:.2f})" if weight != 1.0 else ""
+    print(
+        f"note: {n} of {len(results)} results are from archived sources{demoted}"
+        f" - retired from the live corpus. An archived document records what was"
+        f" true when it was retired, not what is true now.",
+        file=sys.stderr,
+    )
+
+
 def cmd_ask(args) -> int:
     root = _root()
     results, path = run_query(
@@ -130,6 +165,7 @@ def cmd_ask(args) -> int:
         if getattr(args, "explain", False):
             payload["path"] = path
         print(json_mod.dumps(payload, indent=2))
+        _declare_archived(results, _archived_ranking(root)[0])
         return 0
 
     if not results:
@@ -137,9 +173,11 @@ def cmd_ask(args) -> int:
         return 0
 
     for r in results:
-        print(f"{r.score:.4f}  {_resolve_title(root, r.id, r.title)}  ({r.loc})")
+        mark = f"{ARCHIVED_MARKER} " if r.archived else ""
+        print(f"{r.score:.4f}  {mark}{_resolve_title(root, r.id, r.title)}  ({r.loc})")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
+    _declare_archived(results, _archived_ranking(root)[0])
     return 0
 
 
@@ -150,14 +188,20 @@ def cmd_find(args) -> int:
 
     if args.json:
         print(json_mod.dumps({"results": [_as_dict(root, r) for r in results]}, indent=2))
+        _declare_archived(results, _archived_ranking(root)[0])
         return 0
 
     if not results:
         print("No confident matches.")
         return 0
 
+    # **Bare paths, deliberately unmarked.** `find` exists to be piped, so a
+    # `[archived]` prefix on stdout would be read as part of the filename — the
+    # concrete reason ADR-DIR-LIST decision 12 put the note on stderr. The flag
+    # is carried in `--json`, which is where a machine reader should look.
     for r in results:
         print(r.loc)
+    _declare_archived(results, _archived_ranking(root)[0])
     return 0
 
 

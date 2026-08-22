@@ -1,0 +1,1515 @@
+{
+  "summary": {
+    "primary": {
+      "mean_contamination_at_5_live_pts": 32.0,
+      "threshold_warranted_at": 25.0,
+      "threshold_not_warranted_below": 10.0
+    },
+    "guard": {
+      "historical_recall_at_5_pct": 93.33,
+      "floor": 60.0,
+      "passed": true
+    },
+    "reported_not_thresholded": {
+      "mean_contamination_at_5_ambiguous_pts": 66.0,
+      "live_slice_gold_recall_at_5_pct": 90.0,
+      "archived_results_returned": 125,
+      "archived_results_unmarked": 0,
+      "unmarked_rate": 0.0
+    },
+    "verdict": "WARRANTED",
+    "base_rate_note": "62.8% of the corpus is archived \u2014 the blind-ranker anchor",
+    "n": {
+      "live": 20,
+      "historical": 15,
+      "ambiguous": 10
+    }
+  },
+  "per_query": [
+    {
+      "id": "L01",
+      "slice": "live",
+      "q": "how does fux decide which files are documents",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0031_types-list.md",
+      "gold_rank": 3,
+      "top": [
+        {
+          "loc": "archive/proposals/consumer-intent-policy.md",
+          "archived": true
+        },
+        {
+          "loc": "work/compare/file-type-filter.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0031_types-list.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/handoff/v0.31.0-fux-playground-extraction-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-20-r5-hook-latency/ANALYSIS.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L02",
+      "slice": "live",
+      "q": "what does the extracted ingest mode promise",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0016_extracted-mode.md",
+      "gold_rank": 3,
+      "top": [
+        {
+          "loc": "docs/adr/0009_index-lifecycle.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/adr/0001_ingest-mode-naming.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0016_extracted-mode.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0017_enriched-mode.md",
+          "archived": false
+        },
+        {
+          "loc": "work/compare/ingest-mode-naming.compare.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L03",
+      "slice": "live",
+      "q": "how are documents scored and ordered",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0012_ranking.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0012_ranking.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0003-bm25f-index-query-surface.md",
+          "archived": true
+        },
+        {
+          "loc": "work/compare/pruning-criterion.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "work/OPEN-WORK.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-09-pruning-eval/evidence/report.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L04",
+      "slice": "live",
+      "q": "what is in one line of the committed index",
+      "returned": 5,
+      "archived_in_top": 0,
+      "contamination_pct": 0.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0010_index-record.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "README.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0010_index-record.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0013_postings.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0009_index-lifecycle.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0018_url-list.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L05",
+      "slice": "live",
+      "q": "what commands does the fux command line have",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0002_cli-surface.md",
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/example/SKILLS.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.1/docs/scrape-howto-cli-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.1/docs/scrape-howto-cli-prompt.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.1/docs/fux-lab-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/cli-surface.compare.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L06",
+      "slice": "live",
+      "q": "how does ingest work today",
+      "returned": 5,
+      "archived_in_top": 0,
+      "contamination_pct": 0.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0007_ingest.md",
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "work/compare/source-exclusion.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "work/compare/maintenance-trigger.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-20-r5-hook-latency/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-21-r7-preliminary-analysis/report.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0016_extracted-mode.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L07",
+      "slice": "live",
+      "q": "what does the graph lane do",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0029_graph.md",
+      "gold_rank": 4,
+      "top": [
+        {
+          "loc": "work/open/W-57-graph-lane-acceptance.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-21-graph-plane-profile/report.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-56-sibling-environments-missing.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0029_graph.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.1/docs/graphify-obsidian-inspiration.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L08",
+      "slice": "live",
+      "q": "how does the refer plane fetch and verify content",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0030_refer-plane.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0030_refer-plane.md",
+          "archived": false
+        },
+        {
+          "loc": "work/compare/refer-fetch-cache.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-24-m4-refer-plane.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/handoff/v0.33.0-m4-refer-plane-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0006_answer.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L09",
+      "slice": "live",
+      "q": "what is in the fux directory",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0003_fux-directory.md",
+      "gold_rank": 4,
+      "top": [
+        {
+          "loc": "docs/adr/0023_cachedir-tag.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0022_dir-list.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/adr/0011_fux-dir-layout.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0003_fux-directory.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-18-ingest-and-index/report.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L10",
+      "slice": "live",
+      "q": "how do the git hooks keep the index in step",
+      "returned": 5,
+      "archived_in_top": 3,
+      "contamination_pct": 60.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0032_hooks.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "work/proposals/ideal/00-ideal-architecture.proposal.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0032_hooks.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.20.0-query-cli-v1-prompt.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.1/docs/fux-test-repo-plan.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.1/fux/data/skills/agents/SKILL.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L11",
+      "slice": "live",
+      "q": "how does the committed index merge on a conflict",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0033_merge-driver.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "work/compare/maintenance-trigger.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0033_merge-driver.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-20-r6-merge-driver/report.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-25-m5-maintenance.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-22-r6-rerun/VERDICT.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L12",
+      "slice": "live",
+      "q": "what caches does the refer plane use",
+      "returned": 5,
+      "archived_in_top": 0,
+      "contamination_pct": 0.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0034_cache.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0034_cache.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-20-refer-plane-r4/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-20-refer-plane-r4/VERDICT.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-20-refer-plane-r4/report.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0030_refer-plane.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L13",
+      "slice": "live",
+      "q": "how does fux install agent policy files",
+      "returned": 5,
+      "archived_in_top": 3,
+      "contamination_pct": 60.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0035_agent-policy.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0035_agent-policy.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-docs/example/CLI.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0003_fux-directory.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.1/docs/fux-test-repo-plan.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/proposals/consumer-intent-policy.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L14",
+      "slice": "live",
+      "q": "what is the format of the committed url list",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0018_url-list.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0018_url-list.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/adr/0011_fux-dir-layout.md",
+          "archived": true
+        },
+        {
+          "loc": "README.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0002_cli-surface.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0008_url-ingest.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L15",
+      "slice": "live",
+      "q": "who owns the fetcher and where does it live",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0019_fetcher.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0019_fetcher.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-51-fetcher-template-not-shipped.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/README.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0021_http-fetcher.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-50-url-fetch-mechanism.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L16",
+      "slice": "live",
+      "q": "what are the non negotiable laws of this engine",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0001_laws.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0001_laws.md",
+          "archived": false
+        },
+        {
+          "loc": "CLAUDE.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.1/fux/data/skills/propose-rules/SKILL.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.1/CLAUDE.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/index.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L17",
+      "slice": "live",
+      "q": "what is the t1 accelerator and what does it build",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0011_accelerator.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0011_accelerator.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0026_runtime-manifest.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/adr/0005_derived-accelerator.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0024_docs-table.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-22-r9-t2-at-10k/VERDICT.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "L18",
+      "slice": "live",
+      "q": "what does the answer verb return",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0006_answer.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "work/regression/2026-08-18-query-verbs/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0006_answer.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0002_cli-surface.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0005_find.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-54-sources-rewrite.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L19",
+      "slice": "live",
+      "q": "what is the directory list file and its grammar",
+      "returned": 5,
+      "archived_in_top": 3,
+      "contamination_pct": 60.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0022_dir-list.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0022_dir-list.md",
+          "archived": false
+        },
+        {
+          "loc": "work/compare/source-exclusion.compare.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/open/W-53-dirs-file.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/open/W-45-source-exclusion.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/open/W-55-no-file-type-filter.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "L20",
+      "slice": "live",
+      "q": "what does a document declared archived do once it is indexed",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "docs/adr/0037_archived-content.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "docs/adr/0037_archived-content.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0022_dir-list.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/adr/0022_archived-signal.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/README.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0002_cli-surface.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "H01",
+      "slice": "historical",
+      "q": "what was the sqlite substrate",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/knowledge-substrate.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.23.0-knowledge-substrate-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/TOML.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/README.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H02",
+      "slice": "historical",
+      "q": "what was the committed state plane and fux.lock",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.23.0-knowledge-substrate-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/knowledge-substrate.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/README.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0032_hooks.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "H03",
+      "slice": "historical",
+      "q": "what was fuxvec",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0010-fuxvec-binary-dense-search.md",
+      "gold_rank": 3,
+      "top": [
+        {
+          "loc": "archive/v0.26-implemented/v0.23.0-knowledge-substrate-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/knowledge-substrate.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0010-fuxvec-binary-dense-search.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0025_codes-table.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26/proposals/chunk-level-dense-codes.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H04",
+      "slice": "historical",
+      "q": "what was the bundled embedding model and how big was it",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0006-bundled-model.md",
+      "gold_rank": 3,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/compare/query-engine.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0010-fuxvec-binary-dense-search.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0006-bundled-model.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.22.0-hybrid-engine-v2-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/packaged-model.compare.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H05",
+      "slice": "historical",
+      "q": "what was reciprocal rank fusion used for",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0007-rrf-hybrid-fusion.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0007-rrf-hybrid-fusion.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0015-supersession-downrank-penalty.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/TOML.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/hybrid-losing-lexical-hits.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0009-retrieval-kernel-graph-verbs.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H06",
+      "slice": "historical",
+      "q": "what were the full and lean profiles",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0011-profiles-lean-state.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0011-profiles-lean-state.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.23.0-knowledge-substrate-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/chunk-level-dense-codes.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/CHANGELOG.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H07",
+      "slice": "historical",
+      "q": "what was the answer confidence floor",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0014-answer-confidence-floor.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0014-answer-confidence-floor.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/conformance/2026-07-23-min-confidence-calibration/ANALYSIS.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/conformance/2026-07-23-min-confidence-calibration/report.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.25.0-honest-decline-well-formed-queries.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/answer-decline-floor.compare.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H08",
+      "slice": "historical",
+      "q": "what was the supersession down rank penalty",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0015-supersession-downrank-penalty.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0015-supersession-downrank-penalty.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.26.0-supersession-downrank-prompt.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.26.0-supersession-downrank-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/supersession-handling.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.25.0-staleness-ranking-ignores-supersession.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H09",
+      "slice": "historical",
+      "q": "what was the per file ingest cache",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0002-ingest-cache-chunker.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/compare/ingest-strategy.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0002-ingest-cache-chunker.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.20.0-query-cli-v1-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/SKILLS.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/API.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H10",
+      "slice": "historical",
+      "q": "what did fux why do",
+      "returned": 5,
+      "archived_in_top": 1,
+      "contamination_pct": 20.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0012-debug-observability.md",
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "work/regression/2026-08-09-pruning-eval/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26/conformance/2026-07-22-scaling-1k-5k-10k/ANALYSIS.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-19-w54/report.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0002_cli-surface.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-22-r9-t2-at-10k/ANALYSIS.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "H11",
+      "slice": "historical",
+      "q": "what was the advanced fidelity tier for web ingestion",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0005-web-cdp-advanced-tier.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0005-web-cdp-advanced-tier.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/ingest-strategy.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.21.0-ingest-web-advanced-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.21.0-ingest-web-advanced-prompt.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/SKILLS.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H12",
+      "slice": "historical",
+      "q": "what were the six verb projections of the retrieval kernel",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0009-retrieval-kernel-graph-verbs.md",
+      "gold_rank": 1,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0009-retrieval-kernel-graph-verbs.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/README.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/knowledge-substrate.md",
+          "archived": true
+        },
+        {
+          "loc": "work/paper/the-fux-index-paper.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-implemented/PLAN-v0.26.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "H13",
+      "slice": "historical",
+      "q": "what was the retired decision to annotate rather than reorder",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0013-supersession-awareness.md",
+      "gold_rank": 3,
+      "top": [
+        {
+          "loc": "work/regression/2026-08-12-r2-close/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "work/open/W-44-archived-content-signalling.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0013-supersession-awareness.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/adr/0022_archived-signal.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0037_archived-content.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "H14",
+      "slice": "historical",
+      "q": "what did the old agent integration ship",
+      "returned": 5,
+      "archived_in_top": 3,
+      "contamination_pct": 60.0,
+      "unmarked": 0,
+      "gold": "archive/v0.26-docs/adr/0004-agent-integration.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/compare/agent-integration.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0004-agent-integration.md",
+          "archived": true
+        },
+        {
+          "loc": "work/INTERVIEW.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26/CHANGELOG.md",
+          "archived": true
+        },
+        {
+          "loc": "work/WORKLOG.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "H15",
+      "slice": "historical",
+      "q": "what was the p1 to p8 priority list",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": "archive/PRIORITY.md",
+      "gold_rank": 2,
+      "top": [
+        {
+          "loc": "work/open/W-62-measure-against-the-outside-world.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/PRIORITY.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/README.md",
+          "archived": true
+        },
+        {
+          "loc": "work/DOC-REGISTRY.md",
+          "archived": false
+        },
+        {
+          "loc": "work/WORKLOG.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "A01",
+      "slice": "ambiguous",
+      "q": "what is the ingest cache",
+      "returned": 5,
+      "archived_in_top": 5,
+      "contamination_pct": 100.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0002-ingest-cache-chunker.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/SKILLS.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/ingest-strategy.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/API.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.20.0-query-cli-v1-handoff.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "A02",
+      "slice": "ambiguous",
+      "q": "how does bm25f weighting work",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0008-substrate-store-lock-state.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/compare/query-engine.compare.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-12-r2-close/report.md",
+          "archived": false
+        },
+        {
+          "loc": "work/open/W-44-archived-content-signalling.md",
+          "archived": false
+        },
+        {
+          "loc": "work/proposals/ideal/02-lexical-engine.compare.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "A03",
+      "slice": "ambiguous",
+      "q": "what is the committed index layout",
+      "returned": 5,
+      "archived_in_top": 3,
+      "contamination_pct": 60.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/adr/0011_fux-dir-layout.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0003_fux-directory.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/handoff/v0.31.0-fux-dir-layout-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/handoff/v0.32.0-ratification-package.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-12-r2-close/report.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "A04",
+      "slice": "ambiguous",
+      "q": "how do i configure sources",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/handoff/v0.31.0-fux-dir-layout-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/handoff/v0.31.0-fux-dir-layout-prompt.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0014_config.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-19-w54/report.md",
+          "archived": false
+        },
+        {
+          "loc": "docs/adr/0019_fetcher.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "A05",
+      "slice": "ambiguous",
+      "q": "what does fux doctor check",
+      "returned": 5,
+      "archived_in_top": 3,
+      "contamination_pct": 60.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "docs/adr/0003_fux-directory.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.24.0-debug-observability-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-19-w54/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0012-debug-observability.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/DEBUG.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "A06",
+      "slice": "ambiguous",
+      "q": "how does hybrid retrieval work",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26/conformance/2026-07-22-acme-payments/ANALYSIS.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/conformance/2026-07-22-scaling-1k-5k-10k/report.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/hybrid-degrades-at-scale.md",
+          "archived": true
+        },
+        {
+          "loc": "work/proposals/agent-search-landscape.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0010-fuxvec-binary-dense-search.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "A07",
+      "slice": "ambiguous",
+      "q": "what is the chunker",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/adr/0002-ingest-cache-chunker.md",
+          "archived": true
+        },
+        {
+          "loc": "docs/adr/0037_archived-content.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.20.0-query-cli-v1-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/tests_e2e/corpus/docs/no-headings.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/open/W-24-m4-refer-plane.md",
+          "archived": true
+        }
+      ]
+    },
+    {
+      "id": "A08",
+      "slice": "ambiguous",
+      "q": "how is determinism guaranteed",
+      "returned": 5,
+      "archived_in_top": 2,
+      "contamination_pct": 40.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.1/docs/fux-test-repo-plan.md",
+          "archived": true
+        },
+        {
+          "loc": "work/open/W-52-df-over-the-union.md",
+          "archived": false
+        },
+        {
+          "loc": "work/regression/2026-08-20-refer-plane-r4/ANALYSIS.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26-docs/adr/0012-debug-observability.md",
+          "archived": true
+        },
+        {
+          "loc": "work/regression/2026-08-20-refer-plane-r4/report.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "A09",
+      "slice": "ambiguous",
+      "q": "what does fux setup create",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26-docs/example/API.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-docs/example/index.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/v0.23.0-knowledge-substrate-handoff.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/proposals/consumer-intent-policy.md",
+          "archived": true
+        },
+        {
+          "loc": "work/setup/fux-lab.md",
+          "archived": false
+        }
+      ]
+    },
+    {
+      "id": "A10",
+      "slice": "ambiguous",
+      "q": "how does dense retrieval work",
+      "returned": 5,
+      "archived_in_top": 4,
+      "contamination_pct": 80.0,
+      "unmarked": 0,
+      "gold": null,
+      "gold_rank": null,
+      "top": [
+        {
+          "loc": "archive/v0.26/conformance/2026-07-22-acme-payments/ANALYSIS.md",
+          "archived": true
+        },
+        {
+          "loc": "work/proposals/agent-search-landscape.md",
+          "archived": false
+        },
+        {
+          "loc": "archive/v0.26/conformance/2026-07-23-min-confidence-calibration/ANALYSIS.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26/proposals/hybrid-degrades-at-scale.md",
+          "archived": true
+        },
+        {
+          "loc": "archive/v0.26-implemented/phase9-fusion-lexical-hit-loss-handoff.md",
+          "archived": true
+        }
+      ]
+    }
+  ]
+}

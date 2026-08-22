@@ -1,13 +1,14 @@
 # W-59 — the refer plane is built, accepted, and one measurement short
 
-**Status:** OPEN · **Filed:** 2026-08-20 · **re-scoped 2026-08-21** — **R4 is
+**Status:** OPEN · **Filed:** 2026-08-20 · **re-scoped 2026-08-22** — **R4 is
 measured and passed (2026-08-20), and [ADR-REFER](../../docs/adr/0030_refer-plane.md)
 is `accepted` as of 2026-08-21** (`9f8366e`, Arpit's call) — **accepted with
 veto condition 2 open, not closed.** What keeps this item open is the **budget
-sweep**, which needs a graded corpus, and the goldens are unwritten by design
-([W-57](W-57-graph-lane-acceptance.md)) — the second measurement blocked on
-that one item.
-**Blocked by:** [W-57](W-57-graph-lane-acceptance.md) — the goldens
+sweep**, which needs a graded corpus — **now available**: the fux-lab
+`graph-acceptance` environment built for [W-57](W-57-graph-lane-acceptance.md)
+(66 documents, 24 graded goldens, 24/24 pass 2026-08-22).
+**Blocked by:** — nothing. W-57's goldens blocker is resolved; the sweep is
+startable.
 **Closes with:** the budget sweep filed under
 [`../regression/`](../regression/README.md) and ADR-REFER's **veto condition 2**
 resolved — by the sweep separating budgets, or by deleting the assembler if it
@@ -71,14 +72,25 @@ not taken.
       pre-registered 100 ms arm. **With a boundary the verdict states**: the
       plane fetches serially, so cold cost is `k x` the source's latency and a
       source slower than ~295 ms breaches the bound at k=10.
-- [ ] The budget sweep run and reported, **including if it is flat**.
-- [~] **ARC vs LRU measured 2026-08-20 and reported post-hoc** — the metric
-      was changed after seeing a number it then reversed (+0.91 pts overall,
-      **+2.50 pts on hot requests**, against a 2-pt bar declared before the
-      run). The second metric's reasoning is sound and it is still a post-hoc
-      choice, so [`cache-policy.compare.md`](../compare/cache-policy.compare.md)'s
-      reopen-trigger **stays open**. It also asks for *real* workloads, and a
-      synthetic trace can fire that trigger but cannot clear it. **Arpit's call.**
+- [x] The budget sweep run and reported, **including if it is flat** —
+      **run 2026-08-22, and it was not flat, but the finding is not "the
+      assembler wins" either.** Mean |delta| 12.55% (SINGLE, the shipped
+      path), every delta negative or zero: greedy never beat naive top-k,
+      losing up to 35.5% at realistic budgets. Root cause identified as the
+      per-document cap binding against a single candidate — filed as a new,
+      separate item ([W-70](W-70-refer-per-doc-cap-single-candidate.md))
+      rather than fixed inside this measurement. See
+      [`work/regression/2026-08-22-budget-sweep/`](../regression/2026-08-22-budget-sweep/report.md).
+- [x] **ARC vs LRU measured 2026-08-20, reported post-hoc, and ruled on
+      2026-08-22 — closed.** The metric was changed after seeing a number it
+      then reversed (+0.91 pts overall, **+2.50 pts on hot requests**, against
+      a 2-pt bar declared before the run). Post-hoc by definition, and on a
+      synthetic trace where [`cache-policy.compare.md`](../compare/cache-policy.compare.md)'s
+      reopen-trigger asks for a *real* workload. **Arpit reviewed the
+      reasoning directly and ruled: ARC wins.** The trigger does not fire
+      against R4; [ADR-CACHE](../../docs/adr/0034_cache.md) veto condition 6
+      still checks against any future real-workload measurement, updated in
+      the same change.
 - [x] Filed as a conformance run —
       [`work/regression/2026-08-20-refer-plane-r4/`](../regression/2026-08-20-refer-plane-r4/report.md).
 - [x] ADR-REFER's status resolved — **`accepted` 2026-08-21**, on R4's pass

@@ -123,3 +123,59 @@ def test_dropped_is_reported_so_truncation_is_never_silent():
 def test_a_nonpositive_budget_is_refused():
     with pytest.raises(ValueError):
         assemble([], budget=0)
+
+
+# -- W-72: the per-document cap and the single-candidate shape -----------------
+
+
+def test_one_document_may_use_the_whole_budget():
+    """W-72, and the shape `fux answer` actually ships.
+
+    `query/refer_answer.py` passes `refer()` exactly one candidate document, so
+    the per-document cap was discarding up to half the caller's budget to stop a
+    document dominating a field of one. Measured before the fix: the greedy
+    assembler lost to plain top-k by up to 35.5% at 500-2000 byte budgets.
+
+    Five 200-byte passages from one document, against a budget that fits four of
+    them. Under the old cap only two could be seated (1000 * 0.5 = 500 bytes,
+    minus the first-citation exemption); now the budget is the only bound.
+    """
+    scored = [sp("only.md", i, 200, 10.0 - i) for i in range(5)]
+    budget = 4 * (200 + CITATION_OVERHEAD)
+    result = assemble(scored, budget=budget)
+
+    assert len(result.citations) == 4, (
+        f"one document should be bounded by the budget alone, seated "
+        f"{len(result.citations)} of a possible 4"
+    )
+    assert result.used <= budget
+    assert {c.doc_id for c in result.citations} == {"file:only.md"}
+
+
+def test_the_cap_still_binds_the_moment_a_second_document_competes():
+    """The fix is scoped, not a removal.
+
+    The same passages plus one from a second document: the cap is live again,
+    because now there is something to protect. Without this assertion W-72's fix
+    reads as "the cap was wrong" rather than "the cap did not apply".
+    """
+    scored = [sp("big.md", i, 200, 10.0 - i) for i in range(5)]
+    scored.append(sp("other.md", 0, 200, 1.0))
+    budget = 4 * (200 + CITATION_OVERHEAD)
+
+    result = assemble(scored, budget=budget)
+    from_big = sum(c.nbytes for c in result.citations if c.doc_id == "file:big.md")
+    assert from_big <= int(budget * PER_DOC_FRACTION) + 200 + CITATION_OVERHEAD, (
+        "with a competitor present the per-document cap must still bind "
+        "(allowing the first-citation exemption)"
+    )
+
+
+def test_the_single_document_case_is_keyed_on_candidates_not_on_k():
+    """A caller that asks for one document gets the un-capped behaviour whether
+    or not it also passes `k` — the exemption is a property of the candidate
+    set, so it cannot be switched on by an unrelated argument."""
+    scored = [sp("only.md", i, 200, 10.0 - i) for i in range(4)]
+    budget = 4 * (200 + CITATION_OVERHEAD)
+    assert len(assemble(scored, budget=budget).citations) == 4
+    assert len(assemble(scored, budget=budget, k=2).citations) == 2

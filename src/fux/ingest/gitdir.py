@@ -11,10 +11,14 @@ dependency on git object hashes). Binary, non-UTF8, and empty files are
 skipped with a reason, never a crash; a configured source that doesn't exist
 on disk is a misconfiguration and fails loudly instead.
 
-**`archived` is parsed and not yet read.** The declaration is the half this
-change owns; turning it into a record property and a marker in every verb is
-gated on W-44's instrument (ADR-DIR-LIST decision 10). Nothing below branches
-on it, and the ranking is byte-identical either way — which is decision 6.
+**`archived` is parsed, and since 2026-08-22 it is read.** The declaration is
+the half this module owns. `archived_dirs()` exposes it and `is_archived_loc()`
+is the one test for whether a `loc` falls under one — used by `ingest/run.py` to
+stamp the record property (ADR-ARCHIVED-CONTENT decision 1) and by
+`query/rank.py` for the marker and the demotion. **One definition, because two
+copies of this predicate is a differential-law failure waiting for them to
+drift.** The ranking is still byte-identical at the default weight — which is
+ADR-ARCHIVED-CONTENT decision 2, and it has a test.
 
 ## Three conditions, and none of them overrides another
 
@@ -84,15 +88,27 @@ def source_excludes(root: Path, rel_path: str) -> list[str]:
 
 
 def archived_dirs(root: Path, rel_path: str) -> list[str]:
-    """Included entries declared `archived=true` (ADR-DIR-LIST decision 11's
-    input). Reads the same committed declaration decision 5 leaves off the
+    """Included entries declared `archived=true` (ADR-ARCHIVED-CONTENT decision 6's
+    input). Reads the same committed declaration ADR-ARCHIVED-CONTENT decision 1 leaves off the
     record — the ranking keys off the source list, never a path convention
-    (decision 4)."""
+    (ADR-DIR-LIST decision 4)."""
     return [
         entry.value
         for entry in read_dirs(root, rel_path)
         if not entry.exclude and entry.attrs.get("archived") == "true"
     ]
+
+
+def is_archived_loc(loc: str, archived_dirs) -> bool:
+    """`loc` falls under one of `archived_dirs` — a directory entry or an exact
+    single-file entry, mirroring how `walk_sources` resolves an entry against
+    the filesystem.
+
+    **The one definition.** `ingest/run.py` stamps the record property with it
+    and `query/rank.py` reads it for the marker and the demotion; a second copy
+    would let the property and the marker disagree about the same document.
+    """
+    return any(loc == d or loc.startswith(f"{d}/") for d in archived_dirs)
 
 
 #: What counts as a document when the consumer has not said otherwise.
