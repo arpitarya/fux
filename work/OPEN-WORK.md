@@ -46,32 +46,6 @@ when the pre-registration is written, and not because they look ready.*
 - **W-44** · `agent`+`arpit` · **the demotion weight landed 2026-08-22; the marker and disclaimer stay gated** · archived results — **scored normally, demotable, disclaimed**. **Landed:** the demotion weight ([ADR-DIR-LIST](../docs/adr/0022_dir-list.md) decision 11) — `[ranking] archived_weight` in `fux.toml`, **default `1.0`**, `fux.ingest.gitdir.archived_dirs()` reading the declaration (never a path), applied in the one shared `rank()` so the differential law carries it down both the scan and accelerator paths for free. Two tests, not one, per the ⚠ below: `tests/query/test_scan.py` asserts byte-identical results at the default **and** a live document overtaking an archived one once a weight is set; `tests_e2e/test_verbs.py` proves the same through the shipped CLI. **Still gated: the disclaimer** (decision 12, response-level, conditional) and the per-result `[archived]` marker — decision 10 says *"changing what a verb says about a document is a claim that needs an instrument"*, and the disclaimer says **more** than the marker, so it cannot be less gated. **Lifting that gate for the disclaimer alone is Arpit's call and is not assumed.** — [detail](open/W-44-archived-content-signalling.md)
 - **W-52** · **PARKED** · `df` is computed over the union — **42% of live terms carry an inflated `df`**; **trigger: the same pre-registration, plus a second corpus** — [detail](open/W-52-df-over-the-union.md)
 
-### [SETUP-PLAYGROUND](setup/fux-playground.md) · [SETUP-LAB](setup/fux-lab.md) — external sibling-repo redesign
-
-*Neither doc is an ADR (per [[fux-setup-docs]] / `docs/adr/README.md`'s
-scope), so this group is named by the Setup docs each item updates, not by a
-record in `docs/adr/`. **Filed 2026-08-22, planning only — nothing executed.**
-Both items are self-contained handoffs; read the detail file before starting
-either.*
-
-- **W-70** · `agent`+`arpit` · **planning only** · retire `fux-playground`'s
-  graded/goldens contract — Arpit, 2026-08-22: *"it is just for my personal
-  use... no testing or any sample set should be captured."* **Confirmed in
-  this session:** redefines `fux-playground` itself (not a separate repo).
-  ⚠ **This deletes the project's only ranking regression net** — do not
-  execute without first reading how W-57 and W-59 depend on this corpus's
-  phenomena. **Model: Sonnet** for the mechanical rewrite; **Opus** for where
-  the graded phenomena go, if anywhere — [detail](open/W-70-fux-playground-personal-sandbox.md)
-- **W-71** · `agent`+`arpit` · **planning only** · restructure `fux-lab` into
-  five independent git repos, one per tier — **10, 100, 1000, 5000, 10000**
-  documents (tier list confirmed this session) — each with its own fux setup,
-  for agent-driven testing/benchmarking. Two open questions are Arpit's call
-  before scaffolding starts: how `shared/` tooling is reused across five
-  independent repos, and whether the outer directory needs its own
-  safety net (the single-repo shape was partly why the 2026-08-20 loss was
-  recoverable at all). **Model: Sonnet** for scaffolding once those are
-  answered — [detail](open/W-71-fux-lab-tiered-repos.md)
-
 ### No record — external validation
 
 *Fux has never been measured against anything outside its own corpus or

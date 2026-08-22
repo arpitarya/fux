@@ -30,6 +30,52 @@ timestamp: 2026-08-12T00:00:00Z
 
 ---
 
+## ⚠ Planned redesign (2026-08-22) — not yet executed
+
+**Arpit, 2026-08-22, direct:** *"[fux-playground is] for me to try it out how
+it works, how does it feel like... No testing or anything or any sample set
+should be captured from Fux Playground. It is just for my personal use."*
+
+That is a scope reversal, not an extension — a switch from a **graded**
+fixture to a **personal sandbox**. Confirmed in the same session: this
+**redefines `fux-playground` itself** (a separate, differently-purposed repo
+was raised as the alternative and declined). **Nothing below has been
+executed.** The repo on disk still has today's graded contract — the rest of
+this document — until someone builds this.
+
+| | today (this document, below) | after this redesign |
+|---|---|---|
+| **purpose** | grades — regression net for ranking | personal feel/try-out only |
+| **corpus** | 10 adversarial docs, deliberately planting hazards | whatever Arpit wants to read fux answer against — no adversarial requirement |
+| **goldens** | ~50 queries, `goldens/queries.jsonl`, graded on rank | **none** |
+| **`check.py`** | grades the corpus, fails on regression/XPASS | **removed** |
+| **URLs** | 10, runtime smoke test only, never graded | kept — the one piece of today's contract that already matches Arpit's ask |
+| **`--index-guard`** | staleness + determinism check | open — costs nothing, needs no goldens; may be worth keeping even in a pure sandbox (undecided) |
+
+**What survives untouched:** the sibling-repo layout, the editable `../fux`
+dependency, and CDP port 9299 are not about grading. The existing corpus
+content (Calder Group / Helix) can seed the sandbox as-is — nothing forces
+starting over.
+
+**⚠ Hazard — this is the project's only ranking regression net.** Removing it
+does not just simplify a repo, it deletes the mechanism that catches a
+ranking change breaking a known answer. `W-57` and `W-59` in
+[`OPEN-WORK.md`](../OPEN-WORK.md) both currently point at this corpus's
+phenomena (the ADR-0007→ADR-0019 supersession pair, the near-duplicate
+runbooks) as their measurement target. **Do not execute this redesign without
+first reading both items and either re-homing their target corpus or
+recording, by name, that they now have none.**
+
+**Open questions, Arpit's to resolve before anyone builds this:**
+
+1. Where do the graded phenomena go, if anywhere — `tests_e2e/` as a proper
+   fixture, dropped project-wide (W-57/W-59 lose their acceptance
+   measurement), or something else? Not a separate repo.
+2. Does `--index-guard` survive in a pure sandbox?
+3. Git history — reset, or keep and change what's tracked going forward?
+
+---
+
 ## How to set it up
 
 ```bash

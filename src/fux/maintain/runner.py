@@ -7,10 +7,25 @@ what R5's failure bought.
 
 ## One-shot, never resident
 
-The spawned process runs one `fux ingest` and **exits**. There is no loop, no
-scheduler and no watcher — ADR-MAINTENANCE veto condition 6 fires on anything
-resident. It outlives the *commit* by design (that is what deferral means);
-what it may never do is outlive its own single unit of work.
+The spawned process **drains the dirty list and exits**. No scheduler, no
+watcher, nothing resident — ADR-MAINTENANCE veto condition 6 fires on any of
+those. It outlives the *commit* by design (that is what deferral means); what
+it may never do is outlive the work it was started for.
+
+**It does loop, and the loop is a correctness fix rather than a convenience.**
+A commit landing while this runner holds the lock has its spawn refused, on the
+documented assumption that *"the live runner picks up the accumulated list
+anyway"*. That assumption is only true if the live runner has not already taken
+its start-time snapshot — if it has, it clears *its* snapshot, exits, and the
+newer work is stranded with nobody holding it and no guarantee another commit
+will arrive. **CI found this: every Linux arm failed while Windows and macOS
+passed**, which is what a race looks like when one platform is slower.
+
+So `run_once` re-reads the list after each pass and runs again while there is
+work, bounded absolutely by `MAX_PASSES`. That bound is what keeps this on the
+right side of veto 6: the process provably terminates, and anything left over
+stays in the list for `fux doctor` to report and the next commit's spawn to
+collect — exactly where it would have been anyway.
 
 ## Single writer, and why the lock is a pid rather than an OS lock
 
@@ -87,6 +102,17 @@ STATUS_NAME = "runner.status"
 #: writers believing they hold the index.
 STOP_TIMEOUT_S = 30.0
 _POLL_S = 0.05
+
+#: How many times one runner will re-drain the dirty list before exiting and
+#: leaving the rest to the next commit's spawn.
+#:
+#: **A bound, not a tuning knob.** It exists so the loop in `run_once`
+#: provably terminates: without it, a repository committing faster than it
+#: re-indexes would keep one process alive indefinitely, which is precisely
+#: the resident process ADR-MAINTENANCE veto condition 6 forbids. Reaching the
+#: cap is not an error — the leftovers stay in the dirty list, `fux doctor`
+#: reports them, and the next commit spawns a fresh runner.
+MAX_PASSES = 5
 
 
 def _runtime(root: Path) -> Path:
@@ -443,19 +469,48 @@ def run_once(root: Path) -> str:
         # for this file.
         if _stop_path(root).exists() and not stop_requested(root, pid):
             _clear_stop(root)
-        try:
-            report = ingest_run(root, should_stop=lambda: stop_requested(root, pid))
-        except Exception as exc:  # noqa: BLE001 - recorded, not swallowed; see below
-            # A detached process has no stderr anyone reads, so an unrecorded
-            # exception is an invisible failure. It is written down and then
-            # re-raised: the traceback still goes to the process's own (null)
-            # stderr, and nothing here decides the error was unimportant.
-            _write_status(root, "failed", error=f"{type(exc).__name__}: {exc}")
-            raise
-        if report is None:
-            _write_status(root, "stopped")
-            return "stopped"
-        _write_status(root, "ok", docs=report.doc_count, changed=report.changed_count)
+
+        from . import dirty
+
+        passes = 0
+        while True:
+            passes += 1
+            try:
+                report = ingest_run(root, should_stop=lambda: stop_requested(root, pid))
+            except Exception as exc:  # noqa: BLE001 - recorded, not swallowed; see below
+                # A detached process has no stderr anyone reads, so an
+                # unrecorded exception is an invisible failure. It is written
+                # down and then re-raised: the traceback still goes to the
+                # process's own (null) stderr, and nothing here decides the
+                # error was unimportant.
+                _write_status(root, "failed", error=f"{type(exc).__name__}: {exc}", passes=passes)
+                raise
+            if report is None:
+                _write_status(root, "stopped", passes=passes)
+                return "stopped"
+            # **Re-check, and this is a correctness fix rather than a
+            # nicety.** A commit landing while we held the lock had its spawn
+            # refused — correctly, one writer — on the documented assumption
+            # that "the live runner picks up the accumulated list anyway". That
+            # assumption is only true if the live runner has not already taken
+            # its start-time snapshot. If it has, it discards *its* snapshot,
+            # exits, and the newer work is stranded with nobody left to run
+            # it: no process holds it, and no further commit is guaranteed.
+            #
+            # **Found by CI, not by reasoning.** Every Linux arm failed while
+            # Windows and macOS passed — the race is real on all three and the
+            # slower runner simply lost it more often.
+            #
+            # **This is not veto condition 6.** The process still terminates:
+            # it loops only while there is recorded work, and `MAX_PASSES`
+            # bounds it absolutely. It is not resident, has no scheduler and
+            # watches nothing — it drains what exists and exits. Leftovers are
+            # reported by `fux doctor` and picked up by the next commit's
+            # spawn, which is exactly where they were before this loop existed.
+            if not dirty.read(root) or passes >= MAX_PASSES:
+                break
+
+        _write_status(root, "ok", docs=report.doc_count, changed=report.changed_count, passes=passes)
         return "ok"
     finally:
         release(root)

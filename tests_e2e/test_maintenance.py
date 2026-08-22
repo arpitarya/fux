@@ -188,58 +188,62 @@ def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
     assert "new.md" in found, "the deferred runner should have re-indexed the committed tree"
 
 
-def _median_commit_time(root: Path, label: str, rounds: int = 3) -> float:
-    samples = []
-    for i in range(rounds):
-        (root / "docs" / f"timed-{label}-{i}.md").write_text(doc(f"timed{label}{i}"), encoding="utf-8")
-        git(root, "add", "-A")
-        start = time.monotonic()
-        subprocess.run(
-            ["git", "commit", "-qm", f"timed {label} {i}"], cwd=root, capture_output=True,
-            text=True, env=_hook_env(),
-        )
-        samples.append(time.monotonic() - start)
-        _drain(root)
-    return sorted(samples)[len(samples) // 2]
+def test_the_commit_returns_before_the_re_index_has_happened(tmp_path):
+    """ADR-MAINTENANCE veto condition 5, asserted **structurally rather than
+    with a stopwatch** — the commit hands back while the work is still
+    outstanding, which is the property, and it is observable without timing
+    anything.
 
+    > **This replaced a timed test, and the reason is worth keeping.** The
+    > first version committed into a 50-document repo and an 800-document repo
+    > and compared wall clock, asserting the larger stayed within 3×. It
+    > passed locally and **failed both macOS arms in CI** — not on the ratio,
+    > but because draining four full re-indexes of 800 documents blew the
+    > drain timeout on a shared runner.
+    >
+    > Making the bound looser or the timeout longer would have been tuning a
+    > flake until it hid. The real defect is that a **latency** assertion does
+    > not belong in a suite that must be green on someone else's machine:
+    > fux-lab's TEST-PLAN §2 already says latency is not comparable across
+    > surfaces, and ADR-MAINTENANCE's own "How to check it" for veto 5 points
+    > at `work/regression/.../reproduce.sh` — a measured run — rather than at
+    > this file. The cross-size *measurement* is that harness's job. What
+    > belongs here is that the deferral exists at all.
 
-def _seeded_repo(root: Path, docs: int) -> Path:
-    make_repo(root, hooks=True)
-    for i in range(docs):
-        (root / "docs" / f"bulk{i}.md").write_text(doc(f"bulkterm{i}"), encoding="utf-8")
-    git(root, "add", "-A")
-    subprocess.run(
-        ["git", "commit", "-qm", "bulk"], cwd=root, capture_output=True, text=True, env=_hook_env()
-    )
-    assert _drain(root)
-    return root
+    The check is the **hook's own output**, which is deterministic: a deferring
+    `post-commit` announces that it spawned and returned. An inline one printed
+    `fux: ingested N docs …` and then `the index changed — commit .fux/index`,
+    because it had done the work before handing back.
 
-
-def test_the_commit_path_does_not_track_corpus_size(tmp_path):
-    """ADR-MAINTENANCE veto condition 5, in the words the record uses:
-    *"`post-commit` wall time must not track corpus size."*
-
-    Commit one document into a small corpus and into a corpus sixteen times
-    larger, and compare. An inline hook grows with the corpus — that is R5's
-    whole attribution, and none of it went away: `fux ingest` still walks and
-    shas every file and re-resolves every edge. What changed is that nobody
-    waits for it.
-
-    **Not a re-run of R5.** R5 judged the inline hook against a pre-registered
-    1 s bound at 100 000 documents and that verdict stands exactly as measured.
-    This asserts a ratio between two sizes, has no pre-registered threshold,
-    and rules on nothing.
+    > **Observing the *state* instead would be racy, and the reason is a real
+    > property rather than a test artefact.** A first attempt asserted that the
+    > runner was still live, or the dirty list still non-empty, immediately
+    > after the commit. It failed locally with `docs: 152, changed: 0` — the
+    > runner spawned by the *previous* commit was still going, and
+    > `fux ingest` walks the **working tree**, so it had already indexed 150
+    > files that were not committed yet. Deferral widens the window in which
+    > that is true; the index is late either way, and a later run corrects it.
+    > It does mean "is there outstanding work right now" is not a stable
+    > observation, so this asserts the path taken rather than the state left.
     """
-    small = _median_commit_time(_seeded_repo(tmp_path / "small", 50), "small")
-    large = _median_commit_time(_seeded_repo(tmp_path / "large", 800), "large")
-
-    # 3x is deliberately loose — this is a shape assertion on a shared CI box,
-    # not a latency budget. Constant work lands near 1x; an inline hook at 16x
-    # the corpus does not land under 3x.
-    assert large < small * 3, (
-        f"commit cost tracks corpus size: {small:.3f}s at 50 docs vs {large:.3f}s at 800 "
-        f"({large / small:.1f}x for 16x the corpus) - post-commit is doing the work inline"
+    make_repo(tmp_path, hooks=True)
+    for i in range(30):
+        (tmp_path / "docs" / f"bulk{i}.md").write_text(doc(f"bulkterm{i}"), encoding="utf-8")
+    git(tmp_path, "add", "-A")
+    committed = subprocess.run(
+        ["git", "commit", "-m", "bulk"], cwd=tmp_path, capture_output=True, text=True,
+        env=_hook_env(),
     )
+    assert committed.returncode == 0, "a hook must never block a commit"
+
+    output = committed.stdout + committed.stderr
+    assert "in the background" in output, (
+        f"post-commit did not announce a deferred re-index. Output was:\n{output}"
+    )
+    assert "ingested" not in output, (
+        f"post-commit ran an ingest inline — that is what R5 measured at 44 s.\n{output}"
+    )
+    assert _drain(tmp_path), "the detached runner never finished"
 
 
 def test_nothing_fux_spawned_outlives_its_own_run(tmp_path):

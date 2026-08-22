@@ -179,6 +179,57 @@ def test_run_once_clears_a_stop_aimed_at_a_previous_runner(tmp_path):
     assert runner.run_once(tmp_path) == "ok", "a stale stop must not halt a fresh runner"
 
 
+def test_work_recorded_while_the_lock_was_held_is_not_stranded(tmp_path, monkeypatch):
+    """The bug CI found, as a unit test.
+
+    A commit landing while a runner holds the lock has its spawn refused —
+    correctly — on the assumption that *"the live runner picks up the
+    accumulated list anyway"*. That only holds if the live runner has not yet
+    taken its start-time snapshot. If it has, it discards its own snapshot,
+    exits, and the newer ids are stranded: no process holds them and no
+    further commit is guaranteed to arrive.
+
+    **Every Linux CI arm failed on this while Windows and macOS passed** — the
+    race exists on all three, and the slower runner simply lost it more often.
+    """
+    _corpus(tmp_path)
+    real_run = sys.modules["fux.ingest.run"].run
+    landed = []
+
+    def run_then_a_commit_lands(root, **kwargs):
+        report = real_run(root, **kwargs)
+        if not landed:  # exactly once, after the first pass has snapshotted
+            landed.append(True)
+            dirty.record(root, ["file:docs/late.md"])
+        return report
+
+    monkeypatch.setattr(sys.modules["fux.ingest.run"], "run", run_then_a_commit_lands)
+    assert runner.run_once(tmp_path) == "ok"
+    assert dirty.read(tmp_path) == [], (
+        "a runner exited leaving recorded work behind and nobody to do it"
+    )
+
+
+def test_the_redrain_loop_is_bounded(tmp_path, monkeypatch):
+    """Veto condition 6: the runner must terminate. A repository committing
+    faster than it re-indexes must not keep one process alive forever."""
+    _corpus(tmp_path)
+    real_run = sys.modules["fux.ingest.run"].run
+    passes = []
+
+    def run_and_always_dirty(root, **kwargs):
+        passes.append(1)
+        report = real_run(root, **kwargs)
+        dirty.record(root, [f"file:docs/never-ending-{len(passes)}.md"])
+        return report
+
+    monkeypatch.setattr(sys.modules["fux.ingest.run"], "run", run_and_always_dirty)
+    assert runner.run_once(tmp_path) == "ok"
+    assert len(passes) == runner.MAX_PASSES, "the loop did not stop at MAX_PASSES"
+    assert dirty.read(tmp_path), "the leftovers must stay pending for the next spawn to find"
+    assert runner.holder(tmp_path) is None, "the runner must still have exited"
+
+
 def test_a_failed_run_is_recorded_and_still_raises(tmp_path, monkeypatch):
     """A detached process has no stderr anyone reads. Silence is the bug."""
     _corpus(tmp_path)

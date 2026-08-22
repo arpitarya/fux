@@ -25,6 +25,60 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+## ⚠ Planned redesign (2026-08-22) — not yet executed
+
+**Arpit, 2026-08-22, direct:** *"[the lab] will have multiple folders in
+it... All these directories are going to be individual git repos which will
+have independent fux setup in them and should be used for testing or for
+benchmarking by the agent."* Tier list confirmed in the same session: **10,
+100, 1000, 5000, 10000** documents.
+
+**Nothing below has been executed.** `fux-lab` on disk is still one git repo
+with environment subdirectories — the rest of this document — until someone
+builds this.
+
+| | today (this document, below) | after this redesign |
+|---|---|---|
+| **outer structure** | `fux-lab` is one git repo; environments are subdirectories inside it | `fux-lab` is a plain directory; each tier is its own git repo inside it |
+| **tiers** | `1k`, `5k`, `10k` (plus `acme`, `orbit`, `rfc`, `smoke`) | `10`, `100`, `1000`, `5000`, `10000` — the five numeric tiers Arpit named |
+| **isolation** | already isolated (own venv/corpus/results/version pin) but sharing one `.git` | fully isolated, including version control |
+| **`shared/` tooling** | one copy, common to every tier by construction | needs a strategy — see open questions below |
+
+**Undecided, left alone unless a future ask says otherwise:** whether `acme`,
+`orbit`, `rfc` and `smoke` — the existing non-numeric corpora documented below
+— move into this structure, stay as they are, or are dropped.
+
+**What survives untouched:** `shared/new-env.sh`, `shared/generate/make_corpus.py`
+(seeded, byte-identical) and `shared/regress/run.py` all still do their job —
+the question is only how they reach five independent repos instead of one.
+The never-delete-or-rebuild standing rule and the cloud-sandbox requirement
+(no network / Python 3.10 on the device VM) are unaffected.
+
+**⚠ Hazard — the single-repo shape is why the 2026-08-20 loss was recoverable
+at all.** `fux-lab` became a git repo specifically because losing it once,
+with nothing to restore from, was expensive (see the rebuild note below).
+Splitting into five independent repos with no enclosing repo removes
+whatever protection that outer `.git` provided. **This redesign should not
+drop that protection silently** — see open question 2.
+
+**Open questions, Arpit's to resolve before anyone builds this:**
+
+1. **How does `shared/` get into five independent repos?** Vendor a full
+   copy into each (simple, can drift); keep one canonical `shared/` outside
+   all five and have each tier pull from it (preserves "one fix, five tiers
+   recover," adds a cross-repo dependency); or a git submodule per tier
+   (correct versioning, adds submodule overhead).
+2. **Does the outer `fux-lab` directory need its own safety net** — e.g. a
+   manifest listing the five tier repos and their remotes/commits — or is
+   reduced protection an accepted cost of independence?
+3. **Naming** — Arpit called this "Fux setup" in conversation, not
+   "fux-lab." This document assumes the existing name and location
+   (`~/my_programs/fux-lab`) carry forward, since the purpose is unchanged and
+   only the internal shape changes. Confirm before executing if a genuinely
+   new, differently-named repo was meant instead.
+
+---
+
 ## What it is, and why it exists
 
 The lab is where numbers come from. It holds **one directory per environment**

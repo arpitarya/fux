@@ -183,7 +183,7 @@ speedup still missed the bound by 4.5× at the judged size.
 | step | property |
 |---|---|
 | write the ids of the changed documents to a **dirty list** | a *list*, not a flag — see below |
-| spawn a **detached one-shot** re-index | it runs to completion and **exits**; nothing is always-on |
+| spawn a **detached one-shot** re-index | it drains the dirty list and **exits**; nothing is always-on |
 | **return immediately** | commit cost becomes git's cost — 0.22 s at 10k, 0.34 s at 100k, and **constant in the corpus** |
 
 **Three things this decision turns on:**
@@ -495,6 +495,19 @@ legal, explicit, per-document opt-out
 5. **The commit path stops being constant in the corpus** — a deferring hook
    whose cost still grows with corpus size has kept option B's costs and lost
    its benefit. Checkable: `post-commit` wall time must not track corpus size.
+6a. **Amended 2026-08-22, after CI found a stranding bug.** The runner
+   **re-drains**: after a pass it re-reads the dirty list and runs again while
+   there is work, bounded by `runner.MAX_PASSES`. Without that, a commit whose
+   spawn was refused (because this runner held the lock) had its ids stranded —
+   the live runner clears only its own start-time snapshot, so the newer work
+   was left with no process holding it and no guarantee another commit would
+   arrive. **Every Linux CI arm failed on it while Windows and macOS passed**,
+   which is what this race looks like on a slower box.
+   **This is not condition 6 firing.** The bound makes termination provable, so
+   the process is still one-shot in the only sense that matters: it ends.
+   Leftovers past the cap stay in the list, `fux doctor` reports them, and the
+   next commit's spawn collects them — which is where they were before.
+   Checkable: `tests/maintain/test_runner.py -k "stranded or bounded"`.
 6. **The detached runner turns into something always-on** — a resident process,
    a scheduler, or a watcher. That is option C from
    [`maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md),

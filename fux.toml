@@ -25,3 +25,22 @@ cdp_port  = 9299
 # Fixed at 256 (shard = blake2b(id, digest_size=1) -> 00..ff); this key
 # documents the value rather than setting it.
 shards = 256
+
+# Fux marks retired documents `archived` and states no conclusion. These files
+# teach your agents how to READ that mark -- they are the difference between an
+# agent citing a retired design confidently and one that says it is retired.
+#
+# THEY ARE WRITTEN OUTSIDE .fux/, into directories GitHub, AWS and Anthropic
+# own, which is why the default is spelled out here rather than left implicit:
+#
+#   claude   -> .claude/skills/fux-archived-results/SKILL.md
+#   copilot  -> .github/agents/fux.agent.md
+#               .github/instructions/fux-archived-results.instructions.md
+#   kiro     -> .kiro/steering/fux-archived-results.md
+#
+# Two of them are AMBIENT (`applyTo: "**"`, `inclusion: always`) and enter every
+# request in this repo, for every developer, whether or not they are using fux.
+# Delete a name to stop installing it; `install = []` installs none. Editing a
+# file that is already there is safe -- fux never rewrites one.
+[agents]
+install = ["claude", "copilot", "kiro"]
