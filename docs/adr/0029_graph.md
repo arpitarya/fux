@@ -338,6 +338,20 @@ fallback.
 1. **Community assignment is not byte-identical across two machines** on the
    same committed index. That is the L3 claim, and it is the one this record
    most depends on.
+
+   **Checked 2026-08-22 — did not fire, and this condition is now discharged.**
+   `.fux/runtime/graph.json` over the `graph-acceptance` corpus hashes to
+   `3ede58638eca67857fd9919e21632c8ce0964b3c6ce273de73d11daf1ca30a53` on **both**
+   an x86-64 Linux cloud sandbox and Arpit's arm64 macOS machine — all 64 hex
+   characters, from independent `setup.sh` runs that each generated the corpus,
+   ingested and built from scratch.
+
+   **Two different architectures is a stronger result than the condition asked
+   for.** It was written to catch set-iteration order and unseeded randomness,
+   which two runs on one machine cannot see; a matching hash across x86-64 and
+   arm64 also rules out float-width and byte-order dependence in the label
+   propagation. **Repro:** `cd fux-lab/graph-acceptance && ./setup.sh &&
+   shasum -a 256 .fux/runtime/graph.json`.
 2. **A corpus exists where `fux graph` ranks a node farther from the seed above
    a nearer one.** That is the defect laziness was added to remove; its return
    means three iterations is too few for real structure, and `ITERATIONS`

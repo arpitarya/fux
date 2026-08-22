@@ -8,6 +8,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [0.37.0] - 2026-08-22
+
 ### Added
 
 - **Archived documents now say so, in every verb.** A document from a source

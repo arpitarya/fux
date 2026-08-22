@@ -17,10 +17,6 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
-### [ADR-GRAPH](../docs/adr/0029_graph.md) · [ADR-REFER](../docs/adr/0030_refer-plane.md) — the two planes that shipped ahead of their acceptance measurement
-
-- **W-57** · `arpit` · **measured 2026-08-22 on a new corpus — one thing left, and only Arpit's hands can do it** · the three re-scoped phenomena (supersession · near-duplication · staleness≠wrongness) were graded against a new 66-doc fux-lab corpus (`graph-acceptance`), goldens agent-authored at Arpit's direct instruction (a recorded departure from the original DoD). **24/24 pass** ([run](regression/2026-08-22-graph-acceptance/report.md)). fux-playground itself is still ungraded — separate, unresolved. **All that remains: community assignment reproduced byte-identically on a *second machine*** — only one machine (the cloud sandbox) was available this session; needs Arpit to run `fux build && shasum -a 256 .fux/runtime/graph.json` in the `graph-acceptance` env on his own machine and compare against `3ede5863…` — [detail](open/W-57-graph-lane-acceptance.md)
-
 ### [ADR-RANKING](../docs/adr/0012_ranking.md) · [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) — **parked**
 
 *W-52 is gated on a pre-registered instrument **plus a second corpus**. The

@@ -1,7 +1,13 @@
 # W-57 — the graph lane's acceptance measurement
 
-**Status:** MEASURED 2026-08-22, on a substitute corpus — the original
-target (fux-playground's goldens) is still unbuilt. **Filed:** 2026-08-20 ·
+**Status:** **CLOSED 2026-08-22.** Both halves measured: the three phenomena
+at 24/24 on a substitute corpus built for the purpose, and two-machine
+determinism across two architectures. **Two departures from the original
+definition of done, both recorded rather than smoothed over:** the corpus is a
+new fux-lab environment, not fux-playground (whose goldens were lost and may
+never be rebuilt), and its **goldens were agent-authored** — from the
+generator's construction ground truth, never from the engine's own output — at
+Arpit's direct instruction, against this item's own "no agent should do it". **Filed:** 2026-08-20 ·
 **re-scoped 2026-08-20** · **measured 2026-08-22**
 **What happened:** fux-playground's ~50 goldens were never rebuilt (still
 true — see its 2026-08-22 planned-redesign note, which may drop grading
@@ -82,10 +88,17 @@ until a run under `work/regression/` says so.
 - [x] The whole golden set is re-checked, not only the targeted queries —
       all 24 goldens (including 3 general/negative checks) run every time
       `check_graph.py` runs; none are skipped.
-- [ ] Community assignment reproduced **byte-identically on a second machine**
+- [x] Community assignment reproduced **byte-identically on a second machine**
       — `shasum -a 256 .fux/runtime/graph.json` on the same committed index.
-      **Still not done.** Two runs on the same (cloud sandbox) machine matched;
-      no second machine was available this session.
+      **Done 2026-08-22.** `3ede5863…a30a53` on **both** the x86-64 Linux cloud
+      sandbox and Arpit's arm64 macOS machine, from independent `setup.sh` runs
+      that each generated, ingested and built from scratch. **Two architectures
+      is more than the box asked for**: it also rules out float-width and
+      byte-order dependence, which two machines of the same kind would not have
+      caught. [ADR-GRAPH](../../docs/adr/0029_graph.md) veto condition 1
+      discharged; the result is appended to the run's report as a dated addendum
+      rather than merged into its §2 table, which still records what was true
+      when it was filed.
 - [x] Filed as a conformance run:
       [`work/regression/2026-08-22-graph-acceptance/`](../regression/2026-08-22-graph-acceptance/report.md)
       with report, `ANALYSIS.md`, `evidence/`, a README row and a DOC-REGISTRY

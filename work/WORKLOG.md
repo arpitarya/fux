@@ -30,6 +30,25 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-22 — W-57 closes: determinism confirmed on Arpit's own machine  ·  Cowork
+
+- **Asked:** *"What's blocked W fifty seven?"* — then Arpit ran the second-machine check himself and pasted the output.
+- **Did:** Confirmed the hash matches across all 64 hex characters — `3ede58638eca67857fd9919e21632c8ce0964b3c6ce273de73d11daf1ca30a53` on both the x86-64 Linux cloud sandbox and Arpit's arm64 Mac, from independent `setup.sh` runs that each generated, ingested and built from scratch. **[ADR-GRAPH](../docs/adr/0029_graph.md) veto condition 1 discharged.** The result is **appended to the filed run as a dated addendum**, not merged into its §2 table, which still reads *"not checked — only one machine was available this session"* because that is what was true when it was filed. W-57's last DoD box checked, detail file moved to `archive/open/`, row and its emptied ADR-GRAPH/ADR-REFER group removed from OPEN-WORK, outcome recorded in IMPLEMENTATION.md.
+- **Decided / open:** **Two architectures is a stronger result than the condition asked for.** Veto 1 was written to catch set-iteration order and unseeded randomness, which two runs on one machine cannot see; a match across x86-64 and arm64 additionally rules out float-width and byte-order dependence in the label propagation. Worth keeping, because a future reader may otherwise re-run it on two identical Linux boxes and think the condition is equally satisfied.
+- **One correction, recorded rather than quietly fixed:** the addendum's first draft asserted a defect in the corpus generator — that `planted.json` was written outside the environment. **That was wrong**, inferred from a misleading print line rather than checked. Both manifests were rewritten by Arpit's run at the same second and are byte-identical; only the print statement names the source path instead of the destination. No defect filed. This is the repo's own reconcile-don't-read rule catching a status claim the same session was about to write down.
+- **Next:** `work/open/` is down to **W-52** (needs a second corpus) and **W-62** (needs a Confluence-shaped corpus and five external installs). The agent lane is empty. **Nothing this session is committed** — `HEAD` is still `fa3ba30`.
+
+---
+
+## 2026-08-22 — release: v0.37.0 committed, pushed and cut  ·  Claude Code
+
+- **Asked:** "commit push and publish a new version" — closing out the prior session's uncommitted W-44/W-69/W-72 work.
+- **Did:** Unstaged four large `_to_delete/*.tgz` scratch files (~23 MB) that were accidentally `git add -A`'d alongside the real changes — left on disk, flagged below, not committed. Ran the full suite (1098 unit + 73 e2e green) and the ADR ownership/freshness checks before committing. Split into two commits so the freshness check's per-commit ownership rule stays honest: `2786b6f` carries the substantive W-44/W-69/W-72 work (ADRs already updated in the same diff by the prior session); this second, separate release commit bumps `src/fux/__init__.py` to `0.37.0`, closes `CHANGELOG.md`'s `[Unreleased]` section as `[0.37.0]`, and carries `no ADR affected` (a version bump touches no law) — the same split the `e11ca74` v0.36.0 release used. A concurrent Cowork session closed **W-57** (two-machine determinism, ADR-GRAPH veto 1 discharged) while this was in flight; its `OPEN-WORK.md`/`IMPLEMENTATION.md`/ADR edits are reconciled into this same commit rather than clobbered. Next: push to `main`, watch CI, then `gh release create v0.37.0` to fire `publish.yml`, and confirm on PyPI.
+- **Decided / open:** the two `_to_delete/` situations are distinct and both still need Arpit's call: `work/open/_to_delete/` (W-70/W-71, tracked since `e11ca74`) and the new root-level `_to_delete/*.tgz` (untracked, looks like worktree-transfer/backup scratch, never committed).
+- **Next:** push, watch CI, cut the GitHub release, verify PyPI. Arpit to decide the two `_to_delete/` paths; `work/open/` remaining items (W-52, W-62) still need his hands.
+
+---
+
 ## 2026-08-22 — W-44's gate lifted and built; W-69 closes ADR-RS; W-72 fixed  ·  Cowork
 
 - **Asked:** review open work, then — *"The gate is lifted for W-44 - Arpit order, implement W-69, and whatever is pending or can be done in open works."*

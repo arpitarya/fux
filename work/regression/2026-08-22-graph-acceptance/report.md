@@ -85,3 +85,48 @@ outstanding, not silently dropped.
 
 See [`ANALYSIS.md`](ANALYSIS.md) for the methodology caveat on who wrote the
 goldens.
+
+---
+
+## Addendum — 2026-08-22, the second machine
+
+**Appended, not merged into §2 above.** §2's determinism table still reads
+*"not checked — only one machine was available this session"*, because that is
+what was true when the run was filed. A filed run is superseded by a newer
+measurement, never rewritten to look better — the same discipline the M2
+accelerator report's annotated Reproduce block and R6-MERGE's appended
+adjudication follow.
+
+**The check ADR-GRAPH veto condition 1 asks for has now run, on a second
+machine, and passed.**
+
+| machine | architecture | `shasum -a 256 .fux/runtime/graph.json` |
+|---|---|---|
+| cloud sandbox (this run) | x86-64 Linux | `3ede58638eca67857fd9919e21632c8ce0964b3c6ce273de73d11daf1ca30a53` |
+| Arpit's own machine | arm64 macOS | `3ede58638eca67857fd9919e21632c8ce0964b3c6ce273de73d11daf1ca30a53` |
+
+Identical across all 64 hex characters, from **independent `setup.sh` runs** —
+each generated the 66-document corpus from the seeded generator, ingested, and
+built the accelerator from scratch. The second machine also reproduced the
+corpus itself (66 documents, 433 terms, 3 696 postings) before hashing.
+
+**This is a stronger result than the condition required.** Veto 1 was written
+to catch set-iteration order and unseeded randomness, neither of which two runs
+on one machine can see. A match across **two architectures** additionally rules
+out float-width and byte-order dependence in the label propagation.
+
+**Repro:** `cd ~/my_programs/fux-lab/graph-acceptance && ./setup.sh && shasum -a 256 .fux/runtime/graph.json`
+
+**A defect was suspected while reading the run's output and then disproved, which
+is recorded here because the first version of this addendum asserted it.** The
+generator prints `wrote planted-phenomena manifest:
+.../graph-acceptance/../shared/generate/planted.json`, which reads as though the
+environment's own manifest is never refreshed. It is: `write_corpus()` writes the
+canonical copy next to the generator and `__main__` then copies it into the
+environment, and both files on disk were rewritten by this run at the same second
+and are byte-identical (`diff -q`, checked).
+
+**What is real is only that the print statement names the source path rather than
+the destination**, which is cosmetic. **No defect is filed.** The lesson is the
+repo's own — a status claim gets checked against the filesystem before it is
+written down, not inferred from a log line.
