@@ -25,7 +25,20 @@ _SKIP = {
 # `work/WORKLOG.md` is append-only history: its old entries describe a tree that
 # really did have a second archive, and rewriting them would make the record
 # false. `archive/` itself is frozen and its links are never repaired.
-_STALE_LINK_EXEMPT = {"work/WORKLOG.md"}
+#
+# ADR-ONE-ARCHIVE is exempt because it is **the record of this very rule**, and
+# it cannot state what it retired without naming `docs/archive/` and
+# `work/archive/` — they are its §Alternatives and its history, not links to
+# follow. Flagging it is the check firing on correct content, which is how a
+# check gets switched off rather than fixed (the same lesson
+# `tests/test_windows_console_safe.py` paid for when it flagged the code
+# defending against a character).
+#
+# ⚠ **The cost, stated rather than discovered:** a genuinely stale link inside
+# that one file is now invisible to this test. The exemption is per-file
+# because that is the mechanism available, and the mitigation is that the file
+# is short, is about nothing else, and names those paths only in prose.
+_STALE_LINK_EXEMPT = {"work/WORKLOG.md", "docs/adr/0037_one-archive.md"}
 
 
 def test_the_root_archive_exists_and_is_mapped() -> None:

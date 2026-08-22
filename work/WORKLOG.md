@@ -30,6 +30,36 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-22 — new record: ADR-ONE-ARCHIVE (0037)  ·  Cowork
+
+- **Asked:** create a new ADR just for how the archive works, linking to
+  ADR-DIR-LIST if needed. (Clarified from an earlier exchange this session:
+  ADR-DIR-LIST governs ranking of *archived source directories* in a
+  customer's ingested corpus — a different "archive" from this repo's own
+  `archive/` convention, which is what this ADR is actually about; the two
+  are related only by name and are cross-referenced, not merged.)
+- **Did:** wrote [`docs/adr/0037_one-archive.md`](../docs/adr/0037_one-archive.md)
+  (**ADR-ONE-ARCHIVE**, `status: accepted`) — the first decision record for
+  the standing "exactly one `archive/`, at the repo root" rule (Arpit,
+  2026-08-10, restated 2026-08-18), which previously existed only as
+  `CLAUDE.md` prose and `tests/test_archive_law.py`. Owns no `src/`/`tools/`
+  component, per the same "companion record, owns nothing" pattern
+  ADR-CACHEDIR-TAG and its siblings use. Added its register row to
+  [`docs/adr/README.md`](../docs/adr/README.md) (0037, accepted, built: yes).
+  Does not edit `CLAUDE.md` — that file is Arpit's to ratify — but the ADR's
+  Reference section notes a future session may propose repointing
+  `CLAUDE.md`'s "Archive is not evidence" section to cite it by name.
+- **Decided / open:** nothing left open by this record — it formalizes an
+  already-ratified, already-enforced rule. One debt named rather than
+  claimed-covered: `tests/test_archive_law.py` checks that `archive/README.md`
+  *exists*, not that every archived item has a row in it or that every row's
+  named successor still exists — flagged in the ADR's Consequences as a gap
+  the way `tests/test_doc_registry.py` closes it for the live registry, with
+  no claim that anything already checks it.
+- **Next:** none required; a future session could file a small mechanical
+  item for the archive/README.md row-completeness check named above, if
+  Arpit wants it.
+
 ## 2026-08-22 — SETUP-PLAYGROUND and SETUP-LAB rewritten for the planned redesign  ·  Cowork
 
 - **Asked:** document (not implement) two setups: `fux-playground` becoming a
