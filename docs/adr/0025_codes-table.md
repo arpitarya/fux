@@ -152,3 +152,19 @@ an approximate index, which today is explicitly not built.
 ls work/regression/ | grep -i dense
 # expect: no dense-lane latency run yet: this record's veto has not fired
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) ·
+[ADR-DOCS-TABLE](0024_docs-table.md)
+
+**Code**
+
+- [`src/fux/derive/dense.py`](../../src/fux/derive/dense.py)

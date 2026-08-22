@@ -174,3 +174,23 @@ git log --oneline -- archive/v0.26/ | head -3
 grep -rln 'archive/v0.26' src/fux/
 # expect: docstrings in the ported modules, and only those
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md)
+
+**Code**
+
+- [`src/fux/frontmatter.py`](../../src/fux/frontmatter.py)
+- [`src/fux/query/bm25f.py`](../../src/fux/query/bm25f.py)
+- [`src/fux/query/tokenize.py`](../../src/fux/query/tokenize.py)
+
+**Measured evidence**
+
+- [`work/regression/README.md`](../../work/regression/README.md)

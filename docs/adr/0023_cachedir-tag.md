@@ -156,3 +156,23 @@ carrying one.
 find .fux/index -name CACHEDIR.TAG
 # expect: no output — a tag here means the committed index is being marked skippable
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md)
+
+**Code**
+
+- [`src/fux/store/fuxdir.py`](../../src/fux/store/fuxdir.py)
+
+**Papers and specifications**
+
+- The `CACHEDIR.TAG` specification — cache-directory tagging
+  <https://bford.info/cachedir/>

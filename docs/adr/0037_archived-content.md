@@ -544,3 +544,25 @@ src/fux/query/__init__.py: ...  # passed through
 src/fux/query/rank.py: ...      # consumed here
                                           # 3 - three files, no fourth reader
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-FIND](0005_find.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-DIR-LIST](0022_dir-list.md) ·
+[ADR-REFER](0030_refer-plane.md) · [the register](README.md)
+
+**Measured evidence**
+
+- [`tools/archived-signal-eval/PRE-REGISTRATION.md`](../../tools/archived-signal-eval/PRE-REGISTRATION.md)
+- [`work/regression/2026-08-22-archived-signal/VERDICT.md`](../../work/regression/2026-08-22-archived-signal/VERDICT.md)
+
+**Project docs**
+
+- [`work/compare/df-over-the-union.compare.md`](../../work/compare/df-over-the-union.compare.md)

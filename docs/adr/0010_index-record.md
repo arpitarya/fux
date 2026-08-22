@@ -301,3 +301,39 @@ print('undocumented properties:', sorted(seen - known) or 'none')"
 #    named as a migration, not as corruption.
 fux build >/dev/null && echo "rule 2 holds on this corpus"
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-ANSWER](0006_answer.md) ·
+[ADR-INGEST](0007_ingest.md) · [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)
+· [ADR-POSTINGS](0013_postings.md)
+
+**Code**
+
+- [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
+- [`src/fux/store/canonical.py`](../../src/fux/store/canonical.py)
+- [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py)
+- [`src/fux/store/format.py`](../../src/fux/store/format.py)
+- [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+
+**Project docs**
+
+- [`work/compare/meta-privacy.compare.md`](../../work/compare/meta-privacy.compare.md)
+
+**Papers and specifications**
+
+- JSON Lines — the container format
+  <https://jsonlines.org/>
+- RFC 8785 (JSON Canonicalization Scheme) — the canonical-JSON prior art the
+  encoder follows
+  <https://www.rfc-editor.org/rfc/rfc8785>

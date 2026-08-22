@@ -555,3 +555,43 @@ uv run pytest -q tests_e2e/test_maintenance.py -k stop
 # the hooks' own behaviour — install, refuse-to-clobber, uninstall
 uv run pytest -q tests/maintain/test_hooks.py
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-INGEST](0007_ingest.md) · [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)
+· [ADR-URL-LIST](0018_url-list.md) · [ADR-GRAPH](0029_graph.md) ·
+[ADR-MERGE-DRIVER](0033_merge-driver.md)
+
+**Code**
+
+- [`src/fux/maintain/`](../../src/fux/maintain/)
+- [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
+- [`tests_e2e/test_maintenance.py`](../../tests_e2e/test_maintenance.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-20-r5-hook-latency/VERDICT.md`](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md)
+- [`work/regression/2026-08-20-r5-hook-latency/report.md`](../../work/regression/2026-08-20-r5-hook-latency/report.md)
+
+**Project docs**
+
+- [`work/compare/hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md)
+- [`work/compare/maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md)
+
+**Papers and specifications**
+
+- `gitattributes(5)` §Defining a custom merge driver — what the installer must
+  write for git to call the driver at all
+  <https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver>
+- `githooks(5)` — that `post-commit` cannot affect the commit's outcome
+  <https://git-scm.com/docs/githooks>
+- Lucene `IndexWriter` — near-real-time segments; prior art for deferring
+  index maintenance off the write path
+  <https://lucene.apache.org/core/9_0_0/core/org/apache/lucene/index/IndexWriter.html>

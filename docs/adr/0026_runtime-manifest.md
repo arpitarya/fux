@@ -160,3 +160,20 @@ time fux doctor
 # compare against the R3/M2 latency bar in
 # work/regression/2026-08-12-m2-accelerator/report.md
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) ·
+[ADR-RUNTIME-STAMP](0027_runtime-stamp.md)
+
+**Code**
+
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/store/format.py`](../../src/fux/store/format.py)

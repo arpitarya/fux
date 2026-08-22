@@ -17,6 +17,10 @@ The two run **concurrently**; never order one against the other.
 
 ## Open items, by record
 
+### [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — the differential law's unstated boundary
+
+- **W-73** · `agent`+`arpit` · **STARTABLE (the fix); fork 9 is Arpit's** · **the differential law holds only at `archived_weight == 1.0`, and nothing says so.** The accelerator prunes blocks on **unweighted** score bounds and an **unweighted** `theta`, then `rank()` applies the weight afterwards — so at any configured weight, `ask --fast` and `ask --scan` can return different documents. Both directions diverge: `w > 1` skips a block whose document would have won; `w < 1` lowers the real threshold after the pruning that used the old one. `config.py` accepts **any non-negative float**, and `tools/differential/`'s thousands of comparisons all ran at the default. ⚠ **W-44's row asserts the opposite** — *"the differential law carries it down both the scan and accelerator paths for free"* — which is true at `1.0` and at no other value. **The fix is small** (weighted `theta`, ceiling × `w_max`) **and the argument is not**, which is why the model is Opus. Gates the per-source priority feature entirely: [the proposal](proposals/tune-file-and-source-priority.md)'s fork 9 — *may a source weight exceed 1.0?* — is unbuildable until this is answered. **Model: Opus** — [detail](open/W-73-weighted-scores-vs-pruning-bound.md)
+
 ---
 
 # The rules

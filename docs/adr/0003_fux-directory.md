@@ -283,3 +283,36 @@ grep -n '^\*\|/\*' .fux/.gitignore
 git check-ignore -v .fux/index/ ; echo "check-ignore exit=$?"
 # expect: exit=1 (no match) — anything else means the index is being ignored
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-CONFIG](0014_config.md) · [ADR-URL-LIST](0018_url-list.md) ·
+[ADR-FETCHER](0019_fetcher.md) · [ADR-TYPES](0031_types-list.md) ·
+[ADR-MAINTENANCE](0032_hooks.md) · [ADR-AGENT-POLICY](0035_agent-policy.md)
+
+**Code**
+
+- [`src/fux/doctor.py`](../../src/fux/doctor.py)
+- [`src/fux/store/fuxdir.py`](../../src/fux/store/fuxdir.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+
+**Project docs**
+
+- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)
+
+**Papers and specifications**
+
+- `gitignore(5)` — pattern semantics, including the directory-negation trap
+  <https://git-scm.com/docs/gitignore>
+- The `CACHEDIR.TAG` specification — cache-directory tagging
+  <https://bford.info/cachedir/>

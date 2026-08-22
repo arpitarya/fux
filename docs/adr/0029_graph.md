@@ -406,3 +406,41 @@ uv run pytest -q tests/graph/test_walk.py
 # 3 — the re-scoped targets (W-57, not yet run; the goldens need a human —
 #     see archive/open/W-57-graph-lane-acceptance.md)
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-ASK](0004_ask.md) · [ADR-INGEST](0007_ingest.md)
+
+**Code**
+
+- [`src/fux/graph/`](../../src/fux/graph/)
+- [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py)
+- [`tests_e2e/eval/README-relational.md`](../../tests_e2e/eval/README-relational.md)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-21-graph-plane-profile/report.md`](../../work/regression/2026-08-21-graph-plane-profile/report.md)
+- [`work/regression/2026-08-22-graph-acceptance/report.md`](../../work/regression/2026-08-22-graph-acceptance/report.md)
+
+**Project docs**
+
+- [`work/compare/graph-plane-format.compare.md`](../../work/compare/graph-plane-format.compare.md)
+
+**Papers and specifications**
+
+- Levin & Peres, *Markov Chains and Mixing Times*, §1.3 — lazy chains, and
+  laziness as the standard device for removing periodicity
+  <https://pages.uoregon.edu/dlevin/MARKOV/>
+- Page, Brin, Motwani & Winograd, *The PageRank Citation Ranking* (1999) — the
+  0.85 damping default
+  <http://ilpubs.stanford.edu:8090/422/>
+- Raghavan, Albert & Kumara, *Near linear time algorithm to detect community
+  structures in large-scale networks* (Phys. Rev. E 76, 2007) — the community
+  algorithm and its near-linear bound
+  <https://arxiv.org/abs/0709.2938>

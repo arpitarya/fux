@@ -411,3 +411,35 @@ rg -n '"ver"' src/fux/store/ src/fux/ingest/
 # 4 — passes (P4 landed 2026-08-21, see Consequences):
 uv run pytest -q tests/maintain/test_mergedriver.py -k ancestor
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
+[ADR-RECORD](0010_index-record.md) · [ADR-POSTINGS](0013_postings.md) ·
+[ADR-MAINTENANCE](0032_hooks.md)
+
+**Code**
+
+- [`src/fux/maintain/mergedriver.py`](../../src/fux/maintain/mergedriver.py)
+- [`tests/maintain/test_mergedriver.py`](../../tests/maintain/test_mergedriver.py)
+- [`tests_e2e/test_maintenance.py`](../../tests_e2e/test_maintenance.py)
+
+**Measured evidence**
+
+- [`tools/maintenance-bench/PRE-REGISTRATION-R6-v2.md`](../../tools/maintenance-bench/PRE-REGISTRATION-R6-v2.md)
+- [`tools/maintenance-bench/PRE-REGISTRATION.md`](../../tools/maintenance-bench/PRE-REGISTRATION.md)
+- [`work/regression/2026-08-20-r6-merge-driver/VERDICT.md`](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md)
+- [`work/regression/2026-08-22-r6-rerun/VERDICT.md`](../../work/regression/2026-08-22-r6-rerun/VERDICT.md)
+
+**Papers and specifications**
+
+- `gitattributes(5)` §Defining a custom merge driver — what the installer must
+  write for git to call the driver at all
+  <https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver>

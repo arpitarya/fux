@@ -299,3 +299,45 @@ docs — ~2× over budget**. That number is against today's plain-JSON
 placeholder, not this record's designed encoding, which is still unbuilt —
 see [the analysis](../../work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)
 before treating this as evidence the design itself is too big.
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) ·
+[ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) · [ADR-RANKING](0012_ranking.md) ·
+[ADR-CACHEDIR-TAG](0023_cachedir-tag.md) ·
+[ADR-DOCS-TABLE](0024_docs-table.md) · [ADR-CODES-TABLE](0025_codes-table.md)
+· [ADR-RUNTIME-MANIFEST](0026_runtime-manifest.md) ·
+[ADR-RUNTIME-STAMP](0027_runtime-stamp.md) ·
+[ADR-RUNTIME-STATS](0028_runtime-stats.md)
+
+**Code**
+
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
+- [`src/fux/store/collisions.py`](../../src/fux/store/collisions.py)
+- [`src/fux/store/format.py`](../../src/fux/store/format.py)
+- [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-09-pruning-rerun/`](../../work/regression/2026-08-09-pruning-rerun/)
+- [`work/regression/2026-08-09-pruning-rerun/VERDICT.md`](../../work/regression/2026-08-09-pruning-rerun/VERDICT.md)
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md`](../../work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)
+
+**Project docs**
+
+- [`work/proposals/query-log-pruning.md`](../../work/proposals/query-log-pruning.md)
+
+**Papers and specifications**
+
+- Zobel & Moffat, *Inverted Files for Text Search Engines* (ACM Computing
+  Surveys, 2006) — doc-major vs term-major organisation
+  <https://dl.acm.org/doi/10.1145/1132956.1132959>

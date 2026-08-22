@@ -141,3 +141,19 @@ and this record's shape would need to grow alongside it.
 grep -n 'stats\[' src/fux/query/rank.py
 # expect: only "n" and "total_wlen" are read
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) · [ADR-RANKING](0012_ranking.md)
+
+**Code**
+
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/query/rank.py`](../../src/fux/query/rank.py)

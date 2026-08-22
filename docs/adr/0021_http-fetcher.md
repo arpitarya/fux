@@ -319,3 +319,33 @@ grep -rniE "fallback|escalat|retry_with|if .*failed.*cdp" src/fux/ingest/urlsrc.
 grep -n "GENERATED_FILES" src/fux/store/fuxdir.py
 # http.py present means W-50/W-51 landed and this record is in force, not pending
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-FETCHER](0019_fetcher.md) ·
+[ADR-CDP-FETCHER](0020_cdp-fetcher.md)
+
+**Code**
+
+- [`src/fux/store/fuxdir.py`](../../src/fux/store/fuxdir.py)
+- [`src/fux/templates/http.py.txt`](../../src/fux/templates/http.py.txt)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+
+**Papers and specifications**
+
+- `scrapy-playwright` — prior art for a per-request browser opt-in with no
+  automatic escalation
+  <https://github.com/scrapy-plugins/scrapy-playwright>
+- Automatic browser fallback, stated by its proponents — the position this
+  record rejects
+  <https://webclaw.io/blog/javascript-rendering-api-browser-fallback-web-scraping>

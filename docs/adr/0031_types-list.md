@@ -266,3 +266,36 @@ fux ingest --list-skipped | grep -c 'not an indexed file type'
 
 # 3 — unmeasured; it rides with W-52's pre-registration
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-INGEST](0007_ingest.md) · [ADR-URL-LIST](0018_url-list.md)
+· [ADR-FETCHER](0019_fetcher.md) · [ADR-HTTP-FETCHER](0021_http-fetcher.md) ·
+[ADR-DIR-LIST](0022_dir-list.md)
+
+**Code**
+
+- [`src/fux/ingest/gitdir.py`](../../src/fux/ingest/gitdir.py)
+- [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py)
+
+**Project docs**
+
+- [`work/compare/file-type-filter.compare.md`](../../work/compare/file-type-filter.compare.md)
+
+**Papers and specifications**
+
+- GitHub Linguist overrides — a default heuristic most repos never touch, with
+  declarative committed overrides
+  <https://github.com/github-linguist/linguist/blob/main/docs/overrides.md>
+- ripgrep's type system — names at the point of use, globs at the point of
+  definition
+  <https://github.com/BurntSushi/ripgrep/blob/master/GUIDE.md>
+- Sphinx `source_suffix` — allowlist by extension; an unlisted suffix is
+  simply not a source
+  <https://www.sphinx-doc.org/en/master/usage/configuration.html>

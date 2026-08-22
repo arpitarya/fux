@@ -295,3 +295,33 @@ grep -rn 'from .tokenize import\|from ..query.tokenize import' src/fux/
 grep -nE 'HEADING_WEIGHT|BODY_WEIGHT|^K1|^B ' src/fux/query/bm25f.py
 # expect: 3.0, 1.0, 1.2, 0.75
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-ASK](0004_ask.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md)
+
+**Code**
+
+- [`src/fux/query/bm25f.py`](../../src/fux/query/bm25f.py)
+- [`src/fux/query/rank.py`](../../src/fux/query/rank.py)
+- [`src/fux/query/tokenize.py`](../../src/fux/query/tokenize.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-query-verbs/report.md`](../../work/regression/2026-08-18-query-verbs/report.md)
+
+**Papers and specifications**
+
+- Robertson & Zaragoza, *The Probabilistic Relevance Framework: BM25 and
+  Beyond* (2009) — the scoring model
+  <https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf>
+- Robertson, Zaragoza & Taylor, *Simple BM25 Extension to Multiple Weighted
+  Fields* (CIKM 2004) — the original field-weighted formulation
+  <https://dl.acm.org/doi/10.1145/1031171.1031181>

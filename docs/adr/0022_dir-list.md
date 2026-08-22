@@ -312,3 +312,37 @@ and something else).
 grep -rn "archive/" src/fux/ --include=*.py
 # expect: no output
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-RECORD](0010_index-record.md) · [ADR-CONFIG](0014_config.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-FETCHER](0019_fetcher.md) ·
+[ADR-TYPES](0031_types-list.md) ·
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+
+**Code**
+
+- [`tests/test_archive_law.py`](../../tests/test_archive_law.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-12-r2-close/ANALYSIS.md`](../../work/regression/2026-08-12-r2-close/ANALYSIS.md)
+- [`work/regression/2026-08-12-r2-close/report.md`](../../work/regression/2026-08-12-r2-close/report.md)
+- [`work/regression/2026-08-21-source-verbs/ANALYSIS.md`](../../work/regression/2026-08-21-source-verbs/ANALYSIS.md)
+
+**Project docs**
+
+- [`work/compare/source-exclusion.compare.md`](../../work/compare/source-exclusion.compare.md)
+
+**Papers and specifications**
+
+- `gitattributes(5)` — prior art for per-entry attributes on a line-oriented
+  committed file
+  <https://git-scm.com/docs/gitattributes>

@@ -279,3 +279,34 @@ grep -rn "urllib\|http.client\|socket\|requests" src/fux/ --include=*.py
 grep -c 'middleware' src/fux/config.py
 # expect: 3 — the guard and its message, nothing else
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-URL-INGEST](0008_url-ingest.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-CONFIG](0014_config.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-CDP-FETCHER](0020_cdp-fetcher.md) ·
+[ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-REFER](0030_refer-plane.md)
+
+**Code**
+
+- [`.fux/fetchers/cdp.py`](../../.fux/fetchers/cdp.py)
+- [`src/fux/config.py`](../../src/fux/config.py)
+- [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+
+**Papers and specifications**
+
+- `scrapy-playwright` — prior art for a per-request browser opt-in with no
+  automatic escalation
+  <https://github.com/scrapy-plugins/scrapy-playwright>

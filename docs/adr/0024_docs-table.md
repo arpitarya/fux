@@ -149,3 +149,20 @@ grep -rn docidx src/fux/derive/
 # expect: every consumer reads docidx fresh from the current build; none caches
 # it across builds or writes it anywhere outside .fux/runtime/
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md)
+
+**Code**
+
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/dense.py`](../../src/fux/derive/dense.py)
+- [`src/fux/derive/format.py`](../../src/fux/derive/format.py)

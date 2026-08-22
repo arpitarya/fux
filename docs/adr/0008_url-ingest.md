@@ -299,3 +299,38 @@ grep -n '_listed_url_ids' src/fux/ingest/run.py
 grep -rn 'url.config\[' src/fux/
 # expect: no output (passed verbatim to configure(), never indexed)
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-INGEST](0007_ingest.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-FETCHER](0019_fetcher.md)
+
+**Code**
+
+- [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
+- [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py)
+- [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/ANALYSIS.md`](../../work/regression/2026-08-18-ingest-and-index/ANALYSIS.md)
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-19-w54/evidence/demo-fetcher.py`](../../work/regression/2026-08-19-w54/evidence/demo-fetcher.py)
+
+**Project docs**
+
+- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)
+
+**Papers and specifications**
+
+- Chrome DevTools Protocol — the transport the shipped browser template uses
+  <https://chromedevtools.github.io/devtools-protocol/>
+- PEP 518 `[tool]` table — the opaque-config-table discipline this copies
+  <https://peps.python.org/pep-0518/#tool-table>

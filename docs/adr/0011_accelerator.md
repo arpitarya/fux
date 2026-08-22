@@ -312,3 +312,34 @@ grep -nE 'K1|B \*|idf\(' src/fux/derive/accel.py
 grep -n 'index_dir\|shard_path\|runtime_dir' src/fux/derive/build.py
 # expect: reads .fux/index only, writes .fux/runtime only
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-ASK](0004_ask.md) · [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
+[ADR-RECORD](0010_index-record.md) · [ADR-RANKING](0012_ranking.md) ·
+[ADR-GRAPH](0029_graph.md)
+
+**Code**
+
+- [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-12-m2-accelerator/report.md`](../../work/regression/2026-08-12-m2-accelerator/report.md)
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+
+**Papers and specifications**
+
+- Ding & Suel, *Faster Top-k Document Retrieval Using Block-Max Indexes*
+  (SIGIR 2011) — the technique the accelerator adapts
+  <https://engineering.nyu.edu/~suel/papers/bmw.pdf>

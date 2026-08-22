@@ -399,3 +399,47 @@ du -sh .fux/runtime/fetch-cache 2>/dev/null || echo "absent — nothing opted in
 
 # 6 and 7 — measured/observed, not checkable from the tree; see the compare docs
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) ·
+[ADR-CACHEDIR-TAG](0023_cachedir-tag.md) ·
+[ADR-RUNTIME-STAMP](0027_runtime-stamp.md) · [ADR-REFER](0030_refer-plane.md)
+· [ADR-MERGE-DRIVER](0033_merge-driver.md)
+
+**Code**
+
+- [`src/fux/refer/__init__.py`](../../src/fux/refer/__init__.py)
+- [`src/fux/refer/arc.py`](../../src/fux/refer/arc.py)
+- [`src/fux/refer/fetchcache.py`](../../src/fux/refer/fetchcache.py)
+- [`src/fux/refer/freshness.py`](../../src/fux/refer/freshness.py)
+- [`tests/refer/test_arc.py`](../../tests/refer/test_arc.py)
+- [`tests/refer/test_fetchcache.py`](../../tests/refer/test_fetchcache.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-20-refer-plane-r4/VERDICT.md`](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md)
+
+**Project docs**
+
+- [`../GLOSSARY.md`](../GLOSSARY.md)
+- [`work/compare/cache-policy.compare.md`](../../work/compare/cache-policy.compare.md)
+- [`work/compare/record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)
+- [`work/compare/refer-fetch-cache.compare.md`](../../work/compare/refer-fetch-cache.compare.md)
+
+**Papers and specifications**
+
+- Confluence Cloud rate limiting, and Atlassian's own caching guidance — the
+  context decision 6 exists for
+  <https://developer.atlassian.com/cloud/confluence/rate-limiting/>
+- Megiddo & Modha, *ARC: A Self-Tuning, Low Overhead Replacement Cache* (FAST
+  '03)
+  <https://www.usenix.org/legacy/events/fast03/tech/megiddo.html>
+- RFC 5861 (`stale-while-revalidate`) — the shape decision 7 refuses to blur
+  <https://httpwg.org/specs/rfc5861.html>

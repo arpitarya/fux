@@ -970,3 +970,44 @@ grep -n '^from \.\|^import ' src/fux/cli.py
 grep -rn 'exit_code=2' src/
 # expect: no output
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-ANSWER](0006_answer.md) · [ADR-INGEST](0007_ingest.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) · [ADR-URL-LIST](0018_url-list.md) ·
+[ADR-DIR-LIST](0022_dir-list.md) · [ADR-GRAPH](0029_graph.md) ·
+[ADR-TYPES](0031_types-list.md) · [ADR-MAINTENANCE](0032_hooks.md) ·
+[ADR-AGENT-POLICY](0035_agent-policy.md)
+
+**Code**
+
+- [`src/fux/cli.py`](../../src/fux/cli.py)
+- [`tests/test_windows_console_safe.py`](../../tests/test_windows_console_safe.py)
+- [`tests_e2e/test_verbs.py`](../../tests_e2e/test_verbs.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-12-m2-accelerator/report.md`](../../work/regression/2026-08-12-m2-accelerator/report.md)
+- [`work/regression/2026-08-18-cli-surface/ANALYSIS.md`](../../work/regression/2026-08-18-cli-surface/ANALYSIS.md)
+- [`work/regression/2026-08-18-cli-surface/evidence/fixture.sh`](../../work/regression/2026-08-18-cli-surface/evidence/fixture.sh)
+- [`work/regression/2026-08-18-cli-surface/report.md`](../../work/regression/2026-08-18-cli-surface/report.md)
+- [`work/regression/2026-08-21-source-verbs/ANALYSIS.md`](../../work/regression/2026-08-21-source-verbs/ANALYSIS.md)
+- [`work/regression/2026-08-21-source-verbs/report.md`](../../work/regression/2026-08-21-source-verbs/report.md)
+
+**Papers and specifications**
+
+- `cargo add` — prior art for the `add` verb
+  <https://doc.rust-lang.org/cargo/commands/cargo-add.html>
+- `helm repo add` — prior art for the `add` verb
+  <https://helm.sh/docs/helm/helm_repo/>
+- `uv` CLI reference — prior art for the `add` verb
+  <https://docs.astral.sh/uv/reference/cli/>
+- Python `argparse`, §Exiting methods — the boundary pattern this follows
+  <https://docs.python.org/3/library/argparse.html#exiting-methods>

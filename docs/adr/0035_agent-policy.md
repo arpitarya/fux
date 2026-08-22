@@ -370,3 +370,33 @@ grep -rn "\.kiro\|\.github\|\.claude" src/fux/setup.py
 #     flag, never about which document is right.
 ls src/fux/templates/agents/
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-CLI](0002_cli-surface.md) ·
+[ADR-DOTFUX](0003_fux-directory.md) · [ADR-DIR-LIST](0022_dir-list.md) ·
+[ADR-REFER](0030_refer-plane.md) ·
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+
+**Code**
+
+- [`src/fux/refer/freshness.py`](../../src/fux/refer/freshness.py)
+- [`src/fux/setup.py`](../../src/fux/setup.py)
+- [`src/fux/templates/agents/`](../../src/fux/templates/agents/)
+
+**Papers and specifications**
+
+- Claude Agent Skills
+  <https://code.claude.com/docs/en/skills>
+- GitHub Copilot custom agents configuration
+  <https://docs.github.com/en/copilot/reference/custom-agents-configuration>
+- GitHub Copilot repository custom instructions
+  <https://docs.github.com/en/copilot/how-tos/configure-custom-instructions-in-your-ide/add-repository-instructions-in-your-ide>
+- Kiro steering files and inclusion modes
+  <https://kiro.dev/docs/steering/>

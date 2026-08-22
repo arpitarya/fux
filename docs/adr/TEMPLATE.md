@@ -222,3 +222,54 @@ reference is incomplete.
 $ <the check command>
 <output, verbatim>          # <date> — not fired
 ```
+
+---
+
+## References
+
+> **Every source the record cites, gathered in one place.** §2's **Reference
+> (required)** is the *argument's* grounding — the two or three sources a reader
+> must have in hand to accept the decision. This section is the *complete* list:
+> every record, file, run, doc and paper named anywhere above, so a reader can
+> check the record's sourcing without re-reading the record.
+>
+> **Three rules:**
+>
+> 1. **Nothing new appears here.** A reference that is not cited in the body is
+>    not a reference, it is a reading list. Cite it above or delete it.
+> 2. **Never an archived document.** The body may *name* one; this section may
+>    not list one, because a listed reference reads as a source and `archive/`
+>    is not evidence. Repoint at the live successor.
+> 3. **Every link resolves.** A stale link here is a defect, not a footnote —
+>    [`tests/test_archive_law.py`](../../tests/test_archive_law.py) checks the
+>    repo for them.
+>
+> Keep the groups in the order below and **delete any group that is empty.**
+> Records run inline because names are short; the rest are lists because paths
+> are not. Keep the italic lede exactly as it stands — it is what tells a reader
+> the difference between this section and §2's.
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-<NAME>](000N_<short-name>.md) · [ADR-<NAME>](000N_<short-name>.md)
+
+**Code**
+
+- [`src/fux/<module>.py`](../../src/fux/<module>.py)
+- [`tests/<test>.py`](../../tests/<test>.py)
+
+**Measured evidence**
+
+- [`work/regression/<run>/report.md`](../../work/regression/<run>/report.md)
+
+**Project docs**
+
+- [`work/compare/<fork>.compare.md`](../../work/compare/<fork>.compare.md)
+
+**Papers and specifications**
+
+- <Author>, *<Title>* (<year>) — <the one thing it grounds>
+  <https://…>

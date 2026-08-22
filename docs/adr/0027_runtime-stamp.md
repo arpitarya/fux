@@ -159,3 +159,20 @@ fux doctor
 # expect: [OK]/[WARN] accelerator: stale, driven by manifest.json's content
 # hashes, not by stamp.json alone
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) ·
+[ADR-RUNTIME-MANIFEST](0026_runtime-manifest.md)
+
+**Code**
+
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/format.py`](../../src/fux/derive/format.py)

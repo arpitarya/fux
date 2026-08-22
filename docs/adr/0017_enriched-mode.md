@@ -15,7 +15,12 @@ timestamp: 2026-08-19T00:00:00Z
 - **Feature:** the `enriched` ingest mode — the second value of a record's `mode` property, and the boundary that keeps it legal
 - **Owns:** nothing yet — `src/fux/enrich/` does not exist. Its ownership row is added in the change that creates it
 - **Laws:** L1, L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Gate:** [W-38](../../work/open/W-38-m8-deferred.md) — M8, parked behind M6. **Nothing here starts because it is interesting.**
+- **Gate:** **Arpit's sign-off, and it has not been given.** The M8 item that
+  carried this gate — [W-38](../../archive/open/W-38-m8-deferred.md) — was
+  **dropped from the queue 2026-08-22 without being completed**
+  ([`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md), W-38's row), so the
+  gate no longer has a queue item behind it. **Nothing here starts because it is
+  interesting.**
 - **Ratifies:** [W-30](../../work/OPEN-WORK.md), Arpit 2026-08-19 — the naming, and this record accepted the same day
 
 ---
@@ -200,9 +205,11 @@ as an explicit, visible exception — never silently as a side effect of
 enrichment.
 
 **6. Accepting this record does not authorize the work.** It ratifies the
-name, the boundary and the shape — nothing more. The M8 gate in
-[W-38](../../work/open/W-38-m8-deferred.md) — one ADR plus Arpit's sign-off,
-blocked behind M6 — stands unchanged. **A session that reads this record as
+name, the boundary and the shape — nothing more. The M8 gate — one ADR plus
+Arpit's sign-off — stands unchanged in substance, but its queue item does not:
+[W-38](../../archive/open/W-38-m8-deferred.md) was **dropped 2026-08-22, not
+completed**, so "blocked behind M6" no longer describes anything. The ADR half
+of the gate is this record; **the sign-off half has not been given.** **A session that reads this record as
 permission to build `src/fux/enrich/` has misread it**; the gate is the
 permission, and it has not been given.
 
@@ -261,8 +268,9 @@ Recorded so M8 designs against a list rather than a mood. **None is approved.**
   §3.2, and §3.1 for the `snapshot` policy decision 5 defers to.
 - The naming fork and its matrix —
   [`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md).
-- The gate that governs when this may be built —
-  [`work/open/W-38-m8-deferred.md`](../../work/open/W-38-m8-deferred.md).
+- The gate that governs when this may be built, and the record of its queue
+  item being **dropped rather than completed** —
+  [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md), W-38's row.
 - The deterministic counterpart — [ADR-EXTRACTED](0016_extracted-mode.md).
 - The existing dense lane, which is *not* this and needs no model —
   [`src/fux/embed/`](../../src/fux/embed/__init__.py), measured in
@@ -294,3 +302,31 @@ grep -oh '"mode":"[a-z]*"' .fux/index/*.jsonl | sort -u
 # 3. the recall question, once M6 has filed a run
 ls work/regression/*-m6-* 2>/dev/null
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) ·
+[ADR-EXTRACTED](0016_extracted-mode.md)
+
+**Code**
+
+- [`src/fux/embed/__init__.py`](../../src/fux/embed/__init__.py)
+- [`src/fux/embed/fuxvec.py`](../../src/fux/embed/fuxvec.py)
+- [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-12-m2-accelerator/report.md`](../../work/regression/2026-08-12-m2-accelerator/report.md)
+
+**Project docs**
+
+- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)
+- [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md)
+- [`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md)
+- [`work/paper/the-fux-index-paper.md`](../../work/paper/the-fux-index-paper.md)

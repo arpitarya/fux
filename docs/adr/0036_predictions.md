@@ -269,3 +269,37 @@ uv run pytest -q tests/test_prediction_register.py
 grep -rn "100 000\|50 000" tools/*/PRE-REGISTRATION*.md
 # expect: only inside frozen historical files, never in a newly registered one
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-MAINTENANCE](0032_hooks.md)
+
+**Code**
+
+- [`tests/test_adr_frontmatter.py`](../../tests/test_adr_frontmatter.py)
+- [`tests/test_prediction_register.py`](../../tests/test_prediction_register.py)
+- [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-20-r5-hook-latency/VERDICT.md`](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md)
+- [`work/regression/2026-08-20-r6-merge-driver/VERDICT.md`](../../work/regression/2026-08-20-r6-merge-driver/VERDICT.md)
+- [`work/regression/2026-08-22-r6-rerun/VERDICT.md`](../../work/regression/2026-08-22-r6-rerun/VERDICT.md)
+- [`work/regression/README.md`](../../work/regression/README.md)
+
+**Project docs**
+
+- [`CLAUDE.md`](../../CLAUDE.md)
+- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)
+
+**Papers and specifications**
+
+- Center for Open Science, *Preregistration* — the practice, and the
+  outcome-reporting bias it exists to prevent
+  <https://www.cos.io/initiatives/prereg>

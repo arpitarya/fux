@@ -227,3 +227,29 @@ grep -c '"grade": *6' .fux/index/*.jsonl | grep -v ':0$'
 sha1sum .fux/index/*.jsonl > /tmp/a && fux ingest >/dev/null \
   && sha1sum .fux/index/*.jsonl > /tmp/b && diff /tmp/a /tmp/b && echo OK
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-INGEST](0007_ingest.md) ·
+[ADR-ENRICHED](0017_enriched-mode.md)
+
+**Code**
+
+- [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py)
+- [`src/fux/ingest/extract.py`](../../src/fux/ingest/extract.py)
+- [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+
+**Project docs**
+
+- [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md)
+- [`work/compare/ingest-mode-naming.compare.md`](../../work/compare/ingest-mode-naming.compare.md)

@@ -396,3 +396,37 @@ docs — ~2× over budget**. That number is against today's plain-JSON
 placeholder, not `ADR-POSTINGS`'s designed encoding, which is still unbuilt —
 see [the analysis](../../work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)
 before treating this as evidence the design itself is too big.
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-T1-ACCELERATOR](0011_accelerator.md) · [ADR-RANKING](0012_ranking.md) ·
+[ADR-MAINTENANCE](0032_hooks.md)
+
+**Code**
+
+- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/store/canonical.py`](../../src/fux/store/canonical.py)
+- [`src/fux/store/collisions.py`](../../src/fux/store/collisions.py)
+- [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py)
+- [`src/fux/store/format.py`](../../src/fux/store/format.py)
+- [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-12-m2-accelerator/report.md`](../../work/regression/2026-08-12-m2-accelerator/report.md)
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+- [`work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md`](../../work/regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)
+
+**Papers and specifications**
+
+- RFC 8785 (JSON Canonicalization Scheme) — the canonical-JSON prior art the
+  encoder follows
+  <https://www.rfc-editor.org/rfc/rfc8785>

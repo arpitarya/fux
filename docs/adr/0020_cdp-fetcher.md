@@ -300,3 +300,34 @@ grep -niE "download|install|playwright|selenium" .fux/fetchers/cdp.py
 grep -rn "fetch=cdp\|escalat\|fallback" src/fux/ingest/urlsrc.py
 # expect: no automatic-escalation logic in fux's half
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-PORT-LIST](0015_port-list.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-FETCHER](0019_fetcher.md) ·
+[ADR-HTTP-FETCHER](0021_http-fetcher.md)
+
+**Code**
+
+- [`.fux/fetchers/cdp.py`](../../.fux/fetchers/cdp.py)
+- [`src/fux/templates/cdp.py.txt`](../../src/fux/templates/cdp.py.txt)
+- [`tests/ingest/test_cdp_fetcher.py`](../../tests/ingest/test_cdp_fetcher.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+
+**Papers and specifications**
+
+- Chrome DevTools Protocol — the transport the shipped browser template uses
+  <https://chromedevtools.github.io/devtools-protocol/>
+- RFC 6455 (The WebSocket Protocol) — the framing this implements
+  <https://www.rfc-editor.org/rfc/rfc6455>

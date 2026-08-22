@@ -441,3 +441,37 @@ awk '!/^ *#/ && NF {print $1}' .fux/sources/urls 2>/dev/null | sort | uniq -d
 grep -rln "def parse(" src/fux/ingest/sourcelist.py src/fux/ingest/urlsrc.py
 # expect: only sourcelist.py — a second parser is the drift this record forbids
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-DOTFUX](0003_fux-directory.md) · [ADR-INGEST](0007_ingest.md) ·
+[ADR-URL-INGEST](0008_url-ingest.md) · [ADR-RECORD](0010_index-record.md) ·
+[ADR-CONFIG](0014_config.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
+[ADR-FETCHER](0019_fetcher.md) · [ADR-CDP-FETCHER](0020_cdp-fetcher.md) ·
+[ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-DIR-LIST](0022_dir-list.md)
+
+**Code**
+
+- [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py)
+- [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-19-w54/evidence/fixture.sh`](../../work/regression/2026-08-19-w54/evidence/fixture.sh)
+- [`work/regression/2026-08-19-w54/report.md`](../../work/regression/2026-08-19-w54/report.md)
+
+**Papers and specifications**
+
+- `gitattributes(5)` — prior art for per-entry attributes on a line-oriented
+  committed file
+  <https://git-scm.com/docs/gitattributes>
+- `scrapy-playwright` — prior art for a per-request browser opt-in with no
+  automatic escalation
+  <https://github.com/scrapy-plugins/scrapy-playwright>

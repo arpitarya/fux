@@ -375,3 +375,30 @@ grep -n 'refer_answer\|answer_via_refer' src/fux/query/__init__.py
 # expect matches only inside cmd_answer / _answer_via_refer — never in
 # cmd_ask or cmd_find
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-ASK](0004_ask.md) ·
+[ADR-REFER](0030_refer-plane.md)
+
+**Code**
+
+- [`src/fux/query/__init__.py`](../../src/fux/query/__init__.py)
+- [`src/fux/query/refer_answer.py`](../../src/fux/query/refer_answer.py)
+- [`tests_e2e/test_verbs.py`](../../tests_e2e/test_verbs.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-query-verbs/report.md`](../../work/regression/2026-08-18-query-verbs/report.md)
+
+**Papers and specifications**
+
+- Ji et al., *Survey of Hallucination in Natural Language Generation* (2022) —
+  why a confident wrong answer is the expensive failure
+  <https://arxiv.org/abs/2202.03629>

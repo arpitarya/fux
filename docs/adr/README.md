@@ -48,7 +48,8 @@ superseded and moves to [`archive/adr/`](../../archive/adr/README.md),
 its number is how the archive maps it to its successor. A live doc that says
 "ADR-0004" is a defect; fix it on contact.
 
-**Two sections, and they are for different readers.**
+**Two sections and a bibliography.** The two sections are for different
+readers; the bibliography is for both.
 
 - **§1 — For humans.** One screen, maximum. Includes a diagram: a Mermaid
   block **and** a hand-paired ASCII twin. **Both are updated together whenever
@@ -71,6 +72,15 @@ its number is how the archive maps it to its successor. A live doc that says
   required, or the fenced block will not render.
 - **§2 — For agents.** Context · decision · consequences · alternatives
   considered · reference · veto condition.
+- **References.** The last section of every record, after §2: every source the
+  record cites, gathered — **Records · Code · Measured evidence · Project
+  docs · Papers and specifications**, empty groups deleted. It is an index, not
+  an argument: **nothing appears there that is not cited in the body**, and
+  **an archived document is never listed there** (the body may name one; a
+  listed reference reads as a source, and archive is not evidence). §2's
+  `Reference (required)` stays what it is — the two or three sources a reader
+  must have to accept the decision. Added 2026-08-22 across all 37 records and
+  the template.
 
 **The reference is grounded.** A paper, a live doc, code, or measured evidence
 under [`work/regression/`](../../work/regression/README.md). **Never an archived

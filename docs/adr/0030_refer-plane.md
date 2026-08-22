@@ -442,3 +442,37 @@ grep -rn 'no_cache' .fux/ fux.toml 2>/dev/null
 # 6 — the four verdict labels, and that `cached` stays its own
 uv run pytest -q tests/refer/test_fetchcache.py
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-RECORD](0010_index-record.md) ·
+[ADR-FETCHER](0019_fetcher.md) · [ADR-CACHE](0034_cache.md)
+
+**Code**
+
+- [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py)
+- [`src/fux/refer/`](../../src/fux/refer/)
+- [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py)
+- [`tests/refer/`](../../tests/refer/)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-20-refer-plane-r4/VERDICT.md`](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md)
+- [`work/regression/2026-08-22-budget-sweep/report.md`](../../work/regression/2026-08-22-budget-sweep/report.md)
+
+**Project docs**
+
+- [`work/compare/cache-policy.compare.md`](../../work/compare/cache-policy.compare.md)
+- [`work/compare/record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)
+
+**Papers and specifications**
+
+- Megiddo & Modha, *ARC: A Self-Tuning, Low Overhead Replacement Cache* (FAST
+  '03) — the cache and its scan resistance
+  <https://www.usenix.org/legacy/events/fast03/tech/full_papers/megiddo/megiddo.pdf>

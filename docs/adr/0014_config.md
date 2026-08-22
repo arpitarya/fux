@@ -301,3 +301,33 @@ grep -oE '\braw\.get\("[a-z_]+"\)|data\.get\("[a-z]+"' src/fux/config.py | sort 
 fux ingest 2>&1 | head -1
 # on a bad key, expect: error: <path>/fux.toml: <what> must be <what> (got <value>)
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
+[ADR-FETCHER](0019_fetcher.md) · [ADR-HTTP-FETCHER](0021_http-fetcher.md) ·
+[ADR-DIR-LIST](0022_dir-list.md) · [ADR-TYPES](0031_types-list.md) ·
+[ADR-AGENT-POLICY](0035_agent-policy.md) ·
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+
+**Code**
+
+- [`src/fux/config.py`](../../src/fux/config.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-19-w54/evidence/fixture.sh`](../../work/regression/2026-08-19-w54/evidence/fixture.sh)
+
+**Papers and specifications**
+
+- PEP 518 `[tool]` table — the opaque-config-table discipline this copies
+  <https://peps.python.org/pep-0518/#tool-table>
+- TOML v1.0.0 — the config format
+  <https://toml.io/en/v1.0.0>

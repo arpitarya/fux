@@ -441,3 +441,40 @@ fux ingest --full >/dev/null && sha1sum .fux/index/*.jsonl > /tmp/f \
 ls work/regression/*-m6-* 2>/dev/null
 # a parse/edge cost above the M6 budget, measured and filed, reopens this
 ```
+---
+
+## References
+
+*Every source this record cites, gathered in one place. §2's **Reference
+(required)** names the grounding; this is the complete list. An archived
+document is never listed here — the body may name one, but archive is not
+evidence.*
+
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-DOTFUX](0003_fux-directory.md) · [ADR-URL-INGEST](0008_url-ingest.md) ·
+[ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
+[ADR-RECORD](0010_index-record.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
+[ADR-GRAPH](0029_graph.md) · [ADR-MAINTENANCE](0032_hooks.md) ·
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+
+**Code**
+
+- [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py)
+- [`src/fux/ingest/gitdir.py`](../../src/fux/ingest/gitdir.py)
+- [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
+- [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py)
+- [`tests/ingest/test_delta.py`](../../tests/ingest/test_delta.py)
+
+**Measured evidence**
+
+- [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
+- [`work/regression/2026-08-20-ingest-cost-profile/report.md`](../../work/regression/2026-08-20-ingest-cost-profile/report.md)
+
+**Papers and specifications**
+
+- Bazel's hermeticity and action cache — prior art for content-addressed reuse
+  of a pure derivation
+  <https://bazel.build/basics/hermeticity>
+- Sphinx's two-phase read/resolve build — prior art for corpus-wide link
+  resolution as a separate pass
+  <https://www.sphinx-doc.org/en/master/extdev/appapi.html#build-phases>
