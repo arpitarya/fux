@@ -8,6 +8,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [0.37.1] - 2026-08-22
+
+### Changed
+
+- **Docs only, no code change.** `README.md`'s status block was two releases
+  stale (still read `0.36.0` and described the graph lane's two acceptance
+  gaps as open after both closed); rewritten against ground truth and given
+  an archived-content-signalling paragraph. `docs/adr/TEMPLATE.md` gains an
+  optional worked-output block per §2 section, retrofitted to
+  ADR-ARCHIVED-CONTENT, ADR-REFER and ADR-GRAPH where real output existed.
+  The committed `.fux/index/` shards were re-derived from the corpus these
+  doc edits touched.
+
 ## [0.37.0] - 2026-08-22
 
 ### Added

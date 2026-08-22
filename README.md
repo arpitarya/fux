@@ -4,7 +4,7 @@
 small git-carried index, fetch content from the systems that own it, verify
 at answer time.**
 
-> **Status (2026-08-22): `fux-engine` 0.37.0 on PyPI — M2 through M5 shipped.**
+> **Status (2026-08-22): `fux-engine` 0.37.1 on PyPI — M2 through M5 shipped.**
 > The accelerator (M2), the graph lane (M3), the refer plane (M4) and the
 > maintenance hooks (M5) are all in. From any repo:
 > ```bash
