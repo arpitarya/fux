@@ -126,11 +126,26 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"fux {__version__}")
     sub = parser.add_subparsers(dest="command")
 
-    sub.add_parser(
+    p_setup = sub.add_parser(
         "setup", help="write the consumer-owned files into .fux/ (write-if-missing)"
-    ).set_defaults(func=_cmd_setup)
+    )
+    # W-68 / ADR-AGENT-POLICY decisions 5 and 6. The agent policy installs by
+    # default, so this is a user's one-shot escape; `[agents] install = []` in
+    # `fux.toml` is its durable form. A flag rather than a verb — ADR-CLI veto 1.
+    p_setup.add_argument(
+        "--no-agents",
+        action="store_true",
+        help="do not write the agent policy files outside .fux/ (.claude/, .github/, .kiro/)",
+    )
+    p_setup.set_defaults(func=_cmd_setup)
 
-    sub.add_parser("doctor", help="check environment and repo health").set_defaults(func=_cmd_doctor)
+    p_doctor = sub.add_parser("doctor", help="check environment and repo health")
+    # W-66 Phase 4. `doctor` is where the detached runner becomes visible, and
+    # an agent reading that needs a parse rather than a sentence (ADR-CLI,
+    # 2026-08-22). Promotion to a `fux status` verb has a written condition in
+    # ADR-CLI; it is not a matter of feeling crowded.
+    p_doctor.add_argument("--json", action="store_true", help="machine-readable report")
+    p_doctor.set_defaults(func=_cmd_doctor)
 
     p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
     p_ingest.add_argument("--list-skipped", action="store_true", help="print skipped files and why, then exit")
@@ -149,6 +164,19 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="skip building the derived accelerator (results are unaffected either way)",
     )
+    # W-66 Phase 2 / ADR-MAINTENANCE decision 1d. `--stop` is the takeover
+    # without the run; a plain `fux ingest` takes over and then runs. It sits
+    # on `ingest` rather than becoming a verb because ADR-CLI veto 1 forbids
+    # `fux <verb> <subverb>` and `ingest` already owns the re-index.
+    p_ingest.add_argument(
+        "--stop",
+        action="store_true",
+        help="stop a background re-index and do not run one (exit 0 if none was running)",
+    )
+    # The two halves of the deferred hook. Not surface: one is what the hook
+    # calls, the other is what the hook spawned. Neither is for a person.
+    p_ingest.add_argument("--spawn-runner", action="store_true", help=argparse.SUPPRESS)
+    p_ingest.add_argument("--runner", action="store_true", help=argparse.SUPPRESS)
     _add_progress_flags(p_ingest)
     p_ingest.set_defaults(func=_cmd_ingest)
 

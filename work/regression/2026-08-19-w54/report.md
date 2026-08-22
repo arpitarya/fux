@@ -218,4 +218,4 @@ $ fux doctor
   human running it once.
 - **No `archived=` behaviour.** The declaration parses; nothing reads it. That
   is deliberate and gated on W-44's instrument
-  ([ADR-DIR-LIST](../../../docs/adr/0023_dir-list.md) decision 10).
+  ([ADR-DIR-LIST](../../../docs/adr/0022_dir-list.md) decision 10).

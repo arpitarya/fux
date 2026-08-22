@@ -122,3 +122,39 @@ The design point is a Windows-first enterprise fleet, so Windows breakage is a
 real defect, not an edge case — `v0.32.0` shipped a `fux doctor` crash fix
 that only reproduced there. Nothing in the maintenance path may assume POSIX
 paths, a case-sensitive filesystem, or a shell.
+
+## Cowork remote bridge — `git status` leaves an undeletable `index.lock`
+
+**Surface:** Cowork session reaching the repo through the remote-devices bridge
+(`device_bash`), 2026-08-22.
+
+**Symptom.** Any git command that refreshes the index — `git status`,
+`git diff` — prints:
+
+```
+warning: unable to unlink '.../.git/index.lock': Operation not permitted
+```
+
+and **leaves the lock file behind**. Every subsequent git write then fails with
+`Unable to create '.git/index.lock': File exists`.
+
+**Cause.** The bridge's shell blocks `unlink`/`rm` by design. Git creates
+`index.lock` while refreshing, then cannot remove its own lock.
+
+**Fix — use the read-only form:**
+
+```bash
+git --no-optional-locks status --porcelain    # leaves no lock
+```
+
+**If a lock is already stranded**, it cannot be deleted from this surface —
+`mv` it aside instead:
+
+```bash
+mkdir -p .git/_stale_locks
+mv .git/index.lock .git/_stale_locks/index.lock.stale
+```
+
+**Verify it is actually stale before moving it** — a lock held by a live git
+process is not stale, and this repo is edited by concurrent sessions. A 0-byte
+lock whose mtime matches a `git status` you just ran is yours.

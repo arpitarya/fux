@@ -2,11 +2,14 @@
 type: Compare Doc
 title: Pruning Criterion
 description: What decides which postings the committed index keeps — KL top-k (tested, inconclusive), impact-ranked, term-centric, or a combined rule set under an adaptive retention budget.
-status: proposed
+status: rejected
 timestamp: 2026-08-09T00:00:00Z
 ---
 
 # Pruning criterion — Comparison
+
+>
+> ⚠ **Status corrected 2026-08-22 (queue review): `proposed` → `rejected`, and the distinction matters.** This document proposed a three-rule selector under an adaptive retention budget. **It was measured and falsified**: [P1-RERUN](../regression/2026-08-09-pruning-rerun/VERDICT.md) put the best arm **35.9 points below unpruned recall@20**, and [ADR-POSTINGS](../../docs/adr/0013_postings.md) took **option E — full postings, permanently**. Marked `rejected` rather than `accepted` because the proposal lost; the *document* is kept because a falsified prediction is evidence, and the reasoning is why nobody should re-propose it.
 
 > **Verdict (proposed): a combined three-rule selector under an adaptive
 > retention budget, gated on candidate recall rather than index hit@5.**
@@ -54,8 +57,9 @@ rare **across the collection**, so in a corpus where every document is about
 payments, the word `payments` looks uninformative and gets discarded. The
 run literally dropped `webhook` from `docs/api/webhooks.md`.
 
-That is a structural mismatch with Fux's design point (a large, topically
-homogeneous corporate corpus), not bad luck. Three changes follow:
+That is a structural mismatch with Fux's design point (a topically
+homogeneous corporate corpus — the *homogeneity* is what bites, and it is
+unchanged by the 2026-08-21 move to 10 000 documents), not bad luck. Three changes follow:
 
 1. **Rank terms by what the scorer actually uses** — max BM25F impact —
    rather than by divergence from the collection.
@@ -77,6 +81,23 @@ The committed index is only small if most postings can be discarded
 (paper §5: ~6 % term retention gives ~115 MB of postings at 10⁶ documents;
 no pruning gives roughly 0.6–1.5 GB). The criterion decides *which* 6 %.
 
+> **Re-checked at the 10 000-document design point, 2026-08-22 (W-65), and the
+> premise above does not survive the move.** Scaled linearly to 10⁴, the same
+> arithmetic gives **~1.2 MB pruned against ~6–15 MB unpruned**. Both are
+> negligible in a git repository, so at the current design point *"the
+> committed index is only small if most postings can be discarded"* is simply
+> false — the index is small either way.
+>
+> **This makes P1's FAIL more comfortable, not less.** [P1-RERUN](../regression/2026-08-09-pruning-rerun/VERDICT.md)
+> killed pruning on **quality** (35.9 points of recall@20 at 6 % retention),
+> and the thing that ruling gave up was a space saving that, at 10 000
+> documents, is worth single-digit megabytes. A filed verdict is cited and
+> never replaced, and nothing here re-opens it; what changed is that the cost
+> of obeying it fell.
+>
+> **Pruning work is fenced to [W-38](../open/W-38-m8-deferred.md)** and none of
+> this is a licence to reconsider it here.
+
 Prior evidence, in order of weight:
 
 - **Combinations beat single criteria.** The Bilkent comparative study finds
@@ -96,6 +117,15 @@ Prior evidence, in order of weight:
   6.15 — so a "keep everything in a Bloom plane" safety net costs *more*
   than the postings it protects (~2.4 KB/doc at 2 000 terms ≈ 2.4 GB at
   10⁶ docs). Ruled out on arithmetic, not on taste.
+  > **The elimination survives the design-point move; its *stated* reason
+  > half does (W-65, 2026-08-22).** The absolute figure scales to **~24 MB at
+  > 10 000 documents**, which nobody would rule out on size. What actually
+  > eliminates the option is the **ratio** — 11.69 bits against 6.15 means the
+  > safety net is larger than the thing it protects at *any* corpus size — and
+  > that is scale-invariant. The `2.4 GB` is emphasis; the `11.69 vs 6.15` is
+  > the argument. Recorded rather than rewritten, because a reader arriving at
+  > "ruled out on arithmetic" and checking the arithmetic at 10⁴ would
+  > reasonably conclude the elimination had lapsed.
 
 ## §3 · Options
 
@@ -124,7 +154,7 @@ Prior evidence, in order of weight:
 | keeps subject terms in a homogeneous corpus (H) | **no** | partly | yes | **yes** | yes |
 | per-document floor guaranteed (H) | yes | yes | **no** | yes | yes |
 | fits disjunctive BM25F (H) | weak | good | **best** | best | n/a |
-| committed size @1M (H) | ~115 MB | ~115 MB | ~115 MB | ~115 MB | **0.6–1.5 GB** |
+| committed size @1M — *a deferred target since 2026-08-21; at 10⁴ every cell is single-digit MB and the row stops discriminating* (H) | ~115 MB | ~115 MB | ~115 MB | ~115 MB | **0.6–1.5 GB** |
 | implementation cost (M) | done | small | small | small (three rules over one pass + one sweep) | none |
 | measured on Fux corpora (H) | inconclusive | no | no | no | no |
 

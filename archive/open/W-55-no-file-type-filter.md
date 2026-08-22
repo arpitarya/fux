@@ -108,7 +108,7 @@ found under**.
       if Arpit prefers one decision over two.
 - [ ] Arpit's verdict, then an ADR — or an amendment to
       [ADR-INGEST](../../docs/adr/0007_ingest.md) /
-      [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), whichever owns it.
+      [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md), whichever owns it.
 - [ ] `_candidate_paths` implements the verdict, with a test that a `.json`
       beside a `.md` in a configured directory is skipped **with a reason**
       (`fux ingest --list-skipped` must say why, or this becomes the next

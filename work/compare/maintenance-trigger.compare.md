@@ -44,7 +44,7 @@ Two layers need to stay fresh, and they are not the same problem:
    ([ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md) decision
    7), and on drift `ask`/`explain`/`graph`/`path` fall back to a full scan
    rather than trust a stale accelerator or a stale graph plane
-   ([ADR-GRAPH](../../docs/adr/0030_graph.md)). It is never *wrong*,
+   ([ADR-GRAPH](../../docs/adr/0029_graph.md)). It is never *wrong*,
    only slow when stale — so the open problem for this layer is triggering a
    rebuild promptly, not correctness.
 
@@ -128,5 +128,5 @@ default silently.
   a hook, which is what M5 depends on"
 - [ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md) — the
   write-if-different + per-shard-sha staleness mechanism layer 2 already has
-- [ADR-GRAPH](../../docs/adr/0030_graph.md) — the derived graph plane
+- [ADR-GRAPH](../../docs/adr/0029_graph.md) — the derived graph plane
   this rebuild refreshes

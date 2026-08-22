@@ -109,6 +109,32 @@ def test_stale_accelerator_falls_back_rather_than_answering_wrongly(tmp_path):
     ).stdout
 
 
+def test_archived_weight_demotes_only_when_configured(tmp_path):
+    """ADR-DIR-LIST decision 11, through the shipped CLI: byte-identical at
+    the default, and a live document overtakes an archived one once a weight
+    is set — both via `fux.toml`, never a CLI flag."""
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    dirs = tmp_path / ".fux" / "sources" / "dirs"
+    dirs.parent.mkdir(parents=True, exist_ok=True)
+    dirs.write_text("docs\nold archived=true\n", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "old").mkdir()
+    (tmp_path / "old" / "cache.md").write_text(
+        "---\ntitle: Old cache\n---\n# Old cache\n\ncache cache cache design\n", encoding="utf-8"
+    )
+    (tmp_path / "docs" / "cache.md").write_text(
+        "---\ntitle: New cache\n---\n# New\n\na passing mention of cache\n", encoding="utf-8"
+    )
+    _run(tmp_path, "ingest")
+
+    default = _run(tmp_path, "ask", "cache", "--json").stdout
+    assert json.loads(default)["results"][0]["loc"] == "old/cache.md"  # heading match wins
+
+    (tmp_path / "fux.toml").write_text("[sources]\n[ranking]\narchived_weight = 0.1\n", encoding="utf-8")
+    demoted = _run(tmp_path, "ask", "cache", "--json").stdout
+    assert json.loads(demoted)["results"][0]["loc"] == "docs/cache.md"
+
+
 def test_find_prints_locations_one_per_line(tmp_path):
     _write_fixture(tmp_path)
     _run(tmp_path, "ingest")

@@ -2,11 +2,14 @@
 type: Compare Doc
 title: File Type Filter
 description: How fux decides which files in a source tree are documents — built-in allowlist vs a third source file vs a directory attribute vs content sniffing.
-status: proposed
+status: accepted
 timestamp: 2026-08-20T00:00:00Z
 ---
 
 # Which files are documents — Comparison
+
+>
+> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its verdict landed with **W-45 (verdict E, decided the same day)**, W-45 and W-55 are both archived, and [ADR-TYPES](../../docs/adr/0031_types-list.md) is `accepted` and shipped. Decided and built; only the frontmatter lagged.
 
 > **VERDICT: G — DECIDED by Arpit, 2026-08-20.** A built-in default allowlist,
 > overridable by `.fux/sources/types`. A third committed source file, one glob per line,
@@ -94,7 +97,7 @@ so there is no extension to filter on and nothing here applies to it.
 | a consumer can change it **without a release** (H) | yes | **no** | yes | yes | yes | n/a | **yes** |
 | deterministic, L3-safe (H) | yes | yes | yes | yes | yes | **no** | **yes** |
 | one grammar, one parser (M) | **yes** | n/a | yes | no | partly | n/a | **yes** |
-| survives 10⁵–10⁶ docs across many repos (M) | yes | rigid | **yes** | yes | **yes** | no | yes |
+| survives 10⁵–10⁶ docs across many repos — *a deferred target since 2026-08-21, re-weighted to M; it was never the row that decided this fork* (M) | yes | rigid | **yes** | yes | **yes** | no | yes |
 | reviewable in a diff (M) | **yes** | no | yes | yes | yes | **no** | **yes** |
 | cost to build (L) | low | **lowest** | low | low | **high** | high | low |
 

@@ -16,6 +16,32 @@ So this set **brackets L1–L7 on purpose**. Where a proposal breaks a law it
 says which one, and what the law was buying, so the trade is visible rather
 than silent. Nothing here is accepted; every verdict is proposed for Arpit.
 
+> ## ⚠ The whole set argues from the pre-2026-08-21 design point (W-65, 2026-08-22)
+>
+> Filed the same day Arpit moved the design point from 10⁵–10⁶ documents to
+> **10 000**, and written against the old one. This note covers the set rather
+> than annotating five files, because these are **parked proposals**, not
+> accepted records — nothing here gates any work.
+>
+> **What that changes, concretely.** Several proposed verdicts and reopen
+> triggers are keyed to sizes fux is not built for and so **cannot fire as
+> written**:
+>
+> | file | the clause | why it cannot fire |
+> |---|---|---|
+> | `02-lexical-engine` | *"Reopen for C the day a real corpus above ~2×10⁵ documents is measured against the 150 ms warm bar and fails"* | 2×10⁵ is 20× the design point; nothing will measure it |
+> | `02-lexical-engine` | matrix rows `10⁵–10⁶ docs`, `query speed @10⁵/10⁶` | weighted against a deferred target |
+> | `00-ideal-architecture` | *"Replace the lexical engine before a corpus > 2×10⁵ fails the 150 ms bar"* · roadmap rows expecting R5 to PASS **at 100k** and clone→first-query **at 100k** | same |
+> | `01-index-location` · `05-maintenance` | matrix rows scored on `100k-doc hook cost` | the row that decided them is a deferred size |
+> | `README` (this file) | *"adopt `tantivy` only if >1M docs is real"* | 1M left the roadmap entirely |
+>
+> **Nothing here is retracted.** These are arguments about where the design is
+> heading, and CLAUDE.md's litmus says such an argument *"describes where the
+> design is heading and **may not gate work today**"* — which is exactly the
+> status a proposal already has. **A proposal picked up for real work is
+> re-weighted at 10 000 documents first**, and that re-weighting is part of
+> graduating it to a compare doc, not a silent edit here.
+
 ## The one-paragraph answer
 
 Fux's idea — **rank from a small committed index, fetch from the owner,

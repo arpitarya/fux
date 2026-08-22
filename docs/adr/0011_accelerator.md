@@ -229,7 +229,7 @@ reproducible by construction.
   argument with it. That is the veto below.
 - **`fux build` is a two-lane build since 2026-08-20**, and the second lane is
   not this record's. The M3 graph lane's derived plane
-  ([ADR-GRAPH](0030_graph.md)) is written by the same `build()` call,
+  ([ADR-GRAPH](0029_graph.md)) is written by the same `build()` call,
   from the same single pass over the committed shards — `_read_committed` now
   returns the parsed records alongside the doc table so the graph plane costs
   no second read. `DETERMINISTIC_FILES` gains `graph.json`, so the
@@ -238,6 +238,12 @@ reproducible by construction.
   differential law over them.** A graph plane that leaked into the lexical path
   would void every byte-identity claim in this record, so the graph lane's own
   eval asserts `ask` is unmoved through the CLI
+- **`accel.ask()` gained `archived_weight`/`archived_dirs`, 2026-08-22
+  (W-44).** Pass-through keyword-only arguments into the shared `rank()` —
+  the mechanism itself is [ADR-ASK](0004_ask.md)'s, cited here only because
+  the signature this record owns changed. No-op defaults, so every existing
+  caller is unaffected and the differential law between this path and the
+  scan is unchanged.
   (`tests_e2e/test_relational.py::test_the_graph_lane_does_not_move_ask`).
 - **A corpus with hashed URL records had no accelerator at all** and paid the
   scan's 4 248.8 ms rather than 27.2 ms — the whole M2 result forfeited by

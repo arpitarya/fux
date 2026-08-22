@@ -5,7 +5,7 @@
 design was settled in conversation; **what is open is the build, not the call.**
 **Blocked by:** nothing.
 **Closes with:** [ADR-CLI](../../docs/adr/0002_cli-surface.md),
-[ADR-DIR-LIST](../../docs/adr/0023_dir-list.md),
+[ADR-DIR-LIST](../../docs/adr/0022_dir-list.md),
 [ADR-URL-LIST](../../docs/adr/0018_url-list.md),
 [ADR-INGEST](../../docs/adr/0007_ingest.md) and
 [ADR-LAWS](../../docs/adr/0001_laws.md) updated **in the same change**, plus a
@@ -412,7 +412,7 @@ EXPLORE (do not write yet)
 - Read src/fux/sources.py, src/fux/ingest/sourcelist.py, src/fux/ingest/gitdir.py,
   src/fux/ingest/run.py, src/fux/ingest/urlsrc.py, src/fux/store/writer.py,
   src/fux/graph/model.py, src/fux/graph/plane.py, src/fux/cli.py.
-- Read docs/adr/0002_cli-surface.md, 0023_dir-list.md, 0018_url-list.md,
+- Read docs/adr/0002_cli-surface.md, 0022_dir-list.md, 0018_url-list.md,
   0007_ingest.md, 0001_laws.md, and docs/adr/README.md's ownership table.
 - Confirm for yourself, in the code, the three claims the handoff rests on:
   (a) sources.add()/remove() are already generic over a ListSpec;
@@ -503,7 +503,7 @@ is a bug in this repo.
 - Veto check 1's expected verb list is stale the moment this lands. Update it.
 - Consequences: exit codes unchanged; `--json` untouched (these verbs write).
 
-**[ADR-DIR-LIST](../../docs/adr/0023_dir-list.md).**
+**[ADR-DIR-LIST](../../docs/adr/0022_dir-list.md).**
 
 - Record **remove-by-coverage** and why it reuses `!` rather than inventing
   anything: the grammar already has subtraction, and the alternative — deleting

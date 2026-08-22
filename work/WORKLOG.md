@@ -30,6 +30,753 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-22 — proposals, compare and open swept; four stale statuses found  ·  Cowork
+
+- **Asked:** what is `proposals/consumer-policy/` for, is there an open item,
+  and review proposals, `open/` and `compare/` — archive what is done.
+- **Did:**
+  - **`consumer-policy/` held nothing but a pointer.** Its four files moved into
+    the wheel at `src/fux/templates/agents/` when ADR-AGENT-POLICY was written;
+    the directory survived as a README pointing at them. **No open item** — W-68
+    built it and closed. Archived.
+  - **Two proposals archived**, per that directory's own lifecycle (*implemented
+    proposals move to `archive/`*): **consumer-intent-policy** (became
+    ADR-AGENT-POLICY, accepted *and* built) and **process-diet** (graduated
+    2026-08-21; the `Cost:` line is gone from the WORKLOG format). Nine live
+    ideas remain, all genuinely unbuilt.
+  - ⚠ **Four compare docs read `proposed` while their decisions were made and
+    shipped** — the rule-4 defect, in the directory that records decisions:
+    - **ingest-mode-naming** — its own verdict block said *"DECIDED, ratified
+      by Arpit 2026-08-19, closing W-30"*, with two `accepted` ADRs. The
+      frontmatter had simply never been flipped.
+    - **file-type-filter** — landed with W-45; W-45 and W-55 are archived and
+      ADR-TYPES is `accepted`.
+    - **source-exclusion** — both items it waited on are closed, and the
+      include-only whitelist it debated ended 2026-08-20.
+    - **pruning-criterion → `rejected`, not `accepted`, and the distinction is
+      the point.** Its three-rule selector was **measured and falsified** —
+      P1-RERUN put the best arm **35.9 points below unpruned recall@20** and
+      ADR-POSTINGS took option E, full postings permanently. Marked `rejected`
+      because the proposal *lost*; the document is **kept**, because a falsified
+      prediction is evidence and the reasoning is why nobody should re-propose
+      it.
+  - **`work/open/` — nothing archived.** All six items re-derived as genuinely
+    open in the prior pass.
+  - **Accepted compare docs stay put, deliberately.** `compare/README.md`'s
+    archival trigger is **era-obsolescence** (the v0.26 line), not
+    implementation — and live ADRs cite them as their reasoning. Archiving an
+    accepted compare doc would break the citation chain from records to the
+    debates that produced them. **This is the one place the instruction
+    "archive what is built" does not apply**, and it is worth knowing why.
+- **Decided / open:** nothing new blocked. Twelve dead links repointed; WORKLOG
+  left alone as append-only history.
+- **Next:** W-69.
+
+## 2026-08-22 — the ceiling is on promises, not on the design's reach  ·  Cowork
+
+- **Asked:** Arpit — *"since we are limiting it till ten k, that does not mean
+  that we need to update the design. Later on, we will build it for fifty k,
+  hundred k, and so on. So why a necessary question?"*
+- **Did:** he is right and the question should not have existed. **Checked §4
+  before agreeing**: *One keyspace* names **no corpus size at all** — six key
+  ranges in an MST, their wire encodings, and three consequences (one root
+  hash, one merge algorithm, one O(changes) diff). Size-agnostic by
+  construction, so **no size ruling can ever make it stale**. W-26's re-scope
+  box was right; its DoD asking for §4 to be rewritten was simply wrong, and
+  that contradiction had been carried forward as an open question for a day.
+  **The inbox is now empty.**
+- **Decided / open:** the distinction is written into **CLAUDE.md §Litmus**,
+  because it is the one a future session will get wrong: **the ceiling is on
+  measurement and promises, NOT on the design's reach.** Fux is still
+  architected to scale; prose describing behaviour at 10⁵–10⁶ is **describing
+  the architecture, not committing to it**, and must not be "cleaned up" to
+  match the current test target. **The test, per sentence: does it commit at
+  that size, or describe how the design works there? Commitments go,
+  descriptions stay.** ⚠ Without this, the obvious next move for a session
+  reading "10k ceiling" is to go reconcile the architecture docs — which would
+  destroy correct documents to satisfy a rule that does not apply to them.
+- **Next:** W-69.
+
+## 2026-08-22 — OPEN-WORK reviewed against its own eight rules  ·  Cowork
+
+- **Asked:** why is W-26 still in OPEN-WORK, and review the whole document.
+- **Did:** W-26 is **not** an open item — it appears only inside the inbox text,
+  narrating that it closed. **That is rule 2 violated**: *"a resolved thing
+  leaves this file entirely — including the sentence saying it resolved."*
+  Rewritten as what it actually is — a question about whether the paper's §4
+  owes an edit — with no reference to the closed item. ⚠ **I made this exact
+  mistake earlier today, corrected it, and it came back in the next edit.** The
+  rule is easy to honour when deleting a row and easy to break when writing
+  prose about why a row is gone.
+- **Three more defects from the review:**
+  - **W-69 had no detail file.** `open/README.md`'s contract is that an item's
+    file is *created with its index row and deleted with it*. It was a row-only
+    item from creation. Written now. ⚠ **W-68 was filed the same way and closed
+    before anyone noticed**, so this is a pattern in how I file items, not a
+    one-off — worth a check if it recurs.
+  - **A four-line blank block** left by the group removals, collapsed.
+  - **The inbox's one entry is not a blocker** and says so in its own header,
+    which makes "Blocked on Arpit" the wrong home for it. Left in place and
+    labelled rather than moved, because moving it invents a section for one
+    item that nothing waits on.
+- **Rule 4 re-derivation, since the file's markers are assertions:**
+  - **W-44's claim that the demotion weight landed is TRUE** — `query/rank.py`
+    carries `archived_weight: float = 1.0` and `_is_archived_loc`, and
+    `config.py` reads `[ranking] archived_weight` with validation and a
+    non-negative check. Matches ADR-DIR-LIST decision 11 as written.
+  - **ADR-DIR-LIST veto 2 holds**: no `archive/` path heuristic in the engine.
+    The six `archive/` hits in `src/` are all **docstring provenance** —
+    *"ported from `archive/v0.26/…`"* — not logic. Checked rather than assumed,
+    because a grep for `archive/` looks alarming until you read the lines.
+  - Every remaining row's group names a real record, and every row has a lane
+    tag.
+- **Decided / open:** the queue is **six rows, six detail files, no orphans**.
+- **Next:** W-69, which now has a spec.
+
+## 2026-08-22 — ADRs renumbered 0001–0036; W-38 dropped  ·  Cowork
+
+- **Asked:** Arpit — renumber the ADRs contiguously (the T2 deletion left a
+  gap), and remove W-38 from the queue.
+- **Did:** both, with the consequences put in front of him first and accepted.
+  - **36 records renumbered to `0001`–`0036`.** 15 files moved, ~69 documents
+    repointed, every frontmatter `(NNNN)` corrected to match its filename —
+    verified file-by-file, no mismatches. **There was precedent**:
+    `0013_laws.md` became `0001_laws.md` in an earlier pass.
+  - ⚠ **Two costs, recorded at the top of the ADR register so they are read
+    before the table.** (1) **`0022` is now reused** — live `0022` is
+    ADR-DIR-LIST, archived `0022` is ADR-ARCHIVED-SIGNAL. Same number, two
+    records. **This is precisely why "cite by NAME, never by number" exists**,
+    and that rule stopped being stylistic today. (2) **Four frozen files cite
+    ADR paths that no longer resolve** — a frozen pre-registration and a filed
+    verdict are never edited, so they are **broken by design and stay broken**.
+    Resolve them by name.
+  - **The cost is paid once and is not recoverable.** A second renumber would
+    break more for the same cosmetic gain — noted in the register so nobody
+    tidies the sequence again without seeing it.
+  - **W-38 dropped, and the word matters: dropped, not completed.** Nothing in
+    M8's deferred set was built, measured, or decided against. An
+    IMPLEMENTATION row records it anyway, because rule 3 wants an outcome before
+    a row is deleted and *"dropped"* is one — calling it done would be a lie,
+    and recording nothing would make the item look like it never existed.
+  - ⚠ **Its standing law was re-homed rather than dropped with it.** *"Pruning
+    work is forbidden outside a dedicated item"* now lives in **ADR-POSTINGS
+    §Consequences**, where it always belonged: it is a consequence of
+    **P1-RERUN's measured 35.9-point recall loss**, not a scheduling
+    preference. **Deleting the row would have retired a constraint a
+    measurement paid for**, and a pruning change is exactly the kind that looks
+    like a size win and measures as a recall loss.
+  - **The bogus `### the T2 proposal` heading went too** — I had grouped W-38
+    under it when collapsing groups after W-26 closed; W-38 was never about T2.
+- **Decided / open:** nothing new blocked. **W-69 is still the only
+  agent-startable item.**
+- **Next:** W-69.
+
+## 2026-08-22 — ADR-T2-SEGMENTS removed from the register, moved to proposals  ·  Cowork
+
+- **Asked:** Arpit — *"move the document to proposals and remove the ADR
+  completely."* Asked after the consequences were put in front of him twice.
+- **Did:** moved it to [`work/proposals/t2-segments.md`](proposals/t2-segments.md),
+  **number 0037 retired and never reused**, tombstone at `archive/adr/`.
+  - **The tombstone is deliberately not a copy.** Keeping the full text in
+    `archive/` as well as in the proposal would be two versions of one document,
+    and they would drift. It carries the pointer and the history, nothing else.
+  - **Three departures written into the proposal's head rather than left
+    silent**, so a later session does not read them as precedent. (1) CLAUDE.md
+    says *"the decisions that rest on a verdict live in `docs/adr/`"* — R9's
+    decision now does not; that is a departure taken on instruction, not a new
+    general rule. (2) `tools/t2-eval/PRE-REGISTRATION.md` and R9's `VERDICT.md`
+    both still cite `ADR-T2-SEGMENTS` — **neither may be edited**, so those
+    references are **stale by design**; repairing them would mean rewriting a
+    frozen instrument and a filed verdict to match a later filing decision,
+    which is the exact move the freeze prevents. (3) The old **veto condition
+    became a graduation trigger** — *a veto is checked, a trigger is
+    remembered* — and that is a real loss of force, stated plainly.
+  - ⚠ **The move orphaned a component, which the test caught immediately.**
+    `tools/t2-eval/` was owned by the retired record, and
+    `tests/test_adr_ownership.py` accepts only an ADR name or a `W-nn` id — **a
+    proposal cannot own anything.** Fixed by giving it to **ADR-RS** under a new
+    **decision 10**: a harness whose feature record is retired falls back to the
+    prediction record, because an unowned component is one whose contract can
+    change with nothing updating. Written as a **backstop, not a preference** —
+    it returns to a feature record the moment one exists.
+- **Decided / open:** ⚠ **I was wrong about one of my own objections.** I said
+  the move would undermine W-26's closure; rule 3 requires the outcome in
+  `IMPLEMENTATION.md` and evidence under `regression/`, **not an ADR** — both
+  still hold, so the closure is unaffected. The other three objections stood.
+- **Next:** W-69 — still the only agent-startable item.
+
+## 2026-08-22 — ADR-RS: the prediction system gets a record  ·  Cowork
+
+- **Asked:** Arpit — *"create an ADR. Name it ADR-Rs."*
+- **Did:** wrote **[ADR-RS](../docs/adr/0036_predictions.md) (0038)**,
+  `proposed`, and filed **W-69** for its acceptance gate.
+  - ⚠ **The name had to change by one character.** `ADR-Rs` fails
+    `tests/test_adr_frontmatter.py`, which matches `ADR-[A-Z0-9-]+` on the Name
+    line — the lowercase `s` is rejected. Used **`ADR-RS`** and recorded why in
+    the Name line itself, so nobody later "corrects" it back.
+  - **It codifies rather than changes.** Nine decisions, all already in force:
+    the freeze; a threshold never moves and re-judging at a different size is a
+    **new id**; the register claims completeness; ids are never reused; **a
+    verdict is added to, never edited**; an ambiguous result goes to Arpit and
+    **not to whoever ran it**; no threshold above the design-point ceiling; only
+    Arpit retires; never ship a ranking change off one corpus.
+  - **The four terminal states are named because two of them get misread.**
+    **FAIL is a success of the method** — P1 ended the pruning design, R5
+    rewrote the git hook — and a project that treats FAIL as embarrassing stops
+    producing them. **RETIRED is not FAIL**: R7's budget was never missed, the
+    promise was withdrawn.
+  - **It owns `tests/test_regression_runs.py`**, which was unowned. **The
+    harnesses stay put** — a harness belongs to the feature it measures, the
+    discipline belongs to the record.
+  - **CLAUDE.md stays the normative home** and its rules are cited, not
+    restated, so there is one place they can drift from.
+- **Decided / open:** ⚠ **It is deliberately `proposed`, not `accepted`.** Veto
+  4's register check is unbuilt, and accepting a record whose central claim is
+  *"the register is complete"* while nothing verifies completeness is the same
+  error as an unmeasured gate. **W-69 is the gate**, and it is the first
+  agent-startable item on the queue in three passes.
+- **Next:** W-69.
+
+## 2026-08-22 — the prediction register was missing R9  ·  Cowork
+
+- **Asked:** what are the R predictions, where do they live, list them, and is
+  there an ADR for them.
+- **Did:** answering it turned up a gap. **R9 ran on 2026-08-22, passed, and is
+  cited in six documents — and had no row in the prediction table in
+  `IMPLEMENTATION.md`**, which is the only place claiming to be the complete
+  set. Added, and the table now says out loud what it is and that a missing row
+  is its failure mode.
+- **Decided / open:** ⚠ **The prediction discipline has no ADR, and that is a
+  real observation rather than a defect to fix reflexively.** It lives in
+  CLAUDE.md (frozen thresholds, verdicts-are-not-ADRs, never-ship-off-one-corpus)
+  and is enforced by `tests/test_regression_runs.py`. Two harnesses are owned —
+  `tools/maintenance-bench/` by ADR-MAINTENANCE, `tools/pruning-eval/` by an
+  **open item** — but **nothing owns the prediction system itself**, so no veto
+  condition guards it and no record has to change when it changes. CLAUDE.md is
+  arguably the right home for a constitutional rule; the gap is worth naming
+  before someone decides it by accident.
+- **Next:** unchanged — nothing blocked, nothing agent-startable.
+
+## 2026-08-22 — R7 and R8 retired; the ceiling covers promises, not just tests  ·  Cowork
+
+- **Asked:** Arpit — *"remove that promise, it's not needed. Anything that talks
+  about commitments for fifty thousand or hundred thousand or above, remove
+  those commitments. Keep the features, they are going to be helpful either
+  way."*
+- **Did:** extended CLAUDE.md §Litmus from a measurement ceiling to a
+  **commitment** ceiling, and withdrew the two promises that lived above it.
+  - **R7 RETIRED** — the committed-index size budget. It had been blocked for
+    two sessions on a number only Arpit could pick, with a genuine
+    contamination problem attached (the size was already measured, so any
+    threshold chosen now is chosen knowing the answer). **He dissolved the
+    question instead of answering it**, which is the cheaper correct move.
+  - **R8 RETIRED** — a graph-verb bound at 100 000, never registered. I had
+    marked it *dormant* an hour earlier; this ruling **upgrades that to
+    withdrawn**. Both ids retired, not reused.
+  - **The line the whole change turns on, written into §Litmus so it survives
+    this session:** a **promise** about a size Fux is not building for is
+    removed; a **measurement already taken** at that size is untouched.
+    **R5's 44.4 s at 100 000 stands exactly as filed** — that number is *why*
+    `post-commit` defers, and deleting it deletes the reason. The frozen
+    pre-registrations, the filed verdict, the CHANGELOG entries and the test
+    comments citing it as history were all left alone, including two files
+    still carrying now-dead links, because editing a frozen instrument to tidy
+    a link is how the freeze stops meaning anything.
+  - **The size checks survive as measurements with no threshold.**
+    ADR-POSTINGS' and ADR-INDEX-LIFECYCLE's veto-4 blocks were rewritten from
+    *"the budget is retired and has no successor **yet**"* to *"there is no
+    budget and none is owed — print the number, read no verdict off it."*
+  - **W-26 CLOSED.** Its last box was R7, and that box **dissolved rather than
+    being met** — marked `[~]` and explained, because a box that was deleted is
+    not a box that was satisfied and a later reader must be able to tell.
+    Row removed, detail archived, `archive/README.md` row added, links
+    repointed. **W-38's `blocked by W-26` corrected**: it is no longer blocked
+    by an item, it is blocked by a decision nobody has taken.
+- **Decided / open:** **The inbox is down to one item, and that one gates
+  nothing** — whether the paper owes a §4 edit. Two of the three questions that
+  were sitting there dissolved with the promises rather than being answered.
+- **Next:** nothing blocked, nothing startable by an agent alone. The tree still
+  holds six sessions of uncommitted work at HEAD `9bb870e`.
+
+## 2026-08-22 — 10 000 documents becomes a ceiling on MEASUREMENT, not just a target  ·  Cowork
+
+- **Asked:** Arpit — *"I just want to build out the tool with just ten thousand
+  documents… no testing should go beyond ten thousand. Whatever features are
+  built, let's keep them."*
+- **Did:** recorded it in **CLAUDE.md §Litmus**, the one normative home, and
+  chased its consequences rather than leaving them to be discovered.
+  - **The ruling is stronger than the 2026-08-21 design point.** That set what
+    Fux is *built and judged* for; this closes 50 000 and 100 000 **to
+    measurement** until the build is done. A later target is now *next in
+    intent, not next in queue*, and a size-parameterised harness is
+    **readiness, not permission**.
+  - **Three non-consequences written in explicitly**, because a scope ruling
+    misread is how measurements get destroyed: it **un-measures nothing**
+    (R5's 44.4 s at 100 000 stands exactly as filed), it **deletes no feature**
+    (Arpit's words: they are helpful either way), and it **does not forbid an
+    argument about scale** — *"constant in the corpus"* is structural, not
+    measured. What is forbidden is going and benching 50 000 to prove it.
+  - ⚠ **It closed a queue item outright, which was not obvious going in.**
+    **R8** is specified in `graph-plane-format.compare.md` §6 as a graph-verb
+    bound **at 100 000 documents** — now unmeasurable, therefore **dormant**,
+    therefore unable to block anything. That **answers the R8/R9 double-claim**
+    sitting in the inbox without a decision: the two never collided, one being
+    a bound at a size out of scope and the other a tier question at the design
+    point. Inbox 3 → 2; `BLOCKED.json` 3 → 2.
+  - **Annotated rather than rewritten:** the hook-at-scale matrix's `holds at
+    50k` row is now labelled an **argument**, since it can never again be a
+    measurement — both B's ✓ and D's ✗ survive under the ceiling because one is
+    structural and the other arithmetic from 10k data. And
+    `r7-size-budget.compare.md` now records that **the ceiling cuts against its
+    own headline argument** — its case for a ratio rests on *"an absolute has
+    to be re-derived at 50 000"*, a re-derivation now deferred indefinitely.
+    The verdict is left for whoever rules, with the weakening in front of them.
+- **Decided / open:** R7's number is **still Arpit's** — the ceiling does not
+  touch the contamination problem, which does not care what size is in scope.
+- **Next:** still nothing an agent can start alone.
+
+## 2026-08-22 — W-68 closed; the queue is agent-empty  ·  Cowork
+
+- **Asked:** review OPEN-WORK again, clean what is done, list what is blocked.
+- **Did:** re-derived; **W-68 had landed and been marked `DONE` in place** —
+  the same rule-3 pattern as the previous three. **Closing it was illegal as it
+  stood**: rule 3 permits closure only once the outcome is in
+  `IMPLEMENTATION.md`, and there was no row. Wrote the row from the evidence
+  (`setup.py`'s `AGENT_FILES`, `_agents_to_install`, and the 23 tests in
+  `tests/test_setup_agents.py`), **then** deleted the queue row and its
+  now-empty ADR-AGENT-POLICY group.
+  - **The tests are the notable part** — they assert the record's *vetoes*
+    rather than the happy path: every outside path announced **and** how to
+    turn it off; `--no-agents` leaving **no vendor directory behind**; a
+    consumer edit surviving a later `setup`; `absent` and `empty` being
+    different; and **the installer never branching on a vendor directory
+    existing**, asserted directly, because sniffing for `.kiro/` is the
+    derivation ADR-DIR-LIST decision 4 refused.
+- **Decided / open:** **The agent lane is now empty.** Every remaining item is
+  blocked on Arpit, parked behind a missing instrument, or needs setup no agent
+  can do. ⚠ **Still nothing committed** — HEAD `9bb870e`, four sessions' work
+  stacked in one tree. ⚠ **The oldest structural debt is unchanged**: W-44 and
+  W-52 are both parked on a pre-registered query set that **does not exist and
+  has no owner**, and W-44's own file says it *"degrades answers every day it is
+  open"*.
+- **Next:** nothing an agent can start. The queue needs a decision, not a
+  session.
+
+## 2026-08-22 — queue reconciled: three items closed, and a record that had gone false  ·  Cowork
+
+- **Asked:** review OPEN-WORK, remove what is done, and say what can be picked up.
+- **Did:** re-derived against the repo rather than reading the markers (rule 4),
+  which is what turned up the discrepancies.
+  - **W-66, W-67 and W-65 were marked `DONE` with their rows still present** —
+    rule 3 says removed, never ticked. All three verified closable
+    (IMPLEMENTATION rows exist, verdicts filed under `regression/`), rows
+    deleted, detail files moved to `archive/open/` with closure stamps, three
+    rows added to `archive/README.md`.
+  - **W-66's detail file contradicted its own row.** The row said *all four
+    phases*; the DoD had **nine unticked boxes** still reading *"Phase 2"* and
+    *"Phase 4"*. **The code settled it** — `maintain/runner.py` carries the
+    lock, the cooperative stop and takeover; `cli.py` has `--stop`; `doctor.py`
+    has `_background_runner` and `--json`; ADR-DOTFUX was amended for it. The
+    boxes were simply never ticked. Reconciled to the code *before* archiving,
+    so the archived file is truthful rather than merely filed.
+  - ⚠ **A record had gone false.** `docs/adr/README.md` still read
+    **"partial — the deferring hook is unbuilt"** for ADR-MAINTENANCE *after*
+    the hook shipped, and the record's own status line still said
+    *"Build: W-66"* as if pending. Both corrected. **This is exactly what the
+    ADR-currency law exists to catch, and no test caught it** — the register
+    check compares the status *cell* against the record's `status:` field, and
+    both said `accepted`; nothing checks whether the **built** column is true.
+  - **Two stale headings removed** (one emptied by the closures, one whose own
+    item closed), and **W-26 regrouped under the T2 proposal** — the record it
+    gained when T2 was measured and deliberately *not* built.
+  - **Eleven dead links repointed** across `docs/adr/README.md`, `0032_hooks.md`,
+    `0033_merge-driver.md`, `IMPLEMENTATION.md`, `WORKLOG.md` and
+    `INTERVIEW.md` — every one created by the archival itself.
+- **Decided / open:** **259 doc/ADR/archive law checks pass.** ⚠ **The 1101-test
+  claim is the other session's and I could not verify it** — the device VM has
+  no pytest. ⚠ **Nothing is committed.** HEAD is still `9bb870e` with two
+  sessions' work stacked in the tree, and three questions sit in the inbox and
+  `work/BLOCKED.json`.
+- **Next:** W-68 — the only clean agent-lane item left on the queue.
+
+## 2026-08-22 — W-68 built; W-26's last box filed as a fork rather than guessed  ·  Claude Code
+
+- **Asked:** "implement w sixty eight and w twenty six."
+- **Blocker was open on arrival** and is still open — W-26's only remaining box
+  is R7's budget, which W-26 itself assigns to Arpit. Said so first.
+- **Did:**
+  - **W-68 — done.** `fux setup` installs the agent policy: `AGENT_FILES`
+    routing table, `[agents] install` in `config.py` (validated closed set,
+    absent ≠ `[]`, order normalised), `--no-agents`, `SetupReport.outside`, and
+    the mandatory announcement. `tests/test_setup_agents.py` (23) and
+    `tests/test_agent_policy_agreement.py` (13) at the paths the record's own
+    veto checks name. ADR-AGENT-POLICY ⏳ → ✅; ADR-DOTFUX, ADR-CLI and
+    ADR-CONFIG amended in the same change.
+  - **W-26 — the one thing an agent could legitimately do**: wrote
+    [`r7-size-budget.compare.md`](compare/r7-size-budget.compare.md). Five
+    shapes, proposed verdict **B (a ratio)**, **number deliberately blank**.
+    That is the lifecycle's own answer to a fork, and it moves the item
+    without making the decision.
+  - Fixed on contact: `compare/README.md` still showed `hook-at-scale` as
+    "⏳ awaiting Arpit (2026-08-20)" after it was ruled *and* built.
+- **Decided / open:** the blocker now carries **three** questions rather than
+  two — R7's X, the R8/R9 double-claim, and whether §4's *architectural*
+  staleness is in W-26's scope.
+- **Two findings worth carrying.** **(1) The committed index is larger than the
+  corpus it indexes** — 141 % synthetic, 211 % real prose (23 % / 76 % packed).
+  Nothing had said this out loud, and it reframes R7 from "is the index near a
+  budget" to "the index currently costs more than the content". **(2) A veto
+  that cannot be tested honestly should say so in the test file.** The first
+  version of the policy-agreement test flagged correct content; withdrawing it
+  with the reason written down beats leaving a check that trains people to
+  ignore it.
+- **Next:** Arpit answers the three. Nothing is committed — HEAD is still
+  `9bb870e`.
+
+## 2026-08-22 — W-66 finished, W-67 re-measured, W-65 reconciled, W-26's tier question answered  ·  Claude Code
+
+- **Asked:** "Implement w sixty five, w sixty seven, w twenty six", then
+  mid-turn: "Once done, implement w sixty six as well." Four items, on Opus.
+- **Did:** all four, plus one blocker filed rather than guessed.
+  - **W-66 Phases 2+4** (the Opus half the prior pass deliberately left).
+    `src/fux/maintain/runner.py`: `O_CREAT|O_EXCL` pid lock, cooperative stop
+    polled only *before* `write_index`, detached spawn
+    (`start_new_session` / `DETACHED_PROCESS`), takeover on the one
+    `ingest_and_report` seam, `--stop`, `doctor --json`, read-only status.
+    `post-commit` is now one line and constant in the corpus.
+  - **W-67**: new instrument `PRE-REGISTRATION-R6-v2.md`, tier 1 hash-selected,
+    R6 re-run → **PASS** ([R6-MERGE-RERUN](regression/2026-08-22-r6-rerun/VERDICT.md)).
+    ADR-MERGE-DRIVER's veto 2 satisfied on a measurement, not a reading.
+  - **W-65**: 14 documents reconciled to the 10 000-document design point —
+    ten listed plus **four the item's table missed**, and two live veto scripts
+    still keyed to the retired `250 MB @100k` budget.
+  - **W-26**: pre-registered **R9** (R3's 150 ms bar reused verbatim), built a
+    10k lab environment, measured **12.46 ms worst-case p95** → **PASS**, so
+    **T2 is not built**. `the T2 proposal` (0037) accepted as the record of a
+    decision *not* to build. Paper §5–§6 rewritten to measured.
+  - **Tests:** 1101 passing across both suites (was 1040).
+- **Decided / open:** three things went to Arpit rather than being guessed, all
+  in `work/BLOCKED.json` or OPEN-WORK's inbox: **R7's budget at 10k** (W-26
+  says the re-derivation is his if not obvious, and it is not — and the 10k
+  size is already measured, so a budget picked after reading it is
+  contaminated); **`R8` is claimed by two documents** (registered T2's as R9);
+  and **W-67's dead-link box was left unticked** because that item contradicted
+  itself about whether the frozen pre-registration may be edited.
+- **Three findings worth carrying:** `os.kill(pid, 0)` **terminates** on
+  Windows, so the POSIX liveness idiom kills what it probes; an `flock` would
+  make stale locks impossible and was rejected because decision 1c needs the
+  state *reportable*; and `pruning-criterion`'s Bloom-plane elimination is
+  stated as absolute arithmetic (`2.4 GB at 10⁶`) that evaporates at 10⁴ —
+  what survives is the scale-invariant ratio.
+- **Next:** Arpit reads the three inbox items. Nothing is committed — HEAD is
+  still `9bb870e` and a concurrent session's work is staged alongside this.
+
+## 2026-08-22 — W-66 Phases 1+3 and W-44's demotion weight land  ·  Claude Code
+
+- **Asked:** "Implement W-66 and W-44." Picked up from a concurrent session's
+  staged records (ADR-MAINTENANCE 1a–1d, ADR-CLI, ADR-DIR-LIST decisions 11/12
+  — all `docs/adr/` diffs, no code) with HEAD unmoved.
+- **Did:** scoped to what each item's own handoff marks Sonnet-startable, and
+  no further — code, not just docs, for those two slices:
+  - **W-66 Phase 1** — `src/fux/maintain/dirty.py` (union `record`/`read`/
+    `clear`, gitignored under `.fux/runtime/`); `post-commit` now writes it
+    via `git diff-tree --root` before its still-synchronous `fux ingest`
+    call; `ingest/run.py::run()` clears it only after `write_index` succeeds.
+  - **W-66 Phase 3** — `fux ask` declares a non-empty pending count on
+    **stderr** (`query/__init__.py::_declare_pending`), ASCII, never touching
+    `--json`/stdout.
+  - **W-44's demotion weight** — `[ranking] archived_weight` (`config.py`,
+    default `1.0`, rejects negatives/non-numbers/bools);
+    `ingest/gitdir.py::archived_dirs()` reads the existing `archived=true`
+    declaration; `query/rank.py::rank()` applies the multiply (skipped
+    outright at the default) — the one shared scorer, so the differential law
+    carries it down both the scan and accelerator paths with no extra wiring.
+  - **Deliberately not attempted:** W-66 Phase 2 (detached spawn + lock) —
+    the handoff's own model line assigns it to Opus, not Sonnet, because a
+    silent, rare, cross-OS failure there corrupts the index rather than
+    raising. Phase 4 (doctor status) waits on Phase 2's lock existing. W-44's
+    marker/disclaimer stay gated on Arpit's pre-registered query set, per the
+    2026-08-22 ruling already on file.
+  - **Docs, same change (Law zero):** amended ADR-ASK, ADR-T1-ACCELERATOR,
+    ADR-CONFIG, ADR-INGEST (the four owning records the new code touches,
+    beyond ADR-MAINTENANCE/ADR-DIR-LIST/ADR-CLI already staged) —
+    `tests/test_adr_freshness.py` caught the first pass missing exactly these
+    three before ADR-INGEST was added by hand. Updated both `W-66-deferred-
+    hook.md` and `W-44-archived-content-signalling.md`'s DoD checklists,
+    `OPEN-WORK.md`'s two rows, and `CHANGELOG.md` under `[Unreleased]`.
+  - **Tests:** `tests/maintain/test_dirty.py` (new), `tests/maintain/
+    test_hooks.py` (+2), `tests/ingest/test_run.py` (+2, incl. the
+    list-present/absent/stale/corrupt byte-identity assertion), `tests/
+    query/test_scan.py` (+3), `tests/test_config.py` (+6), `tests_e2e/
+    test_maintenance.py` (+2), `tests_e2e/test_verbs.py` (+1). Both suites
+    green: 1040 passed (`tests` + `tests_e2e`).
+- **Decided / open:** nothing re-litigated — followed the fork ruling and the
+  gates already on file. Open: W-66 Phase 2/4 (Opus), W-44's marker/disclaimer
+  (Arpit's instrument).
+- **Next:** Phase 2 (detached runner + single-writer lock) is the next W-66
+  slice, and it needs an Opus session per this file's own model assignment.
+
+## 2026-08-22 — W-61 ruled; W-44's demotion; the disclaimer goes intent-neutral; ADR-AGENT-POLICY  ·  Cowork
+
+- **Asked:** explain W-61 and W-26 in plain language, then — after a long
+  interrogation of *why* the hook cannot just re-index the changed files —
+  rule the fork and "do the full paperwork".
+- **Did:** no code. Records only, and **nothing committed** — a prior session's
+  10 staged files were left staged on Arpit's instruction.
+  - **[`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md)** —
+    `proposed` → **`accepted`**. Verdict **B, the hook defers**, in Arpit's
+    **detached-runner** variant: `post-commit` writes a **dirty list** and
+    spawns a one-shot re-index that exits. Added **§5** (why a one-shot is not
+    the watch daemon `maintenance-trigger.compare.md` rejected) and **§6** (D
+    deferred, not rejected, and this verdict shaped to feed it). **Matrix
+    re-weighted off `holds at 10⁶ (×3)`** onto the 10 000-document design point
+    with 50 000 as the next staged target — which §0 had required of whoever
+    ruled.
+  - **[ADR-MAINTENANCE](../docs/adr/0032_hooks.md)** — `proposed` →
+    **`accepted`**, *not* because R5 passed but because the fork its failure
+    opened was ruled. New **decisions 1a** (defer: list, spawn, return) and
+    **1b** (`ask` declares the pending count). Mermaid **and its ASCII twin**
+    updated together. Veto 1 marked **SPENT** with successors **5** (the commit
+    path must stay constant in the corpus) and **6** (nothing fux spawns may
+    outlive its commit).
+  - **[ADR-MERGE-DRIVER](../docs/adr/0033_merge-driver.md)** — `proposed` →
+    **`accepted`** on Arpit's §3.1 reading of R6, with the debt named in the
+    status itself and a new **veto 5**: if repairing the pre-registration
+    overturns that reading, the record returns to `proposed`.
+  - **[R6-MERGE](regression/2026-08-20-r6-merge-driver/VERDICT.md)** — an
+    **adjudication addendum**, appended below an untouched verdict.
+    `verdict: INCONCLUSIVE` **still reads INCONCLUSIVE**; a filed measurement is
+    not edited by a ruling about it.
+  - **[ADR-CLI](../docs/adr/0002_cli-surface.md)** — the `ask` staleness
+    declaration: stderr-only, ASCII-only, never a gate; new veto 5 if it ever
+    reaches stdout.
+  - **[W-66](../archive/open/W-66-deferred-hook.md)** (the build, 3 phases) and
+    **[W-67](../archive/open/W-67-r6-instrument-repair.md)** (repair §3.1/§3.2, re-specify
+    tier 1, re-run) filed. **W-61 closed**, outcome in `IMPLEMENTATION.md`, row
+    deleted, detail moved to `archive/open/` with a row in `archive/README.md`.
+  - **[MACHINE.md](MACHINE.md)** — on this bridge `git status` leaves an
+    **undeletable** `.git/index.lock`; `git --no-optional-locks` is the fix.
+    Cost a stranded lock before it was understood.
+- **Decided / open:** **The correction that drove the whole session** — Arpit's
+  instinct was "the hook should only process the delta". **Delta ingest already
+  ships** (ADR-INGEST 1b): R5's 44.4 s was measured on a **20-document** commit
+  that already skipped unchanged documents. **Cost tracks corpus size, not
+  delta size** — sha every file, parse every document, resolve every edge, write
+  every shard. That is why B (get off the commit path) beat D (make the passes
+  incremental), and why D loses anyway at 50 000 where its 4× no longer reaches
+  the bound. **I also overstated the daemon conflict** and corrected it from the
+  primary source: `maintenance-trigger.compare.md` rejected an *always-on
+  watcher* and explicitly left "a plausible later layer" open — a process that
+  exits is not that option. **Two debts carried, not absorbed:** ADR-MERGE-DRIVER
+  is accepted on a *reading* of a self-contradicting pre-registration (W-67),
+  and ADR-MAINTENANCE is accepted for a *decision* whose behaviour is unbuilt
+  (W-66).
+- **Then, same session — W-44/W-52 ruled too.** Arpit: archived documents should
+  **score normally, rank lower, and trigger a disclaimer**, with the demotion
+  **configurable**. The demotion reversed the "never reorder" half of
+  [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) decision 6 — **which he had
+  accepted three days earlier** — and a demotion is a ranking change, forbidden
+  off a single corpus. **The reconciliation: ship the weight with a default of
+  `1.0`.** At the default nothing reorders, so the *capability* ships and the
+  *ranking change* does not, and W-52's measurement still decides the default.
+  Recorded as decision **11** (the weight, in `fux.toml` — a ranking parameter,
+  not a source attribute, and decision 3 caps the dirs attribute set at one) and
+  decision **12** (the disclaimer: response-level, conditional, carrying the rule
+  not a hedge). Decision 6 amended to *"may not change an order **at the
+  default**"*; three veto conditions added. **W-44 partly unparked** — the weight
+  is startable, the disclaimer is not.
+  ⚠ **The one thing left with Arpit:** decision 10 gates the signal because
+  *"changing what a verb says about a document is a claim that needs an
+  instrument"*, and the disclaimer says **more** than the marker it gates — so
+  it is gated too. Whether it ships ahead of the query set is his to lift; it
+  was **not** assumed.
+- **Worked output written into the record.** ADR-DIR-LIST §1 now carries three
+  console blocks — today, the default, and a user-set demotion — on this
+  record's own failure case, so the design can be argued about before it is
+  built. Writing them **found a constraint nobody had stated**: `fux find`
+  prints bare paths so it can pipe, so a disclaimer on stdout is swallowed by
+  `xargs` as a filename. Decision 12 already required stdout stability for the
+  `--json` contract; this is a second and more concrete reason, and it is now in
+  the record.
+- **W-66 gained a fourth phase — the runner status.** Arpit: he wants a CLI
+  command for the background process's state. **A detached process that exits is
+  invisible by construction**, so without this 1a trades a slow commit for an
+  opaque one. Landed as **ADR-MAINTENANCE decision 1c**: a check inside
+  `fux doctor` (which already has the `Check(ok, level, name, detail)` shape)
+  plus **`fux doctor --json`, which it has never had** — a status an agent
+  cannot parse is not a status for this audience. **Not a verb**: ADR-CLI veto 1
+  forbids `fux <verb> <subverb>` outright, so `fux index status` was never on
+  the table, and a verb costs a record. Arpit chose *"a check now, a verb if it
+  outgrows it"*, and **outgrows is now a checkable condition in ADR-CLI** — a
+  caller that wants runner state and *not* doctor's other checks, named in the
+  change that promotes it — rather than something a future session claims by
+  feeling. **Read-only, on his call**: it reports a stale lock and names the
+  command to clear it. Automatic clearing was rejected because *provably stale*
+  is a cross-platform pid claim, pids get reused, and being wrong once puts two
+  runners in `.fux/index/` — the exact failure Phase 2's lock exists to prevent.
+  ⚠ **Caught while writing it: `doctor.py` is owned by ADR-DOTFUX**, not
+  ADR-MAINTENANCE, so Phase 4 must amend that record or move the ownership row
+  in the same change — `tests/test_adr_ownership.py` is the tripwire.
+  ⚠ **Also corrected**: Arpit said "W-66 and W-67", but **W-67 has no background
+  process** — it repairs R6's pre-registration and re-runs the merge harness.
+  Long-run feedback there is W-64's progress plane, already shipped.
+- **And a stop/run surface — ADR-MAINTENANCE 1d.** Arpit asked for commands to
+  stop and run the background process, and whether a manual run should do
+  pending-only or start from scratch. **Answer: both already ship** —
+  `fux ingest` is delta (reuse keyed on content sha), `fux ingest --full`
+  re-extracts, and **a delta run is byte-identical to a full run**, asserted on
+  shard digests. So: delta by default, `--full` as the escape hatch — and
+  `--full` is *not* redundant, being the only complete term-hash collision check
+  and the only thing that retro-fits `code` onto unchanged documents.
+  **The trap, now in ADR-INGEST:** the run must never be driven by the dirty
+  list. Delta-ness comes from shas; a run that trusted the list would make it a
+  second source of truth about what changed, turning a corrupt list from a
+  performance bug into a **correctness** one.
+  **His two calls:** `--stop` is a **flag on `fux ingest`**, not a new verb
+  (ADR-CLI veto 1 forbids subcommands, and a `fux reindex` verb would overlap
+  `ingest`); and a manual `fux ingest` **takes over** — stops a live runner,
+  then runs. They compose: `--stop` is the takeover without the run.
+  **Takeover moved stopping onto the mainline**, which forced three things into
+  the record: the stop must be **cooperative** (a kill mid-`write_index` can
+  leave a partial shard — and Windows has no POSIX `SIGTERM`, so L7 and the
+  Windows-first litmus point the same way), a **stopped run leaves the dirty
+  list untouched** because it did not complete, and a **completed run clears
+  only a start-time snapshot** or a commit landing mid-run is silently dropped.
+  ⚠ **Checked against veto 7**, written twenty minutes earlier, and it does not
+  fire: 5a guards the *status* surface from mutating, and `fux ingest` is the
+  write path. `doctor` still never stops a runner and never clears a lock.
+- **The disclaimer was written for one reader, and Arpit caught it.** Decision
+  12's wording — *"the build is based on the records"* — assumed the reader was
+  building. His point: Fux is queried from a **business**, an **architecture**
+  and a **build** stance, *"and maybe more — there could be"*. That last clause
+  is what shaped the fix.
+  **The same archived document is three different things**: *the answer* to
+  *why did we choose X*, *misleading* to *how does X work now*, and *dangerous*
+  to *implement X* — this repo's own probe returned **5/5 archived** for "what
+  is the ingest cache", a subsystem CLAUDE.md forbids porting back.
+  **Decision 12 amended**: the note now states what archived **is** and stops —
+  *"An archived document records what was true when it was retired, not what is
+  true now"* — with no instruction in it. The §1 worked examples were updated to
+  match.
+  **`fux ask --intent=` was rejected, not ignored.** An intent enum is provably
+  incomplete on the day it ships and invites callers to squeeze a fourth stance
+  into the closest of three; and it puts policy inside an engine whose argument
+  is that it ships facts. **The precedent was already set** — the refer plane
+  returns `current`/`stale`/`unverified` and refuses to collapse them, because
+  *"three callers want three different answers from the same index"*. The
+  rejection is kept honest by naming the one cost it does **not** carry: intent
+  never enters the index, so L3 is not threatened.
+  **Filed [`work/proposals/consumer-intent-policy.md`](proposals/consumer-intent-policy.md)**
+  — three layers, one owner each: the record states the fact (Fux, at ingest),
+  the disclaimer states the meaning (Fux, at output), **the policy states what
+  to do (the consumer)**. With drafts for **Claude (SKILL.md), Copilot
+  (`.instructions.md` + `applyTo:`) and Kiro (`.kiro/steering/` + `inclusion:`)**
+  in [`proposals/consumer-policy/`](proposals/consumer-policy/README.md), formats
+  verified against vendor docs the same day. Sharpest shared rule: **ambiguous
+  stance → treat it as building**, the ordering with the worst downside if
+  wrong; and **branch on the `--json` boolean, never the prose**.
+- **Then Arpit asked for a Copilot *agent*, for `fux setup` to install these,
+  and for a record — so the proposal graduated the same day it was filed.**
+  **[ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) (0036)**, `proposed`,
+  built **partial**. It owns `src/fux/templates/agents/`; **`setup.py` stays
+  ADR-DOTFUX's and is *amended*, not claimed** — one component, one owner.
+  **Decision 2 is the one worth reading, and its shape was forced by a failure
+  on the very first run of the check meant to confirm it.** The four renderings
+  had been written to *say the same thing* — "never drop the mark when you
+  summarise" vs "never drop the archived mark when summarising". Same meaning,
+  different bytes. **No substring test can separate a legitimate rewording from
+  a dropped rule**, so a loose test would have certified an agreement it never
+  checked. The eight rules now live in a **verbatim block** between
+  `<!-- fux:policy:begin v1 -->` markers, copied byte for byte into every
+  rendering, with format-native framing around it — the same device the ADRs
+  already use for a Mermaid diagram and its ASCII twin.
+  **Also decided:** Copilot gets **two** files, and they are not alternatives —
+  the agent fires when selected or routed to, the ambient instructions fire
+  always, and **the gap between them is the dangerous case** (output pasted into
+  a chat where the agent was never invoked). Install is from a **declaration in
+  `fux.toml`, never filesystem detection** — sniffing for `.kiro/` is exactly
+  the derivation ADR-DIR-LIST decision 4 refused. And **nothing outside `.fux/`
+  is written without `--agents`**, because `.github/`, `.kiro/` and `.claude/`
+  belong to GitHub, AWS and Anthropic, and `_write_if_missing` protects a file
+  that exists — it does not ask permission to create one in someone else's
+  folder.
+  **Then Arpit overruled the opt-in default: all three install on `fux setup`.**
+  Decisions 5 and 6 amended. His case is the stronger one — a flag nobody knows
+  about means the policy layer exists in the product and in no repository, and
+  **the failure it prevents is silent**: an agent citing a deleted design with a
+  correct-looking citation. The reconciliation that keeps *declared, never
+  derived* intact: `[agents] install = ["claude","copilot","kiro"]` is **written
+  out in full** into `fux.toml`, which is the pattern `setup.py` already uses for
+  the type allowlist — *"the default spelled out rather than left implicit, so a
+  consumer can see it without reading the source."*
+  ⚠ **Two costs recorded rather than discovered.** Default-on makes `setup`'s
+  announcement **the only remaining safeguard**, so it became mandatory with its
+  own veto (1 and 1a). And **two of the four renderings are ambient** — Copilot
+  `applyTo: "**"` and Kiro `inclusion: always` enter every request in the repo,
+  for every developer, using Fux or not. That is a standing context tax, so
+  **the renderings not growing is now a veto condition** with `wc -c` as its
+  check.
+  **W-68 filed** for the installer. The proposal is marked `graduated` and its
+  drafts directory is now a pointer rather than a second copy.
+- **Noticed, not caused by this session:** a concurrent Claude Code session
+  **staged** these files mid-session — 21 files in the index, HEAD unmoved.
+  Nothing was committed from here, per Arpit's instruction.
+- **Next:** W-66 Phase 1 — the dirty list, alone, Sonnet-executable. Or W-44's
+  demotion weight, which is now the smallest startable item on the queue.
+
+---
+
+## 2026-08-22 — the queue reconciled against two releases; register-vs-record drift becomes a check  ·  Claude Code
+
+- **Asked:** review `OPEN-WORK.md` and update the files, because a lot has
+  changed.
+- **Did:** re-derived the queue against `git log`, the record files and
+  `IMPLEMENTATION.md` rather than reading its own markers (rule 4), and fixed
+  what that turned up.
+  - **`OPEN-WORK.md`** — W-59's row said ADR-REFER was still `proposed`; it
+    went **`accepted` on 2026-08-21** (`9f8366e`) **with veto condition 2 left
+    open**, and the plane is now `answer`'s default path, so the assembler the
+    budget sweep may delete is shipped code. **W-61 regrouped** out of the
+    ADR-GRAPH/ADR-REFER heading into its own **ADR-MAINTENANCE ·
+    ADR-MERGE-DRIVER** one — rule 8 groups by the record the change updates,
+    and the old heading also named ADR-RECORD, which no open item touches.
+    W-26's "the only agent-closable item requiring no external setup" corrected
+    — **W-65 is one too**, filed the same day. The inbox now carries the two
+    calls' **age** (2 days), not just their filing date.
+  - **`work/open/W-59`** — its **Hazard forbade exactly what shipped** ("do not
+    wire the plane into `ask`/`answer`"). Rewritten to say the hazard was taken
+    deliberately, on `answer` only, and what it costs: a flat sweep now means
+    changing a released verb's output, so the instruction to delete stands but
+    the change is bigger. Title, "closes with", §Why-this-exists and two DoD
+    boxes reconciled with it.
+  - **`IMPLEMENTATION.md`** — §Predictions still read **"R4–R7 unmeasured"**
+    while three verdicts sat filed in the same file; now a row each (R4 PASS ·
+    R5 FAIL · R6 INCONCLUSIVE · R7 closed unmeasured). M4's status cell and
+    §Not-yet-shipped corrected. **+a row for the Windows console gate.**
+  - **`INTERVIEW.md`** — the state-of-play doc still said **W-63 and W-64 were
+    built and uncommitted** and that the prediction hold was live. New §1 head
+    block (both releases, P1–P7, the design-point move, the Windows gate,
+    1 010 tests); §2's "lift the hold" step deleted, the "W-26 looks available
+    and is not" paragraph retired against its own DoD, `v0.33.0` → `v0.35.0`,
+    twelve verbs → fourteen. §3: `adr-guard.sh` is a **`commit-msg`** hook, not
+    `pre-commit`, and the 10 000-document design point is now a stated standing
+    constraint.
+  - **Five dead links** into `archive/open/` repointed (W-59 ×3, W-44 ×1) and
+    four DOC-REGISTRY rows bumped.
+- **Decided / open:** **the register's status column disagreed with two records
+  it indexes** — ADR-ANSWER and ADR-REFER both flipped `accepted` in `9f8366e`
+  and only the record files were edited. **Second occurrence of the class**
+  (2026-08-19: eight rows drifted the same way), so under the two-strikes rule
+  it became a check in this change: `tests/test_adr_register_status.py`
+  compares every status cell against the record's own frontmatter and fails on
+  a record the table omits. Mutation-checked — reinstating the drift turns it
+  red. **1 012 passed, 1 skipped.** Nothing else in the queue changed state;
+  the two calls with Arpit are untouched and still open.
+- **Next:** W-61's two calls are Arpit's. Agent-lane work is W-65 (the
+  design-point reconciliation, startable) or W-26 (M6 at 10k).
+
+---
+
 ## 2026-08-21 — v0.35.0 pushed, released, and verified live on PyPI  ·  Claude Code
 
 - **Asked:** "commit and everything then publish in one commit."
@@ -281,7 +1028,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 - **Asked:** "remove work/PRIORITY.md reference", after the prior exchange
   noticed the file is archived but still pointed at.
 - **Did:** sweep of the live tree. **Four broken links** — three in
-  [ADR-MERGE-DRIVER](../docs/adr/0034_merge-driver.md) and one in
+  [ADR-MERGE-DRIVER](../docs/adr/0033_merge-driver.md) and one in
   [`compare/graph-plane-format.compare.md`](compare/graph-plane-format.compare.md)
   — repointed to the naming form ("the 2026-08-20 audit's P4") rather than
   deleted, so provenance survives without a dead target. The compare doc's
@@ -620,7 +1367,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
   so it was put to Arpit: carve **both** cache layers out of ADR-REFER, a
   whole-project cache map owning nothing, or the TTL store alone. He chose the
   carve-out, status **proposed**.
-- **Did:** wrote `docs/adr/0035_cache.md` — ADR-CACHE, twelve decisions, seven
+- **Did:** wrote `docs/adr/0034_cache.md` — ADR-CACHE, twelve decisions, seven
   veto conditions, Mermaid + ASCII twin of the TTL→ARC→network consultation
   order. It **owns `src/fux/refer/arc.py` and `src/fux/refer/fetchcache.py`**,
   carved out of ADR-REFER's directory-level claim; `tools/refer-bench/`
@@ -756,7 +1503,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 ## 2026-08-21 — ADR-MERGE-DRIVER split out of ADR-MAINTENANCE  ·  Cowork
 
 - **Asked:** "create a new adr for merge driver."
-- **Did:** wrote [ADR-MERGE-DRIVER](../docs/adr/0034_merge-driver.md) (0034,
+- **Did:** wrote [ADR-MERGE-DRIVER](../docs/adr/0033_merge-driver.md) (0034,
   ⏳ proposed) — decisions 6–9 of ADR-MAINTENANCE, carved out with the
   ownership of `src/fux/maintain/mergedriver.py` (most specific wins; the
   harness stays with ADR-MAINTENANCE, one file runs R5 and R6). ADR-MAINTENANCE
@@ -953,7 +1700,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 - **Asked:** what's blocking W-58; then, mid-discussion, Arpit ratified option
   D (no age bound) from `record-freshness.compare.md`.
 - **Did:** compare doc flipped to `status: accepted` with the decided verdict;
-  [ADR-REFER](../docs/adr/0031_refer-plane.md) decision 4 and veto condition 3
+  [ADR-REFER](../docs/adr/0030_refer-plane.md) decision 4 and veto condition 3
   amended to record the closure; `work/open/W-58-no-recorded-ingest-time.md`
   marked CLOSED and copied to `archive/open/` (the original in `work/open/`
   could not be `git mv`'d/removed from this session — no git access over the
@@ -1052,8 +1799,8 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
   sound, followed by a document to implement it.
 
 - **Did:** read [record-freshness](compare/record-freshness.compare.md),
-  [ADR-REFER](../docs/adr/0031_refer-plane.md), and
-  [ADR-RUNTIME-STAMP](../docs/adr/0028_runtime-stamp.md) to place the idea
+  [ADR-REFER](../docs/adr/0030_refer-plane.md), and
+  [ADR-RUNTIME-STAMP](../docs/adr/0027_runtime-stamp.md) to place the idea
   against what's already decided. Researched `stale-while-revalidate` (RFC
   5861) and Confluence Cloud's REST API rate limits (65,000-point/hour shared
   pool; Atlassian's own guidance is "cache stable responses" and "use ETags
@@ -1072,7 +1819,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
   reopen [W-58](open/W-58-no-recorded-ingest-time.md) or
   [record-freshness](compare/record-freshness.compare.md)'s verdict D — those
   stay exactly as they were. It **does** need a new, explicitly separate
-  fourth verdict state (`cached`) so [ADR-REFER](../docs/adr/0031_refer-plane.md)
+  fourth verdict state (`cached`) so [ADR-REFER](../docs/adr/0030_refer-plane.md)
   decision 6's "never collapse 'we did not look' into 'we looked and it was
   fine'" guarantee survives, and it must live in its own store, never inside
   ARC's keyspace, because ARC's "cannot change the answer" proof depends on
@@ -1135,7 +1882,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
   [`OPEN-WORK.md`](OPEN-WORK.md), detail files moved to
   [`archive/open/`](../archive/open/), the outcome row in
   [`IMPLEMENTATION.md`](IMPLEMENTATION.md) line 50,
-  [ADR-TYPES](../docs/adr/0032_types-list.md) accepted in the register, working
+  [ADR-TYPES](../docs/adr/0031_types-list.md) accepted in the register, working
   tree clean. Re-derived per OPEN-WORK rule 4 rather than read off a marker:
   `git show --stat 9ba02b1`, the archive listing, and a full suite run —
   **719 passed** (`tests` + `tests_e2e`), matching the number that commit
@@ -1666,7 +2413,7 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
   consequence swept in the same change: four items were reserving `ADR-0006`–
   `ADR-0009`, numbers that accepted records already hold, so **milestone items
   now reserve a NAME** — `ADR-GRAPH` (W-23), `ADR-REFER` (W-24),
-  `ADR-MAINTENANCE` (W-25), `ADR-T2-SEGMENTS` (W-26). A number is a filename
+  `ADR-MAINTENANCE` (W-25), `the T2 proposal` (W-26). A number is a filename
   ordinal assigned when the record is written; reserving one in advance is the
   habit that created the contradiction this item existed to close. Row deleted,
   file archived, `IMPLEMENTATION.md` and `archive/README.md` updated. **W-50

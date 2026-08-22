@@ -79,6 +79,21 @@ class Config:
     root: Path
     dirs_file: str
     shards: int
+    #: `[ranking] archived_weight` — a score multiplier for documents under a
+    #: directory declared `archived=true` (ADR-DIR-LIST decision 11). `1.0` is
+    #: the shipped default and a no-op: at it, scoring and order are
+    #: byte-identical to a corpus with no archived declarations at all.
+    #: Moving it off `1.0` is a ranking change and stays behind W-52's gate —
+    #: nothing in this loader enforces that; it is a process rule, not a code
+    #: one, same as `dirs_file` carrying no schema opinion of its own.
+    archived_weight: float = 1.0
+    #: `[agents] install` — which vendors `fux setup` writes policy renderings
+    #: for (ADR-AGENT-POLICY decision 5). **Declared, never derived**: fux does
+    #: not sniff for `.kiro/` or `.github/` and infer intent, which is the same
+    #: derivation ADR-DIR-LIST decision 4 refused for `archived`. Defaults to
+    #: all three, and `setup` writes that default out **in full** so a consumer
+    #: can see and edit it without reading the source. `[]` installs none.
+    agents: tuple[str, ...] = ("claude", "copilot", "kiro")
     url: UrlSource | None = None
 
 
@@ -107,12 +122,57 @@ def load(root: Path) -> Config:
     if shards != FIXED_SHARDS:
         raise FuxError(f"{path}: [index] shards must be {FIXED_SHARDS} this milestone (got {shards!r})")
 
+    archived_weight = data.get("ranking", {}).get("archived_weight", 1.0)
+    if isinstance(archived_weight, bool) or not isinstance(archived_weight, (int, float)) or archived_weight < 0:
+        raise FuxError(
+            f"{path}: [ranking] archived_weight must be a non-negative number (got {archived_weight!r})"
+        )
+
     return Config(
         root=root,
         dirs_file=dirs_file.strip(),
         shards=shards,
+        archived_weight=float(archived_weight),
+        agents=_load_agents(path, data.get("agents")),
         url=_load_url_source(path, sources.get("url")),
     )
+
+
+#: The vendors `[agents] install` may name. Closed, and validated, because a
+#: typo here fails **silently** in the worst way: the policy file a consumer
+#: asked for is simply never written, and nothing says so.
+KNOWN_AGENTS = ("claude", "copilot", "kiro")
+
+
+def _load_agents(path: Path, raw) -> tuple[str, ...]:
+    """`[agents] install`. Absent means all three; `[]` means none.
+
+    **Absent and empty are deliberately different.** Absent is a repo that
+    never expressed a preference and gets ADR-AGENT-POLICY decision 5's
+    default; `install = []` is a consumer who said no, and it is the durable
+    form of `--no-agents`. Collapsing them would make the opt-out unwritable.
+    """
+    if raw is None:
+        return KNOWN_AGENTS
+    if not isinstance(raw, dict):
+        raise FuxError(f"{path}: [agents] must be a table")
+    if "install" not in raw:
+        return KNOWN_AGENTS
+    install = raw["install"]
+    if not isinstance(install, list) or not all(isinstance(a, str) for a in install):
+        raise FuxError(
+            f"{path}: [agents] install must be a list of strings from "
+            f"{list(KNOWN_AGENTS)} (got {install!r}). Use [] to install none"
+        )
+    unknown = [a for a in install if a not in KNOWN_AGENTS]
+    if unknown:
+        raise FuxError(
+            f"{path}: [agents] install names unknown agent(s) {unknown} — "
+            f"known: {list(KNOWN_AGENTS)}. A typo here would silently write nothing"
+        )
+    # Deduped and ordered by KNOWN_AGENTS, not by the file: what gets written
+    # must not depend on the order someone happened to type.
+    return tuple(a for a in KNOWN_AGENTS if a in install)
 
 
 def _load_url_source(path: Path, raw) -> UrlSource | None:

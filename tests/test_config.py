@@ -109,3 +109,52 @@ def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
     _write(tmp_path, "[sources]\n")
     with pytest.raises(FuxError, match=r"\.fux/sources/dirs not found.*fux setup"):
         source_dirs(tmp_path, load(tmp_path).dirs_file)
+
+
+# -- ranking: the archived demotion weight (ADR-DIR-LIST decision 11) ------
+
+
+def test_archived_weight_defaults_to_1(tmp_path):
+    _write(tmp_path, "[sources]\n")
+    assert load(tmp_path).archived_weight == 1.0
+
+
+def test_archived_weight_is_configurable(tmp_path):
+    _write(tmp_path, "[sources]\n[ranking]\narchived_weight = 0.5\n")
+    assert load(tmp_path).archived_weight == 0.5
+
+
+def test_archived_weight_rejects_a_negative_number(tmp_path):
+    _write(tmp_path, "[sources]\n[ranking]\narchived_weight = -1\n")
+    with pytest.raises(FuxError, match="archived_weight must be a non-negative number"):
+        load(tmp_path)
+
+
+def test_archived_weight_rejects_a_non_number(tmp_path):
+    _write(tmp_path, '[sources]\n[ranking]\narchived_weight = "half"\n')
+    with pytest.raises(FuxError, match="archived_weight must be a non-negative number"):
+        load(tmp_path)
+
+
+def test_archived_weight_rejects_a_bool(tmp_path):
+    """`bool` is an `int` subclass in Python — `true`/`false` are not numbers."""
+    _write(tmp_path, "[sources]\n[ranking]\narchived_weight = true\n")
+    with pytest.raises(FuxError, match="archived_weight must be a non-negative number"):
+        load(tmp_path)
+
+
+# -- the archived directory set (ADR-DIR-LIST decision 11's input) ---------
+
+
+def test_archived_dirs_is_only_the_declared_ones(tmp_path):
+    from fux.ingest.gitdir import archived_dirs
+
+    _write_dirs(tmp_path, ["docs", "old/frozen-docs archived=true"])
+    assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old/frozen-docs"]
+
+
+def test_archived_dirs_excludes_exclusion_lines(tmp_path):
+    from fux.ingest.gitdir import archived_dirs
+
+    _write_dirs(tmp_path, ["old archived=true", "!old/keep"])
+    assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old"]

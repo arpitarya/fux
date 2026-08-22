@@ -21,7 +21,7 @@ timestamp: 2026-08-21T00:00:00Z
 - **Evidence:** [`evidence/profile-output.txt`](evidence/profile-output.txt) —
   two independent runs; **every number below is RUN 1**
 - **Under test:** `src/fux/graph/{model,community,walk}.py` — the M3 lane
-  ([ADR-GRAPH](../../../docs/adr/0030_graph.md))
+  ([ADR-GRAPH](../../../docs/adr/0029_graph.md))
 - **Date:** 2026-08-21
 - **What this affects:** ADR-GRAPH **decision 8** (the plane is
   `.fux/runtime/graph.json`). **Decisions 5 and 7 are untouched** — nothing

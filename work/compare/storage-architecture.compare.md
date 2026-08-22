@@ -36,7 +36,7 @@ timestamp: 2026-08-09T00:00:00Z
 > What failed is the claim that the index can be made ~16× smaller *by
 > discarding postings*. This is therefore an **amendment, not a reopen**:
 >
-> - the committed index is **0.6–1.5 GB** at 10⁶ documents, not 220–290 MB;
+> - the committed index is **0.6–1.5 GB** at 10⁶ documents, not 220–290 MB (10⁶ is a deferred target; at the 10 000-document design point every figure in this amendment is three orders smaller and none of them gates anything — W-65, 2026-08-22);
 > - **partial clone** and **external-shards-only committing** stop being
 >   optional levers and become mandatory;
 > - the paper's §5 size model must be re-derived at a retention that holds
@@ -47,7 +47,7 @@ timestamp: 2026-08-09T00:00:00Z
 
 ## Context
 
-At the 1M-doc design point a full-copy store costs 250–450 GB (extrapolated
+At 1M documents — **a deferred target since 2026-08-21, not the design point (W-65, 2026-08-22)** — a full-copy store costs 250–450 GB (extrapolated
 from the measured 10.8 KB/doc at 100k, archived ADR-0011) and duplicates
 content whose owners (git dirs, Confluence, SharePoint) keep evolving it —
 recreating the drift disease Fux exists to cure. The paper

@@ -30,10 +30,14 @@ the fetched text, so freshness is verified per answer rather than maintained
 per corpus.
 
 We give an analytical model, grounded in published compression and pruning
-results and in measurements of the current Fux engine at 10⁵ documents,
-projecting a committed footprint of **≈ 220–290 MB at 10⁶ documents**
-(Figures 1–2), warm-path answers around **220 ms** (Figure 3), and merge
-behavior in which concurrent ingest cannot conflict. All load-bearing
+results and in measurements of the current Fux engine, projecting a committed
+footprint of **≈ 220–290 MB at 10⁶ documents** (Figures 1–2), warm-path answers
+around **220 ms** (Figure 3), and merge behavior in which concurrent ingest
+cannot conflict. **Since 2026-08-21 the design point is 10 000 documents and
+those 10⁶ figures are projections for a deferred target**; at the design point
+the measured numbers are **2.3 MB packed** and **12.46 ms worst-case warm p95**
+(§5, §6), and concurrent-ingest merge behaviour is measured rather than
+projected (§7). All load-bearing
 claims are stated as falsifiable predictions with a defined evaluation
 plan (§8); the pruned-ranking quality prediction P1 gates the build.
 
@@ -80,9 +84,16 @@ cost bounded by citation count, not corpus size.
    whose state is named by one root hash (§4).
 3. A wire/runtime format split that brings the committed footprint to
    ~250 B/doc using published codec results [5, 6, 7] (§5, Figures 1, 2, 4).
+   **Measured 2026-08-22 at the 10 000-document design point: 230 packed
+   B/doc** on a synthetic corpus — but on *real* documents the measured figure
+   is ~4 922 packed B/doc, and neither number is produced by the codecs this
+   claim cites, because they are unbuilt. See §5's box before quoting this.
 4. An analytical latency model anchored in measured baselines (§6, Figure 3).
 5. A falsifiable evaluation plan in which the architecture's riskiest
    assumption — pruned ranking quality — gates all construction (§8).
+   **That gate ran and FAILED**: P1 closed on 2026-08-09 and the committed
+   index carries **full postings, permanently**. The plan worked as designed;
+   this contribution is preserved as the method, not as an open question.
 
 ## 2. Related work
 
@@ -188,8 +199,55 @@ it is recorded as a research note, not a build item.
 
 ## 5. Size model
 
-Assumptions: 10⁶ documents × ~10³ lines (~10⁴ words, ~65 KB) each; top-128
+> ### Measured at the design point, 2026-08-22 — read this before the table
+>
+> **The design point is 10 000 documents** (2026-08-21). Everything after this
+> box is computed at **10⁶**, which is a **deferred target**: it describes
+> where the design is heading and does not gate work today. The projections are
+> **relabelled, not deleted**, because they remain the argument for the
+> roadmap.
+>
+> **What is measured, at 10 000 documents**
+> ([R9](../regression/2026-08-22-r9-t2-at-10k/report.md)):
+>
+> | quantity | measured | the model's per-doc projection |
+> |---|---|---|
+> | committed index, working tree | **14.2 MB** | — |
+> | committed index, git-packed | **2.3 MB** | — |
+> | **packed bytes/document** | **230** | ~250 B/doc (§1.3) |
+> | raw bytes/document | 1 420 | — |
+>
+> **The per-document projection is close, and the agreement is partly
+> coincidental.** §1.3 claims ~250 B/doc from BIC postings and an MPH
+> dictionary — **neither of which is built**. What was measured is plain JSON
+> compressed by git's generic packing, on a **synthetic** corpus whose closed
+> vocabulary makes it far more compressible than prose. On *real* documents the
+> [2026-08-21 preliminary analysis](../regression/2026-08-21-r7-preliminary-analysis/report.md)
+> measured **4 922 packed B/doc** — ~20× this. Both numbers are real; they
+> measure different corpora, and the honest reading is that **corpus
+> composition dominates the committed size far more than the encoding does at
+> this scale.**
+>
+> ⚠ **None of this is R7.** R7's budget was retired with the design point and
+> its re-derivation is Arpit's call; these numbers are characterisation, and a
+> budget chosen after reading them would be contaminated by them.
+>
+> **Measured at 10 000 documents:** the runtime accelerator is **~130 MB per
+> 8 870 documents** in R3's era; R9's derived plane holds 11 316 terms /
+> 375 025 postings. The `~2.5 GB at 10⁶` figure below is a projection for a
+> deferred target and has never been measured at any size.
+
+Assumptions **for the 10⁶ projection below — a deferred target, not the design
+point**: 10⁶ documents × ~10³ lines (~10⁴ words, ~65 KB) each; top-128
 kept terms/doc; ~8M-term pruned vocabulary (Heaps); ~10⁷ extracted edges.
+
+> ⚠ **The `top-128 kept terms/doc` assumption is dead.** P1 closed **FAIL** on
+> 2026-08-09 — pruning does not preserve recall, and the committed index
+> carries **full postings, permanently**
+> ([P1-RERUN](../regression/2026-08-09-pruning-rerun/VERDICT.md)). Every `P/`
+> figure below is therefore a floor for a design that is not being built. It is
+> left in place because the *codec* rates it cites are still the argument for
+> `ADR-POSTINGS`; it is the *pruning* half that died.
 
 | prefix | arithmetic | estimate |
 |--------|-----------|----------|
@@ -224,12 +282,46 @@ never pays a clone tax.
 
 ## 6. Latency model
 
-Anchored baselines (measured, 100k synthetic, ADR-DOTFUX [19]): full-index
+> ### Measured at the design point — the projections below are superseded for 10 000 documents
+>
+> **Warm `ask` at 10 000 documents is 12.46 ms worst-case p95**
+> ([R9](../regression/2026-08-22-r9-t2-at-10k/VERDICT.md), 2026-08-22), against
+> a pre-registered 150 ms bar. Not a projection: measured, on the shipped
+> accelerator, on a corpus regenerable from a seed.
+>
+> | population | accelerator p95 | reference scan p95 |
+> |---|---|---|
+> | **worst (highest `df`)** | **12.46 ms** | 25.07 ms |
+> | typical | 12.54 ms | 26.01 ms |
+> | multi-term | 12.63 ms | 37.06 ms |
+>
+> Population curve: **1 000 → 1.25 ms, 10 000 → 12.46 ms** — linear in document
+> count, because the accelerator's cost tracks posting-list length rather than
+> document size.
+>
+> **The earlier real-corpus point still stands beside it:** R3 measured
+> **27.2 ms worst-case p95 on 8 870 real RFCs** against the same 150 ms bar
+> ([2026-08-12](../regression/2026-08-12-m2-accelerator/report.md)). R9's
+> corpus is synthetic and 18× lighter per document; correcting for that puts
+> the two within 15 % of each other.
+>
+> **What this replaces.** The `Warm ≈ 220 ms` headline below is a projection at
+> 10⁶ documents and remains one. At the design point the measured figure is
+> **more than an order of magnitude better**, which is what
+> [the T2 proposal](../proposals/t2-segments.md) rests on.
+>
+> ⚠ **Two of the projection's premises no longer hold**: it assumes *pruned*
+> postings (P1 FAILed — full postings, permanently) and it is stated for a
+> corpus size that is now a deferred target.
+
+Anchored baselines (measured, 100k synthetic, ADR-DOTFUX [19] — **the
+*archived* v0.26 engine, not this one**): full-index
 load-everything query 10 570 ms; lean warm 4 105 ms; binary-code scan
 54.5 ms of which ~93% is a removable conversion overhead; ingest
 5.7 ms/doc.
 
-Projections at 10⁶ docs (Figure 3): rank ≈ 80–150 ms (MaxScore over pruned
+Projections **at 10⁶ docs — a deferred target** (Figure 3): rank ≈ 80–150 ms
+(MaxScore over pruned
 postings with block-max skipping [7]; 2–4-term queries touch a small
 fraction of 128M postings); dense scan 35–50 ms on int-cached codes
 (measured basis); fetch ≈ ms cache-hit / 0.5–2 s live-parallel; passage
@@ -263,8 +355,8 @@ the existing 100k synthetic + acme/orbit eval corpora and goldens.
 | # | prediction | threshold | falsifies |
 |---|-----------|-----------|-----------|
 | P1 | KL top-128 pruning preserves ranking quality | hit@5 within 2–3 pts of full index | the entire premise |
-| P2 | committed wire ≤ 300 MB at 10⁶ docs | measured on synthetic corpus | §5 model |
-| P3 | warm answer ≤ 300 ms at 10⁶ | end-to-end bench | §6 model |
+| P2 | ~~committed wire ≤ 300 MB at 10⁶ docs~~ **RETIRED** with plan revision 1; successor **R7**, whose budget was retired again with the design point and awaits re-derivation at 10 000 | measured on synthetic corpus | §5 model |
+| P3 | ~~warm answer ≤ 300 ms at 10⁶~~ **RETIRED** with plan revision 1. Answered at the design point instead: **R9 PASS, 12.46 ms vs a 150 ms bar at 10 000 docs** | end-to-end bench | §6 model |
 | P4 | cold external answer ≤ 3 s (k=10, parallel) | bench w/ mock server | fetch design |
 | P5 | clone→first-answer ≤ 5 min (inflate + rederive) | fresh-clone bench | wire/runtime split |
 | P6 | concurrent-ingest merge produces zero conflicts | branch-merge harness | §7 tier 1–2 |

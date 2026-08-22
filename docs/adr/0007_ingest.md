@@ -254,6 +254,30 @@ docs/logo.png: binary
 
 ### Consequences
 
+- **`fux ingest` gained `--stop` and a takeover, 2026-08-22 (W-66).** The verb
+  this record owns is now also how a background re-indexer is halted: a manual
+  `fux ingest` stops a live runner and then runs, and `--stop` is that takeover
+  without the run. **The decision is [ADR-MAINTENANCE](0032_hooks.md) 1d and the
+  surface is [ADR-CLI](0002_cli-surface.md); neither is restated here.** What
+  belongs to *this* record is the consequence for delta ingest:
+  **`--stop` and the takeover change nothing about what a run computes.**
+  Delta-ness is still decided by comparing content shas (decision 1b), **never
+  by reading the dirty list** — the list is advisory, and a run that trusted it
+  would make it a second source of truth about what changed, turning a corrupt
+  list from a performance bug into a correctness one. **`--full` remains the
+  only complete term-hash collision check** and the only thing that retro-fits
+  `code` onto unchanged documents, so it is not made redundant by any of this.
+
+- **`run()` clears the dirty list on completion, 2026-08-22 (W-66 Phase 1).**
+  The list itself and its writer belong to [ADR-MAINTENANCE](0032_hooks.md)
+  (decision 1a); the one line that belongs here is that this record's own
+  `write_index` call is what "completed" means — the clear happens *after*
+  it succeeds, never before, so a run that dies partway (an exception, a
+  killed process) leaves the list intact for whoever picks it up next.
+  Nothing about what `run()` computes reads the list — the point above about
+  `--stop` holds symmetrically for every other caller of `run()`, not only
+  the takeover path.
+
 - **Two reproduced defects fixed (PRIORITY.md P4, 2026-08-21).**
   `ingest/parse.py` decoded content with `"utf-8"`, which leaves a leading
   BOM as a literal `U+FEFF` character rather than stripping it — corrupting
@@ -294,7 +318,7 @@ docs/logo.png: binary
   a verb that deletes a document could not otherwise do so without the
   network, which is the wrong shape for a deletion.
 - **The graph plane can no longer be handed a dangling edge by ingest**
-  (decision 10). [ADR-GRAPH](0030_graph.md)'s `edges_from_records` lifts
+  (decision 10). [ADR-GRAPH](0029_graph.md)'s `edges_from_records` lifts
   edges with no validation on the strength of that, which was true only for
   re-resolved records before this.
 - **An offline run now reads one more committed file** — `.fux/sources/urls`

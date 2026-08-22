@@ -10,7 +10,7 @@ timestamp: 2026-08-19T00:00:00Z
 # ADR-ARCHIVED-SIGNAL — retired content is annotated, never reordered
 
 - **Name:** `ADR-ARCHIVED-SIGNAL` — cite this everywhere; never cite the number
-- **Status:** superseded by ADR-DIR-LIST — **archived 2026-08-19, unbuilt.** Its decisions were carried into [`docs/adr/0023_dir-list.md`](../../docs/adr/0023_dir-list.md); **decision 3 changed**, from deriving `archived` off the path to declaring it on a line
+- **Status:** superseded by ADR-DIR-LIST — **archived 2026-08-19, unbuilt.** Its decisions were carried into [`docs/adr/0022_dir-list.md`](../../docs/adr/0022_dir-list.md); **decision 3 changed**, from deriving `archived` off the path to declaring it on a line
 - **Date:** 2026-08-19
 - **Feature:** the `archived` record property and its appearance in `ask` / `find` / `answer`
 - **Owns:** nothing new — the property is written by `ingest/` ([ADR-INGEST](0007_ingest.md)) and its schema is [ADR-RECORD](0010_index-record.md)'s. This record decides *that it exists and what it may not do*

@@ -37,6 +37,65 @@ def run(start: Path | None = None) -> list[Check]:
     return checks
 
 
+def _background_runner(root: Path) -> Check:
+    """The deferred re-index, reported and never repaired (W-66 Phase 4).
+
+    ADR-MAINTENANCE decision 1c: `post-commit` spawns a detached process that
+    exits, so without this the whole maintenance path is invisible — a runner
+    that died leaves the dirty list intact and says nothing at all. Four
+    questions, one line: is one live and which pid, how many documents are
+    pending, is the lock held or stale, and did the last run fail.
+
+    **Read-only, and that is the decision rather than an omission.** A stale
+    lock is *named* along with the command that clears it; this never clears
+    it. Clearing a lock whose owner is actually alive puts two runners inside
+    `.fux/index/` at once, which is the single failure the lock exists to
+    prevent — decision 1c's veto 7. The logic lives in `maintain/runner.py`
+    (ADR-MAINTENANCE's component); this function only renders it.
+
+    A **warning**, never an error: a pending re-index means the index is late,
+    which is the deferring hook working as designed, not a broken repo.
+    """
+    from .maintain import runner
+
+    state = runner.status(root)
+    pending = state["pending"]
+    last = state["last_run"] or {}
+
+    if state["lock"] == "stale":
+        return Check(
+            "background runner",
+            False,
+            f"a lock is held by pid {state['pid']}, which is not running - a re-index was "
+            f"killed. {pending} changed path(s) pending. Run `fux ingest --stop` to clear it, "
+            f"or delete {state['lock_path']}",
+            level="warn",
+        )
+    if state["running"]:
+        return Check(
+            "background runner",
+            True,
+            f"running (pid {state['pid']}), {pending} changed path(s) pending",
+            level="warn",
+        )
+    if last.get("outcome") == "failed":
+        return Check(
+            "background runner",
+            False,
+            f"the last background re-index FAILED ({last.get('error', 'no detail recorded')}). "
+            f"{pending} changed path(s) pending - run `fux ingest` to see the error",
+            level="warn",
+        )
+    if pending:
+        return Check(
+            "background runner",
+            True,
+            f"idle, {pending} changed path(s) pending - run `fux ingest` to catch up",
+            level="warn",
+        )
+    return Check("background runner", True, "idle, nothing pending", level="warn")
+
+
 def _python_version() -> Check:
     ok = sys.version_info[:2] >= PY_MIN
     have = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -96,6 +155,7 @@ def _layout(root: Path) -> list[Check]:
         )
     )
     checks.append(_accelerator(root))
+    checks.append(_background_runner(root))
     return checks
 
 
@@ -171,10 +231,37 @@ def _is_git_ignored(root: Path, path: Path) -> bool | None:
 
 def cmd_doctor(args) -> int:
     checks = run()
+    exit_code = 0 if all(c.ok for c in checks if c.level == "error") else 1
+
+    if getattr(args, "json", False):
+        # W-66 Phase 4 / ADR-CLI, 2026-08-22: `doctor` had no machine-readable
+        # form, and a status an agent cannot parse is not a status for this
+        # product's actual audience. The runner block is lifted out beside the
+        # checks rather than left as prose inside `detail`, because a caller
+        # asking "is a re-index pending" should not have to parse a sentence.
+        import json as json_mod
+
+        from .config import find_root
+
+        root = find_root()
+        payload = {
+            "ok": exit_code == 0,
+            "version": __version__,
+            "checks": [
+                {"name": c.name, "ok": c.ok, "level": c.level, "detail": c.detail} for c in checks
+            ],
+        }
+        if root is not None:
+            from .maintain import runner
+
+            payload["runner"] = runner.status(root)
+        print(json_mod.dumps(payload, indent=2, sort_keys=True))
+        return exit_code
+
     for check in checks:
         # ASCII only — Windows' default console codepage (cp1252/"charmap")
         # can't encode U+2714/U+2717 and the process crashes on print()
         # rather than degrading; caught by CI's windows runners.
         mark = "OK" if check.ok else ("WARN" if check.level == "warn" else "FAIL")
         print(f"[{mark}] {check.name}: {check.detail}")
-    return 0 if all(c.ok for c in checks if c.level == "error") else 1
+    return exit_code

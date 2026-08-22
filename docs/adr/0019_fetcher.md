@@ -194,7 +194,7 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
   `connect`/`close` bracket.
 
 - **`_sanitize` became `sanitize`, and the refer plane calls it** (2026-08-20,
-  [ADR-REFER](0031_refer-plane.md) decision 3). Fetched-text normalization is
+  [ADR-REFER](0030_refer-plane.md) decision 3). Fetched-text normalization is
   now shared rather than duplicated, because a verify-time sha is compared
   against an ingest-time sha: a one-character divergence between two copies
   would mark **every** URL document permanently stale — a defect that presents

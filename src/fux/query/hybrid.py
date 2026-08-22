@@ -36,7 +36,15 @@ __all__ = ["hybrid_ask", "DENSE_WIDTH"]
 DENSE_WIDTH = 100
 
 
-def hybrid_ask(root: Path, query: str, top: int = 5, *, k: int = RRF_K) -> list[AskResult]:
+def hybrid_ask(
+    root: Path,
+    query: str,
+    top: int = 5,
+    *,
+    k: int = RRF_K,
+    archived_weight: float = 1.0,
+    archived_dirs: frozenset[str] = frozenset(),
+) -> list[AskResult]:
     """Fuse the lexical ranking with the dense ranking. Returns RRF-scored hits."""
     from ..derive import accel
     from ..derive import format as derive_fmt
@@ -45,7 +53,10 @@ def hybrid_ask(root: Path, query: str, top: int = 5, *, k: int = RRF_K) -> list[
         raise FuxError("hybrid needs the derived accelerator - run `fux build` first")
 
     # Lexical lane: reach deeper than `top` so fusion has something to reorder.
-    lexical = accel.ask(root, query, top=max(top * 10, DENSE_WIDTH))
+    lexical = accel.ask(
+        root, query, top=max(top * 10, DENSE_WIDTH),
+        archived_weight=archived_weight, archived_dirs=archived_dirs,
+    )
     lexical_ids = [r.id for r in lexical]
 
     dense_ids = _dense_ids(root, query)

@@ -82,7 +82,11 @@ in the roadmap actually depends on knowing whether the wedge is real.
 
 - PRIORITY.md's original P8 row (archived 2026-08-21 — see
   [`archive/README.md`](../../archive/README.md) for where it moved).
-- CLAUDE.md §Litmus for any new work — the "10k-engineer mega-project,"
-  never Anton, is the design point this measurement tests.
+- CLAUDE.md §Litmus for any new work — **10 000 documents inside a
+  corporation** (Arpit, 2026-08-21), never Anton, is the design point this
+  measurement tests. The quote here used to read *"10k-engineer
+  mega-project"*, which was the pre-2026-08-21 litmus; the **deployment**
+  filter it names is unchanged, and it is the half this item actually tests —
+  a stranger's first fifteen minutes is not a corpus-size question (W-65).
 - [`work/setup/fux-lab.md`](../setup/fux-lab.md) — the environment this
   needs; currently exists but has no Confluence-shaped export corpus.

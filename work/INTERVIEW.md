@@ -27,10 +27,36 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated 2026-08-20.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated 2026-08-22.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: three gates ran, and two did not pass (2026-08-20)
+### The most recent change: two releases, and the queue is nearly empty (2026-08-21)
+
+**`v0.35.0` is released and live on PyPI**, verified black-box from the
+published wheel — a clean venv, `pip install fux-engine==0.35.0`, then `add` /
+`remove` / `update --check` / `ask`. `fux url` answers `invalid choice`, which
+is the retirement working. `v0.34.0` (the graph, refer and maintenance planes,
+delta ingest) shipped the same day, ahead of it.
+
+| what landed | where |
+|---|---|
+| **W-63 — the source verbs** `fux add` / `remove` / `update` over all three source lists; `fux url` deleted; `ingest --refresh-urls` hidden for one release | `v0.35.0` |
+| **W-64 — the progress plane** on `ingest.run()` / `derive.build()`; stderr-only, TTY-gated, counts not clocks, stdout byte-identical with the bar on or off | `v0.35.0` |
+| **scan-by-default** — `ask`/`find`/`answer`/`graph` take the reference scan unless `--fast`; three e2e tests had gone **vacuous** at the flip | `v0.35.0` |
+| **PRIORITY P1–P7**, then `PRIORITY.md` archived — ordering lives in `OPEN-WORK.md` only | `1fc51a7`…`1a8ce1a` |
+| **P6 — the refer plane wired into `answer`** as its default path (`--no-refer` restores the M2 shape); **ADR-REFER and ADR-ANSWER both flip `accepted`** | `9f8366e` |
+| **the Windows console class became a check** — `→` in a `print()` crashed both Windows CI arms on the release commit; second occurrence of the class, so `tests/test_windows_console_safe.py` now gates it | `35eeae0` |
+
+**The design point moved to 10 000 documents on 2026-08-21** (Arpit,
+CLAUDE.md §Litmus). 50 000 then 100 000 are staged later targets. It re-scoped
+W-26, lowered W-61's urgency (a 3.5 s problem, not a 44 s one) and **closed
+nothing** — R5 fails at 10k too. The records still arguing from 10⁵–10⁶ are
+[W-65](../archive/open/W-65-design-point-reconciliation.md), filed the same day and **closed 2026-08-22**.
+
+**Suites: 1 010 passed, 1 skipped** (`tests` + `tests_e2e`, 2026-08-22) — 947
+unit / 64 e2e, nine CI arms green including both Windows.
+
+### Before that: three gates ran, and two did not pass (2026-08-20)
 
 **Arpit lifted the hold on prediction runs, and R4, R5 and R6 all ran the same
 day** against thresholds frozen and committed first.
@@ -39,16 +65,33 @@ day** against thresholds frozen and committed first.
 |---|---|---|
 | **R4** | **PASS** | cold k=10 p95 **1.113 s** / 3 s · warm **0.016 s** / 300 ms |
 | **R5** | **FAIL** | **44.4 s** at 100 000 docs / **1 s** · **0.651 s at 1 000, where it passes** |
-| **R6** | **INCONCLUSIVE** | every tier matched; tier 1 matched *without the driver too* |
+| **R6** | **INCONCLUSIVE** → adjudicated **PASS** (Arpit, 2026-08-22, §3.1) | every tier matched; tier 1 matched *without the driver too* |
 
 **Read R5 as the useful kind of negative.** A 20-document commit costs whatever
 touching the whole corpus costs, and the attribution says why: git is
 ~constant, and two O(corpus) passes are the entire 44 s. **A 10× speedup still
 misses the bound by 4.5×** — which rules out "just optimise it" arithmetically
 rather than by opinion. Only removing the work from the commit path reaches 1 s,
-and that is an architectural call, so it is a compare doc awaiting Arpit
-([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md), proposed
-**B — the hook defers**).
+and that is an architectural call, so it went to a compare doc —
+[`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md), **ruled by Arpit
+on 2026-08-22: B, the hook defers**, in a **detached-runner** variant.
+`post-commit` writes a **dirty list** of the changed documents, spawns a
+one-shot re-index that exits, and returns.
+
+> **The correction worth carrying forward, because it is what everyone gets
+> wrong on first contact.** "Just re-index the files that changed" is **already
+> shipped** — delta extraction landed in M5, and **R5's 44.4 s was measured on a
+> 20-document commit that was already skipping unchanged documents**. Cost
+> tracks **corpus size, not delta size**: sha every file to learn what changed,
+> parse every document because edges need it, resolve every edge because an edge
+> is a claim about *other* documents, write every shard. An agent proposing
+> delta ingest as the fix for R5 has re-derived M5.
+
+**Option D is deferred, not rejected.** Making those passes incremental reaches
+the bound at 10 000 (a 4× speedup gets to 0.99 s) but **not at 50 000**, the
+next staged target, where it would need ~20×. B is constant in the corpus at
+every size. The dirty list is deliberately a **list, not a flag**, because it is
+exactly D's input — so D becomes a later increment rather than a rewrite.
 
 **Read R6 as an instrument finding.** The engine did everything R6 says it
 does. What failed is one third of the harness: tier 1 merges cleanly with the
@@ -56,9 +99,19 @@ driver removed, so it could never have failed. **The control arm — added while
 writing the pre-registration — caught that on its first execution**, and
 without it tier 1 would have been recorded as a pass that proved nothing.
 
-⚠ **Both records stay `proposed`.** ADR-MAINTENANCE now for the *opposite*
-reason to before: not unmeasured, but measured and failing. ADR-REFER because
-one gate passing is not W-59's whole DoD.
+⚠ **Both records stayed `proposed` on the day, and both went `accepted` on
+2026-08-22** — neither on a passing re-measurement, which is the part to
+understand before touching either. **ADR-MAINTENANCE** is accepted because the
+fork R5's failure opened was *ruled*: it now describes a **deferring** hook, not
+the inline one R5 judged. **ADR-MERGE-DRIVER** is accepted on Arpit's reading of
+R6 — §3.1 governs, tier 1 is dropped as uninformative, tiers 2 and 3 carry it.
+⚠ **Both carry a named debt.** ADR-MAINTENANCE describes behaviour that is
+**not built** (W-66). ADR-MERGE-DRIVER rests on a **reading of a
+self-contradicting pre-registration** (W-67), and its veto 5 returns it to
+`proposed` if the repair overturns that reading. **R6-MERGE itself still reads
+`INCONCLUSIVE` and was not edited** — the ruling is an addendum beside it. **ADR-REFER went `accepted` on 2026-08-21** once P6 made the
+plane load-bearing in `answer`: accepted **carrying its budget-sweep veto
+condition open**, which is Arpit's call and not the same as measured.
 
 ### Before that: delta ingest, and a veto that fired (2026-08-20)
 
@@ -92,39 +145,48 @@ a verdict, a hold lifted, or fifty goldens written by hand.
 | shipped 2026-08-20 | record | measured? |
 |---|---|---|
 | W-46 · W-48 — two query defects | ADR-CLI · ADR-ASK · ADR-ANSWER | n/a |
-| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0030_graph.md) ✅ | **no** — W-57 |
-| **M4 core** the refer plane | [ADR-REFER](../docs/adr/0031_refer-plane.md) ⏳ | **no** — W-59 |
-| W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-TYPES](../docs/adr/0032_types-list.md) ✅ | **no** — rides with W-52 |
+| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0029_graph.md) ✅ | **no** — W-57 |
+| **M4 core** the refer plane | [ADR-REFER](../docs/adr/0030_refer-plane.md) ✅ (2026-08-21, veto 2 open) | **partly** — R4 passed; the budget sweep is W-59 |
+| W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) · [ADR-TYPES](../docs/adr/0031_types-list.md) ✅ | **no** — rides with W-52 |
 | W-56 — both lab environments | SETUP-LAB · SETUP-PLAYGROUND | rebuilt, under git |
-| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0033_hooks.md) ⏳ | **no** — W-61 |
-| W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0031_refer-plane.md) 5a-5c ✅ | n/a |
+| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0032_hooks.md) ✅ · [ADR-MERGE-DRIVER](../docs/adr/0033_merge-driver.md) ✅ | **ruled, not passed** — W-66 builds it, W-67 repairs R6's instrument |
+| W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0030_refer-plane.md) 5a-5c ✅ | n/a |
+| **W-63 · W-64** the source verbs, the progress plane | [ADR-CLI](../docs/adr/0002_cli-surface.md) ✅ | captured, not gated |
 
-**Two records are `proposed` rather than `accepted` on purpose** — ADR-REFER
-and ADR-MAINTENANCE — because their gates have not run. **Do not promote them
-without the measurement**; that is the whole reason the status field is being
-used this way.
+**No record on this list is `proposed` any more.** ADR-MAINTENANCE and
+ADR-MERGE-DRIVER both went `accepted` on 2026-08-22 on Arpit's two calls;
+ADR-REFER left the list on 2026-08-21. **What replaced "unratified" as the
+standing risk is subtler and worth naming**: ADR-MAINTENANCE is an accepted
+record describing **unbuilt** behaviour (W-66), and ADR-MERGE-DRIVER is an
+accepted record resting on a **reading** rather than a clean pass (W-67). An
+accepted record that is wrong reads as authority — which is what Law zero exists
+to prevent — so both debts are written into the records themselves rather than
+left only here.
 
-**Arpit held all prediction runs on 2026-08-20**: R4, R5, R6 and R7 run only
-when he says so explicitly. Both harnesses exist
+**The hold on prediction runs was lifted on 2026-08-20** and R4, R5 and R6 ran
+the same day. **R7 was closed *unmeasured* on 2026-08-21** — cancelled on
+Arpit's call, not FAILed — and is re-derived and re-pre-registered at 10 000 by
+M6. Both harnesses exist
 ([`tools/maintenance-bench/`](../tools/maintenance-bench/run.py), the rebuilt
-lab), so this is a decision, not a blocker.
+lab).
 
-**`fux` is twelve flat verbs now** — `setup` `doctor` `ingest` `build` `url`
-`ask` `find` `answer` `explain` `graph` `path` `hooks` — plus a separate
-`fux-merge-index` console script, because git invokes a merge driver as a bare
-command. **Still no subcommand tree.**
+**`fux` is fourteen flat verbs now** — `setup` `doctor` `ingest` `build`
+`add` `remove` `update` `ask` `find` `answer` `explain` `graph` `path` `hooks`
+— plus a separate `fux-merge-index` console script, because git invokes a merge
+driver as a bare command. **`url` was deleted outright at `v0.35.0`** (four
+days old, pre-1.0). **Still no subcommand tree.**
 
 ### Before that: M3 and M4's core landed (2026-08-20)
 
 **Read this first: the engine grew two milestones and neither is measured, and
 the reason is that the measuring environments are gone.**
 
-- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0030_graph.md),
+- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0029_graph.md),
   accepted). `explain` / `graph` / `path`; communities by **unseeded** label
   propagation in a **derived** plane (`.fux/runtime/graph.json`); PPR-lite with
   a **lazy** walk. The archived relational eval passes on the new kernel,
   11/11, its corpus copied live into `tests_e2e/eval/`.
-- **M4's core shipped** ([ADR-REFER](../docs/adr/0031_refer-plane.md),
+- **M4's core shipped** ([ADR-REFER](../docs/adr/0030_refer-plane.md),
   **⏳ proposed, not accepted**). `source` · `freshness` · `arc` · `chunk` ·
   `rescore` · `assemble`. **No verb exposes it** — deliberately.
 - **`fux-lab` and `fux-playground` do not exist on this machine**
@@ -143,9 +205,11 @@ the reason is that the measuring environments are gone.**
   - **A seeded community algorithm** — the randomness was *removed* instead,
     which is the stronger guarantee, and a test parses the module's AST to keep
     it that way.
-  - **Wiring the refer plane into `ask`/`answer`** — its gate has not run, and
+  - **Wiring the refer plane into `ask`/`answer`** — its gate had not run, and
     putting an unmeasured plane on the default surface is how an unproven thing
-    becomes load-bearing.
+    becomes load-bearing. **Flipped 2026-08-21**: R4 passed, and P6 wired
+    **`answer` only** onto the plane by default (`--no-refer` restores the M2
+    shape). `ask`/`find` and ranking are still untouched.
 - **Two defects were found by measuring code rather than reading it.** The
   archived PPR walk truncated at three iterations **ranks by parity** (`d` at 3
   hops scored above `c` at 2); and greedy score-per-byte is **systematically
@@ -246,26 +310,76 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated 2026-08-21.*
+*Updated 2026-08-22 (third pass, same day). Nothing is committed: `HEAD` is
+still `9bb870e` and a **concurrent session's** W-68 / ADR-AGENT-POLICY work is
+staged alongside everything below.*
 
-- **W-63 and W-64 are both BUILT and NEITHER IS COMMITTED (2026-08-21).**
-  Read that twice before you do anything: `HEAD` is `b76300c`, and the working
-  tree carries **three** separate finished changes stacked on top of it — the
-  design-point reconciliation, W-64's progress plane, and W-63's source verbs
-  (which swept in a fourth, an orphan scan-by-default flip nobody had
-  recorded). **Arpit's instruction on 2026-08-21 was "no need to commit
-  anything yet."** Do not commit on your own initiative; do not assume a
-  `git log` tells you what exists.
+- **The immediate next step is Arpit's, not an agent's.** Three decisions sit
+  in [`OPEN-WORK.md`](OPEN-WORK.md)'s inbox and `work/BLOCKED.json`, and **all
+  three sit above completed work** — nothing is waiting to be built:
+  1. **R7's committed-size budget at 10 000 documents.** W-26 says the
+     re-derivation is his if it is not obvious, and it is not. ⚠ **The 10k
+     size is already measured** (14.2 MB raw / 2.3 MB packed), so **a budget
+     chosen after reading that number is contaminated by it** — which is
+     exactly why it was asked rather than answered.
+  2. **`R8` is claimed by two documents.** T2's measurement was registered as
+     **R9**; confirm or swap.
+  3. **W-67 left one DoD box unticked deliberately** — the frozen 2026-08-20
+     pre-registration was not edited, because that item contradicted itself
+     about whether it may be.
+- **The maintenance plane is built, not just described.** W-66's four phases
+  landed: `post-commit` defers to a detached one-shot runner behind a pid lock,
+  the stop is cooperative and fires only before `write_index`, `fux ingest`
+  takes over, `fux doctor` reports the runner and gained `--json`. **This is
+  the change that answers R5's failure** — commit cost is git's cost and
+  constant in the corpus, asserted end to end at 50 vs 800 documents.
+- **M6's largest deliverable was measured and declined.** R9 puts warm
+  worst-case p95 at **12.46 ms at 10 000 documents against R3's 150 ms bar**,
+  so **T2 is not built** and
+  [the T2 proposal](proposals/t2-segments.md) records why. **Read its
+  reopen condition before proposing T2 again**: it is a *number*, not a size,
+  so 50 000 documents arriving does not reopen it — 50 000 documents crossing
+  150 ms does.
+- **Do not quote R9's margin without its caveat.** The corpus is synthetic and
+  **18× lighter per document** than R3's, with 37× fewer distinct terms. The
+  judged quantity survives that (the accelerator is `df`-bound; the *scan* is
+  bytes-bound and shows the full 170× gap), and a density correction lands
+  within 15 % of R3 — but **nobody has measured T1 on real prose at 10 000
+  documents**, that corpus does not exist, and it is recorded as owed.
+- **Two traps found in the lab, both still live.** A stray `.fux/` and
+  `fux.toml` sit at the **fux-lab root**, so `fux setup` in a fresh
+  `<env>/repo/` resolves to the lab root and reports "nothing to do" while
+  writing nothing — write `repo/fux.toml` first. And every environment
+  `new-env.sh` scaffolds pins `fux-engine==0.33.0` from PyPI, which is neither
+  current nor the working tree a tier measurement wants.
+- **R6 no longer rests on a reading.** W-67 re-specified tier 1 to hash-select
+  a shared shard and re-ran: **PASS**. ADR-MERGE-DRIVER's veto 2 is spent.
+  **The frozen 2026-08-20 instrument was not edited** — the repair is a new
+  file beside it.
+- **W-65 reconciled fourteen documents** to the 10 000-document design point,
+  four of which its own table never named. **Two live veto scripts** were still
+  keyed to the retired `250 MB @100k` budget and now say so.
+
+- **Before this pass — the prior state, now superseded above:** nothing was in
+  flight in `src/`, the working tree was clean and `v0.35.0` was live on PyPI
+  (`HEAD` = `9bb870e`, verified black-box from the published wheel). W-63 and
+  W-64 both landed in it; their rows are deleted, their detail files are in
+  `archive/open/`, and their outcomes are rows in
+  [`IMPLEMENTATION.md`](IMPLEMENTATION.md).
 - **What W-63 delivered.** `fux add` / `fux remove` / `fux update` over all
   three source lists, dispatching on the entry. `fux url` deleted;
   `ingest --refresh-urls` hidden for one release. Both `ingest/run.py`
   defects fixed: **a de-listed URL now leaves the index on an offline run**
   (deletion never needed the network) and a carried record's edges are
-  re-checked rather than trusted. 889 unit / 60 e2e green; nine records
-  updated; surface captured at
+  re-checked rather than trusted. Nine records updated; surface captured at
   [`regression/2026-08-21-source-verbs`](regression/2026-08-21-source-verbs/report.md).
-  Its OPEN-WORK row **stays** until it lands, and `IMPLEMENTATION.md` gets no
-  row until then — a row is earned by landing.
+- **The one defect the release itself shipped, and its gate.** A `→` in
+  `fux add`'s rejection message crashed both Windows CI arms — `cp1252` cannot
+  encode it, so `print()` raised and the verb exited non-zero. **Second
+  occurrence of the class** (`fux doctor`'s checkmarks, `v0.30.0`), so under
+  the two-strikes rule it became `tests/test_windows_console_safe.py` in the
+  change that recorded it. **CI caught what nine local runs could not** — read
+  the Windows arms before calling a release green.
 - **L4 now has two named networked paths, and its text did not change.**
   `fux add <URL>` (scoped to that URL) and `fux update`. The law already read
   *"paths"*, plural; what was wrong was the eleven records and docstrings that
@@ -303,44 +417,53 @@ the reason is that the measuring environments are gone.**
   inherits: 47.6 % of R5's failing 44 s is `fux build`** — the derived plane M6
   is about to add a third tier to. Measure a tier's rebuild cost before choosing
   its default.
-- **Two calls sit with Arpit**, both opened by R5: the fork
-  ([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md)) and R6's
-  arithmetic, where the pre-registration's own §3.1 and §3.2 disagree about the
-  result it produced.
-- **Everything else needs Arpit**, in one of three ways:
-  1. **Lift the hold** on prediction runs — then W-59 (R4) and W-61 (R5, R6)
-     run immediately and two records can stop being `proposed`.
-  2. **Give W-58 a verdict** — the compare doc proposes *D, no age bound*.
-  3. **Write the playground's ~50 goldens** (W-57). No agent should do this:
+- **Both of R5's calls were ruled on 2026-08-22 and the inbox is empty.** The
+  fork went to **B** ([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md),
+  now `accepted`) and R6 to **PASS under §3.1**. They left two agent-lane items:
+  **W-66** builds the deferring hook (Phase 1, the dirty list, lands alone and is
+  Sonnet-executable; Phase 2's detached spawn and single-writer lock are
+  **Opus** — they fail silently, rarely, and on someone else's OS), and **W-67**
+  repairs the §3.1/§3.2 contradiction and re-runs a re-specified tier 1.
+- **What else needs Arpit**, now that the hold is lifted and W-58 is ruled:
+  1. **Write the playground's ~50 goldens** (W-57). No agent should do this:
      a golden derived from the engine's own output passes forever, including
-     on the day ranking breaks.
-- **W-26 (M6) looks available and is not.** Its DoD requires *every* R
-  prediction measured, and building `tpack` + T2 early would mean hand-picking
-  the tier-auto threshold the DoD explicitly forbids hardcoding. It is recorded
-  that way in its own detail file so the next session does not re-derive it.
-  **Asked for directly on 2026-08-20 and still not started** — the answer to
-  "implement M6" is this paragraph, not a `tpack` writer.
+     on the day ranking breaks. **W-59's budget sweep is blocked behind it**,
+     so one human afternoon unblocks two items.
+  2. **The external-validation half of [W-62](open/W-62-measure-against-the-outside-world.md)** —
+     five strangers' first fifteen minutes cannot be simulated by an agent. Its
+     README half is agent-startable today.
+- **The old "W-26 looks available and is not" paragraph is retired, and this
+  replaces it.** It rested on a DoD clause requiring *every* R prediction
+  measured. All four now carry a measured value or an honest failure record —
+  R4 ✅, R5 ❌, R6 ⚠, R7 closed unmeasured — so **W-26 is startable**, and its
+  first question is whether T2 earns its place at 10 000 documents at all.
+  Tier-auto still flips by measurement, never by hand.
 - **Any R5 number taken before 2026-08-20 measures an engine that no longer
   exists.** Delta ingest changed ingest cost by more than an order of
   magnitude. When the hold lifts, re-run; do not reason from the old figure.
 - **Nothing is half-built in `src/`, but two things are built-and-unproven.**
   M3 and M4's core both landed complete and green; what is missing is their
-  *measurements*, carried by [W-57](open/W-57-graph-lane-acceptance.md) and
+  *acceptance measurements*, carried by
+  [W-57](open/W-57-graph-lane-acceptance.md) and
   [W-59](open/W-59-refer-plane-measurement.md). **Do not read "landed" as
-  "validated"** — that distinction is the whole reason ADR-REFER says
-  `proposed`.
+  "validated"**, and **do not read ADR-REFER's `accepted` as "measured"**
+  either — it was accepted on 2026-08-21 with its budget-sweep veto condition
+  deliberately left open.
 - **W-59 carries a standing instruction worth knowing before you run it:** if
   the budget sweep comes back flat, the greedy assembler **gets deleted**, not
-  kept. It is written and it is unproven, and those are different things.
+  kept. **What changed on 2026-08-21:** the assembler is now on `answer`'s
+  default path, so that deletion is a change to a released verb's output — the
+  instruction stands, the change is bigger.
 - **The ADR rewrite is done.** `work/adr/` no longer exists; `docs/adr/` holds
   the live set, ADR-LAWS at 0001, and every archived record maps to a successor
   by **name** in [`../archive/adr/README.md`](../archive/adr/README.md).
 - **The Lane B inbox is empty.** W-30, W-31, W-32, W-33 and W-44's decision
   were all ratified by Arpit on 2026-08-19 and their outcomes are in
   [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §Ratified decisions.
-- **`v0.33.0` is released and on PyPI** (2026-08-19), verified black-box from
-  the published wheel. **`CHANGELOG.md` `[Unreleased]` is no longer empty** —
-  it holds W-46, W-48, M3 and M4's core, none of which is released.
+- **`v0.35.0` is released and on PyPI** (2026-08-21), verified black-box from
+  the published wheel; `v0.34.0` shipped the same day ahead of it, and
+  `v0.33.0` on 2026-08-19. **`CHANGELOG.md` `[Unreleased]` is empty again** —
+  everything through the Windows fix is released.
 - **M3 and M4 are done as of 2026-08-20** — the paragraph that used to sit here
   said they were the next step. Both proposals that were to graduate into M4
   have graduated and are archived; one of them shipped **with its central knob
@@ -381,8 +504,10 @@ which are not laws:
   updated in the *same* change; a change that touches no recorded decision says
   `no ADR affected` in the commit message. Enforced by
   `tests/test_adr_freshness.py` in CI and `scripts/adr-guard.sh` as a
-  pre-commit hook — do not treat it as advisory, and do not "fix it in the next
-  commit".
+  **`commit-msg`** hook — not `pre-commit`, because it has to read the commit
+  message to honour the `no ADR affected` escape hatch, and that message does
+  not exist yet at `pre-commit`. Do not treat it as advisory, and do not "fix
+  it in the next commit".
 - **No M-milestone work while its gating prediction is unmeasured or failed.**
   A hard sequencing rule, not a preference.
 - **A pre-registered threshold may never move.** Ambiguous results go to Arpit
@@ -390,8 +515,14 @@ which are not laws:
 - **Do not port the archived engine.** [ADR-PORT-LIST](../docs/adr/0015_port-list.md)
   is the complete list, and it is closed; each entry comes forward with its
   tests, when its milestone needs it.
-- **Do not design in reference to Anton.** The design point is a 10k-engineer
-  corporation's mega-project. Anton is a testbed, not the priority filter.
+- **The design point is 10 000 documents** (Arpit, 2026-08-21 — CLAUDE.md
+  §Litmus is the normative home). 50 000 then 100 000 are staged later targets,
+  **not the filter**. What did *not* change is the deployment filter: a 10 000-
+  document corpus inside a corporation is still inside that corporation, so
+  Windows fleets, proxies/SSO, air-gap and audit remain design inputs. **An
+  argument that turns on 10⁵–10⁶ documents may not gate work today.**
+- **Do not design in reference to Anton.** It is a testbed, not the priority
+  filter.
 - **The adapter cap (git + HTTP + Confluence) is a decision**, not a backlog.
 - **`work/regression/` is the evidence store; the lab is scratch.** Never
   compare wall-clock across surfaces — see [`MACHINE.md`](MACHINE.md).
@@ -686,7 +817,9 @@ Claude Opus 5 (1M context).
 Because the thing it was good at was not the thing the design point needs. The
 v0.26 engine's committed artifact grew with *content* (cache + state plane).
 At a 10-engineer repo that is fine; at a 10k-engineer corporation's
-mega-project — the litmus since 2026-07-21 — it is a copy of the company's
+mega-project — the **deployment** litmus since 2026-07-21, whose scale filter
+was revised to 10 000 documents on 2026-08-21 without touching the deployment
+half — it is a copy of the company's
 knowledge in a git repo, with the staleness, duplication and ACL-drift
 problems that implies. Index-and-refer commits **statistics only**, so the
 artifact stops scaling with content.

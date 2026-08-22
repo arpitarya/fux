@@ -38,6 +38,7 @@ from .config import (
     DEFAULT_DIRS_FILE,
     DEFAULT_TYPES_FILE,
     DEFAULT_URLS_FILE,
+    KNOWN_AGENTS,
     find_root,
     load,
 )
@@ -48,6 +49,31 @@ from .store import fuxdir
 FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
 
 FETCHERS_DIR = "fetchers"
+
+#: vendor -> ((destination relative to the repo root, template under
+#: `templates/agents/`), …) — ADR-AGENT-POLICY decisions 3 and 4.
+#:
+#: **Copilot has two entries and they are not alternatives.** The *agent* fires
+#: when selected or routed to; the *instructions* fire on every matching
+#: request. The gap between them is the dangerous case — someone runs `fux ask`
+#: in a terminal and pastes the output into a chat the agent never saw — so
+#: both ship.
+#:
+#: **This table is the whole of the routing, and that is deliberate.** There is
+#: no `exists()` branch anywhere near it: which vendors install comes from
+#: `[agents] install`, a declaration, never from sniffing the filesystem
+#: (decision 5, and veto condition 4).
+AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
+    "claude": ((".claude/skills/fux-archived-results/SKILL.md", "SKILL.md"),),
+    "copilot": (
+        (".github/agents/fux.agent.md", "fux.agent.md"),
+        (
+            ".github/instructions/fux-archived-results.instructions.md",
+            "fux-archived-results.instructions.md",
+        ),
+    ),
+    "kiro": ((".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),),
+}
 
 _DIRS_HEADER = """\
 # What fux indexes. One entry per line: a directory (walked recursively) or a
@@ -127,6 +153,25 @@ _CONFIG = """\
 # Fixed at 256 (shard = blake2b(id, digest_size=1) -> 00..ff); this key
 # documents the value rather than setting it.
 shards = 256
+
+# Fux marks retired documents `archived` and states no conclusion. These files
+# teach your agents how to READ that mark -- they are the difference between an
+# agent citing a retired design confidently and one that says it is retired.
+#
+# THEY ARE WRITTEN OUTSIDE .fux/, into directories GitHub, AWS and Anthropic
+# own, which is why the default is spelled out here rather than left implicit:
+#
+#   claude   -> .claude/skills/fux-archived-results/SKILL.md
+#   copilot  -> .github/agents/fux.agent.md
+#               .github/instructions/fux-archived-results.instructions.md
+#   kiro     -> .kiro/steering/fux-archived-results.md
+#
+# Two of them are AMBIENT (`applyTo: "**"`, `inclusion: always`) and enter every
+# request in this repo, for every developer, whether or not they are using fux.
+# Delete a name to stop installing it; `install = []` installs none. Editing a
+# file that is already there is safe -- fux never rewrites one.
+[agents]
+install = ["claude", "copilot", "kiro"]
 """
 
 _URLS_HEADER = """\
@@ -150,6 +195,12 @@ _URLS_HEADER = """\
 class SetupReport:
     written: list[str] = field(default_factory=list)
     kept: list[str] = field(default_factory=list)
+    #: Paths written **outside `.fux/` and `fux.toml`** — i.e. into directories
+    #: GitHub, AWS and Anthropic own. Tracked separately because
+    #: ADR-AGENT-POLICY decision 6 makes announcing them mandatory, and veto
+    #: condition 1 fires on a write this list does not contain. A subset of
+    #: `written`, never a replacement for it.
+    outside: list[str] = field(default_factory=list)
 
 
 def template_bytes(name: str) -> bytes:
@@ -160,6 +211,22 @@ def template_bytes(name: str) -> bytes:
         raise FuxError(
             f"the shipped fetcher {name!r} is missing from this install — "
             "reinstall fux-engine, or write .fux/fetchers/ yourself"
+        ) from exc
+
+
+def agent_template_bytes(name: str) -> bytes:
+    """Read one shipped agent rendering out of the wheel. Read, never imported.
+
+    Separate from `template_bytes` only because the error message has to name a
+    different remedy: a missing fetcher means URL ingestion is broken, a
+    missing rendering means the policy layer is.
+    """
+    try:
+        return (resources.files("fux") / "templates" / "agents" / name).read_bytes()
+    except (FileNotFoundError, ModuleNotFoundError) as exc:  # pragma: no cover - broken install
+        raise FuxError(
+            f"the shipped agent policy {name!r} is missing from this install — "
+            "reinstall fux-engine, or run `fux setup --no-agents`"
         ) from exc
 
 
@@ -185,8 +252,47 @@ def _seed_dirs(root: Path) -> bytes:
     return (_DIRS_HEADER + ("\n" + body if body else "")).encode("utf-8")
 
 
-def run(root: Path) -> SetupReport:
-    """Write the consumer-owned files, write-if-missing. Returns what happened."""
+def _agents_to_install(root: Path, requested: bool) -> tuple[str, ...]:
+    """Which vendors this run writes for — **read, never sniffed**.
+
+    `requested=False` is `--no-agents`: a one-shot escape that wins over the
+    declaration. Its durable form is `install = []` in `fux.toml`.
+
+    `fux.toml` may not exist yet (setup is the verb that writes it) and may be
+    mid-edit, so a config that will not load degrades to the default rather
+    than failing the whole run — `cmd_setup` re-loads it at the end and reports
+    a broken file there, which is where that error belongs.
+    """
+    if not requested:
+        return ()
+    try:
+        return load(root).agents
+    except FuxError:
+        return KNOWN_AGENTS
+
+
+def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> None:
+    for vendor in agents:
+        for rel, template in AGENT_FILES[vendor]:
+            path = root / rel
+            before = len(report.written)
+            _write_if_missing(path, agent_template_bytes(template), report, root)
+            if len(report.written) > before:
+                # Recorded at the moment of writing, from the same branch that
+                # wrote it, so the announcement cannot drift out of step with
+                # the filesystem. Veto condition 1 is exactly this list being
+                # incomplete.
+                report.outside.append(rel)
+
+
+def run(root: Path, *, agents: bool = True) -> SetupReport:
+    """Write the consumer-owned files, write-if-missing. Returns what happened.
+
+    `agents=False` is `--no-agents`, and it must write **nothing** under
+    `.github/`, `.kiro/` or `.claude/` — ADR-AGENT-POLICY veto condition 1a:
+    the opt-out is the whole of a user's control over a default-on install, and
+    a leak turns a default into a mandate.
+    """
     report = SetupReport()
     for path in fuxdir.ensure_layout(root):
         report.written.append(path.relative_to(root).as_posix())
@@ -202,6 +308,11 @@ def run(root: Path) -> SetupReport:
     _write_if_missing(root / DEFAULT_TYPES_FILE, _TYPES_HEADER.encode("utf-8"), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _URLS_HEADER.encode("utf-8"), report, root)
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
+
+    # After `fux.toml`, so a first run reads the default this very call just
+    # wrote out in full, and a later run reads whatever the consumer edited it
+    # to (ADR-AGENT-POLICY decision 5).
+    _write_agents(root, report, _agents_to_install(root, agents))
     return report
 
 
@@ -210,18 +321,38 @@ def cmd_setup(args) -> int:
     # marker (`fux.toml`), so requiring one first would be circular. Everywhere
     # else, no root is an error.
     root = find_root() or Path.cwd()
-    report = run(root)
+    report = run(root, agents=not getattr(args, "no_agents", False))
     for rel in report.written:
         print(f"  wrote {rel}")
     for rel in report.kept:
         print(f"  kept  {rel} (yours; never rewritten)")
     if not report.written:
-        print("setup: nothing to do — every consumer-owned file is already here")
+        print("setup: nothing to do - every consumer-owned file is already here")
     else:
         print(
             f"setup: {len(report.written)} file(s) written. They are yours: commit them, "
             "edit them, fux will not rewrite them."
         )
+
+    # ADR-AGENT-POLICY decision 6. The install is default-on, so **this
+    # announcement is the entire remaining safeguard** — a user who did not
+    # want these files must be able to learn they exist from the terminal they
+    # just ran, not from a later `git status` on a repo they share with a team.
+    # Veto condition 1 fires on any agent file written without appearing here.
+    # ASCII only: these bytes reach a Windows console (ADR-CLI veto 7).
+    if report.outside:
+        print()
+        print(
+            f"  note: {len(report.outside)} of those are OUTSIDE .fux/ - they teach your "
+            "agents how to read this index:"
+        )
+        for rel in report.outside:
+            print(f"        {rel}")
+        print(
+            "        Turn them off with [agents] install = [] in fux.toml, "
+            "or `fux setup --no-agents`."
+        )
+
     load(root)  # a hand-edited fux.toml fails loudly here, not on the first ingest
     print("next: add entries to .fux/sources/dirs, then `fux ingest`")
     return 0

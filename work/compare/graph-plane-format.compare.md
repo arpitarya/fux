@@ -22,7 +22,7 @@ timestamp: 2026-08-21T00:00:00Z
 > past tolerable), and its measured case is kept below in full so the next
 > session does not re-derive it. **C — communities-only** is still the better
 > *shape* and still unmeasured; §5's experiment stands. **D — wait for
-> `ADR-T2-SEGMENTS`** is still the end state.
+> `the T2 proposal`** is still the end state.
 > **Filed:** 2026-08-21. **Ruled:** 2026-08-21.
 > **Reopen when:** **the 50 000-document target is taken up** — that is the
 > trigger, not a latency observation, because the latency at 50k is already
@@ -52,7 +52,7 @@ already states as scope.
 ## Context — what fired this
 
 **Nothing fired this, and that is itself the finding.**
-[ADR-GRAPH](../../docs/adr/0030_graph.md)'s three veto conditions are about
+[ADR-GRAPH](../../docs/adr/0029_graph.md)'s three veto conditions are about
 determinism across machines, walk ordering, and the playground's acceptance
 queries. **None of them is about cost.** No R prediction in
 [OPEN-WORK](../OPEN-WORK.md) measures a graph verb's latency either: R3's
@@ -188,7 +188,7 @@ from `.fux/index/*.jsonl`, where they already are.
   whole index record — terms, postings, meta — where B's seek carries only
   edges. It may well be fast enough. Nothing here says it is.
 
-### D — Wait for `ADR-T2-SEGMENTS`
+### D — Wait for `the T2 proposal`
 
 The graph plane becomes an mmap byte-aligned segment when
 [W-26](../open/W-26-m6-scale-t2.md) builds that machinery for the accelerator.
@@ -247,6 +247,21 @@ prediction** — call it **R8**: *a graph verb answers in under X s at 100 000
 documents on a real corpus* — frozen before the implementation is measured,
 owned by ADR-GRAPH, and run in `fux-lab` as a new environment.
 
+> **⚠ R8 IS RETIRED, 2026-08-22 — it is not dormant and not deferred.** Arpit:
+> *"anything that talks about commitments for fifty thousand or hundred
+> thousand or above that, remove those commitments."* R8 as written is a bound
+> **at 100 000 documents**, which is exactly such a commitment, so **it is
+> withdrawn rather than parked**. Its id is retired and not reused.
+>
+> **Nothing above is edited**, because the *reasoning* that produced R8 — that
+> a graph verb's cost needed a stated bound — is still good. What is withdrawn
+> is the **promise**. If a graph-verb bound is wanted, it is a **new prediction
+> at 10 000 documents with a new id**, derived from the R3 precedent (150 ms on
+> the accelerator), never a re-judgement of R8 at a smaller size.
+>
+> **This also settles the R8/R9 double-claim** that sat in the queue's inbox:
+> there is nothing left to claim. **R9** is T2's, and it ran and passed.
+
 Picking X is Arpit's. Picking it *after* seeing this profile is the inversion
 the pre-registration rule exists to stop, which is an argument for deriving it
 from the **R3 precedent** (a query bar of 150 ms, on the accelerator) rather
@@ -281,7 +296,7 @@ than from anything measured here.
   [GRAPH-PLANE-PROFILE](../regression/2026-08-21-graph-plane-profile/report.md),
   its [raw output](../regression/2026-08-21-graph-plane-profile/evidence/profile-output.txt)
   and its harness [`tools/graph-bench/profile.py`](../../tools/graph-bench/profile.py).
-- The record that owns the plane — [ADR-GRAPH](../../docs/adr/0030_graph.md)
+- The record that owns the plane — [ADR-GRAPH](../../docs/adr/0029_graph.md)
   decision 8. Decisions 5 and 7 are explicitly not in question.
 - The write-path fork this does **not** reopen —
   [`hook-at-scale.compare.md`](hook-at-scale.compare.md).
@@ -289,7 +304,7 @@ than from anything measured here.
   [R5-HOOK's ANALYSIS](../regression/2026-08-20-r5-hook-latency/ANALYSIS.md),
   which names its own inability to split `derive` into T1 and graph.
 - The milestone option D belongs to — [W-26](../open/W-26-m6-scale-t2.md) and
-  `ADR-T2-SEGMENTS`, reserved by name.
+  `the T2 proposal`, reserved by name.
 - The code — [`src/fux/graph/plane.py`](../../src/fux/graph/plane.py)
   (`load`, `build_plane`) and
   [`src/fux/graph/model.py`](../../src/fux/graph/model.py) (`Graph`).

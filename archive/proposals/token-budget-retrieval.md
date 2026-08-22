@@ -8,7 +8,7 @@ tags: [refer-plane, query-api, m2, m4]
 ---
 
 > **Implemented 2026-08-20.** Successor:
-> [ADR-REFER](../../docs/adr/0031_refer-plane.md) decisions 10-13 — *still
+> [ADR-REFER](../../docs/adr/0030_refer-plane.md) decisions 10-13 — *still
 > `proposed`; its gate R4 has not run.* Byte budget primary, `k` demoted to
 > a secondary cap, deterministic ties, a per-document cap, and a floor the
 > proposal did not anticipate: greedy score-per-byte is systematically

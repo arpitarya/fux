@@ -139,7 +139,7 @@ default ("show it") was applied rather than stalling the build: `_PREAMBLE` in
 inside a commit by decision rather than by accident of TTY detection. R5's
 44.4 s of silence is the reported symptom and a commit is where a person is
 most likely to think fux has hung. Recorded in
-[ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) §Consequences and
+[ADR-MAINTENANCE](../../docs/adr/0032_hooks.md) §Consequences and
 [ADR-CLI](../../docs/adr/0002_cli-surface.md) decision 9.
 
 **Still Arpit's to reverse, cheaply.** If [W-61](W-61-maintenance-measurement.md)'s

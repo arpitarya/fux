@@ -169,6 +169,48 @@ directories by default (ruff does) will not lint them.
 
 ### Consequences
 
+- **`fux setup` writes outside `.fux/` for the first time, 2026-08-22 (W-68).**
+  This record's scaffolding contract had one boundary — *fux writes into its own
+  directory and `fux.toml`, and nowhere else* — and
+  [ADR-AGENT-POLICY](0035_agent-policy.md) decisions 5 and 6 widen it. `setup`
+  now also writes four agent-policy renderings into `.claude/`, `.github/` and
+  `.kiro/`: directories **Anthropic, GitHub and AWS own**.
+  **That record amends this one; it does not claim `setup.py`**, which stays
+  here. What lives there is the *policy* and its vendor formats; what lives here
+  is the scaffolding contract those files are written under, and it is unchanged
+  in every other respect — **write-if-missing**, so a consumer's edit survives
+  every later run, and the same `template_bytes` read-never-import discipline
+  the fetchers already use.
+  **The boundary did not disappear, it acquired a safeguard.** Because the
+  install is default-on, `SetupReport` gained an `outside` list and `cmd_setup`
+  prints every path it wrote beyond `.fux/` along with how to turn them off.
+  A write that does not appear in that announcement is ADR-AGENT-POLICY's veto
+  condition 1, and `tests/test_setup_agents.py` asserts both halves.
+  ⚠ **Two of the four are ambient** — Copilot's `applyTo: "**"` and Kiro's
+  `inclusion: always` enter *every* request in the consumer's repository,
+  including for developers not using fux. That cost is real, it is stated
+  rather than discovered, and the renderings are size-bounded by a test.
+- **`doctor` gained `--json` and a background-runner check, 2026-08-22
+  (W-66 Phase 4).** This record keeps `src/fux/doctor.py` rather than handing
+  it to [ADR-MAINTENANCE](0032_hooks.md), and the split is deliberate: the
+  runner's state is computed in `maintain/runner.py::status()`, which
+  ADR-MAINTENANCE owns, and `doctor.py` only **renders** it. A check that
+  formats another plane's state is still this record's `Check(ok, level, name,
+  detail)` shape doing its job; a check that *decided* anything about the
+  runner would belong next door.
+  **Two properties this record now also carries:**
+  - **`--json`.** `doctor` had no machine-readable form, and the runner is the
+    first check whose consumer is an agent rather than a person
+    ([ADR-CLI](0002_cli-surface.md), 2026-08-22). The runner's state appears
+    as its own top-level `runner` key, not only as prose inside a `detail`
+    string — a caller asking *"is a re-index pending"* should not have to
+    parse a sentence.
+  - **Read-only, like every other check here.** `doctor` has never repaired
+    anything it reports, and the runner check does not start: a stale lock is
+    named along with the command that clears it. That is
+    [ADR-MAINTENANCE](0032_hooks.md) veto 7 rather than this record's
+    invention, and it is why the check is a **warning** — a pending re-index
+    is the deferring hook working, not a broken repository.
 - **The generated headers name the two networked paths** (2026-08-21, W-63).
   `.fux/README.md` and `.fux/sources/urls` are written by `setup` from
   templates this record owns, and both said fetching happened only under
@@ -182,7 +224,7 @@ directories by default (ruff does) will not lint them.
   default spelled out in comments**. Writing it rather than leaving it absent
   is a deliberate cost — an absent file already behaves correctly — paid so a
   consumer can see what fux considers a document without reading its source.
-  [ADR-TYPES](0032_types-list.md) decision 10.
+  [ADR-TYPES](0031_types-list.md) decision 10.
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —
   "what do I commit?" — is answered by a file fux generates.

@@ -2,11 +2,14 @@
 type: Compare Doc
 title: Ingest Mode Naming
 description: What to call the two ingest tiers — Arpit wants no-AI vs AI; "extracted" collides with the archived edge-grade vocabulary.
-status: proposed
+status: accepted
 timestamp: 2026-08-09T00:00:00Z
 ---
 
 # Ingest-mode naming — Comparison
+
+>
+> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its own verdict block said **DECIDED, ratified by Arpit 2026-08-19 closing W-30**, with [ADR-EXTRACTED](../../docs/adr/0016_extracted-mode.md) and [ADR-ENRICHED](../../docs/adr/0017_enriched-mode.md) both `accepted`. The frontmatter had simply never been flipped.
 
 > **Verdict: DECIDED — `extracted` (no-AI default) + `enriched` (AI opt-in).**
 > **Ratified by Arpit 2026-08-19**, closing W-30. The records are

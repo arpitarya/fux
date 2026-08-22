@@ -73,7 +73,9 @@ target domain measured ~2.5× lighter at median 425 terms).
 |---|---|---|
 | 100k docs, target-domain density (~4–5 KB/doc) | ~450 MB | **~170 MB** |
 | 100k docs, RFC density (13 KB/doc) | ~1.3 GB | ~500 MB |
-| 1M docs | 4–13 GB | T2 territory — binary + external-shards-only + partial clone |
+| 1M docs — *deferred target* | 4–13 GB | T2 territory — binary + external-shards-only + partial clone |
+
+> **The design point is 10 000 documents since 2026-08-21 (W-65, 2026-08-22), and this table has no row for it.** Interpolating the ~4–5 KB/doc line gives roughly **45 MB**, comfortably inside T0/T1 — which is the reading behind [W-26](../open/W-26-m6-scale-t2.md)'s first question, *does T2 earn its place at 10k at all*. Interpolation is not measurement and this note is not a size claim; the measured 10k figure belongs in that milestone.
 
 ## §5 · Schema of record
 

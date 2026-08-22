@@ -41,7 +41,7 @@ survived: the law was enforced, and never over the corpus that broke it.
 Doctor validates the `.fux/` layout and the accelerator. It says nothing about
 whether an entry in `.fux/sources/dirs` exists on disk, or whether a URL line
 was written by fux. Both checks are named in accepted records
-([ADR-DIR-LIST](../../../docs/adr/0023_dir-list.md) §Consequences,
+([ADR-DIR-LIST](../../../docs/adr/0022_dir-list.md) §Consequences,
 [ADR-URL-LIST](../../../docs/adr/0018_url-list.md) decision 13) and neither is
 built. `fux url` reports the completeness check; `fux doctor` is where it
 belongs, because that is the command a person runs without being asked.
@@ -100,7 +100,7 @@ door, exactly the way `[sources.url.config]` exists to prevent for tunables.
 - **The `archived=` declaration is parsed and unread**, so this run says
   nothing about whether declaring a directory archived produces the right
   behaviour — there is no behaviour yet. That is
-  [ADR-DIR-LIST](../../../docs/adr/0023_dir-list.md) decision 10 working as
+  [ADR-DIR-LIST](../../../docs/adr/0022_dir-list.md) decision 10 working as
   intended, and W-44 owns the instrument that will close it.
 - **The two-fetcher grouping is verified for correctness, not for cost.** Five
   URLs across two fetchers imports two modules and brackets two sessions. At

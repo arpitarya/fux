@@ -8,13 +8,77 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`fux setup` now installs agent policy — and writes outside `.fux/` for the
+  first time.** Fux marks retired documents `archived` and states no
+  conclusion; these files teach your agents how to read that mark, which is the
+  difference between an agent citing a deleted design confidently and one that
+  tells you it is retired. Four files, three vendors:
+
+  | vendor | file |
+  |---|---|
+  | Claude | `.claude/skills/fux-archived-results/SKILL.md` |
+  | Copilot | `.github/agents/fux.agent.md` |
+  | Copilot | `.github/instructions/fux-archived-results.instructions.md` |
+  | Kiro | `.kiro/steering/fux-archived-results.md` |
+
+  **They install by default, and `setup` tells you it did** — naming every path
+  and how to turn it off. **`fux setup --no-agents`** skips them for one run;
+  `[agents] install = []` in `fux.toml` is the durable form, and you can name a
+  subset. The default is written into your `fux.toml` in full, so it is
+  something you can read and edit rather than something buried in the engine.
+
+  ⚠ **Two of the four are ambient** — Copilot's `applyTo: "**"` and Kiro's
+  `inclusion: always` enter *every* request in the repository, for every
+  developer, whether or not they are using fux. That is a real cost and it is
+  why `setup` announces them. They are ~2 KB each and a test keeps them that
+  way.
+
+  Write-if-missing like everything else `setup` writes: edit any of them and
+  fux will never rewrite it. [ADR-AGENT-POLICY](docs/adr/0035_agent-policy.md).
+
+- **`post-commit` no longer waits for a re-index.** It records what changed and
+  spawns a **detached one-shot** background run, so committing costs what git
+  costs regardless of corpus size. The re-index still happens; nobody watches
+  it. [ADR-MAINTENANCE](docs/adr/0032_hooks.md) 1a–1d (W-66).
+  - **`fux ingest` takes over** from a background run, and **`fux ingest
+    --stop`** halts one without running — exiting **0** when nothing was
+    running, so scripts can call it defensively.
+  - **`fux doctor` reports the background runner** — live/idle and its pid, how
+    many documents are pending, whether a lock is held or stale, and whether
+    the last run failed. It **names the command to clear a stale lock and never
+    clears it itself**.
+  - **`fux doctor --json`** — `doctor` had no machine-readable form.
+  - Stopping is **cooperative**: a background run is only ever interrupted
+    between units of work and never mid-write, so a stopped run leaves the
+    index byte-clean and nothing pending is lost.
+
+- **`[ranking] archived_weight`** (`fux.toml`, default `1.0`) — a score
+  multiplier for documents under a directory declared `archived=true`.
+  Byte-identical at the default; demotes an archived document only once a
+  weight is configured. [ADR-DIR-LIST](docs/adr/0022_dir-list.md) decision 11
+  (W-44). The marker and the response-level disclaimer (decisions 5/7/12)
+  stay gated on a pre-registered query set.
+- **`fux ask` says when the index is behind.** Since the hook defers, the
+  committed index can lag by more than one commit, so `ask` states how many
+  documents are pending — on **stderr**, so `--json` and every pipe produce
+  exactly the bytes they did before. It is a declaration, never a gate: `ask`
+  does not refuse to answer and does not re-index on your latency.
+  [ADR-MAINTENANCE](docs/adr/0032_hooks.md) decision 1b (W-66).
+- **A dirty list** (`.fux/runtime/dirty`, gitignored) records which documents
+  each commit touched. **It is advisory only** — `fux ingest` produces the same
+  index whether the list is right, stale, empty or missing, which is asserted
+  rather than reasoned about. It exists so the background run can report what
+  is pending, and so a future incremental re-index has something to consume.
+
 ## [0.35.0] - 2026-08-21
 
 The corpus becomes a first-class verb, and two defects that made removing a
 document harder than adding one are fixed.
 [ADR-CLI](docs/adr/0002_cli-surface.md) 1a–1e ·
 [ADR-INGEST](docs/adr/0007_ingest.md) 9–10 ·
-[ADR-DIR-LIST](docs/adr/0023_dir-list.md) 2d–2e, 3a. Surface captured
+[ADR-DIR-LIST](docs/adr/0022_dir-list.md) 2d–2e, 3a. Surface captured
 verbatim in [`work/regression/2026-08-21-source-verbs/`](work/regression/2026-08-21-source-verbs/report.md).
 
 ### Added
@@ -123,18 +187,18 @@ M3 makes the edges ingest already extracts answerable: `explain`, `graph`,
 plane — fetch a citation from the system that owns it, verify it still says
 what the index thinks, re-score on the fetched bytes — and P6 wires it into
 `answer` by default, making it load-bearing for the first time
-([ADR-REFER](docs/adr/0031_refer-plane.md) accepted,
+([ADR-REFER](docs/adr/0030_refer-plane.md) accepted,
 [R4 PASS](work/regression/2026-08-20-refer-plane-r4/VERDICT.md)). M5 adds
 `fux hooks` and a merge driver for the committed index, but
 [R5 FAIL](work/regression/2026-08-20-r5-hook-latency/VERDICT.md) (44.4 s at
 100 000 documents against a 1 s bound) and
 [R6 INCONCLUSIVE](work/regression/2026-08-20-r6-merge-driver/VERDICT.md) mean
-[ADR-MAINTENANCE](docs/adr/0033_hooks.md) stays **proposed, not accepted** —
+[ADR-MAINTENANCE](docs/adr/0032_hooks.md) stays **proposed, not accepted** —
 the hook ships, its accept gate has not cleared. Delta ingest reuses
 extraction for byte-unchanged documents (22.7×–26.4× measured, byte-identical
 to a full run). Only prose files are indexed by default now — a 14 % non-prose
 slice this repo carried silently is excluded
-([ADR-TYPES](docs/adr/0032_types-list.md)) — and L5's hashed-meta rule moved
+([ADR-TYPES](docs/adr/0031_types-list.md)) — and L5's hashed-meta rule moved
 from ingest to `write_index`, so it can no longer be skipped by a caller that
 bypasses ingest.
 
@@ -199,7 +263,7 @@ way).
   `ingested 3 docs (1 changed, 2 carried forward), 2 skipped, 1 shards written`.
 
 - **A TTL-bounded local fetch cache for the refer plane** (W-60,
-  [ADR-REFER](docs/adr/0031_refer-plane.md) 5a-5c). `cache_ttl_seconds`
+  [ADR-REFER](docs/adr/0030_refer-plane.md) 5a-5c). `cache_ttl_seconds`
   (**default 0 — off**) and `no_cache` on the freshness policy; entries live in
   the gitignored `.fux/runtime/fetch-cache/`. Motivated by rate limits rather
   than latency: an agent asking ten questions about one runbook must not fetch
@@ -210,7 +274,7 @@ way).
   the index.
 
 - **`fux hooks` — the maintenance plane** (M5,
-  [ADR-MAINTENANCE](docs/adr/0033_hooks.md), **proposed, not accepted**).
+  [ADR-MAINTENANCE](docs/adr/0032_hooks.md), **proposed, not accepted**).
   Installs `post-commit` / `post-merge` / `post-checkout` and registers a merge
   driver for `.fux/index/*.jsonl`. Every hook is best-effort and **cannot block
   a commit**; installation **refuses rather than overwrites** a hook fux did
@@ -274,7 +338,7 @@ way).
   **Breaking only for a caller writing records directly**; every record this
   repo already holds complied, so nothing changed on disk.
 
-- **Only prose files are indexed now** ([ADR-TYPES](docs/adr/0032_types-list.md),
+- **Only prose files are indexed now** ([ADR-TYPES](docs/adr/0031_types-list.md),
   W-55 verdict G). The git-dir walker had **no file-type filter at all**:
   anything UTF-8-decodable was a document, which on this repo meant 21 of 150
   records (14 %, and 15 % of the tokens) were `.json`, `.svg`, `.sh`, `.py` or
@@ -286,7 +350,7 @@ way).
   `df` moves for every surviving document, so **this changes rankings** — it is
   not claimed to improve them, and nothing has measured it.
 - **`.fux/sources/dirs` accepts `!` exclusions**
-  ([ADR-DIR-LIST](docs/adr/0023_dir-list.md), W-45 verdict E).
+  ([ADR-DIR-LIST](docs/adr/0022_dir-list.md), W-45 verdict E).
   `!work/regression/*/evidence` removes matching paths, and everything beneath
   them, from every included root. Order-independent, no un-exclude, no
   attributes. `*` does not cross a `/`; `**` is the any-depth form.
@@ -302,7 +366,7 @@ way).
 ### Added
 
 - **The refer plane's core — `fux.refer`** (M4,
-  [ADR-REFER](docs/adr/0031_refer-plane.md), **proposed, not accepted**).
+  [ADR-REFER](docs/adr/0030_refer-plane.md), **proposed, not accepted**).
   Fetches a cited document from the system that owns it, verifies it still says
   what the index thinks, cuts it into heading-delimited passages, re-scores
   those against the query, and assembles as much as fits a **byte** budget.
@@ -325,7 +389,7 @@ way).
   returned — asserted by a differential test.
 
 - **The graph lane — `fux explain`, `fux graph`, `fux path`** (M3,
-  [ADR-GRAPH](docs/adr/0030_graph.md)). The `ref`/`tag`/`code` edges
+  [ADR-GRAPH](docs/adr/0029_graph.md)). The `ref`/`tag`/`code` edges
   ingest has extracted since M1 become answerable. `explain` lists a
   document's outbound edges and its community; `graph` returns the
   neighbourhood around a query's best answers, PPR-expanded; `path` returns
@@ -419,7 +483,7 @@ measures nothing about speed, so this release reports no new timing.
   `[sources.url]` setting, which beats the built-in default. `meta` only ever
   *loosens* per line: there is deliberately no way to make one URL stricter.
 - **`.fux/sources/dirs`** — the committed directory list, on the same grammar
-  ([ADR-DIR-LIST](docs/adr/0023_dir-list.md)). A line may declare
+  ([ADR-DIR-LIST](docs/adr/0022_dir-list.md)). A line may declare
   `archived=true`; it is parsed and validated today and **not yet read** — the
   marker in results is gated on a pre-registered query set.
 

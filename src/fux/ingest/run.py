@@ -99,7 +99,8 @@ def run(
     only_urls: set[str] | None = None,
     full: bool = False,
     progress=None,
-) -> IngestReport:
+    should_stop=None,
+) -> IngestReport | None:
     """Walk the configured sources into the committed index.
 
     `only_urls` narrows **which listed URLs are fetched** on a networked run;
@@ -109,8 +110,26 @@ def run(
     the whole run still ends in the one `write_index` call below, so a scoped
     fetch and a full refresh produce the same bytes for everything they agree
     about (L3). `None` means every listed URL.
+
+    `should_stop` is the **cooperative stop** the deferred runner is halted by
+    (W-66 Phase 2, ADR-MAINTENANCE decision 1d). It is polled between units of
+    work and **only ever before `write_index`**: once bytes start reaching a
+    committed shard the run finishes, because `write_index` is the single path
+    into the committed plane and a partial shard is the one outcome worse than
+    a late one. Returning early therefore leaves the index byte-clean and the
+    dirty list untouched.
+
+    **Returns `None` if and only if `should_stop` was supplied and fired.** A
+    caller that passes nothing can never receive it, which is why every
+    existing call site is unaffected by the widened return type.
     """
     progress = progress or _NULL_PROGRESS
+    stopping = should_stop or (lambda: False)
+    # Snapshot first, before any work: a commit landing mid-run appends to the
+    # list, and only what was pending when we *started* is ours to subtract.
+    from ..maintain import dirty as dirty_mod
+
+    covered = dirty_mod.read(root)
     config = load_config(root)
     store_mod.ensure_layout(root)  # `.fux/` README + .gitignore, write-if-missing (ADR-DOTFUX)
     files, skipped = walk_sources(
@@ -123,6 +142,8 @@ def run(
     # count against until it has already finished (W-64's "none until done").
     with progress.phase("walk", len(files)) as p:
         p.update(len(files))
+    if stopping():
+        return None
     existing = store_mod.read_index(root)
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}
 
@@ -163,14 +184,22 @@ def run(
     to_extract = [doc_id for doc_id in parsed if doc_id not in reusable]
     extracted: dict[str, extract_mod.Extracted] = {}
     with progress.phase("extract", len(to_extract)) as p:
-        for doc_id in to_extract:
+        for n, doc_id in enumerate(to_extract):
+            # Polled every `_STOP_EVERY` documents rather than every one: the
+            # check is a file read, and a stop noticed a few documents late is
+            # still sub-second while a per-document poll would put a syscall
+            # on the hot loop the progress plane exists to show moving.
+            if n % _STOP_EVERY == 0 and stopping():
+                return None
             extracted[doc_id] = extract_mod.extract_fields(_loc_of(doc_id), parsed[doc_id])
             p.update(1, detail=_loc_of(doc_id))
     # Re-resolved every run (M5): a new document can resolve a link that
     # dangled yesterday, so this cannot be carried forward like extraction.
     scans: dict[str, list] = {}
     with progress.phase("edges", len(parsed)) as p:
-        for doc_id, doc in parsed.items():
+        for n, (doc_id, doc) in enumerate(parsed.items()):
+            if n % _STOP_EVERY == 0 and stopping():
+                return None
             scans[doc_id] = edges_mod.scan(doc)
             p.update(1)
     known_ids = set(parsed) | set(carried)
@@ -263,9 +292,23 @@ def run(
     # so this phase is a bookend around it rather than a live count —
     # honest under W-64's "counts, not clocks" (no bytes are interpolated).
     shard_total = len({store_mod.shard_for(r["id"]) for r in records})
+    # **The last stop point, and it is here on purpose.** Past this line the
+    # run is committed to finishing: `write_index` is the only path bytes reach
+    # a committed shard by, and stopping inside it is how a partial shard gets
+    # written. Everything above is re-derivable from the sources for free.
+    if stopping():
+        return None
     with progress.phase("write", shard_total, "shards") as p:
         written = store_mod.write_index(root, records)
         p.update(shard_total)
+
+    # W-66: a run that reaches here indexed the whole corpus, so the snapshot
+    # it took at the top is now covered. **Subtracted, never cleared** — an id
+    # recorded by a commit that landed while this run was in flight is not in
+    # `covered` and stays pending (ADR-MAINTENANCE decision 1d). A run that
+    # was stopped or died never reaches this line, so the list survives it.
+    dirty_mod.discard(root, covered)
+
     return IngestReport(
         written_shards=written,
         doc_count=len(records),
@@ -274,6 +317,11 @@ def run(
         reused_count=len(reusable),
     )
 
+
+#: How often the cooperative stop is polled inside the two per-document loops.
+#: A stop is noticed within this many documents, which at any corpus size fux
+#: is judged at is well under a second.
+_STOP_EVERY = 64
 
 #: The fields extraction owns — pure functions of one document's own bytes, and
 #: therefore the only ones a delta run may carry forward. `edges` is absent on

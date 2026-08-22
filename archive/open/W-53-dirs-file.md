@@ -4,7 +4,7 @@
 **Blocked by:** — · **Model:** **Opus.** The code is small; it retires a required
 config key, adds a second reader under one grammar, and lands the archived
 declaration three other items depend on.
-**Spec:** [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) — accepted, unbuilt
+**Spec:** [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) — accepted, unbuilt
 **Lands with:** [W-44](W-44-archived-content-signalling.md), which is the
 annotation half and is gated on its instrument
 
@@ -49,7 +49,7 @@ annotation half and is gated on its instrument
 - **Do not write the `archived` property without W-44's gate.** The file may
   carry the declaration before anything reads it; the *annotation in results* is
   gated on a pre-registered instrument
-  ([ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) decision 10).
+  ([ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) decision 10).
 - **Do not derive `archived` from the path** as a shortcut while the file is
   being built. Decision 4 is the reason this record replaced its predecessor.
 

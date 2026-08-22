@@ -1,28 +1,40 @@
-# W-59 — the refer plane is built and unmeasured
+# W-59 — the refer plane is built, accepted, and one measurement short
 
-**Status:** OPEN · **Filed:** 2026-08-20 — **R4 is measured and passed (2026-08-20).** What keeps this item
-open is the **budget sweep**, which needs a graded corpus, and the goldens are
-unwritten by design ([W-57](W-57-graph-lane-acceptance.md)) — the second
-measurement blocked on that one item.
+**Status:** OPEN · **Filed:** 2026-08-20 · **re-scoped 2026-08-21** — **R4 is
+measured and passed (2026-08-20), and [ADR-REFER](../../docs/adr/0030_refer-plane.md)
+is `accepted` as of 2026-08-21** (`9f8366e`, Arpit's call) — **accepted with
+veto condition 2 open, not closed.** What keeps this item open is the **budget
+sweep**, which needs a graded corpus, and the goldens are unwritten by design
+([W-57](W-57-graph-lane-acceptance.md)) — the second measurement blocked on
+that one item.
 **Blocked by:** [W-57](W-57-graph-lane-acceptance.md) — the goldens
-**Closes with:** [ADR-REFER](../../docs/adr/0031_refer-plane.md) moving
-`proposed` → `accepted`, and a filed run under [`../regression/`](../regression/README.md)
+**Closes with:** the budget sweep filed under
+[`../regression/`](../regression/README.md) and ADR-REFER's **veto condition 2**
+resolved — by the sweep separating budgets, or by deleting the assembler if it
+does not. **The status field is no longer the thing this item flips.**
 **Model:** **Sonnet** to run and file it; **Opus** for the verdict — R4 is a
 gate, and a gate call is Opus work.
 
 ## Why this exists
 
 M4's core landed on 2026-08-20 — source, freshness, ARC, chunk, rescore,
-assemble, with 73 tests. **ADR-REFER is `proposed`, not `accepted`, and that is
-deliberate**: its gate has not run, and an accepted record for an unmeasured
-plane is how an unproven thing becomes load-bearing.
+assemble, with 73 tests. It was filed while **ADR-REFER was `proposed`, and
+deliberately so**: its gate had not run, and an accepted record for an
+unmeasured plane is how an unproven thing becomes load-bearing.
+
+**That changed on 2026-08-21 and the item did not close with it.** R4 passed,
+the plane was wired into `fux answer` as its **default** path (PRIORITY P6,
+`9f8366e`), and Arpit accepted the record **carrying veto condition 2 forward
+as an open condition** — the budget sweep still reopens it the moment it runs
+flat. So the plane is now load-bearing *and* still short one measurement, which
+is exactly the combination this file exists to keep visible.
 
 ## What is unmeasured
 
-**1. R4 itself.** Cold k=10 ≤ **3 s**, warm ≤ **300 ms**, on a mock-server
-bench. This is a pre-registered threshold: it may not move, it may not be
-restated in looser words, and an ambiguous result is handed to Arpit rather
-than adjudicated.
+**1. R4 — measured, not outstanding.** Cold k=10 ≤ **3 s**, warm ≤ **300 ms**,
+on a mock-server bench. **Ran 2026-08-20 and passed** (§Definition of done).
+Kept here because the threshold is pre-registered and stays as written: a later
+re-run is judged against these numbers, not against looser words.
 
 **2. The budget sweep.** Answer-quality-per-byte across budgets. **If it is
 flat, the greedy assembler is not earning its complexity and plain top-k with
@@ -38,14 +50,14 @@ scan-resistance property is unit-tested; the *advantage* is not.
 
 **4. The `max_age` sweep is moot, not outstanding.** W-24's DoD asked for the
 bench at three `max_age` settings to show the knob moves the index-vs-fetch
-mix. [ADR-REFER](../../docs/adr/0031_refer-plane.md) decision 4 removed the
-knob, for the reason in [W-58](W-58-no-recorded-ingest-time.md). Recorded here
+mix. [ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4 removed the
+knob, for the reason in [W-58](../../archive/open/W-58-no-recorded-ingest-time.md). Recorded here
 so a later reader does not go looking for a measurement that was deliberately
 not taken.
 
 ## Definition of done
 
-- [x] `fux-lab` exists again — [W-56](W-56-sibling-environments-missing.md).
+- [x] `fux-lab` exists again — [W-56](../../archive/open/W-56-sibling-environments-missing.md).
       **Not used for R4**: the lab's environments install the published
       `0.33.0` wheel, which predates the refer plane, so the bench measures the
       working tree by path and records its sha.
@@ -69,19 +81,28 @@ not taken.
       synthetic trace can fire that trigger but cannot clear it. **Arpit's call.**
 - [x] Filed as a conformance run —
       [`work/regression/2026-08-20-refer-plane-r4/`](../regression/2026-08-20-refer-plane-r4/report.md).
-- [ ] ADR-REFER's status resolved — `accepted` on a pass, or amended on a fail.
-      A fail is a shipped result, not a failed task.
+- [x] ADR-REFER's status resolved — **`accepted` 2026-08-21**, on R4's pass
+      plus the plane becoming load-bearing in a shipped verb, and **explicitly
+      with veto condition 2 still open**. Arpit was asked directly rather than
+      the record's own "acceptance waits on the sweep" text being read past.
 
 ## Hazard
 
-**Do not wire the plane into `ask`/`answer` before this runs.** No verb exposes
-it today, and that is deliberate: putting an unmeasured plane on the default
-surface is how it becomes load-bearing before anyone knows whether it works.
-The CLI change is a separate change, after a number exists.
+**The hazard this file used to name has been taken deliberately.** It read
+*"do not wire the plane into `ask`/`answer` before this runs"*. R4 ran and
+passed, and P6 then wired **`answer`** — and only `answer` — onto the plane by
+default (`--no-refer` restores the M2 index-only shape). `ask`/`find` and
+ranking are untouched.
+
+**What that costs, and what to do about it:** the budget sweep can no longer
+delete the greedy assembler quietly. If it comes back flat, the deletion lands
+on the default path of a released verb, so it needs its own change with its own
+before/after on `answer`'s output — **the instruction to delete still stands**,
+the change is just bigger than it was on 2026-08-20.
 
 ## Reference
 
-- [ADR-REFER](../../docs/adr/0031_refer-plane.md) — the plane, its decisions,
+- [ADR-REFER](../../docs/adr/0030_refer-plane.md) — the plane, its decisions,
   and the four veto conditions this measurement checks.
-- [`W-24`](W-24-m4-refer-plane.md) — the spec, whose definition of done this
+- [`W-24`](../../archive/open/W-24-m4-refer-plane.md) — the spec, whose definition of done this
   item carries the unmet half of.

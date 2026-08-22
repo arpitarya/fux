@@ -36,7 +36,7 @@ ever left ungrounded. In that one change:
 | retired # | record | superseded by | date |
 |---|---|---|---|
 | [0001](0001_ingest-mode-naming.md) | **ADR-INGEST-MODES** — ingest-mode naming | [ADR-INGEST](../../docs/adr/0007_ingest.md) | 2026-08-18 |
-| [0022](0022_archived-signal.md) | **ADR-ARCHIVED-SIGNAL** — retired content is annotated, never reordered | [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) *(the whole record; `archived` becomes **declared** on a line rather than **derived** from the path)* | 2026-08-19 |
+| [0022](0022_archived-signal.md) | **ADR-ARCHIVED-SIGNAL** — retired content is annotated, never reordered | [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) *(the whole record; `archived` becomes **declared** on a line rather than **derived** from the path)* | 2026-08-19 |
 | [0004](0004_index-format.md) | **ADR-INDEX-FORMAT** — index format & committed store | [ADR-INGEST](../../docs/adr/0007_ingest.md) *(ingest)* · [ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md) *(storage)* · [ADR-RECORD](../../docs/adr/0010_index-record.md) *(schema)* | 2026-08-18 |
 | [0005](0005_derived-accelerator.md) | **ADR-ACCELERATOR** — derived T1 accelerator + the differential law | [ADR-ASK](../../docs/adr/0004_ask.md) *(query)* · [ADR-T1-ACCELERATOR](../../docs/adr/0011_accelerator.md) *(build)* | 2026-08-18 |
 | [0010](0010_url-source-consumer-middleware.md) | **ADR-URL-MIDDLEWARE** — URL source via consumer middleware | [ADR-URL-INGEST](../../docs/adr/0008_url-ingest.md) | 2026-08-18 |

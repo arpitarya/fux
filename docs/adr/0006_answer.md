@@ -165,7 +165,7 @@ path.
 
 **3. No model on this path, now or later.** Not to phrase, not to summarise,
 not once — refer's passages are verbatim spans of fetched bytes
-([ADR-REFER](0031_refer-plane.md) decision "it cannot invent"), never a
+([ADR-REFER](0030_refer-plane.md) decision "it cannot invent"), never a
 rewrite of them.
 
 **4. Top-1 is forced.** There is no `--top`; `answer` means one answer. A caller
@@ -189,7 +189,7 @@ carries three live values: `"refer"` (fetched and re-scored), `"index"`
 again on no-match (nothing to refer to).
 
 **8. Refer is opt-out, not opt-in.** `--no-refer` keeps the M2 path. This
-follows [ADR-REFER](0031_refer-plane.md)'s own reasoning for why a `file:`
+follows [ADR-REFER](0030_refer-plane.md)'s own reasoning for why a `file:`
 citation costs nothing to fetch (the local checkout, always) and a `url:`
 citation exists in the corpus only because the user already configured
 `[sources.url]` with a real address — the network dependency was created by
@@ -279,7 +279,7 @@ $ fux answer "zzz nonexistent term" --json
   while capturing the example above: `refer/chunk.py` chunks the fetched
   bytes as fetched — it does not strip the YAML frontmatter block the way
   `ingest/extract.py`'s title/phrase extraction does. This is consistent with
-  [ADR-REFER](0031_refer-plane.md)'s "it cannot invent" — the passage is a
+  [ADR-REFER](0030_refer-plane.md)'s "it cannot invent" — the passage is a
   genuine verbatim span, frontmatter included — but it is a real readability
   cost on a document that opens with one, recorded here rather than smoothed
   over. Stripping it is `chunk.py`'s call, not this record's, and out of P6's
@@ -332,7 +332,7 @@ $ fux answer "zzz nonexistent term" --json
   [`src/fux/query/refer_answer.py`](../../src/fux/query/refer_answer.py)
   (`answer_via_refer`, the per-URL fetcher resolution that mirrors
   `ingest/urlsrc.py`'s own); the plane it calls —
-  [ADR-REFER](0031_refer-plane.md).
+  [ADR-REFER](0030_refer-plane.md).
 - The ranking it projects — [ADR-ASK](0004_ask.md).
 - Captured behaviour (M2 shape, both modes and the empty case) —
   [`work/regression/2026-08-18-query-verbs/`](../../work/regression/2026-08-18-query-verbs/report.md).

@@ -1,10 +1,26 @@
 # W-44 — Decide how retired content is signalled in results
 
-**Status:** **PARKED** (2026-08-19, Arpit) — the option is chosen and recorded;
-the work is gated on an instrument that does not exist and has no owner.
-**Trigger:** a frozen query set with expected live-vs-archived answers exists.
-Parked with a trigger, never ambient — it does not resume because it looks
-ready.
+**Status:** **PARTLY UNPARKED, 2026-08-22 (Arpit).** The demotion half is
+startable now; the signal half is still gated.
+
+| half | state |
+|---|---|
+| **the demotion weight** — configurable, **default `1.0`** ([ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) decision 11) | **LANDED 2026-08-22.** `[ranking] archived_weight` in `fux.toml`, applied in the one shared `rank()`. At the default nothing reorders (asserted); the actual default stays `1.0` — moving it is still W-52's gate, unchanged by landing the capability |
+| **the disclaimer** — response-level, fires when any archived document is returned (decision 12) | **gated** by decision 10's sentence — *"changing what a verb says about a document is a claim that needs an instrument"*. It says **more** than the marker, so it cannot be less gated. **Arpit's to lift** |
+| **the marker** — `[archived]` per result (decisions 5, 7) | **gated**, unchanged |
+| **moving the default off `1.0`** | **gated harder** — the query set **plus a second corpus**, per [W-52](W-52-df-over-the-union.md) |
+
+**Trigger (for the gated halves):** a frozen query set with expected
+live-vs-archived answers exists. Parked with a trigger, never ambient — it does
+not resume because it looks ready.
+
+> **The 2026-08-22 ruling, so nobody re-litigates it.** Arpit asked for archived
+> documents to be scored normally, demoted, and disclaimed — and the demotion
+> reversed the "never reorder" half of a decision he had accepted on 2026-08-19.
+> **Making the weight configurable with a no-op default is what reconciled the
+> two**: the capability ships, the ranking change does not, and the measurement
+> still decides the default. That reconciliation is the reason this item moved
+> at all; an unconditional demotion would have stayed fully parked.
 **Model:** **Opus** for the pre-registration, Sonnet to build it once frozen
 **Blocked by:** — (nothing waits on it; it degrades answers every day it is open)
 **Evidence:** [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)
@@ -49,20 +65,20 @@ hypothesis, not a measurement):
 > `work/adr/0011_fux-dir-layout.md` — paths the restructure removed. The
 > committed index has not been re-ingested since. Any instrument built for the
 > DoD below has to be built against a corpus the probe never saw.
-> **(4) The config surface is shared with [W-45](W-45-source-exclusion.md).**
+> **(4) The config surface is shared with [W-45](../../archive/open/W-45-source-exclusion.md).**
 > `[sources] dirs` is a flat list of strings; declaring a source `archived`
 > needs the same schema change W-45 needs for exclusion. Decided apart, the
 > second re-litigates the first.
 
 > **2026-08-19 — DECIDED: option B.** Arpit chose *annotate, never reorder*.
 > The decision is recorded in
-> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), which is
+> [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md), which is
 > **accepted and unbuilt**: a record under `archive/` carries `archived: true`,
 > every verb surfaces it, and **the ranking is byte-identical**.
 >
 > **Two things changed on the way in.** *(1)* B needs **no config key** — the
 > one-archive law makes `loc.startswith("archive/")` a complete test, so this is
-> decoupled from [W-45](W-45-source-exclusion.md) after all. *(2)* The `df`
+> decoupled from [W-45](../../archive/open/W-45-source-exclusion.md) after all. *(2)* The `df`
 > contamination is **not** part of B and is filed separately as
 > [W-52](W-52-df-over-the-union.md), because excluding archived documents from
 > `df` moves 42% of live terms and that is a ranking change requiring its own
@@ -74,7 +90,7 @@ hypothesis, not a measurement):
 > derived from `loc.startswith("archive/")`. That fixes the weak point the
 > original recorded — the derivation was exact for this repo and a silent
 > convention for anyone else. The live record is
-> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), and **the file itself now
+> [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md), and **the file itself now
 > exists**: `.fux/sources/dirs` shipped 2026-08-19, and `archived=` is parsed
 > and validated — see the [run](../regression/2026-08-19-w54/report.md).
 >
@@ -113,13 +129,26 @@ never reorder*). It still needs its own measurement and its own ADR.
 
 - [x] ~~Arpit picks A, B or C~~ — **B**, 2026-08-19.
 - [x] ~~An ADR, with a reference~~ —
-      [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md), accepted.
+      [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md), accepted.
 - [ ] **The instrument, before the mechanism** — a pre-registered query set with
       expected live-vs-archived answers, frozen first. Five hand-picked probes
       is not a measurement, and the playground goldens are a different corpus
       and cannot see this. This is ADR-DIR-LIST decision 10's gate.
 - [ ] Build it: the property at ingest, the three verbs agreeing, and a test
       asserting **no archived document is ever returned unmarked**.
+- [x] **The demotion weight** — `fux.toml`, default `1.0`, keyed off the
+      declaration and never a path. **Two tests, not one**: scores and order
+      byte-identical at the default, *and* the weight demonstrably applied when
+      set. A knob that silently does nothing is the failure mode ADR-REFER
+      already refused once with `max_age_seconds`. **Landed 2026-08-22** —
+      `src/fux/config.py` (`archived_weight`), `src/fux/ingest/gitdir.py`
+      (`archived_dirs`), `src/fux/query/rank.py` (the multiply, skipped
+      outright at the default). Both tests exist:
+      `tests/query/test_scan.py` and `tests_e2e/test_verbs.py::test_archived_weight_demotes_only_when_configured`.
+- [ ] **The disclaimer** — response-level, conditional, carrying the rule rather
+      than a hedge. **stdout must stay byte-identical**; whether it is a new
+      `--json` key or stderr-only is [ADR-CLI](../../docs/adr/0002_cli-surface.md)'s
+      call, taken there.
 - [ ] Assert the ranking did not move — scores and order identical with and
       without the property (decision 4).
 - [ ] `CHANGELOG.md` under `[Unreleased] → Added`.

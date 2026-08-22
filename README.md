@@ -54,7 +54,7 @@ at answer time.**
 > [ADR-FETCHER](docs/adr/0019_fetcher.md)).
 > **The graph lane has landed (M3, unreleased)** — `explain`/`graph`/`path`,
 > unseeded label-propagation communities, a lazy PPR walk
-> ([ADR-GRAPH](docs/adr/0030_graph.md)) — with two named gaps still open: its
+> ([ADR-GRAPH](docs/adr/0029_graph.md)) — with two named gaps still open: its
 > playground acceptance targets are unmeasured and determinism is verified on
 > one machine, not two ([W-57](work/open/W-57-graph-lane-acceptance.md)). The
 > v0.26 engine and its docs are archived under

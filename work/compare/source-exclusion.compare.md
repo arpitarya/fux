@@ -2,11 +2,14 @@
 type: Compare Doc
 title: Source Exclusion
 description: How a source tree says "index this directory, except the machine-generated parts" — attribute vs exclusion line vs .fuxignore vs .gitignore vs convention.
-status: proposed
+status: accepted
 timestamp: 2026-08-20T00:00:00Z
 ---
 
 # Excluding part of a source tree — Comparison
+
+>
+> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while both items it was waiting on — **W-45 and W-55** — are closed and archived, and the include-only whitelist it debated **ended on 2026-08-20**. Its own "half an answer" caveat was resolved by W-55 being decided alongside it, which is exactly what the doc asked for.
 
 > **VERDICT: E — DECIDED by Arpit, 2026-08-20.** An exclusion *entry* in `.fux/sources/dirs`, one
 > per line, `!` prefix, repo-relative glob, applied to the whole walk and
@@ -28,7 +31,7 @@ timestamp: 2026-08-20T00:00:00Z
 ## Context
 
 `.fux/sources/dirs` is an include-only whitelist
-([ADR-DIR-LIST](../../docs/adr/0023_dir-list.md)). There is no way to say
+([ADR-DIR-LIST](../../docs/adr/0022_dir-list.md)). There is no way to say
 *"index this directory, except the machine-generated parts."*
 
 It bites in this repo in the most self-referential way available: the
@@ -158,11 +161,18 @@ would remove them without any exclusion mechanism at all.
 
 The two are genuinely orthogonal and both real: a type filter does not stop
 `evidence/report.md` being indexed, and an exclusion does not stop a
-`package-lock.json` in `docs/`. But **their sizes are not comparable at the
-design point.** Under the litmus — a 10k-engineer corporation's mega-project,
-10⁵–10⁶ documents across thousands of repos — "index every text-decodable
-file" means indexing lockfiles, generated OpenAPI specs, vendored fixtures and
-Terraform. The path problem is this repo's; the type problem is everyone's.
+`package-lock.json` in `docs/`. But **their sizes are not comparable at
+scale.** Under the litmus *as it stood when this was filed* — a 10k-engineer
+corporation's mega-project, 10⁵–10⁶ documents across thousands of repos —
+"index every text-decodable file" means indexing lockfiles, generated OpenAPI
+specs, vendored fixtures and Terraform. The path problem is this repo's; the
+type problem is everyone's.
+
+> **The scale filter moved to 10 000 documents on 2026-08-21 (W-65, 2026-08-22).**
+> The **deployment** half of that litmus is explicitly unchanged, and it is the
+> half this argument uses: *thousands of repos* is what makes the type problem
+> everyone's, and a 10 000-document corpus inside a corporation still spans
+> them. The verdict does not move.
 
 **Recommendation on sequencing:** decide W-55 first or together. Choosing an
 exclusion mechanism while the type question is open risks buying a general
@@ -186,7 +196,7 @@ closes.
 
 ## References
 
-- [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) — the file, the grammar, the
+- [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) — the file, the grammar, the
   closed attribute set.
 - [ADR-URL-LIST](../../docs/adr/0018_url-list.md) decisions 8, 10, 13 — no
   whitespace or quoting in values; a repeated key is an error; reader lenient,

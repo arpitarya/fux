@@ -124,8 +124,10 @@ And a `hashed` record — **no `title`, no `phrases`**:
 ### Context
 
 The committed plane is the product. Everything in it is paid for twice — once
-in repository size at 10⁵–10⁶ documents, and once in every diff a reviewer
-reads. Anything that can be recomputed from what is already there is cheaper in
+in repository size, and once in every diff a reviewer reads. (This read *"at
+10⁵–10⁶ documents"* until 2026-08-22; the design point is **10 000**, and the
+sentence never depended on the number — a reviewer reads every diff at every
+scale. W-65.) Anything that can be recomputed from what is already there is cheaper in
 the runtime plane, where it is rebuilt on demand and nobody reviews it.
 
 The schema was frozen at M1 with the fields below and has not moved since. This

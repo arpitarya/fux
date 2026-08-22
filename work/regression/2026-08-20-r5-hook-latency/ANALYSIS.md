@@ -46,7 +46,7 @@ architectural choice rather than an optimisation.
 
 ## Changes made in the same change as this run
 
-**1. [ADR-MAINTENANCE](../../../docs/adr/0033_hooks.md) records both verdicts
+**1. [ADR-MAINTENANCE](../../../docs/adr/0032_hooks.md) records both verdicts
 and stays `proposed`.** Its consequences section said *"R5 AND R6 ARE NOT
 MEASURED"*; it now says what they measured, and its veto conditions 1 and 2
 name this run and its reproduce command instead of saying "held".

@@ -33,7 +33,7 @@ nothing about *when*.
 [`caller-set-freshness-policy.md`](../proposals/caller-set-freshness-policy.md)
 specified `{max_age_seconds, timeout_seconds}`, with age measured against
 recorded provenance. **That provenance does not exist**, so
-[ADR-REFER](../../docs/adr/0031_refer-plane.md) decision 4 refused to ship the
+[ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4 refused to ship the
 knob: a caller passing `max_age_seconds=60` would reasonably believe they had
 bounded their staleness. **A knob that lies is worse than a missing knob.**
 
@@ -116,7 +116,7 @@ exists.
 ## Consequences
 
 - **`max_age_seconds` is struck** from the proposal, and
-  [ADR-REFER](../../docs/adr/0031_refer-plane.md) records the closure — its
+  [ADR-REFER](../../docs/adr/0030_refer-plane.md) records the closure — its
   veto condition 3 is exactly this question, so it fires and is answered rather
   than left open.
 - **No `_format` bump, no ADR-RECORD change, nothing rewritten.** D is the only
@@ -145,5 +145,5 @@ under [`work/regression/`](../regression/README.md), not an opinion.
 - Why timestamps break reproducibility —
   https://reproducible-builds.org/docs/timestamps/
 - The refusal this doc either confirms or overturns —
-  [ADR-REFER](../../docs/adr/0031_refer-plane.md) decision 4.
+  [ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4.
 - The finding — [W-58](../open/W-58-no-recorded-ingest-time.md).

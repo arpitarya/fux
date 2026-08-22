@@ -42,7 +42,7 @@ strict.
 
 ### 2. `dirs` moves out of `fux.toml`
 
-[ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) — was W-53. `[sources] dirs`
+[ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) — was W-53. `[sources] dirs`
 becomes a retired key that errors with instructions. This repo's list migrates,
 with `archive/v0.26-docs   archived=true`. **Write the declaration; do not read
 it yet** — the annotation in results is [W-44](W-44-archived-content-signalling.md),

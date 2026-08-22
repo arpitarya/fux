@@ -92,7 +92,7 @@ rather than repeated.
 
 **This section was written as input to `PRIORITY.md` P7 while P7 was still
 open.** P7 has since been decided and applied — see
-[`work/proposals/process-diet.md`](proposals/process-diet.md) for the actual
+[`archive/proposals/process-diet.md`](../archive/proposals/process-diet.md) for the actual
 four candidates put to Arpit and his verdict on each (only the `Cost:` line
 was accepted and dropped; `NOW.md` stays separate from `INTERVIEW.md`, on
 the grounds that they serve different read patterns, not just different

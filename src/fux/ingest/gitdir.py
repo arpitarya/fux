@@ -83,6 +83,18 @@ def source_excludes(root: Path, rel_path: str) -> list[str]:
     return [entry.value for entry in read_dirs(root, rel_path) if entry.exclude]
 
 
+def archived_dirs(root: Path, rel_path: str) -> list[str]:
+    """Included entries declared `archived=true` (ADR-DIR-LIST decision 11's
+    input). Reads the same committed declaration decision 5 leaves off the
+    record — the ranking keys off the source list, never a path convention
+    (decision 4)."""
+    return [
+        entry.value
+        for entry in read_dirs(root, rel_path)
+        if not entry.exclude and entry.attrs.get("archived") == "true"
+    ]
+
+
 #: What counts as a document when the consumer has not said otherwise.
 #: **Prose formats only.** No `.json`, `.svg`, `.sh`, `.py` or `.mermaid`: they
 #: are machine data or diagram source, and indexing them was the W-55 defect.

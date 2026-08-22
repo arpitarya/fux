@@ -52,7 +52,7 @@ arithmetic.
 **The graph group is the first that does not rank.** `ask`/`find`/`answer`
 return documents ordered by relevance; `explain`/`graph`/`path` return
 relationships the documents themselves stated. That is why they are a group
-rather than three more read verbs — see [ADR-GRAPH](0030_graph.md).
+rather than three more read verbs — see [ADR-GRAPH](0029_graph.md).
 
 The three query verbs differ only in **how much they commit to**. `find` gives
 you locations and stays out of the way. `ask` gives you a ranked list with
@@ -164,7 +164,7 @@ flags — `--install` (the default), `--status`, `--uninstall`, `--json` — rat
 than becoming `fux hooks install`, for the same reason `url` did. It is the
 first verb that **writes outside `.fux/`** (into `.git/hooks/` and
 `.gitattributes`), which is why it refuses to overwrite anything it did not
-write and says so. The reasoning is [ADR-MAINTENANCE](0033_hooks.md)'s.
+write and says so. The reasoning is [ADR-MAINTENANCE](0032_hooks.md)'s.
 
 > **`fux-merge-index` is a separate console script, not a verb**, and that is
 > not a surface inconsistency: git invokes a merge driver as a bare command
@@ -176,7 +176,7 @@ are flat: `fux graph path` would have been the first subcommand tree on this
 surface. They form a group rather than joining `read` because **they do not
 rank** — they return relationships, and a caller reaching for them wants a
 different kind of answer. The verbs, their payloads and the reasoning are
-[ADR-GRAPH](0030_graph.md)'s; what binds here is the flatness, the shared
+[ADR-GRAPH](0029_graph.md)'s; what binds here is the flatness, the shared
 `--json` flag, and that `path`'s no-route case prints prose and exits 0 exactly
 as `find`'s no-match case does — the three-verbs-agree property W-48 examined
 and kept.
@@ -438,8 +438,8 @@ accelerator: 26 terms, 26 blocks, 27 postings (derived, not committed)
 ```
 
 **Adding a file never overrides the type allowlist** — inclusion is a
-conjunction with no precedence ([ADR-DIR-LIST](0023_dir-list.md) /
-[ADR-TYPES](0032_types-list.md)), so the line is written, the check still runs, and
+conjunction with no precedence ([ADR-DIR-LIST](0022_dir-list.md) /
+[ADR-TYPES](0031_types-list.md)), so the line is written, the check still runs, and
 the verb says how to change it. Exit 0: this is a fact about the corpus, not
 an error.
 
@@ -736,6 +736,74 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 
 ### Consequences
 
+- **`fux setup` gains `--no-agents` (2026-08-22, W-68).** A flag, not a verb —
+  veto 1 forbids `fux <verb> <subverb>` and `setup` already owns writing the
+  consumer-owned files, so writing four more is the same territory.
+  **It is an opt-*out*, which is the unusual part and is deliberate**
+  ([ADR-AGENT-POLICY](0035_agent-policy.md) decision 5): the policy files
+  install by default, because an opt-in flag is a feature nobody knows exists
+  and the failure it prevents — an agent citing a retired design confidently,
+  with a correct-looking citation — is silent. Its durable form is
+  `[agents] install = []` in `fux.toml`, so a one-shot escape and a standing
+  preference are both expressible.
+  ⚠ **`setup` now prints a second kind of output**: the paths it wrote outside
+  `.fux/`, and how to turn them off. That announcement is **mandatory**, not
+  cosmetic — with a default-on install it is the entire remaining safeguard,
+  and ADR-AGENT-POLICY's veto 1 fires on any agent file written without
+  appearing in it. **ASCII only**, like everything else this surface prints
+  (veto 7).
+- **`fux ingest` gains `--stop`, and takes over from a live runner
+  (2026-08-22, W-66).** Arpit's call. `fux ingest` stops a background runner
+  holding the lock and then runs; `--stop` is the same takeover without the run.
+  **No new verb** — this record's veto 1 forbids `fux <verb> <subverb>`, and
+  `fux ingest` already owns the re-index, so stopping one is the same territory
+  rather than a thirteenth verb. **`--stop` and `--full` are unrelated axes and
+  read oddly side by side**, which is the honest cost of putting it here; the
+  alternative was a `fux reindex` verb overlapping `ingest`, which is worse.
+  Full semantics — cooperative stop, the dirty list surviving, clearing only a
+  start-time snapshot — are [ADR-MAINTENANCE](0032_hooks.md) decision 1d, not
+  restated here.
+  ⚠ **`--stop` with no runner is success, not an error.** Exit 0 saying nothing
+  was running. A verb whose job is "make sure it is not running" has done its
+  job when it was not running; exiting non-zero there breaks every script that
+  calls it defensively.
+- **`fux doctor` gains `--json`, and the runner status is a check inside it
+  rather than a verb (2026-08-22, W-66).** Arpit's call, and the reasoning is
+  this record's veto 1: `fux <verb> <subverb>` is forbidden, so `fux index
+  status` was never available, and a new verb costs a record. `doctor` already
+  has the shape — `Check(ok, level, name, detail)` — so the background runner
+  becomes one more check. **`--json` is not optional here**: `doctor` has never
+  had it, and a status an agent cannot parse is not a status for this product's
+  actual audience.
+  **The check is read-only.** It reports a stale lock and names the command to
+  clear it; it never clears it. See [ADR-MAINTENANCE](0032_hooks.md) decision 1c
+  and its veto 7.
+  **Promotion to a `fux status` verb is a checkable condition, not a feeling.**
+  Arpit chose "a check now, a verb if it outgrows it", and *outgrows* is
+  defined here so nobody claims it by vibe: **promote when a caller needs runner
+  state without wanting doctor's other checks** — concretely, when a script or
+  agent path parses `fux doctor --json` and discards everything but the runner
+  block, or when running the other checks is a cost (latency, a git call, a
+  false FAIL) rather than a bonus. Until one of those is observed **and named in
+  the change that promotes it**, the check stays where it is. That evidence
+  belongs in `work/regression/` or a WORKLOG entry, not in a commit message.
+- **`ask` declares a pending re-index (2026-08-22, W-66).** Since the hook
+  defers ([ADR-MAINTENANCE](0032_hooks.md) decision 1b), the committed index can
+  be several commits behind rather than one, so `fux ask` **states the pending
+  count on the answer** rather than leaving it to `fux doctor` to be asked.
+  Three constraints this record imposes on that:
+  1. **stderr, not stdout** — `--json` is a contract, and the ADR surface
+     captures compare stdout bytes. The W-64 progress plane solved the identical
+     problem the identical way. If the count is ever wanted *inside* `--json`,
+     that is a new key and therefore a breaking change to be taken here, in the
+     same commit — not a detail settled in code.
+  2. **ASCII only** — a Windows console defaults to the active codepage and a
+     character outside it makes the command crash, not render badly. See the
+     `fux add` arrow that took both Windows arms down on the v0.35.0 release
+     commit, below.
+  3. **It is a declaration, not a gate.** `ask` never refuses to answer because
+     the index is behind, and never re-indexes on the caller's latency. Stating
+     the staleness is the whole of the behaviour.
 - **The `--json` shape is now a contract.** `results[]` of
   `{id, title, loc, score}` for `ask`/`find`; `{answer, citation, source}` for
   `answer`, where `source` selects the sub-shape (`"index"`:
@@ -865,6 +933,14 @@ not a wait:
    import of anything under `fux.` beyond `__version__` and `errors`.
 4. **Exit code `2` starts being produced**, which makes the reserved-vs-live
    statement in §Decision false.
+6. **A `fux status` verb appears without the promotion evidence** named in the
+   Consequences bullet above — i.e. nobody can point at a caller that wanted
+   runner state and not doctor's other checks. Then the surface grew a verb by
+   habit, which is what keeping it flat is for.
+5. **`ask`'s staleness declaration reaches stdout** — in any form, including
+   inside `--json`. That breaks the byte-stability the `--json` contract and
+   the surface captures both rest on, and it is why the declaration was put on
+   stderr rather than beside the answer.
 
 **How to check it:**
 

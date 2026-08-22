@@ -145,7 +145,7 @@ error in the loader — the caller decides whether it is fatal, which is why
 
 **2. There are no required keys.** Amended 2026-08-19: `[sources] dirs` was
 the one required key and is now **retired** — the corpus lives in
-`.fux/sources/dirs`, one entry per line ([ADR-DIR-LIST](0023_dir-list.md)
+`.fux/sources/dirs`, one entry per line ([ADR-DIR-LIST](0022_dir-list.md)
 decision 1). `[sources] dirs_file` says where that file is and defaults to it,
 so a `fux.toml` holding nothing but `[index] shards` is valid. **`fux.toml` is
 policy; the source lists are the corpus**, and that is the whole reason the key
@@ -186,7 +186,7 @@ indexing the wrong corpus or fetching through the wrong file.
 |---|---|---|
 | `[sources.url] urls` | put one URL per line in `.fux/sources/urls` | 0.31.x |
 | `[sources.url] middleware` | renamed to `fetcher`; move the file to `.fux/fetchers/` | 2026-08-19, [ADR-FETCHER](0019_fetcher.md) decision 7 |
-| `[sources] dirs` | put one directory per line in `.fux/sources/dirs`; a line may carry `archived=true` | 2026-08-19, [ADR-DIR-LIST](0023_dir-list.md) decision 1 |
+| `[sources] dirs` | put one directory per line in `.fux/sources/dirs`; a line may carry `archived=true` | 2026-08-19, [ADR-DIR-LIST](0022_dir-list.md) decision 1 |
 
 **A retired key errors whatever its value.** `dirs = []` stops the run exactly
 as `dirs = ["docs"]` does: the key is retired, not merely unused, and a reader
@@ -207,7 +207,7 @@ the boundary, rendered by the CLI, exit 1.
   has **no `fux.toml` key at all**, and deliberately: the types list is
   optional, its absence is meaningful (the built-in default applies), and a key
   whose only job is to relocate an optional file is surface nobody asked for.
-  Decided in [ADR-TYPES](0032_types-list.md).
+  Decided in [ADR-TYPES](0031_types-list.md).
 
 - **The config fits on a screen**, so a new consumer reads all of it.
 - **The adapter cap holds at the schema level.** Adding a fetcher needs no
@@ -222,6 +222,32 @@ the boundary, rendered by the CLI, exit 1.
 - **`dirs` is include-only, with no exclusions** — so committed measurement
   evidence under `work/regression/` contaminates the corpus it measures. Filed
   as [W-45](../../archive/open/W-45-source-exclusion.md).
+- **`[agents] install` joined the schema, 2026-08-22 (W-68).** Which vendors
+  `fux setup` writes policy renderings for
+  ([ADR-AGENT-POLICY](0035_agent-policy.md) decision 5). **A closed, validated
+  set** — `claude`, `copilot`, `kiro` — because the failure mode of a typo here
+  is the worst kind: the file a consumer asked for is simply never written and
+  nothing says so. Unknown names are a loud `FuxError`.
+  **Absent and `[]` are deliberately different**, which is unusual for this
+  schema and is the point: every other key here treats absent as *"take the
+  default"*, and so does this one — but `install = []` is a consumer who said
+  **no**, and it is the durable form of `--no-agents`. Collapsing the two would
+  make the opt-out unwritable.
+  **Order is normalised, not preserved.** The loader returns the vendors in a
+  fixed order regardless of how they were typed, so what gets written cannot
+  depend on the order someone happened to list them in — the same instinct as
+  ADR-DIR-LIST's *"the loader dedupes and sorts, so file order is presentation
+  only"*.
+- **`[ranking] archived_weight` joined the schema, 2026-08-22 (W-44).** A
+  score multiplier for documents under a directory declared `archived=true`
+  ([ADR-DIR-LIST](0022_dir-list.md) decision 11). Default `1.0`, validated as
+  a non-negative number — a bool is rejected explicitly, since `bool` is an
+  `int` subclass in Python and `archived_weight = true` would otherwise parse
+  silently as `1`. **This loader enforces the type, not the process rule**:
+  nothing here stops a session from setting it to something other than `1.0`,
+  but [ADR-DIR-LIST](0022_dir-list.md)'s veto condition still fires if that
+  ships without the pre-registered query set and second corpus
+  ([W-52](../../work/open/W-52-df-over-the-union.md)).
 
 ### Alternatives considered
 

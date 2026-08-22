@@ -275,7 +275,7 @@ and the differential harness now carries a hashed record to prove it.
 ### Consequences
 
 - **L5 is now enforced inside `write_index`** (2026-08-20,
-  [ADR-MAINTENANCE](0033_hooks.md) decision 10). Until M5 the hashed-meta
+  [ADR-MAINTENANCE](0032_hooks.md) decision 10). Until M5 the hashed-meta
   rule for non-git sources lived in `ingest/run.py` — in *one caller* — so any
   second writer could have put a private document's title into a committed
   shard and nothing would have refused. The check now runs per record, **before
@@ -286,7 +286,7 @@ and the differential harness now carries a hashed record to prove it.
   to close. **The existing corpus already complied**, so this landed without
   changing a committed byte.
 - **`.fux/index/*.jsonl` now merges through a custom driver** rather than
-  textually ([ADR-MAINTENANCE](0033_hooks.md) decisions 6-9). Decision
+  textually ([ADR-MAINTENANCE](0032_hooks.md) decisions 6-9). Decision
   7's write-if-different discipline is what makes that safe: the driver's
   output is sorted by id, so two machines merging the same three inputs produce
   the same bytes.
@@ -374,10 +374,18 @@ diff <(fux ask "any query" --json) <(fux ask "any query" --scan --json) && echo 
 grep -n '_assert_invariants' src/fux/derive/build.py
 # expect: defined and called per record — removing the call is the veto
 
-# 4. density against the M6 budget (<= 250 MB packed @100k docs).
+# 4. committed index size — informational only, no threshold, by ruling.
+#    ⚠ 2026-08-22 (Arpit): **R7 IS RETIRED AND HAS NO SUCCESSOR.** The budget
+#    read "<= 250 MB packed @100k docs", frozen against a 10^5-10^6 design
+#    point. Arpit retired the promise outright rather than re-deriving it:
+#    "remove that promise, it's not needed... nothing related to fifty
+#    thousand or hundred thousand should be tested or committed, or have
+#    rules or promises for it."
+#    So this is a MEASUREMENT, never a gate. Print the number, watch it over
+#    time, and read NO pass or fail off it. A size promise returns only if
+#    Arpit reopens one, at 10 000 documents, as a new prediction with a new id.
 #    `du -sh` is working-tree size, not "packed" — isolate the index in a
-#    scratch repo and measure the real pack, the way the 2026-08-21
-#    preliminary analysis did (see below, and its evidence/pack_compression.sh)
+#    scratch repo and measure the real pack.
 bash work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.sh
 ```
 

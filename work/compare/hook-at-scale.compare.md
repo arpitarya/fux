@@ -1,31 +1,45 @@
 ---
 type: Compare Doc
 title: The Hook at Scale — Where a Re-index Runs When the Corpus Is Large
-description: R5 failed at 100 000 documents (44.4 s against a 1 s bound), firing ADR-MAINTENANCE veto condition 1. Four viable responses — accept a documented ceiling, defer the work off the commit, move it to pre-push, or make the corpus-wide passes incremental — compared against the measured attribution.
-status: proposed
+description: R5 failed at 100 000 documents (44.4 s against a 1 s bound), firing ADR-MAINTENANCE veto condition 1. Four viable responses were compared against the measured attribution. RULED 2026-08-22 by Arpit — B, the hook defers, in its detached-runner variant: post-commit writes a dirty list and spawns a one-shot re-index, and `fux ask` declares the pending count.
+status: accepted
 timestamp: 2026-08-20T00:00:00Z
 ---
 
 # The hook at scale — Comparison
 
-> **Proposed verdict: B — the hook defers.** `post-commit` records that the
-> index is dirty and returns; the re-index runs out of band, and `fux doctor`
-> already reports a stale index so the lag is visible rather than silent. It is
-> the only option that reaches the bound at **every** corpus size, and it does
-> so without touching the correctness argument that made `post-commit` the
-> right hook in the first place.
+> ## VERDICT — **B, the hook defers.** Ruled by Arpit, 2026-08-22.
+>
+> `post-commit` **writes a list of the documents that changed and returns.**
+> The re-index runs out of band; `fux doctor` already reports a stale index,
+> and `fux ask` now **declares the pending count on the answer**, so the lag is
+> announced rather than merely discoverable.
+>
+> **Three things Arpit settled, in his words and not to be re-litigated:**
+>
+> 1. **A dirty *list*, not a dirty *flag*.** The hook records *which* documents
+>    changed. That is what makes option D a later increment rather than a
+>    rewrite: D consumes exactly this list.
+> 2. **A detached one-shot runner, not lazy-on-next-use.** The hook spawns a
+>    re-index that runs to completion and exits. See §5 on why this is not the
+>    watch daemon `maintenance-trigger.compare.md` rejected.
+> 3. **`fux ask` warns on the answer** when documents are pending, mirroring the
+>    refer plane's existing three-state honesty — which already refuses to
+>    collapse *"we did not look"* into *"we looked and it was fine"*.
+>
 > **Rejected:** **A — accept a documented ceiling** (honest, but it makes the
 > flagship maintenance feature unavailable at the corpus size the whole plan is
-> designed for); **C — move to `pre-push`** (cheaper per event, but it does not
-> change the cost, only how often you pay it, and it makes the *push* the thing
-> that hangs for 44 s); **D — make the corpus-wide passes incremental**
-> (attacks the real cost, and **the arithmetic says it cannot reach the bound**
-> — see §4; worth doing on its own merits, not as the answer here).
-> **Status:** ⏳ **awaiting Arpit.** **Filed:** 2026-08-20.
+> designed for); **C — move to `pre-push`** (does not change the cost, only how
+> often you pay it, and it makes the *push* the thing that hangs).
+> **D — make the corpus-wide passes incremental** is **not rejected**: it is
+> deferred to its own item on its own merits, and this verdict is deliberately
+> shaped to feed it. See §6.
+>
+> **Filed:** 2026-08-20. **Ruled:** 2026-08-22.
+> **Builds under:** W-66.
 > **Reopen when:** a re-run of R5 against the frozen pre-registration passes at
-> 100 000 documents under whichever option is taken, or the deferred re-index
-> is observed answering a query from an index the checked-out commit does not
-> match.
+> 100 000 documents under this option, or the deferred re-index is observed
+> answering a query from an index the checked-out commit does not match.
 
 ## §0 — Re-scoped 2026-08-21: the design point moved, the fork did not close
 
@@ -64,10 +78,12 @@ live option**, where at 100 000 it was arithmetically dead. B still wins on
 holding at every size and on not needing the speedup at all; D now competes on
 keeping the index/tree agreement window tight, which is B's one real cost.
 
-**What this section does not do:** it does not change the proposed verdict, and
-it does not re-run the matrix. **The verdict is still Arpit's**, and the matrix
-below still weights `holds at 10⁶ (×3)` — a criterion the new litmus demotes.
-Whoever takes this up re-weights it there, in the same change as the ruling.
+**What this section did not do:** it did not change the proposed verdict, and
+it did not re-run the matrix. **Both were left to Arpit, and he ruled on
+2026-08-22** — B, in its detached-runner variant. The matrix *has* now been
+re-weighted off `holds at 10⁶ (×3)` and onto the 10 000-document design point
+with 50 000 as the next staged target, in that same change, as this section
+required.
 
 ## Context — what fired this
 
@@ -80,7 +96,7 @@ Whoever takes this up re-weights it there, in the same change as the ruling.
 | 10 000 | 3.523 s | 3.5× over |
 | **100 000** | **44.380 s** | **44× over** |
 
-[ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) veto condition 1 states the
+[ADR-MAINTENANCE](../../docs/adr/0032_hooks.md) veto condition 1 states the
 consequence in its own words: *"`post-commit` is too slow to be automatic and
 the hook becomes opt-in or incremental in a way it currently is not."* **Which
 of those** is the fork, and it has more than two viable answers, so it is here
@@ -125,11 +141,13 @@ does not install the hook.
 - **For:** zero work; nothing about the design changes; the honest reading of
   a measured limit.
 - **Against:** the maintenance plane's headline capability is then absent at
-  10⁵–10⁶ documents, which CLAUDE.md's litmus calls **the design point, not a
-  stretch goal**. "It works on small repositories" is what the archived engine
+  10⁵–10⁶ documents, which CLAUDE.md's litmus **then called** *the design
+  point, not a stretch goal* (it moved to 10 000 on 2026-08-21 — W-65, 2026-08-22;
+  §0 above already re-weighted the matrix, and this bullet is the one sentence
+  that kept the old tense). "It works on small repositories" is what the archived engine
   could already do.
 
-### B — The hook defers *(proposed)*
+### B — The hook defers *(RULED 2026-08-22)*
 
 `post-commit` writes a dirty marker and returns. The re-index runs out of band —
 on the next `fux` invocation that needs a fresh index, or a background process
@@ -139,15 +157,20 @@ index, so the lag stays visible.
 - **For:** commit cost becomes git's cost — **0.34 s at 100 000 documents**,
   and constant in the corpus. It is the only option that reaches the bound at
   every size. The one-commit-lag argument that made `post-commit` correct
-  ([ADR-MAINTENANCE](../../docs/adr/0033_hooks.md) decision 1) is unchanged;
+  ([ADR-MAINTENANCE](../../docs/adr/0032_hooks.md) decision 1) is unchanged;
   the lag simply becomes *a few commits* instead of *one*.
 - **Against:** the window in which the committed index disagrees with the
   checked-out tree gets longer and less predictable, and "out of band" needs a
-  concrete mechanism — which is a real design question, not a detail. A
-  background process is something this architecture has never needed
-  ([`maintenance-trigger.compare.md`](maintenance-trigger.compare.md) rejected
-  a watch daemon partly on those grounds), so the honest form of B is probably
-  *lazy* rather than *background*: re-index on next use.
+  concrete mechanism — which is a real design question, not a detail.
+
+> **Both of those were settled on 2026-08-22, and this paragraph is kept as
+> written because it is what the fork looked like before the ruling.** The
+> mechanism is a **detached one-shot runner** — *not* the lazy-on-next-use form
+> this section guessed at, and *not* the watch daemon
+> [`maintenance-trigger.compare.md`](maintenance-trigger.compare.md) rejected;
+> §5 works through why the rejection does not transfer. The widened window is
+> answered by **`fux ask` declaring the pending count**, which converts it from
+> a silent lag into a stated one.
 
 ### C — Move the re-index to `pre-push`
 
@@ -188,22 +211,85 @@ A 100× improvement in two mature, stdlib-only passes is not a plan. **D is
 worth doing and cannot close this**; B closes it arithmetically and at every
 size.
 
+## §5 — Why the detached runner is *not* the daemon that was rejected
+
+**This verdict was checked against
+[`maintenance-trigger.compare.md`](maintenance-trigger.compare.md) before it was
+taken, because that document is `accepted` and rejected an option that sounds
+like this one.** It is not the same option.
+
+| | **C — watch daemon** (rejected there) | **B's runner** (ruled here) |
+|---|---|---|
+| lifetime | always on, indefinitely | starts, re-indexes, **exits** |
+| trigger | every file save, live | one commit |
+| watches the filesystem | yes | **no** — the hook hands it a list |
+| process to run and manage | **yes** | none between commits |
+| helps the merge story | no | not its job — the driver already does |
+
+Its three stated objections land on C and miss this:
+
+1. *"Doesn't touch the merge-conflict problem"* — correct, and irrelevant:
+   [ADR-MERGE-DRIVER](../../docs/adr/0033_merge-driver.md) owns that, and R6
+   is ruled.
+2. *"Requires an always-on background process this codebase has never needed"* —
+   **this is the objection that does not transfer.** A one-shot that exits is
+   not always-on. The matrix row below scores it `none` for that reason.
+3. *"Does nothing for a contributor editing over SSH or on a machine where the
+   daemon isn't running"* — the runner is spawned *by the commit*, so it runs
+   wherever the commit happens. That is strictly better than a daemon.
+
+**And that document did not close the door anyway.** Its own consequences say a
+daemon *"is not eliminated forever — a plausible later layer on top of A"*.
+This is less than that: not a layer, one process invocation per commit.
+
+**What the sidestep does not buy:** a detached spawn still has to be
+stdlib-only (L1) and still has to work on a Windows-first fleet, and two
+commits in quick succession still need a single-writer discipline. Those are
+W-66's problems and they are real; they are just not *this* objection.
+
+## §6 — D is deferred, not rejected, and this verdict is shaped to feed it
+
+The dirty **list** is the concession that makes D cheap later. D's definition —
+*"resolve edges only for the dirty set; rebuild only the shards and segments the
+change touches"* — needs exactly one input: the dirty set. B now produces it
+and writes it down.
+
+So the sequencing is **B closes this fork; D becomes its own item, judged on its
+own merits**, and when it lands it makes the *runner* faster rather than
+changing what the hook does. Two consequences worth stating:
+
+- **The list alone buys no speedup.** The runner still calls today's
+  `fux ingest`, which walks the corpus. B's win is that you are not waiting for
+  it — not that it got smaller.
+- **D's arithmetic is bounded.** At 10 000 documents a 4× speedup of the two
+  O(corpus) passes reaches 0.99 s. At 50 000 — the next staged target — the
+  same 4× does not: the passes scale to ~15.5 s and would need ~20×. **D is a
+  10k-only answer; B is size-independent.** That asymmetry is why D could never
+  have closed this fork on its own, at either design point.
+
 ## Matrix
+
+**Re-weighted 2026-08-22 for the 10 000-document litmus, as §0 required of
+whoever ruled.** The old `reaches the bound at 100k (×3)` and `holds at 10⁶
+(×3)` rows are replaced by the design point and the *next staged target*; the
+100 000-document FAIL stands as measured and is not restated here.
 
 | criterion (weight) | A ceiling | **B defer** | C pre-push | D incremental |
 |---|---|---|---|---|
-| reaches the 1 s bound at 100k (×3) | ✗ | **✓** | ✗ | ✗ |
-| holds at 10⁶ (×3) | ✗ | **✓** | ✗ | ✗ |
-| index/tree agreement window (×2) | best | **worse, visible** | worse | best |
+| reaches the 1 s bound at **10k**, the design point (×3) | ✗ (3.3 s) | **✓ (0.22 s)** | ✗ | ~ (0.99 s at an unbuilt 4×) |
+| **holds at 50k, the next staged target** (×2) | ✗ | **✓ — constant** | ✗ | ✗ (needs ~20×) |
+
+> **This row is an ARGUMENT, not a measurement, and since 2026-08-22 it can only ever be one.** Arpit capped measurement at 10 000 documents, so nobody may go and bench 50 000 to settle it. B's ✓ is *structural* — commit cost becomes git's cost, which does not track corpus size — and D's ✗ is arithmetic from the measured 10k passes. **Both remain legitimate under the ceiling**, which forbids measuring a larger size, not reasoning about one. The verdict is unaffected: B also wins the 10k row outright, needs no unbuilt speedup, and is already shipped.
+| index/tree agreement window (×2) | best | **worse — and now declared on the answer** | worse | best |
 | implementation cost (×1) | none | **moderate** | low | high |
 | keeps ADR-INGEST decision 1 (×2) | ✓ | **✓** | ✓ | ✗ |
-| new always-on process (×2) | none | **none, if lazy** | none | none |
+| new always-on process (×2) | none | **none — one-shot, exits (§5)** | none | none |
 
 ## References
 
 - The measurement — [R5-HOOK](../regression/2026-08-20-r5-hook-latency/VERDICT.md)
   and its [report](../regression/2026-08-20-r5-hook-latency/report.md) §3.
-- The veto that fired — [ADR-MAINTENANCE](../../docs/adr/0033_hooks.md)
+- The veto that fired — [ADR-MAINTENANCE](../../docs/adr/0032_hooks.md)
   condition 1.
 - The trigger choice this does **not** reopen —
   [`maintenance-trigger.compare.md`](maintenance-trigger.compare.md).

@@ -62,23 +62,32 @@ _PREAMBLE = f"""#!/bin/sh
 # merge or a checkout. It reports and gets out of the way.
 set -u
 command -v fux >/dev/null 2>&1 || exit 0
-# W-64: show the progress bar during a hook, explicitly rather than by
-# accident of TTY detection — R5's 44.4 s of silence on the commit path is
-# the exact failure this exists to fix. Revisit if W-61's fork resolves to
-# option B (the hook defers): commit cost becomes ~0.3 s and constant, and a
-# bar that flashes that briefly is noise the ~200-doc threshold mostly
-# suppresses anyway.
+# W-64 turned the progress bar ON here, to break R5's 44.4 s of silence on the
+# commit path, and said in as many words: revisit if the fork resolves to
+# option B. It did (2026-08-22), so this is that revisit. post-commit no
+# longer waits for an ingest at all, and the ingest that does run is detached
+# with no terminal to paint. post-merge and post-checkout still run inline and
+# still want the bar.
 export FUX_NO_PROGRESS=0
 """
 
 HOOKS: dict[str, str] = {
     # The committed index is derived from the COMMITTED tree, which is why this
     # runs after the commit rather than before it. See the module docstring.
+    #
+    # **It defers** (W-66 Phase 2, ADR-MAINTENANCE decision 1a). One line, and
+    # everything it does is constant in the corpus: `--spawn-runner` records
+    # HEAD's paths into the dirty list and spawns a detached one-shot
+    # re-index, then returns. R5 failed because this used to be `fux ingest`
+    # inline — 44.4 s at 100 000 documents on a 20-document commit.
+    #
+    # **All the logic moved into Python.** Phase 1 wrote the dirty list with a
+    # `cat`/`sed`/`sort`/`mv` pipeline here; that is the part of a hook most
+    # likely to behave differently under git-for-windows, and it could not be
+    # unit-tested. `runner.record_head` is the same thing where a test can
+    # reach it.
     "post-commit": _PREAMBLE + """
-fux ingest 2>&1 | sed 's/^/fux: /' || exit 0
-if ! git diff --quiet -- .fux/index 2>/dev/null; then
-  echo "fux: the index changed — commit .fux/index to keep it in step"
-fi
+fux ingest --spawn-runner || exit 0
 """,
     # A merge brings in both content and (possibly merge-driver-resolved) index
     # lines. Re-ingesting derives the index from the merged CONTENT, which is

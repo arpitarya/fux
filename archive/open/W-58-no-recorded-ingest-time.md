@@ -4,7 +4,7 @@
 [`record-freshness.compare.md`](../compare/record-freshness.compare.md).
 `max_age_seconds` is struck from the freshness proposal for good; content
 verification (sha comparison) is the answer.
-[ADR-REFER](../../docs/adr/0031_refer-plane.md) decision 4 and veto condition 3
+[ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4 and veto condition 3
 amended in the same change. **A and C turned out to be the same option** (the
 reproducible-builds convention for a deterministic stamp in a git repo *is*
 the commit date), and a fifth — **E, one corpus-level stamp** — remains the
@@ -47,7 +47,7 @@ with age measured "against the ledger's recorded `sha@index` provenance, not
 wall clock at query time".
 
 **That provenance does not exist**, so the knob was not built.
-[ADR-REFER](../../docs/adr/0031_refer-plane.md) decision 4 records the refusal
+[ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4 records the refusal
 and the reasoning: shipping `max_age_seconds` would mean shipping a knob that
 silently does nothing, and a caller passing `max_age_seconds=60` would
 reasonably believe they had bounded their staleness. **A knob that lies is
@@ -86,7 +86,7 @@ clone**, so a CI checkout would consider the entire corpus freshly written.
 - [x] If no: strike `max_age_seconds` from
       [`../proposals/caller-set-freshness-policy.md`](../proposals/caller-set-freshness-policy.md)
       — or from its archived successor — and record the closure in
-      [ADR-REFER](../../docs/adr/0031_refer-plane.md), whose veto condition 3
+      [ADR-REFER](../../docs/adr/0030_refer-plane.md), whose veto condition 3
       is exactly this. **Done** — the proposal's live copy is archived at
       [`archive/proposals/caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md);
       ADR-REFER decision 4 and veto condition 3 amended 2026-08-20.

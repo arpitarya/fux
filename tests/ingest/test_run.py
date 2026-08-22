@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fux import store
 from fux.ingest.run import run
+from fux.maintain import dirty
 
 
 def _init(tmp_path, files: dict[str, str], toml: str = "[sources]\n", dirs=("docs",)):
@@ -32,6 +33,34 @@ def test_double_ingest_is_byte_identical_and_zero_changed(tmp_path):
     after = {p: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
     assert before == after
     assert report2.changed_count == 0
+
+
+def test_a_completed_run_clears_the_dirty_list(tmp_path):
+    _init(tmp_path, {"docs/a.md": "# A\n\nbody\n"})
+    dirty.record(tmp_path, ["file:docs/a.md"])
+    run(tmp_path)
+    assert dirty.read(tmp_path) == []
+
+
+def test_ingest_is_byte_identical_regardless_of_the_dirty_list(tmp_path):
+    """W-66 Phase 1 DoD: the list is advisory only. Present, absent, stale or
+    corrupt must never change what a run indexes — it may only be cleared."""
+    _init(tmp_path, {"docs/a.md": "# A\n\nbody\n", "docs/b.md": "# B\n\nother\n"})
+
+    run(tmp_path)  # absent
+    baseline = {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)}
+
+    dirty.record(tmp_path, ["file:docs/a.md"])  # present, correct
+    run(tmp_path)
+    assert {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)} == baseline
+
+    dirty.record(tmp_path, ["file:no-such-doc.md", "url:https://stale.example/x"])  # stale
+    run(tmp_path)
+    assert {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)} == baseline
+
+    (tmp_path / ".fux" / "runtime" / "dirty").write_bytes(b"\xff\xfe not even lines")  # corrupt
+    run(tmp_path)
+    assert {p.name: p.read_bytes() for p in store.iter_shard_paths(tmp_path)} == baseline
 
 
 def test_ver_starts_at_1_and_bumps_only_on_content_change(tmp_path):

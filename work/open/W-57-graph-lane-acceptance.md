@@ -27,7 +27,7 @@ exits non-zero and this item cannot start.
 > returns the superseded material above the ADR that replaced it. That is
 > evidence the corpus is fit to grade — **it is not a golden**, and writing it
 > down as one is the human step this item waits on.
-**Closes with:** an update to [ADR-GRAPH](../../docs/adr/0030_graph.md)
+**Closes with:** an update to [ADR-GRAPH](../../docs/adr/0029_graph.md)
 §Consequences, and a filed run under [`../regression/`](../regression/README.md)
 **Model:** **Sonnet** to run and file it; **Opus** if the numbers come back
 ambiguous, because that is a gate call.
@@ -54,7 +54,7 @@ they are here:
 
 ## What must not be claimed until this runs
 
-[ADR-GRAPH](../../docs/adr/0030_graph.md) is written so it does **not**
+[ADR-GRAPH](../../docs/adr/0029_graph.md) is written so it does **not**
 claim the gap is closed, and its veto condition 3 is exactly this measurement.
 Nothing in the repo should say the lane is proven against the graded corpus
 until a run under `work/regression/` says so.
@@ -90,7 +90,7 @@ constants are honest defaults precisely because nothing has been fitted yet.
 
 ## Reference
 
-- [ADR-GRAPH](../../docs/adr/0030_graph.md) — the lane, its constants, and
+- [ADR-GRAPH](../../docs/adr/0029_graph.md) — the lane, its constants, and
   the veto condition this measurement checks.
 - [SETUP-PLAYGROUND](../setup/fux-playground.md) — what the corpus is and what
   its contract is.

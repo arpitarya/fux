@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import subprocess
 import sys
 
@@ -75,6 +76,39 @@ def test_no_hook_can_block_the_operation_it_follows(repo):
     for name, body in hooks.HOOKS.items():
         assert "command -v fux" in body, name
         assert "exit 0" in body, name
+
+
+# -- W-66 Phase 2: post-commit defers --------------------------------------
+
+
+def test_post_commit_never_re_indexes_inline():
+    """The whole of the fork's ruling. R5 failed because this hook ran a full
+    `fux ingest` and waited for it — 44.4 s at 100 000 documents."""
+    body = hooks.HOOKS["post-commit"]
+    assert "--spawn-runner" in body
+    commands = [
+        line for line in body.splitlines()
+        if line.startswith("fux ") and "--spawn-runner" not in line
+    ]
+    assert commands == [], f"post-commit still runs something inline: {commands}"
+
+
+def test_post_commit_does_no_work_that_tracks_corpus_size():
+    """ADR-MAINTENANCE veto condition 5, as a property of the hook body: it
+    spawns and returns. Anything O(corpus) here would be the veto firing."""
+    body = hooks.HOOKS["post-commit"]
+    for forbidden in ("git diff-tree", "sort", "sed", "cat ", "fux build"):
+        assert forbidden not in body, f"{forbidden!r} belongs in Python, not the hook"
+
+
+def test_the_dirty_list_is_written_in_python_not_shell():
+    """Phase 1 wrote it with a `cat`/`sed`/`sort`/`mv` pipeline. That is the
+    part of a hook most likely to differ under git-for-windows, and it could
+    not be unit-tested; `record_head` is the same thing where a test reaches."""
+    from fux.maintain import runner
+
+    assert callable(runner.record_head)
+    assert "--root" in inspect.getsource(runner.record_head)  # the first commit works
 
 
 def test_pre_commit_is_deliberately_not_installed(repo):

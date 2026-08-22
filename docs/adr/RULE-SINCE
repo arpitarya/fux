@@ -19,5 +19,27 @@
 # is real and is stated rather than buried: those commits are no longer
 # re-auditable by this gate.
 #
-# Previous baseline: 1fc51a7257efeb943c512809bc531c7817dbc753
-301c65af310424d266ad40a4e22961722a586d97
+# Moved forward again 2026-08-22, a third time, for a THIRD shape of the same
+# cause: the register was RENUMBERED. ADR-0022 had been archived, leaving a
+# hole, and closing it shifted eleven records down one — `0033_hooks.md` became
+# `0032_hooks.md`, `0031_refer-plane.md` became `0030_refer-plane.md`, and so
+# on. The ownership table names records by PATH, so every historical commit
+# that touched a record at its old number now reads as touching nothing.
+#
+# The bulk review: `301c65a..9bb870e` is fourteen commits, of which exactly one
+# — `e5f6b9a`, the v0.35.0 release — trips the gate under the new table. It was
+# re-audited against the numbering in force when it landed and it **passed**:
+# it touched `docs/adr/0030_graph.md`, `docs/adr/0031_refer-plane.md` and
+# `docs/adr/0033_hooks.md`, which were ADR-GRAPH, ADR-REFER and ADR-MAINTENANCE
+# respectively at that moment. It was compliant when written; only the
+# renumbering makes it look otherwise.
+#
+# The cost is the one the 2026-08-21 entry already names, and it is stated
+# rather than buried: commits before this sha are no longer re-auditable by
+# this gate. That is the standing price of renumbering a register, and it is
+# why renumbering is not a tidy-up.
+#
+# Previous baselines:
+#   1fc51a7257efeb943c512809bc531c7817dbc753
+#   301c65af310424d266ad40a4e22961722a586d97
+9bb870ef7dc4c25386cca15d999bcb2b4e7a81f5

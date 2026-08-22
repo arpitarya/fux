@@ -39,7 +39,7 @@ resistance**: a re-index after a large merge is the bulk scan that flushes an
 LRU's hot set, and here a miss costs a network fetch. In-memory and
 per-process — distinct from the [TTL fetch cache](#ttl-fetch-cache), which is
 on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
-[ADR-CACHE](adr/0035_cache.md) decisions 2–5,
+[ADR-CACHE](adr/0034_cache.md) decisions 2–5,
 [cache-policy](../work/compare/cache-policy.compare.md).
 
 **BIC (Binary Interpolative Coding)** — The posting-list codec for the
@@ -277,7 +277,7 @@ typed keys in fux's schema. See [ADR-URL-INGEST](../archive/adr/0010_url-source-
 [ADR-DOTFUX](../archive/adr/0011_fux-dir-layout.md).
 
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
-bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs).
+bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs — **deferred-target arithmetic**; the design point is 10 000 since 2026-08-21).
 **Deferred to [M8](../work/open/W-38-m8-deferred.md)** as a pure-win optimization; M3 ships a sorted
 u64-hash array instead. RecSplit / PtrHash (refs [9,10]).
 
@@ -298,7 +298,10 @@ updates it **in the same change**. the item's own detail file under [`work/open/
 OPEN-WORK is the *state*.
 
 **P-predictions (P1…P7)** — The paper's falsifiable claims, each gating a
-milestone: P1 pruning holds quality · P2 wire ≤ 300 MB @1M · P3 warm answer
+milestone. **Retired**: P1 closed FAIL, and P2–P7 were retired with plan
+revision 1 in favour of the R-series (R1–R7). The `@1M` thresholds below are
+**historical**, not live gates — 1M is a deferred target and the design point
+is 10 000 documents (W-65, 2026-08-22). Listed: P1 pruning holds quality · P2 wire ≤ 300 MB @1M · P3 warm answer
 ≤ 300 ms @1M · P4 cold external answer ≤ 3 s · P5 clone→first answer ≤ 5 min ·
 P6 concurrent-ingest merges cleanly · P7 20-doc commit re-indexes < 1 s.
 Status lives in [OPEN-WORK §2](../work/OPEN-WORK.md). See
@@ -364,7 +367,7 @@ Ported at [M4](../work/open/W-24-m4-refer-plane.md) from archived ADR-0007.
 **Runtime segments** — The local, **gitignored** query plane produced by
 [inflation](#inflation): byte-aligned, memory-mapped, 128-entry posting blocks
 with per-block max impact and skip pointers, decoded at native speed via
-`memoryview.cast`. Large (~2.5 GB at 10⁶) and disposable — the mirror image of
+`memoryview.cast`. Large (~2.5 GB at 10⁶ — **a deferred target**, not the design point; see [Litmus](../CLAUDE.md)) and disposable — the mirror image of
 the [wire format](#wire-format). See
 [storage-architecture](../work/compare/storage-architecture.compare.md).
 
@@ -372,7 +375,7 @@ the [wire format](#wire-format). See
 [content-never-durable](#content-never-durable-the-law): Fux additionally
 commits a machine-made Markdown copy with provenance frontmatter, for
 air-gap availability, PR-reviewed change tracking, or audit retention. The
-archived frontmatter parser's home in v0.30. Built at [M6](../work/open/W-26-m6-scale-t2.md).
+archived frontmatter parser's home in v0.30. Built at [M6](../archive/open/W-26-m6-scale-t2.md).
 
 **TTL fetch cache** — *Time-to-live.* The on-disk, **gitignored**, per-machine
 store at `.fux/runtime/fetch-cache/` that answers *"do I need to fetch this at
@@ -386,7 +389,7 @@ two are separate stores and why a TTL hit is labelled
 caching whatever the TTL says. Disk-bounded, oldest-`fetched_at` evicted first.
 **The only place in the engine that reads a wall clock.** Its existence is a
 rate-limit answer, not a latency one — an agent asking ten questions about one
-runbook must not fetch it ten times. See [ADR-CACHE](adr/0035_cache.md)
+runbook must not fetch it ten times. See [ADR-CACHE](adr/0034_cache.md)
 decisions 6–11, [refer-fetch-cache](../work/compare/refer-fetch-cache.compare.md).
 
 **`cached` (the fourth verdict)** — One of the four freshness labels the
@@ -396,8 +399,8 @@ decisions 6–11, [refer-fetch-cache](../work/compare/refer-fetch-cache.compare.
 it carries `age_seconds` so a caller can judge for itself. **Never folded into
 `current`**, which is reserved for "verified against the source this call".
 Collapsing them anywhere downstream is the "knob that lies" failure in a new
-location. See [ADR-CACHE](adr/0035_cache.md) decision 7,
-[ADR-REFER](adr/0031_refer-plane.md) decision 6.
+location. See [ADR-CACHE](adr/0034_cache.md) decision 7,
+[ADR-REFER](adr/0030_refer-plane.md) decision 6.
 
 **URL source (`[sources.url]`)** — The `src: "url"` ingestion path: URLs are
 read from the committed `.fux/sources/urls` (one per line), fetched through

@@ -13,7 +13,7 @@ timestamp: 2026-08-19T00:00:00Z
 - **Status:** accepted
 - **Date:** 2026-08-19
 - **Feature:** `.fux/sources/urls` — the file format itself, as distinct from what fetches its entries
-- **Owns:** `src/fux/ingest/sourcelist.py` — the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0023_dir-list.md) decision 2. Added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-FETCHER](0019_fetcher.md), which owns `ingest/urlsrc.py`; **the *writer* moved to [ADR-CLI](0002_cli-surface.md) on 2026-08-21** (W-63), when `src/fux/sources.py` stopped being `fux url` and became `add`/`remove`/`update` over all three lists. This record still decides what a URL line **means**; ADR-CLI decides what the command does
+- **Owns:** `src/fux/ingest/sourcelist.py` — the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0022_dir-list.md) decision 2. Added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-FETCHER](0019_fetcher.md), which owns `ingest/urlsrc.py`; **the *writer* moved to [ADR-CLI](0002_cli-surface.md) on 2026-08-21** (W-63), when `src/fux/sources.py` stopped being `fux url` and became `add`/`remove`/`update` over all three lists. This record still decides what a URL line **means**; ADR-CLI decides what the command does
 - **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
 - **Split from:** [ADR-URL-INGEST](0008_url-ingest.md) decisions 5 and 6, which shipped in 0.31.x and are restated nowhere
 
@@ -179,7 +179,7 @@ fetch outcomes.
 default applies, so **every list that is valid today stays valid forever**.
 Built 2026-08-19 in
 [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) — **one parser, shared
-with `.fux/sources/dirs`** ([ADR-DIR-LIST](0023_dir-list.md) decision 2). Two
+with `.fux/sources/dirs`** ([ADR-DIR-LIST](0022_dir-list.md) decision 2). Two
 parsers for one grammar is how `#`-handling, sorting and the unknown-key error
 end up disagreeing.
 

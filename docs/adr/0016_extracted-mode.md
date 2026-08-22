@@ -171,7 +171,7 @@ survives only in the frozen archived fidelity vocabulary.
   bump plus re-ingest everywhere. That is the cost this ratification buys out.
 - **The paper's §3.2 is stale in the other direction** — it still calls this
   tier "Inferred mode". That text is superseded by this record; the paper is
-  rewritten to measured values at M6 ([W-26](../../work/open/W-26-m6-scale-t2.md)).
+  rewritten to measured values at M6 ([W-26](../../archive/open/W-26-m6-scale-t2.md)).
 - **`extract.py` moves to this record** in the ownership table, out of
   ADR-INGEST's claim on `src/fux/ingest/`. Most specific wins, exactly as
   `store/fuxdir.py` already resolves against `store/`. ADR-INGEST keeps how

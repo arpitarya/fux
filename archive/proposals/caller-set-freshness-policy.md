@@ -8,7 +8,7 @@ tags: [refer-plane, m4, api-surface]
 ---
 
 > **Implemented 2026-08-20, with its central knob deliberately refused.**
-> Successor: [ADR-REFER](../../docs/adr/0031_refer-plane.md) — *still
+> Successor: [ADR-REFER](../../docs/adr/0030_refer-plane.md) — *still
 > `proposed`; its gate R4 has not run.* The `never` sentinel and the
 > caller-owned policy shipped; `max_age_seconds` did **not**, because the
 > committed record carries no ingest time and the knob could not have been

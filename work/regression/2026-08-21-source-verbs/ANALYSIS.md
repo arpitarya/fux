@@ -106,7 +106,7 @@ from "has no edges"` — directly above the branch that treated them the same.
 **Fix.** `explain` now checks the committed index — not the graph plane, since
 an edgeless document is absent from one and present in the other — and raises
 for a document the corpus does not hold. It belongs to
-[ADR-GRAPH](../../../docs/adr/0030_graph.md), updated in the same change.
+[ADR-GRAPH](../../../docs/adr/0029_graph.md), updated in the same change.
 
 **Repro (against the pre-fix code).**
 

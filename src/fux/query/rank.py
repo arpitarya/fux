@@ -49,12 +49,22 @@ class Corpus:
         return self.total_wlen / self.n
 
 
+def _is_archived_loc(loc: str, archived_dirs: frozenset[str]) -> bool:
+    """`loc` falls under one of `archived_dirs` — a directory entry or an
+    exact single-file entry, mirroring how `gitdir.walk_sources` resolves an
+    entry against the filesystem."""
+    return any(loc == d or loc.startswith(f"{d}/") for d in archived_dirs)
+
+
 def rank(
     candidates: list[dict],
     query_hashes: list[str],
     df: dict[str, int],
     corpus: Corpus,
     top: int,
+    *,
+    archived_weight: float = 1.0,
+    archived_dirs: frozenset[str] = frozenset(),
 ) -> list[AskResult]:
     """Score, sort, truncate. The only place any of the three happens.
 
@@ -62,10 +72,17 @@ def rank(
     scoring can still return 0 (a matched hash with zero weighted tf), and those
     are dropped rather than ranked — `ask` says "no confident matches" instead
     of listing a document it scored at zero.
+
+    `archived_weight`/`archived_dirs` are ADR-DIR-LIST decision 11's demotion:
+    a document under a declared-archived directory has its score multiplied by
+    the weight. At the shipped default (`1.0`) this is skipped outright, so a
+    corpus with no configured weight scores and orders byte-identically to one
+    with the property computed at all — decision 6's veto, held.
     """
     if corpus.n == 0:
         return []
     avg_wlen = corpus.avg_wlen
+    demote = archived_weight != 1.0 and archived_dirs
 
     scored = []
     for record in candidates:
@@ -77,6 +94,8 @@ def rank(
             corpus.n,
             avg_wlen,
         )
+        if demote and _is_archived_loc(record["loc"], archived_dirs):
+            s *= archived_weight
         if s > 0:
             scored.append((record, s))
 

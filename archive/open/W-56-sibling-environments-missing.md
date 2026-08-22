@@ -53,7 +53,7 @@ is not a golden.
 It is the instrument for:
 
 - the graph lane's named acceptance targets `q005`/`q009`/`q011`/`q015`
-  ([W-57](W-57-graph-lane-acceptance.md), [ADR-GRAPH](../../docs/adr/0030_graph.md));
+  ([W-57](W-57-graph-lane-acceptance.md), [ADR-GRAPH](../../docs/adr/0029_graph.md));
 - the dense lane's named target set `q008`/`q017`/`q030`/`q031`/`q036`, which
   is the evidence that would let `--hybrid` flip on
   ([`query/hybrid.py`](../../src/fux/query/hybrid.py) says so in its docstring);

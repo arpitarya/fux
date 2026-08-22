@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from fux.query.scan import ask, scan_candidates
 from fux.store import term_hash, write_index
 
@@ -68,6 +70,47 @@ def test_top_limits_results(tmp_path):
         [_rec(f"file:{i}.md", str(i), 10, {term_hash("x"): [0, 1]}) for i in range(10)],
     )
     assert len(ask(tmp_path, "x", top=3)) == 3
+
+
+# -- ADR-DIR-LIST decision 11: the archived demotion weight ----------------
+
+
+def _archived_setup(tmp_path):
+    write_index(
+        tmp_path,
+        [
+            _rec("file:archive/old.md", "Old", 10, {term_hash("cache"): [1, 0]}),
+            _rec("file:docs/new.md", "New", 10, {term_hash("cache"): [0, 1]}),
+        ],
+    )
+
+
+def test_default_weight_is_byte_identical_to_no_archived_dirs(tmp_path):
+    _archived_setup(tmp_path)
+    plain = ask(tmp_path, "cache")
+    with_dirs_at_default = ask(tmp_path, "cache", archived_weight=1.0, archived_dirs=frozenset({"archive"}))
+    assert plain == with_dirs_at_default
+
+
+def test_weight_below_one_demotes_the_archived_document(tmp_path):
+    _archived_setup(tmp_path)
+    baseline = ask(tmp_path, "cache")
+    assert baseline[0].id == "file:archive/old.md"  # heading match wins pre-demotion
+
+    demoted = ask(tmp_path, "cache", archived_weight=0.1, archived_dirs=frozenset({"archive"}))
+    assert demoted[0].id == "file:docs/new.md"
+    archived_result = next(r for r in demoted if r.id == "file:archive/old.md")
+    baseline_archived = next(r for r in baseline if r.id == "file:archive/old.md")
+    assert archived_result.score == pytest.approx(baseline_archived.score * 0.1)
+
+
+def test_weight_never_touches_a_document_outside_the_archived_dirs(tmp_path):
+    _archived_setup(tmp_path)
+    baseline = ask(tmp_path, "cache")
+    demoted = ask(tmp_path, "cache", archived_weight=0.1, archived_dirs=frozenset({"archive"}))
+    live_baseline = next(r for r in baseline if r.id == "file:docs/new.md")
+    live_demoted = next(r for r in demoted if r.id == "file:docs/new.md")
+    assert live_baseline.score == live_demoted.score
 
 
 def test_multi_term_query_prefers_document_matching_both(tmp_path):

@@ -1,0 +1,108 @@
+{
+  "fux": "/Users/arpitarya/my_programs/fux/.venv/bin/fux",
+  "engine_sha": "9bb870e+dirty",
+  "python": "3.14.2",
+  "platform": "Darwin 25.3.0 arm64",
+  "r5_budget_s": 1.0,
+  "r5_commit_docs": 20,
+  "r5_judged_docs": 100000,
+  "pre_registration": "tools/maintenance-bench/PRE-REGISTRATION.md",
+  "r6": [
+    {
+      "tier": "1 \u00b7 machine, disjoint adds, one shard",
+      "description": "both sides add documents sharing a shard",
+      "expected_conflict": false,
+      "treatment": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "control": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/08.jsonl"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/08.jsonl"
+        ]
+      },
+      "informative": true,
+      "passes": true,
+      "matches_expectation": true,
+      "post_hoc": false
+    },
+    {
+      "tier": "1-disjoint \u00b7 machine, disjoint adds",
+      "description": "UNJUDGED \u2014 the everyday case; needs no driver",
+      "expected_conflict": false,
+      "treatment": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "control": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "informative": false,
+      "passes": false,
+      "matches_expectation": true,
+      "post_hoc": true
+    },
+    {
+      "tier": "2 \u00b7 machine, one shard, two lines",
+      "description": "adjacency is not a disagreement",
+      "expected_conflict": false,
+      "treatment": {
+        "conflicted": false,
+        "conflicting_paths": [],
+        "machine_plane_conflicts": []
+      },
+      "control": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/16.jsonl"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/16.jsonl"
+        ]
+      },
+      "informative": true,
+      "passes": true,
+      "matches_expectation": true,
+      "post_hoc": false
+    },
+    {
+      "tier": "3 \u00b7 the same document, both sides",
+      "description": "human conflict preserved; machine plane refuses",
+      "expected_conflict": true,
+      "treatment": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/08.jsonl",
+          "docs/doc-0.md"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/08.jsonl"
+        ]
+      },
+      "control": {
+        "conflicted": true,
+        "conflicting_paths": [
+          ".fux/index/08.jsonl",
+          "docs/doc-0.md"
+        ],
+        "machine_plane_conflicts": [
+          ".fux/index/08.jsonl"
+        ]
+      },
+      "informative": null,
+      "passes": true,
+      "matches_expectation": true,
+      "post_hoc": false
+    }
+  ],
+  "r6_verdict": "PASS",
+  "r6_pre_registration": "tools/maintenance-bench/PRE-REGISTRATION-R6-v2.md"
+}

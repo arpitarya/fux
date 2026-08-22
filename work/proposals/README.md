@@ -34,25 +34,21 @@ commitment; everything here is findable.
 
 **Filed and graduated 2026-08-21 — PRIORITY.md P7:**
 
-* [Put the process on a diet](process-diet.md) - **graduated same-session** —
-  four candidate governance cuts, each put to Arpit for a direct verdict.
-  Accepted: drop the WORKLOG `Cost:` line (58/58 entries had said
-  `unmeasured`). Rejected: merging `NOW.md` into `INTERVIEW.md`; a
-  no-same-day-supersession rule. Audited and found nothing to cut: capping
-  the doc-meta test suite — all 35 tests across 8 files guard a real,
-  mechanical property, several having caught genuine historical bugs; the
-  original audit's "~30% of tests guard prose" does not reproduce at file
-  granularity (≈4%), corrected on contact rather than acted on unverified.
 
 **Filed 2026-08-10 — from the agent-search-API landscape research:**
 
 * [Agent search-API landscape](agent-search-landscape.md) - research note, not a build item: Parallel/Perplexity/Exa/Brave independently arrived at three index-and-refer decisions, and the corpus they *cannot* reach names Fux's wedge. The evidence base the next two cite.
 *Both of the 2026-08-10 refer-plane proposals **graduated and were archived on
 2026-08-20**, when M4's core landed — their live successor is
-[ADR-REFER](../../docs/adr/0031_refer-plane.md), which is still `proposed`
+[ADR-REFER](../../docs/adr/0030_refer-plane.md), which is still `proposed`
 because R4 has not run. One of the two shipped with its central knob
 deliberately refused; the reasoning is in the record and the open question is
 [W-58](../open/W-58-no-recorded-ingest-time.md).*
+
+**Filed 2026-08-22:**
+
+* [T2 segments](t2-segments.md) - **was ADR-T2-SEGMENTS (0037) until Arpit moved it here the same day.** The record that **T2 is not built**, decided by measurement: [R9](../regression/2026-08-22-r9-t2-at-10k/VERDICT.md) answered worst-case queries in **12.46 ms against a 150 ms bar**, twelve times inside it, so the third storage tier buys nothing at the design point. **Nothing was ever built** — no `tpack`, no BIC codec, no `tier` knob in `src/`. Its old veto is now a **graduation trigger**, and the difference matters: *a veto is checked, a trigger is remembered*. **Graduates if a measured warm p95 exceeds 150 ms** — a number, never a corpus size. ⚠ Two frozen files still cite it as an ADR and always will; see its head.
+
 
 **Filed 2026-08-09 for the v0.30 architecture:**
 
@@ -81,3 +77,17 @@ architecture), chunk-level-dense-codes, hybrid-degrades-at-scale (✅ resolved
 *(The fourth idea from the 2026-07-21 ideation — the **product-memory corpus**,
 Arpit's own seed — graduated into the v0.26 plan; its successor concept lives on
 as the committed index + ledger of the current architecture.)*
+
+**Graduated and archived 2026-08-22** — moved out of this directory once their
+change was live, per this file's own lifecycle (*implemented proposals move to
+`archive/`*):
+
+* [Consumer intent policy](../../archive/proposals/consumer-intent-policy.md) — became
+  [ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md), accepted **and built**:
+  `fux setup` installs the four renderings and they live at
+  [`src/fux/templates/agents/`](../../src/fux/templates/agents/). Its
+  `consumer-policy/` drafts directory went with it — the files had already moved
+  to the wheel, leaving only a pointer.
+* [Put the process on a diet](../../archive/proposals/process-diet.md) — graduated
+  same-session 2026-08-21 (PRIORITY P7); the `Cost:` line is gone from the
+  WORKLOG format and the change is live in the process itself.

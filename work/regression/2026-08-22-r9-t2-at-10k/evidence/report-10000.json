@@ -1,0 +1,46 @@
+{
+  "engine_sha": "9bb870e+dirty",
+  "python": "3.14.2",
+  "platform": "Darwin 25.3.0 arm64",
+  "pre_registration": "tools/t2-eval/PRE-REGISTRATION.md",
+  "r9_bar_ms": 150.0,
+  "r9_judged_docs": 10000,
+  "latency": {
+    "corpus_docs": 10000,
+    "populations": {
+      "worst": {
+        "queries": 20,
+        "accel_median_ms": 12.15,
+        "accel_p95_ms": 12.46,
+        "accel_max_ms": 12.53,
+        "scan_median_ms": 24.14,
+        "scan_p95_ms": 25.07
+      },
+      "typical": {
+        "queries": 20,
+        "accel_median_ms": 12.05,
+        "accel_p95_ms": 12.54,
+        "accel_max_ms": 12.65,
+        "scan_median_ms": 24.45,
+        "scan_p95_ms": 26.01
+      },
+      "multi": {
+        "queries": 20,
+        "accel_median_ms": 12.09,
+        "accel_p95_ms": 12.63,
+        "accel_max_ms": 13.49,
+        "scan_median_ms": 35.45,
+        "scan_p95_ms": 37.06
+      }
+    },
+    "judged_p95_ms": 12.46,
+    "passes": true
+  },
+  "index_size_POST_HOC_not_R7": {
+    "raw_bytes": 14215412,
+    "packed_bytes": 2257247,
+    "raw_bytes_per_doc": 1421.5,
+    "packed_bytes_per_doc": 225.7
+  },
+  "r9_verdict": "PASS"
+}

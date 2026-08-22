@@ -79,9 +79,19 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
     return candidates, df, Corpus(n=total_docs, total_wlen=total_wlen)
 
 
-def ask(root: Path, query: str, top: int = 5) -> list[AskResult]:
+def ask(
+    root: Path,
+    query: str,
+    top: int = 5,
+    *,
+    archived_weight: float = 1.0,
+    archived_dirs: frozenset[str] = frozenset(),
+) -> list[AskResult]:
     query_hashes = query_term_hashes(query)
     if not query_hashes:
         return []
     candidates, df, corpus = scan_candidates(root, query_hashes)
-    return rank(candidates, query_hashes, df, corpus, top)
+    return rank(
+        candidates, query_hashes, df, corpus, top,
+        archived_weight=archived_weight, archived_dirs=archived_dirs,
+    )

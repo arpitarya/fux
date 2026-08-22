@@ -31,6 +31,7 @@ it is purely a speed decision. `--scan` forces the reference path explicitly
 from __future__ import annotations
 
 import json as json_mod
+import sys
 from pathlib import Path
 
 from ..config import find_root
@@ -41,21 +42,41 @@ from .scan import ask as scan_ask
 __all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
 
 
+def _archived_ranking(root: Path) -> tuple[float, frozenset[str]]:
+    """The demotion weight and the directories it applies to (ADR-DIR-LIST
+    decision 11) — read fresh per query, from `fux.toml` and the committed
+    dirs list, never from the record (decision 5 is gated; this is not).
+
+    Degrades to the no-op default when config or the dirs list can't be read,
+    so `ask`/`find` never fail because ranking metadata is missing — the same
+    tolerance `_root()` already extends to a corpus with no `fux.toml` at all.
+    """
+    from ..config import load as load_config
+    from ..ingest.gitdir import archived_dirs
+
+    try:
+        config = load_config(root)
+        return config.archived_weight, frozenset(archived_dirs(root, config.dirs_file))
+    except FuxError:
+        return 1.0, frozenset()
+
+
 def run_query(
     root: Path, query: str, top: int, *, force_scan: bool = True, use_hybrid: bool = False
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`."""
+    weight, dirs = _archived_ranking(root)
     if use_hybrid:
         from .hybrid import hybrid_ask
 
-        return hybrid_ask(root, query, top=top), "hybrid"
+        return hybrid_ask(root, query, top=top, archived_weight=weight, archived_dirs=dirs), "hybrid"
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
         if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
-            return accel.ask(root, query, top=top), "accelerator"
-    return scan_ask(root, query, top=top), "scan"
+            return accel.ask(root, query, top=top, archived_weight=weight, archived_dirs=dirs), "accelerator"
+    return scan_ask(root, query, top=top, archived_weight=weight, archived_dirs=dirs), "scan"
 
 
 def _root() -> Path:
@@ -73,6 +94,22 @@ def _force_scan(args) -> bool:
     return not getattr(args, "fast", False)
 
 
+def _declare_pending(root: Path) -> None:
+    """W-66 Phase 3: state a lagging index on stderr, never on stdout.
+
+    `--json` is a contract and the ADR surface captures compare stdout bytes
+    (the W-64 progress plane solved the identical problem the identical way),
+    so this never touches the answer itself — it declares, it never gates.
+    ASCII only: a Windows console's default codepage cannot encode a fancy
+    dash or arrow and the process crashes on print() rather than degrading.
+    """
+    from ..maintain import dirty
+
+    pending = dirty.read(root)
+    if pending:
+        print(f"fux: {len(pending)} changed path(s) pending re-index", file=sys.stderr)
+
+
 def cmd_ask(args) -> int:
     root = _root()
     results, path = run_query(
@@ -82,6 +119,7 @@ def cmd_ask(args) -> int:
         force_scan=_force_scan(args),
         use_hybrid=getattr(args, "hybrid", False),
     )
+    _declare_pending(root)
 
     if args.json:
         # `--explain` is not text-only: a caller that wants to log which path

@@ -13,6 +13,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -147,6 +148,186 @@ def test_the_post_commit_hook_reindexes_after_a_commit(tmp_path):
 
     found = fux(tmp_path, "find", "brandnewterm", "--json").stdout
     assert "new.md" in found, "post-commit should have re-indexed the committed tree"
+
+
+def _hook_env() -> dict:
+    return dict(os.environ, PATH=f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}")
+
+
+def _drain(root: Path, timeout: float = 120.0) -> bool:
+    """Wait for the detached runner to finish. True if it drained the list."""
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        pending = fux(root, "doctor", "--json").stdout
+        try:
+            state = json.loads(pending)["runner"]
+        except (ValueError, KeyError):
+            return False
+        if not state["running"] and state["pending"] == 0:
+            return True
+        time.sleep(0.2)
+    return False
+
+
+def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
+    """W-66 Phase 2, through the real hook, real git, and a real detached
+    process. The commit returns before the re-index has happened — that is
+    the whole of the fork's ruling — and the runner finishes it afterwards."""
+    make_repo(tmp_path, hooks=True)
+
+    (tmp_path / "docs" / "new.md").write_text(doc("dirtylistterm"), encoding="utf-8")
+    git(tmp_path, "add", "-A")
+    committed = subprocess.run(
+        ["git", "commit", "-m", "add new"], cwd=tmp_path, capture_output=True, text=True,
+        env=_hook_env(),
+    )
+    assert committed.returncode == 0, "a hook must never block a commit"
+
+    assert _drain(tmp_path), "the detached runner never finished"
+    found = fux(tmp_path, "find", "dirtylistterm", "--json").stdout
+    assert "new.md" in found, "the deferred runner should have re-indexed the committed tree"
+
+
+def _median_commit_time(root: Path, label: str, rounds: int = 3) -> float:
+    samples = []
+    for i in range(rounds):
+        (root / "docs" / f"timed-{label}-{i}.md").write_text(doc(f"timed{label}{i}"), encoding="utf-8")
+        git(root, "add", "-A")
+        start = time.monotonic()
+        subprocess.run(
+            ["git", "commit", "-qm", f"timed {label} {i}"], cwd=root, capture_output=True,
+            text=True, env=_hook_env(),
+        )
+        samples.append(time.monotonic() - start)
+        _drain(root)
+    return sorted(samples)[len(samples) // 2]
+
+
+def _seeded_repo(root: Path, docs: int) -> Path:
+    make_repo(root, hooks=True)
+    for i in range(docs):
+        (root / "docs" / f"bulk{i}.md").write_text(doc(f"bulkterm{i}"), encoding="utf-8")
+    git(root, "add", "-A")
+    subprocess.run(
+        ["git", "commit", "-qm", "bulk"], cwd=root, capture_output=True, text=True, env=_hook_env()
+    )
+    assert _drain(root)
+    return root
+
+
+def test_the_commit_path_does_not_track_corpus_size(tmp_path):
+    """ADR-MAINTENANCE veto condition 5, in the words the record uses:
+    *"`post-commit` wall time must not track corpus size."*
+
+    Commit one document into a small corpus and into a corpus sixteen times
+    larger, and compare. An inline hook grows with the corpus — that is R5's
+    whole attribution, and none of it went away: `fux ingest` still walks and
+    shas every file and re-resolves every edge. What changed is that nobody
+    waits for it.
+
+    **Not a re-run of R5.** R5 judged the inline hook against a pre-registered
+    1 s bound at 100 000 documents and that verdict stands exactly as measured.
+    This asserts a ratio between two sizes, has no pre-registered threshold,
+    and rules on nothing.
+    """
+    small = _median_commit_time(_seeded_repo(tmp_path / "small", 50), "small")
+    large = _median_commit_time(_seeded_repo(tmp_path / "large", 800), "large")
+
+    # 3x is deliberately loose — this is a shape assertion on a shared CI box,
+    # not a latency budget. Constant work lands near 1x; an inline hook at 16x
+    # the corpus does not land under 3x.
+    assert large < small * 3, (
+        f"commit cost tracks corpus size: {small:.3f}s at 50 docs vs {large:.3f}s at 800 "
+        f"({large / small:.1f}x for 16x the corpus) - post-commit is doing the work inline"
+    )
+
+
+def test_nothing_fux_spawned_outlives_its_own_run(tmp_path):
+    """ADR-MAINTENANCE veto condition 6. The runner is one-shot: it may
+    outlive the *commit* (that is what deferral means) but it must exit, and
+    nothing resident may remain once it has."""
+    make_repo(tmp_path, hooks=True)
+    (tmp_path / "docs" / "resident.md").write_text(doc("residentterm"), encoding="utf-8")
+    git(tmp_path, "add", "-A")
+    subprocess.run(
+        ["git", "commit", "-qm", "resident"], cwd=tmp_path, capture_output=True, text=True,
+        env=_hook_env(),
+    )
+    assert _drain(tmp_path)
+
+    state = json.loads(fux(tmp_path, "doctor", "--json").stdout)["runner"]
+    assert state["running"] is False
+    assert state["lock"] == "free", "the runner exited without releasing its lock"
+
+
+def test_two_commits_in_quick_succession_produce_one_runner_and_one_index(tmp_path):
+    """The `git rebase` case, in miniature. A naive implementation spawns one
+    runner per commit; the lock is what makes it one."""
+    make_repo(tmp_path, hooks=True)
+    for i in range(4):
+        (tmp_path / "docs" / f"rapid{i}.md").write_text(doc(f"rapidterm{i}"), encoding="utf-8")
+        git(tmp_path, "add", "-A")
+        subprocess.run(
+            ["git", "commit", "-qm", f"rapid {i}"], cwd=tmp_path, capture_output=True, text=True,
+            env=_hook_env(),
+        )
+    assert _drain(tmp_path)
+
+    for i in range(4):
+        assert f"rapid{i}.md" in fux(tmp_path, "find", f"rapidterm{i}", "--json").stdout, (
+            f"rapid{i} was dropped - the union in the dirty list did not hold"
+        )
+
+
+def test_ingest_stop_exits_zero_with_nothing_running(tmp_path):
+    """ADR-CLI, 2026-08-22: "make sure it is not running" has succeeded when
+    it was not running. Every script that calls it defensively depends on it."""
+    make_repo(tmp_path, hooks=False)
+    result = fux(tmp_path, "ingest", "--stop")
+    assert result.returncode == 0
+    assert "no background re-index was running" in result.stdout
+
+
+def test_doctor_json_reports_the_runner(tmp_path):
+    """W-66 Phase 4: a status an agent cannot parse is not a status."""
+    make_repo(tmp_path, hooks=False)
+    payload = json.loads(fux(tmp_path, "doctor", "--json").stdout)
+    assert set(payload["runner"]) >= {"running", "pid", "lock", "pending", "last_run"}
+    assert any(c["name"] == "background runner" for c in payload["checks"])
+
+
+def test_doctor_reports_a_stale_lock_without_clearing_it(tmp_path):
+    """Veto 7 through the shipped CLI: reporting must not repair."""
+    make_repo(tmp_path, hooks=False)
+    dead = subprocess.Popen([sys.executable, "-c", "pass"])
+    dead.wait()
+    lock = tmp_path / ".fux" / "runtime" / "runner.lock"
+    lock.parent.mkdir(parents=True, exist_ok=True)
+    lock.write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
+    before = lock.read_bytes()
+
+    text = fux(tmp_path, "doctor").stdout
+    assert "fux ingest --stop" in text, "a stale lock must name its remedy"
+    assert lock.read_bytes() == before, "doctor cleared the lock it was only asked to report"
+
+    assert fux(tmp_path, "ingest", "--stop").returncode == 0
+    assert not lock.exists(), "the explicit takeover should have cleared it"
+
+
+def test_ask_declares_a_pending_reindex_on_stderr_never_stdout(tmp_path):
+    """W-66 Phase 3. Simulates the lagging window Phase 2's deferral will
+    open — a dirty list with no completed run behind it yet."""
+    make_repo(tmp_path, hooks=False)
+    quiet = fux(tmp_path, "ask", "aa", "--json")
+    assert quiet.stderr == ""
+
+    dirty_path = tmp_path / ".fux" / "runtime" / "dirty"
+    dirty_path.parent.mkdir(parents=True, exist_ok=True)
+    dirty_path.write_text("file:docs/aa.md\nfile:docs/gr.md\n", encoding="utf-8")
+
+    loud = fux(tmp_path, "ask", "aa", "--json")
+    assert loud.stdout == quiet.stdout  # the declaration never touches the contract
+    assert "2 changed path(s) pending re-index" in loud.stderr
 
 
 def test_a_hook_never_blocks_a_commit_even_when_fux_is_absent(tmp_path):

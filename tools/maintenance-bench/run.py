@@ -273,8 +273,18 @@ def _tier(name: str, description: str, expect_conflict: bool, build) -> dict:
     }
 
 
-def tier1(repo: Path, treatment: bool):
-    """Both sides add different documents — the everyday case."""
+def tier1_disjoint(repo: Path, treatment: bool):
+    """Both sides add different documents — the everyday case. **Unjudged.**
+
+    This was the pre-registered tier 1 on 2026-08-20 and it turned out
+    uninformative: two documents added on two branches usually hash into two
+    different shard files, and git's textual merge handles two different files
+    without help. Under
+    [`PRE-REGISTRATION-R6-v2.md`](PRE-REGISTRATION-R6-v2.md) §3 the judged tier
+    1 is the one-shard variant below, and this stays as a reported arm —
+    "most concurrent adds need no driver" is a true finding, and dropping the
+    arm that shows it would be deleting a result.
+    """
     _branch_edit(repo, "left", {"docs/left.md": _doc(500)})
     _branch_edit(repo, "right", {"docs/right.md": _doc(600)})
     git(repo, "checkout", "-q", "left")
@@ -337,16 +347,20 @@ def tier3(repo: Path, treatment: bool):
     return conflicted, paths
 
 
-def tier1b(repo: Path, treatment: bool):
-    """**Post-hoc, and labelled as such.** Disjoint adds into ONE shard.
+def tier1(repo: Path, treatment: bool):
+    """Disjoint adds into ONE shard — **the judged tier 1 since R6-v2.**
 
-    Tier 1 as pre-registered turned out uninformative: two documents added on
-    two branches usually hash into two different shard files, and git's textual
-    merge handles two different files without help. That is a real finding
-    about tier 1, not a defect to be hidden — so tier 1 is reported unchanged
-    and this arm is added beside it, **outside the verdict**, to answer the
-    question tier 1 was meant to answer: what happens when two people add
-    documents that land in the *same* shard?
+    Two people add documents at the same time, and the pair is pinned into one
+    shard file so the scenario actually exercises the driver rather than git's
+    ordinary two-different-files merge.
+
+    **This function's body is unchanged from when it was `tier1b`**, the
+    post-hoc arm added on 2026-08-20 after the original tier 1 came out
+    uninformative. Promoting it rather than rewriting it is deliberate: the
+    definition is in git history from before the re-specification, so *what* is
+    being measured does not depend on this session's word for it
+    ([`PRE-REGISTRATION-R6-v2.md`](PRE-REGISTRATION-R6-v2.md) §0). Its
+    post-hoc *result* remains inadmissible; only the specification carries over.
 
     The pair is found by hashing candidate names at run time, so nothing here
     depends on the corpus generator's ordering.
@@ -367,8 +381,8 @@ def tier1b(repo: Path, treatment: bool):
 
 def measure_r6() -> list[dict]:
     tiers = [
-        ("1 · machine, disjoint adds", "both sides add documents", False, tier1, False),
-        ("1b · machine, disjoint adds, one shard", "POST-HOC — outside the verdict", False, tier1b, True),
+        ("1 · machine, disjoint adds, one shard", "both sides add documents sharing a shard", False, tier1, False),
+        ("1-disjoint · machine, disjoint adds", "UNJUDGED — the everyday case; needs no driver", False, tier1_disjoint, True),
         ("2 · machine, one shard, two lines", "adjacency is not a disagreement", False, tier2, False),
         ("3 · the same document, both sides", "human conflict preserved; machine plane refuses", True, tier3, False),
     ]
@@ -378,10 +392,13 @@ def measure_r6() -> list[dict]:
         row["post_hoc"] = post_hoc
         rows.append(row)
         info = {True: "informative", False: "UNINFORMATIVE", None: "n/a"}[row["informative"]]
+        # An unjudged arm must never print PASS or FAIL. It contributes to no
+        # verdict, and a reader scanning this output for a red word should not
+        # find one on a line that decides nothing.
+        outcome = "unjudged" if post_hoc else ("PASS" if row["passes"] else "FAIL")
         print(
             f"  R6 tier {name}: treatment conflicted={row['treatment']['conflicted']} · "
-            f"control conflicted={row['control']['conflicted']} · {info} · "
-            f"{'PASS' if row['passes'] else 'FAIL'}"
+            f"control conflicted={row['control']['conflicted']} · {info} · {outcome}"
         )
     return rows
 
@@ -446,10 +463,11 @@ def main(argv=None) -> int:
         clean_tiers = [r for r in judged if r["informative"] is not None]
         all_informative = all(r["informative"] for r in clean_tiers)
         none_informative = not any(r["informative"] for r in clean_tiers)
-        # PRE-REGISTRATION.md §3.2, applied literally. The `AMBIGUOUS` branch is
-        # not a fourth outcome invented here — it is what the frozen table does
-        # NOT cover, and CLAUDE.md says a result between the defined rows is
-        # written up and handed to Arpit rather than adjudicated by the runner.
+        # PRE-REGISTRATION-R6-v2.md §3.2, applied literally — four rows, and
+        # every possible result now lands on exactly one of them. `PARTIAL` is
+        # the row the 2026-08-20 frozen table lacked, which is what made that
+        # run's outcome a reading rather than a verdict; it resolves nothing on
+        # purpose and routes to Arpit, per CLAUDE.md.
         if not matches:
             report["r6_verdict"] = "FAIL"
         elif all_informative:
@@ -457,7 +475,8 @@ def main(argv=None) -> int:
         elif none_informative:
             report["r6_verdict"] = "INCONCLUSIVE"
         else:
-            report["r6_verdict"] = "AMBIGUOUS — every tier matches; some but not all are informative"
+            report["r6_verdict"] = "PARTIAL — all tiers match; exactly one of tiers 1/2 is informative (Arpit's call)"
+        report["r6_pre_registration"] = "tools/maintenance-bench/PRE-REGISTRATION-R6-v2.md"
         print(f"  R6 verdict: {report['r6_verdict']}")
 
     if args.out:

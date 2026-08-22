@@ -11,58 +11,66 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — the inbox
 
-**Two calls, both filed 2026-08-20 out of R5's failure.** The three
-non-blocking calls filed 2026-08-21 are all closed — each was taken on the
-default its own detail file pre-authorised, which is what those defaults are
-for. (W-64's hook question: show the bar. W-63's two: `fux url` deleted
-outright, `ingest --refresh-urls` hidden for one release.)
-
-> **The design point moved to 10 000 documents on 2026-08-21** (Arpit —
-> CLAUDE.md §Litmus, which is the one normative home and is not restated here).
-> **It did not close anything in this inbox**, and the rows below say what it
-> did change. It did lower W-61's urgency from a 44 s problem to a 3.5 s one.
-
-- **W-61 · the fork** — [`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md).
-  **Open, lower urgency** (Arpit, 2026-08-21). R5 failed at 100 000 documents
-  (44.4 s vs a 1 s bound) and [ADR-MAINTENANCE](../docs/adr/0033_hooks.md)
-  veto 1 fired. Proposed **B — the hook defers**: commit cost becomes git's
-  cost (**0.34 s at 100k, constant**), the only option reaching the bound at
-  every size. **The design-point change did not close this — R5 fails at
-  10 000 too, 3.523 s against the same 1 s bound**, passing only near ~1 500.
-  What it *did* change is the option set: §0 of the compare doc shows that at
-  10k the fixed cost is 0.216 s and **a 4× speedup of the two O(corpus) passes
-  now reaches the bound**, where at 100k nothing under 100× did. **D is live
-  again**; B still wins on holding at every size. The matrix still weights
-  `holds at 10⁶ (×3)` and is re-weighted by whoever rules, in that change.
-- **W-61 · R6's arithmetic** — the record it decides is
-  [ADR-MERGE-DRIVER](../docs/adr/0034_merge-driver.md) since the 2026-08-21
-  split, not ADR-MAINTENANCE. Every tier matched, tiers 2 and 3 informatively,
-  but tier 1 also merged cleanly with the driver removed. **The
-  pre-registration's §3.1 and §3.2 disagree about this exact result** ("does
-  not count toward the pass" vs "tiers 1 and 2 must be informative"), so the
-  runner did not adjudicate it. The instrument, not the threshold, is what
-  should change — and not in the same change that files the verdict.
+**Empty.**
 
 ---
 
 ## Open items, by record
 
-### [ADR-GRAPH](../docs/adr/0030_graph.md) · [ADR-REFER](../docs/adr/0031_refer-plane.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) — the environments, and what they gate
+### [ADR-RS](../docs/adr/0036_predictions.md) — the prediction system, now owned
 
-- **W-61** · `arpit` · **both gates ran 2026-08-20. R5 **FAIL** ([R5-HOOK](regression/2026-08-20-r5-hook-latency/VERDICT.md)) — 44.4 s at the judged 100 000 documents against a **1 s** bound, and **0.651 s at 1 000, where it passes**. R6 **INCONCLUSIVE** ([R6-MERGE](regression/2026-08-20-r6-merge-driver/VERDICT.md)) — every tier matched, but tier 1 matched with the driver *removed* too, so it proves nothing.** The cost is two O(corpus) passes, and **a 10× speedup still misses the bound by 4.5×** — only taking the work off the commit path reaches it. **Two calls now sit with Arpit**: the fork ([`hook-at-scale.compare.md`](compare/hook-at-scale.compare.md), proposed **B — the hook defers**), and whether R6 reads as PASS under its own §3.1 or not-yet under §3.2. **Re-scoped 2026-08-21 — open at lower urgency**: the 10k design point leaves R5 failing (3.523 s vs 1 s) but makes it a 3.5 s problem rather than a 44 s one, and revives option D. **Neither the frozen pre-registration nor the filed verdict is edited** — a 10k bound would be a new pre-registration and a new verdict — [detail](open/W-61-maintenance-measurement.md)
-- **W-59** · `agent`+`arpit` · **R4 ran 2026-08-20 and PASSED** ([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)) — cold p95 **1.113 s** / 3 s, warm **0.016 s** / 300 ms, **with a boundary**: the plane fetches serially, so cold cost is `k ×` the source's latency and anything slower than ~295 ms breaches the bound at k=10. [ADR-REFER](../docs/adr/0031_refer-plane.md) is still **`proposed`** — one gate passing is not the whole DoD. **What keeps it open:** the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**), which needs goldens a human must write (W-57); and ARC-vs-LRU, which was measured but **post-hoc** — the metric changed after seeing a number it reversed — so the cache compare doc's trigger is Arpit's to call — [detail](open/W-59-refer-plane-measurement.md)
+- **W-69** · `agent` · **STARTABLE** · build ADR-RS **veto 4's register check**,
+  which is that record's **acceptance gate**. A test that walks
+  `work/regression/*/VERDICT.md`, reads each `prediction:` id, and asserts a
+  matching row in `IMPLEMENTATION.md`'s prediction table — **it would have
+  caught R9**, which ran, passed and was cited in six documents while having no
+  row, with nothing in the repo positioned to notice. **Small and mechanical**;
+  the care is in the direction: *every filed verdict has a row*, not *every row
+  has a verdict* (a RETIRED id has no verdict and must not fail). ⚠ **Accepting
+  ADR-RS before this exists would mean accepting a record whose central claim is
+  "the register is complete" while nothing verifies completeness** — the same
+  class of error as an unmeasured gate. **Model: Sonnet** — decided design,
+  assertable invariant — [detail](open/W-69-prediction-register-check.md)
+
+### [ADR-GRAPH](../docs/adr/0029_graph.md) · [ADR-REFER](../docs/adr/0030_refer-plane.md) — the two planes that shipped ahead of their acceptance measurement
+
+- **W-59** · `agent`+`arpit` · **R4 ran 2026-08-20 and PASSED** ([R4-REFER](regression/2026-08-20-refer-plane-r4/VERDICT.md)) — cold p95 **1.113 s** / 3 s, warm **0.016 s** / 300 ms, **with a boundary**: the plane fetches serially, so cold cost is `k ×` the source's latency and anything slower than ~295 ms breaches the bound at k=10. [ADR-REFER](../docs/adr/0030_refer-plane.md) went **`accepted` on 2026-08-21** (`9f8366e`, Arpit's call) — **with veto condition 2 left open, not closed**: the budget sweep reopens the record the moment it runs flat. **The stakes rose in the same change**: the plane is the default path in `fux answer` as of `v0.35.0`, so the assembler this item may delete is shipped code, not a spare part. **What keeps it open:** the budget sweep (**if it comes back flat the greedy assembler gets deleted, not kept**), which needs goldens a human must write (W-57); and ARC-vs-LRU, which was measured but **post-hoc** — the metric changed after seeing a number it reversed — so the cache compare doc's trigger is Arpit's to call — [detail](open/W-59-refer-plane-measurement.md)
 - **W-57** · `arpit` · **blocked on the goldens — a human must write them** · the graph lane's acceptance measurement is unrun, and **re-scoped 2026-08-20**: `q005`/`q009`/`q011`/`q015` were ids in the lost golden set and cannot be recovered, so the targets are now **phenomena** (supersession · near-duplication · staleness≠wrongness), all three built deliberately into the rebuilt corpus. **The supersession gap already reproduces** — `what replaced helix mesh` returns the superseded doc above the ADR that replaced it — [detail](open/W-57-graph-lane-acceptance.md)
 
-
-
-### [ADR-DIR-LIST](../docs/adr/0023_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
+### [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) — **parked**
 
 *Both are gated on a pre-registered instrument that does not exist, is not an
 item, and has no owner. **Parked with a trigger, not scheduled**: they resume
 when the pre-registration is written, and not because they look ready.*
 
-- **W-44** · **PARKED** · annotate archived results, never reorder — decided ([ADR-DIR-LIST](../docs/adr/0023_dir-list.md)); **trigger: a frozen query set with expected live-vs-archived answers exists** — [detail](open/W-44-archived-content-signalling.md)
+- **W-44** · `agent`+`arpit` · **the demotion weight landed 2026-08-22; the marker and disclaimer stay gated** · archived results — **scored normally, demotable, disclaimed**. **Landed:** the demotion weight ([ADR-DIR-LIST](../docs/adr/0022_dir-list.md) decision 11) — `[ranking] archived_weight` in `fux.toml`, **default `1.0`**, `fux.ingest.gitdir.archived_dirs()` reading the declaration (never a path), applied in the one shared `rank()` so the differential law carries it down both the scan and accelerator paths for free. Two tests, not one, per the ⚠ below: `tests/query/test_scan.py` asserts byte-identical results at the default **and** a live document overtaking an archived one once a weight is set; `tests_e2e/test_verbs.py` proves the same through the shipped CLI. **Still gated: the disclaimer** (decision 12, response-level, conditional) and the per-result `[archived]` marker — decision 10 says *"changing what a verb says about a document is a claim that needs an instrument"*, and the disclaimer says **more** than the marker, so it cannot be less gated. **Lifting that gate for the disclaimer alone is Arpit's call and is not assumed.** — [detail](open/W-44-archived-content-signalling.md)
 - **W-52** · **PARKED** · `df` is computed over the union — **42% of live terms carry an inflated `df`**; **trigger: the same pre-registration, plus a second corpus** — [detail](open/W-52-df-over-the-union.md)
+
+### [SETUP-PLAYGROUND](setup/fux-playground.md) · [SETUP-LAB](setup/fux-lab.md) — external sibling-repo redesign
+
+*Neither doc is an ADR (per [[fux-setup-docs]] / `docs/adr/README.md`'s
+scope), so this group is named by the Setup docs each item updates, not by a
+record in `docs/adr/`. **Filed 2026-08-22, planning only — nothing executed.**
+Both items are self-contained handoffs; read the detail file before starting
+either.*
+
+- **W-70** · `agent`+`arpit` · **planning only** · retire `fux-playground`'s
+  graded/goldens contract — Arpit, 2026-08-22: *"it is just for my personal
+  use... no testing or any sample set should be captured."* **Confirmed in
+  this session:** redefines `fux-playground` itself (not a separate repo).
+  ⚠ **This deletes the project's only ranking regression net** — do not
+  execute without first reading how W-57 and W-59 depend on this corpus's
+  phenomena. **Model: Sonnet** for the mechanical rewrite; **Opus** for where
+  the graded phenomena go, if anywhere — [detail](open/W-70-fux-playground-personal-sandbox.md)
+- **W-71** · `agent`+`arpit` · **planning only** · restructure `fux-lab` into
+  five independent git repos, one per tier — **10, 100, 1000, 5000, 10000**
+  documents (tier list confirmed this session) — each with its own fux setup,
+  for agent-driven testing/benchmarking. Two open questions are Arpit's call
+  before scaffolding starts: how `shared/` tooling is reused across five
+  independent repos, and whether the outer directory needs its own
+  safety net (the single-repo shape was partly why the 2026-08-20 loss was
+  recoverable at all). **Model: Sonnet** for scaffolding once those are
+  answered — [detail](open/W-71-fux-lab-tiered-repos.md)
 
 ### No record — external validation
 
@@ -71,33 +79,6 @@ fixtures. Owns no `src/`/`tools/` component — this is a measurement item,
 not a build.*
 
 - **W-62** · `agent`+`arpit` · **the README-fix half is agent-startable now; the three-way measurement and the five external installs are not** · moved here from PRIORITY.md's P8 row when that file was archived, 2026-08-21 — 50 real org-doc questions (Fux BM25F vs `rg` vs one commercial baseline, metric = agent task success and tokens, not p95) plus five external users' first-failure reports. **Why it matters**: 0 stars, a download pattern that looks like mirrors, and an industry converged on grep for local code — the wedge (private, off-disk enterprise docs) has never been tested against real docs or a real stranger's first fifteen minutes — [detail](open/W-62-measure-against-the-outside-world.md)
-
-### Every record that argues from the old design point — the reconciliation
-
-*No record owns this because it touches most of them. **Filed 2026-08-21, the
-same day the design point moved**, so that the staleness it names is an item
-rather than a silent inconsistency — the P2 precedent, at one tenth the size.*
-
-- **W-65** · `agent` · **STARTABLE** · reconcile the record set to the
-  10 000-document design point. **Nine live documents assert 10⁵–10⁶ as the
-  design point** and are now stale: `ADR-POSTINGS` (doc-major is *argued from*
-  that scale), `ADR-RECORD`, `ADR-TYPES`, `ADR-GRAPH`, `GLOSSARY`, and four
-  compare docs (`pruning-criterion`, `file-type-filter`, `source-exclusion`,
-  `refer-fetch-cache`, `storage-architecture`). **The fix is relabelling, not
-  deletion** — an argument that holds at 10⁶ usually still holds at 10⁴, and
-  the ones that *only* work at scale are exactly what this item must surface
-  rather than quietly rewrite. **Two hard rules: frozen pre-registrations and
-  filed `VERDICT.md`s are never edited** (`tools/maintenance-bench/PRE-REGISTRATION.md`
-  stays as written), and **the paper is W-26's, not this item's** —
-  [detail](open/W-65-design-point-reconciliation.md)
-
-### No record yet — the unbuilt milestones
-
-*Each writes its own record when it lands. **The detail file is the spec** —
-`PLAN.md` was archived 2026-08-18 and its scope migrated into these files.*
-
-- **W-26** · `agent` · **STARTABLE — the only agent-closable item requiring no external setup · RE-SCOPED TO 10 000 DOCUMENTS, Arpit 2026-08-21** · M6 scale & T2 — `tpack`, mmap segments, **10k + RFC bench (100k and 1M struck)**, paper §4–§6 rewritten to measured **at 10k**. **R7's budget is re-derived and pre-registered at 10k before any number is taken — the old ≤ 250 MB @100k row is history, not a divisor.** **And the milestone's first question is now whether T2 earns its place at all at 10k** — R3 measured 27.2 ms p95 on 8 870 RFCs, which is the design point almost exactly, so "T1 is enough" is a legitimate close that writes `ADR-T2-SEGMENTS` as a decision *not* to build. Its DoD wants *every* R prediction to carry **a measured value or an honest failure record**, and all four now do: R4 ✅ · R5 ❌ · R6 ⚠ · **R7 CLOSED unmeasured 2026-08-21** — [analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md); tier-auto correctness (R7's other half) stays unmeasurable until T2 exists — **still this milestone's own measurement to make, not a precondition for starting it.** **What it inherits from R5's failure:** 47.6 % of that 44 s is `fux build`, the derived plane M6 is about to add a *third tier* to — so measure any tier's rebuild cost before choosing its default. **What it inherits from R7's preliminary read:** the current committed index runs ~2× over a 250 MB@100k budget on real data — `ADR-POSTINGS`'s compact encoding (BIC/MPH, unbuilt) is the planned fix and is now better-motivated, not optional. **Unchanged:** tier-auto flips **by measurement, never by hand** — [detail](open/W-26-m6-scale-t2.md)
-- **W-38** · **PARKED** · blocked by W-26 · M8 deferred set — one record + sign-off each; **pruning work is forbidden outside this item** — [detail](open/W-38-m8-deferred.md)
 
 ---
 

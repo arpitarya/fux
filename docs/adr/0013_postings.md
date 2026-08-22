@@ -13,7 +13,7 @@ timestamp: 2026-08-18T00:00:00Z
 - **Status:** proposed
 - **Supersedes (on acceptance):** nothing — the postings shape was recorded
   only in passing, across two other records
-- **Owns (on acceptance):** no module. This record specifies a format that
+- **Owns:** **`tools/pruning-eval/`** — the gate harness and its frozen pre-registrations, **re-homed here 2026-08-22** when W-38 was dropped and left it orphaned; it belongs with the record that owns the pruning decision and now carries its standing law. Otherwise **no module** — this record specifies a format that
   [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) and
   [ADR-T1-ACCELERATOR](0011_accelerator.md) implement on their two sides
 - **Laws:** L2, L3 — see [ADR-LAWS](0001_laws.md); never restated here
@@ -121,13 +121,34 @@ An inverted index is term-major by default — that is what "inverted" means, an
 every textbook builds it that way. Fux commits its index to git, which changes
 the calculation completely.
 
-At 10⁵–10⁶ documents, a term-major committed index means a one-word edit
-touches every term line that word appears on. The diff is unreadable, two
-branches editing unrelated documents conflict on shared terms, and the review
-that the committed-index premise exists to enable becomes impossible.
+A term-major committed index means a one-word edit touches every term line that
+word appears on. The diff is unreadable, two branches editing unrelated
+documents conflict on shared terms, and the review that the committed-index
+premise exists to enable becomes impossible.
 
 Doc-major in git solves that and makes querying linear in the corpus. Hence two
 shapes — and the obligation to keep them equal.
+
+> **Re-checked against the 10 000-document design point, 2026-08-22 (W-65).**
+> This paragraph used to open *"At 10⁵–10⁶ documents…"*, and that phrase was
+> the reason W-65 named this record *"the one to think hardest about"*: the
+> scale looked like the premise of the doc-major decision.
+>
+> **It is not, and the decision does not move.** What makes term-major
+> unreviewable in git is *structural* — a posting list is keyed by term, so
+> editing one document rewrites every line for every word it contains,
+> whatever the corpus size. Scale sets the **magnitude** of the damage, not
+> its direction. At 10 000 documents with an ordinary Zipfian vocabulary a
+> common term's posting list still runs to thousands of entries, so a one-word
+> edit still produces a diff nobody reads and still conflicts with an unrelated
+> branch touching the same word.
+>
+> The scale clause was therefore removed rather than divided by ten: it was
+> emphasis, and leaving a number there would have implied the decision is
+> re-derivable from arithmetic it never rested on. **The argument survives at
+> the new design point unchanged, and the smallest corpus at which it stops
+> holding has never been measured** — nobody has needed it to be, because the
+> committed index is doc-major at every size fux ships.
 
 ### Decision
 
@@ -169,6 +190,20 @@ tokenizer, so a stopword is absent from both planes rather than filtered at
 query time ([ADR-RANKING](0012_ranking.md)).
 
 ### Consequences
+
+- **Pruning work is forbidden outside a dedicated, sign-off'd item — re-homed
+  here 2026-08-22.** This was W-38's "standing law" and moved when Arpit removed
+  that item from the queue. **It is a consequence of P1, not a preference:**
+  [P1-RERUN](../../work/regression/2026-08-09-pruning-rerun/VERDICT.md) measured
+  five selectors at matched retention and the best arm came in **35.9 points
+  below unpruned recall@20**, which is what put *full postings, permanently*
+  (option E) into this record. **If pruning appears in any other milestone's
+  diff, that is a plan violation, not a bonus** — and the reason is that a
+  pruning change looks like a size win and is measured as a recall loss, so it
+  is exactly the kind of work that gets waved through on the wrong metric.
+  The parked idea itself survives as
+  [`query-log-pruning.md`](../../work/proposals/query-log-pruning.md).
+
 
 - **A document edit is one line in one shard.** The reviewable-diff property
   the committed index exists for.
@@ -219,11 +254,11 @@ query time ([ADR-RANKING](0012_ranking.md)).
   *Inverted Files for Text Search Engines* (ACM Computing Surveys, 2006):
   https://dl.acm.org/doi/10.1145/1132956.1132959
 - The other generated files the derived plane writes alongside `postings/`,
-  each with its own record — [ADR-CACHEDIR-TAG](0024_cachedir-tag.md),
-  [ADR-DOCS-TABLE](0025_docs-table.md), [ADR-CODES-TABLE](0026_codes-table.md),
-  [ADR-RUNTIME-MANIFEST](0027_runtime-manifest.md),
-  [ADR-RUNTIME-STAMP](0028_runtime-stamp.md),
-  [ADR-RUNTIME-STATS](0029_runtime-stats.md).
+  each with its own record — [ADR-CACHEDIR-TAG](0023_cachedir-tag.md),
+  [ADR-DOCS-TABLE](0024_docs-table.md), [ADR-CODES-TABLE](0025_codes-table.md),
+  [ADR-RUNTIME-MANIFEST](0026_runtime-manifest.md),
+  [ADR-RUNTIME-STAMP](0027_runtime-stamp.md),
+  [ADR-RUNTIME-STATS](0028_runtime-stats.md).
 
 ### Veto condition
 
@@ -242,10 +277,18 @@ grep -oE '"[0-9a-f]{16}":\[[^]]*\]' .fux/index/*.jsonl | grep '\.' && echo "VETO
 # 3. collisions still fail the build rather than merging silently
 grep -n 'term-hash collision' src/fux/store/collisions.py
 
-# 4. committed density against the M6 budget (<= 250 MB packed @100k docs).
+# 4. committed index size — informational only, no threshold, by ruling.
+#    ⚠ 2026-08-22 (Arpit): **R7 IS RETIRED AND HAS NO SUCCESSOR.** The budget
+#    read "<= 250 MB packed @100k docs", frozen against a 10^5-10^6 design
+#    point. Arpit retired the promise outright rather than re-deriving it:
+#    "remove that promise, it's not needed... nothing related to fifty
+#    thousand or hundred thousand should be tested or committed, or have
+#    rules or promises for it."
+#    So this is a MEASUREMENT, never a gate. Print the number, watch it over
+#    time, and read NO pass or fail off it. A size promise returns only if
+#    Arpit reopens one, at 10 000 documents, as a new prediction with a new id.
 #    `du -sh` is working-tree size, not "packed" — isolate the index in a
-#    scratch repo and measure the real pack, the way the 2026-08-21
-#    preliminary analysis did (see below, and its evidence/pack_compression.sh)
+#    scratch repo and measure the real pack.
 bash work/regression/2026-08-21-r7-preliminary-analysis/evidence/pack_compression.sh
 ```
 

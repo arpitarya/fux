@@ -167,17 +167,68 @@ section *and* ADR-LAWS' table, in the same commit.
 ## Litmus for any new work
 
 **The design point is 10 000 documents** (Arpit, 2026-08-21). Fux is built,
-measured and judged at that size. **50 000 and then 100 000 are staged later
-targets, not the filter.**
+measured and judged at that size.
+
+> **And since 2026-08-22, it is a CEILING ON MEASUREMENT *AND* ON COMMITMENT.**
+> Arpit: *"no testing should go beyond ten thousand documents"*, and —
+> *"anything that talks about commitments for fifty thousand or hundred
+> thousand or above that, remove those commitments… there should be no rules or
+> promises for it."*
+>
+> **Above 10 000 documents: do not measure, do not file a verdict, do not write
+> a threshold, a budget, a bound, a veto condition or a pre-registration, and do
+> not block work on one.** 50 000 and 100 000 are re-entered deliberately, by
+> Arpit, when the build is done — they are not a queue a session may start
+> drawing from because it has capacity.
+>
+> **Two predictions were withdrawn under this rule on 2026-08-22**: **R7**
+> (committed-index size, budget frozen at 100k) and **R8** (a graph-verb bound
+> at 100k, never registered). Both ids are **retired and not reused**. If either
+> question is wanted again it returns as a **new prediction at 10 000 with a new
+> id** — never a revival at a smaller size, which would be moving a frozen
+> threshold in disguise.
+>
+> **THE CEILING IS ON MEASUREMENT AND PROMISES — NOT ON THE DESIGN'S REACH.**
+> Arpit, 2026-08-22: *"since we are limiting it till ten k, that does not mean
+> that we need to update the design. Later on, we will build it for fifty k,
+> hundred k, and so on."*
+>
+> **Fux is still architected to scale.** A document describing how the design
+> behaves at 10⁵–10⁶ is **describing the architecture, not making a promise**,
+> and it is not stale — it says where this is going. **Do not "clean up"
+> architectural prose to match the current test target.** The paper's §4
+> (one keyspace) is the worked example: it names no corpus size at all, so no
+> size ruling can ever make it stale, and a session that "reconciled" it would
+> be destroying a correct document to satisfy a rule that does not apply to it.
+>
+> **The test, applied per sentence:** does it *commit* to something at a size
+> above the ceiling — a threshold, a budget, a bound, a veto — or does it
+> *describe* how the design works there? **Commitments go. Descriptions stay.**
+>
+> **Three things this does NOT do**, and getting these wrong is how a scope
+> ruling turns into a data loss:
+> 1. **It does not un-measure anything.** Verdicts already filed above 10 000 —
+>    R5's 44.4 s at 100 000 above all — **stand exactly as measured** and are
+>    never edited. A pre-registered threshold may never move, and a scope change
+>    is not a re-judgement.
+> 2. **It does not delete a feature.** Arpit: *"whatever features are built,
+>    let's keep them — they are going to be helpful either way."* Nothing is
+>    ripped out for being bigger than the current target.
+> 3. **It does not forbid an ARGUMENT about scale.** *"This cost is constant in
+>    the corpus"* is a structural claim, not a measurement, and it stays
+>    legitimate. What is forbidden is going and **measuring** it at 50 000 to
+>    prove the point.
 
 This replaced a 10⁵–10⁶ design point on 2026-08-21. **What changed is the
 scale filter. What did not change is the deployment filter** — a
 10 000-document corpus inside a corporation is still inside that corporation.
 
-- **Scale is a staged target, not the default.** 10k now; 50k next; 100k
-  after that. An argument that turns on 10⁵–10⁶ documents describes where the
-  design is heading and **may not gate work today**. A feature is not blocked,
-  and a measurement is not owed, because of a size Fux is not yet built for.
+- **Scale is a staged target, not the default — and the later stages are
+  closed to measurement.** 10k now. 50k and 100k are **later**, and since
+  2026-08-22 no session runs a measurement at either without Arpit re-opening
+  them. An argument that turns on 10⁵–10⁶ documents describes where the design
+  is heading and **may not gate work today**. A feature is not blocked, and a
+  measurement is not owed, because of a size Fux is not yet built for.
 
 - **Enterprise realities are still design inputs** — Windows-first fleets,
   proxies and SSO in front of every internal site, air-gapped/regulated
@@ -191,7 +242,8 @@ scale filter. What did not change is the deployment filter** — a
 The question per feature: *"does this hold up on a 10 000-document corpus
 inside that corporation, and does it foreclose 50k later?"* **The second
 clause is a check against painting into a corner — not a licence to build for
-a size nobody is measuring.**
+a size nobody is measuring, and since 2026-08-22 not a licence to measure one
+either.** Answer it by reasoning, never by running a 50 000-document bench.
 
 Anton remains a convenient testbed. **Do not design in reference to it.**
 
@@ -363,7 +415,7 @@ code moved**:
    top. A wrong old entry is corrected by a new entry, not by a rewrite.
    (The mandatory `Cost:` line was dropped 2026-08-21, PRIORITY.md P7 —
    58 of 58 entries had said `unmeasured`; see
-   [`work/proposals/process-diet.md`](work/proposals/process-diet.md).)
+   [`archive/proposals/process-diet.md`](archive/proposals/process-diet.md).)
 2. **[`work/INTERVIEW.md`](work/INTERVIEW.md)** — the state-of-play doc, kept
    current **during** the session, not in a wrap-up pass. Four maintained
    sections: state of play · in-flight work + the immediate next step ·

@@ -13,7 +13,7 @@ The source list is an include-only whitelist. There is no way to say *"index
 this directory, except the machine-generated parts."*
 
 **The list moved on 2026-08-19** — it is `.fux/sources/dirs`, not
-`[sources] dirs`, which is now a retired key ([ADR-DIR-LIST](../../docs/adr/0023_dir-list.md)
+`[sources] dirs`, which is now a retired key ([ADR-DIR-LIST](../../docs/adr/0022_dir-list.md)
 decision 1). Nothing about the finding below changed; only where the whitelist
 lives, and the fact that a line can now carry an attribute.
 
@@ -40,7 +40,7 @@ But it is a convention riding on an implementation detail:
   problem and no dot-prefix to reach for.
 
 > **2026-08-19 — this item now has a home, and still no verdict.**
-> [ADR-DIR-LIST](../../docs/adr/0023_dir-list.md) moves source directories into
+> [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) moves source directories into
 > a line-oriented committed file with per-entry attributes, so "index this
 > directory, except the generated parts" is an attribute on a line rather than a
 > new config shape. **The schema question is answered; the fork is not.** The

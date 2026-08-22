@@ -335,7 +335,15 @@ def _fill_deferred(runtime, blocks, opened, query_hashes, hits, read_blocks) -> 
                     hits[docidx][term] = (tf_h, tf_b)
 
 
-def ask(root: Path, query: str, top: int = 5, *, skipping: bool = True) -> list[AskResult]:
+def ask(
+    root: Path,
+    query: str,
+    top: int = 5,
+    *,
+    skipping: bool = True,
+    archived_weight: float = 1.0,
+    archived_dirs: frozenset[str] = frozenset(),
+) -> list[AskResult]:
     """The accelerated `ask`. Identical output to `query.scan.ask`, by law."""
     query_hashes = query_term_hashes(query)
     if not query_hashes:
@@ -344,4 +352,7 @@ def ask(root: Path, query: str, top: int = 5, *, skipping: bool = True) -> list[
     if not (runtime.dir / fmt.STATS_NAME).exists():
         raise FuxError("no accelerator built — run `fux ingest` (or `fux build`) first")
     candidates, df, corpus = accel_candidates(runtime, query_hashes, top, skipping=skipping)
-    return rank(candidates, query_hashes, df, corpus, top)
+    return rank(
+        candidates, query_hashes, df, corpus, top,
+        archived_weight=archived_weight, archived_dirs=archived_dirs,
+    )

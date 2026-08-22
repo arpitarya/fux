@@ -4,6 +4,7 @@ name: R6-MERGE
 title: R6-MERGE — the three-tier merge harness — INCONCLUSIVE
 description: "All three tiers matched their expected outcome and the driver is demonstrably doing the work on tiers 2 and 3, but tier 1 merged cleanly with the driver removed as well — so it proves nothing, and the frozen verdict table does not cover 'some but not all tiers informative'. The substance of R6 holds; the arithmetic is Arpit's call."
 verdict: INCONCLUSIVE
+adjudication: "PASS — Arpit, 2026-08-22, ruling that §3.1 governs. The measured verdict below is unchanged and unedited; the adjudication is an addendum."
 prediction: R6
 pre_registration: tools/maintenance-bench/PRE-REGISTRATION.md
 timestamp: 2026-08-20T00:00:00Z
@@ -94,3 +95,44 @@ Two readings, and the pre-registration supports both, which is the defect:
 threshold**: tier 1 should be re-specified so that its two added documents
 share a shard — which is what 1b already does — and re-run clean. That is a new
 measurement with its own verdict, not an edit to this one.
+
+---
+
+## Adjudication — Arpit, 2026-08-22
+
+> **Nothing above this line was edited.** A filed verdict is a measurement, and
+> nothing supersedes a measurement except a better measurement. What follows is
+> the answer to the section directly above it — *"The call in front of Arpit"* —
+> recorded where the question was asked.
+
+**Ruling: PASS, under §3.1's reading.** An uninformative tier *"does not count
+toward the pass"*, so tier 1 is dropped from the tally and R6 is judged on the
+tiers that do count — **tiers 2 and 3, both informative, both matched**.
+[ADR-MERGE-DRIVER](../../../docs/adr/0034_merge-driver.md) moves to `accepted`
+on that basis.
+
+**Why the runner could not have taken this call.** §3.2's PASS row requires
+tiers 1 **and** 2 informative; its INCONCLUSIVE row requires **neither**. This
+result — all tiers matching, one of two informative — fits no row in the frozen
+table. CLAUDE.md's rule is that a result between the defined outcomes is written
+up and handed to Arpit rather than adjudicated by whoever ran it. That is what
+happened, and this is the other half of it.
+
+**What this ruling is honestly resting on.** §3.1's clause and §3.2's table
+disagree, and the ruling picks the former. That is a defensible reading — §3.1
+is where informativeness is *defined* and where its consequence is *stated*,
+while §3.2 is a summary table — but it is a reading, not a derivation. **Two
+obligations follow, and both are W-67:**
+
+1. **Repair the instrument, in a change separate from any verdict.** §3.1 and
+   §3.2 are made to agree. The threshold itself is not touched — a
+   pre-registered threshold may never move.
+2. **Re-specify tier 1 and re-run.** Its two added documents must be selected
+   by hashing to share a shard, which is what the post-hoc tier 1b already
+   does. That is a **new** pre-registration and a **new** verdict, never an
+   edit to this one. [ADR-MERGE-DRIVER](../../../docs/adr/0034_merge-driver.md)
+   veto condition 2 is the tripwire if it comes back FAIL.
+
+**What the ruling does not do.** It does not turn tier 1 into evidence, it does
+not promote the post-hoc tier 1b into this verdict, and it does not make the
+frozen table any less contradictory than it was on 2026-08-20.

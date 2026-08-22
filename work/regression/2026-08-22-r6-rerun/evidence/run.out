@@ -1,0 +1,7 @@
+R6 — the three-tier merge harness, with a control arm
+  R6 tier 1 · machine, disjoint adds, one shard: treatment conflicted=False · control conflicted=True · informative · PASS
+  R6 tier 1-disjoint · machine, disjoint adds: treatment conflicted=False · control conflicted=False · UNINFORMATIVE · unjudged
+  R6 tier 2 · machine, one shard, two lines: treatment conflicted=False · control conflicted=True · informative · PASS
+  R6 tier 3 · the same document, both sides: treatment conflicted=True · control conflicted=True · n/a · PASS
+  R6 verdict: PASS
+wrote work/regression/2026-08-22-r6-rerun/evidence/report.json

@@ -110,7 +110,7 @@ sources. It changes what `hashed` *costs* a reader.
 **Ruled: no — outside L2 entirely.** Not "`hashed` implies `snapshot`", and
 not a new named exception either.
 
-Grounding: [ADR-CACHE](../../docs/adr/0035_cache.md) (written two days
+Grounding: [ADR-CACHE](../../docs/adr/0034_cache.md) (written two days
 earlier, same author, same reasoning target) already ruled that ARC and the
 TTL fetch cache — gitignored, per-machine, never committed — sit outside
 L2's scope: *"L2 forbids durable content; this store is deliberately the
