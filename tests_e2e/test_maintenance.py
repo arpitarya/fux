@@ -237,8 +237,16 @@ def test_the_commit_returns_before_the_re_index_has_happened(tmp_path):
     assert committed.returncode == 0, "a hook must never block a commit"
 
     output = committed.stdout + committed.stderr
-    assert "in the background" in output, (
-        f"post-commit did not announce a deferred re-index. Output was:\n{output}"
+
+    # **Two announcements, and both are deferral.** The hook either spawned a
+    # runner ("re-indexing in the background") or found one already live and
+    # left it to pick the work up ("a re-index is already running"). Which one
+    # you get is a race with the previous commit's runner, and it goes the
+    # second way routinely on a slower box — every Linux CI arm hit it while
+    # macOS and Windows did not. The property under test is the same either
+    # way: the hook did not do the work before handing back.
+    assert "re-index" in output, (
+        f"post-commit announced no deferred re-index at all. Output was:\n{output}"
     )
     assert "ingested" not in output, (
         f"post-commit ran an ingest inline — that is what R5 measured at 44 s.\n{output}"
