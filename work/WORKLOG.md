@@ -30,6 +30,13 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-22 — v0.37.1 published (docs-only patch)  ·  Claude Code
+
+- **Asked:** *"commit everything and publish a patch version"* — following on from a "recreate the README" request where I'd surfaced that no `src/` code had changed since `v0.37.0` shipped. Arpit chose to bump anyway.
+- **Did:** committed the `.fux/index/` shards the maintenance hooks had re-derived from the prior doc edits (58 files total), bumped `__init__.py` to `0.37.1`, added its CHANGELOG entry, pushed to `main` (`6e00fc9`), watched CI green (`gh run watch`), cut `gh release create v0.37.1`, watched `publish.yml` succeed, and polled `pypi.org/pypi/fux-engine/json` until it read `0.37.1` (took ~20s after the workflow completed).
+- **Decided / open:** nothing open. No ADR affected — no `src/` behaviour changed beyond the version string.
+- **Next:** none — queue is empty.
+
 ## 2026-08-22 — README recreated for v0.37.0; this session's doc work committed and pushed  ·  Claude Code
 
 - **Asked:** *"re create the root readme file and then commit and publish."*

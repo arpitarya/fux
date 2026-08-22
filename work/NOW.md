@@ -1,1 +1,1 @@
-QUEUE EMPTY (both lanes + inbox). README.md recreated for v0.37.0 (status bump, W-57 closure, archived-content paragraph) and this session's prior doc work (ADR TEMPLATE worked-output block, dead-link repairs, A+D confirmation) committed and pushed to main.
+QUEUE EMPTY (both lanes + inbox). v0.37.1 published to PyPI — docs-only patch (README, ADR TEMPLATE, re-derived .fux/index/ shards); no src/ change beyond the version string.
