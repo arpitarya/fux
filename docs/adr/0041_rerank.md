@@ -192,6 +192,46 @@ Condition 1 is the live one. On today's evidence enrichment is worth 10 points
 and reranking 4, and a 35 MB dependency targets the class enrichment already
 covers deterministically and for free.
 
+> ## Amended 2026-08-24 — the premise under that sentence MOVED. The ruling stands.
+>
+> **The comparison was between a clean number and a contaminated one**, and
+> nothing in this record said so. *Reranking is worth 4* was measured with no
+> knowledge of the goldens in the mechanism — it is arithmetic over passages,
+> and it could not target a query even in principle. ***Enrichment is worth
+> 10*** came from text written by an author **who had already read the failing
+> queries**.
+>
+> **The blind re-grade**
+> ([run](../../work/regression/2026-08-24-blind-enrichment-regrade/report.md))
+> put enrichment written by an author who had **not** seen the goldens against
+> the same corpus, engine and goldens. Both previously-recorded numbers
+> reproduced exactly, so it is a comparison rather than a different experiment:
+>
+> | | reranking | enrichment (as measured) | enrichment (blind) |
+> |---|---|---|---|
+> | net | **+4** | +9 to +10 | **+1** |
+> | broke | **0** | 0 | **2** |
+>
+> **The ordering inverts**, and blind enrichment is the only one of the three
+> that breaks a query that previously passed.
+>
+> **The diagnostic is the zero, not the score.** Enrichment adds vocabulary to
+> nine of ten documents on a ten-document corpus — a large perturbation of
+> `df` and `avg_wlen`. The blind arm shows what that costs unaimed: two
+> regressions. An arm that perturbs that much and disturbs **not one** of fifty
+> rankings has been fitted to the evaluation.
+>
+> **This amendment deliberately does NOT reopen veto 1.** A ruling made on a
+> comparison, whose comparison has since moved, is reopened **by the person who
+> made it** — that is [W-78](../../work/OPEN-WORK.md), in Arpit's lane. What
+> this record owed was to stop stating a contaminated number as *today's
+> evidence* without saying so. **Condition 2 is untouched and independent**:
+> `onnxruntime` is still not byte-identical across x86-64 and arm64, so the
+> cross-encoder remains refused on determinism whatever happens to condition 1.
+>
+> ⚠ **Scope:** N = 1 blind author, and authorship quality is an unseparated
+> confound. The run says so in its own §Scope.
+
 **Veto 2 — the reranker must never change the membership of a result set.**
 
 ```bash

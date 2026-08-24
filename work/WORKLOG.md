@@ -30,6 +30,53 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-24 — the blind enrichment re-grade: +1, not +10  ·  Cowork
+
+- **Asked:** the second half of *"4 and 5 look good implement it now"* — run the
+  blind enrichment re-grade the rerank run named as its own follow-up.
+- **Did:** three arms on `fux-playground`, same corpus, engine and goldens, one
+  variable. The blind arm's enrichment was written by a **separate agent with a
+  fresh context**, given the ten documents and the authoring skill and
+  **forbidden** from reading `goldens/`, the previous enrichment, `check.py`,
+  the README (which quotes the old numbers) or the committed index — and from
+  running any ranking command, so it could not iterate toward the answer.
+
+  | arm | pass | net | fixed | broke |
+  |---|---|---|---|---|
+  | no enrichment | 32/50 | baseline | - | - |
+  | **blind** | **33/50** | **+1** | 3 | **2** |
+  | as committed | 41/50 | +9 | 9 | **0** |
+
+  Both previously-recorded numbers reproduced **exactly**, which is what makes
+  this a comparison rather than a different experiment.
+- **The finding, and it is structural rather than statistical.** **The
+  diagnostic is the zero.** Enrichment adds vocabulary to nine of ten documents
+  on a ten-document corpus — a large perturbation of `df` and `avg_wlen`. The
+  blind arm shows what that costs unaimed: two regressions. An arm that
+  perturbs that much and disturbs **not one** of fifty rankings has been fitted
+  to the evaluation. That argument does not need N to be large, which is
+  fortunate: **N is 1**, and authorship quality is an unseparated confound.
+- **Fux already forbids this in the other direction.** There is no
+  `--update-goldens` flag, because a golden regenerated from engine output is a
+  screenshot with a test attached. This is the same failure through the other
+  door — corpus metadata fitted to the goldens — and nothing forbade it.
+- **Decided / open:**
+  - **ADR-RERANK amended, deliberately NOT reopened.** Its veto 1 deferred the
+    cross-encoder on *"enrichment is worth 10 and reranking 4"*; blind that
+    reads **+1 against +4**. What the record owed was to stop asserting a
+    contaminated number as *today's evidence*. **Reopening a ruling made on a
+    comparison is the ruler's call** — filed as **W-78**, `arpit` lane.
+  - ⚠ **Veto 1's condition 2 is independent and untouched**: `onnxruntime` is
+    still not byte-identical across architectures, so the cross-encoder stays
+    refused on determinism whatever is decided. Reopening condition 1 licenses
+    an argument, not a build.
+  - A **blind-authorship rule** is proposed for ADR-RS rather than ADR-ENRICH:
+    `fux enrich` cannot enforce it, because the model is the author and fux
+    never calls one, so it is measurement protocol and not engine behaviour.
+- **Next:** W-78's two rulings, then W-77's four. Both are Arpit's.
+
+---
+
 ## 2026-08-24 — ADR-TUNE built: the tunables file, and a stats plane that was baking a tunable  ·  Cowork
 
 - **Asked:** *"4 and 5 look good implement it now"* — build ADR-TUNE, and run

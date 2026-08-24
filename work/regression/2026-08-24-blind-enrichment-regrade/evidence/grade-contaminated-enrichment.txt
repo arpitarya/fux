@@ -1,0 +1,12 @@
+  FAIL   q006: wanted docs/postmortem-checkout-outage.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']
+  FAIL   q007: wanted docs/reference-deployment-tiers.md at rank <= 1, got 2 | top: ['docs/guide-onboarding.md', 'docs/reference-deployment-tiers.md', 'docs/reference-calderctl.md']
+  FAIL   q012: wanted docs/reference-calderctl.md at rank <= 2, got 4 | top: ['docs/guide-oncall-rota.md', 'docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md']
+  FAIL   q019: wanted docs/adr-0019-calder-gateway.md at rank <= 2, got 5 | top: ['docs/adr-0007-helix-mesh.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']
+  FAIL   q028: wanted docs/runbook-gateway-rollback.md at rank <= 1, got 5 | top: ['docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md', 'docs/policy-data-retention.md']
+  FAIL   q029: wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 5 | top: ['docs/postmortem-checkout-outage.md', 'docs/reference-calderctl.md', 'docs/policy-data-retention.md']
+  FAIL   q034: wanted docs/guide-oncall-rota.md at rank <= 2, got 3 | top: ['docs/reference-deployment-tiers.md', 'docs/guide-onboarding.md', 'docs/guide-oncall-rota.md']
+  FAIL   q035: wanted docs/guide-onboarding.md at rank <= 1, got 2 | top: ['docs/guide-oncall-rota.md', 'docs/guide-onboarding.md', 'docs/postmortem-checkout-outage.md']
+  FAIL   q044: wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md']
+
+FAIL 9 · pass 41
+FAIL — 9 of 50

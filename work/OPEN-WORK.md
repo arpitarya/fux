@@ -18,18 +18,25 @@ reopening condition. Decisions in
 `archive/open/W-76-DECISIONS.md` D27–D30, evidence in
 [`regression/2026-08-24-rerank-and-goldens/`](regression/2026-08-24-rerank-and-goldens/).
 
-**One follow-up is worth a person and is not blocking anything:** have someone
-write enrichment for the playground **without reading `goldens/queries.jsonl`**,
-and re-grade. The enrichment measured on 2026-08-24 was written by an author who
-had already seen the failing queries, so `38/50` and `41/50` are an **upper
-bound**, not a measurement — disclosed in that run's `ANALYSIS.md` §1. The
-unenriched `28 -> 32` is unaffected. This is also what would let **W-76 veto 3**
-(*how small is "a small tilt"?*) be set on a clean number rather than a
-contaminated one.
+**The blind re-grade RAN (2026-08-24), and it did not come back small.**
+Enrichment written by an author who had **not** seen the goldens is worth
+**`+1`** (`32 -> 33`); the enrichment as committed, whose author had, is worth
+**`+9`** (`32 -> 41`). Both previously-recorded numbers reproduced exactly.
+**The diagnostic is not the score — it is that the contaminated arm breaks
+zero** of fifty rankings while adding vocabulary to nine of ten documents; the
+blind arm fixes 3 and **breaks 2**.
+[The run](regression/2026-08-24-blind-enrichment-regrade/report.md) ·
+[what it means, unadjudicated](regression/2026-08-24-blind-enrichment-regrade/ANALYSIS.md).
+
+**Two rulings are now owed, and both are yours — [W-78](open/W-78-enrichment-was-measured-against-its-own-answers.md) below.**
 
 ---
 
 ## Open items, by record
+
+### [ADR-RERANK](../docs/adr/0041_rerank.md) · [ADR-RS](../docs/adr/0036_predictions.md) — a ruling made on a number nobody knew was contaminated
+
+- **W-78** · `arpit` · **filed 2026-08-24 from the blind re-grade.** **Enrichment is worth `+1` blind and `+9` when its author has read the failing queries.** ADR-RERANK's veto 1 deferred the cross-encoder on *"enrichment is worth 10 points and reranking 4, and a 35 MB dependency targets the class enrichment already covers deterministically and for free"* — **blind, that reads +1 against +4, and the class is not covered.** The record has been amended to stop asserting the contaminated number as today's evidence and **deliberately not reopened**: a ruling made on a comparison is reopened by the person who made it. ⚠ **Veto 1's condition 2 is independent and untouched** — `onnxruntime` is still not byte-identical across architectures, so the cross-encoder stays refused on determinism whatever is decided; reopening condition 1 licenses an argument, not a build. **Second ruling owed:** fux forbids `--update-goldens` because a golden regenerated from engine output is a screenshot with a test attached — **this is the same failure through the other door**, corpus metadata fitted to the goldens, and nothing forbade it. A blind-authorship rule is proposed for [ADR-RS](../docs/adr/0036_predictions.md), which is where a measurement-protocol rule belongs (`fux enrich` **cannot** enforce it — the model is the author and fux never calls one). ⚠ N = 1 blind author; **authorship quality is an unseparated confound**, and a second blind author is the cheap agent-closable way to settle it. **Model: Opus** — the ruling is a judgement about evidence — [detail](open/W-78-enrichment-was-measured-against-its-own-answers.md)
 
 ### [ADR-RANKING](../docs/adr/0012_ranking.md) · the whole register — records vs the code they describe
 
