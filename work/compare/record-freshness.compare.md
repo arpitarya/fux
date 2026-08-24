@@ -15,7 +15,7 @@ timestamp: 2026-08-20T00:00:00Z
 > the *middle*, and in HTTP — where this whole vocabulary comes from — the
 > middle exists to **avoid the fetch**, not to make the answer more correct.
 > Nobody has measured that fetch cost yet: **R4 is unmeasured**
-> ([W-59](../open/W-59-refer-plane-measurement.md)). Deciding a cost
+> ([W-59](../../archive/open/W-59-refer-plane-measurement.md)). Deciding a cost
 > optimisation before measuring the cost is backwards.
 > **Status:** ✅ decided 2026-08-20 — Arpit: **D**. **Confidence:** high on
 > rejecting B (mtimes), high on A/C collapsing into one option, medium on D
@@ -30,7 +30,7 @@ title · phrases · terms · wlen · edges`. **None is temporal.** `ver` is a
 revision counter — it increments when the content sha changes — and says
 nothing about *when*.
 
-[`caller-set-freshness-policy.md`](../proposals/caller-set-freshness-policy.md)
+[`caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md)
 specified `{max_age_seconds, timeout_seconds}`, with age measured against
 recorded provenance. **That provenance does not exist**, so
 [ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4 refused to ship the
@@ -125,7 +125,7 @@ exists.
   the endpoints. If E ever lands, it slots between them without changing
   either.
 - **This decision is measurable later and not now.** R4 has not run
-  ([W-59](../open/W-59-refer-plane-measurement.md)), so the cost `max_age`
+  ([W-59](../../archive/open/W-59-refer-plane-measurement.md)), so the cost `max_age`
   would avoid is unknown. Under the repo's own rule — never ship off an
   unmeasured hunch — that settles it for today.
 
@@ -146,4 +146,4 @@ under [`work/regression/`](../regression/README.md), not an opinion.
   https://reproducible-builds.org/docs/timestamps/
 - The refusal this doc either confirms or overturns —
   [ADR-REFER](../../docs/adr/0030_refer-plane.md) decision 4.
-- The finding — [W-58](../open/W-58-no-recorded-ingest-time.md).
+- The finding — [W-58](../../archive/open/W-58-no-recorded-ingest-time.md).

@@ -43,7 +43,7 @@ commitment; everything here is findable.
 [ADR-REFER](../../docs/adr/0030_refer-plane.md), which is still `proposed`
 because R4 has not run. One of the two shipped with its central knob
 deliberately refused; the reasoning is in the record and the open question is
-[W-58](../open/W-58-no-recorded-ingest-time.md).*
+[W-58](../../archive/open/W-58-no-recorded-ingest-time.md).*
 
 **Filed 2026-08-22:**
 

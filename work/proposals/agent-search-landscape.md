@@ -14,8 +14,8 @@ tags: [landscape, refer-plane, evidence, positioning]
 > rejected option: the evidence base two proposals cite, and the record of
 > *why* they were filed.
 >
-> **Spawned:** [`caller-set-freshness-policy.md`](caller-set-freshness-policy.md) ·
-> [`token-budget-retrieval.md`](token-budget-retrieval.md)
+> **Spawned:** [`caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md) ·
+> [`token-budget-retrieval.md`](../../archive/proposals/token-budget-retrieval.md)
 
 ## Signal
 
@@ -70,7 +70,7 @@ independently, from the opposite end of the scale axis.
 
 The one thing they add that Fux does not yet have is that the *caller* sets the
 staleness tolerance. That became
-[`caller-set-freshness-policy.md`](caller-set-freshness-policy.md).
+[`caller-set-freshness-policy.md`](../../archive/proposals/caller-set-freshness-policy.md).
 
 ### 2 · The unit of retrieval is a token budget, not a result count
 
@@ -84,7 +84,7 @@ staleness tolerance. That became
 
 - Everyone else ranks documents and then truncates. Parallel claims to rank
   *for* the truncation. It is the sharpest idea in the peer set, and it became
-  [`token-budget-retrieval.md`](token-budget-retrieval.md).
+  [`token-budget-retrieval.md`](../../archive/proposals/token-budget-retrieval.md).
 
 ### 3 · The retrieval unit is the passage, not the document — four independent arrivals
 

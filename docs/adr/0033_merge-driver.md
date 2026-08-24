@@ -158,6 +158,20 @@ Merge made by the 'ort' strategy.
 > three-line fixture shards. The fixtures are reduced — a real record carries
 > `terms`, `code` and `edges` — and the driver reads only `id` and `ver`.
 
+> **Amended 2026-08-24 (W-76 Phases 1, 2 and 7) — one word in the aside.** *"A
+> real record carries `terms`, `code` and `edges`"*: `code` was removed in
+> Phase 1. A real record carries `terms`, `flen`, `vectors` and `edges`, plus
+> the `mtime` and `superseded` priors when it has them —
+> [ADR-RECORD](0010_index-record.md) holds the full list.
+>
+> **The clause it qualifies is the one that matters and it is untouched: the
+> driver reads only `id` and `ver`.** That is why the fixture transcripts above
+> are still valid evidence and are not re-captured — they would be
+> byte-identical, because every field this amendment corrects is a field
+> `merge_shards` never looks at. A driver that had to know the schema would
+> need re-capturing on every phase of W-76; this one did not need re-capturing
+> on any.
+
 ---
 
 ## §2 — For agents

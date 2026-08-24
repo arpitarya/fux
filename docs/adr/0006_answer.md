@@ -111,8 +111,28 @@ title: Why pruning failed
 
 The gate measured static pruning twice and it did not preserve candidate recall.
 
-  -- docs/pruning.md#p0 (sha b0093c74baa0, current)
+  -- docs/pruning.md:L1-L6 (sha b0093c74baa0, current)
 ```
+
+> **Amended 2026-08-24 (W-76 Phases 1 and 5) — every worked output above, and
+> the one in §2 with it.** The trailing line read
+> *`-- docs/pruning.md#p0 (sha b0093c74baa0, current)`*, and the `--json`
+> capture carried *`"loc": "docs/pruning.md#p0"`*. These are this record's
+> **only** worked outputs, and decision 2 below points a reader straight at
+> them, so a wrong locator shape here is not cosmetic — it is the thing a
+> caller writes a parser against.
+>
+> **Phase 5 changed the locator from `path#p3` to `path:L12-L40`**, because an
+> agent acts on a citation by opening a file at a line and the ordinal forced a
+> second call to work out which lines those were. The ordinal is not lost: it
+> survives as `passage.ordinal` and in the `--json`/MCP payload, because it is
+> stable across a reflow that moves every line number.
+>
+> All three blocks were **re-run against the fixture rather than hand-edited**,
+> which is why the `score` moved too — `0.7397539005902937` was measured under
+> the two-field analyzer, and Phase 1's five fields put the same passage at
+> `1.1353167502114923`. The `sha` and the passage text are unchanged, which is
+> the point: the bytes did not move, the scoring of them did.
 
 `"source"` is the machine-readable form of that trailing line, now with
 three live values instead of the one M2 shipped with:
@@ -219,7 +239,7 @@ title: Why pruning failed
 
 The gate measured static pruning twice and it did not preserve candidate recall.
 
-  -- docs/pruning.md#p0 (sha b0093c74baa0, current)
+  -- docs/pruning.md:L1-L6 (sha b0093c74baa0, current)
 ```
 
 ```console
@@ -230,19 +250,28 @@ $ fux answer "why did pruning fail" --json
       {
         "heading": "",
         "text": "---\ntitle: Why pruning failed\n---\n\n# Why pruning failed\n\nThe gate measured static pruning twice and it did not preserve candidate recall.",
-        "score": 0.7397539005902937
+        "score": 1.1353167502114923
       }
     ]
   },
   "citation": {
     "id": "file:docs/pruning.md",
-    "loc": "docs/pruning.md#p0",
+    "loc": "docs/pruning.md:L1-L6",
     "sha": "b0093c74baa0bcae4a3d7e26d5ce1a074a11578b",
     "freshness": "current"
   },
   "source": "refer"
 }
 ```
+
+> **Amended 2026-08-24 (W-76 Phases 1 and 5) — the same two corrections as §1,
+> stated where the second copy of them is.** The trailing line read
+> *`-- docs/pruning.md#p0 (sha b0093c74baa0, current)`* and the payload read
+> *`"loc": "docs/pruning.md#p0"`* with *`"score": 0.7397539005902937`*. Phase 5
+> moved the locator to `path:L12-L40` so a citation names a place a file can be
+> opened at, and Phase 1's five-field analyzer moved the score. **Both blocks
+> were re-run against the fixture, not re-typed** — that is what "verbatim,
+> captured against a fixture" above is supposed to mean, and it now does again.
 
 ```console
 $ fux answer "why did pruning fail" --no-refer

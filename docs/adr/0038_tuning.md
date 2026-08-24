@@ -28,6 +28,25 @@ timestamp: 2026-08-22T00:00:00Z
 - **Blocked on:** [W-73](../../work/OPEN-WORK.md) — decision 12 is unbuilt, and
   priority cannot ship in a build that has `--fast` in it until it is
 
+> **Amended 2026-08-24 — the block is lifted: W-73 is built.**
+> `rank.Weighting` now carries the query-time weights into the accelerator,
+> `derive/accel.py::block_bound` recombines the per-field extrema **at those
+> weights**, and `_kth_score`/`_cannot_reach` take the weighting instead of
+> assuming `1.0`. **The differential law holds at every configured weight**,
+> where before it held at `1.0` and at no other value — which is exactly what
+> decision 12 was waiting on, and what made per-source priority unshippable in
+> a build containing `--fast`.
+>
+> **The declared threat measured free.** Fork 3's fear was that per-field
+> extrema would loosen the bound and cost scan work; the run over 10 000 real
+> documents came back at **+0.0 % blocks scanned**, because 92.5 % of postings
+> are body-only and a per-field sum over a single-field posting is exact
+> rather than loose.
+>
+> **This record is still `proposed`, and now for one reason instead of two.**
+> `src/fux/tune.py` does not exist; nothing below decision 3 is built. Veto
+> condition 2, which fired when this was written, is corrected where it stands.
+
 ---
 
 ## §1 — For humans
@@ -36,6 +55,29 @@ Fux has **twelve constants that decide what you read first** and, until now,
 exactly one of them was reachable without editing the source. This record gives
 them a home: `.fux/tune.toml`, written once by `fux setup`, committed to your
 repo, and never rewritten by fux again.
+
+> **Amended 2026-08-24 (W-44, W-68 and W-76 Phases 2, 6 and 7).** *"Exactly one
+> of them was reachable"* is the sentence that has gone stale, and it went
+> stale by being answered rather than ignored. **Seven ordering keys are
+> reachable from `fux.toml` today** — `[ranking] archived_weight ·
+> superseded_weight · recency_half_life_days · rerank_weight` and
+> `[dense] mode · threshold · weight` — every one of them added after this
+> record was written, and every one a tune key by decision 1's own membership
+> test, because not one changes a byte in `.fux/index/`.
+>
+> **That makes this record more urgent, not less.** The argument here was
+> never *"there is no way to tune"*; it was *"there is no home for tuning"*,
+> and what has happened since is that ranking knobs have been landing in
+> `fux.toml` one at a time because there is nowhere else to put them — which
+> is the split across two files decision 7 exists to prevent, happening
+> quietly. [ADR-CONFIG](0014_config.md) documents all seven and says of each
+> that it belongs here.
+>
+> The count of *constants* moved too, and by more than one: `bm25f.py`'s
+> `HEADING_WEIGHT` and `BODY_WEIGHT` are now **views on a five-element
+> `FIELD_WEIGHTS` tuple**, and `query/rerank.py` and `query/dense.py` are two
+> modules of ordering constants that did not exist. Twelve was a floor when it
+> was written and is a floor now.
 
 **One rule decides what is allowed in it**, and it is mechanical rather than a
 matter of taste:
@@ -119,6 +161,27 @@ because a file's content is a specification and not a capture.
 `graph/__init__.py`. Only `archived_weight` has a key, and it was given one by
 [ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 4 with a default of
 `1.0` chosen so that nothing reorders.
+
+> **Amended 2026-08-24 (W-44, W-68 and W-76 Phases 1, 2, 6 and 7).** The last
+> two sentences are false and the first is now a floor. **Seven keys are
+> reachable**, not one: `[ranking] archived_weight · superseded_weight ·
+> recency_half_life_days · rerank_weight`, and `[dense] mode · threshold ·
+> weight` — all in `fux.toml`, all validated by `config.py`, all defaulting to
+> a no-op.
+>
+> The inventory of constants moved with them. The twelve named above all still
+> exist under those names, but **`HEADING_WEIGHT` and `BODY_WEIGHT` are no
+> longer constants in their own right** — Phase 1 made them *views* on
+> `bm25f.FIELD_WEIGHTS`, a five-element tuple aligned to `store.TF_FIELDS`, so
+> what used to be two numbers is five. And two whole modules of ordering
+> constants arrived since: `query/rerank.py` (`DEPTH`, `WEIGHT`,
+> `COVERAGE_POWER`) and `query/dense.py` (`MIN_LEXICAL_RESULTS`,
+> `RESCORE_FACTOR`, `MIN_RESCORE`).
+>
+> **The three forces below are unaffected — they are the reason the drift
+> happened.** Nothing in this paragraph's argument depended on the number being
+> twelve or the reachable count being one; it depended on there being no file,
+> and there is still no file.
 
 Three forces meet here.
 
@@ -230,10 +293,24 @@ Adding a key is a change to this record.
 [bm25f]
 #k1             = 1.2      # term-frequency saturation
 #b              = 0.75     # length normalisation, 0 = off, 1 = full
-# heading_weight / body_weight are NOT keys yet — see decision 6.
+# The five field weights, in `store.TF_FIELDS` order. Keys since W-76 Phase 1
+# removed the committed `wlen` — see decision 6 and its amendment.
+#body_weight    = 1.0
+#heading_weight = 3.0
+#title_weight   = 2.0
+#path_weight    = 1.5
+#ctx_weight     = 1.0
 
 [ranking]
-#archived_weight = 1.0     # multiplier for a source declared archived
+#archived_weight        = 1.0   # multiplier for a source declared archived
+#superseded_weight      = 1.0   # multiplier for a document another supersedes
+#recency_half_life_days = 0.0   # 0 = off; decays on the committed `mtime`
+#rerank_weight          = 0.0   # 0 = off; the proximity reranker's uplift
+
+[dense]                    # the committed per-chunk vector lane
+#mode      = "off"         # "off" | "gated" | "always"
+#threshold = 0.0           # lexical confidence below which `gated` fuses
+#weight    = 0.0           # how far a fused score may move a ranking
 
 [fuse]                     # `ask --hybrid` only
 #rrf_k       = 60
@@ -257,6 +334,31 @@ Adding a key is a change to this record.
 #"docs/"   = 1.5
 #"vendor/" = 0.3
 ```
+
+> **Amended 2026-08-24 (W-76 Phases 1, 2, 6 and 7) — the closed key set had
+> gone stale, and a *closed* set that is stale is worse than an open one.**
+> The specimen declared `[bm25f]` with two keys and a comment reading
+> *"heading_weight / body_weight are NOT keys yet — see decision 6"*,
+> `[ranking]` with `archived_weight` alone, and no `[dense]` table. Decision 5
+> makes an unknown key **a loud error**, so this list is not illustrative: as
+> written it would have rejected `superseded_weight`,
+> `recency_half_life_days`, `rerank_weight` and every `[dense]` key — four of
+> which `fux.toml` already accepts and validates today, and all seven of which
+> decision 7 relocates here.
+>
+> **The field weights are in because decision 6b happened**, not because
+> anything was relaxed: Phase 1 stopped committing `wlen`, which was the single
+> reason they could not be keys, and Phase 1 did that *in order to* make them
+> keys. There are **five** of them now rather than two, and the specimen carries
+> the shipped values from `bm25f.FIELD_WEIGHTS` in `store.TF_FIELDS` order. The
+> five key **names** are this amendment's proposal and nothing contradicts them
+> — `src/fux/tune.py` does not exist, so no loader has an opinion yet.
+>
+> **`[dense] mode` is the one key here that is a string rather than a number**,
+> and it takes decision 5b's validation rule in the form `meta` takes it in
+> [ADR-CONFIG](0014_config.md): a closed set, checked, because a mistyped
+> `"gated "` that silently meant `off` would present as a ranking bug and not a
+> config one.
 
 **5a. What is deliberately OUT, in three classes.** Naming them is what stops
 the file growing into "everything with a number in it":
@@ -285,6 +387,35 @@ modules, with nothing tying them together:
 | `query/bm25f.py` | the numerator — `wtf = 3·tf_heading + 1·tf_body` | query time |
 | `ingest/extract.py` | **`wlen = 3·len(heading_tokens) + 1·len(body_tokens)`** | **ingest — and `wlen` is committed** |
 
+> **Amended 2026-08-24 (W-76 Phase 1) — this decision's premise no longer
+> exists, and it was removed on this decision's own instruction.** The heading
+> says the two weights are not keys *"because they are already baked into the
+> committed index"*. **They are not baked in any more.** `ingest/extract.py`
+> holds **no weight constants at all** — the second row of the table above is
+> a claim about code that has been deleted. What it commits is `flen`, the five
+> raw per-field **token counts**, and `wlen` is derived at query time by
+> `bm25f.derive_wlen()` from the weights in force. There is now exactly one
+> `HEADING_WEIGHT` in the engine, and it is a *view* on
+> `bm25f.FIELD_WEIGHTS[TF_FIELDS.index("heading")]`.
+>
+> **So decision 6 is reversed, and 6b below is the instrument that reversed
+> it** — not a competing view arrived at later. Read the two together: 6b said
+> *"when the committed format next moves, `extract.py` stores the observation
+> rather than the derived value … and lets them become keys"*, the format
+> moved to `fux.index.v2`, and it did so **because** `ctx` could not be a
+> weighted field while a committed number was a function of a tunable. The
+> field weights are tune keys now; decision 5's specimen carries all five.
+>
+> **6a is untouched and is the part that mattered.** *No committed field may be
+> a function of a tunable* is exactly the rule that forced this change rather
+> than being weakened by it. `flen` is an observation; `wlen` is a function of a
+> tunable; the first is committed and the second is not.
+>
+> The paragraphs below are left standing because **they are still the clearest
+> statement of the defect** — fux's own LUCENE-6819, the numerator reweighted
+> while the stored denominator keeps the old weight. It is a description of
+> what was fixed, and it reads as history rather than as current shape.
+
 `wlen` is BM25F's length term:
 
 ```
@@ -309,6 +440,38 @@ and a few bytes per record.
 **6c. A gate is owed today, either way:** a test asserting
 `query.bm25f.HEADING_WEIGHT == ingest.extract.HEADING_WEIGHT`. Nothing ties them
 now, so editing one is a silent corpus-wide scoring error.
+
+> **Amended 2026-08-24 (W-76 Phase 1) — both of these describe future work
+> that has already been done, and 6c now describes an impossible test.**
+>
+> **6b shipped, at five fields rather than two.** `extract.py` stores the
+> observation: `flen`, a tuple of raw per-field token counts in
+> `store.TF_FIELDS` order. `_format` went to `fux.index.v2` and `analyzer` to
+> `v2` in the same move. The one thing 6b got wrong is the arity — it costed
+> *"the two token counts as two ints"*, and what landed is five, because the
+> change was forced by `ctx` needing to be a weighted field and `title` and
+> `path` came with it.
+>
+> **6c can no longer be written as specified, and that is the good outcome.**
+> It asks for `query.bm25f.HEADING_WEIGHT == ingest.extract.HEADING_WEIGHT`;
+> `ingest/extract.py` has no weight constants, so the right-hand side does not
+> resolve. **A gate that cannot be written because the divergence it guarded
+> has no two sides left is a fixed defect, not a skipped one.** What stands in
+> its place is an assertion of a different kind, at module scope in
+> `query/bm25f.py`:
+>
+> ```python
+> assert len(FIELD_WEIGHTS) == len(TF_FIELDS), "field weights must align with TF_FIELDS"
+> ```
+>
+> That guards what is actually breakable now — **alignment, not equality**. The
+> failure mode moved with the design: two copies of one number drifting apart
+> was the old risk, and a weight tuple that has stopped lining up index-for-index
+> with the committed field order is the new one, because a misaligned tuple
+> weights body as heading with nothing erroring.
+>
+> Veto condition 4 below still reads *"decision 6c's equality gate"* and should
+> be read as naming this assertion — see the correction there.
 
 ---
 
@@ -473,7 +636,18 @@ scorer.**
 
 **This is the decision the feature is blocked on**, it amends
 [ADR-T1-ACCELERATOR](0011_accelerator.md), and it is filed as
-[W-73](../../work/open/W-73-weighted-scores-vs-pruning-bound.md).
+W-73, closed 2026-08-24 — [the fix and its measurement](../../work/IMPLEMENTATION.md) and
+[the fork-3 run](../../work/regression/2026-08-23-fork3-per-field-bound/report.md).
+
+> **Amended 2026-08-24 — nothing is blocked on this any more: W-73 is built.**
+> The arithmetic below is no longer a specification of work owed, it is a
+> description of `derive/accel.py` as it stands. `block_bound` recombines the
+> per-field extrema **at the weights in force**, `_kth_score` computes `theta`
+> on the weighted scores, and `_cannot_reach` scales its ceiling by
+> `weighting.maximum` rather than assuming `1.0` — so **the differential law
+> holds at every configured weight**, where it previously held at `1.0` alone
+> and said nothing about it. Per-source priority is no longer gated on the
+> accelerator; it is gated on `src/fux/tune.py`, which does not exist.
 
 Block skipping is safe on one property:
 
@@ -541,12 +715,26 @@ wrong one, and uniform random sampling will essentially never generate it.
 - **Debt, owed now:** decision 6c's equality gate, decision 1b's boundary test,
   and W-73. The first two are one test each.
 
+  > **Amended 2026-08-24 (W-73, W-76 Phase 1) — two of the three are
+  > discharged.** W-73 is built. 6c's equality gate is **unwritable and does
+  > not need writing**: `ingest/extract.py` holds no weight constant for it to
+  > compare against, and `bm25f.py`'s module-scope
+  > `assert len(FIELD_WEIGHTS) == len(TF_FIELDS)` guards what replaced the
+  > divergence. **Decision 1b's boundary test is the one real debt left**, and
+  > it cannot be discharged before `src/fux/tune.py` exists to have a boundary.
+
 **What this record does NOT do.**
 
 - It does not build `fux tune`. The utility is
   [`work/proposals/ranking-tuning.md`](../../work/proposals/ranking-tuning.md);
   this record only defines the surface it reports on.
 - It does not make the field weights tunable (decision 6).
+
+  > **Amended 2026-08-24 (W-76 Phase 1).** It does now — or rather, the engine
+  > does, and this record no longer refuses it. Phase 1 stopped committing
+  > `wlen`, which was decision 6's only ground; the five field weights are tune
+  > keys in decision 5's specimen. **What this record still does not do is
+  > build the loader that reads them.**
 - It does not change any default. **Every key ships at the value the engine
   already uses**, so an accepted-and-built ADR-TUNE moves no result anywhere
   until someone writes a line.
@@ -635,6 +823,15 @@ engine.
 case. **This condition is FIRING as of 2026-08-22** — it is W-73, and this
 record is `proposed` partly because of it.
 
+> **Amended 2026-08-24 — this condition no longer fires. W-73 is built.** The
+> weight now reaches the bound: `block_bound` recombines per-field extrema at
+> the weights in force, `theta` is computed on weighted scores, and the
+> ceiling is scaled by `weighting.maximum`. **The condition itself is kept
+> exactly as worded** — it was never a to-do item, it is the check that says
+> whether the accelerator and the scan still agree under a configured weight,
+> and it is worth more now that something can actually move it. **Read it as
+> armed rather than as firing.**
+
 **3 — `fux tune` writes `.fux/tune.toml`.** Decision 3b is then false and the
 consumer's comments are fux's to delete.
 *Check:* `grep -rn "tune.toml" src/fux/` shows no write path outside
@@ -644,6 +841,19 @@ consumer's comments are fux's to delete.
 false, and `wlen` has a sibling.
 *Check:* decision 6c's equality gate, extended to any constant read by both
 `src/fux/ingest/` and `src/fux/query/`.
+
+> **Amended 2026-08-24 (W-76 Phase 1) — the condition stands; the check has to
+> be re-pointed.** *"`wlen` has a sibling"* reads as though `wlen` were still
+> committed. It is not — Phase 1 removed it precisely because it was a
+> committed field that was a function of a tunable, which is to say **this veto
+> had already fired once and this is the record of it being cleared**. And
+> decision 6c's equality gate no longer exists to extend: there is no
+> `ingest.extract.HEADING_WEIGHT` to compare against.
+>
+> *Check, restated:* no constant is read by both `src/fux/ingest/` and
+> `src/fux/query/` such that a committed value depends on it — plus
+> `bm25f.py`'s `assert len(FIELD_WEIGHTS) == len(TF_FIELDS)`, which guards the
+> alignment that replaced the equality.
 
 **5 — the key set stops being closed.** A key is honoured that this record does
 not name, or an unknown key stops erroring. Decision 5 is then a suggestion.
@@ -681,6 +891,13 @@ evidence.*
   constants, and one half of decision 6
 - [`src/fux/ingest/extract.py`](../../src/fux/ingest/extract.py) — the other
   half: `wlen`, computed at ingest and committed
+
+  > **Amended 2026-08-24 (W-76 Phase 1).** There is no other half any more.
+  > `extract.py` commits `flen` — five raw per-field **token counts**, an
+  > observation — and holds no weight constant of any kind; `wlen` is derived
+  > at query time by `bm25f.derive_wlen()`. Read this entry as *the module that
+  > stopped being decision 6's second half*, which is the only reason it is
+  > still worth citing here.
 - [`src/fux/query/rank.py`](../../src/fux/query/rank.py) — where a weight is
   applied today, after pruning
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py) — `block_bound`,
@@ -706,7 +923,9 @@ evidence.*
   — the design, the ten forks, and the survey behind decisions 8–10
 - [`work/proposals/ranking-tuning.md`](../../work/proposals/ranking-tuning.md)
   — why the instrument is worth more than the knobs
-- [`work/open/W-73-weighted-scores-vs-pruning-bound.md`](../../work/open/W-73-weighted-scores-vs-pruning-bound.md)
+- W-73's outcome — [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)'s W-73 row and
+  [the fork-3 run](../../work/regression/2026-08-23-fork3-per-field-bound/report.md); the closed
+  detail file is `archive/open/W-73-weighted-scores-vs-pruning-bound.md`, **named, never cited**
   — decision 12's build item
 
 **Papers and specifications**

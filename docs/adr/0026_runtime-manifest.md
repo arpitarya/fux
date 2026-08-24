@@ -51,7 +51,8 @@ flowchart LR
    .fux/index/*.jsonl -- content_sha computed per shard while reading
               |
               v
-   manifest.json: {schema, analyzer, block_size, docs, terms, blocks,
+   manifest.json: {schema, index_schema, analyzer, block_size,
+                    docs_fields, docs, terms, blocks,
                     shards: {shard filename -> content_sha}}
               |
               |  fux doctor / ask --explain
@@ -65,22 +66,43 @@ flowchart LR
 
 </details>
 
+> **Amended 2026-08-24 (W-76 Phase 2).** The ASCII twin listed the manifest's
+> fields and listed six of them; `index_schema` was already missing and
+> `docs_fields` had been added. The Mermaid box beside it says *"schema,
+> counts, {shard: sha}"* and is left as it stands — it names no field, so it
+> is abstract rather than stale, and the two halves still tell the same story.
+
 ### Examples
 
-`.fux/runtime/manifest.json` in this repo (128 docs, 8507 terms — the shard
-map is abbreviated to two real entries; the full file lists one per committed
-shard):
+`.fux/runtime/manifest.json` in this repo, **re-captured 2026-08-24** (434
+docs, 11 399 terms, 11 801 blocks — the shard map is abbreviated to two real
+entries; the full file lists one per committed shard, 218 of them):
 
 ```json
 {
-  "analyzer": "v1", "block_size": 128, "blocks": 8507, "docs": 128,
-  "index_schema": "fux.index.v1", "schema": "fux.runtime.v1", "terms": 8507,
+  "analyzer": "v2", "block_size": 128, "blocks": 11801, "docs": 434,
+  "docs_fields": ["id","loc","title","flen","archived","superseded","mtime"],
+  "index_schema": "fux.index.v2", "schema": "fux.runtime.v3", "terms": 11399,
   "shards": {
-    "01.jsonl": "a44217eec8539506154631f3500a1f75025fd36f",
-    "05.jsonl": "e608571c4242c7c911d3b84050e44b47c0d185ec"
+    "01.jsonl": "69409d3e891ce756997eb7cd6a1e1d0c7df2c64c",
+    "05.jsonl": "236eb125db5497a3947de692b08a0bca7ced5011"
   }
 }
 ```
+
+> **Amended 2026-08-24 (W-76 Phases 1 and 2).** This block was introduced as
+> *"`.fux/runtime/manifest.json` in this repo"* and showed `analyzer: "v1"`,
+> `index_schema: "fux.index.v1"` and `schema: "fux.runtime.v1"` — a manifest
+> no build in this tree has produced since 2026-08-23, presented as a reading
+> of the live file. **All three version strings moved, and `docs_fields`
+> appeared, which is the interesting one**; see decision 1. Re-captured for
+> real; only the shard map is abridged, and it is marked as abridged.
+>
+> Two of the counts are worth reading against each other: `blocks` (11 801)
+> now exceeds `terms` (11 399), where the old capture had them equal at 8507.
+> A block holds 128 postings, so equality meant **every term fitted in one
+> block**. It no longer does: 335 terms span more than one, counted from the
+> live postings.
 
 ---
 
@@ -95,9 +117,36 @@ asserting it — needs a way to answer "does `.fux/runtime/` still match
 
 ### Decision
 
-**1. Fields: `schema`, `index_schema`, `analyzer`, `block_size`, `docs`,
-`terms`, `blocks`, and `shards` (shard filename → `content_sha`).** The counts
-double as a human-readable build summary.
+**1. Fields: `schema`, `index_schema`, `analyzer`, `block_size`,
+`docs_fields`, `docs`, `terms`, `blocks`, and `shards` (shard filename →
+`content_sha`).** Nine keys. The counts double as a human-readable build
+summary; `docs_fields` does not — it is **part of the runtime contract**,
+compared key-for-key by `is_fresh()`.
+
+> **Amended 2026-08-24 (W-76 Phase 2) — a ninth key, and it exists because of
+> a real silent-divergence bug.** This listed eight fields. `docs_fields` was
+> added on 2026-08-23, and the story is the reason it is in the *manifest*
+> rather than in a comment.
+>
+> **`superseded` and `mtime` were added to `docs.jsonl` while
+> `RUNTIME_SCHEMA` stayed put.** Nothing in the freshness check could see the
+> difference, so an accelerator built minutes earlier kept being read — and
+> because the demotion those two fields carry was applied by the scan and not
+> by a doc table that lacked them, **`ask --scan` applied a supersession
+> demotion and `ask --fast` did not.** Two query paths, the same corpus, the
+> same query, different documents. No error, no warning, no stale marker: the
+> divergence arrived through *staleness*, which is a channel W-73's arithmetic
+> fix could not close.
+>
+> **The lesson is why the key holds the field set rather than a version
+> string.** A schema string only moves when somebody remembers to move it, and
+> the whole class of bug is somebody not remembering. `fmt.DOCS_FIELDS` is
+> written straight into the manifest and compared to itself at read time, so
+> the field set moves **because it is the table** — adding a column to
+> `docs.jsonl` invalidates every existing accelerator automatically, with no
+> discipline required from the person adding it. `is_fresh()` returns `False`
+> and the build reruns; the derived plane is disposable, so that is the cheap
+> outcome and a wrong ranking is not.
 
 **2. The per-shard hash reuses the store's own hash family.** The same
 `content_sha` (blake2b, 20-byte digest) that the committed ledger already
@@ -146,6 +195,9 @@ when it needs to *know*, not guess.
 - The reused hash function —
   [`src/fux/store/format.py`](../../src/fux/store/format.py)
   (`content_sha()`).
+- **The `docs_fields` half of the contract** — the field set at
+  [`derive/format.py::DOCS_FIELDS`](../../src/fux/derive/format.py), and the
+  comparison at [`derive/accel.py::is_fresh`](../../src/fux/derive/accel.py).
 - The parent record — [ADR-T1-ACCELERATOR](0011_accelerator.md), decision 8.
 
 ### Veto condition
@@ -171,9 +223,12 @@ evidence.*
 
 **Records** — [ADR-LAWS](0001_laws.md) ·
 [ADR-T1-ACCELERATOR](0011_accelerator.md) ·
+[ADR-DOCS-TABLE](0024_docs-table.md) ·
 [ADR-RUNTIME-STAMP](0027_runtime-stamp.md)
 
 **Code**
 
+- [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
 - [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
 - [`src/fux/store/format.py`](../../src/fux/store/format.py)

@@ -10,7 +10,7 @@ timestamp: 2026-08-20T00:00:00Z
 
 > **Verdict: A — git hooks (`post-commit`/`post-merge`/`post-checkout`)
 > driving delta ingest**, exactly as scoped in
-> [W-25](../open/W-25-m5-maintenance.md) / `ADR-MAINTENANCE` (reserved). A
+> [W-25](../../archive/open/W-25-m5-maintenance.md) / `ADR-MAINTENANCE` (reserved). A
 > hook re-emits only the changed lines into the committed index — not a full
 > rebuild — and the existing write-if-different + per-shard-sha discipline
 > ([ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md)) does the
@@ -51,7 +51,7 @@ Two layers need to stay fresh, and they are not the same problem:
 This isn't new ground: [ADR-INGEST](../../docs/adr/0007_ingest.md)'s
 consequences section already named the target — **"re-ingest is safe to run
 on a hook, which is what M5 depends on"** — and
-[W-25](../open/W-25-m5-maintenance.md) is the open item that was scoped to
+[W-25](../../archive/open/W-25-m5-maintenance.md) is the open item that was scoped to
 build it: hooks → delta ingest, a line-wise last-writer-wins merge driver via
 `.gitattributes`, and `meta: hashed` enforcement at write time. W-25 is
 **unblocked and next in queue**. This document is not proposing a new idea —
@@ -122,7 +122,7 @@ default silently.
 
 ## References
 
-- [W-25 — M5: maintenance](../open/W-25-m5-maintenance.md) — the item this
+- [W-25 — M5: maintenance](../../archive/open/W-25-m5-maintenance.md) — the item this
   document backs
 - [ADR-INGEST](../../docs/adr/0007_ingest.md) — "re-ingest is safe to run on
   a hook, which is what M5 depends on"

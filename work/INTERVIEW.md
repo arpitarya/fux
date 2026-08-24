@@ -27,10 +27,40 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated 2026-08-22.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated 2026-08-24.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: two releases, and the queue is nearly empty (2026-08-21)
+### The most recent change: `v2.0.0-alpha.0`, and the records caught up to it (2026-08-24)
+
+**`v2.0.0-alpha.0` is released.** It is a **pre-release on purpose**: the
+committed record shape moved to `fux.index.v2` (five-field BM25F, `flen`
+replacing `wlen`, the `code` field dropped) and the analyzer to `v2`, so it
+ships ahead of a stable `2.0.0` to give the migration a soak. **All four new
+records — ADR-TUNE, ADR-MCP, ADR-ENRICH, ADR-RERANK — are `status: proposed`.**
+Ratifying them is a separate, human step and it is owed.
+
+**W-73 and W-76 are closed.** Both built, both released, both recorded in
+[`IMPLEMENTATION.md`](IMPLEMENTATION.md); their detail files retired into
+`archive/open/`. The queue is **three, and every one of them is `arpit`**.
+
+**What the 2026-08-24 audit found, and it is the thing to carry forward.**
+`tests/test_adr_freshness.py` **passed throughout W-76 while sixteen records
+went stale**, because ownership is **directory-level**: rewriting the scorer
+under `src/fux/query/` satisfied the check by touching **ADR-ASK**, while
+**ADR-RANKING**, whose entire subject is that scorer, was never opened. *The
+check is not wrong; it is narrower than it reads.* Deciding whether a record
+may declare *"I describe this component even though I do not own it"* is
+[W-77](open/W-77-record-reconciliation.md)'s real deliverable.
+
+**A second class was closed the same day.** The register's display labels
+disagreed with their filenames on **sixteen** rows (the standing note claimed
+four) and `[0039]` labelled two rows — which manufactured broken links, because
+a link written from a label resolves to a plausible file that does not exist. A
+repo-wide sweep found **71 more**. All fixed, and gated by
+[`tests/test_doc_links.py`](../tests/test_doc_links.py) under the two-strikes
+rule.
+
+### Before that: two releases, and the queue is nearly empty (2026-08-21)
 
 **`v0.35.0` is released and live on PyPI**, verified black-box from the
 published wheel — a clean venv, `pip install fux-engine==0.35.0`, then `add` /
@@ -190,7 +220,7 @@ the reason is that the measuring environments are gone.**
   **⏳ proposed, not accepted**). `source` · `freshness` · `arc` · `chunk` ·
   `rescore` · `assemble`. **No verb exposes it** — deliberately.
 - **`fux-lab` and `fux-playground` do not exist on this machine**
-  ([W-56](open/W-56-sibling-environments-missing.md)). The lab is the one the
+  ([W-56](../archive/open/W-56-sibling-environments-missing.md)). The lab is the one the
   standing obligation says is never deleted; the playground held **50 graded
   goldens with one local commit and no remote**. Between them they are the
   instrument for **R4, R5, R6 and R7 — every unmeasured prediction left in the
@@ -201,7 +231,7 @@ the reason is that the measuring environments are gone.**
     (`ver` is a revision counter), so the bound could not have been honoured.
     Freshness is a mode plus **content verification** — comparing shas, which
     answers the question exactly rather than approximately.
-    [W-58](open/W-58-no-recorded-ingest-time.md).
+    [W-58](../archive/open/W-58-no-recorded-ingest-time.md).
   - **A seeded community algorithm** — the randomness was *removed* instead,
     which is the stronger guarantee, and a test parses the module's AST to keep
     it that way.
@@ -243,7 +273,7 @@ the reason is that the measuring environments are gone.**
 - **`archived=` is parsed and deliberately unread.** ADR-ARCHIVED-CONTENT decision 5
   was amended to split the file from the signal: parsing a declaration nothing
   reads cannot be wrong, and changing what a verb says about a document needs
-  an instrument. [W-44](open/W-44-archived-content-signalling.md) still owns it.
+  an instrument. [W-44](../archive/open/W-44-archived-content-signalling.md) still owns it.
 
 ### Before that
 
@@ -267,7 +297,7 @@ the reason is that the measuring environments are gone.**
   opened it at 0001; **[ADR-CLI](../docs/adr/0002_cli-surface.md)** is 0002 —
   the six-verb command-line surface, with every command and its real output
   captured in [`regression/2026-08-18-cli-surface/`](regression/2026-08-18-cli-surface/report.md).
-  Writing it found a live defect ([W-46](open/W-46-hybrid-missing-model-crash.md)).
+  Writing it found a live defect ([W-46](../archive/open/W-46-hybrid-missing-model-crash.md)).
 - **A great deal of valuable writing is not a decision** (2026-08-18). Three
   documents left `work/adr/` without being superseded, because none of them was
   ever an ADR: the two P1 rulings became **verdicts** beside their evidence,
@@ -310,11 +340,25 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated 2026-08-22 (fifth pass, same day). Nothing is committed: `HEAD` is
-still `9bb870e` and a **concurrent session's** W-68 / ADR-AGENT-POLICY work is
-staged alongside everything below.*
+*Updated 2026-08-24. `HEAD` is at the `v2.0.0-alpha.0` release plus the W-77
+audit; the working tree is clean. The queue below is **three items, all in the
+`arpit` lane** — W-77, W-74, W-75. W-73 and W-76 were closed on 2026-08-24 and
+their entries here are history, not pending work.*
 
-- **The queue is three items — W-75 was filed 2026-08-22** under a new
+**The immediate next step: build ADR-TUNE** — `.fux/tune.toml` +
+`src/fux/tune.py`. Its stated blocker was W-73, which is now built, released
+and closed, so decision 12 is unblocked. ⚠ **Parts of that record are stale on
+arrival**: several of its own decisions shipped inside W-76 (6b's
+`wlen`->`flen` migration, and query-time field weights), so read it against the
+code before building from it.
+
+⚠ **A live fork, unadjudicated, filed 2026-08-24:** ~40 of the links the sweep
+repointed now point *into* `archive/`. Whether a link in an ADR's prose
+*names* an archived item or *cites* it is Arpit's call — a test was written for
+it and **deliberately removed rather than shipped red**, because it could not
+tell the two apart. Both readings are written out in W-77.
+
+- **W-75 was filed 2026-08-22** under a new
   **ADR-URL-INGEST · ADR-FETCHER** group: [nothing in fux can learn that a URL
   changed](open/W-75-url-freshness.md), spec in
   [`proposals/url-freshness.md`](proposals/url-freshness.md), two forks split
@@ -483,8 +527,8 @@ staged alongside everything below.*
 - **Nothing is half-built in `src/`, but two things are built-and-unproven.**
   M3 and M4's core both landed complete and green; what is missing is their
   *acceptance measurements*, carried by
-  [W-57](open/W-57-graph-lane-acceptance.md) and
-  [W-59](open/W-59-refer-plane-measurement.md). **Do not read "landed" as
+  [W-57](../archive/open/W-57-graph-lane-acceptance.md) and
+  [W-59](../archive/open/W-59-refer-plane-measurement.md). **Do not read "landed" as
   "validated"**, and **do not read ADR-REFER's `accepted` as "measured"**
   either — it was accepted on 2026-08-21 with its budget-sweep veto condition
   deliberately left open.
@@ -508,8 +552,8 @@ staged alongside everything below.*
   have graduated and are archived; one of them shipped **with its central knob
   refused**, and the refusal is the interesting part (W-58).
 - **Two items are PARKED behind one missing instrument** —
-  [W-44](open/W-44-archived-content-signalling.md) and
-  [W-52](open/W-52-df-over-the-union.md) both wait on a pre-registered query
+  [W-44](../archive/open/W-44-archived-content-signalling.md) and
+  [W-52](../archive/open/W-52-df-over-the-union.md) both wait on a pre-registered query
   set with expected live-vs-archived answers. Nobody owns writing it. They
   resume when it exists, **not because they look ready**.
 - **Three findings from W-54's run are not filed as items** and are named in
@@ -779,7 +823,8 @@ through the back door. `[sources.url.config]` is passed verbatim and never
 read — the PEP 518 `[tool.*]` discipline. Hold that line for every future
 fetcher. Maintainers of this doc so
 far: each session's model, per the standing instruction above — this entry
-by Claude (Cowork, claude-fable-5).
+by Claude (Cowork, claude-fable-5); the 2026-08-24 reconciliation pass by
+Claude (Cowork, claude-opus-5).
 
 **Update (2026-08-12, Claude Code):** Phase 0 of the v0.32.0 open-items
 program cleared the backlog; **R2 is 3/3 PASS**. Three pieces of judgment to

@@ -17,7 +17,7 @@ trigger).*
 given a [locator](#locator) and a version, it returns bytes. v0.30 ships
 exactly three — git-dir, generic HTTP (conditional GET), Confluence REST —
 and the cap is a decision, not a backlog. MCP is the endgame and is parked as
-[a proposal](../work/proposals/mcp-adapters.md). See [M5](../work/open/W-25-m5-maintenance.md).
+[a proposal](../work/proposals/mcp-adapters.md). See [M5](../archive/open/W-25-m5-maintenance.md).
 
 **ADR** — Architecture Decision Record. One per completed feature, in
 [`adr/`](adr/): decision, context, alternatives, consequences, references
@@ -53,20 +53,20 @@ sit on the query path. Moffat & Stuiver 2000 (ref [6]). See
 [runtime segments](#runtime-segments): per-block maximum impacts let whole
 posting blocks be skipped when they cannot enter the top-k. Correctness
 contract: skipping may **never** change the result set relative to exhaustive
-scoring *on the same index* — a property test at [M4](../work/open/W-24-m4-refer-plane.md). Distinct from
+scoring *on the same index* — a property test at [M4](../archive/open/W-24-m4-refer-plane.md). Distinct from
 [static pruning](#pruning-static-top-k), which does drop documents.
 
 **BM25F** — The lexical ranking function, carried over unchanged from the
 archived engine: BM25 with *fielded* term frequency — heading (3.0), path
 (2.0), body (1.0) summed first, then saturated once (k1=1.2, b=0.75). Not
-per-field BM25 glued together. Ported at [M4](../work/open/W-24-m4-refer-plane.md); it is also the single
+per-field BM25 glued together. Ported at [M4](../archive/open/W-24-m4-refer-plane.md); it is also the single
 scorer both arms of the [pruning eval](#pruning-eval-the-gate) run through.
 
 **Chunk** — The passage unit: a heading-bounded slice of a document
 (256–512 token target, code fences and tables atomic), carrying its heading
 path and `file:line` span. In v0.30 chunks are **not durable** — they are
 re-derived transiently from fetched bytes at answer time. Ported at
-[M5](../work/open/W-25-m5-maintenance.md).
+[M5](../archive/open/W-25-m5-maintenance.md).
 
 **Compare doc** — A decision record written *before* building whenever a fork
 has multiple viable options: debate, matrix, grounded references, a proposed
@@ -146,7 +146,7 @@ documents, which is the compression lever the [BIC](#bic-binary-interpolative-co
 size model assumes (paper Figure 4).
 
 **Edge grade (EXTRACTED / INFERRED)** — The archived link-graph vocabulary,
-ported at [M3](../work/open/W-23-m3-graph-lane.md): `EXTRACTED` = deterministically parsed from the
+ported at [M3](../archive/open/W-23-m3-graph-lane.md): `EXTRACTED` = deterministically parsed from the
 document, `INFERRED` = model- or heuristic-derived and ranked below it. Since
 [ADR-EXTRACTED](adr/0016_extracted-mode.md) these **agree** with the
 [ingest modes](#extracted-mode) rather than contradicting them: `extracted`
@@ -164,7 +164,7 @@ deterministic signal wherever they compete, and **enrichment never runs inside
 `fux ingest`** — it is its own command, pinned then ingested. Contrast
 [extracted mode](#extracted-mode). Named and fenced by
 [ADR-ENRICHED](adr/0017_enriched-mode.md) (accepted 2026-08-19 — the contract,
-not permission to build); deferred to [M8](../work/open/W-38-m8-deferred.md).
+not permission to build); deferred to [M8](../archive/open/W-38-m8-deferred.md).
 
 **Extracted mode** — The **default** ingest tier: `$0`, offline, stdlib,
 deterministic — conversion, chunking, term selection, static-table embedding
@@ -203,7 +203,7 @@ commits nothing; its **evidence is filed** into
 **FuxVec** — The from-scratch stdlib dense engine: sign-quantizes a 256-dim
 int8 embedding into a **256-bit code** (32 B/doc), scans by Hamming distance,
 re-scores the top candidates with exact int8 cosine. Becomes the `V/` plane at
-[M3](../work/open/W-23-m3-graph-lane.md). Ported from archived ADR-0010.
+[M3](../archive/open/W-23-m3-graph-lane.md). Ported from archived ADR-0010.
 
 **Handoff** — A self-contained build spec (context, definition-of-done, scope
 in/out, constraints, edge cases, tests, open questions) paired with a
@@ -278,7 +278,7 @@ typed keys in fux's schema. See [ADR-URL-INGEST](../archive/adr/0010_url-source-
 
 **MPH (minimal perfect hash)** — A collision-free term→slot map at ~2–3
 bits/key, the planned `D/` dictionary upgrade (~15 MB saving at 10⁶ docs — **deferred-target arithmetic**; the design point is 10 000 since 2026-08-21).
-**Deferred to [M8](../work/open/W-38-m8-deferred.md)** as a pure-win optimization; M3 ships a sorted
+**Deferred to [M8](../archive/open/W-38-m8-deferred.md)** as a pure-win optimization; M3 ships a sorted
 u64-hash array instead. RecSplit / PtrHash (refs [9,10]).
 
 **MRR** — Mean Reciprocal Rank: mean of 1/rank of the first correct result
@@ -315,7 +315,7 @@ file or store.
 **PPR-lite** — Personalized PageRank restricted to the seed neighbourhood
 (damping 0.85, exactly 3 iterations, sorted traversal). A *fixed* iteration
 count because reproducibility outranks precision here. Ported to the kernel at
-[M4](../work/open/W-24-m4-refer-plane.md) from archived ADR-0009.
+[M4](../archive/open/W-24-m4-refer-plane.md) from archived ADR-0009.
 
 **Known failure (`xfail`)** — A [golden query](#golden-query) marked
 `known_failure: "<reason>"` because the engine does not yet satisfy it. The
@@ -362,7 +362,7 @@ audit are all one hash compare.
 combine: each contributes `1/(k + rank)`, k=60, summed — ranks, not scores, so
 there is no calibration problem. *This is Fux's reranking layer*; a
 cross-encoder reranker was researched and rejected as ~8× over the size budget.
-Ported at [M4](../work/open/W-24-m4-refer-plane.md) from archived ADR-0007.
+Ported at [M4](../archive/open/W-24-m4-refer-plane.md) from archived ADR-0007.
 
 **Runtime segments** — The local, **gitignored** query plane produced by
 [inflation](#inflation): byte-aligned, memory-mapped, 128-entry posting blocks

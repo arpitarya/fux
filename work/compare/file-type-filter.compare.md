@@ -16,8 +16,8 @@ timestamp: 2026-08-20T00:00:00Z
 > same grammar as `dirs` and `urls`, `!` to subtract. **Absent means the
 > built-in default applies** — not "index everything", which is today's
 > behaviour and the defect.
-> **Status:** **decided.** The build is [W-55](../open/W-55-no-file-type-filter.md)
-> and it **lands with [W-45](../open/W-45-source-exclusion.md)** (verdict **E**,
+> **Status:** **decided.** The build is [W-55](../../archive/open/W-55-no-file-type-filter.md)
+> and it **lands with [W-45](../../archive/open/W-45-source-exclusion.md)** (verdict **E**,
 > decided the same day) — one grammar change to `.fux/sources/`, not two.
 > **Confidence at the time of the call:** high on rejecting F (content
 > sniffing) and D (a TOML key); medium-high on G over A, which is a defaults
@@ -167,7 +167,7 @@ another, so there is no order to remember and no order to get wrong.
   21 records disappear and `df` moves for every surviving document. It needs a
   re-ingest and a `CHANGELOG` entry flagged breaking. **It is also a ranking
   change**, which means it cannot ship on this corpus alone —
-  [W-52](../open/W-52-df-over-the-union.md)'s pre-registration discipline
+  [W-52](../../archive/open/W-52-df-over-the-union.md)'s pre-registration discipline
   applies here too, and the two should be measured in one run.
 - **It removes 14 of W-45's 16 motivating files** — but not the other two, and
   not `evidence/report.md`. Both mechanisms are still needed; this one is
@@ -199,6 +199,6 @@ override the global file for that root.
   https://www.sphinx-doc.org/en/master/usage/configuration.html
 - The measurement — re-derived from `.fux/index/*.jsonl`, 2026-08-20; the
   method is four lines and is reproduced in
-  [W-55](../open/W-55-no-file-type-filter.md).
+  [W-55](../../archive/open/W-55-no-file-type-filter.md).
 - The exclusion grammar this reuses —
   [`source-exclusion.compare.md`](source-exclusion.compare.md) verdict E.

@@ -191,7 +191,7 @@ from `.fux/index/*.jsonl`, where they already are.
 ### D — Wait for `the T2 proposal`
 
 The graph plane becomes an mmap byte-aligned segment when
-[W-26](../open/W-26-m6-scale-t2.md) builds that machinery for the accelerator.
+[W-26](../../archive/open/W-26-m6-scale-t2.md) builds that machinery for the accelerator.
 
 - **For:** the correct end state — zero parse, O(1) node lookup, one format for
   every runtime artefact instead of two. The name is already reserved and the
@@ -303,7 +303,7 @@ than from anything measured here.
 - The gap this partially fills —
   [R5-HOOK's ANALYSIS](../regression/2026-08-20-r5-hook-latency/ANALYSIS.md),
   which names its own inability to split `derive` into T1 and graph.
-- The milestone option D belongs to — [W-26](../open/W-26-m6-scale-t2.md) and
+- The milestone option D belongs to — [W-26](../../archive/open/W-26-m6-scale-t2.md) and
   `the T2 proposal`, reserved by name.
 - The code — [`src/fux/graph/plane.py`](../../src/fux/graph/plane.py)
   (`load`, `build_plane`) and

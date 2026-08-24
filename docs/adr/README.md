@@ -141,7 +141,7 @@ again here.
 >
 > **Arpit's instruction, taken with the consequences stated.** Deleting
 > ADR-T2-SEGMENTS left a gap at `0037`, and `0022` had been vacant since
-> 2026-08-19. All 36 records are now `0001`–`0036`; **15 files moved** and ~69
+> 2026-08-19. All records were renumbered on 2026-08-22; the sequence has since reached **`0041`**; **15 files moved** and ~69
 > documents were repointed. (There is precedent: `0013_laws.md` became
 > `0001_laws.md` in an earlier pass.)
 >
@@ -181,33 +181,44 @@ again here.
 | [0019](0019_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, and nothing composes | accepted | yes |
 | [0020](0020_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — drives your existing Chrome over CDP on a hand-rolled stdlib WebSocket; never escalated to | accepted | yes |
 | [0021](0021_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET, written into your repo by `fux setup` so core keeps zero network lines and zero network imports | accepted | yes |
-| [0023](0022_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — source dirs leave `fux.toml`; a directory may be declared `archived=true`, a declaration never derived from a path. **The file and the declaration are built.** What that declaration triggers once it exists is [ADR-ARCHIVED-CONTENT](0037_archived-content.md) — carved out 2026-08-22 | accepted | yes |
-| [0024](0023_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | ⏳ proposed | yes |
-| [0025](0024_docs-table.md) | **ADR-DOCS-TABLE** | `docs.jsonl` — the docidx-ordered doc table every other derived structure joins against | ⏳ proposed | yes |
-| [0026](0025_codes-table.md) | **ADR-CODES-TABLE** | `codes.jsonl` — the dense lane's per-document FuxVec codes, decoded once per process | ⏳ proposed | yes |
-| [0027](0026_runtime-manifest.md) | **ADR-RUNTIME-MANIFEST** | `manifest.json` — the per-shard content-sha fingerprint that detects a stale accelerator | ⏳ proposed | yes |
-| [0028](0027_runtime-stamp.md) | **ADR-RUNTIME-STAMP** | `stamp.json` — the cheap, non-reproducible size/mtime pre-check ahead of the manifest's real one | ⏳ proposed | yes |
-| [0029](0028_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide `n` and `total_wlen` that BM25F length normalization reads | ⏳ proposed | yes |
-| [0030](0029_graph.md) | **ADR-GRAPH** | M3 — `explain`/`graph`/`path`, unseeded label-propagation communities in a derived plane, and PPR-lite with a **lazy** walk | ✅ accepted | yes |
-| [0033](0032_hooks.md) | **ADR-MAINTENANCE** | M5 — `post-commit` **defers** (never `pre-commit`): it writes a dirty list and spawns a one-shot re-index; the installer that registers the merge driver; and L5 moved into `write_index` where nothing can skip it | ✅ accepted | **yes — all four phases built 2026-08-22** |
-| [0034](0033_merge-driver.md) | **ADR-MERGE-DRIVER** | The committed index merges line by line, last-writer-wins on `(ver, sha)`, refuses rather than guesses — carved out of ADR-MAINTENANCE 2026-08-21 | ✅ accepted | yes |
-| [0032](0031_types-list.md) | **ADR-TYPES** | which files are documents — a compiled-in prose allowlist, replaced (not extended) by `.fux/sources/types`; absent means the default, never "everything" | ✅ accepted | yes |
-| [0031](0030_refer-plane.md) | **ADR-REFER** | M4 core — fetch through the *consumer's* fetcher, verify by content sha (there is no recorded ingest time), ARC keyed `(loc, sha)`, and a **byte** budget with a floor | ✅ accepted | partial |
-| [0035](0034_cache.md) | **ADR-CACHE** | The refer plane's two caches — ARC keyed `(loc, sha)` cannot change an answer; the TTL fetch store is opt-in, disk-bounded, and answers `cached`, never `current`. Carved out of ADR-REFER 2026-08-21 | ⏳ proposed | yes |
-| [0036](0035_agent-policy.md) | **ADR-AGENT-POLICY** | Fux ships the policy its consumers need to read it correctly — one canonical policy carried as a **verbatim block** into Claude skills, Copilot agents + instructions, and Kiro steering; installed by `fux setup --agents` from a **declaration, never detection**, and never outside `.fux/` unless asked | ✅ accepted | yes — installer landed 2026-08-22 (W-68); default-on, `--no-agents` and `install = []` opt out, every path outside `.fux/` announced |
-| [0038](0036_predictions.md) | **ADR-RS** | The R predictions — a claim frozen before measurement; the threshold never moves, the verdict is never edited, an ambiguous result goes to Arpit rather than the runner, and an R ends in exactly four ways (PASS · FAIL · INCONCLUSIVE · RETIRED), of which **FAIL is a success of the method** and **RETIRED is not a FAIL** | ✅ accepted | yes — veto 4's register check landed 2026-08-22 (W-69), `tests/test_prediction_register.py`; it reads **both** registers, because the first non-`R` verdict (`W44-SIGNAL`) arrived the same day |
+| [0022](0022_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — source dirs leave `fux.toml`; a directory may be declared `archived=true`, a declaration never derived from a path. **The file and the declaration are built.** What that declaration triggers once it exists is [ADR-ARCHIVED-CONTENT](0037_archived-content.md) — carved out 2026-08-22 | accepted | yes |
+| [0023](0023_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | ⏳ proposed | yes |
+| [0024](0024_docs-table.md) | **ADR-DOCS-TABLE** | `docs.jsonl` — the docidx-ordered doc table every other derived structure joins against | ⏳ proposed | yes |
+| [0025](0025_codes-table.md) | **ADR-CODES-TABLE** | `codes.jsonl` — the dense lane's per-document FuxVec codes, decoded once per process | ⏳ proposed | yes |
+| [0026](0026_runtime-manifest.md) | **ADR-RUNTIME-MANIFEST** | `manifest.json` — the per-shard content-sha fingerprint that detects a stale accelerator | ⏳ proposed | yes |
+| [0027](0027_runtime-stamp.md) | **ADR-RUNTIME-STAMP** | `stamp.json` — the cheap, non-reproducible size/mtime pre-check ahead of the manifest's real one | ⏳ proposed | yes |
+| [0028](0028_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide `n` and `total_wlen` that BM25F length normalization reads | ⏳ proposed | yes |
+| [0029](0029_graph.md) | **ADR-GRAPH** | M3 — `explain`/`graph`/`path`, unseeded label-propagation communities in a derived plane, and PPR-lite with a **lazy** walk | ✅ accepted | yes |
+| [0030](0030_refer-plane.md) | **ADR-REFER** | M4 core — fetch through the *consumer's* fetcher, verify by content sha (there is no recorded ingest time), ARC keyed `(loc, sha)`, and a **byte** budget with a floor | ✅ accepted | partial |
+| [0031](0031_types-list.md) | **ADR-TYPES** | which files are documents — a compiled-in prose allowlist, replaced (not extended) by `.fux/sources/types`; absent means the default, never "everything" | ✅ accepted | yes |
+| [0032](0032_hooks.md) | **ADR-MAINTENANCE** | M5 — `post-commit` **defers** (never `pre-commit`): it writes a dirty list and spawns a one-shot re-index; the installer that registers the merge driver; and L5 moved into `write_index` where nothing can skip it | ✅ accepted | **yes — all four phases built 2026-08-22** |
+| [0033](0033_merge-driver.md) | **ADR-MERGE-DRIVER** | The committed index merges line by line, last-writer-wins on `(ver, sha)`, refuses rather than guesses — carved out of ADR-MAINTENANCE 2026-08-21 | ✅ accepted | yes |
+| [0034](0034_cache.md) | **ADR-CACHE** | The refer plane's two caches — ARC keyed `(loc, sha)` cannot change an answer; the TTL fetch store is opt-in, disk-bounded, and answers `cached`, never `current`. Carved out of ADR-REFER 2026-08-21 | ⏳ proposed | yes |
+| [0035](0035_agent-policy.md) | **ADR-AGENT-POLICY** | Fux ships the policy its consumers need to read it correctly — one canonical policy carried as a **verbatim block** into Claude skills, Copilot agents + instructions, and Kiro steering; installed by `fux setup --agents` from a **declaration, never detection**, and never outside `.fux/` unless asked | ✅ accepted | yes — installer landed 2026-08-22 (W-68); default-on, `--no-agents` and `install = []` opt out, every path outside `.fux/` announced |
+| [0036](0036_predictions.md) | **ADR-RS** | The R predictions — a claim frozen before measurement; the threshold never moves, the verdict is never edited, an ambiguous result goes to Arpit rather than the runner, and an R ends in exactly four ways (PASS · FAIL · INCONCLUSIVE · RETIRED), of which **FAIL is a success of the method** and **RETIRED is not a FAIL** | ✅ accepted | yes — veto 4's register check landed 2026-08-22 (W-69), `tests/test_prediction_register.py`; it reads **both** registers, because the first non-`R` verdict (`W44-SIGNAL`) arrived the same day |
 | [0037](0037_archived-content.md) | **ADR-ARCHIVED-CONTENT** | What a document declared `archived=true` does once it is indexed — a record property, ranking byte-identical **at the default**, a configurable demotion weight (default `1.0`), a marker and a response-level disclaimer, both still gated on W-44's instrument. **Carved out of ADR-DIR-LIST's decisions 5-8 and 10-12, 2026-08-22** — same substance, renumbered 1-7 | accepted | partial — the demotion weight is built (W-44, 2026-08-22); the record property, marker and disclaimer stay gated |
-| [0039](0038_tuning.md) | **ADR-TUNE** | `.fux/tune.toml` — every knob that changes ordering and none that changes the index, decided by one mechanical test (*does changing it change a byte in `.fux/index/`?*); committed, written once by `fux setup`, **never rewritten by fux**; plus per-source priority in **either direction**, where fux states the cost and refuses only `w ≤ 0`. Carries the finding that the field weights are already baked into the committed `wlen` | ⏳ proposed | **no** — blocked on W-73 (decision 12) |
+| [0038](0038_tuning.md) | **ADR-TUNE** | `.fux/tune.toml` — every knob that changes ordering and none that changes the index, decided by one mechanical test (*does changing it change a byte in `.fux/index/`?*); committed, written once by `fux setup`, **never rewritten by fux**; plus per-source priority in **either direction**, where fux states the cost and refuses only `w ≤ 0`. Carries the finding that the field weights are already baked into the committed `wlen` | ⏳ proposed | **no** — ⚠ **its stated blocker is discharged.** W-73 was built 2026-08-23, so decision 12 is unblocked and the differential law now holds at every configured weight. What is still unbuilt is the FILE: no `.fux/tune.toml`, no `src/fux/tune.py`. Several of this record's own decisions shipped inside W-76 (6b's `wlen`->`flen` migration; query-time field weights), which makes parts of it stale on arrival — see W-77 |
 | [0039](0039_mcp.md) | **ADR-MCP** | `fux mcp` — the stdio JSON-RPC server for coding agents. Three tools rather than nine verbs, **stdlib-only** (L1 held, not bracketed), warm across calls so the ~50-150 ms interpreter start-up is paid once instead of per query. **`answer` is deliberately not exposed: the agent IS the answerer.** Every result carries the `sha` the ranking used, so an agent can verify the index is current without trusting it | ⏳ proposed | **yes** — built and tested 2026-08-23 |
 | [0040](0040_enrich.md) | **ADR-ENRICH** | Enrichment as an **agent skill, not an API call** (Arpit, 2026-08-23). `fux enrich --plan/--check` are the deterministic halves; a coding agent generates. **L1 and L4 are HELD, not bracketed** — nothing under `src/` imports an SDK, opens a socket or holds a key, and the `$0` law survives. Fux **verifies** `source_sha` and merely **records** `model`, which is the honest cost. Scope is declared `enrich=true`; **partial coverage is the steady state**, because sha-keying un-enriches a document the moment it changes. Ships claude-only and **invoked, never ambient** | ⏳ proposed | **yes** — built and tested 2026-08-23 |
 | [0041](0041_rerank.md) | **ADR-RERANK** | Proximity reranking over the refer plane's own passages — coverage, minimum span and adjacency, the three things BM25F structurally cannot see. **The 17-32 M cross-encoder W-76 Phase 6 specified was REFUSED**, and not on cost: `onnxruntime` is not byte-identical across x86-64 and arm64, so it would break the cross-machine determinism that makes *clone it and run the query* true. L1, L3 and L4 all held. Coverage **multiplies and is squared** — measured, it is the difference between moving 2 goldens and moving 4. **Default off**, because the reranker reads the working tree and its output is therefore not a pure function of the committed index. Measured 28 -> 32 of 50, 4 fixed / 0 broken, +8 ms p95 at 10 000 docs, differential law green over 240 comparisons | ⏳ proposed | **yes** — built, tested and measured 2026-08-24 |
 
-> ⚠ **The display numbers on the four rows above drifted** (2026-08-23, noticed while adding ADR-MCP):
-> `0036`->`0035_agent-policy.md`, `0038`->`0036_predictions.md`, `0039`->`0038_tuning.md`. The **links are
-> correct and the files are correct**; only the bracketed labels are off. Left unfixed on purpose — those
-> rows belong to another session's uncommitted work and rewriting them would tangle two diffs. **ADR-MCP's
-> row above is the accurate one**: file `0039_mcp.md`, label `0039`.
-| 0030+ | — | unwritten | planned | — |
+> ## The display-number drift is FIXED (2026-08-24) — and this is what it cost
+>
+> **As part of [W-77](../../work/open/W-77-record-reconciliation.md)'s reconciliation, these were the
+> updates made to this table:** every bracketed label now equals its own filename, and the rows are
+> **sorted by number** — `0001` through `0041`, contiguous, no gaps, no duplicates.
+>
+> **What was actually wrong, and it was worse than the note it replaces said.** That note admitted drift
+> on *four* rows. The real count was **sixteen**, and `[0039]` labelled **two different rows** —
+> `0038_tuning.md` and `0039_mcp.md`. Four rows were also out of sequence (`0033, 0034, 0032, 0031`).
+>
+> **The damage was not cosmetic, which is the finding.** A link written from the *label* rather than the
+> *filename* resolves to a plausible file that does not exist — which is how this table manufactured four
+> of the five broken links W-77 fixed, and it would have kept manufacturing them.
+>
+> **The gate that now stops it recurring:** [`tests/test_doc_links.py`](../../tests/test_doc_links.py),
+> added the same day, fails when any relative link in a live document points at a file that is not there.
+> It was written under CLAUDE.md's two-strikes rule and it found **71 more** broken links on its first run.
 
 **`status` and `built` are two different questions, and conflating them is how
 the `CLAUDE.md` PROPOSED header survived ten days.** `status: accepted` means
@@ -219,7 +230,7 @@ out.
 
 **A row with `built: no` or `partial` must be claimed by an open item in
 [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md)** — otherwise it is a decision
-nobody is going to act on, which is a wish. Today: ADR-ENRICHED → W-38 ·
+nobody is going to act on, which is a wish. ⚠ **This worked example went dead and was corrected 2026-08-24** — it named W-38, W-54, W-23 and W-24, none of which is in `OPEN-WORK.md` any more (W-38 is archived), and three of the records it listed now read `built: yes`. **Today: ADR-ENRICHED → no open item (see W-77) · ADR-PORT-LIST → no open item · ADR-TUNE → W-77.** Superseded example follows: ADR-ENRICHED → W-38 ·
 ADR-URL-LIST, ADR-HTTP-FETCHER, ADR-DIR-LIST → W-54 · ADR-PORT-LIST → W-23/W-24
 (its M3 and M4 rows).
 
@@ -268,7 +279,7 @@ proposed**. Nothing forced their hand.
 **One accepted record owns nothing, on purpose.** ADR-ENRICHED decides a
 contract for a mode that is not built: the name, the boundary that keeps it
 outside the maintenance path, and the record shape. Acceptance is not
-permission to build it — [W-38](../../work/open/W-38-m8-deferred.md)'s M8 gate
+permission to build it — [W-38](../../archive/open/W-38-m8-deferred.md)'s M8 gate
 is, and it has not been given.
 
 The v0.26 engine's ADRs 0001–0015 are frozen at
@@ -353,6 +364,7 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/progress.py` | ADR-CLI | the progress plane on `ingest.run()`/`derive.build()` — stderr-only, TTY-gated, counts not clocks (W-64, 2026-08-21) |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator |
+| `src/fux/ingest/priors.py` | ADR-INGEST | ⚠ **covered only by the directory claim, and no ADR mentions it.** It computes the supersession and recency priors and writes `mtime` and `superseded` into the committed record; ADR-RECORD documents neither property and the weights live in ADR-CONFIG. A ranking-prior module under a record about walking git directories — W-77 |
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |
 | `src/fux/ingest/extract.py` | ADR-EXTRACTED | what extraction *promises* — title, phrases, terms, wlen, taken from the bytes and nothing else |
 | `src/fux/ingest/sourcelist.py` | ADR-URL-LIST | the one grammar both committed source lists are parsed by |
@@ -360,7 +372,7 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/derive/` | ADR-T1-ACCELERATOR | T1 build, block maxima, skipping, dense lane |
 | `src/fux/query/` | ADR-ASK | BM25F, scan, rank, fusion — bound by the differential law |
 | `src/fux/query/rerank.py` | ADR-RERANK | proximity reranking — carved out of ADR-ASK's directory-level claim 2026-08-24, most specific wins. Separate because it is the one thing under `query/` that reads the WORKING TREE rather than the committed index, and because the record it needs to carry is a refusal (the cross-encoder) rather than a scorer |
-| `src/fux/embed/` | ADR-T1-ACCELERATOR | `fuxvec` codes; ships default-off on measured evidence |
+| `src/fux/embed/` | ADR-T1-ACCELERATOR | ⚠ **misleading since W-76 Phase 7.** `embed/chunkvec.py` produces the **committed** per-chunk `int8` `vectors` field, so a component that writes the committed index is claimed by the record that opens *"the derived plane's only input is the committed shards"*. The 32-byte document code this note described is deleted. Re-home — W-77. Original note: | `fuxvec` codes; ships default-off on measured evidence |
 | `src/fux/enrich.py` | ADR-ENRICH | `fux enrich --plan/--check` — the deterministic halves |
 | `src/fux/templates/agents/ENRICH-SKILL.md` | ADR-ENRICH | the generation half — a skill rather than code, because [ADR-ENRICH](0040_enrich.md) decision 1 refuses to put a model call under `src/` |
 | `src/fux/mcp.py` | ADR-MCP | the stdio JSON-RPC server — `fux_search` / `fux_passage` / `fux_related`, stdlib-only, warm across calls. **`answer` is deliberately absent**: the agent is the answerer |

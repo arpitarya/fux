@@ -205,9 +205,9 @@ queries were written *specifically* to have no lexical route to their answer.
 
 ## §5 — Reference
 
-- The rules these follow — [`fux-playground/goldens/README.md`](../../../fux-playground/goldens/README.md)
+- The rules these follow — [`fux-playground/goldens/README.md`](../../archive/v0.30-rev1-planning/README.md)
 - The harness — `fux-playground/check.py`
 - The loss — W-56, 2026-08-20
 - The precedent for agent-authored ground truth accepted on instruction —
   [`work/regression/2026-08-22-graph-acceptance/`](../regression/2026-08-22-graph-acceptance/)
-- W-76 Phases 7 and 8 — [`work/open/W-76-amended-architecture.md`](../open/W-76-amended-architecture.md)
+- W-76 Phases 7 and 8 — closed 2026-08-24; the outcome is [`IMPLEMENTATION.md`](../IMPLEMENTATION.md)'s W-76 row

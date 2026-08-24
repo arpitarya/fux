@@ -612,7 +612,7 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
   MACHINE.md        environment/tooling quirks per surface (local · bridge · cloud · CI)
   DOC-REGISTRY.md   doc freshness tracker (triggers + last-verified)
   paper/            the architecture of record + figures + predictions
-  architecture.svg  the detailed diagram · architecture-overview.svg (5 components)
+  architecture-high-level.svg  what fux is · architecture-detailed.svg  the mechanism
   open/             one detail file per open W-nn; deleted with its row
   setup/            fux-playground (grades) and fux-lab (measures) — outside this repo
   regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules

@@ -53,13 +53,19 @@ PEP 518's `[tool.*]` tables.
 ```mermaid
 flowchart TD
     F["fux.toml"] --> S["[sources]"]
-    S --> D["dirs — REQUIRED<br/>non-empty list of strings"]
+    S --> D["dirs_file — optional<br/>default .fux/sources/dirs"]
     S --> U["[sources.url] — optional"]
     U --> M["fetcher · urls_file<br/>paths, defaulted"]
     U --> ME["meta — hashed | plain"]
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
     F --> I["[index]"]
     I --> SH["shards = 256<br/>documents the value, cannot set it"]
+    F --> R["[ranking] — ordering only"]
+    R --> RW["archived_weight · superseded_weight<br/>recency_half_life_days · rerank_weight"]
+    F --> DN["[dense] — the per-chunk vector lane"]
+    DN --> DM["mode = off | gated | always<br/>threshold · weight"]
+    F --> AG["[agents]"]
+    AG --> AI["install — claude · copilot · kiro<br/>absent = all three, [] = none"]
     CF -.->|"verbatim"| MW["your fetcher's configure()"]
 ```
 
@@ -70,10 +76,10 @@ flowchart TD
    fux.toml
      |
      +-- [sources]
-     |     +-- dirs            REQUIRED  non-empty list of strings
+     |     +-- dirs_file       optional  default .fux/sources/dirs
      |     |
      |     +-- [sources.url]   optional -- the whole URL source
-     |           +-- fetcher   path, default .fux/fetchers/cdp.py
+     |           +-- fetcher      path, default .fux/fetchers/http.py
      |           +-- urls_file    path, default .fux/sources/urls
      |           +-- meta         "hashed" (default) | "plain"
      |           +-- [sources.url.config]
@@ -82,10 +88,49 @@ flowchart TD
      |                        +--> your fetcher's configure(config)
      |
      +-- [index]
-           +-- shards = 256   documents the value; cannot change it
+     |     +-- shards = 256   documents the value; cannot change it
+     |
+     +-- [ranking]            ORDERING ONLY -- changes no byte of .fux/index/
+     |     +-- archived_weight         1.0  (no-op)
+     |     +-- superseded_weight       1.0  (no-op)
+     |     +-- recency_half_life_days  0.0  (off)
+     |     +-- rerank_weight           0.0  (off)
+     |
+     +-- [dense]              the per-chunk vector lane
+     |     +-- mode           "off" (default) | "gated" | "always"
+     |     +-- threshold      0.0
+     |     +-- weight         0.0
+     |
+     +-- [agents]
+           +-- install        absent = claude, copilot, kiro; [] = none
 ```
 
 </details>
+
+> **Amended 2026-08-24 (W-68, W-44 and W-76 Phases 2, 6 and 7) — both halves of
+> the pair, together.** Both diagrams drew **two** tables, `[sources]` and
+> `[index]`, and stopped. `config.py` reads **five**: `data.get("agents")`,
+> `data.get("dense")`, `data.get("index")`, `data.get("ranking")` and
+> `data.get("sources")`. **This record's title is *"`fux.toml` and every
+> property in it"***, and the picture at the top of it was the fastest way for
+> a reader to conclude that `[ranking]`, `[dense]` and `[agents]` are not
+> schema — three of them are validated as loudly as `meta` is, and one of them
+> (`[dense] mode`) decides whether a second retrieval lane runs at all.
+>
+> Two smaller corrections rode along, because a diagram is redrawn whole or not
+> at all. **`dirs` is drawn as `dirs_file`**: decision 2 retired the array on
+> 2026-08-19 and the loader now *errors* on it with instructions, so the node
+> marked `REQUIRED` named the one key that is guaranteed to fail. And the
+> twin's fetcher default read `.fux/fetchers/cdp.py`, which decision 5 replaced
+> with `.fux/fetchers/http.py` on the same day — the Mermaid half had never
+> carried the path, which is exactly how a twin drifts.
+>
+> **Named rather than rewritten:** the two `dirs = ["docs"]` snippets below
+> are stale for the same reason, and would now *error* rather than work. The
+> second is a dated capture from the fixture behind this record's Evidence
+> line, so it stays as the artefact it is; the first is the older minimal
+> example. Decision 2 carries the retirement in full — read `dirs_file` for
+> `dirs` in both, and the diagram above for the shape.
 
 ### Examples
 
@@ -305,6 +350,36 @@ two files.
 live in the committed record; these are the weights applied to those facts.
 That split is the whole of decision 1.
 
+> **Amended 2026-08-24 (W-76 Phases 6 and 7) — the amendment above is itself
+> two keys and a whole table short.** It opens *"`[ranking]` gains two keys"*
+> and says *"**Both** are validated the same way `archived_weight` is"*. Phases
+> 6 and 7 landed after it was written and neither came back to it, so this
+> record — whose title promises **every property in `fux.toml`** — documented
+> four of the seven keys the loader actually reads outside `[sources]` and
+> `[index]`.
+>
+> | key | default | what it does |
+> |---|---|---|
+> | `[ranking] rerank_weight` | `0.0` (off) | bounded uplift from the proximity reranker ([ADR-RERANK](0041_rerank.md)) |
+> | `[dense] mode` | `"off"` | `off` · `gated` · `always` — whether the per-chunk vector lane fuses at all |
+> | `[dense] threshold` | `0.0` | the lexical-confidence score below which `gated` decides to fuse |
+> | `[dense] weight` | `0.0` | how much the fused dense score may move a finished lexical ranking |
+>
+> **`rerank_weight` is validated exactly as the other three `[ranking]` keys
+> are** — non-negative number, `bool` rejected explicitly. `[dense] mode` is
+> the one key on this surface validated against a **closed set of strings**
+> rather than a range, and for the reason decision 6 gives for `meta`: a
+> mistyped `"gated "` that quietly meant `off` would present as a ranking
+> problem, not a config one. `threshold` and `weight` take the numeric rule.
+>
+> **All four ship as no-ops, and that is a discipline rather than a
+> coincidence.** Each one changes **ordering** and not a byte of `.fux/index/`,
+> so each is a tune key by decision 1's membership test and each belongs in
+> `.fux/tune.toml` with the other three when [ADR-TUNE](0038_tuning.md) is
+> built. **A change to ordering ships dark until a golden run says what it
+> did** — which is why `[dense] mode` defaults to `off` even though the vectors
+> are committed either way: the fusion waits on a gate, the storage does not.
+
 ### Veto condition
 
 **Reopen this decision if** fux ever reads a key inside `[sources.url.config]`,
@@ -318,8 +393,17 @@ grep -rn 'config\[' src/fux/ | grep -v 'test'
 # expect: no output. Fux validates that it is a table and passes it on.
 
 # 2. the config surface has not grown
-grep -oE '\braw\.get\("[a-z_]+"\)|data\.get\("[a-z]+"' src/fux/config.py | sort -u
-# expect: sources, index, fetcher, urls_file, meta, config — and nothing else
+# Amended 2026-08-24 (W-68, W-44, W-76 Phases 2 and 7): this expected
+# "sources, index, fetcher, urls_file, meta, config" and REPORTED FAILURE ON A
+# HEALTHY TREE. Two faults, and the second is the instructive one. The surface
+# genuinely grew -- [ranking], [dense] and [agents] are all read now. But the
+# `raw.get("...")` half of the pattern never matched anything even in 2026-08:
+# every real call passes a default, so the `")` in the alternation cannot hit,
+# and `fetcher`/`urls_file`/`meta`/`config` were never in this output. A check
+# nobody has run is indistinguishable from a check that passes.
+grep -oE '\bdata\.get\("[a-z]+"' src/fux/config.py | sort -u
+# expect exactly: agents, dense, index, ranking, sources — and nothing else.
+# A SIXTH top-level table is the veto; a new key inside these five is not.
 
 # 3. every rejected value still names the file and the value
 fux ingest 2>&1 | head -1

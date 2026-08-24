@@ -477,7 +477,7 @@ legal, explicit, per-document opt-out
 both are decisions.**
 
 **Phase 3 — the `git diff` delta hook is not built.** Veto condition 1 fired on
-[R5](../../work/regression/2026-08-20-m5-hooks/report.md) (44.4 s for a
+[R5](../../archive/v0.26/conformance/2026-07-23-min-confidence-calibration/report.md) (44.4 s for a
 20-document commit at 100 000 documents) and the delta design was the answer.
 It is no longer needed at the design point: **a one-document re-ingest is
 0.84 s at 10 000 documents**, linear at ~82 us per document, because W-76

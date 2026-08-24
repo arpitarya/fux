@@ -25,7 +25,7 @@ are all mid-rewrite, and a doc being rewritten is work.
 | [`compare/`](compare/README.md) | live forks — verdict + reopen-trigger | a fork opens, closes, or its trigger fires |
 | [`proposals/`](proposals/README.md) | parked ideas, not adopted | an idea is filed, graduates, or is rejected |
 | [`paper/`](paper/the-fux-index-paper.md) | the architecture of record + figures | the architecture changes; a prediction gets measured |
-| `architecture.svg` · `architecture-overview.svg` | the two diagrams | any tier/record-shape/query-path change (detailed) · any component add/remove (overview) |
+| `architecture-high-level.svg` · `architecture-detailed.svg` | the two diagrams | any record-shape, plane or query-path change (detailed) · any change to **what fux is** rather than how it works (high-level) — the high-level one should move rarely, and if it moves often it is drawn at the wrong altitude |
 | [`setup/`](setup/README.md) | the two things fux needs but does not contain — `fux-playground` (grades) and `fux-lab` (measures) | either is set up differently, or a new external dependency appears |
 
 **Records live in [`../docs/adr/`](../docs/adr/README.md), and nowhere else.**

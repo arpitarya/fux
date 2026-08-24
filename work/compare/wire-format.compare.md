@@ -20,7 +20,7 @@ timestamp: 2026-08-09T00:00:00Z
 > ⚠ **That trigger is unreachable, so it is not a live condition (W-65, 2026-08-22).**
 > It is keyed to **1M documents** — a deferred target since 2026-08-21 — and to
 > **P2**, retired with plan revision 1. P2's successor R7 is itself *closed
-> unmeasured* and awaiting re-derivation at 10 000 ([W-26](../open/W-26-m6-scale-t2.md)).
+> unmeasured* and awaiting re-derivation at 10 000 ([W-26](../../archive/open/W-26-m6-scale-t2.md)).
 > A veto written as an event nobody is waiting for never fires; re-deriving
 > this one belongs with whatever decides T2's future, not here.
 

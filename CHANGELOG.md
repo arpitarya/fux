@@ -42,6 +42,21 @@ is still `status: proposed`.
   so the two paths could disagree on that marker even at the default
   weight; fixed in the same change (`RUNTIME_SCHEMA` -> `fux.runtime.v3`).
   This closes the known limitation recorded in `1.0.0`.
+- **`fux ingest --full` could not perform the migration this release
+  requires.** It read the existing index *before* checking `--full`, so the one
+  command that exists to replace an outdated index **refused to run against
+  one** — leaving `rm -rf .fux/index/` as the only apparent way forward, which
+  silently destroys every `url:` record, the one thing in the index that cannot
+  be rebuilt offline. `--full` now discards an unreadable index when nothing
+  would be lost, and refuses **by name** when `url:` records would be. Present
+  in `1.0.0`. [ADR-INDEX-LIFECYCLE](docs/adr/0009_index-lifecycle.md)
+  decision 10.
+- **`fux enrich --plan` printed a sha that could not be used.** It showed the
+  first 12 characters while validation compared the whole value, so enrichment
+  written by correctly following the documented procedure came back `STALE` —
+  under a message rendering two identical-looking shas. Both the command and
+  the skill's own worked example are corrected.
+  [ADR-ENRICH](docs/adr/0040_enrich.md) decision 11.
 
 ### Added
 
@@ -101,7 +116,7 @@ marks the milestone `v0.37.1` already reached, not new code.
 
 ### Known limitation
 
-- **[W-73](https://github.com/arpitarya/fux/blob/main/work/open/W-73-weighted-scores-vs-pruning-bound.md):**
+- **[W-73](https://github.com/arpitarya/fux/blob/main/archive/open/W-73-weighted-scores-vs-pruning-bound.md):**
   the accelerator's differential law — `ask --fast` and `ask --scan` return
   identical results — holds only at the `archived_weight` default (`1.0`).
   The pruning bound is computed unweighted; a configured weight can make the

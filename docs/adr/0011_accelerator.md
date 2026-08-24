@@ -50,7 +50,7 @@ flowchart TD
     INV -->|no| ERR["refuse, exit 1<br/>never a divergent accelerator"]
     INV -->|yes| R[".fux/runtime/ — DERIVED"]
     R --> P["postings/xx.jsonl<br/>term-major, blocks of 128"]
-    R --> I["postings/xx.idx<br/>40-byte entries: offset, mx, mnw"]
+    R --> I["postings/xx.idx<br/>62-byte entries: offset, mx, mnw"]
     R --> D["docs.jsonl · stats.json"]
     R --> M["manifest.json<br/>a sha per committed shard"]
     M -->|"drift?"| S["stale -> the scan answers"]
@@ -70,7 +70,7 @@ flowchart TD
           v
    .fux/runtime/             DERIVED, gitignored, disposable
       postings/xx.jsonl      term-major, blocks of 128 postings
-      postings/xx.idx        40-byte entries: offset, length, mx, mnw, doc range
+      postings/xx.idx        62-byte entries: offset, length, mx, mnw, doc range
       docs.jsonl             id -> loc, title, wlen
       stats.json             n, total_wlen
       manifest.json          a sha per committed shard  --drift--> stale
@@ -175,9 +175,21 @@ The differential law then reduces to "the candidate set and `(n, total_wlen,
 df)` are identical", which a test can assert.
 
 **3. Postings are blocked at 128**, a measured shape, with a **binary offset
-table** beside each shard — 40 bytes per entry, `<8sHQIIIIIH`, carrying the
-block's byte offset and length, its `mx` (max weighted tf), `mnw` (min `wlen`),
-its document range, and its count. Binary because the alternative — fixed-width
+table** beside each shard — **62 bytes per entry, `<8sHQI` + `5H` + `5I` +
+`IIH`** — carrying the block's byte offset and length, its `mx`, `mnw`, its
+document range, and its count.
+
+> **Amended 2026-08-24 (W-76 Phase 1 + W-73).** This read *"40 bytes per entry,
+> `<8sHQIIIIIH` … `mx` (max weighted tf), `mnw` (min `wlen`)"* — three claims,
+> all now false. **`mx` and `mnw` are per-field arrays and deliberately
+> UNWEIGHTED**, recombined at the query's own weights by `block_bound`, because
+> a *weighted* extremum cannot be stored once when the weights are query-time
+> tune keys — that was W-73's whole defect. Per-field extrema over-estimate
+> `mx` and under-estimate `mnw`, and **both errors push the bound up**, so a
+> block that could contain a winner is never skipped. Measured cost:
+> **+0.0 % blocks scanned**, because 92.5 % of postings are single-field, which
+> makes the per-field sum exact rather than loose
+> ([fork 3](../../work/regression/2026-08-23-fork3-per-field-bound/)). Binary because the alternative — fixed-width
 integers inside the JSON line — needs zero padding, which JSON forbids.
 
 **4. Skipping is proved, not heuristic.** Terms open rarest-first. After each,
@@ -324,7 +336,11 @@ only, and `w(d) * S_opened(d) <= w(d) * S_full(d)` for `w >= 0`, so a weighted
 no configured weight is byte-identical to the pre-W-73 arithmetic and the
 differential evidence gathered at the default stands unmodified.
 
-The doc table now carries `archived` (runtime schema `fux.runtime.v2`). Without
+The doc table now carries `archived` (runtime schema **`fux.runtime.v3`** as of
+W-76; this sentence said `v2` until 2026-08-24, and the table has since gained
+`flen`, `superseded` and `mtime` as well — the additions that forced
+`docs_fields` into the manifest, because a schema string only moves when
+someone remembers to move it and nobody did). Without
 it the accelerator could only re-derive the flag by matching `loc` against the
 configured directories, while the scan reads the record's own stamp first — a
 second divergence, on the flag rather than the order.

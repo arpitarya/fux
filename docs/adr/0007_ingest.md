@@ -34,6 +34,22 @@ cannot depend on anything *but* one document's own bytes, which is what
 `extracted` mode means, so a file whose `sha` is unchanged keeps the `title`,
 `phrases`, `terms`, `wlen` and `code` it already had.
 
+> **Amended 2026-08-24 (W-76 Phases 1 and 7).** The list read *"`title`,
+> `phrases`, `terms`, `wlen` and `code`"*. `wlen` is gone — Phase 1 replaced it
+> with `flen`, the five raw per-field token counts, because a *weighted* sum
+> computed at ingest made a committed field a function of a tunable. `code` is
+> gone too, and **what replaced it is why this paragraph matters more than it
+> used to**: Phase 7 commits per-chunk `int8` `vectors`, and they are carried
+> forward by exactly this mechanism.
+>
+> The measurement below says 92 % of a full ingest sat in the embedding. Phase 1
+> removed that embedding and Phase 7 put a **denser** one back — measured
+> 2026-08-23, a full ingest of 1 000 documents went **0.95 s → 6.46 s, 6.8×
+> slower**. **The post-commit hook did not move (+10 %)**, and the only reason
+> is the sentence above: carry-forward re-embeds changed documents and nothing
+> else, so the cost lands on `--full` and on a first ingest, which is where it
+> can be afforded. `vectors` is now the field this whole decision is paying for.
+
 **That split was a measurement, not a preference.** This record originally
 re-extracted everything and said so; its veto condition named "full
 re-extraction becomes the measured bottleneck at scale" as the thing that would
@@ -57,7 +73,7 @@ binary, whatever the reason, with the reason.
 flowchart LR
     S[".fux/sources/dirs<br/>one entry per line"] --> W["walk<br/>skips reported"]
     W --> P["parse<br/>frontmatter + NFC"]
-    P --> X["extract<br/>title · phrases · terms · wlen<br/><i>skipped when sha is unchanged</i>"]
+    P --> X["extract<br/>title · phrases · terms · flen · vectors<br/><i>skipped when sha is unchanged</i>"]
     X --> E["resolve edges<br/>corpus-wide, every run"]
     E --> WR["write<br/>identical bytes = no write"]
     WR --> I[".fux/index/*.jsonl"]
@@ -74,8 +90,9 @@ flowchart LR
   dirs)                            SKIPPED     every run)
                                    when sha
                                   unchanged
-                                    terms                        |
-                                    wlen                         v
+                                    terms
+                                    flen                         |
+                                   vectors                       v
                                                         .fux/index/*.jsonl
                                                                  |
                                                                  v
@@ -84,6 +101,16 @@ flowchart LR
 ```
 
 </details>
+
+> **Amended 2026-08-24 (W-76 Phases 1 and 7) — both halves of the pair,
+> together.** Both drew the extract step as *"title · phrases · terms ·
+> `wlen`"*. `wlen` is not extracted and is not committed: `flen` is, and `wlen`
+> is derived at query time by `bm25f.derive_wlen()` from the weights in force.
+> **The missing box is the expensive one** — `vectors`, one committed `int8`
+> vector per chunk, is what the extract step now spends its time on, and a
+> diagram of the ingest pipeline that omits the step costing **6.8× on a full
+> run** is drawing the wrong shape. The *"skipped when sha is unchanged"* note
+> is unchanged and is what keeps that cost off the hook path.
 
 ### Examples
 
@@ -133,6 +160,20 @@ way to notice.
 `terms`, `wlen`, `code` — when its content `sha` matches the record already in
 the index, it is a `file:` record with `meta: plain`, and the shard header
 still equals `store.HEADER`. **`fux ingest --full` re-extracts regardless.**
+
+> **Amended 2026-08-24 (W-76 Phases 1 and 7).** The carried set is now
+> `("title", "phrases", "terms", "flen", "code", "vectors")` —
+> `run.py::EXTRACTED_FIELDS`, which is the normative list. `wlen` became
+> `flen`; `vectors` joined. `code` is still *named* in the tuple and **no
+> record carries it**: nothing writes one any more, so the entry only ever
+> matches a pre-v2 record — and the third gate condition, the shard header
+> equalling `store.HEADER`, refuses those outright. It is inert rather than
+> wrong.
+>
+> **The three gate conditions are untouched, and one of them is now doing more
+> work than when it was written.** `vectors` is a model output, so a
+> carried-forward vector produced by a different model bundle would be exactly
+> the silent cross-version mixing the header check exists to stop.
 
 The gate is those three conditions together, and each is load-bearing:
 
@@ -235,6 +276,15 @@ accelerator: 85 terms, 85 blocks, 89 postings (derived, not committed)
 # after : {'sha': '95af0076…', 'ver': 2, 'wlen': 35}
 ```
 
+> **Amended 2026-08-24 (W-76 Phase 1) — the note above already says why this
+> block is not edited, and this is the second reason.** No record carries
+> `wlen` any more; the same two lines taken today would read `'flen': [...]`, a
+> list of five per-field token counts rather than one weighted number. **The
+> capture stays verbatim** for exactly the reason given above it — a transcript
+> quietly rewritten to match today's code is no longer evidence of anything —
+> and what it is evidence of is undisturbed: an edited document gets a new
+> `sha`, a bumped `ver`, and one rewritten shard.
+
 **A document deleted — record and shard both go:**
 
 ```console
@@ -287,6 +337,15 @@ docs/logo.png: binary
   only complete term-hash collision check** and the only thing that retro-fits
   `code` onto unchanged documents, so it is not made redundant by any of this.
 
+  > **Amended 2026-08-24 (W-76 Phases 1 and 7).** There is no `code` to
+  > retro-fit — Phase 1 removed the field. **The claim survives with its
+  > subject replaced**: `--full` is the only thing that retro-fits `vectors`
+  > onto unchanged documents, and it is the same argument, on a field that
+  > costs far more. A machine that ingested without the model bundle commits
+  > records with no `vectors` at all — a degraded lane, never an error, because
+  > the lexical index answers on its own — and nothing but `--full` will fill
+  > them in later.
+
 - **`run()` clears the dirty list on completion, 2026-08-22 (W-66 Phase 1).**
   The list itself and its writer belong to [ADR-MAINTENANCE](0032_hooks.md)
   (decision 1a); the one line that belongs here is that this record's own
@@ -330,6 +389,15 @@ docs/logo.png: binary
   loudly" guarantee and is written down rather than hoped about.
 - **A newly available embedding bundle does not retro-fit `code`** onto
   documents that have not changed since. `--full` fixes it; nothing else will.
+
+  > **Amended 2026-08-24 (W-76 Phases 1 and 7).** Read `vectors` for `code`:
+  > the field changed, the consequence did not, and **it is a sharper edge than
+  > it was**. `code` was one 256-bit sign code per document; `vectors` is one
+  > `int8` vector per chunk, roughly 9.8× the density, and it is what the dense
+  > lane retrieves on. A corpus ingested on a source install carries none of
+  > them, and `[dense] mode` will simply find nothing to fuse — silently,
+  > because a missing vector is indistinguishable from a document that does not
+  > match. `--full` still fixes it and still nothing else will.
 - **`0 shards written` can accompany a deletion**, since removing a shard is
   not a write. True, and mildly under-informative when reading a run log.
 - **Re-ingest is safe to run on a hook**, which is what M5 depends on.
@@ -418,6 +486,24 @@ docs/logo.png: binary
 **Amended 2026-08-23 (W-76 Phase 1).** `EXTRACTED_FIELDS` — the tuple naming
 what carry-forward reuses verbatim for an unchanged `sha` — is now
 `("title", "phrases", "terms", "flen", "code")`: `wlen` became `flen`.
+
+> **Amended 2026-08-24 (W-76 Phase 7) — the tuple gained a sixth name the same
+> week, and this amendment was written one phase too early.** It is
+> `("title", "phrases", "terms", "flen", "code", "vectors")`.
+>
+> **`vectors` is not one more name on a list.** It is the reason carry-forward
+> is now load-bearing rather than merely fast: a full ingest of 1 000 documents
+> measured **0.95 s → 6.46 s, 6.8× slower**, once per-chunk embedding came
+> back — and the post-commit hook moved **+10 %**, because this tuple is what
+> keeps the embedding to changed documents. The 92 % measurement that fired
+> this record's veto in the first place was about an embedding pass that Phase
+> 1 deleted and Phase 7 replaced with a denser one; the decision it produced is
+> what made the replacement affordable.
+>
+> The invalidation argument below carries over exactly. `vectors` is a model
+> output as well as a function of bytes, so a vector carried across a model
+> change would be the same silent mixing the header check refuses — and
+> `analyzer` went `v1` → `v2` in the change that introduced it.
 
 The carry-forward gate is unchanged and is what makes this safe: it is
 conditioned on the shard header still matching `store.HEADER`, and the header

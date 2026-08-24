@@ -240,7 +240,7 @@ rather than a reason to move the target.
 
 ## §8 · Reference
 
-- [W-26](../open/W-26-m6-scale-t2.md) §re-scope — *"is not simply divided by
+- [W-26](../../archive/open/W-26-m6-scale-t2.md) §re-scope — *"is not simply divided by
   ten"*, and the instruction that makes this Arpit's.
 - [The 2026-08-21 preliminary analysis](../regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md)
   — 2.429× real git-pack compression, 91.3 % of raw bytes in `terms`, and why

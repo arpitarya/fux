@@ -424,7 +424,7 @@ The set stays **closed** and is now `archived` and `enrich`, both
 
 | attribute | changes committed bytes? | defining record |
 |---|---|---|
-| `archived` | no — it routes ranking | [ADR-DIR-LIST](0023_dir-list.md) |
+| `archived` | no — it routes ranking | [ADR-DIR-LIST](0022_dir-list.md) |
 | **`enrich`** | **yes, indirectly** — a scope's documents gain a `ctx` field | [ADR-ENRICH](0040_enrich.md) |
 
 `enrich` is the first attribute whose effect on the index is *indirect*: the

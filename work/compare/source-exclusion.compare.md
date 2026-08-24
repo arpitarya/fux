@@ -14,8 +14,8 @@ timestamp: 2026-08-20T00:00:00Z
 > **VERDICT: E — DECIDED by Arpit, 2026-08-20.** An exclusion *entry* in `.fux/sources/dirs`, one
 > per line, `!` prefix, repo-relative glob, applied to the whole walk and
 > order-independent. **Not** an attribute on a directory line.
-> **Status:** **decided** — the build is [W-45](../open/W-45-source-exclusion.md), which stays open until
-> it lands, and **lands with [W-55](../open/W-55-no-file-type-filter.md)**: one
+> **Status:** **decided** — the build is [W-45](../../archive/open/W-45-source-exclusion.md), which stays open until
+> it lands, and **lands with [W-55](../../archive/open/W-55-no-file-type-filter.md)**: one
 > grammar change, not two. · **Confidence at the time of the call:** medium-high on eliminating
 > B/C/D (measured), medium on E over A (a grammar-shape judgment, not a
 > measurement) · **Reopen when:** a consumer needs an exclusion that must
@@ -25,7 +25,7 @@ timestamp: 2026-08-20T00:00:00Z
 > **This verdict is half an answer, and says so.** The measurement below found
 > a second, larger cause that no option here addresses:
 > **fux has no file-type filter at all**, so `.json`, `.sh` and `.py` are
-> indexed as documents. That is [W-55](../open/W-55-no-file-type-filter.md),
+> indexed as documents. That is [W-55](../../archive/open/W-55-no-file-type-filter.md),
 > and **it should be decided before or with this one** — see §The interaction.
 
 ## Context
@@ -141,7 +141,7 @@ condition someone can check.
 ## The interaction — and why this verdict is half an answer
 
 Measuring the corpus to write this doc surfaced a **separate and larger
-cause**, filed as [W-55](../open/W-55-no-file-type-filter.md):
+cause**, filed as [W-55](../../archive/open/W-55-no-file-type-filter.md):
 `gitdir.py::_candidate_paths` applies **no extension filter**. Anything
 UTF-8-decodable is a document.
 

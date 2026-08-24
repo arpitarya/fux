@@ -31,10 +31,23 @@ many times, in these fields*. Fux stores the same set of postings **twice, in
 two shapes**, because the two consumers want opposite things.
 
 **Git wants doc-major.** One document's edit should touch one line. So the
-committed record carries its own postings inline: `terms` maps a term hash to
-`[heading_tf, body_tf]`. Edit one document, and exactly one line of one shard
-changes. A term-major committed index would spray that edit across every term
-the document contains — an unreviewable diff and a merge conflict per term.
+committed record carries its own postings inline: `terms` maps a 16-hex term
+hash to a **five-element sparse tf list**, one slot per field in `TF_FIELDS`
+order and trailing zeros omitted. Edit one document, and exactly one line of one
+shard changes. A term-major committed index would spray that edit across every
+term the document contains — an unreviewable diff and a merge conflict per term.
+
+> **Amended 2026-08-24 (W-76 Phase 1).** This read *"`terms` maps a term hash to
+> `[heading_tf, body_tf]`"* — two fields, both always written. There are five
+> now (`body`, `heading`, `title`, `path`, `ctx`), and the list is **sparse**:
+> trailing zeros are not written at all, so a body-only posting is `[1]` rather
+> than `[1,0,0,0,0]`. That is not a cosmetic saving and it is why `body` is
+> first in the order. Measured on this repo, **92.5 % of postings are
+> body-only**, so the sparse body-first encoding came in **-36.7 %** on tf
+> bytes *while the field count went from two to five*; the naive dense
+> five-slot form would have been **+24 %**. The field order is therefore a
+> committed format decision, not a preference — see
+> [ADR-RANKING](0012_ranking.md).
 
 **Queries want term-major.** Answering "index format canonical" means walking
 three terms, not five thousand documents. So the derived plane inverts it: one
@@ -50,14 +63,14 @@ That branch is closed, not paused.
 ```mermaid
 flowchart LR
     subgraph committed ["COMMITTED — doc-major, in git"]
-        D1["doc A: terms {h1:[1,0], h2:[0,3]}"]
-        D2["doc B: terms {h2:[0,1], h3:[2,0]}"]
+        D1["doc A: terms {h1:[1], h2:[0,3]}"]
+        D2["doc B: terms {h2:[0,1], h3:[2]}"]
     end
     subgraph derived ["DERIVED — term-major, gitignored"]
-        T1["h1: [[A,1,0]]"]
-        T2["h2: [[A,0,3],[B,0,1]]"]
-        T3["h3: [[B,2,0]]"]
-        IX["xx.idx — 40B per block:<br/>offset · mx · mnw · doc range"]
+        T1["h1: [[A,[1]]]"]
+        T2["h2: [[A,[0,3]],[B,[0,1]]]"]
+        T3["h3: [[B,[2]]]"]
+        IX["xx.idx — 62B per entry:<br/>offset · per-field mx · per-field mnw · doc range"]
     end
     D1 -->|"fux build"| T2
     D2 -->|"fux build"| T2
@@ -70,46 +83,82 @@ flowchart LR
 ```text
   COMMITTED  (doc-major, in git)          DERIVED  (term-major, gitignored)
   ------------------------------         ---------------------------------
-  doc A: terms { h1:[1,0],               h1 -> [[A,1,0]]
-                 h2:[0,3] }              h2 -> [[A,0,3], [B,0,1]]
-  doc B: terms { h2:[0,1],   --build-->  h3 -> [[B,2,0]]
-                 h3:[2,0] }
-                                         xx.idx: 40 bytes per block
-  edit doc A -> ONE line changes                offset · length
-  (this is why git gets doc-major)              mx · mnw
+  doc A: terms { h1:[1],                 h1 -> [[A,[1]]]
+                 h2:[0,3] }              h2 -> [[A,[0,3]], [B,[0,1]]]
+  doc B: terms { h2:[0,1],   --build-->  h3 -> [[B,[2]]]
+                 h3:[2] }
+                                         xx.idx: 62 bytes per entry
+  tf slots are (body, heading, title,           offset · length
+  path, ctx) with trailing zeros                mx[5] · mnw[5]   <- per field,
+  omitted -- [1] is body-only                                       UNWEIGHTED
                                                 first_doc · last_doc · count
+  edit doc A -> ONE line changes
+  (this is why git gets doc-major)
 
   Same postings. Opposite shapes. One is reviewed; the other is rebuilt.
 ```
 
 </details>
 
+> **Amended 2026-08-24 (W-76 Phase 1) — both halves of the pair, together.**
+> Both diagrams drew two-element tf pairs, a flat `[docidx, heading_tf,
+> body_tf]` derived posting, and a 40-byte offset entry carrying one scalar
+> `mx` and one scalar `mnw`. All three are stale. The tf slot is a **sparse
+> five-element list**, so the derived posting nests it — `[docidx, [tf…]]` —
+> rather than spreading it across the row, which is what keeps the shape
+> readable as the field count changes. The offset entry is **62 bytes**, and
+> its `mx`/`mnw` are **per-field arrays and deliberately unweighted**, because
+> a weighted extremum cannot be precomputed once when the weights are
+> query-time tune keys; `derive/accel.py::block_bound` recombines them at the
+> weights in force ([ADR-T1-ACCELERATOR](0011_accelerator.md)).
+
 ### Examples
 
-**Committed** — postings inline in the document's own record, `[heading_tf,
-body_tf]` per term hash:
+**Committed** — postings inline in the document's own record, a sparse
+five-slot tf list per term hash, in `TF_FIELDS` order and with trailing zeros
+omitted. From this record's own line in the live index:
 
 ```json
 "terms": {
-  "15b18d006e8a6e50": [0, 1],
-  "3d48c93aa729e567": [1, 0],
-  "590407b549d6e3b4": [0, 2]
+  "0097ee914e37dedf": [1],
+  "0434edd58f20e873": [1, 1],
+  "1fc5bd8679f757f5": [35, 0, 0, 1],
+  "70d128b81140b42d": [22, 1, 1, 1]
 }
 ```
 
-**Derived** — one line per block, `[term_hash, [[docidx, heading_tf,
-body_tf], …]]`:
+Read those four in order: body only; body and heading; a term that occurs 35
+times in the body and once in the **path**, where the interior zeros must be
+written because a later slot is non-zero; and a term in body, heading, title
+and path at once. The same trimming applies to `flen`, which for this document
+is `[1827, 141, 6, 6]` — four numbers, not five, because `ctx` is empty and an
+empty trailing field is not written at all.
+
+**Derived** — one line per block, `[term_hash, [[docidx, [tf…]], …]]`:
 
 ```console
-$ head -1 .fux/runtime/postings/03.jsonl
-["0344439b989e1c65",[[0,0,1]]]
+$ grep -m1 '"0327703c9f10dbf6"' .fux/runtime/postings/03.jsonl
+["0327703c9f10dbf6",[[291,[2]],[295,[2]]]]
 ```
 
 **The field order is not guessable, so it is pinned** in every shard's header:
 
 ```json
-{"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}
+{"_format":"fux.index.v2","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}
 ```
+
+> **Amended 2026-08-24 (W-76 Phase 1).** This block was introduced as the
+> current pinned header and read
+> *`{"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}`*.
+> All three values moved at once, and they moved together on purpose: the tf
+> arity, the tf **order**, and the analyzer are exactly the three things a
+> reader cannot recover from the postings themselves, so a shard that pins one
+> without the others is worse than useless. `store/reader.py` **refuses** a
+> shard whose header does not match the running build rather than mixing it in
+> — two analyzers in one index is undetectable at query time and corrupts every
+> `df`, and a `[1, 2]` read under the old order silently swaps body for
+> heading. The examples above it were re-taken from the live `v2` index rather
+> than rewritten by hand.
 
 ---
 
@@ -153,7 +202,19 @@ shapes — and the obligation to keep them equal.
 ### Decision
 
 **1. Committed postings are inline and doc-major.** `terms` in the record maps
-a **16-hex term hash** to `[heading_tf, body_tf]`.
+a **16-hex term hash** to a **five-element sparse tf list** — one slot per field
+in `TF_FIELDS` order, trailing zeros omitted.
+
+> **Amended 2026-08-24 (W-76 Phase 1).** This read *"maps a 16-hex term hash to
+> `[heading_tf, body_tf]`"*. The hash is unchanged; the value is not. Five
+> fields (`body`, `heading`, `title`, `path`, `ctx`) replaced two because two
+> could not carry enrichment vocabulary or a path without folding them into
+> `body`, where no field weight could reach them ([ADR-RANKING](0012_ranking.md)
+> decision 1). **Sparsity is what paid for the extra three**: trailing zeros are
+> never written, 92.5 % of postings are body-only, and body-first ordering
+> measured **-36.7 %** on tf bytes *while going from two fields to five*. The
+> integer rule below (decision 4) is untouched, and so is the one-line-per-
+> document property this decision exists for.
 
 **2. The key is a hash, not the term.** 8-byte blake2b. It bounds the key size,
 and it means the committed index does not carry a readable vocabulary of a
@@ -169,14 +230,37 @@ plane — floats are not byte-reproducible across platforms, and the
 byte-identical guarantee is the whole basis of the design.
 
 **5. Derived postings are term-major and blocked at 128.** One JSON line per
-block: `[term_hash, [[docidx, heading_tf, body_tf], …]]`. `docidx` is a
-position in `docs.jsonl`, not an `id` — an integer keeps the block line small
-and the block scan tight.
+block: `[term_hash, [[docidx, [tf…]], …]]`. `docidx` is a position in
+`docs.jsonl`, not an `id` — an integer keeps the block line small and the block
+scan tight.
 
-**6. Each postings shard has a binary offset table beside it**, 40 bytes per
-block, sorted by `(term, block_no)` so a term's blocks are one bisect and a
+> **Amended 2026-08-24 (W-76 Phase 1).** This read *"`[term_hash, [[docidx,
+> heading_tf, body_tf], …]]`"* — a flat row, with the tf values spread out
+> beside the `docidx`. The tf list is **nested** now, one element of the row
+> rather than the tail of it. That is the shape that survives a field count
+> changing: a flat row has to be re-specified every time the arity moves, and a
+> reader has no way to tell a two-field row from a truncated three-field one.
+> Nesting also lets the derived posting reuse the committed record's tf list
+> **verbatim**, trailing zeros already trimmed, which is what makes the two
+> planes checkably the same information rather than two encodings of it.
+
+**6. Each postings shard has a binary offset table beside it**, 62 bytes per
+entry, sorted by `(term, block_no)` so a term's blocks are one bisect and a
 contiguous read. Contents and rationale in
 [ADR-T1-ACCELERATOR](0011_accelerator.md).
+
+> **Amended 2026-08-24 (W-76 Phase 1 + W-73).** This read *"40 bytes per
+> block"*. The entry grew to **62 bytes** because its two summary scalars
+> became **per-field arrays** — `mx` and `mnw` are now `5H` and `5I`, and
+> deliberately **unweighted**. A *weighted* extremum cannot be precomputed once
+> when the field weights are query-time tune keys, which was W-73's defect;
+> `derive/accel.py::block_bound` recombines the arrays at the weights in force
+> instead. The cost of the looser per-field bound was measured at **+0.0 %
+> blocks scanned**. **The offset table is derived and disposable**, so growing
+> it by 22 bytes an entry costs a rebuild and nothing in git — which is exactly
+> why the arrays could go here rather than into the committed plane. The
+> layout itself belongs to [ADR-T1-ACCELERATOR](0011_accelerator.md); this
+> record only names its size.
 
 **7. Both planes shard on the first hash byte** — the committed store by
 document id, the postings by term hash. Same 256-way split, same reasoning.
@@ -245,7 +329,10 @@ query time ([ADR-RANKING](0012_ranking.md)).
   (`hash_terms`), [`format.py`](../../src/fux/store/format.py) (`term_hash`),
   [`collisions.py`](../../src/fux/store/collisions.py).
 - Derived side — [`src/fux/derive/build.py`](../../src/fux/derive/build.py) and
-  [`format.py`](../../src/fux/derive/format.py) (the 40-byte entry layout).
+  [`format.py`](../../src/fux/derive/format.py) (the 62-byte entry layout —
+  **amended 2026-08-24**, this said *"the 40-byte entry layout"*; that module's
+  own docstring now carries the `<8sHQI` + `5H` + `5I` + `IIH` breakdown and
+  the reason the two extrema became per-field arrays).
 - Both shapes, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §§2–3.
 - The pruning verdict — P1-RERUN and

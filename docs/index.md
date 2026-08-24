@@ -26,7 +26,7 @@ update both or neither.
 * [Open work](../work/OPEN-WORK.md) - **the single live queue**, two concurrent lanes; finished items are deleted, not ticked.
 * [Implementation](../work/IMPLEMENTATION.md) - the milestone log: what shipped, when, and the outcome. What OPEN-WORK reconciles against.
 * [The paper](../work/paper/the-fux-index-paper.md) - the architecture of record, with figures and falsifiable predictions.
-* [Overview diagram](../work/architecture-overview.svg) - five components, one glance · [detailed diagram](../work/architecture.svg) - tiers, record shapes, query path.
+* [High-level diagram](../work/architecture-high-level.svg) - what fux is, in three boxes, for someone who has never seen it · [detailed diagram](../work/architecture-detailed.svg) - the mechanism: record shape, both retrieval paths, the two planes and the laws that separate them.
 * [Model handoff interview](../work/INTERVIEW.md) - the state of play; read before substantive changes.
 * [Worklog](../work/WORKLOG.md) - per-exchange session trail, newest first.
 * [Machine notes](../work/MACHINE.md) - what breaks on which surface, and why.

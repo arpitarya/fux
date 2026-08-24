@@ -87,8 +87,24 @@ network, full function:
 >>> bundle.documents[0].as_record()["freshness"]
 'current'
 >>> bundle.assembled.citations[0].locator
-'runbook.md#p1'
+'archive/v0.26/tests_e2e/eval/relational/docs/runbook-rollback.md:L5-L8'
 ```
+
+> **Amended 2026-08-24 (W-76 Phase 5).** The last line read *`'runbook.md#p1'`*
+> — the wrong *shape*, under a heading that promises the block was verified
+> against the local checkout. `ScoredPassage.locator` is now `path:L12-L40`,
+> because **an agent acts on a citation by opening a file at a line**, and a
+> passage ordinal forced a second call to work out which lines those were. The
+> ordinal did not die: it survives as `passage.ordinal` and in the
+> `--json`/MCP payload, because it is stable across a reflow that moves every
+> line number, which is exactly when a stored citation would otherwise point
+> somewhere else silently. The ordinal form is still what a passage carrying
+> no line range falls back to — a wrong line number is worse than an honest
+> ordinal.
+>
+> The path grew because the value above was **re-captured for real** rather
+> than re-shaped by hand: that query's top candidate on this checkout today is
+> the archived rollback runbook, and the block now says what the code says.
 
 An unreachable source degrades honestly — declared, never stale-as-fresh:
 
@@ -149,6 +165,21 @@ terms · wlen · edges`; `ver` is a revision counter, not a time, and
 `runtime/stamp.json` holds mtimes but is derived and *explicitly excluded* from
 the byte-identity assertion because mtimes are not reproducible.
 
+> **Amended 2026-08-24 (W-76 Phases 1, 2 and 7) — the field list.** This read
+> *"A record carries `id · src · loc · sha · ver · mode · meta · title ·
+> phrases · terms · wlen · edges`"*, and it is now false in three places at
+> once: Phase 1 replaced `wlen` with the per-field `flen`, Phase 2 added the
+> `mtime` and `superseded` priors, and Phase 7 added committed per-chunk
+> `vectors`. Counted on this repo's 434 committed records today, the names are
+> `archived · edges · flen · id · loc · meta · mode · mtime · phrases · sha ·
+> src · terms · title · vectors · ver`, plus `title_h` in place of
+> `title`/`phrases` on a `hashed` record — [ADR-RECORD](0010_index-record.md)
+> owns the schema and carries the same list.
+>
+> **`ver` is still a revision counter and not a time.** That clause survives
+> untouched. What does not survive is the sentence it was written to support —
+> see immediately below.
+
 > Shipping the knob anyway would mean shipping one that silently does nothing,
 > and a caller passing `max_age_seconds=60` would reasonably believe they had
 > bounded their staleness. **The policy is a mode — `never` | `always` — plus
@@ -160,6 +191,31 @@ the byte-identity assertion because mtimes are not reproducible.
 > one) is the answer; `max_age_seconds` is struck from the proposal for good,
 > not deferred. Decision 4 stands permanently on this ground — see
 > [`work/compare/record-freshness.compare.md`](../../work/compare/record-freshness.compare.md).
+
+> **Amended 2026-08-24 (W-76 Phase 2) — the premise died, and this record does
+> not get to pretend the conclusion is unaffected.** Decision 4 rests on
+> *"There is no such provenance"*, and the block above closes W-58 *"for good,
+> not deferred"* and calls the decision permanent **on that ground**. The
+> ground is gone. Phase 2 committed `mtime` — a **git commit timestamp**, not a
+> filesystem one, chosen that way precisely so a recorded time could be
+> committed without costing L3 a thing — and it is present on **414 of this
+> repo's 434 records**. `[ranking] recency_half_life_days` already reads it
+> and decays a score by it. That is a ledger-recorded provenance, which is
+> exactly the thing decision 4 says does not exist.
+>
+> **What follows from that is a ruling, not an edit, and it is deliberately
+> not made here.** Two readings are open. Either the refusal survives on
+> decision 5's ground instead — content verification answers *"is the index
+> still right"* exactly where an age only ever answered *"probably"*, and that
+> argument never once depended on the absence of a timestamp — or
+> `max_age_seconds` is **reopenable**, because the single stated reason the
+> knob would have lied has been removed and a caller asking to bound staleness
+> by age can now be given an honest answer. The two readings differ in what
+> they cost, so picking one by default is the wrong move.
+>
+> **Until Arpit rules, treat decision 4 as standing but unargued**: the
+> behaviour is unchanged and nothing downstream should assume otherwise, but
+> no one may cite the "no such provenance" sentence as the reason for it.
 
 **5. Freshness is verified by content, and that is stronger than age.** A fetch
 compares the fetched bytes' sha against the recorded sha. This answers *"is the

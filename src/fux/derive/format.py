@@ -17,7 +17,13 @@ padding, which JSON forbids.
 The table is derived, never committed, so no committed-bytes law applies to
 it. `mx` and `mnw` are integers regardless, per compare doc §7.
 
-## Entry layout — 40 bytes, `<8sHQIIIIIH`, no padding under `<`
+## Entry layout — 62 bytes, `<8sHQI` + `5H` + `5I` + `IIH`, no padding under `<`
+
+**Was 40 bytes and `<8sHQIIIIIH` until W-76 Phase 1.** The two scalars that
+grew are the reason: `mx` and `mnw` were single weighted numbers, and a
+weighted extremum cannot be stored once when the weights are query-time tune
+keys. They are now **per-field and deliberately UNWEIGHTED** arrays, recombined
+at the query's own weights by `accel.block_bound`.
 
 | field | type | meaning |
 |---|---|---|
@@ -25,11 +31,18 @@ it. `mx` and `mnw` are integers regardless, per compare doc §7.
 | `block_no` | `u16` | block ordinal within the term, from 0 |
 | `offset` | `u64` | byte offset of the block line in its postings shard |
 | `length` | `u32` | byte length of the block line, newline excluded |
-| `mx` | `u32` | **max weighted tf** in the block: `max(3*tf_heading + tf_body)` |
-| `mnw` | `u32` | **min `wlen`** in the block |
+| `mx` | `5×u16` | per-field **max unweighted tf** in the block, one per `TF_FIELDS` |
+| `mnw` | `5×u32` | per-field **min `flen`** in the block, one per `TF_FIELDS` |
 | `first_doc` | `u32` | lowest docidx in the block |
 | `last_doc` | `u32` | highest docidx in the block |
 | `count` | `u16` | postings in the block |
+
+**Why per-field extrema are safe.** They over-estimate `mx` and under-estimate
+`mnw` relative to the true weighted extremum, and both errors push the bound
+**up** — so a block that could contain a winner is never skipped. Measured cost
+on this repo and on 10 000 real documents: **+0.0 % blocks scanned**, because
+92.5 % of postings are single-field, which makes the per-field sum exact rather
+than loose. Filed: `work/regression/2026-08-23-fork3-per-field-bound/`.
 
 Entries are sorted by `(term, block_no)`, so a term's blocks are found by one
 bisect and read as a contiguous run.
@@ -83,7 +96,7 @@ RUNTIME_SCHEMA = "fux.runtime.v3"
 #: this costs disk in `.fux/runtime/` and nothing in git.
 _FIELD_COUNT = 5
 ENTRY_STRUCT = struct.Struct("<8sHQI" + f"{_FIELD_COUNT}H" + f"{_FIELD_COUNT}I" + "IIH")
-ENTRY_SIZE = ENTRY_STRUCT.size  # 40
+ENTRY_SIZE = ENTRY_STRUCT.size  # 62
 
 #: Every key the doc table carries. **Part of the runtime contract, checked by
 #: `is_fresh`.** Learned the hard way on 2026-08-23: `superseded` and `mtime`

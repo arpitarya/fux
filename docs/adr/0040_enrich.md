@@ -80,7 +80,7 @@ the fact that enrichment lands as a reviewable diff.
 **4. Scope is DECLARED — `enrich=true` on a `.fux/sources/dirs` line.**
 
 The same closed-attribute grammar as `archived`, for the same reason
-([ADR-DIR-LIST](0023_dir-list.md) decision 10): a path heuristic is exact for
+([ADR-DIR-LIST](0022_dir-list.md) decision 10): a path heuristic is exact for
 the repo that invented it and a silent convention for everyone else.
 Enrichment costs money and changes ranking, so which directories get it is a
 human decision written in a diffable line.
@@ -169,7 +169,8 @@ being told to copy.
 
 - Arpit's ruling and the full argument —
   [`work/proposals/ideal/07-rulings.amendment.md`](../../work/proposals/ideal/07-rulings.amendment.md)
-- W-76 Phase 8 — [`work/open/W-76-amended-architecture.md`](../../work/open/W-76-amended-architecture.md)
+- W-76 Phase 8 — the outcome of record is [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)'s W-76 row.
+  The closed detail file is `archive/open/W-76-amended-architecture.md` — **named, never cited**
 - The contract this inherits — [ADR-ENRICHED](0017_enriched-mode.md)
 - Tests — [`tests/test_enrich.py`](../../tests/test_enrich.py)
 

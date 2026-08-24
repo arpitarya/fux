@@ -16,7 +16,7 @@ timestamp: 2026-08-20T00:00:00Z
 > proof of freshness — applied to the refer plane's fetch step instead of the
 > accelerator's build step. **It does not touch the committed record**:
 > [record-freshness](record-freshness.compare.md)'s verdict D and
-> [W-58](../open/W-58-no-recorded-ingest-time.md) are unaffected, because the
+> [W-58](../../archive/open/W-58-no-recorded-ingest-time.md) are unaffected, because the
 > clock lives in gitignored cache metadata, not in a shard. A cache-served
 > answer gets a **fourth verdict state, `cached`**, carrying `age_seconds` —
 > never silently relabelled `current` — so
@@ -26,7 +26,7 @@ timestamp: 2026-08-20T00:00:00Z
 > **Status:** ✅ accepted (Arpit, 2026-08-20) — **as proposed**: default
 > `cache_ttl_seconds` **300 s**, and build proceeds **without waiting on
 > R4**, on the Confluence-rate-limit rationale stated above. **This decision
-> is independent of [W-58](../open/W-58-no-recorded-ingest-time.md) /
+> is independent of [W-58](../../archive/open/W-58-no-recorded-ingest-time.md) /
 > [record-freshness](record-freshness.compare.md), which is still ⏳ awaiting
 > Arpit on its own terms** — accepting F does not answer whether the
 > committed record needs a timestamp; the two questions do not share a
@@ -200,5 +200,5 @@ latency question has an actual number.
   decisions 4, 6, 7, 9
 - The sibling decision this does not reopen —
   [record-freshness](record-freshness.compare.md) ·
-  [W-58](../open/W-58-no-recorded-ingest-time.md)
-- The item this document backs — [W-60](../open/W-60-refer-fetch-cache.md)
+  [W-58](../../archive/open/W-58-no-recorded-ingest-time.md)
+- The item this document backs — [W-60](../../archive/open/W-60-refer-fetch-cache.md)

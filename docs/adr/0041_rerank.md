@@ -40,7 +40,7 @@ passages. Optional dependency (`onnxruntime`)."* That is not built. Three
 reasons, in the order they matter:
 
 **1. It would break cross-machine determinism, which is the product.**
-[ADR-GRAPH](0028_graph-plane.md) proved fux's float arithmetic is byte-identical
+[ADR-GRAPH](0029_graph.md) proved fux's float arithmetic is byte-identical
 between x86-64 Linux and arm64 macOS — **for pure Python**. `onnxruntime`
 dispatches to different SIMD kernels per architecture and reduces GEMMs in a
 different order, so two developers on the same commit would get different
@@ -172,8 +172,11 @@ Filed: [`work/regression/2026-08-24-rerank-and-goldens/`](../../work/regression/
 
 - The goldens and how they were written — [`work/proposals/playground-goldens-draft.md`](../../work/proposals/playground-goldens-draft.md)
 - The run — [`work/regression/2026-08-24-rerank-and-goldens/`](../../work/regression/2026-08-24-rerank-and-goldens/)
-- W-76 Phase 6 — [`work/open/W-76-amended-architecture.md`](../../work/open/W-76-amended-architecture.md)
-- The determinism result that decision 1 rests on — [ADR-GRAPH](0028_graph-plane.md)
+- W-76 Phase 6 — the measured outcome is [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)'s W-76 row and
+  [the run](../../work/regression/2026-08-24-rerank-and-goldens/report.md). The item's
+  detail file is closed and lives at `archive/open/W-76-amended-architecture.md` —
+  **named, never cited**
+- The determinism result that decision 1 rests on — [ADR-GRAPH](0029_graph.md)
 - Tests — [`tests/query/test_rerank.py`](../../tests/query/test_rerank.py)
 
 ## 6 · Veto condition

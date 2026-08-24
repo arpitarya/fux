@@ -22,3 +22,6 @@ venv/
 .locks/
 .progress-nudged
 
+# Per-machine Claude Code settings — a local permission cache, never shared.
+.claude/settings.local.json
+

@@ -95,7 +95,7 @@ no pruning gives roughly 0.6–1.5 GB). The criterion decides *which* 6 %.
 > never replaced, and nothing here re-opens it; what changed is that the cost
 > of obeying it fell.
 >
-> **Pruning work is fenced to [W-38](../open/W-38-m8-deferred.md)** and none of
+> **Pruning work is fenced to [W-38](../../archive/open/W-38-m8-deferred.md)** and none of
 > this is a licence to reconsider it here.
 
 Prior evidence, in order of weight:

@@ -9,7 +9,7 @@ timestamp: 2026-08-22T00:00:00Z
 
 # `df` over the union — should archived documents count toward rarity?
 
-**The fork [W-52](../open/W-52-df-over-the-union.md) has been parked on since
+**The fork [W-52](../../archive/open/W-52-df-over-the-union.md) has been parked on since
 2026-08-19.** This document exists so Arpit can decide it against evidence
 rather than against the 42 % figure alone.
 

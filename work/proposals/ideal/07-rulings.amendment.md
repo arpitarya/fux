@@ -235,7 +235,7 @@ That makes the selection rule the design decision, not an operational detail.
 ### The decision — declare the scope, do not derive it
 
 Same closed-attribute grammar as `archived=true`
-([ADR-DIR-LIST](../../../docs/adr/0023_dir-list.md)):
+([ADR-DIR-LIST](../../../docs/adr/0022_dir-list.md)):
 
 ```
 .fux/sources/dirs

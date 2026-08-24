@@ -1,1 +1,3 @@
-v2.0.0-alpha.0 published 2026-08-24 — W-73 and all nine phases of W-76 committed, pushed, released. Queue: blind-enrichment re-grade is the one open follow-up (not blocking); nothing else pending.
+✓ W-77's audit landed (16 records amended, register renumbered 0001–0041 contiguous, 71 broken links repointed, `tests/test_doc_links.py` added as the gate) · W-73 and W-76 **closed** — built, released in `v2.0.0-alpha.0`, recorded in `IMPLEMENTATION.md`, detail files retired to `archive/open/` · → **ADR-TUNE's build**: `.fux/tune.toml` + `src/fux/tune.py`, its stated blocker (W-73) discharged.
+
+Queue is three: **W-77** (`arpit`, four rulings owed + the governance gap), **W-74** and **W-75** (both `arpit`, forks unruled). The one non-blocking follow-up is the **blind enrichment re-grade** — 2026-08-24's `38/50` and `41/50` were written by an author who had seen the failing queries, so they are an upper bound, not a measurement.

@@ -27,6 +27,20 @@ document's own bytes, and nothing was invented.** Title, phrases, terms,
 length, edges, dense code — each is a function of the file, computed by
 stdlib code, offline, with no model anywhere in the path.
 
+> **Amended 2026-08-24 (W-76 Phases 1 and 7).** *"Dense code"* names a field
+> that no longer exists — `code`, one 256-bit sign vector per document, was
+> removed in Phase 1 and Phase 7 committed **per-chunk `int8` `vectors`** in its
+> place. *"Length"* is `flen`, five raw per-field token counts, not the single
+> weighted `wlen` this sentence was written for.
+>
+> **The law is untouched, and the new field is held to it as strictly as the
+> old one.** A vector is still a function of the document's bytes and a bundled
+> static model — a lookup table, not an inference — computed offline with no
+> network. The one thing that changed is what happens when the bundle is
+> absent: `vectors` is simply empty, a degraded lane and never an error,
+> because the lexical index answers on its own. **An absent field is still not
+> an invented one**, which is the whole of what `extracted` promises.
+
 That is why the mode is worth naming at all. `mode` is not documentation — it
 is a property in the committed wire format, sitting beside `meta` in every
 line of `.fux/index/*.jsonl`. A reader who sees `extracted` may rely on the
@@ -43,8 +57,8 @@ proposed and unbuilt.
 
 ```mermaid
 flowchart LR
-    D["document bytes"] --> X["extract<br/>stdlib only, offline"]
-    X --> T["title · phrases<br/>terms · wlen · edges"]
+    D["document bytes"] --> X["extract<br/>stdlib + bundled static model, offline"]
+    X --> T["title · phrases<br/>terms · flen · vectors · edges"]
     T --> R["record<br/>mode: extracted"]
     R --> G["guarantee<br/>byte-reproducible"]
 ```
@@ -53,10 +67,11 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-  +----------+     +------------------+     +--------------------+
-  | document | --> | extract          | --> | title · phrases    |
-  |  bytes   |     | stdlib, offline  |     | terms · wlen · edge|
-  +----------+     +------------------+     +---------+----------+
+  +----------+     +------------------+     +----------------------+
+  | document | --> | extract          | --> | title · phrases      |
+  |  bytes   |     | stdlib + static  |     | terms · flen         |
+  |          |     | model, offline   |     | vectors · edges      |
+  +----------+     +------------------+     +---------+------------+
                                                       |
                                                       v
                                         +-----------------------------+
@@ -67,40 +82,83 @@ flowchart LR
 
 </details>
 
+> **Amended 2026-08-24 (W-76 Phases 1 and 7) — both halves of the pair,
+> together.** Both drew the extracted set as *"title · phrases · terms · `wlen`
+> · edges"*. `wlen` is not extracted and is not committed — `flen` is, and
+> `wlen` is derived at query time from the weights in force — and `vectors` was
+> missing from a picture whose whole job is to show what the mode covers.
+>
+> The extract box gained *"+ bundled static model"* for the same reason. It
+> read *"stdlib only"*, which was already an overstatement when `code` existed
+> and would now be read as saying `vectors` comes from somewhere outside this
+> diagram. **The model is a lookup table shipped in the wheel, not an
+> inference and not a network call** — which is precisely why the mode's
+> guarantee survives it, and why the diagram should say so rather than omit it.
+
 ### Examples
 
 **What the mode looks like on disk.** One record, captured from this repo's own
 committed index (`.fux/index/c0.jsonl`), pretty-printed; `terms` is truncated
-from 215 entries and `edges` from 27, marked where. Every other byte is
-verbatim. The shard itself is one record per line, unindented.
+from 299 entries, `edges` from 42, and each of the 4 `vectors` from 342
+base64url characters, marked where. Keys are reordered for reading — the shard
+sorts them — and every value shown is verbatim. The shard itself is one record
+per line, unindented.
 
 ```json
 {
-  "_format": "fux.index.v1",   // the shard's first line, once per file
-  "analyzer": "v1",
-  "tf_fields": ["heading", "body"]
+  "_format": "fux.index.v2",   // the shard's first line, once per file
+  "analyzer": "v2",
+  "tf_fields": ["body", "heading", "title", "path", "ctx"]
 }
 {
   "id":      "file:docs/index.md",
   "src":     "git",
   "loc":     "docs/index.md",
-  "sha":     "d900ba5fd6538df613c47b62d804228b53e92349",
-  "ver":     2,
+  "sha":     "e8005dd97a8caeb59205e0e4a945b1ed92acdc13",
+  "ver":     1,
   "mode":    "extracted",
   "meta":    "plain",
+  "mtime":   1787122917,
   "title":   "Fux docs — knowledge bundle root (v0.30 rebuild)",
   "phrases": ["Fux docs — knowledge bundle root (v0.30 rebuild)",
               "Core (read in this order)", "Decisions", "Build"],
-  "terms":   {"025ca789b62d1a8c": [0, 1],
-              "02ed1a6e6bbb346c": [0, 2],
-              "0444cc705e1aa5d0": [0, 3]},   // … 215 total
-  "wlen":    444,
-  "code":    "c-oipo_E6Ew44yT0wlJqDbvYgp01Ju-n4hqhqWTXlUw",
+  "terms":   {"0097ee914e37dedf": [1],
+              "031b0e9051c7d6b4": [1],
+              "0387c9370a386785": [1]},      // … 299 total
+  "flen":    [691, 13, 8, 3],
+  "vectors": ["E0GB1kceAvGoBMJHARIl8-km4PbqBxb2DA4aAP0L8gk2Lw0X…",
+              "En-E0Ew6EMDDBNonxgQUBPsSA_7g--bnHvUUBPYu8QgsECUJ…",
+              "_0an3n8TJQbPAvIr2fE9-PcI9e3-GwX39-8FAA0W5AsQHSYP…",
+              "DGSB431JOuOdDsYVyBYT9f8I4t7s8Q_87hEk4-hFBggkHA8W…"],
   "edges":   [{"dst": "file:CLAUDE.md",           "grade": 10, "kind": "code"},
-              {"dst": "file:docs/GLOSSARY.md",    "grade":  8, "kind": "code"},
-              {"dst": "file:docs/GLOSSARY.md",    "grade": 10, "kind": "ref"}]  // … 27 total
+              {"dst": "file:README.md",           "grade": 10, "kind": "code"},
+              {"dst": "file:docs/GLOSSARY.md",    "grade":  8, "kind": "code"}]  // … 42 total
 }
 ```
+
+> **Amended 2026-08-24 (W-76 Phases 1, 2 and 7) — re-captured, because the
+> label promised something the block had stopped delivering.** It read
+> *"captured from this repo's own committed index (`.fux/index/c0.jsonl`) …
+> **Every other byte is verbatim**"*, and what followed was a `v1` header, `[0,
+> 1]` tf pairs under `["heading", "body"]`, `"wlen": 444` and
+> `"code": "c-oipo_E6Ew44yT0wlJqDbvYgp01Ju-n4hqhqWTXlUw"`. **Not one of those
+> is in that file.** §1 of this record went stale while the amendment at the
+> foot of §2 correctly described every one of the changes — which is how a
+> reader ends up trusting the wrong half of the same document.
+>
+> The block above is the same document's record, read out of `c0.jsonl` today:
+> `v2` header, five tf fields in `store.TF_FIELDS` order, single-element tf
+> lists (trailing zeros are trimmed, and 92.5 % of postings are body-only),
+> `flen` instead of `wlen`, four committed per-chunk `vectors` instead of one
+> document `code`, and the Phase-2 `mtime` prior. **`ver` went *down*, from `2`
+> to `1`, and that is not a typo** — the schema migration ran `--full`, which
+> reads no prior index, so every revision counter in the corpus restarted at
+> `1`. `sha` moved because the document has been edited since.
+>
+> **One promise in the label is now weaker and is stated instead of quietly
+> dropped:** the keys are shown in a reading order, and the shard sorts them
+> alphabetically. Every *value* is verbatim; the *byte sequence* is not, and
+> was not before either.
 
 **Read it as the contract.** Every value above is a function of
 `docs/index.md`'s bytes and the corpus's link structure, and of nothing else:
@@ -109,7 +167,22 @@ tokens that literally appear in it, with per-field frequencies; `wlen` is its
 token count; `code` is the bundled static model's sign-quantized vector — a
 lookup table, not an inference; `edges` are links the document actually
 contains, graded `10` when the target resolved unambiguously and `8` when a
-backtick path resolved only by basename. **Grade `6` — `INFERRED` — does not
+backtick path resolved only by basename.
+
+> **Amended 2026-08-24 (W-76 Phases 1, 2 and 7) — two clauses name fields that
+> are gone, and one field is missing a clause.** Read it as: **`flen`** is its
+> per-field token counts, five of them, raw and unweighted — the weighting is a
+> query-time policy and deliberately not committed; **`vectors`** are the
+> bundled static model's quantized chunk vectors, one per chunk, still a lookup
+> table and still not an inference; and **`mtime`** is the document's git
+> **commit** timestamp, which is a fact about the corpus's history rather than
+> about the file on disk, and is committable for exactly that reason — a
+> filesystem mtime differs per machine and would break the reproducibility this
+> mode's name asserts.
+>
+> **Every one of them still passes the test this paragraph applies**, which is
+> the only reason the amendment is short: each is a function of the document's
+> bytes, its path, or the corpus's own recorded structure, and of nothing else. **Grade `6` — `INFERRED` — does not
 appear here and cannot**: [`ingest/edges.py`](../../src/fux/ingest/edges.py)
 reserves it and states it is "unused until the enriched tier". That absence is
 the mode, visible in the bytes.
@@ -232,6 +305,28 @@ ratified but unbuilt — [ADR-ENRICHED](0017_enriched-mode.md)), or if
 re-ingesting an unchanged corpus stops producing byte-identical shards, or if
 an `edges` entry ever carries grade `6` on an `extracted` record — each means
 the contract this name asserts is no longer true of the bytes.
+
+> **Amended 2026-08-24 (W-76 Phase 8) — the first trip-wire stopped matching,
+> and it stopped matching in the direction that hides a fire.**
+> **`src/fux/enrich.py` exists**, so *"before `src/fux/enrich/` exists"* now
+> reads as a window that has already closed — a reader checking this condition
+> would conclude it can no longer fire, which is the opposite of the truth.
+>
+> **The path was a proxy for the wrong thing.** `fux enrich`
+> ([ADR-ENRICH](0040_enrich.md)) does **not** build the enriched mode: it plans
+> and validates enrichment that a coding agent generates, the result is pinned
+> text that ingest tokenizes into the `ctx` field, and the record it lands on
+> stays `"mode": "extracted"` — correctly, because a pinned file is bytes fux
+> read, not something fux inferred. `run.py` writes the literal string
+> `"extracted"` at both of its two record sites and there is no third.
+> [ADR-ENRICHED](0017_enriched-mode.md) is still `proposed` and still unbuilt.
+>
+> *Restated, without the proxy:* **reopen if any committed record carries a
+> `mode` value this record has not ratified** — which is check 1 below,
+> unchanged, and the only form of the condition that cannot go stale by a
+> module being renamed. A second mode arriving is a change to
+> [ADR-ENRICHED](0017_enriched-mode.md) and to this record, together, before
+> a byte of it is written.
 
 **How to check it:**
 
