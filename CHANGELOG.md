@@ -8,6 +8,74 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.0] - 2026-08-24
+
+**A pre-release.** The record shape and analyzer changed, so this ships
+ahead of a stable `2.0.0` to give the migration a soak before it is called
+final — every new ADR here (`ADR-TUNE`, `ADR-MCP`, `ADR-ENRICH`, `ADR-RERANK`)
+is still `status: proposed`.
+
+### Changed
+
+- **Breaking: the committed record shape moves to `fux.index.v2`.** BM25F
+  goes from two fields to five (`body, heading, title, path, ctx`), body
+  first — measured **-36.7%** on tf-vector bytes while adding three fields.
+  `flen` replaces `wlen`, so field weights are tunable without touching a
+  committed byte. The `code` field is dropped (it was 91% of every ingest
+  for 0.4% of the index). `fux ingest --full` is required to move an
+  existing `.fux/index/` off `v1`; this repo's own corpus is migrated in
+  this release (434 records, delta run byte-identical to the full run).
+  [ADR-INDEX-LIFECYCLE](docs/adr/0009_index-lifecycle.md),
+  [ADR-RECORD](docs/adr/0010_index-record.md).
+- **The analyzer moves to `v2`** — Porter stemming (75/75 published vectors)
+  and identifier splitting, `query/analyzer.py` + `query/stem.py`.
+
+### Fixed
+
+- **[W-73] The accelerator's differential law held only at `archived_weight
+  == 1.0`.** `ask --fast` and `ask --scan` could silently disagree at any
+  other configured weight, in both directions. `rank.Weighting` now carries
+  the query-time weights into the pruning bound itself (`derive/accel.py`),
+  so the law holds at every weight — verified by an adversarial fixture
+  that fails at `w = 500` without the fix. A second, smaller divergence
+  found on the way: the derived doc table didn't carry the `archived` flag,
+  so the two paths could disagree on that marker even at the default
+  weight; fixed in the same change (`RUNTIME_SCHEMA` -> `fux.runtime.v3`).
+  This closes the known limitation recorded in `1.0.0`.
+
+### Added
+
+- **`.fux/tune.toml`** — a committed, write-if-missing ranking file for
+  BM25F field weights, fuse/graph/refer constants and per-source query-time
+  priority (longest-directory-match, multiplicative, both directions
+  allowed — fux states the cost rather than picking a side).
+  [ADR-TUNE](docs/adr/0038_tuning.md).
+- **`fux enrich`** — a separate, opt-in command that writes model-assisted
+  enrichment into `.fux/enrich/` for a named scope; never runs inside
+  `fux ingest`, so the maintenance path stays model-free (L3).
+  [ADR-ENRICH](docs/adr/0040_enrich.md).
+- **`fux mcp`** — serves the index to coding agents over stdio JSON-RPC,
+  stdlib-only, as three tools rather than the full CLI surface (no
+  `answer` — the agent is the answerer). [ADR-MCP](docs/adr/0039_mcp.md).
+- **Proximity reranking**, in stdlib arithmetic — a specified cross-encoder
+  pass was refused because `onnxruntime` is not byte-identical across
+  x86-64/arm64. Measured on 50 new playground goldens: 28 -> 32 (4 fixed,
+  0 broken), +8ms p95 against a 150ms bar at 10 000 documents, 240
+  differential comparisons green. [ADR-RERANK](docs/adr/0041_rerank.md).
+- **Per-chunk committed `int8` vectors**, with a derived Hamming-prefix
+  prefilter over them replacing the old whole-document sign codes.
+- **Priors** — `supersedes:` frontmatter edges and git commit recency,
+  folded into ranking through the same `Weighting` the accelerator bounds
+  on, rather than as an unbounded side channel.
+
+### Known limitation
+
+- **Enrichment measured in this release's regression run
+  ([`2026-08-24-rerank-and-goldens`](work/regression/2026-08-24-rerank-and-goldens/))
+  was authored by someone who had already seen the failing queries** — its
+  28/50 -> 38/50-41/50 numbers are an upper bound, not a clean measurement.
+  A re-grade against blind enrichment is the named follow-up.
+
 ## [1.0.0] - 2026-08-22
 
 **The first major release of the v0.30 index-and-refer rebuild.** M2 through

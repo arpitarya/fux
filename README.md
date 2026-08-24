@@ -4,9 +4,11 @@
 small git-carried index, fetch content from the systems that own it, verify
 at answer time.**
 
-> **Status (2026-08-22): `fux-engine` 1.0.0 on PyPI — M2 through M5 shipped.**
-> The accelerator (M2), the graph lane (M3), the refer plane (M4) and the
-> maintenance hooks (M5) are all in. From any repo:
+> **Status (2026-08-24): `fux-engine` 2.0.0-alpha.0 on PyPI — the record
+> shape moves to `fux.index.v2`.** M2 through M5 (accelerator, graph lane,
+> refer plane, maintenance hooks) are in; this release adds five-field
+> BM25F, per-source tuning (`.fux/tune.toml`), proximity reranking,
+> `fux enrich` and `fux mcp`. From any repo:
 > ```bash
 > fux setup                # writes the files you own, write-if-missing
 > fux ingest               # builds the committed .fux/index/*.jsonl (+ the accelerator)
