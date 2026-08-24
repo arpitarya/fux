@@ -473,6 +473,36 @@ legal, explicit, per-document opt-out
 - The control-and-treatment merge test:
   [`tests_e2e/test_maintenance.py`](../../tests_e2e/test_maintenance.py)
 
+**Amended 2026-08-23 (W-76 Phases 3 and 9): two things were NOT built, and
+both are decisions.**
+
+**Phase 3 — the `git diff` delta hook is not built.** Veto condition 1 fired on
+[R5](../../work/regression/2026-08-20-m5-hooks/report.md) (44.4 s for a
+20-document commit at 100 000 documents) and the delta design was the answer.
+It is no longer needed at the design point: **a one-document re-ingest is
+0.84 s at 10 000 documents**, linear at ~82 us per document, because W-76
+Phase 1's removal of the `code` field took **91 % of a full ingest** with it.
+
+Filed as [`2026-08-23-r5-rerun-after-code-removal`](../../work/regression/2026-08-23-r5-rerun-after-code-removal/report.md),
+and **re-confirmed after Phase 7** — committed per-chunk vectors made a *full*
+ingest 6.8x slower and left the hook unmoved, because carry-forward re-embeds
+only changed documents.
+
+> **The reopen condition is a NUMBER, not a size: a measured one-document
+> re-ingest above 5 s.**
+
+That replaces veto condition 1's original trigger. R5 itself is **not
+retracted** — it measured a real cost on the engine of 2026-08-20.
+
+**Phase 9 — `refs/fux/<tree>` is not built, and could not have been a
+correctness path.** `git clone` fetches no custom refs and runs no hooks
+(hooks live in `.git/`, which is not cloned), so nothing could fetch a derived
+plane on arrival. Arpit's fork A ruling removed the premise anyway by
+committing everything the index needs. The residual cache-warmth idea is
+recorded in `maintain/hooks.py::REFS_NOTE` and is unbuilt: the accelerator
+rebuilds in **0.7 s at 10 000 documents**, and `fux build` is now discoverable
+through Phase 0's nudge.
+
 ### Veto condition
 
 **Reopen this decision if any of these becomes true:**

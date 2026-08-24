@@ -104,7 +104,12 @@ def test_a_trailing_slash_is_the_same_directory(repo, monkeypatch, capsys):
     `docs` wrote a second line for the same directory.
     """
     _add(repo, monkeypatch, _args("docs/"))
-    assert [line for line in _dirs(repo).splitlines() if line.strip()] == ["docs archived=false"]
+    # A fux-written line states EVERY attribute explicitly (ADR-URL-LIST
+    # decision 12), so this grows when the closed attribute set grows.
+    # `enrich=false` arrived with W-76 Phase 8.
+    assert [line for line in _dirs(repo).splitlines() if line.strip()] == [
+        "docs archived=false enrich=false"
+    ]
     assert "updated" in capsys.readouterr().out
 
 

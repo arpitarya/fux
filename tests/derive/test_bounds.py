@@ -18,11 +18,12 @@ import pytest
 
 from fux.derive import accel, build
 from fux.derive import format as fmt
-from fux.query.bm25f import BODY_WEIGHT, HEADING_WEIGHT, score_record
+from fux.derive.format import _FIELD_COUNT
+from fux.query.bm25f import score_record
 from fux.store import term_hash, write_index
 
 
-def _rec(doc_id, title, wlen, terms) -> dict:
+def _rec(doc_id, title, flen, terms) -> dict:
     return {
         "id": doc_id,
         "src": "git",
@@ -32,7 +33,7 @@ def _rec(doc_id, title, wlen, terms) -> dict:
         "title": title,
         "phrases": [],
         "terms": terms,
-        "wlen": wlen,
+        "flen": flen,
         "edges": [],
     }
 
@@ -43,17 +44,24 @@ def _spread_corpus(n_docs: int = 400) -> list[dict]:
     Term frequencies and document lengths both vary widely and *independently*,
     so blocks contain a genuine spread of `wtf` and `wlen` — the case where a
     bound that used `mx` alone, or the wrong `wlen`, would be wrong.
+
+    tf vectors are `[body, heading]` (v2 order — `store.TF_FIELDS`), the
+    trailing three fields always absent (trimmed to `[]` by `store.trim` at
+    write time, but written explicitly here since these are hand-built
+    postings, not run through `hash_terms`).
     """
     records = []
     common = term_hash("common")
     for i in range(n_docs):
-        terms = {common: [i % 7, i % 13 + 1]}
+        terms = {common: [i % 13 + 1, i % 7]}
         # A rare term every 10th doc, and a mid-frequency one every 3rd.
         if i % 10 == 0:
-            terms[term_hash(f"rare{i}")] = [i % 5, 1]
+            terms[term_hash(f"rare{i}")] = [1, i % 5]
         if i % 3 == 0:
-            terms[term_hash("mid")] = [1, i % 17]
-        records.append(_rec(f"file:doc{i:04d}.md", f"Doc {i}", 10 + (i * 37) % 900, terms))
+            terms[term_hash("mid")] = [i % 17, 1]
+        # A single-field flen (body only) so derive_wlen(flen) == flen[0] —
+        # the simplest honest translation of the old scalar `wlen`.
+        records.append(_rec(f"file:doc{i:04d}.md", f"Doc {i}", [10 + (i * 37) % 900], terms))
     return records
 
 
@@ -86,10 +94,10 @@ def test_bound_dominates_every_posting_in_every_block(built):
             bound = accel.block_bound(block, df, n, avg_wlen)
             checked_blocks += 1
 
-            for docidx, tf_h, tf_b in runtime.read_block(block):
+            for docidx, tf in runtime.read_block(block):
                 actual = score_record(
-                    {block.term: [tf_h, tf_b]},
-                    docs[docidx]["wlen"],
+                    {block.term: tf},
+                    docs[docidx]["flen"],
                     [block.term],
                     {block.term: df},
                     n,
@@ -98,7 +106,7 @@ def test_bound_dominates_every_posting_in_every_block(built):
                 checked_postings += 1
                 assert actual <= bound, (
                     f"bound violated: block {block.term}#{block.block_no} bound={bound!r} "
-                    f"but doc {docidx} scores {actual!r} (tf={tf_h},{tf_b} wlen={docs[docidx]['wlen']})"
+                    f"but doc {docidx} scores {actual!r} (tf={tf} flen={docs[docidx]['flen']})"
                 )
 
     assert checked_blocks > 10, "fixture too small to be a real test"
@@ -106,7 +114,11 @@ def test_bound_dominates_every_posting_in_every_block(built):
 
 
 def test_mx_is_the_max_weighted_tf_in_its_block(built):
-    """`mx` must be exactly `max(3*tf_h + tf_b)`, as an integer."""
+    """`mx` must be exactly the per-field MAXIMUM tf across the block's postings.
+
+    Unweighted since W-76 Phase 1 (`derive/format.py::ENTRY_STRUCT` docstring)
+    — `block_bound` recombines with the weights in force at query time.
+    """
     runtime = accel.Runtime(built)
     for prefix in {f"{b:02x}" for b in range(256)}:
         buf = runtime.offsets(prefix)
@@ -114,12 +126,17 @@ def test_mx_is_the_max_weighted_tf_in_its_block(built):
             raw = fmt.unpack_entry(buf, index)
             block = accel.Block(raw[0].hex(), raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8])
             postings = runtime.read_block(block)
-            expected = max(int(HEADING_WEIGHT) * h + int(BODY_WEIGHT) * b for _, h, b in postings)
-            assert block.mx == expected
+            expected = [0] * _FIELD_COUNT
+            for _, tf in postings:
+                for i, count in enumerate(tf):
+                    if count > expected[i]:
+                        expected[i] = count
+            assert list(block.mx) == expected
 
 
 def test_mnw_is_the_min_wlen_in_its_block(built):
-    """`mnw` must be the *minimum* length — the direction that makes the bound valid.
+    """`mnw` must be the per-field MINIMUM token count — the direction that
+    makes the bound valid.
 
     Using the max would produce a smaller, invalid bound and would still look
     plausible on any corpus whose documents are similar in length.
@@ -132,7 +149,12 @@ def test_mnw_is_the_min_wlen_in_its_block(built):
             raw = fmt.unpack_entry(buf, index)
             block = accel.Block(raw[0].hex(), raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8])
             postings = runtime.read_block(block)
-            assert block.mnw == min(docs[d]["wlen"] for d, _, _ in postings)
+            docidxs = [d for d, _ in postings]
+            expected = [
+                min((docs[d]["flen"][i] if i < len(docs[d]["flen"]) else 0) for d in docidxs)
+                for i in range(_FIELD_COUNT)
+            ]
+            assert list(block.mnw) == expected
 
 
 def test_doc_range_covers_every_posting(built):
@@ -147,7 +169,7 @@ def test_doc_range_covers_every_posting(built):
         for index in range(len(buf) // fmt.ENTRY_SIZE):
             raw = fmt.unpack_entry(buf, index)
             block = accel.Block(raw[0].hex(), raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8])
-            docidxs = [d for d, _, _ in runtime.read_block(block)]
+            docidxs = [d for d, _ in runtime.read_block(block)]
             assert block.first_doc == min(docidxs) == docidxs[0]
             assert block.last_doc == max(docidxs) == docidxs[-1]
             assert docidxs == sorted(docidxs), "postings must be docidx-ascending for range gating"
@@ -172,9 +194,9 @@ def test_bound_is_not_vacuous(built):
             block = accel.Block(raw[0].hex(), raw[1], raw[2], raw[3], raw[4], raw[5], raw[6], raw[7], raw[8])
             df = sum(b.count for b in runtime.blocks_for(block.term))
             bound = accel.block_bound(block, df, n, avg_wlen)
-            for docidx, tf_h, tf_b in runtime.read_block(block):
+            for docidx, tf in runtime.read_block(block):
                 actual = score_record(
-                    {block.term: [tf_h, tf_b]}, docs[docidx]["wlen"], [block.term], {block.term: df}, n, avg_wlen
+                    {block.term: tf}, docs[docidx]["flen"], [block.term], {block.term: df}, n, avg_wlen
                 )
                 if actual == bound:
                     attained += 1

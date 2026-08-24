@@ -24,8 +24,16 @@ from .format import (
     term_hash,
     title_hash,
 )
-from .reader import iter_shard_paths, raw_record_lines, read_index, read_shard
-from .writer import HEADER_LINE, hash_terms, write_index
+from .reader import (
+    foreign_url_ids,
+    index_header,
+    index_is_foreign,
+    iter_shard_paths,
+    raw_record_lines,
+    read_index,
+    read_shard,
+)
+from .writer import HEADER_LINE, trim, hash_terms, write_index
 
 __all__ = [
     "ANALYZER_VERSION",
@@ -45,10 +53,13 @@ __all__ = [
     "content_sha",
     "display_title",
     "derived_dir",
+    "foreign_url_ids",
     "ensure_layout",
     "fux_dir",
     "hash_terms",
     "index_dir",
+    "index_header",
+    "index_is_foreign",
     "iter_shard_paths",
     "raw_record_lines",
     "read_index",
@@ -56,6 +67,7 @@ __all__ = [
     "shard_for",
     "shard_path",
     "term_hash",
+    "trim",
     "title_hash",
     "write_index",
 ]

@@ -275,6 +275,37 @@ meaning from position:
   https://www.rfc-editor.org/rfc/rfc8785
 - JSON Lines, the container format: https://jsonlines.org/
 
+**Amended 2026-08-23 (W-76 Phase 7): `vectors` — committed per-chunk `int8`.**
+
+Arpit's fork A ruling: *"I would like everything committed. I don't want to run
+`fux build`. I'm going to clone the repo and run the query. That's all."* So the
+dense lane's real data is in the committed record and the 256-bit sign codes
+are **derived** from it.
+
+| | the removed `code` field | `vectors` |
+|---|---|---|
+| unit | one per **document** | one per **chunk** (~9.8/doc measured) |
+| precision | 1 bit per dimension, 32 B | **8 bits** per dimension, 256 B |
+| plane | committed | committed; sign codes derived |
+
+**No float is committed.** `Vec` carries `q` (int8) and a `scale`, and ranking
+uses cosine similarity, where **the scales cancel**. Only `q` is stored — which
+keeps L3 true here without any argument about float formatting.
+
+**Pure Python is a requirement, not a preference.** [ADR-GRAPH](0029_graph.md)
+proved fux's float maths is byte-identical across x86-64 Linux and arm64 macOS,
+and that result is what makes committing model-derived bytes safe. It was
+proved for stdlib only; a numpy fast path would put committed bytes at risk.
+
+**The chunker is shared with the refer plane, deliberately.** Two chunkers
+would let a citation's span and a vector's span disagree about what a passage
+is, and the retrieved thing would quietly stop being the cited thing.
+
+**Cost, measured 2026-08-23:** a full ingest is **6.8x slower** (0.95 s ->
+6.46 s at 1 000 documents). The **hook is unaffected** (+10 %) because
+carry-forward re-embeds only changed documents — see
+[the R5 re-run](../../work/regression/2026-08-23-r5-rerun-after-code-removal/report.md) §6.
+
 ### Veto condition
 
 **Reopen this decision if** a property appears that is derivable from the

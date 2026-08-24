@@ -23,19 +23,20 @@ def _rec(doc_id, title, terms, edges=()) -> dict:
         "title": title,
         "phrases": [],
         "terms": terms,
-        "wlen": 20,
+        "flen": [20],
         "edges": list(edges),
     }
 
 
 @pytest.fixture
 def corpus(tmp_path):
+    # tf is `[body, heading]` (v2 order — `store.TF_FIELDS`).
     write_index(
         tmp_path,
         [
-            _rec("file:a.md", "A", {term_hash("alpha"): [1, 2]},
+            _rec("file:a.md", "A", {term_hash("alpha"): [2, 1]},
                  [{"kind": "ref", "dst": "file:b.md", "grade": 10}]),
-            _rec("file:b.md", "B", {term_hash("alpha"): [0, 1]},
+            _rec("file:b.md", "B", {term_hash("alpha"): [1, 0]},
                  [{"kind": "tag", "dst": "tag:ops", "grade": 10}]),
             _rec("file:c.md", "C", {term_hash("beta"): [1, 1]}),
         ],

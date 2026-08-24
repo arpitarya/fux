@@ -37,8 +37,35 @@ AMBIENT = ("fux-archived-results.instructions.md", "steering-fux-archived-result
 AMBIENT_MAX_BYTES = 4096
 
 
+#: Files in `templates/agents/` that are NOT renderings of the archived-results
+#: policy, and must not be checked against its verbatim block.
+#:
+#: `ENRICH-SKILL.md` (W-76 Phase 8) is a **procedure**, not a policy: it tells
+#: an agent how to generate enrichment when a human asks, and carries no claim
+#: about how to read fux's output. Holding it to the policy block would force
+#: an unrelated eight-rule preamble into an instruction file whose whole job is
+#: to be invoked deliberately and rarely.
+#:
+#: **This list is the escape hatch and it must stay short.** Every name here is
+#: a file the agreement check no longer protects, so adding one is a decision,
+#: not a convenience -- which is why `test_the_exemptions_are_deliberate` below
+#: pins its contents.
+NOT_A_POLICY_RENDERING = frozenset({"POLICY.md", "ENRICH-SKILL.md"})
+
+
 def renderings() -> list[Path]:
-    return sorted(p for p in AGENTS.glob("*.md") if p.name != "POLICY.md")
+    return sorted(p for p in AGENTS.glob("*.md") if p.name not in NOT_A_POLICY_RENDERING)
+
+
+def test_the_exemptions_are_deliberate():
+    """Pin the escape hatch.
+
+    A file added to `NOT_A_POLICY_RENDERING` stops being checked for the
+    verbatim policy block. That is occasionally right and always worth
+    noticing, so the set is asserted rather than trusted -- otherwise the
+    cheapest way to fix a failing agreement test is to add a name to it.
+    """
+    assert NOT_A_POLICY_RENDERING == {"POLICY.md", "ENRICH-SKILL.md"}
 
 
 def canonical_block() -> str:

@@ -12,7 +12,7 @@
   </defs>
 
   <rect width="1080" height="760" fill="#fafafa"/>
-  <text x="36" y="40" font-size="18" fill="#1a1f27" font-weight="600">Fux v0.30 — how it works (plan revision 2, 2026-08-09)</text>
+  <text x="36" y="40" font-size="18" fill="#1a1f27" font-weight="600">Fux 1.0.0 — how it works (rev 3, 2026-08-24: W-76 analyzer v2, five fields, enrichment, MCP)</text>
   <text x="36" y="58" font-size="10.5" fill="#8a93a0">full postings (ADR-0003) · tiered JSONL (index-format compare) · git is the Merkle tree · blue = committed · gray = derived, disposable</text>
 
   <!-- SOURCES -->
@@ -23,22 +23,25 @@
   <text x="60" y="140" font-size="9" fill="#8a93a0">M1 · local read, free</text>
   <rect x="52" y="154" width="198" height="36" rx="6" fill="#f4f4f6" stroke="#c9cfd8"/>
   <text x="60" y="169" font-size="10" fill="#1a1f27">HTTP · Confluence</text>
-  <text x="60" y="182" font-size="9" fill="#8a93a0">M4 · capped; MCP is the endgame</text>
+  <text x="60" y="182" font-size="9" fill="#8a93a0">M4 · capped · fux mcp SHIPPED (ADR-MCP)</text>
   <text x="52" y="212" font-size="9" fill="#8a93a0">no text is ever stored in the index —</text>
   <text x="52" y="224" font-size="9" fill="#8a93a0">content is fetched live when cited</text>
 
   <!-- INGEST -->
   <line x1="266" y1="150" x2="304" y2="150" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
-  <rect x="308" y="78" width="240" height="150" rx="10" fill="#fff" stroke="#c9cfd8"/>
-  <text x="324" y="100" font-size="11.5" fill="#1a1f27" font-weight="600">fux ingest — extract, discard</text>
-  <text x="324" y="120" font-size="9.5" fill="#1a1f27">transient convert → per doc:</text>
-  <text x="332" y="136" font-size="9.5" fill="#1a1f27">terms (16-hex hashes) + wlen</text>
-  <text x="332" y="150" font-size="9.5" fill="#1a1f27">title · phrases · edges · code(32 B)</text>
-  <text x="324" y="170" font-size="9" fill="#8a93a0">deterministic: NFC, sorted, no floats,</text>
-  <text x="324" y="182" font-size="9" fill="#8a93a0">no clocks · incremental by sha</text>
-  <rect x="324" y="192" width="208" height="26" rx="6" fill="#e8f5ee" stroke="#0f9d58"/>
-  <text x="332" y="203" font-size="9" fill="#1a1f27">M5: git hooks re-emit changed lines;</text>
-  <text x="332" y="214" font-size="9" fill="#1a1f27">merge driver = line-wise LWW (ver, sha)</text>
+  <rect x="308" y="78" width="240" height="180" rx="10" fill="#fff" stroke="#c9cfd8"/>
+  <text x="324" y="98" font-size="11.5" fill="#1a1f27" font-weight="600">fux ingest — extract, discard</text>
+  <text x="324" y="116" font-size="9.5" fill="#1a1f27">transient convert → per doc:</text>
+  <text x="332" y="130" font-size="9" fill="#1a1f27">terms (16-hex) + flen[5] &#183; wlen DERIVED</text>
+  <text x="332" y="142" font-size="9" fill="#1a1f27">+ ctx from .fux/enrich/&#60;sha&#62;.md</text>
+  <text x="332" y="154" font-size="9" fill="#1a1f27">+ int8 vectors, one per chunk</text>
+  <text x="332" y="169" font-size="9" fill="#b06a00">analyzer v2: split ids &#8594; lower &#8594; stop &#8594; stem</text>
+  <text x="332" y="181" font-size="9" fill="#b06a00">&#8195;hash the FINAL token &#183; ingest and query share it</text>
+  <text x="324" y="196" font-size="9" fill="#8a93a0">deterministic: NFC, sorted, no floats,</text>
+  <text x="324" y="207" font-size="9" fill="#8a93a0">no clocks · incremental by sha</text>
+  <rect x="324" y="216" width="208" height="26" rx="6" fill="#e8f5ee" stroke="#0f9d58"/>
+  <text x="332" y="227" font-size="9" fill="#1a1f27">M5: git hooks re-emit changed lines;</text>
+  <text x="332" y="238" font-size="9" fill="#1a1f27">merge driver = line-wise LWW (ver, sha)</text>
 
   <!-- COMMITTED INDEX -->
   <line x1="548" y1="150" x2="586" y2="150" stroke="#3d6df2" stroke-width="1.6" marker-end="url(#b)"/>
@@ -49,15 +52,15 @@
   <rect x="606" y="124" width="422" height="92" rx="6" fill="#fff" stroke="#c9cfd8"/>
   <text x="614" y="140" font-size="8.6" fill="#52514e">{"id":"file:docs/api/webhooks.md","src":"git","loc":"docs/api/webhooks.md",</text>
   <text x="614" y="153" font-size="8.6" fill="#52514e"> "sha":"9f2c41ab…","ver":1,"mode":"refer","meta":"plain","title":"Webhooks",</text>
-  <text x="614" y="166" font-size="8.6" fill="#52514e"> "wlen":[12,1840],"community":17,"code":"pU3KGCUw…(base64, 32 B)",</text>
+  <text x="614" y="166" font-size="8.6" fill="#52514e"> "flen":[1840,12,3,4,58],"community":17,"vecs":["gP7…",…9.8/doc],</text>
   <text x="614" y="179" font-size="8.6" fill="#52514e"> "terms":{"05a9c3061b8ee402":[3,15],"52b96e14d0a71c88":[2,5],…FULL postings},</text>
   <text x="614" y="192" font-size="8.6" fill="#52514e"> "edges":[["ref","file:docs/adr/0013-…",10],["tag","tag:payments",10]]}</text>
-  <text x="614" y="208" font-size="8.4" fill="#8a93a0">binary rides as properties: code · (T2) tpack — same record, one field swaps</text>
+  <text x="614" y="208" font-size="8.4" fill="#8a93a0">flen is per FIELD [body, heading, title, path, ctx] · wlen is derived from it, never stored</text>
 
   <text x="606" y="234" font-size="9.5" fill="#1a1f27">git IS the Merkle tree: doc edit = 1-line diff · merge = line replace ·</text>
   <text x="606" y="247" font-size="9.5" fill="#1a1f27">corpus state = one tree hash · measured: 1-line edit in a 138 MB shard ≈ free</text>
   <text x="606" y="266" font-size="9" fill="#8a93a0">meta policy: git sources plain · external hashed (title_h, no phrases) — ACL containment</text>
-  <text x="606" y="290" font-size="9.5" fill="#3d6df2" font-weight="600">size @100k target-density ≈ 170 MB git-packed (R7 ≤ 250 MB)</text>
+  <text x="606" y="290" font-size="9.5" fill="#3d6df2" font-weight="600">10 000 docs is the design point (CLAUDE.md §Litmus) · measured p95 33.53 ms</text>
 
   <!-- DERIVED -->
   <line x1="817" y1="306" x2="817" y2="336" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
@@ -77,15 +80,18 @@
 
   <rect x="52" y="516" width="150" height="56" rx="7" fill="#f4f4f6" stroke="#c9cfd8"/>
   <text x="127" y="537" font-size="10.5" fill="#1a1f27" text-anchor="middle">hash query terms</text>
-  <text x="127" y="551" font-size="9" fill="#8a93a0" text-anchor="middle">blake2b 16-hex —</text>
+  <text x="127" y="551" font-size="9" fill="#8a93a0" text-anchor="middle">analyzer v2 &#8594; blake2b 16-hex —</text>
   <text x="127" y="562" font-size="9" fill="#8a93a0" text-anchor="middle">same space as the index</text>
 
   <line x1="202" y1="544" x2="240" y2="544" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
 
-  <rect x="244" y="516" width="216" height="56" rx="7" fill="#eef3fd" stroke="#3d6df2"/>
+  <rect x="244" y="516" width="216" height="86" rx="7" fill="#eef3fd" stroke="#3d6df2"/>
   <text x="352" y="533" font-size="10.5" fill="#1a1f27" text-anchor="middle">rank — tier picks the path</text>
   <text x="352" y="547" font-size="8.8" fill="#8a93a0" text-anchor="middle">T0 cold: prefilter scan (191 ms@5k)</text>
   <text x="352" y="559" font-size="8.8" fill="#8a93a0" text-anchor="middle">T1: bisect+mx (0.035–44 ms) · BM25F+RRF</text>
+  <text x="352" y="571" font-size="8.8" fill="#b06a00" text-anchor="middle">W-73: theta and the ceiling are WEIGHTED —</text>
+  <text x="352" y="582" font-size="8.8" fill="#b06a00" text-anchor="middle">the law held only at weight 1.0 before</text>
+  <text x="352" y="595" font-size="8.8" fill="#0f9d58" text-anchor="middle">no accelerator &#8594; stderr says 'fux build'</text>
 
   <line x1="460" y1="544" x2="498" y2="544" stroke="#5f6b7a" stroke-width="1.4" marker-end="url(#a)"/>
   <text x="479" y="536" font-size="8.5" fill="#5f6b7a" text-anchor="middle">top-k</text>
@@ -109,12 +115,12 @@
   <text x="982" y="551" font-size="8.8" fill="#8a93a0" text-anchor="middle">cited · fresh</text>
   <text x="982" y="562" font-size="8.8" fill="#8a93a0" text-anchor="middle">sha checked</text>
 
-  <text x="52" y="596" font-size="9" fill="#8a93a0">freshness: live sha vs indexed sha at answer time → verified, or that one doc re-ingested · offline: repo sources full function, external → declared staleness</text>
-  <text x="52" y="614" font-size="9" fill="#8a93a0">cold clone answers immediately by scan — the accelerator is an optimization, never a prerequisite</text>
-  <text x="52" y="640" font-size="9.5" fill="#1a1f27" font-weight="600">tiers: T0 ≤~20k docs — scan only · T1 ≤~200k — blocked accelerator · T2 beyond — terms→tpack, mmap segments, partial clone, external-shards-only</text>
+  <text x="52" y="624" font-size="9" fill="#8a93a0">freshness: live sha vs indexed sha at answer time → verified, or that one doc re-ingested · offline: repo sources full function, external → declared staleness</text>
+  <text x="52" y="640" font-size="9" fill="#8a93a0">cold clone answers immediately by scan — the accelerator is an optimization, never a prerequisite</text>
+  <text x="52" y="662" font-size="9.5" fill="#1a1f27" font-weight="600">tiers: T0 scan only (the default, always correct) · T1 blocked accelerator · T2 NOT BUILT — R9 measured 12.46 ms against a 150 ms bar at the design point, so the third tier buys nothing</text>
 
   <!-- footer -->
   <text x="36" y="688" font-size="9.5" fill="#8a93a0">build order: M0 scaffold → M1 T0 slice (committed store + scan ask, dogfood + graded sibling corpus) → M2 T1 accelerator → M3 graph → M4 refer → M5 maintenance → M6 scale/T2 → M7 dogfood gate</text>
   <text x="36" y="706" font-size="9.5" fill="#8a93a0">measured basis: bisect 0.035 ms · worst common term 44 ms (mx-skip) · 1-line edit in 138 MB shard deltas ≈ 0 · git pack ×0.38 · pruning FAIL → full postings (ADR-0003)</text>
-  <text x="36" y="724" font-size="9.5" fill="#b8860b">predictions R1–R7 in PLAN rev 2 · rev-1 diagrams archived at archive/v0.30-rev1-planning/</text>
+  <text x="36" y="724" font-size="9.5" fill="#b8860b">R7 and R8 were WITHDRAWN under the 10 000-doc ceiling; R9 answered T2 · rev-1 diagrams at archive/v0.30-rev1-planning/</text>
 </svg>

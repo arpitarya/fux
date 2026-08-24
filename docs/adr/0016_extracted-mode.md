@@ -203,6 +203,27 @@ Full matrix: [`work/compare/ingest-mode-naming.compare.md`](../../work/compare/i
 - How ingest runs, as distinct from what extraction promises —
   [ADR-INGEST](0007_ingest.md).
 
+**Amended 2026-08-23 (W-76 Phase 1).** Extraction now produces **five tf
+fields** — `body`, `heading`, `title`, `path`, `ctx`, in `store.TF_FIELDS`
+order — and **`flen` in place of `wlen`**.
+
+- **`title` and `path` are new fields, not new content.** Both were already
+  *in* the record (as `title`, and as `loc`); extracted-mode law is unchanged
+  because nothing is invented — the title's own tokens and the path's own
+  segments are taken from the document and its location. `title` previously
+  had to be folded into the heading tokens because there was nowhere else to
+  put it; it now has its own field and is **no longer double-counted**.
+- **`ctx` is declared and always empty** until Phase 8's `fux enrich` exists.
+  An empty field is a trailing zero and is not written at all, so it costs
+  nothing to reserve.
+- **`flen` replaces `wlen` because `wlen` was a function of a tunable** —
+  ADR-TUNE decision 6. `flen` carries raw per-field token counts, which are
+  facts; the weighting happens at query time in `query/bm25f.py::derive_wlen`.
+- **`code` is no longer emitted.** It was 0.4 % of the index and **91 % of a
+  full ingest**; Phase 7 returns the same Hamming scan as a *derived*
+  prefilter over per-chunk vectors. `Extracted.code` is retained as a field
+  and is always `None`, so the shape of the dataclass does not churn twice.
+
 ### Veto condition
 
 **Reopen this decision if** a committed record carries a `mode` value other

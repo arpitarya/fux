@@ -46,7 +46,11 @@ def test_results_are_sorted_and_tie_break_on_the_locator():
 
 def test_the_locator_addresses_the_passage_not_just_the_document():
     scored = rescore("storage", _doc("# Storage\n\n" + ("storage " * 40)))
-    assert scored[0].locator == "a.md#p0"
+    # W-76 Phase 5: the locator is a LINE RANGE now, not a passage ordinal.
+    # The assertion's intent is unchanged — the locator must address the
+    # passage rather than just the document — and a line range addresses it
+    # more precisely, which is the whole point of the change.
+    assert scored[0].locator == "a.md:L1-L3"
 
 
 def test_an_empty_query_scores_nothing():

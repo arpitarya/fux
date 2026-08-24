@@ -128,6 +128,9 @@ def cmd_graph(args) -> int:
     from ..query import run_query
 
     root = _root()
+    from ..query import _declare_no_accelerator
+
+    _declare_no_accelerator(root)
     plane = plane_mod.load(root)
 
     # Scan by default, `--fast` opts into the accelerator for the seed query

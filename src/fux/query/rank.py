@@ -17,7 +17,7 @@ See `work/adr/0005_derived-accelerator.md`.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from .. import store as store_mod
 from ..ingest.gitdir import is_archived_loc
@@ -49,6 +49,11 @@ class Corpus:
 
     n: int
     total_wlen: int
+    #: The newest commit timestamp in the corpus (W-76 Phase 2), or 0 when no
+    #: record carries one. Recency is normalised against it so the freshest
+    #: document scores 1.0 and the prior is a pure demotion -- which is what
+    #: keeps `Weighting.maximum` finite and the block bound usable.
+    newest_mtime: int = 0
 
     @property
     def avg_wlen(self) -> float:
@@ -74,6 +79,95 @@ def _record_is_archived(record: dict, archived_dirs: frozenset[str]) -> bool:
     return bool(archived_dirs) and is_archived_loc(record["loc"], archived_dirs)
 
 
+@dataclass(frozen=True)
+class Weighting:
+    """The score multiplier policy, in ONE place, for both candidate paths.
+
+    **This type exists because of W-73.** The weight used to be applied only
+    inside `rank()`, *after* the accelerator had already truncated the
+    candidate set on an **unweighted** bound and an **unweighted** `theta`. At
+    any weight but `1.0` the two paths could then return different documents —
+    silently, data-dependently, with no exception and no short read.
+
+    The bound is safe on exactly one property::
+
+        for every unseen d:   w(d) * S(d)  <  theta_w
+
+    `S(d)` is bounded above by the block ceiling and `w(d)` by `maximum`, so
+    scaling the ceiling by `maximum` and drawing `theta_w` from **weighted**
+    candidate scores restores it. Both halves are required: scaling alone
+    leaves `theta` too high when weights demote the current top-k, and a
+    weighted `theta` alone leaves the ceiling too low when weights promote.
+
+    `maximum` is the supremum over the **configuration**, never over the
+    observed candidates: an unseen document may carry a weight that no
+    candidate does, which is precisely the case the bound has to survive.
+    """
+
+    archived_weight: float = 1.0
+    archived_dirs: frozenset[str] = frozenset()
+    #: W-76 Phase 2. Both default to no-ops, so a corpus that configures
+    #: nothing scores byte-identically to before they existed.
+    superseded_weight: float = 1.0
+    recency_half_life_days: float = 0.0
+    #: The newest commit timestamp in the corpus, used to normalise recency so
+    #: the freshest document scores `1.0`. Zero disables the prior.
+    newest_mtime: int = 0
+
+    @property
+    def trivial(self) -> bool:
+        """No document can be scaled — the whole weighting is a no-op.
+
+        When this holds every weighted path short-circuits to the arithmetic
+        that shipped before W-73, so a corpus with no configured weight still
+        scores and orders **byte-identically** (ADR-ARCHIVED-CONTENT decision
+        2's veto) and the differential evidence gathered at the default still
+        stands unmodified.
+        """
+        return (
+            self.archived_weight == 1.0
+            and self.superseded_weight == 1.0
+            and self.recency_half_life_days <= 0
+        )
+
+    @property
+    def maximum(self) -> float:
+        """`sup_d w(d)` over every document the configuration can produce.
+
+        `1.0` is always attainable — a document that is not archived is never
+        scaled — so the supremum is `max(1.0, archived_weight)` and never the
+        configured weight alone. Taking the configured weight alone would make
+        the ceiling too small for `w < 1`, which is the demotion direction and
+        the one that looks safe.
+        """
+        #: `archived` and `superseded` are INDEPENDENT flags, so a document can
+        #: carry both and be scaled twice. The supremum is therefore the
+        #: product of the per-flag suprema, not the larger of the two.
+        #:
+        #: Recency contributes exactly `1.0`: `recency_multiplier` is bounded
+        #: to `(0, 1]` by construction, so it can only ever demote. That bound
+        #: is load-bearing here — an unbounded recency prior would make this
+        #: supremum unbounded and the block bound useless.
+        return max(1.0, self.archived_weight) * max(1.0, self.superseded_weight)
+
+    def of(self, record: dict) -> float:
+        """The multiplier for one record: archived x superseded x recency."""
+        if self.trivial:
+            return 1.0
+        weight = 1.0
+        if self.archived_weight != 1.0 and _record_is_archived(record, self.archived_dirs):
+            weight *= self.archived_weight
+        if self.superseded_weight != 1.0 and record.get("superseded"):
+            weight *= self.superseded_weight
+        if self.recency_half_life_days > 0:
+            from ..ingest.priors import recency_multiplier
+
+            weight *= recency_multiplier(
+                record.get("mtime"), self.newest_mtime, self.recency_half_life_days
+            )
+        return weight
+
+
 def rank(
     candidates: list[dict],
     query_hashes: list[str],
@@ -83,6 +177,7 @@ def rank(
     *,
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
+    weighting: "Weighting | None" = None,
 ) -> list[AskResult]:
     """Score, sort, truncate. The only place any of the three happens.
 
@@ -107,21 +202,28 @@ def rank(
     if corpus.n == 0:
         return []
     avg_wlen = corpus.avg_wlen
-    demote = archived_weight != 1.0
+    if weighting is None:
+        weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
+    # Recency needs the corpus it is being normalised against, and the corpus
+    # is only known here. `replace` rather than mutation: `Weighting` is frozen
+    # so that a caller can never hand two code paths a policy that drifted.
+    if weighting.recency_half_life_days > 0 and corpus.newest_mtime:
+        weighting = replace(weighting, newest_mtime=corpus.newest_mtime)
+    demote = not weighting.trivial
 
     scored = []
     for record in candidates:
         s = score_record(
             record.get("terms", {}),
-            record.get("wlen", 0),
+            record.get("flen", []),
             query_hashes,
             df,
             corpus.n,
             avg_wlen,
         )
-        archived = _record_is_archived(record, archived_dirs)
-        if demote and archived:
-            s *= archived_weight
+        archived = _record_is_archived(record, weighting.archived_dirs)
+        if demote:
+            s *= weighting.of(record)
         if s > 0:
             scored.append((record, s, archived))
 

@@ -310,10 +310,45 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated 2026-08-22 (third pass, same day). Nothing is committed: `HEAD` is
+*Updated 2026-08-22 (fifth pass, same day). Nothing is committed: `HEAD` is
 still `9bb870e` and a **concurrent session's** W-68 / ADR-AGENT-POLICY work is
 staged alongside everything below.*
 
+- **The queue is three items — W-75 was filed 2026-08-22** under a new
+  **ADR-URL-INGEST · ADR-FETCHER** group: [nothing in fux can learn that a URL
+  changed](open/W-75-url-freshness.md), spec in
+  [`proposals/url-freshness.md`](proposals/url-freshness.md), two forks split
+  out to [`compare/url-refresh-trigger`](compare/url-refresh-trigger.compare.md)
+  and [`compare/url-fetch-concurrency`](compare/url-fetch-concurrency.compare.md).
+  **A file change is an event; a URL change is not** — `post-commit` re-indexes
+  a changed repo document, a changed URL waits for a human to type `fux update`,
+  and nothing reports how long ago that was. Two reframes carry the argument:
+  *answer* freshness is already shipped, so a stale `url:` record costs
+  **recall, not correctness**; and a **detector** and a **clock** are different
+  roles, which collapses most of the apparent options. **Eight forks, all
+  Arpit's** — fork 3 is the consequential one, because it amends a contract
+  (`ADR-FETCHER` decision 2, four functions) that has survived two callers
+  unchanged. **Phases 0 (measure) and 1 (report) are startable now and depend
+  on no fork.** ⚠ Three hazards live in the item: `dirty.py`'s *"advisory,
+  never authoritative"* is what keeps L3 true and a URL refresh driven by it is
+  not advisory; a changed validator token must never mean a changed record; and
+  **`cdp.py` is not thread-safe** (`global _session`, one WebSocket), so a blind
+  thread pool produces plausible documents attributed to the wrong URLs — it
+  passes every determinism check.
+- **The queue's second item — W-74, filed 2026-08-22** under a new
+  **ADR-RS** group: [fux has no contract for what *right* means](open/W-74-answer-quality-measurement-contract.md),
+  spec in [`proposals/measuring-answer-quality.md`](proposals/measuring-answer-quality.md).
+  ADR-RS governs *how* a claim is frozen and is silent on *what quantity is
+  worth freezing*, so every quality number this project has produced carries an
+  undeclared query distribution and an implicit cost model where a fabricated
+  citation and an honest decline count the same. **Nothing is decided — it ends
+  in six forks, all Arpit's**, and fork 4 is the one that can quietly break a
+  law-adjacent property (measuring the `answered` gate needs a judge model:
+  outside the maintenance path so L3 holds, non-reproducible unless the model
+  and prompt are pinned). **Part A — the declarations — is unblocked by the
+  lab; Part B cannot run**, because `acme`/`orbit` are gone and the five-tier
+  redesign is unexecuted. ⚠ **It is not a re-filing of the withdrawn W-62** and
+  says so in both files; if the two are ever confused, W-74 yields.
 - **The immediate next step is Arpit's, not an agent's.** Three decisions sit
   in [`OPEN-WORK.md`](OPEN-WORK.md)'s inbox and `work/BLOCKED.json`, and **all
   three sit above completed work** — nothing is waiting to be built:

@@ -1,0 +1,3 @@
+    docs  full ingest  1-doc delta
+    1000        6.46s        0.09s
+    2500       16.06s        0.22s

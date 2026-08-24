@@ -41,9 +41,9 @@ def test_shard_distribution_across_many_ids_is_not_degenerate():
 
 
 def test_header_carries_format_analyzer_and_tf_fields():
-    assert HEADER["_format"] == "fux.index.v1"
+    assert HEADER["_format"] == "fux.index.v2"
     assert HEADER["analyzer"]
-    assert HEADER["tf_fields"] == ["heading", "body"]
+    assert HEADER["tf_fields"] == ["body", "heading", "title", "path", "ctx"]
 
 
 # Golden vectors — pin the exact algorithm (blake2b + digest_size), not just

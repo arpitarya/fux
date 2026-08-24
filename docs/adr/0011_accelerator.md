@@ -288,10 +288,70 @@ reproducible by construction.
   *Faster Top-k Document Retrieval Using Block-Max Indexes* (SIGIR 2011):
   https://engineering.nyu.edu/~suel/papers/bmw.pdf
 
+### The weighted bound (W-73, 2026-08-23)
+
+**The block bound is safe on exactly one property, and it is a property about
+the WEIGHTED score:**
+
+```
+for every unseen d:   w(d) * S(d)  <  theta_w      =>  d cannot enter the top-k
+```
+
+Until 2026-08-23 the accelerator computed both halves **unweighted** — the
+ceiling from `mx`/`mnw`, and `theta` from raw candidate scores — while
+`rank()` applied `w(d)` *afterwards*, on a candidate set that had already been
+truncated. The law therefore held at `archived_weight == 1.0` and **at no
+other value**, and `config.py` accepts any non-negative float.
+
+**Both halves are required, and each covers a direction the other does not:**
+
+| half | what it fixes | the direction it covers |
+|---|---|---|
+| `theta` drawn from **weighted** candidate scores | demoting the current top-k lowers the real threshold, so a document pruned on the old `theta` should now enter | `w < 1` |
+| ceiling scaled by **`Weighting.maximum`** | a promoted document is skipped on a ceiling that never knew about the promotion | `w > 1` |
+
+**`maximum` is the supremum over the CONFIGURATION, never over the observed
+candidates** — the document the test is about has not been seen, so nothing is
+known about its weight except that the configuration bounds it. It is
+`max(1.0, archived_weight)` and never the configured weight alone: `1.0` is
+always attainable, because a document that is not archived is never scaled.
+
+Weighting an *under-estimate* is legal: `_kth_score` scores over opened terms
+only, and `w(d) * S_opened(d) <= w(d) * S_full(d)` for `w >= 0`, so a weighted
+`theta` is still a lower bound and a lower `theta` skips less, never more.
+
+**At `Weighting.trivial` every weighted path short-circuits**, so a corpus with
+no configured weight is byte-identical to the pre-W-73 arithmetic and the
+differential evidence gathered at the default stands unmodified.
+
+The doc table now carries `archived` (runtime schema `fux.runtime.v2`). Without
+it the accelerator could only re-derive the flag by matching `loc` against the
+configured directories, while the scan reads the record's own stamp first — a
+second divergence, on the flag rather than the order.
+
 ### Veto condition
 
 **Reopen this decision if** the two paths ever disagree, or if a scoring change
 invalidates the block bound.
+
+**Veto 5 (W-73): a weight that can reach the scorer without reaching the
+bound.** Any new multiplier applied in `rank()` — per-source priority is the
+next one — must be expressed through `Weighting` so that `maximum` and the
+weighted `theta` see it. A multiplier added directly in `rank()` re-opens
+exactly this defect, silently.
+
+```bash
+# 5. every score multiplier is routed through Weighting
+grep -nE '\*=' src/fux/query/rank.py
+# expect: only `s *= archived_weight` guarded by `demote`, which Weighting owns
+
+# 6. the bound survives a NON-default weight, including the adversarial case
+pytest -q tests/derive/test_weighted_bound.py
+
+# 7. the differential harness sweeps weights, not just the default
+grep -n 'WEIGHTS' tools/differential/run.py
+# expect: a tuple straddling 1.0 and reaching far enough to eat the block slack
+```
 
 **How to check it:**
 

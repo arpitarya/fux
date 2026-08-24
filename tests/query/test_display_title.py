@@ -15,11 +15,18 @@ import argparse
 import json as json_mod
 
 from fux.query import cmd_answer, cmd_ask, cmd_find
+from fux.query.tokenize import tokenize
 from fux.store import DisplayCache, content_sha, term_hash, title_hash, write_index
 
 DOC_ID = "url:https://x.test/handbook"
 SHA = content_sha(DOC_ID.encode("utf-8"))
 TITLE = "The Oncall Handbook"
+
+
+def _h(word: str) -> str:
+    """Hash the ANALYZED form — the query analyzes before hashing too, so a
+    fixture that hashes the raw word would never be found (v2)."""
+    return term_hash(tokenize(word)[0])
 
 
 def _record() -> dict:
@@ -31,8 +38,8 @@ def _record() -> dict:
         "meta": "hashed",
         "sha": SHA,
         "title_h": title_hash(TITLE),
-        "terms": {term_hash("oncall"): [1, 2]},
-        "wlen": 12,
+        "terms": {_h("oncall"): [2, 1]},
+        "flen": [12],
         "edges": [],
     }
 

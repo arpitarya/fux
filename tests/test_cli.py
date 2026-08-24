@@ -29,9 +29,17 @@ def test_parser_has_the_verb_surface():
     rather than with rankings** (M3) · maintenance `hooks` wires the
     repository up to keep its own index in step (M5).
 
-    Five groups, not four, since the graph lane landed — and the count was
-    never the mental model, which is why adding one costs a line here and a
-    line in ADR-CLI rather than a redesign.
+    Seven groups: W-76 Phase 5 added **agent `mcp`**, Phase 8 added
+    **enrichment `enrich`** — which plans and validates the text an agent skill
+    generates, and has **no `--model` flag**, because fux never calls one.
+
+    Phase 5's `mcp` — the index served to
+    coding agents over stdio JSON-RPC ([ADR-MCP](../docs/adr/0039_mcp.md)). A
+    verb rather than a flag on `ask`, because it is a long-running server and
+    not a query.
+
+    Six, not four, and the count was never the mental model — which is why
+    adding one costs a line here and a line in ADR-CLI rather than a redesign.
 
     **`url` is gone, not deprecated** (W-63). It was four days old, pre-1.0,
     and its whole surface is `fux add <URL>` / `fux remove <URL>`. The flag
@@ -52,6 +60,8 @@ def test_parser_has_the_verb_surface():
         "ask",
         "find",
         "answer",
+        "enrich",
+        "mcp",
         "explain",
         "graph",
         "path",

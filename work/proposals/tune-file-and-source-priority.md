@@ -2,11 +2,16 @@
 type: Proposal
 title: .fux/tune.toml, and per-source priority
 description: A tunables file separate from fux.toml, written by fux setup and never rewritten; plus a per-source preference weight. Carries the boundary rule that keeps tuning off the maintenance path, and the pruning-bound blocker that both features run into.
-status: proposed
+status: graduated
 timestamp: 2026-08-22T00:00:00Z
 ---
 
 # `.fux/tune.toml`, and per-source priority
+
+> **GRADUATED 2026-08-22 → [ADR-TUNE](../../docs/adr/0038_tuning.md).** The record is the live
+> decision; this file is kept for the survey behind it and the ten forks as they were
+> put. **Cite ADR-TUNE, never this.** Forks 1–10 are answered in the record's decisions;
+> where the two disagree, the record wins.
 
 **Arpit, 2026-08-22, two requests:**
 
@@ -19,6 +24,19 @@ timestamp: 2026-08-22T00:00:00Z
 The design research behind the knobs themselves is
 [`ranking-tuning.md`](ranking-tuning.md); this file is the shape of the two
 things asked for. **Neither is decided.** §7 lists the forks.
+
+**RULED — Arpit, 2026-08-22, fork 9: BOTH DIRECTIONS ARE ALLOWED.** A weight
+may go above `1.0` or below it, and **the consumer decides which**. Fux's job is
+to *call out the consequence* — in `tune.toml`'s own comments, in `fux doctor`,
+and in `fux tune` — never to refuse the value. *"If it understands the
+consequences, it's okay."* The line that follows from it, and it is now this
+file's organising principle:
+
+> **Refuse what is broken or already has a tool. Warn about what is merely
+> strong.**
+
+§3.8 is the consequence surface that ruling requires. **W-73 is now
+unblocked and fully agent-startable** — both accelerator changes are in scope.
 
 **One finding gates both of them, and it is in §6**: fux's accelerator prunes
 on **unboosted** score bounds, so *any* per-document weight other than `1.0`
@@ -107,34 +125,149 @@ someone approved.
 # leaves `.fux/index/` byte-identical.
 
 [bm25f]
-#heading_weight = 3        # WHOLE NUMBERS ONLY — see the note below
-#body_weight    = 1
-#k1             = 1.2
-#b              = 0.75
-
-[fuse]
-#rrf_k       = 60
-#dense_width = 100
-
-[graph]
-#damping    = 0.85
-#iterations = 3
-#laziness   = 0.5
-#hop_decay  = 0.5
+#k1             = 1.2      # term-frequency saturation
+#b              = 0.75     # length normalisation, 0 = off, 1 = full
+#heading_weight = 3        # ⚠ NOT SHIPPABLE YET — see §2.5, it is baked into `wlen`
+#body_weight    = 1        # ⚠ same, and it is the pinned coordinate anyway
 
 [ranking]
-#archived_weight = 1.0
+#archived_weight = 1.0     # score multiplier for a source declared archived
 
-# Per-source preference. The key is a source entry EXACTLY as it appears in
-# .fux/sources/dirs or .fux/sources/urls. Anything unlisted is 1.0.
+[fuse]                     # `ask --hybrid` only
+#rrf_k       = 60          # Cormack et al. 2009; not a tuned value
+#dense_width = 100         # how deep the dense lane reaches before fusion
+
+[graph]                    # `explain` / `graph` / `path`
+#damping      = 0.85       # PageRank's published default; restart = 1 - damping
+#iterations   = 3
+#laziness     = 0.5        # the conventional lazy chain
+#hop_decay    = 0.5        # grade product, decayed per extra hop
+#expand_limit = 10
+#seed_depth   = 5
+
+[refer]                    # `answer`, and `ask --refer`
+#budget            = 8000  # bytes of assembled passage
+#per_doc_fraction  = 0.5   # cap on one document's share of the budget
+#min_passage_bytes = 120
+#max_passage_bytes = 4000
+
+# --- [priority] --------------------------------------------------------
+# Prefer some sources over others. The key is a source entry EXACTLY as it
+# appears in .fux/sources/dirs or .fux/sources/urls. Unlisted = 1.0.
 # When entries overlap, the LONGEST matching entry wins.
+#
+# Above 1.0 promotes, below 1.0 demotes. BOTH ARE ALLOWED and the choice is
+# yours. What they cost:
+#
+#   * SPREAD IS THE COST, NOT DIRECTION. `docs/ = 1.5` with the rest at 1.0
+#     is the SAME RANKING as `docs/ = 1.0` with the rest at 0.667. What slows
+#     the accelerator is max / min, whichever side of 1.0 you work on.
+#
+#   * DEMOTING ONLY MAKES 1.0 A CEILING. Every source you add later arrives
+#     at 1.0 -- top priority -- until you remember to demote it too.
+#     Promoting instead leaves 1.0 in the middle, and new sources arrive
+#     ordinary.
+#
+#   * A BIG ENOUGH WEIGHT IS NOT A PREFERENCE, IT IS A FILTER. Past some
+#     value every document in the preferred source outranks every document
+#     in the others, whatever the query. That value depends on YOUR corpus;
+#     `fux tune` prints it.
+#
+#   * A SMALL ENOUGH WEIGHT DOES NOTHING AT ALL. `fux tune` prints that one
+#     too, so you can tell "no effect" from "no change needed".
+#
+#   * BIG FOLDERS ALREADY WIN. 800 files is 800 chances to score, before any
+#     weight. If a weight seems to do nothing, read the per-source share
+#     before raising it.
+#
+# `fux tune` measures all of the above on this repo; `fux doctor` checks the
+# cheap ones on every run. NEITHER WILL STOP YOU. The only refusals are a
+# weight <= 0 -- negative inverts the ordering, and zero is exclusion, which
+# the `!` entry in .fux/sources/dirs already does properly.
 [priority]
-#"docs/"                      = 1.5
-#"vendor/"                    = 0.3
-#"https://example.com/runbook" = 2.0
+#"docs/"                       = 1.5
+#"vendor/"                     = 0.3
+#"https://example.com/runbook"  = 2.0
 ```
 
-### §2.3 — Validation is where the engine's real constraints surface
+### §2.3 — What is in, what is out, and why
+
+Membership is decided by §1's test, applied to every module-level constant in
+`src/`. Three groups fail it, and naming them is what stops the file growing
+into "everything with a number in it".
+
+**Out — changing it changes the committed index.** These are not tune keys;
+they are format decisions, and moving one costs a re-ingest and a `_format`
+bump:
+
+| constant | what it fixes |
+|---|---|
+| `ingest/extract.py` `MAX_PHRASES = 12` | how many headings become `phrases` |
+| `ingest/edges.py` `EXTRACTED_GRADE 10` · `AMBIG_GRADE 8` · `INFERRED_GRADE 6` | edge confidence, committed per edge |
+| `embed/fuxvec.py` `CODE_BITS = 256` | dense code width |
+| `embed/model.py` `MAX_TOKENS = 1024` | embedding truncation |
+| `config.py` `FIXED_SHARDS = 256` | already documented as not configurable |
+| `ingest/gitdir.py` `DEFAULT_TYPES` | **already has a home** — `.fux/sources/types` (ADR-TYPES) |
+
+**Out — derived, and a speed knob rather than a ranking one.**
+`derive/format.py` `BLOCK_SIZE = 128` changes `.fux/runtime/` and nothing else;
+the differential law means results cannot move, only latency. Real, measurable
+(the BMW literature finds block sizing matters a lot), and it belongs to
+ADR-T1-ACCELERATOR as a **derived-plane** setting, not to a ranking file. Same
+for `graph/community.py` `MAX_SWEEPS = 20`, which shapes `graph.json`.
+
+**Out — operational, not retrieval.** `maintain/runner.py` `STOP_TIMEOUT_S`,
+`MAX_PASSES`; `progress.py` `THRESHOLD = 200`; `refer/fetchcache.py`
+`DEFAULT_TTL_SECONDS = 300` and `DEFAULT_MAX_BYTES = 500 MB`. The cache pair is
+the arguable one — it is genuinely a knob a consumer might want — but it is
+**resource policy, not ranking**, and ADR-CACHE owns it. If it is ever exposed
+it belongs in `fux.toml` beside the fetcher config, or the boundary rule
+becomes "anything with a number in it".
+
+### §2.4 — ⚠ The field weights are already baked into the committed index
+
+**Found while inventorying, and it changes what can ship on day one.**
+
+There are **two** `HEADING_WEIGHT` constants, with the same name and the same
+value, in different modules and with no test tying them together:
+
+| module | used for | when |
+|---|---|---|
+| `query/bm25f.py` | the numerator — `wtf = 3·tf_heading + 1·tf_body` | query time |
+| `ingest/extract.py` | **`wlen = 3·len(heading_tokens) + 1·len(body_tokens)`** | **ingest time — and `wlen` is committed** |
+
+`wlen` is the denominator's length term:
+
+```
+denom = wtf + K1 · (1 - B + B · wlen / avg_wlen)
+```
+
+So **setting `heading_weight` in `tune.toml` would reweight the numerator while
+every committed `wlen` stayed on the old weight.** The two halves of the same
+formula would disagree, silently, with no error anywhere.
+
+**This is fux's own LUCENE-6819.** A tunable is fused into a stored value, so
+changing it requires rewriting the corpus — the exact property §3.1 rejects
+index-time boosts for. It was invisible until someone tried to make the weight
+configurable.
+
+Three ways out:
+
+| | what | cost |
+|---|---|---|
+| **a** | `heading_weight` is **not** a tune key; it stays a source constant | free, and honest — but it is one of the more promising axes ([`ranking-tuning.md`](ranking-tuning.md) §6 item 2) |
+| **b** | **store the observation, not the derived value** — commit `heading_tokens` and `body_tokens` as two ints and compute `wlen` at query time from the current weights | a `_format` bump and a few bytes per record; makes the weight genuinely query-time |
+| **c** | make it a tune key that requires `fux ingest --full` | reintroduces exactly the property Lucene deleted |
+
+**Proposed: (a) now, (b) when the format next moves.** (b) is the right shape —
+*the index should store what it observed, never a number computed from a knob*
+— and it generalises: **no committed field may be a function of a tunable.**
+
+**And a one-line gate, today, either way:** a test asserting
+`query.bm25f.HEADING_WEIGHT == ingest.extract.HEADING_WEIGHT`. Nothing ties
+them now, so editing one is a silent corpus-wide scoring error.
+
+### §2.5 — Validation is where the engine's real constraints surface
 
 - **`heading_weight` and `body_weight` must be whole numbers.**
   `derive/build.py` asserts it today, because a block's max weighted tf has to
@@ -151,6 +284,103 @@ someone approved.
   rule, applied to the file that can silently change every answer.
 
 ---
+
+### §2.6 — Error handling
+
+**The guarantee that falls out of §1 first**, because it is the boundary rule
+paying rent:
+
+> **You cannot break your maintenance path by editing your ranking file.**
+> `ingest`, `add`/`remove`/`update` and the post-commit hook never read
+> `tune.toml`. A file with a missing bracket stops answers, never the index.
+
+**The governing rule for the read verbs**, and it decides every case below:
+
+> **A ranking file that cannot be read is never silently replaced by a
+> different ranking.**
+
+Falling back to defaults on a parse error is the worst available outcome: the
+user believes their weights are active, fux answers on different ones, and
+nothing anywhere says so. So a broken file is **fatal to the read verbs** —
+`FuxError`, rendered at the CLI boundary, **exit 1**, nothing on stdout (a
+`--json` caller must never receive half a document).
+
+| case | verdict | why |
+|---|---|---|
+| file absent, or present and empty | **not an error** — every default | the file is a place to deviate, never a requirement |
+| unreadable (permissions) | error | |
+| TOML syntax error | error, `file:line:col` | `tomllib` gives the position; pass it through |
+| **git conflict marker** | error naming *that*, not the syntax | a committed file people edit will get `<<<<<<<`; "expected '=' " is a bad way to learn that |
+| unknown table (`[bm25g]`) | error, naming the nearest legal table | |
+| unknown key | error, naming the key and its table's legal set | ADR-URL-LIST's writer-strict rule, applied to the file that can silently change every answer |
+| wrong type (`k1 = "1.2"`) | error naming the expected type | |
+| out of range (`b = 1.5`) | error naming the range **and what the ends mean** | |
+| breaks an invariant (`heading_weight = 2.7`) | error naming the accelerator's `u32 mx` | §2.4 — a storage invariant, not a taste |
+| `priority ≤ 0` | error (§3.8) | negative inverts ordering; zero is exclusion, and `!` already owns it |
+| **priority key matching no source** | **warning on stderr, once — not fatal** | see below |
+| legal but aggressive (`priority = 40`) | **nothing at load** | §3.8's ruling: `doctor` and `tune` call out the cost, neither refuses |
+
+**Why the orphaned key is a warning and the others are not.** With a syntax
+error *nothing* is known. With an orphan, every other weight still applies
+exactly as written and the failure is scoped to one line — and a source can be
+legitimately absent for a moment (a folder mid-rename, a priority written
+before its `fux add`). Making `ask` fail because someone deleted a directory is
+worse than saying so. It is repeated as a durable `doctor` line so it cannot
+rot quietly.
+
+**Report every problem, not the first.** Syntax stops at the first position —
+`tomllib` cannot do better — but semantic validation collects. A file with
+three bad values should cost one run to fix, not three. Cap the list at ten.
+
+```console
+$ fux ask "how does the fetcher work"
+fux: .fux/tune.toml — 3 problems
+
+  line  9  [bm25f] b = 1.5
+           must be between 0 and 1  (0 = no length normalisation, 1 = full)
+
+  line 11  [bm25f] heading_weight = 2.7
+           must be a whole number — the accelerator stores a block's max
+           weighted tf as a u32, and a fractional weight breaks that
+
+  line 27  [priority] "vendor/" = 0
+           0 is exclusion, not a preference. Put `!vendor/` in
+           .fux/sources/dirs, which is the tool that means it
+
+  `fux doctor` checks this file without running a query.
+```
+
+```console
+$ fux ask "..."
+fux: .fux/tune.toml:26 - priority key "runbook/" matches no source entry (ignored)
+```
+
+**`--no-tune` on the read verbs.** One flag, no subverb, and it earns itself
+three times over: it is the *"is it me or the config?"* switch when a ranking
+looks wrong, it is how CI compares against engine defaults, and `fux tune`
+needs the off-arm internally anyway to compute every off-vs-on number in §3.8.
+The code exists regardless; exposing it is nearly free.
+
+**`fux doctor` validates without querying**, so the file can be checked before
+it is committed — and reports what it is *doing*, not only whether it parses:
+
+```console
+$ fux doctor
+...
+tune.toml    ok · 6 keys set · weights on 3 sources, spread 5.0x
+             ! "runbook/" matches no source entry — did a directory move?
+             ! every weight is below 1.0, so 1.0 is your ceiling: sources added
+               later arrive at top priority
+```
+
+**One enterprise detail worth building in rather than discovering.**
+`tomllib.load` reads binary and a **UTF-8 BOM makes it fail with a decode error
+that names nothing useful** — and Windows editors write BOMs. CLAUDE.md's
+litmus puts Windows-first fleets in scope, so: strip a leading BOM before
+parsing, or catch it and say *"this file starts with a byte-order mark"*.
+
+**No new exception type.** The error contract is one `FuxError`, no subclass
+hierarchy, raised in the loader and rendered at the boundary.
 
 ## §3 — Per-source priority: what the field has settled
 
@@ -300,6 +530,59 @@ this file share an output surface rather than each growing their own.
 
 ---
 
+### §3.8 — The consequence surface (Arpit's ruling, 2026-08-22)
+
+Both directions are legal, so **every consequence has to be visible, and each
+one has to be a number rather than a mood.** Three tiers, split by what each
+costs to produce:
+
+| tier | where | cost | carries |
+|---|---|---|---|
+| **written** | `tune.toml`'s own comments | free, and permanent — fux never rewrites the file | the rules that are true on any corpus |
+| **checked** | `fux doctor` | cheap — reads the source lists, runs no query | structural faults and dangerous *shapes* |
+| **measured** | `fux tune` | a run | the numbers that only this corpus can answer |
+
+**Tier 1 — written into the file.** Five rules, all corpus-independent:
+
+1. **Spread is the cost, not direction** (§6.4) — `max ÷ min`.
+2. **Demoting only makes `1.0` the ceiling**, so every source added later
+   arrives at top priority until it is demoted too.
+3. **A big enough weight stops being a preference and becomes a filter** —
+   past some value every document in the preferred source outranks every
+   document in the others, whatever the query.
+4. **A small enough weight does nothing at all.**
+5. **Big folders already win** — 800 files is 800 chances to score, before any
+   weight is applied.
+
+**Tier 2 — `fux doctor`.** Structural, always on, no corpus scan:
+
+- a `[priority]` key matching **no source entry** — the rename-drift failure
+  that keying by path buys, and the reason it is catchable at all;
+- the **spread**, stated as a number;
+- **the all-below-`1.0` shape**, named as rule 2 above, once.
+
+**Tier 3 — `fux tune`.** The numbers nobody else ships (§3.7):
+
+- **the two crossovers** — the weight below which nothing changes, and the
+  weight at which the preferred source *totally dominates*. Rules 3 and 4 turned
+  into two numbers for *this* corpus, with the user's current value placed
+  between them;
+- **per-source share of results, off vs on** — rule 5, measured;
+- **rank displacement** — how many results moved, how far;
+- **the accelerator's price** — blocks opened and warm p95, weights off vs on,
+  against R3's 150 ms bar. This is what makes rule 1 concrete rather than a
+  caution.
+
+**None of the three refuses anything.** Which is the ruling, and it is also
+what makes the two exceptions defensible:
+
+| value | fux does | why it is not a preference |
+|---|---|---|
+| `w < 0` | **error** | a negative multiplier inverts ordering — broken, not aggressive |
+| `w == 0` | **error**, naming the `!` exclusion entry | that is *exclusion*, and ADR-DIR-LIST decision 2a already owns it. Two ways to do one thing is the rot |
+| `w > 0` | **allowed, any value**, consequence called out | the ruling |
+| non-integer `heading_weight` | **error** at load, naming the reason | it breaks the accelerator's `u32 mx` — a storage invariant, not a taste (and see §2.4) |
+
 ## §4 — Which verbs it applies to
 
 | verb | priority applies | why |
@@ -324,8 +607,15 @@ must go to **stderr**, never stdout — the same constraint ADR-DIR-LIST
 decision 12 hit with the archived disclaimer.
 
 **Recommendation:** when any weight is not `1.0`, the read verbs say so once on
-stderr. A ranking that silently differs from the engine's default is the kind
-of thing a new team member spends an afternoon on.
+stderr — and name the **spread**, not merely the fact, because that is the
+number §3.8 rule 1 is about:
+
+```
+fux: ranking weights active - 3 sources, spread 5.0x (.fux/tune.toml)
+```
+
+A ranking that silently differs from the engine's default is the kind of thing
+a new team member spends an afternoon on.
 
 ---
 
@@ -478,11 +768,11 @@ both accelerator changes. The extra one is a single multiply.
 | 6 | priority: config table or source-line attribute | **config table** (§3.3) | ADR-URL-LIST, ADR-DIR-LIST |
 | 7 | multiplicative or additive-saturating | **multiplicative v1**, saturating named as the graduation path | ADR-RANKING |
 | 8 | overlap resolution | **longest match wins** (§3.4) | ADR-RANKING |
-| 9 | may a weight exceed 1.0? | **yes** — see §6.4: demotion-only does not avoid the fix, and it makes every newly added source top priority by default. Band + `doctor` warning outside it | ADR-RANKING, ADR-T1-ACCELERATOR |
+| 9 | may a weight exceed 1.0? | ✅ **RULED (Arpit, 2026-08-22): yes — both directions, consumer's choice.** Fux calls out the consequence (§3.8) and refuses only `w ≤ 0`. **W-73 is a prerequisite** | ADR-RANKING, ADR-T1-ACCELERATOR |
 | 10 | does `--hybrid` apply it twice? | **no** — lexical lane only | ADR-RANKING |
 
-Fork 9 is the one that must be answered **first**, because forks 6–8 are
-unbuildable while it is open.
+**Fork 9 is answered.** Forks 6–8 are buildable the moment W-73 lands; forks
+1–5 and 10 are still Arpit's.
 
 ---
 
@@ -510,15 +800,21 @@ unbuildable while it is open.
 
 ## §9 — Graduation trigger
 
-**This graduates when Arpit rules on fork 9** — whether a source weight may
-exceed `1.0`.
+**Fork 9 fired it on 2026-08-22** — the original trigger was *"Arpit rules on
+whether a weight may exceed 1.0"*, and he has.
 
-Everything else follows from it. **A yes** takes both accelerator changes and
-gives the ergonomics he described — *"priority for just one"* is one line.
-**A no** still takes the weighted `theta` (§6.4), saves only the bound multiply,
-and accepts that every source added later arrives at maximum priority.
+**The next gate is W-73 landing.** Until the accelerator's bound accounts for a
+weight, per-source priority cannot ship in a build that has `--fast` in it —
+the two paths would return different documents, which is the one thing the
+differential law exists to prevent.
 
----
+Order, therefore:
+
+1. **W-73** — weighted `theta`, `ceiling × w_max`, and the differential sweep
+   that proves it.
+2. **Forks 1–5** — the file itself. Independent of priority; buildable in
+   parallel.
+3. **Forks 6–8, 10** — priority on top of both.
 
 ## Reference
 

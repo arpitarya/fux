@@ -64,7 +64,19 @@ FETCHERS_DIR = "fetchers"
 #: `[agents] install`, a declaration, never from sniffing the filesystem
 #: (decision 5, and veto condition 4).
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
-    "claude": ((".claude/skills/fux-archived-results/SKILL.md", "SKILL.md"),),
+    # `fux-enrich` is **claude-only and INVOKED, never ambient** (W-76 Phase 8).
+    #
+    # Two of the three renderings below are ambient -- Copilot's
+    # `applyTo: "**"` and Kiro's `inclusion: always` -- and enter every request
+    # for every developer in the repo. **An ambient skill that writes files
+    # into a committed directory and changes ranking is a different risk
+    # class**, so it ships only in the format that has an explicit-invocation
+    # model, and its description names the trigger phrases rather than the
+    # topic.
+    "claude": (
+        (".claude/skills/fux-archived-results/SKILL.md", "SKILL.md"),
+        (".claude/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
+    ),
     "copilot": (
         (".github/agents/fux.agent.md", "fux.agent.md"),
         (

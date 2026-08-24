@@ -47,7 +47,32 @@ from pathlib import Path
 
 from ..errors import FuxError
 
-__all__ = ["install", "status", "uninstall", "HOOKS", "MERGE_DRIVER_NAME"]
+__all__ = ["install", "status", "uninstall", "HOOKS", "MERGE_DRIVER_NAME", "REFS_NOTE"]
+
+#: W-76 Phase 9, and it is a NOTE rather than a feature — on purpose.
+#:
+#: Doc 01 of the ideal set proposed carrying the derived plane on
+#: `refs/fux/<tree-sha>` so a clone could fetch it instead of building. Arpit's
+#: fork A ruling (2026-08-23) refused the premise: everything the index needs
+#: is committed, so a clone answers without fetching anything.
+#:
+#: **It could not have worked as a correctness path anyway**, and that is the
+#: durable part worth recording:
+#:
+#:   - `git clone` does not fetch custom refs. A ref under `refs/fux/` is
+#:     invisible to a default clone.
+#:   - `git clone` does not run hooks. Hooks live in `.git/hooks`, which is not
+#:     cloned, so nothing local can fetch the ref on arrival either.
+#:
+#: What survives is a **cache-warmth** idea with no correctness role: a team
+#: that wanted `--fast` warm on arrival could publish and fetch the derived
+#: plane themselves. Two commands would implement it and neither is written,
+#: because the accelerator rebuilds in **0.7 s at 10 000 documents** (measured
+#: 2026-08-23) and `fux build` already exists and is now discoverable via
+#: Phase 0's nudge.
+#:
+#: Recorded here so a later session finds the reasoning rather than the idea.
+REFS_NOTE = "refs/fux/<tree> — see the module note; not built, and not a correctness path"
 
 MERGE_DRIVER_NAME = "fux-index"
 

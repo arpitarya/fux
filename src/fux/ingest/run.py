@@ -152,7 +152,7 @@ def run(
         p.update(len(files))
     if stopping():
         return None
-    existing = store_mod.read_index(root)
+    existing = _existing_index(root, full=full)
     existing_urls = {doc_id: rec for doc_id, rec in existing.items() if doc_id.startswith("url:")}
 
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
@@ -199,7 +199,15 @@ def run(
             # on the hot loop the progress plane exists to show moving.
             if n % _STOP_EVERY == 0 and stopping():
                 return None
-            extracted[doc_id] = extract_mod.extract_fields(_loc_of(doc_id), parsed[doc_id])
+            # W-76 Phase 8: pinned enrichment, keyed by the SOURCE content
+            # sha. A document that changed no longer matches its enrichment
+            # file, so the stale text is simply not found -- staleness is
+            # structural here rather than a check someone has to remember.
+            extracted[doc_id] = extract_mod.extract_fields(
+                _loc_of(doc_id),
+                parsed[doc_id],
+                _enrichment_for(root, file_shas.get(doc_id, "")),
+            )
             p.update(1, detail=_loc_of(doc_id))
     # Re-resolved every run (M5): a new document can resolve a link that
     # dangled yesterday, so this cannot be carried forward like extraction.
@@ -259,11 +267,11 @@ def run(
                     "title": fields.title,
                     "phrases": fields.phrases,
                     "terms": store_mod.hash_terms(fields.terms, tracker),
-                    "wlen": fields.wlen,
+                    "flen": store_mod.trim(fields.flen),
                 }
             )
-            if fields.code is not None:
-                record["code"] = fields.code
+            if fields.vectors:
+                record["vectors"] = list(fields.vectors)
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
         record["edges"] = edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename)
@@ -280,7 +288,7 @@ def run(
             "ver": 0,
             "mode": "extracted",
             "terms": store_mod.hash_terms(fields.terms, tracker),
-            "wlen": fields.wlen,
+            "flen": store_mod.trim(fields.flen),
             "edges": edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
         }
         record["ver"] = ver_for(doc_id, record["sha"])
@@ -297,8 +305,8 @@ def run(
             # so this costs a write, not a fetch. `write_index` refuses to
             # commit this record without it (`store/writer.py`).
             store_mod.DisplayCache(root).put(record["sha"], doc_id, fields.title)
-        if fields.code is not None:
-            record["code"] = fields.code
+        if fields.vectors:
+            record["vectors"] = list(fields.vectors)
         records.append(record)
 
     # `known_ids` is exactly this run's final id set — every parsed document
@@ -309,6 +317,28 @@ def run(
     # `write_index` groups by shard internally and offers no per-shard hook,
     # so this phase is a bookend around it rather than a live count —
     # honest under W-64's "counts, not clocks" (no bytes are interpolated).
+    # W-76 Phase 2 — the two ranking priors, stamped as FACTS.
+    #
+    # Both are applied here rather than inside the per-document loops because
+    # both are corpus-wide: `superseded` is a relation another document
+    # declares, and the git walk is deliberately ONE subprocess for the whole
+    # corpus rather than one per document (10 000 process spawns would dwarf
+    # the entire rest of an ingest, measured at 9.5 s for 10 000 documents).
+    #
+    # The weights that read these are tunable; these values are not. That is
+    # ADR-TUNE decision 1's split, and it is why they can live in the
+    # committed index at all.
+    from .priors import git_commit_times, superseded_ids
+
+    retired = superseded_ids(records)
+    commit_times = git_commit_times(root, [r["loc"] for r in records if r.get("src") == "git"])
+    for record in records:
+        if record["id"] in retired:
+            record["superseded"] = True
+        mtime = commit_times.get(record.get("loc"))
+        if mtime is not None:
+            record["mtime"] = mtime
+
     shard_total = len({store_mod.shard_for(r["id"]) for r in records})
     # **The last stop point, and it is here on purpose.** Past this line the
     # run is committed to finishing: `write_index` is the only path bytes reach
@@ -336,6 +366,29 @@ def run(
     )
 
 
+def _enrichment_for(root, sha: str) -> str:
+    """The pinned enrichment body for a content sha, or `""`.
+
+    Returns the text **after** the frontmatter: the frontmatter is provenance
+    for a human and for `fux enrich --check`, not vocabulary for the index.
+    Indexing it would put the model's name and a date into `ctx` and let a
+    document match a query for its own metadata.
+
+    **Validated before use.** A malformed file is ignored rather than indexed,
+    because the failure mode of trusting it is silent: whatever text is in
+    there becomes searchable vocabulary attributed to this document.
+    """
+    if not sha:
+        return ""
+    from ..enrich import enrich_path, match_end, validate
+
+    path = enrich_path(root, sha)
+    if not path.is_file() or validate(path, expected_sha=sha) is not None:
+        return ""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return text[match_end(text) :].strip()
+
+
 #: How often the cooperative stop is polled inside the two per-document loops.
 #: A stop is noticed within this many documents, which at any corpus size fux
 #: is judged at is well under a second.
@@ -344,7 +397,50 @@ _STOP_EVERY = 64
 #: The fields extraction owns — pure functions of one document's own bytes, and
 #: therefore the only ones a delta run may carry forward. `edges` is absent on
 #: purpose, and `sha`/`ver` are recomputed because that is what they are for.
-EXTRACTED_FIELDS = ("title", "phrases", "terms", "wlen", "code")
+EXTRACTED_FIELDS = ("title", "phrases", "terms", "flen", "code", "vectors")
+
+
+
+def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
+    """The prior index, or `{}` when `--full` is discharging a schema migration.
+
+    ADR-INDEX-LIFECYCLE decision 10 owes a full re-ingest on every index older
+    than the current analyzer and names `fux ingest --full` as the command that
+    pays it. Reading the prior index unconditionally made that command **refuse
+    the exact index it exists to replace** — the migration path was documented
+    and unreachable.
+
+    `--full` re-extracts every document from source anyway, so a foreign index
+    contributes nothing to it *except* `url:` records, which came from the
+    network and cannot be rebuilt offline. So:
+
+    - **no `url:` records** — the foreign index is discarded and `--full`
+      rebuilds from committed sources. Nothing is lost that a re-extraction
+      does not restore.
+    - **any `url:` records** — refuse, and name them. Deleting them silently
+      is the failure this whole seam exists to prevent, and there is no offline
+      way to carry them: their content is not recoverable from the shard,
+      only their identity is.
+
+    A delta run (`full=False`) is unchanged: it still reads, and still refuses
+    a foreign index loudly, because carry-forward genuinely cannot proceed.
+    """
+    if not (full and store_mod.index_is_foreign(root)):
+        return store_mod.read_index(root)
+
+    header = store_mod.index_header(root) or {}
+    stranded = store_mod.foreign_url_ids(root)
+    if stranded:
+        shown = "\n  ".join(stranded[:10])
+        more = f"\n  ... and {len(stranded) - 10} more" if len(stranded) > 10 else ""
+        raise FuxError(
+            f"--full: the committed index was written by an older fux "
+            f"(_format={header.get('_format')!r}, analyzer={header.get('analyzer')!r}) "
+            f"and holds {len(stranded)} url: record(s) that a re-ingest cannot rebuild "
+            f"offline:\n  {shown}{more}\n"
+            f"Re-fetch them on a networked run instead: `fux update`."
+        )
+    return {}
 
 
 def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) -> dict[str, dict]:

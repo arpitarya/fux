@@ -75,6 +75,18 @@ def _cmd_build(args) -> int:
     return cmd_build(args)
 
 
+def _cmd_enrich(args) -> int:
+    from .enrich import cmd_enrich
+
+    return cmd_enrich(args)
+
+
+def _cmd_mcp(args) -> int:
+    from .mcp import cmd_mcp
+
+    return cmd_mcp(args)
+
+
 def _cmd_hooks(args) -> int:
     from .maintain import cmd_hooks
 
@@ -282,6 +294,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="skip the refer plane; answer from the index's own structure alone",
     )
     p_answer.set_defaults(func=_cmd_answer)
+
+    # W-76 Phase 8. **No `--model` flag, and that is the design**: fux never
+    # calls a model, so there is no networked path to fence. Generation is the
+    # `fux-enrich` agent skill; these two flags are the deterministic halves.
+    p_enrich = sub.add_parser(
+        "enrich", help="plan and validate the enrichment an agent skill generates"
+    )
+    enrich_mode = p_enrich.add_mutually_exclusive_group()
+    enrich_mode.add_argument(
+        "--plan", action="store_true", help="print the worklist (the default)"
+    )
+    enrich_mode.add_argument(
+        "--check", action="store_true", help="validate what exists and report coverage"
+    )
+    p_enrich.set_defaults(func=_cmd_enrich)
+
+    # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running
+    # server, not a query, and ADR-CLI's four groups gain a fifth consumer-facing
+    # one rather than overloading the read verbs.
+    p_mcp = sub.add_parser(
+        "mcp", help="serve the index over MCP on stdio, for coding agents"
+    )
+    p_mcp.set_defaults(func=_cmd_mcp)
 
     p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
     p_hooks.add_argument("--install", action="store_true", help="write them (the default)")

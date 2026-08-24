@@ -11,9 +11,32 @@ from pathlib import Path
 
 INDEX_DIR = ".fux/index"
 
-SCHEMA_ID = "fux.index.v1"
-ANALYZER_VERSION = "v1"
-TF_FIELDS = ("heading", "body")
+# v2 (W-76 Phase 1 record half, 2026-08-23): five tf fields instead of two,
+# trailing zeros omitted, and `wlen` replaced by `flen` (per-field token
+# counts) so the length normaliser stops being a function of a tunable.
+SCHEMA_ID = "fux.index.v2"
+# v2 (W-76 Phase 1, 2026-08-23): identifier splitting before lowercasing,
+# plus Porter stemming before hashing. A v1 shard is refused by
+# `store/reader.py` rather than silently mixed -- two analyzers in one
+# index is undetectable at query time and corrupts every df.
+ANALYZER_VERSION = "v2"
+#: **Order is load-bearing, and body comes first on purpose.**
+#:
+#: A tf vector is written with trailing zeros omitted, so the cheapest shape to
+#: encode is whichever field is most often the only one present. Measured on
+#: this repo (411 documents, 186 799 postings, 2026-08-23):
+#:
+#:     body only              92.5 %      ->  [1]        3 bytes
+#:     heading and body        5.1 %      ->  [1,2]      5 bytes
+#:     heading only            2.4 %      ->  [0,2]      5 bytes
+#:
+#: Body-first plus trailing-zero omission measured **-36.7 %** on the tf
+#: vectors in the live index (941 130 B -> 595 492 B) *while going from two
+#: fields to five*. Heading-first would have cost +24 %.
+#:
+#: Reordering this tuple changes every record and is an ADR-recorded format
+#: bump, not a refactor.
+TF_FIELDS = ("body", "heading", "title", "path", "ctx")
 
 # The first line of every shard — pins schema, analyzer, and tf-array order
 # so a reader never has to guess field meaning from position alone.

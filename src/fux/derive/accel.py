@@ -58,6 +58,8 @@ from ..errors import FuxError
 from ..query.bm25f import B, K1, idf
 from ..query.rank import AskResult, Corpus, rank
 from ..query.scan import query_term_hashes
+from ..query.bm25f import FIELD_WEIGHTS
+from ..query.rank import Weighting
 from . import format as fmt
 
 __all__ = ["ask", "accel_candidates", "block_bound", "is_fresh", "Runtime"]
@@ -71,8 +73,11 @@ class Block:
     block_no: int
     offset: int
     length: int
-    mx: int
-    mnw: int
+    #: PER-FIELD extrema, unweighted (W-76 Phase 1). Recombined with the
+    #: weights in force at query time by `block_bound`, so editing
+    #: `tune.toml` never invalidates a built accelerator.
+    mx: tuple[int, ...]
+    mnw: tuple[int, ...]
     first_doc: int
     last_doc: int
     count: int
@@ -145,26 +150,45 @@ class Runtime:
             lo += 1
         return out
 
-    def read_block(self, block: Block) -> list[tuple[int, int, int]]:
+    def read_block(self, block: Block) -> list[tuple[int, list[int]]]:
         """Parse one block line into its postings. The only JSON parse on this path."""
         buf = self.postings(fmt.term_prefix(block.term))
         line = buf[block.offset : block.offset + block.length]
         _, entries = json.loads(line)
-        return [(e[0], e[1], e[2]) for e in entries]
+        return [(e[0], e[1]) for e in entries]
 
 
-def block_bound(block: Block, df: int, n: int, avg_wlen: float) -> float:
+def block_bound(
+    block: Block, df: int, n: int, avg_wlen: float, weights: tuple[float, ...] = FIELD_WEIGHTS
+) -> float:
     """The largest BM25F contribution any posting in `block` can make.
 
-    Uses `mx` (max weighted tf, contribution increases in it) with `mnw` (min
-    document length, contribution decreases in it). Proof in the module
-    docstring; exhaustively tested against every posting in
-    `tests/derive/test_bounds.py`.
+    Contribution increases in weighted tf and decreases in document length, so
+    a block is dominated by (its maximum weighted tf, its minimum length).
+
+    **Since W-76 Phase 1 the extrema are stored per field and recombined
+    here**, at the weights in force, rather than stored pre-weighted. That is
+    what lets a field weight be a `tune.toml` key without a rebuild — and it
+    makes the bound LOOSER, provably in the safe direction:
+
+        sum_i w_i * max_d tf_i(d)  >=  max_d sum_i w_i * tf_i(d)      (mx)
+        sum_i w_i * min_d len_i(d) <=  min_d sum_i w_i * len_i(d)     (mnw)
+
+    An over-estimated numerator and an under-estimated length both push the
+    bound UP. A bound that is too high skips fewer blocks; a bound that is too
+    low loses documents. Only the first is possible here.
     """
-    wtf = float(block.mx)
+    wtf = 0.0
+    for i, value in enumerate(block.mx):
+        if value:
+            wtf += weights[i] * value
     if wtf == 0:
         return 0.0
-    denom = wtf + K1 * (1 - B + B * block.mnw / avg_wlen)
+    mnw = 0.0
+    for i, value in enumerate(block.mnw):
+        if value:
+            mnw += weights[i] * value
+    denom = wtf + K1 * (1 - B + B * mnw / avg_wlen)
     return idf(df, n) * wtf * (K1 + 1) / denom
 
 
@@ -186,6 +210,12 @@ def is_fresh(root: Path) -> bool:
     except (OSError, ValueError, KeyError):
         return False
     if manifest.get("schema") != fmt.RUNTIME_SCHEMA:
+        return False
+    # The doc table's field set, not just the schema string. A field added to
+    # the table without a schema bump is invisible to the check above and
+    # produces a runtime the scorer reads facts OUT of that are not IN it --
+    # so `--fast` and `--scan` weight the same document differently, silently.
+    if list(manifest.get("docs_fields", ())) != list(fmt.DOCS_FIELDS):
         return False
 
     from .. import store as store_mod
@@ -209,6 +239,7 @@ def accel_candidates(
     top: int,
     *,
     skipping: bool = True,
+    weighting: "Weighting | None" = None,
 ) -> tuple[list[dict], dict[str, int], Corpus]:
     """Candidate records, `df`, and the corpus statistics — the scan's contract.
 
@@ -216,8 +247,14 @@ def accel_candidates(
     reads only `terms` (at the query hashes), `wlen`, `id`, `title` and `loc`,
     all of which the doc table and the postings carry.
     """
+    if weighting is None:
+        weighting = Weighting()
     stats = runtime.stats
-    corpus = Corpus(n=stats["n"], total_wlen=stats["total_wlen"])
+    corpus = Corpus(
+        n=stats["n"],
+        total_wlen=stats["total_wlen"],
+        newest_mtime=stats.get("newest_mtime", 0),
+    )
     if corpus.n == 0:
         return [], dict.fromkeys(query_hashes, 0), corpus
     avg_wlen = corpus.avg_wlen
@@ -230,18 +267,18 @@ def accel_candidates(
     # expensive one is the most likely to be skipped outright.
     order = sorted(query_hashes, key=lambda h: (df[h], h))
 
-    # docidx -> {term: (tf_h, tf_b)}
-    hits: dict[int, dict[str, tuple[int, int]]] = {}
+    # docidx -> {term: per-field tf list}
+    hits: dict[int, dict[str, list[int]]] = {}
     opened: set[str] = set()
     read_blocks: dict[str, set[int]] = {h: set() for h in query_hashes}
 
     for term in order:
-        if skipping and hits and _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen):
+        if skipping and hits and _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen, weighting):
             break
         for block in blocks[term]:
             read_blocks[term].add(block.block_no)
-            for docidx, tf_h, tf_b in runtime.read_block(block):
-                hits.setdefault(docidx, {})[term] = (tf_h, tf_b)
+            for docidx, tf in runtime.read_block(block):
+                hits.setdefault(docidx, {})[term] = tf
         opened.add(term)
 
     # Deferred terms still owe their tf for documents already in the candidate
@@ -255,21 +292,31 @@ def accel_candidates(
             "id": docs[docidx]["id"],
             "loc": docs[docidx]["loc"],
             "title": docs[docidx]["title"],
-            "wlen": docs[docidx]["wlen"],
-            "terms": {term: [tf_h, tf_b] for term, (tf_h, tf_b) in terms.items()},
+            "flen": docs[docidx]["flen"],
+            "archived": docs[docidx].get("archived", False),
+            "superseded": docs[docidx].get("superseded", False),
+            "mtime": docs[docidx].get("mtime"),
+            "terms": {term: list(tf) for term, tf in terms.items()},
         }
         for docidx, terms in hits.items()
     ]
     return candidates, df, corpus
 
 
-def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen) -> bool:
+def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen, weighting=None) -> bool:
     """True when no unseen document can enter the top `top`.
 
-    `theta` is the k-th best *exact* score over the candidates gathered so far.
-    An unseen document matches only deferred terms, so its ceiling is the sum
-    of those terms' best block bounds.
+    `theta` is the k-th best *weighted* score over the candidates gathered so
+    far. An unseen document matches only deferred terms, so its ceiling is the
+    sum of those terms' best block bounds — **scaled by the largest weight the
+    configuration can produce** (W-73).
+
+    The scale factor is `weighting.maximum`, not the weight of any candidate:
+    the document this test is about has not been seen, so nothing is known
+    about its weight except that the configuration bounds it.
     """
+    if weighting is None:
+        weighting = Weighting()
     deferred = [h for h in order if h not in opened]
     if not deferred:
         return True
@@ -281,7 +328,10 @@ def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, a
             continue
         ceiling += max(block_bound(b, df[term], corpus.n, avg_wlen) for b in term_blocks)
 
-    theta = _kth_score(hits, docs, [h for h in order if h in opened], df, corpus, top, avg_wlen)
+    if not weighting.trivial:
+        ceiling *= weighting.maximum
+
+    theta = _kth_score(hits, docs, [h for h in order if h in opened], df, corpus, top, avg_wlen, weighting)
     if theta is None:
         return False
     # Rounding-aware: `rank()` compares round(score, 9), so a bound that merely
@@ -289,23 +339,31 @@ def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, a
     return round(ceiling, 9) < round(theta, 9)
 
 
-def _kth_score(hits, docs, opened_order, df, corpus, top, avg_wlen) -> float | None:
-    """The `top`-th best score among current candidates, or None if too few.
+def _kth_score(hits, docs, opened_order, df, corpus, top, avg_wlen, weighting=None) -> float | None:
+    """The `top`-th best **weighted** score among current candidates.
+
+    `None` when there are fewer than `top` candidates.
 
     Scored over the **opened terms only**, so it under-estimates each
     candidate's final score once deferred terms are filled in. That is the safe
-    direction: a lower `theta` skips less, never more.
+    direction: a lower `theta` skips less, never more. Multiplying by a
+    non-negative `w(d)` preserves that direction, because
+    `w(d)*S_opened(d) <= w(d)*S_full(d)` — which is what makes it legal to
+    weight an under-estimate rather than having to weight the final score.
     """
+    if weighting is None:
+        weighting = Weighting()
     if len(hits) < top:
         return None
     from ..query.bm25f import score_record
 
     scores = []
     for docidx, terms in hits.items():
-        record_terms = {term: [tf_h, tf_b] for term, (tf_h, tf_b) in terms.items()}
-        scores.append(
-            score_record(record_terms, docs[docidx]["wlen"], opened_order, df, corpus.n, avg_wlen)
-        )
+        record_terms = {term: list(tf) for term, tf in terms.items()}
+        s = score_record(record_terms, docs[docidx]["flen"], opened_order, df, corpus.n, avg_wlen)
+        if not weighting.trivial:
+            s *= weighting.of(docs[docidx])
+        scores.append(s)
     scores.sort(reverse=True)
     return scores[top - 1]
 
@@ -330,9 +388,9 @@ def _fill_deferred(runtime, blocks, opened, query_hashes, hits, read_blocks) -> 
             if lo >= len(wanted) or wanted[lo] > block.last_doc:
                 continue  # covers no candidate — not read, not parsed
             read_blocks[term].add(block.block_no)
-            for docidx, tf_h, tf_b in runtime.read_block(block):
+            for docidx, tf in runtime.read_block(block):
                 if docidx in hits:
-                    hits[docidx][term] = (tf_h, tf_b)
+                    hits[docidx][term] = tf
 
 
 def ask(
@@ -343,6 +401,7 @@ def ask(
     skipping: bool = True,
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
+    weighting: "Weighting | None" = None,
 ) -> list[AskResult]:
     """The accelerated `ask`. Identical output to `query.scan.ask`, by law."""
     query_hashes = query_term_hashes(query)
@@ -351,8 +410,13 @@ def ask(
     runtime = Runtime(root)
     if not (runtime.dir / fmt.STATS_NAME).exists():
         raise FuxError("no accelerator built — run `fux ingest` (or `fux build`) first")
-    candidates, df, corpus = accel_candidates(runtime, query_hashes, top, skipping=skipping)
+    if weighting is None:
+        weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
+    candidates, df, corpus = accel_candidates(
+        runtime, query_hashes, top, skipping=skipping, weighting=weighting
+    )
     return rank(
         candidates, query_hashes, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
+        weighting=weighting,
     )

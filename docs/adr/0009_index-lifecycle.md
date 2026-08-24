@@ -354,6 +354,74 @@ and the differential harness now carries a hashed record to prove it.
 - Canonical JSON, the prior art this follows — RFC 8785 (JCS):
   https://www.rfc-editor.org/rfc/rfc8785
 
+**Decision 10 — the analyzer bumps to `v2` (W-76 Phase 1, 2026-08-23).**
+
+Analyzer v2 splits identifiers *before* lowercasing and Porter-stems *before*
+hashing (`query/analyzer.py`, `query/stem.py`). Both change which hash a given
+piece of text produces, so **every `terms` key in the index changes** and a v1
+shard and a v2 shard cannot coexist.
+
+This is the case decision 9 drew the line for: decision 9 says a *value*
+encoding change bumps neither `_format` nor `analyzer`, because the property
+set is unchanged. Here the property set is unchanged too — a record still has
+`terms`, still maps a 16-hex hash to a per-field tf — but **the function that
+produces the key changed**, and that is precisely what the `analyzer` field
+pins. `_format` stays `fux.index.v1`; `analyzer` goes `v1` -> `v2`.
+
+**Nothing tries to migrate, and nothing tries to mix.** `store/reader.py`
+refuses a shard whose header names another analyzer, and `ingest`'s
+carry-forward is gated on the same header, so a bump invalidates every carried
+field at once rather than leaving a corpus half-analyzed. Two analyzers inside
+one index would be undetectable at query time and would corrupt every `df`.
+
+**A full re-ingest is owed on every existing index**, this repo's own included:
+
+```bash
+fux ingest --full     # every document re-extracted under v2
+```
+
+Until that runs, `store/reader.py` refuses the committed shards — loudly, by
+design, rather than returning a silently wrong ranking.
+
+**Amendment, 2026-08-24 — the command above did not work, and now does.**
+
+`ingest` read the prior index unconditionally, before any `--full` check, in
+order to carry `url:` records forward. So the command this decision names as
+the migration **refused the exact index it exists to replace**, and the only
+way out was `rm -rf .fux/index/` — which silently destroys every `url:`
+record, the one thing in the index that is not a function of a committed file.
+This was found on 2026-08-24 by running the documented command on this repo.
+
+`ingest/run.py::_existing_index` now splits the two cases, and the line it
+draws is worth stating precisely:
+
+> **Record identity is schema-stable; record content is not.**
+
+`id` has meant the same thing since v1. `terms` has not — v1 hashed a
+different function over two fields where v2 hashes five. So:
+
+- **`--full` on a foreign index** reads `id` and nothing else
+  (`store/reader.py::foreign_url_ids`). No `url:` records -> the old shards are
+  discarded and every document is re-extracted from source, losing nothing a
+  re-extraction does not restore. Any `url:` records -> **refuse**, name them,
+  and point at `fux update`, which is the only thing that can rebuild them.
+- **A delta run on a foreign index** still refuses outright. Carry-forward
+  genuinely cannot proceed across analyzers, and that refusal is unchanged.
+- **`read_index` still refuses a foreign shard**, unchanged. Nothing migrates
+  a record; the relaxation is scoped to the one command that was going to
+  rebuild every record from source anyway.
+
+This does not weaken *"nothing tries to migrate, and nothing tries to mix"* —
+it is what makes the sentence true, because the alternative in practice was a
+consumer deleting the directory by hand and never being told what went with
+it. Pinned by `tests/store/test_foreign_index.py` (14 tests), including that
+`read_index` and delta ingest both still refuse.
+
+**Discharged on this repo, 2026-08-24.** 434 records, 218 shards, 6.3 MB;
+header `fux.index.v2` / analyzer `v2` / `tf_fields` `["body","heading","title",
+"path","ctx"]`; the `code` field gone. A delta run reproduces the full run's
+shards byte for byte, so L3 holds on the migrated index.
+
 ### Veto condition
 
 **Reopen this decision if** the committed index stops being byte-reproducible,

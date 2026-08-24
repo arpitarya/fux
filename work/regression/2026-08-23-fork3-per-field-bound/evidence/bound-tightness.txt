@@ -1,0 +1,7 @@
+blocks compared : 101
+identical bound : 35
+looser bound    : 66
+loose/tight median 1.0049  max 1.0083
+
+A bound this close to tight never flips round(bound,9) < round(theta,9),
+which is why the block counts in bench-run.log are identical.

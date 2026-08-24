@@ -75,12 +75,30 @@ class Report:
         return not self.mismatches
 
 
+#: Score weights every query is checked at (W-73, 2026-08-23).
+#:
+#: Before W-73 this harness only ever ran at `1.0`, which is why "thousands of
+#: comparisons" never touched the defect: the weight was applied after the
+#: candidate set had already been truncated on an unweighted bound. The values
+#: below straddle 1.0 in both directions, because both directions diverge for
+#: different reasons.
+#:
+#: **500.0 is not decoration.** The measured divergence on the adversarial
+#: fixture in `tests/derive/test_weighted_bound.py` appears at 500 and NOT at
+#: 4.0 or 25.0 — the block bound is tight but the slack between a weak
+#: posting and its block's `mx` is real, and a small weight does not eat it.
+#: A sweep that stops at "a plausible configuration" measures floating point.
+WEIGHTS = (1.0, 0.5, 2.0, 500.0)
+
+
 def compare(
     root: Path,
     queries: list[str],
     *,
     tops: tuple[int, ...] = TOPS,
     modes: tuple[str, ...] = ("off", "on"),
+    weights: tuple[float, ...] = WEIGHTS,
+    archived_dirs: frozenset[str] = frozenset(),
 ) -> Report:
     """Run every query down both paths, at every `top`, in every mode, and diff.
 
@@ -94,17 +112,21 @@ def compare(
 
     for query in queries:
         for top in tops:
-            t0 = time.perf_counter()
-            expected = payload(scan.ask(root, query, top=top))
-            scan_seconds += time.perf_counter() - t0
-
-            for mode in modes:
+            for weight in weights:
+                kw = {"archived_weight": weight, "archived_dirs": archived_dirs}
                 t0 = time.perf_counter()
-                got = payload(accel.ask(root, query, top=top, skipping=(mode == "on")))
-                accel_seconds += time.perf_counter() - t0
-                checks += 1
-                if got != expected:
-                    mismatches.append(Mismatch(query, expected, got, mode, top))
+                expected = payload(scan.ask(root, query, top=top, **kw))
+                scan_seconds += time.perf_counter() - t0
+
+                for mode in modes:
+                    t0 = time.perf_counter()
+                    got = payload(accel.ask(root, query, top=top, skipping=(mode == "on"), **kw))
+                    accel_seconds += time.perf_counter() - t0
+                    checks += 1
+                    if got != expected:
+                        mismatches.append(
+                            Mismatch(f"{query}  [w={weight}]", expected, got, mode, top)
+                        )
 
     return Report(len(queries), checks, mismatches, scan_seconds, accel_seconds)
 

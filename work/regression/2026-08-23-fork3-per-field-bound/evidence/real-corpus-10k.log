@@ -1,0 +1,9 @@
+corpus              10 000 REAL prose documents (fux-lab r9-t2)
+queries             60 from the corpus's own vocabulary
+accelerator p95        33.53 ms   (bar: 150 ms)
+accelerator median     12.67 ms
+reference scan p95    225.18 ms
+blocks loose/tight  1768 / 1768
+extra blocks (fork 3) +0.0 %
+
+R3 bar: PASS

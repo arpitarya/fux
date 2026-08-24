@@ -1,36 +1,27 @@
-"""The tokenizer/analyzer — ported from `archive/v0.26/src/fux/index/bm25f.py`,
-plus stopword filtering (the M1 build-time addition below).
+"""The tokenizer both sides of a match share. **Analyzer v2** (W-76 Phase 1).
 
-Lowercase runs of `[a-z0-9_]`, minus a fixed English stopword list. Shared by
-`ingest/` (building a document's `terms`) and `query/` (tokenizing the
-question) so the two sides of a match are guaranteed to agree.
+The pipeline itself lives in `analyzer.py`; this module is the stable entry
+point `ingest/` and `query/` have always imported, kept so that every caller
+continues to get *the same* analysis by construction rather than by review.
 
-`path_tokens` is not ported: M1's postings carry only `heading`/`body` (the
-compare doc's schema of record, §5) — the archived third `path` field is
-dropped, recorded in ADR-RECORD.
+v1 was: lowercase, `[a-z0-9_]+`, drop 50 stopwords. v2 adds identifier
+splitting (before lowercasing, which is the only point at which `camelCase`
+is still recoverable) and Porter stemming (after stopwords, before hashing).
 
-Stopword filtering was not in the archived module or the M1 handoff spec —
-added after R2 measured its absence: on this repo's corpus, un-filtered BM25F
-let a glossary's dictionary-style repetition of "what"/"is"/"the" outrank a
-focused, correct answer on a natural-language question (measured, not
-hypothetical; see ADR-RECORD and work/regression/2026-08-10-m1-t0-slice/).
-Standard IR practice, not tuned to that one query — the list below is the
-same one `archive/v0.26/src/fux/graph/extract.py` already used for its
-top-terms extraction.
+**A v2 index and a v1 index cannot be mixed**, and nothing tries: the shard
+header pins `analyzer`, `store/reader.py` refuses a shard written by another
+one, and `ingest`'s carry-forward is gated on the same header. A bump
+therefore invalidates every carried field at once, which is the property that
+makes it safe to change this file at all.
 """
 
 from __future__ import annotations
 
-import re
+from .analyzer import _STOPWORDS, analyze
 
-_TOKEN_RE = re.compile(r"[a-z0-9_]+")
-
-_STOPWORDS = frozenset(
-    """a an and are as at be but by for from has have how i if in into is it its
-    of on or that the their then there these this to was were what when where
-    which who why will with you your we our not can may""".split()
-)
+__all__ = ["tokenize", "_STOPWORDS"]
 
 
 def tokenize(text: str) -> list[str]:
-    return [t for t in _TOKEN_RE.findall(text.lower()) if t not in _STOPWORDS]
+    """Analyzed terms in document order, with duplicates (they are the tf)."""
+    return analyze(text)

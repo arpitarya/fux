@@ -342,6 +342,17 @@ the caller's window. `dropped` is reported so truncation is never silent.
 - The plane and its tests: [`src/fux/refer/`](../../src/fux/refer/) ·
   [`tests/refer/`](../../tests/refer/)
 
+**Amended 2026-08-23 (W-76 Phase 1).** Passage rescoring builds its pseudo-
+records with the **five-field** tf vector and a `flen`, matching the committed
+shape so `score_record` is literally the same call on both sides.
+
+**A passage populates exactly two of the five fields** — its own heading and
+its own text. `title`, `path` and `ctx` are document-level: they are identical
+across every passage of a document, so including them would add the same
+constant to every passage's score, change no ordering, and make every vector
+longer. Leaving them zero is not an omission, it is the correct model of what
+a passage *is*.
+
 ### Veto condition
 
 **Reopen this decision if any of these becomes true:**

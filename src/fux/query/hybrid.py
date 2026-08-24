@@ -114,7 +114,22 @@ def _dense_ids(root: Path, query: str) -> list[str]:
     if vec is None:
         return []  # nothing embeddable in the query itself
 
+    # W-76 Phase 7 made the derived code table PER-CHUNK, so `hamming_ranking`
+    # -- which expects one code per document -- would raise `TypeError: ... ^
+    # 'list'` on any real table. `nearest_docs` is the per-chunk equivalent: a
+    # document is ranked by its BEST chunk, which is the same max-sim rule the
+    # exact rescore uses.
+    #
+    # **This path is no longer the one `fux ask --hybrid` takes.** `run_query`
+    # routes through `query/dense.py`'s gated fusion (ADR-ENRICH's sibling
+    # decision in W-76 Phase 7). This module survives because
+    # `tools/differential/playground_grade.py` grades it as a named strategy,
+    # and a grading harness that cannot run its own baseline is worse than one
+    # extra module. **It was broken by the Phase 7 migration and nothing
+    # caught it** -- every test either monkeypatched `_dense_ids` or returned
+    # early on a missing model, which is why the fix carries this note.
     query_code = int.from_bytes(quantize(vec), "little")
     runtime = accel.Runtime(root)
     docs = runtime.docs
-    return [docs[i]["id"] for i in dense.hamming_ranking(query_code, codes, DENSE_WIDTH)]
+    ranked = dense.nearest_docs(query_code, codes, len(codes))
+    return [docs[i]["id"] for i in ranked if i < len(docs)]

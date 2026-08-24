@@ -1,12 +1,13 @@
 # W-73 — a non-default score weight breaks the accelerator's pruning bound
 
 **Status:** OPEN
-**Lane:** `agent` (the fix) + `arpit` (fork 9 of the proposal — may a weight exceed 1.0?)
+**Lane:** `agent` — **fork 9 ruled 2026-08-22 (Arpit): both directions allowed, the consumer chooses, fux states the cost.** Both accelerator changes are therefore in scope; the demotion-only shortcut is off the table.
 **Filed:** 2026-08-22 (Cowork), while researching per-source priority
 **Spec:** this file · design context in
 [`../proposals/tune-file-and-source-priority.md`](../proposals/tune-file-and-source-priority.md) §6
-**Closes with:** **`ADR-T1-ACCELERATOR`** (owns the bound) and
-**`ADR-RANKING`** (owns the weight)
+**Closes with:** **[ADR-TUNE](../../docs/adr/0038_tuning.md) decision 12** (written 2026-08-22; its
+**veto condition 2 is FIRING** and names this item) plus an **`ADR-T1-ACCELERATOR`**
+amendment, since that record owns the bound
 **Model:** **Opus** — it is a correctness argument about an invariant, and a
 wrong call here is silent. The *edit* is small; the reasoning is not.
 

@@ -3,10 +3,18 @@ from __future__ import annotations
 import pytest
 
 from fux.query.scan import ask, scan_candidates
+from fux.query.tokenize import tokenize
 from fux.store import term_hash, write_index
 
 
-def _rec(doc_id, title, wlen, terms) -> dict:
+def _h(word: str) -> str:
+    """Hash the ANALYZED form of `word` — `ask` analyzes the query before
+    hashing, so a fixture built from the raw word's hash would never match
+    once the word has any morphology to strip (v2)."""
+    return term_hash(tokenize(word)[0])
+
+
+def _rec(doc_id, title, flen, terms) -> dict:
     return {
         "id": doc_id,
         "src": "git",
@@ -16,7 +24,7 @@ def _rec(doc_id, title, wlen, terms) -> dict:
         "title": title,
         "phrases": [],
         "terms": terms,
-        "wlen": wlen,
+        "flen": flen,
         "edges": [],
     }
 
@@ -26,7 +34,7 @@ def test_empty_index_returns_nothing(tmp_path):
 
 
 def test_finds_a_matching_document(tmp_path):
-    write_index(tmp_path, [_rec("file:a.md", "A", 10, {term_hash("pruning"): [0, 1]})])
+    write_index(tmp_path, [_rec("file:a.md", "A", [10], {_h("pruning"): [1, 0]})])
     results = ask(tmp_path, "pruning")
     assert len(results) == 1
     assert results[0].id == "file:a.md"
@@ -36,7 +44,7 @@ def test_finds_a_matching_document(tmp_path):
 
 
 def test_query_with_no_matches_returns_empty(tmp_path):
-    write_index(tmp_path, [_rec("file:a.md", "A", 10, {term_hash("pruning"): [0, 1]})])
+    write_index(tmp_path, [_rec("file:a.md", "A", [10], {_h("pruning"): [1, 0]})])
     assert ask(tmp_path, "zzznomatch") == []
 
 
@@ -44,8 +52,9 @@ def test_heading_match_ranks_above_body_match(tmp_path):
     write_index(
         tmp_path,
         [
-            _rec("file:heading.md", "Heading doc", 10, {term_hash("install"): [1, 0]}),
-            _rec("file:body.md", "Body doc", 10, {term_hash("install"): [0, 1]}),
+            # tf is `[body, heading]` (v2 order — `store.TF_FIELDS`).
+            _rec("file:heading.md", "Heading doc", [10], {_h("install"): [0, 1]}),
+            _rec("file:body.md", "Body doc", [10], {_h("install"): [1, 0]}),
         ],
     )
     results = ask(tmp_path, "install")
@@ -56,8 +65,8 @@ def test_deterministic_tiebreak_on_id(tmp_path):
     write_index(
         tmp_path,
         [
-            _rec("file:b.md", "B", 10, {term_hash("same"): [0, 1]}),
-            _rec("file:a.md", "A", 10, {term_hash("same"): [0, 1]}),
+            _rec("file:b.md", "B", [10], {_h("same"): [1, 0]}),
+            _rec("file:a.md", "A", [10], {_h("same"): [1, 0]}),
         ],
     )
     results = ask(tmp_path, "same")
@@ -67,7 +76,7 @@ def test_deterministic_tiebreak_on_id(tmp_path):
 def test_top_limits_results(tmp_path):
     write_index(
         tmp_path,
-        [_rec(f"file:{i}.md", str(i), 10, {term_hash("x"): [0, 1]}) for i in range(10)],
+        [_rec(f"file:{i}.md", str(i), [10], {_h("x"): [1, 0]}) for i in range(10)],
     )
     assert len(ask(tmp_path, "x", top=3)) == 3
 
@@ -79,8 +88,10 @@ def _archived_setup(tmp_path):
     write_index(
         tmp_path,
         [
-            _rec("file:archive/old.md", "Old", 10, {term_hash("cache"): [1, 0]}),
-            _rec("file:docs/new.md", "New", 10, {term_hash("cache"): [0, 1]}),
+            # tf is `[body, heading]` (v2 order) — "old.md" is a heading match,
+            # "new.md" a body match, same as before the field-order flip.
+            _rec("file:archive/old.md", "Old", [10], {_h("cache"): [0, 1]}),
+            _rec("file:docs/new.md", "New", [10], {_h("cache"): [1, 0]}),
         ],
     )
 
@@ -137,7 +148,7 @@ def test_the_record_property_marks_without_any_dirs_declaration(tmp_path):
     its source list changed. This is why the property exists at all rather than
     being recomputed by every reader.
     """
-    rec = _rec("file:old/legacy.md", "Legacy", 10, {term_hash("cache"): [1, 0]})
+    rec = _rec("file:old/legacy.md", "Legacy", [10], {_h("cache"): [0, 1]})
     rec["archived"] = True
     write_index(tmp_path, [rec])
     (result,) = ask(tmp_path, "cache")
@@ -169,8 +180,8 @@ def test_multi_term_query_prefers_document_matching_both(tmp_path):
     write_index(
         tmp_path,
         [
-            _rec("file:both.md", "Both", 10, {term_hash("pruning"): [0, 1], term_hash("gate"): [0, 1]}),
-            _rec("file:one.md", "One", 10, {term_hash("pruning"): [0, 1]}),
+            _rec("file:both.md", "Both", [10], {_h("pruning"): [1, 0], _h("gate"): [1, 0]}),
+            _rec("file:one.md", "One", [10], {_h("pruning"): [1, 0]}),
         ],
     )
     results = ask(tmp_path, "pruning gate")
@@ -180,7 +191,7 @@ def test_multi_term_query_prefers_document_matching_both(tmp_path):
 def test_results_are_deterministic_across_repeated_calls(tmp_path):
     write_index(
         tmp_path,
-        [_rec(f"file:{i}.md", str(i), 10 + i, {term_hash("pruning"): [i % 2, 1]}) for i in range(20)],
+        [_rec(f"file:{i}.md", str(i), [10 + i], {_h("pruning"): [1, i % 2]}) for i in range(20)],
     )
     first = ask(tmp_path, "pruning")
     second = ask(tmp_path, "pruning")
@@ -197,13 +208,13 @@ def test_df_is_not_inflated_by_a_hash_quoted_outside_terms(tmp_path):
     exact by construction) silently disagrees with this reference scan and
     derive/build.py's tripwire refuses to build.
     """
-    stray_hash = term_hash("deadbeefdeadbeef")
+    stray_hash = _h("deadbeefdeadbeef")
     write_index(
         tmp_path,
         [
             # The hash string is literally quoted in `title`, not a key of `terms`.
-            _rec("file:stray.md", stray_hash, 10, {}),
-            _rec("file:real.md", "Real", 10, {stray_hash: [0, 1]}),
+            _rec("file:stray.md", stray_hash, [10], {}),
+            _rec("file:real.md", "Real", [10], {stray_hash: [1, 0]}),
         ],
     )
     query_hashes = [stray_hash]
@@ -223,8 +234,8 @@ def test_scan_never_parses_non_candidate_lines(tmp_path, monkeypatch):
     write_index(
         tmp_path,
         [
-            _rec("file:match.md", "Match", 10, {term_hash("pruning"): [0, 1]}),
-            _rec("file:nomatch.md", "NoMatch", 10, {term_hash("gate"): [0, 1]}),
+            _rec("file:match.md", "Match", [10], {_h("pruning"): [1, 0]}),
+            _rec("file:nomatch.md", "NoMatch", [10], {_h("gate"): [1, 0]}),
         ],
     )
     real_loads = scan_mod.json.loads

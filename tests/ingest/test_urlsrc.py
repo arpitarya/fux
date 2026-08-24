@@ -13,6 +13,7 @@ from fux.config import load as load_config
 from fux.errors import FuxError
 from fux.ingest.run import run
 from fux.ingest.urlsrc import UrlEntry, fetch_all, load_fetcher, read_urls
+from fux.query.tokenize import tokenize
 from fux.store.format import term_hash, title_hash
 
 FAKE_FETCHER = '''\
@@ -290,7 +291,8 @@ def test_refresh_ingests_urls_with_hashed_meta_default(tmp_path):
     assert record["meta"] == "hashed"
     assert record["title_h"] == title_hash("Page a")
     assert "title" not in record and "phrases" not in record  # no display text leaks
-    assert term_hash("rendered") in record["terms"]
+    # v2 hashes the ANALYZED term, not the raw word — "rendered" stems to "render"
+    assert term_hash(tokenize("rendered")[0]) in record["terms"]
 
 
 def test_plain_meta_is_an_explicit_opt_in(tmp_path):

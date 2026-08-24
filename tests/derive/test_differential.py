@@ -24,7 +24,7 @@ from fux.store import DisplayCache, content_sha, term_hash, title_hash, write_in
 TOPS = (1, 5, 20, 50)
 
 
-def _rec(doc_id, title, wlen, terms) -> dict:
+def _rec(doc_id, title, flen, terms) -> dict:
     return {
         "id": doc_id,
         "src": "git",
@@ -34,7 +34,7 @@ def _rec(doc_id, title, wlen, terms) -> dict:
         "title": title,
         "phrases": [],
         "terms": terms,
-        "wlen": wlen,
+        "flen": flen,
         "edges": [],
     }
 
@@ -58,18 +58,22 @@ def assert_identical(root, queries, tops=TOPS):
 
 @pytest.fixture
 def corpus(tmp_path):
-    """A corpus with a genuine df spread, ties, and a very common term."""
+    """A corpus with a genuine df spread, ties, and a very common term.
+
+    tf vectors are `[body, heading]` (v2 order — `store.TF_FIELDS`); `flen`
+    is a single body-token count, so `derive_wlen(flen) == flen[0]`.
+    """
     records = []
     for i in range(250):
-        terms = {term_hash("common"): [0, 1 + i % 4]}
+        terms = {term_hash("common"): [1 + i % 4, 0]}
         if i % 5 == 0:
-            terms[term_hash("mid")] = [1, i % 9]
+            terms[term_hash("mid")] = [i % 9, 1]
         if i % 25 == 0:
-            terms[term_hash(f"rare{i}")] = [2, 3]
-        # Deliberate exact duplicates: identical tf AND identical wlen, so the
+            terms[term_hash(f"rare{i}")] = [3, 2]
+        # Deliberate exact duplicates: identical tf AND identical flen, so the
         # scores tie and only the id tie-break separates them.
         wlen = 100 if i % 7 == 0 else 20 + (i * 31) % 700
-        records.append(_rec(f"file:d{i:04d}.md", f"Doc {i}", wlen, terms))
+        records.append(_rec(f"file:d{i:04d}.md", f"Doc {i}", [wlen], terms))
     write_index(tmp_path, records)
     build(tmp_path)
     return tmp_path
@@ -108,27 +112,28 @@ def test_top_larger_than_the_corpus(corpus):
 
 
 def test_single_document_corpus(tmp_path):
-    write_index(tmp_path, [_rec("file:a.md", "A", 10, {term_hash("solo"): [1, 1]})])
+    write_index(tmp_path, [_rec("file:a.md", "A", [10], {term_hash("solo"): [1, 1]})])
     build(tmp_path)
     assert_identical(tmp_path, ["solo", "absent", ""], tops=(1, 5))
 
 
-def test_document_without_wlen(tmp_path):
+def test_document_without_flen(tmp_path):
     """`scan.py` counts it in `n` but contributes 0 to `total_wlen`.
 
     The accelerator must reproduce that asymmetry rather than the more
-    sensible-looking thing.
+    sensible-looking thing. `flen` (not `wlen`) is the field that can now be
+    absent — W-76 Phase 1 replaced the committed scalar with the per-field list.
     """
-    record = _rec("file:a.md", "A", 0, {term_hash("solo"): [1, 1]})
-    del record["wlen"]
-    write_index(tmp_path, [record, _rec("file:b.md", "B", 40, {term_hash("solo"): [1, 2]})])
+    record = _rec("file:a.md", "A", [0], {term_hash("solo"): [1, 1]})
+    del record["flen"]
+    write_index(tmp_path, [record, _rec("file:b.md", "B", [40], {term_hash("solo"): [2, 1]})])
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1, 5))
 
 
-def _hashed(doc_id, title, wlen, terms) -> dict:
+def _hashed(doc_id, title, flen, terms) -> dict:
     """A `meta: hashed` record, the shape `--refresh-urls` actually writes."""
-    record = _rec(doc_id, title, wlen, terms)
+    record = _rec(doc_id, title, flen, terms)
     del record["title"], record["phrases"]
     record["src"] = "url"
     record["loc"] = doc_id.removeprefix("url:")
@@ -151,7 +156,7 @@ def _warm(root, record) -> dict:
 
 def test_hashed_meta_titles(tmp_path):
     """`title_h` records must resolve the same display title on both paths."""
-    write_index(tmp_path, [_warm(tmp_path, _hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]}))])
+    write_index(tmp_path, [_warm(tmp_path, _hashed("url:https://x/a", "Page A", [10], {term_hash("solo"): [1, 1]}))])
     build(tmp_path)
     assert_identical(tmp_path, ["solo"], tops=(1,))
     # The prefix is storage. What a verb shows is the hash, opaque either way.
@@ -168,11 +173,11 @@ def test_a_corpus_holding_a_hashed_record_builds_and_agrees(tmp_path):
     standing between the engine and a fast wrong answer was a stopped run.
     """
     records = [
-        _rec("file:a.md", "A", 12, {term_hash("oncall"): [1, 2], term_hash("rotation"): [0, 1]}),
-        _rec("file:b.md", "B", 30, {term_hash("oncall"): [0, 1]}),
-        _warm(tmp_path, _hashed("url:https://x/handbook", "Oncall handbook", 11,
-                {term_hash("oncall"): [1, 3], term_hash("pager"): [0, 2]})),
-        _warm(tmp_path, _hashed("url:https://x/deploys", "Deploy runbook", 20, {term_hash("rotation"): [0, 1]})),
+        _rec("file:a.md", "A", [12], {term_hash("oncall"): [2, 1], term_hash("rotation"): [1, 0]}),
+        _rec("file:b.md", "B", [30], {term_hash("oncall"): [1, 0]}),
+        _warm(tmp_path, _hashed("url:https://x/handbook", "Oncall handbook", [11],
+                {term_hash("oncall"): [3, 1], term_hash("pager"): [2, 0]})),
+        _warm(tmp_path, _hashed("url:https://x/deploys", "Deploy runbook", [20], {term_hash("rotation"): [1, 0]})),
     ]
     write_index(tmp_path, records)
     build(tmp_path)  # must not raise: the invariant holds by field shape
@@ -183,7 +188,7 @@ def test_a_pre_prefix_title_h_still_stops_the_build_and_names_the_migration(tmp_
     """An index written before the prefix is old, not corrupt. Say which."""
     from fux.errors import FuxError
 
-    record = _hashed("url:https://x/a", "Page A", 10, {term_hash("solo"): [1, 1]})
+    record = _hashed("url:https://x/a", "Page A", [10], {term_hash("solo"): [1, 1]})
     record["title_h"] = term_hash("Page A")  # the bare, pre-2026-08-19 shape
     write_index(tmp_path, [_warm(tmp_path, record)])
     with pytest.raises(FuxError, match="predates the `h:` prefix"):
@@ -197,7 +202,7 @@ def test_a_term_spanning_many_blocks(tmp_path):
     n = BLOCK_SIZE * 3 + 7
     write_index(
         tmp_path,
-        [_rec(f"file:d{i:04d}.md", f"D{i}", 10 + i, {term_hash("everywhere"): [0, 1 + i % 3]}) for i in range(n)],
+        [_rec(f"file:d{i:04d}.md", f"D{i}", [10 + i], {term_hash("everywhere"): [1 + i % 3, 0]}) for i in range(n)],
     )
     build(tmp_path)
     runtime = accel.Runtime(tmp_path)

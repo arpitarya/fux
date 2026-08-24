@@ -26,9 +26,35 @@ from pathlib import Path
 
 from .. import store as store_mod
 from .rank import AskResult, Corpus, rank
+from .bm25f import derive_wlen
 from .tokenize import tokenize
 
-_WLEN_RE = re.compile(rb'"wlen":(\d+)')
+#: The byte-level oracle, now over per-field counts (W-76 Phase 1).
+#:
+#: `wlen` used to be committed and could be read with one integer capture.
+#: It is now DERIVED from `flen` at the weights in force, so this pass parses
+#: the array and applies `derive_wlen` — the same function the scorer, the
+#: accelerator's bound and the refer plane use, so the four cannot drift.
+#:
+#: Still a raw-bytes read rather than a JSON parse: this runs on every line in
+#: the corpus, candidate or not, and parsing every record to sum a length is
+#: what the prefilter exists to avoid.
+_FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
+
+
+#: W-76 Phase 2. Same reasoning as `_FLEN_RE`: read from bytes on every line,
+#: candidate or not, rather than parsing the corpus to find one integer.
+_MTIME_RE = re.compile(rb'"mtime":(\d+)')
+
+
+def _flen_from_line(line: bytes) -> list[int] | None:
+    m = _FLEN_RE.search(line)
+    if m is None:
+        return None
+    inner = m.group(1).strip()
+    if not inner:
+        return []
+    return [int(part) for part in inner.split(b",")]
 
 __all__ = ["AskResult", "ask", "query_term_hashes", "scan_candidates"]
 
@@ -48,6 +74,7 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
 
     total_docs = 0
     total_wlen = 0
+    newest_mtime = 0
     df: dict[str, int] = dict.fromkeys(query_hashes, 0)
     candidates: list[dict] = []
 
@@ -55,9 +82,14 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
         _, lines = store_mod.raw_record_lines(path)
         for line in lines:
             total_docs += 1
-            m = _WLEN_RE.search(line)
-            if m:
-                total_wlen += int(m.group(1))
+            flen = _flen_from_line(line)
+            if flen is not None:
+                total_wlen += derive_wlen(flen)
+            mt = _MTIME_RE.search(line)
+            if mt is not None:
+                value = int(mt.group(1))
+                if value > newest_mtime:
+                    newest_mtime = value
             # The substring check is a prefilter only: a query hash can appear
             # as a literal 16-hex string somewhere outside `terms` (a title,
             # an id, a sha — anything quoted) without the document actually
@@ -76,7 +108,7 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
                     df[h] += 1
             candidates.append(record)
 
-    return candidates, df, Corpus(n=total_docs, total_wlen=total_wlen)
+    return candidates, df, Corpus(n=total_docs, total_wlen=total_wlen, newest_mtime=newest_mtime)
 
 
 def ask(
@@ -86,6 +118,7 @@ def ask(
     *,
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
+    weighting=None,
 ) -> list[AskResult]:
     query_hashes = query_term_hashes(query)
     if not query_hashes:
@@ -94,4 +127,5 @@ def ask(
     return rank(
         candidates, query_hashes, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
+        weighting=weighting,
     )

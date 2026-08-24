@@ -177,7 +177,18 @@ URLS = ListSpec(
 
 DIRS = ListSpec(
     kind="dirs",
-    attributes=(Attribute("archived", ("true", "false"), "false"),),
+    attributes=(
+        Attribute("archived", ("true", "false"), "false"),
+        # W-76 Phase 8. **Declared, never derived** -- the same rule
+        # `archived` follows, for the same reason. Enrichment costs money and
+        # changes ranking, so which directories get it is a decision a human
+        # writes in a diffable line, not something fux infers from a path.
+        #
+        # Partial coverage ACROSS the corpus is the intended state; partial
+        # coverage INSIDE a declared scope is a defect, and that is exactly
+        # the split `fux enrich --check` reports on.
+        Attribute("enrich", ("true", "false"), "false"),
+    ),
     validate=_dir_reason,
     allow_exclusions=True,
 )

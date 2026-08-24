@@ -44,10 +44,16 @@ def _decode(code: str) -> int:
     return int.from_bytes(base64.urlsafe_b64decode(code + padding), "little")
 
 
-def build_codes(directory: Path, docs: list[dict], codes: list[str | None]) -> int:
-    """Write the docidx-ordered code table. `None` means the document has no code.
+def build_codes(directory: Path, docs: list[dict], codes: list[list[str]]) -> int:
+    """Write the docidx-ordered code table — **a list of codes per document**.
 
-    A document with nothing embeddable is stored as `null` rather than as an
+    W-76 Phase 7 made this per-chunk. It is a *cache of a sign test on
+    committed bytes*: the `int8` vectors are in `.fux/index/`, and these are
+    one bit per dimension derived from them. Deleting the table costs speed and
+    nothing else, which is exactly why it belongs in the derived plane while
+    the vectors do not.
+
+    A document with nothing embeddable is stored as `[]` rather than as an
     all-zero code: a zero code sits at a misleading middle distance from every
     query, which would make unembeddable documents quietly rankable.
     """
@@ -56,12 +62,42 @@ def build_codes(directory: Path, docs: list[dict], codes: list[str | None]) -> i
     return len(payload)
 
 
-def load_codes(root: Path) -> list[int | None]:
-    """The code table as ints, docidx-ordered. Decoded once per process."""
+def load_codes(root: Path) -> list[list[int]]:
+    """The code table as ints — a list per document, docidx-ordered."""
     path = fmt.runtime_dir(root) / CODES_NAME
     if not path.exists():
         return []
-    return [None if c is None else _decode(c) for c in json.loads(path.read_bytes())]
+    raw = json.loads(path.read_bytes())
+    out: list[list[int]] = []
+    for entry in raw:
+        if entry is None:
+            out.append([])
+        elif isinstance(entry, str):  # a pre-Phase-7 table: one code per doc
+            out.append([_decode(entry)])
+        else:
+            out.append([_decode(c) for c in entry])
+    return out
+
+
+def nearest_docs(query_code: int, codes: list[list[int]], limit: int) -> list[int]:
+    """Docidxs whose BEST chunk is nearest the query, nearest first.
+
+    The prefilter, and the whole reason the derived table exists: a popcount
+    over one int per chunk, versus 256 multiply-adds per chunk for the exact
+    score. It narrows the corpus to `limit` documents that the `int8` rescore
+    can then afford to look at properly.
+
+    Ties break on docidx so the ranking is reproducible — the dense lane feeds
+    a fusion whose input order must not depend on iteration order.
+    """
+    scored = []
+    for docidx, chunk_codes in enumerate(codes):
+        if not chunk_codes:
+            continue
+        best = min((query_code ^ code).bit_count() for code in chunk_codes)
+        scored.append((best, docidx))
+    scored.sort()
+    return [docidx for _, docidx in scored[:limit]]
 
 
 def hamming_ranking(query_code: int, codes: list[int | None], width: int) -> list[int]:

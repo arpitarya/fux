@@ -1,1 +1,1 @@
-v1.0.0 published to PyPI, the first major release (docs/version bump only). Queue carries one open item: W-73 — the accelerator's differential law holds only at archived_weight == 1.0; fix and fork 9 of tune-file-and-source-priority.md are Arpit's/agent's next.
+v2.0.0-alpha.0 published 2026-08-24 — W-73 and all nine phases of W-76 committed, pushed, released. Queue: blind-enrichment re-grade is the one open follow-up (not blocking); nothing else pending.

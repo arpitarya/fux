@@ -914,6 +914,30 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
 - Python's own guidance on the boundary pattern this follows —
   https://docs.python.org/3/library/argparse.html#exiting-methods
 
+**Amended 2026-08-23 (W-76 Phase 5): a fifth group, `mcp`.**
+
+`fux mcp` serves the index to coding agents over stdio JSON-RPC.
+[ADR-MCP](0039_mcp.md) owns the protocol and the tool surface; what belongs
+here is the **shape of the verb**:
+
+- **A verb, not a flag on `ask`.** It is a long-running server, not a query.
+  Overloading a read verb with a mode that never returns would make
+  `fux ask --serve` a different program wearing the same name.
+- **Veto 1 (no `fux <verb> <subverb>` trees) is unaffected** — `mcp` is flat,
+  like the other fourteen. The mental model stays *groups*, not a count.
+- **It writes nothing and reads nothing outside `.fux/`**, so it inherits no
+  new boundary obligations. Errors still translate through `main`'s single
+  `FuxError` handler; the server's own tool-level failures never reach it,
+  because ADR-MCP decision 6 keeps them inside the JSON-RPC result.
+
+**Also amended (W-76 Phase 1): `--hybrid` now fails loudly.** The
+document-level `code` field was removed with analyzer v2 and per-chunk vectors
+arrive in Phase 7, so the flag has no lane to fuse. It is **kept and made to
+error**, naming Phase 7 — the `ingest --refresh-urls` precedent (hide and
+survive one release) rather than the `fux url` one (delete outright), because
+1.0.0 is on PyPI. **A flag that silently becomes a no-op is worse than one
+that stops**: the caller asked for fusion and would be told it happened.
+
 ### Veto condition
 
 **Reopen this decision if any of the following becomes true.** Each is a check,

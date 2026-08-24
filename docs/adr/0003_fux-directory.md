@@ -263,6 +263,25 @@ directories by default (ruff does) will not lint them.
 - `gitignore` pattern semantics, including the directory-negation trap —
   https://git-scm.com/docs/gitignore
 
+**Amended 2026-08-23 (W-76 Phase 8): `.fux/enrich/` — a fifth entry, COMMITTED.**
+
+| entry | kind | what it is |
+|---|---|---|
+| `enrich/` | **committed** | pinned enrichment text, one file per **source content sha** |
+
+**Why committed rather than derived.** It cannot be re-derived: a model wrote
+it, in an agent, once. Deriving it would mean calling a model, which
+[ADR-ENRICH](0040_enrich.md) decision 1 refuses. And because it is committed,
+**every clone has identical coverage** — so the index each clone builds is
+identical, and L3 holds with a wider input rather than a weaker property.
+
+**Keyed by the SOURCE sha, not by path.** Editing a document orphans its
+enrichment automatically, so staleness is structural rather than a check
+someone has to remember to write. `fux setup` writes the directory when the
+first enrichment lands; `fux enrich` never fabricates one.
+
+`fux doctor`'s undeclared-entry warning covers it like every other child.
+
 ### Veto condition
 
 **Reopen this decision if** a child of `.fux/` exists that the README table does

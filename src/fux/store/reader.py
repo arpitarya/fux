@@ -91,3 +91,73 @@ def read_index(root: Path) -> dict[str, dict]:
                 raise FuxError(f"duplicate id across shards: {doc_id!r}")
             out[doc_id] = record
     return out
+
+
+# -- the foreign-index seam ---------------------------------------------------
+#
+# ADR-INDEX-LIFECYCLE decision 10 says a full re-ingest is owed on every index
+# written before an analyzer bump, and names `fux ingest --full` as the command
+# that discharges it. That command read the existing index unconditionally — to
+# carry `url:` records forward — so **the documented migration refused the very
+# index it exists to replace.** These two functions are what let `--full` treat
+# a foreign index as absent without ever misreading one.
+#
+# The line they hold: **record identity is schema-stable; record content is
+# not.** `id` has meant the same thing since v1. `terms` has not — v1 hashed a
+# different function over two fields where v2 hashes five. So `foreign_url_ids`
+# reads `id` and refuses to touch anything else, and every other reader keeps
+# refusing the shard outright.
+
+
+def index_header(root: Path) -> dict | None:
+    """The first shard's header, unvalidated — or `None` with no index.
+
+    The one place a header is read *without* being required to match. Every
+    other path in this module compares against `HEADER` and raises.
+    """
+    paths = iter_shard_paths(root)
+    if not paths:
+        return None
+    raw = paths[0].read_bytes().split(b"\n", 1)[0]
+    if not raw:
+        raise FuxError(f"empty shard file: {paths[0]}")
+    header = _load_json(raw, path=paths[0], lineno=1)
+    return header if isinstance(header, dict) else None
+
+
+def index_is_foreign(root: Path) -> bool:
+    """True when an index exists that this reader refuses.
+
+    Distinguished from "no index" deliberately: absent is a first run, foreign
+    is a migration, and the two want different messages.
+    """
+    header = index_header(root)
+    if header is None:
+        return False
+    return any(header.get(k) != HEADER[k] for k in ("_format", "analyzer", "tf_fields"))
+
+
+def foreign_url_ids(root: Path) -> list[str]:
+    """`url:` ids inside an index this reader refuses.
+
+    **Why this is safe when `read_shard` is not:** it parses each line and
+    reads `id` — a field whose meaning has not changed across any schema
+    version — and reads nothing else. It never touches `terms`, whose meaning
+    is exactly what the refused header says has changed.
+
+    **Why it exists:** a `file:` record is a pure function of a committed file,
+    so discarding one costs a re-extraction and nothing more. A `url:` record
+    is the only thing in the index that came from the network, cannot be
+    rebuilt offline, and would be **silently lost** by a migration that simply
+    deleted the old shards. This is the list `--full` refuses to strand.
+    """
+    out: list[str] = []
+    for path in iter_shard_paths(root):
+        lines = path.read_bytes().split(b"\n")
+        for lineno, line in enumerate(lines[1:], start=2):
+            if not line or b'"url:' not in line:
+                continue
+            record = _load_json(line, path=path, lineno=lineno)
+            if isinstance(record, dict) and str(record.get("id", "")).startswith("url:"):
+                out.append(record["id"])
+    return sorted(out)

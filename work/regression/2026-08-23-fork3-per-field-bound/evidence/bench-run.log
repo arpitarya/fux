@@ -1,0 +1,15 @@
+
+corpus                 10000 documents
+queries                60 x 2 tops = 120 timed calls
+accelerator p95           64.54 ms   (bar: 150 ms)
+accelerator median        44.69 ms
+reference scan p95       207.28 ms
+blocks read, median       156.0
+blocks read, p95          234.0
+
+--- fork 3 attribution, same corpus and process ---
+blocks read, per-field (loose)      18252
+blocks read, oracle    (tight)      18252
+extra blocks read attributable to fork 3   +0.0 %
+
+R3 bar (150 ms warm p95): PASS

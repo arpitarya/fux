@@ -36,13 +36,14 @@ from pathlib import Path
 
 from ..config import find_root
 from ..errors import FuxError
-from .rank import AskResult
+from . import rerank
+from .rank import AskResult, Weighting
 from .scan import ask as scan_ask
 
 __all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
 
 
-def _archived_ranking(root: Path) -> tuple[float, frozenset[str]]:
+def _archived_ranking(root: Path) -> tuple["Weighting", frozenset[str]]:
     """The demotion weight and the directories it applies to (ADR-ARCHIVED-CONTENT
     decision 6) — read fresh per query, from `fux.toml` and the committed
     dirs list, never from the record (ADR-ARCHIVED-CONTENT decision 1 is gated; this is not).
@@ -56,9 +57,17 @@ def _archived_ranking(root: Path) -> tuple[float, frozenset[str]]:
 
     try:
         config = load_config(root)
-        return config.archived_weight, frozenset(archived_dirs(root, config.dirs_file))
+        return (
+            Weighting(
+                archived_weight=config.archived_weight,
+                archived_dirs=frozenset(archived_dirs(root, config.dirs_file)),
+                superseded_weight=config.superseded_weight,
+                recency_half_life_days=config.recency_half_life_days,
+            ),
+            frozenset(archived_dirs(root, config.dirs_file)),
+        )
     except FuxError:
-        return 1.0, frozenset()
+        return Weighting(), frozenset()
 
 
 def run_query(
@@ -66,17 +75,90 @@ def run_query(
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`."""
-    weight, dirs = _archived_ranking(root)
-    if use_hybrid:
-        from .hybrid import hybrid_ask
+    weighting, dirs = _archived_ranking(root)
+    # W-76 Phase 7: the lane exists again, over COMMITTED per-chunk vectors.
+    # `--hybrid` is the explicit opt-in (mode `always`); `[dense] mode` is the
+    # durable form, and it ships `off` until the goldens rule on it.
+    # W-76 Phase 6: when the reranker is on, retrieve DEEPER than the caller
+    # asked and hand back `top` from the reordered list. This is what the gate
+    # means by "top-20 -> top-5" -- a reranker that can only shuffle the five
+    # documents already shown cannot promote the sixth, and the sixth is where
+    # most of the recoverable failures are.
+    rerank_weight = _rerank_weight(root)
+    depth = max(top, rerank.DEPTH) if rerank_weight > 0 else top
 
-        return hybrid_ask(root, query, top=top, archived_weight=weight, archived_dirs=dirs), "hybrid"
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
         if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
-            return accel.ask(root, query, top=top, archived_weight=weight, archived_dirs=dirs), "accelerator"
-    return scan_ask(root, query, top=top, archived_weight=weight, archived_dirs=dirs), "scan"
+            results = accel.ask(root, query, top=depth, weighting=weighting, archived_dirs=dirs)
+            fused = _maybe_fuse(root, query, results, use_hybrid)
+            return _maybe_rerank(root, query, fused, rerank_weight, top), "accelerator"
+    results = scan_ask(root, query, top=depth, weighting=weighting, archived_dirs=dirs)
+    fused = _maybe_fuse(root, query, results, use_hybrid)
+    return _maybe_rerank(root, query, fused, rerank_weight, top), "scan"
+
+
+def _rerank_weight(root: Path) -> float:
+    """`[ranking] rerank_weight`, or 0 when there is no readable config.
+
+    Defaults to off in the same way `[dense] mode` does, and for the same
+    reason: a ranking change ships dark until it is measured, and the number
+    that turns it on is a tune key rather than a constant.
+    """
+    try:
+        from ..config import load as load_config
+
+        return load_config(root).rerank_weight
+    except FuxError:
+        return 0.0
+
+
+def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
+    """Proximity rerank, then truncate to what the caller asked for.
+
+    **After fusion, never before.** Fusion may admit a document the lexical
+    lane missed; reranking it is exactly as legitimate as reranking any other
+    candidate, and doing it in the other order would rerank a list the fused
+    document was not yet in.
+    """
+    if weight <= 0:
+        return results[:top]
+    return rerank.rerank(root, query, results, weight=weight)[:top]
+
+
+def _maybe_fuse(root: Path, query: str, results, use_hybrid: bool):
+    """Gated dense fusion (W-76 Phase 7), applied to a finished lexical ranking.
+
+    **After ranking, never inside it.** The dense score is not a BM25F term and
+    is not on its scale; folding it into the scorer would break the differential
+    law's single-`rank()` structure and put a float on the hot path both
+    candidate generators share. Boosting a finished list keeps both paths
+    identical up to the point fusion happens, and fusion is deterministic.
+    """
+    from .dense import dense_scores, should_fuse
+
+    try:
+        from ..config import load as load_config
+
+        config = load_config(root)
+        mode = "always" if use_hybrid else config.dense_mode
+        threshold, weight = config.dense_threshold, config.dense_weight
+    except FuxError:
+        mode, threshold, weight = ("always" if use_hybrid else "off"), 0.0, 0.0
+    if use_hybrid and weight <= 0:
+        # `--hybrid` with no configured weight would be a silent no-op, which
+        # is the failure Phase 1 replaced with a loud error. Give it a usable
+        # default rather than pretending it fused.
+        weight = 0.25
+    if not should_fuse(mode, results, threshold):
+        return results
+    from .. import store as store_mod
+    from .dense import merge
+
+    top = len(results) or 5
+    dense = dense_scores(root, query, top, extra={r.id for r in results})
+    return merge(results, dense, weight, top, store_mod.read_index(root))
 
 
 def _root() -> Path:
@@ -108,6 +190,49 @@ def _declare_pending(root: Path) -> None:
     pending = dirty.read(root)
     if pending:
         print(f"fux: {len(pending)} changed path(s) pending re-index", file=sys.stderr)
+
+
+def _declare_no_accelerator(root: Path) -> None:
+    """W-76 Phase 0: tell a fresh clone that `fux build` exists.
+
+    **The gap this closes.** Everything fux needs to answer is committed, so a
+    clone answers immediately — on the reference scan, which is correct and
+    slow (measured: 4.2 s against the accelerator's warm p95 of 27.2 ms on
+    8 870 documents). Nothing ever told the person that. `fux build` has always
+    existed; it was undiscoverable at exactly the moment it was worth running.
+
+    **The condition is narrow on purpose:** committed shards present, no fresh
+    accelerator. That is a clone, a merge, or a checkout — precisely the cases
+    `fux build` exists for. It deliberately does NOT fire when the index itself
+    is absent, because then the answer is `fux ingest` and saying `fux build`
+    would send someone down the wrong path.
+
+    Same contract as `_declare_pending` and `_declare_archived`, for the same
+    three reasons: `fux find` pipes bare paths so a note on stdout is read by
+    `xargs` as a filename; `--json` is a contract; and this **declares, it
+    never gates**. ASCII only -- a Windows console's default codepage cannot
+    encode a fancy dash and the process crashes on `print()` rather than
+    degrading.
+
+    **The second line is load-bearing.** Without "results are identical either
+    way" a reader assumes building might change their answers, which is the
+    exact opposite of the differential law the accelerator is built on.
+    """
+    from .. import store as store_mod
+    from ..derive import accel, format as derive_fmt
+
+    try:
+        if not any(True for _ in store_mod.iter_shard_paths(root)):
+            return  # no index at all -- `fux ingest` is the answer, not `fux build`
+    except (OSError, FuxError):
+        return
+    if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
+        return
+    print(
+        "fux: no fresh accelerator - this query used the reference scan.\n"
+        "     Run 'fux build' for faster queries; results are identical either way.",
+        file=sys.stderr,
+    )
 
 
 #: ADR-ARCHIVED-CONTENT decision 3 — the per-result marker in text output.
@@ -155,6 +280,7 @@ def cmd_ask(args) -> int:
         use_hybrid=getattr(args, "hybrid", False),
     )
     _declare_pending(root)
+    _declare_no_accelerator(root)
 
     if args.json:
         # `--explain` is not text-only: a caller that wants to log which path
@@ -165,7 +291,7 @@ def cmd_ask(args) -> int:
         if getattr(args, "explain", False):
             payload["path"] = path
         print(json_mod.dumps(payload, indent=2))
-        _declare_archived(results, _archived_ranking(root)[0])
+        _declare_archived(results, _archived_ranking(root)[0].archived_weight)
         return 0
 
     if not results:
@@ -177,7 +303,7 @@ def cmd_ask(args) -> int:
         print(f"{r.score:.4f}  {mark}{_resolve_title(root, r.id, r.title)}  ({r.loc})")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
-    _declare_archived(results, _archived_ranking(root)[0])
+    _declare_archived(results, _archived_ranking(root)[0].archived_weight)
     return 0
 
 
@@ -185,10 +311,11 @@ def cmd_find(args) -> int:
     """Ranked documents, one per line — the terse listing verb."""
     root = _root()
     results, _ = run_query(root, args.query, args.top, force_scan=_force_scan(args))
+    _declare_no_accelerator(root)
 
     if args.json:
         print(json_mod.dumps({"results": [_as_dict(root, r) for r in results]}, indent=2))
-        _declare_archived(results, _archived_ranking(root)[0])
+        _declare_archived(results, _archived_ranking(root)[0].archived_weight)
         return 0
 
     if not results:
@@ -201,7 +328,7 @@ def cmd_find(args) -> int:
     # is carried in `--json`, which is where a machine reader should look.
     for r in results:
         print(r.loc)
-    _declare_archived(results, _archived_ranking(root)[0])
+    _declare_archived(results, _archived_ranking(root)[0].archived_weight)
     return 0
 
 
@@ -219,6 +346,7 @@ def cmd_answer(args) -> int:
     """
     root = _root()
     results, _ = run_query(root, args.query, 1, force_scan=_force_scan(args))
+    _declare_no_accelerator(root)
 
     if not results:
         if args.json:

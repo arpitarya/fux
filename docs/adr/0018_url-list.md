@@ -417,6 +417,23 @@ which is the point of decision 11.
   opt-in and there is no automatic escalation:
   https://github.com/scrapy-plugins/scrapy-playwright
 
+**Amended 2026-08-23 (W-76 Phase 8): the `dirs` attribute set gains `enrich`.**
+
+The set stays **closed** and is now `archived` and `enrich`, both
+`true|false`, both defaulting to `false`, both **declared and never derived**.
+
+| attribute | changes committed bytes? | defining record |
+|---|---|---|
+| `archived` | no — it routes ranking | [ADR-DIR-LIST](0023_dir-list.md) |
+| **`enrich`** | **yes, indirectly** — a scope's documents gain a `ctx` field | [ADR-ENRICH](0040_enrich.md) |
+
+`enrich` is the first attribute whose effect on the index is *indirect*: the
+attribute itself writes nothing, but it decides which documents `fux enrich`
+plans for, and a document with pinned enrichment indexes extra `ctx` terms.
+That is worth stating because decision 12's rule — **a fux-written line states
+every attribute explicitly** — now writes `docs archived=false enrich=false`,
+and a reader should know which half of that can move a byte.
+
 ### Veto condition
 
 **Reopen this decision if** an attribute is wanted that cannot be written as a

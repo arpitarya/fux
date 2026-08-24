@@ -331,6 +331,14 @@ fallback.
 - The eval, its corpus and its stated adaptation:
   [`tests_e2e/eval/README-relational.md`](../../tests_e2e/eval/README-relational.md)
 
+**`fux graph` carries the W-76 Phase 0 accelerator declaration (2026-08-23).**
+`graph` seeds from a ranked query, so it pays the reference scan on a fresh
+clone exactly as `ask` does and the same stderr note applies. **`explain` and
+`path` deliberately do not take it**: both address a document by id rather than
+by a ranked query, so the accelerator is not what makes them fast and the note
+would be advice that does not apply. Same contract as every other declaration
+on this surface -- stderr never stdout, ASCII only, declares never gates.
+
 ### Veto condition
 
 **Reopen this decision if any of these becomes true:**

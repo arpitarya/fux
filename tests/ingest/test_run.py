@@ -105,9 +105,11 @@ def test_skipped_files_reported_not_crashed(tmp_path):
 
 
 def test_terms_are_real_16_hex_hashes(tmp_path):
+    from fux.query.tokenize import tokenize
     from fux.store.format import term_hash
 
     _init(tmp_path, {"docs/a.md": "# A\n\npruning gate\n"})
     run(tmp_path)
     record = store.read_index(tmp_path)["file:docs/a.md"]
-    assert term_hash("pruning") in record["terms"]
+    # v2 hashes the ANALYZED term, not the raw word — "pruning" stems to "prune"
+    assert term_hash(tokenize("pruning")[0]) in record["terms"]

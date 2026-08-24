@@ -82,4 +82,8 @@ def test_rejects_hostile_line_separators():
 def test_golden_header_line():
     from fux.store.format import HEADER
 
-    assert canonical_dumps(HEADER) == b'{"_format":"fux.index.v1","analyzer":"v1","tf_fields":["heading","body"]}\n'
+    # _format bumped v1 -> v2 and tf_fields grew from [heading, body] to the
+    # five-field, body-first order (W-76 Phase 1: see TF_FIELDS docstring).
+    assert canonical_dumps(HEADER) == (
+        b'{"_format":"fux.index.v2","analyzer":"v2","tf_fields":["body","heading","title","path","ctx"]}\n'
+    )

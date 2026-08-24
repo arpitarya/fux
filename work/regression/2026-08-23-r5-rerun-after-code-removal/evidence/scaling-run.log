@@ -1,0 +1,5 @@
+    docs  full ingest  1-doc delta  per-doc us
+    1000        0.95s        0.08s       81.8
+    2500        2.36s        0.20s       78.1
+    5000        4.71s        0.40s       79.5
+   10000        9.52s        0.84s       84.0

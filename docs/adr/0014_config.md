@@ -281,6 +281,30 @@ the boundary, rendered by the CLI, exit 1.
   https://peps.python.org/pep-0518/#tool-table
 - TOML, the format: https://toml.io/en/v1.0.0
 
+**Amended 2026-08-23 (W-76 Phase 2).** `[ranking]` gains two keys, both
+defaulting to no-ops so a corpus that configures nothing scores byte-identically
+to before they existed:
+
+| key | default | what it does |
+|---|---|---|
+| `superseded_weight` | `1.0` | multiplier for a document another document declares it supersedes |
+| `recency_half_life_days` | `0.0` (off) | exponential decay on a document's last-commit timestamp |
+
+**Both are validated the same way `archived_weight` is** — non-negative
+numbers, `bool` rejected explicitly because `True` is an `int` in Python and
+would silently become `1.0`.
+
+**Both belong in `.fux/tune.toml` and are here only because ADR-TUNE is not
+built.** They pass decision 1's membership test cleanly — changing either
+changes no byte in `.fux/index/`, which is [the measured gate](../../tests/query/test_tunable_weights.py)
+Phase 1 added — and ADR-TUNE decision 7 already relocates `archived_weight`.
+These move with it, in the same change, or `[ranking]` ends up split across
+two files.
+
+**Neither is a fact about a document.** `superseded` and `mtime` are facts and
+live in the committed record; these are the weights applied to those facts.
+That split is the whole of decision 1.
+
 ### Veto condition
 
 **Reopen this decision if** fux ever reads a key inside `[sources.url.config]`,

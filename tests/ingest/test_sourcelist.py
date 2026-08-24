@@ -114,7 +114,11 @@ def test_urls_rejects_a_non_http_scheme_at_its_line_number():
 
 def test_dirs_has_its_own_closed_attribute_set():
     (entry,) = _parse("archive/v0.26-docs archived=true", sourcelist.DIRS)
-    assert entry.attrs == {"archived": "true"}
+    # The set is CLOSED and now holds two: `archived` (ADR-DIR-LIST) and
+    # `enrich` (ADR-ENRICH, W-76 Phase 8). `attrs` is *resolved* — every
+    # attribute in the spec is present with its default — so this grows
+    # whenever the closed set does, which is the point of asserting it.
+    assert entry.attrs == {"archived": "true", "enrich": "false"}
     with pytest.raises(FuxError, match=r"unknown attribute 'meta'"):
         _parse("docs meta=plain", sourcelist.DIRS)
 

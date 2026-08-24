@@ -415,6 +415,17 @@ docs/logo.png: binary
   full-rebuild escape hatch — Bazel's action cache keyed on the action's inputs:
   https://bazel.build/basics/hermeticity
 
+**Amended 2026-08-23 (W-76 Phase 1).** `EXTRACTED_FIELDS` — the tuple naming
+what carry-forward reuses verbatim for an unchanged `sha` — is now
+`("title", "phrases", "terms", "flen", "code")`: `wlen` became `flen`.
+
+The carry-forward gate is unchanged and is what makes this safe: it is
+conditioned on the shard header still matching `store.HEADER`, and the header
+pins `analyzer`, which went `v1` -> `v2` in the same change. **So every
+carried field was invalidated at once rather than a v1 `flen` surviving beside
+a v2 `terms`.** A format change that did *not* move the analyzer would need
+its own invalidation and does not get it for free.
+
 ### Veto condition
 
 **Reopen this decision if** a delta run stops being byte-identical to

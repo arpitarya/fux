@@ -15,7 +15,7 @@ from fux.store import term_hash, write_index
 from fux.store.fuxdir import CACHEDIR_SIGNATURE
 
 
-def _rec(doc_id, title, wlen, terms, **extra) -> dict:
+def _rec(doc_id, title, flen, terms, **extra) -> dict:
     record = {
         "id": doc_id,
         "src": "git",
@@ -25,7 +25,7 @@ def _rec(doc_id, title, wlen, terms, **extra) -> dict:
         "title": title,
         "phrases": [],
         "terms": terms,
-        "wlen": wlen,
+        "flen": flen,
         "edges": [],
     }
     record.update(extra)
@@ -33,12 +33,14 @@ def _rec(doc_id, title, wlen, terms, **extra) -> dict:
 
 
 def _corpus(n=300):
+    # tf vectors are `[body, heading]` (v2 order — `store.TF_FIELDS`); `flen`
+    # is a single body-token count, so `derive_wlen(flen) == flen[0]`.
     return [
         _rec(
             f"file:doc{i:04d}.md",
             f"Doc {i}",
-            10 + i,
-            {term_hash("common"): [0, 1 + i % 5], term_hash(f"t{i % 40}"): [1, 2]},
+            [10 + i],
+            {term_hash("common"): [1 + i % 5, 0], term_hash(f"t{i % 40}"): [2, 1]},
         )
         for i in range(n)
     ]
@@ -87,7 +89,7 @@ def test_rebuild_drops_stale_postings_shards(tmp_path):
 
     assert len(before) > 1
 
-    write_index(tmp_path, [_rec("file:only.md", "Only", 5, {term_hash("solo"): [1, 0]})])
+    write_index(tmp_path, [_rec("file:only.md", "Only", [5], {term_hash("solo"): [0, 1]})])
     build(tmp_path)
     after = {p.name for p in (fmt.runtime_dir(tmp_path) / fmt.POSTINGS_DIR).glob("*.jsonl")}
 
@@ -119,25 +121,26 @@ def test_build_refuses_a_stray_quoted_term_hash(tmp_path):
     divergence no test would catch.
     """
     stray = "deadbeefdeadbeef"
-    write_index(tmp_path, [_rec("file:a.md", stray, 10, {term_hash("x"): [1, 0]})])
+    write_index(tmp_path, [_rec("file:a.md", stray, [10], {term_hash("x"): [0, 1]})])
     with pytest.raises(FuxError, match="outside `terms`"):
         build(tmp_path)
 
 
-def test_build_refuses_when_regex_wlen_disagrees_with_the_parse(tmp_path):
-    """Invariant 2: `scan.py` sums `wlen` by regex and scores from the parse.
+def test_build_refuses_when_regex_flen_disagrees_with_the_parse(tmp_path):
+    """Invariant 2: `scan.py` sums `flen` (via `derive_wlen`) by regex and scores from the parse.
 
-    A record whose serialized bytes present a different `wlen` to the regex than
+    A record whose serialized bytes present a different `flen` to the regex than
     to `json.loads` would give the two paths different `avg_wlen`, and therefore
     different scores for every document in the corpus.
 
     Reaching it needs a **nested key**, not a string value: a string containing
-    `"wlen":` is escaped to `\\"wlen\\":` on the way out, so the regex never
-    matches it. Canonical keys sort, so `edges` serializes before `wlen` and
-    the regex finds the nested one first.
+    `"flen":` is escaped to `\\"flen\\":` on the way out, so the regex never
+    matches it. Canonical keys sort, so `edges` serializes before `flen` and
+    the regex finds the nested one first — and it must be an *array* value to
+    match `_FLEN_RE`'s `\\[...\\]`, same shape as the real field.
     """
-    record = _rec("file:a.md", "A", 10, {term_hash("x"): [1, 0]})
-    record["edges"] = [{"dst": "file:b.md", "grade": 8, "kind": "ref", "wlen": 999}]
+    record = _rec("file:a.md", "A", [10], {term_hash("x"): [0, 1]})
+    record["edges"] = [{"dst": "file:b.md", "grade": 8, "kind": "ref", "flen": [999]}]
     write_index(tmp_path, [record])
     with pytest.raises(FuxError, match="byte-level regex reads"):
         build(tmp_path)

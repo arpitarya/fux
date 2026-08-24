@@ -10,7 +10,7 @@ the reason the accelerator can be deleted at any moment without loss.
 and it derives its statistics from **raw bytes**, not from the parsed record:
 
 - `df[h]` counts a document if `"<hash>"` appears anywhere on its line.
-- `total_wlen` sums the first `"wlen":N` the regex finds on the line.
+- `total_wlen` sums `derive_wlen(flen)` for the `flen` the regex finds.
 
 The accelerator derives the same numbers from the parsed record. These agree
 only if no quoted 16-hex token ever appears outside `terms`, and if the regex
@@ -26,6 +26,7 @@ divergence that no test would ever catch.
 
 from __future__ import annotations
 
+import base64
 import json
 import re
 from dataclasses import dataclass
@@ -34,22 +35,21 @@ from pathlib import Path
 from .. import store as store_mod
 from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
-from ..query.bm25f import BODY_WEIGHT, HEADING_WEIGHT
 from ..store import fuxdir
 from ..graph import plane as graph_plane
 from . import dense
+from ..query.bm25f import derive_wlen
 from . import format as fmt
+from .format import _FIELD_COUNT
 
 _QUOTED_HASH_RE = re.compile(rb'"([0-9a-f]{16})"')
-_WLEN_RE = re.compile(rb'"wlen":(\d+)')
+_FLEN_RE = re.compile(rb'"flen":\[([0-9,\s]*)\]')
 
-# The weights are floats in bm25f.py but are whole numbers, so a block's max
-# weighted tf is an exact integer — which is what lets `mx` be a u32 and the
-# compare doc's "mx is an integer" rule hold without rounding anywhere.
-_HEADING_W = int(HEADING_WEIGHT)
-_BODY_W = int(BODY_WEIGHT)
-if _HEADING_W != HEADING_WEIGHT or _BODY_W != BODY_WEIGHT:  # pragma: no cover - guards a future edit
-    raise AssertionError("BM25F field weights must be whole numbers for integer mx")
+#: `mx` is a per-field u16. A document with more than this many occurrences of
+#: one term in one field is not a corpus fux serves, and packing one would
+#: silently truncate the bound — which is the one error direction that loses
+#: documents. Refuse instead.
+_MAX_TF = 0xFFFF
 
 
 @dataclass
@@ -88,7 +88,7 @@ def build(root: Path, *, progress=None) -> BuildReport:
         written += graph_plane.build_plane(directory, records)
         p.update(edge_total)
 
-    blocks, postings_count = _write_postings(root, postings, [d["wlen"] for d in docs], progress)
+    blocks, postings_count = _write_postings(root, postings, [d["flen"] for d in docs], progress)
 
     written += _write_json(
         directory / fmt.MANIFEST_NAME,
@@ -97,6 +97,7 @@ def build(root: Path, *, progress=None) -> BuildReport:
             "index_schema": store_mod.SCHEMA_ID,
             "analyzer": store_mod.ANALYZER_VERSION,
             "block_size": fmt.BLOCK_SIZE,
+            "docs_fields": list(fmt.DOCS_FIELDS),
             "docs": len(docs),
             "terms": len(postings),
             "blocks": blocks,
@@ -125,7 +126,7 @@ def _read_committed(root: Path, progress=None):
     Returns `(docs, codes, postings, stats, shard_stamp, records)`. `docs` is sorted by
     id, so a document's index is stable across builds; `codes` is parallel to
     it (the dense lane's table, `None` where a record has no `code`); and
-    `postings` maps a term hash to its `(docidx, tf_heading, tf_body)` list in
+    `postings` maps a term hash to its `(docidx, per-field tf list)` list in
     docidx order.
     """
     progress = progress or _NULL_PROGRESS
@@ -147,32 +148,67 @@ def _read_committed(root: Path, progress=None):
                 total_docs += 1
                 record = json.loads(line)
                 _assert_invariants(path, lineno, line, record)
-                m = _WLEN_RE.search(line)
+                # Same derivation as `query/scan.py`, from the same bytes —
+                # `_assert_invariants` has just proved the regex and the parse
+                # agree on this record's `flen`, so either source is the same
+                # number. Reading it from the regex keeps the two corpus-stat
+                # passes literally identical rather than merely equivalent.
+                m = _FLEN_RE.search(line)
                 if m:
-                    total_wlen += int(m.group(1))
+                    inner = m.group(1).strip()
+                    total_wlen += derive_wlen(
+                        [int(part) for part in inner.split(b",")] if inner else []
+                    )
                 records.append(record)
             p.update(1)
 
     records.sort(key=lambda r: r["id"])
 
+    # `archived` is carried, not re-derived. The scan reads the record's own
+    # stamp first and only falls back to matching `loc` against the configured
+    # archived directories; a doc table without the stamp forces the
+    # accelerator down the fallback alone, so a record stamped `archived: true`
+    # whose loc no longer matches a configured directory would be flagged by
+    # one path and not the other. Same class of defect as W-73, on the flag
+    # rather than the order (W-76 Phase 0 groundwork).
     docs = [
         {
             "id": r["id"],
             "loc": r["loc"],
             "title": store_mod.display_title(r),
-            "wlen": r.get("wlen", 0),
+            "flen": list(r.get("flen", [])),
+            "archived": bool(r.get("archived", False)),
+            # W-76 Phase 2, same reasoning as `archived` above: a fact the
+            # scan reads off the record must be CARRIED here, not re-derived,
+            # or the two paths weight the same document differently.
+            "superseded": bool(r.get("superseded", False)),
+            "mtime": r.get("mtime"),
         }
         for r in records
     ]
 
-    codes = [r.get("code") for r in records]
+    # Per-chunk sign codes, derived from the COMMITTED `int8` vectors
+    # (W-76 Phase 7). One popcount-able int per chunk, cached here so the
+    # query path never decodes 256 components just to reject a document.
+    from ..embed import chunkvec
 
-    postings: dict[str, list[tuple[int, int, int]]] = {}
+    codes = [
+        [
+            base64.urlsafe_b64encode(chunkvec.sign_code(chunkvec.decode(v)))
+            .decode("ascii")
+            .rstrip("=")
+            for v in r.get("vectors", ())
+        ]
+        for r in records
+    ]
+
+    postings: dict[str, list[tuple[int, list[int]]]] = {}
     for docidx, record in enumerate(records):
         for term, tf in record.get("terms", {}).items():
-            postings.setdefault(term, []).append((docidx, tf[0], tf[1]))
+            postings.setdefault(term, []).append((docidx, list(tf)))
 
-    stats = {"n": total_docs, "total_wlen": total_wlen}
+    newest_mtime = max((r["mtime"] for r in records if isinstance(r.get("mtime"), int)), default=0)
+    stats = {"n": total_docs, "total_wlen": total_wlen, "newest_mtime": newest_mtime}
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
     return docs, codes, postings, stats, shard_stamp, records
@@ -206,21 +242,54 @@ def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> No
             + migration
         )
 
-    m = _WLEN_RE.search(line)
-    regex_wlen = int(m.group(1)) if m else None
-    parsed_wlen = record.get("wlen")
-    if regex_wlen != parsed_wlen:
+    m = _FLEN_RE.search(line)
+    if m is None:
+        regex_flen = None
+    else:
+        inner = m.group(1).strip()
+        regex_flen = [int(part) for part in inner.split(b",")] if inner else []
+    parsed_flen = list(record.get("flen", [])) if "flen" in record else None
+    if regex_flen != parsed_flen:
         raise FuxError(
-            f"{path}:{lineno}: record {record.get('id')!r} has wlen {parsed_wlen!r} but the "
-            f"byte-level regex reads {regex_wlen!r}. `query/scan.py` derives avg_wlen from the "
+            f"{path}:{lineno}: record {record.get('id')!r} has flen {parsed_flen!r} but the "
+            f"byte-level regex reads {regex_flen!r}. `query/scan.py` derives avg_wlen from the "
             f"regex and scores from the parse; they must agree. Refusing to build."
         )
 
 
+def _per_field_max(block) -> tuple[int, ...]:
+    """The largest tf each field reaches anywhere in the block."""
+    out = [0] * _FIELD_COUNT
+    for _, tf in block:
+        for i, count in enumerate(tf):
+            if count > out[i]:
+                out[i] = count
+    for i, value in enumerate(out):
+        if value > _MAX_TF:
+            raise FuxError(
+                f"term frequency {value} exceeds the u16 the offset table packs. "
+                "A truncated `mx` under-estimates the block bound and loses documents, "
+                "so the build refuses rather than writing one."
+            )
+    return tuple(out)
+
+
+def _per_field_min_len(block, flens: list[list[int]]) -> tuple[int, ...]:
+    """The smallest token count each field reaches anywhere in the block."""
+    out = [0xFFFFFFFF] * _FIELD_COUNT
+    for docidx, _ in block:
+        flen = flens[docidx]
+        for i in range(_FIELD_COUNT):
+            value = flen[i] if i < len(flen) else 0
+            if value < out[i]:
+                out[i] = value
+    return tuple(0 if v == 0xFFFFFFFF else v for v in out)
+
+
 def _write_postings(
     root: Path,
-    postings: dict[str, list[tuple[int, int, int]]],
-    wlens: list[int],
+    postings: dict[str, list[tuple[int, list[int]]]],
+    flens: list[list[int]],
     progress=None,
 ) -> tuple[int, int]:
     """Write term-major block lines plus the fixed-width offset table.
@@ -252,8 +321,14 @@ def _write_postings(
                         ensure_ascii=False,
                         separators=(",", ":"),
                     ).encode("utf-8")
-                    mx = max(_HEADING_W * tf_h + _BODY_W * tf_b for _, tf_h, tf_b in block)
-                    mnw = min(wlens[docidx] for docidx, _, _ in block)
+                    # PER-FIELD extrema, deliberately unweighted — see
+                    # `derive/format.py::ENTRY_STRUCT`. `mx` over-estimates the
+                    # block's true maximum weighted tf once recombined, and
+                    # `mnw` under-estimates its true minimum length; both
+                    # errors push the bound UP, which is the direction that
+                    # never loses a document.
+                    mx = _per_field_max(block)
+                    mnw = _per_field_min_len(block, flens)
                     entries.append(
                         fmt.pack_entry(
                             bytes.fromhex(term),

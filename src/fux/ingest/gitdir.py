@@ -99,6 +99,20 @@ def archived_dirs(root: Path, rel_path: str) -> list[str]:
     ]
 
 
+def enrich_dirs(root: Path, rel_path: str) -> list[str]:
+    """Included entries declared `enrich=true` (W-76 Phase 8).
+
+    The same shape as `archived_dirs` and read from the same committed file,
+    because the two answer the same kind of question: *which directories did a
+    human decide something about?* Neither is ever inferred from a path.
+    """
+    return [
+        entry.value
+        for entry in read_dirs(root, rel_path)
+        if not entry.exclude and entry.attrs.get("enrich") == "true"
+    ]
+
+
 def is_archived_loc(loc: str, archived_dirs) -> bool:
     """`loc` falls under one of `archived_dirs` — a directory entry or an exact
     single-file entry, mirroring how `walk_sources` resolves an entry against

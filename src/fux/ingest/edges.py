@@ -39,6 +39,12 @@ class DocScan:
     links: list[str]
     code_spans: list[str]
     tags: list[str]
+    #: Frontmatter `supersedes:` — paths this document retires. **Declared,
+    #: never inferred** (W-76 Phase 2): nothing guesses supersession from
+    #: titles, numbering or dates. Same rule ADR-DIR-LIST decision 10 applies
+    #: to `archived`, for the same reason -- a heuristic that is exact for the
+    #: repo that invented it is a silent convention for everyone else.
+    supersedes: list[str]
 
 
 def scan(doc: ParsedDoc) -> DocScan:
@@ -46,6 +52,7 @@ def scan(doc: ParsedDoc) -> DocScan:
         links=[m.group(1) for m in _LINK_RE.finditer(doc.body)],
         code_spans=[m.group(1) for m in _INLINE_CODE_RE.finditer(doc.body)],
         tags=_scan_tags(doc.meta),
+        supersedes=_scan_supersedes(doc.meta),
     )
 
 
@@ -67,6 +74,22 @@ def resolve(doc_id: str, doc_scan: DocScan, known_ids: set[str], by_basename: di
         dst = _resolve_ref(doc_id, target, known_ids)
         if dst and dst != doc_id:
             edges[("ref", dst)] = EXTRACTED_GRADE
+
+    for target in doc_scan.supersedes:
+        # **Repo-root relative, not document relative.** A markdown link is
+        # written relative to the file it sits in, so `_resolve_ref` resolves
+        # it that way. A frontmatter `supersedes:` entry is a DECLARATION, and
+        # every other declared path in fux -- `.fux/sources/dirs`, its `!`
+        # exclusions, `[priority]` keys -- is written from the repo root. A
+        # declaration that resolved relative to its own directory would be the
+        # only one in the system that did.
+        #
+        # Reusing `_resolve_ref`'s existing absolute branch rather than adding
+        # a second resolver: one code path, one set of `/index.md` fallbacks.
+        dst = _resolve_ref(doc_id, "/" + target.lstrip("/"), known_ids)
+        if dst and dst != doc_id:
+            # Graded EXTRACTED: the document said so in its own frontmatter.
+            edges[("supersedes", dst)] = EXTRACTED_GRADE
 
     for tag in doc_scan.tags:
         edges[("tag", f"{TAG_PREFIX}{tag}")] = EXTRACTED_GRADE
@@ -131,6 +154,16 @@ def _normalize_path(path: str) -> str:
             continue
         parts.append(part)
     return "/".join(parts)
+
+
+def _scan_supersedes(meta: dict) -> list[str]:
+    """`supersedes:` as a list, or a single string, or absent."""
+    raw = meta.get("supersedes")
+    if isinstance(raw, str):
+        return [raw.strip()] if raw.strip() else []
+    if isinstance(raw, list):
+        return [item.strip() for item in raw if isinstance(item, str) and item.strip()]
+    return []
 
 
 def _scan_tags(meta: dict) -> list[str]:
