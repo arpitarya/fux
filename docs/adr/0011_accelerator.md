@@ -71,14 +71,23 @@ flowchart TD
    .fux/runtime/             DERIVED, gitignored, disposable
       postings/xx.jsonl      term-major, blocks of 128 postings
       postings/xx.idx        62-byte entries: offset, length, mx, mnw, doc range
-      docs.jsonl             id -> loc, title, wlen
-      stats.json             n, total_wlen
+      docs.jsonl             id -> loc, title, flen, archived, superseded, mtime
+      stats.json             n, total_flen (RAW per-field), newest_mtime
       manifest.json          a sha per committed shard  --drift--> stale
                                                                      |
                                               the scan answers <-----+
 ```
 
 </details>
+
+> **Amended 2026-08-24 — the twin's field lists, corrected in place.** It named
+> `docs.jsonl` as *"id -> loc, title, wlen"* and `stats.json` as
+> *"n, total_wlen"*. No record or table carries a `wlen`: the doc table carries
+> `flen` (and `archived`, `superseded`, `mtime`, added across W-73 and W-76),
+> and the stats plane carries **raw** `total_flen` plus `newest_mtime`. **The
+> Mermaid half names no fields at all**, which is why only one side moved —
+> and why it drifted unnoticed for two schema versions. Both are read together;
+> only one of them was ever able to be wrong about this.
 
 ### Examples
 
@@ -345,6 +354,72 @@ it the accelerator could only re-derive the flag by matching `loc` against the
 configured directories, while the scan reads the record's own stamp first — a
 second divergence, on the flag rather than the order.
 
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — the same argument,
+> on a second axis, plus a stats-plane change nobody predicted.**
+>
+> **`block_bound` takes a `Scoring`.** `k1`, `b` and the five field weights are
+> `.fux/tune.toml` keys now, and they reach the **bound**, not only the scorer;
+> `accel_candidates`, `ask`, `_cannot_reach` and `_kth_score` thread the same
+> object down. W-73 carried the *document-level* multipliers into the bound
+> through `Weighting`; this is the identical defect one axis over, and it would
+> have been identical in effect — the accelerator truncating on a bound
+> computed at weights the scorer was not using.
+>
+> **`.fux/runtime/stats.json` now stores `total_flen` — five RAW per-field
+> token-count totals — in place of a pre-weighted `total_wlen`.**
+> `RUNTIME_SCHEMA` goes `fux.runtime.v3` → **`fux.runtime.v4`**, so a v3
+> runtime is refused and rebuilt. §Decision 2's *"the candidate set and
+> `(n, total_wlen, df)` are identical"* still names the right three; the
+> `total_wlen` in it is a **float derived per query** on both paths.
+>
+> **Why the plane had to change at all**, and this was not anticipated
+> anywhere: a stored `total_wlen` was a **function of a tunable**. The moment a
+> field weight became a key, `avg_wlen` would move on the scan path — which
+> derives it per query — and *not* on this one, which read the baked number.
+> Same corpus, two `avg_wlen`s: a differential-law break, and one needing a
+> **rebuild** to repair, which would have made *"changing a knob needs no
+> rebuild"* false. The plane's own record is
+> [ADR-RUNTIME-STATS](0028_runtime-stats.md); the fix is to store the
+> observation and weight it at query time.
+>
+> **The finding worth carrying forward is about how to TEST a bound, and it is
+> a trap this record could fall into again.**
+>
+> **BM25 saturates, so an unweighted bound is nearly indistinguishable from a
+> weighted one whenever `tf` is large.** At `tf = 90` a term's contribution is
+> already within a percent of its `idf * (k1 + 1)` ceiling, so computing the
+> bound at weight `1.0` instead of `60.0` barely moves it and nothing diverges.
+> The gap only opens where weighted `tf` is comparable to `k1` — which means
+> **small counts**.
+>
+> **So a weight sweep over a realistic corpus passes while proving nothing.**
+> The fixture that actually falsifies an unweighted bound needs every `tf` at
+> 1 or 2, the deferred term common and its documents short, and the opened
+> term's documents long enough that length normalisation keeps `theta` low.
+> Verified by mutation: reverting `block_bound`'s `scoring` argument makes it
+> diverge at `top = 20`
+> ([`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py), 47
+> tests). A fixture that does *not* fail under that mutation certifies an
+> unsound bound as proven — the trap `tests/derive/test_differential.py` paid
+> for once already.
+>
+> **Everything §The weighted bound argues is unchanged in form.** Per-field
+> extrema stay stored UNWEIGHTED and are recombined at the query's own
+> `Scoring`; both errors still push the bound up, so a block that could hold a
+> winner is never skipped. `Weighting.maximum` gains per-source priority as a
+> third independent multiplier, still `max(1.0, …)` per factor because an
+> unlisted document is scaled by `1.0` and a configuration of demotions must
+> not lower the ceiling.
+>
+> **⚠ Why this record was amended at all.** `derive/accel.py` and
+> `derive/build.py` are this record's own components, so the freshness check
+> did point here — but `stats.json`'s shape is
+> [ADR-RUNTIME-STATS](0028_runtime-stats.md)'s subject and it owns no module,
+> so nothing would have pointed *there*. Both are amended today by a session
+> that went looking, which is
+> [W-77](../../work/open/W-77-record-reconciliation.md)'s finding: a record
+> that **describes** a component the check cannot see rots in silence.
+
 ### Veto condition
 
 **Reopen this decision if** the two paths ever disagree, or if a scoring change
@@ -400,7 +475,8 @@ evidence.*
 **Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
 [ADR-ASK](0004_ask.md) · [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
 [ADR-RECORD](0010_index-record.md) · [ADR-RANKING](0012_ranking.md) ·
-[ADR-GRAPH](0029_graph.md)
+[ADR-RUNTIME-STATS](0028_runtime-stats.md) · [ADR-GRAPH](0029_graph.md) ·
+[ADR-TUNE](0038_tuning.md)
 
 **Code**
 

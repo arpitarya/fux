@@ -283,6 +283,44 @@ reason the caller never asked for.
 end assembly — a smaller one further down may still fit, and stopping wastes
 the caller's window. `dropped` is reported so truncation is never silent.
 
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — the sizes decisions
+> 10–12 argue about are parameters now, fed from `[refer]`. Every default is
+> unchanged.**
+>
+> `refer()` gains `per_doc_fraction`, `min_passage_bytes` and
+> `max_passage_bytes` beside the `budget` it already took; `chunk()` and
+> `assemble()` take them as **parameters instead of reading module globals**,
+> defaulting to those same globals. An unconfigured caller gets byte-identical
+> bundles.
+>
+> **What a `[refer]` key can and cannot reach is the reason these qualify.**
+> None of the four can change which documents are fetched, or what a citation's
+> `sha` is: they move passage boundaries and a byte budget, both strictly
+> downstream of every fetch and every verdict. Decisions 1–9 — the fetcher
+> contract, the four-state verdict, the policy travelling in the bundle — are
+> untouchable from this file, which is what stops a tunable from becoming a way
+> to configure the freshness record.
+>
+> **The two exemptions in decision 12 are deliberately NOT tunable**, and that
+> is the sharper half of this. A document's first citation, and a
+> single-document candidate set, both bypass the per-document cap. They are
+> what keep the cap meaning *"do not dominate"* rather than *"do not appear"* —
+> a knob able to silence the best answer is a defect with a config key.
+> `per_doc_fraction` moves the cap; it cannot move the floor.
+>
+> **`chunk()`'s two guarantees survive any value.** The split stays
+> deterministic and total — every byte lands in exactly one passage, and a
+> preamble before the first heading is still its own passage. The floor decides
+> only *where* a byte lands, never whether it lands. The one combination that
+> would make the split ill-defined, a floor at or above the ceiling, is refused
+> by the loader rather than absorbed here.
+>
+> **`answer` passes its already-loaded tune down** —
+> `query/refer_answer.py::answer_via_refer` takes an optional `tune=` rather
+> than reading the file itself. A second read could pick up a different one and
+> assemble an answer under sizes that did not choose it, and `--no-tune` would
+> become a flag two modules each had to remember to honour.
+
 ### Consequences
 
 - **The R4 bench calls `fux update`, not `fux ingest --refresh-urls`**
@@ -519,7 +557,8 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [ADR-RECORD](0010_index-record.md) ·
-[ADR-FETCHER](0019_fetcher.md) · [ADR-CACHE](0034_cache.md)
+[ADR-FETCHER](0019_fetcher.md) · [ADR-CACHE](0034_cache.md) ·
+[ADR-TUNE](0038_tuning.md)
 
 **Code**
 

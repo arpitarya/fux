@@ -45,8 +45,20 @@ DERIVED: dict[str, str] = {
 #: Files fux generates at the top level of `.fux/` (write-if-missing).
 GENERATED_FILES = ("README.md", ".gitignore")
 
+#: Committed FILES at the top level, as opposed to committed directories.
+#:
+#: **This tuple exists because its absence was a live defect.** `DECLARED` was
+#: built from `COMMITTED` (directories), `DERIVED` and `GENERATED_FILES`, so a
+#: committed *file* had no row anywhere and `fux doctor` reported it as an
+#: undeclared entry — ADR-DOTFUX veto condition 1, firing. `tune.toml` would
+#: have shipped into that warning on day one; `.fux/enrich/` was already in it.
+#: Found 2026-08-24 by checking the claim instead of asserting it.
+COMMITTED_FILES: dict[str, str] = {
+    "tune.toml": "the tunables: HOW results are ordered, never what is indexed (ADR-TUNE)",
+}
+
 #: Everything legally found directly under `.fux/`; anything else is a warning.
-DECLARED = (*COMMITTED, *DERIVED, *GENERATED_FILES)
+DECLARED = (*COMMITTED, *COMMITTED_FILES, *DERIVED, *GENERATED_FILES)
 
 # CACHEDIR.TAG's first line is a fixed signature — byte-exact, per the spec.
 CACHEDIR_SIGNATURE = "Signature: 8a477f597d28d172789f06886806bc55"
@@ -81,6 +93,7 @@ def _readme() -> str:
         "| `.gitignore` | committed | lists only the derived directories, never `*` |",
     ]
     rows += [f"| `{name}/` | committed | {desc} |" for name, desc in COMMITTED.items()]
+    rows += [f"| `{name}` | committed | {desc} |" for name, desc in COMMITTED_FILES.items()]
     rows += [f"| `{name}/` | derived | {desc}; carries `CACHEDIR.TAG` |" for name, desc in DERIVED.items()]
     rows += [
         "",

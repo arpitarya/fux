@@ -10,7 +10,9 @@ the reason the accelerator can be deleted at any moment without loss.
 and it derives its statistics from **raw bytes**, not from the parsed record:
 
 - `df[h]` counts a document if `"<hash>"` appears anywhere on its line.
-- `total_wlen` sums `derive_wlen(flen)` for the `flen` the regex finds.
+- `total_flen` sums each field's raw token counts from the `flen` the regex
+  finds. Raw, never weighted: the weights are tunable, and a stored number
+  that is a function of a tunable is ADR-TUNE decision 6a's defect.
 
 The accelerator derives the same numbers from the parsed record. These agree
 only if no quoted 16-hex token ever appears outside `terms`, and if the regex
@@ -38,7 +40,7 @@ from ..progress import NULL as _NULL_PROGRESS
 from ..store import fuxdir
 from ..graph import plane as graph_plane
 from . import dense
-from ..query.bm25f import derive_wlen
+from ..store import TF_FIELDS
 from . import format as fmt
 from .format import _FIELD_COUNT
 
@@ -132,7 +134,7 @@ def _read_committed(root: Path, progress=None):
     progress = progress or _NULL_PROGRESS
     records: list[dict] = []
     total_docs = 0
-    total_wlen = 0
+    total_flen = [0] * len(TF_FIELDS)
     shard_stamp: list[tuple[str, str, int, int]] = []
 
     paths = list(store_mod.iter_shard_paths(root))
@@ -156,9 +158,8 @@ def _read_committed(root: Path, progress=None):
                 m = _FLEN_RE.search(line)
                 if m:
                     inner = m.group(1).strip()
-                    total_wlen += derive_wlen(
-                        [int(part) for part in inner.split(b",")] if inner else []
-                    )
+                    for i, part in enumerate(inner.split(b",") if inner else []):
+                        total_flen[i] += int(part)
                 records.append(record)
             p.update(1)
 
@@ -208,7 +209,13 @@ def _read_committed(root: Path, progress=None):
             postings.setdefault(term, []).append((docidx, list(tf)))
 
     newest_mtime = max((r["mtime"] for r in records if isinstance(r.get("mtime"), int)), default=0)
-    stats = {"n": total_docs, "total_wlen": total_wlen, "newest_mtime": newest_mtime}
+    # RAW per-field totals, never pre-weighted. The weights are a `tune.toml`
+    # key, and a stored number that is a function of a tunable is exactly what
+    # ADR-TUNE decision 6a forbids — the same defect the committed `wlen` had
+    # before W-76 Phase 1, one plane up. Both query paths weight this at query
+    # time, so changing a field weight needs no rebuild and cannot make
+    # `--fast` and `--scan` disagree.
+    stats = {"n": total_docs, "total_flen": total_flen, "newest_mtime": newest_mtime}
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
     return docs, codes, postings, stats, shard_stamp, records

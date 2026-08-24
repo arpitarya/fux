@@ -38,6 +38,11 @@ def test_parser_has_the_verb_surface():
     verb rather than a flag on `ask`, because it is a long-running server and
     not a query.
 
+    ADR-TUNE added **`tune`**, which prints the tunables file and exits. A verb
+    rather than `setup --print-tune` because it answers a question on its own —
+    *what can I change?* — and it is the one verb that touches neither the repo
+    nor the network, so it works before `fux setup` has ever run.
+
     Six, not four, and the count was never the mental model — which is why
     adding one costs a line here and a line in ADR-CLI rather than a redesign.
 
@@ -66,6 +71,7 @@ def test_parser_has_the_verb_surface():
         "graph",
         "path",
         "hooks",
+        "tune",
     }
 
 

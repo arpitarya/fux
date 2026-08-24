@@ -1,0 +1,62 @@
+# .fux/tune.toml — HOW results are ordered. Never WHAT is indexed.
+#
+# Written once by `fux setup`; fux never rewrites it. Absent, empty, or every
+# key commented out means every default — this file is optional.
+#
+# The rule for what may live here is mechanical: changing any value below
+# leaves `.fux/index/` byte-identical. Nothing here is read by `ingest`,
+# `build` or the hooks.
+#
+# `fux ask --no-tune` ignores this file entirely, which is the
+# "is it me or the config?" switch.
+
+[bm25f]
+#k1                     = 1.2      # term-frequency saturation
+#b                      = 0.75     # length normalisation, 0 = off, 1 = full
+# The five field weights, in index order. 0 means "ignore this field".
+#body_weight            = 1.0
+#heading_weight         = 3.0
+#title_weight           = 2.0
+#path_weight            = 1.5
+#ctx_weight             = 1.0
+
+[ranking]
+#archived_weight        = 1.0   # multiplier for a source declared archived
+#superseded_weight      = 1.0   # multiplier for a document another supersedes
+#recency_half_life_days = 0.0   # 0 = off; decays on the committed `mtime`
+#rerank_weight          = 0.0   # 0 = off; the proximity reranker's uplift
+
+[dense]                         # the committed per-chunk vector lane
+#mode      = "off"              # "off" | "gated" | "always"
+#threshold = 0.0                # lexical confidence below which `gated` fuses
+#weight    = 0.0                # how far a fused score may move a ranking
+
+[fuse]                          # `ask --hybrid` only
+#rrf_k       = 60
+#dense_width = 100
+
+[graph]                         # explain / graph / path
+#damping      = 0.85
+#iterations   = 3
+#laziness     = 0.5
+#hop_decay    = 0.5
+#expand_limit = 10
+#seed_depth   = 5
+
+[refer]                         # answer, and the refer plane
+#budget            = 8000       # bytes of assembled passage
+#per_doc_fraction  = 0.5
+#min_passage_bytes = 120
+#max_passage_bytes = 4000
+
+[priority]
+# A multiplicative weight per SOURCE ENTRY, exactly as it appears in
+# .fux/sources/dirs or .fux/sources/urls. Anything unlisted is 1.0, and when
+# two entries both match, the LONGER one wins.
+#
+# Either direction is allowed and fux states the cost rather than clamping it.
+# Two values are refused, and neither is a preference being denied: a negative
+# weight inverts the ordering, and zero means EXCLUDE — which already has a
+# home, the `!` prefix in .fux/sources/.
+#"docs/"   = 1.5
+#"vendor/" = 0.3

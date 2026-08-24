@@ -19,7 +19,7 @@ import pytest
 from fux.derive import accel, build
 from fux.derive import format as fmt
 from fux.derive.format import _FIELD_COUNT
-from fux.query.bm25f import score_record
+from fux.query.bm25f import derive_wlen, score_record
 from fux.store import term_hash, write_index
 
 
@@ -77,7 +77,7 @@ def test_bound_dominates_every_posting_in_every_block(built):
     runtime = accel.Runtime(built)
     stats = runtime.stats
     n = stats["n"]
-    avg_wlen = stats["total_wlen"] / n
+    avg_wlen = derive_wlen(list(stats["total_flen"])) / n
     docs = runtime.docs
 
     checked_blocks = 0
@@ -183,7 +183,7 @@ def test_bound_is_not_vacuous(built):
     """
     runtime = accel.Runtime(built)
     stats = runtime.stats
-    n, avg_wlen = stats["n"], stats["total_wlen"] / stats["n"]
+    n, avg_wlen = stats["n"], derive_wlen(list(stats["total_flen"])) / stats["n"]
     docs = runtime.docs
 
     attained = 0
@@ -203,3 +203,30 @@ def test_bound_is_not_vacuous(built):
                     break
 
     assert attained > 0, "no block's bound is attained by any posting — the bound is vacuous"
+
+
+def test_a_v3_runtime_plane_is_refused_with_an_actionable_message(tmp_path):
+    """The upgrade door, at the one surface that does not go through `is_fresh`.
+
+    `RUNTIME_SCHEMA` moved to `fux.runtime.v4` on 2026-08-24 because
+    `stats.json` stopped storing a pre-weighted `total_wlen` (ADR-TUNE). The
+    CLI never reaches this — `is_fresh` refuses a stale schema and the query
+    falls back to the scan — but `accel.accel_candidates` is also a direct
+    call, and there a missing key would surface as a `KeyError` naming nothing
+    a consumer can act on.
+    """
+    import json
+
+    import pytest
+
+    from fux.derive import accel, format as fmt
+    from fux.errors import FuxError
+
+    directory = fmt.runtime_dir(tmp_path)
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / fmt.STATS_NAME).write_text(
+        json.dumps({"n": 3, "total_wlen": 300, "newest_mtime": 0}), encoding="utf-8"
+    )
+    runtime = accel.Runtime(tmp_path)
+    with pytest.raises(FuxError, match=r"run `fux build`"):
+        accel.accel_candidates(runtime, ["deadbeefdeadbeef"], 5)

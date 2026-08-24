@@ -33,7 +33,7 @@ import pytest
 
 from fux.derive import accel, build
 from fux.query import scan
-from fux.query.bm25f import FIELD_WEIGHTS, derive_wlen
+from fux.query.bm25f import FIELD_WEIGHTS, Scoring, derive_wlen
 from fux.store import TF_FIELDS, iter_shard_paths, term_hash, write_index
 
 HEADING = TF_FIELDS.index("heading")
@@ -102,10 +102,12 @@ def _runtime_bytes(root) -> bytes:
     )
 
 
-def _weights(heading: float) -> tuple[float, ...]:
+def _weights(heading: float) -> Scoring:
     out = list(FIELD_WEIGHTS)
     out[HEADING] = heading
-    return tuple(out)
+    # One object, because `k1`, `b` and the weights all land in one fraction —
+    # ADR-TUNE, 2026-08-24.
+    return Scoring(weights=tuple(out))
 
 
 def _order(root, weights):

@@ -33,13 +33,30 @@ from .walk import expand, routes
 
 __all__ = ["cmd_explain", "cmd_graph", "cmd_path"]
 
-#: How many nodes a PPR expansion adds beyond the seeds. Wider mostly adds
-#: nodes the score already ranked last.
-EXPAND_LIMIT = 10
+# **The sizes this lane runs at live in `tune.Tune`, not here.** They used to
+# be two module constants: `EXPAND_LIMIT = 10` — how many nodes a PPR expansion
+# adds beyond the seeds, where wider mostly adds nodes the score already ranked
+# last — and `SEED_DEPTH = 5`, seeds taken from the ranker, deep enough that a
+# query with one strong answer still has something to walk from.
+#
+# Both became `[graph]` keys, and keeping a local copy of a default is how the
+# two drift: nothing here would have failed if they disagreed, the walk would
+# simply have run at a width nobody configured. The reasoning outlived the
+# numbers, so it is kept and they are not.
 
-#: Seeds taken from the ranker before expanding. Deep enough that a query with
-#: one strong answer still has something to walk from.
-SEED_DEPTH = 5
+
+def _tune_for(root: Path, args):
+    """`.fux/tune.toml` for one graph invocation, honouring `--no-tune`.
+
+    Loaded **once per command** and handed down, the same discipline
+    `query/__init__.py` applies: `cmd_graph` uses the tune twice — for the seed
+    query and for the walk — and two loads could disagree if the file changed
+    between them, which would produce a neighbourhood around seeds that were
+    ranked under different weights.
+    """
+    from ..tune import load as load_tune
+
+    return load_tune(root, enabled=not getattr(args, "no_tune", False))
 
 
 def _root() -> Path:
@@ -135,9 +152,28 @@ def cmd_graph(args) -> int:
 
     # Scan by default, `--fast` opts into the accelerator for the seed query
     # — same choice and same mutually-exclusive `--scan` as `ask` (ADR-ASK).
-    results, _ = run_query(root, args.query, SEED_DEPTH, force_scan=not getattr(args, "fast", False))
+    tune = _tune_for(root, args)
+    results, _ = run_query(
+        root,
+        args.query,
+        tune.seed_depth,
+        force_scan=not getattr(args, "fast", False),
+        tune=tune,
+    )
     seeds = [r.id for r in results]
-    expanded = expand(plane.graph, seeds, limit=EXPAND_LIMIT)
+    # `seed_depth` and `expand_limit` are the two sizes this verb reports, and
+    # they are separately tunable because they answer different questions: how
+    # much of the ranking to trust as a starting point, and how far the walk
+    # may wander from it. The walk parameters go to `expand` rather than being
+    # read there — see `walk.ppr`.
+    expanded = expand(
+        plane.graph,
+        seeds,
+        limit=tune.expand_limit,
+        damping=tune.damping,
+        iterations=tune.iterations,
+        laziness=tune.laziness,
+    )
 
     nodes = [
         {"path": _loc_of(r.id), "id": r.id, "role": "seed", "score": r.score}
@@ -167,7 +203,10 @@ def cmd_path(args) -> int:
     src = _resolve_doc(root, args.src)
     dst = _resolve_doc(root, args.dst)
 
-    found = routes(plane.graph, src, dst, hops=args.hops)
+    # `--hops` bounds the search and stays a CLI argument; `hop_decay` only
+    # orders what the search found. See `walk.routes` for why the boundary is
+    # there rather than one step over.
+    found = routes(plane.graph, src, dst, hops=args.hops, hop_decay=_tune_for(root, args).hop_decay)
 
     if args.json:
         print(

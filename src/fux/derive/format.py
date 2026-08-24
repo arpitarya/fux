@@ -76,7 +76,12 @@ BLOCK_SIZE = 128
 # A v1 runtime is not read: `is_fresh()` refuses it and the build reruns.
 # v3 (W-76 Phase 1): per-field extrema in the offset table, `flen` in the
 # doc table. A v2 runtime is refused and rebuilt.
-RUNTIME_SCHEMA = "fux.runtime.v3"
+#: v4 (2026-08-24, ADR-TUNE): `stats.json` carries `total_flen`, the five raw
+#: per-field token-count totals, in place of a pre-weighted `total_wlen`. The
+#: field weights became `tune.toml` keys, so a weighted total stored here would
+#: be a derived value that goes stale the moment a knob moves — and only on the
+#: accelerator path, which is a differential-law break rather than a slow query.
+RUNTIME_SCHEMA = "fux.runtime.v4"
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
 #:

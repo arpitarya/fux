@@ -60,8 +60,8 @@ from pathlib import Path
 from . import arc as arc_mod
 from . import fetchcache as fetchcache_mod
 from . import freshness as freshness_mod
-from .assemble import DEFAULT_BUDGET, Assembled, assemble
-from .chunk import chunk
+from .assemble import DEFAULT_BUDGET, PER_DOC_FRACTION, Assembled, assemble
+from .chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
 from .freshness import Policy, Verdict, cached as cached_verdict, verify
 from .rescore import ScoredPassage, rescore
 from ..errors import FuxError
@@ -137,6 +137,9 @@ def refer(
     *,
     policy: Policy | None = None,
     budget: int = DEFAULT_BUDGET,
+    per_doc_fraction: float = PER_DOC_FRACTION,
+    min_passage_bytes: int = MIN_PASSAGE_BYTES,
+    max_passage_bytes: int = MAX_PASSAGE_BYTES,
     k: int | None = None,
     cache: arc_mod.ARC | None = None,
     fetcher=None,
@@ -147,6 +150,13 @@ def refer(
     The candidates come from the ranker — this plane does not decide *which*
     documents answer the query, only which of their passages do and which of
     those fit.
+
+    The four `[refer]` keys arrive as parameters and default to the module
+    constants, so an unconfigured caller gets byte-identical bundles. **None of
+    them can change which documents are looked at or what a citation's `sha`
+    is** — they move the passage boundaries and the byte budget, which is
+    downstream of every fetch and every verdict. That is what keeps them
+    tunables rather than a way to configure the freshness record.
     """
     policy = policy or Policy()
     decision = freshness_mod.decide(policy)
@@ -165,10 +175,23 @@ def refer(
         if result is None:
             continue
         text = result.content.decode("utf-8", errors="replace")
-        fetched.append((doc_id, loc, result.sha, chunk(text)))
+        fetched.append(
+            (
+                doc_id,
+                loc,
+                result.sha,
+                chunk(
+                    text,
+                    min_passage_bytes=min_passage_bytes,
+                    max_passage_bytes=max_passage_bytes,
+                ),
+            )
+        )
 
     scored: list[ScoredPassage] = rescore(query, fetched)
-    assembled = assemble(scored, budget=budget, k=k, source="fetched")
+    assembled = assemble(
+        scored, budget=budget, k=k, source="fetched", per_doc_fraction=per_doc_fraction
+    )
     return Bundle(assembled=assembled, documents=documents, policy=policy.as_record())
 
 

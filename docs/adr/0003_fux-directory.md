@@ -154,6 +154,61 @@ code.
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
 | **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `fetchers/http.py`, `fetchers/cdp.py` | **optional, explicit, once per repo** — a consumer asked for it |
 
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built): `tune.toml` — a
+> new child, COMMITTED, and `fux setup` writes one more file.**
+>
+> | entry | kind | what it is |
+> |---|---|---|
+> | `tune.toml` | **committed** | every knob that changes how results are ORDERED, and none that changes what is indexed |
+>
+> **Committed because it is a consumer's stated preference**, and a preference
+> that does not travel with the clone is not one — two clones of a repo would
+> rank the same corpus differently, which is the class of surprise decision 1's
+> committed/derived split exists to remove. It is not derived from anything;
+> nothing can recompute it.
+>
+> **Write-if-missing, and then never touched again.** It joins the `fux setup`
+> row above under exactly the rule that row already states, and the promise is
+> load-bearing rather than incidental: the file ships with **every key
+> commented out**, so it is a menu of defaults a human annotates. A rewrite
+> would eat those annotations, which is why `fux tune` *prints* the specimen
+> for pasting instead of editing the file
+> ([ADR-CLI](0002_cli-surface.md) decision 1's amendment).
+>
+> **Inside `.fux/`, so it is not a `report.outside` path.** That list exists
+> for writes into directories another vendor owns — the boundary the
+> Consequences bullet below records `setup` crossing for
+> [ADR-AGENT-POLICY](0035_agent-policy.md). A file in fux's own directory has
+> never been one, and announcing it as such would blunt the announcement that
+> matters.
+>
+> **Nothing here reaches the maintenance path.** `ingest`, `build` and the
+> hooks never open it, which is what keeps a committed file out of the
+> byte-identity argument L3 rests on ([ADR-LAWS](0001_laws.md)).
+>
+> **⚠ This record's veto condition 1 has FIRED, and it is open.** `tune.toml`
+> is a child of `.fux/` that the README table does not declare, because
+> `fuxdir.DECLARED` is `COMMITTED + DERIVED + GENERATED_FILES` and all three
+> hold **directories** plus the two files fux generates. Observed, not
+> inferred:
+>
+> ```console
+> $ fux doctor | grep 'layout declared'
+> [WARN] .fux/ layout declared: undeclared entries: tune.toml - see .fux/README.md and ADR-DOTFUX
+> ```
+>
+> **`.fux/enrich/` is in the same state**, and the amendment further down that
+> says *"`fux doctor`'s undeclared-entry warning covers it like every other
+> child"* is wrong in exactly this way: the warning **fires on** it rather than
+> covering it.
+>
+> **Left open rather than patched here.** The fix is a line of code plus a
+> decision about whether `GENERATED_FILES` is the right home for a file fux
+> writes once and never rewrites — and decision 1 says an undeclared entry is
+> *"a `fux doctor` warning, not a shrug"*, which is the mechanism working. It
+> is warning. What it is warning about is that this record has not been
+> extended to cover a committed **file**, only committed directories.
+
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run.
 `fux setup` is also the one verb permitted to run before a repo root exists,
@@ -314,7 +369,8 @@ evidence.*
 **Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
 [ADR-CONFIG](0014_config.md) · [ADR-URL-LIST](0018_url-list.md) ·
 [ADR-FETCHER](0019_fetcher.md) · [ADR-TYPES](0031_types-list.md) ·
-[ADR-MAINTENANCE](0032_hooks.md) · [ADR-AGENT-POLICY](0035_agent-policy.md)
+[ADR-MAINTENANCE](0032_hooks.md) · [ADR-AGENT-POLICY](0035_agent-policy.md) ·
+[ADR-TUNE](0038_tuning.md)
 
 **Code**
 

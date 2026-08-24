@@ -75,5 +75,31 @@ def test_derived_dir_is_idempotent_and_keeps_an_edited_tag(tmp_path):
     assert (tmp_path / ".fux" / "cache" / "CACHEDIR.TAG").read_text(encoding="utf-8") == "edited\n"
 
 
-def test_declared_covers_committed_derived_and_generated():
-    assert set(fuxdir.DECLARED) == {*fuxdir.COMMITTED, *fuxdir.DERIVED, *fuxdir.GENERATED_FILES}
+def test_declared_covers_every_kind_of_child():
+    """`DECLARED` is what `fux doctor` measures "undeclared entries" against.
+
+    **A kind of child missing from this union is a live defect, not a gap in a
+    test.** `COMMITTED_FILES` was added 2026-08-24 because there was no such
+    category: `COMMITTED` holds directories, so a committed *file* had no row
+    anywhere and `fux doctor` warned about it forever. `.fux/tune.toml` would
+    have shipped straight into that warning.
+    """
+    assert set(fuxdir.DECLARED) == {
+        *fuxdir.COMMITTED,
+        *fuxdir.COMMITTED_FILES,
+        *fuxdir.DERIVED,
+        *fuxdir.GENERATED_FILES,
+    }
+
+
+def test_a_committed_file_is_not_reported_as_undeclared(tmp_path):
+    """The regression, stated at the surface a consumer actually sees."""
+    from fux import doctor
+
+    fuxdir.ensure_layout(tmp_path)
+    (tmp_path / ".fux" / "tune.toml").write_text("[bm25f]\n", encoding="utf-8")
+    extras = sorted(
+        p.name for p in (tmp_path / ".fux").iterdir() if p.name not in fuxdir.DECLARED
+    )
+    assert "tune.toml" not in extras, f"doctor would warn about a file fux itself writes: {extras}"
+    assert doctor is not None

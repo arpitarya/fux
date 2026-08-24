@@ -66,7 +66,14 @@ LAZINESS = 0.5
 HOP_DECAY = 0.5
 
 
-def ppr(graph: Graph, seeds: list[str]) -> dict[str, float]:
+def ppr(
+    graph: Graph,
+    seeds: list[str],
+    *,
+    damping: float = DAMPING,
+    iterations: int = ITERATIONS,
+    laziness: float = LAZINESS,
+) -> dict[str, float]:
     """Personalized PageRank, lite — power iteration over the seed neighbourhood.
 
     Seeds are personalized **by rank, not by score**: the document the ranker
@@ -77,6 +84,13 @@ def ppr(graph: Graph, seeds: list[str]) -> dict[str, float]:
     The walk is **lazy** — see the module docstring for the measurement that
     forced it. Without laziness this function, at three iterations, ranks a
     three-hop node above a two-hop one.
+
+    The three parameters are `[graph]`'s, defaulting to the constants above, so
+    an unconfigured repo walks exactly the walk this module documents. **They
+    are arguments rather than module reads on purpose**: the parity artefact in
+    the docstring is a joint property of `iterations` and `laziness`, and a
+    caller that can set one without the other would be able to reintroduce it
+    silently. Passed together, a reader of one call site sees both.
     """
     if not seeds or not graph.edges:
         return {}
@@ -86,32 +100,47 @@ def ppr(graph: Graph, seeds: list[str]) -> dict[str, float]:
     seed_mass = {k: v / total for k, v in seed_mass.items()}
 
     scores = dict(seed_mass)
-    for _ in range(ITERATIONS):
+    for _ in range(iterations):
         nxt: dict[str, float] = {}
         for node in sorted(scores):  # sorted: reproducible float accumulation
             mass = scores[node]
             # Laziness: part of the mass stays where it is. This is the whole
             # of the correction over the archived walk.
-            nxt[node] = nxt.get(node, 0.0) + DAMPING * LAZINESS * mass
+            nxt[node] = nxt.get(node, 0.0) + damping * laziness * mass
             neighbours = graph.neighbours(node)
             out_weight = sum(grade for _, grade in neighbours)
             if not out_weight:
                 continue
             for neighbour, grade in neighbours:
-                share = DAMPING * (1 - LAZINESS) * mass * (grade / out_weight)
+                share = damping * (1 - laziness) * mass * (grade / out_weight)
                 nxt[neighbour] = nxt.get(neighbour, 0.0) + share
         for node, mass in seed_mass.items():  # restart
-            nxt[node] = nxt.get(node, 0.0) + (1 - DAMPING) * mass
+            nxt[node] = nxt.get(node, 0.0) + (1 - damping) * mass
         scores = nxt
     return scores
 
 
-def expand(graph: Graph, seeds: list[str], *, limit: int, min_score: float = 0.0) -> list[tuple[str, float]]:
-    """Top non-seed nodes by PPR score. Ties break on id, as everywhere."""
+def expand(
+    graph: Graph,
+    seeds: list[str],
+    *,
+    limit: int,
+    min_score: float = 0.0,
+    damping: float = DAMPING,
+    iterations: int = ITERATIONS,
+    laziness: float = LAZINESS,
+) -> list[tuple[str, float]]:
+    """Top non-seed nodes by PPR score. Ties break on id, as everywhere.
+
+    The walk parameters are forwarded rather than absorbed: `expand` decides
+    how many nodes come back, `ppr` decides what the numbers mean, and mixing
+    the two would leave a caller unable to say which one it had configured.
+    """
     seed_set = set(seeds)
+    walked = ppr(graph, seeds, damping=damping, iterations=iterations, laziness=laziness)
     ranked = [
         (node, score)
-        for node, score in ppr(graph, seeds).items()
+        for node, score in walked.items()
         if node not in seed_set and score >= min_score
     ]
     ranked.sort(key=lambda kv: (-kv[1], kv[0]))
@@ -130,7 +159,15 @@ class Route:
         return self.hops[-1].dst
 
 
-def routes(graph: Graph, src: str, dst: str, *, hops: int, limit: int = 10) -> list[Route]:
+def routes(
+    graph: Graph,
+    src: str,
+    dst: str,
+    *,
+    hops: int,
+    limit: int = 10,
+    hop_decay: float = HOP_DECAY,
+) -> list[Route]:
     """Every simple directed route `src` → `dst` of at most `hops` edges.
 
     Simple — a node is never revisited within a route — because a cycle adds
@@ -139,6 +176,11 @@ def routes(graph: Graph, src: str, dst: str, *, hops: int, limit: int = 10) -> l
 
     Depth-first over `out_edges`, which is sorted, so the enumeration order is
     fixed before the final sort ever runs.
+
+    `hop_decay` is `[graph] hop_decay`. It changes the *ordering* of routes and
+    never which routes exist — enumeration is bounded by `hops`, which is a CLI
+    argument and deliberately not a tunable: a tune file that could widen a
+    search would make `--hops 2` mean different things in two repos.
     """
     if hops < 1 or src == dst:
         return []
@@ -153,7 +195,7 @@ def routes(graph: Graph, src: str, dst: str, *, hops: int, limit: int = 10) -> l
                 continue
             step = trail + [edge]
             if edge.dst == dst:
-                found.append(Route(hops=step, reliability=reliability(step)))
+                found.append(Route(hops=step, reliability=reliability(step, hop_decay=hop_decay)))
                 continue  # a longer route to the same place is not more evidence
             walk(edge.dst, step, seen | {edge.dst})
 
@@ -163,14 +205,19 @@ def routes(graph: Graph, src: str, dst: str, *, hops: int, limit: int = 10) -> l
     return found[:limit]
 
 
-def reliability(hops: list[Edge]) -> float:
+def reliability(hops: list[Edge], *, hop_decay: float = HOP_DECAY) -> float:
     """Grade product, decayed per extra hop. A direct EXTRACTED link is 1.0.
 
     Two properties are load-bearing and both are asserted in the eval: it is
     bounded by 1.0, and it **strictly decreases with distance** — so a reader
-    can tell a stated relationship from an inferred chain of three.
+    can tell a stated relationship from an inferred chain of three. The first
+    holds for every `hop_decay` the tune file accepts; **the second holds only
+    below 1.0**, and `tune.py` accepts 1.0. That is stated rather than clamped:
+    a consumer who sets `hop_decay = 1.0` is saying distance should cost
+    nothing, and the cost of saying it is that a three-hop chain can now tie a
+    direct link.
     """
     score = 1.0
     for edge in hops:
         score *= edge.grade / EXTRACTED_GRADE
-    return score * (HOP_DECAY ** (len(hops) - 1))
+    return score * (hop_decay ** (len(hops) - 1))

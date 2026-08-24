@@ -295,6 +295,45 @@ repo root exists, because it is what creates one
 ([ADR-DOTFUX](0003_fux-directory.md) decision 6). Everything it writes is the
 consumer's from that moment, and no later run rewrites any of it.
 
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — one new flat verb,
+> and one new flag on six existing ones.**
+>
+> **`fux tune` is flat, and this record's own veto 1 is the reason.** Veto 1
+> refuses `fux <verb> <subverb>`, so `fux tune print` / `fux tune show` were
+> never on the table; the verb takes **no arguments at all**.
+>
+> **It prints the specimen tunables file and never writes one.** `tomllib`
+> reads and nothing in the stdlib writes TOML, so a writer would mean either a
+> third-party runtime dependency — L1, [ADR-LAWS](0001_laws.md) — or fux
+> round-tripping a commented file it promised never to rewrite
+> ([ADR-DOTFUX](0003_fux-directory.md)). The human pastes; the file stays
+> theirs.
+>
+> It reads no repo state either, so it works before `fux setup` has run and
+> outside a root. That is the second verb with that property, and it earns it
+> the opposite way to `setup`: by writing nothing, rather than by creating the
+> root.
+>
+> **`--no-tune` joins `ask`, `find`, `answer`, `explain`, `graph` and
+> `path`** — ignore `.fux/tune.toml`, answer on the engine's defaults. A flag
+> rather than a verb per veto 1, and **one** flag rather than a knob per tune
+> table: the question it answers is *"is it me or the config?"*, and bisecting
+> that across six switches is an experiment where one switch is a single
+> re-run. Decision 2's shared query parser carries it for the three read verbs,
+> so those cannot diverge on it.
+>
+> **⚠ `explain --no-tune` is inert today, and it ships that way knowingly.**
+> `cmd_explain` reads no tunable at all, so the flag parses and does nothing.
+> It was added for a consistent surface across the three graph verbs — which
+> makes it a promise with nothing behind it, and this record would rather carry
+> the note than let a caller find out. ADR-TUNE records the same gap and
+> adjudicates it no more than this does.
+>
+> `fux setup` writes one more file as of the same change — `.fux/tune.toml`,
+> write-if-missing like everything in decision 1f, and inside `.fux/` so it is
+> **not** one of the `report.outside` paths announcing a write into another
+> vendor's directory.
+
 **2. The three query verbs share one parser.** Every one of them takes a
 positional `query`, `--json`, and a mutually exclusive `--fast`/`--scan` pair
 (`--scan`, the default, is redundant with it but kept for explicit bug
@@ -1063,9 +1102,11 @@ print('nested:', nested)"
 # Amended 2026-08-24 (W-76 Phases 5 and 8): this listed fourteen names and
 # omitted 'enrich' and 'mcp'. The list is informational -- `nested: []` is the
 # veto -- but a stale one invites a reader to "fix" a healthy tree.
+# Amended 2026-08-24 (ADR-TUNE built): 'tune' joins the list, for the same
+# reason -- an informational list that lags the parser invites the "fix".
 # expect: ['add', 'answer', 'ask', 'build', 'doctor', 'enrich', 'explain',
 #          'find', 'graph', 'hooks', 'ingest', 'mcp', 'path', 'remove',
-#          'setup', 'update']
+#          'setup', 'tune', 'update']
 # expect: nested: []   <- this is the veto; the list above is informational
 
 # 2. the defaults are still off
@@ -1097,7 +1138,7 @@ evidence.*
 [ADR-T1-ACCELERATOR](0011_accelerator.md) · [ADR-URL-LIST](0018_url-list.md) ·
 [ADR-DIR-LIST](0022_dir-list.md) · [ADR-GRAPH](0029_graph.md) ·
 [ADR-TYPES](0031_types-list.md) · [ADR-MAINTENANCE](0032_hooks.md) ·
-[ADR-AGENT-POLICY](0035_agent-policy.md)
+[ADR-AGENT-POLICY](0035_agent-policy.md) · [ADR-TUNE](0038_tuning.md)
 
 **Code**
 

@@ -26,7 +26,8 @@ from pathlib import Path
 
 from .. import store as store_mod
 from .rank import AskResult, Corpus, rank
-from .bm25f import derive_wlen
+from ..store import TF_FIELDS
+from .bm25f import DEFAULT_SCORING, Scoring, derive_wlen
 from .tokenize import tokenize
 
 #: The byte-level oracle, now over per-field counts (W-76 Phase 1).
@@ -68,12 +69,19 @@ def query_term_hashes(query: str) -> list[str]:
     return list(dict.fromkeys(store_mod.term_hash(t) for t in tokenize(query)))
 
 
-def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], dict[str, int], Corpus]:
+def scan_candidates(
+    root: Path, query_hashes: list[str], *, scoring: Scoring = DEFAULT_SCORING
+) -> tuple[list[dict], dict[str, int], Corpus]:
     """The B2 pass: candidate records, `df`, and the corpus statistics."""
     patterns = {h: f'"{h}"'.encode("ascii") for h in query_hashes}
 
     total_docs = 0
-    total_wlen = 0
+    # Per-field token-count totals, summed raw and weighted ONCE at the end.
+    # Summing `derive_wlen` per record would give the same number today and
+    # would silently bake the weights into a running total the moment anything
+    # here started caching it — the accelerator's stats plane made exactly that
+    # mistake (ADR-TUNE, 2026-08-24).
+    total_flen = [0] * len(TF_FIELDS)
     newest_mtime = 0
     df: dict[str, int] = dict.fromkeys(query_hashes, 0)
     candidates: list[dict] = []
@@ -84,7 +92,8 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
             total_docs += 1
             flen = _flen_from_line(line)
             if flen is not None:
-                total_wlen += derive_wlen(flen)
+                for i, count in enumerate(flen):
+                    total_flen[i] += count
             mt = _MTIME_RE.search(line)
             if mt is not None:
                 value = int(mt.group(1))
@@ -108,7 +117,15 @@ def scan_candidates(root: Path, query_hashes: list[str]) -> tuple[list[dict], di
                     df[h] += 1
             candidates.append(record)
 
-    return candidates, df, Corpus(n=total_docs, total_wlen=total_wlen, newest_mtime=newest_mtime)
+    return (
+        candidates,
+        df,
+        Corpus(
+            n=total_docs,
+            total_wlen=derive_wlen(total_flen, scoring),
+            newest_mtime=newest_mtime,
+        ),
+    )
 
 
 def ask(
@@ -119,13 +136,14 @@ def ask(
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
     weighting=None,
+    scoring: Scoring = DEFAULT_SCORING,
 ) -> list[AskResult]:
     query_hashes = query_term_hashes(query)
     if not query_hashes:
         return []
-    candidates, df, corpus = scan_candidates(root, query_hashes)
+    candidates, df, corpus = scan_candidates(root, query_hashes, scoring=scoring)
     return rank(
         candidates, query_hashes, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
-        weighting=weighting,
+        weighting=weighting, scoring=scoring,
     )

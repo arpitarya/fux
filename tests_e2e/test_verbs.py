@@ -112,7 +112,8 @@ def test_stale_accelerator_falls_back_rather_than_answering_wrongly(tmp_path):
 def test_archived_weight_demotes_only_when_configured(tmp_path):
     """ADR-ARCHIVED-CONTENT decision 6, through the shipped CLI: byte-identical at
     the default, and a live document overtakes an archived one once a weight
-    is set — both via `fux.toml`, never a CLI flag."""
+    is set — both via `.fux/tune.toml` since ADR-TUNE moved the key there
+    (2026-08-24), never a CLI flag."""
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
@@ -130,9 +131,16 @@ def test_archived_weight_demotes_only_when_configured(tmp_path):
     default = _run(tmp_path, "ask", "cache", "--json").stdout
     assert json.loads(default)["results"][0]["loc"] == "old/cache.md"  # heading match wins
 
-    (tmp_path / "fux.toml").write_text("[sources]\n[ranking]\narchived_weight = 0.1\n", encoding="utf-8")
+    (tmp_path / ".fux" / "tune.toml").write_text(
+        "[ranking]\narchived_weight = 0.1\n", encoding="utf-8"
+    )
     demoted = _run(tmp_path, "ask", "cache", "--json").stdout
     assert json.loads(demoted)["results"][0]["loc"] == "docs/cache.md"
+
+    # `--no-tune` is the "is it me or the config?" switch (ADR-TUNE decision
+    # 11): the same corpus, the same tune file, the engine's own ordering.
+    untuned = _run(tmp_path, "ask", "cache", "--json", "--no-tune").stdout
+    assert json.loads(untuned)["results"][0]["loc"] == "old/cache.md"
 
 
 def test_find_prints_locations_one_per_line(tmp_path):

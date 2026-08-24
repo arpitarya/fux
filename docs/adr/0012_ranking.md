@@ -281,6 +281,53 @@ index-for-index with `TF_FIELDS`.
 > ranking that is plausible and wrong, which is the failure mode with no
 > symptom.
 
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — all seven numbers
+> above are still the defaults, and none of them is a constant any more.**
+>
+> `K1`, `B` and `FIELD_WEIGHTS` remain in `bm25f.py` as the module-level
+> defaults, and an unconfigured corpus scores byte-identically to before. What
+> is new is that `[bm25f]` in `.fux/tune.toml` can replace any of them per
+> query.
+>
+> **They travel as ONE frozen `Scoring` object, never as separate arguments.**
+> `weighted_tf`, `derive_wlen` and `score_record` take
+> `scoring: Scoring = DEFAULT_SCORING` where they took a bare `weights` tuple;
+> `Scoring` carries `k1`, `b` and the five weights together, plus a `trivial`
+> property so a default query can short-circuit.
+>
+> **The reason is decision 2's fraction, read as a whole:**
+>
+> ```
+> denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
+> ```
+>
+> `wtf` is the weights applied to the numerator, `wlen` is the *same* weights
+> applied to the denominator, and `k1` and `b` join them. Three parameters make
+> "pass the weights, forget `k1`" available at every call site — reweighting
+> half a formula, silently, corpus-wide. One object makes it unrepresentable.
+> It is the same shape as the committed-`wlen` defect decision 11's amendment
+> records, one level up.
+>
+> **What this record's decisions still assert, unchanged.** Weight-then-
+> saturate-once (decision 2), the `idf` form (4), statistics as inputs (5),
+> query-hash order (7), the rounding-aware sort (8). **§Consequences' warning
+> about these very numbers is now the operative one**: *"any change to the
+> constants…
+> invalidates `block_bound` and the skipping proof"*. The field weights reach
+> the bound as of the same change — [ADR-T1-ACCELERATOR](0011_accelerator.md)'s
+> §The weighted bound — which is why this could ship at all.
+>
+> **⚠ Why this record was amended at all, said out loud.** Nothing forced it.
+> `bm25f.py` lives under `src/fux/query/`, which
+> [ADR-ASK](0004_ask.md) owns as a **directory**, so
+> [`tests/test_adr_freshness.py`](../../tests/test_adr_freshness.py) was
+> satisfied by ADR-ASK alone — while this record, whose entire subject is the
+> scorer that changed, would have gone on describing three fixed constants.
+> That is exactly the governance gap
+> [W-77](../../work/open/W-77-record-reconciliation.md) filed after W-76 rotted
+> sixteen records with the check green throughout. A **describing** record rots
+> in silence; the only thing that catches it is a session choosing to look.
+
 **4. `idf(df, n) = log((n - df + 0.5) / (df + 0.5) + 1)`** — the `+1` form, so
 `idf` never goes negative on a term in most of the corpus.
 
@@ -515,6 +562,16 @@ grep -rn 'from .tokenize import\|from ..query.tokenize import' src/fux/
 #    than two literals and grepping for them proves nothing. Read the tuple.
 grep -nE 'FIELD_WEIGHTS: |^K1|^B ' src/fux/query/bm25f.py
 # expect: (1.0, 3.0, 2.0, 1.5, 1.0), 1.2, 0.75 — body and heading unmoved
+#    Amended 2026-08-24 (ADR-TUNE built): these are the DEFAULTS, not the
+#    values in force. `.fux/tune.toml`'s [bm25f] replaces any of them per
+#    query, so the archived-baseline claim holds for `ask --no-tune` and for
+#    a repo that configured nothing -- which is what the suites run.
+
+# 5. the scorer takes them as ONE object, so half a fraction cannot be reweighted
+grep -nE 'scoring: Scoring|weights: tuple' src/fux/query/bm25f.py
+# expect: `scoring: Scoring` on weighted_tf, derive_wlen and score_record, and
+# `weights:` ONLY on the Scoring dataclass field. A bare `weights` parameter
+# reappearing on a scorer is the defect ADR-TUNE decision 6 names.
 ```
 ---
 

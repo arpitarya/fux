@@ -305,6 +305,13 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     the opt-out is the whole of a user's control over a default-on install, and
     a leak turns a default into a mandate.
     """
+    # Imported here rather than at module level: `..tune` pulls in
+    # `query.bm25f` for the defaults it quotes, and through it the whole query
+    # package. `setup` never ranks anything, so paying for the ranker to write
+    # a commented file is a cost with no return. There is no import cycle to
+    # dodge — this is latency, in the same spirit as ADR-CLI decision 7.
+    from .tune import TUNE_NAME, specimen
+
     report = SetupReport()
     for path in fuxdir.ensure_layout(root):
         report.written.append(path.relative_to(root).as_posix())
@@ -320,6 +327,16 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     _write_if_missing(root / DEFAULT_TYPES_FILE, _TYPES_HEADER.encode("utf-8"), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _URLS_HEADER.encode("utf-8"), report, root)
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
+    # Every key commented out, so a fresh repo runs on the engine's own
+    # defaults and the file is a menu rather than a configuration (ADR-TUNE
+    # decisions 2 and 3). Write-if-missing like everything else here: this is
+    # the file fux promised never to rewrite, and `fux tune` prints rather than
+    # edits for the same reason.
+    #
+    # **Inside `.fux/`, so it is not a `report.outside` path.** That list is
+    # for writes into directories other vendors own, which is what makes
+    # announcing them mandatory; a file in fux's own directory is not one.
+    _write_if_missing(root / TUNE_NAME, specimen().encode("utf-8"), report, root)
 
     # After `fux.toml`, so a first run reads the default this very call just
     # wrote out in full, and a later run reads whatever the consumer edited it

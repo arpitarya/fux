@@ -42,10 +42,19 @@ def hybrid_ask(
     top: int = 5,
     *,
     k: int = RRF_K,
+    dense_width: int = DENSE_WIDTH,
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
 ) -> list[AskResult]:
-    """Fuse the lexical ranking with the dense ranking. Returns RRF-scored hits."""
+    """Fuse the lexical ranking with the dense ranking. Returns RRF-scored hits.
+
+    `k` and `dense_width` are `[fuse] rrf_k` and `[fuse] dense_width` — both
+    default to the module constants, so a caller that passes neither gets
+    exactly the pre-tune arithmetic. They are parameters rather than reads of
+    the globals because this function is also a graded strategy in
+    `tools/differential/playground_grade.py`, and a harness that cannot vary a
+    knob cannot measure it.
+    """
     from ..derive import accel
     from ..derive import format as derive_fmt
 
@@ -54,7 +63,7 @@ def hybrid_ask(
 
     # Lexical lane: reach deeper than `top` so fusion has something to reorder.
     lexical = accel.ask(
-        root, query, top=max(top * 10, DENSE_WIDTH),
+        root, query, top=max(top * 10, dense_width),
         archived_weight=archived_weight, archived_dirs=archived_dirs,
     )
     lexical_ids = [r.id for r in lexical]

@@ -25,8 +25,9 @@ timestamp: 2026-08-22T00:00:00Z
   [ADR-T1-ACCELERATOR](0011_accelerator.md) (a weight must reach the bound) ·
   [ADR-CLI](0002_cli-surface.md) (`setup` writes one more file; `--no-tune`) ·
   [ADR-ARCHIVED-CONTENT](0037_archived-content.md) (its weight moves file)
-- **Blocked on:** [W-73](../../work/OPEN-WORK.md) — decision 12 is unbuilt, and
-  priority cannot ship in a build that has `--fast` in it until it is
+- **Was blocked on:** W-73 — **discharged.** W-73 was built 2026-08-23 and
+  closed 2026-08-24; decision 12 is now built for the document-level weights
+  *and* for the field weights this record adds. See the amendment below.
 
 > **Amended 2026-08-24 — the block is lifted: W-73 is built.**
 > `rank.Weighting` now carries the query-time weights into the accelerator,
@@ -46,6 +47,56 @@ timestamp: 2026-08-22T00:00:00Z
 > **This record is still `proposed`, and now for one reason instead of two.**
 > `src/fux/tune.py` does not exist; nothing below decision 3 is built. Veto
 > condition 2, which fired when this was written, is corrected where it stands.
+
+> ## Amended 2026-08-24 — BUILT. What this proposal changed, and what it cost
+>
+> `src/fux/tune.py` exists. `.fux/tune.toml` is written by `fux setup`, read
+> once per query, and every table below is loaded and validated.
+> **`status` stays `proposed`**: building is not ratifying, and the difference
+> is the whole point of the register carrying two columns.
+>
+> **The updates this proposal made, in the change that made them:**
+>
+> | what | where |
+> |---|---|
+> | the loader, the closed key set, the two refusals, longest-match priority | `src/fux/tune.py` |
+> | `k1`, `b` and the five field weights carried as ONE `Scoring` object | `src/fux/query/bm25f.py` |
+> | the field weights reach the pruning **bound**, not only the scorer | `src/fux/derive/accel.py::block_bound` |
+> | the runtime stats plane stores `total_flen`, raw — `RUNTIME_SCHEMA` -> `fux.runtime.v4` | `src/fux/derive/build.py`, `format.py` |
+> | `[priority]` resolution on `Weighting`, multiplying with archived and superseded | `src/fux/query/rank.py` |
+> | `[ranking]` and `[dense]` retired from `fux.toml` with an error naming the new home | `src/fux/config.py` |
+> | `--no-tune` on the read verbs; `fux tune` prints and never writes | `src/fux/cli.py` |
+> | decision 1b's membership test and decision 12's differential, executed | `tests/test_tune_boundary.py` |
+>
+> **The finding this build produced, and it was not anticipated anywhere in
+> this record.** `.fux/runtime/stats.json` stored `total_wlen` — the corpus
+> length total, **pre-weighted at build time**. The moment a field weight
+> became a key, that number was a stored function of a tunable: `avg_wlen`
+> would move on the scan path (which derives it per query) and *not* on the
+> accelerator path (which read the baked one). Same corpus, two `avg_wlen`s —
+> a **differential-law break**, and one that a rebuild would have been needed
+> to repair, which would have made "changing a knob needs no rebuild" false.
+>
+> It is fixed the way decision 6a says to fix it, one plane up: **store the
+> observation, not the derived value.** The plane now carries `total_flen`,
+> the five raw per-field totals, and both paths weight it at query time.
+> `RUNTIME_SCHEMA` goes to `fux.runtime.v4`; the runtime is derived and
+> disposable, so the cost is one `fux build`.
+>
+> **Two things are settable but not yet reachable, and saying so is the point:**
+>
+> 1. **`[fuse] rrf_k` and `dense_width` are validated and threaded, but no CLI
+>    invocation reads them.** `--hybrid` routes through `query/dense.py`'s
+>    gated fusion, which uses neither; their only consumer is `hybrid_ask`,
+>    reached solely from `tools/differential/playground_grade.py`. They are
+>    keys to a lane that has not landed.
+> 2. **`explain --no-tune` is inert.** `cmd_explain` reads no tunable, so the
+>    flag parses and does nothing. It was added for a consistent surface
+>    across the three graph verbs, and it is a promise with nothing behind it
+>    today.
+>
+> Both are boundary questions for decision 5 rather than defects, and neither
+> is adjudicated here.
 
 ---
 
@@ -552,6 +603,21 @@ A non-integer `heading_weight` is also an error rather than a warning, whenever
 decision 6b makes it a key — it breaks the accelerator's `u32` block maximum,
 which is a storage invariant and not a taste.
 
+> **Amended 2026-08-24 — the non-integer refusal is REVERSED, on the same
+> premise-is-gone grounds as decision 6.** It was justified by a storage
+> invariant: a fractional weight multiplied into a stored `u32` block maximum.
+> **Nothing integral is stored any more.** Since W-76 Phase 1 `Block.mx` and
+> `Block.mnw` hold **raw per-field extrema** and `block_bound` recombines them
+> in float at query time, so `heading_weight = 2.5` is arithmetic, not a
+> corrupted field. Fractional field weights are accepted, and
+> `tests/test_tune.py::test_a_non_integer_field_weight_is_legal` is the gate
+> that keeps the reversal honest.
+>
+> **The two refusals in the table above are untouched and are the ruling.**
+> They apply to `[priority]`, where they were argued. A field weight of `0`
+> is a different thing entirely — it means *ignore this field*, which is a
+> ranking choice, not the source exclusion `!` already owns.
+
 **9b. The consequence surface, in three tiers by what each costs to produce:**
 
 | tier | where | cost | carries |
@@ -803,25 +869,36 @@ wrong one, and uniform random sampling will essentially never generate it.
 
 ### Veto condition
 
-**No output blocks appear below.** Nothing is built, and an invented transcript
-is worse than none — the commands are written so they can be run the day the
-code exists.
+**No output blocks appear below.** Nothing was built when this was written, and
+an invented transcript is worse than none — the commands were written so they
+could be run the day the code existed.
+
+> **Amended 2026-08-24 — the code exists, so the checks are now runnable, and
+> five of the six are runnable *as tests* rather than by hand.** Each condition
+> below carries its executable check. The one that still needs a human is
+> condition 6, because *"refused for being strong rather than broken"* is a
+> judgement about intent that a test can only approximate.
 
 **Reopen this decision if any of the following becomes true:**
 
 **1 — a tune key reaches the index.** Mutating any key in `.fux/tune.toml` and
 re-ingesting produces a committed byte different from the unmutated run. Decision
 1 is then false and the file is a second ingest config.
-*Check:* `tools/differential/tune_boundary.py` (decision 1b), or by hand —
-set a key, `fux ingest --full`, `git diff --stat .fux/index/`.
+*Check:* `uv run pytest -q tests/test_tune_boundary.py` — it mutates **every**
+key in `_SCHEMA` (and fails if a key is added to the loader and not to the
+mutation list), exercises the read path so a merely-parsed key cannot pass, and
+asserts the committed shards are byte-identical. By hand: set a key,
+`fux ingest --full`, `git diff --stat .fux/index/`.
 
 **2 — a weight reaches the scorer without reaching the bound.** `fux ask --fast`
 and `fux ask --scan` return different documents at any legal weight. Decision 12
 is then unbuilt or regressed, and the differential law is false in the shipped
 engine.
 *Check:* the weight sweep in `tools/differential/`, including 12b's adversarial
-case. **This condition is FIRING as of 2026-08-22** — it is W-73, and this
-record is `proposed` partly because of it.
+case, plus
+`tests/test_tune_boundary.py::test_the_differential_law_holds_at_every_scoring`.
+**This condition was FIRING as of 2026-08-22** — it was W-73, and this record
+was `proposed` partly because of it.
 
 > **Amended 2026-08-24 — this condition no longer fires. W-73 is built.** The
 > weight now reaches the bound: `block_bound` recombines per-field extrema at
@@ -832,10 +909,32 @@ record is `proposed` partly because of it.
 > and it is worth more now that something can actually move it. **Read it as
 > armed rather than as firing.**
 
+> **Amended again 2026-08-24 (this build) — the condition reopened for the
+> FIELD weights, and closing it needed a fixture that most corpora cannot
+> provide.** W-73 closed it for document-level multipliers. `k1`, `b` and the
+> five field weights are inputs to `block_bound` *and* to `score_record`, so
+> the same divergence class returned on a new axis. It is closed the same way,
+> and **verified by mutation**: reverting `block_bound`'s `scoring` argument
+> makes `tests/test_tune_boundary.py` fail on two sweep arms.
+>
+> **The finding worth keeping, because it would silently defeat the obvious
+> test.** BM25 **saturates**, so the bound is nearly insensitive to a field
+> weight whenever `tf` is large — at `tf = 90` the contribution is within a
+> percent of its `idf * (k1 + 1)` ceiling, and computing the bound at `1.0`
+> instead of `60.0` barely moves it. A sweep over a realistic corpus therefore
+> **passes while proving nothing**; the first fixture written for this did
+> exactly that, and the mutant survived it. The gap only opens where weighted
+> `tf` is comparable to `k1` — **small counts** — which is why the fixture uses
+> `tf = 1`, long documents for the opened term (to keep `theta` low) and short
+> ones for the deferred term. This is the same trap
+> `tests/derive/test_differential.py` records paying for at a single `top`.
+
 **3 — `fux tune` writes `.fux/tune.toml`.** Decision 3b is then false and the
 consumer's comments are fux's to delete.
 *Check:* `grep -rn "tune.toml" src/fux/` shows no write path outside
-`src/fux/setup.py`.
+`src/fux/setup.py`'s write-if-missing. `fux tune` calls `print()`; there is no
+TOML writer in the stdlib and none was hand-rolled, which is what makes this
+condition cheap to keep true.
 
 **4 — a committed field becomes a function of a tunable.** Decision 6a is then
 false, and `wlen` has a sibling.
@@ -857,13 +956,22 @@ false, and `wlen` has a sibling.
 
 **5 — the key set stops being closed.** A key is honoured that this record does
 not name, or an unknown key stops erroring. Decision 5 is then a suggestion.
-*Check:* a test asserting the loader's accepted key set equals the set named in
-decision 5.
+*Check:* `tests/test_tune.py::test_every_specimen_table_is_in_the_schema` and
+`::test_every_schema_key_appears_in_the_specimen` — the loader's key set and
+the file `fux setup` writes are asserted equal in both directions, so a key
+that exists but is undocumented fails as loudly as one that is documented but
+unread.
 
 **6 — a value is refused for being strong rather than broken.** Any clamp,
 cap or band that rejects a positive weight. Decision 9 is then reversed, and it
 was Arpit's ruling rather than an implementation choice.
-*Check:* the validator refuses exactly `w < 0` and `w == 0`, and nothing else.
+*Check:* the validator refuses exactly `w < 0` and `w == 0` in `[priority]`,
+and nothing else —
+`tests/test_tune.py::test_a_large_priority_is_allowed_and_not_clamped` holds
+the positive half. **This condition nearly fired during the build**: decision
+9a's *"a non-integer `heading_weight` is an error"* would have refused `2.5`
+for a storage invariant that no longer exists. Reversed where it stands, rather
+than carried as folklore.
 
 ---
 

@@ -30,6 +30,7 @@ this module.
 from __future__ import annotations
 
 import math
+from dataclasses import dataclass
 
 from ..store import TF_FIELDS
 
@@ -54,11 +55,47 @@ K1 = 1.2
 B = 0.75
 
 
+@dataclass(frozen=True)
+class Scoring:
+    """`k1`, `b` and the five field weights, carried as ONE object.
+
+    **Why one object and not three parameters.** Every number here appears on
+    both sides of the same fraction:
+
+        denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
+
+    `wtf` is the field weights applied to the numerator; `wlen` is the same
+    weights applied to the denominator; `k1` and `b` join them. A caller that
+    passes the weights and forgets `k1` reweights half a formula — which is
+    the exact defect [ADR-TUNE](../../docs/adr/0038_tuning.md) decision 6
+    recorded as fux's own LUCENE-6819, one level up. Three parameters make
+    that mistake possible at every call site; one object makes it
+    unrepresentable.
+
+    Immutable, and the default instance is shared — a query that sets nothing
+    allocates nothing.
+    """
+
+    k1: float = K1
+    b: float = B
+    weights: tuple[float, ...] = FIELD_WEIGHTS
+
+    @property
+    def trivial(self) -> bool:
+        """True when this is the engine default, so callers can skip work."""
+        return self.k1 == K1 and self.b == B and self.weights == FIELD_WEIGHTS
+
+
+#: The engine defaults. `tune.load()` returns this when `.fux/tune.toml` is
+#: absent, empty, or every key is commented out — the `$0` no-config path.
+DEFAULT_SCORING = Scoring()
+
+
 def idf(df: int, n: int) -> float:
     return math.log((n - df + 0.5) / (df + 0.5) + 1)
 
 
-def weighted_tf(tf: list[int], weights: tuple[float, ...] = FIELD_WEIGHTS) -> float:
+def weighted_tf(tf: list[int], scoring: Scoring = DEFAULT_SCORING) -> float:
     """The BM25F numerator for one term in one document.
 
     `tf` may be shorter than `weights` — trailing zeros are omitted on the
@@ -67,13 +104,14 @@ def weighted_tf(tf: list[int], weights: tuple[float, ...] = FIELD_WEIGHTS) -> fl
     makes the short form free rather than merely small.
     """
     total = 0.0
+    weights = scoring.weights
     for i, count in enumerate(tf):
         if count:
             total += weights[i] * count
     return total
 
 
-def derive_wlen(flen: list[int], weights: tuple[float, ...] = FIELD_WEIGHTS) -> float:
+def derive_wlen(flen: list[int], scoring: Scoring = DEFAULT_SCORING) -> float:
     """The length normaliser, from committed per-field counts and live weights.
 
     **The one place this arithmetic exists.** Four callers need it — ingest's
@@ -82,6 +120,7 @@ def derive_wlen(flen: list[int], weights: tuple[float, ...] = FIELD_WEIGHTS) -> 
     drift.
     """
     total = 0.0
+    weights = scoring.weights
     for i, count in enumerate(flen):
         if count:
             total += weights[i] * count
@@ -95,7 +134,7 @@ def score_record(
     df: dict[str, int],
     n: int,
     avg_wlen: float,
-    weights: tuple[float, ...] = FIELD_WEIGHTS,
+    scoring: Scoring = DEFAULT_SCORING,
 ) -> float:
     """Sum of each matched query term's weight-then-saturate contribution.
 
@@ -105,15 +144,16 @@ def score_record(
     """
     if n <= 0 or avg_wlen <= 0:
         return 0.0
-    wlen = float(flen) if isinstance(flen, (int, float)) else derive_wlen(flen, weights)
+    wlen = float(flen) if isinstance(flen, (int, float)) else derive_wlen(flen, scoring)
+    k1, b = scoring.k1, scoring.b
     total = 0.0
     for h in query_hashes:
         tf = terms.get(h)
         if tf is None:
             continue
-        wtf = weighted_tf(tf, weights)
+        wtf = weighted_tf(tf, scoring)
         if wtf == 0:
             continue
-        denom = wtf + K1 * (1 - B + B * wlen / avg_wlen)
-        total += idf(df.get(h, 0), n) * wtf * (K1 + 1) / denom
+        denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
+        total += idf(df.get(h, 0), n) * wtf * (k1 + 1) / denom
     return total

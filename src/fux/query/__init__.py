@@ -37,45 +37,86 @@ from pathlib import Path
 from ..config import find_root
 from ..errors import FuxError
 from . import rerank
+from typing import TYPE_CHECKING
+
 from .rank import AskResult, Weighting
 from .scan import ask as scan_ask
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from ..tune import Tune
 
 __all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
 
 
-def _archived_ranking(root: Path) -> tuple["Weighting", frozenset[str]]:
-    """The demotion weight and the directories it applies to (ADR-ARCHIVED-CONTENT
-    decision 6) — read fresh per query, from `fux.toml` and the committed
-    dirs list, never from the record (ADR-ARCHIVED-CONTENT decision 1 is gated; this is not).
+def _tune(root: Path, *, enabled: bool = True) -> "Tune":
+    """`.fux/tune.toml`, read once per query.
 
-    Degrades to the no-op default when config or the dirs list can't be read,
-    so `ask`/`find` never fail because ranking metadata is missing — the same
+    **A malformed tune file is a loud error, not a silent default.** That is
+    the opposite of `_archived_ranking`'s old tolerance for a missing
+    `fux.toml`, and deliberately so: an absent file means *"every default"*
+    and is the normal case, while a file that exists and cannot be parsed
+    means someone edited it and got it wrong. Degrading there would answer a
+    question with the engine's ranking while the reader believed it was
+    theirs (ADR-TUNE decision 10).
+    """
+    from ..tune import load as load_tune
+
+    return load_tune(root, enabled=enabled)
+
+
+def _archived_ranking(root: Path, tune: "Tune") -> tuple["Weighting", frozenset[str]]:
+    """The document-level multipliers and the directories they apply to.
+
+    The weights come from `.fux/tune.toml` (ADR-TUNE decision 7 moved them out
+    of `fux.toml`); the archived *declaration* still comes from the committed
+    dirs list, never from a path convention (ADR-DIR-LIST decision 4).
+
+    Degrades to no archived directories when the dirs list can't be read, so
+    `ask`/`find` never fail because ranking metadata is missing — the same
     tolerance `_root()` already extends to a corpus with no `fux.toml` at all.
+    **The tune file is not covered by that tolerance**; see `_tune`.
     """
     from ..config import load as load_config
     from ..ingest.gitdir import archived_dirs
 
     try:
-        config = load_config(root)
-        return (
-            Weighting(
-                archived_weight=config.archived_weight,
-                archived_dirs=frozenset(archived_dirs(root, config.dirs_file)),
-                superseded_weight=config.superseded_weight,
-                recency_half_life_days=config.recency_half_life_days,
-            ),
-            frozenset(archived_dirs(root, config.dirs_file)),
-        )
+        dirs = frozenset(archived_dirs(root, load_config(root).dirs_file))
     except FuxError:
-        return Weighting(), frozenset()
+        dirs = frozenset()
+    return (
+        Weighting(
+            archived_weight=tune.archived_weight,
+            archived_dirs=dirs,
+            superseded_weight=tune.superseded_weight,
+            recency_half_life_days=tune.recency_half_life_days,
+            priority=tune.priority,
+        ),
+        dirs,
+    )
 
 
 def run_query(
-    root: Path, query: str, top: int, *, force_scan: bool = True, use_hybrid: bool = False
+    root: Path,
+    query: str,
+    top: int,
+    *,
+    force_scan: bool = True,
+    use_hybrid: bool = False,
+    tune: "Tune | None" = None,
+    use_tune: bool = True,
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
-    and a fresh build exists. Return `(results, path)`."""
-    weighting, dirs = _archived_ranking(root)
+    and a fresh build exists. Return `(results, path)`.
+
+    `use_tune=False` is `--no-tune`: `.fux/tune.toml` is not read at all, so
+    the answer is the engine's own (ADR-TUNE decision 11). Callers that have
+    already loaded a `Tune` pass it as `tune=` rather than paying for a second
+    parse.
+    """
+    if tune is None:
+        tune = _tune(root, enabled=use_tune)
+    scoring = tune.scoring
+    weighting, dirs = _archived_ranking(root, tune)
     # W-76 Phase 7: the lane exists again, over COMMITTED per-chunk vectors.
     # `--hybrid` is the explicit opt-in (mode `always`); `[dense] mode` is the
     # durable form, and it ships `off` until the goldens rule on it.
@@ -84,34 +125,23 @@ def run_query(
     # means by "top-20 -> top-5" -- a reranker that can only shuffle the five
     # documents already shown cannot promote the sixth, and the sixth is where
     # most of the recoverable failures are.
-    rerank_weight = _rerank_weight(root)
+    rerank_weight = tune.rerank_weight
     depth = max(top, rerank.DEPTH) if rerank_weight > 0 else top
 
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
         if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
-            results = accel.ask(root, query, top=depth, weighting=weighting, archived_dirs=dirs)
-            fused = _maybe_fuse(root, query, results, use_hybrid)
+            results = accel.ask(
+                root, query, top=depth, weighting=weighting, archived_dirs=dirs, scoring=scoring
+            )
+            fused = _maybe_fuse(root, query, results, use_hybrid, tune)
             return _maybe_rerank(root, query, fused, rerank_weight, top), "accelerator"
-    results = scan_ask(root, query, top=depth, weighting=weighting, archived_dirs=dirs)
-    fused = _maybe_fuse(root, query, results, use_hybrid)
+    results = scan_ask(
+        root, query, top=depth, weighting=weighting, archived_dirs=dirs, scoring=scoring
+    )
+    fused = _maybe_fuse(root, query, results, use_hybrid, tune)
     return _maybe_rerank(root, query, fused, rerank_weight, top), "scan"
-
-
-def _rerank_weight(root: Path) -> float:
-    """`[ranking] rerank_weight`, or 0 when there is no readable config.
-
-    Defaults to off in the same way `[dense] mode` does, and for the same
-    reason: a ranking change ships dark until it is measured, and the number
-    that turns it on is a tune key rather than a constant.
-    """
-    try:
-        from ..config import load as load_config
-
-        return load_config(root).rerank_weight
-    except FuxError:
-        return 0.0
 
 
 def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
@@ -127,7 +157,7 @@ def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
     return rerank.rerank(root, query, results, weight=weight)[:top]
 
 
-def _maybe_fuse(root: Path, query: str, results, use_hybrid: bool):
+def _maybe_fuse(root: Path, query: str, results, use_hybrid: bool, tune: "Tune"):
     """Gated dense fusion (W-76 Phase 7), applied to a finished lexical ranking.
 
     **After ranking, never inside it.** The dense score is not a BM25F term and
@@ -138,14 +168,8 @@ def _maybe_fuse(root: Path, query: str, results, use_hybrid: bool):
     """
     from .dense import dense_scores, should_fuse
 
-    try:
-        from ..config import load as load_config
-
-        config = load_config(root)
-        mode = "always" if use_hybrid else config.dense_mode
-        threshold, weight = config.dense_threshold, config.dense_weight
-    except FuxError:
-        mode, threshold, weight = ("always" if use_hybrid else "off"), 0.0, 0.0
+    mode = "always" if use_hybrid else tune.dense_mode
+    threshold, weight = tune.dense_threshold, tune.dense_weight
     if use_hybrid and weight <= 0:
         # `--hybrid` with no configured weight would be a silent no-op, which
         # is the failure Phase 1 replaced with a loud error. Give it a usable
@@ -174,6 +198,17 @@ def _force_scan(args) -> bool:
     for explicit bug reproduction — and argparse's mutually exclusive group
     guarantees the two are never both set."""
     return not getattr(args, "fast", False)
+
+
+def _tune_for(root: Path, args) -> "Tune":
+    """The tune for one command invocation, honouring `--no-tune`.
+
+    Loaded ONCE and handed to both `run_query` and the archived declaration.
+    Two loads could disagree if the file changed between them, and a ranking
+    explained by a different weight than the one that produced it is worse
+    than no explanation at all.
+    """
+    return _tune(root, enabled=not getattr(args, "no_tune", False))
 
 
 def _declare_pending(root: Path) -> None:
@@ -272,12 +307,14 @@ def _declare_archived(results, weight: float) -> None:
 
 def cmd_ask(args) -> int:
     root = _root()
+    tune = _tune_for(root, args)
     results, path = run_query(
         root,
         args.query,
         args.top,
         force_scan=_force_scan(args),
         use_hybrid=getattr(args, "hybrid", False),
+        tune=tune,
     )
     _declare_pending(root)
     _declare_no_accelerator(root)
@@ -291,7 +328,7 @@ def cmd_ask(args) -> int:
         if getattr(args, "explain", False):
             payload["path"] = path
         print(json_mod.dumps(payload, indent=2))
-        _declare_archived(results, _archived_ranking(root)[0].archived_weight)
+        _declare_archived(results, tune.archived_weight)
         return 0
 
     if not results:
@@ -303,19 +340,20 @@ def cmd_ask(args) -> int:
         print(f"{r.score:.4f}  {mark}{_resolve_title(root, r.id, r.title)}  ({r.loc})")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
-    _declare_archived(results, _archived_ranking(root)[0].archived_weight)
+    _declare_archived(results, tune.archived_weight)
     return 0
 
 
 def cmd_find(args) -> int:
     """Ranked documents, one per line — the terse listing verb."""
     root = _root()
-    results, _ = run_query(root, args.query, args.top, force_scan=_force_scan(args))
+    tune = _tune_for(root, args)
+    results, _ = run_query(root, args.query, args.top, force_scan=_force_scan(args), tune=tune)
     _declare_no_accelerator(root)
 
     if args.json:
         print(json_mod.dumps({"results": [_as_dict(root, r) for r in results]}, indent=2))
-        _declare_archived(results, _archived_ranking(root)[0].archived_weight)
+        _declare_archived(results, tune.archived_weight)
         return 0
 
     if not results:
@@ -328,7 +366,7 @@ def cmd_find(args) -> int:
     # is carried in `--json`, which is where a machine reader should look.
     for r in results:
         print(r.loc)
-    _declare_archived(results, _archived_ranking(root)[0].archived_weight)
+    _declare_archived(results, tune.archived_weight)
     return 0
 
 
@@ -345,7 +383,8 @@ def cmd_answer(args) -> int:
     `"source": "index"` — never silence.
     """
     root = _root()
-    results, _ = run_query(root, args.query, 1, force_scan=_force_scan(args))
+    tune = _tune_for(root, args)
+    results, _ = run_query(root, args.query, 1, force_scan=_force_scan(args), tune=tune)
     _declare_no_accelerator(root)
 
     if not results:
@@ -366,7 +405,7 @@ def cmd_answer(args) -> int:
     no_refer_flag = getattr(args, "no_refer", False)
 
     if not no_refer_flag:
-        referred = _answer_via_refer(root, args.query, best)
+        referred = _answer_via_refer(root, args.query, best, tune)
         if referred is not None:
             _print_refer_answer(referred, args.json)
             return 0
@@ -374,14 +413,14 @@ def cmd_answer(args) -> int:
     return _print_index_answer(root, best, args.json, requested=no_refer_flag)
 
 
-def _answer_via_refer(root: Path, query: str, best: AskResult):
+def _answer_via_refer(root: Path, query: str, best: AskResult, tune: "Tune"):
     """`None` on any failure to produce a usable citation — never raises."""
     from .refer_answer import answer_via_refer
 
     record = _record_for(root, best.id)
     if record is None:
         return None
-    return answer_via_refer(root, query, best.id, best.loc, record["sha"])
+    return answer_via_refer(root, query, best.id, best.loc, record["sha"], tune=tune)
 
 
 def _print_refer_answer(bundle, as_json: bool) -> None:

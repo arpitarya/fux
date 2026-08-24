@@ -113,12 +113,19 @@ def assemble(
     k: int | None = None,
     source: str = "fetched",
     overhead: int = 0,
+    per_doc_fraction: float = PER_DOC_FRACTION,
 ) -> Assembled:
     """Fill `budget` bytes with the highest-value passages that fit.
 
     `overhead` is what the renderer will spend on the answer as a whole —
     headers, the policy stamp — charged before any citation is selected, so the
     budget bounds the whole thing rather than just the payload.
+
+    `per_doc_fraction` is `[refer]`'s, and it changes only the cap below. The
+    two exemptions it is subject to — a document's first citation, and a
+    single-document candidate set — are **not** tunable, because they are what
+    keep the cap from turning "do not dominate" into "do not appear". A knob
+    that can silence the best answer is a defect with a config key.
 
     Greedy by **score per byte**, which is the right objective: the question is
     not "what scores highest" but "what is the most answer per byte of the
@@ -154,7 +161,7 @@ def assemble(
     # intent, so a caller that passes many chunks of one document still gets
     # the un-capped behaviour it asked for by passing one document.
     single_document = len({s.doc_id for s in candidates}) <= 1
-    per_doc_cap = budget if single_document else int(budget * PER_DOC_FRACTION)
+    per_doc_cap = budget if single_document else int(budget * per_doc_fraction)
     used = overhead
     per_doc: dict[str, int] = {}
     chosen: list[Citation] = []

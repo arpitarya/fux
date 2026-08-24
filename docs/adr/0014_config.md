@@ -60,10 +60,8 @@ flowchart TD
     U --> CF["[sources.url.config]<br/>PASSED THROUGH, never read"]
     F --> I["[index]"]
     I --> SH["shards = 256<br/>documents the value, cannot set it"]
-    F --> R["[ranking] — ordering only"]
-    R --> RW["archived_weight · superseded_weight<br/>recency_half_life_days · rerank_weight"]
-    F --> DN["[dense] — the per-chunk vector lane"]
-    DN --> DM["mode = off | gated | always<br/>threshold · weight"]
+    F -.->|"RETIRED 2026-08-24<br/>error, never ignored"| RT["[ranking] · [dense]"]
+    RT ==>|"seven keys moved"| TU[".fux/tune.toml<br/>ORDERING — ADR-TUNE"]
     F --> AG["[agents]"]
     AG --> AI["install — claude · copilot · kiro<br/>absent = all three, [] = none"]
     CF -.->|"verbatim"| MW["your fetcher's configure()"]
@@ -90,19 +88,17 @@ flowchart TD
      +-- [index]
      |     +-- shards = 256   documents the value; cannot change it
      |
-     +-- [ranking]            ORDERING ONLY -- changes no byte of .fux/index/
-     |     +-- archived_weight         1.0  (no-op)
-     |     +-- superseded_weight       1.0  (no-op)
-     |     +-- recency_half_life_days  0.0  (off)
-     |     +-- rerank_weight           0.0  (off)
-     |
-     +-- [dense]              the per-chunk vector lane
-     |     +-- mode           "off" (default) | "gated" | "always"
-     |     +-- threshold      0.0
-     |     +-- weight         0.0
-     |
      +-- [agents]
-           +-- install        absent = claude, copilot, kiro; [] = none
+     |     +-- install        absent = claude, copilot, kiro; [] = none
+     |
+     +-- [ranking]  RETIRED 2026-08-24 --+   an ERROR naming the new home,
+     +-- [dense]    RETIRED 2026-08-24 --+   at any value, never ignored
+                                         |
+                                         v
+                            .fux/tune.toml   ORDERING ONLY -- ADR-TUNE
+                              archived_weight · superseded_weight
+                              recency_half_life_days · rerank_weight
+                              dense mode · threshold · weight
 ```
 
 </details>
@@ -236,6 +232,46 @@ indexing the wrong corpus or fetching through the wrong file.
 **A retired key errors whatever its value.** `dirs = []` stops the run exactly
 as `dirs = ["docs"]` does: the key is retired, not merely unused, and a reader
 that tolerates the empty form teaches people the key still exists.
+
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — the first retired
+> *tables*, and they take seven keys with them.**
+>
+> | retired table | says | since |
+> |---|---|---|
+> | `[ranking]` | moved to `.fux/tune.toml`; run `fux setup` to write the file, move the keys across, delete the table | 2026-08-24, ADR-TUNE decision 7 |
+> | `[dense]` | the same | 2026-08-24 |
+>
+> The seven that moved are `archived_weight`, `superseded_weight`,
+> `recency_half_life_days`, `rerank_weight`, `dense_mode`, `dense_threshold`
+> and `dense_weight`. **The `Config` dataclass no longer carries any of
+> them**, and `config.py` no longer validates them — `tune.py` does, against
+> the same rules.
+>
+> **It follows the `middleware` → `fetcher` precedent in the table above,
+> deliberately and for the same reason.** A key that is quietly not read is
+> worse than one that stops the run, because the reader believes their setting
+> is in force and diagnoses a ranking problem instead of a config one. So
+> `[ranking]` and `[dense]` raise a `FuxError` naming `.fux/tune.toml`, at any
+> value, including an empty table.
+>
+> **The cost, said out loud: this breaks every repo that set one of the
+> seven.** Nothing migrates automatically, because a migrator would have to
+> write TOML into a file this project promised never to rewrite. The error
+> message is the migration instruction, which is the whole of what is offered.
+>
+> **The two amendments above are now history rather than schema.** Both
+> predicted this move — *"both belong in `.fux/tune.toml` and are here only
+> because ADR-TUNE is not built"*, and *"each belongs in `.fux/tune.toml` with
+> the other three when ADR-TUNE is built"* — and both were right. They are
+> left standing as the record of a relocation that was argued before it
+> happened; read them for **why** the keys left, never for what `fux.toml`
+> holds today.
+>
+> **Both diagrams are redrawn in this change, together, and the amendment
+> under them is now history too.** It corrected a two-table picture to five;
+> the loader reads **three** — `[sources]`, `[index]`, `[agents]` — and
+> *refuses* two. The pair now draws the refusal and where the keys went, which
+> is the fact a reader of a five-table picture would have got wrong.
 
 **8. `[sources.url.config]` is validated as *a table* and nothing more.** It is
 passed to the fetcher's `configure()` verbatim. Fux never reads a key inside
@@ -401,9 +437,16 @@ grep -rn 'config\[' src/fux/ | grep -v 'test'
 # every real call passes a default, so the `")` in the alternation cannot hit,
 # and `fetcher`/`urls_file`/`meta`/`config` were never in this output. A check
 # nobody has run is indistinguishable from a check that passes.
+# Amended 2026-08-24 (ADR-TUNE built): [ranking] and [dense] are retired --
+# they are REFUSED by name now, not read, so they no longer appear here.
 grep -oE '\bdata\.get\("[a-z]+"' src/fux/config.py | sort -u
-# expect exactly: agents, dense, index, ranking, sources — and nothing else.
-# A SIXTH top-level table is the veto; a new key inside these five is not.
+# expect exactly: agents, index, sources — and nothing else.
+# A FOURTH top-level table is the veto; a new key inside these three is not.
+
+# 2b. the retired tables still error rather than being silently ignored
+grep -n 'for retired in' src/fux/config.py
+# expect: the ("ranking", "dense") loop. Deleting it does not restore the
+# keys -- it makes a stale fux.toml quietly index-and-rank the wrong way.
 
 # 3. every rejected value still names the file and the value
 fux ingest 2>&1 | head -1
@@ -422,11 +465,13 @@ evidence.*
 [ADR-FETCHER](0019_fetcher.md) · [ADR-HTTP-FETCHER](0021_http-fetcher.md) ·
 [ADR-DIR-LIST](0022_dir-list.md) · [ADR-TYPES](0031_types-list.md) ·
 [ADR-AGENT-POLICY](0035_agent-policy.md) ·
-[ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md) · [ADR-TUNE](0038_tuning.md)
 
 **Code**
 
 - [`src/fux/config.py`](../../src/fux/config.py)
+- [`src/fux/tune.py`](../../src/fux/tune.py) — where the seven retired
+  `[ranking]`/`[dense]` keys are read and validated as of 2026-08-24
 
 **Measured evidence**
 

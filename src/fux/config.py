@@ -79,23 +79,6 @@ class Config:
     root: Path
     dirs_file: str
     shards: int
-    #: `[ranking] archived_weight` — a score multiplier for documents under a
-    #: directory declared `archived=true` (ADR-ARCHIVED-CONTENT decision 6). `1.0` is
-    #: the shipped default and a no-op: at it, scoring and order are
-    #: byte-identical to a corpus with no archived declarations at all.
-    #: Moving it off `1.0` is a ranking change and stays behind W-52's gate —
-    #: nothing in this loader enforces that; it is a process rule, not a code
-    #: one, same as `dirs_file` carrying no schema opinion of its own.
-    archived_weight: float = 1.0
-    superseded_weight: float = 1.0
-    recency_half_life_days: float = 0.0
-    dense_mode: str = "off"
-    dense_threshold: float = 0.0
-    dense_weight: float = 0.0
-    #: W-76 Phase 6 — the proximity reranker's bounded uplift. A tune key
-    #: rather than a constant because it changes ORDERING and not a byte of
-    #: `.fux/index/`, which is ADR-TUNE decision 1's membership test.
-    rerank_weight: float = 0.0
     #: `[agents] install` — which vendors `fux setup` writes policy renderings
     #: for (ADR-AGENT-POLICY decision 5). **Declared, never derived**: fux does
     #: not sniff for `.kiro/` or `.github/` and infer intent, which is the same
@@ -131,79 +114,25 @@ def load(root: Path) -> Config:
     if shards != FIXED_SHARDS:
         raise FuxError(f"{path}: [index] shards must be {FIXED_SHARDS} this milestone (got {shards!r})")
 
-    archived_weight = data.get("ranking", {}).get("archived_weight", 1.0)
-    if isinstance(archived_weight, bool) or not isinstance(archived_weight, (int, float)) or archived_weight < 0:
-        raise FuxError(
-            f"{path}: [ranking] archived_weight must be a non-negative number (got {archived_weight!r})"
-        )
-
-    # W-76 Phase 2. Both live under `[ranking]` beside `archived_weight` and
-    # both default to no-ops. **They move to `.fux/tune.toml` when ADR-TUNE is
-    # built** -- decision 7 already relocates `archived_weight` there, and
-    # these belong with it: none of them changes a byte in `.fux/index/`,
-    # which is decision 1's membership test for a tune key.
-    superseded_weight = data.get("ranking", {}).get("superseded_weight", 1.0)
-    if (
-        isinstance(superseded_weight, bool)
-        or not isinstance(superseded_weight, (int, float))
-        or superseded_weight < 0
-    ):
-        raise FuxError(
-            f"{path}: [ranking] superseded_weight must be a non-negative number "
-            f"(got {superseded_weight!r})"
-        )
-    recency_half_life_days = data.get("ranking", {}).get("recency_half_life_days", 0.0)
-    if (
-        isinstance(recency_half_life_days, bool)
-        or not isinstance(recency_half_life_days, (int, float))
-        or recency_half_life_days < 0
-    ):
-        raise FuxError(
-            f"{path}: [ranking] recency_half_life_days must be a non-negative number "
-            f"(got {recency_half_life_days!r})"
-        )
-
-    # W-76 Phase 7. **Default off**, and that is a measurement rather than a
-    # preference: the removed document-level lane fixed 3 graded queries and
-    # broke 9, and Phase 7's gate says the per-chunk unit must reach
-    # >= 3-fixed / 0-broken before it is switched on. The vectors are
-    # committed either way; only the fusion waits.
-    dense = data.get("dense", {})
-    dense_mode = dense.get("mode", "off")
-    if dense_mode not in ("off", "gated", "always"):
-        raise FuxError(
-            f"{path}: [dense] mode must be off, gated or always (got {dense_mode!r})"
-        )
-    dense_threshold = dense.get("threshold", 0.0)
-    dense_weight = dense.get("weight", 0.0)
-    for key, value in (("threshold", dense_threshold), ("weight", dense_weight)):
-        if isinstance(value, bool) or not isinstance(value, (int, float)) or value < 0:
-            raise FuxError(f"{path}: [dense] {key} must be a non-negative number (got {value!r})")
-
-    # W-76 Phase 6. **Default off**, on the same discipline as `[dense] mode`:
-    # a change to ordering ships dark until a golden run says what it did.
-    rerank_weight = data.get("ranking", {}).get("rerank_weight", 0.0)
-    if (
-        isinstance(rerank_weight, bool)
-        or not isinstance(rerank_weight, (int, float))
-        or rerank_weight < 0
-    ):
-        raise FuxError(
-            f"{path}: [ranking] rerank_weight must be a non-negative number "
-            f"(got {rerank_weight!r})"
-        )
+    # ADR-TUNE decision 7: every knob that changes ORDER moved to
+    # `.fux/tune.toml`, and the old keys are retired with an error naming the
+    # new home rather than being silently ignored. The `middleware` -> `fetcher`
+    # precedent below is the same shape, for the same reason: a key that is
+    # quietly not read is worse than one that errors, because the reader
+    # believes their setting is in force.
+    for retired in ("ranking", "dense"):
+        if retired in data:
+            raise FuxError(
+                f"{path}: [{retired}] moved to .fux/tune.toml — it holds every knob that "
+                f"changes how results are ORDERED, and none that changes what is indexed. "
+                f"Run `fux setup` to write the file, move the keys across, and delete "
+                f"[{retired}] from here (ADR-TUNE, 2026-08-24)"
+            )
 
     return Config(
         root=root,
         dirs_file=dirs_file.strip(),
         shards=shards,
-        archived_weight=float(archived_weight),
-        superseded_weight=float(superseded_weight),
-        recency_half_life_days=float(recency_half_life_days),
-        dense_mode=dense_mode,
-        dense_threshold=float(dense_threshold),
-        dense_weight=float(dense_weight),
-        rerank_weight=float(rerank_weight),
         agents=_load_agents(path, data.get("agents")),
         url=_load_url_source(path, sources.get("url")),
     )

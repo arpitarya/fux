@@ -21,7 +21,7 @@ from dataclasses import dataclass, replace
 
 from .. import store as store_mod
 from ..ingest.gitdir import is_archived_loc
-from .bm25f import score_record
+from .bm25f import DEFAULT_SCORING, Scoring, score_record
 
 
 @dataclass(frozen=True)
@@ -42,13 +42,22 @@ class Corpus:
     """The statistics BM25F needs, derived per query and never stored.
 
     `n` counts every record line; `total_wlen` sums the `wlen` of the records
-    that have one. A record without `wlen` therefore contributes to the
+    that have one. A record without `flen` therefore contributes to the
     denominator and not the numerator — that is `scan.py`'s behaviour, and the
-    accelerator's build asserts it reproduces the same two integers.
+    accelerator's build asserts it reproduces the same statistics.
+
+    **`total_wlen` is a float and is derived per query** (ADR-TUNE, 2026-08-24).
+    It used to be an integer summed at build time with the field weights baked
+    in, which meant a `tune.toml` field weight moved `avg_wlen` on the scan
+    path and not on the accelerator path — the two disagreeing on the same
+    corpus, which is a differential-law break, and it would have needed a
+    rebuild to fix. The runtime stats plane now stores `total_flen`, the five
+    raw per-field token-count totals, and both paths weight them at query time.
+    Decision 6a one level up: *no stored value may be a function of a tunable*.
     """
 
     n: int
-    total_wlen: int
+    total_wlen: float
     #: The newest commit timestamp in the corpus (W-76 Phase 2), or 0 when no
     #: record carries one. Recency is normalised against it so the freshest
     #: document scores 1.0 and the prior is a pure demotion -- which is what
@@ -113,6 +122,33 @@ class Weighting:
     #: The newest commit timestamp in the corpus, used to normalise recency so
     #: the freshest document scores `1.0`. Zero disables the prior.
     newest_mtime: int = 0
+    #: `.fux/tune.toml`'s `[priority]` (ADR-TUNE decision 8), **sorted
+    #: longest-key-first** by the loader so `priority_for` can stop at the
+    #: first match. Empty is the default and costs nothing.
+    priority: tuple[tuple[str, float], ...] = ()
+
+    def priority_for(self, loc: str) -> float:
+        """The per-source multiplier for a document location; unlisted is `1.0`.
+
+        **Longest matching entry wins** (ADR-TUNE decision 8a). Elasticsearch
+        resolves the same overlap with first-match on an ordered array; fux
+        cannot copy that, and the reason is a property worth being pleased
+        about — its source lists are loader-sorted and file order is
+        presentation only, so there is no first. Longest-match is
+        order-independent, which is what L3 needs. Ties cannot occur because
+        TOML keys are unique.
+
+        **This is the only implementation.** `tune.Tune` carries the data and
+        deliberately does not resolve it: the rule has to live next to the
+        bound that must agree with it, or the two drift and `--fast` and
+        `--scan` disagree — the W-73 class, on a different multiplier.
+        """
+        if not self.priority:
+            return 1.0
+        for entry, weight in self.priority:
+            if loc == entry or loc.startswith(entry):
+                return weight
+        return 1.0
 
     @property
     def trivial(self) -> bool:
@@ -128,6 +164,7 @@ class Weighting:
             self.archived_weight == 1.0
             and self.superseded_weight == 1.0
             and self.recency_half_life_days <= 0
+            and not self.priority
         )
 
     @property
@@ -148,7 +185,15 @@ class Weighting:
         #: to `(0, 1]` by construction, so it can only ever demote. That bound
         #: is load-bearing here — an unbounded recency prior would make this
         #: supremum unbounded and the block bound useless.
-        return max(1.0, self.archived_weight) * max(1.0, self.superseded_weight)
+        #: Per-source priority is a third independent multiplier, so it joins
+        #: the product. `max(1.0, ...)` again rather than the raw maximum: an
+        #: unlisted document is scaled by `1.0`, so `1.0` is always attainable
+        #: and a configuration of demotions must not lower the ceiling.
+        return (
+            max(1.0, self.archived_weight)
+            * max(1.0, self.superseded_weight)
+            * max([1.0, *(w for _, w in self.priority)])
+        )
 
     def of(self, record: dict) -> float:
         """The multiplier for one record: archived x superseded x recency."""
@@ -165,6 +210,8 @@ class Weighting:
             weight *= recency_multiplier(
                 record.get("mtime"), self.newest_mtime, self.recency_half_life_days
             )
+        if self.priority:
+            weight *= self.priority_for(record.get("loc", ""))
         return weight
 
 
@@ -178,6 +225,7 @@ def rank(
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
+    scoring: Scoring = DEFAULT_SCORING,
 ) -> list[AskResult]:
     """Score, sort, truncate. The only place any of the three happens.
 
@@ -220,6 +268,7 @@ def rank(
             df,
             corpus.n,
             avg_wlen,
+            scoring,
         )
         archived = _record_is_archived(record, weighting.archived_dirs)
         if demote:

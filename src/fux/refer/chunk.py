@@ -65,7 +65,12 @@ class Passage:
         return len(self.text.encode("utf-8"))
 
 
-def chunk(content: str) -> list[Passage]:
+def chunk(
+    content: str,
+    *,
+    min_passage_bytes: int = MIN_PASSAGE_BYTES,
+    max_passage_bytes: int = MAX_PASSAGE_BYTES,
+) -> list[Passage]:
     """Split into heading-delimited passages, in document order.
 
     Deterministic and total: every byte of the input lands in exactly one
@@ -73,13 +78,19 @@ def chunk(content: str) -> list[Passage]:
     first heading is its own passage with an empty heading — a preamble is
     content, and dropping it silently is how the one sentence that answers the
     question disappears.
+
+    The two bounds are `[refer]`'s, threaded from the caller rather than read
+    off the module, and both properties above survive any value of them: the
+    floor only decides *where* a byte lands, never whether it lands at all.
+    `tune.py` refuses a floor at or above the ceiling, which is the one
+    combination that would make the split ill-defined.
     """
     sections = _sections(content)
-    merged = _merge_runts(sections)
+    merged = _merge_runts(sections, min_passage_bytes=min_passage_bytes)
 
     passages: list[Passage] = []
     for heading, text, start, end in merged:
-        for piece, offset in _split_oversized_with_offsets(text):
+        for piece, offset in _split_oversized_with_offsets(text, max_passage_bytes):
             piece_lines = piece.count("\n") + 1
             piece_start = start + offset
             passages.append(
@@ -123,7 +134,11 @@ def _sections(content: str) -> list[tuple[str, str, int, int]]:
     return out
 
 
-def _merge_runts(sections: list[tuple[str, str, int, int]]) -> list[tuple[str, str, int, int]]:
+def _merge_runts(
+    sections: list[tuple[str, str, int, int]],
+    *,
+    min_passage_bytes: int = MIN_PASSAGE_BYTES,
+) -> list[tuple[str, str, int, int]]:
     """Fold a too-short section forward into the next one.
 
     Forward rather than backward: a stub heading almost always introduces what
@@ -136,7 +151,7 @@ def _merge_runts(sections: list[tuple[str, str, int, int]]) -> list[tuple[str, s
     carry_heading = ""
     carry_start = 0
     for heading, text, start, end in sections:
-        if len(text.encode("utf-8")) < MIN_PASSAGE_BYTES and (heading or carry):
+        if len(text.encode("utf-8")) < min_passage_bytes and (heading or carry):
             if not carry:
                 carry_heading = heading
                 carry_start = start
@@ -160,7 +175,9 @@ def _merge_runts(sections: list[tuple[str, str, int, int]]) -> list[tuple[str, s
     return out
 
 
-def _split_oversized_with_offsets(text: str) -> list[tuple[str, int]]:
+def _split_oversized_with_offsets(
+    text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES
+) -> list[tuple[str, int]]:
     """`(piece, line_offset)` — the same split, carrying where each piece starts.
 
     The offset is measured in lines from the start of `text`, so a caller can
@@ -169,7 +186,7 @@ def _split_oversized_with_offsets(text: str) -> list[tuple[str, int]]:
     identical paragraphs in one section would make a search return the first
     one for both, and cite the wrong lines for the second.
     """
-    pieces = _split_oversized(text)
+    pieces = _split_oversized(text, max_passage_bytes)
     out: list[tuple[str, int]] = []
     offset = 0
     for piece in pieces:
@@ -180,16 +197,22 @@ def _split_oversized_with_offsets(text: str) -> list[tuple[str, int]]:
     return out
 
 
-def _split_oversized(text: str) -> list[str]:
-    """Split on blank lines until each piece fits, never mid-paragraph."""
-    if len(text.encode("utf-8")) <= MAX_PASSAGE_BYTES:
+def _split_oversized(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[str]:
+    """Split on blank lines until each piece fits, never mid-paragraph.
+
+    A single paragraph longer than the ceiling still comes back whole — the
+    split is on paragraph boundaries and there is no smaller one to use. That
+    is a bound the assembler then enforces by not seating it, rather than a
+    passage cut mid-sentence and cited as if it were the author's.
+    """
+    if len(text.encode("utf-8")) <= max_passage_bytes:
         return [text]
     pieces: list[str] = []
     current: list[str] = []
     size = 0
     for para in text.split("\n\n"):
         para_size = len(para.encode("utf-8")) + 2
-        if current and size + para_size > MAX_PASSAGE_BYTES:
+        if current and size + para_size > max_passage_bytes:
             pieces.append("\n\n".join(current))
             current, size = [], 0
         current.append(para)

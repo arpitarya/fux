@@ -66,8 +66,20 @@ green over 240 comparisons), which is the built-and-measured pair the register
 treats as decisive elsewhere.
 
 **4. ADR-TUNE's key names.** Its specimen `.fux/tune.toml` was reopened to add
-five field weights and the `[dense]` table. Those five names are **an
-amendment's proposal, not a decision** — `src/fux/tune.py` does not exist.
+five field weights and the `[dense]` table. Those five names were **an
+amendment's proposal, not a decision** — `src/fux/tune.py` did not exist.
+
+> **Narrowed 2026-08-24 — the module exists and the names are now load-bearing.**
+> ADR-TUNE is built (`v2.0.0-alpha.1`). `src/fux/tune.py` implements every name
+> in the specimen, and two tests assert the loader's key set and the shipped
+> file are equal **in both directions**, so a name cannot drift from its
+> documentation in either.
+>
+> **What is left is smaller and is still Arpit's**: the names are now a shipped
+> interface rather than a proposal, so renaming one is a breaking change from
+> here. If any of the five field-weight names or the `[dense]` key names are
+> wrong, **this is the last cheap moment to say so** — the record is still
+> `status: proposed`, which is exactly the state that makes the change free.
 
 ## Owed — one mechanical defect, bigger than it was flagged
 

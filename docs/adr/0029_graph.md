@@ -281,6 +281,54 @@ fallback.
   archived choice; `LAZINESS = 0.5` is the conventional lazy chain. Only the
   *need* for laziness is measured. They are honest defaults, not tuned values,
   and the veto condition below is what would force them to be earned.
+
+  > **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — the constants
+  > are now parameters, and the honesty above is what made them tunable rather
+  > than something that had to be defended first.**
+  >
+  > `DAMPING`, `ITERATIONS`, `LAZINESS` and `HOP_DECAY` are keyword parameters
+  > on `walk.ppr`, `walk.expand` and `walk.routes`, defaulting to the module
+  > constants of the same names. **The default values do not move**, so an
+  > unconfigured repo walks exactly the walk this record describes and the
+  > charts in §1 still recompute.
+  >
+  > **`EXPAND_LIMIT` and `SEED_DEPTH` were DELETED**, not parameterised. They
+  > were `graph/__init__.py` module constants with no other reader, and they
+  > are now `[graph] expand_limit` and `[graph] seed_depth`. Keeping a local
+  > copy of a default beside a config key is how the two drift — nothing would
+  > have failed if they disagreed; the walk would simply have run at a width
+  > nobody configured. **The reasoning outlived the numbers and is kept as a
+  > comment where they were.**
+  >
+  > **Parameters rather than module reads, and that is the whole of the
+  > change.** The parity artefact decision 9 corrects is a **joint** property
+  > of `iterations` and `laziness` — at three iterations, an unlazy walk ranks
+  > a three-hop node above a two-hop one. A caller able to set one without the
+  > other could reintroduce it silently; passed together, one call site shows
+  > both.
+  >
+  > **`--hops` stays a CLI argument and is not a tune key**, because it bounds
+  > what the search *finds*; `hop_decay` only orders what it found. That is the
+  > membership test one level up, applied to a boundary that could plausibly
+  > have gone either way.
+  >
+  > **The tune is loaded once per command**, so `graph`'s seed query and its
+  > walk cannot read two different files — a neighbourhood around seeds ranked
+  > under weights that did not choose them is the failure that would have made
+  > the saving worth nothing.
+  >
+  > **The three PPR constants are still unmeasured, and a knob does not measure
+  > them.** What has changed is only that a consumer can vary them without
+  > editing the source — evidence-gathering, not evidence. Veto condition 2
+  > below is unaffected: `ITERATIONS` is still the module constant it names,
+  > and it still becomes a measured value if a farther node ever outranks a
+  > nearer one.
+  >
+  > **Veto 3's closing phrase names a constant that no longer exists** —
+  > *"the lane needs a different shape, not a bigger `EXPAND_LIMIT`"*. Read
+  > `[graph] expand_limit` for it; the argument is untouched and is in fact
+  > sharper now, because widening the walk is a config edit rather than a
+  > release, which makes it the easier wrong answer to reach for.
 - **`graph.json`'s cost is now profiled, and it is the plane, not the
   algorithms.** [`2026-08-21-graph-plane-profile`](../../work/regression/2026-08-21-graph-plane-profile/report.md)
   puts **9.34 s of a 9.54 s `fux graph` at 100 000 docs (98 %) in
@@ -423,7 +471,8 @@ uv run pytest -q tests/graph/test_walk.py
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [ADR-ASK](0004_ask.md) · [ADR-INGEST](0007_ingest.md)
+**Records** — [ADR-ASK](0004_ask.md) · [ADR-INGEST](0007_ingest.md) ·
+[ADR-TUNE](0038_tuning.md)
 
 **Code**
 

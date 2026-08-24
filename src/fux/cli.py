@@ -111,6 +111,17 @@ def _cmd_path(args) -> int:
     return cmd_path(args)
 
 
+def _cmd_tune(args) -> int:
+    # **Prints, never writes** — ADR-TUNE decision 3b. `tomllib` reads and
+    # nothing in the stdlib writes TOML, so a writer would mean either a
+    # third-party dependency (L1) or fux round-tripping a commented file it
+    # promised never to rewrite. The human pastes; the file stays theirs.
+    from .tune import specimen
+
+    print(specimen())
+    return 0
+
+
 #: The write verbs — the only ones that construct a `Progress` in `main`
 #: (W-64). `add`/`remove`/`update` joined it in W-63: they end in
 #: `ingest.run()`, so they inherit the bar from that seam rather than growing
@@ -130,6 +141,21 @@ def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
         dest="force_progress",
         action="store_true",
         help="paint the progress bar even off a TTY, overriding FUX_NO_PROGRESS too",
+    )
+
+
+def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
+    """`--no-tune` on every verb that reads `.fux/tune.toml` (ADR-TUNE decision 11).
+
+    A flag rather than a verb, per ADR-CLI veto 1 — and one flag rather than a
+    knob per table, because the question it answers is *"is it me or the
+    config?"*. Bisecting that with six flags is an experiment; with one it is a
+    single re-run, which is the whole reason the tune file is one file.
+    """
+    parser.add_argument(
+        "--no-tune",
+        action="store_true",
+        help="ignore .fux/tune.toml and use the engine defaults",
     )
 
 
@@ -268,6 +294,7 @@ def build_parser() -> argparse.ArgumentParser:
             action="store_true",
             help="force the reference scan path (the default; kept for explicit bug reproduction)",
         )
+        _add_tune_flag(p)
         return p
 
     p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
@@ -331,6 +358,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
     p_explain.add_argument("--json", action="store_true", help="machine-readable output")
+    _add_tune_flag(p_explain)
     p_explain.set_defaults(func=_cmd_explain)
 
     p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")
@@ -347,6 +375,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="force the reference scan path for the seeds (the default)",
     )
+    _add_tune_flag(p_graph)
     p_graph.set_defaults(func=_cmd_graph)
 
     p_path = sub.add_parser("path", help="how two documents are connected, most reliable route first")
@@ -354,7 +383,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_path.add_argument("dst", metavar="TO", help="the document the route ends at")
     p_path.add_argument("--hops", type=int, default=2, metavar="N", help="max edges in a route (default 2)")
     p_path.add_argument("--json", action="store_true", help="machine-readable output")
+    _add_tune_flag(p_path)
     p_path.set_defaults(func=_cmd_path)
+
+    # A flat verb with no arguments at all: it neither reads the repo nor
+    # writes it, so it works before `fux setup` has run and outside a root.
+    # Printing is the whole feature — see `_cmd_tune`.
+    p_tune = sub.add_parser(
+        "tune", help="print the tunables file for you to paste into .fux/tune.toml"
+    )
+    p_tune.set_defaults(func=_cmd_tune)
 
     return parser
 

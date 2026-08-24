@@ -44,12 +44,22 @@ a per-query, O(corpus) scan into an O(1) lookup.
 > sum with float weights. A reader that types `stats["total_wlen"]` as `int`
 > is reading a schema that has not existed since 2026-08-23.
 
+> **Amended again 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — and this
+> supersedes the note above rather than adding to it.** There is no
+> `total_wlen` in this file at all now. The field is **`total_flen`**: five
+> **raw** per-field token-count totals, integers, weighted at *query* time by
+> whichever `Scoring` the query is running under. `avg_wlen` is still
+> `total_wlen / n` — it is just that `total_wlen` is computed on the way past
+> rather than stored. Decision 1 below carries the full argument; the amendment
+> above is now the history of a schema that lasted one day.
+
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
 ```mermaid
 flowchart LR
-    A[".fux/index/*.jsonl,<br/>every record's flen"] -->|"fux build, one pass:<br/>derive_wlen(flen)"| B["stats.json:<br/>{n, total_wlen, newest_mtime}"]
-    B -->|"avg_wlen<br/>= total_wlen / n"| C["BM25F length<br/>normalisation"]
+    A[".fux/index/*.jsonl,<br/>every record's flen"] -->|"fux build, one pass:<br/>SUM the raw counts, per field"| B["stats.json:<br/>{n, total_flen, newest_mtime}"]
+    B -->|"derive_wlen(total_flen, scoring)<br/>AT QUERY TIME"| W["total_wlen<br/>avg_wlen = total_wlen / n"]
+    W --> C["BM25F length<br/>normalisation"]
     B -->|"newest_mtime"| D["recency prior —<br/>normalised so the freshest<br/>document scores 1.0"]
 ```
 
@@ -59,16 +69,20 @@ flowchart LR
 ```text
    .fux/index/*.jsonl -- every record's flen and mtime, one pass
               |
-              |  fux build: total_wlen += derive_wlen(flen)
+              |  fux build: total_flen[i] += flen[i]   RAW, never weighted
               |             newest_mtime = max(mtime)
               v
    stats.json: {n: document count,
-                total_wlen: sum of DERIVED wlen (a float),
+                total_flen: five RAW per-field token-count totals,
                 newest_mtime: newest commit timestamp in the corpus}
               |
-              +-- avg_wlen = total_wlen / n
+              +-- AT QUERY TIME, under the query's own Scoring:
+              |     total_wlen = derive_wlen(total_flen, scoring)
+              |     avg_wlen   = total_wlen / n
               |        v
               |   BM25F length normalisation, every scored document
+              |   (both paths do this, which is why a field weight
+              |    cannot make --fast and --scan disagree)
               |
               +-- newest_mtime
                        v
@@ -88,6 +102,15 @@ flowchart LR
 > normalises the recency prior, and that is a different arrow into a different
 > multiplier.
 
+> **Amended again 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — both halves,
+> together, and this is the third redraw in two days.** They drew the build
+> step as `derive_wlen(flen)` and the output as `total_wlen`. The build now
+> sums the **raw** per-field counts and `derive_wlen` has moved to the query
+> side of the arrow, where it is applied under the query's own `Scoring`.
+> **The arrow that moved is the whole decision**, so the picture is the fastest
+> place to see it: a weight applied on the left of `stats.json` is baked, and a
+> baked weight cannot be a tune key.
+
 ### Examples
 
 `.fux/runtime/stats.json` in this repo — **re-captured 2026-08-24** — 434
@@ -101,6 +124,16 @@ $ cat .fux/runtime/stats.json
 Three fields, sorted keys, and a **float** `total_wlen` — the trailing `.0` is
 not cosmetic, it is the visible edge of the weighted derivation that replaced
 a committed integer.
+
+> **Annotated, not re-captured, 2026-08-24 ([ADR-TUNE](0038_tuning.md)
+> built).** That console block is a **`fux.runtime.v3` capture** and it is left
+> as the dated artefact it is. Under v4 the key is `total_flen` and its value
+> is a **list of five integers**, the raw per-field totals; there is no
+> `total_wlen` on the wire and nothing in this file is a float any more.
+> **No replacement capture is written here** — this repo's runtime plane is
+> derived and gitignored, and inventing a line of JSON for a build nobody ran
+> would be exactly the fabricated evidence a dated capture exists to avoid.
+> Run `fux build && cat .fux/runtime/stats.json` for the current shape.
 
 ---
 
@@ -118,6 +151,60 @@ doing that per query would scale with corpus size on the hot path.
 **1. Fields: `n`, `total_wlen`, and `newest_mtime`.** The two numbers BM25F's
 length normalisation reads, plus the one the recency prior normalises against
 — and nothing else. Still no per-field breakdown, still no percentiles.
+
+> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — `total_wlen` is
+> gone, and it is replaced by exactly the thing the sentence above says this
+> file does not hold.**
+>
+> **The field is `total_flen`: the five RAW per-field token-count totals.**
+> *"Still no per-field breakdown"* is now false in the letter and right in the
+> spirit — the plane holds five numbers where it held one, and it holds them
+> **because** it must not hold the derived one. `RUNTIME_SCHEMA` goes
+> `fux.runtime.v3` → **`fux.runtime.v4`**, so a v3 plane is refused and rebuilt
+> rather than misread.
+>
+> **What forced it: `total_wlen` had become a stored function of a tunable.**
+> It was `sum(derive_wlen(flen))` — the field weights applied at **build**
+> time. The moment those weights became `.fux/tune.toml` keys, `avg_wlen` would
+> move on the scan path, which derives it per query, and **not** on the
+> accelerator path, which read the baked number. Same corpus, two `avg_wlen`s:
+> the two paths returning different bytes, which is
+> [ADR-ASK](0004_ask.md)'s differential law breaking.
+>
+> **And it would have needed a `fux build` to repair**, which is the part that
+> made it unshippable rather than merely wrong. A knob whose effect requires a
+> rebuild is not a knob; the whole claim under ADR-TUNE is that editing
+> ordering cannot touch the maintenance path.
+>
+> **The fix is decision 3's own principle, applied one field further: store the
+> observation, not the value derived from it.** `flen` is a fact about a
+> document; the weighting is a policy applied to that fact. `total_flen` is the
+> corpus-wide sum of the facts, and **both query paths weight it at query
+> time** — `derive_wlen` remains the one place that arithmetic exists, so the
+> scan and the accelerator cannot drift.
+>
+> **This is the same shape as the committed-`wlen` defect W-76 Phase 1 removed
+> from the record**, one plane up — and the amendments above, which report
+> `total_wlen` as *"a sum of DERIVED lengths, a float on the wire"*, are the
+> record of the state in between. Read them for the history; the plane no
+> longer stores a derived number at all.
+>
+> **`n` and `newest_mtime` are untouched**, and the membership bar this record
+> applies is untouched with them: corpus-wide, unsupplied by any single
+> posting, needed on the hot path. `total_flen` passes it five times over
+> rather than once.
+>
+> **⚠ Why this record was amended at all.** It **owns no module** — decision-
+> making about `stats.json` lives here, the code lives in `derive/build.py`
+> under [ADR-T1-ACCELERATOR](0011_accelerator.md). So
+> [`tests/test_adr_freshness.py`](../../tests/test_adr_freshness.py) cannot
+> ever point here, and did not: the change satisfied the check by touching the
+> accelerator's record. **That is precisely how this record's own veto fired
+> unnoticed on 2026-08-23**, as the Veto condition below already says at
+> length. It is amended today by a session that went looking, which is
+> [W-77](../../work/open/W-77-record-reconciliation.md)'s finding: a record
+> that describes a component it does not own has no mechanical protection at
+> all.
 
 > **Amended 2026-08-24 (W-76 Phase 2) — this is the fired veto, stated where
 > the claim it falsified lives.** This read *"Fields: `n` and `total_wlen`.
@@ -177,6 +264,19 @@ same committed input.
   length normalization for every other document's score too. That is the
   intended BM25F behavior, not a side effect to guard against.
 
+  > **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — read
+  > `n`/`total_flen`, and note the second thing that now recomputes.** A
+  > corpus change still moves length normalisation for every document, exactly
+  > as stated. What is new is that **editing a field weight does too, with no
+  > `fux build` at all** — `total_wlen` is derived from the stored raw totals
+  > per query. That is the property the whole schema change bought: ordering is
+  > editable without touching the maintenance path.
+
+- **`avg_wlen` costs a five-element weighted sum per query rather than a
+  dict lookup**, and that is the price paid, said plainly. It is five
+  multiply-adds against an O(corpus) scan the file exists to avoid — the
+  lookup was never the expensive part.
+
 ### Alternatives considered
 
 - **Compute `n`/`total_wlen` at query time by scanning `docs.jsonl`.**
@@ -190,6 +290,20 @@ same committed input.
   body-length totals). Rejected for now: nothing in `rank()`'s current BM25F
   implementation needs more than the single `total_wlen`/`n` pair; a real
   requirement is the trigger, not anticipation.
+
+  > **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — this alternative
+  > was accepted, and by exactly the process its own last sentence names.**
+  > *"Separate heading-length and body-length totals"* is what `total_flen`
+  > is — five of them. **The rejection is not overturned; the trigger arrived.**
+  > A real requirement showed up: field weights became query-time keys, so the
+  > only number that could safely be stored was the unweighted one, and the
+  > unweighted one is per-field by construction.
+  >
+  > **Worth keeping as a worked example of a well-written rejection.** It did
+  > not say *no*; it said *not without a requirement*, and it named what would
+  > count. Written on 2026-08-19, triggered on 2026-08-24 — five days in which
+  > nobody had to defend five stored numbers, and then one sentence that
+  > justified them.
 
 ### Reference (required)
 
@@ -252,10 +366,18 @@ veto to trigger, and this record's shape would need to grow alongside it.
 # and total_wlen" was satisfied by silence on a healthy tree, which is how the
 # veto above fired unnoticed. The reader is `derive/accel.py`; `scan.py`
 # computes the same three itself.
+# Amended 2026-08-24 (ADR-TUNE built): the key is `total_flen` now -- five RAW
+# per-field totals -- and the old expectation would have reported failure on a
+# healthy tree, which is how a veto check stops being read.
 grep -n 'stats\[\|stats\.get(' src/fux/derive/accel.py
-# expect: exactly three keys -- "n", "total_wlen", "newest_mtime".
+# expect: exactly three keys -- "n", "total_flen", "newest_mtime".
 # A fourth is this veto firing again. Nothing at all means the reader moved
 # and this check has gone blind -- treat that as a failure, not a pass.
+
+# the stored number must stay RAW: a weight applied on the build side is a
+# stored function of a tunable, and only the accelerator path would see it
+grep -n 'derive_wlen' src/fux/derive/build.py
+# expect: no output. `build.py` sums flen; `accel.py` weights it per query.
 
 grep -n 'newest_mtime' src/fux/query/scan.py src/fux/derive/build.py
 # expect: both paths compute it, so `--fast` and `--scan` cannot disagree
@@ -272,7 +394,7 @@ evidence.*
 **Records** — [ADR-LAWS](0001_laws.md) · [ADR-DOTFUX](0003_fux-directory.md) ·
 [ADR-RECORD](0010_index-record.md) ·
 [ADR-T1-ACCELERATOR](0011_accelerator.md) · [ADR-RANKING](0012_ranking.md) ·
-[ADR-RUNTIME-MANIFEST](0026_runtime-manifest.md)
+[ADR-RUNTIME-MANIFEST](0026_runtime-manifest.md) · [ADR-TUNE](0038_tuning.md)
 
 **Code**
 

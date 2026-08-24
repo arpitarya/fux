@@ -100,7 +100,11 @@ def test_rebuild_drops_stale_postings_shards(tmp_path):
 
 
 def test_stats_match_the_scan_oracle(tmp_path):
-    """`n` and `total_wlen` must be exactly what `query/scan.py` derives."""
+    """`n` and the corpus length total must be exactly what `query/scan.py` derives.
+
+    The plane stores `total_flen` (raw per-field counts) since 2026-08-24; the
+    oracle is still `scan.py`'s `Corpus`, weighted at the same defaults.
+    """
     from fux.query.scan import scan_candidates
 
     write_index(tmp_path, _corpus(50))
@@ -109,7 +113,9 @@ def test_stats_match_the_scan_oracle(tmp_path):
 
     stats = json.loads((fmt.runtime_dir(tmp_path) / fmt.STATS_NAME).read_bytes())
     assert stats["n"] == corpus.n
-    assert stats["total_wlen"] == corpus.total_wlen
+    from fux.query.bm25f import derive_wlen
+
+    assert derive_wlen(list(stats["total_flen"])) == corpus.total_wlen
 
 
 def test_build_refuses_a_stray_quoted_term_hash(tmp_path):

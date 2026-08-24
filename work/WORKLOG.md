@@ -30,6 +30,65 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-24 — ADR-TUNE built: the tunables file, and a stats plane that was baking a tunable  ·  Cowork
+
+- **Asked:** *"4 and 5 look good implement it now"* — build ADR-TUNE, and run
+  the blind enrichment re-grade. Plus: frame each ADR edit as **what this
+  proposal changed** rather than a silent edit.
+- **Did:** `src/fux/tune.py` and everything it needed.
+  - **The loader.** Seven tables, a **closed** key set (unknown table or key
+    is a loud error), semantic errors collected and reported together and
+    capped at ten, merge-conflict markers and a UTF-8 BOM handled by name
+    rather than surfacing as a confusing parse error.
+  - **`[priority]`, either direction, longest match wins.** Resolved on
+    `query/rank.py::Weighting` rather than on `Tune` — deliberately, so the
+    rule sits next to the pruning bound that has to agree with it. Two
+    refusals only: negative (inverts the order) and zero (that is exclusion,
+    and `!` in `.fux/sources/` already owns it).
+  - **`k1`, `b` and the five field weights as ONE `Scoring` object**, because
+    they appear on both sides of one fraction and three parameters make it
+    possible to reweight a numerator against a stale denominator.
+  - `--no-tune` on the read verbs, `fux tune` that prints and never writes,
+    `fux setup` writing the file, and `[ranking]`/`[dense]` retired from
+    `fux.toml` with an error naming the new home.
+- **Two defects the build surfaced, neither anticipated by the record:**
+  1. **`.fux/runtime/stats.json` stored a pre-weighted `total_wlen`.** The
+     moment a field weight became a key, that was a stored function of a
+     tunable: `avg_wlen` would move on the scan path and not the accelerator
+     path. Same corpus, two `avg_wlen`s — a differential-law break, and one a
+     rebuild would have been needed to repair, which would have made *"a knob
+     needs no rebuild"* false. Fixed the way ADR-TUNE decision 6a says to:
+     store the observation, not the derived value. `RUNTIME_SCHEMA` -> `v4`.
+  2. **`fux doctor` warned about files fux itself writes.** `.fux/` had no
+     category for a committed *file*, only directories. Found by a subagent
+     checking the claim instead of asserting it; `.fux/enrich/` was already
+     in that state.
+- **The finding worth carrying past this item.** **BM25 saturates**, so an
+  unweighted pruning bound is nearly indistinguishable from a weighted one at
+  large `tf` — at `tf = 90` the contribution is within a percent of its
+  ceiling. **A differential sweep over a realistic corpus therefore passes
+  while proving nothing.** The first fixture written here did exactly that:
+  the mutant survived it. The shipped fixture uses `tf = 1`, long documents
+  for the opened term and short ones for the deferred term, and it is
+  **verified by mutation** — reverting `block_bound`'s `scoring` argument
+  fails two sweep arms. This is `tests/derive/test_differential.py`'s
+  single-`top` lesson, on a new axis.
+- **Decided / open:**
+  - ADR-TUNE stays `status: proposed`. **Built is not ratified**, and the
+    register carries two columns for that reason.
+  - **Two things are settable but not reachable and are said out loud rather
+    than hidden**: `[fuse]`'s two keys have no CLI consumer, and
+    `explain --no-tune` is inert.
+  - Nine records amended — six that OWN the changed components and three that
+    merely DESCRIBE them (ADR-RANKING, ADR-T1-ACCELERATOR, ADR-RUNTIME-STATS).
+    The freshness gate demanded only the six; the other three are W-77's
+    governance gap, met deliberately rather than by luck.
+- **Next:** the blind enrichment re-grade in fux-playground.
+  ⚠ **Owed on Arpit's machine:** `fux ingest --full` then `fux build` — three
+  docs moved to `archive/open/` and the runtime schema moved to v4.
+
+---
+
 ## 2026-08-24 — W-77's audit landed; W-73 and W-76 closed; the broken-link class gated  ·  Cowork
 
 - **Asked:** review the project, the open items and the ADRs, and say what to

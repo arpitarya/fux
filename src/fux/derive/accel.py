@@ -55,10 +55,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..errors import FuxError
-from ..query.bm25f import B, K1, idf
+from ..query.bm25f import DEFAULT_SCORING, Scoring, derive_wlen, idf
 from ..query.rank import AskResult, Corpus, rank
 from ..query.scan import query_term_hashes
-from ..query.bm25f import FIELD_WEIGHTS
 from ..query.rank import Weighting
 from . import format as fmt
 
@@ -159,7 +158,7 @@ class Runtime:
 
 
 def block_bound(
-    block: Block, df: int, n: int, avg_wlen: float, weights: tuple[float, ...] = FIELD_WEIGHTS
+    block: Block, df: int, n: int, avg_wlen: float, scoring: Scoring = DEFAULT_SCORING
 ) -> float:
     """The largest BM25F contribution any posting in `block` can make.
 
@@ -178,6 +177,7 @@ def block_bound(
     bound UP. A bound that is too high skips fewer blocks; a bound that is too
     low loses documents. Only the first is possible here.
     """
+    weights = scoring.weights
     wtf = 0.0
     for i, value in enumerate(block.mx):
         if value:
@@ -188,8 +188,9 @@ def block_bound(
     for i, value in enumerate(block.mnw):
         if value:
             mnw += weights[i] * value
-    denom = wtf + K1 * (1 - B + B * mnw / avg_wlen)
-    return idf(df, n) * wtf * (K1 + 1) / denom
+    k1, b = scoring.k1, scoring.b
+    denom = wtf + k1 * (1 - b + b * mnw / avg_wlen)
+    return idf(df, n) * wtf * (k1 + 1) / denom
 
 
 def is_fresh(root: Path) -> bool:
@@ -240,6 +241,7 @@ def accel_candidates(
     *,
     skipping: bool = True,
     weighting: "Weighting | None" = None,
+    scoring: Scoring = DEFAULT_SCORING,
 ) -> tuple[list[dict], dict[str, int], Corpus]:
     """Candidate records, `df`, and the corpus statistics — the scan's contract.
 
@@ -250,9 +252,25 @@ def accel_candidates(
     if weighting is None:
         weighting = Weighting()
     stats = runtime.stats
+    if "total_flen" not in stats:
+        # A `fux.runtime.v3` plane, built before the field weights became
+        # tunable. `is_fresh` already refuses it, so the CLI degrades to the
+        # scan path rather than arriving here — this is the direct-call door,
+        # and a KeyError would name nothing a consumer can act on.
+        raise FuxError(
+            "the accelerator was built by an older fux (no `total_flen` in "
+            "stats.json) -- run `fux build` to rebuild the derived plane. "
+            "Nothing committed changed; the runtime is disposable"
+        )
+    # `total_flen` is the five RAW per-field token-count totals; the weights
+    # are applied here, at query time, exactly as `scan.py` applies them. The
+    # plane stored a pre-weighted `total_wlen` until 2026-08-24, which meant a
+    # `tune.toml` field weight moved `avg_wlen` on the scan path and not on
+    # this one — the same corpus, two `avg_wlen`s, and a differential-law break
+    # that a rebuild would have been needed to repair.
     corpus = Corpus(
         n=stats["n"],
-        total_wlen=stats["total_wlen"],
+        total_wlen=derive_wlen(list(stats["total_flen"]), scoring),
         newest_mtime=stats.get("newest_mtime", 0),
     )
     if corpus.n == 0:
@@ -273,7 +291,10 @@ def accel_candidates(
     read_blocks: dict[str, set[int]] = {h: set() for h in query_hashes}
 
     for term in order:
-        if skipping and hits and _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen, weighting):
+        if skipping and hits and _cannot_reach(
+            runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
+            weighting, scoring,
+        ):
             break
         for block in blocks[term]:
             read_blocks[term].add(block.block_no)
@@ -303,7 +324,10 @@ def accel_candidates(
     return candidates, df, corpus
 
 
-def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen, weighting=None) -> bool:
+def _cannot_reach(
+    runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
+    weighting=None, scoring: Scoring = DEFAULT_SCORING,
+) -> bool:
     """True when no unseen document can enter the top `top`.
 
     `theta` is the k-th best *weighted* score over the candidates gathered so
@@ -326,12 +350,15 @@ def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, a
         term_blocks = blocks[term]
         if not term_blocks:
             continue
-        ceiling += max(block_bound(b, df[term], corpus.n, avg_wlen) for b in term_blocks)
+        ceiling += max(block_bound(b, df[term], corpus.n, avg_wlen, scoring) for b in term_blocks)
 
     if not weighting.trivial:
         ceiling *= weighting.maximum
 
-    theta = _kth_score(hits, docs, [h for h in order if h in opened], df, corpus, top, avg_wlen, weighting)
+    theta = _kth_score(
+        hits, docs, [h for h in order if h in opened], df, corpus, top, avg_wlen,
+        weighting, scoring,
+    )
     if theta is None:
         return False
     # Rounding-aware: `rank()` compares round(score, 9), so a bound that merely
@@ -339,7 +366,10 @@ def _cannot_reach(runtime, blocks, df, opened, order, hits, docs, corpus, top, a
     return round(ceiling, 9) < round(theta, 9)
 
 
-def _kth_score(hits, docs, opened_order, df, corpus, top, avg_wlen, weighting=None) -> float | None:
+def _kth_score(
+    hits, docs, opened_order, df, corpus, top, avg_wlen,
+    weighting=None, scoring: Scoring = DEFAULT_SCORING,
+) -> float | None:
     """The `top`-th best **weighted** score among current candidates.
 
     `None` when there are fewer than `top` candidates.
@@ -360,7 +390,9 @@ def _kth_score(hits, docs, opened_order, df, corpus, top, avg_wlen, weighting=No
     scores = []
     for docidx, terms in hits.items():
         record_terms = {term: list(tf) for term, tf in terms.items()}
-        s = score_record(record_terms, docs[docidx]["flen"], opened_order, df, corpus.n, avg_wlen)
+        s = score_record(
+            record_terms, docs[docidx]["flen"], opened_order, df, corpus.n, avg_wlen, scoring
+        )
         if not weighting.trivial:
             s *= weighting.of(docs[docidx])
         scores.append(s)
@@ -402,6 +434,7 @@ def ask(
     archived_weight: float = 1.0,
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
+    scoring: Scoring = DEFAULT_SCORING,
 ) -> list[AskResult]:
     """The accelerated `ask`. Identical output to `query.scan.ask`, by law."""
     query_hashes = query_term_hashes(query)
@@ -413,10 +446,10 @@ def ask(
     if weighting is None:
         weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
     candidates, df, corpus = accel_candidates(
-        runtime, query_hashes, top, skipping=skipping, weighting=weighting
+        runtime, query_hashes, top, skipping=skipping, weighting=weighting, scoring=scoring
     )
     return rank(
         candidates, query_hashes, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
-        weighting=weighting,
+        weighting=weighting, scoring=scoring,
     )

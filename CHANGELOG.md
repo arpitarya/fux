@@ -8,6 +8,63 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.1] - 2026-08-24
+
+**ADR-TUNE is built.** The knobs that decide what you read first have a home.
+
+### Added
+
+- **`.fux/tune.toml` — the tunables file.** Committed, written once by
+  `fux setup`, and **never rewritten by fux**. Absent, empty, or every key
+  commented out means every default, so `$0` stays `$0`. Seven tables:
+  `[bm25f]` (`k1`, `b`, five field weights), `[ranking]`, `[dense]`,
+  `[fuse]`, `[graph]`, `[refer]`, and `[priority]`.
+  [ADR-TUNE](docs/adr/0038_tuning.md).
+- **Per-source priority, in either direction.** A multiplicative weight keyed
+  by a source entry exactly as it appears in `.fux/sources/`. Anything
+  unlisted is `1.0`; when two entries match, the **longer** one wins. Fux
+  states the cost and refuses exactly two values: a negative weight (it
+  inverts the ordering) and zero (that is exclusion, and the `!` prefix in
+  `.fux/sources/` already owns it).
+- **`--no-tune`** on the read verbs — the *is it me or the config?* switch. It
+  does not read the file at all, so a malformed tune file does not stop it.
+- **`fux tune`** — prints the tunables file for you to paste. It never writes;
+  there is no TOML writer anywhere in fux, which is what keeps the
+  never-rewritten promise cheap to hold.
+
+### Changed
+
+- **Breaking: `[ranking]` and `[dense]` are retired from `fux.toml`.** They
+  moved to `.fux/tune.toml` whole. The old tables now raise an error naming
+  the new home rather than being silently ignored — a key that is quietly
+  not read is worse than one that errors, because you believe your setting is
+  in force. Same shape as the `middleware` -> `fetcher` rename.
+- **`RUNTIME_SCHEMA` -> `fux.runtime.v4`.** `.fux/runtime/stats.json` stores
+  `total_flen`, the five **raw** per-field token-count totals, where it used
+  to store a pre-weighted `total_wlen`. Run `fux build` once; nothing
+  committed changed and the runtime plane is disposable. An older plane is
+  refused with a message that says so rather than a `KeyError`.
+- `k1`, `b` and the five field weights are carried as one `Scoring` object
+  through the scorer and the accelerator's pruning bound. They appear on both
+  sides of one fraction, and passing them separately is what makes it possible
+  to reweight a numerator against a denominator computed at the old weights.
+
+### Fixed
+
+- **`fux doctor` warned about files fux itself writes.** `.fux/` had no
+  category for a committed *file* — only directories — so `tune.toml` (and
+  `enrich/`) reported as undeclared entries. Found by checking the claim
+  instead of asserting it.
+
+### Notes
+
+- **The four new records still ship `status: proposed`.** Built is not
+  ratified, and the register carries two columns for exactly that reason.
+- Two `[fuse]` keys are validated but no CLI path reads them today, and
+  `explain --no-tune` is inert. Both are stated in ADR-TUNE rather than left
+  to be discovered.
+
+
 ## [2.0.0-alpha.0] - 2026-08-24
 
 **A pre-release.** The record shape and analyzer changed, so this ships

@@ -24,15 +24,27 @@ the refer plane's own honest `unverified` verdict (`refer/source.py`'s
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ..errors import FuxError
 from ..refer import Bundle, Policy, refer
 from ..refer.freshness import ALWAYS
 
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from ..tune import Tune
+
 __all__ = ["answer_via_refer"]
 
 
-def answer_via_refer(root: Path, query: str, doc_id: str, loc: str, sha: str) -> Bundle | None:
+def answer_via_refer(
+    root: Path,
+    query: str,
+    doc_id: str,
+    loc: str,
+    sha: str,
+    *,
+    tune: "Tune | None" = None,
+) -> Bundle | None:
     """Fetch, verify, re-score and assemble the single winning citation.
 
     Returns `None` (never raises) when refer produced nothing usable — an
@@ -40,10 +52,32 @@ def answer_via_refer(root: Path, query: str, doc_id: str, loc: str, sha: str) ->
     working tree — so the caller can fall back to the index-only path
     rather than answer with nothing. `sha` is the record's *indexed* sha,
     compared against what is actually fetched to decide `current`/`stale`.
+
+    `tune` is the caller's already-loaded `.fux/tune.toml`; `None` means the
+    refer plane's own defaults. **It is passed in rather than loaded here on
+    purpose** — `cmd_answer` has already read the file to rank with, and a
+    second read could pick up a different one, producing an answer assembled
+    under weights that did not choose it. It also keeps `--no-tune` a single
+    decision made once, instead of a flag two modules each have to honour.
     """
     fetch, close = _load_fetcher(root, doc_id, loc)
+    # Absent, rather than defaulted here: `refer()` owns what these mean when
+    # nobody has said, and restating its four defaults in this module would be
+    # a second copy that no test compares against the first.
+    sizes = (
+        {}
+        if tune is None
+        else {
+            "budget": tune.budget,
+            "per_doc_fraction": tune.per_doc_fraction,
+            "min_passage_bytes": tune.min_passage_bytes,
+            "max_passage_bytes": tune.max_passage_bytes,
+        }
+    )
     try:
-        bundle = refer(root, query, [(doc_id, loc, sha)], policy=Policy(mode=ALWAYS), fetcher=fetch)
+        bundle = refer(
+            root, query, [(doc_id, loc, sha)], policy=Policy(mode=ALWAYS), fetcher=fetch, **sizes
+        )
     finally:
         close()
     return bundle if bundle.assembled.citations else None

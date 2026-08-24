@@ -111,36 +111,45 @@ def test_a_missing_dirs_list_fails_loudly_naming_setup(tmp_path):
         source_dirs(tmp_path, load(tmp_path).dirs_file)
 
 
-# -- ranking: the archived demotion weight (ADR-ARCHIVED-CONTENT decision 6) ------
+# -- the ranking keys left this file (ADR-TUNE decision 7) ------------------
+#
+# `[ranking]` and `[dense]` moved to `.fux/tune.toml` on 2026-08-24. Their
+# validation moved with them (`tests/test_tune.py`); what stays here is the
+# refusal, because a silently ignored key is worse than one that errors — the
+# reader believes their setting is in force. Same shape as the
+# `middleware` -> `fetcher` rename below.
 
 
-def test_archived_weight_defaults_to_1(tmp_path):
-    _write(tmp_path, "[sources]\n")
-    assert load(tmp_path).archived_weight == 1.0
-
-
-def test_archived_weight_is_configurable(tmp_path):
+def test_a_retired_ranking_table_names_its_new_home(tmp_path):
     _write(tmp_path, "[sources]\n[ranking]\narchived_weight = 0.5\n")
-    assert load(tmp_path).archived_weight == 0.5
-
-
-def test_archived_weight_rejects_a_negative_number(tmp_path):
-    _write(tmp_path, "[sources]\n[ranking]\narchived_weight = -1\n")
-    with pytest.raises(FuxError, match="archived_weight must be a non-negative number"):
+    with pytest.raises(FuxError, match=r"\[ranking\] moved to \.fux/tune\.toml"):
         load(tmp_path)
 
 
-def test_archived_weight_rejects_a_non_number(tmp_path):
-    _write(tmp_path, '[sources]\n[ranking]\narchived_weight = "half"\n')
-    with pytest.raises(FuxError, match="archived_weight must be a non-negative number"):
+def test_a_retired_dense_table_names_its_new_home(tmp_path):
+    _write(tmp_path, '[sources]\n[dense]\nmode = "gated"\n')
+    with pytest.raises(FuxError, match=r"\[dense\] moved to \.fux/tune\.toml"):
         load(tmp_path)
 
 
-def test_archived_weight_rejects_a_bool(tmp_path):
-    """`bool` is an `int` subclass in Python — `true`/`false` are not numbers."""
-    _write(tmp_path, "[sources]\n[ranking]\narchived_weight = true\n")
-    with pytest.raises(FuxError, match="archived_weight must be a non-negative number"):
+def test_an_empty_retired_table_is_refused_too(tmp_path):
+    """An empty `[ranking]` is still a reader believing this file ranks.
+
+    Refusing only tables that carry keys would let `[ranking]` sit in a
+    consumer's config forever, silently doing nothing, which is the exact
+    outcome the retirement exists to prevent.
+    """
+    _write(tmp_path, "[sources]\n[ranking]\n")
+    with pytest.raises(FuxError, match=r"\[ranking\] moved to \.fux/tune\.toml"):
         load(tmp_path)
+
+
+def test_config_no_longer_carries_the_ranking_fields(tmp_path):
+    """The fields are gone, not merely unread — two homes is decision 1's rot."""
+    _write(tmp_path, "[sources]\n")
+    config = load(tmp_path)
+    for gone in ("archived_weight", "superseded_weight", "dense_mode", "rerank_weight"):
+        assert not hasattr(config, gone), f"{gone} should have moved to tune.toml"
 
 
 # -- the archived directory set (ADR-ARCHIVED-CONTENT decision 6's input) ---------
