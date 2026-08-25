@@ -78,12 +78,41 @@ Proposed wording, for acceptance or rejection rather than as a decision taken:
 > writes — the run states who authored the artifact and what they had read, or
 > the number is an upper bound and must be labelled one.
 
-## Agent-closable now, if 1 is ruled either way
+## ~~Agent-closable~~ — DONE 2026-08-24, and the answer is not ambiguous
 
-- **A second blind author** separates contamination from craft, which is the
-  one thing this run cannot do. If the second lands near `33`, contamination is
-  the explanation; near `40`, the first blind author was simply worse at the
-  task. Cheap: the protocol is written down in the run's report.
+**A second blind author was run.** The prediction was written before it:
+*"if the second lands near `33`, contamination is the explanation; near `40`,
+the first blind author was simply worse at the task."*
+
+**It landed at `31`.**
+[The run](../regression/2026-08-24-blind-enrichment-second-author/report.md).
+
+| arm | pass | net | broke |
+|---|---|---|---|
+| no enrichment | 32/50 | baseline | — |
+| blind #1 | 33/50 | **+1** | 2 |
+| **blind #2** | **31/50** | **−1** | 2 |
+| contaminated | 41/50 | +9 | **0** |
+
+**And the decisive evidence is not the score.** Both blind authors broke the
+**same two queries**, `q015` and `q021`; the contaminated author broke neither.
+Two independent agents with different stated strategies producing *identical*
+casualties is a property of the task, not of craft. **The confound is closed.**
+
+**The mechanism is one word.** `q015` asks *"what is the **current** decision
+for east west traffic"* and wants the current ADR. All three authors correctly
+marked the superseded ADR as retired — but the blind ones wrote
+*"no-longer-**current**"* and *"replaced by the **current** decision"*, while
+the contaminated one wrote *"retired and replaced"* and never used the token.
+**BM25F cannot see negation**: honest metadata about a retired document ranks it
+as a live one. The blind authors wrote the better documentation and were
+punished for a token collision.
+
+⚠ **Fux's own answer to this is inert on the fixture.** `[ranking]
+superseded_weight` demotes a document another declares it supersedes — but
+`superseded_ids` reads a **frontmatter** `supersedes:` key (*declared, never
+inferred*), and the playground declares its supersession in prose only. The
+flag is never set, so the prior has never been graded by anything.
 
 ## Not in scope
 
@@ -97,4 +126,10 @@ direction, and the golden set that would test it does not exist.
 - [ ] ADR-RERANK veto 1: reopened, or confirmed standing with the new number
       named in the confirmation.
 - [ ] The blind-authorship rule is accepted into ADR-RS, rewritten, or refused.
-- [ ] If either ruling wants it: a second blind author, filed as a new run.
+- [x] ~~A second blind author~~ — **done 2026-08-24**, `31/50`, and both blind
+      authors break the same two queries. The confound is closed.
+- [ ] Optional, and NOT a precondition for either ruling: make the playground
+      declare its supersession in frontmatter so `superseded_weight` is
+      exercised at all. ⚠ It re-shas ADR-0019 and stales every arm's
+      enrichment for that document — do it once, deliberately, outside a
+      comparison.

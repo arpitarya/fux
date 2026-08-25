@@ -30,6 +30,54 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-24 — the second blind author: the confound is closed, and the mechanism is one word  ·  Cowork
+
+- **Asked:** *"continue."* The one thing the re-grade named as agent-closable
+  was a second blind author, because it was the only way to separate
+  contamination from authorship craft.
+- **Did:** ran it. Same protocol, fresh agent, same prohibitions.
+
+  | arm | pass | net | broke |
+  |---|---|---|---|
+  | no enrichment | 32/50 | baseline | - |
+  | blind #1 | 33/50 | **+1** | 2 |
+  | **blind #2** | **31/50** | **-1** | 2 |
+  | contaminated | 41/50 | +9 | **0** |
+
+  The prediction was written before the run: *near 33 means contamination, near
+  40 means the first author was simply worse.* **It landed at 31.**
+- **The decisive evidence is not the score.** **Both blind authors broke the
+  SAME two queries** - `q015` and `q021` - and the contaminated author broke
+  neither. Two independent agents with different stated strategies producing
+  *identical* casualties is a property of the task, not of craft.
+- **The mechanism, and it is one word.** `q015` asks *"what is the CURRENT
+  decision for east west traffic"* and wants the current ADR. All three authors
+  correctly recorded that the other ADR is retired - but the blind ones wrote
+  *"no-longer-current"* and *"replaced by the current decision"*, while the
+  contaminated one wrote *"retired and replaced"* and never used the token.
+  **BM25F cannot see negation.** Honest metadata about a retired document ranks
+  it as a live one. **The blind authors wrote the better documentation and were
+  punished for a token collision** - which reframes the contaminated arm's edge
+  as largely what it WITHHELD rather than what it wrote.
+- **A diagnostic was attempted and abandoned, and is reported as such.** Fux's
+  own answer to this is `[ranking] superseded_weight` - and it is **inert on
+  the fixture**: `superseded_ids` reads a frontmatter `supersedes:` key
+  (*declared, never inferred*) and the playground declares its supersession in
+  prose only, so the flag is never set. Adding the key changes the document's
+  sha, which stales every arm's enrichment for it (the contaminated arm fell
+  41 -> 35 on that alone). Reverted, and all four headline numbers re-verified.
+  ⚠ Disclosed in the run: that diagnostic was designed by someone who had by
+  then read `q015`.
+- **Decided / open:**
+  - **W-78 now carries `n = 2` and a demonstrated mechanism** rather than one
+    sample and a caveat. Both rulings are still Arpit's and neither was taken.
+  - The three ways out of the negation problem are named in the analysis, and
+    the tempting one - forbid currency vocabulary in enrichment - is the wrong
+    one: it makes the documentation less true to suit a scorer.
+- **Next:** W-78's two rulings, then W-77's four.
+
+---
+
 ## 2026-08-24 — the blind enrichment re-grade: +1, not +10  ·  Cowork
 
 - **Asked:** the second half of *"4 and 5 look good implement it now"* — run the

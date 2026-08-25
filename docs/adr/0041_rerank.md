@@ -229,8 +229,45 @@ covers deterministically and for free.
 > `onnxruntime` is still not byte-identical across x86-64 and arm64, so the
 > cross-encoder remains refused on determinism whatever happens to condition 1.
 >
-> ⚠ **Scope:** N = 1 blind author, and authorship quality is an unseparated
-> confound. The run says so in its own §Scope.
+> ⚠ **Scope, as it stood on the day:** N = 1 blind author, and authorship
+> quality was an unseparated confound.
+
+> ## Amended again 2026-08-24 — the confound is CLOSED, and against enrichment
+>
+> A **second blind author** was run under the same prohibitions
+> ([run](../../work/regression/2026-08-24-blind-enrichment-second-author/report.md)).
+> The prediction was written before it: *near 33 means contamination, near 40
+> means the first author was simply worse.* **It landed at 31.**
+>
+> | arm | pass | net | broke |
+> |---|---|---|---|
+> | no enrichment | 32/50 | baseline | — |
+> | blind #1 | 33/50 | **+1** | 2 |
+> | **blind #2** | **31/50** | **−1** | 2 |
+> | contaminated | 41/50 | +9 | **0** |
+>
+> **Two blind authors, mean zero.** And the decisive evidence is not the score:
+> **both broke the same two queries** while the contaminated author broke
+> neither. Identical casualties from two independent agents with different
+> stated strategies is a property of the task, not of craft.
+>
+> **The mechanism belongs in THIS record, because it is an argument for the
+> thing this record refused.** `q015` asks *"what is the **current** decision
+> for east west traffic"*. All three authors correctly marked the other ADR
+> retired — the blind ones as *"no-longer-**current**"* and *"replaced by the
+> **current** decision"*, the contaminated one as *"retired and replaced"*.
+> **BM25F cannot see negation**, so the honest phrasing hands the superseded
+> document the query's own word.
+>
+> **A cross-encoder reads word order and would separate them.** That is not an
+> argument that veto 1 should fall — condition 2 is untouched and
+> `onnxruntime` is still not byte-identical across architectures — but it is
+> the first evidence that the deferred capability targets a failure this
+> corpus actually has, rather than one it was assumed to have.
+>
+> **Still not reopened here.** [W-78](../../work/OPEN-WORK.md) is where it is
+> ruled, and it now carries `n = 2` and a demonstrated mechanism rather than
+> one sample and a caveat.
 
 **Veto 2 — the reranker must never change the membership of a result set.**
 

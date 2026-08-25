@@ -1,0 +1,22 @@
+  FAIL   q005: wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/postmortem-checkout-outage.md']
+  FAIL   q006: wanted docs/postmortem-checkout-outage.md at rank <= 1, got absent | top: ['docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md', 'docs/guide-oncall-rota.md']
+  FAIL   q007: wanted docs/reference-deployment-tiers.md at rank <= 1, got 3 | top: ['docs/guide-onboarding.md', 'docs/reference-calderctl.md', 'docs/reference-deployment-tiers.md']
+  FAIL   q012: wanted docs/reference-calderctl.md at rank <= 2, got 4 | top: ['docs/guide-oncall-rota.md', 'docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md']
+  FAIL   q015: wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']
+  FAIL   q017: wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']
+  FAIL   q018: wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']
+  FAIL   q019: wanted docs/adr-0019-calder-gateway.md at rank <= 2, got absent | top: ['docs/runbook-mesh-rollback-legacy.md', 'docs/policy-data-retention.md', 'docs/adr-0007-helix-mesh.md']
+  FAIL   q021: wanted docs/reference-deployment-tiers.md at rank <= 2, got 3 | top: ['docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']
+  FAIL   q027: wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']
+  FAIL   q028: wanted docs/runbook-gateway-rollback.md at rank <= 1, got 5 | top: ['docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-calderctl.md']
+  FAIL   q029: wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got absent | top: ['docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-calderctl.md']
+  FAIL   q032: wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/runbook-mesh-rollback-legacy.md', 'docs/adr-0019-calder-gateway.md', 'docs/policy-data-retention.md']
+  FAIL   q034: wanted docs/guide-oncall-rota.md at rank <= 2, got 3 | top: ['docs/reference-deployment-tiers.md', 'docs/guide-onboarding.md', 'docs/guide-oncall-rota.md']
+  FAIL   q035: wanted docs/guide-onboarding.md at rank <= 1, got 2 | top: ['docs/guide-oncall-rota.md', 'docs/guide-onboarding.md', 'docs/adr-0019-calder-gateway.md']
+  FAIL   q043: wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']
+  FAIL   q044: wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md']
+  FAIL   q049: wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']
+  FAIL   q050: wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']
+
+FAIL 19 · pass 31
+FAIL — 19 of 50
