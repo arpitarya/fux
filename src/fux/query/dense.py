@@ -17,6 +17,17 @@ why `--hybrid` shipped off. The per-chunk unit is what should fix that — a
 them — but *should* is not a number, and W-76's Phase 7 gate says so
 explicitly:
 
+> RUN 2026-08-24, and it FAILED: **0 fixed / 2 broken**, at every setting that
+> fires. `[dense] mode` stays `off`.
+> [DENSE-CHUNK](../../../work/regression/2026-08-24-dense-lane-gate/VERDICT.md).
+>
+> **The cause is this module's input, not this module.** `embed/model.py`
+> mean-pools static token vectors -- no layers, no attention -- so the dense
+> lane is as order-blind as BM25F, and `always` mode breaks the one
+> current-vs-superseded query a semantic lane was most expected to rescue. The
+> committed vectors stay: they cost nothing while `mode = off`, and a better
+> pooling reuses them unchanged.
+>
 > the 3-fixed/9-broken result must become **>= 3-fixed / 0-broken**
 
 Until that runs on the 50 goldens, `[dense] mode` defaults to `off` and the

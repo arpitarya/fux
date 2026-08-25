@@ -30,6 +30,55 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-24 — asked to turn the dense lane on; ran its gate instead, and it failed  ·  Cowork
+
+- **Asked:** *"I like all the options a, b, c, and d. And on c, let's turn it
+  on."* Then, after the result: *"we need to remove the dead code. added to the
+  work document."*
+- **Did NOT turn it on.** `[dense] mode` ships `off` behind a **pre-registered**
+  bar (`>= 3-fixed / 0-broken`, in `query/dense.py` and ADR-CLI). The answer to
+  "turn it on" is to run the bar.
+
+  | setting | pass | fixed | broke |
+  |---|---|---|---|
+  | `off` (control) | 32/50 | - | - |
+  | `gated` t=0.5 | 32/50 | 0 | 0 (never fires) |
+  | `gated` t=8.0 | 31/50 | 0 | 1 |
+  | `always` w=0.25 | 30/50 | 0 | **2** |
+  | `always` w=0.5 | 30/50 | 0 | **2** |
+
+  **0 fixed at every setting.** Filed as **DENSE-CHUNK, FAIL**.
+- **The cause is structural, and it is the finding.** `embed/model.py::embed`
+  tokenizes, looks each token up in a packed table, sums, divides. **No
+  transformer layers, no attention.** The dense lane is a bag of word-vectors
+  averaged — **as order-blind as BM25F**. `always` mode breaks **`q015`**, the
+  current-vs-superseded query a semantic lane was most expected to rescue.
+- **Phase 7 was right about the unit and wrong about the constraint.** Per-chunk
+  IS a better unit than per-document. It was not the binding one. *Changing the
+  granularity of an averaging operation does not change what averaging can
+  represent.*
+- ⚠ **The convergence, which is strategically the important part.** Three of the
+  four ways to fix `q015` — rebuild the dense lane, the deferred cross-encoder,
+  per-chunk lexical (option A does NOT fix it) — need to read **word order** at
+  query time. That is the one capability fux has refused twice on cross-machine
+  determinism. **Fux cannot currently represent negation, and every escape route
+  runs through the same locked door.** Recorded as an observation; the
+  determinism argument that locked it is untouched and is a good argument.
+- **A self-correction, recorded rather than quietly fixed.** I called
+  `[dense] gated` dead code. **It is not.** It did not fire at `threshold` 0.5
+  or 2.0 because the corpus's top lexical score is ~8.08 and the gate is
+  `score < threshold`; at 8.0 it fires, at 100 it fires on everything. "Delete
+  the dead code" was already being written down when it turned out not to be
+  dead. W-79 says so at the top.
+- **Filed W-79** (`agent`): `query/hybrid.py` is off the live path, its two
+  `[fuse]` tune keys are settable-validated-unreachable, and
+  `explain --no-tune` is inert. The ruling owed is delete-or-wire-up.
+  ⚠ Deleting the `[fuse]` keys is a **closed-key-set change** — an amendment to
+  ADR-TUNE, not a tidy-up.
+- **Next:** W-78's two rulings; W-79's one. Then W-77, W-74, W-75.
+
+---
+
 ## 2026-08-24 — the second blind author: the confound is closed, and the mechanism is one word  ·  Cowork
 
 - **Asked:** *"continue."* The one thing the re-grade named as agent-closable

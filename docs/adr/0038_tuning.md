@@ -86,7 +86,11 @@ timestamp: 2026-08-22T00:00:00Z
 > **Two things are settable but not yet reachable, and saying so is the point:**
 >
 > 1. **`[fuse] rrf_k` and `dense_width` are validated and threaded, but no CLI
->    invocation reads them.** `--hybrid` routes through `query/dense.py`'s
+>    invocation reads them.** *(Filed 2026-08-24 as
+>    [W-79](../../work/open/W-79-remove-the-dead-fusion-code.md), on Arpit's
+>    instruction to remove the dead code. Deleting them is a **closed-key-set
+>    change** and therefore an amendment to this record, not a tidy-up —
+>    decision 5 says so.)* `--hybrid` routes through `query/dense.py`'s
 >    gated fusion, which uses neither; their only consumer is `hybrid_ask`,
 >    reached solely from `tools/differential/playground_grade.py`. They are
 >    keys to a lane that has not landed.
