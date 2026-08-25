@@ -126,9 +126,15 @@ def test_a_retired_ranking_table_names_its_new_home(tmp_path):
         load(tmp_path)
 
 
-def test_a_retired_dense_table_names_its_new_home(tmp_path):
+def test_a_dense_table_names_its_REMOVAL_not_a_forwarding_address(tmp_path):
+    """`[dense]` was retired twice, and the second time it stopped existing.
+
+    2026-08-24 moved it to `tune.toml`; 2026-08-25 deleted the lane outright.
+    A `fux.toml` old enough to still carry it would otherwise be forwarded to a
+    table that is also gone, which is a worse answer than no answer.
+    """
     _write(tmp_path, '[sources]\n[dense]\nmode = "gated"\n')
-    with pytest.raises(FuxError, match=r"\[dense\] moved to \.fux/tune\.toml"):
+    with pytest.raises(FuxError, match="REMOVED on 2026-08-25"):
         load(tmp_path)
 
 

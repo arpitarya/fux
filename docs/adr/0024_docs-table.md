@@ -23,6 +23,17 @@ timestamp: 2026-08-19T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — a citation repointed after the dense lane was deleted
+>
+> This record cited `src/fux/derive/dense.py` for the doc table's parallel
+> `codes` array. **That module was deleted** with the embedding model (Arpit,
+> 2026-08-25), and so was the array: `_read_committed` no longer produces one
+> and `build()` no longer has a `codes` phase.
+>
+> The citation is removed rather than repointed at the archive, per
+> archive-is-not-evidence. **The doc table itself is unchanged** — same
+> `DOCS_FIELDS`, same ordering, same freshness contract.
+
 ## §1 — For humans
 
 `docs.jsonl` is the derived plane's doc table: one JSON object per line,
@@ -215,7 +226,7 @@ the same committed input, verified the same way as `manifest.json` and
   (`_write_docs()`, `_read_committed()`).
 - Consumers of the `docidx` contract —
   [`src/fux/derive/format.py`](../../src/fux/derive/format.py) (the postings
-  entry layout), [`src/fux/derive/dense.py`](../../src/fux/derive/dense.py)
+  entry layout), `src/fux/derive/dense.py` (deleted 2026-08-25)
   (`codes.jsonl`'s array order).
 - The parent record — [ADR-T1-ACCELERATOR](0011_accelerator.md).
 
@@ -249,7 +260,7 @@ evidence.*
 **Code**
 
 - [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
-- [`src/fux/derive/dense.py`](../../src/fux/derive/dense.py)
+- `src/fux/derive/dense.py` (deleted 2026-08-25)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
 - [`src/fux/query/bm25f.py`](../../src/fux/query/bm25f.py)
 - [`src/fux/query/rank.py`](../../src/fux/query/rank.py)

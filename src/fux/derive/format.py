@@ -81,7 +81,15 @@ BLOCK_SIZE = 128
 #: field weights became `tune.toml` keys, so a weighted total stored here would
 #: be a derived value that goes stale the moment a knob moves — and only on the
 #: accelerator path, which is a differential-law break rather than a slow query.
-RUNTIME_SCHEMA = "fux.runtime.v4"
+#: v5 (2026-08-25, Arpit): `codes.jsonl` is gone. The dense lane and the
+#: embedding model that fed it were deleted, so the plane no longer carries a
+#: Hamming prefilter. **The bump is not strictly required for correctness** —
+#: nothing reads the file any more, so a stale v4 plane could not diverge — but
+#: a v4 plane leaves an orphan `codes.jsonl` on disk that no rebuild removes,
+#: and this project has already been bitten once by trusting a schema string
+#: that someone forgot to move (see `DOCS_FIELDS` below). Refusing the plane
+#: costs one rebuild of a disposable directory.
+RUNTIME_SCHEMA = "fux.runtime.v5"
 
 #: v3 (W-76 Phase 1 record half): `mx` and `mnw` become PER-FIELD arrays.
 #:
@@ -123,7 +131,11 @@ POSTINGS_DIR = "postings"
 #: Files whose bytes must be identical across two builds of the same index.
 #: `stamp.json` is deliberately excluded — it carries filesystem mtimes, which
 #: are the fast staleness check and are not reproducible by construction.
-DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MANIFEST_NAME, "codes.jsonl", "graph.json")
+#:
+#: `codes.jsonl` left this tuple on 2026-08-25 with the dense lane. A `v4`
+#: plane still has the file on disk; `RUNTIME_SCHEMA` moved to `v5` in the same
+#: change so such a plane is refused and rebuilt rather than read past.
+DETERMINISTIC_FILES = (DOCS_NAME, STATS_NAME, MANIFEST_NAME, "graph.json")
 
 
 def runtime_dir(root: Path) -> Path:

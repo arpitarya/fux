@@ -129,7 +129,7 @@ solved, and nothing has yet made it worth building the fix.
 - [`docs/adr/0002_cli-surface.md`](../../docs/adr/0002_cli-surface.md)
   §"`fux ask --hybrid`" — the worked `--explain` example showing the padding
   failure
-- [`src/fux/query/dense.py`](../../src/fux/query/dense.py) — the live fusion
+- `src/fux/query/dense.py` (deleted 2026-08-25) — the live fusion
   `--hybrid` runs today; a multiplicative boost on the BM25F score, not the
   RRF lane this proposal was originally written against (deleted by W-79,
   2026-08-26 — see [ADR-ASK](../../docs/adr/0004_ask.md) decision 9's

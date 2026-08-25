@@ -25,6 +25,27 @@ timestamp: 2026-08-19T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the bundled embedding is gone
+>
+> This record cited `src/fux/embed/__init__.py` and `src/fux/embed/fuxvec.py`.
+> **The whole package was deleted** on Arpit's instruction (2026-08-25),
+> together with the 7.9 MB `model.bin` it shipped.
+>
+> **Enrichment is untouched, and the distinction matters.** `fux enrich` never
+> called this model and never called any model —
+> [ADR-ENRICH](0040_enrich.md) decision 1 refuses to put a model call under
+> `src/`, which is exactly why enrichment survives the removal intact. What
+> died is the *dense retrieval lane*: a vector the engine computed itself, at
+> ingest, to rank with. Enrichment is pinned **text**, written by an agent
+> outside fux and tokenised like any other field.
+>
+> ⚠ **This also closes **W-80** (retired to `archive/open/` in this change; named, not cited)
+> by deletion.** That item was the bundle's provenance defect — live error
+> messages pointing at `tools/distill/distill.py`, which is not in the repo.
+> There is no bundle now, so there is no provenance to be missing. **That is a
+> dissolution, not a fix**, and the difference is recorded rather than claimed
+> as a win.
+
 ## §1 — For humans
 
 `enriched` names what a coding agent — Claude Code, Copilot, Codex, Kiro —
@@ -258,7 +279,7 @@ Recorded so M8 designs against a list rather than a mood. **None is approved.**
   `inferred` to creep back in, which is the exact collision
   [ADR-EXTRACTED](0016_extracted-mode.md) exists to close.
 - **Adopt a vector database for the enriched tier** — rejected long before
-  this record, on L1; see [`src/fux/embed/fuxvec.py`](../../src/fux/embed/fuxvec.py)'s
+  this record, on L1; see `src/fux/embed/fuxvec.py` (deleted 2026-08-25)'s
   module docstring.
 
 ### Reference (required)
@@ -273,7 +294,7 @@ Recorded so M8 designs against a list rather than a mood. **None is approved.**
   [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md), W-38's row.
 - The deterministic counterpart — [ADR-EXTRACTED](0016_extracted-mode.md).
 - The existing dense lane, which is *not* this and needs no model —
-  [`src/fux/embed/`](../../src/fux/embed/__init__.py), measured in
+  `src/fux/embed/` (deleted 2026-08-25), measured in
   [`work/regression/2026-08-12-m2-accelerator/report.md`](../../work/regression/2026-08-12-m2-accelerator/report.md).
 
 ### Veto condition
@@ -316,8 +337,8 @@ evidence.*
 
 **Code**
 
-- [`src/fux/embed/__init__.py`](../../src/fux/embed/__init__.py)
-- [`src/fux/embed/fuxvec.py`](../../src/fux/embed/fuxvec.py)
+- `src/fux/embed/__init__.py` (deleted 2026-08-25)
+- `src/fux/embed/fuxvec.py` (deleted 2026-08-25)
 - [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py)
 
 **Measured evidence**

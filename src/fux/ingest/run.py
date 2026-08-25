@@ -8,14 +8,15 @@ on the rest of the corpus — a new document can resolve a link that dangled
 yesterday — so edges cannot be carried forward. Extraction cannot depend on
 anything but one document's own bytes (that is what `extracted` mode *means*),
 so for a file whose `sha` is unchanged the prior record's `title`, `phrases`,
-`terms`, `wlen` and `code` are reused verbatim.
+`terms` and `flen` are reused verbatim.
 
-That split is worth having because of where the time goes. Profiled at 1 000
-documents, **92 % of a full ingest is `_fuxvec_code`** — the dense embedding —
-and parsing plus edge resolution is under 5 %. Reusing extraction is therefore
-almost all of the win at almost none of the risk, and it is what makes R5
-(a 20-doc commit re-indexed in under a second) reachable at corpus sizes a
-real repository has.
+That split was worth having because of where the time went. Profiled at 1 000
+documents, **92 % of a full ingest was the dense embedding** — and parsing plus
+edge resolution under 5 %. **That cost is gone entirely** (2026-08-25): the
+model and the vector lane were deleted, so extraction is now pure tokenisation.
+Reuse is kept because it is still the difference between re-tokenising a corpus
+and re-tokenising a commit, which is what makes R5 (a 20-doc commit re-indexed
+in under a second) reachable at the sizes a real repository has.
 
 **A delta run is byte-identical to a full run.** Reuse is keyed on the content
 sha and gated on the shard header still matching `store.HEADER`, so an analyzer
@@ -270,8 +271,6 @@ def run(
                     "flen": store_mod.trim(fields.flen),
                 }
             )
-            if fields.vectors:
-                record["vectors"] = list(fields.vectors)
         # Edges last, and never reused: they are the one field the rest of the
         # corpus can change without this document changing.
         record["edges"] = edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename)
@@ -305,8 +304,6 @@ def run(
             # so this costs a write, not a fetch. `write_index` refuses to
             # commit this record without it (`store/writer.py`).
             store_mod.DisplayCache(root).put(record["sha"], doc_id, fields.title)
-        if fields.vectors:
-            record["vectors"] = list(fields.vectors)
         records.append(record)
 
     # `known_ids` is exactly this run's final id set — every parsed document
@@ -397,7 +394,7 @@ _STOP_EVERY = 64
 #: The fields extraction owns — pure functions of one document's own bytes, and
 #: therefore the only ones a delta run may carry forward. `edges` is absent on
 #: purpose, and `sha`/`ver` are recomputed because that is what they are for.
-EXTRACTED_FIELDS = ("title", "phrases", "terms", "flen", "code", "vectors")
+EXTRACTED_FIELDS = ("title", "phrases", "terms", "flen")
 
 
 

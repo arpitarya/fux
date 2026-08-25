@@ -35,6 +35,23 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **`ask --hybrid` is removed from the verb surface** (Arpit, 2026-08-25).
+> The dense lane it opted into no longer exists, along with the embedding
+> model, the committed per-chunk vectors and the `[dense]` tune table.
+>
+> **This is a breaking change to a shipped surface**, and it is recorded as one
+> rather than smoothed over: `--hybrid` shipped in `v2.0.0-alpha.1`. A script
+> passing it now gets argparse's *unrecognized arguments* error rather than a
+> silent no-op, which is the louder of the two and the right one — a flag that
+> quietly stopped doing anything is the failure decision 6's own correction
+> history is made of.
+>
+> **Nothing about the default output moves**, because the flag was off by
+> default and the lane's `mode` defaulted to `off`. Anyone who never typed
+> `--hybrid` sees byte-identical results.
+
 ## §1 — For humans
 
 `fux` has **flat verbs and no subcommand tree**, in groups:

@@ -2,7 +2,7 @@
 type: ADR
 name: ADR-CODES-TABLE
 title: ADR-CODES-TABLE (0025) — codes.jsonl, the dense lane's per-document codes
-description: A docidx-aligned array of base64url FuxVec codes, decoded to ints once per process rather than once per query, feeding a default-off Hamming-distance ranking lane.
+description: "RETIRED 2026-08-25. A docidx-aligned array of base64url FuxVec codes feeding a default-off Hamming-distance ranking lane. The table, the lane, the committed vectors under it and the embedding model above it were all deleted after DENSE-CHUNK measured 0 fixed / 2 broken. Kept as the record of a lane fux built, measured and removed."
 status: proposed
 timestamp: 2026-08-19T00:00:00Z
 ---
@@ -10,7 +10,15 @@ timestamp: 2026-08-19T00:00:00Z
 # ADR-CODES-TABLE — codes.jsonl, the dense lane's per-document codes
 
 - **Name:** `ADR-CODES-TABLE` — cite this everywhere; never cite the number
-- **Status:** proposed
+- **Status:** `proposed`, **and it will never be anything else** — its subject
+  was deleted on 2026-08-25. ⚠ The frontmatter vocabulary is closed to
+  `accepted | proposed | superseded` and **none of the three fits a record whose
+  subject ceased to exist**: nothing supersedes this, and it was never accepted.
+  `proposed` is the literally-true one and is kept deliberately rather than
+  stretched. **Adding a fourth status is a convention change and is Arpit's** —
+  the alternative precedent, deleting the record outright (ADR-T2-SEGMENTS,
+  2026-08-22), forced a contiguous renumber that put two records on number
+  `0022`, and is not repeated here unasked
 - **Supersedes (on acceptance):** nothing — `codes.jsonl`'s shape was
   previously described only inside `derive/dense.py`'s own docstring and
   [ADR-T1-ACCELERATOR](0011_accelerator.md)'s ownership line; this record
@@ -24,6 +32,29 @@ timestamp: 2026-08-19T00:00:00Z
 - **Feature:** `.fux/runtime/codes.jsonl`, the dense/semantic ranking lane
 
 ---
+
+> ## RETIRED 2026-08-25 — the table this record describes no longer exists
+>
+> **`.fux/runtime/codes.jsonl` is gone**, and so is everything that produced or
+> read it: `derive/dense.py`, `query/dense.py`, `embed/chunkvec.py` and the
+> committed per-chunk `vectors` the codes were derived from. Arpit's
+> instruction, 2026-08-25: *"Remove the model."*
+>
+> **This record never reached `accepted`.** It was written on 2026-08-19 to
+> pull the table's shape out of a module docstring for independent reference,
+> and it owned no module. It is retired **as a proposal that was overtaken by
+> the deletion of its subject**, not as a decision that was reversed.
+>
+> **What it still documents, and why it is not deleted outright:** the shape of
+> a dense lane fux actually built, measured, and removed. The measurement is
+> [DENSE-CHUNK](../../work/regression/2026-08-24-dense-lane-gate/VERDICT.md) —
+> **0 fixed / 2 broken at every setting that fires** — and the cause is in this
+> record's own subject matter: sign codes over mean-pooled static token vectors
+> cannot see word order, so the lane was as order-blind as BM25F.
+>
+> ⚠ **`RUNTIME_SCHEMA` moved `fux.runtime.v4` -> `v5`** so a plane built before
+> this change is refused and rebuilt, rather than left with an orphan
+> `codes.jsonl` that nothing removes.
 
 ## §1 — For humans
 
@@ -223,7 +254,7 @@ fused into `ask` only on explicit request — see
 ### Reference (required)
 
 - Generator and consumer —
-  [`src/fux/derive/dense.py`](../../src/fux/derive/dense.py) (`build_codes()`,
+  `src/fux/derive/dense.py` (deleted 2026-08-25) (`build_codes()`,
   `load_codes()`, `nearest_docs()`).
 - The committed `vectors` field this table is derived from —
   [ADR-RECORD](0010_index-record.md), and its Phase-7 amendment.
@@ -265,4 +296,4 @@ evidence.*
 
 **Code**
 
-- [`src/fux/derive/dense.py`](../../src/fux/derive/dense.py)
+- `src/fux/derive/dense.py` (deleted 2026-08-25)

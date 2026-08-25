@@ -28,7 +28,6 @@ divergence that no test would ever catch.
 
 from __future__ import annotations
 
-import base64
 import json
 import re
 from dataclasses import dataclass
@@ -39,7 +38,6 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from ..store import fuxdir
 from ..graph import plane as graph_plane
-from . import dense
 from ..store import TF_FIELDS
 from . import format as fmt
 from .format import _FIELD_COUNT
@@ -66,7 +64,7 @@ class BuildReport:
 def build(root: Path, *, progress=None) -> BuildReport:
     """Materialize `.fux/runtime/` from the committed index."""
     progress = progress or _NULL_PROGRESS
-    docs, codes, postings, stats, shard_stamp, records = _read_committed(root, progress)
+    docs, postings, stats, shard_stamp, records = _read_committed(root, progress)
 
     directory = fuxdir.derived_dir(root, fmt.RUNTIME_DIR)
     postings_directory = directory / fmt.POSTINGS_DIR
@@ -76,12 +74,14 @@ def build(root: Path, *, progress=None) -> BuildReport:
     written = 0
     written += _write_docs(directory, docs)
     written += _write_json(directory / fmt.STATS_NAME, stats)
-    # `dense.build_codes` and `graph_plane.build_plane` offer no per-item
-    # hook, so these two are bookends around the call rather than a live
-    # count — the same honesty tradeoff as the `write` phase in ingest.run.
-    with progress.phase("codes", len(docs)) as p:
-        written += dense.build_codes(directory, docs, codes)
-        p.update(len(docs))
+    # `graph_plane.build_plane` offers no per-item hook, so this is a bookend
+    # around the call rather than a live count — the same honesty tradeoff as
+    # the `write` phase in ingest.run.
+    #
+    # **The `codes` phase is gone** (2026-08-25): it derived a Hamming
+    # prefilter over the committed per-chunk vectors, and both the vectors and
+    # the lane that read them were deleted with the embedding model.
+    #
     # The graph lane's plane, from the same single pass over the shards. It is
     # derived for the reason `plane.py` gives: a community label is global, so
     # committing one would turn a one-file commit into a corpus-wide diff.
@@ -125,11 +125,9 @@ def build(root: Path, *, progress=None) -> BuildReport:
 def _read_committed(root: Path, progress=None):
     """One pass over the committed shards: doc table, postings, statistics.
 
-    Returns `(docs, codes, postings, stats, shard_stamp, records)`. `docs` is sorted by
-    id, so a document's index is stable across builds; `codes` is parallel to
-    it (the dense lane's table, `None` where a record has no `code`); and
-    `postings` maps a term hash to its `(docidx, per-field tf list)` list in
-    docidx order.
+    Returns `(docs, postings, stats, shard_stamp, records)`. `docs` is sorted by
+    id, so a document's index is stable across builds, and `postings` maps a
+    term hash to its `(docidx, per-field tf list)` list in docidx order.
     """
     progress = progress or _NULL_PROGRESS
     records: list[dict] = []
@@ -188,21 +186,6 @@ def _read_committed(root: Path, progress=None):
         for r in records
     ]
 
-    # Per-chunk sign codes, derived from the COMMITTED `int8` vectors
-    # (W-76 Phase 7). One popcount-able int per chunk, cached here so the
-    # query path never decodes 256 components just to reject a document.
-    from ..embed import chunkvec
-
-    codes = [
-        [
-            base64.urlsafe_b64encode(chunkvec.sign_code(chunkvec.decode(v)))
-            .decode("ascii")
-            .rstrip("=")
-            for v in r.get("vectors", ())
-        ]
-        for r in records
-    ]
-
     postings: dict[str, list[tuple[int, list[int]]]] = {}
     for docidx, record in enumerate(records):
         for term, tf in record.get("terms", {}).items():
@@ -218,7 +201,7 @@ def _read_committed(root: Path, progress=None):
     stats = {"n": total_docs, "total_flen": total_flen, "newest_mtime": newest_mtime}
     # `records` rides along so the graph plane needs no second pass over the
     # shards; it is already sorted by id, which is what makes it usable.
-    return docs, codes, postings, stats, shard_stamp, records
+    return docs, postings, stats, shard_stamp, records
 
 
 def _assert_invariants(path: Path, lineno: int, line: bytes, record: dict) -> None:

@@ -373,7 +373,6 @@ the check, so a component cannot stay unowned by accident.
 | `src/fux/derive/` | ADR-T1-ACCELERATOR | T1 build, block maxima, skipping, dense lane |
 | `src/fux/query/` | ADR-ASK | BM25F, scan, rank, fusion — bound by the differential law |
 | `src/fux/query/rerank.py` | ADR-RERANK | proximity reranking — carved out of ADR-ASK's directory-level claim 2026-08-24, most specific wins. Separate because it is the one thing under `query/` that reads the WORKING TREE rather than the committed index, and because the record it needs to carry is a refusal (the cross-encoder) rather than a scorer |
-| `src/fux/embed/` | ADR-T1-ACCELERATOR | ⚠ **misleading since W-76 Phase 7.** `embed/chunkvec.py` produces the **committed** per-chunk `int8` `vectors` field, so a component that writes the committed index is claimed by the record that opens *"the derived plane's only input is the committed shards"*. The 32-byte document code this note described is deleted. Re-home — W-77. Original note: | `fuxvec` codes; ships default-off on measured evidence |
 | `src/fux/enrich.py` | ADR-ENRICH | `fux enrich --plan/--check` — the deterministic halves |
 | `src/fux/templates/agents/ENRICH-SKILL.md` | ADR-ENRICH | the generation half — a skill rather than code, because [ADR-ENRICH](0040_enrich.md) decision 1 refuses to put a model call under `src/` |
 | `src/fux/mcp.py` | ADR-MCP | the stdio JSON-RPC server — `fux_search` / `fux_passage` / `fux_related`, stdlib-only, warm across calls. **`answer` is deliberately absent**: the agent is the answerer |

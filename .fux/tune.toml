@@ -26,15 +26,6 @@
 #recency_half_life_days = 0.0   # 0 = off; decays on the committed `mtime`
 #rerank_weight          = 0.0   # 0 = off; the proximity reranker's uplift
 
-[dense]                         # the committed per-chunk vector lane
-#mode      = "off"              # "off" | "gated" | "always"
-#threshold = 0.0                # lexical confidence below which `gated` fuses
-#weight    = 0.0                # how far a fused score may move a ranking
-
-[fuse]                          # `ask --hybrid` only
-#rrf_k       = 60
-#dense_width = 100
-
 [graph]                         # explain / graph / path
 #damping      = 0.85
 #iterations   = 3

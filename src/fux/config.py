@@ -120,14 +120,23 @@ def load(root: Path) -> Config:
     # precedent below is the same shape, for the same reason: a key that is
     # quietly not read is worse than one that errors, because the reader
     # believes their setting is in force.
-    for retired in ("ranking", "dense"):
-        if retired in data:
-            raise FuxError(
-                f"{path}: [{retired}] moved to .fux/tune.toml — it holds every knob that "
-                f"changes how results are ORDERED, and none that changes what is indexed. "
-                f"Run `fux setup` to write the file, move the keys across, and delete "
-                f"[{retired}] from here (ADR-TUNE, 2026-08-24)"
-            )
+    if "ranking" in data:
+        raise FuxError(
+            f"{path}: [ranking] moved to .fux/tune.toml — it holds every knob that "
+            f"changes how results are ORDERED, and none that changes what is indexed. "
+            f"Run `fux setup` to write the file, move the keys across, and delete "
+            f"[ranking] from here (ADR-TUNE, 2026-08-24)"
+        )
+    if "dense" in data:
+        # Retired TWICE: to tune.toml on 2026-08-24, then out of existence on
+        # 2026-08-25 with the model. Someone whose fux.toml predates both gets
+        # the final answer, not a forwarding address to a table that is also gone.
+        raise FuxError(
+            f"{path}: [dense] was REMOVED on 2026-08-25 along with the embedding model, "
+            f"the committed per-chunk vectors and `ask --hybrid`. Delete the table. "
+            f"Ranking is unchanged: the lane's `mode` defaulted to `off`, and the gate "
+            f"that would have moved it measured 0 fixed / 2 broken"
+        )
 
     return Config(
         root=root,

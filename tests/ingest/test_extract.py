@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from fux.ingest.extract import extract_fields
 from fux.ingest.parse import parse
 from fux.query.bm25f import derive_wlen
@@ -62,34 +64,33 @@ def test_flen_is_per_field_counts_and_derives_the_weighted_wlen():
     assert derive_wlen(fields.flen) == 1.0 * 3 + 3.0 * 2 + 2.0 * 2 + 1.5 * 2 + 1.0 * 0
 
 
-def test_the_code_field_is_no_longer_emitted():
-    """W-76 Phase 1 removed the document-level dense code.
+def test_extraction_emits_no_vectors_and_no_code():
+    """Both dense fields are gone, and this test is the record of the decision.
 
-    This test asserted the opposite until 2026-08-23 and is deliberately kept
-    rather than deleted: the removal is a **decision**, and a decision with no
-    test is one a later session re-implements by accident.
+    `code` (per document) went in W-76 Phase 1 -- 0.4 % of the index and **91 %
+    of every full ingest**. `vectors` (per chunk) replaced it, and went on
+    **2026-08-25** with the embedding model itself, on Arpit's call.
 
-    Why it went: `code` was 0.4 % of the index and **91 % of every full
-    ingest** — the filed cost profile puts 3.996 s of a 4.38 s 1 000-document
-    ingest inside `_fuxvec_code`. Dropping it made ingest ~11x faster.
+    The reason the second removal is not a reversal of the first: Phase 7's
+    claim was that the *unit* was the defect -- a 12 KB document averaged into
+    one point sits near none of its sections -- and per-chunk vectors were the
+    fix. **They were measured and they were not**: DENSE-CHUNK came back
+    0 fixed / 2 broken at every setting that fires, because the bundled model
+    mean-pools static token vectors, so the lane was as order-blind as BM25F.
 
-    It is not replaced by nothing. Phase 7 brings the same 256-bit Hamming
-    scan back as the **derived** prefilter over committed per-chunk `int8`
-    vectors — per chunk instead of per document, which is what fixes the
-    doc-averaging that made the old lane fix 3 goldens and break 9. When that
-    lands, this test is the one to rewrite.
+    This test asserted the *presence* of `code` until 2026-08-23 and is kept
+    rather than deleted, for the reason it was kept then: a removal is a
+    decision, and a decision with no test is one a later session re-implements
+    by accident. **Anything reintroducing an embedding here has to delete this
+    test on purpose**, and answer the gate first.
     """
     doc = parse(b"# Rollback procedure\n\nRollbacks complete within two minutes.\n")
     fields = extract_fields("a.md", doc)
-    assert fields.code is None
-
-
-def test_code_field_absent_for_unembeddable_text():
-    # title falls back to filename otherwise, and "a.md" alone is embeddable —
-    # pin an all-emoji frontmatter title too so the whole embed input is OOV.
-    doc = parse('---\ntitle: "🎯🎯🎯"\n---\n\n🎯 🎯 🎯\n'.encode("utf-8"))
-    fields = extract_fields("a.md", doc)
-    assert fields.code is None
+    assert not hasattr(fields, "code")
+    assert not hasattr(fields, "vectors")
+    # And nothing under `embed/` is importable any more -- the package is gone.
+    with pytest.raises(ModuleNotFoundError):
+        __import__("fux.embed")
 
 
 def test_extraction_is_deterministic():

@@ -21,6 +21,22 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — FuxVec is retired from the port list
+>
+> **`FuxVec embed + 32 B codes` leaves the list, and this time the module goes
+> with it.** `src/fux/embed/` — `model.py`, `fuxvec.py`, `chunkvec.py` and the
+> 7.9 MB `model.bin` — was deleted on Arpit's instruction (2026-08-25).
+>
+> **It is the second row retired in two days**, after RRF fusion, and for a
+> related reason worth stating once: **a port earns its place by having a live
+> consumer, not by having been ported.** `fuxvec.py` had none — `doc_code`,
+> `hamming`, `prefilter` and `CODE_BYTES` had zero call sites in `src/`, and
+> `quantize` was reached only by `_fuxvec_code()`, which nothing called either.
+> A module kept for what it pins is a module a reader will believe is live.
+>
+> **Reviving either needs a new record and Arpit's sign-off**, per rule 1. A
+> retired row is not a standing licence.
+
 ## §1 — For humans
 
 The v0.19–0.26 engine is archived at [`archive/v0.26/`](../../archive/v0.26/),

@@ -330,6 +330,43 @@ it were in force. ⚠ Sealing also *shrinks* the visible set, which makes
 decision 14's power problem worse before it makes it better; W-81 has to
 resolve that tension rather than inherit it silently.
 
+**16. When a pre-registration's live path is DELETED, the run keeps a mirror of
+it — the verdict is not edited.** Added 2026-08-25, the first day it was needed.
+
+Decision 1 freezes a pre-registration and decision 5 freezes a verdict, and
+between them they assume the file the verdict *points at* keeps existing. It
+does not always: [DENSE-CHUNK](../../work/regression/2026-08-24-dense-lane-gate/VERDICT.md)
+names `src/fux/query/dense.py` — the bar lived in that module's docstring — and
+that module was deleted when the dense lane and the embedding model were
+removed.
+
+**The three ways out, and why this one:**
+
+| | |
+|---|---|
+| edit `pre_registration:` to point somewhere else | **forbidden by decision 5.** A verdict is never edited |
+| keep the module alive as a stub so the pointer resolves | a file kept only so a test passes, which is the vestige class this project keeps deleting |
+| **mirror the file into the run** | ✅ the measurement stays citable and nothing frozen is touched |
+
+**The rule.** The run carries the pre-registration at its *original path* under
+`evidence/pre-registration/`, **byte for byte as it stood when the verdict was
+ruled** — verified against the commit that filed the verdict, not copied from
+whatever the file had drifted to.
+[`tests/test_regression_runs.py`](../../tests/test_regression_runs.py) resolves
+the pointer there **only when the live path is gone**, and a second check
+refuses a mirror that sits beside a live file, because two frozen thresholds
+for one verdict is exactly the ambiguity decisions 1 and 2 exist to prevent.
+
+**Why this is not archive-is-not-evidence in disguise.** `archive/` holds
+superseded *decisions*, which may be named but never cited as grounding. This
+holds a frozen *threshold* a filed measurement was ruled against. **It is the
+evidence**, kept beside the run that used it, in the one directory this project
+forbids editing.
+
+⚠ **The general problem it solves is not rare.** Deleting dead code and keeping
+measurements readable would otherwise be in tension, and a project that has to
+choose will quietly choose the code — leaving verdicts that point at nothing.
+
 ### Consequences
 
 - **The prediction system is now guardable.** Before this record a change to
@@ -448,6 +485,9 @@ resolve that tension rather than inherit it silently.
     document quotes ±2 queries without the word *provisional*, the placeholder
     has hardened into a fact nobody measured, which is the failure R7 and R8
     were withdrawn for in a different costume.
+11. **A `pre_registration:` line is edited to survive a deletion**, or a
+    mirrored copy is kept *beside* a live one. Decision 16 allows exactly one
+    shape and the second check enforces it.
 
 **How to check them:**
 

@@ -300,12 +300,6 @@ def build_parser() -> argparse.ArgumentParser:
     p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
     p_ask.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
     p_ask.add_argument("--explain", action="store_true", help="report which path answered")
-    p_ask.add_argument(
-        "--hybrid",
-        action="store_true",
-        help="fuse the dense lane in via RRF (OFF by default: it changes rankings, "
-        "and on this repo's frozen R2 questions it makes them worse)",
-    )
     p_ask.set_defaults(func=_cmd_ask)
 
     p_find = _query_parser("find", "ranked document locations, one per line")

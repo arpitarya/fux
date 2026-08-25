@@ -23,6 +23,21 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **`[dense]` in `fux.toml` now names its REMOVAL rather than a new home.**
+> The table was retired to `.fux/tune.toml` on 2026-08-24 (ADR-TUNE decision
+> 7); on 2026-08-25 the lane itself was deleted, so the forwarding address
+> stopped existing too.
+>
+> **A config old enough to carry `[dense]` is old enough to be forwarded
+> twice**, and the second hop would have landed on nothing. The error now
+> states the removal, the verdict behind it, and that **ranking does not move**
+> — `mode` defaulted to `off`.
+>
+> `[ranking]`'s retirement is unchanged: it still points at `tune.toml`,
+> because `tune.toml` still has it.
+
 ## §1 — For humans
 
 A working `fux.toml` is three lines:

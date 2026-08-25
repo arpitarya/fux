@@ -21,6 +21,25 @@ timestamp: 2026-08-20T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **The embedding pass is gone from ingest** (Arpit, 2026-08-25), and with it
+> the largest single cost this record has ever described.
+>
+> **What this changes about the cost story.** `EXTRACTED_FIELDS` is now
+> `("title", "phrases", "terms", "flen")` — `code` and `vectors` are removed
+> from the carry-forward set, so an incremental run drops them from an existing
+> record rather than preserving them, and a delta run stays byte-identical to a
+> full run, which is the invariant that matters here.
+>
+> ⚠ **The carry-forward optimisation is KEPT, and its justification is now
+> weaker.** It was introduced because **92 % of a full ingest was the dense
+> embedding**; that 92 % no longer exists. What remains is the difference
+> between re-tokenising a corpus and re-tokenising a commit — still worth
+> having, still what makes R5 reachable, but no longer the dominant term.
+> **Nobody has re-measured the split since the model came out**, and this
+> record should not be read as claiming a number it does not have.
+
 ## §1 — For humans
 
 Ingest turns whatever your `fux.toml` points at into committed records. It runs

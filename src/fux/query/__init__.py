@@ -101,7 +101,6 @@ def run_query(
     top: int,
     *,
     force_scan: bool = True,
-    use_hybrid: bool = False,
     tune: "Tune | None" = None,
     use_tune: bool = True,
 ) -> tuple[list[AskResult], str]:
@@ -117,9 +116,11 @@ def run_query(
         tune = _tune(root, enabled=use_tune)
     scoring = tune.scoring
     weighting, dirs = _archived_ranking(root, tune)
-    # W-76 Phase 7: the lane exists again, over COMMITTED per-chunk vectors.
-    # `--hybrid` is the explicit opt-in (mode `always`); `[dense] mode` is the
-    # durable form, and it ships `off` until the goldens rule on it.
+    # The dense lane is GONE (2026-08-25, Arpit) -- `--hybrid`, `[dense]`, the
+    # committed vectors and the embedding model with it. DENSE-CHUNK measured
+    # 0 fixed / 2 broken at every setting that fires, and a lane that is off by
+    # measurement is a lane nobody may switch on. There is one ranking path now.
+    #
     # W-76 Phase 6: when the reranker is on, retrieve DEEPER than the caller
     # asked and hand back `top` from the reordered list. This is what the gate
     # means by "top-20 -> top-5" -- a reranker that can only shuffle the five
@@ -135,54 +136,24 @@ def run_query(
             results = accel.ask(
                 root, query, top=depth, weighting=weighting, archived_dirs=dirs, scoring=scoring
             )
-            fused = _maybe_fuse(root, query, results, use_hybrid, tune)
-            return _maybe_rerank(root, query, fused, rerank_weight, top), "accelerator"
+            return _maybe_rerank(root, query, results, rerank_weight, top), "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs, scoring=scoring
     )
-    fused = _maybe_fuse(root, query, results, use_hybrid, tune)
-    return _maybe_rerank(root, query, fused, rerank_weight, top), "scan"
+    return _maybe_rerank(root, query, results, rerank_weight, top), "scan"
 
 
 def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
     """Proximity rerank, then truncate to what the caller asked for.
 
-    **After fusion, never before.** Fusion may admit a document the lexical
-    lane missed; reranking it is exactly as legitimate as reranking any other
-    candidate, and doing it in the other order would rerank a list the fused
-    document was not yet in.
+    **It used to run after dense fusion, and the ordering mattered**: fusion
+    could admit a document the lexical lane missed, and reranking a list that
+    document was not yet in would have skipped it. Fusion was deleted on
+    2026-08-25, so this is now simply the last stage.
     """
     if weight <= 0:
         return results[:top]
     return rerank.rerank(root, query, results, weight=weight)[:top]
-
-
-def _maybe_fuse(root: Path, query: str, results, use_hybrid: bool, tune: "Tune"):
-    """Gated dense fusion (W-76 Phase 7), applied to a finished lexical ranking.
-
-    **After ranking, never inside it.** The dense score is not a BM25F term and
-    is not on its scale; folding it into the scorer would break the differential
-    law's single-`rank()` structure and put a float on the hot path both
-    candidate generators share. Boosting a finished list keeps both paths
-    identical up to the point fusion happens, and fusion is deterministic.
-    """
-    from .dense import dense_scores, should_fuse
-
-    mode = "always" if use_hybrid else tune.dense_mode
-    threshold, weight = tune.dense_threshold, tune.dense_weight
-    if use_hybrid and weight <= 0:
-        # `--hybrid` with no configured weight would be a silent no-op, which
-        # is the failure Phase 1 replaced with a loud error. Give it a usable
-        # default rather than pretending it fused.
-        weight = 0.25
-    if not should_fuse(mode, results, threshold):
-        return results
-    from .. import store as store_mod
-    from .dense import merge
-
-    top = len(results) or 5
-    dense = dense_scores(root, query, top, extra={r.id for r in results})
-    return merge(results, dense, weight, top, store_mod.read_index(root))
 
 
 def _root() -> Path:
@@ -313,7 +284,6 @@ def cmd_ask(args) -> int:
         args.query,
         args.top,
         force_scan=_force_scan(args),
-        use_hybrid=getattr(args, "hybrid", False),
         tune=tune,
     )
     _declare_pending(root)

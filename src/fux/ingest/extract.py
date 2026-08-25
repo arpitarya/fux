@@ -1,16 +1,18 @@
-"""Per-document field extraction — title, heading-derived phrases, the
-tokenizer's `terms`/`wlen`, and FuxVec's `code`. Extracted-mode law: every
-field is *taken from* the document; nothing invented.
+"""Per-document field extraction — title, heading-derived phrases and the
+tokenizer's per-field `terms`/`flen`. Extracted-mode law: every field is
+*taken from* the document; nothing invented.
+
+**No vectors, no codes, and no model** (2026-08-25, Arpit). Extraction is pure
+tokenisation now: the embedding lane it used to feed was deleted with the
+bundle, so this module has no dependency outside the analyzer.
 """
 
 from __future__ import annotations
 
-import base64
 import re
 from collections import Counter
 from dataclasses import dataclass
 
-from ..embed import get_model, quantize
 from ..query.tokenize import tokenize
 from .parse import ParsedDoc
 
@@ -32,11 +34,6 @@ class Extracted:
     #: made a committed field a function of a tunable — ADR-TUNE decision 6.
     #: These are facts; the weighting happens at query time.
     flen: tuple[int, ...]
-    code: str | None  # base64url, no padding; None when nothing embeddable
-    #: W-76 Phase 7 — one committed `int8` vector per chunk, base64url. Empty
-    #: when the model bundle is absent (a source install), which is a degraded
-    #: lane and never an error: the lexical index answers on its own.
-    vectors: tuple[str, ...] = ()
 
 
 def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extracted:
@@ -72,19 +69,10 @@ def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extra
     terms = _term_freqs(per_field)
     flen = tuple(len(tokens) for tokens in per_field)
 
-    # `code` is gone (W-76 Phase 1). It was 0.4 % of the index and **91 % of
-    # every full ingest** -- the filed cost profile puts 3.996 s of a 4.38 s
-    # 1 000-doc ingest inside `_fuxvec_code`. It is not replaced by nothing:
-    # Phase 7 brings the same Hamming scan back as the DERIVED prefilter over
-    # committed per-chunk `int8` vectors, per chunk instead of per document.
-    return Extracted(
-        title=title,
-        phrases=phrases,
-        terms=terms,
-        flen=flen,
-        code=None,
-        vectors=_chunk_vectors(doc.body),
-    )
+    # `code` went in W-76 Phase 1, `vectors` on 2026-08-25 with the model.
+    # Both were the dense lane's input, and the lane never earned its cost:
+    # DENSE-CHUNK measured 0 fixed / 2 broken at every setting that fires.
+    return Extracted(title=title, phrases=phrases, terms=terms, flen=flen)
 
 
 def _title(meta: dict, headings: list[str], rel_path: str) -> str:
@@ -109,38 +97,4 @@ def _term_freqs(per_field: tuple[list[str], ...]) -> dict[str, tuple[int, ...]]:
     return {term: tuple(counter[term] for counter in counters) for term in vocabulary}
 
 
-def _chunk_vectors(body: str) -> tuple[str, ...]:
-    """One `int8` vector per heading-delimited chunk, committed.
 
-    **Reuses the refer plane's chunker rather than splitting again.** Two
-    chunkers would mean a citation's span and a vector's span could disagree
-    about what a passage is -- the retrieved thing and the cited thing would
-    quietly stop being the same thing.
-
-    Returns `()` when the model bundle is absent. That is a source install
-    without the wheel's data file, and it is a **degraded lane, not a
-    failure**: the lexical index answers on its own and always has.
-    """
-    from ..embed import chunkvec
-    from ..refer.chunk import chunk
-
-    model = get_model()
-    if model is None:
-        return ()
-    out = []
-    for passage in chunk(body):
-        text = f"{passage.heading}\n\n{passage.text}" if passage.heading else passage.text
-        vec = model.embed(text)
-        if vec is not None:
-            out.append(chunkvec.encode(vec))
-    return tuple(out)
-
-
-def _fuxvec_code(title: str, body: str) -> str | None:
-    model = get_model()
-    if model is None:  # bundle not present (e.g. sdist without the wheel's data file)
-        return None
-    vec = model.embed(f"{title}\n{body}")
-    if vec is None:
-        return None
-    return base64.urlsafe_b64encode(quantize(vec)).rstrip(b"=").decode("ascii")

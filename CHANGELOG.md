@@ -10,6 +10,39 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Removed
 
+- **Breaking: the bundled embedding model and the entire dense lane are gone**
+  (Arpit, 2026-08-25). `src/fux/embed/` — `model.py`, `fuxvec.py`,
+  `chunkvec.py` and the 7.9 MB `model.bin` — plus `query/dense.py`,
+  `derive/dense.py`, `.fux/runtime/codes.jsonl`, the committed per-chunk
+  `vectors` field, the `[dense]` tune table and **`ask --hybrid`**.
+
+  **Why:** [DENSE-CHUNK](work/regression/2026-08-24-dense-lane-gate/VERDICT.md)
+  measured **0 fixed / 2 broken at every setting that fires**, against a bar of
+  `>= 3-fixed / 0-broken`. The bundled model mean-pools static token vectors, so
+  the lane was **as order-blind as BM25F** — it duplicated the lexical lane's
+  blind spot at far higher cost.
+
+  **What it cost, measured A/B on the same corpus**
+  ([run](work/regression/2026-08-25-model-removal/report.md)):
+
+  | | before | after | |
+  |---|---|---|---|
+  | wheel | 6.84 MB | **233 KB** | **30.1x smaller** — the download was 97 % model |
+  | committed index | 6 528 570 B | 5 052 388 B | **-22.6 %** |
+  | full ingest | 33–36 s | ~4.9 s | **~6.8x faster** |
+
+  **Ranking does not move.** `[dense] mode` defaulted to `off` and the gate
+  returned before any dense work, so anyone who never typed `--hybrid` sees
+  byte-identical results. The differential law still holds.
+
+  **Migration:** delete `[dense]` from `.fux/tune.toml` (and from `fux.toml` if
+  it predates 2026-08-24) — both now raise an error naming the removal rather
+  than a generic "unknown table". Drop `--hybrid` from any script; it is now an
+  argparse error rather than a silent no-op. `RUNTIME_SCHEMA` moves
+  `fux.runtime.v4` -> `v5`, so `.fux/runtime/` is refused and rebuilt once;
+  nothing committed needs regenerating, though a re-ingest is what drops the
+  `vectors` field from existing records.
+
 - **Breaking: `[fuse]` is gone from `.fux/tune.toml`'s key set.** `rrf_k` and
   `dense_width` were validated and threaded but had no CLI reader — their only
   consumer, `src/fux/query/hybrid.py`'s `hybrid_ask`, was already off the live

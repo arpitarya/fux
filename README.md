@@ -34,9 +34,12 @@ at answer time.**
 > results, faster (Arpit, 2026-08-21). `--scan` still forces the reference
 > path explicitly, for bug reproduction.
 >
-> A dense lane exists behind `ask --hybrid` and is **off by default** — on the
-> graded corpus it closes three known gaps and breaks nine working queries,
-> so the default is a measurement rather than a preference.
+> **There is no dense lane and no bundled model** (2026-08-25). One existed
+> behind `ask --hybrid`, shipped off by default, and was deleted after its own
+> gate measured **0 fixed / 2 broken** — the bundled embedding mean-pooled
+> static token vectors, so it was as order-blind as the lexical scorer it was
+> meant to complement. Removing it took the wheel from **6.84 MB to 233 KB**.
+> Ranking is unchanged; the flag is gone.
 >
 > **The corpus is maintained with `fux add` / `fux remove` / `fux update`**
 > (2026-08-21), over directories, single documents and URLs alike — the entry
@@ -89,8 +92,8 @@ at answer time.**
   Confluence. Fux never keeps a durable copy (except explicit per-source
   `snapshot` policy).
 - **Git carries the index** — doc-major, sharded, human-readable JSONL;
-  full per-document postings, dense binary codes, an extracted link graph,
-  and a source ledger, one line per document, sorted and content-sharded so
+  full per-document postings, an extracted link graph, and a source ledger,
+  one line per document, sorted and content-sharded so
   git itself diffs and merges it —
   [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md).
 - **Answers verify themselves.** Rank in the index, fetch the cited

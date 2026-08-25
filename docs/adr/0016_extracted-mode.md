@@ -19,6 +19,34 @@ timestamp: 2026-08-19T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **Extraction no longer emits `code` or `vectors`, and no longer loads a
+> model at all** (Arpit, 2026-08-25). `Extracted` is now four fields —
+> `title`, `phrases`, `terms`, `flen` — every one of them a pure function of
+> the document's own bytes and the analyzer.
+>
+> **This makes the extracted-mode law easier to state, not harder.** *Every
+> field is taken from the document; nothing is invented* was always slightly
+> awkward about an embedding: a vector is not *in* the bytes, it is a model's
+> reading of them, and the model was a 7.9 MB binary whose recipe was not in
+> the repo (the defect filed as W-80). That awkwardness is gone with it.
+>
+> | field | went | why |
+> |---|---|---|
+> | `code` | W-76 Phase 1, 2026-08-23 | 0.4 % of the index, **91 % of every full ingest** |
+> | `vectors` | **2026-08-25** | its lane measured 0 fixed / 2 broken |
+>
+> ⚠ **The second removal is not a reversal of the first's reasoning.** Phase 1
+> removed a per-*document* vector and Phase 7 replaced it with per-*chunk*
+> vectors on the argument that the unit was the defect. **That argument was
+> measured and it was wrong** — the model mean-pools static token vectors, so
+> the unit was never the binding constraint.
+>
+> **`tests/ingest/test_extract.py` keeps a test asserting the absence of both**,
+> for the reason it kept one in 2026-08-23: a removal is a decision, and a
+> decision with no test is one a later session re-implements by accident.
+
 ## §1 — For humans
 
 Every record Fux commits today carries `"mode":"extracted"`. This record says

@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-81
 title: "W-81 — two of the six accepted measurement rules are not built: the sealed query subset, and the decoy / placebo controls"
-description: "Arpit accepted the run-classification rule on 2026-08-25. Four of its six parts are protocol and took effect that day. Two are build work and did not: a sealed subset of fux-playground's goldens held by one owner, and the decoy-query and content-free-placebo control arms that separate source bias from content. Filed so ADR-RS decision 15 is not read as in force."
+description: "Arpit accepted the run-classification rule on 2026-08-25. Four of its six parts are protocol and took effect that day. Two are build work and did not: a sealed subset of the goldens held by one owner, and the decoy-query and content-free-placebo control arms. Also carries a SCOPE DEFECT in decision 12 found on the rule's first application — it forbids an informed run from stating a delta, which as written forbids reporting a file size — and an unbuilt orphaned-module check, after three dead modules were found in two days by hand."
 status: open
 lane: agent
 timestamp: 2026-08-25T00:00:00Z
@@ -70,7 +70,62 @@ not higher — and measured, blind, it was already below decision 14's floor. Th
 controls are owed because the runs cannot separate the two and **did not say
 so**, which is the reporting defect, not because the finding is in doubt.
 
-## 3 · Not in scope
+## 3 · A scope defect in decision 12, found on the rule's FIRST application
+
+**Filed 2026-08-25, one day after the rule was ruled.**
+
+[ADR-RS](../../docs/adr/0036_predictions.md) decision 12 says an informed run
+**never supplies a delta**. The first run filed under the rule —
+[the model-removal measurement](../regression/2026-08-25-model-removal/report.md)
+— is `informed` by construction (one session proposed, executed and measured the
+change) and **its entire content is deltas**: a wheel 30x smaller, an index
+22.6 % smaller, an ingest 6.8x faster.
+
+**The rule as written forbids reporting a file size.** That is plainly not what
+was ruled.
+
+**The distinction the wording is missing.** Decision 12 exists because an author
+who has read the evaluation queries can fit an artifact to them. That hazard
+needs an evaluation set to exist. **Wall-clock seconds and bytes on disk have
+no evaluation set** — there are no queries to have seen, no judgments, no
+per-query scores, and no mechanism by which knowing the goldens bends a byte
+count.
+
+| kind of number | can authorship contaminate it? |
+|---|---|
+| nDCG, pass@k, fixed/broken on a golden set | **yes** — this is what decision 12 is for |
+| bytes on disk, wall-clock, wheel size | **no** — nothing to have seen |
+| p95 latency on a *chosen* query set | ⚠ **partly** — the query set is a choice, and a favourable one can be picked |
+
+⚠ **The third row is why this is not a one-line fix.** A latency number sits
+between the two: the metric cannot be fitted, but the *sample* can. Any
+narrowing has to say which side that falls on, and the answer is probably
+*declare the query set and how it was chosen* rather than *blind or informed*.
+
+**Not adjudicated here.** The rule is one day old and was ruled by Arpit;
+narrowing it is his. The measurement applied it **as written** and disclosed the
+conflict in its own report rather than quietly exempting itself.
+
+## 4 · A check for orphaned modules — three found in two days, none by a test
+
+**Not part of the accepted rule; filed here because it came out of the same
+work and has no better home.**
+
+Three modules under `src/` were deleted in two days for having no caller:
+`query/hybrid.py`, `query/fuse.py`, and `embed/fuxvec.py`. **All three had
+passing tests the whole time**, which is exactly why none was noticed: a tested
+module looks alive. `fuxvec.py` had been dead since 2026-08-23 — `doc_code`,
+`hamming`, `prefilter` and `CODE_BYTES` with **zero call sites** in `src/`, and
+`quantize` reached only from a function nothing called.
+
+**What would catch the fourth:** a check flagging any `src/` module with no
+importer outside its own package and no caller outside its own tests.
+
+⚠ **It needs a declared-exception list before it can be green** — entry points,
+`__init__` re-exports and CLI-dispatched handlers all look orphaned to a naive
+importer graph, and a check that cannot go green gets deleted.
+
+## 5 · Not in scope
 
 - **Re-running the enrichment arms.** Those reports are frozen and stand as
   filed. New controls produce a **new** run, per decision 5's sibling rule.
@@ -90,3 +145,9 @@ so**, which is the reporting defect, not because the finding is in doubt.
       — and **it will be `informed`**, because whoever builds this will have
       read everything. That is the correct label, not a reason to delay.
 - [ ] ADR-RS decision 15 loses its `NOT BUILT` marker in the same change.
+- [ ] **§3 is Arpit's**, not an agent's: decision 12 either gains a scope line
+      distinguishing quality deltas from cost deltas, or it does not and cost
+      measurements keep disclosing the conflict. Both are defensible; picking is
+      not an agent's call.
+- [ ] The orphaned-module check in §4, **with its exception list**, or a written
+      decision not to build it.

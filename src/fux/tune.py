@@ -76,7 +76,6 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "recency_half_life_days",
         "rerank_weight",
     ),
-    "dense": ("mode", "threshold", "weight"),
     "graph": (
         "damping",
         "iterations",
@@ -93,7 +92,6 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
 
 _OPEN_TABLES = frozenset({"priority"})
 
-_DENSE_MODES = ("off", "gated", "always")
 
 
 @dataclass(frozen=True)
@@ -111,10 +109,6 @@ class Tune:
     recency_half_life_days: float = 0.0
     rerank_weight: float = 0.0
 
-    # [dense]
-    dense_mode: str = "off"
-    dense_threshold: float = 0.0
-    dense_weight: float = 0.0
 
     # [graph]
     damping: float = 0.85
@@ -264,6 +258,18 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
 
     c = _Collector(path)
 
+    if "dense" in data:
+        # Removed 2026-08-25 with the embedding model and the lane it fed.
+        # A bare "unknown table" error would read as a typo; this file is the
+        # one place a consumer configured the lane, so it is where they find
+        # out it is gone.
+        raise FuxError(
+            f"{path}: [dense] was REMOVED on 2026-08-25 along with the embedding model, "
+            "the committed per-chunk vectors and `ask --hybrid`. The lane never earned "
+            "its cost -- DENSE-CHUNK measured 0 fixed / 2 broken at every setting that "
+            "fires (work/regression/2026-08-24-dense-lane-gate/). Delete the table; "
+            "ranking is unchanged, because `mode` defaulted to `off`"
+        )
     unknown_tables = [k for k in data if k not in _SCHEMA]
     if unknown_tables:
         raise FuxError(
@@ -318,20 +324,6 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         _non_negative(c, "ranking", "rerank_weight", ranking["rerank_weight"], 0.0)
         if "rerank_weight" in ranking
         else 0.0
-    )
-
-    dense = data.get("dense", {})
-    dense_mode = dense.get("mode", "off")
-    if dense_mode not in _DENSE_MODES:
-        c.add(f"[dense] mode must be one of {list(_DENSE_MODES)} (got {dense_mode!r})")
-        dense_mode = "off"
-    dense_threshold = (
-        _non_negative(c, "dense", "threshold", dense["threshold"], 0.0)
-        if "threshold" in dense
-        else 0.0
-    )
-    dense_weight = (
-        _non_negative(c, "dense", "weight", dense["weight"], 0.0) if "weight" in dense else 0.0
     )
 
     graph = data.get("graph", {})
@@ -413,9 +405,6 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         superseded_weight=superseded_weight,
         recency_half_life_days=half_life,
         rerank_weight=rerank_weight,
-        dense_mode=dense_mode,
-        dense_threshold=dense_threshold,
-        dense_weight=dense_weight,
         damping=damping,
         iterations=iterations,
         laziness=laziness,
@@ -462,11 +451,6 @@ def specimen() -> str:
 #superseded_weight      = 1.0   # multiplier for a document another supersedes
 #recency_half_life_days = 0.0   # 0 = off; decays on the committed `mtime`
 #rerank_weight          = 0.0   # 0 = off; the proximity reranker's uplift
-
-[dense]                         # the committed per-chunk vector lane
-#mode      = "off"              # "off" | "gated" | "always"
-#threshold = 0.0                # lexical confidence below which `gated` fuses
-#weight    = 0.0                # how far a fused score may move a ranking
 
 [graph]                         # explain / graph / path
 #damping      = 0.85

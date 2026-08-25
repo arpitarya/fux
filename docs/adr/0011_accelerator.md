@@ -21,6 +21,36 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **Arpit, 2026-08-25: *"Remove the model."*** `src/fux/embed/` is gone — the
+> 7.9 MB bundle, `model.py`, `fuxvec.py` and `chunkvec.py` — and so is
+> `derive/dense.py`, this record's dense half.
+>
+> **This record owned both, and the ownership table row for `src/fux/embed/`
+> is deleted in the same change.** That row carried its own ⚠ since W-76
+> Phase 7 — a component that wrote the *committed* index claimed by the record
+> that opens *"the derived plane's only input is the committed shards"*. The
+> contradiction is resolved by the component ceasing to exist, which is a
+> worse reason than fixing it and an honest one.
+>
+> | what went | where it was |
+> |---|---|
+> | the `codes` build phase | `derive/build.py` — `_read_committed` no longer returns a `codes` array |
+> | `codes.jsonl` | out of `DETERMINISTIC_FILES` |
+> | `RUNTIME_SCHEMA` | `fux.runtime.v4` -> **`v5`** |
+>
+> **The schema bump is not required for correctness and was made anyway.**
+> Nothing reads `codes.jsonl` now, so a stale `v4` plane could not diverge —
+> but it would leave an orphan file no rebuild removes, and this record's own
+> `DOCS_FIELDS` comment exists because someone once trusted a schema string
+> that had not been moved. Refusing the plane costs one rebuild of a
+> disposable directory.
+>
+> ⚠ **The differential law is untouched and is now easier to hold**: there is
+> one ranking path, and no post-ranking fusion stage that either candidate
+> generator could see differently.
+
 ## §1 — For humans
 
 The committed index is **doc-major**: one line per document. That shape is

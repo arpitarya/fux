@@ -1,0 +1,33 @@
+$ # baseline: /tmp/fuxbase, git worktree at a3f75b0, src/fux/embed/ present
+OLD ingest (with model): 36.140661195 s
+OLD index: 6,528,570 bytes, 720 records, 4290 chunk vectors
+OLD ingest run2: 33.001948398 s
+
+$ # treatment: /tmp/fuxwork, model and dense lane removed
+NEW ingest wall: 4.978614212 s
+NEW index: 5,052,388 bytes, 721 records, 0 chunk vectors
+NEW ingest run2: 4.843515888 s
+
+$ ls -l /tmp/wh_old/*.whl /tmp/wh_new/*.whl
+   238208 bytes  /tmp/wh_new/fux_engine-2.0.0a1-py3-none-any.whl
+  7170167 bytes  /tmp/wh_old/fux_engine-2.0.0a1-py3-none-any.whl
+
+$ # direct count of the `vectors` key on the pre-deletion committed index
+records            1304
+chunks w/ vectors  8094
+index bytes        12,162,978
+vector bytes       2,794,170   (23.0 % of the committed index)
+
+$ # differential law, WITH the non-empty guard
+IDENTICAL n=5   differential law
+IDENTICAL n=5   index format canonical
+IDENTICAL n=5   how does enrichment work
+IDENTICAL n=5   supersession ranking
+IDENTICAL n=5   merge driver conflict
+IDENTICAL n=5   bm25f field weights
+fail=0
+
+$ # the FIRST attempt, kept because it is the finding: a vacuous pass
+IDENTICAL  scan==fast   differential law        <- both sides were ""
+IDENTICAL  scan==fast   index format canonical  <- .fux/tune.toml still had
+IDENTICAL  scan==fast   how does enrichment work   [dense]; every call errored

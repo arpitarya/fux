@@ -34,6 +34,27 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **The committed record loses `vectors`** (Arpit, 2026-08-25) — one base64url
+> `int8` vector per chunk, added by W-76 Phase 7.
+>
+> **Measured on this repo's own index before the removal: 8 094 chunk vectors
+> across 1 304 records, 2.79 MB of a 12.16 MB index — 23.0 %.** Nearly a
+> quarter of the committed plane existed for a lane that shipped `off` and
+> measured worse when switched on.
+>
+> ⚠ **`SCHEMA_ID` deliberately stays `fux.index.v2`.** A removed optional key
+> is inert for every reader — no consumer looks for `vectors` any more, so an
+> index still carrying them is read correctly and ranks identically. Bumping
+> would force a re-ingest that buys nothing, and this record's bumps have
+> always been for shapes that would be *misread*, not for shapes that shrank.
+> The derived plane bumped (`fux.runtime.v4` -> `v5`) because a stale plane
+> there leaves an orphan file; the committed plane has no equivalent hazard.
+>
+> **A record written before this change is therefore still valid** and simply
+> carries a field nothing consults, until its document next changes.
+
 ## §1 — For humans
 
 A shard file is JSONL. Its **first line is a header** pinning the schema and

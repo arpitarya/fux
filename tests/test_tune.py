@@ -269,9 +269,16 @@ def test_every_schema_key_appears_in_the_specimen():
     assert not missing, missing
 
 
-def test_the_dense_mode_set_is_closed(tmp_path):
-    _write(tmp_path, '[dense]\nmode = "sometimes"\n')
-    with pytest.raises(FuxError, match="mode must be one of"):
+def test_a_retired_dense_table_names_its_removal_rather_than_reading_as_a_typo(tmp_path):
+    """`[dense]` went with the model on 2026-08-25.
+
+    A consumer who configured the lane has this table in their file. The closed
+    key set would call it an unknown table, which reads as a typo; they need to
+    be told it was removed, and that their ranking has not moved because `mode`
+    defaulted to `off` anyway.
+    """
+    _write(tmp_path, '[dense]\nmode = "always"\n')
+    with pytest.raises(FuxError, match="REMOVED on 2026-08-25"):
         load(tmp_path)
 
 

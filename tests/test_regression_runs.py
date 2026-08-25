@@ -125,14 +125,51 @@ def test_verdict_says_what_it_ruled_and_against_what(path: Path) -> None:
     )
 
 
+#: Where a run keeps a copy of a pre-registration whose live path has since been
+#: deleted. The verdict is frozen and its `pre_registration:` line is never
+#: rewritten, so the pointer is resolved here instead -- see ADR-RS decision 5.
+MIRROR = "evidence/pre-registration"
+
+
 @pytest.mark.parametrize("path", verdicts(), ids=lambda p: p.parent.name)
 def test_verdict_points_at_a_frozen_pre_registration(path: Path) -> None:
-    """The threshold has to have been written down *before* the number existed."""
+    """The threshold has to have been written down *before* the number existed.
+
+    **The live path is not the only admissible home.** Code gets deleted, and a
+    measurement has to stay citable after the thing it measured stops existing
+    -- otherwise the project would be choosing between deleting dead code and
+    keeping its evidence readable. So a run may carry the pre-registration
+    itself, mirrored at its original path under `evidence/pre-registration/`.
+    The VERDICT.md is never touched either way.
+    """
     meta = fm.parse(path.read_text(encoding="utf-8")).meta
-    target = ROOT / str(meta["pre_registration"])
-    assert target.is_file(), (
-        f"{path.parent.name}/VERDICT.md: pre_registration points at {meta['pre_registration']!r}, "
-        "which does not exist. A verdict without its frozen threshold is an opinion."
+    rel = str(meta["pre_registration"])
+    live = ROOT / rel
+    mirrored = path.parent / MIRROR / rel
+    assert live.is_file() or mirrored.is_file(), (
+        f"{path.parent.name}/VERDICT.md: pre_registration points at {rel!r}, which exists "
+        f"neither live nor mirrored at {MIRROR}/{rel}. A verdict without its frozen "
+        "threshold is an opinion. If the live file was deleted, copy it -- byte for byte, "
+        "as it stood when the verdict was ruled -- into the run rather than editing the "
+        "verdict, which is frozen."
+    )
+
+
+def test_a_mirrored_pre_registration_is_only_used_when_the_live_one_is_gone() -> None:
+    """A mirror beside a live file is two thresholds, and they can disagree.
+
+    This is the failure the mirror introduces, so it is checked rather than
+    trusted: the mirror is a last resort, not a second copy kept in parallel.
+    """
+    both = []
+    for v in verdicts():
+        rel = str(fm.parse(v.read_text(encoding="utf-8")).meta["pre_registration"])
+        if (ROOT / rel).is_file() and (v.parent / MIRROR / rel).is_file():
+            both.append(f"{v.parent.name}: {rel}")
+    assert not both, (
+        "a pre-registration exists BOTH live and mirrored, which is two frozen thresholds "
+        "for one verdict and nothing keeps them equal:\n  " + "\n  ".join(both) + "\n\n"
+        "Delete the mirror -- the live file is the pre-registration while it exists."
     )
 
 

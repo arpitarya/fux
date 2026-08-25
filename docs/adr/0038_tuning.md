@@ -138,6 +138,28 @@ timestamp: 2026-08-22T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
+>
+> **`[dense]` is removed from the closed key set** (Arpit, 2026-08-25) — the
+> lane it configured, the committed vectors it weighted and the model that
+> produced them are all deleted. The schema is now **five tables**: `bm25f`,
+> `ranking`, `graph`, `refer`, `priority`.
+>
+> **The removal errors rather than falling through to *unknown table*.**
+> `[dense]` in a `.fux/tune.toml` names its own removal, the verdict that
+> caused it, and the fact that **ranking does not move** — `mode` defaulted to
+> `off`, so a consumer who configured the table was already getting lexical
+> answers. A bare *unknown table* error would have read as a typo.
+>
+> ⚠ **`fux.toml` gets the same treatment, and it needed it more.**
+> `[dense]` there was retired to *this* file on 2026-08-24; a config old enough
+> to still carry it would have been forwarded to a table that is also gone.
+> [ADR-CONFIG](0014_config.md) now names the removal instead.
+>
+> **This is the second table to leave the schema after `[fuse]`** (W-79, the
+> same day). Both left for the same reason and it is worth stating as a
+> pattern: **a tunable for a lane nobody runs is a knob that cannot be turned.**
+
 ## §1 — For humans
 
 Fux has **twelve constants that decide what you read first** and, until now,
