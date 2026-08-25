@@ -1,0 +1,6 @@
+machine   x86_64
+ort       1.23.2
+python    3.11.15
+out.sha256 ff4766826326d11da18e6aa938a5c2d91c616382aeb165716e6bc6008a808f3f
+pooled     np.float32(-0.021671757)
+pooled.hex f888b1bc

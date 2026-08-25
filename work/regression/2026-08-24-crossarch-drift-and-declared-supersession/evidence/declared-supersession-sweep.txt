@@ -1,0 +1,25 @@
+Playground, docs/adr-0019-calder-gateway.md gains `supersedes:` frontmatter
+(the fact an offline model would write). Fresh `fux ingest --full` per arm.
+
+superseded flag after ingest:
+  docs/adr-0007-helix-mesh.md      superseded: True
+  docs/adr-0019-calder-gateway.md  supersedes edge -> file:docs/adr-0007-helix-mesh.md
+
+UNENRICHED arm
+  superseded_weight=1.0 -> pass 32 | q015 pass  q016 FAIL
+  superseded_weight=0.7 -> pass 33 | q015 pass  q016 FAIL
+  superseded_weight=0.5 -> pass 32 | q015 pass  q016 FAIL
+  superseded_weight=0.3 -> pass 29 | q015 pass  q016 FAIL
+  superseded_weight=0.1 -> pass 29 | q015 pass  q016 FAIL
+
+BLIND #1 enrichment
+  w=1.0 -> pass 33 | q015 FAIL q016 pass q021 FAIL
+  w=0.7 -> pass 34 | q015 pass q016 pass q021 FAIL
+  w=0.5 -> pass 33 | q015 pass q016 pass q021 FAIL
+  w=0.3 -> pass 31 | q015 pass q016 pass q021 FAIL
+
+BLIND #2 enrichment
+  w=1.0 -> pass 31 | q015 FAIL q016 pass q021 FAIL
+  w=0.7 -> pass 32 | q015 pass q016 pass q021 FAIL
+  w=0.5 -> pass 32 | q015 pass q016 pass q021 FAIL
+  w=0.3 -> pass 29 | q015 pass q016 pass q021 FAIL

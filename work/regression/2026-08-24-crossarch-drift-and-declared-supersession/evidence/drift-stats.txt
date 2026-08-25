@@ -1,0 +1,13 @@
+onnxruntime 1.23.2, identical graph bytes, identical input bytes,
+intra/inter_op_num_threads=1, ORT_SEQUENTIAL, ORT_DISABLE_ALL.
+
+elements                49152
+bit-identical           NO
+elements differing      40746  (82.9%)
+max |delta|             1.907e-06
+mean |delta|            2.538e-07
+max relative delta      7.726e-03
+max ULPs                81920
+
+fux sorts on round(score, 9); a score of order 1 drifts ~1.9e-06,
+which is ~2000x the rounding. One encoder block. A 6-layer model compounds it.

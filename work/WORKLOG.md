@@ -30,6 +30,58 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-24 — route 4 nailed condition 2 shut; route 2 made it irrelevant  ·  Cowork
+
+- **Asked:** *"Let's try route four and build route two as well. Will that
+  unblock?"* **Answer: no, and that is the good outcome.**
+- **Route 4 — cross-architecture determinism, measured for the first time.**
+  Identical ONNX graph shaped like one encoder block (MatMul, Softmax,
+  LayerNormalization, Gelu, residuals) at MiniLM-L6 dimensions; identical input
+  bytes; `onnxruntime==1.23.2` on both; single-threaded, sequential, **all graph
+  optimisations disabled** so the comparison is kernels rather than fusions.
+
+  | | x86_64 | aarch64 |
+  |---|---|---|
+  | sha256(out) | ff476682... | b3b86c04... |
+  | pooled bits | f888b1bc | f388b1bc |
+
+  **82.9 % of elements differ, max abs delta 1.907e-06**, after ONE block.
+  `rank()` sorts on `round(score, 9)` -- so the drift is ~2000x the rounding,
+  and a six-layer model compounds it. **ADR-RERANK veto 1 condition 2 stops
+  being an assumption.** It also now has a bar someone could aim at: below
+  `5e-10`.
+- **Route 2 -- declare the fact offline, rank on it deterministically. Built,
+  and it works.** `supersedes:` in ADR-0019's frontmatter made `superseded:
+  true` fire for the first time on any fux corpus; `superseded_weight` then
+  demotes with arithmetic that already ships.
+  **`q015` recovers in BOTH blind arms** (33->34, 31->32 at w=0.7), `q016` with
+  it, at w = 0.7 / 0.5 / 0.3 -- so it is the mechanism, not a lucky weight.
+  ⚠ The declaration ALONE does nothing: at w=1.0 the flag is set and q015 still
+  fails. The fact has to be used.
+- **Why this is the interesting result.** A cross-encoder fixes q015 by reading
+  word order AT QUERY TIME. A declaration fixes it by reading word order ONCE,
+  OFFLINE, and committing the conclusion. Same ranking; only one of them has a
+  determinism problem, **because the other has finished thinking before the
+  query arrives.** That is ADR-ENRICH's own thesis -- a model as a source, never
+  a step -- applied to a FACT rather than to prose.
+- **Disclosures, because this session is about exactly this:** the route was
+  designed by someone who had read q015; the mitigation is that the declaration
+  is copied from the document's own prose, is reviewable in a diff, and was
+  validated on both blind arms plus an untargeted query. ADR-0019's enrichment
+  was re-pinned by hand (same body, new sha). The route-4 graph is synthetic,
+  not MiniLM.
+- **Decided / open:**
+  - **Neither route unblocks condition 2**, and W-78's two rulings are still
+    Arpit's -- but both now rest on evidence they lacked this morning.
+  - ⚠ Route 2 covers **declared** relations only. *"this approach was
+    abandoned"*, *"do not use X"*, *"unlike Y"* are untouched, and **nobody has
+    counted how many a real corpus contains.** If that number is large the
+    argument for query-time word order returns; it just cannot lean on q015.
+  - **The offline declarer is unbuilt.** This run wrote the frontmatter by hand.
+- **Next:** W-78's two rulings; W-79's one.
+
+---
+
 ## 2026-08-24 — asked to turn the dense lane on; ran its gate instead, and it failed  ·  Cowork
 
 - **Asked:** *"I like all the options a, b, c, and d. And on c, let's turn it

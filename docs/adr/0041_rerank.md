@@ -188,6 +188,28 @@ Filed: [`work/regression/2026-08-24-rerank-and-goldens/`](../../work/regression/
 2. a cross-encoder is available whose output is byte-identical across x86-64
    and arm64, or the differential law is formally scoped to exclude it.
 
+> **Amended 2026-08-24 — condition 2 was an assumption. It is now a
+> MEASUREMENT, and it is not close.**
+> [The run](../../work/regression/2026-08-24-crossarch-drift-and-declared-supersession/report.md).
+>
+> An identical ONNX graph shaped like one transformer encoder block, identical
+> input bytes, `onnxruntime==1.23.2` on both machines, **single-threaded,
+> sequential, every graph optimisation disabled** — the most deterministic
+> configuration the runtime offers:
+>
+> | | x86_64 | aarch64 |
+> |---|---|---|
+> | `sha256(out)` | `ff476682...` | `b3b86c04...` |
+> | pooled bits | `f888b1bc` | `f388b1bc` |
+>
+> **82.9 % of elements differ; max absolute delta `1.907e-06`.** `rank()` sorts
+> on `round(score, 9)`, so the drift is **roughly two thousand times the
+> rounding** — and that is after **one** block. A six-layer model compounds it.
+>
+> **This sets the bar for anyone who wants to reopen condition 2.** The number
+> to beat is not *"small drift"*; it is drift below `5e-10`. Nothing in that
+> run is within three orders of magnitude of it.
+
 Condition 1 is the live one. On today's evidence enrichment is worth 10 points
 and reranking 4, and a 35 MB dependency targets the class enrichment already
 covers deterministically and for free.
@@ -268,6 +290,33 @@ covers deterministically and for free.
 > **Still not reopened here.** [W-78](../../work/OPEN-WORK.md) is where it is
 > ruled, and it now carries `n = 2` and a demonstrated mechanism rather than
 > one sample and a caveat.
+
+> **Amended again 2026-08-24 — `q015` is no longer an argument for this
+> capability, because it has a deterministic fix.**
+>
+> The failure was: BM25F reads *"no longer current"* as *"current"*, so the
+> superseded ADR wins a query asking for the current one. A cross-encoder would
+> fix that **by reading word order at query time**. Declaring the relation fixes
+> it **by reading word order once, offline, and committing the conclusion** —
+> `supersedes:` in frontmatter, then `superseded_weight` demoting with
+> integer-deterministic arithmetic that already ships.
+>
+> Measured: **`q015` recovers in BOTH blind arms** at `w` = 0.7, 0.5 and 0.3,
+> and `q016` with it —
+> [the run](../../work/regression/2026-08-24-crossarch-drift-and-declared-supersession/report.md).
+>
+> **That is this record's own thesis arriving from the other direction.**
+> [ADR-ENRICH](0040_enrich.md) already holds that a model is *a source, never a
+> step*; this applies it to a **fact** rather than to prose. A model that has
+> finished thinking before the query arrives has no determinism problem to
+> solve.
+>
+> ⚠ **What this does NOT settle.** It covers **declared** relations only.
+> *"this approach was abandoned"*, *"do not use X"*, *"unlike Y"* — every other
+> negation a document can express is untouched, and **nobody has measured how
+> many of them a real corpus contains.** If that number is large, the argument
+> for reading word order at query time returns; it just cannot lean on `q015`
+> any more.
 
 **Veto 2 — the reranker must never change the membership of a result set.**
 

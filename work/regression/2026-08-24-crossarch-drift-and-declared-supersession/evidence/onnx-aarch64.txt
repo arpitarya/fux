@@ -1,0 +1,6 @@
+machine   aarch64
+ort       1.23.2
+python    3.10.12
+out.sha256 b3b86c043770c49dda6aa0982d9df7427997dde2839b154227ffffedbb5e4248
+pooled     np.float32(-0.021671748)
+pooled.hex f388b1bc

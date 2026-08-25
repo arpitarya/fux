@@ -57,10 +57,20 @@ the class enrichment already covers deterministically and for free."*
 - The record has been **amended to stop asserting the contaminated number as
   today's evidence**, and deliberately **not** reopened — a ruling made on a
   comparison is reopened by the person who made it.
-- ⚠ **Condition 2 is independent and untouched.** `onnxruntime` is still not
-  byte-identical across x86-64 and arm64, so the cross-encoder stays refused on
-  determinism **whatever is decided here**. Reopening condition 1 does not
-  license a build; it licenses an argument.
+- ⚠ **Condition 2 is independent, and it is now MEASURED rather than assumed.**
+  Identical graph and input, same `onnxruntime`, single-threaded, optimisations
+  off: **82.9 % of elements differ, max `1.907e-06`** after one encoder block,
+  against a `round(score, 9)` sort — **~2000x the rounding**
+  ([run](../regression/2026-08-24-crossarch-drift-and-declared-supersession/report.md)).
+  The cross-encoder stays refused on determinism **whatever is decided here**.
+  Reopening condition 1 licenses an argument, not a build.
+- **And the argument itself got weaker in a useful way.** `q015` — the failure
+  that put condition 1 back on the table — **now has a deterministic fix that
+  needs no cross-encoder**: declare `supersedes:` offline, let
+  `superseded_weight` demote. **`q015` recovers in both blind arms.** So the
+  case for reopening can no longer lean on it. ⚠ It covers **declared**
+  relations only; every other kind of negation a document can express is
+  untouched, and nobody has counted them.
 
 **2. Does the measurement discipline gain a blind-authorship rule?**
 
