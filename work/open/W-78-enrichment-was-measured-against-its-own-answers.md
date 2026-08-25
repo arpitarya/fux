@@ -45,6 +45,39 @@ screenshot with a test attached. **This is the same failure entering through
 the other door** — not the goldens fitted to the engine, but the corpus
 metadata fitted to the goldens. Nothing forbade it, so nothing caught it.
 
+## Both rulings now have a compare doc, a literature review, and a recommendation
+
+**Ruling 1** — [`compare/cross-encoder-reopen.compare.md`](../compare/cross-encoder-reopen.compare.md).
+**Recommendation: CONFIRM the refusal, on a rewritten reason.**
+
+**Ruling 2** — [`compare/blind-authorship-rule.compare.md`](../compare/blind-authorship-rule.compare.md).
+**Recommendation: ACCEPT — and replace the wording**, which is wrong in four
+ways the literature names precisely.
+
+> ## ⚠ Three corrections to this item's own evidence, 2026-08-24
+>
+> The reports they appear in are frozen, so they are corrected here.
+>
+> **1. The "zero broken" argument is weak as stated.** Fisher's exact test on
+> 0/50 vs 2/50 gives **p ≈ 0.49**; under a 4 %-per-query null, P(0 in 50)
+> ≈ 0.13. The filed claim that it *"does not need N to be large"* is wrong as
+> a marginal comparison. **The force is in the CONCORDANCE** — both blind
+> authors broke the *same two*, and the contaminated author preserved exactly
+> those two: **≈ 0.028**, about **17x** the weight. Cite it that way.
+>
+> **2. Fifty queries is under-powered.** TREC puts MAP error at 50 topics
+> around **2.4 %**; the Kaggle meta-analysis recommends **≥ 10 000 examples**
+> against adaptive effects. The blind results were **+1 and −1** — **noise**,
+> and the proposed rule as drafted would have certified them as evidence.
+>
+> **3. No source-bias control.** *Neural Retrievers are Biased Towards
+> LLM-Generated Content* (KDD 2024) shows retrievers rank LLM-written text
+> higher **independently of whether it informs**. Every arm added ~70 tokens
+> of LLM prose to nine of ten documents with **no matched placebo**. This does
+> not threaten the *"enrichment is worth ~0"* conclusion — source bias would
+> make the true content contribution *lower* — but the runs cannot separate
+> them and did not say so.
+
 ## Owed — two rulings, both Arpit's
 
 **1. Does [ADR-RERANK](../../docs/adr/0041_rerank.md) veto 1 reopen?**
@@ -133,9 +166,13 @@ direction, and the golden set that would test it does not exist.
 
 ## Definition of done
 
-- [ ] ADR-RERANK veto 1: reopened, or confirmed standing with the new number
-      named in the confirmation.
-- [ ] The blind-authorship rule is accepted into ADR-RS, rewritten, or refused.
+- [ ] ADR-RERANK veto 1: reopened, or confirmed standing **with the rewritten
+      reason** — [the compare doc](../compare/cross-encoder-reopen.compare.md)
+      §6 drafts it. Re-confirming on the *old* reason repeats this item's error
+      at a different address.
+- [ ] The blind-authorship rule is accepted, **in the rewritten form**
+      ([compare doc](../compare/blind-authorship-rule.compare.md) §5), amended,
+      or refused. ⚠ The originally proposed wording is **not** recommended.
 - [x] ~~A second blind author~~ — **done 2026-08-24**, `31/50`, and both blind
       authors break the same two queries. The confound is closed.
 - [ ] Optional, and NOT a precondition for either ruling: make the playground

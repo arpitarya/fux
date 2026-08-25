@@ -30,6 +30,52 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-24 — read the literature for both of W-78's rulings; it corrected us four times  ·  Cowork
+
+- **Asked:** *"What would you recommend for blocker one and two? do some
+  research?"* Two research agents, ~200 web sources.
+- **Ruling 1 -- recommend CONFIRM, on a REWRITTEN reason**
+  ([compare doc](compare/cross-encoder-reopen.compare.md)). The canonical
+  BM25+CE `+4.2 nDCG` is a **2021** number; nobody has re-run it for a small
+  cross-encoder and BEIR deprecated its reranking sheet in 2023. Gains
+  concentrate where the first stage is WEAK (MS MARCO .220 -> .388) and nearly
+  vanish where it is strong (SciFact .658 -> .676). ~40% of queries gain
+  nothing. Rerankers fall BELOW retriever-only in ~half of measured
+  configurations. The 2026 wins are 20B+ models, not 22M MiniLMs. The metadata
+  alternative has **+32 points on versioned technical documentation**.
+  ⚠ The honest counter is in the doc: most retrievers score BELOW random on
+  negation and cross-encoders are the only sub-LLM class that clears it.
+- **Ruling 2 -- recommend ACCEPT, REWRITTEN**
+  ([compare doc](compare/blind-authorship-rule.compare.md)). **TREC has had
+  this rule since 1994** (manual vs automatic runs) and its mechanism beats
+  ours: **reclassify, do not ban.** CONSORT 2025 says to abandon binary
+  blinding labels; ARRIVE 2.0 item 5 is the sentence to copy.
+- **FOUR CORRECTIONS TO OUR OWN FILED CLAIMS.** The reports are frozen, so they
+  are recorded in W-78 and in the compare docs:
+  1. **The "zero broken" argument is p ~ 0.49** as a marginal comparison
+     (Fisher exact, 0/50 vs 2/50). The force was always the **concordance** --
+     both blind authors broke the SAME two, ~0.028, about **17x** the weight.
+  2. **Fifty queries is under-powered** (TREC ~2.4% MAP error at 50 topics;
+     Kaggle meta-analysis recommends >= 10 000). Our +1 and -1 are noise.
+  3. **No source-bias control.** Retrievers rank LLM-written text higher
+     regardless of whether it informs (KDD 2024). Every arm added ~70 tokens of
+     LLM prose to nine of ten documents with no matched placebo.
+  4. **"onnxruntime is not byte-identical across architectures" had too general
+     a cause.** Arm's own docs say basic IEEE-754 ops ARE identical; the
+     divergence is per-ISA GEMM kernel selection, FMA contraction and libm.
+     And onnxruntime's suggested tolerance is ~1e-5, LOOSER than our measured
+     1.9e-6 -- to spec, and still breaking fux's promise.
+- **Concurrency:** a Claude Code session executed and committed **W-79**
+  (`cc45c14`) while this research ran. My patch collided, was **not** forced,
+  and this work was rebased onto theirs. Nothing of theirs was overwritten.
+- **Decided / open:** nothing ruled. Both remain Arpit's, now with a
+  recommendation and a reopening condition that can fire -- **measure whether
+  UNDECLARED negation is common in a real corpus.** Nobody ever has.
+- **Next:** the two rulings.
+
+---
+
+
 ## 2026-08-26 — W-79: the dead fusion code, deleted  ·  Claude Code
 
 - **Asked:** implement W-79 — rule delete-or-wire-up on three things that
