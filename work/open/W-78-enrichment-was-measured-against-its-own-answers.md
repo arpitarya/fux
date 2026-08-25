@@ -2,7 +2,7 @@
 type: OpenItem
 id: W-78
 title: "W-78 — enrichment's value was measured by an author who had read the answers, and the ruling it justified is still standing"
-description: "The blind re-grade put enrichment at +1 against the +9 recorded on 2026-08-24. The comparison that deferred the cross-encoder was between a clean number and a contaminated one. Two things are owed and both are Arpit's: whether ADR-RERANK's veto 1 reopens, and whether the measurement discipline gains a blind-authorship rule."
+description: "The blind re-grade put enrichment at +1 against the +9 recorded on 2026-08-24. The comparison that deferred the cross-encoder was between a clean number and a contaminated one. RULING 2 IS MADE (Arpit, 2026-08-25): the run-classification rule is accepted in its rewritten form and lives in ADR-RS decisions 11-15. ONE ruling remains, and it is Arpit's: whether ADR-RERANK veto 1 reopens or is confirmed on a rewritten reason."
 status: open
 lane: arpit
 timestamp: 2026-08-24T00:00:00Z
@@ -45,14 +45,21 @@ screenshot with a test attached. **This is the same failure entering through
 the other door** — not the goldens fitted to the engine, but the corpus
 metadata fitted to the goldens. Nothing forbade it, so nothing caught it.
 
-## Both rulings now have a compare doc, a literature review, and a recommendation
+## One ruling made, one still owed
 
-**Ruling 1** — [`compare/cross-encoder-reopen.compare.md`](../compare/cross-encoder-reopen.compare.md).
+**Ruling 2 — RULED 2026-08-25 (Arpit): ACCEPTED, in the rewritten form.**
+[`compare/blind-authorship-rule.compare.md`](../compare/blind-authorship-rule.compare.md)
+is `accepted`; the rule is in force as
+[ADR-RS](../../docs/adr/0036_predictions.md) decisions 11-14 and
+[`CLAUDE.md`](../../CLAUDE.md) §Conformance runs, and is checked from
+2026-08-25 forward by
+[`tests/test_regression_runs.py`](../../tests/test_regression_runs.py). ⚠ Two of
+its six parts are apparatus and did **not** take effect —
+[W-81](W-81-the-sealed-set-and-the-two-controls.md).
+
+**Ruling 1 — still owed, still Arpit's.**
+[`compare/cross-encoder-reopen.compare.md`](../compare/cross-encoder-reopen.compare.md).
 **Recommendation: CONFIRM the refusal, on a rewritten reason.**
-
-**Ruling 2** — [`compare/blind-authorship-rule.compare.md`](../compare/blind-authorship-rule.compare.md).
-**Recommendation: ACCEPT — and replace the wording**, which is wrong in four
-ways the literature names precisely.
 
 > ## ⚠ Three corrections to this item's own evidence, 2026-08-24
 >
@@ -114,7 +121,13 @@ the class enrichment already covers deterministically and for free."*
   relations only; every other kind of negation a document can express is
   untouched, and nobody has counted them.
 
-**2. Does the measurement discipline gain a blind-authorship rule?**
+**2. Does the measurement discipline gain a blind-authorship rule?** — **YES. RULED 2026-08-25.**
+
+> **Arpit accepted the rewritten form.** What follows is the reasoning as it
+> stood when the question was open; the *accepted* wording is
+> [the compare doc](../compare/blind-authorship-rule.compare.md) §5 and it is
+> **not** the wording quoted below, which was refused. Kept rather than
+> replaced so the ruling can be read against what it ruled on.
 
 [ADR-ENRICH](../../docs/adr/0040_enrich.md) governs how enrichment is generated
 and pinned and says nothing about who may have seen the evaluation. `fux
@@ -123,12 +136,17 @@ enrich` **cannot** enforce it — the model is the author and fux never calls on
 [ADR-RS](../../docs/adr/0036_predictions.md), beside the
 threshold-never-moves rule it is a sibling of.
 
-Proposed wording, for acceptance or rejection rather than as a decision taken:
+⚠ **The wording below was REFUSED.** It is kept because the ruling is only
+legible against it. Four faults: *"has seen"* is the binary CONSORT 2025 tells
+you to abandon; *"seen"* is undefined exactly where teams fail; *"is not
+evidence"* is a prohibition and will be violated quietly where TREC's
+reclassification would not; and *"upper bound"* asserts a bounded magnitude a
+leak does not have.
 
-> **An artifact whose author has seen the evaluation set is not evidence about
+> ~~**An artifact whose author has seen the evaluation set is not evidence about
 > that evaluation set.** Where fux cannot enforce this — anything a model
 > writes — the run states who authored the artifact and what they had read, or
-> the number is an upper bound and must be labelled one.
+> the number is an upper bound and must be labelled one.~~
 
 ## ~~Agent-closable~~ — DONE 2026-08-24, and the answer is not ambiguous
 
@@ -179,9 +197,12 @@ direction, and the golden set that would test it does not exist.
       reason** — [the compare doc](../compare/cross-encoder-reopen.compare.md)
       §6 drafts it. Re-confirming on the *old* reason repeats this item's error
       at a different address.
-- [ ] The blind-authorship rule is accepted, **in the rewritten form**
-      ([compare doc](../compare/blind-authorship-rule.compare.md) §5), amended,
-      or refused. ⚠ The originally proposed wording is **not** recommended.
+- [x] ~~The blind-authorship rule is accepted, in the rewritten form~~ —
+      **DONE 2026-08-25 (Arpit). ACCEPTED**, in
+      [the rewritten form](../compare/blind-authorship-rule.compare.md) §5; the
+      originally drafted wording was **refused**. In force as ADR-RS decisions
+      11-14 and CLAUDE.md §Conformance runs, checked from 2026-08-25 forward.
+      ⚠ The sealed set and the two controls are **not built** — W-81.
 - [x] ~~A second blind author~~ — **done 2026-08-24**, `31/50`, and both blind
       authors break the same two queries. The confound is closed.
 - [ ] Optional, and NOT a precondition for either ruling: make the playground

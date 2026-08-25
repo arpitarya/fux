@@ -588,6 +588,39 @@ Per run, in the same change:
 4. Save the primary data under `evidence/`.
 5. Add the run to [`work/regression/README.md`](work/regression/README.md)
    and bump the DOC-REGISTRY row.
+6. **Classify the run — `blind` or `informed` — in the report's frontmatter,
+   and name who authored each artifact and what evaluation material they could
+   reach.** Required from 2026-08-25 for every *measured* run; a surface
+   capture is exempt. See below.
+
+**Every measured run is `blind` or `informed`, and says which.** A run is
+**blind** only if *every* artifact it depends on — corpus enrichment, the
+enrichment prompt, chunking and index configuration, retriever and reranker
+settings, **and the analysis** — was authored with no access to the evaluation
+queries, the judgments, prior per-query scores, or any derived report of them
+(a failure list, a dashboard, a ticket naming a query). Anything else is
+**informed**.
+
+- **An informed run is reclassified, not banned.** File it, list it, cite it,
+  let it inform the corpus. It is **never compared with a blind run and never
+  used to state a delta.** This is TREC's manual/automatic split; a rule that
+  bans useful work gets routed around, a rule that sorts it survives.
+- **Say who authored each artifact and what they could reach** — *queries /
+  judgments / prior scores / none*. The burden is on the author to argue
+  exposure was absent. An informed number is **not** an "upper bound" (that
+  claims a bounded magnitude a leak does not have); label it **"not a
+  generalisation estimate."**
+- **A delta below the set's resolution is "no detected change"**, whoever
+  authored it. Provisionally — and this is a placeholder for a measurement, not
+  a measurement — **nothing under ±2 queries (4 pp) on a 50-query set counts.**
+- **Do not edit a frozen report to classify it.** The rule is baselined at
+  2026-08-25 on the run directory's own date, and
+  `tests/test_regression_runs.py` checks it from there.
+
+Ruled by Arpit 2026-08-25 (W-78 ruling 2); explained and guarded by
+[ADR-RS](docs/adr/0036_predictions.md) decisions 11-15. ⚠ Two parts of the
+accepted rule — a **sealed** query set and the **decoy/placebo controls** — are
+**not built** and are owed as W-81; nothing may cite them as in force.
 
 **A verdict is not an ADR.** When a run adjudicates a pre-registered
 prediction, the ruling is a `VERDICT.md` beside its evidence — `type: Verdict`,

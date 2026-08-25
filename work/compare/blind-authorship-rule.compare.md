@@ -1,15 +1,54 @@
 ---
 type: Compare Doc
 title: The Blind-Authorship Rule — and Three Corrections to the Evidence Behind It
-description: "W-78 ruling 2. The rule is well-precedented — TREC has had it since 1994 as the manual/automatic run split. But the wording proposed on 2026-08-24 is wrong in four ways, the `zero broken` statistic is weak as stated (Fisher exact p ~ 0.49), 50 queries is under-powered, and the runs lack a source-bias control. RECOMMENDATION: accept, rewritten. UNRULED."
-status: proposed
+description: "W-78 ruling 2. RULED 2026-08-25 (Arpit): ACCEPTED in the rewritten form of §5. The rule is well-precedented — TREC has had the manual/automatic run split since 1994 — and the mechanism that matters is reclassify-do-not-ban. The wording proposed on 2026-08-24 was refused: it is wrong in four ways, and it was silent on power and on controls. Also carries three corrections to fux's own filed evidence."
+status: accepted
 timestamp: 2026-08-24T00:00:00Z
 ---
 
 # The blind-authorship rule, with the literature read
 
-> **UNRULED. Arpit's call** — [W-78](../open/W-78-enrichment-was-measured-against-its-own-answers.md)
-> ruling 2. **Recommendation: ACCEPT — and replace the wording.**
+> ## Verdict: ACCEPTED, in the rewritten form — Arpit, 2026-08-25
+>
+> **The call.** The rule is adopted as **§5's wording**, not as the wording
+> drafted on 2026-08-24. The single load-bearing difference: an informed run is
+> **reclassified, never banned**, and never supplies a delta — TREC's
+> manual/automatic split, in force there since 1994.
+>
+> **Confidence: high on the mechanism, low on the numbers.** The precedent is
+> thirty years old and the failure mode is documented across four literatures.
+> What is *not* settled is fux's own resolution: the floor in decision 14 is a
+> **placeholder**, taken from two author samples, and is labelled one everywhere
+> it appears.
+>
+> **Where it now lives.** [ADR-RS](../../docs/adr/0036_predictions.md)
+> decisions 11-15 · [`CLAUDE.md`](../../CLAUDE.md) §Conformance runs ·
+> [`work/regression/README.md`](../regression/README.md) per-run contract row 7
+> · checked by [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py)
+> from 2026-08-25 forward, baselined on the run directory's own date so no
+> frozen report is edited to satisfy a rule written after it.
+>
+> ⚠ **Two of the six parts did NOT take effect** — the sealed query subset and
+> the decoy/placebo controls are apparatus, not protocol, and are owed as
+> [W-81](../open/W-81-the-sealed-set-and-the-two-controls.md). ADR-RS decision
+> 15 carries them marked `NOT BUILT`.
+>
+> ⚠ **The ruling costs this project's own evidence something.** Decision 14's
+> floor puts the blind arms' `+1` and `-1` below detection: the honest reading
+> is **no detected effect**, not `+1`. What survives is the **concordance**
+> (§0a), which is the statistic to cite from here on.
+>
+> **Reopen-trigger — a condition, not a date.** Reopen if any of these becomes
+> checkable-true: (1) **a run is filed that is neither blind nor informed** —
+> a genuine third category exists and the binary is wrong; (2) **the
+> classification is satisfied by every run for six consecutive runs while a
+> contaminated artifact still reaches a delta** — the label is decorative and
+> the sealed set in W-81 is the only remaining control; (3) **author-to-author
+> variance is measured** with more than two samples and lands anywhere other
+> than the provisional ±2 queries, which retires decision 14's placeholder;
+> or (4) **a run needs to state a delta and cannot**, because every eligible
+> author is exposed — the case §4 predicts a ban would create and this wording
+> was chosen to avoid.
 
 ## 0 · Three corrections to fux's own filed claims
 

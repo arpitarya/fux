@@ -21,6 +21,24 @@ timestamp: 2026-08-23T00:00:00Z
 > separate command, graded below deterministic signal — and explicitly did not
 > authorise a build. What changes here is **who runs the model**.
 
+> ## Pointer added 2026-08-25 — who may author an enrichment, when it is being MEASURED
+>
+> **This record governs how enrichment is generated and pinned, and it stays
+> silent on who may have read the evaluation set. That silence is deliberate
+> and now has an address.** `fux enrich` cannot enforce authorship — fux never
+> calls a model, so the author is outside the program — which makes it a
+> **measurement-protocol** rule, and it lives in
+> [ADR-RS](0036_predictions.md) decisions 11-15 (ruled by Arpit 2026-08-25,
+> [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md)
+> ruling 2).
+>
+> **What it means for anyone writing enrichment.** Nothing changes about
+> *generating* it. What changes is that a **run which measures** it declares
+> whether the enrichment's author could reach the evaluation queries — `blind`
+> or `informed` — and an informed run never supplies a delta. This is not a
+> restriction on enrichment; it is a restriction on what a number about
+> enrichment may claim.
+
 ## 1 · Examples
 
 ```console

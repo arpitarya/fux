@@ -2,7 +2,7 @@
 type: ADR
 name: ADR-RS
 title: "ADR-RS (0036) — the R predictions: what a frozen claim is, and the four ways one can end"
-description: "The prediction system had governed every gate in this project without a record of its own. An R is a claim frozen before measurement; its threshold may never move; its verdict is never edited; an ambiguous result goes to Arpit rather than being adjudicated by whoever ran it; and it can end in exactly four ways — PASS, FAIL, INCONCLUSIVE, RETIRED — of which FAIL is a success and RETIRED is not a failure."
+description: "The prediction system had governed every gate in this project without a record of its own. An R is a claim frozen before measurement; its threshold may never move; its verdict is never edited; an ambiguous result goes to Arpit rather than being adjudicated by whoever ran it; and it can end in exactly four ways — PASS, FAIL, INCONCLUSIVE, RETIRED — of which FAIL is a success and RETIRED is not a failure. Amended 2026-08-25 with the RUN-CLASSIFICATION rule (W-78 ruling 2, Arpit): every measured run is blind or informed and says which, an informed run is reclassified rather than banned and never supplies a delta, and a delta below the set's resolution is no detected change."
 status: accepted
 timestamp: 2026-08-22T00:00:00Z
 ---
@@ -24,8 +24,9 @@ timestamp: 2026-08-22T00:00:00Z
   acceptance is met, and it was met by building the check rather than by
   deciding the check was unnecessary
 - **Date:** 2026-08-22
-- **Feature:** the prediction system — the R ids, their register, and the rules
-  that make a frozen claim mean something
+- **Feature:** the prediction system — the R ids, their register, the rules
+  that make a frozen claim mean something, and **since 2026-08-25 the
+  classification of the runs those claims are measured by**
 - **Owns:** [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py)
   — the per-run contract, previously unowned — **and `tools/t2-eval/`, by the
   fallback in decision 10.** The other harnesses stay where they are:
@@ -35,6 +36,47 @@ timestamp: 2026-08-22T00:00:00Z
 - **Laws:** L3
 - **Amends:** nothing. CLAUDE.md keeps the rules verbatim and stays the
   normative home; this record explains and guards them
+
+> ## Ruled 2026-08-25 — the run-classification rule is ACCEPTED. What the ruling changed, and what it did not
+>
+> **Arpit accepted [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md)
+> ruling 2 on 2026-08-25, in the rewritten form** argued in
+> [`blind-authorship-rule.compare.md`](../../work/compare/blind-authorship-rule.compare.md)
+> §5. The originally drafted wording — *"an artifact whose author has seen the
+> evaluation set is not evidence about that evaluation set"* — was **not**
+> accepted, and the compare doc names four reasons it is wrong.
+>
+> **What the ruling made true, in the change that made it true:**
+>
+> | what | where |
+> |---|---|
+> | every measured run is `blind` or `informed` and declares which | decisions 11–13 below; `CLAUDE.md` §Conformance runs |
+> | an informed run is **reclassified, never banned** — TREC's mechanism | decision 12 |
+> | a delta below the set's resolution is **"no detected change"** | decision 14 |
+> | the classification is **checked**, for runs filed from this date | [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py) |
+> | the per-run contract gains row 7 | [`work/regression/README.md`](../../work/regression/README.md) |
+> | the sealed set and the two controls — **owed, not built** | decision 15, [W-81](../../work/open/W-81-the-sealed-set-and-the-two-controls.md) |
+>
+> **What it did NOT change.** Not one filed verdict, pre-registration or
+> report. **`Amends: nothing` still holds** — CLAUDE.md remains the normative
+> home and gains the rule verbatim; this record explains and guards it, which
+> is the arrangement decision 1's preamble already described.
+>
+> ⚠ **The ruling costs this record's own evidence something, and the cost is
+> stated rather than absorbed.** Decision 14's floor **retroactively
+> reclassifies fux's own blind enrichment arms**: `+1` and `-1` on 50 queries
+> are below any defensible resolution, so the honest reading is *"no detected
+> effect"*, not *"+1"*. What survives the floor is the **concordance** — both
+> blind authors broke the *same two* queries and the informed author preserved
+> exactly those two, ~0.028 — which is a different statistic and is the one to
+> cite. Three corrections to the filed evidence are recorded in
+> [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md);
+> the reports themselves are frozen and were not edited.
+>
+> ⚠ **Two of the six rules in the accepted wording are NOT in force**, and
+> saying otherwise would be the overclaim this record exists to prevent. The
+> sealed query set and the decoy/placebo controls are **build work**, not
+> protocol, and they are filed as W-81. Decisions 11–14 are in force today.
 
 ---
 
@@ -96,6 +138,37 @@ embarrassing will quietly stop producing them.
 
 **RETIRED is not FAIL either**, and conflating them would misreport history.
 R7's budget was never missed; the promise was withdrawn.
+
+### Blind and informed — the second half of the same idea
+
+**Pre-registration stops you moving the goalposts after the shot. Run
+classification stops you moving the *goal*.**
+
+A prediction freezes the threshold before the number exists. But a threshold is
+only half of what a measurement rests on — the other half is the **artifacts**
+the run measures: the enrichment text, the prompt that wrote it, the chunking,
+the tuned weights, the analysis. If any of those was authored by someone who
+had already read the evaluation queries, the number is about *those queries*,
+not about the engine, and no amount of threshold discipline recovers it.
+
+Fux learned this the expensive way. An enrichment written by an author who had
+seen the failing queries measured **+9**; the same intervention written blind
+measured **+1**, and a second blind author measured **-1**. The tell was not
+the score — it was that the informed arm broke **nothing**, on a corpus where
+adding vocabulary to nine of ten documents *must* disturb something.
+
+**So every run now says which kind it is:**
+
+| | means |
+|---|---|
+| **blind** | every artifact it depends on was authored with no access to the queries, the judgments, or prior per-query scores |
+| **informed** | anything else |
+
+**An informed run is not thrown away.** It is filed, cited, and may inform the
+corpus — it simply never supplies a delta and is never compared with a blind
+one. That is TREC's manual/automatic split, which has worked since 1994, and it
+works because **a rule that bans useful work gets routed around, while a rule
+that sorts it survives**.
 
 ---
 
@@ -175,6 +248,88 @@ and an unowned component is a component whose contract can change with no
 record updating. **This is a backstop, not a preference**: a harness moves to
 its feature's record the moment one exists.
 
+**11. Every measured run is `blind` or `informed`, and declares which.** A run
+is **blind** only if *every* artifact it depends on was authored without access
+to the evaluation queries, the judgments, prior per-query scores, or any
+derived report of them — a failure list, a dashboard, a ticket naming a query.
+The artifacts are: **corpus enrichment, the enrichment prompt, chunking and
+index configuration, retriever and reranker settings, and the analysis.**
+Anything else is **informed**.
+
+Two things this deliberately does not say. It does not say *"has seen"*, the
+binary CONSORT 2025 item 20a tells you to abandon — blindness is per-person and
+per-stage, and the drafted wording omitted analysts entirely. And it does not
+name the model, because **the artifact is the contaminated object**, not the
+model and not the metric. *That* phrasing is kept verbatim from the original
+draft; it was the part the draft got right.
+
+**12. An informed run is RECLASSIFIED, never banned — and never supplies a
+delta.** It is filed, listed, cited, and may inform the corpus. It is **never
+compared with a blind run and never used to state a difference between arms.**
+
+This is the load-bearing decision and it is the one the drafted wording missed.
+TREC has split manual from automatic runs since **1994**: manual runs are
+reported and contribute to the judgment pool, and are never scored against
+automatic ones. **A prohibition on useful work gets routed around quietly; a
+taxonomy survives**, and a rule that is quietly violated is worse than no rule
+because it also supplies false assurance.
+
+**13. The run states who authored each artifact and what evaluation material
+they could reach.** Per artifact: the author, and which of *queries /
+judgments / prior scores / none*. The sentence copied is ARRIVE 2.0 item 5 —
+*"describe who was aware of the group allocation at the different stages."*
+
+**The burden is on the author to argue exposure was absent**, not on a reader
+to demonstrate it was present. Paraphrase-level exposure defeats string
+matching, and BIG-bench's canary GUID — embedded precisely so labs could
+exclude it, and reproducible by a model that was trained on it anyway — is the
+standing proof that *"did you read the file?"* is not the question. Disclosure
+is the fallback; a set nobody can reach is the control.
+
+**And the label for an informed number is not "upper bound".** An upper bound
+asserts a known direction *and* a bounded magnitude; a leaked measurement has
+**unknown bias magnitude**. The honest label is **"not a generalisation
+estimate."**
+
+**14. A delta smaller than the set's resolution is reported as "no detected
+change", whoever authored it.** Fux's engine is deterministic, so *run-to-run*
+variance is zero — and that is not the variance that matters. The variance that
+matters is **author-to-author**, and it has been sampled exactly twice: `+1` and
+`-1` on fux-playground's 50 queries.
+
+**Provisionally, and explicitly as a placeholder for a measurement rather than
+a measurement: on a 50-query set, nothing under ±2 queries (4 pp) is a detected
+change.** TREC puts standard MAP error at 50 topics near **2.4 %**; a
+meta-analysis of >120 Kaggle competitions recommends **≥10 000 examples** to be
+safe from adaptive effects. Fifty queries is under-powered and this record says
+so rather than letting a future reader discover it.
+
+⚠ **This applies retroactively to fux's own numbers, and that is the point.**
+The blind arms' `+1` and `-1` are below the floor: the honest reading is **no
+detected effect**, not `+1`. What survives is the **concordance** — both blind
+authors broke the same two queries, the informed author preserved exactly those
+two, ~0.028 — a different statistic, roughly **17x** the evidential weight of
+the *"broke nothing"* sentence that was actually filed, and the one to cite.
+
+**15. An enrichment change is scored against a decoy set and a placebo — NOT
+BUILT, and owed as [W-81](../../work/open/W-81-the-sealed-set-and-the-two-controls.md).**
+*Neural Retrievers are Biased Towards LLM-Generated Content* (KDD 2024)
+establishes **source bias**: retrievers rank LLM-written text higher
+independently of whether it informs, and the effect reaches re-rankers. Every
+fux enrichment arm added ~70 tokens of fluent LLM prose to nine of ten
+documents with **no matched control**, so text *presence* and text *content*
+are not separable in any number this project has filed.
+
+Two controls close it — a **decoy** query set the enrichment was not aimed at,
+and a **content-free placebo** enrichment of matched length — and decision 11
+implies a third thing that does not exist either: a **sealed** subset of
+queries, held by one owner, never shown to anyone who authors an artifact,
+rotated when it leaks. **None of the three is built.** They are build work, not
+protocol, and this decision is filed as unbuilt rather than written as though
+it were in force. ⚠ Sealing also *shrinks* the visible set, which makes
+decision 14's power problem worse before it makes it better; W-81 has to
+resolve that tension rather than inherit it silently.
+
 ### Consequences
 
 - **The prediction system is now guardable.** Before this record a change to
@@ -190,6 +345,26 @@ its feature's record the moment one exists.
 - **Nothing about any existing R changes.** No verdict, no pre-registration and
   no status is touched by writing this down.
 
+**Added by the 2026-08-25 ruling:**
+
+- **A run can now be wrong in a way the register catches.** Before decision 11,
+  an artifact authored against the evaluation set produced a number that looked
+  exactly like a clean one. It still can — but the run has to *say* so, and a
+  run filed from 2026-08-25 that says nothing fails
+  [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py).
+- **The existing runs are exempt by baseline, not by exception.** Every filed
+  report is frozen (decision 5's sibling rule for reports), so the check is
+  anchored to the run's own directory date. This is the `docs/adr/RULE-SINCE`
+  pattern applied to a second gate, and it is the only shape that does not
+  require editing frozen evidence to turn a rule on.
+- **A surface capture is out of scope**, and deliberately: it pre-registers no
+  threshold and states no delta, so a classification on it would be a label
+  with nothing to label. The check reads the same *"surface capture"*
+  declaration the evidence rule already reads, so the two cannot drift apart.
+- **Fux's own enrichment numbers are downgraded by its own new rule** — see
+  decision 14. A discipline whose first act is to weaken the evidence that
+  motivated it is behaving correctly.
+
 ### Alternatives considered
 
 | | why not |
@@ -197,6 +372,10 @@ its feature's record the moment one exists.
 | **Leave it in CLAUDE.md only** | it worked until it didn't — R9 went unregistered and nothing noticed, because no record owned noticing. CLAUDE.md stays the normative home; this adds the ownership and the vetoes |
 | **Own the harnesses too** | a harness belongs to the feature it measures — `maintenance-bench` with ADR-MAINTENANCE. Claiming them here would break one-component-one-owner for no gain |
 | **Fold predictions into the ADR register** | different lifecycles. A record is superseded by argument; a prediction is superseded only by a better measurement, and mixing them invites exactly the confusion decision 5 forbids |
+| **The originally drafted wording** — *"an artifact whose author has seen the evaluation set is not evidence"* | **refused 2026-08-25.** Four faults, each named by a standard: *"has seen"* is the binary CONSORT 2025 abandons; *"seen"* is undefined exactly where teams fail (queries? judgments? a Slack thread naming a bad query?); *"is not evidence"* is a prohibition and will be violated quietly where TREC's reclassification would not; and *"upper bound"* asserts a bounded magnitude a leak does not have. It was also silent on power and on controls |
+| **Ban informed artifacts outright** | you cannot unsee. Everyone working on this project accumulates exposure, so a ban ends with nobody eligible to author anything — and the rule would then be ignored rather than repealed |
+| **Rely on disclosure alone, with no sealed set** | BIG-bench's canary is the counter-example: a marker embedded *so that* labs could exclude it, and reproducible by a model trained on it regardless. FrontierMath's actual fix was a sealed holdout, not a norm. Disclosure is the fallback; decision 15 owes the control |
+| **Enforce it in `fux enrich`** | fux never calls a model — the author is outside the program, so there is nothing for the code to check. This is a measurement-protocol rule and its enforcement lives where runs are filed, which is why it landed here and not in [ADR-ENRICH](0040_enrich.md) |
 
 ### Reference (required)
 
@@ -218,6 +397,19 @@ its feature's record the moment one exists.
   pre-registration, so nothing could have been tuned to pass.
 - Pre-registration as practised in empirical research, and the outcome-reporting
   bias it exists to prevent — <https://www.cos.io/initiatives/prereg>
+- **The ruling behind decisions 11-15** —
+  [`work/compare/blind-authorship-rule.compare.md`](../../work/compare/blind-authorship-rule.compare.md),
+  accepted by Arpit 2026-08-25, and
+  [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md),
+  which carries the three corrections to the evidence.
+- **The measurement that motivated them** —
+  [the blind enrichment re-grade](../../work/regression/2026-08-24-blind-enrichment-regrade/report.md)
+  and [the second blind author](../../work/regression/2026-08-24-blind-enrichment-second-author/report.md).
+  ⚠ Both are **informed** runs by decision 11 (the analysis was written with the
+  scores in hand) and both are below decision 14's floor. They are cited for the
+  **concordance**, which is what survives.
+- **The unbuilt half** —
+  [W-81](../../work/open/W-81-the-sealed-set-and-the-two-controls.md).
 
 ### Veto condition
 
@@ -243,6 +435,19 @@ its feature's record the moment one exists.
    ceiling** (CLAUDE.md §Litmus).
 6. **A session adjudicates its own ambiguous result** rather than handing it to
    Arpit.
+7. **A delta is stated across the blind/informed boundary** — an informed arm
+   compared with a blind one, or either compared with a baseline the other
+   authored. Decision 12 forbids it; this is the condition most likely to be
+   broken by accident, because the two numbers sit in the same table.
+8. **A measured run filed on or after 2026-08-25 carries no `classification`**,
+   or names fewer artifacts than decision 11 lists. **Mechanical** — see check 7
+   below.
+9. **A delta below decision 14's floor is reported as a change** rather than as
+   *no detected change*.
+10. **Decision 14's floor is cited as measured.** It is a placeholder. If a
+    document quotes ±2 queries without the word *provisional*, the placeholder
+    has hardened into a fact nobody measured, which is the failure R7 and R8
+    were withdrawn for in a different costume.
 
 **How to check them:**
 
@@ -268,6 +473,15 @@ uv run pytest -q tests/test_prediction_register.py
 # 5 — no live threshold names a size above the ceiling
 grep -rn "100 000\|50 000" tools/*/PRE-REGISTRATION*.md
 # expect: only inside frozen historical files, never in a newly registered one
+
+# 7 — every measured run filed from 2026-08-25 declares blind or informed
+uv run pytest -q tests/test_regression_runs.py -k classification
+# baselined on the run directory's own date: frozen reports are never edited to
+# satisfy a rule written after them. A surface capture is out of scope by
+# decision 15's scope note, read from the same declaration the evidence rule uses.
+
+# 9/10 — the floor is quoted as provisional wherever it is quoted at all
+grep -rn "no detected change\|resolution floor" work/ docs/ --include=*.md
 ```
 ---
 
@@ -303,3 +517,24 @@ evidence.*
 - Center for Open Science, *Preregistration* — the practice, and the
   outcome-reporting bias it exists to prevent
   <https://www.cos.io/initiatives/prereg>
+- **TREC**, the manual/automatic run split, in force since TREC-2 (1994) and
+  restated in the Deep Learning Track guidelines — the mechanism decisions 11
+  and 12 copy: *reclassify, do not ban*.
+- **CONSORT 2025**, item 20a — abandon binary blinding labels; name **who** was
+  blind at **which stage**, analysts included. Decision 11's per-artifact list.
+- **ARRIVE 2.0**, item 5 — *"describe who was aware of the group allocation at
+  the different stages."* Decision 13's sentence, copied.
+- Kaufman, Rosset et al., *Leakage in Data Mining* (KDD 2011) — legitimacy is a
+  property of **how a feature came to exist**, not of its values. An enrichment
+  note is a feature.
+- Kriegeskorte et al., *Circular analysis in systems neuroscience*
+  (Nature Neuroscience, 2009) — the same data selecting the artifact and scoring
+  it; the closest fit for the **human** role in this failure.
+- Dai et al., *Neural Retrievers are Biased Towards LLM-Generated Content*
+  (KDD 2024) — **source bias**; decision 15's placebo arm exists because of it.
+- Nogueira et al., **doc2query** — document expansion that enforces the split
+  mechanically, using training queries only. Document-side enrichment done
+  correctly is not novel; doing it without the split is what was novel here.
+- **BIG-bench**'s canary GUID, and **FrontierMath**'s sealed holdout — the two
+  standing demonstrations that disclosure is a fallback and a sealed set is the
+  control (decision 13, decision 15).
