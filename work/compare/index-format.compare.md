@@ -16,8 +16,8 @@ timestamp: 2026-08-09T00:00:00Z
 > `tpack:` (a base64 binary property) and the mmap segment design returns
 > as tier T2 — a field-level change, not a format fork. Full postings, no
 > pruning (P1-RERUN). **Supersedes the MST keyspace + BIC wire verdicts
-> for the committed plane** ([keyspace-unification](keyspace-unification.compare.md),
-> [wire-format](wire-format.compare.md) — see their amendment notes).
+> for the committed plane** (`keyspace-unification` (archived 2026-08-25),
+> `wire-format` (archived 2026-08-25) — see their amendment notes).
 > **Status:** ✅ accepted (Arpit, 2026-08-09, in session) ·
 > **Confidence:** high — every load-bearing claim below is measured, not
 > estimated.

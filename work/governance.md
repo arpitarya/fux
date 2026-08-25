@@ -1,6 +1,8 @@
 # GOVERNANCE — how this repo's process is documented, and by what
 
-**How to use this file.** Fux is governed by ~90 markdown/JSON files spread
+**How to use this file.** ⚠ **Counts here were recounted 2026-08-25 and had drifted badly** — `open/` said 7 when it was 5, `regression/` said 13 when it was 29, the register said 33 when it was 41. A file whose whole job is to be the index cannot be the one that is stale, so the counts now carry the date they were taken.
+
+**Fux is governed by ~90 markdown/JSON files spread
 across `CLAUDE.md`, `docs/`, `work/`, and `tests/`. This is the map: what each
 governs, who reads it (agent, human, or both), what enforces it, and where the
 weight could come out. It does not replace any file below — it is the index
@@ -20,17 +22,17 @@ none of them currently is.
 | file/dir | governs | audience | enforced by | update trigger |
 |---|---|---|---|---|
 | `OPEN-WORK.md` | the single live queue, two lanes (`agent`/`arpit`) | both | none directly | same change as the work it tracks |
-| `open/W-nn-*.md` (7 files) | one detail spec per open item | agent (executor) | none | opened with the item, deleted with it |
+| `open/W-nn-*.md` (**5 files**, recounted 2026-08-25) | one detail spec per open item | agent (executor) | none | opened with the item, deleted with it |
 | `BLOCKED.json` | the machine-readable gate state | agent | `stop-if-blocked.sh` hook | a session blocks or unblocks |
 | `INTERVIEW.md` (72 KB) | cold-start state of play for a successor session | agent | none | during the session, not at the end |
 | `IMPLEMENTATION.md` (28 KB) | milestone log — what shipped, when | both | none | a milestone lands |
 | `WORKLOG.md` (305 KB, append-only) | per-session trail | both (audit trail) | none — but CLAUDE.md requires it every session | every session |
-| `NOW.md` (1 line) | one-line current-state pointer | both | none | every session transition |
+| `NOW.md` (a handful of lines; overwritten every session) | one-line current-state pointer | both | none | every session transition |
 | `MACHINE.md` | environment/surface quirks (4 surfaces) | agent | none | a surface breaks in a new way |
 | `DOC-REGISTRY.md` (62 KB) | per-doc freshness table for **live** docs | both | `tests/test_doc_registry.py` | any registered doc is touched |
-| `compare/*.md` (13 docs + README) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
-| `proposals/*.md` (8 docs + README) | parked, undecided ideas | both | none | filed, graduates, or rejected |
-| `regression/<date>-<run>/` (13 runs) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
+| `compare/*.md` (**18 docs + README**, recounted 2026-08-25 — four moved to `archive/compare/`) | live forks — verdict + reopen-trigger | both | none | fork opens/closes/reopen-trigger fires |
+| `proposals/*.md` (**13 docs + README**, recounted 2026-08-25 — the `ideal/` set and one proposal archived) | parked, undecided ideas | both | none | filed, graduates, or rejected |
+| `regression/<date>-<run>/` (**29 runs**, recounted 2026-08-25) | measured evidence other docs cite | both | `tests/test_regression_runs.py` | every measurement run |
 | `setup/*.md` (2 docs + README) | how `fux-playground`/`fux-lab` are stood up | human (mostly) | `tests/test_setup_docs.py` | either sibling changes |
 | `paper/the-fux-index-paper.md` | architecture of record + falsifiable predictions | both | none | architecture changes / a prediction is measured |
 | `architecture*.svg` (2 diagrams) | visual architecture | human | none | tier/component changes |
@@ -42,7 +44,7 @@ none of them currently is.
 | `docs/index.md` | bundle root, reading order across `docs/`+`work/` | both | none | either tree's structure changes |
 | `docs/GLOSSARY.md` (24 KB) | recurring terms, defined once | human | none | a term is coined or redefined |
 | `docs/adr/README.md` | the ADR register: convention, ownership, state | both | none directly (feeds the tests below) | a record's state changes |
-| `docs/adr/000N_*.md` (**33 live records**) | one decision per completed feature/measurement | both (§1 human, §2 agent, per-record) | `test_adr_frontmatter.py`, `test_adr_freshness.py`, `test_adr_ownership.py`, `test_adr_owns_consistency.py` | the owning code changes |
+| `docs/adr/000N_*.md` (**41 live records**, recounted 2026-08-25) | one decision per completed feature/measurement | both (§1 human, §2 agent, per-record) | `test_adr_frontmatter.py`, `test_adr_freshness.py`, `test_adr_ownership.py`, `test_adr_owns_consistency.py` | the owning code changes |
 | `docs/adr/TEMPLATE.md` | the shape new ADRs must follow | agent (author) | none | convention changes |
 | `docs/adr/RULE-SINCE` | the freshness gate's audit baseline | agent (tooling) | read by `test_adr_freshness.py` | the gate's rule tightens |
 

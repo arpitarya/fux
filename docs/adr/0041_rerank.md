@@ -16,6 +16,18 @@ timestamp: 2026-08-24T00:00:00Z
 - **Owns:** `src/fux/query/rerank.py`
 - **Laws:** **L1, L3 and L4 all HELD** — that is decision 1, and it is the record
 
+> ## Amended 2026-08-25 (cleanup) — a dead cross-reference removed
+>
+> `query/rerank.py::boost` justified best-passage-not-average-passage by citing
+> `embed/chunkvec.py::max_sim` as having made the same argument for vectors.
+> **That module was deleted with the dense lane**, so the citation is replaced
+> by the argument itself, which never depended on the lane.
+>
+> ⚠ **Nothing about this record's decisions changes.** Veto 1 is still standing
+> and unreopened, and its condition 2 (cross-architecture float determinism) is
+> untouched by the model removal — the deleted embedder and the refused
+> cross-encoder are different components with different objections.
+
 ## 1 · Examples
 
 ```console

@@ -51,6 +51,19 @@ timestamp: 2026-08-18T00:00:00Z
 > one ranking path, and no post-ranking fusion stage that either candidate
 > generator could see differently.
 
+> ## Amended 2026-08-25 (cleanup) — the differential harness lost its third mode
+>
+> `tools/differential/playground_grade.py` graded three modes: `scan`,
+> `accelerator` and `hybrid`. **It was BROKEN by the model removal** — its
+> `hybrid` lambda called `run_query(..., use_hybrid=True)`, a keyword the
+> function no longer accepts, so the harness raised `TypeError` before grading
+> anything. Found by a post-change sweep, not by a test: **no test imports this
+> harness**, which is why a live tool sat broken.
+>
+> **Two modes remain, and they are the right two** — `scan` and `accelerator`
+> are exactly the pair the differential law binds together, so the harness is
+> now precisely a differential-law instrument rather than that plus a lane.
+
 ## §1 — For humans
 
 The committed index is **doc-major**: one line per document. That shape is

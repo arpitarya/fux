@@ -186,7 +186,7 @@ being told to copy.
 ## 5 · Reference (required)
 
 - Arpit's ruling and the full argument —
-  [`work/proposals/ideal/07-rulings.amendment.md`](../../work/proposals/ideal/07-rulings.amendment.md)
+  `work/proposals/ideal/07-rulings.amendment.md` (archived 2026-08-25)
 - W-76 Phase 8 — the outcome of record is [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)'s W-76 row.
   The closed detail file is `archive/open/W-76-amended-architecture.md` — **named, never cited**
 - The contract this inherits — [ADR-ENRICHED](0017_enriched-mode.md)

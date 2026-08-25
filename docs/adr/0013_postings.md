@@ -286,7 +286,7 @@ query time ([ADR-RANKING](0012_ranking.md)).
   pruning change looks like a size win and is measured as a recall loss, so it
   is exactly the kind of work that gets waved through on the wrong metric.
   The parked idea itself survives as
-  [`query-log-pruning.md`](../../work/proposals/query-log-pruning.md).
+  `query-log-pruning.md` (archived 2026-08-25).
 
 
 - **A document edit is one line in one shard.** The reviewable-diff property
@@ -421,7 +421,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/proposals/query-log-pruning.md`](../../work/proposals/query-log-pruning.md)
+- `work/proposals/query-log-pruning.md` (archived 2026-08-25)
 
 **Papers and specifications**
 

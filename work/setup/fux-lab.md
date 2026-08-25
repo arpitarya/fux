@@ -205,6 +205,8 @@ Two consequences that bite immediately:
 Three findings worth carrying, all of which came from the lab and none of which
 the fixture gate caught:
 
+⚠ **Superseded 2026-08-25 — the two rows below are findings about a lane that no longer exists.** The dense lane, the embedding model and `--hybrid` were deleted after DENSE-CHUNK measured **0 fixed / 2 broken**. They are kept as the record of what the lab established, not as live guidance; and the corpora behind them (`acme`, `orbit`) were lost in the 2026-08-20 wipe, so neither number can be reproduced.
+
 - **The synthetic "hybrid 4× worse" result did not reproduce** on a realistic
   corpus: hybrid hit@5 went `.182 → .855`, parity with lexical (`.873`). The
   collapse was near-identical template prose defeating dense retrieval — a

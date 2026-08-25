@@ -1,19 +1,22 @@
-"""Grade the fux-playground goldens in both retrieval modes, side by side.
+"""Grade the fux-playground goldens in every retrieval mode, side by side.
 
-Exists so the M2 hybrid decision is made on the graded corpus rather than on
+Exists so a ranking decision is made on the graded corpus rather than on
 impressions, **without editing the sibling repo** — `fux-playground/tools/check.py`
 grades one mode (whatever `fux ask` does by default) and has no flag for a
 second, by design: it is a consumer, not a lab bench.
 
+**The `hybrid` mode is gone (2026-08-25).** It graded the dense lane, and the
+lane, the embedding model and the `--hybrid` flag were all deleted after
+DENSE-CHUNK measured 0 fixed / 2 broken. Two modes remain, and they are the two
+the differential law binds together: `scan` and `accelerator` must agree.
+
 Reports, per mode:
 
 - pass / fail against each golden's `expect_top` contract
-- `XPASS` — a query marked `known_failure` that now passes, which is the number
-  M2's DoD asks for
-- `REGRESSION` — a query that passed and no longer does. **This is the number
-  that decides the hybrid default**, and it is reported first, because a lane
-  that closes two gaps while breaking five is a loss that a headline
-  "2 XPASS" would hide.
+- `XPASS` — a query marked `known_failure` that now passes
+- `REGRESSION` — a query that passed and no longer does, **reported first**,
+  because a change that closes two gaps while breaking five is a loss that a
+  headline "2 XPASS" would hide.
 
 Usage:
     python tools/differential/playground_grade.py [--playground ~/my_programs/fux-playground]
@@ -30,13 +33,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from fux.derive import accel  # noqa: E402
-from fux.query import run_query  # noqa: E402
 from fux.query.scan import ask as scan_ask  # noqa: E402
 
 MODES = {
     "scan": lambda root, q, top: scan_ask(root, q, top=top),
     "accelerator": lambda root, q, top: accel.ask(root, q, top=top),
-    "hybrid": lambda root, q, top: run_query(root, q, top, use_hybrid=True)[0],
 }
 
 
@@ -136,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
 
     baseline = None
     results: dict[str, ModeResult] = {}
-    for mode in ("scan", "accelerator", "hybrid"):
+    for mode in ("scan", "accelerator"):
         results[mode] = grade(root, goldens, mode, baseline)
         if mode == "scan":
             baseline = results[mode]

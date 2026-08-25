@@ -14,6 +14,28 @@ requests, not one, and the second is worth more than the first.
 
 ---
 
+
+> ## ⚠ Overtaken in four specific ways, 2026-08-25 — the ARGUMENT stands, the facts do not
+>
+> This note's thesis — *build the evaluation instrument, not the optimiser;
+> judgment supply is the binding constraint* — is untouched and still unbuilt.
+> Four of its factual claims are now false, and they are load-bearing enough
+> that a reader would be misled:
+>
+> 1. **"Exactly one of the twelve is configurable"** and the whole §2 knob
+>    table. **ADR-TUNE shipped 2026-08-24**: `.fux/tune.toml` exposes `k1`, `b`,
+>    the five field weights, four `[ranking]` knobs, six `[graph]`, four
+>    `[refer]` and `[priority]`. `fux.toml [ranking]` now raises an error.
+> 2. **§2.1's "field weights must be integers"**, with its quoted
+>    `AssertionError`. **Dissolved by W-73** — `mx` is a raw per-field `u16`
+>    count and the weights are carried at query time by `Scoring`.
+> 3. **The `--hybrid` row**, and §6/§11's *"the hybrid default … the one item
+>    with a decision waiting on it"*. **The dense lane was deleted 2026-08-25**;
+>    that trigger can never fire.
+> 4. ⚠ **The verb name is spent.** This note proposes `fux tune` for the
+>    tuner; `fux tune` now exists and prints the tunables file. If this is ever
+>    picked up it needs a different name.
+
 ## §1 — The headline, stated first
 
 **The best-documented result in this literature is that tuning BM25's k1/b

@@ -30,5 +30,5 @@ needs no inflation, the wire IS the runtime.
 showing ≤ 2× the mmap segments' query latency.
 
 **References.** Navarro CPM '12 · Ferragina–Manzini FM-index ·
-[`../compare/keyspace-unification.compare.md`](../compare/keyspace-unification.compare.md)
+`../compare/keyspace-unification.compare.md` (archived 2026-08-25)
 (option C, the rejection this note preserves) · paper §4.

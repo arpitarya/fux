@@ -27,10 +27,26 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated 2026-08-24.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-08-25**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: `v2.0.0-alpha.0`, and the records caught up to it (2026-08-24)
+### The most recent change: the embedding model was DELETED (2026-08-25)
+
+**Arpit removed the embedding model and the entire dense lane.** `src/fux/embed/`
+(including a 7.9 MB `model.bin`), `query/dense.py`, `derive/dense.py`, the
+committed per-chunk `vectors` field, `[dense]` and **`ask --hybrid`**. Cause:
+[DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md) measured
+**0 fixed / 2 broken at every setting that fires** — the model mean-pools static
+token vectors, so the lane was **as order-blind as BM25F**. Measured cost of
+carrying it: the **wheel was 97 % model** (6.84 MB -> 233 KB), the committed
+index **-22.6 %**, a full ingest **6.8x** faster
+([run](regression/2026-08-25-model-removal/report.md)).
+
+**Fux is now lexical-only, with no bundled model and no path to a semantic lane
+that does not start by re-adding a dependency.** That is the state of play; the
+sections below that describe a dense lane are history and are marked.
+
+### Before that: `v2.0.0-alpha.0`, and the records caught up to it (2026-08-24)
 
 **`v2.0.0-alpha.0` is released.** It is a **pre-release on purpose**: the
 committed record shape moved to `fux.index.v2` (five-field BM25F, `flen`
@@ -159,10 +175,13 @@ would reopen it*. That measurement was taken, filed
 92 % of an ingest is the dense embedding), and the decision changed in the same
 change. Nobody had to argue about it.
 
-**Two guarantees are narrower now, and both are written down**: term-hash
-collision detection is complete only under `--full`, and a newly available
-embedding bundle does not retro-fit `code` onto unchanged documents. Neither is
-hidden in a docstring; both are in ADR-INGEST's Consequences.
+**One guarantee is narrower, and it is written down**: term-hash collision
+detection is complete only under `--full`. It is in ADR-INGEST's Consequences,
+not hidden in a docstring. ⚠ **This paragraph used to name a second guarantee**
+— *"a newly available embedding bundle does not retro-fit `code`"* — and both
+the bundle and `code` were deleted (2026-08-23 and 2026-08-25). The carry-forward
+property survives the field: a new extraction rule does not reach an unchanged
+document until it changes or `--full` runs.
 
 ⚠ **It is not R5.** It makes R5 *reachable* at corpus sizes where the old build
 could not have passed it. The gate itself is still held.
@@ -284,8 +303,10 @@ the reason is that the measuring environments are gone.**
   on 8 870 RFCs against a pre-registered 150 ms bar.
 - **The pruning gate closed FAIL.** The committed index carries full postings,
   permanently. That design branch is closed, not paused.
-- **Hybrid fusion is built and ships default-off**, on a measured net −6.
-  Flipping it needs new evidence *and* a separate sign-off.
+- ⚠ **Hybrid fusion is GONE (2026-08-25)**, not off. It shipped default-off on
+  a measured net −6, its per-chunk successor measured **0 fixed / 2 broken**,
+  and Arpit deleted the lane, the model and the flag. `--hybrid` is now an
+  argparse error. **There is no dense lane to flip.**
 - **Documentation moved into [`work/`](README.md) on 2026-08-18**, and the ADR
   system was rebuilt around cite-by-name, §1-humans/§2-agents, checkable veto
   conditions, and an ownership table with an executable twin.
@@ -340,10 +361,15 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated 2026-08-24. `HEAD` is at the `v2.0.0-alpha.0` release plus the W-77
-audit; the working tree is clean. The queue below is **three items, all in the
-`arpit` lane** — W-77, W-74, W-75. W-73 and W-76 were closed on 2026-08-24 and
-their entries here are history, not pending work.*
+*Updated **2026-08-25**. The queue is **five**: **W-78** (ruling 1 only —
+reopen ADR-RERANK veto 1 or confirm it), **W-81** (`agent`), **W-77**, **W-74**,
+**W-75**. Four of the five are `arpit`-lane rulings. W-73, W-76, W-79 and W-80
+are closed and their entries below are history, not pending work.*
+
+> ⚠ **The count in this section was wrong twice before it was right.** It said
+> "three, all `arpit`" while W-79 was open and `agent`-lane, and again after
+> W-81 was filed. The lesson is in `governance.md`: **a file whose job is to be
+> the current state cannot be the one that is stale.**
 
 > **Addendum 2026-08-26 — this section predates two things that happened since
 > and needs a fuller pass; not done here, flagged instead.** (1) ADR-TUNE was
@@ -360,9 +386,11 @@ their entries here are history, not pending work.*
 > now — three, and W-79's absence from the original count above was already
 > wrong the day it was written, not made wrong by this close.
 
-**The immediate next step: build ADR-TUNE** — `.fux/tune.toml` +
-`src/fux/tune.py`. Its stated blocker was W-73, which is now built, released
-and closed, so decision 12 is unblocked. ⚠ **Parts of that record are stale on
+⚠ **~~The immediate next step: build ADR-TUNE~~ — BUILT 2026-08-24**, shipped
+in `v2.0.0-alpha.1`; the record is still `status: proposed` pending
+ratification (that ratification is W-77 ruling 3). **The immediate next step is
+now W-78 ruling 1**, which is Arpit's. The paragraph below is kept as the
+record of what was owed at the time. ⚠ **Parts of that record are stale on
 arrival**: several of its own decisions shipped inside W-76 (6b's
 `wlen`->`flen` migration, and query-time field weights), so read it against the
 code before building from it.
@@ -887,8 +915,11 @@ The dense lane closed three named gaps and broke nine queries — including all
 five no-answer queries. INTERVIEW item 5 below already states the mechanism: a
 binary prefilter always has a nearest neighbour, so "No confident matches"
 stops being reachable, and the archived calibration measured that no score
-floor separates noise from a true rescue. Hybrid ships **default-off** on that
-evidence. Do not flip it without a lane that can decline.
+floor separates noise from a true rescue. Hybrid shipped **default-off** on that
+evidence. ⚠ **Superseded 2026-08-25: the lane was deleted**, so there is nothing
+to flip — but **the lesson outlives the lane and is why this paragraph stays**:
+a retrieval lane that cannot decline to answer will manufacture an answer, and
+that is a property of the design, not of the model.
 
 **Fourth, dogfooding has a self-reference trap.** Filing a conformance run's
 raw CLI output into `docs/` put the query strings into the indexed corpus, and

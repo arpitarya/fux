@@ -40,6 +40,15 @@ timestamp: 2026-08-20T00:00:00Z
 > **Nobody has re-measured the split since the model came out**, and this
 > record should not be read as claiming a number it does not have.
 
+> ## Amended 2026-08-25 (cleanup) — a consequence restated without its dead example
+>
+> The incremental-ingest consequence *"a newly-available embedding bundle does
+> not retro-fit `code` onto unchanged documents"* named two things that no
+> longer exist. **The property it describes is the carry-forward's and outlives
+> any particular field**, so it is restated generally rather than deleted: a new
+> extraction rule does not reach an unchanged document until that document
+> changes or `--full` runs. `src/fux/ingest/run.py`'s module docstring matches.
+
 ## §1 — For humans
 
 Ingest turns whatever your `fux.toml` points at into committed records. It runs

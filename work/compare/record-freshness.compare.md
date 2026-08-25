@@ -23,6 +23,36 @@ timestamp: 2026-08-20T00:00:00Z
 > **Reopen when:** R4's measurement shows warm-path fetch cost dominating and a
 > caller willing to trade staleness for latency. Then build **E**, not A/B/C.
 
+
+> ## ⚠ THE PREMISE OF THIS VERDICT IS DEAD, 2026-08-25 — and the ruling is Arpit's
+>
+> This doc was decided **D — no age bound**, on the ground that *"none of a
+> committed record's fields is temporal"* and therefore *"that provenance does
+> not exist"*. **Every committed record now carries `mtime`**, a git commit
+> timestamp written by `ingest/run.py` from `priors.git_commit_times` — which
+> is exactly the provenance the verdict said was absent.
+>
+> **This is not an agent's to re-decide.** It is filed as
+> [W-77](../open/W-77-record-reconciliation.md) ruling 1, in the `arpit` lane:
+> *"ADR-REFER decision 4 is currently **standing but unargued**, which is the
+> one state a record should never be in."*
+>
+> **Four further claims in the body are now false**, listed so a reader does
+> not act on them:
+>
+> - *"fields are `id · src · loc · sha · ver · mode · meta · title · phrases ·
+>   terms · wlen · edges`. **None is temporal.**"* — `wlen` became `flen`, and
+>   `mtime` is temporal.
+> - the matrix's *"one git call per file"* cost for option C — `priors.py` does
+>   the whole corpus in **one** invocation, and its docstring says a per-file
+>   call was rejected precisely because it would be 10 000 spawns.
+> - the matrix's *"A and C break byte-reproducibility"* — contradicted by the
+>   shipped code, which commits a **git commit timestamp** specifically so the
+>   value does not vary by machine, and does so without breaking write-if-different.
+>
+> ⚠ The same dead premise is recited in `src/fux/refer/freshness.py`'s module
+> docstring.
+
 ## Context
 
 A committed record's fields are `id · src · loc · sha · ver · mode · meta ·

@@ -30,6 +30,22 @@ timestamp: 2026-08-12T00:00:00Z
 
 ---
 
+
+> ## ⚠ Owed on this sibling, 2026-08-25 — it will ERROR until someone does this
+>
+> **`fux-playground/.fux/tune.toml` still contains `[dense]`**, and `[dense]`
+> was removed from the schema on 2026-08-25. Every `fux` command in that repo
+> now exits with an error naming the removal. **Delete the table** — ranking
+> does not move, because `mode` defaulted to `off`.
+>
+> Also owed there: the committed index is still `fux.index.v1` and wants
+> `fux ingest --full && fux build`.
+>
+> **This instruction lives here rather than only in `NOW.md`**, which is
+> overwritten every session — a chore recorded only in a file that gets erased
+> is a chore that gets forgotten. SETUP-PLAYGROUND's own trigger is *"either
+> sibling changes"*, and the sibling changed.
+
 ## ⚠ Planned redesign (2026-08-22) — not yet executed
 
 **Arpit, 2026-08-22, direct:** *"[fux-playground is] for me to try it out how
@@ -233,7 +249,7 @@ does not redden the suite. A known failure that starts *passing* is reported
 as `XPASS` and fails the run, so a closed gap is recorded deliberately rather
 than drifting.
 
-At the time of writing: **41 pass, 9 xfail, 0 unexplained failures.** The nine
+At the time of writing: ⚠ **41 pass, 9 xfail, 0 unexplained failures** — *as of 2026-08-20.* ⚠ **Half of what the nine xfails were FOR no longer exists**: they were pre-registered targets for the M2 **dense lane** (deleted 2026-08-25, after measuring 0 fixed / 2 broken) and the M3 graph lane, which stands. The nine
 are the deliverable, not a defect in it — they are pre-registered targets for
 the M2 dense lane and M3 graph lane.
 

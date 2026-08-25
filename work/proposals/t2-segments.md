@@ -137,7 +137,7 @@ implementation is surface pretending to be capability**, and the rule
 is a tier to flip to. When T2 is built, the knob is part of building it.
 
 **4. The T2 design is kept, not deleted.** Its internals live in
-[`wire-format.compare.md`](../compare/wire-format.compare.md) — BIC
+`wire-format.compare.md` (archived 2026-08-25) — BIC
 postings, 4-bit impacts, front-coded ledger, 128-entry mmap blocks — and its
 tier row in `index-format.compare.md` §3. **Nothing is retracted**; what is
 recorded is that the escape hatch stays unopened. The BIC codec remains fenced
@@ -209,7 +209,7 @@ gets an answer built for a speed problem.
   T2 must not be pre-built.
 - [`index-format.compare.md`](../compare/index-format.compare.md) §3 —
   the tier table T2 is a row of.
-- [`wire-format.compare.md`](../compare/wire-format.compare.md) — the
+- `wire-format.compare.md` (archived 2026-08-25) — the
   segment design, kept intact for the day the bar is crossed.
 - Block-max skipping, which is why T1 is fast enough that T2 is not needed:
   Ding & Suel, *Faster top-k document retrieval using block-max indexes*

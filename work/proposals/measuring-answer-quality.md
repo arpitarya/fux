@@ -247,7 +247,7 @@ the failure in §1.
    as a gate · measure it by hand on a small slice.
 5. **Does the scorecard become a public claim (README) or stay internal?**
 6. **Does a query log get built to source `P(q)`?** It collides with
-   [`query-log-pruning.md`](query-log-pruning.md), which already carries the
+   `query-log-pruning.md` (archived 2026-08-25), which already carries the
    privacy decision (committed vs local) this would inherit. If that proposal
    graduates first, this fork closes with it.
 
@@ -279,7 +279,7 @@ without them is the defect in §0.
   five-tier redesign
 - [`ranking-tuning.md`](ranking-tuning.md) — the instrument-not-the-optimiser
   argument, and the judgment-supply constraint this shares
-- [`query-log-pruning.md`](query-log-pruning.md) — the query log fork 6 would
+- `query-log-pruning.md` (archived 2026-08-25) — the query log fork 6 would
   need, and the privacy decision it carries
 - `tools/pruning-eval/pruning/metrics.py` · `evalset.py` — the existing
   document-level hit@5 / P@10 / MRR implementation and its stated eval-set

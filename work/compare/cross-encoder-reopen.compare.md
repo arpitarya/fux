@@ -41,7 +41,7 @@ exists but targets threading, not ISA — **it would not help.**
 Everywhere below that says *"a 22M MiniLM"* was **my gloss, not the record's**.
 The record specifies neither MiniLM nor 22M. `ADR-RERANK` decision 1 quotes
 W-76 Phase 6 as *"17–32 M cross-encoder"*, and
-[`proposals/ideal/README.md`](../proposals/ideal/README.md) names the source:
+`proposals/ideal/README.md` (archived 2026-08-25) names the source:
 **Ettin**, whose reranker line is **17.6M / 32.8M** — which is exactly where
 the record's "17–32M" comes from.
 

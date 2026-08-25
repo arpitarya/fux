@@ -137,6 +137,43 @@ If the answer is *citing*, the work is per-link and needs judgment — each one
 repointed at its live successor (`IMPLEMENTATION.md`'s row, or the record that
 absorbed the decision), not deleted.
 
+## Added 2026-08-25 by the cleanup sweep — two more governance items, both yours
+
+**5. The ADR status vocabulary has no value for a record whose SUBJECT ceased
+to exist.** `tests/test_adr_frontmatter.py` closes `status:` to
+`accepted | proposed | superseded`. ADR-CODES-TABLE described
+`.fux/runtime/codes.jsonl`; that file, and every module that touched it, were
+deleted on 2026-08-25. It was **never accepted**, and **nothing supersedes it**
+— its subject simply stopped existing.
+
+It is left at `proposed`, which is literally true, with the situation stated in
+its own Status bullet. ⚠ **The alternative precedent is worse and was not
+repeated**: deleting ADR-T2-SEGMENTS from the register on 2026-08-22 forced a
+contiguous renumber that put **two records on number `0022`** — the reason
+*"cite by NAME, never by number"* is now load-bearing rather than stylistic.
+
+**The options, none taken:** add a fourth status (a convention change touching
+ADR-TEMPLATE and the frontmatter test); rule that `superseded` covers
+subject-deletion and say what supersedes it; or rule that `proposed` is the
+correct resting state and write that down so the next session does not re-ask.
+
+⚠ **This was recorded only in `NOW.md` when it was found**, which is overwritten
+every session. Filed here so it survives.
+
+**6. `work/regression/2026-08-22-budget-sweep/report.md` points its
+pre-registration link at `PRE-REGISTRATION.md` *relative to the run directory*,
+and no such file is there** — the real one is
+`tools/refer-budget-sweep/PRE-REGISTRATION.md`. The file exists; the path is
+wrong.
+
+**Neither gate catches it**: the run files no `VERDICT.md`, so
+`test_regression_runs.py`'s pointer check never sees it, and
+`tests/test_doc_links.py` exempts frozen trees by law. ⚠ **And the report is
+frozen**, so this cannot be fixed by editing it — which is exactly the shape
+ADR-RS decision 16 handles for deleted paths but **not** for wrong ones. Ruling
+needed on whether a *mis-pointed* frozen pre-registration gets the same mirror
+treatment, or a corrections file, or nothing.
+
 ## Definition of done
 
 - [ ] The four rulings above are made and recorded.
@@ -144,6 +181,10 @@ absorbed the decision), not deleted.
       2026-08-24**: sixteen labels corrected, table sorted `0001`-`0041`, and
       71 further broken links repointed behind a new gate.
 - [ ] The archived-link fork above is ruled: naming, or citing.
+- [ ] **Item 5** — the status vocabulary: fourth status, a ruling that
+      `superseded` covers it, or a ruling that `proposed` is correct and final.
+- [ ] **Item 6** — whether a frozen pre-registration pointer that is WRONG
+      (not deleted) gets a mirror, a corrections file, or nothing.
 - [ ] A decision on the governance gap: either widen the freshness check to
       honour a declared *describes* relationship, or accept directory-level
       ownership and say plainly in `CLAUDE.md` that the check does not protect

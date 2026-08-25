@@ -47,7 +47,7 @@ on disk. Megiddo & Modha, FAST 2003 (paper ref [11]). See
 its own midpoints, reaching ~4.5 bits/posting on clustered lists. Chosen
 because the wire path decodes **once** (at inflation), so codec speed does not
 sit on the query path. Moffat & Stuiver 2000 (ref [6]). See
-[wire-format](../work/compare/wire-format.compare.md).
+`wire-format` (archived 2026-08-25).
 
 **Block-max / MaxScore** — Dynamic-pruning query evaluation over the
 [runtime segments](#runtime-segments): per-block maximum impacts let whole
@@ -246,7 +246,7 @@ in a **single content-addressed Merkle Search Tree**. Consequences that make
 it worth the constraint: one **root hash names the whole corpus state**, one
 merge algorithm covers everything, one diff is O(changes), one format version.
 Auvolat & Taïani, SRDS 2019 (ref [4]). See
-[keyspace-unification](../work/compare/keyspace-unification.compare.md).
+`keyspace-unification` (archived 2026-08-25).
 
 **KL term selection** — The [pruning](#pruning-static-top-k) rule:
 score each term of a document by its contribution to the KL divergence between
@@ -416,7 +416,7 @@ ingest carries every `url:` record forward byte-identically. See
 edges. Optimized for *size and diffability*, explicitly **not** for query
 speed — it is decoded once by [inflation](#inflation). Its twin is
 [runtime segments](#runtime-segments). See
-[wire-format](../work/compare/wire-format.compare.md).
+`wire-format` (archived 2026-08-25).
 
 **Worklog** — [`../work/WORKLOG.md`](../work/WORKLOG.md): the per-exchange rolling session
 handoff (OKF `log.md` style, newest first) so a new chat picks up cold.

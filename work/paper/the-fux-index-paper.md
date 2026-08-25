@@ -11,6 +11,28 @@ timestamp: 2026-08-09T00:00:00Z
 **Arpit Arya** · drafted with Claude (Anthropic)
 *Draft v0.2 — 2026-08-09 · supersedes the withdrawn FuxDB draft (v0.1)*
 
+> ## ⚠ Status note, 2026-08-25 — three components in this paper were never built, or were built and deleted
+>
+> **This paper is the architecture of record and is deliberately NOT rewritten
+> here.** Rewriting its size and latency models would mean inventing numbers
+> nobody has measured. What follows is the list of where it and the engine
+> disagree, so a reader is never misled by a specific figure.
+>
+> | the paper says | reality |
+> |---|---|
+> | **dense binary codes** are part of the committed index (Abstract, §1.2, §3.2) | ⚠ **Deleted 2026-08-25.** The doc-level `code` went 2026-08-23; its per-chunk successor and the model behind it went 2026-08-25, after [DENSE-CHUNK](../regression/2026-08-24-dense-lane-gate/VERDICT.md) measured **0 fixed / 2 broken**. There is no dense lane |
+> | **pruned** per-document term statistics (Abstract, §1.2) | ⚠ **Falsified.** P1-RERUN closed FAIL; the committed index carries **full postings, permanently** ([ADR-POSTINGS](../../docs/adr/0013_postings.md) decision 8) |
+> | **six key prefixes in one Merkle-Search-Tree keyspace** (§1.2, §4) | ⚠ **Never built.** Superseded 2026-08-09 — git itself supplies the Merkle tree, and the committed plane is sharded canonical JSONL. ⚠ **§4 is deliberately exempt** and stays as a description of the superseded design, on Arpit's ruling ([`../BLOCKED.json`](../BLOCKED.json)) |
+> | §5's size model includes **`V/` at 32 B x 10⁶ = 32 MB**, summed into the ≈220-290 MB total | ⚠ That row is gone. **The total is not re-derived here** — deriving it would need a measurement nobody has taken at 10⁶, which is two orders of magnitude above CLAUDE.md §Litmus's ceiling anyway |
+> | §6's latency model quotes **"dense scan 35-50 ms on int-cached codes (measured basis)"** | ⚠ The measured basis no longer exists |
+> | §8 offers a **"signature prefilter"** as mitigation | ⚠ It died with `embed/fuxvec.py` |
+>
+> **What the paper still gets right, and it is the load-bearing part:**
+> index-and-refer itself — a small deterministic index carried in git, content
+> left in the systems that own it, freshness verified per answer. That is
+> shipped and measured. The engine that lost a semantic lane got *smaller*, not
+> less able: the wheel went **6.84 MB -> 233 KB**.
+
 ## Abstract
 
 Agents working in codebases need ranked, cited answers from organizational

@@ -23,6 +23,28 @@ timestamp: 2026-08-21T00:00:00Z
 > second half of the original trigger — "hashed mode's degraded `explain`
 > labels measurably block adoption" — is what 2026-08-21 answers.
 
+
+> ## ⚠ One of the 2026-08-21 sub-rulings is DEAD, 2026-08-25
+>
+> **The main fork is untouched** — hashed-by-default, and materialise-first —
+> and both halves are built (`store/displaycache.py`, `assert_meta_policy` in
+> `store/writer.py`).
+>
+> **What died is the `code` sub-ruling.** This doc records *"**Ruled: keep it.**
+> `code` … stays on `hashed` records exactly as on `plain` ones"*, and justifies
+> it by *"excluding it would have cost `--hybrid`'s dense-lane ranking"*.
+> `code` left the record on 2026-08-23, and on **2026-08-25** the embedding
+> model, `query/dense.py`, the committed `vectors` and `--hybrid` were all
+> deleted. The ruling is moot and the justification names three things that no
+> longer exist.
+>
+> ⚠ **Reopen-trigger (c) — *"`--hybrid` flips default-on"* — can never fire.**
+> The remaining triggers are unaffected.
+>
+> **This is the only place in `work/compare/` the model deletion left a false
+> claim**, which is worth knowing: the dense lane's forks were never argued
+> here. They lived in W-79, W-80, the dense-lane gate and ADR-CODES-TABLE.
+
 ## Context
 
 A KL top-128 term list plus YAKE phrases is a decent *summary* of a

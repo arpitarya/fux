@@ -207,8 +207,9 @@ def passage_boost(query_terms: list[str], passage_terms: list[str]) -> float:
 def boost(query_terms: list[str], text: str) -> float:
     """A document scores as its BEST passage, never its average one.
 
-    The same argument `embed/chunkvec.py::max_sim` makes for vectors, and it
-    matters more here: measured over whole documents, every candidate in a
+    The deleted dense lane made the same argument for vectors (max-sim per
+    document, never mean-sim), and it matters more here: measured over whole
+    documents, every candidate in a
     corpus about one subject reaches coverage 1.0 somewhere, and the signal
     flattens to noise. A document that answers the question in one section and
     discusses nine other things is exactly what should win, and averaging is

@@ -28,8 +28,10 @@ Two honest consequences, both recorded in ADR-MAINTENANCE:
 - **Term-hash collision detection is complete only on a full run.** The tracker
   sees the raw terms of changed documents; an unchanged document contributes
   hashes it cannot un-hash. `--full` is the complete check.
-- **A newly-available embedding bundle does not retro-fit `code`** onto
-  unchanged documents until they change or `--full` runs.
+- **A new extraction rule does not retro-fit onto unchanged documents** until
+  they change or `--full` runs. This used to be stated about the embedding
+  bundle and `code`; both were deleted on 2026-08-25, but the property is the
+  carry-forward's and outlives any particular field.
 
 `ver` bumps strictly on this record's own `sha` changing, independent of edges
 (the M1 build-time decision on `ver` semantics). "Incremental" still also means
