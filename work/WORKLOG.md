@@ -65,6 +65,18 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
      divergence is per-ISA GEMM kernel selection, FMA contraction and libm.
      And onnxruntime's suggested tolerance is ~1e-5, LOOSER than our measured
      1.9e-6 -- to spec, and still breaking fux's promise.
+- **A FIFTH correction, from Arpit, within the hour: "which 22M MiniLM?"**
+  There isn't one. *"22M MiniLM"* was my gloss; the record says **17-32M**,
+  which is **Ettin**'s reranker line (17.6M / 32.8M), and Ettin was chosen
+  *because* it beats MiniLM -- its authors report **+0.051 nDCG@10 over
+  ms-marco-MiniLM-L12-v2 at half the parameters** and ~1.9x MiniLM-L6's CPU
+  throughput. **The compare doc's value leg was argued at the wrong strength.**
+  The distributional findings (~40% of queries gain nothing; gains concentrate
+  where the first stage is weak; rerankers go backwards in ~half of configs)
+  are about QUERIES, not models, and survive. So does determinism. Corrected in
+  the doc's new SS0c rather than quietly. ⚠ Also surfaced: 20 candidates at 267
+  pairs/s is **~75 ms**, against a measured 33.5 ms p95 and a 150 ms bar --
+  about half the remaining headroom. Cheap, not free.
 - **Concurrency:** a Claude Code session executed and committed **W-79**
   (`cc45c14`) while this research ran. My patch collided, was **not** forced,
   and this work was rebased onto theirs. Nothing of theirs was overwritten.

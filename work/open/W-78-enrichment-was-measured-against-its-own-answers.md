@@ -70,6 +70,15 @@ ways the literature names precisely.
 > against adaptive effects. The blind results were **+1 and −1** — **noise**,
 > and the proposed rule as drafted would have certified them as evidence.
 >
+> **3b. THE COMPARE DOC ARGUED AGAINST THE WRONG MODEL** (caught by Arpit,
+> 2026-08-24). *"22M MiniLM"* was a gloss, not the record. `ADR-RERANK` says
+> **17–32M**, which is **Ettin**'s reranker line (17.6M / 32.8M) — chosen
+> *because* it beats MiniLM: its authors report **+0.051 nDCG@10 over
+> `ms-marco-MiniLM-L12-v2` at half the parameters**, and ~1.9x MiniLM-L6's CPU
+> throughput. The recommendation's value leg is restated at the correct
+> strength in [the compare doc](../compare/cross-encoder-reopen.compare.md)
+> §0c; the distributional and determinism legs are untouched.
+>
 > **3. No source-bias control.** *Neural Retrievers are Biased Towards
 > LLM-Generated Content* (KDD 2024) shows retrievers rank LLM-written text
 > higher **independently of whether it informs**. Every arm added ~70 tokens

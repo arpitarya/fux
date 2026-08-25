@@ -36,6 +36,51 @@ Our measured `1.9e-06` sits **inside their tolerance**. The runtime is
 behaving to spec while breaking fux's promise. `use_deterministic_compute`
 exists but targets threading, not ISA — **it would not help.**
 
+**0c. ⚠ THIS DOCUMENT ARGUED AGAINST THE WRONG MODEL, and Arpit caught it.**
+
+Everywhere below that says *"a 22M MiniLM"* was **my gloss, not the record's**.
+The record specifies neither MiniLM nor 22M. `ADR-RERANK` decision 1 quotes
+W-76 Phase 6 as *"17–32 M cross-encoder"*, and
+[`proposals/ideal/README.md`](../proposals/ideal/README.md) names the source:
+**Ettin**, whose reranker line is **17.6M / 32.8M** — which is exactly where
+the record's "17–32M" comes from.
+
+**And Ettin was chosen precisely because it beats MiniLM.** Its authors report:
+
+| model | params | MTEB Retrieval nDCG@10 | CPU (i7-13700K) |
+|---|---|---|---|
+| **Ettin-17M** | **17.6M** | **0.5576** | **267.4 pairs/s** |
+| `ms-marco-MiniLM-L12-v2` | 33M | 0.5066 | — |
+| `ms-marco-MiniLM-L6-v2` | — | — | 143.9 pairs/s |
+
+**+0.051 nDCG at roughly half the parameters, and ~1.9x the CPU throughput.**
+
+**What this changes:** §2's tables are `+MiniLM-L6` columns. They are therefore
+evidence about a model **weaker than the one fux specified**, by its authors'
+own claim. Leg 1 of the recommendation was argued at the wrong strength and is
+restated in §6.
+
+**What it does NOT change**, and this is the part that survives:
+
+- The **distributional** findings in §2 are about *queries*, not about which
+  reranker: ~40 % gain nothing, gains concentrate where the first stage is
+  weak, rerankers fall below retriever-only in ~half of configurations. A
+  better reranker moves the magnitude, not the shape.
+- **Determinism.** Ettin ships as ONNX and runs on the same runtime. §0a and
+  §0b apply unchanged.
+- **The metadata alternative's +32 pts.**
+- ⚠ **Ettin's numbers are self-reported by the model's authors on MTEB
+  Retrieval** — not an independent BEIR re-run, and not on a SciFact-shaped
+  corpus.
+
+**And the latency is worse than it first looks.** 20 candidates at 267.4
+pairs/s is **~75 ms**. Fux's measured p95 at 10 000 documents is **33.5 ms**
+against R3's **150 ms** bar — so the specified reranker would consume **about
+half the remaining headroom** on a machine at least as fast as an i7-13700K.
+Cheap, not free.
+
+---
+
 ## 1 · The claim the refusal was argued against
 
 *"a 35 MB dependency targets the class enrichment already covers
@@ -133,9 +178,14 @@ already demonstrated in miniature: declare the fact, weight it deterministically
 The old reason was *"enrichment already covers it, for free."* That is false.
 Three replacement legs, each independently sufficient:
 
-1. **The value is unproven for corpora shaped like fux's.** The gains
-   concentrate where the first stage is weak; fux's is strong. Reranking is
-   measured to go *backwards* in roughly half of tested configurations.
+1. **The value is unproven for corpora shaped like fux's** — and this leg is
+   **weaker than §2 makes it look**, because §2's numbers are MiniLM-L6 and the
+   record specifies **Ettin-17M, which its authors measure at +0.051 nDCG over
+   MiniLM-L12** (§0c). What survives the correction is the *shape*, not the
+   magnitude: gains concentrate where the first stage is weak, fux's is strong,
+   ~40 % of queries gain nothing, and reranking goes *backwards* in roughly
+   half of tested configurations. **Nobody has run Ettin on a SciFact-shaped
+   corpus, and nobody has run any reranker on fux's.**
 2. **The determinism cost has no supplier.** Not one shipping runtime offers
    bit-exact cross-ISA inference, and the only project that claims it is
    float32-only, academic, and silent on ARM.
@@ -162,9 +212,15 @@ was not enough. Reopen when **either**:
 
 ## 8 · Where this recommendation could be wrong
 
-- **§2's evidence is about IR benchmarks, not about a 10-document fixture.**
-  Fux has never measured a cross-encoder on its own corpus at all. The
-  recommendation is an argument from other people's corpora.
+- **§2's evidence is about IR benchmarks, not about a 10-document fixture**,
+  **and it is about the wrong model** (§0c). Fux has never measured any
+  cross-encoder on its own corpus. The recommendation is an argument from other
+  people's corpora, about a weaker reranker than the one specified.
+- **The cheapest thing that would settle leg 1 is to run Ettin-17M once**, on
+  the playground's 50 goldens, offline, ignoring determinism entirely — purely
+  to learn the number. It cannot ship, but it would replace *"unproven"* with
+  a measurement, and §0c means the current argument is not entitled to assume
+  the number is small.
 - **§3 could be underweighted.** If undeclared negation turns out to be
   common — and nobody knows — then confirming here defers a real capability on
   the strength of an unmeasured assumption, which is the exact error W-78
