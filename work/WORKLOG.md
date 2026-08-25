@@ -65,6 +65,27 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
      divergence is per-ISA GEMM kernel selection, FMA contraction and libm.
      And onnxruntime's suggested tolerance is ~1e-5, LOOSER than our measured
      1.9e-6 -- to spec, and still breaking fux's promise.
+- **Then: "should we be using a better model?" -> W-80 and a proposal.**
+  There are **three model slots** and the answer differs in each. Reranker:
+  no -- determinism blocks every size equally and Ettin-17M already eats ~75 ms
+  of a ~116 ms budget. Offline declarer (route 2): **yes, unambiguously** --
+  it runs once, output committed, determinism costs nothing. Embedding: **yes,
+  and this is the live one** -- fux bundles **`potion-base-8M`, a
+  GENERAL-PURPOSE static embedding, for a RETRIEVAL task**, and
+  `potion-retrieval-32M` is the retrieval-tuned sibling (MTEB Retrieval 35.06
+  vs potion-base-32M 32.67), is **matryoshka**, and **at dim 256 changes not
+  one committed byte per chunk**. ⚠ Breaches ADR 0006's <=10 MB bundle budget
+  and **will not fix q015** -- still order-blind.
+- **W-80 filed, and it is a user-facing defect rather than doc rot.**
+  `src/fux/embed/model.py` tells a user with a corrupt model to run
+  `tools/distill/distill.py`. **That path is not in the repo.**
+  `model.json`'s `recipe` field says the same. It is recoverable --
+  `archive/v0.26/tools/distill/distill.py` matches the shipped bundle on
+  teacher, magic and the quantization string **verbatim** -- and the bundle's
+  own sha256/size **pass**, so **integrity is fine and provenance is what is
+  missing**. ⚠ The obvious fix is **illegal**: repointing `model.json` at the
+  archive grounds a LIVE claim in an ARCHIVED document. The fork is *restore it
+  live* or *delete the provenance claim*. **It blocks any model swap.**
 - **A FIFTH correction, from Arpit, within the hour: "which 22M MiniLM?"**
   There isn't one. *"22M MiniLM"* was my gloss; the record says **17-32M**,
   which is **Ettin**'s reranker line (17.6M / 32.8M), and Ettin was chosen
