@@ -49,7 +49,6 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "rerank_weight": "0.75",
     },
     "dense": {"mode": '"gated"', "threshold": "0.4", "weight": "0.3"},
-    "fuse": {"rrf_k": "5", "dense_width": "7"},
     "graph": {
         "damping": "0.25",
         "iterations": "9",

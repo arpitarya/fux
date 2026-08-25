@@ -77,7 +77,6 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "rerank_weight",
     ),
     "dense": ("mode", "threshold", "weight"),
-    "fuse": ("rrf_k", "dense_width"),
     "graph": (
         "damping",
         "iterations",
@@ -116,10 +115,6 @@ class Tune:
     dense_mode: str = "off"
     dense_threshold: float = 0.0
     dense_weight: float = 0.0
-
-    # [fuse]
-    rrf_k: int = 60
-    dense_width: int = 100
 
     # [graph]
     damping: float = 0.85
@@ -339,14 +334,6 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         _non_negative(c, "dense", "weight", dense["weight"], 0.0) if "weight" in dense else 0.0
     )
 
-    fuse = data.get("fuse", {})
-    rrf_k = _at_least(c, "fuse", "rrf_k", fuse["rrf_k"], 60, 1) if "rrf_k" in fuse else 60
-    dense_width = (
-        _at_least(c, "fuse", "dense_width", fuse["dense_width"], 100, 1)
-        if "dense_width" in fuse
-        else 100
-    )
-
     graph = data.get("graph", {})
     damping = _fraction(c, "graph", "damping", graph["damping"], 0.85) if "damping" in graph else 0.85
     iterations = (
@@ -429,8 +416,6 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         dense_mode=dense_mode,
         dense_threshold=dense_threshold,
         dense_weight=dense_weight,
-        rrf_k=rrf_k,
-        dense_width=dense_width,
         damping=damping,
         iterations=iterations,
         laziness=laziness,
@@ -482,10 +467,6 @@ def specimen() -> str:
 #mode      = "off"              # "off" | "gated" | "always"
 #threshold = 0.0                # lexical confidence below which `gated` fuses
 #weight    = 0.0                # how far a fused score may move a ranking
-
-[fuse]                          # `ask --hybrid` only
-#rrf_k       = 60
-#dense_width = 100
 
 [graph]                         # explain / graph / path
 #damping      = 0.85

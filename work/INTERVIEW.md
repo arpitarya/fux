@@ -345,6 +345,21 @@ audit; the working tree is clean. The queue below is **three items, all in the
 `arpit` lane** — W-77, W-74, W-75. W-73 and W-76 were closed on 2026-08-24 and
 their entries here are history, not pending work.*
 
+> **Addendum 2026-08-26 — this section predates two things that happened since
+> and needs a fuller pass; not done here, flagged instead.** (1) ADR-TUNE was
+> built the same day this was last updated (see its 2026-08-24 amendment) —
+> *"the immediate next step: build ADR-TUNE"* below is stale, it is built and
+> `status: proposed` pending ratification. Building it surfaced two gaps
+> (`[fuse]` unreachable, `explain --no-tune` inert), filed same-day as **W-79**
+> in the `agent` lane — a fourth queue item this section's own count omits.
+> (2) **W-79 is now closed** — ruled delete, built 2026-08-26:
+> `query/hybrid.py` deleted, `[fuse]` out of ADR-TUNE's schema, `explain
+> --no-tune` removed, `playground_grade.py` repointed at `run_query`. Detail:
+> [`archive/open/W-79-remove-the-dead-fusion-code.md`](../archive/open/W-79-remove-the-dead-fusion-code.md),
+> `IMPLEMENTATION.md`'s W-79 row. The queue is genuinely **W-77, W-74, W-75**
+> now — three, and W-79's absence from the original count above was already
+> wrong the day it was written, not made wrong by this close.
+
 **The immediate next step: build ADR-TUNE** — `.fux/tune.toml` +
 `src/fux/tune.py`. Its stated blocker was W-73, which is now built, released
 and closed, so decision 12 is unblocked. ⚠ **Parts of that record are stale on

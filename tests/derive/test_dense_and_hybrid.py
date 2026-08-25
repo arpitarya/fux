@@ -1,4 +1,4 @@
-"""The dense lane and the hybrid fusion built on it.
+"""The dense lane, and the gated fusion built on it (`query/dense.py`).
 
 The invariant that matters here is a *negative* one: **turning hybrid on must
 be the only way to change `ask`'s answer.** The lexical default is what the
@@ -18,7 +18,6 @@ from fux.errors import FuxError
 from fux.derive import accel, build, dense
 from fux.derive import format as fmt
 from fux.query import scan
-from fux.query.hybrid import hybrid_ask
 from fux.store import term_hash, write_index
 
 
@@ -129,83 +128,9 @@ def test_hybrid_does_not_leak_into_the_default_path(corpus):
     assert accel.ask(corpus, "alpha", top=5) == scan.ask(corpus, "alpha", top=5)
 
 
-def test_hybrid_returns_rrf_scores_not_bm25f_scores(corpus, monkeypatch):
-    monkeypatch.setattr("fux.query.hybrid._dense_ids", lambda root, query: ["file:c.md"])
-    fused = hybrid_ask(corpus, "alpha", top=5)
-    assert fused
-    # RRF scores live near 1/(k+rank); BM25F scores on this fixture are >1.
-    assert all(r.score < 0.1 for r in fused)
-
-
-def test_hybrid_can_surface_a_document_the_lexical_lane_never_saw(corpus, monkeypatch):
-    """A dense-only hit still needs a title and a loc, from the doc table."""
-    monkeypatch.setattr("fux.query.hybrid._dense_ids", lambda root, query: ["file:c.md"])
-    ids = [r.id for r in hybrid_ask(corpus, "alpha", top=5)]
-    assert "file:c.md" in ids
-    hit = next(r for r in hybrid_ask(corpus, "alpha", top=5) if r.id == "file:c.md")
-    assert hit.loc == "c.md" and hit.title == "C"
-
-
-def test_hybrid_degrades_to_lexical_when_the_dense_lane_is_unavailable(corpus, monkeypatch):
-    monkeypatch.setattr("fux.query.hybrid._dense_ids", lambda root, query: [])
-    fused = [r.id for r in hybrid_ask(corpus, "alpha", top=5)]
-    lexical = [r.id for r in scan.ask(corpus, "alpha", top=5)]
-    assert fused == lexical
-
-
 def test_dense_lane_is_empty_without_a_code_table(tmp_path):
     write_index(tmp_path, [_rec("file:a.md", "A", [10], {term_hash("alpha"): [0, 1]})])
     assert dense.load_codes(tmp_path) == []
-
-
-def test_a_real_dense_lane_bug_is_not_swallowed(corpus, monkeypatch):
-    """The narrow `except` clause, asserted.
-
-    A bare `except Exception` would turn every dense-lane defect into "hybrid
-    quietly returns the lexical answer" — a silent degradation that looks like
-    a working feature.
-    """
-    def boom(*args, **kwargs):
-        raise RuntimeError("dense lane is broken")
-
-    monkeypatch.setattr("fux.derive.dense.load_codes", boom)
-    with pytest.raises(RuntimeError, match="dense lane is broken"):
-        hybrid_ask(corpus, "alpha", top=5)
-
-
-def test_a_source_install_without_the_bundle_degrades_instead_of_crashing(corpus, monkeypatch):
-    """W-46: `get_model()` returns `None` on a source install, and `None.embed`
-    raised `AttributeError` — which was not in the guard's exception tuple, so
-    the guard written for exactly this case was dead.
-
-    The fix is an explicit `None` check, **not** a widened `except`: widening
-    to `AttributeError` would swallow every real bug inside `embed()` and
-    reintroduce the silent degradation the narrow tuple exists to prevent.
-    """
-    import fux.embed as embed_mod
-
-    monkeypatch.setattr(embed_mod, "get_model", lambda: None)
-    from fux.query.hybrid import _dense_ids
-
-    assert _dense_ids(corpus, "alpha") == []
-
-    fused = [r.id for r in hybrid_ask(corpus, "alpha", top=5)]
-    assert fused == [r.id for r in scan.ask(corpus, "alpha", top=5)]
-
-
-def test_the_none_guard_does_not_swallow_a_bug_inside_embed(corpus, monkeypatch):
-    """The other half of W-46: a present-but-broken model must still raise."""
-    import fux.embed as embed_mod
-
-    class Broken:
-        def embed(self, query):
-            raise AttributeError("a real bug inside embed()")
-
-    monkeypatch.setattr(embed_mod, "get_model", lambda: Broken())
-    from fux.query.hybrid import _dense_ids
-
-    with pytest.raises(AttributeError, match="a real bug inside embed"):
-        _dense_ids(corpus, "alpha")
 
 
 def test_ask_hybrid_exits_zero_on_a_source_install(corpus, monkeypatch, capsys):

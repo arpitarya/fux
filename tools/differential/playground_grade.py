@@ -30,13 +30,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
 from fux.derive import accel  # noqa: E402
-from fux.query.hybrid import hybrid_ask  # noqa: E402
+from fux.query import run_query  # noqa: E402
 from fux.query.scan import ask as scan_ask  # noqa: E402
 
 MODES = {
     "scan": lambda root, q, top: scan_ask(root, q, top=top),
     "accelerator": lambda root, q, top: accel.ask(root, q, top=top),
-    "hybrid": lambda root, q, top: hybrid_ask(root, q, top=top),
+    "hybrid": lambda root, q, top: run_query(root, q, top, use_hybrid=True)[0],
 }
 
 

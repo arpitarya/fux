@@ -30,6 +30,40 @@ P7: 58 of 58 entries had said `unmeasured`, never once a real number. See
 
 ---
 
+## 2026-08-26 — W-79: the dead fusion code, deleted  ·  Claude Code
+
+- **Asked:** implement W-79 — rule delete-or-wire-up on three things that
+  looked shipped and were not, and act on it.
+- **Did:** ruled **delete**, per the item's own recommendation (the live
+  `--hybrid` lane already exists in `query/dense.py`; a second implementation
+  only a grading harness called is exactly the drift ADR-TUNE decision 1
+  exists to prevent). Deleted `src/fux/query/hybrid.py` (`hybrid_ask`, the
+  module-level RRF fusion). Removed `[fuse] rrf_k`/`dense_width` from
+  `tune.py`'s `_SCHEMA`, `Tune` and the specimen — a closed-key-set change.
+  Removed `explain --no-tune` from `cli.py`'s parser (`cmd_explain` never read
+  a tunable). Repointed `tools/differential/playground_grade.py`'s `"hybrid"`
+  mode at `fux.query.run_query(..., use_hybrid=True)`. Removed the
+  hybrid.py-specific tests in `tests/derive/test_dense_and_hybrid.py` and the
+  `"fuse"` entry in `tests/test_tune_boundary.py`'s mutation table; kept
+  `query/fuse.py` (`RRF_K`, `rrf()`) — it has no consumer left in `src/` but
+  is the archived engine's ported RRF math, pinned by `tests/query/test_fuse.py`
+  independent of the module that used to call it. Amended
+  [ADR-TUNE](../docs/adr/0038_tuning.md), [ADR-CLI](../docs/adr/0002_cli-surface.md),
+  [ADR-ASK](../docs/adr/0004_ask.md) and [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md)
+  in the same change (all four owned something in the diff, per
+  `test_adr_freshness.py`). Fixed two links this broke
+  (`work/proposals/agent-hybrid-policy.md`, `archive/README.md`'s W-46 row) and
+  a third stale claim in ADR-CLI's own "missing-bundle path is covered"
+  paragraph. Moved the item's detail file to `archive/open/` and its
+  `OPEN-WORK.md` row deleted; added its `IMPLEMENTATION.md` row.
+- **Decided / open:** `[dense] mode = "gated"` is untouched — its own FAIL
+  verdict ([DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md))
+  stands and it stays `off`; W-79 was never about that code. CHANGELOG's
+  `[Unreleased]` carries the breaking-change entry; no version bump this
+  session.
+- **Next:** none — item closed. Full test suite green
+  (`uv run pytest -q tests`, 1355 passed).
+
 ## 2026-08-24 — route 4 nailed condition 2 shut; route 2 made it irrelevant  ·  Cowork
 
 - **Asked:** *"Let's try route four and build route two as well. Will that

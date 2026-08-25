@@ -314,25 +314,28 @@ consumer's from that moment, and no later run rewrites any of it.
 > the opposite way to `setup`: by writing nothing, rather than by creating the
 > root.
 >
-> **`--no-tune` joins `ask`, `find`, `answer`, `explain`, `graph` and
-> `path`** — ignore `.fux/tune.toml`, answer on the engine's defaults. A flag
-> rather than a verb per veto 1, and **one** flag rather than a knob per tune
-> table: the question it answers is *"is it me or the config?"*, and bisecting
-> that across six switches is an experiment where one switch is a single
-> re-run. Decision 2's shared query parser carries it for the three read verbs,
-> so those cannot diverge on it.
->
-> **⚠ `explain --no-tune` is inert today, and it ships that way knowingly.**
-> `cmd_explain` reads no tunable at all, so the flag parses and does nothing.
-> It was added for a consistent surface across the three graph verbs — which
-> makes it a promise with nothing behind it, and this record would rather carry
-> the note than let a caller find out. ADR-TUNE records the same gap and
-> adjudicates it no more than this does.
+> **`--no-tune` joins `ask`, `find`, `answer`, `graph` and `path`** — ignore
+> `.fux/tune.toml`, answer on the engine's defaults. A flag rather than a verb
+> per veto 1, and **one** flag rather than a knob per tune table: the question
+> it answers is *"is it me or the config?"*, and bisecting that across six
+> switches is an experiment where one switch is a single re-run. Decision 2's
+> shared query parser carries it for the three read verbs, so those cannot
+> diverge on it.
 >
 > `fux setup` writes one more file as of the same change — `.fux/tune.toml`,
 > write-if-missing like everything in decision 1f, and inside `.fux/` so it is
 > **not** one of the `report.outside` paths announcing a write into another
 > vendor's directory.
+>
+> **Amended 2026-08-26 (W-79) — `explain` dropped the flag; it never had
+> anything to wire it to.** The paragraph above used to read *"joins `ask`,
+> `find`, `answer`, `explain`, `graph` and `path`"* and carried a note that
+> `explain --no-tune` parsed and did nothing, because `cmd_explain` reads no
+> tunable at all. [ADR-TUNE](0038_tuning.md) filed that gap as
+> [W-79](../../archive/open/W-79-remove-the-dead-fusion-code.md) and ruled
+> delete: the flag is removed from `explain`'s parser in `src/fux/cli.py`
+> rather than wired to a tunable that verb has no use for. Five verbs carry
+> it now, not six.
 
 **2. The three query verbs share one parser.** Every one of them takes a
 positional `query`, `--json`, and a mutually exclusive `--fast`/`--scan` pair
@@ -974,11 +977,18 @@ usage: fux [-h] [--version] {doctor,ingest,build,ask,find,answer} ...
   dead API; the alternative — removing it and re-adding it at M5 — is worse,
   because exit codes are what scripts branch on.
 - **The missing-bundle path is now covered.** `tests/derive/test_dense_and_hybrid.py`
-  monkeypatches `get_model` to `None` and asserts the lexical fallback at exit 0,
-  and separately asserts that a present-but-broken model still raises. It lives
-  beside the other hybrid tests rather than in `tests/query/`, because splitting
-  hybrid coverage across two directories to duplicate a corpus fixture costs more
-  than it documents.
+  monkeypatches `get_model` to `None` and asserts the lexical fallback at exit 0
+  (`test_ask_hybrid_exits_zero_on_a_source_install`, run through `cmd_ask`
+  itself, the live path).
+
+  > **Amended 2026-08-26 (W-79).** This bullet used to also cite a
+  > present-but-broken-model-still-raises assertion against `query/hybrid.py`'s
+  > own `_dense_ids`. That module is deleted — it was off the live path since
+  > W-76 Phase 7 and only `tools/differential/playground_grade.py` called it.
+  > The invariant does not need a test on the live path: `query/dense.py`'s
+  > `query_vector()` has no `except` around `get_model()`/`model.embed()` at
+  > all, so a real bug there propagates by construction rather than by a guard
+  > that has to be kept narrow.
 
 ### Alternatives considered
 

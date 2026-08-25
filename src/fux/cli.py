@@ -358,7 +358,6 @@ def build_parser() -> argparse.ArgumentParser:
     p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
     p_explain.add_argument("--json", action="store_true", help="machine-readable output")
-    _add_tune_flag(p_explain)
     p_explain.set_defaults(func=_cmd_explain)
 
     p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")

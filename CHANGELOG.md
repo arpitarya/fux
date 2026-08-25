@@ -8,6 +8,25 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Removed
+
+- **Breaking: `[fuse]` is gone from `.fux/tune.toml`'s key set.** `rrf_k` and
+  `dense_width` were validated and threaded but had no CLI reader — their only
+  consumer, `src/fux/query/hybrid.py`'s `hybrid_ask`, was already off the live
+  path. Anyone who set either key now gets a loud "unknown key" error instead
+  of a silent no-op. `--hybrid` is unaffected: it fuses through
+  `query/dense.py`'s gated lane, which never read these keys.
+- **Breaking: `explain --no-tune` is removed.** `cmd_explain` never read a
+  tunable, so the flag parsed and did nothing. `--no-tune` now applies to
+  `ask`, `find`, `answer`, `graph` and `path` — five verbs, not six.
+- `src/fux/query/hybrid.py` — the module-level RRF fusion, dead since W-76
+  Phase 7 gave `--hybrid` a lane through `query/dense.py`. Its only caller,
+  `tools/differential/playground_grade.py`, now grades `--hybrid` through
+  `fux.query.run_query`, the same path the CLI takes.
+  [ADR-TUNE](docs/adr/0038_tuning.md), [ADR-CLI](docs/adr/0002_cli-surface.md),
+  [ADR-ASK](docs/adr/0004_ask.md) — filed as
+  [W-79](archive/open/W-79-remove-the-dead-fusion-code.md).
+
 ## [2.0.0-alpha.1] - 2026-08-24
 
 **ADR-TUNE is built.** The knobs that decide what you read first have a home.

@@ -87,7 +87,7 @@ timestamp: 2026-08-22T00:00:00Z
 >
 > 1. **`[fuse] rrf_k` and `dense_width` are validated and threaded, but no CLI
 >    invocation reads them.** *(Filed 2026-08-24 as
->    [W-79](../../work/open/W-79-remove-the-dead-fusion-code.md), on Arpit's
+>    [W-79](../../archive/open/W-79-remove-the-dead-fusion-code.md), on Arpit's
 >    instruction to remove the dead code. Deleting them is a **closed-key-set
 >    change** and therefore an amendment to this record, not a tidy-up —
 >    decision 5 says so.)* `--hybrid` routes through `query/dense.py`'s
@@ -101,6 +101,35 @@ timestamp: 2026-08-22T00:00:00Z
 >
 > Both are boundary questions for decision 5 rather than defects, and neither
 > is adjudicated here.
+
+> ## Amended 2026-08-26 — W-79 RULED: delete. Both gaps above are closed.
+>
+> **1. `[fuse]` is gone.** `rrf_k` and `dense_width` are removed from
+> `_SCHEMA`, `Tune`, the loader and the specimen — the closed key set this
+> record's decision 5 governs is now **six** tables, not seven.
+> `src/fux/query/hybrid.py` (their only consumer, `hybrid_ask`) is deleted
+> outright: `--hybrid` already had a live lane through `query/dense.py`'s
+> gated fusion since W-76 Phase 7, so the module was a second implementation
+> nothing but `tools/differential/playground_grade.py` called, which is
+> exactly the drift decision 1 exists to prevent. `playground_grade.py`'s
+> `"hybrid"` mode now calls `fux.query.run_query(..., use_hybrid=True)` —
+> the same path `fux ask --hybrid` takes — so the harness grades what ships.
+> `src/fux/query/fuse.py` (`RRF_K`, `rrf()`) is **not** deleted: it is the
+> archived engine's ported RRF math, kept independent of the module that
+> was its only caller (`tests/query/test_fuse.py`), and it names no key in
+> the now-six-table schema.
+>
+> **2. `explain --no-tune` is gone.** The flag is removed from the `explain`
+> parser in `src/fux/cli.py` — `cmd_explain` never read a tunable, so there
+> was nothing to wire up. `--no-tune` now reads `ask`, `find`, `answer`,
+> `graph` and `path` — five verbs, not six.
+>
+> **Blast radius, stated per CLAUDE.md's dead-code note in
+> [W-79](../../archive/open/W-79-remove-the-dead-fusion-code.md):** both were
+> reachable-but-inert for one release (`2.0.0-alpha.1`); anyone who set
+> `[fuse]` keys or passed `explain --no-tune` gets a loud "unknown key" /
+> "unrecognized argument" error now, not a silent no-op. Named in
+> `CHANGELOG.md`.
 
 ---
 
@@ -366,10 +395,6 @@ Adding a key is a change to this record.
 #mode      = "off"         # "off" | "gated" | "always"
 #threshold = 0.0           # lexical confidence below which `gated` fuses
 #weight    = 0.0           # how far a fused score may move a ranking
-
-[fuse]                     # `ask --hybrid` only
-#rrf_k       = 60
-#dense_width = 100
 
 [graph]                    # explain / graph / path
 #damping      = 0.85
@@ -1015,10 +1040,16 @@ evidence.*
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py) — `block_bound`,
   `_cannot_reach`, `_kth_score`; decision 12's target
 - [`src/fux/query/fuse.py`](../../src/fux/query/fuse.py) ·
-  [`src/fux/query/hybrid.py`](../../src/fux/query/hybrid.py) ·
   [`src/fux/graph/walk.py`](../../src/fux/graph/walk.py) ·
   [`src/fux/refer/assemble.py`](../../src/fux/refer/assemble.py) — the rest of
   decision 5's key set
+
+  > **Amended 2026-08-26 (W-79).** `query/hybrid.py` was the fourth entry here
+  > and is deleted — see the amendment below. `fuse.py`'s `RRF_K`/`rrf()` stay:
+  > they are the archived-engine's ported RRF arithmetic
+  > (`tests/query/test_fuse.py`), independent of the dead module that was
+  > their only caller, and nothing else in decision 5's key set names them —
+  > `[fuse]` is gone from the schema.
 - [`src/fux/config.py`](../../src/fux/config.py) — `archived_weight`'s current
   home, and decision 7's retirement
 - [`src/fux/setup.py`](../../src/fux/setup.py) — decision 3's writer

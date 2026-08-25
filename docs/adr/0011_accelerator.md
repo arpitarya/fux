@@ -309,6 +309,16 @@ reproducible by construction.
   *Faster Top-k Document Retrieval Using Block-Max Indexes* (SIGIR 2011):
   https://engineering.nyu.edu/~suel/papers/bmw.pdf
 
+> **Amended 2026-08-26 (W-79).** `tools/differential/playground_grade.py`'s
+> `"hybrid"` grading mode called `fux.query.hybrid.hybrid_ask` directly — a
+> module-level RRF implementation that was already off the live path (see
+> [ADR-ASK](0004_ask.md) decision 9's 2026-08-24 amendment) and existed only
+> because this harness was its sole caller. W-79 deleted that module and
+> repointed the mode at `fux.query.run_query(..., use_hybrid=True)`, the same
+> call `fux ask --hybrid` makes — so the harness now grades the ranking that
+> actually ships, not a parallel implementation of it. Scan and accelerator
+> modes are unchanged.
+
 ### The weighted bound (W-73, 2026-08-23)
 
 **The block bound is safe on exactly one property, and it is a property about

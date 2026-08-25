@@ -29,11 +29,17 @@ copies. Nothing wired that check; it was a direct read of the files.
 **Where the two cases line up:**
 
 - **Both are outputs an agent could take at face value and act on wrongly.**
-  Archived marking: citing a retired design as current. Hybrid: trusting an
-  RRF-fused ranking as if it were the default lexical answer, or comparing an
-  RRF score to a BM25F score as though the numbers were on the same scale
-  (`src/fux/query/hybrid.py`'s own docstring: *"Scores are RRF scores, not
-  BM25F scores... not meant to be [compared]"*).
+  Archived marking: citing a retired design as current. Hybrid: trusting a
+  fused ranking as if it were the default lexical answer — the risk this
+  bullet names outlived the RRF lane it was written against. W-79
+  (2026-08-26) deleted `src/fux/query/hybrid.py`, the module-level RRF
+  fusion this bullet originally cited (`hybrid_ask`, off the live path since
+  W-76 Phase 7); `--hybrid` today runs `query/dense.py`'s gated fusion, which
+  multiplies a dense similarity into the BM25F score rather than producing a
+  separate RRF scale. The misreadability risk this proposal argues for is
+  narrower now — a boosted score, not an incomparable one — but a caller that
+  does not know a boost was applied can still misattribute the ranking to
+  lexical relevance alone.
 - **Both are measured, not stylistic, defaults.** `--hybrid` is off on a
   measured net −6 across the graded corpus
   ([`docs/adr/0004_ask.md`](../../docs/adr/0004_ask.md) decision 9); an agent
@@ -123,8 +129,11 @@ solved, and nothing has yet made it worth building the fix.
 - [`docs/adr/0002_cli-surface.md`](../../docs/adr/0002_cli-surface.md)
   §"`fux ask --hybrid`" — the worked `--explain` example showing the padding
   failure
-- [`src/fux/query/hybrid.py`](../../src/fux/query/hybrid.py) — RRF-vs-BM25F
-  score non-comparability, stated in the docstring
+- [`src/fux/query/dense.py`](../../src/fux/query/dense.py) — the live fusion
+  `--hybrid` runs today; a multiplicative boost on the BM25F score, not the
+  RRF lane this proposal was originally written against (deleted by W-79,
+  2026-08-26 — see [ADR-ASK](../../docs/adr/0004_ask.md) decision 9's
+  amendment)
 - [`work/proposals/ideal/03-semantic-lane.compare.md`](ideal/03-semantic-lane.compare.md) —
   the reachability-collapse and attractor-collision failure classes
 - [`work/regression/2026-08-12-m2-accelerator/report.md`](../regression/2026-08-12-m2-accelerator/report.md) —
