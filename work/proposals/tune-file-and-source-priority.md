@@ -598,6 +598,16 @@ preference is ever wanted *in* the fused lane rather than through it, that
 mechanism is the natural expression, and its arithmetic is already calibrated.
 Not proposed for v1.
 
+> **Amended 2026-08-26 (W-79) — the mechanism is gone and the last clause was
+> never usable.** `src/fux/query/fuse.py` is deleted, so `offsets` is no longer
+> "ported, unused"; it is not present. And *"its arithmetic is already
+> calibrated"* could not have grounded a live decision even while the file
+> existed: the `[11, ∞)` interval was measured on the **archived** engine, which
+> archive-is-not-evidence forbids citing. Also note the row above — *"RRF
+> consumes ranks"* — no longer describes `ask --hybrid`: the live lane is
+> `query/dense.py::fuse`, a bounded multiplicative uplift in **score** space, so
+> the double-counting argument needs re-deriving before it is relied on.
+
 ---
 
 ## §5 — What `find`'s piping contract costs here

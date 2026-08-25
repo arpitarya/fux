@@ -74,7 +74,7 @@ shards or a model-free ingest; those were means.
 | step | change | gate | why this order |
 |---|---|---|---|
 | 1 | analyzer: split + stem + path/title fields | hit@5 / MRR on goldens, ≥ today | biggest expected lift, zero new deps, zero format risk (derived index only) |
-| 2 | supersession offset + recency prior | same + "retired ADR outranks live" class → 0 | code is ported already (`rrf(offsets=)`) |
+| 2 | supersession offset + recency prior | same + "retired ADR outranks live" class → 0 | ⚠ ~~code is ported already (`rrf(offsets=)`)~~ — **false since 2026-08-26**, `query/fuse.py` is deleted (W-79). The live path is `[ranking] superseded_weight` at `query/rank.py:205`, which exists but is inert on the fixture (W-78) |
 | 3 | delta hooks (`git diff` + reverse edges) | **re-run R5**; expect PASS at 100k | turns the one FAIL into a PASS without touching ranking |
 | 4 | split committed/derived; stop committing repo shards | R6 becomes moot; clone→first-query time measured | removes the merge driver and two ADRs |
 | 5 | MCP server + line-range citations | an agent completes the playground tasks with fewer tool calls than grep (measure calls + tokens) | the consumer-facing change; everything above makes it good |

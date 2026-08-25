@@ -381,6 +381,15 @@ Neither default may flip without new evidence and a separate sign-off.
 > not *"off because it measured worse"*. The `--hybrid` transcript further down
 > §2 is a capture of the deleted lane and is left standing as the historical
 > record it is.
+>
+> **Extended 2026-08-26 (W-79) — "via RRF" is wrong too, and now doubly so.**
+> The live lane fuses via `query/dense.py::fuse`, a **bounded multiplicative
+> uplift** on BM25F scores, not Reciprocal Rank Fusion. Both RRF modules are
+> now deleted — `query/hybrid.py` and then `query/fuse.py` — so the clause
+> names nothing that exists. Read decision 6 as *"`--hybrid` fuses the dense
+> lane"*. This also dates the §2 transcript's `0.03`-magnitude scores and the
+> *"RRF scores are rank-derived"* note beneath it: both are true **of the
+> deleted path** and describe no output fux can produce today.
 
 **7. `fux --version` stays instant.** Handlers import their modules lazily
 inside the dispatch functions. Adding a module-level import to `cli.py` breaks

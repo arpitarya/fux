@@ -114,10 +114,15 @@ timestamp: 2026-08-22T00:00:00Z
 > exactly the drift decision 1 exists to prevent. `playground_grade.py`'s
 > `"hybrid"` mode now calls `fux.query.run_query(..., use_hybrid=True)` —
 > the same path `fux ask --hybrid` takes — so the harness grades what ships.
-> `src/fux/query/fuse.py` (`RRF_K`, `rrf()`) is **not** deleted: it is the
-> archived engine's ported RRF math, kept independent of the module that
-> was its only caller (`tests/query/test_fuse.py`), and it names no key in
-> the now-six-table schema.
+> `src/fux/query/fuse.py` (`RRF_K`, `rrf()`) **is deleted too, later the same
+> day.** It was first kept as the archived engine's ported RRF math; the
+> reason failed on review — what it pins is a supersession penalty calibrated
+> on the archived engine, which archive-is-not-evidence forbids citing as live
+> grounding, and live supersession is already `[ranking] superseded_weight` in
+> score space. A module with a live-looking `RRF_K = 60` and no caller misled a
+> reader the same day. `tests/query/test_fuse.py` goes with it. It named no key
+> in the now-six-table schema either way, so decision 5 is untouched — see
+> [ADR-ASK](0004_ask.md) decision 9 for the full reasoning.
 >
 > **2. `explain --no-tune` is gone.** The flag is removed from the `explain`
 > parser in `src/fux/cli.py` — `cmd_explain` never read a tunable, so there
@@ -241,10 +246,17 @@ because a file's content is a specification and not a capture.
 **Twelve constants decide fux's ordering, and one of them is reachable.**
 `K1`, `B`, `HEADING_WEIGHT` and `BODY_WEIGHT` in `query/bm25f.py`; `RRF_K` in
 `query/fuse.py`; `DENSE_WIDTH` in `query/hybrid.py`; `DAMPING`, `ITERATIONS`,
+
 `LAZINESS`, `HOP_DECAY` in `graph/walk.py`; `EXPAND_LIMIT` and `SEED_DEPTH` in
 `graph/__init__.py`. Only `archived_weight` has a key, and it was given one by
 [ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 4 with a default of
 `1.0` chosen so that nothing reorders.
+
+> **Dated 2026-08-26 (W-79) — the module list above names two deleted files.**
+> `RRF_K` in `query/fuse.py` and `DENSE_WIDTH` in `query/hybrid.py` are both
+> gone. **Ten constants, not twelve.** The sentence is left intact as the dated
+> context it is rather than rewritten, but no reader should go looking for
+> either file.
 
 > **Amended 2026-08-24 (W-44, W-68 and W-76 Phases 1, 2, 6 and 7).** The last
 > two sentences are false and the first is now a floor. **Seven keys are
@@ -1039,17 +1051,20 @@ evidence.*
   applied today, after pruning
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py) — `block_bound`,
   `_cannot_reach`, `_kth_score`; decision 12's target
-- [`src/fux/query/fuse.py`](../../src/fux/query/fuse.py) ·
-  [`src/fux/graph/walk.py`](../../src/fux/graph/walk.py) ·
+- [`src/fux/graph/walk.py`](../../src/fux/graph/walk.py) ·
   [`src/fux/refer/assemble.py`](../../src/fux/refer/assemble.py) — the rest of
   decision 5's key set
 
-  > **Amended 2026-08-26 (W-79).** `query/hybrid.py` was the fourth entry here
-  > and is deleted — see the amendment below. `fuse.py`'s `RRF_K`/`rrf()` stay:
-  > they are the archived-engine's ported RRF arithmetic
-  > (`tests/query/test_fuse.py`), independent of the dead module that was
-  > their only caller, and nothing else in decision 5's key set names them —
-  > `[fuse]` is gone from the schema.
+  > **Amended 2026-08-26 (W-79), twice in one day.** `query/hybrid.py` was the
+  > fourth entry here and is deleted. `src/fux/query/fuse.py` was the first and
+  > **is now deleted too** — the link is removed rather than left pointing at a
+  > file that is not there. An earlier reading kept it as the archived engine's
+  > ported RRF arithmetic; that reason failed on review, because what it pinned
+  > was calibrated on the archived engine (which archive-is-not-evidence forbids
+  > citing as live grounding) and live supersession is already
+  > `[ranking] superseded_weight` in score space. Neither named a key in
+  > decision 5's set — `[fuse]` is gone from the schema — so the key set itself
+  > is unchanged.
 - [`src/fux/config.py`](../../src/fux/config.py) — `archived_weight`'s current
   home, and decision 7's retirement
 - [`src/fux/setup.py`](../../src/fux/setup.py) — decision 3's writer

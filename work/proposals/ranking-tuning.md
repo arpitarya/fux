@@ -63,8 +63,8 @@ can reach it:
 | `BODY_WEIGHT` | 1.0 | `query/bm25f.py` | module constant |
 | `K1` | 1.2 | `query/bm25f.py` | module constant |
 | `B` | 0.75 | `query/bm25f.py` | module constant |
-| `RRF_K` | 60 | `query/fuse.py` | argument, defaulted |
-| `DENSE_WIDTH` | 100 | `query/hybrid.py` | module constant |
+| ~~`RRF_K`~~ | ~~60~~ | ~~`query/fuse.py`~~ | **deleted 2026-08-26 (W-79)** |
+| ~~`DENSE_WIDTH`~~ | ~~100~~ | ~~`query/hybrid.py`~~ | **deleted 2026-08-26 (W-79)** |
 | hybrid on/off | off | `query/__init__.py` | `--hybrid` flag |
 | `archived_weight` | 1.0 | `config.py` | **`fux.toml` `[ranking]`** |
 | `DAMPING` | 0.85 | `graph/walk.py` | module constant |

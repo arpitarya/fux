@@ -93,11 +93,20 @@ forward; reviving it needs its own record and Arpit's sign-off.
 | tokenizer + analyzer chain | ingest, query | M1 |
 | BM25F scoring math + exact-df discipline | kernel | M1 (scan) / M2 (accelerated) |
 | FuxVec embed + 32 B codes | the `code` property, dense lane | M1 / M2 |
-| RRF fusion (k=60) | kernel | M2 |
+| ~~RRF fusion (k=60)~~ | ~~kernel~~ | **ported M2, RETIRED 2026-08-26** |
 | PPR-lite + edge extraction | graph lane | M3 |
 | chunker (heading-aware) | passage re-score | M4 |
 | converters (fidelity tiers) | transient convert | M4 |
 | CLI verb surface (`ask`/`find`/`answer`/`explain`/`graph`/`path`) | UX contract | M2–M4 |
+
+> **RRF is retired from the list, 2026-08-26 (W-79).** It was ported in M2 and
+> both its consumers are now gone — `query/hybrid.py` deleted earlier the same
+> day, then `query/fuse.py` itself. The live dense lane fuses via
+> `query/dense.py::fuse`, a bounded multiplicative uplift, which is **not** a
+> port and is owned by [ADR-ASK](0004_ask.md) decision 9. The row is struck
+> rather than removed so a reader who remembers RRF is here finds out what
+> happened to it. **Reviving it needs a new record and Arpit's sign-off**, per
+> rule 1 — a retired row is not a standing licence.
 
 **2. Each module arrives with its tests.** A port without its tests is a
 rewrite wearing the old code's name.

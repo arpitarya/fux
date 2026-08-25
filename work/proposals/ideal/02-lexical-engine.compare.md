@@ -32,7 +32,20 @@ laws_bracketed: [L1]
 | bigram shingles for headings/titles only | cheap phrase signal without positional postings | precision on multi-word names |
 | proximity / exact-phrase **at rescore time on fetched bytes** | the refer plane already has the bytes; positional scoring there is free | precision of the *cited passage* |
 | recency prior from `git log -1 --format=%ct` per doc | Zoekt uses file recency as a signal | runbooks/ADRs: newer wins ties |
-| supersession down-rank via extracted `supersedes` edges, through the already-ported `rrf(offsets=)` | archived ADR-0015 calibrated offset 15 | retired decisions stop outranking live ones |
+| supersession down-rank via extracted `supersedes` edges, ~~through the already-ported `rrf(offsets=)`~~ | ~~archived ADR-0015 calibrated offset 15~~ | retired decisions stop outranking live ones |
+
+> **Amended 2026-08-26 (W-79) — the mechanism this row names no longer exists.**
+> `src/fux/query/fuse.py` is deleted, so `rrf(offsets=)` is not "already
+> ported"; reviving it needs a new record and Arpit's sign-off per
+> [ADR-PORT-LIST](../../../docs/adr/0015_port-list.md) rule 1. **The row's
+> *goal* is unaffected and still worth doing** — and it is closer than it
+> reads: `[ranking] superseded_weight` already exists as a score-space
+> multiplier at `query/rank.py:205`. ⚠ It is **inert on the fixture**, because
+> `superseded_ids` reads a frontmatter `supersedes:` key the playground
+> declares in prose only — see [W-78](../../OPEN-WORK.md), where this is the
+> diagnosed cause of `q015`. The calibrated *offset 15* does not carry over:
+> it was measured in rank space on the archived engine, and
+> archive-is-not-evidence forbids citing it as live grounding regardless.
 
 **Keep the hashed term space** — it is what makes `hashed` meta (the ACL
 leak fix) possible. Stem *before* hashing.
