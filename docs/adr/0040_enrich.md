@@ -29,7 +29,7 @@ timestamp: 2026-08-23T00:00:00Z
 > calls a model, so the author is outside the program — which makes it a
 > **measurement-protocol** rule, and it lives in
 > [ADR-RS](0036_predictions.md) decisions 11-15 (ruled by Arpit 2026-08-25,
-> [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md)
+> **W-78** (closed 2026-08-25, retired to `archive/open/`; named, not cited)
 > ruling 2).
 >
 > **What it means for anyone writing enrichment.** Nothing changes about

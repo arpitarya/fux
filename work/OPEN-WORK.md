@@ -42,34 +42,25 @@ supplies a delta. In force as
 2026-08-25 forward. ⚠ Two of its six parts are **build work and did not take
 effect** — [W-81](open/W-81-the-sealed-set-and-the-two-controls.md).
 
-**One ruling is still owed, and it is yours — [W-78](open/W-78-enrichment-was-measured-against-its-own-answers.md) below.**
+**W-78 IS CLOSED (2026-08-25) — both rulings made, and neither built anything.**
+**Ruling 2:** the run-classification rule, accepted rewritten (ADR-RS 11-16).
+**Ruling 1, on your delegation:** ADR-RERANK veto 1 — **condition 1 VACATED**,
+not rewritten, because the drafted replacement's lead leg argued value from
+other people's corpora about a weaker model than the record specifies, and
+substituting a second unmeasured claim for the first is W-78's own error;
+**condition 2 RESTATED** as *score-level drift below the target corpus's
+adjacent-gap floor*. ⚠ **The cross-encoder is still refused and still unbuilt** —
+what changed is that the refusal now rests on **one measurable unmet
+condition** instead of a dead argument and a bar that
+[measurement](regression/2026-08-25-rank-flip-susceptibility/report.md) showed
+demanded ~200 000x more precision than the corpus can resolve.
+⚠ **This record now holds NO position on the cross-encoder's value.** Correct —
+there is none. Reopening is two named experiments, not an argument.
 
-⚠ **And its determinism leg just got weaker, 2026-08-25.** ADR-RERANK veto 1
-condition 2 quoted **element** drift against a rounding constant; a ranking only
-moves when drift beats the **gap to the next document**. Measured: at
-`1.907e-06`, **0.00 % of 297 queries flip**, and the knee is ~52x higher — the
-`5e-10` bar asks for ~200 000x more precision than this corpus can resolve.
-⚠ **Condition 2 does not fall** — the *score-level* drift of a real reranker has
-never been measured, so this is a **lower bound**. It is now falsifiable rather
-than rounding-derived.
-[The run](regression/2026-08-25-rank-flip-susceptibility/report.md) · ⚠ it also
-found that **4.38 % of top-5 orderings are decided by `docidx`, not relevance**.
-
-**And the model is gone (2026-08-25, your call).** `src/fux/embed/`, both
-`dense.py` modules, the committed `vectors` field, `[dense]` and `ask --hybrid`.
-**The wheel went 6.84 MB -> 233 KB — 30x — because the download was 97 % model**;
-the committed index -22.6 %; a full ingest 6.8x faster. Ranking does not move.
-[The measurement](regression/2026-08-25-model-removal/report.md) ·
-[what it cost and what it found](regression/2026-08-25-model-removal/ANALYSIS.md).
-**W-80 closed by dissolution** — no bundle, no missing provenance.
 
 ---
 
 ## Open items, by record
-
-### [ADR-RERANK](../docs/adr/0041_rerank.md) · [ADR-RS](../docs/adr/0036_predictions.md) — a ruling made on a number nobody knew was contaminated (**ruling 2 settled 2026-08-25; ruling 1 open**)
-
-- **W-78** · `arpit` · **filed 2026-08-24 from the blind re-grade.** **Enrichment is worth `+1` blind and `+9` when its author has read the failing queries.** ADR-RERANK's veto 1 deferred the cross-encoder on *"enrichment is worth 10 points and reranking 4, and a 35 MB dependency targets the class enrichment already covers deterministically and for free"* — **blind, that reads +1 against +4, and the class is not covered.** The record has been amended to stop asserting the contaminated number as today's evidence and **deliberately not reopened**: a ruling made on a comparison is reopened by the person who made it. ⚠ **Veto 1's condition 2 is independent and untouched** — `onnxruntime` is still not byte-identical across architectures, so the cross-encoder stays refused on determinism whatever is decided; reopening condition 1 licenses an argument, not a build. **RULING 2 IS MADE (Arpit, 2026-08-25): ACCEPTED, in the rewritten form** — [ADR-RS](../docs/adr/0036_predictions.md) decisions 11-14 and [`CLAUDE.md`](../CLAUDE.md) §Conformance runs now carry it, checked from 2026-08-25 forward; ⚠ two of its six parts are apparatus and did **not** take effect ([W-81](open/W-81-the-sealed-set-and-the-two-controls.md)). **The reasoning it settled:** fux forbids `--update-goldens` because a golden regenerated from engine output is a screenshot with a test attached — **this is the same failure through the other door**, corpus metadata fitted to the goldens, and nothing forbade it. The rule landed in [ADR-RS](../docs/adr/0036_predictions.md), which is where a measurement-protocol rule belongs (`fux enrich` **cannot** enforce it — the model is the author and fux never calls one). ⚠ **The wording originally drafted here was REFUSED**; what was accepted is *reclassify, never ban*, TREC's mechanism since 1994. **The confound is CLOSED (2026-08-24): a second blind author scored `31/50`, net `-1`.** Two blind authors, `+1` and `-1`, mean zero — and **both broke the same two queries** while the contaminated author broke neither, which is a property of the task rather than of craft. **The mechanism is one word**: `q015` asks for the *current* decision and both blind authors truthfully wrote *"no-longer-current"* on the **superseded** ADR, while the contaminated one wrote *"retired and replaced"*. **BM25F cannot see negation**, so honest metadata about a retired document ranks it as a live one. ⚠ Fux's own answer, `[ranking] superseded_weight`, is **inert on the fixture** — `superseded_ids` reads a frontmatter `supersedes:` key and the playground declares supersession in prose only, so the prior has never been graded. **ONE ruling remains: [reopen-or-confirm](compare/cross-encoder-reopen.compare.md) — recommend CONFIRM, on a rewritten reason.** [The blind-authorship rule](compare/blind-authorship-rule.compare.md) is **✅ accepted (2026-08-25)**. ⚠ **Three corrections to this item's own evidence are recorded in it**: the *zero broken* argument is **p ≈ 0.49** as a marginal comparison and must be cited as the **concordance** instead (≈ 0.028, ~17x the weight); fifty queries is **under-powered** (TREC ~2.4 % error at 50 topics) so `+1`/`-1` are noise; and the runs have **no source-bias control**, which KDD 2024 shows matters for any LLM-written text — now owed as [W-81](open/W-81-the-sealed-set-and-the-two-controls.md). ⚠ **Under the rule this item's own ruling created, `+1` and `-1` are below the resolution floor**: the honest reading of the blind arms is *no detected effect*, and the statistic that survives is the concordance. **Model: Opus** — the ruling is a judgement about evidence — [detail](open/W-78-enrichment-was-measured-against-its-own-answers.md)
 
 ### [ADR-RANKING](../docs/adr/0012_ranking.md) · the whole register — records vs the code they describe
 

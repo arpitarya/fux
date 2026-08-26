@@ -3,12 +3,25 @@ type: OpenItem
 id: W-78
 title: "W-78 — enrichment's value was measured by an author who had read the answers, and the ruling it justified is still standing"
 description: "The blind re-grade put enrichment at +1 against the +9 recorded on 2026-08-24. The comparison that deferred the cross-encoder was between a clean number and a contaminated one. RULING 2 IS MADE (Arpit, 2026-08-25): the run-classification rule is accepted in its rewritten form and lives in ADR-RS decisions 11-15. ONE ruling remains, and it is Arpit's: whether ADR-RERANK veto 1 reopens or is confirmed on a rewritten reason."
-status: open
+status: closed
 lane: arpit
 timestamp: 2026-08-24T00:00:00Z
 ---
 
 # W-78 — the number that justified a ruling was contaminated
+
+> ## ✅ CLOSED 2026-08-25 — both rulings made
+>
+> **Ruling 2** (2026-08-25): the run-classification rule **accepted**, in the
+> rewritten form — ADR-RS decisions 11-16.
+> **Ruling 1** (2026-08-25, on delegation): ADR-RERANK veto 1 **condition 1
+> vacated, condition 2 restated**; the refusal stands on one measurable unmet
+> condition. Neither ruling built anything.
+>
+> ⚠ **What this item did NOT settle, and nobody should read it as settling:**
+> whether a cross-encoder would help. **This record now holds no position on
+> that** — deliberately, because there is no evidence either way. The
+> reopening path is two named experiments, not an argument.
 
 ## The one-line version
 
@@ -205,10 +218,18 @@ direction, and the golden set that would test it does not exist.
 
 ## Definition of done
 
-- [ ] ADR-RERANK veto 1: reopened, or confirmed standing **with the rewritten
-      reason** — [the compare doc](../compare/cross-encoder-reopen.compare.md)
-      §6 drafts it. Re-confirming on the *old* reason repeats this item's error
-      at a different address.
+- [x] ~~ADR-RERANK veto 1: reopened, or confirmed standing with the rewritten
+      reason~~ — **DONE 2026-08-25 (Arpit, on delegation: *"Go for it. Make a
+      call."*).** **Condition 1 VACATED**, not rewritten — the compare doc's own
+      §6 recommendation was **not** taken, because its lead leg argues value
+      from other people's corpora about a weaker model than the record
+      specifies, and substituting a second unmeasured claim for the first is
+      this item's own error. **Condition 2 RESTATED** as *score-level drift
+      below the target corpus's adjacent-gap floor*, replacing a
+      rounding-derived `5e-10` that
+      [measurement](../regression/2026-08-25-rank-flip-susceptibility/report.md)
+      showed demanded ~200 000x more precision than the corpus can resolve.
+      **The refusal stands, on one measurable unmet condition.**
 - [x] ~~The blind-authorship rule is accepted, in the rewritten form~~ —
       **DONE 2026-08-25 (Arpit). ACCEPTED**, in
       [the rewritten form](../compare/blind-authorship-rule.compare.md) §5; the

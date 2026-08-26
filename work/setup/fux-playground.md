@@ -31,20 +31,29 @@ timestamp: 2026-08-12T00:00:00Z
 ---
 
 
-> ## ⚠ Owed on this sibling, 2026-08-25 — it will ERROR until someone does this
+> ## ⚠ Owed on this sibling, 2026-08-25 — CORRECTED
 >
-> **`fux-playground/.fux/tune.toml` still contains `[dense]`**, and `[dense]`
-> was removed from the schema on 2026-08-25. Every `fux` command in that repo
-> now exits with an error naming the removal. **Delete the table** — ranking
-> does not move, because `mode` defaulted to `off`.
+> ⚠ **An earlier version of this block was WRONG and is corrected here rather
+> than deleted.** It claimed `fux-playground/.fux/tune.toml` still contained
+> `[dense]` and that *"every `fux` command in that repo now exits with an
+> error"*. **It does not contain `[dense]`** — the file holds only
+> `[ranking] rerank_weight = 1.0`. The claim was inferred from *fux's own*
+> config, which did carry the table, and asserted three times without being
+> checked. **Nothing in that repo errors.**
 >
-> Also owed there: the committed index is still `fux.index.v1` and wants
-> `fux ingest --full && fux build`.
+> **What is actually owed, and it is real:** the committed index is
+> `fux.index.v1` with a **two-field analyzer** (`heading`, `body`). Current fux
+> is `fux.index.v2` with five fields and refuses a v1 shard outright rather
+> than mixing analyzers. **`fux ingest --full && fux build` is required** before
+> that repo answers a query at all.
 >
-> **This instruction lives here rather than only in `NOW.md`**, which is
-> overwritten every session — a chore recorded only in a file that gets erased
-> is a chore that gets forgotten. SETUP-PLAYGROUND's own trigger is *"either
-> sibling changes"*, and the sibling changed.
+> **Not owed, deliberately:** the `supersedes:` declaration on
+> `docs/adr-0019-calder-gateway.md`. It was added and graded in the cloud
+> ([P-SUPERSEDE](../regression/2026-08-25-supersession-and-reranker-default/VERDICT.md))
+> and **the demotion it enables FAILED its bar**. The declaration alone is
+> measurably neutral — 0 fixed, 0 broken — and adding it would **stale
+> ADR-0019's enrichment** by changing the document's `sha`. It buys nothing
+> today. Add it if query-intent work starts.
 
 ## ⚠ Planned redesign (2026-08-22) — not yet executed
 

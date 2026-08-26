@@ -22,6 +22,44 @@ timestamp: 2026-08-18T00:00:00Z
 
 ---
 
+> ## Amended 2026-08-25 — `superseded_weight` was MEASURED for the first time, and FAILED
+>
+> **The prior shipped in `v2.0.0-alpha.1` and had never been exercised by any
+> measurement.** It reads a frontmatter `supersedes:` key; the graded corpus
+> declared supersession in prose only, so the flag never set and the knob was
+> untested code.
+>
+> **Declared it and graded it**
+> ([P-SUPERSEDE](../../work/regression/2026-08-25-supersession-and-reranker-default/VERDICT.md),
+> **FAIL** against a frozen `>= 1 fixed / 0 broken`):
+>
+> | `superseded_weight` | fixed | broken |
+> |---|---|---|
+> | `0.5` | `q015`, `q049` | `q022`, `q033` |
+> | `0.25` | `q015`, `q049` | `q004`, `q022`, `q033`, `q046` |
+>
+> **The control is clean** — the frontmatter edit alone fixes 0 and breaks 0 —
+> so every movement is the demotion. **It works mechanically**, and it fixes
+> `q015`, the canonical failure a cross-encoder was wanted for.
+>
+> **And every query it breaks has the SUPERSEDED document as its correct
+> answer**: *"can I start new work against helix mesh"*, *"why keep a superseded
+> record"*, *"why did we adopt a service mesh in the first place"*.
+>
+> > **Supersession is a property of the QUERY'S INTENT, not of the DOCUMENT.**
+> > A superseded document is fully relevant to *what did we used to do*, *why*,
+> > and *may I still use it* — and wrong for exactly one intent, *what is true
+> > now*. `q015` contains the word **"current"**; the four it breaks do not.
+> > **The signal was in the query the whole time.**
+>
+> **`superseded_weight` keeps its neutral `1.0` default.** ⚠ It is now a shipped
+> knob whose only measured non-neutral settings both FAIL — noted, not retired,
+> because retiring it is a separate call.
+>
+> ⚠ **Magnitude claims nothing**: ±2 on 50 queries is below ADR-RS decision 14's
+> floor. The **direction** carries — four breakages sharing one mechanism is
+> structural, not noise.
+
 ## §1 — For humans
 
 Fux ranks with **BM25F over five fields** — `body`, `heading`, `title`, `path`

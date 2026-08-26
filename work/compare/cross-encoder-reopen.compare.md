@@ -2,14 +2,37 @@
 type: Compare Doc
 title: Reopen the Cross-Encoder, or Confirm the Refusal — with the Literature Read
 description: "W-78 ruling 1, with a literature review behind it. The 2021 BM25+CE number everyone quotes has never been re-run for a small cross-encoder; reranking falls BELOW retriever-only in ~half of measured configurations; the metadata alternative has a +32pp precedent on exactly this corpus type. Recommendation: CONFIRM, on a rewritten reason. UNRULED."
-status: proposed
+status: accepted
 timestamp: 2026-08-24T00:00:00Z
 ---
 
 # Reopen the cross-encoder, or confirm the refusal
 
-> **UNRULED. This is Arpit's call** — [W-78](../open/W-78-enrichment-was-measured-against-its-own-answers.md)
-> ruling 1. What follows is the evidence, the recommendation, and the two
+> ## Verdict: condition 1 VACATED, condition 2 RESTATED, refusal STANDS — Arpit, 2026-08-25, on delegation
+>
+> **The recommendation below (§6, "confirm on a rewritten reason") was NOT
+> taken, and the difference matters.** Its lead leg argues value from other
+> people's corpora about a weaker model than the record specifies (§0c).
+> **Condition 1 was vacated instead** — withdrawn, not replaced — because
+> substituting a second unmeasured claim for the first is precisely the error
+> W-78 documents. This record now holds **no position on the cross-encoder's
+> value**, which is correct, because there is none.
+>
+> **Condition 2 was restated, not confirmed.** The `5e-10` bar was derived from
+> `round(score, 9)`, which is not the binding constraint;
+> [measurement](../regression/2026-08-25-rank-flip-susceptibility/report.md)
+> puts the median adjacent gap at `0.27` and the flip rate at the quoted drift
+> at **0.00 %**. The new bar is **score-level drift below the target corpus's
+> adjacent-gap floor** — falsifiable, and unmet only because **nobody has
+> measured the quantity**.
+>
+> **Reopen-trigger:** both of (1) score-level drift measured below that floor,
+> and (2) value measured on the target corpus with its own goldens. ⚠
+> **Undeclared negation is deliberately NOT a trigger** — it argues a problem
+> exists, not that this is the solution.
+>
+> **Superseded framing below.** What follows was the evidence, the
+> recommendation, and the two
 > places the recommendation could be wrong.
 
 ## 0 · Two corrections to fux's own record, first

@@ -39,7 +39,7 @@ timestamp: 2026-08-22T00:00:00Z
 
 > ## Ruled 2026-08-25 — the run-classification rule is ACCEPTED. What the ruling changed, and what it did not
 >
-> **Arpit accepted [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md)
+> **Arpit accepted **W-78** (closed 2026-08-25, retired to `archive/open/`; named, not cited)
 > ruling 2 on 2026-08-25, in the rewritten form** argued in
 > [`blind-authorship-rule.compare.md`](../../work/compare/blind-authorship-rule.compare.md)
 > §5. The originally drafted wording — *"an artifact whose author has seen the
@@ -70,7 +70,7 @@ timestamp: 2026-08-22T00:00:00Z
 > blind authors broke the *same two* queries and the informed author preserved
 > exactly those two, ~0.028 — which is a different statistic and is the one to
 > cite. Three corrections to the filed evidence are recorded in
-> [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md);
+> **W-78** (closed 2026-08-25, retired to `archive/open/`; named, not cited);
 > the reports themselves are frozen and were not edited.
 >
 > ⚠ **Two of the six rules in the accepted wording are NOT in force**, and
@@ -437,7 +437,7 @@ choose will quietly choose the code — leaving verdicts that point at nothing.
 - **The ruling behind decisions 11-15** —
   [`work/compare/blind-authorship-rule.compare.md`](../../work/compare/blind-authorship-rule.compare.md),
   accepted by Arpit 2026-08-25, and
-  [W-78](../../work/open/W-78-enrichment-was-measured-against-its-own-answers.md),
+  **W-78** (closed 2026-08-25, retired to `archive/open/`; named, not cited),
   which carries the three corrections to the evidence.
 - **The measurement that motivated them** —
   [the blind enrichment re-grade](../../work/regression/2026-08-24-blind-enrichment-regrade/report.md)

@@ -28,6 +28,36 @@ timestamp: 2026-08-24T00:00:00Z
 > untouched by the model removal — the deleted embedder and the refused
 > cross-encoder are different components with different objections.
 
+> ## Amended 2026-08-25 — the default stays `0.0`, AGAINST the number
+>
+> Re-measured on the goldens, unenriched: **`28 -> 32`, `+4`, zero broken** —
+> reproducing the 2026-08-24 result exactly
+> ([run](../../work/regression/2026-08-25-supersession-and-reranker-default/report.md)).
+> The frozen bar for flipping the shipped default (`net >= +2`, `broken <= 1`)
+> is **met, decisively**. **The default does not flip.**
+>
+> **Because the `+4` is an `informed` number by this project's own new rule.**
+> The `WEIGHT` and `COVERAGE_POWER` constants above were chosen from *"the 4x5
+> sweep of (COVERAGE_POWER, WEIGHT) over the 50 goldens"* — **retriever
+> settings authored with the evaluation in hand**, which is
+> [ADR-RS](0036_predictions.md) decision 11's own example of an informed
+> artifact. Decision 12: an informed run **never supplies a delta**.
+>
+> ⚠ **This corrects a claim made in this record's own W-78 amendment**, that
+> reranking's `+4` was clean because *"the author of the arithmetic could not
+> target a query even in principle"*. **True of the algorithm, false of its
+> constants.**
+>
+> **The honest counter, and it is why this is a hold rather than a rejection:**
+> those constants were taken **from the middle of a measured plateau rather
+> than a peak**, explicitly so they would survive a corpus they were not tuned
+> on. That is the right mitigation. It is not a substitute for the corpus.
+>
+> **What flips it:** the reranker graded on **a second corpus with goldens
+> nobody has tuned on**. It does not exist, and its absence now blocks this,
+> the cross-encoder's value question, and every generalisation from ten
+> documents.
+
 ## 1 · Examples
 
 ```console
@@ -309,6 +339,89 @@ covers deterministically and for free.
 >
 > ⚠ **Scope, as it stood on the day:** N = 1 blind author, and authorship
 > quality was an unseparated confound.
+
+
+> ## RULED 2026-08-25 — veto 1 condition 1 is VACATED; condition 2 is restated. The refusal stands.
+>
+> **Arpit, 2026-08-25: *"Go for it. Make a call."*** — the delegation, after
+> the recommendation and its alternatives were laid out. This closes
+> [W-78](../../work/OPEN-WORK.md) ruling 1. It is recorded as **his ruling,
+> taken on delegation**, not as a session adjudicating a fork it was handed.
+>
+> ### Condition 1 — VACATED, not rewritten
+>
+> The refusal was argued as *"enrichment is worth 10 points and reranking 4, so
+> a 35 MB dependency targets a class enrichment already covers deterministically
+> and for free."*
+>
+> **That premise is dead.** Blind, enrichment is worth `+1` and `−1` — below
+> ADR-RS decision 14's resolution floor, so the honest reading is **no detected
+> effect**. The class is **not** covered.
+>
+> **Condition 1 is withdrawn rather than replaced, and the choice is the whole
+> point.** The drafted replacement had three legs, and its lead leg — *"the
+> value is unproven for corpora shaped like fux's"* — is an argument from
+> **other people's corpora, about a weaker model than the one specified**
+> (§0c: the record says Ettin-17M, the tables are MiniLM-L6). **Substituting a
+> second unmeasured claim for the first is the exact error W-78 documents.** A
+> condition with no evidence behind it should be absent, not restated.
+>
+> ⚠ **Consequence, stated rather than hidden: this record now holds NO position
+> on the cross-encoder's value.** If condition 2 is ever satisfied, the value
+> question starts from zero. That is correct — it *is* at zero.
+>
+> ### Condition 2 — RESTATED, and it is what the refusal now rests on
+>
+> **Old bar:** drift below `5e-10`, derived from `rank()`'s `round(score, 9)`.
+>
+> **That bar is wrong, and wrong in the strict direction.** The rounding was
+> never the binding constraint — a ranking moves when drift exceeds **the gap
+> to the next document**.
+> [Measured](../../work/regression/2026-08-25-rank-flip-susceptibility/report.md)
+> over 495 documents and 297 queries: median adjacent top-5 gap **`0.27`**, and
+> at the quoted `1.907e-06` there are **0.00 % order flips, 0.00 % membership
+> flips and 0.00 % at-risk** — no adjacent pair in the sample is within twice
+> it. The knee is `~1e-4`. **`5e-10` demanded ~200 000x more precision than the
+> corpus can resolve.**
+>
+> **New bar, and it is falsifiable:**
+>
+> > **The SCORE-LEVEL drift of the candidate reranker, measured across x86-64
+> > and aarch64 on identical input, must sit below the corpus's adjacent-gap
+> > floor.** That floor is `~5e-5` on this repository and **must be
+> > re-measured for the corpus in question** — gaps shrink as a corpus grows.
+>
+> **The refusal STANDS on this**, and the reason is not that the bar is
+> unmeetable — it is that **nobody has measured the quantity.** `1.907e-06` is
+> one element of an intermediate tensor after **one** encoder block; six layers
+> compound, and a final scalar may average. ⚠ And the flip measurement is a
+> **lower bound**: a cross-encoder reranks ~20 already-similar documents, the
+> regime that manufactures near-ties, so its own gaps are plausibly tighter
+> than BM25F's.
+>
+> ### What would reopen this
+>
+> **Both**, and they are now independent experiments rather than arguments:
+>
+> 1. **Score-level drift measured below the target corpus's adjacent-gap
+>    floor.** Run any small ONNX reranker on two architectures, diff the
+>    **final scores**. Half a day. Nobody has done it.
+> 2. **Value measured on the target corpus** — the specified model, that
+>    corpus's own goldens. This record holds no position; anyone reopening
+>    supplies the number.
+>
+> ⚠ **Undeclared negation is NOT a reopening condition, and that is deliberate.**
+> It is the strongest *argument* for the capability — `q015` is real and BM25F
+> structurally cannot see it — but it argues that **a problem exists**, not that
+> **this** is the solution. Measure the problem first; it may have a cheaper fix,
+> as the declared-supersession route already suggests.
+>
+> ### What did NOT change
+>
+> **The cross-encoder is still refused, and nothing is built.** The outcome is
+> identical to yesterday's. What changed is that the refusal now rests on **one
+> stated, measurable, unmet condition** instead of one dead argument and one
+> mis-specified bar.
 
 > ## Amended again 2026-08-24 — the confound is CLOSED, and against enrichment
 >
