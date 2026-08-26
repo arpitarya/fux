@@ -6,7 +6,7 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
-## [Unreleased]
+## [2.0.0-alpha.2] - 2026-08-26
 
 ### Added
 
