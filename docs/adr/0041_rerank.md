@@ -222,6 +222,50 @@ Filed: [`work/regression/2026-08-24-rerank-and-goldens/`](../../work/regression/
 > to beat is not *"small drift"*; it is drift below `5e-10`. Nothing in that
 > run is within three orders of magnitude of it.
 
+> ## ⚠ Amended 2026-08-25 — THAT BAR IS DERIVED FROM THE WRONG QUANTITY
+>
+> **Arpit, 2026-08-25: *"the objective is not to give the same answer always…
+> it is to always give the right or most relevant answer."*** Condition 2 was
+> re-examined against that and it does not survive as written.
+>
+> **`round(score, 9)` is not the binding constraint.** A ranking changes when
+> drift exceeds **the gap to the next document**, not when it exceeds the
+> rounding. [Measured](../../work/regression/2026-08-25-rank-flip-susceptibility/report.md)
+> on 495 documents and 297 queries: the **median adjacent top-5 gap is `0.27`**
+> — five orders of magnitude above the quoted drift.
+>
+> **At `1.907e-06`, on this corpus, nothing moves.** `0.00 %` order flips,
+> `0.00 %` membership flips, **and `0.00 %` at-risk** — no adjacent top-5 pair
+> in the sample is even within `2 x 1.907e-06`. The knee is **~`1e-4`, ~52x the
+> drift**; ~27 % of queries flip only at `1e-2`, ~5 200x it.
+>
+> **So the `5e-10` bar is wrong, and it is wrong in the strict direction** —
+> it demands roughly **200 000x** more precision than this corpus can detect.
+>
+> ⚠ **This does NOT reopen condition 2, and it does not license a build.**
+> Three things stand between this and any such conclusion:
+>
+> 1. **The score-level drift has never been measured.** `1.907e-06` is one
+>    element of an intermediate tensor after **one** encoder block. A six-layer
+>    model compounds. **The number that decides condition 2 does not exist yet.**
+> 2. **A cross-encoder's score geometry is probably tighter than BM25F's** — it
+>    reranks ~20 already-similar documents, the regime that produces near-ties.
+>    The measurement is a **lower bound**, not an estimate.
+> 3. **One corpus, 495 documents, no goldens**, three orders of magnitude below
+>    the design point. Adjacent gaps shrink as a corpus grows.
+>
+> **What this DOES change: condition 2 is now falsifiable.** Restate the bar as
+> *score-level drift below the corpus's adjacent-gap floor* — measurable, and
+> measured at `~5e-5` for this corpus — instead of a rounding-derived `5e-10`
+> that no runtime could ever meet. **The prerequisite is one experiment**: run
+> any small ONNX reranker on two architectures and diff the **final scores**.
+>
+> ⚠ **And the run found a larger source of arbitrary ordering than the drift.**
+> **4.38 % of queries contain an EXACT top-5 tie**, resolved by `docidx` rather
+> than relevance. Deterministic, so it breaks no law — and arbitrary, which is
+> the thing that matters when the objective is the right answer. Filed as a
+> fork in that run's ANALYSIS §2.1; not decided here.
+
 Condition 1 is the live one. On today's evidence enrichment is worth 10 points
 and reranking 4, and a 35 MB dependency targets the class enrichment already
 covers deterministically and for free.

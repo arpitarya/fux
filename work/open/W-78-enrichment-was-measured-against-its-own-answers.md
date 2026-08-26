@@ -106,7 +106,19 @@ the class enrichment already covers deterministically and for free."*
 - The record has been **amended to stop asserting the contaminated number as
   today's evidence**, and deliberately **not** reopened — a ruling made on a
   comparison is reopened by the person who made it.
-- ⚠ **Condition 2 is independent, and it is now MEASURED rather than assumed.**
+- ⚠⚠ **AMENDED 2026-08-25: condition 2's number was measured at the WRONG
+  LEVEL.** The drift figure is *element* drift in an intermediate tensor; a
+  ranking only moves when drift exceeds the **gap to the next document**.
+  [Measured](../regression/2026-08-25-rank-flip-susceptibility/report.md) on
+  495 documents / 297 queries: at `1.907e-06`, **0.00 % order flips and 0.00 %
+  at-risk** — the knee is ~52x higher. **The `5e-10` bar demands ~200 000x more
+  precision than this corpus can detect.** ⚠ It does **not** follow that
+  condition 2 falls: the **score-level** drift of a real reranker has never been
+  measured, and a cross-encoder's score gaps are probably tighter than BM25F's,
+  so the result is a **lower bound**. What changes is that condition 2 is now
+  **falsifiable** rather than rounding-derived. Details in ADR-RERANK's
+  2026-08-25 amendment.
+- ⚠ **Condition 2 as originally filed — measured rather than assumed.**
   Identical graph and input, same `onnxruntime`, single-threaded, optimisations
   off: **82.9 % of elements differ, max `1.907e-06`** after one encoder block,
   against a `round(score, 9)` sort — **~2000x the rounding**

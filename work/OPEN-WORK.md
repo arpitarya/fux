@@ -44,6 +44,17 @@ effect** — [W-81](open/W-81-the-sealed-set-and-the-two-controls.md).
 
 **One ruling is still owed, and it is yours — [W-78](open/W-78-enrichment-was-measured-against-its-own-answers.md) below.**
 
+⚠ **And its determinism leg just got weaker, 2026-08-25.** ADR-RERANK veto 1
+condition 2 quoted **element** drift against a rounding constant; a ranking only
+moves when drift beats the **gap to the next document**. Measured: at
+`1.907e-06`, **0.00 % of 297 queries flip**, and the knee is ~52x higher — the
+`5e-10` bar asks for ~200 000x more precision than this corpus can resolve.
+⚠ **Condition 2 does not fall** — the *score-level* drift of a real reranker has
+never been measured, so this is a **lower bound**. It is now falsifiable rather
+than rounding-derived.
+[The run](regression/2026-08-25-rank-flip-susceptibility/report.md) · ⚠ it also
+found that **4.38 % of top-5 orderings are decided by `docidx`, not relevance**.
+
 **And the model is gone (2026-08-25, your call).** `src/fux/embed/`, both
 `dense.py` modules, the committed `vectors` field, `[dense]` and `ask --hybrid`.
 **The wheel went 6.84 MB -> 233 KB — 30x — because the download was 97 % model**;
