@@ -11,6 +11,7 @@ tagged with [`CACHEDIR.TAG`](https://bford.info/cachedir/)).
 | `index/` | committed | the wire-format index (ADR-RECORD) |
 | `sources/` | committed | the committed source lists (`dirs`, `urls`), one entry per line |
 | `fetchers/` | committed | consumer-owned code (`cdp.py`, `http.py`), edit freely |
+| `tune.toml` | committed | the tunables: HOW results are ordered, never what is indexed (ADR-TUNE) |
 | `runtime/` | derived | M2 accelerator segments, and M4's fetch cache nested at `runtime/fetch-cache/`; carries `CACHEDIR.TAG` |
 
 ## The fetchers are yours

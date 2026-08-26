@@ -92,6 +92,19 @@ class FetcherError(RuntimeError):
     """Raised for every expected failure; fux records it as the skip reason."""
 
 
+#: W-82 3.3 -- DECLARED EXPLICITLY, not omitted. Omission and 1 behave
+#: identically, and this line is where the REASON gets written for whoever
+#: copies this file and starts editing it:
+#:
+#:   `connect()` sets a module-global `_session` holding ONE WebSocket that
+#:   every `fetch()` reuses. Two threads writing frames onto it produce
+#:   PLAUSIBLE DOCUMENTS ATTRIBUTED TO THE WRONG URLs -- which lands in the
+#:   committed index, passes every determinism check, and is caught only by a
+#:   human reading an answer.
+#:
+#: Raise this only after giving each worker its own session.
+MAX_PARALLEL = 1
+
 def accept_key_for(key: str) -> str:
     """Sec-WebSocket-Accept for a Sec-WebSocket-Key (RFC 6455 §4.2.2)."""
     digest = hashlib.sha1((key + _WS_GUID).encode("ascii")).digest()

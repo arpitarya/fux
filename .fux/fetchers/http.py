@@ -77,6 +77,15 @@ _BLOCK_BREAK = {"p", "div", "section", "article", "main", "header", "footer", "f
 _HEADINGS = {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
 
 
+#: W-82 3.3 -- this fetcher IS safe to call from several threads: `fetch`
+#: builds a fresh `urllib.request.Request` per call and holds no shared
+#: connection. `configure()` mutates module globals ONCE, before any fetch.
+#:
+#: This is capability, not policy: it says what is SAFE, not what is polite.
+#: `[sources.url] max_parallel` is where a consumer says how many they want,
+#: and fux uses `min(this, that)`.
+MAX_PARALLEL = 8
+
 def html_to_markdown(html: str) -> str:
     parser = _MdParser()
     parser.feed(html)

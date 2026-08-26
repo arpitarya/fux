@@ -66,6 +66,24 @@ Three rules that make the ladder safe rather than clever:
 `archived` as fields rather than as prose you have to parse. **Branch on the
 fields, never on the wording** - the wording is not a contract.
 
+### Line ranges come from `answer`, never from `ask`
+
+**`ask` and `find` return DOCUMENTS. Only `answer` returns a SPAN.**
+
+| verb | `loc` looks like | network |
+|---|---|---|
+| `fux ask` / `fux find` | `docs/mesh.md` | none - index only |
+| `fux answer` | `docs/mesh.md:L10-L13` | fetches each cited source |
+
+**If you need a line range, use `answer`.** Running `ask` and reporting that
+fux "does not give line numbers" is wrong, and it is the most common way to be
+wrong about this tool.
+
+**This is law L4 showing through the surface, not an omission.** A line range
+can only be computed by chunking the *fetched* bytes; the index holds
+statistics, not text, so it has nothing to count lines in. Giving `ask` line
+numbers would mean making it fetch, and `ask` is offline by default.
+
 ## 3. Read the freshness verdict on `answer`
 
 `answer` fetches each cited source and compares it against what was indexed:

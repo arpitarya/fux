@@ -39,6 +39,18 @@ play: the worklog is the granular, per-exchange trail.
   changed by this session, so **no ADR affected**.
 - **Next:** none — release is live.
 
+## 2026-08-26 — "I ran fux ask and got no lines" — right command, wrong verb  ·  Cowork
+- **Asked:** *"we talked about paragraphs and lines. I don't see them. Is something not built?"*
+- **Answered: nothing is unbuilt.** Heading-delimited passages, paragraph splitting above 4 KB, and `path:L12-L40` line ranges all shipped in **W-76 Phase 5** and work today. **Verified by running it**, not by reading `chunk.py`: a fresh index over a three-section fixture returned `-- docs/mesh.md:L1-L8 (sha 516bef067812, current)` in text and `"loc": "docs/mesh.md:L10-L13"` in `--json`, with two ranked passages carrying their headings.
+- ⚠ **The defect was mine and it was in the documentation.** I wrote a page explaining Fux and omitted its most distinctive output — the thing that makes a citation actionable. A reader of `docs/guide.html` would have concluded exactly what Arpit concluded: that the feature was missing.
+- **Did:** added a *What a citation actually is* subsection — the captured text and JSON, the four-step chunking rule (split on headings → merge under 120 bytes → split over 4 000 on paragraph boundaries → address as 1-based inclusive lines), why passages are transient under L2, why the byte budget is honest because chunking runs on fetched bytes, and why an ordinal is kept beside the line range.
+- **The output is CAPTURED, not illustrated** — this project's own lesson, and the reason the guide now carries a note saying so.
+- **Decided / open:** nothing decided. ⚠ **The lesson worth keeping: a feature that is built, tested and undocumented is indistinguishable from a feature that does not exist.** Every gate this repo runs checks that documentation is *true*; none checks that it is *complete*.
+- ⚠ **Then Arpit said what he actually ran: `fux ask "playground"`. That reframed the finding.** `ask` and `find` are **document-level** — `"loc": "docs/mesh.md"`. Only `answer` is **span-level** — `"loc": "docs/mesh.md:L10-L13"`. Verified both by running them side by side. **Nothing is broken; it was the wrong verb for the question.**
+- **And the split is L4 showing through the surface, not an oversight.** A line range can only be computed by chunking the *fetched* bytes; the index holds statistics, not text, so it has nothing to count lines in. Giving `ask` line numbers would mean making it fetch, and `ask` is offline by default. **Worth stating rather than fixing** — someone will otherwise propose "just add line numbers to ask" and not see the fence they are crossing.
+- **Did, second pass:** a `Line ranges come from answer, never from ask` block leading the citation section of `docs/guide.html`, the same block in **both usage renderings** (`USAGE-SKILL.md` → Claude + Kiro, `fux-usage.instructions.md` → Copilot), and ADR-AGENT-POLICY amended to record why the omission mattered — **an agent reading the old skill could have reported a shipped feature as missing.**
+- **Next:** unchanged — §3.0, which needs a real URL corpus.
+
 ## 2026-08-26 — the register, the diagram and one page that explains fux  ·  Cowork
 - **Asked:** *"update the ADRs and update the architecture diagram… create an image… one big HTML file… commit push and publish."*
 - **Did:** annotated **ten register rows** with the W-82 phase that changed them; **redrew `architecture-detailed.svg`**; rendered it to `docs/img/fux-architecture.png`; wrote **`docs/guide.html`**, one self-contained page with the diagram inlined.

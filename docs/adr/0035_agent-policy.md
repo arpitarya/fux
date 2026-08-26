@@ -317,6 +317,24 @@ theirs and stays; a file three versions behind is at least **identifiable**, and
 > the body; putting it only in `compatibility` would repeat the *knob that
 > cannot work* failure this project has already paid for once.
 
+> **Amended 2026-08-26 — the `fux-usage` skill now states which verb yields a
+> line range, because omitting it produced a wrong conclusion in the field.**
+>
+> A user ran `fux ask` and reported that fux does not return line numbers. It
+> does — from **`answer`**. `ask` and `find` are document-level (`docs/mesh.md`);
+> `answer` is span-level (`docs/mesh.md:L10-L13`).
+>
+> ⚠ **The skill described the verbs and never described this**, so an agent
+> reading it could reach the same wrong conclusion and report a shipped feature
+> as missing. **A feature that is built, tested and undocumented is
+> indistinguishable from one that does not exist.**
+>
+> **It is L4 showing through the surface, not an oversight worth designing away.**
+> A line range can only be computed by chunking the *fetched* bytes; the index
+> holds statistics, not text, so it has nothing to count lines in. Giving `ask`
+> line numbers would mean making it fetch, and `ask` is one of the verbs that is
+> offline by default. Both usage renderings now say so.
+
 ### Alternatives considered
 
 | | why not |

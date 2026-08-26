@@ -189,6 +189,105 @@ fux update                      # re-read everything listed, re-fetching URLs</c
 </table>
 </div>
 
+<h3>Line ranges come from <code>answer</code>, never from <code>ask</code></h3>
+
+<div class="note warn">
+  <strong>The single most confusing thing about the surface, so it goes first.</strong>
+  <code>ask</code> and <code>find</code> return <strong>documents</strong>. Only <code>answer</code>
+  returns a <strong>span</strong> with line numbers. If you ran <code>fux ask</code> and expected
+  <code>:L12-L40</code>, nothing is broken — it is the wrong verb for that question.
+</div>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Verb</th><th>Granularity</th><th><code>loc</code> looks like</th><th>Network</th></tr></thead>
+  <tbody>
+    <tr><td><code>fux ask</code></td><td>document</td><td><code>docs/mesh.md</code></td>
+      <td>none — index only</td></tr>
+    <tr><td><code>fux find</code></td><td>document</td><td><code>docs/mesh.md</code></td>
+      <td>none — index only</td></tr>
+    <tr><td><code>fux answer</code></td><td><strong>span</strong></td>
+      <td><strong><code>docs/mesh.md:L10-L13</code></strong></td>
+      <td>fetches each cited source</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <strong>This is L4, not an omission.</strong> A line range can only be computed by chunking the
+  <em>fetched</em> bytes — the index holds statistics, not text, so it has nothing to count lines in.
+  Giving <code>ask</code> line numbers would mean making it fetch, and <code>ask</code> is one of the
+  verbs that is offline by default. The split is the law showing through the surface.
+</div>
+
+<h3>What a citation actually is</h3>
+<p>So: <code>fux answer</code> does not hand you a document and wish you luck. It cites a
+<strong>span</strong> — a heading-delimited passage with a line range and the sha of the bytes it
+read.</p>
+
+<pre><code>$ fux answer "why did we choose helix"
+
+# Service mesh
+
+We adopted a service mesh to stop a slow dependency taking down checkout.
+
+## Why we chose Helix
+
+Helix gave us per-route timeouts and circuit breaking without touching
+application code. The alternative was a library in every service.
+
+  -- docs/mesh.md:L1-L8 (sha 516bef067812, current)</code></pre>
+
+<p>The same thing in <code>--json</code>, which is what an agent should read:</p>
+<pre><code>"citation": {
+  "id":        "file:docs/mesh.md",
+  "loc":       "docs/mesh.md:L10-L13",
+  "sha":       "516bef06781262a0a64b10027316c18d668eeccb",
+  "freshness": "current"
+}</code></pre>
+
+<div class="note">
+  <strong>Verbatim from a real run</strong>, not illustrated. Examples that are typed rather than
+  captured rot silently, and this project has paid for that once already.
+</div>
+
+<h4 style="margin-top:26px;font-size:.98rem">How the spans are chosen</h4>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Step</th><th>Rule</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Split</td><td>On <strong>markdown headings</strong></td>
+      <td>A document's headings are the author's own segmentation. It costs nothing, needs no model,
+      and produces boundaries a human already agreed with.</td></tr>
+    <tr><td>Merge</td><td>Sections under <strong>120 bytes</strong> fold into the next one</td>
+      <td>A two-line passage is a citation nobody can read in isolation.</td></tr>
+    <tr><td>Split again</td><td>Sections over <strong>4 000 bytes</strong> split on
+      <strong>paragraph boundaries</strong></td>
+      <td>One 40 KB section would otherwise eat the whole byte budget by itself.</td></tr>
+    <tr><td>Address</td><td><code>path:L&lt;start&gt;-L&lt;end&gt;</code>, 1-based and inclusive</td>
+      <td>An agent acts on a citation by opening a file at a line. An ordinal would force a second
+      call just to find out which lines those are.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>Text before the first heading is its own passage. A preamble is content, and dropping it silently
+is how the one sentence that answers the question disappears.</p>
+
+<div class="note">
+  <strong>The passages are transient, and that is L2, not a design preference.</strong> They exist
+  for the length of one query — never written to <code>.fux/</code>, never cached to disk, never put
+  in the index. They are also what makes the byte budget honest: because chunking runs on the
+  <em>fetched</em> bytes, the assembler knows every candidate's real size instead of estimating it
+  from index statistics. A web-scale system has to guess here; this one does not.
+</div>
+
+<div class="note">
+  <strong>An ordinal is kept beside the line range</strong>, and the reason is worth knowing: line
+  numbers move when a document reflows, and a stored citation would then point somewhere else
+  without ever looking wrong. The ordinal survives that.
+</div>
+
 <h3>Read the freshness verdict</h3>
 <p><code>fux answer</code> fetches each cited source and compares it against what was indexed.
 Four states, and the fourth exists precisely so the other three stay honest:</p>
