@@ -1,0 +1,655 @@
+<title>Fux Guide</title>
+<style>
+  :root{
+    --bg:#fcfcfb; --panel:#ffffff; --ink:#14181f; --muted:#5b6472; --faint:#8a93a0;
+    --line:#e3e6ea; --accent:#3d6df2; --accent-soft:#eef3fd;
+    --ok:#1d8a5e; --ok-soft:#eaf7f0; --warn:#c2410c; --warn-soft:#fdf1e9;
+    --code-bg:#f4f5f7;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0f1215; --panel:#161a1f; --ink:#e9edf2; --muted:#a2acba; --faint:#7d8794;
+      --line:#252b33; --accent:#7aa2ff; --accent-soft:#182234;
+      --ok:#4ec38a; --ok-soft:#12241c; --warn:#f0955c; --warn-soft:#2a1a12;
+      --code-bg:#1b2027;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0f1215; --panel:#161a1f; --ink:#e9edf2; --muted:#a2acba; --faint:#7d8794;
+    --line:#252b33; --accent:#7aa2ff; --accent-soft:#182234;
+    --ok:#4ec38a; --ok-soft:#12241c; --warn:#f0955c; --warn-soft:#2a1a12;
+    --code-bg:#1b2027;
+  }
+
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.62;
+       margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:980px;margin:0 auto;padding:56px 24px 120px}
+
+  header.top{border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:44px}
+  h1{font-size:2.1rem;line-height:1.15;margin:0 0 10px;letter-spacing:-.02em}
+  .sub{color:var(--muted);font-size:1.02rem;margin:0 0 18px;max-width:62ch}
+  .meta{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{font-family:var(--mono);font-size:.74rem;padding:4px 10px;border-radius:999px;
+        border:1px solid var(--line);color:var(--muted);background:var(--panel)}
+  .pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+
+  nav.toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+          padding:18px 22px;margin-bottom:52px}
+  nav.toc strong{display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+                 color:var(--faint);margin-bottom:10px}
+  nav.toc ol{margin:0;padding-left:20px;columns:2;column-gap:34px}
+  @media(max-width:640px){nav.toc ol{columns:1}}
+  nav.toc li{margin:3px 0}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  h2{font-size:1.5rem;margin:64px 0 6px;letter-spacing:-.01em;scroll-margin-top:20px}
+  h2 .num{color:var(--faint);font-family:var(--mono);font-size:.9rem;margin-right:10px;font-weight:400}
+  h3{font-size:1.06rem;margin:34px 0 8px}
+  h2+p.lede{color:var(--muted);margin-top:0;max-width:66ch}
+  p{max-width:70ch}
+
+  code{font-family:var(--mono);font-size:.87em;background:var(--code-bg);
+       padding:1px 5px;border-radius:4px}
+  pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+      padding:14px 16px;overflow-x:auto;font-size:.84rem;line-height:1.6}
+  pre code{background:none;padding:0;font-size:1em}
+
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:18px 0}
+  table{border-collapse:collapse;width:100%;font-size:.9rem;min-width:520px}
+  th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:var(--panel);font-size:.76rem;letter-spacing:.05em;text-transform:uppercase;
+     color:var(--faint);font-weight:600;white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  td code{white-space:nowrap}
+
+  .note{border-left:3px solid var(--line);padding:12px 0 12px 18px;margin:22px 0;color:var(--muted)}
+  .note.warn{border-color:var(--warn);background:var(--warn-soft);border-radius:0 8px 8px 0;
+             padding:14px 18px;color:var(--ink)}
+  .note.ok{border-color:var(--ok);background:var(--ok-soft);border-radius:0 8px 8px 0;
+           padding:14px 18px;color:var(--ink)}
+  .note strong{color:var(--ink)}
+
+  figure{margin:26px 0 10px}
+  .archbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;
+           padding:10px;overflow-x:auto}
+  svg.arch{width:100%;height:auto;min-width:900px;display:block}
+  figcaption{color:var(--faint);font-size:.82rem;margin-top:10px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin:22px 0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+  .card h4{margin:0 0 6px;font-size:.95rem}
+  .card p{margin:0;font-size:.88rem;color:var(--muted)}
+
+  .law{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.92rem}
+  .law:last-child{border-bottom:none}
+  .law b{font-family:var(--mono);color:var(--accent);flex:0 0 30px}
+
+  footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);
+         color:var(--faint);font-size:.85rem}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <h1>Fux</h1>
+  <p class="sub">A search index for your documents that lives in your git repo — as text you can read,
+  diff and review. No server, no vector database, no API key, and no second copy of your content.</p>
+  <div class="meta">
+    <span class="pill">2.0.0-alpha.2</span>
+    <span class="pill">fux.index.v2</span>
+    <span class="pill">analyzer v2</span>
+    <span class="pill">fux.runtime.v4</span>
+    <span class="pill ok">lexical only — no model anywhere</span>
+  </div>
+</header>
+
+<nav class="toc">
+  <strong>Contents</strong>
+  <ol>
+    <li><a href="#what">What Fux is</a></li>
+    <li><a href="#use">How to use it</a></li>
+    <li><a href="#agents">Running it as an agent</a></li>
+    <li><a href="#arch">Architecture</a></li>
+    <li><a href="#laws">The seven laws</a></li>
+    <li><a href="#decided">Decisions made</a></li>
+    <li><a href="#pending">Decisions pending</a></li>
+    <li><a href="#honest">What is not verified</a></li>
+  </ol>
+</nav>
+
+<h2 id="what"><span class="num">01</span>What Fux is</h2>
+<p class="lede">One sentence: rank from a small committed index, fetch content from the systems that
+own it, and verify at answer time.</p>
+
+<div class="grid">
+  <div class="card">
+    <h4>Your documents stay put</h4>
+    <p>The repo, a wiki, a web page. Fux never copies them and never stores their text — it stores
+    statistics that make them findable.</p>
+  </div>
+  <div class="card">
+    <h4>The index is committed</h4>
+    <p><code>.fux/index/</code> — 256 shards of canonical JSON, one line per document. Small enough
+    for git, plain enough to diff and merge.</p>
+  </div>
+  <div class="card">
+    <h4>Answers quote the original</h4>
+    <p>The index says which document answers you. The words come back from that document as it
+    stands today, with a freshness verdict attached.</p>
+  </div>
+</div>
+
+<div class="note">
+  <strong>Why "index", not "database".</strong> What Fux commits is an index: statistics that make
+  documents findable. It is load-bearing vocabulary, not a style preference — the moment it reads as
+  a database, people expect it to hold the content, and holding content is the one thing it must
+  never do.
+</div>
+
+<h2 id="use"><span class="num">02</span>How to use it</h2>
+
+<h3>Install and set up</h3>
+<pre><code>pip install fux-engine          # or: uv add fux-engine
+fux setup                       # writes the files YOU own — never rewritten after
+fux ingest &amp;&amp; fux build          # build the index, then the fast path</code></pre>
+<p><code>fux setup</code> writes <code>fux.toml</code>, the source lists under
+<code>.fux/sources/</code>, the fetcher templates, and your agent files. Everything it writes is
+yours: commit it, edit it, Fux will not overwrite it.</p>
+
+<h3>Tell it what to index</h3>
+<pre><code>fux add docs/                   # a directory, walked recursively
+fux add README.md               # a single file
+fux add https://wiki.corp/page  # a URL — recorded AND fetched
+fux remove docs/legacy/
+fux update                      # re-read everything listed, re-fetching URLs</code></pre>
+
+<h3>Ask</h3>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Command</th><th>Gives you</th><th>Reach for it when</th></tr></thead>
+  <tbody>
+    <tr><td><code>fux ask "…" --json</code></td><td>Ranked results with <code>score</code>,
+      <code>loc</code>, <code>archived</code></td><td>You want candidates and will judge them</td></tr>
+    <tr><td><code>fux find "…"</code></td><td>Bare paths</td><td>You are piping into something else</td></tr>
+    <tr><td><code>fux answer "…"</code></td><td>One cited answer, re-scored on the source's
+      current bytes</td><td>You want the answer, with a freshness verdict</td></tr>
+    <tr><td><code>fux explain &lt;loc&gt;</code></td><td>Edges into and out of one document</td>
+      <td>You are asking what something depends on</td></tr>
+    <tr><td><code>fux graph "…"</code></td><td>The neighbourhood around the best answers</td>
+      <td>You are orienting in unfamiliar territory</td></tr>
+    <tr><td><code>fux path &lt;a&gt; &lt;b&gt;</code></td><td>How two documents connect</td>
+      <td>You suspect a relationship and want the chain</td></tr>
+    <tr><td><code>fux doctor</code></td><td>Install health, index health, URL health</td>
+      <td>Something is off and you want it named</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Read the freshness verdict</h3>
+<p><code>fux answer</code> fetches each cited source and compares it against what was indexed.
+Four states, and the fourth exists precisely so the other three stay honest:</p>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Verdict</th><th>Means</th><th>What to do</th></tr></thead>
+  <tbody>
+    <tr><td><code>current</code></td><td>The source still matches the index</td><td>Cite it plainly</td></tr>
+    <tr><td><code>stale</code></td><td>The source changed since ingest</td>
+      <td>The quoted passage is from the <em>current</em> bytes — the answer is right, the index is
+      behind. Say so.</td></tr>
+    <tr><td><code>unverified</code></td><td>The source could not be reached</td>
+      <td>Do not present it as confirmed</td></tr>
+    <tr><td><code>cached</code></td><td>Served from a TTL cache</td>
+      <td><em>We looked recently</em> — which is not <em>we looked just now</em></td></tr>
+  </tbody>
+</table>
+</div>
+<div class="note">
+  <strong>Why <code>cached</code> is never folded into <code>current</code>.</strong> Collapsing
+  <em>we did not look</em> into <em>we looked and it was fine</em> is the failure the whole refer
+  plane exists to prevent. A knob that lies about freshness is worse than no knob.
+</div>
+
+<h2 id="agents"><span class="num">03</span>Running it as an agent</h2>
+<p class="lede"><code>fux setup</code> writes agent instructions for Claude, Kiro and Copilot. The
+most important thing they carry is how to <em>find</em> the command.</p>
+
+<div class="note warn">
+  <strong>The defect this closes was live and silent.</strong> <code>fux</code> is a console script,
+  so it is on <code>PATH</code> only where its installing environment's <code>bin/</code> is. In any
+  repo whose Fux lives in an unactivated <code>.venv/</code>, an agent got
+  <code>command not found</code>, concluded <em>not installed</em>, and <strong>silently fell back to
+  grep</strong> — while the engine sat there and the committed index sat beside it. It did not error.
+  It degraded, and the degradation read exactly like an honest answer.
+</div>
+
+<h3>The invocation ladder</h3>
+<pre><code>fux --version                 # a venv is active, or fux is global (pipx, uv tool)
+uv run fux --version          # a uv-managed repo
+./.venv/bin/fux --version     # venv present, not active   (Windows: .venv\Scripts\fux.exe)
+python -m fux.cli --version   # importable, no script installed</code></pre>
+<p>Probe with <code>--version</code> and cache the winner for the session. Never <code>which</code> —
+it answers <em>is there a file</em>, not <em>does it run</em>, and a stale shim from a deleted venv
+passes it.</p>
+
+<div class="note ok">
+  <strong>Never activate, never install.</strong> An agent calls the absolute path from rung 3. It
+  does not source an activate script, modify <code>PATH</code>, or install anything — mutating the
+  user's shell so a read-only query can run is a side effect nobody consented to, and in a
+  non-interactive subshell it usually does not even persist. <em>This is enforced by a test</em>,
+  because it is exactly the fix a well-meaning edit reaches for.
+</div>
+
+<p>If every rung fails, the agent says <em>which ones it tried</em> and that it fell back — never
+that the package is absent. That one sentence turns a silent degradation into a diagnosable failure.</p>
+
+<h3>Where the files land</h3>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Vendor</th><th>Files</th></tr></thead>
+  <tbody>
+    <tr><td>Claude</td><td><code>.claude/skills/fux-usage/</code> ·
+      <code>fux-archived-results/</code> · <code>fux-enrich/</code></td></tr>
+    <tr><td>Kiro</td><td><code>.kiro/skills/fux-usage/</code> ·
+      <code>.kiro/steering/fux-archived-results.md</code></td></tr>
+    <tr><td>Copilot</td><td><code>.github/agents/</code> · <code>.github/instructions/</code></td></tr>
+  </tbody>
+</table>
+</div>
+<p>Kiro implements the same open Agent Skills standard Claude does, so the usage skill is
+<strong>one template at two paths</strong> — agreement by construction rather than by a conformance
+test comparing two files that could drift.</p>
+
+<div class="note warn">
+  <strong>Two Kiro traps worth knowing.</strong> Kiro CLI does not support steering inclusion modes,
+  so every file in <code>.kiro/steering/</code> enters every interaction there — which is why the
+  usage guidance ships as a <em>skill</em>. And Kiro <strong>custom agents load neither skills nor
+  steering by default</strong>: they need explicit <code>skill://</code> / <code>file://</code>
+  entries in <code>resources</code>. Fux cannot write someone's agent config, so the skill says it.
+</div>
+
+<h2 id="arch"><span class="num">04</span>Architecture</h2>
+<p class="lede">Two planes. One is committed and holds statistics; one is derived, gitignored, and
+holds speed. Deleting the derived plane costs you time, never an answer.</p>
+
+<figure>
+  <div class="archbox">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 1080" class="arch" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+      <defs>
+        <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#3d6df2" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#1d8a5e" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+        <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+          <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#8a93a0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+
+      <rect width="1240" height="1080" fill="#fcfcfb"/>
+
+      <text x="48" y="46" font-size="22" fill="#14181f" font-weight="600">Fux — the mechanism</text>
+      <text x="48" y="70" font-size="12" fill="#626b78">2.0.0-alpha.2 · 2026-08-26 · fux.index.v2 / analyzer v2 / fux.runtime.v4 · lexical only, no model anywhere</text>
+
+      <rect x="880" y="30" width="14" height="14" rx="3" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+      <text x="902" y="42" font-size="11.5" fill="#4a5260">committed to git</text>
+      <rect x="1010" y="30" width="14" height="14" rx="3" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="1032" y="42" font-size="11.5" fill="#4a5260">derived</text>
+      <rect x="1104" y="30" width="14" height="14" rx="3" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+      <text x="1126" y="42" font-size="11.5" fill="#1d8a5e">new in alpha.2</text>
+
+      <!-- ================= INGEST ================= -->
+      <text x="48" y="106" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">INGEST — WALK, FETCH, ANALYSE, DISCARD</text>
+
+      <rect x="48" y="120" width="212" height="92" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+      <text x="64" y="144" font-size="13" fill="#14181f" font-weight="600">.fux/sources/</text>
+      <text x="64" y="164" font-size="11.5" fill="#4a5260">dirs · urls · types</text>
+      <text x="64" y="184" font-size="11" fill="#8a93a0">one entry per line</text>
+      <text x="64" y="201" font-size="11" fill="#8a93a0">loader-sorted — order cannot</text>
+
+      <rect x="284" y="120" width="232" height="92" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+      <text x="300" y="144" font-size="13" fill="#14181f" font-weight="600">fetch_all — PARALLEL</text>
+      <text x="300" y="164" font-size="11.5" fill="#4a5260">MAX_PARALLEL declared by the</text>
+      <text x="300" y="181" font-size="11.5" fill="#4a5260">fetcher; min(declared, configured)</text>
+      <text x="300" y="201" font-size="11" fill="#1d8a5e" font-weight="600">absent = 1 · cdp declares 1</text>
+
+      <rect x="540" y="120" width="200" height="92" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="556" y="144" font-size="13" fill="#14181f" font-weight="600">analyzer v2</text>
+      <text x="556" y="164" font-size="11.5" fill="#4a5260">split · lower · stopwords</text>
+      <text x="556" y="181" font-size="11.5" fill="#4a5260">Porter stem · blake2b 16-hex</text>
+      <text x="556" y="201" font-size="11" fill="#8a93a0">order is load-bearing</text>
+
+      <rect x="764" y="120" width="196" height="92" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="780" y="144" font-size="13" fill="#14181f" font-weight="600">priors</text>
+      <text x="780" y="164" font-size="11.5" fill="#4a5260">supersedes: · archived</text>
+      <text x="780" y="181" font-size="11.5" fill="#4a5260">git commit recency (mtime)</text>
+      <text x="780" y="201" font-size="11" fill="#8a93a0">no wall clock at write time</text>
+
+      <rect x="984" y="120" width="208" height="92" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+      <text x="1000" y="144" font-size="13" fill="#14181f" font-weight="600">url health</text>
+      <text x="1000" y="164" font-size="11.5" fill="#4a5260">runtime/url-state.json</text>
+      <text x="1000" y="181" font-size="11.5" fill="#4a5260">fail_streak · last_seen_run</text>
+      <text x="1000" y="201" font-size="11" fill="#1d8a5e" font-weight="600">RUNS, never seconds</text>
+
+      <line x1="260" y1="166" x2="278" y2="166" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+      <line x1="516" y1="166" x2="534" y2="166" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+      <line x1="740" y1="166" x2="758" y2="166" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+
+      <!-- ================= COMMITTED PLANE ================= -->
+      <rect x="48" y="240" width="1144" height="158" rx="12" fill="#eef3fd" stroke="#3d6df2" stroke-width="2.2"/>
+      <text x="68" y="268" font-size="13.5" fill="#14181f" font-weight="700">THE COMMITTED PLANE · .fux/index/{00..ff}.jsonl</text>
+      <text x="68" y="288" font-size="11.5" fill="#4a5260">256 shards, doc-major, one canonical JSON line per document · the header pins schema + analyzer</text>
+
+      <rect x="68" y="302" width="256" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
+      <text x="84" y="324" font-size="12" fill="#14181f" font-weight="600">identity</text>
+      <text x="84" y="344" font-size="11" fill="#4a5260">id · src · loc · sha · ver</text>
+      <text x="84" y="362" font-size="11" fill="#4a5260">mode · meta</text>
+
+      <rect x="340" y="302" width="286" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
+      <text x="356" y="324" font-size="12" fill="#14181f" font-weight="600">retrieval</text>
+      <text x="356" y="344" font-size="11" fill="#4a5260">terms{hash: [tf x5]} · flen[5]</text>
+      <text x="356" y="362" font-size="11" fill="#4a5260">title · phrases</text>
+
+      <rect x="642" y="302" width="262" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
+      <text x="658" y="324" font-size="12" fill="#14181f" font-weight="600">priors &amp; edges</text>
+      <text x="658" y="344" font-size="11" fill="#4a5260">archived · superseded</text>
+      <text x="658" y="362" font-size="11" fill="#4a5260">mtime · edges</text>
+
+      <rect x="920" y="302" width="256" height="80" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2"/>
+      <text x="936" y="324" font-size="12" fill="#14181f" font-weight="600">five weighted fields</text>
+      <text x="936" y="344" font-size="11" fill="#4a5260">body 1.0 · heading 3.0 · title 2.0</text>
+      <text x="936" y="362" font-size="11" fill="#4a5260">path 1.5 · ctx 1.0</text>
+
+      <text x="68" y="394" font-size="11" fill="#3d6df2" font-weight="600">no prose · no floats · no clocks · no vectors — the dense lane and its model were deleted 2026-08-25</text>
+
+      <!-- ================= DERIVED PLANE ================= -->
+      <text x="48" y="436" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE DERIVED PLANE · .fux/runtime/ — gitignored, rebuilt by `fux build` in seconds</text>
+
+      <rect x="48" y="450" width="184" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="64" y="474" font-size="12.5" fill="#14181f" font-weight="600">postings</text>
+      <text x="64" y="494" font-size="11" fill="#4a5260">term-major, 128/block</text>
+      <text x="64" y="512" font-size="11" fill="#4a5260">62-byte offset table</text>
+
+      <rect x="246" y="450" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="262" y="474" font-size="12.5" fill="#14181f" font-weight="600">docs table</text>
+      <text x="262" y="494" font-size="11" fill="#4a5260">loc · title · flen</text>
+      <text x="262" y="512" font-size="11" fill="#4a5260">archived · superseded</text>
+
+      <rect x="436" y="450" width="164" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="452" y="474" font-size="12.5" fill="#14181f" font-weight="600">graph</text>
+      <text x="452" y="494" font-size="11" fill="#4a5260">CSR + communities</text>
+      <text x="452" y="512" font-size="11" fill="#4a5260">lazy PPR</text>
+
+      <rect x="614" y="450" width="176" height="86" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="630" y="474" font-size="12.5" fill="#14181f" font-weight="600">fetch-cache</text>
+      <text x="630" y="494" font-size="11" fill="#4a5260">TTL-bounded</text>
+      <text x="630" y="512" font-size="11" fill="#c2410c" font-weight="600">the ONLY wall clock</text>
+
+      <rect x="804" y="450" width="176" height="86" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+      <text x="820" y="474" font-size="12.5" fill="#14181f" font-weight="600">dirty list</text>
+      <text x="820" y="494" font-size="11" fill="#4a5260">post-commit writes it</text>
+      <text x="820" y="512" font-size="11" fill="#1d8a5e" font-weight="600">refer now writes it too</text>
+
+      <rect x="994" y="450" width="182" height="86" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+      <text x="1010" y="474" font-size="12.5" fill="#14181f" font-weight="600">last-cited</text>
+      <text x="1010" y="494" font-size="11" fill="#4a5260">(loc, sha) of the last answer</text>
+      <text x="1010" y="512" font-size="11" fill="#1d8a5e" font-weight="600">a report, NOT a memo</text>
+
+      <rect x="48" y="552" width="1128" height="50" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.2" stroke-dasharray="5 4"/>
+      <text x="66" y="573" font-size="12" fill="#14181f" font-weight="600">The differential law —</text>
+      <text x="212" y="573" font-size="12" fill="#4a5260">every result the accelerator returns is byte-identical to the reference scan.</text>
+      <text x="66" y="592" font-size="11.5" fill="#626b78">Delete the derived plane and you lose speed, never an answer. That is what makes it disposable.</text>
+
+      <!-- ================= QUERY ================= -->
+      <text x="48" y="644" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">QUERY — EVERY CALL</text>
+
+      <rect x="48" y="658" width="196" height="78" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="64" y="682" font-size="12.5" fill="#14181f" font-weight="600">ask · find · answer</text>
+      <text x="64" y="702" font-size="12.5" fill="#14181f" font-weight="600">explain · graph · path</text>
+      <text x="64" y="722" font-size="11" fill="#8a93a0">shares the ingest analyzer</text>
+
+      <rect x="268" y="658" width="212" height="78" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="284" y="682" font-size="12.5" fill="#14181f" font-weight="600">accelerator or scan</text>
+      <text x="284" y="702" font-size="11" fill="#4a5260">bisect → block-max → decode</text>
+      <text x="284" y="720" font-size="11" fill="#4a5260">or a byte prefilter over shards</text>
+
+      <rect x="504" y="658" width="196" height="78" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="520" y="682" font-size="12.5" fill="#14181f" font-weight="600">rank() — BM25F</text>
+      <text x="520" y="702" font-size="11" fill="#4a5260">k1 1.2 · b 0.75</text>
+      <text x="520" y="720" font-size="11" fill="#4a5260">weight, then saturate — once</text>
+
+      <rect x="724" y="658" width="196" height="78" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="740" y="682" font-size="12.5" fill="#14181f" font-weight="600">proximity rerank</text>
+      <text x="740" y="702" font-size="11" fill="#4a5260">opt-in, off by default</text>
+      <text x="740" y="720" font-size="11" fill="#4a5260">reorders — never retrieves</text>
+
+      <rect x="944" y="658" width="232" height="78" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+      <text x="960" y="682" font-size="12.5" fill="#14181f" font-weight="600">refer → answer</text>
+      <text x="960" y="702" font-size="11" fill="#4a5260">fetch the live document,</text>
+      <text x="960" y="720" font-size="11" fill="#4a5260">compare sha, cite path:L12-L40</text>
+
+      <line x1="244" y1="697" x2="262" y2="697" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+      <line x1="480" y1="697" x2="498" y2="697" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+      <line x1="700" y1="697" x2="718" y2="697" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+      <line x1="920" y1="697" x2="938" y2="697" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+
+      <!-- THE DETECTOR LOOP -->
+      <path d="M 1060 736 L 1060 766 L 620 766" fill="none" stroke="#1d8a5e" stroke-width="2.2"/>
+      <path d="M 620 766 L 28 766 L 28 166 L 42 166" fill="none" stroke="#1d8a5e" stroke-width="2.2" marker-end="url(#g)"/>
+      <rect x="626" y="750" width="404" height="32" rx="8" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.4"/>
+      <text x="828" y="771" font-size="12" fill="#1d8a5e" text-anchor="middle" font-weight="600">sha differs → mark dirty → narrowed re-ingest fixes ranking</text>
+
+      <text x="196" y="802" font-size="12.5" fill="#14181f" font-weight="700">THE LOOP THAT CLOSES THE GAP</text>
+      <text x="196" y="822" font-size="12" fill="#4a5260">Before this, refer computed the verdict and threw it away — so a changed URL kept its old terms, stopped</text>
+      <text x="196" y="840" font-size="12" fill="#4a5260">ranking, was never cited, and nothing noticed. It buys RECALL, not correctness: a changed document could</text>
+      <text x="196" y="858" font-size="12" fill="#4a5260">never be mis-answered, only fail to surface.</text>
+
+      <!-- ================= AGENT SURFACE ================= -->
+      <text x="48" y="884" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE AGENT SURFACE — written by `fux setup`, owned by the consumer, never rewritten</text>
+
+      <rect x="48" y="898" width="164" height="74" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+      <text x="64" y="922" font-size="12.5" fill="#14181f" font-weight="600">fux setup</text>
+      <text x="64" y="942" font-size="11" fill="#4a5260">declared vendors only,</text>
+      <text x="64" y="960" font-size="11" fill="#4a5260">never sniffed</text>
+
+      <rect x="236" y="898" width="300" height="74" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+      <text x="252" y="922" font-size="12.5" fill="#14181f" font-weight="600">.claude/skills/ · .kiro/skills/</text>
+      <text x="252" y="942" font-size="11" fill="#4a5260">the SAME template bytes at both paths —</text>
+      <text x="252" y="960" font-size="11" fill="#1d8a5e" font-weight="600">agreement by construction</text>
+
+      <rect x="560" y="898" width="616" height="74" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.6"/>
+      <text x="576" y="922" font-size="12.5" fill="#14181f" font-weight="600">the invocation ladder — fux → uv run fux → ./.venv/bin/fux → python -m fux.cli</text>
+      <text x="576" y="942" font-size="11" fill="#4a5260">Probe with --version, cache per session. NEVER activate a venv, modify PATH, or install anything.</text>
+      <text x="576" y="960" font-size="11" fill="#c2410c" font-weight="600">An unactivated .venv used to read as "not installed" — and sent agents silently to grep.</text>
+
+      <line x1="212" y1="935" x2="230" y2="935" stroke="#3d6df2" stroke-width="1.8" marker-end="url(#a)"/>
+
+      <!-- ================= LAWS ================= -->
+      <line x1="48" y1="1000" x2="1192" y2="1000" stroke="#e4e4e0" stroke-width="1"/>
+      <text x="48" y="1026" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE LAWS THIS SHAPE ENFORCES</text>
+      <text x="48" y="1050" font-size="11.5" fill="#4a5260">L1 stdlib only — threading is stdlib, so the pool costs nothing</text>
+      <text x="470" y="1050" font-size="11.5" fill="#4a5260">L2 no durable content — the index holds statistics</text>
+      <text x="856" y="1050" font-size="11.5" fill="#4a5260">L3 deterministic — the sort, not the loop</text>
+      <text x="48" y="1068" font-size="11.5" fill="#4a5260">L4 offline by default — two named networked paths</text>
+      <text x="470" y="1068" font-size="11.5" fill="#4a5260">L5 hashed meta by default for non-git sources</text>
+      <text x="856" y="1068" font-size="11.5" fill="#4a5260">L6 say "index", not "db" · L7 Python ≥ 3.11</text>
+    </svg>
+  </div>
+  <figcaption>Fux 2.0.0-alpha.2. Green marks what landed in this release. Also available as
+  <a href="img/fux-architecture.png">PNG</a> and <a href="img/fux-architecture.svg">SVG</a>.</figcaption>
+</figure>
+
+<h3>The loop that closes the gap</h3>
+<p>The refer plane already fetched every cited URL and already computed whether its sha still matched
+the index — then <strong>threw the fact away</strong>. So a URL that changed upstream kept its old
+terms, stopped ranking into the candidate window, was never cited again, and nothing ever noticed.
+It now records that document in the dirty list, where a narrowed re-ingest corrects the terms.</p>
+
+<div class="note">
+  <strong>This buys recall, not correctness.</strong> A changed document could never be
+  <em>mis-answered</em> — the verdict beside every citation is what stops that. It could only fail to
+  surface. That is a weaker good than correctness, and the work is priced as buying the weaker one.
+</div>
+
+<h3>Why concurrency is safe here</h3>
+<p><strong>Sequential fetching was never what made the index deterministic — the trailing sort is.</strong>
+<code>fetch_all</code> sorts its results before returning, so completion order never reaches a
+committed byte. That single fact is what makes a thread pool cheap to reason about.</p>
+<div class="note warn">
+  <strong>A blanket pool would have been silently wrong.</strong> The shipped <code>cdp.py</code>
+  holds one WebSocket in a module global that every fetch reuses; two threads writing frames onto it
+  produce <em>plausible documents attributed to the wrong URLs</em>. That lands in the committed
+  index, <strong>passes every determinism check</strong>, and is caught only by a human reading an
+  answer. Hence <code>MAX_PARALLEL</code>: declared by the fetcher, never detected by Fux, and
+  <code>1</code> when absent.
+</div>
+
+<h2 id="laws"><span class="num">05</span>The seven laws</h2>
+<p class="lede">These are not guidelines. Every record cites them by number and none restates them.</p>
+<div class="law"><b>L1</b><span><strong>$0, stdlib-only runtime.</strong> No third-party runtime
+  dependency. The frontmatter parser and every codec are hand-rolled on purpose.</span></div>
+<div class="law"><b>L2</b><span><strong>Content is never durable outside its source system.</strong>
+  The index holds statistics, never content. The whole architecture rests on this.</span></div>
+<div class="law"><b>L3</b><span><strong>Deterministic — no model in the maintenance path.</strong>
+  Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
+<div class="law"><b>L4</b><span><strong>Offline by default.</strong> Network access only inside
+  explicit, fenced, opt-in paths — <code>fux add &lt;URL&gt;</code> and <code>fux update</code>.</span></div>
+<div class="law"><b>L5</b><span><strong>Hashed meta is the default</strong> for non-git sources,
+  enforced at write time. It closes an ACL-mismatch leak.</span></div>
+<div class="law"><b>L6</b><span><strong>Say "index", not "db".</strong> Load-bearing vocabulary.</span></div>
+<div class="law"><b>L7</b><span><strong>Python ≥ 3.11.</strong></span></div>
+
+<h2 id="decided"><span class="num">06</span>Decisions made</h2>
+<p class="lede">Fux keeps 41 architecture decision records. Every behaviour change updates its record
+in the same commit — enforced by a test in CI and a <code>commit-msg</code> hook, not by trust.</p>
+
+<h3>The four calls of 2026-08-26</h3>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Question</th><th>Call</th><th>Consequence</th></tr></thead>
+  <tbody>
+    <tr><td>Answer-time fetching</td><td><strong>Every cited URL is fetched before the final answer</strong></td>
+      <td>Already shipped — and it <strong>withdrew</strong> two proposed flags outright</td></tr>
+    <tr><td>How a changed URL is detected</td><td><strong>Query-driven dirty list</strong>, unconditional</td>
+      <td>Prioritisation comes out usage-weighted for free</td></tr>
+    <tr><td>Parallel fetching</td><td><strong>Declared capability</strong>, <code>min(declared, configured)</code></td>
+      <td>Safe for the thread-unsafe browser fetcher by construction</td></tr>
+    <tr><td>A local content store</td><td><strong>Not built</strong></td>
+      <td>Copying the corpus blunts the wedge for two narrow wins</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">
+  <strong>The withdrawal worth understanding.</strong> A proposal for <code>update --warm</code> and
+  <code>answer --memo</code> was folded in and then withdrawn by the first call above. If the bytes
+  are fetched regardless, a warmed store saves nothing on the answer path, and an answer memo caches
+  the output of a pure function whose inputs were just downloaded. What survived is a
+  <em>report</em>: <code>answer</code> now says whether anything changed since you last asked the
+  same question. Nothing is stored, nothing is replayed.
+</div>
+
+<h3>Some decisions that shaped the engine</h3>
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Decision</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>The pruned index is dead, not deferred</td>
+      <td>A pre-registered gate closed FAIL. The committed index carries full postings, permanently.</td></tr>
+    <tr><td>The dense lane and its model were deleted</td>
+      <td>Measured 0 fixed / 2 broken at every setting that fires — the model mean-pooled static
+      vectors, so the lane was as order-blind as BM25F. The wheel was 97% model.</td></tr>
+    <tr><td>A cross-encoder reranker was refused</td>
+      <td><code>onnxruntime</code> is not byte-identical across architectures, which would break
+      <em>clone it and run the query</em>.</td></tr>
+    <tr><td>The <code>post-commit</code> hook defers</td>
+      <td>An inline re-index cost 44s on a 20-document commit, because cost tracks corpus size, not
+      delta size. The hook writes a dirty list and spawns a detached runner.</td></tr>
+    <tr><td>Randomness was removed, not seeded</td>
+      <td>A fixed seed does not survive a Python version that reorders a set. A test asserts the
+      <em>absence</em> of the import, by parsing the AST.</td></tr>
+    <tr><td><code>max_age_seconds</code> was refused</td>
+      <td>There was no recorded ingest time, so the bound could not have been honoured. Freshness is
+      content verification instead — which answers the question exactly rather than approximately.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Record status</h3>
+<p>Of 41 records, <strong>26 are accepted</strong> and <strong>15 remain proposed</strong>. Proposed
+does not mean unbuilt — several describe shipped behaviour and are waiting on ratification, which is
+a human step and is owed.</p>
+
+<h2 id="pending"><span class="num">07</span>Decisions pending</h2>
+<p class="lede">Twenty-seven open forks. Every one is a judgement about what counts as success, and a
+metric chosen badly is wrong <em>quietly</em> for months — so none is an agent's to pick.</p>
+
+<div class="tablewrap">
+<table>
+  <thead><tr><th>Area</th><th>Open</th><th>The one that bites first</th></tr></thead>
+  <tbody>
+    <tr><td>URL freshness</td><td>8 forks (1 ruled)</td>
+      <td>Whether the fetcher contract gains an optional <code>validate()</code> — gated on a
+      measurement that needs a real URL corpus</td></tr>
+    <tr><td>What "right" means</td><td>6 forks</td>
+      <td>Whether the <em>answered</em> gate is measured at all. It needs a judge model — ruling
+      "measure it" without pinning the model <strong>and</strong> the prompt makes every future
+      comparison meaningless.</td></tr>
+    <tr><td>The records themselves</td><td>6 rulings + 2</td>
+      <td>A record whose premise died and now stands <em>unargued</em> — the one state a record
+      should never be in</td></tr>
+    <tr><td>Measurement discipline</td><td>1 scope defect</td>
+      <td>An informed run "never supplies a delta" — which <strong>as written forbids reporting a
+      file size</strong></td></tr>
+    <tr><td>The agent surface</td><td>4 forks (1 ruled)</td>
+      <td>Whether <code>python -m fux</code> becomes a second permanent entry point</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note warn">
+  <strong>A time-sensitive one.</strong> The narrowed-refresh flag has no name yet —
+  <code>--dirty</code>, <code>--stale</code>, <code>--changed</code>. It is free to choose today and
+  a deprecation cycle once anything ships against it. The same is true of the tunables file's key
+  names: they are a shipped interface now, and the record still being <em>proposed</em> is the only
+  thing making a rename free.
+</div>
+
+<div class="note">
+  <strong>Why the measurements are blocked on corpora, not on code.</strong> Two of the six planned
+  phases did not land, and neither is a coding task: one needs a real URL corpus to run
+  <code>fux update</code> twice against, the other needs the graded playground repo. Producing a
+  number for either without its corpus is precisely the failure the measurement discipline exists to
+  prevent.
+</div>
+
+<h2 id="honest"><span class="num">08</span>What is not verified</h2>
+
+<div class="note warn">
+  <strong>The end-to-end suite has not been seen green.</strong> It spawns the real CLI in a
+  subprocess and fails identically on a clean tree in the environment this release was built in —
+  identical before and after, so the change introduces <strong>no regression</strong>. That is not
+  the same claim as passing. It needs one run on a real Python 3.11+ install before release.
+</div>
+
+<p>The unit suite is <strong>1 433 green</strong>. It ran under a harness-only shim that backports
+one stdlib module, because the build environment had only Python 3.10 — so it tested 3.10, not the
+supported floor. The shim never enters the repo.</p>
+
+<div class="note">
+  <strong>Why this section exists at all.</strong> Two runs in this project's history passed their
+  number and failed their claim, and a human caught both — not the metric. Stating what a measurement
+  did <em>not</em> establish is cheaper than discovering it later, and a project that hides its
+  unverified edges teaches everyone to distrust the verified ones.
+</div>
+
+<footer>
+  Fux 2.0.0-alpha.2 · generated 2026-08-26 · the decision records live in <code>docs/adr/</code>,
+  the open queue in <code>work/OPEN-WORK.md</code>.
+</footer>
+
+</div>
