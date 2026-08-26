@@ -422,6 +422,38 @@ legal, explicit, per-document opt-out
   costs ~0.3 s and constant, which the bar's count threshold mostly suppresses
   anyway.
 
+> **Amended 2026-08-26 (W-82 §3.2, §3.1) — the dirty list has a second
+> producer, and `maintain/` gained `urlstate.py`.**
+>
+> This record described one writer: `post-commit`, recording the documents a
+> commit changed. **The refer plane is now a second** — it records a `url:`
+> doc id when a cited document's sha no longer matches the index.
+>
+> ⚠ **The contract this leans on needs saying rather than assuming.**
+> `dirty.py` is *"advisory, never authoritative"*, and that sentence is what
+> keeps L3 true: `fux ingest` re-walks the whole corpus regardless, so the list
+> can never change a committed byte. A **URL** refresh driven by the list *is*
+> authoritative for the URLs it names, because not fetching the rest is the
+> entire point. The defence:
+>
+> > The `url:` half of the index is **already** a mosaic of different moments.
+> > Every record holds whatever its last fetch produced, and no two were
+> > necessarily fetched together. A partial refresh changes the *spread* of
+> > those moments, not the kind of object the index is. L3 is *same sources ->
+> > same bytes*, and **a URL is not the same source twice.**
+>
+> ⚠ **This is not "just index the delta"**, which was ruled *not* the fix for
+> R5. That was an offline filesystem walk that is already cheap; this is a
+> networked path that is not, and the economics invert.
+>
+> `maintain/urlstate.py` is covered by this record's existing directory-level
+> claim on `src/fux/maintain/`; no ownership row changes. ⚠ **It deliberately
+> holds no timestamp** — [`refer/fetchcache.py`](../../src/fux/refer/fetchcache.py)
+> states the invariant that *wall clock lives in the TTL store and nowhere
+> else*, so freshness here is counted in **networked runs**, not seconds.
+> W-75 had specified `validated_at` / `changed_at`; shipping them would have
+> been a quiet contradiction of an accepted record.
+
 ### Alternatives considered
 
 - **`pre-commit` with `git stash --keep-index`.** Rejected: decision 1.

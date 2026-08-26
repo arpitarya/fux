@@ -470,7 +470,7 @@ second divergence, on the flag rather than the order.
 > [ADR-RUNTIME-STATS](0028_runtime-stats.md)'s subject and it owns no module,
 > so nothing would have pointed *there*. Both are amended today by a session
 > that went looking, which is
-> [W-77](../../work/open/W-77-record-reconciliation.md)'s finding: a record
+> [W-82 §5.3](../../work/open/W-82-the-consolidated-build.md)'s finding: a record
 > that **describes** a component the check cannot see rots in silence.
 
 ### Veto condition

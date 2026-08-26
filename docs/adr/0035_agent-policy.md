@@ -266,6 +266,57 @@ theirs and stays; a file three versions behind is at least **identifiable**, and
   *branch on the `archived` boolean, never on the note's wording*, so a future
   reword cannot break a consumer.
 
+> **Amended 2026-08-26 (W-82 §3.6) — a fourth rendering, and the silent failure
+> it closes.**
+>
+> ⚠ **The defect was live and in this record's own templates.**
+> `fux.agent.md` read: *"If `fux` is not installed or there is no index, say so
+> and fall back to ordinary search."* But `fux` is a **console script** — on
+> `PATH` only where its installing environment's `bin/` is — so in any repo whose
+> fux lives in an unactivated `.venv/`, an agent got `command not found`,
+> concluded *not installed*, and **silently used grep** while the engine sat
+> there and the committed index sat beside it. **It did not error. It degraded,
+> and the degradation read exactly like an honest answer.**
+>
+> **`fux-usage` now ships**, carrying a four-rung ladder — `fux` → `uv run fux`
+> → `./.venv/bin/fux` (`.venv\Scripts\fux.exe` on Windows) →
+> `python -m fux.cli` — probed with `--version` and cached for the session.
+> Three rules are gated by
+> [`tests/test_setup_agents_usage.py`](../../tests/test_setup_agents_usage.py):
+> the rungs appear **in order** in every rendering; exhausting them yields
+> *"could not be invoked, here is what I tried"* and **never** a claim that the
+> package is absent; and **no rendering may tell an agent to activate a
+> virtualenv, modify `PATH`, or install anything.** That last one is the failure
+> a well-meaning edit introduces, which is why it is a test and not a sentence.
+>
+> **One template, two destinations.** Kiro implements the same open Agent Skills
+> standard Claude does, so the identical `USAGE-SKILL.md` bytes are mapped to
+> `.claude/skills/fux-usage/SKILL.md` **and** `.kiro/skills/fux-usage/SKILL.md`.
+> That is **agreement by construction**, strictly stronger than decision 2's
+> conformance test asserting two separately-maintained files still match.
+>
+> ⚠ **It ships to Kiro as a SKILL, not steering, and the reason is mechanical:**
+> **Kiro CLI does not support steering inclusion modes**, so every file in
+> `.kiro/steering/` enters every interaction there and `inclusion: manual` does
+> not protect anyone. A skill is progressive-disclosure on every Kiro surface.
+> The existing archived-results rendering stays as steering with
+> `inclusion: always`, which is correct — it is a policy that should be ambient.
+>
+> **Decision 2's scope is narrowed, not weakened.** The usage renderings are an
+> *operating manual*, carry no claim about reading an archived result, and point
+> at `fux-archived-results` for that — so they are exempt from the verbatim
+> policy block, and the exemption is pinned by
+> `test_the_exemptions_are_deliberate`.
+>
+> ⚠ **Two things this record now states that fux cannot enforce.** Kiro **custom
+> agents load neither skills nor steering by default** — they need explicit
+> `skill://` / `file://` `resources` — so a consumer on a custom agent receives
+> none of these files and gets no error. Fux cannot write someone's agent
+> config, so the skill body says it instead. And the skill's `compatibility`
+> frontmatter field is **a declaration nothing checks**, so the ladder lives in
+> the body; putting it only in `compatibility` would repeat the *knob that
+> cannot work* failure this project has already paid for once.
+
 ### Alternatives considered
 
 | | why not |

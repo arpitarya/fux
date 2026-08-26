@@ -24,8 +24,32 @@ fux find "<question>"                 # bare paths, safe to pipe
 Prefer `--json`. It gives you `score`, `loc`, and `archived` as fields rather
 than as prose you have to parse.
 
-**If `fux` is not installed or there is no index, say so and fall back to
-ordinary search.** Do not fabricate a citation.
+### Resolve the command before concluding it is missing
+
+**`fux` is a console script**, so it is on `PATH` only where its installing
+environment's `bin/` is. A repo whose fux lives in an unactivated `.venv/` has a
+working engine and a committed index, and a bare `fux` still says
+`command not found`. **That is not evidence that fux is absent.** Try, in order:
+
+```bash
+fux --version                    # a venv is active, or fux is global
+uv run fux --version             # a uv-managed repo
+./.venv/bin/fux --version        # venv present, not active  (Windows: .venv\Scripts\fux.exe)
+python -m fux.cli --version      # importable, no script installed
+```
+
+Probe with `--version` and reuse the winner for the session. **Never use `which`
+to decide** — it answers *is there a file*, not *does it run*. **Never activate a
+virtualenv, never modify the `PATH` variable, never install anything**; call the
+absolute path from rung 3.
+
+**If every rung fails, say which ones you tried** — *"fux could not be invoked;
+tried `fux`, `uv run fux`, `./.venv/bin/fux`, `python -m fux.cli`"* — then fall
+back to ordinary search **and say that you fell back**. A silent fallback reads
+exactly like an honest answer, which is why it is the failure worth naming.
+
+**If there is no index**, `fux ingest && fux build` builds one. Either way, do
+not fabricate a citation.
 
 ## Archived results — the part that matters
 

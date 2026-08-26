@@ -8,6 +8,73 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **URL freshness closes its loop** (W-82 §3.2). The refer plane already fetched
+  every cited URL and already computed whether its sha still matched the index —
+  then **threw the fact away**. It now records that `url:` doc id in the dirty
+  list, where `ingest.run(only_urls=...)` consumes it.
+
+  **This buys recall, not correctness.** A changed document could never be
+  *mis-answered* — the verdict beside every citation is what stops that — it
+  could only fail to surface, because ranking runs on the terms the index
+  recorded. Prioritisation comes out **usage-weighted for free**: documents
+  people actually retrieve get verified constantly, because they are cited.
+
+- **`fux doctor` reports URL health** (W-82 §3.1). How many `url:` records
+  exist, how many the last networked run confirmed, how many have never been
+  re-fetched since first ingest, and how many are failing — naming any that have
+  failed five runs in a row.
+
+  **Report, never auto-delete.** ADR-URL-INGEST decision 4 forbids treating a
+  failed fetch as a deletion, and the cost of that rule is that a permanently
+  dead URL lives in the index forever. This makes the cost legible instead of
+  invisible. ⚠ **The counters are runs, not clocks** — wall clock lives in the
+  TTL store and nowhere else.
+
+- **Parallel URL fetching, by declared capability** (W-82 §3.3). A fetcher
+  module may declare `MAX_PARALLEL = n`; **absent the declaration it is 1**, so
+  behaviour is byte-for-byte what shipped before. `[sources.url] max_parallel`
+  caps it from the consumer side: `min(declared, configured)`.
+
+  Two values, two kinds of refusal — the module's declaration is **capability**
+  and exceeding it clamps down loudly; the config value is **policy** and a
+  large one is honoured with a warning that states the cost; `< 1` refuses.
+
+  ⚠ **A blanket pool would have been silently wrong.** The shipped `cdp.py`
+  holds one WebSocket in a module global, and two threads on it produce
+  *plausible documents attributed to the wrong URLs* — which passes every
+  determinism check. **Sequential fetching was never what made the index
+  deterministic; the trailing sort is.** First threading in `src/fux/`; stdlib
+  only, so L1 is untouched.
+
+- **`fux answer` says whether anything changed since you last asked** (W-82
+  §3.4). ⚠ **A report, not a memo** — no answer is stored and nothing is
+  replayed; only the previous answer's `(loc, sha)` pairs are remembered. On
+  **stderr in both text and JSON mode**, so stdout stays byte-identical.
+
+- **A `fux-usage` agent skill, and an invocation ladder** (W-82 §3.6), closing a
+  live silent defect: the shipped agent rendering told an agent to fall back to
+  ordinary search when `fux` was not found, so **any repo whose fux lived in an
+  unactivated `.venv/` had agents quietly using grep** while the engine and the
+  committed index sat right there.
+
+  The ladder is `fux` -> `uv run fux` -> `./.venv/bin/fux`
+  (`.venv\Scripts\fux.exe` on Windows) -> `python -m fux.cli`, probed with
+  `--version` and cached per session. **No rendering may tell an agent to
+  activate a virtualenv, modify `PATH`, or install anything** — gated by a test,
+  because that is the fix a well-meaning edit reaches for.
+
+  It ships to Claude and Kiro from **one template at two paths**, because Kiro
+  implements the same open Agent Skills standard — agreement by construction
+  rather than by conformance test.
+
+### Changed
+
+- `[sources.url]` gains `max_parallel`. Absent means *whatever the fetcher
+  declares*, which is `1` unless the module says otherwise.
+
+
 ### Removed
 
 - **Breaking: the bundled embedding model and the entire dense lane are gone**

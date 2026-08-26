@@ -73,9 +73,22 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # class**, so it ships only in the format that has an explicit-invocation
     # model, and its description names the trigger phrases rather than the
     # topic.
+    #
+    # **`USAGE-SKILL.md` is mapped TWICE, to two vendors, from one template**
+    # (W-82 3.6). Kiro implements the same open Agent Skills standard Claude
+    # does -- a folder with a `SKILL.md` carrying `name` + `description`,
+    # loaded by progressive disclosure -- so the identical bytes are valid in
+    # both. That is **agreement by construction**, which is strictly stronger
+    # than decision 2's conformance test asserting two renderings still match.
+    #
+    # It ships as a **skill** for Kiro rather than steering, deliberately:
+    # **Kiro CLI does not support steering inclusion modes**, so every file in
+    # `.kiro/steering/` enters every interaction and `inclusion: manual` does
+    # not protect anyone. A skill is progressive-disclosure on every surface.
     "claude": (
         (".claude/skills/fux-archived-results/SKILL.md", "SKILL.md"),
         (".claude/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
+        (".claude/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
     ),
     "copilot": (
         (".github/agents/fux.agent.md", "fux.agent.md"),
@@ -83,8 +96,12 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
             ".github/instructions/fux-archived-results.instructions.md",
             "fux-archived-results.instructions.md",
         ),
+        (".github/instructions/fux-usage.instructions.md", "fux-usage.instructions.md"),
     ),
-    "kiro": ((".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),),
+    "kiro": (
+        (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
+        (".kiro/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
+    ),
 }
 
 _DIRS_HEADER = """\

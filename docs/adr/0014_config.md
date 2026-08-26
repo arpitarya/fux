@@ -345,6 +345,34 @@ the boundary, rendered by the CLI, exit 1.
   ships without the pre-registered query set and second corpus
   ([W-52](../../archive/open/W-52-df-over-the-union.md)).
 
+> **Amended 2026-08-26 (W-82 §3.3) — `[sources.url] max_parallel`.**
+>
+> How many URLs may be fetched at once. **`None` means *whatever the fetcher
+> declares*,** which is `1` unless the module sets `MAX_PARALLEL`.
+>
+> **Two values wear one name and get different kinds of refusal**, per Arpit's
+> standing rule *state the cost, don't clamp the knob*:
+>
+> | value | kind | treatment |
+> |---|---|---|
+> | `MAX_PARALLEL` in the fetcher module | **capability** | exceeding it is a correctness violation → **clamped down, loudly**, naming the module and the number |
+> | `[sources.url] max_parallel` | **policy** | merely rude → **honoured, with a warning stating the cost**; never clamped down |
+> | `max_parallel < 1` | **broken** | `FuxError` — the treatment `cache_ttl_seconds < 0` already gets |
+>
+> **Default `4` when a fetcher declares more, and it is a judgement rather than
+> a measurement** — polite to a single intranet host without configuration, high
+> enough that the difference from sequential is visible. Cheap to change.
+> **Global, not per-host.** The crawler literature's politeness constraint is
+> per-host, and the common case at the design point is one wiki; shipping both
+> now would mean picking a second default with no more evidence than the first.
+> A per-host key is promoted **when a 429 is actually observed**.
+>
+> ⚠ **It belongs here and not in `.fux/tune.toml`.** ADR-TUNE's mechanical test
+> is *does changing it change a byte in `.fux/index/`?* — and this does not, so
+> the test alone would misfile it. The second clause settles it: it is not a
+> ranking value either. It is **operational**, so it sits beside the other
+> `[sources.url]` keys.
+
 ### Alternatives considered
 
 - **Configure in `pyproject.toml` under `[tool.fux]`.** Rejected: fux indexes

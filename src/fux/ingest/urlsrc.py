@@ -41,6 +41,8 @@ spaces, and CRLF becomes LF, before the text ever reaches the canonical writer.
 
 from __future__ import annotations
 
+import sys
+
 import importlib.util
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
@@ -155,8 +157,112 @@ def configure_fetcher(module, config: dict) -> None:
         raise FuxError(f"[sources.url] fetcher configure() failed: {exc}") from exc
 
 
+#: Politeness default for `[sources.url] max_parallel` (W-82 §3.3).
+#: **A judgement, not a measurement** — low enough to be polite to a single
+#: intranet host without configuration, high enough that the difference from
+#: sequential is immediately visible. Cheap to change; nothing measured it.
+DEFAULT_MAX_PARALLEL = 4
+
+#: A fetcher that declares nothing is called **one URL at a time**, which is
+#: byte-for-byte the behaviour that shipped before this existed. Opting in is
+#: the author's act, never fux's inference — ADR-FETCHER decision 5's
+#: *declared, never detected*, applied to a second property.
+UNDECLARED_MAX_PARALLEL = 1
+
+
+def resolve_parallel(module, configured: int | None) -> int:
+    """`min(what the fetcher declared, what the consumer configured)`.
+
+    **Two values wearing one name, and they get different kinds of refusal** —
+    Arpit's standing rule, *state the cost, don't clamp the knob*:
+
+    - **`MAX_PARALLEL` in the fetcher module is CAPABILITY.** It is the author
+      saying *this `fetch` is reentrant given one `connect`*. Exceeding it is
+      not a preference, it is a correctness violation, so it is **clamped down,
+      loudly, on stderr**, naming the module and the number.
+    - **`[sources.url] max_parallel` is POLICY** — politeness, local bandwidth,
+      how much load the wiki should take. A large value is merely rude, so it is
+      **honoured with a warning that states the cost**, never clamped down.
+    - **`max_parallel < 1` is BROKEN** and refuses, the same treatment
+      `cache_ttl_seconds < 0` already gets in `refer/freshness.py`.
+    """
+    if configured is not None and configured < 1:
+        raise FuxError(
+            f"[sources.url] max_parallel must be >= 1, got {configured}. "
+            "1 fetches one URL at a time, which is the default when no fetcher declares more"
+        )
+    declared = getattr(module, "MAX_PARALLEL", UNDECLARED_MAX_PARALLEL)
+    if not isinstance(declared, int) or isinstance(declared, bool) or declared < 1:
+        # A malformed declaration is not a reason to fail an ingest, and it is
+        # certainly not a reason to guess a larger number: fall back to the
+        # value that is always safe.
+        declared = UNDECLARED_MAX_PARALLEL
+    if configured is None:
+        return declared
+    if configured > declared:
+        print(
+            f"note: {getattr(module, '__name__', 'fetcher')} declares MAX_PARALLEL = {declared}; "
+            f"max_parallel = {configured} clamped to {declared} - exceeding a fetcher's declared "
+            "maximum is a correctness violation, not a preference",
+            file=sys.stderr,
+        )
+    elif configured >= 16:
+        print(
+            f"note: max_parallel = {configured} will open up to {configured} concurrent "
+            "connections; many intranet hosts rate-limit well below that and return 429, "
+            "which fux records as a skip - and a skip keeps the prior record, so a throttled "
+            "run looks like a quiet one",
+            file=sys.stderr,
+        )
+    return min(declared, configured)
+
+
+def _fetch_group(module, urls: list[str], workers: int):
+    """Yield `(url, text, exception)` for every URL, in **sorted order**.
+
+    Sequential at `workers == 1`, so a fetcher that declares nothing takes the
+    exact code path shape it always did.
+
+    **Per-URL error isolation stays here, in fux.** A `fetch` that raises
+    becomes one `(url, None, exc)` and the batch continues — that is
+    ADR-URL-INGEST decision 4 in code, and it is the reason an optional
+    `fetch_many` was rejected: it would have moved this responsibility to every
+    fetcher author, and most would not reimplement it correctly.
+
+    ⚠ **Results are re-sorted before yielding.** Completion order is not
+    submission order under a pool, and the caller's own trailing sorts already
+    handle the committed bytes — but yielding in completion order would make
+    the *progress* output non-deterministic for no benefit.
+    """
+    if workers <= 1:
+        for url in urls:
+            try:
+                yield url, module.fetch(url), None
+            except Exception as exc:
+                yield url, None, exc
+        return
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    results: dict[str, tuple] = {}
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = {pool.submit(module.fetch, url): url for url in urls}
+        for future in futures:
+            url = futures[future]
+            try:
+                results[url] = (url, future.result(), None)
+            except Exception as exc:
+                results[url] = (url, None, exc)
+    for url in urls:
+        yield results[url]
+
+
 def fetch_all(
-    root: Path, entries: list[UrlEntry], config: dict | None = None
+    root: Path,
+    entries: list[UrlEntry],
+    config: dict | None = None,
+    *,
+    max_parallel: int | None = None,
 ) -> tuple[list[FetchedUrl], list[Skipped]]:
     """Fetch every URL through the fetcher its line declared.
 
@@ -168,6 +274,25 @@ def fetch_all(
     `configure` / `connect` / `close` bracket, and `close` runs even when a
     fetch raised. A `fetch` that raises becomes a `Skipped`; the batch
     continues.
+
+    ## Concurrency (W-82 §3.3) — and why it is invisible to L3
+
+    **Sequential fetching is not what makes the index deterministic — the sort
+    is.** This function ends `fetched.sort(...)` / `skipped.sort(...)`, so
+    completion order never reaches a committed byte. That single fact is what
+    makes a pool cheap to reason about here.
+
+    **`connect()` / `close()` stay once per group, never once per worker.** Only
+    `fetch` is called concurrently, and a fetcher declaring `MAX_PARALLEL > 1`
+    is declaring exactly that — *my `fetch` is reentrant given one `connect`*.
+
+    ⚠ **A blanket pool would have been silently wrong.** The shipped `cdp.py`
+    sets a module-global `_session` holding **one WebSocket** that every
+    `fetch()` reuses; two threads writing frames onto it produce **plausible
+    documents attributed to the wrong URLs**. That lands in the committed index,
+    **passes every determinism check** (the sort still runs), and is found only
+    by a human reading an answer. `http.py` builds a fresh request per call and
+    is safe. Hence `MAX_PARALLEL`: declared, never detected.
     """
     groups: dict[str, list[str]] = {}
     for entry in entries:
@@ -186,10 +311,10 @@ def fetch_all(
             except Exception as exc:
                 raise FuxError(f"[sources.url] fetcher connect() failed: {exc}") from exc
         try:
-            for url in sorted(set(groups[fetcher_path])):
-                try:
-                    text = module.fetch(url)
-                except Exception as exc:  # a failed page is a fact, not a crash
+            urls = sorted(set(groups[fetcher_path]))
+            workers = resolve_parallel(module, max_parallel)
+            for url, text, exc in _fetch_group(module, urls, workers):
+                if exc is not None:  # a failed page is a fact, not a crash
                     skipped.append(Skipped(rel_path=url, reason=f"fetch failed: {exc}"))
                     continue
                 if not isinstance(text, str) or not text.strip():

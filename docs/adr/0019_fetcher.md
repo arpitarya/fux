@@ -225,6 +225,57 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
   merely disfavoured, it contradicts an accepted record; taking it means
   superseding this one, not amending it.
 
+> **Amended 2026-08-26 (W-82 §3.3) — an optional module constant, and it is not
+> a fifth function.**
+>
+> A fetcher module may declare `MAX_PARALLEL = n`. **Absent the declaration the
+> value is 1**, and behaviour is byte-for-byte what shipped before. Fux uses
+> `min(declared, configured)` workers.
+>
+> This is **decision 5's own principle — *declared, never detected* — applied to
+> a second property**, and it is deliberately a *constant* rather than a
+> function: the four-function contract has survived two callers unchanged, and
+> a capability flag is not a capability.
+>
+> ⚠ **Why a blanket pool was refused, and it is not "it crashes".** The shipped
+> `cdp.py` sets a module-global `_session` holding **one WebSocket** that every
+> `fetch()` reuses. Two threads writing frames onto it produce **plausible
+> documents attributed to the wrong URLs** — which lands in the committed index,
+> **passes every determinism check**, and is found only by a human reading an
+> answer. `http.py` builds a fresh request per call and is safe. A blanket pool
+> would have been correct for the fetcher most consumers use and silently
+> corrupting for the one the enterprise design point exists to serve.
+>
+> **`connect()` / `close()` stay once per group, never once per worker.** Only
+> `fetch` runs concurrently, so a fetcher declaring `MAX_PARALLEL > 1` is
+> declaring exactly *my `fetch` is reentrant given one `connect`*.
+>
+> **The finding that made this cheap: sequential fetching is not what makes the
+> index deterministic — the trailing sort is.** `fetch_all` ends
+> `fetched.sort(...)` / `skipped.sort(...)`, so completion order never reaches a
+> committed byte. **Concurrency inside that function is invisible to L3.**
+> `concurrent.futures` is stdlib, so **L1 is untouched** — this is the first
+> threading anywhere in `src/fux/`, and the novelty is the argument, not the
+> import.
+>
+> **Per-URL error isolation stays in fux**, which is why an optional
+> `fetch_many` was rejected: a raising `fetch` becomes one `Skipped` and the
+> batch continues — [ADR-URL-INGEST](0008_url-ingest.md) decision 4 in code —
+> and under `fetch_many` every fetcher author would have to reimplement that
+> correctly, and most would not.
+>
+> **The shipped `cdp.py` declares `1` explicitly rather than omitting it.**
+> Omission and `1` behave identically; the explicit line is where the *reason*
+> gets written for the consumer who copies the file and starts editing it.
+> `http.py` declares `8`: if the safe fetcher does not opt in, the mechanism
+> ships dead.
+>
+> ⚠ **One test is owed that no manual checking substitutes for**, and it exists:
+> a fetcher declaring `1` is **observed** never to have two `fetch` calls in
+> flight, via a counter inside a test fetcher — with a control arm proving a
+> fetcher declaring more genuinely does run concurrently, so a pool that never
+> parallelised could not pass by doing nothing.
+
 ### Alternatives considered
 
 - **Keep "middleware".** Rejected: it names a composition pattern for something

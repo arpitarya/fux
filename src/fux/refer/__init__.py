@@ -188,11 +188,66 @@ def refer(
             )
         )
 
+    _mark_changed_urls_dirty(root, documents)
+
     scored: list[ScoredPassage] = rescore(query, fetched)
     assembled = assemble(
         scored, budget=budget, k=k, source="fetched", per_doc_fraction=per_doc_fraction
     )
     return Bundle(assembled=assembled, documents=documents, policy=policy.as_record())
+
+
+def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:
+    """The detector — W-82 §3.2, and the loop it closes is the point.
+
+    This plane already fetches every cited URL and already computes whether its
+    sha still matches the index. Until now it rendered `stale` to the caller and
+    **threw that knowledge away**, so the index kept the old terms, the document
+    stopped ranking, and nothing ever noticed. Recording the doc id here lets a
+    narrowed `ingest.run(only_urls=...)` put the terms right.
+
+    **This buys recall, not correctness.** A changed document could never be
+    *mis-answered* — the verdict beside every citation is what stops that — it
+    could only fail to surface. That is a weaker good, and it is priced as one.
+
+    Three deliberate restrictions:
+
+    - **`url:` ids only.** A `file:` document has an event already: git observes
+      the change and `post-commit` re-indexes it. Recording those here would be
+      a second write path into a flow that works.
+    - **Only `current is False`, never `None`.** `None` is *"we did not look"* --
+      a refused fetch, a network failure, a `never` policy. Marking those dirty
+      would churn the list on exactly the days the network is bad, which is when
+      it helps least.
+    - **Best-effort.** An unwritable `.fux/runtime/` must never fail an answer
+      that otherwise succeeded. `dirty.record` is advisory by contract, so a
+      write that does not happen costs a delayed refresh and nothing else.
+
+    ⚠ **On the "advisory, never authoritative" contract this leans on.**
+    `dirty.py`'s docstring is the sentence that keeps L3 true: `fux ingest`
+    re-walks the whole corpus regardless, so the list can never change a
+    committed byte. A *URL* refresh driven by this list is authoritative for the
+    URLs it names, because not fetching the rest is the entire point -- so the
+    defence has to be said rather than assumed: **the `url:` half of the index
+    is already a mosaic of different moments.** Every record holds whatever its
+    last fetch produced, and no two were necessarily fetched together. A partial
+    refresh changes the *spread* of those moments, not the kind of object the
+    index is. L3 is *same sources -> same bytes*, and a URL is not the same
+    source twice.
+
+    ⚠ **This is not "just index the delta"**, which was ruled *not* the fix for
+    R5. That was an offline filesystem walk that is already cheap; this is a
+    networked path that is not, and the economics invert.
+    """
+    changed = [c.doc_id for c in documents if c.doc_id.startswith("url:") and c.verdict.current is False]
+    if not changed:
+        return
+    try:
+        from ..maintain import dirty
+
+        dirty.record(root, changed)
+    except Exception:  # pragma: no cover - a detector must not break an answer
+        pass
 
 
 def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache):

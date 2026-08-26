@@ -156,7 +156,65 @@ def _layout(root: Path) -> list[Check]:
     )
     checks.append(_accelerator(root))
     checks.append(_background_runner(root))
+    checks.append(_url_health(root))
     return checks
+
+
+def _url_health(root: Path) -> Check:
+    """The `url:` half of the corpus, reported (W-82 §3.1).
+
+    Doctor had **no URL check at all**, which is the defect: a URL that has
+    failed every fetch for a month looked exactly like one fetched a minute ago.
+    [ADR-URL-INGEST](../../docs/adr/0008_url-ingest.md) decision 4 keeps the
+    prior record on a failed fetch — correct, because a flaky network must never
+    present as a deletion — and the cost of that rule is that **a permanently
+    dead URL lives in the index forever**. This makes the cost visible.
+
+    **Report, never auto-delete**, and **never fetch**: doctor stays offline
+    (this module's contract), so every number here comes from the committed
+    index and a gitignored counter file. It says what the last networked run
+    saw; it does not go looking.
+
+    A **warning**, never an error. A stale or failing URL means the index is
+    behind, which is a fact about the world rather than a broken install, and
+    reporting it as a failure would train people to ignore a red doctor —
+    the same reasoning `_accelerator` records.
+    """
+    from .maintain import urlstate
+
+    try:
+        from .store import reader
+
+        indexed = [doc_id[4:] for doc_id in reader.read_index(root) if doc_id.startswith("url:")]
+    except Exception:
+        # An unreadable or absent index is another check's business, not this
+        # one's. Reporting "cannot tell" beats a traceback on a health command.
+        return Check("url sources", True, "skipped (no readable index)", level="warn")
+
+    summary = urlstate.summarize(urlstate.read(root), indexed)
+    if not summary.has_urls:
+        return Check("url sources", True, "none indexed", level="warn")
+
+    parts = [f"{summary.indexed} url: record(s)"]
+    if summary.run_seq == 0:
+        parts.append("no networked run recorded yet - run `fux update`")
+    else:
+        parts.append(f"{summary.confirmed_last_run} confirmed by the last run")
+    if summary.never_confirmed:
+        parts.append(f"{summary.never_confirmed} never re-fetched since first ingest")
+    if summary.failing:
+        parts.append(f"{summary.failing} failing")
+    detail = ", ".join(parts)
+    if summary.failing_urls:
+        # Named, not just counted: a count tells you something is wrong and a
+        # name tells you which line of `.fux/sources/urls` to go and look at.
+        listed = ", ".join(summary.failing_urls[:5])
+        more = f" (+{len(summary.failing_urls) - 5} more)" if len(summary.failing_urls) > 5 else ""
+        detail += (
+            f" - failed {urlstate.FAILING_STREAK}+ runs in a row: {listed}{more}. "
+            "fux never deletes a URL record; remove the line from .fux/sources/urls yourself"
+        )
+    return Check("url sources", not summary.failing_urls, detail, level="warn")
 
 
 def _accelerator(root: Path) -> Check:

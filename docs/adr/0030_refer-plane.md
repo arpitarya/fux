@@ -387,6 +387,36 @@ the caller's window. `dropped` is reported so truncation is never silent.
   surface as the bullet above states. Full rationale on
   [ADR-RECORD](0010_index-record.md).
 
+> **Amended 2026-08-26 (W-82 §3.2) — the plane now records what it learns.**
+>
+> This record described a plane that fetches a cited document, compares
+> `fetched_sha` against `indexed_sha`, and **renders the verdict to the
+> caller**. It did exactly that and then threw the knowledge away — so a URL
+> that had changed upstream kept its old terms in the index, stopped ranking
+> into the candidate window, was never cited again, and **nothing ever
+> noticed**.
+>
+> `refer()` now records any `url:` document whose verdict is definitively
+> `stale` into the dirty list, where a narrowed `ingest.run(only_urls=...)`
+> consumes it.
+>
+> **This buys recall, not correctness.** A changed document could never be
+> *mis-answered* — decision 6's three-state guarantee is what stops that — it
+> could only fail to surface. That is the weaker good, and it is priced as one.
+>
+> Three restrictions, each load-bearing: **`url:` ids only** (a `file:` change
+> already has an event — git observes it and `post-commit` re-indexes, so
+> recording it here would be a second write path into a flow that works);
+> **only `current is False`, never `None`** (`None` is *we did not look*, and
+> marking those dirty would churn the list on exactly the days the network is
+> bad); and **best-effort**, so an unwritable `.fux/runtime/` cannot fail an
+> answer.
+>
+> ⚠ **It changes no byte of the bundle.** Recording a doc id is local,
+> gitignored state, and a test asserts the emitted records are identical with
+> the list empty and non-empty — the differential discipline that caught ARC's
+> `"note": "cache hit"` leak, applied to this change.
+
 ### Alternatives considered
 
 - **An HTTP client in `src/fux/refer/`.** Rejected: L1, L4 and the adapter cap,

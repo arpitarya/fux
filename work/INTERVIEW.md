@@ -27,8 +27,41 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-08-25**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-08-26**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
+
+### The most recent change: the queue is ONE item (2026-08-26)
+
+**Arpit collapsed W-74, W-75, W-77 and W-81 — and the five documents behind
+them — into a single file**,
+[`open/W-82-the-consolidated-build.md`](open/W-82-the-consolidated-build.md).
+**Read that before anything else in this section**; several paragraphs below
+still describe the four items separately and are history now.
+
+⚠ **A merge, not a close.** Nothing was decided by moving it. Every fork those
+four items carried is still open and still Arpit's — twenty-three of them,
+registered in W-82 §5.
+
+⚠ **The two compare docs' verdicts were folded into W-82 §4 verbatim BEFORE the
+archive move**, because archiving a compare doc makes its verdict uncitable and
+W-82 §1's calls rest on them. **W-82 §4 is the live home of the clock verdict
+and the concurrency verdict.** `archive/compare/url-refresh-trigger.compare.md`
+and `url-fetch-concurrency.compare.md` may be named, never cited.
+
+**Four calls were made the same day, and one of them withdrew a proposal:**
+
+| call | consequence |
+|---|---|
+| **every cited URL is fetched before the final answer** | already shipped — and it **withdrew `update --warm` and `answer --memo` outright**, since fetching regardless leaves neither flag a justification |
+| **the detector is the query-driven dirty list**, unconditional | W-82 §3.2; `dirty.py` and `run(only_urls=…)` both already exist |
+| **concurrency is declared capability**, `min(declared, configured)` | W-82 §4.2 — the one fork of the twenty-four that is ruled |
+| **no local content store** | W-82 §6, with a reopen trigger, so it is not re-derived |
+
+⚠ **The gap that survives every one of those calls, and it is the reason W-82
+exists:** fetching at answer time fixes **correctness** and cannot fix
+**recall**. A URL that changed upstream still holds its old terms in the index,
+so it never ranks into the candidate window, is never cited, is never fetched,
+and **nothing notices**.
 
 ### The most recent change: the embedding model was DELETED (2026-08-25)
 
@@ -66,7 +99,7 @@ under `src/fux/query/` satisfied the check by touching **ADR-ASK**, while
 **ADR-RANKING**, whose entire subject is that scorer, was never opened. *The
 check is not wrong; it is narrower than it reads.* Deciding whether a record
 may declare *"I describe this component even though I do not own it"* is
-[W-77](open/W-77-record-reconciliation.md)'s real deliverable.
+[W-82 §5.3](open/W-82-the-consolidated-build.md)'s real deliverable.
 
 **A second class was closed the same day.** The register's display labels
 disagreed with their filenames on **sixteen** rows (the standing note claimed
@@ -403,10 +436,10 @@ tell the two apart. Both readings are written out in W-77.
 
 - **W-75 was filed 2026-08-22** under a new
   **ADR-URL-INGEST · ADR-FETCHER** group: [nothing in fux can learn that a URL
-  changed](open/W-75-url-freshness.md), spec in
-  [`proposals/url-freshness.md`](proposals/url-freshness.md), two forks split
-  out to [`compare/url-refresh-trigger`](compare/url-refresh-trigger.compare.md)
-  and [`compare/url-fetch-concurrency`](compare/url-fetch-concurrency.compare.md).
+  changed](open/W-82-the-consolidated-build.md), spec in
+  [W-82 §3](open/W-82-the-consolidated-build.md), two forks split
+  out to [W-82 §4.1](open/W-82-the-consolidated-build.md)
+  and [W-82 §4.2](open/W-82-the-consolidated-build.md).
   **A file change is an event; a URL change is not** — `post-commit` re-indexes
   a changed repo document, a changed URL waits for a human to type `fux update`,
   and nothing reports how long ago that was. Two reframes carry the argument:
@@ -423,8 +456,8 @@ tell the two apart. Both readings are written out in W-77.
   thread pool produces plausible documents attributed to the wrong URLs — it
   passes every determinism check.
 - **The queue's second item — W-74, filed 2026-08-22** under a new
-  **ADR-RS** group: [fux has no contract for what *right* means](open/W-74-answer-quality-measurement-contract.md),
-  spec in [`proposals/measuring-answer-quality.md`](proposals/measuring-answer-quality.md).
+  **ADR-RS** group: [fux has no contract for what *right* means](open/W-82-the-consolidated-build.md),
+  spec in [W-82 §5.2](open/W-82-the-consolidated-build.md).
   ADR-RS governs *how* a claim is frozen and is silent on *what quantity is
   worth freezing*, so every quality number this project has produced carries an
   undeclared query distribution and an implicit cost model where a fabricated

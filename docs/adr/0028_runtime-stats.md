@@ -202,7 +202,7 @@ length normalisation reads, plus the one the recency prior normalises against
 > accelerator's record. **That is precisely how this record's own veto fired
 > unnoticed on 2026-08-23**, as the Veto condition below already says at
 > length. It is amended today by a session that went looking, which is
-> [W-77](../../work/open/W-77-record-reconciliation.md)'s finding: a record
+> [W-82 §5.3](../../work/open/W-82-the-consolidated-build.md)'s finding: a record
 > that describes a component it does not own has no mechanical protection at
 > all.
 

@@ -57,12 +57,22 @@ class UrlSource:
       never what it *means*. Same discipline as PEP 518's `[tool.*]` tables,
       and it is what keeps the adapter cap from leaking one fetcher's
       vocabulary into fux's config schema.
+    - `max_parallel` — how many URLs may be fetched at once (W-82 §3.3).
+      **`None` means "whatever the fetcher declares"**, which is `1` unless the
+      module sets `MAX_PARALLEL`. This is **policy**, not capability: it is
+      never clamped *up* past what a fetcher declared safe, and a large value is
+      honoured with a warning rather than silently reduced — Arpit's rule,
+      *state the cost, don't clamp the knob*. `< 1` is broken and refuses.
+      ⚠ **It lives here and not in `tune.toml`** because it changes no byte in
+      `.fux/index/` **and** is not a ranking value: it is operational, so it
+      belongs beside the other `[sources.url]` keys.
     """
 
     fetcher: str
     urls_file: str
     meta: str  # "hashed" | "plain"
     config: dict
+    max_parallel: int | None = None
 
 
 @dataclass
@@ -212,9 +222,29 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
     config = raw.get("config", {})
     if not isinstance(config, dict):  # the ONLY validation fux does on it
         raise FuxError(f"{path}: [sources.url.config] must be a table (got {type(config).__name__})")
+    max_parallel = raw.get("max_parallel")
+    if max_parallel is not None:
+        # Refuse what is BROKEN; warn about what is merely strong. A value below
+        # 1 cannot mean anything -- there is no such thing as fetching less than
+        # one URL at a time -- so it is an error here rather than a silent clamp
+        # to 1, which would honour a number the consumer plainly did not mean.
+        # The "this is a lot of connections" warning belongs at the point of use
+        # (`urlsrc.resolve_parallel`), where the fetcher's own declared maximum
+        # is known and the note can state the real cost.
+        if isinstance(max_parallel, bool) or not isinstance(max_parallel, int):
+            raise FuxError(
+                f"{path}: [sources.url] max_parallel must be an integer >= 1 "
+                f"(got {max_parallel!r})"
+            )
+        if max_parallel < 1:
+            raise FuxError(
+                f"{path}: [sources.url] max_parallel must be >= 1 (got {max_parallel}). "
+                "1 fetches one URL at a time, which is the default"
+            )
     return UrlSource(
         fetcher=fetcher.strip(),
         urls_file=urls_file.strip(),
         meta=meta,
         config=dict(config),
+        max_parallel=max_parallel,
     )

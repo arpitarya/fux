@@ -229,3 +229,27 @@ the reason R2 question 3 could not be answered at M1.
 | [`proposals/consumer-intent-policy.md`](proposals/consumer-intent-policy.md) | 2026-08-22 | **Graduated and built.** Became [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md); `fux setup` installs the four renderings, which live at [`src/fux/templates/agents/`](../src/fux/templates/agents/). Its `consumer-policy/` drafts directory came with it — by then only a pointer, since the files had already moved into the wheel |
 | [`proposals/process-diet.md`](proposals/process-diet.md) | 2026-08-22 | **Graduated 2026-08-21** (PRIORITY P7) and the change is live in the process: the `Cost:` line left the WORKLOG format after 58/58 entries said `unmeasured` |
 | [`proposals/consumer-policy-README.md`](proposals/consumer-policy-README.md) | 2026-08-22 | the drafts directory's index, kept only so the pointer it carried is not lost |
+
+## The 2026-08-26 consolidation — nine documents, one successor
+
+**Arpit collapsed the open queue to a single item.** Four open items and the
+five documents supporting them were replaced by
+[`work/open/W-82-the-consolidated-build.md`](../work/open/W-82-the-consolidated-build.md),
+which is the **live successor for every row below**.
+
+⚠ **The two compare docs' verdicts were folded into W-82 §4 verbatim before the
+move**, precisely because archiving them would otherwise have made those
+verdicts uncitable. **W-82 §4 is the live home of both**, including their
+reopen triggers; the files below may be named, never cited.
+
+| file | archived | why |
+|---|---|---|
+| [`open/W-74-answer-quality-measurement-contract.md`](open/W-74-answer-quality-measurement-contract.md) | 2026-08-26 | consolidated into **W-82 §5.2**. Item still open — the move is a merge, not a close |
+| [`open/W-75-url-freshness.md`](open/W-75-url-freshness.md) | 2026-08-26 | consolidated into **W-82 §3 and §5.1** |
+| [`open/W-77-record-reconciliation.md`](open/W-77-record-reconciliation.md) | 2026-08-26 | consolidated into **W-82 §5.3** |
+| [`open/W-81-the-sealed-set-and-the-two-controls.md`](open/W-81-the-sealed-set-and-the-two-controls.md) | 2026-08-26 | consolidated into **W-82 §3.5 and §5.4** |
+| [`proposals/url-freshness.md`](proposals/url-freshness.md) | 2026-08-26 | its argument is **W-82 §2, §3 and §5.1** |
+| [`proposals/measuring-answer-quality.md`](proposals/measuring-answer-quality.md) | 2026-08-26 | its argument is **W-82 §5.2** |
+| [`proposals/prepare-then-ask.md`](proposals/prepare-then-ask.md) | 2026-08-26 | ⚠ **withdrawn, not merely moved.** `update --warm` and `answer --memo` were both withdrawn under W-82 §1's ruling — if every cited URL is fetched before the final answer, neither flag has a justification. What survives is **W-82 §3.4** |
+| [`compare/url-refresh-trigger.compare.md`](compare/url-refresh-trigger.compare.md) | 2026-08-26 | **verdict folded into W-82 §4.1** before archiving |
+| [`compare/url-fetch-concurrency.compare.md`](compare/url-fetch-concurrency.compare.md) | 2026-08-26 | **verdict folded into W-82 §4.2** before archiving; its fork was **ruled** the same day |

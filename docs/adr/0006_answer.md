@@ -335,6 +335,40 @@ $ fux answer "zzz nonexistent term" --json
   every result, not just the first) and is left as a distinct, undecided
   scope for a future item rather than assumed here.
 
+> **Amended 2026-08-26 (W-82 §3.4) — `answer` now says whether anything changed
+> since the same question was last asked.**
+>
+> Arpit's ask was *"if nothing has changed, then give the same old answer."*
+> The comparison that needs — **did the cited bytes move?** — was already
+> performed on every call by the refer plane. What was missing was only the
+> memory of what was said last time.
+>
+> ⚠ **It is a report, not a memo. No answer is stored and nothing is replayed.**
+> Every answer is still recomputed on freshly fetched bytes, per the 2026-08-26
+> ruling that a URL's actual document is fetched before any final answer. Only
+> the previous answer's `(loc, sha)` pairs are remembered, in gitignored
+> `.fux/runtime/last-cited.json`.
+>
+> **`answer --memo` was proposed and WITHDRAWN**, and the reasoning is W-82
+> §6.0: this verb is model-free and deterministic and ARC is keyed
+> `(loc, sha)`, so identical bytes give an identical answer **by construction**
+> — a memo would cache the output of a pure function whose inputs were just
+> downloaded. Its sharpest hazard was that a memo validated by a TTL hit would
+> replay an answer on bytes nobody confirmed **while reporting `current`**.
+> Storing only `(loc, sha)` cannot do that, because there is no stored answer
+> to serve.
+>
+> **It needs no fifth verdict label.** [ADR-REFER](0030_refer-plane.md)
+> decision 6's four labels are **per-citation** facts about one fetch; this is a
+> **per-answer** statement about two runs. Different object, different place.
+>
+> ⚠ **The line goes to stderr in BOTH text and JSON mode**, so this record's
+> documented stdout — including the `source` key callers switch on — is
+> **byte-identical with the feature on or off**. That is W-64's rule for the
+> progress plane applied here, and it is why the signal is not a JSON field.
+> Promoting it to one would be additive but would move a documented surface, so
+> it is a fork rather than a default.
+
 ### Alternatives considered
 
 - **Generate a fluent sentence from title + phrases.** Rejected: fabrication

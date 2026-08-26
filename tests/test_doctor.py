@@ -173,6 +173,117 @@ def test_accelerator_goes_stale_when_the_index_changes(tmp_path):
     assert shard_path(tmp_path, "05").exists() or True  # shard identity is not the point
 
 
+def _url_index(tmp_path, urls):
+    from fux.store import term_hash, write_index
+
+    write_index(
+        tmp_path,
+        [
+            {
+                "id": f"url:{url}",
+                "src": "url",
+                "loc": url,
+                "mode": "extracted",
+                # `plain` because the fixture carries readable `title`/`phrases`.
+                # `hashed` is L5's default for non-git sources and the writer
+                # refuses readable text under it — correct, and not what this
+                # test is about.
+                "meta": "plain",
+                "title": "T",
+                "phrases": [],
+                "terms": {term_hash("alpha"): [1, 0]},
+                "wlen": 4,
+                "edges": [],
+            }
+            for url in urls
+        ],
+    )
+
+
+def test_url_check_says_none_when_no_url_records_are_indexed(tmp_path):
+    _git_repo(tmp_path)
+    _url_index(tmp_path, [])
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert check.ok
+    assert check.level == "warn"
+    assert "none indexed" in check.detail
+
+
+def test_url_check_reports_never_fetched_before_any_networked_run(tmp_path):
+    """The case that was invisible: indexed, never re-fetched, nothing said."""
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a", "https://b"])
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert check.ok
+    assert "2 url: record(s)" in check.detail
+    assert "no networked run recorded yet" in check.detail
+    assert "2 never re-fetched since first ingest" in check.detail
+
+
+def test_url_check_reports_what_the_last_run_confirmed(tmp_path):
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a", "https://b"])
+    urlstate.observe(
+        tmp_path, fetched={"https://a": "sha"}, failed=["https://b"], listed=["https://a", "https://b"]
+    )
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "1 confirmed by the last run" in check.detail
+    assert "1 failing" in check.detail
+
+
+def test_url_check_names_a_persistently_failing_url_and_refuses_to_delete_it(tmp_path):
+    """ADR-URL-INGEST decision 4 forbids treating a failed fetch as a deletion.
+
+    So the check reports and points at the file a human must edit — and the
+    record is still in the index afterwards, which is the property under test.
+    """
+    from fux.maintain import urlstate
+    from fux.store import reader
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://dead"])
+    for _ in range(urlstate.FAILING_STREAK):
+        urlstate.observe(tmp_path, fetched={}, failed=["https://dead"], listed=["https://dead"])
+
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert not check.ok
+    assert check.level == "warn"  # never fails the command
+    assert "https://dead" in check.detail
+    assert ".fux/sources/urls" in check.detail
+    assert "url:https://dead" in reader.read_index(tmp_path)
+
+
+def test_url_check_survives_an_unreadable_index(tmp_path):
+    _git_repo(tmp_path)
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert check.ok
+
+
+def test_url_state_carries_no_wall_clock(tmp_path):
+    """The invariant `refer/fetchcache.py` states and ADR-REFER rests on:
+    wall clock lives in the TTL store and nowhere else.
+
+    W-75 specified this file with `validated_at` / `changed_at`. Both are
+    timestamps, and shipping them would have been a quiet contradiction of an
+    accepted record. Freshness here is counted in runs.
+    """
+    import json
+
+    from fux.maintain import urlstate
+
+    (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    urlstate.observe(tmp_path, fetched={"https://a": "sha"}, failed=[], listed=["https://a"])
+    raw = json.loads((tmp_path / ".fux" / "runtime" / urlstate.STATE_NAME).read_text(encoding="utf-8"))
+
+    flat = json.dumps(raw)
+    assert "_at" not in flat and "time" not in flat and "stamp" not in flat
+    for health in raw["urls"].values():
+        for value in health.values():
+            assert value is None or isinstance(value, int)
+
+
 def test_every_check_detail_is_ascii_in_every_branch(tmp_path):
     """The Windows codepage guard, applied to the failing branches too.
 

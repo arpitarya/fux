@@ -377,6 +377,7 @@ def cmd_answer(args) -> int:
     if not no_refer_flag:
         referred = _answer_via_refer(root, args.query, best, tune)
         if referred is not None:
+            _declare_change_since_last_ask(root, args.query, referred)
             _print_refer_answer(referred, args.json)
             return 0
 
@@ -391,6 +392,39 @@ def _answer_via_refer(root: Path, query: str, best: AskResult, tune: "Tune"):
     if record is None:
         return None
     return answer_via_refer(root, query, best.id, best.loc, record["sha"], tune=tune)
+
+
+def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:
+    """W-82 3.4 — *"nothing has changed since you last asked."*
+
+    **A report, not a memo.** No answer is stored and nothing is replayed: the
+    answer above was recomputed on freshly fetched bytes, per the 2026-08-26
+    ruling that a URL's actual document is fetched before any final answer. All
+    this remembers is which `(loc, sha)` pairs the previous answer to the same
+    question cited.
+
+    **stderr, in both text and JSON mode**, so `answer`'s stdout stays
+    byte-identical with this on or off — the rule W-64 set for the progress
+    plane, and the reason the archived-results signal sits there too. Promoting
+    it to a JSON field would be additive but would move a documented surface,
+    so it is a fork rather than a default (W-82 3.4).
+
+    Best-effort throughout: a diagnostic that can fail an answer is worse than
+    no diagnostic.
+    """
+    try:
+        from ..maintain import lastcited
+
+        cited = {d.loc: (d.verdict.fetched_sha or d.verdict.indexed_sha) for d in bundle.documents}
+        if not cited:
+            return
+        change = lastcited.compare(root, query, cited)
+        line = change.line()
+        if line:
+            print(line, file=sys.stderr)
+        lastcited.remember(root, query, cited)
+    except Exception:  # pragma: no cover - a report must not break an answer
+        pass
 
 
 def _print_refer_answer(bundle, as_json: bool) -> None:

@@ -55,7 +55,7 @@ timestamp: 2026-08-22T00:00:00Z
 > | a delta below the set's resolution is **"no detected change"** | decision 14 |
 > | the classification is **checked**, for runs filed from this date | [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py) |
 > | the per-run contract gains row 7 | [`work/regression/README.md`](../../work/regression/README.md) |
-> | the sealed set and the two controls — **owed, not built** | decision 15, [W-81](../../work/open/W-81-the-sealed-set-and-the-two-controls.md) |
+> | the sealed set and the two controls — **owed, not built** | decision 15, [W-82 §5.4](../../work/open/W-82-the-consolidated-build.md) |
 >
 > **What it did NOT change.** Not one filed verdict, pre-registration or
 > report. **`Amends: nothing` still holds** — CLAUDE.md remains the normative
@@ -312,7 +312,7 @@ two, ~0.028 — a different statistic, roughly **17x** the evidential weight of
 the *"broke nothing"* sentence that was actually filed, and the one to cite.
 
 **15. An enrichment change is scored against a decoy set and a placebo — NOT
-BUILT, and owed as [W-81](../../work/open/W-81-the-sealed-set-and-the-two-controls.md).**
+BUILT, and owed as [W-82 §5.4](../../work/open/W-82-the-consolidated-build.md).**
 *Neural Retrievers are Biased Towards LLM-Generated Content* (KDD 2024)
 establishes **source bias**: retrievers rank LLM-written text higher
 independently of whether it informs, and the effect reaches re-rankers. Every
@@ -446,7 +446,7 @@ choose will quietly choose the code — leaving verdicts that point at nothing.
   scores in hand) and both are below decision 14's floor. They are cited for the
   **concordance**, which is what survives.
 - **The unbuilt half** —
-  [W-81](../../work/open/W-81-the-sealed-set-and-the-two-controls.md).
+  [W-82 §5.4](../../work/open/W-82-the-consolidated-build.md).
 
 ### Veto condition
 

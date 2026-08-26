@@ -292,6 +292,31 @@ directories by default (ruff does) will not lint them.
   replacing an unratified decision inherits its ambiguity. Retirement happens in
   the change that accepts this one, once W-31 is called.
 
+> **Amended 2026-08-26 (W-82 §3.1) — `fux doctor` gained a URL section, and
+> `.fux/runtime/` gained two files.**
+>
+> This record's list of what doctor checks was *the background runner, the
+> Python version, the repo root, the layout and the accelerator* — **and nothing
+> about URLs**. That silence was the defect: a URL that had failed every fetch
+> for a month looked exactly like one fetched a minute ago.
+>
+> `doctor.py` now reports, as a **warning and never an error**: how many `url:`
+> records exist, how many the last networked run confirmed, how many have never
+> been re-fetched since first ingest, and how many are failing — naming any that
+> have failed `FAILING_STREAK` runs in a row.
+>
+> **It reports and never deletes**, because
+> [ADR-URL-INGEST](0008_url-ingest.md) decision 4 forbids treating a failed
+> fetch as a deletion. The cost of that rule is that a permanently dead URL
+> lives in the index forever; this makes the cost legible instead of invisible.
+> **It also never fetches** — doctor stays offline, so every number comes from
+> the committed index and a gitignored counter.
+>
+> Two new **derived, gitignored** files nest inside the already-declared
+> `runtime/`: `url-state.json` (per-URL counters) and `url-shas.json` (the sha
+> each URL last produced, so *"it changed"* can be distinguished from *"we
+> fetched it"*). Neither is committed and neither can change a committed byte.
+
 ### Alternatives considered
 
 - **Two top-level directories** — `.fux/` committed, `.fux-cache/` derived.

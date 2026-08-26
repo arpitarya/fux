@@ -467,6 +467,22 @@ docs/logo.png: binary
   record no reader can ever show a title for. Full rationale on
   [ADR-RECORD](0010_index-record.md).
 
+> **Amended 2026-08-26 (W-82 §3.1) — the networked path records per-URL health.**
+>
+> After `fetch_all`, `run()` records what happened to each listed URL into
+> `.fux/runtime/url-state.json` — success, failure, and whether the sanitized
+> sha actually moved.
+>
+> **Only on the networked path, and that is the decision.** An offline
+> `fux ingest` fetches nothing, so it learns nothing about any URL; bumping the
+> run counter there would age every URL for a run that never looked at one.
+>
+> **Best-effort and advisory.** The write is wrapped and swallowed: a reporting
+> plane that can fail an ingest which otherwise succeeded is worse than no
+> reporting plane — the same reasoning [ADR-MAINTENANCE](0032_hooks.md)
+> decision 3 applies to hooks. Nothing here changes a committed byte, so
+> **L3 is untouched**: same sources still give the same index.
+
 ### Alternatives considered
 
 - **Skip unchanged files entirely, by `sha`.** Still rejected, and this is the

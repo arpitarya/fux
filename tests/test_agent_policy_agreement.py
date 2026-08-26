@@ -50,7 +50,16 @@ AMBIENT_MAX_BYTES = 4096
 #: a file the agreement check no longer protects, so adding one is a decision,
 #: not a convenience -- which is why `test_the_exemptions_are_deliberate` below
 #: pins its contents.
-NOT_A_POLICY_RENDERING = frozenset({"POLICY.md", "ENRICH-SKILL.md"})
+#: `USAGE-SKILL.md` and `fux-usage.instructions.md` (W-82 3.6) are an
+#: **operating manual**, not a policy: they teach how to resolve and invoke the
+#: `fux` command and which verb to reach for, and state no position on how to
+#: read an archived result. They point AT `fux-archived-results` for that, which
+#: is the correct relationship -- inlining the eight-rule block would duplicate
+#: a policy that already has a rendering per vendor, and duplication is exactly
+#: what decision 2's byte-for-byte check exists to prevent drifting.
+NOT_A_POLICY_RENDERING = frozenset(
+    {"POLICY.md", "ENRICH-SKILL.md", "USAGE-SKILL.md", "fux-usage.instructions.md"}
+)
 
 
 def renderings() -> list[Path]:
@@ -65,7 +74,12 @@ def test_the_exemptions_are_deliberate():
     noticing, so the set is asserted rather than trusted -- otherwise the
     cheapest way to fix a failing agreement test is to add a name to it.
     """
-    assert NOT_A_POLICY_RENDERING == {"POLICY.md", "ENRICH-SKILL.md"}
+    assert NOT_A_POLICY_RENDERING == {
+        "POLICY.md",
+        "ENRICH-SKILL.md",
+        "USAGE-SKILL.md",
+        "fux-usage.instructions.md",
+    }
 
 
 def canonical_block() -> str:

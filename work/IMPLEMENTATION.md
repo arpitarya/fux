@@ -21,6 +21,27 @@ Rules:
 
 ---
 
+## W-82 §3.1-§3.6 — five phases of the consolidated build (2026-08-26)
+
+| what landed | where | outcome |
+|---|---|---|
+| **§3.1 the URL health report** — `fux doctor` gains a URL section; `fail_streak` in `.fux/runtime/url-state.json` | `maintain/urlstate.py`, `doctor.py`, `ingest/run.py` | doctor had **no URL check at all**; report-never-delete, per ADR-URL-INGEST decision 4 |
+| **§3.2 the detector** — the refer plane records a `url:` doc id when `fetched_sha != indexed_sha` | `refer/__init__.py` | **closes the recall loop**: a changed URL now gets its terms corrected instead of silently ceasing to rank |
+| **§3.3 parallel fetch + the cap** — `MAX_PARALLEL` declared capability, `min(declared, configured)` | `ingest/urlsrc.py`, `config.py`, both fetcher templates | first threading in `src/fux/`; **stdlib, so L1 untouched**; invisible to L3 because the trailing sort, not the loop, is what makes the index deterministic |
+| **§3.4 the changed/unchanged line** — the last answer's cited `(loc, sha)` set | `maintain/lastcited.py`, `query/__init__.py` | **a report, not a memo**: no answer stored, nothing replayed, stderr-only so stdout stays byte-identical |
+| **§3.6 the agent surface** — `fux-usage` skill and the four-rung invocation ladder | `templates/agents/USAGE-SKILL.md` + 2 renderings, `setup.py` | closes a **live silent defect**: an unactivated `.venv` read as *not installed* and sent agents to grep |
+
+**Records amended in the same change** (Law zero): ADR-DOTFUX · ADR-INGEST ·
+ADR-REFER · ADR-MAINTENANCE · ADR-ANSWER · ADR-ASK · ADR-AGENT-POLICY ·
+ADR-FETCHER · ADR-CONFIG.
+
+**Verification: 1 433 unit tests green**, up from 1 335.
+⚠ **`tests_e2e/` is UNVERIFIED** — it spawns the real CLI and fails identically
+(55/11) on a clean tree in the build environment, so the change introduces no
+regression and *green* is not a claim available from here.
+⚠ **§3.0 and §3.5 did not land**, and neither is a code task: §3.0 needs a real
+URL corpus, §3.5 needs `fux-playground`. Neither exists on this machine.
+
 ## Milestones
 
 | milestone | shipped | release | closed by | outcome |

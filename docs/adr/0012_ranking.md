@@ -362,7 +362,7 @@ index-for-index with `TF_FIELDS`.
 > satisfied by ADR-ASK alone — while this record, whose entire subject is the
 > scorer that changed, would have gone on describing three fixed constants.
 > That is exactly the governance gap
-> [W-77](../../work/open/W-77-record-reconciliation.md) filed after W-76 rotted
+> [W-82 §5.3](../../work/open/W-82-the-consolidated-build.md) filed after W-76 rotted
 > sixteen records with the check green throughout. A **describing** record rots
 > in silence; the only thing that catches it is a session choosing to look.
 

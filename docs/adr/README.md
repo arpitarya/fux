@@ -204,7 +204,7 @@ again here.
 
 > ## The display-number drift is FIXED (2026-08-24) — and this is what it cost
 >
-> **As part of [W-77](../../work/open/W-77-record-reconciliation.md)'s reconciliation, these were the
+> **As part of [W-82 §5.3](../../work/open/W-82-the-consolidated-build.md)'s reconciliation, these were the
 > updates made to this table:** every bracketed label now equals its own filename, and the rows are
 > **sorted by number** — `0001` through `0041`, contiguous, no gaps, no duplicates.
 >

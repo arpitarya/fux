@@ -107,7 +107,10 @@ def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["kiro"]\n', encoding="utf-8")
     setup_mod.run(root)
-    assert _agent_files_on_disk(root) == [".kiro/steering/fux-archived-results.md"]
+    assert _agent_files_on_disk(root) == [
+        ".kiro/skills/fux-usage/SKILL.md",
+        ".kiro/steering/fux-archived-results.md",
+    ]
 
 
 def test_optout_through_the_real_cli(tmp_path, monkeypatch, capsys):

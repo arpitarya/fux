@@ -170,9 +170,22 @@ def run(
         # reconciliation and carry-forward key on, so narrowing it here would
         # turn a scoped fetch into a corpus-wide deletion.
         to_fetch = resolved if only_urls is None else [e for e in resolved if e.url in only_urls]
-        fetched, url_skipped = urlsrc.fetch_all(root, to_fetch, config.url.config)
+        fetched, url_skipped = urlsrc.fetch_all(
+            root, to_fetch, config.url.config, max_parallel=config.url.max_parallel
+        )
         skipped = skipped + url_skipped
         fresh = {f"url:{fu.url}": fu.content for fu in fetched}
+        # W-82 3.1: record how this run went, per URL. Only on the networked
+        # path -- an offline `fux ingest` fetches nothing, so it learns nothing
+        # about any URL, and bumping the run counter there would age every URL
+        # for a run that never looked at one. Advisory and gitignored: it
+        # cannot change a committed byte, only what `fux doctor` can say.
+        _observe_url_health(
+            root,
+            fetched=fetched,
+            skipped=url_skipped,
+            listed=[doc_id[4:] for doc_id in url_meta],
+        )
         for doc_id in url_meta:
             if doc_id not in fresh and doc_id in existing_urls:
                 carried[doc_id] = existing_urls[doc_id]  # failed fetch keeps the prior record
@@ -470,6 +483,28 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
         and record.get("src") == "git"
         and record.get("meta") == "plain"
     }
+
+
+def _observe_url_health(root: Path, *, fetched, skipped, listed) -> None:
+    """Record this networked run's per-URL outcome (W-82 3.1).
+
+    **Best-effort, and that is deliberate.** This is a reporting plane; a
+    failure to write it must never fail an ingest that otherwise succeeded.
+    The same reasoning ADR-MAINTENANCE decision 3 applies to hooks: a
+    diagnostic that can break the thing it diagnoses is worse than no
+    diagnostic.
+    """
+    from ..maintain import urlstate
+
+    try:
+        urlstate.observe(
+            root,
+            fetched={fu.url: store_mod.content_sha(fu.content) for fu in fetched},
+            failed=[s.rel_path for s in skipped],
+            listed=listed,
+        )
+    except Exception:  # pragma: no cover - a report must not break the run
+        pass
 
 
 def _listed_url_ids(root: Path, config, existing_urls: dict[str, dict]) -> set[str]:

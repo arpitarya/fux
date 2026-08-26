@@ -33,7 +33,7 @@ timestamp: 2026-08-20T00:00:00Z
 > is exactly the provenance the verdict said was absent.
 >
 > **This is not an agent's to re-decide.** It is filed as
-> [W-77](../open/W-77-record-reconciliation.md) ruling 1, in the `arpit` lane:
+> [W-82 §5.3](../open/W-82-the-consolidated-build.md) ruling 1, in the `arpit` lane:
 > *"ADR-REFER decision 4 is currently **standing but unargued**, which is the
 > one state a record should never be in."*
 >
