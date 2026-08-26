@@ -24,6 +24,30 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-26 — push and publish v2.0.0-alpha.2  ·  Claude Code
+- **Asked:** *"push and publish the version."*
+- **Did:** `main` was 17 local commits ahead of `origin/main` (`__version__` already
+  bumped to `2.0.0-alpha.2`, unreleased since alpha.0). Dated the CHANGELOG's
+  `[Unreleased]` section as `[2.0.0-alpha.2] - 2026-08-26`, pushed, watched CI
+  green on all 9 matrix jobs, `gh release create v2.0.0-alpha.2 --prerelease`,
+  watched `publish.yml` green, confirmed `2.0.0a2` live on PyPI's JSON API.
+  Fixed CLAUDE.md's stale version-history line on contact (§Statements of fact
+  are exempt) — it still said `0.35.0`, six releases behind.
+- **Decided / open:** `2.0.0-alpha.1` was bumped and changelogged in an earlier
+  session but never tagged/released — skipped straight to alpha.2 rather than
+  releasing a version nobody could ever have installed; no fux behaviour
+  changed by this session, so **no ADR affected**.
+- **Next:** none — release is live.
+
+## 2026-08-26 — the register, the diagram and one page that explains fux  ·  Cowork
+- **Asked:** *"update the ADRs and update the architecture diagram… create an image… one big HTML file… commit push and publish."*
+- **Did:** annotated **ten register rows** with the W-82 phase that changed them; **redrew `architecture-detailed.svg`**; rendered it to `docs/img/fux-architecture.png`; wrote **`docs/guide.html`**, one self-contained page with the diagram inlined.
+- ⚠ **The detailed diagram was badly stale and nobody had noticed.** It still showed `vectors[] — int8`, `sign codes` and `dense fuse` — **the entire dense lane, deleted 2026-08-25** — and was stamped `2.0.0-alpha.0`. A diagram is documentation that nothing tests, so it rots silently while every prose claim around it stays gated. It now carries a `new in alpha.2` legend so the delta is visible rather than asserted.
+- **Two render defects caught by LOOKING at the PNG rather than trusting the SVG**: the detector loop was routed straight through the committed-plane box, and a bold caption collided with the sentence after it. Both fixed and re-rendered. *Run it, do not read it* applies to pictures too.
+- **The guide carries a `What is not verified` section on purpose.** It states plainly that `tests_e2e/` has never been seen green here and that the unit suite ran on 3.10 under a shim. A page that hides its unverified edges teaches the reader to distrust the verified ones.
+- **Decided / open:** nothing new was decided. ⚠ The guide's counts (41 records, 26 accepted, 27 forks) are **facts about a moment**, are not gated by any test, and will go stale silently — its DOC-REGISTRY row says so.
+- **Next:** unchanged — §3.0, the Phase 0 measurement, which needs a real URL corpus and must disclose its collision with ADR-RS decision 12.
+
 ## 2026-08-26 — W-82 built: five of six phases, and three corrections the code made to the plan  ·  Cowork
 - **Asked:** *"Let's go ahead and implement W-82."*
 - **Did:** built **§3.1** (URL health report), **§3.2** (the detector), **§3.3** (parallel fetch + the cap), **§3.4** (the changed/unchanged line) and **§3.6** (the agent surface + the invocation ladder). Nine records amended in the same change; **1 433 unit tests green**, up from 1 335.
