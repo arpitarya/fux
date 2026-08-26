@@ -39,6 +39,17 @@ play: the worklog is the granular, per-exchange trail.
   changed by this session, so **no ADR affected**.
 - **Next:** none — release is live.
 
+## 2026-08-26 — the index record's shape, declared once instead of four times  ·  Cowork
+- **Asked:** *"Fux index block. Create a template file and use that template file to create the index."* ⚠ **Asked which index first** — "index" names three different things in this repo and "block" maps to two — and Arpit chose the committed record.
+- **Did:** `store/index-record.json` declares every field (type, when required, default, display, carried, omit_when); `store/recordshape.py` loads and builds from it; `store/writer.py`'s `DISPLAY_FIELDS` and `ingest/run.py`'s `EXTRACTED_FIELDS` now come from it; both record kinds are assembled through `build()`.
+- **The problem it solves, stated precisely:** the shape lived in **four** places — assembled inline twice in `run.py`, policed by a tuple in `writer.py`, carried by a tuple in `run.py`, described in prose by ADR-RECORD — and **nothing compared them.** Adding a display field meant remembering a tuple in a different module, and **forgetting was silent**: the field would ship and L5's check simply would not look at it. Same shape as W-82 §5.3's governance gap — a real rule, and a check narrower than it reads.
+- ⚠ **The gate on the whole change: no committed byte moved**, asserted by comparing canonical encodings rather than dicts. **Checked before designing** that `canonical_dumps` uses `sort_keys=True` — so the template's key order is presentational and cannot reach the index. That is *also* asserted, because if it ever stops being true the template silently becomes a wire format.
+- **`validate()` is deliberately not on the write path** — `write_index` already enforces L5's meta policy and `canonical_dumps` already refuses floats, nulls and hostile text. **A test asserts the writer does not call it**, so the omission cannot rot into an assumption.
+- ⚠ **Concurrent session, and it is not hypothetical.** The tree carries another session's uncommitted W-83 work *and* a new `src/fux/query/headings.py` — the heading-level `ask` I recommended two turns ago. **I committed only my own paths**, never `-A`. Their two failures (a broken link in ADR-CONFIG to a W-83 file still under `work/open/`, and ADR-ASK/ADR-MCP owed for `headings.py`) are theirs to close and are untouched.
+- **They also corrected me:** W-83 found that `DEFAULT_MAX_PARALLEL = 4` shipped in my §3.3 **referenced by nothing** — unconfigured repos inherited `http.py`'s declared `8` while the constant stated 4. Their fix is right; my test asserted the old contract and they had already fixed it before I got there.
+- **Decided / open:** nothing new decided. **Verification: 1 461 green** (19 new). ⚠ `tests_e2e/` still unverified in this environment.
+- **Next:** unchanged — W-82 §3.0, which needs a real URL corpus.
+
 ## 2026-08-26 — "I ran fux ask and got no lines" — right command, wrong verb  ·  Cowork
 - **Asked:** *"we talked about paragraphs and lines. I don't see them. Is something not built?"*
 - **Answered: nothing is unbuilt.** Heading-delimited passages, paragraph splitting above 4 KB, and `path:L12-L40` line ranges all shipped in **W-76 Phase 5** and work today. **Verified by running it**, not by reading `chunk.py`: a fresh index over a three-section fixture returned `-- docs/mesh.md:L1-L8 (sha 516bef067812, current)` in text and `"loc": "docs/mesh.md:L10-L13"` in `--json`, with two ranked passages carrying their headings.

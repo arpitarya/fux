@@ -1,0 +1,55 @@
+{
+  "_comment": [
+    "THE COMMITTED INDEX RECORD, declared once. Package data, not consumer data.",
+    "",
+    "Before this file the record shape existed in four places and agreed with",
+    "itself only by habit: assembled inline twice in ingest/run.py (once for git",
+    "documents, once for url), policed by a DISPLAY_FIELDS tuple in",
+    "store/writer.py, carried forward by an EXTRACTED_FIELDS tuple in",
+    "ingest/run.py, and described in prose by ADR-RECORD. Nothing compared them.",
+    "",
+    "KEY ORDER HERE IS PRESENTATION ONLY. canonical_dumps sorts keys, so the",
+    "order in this file cannot reach a committed byte. What CAN reach one is the",
+    "field set, the defaults and omit_when -- which is why `schema` below must",
+    "match store/format.py's SCHEMA_ID: two fux versions with different shapes",
+    "must never both call their output fux.index.v2.",
+    "",
+    "omit_when: a field equal to this value is LEFT OUT of the record rather",
+    "than written as false. That is ADR-ARCHIVED-CONTENT decision 1 -- a live",
+    "record's shape is unchanged, so no existing consumer's parse breaks.",
+    "",
+    "display: true marks text a human can read. L5 forbids these on a hashed",
+    "record, and store/writer.py enforces it at write time rather than in the",
+    "caller that happens to be used today.",
+    "",
+    "carried: true marks a pure function of bytes that have not changed, so a",
+    "delta ingest may reuse the prior value instead of re-extracting. `edges` is",
+    "deliberately NOT carried: it is the one field the rest of the corpus can",
+    "change without this document changing."
+  ],
+
+  "schema": "fux.index.v2",
+
+  "fields": {
+    "id":         { "type": "str",  "required": "always" },
+    "src":        { "type": "str",  "required": "always", "enum": ["git", "url"] },
+    "loc":        { "type": "str",  "required": "always" },
+    "sha":        { "type": "str",  "required": "always" },
+    "ver":        { "type": "int",  "required": "always", "default": 0 },
+    "mode":       { "type": "str",  "required": "always", "default": "extracted",
+                    "enum": ["extracted", "enriched"] },
+    "meta":       { "type": "str",  "required": "non-git", "enum": ["plain", "hashed"] },
+
+    "title":      { "type": "str",  "required": "never", "display": true, "carried": true },
+    "phrases":    { "type": "list", "required": "never", "display": true, "carried": true },
+    "title_h":    { "type": "str",  "required": "when-hashed" },
+
+    "terms":      { "type": "dict", "required": "never", "carried": true },
+    "flen":       { "type": "list", "required": "never", "carried": true },
+    "edges":      { "type": "list", "required": "never" },
+
+    "archived":   { "type": "bool", "required": "never", "omit_when": false },
+    "superseded": { "type": "bool", "required": "never", "omit_when": false },
+    "mtime":      { "type": "int",  "required": "never" }
+  }
+}

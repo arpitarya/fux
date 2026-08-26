@@ -21,6 +21,68 @@ Rules:
 
 ---
 
+## The record shape is declared once (2026-08-26)
+
+`src/fux/store/index-record.json` declares every field of a committed
+record; `store/recordshape.py` loads it; `store/writer.py` and `ingest/run.py`
+read it instead of restating it.
+
+**What it replaced agreed with itself only by habit** — the shape was assembled
+inline **twice** in `ingest/run.py`, policed by `DISPLAY_FIELDS` in
+`store/writer.py`, carried by `EXTRACTED_FIELDS` in `ingest/run.py`, and
+described in prose by ADR-RECORD. **Nothing compared them.** Adding a display
+field meant remembering a tuple in another module, and forgetting was silent:
+the field shipped and L5's check did not look at it.
+
+| property | how it is held |
+|---|---|
+| **no committed byte moved** | a test compares canonical encodings, not dicts |
+| template key order is presentational | asserted — `canonical_dumps` sorts keys, and if that stops being true the template silently becomes a wire format |
+| the template's `schema` equals `SCHEMA_ID` | two fux versions with different shapes must never both claim `fux.index.v2` |
+| an undeclared field is refused by `build()` | a typo'd key used to reach the index and never be read again |
+| `validate()` is **not** on the write path | asserted by a test, so the deliberate omission cannot rot into an assumption |
+
+**Records:** ADR-INDEX-LIFECYCLE and ADR-INGEST amended in the same change.
+**Verification:** 1 461 unit tests green (19 new).
+
+## W-83 — the unconfigured fetch ceiling (2026-08-26)
+
+**Arpit:** the number of parallel requests `fux update` / `fux add <URL>` /
+`fux ingest --refresh-urls` may open must be a stated property in `fux.toml`,
+*"otherwise it'll become one of a DDoS attack."*
+
+| what landed | where | outcome |
+|---|---|---|
+| **the unconfigured ceiling** — `resolve_parallel(module, None)` returns `min(declared, DEFAULT_MAX_PARALLEL)` | `ingest/urlsrc.py` | the constant had existed since §3.3 **referenced by nothing**; an unconfigured run inherited `http.py`'s declared `8` |
+| **the knob in `fux.toml`** — `max_parallel` written into the commented `[sources.url]` block, number **interpolated** from the constant | `setup.py` | it was readable by `config.py` and named by nothing a consumer would open |
+| **the policy in `fux doctor`** — the URL section says how many will be opened and where the number came from | `doctor.py` | reports policy only; **never imports the consumer's fetcher** to read `MAX_PARALLEL` off it |
+
+**The finding worth carrying, and it is not the feature.** ADR-CONFIG's W-82
+amendment **already specified** *"default `4` when a fetcher declares more"* —
+while stating four paragraphs earlier that *"`None` means whatever the fetcher
+declares."* **Two sentences in one amendment, contradicting each other**, and
+the code implemented the wrong one. So this was **the code being brought into
+line with a record that already had it right**, not a change against a record.
+
+⚠ **The governance gap that surfaced and is NOT fixed.** `test_adr_freshness`
+checks that an owning record was *touched*, never that it is *coherent*. A
+record can be amended and self-contradicting in the same commit and every
+mechanical check passes.
+
+**Records amended in the same change** (Law zero): ADR-CONFIG · ADR-FETCHER ·
+ADR-DOTFUX. **Item:**
+[`archive/open/W-83-…`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md).
+
+**Verification: 1 461 unit tests pass**, 8 of them new.
+⚠ **Two known failures are the 3.10 harness shim**, not the change — the build
+environment has no 3.11+ interpreter, so `fux doctor` correctly reports
+`3.10 < 3.11` and its two version tests fail. ⚠ **`tests_e2e/` unverified**,
+same cause, unchanged from W-82. ⚠ **Not committed** — a concurrent session was
+live in the same tree (`query/`, `store/`, `ingest/run.py`), so staging was left
+to whoever commits next.
+
+---
+
 ## W-82 §3.1-§3.6 — five phases of the consolidated build (2026-08-26)
 
 | what landed | where | outcome |

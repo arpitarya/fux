@@ -483,6 +483,22 @@ docs/logo.png: binary
 > decision 3 applies to hooks. Nothing here changes a committed byte, so
 > **L3 is untouched**: same sources still give the same index.
 
+> **Amended 2026-08-26 — both record kinds are assembled through the template.**
+>
+> The `git` and `url` records were two inline dicts a few dozen lines apart,
+> and `EXTRACTED_FIELDS` — which fields a delta ingest may carry forward — was a
+> tuple here with no connection to either. All three now come from
+> `store/index-record.json` via `store/recordshape.py`.
+>
+> ⚠ **`edges` remains excluded from the carried set, and the template says why
+> rather than leaving it to be re-derived**: it is the one field the rest of the
+> corpus can change without this document changing, so carrying it forward would
+> freeze a link a newly added document should have resolved. That was already
+> decision 1b's reasoning; it is now written where the exclusion lives.
+>
+> No committed byte moves — see [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)'s
+> amendment of the same date for the byte-identity argument and its test.
+
 ### Alternatives considered
 
 - **Skip unchanged files entirely, by `sha`.** Still rejected, and this is the

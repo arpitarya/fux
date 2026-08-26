@@ -259,15 +259,15 @@ def run(
 
     for wf in files:
         doc_id = f"file:{wf.rel_path}"
-        record = {
-            "id": doc_id,
-            "src": "git",
-            "loc": wf.rel_path,
-            "sha": file_shas[doc_id],
-            "ver": 0,
-            "mode": "extracted",
-            "meta": "plain",
-        }
+        record = store_mod.recordshape.build(
+            id=doc_id,
+            src="git",
+            loc=wf.rel_path,
+            sha=file_shas[doc_id],
+            ver=0,
+            mode="extracted",
+            meta="plain",
+        )
         # Absent when false, so a live record's shape is unchanged and no
         # existing consumer's parse breaks (decision 1).
         if archived_srcs and is_archived_loc(wf.rel_path, archived_srcs):
@@ -294,17 +294,17 @@ def run(
 
     for doc_id in sorted(fresh):
         fields = extracted[doc_id]
-        record = {
-            "id": doc_id,
-            "src": "url",
-            "loc": _loc_of(doc_id),
-            "sha": store_mod.content_sha(fresh[doc_id]),
-            "ver": 0,
-            "mode": "extracted",
-            "terms": store_mod.hash_terms(fields.terms, tracker),
-            "flen": store_mod.trim(fields.flen),
-            "edges": edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
-        }
+        record = store_mod.recordshape.build(
+            id=doc_id,
+            src="url",
+            loc=_loc_of(doc_id),
+            sha=store_mod.content_sha(fresh[doc_id]),
+            ver=0,
+            mode="extracted",
+            terms=store_mod.hash_terms(fields.terms, tracker),
+            flen=store_mod.trim(fields.flen),
+            edges=edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
+        )
         record["ver"] = ver_for(doc_id, record["sha"])
         # Per-URL, not per-source: a line may opt one public document out of
         # hashing (ADR-URL-LIST decision 10). It only ever loosens.
@@ -409,7 +409,16 @@ _STOP_EVERY = 64
 #: The fields extraction owns — pure functions of one document's own bytes, and
 #: therefore the only ones a delta run may carry forward. `edges` is absent on
 #: purpose, and `sha`/`ver` are recomputed because that is what they are for.
-EXTRACTED_FIELDS = ("title", "phrases", "terms", "flen")
+#: Pure functions of bytes that have not changed, so a delta ingest may reuse
+#: the prior value. **Read from the record template** (W-83b) rather than
+#: restated, because this tuple and the record's shape lived in different
+#: modules and nothing compared them.
+#:
+#: ⚠ `edges` is deliberately absent, and it is the interesting exclusion: it is
+#: the one field the rest of the corpus can change without this document
+#: changing, so carrying it forward would freeze a link that a newly added
+#: document should have resolved.
+EXTRACTED_FIELDS = store_mod.recordshape.carried_fields()
 
 
 

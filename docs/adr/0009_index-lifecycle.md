@@ -320,6 +320,53 @@ and the differential harness now carries a hashed record to prove it.
   privacy shape this exists for; this record owns only that the write refuses
   correctly.
 
+> **Amended 2026-08-26 — the record's shape is declared in one template file
+> instead of four places.**
+>
+> `store/index-record.json` now declares every field of a committed record —
+> its type, when it is required, its default, whether it carries display text,
+> whether a delta ingest may carry it forward, and whether it is omitted rather
+> than written false. `store/recordshape.py` loads it; `store/writer.py` reads
+> `DISPLAY_FIELDS` from it; `ingest/run.py` builds both record kinds through it.
+>
+> ⚠ **What it replaces agreed with itself only by habit.** The shape was
+> assembled inline **twice** in `ingest/run.py` (once for `git`, once for
+> `url`), policed by a `DISPLAY_FIELDS` tuple here in `store/`, carried forward
+> by an `EXTRACTED_FIELDS` tuple in `ingest/`, and described in prose by
+> [ADR-RECORD](0010_index-record.md). **Nothing compared them.** Adding a
+> display field meant remembering a tuple in a different module, and forgetting
+> was **silent**: the field shipped and L5's check simply did not look at it.
+>
+> **It changes no committed byte, and a test asserts exactly that** by comparing
+> canonical encodings rather than dicts. `canonical_dumps` sorts keys, so the
+> template's key order is presentation and cannot reach the index — also
+> asserted, because if that ever stops being true the template silently becomes
+> a wire format. What *can* reach a byte is the field set, the defaults and
+> `omit_when`, which is why the template's `schema` must equal `SCHEMA_ID`:
+> two fux versions with different shapes must never both call their output
+> `fux.index.v2`.
+>
+> ⚠ **`validate()` is deliberately NOT on the write path.** `write_index`
+> already enforces the one rule that closes a leak (L5's meta policy) and
+> `canonical_dumps` already refuses floats, nulls and hostile text; a third gate
+> on the hot path would re-check what those two guarantee. It is a tool for
+> tests and for callers building records by hand — and a test asserts the writer
+> does not call it, so the distinction cannot rot into an assumption.
+>
+> **`build()` refuses an undeclared field.** A typo'd key used to sail into the
+> committed index and never be read again — no error, no test, a field that
+> exists forever and means nothing.
+>
+> ⚠ **The template lives in `src/fux/store/`, not `src/fux/templates/`, and the
+> ADR guard is why.** The first commit attempt was refused: `templates/` is
+> claimed by [ADR-FETCHER](0019_fetcher.md), because the fetcher files live
+> there — so a record-shape template put in it would have been **owned by a
+> record with nothing to say about the record shape.** Moving it beside the
+> code that owns it makes the ownership correct *by construction* rather than
+> by a carve-out somebody has to remember. **This is W-82 §5.3's governance gap
+> firing on the change that cites it**, and the check caught it before a human
+> did.
+
 ### Alternatives considered
 
 - **SQLite.** Rejected: a binary file does not diff or merge, which forfeits

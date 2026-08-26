@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+from . import recordshape
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
 from .displaycache import DisplayCache
@@ -36,6 +37,7 @@ from .reader import (
 from .writer import HEADER_LINE, trim, hash_terms, write_index
 
 __all__ = [
+    "recordshape",
     "ANALYZER_VERSION",
     "COMMITTED",
     "DECLARED",

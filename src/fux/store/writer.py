@@ -46,6 +46,7 @@ from ..errors import FuxError
 from .canonical import canonical_dumps
 from .collisions import CollisionTracker
 from .displaycache import DisplayCache
+from . import recordshape
 from .format import HEADER, index_dir, shard_for, shard_path
 
 HEADER_LINE = canonical_dumps(HEADER)
@@ -100,7 +101,12 @@ def write_index(root: Path, records: list[dict]) -> list[Path]:
 #: Fields that carry text a human can read. A `hashed` record may hold none of
 #: them: the whole point is that the index reveals nothing the source system
 #: would not have shown this reader.
-DISPLAY_FIELDS = ("title", "phrases")
+#: Fields that carry text a human can read, **read from the record template**
+#: rather than restated here (W-83b). This tuple and the record's shape used to
+#: live in different modules and agreed only by habit: adding a display field
+#: meant remembering to touch this line, and forgetting was SILENT -- the field
+#: shipped and L5's check simply did not look at it.
+DISPLAY_FIELDS = recordshape.display_fields()
 
 
 def assert_meta_policy(record: dict, root: Path) -> None:
