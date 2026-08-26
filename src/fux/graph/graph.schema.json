@@ -1,0 +1,69 @@
+{
+  "_comment": [
+    "THE GRAPH PLANE -- .fux/runtime/graph.json, derived and gitignored.",
+    "",
+    "It had no declared shape at all, and it is the largest derived structure",
+    "fux writes: on this repo, 3 050 edges and 458 community assignments. It is",
+    "also the only derived file with NO guard of the DOCS_FIELDS kind -- the doc",
+    "table at least carries a field tuple the runtime version checks.",
+    "",
+    "WHY IT MATTERS DESPITE BEING DISPOSABLE: `explain`, `graph` and `path` read",
+    "it, and it is one of DETERMINISTIC_FILES -- two builds of the same index",
+    "must produce byte-identical graph.json. A shape that drifts does not just",
+    "break a verb; it breaks a byte-identity assertion that is checked, so the",
+    "failure surfaces somewhere other than the change that caused it."
+  ],
+
+  "schema": "fux.graph.v1",
+
+  "graph_plane": {
+    "_doc": [
+      "The whole file. Written with `sort_keys=False` and no indent -- the key",
+      "ORDER is therefore load-bearing here in a way it is not for the committed",
+      "record, because determinism comes from the writer emitting the same",
+      "sequence rather than from a sort. `communities` is built from a sorted",
+      "node list for the same reason.",
+      "",
+      "COMMUNITIES ARE UNSEEDED AND THAT IS THE STRONGER GUARANTEE. Label",
+      "propagation is random twice over and the reflex is `random.seed(0)`; a",
+      "fixed seed does not survive a Python version that reorders a set. The",
+      "randomness was REMOVED instead -- sorted visit order, ties broken on the",
+      "smallest label -- and a test asserts the ABSENCE of the import by parsing",
+      "the module's AST."
+    ],
+    "fields": {
+      "schema":      { "type": "str",  "required": "always", "doc": "pins the plane's version" },
+      "edges":       { "type": "list", "required": "always", "of": "list",
+                       "doc": "each element is [src, kind, dst, grade]" },
+      "communities": { "type": "dict", "required": "always",
+                       "doc": "node id -> community label, emitted in sorted node order" }
+    },
+    "example": {
+      "schema": "fux.graph.v1",
+      "edges": [
+        ["file:docs/mesh.md", "supersedes", "file:docs/adr-storage.md", "DECLARED"],
+        ["file:docs/mesh.md", "links", "file:docs/runbook-rollback.md", "INFERRED"]
+      ],
+      "communities": { "file:docs/mesh.md": 0, "file:docs/runbook-rollback.md": 0 }
+    }
+  },
+
+  "edge": {
+    "_doc": [
+      "One element of `edges`, a 4-tuple rather than an object: there are",
+      "thousands of them and the key names would be 60% of the file.",
+      "",
+      "`grade` is where a model-derived edge is distinguishable from a declared",
+      "one, and the distinction is the whole reason the field exists -- it is",
+      "why `inferred` was retired as an INGEST MODE name, because INFERRED is",
+      "the edge grade for model-derived and the collision would have been",
+      "silent."
+    ],
+    "positions": ["src", "kind", "dst", "grade"],
+    "src":   { "type": "str", "doc": "doc id the edge leaves" },
+    "kind":  { "type": "str", "doc": "the relation, e.g. supersedes / links" },
+    "dst":   { "type": "str", "doc": "doc id the edge enters" },
+    "grade": { "type": "str", "doc": "DECLARED (from the document) or INFERRED (derived)" },
+    "example": ["file:docs/mesh.md", "supersedes", "file:docs/adr-storage.md", "DECLARED"]
+  }
+}

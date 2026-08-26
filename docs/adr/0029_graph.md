@@ -340,6 +340,34 @@ fallback.
   Decisions 5 and 7 (unseeded propagation; derived not committed) are
   untouched by this finding.
 
+> **Amended 2026-08-26 — `graph.json` has a declared shape, and is checked
+> against it on load.**
+>
+> `graph/graph.schema.json` declares the plane: `schema` · `edges` · the
+> `communities` map, plus the 4-tuple `[src, kind, dst, grade]` an edge is.
+> `plane.load` validates the payload before trusting it.
+>
+> ⚠ **This was the largest derived structure fux writes and the one with NO
+> guard at all.** The doc table at least carries `DOCS_FIELDS`, which the
+> runtime version checks; the graph had neither. And unlike the doc table it is
+> one of `DETERMINISTIC_FILES` — two builds of the same index must produce
+> byte-identical `graph.json` — so a drifted shape does not merely break a verb,
+> it breaks a byte-identity assertion **that surfaces somewhere other than the
+> change that caused it.**
+>
+> **An edge is a 4-tuple rather than an object, and the schema says why**: there
+> are thousands of them and the key names would be most of the file. The schema
+> declares the positions instead, which is the honest way to describe a
+> positional shape rather than pretending it is a mapping.
+>
+> ⚠ **`grade` is where a model-derived edge is distinguishable from a declared
+> one**, and the schema records that this is why `inferred` was retired as an
+> *ingest mode* name — `INFERRED` is the edge grade for model-derived, and the
+> collision would have been silent.
+>
+> **Nothing about the walk, the communities or their unseeded determinism
+> changes.** This declares what was already written.
+
 ### Alternatives considered
 
 - **A Leiden-class algorithm with a fixed seed.** Rejected: Leiden needs a

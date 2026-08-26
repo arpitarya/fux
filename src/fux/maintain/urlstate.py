@@ -56,9 +56,31 @@ import json
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..schema import load as load_schema
 from ..store import fuxdir
 
 STATE_NAME = "url-state.json"
+
+#: The declared shapes, beside this module (`maintain/state.schema.json`).
+SCHEMA_NAME = "state.schema.json"
+
+
+def _shape(name: str):
+    """One shape out of the multi-shape schema file.
+
+    `state.schema.json` declares four related shapes rather than four files,
+    because they are written and read by the same two modules and versioned by
+    one string — the same argument the derived plane's schema makes.
+    """
+    return load_schema("fux.maintain", SCHEMA_NAME).shape(name)
+
+
+def _file_schema():
+    return _shape("url_state_file")
+
+
+def _health_schema():
+    return _shape("url_health")
 
 #: Consecutive failed fetches before `fux doctor` names a URL individually.
 #: A single failure is a flaky network; five in a row is a fact about the URL.
@@ -113,23 +135,32 @@ def read(root: Path) -> UrlState:
         return UrlState()
     if not isinstance(raw, dict):
         return UrlState()
-    seq = raw.get("run_seq")
-    urls_raw = raw.get("urls")
-    state = UrlState(run_seq=seq if isinstance(seq, int) and seq >= 0 else 0)
-    if isinstance(urls_raw, dict):
-        for url, entry in urls_raw.items():
-            if not isinstance(url, str) or not isinstance(entry, dict):
-                continue
-            state.urls[url] = UrlHealth(
-                last_seen_run=_int_or_none(entry.get("last_seen_run")),
-                last_changed_run=_int_or_none(entry.get("last_changed_run")),
-                fail_streak=_int_or_none(entry.get("fail_streak")) or 0,
-            )
+    # `coerce`, not a hand-rolled field-by-field check. Both do the same thing;
+    # the difference is that the schema is the ONE place a new field has to be
+    # declared, instead of a place plus a reader that must remember it.
+    top = _file_schema().coerce(raw)
+    state = UrlState(run_seq=max(0, top.get("run_seq", 0)))
+    health = _health_schema()
+    for url, entry in (top.get("urls") or {}).items():
+        if not isinstance(url, str):
+            continue
+        fields = health.coerce(entry)
+        state.urls[url] = UrlHealth(
+            last_seen_run=_non_negative(fields.get("last_seen_run")),
+            last_changed_run=_non_negative(fields.get("last_changed_run")),
+            fail_streak=max(0, fields.get("fail_streak", 0)),
+        )
     return state
 
 
-def _int_or_none(value) -> int | None:
-    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 0 else None
+def _non_negative(value) -> int | None:
+    """`coerce` guarantees the TYPE; this rejects a negative counter.
+
+    Kept separate on purpose — a run counter below zero is not a type error, it
+    is a value nobody could have written, and mixing the two into one check
+    would make the schema responsible for arithmetic it cannot see.
+    """
+    return value if isinstance(value, int) and value >= 0 else None
 
 
 def write(root: Path, state: UrlState) -> None:

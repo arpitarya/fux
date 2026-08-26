@@ -24,6 +24,78 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-26 — W-84: `ask` cites at heading level, and refuses to cite at line level  ·  Cowork
+- **Asked:** *"would it be a good idea to have ask at line level rather than
+  document level??"* — then, on the answer: *"Implement the heading level.
+  Create a work document, implement it, then close it out."*
+- **The answer given, and it is half the deliverable.** **No** to line level.
+  An `ask` line range could only be computed at ingest, so one edit makes it
+  point at the wrong lines **while looking exactly as right as before** — the
+  same defect class as `max_age_seconds` or a `cached` verdict reported as
+  `current`. It also costs a positional index (2–4× the postings, Zobel &
+  Moffat 2006 §5) against an index whose pitch is that it fits in git, and its
+  value is thinnest exactly where the cost is highest: `file:` sources are
+  already in the tree, and `url:` sources are the ones most likely to have
+  changed since ingest. **`answer` cites lines because it fetched the bytes.**
+- **Yes to heading level, and it is nearly free.** A record's `phrases` — its
+  headings, up to twelve — have been committed by `ingest/extract.py` all
+  along and were rendered by **`answer --no-refer` only**. Nothing new is
+  stored, extracted or computed.
+- **Did:** filed [W-84](../archive/open/W-84-heading-level-ask.md), built it,
+  closed it the same day. New `src/fux/query/headings.py`: analyze query and
+  phrase through the **one shared analyzer**, score by count of *distinct*
+  query terms, drop zeros, sort `(-matches, document position)`, cap at 3.
+  Rendered as indented `§` lines in `fux ask`, as an always-present
+  `"headings"` array in `ask/find --json`, and in the MCP `fux_search` payload.
+  **`fux find`'s piped stdout is byte-identical to before.** ADR-ASK
+  (decision 10) and ADR-MCP (decision 9) amended in the same change.
+  **21 new tests, 1 500 pass** (was 1 483 after W-83).
+- **Display-only, and that is the load-bearing part.** `headings_for` runs on
+  the already-unified result list after `run_query` returns — the position
+  `_resolve_title` occupies under P5 — so there is no seam for the differential
+  law to break through. Re-verified on this repo: `diff <(ask --json) <(ask
+  --json --fast)` is `IDENTICAL` with headings present.
+- **A live defect found on the way, and it is the same one twice.**
+  `fux_search`'s **MCP tool description** claimed *"line-range citations"* and
+  `_search` has never returned one — the identical wrong claim commit
+  `ad95a24` had fixed in `docs/guide.html` and the usage skills **earlier the
+  same day**, surviving in the machine-facing copy. Worse there: a human
+  notices a doc that disagrees with the output in front of them; an agent acts
+  on the description. Corrected and pinned by a test. ⚠ **Tool descriptions
+  are documentation compiled into the package and no gate reads them** —
+  `fux_passage`'s and `fux_related`'s are still unchecked.
+- **Decided / open:** no `--headings` flag (`find` is the pipeable verb and is
+  untouched; `ask` is the verb whose job is an actionable citation, so the
+  useful behaviour is the default) — **reopen if a real consumer's stdout parse
+  breaks**. `"headings"` is always present, `[]` when nothing matches, because
+  an absent key is a trap (W-48). Zero matches prints nothing, never the first
+  three headings. **No OPEN-WORK row was ever added**: the item opened and
+  closed in one session, and a row that would be deleted in the same change is
+  a tombstone.
+- ⚠ **NOT COMMITTED, and not for the usual reason.** A concurrent session is
+  mid-rename in this tree (`store/recordshape.py` → `recordschema.py`,
+  `index-record.json` → `index-record.schema.json`, plus edits to `doctor.py`,
+  `ingest/`, and these `work/` files). Committing would sweep a half-finished
+  rename into a W-84 commit. Arpit commits, or a later session does once the
+  tree is quiet.
+- ⚠ **`tests_e2e/` unverified** — the sandbox has Python 3.10 only and
+  github.com is blocked, so the unit suite ran under a harness-only `tomllib`
+  shim (`tomli`, the exact backport) that **never enters the repo**. The two
+  `test_doctor.py` failures are that shim correctly reporting `3.10 < 3.11`,
+  and they were failing before this change. Same limitation W-82's build
+  disclosed; **`tests_e2e/` needs a real 3.11+ install before release.**
+- **Next:** commit W-84 once the concurrent session's rename lands, then
+  W-82 §3.0 — run `fux update` twice on a real URL corpus.
+
+## 2026-08-26 — W-85: the property W-83 said it exposed was a comment, and had reached nobody  ·  Cowork
+- **Asked:** *"I wanted a property exposed. Where is that property? It should be present by default."* → offered the fork (live table vs. its own table) → **"never commented. If it is commented, throw an error that the value has to be present."**
+- **The two failures behind one complaint.** (1) W-83's line was `#max_parallel = 4`, **commented, inside an already-commented `[sources.url]` table** — a comment about a number, not a number. (2) `fux setup` is **write-if-missing**, so the template change reached **new repos and nobody else**; this repo's own `fux.toml` still showed the pre-W-83 block, which is the file Arpit opened.
+- **Did:** filed [W-85](../archive/open/W-85-max-parallel-is-required.md), built it, closed it. `max_parallel` is **required** whenever `[sources.url]` exists (`UrlSource.max_parallel` has no default; a missing key raises with the line to paste); `fux setup` writes `[sources.url]` **live**; this repo's `fux.toml` updated by hand; doctor's now-unreachable `unset` branch deleted; 6 fixtures updated. **ADR-CONFIG + ADR-DOTFUX amended in the same change. `tests/` 1 534 pass.**
+- **Decided / open:** ⚠ **A repo with no `[sources.url]` at all is exempt** — it fetches nothing, so a required bound there would be noise, and noise is how a safety value stops being read. ⚠ **One behaviour changed and it is not cosmetic:** `fux add <URL>` used to record the line and refuse to fetch; in a repo scaffolded after this it fetches. **The gate moved to `.fux/sources/urls` being empty** — L4's *explicit, fenced, opt-in* is satisfied by the verb, not by a commented table. If Arpit wants the old refusal back, that is one branch in `sources.py:cmd_add`.
+- **The rule this leaves behind, now in ADR-DOTFUX:** **a change to a write-if-missing template is a change for new repos only.** To reach existing ones the mechanism is a **loader refusal or a `doctor` check, never a rewrite** — a rewrite eats annotations, which is why `fux tune` prints a specimen.
+- ⚠ **Still not committed**, same reason as the W-83 entry below: the concurrent session has since added `src/fux/schema.py`, `W-86` and a `test_schemas.py`. Five of the seven suite failures are theirs; two are the 3.10 shim.
+- **Next:** none for W-85. Arpit may want to rule on whether `fux add <URL>` should still refuse when the URL list is empty.
+
 ## 2026-08-26 — W-83: the parallel-fetch default was in the record and not in the code  ·  Cowork
 - **Asked:** *"Whenever we run fux update or fux build or fux add URLs, there should be how many number of parallel requests can be triggered. Otherwise, it'll become one of a DDoS attack. Expose that property in fux.toml. Create a work document, then implement it and close it out."*
 - **Reconciled first, and it changed the item.** The knob already existed —
@@ -84,6 +156,17 @@ play: the worklog is the granular, per-exchange trail.
   releasing a version nobody could ever have installed; no fux behaviour
   changed by this session, so **no ADR affected**.
 - **Next:** none — release is live.
+
+## 2026-08-26 — five schemas, one mechanism, and the gate that discovers them  ·  Cowork
+- **Asked:** *"Create schema for all of them. and the schema should be used in the code."*
+- ✓ **`src/fux/schema.py` — one mechanism, five declarations.** Five small validators would have produced five subtly different ideas of what *required* means, which is the drift the whole exercise exists to stop.
+- ✓ **Five schemas, each beside the code it describes and each USED, not just tested:** `query/output.schema.json` (the only **public** shape — `fux answer --json` is validated against it **before printing**, so fux cannot emit JSON that violates its own contract); `graph/graph.schema.json` (validated on `plane.load`); `maintain/state.schema.json` (`coerce` replaced the hand-rolled `_int_or_none` and `isinstance` filters in both readers); `config.schema.json`; plus the two from earlier today.
+- ✓ **`tests/test_schemas.py` DISCOVERS schemas rather than listing them** — a sixth one next month is covered the moment it lands. It asserts every schema is loadable, declares a version id, carries an example per shape, **lives beside code** (not in a shared `schemas/` dir), and that **every example validates against its own declaration**. ⚠ It carries its own anti-vacuity check, because a discovery gate that discovers nothing passes for the wrong reason — R6 tier 1's failure.
+- ⚠ **The gate immediately caught two bugs in my own mechanism**, which is the whole argument for it: `Schema` assumed `fields` was a mapping and **crashed on the offset table's ORDERED list** — a binary layout's order *is* the format, so `positional` is now a first-class case rather than a shape forced to pretend it is an object; and my example-check treated the top-level `examples` map as if it were a shape.
+- ⚠ **The ADR guard again did real work.** `src/fux/schema.py` was claimed by no record; it now sits under **ADR-LAWS beside `errors.py`**, for the same reason — cross-cutting, and ADR-LAWS is the one record that legitimately spans planes. **The schema FILES are deliberately not there**: each lives beside its code so ownership is correct by construction. `tests/test_adr_ownership.py` updated in the same change, as the rule requires.
+- ⚠ **A concurrent session is editing the same tree hard.** They extended my `query/output.schema.json` with `headings` for W-84 (heading-level `ask` — the design I recommended two turns ago), changed `max_parallel` semantics twice (W-83, then W-85 making it required), and left `config.py` momentarily un-importable mid-write. **I committed only my own paths** and aligned my config schema to their code rather than the reverse.
+- **Verification: 1 539 unit tests green.** ⚠ `tests_e2e/` still unverified here.
+- **Next:** unchanged — W-82 §3.0.
 
 ## 2026-08-26 — "template" was the wrong word, and the derived plane got a schema  ·  Cowork
 - **Asked:** *"Rather than calling a template, let's call it schema and create schema for postings as well. Add an example in schema as well… can you think of any other file that needs a schema?"*

@@ -353,6 +353,7 @@ the check, so a component cannot stay unowned by accident.
 |---|---|---|
 | `src/fux/__init__.py` | ADR-LAWS | package identity and version |
 | `src/fux/errors.py` | ADR-LAWS | the single flat `FuxError` — CLAUDE.md §Error contract |
+| `src/fux/schema.py` | ADR-LAWS | the **one** schema mechanism every plane's declared shape loads through. Here for the same reason `errors.py` is: it is cross-cutting, and ADR-LAWS is the one record that legitimately spans planes. **The schema FILES are not here** — each lives beside the code it describes, so its ownership is correct by construction |
 | `src/fux/frontmatter.py` | ADR-LAWS | hand-rolled parser — law L1, `$0` stdlib-only |
 | `src/fux/config.py` | ADR-CONFIG | `fux.toml` schema; the opaque `[sources.url.config]` table. `[ranking]` and `[dense]` were retired out of it 2026-08-24 and now raise, naming `.fux/tune.toml` |
 | `src/fux/tune.py` | ADR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it, and this module deliberately does not duplicate it |

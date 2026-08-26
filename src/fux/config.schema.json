@@ -1,0 +1,96 @@
+{
+  "_comment": [
+    "fux.toml -- POLICY, not corpus. The one schema here that is CONSUMER-FACING:",
+    "a human writes this file by hand, so its failure mode is not drift between",
+    "two modules but a typo that costs someone an afternoon.",
+    "",
+    "WHAT IS DECLARED HERE AND WHAT IS NOT, because the boundary is the point:",
+    "",
+    "  fux.toml       policy -- where things live, how to reach them",
+    "  .fux/sources/  the CORPUS -- one entry per line, so 5k entries diff and",
+    "                 merge line by line instead of as one TOML array",
+    "  .fux/tune.toml every knob that changes ORDERING and none that changes the",
+    "                 index, decided by one mechanical test",
+    "",
+    "[sources.url.config] IS DELIBERATELY OPAQUE AND IS NOT DECLARED FIELD BY",
+    "FIELD. Fux validates that it is a table and never reads a key inside it --",
+    "PEP 518's [tool.*] discipline. Typing `cdp_port` or `settle_ms` into this",
+    "schema would breach the adapter cap through the back door: it would put one",
+    "fetcher's vocabulary into fux's config surface, where every future fetcher",
+    "would have to be argued against it. That is why its type is `dict` and",
+    "stops there."
+  ],
+
+  "schema": "fux.config.v1",
+
+  "sources": {
+    "_doc": "The `[sources]` table. Everything has a default; the keys exist to be seen rather than to be required.",
+    "fields": {
+      "dirs_file":  { "type": "str", "required": "never", "default": ".fux/sources/dirs",
+                      "doc": "the committed directory list" },
+      "types_file": { "type": "str", "required": "never", "default": ".fux/sources/types",
+                      "doc": "OPTIONAL. Absent means the built-in prose allowlist; present REPLACES it entirely -- an absent file never means index-everything and never means index-nothing" }
+    },
+    "example": { "dirs_file": ".fux/sources/dirs" }
+  },
+
+  "sources_url": {
+    "_doc": [
+      "The `[sources.url]` table. Its PRESENCE enables URL ingestion; absent",
+      "means fux never imports a fetcher at all.",
+      "",
+      "Three layers resolve every attribute, in one order: the built-in default,",
+      "then this table, then the line in `.fux/sources/urls`. A line beats both,",
+      "and only ever for its own URL."
+    ],
+    "fields": {
+      "fetcher":      { "type": "str",  "required": "never", "default": ".fux/fetchers/http.py",
+                        "doc": "the file a line with no `fetch=` uses, AND the directory `fetch=cdp` resolves in -- one key carries both, so relocating your fetchers is a one-line change" },
+      "urls_file":    { "type": "str",  "required": "never", "default": ".fux/sources/urls" },
+      "meta":         { "type": "str",  "required": "never", "default": "hashed",
+                        "enum": ["hashed", "plain"],
+                        "doc": "L5's privacy FLOOR for this source. A line may loosen it to `plain` for one public document; there is deliberately no way to make one line stricter" },
+      "max_parallel": { "type": "int",  "required": "when-url-configured",
+                        "doc": "URLs in flight at once. ⚠ REQUIRED whenever [sources.url] exists (W-85) -- every other key here has a default and this one does not, because a repo that CAN fetch must say how hard in a number a person can read. Below 1 refuses; above the fetcher's declared MAX_PARALLEL is clamped down loudly, because a declaration answers what is SAFE and this answers what is POLITE" },
+      "config":       { "type": "dict", "required": "never", "default": {},
+                        "doc": "passed VERBATIM to the fetcher's configure(). Fux never reads a key inside it -- see the note at the head of this file" }
+    },
+    "example": {
+      "fetcher": ".fux/fetchers/http.py",
+      "urls_file": ".fux/sources/urls",
+      "meta": "hashed",
+      "max_parallel": 4,
+      "config": { "cdp_port": 9222 }
+    }
+  },
+
+  "agents": {
+    "_doc": [
+      "The `[agents]` table -- which vendors `fux setup` writes instruction",
+      "files for.",
+      "",
+      "DECLARED, NEVER DETECTED. Fux does not sniff the filesystem for a",
+      "`.claude/` directory and infer intent from it; a declaration is exact for",
+      "the repo it was written in, and a silent convention everywhere else.",
+      "`install = []` installs none."
+    ],
+    "fields": {
+      "install": { "type": "list", "required": "never", "of": "str",
+                   "doc": "any of: claude, copilot, kiro. Absent means all of them; [] means none" }
+    },
+    "example": { "install": ["claude", "kiro"] }
+  },
+
+  "_retired_keys": {
+    "_doc": [
+      "Keys that once existed and now STOP THE RUN with instructions rather than",
+      "being ignored. A silently-ignored key is a config a person believes is in",
+      "force and is not.",
+      "",
+      "Both were breaking changes taken deliberately while they were cheapest."
+    ],
+    "middleware": "renamed to `fetcher`; the file also moved from .fux/middleware/ to .fux/fetchers/",
+    "sources.dirs": "the corpus left fux.toml for `.fux/sources/dirs`, one entry per line",
+    "ranking": "moved to `.fux/tune.toml` -- it changes ordering, not the index"
+  }
+}

@@ -90,5 +90,18 @@ def load(root: Path) -> GraphPlane:
             "run `fux build` to rebuild the derived plane"
         )
 
+    # Checked against `graph/graph.schema.json` before it is trusted. This is
+    # the largest derived structure fux writes and it had NO guard of the
+    # DOCS_FIELDS kind -- and unlike the others it is one of
+    # DETERMINISTIC_FILES, so a drifted shape breaks a byte-identity assertion
+    # that surfaces somewhere other than the change that caused it.
+    _schema().validate(payload, label=str(path))
     edges = [Edge(src=s, kind=k, dst=d, grade=g) for s, k, d, g in payload["edges"]]
     return GraphPlane(Graph(edges), dict(payload["communities"]))
+
+
+def _schema():
+    """The declared shape of `graph.json`, beside this module."""
+    from ..schema import load as load_schema
+
+    return load_schema("fux.graph", "graph.schema.json").shape("graph_plane")

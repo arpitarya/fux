@@ -1,0 +1,129 @@
+{
+  "_comment": [
+    "THE ONLY PUBLIC SHAPE FUX HAS.",
+    "",
+    "Everything else declared in this repo is internal -- the committed record,",
+    "the derived plane, the graph, the local state. This one is parsed by other",
+    "people's agents, and it is the one that had no declaration at all.",
+    "",
+    "ADR-ANSWER already tells callers to switch on `source`, and ADR-ASK's",
+    "archived-results policy tells them to branch on the `archived` BOOLEAN",
+    "rather than on prose -- two contracts stated in prose, checked by nothing.",
+    "A key quietly renamed here breaks a consumer silently, at their end, with",
+    "no error on ours.",
+    "",
+    "`fux answer --json` is validated against this before it is printed, so fux",
+    "cannot emit JSON that violates its own contract. That costs microseconds on",
+    "a payload of a handful of keys and buys a promise worth making."
+  ],
+
+  "schema": "fux.output.v1",
+
+  "ask_result": {
+    "_doc": [
+      "One element of `fux ask --json`'s `results` array, and of `fux find",
+      "--json`'s. DOCUMENT-LEVEL: `loc` is a path or a URL and carries NO line",
+      "range. Only `fux answer` cites a span -- see `answer_citation`.",
+      "",
+      "That is law L4 showing through the surface, not an omission: a line range",
+      "can only be computed by chunking the FETCHED bytes, the index holds",
+      "statistics rather than text, and `ask` is offline by default.",
+      "",
+      "SECTION-LEVEL, THOUGH, SINCE W-84 (2026-08-26): `headings` names the",
+      "document's committed headings that match the query. A heading is not a",
+      "span -- no fetch, no chunking, no line arithmetic -- and it survives the",
+      "document being edited, which is precisely what a line range computed at",
+      "ingest would not. ADR-ASK decision 10 carries the argument.",
+      "",
+      "-- added by the W-84 session, 2026-08-26. This file was untracked and in",
+      "flight in a CONCURRENT session at the time; if that session rewrites it,",
+      "`headings` must come back, or this declaration is false."
+    ],
+    "fields": {
+      "id":       { "type": "str",  "required": "always", "doc": "the committed record's id" },
+      "title":    { "type": "str",  "required": "always", "doc": "display title, or a labelled hash under L5" },
+      "loc":      { "type": "str",  "required": "always", "doc": "path or URL -- no line range" },
+      "score":    { "type": "any",  "required": "always", "doc": "float; the one place a float is legal, because this is output and not a committed byte" },
+      "archived": { "type": "bool", "required": "always", "doc": "BRANCH ON THIS, never on the prose note" },
+      "headings": { "type": "any",  "required": "always",
+                    "doc": "list[str] -- the document's headings matching the query, best first, at most 3. ALWAYS PRESENT: `[]` means nothing matched, or the record is `hashed` and carries no display text at all (L5). An absent key would be indistinguishable from an older fux (W-48)" }
+    },
+    "example": {
+      "id": "file:docs/mesh.md",
+      "title": "Service mesh",
+      "loc": "docs/mesh.md",
+      "score": 5.9021,
+      "archived": false,
+      "headings": ["Rollback procedure"]
+    }
+  },
+
+  "answer_citation": {
+    "_doc": [
+      "`fux answer --json`'s `citation`. SPAN-LEVEL: `loc` carries a 1-based,",
+      "inclusive line range, because an agent acts on a citation by opening a",
+      "file at a line.",
+      "",
+      "`freshness` is the four-state verdict and `cached` is NEVER folded into",
+      "`current` -- collapsing 'we did not look' into 'we looked and it was",
+      "fine' is the failure the refer plane exists to prevent."
+    ],
+    "fields": {
+      "id":        { "type": "str", "required": "always" },
+      "loc":       { "type": "str", "required": "always", "doc": "path:L<start>-L<end>, 1-based inclusive" },
+      "sha":       { "type": "str", "required": "always", "doc": "of the bytes actually cited" },
+      "freshness": { "type": "str", "required": "always",
+                     "enum": ["current", "stale", "unverified", "cached"] }
+    },
+    "example": {
+      "id": "file:docs/mesh.md",
+      "loc": "docs/mesh.md:L10-L13",
+      "sha": "516bef06781262a0a64b10027316c18d668eeccb",
+      "freshness": "current"
+    }
+  },
+
+  "answer_payload": {
+    "_doc": [
+      "The whole of `fux answer --json`.",
+      "",
+      "`source` is the key ADR-ANSWER tells callers to switch on, and it is",
+      "REQUIRED ON EVERY BRANCH -- including the no-match one, where `answer`",
+      "and `citation` are both absent. An absent key is a trap, not a signal",
+      "(W-48), which is why it is `required: always` here rather than described",
+      "as usually-present."
+    ],
+    "fields": {
+      "answer":   { "type": "any", "required": "never",
+                    "doc": "an object with `passages`, or null on no match" },
+      "citation": { "type": "any", "required": "never",
+                    "doc": "an `answer_citation`, or null on no match" },
+      "source":   { "type": "str", "required": "always", "enum": ["refer", "index"],
+                    "doc": "refer = fetched and re-scored; index = the M2 shape" }
+    },
+    "example": {
+      "answer": { "passages": [
+        { "heading": "Rollback procedure", "text": "Drain the sidecar and fail open.", "score": 2.689 }
+      ] },
+      "citation": {
+        "id": "file:docs/mesh.md", "loc": "docs/mesh.md:L10-L13",
+        "sha": "516bef06781262a0a64b10027316c18d668eeccb", "freshness": "current"
+      },
+      "source": "refer"
+    }
+  },
+
+  "passage": {
+    "_doc": "One element of `answer.passages`, in assembled order.",
+    "fields": {
+      "heading": { "type": "str", "required": "always", "doc": "the section heading, or empty for a preamble" },
+      "text":    { "type": "str", "required": "always", "doc": "verbatim from the fetched bytes" },
+      "score":   { "type": "any", "required": "always", "doc": "float" }
+    },
+    "example": {
+      "heading": "Rollback procedure",
+      "text": "Drain the sidecar and fail open to direct routing.",
+      "score": 2.689
+    }
+  }
+}

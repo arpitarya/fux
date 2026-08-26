@@ -454,6 +454,32 @@ legal, explicit, per-document opt-out
 > W-75 had specified `validated_at` / `changed_at`; shipping them would have
 > been a quiet contradiction of an accepted record.
 
+> **Amended 2026-08-26 — this package's two local state files have a declared
+> shape, and the readers use it.**
+>
+> `maintain/state.schema.json` declares `url-state.json`, its per-URL health
+> entry, `url-shas.json` and `last-cited.json`. Both readers now call
+> `schema.coerce` instead of hand-rolling per-field suspicion — an
+> `_int_or_none` helper in one file, an `isinstance` filter in the other.
+>
+> **The defensiveness was right and survives.** These files can be truncated by
+> a killed runner, hand-edited by someone debugging a failing URL, or written by
+> an older fux, so a reporting plane must degrade rather than raise. What
+> changed is *where* that tolerance lives: `coerce` keeps declared, well-typed
+> fields and drops the rest, so **a new field is declared in one place instead
+> of a place plus a reader that must remember it.**
+>
+> ⚠ **The schema records the constraint that shaped the file**: these counters
+> are **runs, never seconds**, because `refer/fetchcache.py` states that wall
+> clock lives in the TTL store and nowhere else. W-75 had specified
+> `validated_at` and `changed_at`; shipping them would have quietly contradicted
+> an accepted record.
+>
+> **`token` is declared absent on purpose** — it belongs to the optional
+> `validate()` fetcher function, which is an unruled fork gated on a
+> measurement. Declaring a field nothing writes is how a knob that cannot work
+> ships.
+
 ### Alternatives considered
 
 - **`pre-commit` with `git stash --keep-index`.** Rejected: decision 1.

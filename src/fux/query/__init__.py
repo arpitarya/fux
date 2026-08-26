@@ -8,6 +8,23 @@
 | `find` | ranked documents, terse — one line per hit | unchanged |
 | `answer` | the single best answer, assembled from the index | becomes extractive over fetched content |
 
+## `ask` is heading-level; `answer` is line-level (W-84, 2026-08-26)
+
+**`ask` names the sections that match, `answer` names the lines.** The split is
+L2 and L4 showing through the surface, not an omission:
+
+- A **line range** can only be computed by chunking **fetched** bytes, which is
+  what `answer` does and `ask`, offline by default, does not. A range computed
+  at ingest would describe the document as it was then and point somewhere
+  wrong after one edit, while looking exactly as right.
+- A **heading** is already committed — `phrases` on every plain record, put
+  there by `ingest/extract.py`. Naming the matching ones costs no positional
+  index, no fetch and no byte. Its staleness exposure is `title`'s exactly.
+
+The selection lives in [`headings.py`](headings.py) and is **display-only**:
+it runs on the already-unified result list after `run_query` returns, like
+`_resolve_title` (P5), so it can never reach a score or an ordering.
+
 **`answer` is honest about its ceiling.** The archived engine's `answer` was
 extractive TextRank over cached document content; this build commits
 statistics, not content, and the refer plane that fetches it is M4. So M2's
@@ -156,6 +173,37 @@ def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
     return rerank.rerank(root, query, results, weight=weight)[:top]
 
 
+# -- the output contract -------------------------------------------------------
+
+#: The declared shape of what `--json` prints, beside this module
+#: (`query/output.schema.json`). **The only PUBLIC shape fux has**: everything
+#: else declared in this repo is internal, and this one is parsed by other
+#: people's agents.
+OUTPUT_SCHEMA = "output.schema.json"
+
+
+def _emit(payload: dict, shape: str) -> None:
+    """Validate against the output contract, then print.
+
+    **Fux cannot emit JSON that violates its own contract**, and that is worth
+    a few microseconds on a payload of a handful of keys. ADR-ANSWER already
+    tells callers to switch on `source` and ADR-ASK tells them to branch on the
+    `archived` boolean — two promises stated in prose and checked by nothing
+    until now. A key quietly renamed here breaks a consumer silently, at their
+    end, with no error at ours.
+
+    ⚠ **A contract violation is a BUG IN FUX, so it raises rather than
+    degrading.** That is the opposite of how the reading paths behave, and
+    deliberately: `coerce` exists because a file on disk may have been written
+    by an older version or a killed process, and neither applies to a dict this
+    process built three lines ago.
+    """
+    from ..schema import load as load_schema
+
+    load_schema("fux.query", OUTPUT_SCHEMA).shape(shape).validate(payload, label=f"--json {shape}")
+    print(json_mod.dumps(payload, indent=2))
+
+
 def _root() -> Path:
     root = find_root()
     if root is None:
@@ -244,6 +292,19 @@ def _declare_no_accelerator(root: Path) -> None:
 #: ADR-ARCHIVED-CONTENT decision 3 — the per-result marker in text output.
 ARCHIVED_MARKER = "[archived]"
 
+#: W-84 — what precedes a matched heading in `ask`'s text output. The section
+#: sign, because that is what a section reference has looked like in print for
+#: four centuries and no reader has to be taught it.
+SECTION_MARKER = "§"
+
+
+def _headings_for(record: dict | None, query: str) -> list[str]:
+    """W-84's matched headings — imported lazily so `find`'s hot path and every
+    caller that never renders one pays nothing for the analyzer import."""
+    from .headings import headings_for
+
+    return headings_for(record, query)
+
 
 def _declare_archived(results, weight: float) -> None:
     """ADR-ARCHIVED-CONTENT decision 7: a response-level note when any archived
@@ -294,7 +355,7 @@ def cmd_ask(args) -> int:
         # answered a slow query needs it in the machine-readable form too. The
         # key is additive and appears only when asked for, so no existing
         # consumer's parse changes (W-48).
-        payload: dict = {"results": [_as_dict(root, r) for r in results]}
+        payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
         if getattr(args, "explain", False):
             payload["path"] = path
         print(json_mod.dumps(payload, indent=2))
@@ -305,9 +366,16 @@ def cmd_ask(args) -> int:
         print("No confident matches.")
         return 0
 
+    # W-84 — the matched headings under each hit. **Indented, never on the
+    # citation line**: the `(loc)` a reader copies must stay a bare locator,
+    # and a heading is not part of one. `find` is the verb for piping and is
+    # deliberately unchanged.
     for r in results:
+        record = _record_for(root, r.id)
         mark = f"{ARCHIVED_MARKER} " if r.archived else ""
-        print(f"{r.score:.4f}  {mark}{_resolve_title(root, r.id, r.title)}  ({r.loc})")
+        print(f"{r.score:.4f}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
+        for heading in _headings_for(record, args.query):
+            print(f"        {SECTION_MARKER} {heading}")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
     _declare_archived(results, tune.archived_weight)
@@ -322,7 +390,11 @@ def cmd_find(args) -> int:
     _declare_no_accelerator(root)
 
     if args.json:
-        print(json_mod.dumps({"results": [_as_dict(root, r) for r in results]}, indent=2))
+        print(
+            json_mod.dumps(
+                {"results": [_as_dict(root, r, args.query) for r in results]}, indent=2
+            )
+        )
         _declare_archived(results, tune.archived_weight)
         return 0
 
@@ -362,11 +434,7 @@ def cmd_answer(args) -> int:
             # `"source"` is the key ADR-ANSWER tells callers to switch on when
             # the refer plane lands, so it must be present on the no-match
             # branch too — an absent key is a trap, not a signal (W-48).
-            print(
-                json_mod.dumps(
-                    {"answer": None, "citation": None, "source": "index"}, indent=2
-                )
-            )
+            _emit({"answer": None, "citation": None, "source": "index"}, "answer_payload")
         else:
             print("No confident matches.")
         return 0
@@ -527,16 +595,37 @@ def _resolve_title(root: Path, doc_id: str, fallback_title: str) -> str:
     two paths disagree. Re-reads one shard rather than trusting
     `fallback_title`'s shape to reveal whether the record is hashed.
     """
+    return _title_from(root, _record_for(root, doc_id), fallback_title)
+
+
+def _title_from(root: Path, record: dict | None, fallback_title: str) -> str:
+    """`_resolve_title`'s second half, split out so a caller that already holds
+    the record does not read the same shard twice.
+
+    W-84: `ask` needs the record for its `phrases` as well as its title, and
+    two lookups per result for one record is a cost with no reader. The
+    behaviour is `_resolve_title`'s exactly — that name is what ADR-ASK cites
+    and what P5 decided, and it still does what it says.
+    """
     from .. import store as store_mod
 
-    record = _record_for(root, doc_id)
     if record is None:
         return fallback_title
     return store_mod.display_title(record, cache=store_mod.DisplayCache(root))
 
 
-def _as_dict(root: Path, result: AskResult) -> dict:
-    """`AskResult` as JSON, with `title` upgraded through the P5 display cache."""
+def _as_dict(root: Path, result: AskResult, query: str) -> dict:
+    """`AskResult` as JSON, with `title` upgraded through the P5 display cache
+    and W-84's matched `headings` alongside it.
+
+    **`headings` is always present, even when empty.** An absent key is a trap,
+    not a signal (W-48) — a caller cannot tell "this document has no matching
+    heading" from "this version of fux does not do headings". Both paths
+    produce it from the same committed record, so the differential law is
+    untouched: it is a function of a list the two generators already agree on.
+    """
+    record = _record_for(root, result.id)
     payload = dict(result.__dict__)
-    payload["title"] = _resolve_title(root, result.id, result.title)
+    payload["title"] = _title_from(root, record, result.title)
+    payload["headings"] = _headings_for(record, query)
     return payload
