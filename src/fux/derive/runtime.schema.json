@@ -1,0 +1,145 @@
+{
+  "_comment": [
+    "THE DERIVED PLANE'S SHAPES, declared once. Everything here lives under",
+    ".fux/runtime/ -- gitignored, disposable, rebuildable from the committed",
+    "shards alone by `fux build`.",
+    "",
+    "WHY A DERIVED PLANE NEEDS A SCHEMA AT ALL, given it is disposable: because",
+    "disposable is not the same as harmless. The accelerator must return",
+    "byte-identical results to the reference scan (the differential law), so a",
+    "shape that drifts does not corrupt the index -- it makes ONE OF THE TWO",
+    "PATHS DISAGREE, which is a fast wrong answer.",
+    "",
+    "That is not hypothetical. On 2026-08-23 `superseded` and `mtime` were added",
+    "to the doc table while RUNTIME_SCHEMA stayed put, so an accelerator built",
+    "minutes earlier kept being read: `ask --scan` applied a supersession",
+    "demotion and `ask --fast` did not. DOCS_FIELDS exists because of that day.",
+    "This file is the same idea, extended to the shapes that had no such guard.",
+    "",
+    "IT COVERS THE WHOLE PLANE, NOT JUST POSTINGS, and that is deliberate: the",
+    "four shapes are written by one build, read by one query path, and versioned",
+    "by one string. Splitting them into four files would invite three of them to",
+    "be updated and the fourth forgotten -- which is precisely the failure mode",
+    "above, in a new costume."
+  ],
+
+  "schema": "fux.runtime.v5",
+
+  "postings_block_line": {
+    "_doc": [
+      "One line of .fux/runtime/postings/<xx>.jsonl -- term-major, the shape the",
+      "accelerator reads. `xx` is the term hash's first byte, mirroring the",
+      "committed shard addressing.",
+      "",
+      "A block holds at most BLOCK_SIZE postings. Splitting is what lets the",
+      "block-max bound skip a whole run of documents without decoding them.",
+      "",
+      "The tf array is PER FIELD and its length is the number of fields the",
+      "document actually uses -- trailing zeros are trimmed, which is why the",
+      "example below shows arrays of 1, 2 and 3 rather than always 5."
+    ],
+    "layout": ["term_hash", "postings"],
+    "term_hash": { "type": "str", "chars": 16, "doc": "hex, the committed key" },
+    "postings": {
+      "type": "list",
+      "element": ["docidx", "tf_per_field"],
+      "docidx": { "type": "int", "doc": "row in docs.jsonl, ascending within a block" },
+      "tf_per_field": {
+        "type": "list", "of": "int", "max_len": 5,
+        "doc": "body, heading, title, path, ctx -- trailing zeros trimmed"
+      }
+    },
+    "example": ["000219ac0fa26dbb", [[0, [0, 2]], [2, [2, 1]], [4, [5]], [17, [5, 0, 1]]]]
+  },
+
+  "offset_table_entry": {
+    "_doc": [
+      "One fixed-width record of .fux/runtime/postings/<xx>.idx -- a binary side",
+      "table, NOT a JSONL retreat. Reading a block's max impact by string-slicing",
+      "the block line measured 397ms -> 44ms; a struct.unpack at a computed index",
+      "is strictly cheaper and leaves the block line honestly valid JSON.",
+      "",
+      "Entries are sorted by (term, block_no), so a term's blocks are one bisect",
+      "and then a contiguous run.",
+      "",
+      "WAS 40 BYTES until W-76 Phase 1. `mx` and `mnw` were single WEIGHTED",
+      "scalars, and a weighted extremum cannot be stored once when the weights",
+      "are query-time tune keys -- it would go stale the moment someone edited",
+      "tune.toml, and only on the accelerator path, which is a differential-law",
+      "break rather than a slow query. They are now per-field and UNWEIGHTED,",
+      "recombined at the query's own weights by `accel.block_bound`."
+    ],
+    "struct": "<8sHQI5H5IIIH",
+    "size_bytes": 62,
+    "fields": [
+      { "name": "term",      "code": "8s",  "doc": "raw 8-byte term hash (the 16-hex key, unhexlified)" },
+      { "name": "block_no",  "code": "H",   "doc": "block ordinal within the term, from 0" },
+      { "name": "offset",    "code": "Q",   "doc": "byte offset of the block line in its postings shard" },
+      { "name": "length",    "code": "I",   "doc": "byte length of the block line, newline excluded" },
+      { "name": "mx",        "code": "5H",  "doc": "per-field MAX unweighted tf in the block" },
+      { "name": "mnw",       "code": "5I",  "doc": "per-field MIN flen in the block" },
+      { "name": "first_doc", "code": "I",   "doc": "lowest docidx in the block" },
+      { "name": "last_doc",  "code": "I",   "doc": "highest docidx in the block" },
+      { "name": "count",     "code": "H",   "doc": "postings in the block" }
+    ],
+    "_why_both_extrema": [
+      "A term's BM25F contribution is increasing in weighted tf AND decreasing",
+      "in flen, so an upper bound over a block needs the maximum of the first",
+      "and the minimum of the second. `mx` alone is valid but loose.",
+      "",
+      "Per-field extrema OVER-estimate mx and UNDER-estimate mnw relative to the",
+      "true weighted extremum, and both errors push the bound UP -- so a block",
+      "that could contain a winner is never skipped. Measured cost: +0.0% blocks",
+      "scanned, because 92.5% of postings are single-field, which makes the",
+      "per-field sum exact rather than loose."
+    ],
+    "example": {
+      "term": "000219ac0fa26dbb", "block_no": 0, "offset": 0, "length": 3184,
+      "mx": [5, 2, 1, 0, 0], "mnw": [10, 0, 0, 0, 0],
+      "first_doc": 0, "last_doc": 127, "count": 128
+    }
+  },
+
+  "docs_table_line": {
+    "_doc": [
+      "One line of .fux/runtime/docs.jsonl -- the docidx-ordered table every",
+      "other derived structure joins against. Line N is docidx N.",
+      "",
+      "THE FIELD SET IS PART OF THE RUNTIME CONTRACT and `is_fresh` checks it.",
+      "A schema string only moves when someone remembers to move it; this field",
+      "set moves whenever the table does, because it IS the table."
+    ],
+    "fields": {
+      "id":         { "type": "str",  "doc": "the committed record's id" },
+      "loc":        { "type": "str",  "doc": "path or URL" },
+      "title":      { "type": "str",  "doc": "display title, or the labelled hash for a hashed record" },
+      "flen":       { "type": "list", "of": "int", "doc": "per-field token counts, trailing zeros trimmed" },
+      "archived":   { "type": "bool" },
+      "superseded": { "type": "bool" },
+      "mtime":      { "type": "int",  "doc": "git commit time -- NOT wall clock at build time" }
+    },
+    "example": {
+      "archived": false, "flen": [990, 6, 1, 2], "id": "file:README.md",
+      "loc": "README.md", "mtime": 1787688862, "superseded": false, "title": "Fux"
+    }
+  },
+
+  "stats": {
+    "_doc": [
+      "The whole of .fux/runtime/stats.json -- the corpus-wide numbers BM25F",
+      "length normalization reads.",
+      "",
+      "`total_flen` is RAW and per-field. It was a single pre-weighted",
+      "`total_wlen` until 2026-08-24: once field weights became tune.toml keys, a",
+      "weighted total stored here would move `avg_wlen` on the scan path and not",
+      "on the accelerator path. Storing raw and weighting at query time is what",
+      "keeps the two paths equal."
+    ],
+    "fields": {
+      "n":            { "type": "int",  "doc": "documents in the index" },
+      "newest_mtime": { "type": "int",  "doc": "max mtime, for the recency prior" },
+      "total_flen":   { "type": "list", "of": "int", "len": 5, "doc": "raw per-field token totals" }
+    },
+    "example": { "n": 508, "newest_mtime": 1787728844, "total_flen": [637866, 21752, 3380, 4524, 0] }
+  }
+}

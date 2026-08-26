@@ -367,6 +367,39 @@ and the differential harness now carries a hashed record to prove it.
 > firing on the change that cites it**, and the check caught it before a human
 > did.
 
+> **Amended 2026-08-26 (later) — it is called a SCHEMA, and the derived plane
+> has one too.**
+>
+> *Template* was the wrong word (Arpit): a template is something you copy and
+> fill in — which is exactly what `templates/http.py.txt` is. This file is not
+> copied anywhere. It **declares a shape and is checked against the code**, so
+> it is a schema, and the vocabulary now says so:
+> `store/index-record.schema.json`, loaded by `store/recordschema.py`.
+>
+> **`derive/runtime.schema.json` declares the derived plane** — the postings
+> block line, the 62-byte offset-table entry, the doc table and `stats.json` —
+> and it covers all four rather than only postings, deliberately: they are
+> written by one build, read by one query path, and versioned by **one string**.
+> Four files would invite three to be updated and the fourth forgotten.
+>
+> ⚠ **A disposable plane still needs a schema, and the reason is not tidiness.**
+> The accelerator must return byte-identical results to the reference scan, so a
+> shape that drifts does not corrupt the index — **it makes one of the two paths
+> disagree, which is a fast wrong answer.** On 2026-08-23 `superseded` and
+> `mtime` were added to the doc table while `RUNTIME_SCHEMA` stayed put, and
+> `ask --scan` applied a supersession demotion that `ask --fast` did not.
+> `DOCS_FIELDS` exists because of that day; this extends the idea to the shapes
+> that had no such guard — above all the **struct string**, which the docstring
+> table described in prose and nothing checked, and which has already been wrong
+> once (the entry grew 40 → 62 bytes).
+>
+> **Every declared shape carries a worked example, and the examples are tested**
+> — not decorated. The record schema's two examples are `validate()`d *and*
+> pushed through `canonical_dumps`, because an example that validates but cannot
+> be written is still a lie about what a record looks like. The offset entry's
+> example is packed and round-tripped. **A test asserts every shape has one**,
+> since a shape without an example is a shape somebody will guess at.
+
 ### Alternatives considered
 
 - **SQLite.** Rejected: a binary file does not diff or merge, which forfeits

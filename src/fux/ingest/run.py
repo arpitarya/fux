@@ -259,7 +259,7 @@ def run(
 
     for wf in files:
         doc_id = f"file:{wf.rel_path}"
-        record = store_mod.recordshape.build(
+        record = store_mod.recordschema.build(
             id=doc_id,
             src="git",
             loc=wf.rel_path,
@@ -294,7 +294,7 @@ def run(
 
     for doc_id in sorted(fresh):
         fields = extracted[doc_id]
-        record = store_mod.recordshape.build(
+        record = store_mod.recordschema.build(
             id=doc_id,
             src="url",
             loc=_loc_of(doc_id),
@@ -410,7 +410,7 @@ _STOP_EVERY = 64
 #: therefore the only ones a delta run may carry forward. `edges` is absent on
 #: purpose, and `sha`/`ver` are recomputed because that is what they are for.
 #: Pure functions of bytes that have not changed, so a delta ingest may reuse
-#: the prior value. **Read from the record template** (W-83b) rather than
+#: the prior value. **Read from the record schema** (W-83b) rather than
 #: restated, because this tuple and the record's shape lived in different
 #: modules and nothing compared them.
 #:
@@ -418,7 +418,7 @@ _STOP_EVERY = 64
 #: the one field the rest of the corpus can change without this document
 #: changing, so carrying it forward would freeze a link that a newly added
 #: document should have resolved.
-EXTRACTED_FIELDS = store_mod.recordshape.carried_fields()
+EXTRACTED_FIELDS = store_mod.recordschema.carried_fields()
 
 
 

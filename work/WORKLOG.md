@@ -24,6 +24,52 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-26 — W-83: the parallel-fetch default was in the record and not in the code  ·  Cowork
+- **Asked:** *"Whenever we run fux update or fux build or fux add URLs, there should be how many number of parallel requests can be triggered. Otherwise, it'll become one of a DDoS attack. Expose that property in fux.toml. Create a work document, then implement it and close it out."*
+- **Reconciled first, and it changed the item.** The knob already existed —
+  W-82 §3.3 shipped `[sources.url] max_parallel`, and `fux add <URL>`,
+  `fux update` and `fux ingest --refresh-urls` all route through
+  `fetch_all(..., max_parallel=…)`. **`fux build` opens no socket at all**
+  (it rebuilds the derived accelerator from committed bytes), and the refer
+  plane fetches cited URLs **one at a time** in a plain loop — both stated in
+  the item so nobody re-derives them.
+- **Did:** filed [W-83](../archive/open/W-83-the-unconfigured-fetch-ceiling.md),
+  built it, closed it the same day. Three changes: `resolve_parallel(module,
+  None)` now returns `min(declared, DEFAULT_MAX_PARALLEL)`; `fux setup` writes
+  `max_parallel` into the commented `[sources.url]` block with the number
+  **interpolated from the constant, never typed**; `fux doctor`'s URL section
+  states the concurrency in force. ADR-CONFIG, ADR-FETCHER and ADR-DOTFUX
+  amended in the same change. **11 new tests, 1 484 pass.**
+- **The defect underneath, and it is the reverse of the usual one.**
+  `DEFAULT_MAX_PARALLEL = 4` had sat in `ingest/urlsrc.py` since §3.3 carrying
+  the whole politeness rationale in its docstring and **referenced by nothing** —
+  so an unconfigured `fux update` inherited `http.py`'s declared
+  `MAX_PARALLEL = 8` and opened eight connections to one intranet host, while a
+  constant in the same file said the default was four.
+- **Decided / open:** ⚠ **The record was right and the code was wrong.**
+  ADR-CONFIG's W-82 amendment **already said** *"default 4 when a fetcher
+  declares more"* — and, four paragraphs earlier, *"`None` means whatever the
+  fetcher declares."* Two sentences in one amendment, contradicting each other.
+  So this was not a change against an accepted record; it was the code being
+  brought into line with one, plus repairing the sentence that disagreed.
+  **The governance gap that follows is NOT fixed and is stated in three
+  places:** `test_adr_freshness` checks that a record was *touched*, never that
+  it is *coherent* — a record can be amended and self-contradicting in the same
+  commit and every mechanical check fux has passes. Same family as W-82 §5.3.
+  **One fork deliberately not taken:** the bound is per **fetcher group**, not
+  per host, so twenty hosts behind `http.py` share one budget; ADR-CONFIG's
+  existing trigger stands — per-host is promoted **when a 429 is observed**.
+- ⚠ **Nothing was committed, and that is deliberate.** A concurrent session was
+  live in the same tree (`src/fux/query/`, `src/fux/store/`, `ingest/run.py`
+  and two records modified by work that is not this session's). Staging left to
+  whoever commits next; the ADR-freshness working-tree check now names only
+  **ADR-ASK and ADR-MCP**, which belong to that other session.
+- ⚠ **Verified under the 3.10 shim**, same deviation W-82 disclosed: the build
+  environment has no 3.11+ interpreter, so two `test_doctor` version tests fail
+  correctly and `tests_e2e/` stays unverified.
+- **Next:** none for W-83. Whoever commits: `no ADR affected` does **not** apply
+  — three records were amended and must go in the same commit as `src/`.
+
 ## 2026-08-26 — push and publish v2.0.0-alpha.2  ·  Claude Code
 - **Asked:** *"push and publish the version."*
 - **Did:** `main` was 17 local commits ahead of `origin/main` (`__version__` already
@@ -38,6 +84,16 @@ play: the worklog is the granular, per-exchange trail.
   releasing a version nobody could ever have installed; no fux behaviour
   changed by this session, so **no ADR affected**.
 - **Next:** none — release is live.
+
+## 2026-08-26 — "template" was the wrong word, and the derived plane got a schema  ·  Cowork
+- **Asked:** *"Rather than calling a template, let's call it schema and create schema for postings as well. Add an example in schema as well… can you think of any other file that needs a schema?"*
+- ✓ **The rename is a real correction, not a preference.** A *template* is something you copy and fill in — which is exactly what `templates/http.py.txt` is. The record file is never copied; it **declares a shape and is checked against the code**. `store/index-record.schema.json` + `store/recordschema.py`.
+- ✓ **`derive/runtime.schema.json` covers the whole derived plane, not only postings**, and that is deliberate: the postings block line, the 62-byte offset entry, the doc table and `stats.json` are written by one build, read by one query path, and versioned by **one string**. Four files would invite three to be updated and the fourth forgotten — which is the exact failure this guards.
+- ⚠ **Why a disposable plane still needs a schema.** The accelerator must return byte-identical results to the reference scan, so a drifted shape does not corrupt the index — **it makes one of the two paths disagree, which is a fast wrong answer.** On 2026-08-23 `superseded`/`mtime` joined the doc table while `RUNTIME_SCHEMA` stayed put, and `ask --scan` demoted a superseded document while `ask --fast` did not. `DOCS_FIELDS` exists because of that day.
+- ✓ **The highest-value assertion is the struct string.** `format.py`'s docstring table described the 62-byte layout in prose and **nothing checked it** — and it has already been wrong once (40 → 62 bytes in W-76 Phase 1). Two tests now hold it: the declared `struct` equals `ENTRY_STRUCT.format`, **and** the per-field `code` values concatenate back to it, because the string could match while the table beside it described something else entirely.
+- ✓ **Examples are tested, not decorated.** The record schema's two are `validate()`d *and* pushed through `canonical_dumps` — an example that validates but cannot be written is still a lie. The offset entry's is packed and round-tripped. **A test asserts every declared shape has one**, since a shape without an example is a shape somebody will guess at.
+- **Verification: 1 500 unit tests green** (39 new). ⚠ Only my paths staged; a concurrent session's W-83 work is in the same tree.
+- **Next:** unchanged — W-82 §3.0. ⚠ The five further schema candidates are listed in the answer and **none was built**; the `--json` output contract is the one worth doing next, because it is the only public one.
 
 ## 2026-08-26 — the index record's shape, declared once instead of four times  ·  Cowork
 - **Asked:** *"Fux index block. Create a template file and use that template file to create the index."* ⚠ **Asked which index first** — "index" names three different things in this repo and "block" maps to two — and Arpit chose the committed record.

@@ -51,5 +51,63 @@
     "archived":   { "type": "bool", "required": "never", "omit_when": false },
     "superseded": { "type": "bool", "required": "never", "omit_when": false },
     "mtime":      { "type": "int",  "required": "never" }
-  }
+  },
+
+  "_examples_doc": [
+    "Two, because the two source kinds differ in the one way that matters:",
+    "a git record may say what it likes -- the repo already holds its bytes --",
+    "and a non-git record must state `meta` explicitly and, when hashed, carry",
+    "NO display text. That is L5, and it closes an ACL-mismatch leak: a document",
+    "readable by fifty people inside Confluence must not become a title readable",
+    "by everyone with the repo.",
+    "",
+    "Both are shown as the DICT, not the committed line. The committed line is",
+    "`canonical_dumps` of this -- sorted keys, no spaces, one trailing newline."
+  ],
+
+  "examples": {
+    "git": {
+      "id": "file:docs/mesh.md",
+      "src": "git",
+      "loc": "docs/mesh.md",
+      "sha": "516bef06781262a0a64b10027316c18d668eeccb",
+      "ver": 3,
+      "mode": "extracted",
+      "meta": "plain",
+      "title": "Service mesh",
+      "phrases": ["Why we chose Helix", "Rollback procedure"],
+      "terms": { "000219ac0fa26dbb": [5, 2, 1], "8f1c2d3e4a5b6071": [1] },
+      "flen": [412, 9, 2, 3],
+      "edges": ["file:docs/adr-storage.md"],
+      "mtime": 1787688862
+    },
+
+    "url_hashed": {
+      "_note": "The L5 default for a non-git source: `title_h`, and no readable text.",
+      "id": "url:https://wiki.corp/handbook",
+      "src": "url",
+      "loc": "https://wiki.corp/handbook",
+      "sha": "9a3f1c07b2e84d5566aa01ff3c2b7e9d40e15c8b",
+      "ver": 1,
+      "mode": "extracted",
+      "meta": "hashed",
+      "title_h": "h:4f2a9c1e8b0d7365",
+      "terms": { "000219ac0fa26dbb": [2] },
+      "flen": [1180],
+      "edges": [],
+      "archived": true
+    }
+  },
+
+  "_absent_from_the_examples_on_purpose": [
+    "`archived: false` and `superseded: false` appear in NEITHER example, and",
+    "that is the point of `omit_when`: absent, not false. A live record's shape",
+    "stays unchanged, so no existing consumer's parse breaks. The git example",
+    "omits both; the url example carries `archived: true` because it is true.",
+    "",
+    "`title` and `phrases` are absent from the hashed example for the same",
+    "reason they are FORBIDDEN there -- `store/writer.py` refuses to commit that",
+    "record, at write time, rather than trusting the one caller that happens to",
+    "be used today."
+  ]
 }

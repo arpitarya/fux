@@ -1,6 +1,6 @@
-"""The committed record's shape, loaded from one template instead of four places.
+"""The committed record's shape, loaded from one schema instead of four places.
 
-`store/index-record.json` declares every field of a committed record: its
+`store/index-record.schema.json` declares every field of a committed record: its
 type, when it is required, its default, whether it carries display text, whether
 a delta ingest may carry it forward, and whether it is omitted rather than
 written false.
@@ -25,9 +25,9 @@ narrower than it reads.
 ## What this deliberately does NOT do
 
 **It does not change a single committed byte, and a test asserts that.**
-`canonical_dumps` sorts keys, so the order in the template is presentation and
+`canonical_dumps` sorts keys, so the order in the schema is presentation and
 cannot reach the index. The field set, the defaults and `omit_when` *can*, which
-is why `schema` in the template must equal `format.SCHEMA_ID` — two fux versions
+is why `schema` in the schema must equal `format.SCHEMA_ID` — two fux versions
 with different shapes must never both call their output `fux.index.v2`.
 
 **It is not a validator that runs on every write.** `write_index` already
@@ -63,7 +63,7 @@ __all__ = [
 #: `src/fux/store/` is ADR-INDEX-LIFECYCLE's, which is exactly right -- so the
 #: ownership is correct BY CONSTRUCTION instead of by a carve-out somebody has
 #: to remember. The ADR guard caught this on the first commit attempt.
-TEMPLATE_NAME = "index-record.json"
+SCHEMA_NAME = "index-record.schema.json"
 
 _PY_TYPES = {"str": str, "int": int, "bool": bool, "list": list, "dict": dict}
 
@@ -115,17 +115,17 @@ class RecordShape:
 
 @lru_cache(maxsize=1)
 def shape() -> RecordShape:
-    """The parsed template. Cached — it is package data and cannot change under us.
+    """The parsed schema. Cached — it is package data and cannot change under us.
 
     A missing or malformed template is a **broken installation**, not a user
     error, and says so: the alternative is a default shape silently taking over
     and writing an index nobody declared.
     """
     try:
-        raw = json.loads((resources.files("fux.store") / TEMPLATE_NAME).read_text("utf-8"))
+        raw = json.loads((resources.files("fux.store") / SCHEMA_NAME).read_text("utf-8"))
     except (OSError, ValueError) as exc:
         raise FuxError(
-            f"the index-record template is missing or unreadable ({exc}). "
+            f"the index-record schema is missing or unreadable ({exc}). "
             "This is a broken install, not a configuration problem — reinstall fux-engine"
         ) from exc
     return RecordShape(raw)
@@ -149,7 +149,7 @@ def carried_fields() -> tuple[str, ...]:
 
 def build(**values) -> dict:
     """Assemble one record: apply defaults, drop `omit_when` values, refuse
-    anything the template does not declare.
+    anything the schema does not declare.
 
     **The last clause is the point.** A typo'd key used to sail through into the
     committed index and simply never be read again — no error, no test, a field
@@ -159,8 +159,8 @@ def build(**values) -> dict:
     unknown = [k for k in values if k not in shp.fields]
     if unknown:
         raise FuxError(
-            f"record field(s) not declared in {TEMPLATE_NAME}: {', '.join(sorted(unknown))}. "
-            "Add the field to the template — with its type and whether it is display text — "
+            f"record field(s) not declared in {SCHEMA_NAME}: {', '.join(sorted(unknown))}. "
+            "Add the field to the schema — with its type and whether it is display text — "
             "or fix the spelling"
         )
 
@@ -179,7 +179,7 @@ def build(**values) -> dict:
 
 
 def validate(record: dict) -> None:
-    """Check one record against the template. Raises `FuxError` on the first fault.
+    """Check one record against the schema. Raises `FuxError` on the first fault.
 
     For tests and for callers assembling records by hand. **Not called on the
     write path** — see the module docstring for why that is deliberate.
