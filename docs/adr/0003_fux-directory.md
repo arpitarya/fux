@@ -317,6 +317,63 @@ directories by default (ruff does) will not lint them.
 > each URL last produced, so *"it changed"* can be distinguished from *"we
 > fetched it"*). Neither is committed and neither can change a committed byte.
 
+> **Amended 2026-08-26 (W-83) — the two scaffolding moments both learned to
+> say how many connections a networked run will open.**
+>
+> Both components this record owns changed, for one reason: the concurrency
+> bound shipped readable by `config.py` and **named by nothing a consumer would
+> ever open**. The decision itself belongs to
+> [ADR-CONFIG](0014_config.md)'s W-83 amendment; what lands here is the surface.
+>
+> **`setup.py`** writes `max_parallel` into the `[sources.url]` block of
+> `fux.toml`, alongside `fetcher`, `urls_file` and `meta` — the three it
+> already named. ⚠ **The number is interpolated from `DEFAULT_MAX_PARALLEL`,
+> never typed.** A comment restating a constant is precisely the drift W-83
+> exists to fix, and writing this one by hand would have reproduced the defect
+> in the same commit that removed it. `tests/test_setup.py` fails if the
+> interpolation is ever flattened, and a second test uncomments the block and
+> loads it — a commented example that does not parse when uncommented is worse
+> than none.
+>
+> **`doctor.py`**'s URL section gains one clause: how many URLs a networked
+> verb may open at once, and whether that came from `fux.toml` or the default.
+>
+> ⚠ **Doctor reports the POLICY and refuses to compute the effective value**,
+> and the refusal is this record's business rather than ADR-CONFIG's. The
+> effective number is `min(configured, declared)`; `declared` lives in a
+> **consumer-owned Python file**, so reading it means importing it, and
+> importing it runs whatever sits at that file's module level. **Doctor is the
+> command a person runs when something is already wrong** — it stays offline
+> (above) and it must equally stay out of the business of executing consumer
+> code. It names the `min(...)` rule and leaves `fux update` to apply it.
+> `tests/test_doctor.py` plants a fetcher whose module body raises and asserts
+> the check still returns.
+
+> **Amended 2026-08-26 (W-85) — what `setup` writes is LIVE, and
+> write-if-missing is why the loader had to do the rest.**
+>
+> Arpit, on being shown W-83's commented line: **"never commented. If it is
+> commented, throw an error that the value has to be present."** `_CONFIG` now
+> emits `[sources.url]` and its four keys **uncommented**, `max_parallel`
+> included; the decision and its consequences are
+> [ADR-CONFIG](0014_config.md)'s W-85 amendment.
+>
+> ⚠ **This record's own write-if-missing promise is what made a template fix
+> insufficient**, and that is worth stating plainly rather than discovering
+> twice. `fux setup` never rewrites an existing `fux.toml`, so **W-83's
+> template change reached new repos and nobody else** — including this repo,
+> whose config still showed the pre-W-83 block when Arpit opened it. That is
+> not a bug in the promise: a rewrite would eat a consumer's annotations, the
+> same reason `fux tune` prints a specimen instead of editing `tune.toml`
+> (above). **The migration therefore lives in the loader, not here** — a
+> required key errors on the next command with the line to paste.
+>
+> **The general rule this leaves behind:** a change to `_CONFIG` (or to any
+> write-if-missing template) is a change for **new repos only**. If it must
+> reach existing ones, the mechanism is a loader refusal or a `doctor` check —
+> never a rewrite. `fux setup`'s own `report.kept` is the evidence the file was
+> left alone.
+
 ### Alternatives considered
 
 - **Two top-level directories** — `.fux/` committed, `.fux-cache/` derived.

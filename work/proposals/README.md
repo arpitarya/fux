@@ -57,6 +57,10 @@ deliberately refused; the reasoning is in the record and the open question is
 
 
 
+**Filed 2026-08-26:**
+
+* [Structure-aware extraction](structure-aware-extraction.md) - tables, code fences and lists as **fields, not decoders**. Arpit asked during [W-86](../open/W-86-the-decoder-plane.md) whether decoders should handle structure *inside* a text document; they should not — by the time a decoder finishes, a table **is already Markdown**, and weighting it is `extract.py`'s job. ⚠ **The boundary is the load-bearing part:** in decoders, every consumer-owned decoder would re-implement ranking policy in code fux cannot test or version; in `extract.py`, one implementation and every format inherits it free. Names the strongest concrete suspicion — **table cells inflate `flen`, so BM25 length normalisation makes a table-heavy document read as denser than it is**. **Graduates when W-86's P4 (OOXML) lands**, because that is when a real corpus first contains tables fux can see; a ranking change then needs a pre-registration and a verdict at 10 000 documents, never an argument.
+
 **Filed 2026-08-09 for the v0.30 architecture:**
 
 * [MCP as the adapter endgame](mcp-adapters.md) - one protocol instead of per-app adapters; org's own auth. Graduates on the first MCP-gateway design partner or a fourth adapter request.

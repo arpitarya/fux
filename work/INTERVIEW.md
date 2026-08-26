@@ -30,7 +30,88 @@ valuable judgement, but not the state of play.
 *Updated **2026-08-26**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: the queue is ONE item (2026-08-26)
+### The most recent change: W-86 filed — the decoder plane (2026-08-26)
+
+**No code moved. Three findings did.** Arpit asked whether fux could interpret
+PDFs, decks, spreadsheets, JSON and YAML;
+[W-86](open/W-86-the-decoder-plane.md) is the plan, and
+[`compare/index-lock.compare.md`](compare/index-lock.compare.md) is the lock
+fork he told the session to research and call itself.
+
+1. **The decoder plane already exists, in the wrong place, twice.**
+   `.fux/fetchers/http.py:69` is an HTML→Markdown decoder; `cdp.py:282` carries
+   the same `_MdParser` marked *"Kept identical to…"*, tested by nothing.
+   Neither is reachable from the git-dir walker — **a local `.html` on disk is
+   never decoded.** A session that starts by *writing* an HTML decoder has
+   already gone wrong.
+2. **A live heading defect.** `.rst`, `.adoc` and `.org` are allowed types
+   whose heading syntax matches nothing in `extract.py`'s `^(#{1,6})\s+`. Three
+   of six allowed types have had every heading land in the body field since the
+   allowlist shipped. That is P0 — a correctness fix, not a new capability.
+3. **The index lock exists; its scope is the gap.** `runner.py::acquire` has
+   **one caller**, the background runner. A foreground `fux ingest` evicts the
+   runner and then writes holding nothing. ⚠ Read from call sites, **not
+   reproduced.**
+
+**The contract a decoder must satisfy is forced, not chosen:** `bytes →
+Markdown | None`, because `extract.py` re-derives headings from `#` and a
+decoder returning flat text silently disables *"heading match outranks body
+match"* on every non-Markdown document. `None` means *a model must read this*,
+and it feeds a **committed queue** with **gitignored progress** — Arpit's
+split, 2026-08-26.
+
+**Fork E was ruled the same day, and the law did not move.** Arpit: *"let the
+consumer add the dependencies — unless the consumer adds the dependencies,
+that feature won't be available."* This looked like an L1 amendment and is not
+one: [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 1 already states the
+pattern as a table — network I/O → `.fux/fetchers/`, model calls → the
+consumer's agent — and **this is its third row, `.fux/decoders/<name>.py`.**
+L1 constrains the runtime fux ships; consumer code is not that. ⚠ **The
+binding objection was L3, not L1** — a decoder that ran whenever its library
+imported would make two developers with identical sources produce different
+root hashes, so the set is **declared, not detected**, and a machine that
+cannot satisfy it **fails loudly** rather than shipping a smaller index. ⚠ The
+honest cost: a consumer decoder **can break L4 and no gate reaches it** — the
+same asymmetry ADR-ENRICH decision 3 owns about `model:`.
+
+**Two refusals to preserve.** `.json` may not re-enter the allowlist by
+argument: ADR-TYPES verdict G was measured, and only a new pre-registration at
+10 000 documents replaces it. And full YAML is refused **on correctness** —
+expanding anchors duplicates terms and inflates `tf`, so the conformant parser
+is the wrong one.
+
+### The change before it: `ask` cites at heading level (W-84, 2026-08-26)
+
+**Arpit asked whether `ask` should cite at line level. The answer was no, and
+the refusal is the durable half** — [ADR-ASK](../docs/adr/0004_ask.md)
+decision 10 carries it. A line range on `ask` could only be computed at
+**ingest**, so one edit makes it point at the wrong lines *while looking
+exactly as right as before*; it also costs a positional index (2–4× the
+postings) against an index whose whole pitch is that it fits in git.
+**`answer` cites lines because it fetched the bytes.** If a future session
+proposes "just add line numbers to `ask`", that is the fence it is crossing.
+
+**What shipped was already in the index.** `phrases` — the document's headings,
+extracted at ingest since M2 — were rendered by `answer --no-refer` alone.
+[`query/headings.py`](../src/fux/query/headings.py) now selects the ones
+matching the query and `ask` (text), `ask/find --json` and MCP `fux_search`
+render them. **Display-only, after `run_query` returns** — the position
+`_resolve_title` occupies under P5, which is what keeps the differential law
+intact. `find`'s piped stdout is byte-identical.
+
+⚠ **The defect it found is the one to carry forward:** `fux_search`'s **MCP
+tool description** claimed *"line-range citations"* it has never returned — the
+identical wrong claim commit `ad95a24` had fixed in `docs/guide.html` earlier
+the same day, surviving in the machine-facing copy. **Tool descriptions are
+documentation compiled into the package and no gate reads them.**
+`fux_passage`'s and `fux_related`'s are still unchecked.
+
+⚠ **Not committed.** A concurrent session was mid-rename in the tree
+(`store/recordshape.py` → `recordschema.py`); a W-84 commit would have swept a
+half-finished rename in. **1 500 unit tests green**; `tests_e2e/` unverified
+(3.10 sandbox — the same limitation W-82's build disclosed).
+
+### The change before it: the queue is ONE item (2026-08-26)
 
 **Arpit collapsed W-74, W-75, W-77 and W-81 — and the five documents behind
 them — into a single file**,

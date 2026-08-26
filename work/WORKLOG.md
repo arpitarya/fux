@@ -24,6 +24,192 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-26 — W-86 §13: four follow-ups, two of them refusals, one a live L3 defect  ·  Cowork
+
+- **Asked:** four things at once — a `fux decoder` CLI verb that sets up
+  dependencies; *"move HTTP and CDP from fetcher to decoder"*; whether decoders
+  should exist for structure **inside** a text document (tables, *"could be
+  more"*); and whether decoders should be exposed editable in `.fux/` with
+  defaults written by `fux setup`.
+
+- **Did:** answered all four in [W-86](open/W-86-the-decoder-plane.md) §13,
+  added **P8**, added forks **H/I/J** (nine now), and filed
+  [`proposals/structure-aware-extraction.md`](proposals/structure-aware-extraction.md).
+  No code changed.
+
+- **The one that matters: HTTP/CDP is HALF right, and the right half is a live
+  L3 defect.** They must not move — fetching is network I/O and stays a
+  fetcher. **The HTML→Markdown pass inside them must.** `fetch(url) -> str`
+  returns **markdown**, so a fetcher does both jobs, and `http.py:43` states
+  the consequence as a requirement nothing enforces:
+
+  > *"Both fetchers must produce the same markdown from the same bytes, or
+  > which fetcher retrieved a URL becomes visible in the index."*
+
+  **That is *same sources → same index* written down as a coding convention.**
+  `fetch(url) -> bytes` makes the `_MdParser` duplication structurally
+  impossible, **retires the requirement instead of enforcing it**, and — new
+  capability — **makes a URL serving a PDF indexable**, which the current
+  contract forbids outright. ⚠ **Breaking change to the consumer fetcher
+  contract** → fork H, P8, before P7. **Fork D dissolves if H is yes.**
+
+- **Two refusals, and both are boundary defences.**
+  1. **`fux decoder` may never install.** Running `pip` is network (**L4**) and
+     mutates the consumer's environment. Fux **prints** the command. Fourth row
+     of the same table: fux refuses to fetch, to call a model, to add a
+     dependency, and to install.
+  2. **Tables are not decoder work.** By the time a decoder finishes, a table
+     *is already Markdown*; weighting it is `extract.py`'s. In decoders,
+     **every consumer decoder re-implements ranking policy** in code fux cannot
+     test or version. In `extract.py`, one implementation and every format
+     inherits it free. Parked as a proposal, graduating when P4 (OOXML) lands.
+
+- **Editable decoders: yes to the seam, no to exporting all of them.** The
+  argument is this item's own §1 at 15×: `_MdParser` was copied with a comment
+  saying *"Kept identical to…"* and nothing kept it identical. **A copied
+  default never receives a bug fix**, and upgrading fux would upgrade nobody's
+  decoders. Built-ins stay in `src/fux/decode/`; `.fux/decoders/<name>.py`
+  **overrides by name**; `fux setup` writes **one commented example**.
+
+- **Decided / open.** Nothing was decided *for* Arpit. Three new forks are his,
+  and **H should be ruled first** because it collapses D and reorders the
+  phases.
+
+- **Next:** unchanged — P0 and P1 are startable now and depend on no fork.
+
+## 2026-08-26 — W-86 fork E ruled: the consumer-owned decoder, and the law that did not move  ·  Cowork
+
+- **Asked:** *"For D, let the consumer add the dependencies — unless the
+  consumer adds the dependencies, that feature won't be available."*
+
+- **The fork was misnamed and saying so was the first useful act.** D is *do
+  the fetchers import `src/fux/decode/`*, which has no dependencies in it. The
+  ruling describes **E, the `$0` boundary**, and it reaches much further than
+  E did. Confirmed with Arpit before writing anything.
+
+- **The objection that mattered was L3, not L1.** L1 is the loud one — *"no
+  third-party runtime dependencies"* is the stated promise — but it is a law
+  he may amend. **L3 is structural:** if a decoder ran whenever its library
+  happened to be importable, two developers ingesting **identical sources**
+  would produce **different root hashes**, because the index would become a
+  function of the environment. He ruled **declared, error loudly**, which
+  closes it.
+
+- **Did:** ruled fork E into [W-86](open/W-86-the-decoder-plane.md) §12 (six
+  subsections), added **P7**, reconciled §2's contract table, §5's out-of-scope
+  bullets, §6's tier E row, the DoD and the tests, and **reconciled
+  [`index-lock.compare.md`](compare/index-lock.compare.md) §4 the same day**.
+  No code changed.
+
+- **The finding: the law does not need to move, and the argument was already
+  written down twice.** The session went in expecting to propose an L1
+  amendment plus the matching `CLAUDE.md` + ADR-LAWS edit. **Neither is
+  needed.** [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 1 states the
+  pattern as a table and calls it *"ADR-FETCHER's pattern applied to a second
+  boundary"* — **this ruling is that table's third row**:
+
+  | fux refuses to own | consumer owns it as |
+  |---|---|
+  | network I/O | `.fux/fetchers/http.py` |
+  | model calls | the consumer's agent |
+  | **third-party parsing libraries** | **`.fux/decoders/<name>.py`** |
+
+  ADR-FETCHER decision 1 is the grounding: *"`src/fux/` holds no network code
+  … no dependency for any of [them] — **a design choice rather than a
+  dependency budget**."* L1 constrains the runtime fux ships; a consumer
+  decoder is not that.
+
+- **Decided / open.** Fork E **closed**. **New sub-fork opened** and not taken:
+  does a consumer decoder receive **bytes** (parallel to a built-in decoder) or
+  a **path** (parallel to a fetcher, which is handed a URL)? Six of W-86's
+  original seven forks remain Arpit's, and the lock verdict is still proposed.
+
+- **The honest cost, written into the record rather than implied.** A consumer
+  decoder **can break L4 and no gate can stop it** — an import fence cannot
+  reach code loaded by path. That is the same asymmetry ADR-ENRICH decision 3
+  already owns about `model:` being a claim fux records and cannot confirm, and
+  it is written the same way: a documented consumer obligation, checked by
+  review of a committed diff. **A test must not be claimed to cover it.**
+
+- **What the ruling does NOT open**, recorded because a later session will try:
+  the runtime (`src/fux/` stays stdlib, fence extended to `decode/`), the index
+  mutex (`filelock` stays refused — a mutex is runtime code, not consumer
+  code), OCR into `extracted` (**L3** bars the model, not the dependency), and
+  any general optional-deps policy for query-time features.
+
+- **Next:** unchanged — P0 and P1 are startable now; P7 follows P1 and needs
+  the bytes-or-path sub-fork; P6 still waits on the lock verdict.
+
+## 2026-08-26 — W-86 filed: the decoder plane, and the lock that already exists  ·  Cowork
+
+- **Asked:** *"Can we build fetchers or middleware or anything else to interpret
+  images, PPT, PDFs, Excel documents, JSON files, YAML files?"* — then, on the
+  answer: *"I want individual decoders to be built out… propose what other files
+  we can build decoders for… when I say decoder, is it converting everything to
+  text?"* — then *"create a work document to implement all these decoders"*,
+  plus a committed list of what needs enrichment, plus *"a lock file would be a
+  good idea whenever the index is getting updated."*
+
+- **Did:** filed [W-86](open/W-86-the-decoder-plane.md) (seven phases, seven
+  forks) and wrote [`compare/index-lock.compare.md`](compare/index-lock.compare.md)
+  on Arpit's instruction to *"do the research and make a call, make sure to
+  create a compare document for record keeping."* No code changed.
+
+- **The three findings, and they matter more than the plan.**
+
+  1. **The decoder plane already exists, in the wrong place, twice.**
+     `.fux/fetchers/http.py:69` is an HTML→Markdown decoder — *"stdlib
+     html.parser, deterministic"* — and `cdp.py:282` carries the same
+     `_MdParser` marked *"Kept identical to…"*. **Nothing tests that they
+     agree**, and neither is reachable from the git-dir walker, so a local
+     `.html` on disk is never decoded. The hardest decoder in the set is
+     written; the work is lifting it, not writing it.
+
+  2. **A live heading defect, free to fix, shipped since the allowlist.**
+     `DEFAULT_TYPES` allows `.rst`, `.adoc` and `.org`; `extract.py` derives
+     headings with `^(#{1,6})\s+` alone. reStructuredText underlines, AsciiDoc
+     `== Section` and Org `* Heading` match **none** of it — so three of six
+     allowed types have had every heading land in the body field, with an empty
+     `phrases` list feeding the `§` lines W-84 shipped **the same day**.
+
+  3. **The lock exists; the gap is its scope.** `runner.py::acquire` is
+     `O_CREAT|O_EXCL` with a pid inside, and its own docstring rejects
+     `fcntl`/`msvcrt` for the right reason. But **it has exactly one caller** —
+     the background runner. A foreground `fux ingest` calls `request_stop` to
+     *evict* a runner and then writes **holding nothing**. Two foreground
+     ingests race. ⚠ Asserted from call-site reading, **not reproduced**, and
+     written into the compare doc as the claim a build must falsify first.
+
+- **Decided / open.** Arpit ruled **committed queue, gitignored progress**, and
+  told the session to make the lock call itself. **Proposed verdict B — two
+  files, neither new**, rejecting a merged file on a single line: a mutex must
+  be gitignored and a queue must be committed, and no `.gitignore` can express
+  half a file. **Not accepted — W-86 P6 is blocked until Arpit rules it.**
+  Rejected E (OS advisory locks) on **L1** plus invisibility; rejected D (do
+  nothing) on `MACHINE.md`'s measured stranded-lock incident.
+
+- **Two things deliberately refused.** `.json` is **not** proposed back into the
+  allowlist by argument — ADR-TYPES verdict G was measured, and only a new
+  pre-registration at 10 000 documents may replace it. And **full YAML is
+  refused on correctness, not cost**: expanding anchors duplicates terms and
+  inflates `tf`, so a *conformant* parser is the wrong one here.
+
+- **⚠ A race observed, then disproved, inside this session — worth recording
+  because the recovery is the lesson.** A directory listing showed
+  `open/W-85-max-parallel-is-required.md` as an open item with no OPEN-WORK
+  row, and this entry originally said so. Re-derived before finishing —
+  against `archive/open/`, `archive/README.md`, `IMPLEMENTATION.md` and
+  `git status` — **W-85 was filed, built, closed and correctly archived by the
+  concurrent session**, which moved the file while this one was writing.
+  `work/open/` holds W-86 and the README. **The queue was never wrong; a
+  listing read mid-move was.** OPEN-WORK rule 3 — *markers are assertions,
+  re-derive rather than read* — applied to another session's work in flight,
+  and it is the only reason a false defect did not land in three documents.
+
+- **Next:** Arpit rules the lock fork; P0 (the heading grammar) and P1
+  (`src/fux/decode/` + lifting HTML out of both fetchers) are independent of
+  every fork and startable immediately.
+
 ## 2026-08-26 — W-84: `ask` cites at heading level, and refuses to cite at line level  ·  Cowork
 - **Asked:** *"would it be a good idea to have ask at line level rather than
   document level??"* — then, on the answer: *"Implement the heading level.

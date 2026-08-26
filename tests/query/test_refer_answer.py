@@ -48,7 +48,7 @@ def _sha(text: str) -> str:
 
 def _init_url_repo(tmp_path, *, url="https://x.test/a", config_table=""):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nfetcher = "mw.py"\n' + config_table, encoding="utf-8"
+        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\n' + config_table, encoding="utf-8"
     )
     (tmp_path / "mw.py").write_text(FAKE_FETCHER, encoding="utf-8")
     urls_path = tmp_path / ".fux" / "sources" / "urls"

@@ -43,6 +43,7 @@ from .config import (
     load,
 )
 from .errors import FuxError
+from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from .store import fuxdir
 
 #: Generated name -> the package-data file it is copied from.
@@ -163,13 +164,33 @@ _CONFIG = """\
 [sources]
 #dirs_file = ".fux/sources/dirs"
 
-# URL ingestion through YOUR fetcher files. Uncomment to enable. Fetching only
-# ever happens under `fux add <URL>` or `fux update` -- fux is offline by default.
-#[sources.url]
-#fetcher   = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
-#                                     # and the directory `fetch=cdp` resolves in
-#urls_file = ".fux/sources/urls"
-#meta      = "hashed"                 # the floor; a line may loosen it to plain
+# URL ingestion through YOUR fetcher files. Nothing is fetched until a URL is
+# listed in .fux/sources/urls, and the only thing that lists one is an explicit
+# `fux add <URL>` -- fux is offline by default, and THAT is the gate.
+[sources.url]
+fetcher      = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
+                                        # and the directory `fetch=cdp` resolves in
+urls_file    = ".fux/sources/urls"
+meta         = "hashed"                 # the floor; a line may loosen it to plain
+
+# HOW MANY URLs MAY BE IN FLIGHT AT ONCE, across `fux add <URL>`, `fux update`
+# and `fux ingest --refresh-urls`. (`fux ask` verifies cited URLs one at a time,
+# and `fux build` opens no socket at all -- neither is affected.)
+#
+# THIS KEY IS REQUIRED AND MAY NOT BE COMMENTED OUT. Every other key above has
+# a default; this one does not, on purpose. A repo that CAN fetch has to say how
+# hard, in a number a person can read, because the failure it prevents -- a
+# hundred connections opened at your own intranet -- is not one you find out
+# about by reading code. Comment it out and fux refuses to load and tells you so.
+#
+# THE EFFECTIVE VALUE IS min(this, what your fetcher declares). Your fetcher
+# declares what is SAFE -- `MAX_PARALLEL` in the module, 8 for the shipped
+# http.py, 1 for cdp.py because it reuses one WebSocket. This key is what is
+# POLITE, and it is the one your intranet cares about.
+#
+# Raising it is honoured, never clamped: a bigger number is merely rude, and at
+# 16+ fux says so on stderr rather than quietly reducing it. Below 1 refuses.
+max_parallel = {default}
 
 # Fetcher tunables. Fux passes this table to the fetcher's optional
 # `configure(config)` VERBATIM and never reads a key inside it -- the keys mean
@@ -201,7 +222,11 @@ shards = 256
 # file that is already there is safe -- fux never rewrites one.
 [agents]
 install = ["claude", "copilot", "kiro"]
-"""
+""".format(default=DEFAULT_MAX_PARALLEL)
+#: ⚠ **`{default}` is interpolated, not typed** (W-83). The number in the
+#: written `fux.toml` and the number the engine actually applies are the same
+#: object, so the comment cannot drift from the behaviour the way the constant
+#: itself did before W-83 made it effective. `tests/test_setup.py` asserts it.
 
 _URLS_HEADER = """\
 # The URLs fux indexes. One per line. `#` starts a comment at the start of a

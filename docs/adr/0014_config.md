@@ -347,8 +347,9 @@ the boundary, rendered by the CLI, exit 1.
 
 > **Amended 2026-08-26 (W-82 §3.3) — `[sources.url] max_parallel`.**
 >
-> How many URLs may be fetched at once. **`None` means *whatever the fetcher
-> declares*,** which is `1` unless the module sets `MAX_PARALLEL`.
+> How many URLs may be fetched at once. **`None` means
+> `min(what the fetcher declares, 4)`** — see the W-83 amendment below, which
+> corrected the code rather than this record.
 >
 > **Two values wear one name and get different kinds of refusal**, per Arpit's
 > standing rule *state the cost, don't clamp the knob*:
@@ -372,6 +373,118 @@ the boundary, rendered by the CLI, exit 1.
 > the test alone would misfile it. The second clause settles it: it is not a
 > ranking value either. It is **operational**, so it sits beside the other
 > `[sources.url]` keys.
+
+> **Amended 2026-08-26 (W-83) — the default was in this record and not in the
+> code, and the key was in neither `fux.toml` nor `fux doctor`.**
+>
+> Arpit: the number of parallel requests a networked verb may open must be a
+> stated property, *"otherwise it'll become one of a DDoS attack."* Three
+> findings, and **the first is the one worth carrying**:
+>
+> **1 · The record was right and the code was wrong — the rare direction.**
+> The W-82 amendment above stated *"default `4` when a fetcher declares more"*
+> and, four paragraphs earlier, *"`None` means whatever the fetcher declares"*.
+> **Those two sentences contradict each other**, and the code implemented the
+> second: `resolve_parallel(module, None)` returned `declared`, and the shipped
+> `http.py` declares `8`. `DEFAULT_MAX_PARALLEL = 4` existed in
+> `ingest/urlsrc.py`, carried the politeness rationale in its docstring, and
+> **was referenced by nothing**. An unconfigured `fux update` over a large list
+> therefore opened **eight** concurrent connections to one intranet host.
+> The code now applies `min(declared, DEFAULT_MAX_PARALLEL)`; the first
+> sentence is repaired above.
+>
+> **What that says about Law zero, and it is not the usual lesson.** The
+> freshness gate checks that a record was *touched*, never that it is
+> *coherent* — so a record can be amended and self-contradicting in the same
+> commit, and the check is satisfied. A contradiction inside one amendment is
+> invisible to every mechanical check fux has.
+>
+> **2 · Silence is politeness, not the fetcher's ceiling.** A declaration
+> answers *what is safe* — `http.py`'s `8` is a true statement about a fetcher
+> that builds a fresh `Request` per call — and never *what is polite unasked*.
+> Nobody declared `8` for a given repo's wiki. The default can only ever
+> **lower**: `cdp.py`'s `MAX_PARALLEL = 1` still wins. And it decides only what
+> **saying nothing** means — `max_parallel = 8` against a fetcher declaring `8`
+> returns `8`, silently, so *state the cost, don't clamp the knob* is untouched.
+>
+> **3 · A key nobody can find is not a key.** `fux setup` wrote a
+> `[sources.url]` block naming `fetcher`, `urls_file` and `meta` and omitting
+> this one; the only way to discover the guard was to read `config.py`. The
+> written `fux.toml` now carries it, **with the number interpolated from
+> `DEFAULT_MAX_PARALLEL` rather than typed** — a comment stating a constant is
+> the exact drift this amendment is fixing one file over — and
+> `tests/test_setup.py` fails if anyone un-interpolates it. `fux doctor`'s URL
+> section states the policy in force.
+>
+> ⚠ **`fux doctor` reports POLICY and refuses to compute the product.** The
+> effective value is `min(configured, declared)` and `declared` lives in a
+> consumer-owned Python file, so reading it means importing it. Doctor is the
+> command a person runs when something is *already* wrong; it may not be the
+> command that executes their fetcher. It names the rule and leaves `fux update`
+> to apply it.
+>
+> **Unchanged and worth restating: the bound is per fetcher group, not per
+> host.** Twenty hosts behind `http.py` share one budget — politer than needed —
+> and five hundred URLs on one host get that same budget, which is the case it
+> exists for. The conservative direction is the wrong one here, so per-host
+> stays unbuilt and its trigger stands: **promoted when a 429 is observed.**
+>
+> **Reference:** `src/fux/ingest/urlsrc.py:resolve_parallel` ·
+> `tests/ingest/test_url_parallel.py` · `tests/test_setup.py` ·
+> [the archived item](../../archive/open/W-83-the-unconfigured-fetch-ceiling.md).
+
+> **Amended 2026-08-26 (W-85) — `max_parallel` is REQUIRED, and `[sources.url]`
+> now ships live.**
+>
+> **Arpit, ruling on W-83's output the same day:** *"I wanted a property
+> exposed. Where is that property? It should be present by default."* — and,
+> shown the commented line W-83 had written: **"never commented. If it is
+> commented, throw an error that the value has to be present."**
+>
+> **W-83 exposed nothing.** Its line was `#max_parallel = 4`, inside an
+> already-commented `[sources.url]` table, so a consumer opening `fux.toml` saw
+> a comment about a number rather than a number.
+>
+> | case | behaviour |
+> |---|---|
+> | `[sources.url]` live, `max_parallel` live | its value, validated as before |
+> | `[sources.url]` live, `max_parallel` absent or commented | **`FuxError`**, naming the key and quoting the line to paste |
+> | `[sources.url]` absent entirely | **no error** — nothing fetches, so there is nothing to bound |
+>
+> **The third row is a drawn line, not an oversight.** A docs-only repo forced
+> to declare a fetch bound is a repo where the key is noise, and **noise is how
+> a safety value stops being read**. What is forbidden is a repo that *can*
+> fetch and does not say how hard.
+>
+> ⚠ **This is the only key in `fux.toml` with no default**, which reverses the
+> file's own preamble (*"every key below has a default"*) for exactly one line.
+> The justification is the failure mode: an implicit concurrency is not a thing
+> a person discovers by reading their config, and the damage it prevents — a
+> hundred sockets opened at their own intranet — lands on a third party who
+> never chose it.
+>
+> **Requiredness is the migration path, and nothing else could have been.**
+> `fux setup` is write-if-missing ([ADR-DOTFUX](0003_fux-directory.md)), so a
+> template change reaches **new repos only** — this repo's own `fux.toml`, and
+> every existing user's, gained nothing at all from W-83. A loader error
+> reaches them, because it puts the key in front of the person on their next
+> command with the value to type. **A rewrite was refused**: it would eat a
+> consumer's annotations, which is the same reason `fux tune` prints a specimen
+> instead of editing.
+>
+> ⚠ **`[sources.url]` now ships LIVE, and one behaviour changes with it.**
+> `fux add <URL>` previously recorded the line and printed *"no `[sources.url]`
+> in fux.toml, so nothing can fetch this line yet"*; in a repo scaffolded after
+> this change it fetches. **The gate did not disappear — it moved to where it
+> always really was:** `.fux/sources/urls` is empty, and the only thing that
+> puts an address in it is an explicit `fux add <URL>`. **L4's *explicit,
+> fenced, opt-in* is satisfied by the verb, not by a commented table** — and a
+> table you must uncomment before the tool works is friction, not a fence.
+> The refusal branch stays for repos that genuinely have no `[sources.url]`.
+>
+> **Reference:** `src/fux/config.py:_load_url_source` ·
+> `src/fux/setup.py:_CONFIG` · `tests/test_setup.py` ·
+> [the archived item](../../archive/open/W-85-max-parallel-is-required.md).
 
 ### Alternatives considered
 

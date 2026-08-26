@@ -45,6 +45,49 @@ the field shipped and L5's check did not look at it.
 **Records:** ADR-INDEX-LIFECYCLE and ADR-INGEST amended in the same change.
 **Verification:** 1 461 unit tests green (19 new).
 
+## W-85 — `max_parallel` is required, never commented (2026-08-26)
+
+**Arpit, ruling on W-83's output the same day:** *"I wanted a property exposed.
+Where is that property? It should be present by default."* — then, shown the
+commented line W-83 had written: **"never commented. If it is commented, throw
+an error that the value has to be present."**
+
+| what landed | where | outcome |
+|---|---|---|
+| **the key is required** — `[sources.url]` without `max_parallel` refuses to load, naming the line to paste | `config.py` | `UrlSource.max_parallel` has **no default**; the only key in `fux.toml` that does not |
+| **the table ships live** — `[sources.url]` and its four keys uncommented | `setup.py` | the number is a number in the file, not a comment about one |
+| **this repo's own `fux.toml`** updated by hand | `fux.toml` | nothing else could have — see below |
+| doctor's `max_parallel unset` branch removed as unreachable | `doctor.py` | dead code that read like reassurance |
+
+**W-83 shipped a config property to nobody who already had a `fux.toml`.**
+`fux setup` is write-if-missing (ADR-DOTFUX), so a `_CONFIG` change reaches
+**new repos only** — this repo's config still showed the pre-W-83 block when
+Arpit opened it. **The general rule, now in ADR-DOTFUX:** if a template change
+must reach existing repos, the mechanism is a **loader refusal or a `doctor`
+check, never a rewrite** — a rewrite would eat a consumer's annotations, the
+same reason `fux tune` prints a specimen instead of editing.
+
+⚠ **One behaviour changed.** `fux add <URL>` used to record the line and print
+*"no `[sources.url]` in fux.toml, so nothing can fetch this line yet"*; in a repo
+scaffolded after this it fetches. **The gate moved to where it always really
+was** — `.fux/sources/urls` is empty, and only an explicit `fux add` puts an
+address in it. L4's *explicit, fenced, opt-in* is satisfied by the verb.
+
+⚠ **A repo with no `[sources.url]` at all is exempt** and stays exempt: it
+fetches nothing, so there is nothing to bound, and a required key there would
+be noise.
+
+**Records amended in the same change** (Law zero): ADR-CONFIG · ADR-DOTFUX.
+**Item:** [`archive/open/W-85-…`](../archive/open/W-85-max-parallel-is-required.md).
+
+**Verification: `tests/` 1 534 pass** under the same 3.10 shim; the two
+`test_doctor` version failures are that shim, and the other five name a
+concurrent session's files (`src/fux/schema.py`, `W-86`, ADR-GRAPH,
+ADR-MAINTENANCE, `test_schemas.py`). ⚠ **`tests_e2e/` unverified**, same cause.
+⚠ **Not committed**, same reason as W-83.
+
+---
+
 ## W-83 — the unconfigured fetch ceiling (2026-08-26)
 
 **Arpit:** the number of parallel requests `fux update` / `fux add <URL>` /
@@ -73,13 +116,21 @@ mechanical check passes.
 ADR-DOTFUX. **Item:**
 [`archive/open/W-83-…`](../archive/open/W-83-the-unconfigured-fetch-ceiling.md).
 
-**Verification: 1 461 unit tests pass**, 8 of them new.
-⚠ **Two known failures are the 3.10 harness shim**, not the change — the build
-environment has no 3.11+ interpreter, so `fux doctor` correctly reports
-`3.10 < 3.11` and its two version tests fail. ⚠ **`tests_e2e/` unverified**,
-same cause, unchanged from W-82. ⚠ **Not committed** — a concurrent session was
-live in the same tree (`query/`, `store/`, `ingest/run.py`), so staging was left
-to whoever commits next.
+**Verification: 1 484 unit tests pass**, **11 of them new** (3 on what silence
+means, 3 on the written `fux.toml`, 5 on doctor). ⚠ **The total is not
+attributable to this item alone** — a concurrent session was adding tests to the
+same tree while this ran, which is why the count is reported and the *new* count
+is enumerated.
+
+⚠ **Four failures remain and none belongs to this change**, checked by name:
+two are the **3.10 harness shim** (the build environment has no 3.11+
+interpreter, so `fux doctor` correctly reports `3.10 < 3.11`), and two name the
+other session's files — `test_adr_freshness` flags **ADR-INGEST** and
+**ADR-INDEX-LIFECYCLE** over `ingest/run.py` and `store/`, and `test_doc_links`
+flags a `W-84` file this session did not create.
+⚠ **`tests_e2e/` unverified**, same shim cause, unchanged from W-82.
+⚠ **Not committed** — staging was left to whoever commits next, because
+re-staging mid-flight across another live session is the hazard CLAUDE.md names.
 
 ---
 
@@ -130,6 +181,7 @@ outcome is recorded here.
 
 | item | closed | closed by | outcome |
 |---|---|---|---|
+| **[W-84](../archive/open/W-84-heading-level-ask.md)** — `ask` cites at heading level | 2026-08-26 | [ADR-ASK](../docs/adr/0004_ask.md) decision 10 · [ADR-MCP](../docs/adr/0039_mcp.md) decision 9 | **The refusal is half the outcome.** Arpit asked whether `ask` should cite lines; it may not. A line range on `ask` could only be computed at **ingest**, so one edit makes it point at the wrong lines *while looking exactly as right as before* — the defect class of `max_age_seconds` and of a `cached` verdict reported as `current`. It also costs a positional index (2–4× the postings, Zobel & Moffat 2006 §5) against an index whose whole pitch is that it fits in git, and its value is thinnest where the cost is highest: `file:` sources are already in the working tree, `url:` sources are the ones most likely to have changed since ingest. **`answer` cites lines because it fetched the bytes and cites their sha.** What shipped instead was already committed: `phrases` — the document's headings, extracted at ingest since M2 and rendered by **`answer --no-refer` alone**. New `src/fux/query/headings.py` selects the ones matching the query (shared analyzer, scored by count of *distinct* query terms, zeros dropped, sorted `(-matches, document position)`, capped at 3) and `fux ask` renders them as indented `§` lines, `ask/find --json` as an always-present `"headings"` array, and MCP `fux_search` in its result rows. **`fux find`'s piped stdout is byte-identical** — a `§` on it would be read as a filename ([ADR-DIR-LIST](../docs/adr/0022_dir-list.md) decision 12's argument). **Display-only**, run on the already-unified list after `run_query` returns, exactly where `_resolve_title` runs under P5, so no seam exists for the differential law to break through — re-verified on this repo, `diff` of the two paths is `IDENTICAL` with headings present. ⚠ **A live defect found on the way:** `fux_search`'s **MCP tool description** claimed *"line-range citations"* and `_search` has never returned one — the identical wrong claim `ad95a24` had fixed in `docs/guide.html` and the usage skills **earlier the same day**, surviving in the machine-facing copy, where it is worse: an agent acts on a tool description with no human reading the output beside it. Corrected and pinned by a test. **Tool descriptions are documentation compiled into the package and no gate reads them** — `fux_passage`'s and `fux_related`'s remain unchecked. **21 new tests, `tests/` 1 500 green.** ⚠ **`tests_e2e/` unverified** (Python 3.10 sandbox, `tomllib` shim that never enters the repo — the two `test_doctor.py` failures are that shim, and predate this change). ⚠ **Not committed** — a concurrent session was mid-rename in the tree (`store/recordshape.py` → `recordschema.py`) and a W-84 commit would have swept it in |
 | **[W-63](../archive/open/W-63-source-verbs.md)** — the source verbs | 2026-08-21 | `v0.35.0` (PyPI 2026-08-21, verified black-box from the published wheel) | [ADR-CLI](../docs/adr/0002_cli-surface.md) 1a-1e · [ADR-INGEST](../docs/adr/0007_ingest.md) 9-10 · [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) 2d-2e, 3a · [the capture](regression/2026-08-21-source-verbs/report.md) | **The corpus finally has a command.** `fux add` / `fux remove` / `fux update` over all three committed source lists, dispatching on the entry — anything with a `scheme://` is a URL, `--types` says type pattern, everything else is a path, and a path may be a directory **or a single document**, which the list always accepted and no command ever wrote. `add` ingests by default and **fetches the one URL it just added**, announcing on stderr; `remove` deletes the line or, for a path held only by a listed ancestor, **subtracts it with `!`** and says which branch it took; `update` re-reads what is listed and **never writes a line**, which is the one sentence that keeps three verbs from overlapping. `fux url` deleted outright (four days old, pre-1.0); `ingest --refresh-urls` hidden for one release. **Two defects fixed first, both real independent of the verbs.** A de-listed URL used to survive an offline ingest, so **deleting a document required the network it has no use for** — reconciliation reads a committed file and now runs on every ingest, while the transient-failure guarantee (a *still-listed* URL whose fetch fails keeps its record) is untouched, because one keys on the list and the other on the fetch. And a carried `url:` record kept edges resolved against a **previous** run's corpus, so a removed document survived as a target in the derived graph plane; every carried record's edges are re-checked against the run's own id set. Both verified by mutation — reinstating either turns the new tests red. **Capturing the surface found four more defects the unit suite did not**, three of them in W-63 itself, and every one did something defensible while *saying* something false: an L4 announcement that fired with nothing fetched; `add '*.pdf' --types` **silently un-indexing every markdown document** (the types file replaces the built-in allowlist rather than extending it — W-55's invisible filter from a new direction); a type-allowlist skip reported as a failed fetch; and `explain` answering for a document not in the index. All fixed, all written up in [ANALYSIS](regression/2026-08-21-source-verbs/ANALYSIS.md). **L4's text did not change** — it already read *paths*, plural; what was wrong was the nine records and eleven docstrings that narrowed it to `--refresh-urls`, and those were corrected rather than the law restated. `src/fux/sources.py` re-owned from ADR-URL-LIST to ADR-CLI in the same change |
 | **[W-64](../archive/open/W-64-progress-plane.md)** — a progress plane for the write verbs | 2026-08-21 | [ADR-CLI](../docs/adr/0002_cli-surface.md) decision 9 · [the capture](regression/2026-08-21-progress-plane/report.md) | **Built and captured; not a milestone and not a gate.** `src/fux/progress.py` — stdlib, stderr-only, TTY-gated, count-based, threshold-gated at ~200, and **clock-free**: no `time` import, no elapsed, no ETA, no rate, because ingest is a maintenance path. Seven phases across `ingest.run()` (`walk`/`extract`/`edges`/`write`) and `derive.build()` (`read`/`codes`/`graph`/`postings`), reported through a `progress=None` keyword that **means silent, so no existing caller or test changed** — which is what kept this small. `main` builds **one** `Progress` and hands it to both, so an `ingest` that also builds is one continuous sequence rather than two bars fighting for a line. **The invariant is a test, not an intention**: `tests_e2e/test_progress_surface.py` runs each write verb twice, with and without `--progress`, and asserts stdout is byte-identical — a leak there would corrupt the `--json` contract every agent consumer reads. **Found while capturing, and fixed in the same change:** a phase whose total is not documents must name its unit, or `write`'s `252/252` sitting under `edges`' `1203/1203` reads as losing 950 documents. **The one open call was decided on its stated default** rather than stalling: the git hooks export `FUX_NO_PROGRESS=0` and show the bar, reversible in one line if [W-61](../archive/open/W-61-maintenance-measurement.md)'s fork lands on B. ⚠ **What is not claimed: repaint cost at R5's 100 000 documents.** This ran at 1 203; the bar is a write plus a flush per document, and that is [W-26](../archive/open/W-26-m6-scale-t2.md)'s to measure, not this row's to assume |
 | **the Windows console class, gated** — `fux add` crashed on a rejected file | 2026-08-21 | `35eeae0` · [ADR-CLI](../docs/adr/0002_cli-surface.md) consequence + veto 7 | **Second occurrence of the class, so it became a check in the change that recorded it** (CLAUDE.md's two-strikes rule). `fux add` on a file the type allowlist rejects printed `→` (U+2192); `cp1252` cannot encode it, so `print()` raised `UnicodeEncodeError` and the verb exited non-zero. **Both Windows CI arms went red on the `v0.35.0` release commit; every POSIX arm and every local run was green** — the first occurrence was `fux doctor`'s checkmarks at `v0.30.0`. `tests/test_windows_console_safe.py` parses every module under `src/fux/` and refuses a non-cp1252 character in any string reaching `print()`, `FuxError()` or `.write()`. **Scoped to streaming calls, not all string literals**, because the first version flagged `store/canonical.py` and `ingest/urlsrc.py` for holding U+2028/U+2029/U+0085 as the sentinels they strip — a guard that flags the code defending against a character is one people learn to switch off. One test skipped on Windows: there is no SIGINT to deliver to another pid there. |

@@ -166,7 +166,88 @@ def test_the_generated_config_loads(tmp_path):
     config = load(tmp_path)
     assert config.dirs_file == ".fux/sources/dirs"
     assert config.shards == 256
-    assert config.url is None  # [sources.url] ships commented out: offline by default
+    # ⚠ CHANGED BY W-85. This asserted `config.url is None` — `[sources.url]`
+    # shipped commented out, which is what made the concurrency bound invisible.
+    # The table is live now and the OPT-IN MOVED TO THE URL LIST: `[sources.url]`
+    # says *how* to fetch, `.fux/sources/urls` says *whether*, and it is empty.
+    assert config.url is not None
+    # ...and the list it points at is header comments only. Not one address, so
+    # nothing can be fetched: the opt-in is a URL existing, not a table existing.
+    from fux.ingest import sourcelist
+
+    listed = sourcelist.parse(
+        (tmp_path / config.url.urls_file).read_text(encoding="utf-8"),
+        sourcelist.URLS,
+        origin=config.url.urls_file,
+    )
+    assert listed == []
+
+
+# -- W-85: the concurrency knob is PRESENT, LIVE and REQUIRED ---------------
+
+
+def test_the_written_config_names_max_parallel_uncommented(tmp_path):
+    """Arpit, 2026-08-26: *"I wanted a property exposed. Where is that property?
+    It should be present by default."* — then, on being shown a commented line:
+    *"never commented. If it is commented, throw an error."*
+
+    W-83 wrote `#max_parallel = 4` inside a commented table, so a consumer
+    opening `fux.toml` saw a comment about a number rather than a number.
+    """
+    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
+
+    setup_mod.run(tmp_path)
+    written = (tmp_path / "fux.toml").read_text(encoding="utf-8")
+    assert f"\nmax_parallel = {DEFAULT_MAX_PARALLEL}\n" in written, "must be live, not commented"
+    assert f"#max_parallel" not in written
+    assert "\n[sources.url]\n" in written
+    assert "min(this, what your fetcher declares)" in written
+
+
+def test_the_configs_stated_default_is_the_one_the_engine_applies(tmp_path):
+    """The gate, not the trust. A number typed into the template drifts from the
+    constant beside it — which is the defect W-83 fixed one file over. `_CONFIG`
+    interpolates `DEFAULT_MAX_PARALLEL`; this fails if anyone flattens it."""
+    from fux.config import load
+    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
+
+    setup_mod.run(tmp_path)
+    assert "{default}" not in (tmp_path / "fux.toml").read_text(encoding="utf-8")
+    assert load(tmp_path).url.max_parallel == DEFAULT_MAX_PARALLEL
+
+
+def test_commenting_max_parallel_out_makes_the_config_refuse_to_load(tmp_path):
+    """The half of the ruling a template alone cannot deliver.
+
+    `fux setup` is write-if-missing, so it never reaches a `fux.toml` that
+    already exists — this repo's own included. **The loader error is the
+    migration path**: it puts the key in front of the person on their next
+    command, with the value to type.
+    """
+    from fux.config import load
+    from fux.errors import FuxError
+
+    setup_mod.run(tmp_path)
+    path = tmp_path / "fux.toml"
+    path.write_text(
+        path.read_text(encoding="utf-8").replace("\nmax_parallel = ", "\n#max_parallel = "),
+        encoding="utf-8",
+    )
+    with pytest.raises(FuxError) as exc:
+        load(tmp_path)
+    message = str(exc.value)
+    assert "max_parallel must be present" in message
+    assert "max_parallel = " in message, "an error that does not say what to type is half a migration"
+
+
+def test_a_repo_with_no_url_source_at_all_is_not_forced_to_declare_one(tmp_path):
+    """The line W-85 draws. A docs-only repo fetches nothing, so there is
+    nothing to bound, and demanding a bound there would make the key noise —
+    which is how a safety value stops being read."""
+    from fux.config import load
+
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    assert load(tmp_path).url is None
 
 
 # -- the rule that keeps ingest out of the code business -------------------

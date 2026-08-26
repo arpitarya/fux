@@ -58,11 +58,16 @@ class UrlSource:
       and it is what keeps the adapter cap from leaking one fetcher's
       vocabulary into fux's config schema.
     - `max_parallel` — how many URLs may be fetched at once (W-82 §3.3).
-      **`None` means "whatever the fetcher declares"**, which is `1` unless the
-      module sets `MAX_PARALLEL`. This is **policy**, not capability: it is
-      never clamped *up* past what a fetcher declared safe, and a large value is
-      honoured with a warning rather than silently reduced — Arpit's rule,
-      *state the cost, don't clamp the knob*. `< 1` is broken and refuses.
+      ⚠ **REQUIRED whenever `[sources.url]` exists** (W-85, Arpit: *"never
+      commented. If it is commented, throw an error that the value has to be
+      present."*). It is the only key here with no default: a repo that **can**
+      fetch must say how hard, in the file. A repo with no `[sources.url]` at
+      all is exempt — it fetches nothing, so there is nothing to bound.
+      The effective value is `min(this, the fetcher's MAX_PARALLEL)`. This is
+      **policy**, not capability: it is never clamped *up* past what a fetcher
+      declared safe, and a large value is honoured with a warning rather than
+      silently reduced — Arpit's rule, *state the cost, don't clamp the knob*.
+      `< 1` is broken and refuses.
       ⚠ **It lives here and not in `tune.toml`** because it changes no byte in
       `.fux/index/` **and** is not a ranking value: it is operational, so it
       belongs beside the other `[sources.url]` keys.
@@ -72,7 +77,12 @@ class UrlSource:
     urls_file: str
     meta: str  # "hashed" | "plain"
     config: dict
-    max_parallel: int | None = None
+    #: ⚠ **No default, and that is the point** (W-85). Every other field here
+    #: carries one; this one is required whenever `[sources.url]` exists,
+    #: because a repo that can fetch must say how hard in a number a person can
+    #: read. Leaving a default here would put the value back where W-85 took it
+    #: from — implicit, and therefore unread.
+    max_parallel: int
 
 
 @dataclass
@@ -222,25 +232,44 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
     config = raw.get("config", {})
     if not isinstance(config, dict):  # the ONLY validation fux does on it
         raise FuxError(f"{path}: [sources.url.config] must be a table (got {type(config).__name__})")
-    max_parallel = raw.get("max_parallel")
-    if max_parallel is not None:
-        # Refuse what is BROKEN; warn about what is merely strong. A value below
-        # 1 cannot mean anything -- there is no such thing as fetching less than
-        # one URL at a time -- so it is an error here rather than a silent clamp
-        # to 1, which would honour a number the consumer plainly did not mean.
-        # The "this is a lot of connections" warning belongs at the point of use
-        # (`urlsrc.resolve_parallel`), where the fetcher's own declared maximum
-        # is known and the note can state the real cost.
-        if isinstance(max_parallel, bool) or not isinstance(max_parallel, int):
-            raise FuxError(
-                f"{path}: [sources.url] max_parallel must be an integer >= 1 "
-                f"(got {max_parallel!r})"
-            )
-        if max_parallel < 1:
-            raise FuxError(
-                f"{path}: [sources.url] max_parallel must be >= 1 (got {max_parallel}). "
-                "1 fetches one URL at a time, which is the default"
-            )
+    # W-85 (Arpit): *"never commented. If it is commented, throw an error that
+    # the value has to be present."* A repo that CAN fetch must say how hard,
+    # in the file, in numbers a person can read -- so this is the one
+    # `[sources.url]` key with no default. A repo with no `[sources.url]` at
+    # all is not covered: it fetches nothing, so there is nothing to bound, and
+    # demanding a bound there would make the key noise. Noise is how a safety
+    # value stops being read.
+    if "max_parallel" not in raw:
+        # Imported here rather than at module scope: the constant belongs to the
+        # fetch plane (ADR-FETCHER owns `urlsrc.py`), and a top-level import
+        # would put `fux.config` downstream of `fux.ingest` for one integer.
+        from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
+
+        raise FuxError(
+            f"{path}: [sources.url] max_parallel must be present -- it is how many URLs "
+            f"fux may fetch at once, and it is not allowed to be implicit or commented out. "
+            f"Add:\n\n    max_parallel = {DEFAULT_MAX_PARALLEL}\n\n"
+            "under [sources.url]. The effective value is min(this, your fetcher's "
+            "MAX_PARALLEL); raise it if your host can take it."
+        )
+    max_parallel = raw["max_parallel"]
+    # Refuse what is BROKEN; warn about what is merely strong. A value below
+    # 1 cannot mean anything -- there is no such thing as fetching less than
+    # one URL at a time -- so it is an error here rather than a silent clamp
+    # to 1, which would honour a number the consumer plainly did not mean.
+    # The "this is a lot of connections" warning belongs at the point of use
+    # (`urlsrc.resolve_parallel`), where the fetcher's own declared maximum
+    # is known and the note can state the real cost.
+    if isinstance(max_parallel, bool) or not isinstance(max_parallel, int):
+        raise FuxError(
+            f"{path}: [sources.url] max_parallel must be an integer >= 1 "
+            f"(got {max_parallel!r})"
+        )
+    if max_parallel < 1:
+        raise FuxError(
+            f"{path}: [sources.url] max_parallel must be >= 1 (got {max_parallel}). "
+            "1 fetches one URL at a time"
+        )
     return UrlSource(
         fetcher=fetcher.strip(),
         urls_file=urls_file.strip(),

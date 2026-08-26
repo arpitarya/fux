@@ -62,7 +62,7 @@ def _write_urls(tmp_path, lines):
 
 def _init(tmp_path, *, urls, meta=None, files=None, fetcher=FAKE_FETCHER, config=None):
     files = files if files is not None else {"docs/a.md": "# Doc A\n\nrepo body\n"}
-    url_lines = '[sources.url]\nfetcher = "mw.py"\n'
+    url_lines = '[sources.url]\nfetcher = "mw.py"\nmax_parallel = 4\n'
     if meta is not None:
         url_lines += f'meta = "{meta}"\n'
     if config is not None:
@@ -94,7 +94,7 @@ def test_config_meta_defaults_to_hashed(tmp_path):
 
 
 def test_config_paths_default_into_the_fux_dir(tmp_path):
-    _write_toml(tmp_path, "[sources]\n[sources.url]\n")
+    _write_toml(tmp_path, "[sources]\n[sources.url]\nmax_parallel = 4\n")
     cfg = load_config(tmp_path)
     # The default is the plain-GET fetcher: a line with no `fetch=` means
     # `fetch=http` (ADR-HTTP-FETCHER decision 1), and this key is the
@@ -105,7 +105,7 @@ def test_config_paths_default_into_the_fux_dir(tmp_path):
 
 def test_config_rejects_bad_meta(tmp_path):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nfetcher = "mw.py"\nmeta = "cleartext"\n'
+        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\nmeta = "cleartext"\n'
     )
     with pytest.raises(FuxError, match="meta must be"):
         load_config(tmp_path)
@@ -113,7 +113,7 @@ def test_config_rejects_bad_meta(tmp_path):
 
 def test_config_rejects_an_inline_urls_list_and_names_the_file(tmp_path):
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nurls = ["https://x.test/a"]\n'
+        '[sources]\n[sources.url]\nmax_parallel = 4\nurls = ["https://x.test/a"]\n'
     )
     with pytest.raises(FuxError, match=r"\.fux/sources/urls"):
         load_config(tmp_path)
@@ -124,7 +124,7 @@ def test_config_table_is_opaque_but_must_be_a_table(tmp_path):
     assert load_config(tmp_path).url.config == {"cdp_port": 9333, "anything_at_all": "fux never reads this"}
 
     (tmp_path / "fux.toml").write_text(
-        '[sources]\n[sources.url]\nfetcher = "mw.py"\nconfig = 9222\n'
+        '[sources]\n[sources.url]\nmax_parallel = 4\nfetcher = "mw.py"\nconfig = 9222\n'
     )
     with pytest.raises(FuxError, match=r"\[sources.url.config\] must be a table"):
         load_config(tmp_path)

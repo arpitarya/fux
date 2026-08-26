@@ -158,3 +158,17 @@ mv .git/index.lock .git/_stale_locks/index.lock.stale
 **Verify it is actually stale before moving it** — a lock held by a live git
 process is not stale, and this repo is edited by concurrent sessions. A 0-byte
 lock whose mtime matches a `git status` you just ran is yours.
+
+⚠ **`git mv` strands one too, and there is no read-only form of it** (2026-08-26,
+W-84). `git mv work/open/W-84… archive/open/W-84…` failed with the file not yet
+tracked, and left the same undeletable `index.lock` behind on the way out —
+so a session retiring a **new, untracked** detail file into `archive/open/`
+gets the worst of both: no move, and a locked repo.
+
+**Use a plain `mv` for an untracked file.** Git records the move at
+`git add` time from the paths, not from having been told; `git mv` buys nothing
+here and costs a lock.
+
+```bash
+mv work/open/W-nn-….md archive/open/     # untracked: plain mv, no lock
+```

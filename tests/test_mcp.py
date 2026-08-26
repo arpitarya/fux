@@ -27,7 +27,7 @@ from fux.store import TF_FIELDS, term_hash, write_index
 BODY = TF_FIELDS.index("body")
 
 
-def _rec(doc_id, title, word, *, edges=(), superseded=False) -> dict:
+def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=()) -> dict:
     tf = [0] * len(TF_FIELDS)
     tf[BODY] = 5
     flen = [0] * len(TF_FIELDS)
@@ -39,7 +39,7 @@ def _rec(doc_id, title, word, *, edges=(), superseded=False) -> dict:
         "mode": "extracted",
         "meta": "plain",
         "title": title,
-        "phrases": [],
+        "phrases": list(phrases),
         "terms": {term_hash(word): tf},
         "flen": flen,
         "sha": "a" * 40,
@@ -64,12 +64,22 @@ def repo(tmp_path):
             # explicitly. The edge below is what a real ingest would derive it
             # FROM; both are present here so the fixture matches what the
             # pipeline actually produces.
-            _rec("file:docs/retry.md", "Retry policy", "rollback", superseded=True),
+            _rec(
+                "file:docs/retry.md",
+                "Retry policy",
+                "rollback",
+                superseded=True,
+                # W-84: the headings a real ingest would have extracted. One
+                # matches the query the tests use, one does not, so the
+                # filtering is visible rather than assumed.
+                phrases=["Backoff", "Rollback procedure"],
+            ),
             _rec(
                 "file:docs/new.md",
                 "New decision",
                 "rollback",
                 edges=[{"kind": "supersedes", "dst": "file:docs/retry.md", "grade": 10}],
+                phrases=["Scope"],
             ),
         ],
     )
@@ -144,6 +154,30 @@ def test_search_surfaces_the_supersession_flag(repo):
     flags = {r["path"]: r["superseded"] for r in payload["results"]}
     assert flags.get("docs/retry.md") is True
     assert flags.get("docs/new.md") is False
+
+
+def test_search_carries_the_matching_headings(repo):
+    """W-84 — section-level, and only the sections the query asked about.
+
+    `fux_search` stays document-level (no fetch, no chunking, no line
+    arithmetic); this narrows *where in the document* to look, which is the
+    decision an agent makes before it spends a `fux_passage` call.
+    """
+    payload = _call(repo, "fux_search", {"query": "rollback", "k": 5})["structuredContent"]
+    headings = {r["path"]: r["headings"] for r in payload["results"]}
+    assert headings["docs/retry.md"] == ["Rollback procedure"], "`Backoff` does not match"
+    assert headings["docs/new.md"] == [], "present and empty — an absent key is a trap"
+
+
+def test_search_does_not_claim_line_ranges_it_never_returns(repo):
+    """The tool description said *"line-range citations"* until 2026-08-26 and
+    `_search` has never returned one. An agent reads this string and acts on
+    it, so a false claim here is worse than a false one in a doc."""
+    (search,) = [t for t in TOOLS if t["name"] == "fux_search"]
+    assert "line-range" not in search["description"]
+    payload = _call(repo, "fux_search", {"query": "rollback", "k": 5})["structuredContent"]
+    for row in payload["results"]:
+        assert ":L" not in row["path"], "a search hit is a document, not a span"
 
 
 def test_passage_returns_exactly_the_requested_lines(repo):

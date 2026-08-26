@@ -232,6 +232,16 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
 > value is 1**, and behaviour is byte-for-byte what shipped before. Fux uses
 > `min(declared, configured)` workers.
 >
+> ⚠ **Amended 2026-08-26 (W-83): a declaration is a CEILING on what a consumer
+> may ask for, never a FLOOR on what fux will do unasked.** When the consumer
+> has configured nothing, fux uses `min(declared, 4)` — see
+> [ADR-CONFIG](0014_config.md)'s W-83 amendment for why. `MAX_PARALLEL` answers
+> *what is safe*; it was never a claim about what the consumer's host can
+> absorb, and reading it as one is how `http.py`'s honest `8` became eight live
+> connections to a wiki nobody asked about. Fetcher authors: **declare the
+> truth about your module and nothing about politeness** — the second half is
+> the consumer's to say, in `fux.toml`.
+>
 > This is **decision 5's own principle — *declared, never detected* — applied to
 > a second property**, and it is deliberately a *constant* rather than a
 > function: the four-function contract has survived two callers unchanged, and

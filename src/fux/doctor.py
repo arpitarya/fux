@@ -192,8 +192,14 @@ def _url_health(root: Path) -> Check:
         return Check("url sources", True, "skipped (no readable index)", level="warn")
 
     summary = urlstate.summarize(urlstate.read(root), indexed)
+    policy = _parallel_policy(root)
     if not summary.has_urls:
-        return Check("url sources", True, "none indexed", level="warn")
+        # ⚠ The concurrency belongs in THIS branch above all (W-83). An empty
+        # corpus with `[sources.url]` configured is a repo about to run its
+        # first `fux add <URL>` — the moment the number matters most and the
+        # only moment nobody can look it up from a previous run.
+        detail = "none indexed" if policy is None else f"none indexed, {policy}"
+        return Check("url sources", True, detail, level="warn")
 
     parts = [f"{summary.indexed} url: record(s)"]
     if summary.run_seq == 0:
@@ -204,6 +210,8 @@ def _url_health(root: Path) -> Check:
         parts.append(f"{summary.never_confirmed} never re-fetched since first ingest")
     if summary.failing:
         parts.append(f"{summary.failing} failing")
+    if policy is not None:
+        parts.append(policy)
     detail = ", ".join(parts)
     if summary.failing_urls:
         # Named, not just counted: a count tells you something is wrong and a
@@ -215,6 +223,46 @@ def _url_health(root: Path) -> Check:
             "fux never deletes a URL record; remove the line from .fux/sources/urls yourself"
         )
     return Check("url sources", not summary.failing_urls, detail, level="warn")
+
+
+def _parallel_policy(root: Path) -> str | None:
+    """How many URLs a networked verb may open at once — W-83.
+
+    **The number a person needs before running `fux update` over a corporate
+    wiki**, said by the one command whose job is to tell them what will happen.
+    Without it the only way to learn the concurrency was to read `config.py`.
+
+    ⚠ **This reports POLICY and refuses to compute the product**, and that is a
+    constraint rather than laziness. The effective value is
+    `min(configured, declared)`, and `declared` lives in a **consumer-owned
+    Python file** — reading it means importing it, which runs whatever is at
+    that file's module level. `fux doctor` is the command a person runs when
+    something is already wrong; it may not be the command that executes their
+    fetcher. So it names the rule and lets `fux update` apply it.
+    """
+    from .config import load
+
+    try:
+        url = load(root).url
+    except Exception:
+        # No readable fux.toml is `_config`'s finding to report, not this
+        # function's, and a health command must not raise twice for one cause.
+        # ⚠ Since W-85 this also swallows the *missing `max_parallel`* refusal —
+        # correctly: that error belongs to whichever command the person actually
+        # ran, stated once, not repeated as a doctor line.
+        return None
+    if url is None:
+        # No `[sources.url]` at all: there is no fetching to bound, and a
+        # concurrency figure for a source that does not exist is noise on a
+        # command whose whole value is that its output is worth reading.
+        return None
+    # No "unset" branch since W-85: `max_parallel` is required, so a loaded
+    # `UrlSource` always carries a real number. A fallback here would be dead
+    # code that reads like reassurance.
+    return (
+        f"fetches <= {url.max_parallel} at a time "
+        "(max_parallel; also capped by your fetcher's MAX_PARALLEL)"
+    )
 
 
 def _accelerator(root: Path) -> Check:

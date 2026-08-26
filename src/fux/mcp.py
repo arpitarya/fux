@@ -34,11 +34,20 @@ PROTOCOL_VERSION = "2024-11-05"
 TOOLS = [
     {
         "name": "fux_search",
+        # ⚠ **This said "line-range citations" until 2026-08-26 and that was
+        # false** -- `_search` returns a document path, a sha, and now the
+        # matching headings; it has never returned a line range and by design
+        # never will (see `_search`'s closing comment). An agent reading the
+        # old text would look for a field that is not there, or believe fux
+        # cannot do spans at all when `fux_passage` is the tool that does.
+        # This is the same defect commit ad95a24 fixed in the human docs,
+        # still live in the surface an agent actually reads. W-84.
         "description": (
             "Search the committed index for documents relevant to a natural-language "
-            "question. Returns ranked results with line-range citations and content "
-            "hashes. This is the call to make first for any 'where is X' or 'why did "
-            "we decide Y' question about this repository."
+            "question. Returns ranked documents with content hashes and the headings "
+            "that match your query -- section-level, not line-level; call fux_passage "
+            "for the lines. This is the call to make first for any 'where is X' or "
+            "'why did we decide Y' question about this repository."
         ),
         "inputSchema": {
             "type": "object",
@@ -98,6 +107,7 @@ def _root() -> Path:
 
 def _search(root: Path, args: dict) -> dict:
     from .query import run_query
+    from .query.headings import headings_for
 
     query = args.get("query") or ""
     k = int(args.get("k") or 5)
@@ -120,6 +130,13 @@ def _search(root: Path, args: dict) -> dict:
                 "sha": record.get("sha", ""),
                 "archived": r.archived,
                 "superseded": bool(record.get("superseded", False)),
+                # W-84 -- the document's headings that match this query, best
+                # first, at most three. **Free here**: the record is already in
+                # hand for `sha`, and `phrases` was committed at ingest. Always
+                # present, `[]` when nothing matches or the record is `hashed`
+                # (which carries no display text at all, L5) -- an absent key
+                # would be indistinguishable from an older server.
+                "headings": headings_for(record, query),
             }
         )
     return {
@@ -131,6 +148,12 @@ def _search(root: Path, args: dict) -> dict:
         # call into the expensive one. The index knows documents; the refer
         # plane knows spans. `fux_passage` is one more call and it is the call
         # the agent was going to make anyway.
+        #
+        # **`headings` is not a retreat from that** (W-84). It is not a span and
+        # does not pretend to be: no fetch, no chunking, no line arithmetic --
+        # just the committed heading text, filtered to what the query asked
+        # about. It narrows WHICH document to open and WHERE to look in it,
+        # which is the decision an agent makes before it spends a `fux_passage`.
         "next": "call fux_passage with a path to read a span, or fux_related for neighbours",
     }
 

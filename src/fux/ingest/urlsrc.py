@@ -157,10 +157,19 @@ def configure_fetcher(module, config: dict) -> None:
         raise FuxError(f"[sources.url] fetcher configure() failed: {exc}") from exc
 
 
-#: Politeness default for `[sources.url] max_parallel` (W-82 §3.3).
+#: Politeness default for `[sources.url] max_parallel` (W-82 §3.3, **made
+#: effective by W-83**).
+#:
 #: **A judgement, not a measurement** — low enough to be polite to a single
 #: intranet host without configuration, high enough that the difference from
 #: sequential is immediately visible. Cheap to change; nothing measured it.
+#:
+#: ⚠ **It shipped referenced by nothing, and that was the defect W-83 fixed.**
+#: `resolve_parallel(module, None)` returned `declared`, and the shipped
+#: `http.py` declares `8` — so an unconfigured `fux update` over a large list
+#: opened **eight** concurrent connections while this constant sat in the same
+#: file stating the default was four and explaining why four was the polite
+#: number. A wrong constant that reads as authority is worse than no constant.
 DEFAULT_MAX_PARALLEL = 4
 
 #: A fetcher that declares nothing is called **one URL at a time**, which is
@@ -185,6 +194,27 @@ def resolve_parallel(module, configured: int | None) -> int:
       **honoured with a warning that states the cost**, never clamped down.
     - **`max_parallel < 1` is BROKEN** and refuses, the same treatment
       `cache_ttl_seconds < 0` already gets in `refer/freshness.py`.
+
+    ## Silence is `min(declared, DEFAULT_MAX_PARALLEL)` — W-83
+
+    **A declaration answers *what is safe*, never *what is polite unasked*.**
+    `http.py`'s `MAX_PARALLEL = 8` is a true statement about `http.py` — a
+    fresh `Request` per call, no shared connection — and it is not a claim
+    about what the consumer's wiki can absorb. Nobody declared `8` for *this*
+    repo, so the safe reading of silence is the polite one, and an
+    unconfigured run is bounded by fux's politeness rather than by the
+    library author's ceiling.
+
+    Three things this deliberately does **not** change:
+
+    - **It can only lower, never raise.** A fetcher declaring `1` still gets
+      `1`, so `cdp.py`'s one-WebSocket hazard is exactly as protected.
+    - **The knob still reaches the ceiling.** `max_parallel = 8` against a
+      fetcher declaring `8` returns `8`, silently — *state the cost, don't
+      clamp the knob* applies to what the consumer **said**, and this rule
+      only decides what saying **nothing** means.
+    - **No warning fires here.** The default is fux's own choice; warning a
+      consumer about a number they did not pick is noise.
     """
     if configured is not None and configured < 1:
         raise FuxError(
@@ -198,7 +228,10 @@ def resolve_parallel(module, configured: int | None) -> int:
         # value that is always safe.
         declared = UNDECLARED_MAX_PARALLEL
     if configured is None:
-        return declared
+        # W-83. `min`, not `DEFAULT_MAX_PARALLEL`: a fetcher that declares less
+        # than the politeness default keeps its own smaller number, which is the
+        # whole of `cdp.py`'s protection.
+        return min(declared, DEFAULT_MAX_PARALLEL)
     if configured > declared:
         print(
             f"note: {getattr(module, '__name__', 'fetcher')} declares MAX_PARALLEL = {declared}; "
@@ -285,6 +318,17 @@ def fetch_all(
     **`connect()` / `close()` stay once per group, never once per worker.** Only
     `fetch` is called concurrently, and a fetcher declaring `MAX_PARALLEL > 1`
     is declaring exactly that — *my `fetch` is reentrant given one `connect`*.
+
+    **The bound is per fetcher group, not per host** (W-83, stated because it is
+    the shape of the thing rather than a defect in it). A group is every URL
+    resolving to one fetcher file. Twenty hosts through `http.py` therefore
+    share one budget — politer than they need to be — and five hundred URLs on
+    a single host get the same budget, which is the case the bound exists for.
+    The conservative direction is the one that would be wrong here.
+
+    **Unconfigured is `min(declared, DEFAULT_MAX_PARALLEL)`**, so a repo that
+    has never opened `fux.toml` is bounded by fux's politeness rather than by
+    whatever ceiling its fetcher's author found technically sound.
 
     ⚠ **A blanket pool would have been silently wrong.** The shipped `cdp.py`
     sets a module-global `_session` holding **one WebSocket** that every

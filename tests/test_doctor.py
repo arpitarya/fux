@@ -220,6 +220,87 @@ def test_url_check_reports_never_fetched_before_any_networked_run(tmp_path):
     assert "2 never re-fetched since first ingest" in check.detail
 
 
+def test_url_check_states_the_concurrency_a_networked_run_will_use(tmp_path):
+    """W-83. The number a person needs BEFORE pointing `fux update` at a
+    corporate wiki, said by the command whose job is to say what will happen."""
+    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert f"fetches <= {DEFAULT_MAX_PARALLEL} at a time" in check.detail
+    assert "MAX_PARALLEL" in check.detail  # the other half of the min() is named
+
+
+def test_a_config_missing_max_parallel_leaves_doctor_silent_rather_than_crashing(tmp_path):
+    """W-85. A `[sources.url]` without `max_parallel` REFUSES TO LOAD — and
+    that refusal belongs to whichever command the person actually ran, said
+    once. Doctor stays quiet about it instead of raising a second time or
+    inventing a number it cannot know."""
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "url sources")  # must not raise
+    assert "fetches <=" not in check.detail
+
+
+def test_the_concurrency_is_stated_before_the_first_url_is_indexed(tmp_path):
+    """The branch that matters most, and the one that short-circuited first.
+
+    An empty corpus with `[sources.url]` configured is a repo about to run its
+    first `fux add <URL>` — the moment the number is worth knowing, and the
+    only moment nobody can infer it from a previous run.
+    """
+    from fux.ingest.urlsrc import DEFAULT_MAX_PARALLEL
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, [])
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "none indexed" in check.detail
+    assert f"fetches <= {DEFAULT_MAX_PARALLEL} at a time" in check.detail
+
+
+def test_no_url_source_means_no_concurrency_line_at_all(tmp_path):
+    """A bound on fetching that cannot happen is noise, and doctor's whole
+    value is that its output is worth reading."""
+    _git_repo(tmp_path)
+    _url_index(tmp_path, [])
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert check.detail == "none indexed"
+
+
+def test_url_check_reports_a_configured_max_parallel(tmp_path):
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n[sources.url]\nmax_parallel = 2\n", encoding="utf-8"
+    )
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "fetches <= 2 at a time" in check.detail
+    assert "unset" not in check.detail
+
+
+def test_doctor_never_imports_the_consumers_fetcher_to_read_its_declaration(tmp_path):
+    """The effective value is `min(configured, declared)` and doctor reports
+    only the first half — because reading the second means importing a
+    consumer-owned Python file, and `fux doctor` is the command a person runs
+    when something is ALREADY wrong. A booby-trapped fetcher must not detonate
+    on a health check."""
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    fetchers = tmp_path / ".fux" / "fetchers"
+    fetchers.mkdir(parents=True, exist_ok=True)
+    (fetchers / "http.py").write_text(
+        "raise SystemExit('doctor imported the fetcher')\n", encoding="utf-8"
+    )
+    (tmp_path / "fux.toml").write_text("[sources]\n[sources.url]\nmax_parallel = 4\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "url sources")  # must not raise
+    assert "fetches <=" in check.detail
+
+
 def test_url_check_reports_what_the_last_run_confirmed(tmp_path):
     from fux.maintain import urlstate
 

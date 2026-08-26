@@ -40,7 +40,41 @@ def test_an_undeclared_fetcher_is_called_one_at_a_time():
 def test_the_cap_is_the_minimum_of_the_two():
     assert urlsrc.resolve_parallel(_fetcher(declared=8), 4) == 4
     assert urlsrc.resolve_parallel(_fetcher(declared=2), 8) == 2
-    assert urlsrc.resolve_parallel(_fetcher(declared=8), None) == 8
+    # ⚠ CHANGED BY W-83, and it is a behaviour change rather than a corrected
+    # test. This line asserted `== 8` when §3.3 shipped: unconfigured meant
+    # *whatever the fetcher declared*, so an untouched repo inherited
+    # `http.py`'s 8. It now means `min(declared, DEFAULT_MAX_PARALLEL)`.
+    assert urlsrc.resolve_parallel(_fetcher(declared=8), None) == urlsrc.DEFAULT_MAX_PARALLEL
+
+
+# -- W-83: what SILENCE means ------------------------------------------------
+
+
+def test_saying_nothing_gets_the_politeness_default_not_the_fetchers_ceiling():
+    """A declaration answers *what is safe*, never *what is polite unasked*.
+
+    `http.py`'s `MAX_PARALLEL = 8` is a true statement about `http.py` — a
+    fresh `Request` per call — and not a claim about what the consumer's wiki
+    can absorb. Nobody declared 8 for *this* repo.
+    """
+    assert urlsrc.DEFAULT_MAX_PARALLEL < 8, "the test is vacuous if they are equal"
+    assert urlsrc.resolve_parallel(_fetcher(declared=8), None) == urlsrc.DEFAULT_MAX_PARALLEL
+    assert urlsrc.resolve_parallel(_fetcher(declared=64), None) == urlsrc.DEFAULT_MAX_PARALLEL
+
+
+def test_the_default_only_ever_lowers_never_raises():
+    """`min`, not the constant. A fetcher declaring less keeps its own smaller
+    number — which is the whole of `cdp.py`'s one-WebSocket protection."""
+    assert urlsrc.resolve_parallel(_fetcher(declared=1, name="cdp"), None) == 1
+    assert urlsrc.resolve_parallel(_fetcher(), None) == 1  # undeclared is still 1
+    assert urlsrc.resolve_parallel(_fetcher(declared=2), None) == 2
+
+
+def test_the_knob_still_reaches_the_declared_ceiling_silently(capsys):
+    """The default decides what saying NOTHING means. It must not become a
+    second clamp on what the consumer explicitly asked for."""
+    assert urlsrc.resolve_parallel(_fetcher(declared=8), 8) == 8
+    assert capsys.readouterr().err == ""
 
 
 def test_exceeding_a_declared_capability_clamps_down_loudly(capsys):
