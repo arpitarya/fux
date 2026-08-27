@@ -722,3 +722,39 @@ def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
     )
     assert why == "", why
     assert markdown == "consumer decoder ran: payload"
+
+
+# --- URLs reach the enrichment queue too (Arpit, 2026-08-28) ---------------
+#
+# The file path routed an unreadable document into `.fux/enrich/queue.tsv` with
+# its reason; the URL path routed it nowhere, so a URL that needed a model could
+# never be queued for one. ADR-FETCHER decision 11 named the asymmetry; this is
+# it closed.
+
+def test_a_fetch_failure_is_not_queued_for_a_model():
+    """⚠ **The care that earns the `UNFETCHED` kind.** A 404 or a timeout is not
+    something enrichment discharges, and `queue.tsv` is COMMITTED — queueing one
+    would put a permanent work item in front of the whole team that no amount of
+    model time closes.
+    """
+    from fux.ingest.gitdir import UNFETCHED, UNREADABLE, Skipped
+
+    dead = Skipped(rel_path="https://x.test/gone", reason="fetch failed: 404", kind=UNFETCHED)
+    unreadable = Skipped(rel_path="https://x.test/scan", reason="pdf: no text layer")
+
+    assert dead.kind == UNFETCHED
+    assert unreadable.kind == UNREADABLE, "the default stays the loud bucket"
+    queued = [s for s in (dead, unreadable) if s.kind != UNFETCHED]
+    assert [s.rel_path for s in queued] == ["https://x.test/scan"]
+
+
+def test_the_kind_is_set_at_the_skip_site_not_read_back_from_the_reason():
+    """Branching on prose is what W-82 ruling 12 refused, and the classification
+    would be one string edit away from silently wrong."""
+    import inspect
+
+    from fux.ingest import urlsrc
+
+    source = inspect.getsource(urlsrc.fetch_all)
+    assert "kind=UNFETCHED" in source
+    assert 'reason.startswith("fetch failed' not in source

@@ -247,6 +247,43 @@ URL bytes.** Amended 2026-08-27, on
   needs a model can never be queued for one.** `queue.tsv` is committed, so
   that is a scope call. **Named, not taken.**
 
+**12. `validate(url) -> str | None` — the optional fifth function.** W-87 P4
+fork 3, ruled by Arpit 2026-08-28 once [P3](../../work/regression/2026-08-27-p3-sha-stability/VERDICT.md)
+cleared its gate at 19/19.
+
+⚠ **THE INVARIANT, and it is the whole of the design: a changed token must NEVER
+mean a changed record.**
+
+| the fetcher says | fux does |
+|---|---|
+| a token **equal** to last run's | **skips the body fetch** — the only thing `validate` may do |
+| a **different** token | fetches, **then still compares the sanitized sha** |
+| `None` — *"I cannot tell"* | fetches, exactly as before |
+| raises | fetches. An optimisation may not fail a run |
+
+**So a chatty `ETag` costs a wasted fetch and cannot churn a shard.**
+`validate` can only ever save work — byte-determinism is untouched **by
+construction**, not by test. Verified live: `Special:Random`'s token rotates
+every request, and it is re-fetched every run while three stable URLs are not.
+
+- **Zero migration.** `None` and a missing function are the same thing, so every
+  fetcher written before this keeps working.
+- **The token is opaque.** Fux hashes and compares; it never parses one. That is
+  what stops `validate` smuggling HTTP semantics into an engine that has none.
+- **The shipped `http.py` implements it** — a `HEAD` for `ETag`, falling back to
+  `Last-Modified` — which is the clean test that the fifth function is not dead
+  weight. ⚠ **It names its own cost**: a `HEAD` is not free, is not always
+  honoured, and some servers compute a different `ETag` for it. The docstring
+  says to delete the function if that is your intranet.
+- ⚠ **It reaches existing repos only when they copy it in.** `fux setup` is
+  write-if-missing and never rewrites a consumer's fetcher — the same freeze
+  ADR-DOTFUX decision 6 names. Measured: a repo created before this change
+  learned **0 of 7** tokens until its `http.py` was replaced by hand.
+- **A validated URL is neither a fetch nor a skip**, and is counted separately —
+  its prior record is correct and carried forward, which is the opposite of a
+  failure. `fux update` prints the count, because **an optimisation that fails
+  silently in the safe direction looks identical to one that never ran.**
+
 ### Consequences
 
 - **The contract survived gaining a second caller unchanged.** The refer plane

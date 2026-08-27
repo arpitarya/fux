@@ -646,6 +646,15 @@ def cmd_update(args) -> int:
                 )
 
     report = _ingest(root, args, refresh_urls=refresh, only_urls=only_urls)
+    # Fork 3: a saved fetch is worth one line. An optimisation nobody can see is
+    # one nobody can verify — and `validate` is exactly the kind that fails
+    # silently in the safe direction, so a run where it stopped working looks
+    # identical to one where it never ran.
+    if getattr(report, "validated", 0):
+        print(
+            f"  {report.validated} URL(s) unchanged by validate(); no body fetched",
+            file=sys.stderr,
+        )
     for s in report.skipped:
         if s.rel_path.startswith(("http://", "https://")):
             print(f"  ! {s.rel_path} — {s.reason}; prior record kept", file=sys.stderr)

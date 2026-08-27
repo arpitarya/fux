@@ -46,13 +46,14 @@ from __future__ import annotations
 
 import sys
 
+import hashlib
 import importlib.util
 from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 from ..errors import FuxError
 from . import sourcelist
-from .gitdir import Skipped
+from .gitdir import UNFETCHED, Skipped
 
 _HOSTILE_LINE_BREAKS = ("\u2028", "\u2029", "\u0085")
 
@@ -415,6 +416,8 @@ def fetch_all(
     config: dict | None = None,
     *,
     max_parallel: int | None = None,
+    known_tokens: dict[str, str] | None = None,
+    validation_out: dict | None = None,
 ) -> tuple[list[FetchedUrl], list[Skipped]]:
     """Fetch every URL through the fetcher its line declared.
 
@@ -464,6 +467,12 @@ def fetch_all(
     limited: dict[str, int] = {}
     fetched: list[FetchedUrl] = []
     skipped: list[Skipped] = []
+    #: URLs a `validate()` said are unchanged, so no body was fetched. **Not a
+    #: skip**: the prior record is correct and stays, which is the opposite of a
+    #: failure, so they are reported separately or a healthy run would look like
+    #: a broken one.
+    validated: list[str] = []
+    token_shas: dict[str, str] = {}
     for fetcher_path in sorted(groups):
         module = load_fetcher(root, fetcher_path)
         configure_fetcher(module, config or {})
@@ -476,14 +485,29 @@ def fetch_all(
                 raise FuxError(f"[sources.url] fetcher connect() failed: {exc}") from exc
         try:
             urls = sorted(set(groups[fetcher_path]))
+
+            # Fork 3: ask which of these can be skipped before opening a socket
+            # for their bodies. `unchanged` is a set of URLs whose token matched
+            # what we stored -- and skipping a fetch is ALL it may do; see
+            # `validate_group`'s invariant.
+            unchanged, learned = validate_group(module, urls, known_tokens or {})
+            token_shas.update(learned)
+            for url in sorted(unchanged):
+                validated.append(url)
+            urls = [u for u in urls if u not in unchanged]
+
             workers = resolve_parallel(module, max_parallel)
             for url, text, exc in _fetch_group(module, urls, workers, limited):
                 if exc is not None:  # a failed page is a fact, not a crash
-                    skipped.append(Skipped(rel_path=url, reason=f"fetch failed: {exc}"))
+                    skipped.append(
+                        Skipped(rel_path=url, reason=f"fetch failed: {exc}", kind=UNFETCHED)
+                    )
                     continue
                 raw, content_type = _unpack(text)
                 if raw is None:
-                    skipped.append(Skipped(rel_path=url, reason="fetcher returned no bytes"))
+                    skipped.append(
+                        Skipped(rel_path=url, reason="fetcher returned no bytes", kind=UNFETCHED)
+                    )
                     continue
                 markdown, why = _decode_fetched(raw, content_type, url, root)
                 if markdown is None:
@@ -503,6 +527,9 @@ def fetch_all(
     fetched.sort(key=lambda f: f.url)
     skipped.sort(key=lambda s: s.rel_path)
     _report_rate_limits(root, limited)
+    if validation_out is not None:
+        validation_out["unchanged"] = sorted(validated)
+        validation_out["token_shas"] = dict(sorted(token_shas.items()))
     return fetched, skipped
 
 
@@ -541,6 +568,60 @@ _TYPE_EXT = {
     "application/rtf": ".rtf",
     "text/rtf": ".rtf",
 }
+
+
+def validate_group(module, urls: list[str], known: dict[str, str]) -> tuple[set[str], dict[str, str]]:
+    """Ask an optional `validate(url) -> str | None` which URLs can be skipped.
+
+    Returns `(unchanged, fresh_token_shas)` — the URLs whose token matches what
+    we stored, and every token sha this pass learned.
+
+    **W-87 P4 fork 3, ruled by Arpit 2026-08-28.** `validate` is the fifth
+    function on the fetcher contract, and the only optional one that can change
+    what fux fetches.
+
+    ⚠ **THE INVARIANT, and if one sentence reaches a reader it is this one: a
+    changed token must NEVER mean a changed record.**
+
+    * token **unchanged** → skip the fetch. That is the **only** thing
+      `validate` is permitted to do.
+    * token **changed, or `None`, or it raised** → fetch, and then **still
+      compare the sanitized sha** exactly as before.
+
+    Otherwise a chatty `ETag` — one that rotates on every request, or encodes a
+    timestamp — would churn shards on every run and byte-determinism would be
+    gone. **So `validate` can only ever save work; it can never cause a shard to
+    be written.**
+
+    - **`None` means "I cannot tell", never "unchanged."** It degrades to a full
+      fetch, so **every fetcher written before this contract keeps working with
+      zero migration.**
+    - **The token is opaque.** Fux hashes it and compares; it never parses one.
+      That is what stops `validate` smuggling HTTP semantics into an engine that
+      has none.
+    - **A raise is not a failure of the URL.** Validation is an optimisation, so
+      an exception here means "fetch it" rather than "skip it" — the safe
+      direction, and it keeps a broken `validate` from silently emptying a
+      corpus.
+    """
+    validate = getattr(module, "validate", None)
+    if not callable(validate):
+        return set(), {}
+
+    unchanged: set[str] = set()
+    shas: dict[str, str] = {}
+    for url in urls:
+        try:
+            token = validate(url)
+        except Exception:  # noqa: BLE001 - an optimisation may not fail a run
+            continue
+        if not token:
+            continue  # "I cannot tell" -> fetch it
+        sha = hashlib.sha256(str(token).encode("utf-8")).hexdigest()
+        shas[url] = sha
+        if known.get(url) == sha:
+            unchanged.add(url)
+    return unchanged, shas
 
 
 def _unpack(result) -> tuple[bytes | None, str]:

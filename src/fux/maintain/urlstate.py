@@ -39,7 +39,12 @@ last confirmed it. *"Confirmed two runs ago"* is what a maintainer can act on
 anyway — *"confirmed 41 minutes ago"* invites the age bound that
 `record-freshness.compare.md` verdict D already refused.
 
-⚠ **`token` is deliberately absent.** It belongs to the optional `validate()`
+⚠ **`token_sha` arrived 2026-08-28** with the optional `validate()`; the
+paragraph below is kept because it records why the field was *absent* for so
+long, and the answer — *declaring a field nothing writes is how a knob that
+cannot work ships* — is still the rule.
+
+⚠ **The historical note: `token` was deliberately absent.** It belonged to the optional `validate()`
 fetcher function, which is **an unruled fork gated on a measurement**. Writing a
 field nothing reads is how a knob that cannot work gets shipped.
 
@@ -97,12 +102,27 @@ class UrlHealth:
     last_changed_run: int | None = None
     #: Consecutive failed fetches, reset to 0 by any success.
     fail_streak: int = 0
+    #: `sha256` of the last validation token this URL's fetcher returned.
+    #: `None` = the fetcher has no `validate()`, or said it could not tell.
+    #:
+    #: ⚠ **THE HASH, NEVER THE TOKEN** (W-87 P4 fork 4, ruled 2026-08-28). An
+    #: `ETag` is opaque to fux but not necessarily to everyone: it can be a
+    #: content hash, a version counter, or an internal object id, and this file
+    #: — while gitignored — is exactly the kind of local state that ends up in a
+    #: support bundle. Storing `sha256(token)` compares as well as the token
+    #: does and carries none of it, so **L5 is untouched by construction.**
+    #:
+    #: **Counters, no clocks** — unchanged. A token is an opaque equality
+    #: witness, not a timestamp, even when a server happened to build it from
+    #: one.
+    token_sha: str | None = None
 
     def as_json(self) -> dict:
         return {
             "last_seen_run": self.last_seen_run,
             "last_changed_run": self.last_changed_run,
             "fail_streak": self.fail_streak,
+            "token_sha": self.token_sha,
         }
 
 
@@ -163,6 +183,7 @@ def read(root: Path) -> UrlState:
             last_seen_run=_non_negative(fields.get("last_seen_run")),
             last_changed_run=_non_negative(fields.get("last_changed_run")),
             fail_streak=max(0, fields.get("fail_streak", 0)),
+            token_sha=fields.get("token_sha") or None,
         )
     return state
 
@@ -216,6 +237,7 @@ def observe(
     fetched: dict[str, str],
     failed,
     listed,
+    token_shas: dict[str, str] | None = None,
 ) -> UrlState:
     """Record one networked run's outcome and bump `run_seq`.
 
@@ -243,8 +265,15 @@ def observe(
     listed_set = {u for u in listed}
     previous_shas = _read_shas(root)
 
+    tokens = token_shas or {}
     for url in listed_set:
         health = state.urls.setdefault(url, UrlHealth())
+        # Fork 3. Recorded for every URL this run learned a token for, whether
+        # it was then fetched or skipped as unchanged — the point of storing it
+        # is that the NEXT run can compare. A URL whose fetcher has no
+        # `validate()` never appears here and keeps `token_sha = None`.
+        if url in tokens:
+            health.token_sha = tokens[url]
         if url in fetched:
             if previous_shas.get(url) not in (None, fetched[url]):
                 health.last_changed_run = state.run_seq

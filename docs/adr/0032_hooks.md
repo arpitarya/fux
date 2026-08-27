@@ -454,6 +454,25 @@ Ruled by Arpit 2026-08-28.
   not. A daemon that never ran is **not** a finding — a check that fires for
   everyone is one people learn to skip.
 
+**13. `token_sha` — the validation token's hash, and never the token.** W-87 P4
+fork 4, ruled 2026-08-28 with fork 3.
+
+- **`sha256(token)` in `url-state.json`.** An `ETag` is opaque to fux but not
+  necessarily to everyone: it can be a content hash, a version counter, or an
+  internal object id. This file is gitignored and is still exactly the kind of
+  local state that ends up in a support bundle. **Hashing compares as well as the
+  token does and carries none of it, so L5 is untouched by construction.**
+- **Counters, no clocks — unchanged.** A token is an opaque equality witness,
+  not a timestamp, even when a server built it from one.
+- 🔴 **It was declared, written, and NOT READ BACK for its first hour**, so
+  `validate()` learned a token every run and matched none — the optimisation did
+  nothing while every test passed. **`state.schema.json`'s own header predicts
+  this failure in as many words**: *"add a field and you must remember to teach
+  the reader about it, or it is silently dropped on the next read."*
+  **Now gated**: `test_every_declared_field_survives_a_round_trip` walks the
+  *declared* shape rather than a hard-coded list, so the next field is covered
+  without editing the test.
+
 ### Consequences
 
 - **There is no path into a committed shard that skips L5.** That is the

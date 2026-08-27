@@ -445,6 +445,28 @@ ingested 2 docs (0 changed, 2 carried forward), 1 not indexed, 2 skipped, 0 shar
 > The suppressed line is wrapped here for the page; the engine prints it on one
 > line.
 
+**16. A URL that needs a model reaches the same committed queue a file does.**
+Ruled by Arpit 2026-08-28; ADR-FETCHER decision 11 had named the asymmetry.
+
+- **The gap:** an unreadable file went to `.fux/enrich/queue.tsv` with its
+  reason; an unreadable URL went nowhere. **A scanned PDF behind a URL needs a
+  model exactly as much as one on disk.**
+- **Same `doc_id` convention** (`url:https://…`), same reason string, one sorted
+  queue — so `file:` and `url:` entries interleave deterministically and a re-run
+  on an unchanged corpus is still an empty diff.
+- ⚠ **A FETCH FAILURE IS NOT QUEUED**, and that distinction earns a third skip
+  kind. `UNFETCHED` means the bytes never arrived — a 404, a timeout — and **no
+  amount of model time discharges it**. `queue.tsv` is committed, so queueing one
+  would put a permanent work item in front of the whole team. Verified live: a
+  real 404 and a real 429 stay out, and `jsondoc: nothing readable in .json` goes
+  in.
+- **The kind is set at the skip site**, never re-derived by reading `reason`
+  back — branching on prose is what W-82 ruling 12 refused.
+- ⚠ **A queued URL carries an EMPTY sha, honestly.** Its bytes were not
+  retained, so there is nothing to hash; the file path's sha exists only because
+  the working tree still holds the file. Inventing one would make the queue claim
+  an identity it cannot check.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in

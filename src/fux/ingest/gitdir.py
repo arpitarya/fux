@@ -99,6 +99,20 @@ class WalkedFile:
 POLICY = "policy"
 UNREADABLE = "unreadable"
 
+#: The bytes never arrived — a 404, a timeout, a refused connection. **Only ever
+#: set on the URL path**, where retrieval can fail independently of whether the
+#: document would have been readable.
+#:
+#: ⚠ **The distinction that earns a third value: a model cannot fix a 404.**
+#: `UNREADABLE` means fux held the bytes and got nothing out of them, which is
+#: exactly what `.fux/enrich/queue.tsv` is for. `UNFETCHED` means there were no
+#: bytes, so queueing it would put a work item in front of a person that no
+#: amount of enrichment discharges — and the queue is committed, so it would be
+#: a work item in front of the whole team.
+#:
+#: Set at the skip site like the other two, never re-derived from `reason`.
+UNFETCHED = "unfetched"
+
 
 @dataclass(frozen=True)
 class Skipped:

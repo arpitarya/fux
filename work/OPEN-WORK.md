@@ -18,11 +18,6 @@ and `L8` ratified. Removed rather than ticked, per rule 2.
 
 ## Blocked on Arpit — decisions
 
-- **Does a URL belong in `.fux/enrich/queue.tsv`?** The file path routes an
-  unreadable document there with its reason; the URL path routes it nowhere
-  (`grep -c queue urlsrc.py` → `0`), so **a URL that needs a model can never be
-  queued for one.** `queue.tsv` is committed, so this changes committed bytes.
-  [ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 11 names it, undecided.
 - ✅ **The fork counts were RE-DERIVED on 2026-08-27 and W-82 has ZERO open
   forks of its own.** 27 total; **18 ruled** by
   [the ledger](open/W-82-rulings-2026-08-27.md); of the remaining 9, **6** are

@@ -735,6 +735,12 @@ thing to refresh, it should not have to be asked for. A behaviour change to a
 shipped verb, free now and a deprecation cycle once anyone scripts it. See
 [ADR-URL-INGEST](0008_url-ingest.md) decision 8.
 
+⚠ **`fux update` prints a validated-URL count from 2026-08-28.** One line:
+`N URL(s) unchanged by validate(); no body fetched`. **An optimisation that
+fails silently in the safe direction looks identical to one that never ran**, so
+the count is the only way a person can tell `validate()` is working. Silent when
+zero. See [ADR-FETCHER](0019_fetcher.md) decision 12.
+
 ### Consequences
 
 - **Adding a verb costs a record.** A group row, a decision, and a line in the

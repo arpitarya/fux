@@ -28,6 +28,10 @@ The contract fux relies on — keep these names:
     fetch(url: str) -> tuple[bytes, str]
                              # required; the bytes for one URL, plus the
                              # Content-Type the server declared. Fux decodes.
+    validate(url: str) -> str | None
+                             # optional; a cheap token (ETag, Last-Modified, a
+                             # version number). Unchanged token -> fux skips the
+                             # fetch. `None` -> "I cannot tell", fetch it.
     close() -> None          # optional; called once after the last fetch
 
 There is no `connect`/`close` below: they are optional, and a stateless GET has
@@ -149,6 +153,50 @@ def fetch(url: str) -> tuple[bytes, str]:
     if not raw:
         raise FetcherError(f"nothing returned from {url}")
     return raw, content_type
+
+
+def validate(url: str) -> str | None:
+    """Cheap answer to *"might this have changed?"* — an opaque token, or `None`.
+
+    **Optional, and fux calls it only if it exists** (W-87 P4 fork 3, ruled by
+    Arpit 2026-08-28). Fux hashes what you return and compares it with what this
+    URL returned last time. **It never parses a token**, which is what stops
+    this smuggling HTTP semantics into an engine that has none.
+
+    ⚠ **`None` means "I cannot tell", never "unchanged."** It degrades to a full
+    fetch, so returning `None` is always safe and never wrong.
+
+    ⚠ **What fux does with a CHANGED token: it fetches, and then still compares
+    the sanitized sha.** A token that rotates on every request — some servers
+    build an `ETag` from a timestamp — therefore costs you a wasted fetch and
+    **cannot** churn the index. `validate` can only ever save work.
+
+    **This implementation is a `HEAD`**, which is the cheapest thing that gets an
+    `ETag` or a `Last-Modified` without a body. A server that answers neither
+    gets `None` and is fetched as before.
+
+    ⚠ **A `HEAD` is not free and is not always honoured.** Some servers reject
+    it, some compute a different `ETag` for it than for `GET`, and against those
+    this trades one round trip for two. If that is your intranet, delete this
+    function — the contract is optional precisely so you can.
+    """
+    request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT_S) as response:
+            etag = response.headers.get("ETag")
+            if etag:
+                return etag
+            # `Last-Modified` is weaker -- one-second resolution, and a server
+            # may not update it for a change smaller than that -- so it is the
+            # fallback rather than the first choice. A false "unchanged" here
+            # costs a stale document until the next real change, which is why
+            # the sanitized-sha comparison behind it is not optional.
+            return response.headers.get("Last-Modified")
+    except Exception:
+        # Never raise from an optimisation. A `HEAD` that fails says nothing
+        # about whether the document is fetchable, and fux reads `None` as
+        # "fetch it" -- the safe direction.
+        return None
 
 
 def is_rate_limited(exc: Exception) -> bool:

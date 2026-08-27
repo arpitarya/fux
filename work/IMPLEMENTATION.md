@@ -21,6 +21,67 @@ Rules:
 
 ---
 
+## Wave 4 — the fetcher contract gains its fifth function (2026-08-28)
+
+**Two calls, both built and both verified against real servers.**
+
+### `validate()` — fork 3
+
+`validate(url) -> str | None`, optional, with the shipped `http.py` implementing
+it (a `HEAD` for `ETag`, falling back to `Last-Modified`) — which is the clean
+test that a fifth function is not dead weight.
+
+⚠ **The invariant is the design: a changed token must NEVER mean a changed
+record.** Unchanged token → skip the body, the *only* thing `validate` may do.
+Changed, `None`, or raising → fetch, and **still compare the sanitized sha**. So
+a chatty `ETag` costs a wasted fetch and **cannot churn a shard**; byte
+determinism is untouched **by construction**.
+
+**Verified live:** 3 of 7 real URLs skip their body fetch, while
+`Special:Random` — whose token rotates on every request — is re-fetched every
+run. **That is the invariant working, observed rather than asserted.**
+
+⚠ **It reaches existing repos only when they copy the fetcher in.** `fux setup`
+is write-if-missing and never rewrites a consumer's file — the freeze ADR-DOTFUX
+decision 6 names. **Measured:** a repo created before this change learned **0 of
+7** tokens until its `http.py` was replaced by hand.
+
+**`fux update` prints the count**, because an optimisation that fails silently
+in the safe direction looks identical to one that never ran.
+
+### `token_sha` — fork 4
+
+**`sha256(token)`, never the token.** An `ETag` can be a content hash, a version
+counter or an internal object id, and `url-state.json` — gitignored — is exactly
+the kind of local state that reaches a support bundle. **L5 is untouched by
+construction, not by policy.**
+
+🔴 **It was declared, written, and NOT READ BACK for its first hour.**
+`validate()` learned a token every run and matched none, so the optimisation did
+nothing **while every test passed**. **`state.schema.json`'s own header predicts
+this in as many words** — *"add a field and you must remember to teach the reader
+about it, or it is silently dropped on the next read"* — and I walked into it
+anyway. Now gated by a round-trip test that walks the **declared** shape, so the
+next field is covered without editing the test.
+
+### URLs reach the enrichment queue
+
+An unreadable file went to `.fux/enrich/queue.tsv`; an unreadable URL went
+nowhere. Same `doc_id` convention, one sorted queue.
+
+⚠ **A fetch failure is NOT queued**, and that earns a third skip kind:
+`UNFETCHED` means the bytes never arrived, and **no amount of model time
+discharges a 404**. `queue.tsv` is committed, so queueing one would put a
+permanent work item in front of the whole team. **Verified live** — a real 404
+and a real 429 stay out; `jsondoc: nothing readable in .json` goes in, beside
+its file-path sibling.
+
+### Verified
+
+`tests/` **2 244 passed, 1 skipped** · `tests_e2e/` **73 passed**. Records:
+ADR-FETCHER 12, ADR-MAINTENANCE 13, ADR-INGEST 16, ADR-CLI 11.
+
+
 ## Wave 3 — a signal worth publishing, a threshold that is not, and the last owed control (2026-08-28)
 
 **Two calls. One shipped as ruled; one shipped half, because measuring it

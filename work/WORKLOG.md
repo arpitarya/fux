@@ -24,6 +24,43 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — wave 4: the fifth function, and a field the reader forgot  ·  Claude Code
+
+- **Asked:** keep resolving.
+
+- **Did:** wave 4's two calls, both ruled by Arpit and both built.
+
+- **`validate()` (fork 3).** Optional fifth function; the shipped `http.py`
+  implements it, which is the clean test that it is not dead weight.
+  **The invariant is the design: a changed token must never mean a changed
+  record.** Verified live — 3 of 7 real URLs skip their body, and
+  `Special:Random` is re-fetched every run because its token rotates. ⚠ It
+  reaches existing repos only when they copy the fetcher in; measured **0 of 7**
+  until the lab repo's `http.py` was replaced by hand.
+
+- **`token_sha` (fork 4).** `sha256(token)`, never the token — L5 untouched by
+  construction.
+
+- **🔴 And I walked into the failure the schema file predicts.** `token_sha` was
+  declared, written and **not read back**, so `validate()` matched nothing while
+  **every test passed**. `state.schema.json`'s header says it verbatim: *"add a
+  field and you must remember to teach the reader about it, or it is silently
+  dropped on the next read."* **The warning was there and the code still shipped
+  broken for an hour.** Now gated by a round-trip test that walks the *declared*
+  shape rather than a list someone must remember to extend.
+
+- **URLs reach the enrichment queue.** ⚠ Fetch failures do **not** — a new
+  `UNFETCHED` kind — because a committed queue entry for a 404 is a permanent
+  team-visible work item no model closes.
+
+- **Decided / open:** waves 0–4 are closed. **Only wave 5 remains**, and it is
+  measurement inputs rather than calls.
+
+- **Verified:** `tests/` **2 244 passed** · `tests_e2e/` **73 passed**.
+
+- **Next:** wave 5 — the `unanswerable` class (needs a **blind** author),
+  `recall@k` annotation, and the ±2-query resolution floor.
+
 ## 2026-08-28 — R10 ruled, the doc_coverage gate ruled off, and a file that vanished  ·  Claude Code
 
 - **Asked:** keep resolving.

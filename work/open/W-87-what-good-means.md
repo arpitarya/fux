@@ -67,7 +67,7 @@ contract.** It may run the moment a URL corpus exists.
 | **P1** | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | P0 · needs `fux-playground` — ⚠ except the **orphaned-module check, ✅ BUILT 2026-08-27**, which never did |
 | **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | P0 · P1 · needs corpora |
 | ~~**P3**~~ | **§3.0** — sanitized-sha stability | ✅ **PASS 2026-08-27**, 19/19 = 100 % — [verdict](../regression/2026-08-27-p3-sha-stability/VERDICT.md) |
-| **P4** | forks 3 & 4 — `validate` and token storage | 🔓 **unblocked** — P3's number is in. **Arpit's call, not a build task** |
+| ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 12, [ADR-MAINTENANCE](../../docs/adr/0032_hooks.md) decision 13 |
 | ~~**P5**~~ | ~~`tests_e2e/` verification~~ | ✅ **DONE 2026-08-27** — 74/74 on 3.11.15; found one real defect |
 
 **What did NOT move, and why:** W-82's seven blocked rulings (1, 4, 6, 7, 12, 16
@@ -271,8 +271,15 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
 > The gate is the only thing that was in the way; **both forks are now
 > decidable, and neither is decided.**
 
-- [ ] **Fork 3** — amend the four-function fetcher contract with `validate`?
-      ✅ **Gate cleared** ([P3](../regression/2026-08-27-p3-sha-stability/VERDICT.md)).
+- [x] ✅ **Fork 3 — BUILT 2026-08-28.** `validate(url) -> str | None`, optional,
+      with the shipped `http.py` implementing it (a `HEAD` for `ETag`, falling
+      back to `Last-Modified`). **Verified live: 3 of 7 real URLs skipped their
+      body fetch**, while `Special:Random` — whose token rotates every request —
+      is re-fetched every run, which is the invariant working.
+      ⚠ **It reaches existing repos only when they copy the fetcher in**:
+      `fux setup` is write-if-missing. Measured — a repo made before the change
+      learned **0 of 7** tokens until its `http.py` was replaced by hand.
+      ADR-FETCHER decision 12. *(Original gate note: cleared ([P3](../regression/2026-08-27-p3-sha-stability/VERDICT.md)).
       ⚠ **Still Arpit's**, and the number does not answer it: the case against is
       that four functions survived two callers untouched, and ADR-FETCHER
       decision 3's refusal of anything that composes is independent of P3.
@@ -283,9 +290,15 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
       that is *all* `validate` may do; token changed → fetch, then **still**
       compare the sanitized sha. Otherwise a chatty `ETag` churns shards and
       byte-determinism is gone.
-- [ ] **Fork 4** — where the validation token lives. Downstream of fork 3.
-      `.fux/runtime/url-state.json` costs L3 nothing; ⚠ store `sha256(token)`,
-      never the token, so L5 is untouched.
+- [x] ✅ **Fork 4 — BUILT 2026-08-28.** `token_sha` in
+      `.fux/runtime/url-state.json`: **`sha256(token)`, never the token**, so L5
+      is untouched by construction. Counters, no clocks — a token is an opaque
+      equality witness even when a server built it from a timestamp.
+      🔴 **It was declared, written and NOT read back for its first hour**, so
+      `validate()` matched nothing while every test passed —
+      `state.schema.json`'s own header predicts that failure in as many words.
+      Now gated by a round-trip test that walks the *declared* shape.
+      ADR-MAINTENANCE decision 13.
 
 ## P5 — `tests_e2e/` verification (moved from W-82, 2026-08-27)
 

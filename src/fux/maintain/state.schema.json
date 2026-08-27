@@ -31,7 +31,11 @@
       "",
       "`token` is DELIBERATELY ABSENT. It belongs to the optional `validate()`",
       "fetcher function, which is an unruled fork gated on a measurement.",
-      "Declaring a field nothing writes is how a knob that cannot work ships."
+      "Declaring a field nothing writes is how a knob that cannot work ships.",
+      "",
+      "`token_sha` ARRIVED 2026-08-28 with the optional `validate()`. It is a",
+      "counter-shaped field like the rest: an opaque equality witness, never a",
+      "timestamp, even when a server built it from one."
     ],
     "fields": {
       "last_seen_run": {
@@ -49,12 +53,18 @@
         "required": "always",
         "default": 0,
         "doc": "consecutive failed fetches; any success resets it"
+      },
+      "token_sha": {
+        "type": "str",
+        "required": "never",
+        "doc": "sha256 of the last validation token the fetcher returned. THE HASH, NEVER THE TOKEN -- an ETag can be a content hash, a version counter or an internal object id, and this file ends up in support bundles. Hashing compares as well and carries none of it, so L5 is untouched by construction. Absent = the fetcher has no validate(), or said it could not tell."
       }
     },
     "example": {
       "last_seen_run": 12,
       "last_changed_run": 7,
-      "fail_streak": 0
+      "fail_streak": 0,
+      "token_sha": "9f2c1e4a7b3d5f60a8c2e1b4d7f0a3c65e8b1d4f7a0c3e6b9d2f5a8c1e4b7d09"
     }
   },
   "url_state_file": {
@@ -83,7 +93,8 @@
         "https://wiki.corp/handbook": {
           "last_seen_run": 12,
           "last_changed_run": 7,
-          "fail_streak": 0
+          "fail_streak": 0,
+          "token_sha": "9f2c1e4a7b3d5f60a8c2e1b4d7f0a3c65e8b1d4f7a0c3e6b9d2f5a8c1e4b7d09"
         }
       },
       "rate_limited": {
