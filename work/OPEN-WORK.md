@@ -52,8 +52,16 @@ shell and could not look. **Re-derive before believing a blocker** — rule 4.
 are built. ⚠ **Built is not proven:** none has yet been used in a run that
 adjudicates anything, and the marker moving does not make a control evidence.
 
-⚠ **The ±2-query (4 pp) resolution floor is still a placeholder for a
-measurement**, and **every "no detected change" ruling currently rests on it.**
+🔴 **The ±2-query floor is MEASURED and was far too loose — awaiting your call.**
+A paired exact test needs a net of **6–16** depending on how many queries
+flipped; **at net 2 the p-value is never below 0.68**
+([run](regression/2026-08-28-resolution-floor/report.md), ADR-RS decision 19).
+⚠ **It is also the wrong SHAPE** — the bar tracks the **flips**, not the set
+size — so replacing `2` with `8` would be a better wrong answer. **The cheapest
+fix is a reporting change: a run must report its discordant count, and no filed
+run does.** ⚠ **Two filed uplifts sit under the real bar and are named, not
+re-judged**; the losses are one-sided, entirely on claims of improvement.
+**NOT ADOPTED** — replacing it changes how filed results read.
 
 ---
 

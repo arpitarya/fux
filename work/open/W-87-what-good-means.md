@@ -209,16 +209,37 @@ visible set and whoever builds it must resolve that tension, not inherit it.
 
 - [ ] **`recall@k` is not computed today.** It needs known-relevant sets per
       query — real annotation across the 50 playground goldens.
+      ⚠ **Also not this session's to do.** Annotating *which documents are
+      relevant* after seeing which ones rank well is how a metric gets fitted to
+      the system it is meant to judge. **The annotation must precede the
+      scores**, and for this session it no longer can.
 - [ ] **The `unanswerable` class does not exist** and must be authored — and
       authored **blind**, or it contaminates the set it is meant to test
       (the W-78 lesson).
+      🔴 **THIS SESSION CANNOT AUTHOR IT.** It has read the goldens, the decoys,
+      and per-query scores across four measurement runs. **Anything it wrote
+      would be informed by construction**, and the one property this class needs
+      is that its author had not looked. ⚠ **The 15 decoys are NOT this class** —
+      they are a control, authored by this session, and using them as the
+      `unanswerable` class would launder informed material into a blind slot.
+      **It needs a different author.**
 - [ ] ⚠ **Part B cannot run as specified.** `acme` and `orbit` were lost in the
       2026-08-20 lab wipe **along with their generator**, and
       `tools/pruning-eval/` still hard-codes reading them. **Part A — the
       declarations — needs none of that**, and declaring is most of the value.
-- [ ] **The ±2-query (4 pp) resolution floor is a placeholder for a measurement,
-      not a measurement.** Every "no detected change" ruling currently rests on
-      it.
+- [x] ✅ **MEASURED 2026-08-28** —
+      [the run](../regression/2026-08-28-resolution-floor/report.md), ADR-RS
+      decision 19. 🔴 **The placeholder admits coin flips**: a paired exact test
+      needs a net of **6–16** depending on how many queries flipped, and **at
+      net 2 the p-value is never below 0.68.**
+      ⚠ **It is the wrong SHAPE too** — the bar tracks the **flips**, not the set
+      size — so replacing `2` with `8` would be a better wrong answer.
+      **The cheapest fix is a REPORTING change: a run must state its discordant
+      count**, and no filed run does, so no paired result on record can be
+      tested from what was filed.
+      ⚠ **NOT ADOPTED** — replacing the floor changes how filed results read,
+      which is Arpit's call. Two filed uplifts are named and re-judged by
+      nothing.
 
 ## P3 — §3.0, the sanitized-sha stability measurement (moved from W-82, 2026-08-27)
 

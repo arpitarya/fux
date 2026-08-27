@@ -24,6 +24,39 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — wave 5: the floor admits coin flips, and two inputs I may not author  ·  Claude Code
+
+- **Asked:** keep resolving.
+
+- **🔴 Did, the resolution floor — and it is the sharpest finding of the day.**
+  `CLAUDE.md` called ±2 queries a placeholder; it is worse than provisional.
+  A paired exact test (McNemar) needs a net of **6–16** depending on how many
+  queries flipped, and **at net 2 the p-value is never below 0.68.** The bar
+  admits results indistinguishable from a coin flip.
+  ⚠ **It is the wrong SHAPE too** — it tracks the **flips**, not the set size —
+  so replacing `2` with `8` would be a better wrong answer.
+  ⚠ **The cheapest fix is a reporting change**: state the discordant count. **No
+  filed run does**, so no paired result on record can be tested from what was
+  filed. **Two filed uplifts are named and re-judged by nothing.**
+  **NOT ADOPTED** — it changes how filed results read, which is Arpit's.
+
+- **Did NOT do two things, deliberately.** The `unanswerable` class must be
+  authored **blind**, and I have read the goldens, the decoys and per-query
+  scores across four runs — **anything I wrote would be informed by
+  construction**, and the decoys are a control, not that class. `recall@k`
+  annotation has the same problem in reverse: marking documents relevant *after*
+  seeing what ranks well fits the metric to the system it judges. **Both are
+  recorded as needing a different author rather than left looking undone.**
+
+- **Decided / open:** all five waves are worked through. What remains is two
+  authoring tasks needing someone who has not looked, and three calls of Arpit's
+  that came out of the work rather than into it.
+
+- **Verified:** `tests/` **2 248 passed** · `tests_e2e/` **73 passed**.
+
+- **Next:** Arpit on the resolution floor; a blind author for the
+  `unanswerable` class.
+
 ## 2026-08-28 — wave 4: the fifth function, and a field the reader forgot  ·  Claude Code
 
 - **Asked:** keep resolving.

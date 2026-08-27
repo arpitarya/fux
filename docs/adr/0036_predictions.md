@@ -435,6 +435,48 @@ one (W-82 ruling 8).
   freezing the document rather than against it.
 
 
+**19. The ±2-query resolution floor is measured, and it was far too loose — ⚠
+NOT YET ADOPTED.** Computed 2026-08-28,
+[the run](../../work/regression/2026-08-28-resolution-floor/report.md).
+
+Two arms graded on the **same** queries is a **paired** comparison: queries both
+arms agree on carry no information, and only the ones that **flip** do. That is
+McNemar's test, an exact binomial on the discordant pairs — **arithmetic, with
+no corpus in it to have been contaminated by.**
+
+| queries that flipped | net difference needed at α = 0.05 |
+|---:|---:|
+| 2 · 4 | **impossible** |
+| 6 – 12 | **8** |
+| 20 | **10** |
+| 50 | **16** |
+
+🔴 **At a net of 2 — the current bar — the p-value is never below 0.68.** The
+placeholder does not under-protect slightly; **it admits results that are
+indistinguishable from a coin flip.**
+
+⚠ **And it is the wrong SHAPE, not just the wrong number.** *"±2 on a 50-query
+set"* implies the bar tracks the set size; **it tracks the flips.** Replacing
+`2` with `8` would be a better wrong answer.
+
+- **The cheapest fix is a reporting change, not a threshold change: a run must
+  report its DISCORDANT COUNT.** No run this project has filed does, so **no
+  paired result on record can be tested from what was filed.**
+- ⚠ **Named, and re-judged by nothing:** the reranker's `28 → 32` is a net of
+  **4** and clears α only if exactly 4 flipped and all 4 went one way; W-78's
+  enrichment deltas are in the same position. **Nothing supersedes a measurement
+  except a better measurement**, so this changes no verdict.
+- **The losses are one-sided.** A *"no detected change"* ruling made under a
+  loose bar stays true under a stricter one; the exposure is entirely on the
+  claims of **improvement**.
+- **`α = 0.05` is conventional and stated, not derived.**
+- ⚠ **Detectability is not generalisation.** Clearing this says a result is
+  unlikely to be chance and says nothing about 10 000 documents; `CLAUDE.md`
+  §Litmus governs that separately.
+
+**NOT ADOPTED**: replacing the floor changes how filed results read, which is
+Arpit's call.
+
 ### Consequences
 
 - **The prediction system is guardable.** A change to the discipline updates

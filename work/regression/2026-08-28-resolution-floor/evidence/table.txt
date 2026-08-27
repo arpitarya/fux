@@ -1,0 +1,22 @@
+Paired (McNemar) exact binomial, two-sided, alpha = 0.05
+
+ discordant  net needed  as queries   note
+          2          --          --   no net difference can clear alpha
+          4          --          --   no net difference can clear alpha
+          6           6           6   so few flips that only a near-total split counts
+          8           8           8   
+         10           8           8   
+         12           8           8   
+         15           9           9   
+         20          10          10   
+         25          11          11   
+         30          12          12   
+         40          14          14   
+         50          16          16   
+
+`discordant` = queries where the two arms DISAGREE. Queries both arms
+get right, or both get wrong, carry no information in a paired test.
+
+⚠ The floor is a function of the FLIPS, not of the set size. A '±2 on 50'
+rule of thumb is only right when about 5 queries flipped; at 20 flips it
+is far too loose, and at 4 flips it is too strict.

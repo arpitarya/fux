@@ -21,6 +21,58 @@ Rules:
 
 ---
 
+## Wave 5 — one input measured, two that need a different author (2026-08-28)
+
+### 🔴 The resolution floor admits coin flips
+
+**`CLAUDE.md` called it a placeholder, and it was worse than provisional.**
+
+Two arms graded on the **same** queries is a **paired** comparison: only the
+queries that **flip** carry information. McNemar's exact binomial gives the bar,
+and it is **arithmetic — there is no corpus in it to have been contaminated by.**
+
+| queries that flipped | net needed at α = 0.05 |
+|---:|---:|
+| 2 · 4 | **impossible** |
+| 6 – 12 | **8** |
+| 20 | **10** |
+| 50 | **16** |
+
+**At a net of 2 — the current bar — the p-value is never below 0.68.**
+
+⚠ **And the rule is the wrong SHAPE, not just the wrong number.** *"±2 on a
+50-query set"* implies the bar tracks the set size; it tracks the **flips**.
+**Replacing `2` with `8` would be a better wrong answer.**
+
+**The cheapest fix is a reporting change: a run must state its discordant
+count** — and no run this project has filed does, so **no paired result on
+record can be tested from what was filed.**
+
+⚠ **Named and re-judged by nothing:** the reranker's `28 → 32` is a net of 4 and
+clears α only if exactly 4 flipped and all went one way. **The losses are
+one-sided** — a *"no detected change"* under a loose bar stays true under a
+strict one, so the exposure is entirely on claims of **improvement**.
+**NOT ADOPTED**: it changes how filed results read.
+
+### Two inputs this session may not author
+
+- **The `unanswerable` class.** It must be authored **blind**, and this session
+  has read the goldens, the decoys and per-query scores across four runs.
+  **Anything it wrote would be informed by construction.** ⚠ **The 15 decoys are
+  not this class** — using them would launder informed material into a blind
+  slot.
+- **`recall@k` annotation.** Marking which documents are relevant *after* seeing
+  which ones rank well is how a metric gets fitted to the system it judges.
+  **The annotation must precede the scores, and here it no longer can.**
+
+**Both are recorded as needing a different author rather than left looking
+undone.**
+
+### Verified
+
+`tests/` **2 248 passed, 1 skipped**. Record: ADR-RS decision 19.
+
+
 ## Wave 4 — the fetcher contract gains its fifth function (2026-08-28)
 
 **Two calls, both built and both verified against real servers.**
