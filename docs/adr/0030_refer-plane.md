@@ -250,6 +250,34 @@ exactly when a stored citation would otherwise point somewhere else silently. A
 passage carrying no line range falls back to the ordinal form: **a wrong line
 number is worse than an honest ordinal.**
 
+**18. The implementation modules are private, because the function is the API.**
+Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
+
+`assemble.py` → `_assemble.py`, `chunk.py` → `_chunk.py`,
+`rescore.py` → `_rescore.py`. `arc.py`, `fetchcache.py`, `freshness.py`,
+`source.py` and `detector.py` keep their names — nothing re-exports over them.
+
+- **The trap.** `from .thing import thing` in a package `__init__` binds the
+  **function** to `package.thing`, permanently shadowing the **submodule**. Both
+  `from package import thing` and `import package.thing` then hand back the
+  function, and every attribute access on it raises `AttributeError` at a call
+  site far from the cause.
+- **Why the MODULE was renamed rather than the function.** The function is what
+  callers use; the module is implementation. An underscore says what was already
+  true and **no caller changed** — where renaming the export would have touched
+  roughly thirty sites for the same result.
+- ⚠ **What this shape had already cost, unnoticed:** `fux.refer`'s shadow made
+  `tests/refer/test_refer_plane.py` feed **three functions** to
+  `inspect.getsource` while believing it was scanning three modules for
+  `urllib`/`socket` imports. **L4's network import fence silently stopped
+  covering three files** — 552 lines — and nothing failed, because
+  `getsource` works on a function too. A shadow does not have to break a test to
+  cost you one.
+- **Gated by [`tests/test_no_shadowed_submodules.py`](../../tests/test_no_shadowed_submodules.py)**,
+  which walks every package under `src/fux/` and carries a companion test
+  proving it can see a planted shadow — this repo has recorded vacuous passes
+  before.
+
 ### Consequences
 
 - **Offline degradation is honest, and tested.** `file:` sources keep full

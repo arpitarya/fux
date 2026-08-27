@@ -179,6 +179,14 @@ no text to rerank against. **Demoting it would make reachability a ranking
 signal**, which is the failure the refer plane's offline behaviour exists to
 avoid.
 
+⚠ **Import path moved 2026-08-27, behaviour unchanged.** `src/fux/query/rerank.py`
+now imports `chunk` from **`fux.refer._chunk`**: the module was made private
+because `fux.refer` re-exported the `chunk` *function* over its own submodule of
+that name, a shape that had already cost four defects and silently narrowed L4's
+network import fence. The function, its signature and its output are untouched —
+see [ADR-REFER](0030_refer-plane.md) decision 18 and
+[`tests/test_no_shadowed_submodules.py`](../../tests/test_no_shadowed_submodules.py).
+
 ### Consequences — the measurement
 
 50 goldens, graded on rank. **The reranker was measured before the goldens

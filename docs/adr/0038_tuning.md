@@ -633,7 +633,7 @@ evidence.*
 - [`src/fux/query/rank.py`](../../src/fux/query/rank.py)
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
 - [`src/fux/graph/walk.py`](../../src/fux/graph/walk.py)
-- [`src/fux/refer/assemble.py`](../../src/fux/refer/assemble.py)
+- [`src/fux/refer/_assemble.py`](../../src/fux/refer/_assemble.py)
 - [`tests/test_tune.py`](../../tests/test_tune.py)
 - [`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py)
 

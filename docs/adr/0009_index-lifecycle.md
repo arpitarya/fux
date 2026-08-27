@@ -465,7 +465,7 @@ the differential harness carries a hashed record to prove it.
   [`index-record.schema.json`](../../src/fux/store/index-record.schema.json)
   and [`recordschema.py`](../../src/fux/store/recordschema.py).
 - The build and its invariants —
-  [`src/fux/derive/build.py`](../../src/fux/derive/build.py) (the module
+  [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py) (the module
   docstring states why raw-byte and parsed statistics must agree); the derived
   plane's declared shapes —
   [`derive/runtime.schema.json`](../../src/fux/derive/runtime.schema.json).
@@ -495,7 +495,7 @@ sha1sum .fux/index/*.jsonl > /tmp/a && fux ingest >/dev/null \
 diff <(fux ask "any query" --json --fast) <(fux ask "any query" --scan --json) && echo IDENTICAL
 
 # 3. the invariants are still asserted at build time
-grep -n '_assert_invariants' src/fux/derive/build.py
+grep -n '_assert_invariants' src/fux/derive/_build.py
 # expect: defined and called per record — removing the call is the veto
 
 # 4. the schema string still matches the code that writes it
@@ -520,7 +520,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/derive/runtime.schema.json`](../../src/fux/derive/runtime.schema.json)
 - [`src/fux/store/canonical.py`](../../src/fux/store/canonical.py)
 - [`src/fux/store/collisions.py`](../../src/fux/store/collisions.py)

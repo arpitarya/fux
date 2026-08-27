@@ -101,7 +101,7 @@ the right instinct: *a knob ships at the value that changes nothing.*
 
 ### §2.1 — The constraint nobody expects: field weights must be integers
 
-`derive/build.py` asserts it, in the engine, today:
+`derive/_build.py` asserts it, in the engine, today:
 
 ```python
 _HEADING_W = int(HEADING_WEIGHT)

@@ -161,7 +161,7 @@ same committed input.
   expensive part.
 - ⚠ **This record owns no module, so no mechanical check can point at it.**
   Decisions about `stats.json` live here; the code lives in
-  `derive/build.py` under [ADR-T1-ACCELERATOR](0011_accelerator.md). A change to
+  `derive/_build.py` under [ADR-T1-ACCELERATOR](0011_accelerator.md). A change to
   this file satisfies
   [`tests/test_adr_freshness.py`](../../tests/test_adr_freshness.py) by touching
   the accelerator's record, and **this record's own veto has fired unnoticed
@@ -186,7 +186,7 @@ same committed input.
 
 ### Reference (required)
 
-- Generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- Generator — [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
   (`_read_committed()`, the `stats` dict, the write to `fmt.STATS_NAME`).
 - The consumers — [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
   reads this file into `rank.Corpus`;
@@ -223,11 +223,11 @@ grep -n 'stats\[\|stats\.get(' src/fux/derive/accel.py
 
 # 2. the stored number must stay RAW: a weight applied on the build side is a
 #    stored function of a tunable, and only the accelerator path would see it
-grep -n 'derive_wlen' src/fux/derive/build.py
+grep -n 'derive_wlen' src/fux/derive/_build.py
 # expect: no output. build.py sums flen; accel.py weights it per query.
 
 # 3. both paths compute the recency origin, so --fast and --scan cannot disagree
-grep -n 'newest_mtime' src/fux/query/scan.py src/fux/derive/build.py
+grep -n 'newest_mtime' src/fux/query/scan.py src/fux/derive/_build.py
 # expect: matches in both
 ```
 
@@ -248,7 +248,7 @@ evidence.*
 **Code**
 
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/query/bm25f.py`](../../src/fux/query/bm25f.py)
 - [`src/fux/query/rank.py`](../../src/fux/query/rank.py)
 - [`src/fux/query/scan.py`](../../src/fux/query/scan.py)

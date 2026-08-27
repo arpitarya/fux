@@ -59,7 +59,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from .rescore import ScoredPassage
+from ._rescore import ScoredPassage
 
 __all__ = ["Assembled", "Citation", "assemble", "DEFAULT_BUDGET", "PER_DOC_FRACTION"]
 

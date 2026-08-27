@@ -171,7 +171,7 @@ def _chunk_count(root: Path, record: dict) -> int:
     bytes fux already has, and storing it would be a committed field that
     changes whenever the chunker is tuned.
     """
-    from .refer.chunk import chunk
+    from .refer._chunk import chunk
 
     path = root / record.get("loc", "")
     if not path.is_file():

@@ -6,14 +6,14 @@ import ast
 import inspect
 import sys
 
-from fux.refer.chunk import Passage, chunk
-from fux.refer.rescore import rescore
+from fux.refer._chunk import Passage, chunk
+from fux.refer._rescore import rescore
 
 # `fux.refer` re-exports the `rescore` *function*, which shadows the submodule
 # of the same name on the package, so the module is taken from the registry.
-import fux.refer.rescore  # noqa: E402  (imported for the registry entry below)
+import fux.refer._rescore  # noqa: E402  (imported for the registry entry below)
 
-rescore_mod = sys.modules["fux.refer.rescore"]
+rescore_mod = sys.modules["fux.refer._rescore"]
 
 
 def _doc(text: str):

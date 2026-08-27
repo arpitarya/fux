@@ -278,7 +278,7 @@ $ fux answer "zzz nonexistent term" --json
 
 ### Consequences
 
-- **The passage carries the document's frontmatter block.** `refer/chunk.py`
+- **The passage carries the document's frontmatter block.** `refer/_chunk.py`
   chunks the fetched bytes as fetched — it does not strip the YAML frontmatter
   the way `ingest/extract.py`'s title/phrase extraction does. This is
   consistent with the refer plane's "it cannot invent" rule — the passage is a

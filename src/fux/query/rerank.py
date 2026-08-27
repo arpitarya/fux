@@ -218,7 +218,7 @@ def boost(query_terms: list[str], text: str) -> float:
     Chunking is the refer plane's, deliberately -- one chunker, so a passage
     the reranker scored is a passage `answer` can cite.
     """
-    from ..refer.chunk import chunk
+    from ..refer._chunk import chunk
 
     best = 0.0
     for passage in chunk(text):

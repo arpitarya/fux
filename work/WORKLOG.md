@@ -24,6 +24,52 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-27 — wave 1: four calls made, and the smallest was the largest  ·  Claude Code
+
+- **Asked:** *"resolve them one by one"*. Read as: execute everything that is not
+  judgement, and put each actual call to Arpit rather than inventing an answer.
+
+- **Did, wave 0:** committed. 441 files, three sessions' work, on a branch
+  (`work/2026-08-27-queue-clearing`) rather than `main`.
+
+- **Did, wave 1:** put the four independent calls to Arpit in one pass. All four
+  answered; all four executed.
+  - **`L8` — ratified as reverted.** ADR-LAWS decision 8 records it, and records
+    what it does not do: AOL-2006 stays **OVERRIDDEN, NOT REFUTED**.
+  - **The `run` re-export — renamed.** ⚠ **And the queue understated it: the
+    trap was in FOUR places, not one.** A scan found `fux.derive.build` and
+    `fux.refer.{assemble,chunk,rescore}`; `ingest` had already been fixed. The
+    **module** was renamed rather than the function — the function is the API,
+    the module is implementation, and the underscore cost zero caller changes
+    where renaming the export would have touched ~30 sites.
+  - **The nine goldens — annotated**, each reason verified against the corpus.
+  - **The duplicate post-commit test — deleted**, its unique assertion folded in.
+
+- **🔴 The finding of the day, and it was incidental.** `fux.refer`'s shadow had
+  made `tests/refer/test_refer_plane.py` feed **three functions** to
+  `inspect.getsource` while believing it was scanning three modules. **L4's
+  network import fence had silently stopped covering three files — 552 lines —
+  and nothing failed**, because `getsource` works on a function too. **A shadow
+  does not have to break a test to cost you one.** Fence repaired; the shape is
+  now gated repo-wide by `tests/test_no_shadowed_submodules.py`.
+
+- **And a second one from the goldens.** Five of the nine are not corpus gaps —
+  **the answer is present and plainly stated and the ranker puts something else
+  first**: a runbook that states its own duration ranks 5; an exact command match
+  in a code block ranks 4; a `status: superseded` ADR outranks the current one on
+  a currency question. ⚠ **`q035` shows enrichment naming the exact idea and
+  still not lifting the document to rank 1.**
+
+- **Decided / open:** nothing was decided that was Arpit's. **Hands is now
+  empty.** Waves 2–5 remain: the daemon chain, the confidence chain, the fetcher
+  contract, and the measurement inputs.
+
+- **Verified:** `tests/` **2 203 passed** · `tests_e2e/` **74 passed** ·
+  playground **`pass 41 · xfail 9`, PASS**.
+
+- **Next:** wave 2 — the daemon's status reason, then narrow-by-default, in that
+  order.
+
 ## 2026-08-27 — P3 passed, W-82's forks re-derived to zero, and a decoy caught fux believing itself  ·  Claude Code
 
 - **Asked:** *"go"* — continue on whatever is agent-closable. Three things were.

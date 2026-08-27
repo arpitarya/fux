@@ -261,7 +261,7 @@ time ([ADR-RANKING](0012_ranking.md)).
 - Committed side — [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
   (`hash_terms`), [`format.py`](../../src/fux/store/format.py) (`term_hash`),
   [`collisions.py`](../../src/fux/store/collisions.py).
-- Derived side — [`src/fux/derive/build.py`](../../src/fux/derive/build.py) and
+- Derived side — [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py) and
   [`format.py`](../../src/fux/derive/format.py), whose docstring carries the
   62-byte entry's `<8sHQI` + `5H` + `5I` + `IIH` breakdown and the reason the
   two extrema are per-field arrays.
@@ -324,7 +324,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
 - [`src/fux/store/collisions.py`](../../src/fux/store/collisions.py)
 - [`src/fux/store/format.py`](../../src/fux/store/format.py)

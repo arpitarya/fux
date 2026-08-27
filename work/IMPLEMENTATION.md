@@ -21,6 +21,83 @@ Rules:
 
 ---
 
+## Wave 1 — four calls made, and the smallest one was the largest (2026-08-27)
+
+**Arpit ruled four independent blockers in one pass.** Three were minutes; one
+turned out to be four defects wearing one name.
+
+### `L8` — ratified as reverted
+
+Shown the live text and confirmed. ADR-LAWS decision 8 now records the
+ratification, and records what it does **not** do: the AOL-2006 grounding stays
+**OVERRIDDEN, NOT REFUTED**, the risk is accepted, and the mitigation is
+confinement alone. ⚠ **Nothing mechanical checks a law's wording** — the §1
+handle sat on the withdrawn form in four live documents for hours and no test
+noticed.
+
+### The shadowed-submodule trap — FOUR sites, not one
+
+The queue described one instance in `fux.ingest`. **A scan of every package
+found four**, and the `ingest` one had already been fixed:
+
+| package | shadowed | |
+|---|---|---|
+| `fux.derive` | `build` | ✅ fixed |
+| `fux.refer` | `assemble`, `chunk`, `rescore` | ✅ fixed |
+| `fux.ingest` | `run` | already aliased by a prior session |
+
+**The module was renamed, not the function** — `assemble.py` → `_assemble.py`.
+The function is the API and the module is implementation; the underscore says
+what was already true and **no caller changed**, where renaming the export would
+have touched roughly thirty sites for the same result.
+
+🔴 **What the shadow had already cost, unnoticed:**
+`tests/refer/test_refer_plane.py` fed **three functions** to `inspect.getsource`
+believing it was scanning three modules for `urllib`/`socket` imports.
+**L4's network import fence had silently stopped covering three files — 552
+lines — and nothing failed**, because `getsource` works on a function too. The
+fence is repaired and now reads the modules.
+
+**Gated** by `tests/test_no_shadowed_submodules.py`, which walks every package
+under `src/fux/` and carries a companion test proving it can see a planted
+shadow — this repo has recorded vacuous passes before.
+
+### The nine playground goldens — annotated, each with a verified reason
+
+`pass 41 · xfail 9`, matching the README at last. **Every reason was checked
+against the corpus rather than asserted**, and five of the nine turned out to be
+sharper than "the corpus does not cover it" — **the answer is present and
+plainly stated and the ranker puts something else first**:
+
+- `q028`/`q029` — the runbook **states its own duration** on its second line and
+  ranks 5.
+- `q012` — an **exact command match inside a code block** loses to three
+  documents that merely mention the word.
+- `q019` — **supersession is recorded and does not invert a currency question**:
+  the `status: superseded` ADR outranks the current one.
+- `q044` — a **rejected-alternative** section is the answer and loses to the
+  document about what was chosen.
+- ⚠ `q035` — **enrichment did not close it.** The enrichment says in as many
+  words that adding a retry makes an incident worse; the query is *"I added a
+  retry and things got worse"*. Still rank 2.
+
+⚠ **A marker lowers nothing.** `max_rank` is untouched, and a gap that closes
+reports `XPASS` and **fails** the run — which is why annotating was safe.
+
+### The duplicate post-commit test
+
+`test_the_post_commit_hook_reindexes_after_a_commit` deleted; the deferral test
+absorbed it and says so. The deleted one was written when `post-commit`
+re-indexed **inline**, and its subject stopped existing when the fork resolved to
+deferral. ⚠ It had also **raced since 2026-08-22**, failing about one run in
+three on a loaded machine.
+
+### Verified
+
+`tests/` **2 203 passed, 1 skipped** · `tests_e2e/` **74 passed** ·
+playground **41/50, PASS**.
+
+
 ## P3 PASSED, W-82's forks re-derived to zero, and a decoy that caught fux believing itself (2026-08-27)
 
 **Evidence:** [P3](regression/2026-08-27-p3-sha-stability/VERDICT.md) ·
@@ -748,7 +825,7 @@ outcome is recorded here.
 | **W-46** — `ask --hybrid` crashed on a source install | 2026-08-20 | [ADR-CLI](../docs/adr/0002_cli-surface.md) | **Fixed.** `get_model()` returns `None` where the embedding bundle is not shipped, and `None.embed(...)` raised an `AttributeError` the guard's deliberately narrow tuple did not list — so the fallback written for exactly this case was **dead code from the day it was written**. Fixed with an explicit `None` check, not a widened `except`: widening would have swallowed every real bug inside `embed()`, which is the silent degradation the narrow tuple exists to prevent. Both halves asserted in `tests/derive/test_dense_and_hybrid.py` — the `None` path degrades to lexical at exit 0, a present-but-broken model still raises. **It survived because it cannot reproduce where `model.bin` exists, which is every development machine**, and `--hybrid` is default-off so nothing routine walked it. Diagnosis: [run](regression/2026-08-18-cli-surface/ANALYSIS.md) ⚠ **Superseded 2026-08-25: the dense lane, the embedding model and `--hybrid` were DELETED** (Arpit). This row is kept as the build log it is — what was true when it was written — and is NOT a description of the engine today. See the model-removal row below. |
 | **W-48** — three output-contract inconsistencies across the query verbs | 2026-08-20 | [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-ANSWER](../docs/adr/0006_answer.md) · [ADR-FIND](../docs/adr/0005_find.md) | **Two fixed, one deliberately not.** `ask --json --explain` now carries `"path"`, so which lane answered a slow query is readable by the caller that would log it; the key is emitted only under `--explain`, so the default payload stays byte-identical and the differential law through the CLI is untouched. `answer --json` now carries `"source": "index"` on the no-match branch, closing a trap in the very key ADR-ANSWER tells callers to switch on for the M4 upgrade. **Item 3 — `find`'s prose no-match line on stdout — was examined and left alone**, and is now *pinned by a test* so the decision is visible rather than merely remembered: the three verbs say the same thing for the same condition, and ADR-FIND ties reopening it to a real script observed breaking on it. Diagnosis: [run](regression/2026-08-18-query-verbs/ANALYSIS.md) |
 | **PRIORITY P5** — materialise-first display for `hashed` records | 2026-08-21 | `1ba9be1` · [ADR-RECORD](../docs/adr/0010_index-record.md) · [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) · [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-REFER](../docs/adr/0030_refer-plane.md) | **Built to five direct rulings from Arpit, not assumed.** Ingest already holds a non-git document's bytes before writing its record, so it now also writes the title to a new gitignored, `sha`-keyed cache (`.fux/runtime/display-cache/`) before the record may commit — `store/writer.py` refuses a `hashed` record with no matching cache entry. `ask`/`find`/`answer` (text and `--json`) resolve through it; ranking does not (`rank()`'s two call sites pass no cache), so the differential law is untouched by construction — proved directly, not just argued (`test_the_scan_and_accelerator_paths_agree_on_a_cold_hashed_title`). **The two forks PRIORITY.md reserved for Arpit**: the mandatory cache needs **no L2 exception** (citing [ADR-CACHE](../docs/adr/0034_cache.md)'s identical two-day-earlier ruling on gitignored/never-committed caches); a cold cache **forces a re-fetch** to repopulate rather than degrading silently, though grounding found this changed no live behaviour (`_reusable()` already never carries a `hashed` record forward without a fetch attempt). **Two of three sub-questions ruled**: term-hash salting **not built** (a committed salt is not a salt); `code` **kept** on hashed records despite a demonstrated embedding-inversion risk (Morris et al., EMNLP 2023), traded against `--hybrid` ranking quality. **The third needed no ruling**: `loc`/`id` stay plaintext — `loc` is the refer plane's only fetch address (`fetcher(loc)`, no other route for a fresh clone) and is separately committed in plaintext via the URL source list already, so hashing it would cost function for zero privacy gained. This corrects the row's own original "reveals neither title tokens nor URL slug" done-when clause, stated explicitly rather than dropped. `uv run pytest -q tests tests_e2e`: 866 passed. Two unrelated commits landed in the same session and are **not** part of this row: `7b7679c` (the session-lock hook made per-asset) and `5509030` (ADR-CACHE + register reconciliation, pre-existing uncommitted work from a prior Cowork session) |
-| **PRIORITY P6** — the refer plane wired into `answer` | 2026-08-21 | `9f8366e` · [ADR-REFER](../docs/adr/0030_refer-plane.md) · [ADR-ANSWER](../docs/adr/0006_answer.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) | **`answer` fetches, verifies and re-scores by default now.** `src/fux/query/refer_answer.py`'s `answer_via_refer` calls the existing `refer()` with the winning citation and `Policy(mode=ALWAYS)`; `_load_fetcher` resolves and connects the *same* fetcher a `url:` document was ingested with, mirroring `ingest/urlsrc.py`'s own resolution exactly, degrading to `(None, noop)` — never raising — when nothing can be resolved. `"source": "refer"` in `--json`; `--no-refer` keeps the exact M2 index-only shape. Proved against the real CLI on the actual e2e fixture, not just in-process: a passage + a fresh `sha` that changes when the source file changes, without re-ingesting. **Both ADRs accepted, per the row's own done-when.** One tension found and put to Arpit rather than resolved silently: ADR-REFER's own text tied acceptance to the still-unmeasured W-59 budget sweep (separate from R4, which passed) — ruled **accept now**, budget sweep kept as a named, checkable veto condition rather than closed or hidden. ADR-ANSWER substantially rewritten, not status-flipped — its own veto condition had fired ("the disclaimer stops matching what the verb actually does"). **Deliberately scoped to `answer` only** — PRIORITY.md's row title named `ask` too, but its own done-when never tested `ask`, and fetching every ranked result (not just the winner) is a materially bigger, riskier change left undecided rather than assumed. **Found while capturing real output**: a refer passage on a document with frontmatter includes the frontmatter block verbatim (`refer/chunk.py` doesn't strip it, unlike ingest's extraction) — a real readability cost, recorded rather than fixed, `chunk.py`'s call to make. `uv run pytest -q tests tests_e2e`: 877 passed |
+| **PRIORITY P6** — the refer plane wired into `answer` | 2026-08-21 | `9f8366e` · [ADR-REFER](../docs/adr/0030_refer-plane.md) · [ADR-ANSWER](../docs/adr/0006_answer.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) | **`answer` fetches, verifies and re-scores by default now.** `src/fux/query/refer_answer.py`'s `answer_via_refer` calls the existing `refer()` with the winning citation and `Policy(mode=ALWAYS)`; `_load_fetcher` resolves and connects the *same* fetcher a `url:` document was ingested with, mirroring `ingest/urlsrc.py`'s own resolution exactly, degrading to `(None, noop)` — never raising — when nothing can be resolved. `"source": "refer"` in `--json`; `--no-refer` keeps the exact M2 index-only shape. Proved against the real CLI on the actual e2e fixture, not just in-process: a passage + a fresh `sha` that changes when the source file changes, without re-ingesting. **Both ADRs accepted, per the row's own done-when.** One tension found and put to Arpit rather than resolved silently: ADR-REFER's own text tied acceptance to the still-unmeasured W-59 budget sweep (separate from R4, which passed) — ruled **accept now**, budget sweep kept as a named, checkable veto condition rather than closed or hidden. ADR-ANSWER substantially rewritten, not status-flipped — its own veto condition had fired ("the disclaimer stops matching what the verb actually does"). **Deliberately scoped to `answer` only** — PRIORITY.md's row title named `ask` too, but its own done-when never tested `ask`, and fetching every ranked result (not just the winner) is a materially bigger, riskier change left undecided rather than assumed. **Found while capturing real output**: a refer passage on a document with frontmatter includes the frontmatter block verbatim (`refer/_chunk.py` doesn't strip it, unlike ingest's extraction) — a real readability cost, recorded rather than fixed, `chunk.py`'s call to make. `uv run pytest -q tests tests_e2e`: 877 passed |
 | **[W-59](../archive/open/W-59-refer-plane-measurement.md)** — the refer plane's last measurement obligation, discharged | 2026-08-22 | [ADR-REFER](../docs/adr/0030_refer-plane.md) veto condition 2 updated · [the budget sweep](regression/2026-08-22-budget-sweep/report.md) | **The budget sweep ran, and the result is narrower than the item's own FLAT/NOT-FLAT rule anticipated.** By the letter (mean |delta| 12.55% on the shipped single-candidate path) it is NOT FLAT — but every measured delta was negative or zero: the greedy assembler never beat plain top-k, losing up to 35.5% at realistic budgets. Root cause: the per-document cap binds even with one candidate, which is every real `fux answer` call today. **Filed as [W-72](../archive/open/W-72-refer-per-doc-cap-single-candidate.md)** rather than fixed inside the measurement. R4 (PASS, 2026-08-20) and ARC-vs-LRU (Arpit's ruling, 2026-08-22 — ARC wins) close the item's other two open measurements. All three DoD items resolved; item deleted from OPEN-WORK |
 
 | **[W-44](../archive/open/W-44-archived-content-signalling.md)** — archived content finally says so | 2026-08-22 | [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) 1/3/7 · [ADR-INGEST](../docs/adr/0007_ingest.md) · [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md) | **Open since 2026-08-12, and it closed in the order the record asked for.** The instrument decision 5 demanded was built first — 45 frozen queries in three slices, committed before any number — and **then Arpit lifted the gate by direct instruction**; either alone would have unblocked it. Measured **WARRANTED**: 32.00 pts live-intent contamination@5 against a 25 pt bar, findability guard 93.33 % against 60. The diagnosis is the slice gap — the ambiguous slice sits at 66 pts, the corpus's own archived share, so **the scorer has no currency signal at all** and the live slice only looks better because present-tense vocabulary correlates with live documents. Shipped: `archived: true` at ingest, `[archived]` on `ask`'s text, the flag in both verbs' `--json`, a response-level note on **stderr**. **`find`'s stdout stays bare** so it still pipes. **The ranking does not move** — the weight stays `1.0` and two tests assert order and scores are byte-identical with the marker present. One test had to be *sharpened rather than kept*: it compared whole result objects, which silently asserted the marker could never exist |

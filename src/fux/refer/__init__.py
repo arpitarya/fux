@@ -60,10 +60,10 @@ from pathlib import Path
 from . import arc as arc_mod
 from . import fetchcache as fetchcache_mod
 from . import freshness as freshness_mod
-from .assemble import DEFAULT_BUDGET, PER_DOC_FRACTION, Assembled, assemble
-from .chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
+from ._assemble import DEFAULT_BUDGET, PER_DOC_FRACTION, Assembled, assemble
+from ._chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
 from .freshness import Policy, Verdict, cached as cached_verdict, verify
-from .rescore import ScoredPassage, rescore
+from ._rescore import ScoredPassage, rescore
 from ..errors import FuxError
 from .source import Fetched, fetch_document
 

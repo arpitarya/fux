@@ -134,39 +134,6 @@ def test_uninstall_leaves_a_foreign_hook_alone(tmp_path):
     assert not (tmp_path / ".git" / "hooks" / "post-merge").exists()
 
 
-def test_the_post_commit_hook_reindexes_after_a_commit(tmp_path):
-    """The lag is one commit, and the hook says so rather than hiding it.
-
-    ⚠ **This test raced from 2026-08-22 until 2026-08-27.** It was written when
-    `post-commit` re-indexed INLINE, so reading the index on the next line was
-    sound. When the fork resolved to option B the hook became
-    `fux ingest --spawn-runner` — it returns immediately and a detached process
-    does the work — and this became a read against a runner that had not
-    finished. **It failed roughly one run in three on a loaded machine and
-    passed on a fast one**, which is the shape a flake takes before anyone
-    calls it one. `_drain` is how every sibling test waits, and it is what was
-    missing here.
-
-    ⚠ **It now overlaps `test_post_commit_defers_and_a_detached_runner_drains_
-    the_list` almost exactly** — same corpus, same commit, same assertion.
-    Flagged rather than deleted: which of the two survives is a call about what
-    the suite should say, not a fix for the race.
-    """
-    make_repo(tmp_path, hooks=True)
-
-    (tmp_path / "docs" / "new.md").write_text(doc("brandnewterm"), encoding="utf-8")
-    git(tmp_path, "add", "-A")
-    committed = subprocess.run(
-        ["git", "commit", "-m", "add new"], cwd=tmp_path, capture_output=True, text=True,
-        env=_hook_env(),
-    )
-    assert committed.returncode == 0, "a hook must never block a commit"
-
-    assert _drain(tmp_path), "the detached runner never finished"
-    found = fux(tmp_path, "find", "brandnewterm", "--json").stdout
-    assert "new.md" in found, "post-commit should have re-indexed the committed tree"
-
-
 def _hook_env() -> dict:
     return dict(os.environ, PATH=f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}")
 
@@ -230,7 +197,21 @@ def _drain(root: Path, timeout: float = 120.0) -> bool:
 def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
     """W-66 Phase 2, through the real hook, real git, and a real detached
     process. The commit returns before the re-index has happened — that is
-    the whole of the fork's ruling — and the runner finishes it afterwards."""
+    the whole of the fork's ruling — and the runner finishes it afterwards.
+
+    **This absorbed `test_the_post_commit_hook_reindexes_after_a_commit` on
+    2026-08-27** (Arpit's call). The two had converged on the same corpus, the
+    same commit and the same assertion: the deleted one was written when
+    `post-commit` re-indexed **inline**, and once the fork resolved to deferral
+    its subject stopped existing. What it uniquely asserted — that a hook never
+    blocks a commit — is asserted here, and separately in
+    `test_a_hook_never_blocks_a_commit_even_when_fux_is_absent`.
+
+    ⚠ **The deleted test also raced from 2026-08-22 to 2026-08-27**, reading the
+    index on the line after a commit that now returns before the work is done.
+    It failed about one run in three on a loaded machine — the shape a flake
+    takes before anyone calls it one. `_drain` is the fix, and it is used below.
+    """
     make_repo(tmp_path, hooks=True)
 
     (tmp_path / "docs" / "new.md").write_text(doc("dirtylistterm"), encoding="utf-8")

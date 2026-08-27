@@ -163,7 +163,7 @@ to know, not guess.**
 
 ### Reference (required)
 
-- Generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- Generator — [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
   (`build()`, `_read_committed()`).
 - The reused hash function —
   [`src/fux/store/format.py`](../../src/fux/store/format.py) (`content_sha()`).
@@ -204,7 +204,7 @@ evidence.*
 **Code**
 
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
 - [`src/fux/store/format.py`](../../src/fux/store/format.py)
 

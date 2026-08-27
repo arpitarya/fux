@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from ..query.bm25f import derive_wlen, score_record
 from ..query.scan import query_term_hashes
 from ..query.tokenize import tokenize
-from .chunk import Passage
+from ._chunk import Passage
 
 __all__ = ["ScoredPassage", "rescore"]
 

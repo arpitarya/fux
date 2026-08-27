@@ -309,6 +309,32 @@ mutation: reverting `block_bound`'s `scoring` argument makes it diverge at
 fixture that does not fail under that mutation certifies an unsound bound as
 proven.**
 
+**11. The implementation modules are private, because the function is the API.**
+Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
+
+`build.py` → `_build.py`. `accel.py` and `stats.py` keep their names.
+
+- **The trap.** `from .thing import thing` in a package `__init__` binds the
+  **function** to `package.thing`, permanently shadowing the **submodule**. Both
+  `from package import thing` and `import package.thing` then hand back the
+  function, and every attribute access on it raises `AttributeError` at a call
+  site far from the cause.
+- **Why the MODULE was renamed rather than the function.** The function is what
+  callers use; the module is implementation. An underscore says what was already
+  true and **no caller changed** — where renaming the export would have touched
+  roughly thirty sites for the same result.
+- ⚠ **What this shape had already cost, unnoticed:** `fux.refer`'s shadow made
+  `tests/refer/test_refer_plane.py` feed **three functions** to
+  `inspect.getsource` while believing it was scanning three modules for
+  `urllib`/`socket` imports. **L4's network import fence silently stopped
+  covering three files** — 552 lines — and nothing failed, because
+  `getsource` works on a function too. A shadow does not have to break a test to
+  cost you one.
+- **Gated by [`tests/test_no_shadowed_submodules.py`](../../tests/test_no_shadowed_submodules.py)**,
+  which walks every package under `src/fux/` and carries a companion test
+  proving it can see a planted shadow — this repo has recorded vacuous passes
+  before.
+
 ### Consequences
 
 - **The differential law now covers the confidence block too.** `accel.ask`
@@ -395,7 +421,7 @@ proven.**
 
 ### Reference (required)
 
-- The generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py);
+- The generator — [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py);
   the candidate path and the skipping proof —
   [`accel.py`](../../src/fux/derive/accel.py) (its module docstring is the
   normative statement of the argument); the on-disk shapes —
@@ -439,7 +465,7 @@ grep -nE 'K1|B \*|idf\(' src/fux/derive/accel.py
 # expect: only inside block_bound — score arithmetic anywhere else is the veto
 
 # 4. the derived plane still has exactly one input
-grep -n 'index_dir\|shard_path\|runtime_dir' src/fux/derive/build.py
+grep -n 'index_dir\|shard_path\|runtime_dir' src/fux/derive/_build.py
 # expect: reads .fux/index only, writes .fux/runtime only
 
 # 5. every score multiplier is routed through Weighting
@@ -472,7 +498,7 @@ evidence.*
 **Code**
 
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
 - [`src/fux/derive/runtime.schema.json`](../../src/fux/derive/runtime.schema.json)
 - [`tests/derive/test_bounds.py`](../../tests/derive/test_bounds.py)

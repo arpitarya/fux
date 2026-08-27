@@ -11,13 +11,8 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — hands, not decisions
 
-**One item.** Six of the original seven closed on 2026-08-27 — five git
-operations, then the daemon run below, once a session had a shell and Arpit
-authorised the network.
-
-| # | do this | why it is stuck |
-|---|---|---|
-| 1 | **Sanity-check `L8`** in `CLAUDE.md` §Non-negotiable constraints and [ADR-LAWS](../docs/adr/0001_laws.md) decision 8 | A law was written and reverted the same day, from one sentence. Nothing mechanical checks that it says what Arpit meant. ⚠ **Its one-line handle was found stale on 2026-08-27** in ADR-LAWS' §1 table, `INTERVIEW.md`, `IMPLEMENTATION.md` and `compare/README.md`, all carrying the *withdrawn* first form. Reconciled to the live law — **a reconciliation, not a ratification** |
+**Empty.** All seven closed on 2026-08-27 — five git operations, the daemon run,
+and `L8` ratified. Removed rather than ticked, per rule 2.
 
 ---
 
@@ -64,22 +59,6 @@ authorised the network.
   — coverage against the **cited document** rather than the corpus — changes a
   declared signal, `output.schema.json`, the MCP result and every consumer.
   ADR-CONFIDENCE decision 12 names it, untaken.
-- **Nine playground goldens have no `known_failure` annotation.** `check.py`
-  supports the marker and the playground README documents *"41 pass · 9 xfail"*,
-  but no golden carries one, so a full run reports `FAIL — 9 of 50`.
-  **Annotating them turns a red gate green** — a judgement about what the suite
-  should assert, not an agent's to make.
-- **`fux/ingest/__init__.py` re-exports `run` under the submodule's own name.**
-  This has now caused **three separate defects in one day** — a `NameError` that
-  import checks missed, a broken test, and the dead daemon sweep. Each site is
-  guarded now and a structural check refuses the shape in `src/`, but **renaming
-  the export would remove the trap at the source.** It is an API change across
-  the codebase.
-- **Two `tests_e2e` post-commit tests now overlap almost exactly** —
-  `test_the_post_commit_hook_reindexes_after_a_commit` and
-  `test_post_commit_defers_and_a_detached_runner_drains_the_list`: same corpus,
-  same commit, same assertion. Flagged in the docstring rather than deleted;
-  which one survives is a call about what the suite should say.
 - ✅ **The fork counts were RE-DERIVED on 2026-08-27 and W-82 has ZERO open
   forks of its own.** 27 total; **18 ruled** by
   [the ledger](open/W-82-rulings-2026-08-27.md); of the remaining 9, **6** are

@@ -127,7 +127,7 @@ truth for actual staleness.
 
 ### Reference (required)
 
-- Generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- Generator — [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
   (`build()`, the `shard_stamp` collection, the write to `fmt.STAMP_NAME`).
 - The set it is excluded from —
   [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
@@ -164,5 +164,5 @@ evidence.*
 
 **Code**
 
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)

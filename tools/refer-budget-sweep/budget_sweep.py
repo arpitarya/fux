@@ -33,9 +33,9 @@ if _FUX_SRC.is_dir():
 else:
     import fux  # noqa: F401  # fall back to whatever's on PYTHONPATH/installed
 
-from fux.refer.chunk import chunk
-from fux.refer.rescore import rescore
-from fux.refer.assemble import assemble, Assembled, DEFAULT_BUDGET
+from fux.refer._chunk import chunk
+from fux.refer._rescore import rescore
+from fux.refer._assemble import assemble, Assembled, DEFAULT_BUDGET
 
 # The graph-acceptance corpus this sweep reuses (W-57's fux-lab environment).
 ROOT = _REPO_ROOT.parent / "fux-lab" / "graph-acceptance"

@@ -160,7 +160,7 @@ the same committed input, verified the same way as `manifest.json` and
 
 ### Reference (required)
 
-- Generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- Generator — [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
   (`_write_docs()`, `_read_committed()`); the field set and the postings entry
   layout — [`src/fux/derive/format.py`](../../src/fux/derive/format.py).
 - The consumers of what the table carries —
@@ -185,7 +185,7 @@ grep -rn docidx src/fux/derive/
 # it across builds or writes it anywhere outside .fux/runtime/
 
 # 2. every field is carried, not derived
-grep -n '_write_docs' -A 20 src/fux/derive/build.py
+grep -n '_write_docs' -A 20 src/fux/derive/_build.py
 # expect: each value read off the record with .get(); no path matching, no
 # directory list, no recomputation
 ```
@@ -206,7 +206,7 @@ evidence.*
 
 **Code**
 
-- [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
+- [`src/fux/derive/_build.py`](../../src/fux/derive/_build.py)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
 - [`src/fux/query/bm25f.py`](../../src/fux/query/bm25f.py)
 - [`src/fux/query/rank.py`](../../src/fux/query/rank.py)

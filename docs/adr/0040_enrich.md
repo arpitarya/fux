@@ -252,6 +252,14 @@ approved.**
 | **retirement / supersession flags** | nothing in the bytes distinguishes a live document from a retired one | if it reorders rather than annotates, it violates the ruling [ADR-ARCHIVED-CONTENT](0037_archived-content.md) already reached |
 | **richer embeddings** | fux computes no vectors at all ([ADR-ASK](0004_ask.md) decision 9) | **L1 collision** — a larger or API-served model may be *called once and pinned*, never imported into the runtime |
 
+⚠ **Import path moved 2026-08-27, behaviour unchanged.** ``src/fux/enrich.py`` now imports
+`chunk` from **`fux.refer._chunk`**: the module was made private because
+`fux.refer` re-exported the `chunk` *function* over its own submodule of that
+name, a shape that had already cost four defects and silently narrowed L4's
+network import fence. The function, its signature and its output are untouched —
+see [ADR-REFER](0030_refer-plane.md) decision 18 and
+[`tests/test_no_shadowed_submodules.py`](../../tests/test_no_shadowed_submodules.py).
+
 ### Consequences
 
 - **L3 is restated, not weakened:** the index is a deterministic function of
