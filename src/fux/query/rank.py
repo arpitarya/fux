@@ -226,6 +226,7 @@ def rank(
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
+    stats_out: dict | None = None,
 ) -> list[AskResult]:
     """Score, sort, truncate. The only place any of the three happens.
 
@@ -246,7 +247,20 @@ def rank(
     what the marker and the disclaimer read. Telling a reader a document is
     retired and reordering because it is retired are two different decisions,
     and only the second one is configurable.
+
+    `stats_out`, when a caller supplies a dict, receives the two corpus
+    statistics only this function holds — `df` and `n` — for
+    [`confidence.py`](confidence.py) to build its block from
+    (ADR-CONFIDENCE decision 2). **It is an out-parameter rather than a second
+    return value on purpose:** every existing caller of `rank()` is unchanged,
+    the differential law's two paths keep one shared signature, and the dict is
+    owned by the caller rather than by this module, which matters now that
+    fux runs threads. **Nothing read back out of it can reach a score or an
+    ordering** — it is written after the sort and never consulted.
     """
+    if stats_out is not None:
+        stats_out["df"] = dict(df)
+        stats_out["n"] = corpus.n
     if corpus.n == 0:
         return []
     avg_wlen = corpus.avg_wlen

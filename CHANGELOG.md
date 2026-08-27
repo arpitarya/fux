@@ -6,6 +6,106 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This is the v0.30 rebuild's changelog — a fresh start. The v0.26 engine's
 history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md).
 
+## [Unreleased]
+
+### Added
+
+- **`fux ingest` writes the skip list into `.fux/.fuxignore`, and counts it in
+  two numbers** (ADR-FUXIGNORE decision 11, ADR-INGEST decisions 4 and 15).
+  `599 skipped` on this repo was 598 files a committed list rejected exactly as
+  designed and **one** worth looking at, and the list itself sat in
+  `.fux/runtime/skipped` — derived, gitignored, invisible to review.
+
+  ```console
+  ingested 632 docs (32 changed, 600 carried forward), 341 not indexed, 1 skipped, 31 shards written
+  ```
+  ```
+  # .fux/.fuxignore
+  # >>> fux: not indexed >>>
+  # a committed list said not to index these. Rewritten by every `fux ingest`.
+  archive/v0.1/fux/cli.py   # not an indexed file type
+  # <<< fux: not indexed <<<
+
+  # >>> fux: skipped >>>
+  # fux opened these and could not read them.
+  archive/v0.26/tests_e2e/corpus/docs/binary.md   # binary
+  # <<< fux: skipped <<<
+  ```
+
+  **`not indexed`** is a committed list doing its job — `.fuxignore`, a `!`
+  exclusion in `.fux/sources/dirs`, the type allowlist. **`skipped`** is a file
+  fux opened and could not read. Printed lines use the summary's own two words,
+  so a line and the total above it can never say different things about one
+  event. **`.fux/runtime/skipped` is deleted on every run.**
+
+  ⚠ **The blocks are written FIRST, above every hand-written line.** Last match
+  wins in this file, so a block written last would silently beat a `!` you
+  wrote. First means you always win, and `!<path>` is how you pull a file back
+  out of a block.
+
+  ⚠ **A generated line DECIDES, so it freezes the verdict that produced it.**
+  Widen `.fux/sources/types` and the listed `.py` files stay out; write content
+  into a file listed as `empty` and it stays out. That is what putting the list
+  in `.fuxignore` means, and it is not undone — it is made **loud**: every run
+  re-checks each line and warns on stderr when one has stopped being true,
+  naming the edit that fixes it. Delete the line, or write a `!`.
+
+  **A pattern you write suppresses the generated lines it covers.**
+  `__pycache__/` and `*.py[cod]` in this repo keep 257 lines out of the block,
+  leaving 342. That lever is deliberately a person's: fux writes exact paths and
+  never infers a pattern, because an inferred pattern can over-reach onto a file
+  the corpus does not have yet and the failure would be a document silently
+  missing.
+
+  **Nothing machine-readable moved.** `fux ingest --list-skipped` is still
+  `path: reason`, sorted and unprefixed. ⚠ **W-88's report-once promise now
+  covers files only** — a URL has no repo-relative path, so a URL skip has
+  nowhere to be recorded and prints on every networked run; repeat URL failure
+  is `.fux/runtime/url-state.json`'s job.
+
+- **`.fux/.fuxignore` — one file for what is not indexed** (ADR-FUXIGNORE).
+  *"Why is my file not in the index?"* had four answers across three files plus
+  the walker's source. Exclusion now has one home, in `.gitignore`'s grammar:
+  last match wins, `!` re-includes, a trailing `/` means a directory, any `/`
+  anchors at the repo root, `**` is the explicit any-depth form, and a file
+  under an ignored directory cannot be re-included — git's rule, kept.
+
+  **It is read first and decides in both directions.** A path it ignores is
+  skipped whatever `.fux/sources/types` allows; a path it **explicitly**
+  re-includes with `!` is indexed whatever `types` disallows. Every skip names
+  the file, the line number and the pattern:
+  `ignored by .fux/.fuxignore:12 \`*.log\` (docs/notes.log)`.
+
+  ⚠ **`!` means the opposite of what it means next door.** It subtracts in
+  `.fux/sources/dirs` and `.fux/sources/types`; it re-includes here. Deliberate
+  — a `.fuxignore` that did not behave like a `.gitignore` would be worse than
+  none. `fux ingest`, `fux ingest --list-skipped` and `fux doctor` warn when the
+  same pattern is written in both places, naming the `sources/` line to delete.
+
+  ⚠ **A `!` line can now index a format with no decoder, as raw bytes.**
+  `!*.py` really does index Python. That is the shape ADR-TYPES was opened
+  about; it costs one explicit line a human wrote, in one committed file.
+
+  ⚠ **One deliberate divergence from git:** a `#` after whitespace begins a
+  comment, so `*.log  # noisy` is a pattern plus a note. Git reads that whole
+  line as a pattern matching nothing.
+
+  Absent, empty or all-comments means nothing is ignored — safe here, unlike
+  `sources/types`, because this file only ever subtracts by default. `fux setup`
+  writes the header and no patterns, write-if-missing.
+
+### Changed
+
+- **ADR-TYPES decision 7 is narrower.** The three walk conditions were *"a
+  conjunction, deliberately not a priority order"*. They are now a conjunction
+  with exactly one thing above them. ADR-DIR-LIST decision 3a is unchanged and
+  its argument is restated: `fux add` still may not outrank the allowlist,
+  because a verb leaves nothing behind for a reader to find and a committed
+  `.fuxignore` line does.
+- **`!` lines in `.fux/sources/dirs` and `.fux/sources/types` are the
+  deprecated spelling for an exclusion.** They still parse and still work —
+  `fux remove` still writes one — and `.fuxignore` is the home.
+
 ## [2.0.0-alpha.2] - 2026-08-26
 
 ### Added

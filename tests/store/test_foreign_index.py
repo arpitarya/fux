@@ -95,7 +95,7 @@ def test_read_index_still_refuses_a_foreign_shard(tmp_path):
     """The new seam does not widen the old refusal. This is the whole safety
     argument: only `--full`, which rebuilds from source anyway, may proceed."""
     _write_foreign(tmp_path, _file_record("docs/a.md"))
-    with pytest.raises(FuxError, match="_format header"):
+    with pytest.raises(FuxError, match="_format"):
         store_mod.read_index(tmp_path)
 
 
@@ -155,7 +155,7 @@ def test_a_delta_run_still_refuses_a_foreign_index(tmp_path):
     """Carry-forward genuinely cannot proceed against another analyzer, so the
     relaxation is scoped to `--full` and nothing else."""
     _write_foreign(tmp_path, _file_record("docs/a.md"))
-    with pytest.raises(FuxError, match="_format header"):
+    with pytest.raises(FuxError, match="_format"):
         _existing_index(tmp_path, full=False)
 
 

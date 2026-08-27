@@ -27,14 +27,455 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-08-26**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-08-27**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: W-86 filed — the decoder plane (2026-08-26)
+### The most recent change: P3 passed, and a decoy caught fux believing itself (2026-08-27)
+
+**One gate closed, one defect found, and the finding matters more than the gate.**
+
+**W-87 P3 is `PASS`** — 19/19 sanitized shas unchanged across two `fux update`
+runs over 19 real documentation URLs, against a frozen `≥ 80 %`. **Fork 3's gate
+clears and W-87 P4 is unblocked.** ⚠ *Cleared is not decided*: the fetcher
+contract's fifth function is still Arpit's. ⚠ The spec **named no interval**, so
+at 12 s apart this measures server-side determinism, not document churn.
+
+**W-82 has zero open forks of its own** — re-derived against the code: 27 total,
+18 ruled, 8 moved to W-87, 1 answered by the build. What is left under W-82 is
+ruling 3, which is a judgement.
+
+**🔴 Read this before ruling R10.** Two of ADR-RS decision 15's three controls
+were built (`tools/quality-controls/`), and **the decoy set found a defect on its
+first run**:
+
+> *"What is the SLA we publish for the payments API"* → `band: grounded`,
+> `coverage: 1.0`, `missing: []`, `separation: 0.58`, citing the data-retention
+> policy. **No document in the corpus discusses it.**
+
+- **`coverage` and `missing` are CORPUS-WIDE.** The four terms occur in four
+  *different* documents, so nothing reads as missing, both fact-based band
+  clauses pass, and the band falls through to `separation` — which it clears.
+- ⚠ **No ruling on R10 closes this.** `0.58` is above the `0.5` R10's selection
+  rule would have picked. **The two decisions should be read together**, and the
+  case argues `separation` measures **decisiveness** rather than groundedness:
+  a corpus of near-misses is decisive about its best near-miss.
+- **Named, not fixed**, and **deliberately unpinned by any test** — pinning a
+  defect is how it becomes the contract. ADR-CONFIDENCE decision 12.
+
+**ADR-RS decision 15 keeps its `NOT BUILT` marker.** It names three controls; the
+**sealed subset** is the one left, and it is blocked on a judgement rather than an
+environment — decision 15 says sealing *shrinks* the visible set and whoever
+builds it must resolve that tension rather than inherit it. On 50 goldens both
+halves end up too small.
+
+⚠ **And the blocker on all of P1 was false again** — *"needs `fux-playground`,
+not on the build machine"*. It was on the machine; two of three were built within
+the hour. **That is the third time in two sessions that a recorded blocker
+evaporated on contact with a shell.**
+
+---
+
+### Before that: the daemon over the real internet, and R10 (2026-08-27)
+
+**Read this first if you are picking up cold: a whole section of the queue was
+false, and the reason generalises.**
+
+`OPEN-WORK.md` was headed *"Blocked on an environment that does not exist on the
+build machine"* and listed six items. **Both environments were on the machine
+the whole time** — `~/my_programs/fux-lab` and `~/my_programs/fux-playground`,
+the latter still holding its 50 goldens and grading 41/50. The section was
+written by sessions that had no shell and could not look. **It had been holding
+R10, the confidence plane's gate.**
+
+⚠ **Rule 4 — re-derive, do not read — is not advice.** Two consecutive sessions
+now have found the queue's own blockers to be stale or false the moment a shell
+was available. **Check before you believe a blocker.**
+
+**The daemon is done, against real external URLs.** Seven of them, chosen to
+cover exactly what localhost could not: TLS, DNS, two CDNs, a real `404`, a real
+`429`, and **Wikipedia's `Special:Random`** — content that genuinely differs
+between fetches, on a server nobody here controls.
+
+- **The URL tail closed unassisted**: `16:51:55Z` *Laurence Bennett* →
+  `16:52:55Z` *Bargilt Iron Ore Mine*, one sweep interval, no command typed.
+  That is the whole substance of W-82 ruling 3.
+- **The rate-limit path fired for the first time ever** against a real 429 —
+  `fux doctor`: `rate-limited by httpbin.org x8`.
+- ⚠ **Proxy and SSO remain uncovered** and need a corporate network. **Ruling 3
+  is now held on a JUDGEMENT, not on evidence** — the recommendation is that it
+  may land, and the call is Arpit's.
+
+**R10 ran and is `INCONCLUSIVE` — for a reason worth internalising.** Not
+because 50 queries are thin, though they are. **The pre-registration froze two
+rules that disagree on the curve the data actually produced**: it reaches
+`t = 0.75` at `separation 0.3`, falls back at `0.4`, then rises. Its selection
+rule picks `0.5`; its verdict table's non-monotone row picks *no change*.
+
+- **Handed to Arpit, not adjudicated.** ⚠ **Picking `0.5` would be the
+  moving-threshold failure in its most natural costume** — a defensible reading
+  of a frozen sentence that quietly discards the row saying not to.
+- **`SEPARATION_FLOOR` stays `0.10`, and no test was edited** — the confidence
+  test asserts the rule relative to the constant and never its value, a guard
+  built for exactly this moment and working.
+- **The correction lives in [ADR-RS](../docs/adr/0036_predictions.md) decision
+  18, never in the frozen file** (W-82 ruling 8).
+
+**Three defects, all the same shape: an error message that sends the reader
+somewhere there is nothing to find.** A URL skipped as *"no decoder for
+application/json"* while `jsondoc` is built in and ran; consumer decoders never
+reaching URL content because `decode()` was called without `root`; and
+`shard missing/mismatched _format header`, which is what an **engine upgrade**
+produces and which named neither version nor the way out. **If you are adding an
+error path, say what was found, what was expected, and what to do.**
+
+---
+
+### Before that: the backlog cleared, and the checks were checked (2026-08-27)
+
+**A session with a shell.** Four Cowork sessions had run without one
+(`device_bash` 5/5 since 2026-08-26), so the queue had accumulated seven
+decided-but-unexecuted items — and, less visibly, had **never been able to run
+the test suite it was reporting on**.
+
+**The first finding is the one to carry forward.** `OPEN-WORK.md` said *"two ADR
+tests are RED right now."* **Twelve were**, in five groups. The queue was
+accurate about what it had seen and blind to everything else, which is exactly
+what `CLAUDE.md` §Two hazards describes: **a doc repeating a doc is not a second
+source.** If you arrive with a shell and the queue was written without one,
+**run the suite before you believe anything.**
+
+**What closed.** Five hands items (plus two `BLOCKED.json` named that the queue's
+table did not) — two `git rm`, six `git mv` into `archive/`, every ADR-ENRICHED
+citation repointed. `tests/` went **2 158 passed / 12 failed → 2 170 / 0**, and
+`tests_e2e/` ran on **macOS** for the first time (74 passed, 1 skipped).
+
+**Three of the twelve failures were defects in the checks, not in the code**,
+and they are the durable part:
+
+1. **The ADR register's §"the number line is contiguous" note was FALSE.** It
+   described a renumber of `0026`+ down by one that never ran — and **must never
+   run**: W-82 ruling 7 forbids compacting a vacated ordinal, having already
+   watched one put two records on `0022`. The note cited
+   `0025_runtime-manifest.md` and `0042_locks.md`; **neither file has ever
+   existed in this repo.** ⚠ **If you read a doc claiming the numbering is
+   contiguous, it is stale.** `0017` and `0025` are burned, deliberately.
+2. **`tests/test_adr_freshness.py` convicts history unless it is stopped**, and
+   its own docstring claimed it never did. It ran here for the first time and
+   flagged eight commits against records written the same day. Now the register
+   is parsed **per commit** (`git show <sha>:docs/adr/README.md`) — ADR-OWNERSHIP
+   decision 9. **`RULE-SINCE` did NOT move**; the standing precedent was to
+   retire ~95 commits of auditability to excuse eight, twice before.
+   **A fourth entry on `RULE-SINCE` means this fix failed.**
+3. **A frozen pre-registration with no report is a legal state** —
+   `pre-registered, not yet measured`, ADR-RS decision 17. R10's directory failed
+   four checks for correctly following the method: commit the threshold first,
+   measure when the environment exists.
+
+**The daemon is proven, and the hold on W-82 ruling 3 is NARROWER — not lifted.**
+Full lifecycle against a local HTTP server: a page edited at `15:11:21Z` was
+indexed by `15:12:04Z`, unassisted, one `sweep_minutes` later; `stop` reaped the
+pid and freed the lock
+([capture](regression/2026-08-27-daemon-lifecycle/report.md)).
+
+- **The check is a positive control**, not a status read: the indexed term exists
+  only in the fetched page. That matters because the unit gate patches a mock,
+  and **a mock cannot tell "the sweep called ingest" from "the sweep called the
+  mock"** — which is precisely how the dead sweep hid for a day.
+- ⚠ **Localhost is not the network.** No proxy, TLS, SSO, rate limit or DNS.
+  Narrow-by-default's blast radius is *URLs that stop being swept*, so the
+  recommendation is that **ruling 3 stays held** until one real external URL has
+  been swept. **That is Arpit's call.**
+
+**One queue claim was wrong and measurement is how it was caught.** *"Four hook
+tests go green-by-vacuity without `fux` on `PATH`"* → re-run with
+`PATH=/usr/bin:/bin`: **4 failed, 9 passed.** Exactly **one** was vacuous, and it
+is the one whose every assertion is that something is ABSENT. **Prefer measuring
+a claim about the test suite over reading one.**
+
+⚠ **L8's one-line handle was stale in four live docs** — including this one and
+ADR-LAWS' own §1 table — all carrying the form Arpit **withdrew the same day he
+wrote it**. Reconciled. **That is a reconciliation, not a ratification**: the L8
+sanity-check is still open and still his.
+
+---
+
+### Before that: the skip list is COMMITTED, in `.fux/.fuxignore` (W-93, 2026-08-27)
+
+**Read this before touching ingest: `fux ingest` now writes a committed file
+that is also its own input.** Two delimited blocks at the top of
+`.fux/.fuxignore` hold every path the run did not index and why;
+`.fux/runtime/skipped` is deleted on every run. Ruled by Arpit on 2026-08-27.
+
+**How it stays safe.** The blocks are written **first**, above every
+hand-written line — last match wins in this file, so a block written last would
+silently beat a `!` somebody wrote. A block line is a **literal path**, never a
+glob. **Which block a line sits in is its class**, so the `not indexed` /
+`skipped` split survives a round trip with nothing parsing note text. The note
+is **the reason that put the line there**, so the second run does not answer
+*why* with *"because the first run said so"*. And **a hand-written pattern
+suppresses the generated lines it covers** — `__pycache__/` and `*.py[cod]`
+collapse 257 of this repo's 599, leaving 342.
+
+⚠ **The cost, and it is not a bug to be fixed: a generated line DECIDES, so it
+FREEZES.** Widen `.fux/sources/types` and the listed `.py` files stay out. Write
+content into a file listed as `empty` and it stays out. **Arpit was told this
+before he chose it and chose it anyway** — it is what "put the list in
+`.fuxignore`" means, and the alternative is a file whose name is a lie. It is
+made **loud**, not undone: `gitdir.would_index` re-checks every generated line
+each run and warns on stderr, naming the edit that fixes it. Do not "fix" the
+freeze.
+
+⚠ **Two losses, recorded rather than worked around.** A URL has no
+repo-relative path, so **W-88's report-once promise now covers files only** and
+a URL skip prints on every networked run. And a new skip **dirties the working
+tree** on the hook path; an unchanged run writes nothing, so steady state is
+quiet.
+
+**The process lesson is bigger than the change.** The first pass of this item
+read the request as a diagnosis to verify, verified it, found it wrong, and
+shipped something else that was correct and beside the point. **Checking was
+right; substituting was not.** See §4.
+
+### Before that: `fux ingest` counts what it did not index in TWO numbers (W-93 pass 1, 2026-08-27)
+
+**Small change, and the reason it is at the top is the reasoning, not the size.**
+Arpit saw `ingested 632 docs …, 599 skipped` on this repo and said the skipped
+files *"should get added into `.fuxignore`, not skipped"*.
+
+**Reading the walker first is what saved it.** `gitdir.walk_sources` records an
+**ignored** file as skipped too, so moving 599 paths into `.fuxignore` would have
+changed the reason string and left the count at 599. And per-file lines would
+have frozen a **derived** verdict — `not an indexed file type` comes from the
+type allowlist, and `.fuxignore` **outranks** the allowlist, so 274 frozen `.py`
+paths would silently survive the day a `.py` decoder lands.
+
+**The defect was the count, not the files.** 598 of the 599 were the allowlist
+doing exactly its job; **one** was a `binary` fixture worth a look. One number
+over two populations is a number nobody reads by the second run — the same
+failure W-88's skip notice was written for, arrived at from the other side.
+
+**So [ADR-INGEST](../docs/adr/0007_ingest.md) gained decision 15:** a skip
+carries its class — `POLICY` (a committed list said no) or `UNREADABLE` (fux
+opened it and could not read it) — **assigned where the skip is made, never
+parsed back out of the reason string**, and the summary counts them separately.
+`--list-skipped` and `.fux/runtime/skipped` are deliberately unchanged, because
+things pipe them.
+
+⚠ **The open fork this surfaced, and it is Arpit's:** fux's walker reads **no
+`.gitignore`** and has no prune, so it enumerates 257 untracked `__pycache__`
+artifacts on every run. Making `.fuxignore` prune the walk saves real work
+**and** collides with reported-never-silently-dropped. Not filed as a `W-nn` —
+the queue is human-blocked and this session was not going to invent scope.
+
+### Before that: there are EIGHT laws now — `L8` (2026-08-27)
+
+**If you read one thing before touching this repo: the law count changed.**
+Ruled by Arpit on 2026-08-27, closing W-89.
+
+> **L8** · *A use record never leaves the machine.*
+>
+> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law at its one home, `CLAUDE.md` §Non-negotiable constraints.
+
+- **Every one of L1–L7 governs what fux does to documents.** L8 is the first law
+  about what fux retains of *people using it*. L2 governs **corpus content**, and
+  a query is not content however precisely it describes one — that was the gap.
+- **Normative text is `CLAUDE.md` §Non-negotiable constraints**, as always. The
+  handle, the reasoning and the limits are
+  [ADR-LAWS](../docs/adr/0001_laws.md) **decision 8**. Both changed in one commit,
+  which ADR-LAWS decision 4 requires — **if you find them committed separately,
+  that is the defect, not a style question.**
+- **L8 forbids nothing fux does today.** Verified against the code *before* the
+  text was written: `maintain/lastcited.py` hashes the query key
+  (`sha256[:16]` of the normalised text), bounds the store at `MAX_QUESTIONS = 256`,
+  writes into gitignored `.fux/runtime/`, never raises, and reports on **stderr**
+  so stdout stays byte-identical.
+- ⚠ **The thing most likely to be misread.** L8 does **not** make the use record
+  private. `last-cited.json` maps each hashed key to the locators that answered
+  it, so it still says *which documents are asked about and how often*. Those
+  locators are already in the committed `M/` plane — the file adds **frequency,
+  not new exposure**. Grounded in the 2006 AOL search-log release, where
+  de-identified queries still identified a named individual.
+- ⚠ **Why this was a law and not one more ADR decision.** The prohibition already
+  existed as [ADR-QUALITY](../docs/adr/0044_quality-contract.md) decision 11 — and
+  an ADR is a thing another ADR may supersede. Meanwhile
+  [`proposals/ranking-tuning.md`](proposals/ranking-tuning.md) §8 calls a per-repo
+  query log *"an asset fux gets for free"*. **The pull toward building one is
+  documented and growing**, which is OPEN-WORK rule 6's damage-that-accrues.
+
+**W-89 is closed** — outcome in [`IMPLEMENTATION.md`](IMPLEMENTATION.md). ⚠ Its
+detail file still needs a `git mv` into `archive/open/`; no shell was available,
+so it is stamped `status: ruled` and filed with the other stray-file `git`
+operations in [`OPEN-WORK.md`](OPEN-WORK.md).
+
+---
+
+### Before that: the record set was rewritten — metadata once, and no record carries history (2026-08-27)
+
+**Arpit's instruction, and it reshaped all 45 records plus
+[`TEMPLATE.md`](../docs/adr/TEMPLATE.md) and
+[the register](../docs/adr/README.md).** Three parts, none cosmetic:
+
+1. **Frontmatter is stated once.** Ten keys in a fixed order —
+   `type · name · title · description · status · date · feature · owns · laws ·
+   timestamp` (`supersedes`/`ratifies` optional) — and **the body opens at §1.**
+   The `- **Name:** / **Status:** / **Date:** …` bullet block that every record
+   also carried is deleted. Two hand-written copies of one fact drifted, which is
+   what it was always going to do.
+2. ⚠ **`Amended` is abolished, and this is the load-bearing part.** A correction
+   is now a **rewrite of the sentence it corrects, in place**. An amendment
+   appended below leaves the false sentence standing *above* its own correction,
+   and **an agent reads top-down and acts on the first answer it finds** — the
+   W-83 failure, attacked at its source.
+3. **History is gone; arguments stayed.** W-nn narrative, dates and superseded
+   prose removed. Rejected alternatives, the ⚠ silent-failure warnings and
+   measured evidence all kept — **the failure is the argument, the date it
+   happened is not.**
+
+**Four things a session arriving cold will otherwise get wrong:**
+
+1. ⚠ **THE SUITE HAS NEVER BEEN RUN AGAINST ANY OF THIS.** The bash sandbox died
+   mid-session and did not recover. Every consistency claim — key order, owns
+   agreement in both directions, the Mermaid/ASCII pairing, chart `source:` lines
+   — was **derived by reading the tests and grepping the tree**. Run
+   `uv run pytest -q tests` before trusting a word of it.
+2. ⚠ **Three tests are red, and all three have one cause.**
+   `docs/adr/0043_confidence.md` is a stale duplicate of `0045_confidence.md`
+   (same `name:`; `0043` is also ADR-LOCKS). ✅ **Arpit ruled 2026-08-27: keep
+   `0045`** — the concurrent-session reason for leaving it in place is
+   discharged. `git rm` it and all three go green. **Do not "fix" them by
+   reordering the register** — `register_names()` is keyed by name, so
+   reordering only moves which of the two files reads as unlisted.
+3. **Do not re-add an `Amended` block, and do not restore a record's history
+   from git when you find prose missing.** It was removed deliberately, under an
+   explicit instruction. `tests/test_adr_frontmatter.py` will fail you, but the
+   reason matters more than the check.
+4. **`Owns (on acceptance)` no longer exists.** A record that owns nothing
+   declares `owns: []`, whatever its status. The conditional form let a record
+   assert a claim the register did not grant and call the disagreement
+   intentional.
+
+⚠ **It crossed `BLOCKED.json`, and landed two of the blocked rulings by
+accident.** That blocker says W-82 rulings **1, 4, 6, 7** are stuck on
+`docs/adr/README.md` being held uncommitted by the concurrent session — and this
+pass rewrote that file. **Ruling 1** (ADR-MCP / ADR-ENRICH / ADR-RERANK →
+`accepted`) and **ruling 7** (ADR-CODES-TABLE out of the register, archived,
+ordinal burned) are now **landed**; *flip where the code exists* and the archive
+law produced them independently. **Rulings 4 and 6 are not landed** — the
+`describes` column, and ADR-ENRICH superseding ADR-ENRICHED — and both apply
+cleanly on top of the new register. **Do not let a second session claim 1 or 7
+as still outstanding.**
+
+**Also:** `0025_codes-table.md` moved to `archive/adr/` **with no successor** —
+its subject (`codes.jsonl`, the dense lane) was deleted, and that closes the
+2026-08-25 finding that the status vocabulary has no value for *a record whose
+subject ceased to exist*. **The answer was archival, not a fourth status.**
+
+### The change before it: fux states how much it believes its own answer (2026-08-27)
+
+**[ADR-CONFIDENCE](../docs/adr/0045_confidence.md) (`0045`, ⏳ proposed) is the
+runtime half of the quality contract below.** Every answer now carries four
+signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
+`band`, and an `answerable` boolean — on `ask`/`find`/`answer` in `--json`, on
+**stderr** in text mode, and on the `fux_search` MCP result. State is
+[W-90](open/W-90-the-confidence-plane.md).
+
+**Five things a session arriving cold will otherwise get wrong:**
+
+1. ⚠ **`SEPARATION_FLOOR` is a PROXY, not fux's own threshold.** ADR-QUALITY
+   decision 6 froze `t = 0.75` hours earlier; two abstention thresholds
+   governing one decision is drift. **R10 must find the `separation` at which
+   `P(correct) = t`.** If you find yourself picking a floor because it makes
+   bands look sensible, stop — that is the thing decision 6 forbids.
+2. ⚠ **`separation` is ORDINAL and Chow's rule assumes a calibrated
+   probability.** The record states that gap rather than closing it. R10 closes
+   it or says plainly that the floor is a heuristic standing in for a
+   probability nobody computed. **Do not close it by inference.**
+3. ⚠ **`support` is bounded by `--top` and CANNOT become a corpus-wide count.**
+   The accelerator skips documents it proved cannot reach the top `k`, so a
+   corpus-wide number would differ between `--fast` and `--scan` — a
+   differential-law break. This is a constraint, not an oversight; it was found
+   while building.
+4. ⚠ **`ask` and `find` can only ever report `verified: unverified`.** They
+   fetch nothing. Reporting `current` because the index is internally consistent
+   is the exact collapse the refer plane's four-state verdict exists to prevent.
+5. ⚠ **The suite is NOT verified green and no baseline exists.** 59 failed /
+   1811 passed / 8 errors on the last clean run; 38 new tests green in
+   isolation; the sandbox died mid-verification.
+   **`tests/derive/test_weighted_bound.py` is in the blast radius.** And two
+   **stray misnumbered files** — `docs/adr/0043_confidence.md`,
+   `work/open/W-89-the-confidence-plane.md` — are still on disk and must be
+   deleted. ✅ **Ruled by Arpit 2026-08-27** (keep `0045`/`W-90`); the removal is
+   two `git rm`s nobody has run yet, not an open question.
+
+### The change before it: the quality contract is declared (2026-08-27)
+
+**Fux now says what a quality number means, for the first time.**
+[ADR-QUALITY](../docs/adr/0044_quality-contract.md) (`0044`, accepted) ratifies
+W-87 Phase 0 — all six forks, on Arpit's ruling.
+
+**Four things a session arriving cold will otherwise get wrong:**
+
+1. ⚠ **The cost of an error is FROZEN and may never be re-set.** `t = 0.75` →
+   `c = t/(1-t) = 2`, in [`tools/quality/mix.toml`](../tools/quality/mix.toml).
+   It was committed **while `recall@k` is still uncomputed**, which is the only
+   ordering under which it means anything. **If you find yourself adjusting `c`
+   because a number came out badly, stop** — that is veto condition 3 and it
+   voids decision 6.
+2. ⚠ **`nDCG` is a diagnostic here, not the headline, and it is not a style
+   preference.** Two conditions hold in fux — a reranker discards the retriever's
+   ordering, and LLM attention is U-shaped — so a decaying discount asserts a
+   value curve the consumer does not have. If either condition stops being true,
+   veto condition 1 fires and the classical metrics come back.
+3. ⚠ **`recall@k` — the declared headline — is NOT COMPUTED.** Neither is the
+   `unanswerable` class, which does not exist and **must be authored blind**.
+   The contract is a declaration, not an instrument; `tools/quality/` is read by
+   nothing.
+4. ⚠ **W-87's fork 6 ruled "no query log" and deliberately did NOT rule whether
+   L2 reaches one.** That gap is [W-89](../archive/open/W-89-does-l2-reach-a-query-log.md).
+   Do not close it by inference from ADR-QUALITY decision 11 — the record
+   explicitly declines it.
+
+**The queue is three items** — W-82, W-87, W-89 — and the *Blocked on Arpit*
+inbox is no longer empty. ⚠ It said `Empty` for a day while W-87 existed as a
+detail file with no index row.
+
+### The change before it: W-86 closed — the decoder plane, complete (2026-08-26)
+
+**Fux reads thirty extensions now, not six.** Sixteen built-in decoders, all
+stdlib, no dependency added; `fux setup` copies them into `.fux/decoders/` and
+**the copy is what runs**. Consumer decoders may bring dependencies the runtime
+may not — [ADR-DECODE](../docs/adr/0042_decode.md) is the record, and the
+detail file is archived at
+[`archive/open/W-86-the-decoder-plane.md`](../archive/open/W-86-the-decoder-plane.md)
+(named, never cited).
+
+**Four things a session arriving cold will otherwise get wrong:**
+
+1. ⚠ **The enrichment queue is written and nothing reads it.** That is **fork
+   G**, deliberately open — `fux enrich` derives scope from a declared `dirs`
+   line, and a decoder returning `None` is a *discovered* need. Different
+   origins; merging them amends an accepted record. It is not a bug.
+2. ⚠ **`DEFAULT_TYPES` is derived from BUILT-IN decoders only.** A default that
+   grew when a consumer dropped a `logdoc.py` into `.fux/decoders/` would mean
+   **adding a decoder silently starts indexing a new file type**. Pinned by a
+   test.
+3. ⚠ **A bare `str` from a fetcher is still accepted**, as a transition ramp.
+   The P8 break was **never re-costed** — ADR-FETCHER's *"no external
+   consumers"* is dated v0.32.0 and predates the PyPI release. Removing the
+   ramp without measuring is removing the thing that makes the break survivable.
+4. ⚠ **Markdown is ratified as the decoder intermediate, with no reopen
+   trigger.** A future session proposing a structured `headings` field on
+   `ParsedDoc` is reopening a decision, not filling a gap.
+
+**Three forks moved into the archive with the item** — F (a docstring decoder
+for source files), G (above), I (`fux decoder` as its own verb). Each returns
+as a **new item with a new id** if wanted.
+
+### The change before it: W-86 filed — the decoder plane (2026-08-26)
 
 **No code moved. Three findings did.** Arpit asked whether fux could interpret
 PDFs, decks, spreadsheets, JSON and YAML;
-[W-86](open/W-86-the-decoder-plane.md) is the plan, and
+[W-86](../archive/open/W-86-the-decoder-plane.md) is the plan, and
 [`compare/index-lock.compare.md`](compare/index-lock.compare.md) is the lock
 fork he told the session to research and call itself.
 
@@ -475,7 +916,24 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated **2026-08-25**. The queue is **five**: **W-78** (ruling 1 only —
+*Updated **2026-08-27**. The queue is **three**, and every one is `arpit`-lane:*
+
+| item | what it needs | filed |
+|---|---|---|
+| **W-82** | 27 forks, none of which an agent may default | 2026-08-26 |
+| **W-87** | ✅ Phase 0 ruled. P1–P5 need **environments, not decisions** — `fux-playground`, a real URL corpus, a 3.11+ install | 2026-08-27 |
+| **W-89** | does **L2** reach a query log? A gap in the laws | 2026-08-27 |
+
+**The immediate next step: nothing here is agent-closable.** Under CLAUDE.md
+§Triage first, a session that finds this state says so in ≤3 lines and stops.
+
+> ⚠ **Everything below this line in §2 is HISTORY and is stale as a status.**
+> It still reads *"the queue is five"*, names W-74/W-75/W-77/W-81 as separate
+> items (they were **merged into W-82** on 2026-08-26), and names W-78 as open
+> (closed 2026-08-25). It is kept for the judgment in it, not for the counts.
+> The table above is the state of play.
+
+*Superseded lede, 2026-08-25: the queue is **five**: **W-78** (ruling 1 only —
 reopen ADR-RERANK veto 1 or confirm it), **W-81** (`agent`), **W-77**, **W-74**,
 **W-75**. Four of the five are `arpit`-lane rulings. W-73, W-76, W-79 and W-80
 are closed and their entries below are history, not pending work.*
@@ -772,6 +1230,26 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **Verifying a request is not the same as answering it** (2026-08-27, W-93).
+  Arpit asked for the skip list to be written into `.fuxignore`. The walker said
+  his stated *mechanism* would not reduce the count — true — so the session
+  shipped a different, correct change instead and reported it as done. He came
+  back with the same sentence. **A wrong diagnosis inside a request does not
+  invalidate the request**: say what the code says, then ask which shape he
+  wants, and build that. The second pass took two questions and got it right.
+- **Read the code before agreeing with the remedy, even when the person asking
+  owns the repo** (2026-08-27, W-93 pass 1). *"The skipped files should get added into
+  `.fuxignore`"* is a reasonable read of `599 skipped` and it does not work:
+  the walker counts an ignored file as skipped, so the count would not have
+  moved. The observation was right, the diagnosis was one layer off, and the
+  only way to know was `gitdir.walk_sources`. **A remedy that sounds right is
+  not a verified one; the fix is usually adjacent to the one proposed.**
+- **A count over two populations is the same failure as a wall of text**
+  (2026-08-27, W-93). W-88 stopped `fux ingest` printing 599 identical lines
+  nobody read; the number those lines were replaced by was *also* unread,
+  because 598 of it was a list working as designed. **When suppressing output,
+  check that what survives still separates "we chose not to" from "we could
+  not."**
 - **A control arm is not optional in a harness whose job is to prove a feature
   works** (2026-08-20). R6's tier 1 passed and was worthless: it merges cleanly
   with the merge driver *uninstalled*, because two documents added on two

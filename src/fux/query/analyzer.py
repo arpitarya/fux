@@ -88,3 +88,37 @@ def analyze(text: str) -> list[str]:
                 continue
             out.append(_stem(lowered))
     return out
+
+
+def analyze_pairs(text: str) -> list[tuple[str, str]]:
+    """`(surface, analyzed)` for every term `analyze` produces, same order.
+
+    **What this is for.** An analyzed term is what the index is keyed by; it is
+    not a word anyone typed. `mTLS` analyzes to `mtl`, and a report that says
+    *"`mtl` is not in this corpus"* is worse than saying nothing — the reader
+    cannot tell whether fux misunderstood the question or the corpus really is
+    missing the topic. [`confidence.py`](confidence.py) needs the spelling the
+    user actually wrote, and this is the only honest way to get it.
+
+    ⚠ **This deliberately DUPLICATES `analyze`'s loop rather than `analyze`
+    being defined in terms of it, and the duplication is gated by a test.**
+    `analyze` runs over every token in the corpus at ingest — 563 296 of them on
+    this repo — and making the hot path allocate a tuple per token to serve a
+    per-query diagnostic is the wrong trade. What stops the two drifting is
+    `tests/query/test_analyzer.py::test_pairs_agree_with_analyze`, which asserts
+    `[a for _, a in analyze_pairs(t)] == analyze(t)` over the awkward cases:
+    identifiers, acronyms, stopwords, and text that analyzes to nothing.
+
+    **The surface is the pre-lowercase, pre-stem token** — the whole word for a
+    whole match, and the raw part for a split identifier part. `getUserName`
+    yields `('getUserName', 'getusernam')`, `('User', 'user')`,
+    `('Name', 'name')`.
+    """
+    out: list[tuple[str, str]] = []
+    for raw in _WORD_RE.findall(text):
+        for token in (raw, *split_identifier(raw)):
+            lowered = token.lower()
+            if lowered in _STOPWORDS:
+                continue
+            out.append((token, _stem(lowered)))
+    return out

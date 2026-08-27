@@ -303,18 +303,46 @@ def test_machine_data_beside_a_document_is_not_indexed(tmp_path):
     Before this, anything UTF-8-decodable was a document — 14% of this repo's
     own index was `.json`/`.svg`/`.sh`/`.py`, and a raw JSON blob ranked #2 on a
     plain query.
+
+    ⚠ **Rewritten 2026-08-27.** This test asserted that `.json` was not indexed,
+    which stopped being true on **2026-08-26**, when Arpit ruled the default
+    allowlist out to *"all the ones which have a decoder"*. The W-55 measurement
+    was never overturned — what changed is that those tokens were RAW BYTES, and
+    `.json` now passes through a decoder that keeps string values and drops ids,
+    hashes, timestamps and numbers.
+
+    **So the guard moved rather than went away.** `.sh` has no decoder and is
+    still not a document; `.json` is one, and the machine noise inside it is
+    still not searchable. Both halves are asserted, because either one silently
+    reversing is the W-55 defect returning.
     """
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "results.json").write_text(
-        '{"pruning": "gate", "recall": 0.42}', encoding="utf-8"
+        '{"pruning": "gate", "recall": 0.42, '
+        '"run_id": "8f14e45f-ceea-467a-9b3d-9f0a3b2c1d4e", '
+        '"stamp": "2026-08-26T10:00:00Z"}',
+        encoding="utf-8",
     )
     (tmp_path / "docs" / "run.sh").write_text("#!/bin/sh\necho pruning\n", encoding="utf-8")
 
     out = _run(tmp_path, "ingest").stdout
-    assert "not an indexed file type" in out
+    assert "not an indexed file type" in out, "the allowlist still bites, and says so"
 
+    # A format with no decoder is still not a document, however decodable its
+    # bytes happen to be as UTF-8.
     found = _run(tmp_path, "find", "pruning", "--json").stdout
-    assert "results.json" not in found and "run.sh" not in found
+    assert "run.sh" not in found
+
+    # ...and one with a decoder IS. Asserted positively so a silent narrowing of
+    # the default is a failure here rather than a quietly smaller index.
+    assert "results.json" in found
+
+    # The half that makes that safe: nothing a machine wrote is a search term.
+    for noise in ("8f14e45f-ceea-467a-9b3d-9f0a3b2c1d4e", "2026-08-26T10:00:00Z", "0.42"):
+        assert "results.json" not in _run(tmp_path, "find", noise, "--json").stdout, (
+            f"{noise!r} reached the index — the decoder stopped dropping machine "
+            "values, which is what re-admitting .json was conditional on"
+        )
 
 
 def test_a_types_file_replaces_the_default(tmp_path):
@@ -351,7 +379,17 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     _run(tmp_path, "setup")
     types = (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8")
     assert "*.md" in types and "*.adoc" in types
-    assert "No .json" in types  # it says what it excludes, and why
+
+    # ⚠ Was `assert "No .json" in types`. `.json` rejoined the default on
+    # 2026-08-26 (Arpit: *"all the ones which have a decoder"*), so that line
+    # was asserting a sentence the template no longer has a reason to write.
+    assert "*.json" in types, "a decoded format is spelled out like any other"
+
+    # The claim the test was really making — that the file says what is OUT and
+    # why — restated against what it now says.
+    assert "What is OUT of the default, and why" in types
+    assert "\n#*.svg" in types, "an opt-in format is present but commented, not absent"
+    assert "\n*.sh" not in types, "a format with no decoder is not an active line"
 
 
 def test_ingest_puts_no_fetcher_in_a_repo_that_only_wanted_an_index(tmp_path):
@@ -529,14 +567,51 @@ def test_add_of_a_file_does_not_override_the_type_allowlist(tmp_path):
     Promoting an explicitly-added file past the allowlist would be the W-55
     defect arriving from a new direction, so the line is written, the type
     check still runs, and the skip is reported with its reason.
+
+    ⚠ **The fixture was `architecture.pdf` until 2026-08-27**, which stopped
+    testing this the day `.pdf` joined the default allowlist — the file was
+    admitted by type and then failed to *decode*, which is a different check
+    with a different outcome. `.sh` has no decoder and is not in the default,
+    so it is what this assertion has always meant.
+    """
+    _write_fixture(tmp_path)
+    (tmp_path / "docs" / "deploy.sh").write_text("#!/bin/sh\necho architecture\n", encoding="utf-8")
+
+    out = _run(tmp_path, "add", "docs/deploy.sh").stdout
+    assert "added     docs/deploy.sh archived=false" in out
+    assert "not indexed docs/deploy.sh: not an indexed file type" in out
+    assert "architecture" not in _run(tmp_path, "find", "architecture").stdout
+
+
+def test_an_added_file_that_no_decoder_can_read_is_queued_not_fatal(tmp_path):
+    """The check the old fixture was accidentally exercising, made deliberate.
+
+    An allowed TYPE that nothing can DECODE is a third outcome, distinct from
+    both "indexed" and "wrong type": the run completes, the document gets no
+    record, and it is written to the committed queue as work a model is owed.
+
+    ⚠ **This crashed until 2026-08-27** — `run()`'s record loop iterated every
+    walked file and reached `file_shas[doc_id]` for one the parse plane had
+    dropped, so a single undecodable `%PDF` header ended the entire ingest with
+    a `KeyError`. Gated in the unit suite too
+    (`tests/ingest/test_unreadable_document.py`); kept here because the crash
+    was only ever visible through the shipped command.
     """
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "architecture.pdf").write_bytes(b"%PDF-1.4 not really a pdf\n")
 
-    out = _run(tmp_path, "add", "docs/architecture.pdf").stdout
-    assert "added     docs/architecture.pdf archived=false" in out
-    assert "skip docs/architecture.pdf: not an indexed file type" in out
+    added = _run(tmp_path, "add", "docs/architecture.pdf")
+    assert added.returncode == 0, added.stderr
+    assert "added     docs/architecture.pdf archived=false" in added.stdout
+
+    # No record: a document with no extraction behind it would rank on its
+    # filename alone, which is W-55 arriving through the decoder plane.
     assert "architecture" not in _run(tmp_path, "find", "architecture").stdout
+
+    # Dropped, not forgotten.
+    queue = list((tmp_path / ".fux").rglob("*queue*"))
+    assert queue, "the unreadable document was not written down anywhere"
+    assert "docs/architecture.pdf" in queue[0].read_text(encoding="utf-8")
 
 
 def test_dry_run_writes_no_bytes_anywhere(tmp_path):

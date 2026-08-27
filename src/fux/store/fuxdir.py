@@ -36,10 +36,15 @@ COMMITTED: dict[str, str] = {
     "index": "the wire-format index (ADR-RECORD)",
     "sources": "the committed source lists (`dirs`, `urls`), one entry per line",
     "fetchers": "consumer-owned code (`cdp.py`, `http.py`), edit freely",
+    # ASCII only: `_readme()` encodes this table as ASCII on purpose, for
+    # Windows consoles. An em-dash here fails the write, which is how this was
+    # caught rather than shipped.
+    "decoders": "consumer-owned code, one module per format. THESE COPIES ARE WHAT RUN, not the ones inside the installed package (ADR-DECODE)",
+    "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
 }
 
 DERIVED: dict[str, str] = {
-    "runtime": "M2 accelerator segments, and M4's fetch cache nested at `runtime/fetch-cache/`",
+    "runtime": "M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull)",
 }
 
 #: Files fux generates at the top level of `.fux/` (write-if-missing).
@@ -55,6 +60,10 @@ GENERATED_FILES = ("README.md", ".gitignore")
 #: Found 2026-08-24 by checking the claim instead of asserting it.
 COMMITTED_FILES: dict[str, str] = {
     "tune.toml": "the tunables: HOW results are ordered, never what is indexed (ADR-TUNE)",
+    "output.toml": "the output defaults: HOW a result is SHOWN, never which documents come back (ADR-OUTPUT)",
+    # ASCII only, like every other value in these tables -- `_readme()` encodes
+    # them for a Windows console.
+    ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE)",
 }
 
 #: Everything legally found directly under `.fux/`; anything else is a warning.
@@ -70,8 +79,9 @@ CACHEDIR_TAG = (
 
 _GITIGNORE = (
     "# Derived planes only: rebuildable from the committed index and the\n"
-    "# source systems. NEVER add `*` here: `.fux/index/`, `.fux/sources/` and\n"
-    "# `.fux/fetchers/` are committed, and a blanket ignore would drop them\n"
+    "# source systems. NEVER add `*` here: `.fux/index/`, `.fux/sources/`,\n"
+    "# `.fux/fetchers/` and `.fux/decoders/` are committed, and a blanket\n"
+    "# ignore would drop them\n"
     "# from git silently. `fux doctor` checks exactly that.\n"
     + "".join(f"{name}/\n" for name in DERIVED)
 )

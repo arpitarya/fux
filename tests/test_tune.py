@@ -8,6 +8,8 @@ and these do not.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from fux.errors import FuxError
@@ -105,20 +107,20 @@ def test_b_is_a_fraction_and_the_message_says_what_the_ends_mean(tmp_path):
 
 def test_a_field_weight_of_zero_is_legal_and_means_ignore_the_field(tmp_path):
     """Distinct from a `[priority]` zero, which is exclusion and is refused."""
-    _write(tmp_path, "[bm25f]\nheading_weight = 0\n")
+    _write(tmp_path, "[bm25f]\nheading = 0\n")
     assert load(tmp_path).field_weights[1] == 0.0
 
 
 def test_a_non_integer_field_weight_is_legal(tmp_path):
     """The record refused this, on a premise W-76 Phase 1 removed.
 
-    Decision 9a called a fractional `heading_weight` an error because it
+    Decision 9a called a fractional `heading` weight an error because it
     "breaks the accelerator's u32 block maximum". The block extrema are stored
     per field and RAW since W-76 Phase 1, and `block_bound` recombines them in
     float at query time, so nothing integral is stored any more. Amended in the
     record rather than carried as folklore.
     """
-    _write(tmp_path, "[bm25f]\nheading_weight = 2.5\n")
+    _write(tmp_path, "[bm25f]\nheading = 2.5\n")
     assert load(tmp_path).field_weights[1] == 2.5
 
 
@@ -205,7 +207,7 @@ def test_invalid_toml_says_so(tmp_path):
 
 
 def test_scoring_carries_k1_b_and_the_weights_as_one_object(tmp_path):
-    _write(tmp_path, "[bm25f]\nk1 = 1.5\nb = 0.4\ntitle_weight = 9\n")
+    _write(tmp_path, "[bm25f]\nk1 = 1.5\nb = 0.4\ntitle = 9\n")
     scoring = load(tmp_path).scoring
     assert (scoring.k1, scoring.b) == (1.5, 0.4)
     assert scoring.weights[2] == 9.0
@@ -254,7 +256,20 @@ def test_every_specimen_table_is_in_the_schema():
 
 
 def test_every_schema_key_appears_in_the_specimen():
-    """A key nobody can discover is a key nobody uses (decision 4)."""
+    """A key nobody can discover is a key nobody uses (decision 4).
+
+    ⚠ **This matched `#key` only until 2026-08-27**, because the specimen used
+    to be nothing but comments. Arpit's ruling that day made every tunable a
+    LIVE line (`specimen()`'s own docstring records it), so the old matcher
+    demanded a comment marker on keys that are now real declarations and went
+    red on all seventeen of them -- **the test failed for the reason the change
+    was made.**
+
+    What discoverability actually needs is that the key is *declared*, live or
+    commented (`[priority]` stays commented on purpose, and that is not an
+    inconsistency -- its keys are the consumer's own source entries, not
+    tunables with defaults). So the check is now on a declaration, either way.
+    """
     from fux.tune import _SCHEMA
 
     text = specimen()
@@ -262,9 +277,7 @@ def test_every_schema_key_appears_in_the_specimen():
         f"[{table}] {key}"
         for table, keys in _SCHEMA.items()
         for key in keys
-        if f"#{key}" not in text.replace(" ", "").replace("#", "#")
-        and f"#{key} " not in text
-        and f"#{key}=" not in text.replace(" ", "")
+        if not re.search(rf"(?m)^#?\s*{re.escape(key)}\s*=", text)
     ]
     assert not missing, missing
 

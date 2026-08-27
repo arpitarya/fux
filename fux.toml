@@ -4,7 +4,7 @@
 # rather than to be required.
 
 [sources]
-#dirs_file = ".fux/sources/dirs"
+dirs_file = ".fux/sources/dirs"
 
 # URL ingestion through YOUR fetcher files. Nothing is fetched until a URL is
 # listed in .fux/sources/urls, and the only thing that lists one is an explicit

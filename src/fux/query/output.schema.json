@@ -58,6 +58,59 @@
     }
   },
 
+  "confidence": {
+    "_doc": [
+      "HOW MUCH THE INDEX BELIEVES ITS OWN ANSWER. Present on `fux ask`,",
+      "`fux find` and `fux answer` in `--json`, and on the `fux_search` MCP",
+      "result. ALWAYS PRESENT on those surfaces -- an absent key would be",
+      "indistinguishable from an older fux, which is the W-48 trap.",
+      "",
+      "BRANCH ON `band`, AND REFUSE ON `answerable: false`. An agent that reads",
+      "only `coverage` and hedges in prose is the failure this shape exists to",
+      "prevent: a low number gets used anyway, a false boolean cannot be.",
+      "",
+      "`missing` is the field to surface to a human. It carries the USER'S OWN",
+      "query terms that match no document anywhere in the corpus -- never",
+      "corpus content, so it is not an L2 or L5 surface.",
+      "",
+      "`verified` is the refer plane's four-state verdict and `cached` is NEVER",
+      "folded into `current`, exactly as in `answer_citation`. `ask` and `find`",
+      "fetch nothing and therefore always report `unverified`: 'we did not",
+      "look', never 'we looked and it was fine'.",
+      "",
+      "THE `grounded`/`weak` BOUNDARY IS PROVISIONAL. The other three are",
+      "structural facts (nothing scored; a term is absent; the bytes changed).",
+      "That one rests on `confidence.SEPARATION_FLOOR`, which is unmeasured and",
+      "registered as prediction R10. Do not read it as calibrated."
+    ],
+    "fields": {
+      "band":       { "type": "str",  "required": "always",
+                      "enum": ["grounded", "partial", "weak", "none"],
+                      "doc": "best first; BRANCH ON THIS" },
+      "answerable": { "type": "bool", "required": "always",
+                      "doc": "false means abstain -- a refusal, not a low score" },
+      "coverage":   { "type": "any",  "required": "always",
+                      "doc": "float 0.0-1.0; the fraction of the query's idf mass the corpus contains" },
+      "separation": { "type": "any",  "required": "always",
+                      "doc": "float 0.0-1.0; (top1-top2)/top1, and 1.0 when exactly one document scored" },
+      "support":    { "type": "int",  "required": "always",
+                      "doc": "results scoring above zero. BOUNDED BY --top: a corpus-wide count would differ between --fast and --scan and break the differential law" },
+      "verified":   { "type": "str",  "required": "always",
+                      "enum": ["current", "stale", "unverified", "cached"] },
+      "missing":    { "type": "list", "of": "str", "required": "always",
+                      "doc": "the query's own terms that match no document anywhere. `[]` means full coverage" }
+    },
+    "example": {
+      "band": "partial",
+      "answerable": true,
+      "coverage": 0.6127,
+      "separation": 0.3402,
+      "support": 3,
+      "verified": "unverified",
+      "missing": ["mtls"]
+    }
+  },
+
   "answer_citation": {
     "_doc": [
       "`fux answer --json`'s `citation`. SPAN-LEVEL: `loc` carries a 1-based,",
@@ -99,7 +152,13 @@
       "citation": { "type": "any", "required": "never",
                     "doc": "an `answer_citation`, or null on no match" },
       "source":   { "type": "str", "required": "always", "enum": ["refer", "index"],
-                    "doc": "refer = fetched and re-scored; index = the M2 shape" }
+                    "doc": "refer = fetched and re-scored; index = the M2 shape" },
+      "confidence": { "type": "dict", "required": "band_requested",
+                      "doc": "a `confidence` block. CONDITIONAL since ADR-OUTPUT/ADR-CONFIDENCE decision 11: present on EVERY branch when `--band` is passed (or `.fux/output.toml` sets it), and absent on every branch when it is not. **Absent means NOT ASKED FOR. It is never a claim about the answer**, and a consumer must not read a missing key as band `none`. Over MCP it is unconditional -- a tool call has no flags to pass. When present on the no-match branch it reads band `none` / `answerable: false`, which is the branch an agent most needs to be told about" },
+      "audit":    { "type": "any", "required": "never",
+                    "doc": "the refer plane's own record -- `--audit` only, and only on the `refer` branch. See `audit_record`" },
+      "receipt":  { "type": "any", "required": "never",
+                    "doc": "a `receipt` -- `--receipt` only. Absent means NOT ASKED FOR; it is never a claim about the answer" }
     },
     "example": {
       "answer": { "passages": [
@@ -109,7 +168,169 @@
         "id": "file:docs/mesh.md", "loc": "docs/mesh.md:L10-L13",
         "sha": "516bef06781262a0a64b10027316c18d668eeccb", "freshness": "current"
       },
-      "source": "refer"
+      "source": "refer",
+      "confidence": {
+        "band": "grounded", "answerable": true, "coverage": 1.0,
+        "separation": 0.4118, "support": 1, "verified": "current", "missing": []
+      }
+    }
+  },
+
+  "audit_record": {
+    "_doc": [
+      "`fux answer --audit`'s `audit`. THE REFER PLANE'S OWN RECORD, emitted.",
+      "",
+      "`refer.Bundle.as_record()` has existed since M4 and its docstring says",
+      "it is *everything needed to reproduce or audit* an answer. Until",
+      "ADR-PROVENANCE nothing called it -- the record was built on every",
+      "`answer` and thrown away. This key is that record reaching a caller.",
+      "",
+      "PER DOCUMENT it carries the four-state freshness verdict AND BOTH SHAs",
+      "-- `indexed_sha` is what ranking scored, `fetched_sha` is what was read.",
+      "A citation shows you the second; only this shows you both, which is the",
+      "difference between *the answer is current* and *we checked*.",
+      "",
+      "`budget` is the negative space of assembly: `dropped` passages were",
+      "scored, fit no budget, and are invisible in every other surface."
+    ],
+    "fields": {
+      "citations": { "type": "list", "required": "always", "doc": "the assembled citations, in assembled order" },
+      "documents": { "type": "list", "required": "always",
+                     "doc": "one entry per document the plane LOOKED AT, not per document cited -- an unreachable source appears here and nowhere else" },
+      "budget":    { "type": "dict", "required": "always", "doc": "`bytes` (the cap), `used`, `dropped`" },
+      "policy":    { "type": "dict", "required": "always", "doc": "the refer policy in force, as a record" }
+    },
+    "example": {
+      "citations": [
+        { "id": "file:docs/mesh.md", "locator": "docs/mesh.md:L10-L13",
+          "sha": "516bef06781262a0a64b10027316c18d668eeccb",
+          "heading": "Rollback procedure", "text": "Drain the sidecar and fail open.",
+          "score": 2.689, "source": "fetched" }
+      ],
+      "documents": [
+        { "id": "file:docs/mesh.md", "loc": "docs/mesh.md", "freshness": "current",
+          "indexed_sha": "516bef06781262a0a64b10027316c18d668eeccb",
+          "fetched_sha": "516bef06781262a0a64b10027316c18d668eeccb",
+          "strategy": "file", "note": "" }
+      ],
+      "budget": { "bytes": 8000, "used": 613, "dropped": 2 },
+      "policy": { "caches": true, "network": "never" }
+    }
+  },
+
+  "derivation": {
+    "_doc": [
+      "`fux ask --why`'s `derivation`, and a `receipt`'s. WHY THIS, NOT THAT.",
+      "",
+      "`gates` is ADR-QUALITY's funnel as four integers -- `reachable` ->",
+      "`in_window` -> `placed` -> `answered` -- plus `cut_score`, the score of",
+      "the last document inside the retrieval window. THE CUT LINE IS THE",
+      "AUDIT-VALUABLE HALF: it is the only place a caller can see that a",
+      "document was considered and dropped.",
+      "",
+      "PER DOCUMENT, `matched` names the query's own terms the record actually",
+      "carries, with the committed per-field counts and the corpus `df`.",
+      "⚠ THERE IS NO RECONSTRUCTED SCORE, and that is deliberate: `rank.py`",
+      "says re-deriving a score term-by-term yields different low-order bits",
+      "than the sum that produced it, so a recomputed total would disagree with",
+      "the `score` beside it. The score is QUOTED; the attribution explains what",
+      "was available to it.",
+      "",
+      "`rank_before_rerank` and `rank_untuned` are ABSENT when not computed --",
+      "absent means *not measured on this run*, never *unchanged*. Equal-and-",
+      "present is how unchanged is said."
+    ],
+    "fields": {
+      "query":     { "type": "str",  "required": "always" },
+      "path":      { "type": "str",  "required": "always", "doc": "`scan` or `accelerator`" },
+      "gates":     { "type": "dict", "required": "always" },
+      "documents": { "type": "list", "required": "always" }
+    },
+    "example": {
+      "query": "rollback the mesh",
+      "path": "scan",
+      "gates": { "reachable": 412, "in_window": 20, "placed": 5, "answered": 1, "cut_score": 1.2044 },
+      "documents": [
+        { "id": "file:docs/mesh.md", "loc": "docs/mesh.md", "score": 5.9021, "rank": 0,
+          "matched": [ { "term": "rollback", "analyzed": "rollback",
+                         "df": 7, "fields": [1, 0, 3, 0, 0] } ],
+          "missing": ["mesh"], "archived": false, "multiplier": 1.0,
+          "rank_before_rerank": 2 }
+      ]
+    }
+  },
+
+  "receipt": {
+    "_doc": [
+      "`fux answer --receipt`'s `receipt`. A RE-RUNNABLE CLAIM, not a log line.",
+      "",
+      "Fux does not retain an audit trail; it makes one DERIVABLE. The receipt",
+      "names the index digest, the tune digest, the engine, the question and the",
+      "bytes cited -- and `fux verify` re-runs it.",
+      "",
+      "`inputs.index` is a digest of the COMMITTED SHARDS, never the runtime",
+      "stamp: ADR-RUNTIME-STAMP decision 2 excludes the stamp from the",
+      "deterministic set because mtimes differ between checkouts, so a",
+      "stamp-keyed receipt could not reproduce on a fresh clone BY CONSTRUCTION.",
+      "",
+      "⚠ THIS IS AN IN-TOTO STATEMENT, AND IT IS DELIBERATELY UNSIGNED.",
+      "Ruled 2026-08-27: adopt the standard shape, sign nothing. A Statement is",
+      "valid on its own -- the DSSE envelope carrying a signature is a SEPARATE",
+      "layer -- so a consumer who needs one wraps this with `cosign` using THEIR",
+      "identity, which is the only way a signature means anything.",
+      "",
+      "⚠ stdlib `hmac` was refused, and not merely as *weaker*: HMAC gives",
+      "integrity and authenticity but NOT non-repudiation, because verifying",
+      "needs the same secret that signs. With a repo-shared key every developer",
+      "and the CI runner can produce any receipt and each can deny it -- so the",
+      "signature would imply accountability it structurally cannot carry.",
+      "",
+      "⚠ NO TIMESTAMP. L3 forbids a wall clock on a deterministic path, and a",
+      "receipt that differed run to run would defeat its own purpose. A caller",
+      "who wants a time stamps it on the outside.",
+      "",
+      "`inputs.query` IS PLAINTEXT. L8 permitted only a hashed key until Arpit",
+      "reverted it on 2026-08-27; what survives is confinement -- gitignored,",
+      "local, never committed and never transmitted. See ADR-LAWS decision 8.",
+      "",
+      "`fux verify` answers with FOUR STATES and never a boolean: `reproduced`,",
+      "`drifted:corpus`, `drifted:config`, `unverifiable`. Collapsing *we did",
+      "not look* into *we looked and it was fine* is the failure this repo has",
+      "now refused four times."
+    ],
+    "fields": {
+      "_type":         { "type": "str",  "required": "always", "doc": "`https://in-toto.io/Statement/v1` -- the STANDARD envelope shape, adopted 2026-08-27 so the ecosystem can read a fux receipt without a translator" },
+      "subject":       { "type": "list", "required": "always", "doc": "in-toto ResourceDescriptors: `{name, digest: {sha256}, annotations?}` -- what was actually cited, named by digest. `annotations['fux.dev/loc']` carries the line range, because a ResourceDescriptor has no field for one and `annotations` is the spec's own extension point" },
+      "predicateType": { "type": "str",  "required": "always", "doc": "`https://fux.dev/receipt/v1` -- what KIND of claim the predicate makes. Versioned separately from `_type`, so fux's payload can change without pretending the envelope did" },
+      "predicate":     { "type": "dict", "required": "always", "doc": "the claim: `engine`, `inputs`, `confidence`, `derivation`, `verdicts`" }
+    },
+    "example": {
+      "_type": "https://in-toto.io/Statement/v1",
+      "subject": [
+        { "name": "file:docs/mesh.md",
+          "digest": { "sha256": "516bef06781262a0a64b10027316c18d668eeccb" },
+          "annotations": { "fux.dev/loc": "docs/mesh.md:L10-L13" } }
+      ],
+      "predicateType": "https://fux.dev/receipt/v1",
+      "predicate": {
+      "engine": { "version": "2.0.0-alpha.2", "path": "refer" },
+      "inputs": {
+        "index": "9f2c1d77a1b0e4c3f5a6b7c8d9e0f1a2b3c4d5e6f70819a2b3c4d5e6f7081920",
+        "tune": "none",
+        "query": "rollback the mesh"
+      },
+      "confidence": {
+        "band": "grounded", "answerable": true, "coverage": 1.0,
+        "separation": 0.4118, "support": 1, "verified": "current", "missing": []
+      },
+      "derivation": {},
+      "verdicts": [
+        { "id": "file:docs/mesh.md", "loc": "docs/mesh.md", "freshness": "current",
+          "indexed_sha": "516bef06781262a0a64b10027316c18d668eeccb",
+          "fetched_sha": "516bef06781262a0a64b10027316c18d668eeccb",
+          "strategy": "file", "note": "" }
+      ]
+      }
     }
   },
 

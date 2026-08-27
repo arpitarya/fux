@@ -1,0 +1,65 @@
+# .fux/output.toml — HOW a result is SHOWN. Never which documents come back.
+#
+# Written once by `fux setup`; fux never rewrites it. Absent, empty, or every
+# key commented out means every default — this file is optional.
+#
+# The rule for what may live here is mechanical: changing any value below
+# leaves the ranked result set AND ITS ORDER identical. It changes what is
+# printed, never what is computed. (`.fux/tune.toml` is the file that changes
+# ordering; `fux.toml` is the file that changes what is indexed.)
+#
+# Precedence, highest first:  a CLI flag  →  [<verb>]  →  [defaults]  →  built-in.
+#
+# `fux ask --no-output-config` ignores this file entirely, which is the
+# "is it me or the config?" switch.
+
+[defaults]           # only keys that more than one verb has
+#json = false
+#band = false        # the confidence block — ADR-CONFIDENCE decision 11
+#top  = 5            # ⚠ also bounds `confidence.support`, which is a REPORTED
+                     #   signal. This is the one key here that changes a number
+                     #   an agent reads, and it is admitted rather than hidden.
+
+[ask]
+#top     = 5
+#band    = true      # recommended when an agent consumes this repo: a bare
+                     # `fux ask` is otherwise blind to `answerable: false`
+#explain = false
+
+[find]
+#top  = 5
+#band = false        # `find` pipes bare paths; a band on stdout would break that
+
+[answer]
+#band     = false
+#no_refer = false
+#journal  = false    # record each answer's receipt to the local, gitignored
+                     # journal. ⚠ OFF by default and that is deliberate: a $0
+                     # offline tool may not quietly begin recording questions
+                     # because a config line exists somewhere. `--journal` is
+                     # still the per-run switch.
+
+[graph]
+#top = 5
+
+[path]
+#hops = 2
+
+[explain]
+#json = false
+
+[doctor]
+#json = false
+
+[hooks]
+#json = false
+
+[daemon]
+#json = false
+
+[mcp]                # the one surface with NO command-line flags at all.
+                     # This table is the only way to configure it.
+                     # ⚠ There is deliberately no `band` key: the MCP result's
+                     # confidence block is UNCONDITIONAL, because a tool call
+                     # cannot pass a flag. Setting it here is refused.
+#top = 5

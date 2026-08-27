@@ -22,6 +22,17 @@ timestamp: 2026-08-20T00:00:00Z
 > **Confidence at the time of the call:** high on rejecting F (content
 > sniffing) and D (a TOML key); medium-high on G over A, which is a defaults
 > judgment rather than a measurement.
+> ⚠ **AMENDED 2026-08-26 — the default's CONTENTS widened, the mechanism did not.**
+> Arpit: *"all the ones which have a decoder"*. Prose + every extension a
+> **built-in** decoder claims: six globs to thirty-six. **G's structure is
+> untouched** — a built-in default, overridable by `.fux/sources/types`,
+> absent means the default applies. **The 14 % / 11.4 % measurement stands**;
+> what changed is that those tokens were raw bytes and now pass through a
+> decoder ([ADR-DECODE](../../docs/adr/0042_decode.md)). This was rulable
+> precisely because of the confidence line above — *a defaults judgment rather
+> than a measurement*. ⚠ Two documents had claimed it needed a new
+> pre-registration at 10 000 documents; **that was wrong and is corrected**.
+>
 > **Reopen when:** a consumer's corpus is majority non-`.md` prose and the
 > built-in default is wrong more often than it is right — that is the one
 > claim G rests on and it is measured on one repo.

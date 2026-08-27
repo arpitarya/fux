@@ -3,29 +3,15 @@ type: ADR
 name: ADR-CACHE
 title: "ADR-CACHE (0034) — two caches, two different proofs: ARC decides what a fetch returned, the TTL store decides whether to fetch at all"
 description: "The refer plane's caching, carved out of ADR-REFER. ARC is keyed by content address so a hit is byte-identical to a fetch or it is not a hit; the TTL fetch cache is served before any sha is confirmed and therefore lives in its own store, is opt-in, is bounded on disk, and labels its answers `cached` rather than `current`."
-status: proposed
+status: accepted
+date: 2026-08-21
+feature: the refer plane's two caches, and the wall between them
+owns: [src/fux/refer/arc.py, src/fux/refer/fetchcache.py]
+laws: [L1, L2, L3, L5]
 timestamp: 2026-08-21T00:00:00Z
 ---
 
-# ADR-CACHE: two caches, and the wall between them
-
-- **Name:** `ADR-CACHE` — cite this everywhere; never cite the number
-- **Status:** proposed — carries [ADR-REFER](0030_refer-plane.md)'s status
-  unchanged; nothing here is a new decision, and acceptance is Arpit's on the
-  same terms
-- **Date:** 2026-08-21
-- **Feature:** M4 — the refer plane's two caches
-- **Owns:** `src/fux/refer/arc.py` · `src/fux/refer/fetchcache.py` — carved out
-  of ADR-REFER's claim on `src/fux/refer/` on 2026-08-21; most specific wins,
-  the same way [ADR-MERGE-DRIVER](0033_merge-driver.md) takes
-  `mergedriver.py` out of ADR-MAINTENANCE's directory-level claim. **The bench
-  stays with ADR-REFER**: `tools/refer-bench/` runs R4 for the whole plane, and
-  a component is owned once
-- **Split from:** [ADR-REFER](0030_refer-plane.md), which keeps the fetch
-  contract, verification, chunking, rescoring and the byte budget
-- **Laws:** L1, L2, L3, L5 — see [ADR-LAWS](0001_laws.md); never restated here
-
----
+# ADR-CACHE — two caches, and the wall between them
 
 ## §1 — For humans
 
@@ -134,19 +120,14 @@ engine loses its correctness guarantees quietly. The whole design problem is
 that the two useful caches have **different epistemic standing**, and only one
 of them can be proven not to change an answer.
 
-**These decisions were ADR-REFER's 5a, 5b, 5c and 9 until 2026-08-21.** They
-were carved out because caching is a separate mechanism from the plane that
-uses it — a different failure mode (a wrong answer, or a leaked byte, rather
-than a missing citation), a different law surface (L2 and L5, not just L3), and
-two files that a future change will touch together and touch alone. Under Law
-zero the change that touches `arc.py` or `fetchcache.py` must touch the record
-that owns them, and this is now that record. **Nothing here is a new decision**;
-what changed is which file the decisions live in and who owns the two modules.
-The replacement-policy fork itself was settled earlier, in
+**Caching is a separate mechanism from the plane that uses it**, which is why it
+is a separate record: a different failure mode (a wrong answer, or a leaked
+byte, rather than a missing citation), a different law surface (L2 and L5, not
+just L3), and two files that a future change will touch together and touch
+alone. The replacement-policy fork was settled in
 [`cache-policy.compare.md`](../../work/compare/cache-policy.compare.md), and the
 TTL fork in
-[`refer-fetch-cache.compare.md`](../../work/compare/refer-fetch-cache.compare.md)
-(Arpit's verdict **F**, 2026-08-20).
+[`refer-fetch-cache.compare.md`](../../work/compare/refer-fetch-cache.compare.md).
 
 ### Decision
 
@@ -193,9 +174,9 @@ shape a leak can have.
 disable check runs **first and unconditionally** in `get()`, so a caller who
 never opted in cannot be served a cached byte by any code path.
 `Policy.no_cache` refuses caching outright whatever the TTL says: the escape
-hatch for access-controlled and regulated sources, where a local copy
-outliving the reader's permission is the risk L5 exists for. Arpit's TTL
-number, when a caller does opt in, is **300 s** (2026-08-20).
+hatch for access-controlled and regulated sources, where a local copy outliving
+the reader's permission is the risk L5 exists for. The TTL, when a caller does
+opt in, is **300 s**.
 
 **This does not touch L2's single exception** (the per-source `snapshot`
 policy). L2 forbids *durable* content; this store is deliberately the opposite
@@ -203,12 +184,12 @@ policy). L2 forbids *durable* content; this store is deliberately the opposite
 Nothing here is ever committed, so there is nothing for L2 to except.
 
 **7. `cached` is a fourth verdict and is never folded into `current`.** A TTL
-hit is a distinct epistemic position — *we looked recently* — and it carries
-its `age_seconds` so a caller can decide for itself. It still records whether
-the cached bytes matched the index, because dropping that would make the
-verdict a smaller claim than the truth. Collapsing `cached` into `current`
-anywhere downstream is ADR-REFER decision 4's "knob that lies" reappearing in
-a new location, and it is refused for the same reason.
+hit is a distinct epistemic position — *we looked recently* — and it carries its
+`age_seconds` so a caller can decide for itself. It still records whether the
+cached bytes matched the index, because dropping that would make the verdict a
+smaller claim than the truth. Collapsing `cached` into `current` anywhere
+downstream is [ADR-REFER](0030_refer-plane.md) decision 4's *knob that lies*
+reappearing in a new location, and it is refused for the same reason.
 
 **8. Wall clock lives in the TTL store and nowhere else.** It gets the same
 treatment `runtime/stamp.json` already has
@@ -217,11 +198,11 @@ non-reproducible, gitignored, never reaching a committed record. The clock is
 **injected** (`FetchCache(root, clock=...)`) so a test can pin it. The engine's
 *answers* never read the clock; only the decision of whether to re-fetch does.
 
-**Decision 4 of ADR-REFER is untouched by this** — the committed record still
-carries no ingest time. A reader must not conflate the two: one is a local note
-about *when we last looked*, the other would be a committed claim about *when a
-document was ingested*, and that question closed separately as *no*
-([`record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)).
+⚠ **A reader must not conflate this with a committed ingest time.** One is a
+local note about *when we last looked*; the other would be a committed claim
+about *when a document was ingested*, and that question closed separately as
+*no* ([ADR-REFER](0030_refer-plane.md) decision 4, and
+[`record-freshness.compare.md`](../../work/compare/record-freshness.compare.md)).
 
 **9. The TTL store is bounded on disk, evicting oldest `fetched_at` first.**
 `max_bytes`, default **500 MB** — a number chosen here, not specified — bounds
@@ -264,44 +245,26 @@ comparison against a live source.
   is **advisory today** — a caller must set it. Veto condition 7 is what turns
   it mandatory, and the short default TTL is what bounds the exposure
   meanwhile.
-- **ARC-vs-LRU was measured post-hoc at R4, and Arpit ruled on it directly,
-  2026-08-22.** The metric changed after seeing a number that reversed it
-  (+0.91 pts overall / +2.50 on hot requests against a 2-pt bar set before
-  the run) — post-hoc by definition, and on a synthetic trace where the
-  compare doc's trigger asked for a real workload. **Arpit reviewed that
-  reasoning directly and ruled it stands: ARC wins.**
-  [`cache-policy.compare.md`](../../work/compare/cache-policy.compare.md)'s
-  reopen trigger is therefore closed against R4 — it does **not** un-fire on
-  its own; a future measurement on real Fux workloads showing no advantage
-  over LRU would still reopen this (veto condition 6). Decision 3 rests on
-  the published result, the scan-resistance argument, and now this ruling —
-  not on a from-scratch Fux measurement, stated plainly rather than left for
-  a reader to assume.
-- **The size cap on the TTL store landed 2026-08-21** (PRIORITY.md P4).
-  `put()` was unbounded: an entry only stopped counting toward `get()` once its
-  TTL passed, and nothing ever deleted the file, so a long-lived process
-  caching many documents grew the directory without limit.
-- **The freshness gate's baseline moved forward, and that is a real cost.**
-  A carve-out is retroactive: `0264510` (the P4 size cap) touched
-  `fetchcache.py` and ADR-REFER, which was the owning record **at the time**, so
-  it was compliant when it was written — reassigning the file makes it look like
-  a violation it never was. `docs/adr/RULE-SINCE` moved from `1fc51a7` to
-  `301c65a` after re-auditing every commit in between under the pre-carve-out
-  table (192 checks, all passing). The price is that those commits are no longer
-  re-auditable by the gate, and it is stated here rather than left in a comment
-  nobody reads.
-- **Both terms are defined in [`docs/GLOSSARY.md`](../GLOSSARY.md), and one of
-  them was missing.** `ARC` had an entry that predated this record and still
-  pointed only at the compare doc; **`TTL` had no entry at all**, despite being
-  a v0.30 recurring term since W-60 landed on 2026-08-20. Both are now defined
-  and cite this record — a term used across an ADR, a compare doc, a policy
-  field and a verdict label, with no definition, is exactly what the glossary
-  rule exists to prevent.
-- **Two files move out of ADR-REFER's blast radius.** A change to caching now
-  fails the freshness gate against *this* record, which is the point of the
-  carve-out. ADR-REFER's decisions 5a/5b/5c and 9 become pointers here and
-  their numbers are **retired, not reused**, so every doc citing "ADR-REFER
-  decision 9" still resolves to something true.
+- ⚠ **Decision 3 does not rest on a from-scratch Fux measurement, and that is
+  said plainly rather than left for a reader to assume.** ARC-vs-LRU was
+  measured **post-hoc** during the latency run — the metric changed after seeing
+  a number that reversed it (+0.91 pts overall / +2.50 on hot requests against a
+  2-pt bar set before the run) — and it ran on a synthetic trace where the
+  compare doc's own trigger asked for a real workload. **Arpit reviewed that
+  reasoning directly and ruled it stands: ARC wins.** So decision 3 rests on the
+  published result, the scan-resistance argument, and that ruling. **A future
+  measurement on real Fux workloads showing no advantage over LRU still reopens
+  it** (veto condition 6).
+- ⚠ **The TTL store's `put()` was once unbounded**: an entry stopped counting
+  toward `get()` when its TTL passed, and **nothing ever deleted the file**, so a
+  long-lived process caching many documents grew the directory without limit.
+  Decision 9's eviction is what stands between a disposable cache and a full
+  disk.
+- **Both terms are defined in [`docs/GLOSSARY.md`](../GLOSSARY.md).** A term used
+  across an ADR, a compare doc, a policy field and a verdict label, with no
+  definition, is exactly what the glossary rule exists to prevent.
+- **A change to caching fails the freshness gate against *this* record**, which
+  is the point of the carve-out.
 
 ### Alternatives considered
 
@@ -353,9 +316,12 @@ comparison against a live source.
   [`refer-fetch-cache.compare.md`](../../work/compare/refer-fetch-cache.compare.md)
 - The measured run that exercised the warm path —
   [R4-REFER](../../work/regression/2026-08-20-refer-plane-r4/VERDICT.md)
-- The parent record — [ADR-REFER](0030_refer-plane.md), decisions 4, 6, 7
+- The parent record — [ADR-REFER](0030_refer-plane.md), decisions 4, 6 and 7
 - The precedent for a per-machine, non-reproducible artifact —
   [ADR-RUNTIME-STAMP](0027_runtime-stamp.md)
+- The carve-out precedent this follows —
+  [ADR-MERGE-DRIVER](0033_merge-driver.md), which takes `mergedriver.py` out of
+  a directory-level claim the same way
 
 ### Veto condition
 
@@ -373,10 +339,9 @@ comparison against a live source.
    eviction is what stands between a disposable cache and a full disk.
 6. **A measured hit-rate on real Fux workloads shows ARC no better than LRU.**
    Then take the simpler code — the interface is identical and the downgrade is
-   a drop-in. This is the compare doc's own trigger. R4's post-hoc result does
-   **not** count as this happening — Arpit reviewed it 2026-08-22 and ruled ARC
-   wins — so this condition still checks only against a future real-workload
-   measurement, not against R4.
+   a drop-in. ⚠ **The post-hoc synthetic result does not count as this
+   happening** (see Consequences); this condition checks only against a future
+   real-workload measurement.
 7. **A real workflow shows the ACL-staleness window produced a wrong-access
    answer** — a caller saw content from a source they had since lost access to,
    inside the TTL. At that point `no_cache` stops being advisory for

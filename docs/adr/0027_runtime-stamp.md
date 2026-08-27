@@ -3,25 +3,15 @@ type: ADR
 name: ADR-RUNTIME-STAMP
 title: ADR-RUNTIME-STAMP (0027) — stamp.json, the cheap pre-check ahead of the manifest
 description: A deliberately non-reproducible per-shard size/mtime snapshot that short-circuits manifest.json's content-hash check on the common unchanged case, and is never itself proof of freshness.
-status: proposed
+status: accepted
+date: 2026-08-19
+feature: "`.fux/runtime/stamp.json` — the cheap staleness pre-filter, and its deliberate exclusion from the determinism set"
+owns: []
+laws: [L3]
 timestamp: 2026-08-19T00:00:00Z
 ---
 
 # ADR-RUNTIME-STAMP — stamp.json, the cheap pre-check ahead of the manifest
-
-- **Name:** `ADR-RUNTIME-STAMP` — cite this everywhere; never cite the number
-- **Status:** proposed
-- **Supersedes (on acceptance):** nothing — `stamp.json`'s exclusion from the
-  determinism set was previously described only inside
-  [ADR-T1-ACCELERATOR](0011_accelerator.md)'s decision 9; this record pulls it
-  out for independent reference and changes nothing about that decision
-- **Owns (on acceptance):** no module — implemented by
-  `derive/build.py::build()`, which stays owned by ADR-T1-ACCELERATOR
-- **Laws:** L3 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-19
-- **Feature:** `.fux/runtime/stamp.json`
-
----
 
 ## §1 — For humans
 

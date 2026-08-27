@@ -21,7 +21,13 @@ from fux.setup import AGENT_FILES
 LADDER_TEMPLATES = ("USAGE-SKILL.md", "fux-usage.instructions.md", "fux.agent.md")
 
 #: The four rungs, in the order an agent must try them.
-RUNGS = ("fux --version", "uv run fux", "./.venv/bin/fux", "python -m fux.cli")
+#:
+#: Rung 4 became `python -m fux` on 2026-08-27 (Arpit, W-82 §3.6 fork B). It was
+#: `python -m fux.cli` because that spelling already worked and `fux/__main__.py`
+#: did not exist. It exists now, and **the last rung has to be the one a human
+#: guesses** — an agent that reports trying `python -m fux.cli` has reported
+#: something no reader will recognise as "the obvious thing".
+RUNGS = ("fux --version", "uv run fux", "./.venv/bin/fux", "python -m fux")
 
 
 def _template(name: str) -> str:
@@ -44,7 +50,7 @@ def test_every_ladder_template_carries_every_rung(name, rung):
 
 @pytest.mark.parametrize("name", LADDER_TEMPLATES)
 def test_the_rungs_are_in_order(name):
-    """Order is the content. `python -m fux.cli` first would mask a broken venv;
+    """Order is the content. `python -m fux` first would mask a broken venv;
     `./.venv/bin/fux` first would ignore a perfectly good active environment."""
     text = _template(name)
     positions = [text.index(rung) for rung in RUNGS]

@@ -92,7 +92,7 @@ def test_read_shard_rejects_missing_header(tmp_path):
     directory.mkdir(parents=True)
     bad = directory / "00.jsonl"
     bad.write_text('{"id":"file:a.md"}\n', encoding="utf-8")
-    with pytest.raises(FuxError, match="_format header"):
+    with pytest.raises(FuxError, match="_format"):
         read_shard(bad)
 
 
@@ -196,3 +196,45 @@ def HEADER_bytes() -> bytes:
     from fux.store.writer import HEADER_LINE
 
     return HEADER_LINE
+
+
+# --- The upgrade message, which is the one that actually fires --------------
+
+def test_a_version_skew_names_both_versions_and_the_way_out(tmp_path):
+    """Measured 2026-08-27 in `fux-playground`, whose committed index was
+    `fux.index.v1`: all 50 goldens failed with
+    `shard missing/mismatched _format header` — which reads as CORRUPTION.
+
+    There is no migrate verb, so a reader who concludes "my index is broken"
+    has nowhere to go. The two sibling checks below this one in `reader.py`
+    (analyzer, tf_fields) have always named found-and-expected; this one, the
+    one an engine upgrade trips, named neither.
+    """
+    from fux.errors import FuxError
+    from fux.store.reader import read_shard
+
+    shard = tmp_path / "08.jsonl"
+    shard.write_text('{"_format":"fux.index.v1","analyzer":"v1"}\n', encoding="utf-8")
+
+    with pytest.raises(FuxError) as exc:
+        read_shard(shard)
+    message = str(exc.value)
+    assert "fux.index.v1" in message, "must name what it FOUND"
+    assert "fux.index.v2" in message, "must name what it EXPECTED"
+    assert "fux ingest" in message, "must name the way out — there is no migrate verb"
+
+
+def test_a_missing_header_is_not_reported_as_a_version_skew(tmp_path):
+    """A truncated write is not an upgrade, and telling someone to re-ingest
+    over a file that may be half-written is worse advice than no advice."""
+    from fux.errors import FuxError
+    from fux.store.reader import read_shard
+
+    shard = tmp_path / "08.jsonl"
+    shard.write_text('{"something": "else"}\n', encoding="utf-8")
+
+    with pytest.raises(FuxError) as exc:
+        read_shard(shard)
+    message = str(exc.value)
+    assert "no _format header" in message
+    assert "different version" not in message

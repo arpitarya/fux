@@ -1,34 +1,23 @@
 ---
 type: ADR
 name: ADR-URL-INGEST
-title: ADR-URL-INGEST (0008) — URL ingestion through consumer-owned fetcher
-description: Fux never fetches. A consumer-owned file does, behind a four-function contract, only under the two named fenced paths (fux add <URL> and fux update), with the URL list as a committed line-oriented file.
+title: ADR-URL-INGEST (0008) — URL ingestion through a consumer-owned fetcher
+description: Fux never fetches. A consumer-owned file does, only under the two named fenced paths; a failed fetch is a skip and never a deletion, and what comes back is normalized.
 status: accepted
+date: 2026-08-18
+feature: the `url:` source and how ingestion behaves around the fetcher boundary
+owns: []
+laws: [L2, L4, L5]
 timestamp: 2026-08-18T00:00:00Z
 ---
 
-# ADR-URL-INGEST — URL ingestion through consumer-owned fetcher
-
-- **Name:** `ADR-URL-INGEST` — cite this everywhere; never cite the number
-- **Status:** accepted
-- **Supersedes:** `ADR-URL-MIDDLEWARE` — **archived 2026-08-18** at
-  [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** nothing of its own — `src/fux/ingest/urlsrc.py` (fux's half of the
-  fetch contract) moved to [ADR-FETCHER](0019_fetcher.md) when the contract
-  split out; this record governs the `url:` source and the committed URL list
-  format, enforced by [ADR-URL-LIST](0018_url-list.md)
-- **Laws:** L2, L4, L5 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-18
-- **Feature:** the `url:` source and its fetcher boundary
-- **Evidence:** [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6
-
----
+# ADR-URL-INGEST — URL ingestion through a consumer-owned fetcher
 
 ## §1 — For humans
 
 **Fux does not fetch URLs. Your code does.**
 
-You write a file — `.fux/fetchers/cdp.py` by default, from a shipped template
+You write a file — `.fux/fetchers/http.py` or `cdp.py`, from a shipped template
 — that knows how to get a page: your browser, your proxy, your SSO, your
 retries. Fux imports it by path, hands it one URL at a time, and takes back
 markdown. Every line of network code lives on your side of that boundary, in
@@ -70,8 +59,8 @@ flowchart LR
 ```text
    fux  (no network code)                 your repo, your code
   +--------------------------+           +------------------------------+
-  | .fux/sources/urls        |           | .fux/fetchers/cdp.py       |
-  |   committed, 1 per line  |           |   fetch(url) -> str  REQUIRED|
+  | .fux/sources/urls        |           | .fux/fetchers/cdp.py         |
+  |   committed, 1 per line  |           |   fetch(url) -> bytes,str    |
   |            |             |  one URL  |   configure(cfg)    optional |
   |  add <URL> · update -----+---------->|   connect() / close()        |
   |            ^             |           +---------------+--------------+
@@ -125,57 +114,49 @@ question was never "which adapters", it was "where is the boundary".
 
 ### Decision
 
-**1–2. The fetch contract left this record on 2026-08-19.** *Fux never
-fetches; a consumer-owned fetcher does*, and the four-function contract that
-states it, are now [ADR-FETCHER](0019_fetcher.md) decisions 1 and 2 — including
-the rename from *middleware*, the `.fux/fetchers/` location, and the rule that
-exactly one fetcher runs per URL. **They are not restated here**: a record that
-paraphrases another is the paraphrase that drifts. What follows is what this
-record still owns — how URL ingestion *behaves* around that contract.
+**1. The fetch contract itself is [ADR-FETCHER](0019_fetcher.md)'s, and is not
+restated here.** *Fux never fetches; a consumer-owned fetcher does*, the
+function contract that states it, the `.fux/fetchers/` location, the rule that
+exactly one fetcher runs per URL, and the verbatim `[sources.url.config]`
+hand-off all live there. A record that paraphrases another is the paraphrase
+that drifts. What follows is what this record owns: how URL ingestion
+*behaves* around that contract.
 
-**3. Fetching happens only under a named fenced path.** Since 2026-08-21
-(W-63) there are **two** — `fux add <URL>`, scoped to the URL just added, and
-`fux update`, which is what `--refresh-urls` retired into. A plain ingest
+**2. Fetching happens only under a named fenced path.** There are two —
+`fux add <URL>`, scoped to the URL just added, and `fux update`. A plain ingest
 carries every listed `url:` record forward byte-identically and never imports
-the fetcher. The count is not the rule; being named, fenced and opt-in is
-(L4, [ADR-CLI](0002_cli-surface.md) decision 1e).
+the fetcher. **The count is not the rule**; being named, fenced and opt-in is
+(L4, [ADR-CLI](0002_cli-surface.md) decision 1d).
 
-**4. A failed fetch keeps the prior record.** It is reported as a skip. A
+**3. A failed fetch keeps the prior record.** It is reported as a skip. A
 transient failure must never present as a deletion.
 
-**4a. Reconciliation is not fetching, and does not wait for it** (2026-08-21,
-W-63). Only a URL *removed from the list* removes a document — and it does so
-on the **next run, networked or not**. This decision used to end "and
-reconciliation happens only on the run that opted into the network", which
-made deleting a document require the one capability deletion has no use for.
-That was a defect, not a design; it is [ADR-INGEST](0007_ingest.md)
-decision 9, and it is what `fux remove <URL>` rests on.
+**4. Reconciliation is not fetching, and does not wait for it.** Only a URL
+*removed from the list* removes a document — and it does so on the **next run,
+networked or not**. Requiring a fetch to delete a document would make deletion
+depend on the one capability deletion has no use for; that was a defect, not a
+design. It is [ADR-INGEST](0007_ingest.md) decision 9, and it is what
+`fux remove <URL>` rests on.
 
-**5–6. The file format left this record on 2026-08-19 too.** The committed
-list, its grammar, its comment rule, the dedupe-and-sort, the closed attribute
-set and the `file:lineno` errors are [ADR-URL-LIST](0018_url-list.md)
-decisions 2–13, built in
-[`sourcelist.py`](../../src/fux/ingest/sourcelist.py) and shared with
-`.fux/sources/dirs`. **Not restated here.** What this record keeps is the
-`read_urls` → `resolve_urls` → `fetch_all` pipeline in
-[`urlsrc.py`](../../src/fux/ingest/urlsrc.py): parse, layer the source-wide
-policy under the line, then fetch each URL through the fetcher its line
-declared, importing only the fetchers some line actually names.
+**5. The pipeline is `read_urls` → `resolve_urls` → `fetch_all`**, in
+[`urlsrc.py`](../../src/fux/ingest/urlsrc.py): parse the list, layer the
+source-wide policy *under* the line's own attributes, then fetch each URL
+through the fetcher its line declared — importing only the fetchers some line
+actually names. The committed list's grammar, comment rule, dedupe-and-sort,
+closed attribute set and `file:lineno` errors are
+[ADR-URL-LIST](0018_url-list.md)'s and are not restated here.
 
-**7. `[sources.url.config]` is passed to `configure` verbatim** — moved to
-[ADR-FETCHER](0019_fetcher.md) decision 8, where the contract lives.
-
-**8. Fux normalizes what comes back**, rather than trusting it: CRLF to LF,
+**6. Fux normalizes what comes back**, rather than trusting it: CRLF to LF,
 U+2028/U+2029/U+0085 to spaces, NUL stripped. Those are legal in JSON and
 hostile to every line-oriented tool downstream.
 
-**9. Hashed meta is the default for URL sources**, and `plain` is an explicit
-per-source opt-in for public content. **See the defect in §Consequences: the
-default currently does not work.**
+**7. Hashed meta is the default for URL sources**, and `plain` is an explicit
+per-source opt-in for public content (L5).
 
 ### What it looks like
 
-Verbatim from [the capture](../../work/regression/2026-08-18-ingest-and-index/report.md) §6,
+Verbatim from
+[the capture](../../work/regression/2026-08-18-ingest-and-index/report.md) §6,
 using the no-network fetcher in
 [`evidence/demo-fetcher.py`](../../work/regression/2026-08-19-w54/evidence/demo-fetcher.py).
 
@@ -203,7 +184,8 @@ ingested 4 docs (2 changed), 3 skipped, 2 shards written
 the batch, and the 404 becomes a skip while the other two documents land.
 
 **A URL record**, `meta = "hashed"` — no display text, `title_h` instead of
-`title`/`phrases`:
+`title`/`phrases`. The capture predates the `flen` field and is not edited; a
+record taken today carries `"flen": [...]` where this shows `"wlen": 11`:
 
 ```json
 {
@@ -221,27 +203,22 @@ the batch, and the 404 becomes a skip while the other two documents land.
 
 ### Consequences
 
-- **`src/fux/` still contains zero network lines**, which is the property the
-  adapter cap rests on.
-- **Fetcher is not linted by default.** It lives in a dotdir and ruff skips
+- **`src/fux/` contains zero network lines**, which is the property the adapter
+  cap rests on.
+- **The fetcher is not linted by default.** It lives in a dotdir and ruff skips
   those. Accepted: it is consumer code, not a CI target.
-- **Hashed results are unreadable by design** — `fux ask` prints
-  `30aef0c52cf11116` where a title would be. That is the mode working, and it
-  is a real usability cost worth stating rather than discovering.
-- **The default was broken, and is fixed (2026-08-19).** With
-  `meta = "hashed"`, the networked path wrote the committed index and
-  then **failed at the accelerator build, exit 1**, and every later `fux build`
-  failed too: the bare 16-hex `title_h` tripped the invariant that keeps the
-  scan and the accelerator in agreement, so a corpus with one hashed URL record
-  was stuck on the reference scan permanently — 27.2 ms against 4 248.8 ms at
-  RFC scale, the whole M2 result forfeited by following the documentation.
-  Diagnosis in
-  [ANALYSIS.md](../../work/regression/2026-08-18-ingest-and-index/ANALYSIS.md).
-  **The fix was the field's shape**, `"h:" + term_hash(...)`
-  ([ADR-RECORD](0010_index-record.md) rule 2), not the check — and the
-  differential harness now carries a hashed record, which it never had.
-- **This record is itself accepted, not proposed** — ratified as-is by W-31
-  ([IMPLEMENTATION.md](../../work/IMPLEMENTATION.md), 2026-08-19).
+- **Hashed results are unreadable by design** — `fux ask` prints a hash where a
+  title would be, unless the display cache can supply one
+  ([ADR-RECORD](0010_index-record.md)). That is the mode working, and it is a
+  real usability cost worth stating rather than discovering.
+- ⚠ **`title_h` carries an `h:` prefix, and that shape is load-bearing.** A
+  bare 16-hex `title_h` tripped the invariant that keeps the scan and the
+  accelerator in agreement, so a corpus with one hashed URL record wrote its
+  committed index and then **failed every accelerator build** — stuck on the
+  reference scan permanently, 27.2 ms against 4 248.8 ms at RFC scale, the
+  whole accelerator result forfeited by following the documentation. **The fix
+  was the field's shape, not the check**, and the differential harness now
+  carries a hashed record, which it never had.
 
 ### Alternatives considered
 
@@ -258,19 +235,25 @@ the batch, and the 404 becomes a skip while the other two documents land.
 - **Fetch on every ingest, with a cache.** Rejected: it makes the network a
   dependency of the ordinary path, and offline-by-default is the property that
   lets ingest run on a hook.
+- **Relaxing the accelerator invariant instead of prefixing `title_h`.**
+  Rejected: the check is what makes the differential law enforceable, and
+  loosening a check to admit a badly shaped field is how a guarantee becomes a
+  suggestion.
 
 ### Reference (required)
 
 - The fux half of the contract —
   [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py) (its docstring
   is the normative statement of the four functions).
-- The carry-forward rule — [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
-  module docstring.
+- The carry-forward rule —
+  [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py) module docstring.
 - A working no-network fetcher, and the captured session —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6.
+- The diagnosis of the hashed-default failure —
+  [`ANALYSIS.md`](../../work/regression/2026-08-18-ingest-and-index/ANALYSIS.md).
 - The opaque-config-table discipline this copies — PEP 518 `[tool.*]`:
   https://peps.python.org/pep-0518/#tool-table
-- The transport the shipped template uses — Chrome DevTools Protocol:
+- The transport the shipped browser template uses — Chrome DevTools Protocol:
   https://chromedevtools.github.io/devtools-protocol/
 
 ### Veto condition
@@ -291,7 +274,7 @@ grep -n 'refresh_urls\|only_urls' src/fux/ingest/run.py
 # expect: the fetcher load sits inside the `if refresh_urls:` branch and nowhere
 #         else; `only_urls` narrows WHICH listed URLs it fetches, never whether
 
-# 2b. removal does NOT need the network (W-63) — this must have no gate at all
+# 2b. removal does NOT need the network — this must have no gate at all
 grep -n '_listed_url_ids' src/fux/ingest/run.py
 # expect: called on the offline branch; reading a committed file is not a fetch
 
@@ -299,6 +282,7 @@ grep -n '_listed_url_ids' src/fux/ingest/run.py
 grep -rn 'url.config\[' src/fux/
 # expect: no output (passed verbatim to configure(), never indexed)
 ```
+
 ---
 
 ## References
@@ -323,10 +307,6 @@ evidence.*
 - [`work/regression/2026-08-18-ingest-and-index/ANALYSIS.md`](../../work/regression/2026-08-18-ingest-and-index/ANALYSIS.md)
 - [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
 - [`work/regression/2026-08-19-w54/evidence/demo-fetcher.py`](../../work/regression/2026-08-19-w54/evidence/demo-fetcher.py)
-
-**Project docs**
-
-- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)
 
 **Papers and specifications**
 

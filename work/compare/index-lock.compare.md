@@ -2,14 +2,22 @@
 type: Compare Doc
 title: The lock — one file or two
 description: Arpit asked for a lock file whenever the index is updated, and for a committed list of what still needs enrichment. Those are two artifacts with opposite lifetimes and opposite git status. This fork decides whether they merge, and what the existing runner.lock's contract should be.
-status: proposed
+status: accepted
 timestamp: 2026-08-26T00:00:00Z
 ---
 
 # The lock — one file or two
 
-> **VERDICT: B — TWO FILES, AND NEITHER IS NEW.** Proposed by the session,
-> **not yet decided by Arpit.**
+> **VERDICT: B — TWO FILES, AND NEITHER IS NEW.** ✅ **ACCEPTED by Arpit,
+> 2026-08-26**, together with the §7 sub-fork: the mutex is renamed
+> **`write.lock`**, and **every command that writes the committed index must
+> hold it** — `ingest`, `build`, `add`, `remove`, `update`, and the background
+> runner. **Read verbs take nothing**: a lock on the read path would fail a
+> search because a re-index was running.
+>
+> ⚠ **The build falsifies §6 before it relies on it.** The two-foreground-ingests
+> race is read from call sites and has never been reproduced; a fix built on an
+> unverified defect is a fix nobody can check.
 >
 > The mutex and the manifest are **separate artifacts, separately named, in
 > separate records**, because they are opposite on the one axis that matters
@@ -130,7 +138,7 @@ E is also what the third-party ecosystem exists to paper over (`filelock`,
 `portalocker`), and **L1 forbids the dependency** that would make it pleasant.
 
 > ⚠ **Reconciled 2026-08-26, the same day, against
-> [W-86](../open/W-86-the-decoder-plane.md) §12.** Arpit ruled that a
+> [W-86](../../archive/open/W-86-the-decoder-plane.md) §12.** Arpit ruled that a
 > **consumer** may add dependencies fux's runtime may not — the third row of
 > ADR-ENRICH decision 1's table. **That ruling does not reach this rejection,
 > and the distinction is the point:** a decoder is consumer code loaded from
@@ -211,7 +219,7 @@ accident. Not by a rule someone has to remember.
   string.** Recommendation: `write.lock`.
 
 **The queue** — committed, and it exists because of the decoders
-([W-86](../open/W-86-the-decoder-plane.md)): a decoder that meets an image or a
+([W-86](../../archive/open/W-86-the-decoder-plane.md)): a decoder that meets an image or a
 scanned PDF **has no way today to say "a model must read this."** It must
 land somewhere durable, sorted, and deterministic (**L3**: sorted by path, no
 wall clock), holding path + content sha + reason — **never content (L2)**.

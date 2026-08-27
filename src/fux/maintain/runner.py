@@ -71,8 +71,10 @@ import os
 import subprocess
 import sys
 import time
+from contextlib import contextmanager
 from pathlib import Path
 
+from ..errors import FuxError
 from ..store import fuxdir
 
 __all__ = [
@@ -90,9 +92,18 @@ __all__ = [
     "status",
     "stop_requested",
     "take_over",
+    "write_lock",
 ]
 
-LOCK_NAME = "runner.lock"
+#: ⚠ **Renamed from `runner.lock` 2026-08-26 (W-86 P6, Arpit's ruling on fork
+#: C).** It is no longer the *runner's* lock: every command that writes the
+#: committed index holds it, so a name saying "runner" was about to become a
+#: small lie the first time a foreground `fux ingest` took it. Gitignored, so
+#: nothing cites the old path.
+#:
+#: **Not `index.lock`** — git keeps one of those feet away in the same repo,
+#: and MACHINE.md already records an incident with a stranded one.
+LOCK_NAME = "write.lock"
 STOP_NAME = "runner.stop"
 STATUS_NAME = "runner.status"
 
@@ -197,23 +208,67 @@ def holder(root: Path) -> int | None:
         return -1
 
 
-def acquire(root: Path) -> bool:
-    """Claim the lock atomically. `False` means somebody else holds it.
+def acquire(root: Path, *, required: bool = False) -> bool:
+    """Claim the write lock atomically. `False` means somebody else holds it.
 
     `O_CREAT|O_EXCL` is the whole mechanism — one syscall, no read-then-write
-    window for a second runner to slip through. This is what makes a 50-commit
+    window for a second writer to slip through. This is what makes a 50-commit
     `git rebase` produce one runner rather than fifty.
+
+    ⚠ **`required` exists because the same line means opposite things to the
+    two callers** (W-86 P6). A background runner that cannot take the lock
+    should decline quietly — someone else is already doing the work. A
+    **foreground writer** that cannot take it and proceeds anyway has inverted
+    the point of the lock, so it raises instead.
+
+    The `OSError` branch is the sharper half of that. Degrading on a read-only
+    or full filesystem is right for a runner and **wrong for a writer**: the
+    write is about to happen either way, and doing it unprotected is the
+    outcome the lock exists to prevent.
     """
     directory = fuxdir.derived_dir(root, "runtime")
     try:
         fd = os.open(str(directory / LOCK_NAME), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
     except FileExistsError:
+        if required:
+            raise FuxError(
+                f"another fux process is writing this index (lock: {lock_path(root)}). "
+                "Wait for it, or - if you are certain no fux process is running - "
+                "delete that file and re-run"
+            ) from None
         return False
-    except OSError:
-        return False  # read-only or full filesystem: degrade, never block
+    except OSError as exc:
+        if required:
+            raise FuxError(
+                f"cannot create the index write lock at {lock_path(root)}: {exc}. "
+                "Writing without it could corrupt the index if a second process starts"
+            ) from exc
+        return False  # a background runner degrades; a writer never does
     with os.fdopen(fd, "w", encoding="utf-8") as handle:
         json.dump({"pid": os.getpid()}, handle)
     return True
+
+
+@contextmanager
+def write_lock(root: Path):
+    """Hold the write lock for the duration of one index write.
+
+    **Every command that writes the committed index uses this** — `ingest`,
+    `build`, `add`, `remove`, `update`. **Read verbs take nothing**: a lock on
+    the read path would make a search fail because a re-index was running,
+    which trades a real problem for a worse one.
+
+    ⚠ A runner that already holds the lock (it called `acquire` itself) must
+    not deadlock against this, so re-entry by the same pid is permitted.
+    """
+    if holder(root) == os.getpid():
+        yield  # already ours; the runner path
+        return
+    acquire(root, required=True)
+    try:
+        yield
+    finally:
+        release(root)
 
 
 def release(root: Path) -> None:

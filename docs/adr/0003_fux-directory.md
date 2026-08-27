@@ -2,26 +2,16 @@
 type: ADR
 name: ADR-DOTFUX
 title: ADR-DOTFUX (0003) — the .fux/ directory
-description: Every child of .fux/ is declared committed or derived; the ignore rule is narrow by construction and asserted by doctor.
+description: Every child of .fux/ is declared committed or derived; the ignore rule is narrow by construction and asserted by doctor against git itself.
 status: accepted
+date: 2026-08-18
+feature: the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest
+owns: [src/fux/store/fuxdir.py, src/fux/doctor.py, src/fux/setup.py]
+laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
 ---
 
 # ADR-DOTFUX — the `.fux/` directory
-
-- **Name:** `ADR-DOTFUX` — cite this everywhere; never cite the number
-- **Status:** accepted
-- **Supersedes:** `ADR-FUX-DIR` — **archived 2026-08-18** at
-  [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** `src/fux/store/fuxdir.py`, `src/fux/doctor.py` — `src/fux/config.py`
-  moved to [ADR-CONFIG](0014_config.md) when that record was split out and
-  accepted
-- **Laws:** L2, L3, L5 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-18
-- **Feature:** the layout of `.fux/` and the invariants that keep it honest
-- **Evidence:** [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §1
-
----
 
 ## §1 — For humans
 
@@ -45,10 +35,12 @@ itself that the index is not ignored.
 flowchart TD
     F[".fux/"]
     F --> C1["index/ — committed<br/>the product"]
-    F --> C2["sources/ — committed<br/>dirs · urls, one per line"]
+    F --> C2["sources/ — committed<br/>dirs · urls · types"]
     F --> C3["fetchers/ — committed<br/>YOUR code"]
-    F --> C4["README.md · .gitignore<br/>committed, write-if-missing"]
-    F --> D1["runtime/ — derived<br/>CACHEDIR.TAG<br/>(nests fetch-cache/, M4)"]
+    F --> C4["decoders/ — committed<br/>YOUR code; these copies RUN"]
+    F --> C5["enrich/ — committed<br/>pinned text + queue.tsv"]
+    F --> C6["tune.toml · .fuxignore · README.md · .gitignore<br/>committed files, write-if-missing"]
+    F --> D1["runtime/ — derived<br/>CACHEDIR.TAG"]
     D1 -.->|"git check-ignore<br/>asserted by doctor"| G["ignored"]
     C1 -.->|"must NOT be ignored"| G
 ```
@@ -60,13 +52,17 @@ flowchart TD
   .fux/
     |
     +-- index/        COMMITTED   the product; not rebuildable from anything
-    +-- sources/      COMMITTED   dirs . urls, one per line
+    +-- sources/      COMMITTED   dirs . urls . types, one entry per line
     +-- fetchers/     COMMITTED   your code, fux never rewrites it
+    +-- decoders/     COMMITTED   your code; THESE COPIES RUN, not the package's
+    +-- enrich/       COMMITTED   pinned enrichment text + queue.tsv
+    +-- tune.toml     COMMITTED   how results are ORDERED (write-if-missing)
+    +-- .fuxignore    COMMITTED   what is NOT indexed, .gitignore's grammar
     +-- README.md     COMMITTED   the declaration table (write-if-missing)
     +-- .gitignore    COMMITTED   names derived dirs; NEVER `*`
     |
     +-- runtime/      derived     accelerator segments  [CACHEDIR.TAG]
-        +-- fetch-cache/          the TTL fetch cache (M4), nested here
+        +-- fetch-cache/          the TTL fetch cache, nested here
 
    `fux doctor` runs `git check-ignore` and fails if index/ is ignored.
 ```
@@ -105,15 +101,14 @@ $ fux doctor
 
 ### Context
 
-`.fux/` accumulated planes as milestones landed: the committed index at M1, the
-URL source and consumer fetcher at 0.31.x, the runtime accelerator at M2, a TTL
-fetch cache nested inside `runtime/` at M4. Nothing declared which of them git
-should carry.
+`.fux/` accumulates planes: the committed index, the source lists, the consumer
+fetchers and decoders, the runtime accelerator, a TTL fetch cache nested inside
+it. Nothing declared which of them git should carry.
 
 The hazard is asymmetric. A derived directory accidentally committed is noise
 someone notices. A **committed directory accidentally ignored is silent data
-loss** — and the repo's own `.gitignore` already carried a `.fux/*` blanket
-that would have eaten `sources/` and `fetchers/` without a word.
+loss** — and this repo's own `.gitignore` once carried a `.fux/*` blanket that
+would have eaten `sources/` and `fetchers/` without a word.
 
 An ignore rule is also the kind of thing a reviewer's eye slides over. It has to
 be a machine's job.
@@ -124,255 +119,175 @@ be a machine's job.
 the generated `.fux/README.md`. Undeclared entries are a `fux doctor` warning,
 not a shrug.
 
-**2. Committed:** `index/` (the product), `sources/` (the line-oriented source
-lists — `dirs` and `urls`, both on the one grammar in
-[ADR-URL-LIST](0018_url-list.md)), `fetchers/` (consumer code), `README.md`,
-`.gitignore`.
-**Derived:** `runtime/` — M2's accelerator segments, and M4's TTL fetch cache
-nested inside it at `runtime/fetch-cache/` (no separate top-level directory
-was reserved for it in the end).
+**2. The declaration, in full.** It is generated from
+[`fuxdir.py`](../../src/fux/store/fuxdir.py)'s `COMMITTED`, `COMMITTED_FILES`,
+`DERIVED` and `GENERATED_FILES` — that module is the source, this table is the
+reasoning.
+
+| entry | kind | what it is, and why that kind |
+|---|---|---|
+| `index/` | committed | the product; nothing can recompute it |
+| `sources/` | committed | `dirs` · `urls` · `types`, one entry per line, on the one grammar in [ADR-URL-LIST](0018_url-list.md) |
+| `fetchers/` | committed | consumer code — decision 4 |
+| `decoders/` | committed | consumer code — decision 5 |
+| `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [ADR-ENRICH](0040_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L3 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
+| `tune.toml` | committed | how results are **ordered**, never what is indexed. A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
+| `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([ADR-FUXIGNORE](0048_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`, and never rewritten |
+| `README.md` · `.gitignore` | committed | generated, write-if-missing |
+| `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, and `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull |
+
+⚠ **`COMMITTED_FILES` exists because its absence was a live defect.** `DECLARED`
+was built from committed *directories* only, so a committed **file** had no row
+anywhere and `fux doctor` reported it as undeclared — this record's veto
+condition 1, firing, on `tune.toml` and `.fux/enrich/` at once. Found by
+checking the claim rather than asserting it. **`.fuxignore` got its row in the
+change that introduced it**, which is what the table is for.
 
 **3. The generated `.gitignore` names derived directories and never a
-wildcard.** `runtime/`, one line. A `*` in that file is a
-defect regardless of what follows it.
+wildcard.** `runtime/`, one line. A `*` in that file is a defect regardless of
+what follows it. One directory-level rule is also why a new file under
+`runtime/` needs no new ignore line.
 
 **4. `fux doctor` asserts the ignore rule against git**, not against the file's
 text — `git check-ignore` on the index path. The check is of the *effective*
 state, which is the only state that matters.
 
-**5. Derived directories carry `CACHEDIR.TAG`** ([bford.info/cachedir](https://bford.info/cachedir/)),
-so backup tools, `tar --exclude-caches` and IDE indexers skip them without
-per-tool configuration.
+**5. Derived directories carry `CACHEDIR.TAG`**
+([bford.info/cachedir](https://bford.info/cachedir/)), so backup tools,
+`tar --exclude-caches` and IDE indexers skip them without per-tool
+configuration. See [ADR-CACHEDIR-TAG](0023_cachedir-tag.md).
 
 **6. Scaffolding has two moments, and everything in both is write-if-missing.**
-Amended 2026-08-19 (Arpit), because one
-generator doing both jobs is how a repo that wanted an index ends up holding
-code.
+One generator doing both jobs is how a repo that wanted an index ends up
+holding code.
 
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `fetchers/http.py`, `fetchers/cdp.py` | **optional, explicit, once per repo** — a consumer asked for it |
-
-> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built): `tune.toml` — a
-> new child, COMMITTED, and `fux setup` writes one more file.**
->
-> | entry | kind | what it is |
-> |---|---|---|
-> | `tune.toml` | **committed** | every knob that changes how results are ORDERED, and none that changes what is indexed |
->
-> **Committed because it is a consumer's stated preference**, and a preference
-> that does not travel with the clone is not one — two clones of a repo would
-> rank the same corpus differently, which is the class of surprise decision 1's
-> committed/derived split exists to remove. It is not derived from anything;
-> nothing can recompute it.
->
-> **Write-if-missing, and then never touched again.** It joins the `fux setup`
-> row above under exactly the rule that row already states, and the promise is
-> load-bearing rather than incidental: the file ships with **every key
-> commented out**, so it is a menu of defaults a human annotates. A rewrite
-> would eat those annotations, which is why `fux tune` *prints* the specimen
-> for pasting instead of editing the file
-> ([ADR-CLI](0002_cli-surface.md) decision 1's amendment).
->
-> **Inside `.fux/`, so it is not a `report.outside` path.** That list exists
-> for writes into directories another vendor owns — the boundary the
-> Consequences bullet below records `setup` crossing for
-> [ADR-AGENT-POLICY](0035_agent-policy.md). A file in fux's own directory has
-> never been one, and announcing it as such would blunt the announcement that
-> matters.
->
-> **Nothing here reaches the maintenance path.** `ingest`, `build` and the
-> hooks never open it, which is what keeps a committed file out of the
-> byte-identity argument L3 rests on ([ADR-LAWS](0001_laws.md)).
->
-> **⚠ This record's veto condition 1 has FIRED, and it is open.** `tune.toml`
-> is a child of `.fux/` that the README table does not declare, because
-> `fuxdir.DECLARED` is `COMMITTED + DERIVED + GENERATED_FILES` and all three
-> hold **directories** plus the two files fux generates. Observed, not
-> inferred:
->
-> ```console
-> $ fux doctor | grep 'layout declared'
-> [WARN] .fux/ layout declared: undeclared entries: tune.toml - see .fux/README.md and ADR-DOTFUX
-> ```
->
-> **`.fux/enrich/` is in the same state**, and the amendment further down that
-> says *"`fux doctor`'s undeclared-entry warning covers it like every other
-> child"* is wrong in exactly this way: the warning **fires on** it rather than
-> covering it.
->
-> **Left open rather than patched here.** The fix is a line of code plus a
-> decision about whether `GENERATED_FILES` is the right home for a file fux
-> writes once and never rewrites — and decision 1 says an undeclared entry is
-> *"a `fux doctor` warning, not a shrug"*, which is the mechanism working. It
-> is warning. What it is warning about is that this record has not been
-> extended to cover a committed **file**, only committed directories.
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `sources/types`, `tune.toml`, `fetchers/*.py`, `decoders/*.py`, and the agent policy files | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run.
 `fux setup` is also the one verb permitted to run before a repo root exists,
 because it is what writes the `fux.toml` that makes a directory a root.
 
-**7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded
-by path, and only under the two fenced paths — `fux add <URL>` and
-`fux update` (2026-08-21, W-63; it was `--refresh-urls` alone until then). The two files fux can put there ship
-as package data with an extension Python's import machinery cannot resolve, so
-**fux copies them and never imports them** ([ADR-FETCHER](0019_fetcher.md)
-decision 1). One known consequence, accepted: linters that skip hidden
-directories by default (ruff does) will not lint them.
+⚠ **A change to a write-if-missing template reaches new repos only.** `fux
+setup` never rewrites an existing file, so a corrected template does not reach
+a repo that already has one — including this one. That is not a bug in the
+promise: a rewrite would eat a consumer's annotations, the same reason `fux
+tune` prints a specimen instead of editing `tune.toml`. **If a change must
+reach existing repos, the mechanism is a loader refusal or a `doctor` check —
+never a rewrite.** `fux setup`'s own `report.kept` is the evidence the file was
+left alone.
+
+⚠ **A worked instance of that ⚠, 2026-08-27.** `sources/types` shipped as a
+template of nothing but comments, and a types file with no live pattern is one
+`read_types` refuses — so **`fux setup` followed by `fux ingest` failed on every
+fresh repo** ([ADR-TYPES](0031_types-list.md) decision 10, amended). The template
+now writes the default out as live lines. Per this decision it reaches **new
+repos only**, so every repo already holding the broken file — including this one
+— is reached by a `doctor` check, `types list usable`, and not by a rewrite.
+That is this ⚠ working as designed, not an exception to it.
+
+**7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
+path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
+The two files fux can put there ship as package data with an extension Python's
+import machinery cannot resolve, so **fux copies them and never imports them**
+([ADR-FETCHER](0019_fetcher.md) decision 1). One known consequence, accepted:
+linters that skip hidden directories by default (ruff does) will not lint them.
+
+**8. `decoders/` is consumer code too, and the copies are what run.** `fux
+setup` writes all sixteen built-in decoders there, write-if-missing, and **the
+modules inside the installed package are not consulted while a copy exists** —
+so a consumer invited to override a decoder can read the ones they are
+overriding, in their own repo.
+
+**It follows `fetchers/`'s ownership model and not its packaging model.** A
+fetcher ships as `templates/*.py.txt` because it carries network code that must
+not be importable inside an offline package
+([ADR-CDP-FETCHER](0020_cdp-fetcher.md) decision 8). A decoder is stdlib-only
+and offline, so it is already a legitimate module: **the module is the
+template**, copied out verbatim, and there is exactly one copy of every decoder
+in the repo rather than two that agree by habit. Three consequences that bite if
+forgotten:
+
+1. ⚠ **After setup, `src/fux/decode/` does not execute in that repo.** Engine
+   upgrades do not reach a consumer's decoders; they re-run `fux setup` after
+   deleting the file they want refreshed. This was ruled with the cost on the
+   table — the alternative (copies inert until edited) was declined.
+2. **A deleted copy restores the built-in.** `rm .fux/decoders/pdfdoc.py` must
+   not silently stop indexing PDFs, which looks exactly like a corpus with no
+   PDFs in it.
+3. **It is committed and must never be gitignored** — sixteen files a consumer
+   owns, dropped out of git without a word, is precisely what
+   `.fux/.gitignore`'s own comment warns about.
+
+**9. `fux setup` writes outside `.fux/`, and every such path is announced.**
+The scaffolding contract had one boundary — *fux writes into its own directory
+and `fux.toml`, and nowhere else* — and
+[ADR-AGENT-POLICY](0035_agent-policy.md) decisions 5 and 6 widen it: `setup`
+also writes agent-policy renderings into `.claude/`, `.github/` and `.kiro/`,
+directories **Anthropic, GitHub and AWS own**. Everything else about the
+contract is unchanged — write-if-missing, and the same read-never-import
+discipline the fetchers use.
+
+**The boundary did not disappear, it acquired a safeguard.** Because the
+install is default-on, `SetupReport` carries an `outside` list and `cmd_setup`
+prints every path it wrote beyond `.fux/` along with how to turn them off. A
+write that does not appear in that announcement is ADR-AGENT-POLICY's veto
+condition 1, and `tests/test_setup_agents.py` asserts both halves. ⚠ **Two of
+the four renderings are ambient** — Copilot's `applyTo: "**"` and Kiro's
+`inclusion: always` enter *every* request in the consumer's repository,
+including for developers not using fux. That cost is stated rather than
+discovered, and the renderings are size-bounded by a test.
+
+**10. `doctor` reports, and never repairs.** Every check returns
+`Check(ok, level, name, detail)` and `--json` carries them. Three properties
+this record binds:
+
+- **Read-only, always.** A stale runner lock is named along with the command
+  that clears it; `doctor` never clears it
+  ([ADR-MAINTENANCE](0032_hooks.md) veto 7). A pending re-index is a
+  **warning** — it is the deferring hook working, not a broken repository.
+- **Offline, always.** The URL section reports how many `url:` records exist,
+  how many the last networked run confirmed, how many have never been
+  re-fetched since first ingest, and how many are failing — naming any that
+  have failed `FAILING_STREAK` runs in a row. Every number comes from the
+  committed index and the gitignored counters under `runtime/`. It **never
+  fetches**, and it **never deletes**: [ADR-URL-INGEST](0008_url-ingest.md)
+  decision 4 forbids treating a failed fetch as a deletion, and the cost of
+  that rule is a permanently dead URL living in the index forever. This makes
+  the cost legible instead of invisible.
+- ⚠ **It reports the concurrency POLICY and refuses to compute the effective
+  value.** The effective bound is `min(configured, declared)`; `declared` lives
+  in a **consumer-owned Python file**, so reading it means importing it, and
+  importing it runs whatever sits at that file's module level. **`doctor` is
+  the command a person runs when something is already wrong** — it must stay
+  out of the business of executing consumer code. It names the `min(...)` rule
+  and leaves `fux update` to apply it. `tests/test_doctor.py` plants a fetcher
+  whose module body raises and asserts the check still returns.
+
+⚠ **`doctor.py` renders another plane's state and that is deliberate.** The
+runner's status is computed in `maintain/runner.py::status()`, which
+[ADR-MAINTENANCE](0032_hooks.md) owns. A check that *formats* another plane's
+state is this record's shape doing its job; a check that **decided** anything
+about the runner would belong next door.
 
 ### Consequences
-
-- **`fux setup` writes outside `.fux/` for the first time, 2026-08-22 (W-68).**
-  This record's scaffolding contract had one boundary — *fux writes into its own
-  directory and `fux.toml`, and nowhere else* — and
-  [ADR-AGENT-POLICY](0035_agent-policy.md) decisions 5 and 6 widen it. `setup`
-  now also writes four agent-policy renderings into `.claude/`, `.github/` and
-  `.kiro/`: directories **Anthropic, GitHub and AWS own**.
-  **That record amends this one; it does not claim `setup.py`**, which stays
-  here. What lives there is the *policy* and its vendor formats; what lives here
-  is the scaffolding contract those files are written under, and it is unchanged
-  in every other respect — **write-if-missing**, so a consumer's edit survives
-  every later run, and the same `template_bytes` read-never-import discipline
-  the fetchers already use.
-  **The boundary did not disappear, it acquired a safeguard.** Because the
-  install is default-on, `SetupReport` gained an `outside` list and `cmd_setup`
-  prints every path it wrote beyond `.fux/` along with how to turn them off.
-  A write that does not appear in that announcement is ADR-AGENT-POLICY's veto
-  condition 1, and `tests/test_setup_agents.py` asserts both halves.
-  ⚠ **Two of the four are ambient** — Copilot's `applyTo: "**"` and Kiro's
-  `inclusion: always` enter *every* request in the consumer's repository,
-  including for developers not using fux. That cost is real, it is stated
-  rather than discovered, and the renderings are size-bounded by a test.
-- **`doctor` gained `--json` and a background-runner check, 2026-08-22
-  (W-66 Phase 4).** This record keeps `src/fux/doctor.py` rather than handing
-  it to [ADR-MAINTENANCE](0032_hooks.md), and the split is deliberate: the
-  runner's state is computed in `maintain/runner.py::status()`, which
-  ADR-MAINTENANCE owns, and `doctor.py` only **renders** it. A check that
-  formats another plane's state is still this record's `Check(ok, level, name,
-  detail)` shape doing its job; a check that *decided* anything about the
-  runner would belong next door.
-  **Two properties this record now also carries:**
-  - **`--json`.** `doctor` had no machine-readable form, and the runner is the
-    first check whose consumer is an agent rather than a person
-    ([ADR-CLI](0002_cli-surface.md), 2026-08-22). The runner's state appears
-    as its own top-level `runner` key, not only as prose inside a `detail`
-    string — a caller asking *"is a re-index pending"* should not have to
-    parse a sentence.
-  - **Read-only, like every other check here.** `doctor` has never repaired
-    anything it reports, and the runner check does not start: a stale lock is
-    named along with the command that clears it. That is
-    [ADR-MAINTENANCE](0032_hooks.md) veto 7 rather than this record's
-    invention, and it is why the check is a **warning** — a pending re-index
-    is the deferring hook working, not a broken repository.
-- **The generated headers name the two networked paths** (2026-08-21, W-63).
-  `.fux/README.md` and `.fux/sources/urls` are written by `setup` from
-  templates this record owns, and both said fetching happened only under
-  `--refresh-urls`. That flag retired into `fux update`, and `fux add <URL>`
-  joined it — so the generated text said something false about L4 to every
-  consumer who ran `fux setup`. Corrected in the templates, and in this
-  repo's own copies, in the same change.
-
-- **`fux setup` writes a fourth consumer-owned file** (2026-08-20):
-  `.fux/sources/types`, write-if-missing like the rest, **with the built-in
-  default spelled out in comments**. Writing it rather than leaving it absent
-  is a deliberate cost — an absent file already behaves correctly — paid so a
-  consumer can see what fux considers a document without reading its source.
-  [ADR-TYPES](0031_types-list.md) decision 10.
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —
   "what do I commit?" — is answered by a file fux generates.
 - **Derived planes are disposable by contract.** `rm -rf .fux/runtime` is
-  always safe; that property is what lets the accelerator be aggressive.
+  always safe; that property is what lets the accelerator be aggressive, and it
+  costs at most one repeat of the skip list.
 - **`doctor` gains a hard dependency on git** for the ignore check. Acceptable:
   the committed index's premise is that git carries it.
-- **This record does not retire ADR-DOTFUX.** That record is ⏳ *proposed* and
-  unratified ([W-31](../../work/IMPLEMENTATION.md) *(ratified 2026-08-19)*), and
-  replacing an unratified decision inherits its ambiguity. Retirement happens in
-  the change that accepts this one, once W-31 is called.
-
-> **Amended 2026-08-26 (W-82 §3.1) — `fux doctor` gained a URL section, and
-> `.fux/runtime/` gained two files.**
->
-> This record's list of what doctor checks was *the background runner, the
-> Python version, the repo root, the layout and the accelerator* — **and nothing
-> about URLs**. That silence was the defect: a URL that had failed every fetch
-> for a month looked exactly like one fetched a minute ago.
->
-> `doctor.py` now reports, as a **warning and never an error**: how many `url:`
-> records exist, how many the last networked run confirmed, how many have never
-> been re-fetched since first ingest, and how many are failing — naming any that
-> have failed `FAILING_STREAK` runs in a row.
->
-> **It reports and never deletes**, because
-> [ADR-URL-INGEST](0008_url-ingest.md) decision 4 forbids treating a failed
-> fetch as a deletion. The cost of that rule is that a permanently dead URL
-> lives in the index forever; this makes the cost legible instead of invisible.
-> **It also never fetches** — doctor stays offline, so every number comes from
-> the committed index and a gitignored counter.
->
-> Two new **derived, gitignored** files nest inside the already-declared
-> `runtime/`: `url-state.json` (per-URL counters) and `url-shas.json` (the sha
-> each URL last produced, so *"it changed"* can be distinguished from *"we
-> fetched it"*). Neither is committed and neither can change a committed byte.
-
-> **Amended 2026-08-26 (W-83) — the two scaffolding moments both learned to
-> say how many connections a networked run will open.**
->
-> Both components this record owns changed, for one reason: the concurrency
-> bound shipped readable by `config.py` and **named by nothing a consumer would
-> ever open**. The decision itself belongs to
-> [ADR-CONFIG](0014_config.md)'s W-83 amendment; what lands here is the surface.
->
-> **`setup.py`** writes `max_parallel` into the `[sources.url]` block of
-> `fux.toml`, alongside `fetcher`, `urls_file` and `meta` — the three it
-> already named. ⚠ **The number is interpolated from `DEFAULT_MAX_PARALLEL`,
-> never typed.** A comment restating a constant is precisely the drift W-83
-> exists to fix, and writing this one by hand would have reproduced the defect
-> in the same commit that removed it. `tests/test_setup.py` fails if the
-> interpolation is ever flattened, and a second test uncomments the block and
-> loads it — a commented example that does not parse when uncommented is worse
-> than none.
->
-> **`doctor.py`**'s URL section gains one clause: how many URLs a networked
-> verb may open at once, and whether that came from `fux.toml` or the default.
->
-> ⚠ **Doctor reports the POLICY and refuses to compute the effective value**,
-> and the refusal is this record's business rather than ADR-CONFIG's. The
-> effective number is `min(configured, declared)`; `declared` lives in a
-> **consumer-owned Python file**, so reading it means importing it, and
-> importing it runs whatever sits at that file's module level. **Doctor is the
-> command a person runs when something is already wrong** — it stays offline
-> (above) and it must equally stay out of the business of executing consumer
-> code. It names the `min(...)` rule and leaves `fux update` to apply it.
-> `tests/test_doctor.py` plants a fetcher whose module body raises and asserts
-> the check still returns.
-
-> **Amended 2026-08-26 (W-85) — what `setup` writes is LIVE, and
-> write-if-missing is why the loader had to do the rest.**
->
-> Arpit, on being shown W-83's commented line: **"never commented. If it is
-> commented, throw an error that the value has to be present."** `_CONFIG` now
-> emits `[sources.url]` and its four keys **uncommented**, `max_parallel`
-> included; the decision and its consequences are
-> [ADR-CONFIG](0014_config.md)'s W-85 amendment.
->
-> ⚠ **This record's own write-if-missing promise is what made a template fix
-> insufficient**, and that is worth stating plainly rather than discovering
-> twice. `fux setup` never rewrites an existing `fux.toml`, so **W-83's
-> template change reached new repos and nobody else** — including this repo,
-> whose config still showed the pre-W-83 block when Arpit opened it. That is
-> not a bug in the promise: a rewrite would eat a consumer's annotations, the
-> same reason `fux tune` prints a specimen instead of editing `tune.toml`
-> (above). **The migration therefore lives in the loader, not here** — a
-> required key errors on the next command with the line to paste.
->
-> **The general rule this leaves behind:** a change to `_CONFIG` (or to any
-> write-if-missing template) is a change for **new repos only**. If it must
-> reach existing ones, the mechanism is a loader refusal or a `doctor` check —
-> never a rewrite. `fux setup`'s own `report.kept` is the evidence the file was
-> left alone.
+- **A committed file needs a row in `COMMITTED_FILES`, not just a mention
+  here.** The veto below is what catches a decision recorded in prose and not
+  in the generator.
+- **Nothing under `tune.toml` reaches the maintenance path.** `ingest`, `build`
+  and the hooks never open it, which is what keeps a committed file out of the
+  byte-identity argument L3 rests on.
 
 ### Alternatives considered
 
@@ -389,35 +304,21 @@ directories by default (ruff does) will not lint them.
   negation rules do not re-include files under an excluded *directory*, which
   is exactly the trap, and the correct form is subtle enough that the next
   editor will break it.
+- **Decoder copies inert until edited.** Rejected under decision 8, with the
+  upgrade cost on the table: a consumer reading `.fux/decoders/pdfdoc.py` and
+  finding it is not the code that ran is a worse surprise than an upgrade that
+  needs a deliberate refresh.
 
 ### Reference (required)
 
 - The generator — [`src/fux/store/fuxdir.py`](../../src/fux/store/fuxdir.py);
-  the checks — [`src/fux/doctor.py`](../../src/fux/doctor.py).
+  the scaffolder — [`src/fux/setup.py`](../../src/fux/setup.py); the checks —
+  [`src/fux/doctor.py`](../../src/fux/doctor.py).
 - The generated layout, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §1.
 - Cache-directory tagging — https://bford.info/cachedir/
 - `gitignore` pattern semantics, including the directory-negation trap —
   https://git-scm.com/docs/gitignore
-
-**Amended 2026-08-23 (W-76 Phase 8): `.fux/enrich/` — a fifth entry, COMMITTED.**
-
-| entry | kind | what it is |
-|---|---|---|
-| `enrich/` | **committed** | pinned enrichment text, one file per **source content sha** |
-
-**Why committed rather than derived.** It cannot be re-derived: a model wrote
-it, in an agent, once. Deriving it would mean calling a model, which
-[ADR-ENRICH](0040_enrich.md) decision 1 refuses. And because it is committed,
-**every clone has identical coverage** — so the index each clone builds is
-identical, and L3 holds with a wider input rather than a weaker property.
-
-**Keyed by the SOURCE sha, not by path.** Editing a document orphans its
-enrichment automatically, so staleness is structural rather than a check
-someone has to remember to write. `fux setup` writes the directory when the
-first enrichment lands; `fux enrich` never fabricates one.
-
-`fux doctor`'s undeclared-entry warning covers it like every other child.
 
 ### Veto condition
 
@@ -439,6 +340,7 @@ grep -n '^\*\|/\*' .fux/.gitignore
 git check-ignore -v .fux/index/ ; echo "check-ignore exit=$?"
 # expect: exit=1 (no match) — anything else means the index is being ignored
 ```
+
 ---
 
 ## References
@@ -449,23 +351,24 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
-[ADR-CONFIG](0014_config.md) · [ADR-URL-LIST](0018_url-list.md) ·
-[ADR-FETCHER](0019_fetcher.md) · [ADR-TYPES](0031_types-list.md) ·
+[ADR-FUXIGNORE](0048_fuxignore.md) ·
+[ADR-URL-INGEST](0008_url-ingest.md) · [ADR-CONFIG](0014_config.md) ·
+[ADR-URL-LIST](0018_url-list.md) · [ADR-FETCHER](0019_fetcher.md) ·
+[ADR-CDP-FETCHER](0020_cdp-fetcher.md) ·
+[ADR-CACHEDIR-TAG](0023_cachedir-tag.md) · [ADR-TYPES](0031_types-list.md) ·
 [ADR-MAINTENANCE](0032_hooks.md) · [ADR-AGENT-POLICY](0035_agent-policy.md) ·
-[ADR-TUNE](0038_tuning.md)
+[ADR-TUNE](0038_tuning.md) · [ADR-ENRICH](0040_enrich.md) ·
+[ADR-DECODE](0042_decode.md)
 
 **Code**
 
 - [`src/fux/doctor.py`](../../src/fux/doctor.py)
+- [`src/fux/setup.py`](../../src/fux/setup.py)
 - [`src/fux/store/fuxdir.py`](../../src/fux/store/fuxdir.py)
 
 **Measured evidence**
 
 - [`work/regression/2026-08-18-ingest-and-index/report.md`](../../work/regression/2026-08-18-ingest-and-index/report.md)
-
-**Project docs**
-
-- [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md)
 
 **Papers and specifications**
 

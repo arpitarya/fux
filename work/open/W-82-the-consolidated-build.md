@@ -160,7 +160,26 @@ from that one asymmetry.
 >    complete **without** adding `src/fux/__main__.py` — which retires fork B's
 >    urgency, though the fork itself stands.
 
-### 3.0 · Phase 0 — the measurement that rules fork 3
+### 3.0 · ⚠ MOVED to [W-87](W-87-what-good-means.md) P3 on 2026-08-27
+
+> **Arpit, 2026-08-27:** *"first, we need to define what good is and then maybe
+> run all those benchmarks, test, regression, etcetera."* Every measurement,
+> benchmark and verification task left in W-82 moved to **W-87**, which is now
+> the measurement item.
+>
+> ⚠ **§3.0 is NOT blocked by W-87's Phase 0.** Its threshold is already frozen
+> and a frozen threshold may never move — it lives there because it is
+> measurement work, **not because it is waiting on the quality contract.** It
+> runs the moment a URL corpus exists.
+>
+> ⚠ **Its two dependent forks moved with it** — §5.1 forks 3 and 4 are
+> [W-87 P4](W-87-what-good-means.md), because a fork gated on a number belongs
+> beside the number.
+>
+> **The spec below is kept as written and is the live spec** — W-87 P3 restates
+> the thresholds and points here for the detail.
+
+#### (the original spec) Phase 0 — the measurement that rules fork 3
 
 **No new code.** Run `fux update` twice against a real URL corpus; count the
 fraction of fetched documents whose **sanitized** sha was unchanged.
@@ -319,7 +338,17 @@ with the rule that `cached` is never folded into `current`.
 
 **Record:** ADR-ANSWER.
 
-### 3.5 · Phase 5 — the measurement apparatus (`agent` lane, independent)
+### 3.5 · ⚠ MOVED to [W-87](W-87-what-good-means.md) P1 on 2026-08-27
+
+> The sealed subset, the decoy set, the content-free placebo and the
+> orphaned-module check are the apparatus the **quality contract** needs, so
+> they went to W-87 with it. Owed since W-78 ruling 2 was accepted, and ⚠
+> **nothing may cite any of it as in force until it is built** — ADR-RS still
+> reads *"the sealed set and the two controls -- owed, not built"*.
+>
+> **The spec below is kept as written and is the live spec.**
+
+#### (the original spec) Phase 5 — the measurement apparatus (`agent` lane, independent)
 
 Unrelated to the URL work and blocked on nothing. **A rule that is written and
 unbuilt reads as in force**, and two of the six accepted parts of the
@@ -698,12 +727,35 @@ integer cannot express.
 
 ## §5 — Blocked on a ruling — the register
 
+> ## ✅ RE-DERIVED 2026-08-27 — W-82 has ZERO open forks of its own
+>
+> Counted against the code and the ledger, not against this file's own prose,
+> because `OPEN-WORK.md` rule 4 says the markers here are assertions.
+>
+> | | n | where it went |
+> |---|---:|---|
+> | **ruled** | **18** | [the ledger](W-82-rulings-2026-08-27.md) §The eighteen |
+> | §5.2, *what "right" means* | 6 | **moved wholesale** to [W-87](W-87-what-good-means.md) |
+> | forks 3 and 4 | 2 | **moved** to [W-87](W-87-what-good-means.md) P4 — and ✅ **fork 3's gate, P3, PASSED 2026-08-27** ([verdict](../regression/2026-08-27-p3-sha-stability/VERDICT.md)); *cleared is not decided* |
+> | §3.6 fork A, does a `fux-usage` skill ship | 1 | **answered by the build, never by a ruling** — it shipped for both vendors (`.claude/skills/fux-usage/`, `.kiro/skills/fux-usage/`) |
+> | **total** | **27** | |
+>
+> **Verified against the repo, not the prose:** `src/fux/__main__.py` exists and
+> `python -m fux --version` works (ruling 14); `copilot` is still in `setup.py`'s
+> `install` list (ruling 13); both usage skills are on disk (fork A).
+>
+> ⚠ **What is still W-82's and is NOT a fork:** ruling 3, narrow-by-default,
+> held on Arpit's judgement — see `OPEN-WORK.md` §Blocked on Arpit — decisions.
+> The daemon is now proven on the real internet, so the hold no longer rests on
+> missing evidence.
+
+
 **Twenty-seven forks — twenty-three inherited, plus §3.6's. One of §3.6's is now
 ruled (C: **Claude and Kiro**); it split into two smaller ones, so the count
 holds. No agent may pick a default on any of them.** §3.6's are stated in full at the end of that
 section rather than repeated here, because they are read alongside the ladder.
 
-### 5.1 · URL freshness — 8 forks
+### 5.1 · URL freshness — 8 forks · ⚠ **SEVEN RULED; only forks 3 and 4 remain, and both moved to [W-87](W-87-what-good-means.md) P4**
 
 | # | fork | proposed, where one exists |
 |---|---|---|
@@ -712,9 +764,14 @@ section rather than repeated here, because they are read alongside the ladder.
 | 3 | **amend the four-function contract with `validate`?** | yes, optional, `http.py` shipping the proof — **gated on §3.0** |
 | 4 | **token storage** | runtime-only first; decide the committed sidecar on the numbers |
 | 5 | **concurrency shape** | ✅ **ruled 2026-08-26** — §4.2 |
-| 6 | **cap default and scope** | `4`, global, promote on an observed 429 |
+| 6 | **cap default and scope** | ✅ **RULED 2026-08-27 (Arpit): `4`, GLOBAL, unchanged.** Ruling 12's backoff is what made this safe to leave alone — a too-high cap now **retries** instead of failing, so a wrong value is self-correcting rather than damaging, and `fux doctor` plus the stderr note name the host so the consumer can lower it themselves. **Per-host was considered and refused**: a second number governing one behaviour is the drift ADR-CONFIDENCE decision 6 was rewritten to stop, and it would slow the common case where URLs are spread across hosts. Lowering to `2` was refused too — every repo would pay double the wall-clock to protect the minority that rate-limit, which ruling 12 already handles without a permanent slowdown |
 | 7 | **what the narrowed refresh is called** | `--dirty`? `--stale`? `--changed`? **Cheap now, a deprecation cycle in a month** |
-| 8 | **dead-URL reporting** | both `doctor` and the `update` summary |
+| 8 | **dead-URL reporting** | ✅ **RULED AND BUILT 2026-08-27 (Arpit): both.** `fux update` now names any URL whose failure **streak** has reached `FAILING_STREAK` (5) and says what to do about it; `doctor` is unchanged. ⚠ **The gap it closes: one failure and forty looked identical** — every failed fetch already printed as a skip with a reason, so a URL dead three weeks read exactly like one that blipped once, and the streak was visible only to whoever thought to run `doctor`. **The person who can fix a dead URL is the one who just ran `update`.** ⚠ **It never exits non-zero**, deliberately: a wiki that moved is a fact outside the repo, and a build break on every run until someone edits a source list is a worse trade than a loud line. `tests/ingest/test_dead_urls.py`, 12 tests |
+
+> ⚠ **Forks 3 and 4 MOVED to [W-87](W-87-what-good-means.md) P4 on
+> 2026-08-27**, with §3.0 (now W-87 P3) — the measurement that settles them. A
+> fork gated on a number belongs beside the number. **The analysis below is
+> kept as written and is the live analysis.**
 
 **On fork 3 — the case for `validate`, and the honest case against.**
 
@@ -766,7 +823,22 @@ set at two) · an adaptive per-URL crawl schedule (the literature does not
 straightforwardly support proportional-to-change-rate over uniform) · a
 push/webhook receiver (that is consumer code calling `fux update`).
 
-### 5.2 · What "right" means — 6 forks
+### 5.2 · What "right" means — ⚠ MOVED OUT 2026-08-27, see [W-87](W-87-what-good-means.md)
+
+> **This section holds no live forks.** Arpit split it out on 2026-08-27 —
+> *"let's cover it as part of separate work"* — because it is the only thing
+> left in W-82 that is a **decision** rather than a measurement or a merge
+> conflict, and its scope is the whole project rather than the URL plane.
+>
+> **The item:** [`W-87-what-good-means.md`](W-87-what-good-means.md).
+> **The researched verdict:** [`../compare/what-good-means.compare.md`](../compare/what-good-means.compare.md).
+>
+> ⚠ **W-82 may not be closed on the strength of this move.** A fork that
+> changed file is still a fork that is open; §7's definition-of-done drops
+> these six rows and gains nothing.
+>
+> **The text below is kept as the statement of the problem** — W-87 restates it
+> and adds the research, so if the two ever disagree, **W-87 is the live one.**
 
 **Fux measures rigorously and has never declared what it is measuring.** ADR-RS
 governs *how* a claim is frozen and is silent on *what quantity is worth

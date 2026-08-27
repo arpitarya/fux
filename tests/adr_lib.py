@@ -34,10 +34,16 @@ def _table_rows(text: str, start: str, end: str) -> list[list[str]]:
     return rows
 
 
-def ownership_table() -> dict[str, str]:
-    """component -> owner (an `ADR-NAME` or a `W-nn` id), from the register."""
+def ownership_table(text: str | None = None) -> dict[str, str]:
+    """component -> owner (an `ADR-NAME` or a `W-nn` id), from the register.
+
+    `text` is the register's content, defaulting to the working tree's.
+    `test_adr_freshness.py` passes an OLD revision of the register so that each
+    commit is judged against the table as it stood **at that commit** -- a row
+    written today may not convict a commit written before it existed.
+    """
     rows = _table_rows(
-        REGISTER.read_text(encoding="utf-8"),
+        REGISTER.read_text(encoding="utf-8") if text is None else text,
         "<!-- OWNERSHIP-TABLE-START -->",
         "<!-- OWNERSHIP-TABLE-END -->",
     )
@@ -48,6 +54,51 @@ def ownership_table() -> dict[str, str]:
         assert component not in table, f"{component} is claimed twice in the ownership table"
         table[component] = owner
     return table
+
+
+def describes_table(text: str | None = None) -> dict[str, list[str]]:
+    """component -> the records that DESCRIBE it but do not own it.
+
+    [ADR-OWNERSHIP](../docs/adr/0049_ownership.md). A second, additive relation:
+    ownership stays exactly one record per component, and any number of records
+    may describe one. Parsed rather than hard-coded for the same reason the
+    ownership table is — a table a test hard-codes is two sources that drift.
+
+    `text` is the register's content, defaulting to the working tree's — see
+    `ownership_table` for why an old revision is ever passed. **A register old
+    enough to predate ADR-OWNERSHIP has no `DESCRIBES` markers at all**, so this
+    returns an empty relation there rather than raising: the relation did not
+    exist yet, which is exactly what "empty" means.
+    """
+    if text is not None and "<!-- DESCRIBES-TABLE-START -->" not in text:
+        return {}
+    rows = _table_rows(
+        REGISTER.read_text(encoding="utf-8") if text is None else text,
+        "<!-- DESCRIBES-TABLE-START -->",
+        "<!-- DESCRIBES-TABLE-END -->",
+    )
+    table: dict[str, list[str]] = {}
+    for cells in rows:
+        component = cells[0].strip("`").rstrip("/")
+        record = cells[1].strip().strip("*").strip("`")
+        table.setdefault(component, []).append(record)
+    return table
+
+
+def describers_of(changed: str, table: dict[str, list[str]] | None = None) -> list[str]:
+    """Every record that describes `changed`, by the same prefix rule as `owns`.
+
+    ⚠ **All matches, not the longest one.** Most-specific-wins exists so there
+    is exactly ONE owner; describing is a set and every member fires, so
+    narrowing it to the most specific row would silently drop describers of a
+    parent directory — the precise class of miss this relation exists to end.
+    """
+    table = describes_table() if table is None else table
+    found: list[str] = []
+    for component, records in table.items():
+        if changed == component or changed.startswith(component + "/"):
+            found.extend(records)
+    return sorted(set(found))
 
 
 def owned_paths(table: dict[str, str] | None = None) -> list[str]:
@@ -64,14 +115,14 @@ def owner_of(changed: str, table: dict[str, str] | None = None) -> str | None:
     return None
 
 
-def register_names() -> dict[str, Path]:
+def register_names(text: str | None = None) -> dict[str, Path]:
     """ADR-NAME -> the record's file, from the register's record-listing table.
 
     The link may point into `docs/adr/` or `work/adr/`; it is resolved
     relative to the register, so the table stays the single source of both a
     record's name and its current state.
     """
-    text = REGISTER.read_text(encoding="utf-8")
+    text = REGISTER.read_text(encoding="utf-8") if text is None else text
     names: dict[str, Path] = {}
     pattern = r"\[(\d{4})\]\(([^)]*\d{4}_[^)]+\.md)\)\s*\|\s*\*\*(ADR-[A-Z0-9-]+)\*\*"
     for m in re.finditer(pattern, text):
@@ -83,14 +134,14 @@ def open_work_ids() -> set[str]:
     return set(re.findall(r"\bW-\d{2}\b", OPEN_WORK.read_text(encoding="utf-8")))
 
 
-def record_path_for(owner: str) -> Path | None:
+def record_path_for(owner: str, text: str | None = None) -> Path | None:
     """The file that IS `owner`'s record — an ADR's own file, or a `W-nn`
     item's detail file under `work/open/`. `None` when it cannot be resolved
     (an unknown owner — test_adr_ownership.py's test_every_owner_resolves is
     what catches that; this function just declines to guess).
     """
     if owner.startswith("ADR-"):
-        return register_names().get(owner)
+        return register_names(text).get(owner)
     if re.fullmatch(r"W-\d{2}", owner):
         matches = sorted(OPEN_DIR.glob(f"{owner}-*.md"))
         return matches[0] if matches else None

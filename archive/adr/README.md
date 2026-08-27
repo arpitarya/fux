@@ -31,16 +31,49 @@ ever left ungrounded. In that one change:
    fails otherwise, which is the point.
 5. Repoint every live citation of it at the successor's **name**.
 
+## ⚠ The live number line was renumbered on 2026-08-27 — a retired number here does not line up with the live one
+
+**`0025` was vacated and then reused.** `ADR-CODES-TABLE` retired out of `0025`
+with **no successor** (its subject, `codes.jsonl`, was deleted rather than
+replaced), and on 2026-08-27 Arpit ruled the resulting hole closed: every live
+record from `0026` up moved **down by one**. So `0025` is now
+[ADR-RUNTIME-MANIFEST](../../docs/adr/0025_runtime-manifest.md), and the `0025`
+row below is a **different record entirely**.
+
+Three consequences, none of them cosmetic:
+
+- **A retired number and a live number are two different address spaces**, and
+  always were — `0022` and `0037` below already collided with live records
+  before this renumber. Uniqueness is per directory, which is what
+  `tests/test_adr_ownership.py` checks.
+- **The `superseded by` column is a NAME for exactly this reason.** A name
+  survives a renumber; the link beside it is a convenience that does not. If a
+  link in this table ever disagrees with its name, **the name wins.**
+- **Any document written before 2026-08-27 may name a record by a number that
+  now means something else.** [`work/WORKLOG.md`](../../work/WORKLOG.md) is
+  append-only, so a number of those sentences stand uncorrected on purpose.
+
 ## The map
 
 | retired # | record | superseded by | date |
 |---|---|---|---|
+| [0017](0017_enriched-mode.md) | **ADR-ENRICHED** — the `enriched` (model-assisted) ingest mode | [ADR-ENRICH](../../docs/adr/0040_enrich.md) *(the whole record; its ratified content was folded in **verbatim first**, W-82 ruling 6, so no sentence was archived before it had a live home)*. ⚠ **The mode is still NOT authorized to be built** — superseding moved the decision, it did not grant the sign-off | 2026-08-27 |
 | [0001](0001_ingest-mode-naming.md) | **ADR-INGEST-MODES** — ingest-mode naming | [ADR-INGEST](../../docs/adr/0007_ingest.md) | 2026-08-18 |
 | [0022](0022_archived-signal.md) | **ADR-ARCHIVED-SIGNAL** — retired content is annotated, never reordered | [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) *(the whole record; `archived` becomes **declared** on a line rather than **derived** from the path)* | 2026-08-19 |
 | [0004](0004_index-format.md) | **ADR-INDEX-FORMAT** — index format & committed store | [ADR-INGEST](../../docs/adr/0007_ingest.md) *(ingest)* · [ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md) *(storage)* · [ADR-RECORD](../../docs/adr/0010_index-record.md) *(schema)* | 2026-08-18 |
 | [0005](0005_derived-accelerator.md) | **ADR-ACCELERATOR** — derived T1 accelerator + the differential law | [ADR-ASK](../../docs/adr/0004_ask.md) *(query)* · [ADR-T1-ACCELERATOR](../../docs/adr/0011_accelerator.md) *(build)* | 2026-08-18 |
 | [0010](0010_url-source-consumer-middleware.md) | **ADR-URL-MIDDLEWARE** — URL source via consumer middleware | [ADR-URL-INGEST](../../docs/adr/0008_url-ingest.md) | 2026-08-18 |
 | [0011](0011_fux-dir-layout.md) | **ADR-FUX-DIR** — the `.fux/` layout | [ADR-DOTFUX](../../docs/adr/0003_fux-directory.md) *(layout)* · [ADR-CONFIG](../../docs/adr/0014_config.md) *(config)* | 2026-08-18 |
+| [0025](0025_codes-table.md) | **ADR-CODES-TABLE** — `codes.jsonl`, the dense lane's per-document codes | **none — the subject was deleted, not replaced.** The live record of the refusal is [ADR-ASK](../../docs/adr/0004_ask.md) decision 9 | 2026-08-27 |
+| [0037](0037_t2-segments.md) | **ADR-T2-SEGMENTS** — the T2 tier, deliberately not built | **none — a tier that was measured and declined.** The measurement stands; nothing replaced the record | 2026-08-22 |
+
+⚠ **Two rows above have no successor, and that is a distinct outcome from
+supersession.** A superseded record was replaced by a better decision; these two
+describe subjects that **ceased to exist** — one deleted after its gate failed,
+one never built. Neither may be revived by pointing at this file: a revival
+needs a new record and Arpit's sign-off, exactly as
+[ADR-PORT-LIST](../../docs/adr/0015_port-list.md) decision 6 says of a retired
+port.
 
 **All five went in one change**, on Arpit's instruction, rather than one at a
 time as each successor was accepted. Two consequences follow and are recorded

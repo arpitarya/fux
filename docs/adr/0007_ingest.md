@@ -2,106 +2,68 @@
 type: ADR
 name: ADR-INGEST
 title: ADR-INGEST (0007) — how ingest works
-description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported, deletions honoured, output byte-identical."
+description: "Re-resolve every edge every run; carry unchanged documents' extraction forward. Write only shards whose bytes changed. Skips are reported once, counted by class, and recorded in the committed `.fux/.fuxignore`; deletions honoured, output byte-identical."
 status: accepted
+date: 2026-08-18
+feature: the `fux ingest` pipeline — sources to committed records
+owns: [src/fux/ingest, src/fux/ingest/priors.py]
+laws: [L2, L3, L4]
 timestamp: 2026-08-20T00:00:00Z
 ---
 
 # ADR-INGEST — how ingest works
 
-- **Name:** `ADR-INGEST` — cite this everywhere; never cite the number
-- **Status:** accepted
-- **Supersedes:** `ADR-INDEX-FORMAT / ADR-INGEST-MODES` — **archived 2026-08-18** at
-  [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** `src/fux/ingest/`
-- **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-18 · **amended 2026-08-20** — the veto condition fired; decision 1 is now a two-pass split (decision 1b)
-- **Feature:** the `fux ingest` pipeline — sources to committed records
-- **Evidence:** [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §4
-
----
-
-> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
->
-> **The embedding pass is gone from ingest** (Arpit, 2026-08-25), and with it
-> the largest single cost this record has ever described.
->
-> **What this changes about the cost story.** `EXTRACTED_FIELDS` is now
-> `("title", "phrases", "terms", "flen")` — `code` and `vectors` are removed
-> from the carry-forward set, so an incremental run drops them from an existing
-> record rather than preserving them, and a delta run stays byte-identical to a
-> full run, which is the invariant that matters here.
->
-> ⚠ **The carry-forward optimisation is KEPT, and its justification is now
-> weaker.** It was introduced because **92 % of a full ingest was the dense
-> embedding**; that 92 % no longer exists. What remains is the difference
-> between re-tokenising a corpus and re-tokenising a commit — still worth
-> having, still what makes R5 reachable, but no longer the dominant term.
-> **Nobody has re-measured the split since the model came out**, and this
-> record should not be read as claiming a number it does not have.
-
-> ## Amended 2026-08-25 (cleanup) — a consequence restated without its dead example
->
-> The incremental-ingest consequence *"a newly-available embedding bundle does
-> not retro-fit `code` onto unchanged documents"* named two things that no
-> longer exist. **The property it describes is the carry-forward's and outlives
-> any particular field**, so it is restated generally rather than deleted: a new
-> extraction rule does not reach an unchanged document until that document
-> changes or `--full` runs. `src/fux/ingest/run.py`'s module docstring matches.
-
 ## §1 — For humans
 
-Ingest turns whatever your `fux.toml` points at into committed records. It runs
+Ingest turns whatever the source lists point at into committed records. It runs
 in five steps — walk, parse, extract, resolve edges, write — and the interesting
-design is in the last one.
+design is in the last two.
 
 **Every edge is re-resolved on every run. Extraction is not.** An edge can point
 at a document elsewhere in the corpus, so adding one file can resolve a link
 that was dangling in another — edges cannot be carried forward. Extraction
 cannot depend on anything *but* one document's own bytes, which is what
 `extracted` mode means, so a file whose `sha` is unchanged keeps the `title`,
-`phrases`, `terms`, `wlen` and `code` it already had.
-
-> **Amended 2026-08-24 (W-76 Phases 1 and 7).** The list read *"`title`,
-> `phrases`, `terms`, `wlen` and `code`"*. `wlen` is gone — Phase 1 replaced it
-> with `flen`, the five raw per-field token counts, because a *weighted* sum
-> computed at ingest made a committed field a function of a tunable. `code` is
-> gone too, and **what replaced it is why this paragraph matters more than it
-> used to**: Phase 7 commits per-chunk `int8` `vectors`, and they are carried
-> forward by exactly this mechanism.
->
-> The measurement below says 92 % of a full ingest sat in the embedding. Phase 1
-> removed that embedding and Phase 7 put a **denser** one back — measured
-> 2026-08-23, a full ingest of 1 000 documents went **0.95 s → 6.46 s, 6.8×
-> slower**. **The post-commit hook did not move (+10 %)**, and the only reason
-> is the sentence above: carry-forward re-embeds changed documents and nothing
-> else, so the cost lands on `--full` and on a first ingest, which is where it
-> can be afforded. `vectors` is now the field this whole decision is paying for.
+`phrases`, `terms` and `flen` it already had.
 
 **That split was a measurement, not a preference.** This record originally
-re-extracted everything and said so; its veto condition named "full
-re-extraction becomes the measured bottleneck at scale" as the thing that would
-reopen it. On 2026-08-20 it did:
-[the cost profile](../../work/regression/2026-08-20-ingest-cost-profile/report.md)
-puts **92 % of a full ingest inside `_fuxvec_code`**, the dense embedding, and
-parse-plus-edge-resolution under 5 %. Carrying extraction forward makes a
-re-ingest of an unchanged 1 000-document corpus **23× faster** and byte-identical.
+re-extracted everything, and its veto condition named "full re-extraction
+becomes the measured bottleneck at scale" as the thing that would reopen it.
+[The cost profile](../../work/regression/2026-08-20-ingest-cost-profile/report.md)
+fired it, and carrying extraction forward made a re-ingest of an unchanged
+1 000-document corpus **23× faster** and byte-identical.
 
-The **write** is still incremental too: a shard whose bytes come out identical
-is left untouched on disk, so git sees nothing. Re-running ingest on an
-unchanged corpus produces byte-identical shards and an empty `git status`,
-while editing one document rewrites exactly one shard.
+⚠ **The measured split no longer describes the current pipeline, and the record
+says so rather than reusing the number.** 92 % of that full ingest sat in a
+dense embedding pass which has since been deleted
+([ADR-ASK](0004_ask.md) decision 9). What carry-forward saves today is the
+difference between re-tokenising a corpus and re-tokenising a commit — still
+worth having, still what makes the hook path affordable, but **nobody has
+re-measured the split**, and this record does not claim a number it does not
+have.
 
-Files that cannot be indexed are **reported, never silently dropped** — empty,
-binary, whatever the reason, with the reason.
+The **write** is incremental too: a shard whose bytes come out identical is left
+untouched on disk, so git sees nothing. Re-running ingest on an unchanged corpus
+produces byte-identical shards and an empty `git status`, while editing one
+document rewrites exactly one shard.
+
+Files that are not indexed are **reported, never silently dropped** — with the
+reason, the first time each is seen.
+
+**And they are counted in two buckets, because they are two different kinds of
+news.** `not indexed` is a committed list doing its job — the type allowlist,
+a `.fuxignore` line, a `!` exclusion — and needs nobody's attention. `skipped`
+is a file fux opened and could not read, and might. On this repo one number
+over both populations read **`599 skipped`**, of which 598 were the allowlist
+working exactly as designed.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
 ```mermaid
 flowchart LR
-    S[".fux/sources/dirs<br/>one entry per line"] --> W["walk<br/>skips reported"]
-    W --> P["parse<br/>frontmatter + NFC"]
-    P --> X["extract<br/>title · phrases · terms · flen · vectors<br/><i>skipped when sha is unchanged</i>"]
+    S[".fux/sources/dirs<br/>one entry per line"] --> W["walk<br/>skips reported once<br/><i>not indexed vs skipped</i>"]
+    W --> P["parse + decode<br/>frontmatter + NFC"]
+    P --> X["extract<br/>title · phrases · terms · flen<br/><i>skipped when sha is unchanged</i>"]
     X --> E["resolve edges<br/>corpus-wide, every run"]
     E --> WR["write<br/>identical bytes = no write"]
     WR --> I[".fux/index/*.jsonl"]
@@ -113,14 +75,14 @@ flowchart LR
 
 ```text
   sources  ->  walk  ->  parse  ->  extract  ->  resolve  ->  write
- (.fux/       skips    frontmatter  title      edges       identical bytes
-  sources/    reported   + NFC      phrases   (corpus-wide,   = no write
-  dirs)                            SKIPPED     every run)
-                                   when sha
-                                  unchanged
-                                    terms
-                                    flen                         |
-                                   vectors                       v
+ (.fux/       skips     decode +    title      edges       identical bytes
+  sources/   reported  frontmatter  phrases   (corpus-wide,   = no write
+  dirs)        once      + NFC      SKIPPED     every run)
+            in TWO                 when sha
+            counts:               unchanged
+          not indexed               terms
+          vs skipped                flen                         |
+                                                                 v
                                                         .fux/index/*.jsonl
                                                                  |
                                                                  v
@@ -129,16 +91,6 @@ flowchart LR
 ```
 
 </details>
-
-> **Amended 2026-08-24 (W-76 Phases 1 and 7) — both halves of the pair,
-> together.** Both drew the extract step as *"title · phrases · terms ·
-> `wlen`"*. `wlen` is not extracted and is not committed: `flen` is, and `wlen`
-> is derived at query time by `bm25f.derive_wlen()` from the weights in force.
-> **The missing box is the expensive one** — `vectors`, one committed `int8`
-> vector per chunk, is what the extract step now spends its time on, and a
-> diagram of the ingest pipeline that omits the step costing **6.8× on a full
-> run** is drawing the wrong shape. The *"skipped when sha is unchanged"* note
-> is unchanged and is what keeps that cost off the hook path.
 
 ### Examples
 
@@ -150,15 +102,28 @@ $ sha1sum .fux/index/*.jsonl > /tmp/a && fux ingest >/dev/null \
 IDENTICAL
 ```
 
-One document edited — one shard written, two carried forward, skips reported.
-Captured 2026-08-20 on a five-file fixture, after decision 1b:
+One document edited — one shard written, two carried forward, skips reported:
 
 ```console
 $ printf '\nA sentence added.\n' >> docs/refer.md
 $ fux ingest
-ingested 3 docs (1 changed, 2 carried forward), 2 skipped, 1 shards written
+ingested 3 docs (1 changed, 2 carried forward), 1 not indexed, 1 skipped, 1 shards written
+  not indexed docs/logo.png: not an indexed file type
   skip docs/empty.md: empty
-  skip docs/logo.png: not an indexed file type
+```
+
+and the run leaves that list in the committed `.fux/.fuxignore`:
+
+```console
+$ head -8 .fux/.fuxignore
+# >>> fux: not indexed >>>
+# a committed list said not to index these. Rewritten by every `fux ingest`.
+docs/logo.png   # not an indexed file type
+# <<< fux: not indexed <<<
+
+# >>> fux: skipped >>>
+# fux opened these and could not read them.
+docs/empty.md   # empty
 accelerator: 13 terms, 13 blocks, 13 postings (derived, not committed)
 ```
 
@@ -184,24 +149,20 @@ document can resolve a link that was dangling in an untouched one. Skipping
 that at this layer would leave the edge dangling forever, with no error and no
 way to notice.
 
-**1b. Carry an unchanged document's extraction forward** — `title`, `phrases`,
-`terms`, `wlen`, `code` — when its content `sha` matches the record already in
-the index, it is a `file:` record with `meta: plain`, and the shard header
-still equals `store.HEADER`. **`fux ingest --full` re-extracts regardless.**
+**1b. Carry an unchanged document's extraction forward** when its content `sha`
+matches the record already in the index, it is a `file:` record with
+`meta: plain`, and the shard header still equals `store.HEADER`. **`fux ingest
+--full` re-extracts regardless.**
 
-> **Amended 2026-08-24 (W-76 Phases 1 and 7).** The carried set is now
-> `("title", "phrases", "terms", "flen", "code", "vectors")` —
-> `run.py::EXTRACTED_FIELDS`, which is the normative list. `wlen` became
-> `flen`; `vectors` joined. `code` is still *named* in the tuple and **no
-> record carries it**: nothing writes one any more, so the entry only ever
-> matches a pre-v2 record — and the third gate condition, the shard header
-> equalling `store.HEADER`, refuses those outright. It is inert rather than
-> wrong.
->
-> **The three gate conditions are untouched, and one of them is now doing more
-> work than when it was written.** `vectors` is a model output, so a
-> carried-forward vector produced by a different model bundle would be exactly
-> the silent cross-version mixing the header check exists to stop.
+**The carried set is declared, not written twice.**
+`run.py::EXTRACTED_FIELDS` reads
+`store.recordschema.carried_fields()`, which reads the `carried: true` flags in
+`store/index-record.schema.json`. Today: `title`, `phrases`, `terms`, `flen`.
+
+⚠ **`edges` is deliberately not carried, and the schema says why where the
+exclusion lives**: it is the one field the rest of the corpus can change without
+this document changing, so carrying it forward would freeze a link a newly added
+document should have resolved.
 
 The gate is those three conditions together, and each is load-bearing:
 
@@ -211,6 +172,11 @@ The gate is those three conditions together, and each is load-bearing:
 | `file:` and `meta: plain` | a `url:` record, which only reappears on a fenced networked run, and a hashed record whose display fields were deliberately never stored reusably |
 | the header equals `store.HEADER` | **two analyzers inside one index** — undetectable afterwards, and a silent differential-law break |
 
+The header pins `analyzer`, so a format change that moves the analyzer
+invalidates every carried field at once rather than letting a v1 `flen` survive
+beside a v2 `terms`. **A format change that does *not* move the analyzer needs
+its own invalidation and does not get it for free.**
+
 **The output is byte-identical to a full run, and that is the property under
 test** — asserted after an edit, an addition and a deletion in
 [`tests/ingest/test_delta.py`](../../tests/ingest/test_delta.py), each against
@@ -218,16 +184,56 @@ the full run's own bytes rather than a hand-written expectation.
 
 **2. Incremental means incremental *writes*.** `write_index` leaves a shard
 untouched when its bytes come out identical. This is what keeps `git status`
-clean and makes re-ingest free in review terms, and it is the only place the
-word "incremental" applies.
+clean and makes re-ingest free in review terms, and it is the only other place
+the word "incremental" applies.
 
 **3. `ver` bumps strictly on this record's own `sha` changing** — never on an
 edge change. A version is a statement about the document, not about its
 neighbourhood, or every doc would churn whenever any doc moved.
 
-**4. Skips are reported with a reason, always.** In the run summary, and
-listable without writing anything via `--list-skipped`. A silently dropped file
-is indistinguishable from a file that was never there.
+**4. Skips are reported with a reason — once, not on every run.** Every skip
+reaches the console the first time it is seen; a later run prints only what is
+**new**, then one counted line for the rest.
+
+**This is the rule defended, not weakened.** A silently dropped file is
+indistinguishable from a file that was never there — but on a real corpus an
+unconditional list is a wall of identical lines on every run, and a wall nobody
+reads makes a dropped file exactly as invisible as silence would. Nothing is
+suppressed that has not already been shown.
+
+**The key is `(path, reason)`, so a changed reason is news again.** A file whose
+skip reason moves from `empty` to `not an indexed file type` prints again; so
+does a fetch failure whose message changes.
+
+**The already-reported set lives in `.fux/.fuxignore`** —
+`ingest/skipnotice.py` writes it there through
+[ADR-FUXIGNORE](0048_fuxignore.md) decision 11, in two delimited blocks,
+sorted, with **no wall clock**. It was `.fux/runtime/skipped` until Arpit ruled
+on 2026-08-27 that a record of what fux did not index belongs in the committed
+file already named after that question. Three properties are load-bearing and
+each is tested:
+
+| property | why |
+|---|---|
+| a path a **hand-written** pattern covers is not news either | such a path gets no generated line (one line beats many), so without this rule it would have nothing recording it and would print every run forever — W-88's wall, rebuilt by W-93's fix |
+| a missing or unparseable file reads as *nothing reported yet* | the safe direction to fail in is printing again, never suppressing something unseen |
+| a **URL** is never recorded, and prints on every networked run | `.fuxignore` matches repo-relative paths and a URL has none (ADR-FUXIGNORE decision 11c). Accepted: a repo has a handful of dead URLs, not hundreds, and repeat failure is already `.fux/runtime/url-state.json`'s job |
+
+⚠ **The set now DECIDES, where the runtime file only described.** A recorded
+path is ignored *because it is recorded*, which freezes the verdict that put it
+there. That cost is ADR-FUXIGNORE decision 11's to carry; what belongs here is
+that it is why `render` can suppress at all — the record and the rule are now
+one file.
+
+**Two escape hatches, both pre-existing:** `fux ingest --list-skipped` walks and
+prints everything, writing nothing; and the notice file itself is `cat`-able.
+**The suppressed count names them both in its own line**, so the way out is on
+screen rather than in a record.
+
+⚠ **What this does not touch:** the skip *rules*, the reasons,
+`--list-skipped`, or any committed byte. The summary counts every skip and not
+only the new ones — in **two counts** rather than one, which is decision 15's
+half of the line, not this one's.
 
 **5. A deleted document's record is removed**, and its shard file with it if it
 becomes empty. The committed index reflects the corpus, not the corpus's
@@ -246,36 +252,137 @@ before the first byte lands.
 ([ADR-URL-INGEST](0008_url-ingest.md)); a plain run never imports the fetcher.
 
 **9. De-listing is honoured on every run; only *fetching* needs the fenced
-path** (2026-08-21, W-63). A `url:` record is carried forward for exactly as
-long as its line exists in `.fux/sources/urls`. Reading that file is not a
-network call, so removing a document never was a networked operation — and
-requiring the network for it meant `fux remove <URL>` could not work offline.
+path.** A `url:` record is carried forward for exactly as long as its line
+exists in `.fux/sources/urls`. Reading that file is not a network call, so
+removing a document never was a networked operation — and requiring the network
+for it would mean `fux remove <URL>` could not work offline.
 
-**This is a behaviour change, and the prior sentence described a defect.**
-This record and `ingest/run.py`'s docstring both used to say reconciliation
-*"happens only on the run that opted into the network"*, stated as design.
-The transient-failure guarantee is untouched and is a separate rule: a URL
-**still listed** whose fetch fails keeps its prior record, because a network
-blip must never delete a document. Reconciliation keys on the list; carry-
-forward keys on the fetch. Conflating the two is what produced the defect.
+**Reconciliation keys on the list; carry-forward keys on the fetch.** The
+transient-failure guarantee is a separate rule and is untouched: a URL **still
+listed** whose fetch fails keeps its prior record, because a network blip must
+never delete a document. Conflating the two is what produced the defect this
+decision fixed.
 
 A missing list with surviving `url:` records is a **loud error**, not a mass
 deletion — the same way a missing `dirs` file is. The two silent readings are
 both worse: emptying every URL document because a file went missing, or
 carrying them forever.
 
-**10. A carried record's edges are re-checked against this run's id set**
-(2026-08-21, W-63). Decision 1's split says extraction may be carried forward
-and edges may not — but a *carried* record was exempt from that in practice,
-because it was reused whole. Its edges were resolved against a **previous**
-run's corpus, so a document removed since survived as an edge target.
-`tag:` targets are exempt: a tag node is minted by the edge and is never a
-document, so it cannot dangle. A record whose edges all still resolve is
-returned uncopied, so an unchanged run still writes byte-identical shards.
+**10. A carried record's edges are re-checked against this run's id set.**
+Decision 1 says edges may not be carried forward — but a *carried* record was
+exempt from that in practice, because it was reused whole. Its edges were
+resolved against a **previous** run's corpus, so a document removed since
+survived as an edge target. `tag:` targets are exempt: a tag node is minted by
+the edge and is never a document, so it cannot dangle. A record whose edges all
+still resolve is returned uncopied, so an unchanged run still writes
+byte-identical shards.
+
+**11. Whether bytes are readable is the decoder registry's question, not the
+walker's.** "Binary" and "non-UTF-8" are not sufficient reasons to skip: a
+`.docx` is a zip and a `.pdf` is compressed streams — both contain NUL bytes,
+neither decodes as UTF-8, and both are documents. `_skip_reason` asks the
+registry whether anything claims the extension **before** it judges the bytes.
+**Empty stays a skip unconditionally**: there is nothing for any decoder to
+read.
+
+- `parse_document(content, rel_path, root)` is the seam, and returns `None` for
+  a document nothing could read. `parse(content)` is unchanged and still handles
+  already-prose files, so **no existing corpus moves**.
+- `run.py` **drops** an undecodable document rather than raising, and parsing
+  happens *above* `file_shas` so an unreadable file contributes no sha either —
+  a sha with no record behind it would make the reuse map claim a document the
+  index does not contain.
+
+⚠ **`DEFAULT_TYPES` is unchanged by this.** [ADR-TYPES](0031_types-list.md)
+verdict G was measured, and a measurement is replaced only by a better
+measurement. A consumer opts a decodable type in through `.fux/sources/types`,
+which was always permitted.
+
+**12. Both record kinds are assembled through the schema.** The `git` and `url`
+records were two inline dicts a few dozen lines apart, and the carried set was a
+tuple with no connection to either. All three come from
+`store/index-record.schema.json` via `store/recordschema.py`. The file
+**declares a shape and is checked against the module**, rather than being copied
+and filled in.
+
+**13. Ingest stamps `archived: true` on records from a declared-archived
+source** ([ADR-ARCHIVED-CONTENT](0037_archived-content.md) decision 1). It reads
+`archived_dirs()` — the same `.fux/sources/dirs` declaration the grammar already
+parses — and never a path convention. Three properties, each deliberate:
+
+- **Absent when false**, so a live record's shape is unchanged and no existing
+  consumer's parse breaks. `_format` is **not** bumped: the property set grows
+  by an optional key that older readers ignore.
+- **Git records only.** A `url:` record has no directory entry to fall under, so
+  the question does not arise.
+- **It changes committed bytes for the archived population**, so the change that
+  ships it re-ingests, and that diff is expected rather than a determinism
+  failure. L3 still holds: same sources, same declaration, same bytes.
+
+**15. A skip carries its CLASS, and the summary counts the two separately.**
+`not indexed` is a committed list doing its job — the type allowlist, a
+`.fuxignore` line, a `!` exclusion in `.fux/sources/dirs`. `skipped` is a file
+fux opened and could not read: `empty`, `binary`, `non-utf8`, a decode that
+found nothing, a fetch that failed.
+
+```console
+ingested 632 docs (32 changed, 600 carried forward), 598 not indexed, 1 skipped, 31 shards written
+```
+
+**Why one number was not enough.** On this repo an ingest reported
+`599 skipped`. 598 of them were `.py`, `.pyc`, `.sh` and `.svg` under
+`archive/v0.1` and `archive/v0.26` — the allowlist working exactly as designed —
+and **one** was a file worth a look. A number that says 599 problems where there
+is one is unread by the second run, which is the same failure decision 4 was
+written for, reached from the other side: decision 4 stopped the *lines* from
+being a wall, and this stops the *count* from being one.
+
+**The class is set where the skip is made, never re-derived from the reason
+string.** `gitdir.POLICY` / `gitdir.UNREADABLE` are assigned at each `continue`
+in `walk_sources`; nothing anywhere parses a reason back into a class. Renaming
+a reason therefore cannot silently move a file between the two counts — the
+kind of coupling W-83 is the case study for.
+
+⚠ **`Skipped.kind` defaults to `UNREADABLE`, and the direction is deliberate.**
+A call site nobody updated over-reports into the loud bucket, where a person
+investigates and finds nothing wrong. The other default would hide a real
+failure inside the deliberate count, where nothing would ever surface it.
+
+**The record carries the class structurally, never as text.**
+`.fux/.fuxignore` holds two blocks, and **which block a line is in is its
+class** — so a second run reports what the first one found without anything
+parsing a note. The note carries the *reason*, and a generated verdict reports
+that reason rather than `ignored by .fux/.fuxignore:12`; otherwise the second
+run's answer to *why* would be *"because the first run said so"*.
+
+**`--list-skipped` is unchanged** — `path: reason`, sorted, unprefixed, because
+things pipe it. The `not indexed` / `skip` wording belongs to the human summary
+and to the printer's indented prose lines, which nothing parses.
+
+**What this does not do:** it changes no skip *rule*, no reason string, no
+committed byte, and no work — a `not indexed` file was never read and still
+is not. It changes only how the same set of skips is *counted and worded*.
+
+**14. The networked path records per-URL health; the offline path does not.**
+After `fetch_all`, `run()` records what happened to each listed URL into
+`.fux/runtime/url-state.json` — success, failure, and whether the sanitized sha
+actually moved. An offline `fux ingest` fetches nothing, so it learns nothing
+about any URL; bumping the run counter there would age every URL for a run that
+never looked at one.
+
+**Best-effort and advisory.** The write is wrapped and swallowed: a reporting
+plane that can fail an ingest which otherwise succeeded is worse than no
+reporting plane. Nothing here changes a committed byte, so **L3 is untouched**.
 
 ### What it looks like
 
-Verbatim from [the capture](../../work/regression/2026-08-18-ingest-and-index/report.md) §4.
+Verbatim from
+[the capture](../../work/regression/2026-08-18-ingest-and-index/report.md) §4.
+The captures below **predate decisions 1b, 4 and 15**, and are left verbatim
+rather than edited — a transcript quietly rewritten to match today's code is no longer
+evidence of anything. Each is also a *first* run, where decision 4's behaviour
+is identical anyway. What they are evidence of is undisturbed: an edited
+document gets a new `sha`, a bumped `ver`, and one rewritten shard.
 
 **Unchanged corpus — byte-identical:**
 
@@ -287,10 +394,6 @@ IDENTICAL
 ```
 
 **One document edited — one shard written, `ver` bumped:**
-
-> The capture predates decision 1b (2026-08-20), so its summary line has no
-> `carried forward` count. Left verbatim rather than edited: a capture that is
-> quietly rewritten to match today's code is no longer evidence of anything.
 
 ```console
 $ printf '\nA sentence added.\n' >> docs/refer.md
@@ -304,14 +407,8 @@ accelerator: 85 terms, 85 blocks, 89 postings (derived, not committed)
 # after : {'sha': '95af0076…', 'ver': 2, 'wlen': 35}
 ```
 
-> **Amended 2026-08-24 (W-76 Phase 1) — the note above already says why this
-> block is not edited, and this is the second reason.** No record carries
-> `wlen` any more; the same two lines taken today would read `'flen': [...]`, a
-> list of five per-field token counts rather than one weighted number. **The
-> capture stays verbatim** for exactly the reason given above it — a transcript
-> quietly rewritten to match today's code is no longer evidence of anything —
-> and what it is evidence of is undisturbed: an edited document gets a new
-> `sha`, a bumped `ver`, and one rewritten shard.
+> Those two lines would read `'flen': [...]` today — five per-field token counts
+> rather than one weighted number. The capture is not edited; see above.
 
 **A document deleted — record and shard both go:**
 
@@ -330,258 +427,183 @@ docs/empty.md: empty
 docs/logo.png: binary
 ```
 
+**The second run says nothing new (decision 4):**
+
+```console
+$ fux ingest
+ingested 2 docs (0 changed, 2 carried forward), 1 not indexed, 1 skipped, 0 shards written
+  (2 already recorded in .fux/.fuxignore;
+   'fux ingest --list-skipped' lists them all)
+
+$ printf '' > docs/late.md && fux ingest
+ingested 2 docs (0 changed, 2 carried forward), 1 not indexed, 2 skipped, 0 shards written
+  skip docs/late.md: empty
+  (2 more already recorded in .fux/.fuxignore;
+   'fux ingest --list-skipped' lists them all)
+```
+
+> The suppressed line is wrapped here for the page; the engine prints it on one
+> line.
+
 ### Consequences
 
-- **Ingest stamps `archived: true` on records from a declared-archived
-  source** (2026-08-22, [ADR-ARCHIVED-CONTENT](0037_archived-content.md)
-  decision 1). It reads `archived_dirs()` — the same `.fux/sources/dirs`
-  declaration the grammar already parses — and never a path convention.
-  Three properties matter and each is deliberate:
-
-  - **Absent when false**, so a live record's shape is unchanged and no
-    existing consumer's parse breaks. `_format` is **not** bumped: the
-    property set grows by an optional key that older readers ignore, which
-    is the same reasoning [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)
-    decision 9 applied to `title_h`.
-  - **Git records only.** A `url:` record has no directory entry to fall
-    under, so the question does not arise.
-  - **It changes committed bytes for the archived population** — 252 of
-    this repo's 401 records — so the change that ships it re-ingests, and
-    that diff is expected rather than a determinism failure. L3 still
-    holds: same sources, same declaration, same bytes.
-
-
-- **`fux ingest` gained `--stop` and a takeover, 2026-08-22 (W-66).** The verb
-  this record owns is now also how a background re-indexer is halted: a manual
-  `fux ingest` stops a live runner and then runs, and `--stop` is that takeover
-  without the run. **The decision is [ADR-MAINTENANCE](0032_hooks.md) 1d and the
-  surface is [ADR-CLI](0002_cli-surface.md); neither is restated here.** What
-  belongs to *this* record is the consequence for delta ingest:
-  **`--stop` and the takeover change nothing about what a run computes.**
-  Delta-ness is still decided by comparing content shas (decision 1b), **never
-  by reading the dirty list** — the list is advisory, and a run that trusted it
-  would make it a second source of truth about what changed, turning a corrupt
-  list from a performance bug into a correctness one. **`--full` remains the
-  only complete term-hash collision check** and the only thing that retro-fits
-  `code` onto unchanged documents, so it is not made redundant by any of this.
-
-  > **Amended 2026-08-24 (W-76 Phases 1 and 7).** There is no `code` to
-  > retro-fit — Phase 1 removed the field. **The claim survives with its
-  > subject replaced**: `--full` is the only thing that retro-fits `vectors`
-  > onto unchanged documents, and it is the same argument, on a field that
-  > costs far more. A machine that ingested without the model bundle commits
-  > records with no `vectors` at all — a degraded lane, never an error, because
-  > the lexical index answers on its own — and nothing but `--full` will fill
-  > them in later.
-
-- **`run()` clears the dirty list on completion, 2026-08-22 (W-66 Phase 1).**
-  The list itself and its writer belong to [ADR-MAINTENANCE](0032_hooks.md)
-  (decision 1a); the one line that belongs here is that this record's own
-  `write_index` call is what "completed" means — the clear happens *after*
-  it succeeds, never before, so a run that dies partway (an exception, a
-  killed process) leaves the list intact for whoever picks it up next.
-  Nothing about what `run()` computes reads the list — the point above about
-  `--stop` holds symmetrically for every other caller of `run()`, not only
-  the takeover path.
-
-- **Two reproduced defects fixed (PRIORITY.md P4, 2026-08-21).**
-  `ingest/parse.py` decoded content with `"utf-8"`, which leaves a leading
-  BOM as a literal `U+FEFF` character rather than stripping it — corrupting
-  the frontmatter delimiter or the first term of any document saved with one.
-  Now decodes with `"utf-8-sig"` (identical to `"utf-8"` when no BOM is
-  present). Separately, `ingest/gitdir.py`'s `walk_sources` built `rel_path`
-  from the filesystem's `Path.relative_to().as_posix()` with no Unicode
-  normalization — a path can come back NFD even when committed as NFC (the
-  same R1/macOS-checkout hazard `parse.py` already normalizes document
-  *content* for), which would make the same document's `rel_path`/`loc`
-  differ by checkout machine. Now NFC-normalized alongside content, closing
-  the one place L3's byte-identical guarantee held for content but not for
-  the path string naming it.
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in
-  extraction.** The expensive half is now proportional to the change; the cheap
-  half still is not, and at very large corpora that residue is what remains to
-  attack. Writing and diffing were already O(changed).
-- **`run()` takes an optional `progress`, and that cost is now visible**
-  (W-64, 2026-08-21). Four phases report counts — `walk`, `extract`, `edges`,
-  `write` — with `extract` the one that matters, since it is the 92 % this
-  record's decision 1b was measured against. The plane and its four rules
-  belong to [ADR-CLI](0002_cli-surface.md) decision 9; what binds here is
-  that **`progress=None` is the default and means silent**, so no existing
-  caller changed, and that the phases report *counts*, never elapsed time —
-  ingest is a maintenance path and a wall clock has no business on it.
+  extraction.** The expensive half is proportional to the change; the cheap half
+  is not, and at very large corpora that residue is what remains to attack.
+  Writing and diffing were already O(changed).
 - **Term-hash collision detection is complete only on a full run.** The tracker
   sees the raw terms of documents it extracted; a carried-forward document
   contributes hashes it cannot un-hash, so a cross-document collision involving
   one of them is not detected on a delta run. `fux ingest --full` is the
-  complete check. This is a real narrowing of archived ADR-0008's "fails
-  loudly" guarantee and is written down rather than hoped about.
-- **A newly available embedding bundle does not retro-fit `code`** onto
-  documents that have not changed since. `--full` fixes it; nothing else will.
-
-  > **Amended 2026-08-24 (W-76 Phases 1 and 7).** Read `vectors` for `code`:
-  > the field changed, the consequence did not, and **it is a sharper edge than
-  > it was**. `code` was one 256-bit sign code per document; `vectors` is one
-  > `int8` vector per chunk, roughly 9.8× the density, and it is what the dense
-  > lane retrieves on. A corpus ingested on a source install carries none of
-  > them, and `[dense] mode` will simply find nothing to fuse — silently,
-  > because a missing vector is indistinguishable from a document that does not
-  > match. `--full` still fixes it and still nothing else will.
-- **`0 shards written` can accompany a deletion**, since removing a shard is
-  not a write. True, and mildly under-informative when reading a run log.
-- **Re-ingest is safe to run on a hook**, which is what M5 depends on.
-- **`fux remove` became possible** (W-63). Decision 9 is its precondition:
-  a verb that deletes a document could not otherwise do so without the
-  network, which is the wrong shape for a deletion.
-- **The graph plane can no longer be handed a dangling edge by ingest**
-  (decision 10). [ADR-GRAPH](0029_graph.md)'s `edges_from_records` lifts
-  edges with no validation on the strength of that, which was true only for
-  re-resolved records before this.
-- **An offline run now reads one more committed file** — `.fux/sources/urls`
-  — but only in a repo that actually holds `url:` records. A directory-only
-  corpus, which is every corpus in this repo's own tests bar one module,
-  never touches it.
-- **`run()` takes a `progress=` and reports four phases through it** (W-64,
-  2026-08-21) — walk, extract, edges, write. The seam is optional and
-  `None` means silent, so every existing caller is unaffected; the rules it
-  obeys, and the invariant that stdout is byte-identical with the bar on or
-  off, are [ADR-CLI](0002_cli-surface.md) decision 9 and are not restated
-  here. **The bar reports counts ingest already knew** — no phase computes
-  anything for the sake of a total, and `write` is a bookend around
+  complete check. This is a real narrowing of a "fails loudly" guarantee and is
+  written down rather than hoped about.
+- **A new extraction rule does not reach an unchanged document** until that
+  document changes or `--full` runs. That is the carry-forward's defining
+  property and it outlives any particular field;
+  [`run.py`](../../src/fux/ingest/run.py)'s module docstring says the same.
+- **`fux ingest --stop` and the runner takeover change nothing about what a run
+  computes.** Delta-ness is decided by comparing content shas (decision 1b),
+  **never by reading the dirty list** — the list is advisory, and a run that
+  trusted it would make it a second source of truth about what changed, turning
+  a corrupt list from a performance bug into a correctness one. The decision is
+  [ADR-MAINTENANCE](0032_hooks.md) 1d and the surface is
+  [ADR-CLI](0002_cli-surface.md).
+- **`run()` clears the dirty list on completion**, where "completed" means this
+  record's own `write_index` call succeeded — never before. A run that dies
+  partway leaves the list intact for whoever picks it up next. Nothing about
+  what `run()` computes reads the list.
+- **`run()` takes an optional `progress`, `None` meaning silent.** Four phases
+  report counts — `walk`, `extract`, `edges`, `write`. The plane's rules belong
+  to [ADR-CLI](0002_cli-surface.md); what binds here is that the phases report
+  **counts ingest already knew**, never elapsed time — ingest is a maintenance
+  path and a wall clock has no business on it. `write` is a bookend around
   `write_index` rather than a live count, because that function offers no
   per-shard hook and interpolating one would be a clock in disguise.
-- **The ingest-mode naming left this record.** What `extracted` promises is
-  now [ADR-EXTRACTED](0016_extracted-mode.md), which also takes
-  `ingest/extract.py`; this record keeps how ingest *runs*. Both were ratified
-  by Arpit on 2026-08-19, closing W-30.
-- **A `hashed` URL record now writes a second thing before it is eligible to
-  commit (P5, 2026-08-21).** The fresh-fetch loop already holds the bytes in
-  `fresh[doc_id]` this run, so it also writes the extracted title to
-  `.fux/runtime/display-cache/`, keyed by `sha` — a write, not a fetch, so
-  this changes ingest's cost by nothing measurable. The offline-by-default law
-  above is untouched by construction: nothing here adds a network call: a
-  *carried-forward* `hashed` record (this run made no fetch for it) whose
-  cache has gone cold is not silently accepted either — `store/writer.py`
-  refuses it, naming the fix as `fux update`. A plain run
-  still makes zero network calls; it can now also fail loudly, on a corpus
-  that predates P5 or whose cache was evicted, rather than commit a hashed
-  record no reader can ever show a title for. Full rationale on
-  [ADR-RECORD](0010_index-record.md).
-
-> **Amended 2026-08-26 (W-82 §3.1) — the networked path records per-URL health.**
->
-> After `fetch_all`, `run()` records what happened to each listed URL into
-> `.fux/runtime/url-state.json` — success, failure, and whether the sanitized
-> sha actually moved.
->
-> **Only on the networked path, and that is the decision.** An offline
-> `fux ingest` fetches nothing, so it learns nothing about any URL; bumping the
-> run counter there would age every URL for a run that never looked at one.
->
-> **Best-effort and advisory.** The write is wrapped and swallowed: a reporting
-> plane that can fail an ingest which otherwise succeeded is worse than no
-> reporting plane — the same reasoning [ADR-MAINTENANCE](0032_hooks.md)
-> decision 3 applies to hooks. Nothing here changes a committed byte, so
-> **L3 is untouched**: same sources still give the same index.
-
-> **Amended 2026-08-26 — both record kinds are assembled through the schema.**
->
-> The `git` and `url` records were two inline dicts a few dozen lines apart,
-> and `EXTRACTED_FIELDS` — which fields a delta ingest may carry forward — was a
-> tuple here with no connection to either. All three now come from
-> `store/index-record.schema.json` via `store/recordschema.py`.
->
-> ⚠ **`edges` remains excluded from the carried set, and the template says why
-> rather than leaving it to be re-derived**: it is the one field the rest of the
-> corpus can change without this document changing, so carrying it forward would
-> freeze a link a newly added document should have resolved. That was already
-> decision 1b's reasoning; it is now written where the exclusion lives.
->
-> No committed byte moves — see [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)'s
-> amendment of the same date for the byte-identity argument and its test.
-
-> **Amended 2026-08-26 (later).** *Template* became **schema** — the file
-> declares a shape and is checked against this module, rather than being copied
-> and filled in. `EXTRACTED_FIELDS` now reads
-> `store.recordschema.carried_fields()`.
+- ⚠ **`fux ingest` now writes a committed file that is also its own input.**
+  `.fux/.fuxignore` is read by the walk and written by the run, so a run reads
+  what the previous run wrote. It converges after one run and is byte-stable
+  after that; what is given up is the weaker property that the file's content is
+  independent of history. The full trade is
+  [ADR-FUXIGNORE](0048_fuxignore.md) decision 11.
+- ⚠ **A new skip dirties the working tree**, including on the hook path. That
+  is correct for a committed record, and an unchanged result writes nothing at
+  all, so steady state leaves `git status` quiet — but *"re-ingest is safe to
+  run on a hook"* now means *"and it may stage a `.fuxignore` line"*.
+- ⚠ **A URL skip is no longer recorded anywhere and prints every networked
+  run.** W-88's report-once promise covers files only. Stated rather than
+  worked around; see decision 4.
+- **The summary line grew a field, and anything scraping it must be re-read.**
+  `N skipped` became `N not indexed, M skipped` (decision 15). Nothing in this
+  repo parses that line — checked — but it is stdout, and stdout is API.
+  `--list-skipped` and `.fux/runtime/skipped` are deliberately *not* part of
+  the change, so a script that wanted the machine-readable list already had a
+  stable one and still does.
+- **A `not indexed` count of zero is now a meaningful statement** — every
+  omission from the index was a file fux could not read, which is worth
+  knowing and was previously unsayable.
+- **`0 shards written` can accompany a deletion**, since removing a shard is not
+  a write. True, and mildly under-informative when reading a run log.
+- **Re-ingest is safe to run on a hook**, which is what the maintenance plane
+  depends on.
+- **`fux remove` became possible.** Decision 9 is its precondition: a verb that
+  deletes a document could not otherwise do so without the network, which is the
+  wrong shape for a deletion.
+- **The graph plane can no longer be handed a dangling edge by ingest**
+  (decision 10). [ADR-GRAPH](0029_graph.md)'s `edges_from_records` lifts edges
+  with no validation on the strength of that, which was true only for
+  re-resolved records before.
+- **An offline run reads one more committed file** — `.fux/sources/urls` — but
+  only in a repo that actually holds `url:` records.
+- **A `hashed` URL record writes a second thing before it is eligible to
+  commit.** The fresh-fetch loop already holds the bytes this run, so it also
+  writes the extracted title to `.fux/runtime/display-cache/`, keyed by `sha` —
+  a write, not a fetch, so ingest's cost does not measurably change and L4 is
+  untouched by construction. A *carried-forward* `hashed` record whose cache has
+  gone cold is refused by `store/writer.py`, naming `fux update` as the fix,
+  rather than committing a record no reader can ever show a title for. Full
+  rationale on [ADR-RECORD](0010_index-record.md).
+- **Two Unicode defects are fixed and stay fixed.** `parse.py` decodes with
+  `"utf-8-sig"`, so a leading BOM is stripped rather than corrupting the
+  frontmatter delimiter or the first term; and `gitdir.py`'s `walk_sources`
+  NFC-normalizes `rel_path`, because a filesystem can hand back NFD for a path
+  committed as NFC and the same document would otherwise get a different `loc`
+  per checkout machine.
 
 ### Alternatives considered
 
-- **Skip unchanged files entirely, by `sha`.** Still rejected, and this is the
+- **Skip unchanged files entirely, by `sha`.** Rejected, and this is the
   distinction decision 1b turns on: skipping a document skips its *edges*, and
   the failure is a **stale** index rather than a broken one — nothing surfaces
   it. Skipping only its extraction cannot go stale, because extraction has no
   input beyond the bytes the sha pins.
-- **Two-pass: cheap pass for unchanged, full pass on demand.** **Adopted
-  2026-08-20** as decision 1b — this record predicted it would be "the natural
-  answer if the veto condition below ever fires," and it fired.
 - **Carry edges forward when the corpus id set is unchanged.** Rejected:
   correct, and a second gate to keep true forever for a slice of the ~5 % that
-  edge resolution costs. The measurement said the embedding was the cost; the
-  cheap thing is not worth a second invariant.
+  edge resolution costs.
 - **Bump `ver` on edge changes too.** Rejected: makes `ver` a property of the
   corpus rather than the document, and every document churns whenever any
   document moves.
-- **Drop unindexable files silently.** Rejected: R2's third question failed
-  because a citation target was outside configured sources, and it looked
-  exactly like a ranking bug. Unreported absence is the expensive kind.
+- **Drop unindexable files silently.** Rejected: a citation target outside
+  configured sources looked exactly like a ranking bug. Unreported absence is
+  the expensive kind.
+- **Keep the already-reported set in `.fux/runtime/skipped`.** Rejected on
+  Arpit's ruling (2026-08-27): a derived, gitignored list is invisible to
+  review, does not survive a clone, and put the answer to *"why is this file not
+  in my index"* somewhere other than the file named after that question. The
+  cost — the record now decides, and so freezes — is carried in
+  [ADR-FUXIGNORE](0048_fuxignore.md) decision 11 and made loud by 11a.
+- **Print every skip on every run.** Rejected under decision 4, from the same
+  premise: the wall nobody reads is the silence this record refuses, reached
+  from the other side.
+- **Let ingest read the dirty list to decide what changed.** Rejected: it would
+  make an advisory file a second source of truth about the corpus, turning a
+  corrupt list from a performance bug into a correctness one.
 
 ### Reference (required)
 
 - The orchestration — [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
   (its module docstring states the incremental rule); the walk —
   [`gitdir.py`](../../src/fux/ingest/gitdir.py); edges —
-  [`edges.py`](../../src/fux/ingest/edges.py).
+  [`edges.py`](../../src/fux/ingest/edges.py); the declared record shape —
+  [`store/index-record.schema.json`](../../src/fux/store/index-record.schema.json).
 - Determinism, change and deletion, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §4.
 - The write-if-identical guarantee —
   [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md).
-- P5's materialise-first write —
-  [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py),
-  called from the fresh-fetch loop in
-  [`ingest/run.py`](../../src/fux/ingest/run.py).
+- **The cost profile that fired the veto** —
+  [`work/regression/2026-08-20-ingest-cost-profile/`](../../work/regression/2026-08-20-ingest-cost-profile/report.md).
+- **The classification and the two counts (decision 15)** — the skip classes,
+  `partition` and `would_index` in
+  [`gitdir.py`](../../src/fux/ingest/gitdir.py); the record and the printed
+  wording in [`skipnotice.py`](../../src/fux/ingest/skipnotice.py); the blocks
+  themselves in [`fuxignore.py`](../../src/fux/ingest/fuxignore.py); the summary
+  in [`ingest/__init__.py`](../../src/fux/ingest/__init__.py). Behaviour pinned
+  by [`tests/ingest/test_gitdir.py`](../../tests/ingest/test_gitdir.py),
+  [`tests/ingest/test_skipnotice.py`](../../tests/ingest/test_skipnotice.py) and
+  [`tests/ingest/test_fuxignore.py`](../../tests/ingest/test_fuxignore.py).
+- Prior art for separating *"we chose not to"* from *"we could not"* in build
+  output — GCC's `-Wunused` family is a warning you may silence by writing a
+  line, while a hard error is not; and `git status` reports ignored paths only
+  under `--ignored`, precisely because a path someone wrote a rule for is not
+  news. Both are the same rule this decision applies to a skip count:
+  https://git-scm.com/docs/git-status#Documentation/git-status.txt---ignoredltmodegt
 - Prior art for corpus-wide link resolution as a separate pass — Sphinx's
   two-phase read/resolve build:
   https://www.sphinx-doc.org/en/master/extdev/appapi.html#build-phases
-- **The cost profile that fired the veto** —
-  [`work/regression/2026-08-20-ingest-cost-profile/`](../../work/regression/2026-08-20-ingest-cost-profile/report.md).
 - Prior art for content-addressed reuse of a pure derivation, with an explicit
   full-rebuild escape hatch — Bazel's action cache keyed on the action's inputs:
   https://bazel.build/basics/hermeticity
 
-**Amended 2026-08-23 (W-76 Phase 1).** `EXTRACTED_FIELDS` — the tuple naming
-what carry-forward reuses verbatim for an unchanged `sha` — is now
-`("title", "phrases", "terms", "flen", "code")`: `wlen` became `flen`.
-
-> **Amended 2026-08-24 (W-76 Phase 7) — the tuple gained a sixth name the same
-> week, and this amendment was written one phase too early.** It is
-> `("title", "phrases", "terms", "flen", "code", "vectors")`.
->
-> **`vectors` is not one more name on a list.** It is the reason carry-forward
-> is now load-bearing rather than merely fast: a full ingest of 1 000 documents
-> measured **0.95 s → 6.46 s, 6.8× slower**, once per-chunk embedding came
-> back — and the post-commit hook moved **+10 %**, because this tuple is what
-> keeps the embedding to changed documents. The 92 % measurement that fired
-> this record's veto in the first place was about an embedding pass that Phase
-> 1 deleted and Phase 7 replaced with a denser one; the decision it produced is
-> what made the replacement affordable.
->
-> The invalidation argument below carries over exactly. `vectors` is a model
-> output as well as a function of bytes, so a vector carried across a model
-> change would be the same silent mixing the header check refuses — and
-> `analyzer` went `v1` → `v2` in the change that introduced it.
-
-The carry-forward gate is unchanged and is what makes this safe: it is
-conditioned on the shard header still matching `store.HEADER`, and the header
-pins `analyzer`, which went `v1` -> `v2` in the same change. **So every
-carried field was invalidated at once rather than a v1 `flen` surviving beside
-a v2 `terms`.** A format change that did *not* move the analyzer would need
-its own invalidation and does not get it for free.
-
 ### Veto condition
 
-**Reopen this decision if** a delta run stops being byte-identical to
-`--full`, or if parse-plus-edge-resolution — the half that is still O(corpus) —
-becomes the measured bottleneck at scale.
+**Reopen this decision if** the committed `.fux/.fuxignore` stops converging —
+a second run on an unchanged corpus that rewrites it is a committed file
+churning on every commit, which is the property decision 2 exists to protect —
+or if a delta run stops being byte-identical to `--full`,
+or if parse-plus-edge-resolution — the half that is still O(corpus) — becomes
+the measured bottleneck at scale, **or if any code path derives a skip's class
+by reading its reason string** — decision 15 rests on the class being assigned
+where the skip is made, and a `reason ==` or `reason.startswith(` outside
+`skipnotice`'s notice-file parse is that property already broken.
 
 **How to check it:**
 
@@ -599,10 +621,29 @@ fux ingest --full >/dev/null && sha1sum .fux/index/*.jsonl > /tmp/f \
   && fux ingest >/dev/null && sha1sum .fux/index/*.jsonl > /tmp/d \
   && diff /tmp/f /tmp/d && echo IDENTICAL
 
-# 4. the residual-bottleneck claim, when someone makes it, must be a filed run
-ls work/regression/*-m6-* 2>/dev/null
-# a parse/edge cost above the M6 budget, measured and filed, reopens this
+# 4. the carried set is still declared, not hand-written
+grep -n 'EXTRACTED_FIELDS' src/fux/ingest/run.py
+# expect: one assignment, reading store.recordschema.carried_fields()
+
+# 5. no skip CLASS is derived from a reason string (decision 15)
+grep -rn 'reason ==\|reason.startswith\|reason.lower()' src/fux/
+# expect EXACTLY ONE hit: sources.py's `reason == "not an indexed file type"`,
+# which tailors one message for `fux add` and assigns no class. A second hit,
+# or any hit that sets `kind`, is this decision's property already broken.
+
+# 6. the machine-readable list is still `path: reason`, sorted, unprefixed
+fux ingest --list-skipped | head -3
+# expect: `<path>: <reason>` lines in path order, no `skip` / `not indexed` word
+
+# 7. the record converges: a second run leaves the committed file untouched
+fux ingest >/dev/null && sha1sum .fux/.fuxignore > /tmp/i1 \
+  && fux ingest >/dev/null && sha1sum .fux/.fuxignore > /tmp/i2 \
+  && diff /tmp/i1 /tmp/i2 && echo STABLE
+
+# 8. the old runtime file is gone and stays gone (decision 11e)
+test ! -e .fux/runtime/skipped && echo OK
 ```
+
 ---
 
 ## References
@@ -613,19 +654,25 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
-[ADR-DOTFUX](0003_fux-directory.md) · [ADR-URL-INGEST](0008_url-ingest.md) ·
+[ADR-DOTFUX](0003_fux-directory.md) · [ADR-ASK](0004_ask.md) ·
+[ADR-URL-INGEST](0008_url-ingest.md) ·
 [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
 [ADR-RECORD](0010_index-record.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
-[ADR-GRAPH](0029_graph.md) · [ADR-MAINTENANCE](0032_hooks.md) ·
-[ADR-ARCHIVED-CONTENT](0037_archived-content.md)
+[ADR-GRAPH](0029_graph.md) · [ADR-TYPES](0031_types-list.md) ·
+[ADR-MAINTENANCE](0032_hooks.md) ·
+[ADR-ARCHIVED-CONTENT](0037_archived-content.md) ·
+[ADR-DECODE](0042_decode.md)
 
 **Code**
 
 - [`src/fux/ingest/edges.py`](../../src/fux/ingest/edges.py)
 - [`src/fux/ingest/gitdir.py`](../../src/fux/ingest/gitdir.py)
 - [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)
+- [`src/fux/ingest/skipnotice.py`](../../src/fux/ingest/skipnotice.py)
+- [`src/fux/store/recordschema.py`](../../src/fux/store/recordschema.py)
 - [`src/fux/store/displaycache.py`](../../src/fux/store/displaycache.py)
 - [`tests/ingest/test_delta.py`](../../tests/ingest/test_delta.py)
+- [`tests/ingest/test_skipnotice.py`](../../tests/ingest/test_skipnotice.py)
 
 **Measured evidence**
 

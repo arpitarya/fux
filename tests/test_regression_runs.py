@@ -48,6 +48,35 @@ def report_of(run: Path) -> Path | None:
     return next((f for f in (run / "report.md", run / "evidence" / "report.md") if f.is_file()), None)
 
 
+def is_pre_registered_only(run: Path) -> bool:
+    """A directory that holds a frozen pre-registration and **no report yet**.
+
+    The project's method is pre-register, commit that file FIRST, then measure
+    ("A pre-registered threshold may never move"), so this state is not an
+    incomplete run -- it is the first half of the method, and it can persist for
+    weeks when the measurement is blocked on an environment (R10 waits on
+    `fux-playground`).
+
+    ⚠ **Deliberately narrow.** It is only legal while there is NO report. The
+    moment a report lands the full contract applies again, so this cannot become
+    a way to file a measurement without its evidence -- which is what the
+    contract exists to prevent. It also does NOT exempt the directory from being
+    listed in the index: a pre-registration nobody can find is exactly as useless
+    as a run nobody can find.
+
+    Before this existed, the only ways to satisfy the contract were to write a
+    report for a run that has not happened, or to move a frozen file -- and
+    W-82 ruling 8 says a frozen `PRE-REGISTRATION.md` is never touched.
+    """
+    return (
+        report_of(run) is None
+        and any(
+            (run / rel).is_file()
+            for rel in ("PRE-REGISTRATION.md", "evidence/PRE-REGISTRATION.md")
+        )
+    )
+
+
 def is_surface_capture(report: Path | None) -> bool:
     """A capture states no delta, so a blind/informed label would label nothing.
 
@@ -61,6 +90,8 @@ def needs_classification(run: Path) -> bool:
     """A MEASURED run, filed on or after the rule's baseline date."""
     if run.name[:10] < CLASSIFY_SINCE:
         return False
+    if is_pre_registered_only(run):
+        return False  # nothing has been measured, so there is nothing to classify
     return not is_surface_capture(report_of(run))
 
 
@@ -87,6 +118,11 @@ def test_run_carries_its_evidence(run: Path) -> None:
     # the verbatim transcript in the report itself. The README says a run must
     # declare which it is, so this reads that declaration rather than guessing.
     declares_capture = is_surface_capture(report_of(run))
+
+    # Pre-registered and not yet measured: the frozen threshold is the whole
+    # content, and it owes no report until the measurement runs.
+    if is_pre_registered_only(run):
+        return
 
     missing = [
         name

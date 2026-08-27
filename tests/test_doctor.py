@@ -336,6 +336,56 @@ def test_url_check_names_a_persistently_failing_url_and_refuses_to_delete_it(tmp
     assert "url:https://dead" in reader.read_index(tmp_path)
 
 
+def test_url_check_reports_a_rate_limited_host_when_urls_are_indexed(tmp_path):
+    """W-82 ruling 12, in the branch that actually runs.
+
+    ⚠ **This is the regression test for a real defect.** `detail` was joined
+    from `parts` BEFORE the note was appended to `parts`, so the note was
+    computed, appended to a list nothing read again, and dropped. The empty
+    branch was correct, which is what hid it: the cumulative count ruling 12
+    persists was unreachable through its only reader in every repo that has
+    URLs -- that is, in every repo where a rate limit can happen at all.
+    """
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a", "https://b"])
+    urlstate.record_rate_limits(tmp_path, {"wiki.corp": 12})
+
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "rate-limited by wiki.corp x12" in check.detail
+    assert "2 url: record(s)" in check.detail  # and it did not displace the rest
+
+
+def test_url_check_reports_a_rate_limited_host_with_nothing_indexed(tmp_path):
+    """The no-URLs branch is where a rate limit is most likely to be the REASON
+    nothing is indexed, so it is reported there too -- and stays reported."""
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, [])
+    urlstate.record_rate_limits(tmp_path, {"wiki.corp": 3})
+
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "none indexed" in check.detail
+    assert "rate-limited by wiki.corp x3" in check.detail
+
+
+def test_the_rate_limit_note_names_the_worst_hosts_first_and_stops_at_three(tmp_path):
+    """Worst first, capped at three: the point is to name the host worth acting
+    on, not to print the whole tally. The cap is silent because the count it
+    drops is by construction smaller than the three it kept."""
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    _url_index(tmp_path, ["https://a"])
+    urlstate.record_rate_limits(tmp_path, {"low": 1, "mid": 5, "high": 9, "top": 20})
+
+    check = _check(doctor.run(tmp_path), "url sources")
+    assert "rate-limited by top x20, high x9, mid x5" in check.detail
+    assert "low x1" not in check.detail
+
+
 def test_url_check_survives_an_unreadable_index(tmp_path):
     _git_repo(tmp_path)
     check = _check(doctor.run(tmp_path), "url sources")
@@ -396,3 +446,34 @@ def test_every_check_detail_is_ascii_in_every_branch(tmp_path):
             check.name.encode("ascii")
 
     assert {"index not gitignored", ".fux/ layout declared", "accelerator"} <= seen
+
+
+# -- the types list (W: setup wrote a file ingest refused) ------------------
+
+
+def test_doctor_flags_a_types_file_with_no_live_pattern(tmp_path, monkeypatch):
+    """ADR-DOTFUX decision 6's ⚠: the fixed template reaches new repos only."""
+    from fux import doctor as doctor_mod
+
+    (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    types = tmp_path / ".fux" / "sources" / "types"
+    types.parent.mkdir(parents=True, exist_ok=True)
+    types.write_text("# every line a comment\n#*.md\n", encoding="utf-8")
+    check = doctor_mod._types_health(tmp_path)
+    assert not check.ok
+    assert "no active pattern" in check.detail
+
+
+def test_doctor_passes_a_types_file_setup_wrote(tmp_path):
+    from fux import doctor as doctor_mod
+    from fux import setup as setup_mod
+
+    setup_mod.run(tmp_path)
+    assert doctor_mod._types_health(tmp_path).ok
+
+
+def test_doctor_passes_when_there_is_no_types_file(tmp_path):
+    from fux import doctor as doctor_mod
+
+    check = doctor_mod._types_health(tmp_path)
+    assert check.ok and "default" in check.detail

@@ -4,65 +4,14 @@ name: ADR-T1-ACCELERATOR
 title: ADR-T1-ACCELERATOR (0011) — the derived T1 accelerator
 description: A disposable term-major index under .fux/runtime/ that makes warm queries fast and is forbidden from changing an answer. Candidates and statistics only, never scores.
 status: accepted
+date: 2026-08-18
+feature: "`.fux/runtime/` — the derived index, `fux build`, and the block bound that makes skipping provable"
+owns: [src/fux/derive, tools/differential]
+laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
 ---
 
 # ADR-T1-ACCELERATOR — the derived T1 accelerator
-
-- **Name:** `ADR-T1-ACCELERATOR` — cite this everywhere; never cite the number
-- **Status:** accepted
-- **Supersedes:** `ADR-ACCELERATOR` — **archived 2026-08-18** at
-  [`archive/adr/`](../../archive/adr/README.md); it may be named, never cited
-- **Owns:** `src/fux/derive/`
-- **Laws:** L1, L3 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-18
-- **Feature:** `.fux/runtime/` — the derived index and `fux build`
-- **Evidence:** [`work/regression/2026-08-12-m2-accelerator/`](../../work/regression/2026-08-12-m2-accelerator/report.md) · [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §3
-
----
-
-> ## Amended 2026-08-25 — the dense lane and the embedding model were DELETED
->
-> **Arpit, 2026-08-25: *"Remove the model."*** `src/fux/embed/` is gone — the
-> 7.9 MB bundle, `model.py`, `fuxvec.py` and `chunkvec.py` — and so is
-> `derive/dense.py`, this record's dense half.
->
-> **This record owned both, and the ownership table row for `src/fux/embed/`
-> is deleted in the same change.** That row carried its own ⚠ since W-76
-> Phase 7 — a component that wrote the *committed* index claimed by the record
-> that opens *"the derived plane's only input is the committed shards"*. The
-> contradiction is resolved by the component ceasing to exist, which is a
-> worse reason than fixing it and an honest one.
->
-> | what went | where it was |
-> |---|---|
-> | the `codes` build phase | `derive/build.py` — `_read_committed` no longer returns a `codes` array |
-> | `codes.jsonl` | out of `DETERMINISTIC_FILES` |
-> | `RUNTIME_SCHEMA` | `fux.runtime.v4` -> **`v5`** |
->
-> **The schema bump is not required for correctness and was made anyway.**
-> Nothing reads `codes.jsonl` now, so a stale `v4` plane could not diverge —
-> but it would leave an orphan file no rebuild removes, and this record's own
-> `DOCS_FIELDS` comment exists because someone once trusted a schema string
-> that had not been moved. Refusing the plane costs one rebuild of a
-> disposable directory.
->
-> ⚠ **The differential law is untouched and is now easier to hold**: there is
-> one ranking path, and no post-ranking fusion stage that either candidate
-> generator could see differently.
-
-> ## Amended 2026-08-25 (cleanup) — the differential harness lost its third mode
->
-> `tools/differential/playground_grade.py` graded three modes: `scan`,
-> `accelerator` and `hybrid`. **It was BROKEN by the model removal** — its
-> `hybrid` lambda called `run_query(..., use_hybrid=True)`, a keyword the
-> function no longer accepts, so the harness raised `TypeError` before grading
-> anything. Found by a post-change sweep, not by a test: **no test imports this
-> harness**, which is why a live tool sat broken.
->
-> **Two modes remain, and they are the right two** — `scan` and `accelerator`
-> are exactly the pair the differential law binds together, so the harness is
-> now precisely a differential-law instrument rather than that plus a lane.
 
 ## §1 — For humans
 
@@ -93,8 +42,9 @@ flowchart TD
     INV -->|no| ERR["refuse, exit 1<br/>never a divergent accelerator"]
     INV -->|yes| R[".fux/runtime/ — DERIVED"]
     R --> P["postings/xx.jsonl<br/>term-major, blocks of 128"]
-    R --> I["postings/xx.idx<br/>62-byte entries: offset, mx, mnw"]
-    R --> D["docs.jsonl · stats.json"]
+    R --> I["postings/xx.idx<br/>62-byte entries:<br/>offset · per-field mx · per-field mnw"]
+    R --> D["docs.jsonl<br/>loc · title · flen · archived · superseded · mtime"]
+    R --> ST["stats.json<br/>n · RAW total_flen · newest_mtime"]
     R --> M["manifest.json<br/>a sha per committed shard"]
     M -->|"drift?"| S["stale -> the scan answers"]
 ```
@@ -113,7 +63,8 @@ flowchart TD
           v
    .fux/runtime/             DERIVED, gitignored, disposable
       postings/xx.jsonl      term-major, blocks of 128 postings
-      postings/xx.idx        62-byte entries: offset, length, mx, mnw, doc range
+      postings/xx.idx        62-byte entries: offset, length, per-field mx,
+                             per-field mnw, doc range, count
       docs.jsonl             id -> loc, title, flen, archived, superseded, mtime
       stats.json             n, total_flen (RAW per-field), newest_mtime
       manifest.json          a sha per committed shard  --drift--> stale
@@ -122,15 +73,6 @@ flowchart TD
 ```
 
 </details>
-
-> **Amended 2026-08-24 — the twin's field lists, corrected in place.** It named
-> `docs.jsonl` as *"id -> loc, title, wlen"* and `stats.json` as
-> *"n, total_wlen"*. No record or table carries a `wlen`: the doc table carries
-> `flen` (and `archived`, `superseded`, `mtime`, added across W-73 and W-76),
-> and the stats plane carries **raw** `total_flen` plus `newest_mtime`. **The
-> Mermaid half names no fields at all**, which is why only one side moved —
-> and why it drifted unnoticed for two schema versions. Both are read together;
-> only one of them was ever able to be wrong about this.
 
 ### Examples
 
@@ -143,7 +85,9 @@ $ fux build
 accelerator rebuilt from the committed index: 5 docs, 97 terms, 97 blocks, 104 postings
 ```
 
-The manifest is the staleness mechanism — a sha per committed shard:
+The manifest is the staleness mechanism — a sha per committed shard. The
+capture predates the current schema strings and is not edited; what it
+demonstrates is the shape:
 
 ```json
 {
@@ -218,31 +162,31 @@ correct.
 ### Decision
 
 **1. The derived plane's only input is the committed shards.** Nothing else.
-That is what makes it deletable, and what makes "rebuilds deterministically
-from committed bytes" a checkable claim.
+That is what makes it deletable, and what makes "rebuilds deterministically from
+committed bytes" a checkable claim.
 
 **2. It generates candidates and statistics, never scores.** Scoring and
-sorting live in `rank()`, shared by both paths ([ADR-RANKING](0012_ranking.md)).
-The differential law then reduces to "the candidate set and `(n, total_wlen,
-df)` are identical", which a test can assert.
+sorting live in `rank()`, shared by both paths
+([ADR-RANKING](0012_ranking.md)). The differential law then reduces to "the
+candidate set and `(n, total_wlen, df)` are identical", which a test can assert
+— where `total_wlen` is a **float derived per query on both paths** from the
+raw `total_flen` the stats plane stores.
 
 **3. Postings are blocked at 128**, a measured shape, with a **binary offset
 table** beside each shard — **62 bytes per entry, `<8sHQI` + `5H` + `5I` +
-`IIH`** — carrying the block's byte offset and length, its `mx`, `mnw`, its
-document range, and its count.
+`IIH`** — carrying the block's byte offset and length, its per-field `mx` and
+`mnw`, its document range, and its count. Binary because the alternative —
+fixed-width integers inside the JSON line — needs zero padding, which JSON
+forbids.
 
-> **Amended 2026-08-24 (W-76 Phase 1 + W-73).** This read *"40 bytes per entry,
-> `<8sHQIIIIIH` … `mx` (max weighted tf), `mnw` (min `wlen`)"* — three claims,
-> all now false. **`mx` and `mnw` are per-field arrays and deliberately
-> UNWEIGHTED**, recombined at the query's own weights by `block_bound`, because
-> a *weighted* extremum cannot be stored once when the weights are query-time
-> tune keys — that was W-73's whole defect. Per-field extrema over-estimate
-> `mx` and under-estimate `mnw`, and **both errors push the bound up**, so a
-> block that could contain a winner is never skipped. Measured cost:
-> **+0.0 % blocks scanned**, because 92.5 % of postings are single-field, which
-> makes the per-field sum exact rather than loose
-> ([fork 3](../../work/regression/2026-08-23-fork3-per-field-bound/)). Binary because the alternative — fixed-width
-integers inside the JSON line — needs zero padding, which JSON forbids.
+⚠ **`mx` and `mnw` are per-field arrays and deliberately UNWEIGHTED**,
+recombined at the query's own weights by `block_bound`. A *weighted* extremum
+cannot be stored once when the weights are query-time tune keys. Per-field
+extrema over-estimate `mx` and under-estimate `mnw`, and **both errors push the
+bound up**, so a block that could contain a winner is never skipped. Measured
+cost: **+0.0 % blocks scanned**, because 92.5 % of postings are single-field,
+which makes the per-field sum exact rather than loose
+([fork 3](../../work/regression/2026-08-23-fork3-per-field-bound/)).
 
 **4. Skipping is proved, not heuristic.** Terms open rarest-first. After each,
 every seen candidate has an exact score, so the k-th best `theta` is exact. An
@@ -251,7 +195,7 @@ term's best block bound; if that cannot reach `theta`, no unopened block can
 change the answer. Worst case is opening everything — the scan's work, never
 wrong.
 
-**5. The bound uses `mx` **and** `mnw` because BM25F's contribution is
+**5. The bound uses `mx` *and* `mnw`** because BM25F's contribution is
 increasing in weighted tf and *decreasing* in document length. `mx` alone is
 valid but loose.
 
@@ -272,134 +216,36 @@ reports it.
 filesystem mtimes, which are the cheap staleness pre-check and are not
 reproducible by construction.
 
-### Consequences
+**10. The plane's four shapes are declared in one schema.**
+[`derive/runtime.schema.json`](../../src/fux/derive/runtime.schema.json)
+declares the postings block line, the 62-byte offset entry, the doc table and
+`stats.json`. **One file for all four, deliberately** — they are written by one
+build, read by one query path, and versioned by **one string**, so four files
+would invite three to be updated and the fourth forgotten.
 
-- **`fux build` is a pure optimisation.** Nothing about correctness depends on
-  the derived plane existing.
-- **`rm -rf .fux/runtime` is always safe**, which is what lets the build be
-  aggressive.
-- **Two formats to keep in step.** The offset table's struct is a binary
-  contract; `RUNTIME_SCHEMA` exists so a mismatch triggers a rebuild rather
-  than a misread.
-- **`build()` takes an optional `progress`** (W-64, 2026-08-21), reporting
-  `read` · `codes` · `graph` · `postings`. R5 attributed **47.6 % of a
-  100 000-document commit-path run to `fux build`**, so this is half of the
-  silence the plane exists to break. `progress=None` is the default and means
-  silent, so nothing about an existing caller — or about the bytes this
-  module writes — changed. The plane's rules are
-  [ADR-CLI](0002_cli-surface.md) decision 9's.
-- **The bound must stay an upper bound.** Any future scoring change — a third
-  field, a different saturation — invalidates `block_bound` and the skipping
-  argument with it. That is the veto below.
-- **`fux build` is a two-lane build since 2026-08-20**, and the second lane is
-  not this record's. The M3 graph lane's derived plane
-  ([ADR-GRAPH](0029_graph.md)) is written by the same `build()` call,
-  from the same single pass over the committed shards — `_read_committed` now
-  returns the parsed records alongside the doc table so the graph plane costs
-  no second read. `DETERMINISTIC_FILES` gains `graph.json`, so the
-  byte-identity assertion covers it too.
-  **What is deliberately unchanged: the accelerator's own outputs, and the
-  differential law over them.** A graph plane that leaked into the lexical path
-  would void every byte-identity claim in this record, so the graph lane's own
-  eval asserts `ask` is unmoved through the CLI
-- **`accel.ask()` gained `archived_weight`/`archived_dirs`, 2026-08-22
-  (W-44).** Pass-through keyword-only arguments into the shared `rank()` —
-  the mechanism itself is [ADR-ASK](0004_ask.md)'s, cited here only because
-  the signature this record owns changed. No-op defaults, so every existing
-  caller is unaffected and the differential law between this path and the
-  scan is unchanged.
-  (`tests_e2e/test_relational.py::test_the_graph_lane_does_not_move_ask`).
-- **A corpus with hashed URL records had no accelerator at all** and paid the
-  scan's 4 248.8 ms rather than 27.2 ms — the whole M2 result forfeited by
-  following the documentation. Fixed 2026-08-19 in the *field shape*, never in
-  this record's invariant ([ADR-RECORD](0010_index-record.md) rule 2); the
-  differential harness now carries a hashed record, which it never had
-  ([run](../../work/regression/2026-08-19-w54/report.md)).
-- **`build()` takes the same `progress=` seam `ingest.run()` does** (W-64,
-  2026-08-21) and reports its passes through it. It changes no output: the
-  bar is stderr-only and `None` means silent, so `DETERMINISTIC_FILES` and
-  every byte-identity assertion in this record are untouched by construction.
-  The rules are [ADR-CLI](0002_cli-surface.md) decision 9.
+⚠ **A disposable plane still needs a declared shape, and the reason is this
+record's own central promise.** A shape that drifts does not corrupt the index
+— **it makes one of the two paths disagree, which is a fast wrong answer.**
+That is not hypothetical: `superseded` and `mtime` once joined the doc table
+while `RUNTIME_SCHEMA` stayed put, and `ask --scan` applied a supersession
+demotion that `ask --fast` did not. `DOCS_FIELDS` exists because of that.
 
-> **Amended 2026-08-26 — the derived plane's shapes are declared in a schema.**
->
-> `derive/runtime.schema.json` declares the four shapes this record's plane
-> writes: the postings block line, the 62-byte offset-table entry, the doc table
-> and `stats.json`. **One file for all four, deliberately** — they are written
-> by one build, read by one query path, and versioned by **one string**, so four
-> files would invite three to be updated and the fourth forgotten.
->
-> ⚠ **A disposable plane still needs a declared shape, and the reason is this
-> record's own central promise.** The accelerator must return byte-identical
-> results to the reference scan, so a shape that drifts does not corrupt the
-> index — **it makes one of the two paths disagree, which is a fast wrong
-> answer.** That is not hypothetical: on 2026-08-23 `superseded` and `mtime`
-> joined the doc table while `RUNTIME_SCHEMA` stayed put, and `ask --scan`
-> applied a supersession demotion that `ask --fast` did not. `DOCS_FIELDS`
-> exists because of that day.
->
-> **The assertion that earns its place is the struct string.** This module's own
-> docstring table described the 62-byte entry layout in prose and **nothing
-> compared it to `ENTRY_STRUCT`** — and the table has already been wrong once,
-> when the entry grew 40 → 62 bytes in W-76 Phase 1. Two tests hold it now: the
-> declared `struct` equals `ENTRY_STRUCT.format`, **and** the per-field `code`
-> values concatenate back to it — because the format string could match while
-> the field table beside it described something else entirely, which is the kind
-> of documentation that reads as authority and is wrong.
->
-> **Every shape carries a worked example and the examples are tested.** The
-> offset entry's is packed through `pack_entry` and round-tripped through
-> `unpack_entry`; the doc-table and stats examples are asserted to carry exactly
-> the declared field sets; the postings example is checked for ascending docidx
-> and trimmed per-field tf. A test asserts every shape has one, since a shape
-> without an example is a shape somebody will guess at.
->
-> **Nothing about the bound, the block size or the plane's disposability
-> changes.** This declares what was already written; it adds no field and moves
-> no byte.
+**The assertion that earns its place is the struct string.** This module's own
+docstring table described the 62-byte entry layout in prose and **nothing
+compared it to `ENTRY_STRUCT`** — and the table has already been wrong once,
+when the entry grew 40 → 62 bytes. Two tests hold it: the declared `struct`
+equals `ENTRY_STRUCT.format`, **and** the per-field `code` values concatenate
+back to it — because the format string could match while the field table beside
+it described something else entirely, which is the kind of documentation that
+reads as authority and is wrong.
 
-### Alternatives considered
+**Every shape carries a worked example and the examples are tested.** The
+offset entry's is packed through `pack_entry` and round-tripped through
+`unpack_entry`; the doc-table and stats examples are asserted to carry exactly
+the declared field sets; the postings example is checked for ascending docidx
+and trimmed per-field tf.
 
-- **Commit the accelerator.** Rejected: it changes on every ingest and is a
-  pure function of bytes already in git.
-- **Score inside the accelerator and compare with a tolerance.** Rejected: a
-  tolerance is a number nobody can defend. Structural identity needs none.
-- **WAND/BlockMax as published, without the rounding-aware test.** Rejected on
-  a real failure mode — this engine's sort is rounded and tie-broken by `id`,
-  so the textbook strict inequality drops legitimate ties.
-- **Skip the offset table; string-slice the block line for `mx`.** Rejected on
-  measurement: B5 measured 397 ms → 44 ms for the slice approach, and a
-  `struct.unpack` at a computed index is strictly cheaper still, with the block
-  line never touched.
-- **A larger block size.** 128 is what B5 measured. Changing it is a
-  measurement, not a preference.
-
-### Reference (required)
-
-- The generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py);
-  the candidate path and the skipping proof —
-  [`accel.py`](../../src/fux/derive/accel.py) (its module docstring is the
-  normative statement of the argument); the on-disk shapes —
-  [`format.py`](../../src/fux/derive/format.py).
-- The bound, exhaustively tested against every posting —
-  `tests/derive/test_bounds.py`.
-- **R3 PASS**, the measured basis for every number above —
-  [`work/regression/2026-08-12-m2-accelerator/`](../../work/regression/2026-08-12-m2-accelerator/report.md).
-- Block-max WAND, the published technique this adapts — Ding & Suel,
-  *Faster Top-k Document Retrieval Using Block-Max Indexes* (SIGIR 2011):
-  https://engineering.nyu.edu/~suel/papers/bmw.pdf
-
-> **Amended 2026-08-26 (W-79).** `tools/differential/playground_grade.py`'s
-> `"hybrid"` grading mode called `fux.query.hybrid.hybrid_ask` directly — a
-> module-level RRF implementation that was already off the live path (see
-> [ADR-ASK](0004_ask.md) decision 9's 2026-08-24 amendment) and existed only
-> because this harness was its sole caller. W-79 deleted that module and
-> repointed the mode at `fux.query.run_query(..., use_hybrid=True)`, the same
-> call `fux ask --hybrid` makes — so the harness now grades the ranking that
-> actually ships, not a parallel implementation of it. Scan and accelerator
-> modes are unchanged.
-
-### The weighted bound (W-73, 2026-08-23)
+### The weighted bound
 
 **The block bound is safe on exactly one property, and it is a property about
 the WEIGHTED score:**
@@ -408,11 +254,11 @@ the WEIGHTED score:**
 for every unseen d:   w(d) * S(d)  <  theta_w      =>  d cannot enter the top-k
 ```
 
-Until 2026-08-23 the accelerator computed both halves **unweighted** — the
-ceiling from `mx`/`mnw`, and `theta` from raw candidate scores — while
-`rank()` applied `w(d)` *afterwards*, on a candidate set that had already been
-truncated. The law therefore held at `archived_weight == 1.0` and **at no
-other value**, and `config.py` accepts any non-negative float.
+The accelerator once computed both halves **unweighted** — the ceiling from
+`mx`/`mnw`, and `theta` from raw candidate scores — while `rank()` applied
+`w(d)` *afterwards*, on a candidate set that had already been truncated. The
+law therefore held at weight `1.0` and **at no other value**, while the config
+accepted any non-negative float.
 
 **Both halves are required, and each covers a direction the other does not:**
 
@@ -424,121 +270,164 @@ other value**, and `config.py` accepts any non-negative float.
 **`maximum` is the supremum over the CONFIGURATION, never over the observed
 candidates** — the document the test is about has not been seen, so nothing is
 known about its weight except that the configuration bounds it. It is
-`max(1.0, archived_weight)` and never the configured weight alone: `1.0` is
-always attainable, because a document that is not archived is never scaled.
+`max(1.0, …)` **per factor**, never the configured weight alone: `1.0` is always
+attainable, because a document that is not archived (or not listed under a
+priority) is never scaled, and a configuration of demotions must not lower the
+ceiling.
 
 Weighting an *under-estimate* is legal: `_kth_score` scores over opened terms
 only, and `w(d) * S_opened(d) <= w(d) * S_full(d)` for `w >= 0`, so a weighted
 `theta` is still a lower bound and a lower `theta` skips less, never more.
 
 **At `Weighting.trivial` every weighted path short-circuits**, so a corpus with
-no configured weight is byte-identical to the pre-W-73 arithmetic and the
+no configured weight is byte-identical to the unweighted arithmetic and the
 differential evidence gathered at the default stands unmodified.
 
-The doc table now carries `archived` (runtime schema **`fux.runtime.v3`** as of
-W-76; this sentence said `v2` until 2026-08-24, and the table has since gained
-`flen`, `superseded` and `mtime` as well — the additions that forced
-`docs_fields` into the manifest, because a schema string only moves when
-someone remembers to move it and nobody did). Without
-it the accelerator could only re-derive the flag by matching `loc` against the
-configured directories, while the scan reads the record's own stamp first — a
-second divergence, on the flag rather than the order.
+**`block_bound` takes a `Scoring` for the same reason.** `k1`, `b` and the five
+field weights are `.fux/tune.toml` keys, and they reach the **bound**, not only
+the scorer; `accel_candidates`, `ask`, `_cannot_reach` and `_kth_score` thread
+the same object down. Document-level multipliers travel through `Weighting`,
+scoring parameters through `Scoring`; a multiplier or a parameter that reaches
+the scorer without reaching the bound is the identical defect on a different
+axis.
 
-> **Amended 2026-08-24 ([ADR-TUNE](0038_tuning.md) built) — the same argument,
-> on a second axis, plus a stats-plane change nobody predicted.**
->
-> **`block_bound` takes a `Scoring`.** `k1`, `b` and the five field weights are
-> `.fux/tune.toml` keys now, and they reach the **bound**, not only the scorer;
-> `accel_candidates`, `ask`, `_cannot_reach` and `_kth_score` thread the same
-> object down. W-73 carried the *document-level* multipliers into the bound
-> through `Weighting`; this is the identical defect one axis over, and it would
-> have been identical in effect — the accelerator truncating on a bound
-> computed at weights the scorer was not using.
->
-> **`.fux/runtime/stats.json` now stores `total_flen` — five RAW per-field
-> token-count totals — in place of a pre-weighted `total_wlen`.**
-> `RUNTIME_SCHEMA` goes `fux.runtime.v3` → **`fux.runtime.v4`**, so a v3
-> runtime is refused and rebuilt. §Decision 2's *"the candidate set and
-> `(n, total_wlen, df)` are identical"* still names the right three; the
-> `total_wlen` in it is a **float derived per query** on both paths.
->
-> **Why the plane had to change at all**, and this was not anticipated
-> anywhere: a stored `total_wlen` was a **function of a tunable**. The moment a
-> field weight became a key, `avg_wlen` would move on the scan path — which
-> derives it per query — and *not* on this one, which read the baked number.
-> Same corpus, two `avg_wlen`s: a differential-law break, and one needing a
-> **rebuild** to repair, which would have made *"changing a knob needs no
-> rebuild"* false. The plane's own record is
-> [ADR-RUNTIME-STATS](0028_runtime-stats.md); the fix is to store the
-> observation and weight it at query time.
->
-> **The finding worth carrying forward is about how to TEST a bound, and it is
-> a trap this record could fall into again.**
->
-> **BM25 saturates, so an unweighted bound is nearly indistinguishable from a
-> weighted one whenever `tf` is large.** At `tf = 90` a term's contribution is
-> already within a percent of its `idf * (k1 + 1)` ceiling, so computing the
-> bound at weight `1.0` instead of `60.0` barely moves it and nothing diverges.
-> The gap only opens where weighted `tf` is comparable to `k1` — which means
-> **small counts**.
->
-> **So a weight sweep over a realistic corpus passes while proving nothing.**
-> The fixture that actually falsifies an unweighted bound needs every `tf` at
-> 1 or 2, the deferred term common and its documents short, and the opened
-> term's documents long enough that length normalisation keeps `theta` low.
-> Verified by mutation: reverting `block_bound`'s `scoring` argument makes it
-> diverge at `top = 20`
-> ([`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py), 47
-> tests). A fixture that does *not* fail under that mutation certifies an
-> unsound bound as proven — the trap `tests/derive/test_differential.py` paid
-> for once already.
->
-> **Everything §The weighted bound argues is unchanged in form.** Per-field
-> extrema stay stored UNWEIGHTED and are recombined at the query's own
-> `Scoring`; both errors still push the bound up, so a block that could hold a
-> winner is never skipped. `Weighting.maximum` gains per-source priority as a
-> third independent multiplier, still `max(1.0, …)` per factor because an
-> unlisted document is scaled by `1.0` and a configuration of demotions must
-> not lower the ceiling.
->
-> **⚠ Why this record was amended at all.** `derive/accel.py` and
-> `derive/build.py` are this record's own components, so the freshness check
-> did point here — but `stats.json`'s shape is
-> [ADR-RUNTIME-STATS](0028_runtime-stats.md)'s subject and it owns no module,
-> so nothing would have pointed *there*. Both are amended today by a session
-> that went looking, which is
-> [W-82 §5.3](../../work/open/W-82-the-consolidated-build.md)'s finding: a record
-> that **describes** a component the check cannot see rots in silence.
+⚠ **The finding worth carrying forward is about how to TEST a bound.** **BM25
+saturates, so an unweighted bound is nearly indistinguishable from a weighted
+one whenever `tf` is large.** At `tf = 90` a term's contribution is already
+within a percent of its `idf * (k1 + 1)` ceiling, so computing the bound at
+weight `1.0` instead of `60.0` barely moves it and nothing diverges. The gap
+only opens where weighted `tf` is comparable to `k1` — which means **small
+counts**.
+
+**So a weight sweep over a realistic corpus passes while proving nothing.** The
+fixture that actually falsifies an unweighted bound needs every `tf` at 1 or 2,
+the deferred term common and its documents short, and the opened term's
+documents long enough that length normalisation keeps `theta` low. Verified by
+mutation: reverting `block_bound`'s `scoring` argument makes it diverge at
+`top = 20`
+([`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py)). **A
+fixture that does not fail under that mutation certifies an unsound bound as
+proven.**
+
+### Consequences
+
+- **The differential law now covers the confidence block too.** `accel.ask`
+  threads `stats_out` straight through to `rank()`, so both generators derive
+  `df` over the same query hashes and report the same `n`, and `--fast` and
+  `--scan` cannot disagree about how confident fux is
+  ([ADR-CONFIDENCE](0045_confidence.md) decision 9).
+- ⚠ **The block bound is why `support` is not a corpus-wide count.** This plane
+  skips documents it has *proved* cannot reach the top `k`, so it never scores
+  them, while the reference scan scores everything. A corpus-wide *"47 documents
+  matched"* would therefore differ between the two paths — a law break — so
+  `support` counts only what both paths agree on. The better number is not
+  available honestly, and the law is worth more than the better number.
+- **`fux build` is a pure optimisation.** Nothing about correctness depends on
+  the derived plane existing.
+- **`rm -rf .fux/runtime` is always safe**, which is what lets the build be
+  aggressive.
+- **Two formats to keep in step.** The offset table's struct is a binary
+  contract; `RUNTIME_SCHEMA` exists so a mismatch triggers a rebuild rather than
+  a misread. **A schema string only moves when someone remembers to move it, and
+  once nobody did** — which is why `docs_fields` is written into the manifest
+  rather than trusted to the version string alone.
+- **The doc table carries `archived`, `superseded` and `mtime`** because
+  otherwise the accelerator could only re-derive them by matching `loc` against
+  the configured directories, while the scan reads the record's own stamp — a
+  second divergence, on the flag rather than the order.
+- **`stats.json` stores RAW `total_flen`, not a pre-weighted total.** A stored
+  weighted total is a **function of a tunable**: the moment a field weight
+  became a key, `avg_wlen` would move on the scan path — which derives it per
+  query — and *not* on this one, which read the baked number. Same corpus, two
+  `avg_wlen`s: a differential-law break needing a **rebuild** to repair, which
+  would make *"changing a knob needs no rebuild"* false. The plane's own record
+  is [ADR-RUNTIME-STATS](0028_runtime-stats.md).
+- **The bound must stay an upper bound.** Any future scoring change — a sixth
+  field, a different saturation — invalidates `block_bound` and the skipping
+  argument with it. That is the veto below.
+- **`fux build` is a two-lane build, and the second lane is not this
+  record's.** The graph plane ([ADR-GRAPH](0029_graph.md)) is written by the
+  same `build()` call, from the same single pass over the committed shards —
+  `_read_committed` returns the parsed records alongside the doc table so the
+  graph plane costs no second read, and `DETERMINISTIC_FILES` covers
+  `graph.json` too. **What is deliberately unchanged is the accelerator's own
+  outputs and the differential law over them**: a graph plane that leaked into
+  the lexical path would void every byte-identity claim here, so the graph
+  lane's own eval asserts `ask` is unmoved through the CLI
+  (`tests_e2e/test_relational.py::test_the_graph_lane_does_not_move_ask`).
+- **`build()` takes the same optional `progress` seam `ingest.run()` does**,
+  reporting its passes. `None` is the default and means silent, and the bar is
+  stderr-only — so `DETERMINISTIC_FILES` and every byte-identity assertion here
+  are untouched by construction. The rules are
+  [ADR-CLI](0002_cli-surface.md).
+- **`accel.ask()` takes the same keyword-only weighting arguments `rank()`
+  does**, with no-op defaults, so every existing caller is unaffected and the
+  differential law between this path and the scan is unchanged.
+- **A corpus with hashed URL records once had no accelerator at all** and paid
+  4 248.8 ms rather than 27.2 ms — the whole accelerator result forfeited by
+  following the documentation. Fixed in the *field shape*, never in this
+  record's invariant ([ADR-RECORD](0010_index-record.md) rule 2); the
+  differential harness now carries a hashed record, which it never had.
+- ⚠ **`tools/differential/playground_grade.py` grades two modes — `scan` and
+  `accelerator` — and no test imports it.** Those are exactly the pair the
+  differential law binds together, so the harness is precisely a
+  differential-law instrument. It has sat broken before, found by a sweep rather
+  than by a test; **a live tool with no test importing it is a tool that can
+  break silently.**
+
+### Alternatives considered
+
+- **Commit the accelerator.** Rejected: it changes on every ingest and is a
+  pure function of bytes already in git.
+- **Score inside the accelerator and compare with a tolerance.** Rejected: a
+  tolerance is a number nobody can defend. Structural identity needs none.
+- **WAND/BlockMax as published, without the rounding-aware test.** Rejected on
+  a real failure mode — this engine's sort is rounded and tie-broken by `id`,
+  so the textbook strict inequality drops legitimate ties.
+- **Skip the offset table; string-slice the block line for `mx`.** Rejected on
+  measurement: 397 ms → 44 ms for the slice approach, and a `struct.unpack` at
+  a computed index is strictly cheaper still, with the block line never touched.
+- **A larger block size.** 128 is what was measured. Changing it is a
+  measurement, not a preference.
+- **Store weighted `mx`/`mnw`.** Rejected under decision 3: a weighted extremum
+  cannot be stored once when the weights are query-time keys, and storing it
+  anyway is what made the bound unsound at every non-default weight.
+
+### Reference (required)
+
+- The generator — [`src/fux/derive/build.py`](../../src/fux/derive/build.py);
+  the candidate path and the skipping proof —
+  [`accel.py`](../../src/fux/derive/accel.py) (its module docstring is the
+  normative statement of the argument); the on-disk shapes —
+  [`format.py`](../../src/fux/derive/format.py) and
+  [`runtime.schema.json`](../../src/fux/derive/runtime.schema.json).
+- The bound, exhaustively tested against every posting —
+  [`tests/derive/test_bounds.py`](../../tests/derive/test_bounds.py); the
+  mutation-verified weighted case —
+  [`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py).
+- **R3 PASS**, the measured basis for every number above —
+  [`work/regression/2026-08-12-m2-accelerator/`](../../work/regression/2026-08-12-m2-accelerator/report.md).
+- The per-field bound's measured cost —
+  [`work/regression/2026-08-23-fork3-per-field-bound/`](../../work/regression/2026-08-23-fork3-per-field-bound/).
+- Block-max WAND, the published technique this adapts — Ding & Suel, *Faster
+  Top-k Document Retrieval Using Block-Max Indexes* (SIGIR 2011):
+  https://engineering.nyu.edu/~suel/papers/bmw.pdf
 
 ### Veto condition
 
 **Reopen this decision if** the two paths ever disagree, or if a scoring change
 invalidates the block bound.
 
-**Veto 5 (W-73): a weight that can reach the scorer without reaching the
-bound.** Any new multiplier applied in `rank()` — per-source priority is the
-next one — must be expressed through `Weighting` so that `maximum` and the
-weighted `theta` see it. A multiplier added directly in `rank()` re-opens
-exactly this defect, silently.
-
-```bash
-# 5. every score multiplier is routed through Weighting
-grep -nE '\*=' src/fux/query/rank.py
-# expect: only `s *= archived_weight` guarded by `demote`, which Weighting owns
-
-# 6. the bound survives a NON-default weight, including the adversarial case
-pytest -q tests/derive/test_weighted_bound.py
-
-# 7. the differential harness sweeps weights, not just the default
-grep -n 'WEIGHTS' tools/differential/run.py
-# expect: a tuple straddling 1.0 and reaching far enough to eat the block slack
-```
+**And specifically: a weight that can reach the scorer without reaching the
+bound.** Any new multiplier applied in `rank()` must be expressed through
+`Weighting` so that `maximum` and the weighted `theta` see it. A multiplier
+added directly in `rank()` re-opens exactly this defect, silently.
 
 **How to check it:**
 
 ```bash
 # 1. the differential law, the property the whole design rests on
-# (scan is the default since 2026-08-21; --fast is what exercises this file)
+# (scan is the default; --fast is what exercises this file)
 diff <(fux ask "any query" --json --top 5) <(fux ask "any query" --json --top 5 --fast) \
   && echo IDENTICAL
 
@@ -552,7 +441,19 @@ grep -nE 'K1|B \*|idf\(' src/fux/derive/accel.py
 # 4. the derived plane still has exactly one input
 grep -n 'index_dir\|shard_path\|runtime_dir' src/fux/derive/build.py
 # expect: reads .fux/index only, writes .fux/runtime only
+
+# 5. every score multiplier is routed through Weighting
+grep -nE '\*=' src/fux/query/rank.py
+# expect: only multiplies Weighting owns
+
+# 6. the bound survives a NON-default weight, including the adversarial case
+pytest -q tests/test_tune_boundary.py
+
+# 7. the differential harness sweeps weights, not just the default
+grep -n 'WEIGHTS' tools/differential/run.py
+# expect: a tuple straddling 1.0 and reaching far enough to eat the block slack
 ```
+
 ---
 
 ## References
@@ -573,6 +474,10 @@ evidence.*
 - [`src/fux/derive/accel.py`](../../src/fux/derive/accel.py)
 - [`src/fux/derive/build.py`](../../src/fux/derive/build.py)
 - [`src/fux/derive/format.py`](../../src/fux/derive/format.py)
+- [`src/fux/derive/runtime.schema.json`](../../src/fux/derive/runtime.schema.json)
+- [`tests/derive/test_bounds.py`](../../tests/derive/test_bounds.py)
+- [`tests/test_tune_boundary.py`](../../tests/test_tune_boundary.py)
+- [`tools/differential/run.py`](../../tools/differential/run.py)
 
 **Measured evidence**
 

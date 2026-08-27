@@ -107,12 +107,36 @@ def test_an_absent_types_file_means_the_built_in_default(tmp_path):
     assert types.default and types.allow == DEFAULT_TYPES
 
 
-def test_the_default_admits_prose_and_refuses_machine_data():
+def test_the_default_admits_prose_and_every_decodable_format():
+    """⚠ **Widened 2026-08-26 on Arpit's ruling** — *"all the ones which have a
+    decoder"*. The default was six prose globs; it is now those plus every
+    extension a **built-in** decoder claims.
+
+    What still stays out is the point of the assertion below: source code,
+    shell scripts, SVG and extensionless files have no decoder, so they remain
+    exactly as far outside the default as ADR-TYPES verdict G left them.
+    """
     types = TypeFilter(allow=DEFAULT_TYPES)
     for name in ("a.md", "a.markdown", "a.txt", "a.rst", "a.adoc", "a.org"):
         assert types.accepts(f"docs/{name}"), name
-    for name in ("a.json", "a.svg", "a.sh", "a.py", "a.mermaid", "LICENSE", "Makefile"):
+    for name in ("a.json", "a.html", "a.docx", "a.pdf", "a.yaml", "a.eml", "a.ipynb"):
+        assert types.accepts(f"docs/{name}"), name
+    for name in ("a.svg", "a.sh", "a.py", "a.mermaid", "LICENSE", "Makefile"):
         assert not types.accepts(f"docs/{name}"), name
+
+
+def test_the_default_never_grows_from_a_consumer_decoder(tmp_path):
+    """A default derived from the live registry would mean **adding a decoder
+    silently starts indexing a new file type**. What counts as a document has
+    to stay a committed line a human wrote in `.fux/sources/types`.
+    """
+    decoders = tmp_path / ".fux" / "decoders"
+    decoders.mkdir(parents=True)
+    (decoders / "logdoc.py").write_text(
+        "EXTENSIONS = ('.log',)\ndef decode(raw, rel_path):\n    return '# log'\n"
+    )
+    assert "*.log" not in DEFAULT_TYPES
+    assert not TypeFilter(allow=DEFAULT_TYPES).accepts("app.log")
 
 
 def test_a_types_file_replaces_the_default_rather_than_extending_it(tmp_path):
@@ -159,9 +183,13 @@ def test_all_three_conditions_apply_together(tree):
         excludes=["work/regression/*/evidence"],
         types=TypeFilter(allow=DEFAULT_TYPES),
     )
-    assert [w.rel_path for w in walked] == ["docs/a.md", "work/regression/r1/report.md"]
+    # `docs/data.json` is now WALKED, not skipped — the 2026-08-26 widening.
+    assert [w.rel_path for w in walked] == [
+        "docs/a.md",
+        "docs/data.json",
+        "work/regression/r1/report.md",
+    ]
     assert {s.rel_path: s.reason for s in skipped} == {
-        "docs/data.json": "not an indexed file type",
         "work/regression/r1/evidence/n.md": "excluded by !work/regression/*/evidence",
     }
 

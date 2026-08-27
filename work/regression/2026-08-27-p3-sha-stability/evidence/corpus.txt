@@ -1,0 +1,22 @@
+# .fux/sources/urls (non-comment lines)
+https://www.rfc-editor.org/rfc/rfc7231.txt                     fetch=http meta=plain
+https://www.rfc-editor.org/rfc/rfc2616.txt                     fetch=http meta=plain
+https://www.rfc-editor.org/rfc/rfc3986.txt                     fetch=http meta=plain
+https://www.rfc-editor.org/rfc/rfc6265.txt                     fetch=http meta=plain
+https://peps.python.org/pep-0008/                              fetch=http meta=plain
+https://peps.python.org/pep-0020/                              fetch=http meta=plain
+https://peps.python.org/pep-0484/                              fetch=http meta=plain
+https://docs.python.org/3/library/pathlib.html                 fetch=http meta=plain
+https://docs.python.org/3/library/json.html                    fetch=http meta=plain
+https://docs.python.org/3/library/subprocess.html              fetch=http meta=plain
+https://docs.python.org/3/tutorial/errors.html                 fetch=http meta=plain
+https://example.com/                                           fetch=http meta=plain
+https://www.iana.org/help/example-domains                      fetch=http meta=plain
+https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol      fetch=http meta=plain
+https://en.wikipedia.org/wiki/Site_reliability_engineering     fetch=http meta=plain
+https://en.wikipedia.org/wiki/Runbook                          fetch=http meta=plain
+https://www.githubstatus.com/                                  fetch=http meta=plain
+https://httpbin.org/html                                       fetch=http meta=plain
+https://go.dev/doc/faq                                         fetch=http meta=plain
+https://en.wikipedia.org/wiki/Special:Random                   fetch=http meta=plain
+https://httpbin.org/html                                       fetch=http meta=plain

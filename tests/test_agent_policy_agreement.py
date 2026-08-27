@@ -30,7 +30,16 @@ END = "<!-- fux:policy:end v1 -->"
 
 #: The two renderings that enter EVERY request in a consumer's repository —
 #: Copilot's `applyTo: "**"` and Kiro's `inclusion: always`. Veto condition 5.
-AMBIENT = ("fux-archived-results.instructions.md", "steering-fux-archived-results.md")
+# W-82 ruling 16 made mechanical. The repo-root `AGENTS.md` is AMBIENT — Kiro
+# loads it on every interaction — so ruling 16's *"it must stay policy-shaped
+# and short"* is enforced by the same byte bound as the other two rather than
+# left to whoever edits it next. Ruling 15 says ambient files carry policy, not
+# manuals; this is that rule holding itself to account.
+AMBIENT = (
+    "fux-archived-results.instructions.md",
+    "steering-fux-archived-results.md",
+    "AGENTS.md",
+)
 
 #: ~2 KB each today. The bound is deliberately loose — this catches a rendering
 #: that doubled, not one that gained a sentence.
@@ -57,8 +66,21 @@ AMBIENT_MAX_BYTES = 4096
 #: is the correct relationship -- inlining the eight-rule block would duplicate
 #: a policy that already has a rendering per vendor, and duplication is exactly
 #: what decision 2's byte-for-byte check exists to prevent drifting.
+#: `DECODER-SKILL.md` (W-86 P7) is a **build procedure**, not a policy: it
+#: tells an agent how to write or edit a decoder when a human asks, and states
+#: no position on how to read fux's output. It is the same shape as
+#: `ENRICH-SKILL.md` — invoked deliberately, writes into a committed directory,
+#: changes ranking — and holding it to the archived-results block would force an
+#: eight-rule preamble about interpreting search results into a file about
+#: parsing file formats. It points AT `fux-archived-results` for that instead.
 NOT_A_POLICY_RENDERING = frozenset(
-    {"POLICY.md", "ENRICH-SKILL.md", "USAGE-SKILL.md", "fux-usage.instructions.md"}
+    {
+        "POLICY.md",
+        "ENRICH-SKILL.md",
+        "USAGE-SKILL.md",
+        "fux-usage.instructions.md",
+        "DECODER-SKILL.md",
+    }
 )
 
 
@@ -79,6 +101,7 @@ def test_the_exemptions_are_deliberate():
         "ENRICH-SKILL.md",
         "USAGE-SKILL.md",
         "fux-usage.instructions.md",
+        "DECODER-SKILL.md",
     }
 
 
@@ -103,7 +126,7 @@ def test_the_block_is_substantial():
 
 def test_there_are_renderings_to_check():
     """A vacuous pass is the failure mode this whole file exists to avoid."""
-    assert len(renderings()) == 4, [p.name for p in renderings()]
+    assert len(renderings()) == 5, [p.name for p in renderings()]
 
 
 @pytest.mark.parametrize("path", renderings(), ids=lambda p: p.name)

@@ -58,6 +58,30 @@ mount can lose a write.
 that a successful write persisted. A repo-wide link check catches it, which is
 how this one surfaced.
 
+**The shell can be wedged for a whole session, with the file tools still
+working.** Observed 2026-08-27: every `mcp__workspace__bash` call — including
+`echo ok` — failed with
+
+```text
+RPC error: ensure user: useradd failed: exit status 12:
+useradd: cannot create directory /sessions/<name>
+```
+
+on five consecutive attempts, and did not recover. `Read`, `Write`, `Edit` and
+`Grep` over `/Users/…/my_programs/fux` were unaffected throughout.
+
+- **What this costs is precisely the things that are not file *content*:** no
+  `git` (so no ground-truth check against `git log`/`status`/`tag`), no
+  `pytest`, and **no `mv`** — which removes even the `_to_delete/` workaround
+  above, because the file tools have no rename and no unlink. A session in this
+  state **cannot remove a file by any means.**
+- **Do not retry past two attempts.** The failure is identical every time and
+  the harness itself stops offering after five.
+- **Say it in the deliverable, not just in chat.** The hazard is a session that
+  writes documentation asserting a deletion or a green suite it had no way to
+  perform. Write the docs as *ruled, pending a command Arpit runs*, and hand him
+  the exact command.
+
 **It has no network and Python 3.10.** fux-engine needs ≥3.11 and installs
 from PyPI, so **the test suite and `fux-lab`'s `setup.sh` cannot run here.**
 Run them in the cloud container (network + 3.11) or in a local terminal.

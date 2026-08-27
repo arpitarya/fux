@@ -4,7 +4,11 @@ name: ADR-TEMPLATE
 title: ADR-TEMPLATE (0000) — the record template
 description: "Copy for each completed feature or ruled measurement. One feature, one ADR. Real records use type: ADR."
 status: proposed
-timestamp: 2026-08-18T00:00:00Z
+date: 2026-08-27
+feature: the record template itself
+owns: []
+laws: []
+timestamp: 2026-08-27T00:00:00Z
 ---
 
 # ADR-<NAME>: <short decision title>
@@ -12,25 +16,54 @@ timestamp: 2026-08-18T00:00:00Z
 > **How to use this file.** Copy it to `docs/adr/000N_<short-name>.md`, take the
 > next free number, and give the record a **NAME** — that name is how every
 > other doc cites it. Delete these instruction blockquotes as you fill it in.
->
-> **The frontmatter above is the exact shape**, six keys in that order:
-> `type` (always `ADR`) · `name` · `title` (`NAME (NNNN) — …`) · `description` ·
-> `status` (`proposed` | `accepted` | `superseded`) · `timestamp`.
-> **Quote any value containing `: `** — `fux`'s parser is permissive and will
-> read it, but strict YAML refuses the whole block, which makes the record's
-> metadata invisible to GitHub, editors and every generator. `name` and `status`
-> must match the `**Name:**` and `**Status:**` lines below, and the title must
-> carry its number. All of that is checked by
-> [`tests/test_adr_frontmatter.py`](../../tests/test_adr_frontmatter.py).
 
-- **Name:** `ADR-<NAME>` — cite this everywhere; never cite the number
-- **Status:** proposed | accepted | superseded by ADR-<NAME>
-- **Date:** YYYY-MM-DD
-- **Feature:** <the one feature this record belongs to — one feature, one ADR>
-- **Owns:** <the `src/` or `tools/` components this record claims — must match
-  the ownership table in [`README.md`](README.md)>
-- **Laws:** <the ADR-LAWS numbers this decision is bound by, e.g. L1, L3 — do
-  not restate them here>
+> ## The frontmatter is the metadata. Nothing below it restates a key.
+>
+> **Ten keys, in this order** — `type` · `name` · `title` · `description` ·
+> `status` · `date` · `feature` · `owns` · `laws` · `timestamp`. Two are
+> optional and appear only when they are true: `supersedes` and `ratifies`.
+>
+> | key | value |
+> |---|---|
+> | `type` | always `ADR` |
+> | `name` | `ADR-<NAME>` — cite this everywhere, never the number |
+> | `title` | `ADR-<NAME> (NNNN) — <short decision title>`; carries both name and number |
+> | `description` | one sentence; what the record decides |
+> | `status` | `proposed` · `accepted` · `superseded` |
+> | `date` | `YYYY-MM-DD` — when the decision was taken |
+> | `feature` | the one feature this record belongs to; one feature, one ADR |
+> | `owns` | inline list of the `src/`/`tools/` paths this record claims, `[]` when none. **Must match the ownership table in [`README.md`](README.md)** |
+> | `laws` | inline list of the ADR-LAWS numbers this decision is bound by, `[]` when none. Never restate a law |
+> | `timestamp` | ISO-8601, for OKF consumers |
+> | `supersedes` | *optional* — the record this one replaces, when there is one |
+> | `ratifies` | *optional* — the work item whose ruling this record records |
+>
+> **Quote any value containing `: `.** `fux`'s parser is permissive and will
+> read it, but strict YAML refuses the whole block, which makes the record's
+> metadata invisible to GitHub, editors and every generator.
+>
+> **Do not repeat any of it in the body.** The body opens at §1.
+> [`tests/test_adr_frontmatter.py`](../../tests/test_adr_frontmatter.py) checks
+> the keys, the quoting, the title, and that no `- **Name:**`-style block has
+> come back.
+
+> ## A record states what is true now. It carries no history.
+>
+> **There are no `Amended` sections, and the word does not appear.** When a
+> decision changes, **rewrite the sentence it changed** — in place, in the same
+> commit. A record is read top-down by an agent that will act on the first
+> answer it finds, so a correction appended below a false sentence is a false
+> sentence with a footnote.
+>
+> **What the record holds:** what fux does today, and what it is committed to
+> doing. **What it does not hold:** what it used to do, what a superseded
+> amendment said, what a number was before it was corrected, or which work item
+> corrected it. Git holds all of that, and git is where it belongs.
+>
+> **The one exception is an argument that still binds.** A rejected alternative
+> belongs in *Alternatives considered* — not because it is history, but because
+> it is the reason the current shape is the current shape, and leaving it out
+> invites the argument back.
 
 ---
 
@@ -38,7 +71,8 @@ timestamp: 2026-08-18T00:00:00Z
 
 > **One screen, maximum.** If it does not fit, the extra belongs in §2.
 
-<Two or three short paragraphs: what changed, and why anyone should care.>
+<Two or three short paragraphs: what this decides, and why anyone should care.
+Present tense. Never "originally", "used to", or "was changed to".>
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.** Keep
 the twin inside the `<details>` block below; the blank line after `</summary>`
@@ -158,6 +192,7 @@ What forces are at play? What problem does this feature solve? Why now?
 ### Decision
 
 The decision, stated plainly. Present tense, imperative where it binds.
+Numbered, so other records can cite `decision 3` rather than quoting.
 
 > **Output — *optional, and this is the one to reach for first*.** Before and
 > after, same command, same corpus. A record whose decision changed observable
@@ -241,8 +276,8 @@ $ <the check command>
 >    not list one, because a listed reference reads as a source and `archive/`
 >    is not evidence. Repoint at the live successor.
 > 3. **Every link resolves.** A stale link here is a defect, not a footnote —
->    [`tests/test_archive_law.py`](../../tests/test_archive_law.py) checks the
->    repo for them.
+>    [`tests/test_doc_links.py`](../../tests/test_doc_links.py) checks the repo
+>    for them.
 >
 > Keep the groups in the order below and **delete any group that is empty.**
 > Records run inline because names are short; the rest are lists because paths

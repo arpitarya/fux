@@ -2,22 +2,16 @@
 type: ADR
 name: ADR-URL-LIST
 title: "ADR-URL-LIST (0018) — the committed URL list"
-description: "One URL per line in a committed file, deduped and sorted by the loader, so config order can never change committed bytes and 5000 entries diff and merge line by line."
+description: "One URL per line in a committed file, deduped and sorted by the loader, so config order can never change committed bytes and thousands of entries diff and merge line by line."
 status: accepted
+date: 2026-08-19
+feature: "`.fux/sources/urls` — the file format itself, and the one grammar both committed source lists are parsed by"
+owns: [src/fux/ingest/sourcelist.py]
+laws: [L2, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
 ---
 
 # ADR-URL-LIST — the committed URL list
-
-- **Name:** `ADR-URL-LIST` — cite this everywhere; never cite the number
-- **Status:** accepted
-- **Date:** 2026-08-19
-- **Feature:** `.fux/sources/urls` — the file format itself, as distinct from what fetches its entries
-- **Owns:** `src/fux/ingest/sourcelist.py` — the grammar, shared with `.fux/sources/dirs` per [ADR-DIR-LIST](0022_dir-list.md) decision 2. Added 2026-08-19 when decisions 7–13 were built: the record decides the format and owns what enforces it. The *fetch* half stays with [ADR-FETCHER](0019_fetcher.md), which owns `ingest/urlsrc.py`; **the *writer* moved to [ADR-CLI](0002_cli-surface.md) on 2026-08-21** (W-63), when `src/fux/sources.py` stopped being `fux url` and became `add`/`remove`/`update` over all three lists. This record still decides what a URL line **means**; ADR-CLI decides what the command does
-- **Laws:** L2, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Split from:** [ADR-URL-INGEST](0008_url-ingest.md) decisions 5 and 6, which shipped in 0.31.x and are restated nowhere
-
----
 
 ## §1 — For humans
 
@@ -25,19 +19,18 @@ The list of URLs Fux indexes is **a file, not a config array**: one URL per
 line, `#` comments, blank lines ignored, committed to your repo.
 
 That is the whole decision, and it is not cosmetic. A TOML array of 5 000
-entries is **one diff hunk and one merge conflict** — two people adding a URL
-in the same week collide, and a reviewer cannot see what changed. One entry per
+entries is **one diff hunk and one merge conflict** — two people adding a URL in
+the same week collide, and a reviewer cannot see what changed. One entry per
 line is what makes the list reviewable at the size it actually reaches.
 
 The second half is that **the loader sorts and dedupes**. File order is
-presentation only. You can group entries by team, by system, by whatever helps
-a human read it, and it cannot change a single committed byte — which is what
+presentation only. You can group entries by team, by system, by whatever helps a
+human read it, and it cannot change a single committed byte — which is what
 keeps [ADR-INGEST](0007_ingest.md)'s byte-reproducibility true when two people
 maintain the same list in different orders.
 
-The third part is **per-URL attributes**, decided here and built later: a line
-may carry `key=value` pairs after the URL, `.gitattributes`-style. **There are
-two, and the set is closed.**
+The third part is **per-URL attributes**: a line may carry `key=value` pairs
+after the URL, `.gitattributes`-style. **There are two, and the set is closed.**
 
 | attribute | values | default | decides |
 |---|---|---|---|
@@ -52,16 +45,16 @@ https://wiki.corp/display/ENG/runbook    fetch=cdp
 https://app.corp/reports/q3              fetch=cdp meta=plain
 ```
 
-**A line with no attributes means every default applies** — which is why this
-can be decided before it is built: every list valid today stays valid forever.
-The full set, what each does to a record, and the candidates deliberately left
-out are in §2.
+**A line with no attributes means every default applies**, so every list valid
+today stays valid.
 
 This record exists separately from [ADR-URL-INGEST](0008_url-ingest.md) because
 the two answer different questions: that record owns **what fetches a URL**,
 this one owns **what the file says**. `fetch=` is the seam between them — this
 record fixes the *grammar* and the closed set of attributes; the fetcher records
-define what `fetch=` selects.
+define what `fetch=` selects. **The writer is [ADR-CLI](0002_cli-surface.md)'s**
+— this record decides what a line *means*, that one decides what the command
+does.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -96,7 +89,7 @@ Captured from the filed fixture,
 ```console
 $ cat .fux/sources/urls
 # one URL per line. `#` is a comment at line start or after whitespace --
-# NOT inside a URL, which is the whole of W-49.
+# NOT inside a URL.
 https://example.invalid/handbook#oncall    fetch=http meta=hashed
 https://example.invalid/handbook#deploys   fetch=http meta=hashed
 https://example.invalid/handbook/oncall
@@ -117,7 +110,6 @@ ingested 7 docs (5 changed), 1 skipped, 5 shards written
   skip https://example.invalid/gone: fetch failed: 404 not found
 ```
 
-
 ---
 
 ## §2 — For agents
@@ -126,114 +118,99 @@ ingested 7 docs (5 changed), 1 skipped, 5 shards written
 
 Three properties had to hold at once, and each rules out an obvious shape.
 
-**It has to merge.** The design point is a corporate corpus, so the list
-reaches thousands of entries maintained by people who do not coordinate. Any
-format where one logical addition touches a shared line produces conflicts
-proportional to team size.
+**It has to merge.** The design point is a corporate corpus, so the list reaches
+thousands of entries maintained by people who do not coordinate. Any format
+where one logical addition touches a shared line produces conflicts proportional
+to team size.
 
 **It has to be reviewable.** A URL entering the index is a decision about what
-an agent will treat as authoritative. It belongs in a diff a human reads, not
-in a value nested three levels into a config file.
+an agent will treat as authoritative. It belongs in a diff a human reads, not in
+a value nested three levels into a config file.
 
 **It must not affect committed bytes.** Two people can hold the same set in
-different orders; the index must not know. This is a direct consequence of
-L3 — same sources, byte-identical index — applied to *config* rather than
-content.
+different orders; the index must not know. This is L3 — same sources,
+byte-identical index — applied to *config* rather than content.
 
 ### Decision
 
-**1. The URL list is a file, not a TOML array.** Default
-`.fux/sources/urls`, declared **committed** by
-[ADR-DOTFUX](0003_fux-directory.md). The path is configurable
-([ADR-CONFIG](0014_config.md)); the format is not.
+**1. The URL list is a file, not a TOML array.** Default `.fux/sources/urls`,
+declared **committed** by [ADR-DOTFUX](0003_fux-directory.md). The path is
+configurable ([ADR-CONFIG](0014_config.md)); the format is not.
 
 **2. One URL per line.** Blank lines are ignored. This is the property that
-makes the file merge line-by-line at any size, and it is the reason the file
-exists rather than an array — the same reasoning that shards the index.
+makes the file merge line-by-line at any size, and it is the same reasoning that
+shards the index.
 
-**3. `#` starts a comment at the start of a line or after whitespace**, and
-the rest of the line is discarded. Groups, owners, and *why this URL is here*
-are the reason a human can maintain the file at all. **`#` anywhere else is
-part of the entry** — a URL fragment is not a comment. Under decision 7 this
-is forced rather than chosen: `https://x/a#frag meta=plain` cannot be parsed
-at all if `#` means a comment everywhere. Built 2026-08-19 in
-[`sourcelist.strip_comment`](../../src/fux/ingest/sourcelist.py).
+**3. `#` starts a comment at the start of a line or after whitespace**, and the
+rest of the line is discarded. **`#` anywhere else is part of the entry** — a
+URL fragment is not a comment. Under decision 7 this is forced rather than
+chosen: `https://x/a#frag meta=plain` cannot be parsed at all if `#` means a
+comment everywhere.
 
 **4. The loader dedupes and sorts.** File order is presentation only. A
-duplicate line is not an error — it is a merge artefact, and failing the run
-for one would make the file hostile to the collaboration it was designed for.
+duplicate line is not an error — it is a merge artefact, and failing the run for
+one would make the file hostile to the collaboration it was designed for.
 
-**5. A non-`http(s)` line is a loud error naming `file:lineno`**, never a
-silent skip. The house pattern from `store/reader.py`: a typo'd scheme that
-quietly fetches nothing is worse than a stopped run, because the corpus is
-then wrong in a way nothing surfaces.
+**5. A non-`http(s)` line is a loud error naming `file:lineno`**, never a silent
+skip. A typo'd scheme that quietly fetches nothing is worse than a stopped run,
+because the corpus is then wrong in a way nothing surfaces.
 
 **6. The list is intent, not state.** A line present means *this document
 belongs in the index*. A fetch that fails keeps the prior record and reports a
 skip; only removing the line removes the document
-([ADR-URL-INGEST](0008_url-ingest.md) decision 4). The file never records
-fetch outcomes.
+([ADR-URL-INGEST](0008_url-ingest.md) decision 3). **The file never records
+fetch outcomes.**
 
 **7. A line may carry attributes after the URL**, separated by whitespace:
-`<url> key=value [key=value ...]`. A line with no attributes means every
-default applies, so **every list that is valid today stays valid forever**.
-Built 2026-08-19 in
-[`sourcelist.py`](../../src/fux/ingest/sourcelist.py) — **one parser, shared
-with `.fux/sources/dirs`** ([ADR-DIR-LIST](0022_dir-list.md) decision 2). Two
+`<url> key=value [key=value ...]`. **One parser, shared with
+`.fux/sources/dirs`** ([ADR-DIR-LIST](0022_dir-list.md) decision 2) — two
 parsers for one grammar is how `#`-handling, sorting and the unknown-key error
-end up disagreeing.
+end up disagreeing. Adding a third list is a `ListSpec`, not a parser.
 
 **8. `key=value` is the only form.** No bare flags, no `-key` unset, no `!key`
 revert — `.gitattributes` needs four states because its entries are *patterns*
-that overlap; ours are exact URLs that do not. One form, one meaning, nothing
-to resolve. Values carry no whitespace and no quoting; a value that needs
-either is a new decision, not a parser feature.
+that overlap; ours are exact entries that do not. One form, one meaning, nothing
+to resolve. Values carry no whitespace and no quoting; a value that needs either
+is a new decision, not a parser feature.
 
 **9. An unknown key is a loud error naming `file:lineno`.** Same rule
 [ADR-RECORD](0010_index-record.md) applies to `_format`: a reader that does not
-know a key must refuse rather than guess. Silently ignoring one is how a
-typo'd `mata=plain` ships a private document to a public index — the failure
-being wrong quietly, which decision 5 already refuses in the other direction.
+know a key must refuse rather than guess. Silently ignoring one is how a typo'd
+`mata=plain` ships a private document to a public index.
 
-**10. A line attribute beats the source-wide setting.** `meta=plain` on a line
-overrides `[sources.url] meta` ([ADR-CONFIG](0014_config.md)) **for that URL
-only**. The default stays the strict one — L5 is a safety property, so opting
-out is per-document and visible in a diff, never a blanket flip. Two lines
-carrying the same URL with **different** attributes are a loud error naming
-both line numbers, not a last-wins merge: exact URLs cannot legitimately
-disagree, and quietly picking one would make a merge artefact into a policy
-change.
+**10. A line attribute beats the source-wide setting, for that URL only.** The
+default stays the strict one — L5 is a safety property, so opting out is
+per-document and visible in a diff, never a blanket flip. **Two lines carrying
+the same URL with *different* attributes are a loud error naming both line
+numbers**, not a last-wins merge: exact URLs cannot legitimately disagree, and
+quietly picking one would make a merge artefact into a policy change.
 
-**11. The attribute set is closed, and it is two.** `fetch` and `meta`, defined
-below. **Adding one is a change to this record**, not a config addition — which
-is what makes decision 9's unknown-key error safe to be strict about: the error
-is never wrong, because there is nothing legitimate it can reject.
+**11. The attribute set is closed, and it is two.** **Adding one is a change to
+this record**, not a config addition — which is what makes decision 9's
+unknown-key error safe to be strict about: the error is never wrong, because
+there is nothing legitimate it can reject.
 
-**12. A fux-written line carries every attribute, explicitly.** `fux add`
-emits the complete set — `fetch=… meta=…` — even where the value equals the
-default. **A generated file holds no implicit
-state**: the line says what it means, and changing a policy is a one-word diff
-rather than the appearance or disappearance of a key. This is the property
-[ADR-RECORD](0010_index-record.md) already gives `meta` inside a record ("*a
-record read years later still says what rule it was written under*"), now given
-to the source list that produced it.
+**12. A fux-written line carries every attribute, explicitly.** `fux add` emits
+the complete set — `fetch=… meta=…` — even where the value equals the default.
+**A generated file holds no implicit state**: the line says what it means, and
+changing a policy is a one-word diff rather than the appearance or disappearance
+of a key. This is the property [ADR-RECORD](0010_index-record.md) already gives
+`meta` inside a record, now given to the source list that produced it.
 
 **13. The reader is lenient; the writer is strict.** A missing attribute takes
 its default **when read**, so a hand-made list, an older file, or a merge that
 dropped a key still loads. But a line missing any attribute **was not written by
 fux**, and that is worth reporting: a completeness check turns *"the list is not
 edited manually"* from a policy into an observation anyone can make. The check
-belongs to `fux doctor` ([ADR-DOTFUX](0003_fux-directory.md)); the rule is here
-because it is a property of the format.
+belongs to `fux doctor`; the rule is here because it is a property of the
+format.
 
 ### The attribute set
 
-**Complete. Anything not in this table is an error at
-`file:lineno`** (decision 9).
-
-**A fux-written line always states both** (decision 12). The *default* column
-is therefore what a **missing** attribute means to the reader — which, in a
-correctly generated file, never happens.
+**Complete. Anything not in this table is an error at `file:lineno`**
+(decision 9). A fux-written line always states both (decision 12), so the
+*default* column is what a **missing** attribute means to the reader — which, in
+a correctly generated file, never happens.
 
 | attribute | values | default when absent | defined by | changes committed bytes? |
 |---|---|---|---|---|
@@ -248,28 +225,16 @@ Exactly one runs ([ADR-FETCHER](0019_fetcher.md) decision 4), and nothing
 escalates from one to another ([ADR-HTTP-FETCHER](0021_http-fetcher.md)
 decision 3) — so the value on the line is the whole story, every run.
 
-**Three layers, one order, for both attributes.** The built-in default in the
-table above, then the source-wide `[sources.url]` setting, then the line.
-`[sources.url] fetcher`'s stem is the source-wide value of `fetch`;
-`[sources.url] meta` is the source-wide value of `meta`. A line beats both,
-for its own URL only — which is decision 10 stated as a resolution order
-rather than as one attribute's special case.
+**Three layers, one order, for both attributes.** The built-in default, then the
+source-wide `[sources.url]` setting, then the line. A line beats both, for its
+own URL only.
 
 **`meta` is a privacy decision, and it only ever loosens per URL.** The
 source-wide setting is the floor; a line may opt one document *out* of hashing
-because that document is public. There is deliberately no way to make one URL
-stricter than the source — a source that needs hashing needs it for everything,
-and per-line strictness would invite the mistake of leaving one line off.
-
-**Two attributes on one line are independent**, in any order, and a line may
-carry either, both, or neither:
-
-| line | fetcher | display fields |
-|---|---|---|
-| `https://a/x` | `http` | hashed |
-| `https://a/x  meta=plain` | `http` | plain |
-| `https://a/x  fetch=cdp` | `cdp` | hashed |
-| `https://a/x  fetch=cdp meta=plain` | `cdp` | plain |
+because that document is public. **There is deliberately no way to make one URL
+stricter than the source** — a source that needs hashing needs it for
+everything, and per-line strictness would invite the mistake of leaving one line
+off.
 
 ### Considered for the set, and deliberately excluded
 
@@ -277,46 +242,47 @@ carry either, both, or neither:
 principle, permanently.** Those are one fetcher's vocabulary, and
 `[sources.url.config]` exists precisely to carry it without fux learning it
 ([ADR-FETCHER](0019_fetcher.md) decision 8). A `settle=500` in this grammar is
-fux knowing what Chrome is, which is the adapter cap breached through the back
-door rather than the front.
+fux knowing what Chrome is — the adapter cap breached through the back door
+rather than the front.
 
 **Content overrides** — `title=`, `summary=`. **Rejected:** the document owns
 its content. Everything in a record is taken from the fetched bytes
 ([ADR-EXTRACTED](0016_extracted-mode.md)), and a title supplied by the list
 would be the one field in the index that no document said.
 
-**Three that the grammar could hold and this record does not decide** — named
-so nobody re-argues them from scratch, and so nobody adds one quietly:
+**Three the grammar could hold and this record does not decide** — named so
+nobody re-argues them from scratch, and so nobody adds one quietly:
 
 | candidate | what it would do | why not here |
 |---|---|---|
-| `snapshot` | commit a machine-made copy of the content, per URL | the `refer`/`snapshot` policy is per *source* today and belongs to the M4 refer plane ([W-24](../../archive/open/W-24-m4-refer-plane.md)); a per-URL form is an L2 decision, not a grammar one |
+| `snapshot` | commit a machine-made copy of the content, per URL | the refer/snapshot policy is per *source* today and belongs to [ADR-REFER](0030_refer-plane.md); a per-URL form is an L2 decision, not a grammar one |
 | `tag` | give a URL document the frontmatter tags a repo file has | URL documents have no frontmatter, so their `tag` edges are always empty — a real gap. But it invents corpus structure in a config file, which needs its own record |
-| `max_age` | per-URL freshness bound at answer time | freshness is the refer plane's, and its threshold is prediction **R4**. Deciding it here would fix a number no one has measured |
+| `max_age` | per-URL freshness bound at answer time | freshness is the refer plane's, and its threshold is a pre-registered prediction. Deciding it here would fix a number no one has measured |
 
 Each would be a new row in the table above **and a change to this record**,
 which is the point of decision 11.
 
+### The `dirs` attribute set
+
+The same grammar carries `.fux/sources/dirs`, whose set is also **closed** and
+is `archived` and `enrich`, both `true|false`, both defaulting to `false`, both
+**declared and never derived**.
+
+| attribute | changes committed bytes? | defining record |
+|---|---|---|
+| `archived` | no — it routes ranking | [ADR-DIR-LIST](0022_dir-list.md) |
+| **`enrich`** | **yes, indirectly** — a scope's documents gain a `ctx` field | [ADR-ENRICH](0040_enrich.md) |
+
+`enrich` is the one attribute whose effect on the index is *indirect*: the
+attribute itself writes nothing, but it decides which documents `fux enrich`
+plans for, and a document with pinned enrichment indexes extra `ctx` terms.
+Worth stating, because decision 12 writes `docs archived=false enrich=false`
+and a reader should know which half of that can move a byte.
+
 ### Consequences
 
-- **The writer commits LF only on disk, regardless of host OS (PRIORITY.md
-  P4, 2026-08-21) — belt, alongside an existing suspenders.** `sources.py`'s
-  `_write` used `write_text`'s platform-default newline translation, which
-  would write CRLF into the working-tree file on Windows. **Correction,
-  2026-08-21, same day:** this was written up as closing a real gap in L3's
-  byte-identical guarantee, which overstated it — `.gitattributes`' `*
-  text=auto eol=lf` (repo root) already normalizes any CRLF to LF at `git
-  add` time for every tracked file, `.fux/sources/urls` included; verified
-  empirically in a scratch repo. Committed bytes were never actually at
-  risk. The Python-level fix (`newline="\n"` now, explicit) is still correct
-  defense-in-depth — it does not depend on `.gitattributes` staying present
-  or correctly matching the path, and it means the working-tree file is
-  right immediately rather than only after the next `git add` — but it is
-  not the fix that was closing an open guarantee gap.
 - **The file is tool-managed, and the writer edits one line rather than
-  regenerating the file** (built 2026-08-19). That is the amendment this
-  record's earlier consequence promised, and it fell the way it did because the
-  obvious alternative loses something real:
+  regenerating the file.** The obvious alternative loses something real:
 
   | decision | what tool-management changes about it | how `fux add` answers |
   |---|---|---|
@@ -324,115 +290,85 @@ which is the point of decision 11.
   | 4, duplicates | "a merge artefact" becomes "a writer must not emit one" | an add to a URL already listed is an **update in place**, never a second line |
   | 4, ordering | the loader's canonical sort could be done once by the writer | a new line lands at its sorted position — a courtesy to the reader, since the loader still sorts and correctness does not depend on it |
 
-  **It still is not a lockfile.** A lockfile is generated whole from a
-  manifest; this file *is* the manifest, and `fux add` is a careful editor of
-  it. Which is why a hand-written line stays legal (decision 13) and
-  `fux add` marks it rather than rewriting it.
-
-- **`fux url` was retired into `fux add` / `fux remove` on 2026-08-21**
-  (W-63). Decisions 12 and 13 are unchanged and were the reason the swap was
-  cheap: the writer still emits every attribute and still marks a line it did
-  not write, so only the command's *name* moved. `--cdp` and `--plain` still
-  decide what is **recorded**.
-
-  What did change: **`fux add <URL>` fetches that one URL**, where `fux url`
-  fetched nothing. The old note here said a managing command that validated a
-  URL by requesting it would make the committed list a function of network
-  weather — and that argument still stands, which is why the fetch does not
-  gate the write. The line is recorded first and stays recorded even when the
-  fetch fails; the failure is reported and exits 1. So the *list* is still not
-  a function of whether the network was up. The *index* is, and always was.
-  Full rationale and the rejected alternatives: [ADR-CLI](0002_cli-surface.md).
-
-- **Two files describe one subsystem**, deliberately: this record for the
-  format, [ADR-URL-INGEST](0008_url-ingest.md) for the fetch contract. The
-  split earned itself immediately — the 2026-08-19 rewrite changed this grammar
-  and nothing about the fetcher contract.
-- **The fragment truncation is fixed, and it was fixed by decision 7, not
-  around it.** The old rule stripped from the first `#` anywhere on the line,
-  so `https://x/page#section` loaded as `https://x/page`, two lines differing
-  only by fragment collapsed into one under decision 4, and a document
-  disappeared with no error — the failure decision 5 exists to prevent,
-  reached by a different route. Making the line whitespace-delimited made the
-  narrow comment rule the only parseable one. **Both landed together,
-  2026-08-19.**
-- **The grammar is built, and it has exactly one implementation.**
-  [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) holds the comment rule,
-  the attribute parse, the dedupe-and-sort and the two error classes; `urls`
-  and `dirs` differ only in a closed attribute set and one entry validator.
-  Adding a third list is a `ListSpec`, not a parser.
+  **It still is not a lockfile.** A lockfile is generated whole from a manifest;
+  this file *is* the manifest, and `fux add` is a careful editor of it. Which is
+  why a hand-written line stays legal (decision 13) and `fux add` marks it
+  rather than rewriting it.
+- **`fux add <URL>` fetches, and the fetch does not gate the write.** A managing
+  command that validated a URL by requesting it would make the committed list a
+  function of network weather — so the line is recorded first and stays recorded
+  even when the fetch fails; the failure is reported and exits 1. **The *list* is
+  not a function of whether the network was up. The *index* is, and always was.**
+- **The writer commits LF only on disk, regardless of host OS.** `.gitattributes`
+  already normalises CRLF to LF at `git add` time for every tracked file, so
+  committed bytes were never at risk — the explicit `newline="\n"` is
+  defence-in-depth that does not depend on `.gitattributes` staying present or
+  correctly matching the path, and it means the working-tree file is right
+  immediately rather than only after the next `git add`.
+- **Two records describe one subsystem**, deliberately: this one for the format,
+  [ADR-URL-INGEST](0008_url-ingest.md) for the fetch contract. The split earns
+  itself whenever the grammar moves and the fetcher contract does not.
+- ⚠ **Decision 3's narrow comment rule fixed a real disappearance, and it was
+  fixed by decision 7 rather than around it.** A rule that stripped from the
+  first `#` anywhere on the line loaded `https://x/page#section` as
+  `https://x/page`; two lines differing only by fragment then collapsed under
+  decision 4, and a document vanished with no error — the failure decision 5
+  exists to prevent, reached by a different route. Making the line
+  whitespace-delimited made the narrow comment rule the only parseable one.
 - **An attribute that changes committed bytes needs a home in the record.**
-  `meta=plain` does — it decides `title`/`phrases` versus `title_h`. Today
-  `meta` is already a record property, so per-URL `meta` needs no schema
-  change. A future attribute that changes bytes without one would be an
-  `_format` question, same class as the `enriched` shape.
+  `meta=plain` has one. A future attribute that changes bytes without one would
+  be an `_format` question.
 - **A duplicate is invisible.** Accepted under decision 4, at the cost that a
   reviewer cannot see from the diff that a line was already present.
 
 ### Alternatives considered
 
-- **A TOML array in `fux.toml`** (`urls = [...]`) — the original shape,
-  **retired with an erroring key** ([ADR-CONFIG](0014_config.md) decision 7).
-  One diff hunk, one merge conflict, and it buries a corpus decision inside
-  config.
+- **A TOML array in `fux.toml`** — the original shape, **retired with an
+  erroring key** ([ADR-CONFIG](0014_config.md) decision 10). One diff hunk, one
+  merge conflict, and it buries a corpus decision inside config.
 - **Erroring on duplicates.** Rejected: duplicates are what merges produce, and
   a list that fails the build after a clean merge trains people to stop
   maintaining it.
 - **Preserving file order.** Rejected: it makes committed bytes a function of
   how someone chose to group their list, which is L3 lost for a cosmetic gain.
 - **Sections** (`[http]` / `[cdp]`) — rejected: they reintroduce order
-  significance, which decision 4 spent effort removing, and moving a URL
-  between mechanisms becomes a two-line diff instead of a one-word one.
-- **A file per mechanism** (`urls`, `urls.cdp`) — rejected: no parser change,
-  but it multiplies files the moment a second attribute exists, and one already
-  does (`meta`). It also makes "which file is this URL in?" a question, where
-  decision 7 makes it a column.
+  significance, which decision 4 spent effort removing, and moving a URL between
+  mechanisms becomes a two-line diff instead of a one-word one.
+- **A file per mechanism** (`urls`, `urls.cdp`) — rejected: it multiplies files
+  the moment a second attribute exists, and one already does. It also makes
+  "which file is this URL in?" a question, where decision 7 makes it a column.
 - **The four `.gitattributes` states** (set / unset / valued / revert) —
   rejected under decision 8. Those exist to resolve overlapping *patterns*;
-  exact URLs never overlap, so three of the four states would only ever be
-  spelling variants of the fourth.
+  exact URLs never overlap, so three of the four would only ever be spelling
+  variants of the fourth.
 - **Last-wins on a duplicate URL with conflicting attributes** — rejected under
-  decision 10. It is what `.gitattributes` does, and it is right there because
-  later lines are deliberate overrides. Here a duplicate is a merge artefact
-  (decision 4 says so), and silently letting a merge artefact decide a privacy
-  policy is the worst available outcome.
+  decision 10. It is what `.gitattributes` does, and it is right *there* because
+  later lines are deliberate overrides. Here a duplicate is a merge artefact,
+  and silently letting one decide a privacy policy is the worst available
+  outcome.
 
 ### Reference (required)
 
-- The loader and its rules — [`read_urls`](../../src/fux/ingest/urlsrc.py),
-  whose docstring states the sort-and-dedupe guarantee.
+- The grammar, in its single implementation —
+  [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py): the
+  comment rule, the attribute parse, the dedupe-and-sort and the two error
+  classes; `urls` and `dirs` differ only in a closed attribute set and one entry
+  validator.
+- The loader that consumes it — `read_urls` in
+  [`urlsrc.py`](../../src/fux/ingest/urlsrc.py), whose docstring states the
+  sort-and-dedupe guarantee.
 - A real list, every attribute exercised, and the fetch behaviour it drives —
   [`work/regression/2026-08-19-w54/`](../../work/regression/2026-08-19-w54/report.md),
   with its committed fixture at
   [`evidence/fixture.sh`](../../work/regression/2026-08-19-w54/evidence/fixture.sh).
-  It is the run that closed the fragment defect, and the first that ever
-  exercised the URL path end to end.
 - The fetch contract this record is split from —
-  [ADR-URL-INGEST](0008_url-ingest.md) decisions 4, 5 and 6.
-- Prior art for per-entry attributes on a line-oriented committed file —
-  git's `gitattributes` format (`pattern attr1 attr2…`, set / unset / valued):
-  https://git-scm.com/docs/gitattributes
+  [ADR-URL-INGEST](0008_url-ingest.md).
+- Prior art for per-entry attributes on a line-oriented committed file — git's
+  `gitattributes` format: https://git-scm.com/docs/gitattributes
 - Prior art for explicit per-entry fetch mechanism rather than automatic
   fallback — `scrapy-playwright`, where browser rendering is a per-request
-  opt-in and there is no automatic escalation:
+  opt-in with no automatic escalation:
   https://github.com/scrapy-plugins/scrapy-playwright
-
-**Amended 2026-08-23 (W-76 Phase 8): the `dirs` attribute set gains `enrich`.**
-
-The set stays **closed** and is now `archived` and `enrich`, both
-`true|false`, both defaulting to `false`, both **declared and never derived**.
-
-| attribute | changes committed bytes? | defining record |
-|---|---|---|
-| `archived` | no — it routes ranking | [ADR-DIR-LIST](0022_dir-list.md) |
-| **`enrich`** | **yes, indirectly** — a scope's documents gain a `ctx` field | [ADR-ENRICH](0040_enrich.md) |
-
-`enrich` is the first attribute whose effect on the index is *indirect*: the
-attribute itself writes nothing, but it decides which documents `fux enrich`
-plans for, and a document with pinned enrichment indexes extra `ctx` terms.
-That is worth stating because decision 12's rule — **a fux-written line states
-every attribute explicitly** — now writes `docs archived=false enrich=false`,
-and a reader should know which half of that can move a byte.
 
 ### Veto condition
 
@@ -458,6 +394,7 @@ awk '!/^ *#/ && NF {print $1}' .fux/sources/urls 2>/dev/null | sort | uniq -d
 grep -rln "def parse(" src/fux/ingest/sourcelist.py src/fux/ingest/urlsrc.py
 # expect: only sourcelist.py — a second parser is the drift this record forbids
 ```
+
 ---
 
 ## References
@@ -472,7 +409,8 @@ evidence.*
 [ADR-URL-INGEST](0008_url-ingest.md) · [ADR-RECORD](0010_index-record.md) ·
 [ADR-CONFIG](0014_config.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
 [ADR-FETCHER](0019_fetcher.md) · [ADR-CDP-FETCHER](0020_cdp-fetcher.md) ·
-[ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-DIR-LIST](0022_dir-list.md)
+[ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-DIR-LIST](0022_dir-list.md) ·
+[ADR-REFER](0030_refer-plane.md) · [ADR-ENRICH](0040_enrich.md)
 
 **Code**
 

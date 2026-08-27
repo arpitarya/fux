@@ -1,0 +1,132 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 760" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#3d6df2" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="g" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#1d8a5e" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="#8a93a0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <rect width="1240" height="760" fill="#fcfcfb"/>
+
+  <text x="48" y="46" font-size="22" fill="#14181f" font-weight="600">Fux — the decoder plane</text>
+  <text x="48" y="70" font-size="12" fill="#626b78">ADR-DECODE · 16 built-in decoders · 30 extensions · stdlib only · no dependency added</text>
+
+  <rect x="880" y="30" width="14" height="14" rx="3" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.6"/>
+  <text x="902" y="42" font-size="11.5" fill="#4a5260">committed to git</text>
+  <rect x="1010" y="30" width="14" height="14" rx="3" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="1032" y="42" font-size="11.5" fill="#4a5260">derived</text>
+  <rect x="1104" y="30" width="14" height="14" rx="3" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+  <text x="1126" y="42" font-size="11.5" fill="#1d8a5e">consumer's own</text>
+
+  <!-- ========== two ways in ========== -->
+  <text x="48" y="108" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">TWO WAYS BYTES ARRIVE — AND ONLY ONE DECODER AFTERWARDS</text>
+
+  <rect x="48" y="122" width="300" height="86" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+  <text x="66" y="146" font-size="13" fill="#14181f" font-weight="600">the git-dir walker</text>
+  <text x="66" y="166" font-size="11.5" fill="#4a5260">reads bytes off disk</text>
+  <text x="66" y="184" font-size="11" fill="#8a93a0">"binary" stopped being a reason to skip</text>
+  <text x="66" y="200" font-size="11" fill="#8a93a0">the moment decoders existed</text>
+
+  <rect x="48" y="222" width="300" height="86" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+  <text x="66" y="246" font-size="13" fill="#14181f" font-weight="600">.fux/fetchers/ — your code</text>
+  <text x="66" y="266" font-size="11.5" fill="#4a5260">fetch(url) → (bytes, Content-Type)</text>
+  <text x="66" y="284" font-size="11" fill="#1d8a5e">it no longer converts anything</text>
+  <text x="66" y="300" font-size="11" fill="#8a93a0">only it ever sees the charset header</text>
+
+  <path d="M 348 165 L 404 200" fill="none" stroke="#3d6df2" stroke-width="1.9" marker-end="url(#a)"/>
+  <path d="M 348 265 L 404 232" fill="none" stroke="#1d8a5e" stroke-width="1.9" marker-end="url(#g)"/>
+
+  <!-- ========== dispatch ========== -->
+  <rect x="410" y="176" width="250" height="80" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.6"/>
+  <text x="426" y="200" font-size="13" fill="#14181f" font-weight="600">dispatch by extension</text>
+  <text x="426" y="220" font-size="11.5" fill="#4a5260">lowercase · declared, never sniffed</text>
+  <text x="426" y="238" font-size="11" fill="#8a93a0">BUILTIN_MODULES is a sorted tuple —</text>
+  <text x="426" y="252" font-size="11" fill="#8a93a0">a directory scan would be filesystem order</text>
+
+  <path d="M 660 216 L 716 216" fill="none" stroke="#8a93a0" stroke-width="1.7" marker-end="url(#m)"/>
+
+  <!-- ========== which copy runs ========== -->
+  <rect x="722" y="150" width="470" height="132" rx="10" fill="#f7fbf9" stroke="#1d8a5e" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <text x="740" y="174" font-size="12.5" fill="#14181f" font-weight="600">which copy runs</text>
+
+  <rect x="740" y="186" width="200" height="42" rx="8" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+  <text x="754" y="204" font-size="12" fill="#14181f" font-weight="600">.fux/decoders/&lt;name&gt;.py</text>
+  <text x="754" y="220" font-size="10.5" fill="#1d8a5e">present → THIS ONE RUNS</text>
+
+  <rect x="956" y="186" width="218" height="42" rx="8" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="970" y="204" font-size="12" fill="#14181f" font-weight="600">the packaged built-in</text>
+  <text x="970" y="220" font-size="10.5" fill="#8a93a0">only when the copy was deleted</text>
+
+  <text x="740" y="248" font-size="11" fill="#4a5260">fux setup writes all 16 · override by MODULE NAME, not by extension</text>
+  <text x="740" y="266" font-size="11" fill="#4a5260">a consumer copy may import any dependency; a missing one is a HARD ERROR</text>
+
+  <!-- ========== the sixteen ========== -->
+  <text x="48" y="356" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE SIXTEEN — GROUPED BY WHAT THEY SHARE</text>
+
+  <rect x="48" y="370" width="272" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="64" y="394" font-size="12.5" fill="#14181f" font-weight="600">zip + XML — via _zip, _xml, _ooxml</text>
+  <text x="64" y="414" font-size="11.5" fill="#4a5260">docxdoc · pptxdoc · xlsxdoc · odtdoc</text>
+  <text x="64" y="434" font-size="11" fill="#8a93a0">bomb caps · SORTED members</text>
+  <text x="64" y="450" font-size="11" fill="#8a93a0">slide10 sorts before slide2 — numeric key</text>
+  <text x="64" y="470" font-size="11" fill="#8a93a0">runs joined with NO separator</text>
+
+  <rect x="336" y="370" width="272" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="352" y="394" font-size="12.5" fill="#14181f" font-weight="600">markup &amp; markup-shaped</text>
+  <text x="352" y="414" font-size="11.5" fill="#4a5260">htmldoc · xmldoc · drawiodoc · rtfdoc</text>
+  <text x="352" y="434" font-size="11" fill="#8a93a0">a DOCTYPE is refused outright —</text>
+  <text x="352" y="450" font-size="11" fill="#8a93a0">closes billion-laughs and XXE in one rule</text>
+  <text x="352" y="470" font-size="11" fill="#8a93a0">htmldoc was LIFTED, not written</text>
+
+  <rect x="624" y="370" width="272" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="640" y="394" font-size="12.5" fill="#14181f" font-weight="600">structured &amp; line-oriented</text>
+  <text x="640" y="414" font-size="11.5" fill="#4a5260">jsondoc · ipynbdoc · tomldoc · inidoc</text>
+  <text x="640" y="431" font-size="11.5" fill="#4a5260">csvdoc · yamldoc · maildoc</text>
+  <text x="640" y="451" font-size="11" fill="#8a93a0">keys → headings · ids, hashes, base64 dropped</text>
+  <text x="640" y="470" font-size="11" fill="#8a93a0">YAML aliases read once — expanding inflates tf</text>
+
+  <rect x="912" y="370" width="280" height="118" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="928" y="394" font-size="12.5" fill="#14181f" font-weight="600">pdfdoc — the awkward one</text>
+  <text x="928" y="414" font-size="11.5" fill="#4a5260">scans for streams; does NOT parse the xref</text>
+  <text x="928" y="434" font-size="11" fill="#8a93a0">a conformant reader needs three sub-formats,</text>
+  <text x="928" y="450" font-size="11" fill="#8a93a0">all of which fail on real, malformed files</text>
+  <text x="928" y="470" font-size="11" fill="#8a93a0">cost: ToUnicode CMaps merged across fonts</text>
+
+  <!-- ========== the contract ========== -->
+  <text x="48" y="536" font-size="11" fill="#9aa3af" font-weight="600" letter-spacing="1.1">THE CONTRACT — TWO NAMES IN ONE FILE</text>
+
+  <rect x="48" y="550" width="560" height="164" rx="10" fill="#eef3fd" stroke="#3d6df2" stroke-width="1.8"/>
+  <text x="68" y="576" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">EXTENSIONS = (".srt", ".vtt")</text>
+  <text x="68" y="598" font-size="12.5" fill="#14181f" font-weight="600" font-family="ui-monospace, Menlo, monospace">def decode(raw: bytes, rel_path: str) -&gt; str | None</text>
+  <text x="68" y="626" font-size="11.5" fill="#4a5260">Markdown out — because extract.py reads # and weights headings above body</text>
+  <text x="68" y="646" font-size="11.5" fill="#4a5260">None means a model must read this. Not an error.</text>
+  <text x="68" y="666" font-size="11.5" fill="#4a5260">Never raises on malformed input · deterministic · never opens a socket</text>
+  <text x="68" y="690" font-size="11" fill="#8a93a0">WANTS_PATH = True switches the first argument to a real file, for libraries</text>
+  <text x="68" y="704" font-size="11" fill="#8a93a0">like pypdf and olefile that refuse a buffer</text>
+
+  <!-- ========== what comes out ========== -->
+  <rect x="632" y="550" width="270" height="164" rx="10" fill="#ffffff" stroke="#c9cfd8" stroke-width="1.4"/>
+  <text x="650" y="576" font-size="12.5" fill="#14181f" font-weight="600">Markdown → the usual path</text>
+  <text x="650" y="600" font-size="11.5" fill="#4a5260">NFC applied. Frontmatter is NOT</text>
+  <text x="650" y="617" font-size="11.5" fill="#4a5260">re-read — an &lt;hr&gt; emits ---, and</text>
+  <text x="650" y="634" font-size="11.5" fill="#4a5260">the parser would eat the document.</text>
+  <text x="650" y="662" font-size="11.5" fill="#4a5260">Then extract.py: title, phrases,</text>
+  <text x="650" y="679" font-size="11.5" fill="#4a5260">terms, flen — exactly as for a</text>
+  <text x="650" y="696" font-size="11.5" fill="#4a5260">file that was already prose.</text>
+
+  <rect x="922" y="550" width="270" height="164" rx="10" fill="#eaf7f0" stroke="#1d8a5e" stroke-width="1.8"/>
+  <text x="940" y="576" font-size="12.5" fill="#14181f" font-weight="600">None → the enrichment queue</text>
+  <text x="940" y="600" font-size="11.5" fill="#4a5260">.fux/enrich/queue.tsv — COMMITTED</text>
+  <text x="940" y="617" font-size="11.5" fill="#4a5260">path · sha · reason. Never content.</text>
+  <text x="940" y="637" font-size="11.5" fill="#4a5260">Sorted, no clock: an unchanged</text>
+  <text x="940" y="654" font-size="11.5" fill="#4a5260">corpus leaves git status clean.</text>
+  <text x="940" y="680" font-size="11" fill="#1d8a5e">progress is gitignored — a backlog is a</text>
+  <text x="940" y="695" font-size="11" fill="#1d8a5e">team fact, whose turn it is, is not</text>
+
+  <path d="M 608 632 L 628 632" fill="none" stroke="#8a93a0" stroke-width="1.7" marker-end="url(#m)"/>
+  <path d="M 608 660 L 720 736 L 1057 736 L 1057 718" fill="none" stroke="#1d8a5e" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#g)"/>
+</svg>

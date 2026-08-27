@@ -52,7 +52,7 @@ def test_no_lock_reads_as_nobody_holding_it(tmp_path):
 def test_an_unparseable_lock_reads_as_held_not_free(tmp_path):
     """Treating a lock we cannot parse as "nothing is running" is how two
     runners end up in the index. It reads as held-by-unknown instead."""
-    path = tmp_path / ".fux" / "runtime" / "runner.lock"
+    path = tmp_path / ".fux" / "runtime" / runner.LOCK_NAME
     path.parent.mkdir(parents=True)
     path.write_text("not json at all", encoding="utf-8")
     assert runner.holder(tmp_path) == -1
@@ -120,7 +120,7 @@ def test_request_stop_breaks_a_lock_whose_holder_is_gone(tmp_path):
     dead.wait()
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
-    (runtime / "runner.lock").write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
+    (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
 
     assert runner.request_stop(tmp_path, timeout=0.5) == "stale"
     assert runner.holder(tmp_path) is None
@@ -132,7 +132,7 @@ def test_a_live_holder_that_ignores_the_stop_is_wedged_not_broken(tmp_path):
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
     # This process is alive and will never poll the stop file.
-    (runtime / "runner.lock").write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
+    (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
 
     assert runner.request_stop(tmp_path, timeout=0.2) == "wedged"
     assert runner.holder(tmp_path) == os.getpid(), "a wedged lock must survive"
@@ -144,7 +144,7 @@ def test_request_stop_clears_its_own_stop_file(tmp_path):
     dead.wait()
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
-    (runtime / "runner.lock").write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
+    (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
     runner.request_stop(tmp_path, timeout=0.5)
     assert not (runtime / "runner.stop").exists()
 
@@ -351,7 +351,7 @@ def test_a_wedged_runner_refuses_the_write_rather_than_racing_it(tmp_path, monke
     _corpus(tmp_path)
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True, exist_ok=True)
-    (runtime / "runner.lock").write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
+    (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": os.getpid()}), encoding="utf-8")
     monkeypatch.setattr(runner, "STOP_TIMEOUT_S", 0.1)
 
     class Args:

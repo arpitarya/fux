@@ -110,11 +110,19 @@ class UrlHealth:
 class UrlState:
     run_seq: int = 0
     urls: dict[str, UrlHealth] = field(default_factory=dict)
+    #: host -> times that host rate-limited a fetch (W-82 ruling 12).
+    #:
+    #: **Keyed by HOST, not by URL**, because a rate limit is a property of the
+    #: server and not of one page — twelve 429s spread over twelve pages of one
+    #: wiki is one fact, not twelve. Counts, never clocks, like everything else
+    #: in this file.
+    rate_limited: dict[str, int] = field(default_factory=dict)
 
     def as_json(self) -> dict:
         return {
             "run_seq": self.run_seq,
             "urls": {url: h.as_json() for url, h in sorted(self.urls.items())},
+            "rate_limited": dict(sorted(self.rate_limited.items())),
         }
 
 
@@ -140,6 +148,12 @@ def read(root: Path) -> UrlState:
     # declared, instead of a place plus a reader that must remember it.
     top = _file_schema().coerce(raw)
     state = UrlState(run_seq=max(0, top.get("run_seq", 0)))
+    for host, count in (top.get("rate_limited") or {}).items():
+        # A negative or non-integer count is a file somebody edited by hand;
+        # dropping it is right, because a report must never be able to break
+        # `fux doctor` (see this function's own contract above).
+        if isinstance(host, str) and isinstance(count, int) and count > 0:
+            state.rate_limited[host] = count
     health = _health_schema()
     for url, entry in (top.get("urls") or {}).items():
         if not isinstance(url, str):
@@ -170,6 +184,30 @@ def write(root: Path, state: UrlState) -> None:
     directory = fuxdir.derived_dir(root, "runtime")
     text = json.dumps(state.as_json(), indent=2, sort_keys=True) + "\n"
     (directory / STATE_NAME).write_text(text, encoding="utf-8")
+
+
+def record_rate_limits(root: Path, counts: dict[str, int]) -> None:
+    """Add this run's rate-limit counts to the persisted state. **Never raises.**
+
+    W-82 ruling 12. Read-modify-write rather than replace: the counts are
+    cumulative across runs, which is what makes *"this host rate-limited you 12
+    times"* a fact worth acting on rather than a blip.
+
+    ⚠ **This never touches `[sources.url] max_parallel`.** The whole point of
+    recording it is that the consumer decides — Arpit's standing rule, state the
+    cost and do not clamp the knob.
+    """
+    if not counts:
+        return
+    try:
+        state = read(root)
+        for host, count in counts.items():
+            if count > 0:
+                state.rate_limited[host] = state.rate_limited.get(host, 0) + count
+        write(root, state)
+    except OSError:
+        # A report that can fail an ingest is worse than a missing report.
+        pass
 
 
 def observe(

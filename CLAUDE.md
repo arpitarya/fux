@@ -49,6 +49,19 @@ ln -sf ../../scripts/adr-guard.sh .git/hooks/commit-msg
 **13 of them** changed an owned component and updated no record. The prose rule
 was already in this file the whole time. That is the measured case for a check.
 
+⚠ **What the check does NOT prove, and nothing else does either.**
+`tests/test_adr_freshness.py` proves an owning record was **touched** in the
+change. **It never reads the record.** A record can be amended into
+self-contradiction in the same commit and every mechanical check fux has will
+pass — **W-83 is the case**: an accepted amendment contradicted itself, the code
+implemented the wrong sentence, and CI was green the whole way.
+
+**So point 3 above — re-read the records you touched code under — is the only
+thing covering coherence, and it is unenforced.** Treat it as the obligation it
+is, not as a tidy-up. Ruled 2026-08-27 (W-82 ruling 18): stated rather than
+mechanised, because the two-strikes rule makes a *second* recorded occurrence
+the trigger for a gate, and this has happened once.
+
 ## Triage first — a human-blocked queue stops the session
 
 **Standing directive (Arpit, 2026-08-12).** Before any work, read
@@ -108,9 +121,12 @@ systems that own it; verify at answer time.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic,
   [ADR-EXTRACTED](docs/adr/0016_extracted-mode.md) — **accepted**) and
   `enriched` (opt-in, model-assisted,
-  [ADR-ENRICHED](docs/adr/0017_enriched-mode.md) — **accepted**: the name, the
-  boundary and the record shape are ratified; **the build is not** — it stays
-  behind W-38's M8 gate). Both ratified by Arpit 2026-08-19.
+  [ADR-ENRICH](docs/adr/0040_enrich.md) — **accepted**: the name, the
+  boundary and the record shape are ratified; **the build is not**). Both
+  ratified by Arpit 2026-08-19. ⚠ **ADR-ENRICHED was superseded 2026-08-27** —
+  its contract was folded into ADR-ENRICH verbatim first, and the
+  non-authorization came with it (ADR-ENRICH decision 8). **`fux enrich` is a
+  different feature** and shipping it did not authorize the mode.
   **`inferred` is retired**, because `INFERRED` is the edge grade for
   *model-derived* and the collision is the whole point of those records.
   **Enrichment never runs inside `fux ingest`** — it is its own command, its
@@ -139,7 +155,7 @@ its milestone needs it. Nothing else comes back.
 ## Non-negotiable constraints
 
 **This section is the only normative statement of the laws.** They are named
-**L1–L7** by [ADR-LAWS](docs/adr/0001_laws.md) so a record can cite one without
+**L1–L8** by [ADR-LAWS](docs/adr/0001_laws.md) so a record can cite one without
 restating it — and no record may restate one. Changing a law changes this
 section *and* ADR-LAWS' table, in the same commit.
 
@@ -163,6 +179,21 @@ section *and* ADR-LAWS' table, in the same commit.
 - **L6** · **Say "index", not "db".** What Fux commits is an index — statistics that
   make documents findable. A council ruling, and it is load-bearing vocabulary.
 - **L7** · **Python ≥ 3.11** (`tomllib`, modern typing). Match the surrounding style.
+- **L8** · **A use record is never committed.** Fux may record what was asked
+  and what was answered — **in plaintext, with no law-level size bound** — and
+  may print a per-answer provenance receipt on stdout. **Every durable trace of
+  use lives on a gitignored path and never reaches a committed byte.**
+  ⚠ **Gitignored is the test, not `.fux/`.** `.fux/index/`, `sources/`,
+  `fetchers/`, `decoders/`, `enrich/`, `tune.toml`, `output.toml` and
+  `.fuxignore` are all **committed**; `.fux/runtime/` is the only derived
+  directory under it. *"Inside `.fux/`"* is not the rule and would put a journal
+  beside the committed index. **L2 governs the corpus; L8 governs the record of
+  who went looking in it** — a query is not content, and no other law reached
+  it. ⚠ **Ruled three times on 2026-08-27 (Arpit): written, reverted, then
+  narrowed to commits alone.** Hashing, a size bound, the stdout prohibition and
+  **the transmission clause** were all in earlier forms and none survives;
+  [ADR-LAWS](docs/adr/0001_laws.md) decision 8 carries each pass and what it
+  traded away — **including the gap the last one leaves open.**
 
 ## Litmus for any new work
 
@@ -386,11 +417,23 @@ Reference: [OKF spec](https://github.com/GoogleCloudPlatform/knowledge-catalog/b
 
 ## Documentation discipline (required)
 
-**Agent-steering files are proposed, never auto-applied.** `CLAUDE.md` and any
-other file that steers a session are Arpit's to ratify: an agent proposes a
-change as a named diff and does not apply it to itself. This rule is why this
-file carried a PROPOSED header from 2026-08-09 until Arpit adopted the rewrite
-on 2026-08-19.
+**An agent may edit this file directly** (Arpit, 2026-08-27). It previously read
+*"Agent-steering files are proposed, never auto-applied — an agent proposes a
+change as a named diff and does not apply it to itself"*, which is why this file
+carried a PROPOSED header from 2026-08-09 until the 2026-08-19 rewrite was
+adopted. **Arpit removed it**: the proposal step had become a way for a ruling
+he had already made to sit unapplied in a ledger nobody reads.
+
+⚠ **What that rule was protecting, now unguarded and worth knowing:** an agent
+can change the instructions it is about to be judged by, in the same session, and
+nothing mechanical will flag it. **Two obligations replace the prohibition:**
+
+1. **Say it out loud.** A change to this file is named in the session's output
+   and in the WORKLOG entry — never folded silently into a larger diff.
+2. **A ruling of Arpit's, or a fact.** Edit this file to record a decision he
+   made or to correct something untrue about the repo. **Do not edit it to
+   grant yourself latitude you were not given** — that is the failure the old
+   rule made structurally impossible and now rests on judgment.
 
 **Statements of fact about the repo are exempt.** A version number, a path, a
 "does not exist yet" that now exists — fixed on contact, in the change that
@@ -467,6 +510,19 @@ ungrounded, and nobody can see that anything is missing. If an archived doc was
 a claim's only support, the claim needs new grounding — code, a live doc, or a
 measured run under [`work/regression/`](work/regression/README.md).
 
+**A link is not a citation** (Arpit, 2026-08-27). Prose naming an archived item
+— *"W-52's trigger"*, *"superseded by X"* — may link to it, **including from a
+Reference block.** This rule governs where a claim is **grounded**, never
+whether a hyperlink may point somewhere, and the ~40 existing links into
+`archive/` all stand. No repointing is owed and no test is owed.
+
+⚠ **The exposure this leaves is real and unguarded.** A Reference block can
+consist entirely of archive links, leaving a claim ungrounded with nothing
+flagging it. A test for this was written and **deliberately removed rather than
+shipped red** — it could not tell naming from citing, and adjudicating it by
+writing a looser check would be the moving-threshold failure in a different
+costume. **The paragraph above is the only guard.**
+
 **There is exactly ONE archive, and it is [`archive/`](archive/README.md) at
 the repo root** (Arpit, 2026-08-10, restated 2026-08-18). Nothing under `docs/`
 or `work/` is an archive. **Anything that gets archived is moved there**, into a
@@ -509,7 +565,7 @@ The register, the convention and the ownership table are in
   executable twin exists.
 - **A record that restates a cross-cutting principle is a bug, not
   redundancy.** The non-negotiable constraints have exactly one home — this
-  file — and are named L1–L7 by
+  file — and are named L1–L8 by
   [ADR-LAWS](docs/adr/0001_laws.md). Every other record cites `ADR-LAWS` and
   the number; none paraphrases. Paraphrases drift, and a drifted paraphrase in
   an accepted record reads as authority.

@@ -1,24 +1,86 @@
 # Which files are documents. One glob per line; `!` subtracts. A pattern with
 # no `/` matches the file NAME anywhere, so `*.md` means every markdown file.
 #
-# THIS FILE IS OPTIONAL. Delete it and the built-in default below applies --
-# an absent file never means "index everything" and never means "index
-# nothing". If the file IS here, it replaces the default entirely.
+# THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
+# absent file never means "index everything" and never means "index nothing".
+# If the file IS here it REPLACES the default entirely, which is why a file
+# with no active line is an error rather than a silently empty index.
 #
-# The built-in default, written out so you can see what you are getting:
-*.md
-*.markdown
-*.txt
-*.rst
-*.adoc
-*.org
+# THE LINES BELOW ARE THAT DEFAULT, written out at `fux setup`: prose, plus
+# every format a built-in decoder reads. They are spelled out rather than left
+# implicit so you can see what fux considers a document without reading its
+# source (ADR-TYPES decision 10). From here they are YOURS -- setup never
+# rewrites this file, so the list stays exactly as you leave it.
 #
-# Prose only. No .json, .svg, .sh, .py or .mermaid -- machine data and diagram
-# source are not documents, and indexing them inflates `df` for exactly the
-# terms your real documents are trying to be found by. No extensionless files
-# either: those are LICENSE, Makefile and Dockerfile far more often than they
-# are prose.
+# NOTHING BELOW NEEDS INSTALLING. fux's runtime is stdlib-only and declares no
+# third-party dependencies, so every built-in decoder works out of the box. A
+# format that needed something installed would appear under OPT-IN at the
+# bottom, commented, with the command that enables it.
+#
+# What is OUT of the default, and why: source code, shell scripts, SVG and
+# extensionless files. They have no decoder, machine data is not a document,
+# and indexing it inflates `df` for exactly the terms your real documents are
+# trying to be found by. Extensionless files are LICENSE, Makefile and
+# Dockerfile far more often than they are prose.
+#
+# ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
+# format READABLE; a line in this file is what makes it INDEXED. Both are
+# required, and that is deliberate -- what counts as a document stays a
+# committed line a human wrote.
 #
 #   !*.min.md          # subtract a generated flavour
 #
 # See ADR-TYPES.
+
+# --- prose: already text, no decoder involved ---
+*.adoc
+*.markdown
+*.md
+*.org
+*.rst
+*.txt
+
+# --- decoded by a built-in decoder (stdlib only, nothing to install) ---
+*.cfg
+*.csv
+*.dio
+*.docm
+*.docx
+*.drawio
+*.eml
+*.fodt
+*.htm
+*.html
+*.ini
+*.ipynb
+*.json
+*.mbox
+*.odp
+*.ods
+*.odt
+*.pdf
+*.pptm
+*.pptx
+*.properties
+*.rtf
+*.toml
+*.tsv
+*.xhtml
+*.xlsm
+*.xlsx
+*.xml
+*.yaml
+*.yml
+
+# --- OPT-IN ---------------------------------------------------------------
+# Not indexed until you uncomment. Nothing here has a built-in decoder, so a
+# line you uncomment indexes RAW BYTES unless you enable it first by writing a
+# decoder for it:
+#
+#   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
+#      one there as a worked example; see the fux-decoder skill)
+#   2. uncomment its glob here
+#   3. `fux ingest`
+#
+#*.log
+#*.svg

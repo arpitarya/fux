@@ -435,10 +435,21 @@ def ask(
     archived_dirs: frozenset[str] = frozenset(),
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
+    stats_out: dict | None = None,
 ) -> list[AskResult]:
-    """The accelerated `ask`. Identical output to `query.scan.ask`, by law."""
+    """The accelerated `ask`. Identical output to `query.scan.ask`, by law.
+
+    `stats_out` is threaded straight through to `rank()`, which means the
+    confidence block is under the differential law like everything else here:
+    both paths derive `df` over the same query hashes and report the same `n`,
+    so `--fast` and `--scan` cannot disagree about how confident fux is
+    (ADR-CONFIDENCE decision 8).
+    """
     query_hashes = query_term_hashes(query)
     if not query_hashes:
+        if stats_out is not None:
+            stats_out.setdefault("df", {})
+            stats_out.setdefault("n", 0)
         return []
     runtime = Runtime(root)
     if not (runtime.dir / fmt.STATS_NAME).exists():
@@ -451,5 +462,5 @@ def ask(
     return rank(
         candidates, query_hashes, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
-        weighting=weighting, scoring=scoring,
+        weighting=weighting, scoring=scoring, stats_out=stats_out,
     )

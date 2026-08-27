@@ -62,25 +62,23 @@ def test_both_fetchers_satisfy_the_contract():
         assert callable(module.configure)
 
 
-def test_the_two_fetchers_convert_html_identically():
-    """`fetch=` is routing, not a property of the document (ADR-URL-LIST).
+def test_neither_shipped_fetcher_converts_anything():
+    """W-86 P8 replaced this test's subject rather than its assertion.
 
-    If the two passes diverged, which fetcher retrieved a page would change the
-    committed index — and a record does not record which fetcher produced it.
+    It used to assert the two fetchers produced **identical markdown**, because
+    `fetch=` is routing and not a property of the document — if the two passes
+    diverged, which fetcher retrieved a page would change the committed index.
+    That property now holds **by construction**: neither file converts at all,
+    both return bytes, and one decoder runs afterwards.
+
+    Asserting absence rather than agreement matters. A test that two copies
+    agree passes right up until someone edits one.
     """
-    http = _load(TEMPLATES / "http.py.txt", "http_fetcher")
-    cdp = _load(TEMPLATES / "cdp.py.txt", "cdp_fetcher")
-    html = (
-        "<html><head><title>Oncall</title></head><body>"
-        "<h1>Oncall</h1><p>Ring the <b>pager</b>.</p>"
-        "<ul><li>one</li><li>two</li></ul>"
-        "<pre><code>fux ask</code></pre>"
-        "<table><tr><th>a</th></tr><tr><td>b</td></tr></table>"
-        "<script>ignored()</script></body></html>"
-    )
-    assert http.html_to_markdown(html) == cdp.html_to_markdown(html)
-    assert http.extract_title(html) == cdp.extract_title(html) == "Oncall"
-
+    for name in ("http.py.txt", "cdp.py.txt"):
+        source = (TEMPLATES / name).read_text(encoding="utf-8")
+        assert "_MdParser" not in source, name
+        assert "html_to_markdown" not in source, name
+        assert "-> tuple[bytes, str]" in source, name
 
 def test_the_http_fetcher_rejects_an_unknown_config_key():
     module = _load(TEMPLATES / "http.py.txt", "http_fetcher_cfg")
@@ -141,6 +139,52 @@ def test_setup_seeds_nothing_it_cannot_see(tmp_path):
     setup_mod.run(tmp_path)
     lines = (tmp_path / ".fux" / "sources" / "dirs").read_text(encoding="utf-8").splitlines()
     assert [line for line in lines if line and not line.startswith("#")] == []
+
+
+def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
+    """The setup -> ingest path, which shipped broken.
+
+    `_TYPES_HEADER` is comments end to end, and `read_types` raises on a file
+    with no active pattern — so `fux setup` followed by `fux ingest` failed on
+    every fresh repo with "lists no file types". Nothing asserted the two verbs
+    composed, which is exactly why it got out.
+    """
+    from fux.ingest.gitdir import DEFAULT_TYPES, read_types
+
+    setup_mod.run(tmp_path)
+    types = read_types(tmp_path)  # must not raise
+    assert set(types.allow) == set(DEFAULT_TYPES)
+    assert types.deny == ()
+
+
+def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
+    """ADR-TYPES decision 10 — visible without reading fux's source."""
+    from fux.ingest.gitdir import DEFAULT_TYPES
+
+    setup_mod.run(tmp_path)
+    text = (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8")
+    active = [ln for ln in text.splitlines() if ln.strip() and not ln.startswith("#")]
+    assert active, "a header alone is not a types file"
+    assert sorted(active) == sorted(DEFAULT_TYPES)
+
+
+def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):
+    """End to end: the two verbs compose, and the default actually matches."""
+    from fux.ingest.gitdir import read_types, walk_sources
+
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "note.md").write_text("# note\n", encoding="utf-8")
+    setup_mod.run(tmp_path)
+    walked, _ = walk_sources(tmp_path, ["docs"], types=read_types(tmp_path))
+    assert [w.rel_path for w in walked] == ["docs/note.md"]
+
+
+def test_setup_never_overwrites_an_edited_types_file(tmp_path):
+    setup_mod.run(tmp_path)
+    listing = tmp_path / ".fux" / "sources" / "types"
+    listing.write_text("*.md\n", encoding="utf-8")
+    setup_mod.run(tmp_path)
+    assert listing.read_text(encoding="utf-8") == "*.md\n"
 
 
 def test_setup_bootstraps_a_bare_directory(tmp_path, monkeypatch, capsys):

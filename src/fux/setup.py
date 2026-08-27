@@ -42,7 +42,9 @@ from .config import (
     find_root,
     load,
 )
+from . import decode as decode_mod
 from .errors import FuxError
+from .ingest import fuxignore
 from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from .store import fuxdir
 
@@ -50,6 +52,10 @@ from .store import fuxdir
 FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
 
 FETCHERS_DIR = "fetchers"
+
+#: W-86 P7. Every built-in decoder is copied here at setup and the copy is what
+#: runs — see `decoder_source` for why there is no `.py.txt` template.
+DECODERS_DIR = "decoders"
 
 #: vendor -> ((destination relative to the repo root, template under
 #: `templates/agents/`), …) — ADR-AGENT-POLICY decisions 3 and 4.
@@ -64,6 +70,21 @@ FETCHERS_DIR = "fetchers"
 #: no `exists()` branch anywhere near it: which vendors install comes from
 #: `[agents] install`, a declaration, never from sniffing the filesystem
 #: (decision 5, and veto condition 4).
+#: The repo-root, **vendor-neutral** agent file (W-82 ruling 16).
+#:
+#: ⚠ **Deliberately NOT in `AGENT_FILES`.** That map is keyed by vendor, and a
+#: neutral file has none — put it under a vendor and all three race to write
+#: the same path, and `--no-agents` would stop writing a file that is not any
+#: vendor's. It gets its own slot for that reason.
+#:
+#: ⚠ **It stays POLICY-SHAPED and SHORT**, which is ruling 15 applied to
+#: itself: Kiro loads `AGENTS.md` on every interaction, so a manual here is a
+#: permanent context tax on every developer in the repo. It carries the
+#: invocation ladder and the archived-results rule, and **points at** the
+#: `fux-usage` skill instead of inlining it.
+AGENTS_FILE = "AGENTS.md"
+AGENTS_TEMPLATE = "AGENTS.md"
+
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # `fux-enrich` is **claude-only and INVOKED, never ambient** (W-76 Phase 8).
     #
@@ -90,6 +111,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         (".claude/skills/fux-archived-results/SKILL.md", "SKILL.md"),
         (".claude/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
         (".claude/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
+        (".claude/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
     ),
     "copilot": (
         (".github/agents/fux.agent.md", "fux.agent.md"),
@@ -102,6 +124,15 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     "kiro": (
         (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
         (".kiro/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
+        # `fux-decoder` ships to the two SKILL surfaces and to neither ambient
+        # one. ADR-ENRICH decision 10 made `fux-enrich` claude-only because the
+        # other two renderings were ambient (`applyTo: "**"`, `inclusion:
+        # always`) and *"an ambient skill that writes into a committed directory
+        # and changes ranking is a different risk class"*. W-82 established that
+        # a Kiro **skill** is progressive-disclosure, not ambient — only Kiro
+        # *steering* is — so the reasoning admits Kiro here while still
+        # excluding Copilot's `instructions/`, which enter every request.
+        (".kiro/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
     ),
 }
 
@@ -132,28 +163,91 @@ _TYPES_HEADER = """\
 # Which files are documents. One glob per line; `!` subtracts. A pattern with
 # no `/` matches the file NAME anywhere, so `*.md` means every markdown file.
 #
-# THIS FILE IS OPTIONAL. Delete it and the built-in default below applies --
-# an absent file never means "index everything" and never means "index
-# nothing". If the file IS here, it replaces the default entirely.
+# THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
+# absent file never means "index everything" and never means "index nothing".
+# If the file IS here it REPLACES the default entirely, which is why a file
+# with no active line is an error rather than a silently empty index.
 #
-# The built-in default, written out so you can see what you are getting:
-*.md
-*.markdown
-*.txt
-*.rst
-*.adoc
-*.org
+# THE LINES BELOW ARE THAT DEFAULT, written out at `fux setup`: prose, plus
+# every format a built-in decoder reads. They are spelled out rather than left
+# implicit so you can see what fux considers a document without reading its
+# source (ADR-TYPES decision 10). From here they are YOURS -- setup never
+# rewrites this file, so the list stays exactly as you leave it.
 #
-# Prose only. No .json, .svg, .sh, .py or .mermaid -- machine data and diagram
-# source are not documents, and indexing them inflates `df` for exactly the
-# terms your real documents are trying to be found by. No extensionless files
-# either: those are LICENSE, Makefile and Dockerfile far more often than they
-# are prose.
+# NOTHING BELOW NEEDS INSTALLING. fux's runtime is stdlib-only and declares no
+# third-party dependencies, so every built-in decoder works out of the box. A
+# format that needed something installed would appear under OPT-IN at the
+# bottom, commented, with the command that enables it.
+#
+# What is OUT of the default, and why: source code, shell scripts, SVG and
+# extensionless files. They have no decoder, machine data is not a document,
+# and indexing it inflates `df` for exactly the terms your real documents are
+# trying to be found by. Extensionless files are LICENSE, Makefile and
+# Dockerfile far more often than they are prose.
+#
+# ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
+# format READABLE; a line in this file is what makes it INDEXED. Both are
+# required, and that is deliberate -- what counts as a document stays a
+# committed line a human wrote.
 #
 #   !*.min.md          # subtract a generated flavour
 #
 # See ADR-TYPES.
 """
+
+_TYPES_OPT_IN = """\
+
+# --- OPT-IN ---------------------------------------------------------------
+# Not indexed until you uncomment. Nothing here has a built-in decoder, so a
+# line you uncomment indexes RAW BYTES unless you enable it first by writing a
+# decoder for it:
+#
+#   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
+#      one there as a worked example; see the fux-decoder skill)
+#   2. uncomment its glob here
+#   3. `fux ingest`
+#
+#*.log
+#*.svg
+"""
+
+_FUXIGNORE = """\
+# What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
+# exclusions belong -- this file is read before anything else, so a line here
+# beats .fux/sources/dirs and .fux/sources/types both.
+#
+#   build/                 a DIRECTORY named build, at any depth (and all of it)
+#   *.log                  a name glob; `*` never crosses a `/`
+#   /notes.md              a leading `/` anchors at the repo root
+#   docs/build             ANY `/` anchors -- this is not `build` at any depth
+#   work/**/evidence       `**` is the explicit any-depth form
+#   [0-9][0-9]-draft.md    character classes work; [!0-9] negates one
+#   !keep.log              `!` RE-INCLUDES, exactly as in .gitignore
+#
+# LAST MATCH WINS, so order matters here and nowhere else in .fux/. And as in
+# git, a file under an ignored DIRECTORY cannot be re-included: `build/` then
+# `!build/keep.md` keeps nothing.
+#
+# `!` MEANS THE OPPOSITE HERE OF WHAT IT MEANS IN .fux/sources/. There `!`
+# subtracts; here it adds back. That is the price of the file behaving like the
+# one you already know. `fux ingest` warns if the same pattern is written in
+# both places, which is where the confusion would actually bite.
+#
+# A `!` LINE OVERRIDES THE TYPE ALLOWLIST. `!*.py` really does index Python --
+# as RAW BYTES, because no decoder claims .py, which is the exact shape
+# .fux/sources/types exists to prevent. It takes a line you wrote to get there.
+#
+# ONE DIVERGENCE FROM GIT, ON PURPOSE: a `#` after whitespace starts a comment,
+# so `*.log   # noisy` is a pattern plus a note. Git reads that whole line as a
+# pattern and matches nothing.
+#
+# THIS FILE IS OPTIONAL AND STARTS EMPTY. Absent or all-comments means nothing
+# is ignored -- unlike .fux/sources/types, where an empty file is an error,
+# because this one only ever subtracts and so can never empty an index.
+#
+# See ADR-FUXIGNORE.
+"""
+
 
 _CONFIG = """\
 # fux.toml -- POLICY, not corpus. What gets indexed is `.fux/sources/dirs`
@@ -162,7 +256,7 @@ _CONFIG = """\
 # rather than to be required.
 
 [sources]
-#dirs_file = ".fux/sources/dirs"
+dirs_file = ".fux/sources/dirs"
 
 # URL ingestion through YOUR fetcher files. Nothing is fetched until a URL is
 # listed in .fux/sources/urls, and the only thing that lists one is an explicit
@@ -255,6 +349,11 @@ class SetupReport:
     #: condition 1 fires on a write this list does not contain. A subset of
     #: `written`, never a replacement for it.
     outside: list[str] = field(default_factory=list)
+    #: True when a hand-written repo-root `AGENTS.md` was found and left alone.
+    #: **Announced rather than silently skipped** — W-82 ruling 16 consequence
+    #: 2: write-if-missing makes the coverage absent precisely where a repo
+    #: already has its own conventions, which is where it is most needed.
+    skipped_agents_md: bool = False
 
 
 def template_bytes(name: str) -> bytes:
@@ -265,6 +364,31 @@ def template_bytes(name: str) -> bytes:
         raise FuxError(
             f"the shipped fetcher {name!r} is missing from this install — "
             "reinstall fux-engine, or write .fux/fetchers/ yourself"
+        ) from exc
+
+
+def decoder_source(name: str) -> bytes:
+    """One built-in decoder's source, read out of the installed package.
+
+    **There is no `.py.txt` template for a decoder, and the asymmetry with the
+    fetchers is deliberate.** A fetcher template must be un-importable because
+    it carries network code that has no business inside an offline package
+    (ADR-CDP-FETCHER decision 8). A decoder is stdlib-only and offline — it is
+    already a legitimate module — so the module *is* the template, and there is
+    exactly one copy of every decoder in the repo rather than two that agree by
+    habit. That was the `_MdParser` defect, and repeating it sixteen times would
+    be worse than committing it once.
+
+    The modules use absolute imports for this reason: the bytes fux ships and
+    the bytes the consumer edits are identical, and a path-loaded copy still
+    resolves `fux.decode._zip`.
+    """
+    try:
+        return (resources.files("fux") / "decode" / f"{name}.py").read_bytes()
+    except (FileNotFoundError, ModuleNotFoundError) as exc:  # pragma: no cover
+        raise FuxError(
+            f"the built-in decoder {name!r} is missing from this install — "
+            "reinstall fux-engine"
         ) from exc
 
 
@@ -282,6 +406,15 @@ def agent_template_bytes(name: str) -> bytes:
             f"the shipped agent policy {name!r} is missing from this install — "
             "reinstall fux-engine, or run `fux setup --no-agents`"
         ) from exc
+
+
+def agent_template_text(name: str) -> str:
+    """The same template as text, for printing rather than writing.
+
+    ASCII-only by ADR-CLI veto 7, which the shipped `AGENTS.md` already is —
+    `agent_template_bytes` decoding cleanly as ASCII is asserted in tests.
+    """
+    return agent_template_bytes(name).decode("utf-8")
 
 
 def _write_if_missing(path: Path, content: bytes, report: SetupReport, root: Path) -> None:
@@ -304,6 +437,33 @@ def _seed_dirs(root: Path) -> bytes:
     seeds = [name for name in ("README.md", "docs") if (root / name).exists()]
     body = "".join(f"{name}\n" for name in sorted(seeds))
     return (_DIRS_HEADER + ("\n" + body if body else "")).encode("utf-8")
+
+
+def _seed_types() -> bytes:
+    """The type allowlist, with the built-in default spelled out as live lines.
+
+    **A header alone is not a types file.** Every line of `_TYPES_HEADER` is a
+    comment, and `read_types` treats a file with no active pattern as an error
+    — so writing the header by itself made `fux setup` followed by `fux ingest`
+    fail on every fresh repo. ADR-TYPES decision 10 always said this file ships
+    "with the default spelled out"; it is spelled out here.
+
+    **Derived, never transcribed.** The globs come from `DEFAULT_TYPES` at the
+    moment setup runs, so the file cannot disagree with the engine that wrote
+    it. What it does do is FREEZE: setup is write-if-missing, so a built-in
+    decoder added later widens `DEFAULT_TYPES` and does not touch a repo that
+    already has this file. That is decision 1a's rule applied to fux's own
+    decoders — what counts as a document stays a committed line a human owns.
+    """
+    from .ingest.gitdir import DEFAULT_TYPES
+
+    decoded = {f"*{ext}" for ext in decode_mod.builtin_extensions()}
+    prose = [glob for glob in DEFAULT_TYPES if glob not in decoded]
+    body = ["", "# --- prose: already text, no decoder involved ---"]
+    body += sorted(prose)
+    body += ["", "# --- decoded by a built-in decoder (stdlib only, nothing to install) ---"]
+    body += sorted(glob for glob in DEFAULT_TYPES if glob in decoded)
+    return (_TYPES_HEADER + "\n".join(body) + "\n" + _TYPES_OPT_IN).encode("utf-8")
 
 
 def _agents_to_install(root: Path, requested: bool) -> tuple[str, ...]:
@@ -339,6 +499,31 @@ def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> N
                 report.outside.append(rel)
 
 
+def _write_root_agents(root: Path, report: SetupReport) -> None:
+    """Write `AGENTS.md`, or announce that we did not — W-82 ruling 16.
+
+    ⚠ **`_write_if_missing` puts the coverage exactly where it is not needed.**
+    A repo that already has a hand-written `AGENTS.md` gets nothing and, worse,
+    no error — so the one place fux's guidance is most likely to be missing is
+    the one place nothing says so. ADR-AGENT-POLICY decision 6 makes the
+    announcement mandatory, so `skipped_agents_md` carries it and `fux setup`
+    prints the snippet for the human to paste.
+    """
+    before = len(report.written)
+    # ⚠ **No `.exists()` here, deliberately.** `_write_if_missing` already
+    # decides, and `test_the_installer_never_branches_on_a_vendor_directory_existing`
+    # asserts this region never sniffs the filesystem — *which agents install is
+    # DECLARED, never sniffed*. Reading the outcome off the report keeps one
+    # decision in one place instead of two that can disagree.
+    _write_if_missing(root / AGENTS_FILE, agent_template_bytes(AGENTS_TEMPLATE), report, root)
+    if AGENTS_FILE in report.kept:
+        report.skipped_agents_md = True
+    if len(report.written) > before:
+        # Repo root is outside `.fux/`, so decision 6's announcement applies
+        # exactly as it does to `.github/` and `.kiro/`.
+        report.outside.append(AGENTS_FILE)
+
+
 def run(root: Path, *, agents: bool = True) -> SetupReport:
     """Write the consumer-owned files, write-if-missing. Returns what happened.
 
@@ -353,6 +538,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # a commented file is a cost with no return. There is no import cycle to
     # dodge — this is latency, in the same spirit as ADR-CLI decision 7.
     from .tune import TUNE_NAME, specimen
+    from .output_config import OUTPUT_NAME, specimen as output_specimen
 
     report = SetupReport()
     for path in fuxdir.ensure_layout(root):
@@ -362,12 +548,26 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     for name, template in FETCHERS.items():
         _write_if_missing(directory / FETCHERS_DIR / name, template_bytes(template), report, root)
 
+    # W-86 P7, ruled by Arpit 2026-08-26: every built-in decoder is written into
+    # `.fux/decoders/`, and **the copy is what runs** (ADR-DECODE decision 11).
+    for name in decode_mod.BUILTIN_MODULES:
+        _write_if_missing(
+            directory / DECODERS_DIR / f"{name}.py", decoder_source(name), report, root
+        )
+
     _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
-    # Written with the default spelled out rather than left implicit: a
-    # consumer should be able to see what fux considers a document without
-    # reading its source (ADR-TYPES).
-    _write_if_missing(root / DEFAULT_TYPES_FILE, _TYPES_HEADER.encode("utf-8"), report, root)
+    # Written with the default spelled out as LIVE lines rather than left
+    # implicit: a consumer should be able to see what fux considers a document
+    # without reading its source (ADR-TYPES decision 10), and a file of nothing
+    # but comments is one `read_types` rejects — see `_seed_types`.
+    _write_if_missing(root / DEFAULT_TYPES_FILE, _seed_types(), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _URLS_HEADER.encode("utf-8"), report, root)
+    # Header only, no patterns: an ignore file that arrives with guesses in it
+    # is one whose first act is to hide a document nobody asked it to hide.
+    # Empty is a legal, meaningful state here (ADR-FUXIGNORE decision 6) in a
+    # way it is not for `types`, so the seed can be honest about knowing
+    # nothing. Write-if-missing like the rest -- `fux setup` never rewrites it.
+    _write_if_missing(root / fuxignore.IGNORE_FILE, _FUXIGNORE.encode("utf-8"), report, root)
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
     # Every key commented out, so a fresh repo runs on the engine's own
     # defaults and the file is a menu rather than a configuration (ADR-TUNE
@@ -379,11 +579,25 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # for writes into directories other vendors own, which is what makes
     # announcing them mandatory; a file in fux's own directory is not one.
     _write_if_missing(root / TUNE_NAME, specimen().encode("utf-8"), report, root)
+    # ADR-OUTPUT decision 1: the same contract as `tune.toml`, one boundary
+    # further in — tune changes WHICH documents come back, this changes how
+    # they are SHOWN. Write-if-missing for the same reason, and `fux output`
+    # prints rather than edits.
+    _write_if_missing(root / OUTPUT_NAME, output_specimen().encode("utf-8"), report, root)
 
     # After `fux.toml`, so a first run reads the default this very call just
     # wrote out in full, and a later run reads whatever the consumer edited it
     # to (ADR-AGENT-POLICY decision 5).
-    _write_agents(root, report, _agents_to_install(root, agents))
+    installing = _agents_to_install(root, agents)
+    _write_agents(root, report, installing)
+    # ⚠ **Gated on the RESOLVED set, not on the `agents` flag.** `--no-agents`
+    # is one opt-out; a `[agents] install = []` declaration is the other, and a
+    # repo-root file is the most visible thing either could leak
+    # (ADR-AGENT-POLICY veto 1a). ⚠ **And only when EVERY vendor installs**: a
+    # partial declaration names what it wants, and a neutral file nobody named
+    # is not covered by that naming.
+    if installing == KNOWN_AGENTS:
+        _write_root_agents(root, report)
     return report
 
 
@@ -411,6 +625,20 @@ def cmd_setup(args) -> int:
     # just ran, not from a later `git status` on a repo they share with a team.
     # Veto condition 1 fires on any agent file written without appearing here.
     # ASCII only: these bytes reach a Windows console (ADR-CLI veto 7).
+    if report.skipped_agents_md:
+        # W-82 ruling 16 consequence 2. The snippet is printed rather than
+        # merged: `AGENTS.md` is the consumer's file and fux does not edit
+        # files it did not write.
+        print()
+        print(
+            "  note: this repo already has AGENTS.md, so fux left it alone.\n"
+            "        Agents read it on every interaction, so nothing here tells\n"
+            "        them the index exists. Paste this into it:"
+        )
+        print()
+        for line in agent_template_text(AGENTS_TEMPLATE).splitlines():
+            print(f"    {line}" if line else "")
+        print()
     if report.outside:
         print()
         print(
@@ -426,4 +654,5 @@ def cmd_setup(args) -> int:
 
     load(root)  # a hand-edited fux.toml fails loudly here, not on the first ingest
     print("next: add entries to .fux/sources/dirs, then `fux ingest`")
+    print("      anything you do NOT want indexed goes in .fux/.fuxignore")
     return 0

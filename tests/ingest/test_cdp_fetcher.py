@@ -123,27 +123,37 @@ def test_fragmented_message_reassembles_and_answers_ping(mw):
     assert pongs == [b""]
 
 
-def test_html_to_markdown_headings_lists_code(mw):
-    html = (
-        "<html><head><title>T</title><style>x{}</style></head><body>"
-        "<h1>Guide</h1><p>Intro <b>bold</b> text.</p>"
-        "<ul><li>one</li><li>two</li></ul>"
-        "<pre>code line</pre></body></html>"
-    )
-    md = mw.html_to_markdown(html)
-    assert "# Guide" in md
-    assert "- one" in md and "- two" in md
-    assert "```\ncode line\n```" in md
-    assert "**bold**" in md
-    assert "x{}" not in md  # style dropped
+def test_the_conversion_is_no_longer_this_fetcher_s_job(mw):
+    """W-86 P8: `fetch()` returns bytes and a content type; `fux.decode` converts.
+
+    Asserting the functions are **absent** is the point. A test that they still
+    behave correctly would keep passing after someone re-added a private copy,
+    which is the exact defect the lift removed.
+    """
+    assert not hasattr(mw, "html_to_markdown")
+    assert not hasattr(mw, "extract_title")
+    assert not hasattr(mw, "_MdParser")
 
 
-def test_html_to_markdown_is_deterministic(mw):
-    html = "<h2>A</h2><p>b</p><table><tr><th>h</th></tr><tr><td>v</td></tr></table>"
-    assert mw.html_to_markdown(html) == mw.html_to_markdown(html)
-
-
-def test_extract_title_and_links(mw):
-    html = '<head><title> My Page </title></head><body><a href="/x#frag">x</a><a href="mailto:a@b">m</a></body>'
-    assert mw.extract_title(html) == "My Page"
+def test_link_extraction_stays_here_because_crawling_is_a_fetcher_s_job(mw):
+    """The decoder plane may not open a socket, so following links cannot live
+    there. This is the one HTML-reading function that correctly belongs to a
+    fetcher.
+    """
+    html = '<body><a href="/x#frag">x</a><a href="mailto:a@b">m</a></body>'
     assert mw.extract_links(html, "https://s.test/base/") == ["https://s.test/x"]
+
+
+def test_fetch_returns_bytes_and_a_declared_type(mw, monkeypatch):
+    """A browser capture has no server header to read, which is exactly why the
+    type is stated explicitly rather than left for fux to guess.
+    """
+
+    class _Session:
+        def capture(self, url):
+            return "<h1>Rendered</h1>"
+
+    monkeypatch.setattr(mw, "_session", _Session())
+    raw, content_type = mw.fetch("https://s.test/page")
+    assert raw == b"<h1>Rendered</h1>"
+    assert content_type.startswith("text/html")

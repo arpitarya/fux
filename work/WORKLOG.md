@@ -24,6 +24,1341 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-27 — P3 passed, W-82's forks re-derived to zero, and a decoy caught fux believing itself  ·  Claude Code
+
+- **Asked:** *"go"* — continue on whatever is agent-closable. Three things were.
+
+- **Did, W-87 P3 (a frozen gate):** built a lab environment with **19 real
+  external documentation URLs** — RFCs, PEPs, `docs.python.org`, Wikipedia, a
+  live status page — and ran `fux update` twice. **19/19 = 100 %** of sanitized
+  shas unchanged, against a frozen `≥ 80 %`. **`PASS`; fork 3's gate clears and
+  W-87 P4 is unblocked.**
+  - **A control arm was run**, because a 100 % with none is the M1 failure — a
+    treatment that touched nothing, reported as a null effect. `Special:Random`
+    changed, the 19 did not.
+  - ⚠ **The spec named no INTERVAL.** At 12 s apart this measures **server-side
+    determinism**, not document churn. Said in the verdict rather than left for
+    a later reader to assume.
+  - ⚠ **ADR-RS decision 12's own reopen trigger has FIRED** — four disclosures
+    against a stated threshold of three. **Recorded, not acted on**: decision 12
+    is Arpit's and its text forbids a session narrowing it.
+
+- **Did, W-82's fork counts** (the queue said re-derive rather than read):
+  **zero open forks of its own.** 27 total · 18 ruled · 6 moved to W-87 · 2
+  moved to W-87 P4 · 1 answered by the build. Verified against the code —
+  `__main__.py` exists, `copilot` is still installed, both usage skills are on
+  disk.
+
+- **Did, two of ADR-RS decision 15's three controls** — `tools/quality-controls/`,
+  owed since W-78. **The blocker on them was false**: they needed
+  `fux-playground`, which was on the machine.
+  - **The placebo**: matched-length, content-free, **one shared sentence pool so
+    every placebo has identical vocabulary** (a placebo about another topic would
+    still discriminate). Deterministic from the source sha, no model. An early
+    version overshot length by **+8 %**, confounding length with content — the
+    one confound it exists to remove.
+  - **The decoys**: fifteen questions the corpus cannot answer. ⚠ **The one kind
+    of evaluation material an agent may author** — no correct answer, nothing to
+    fit.
+  - **ADR-RS decision 15 KEEPS `NOT BUILT`.** It names three; the sealed subset
+    is missing and is a judgement, not a build.
+
+- **🔴 The decoys found a defect on their first run.** *"What is the SLA we
+  publish for the payments API"* returns **`grounded`** — `coverage: 1.0`,
+  `missing: []`, `separation: 0.58` — citing the data-retention policy, for a
+  question no document discusses. **`coverage` and `missing` are corpus-wide**,
+  and its four terms occur in four *different* documents, so nothing reads as
+  missing and the band falls through to the separation test.
+  - **That is the exact failure `confidence.py`'s docstring opens with.**
+  - ⚠ **No ruling on R10 catches it** — `0.58` is above the `0.5` R10's selection
+    rule would have picked. **Worth knowing before R10 is ruled**, and it argues
+    `separation` measures *decisiveness*, not groundedness.
+  - **Named, not fixed**, and **no test pins the current behaviour** —
+    per-document coverage changes a declared signal, the schema, the MCP result
+    and every consumer. ADR-CONFIDENCE decision 12.
+
+- **Decided / open:** nothing was decided that was Arpit's. Four calls now wait:
+  R10's one question, narrow-by-default, L8, and **per-document coverage** — the
+  last of which R10's ruling does not reach, so the two should be read together.
+
+- **Verified:** `tests/` **2 192 passed, 1 skipped**. Playground left at 41/50.
+
+- **Next:** ⚠ **three sessions of work are uncommitted** (400+ files). Committing
+  is the highest-value remaining action and has not been asked for.
+
+## 2026-08-27 — the daemon over the real internet, R10 measured, and a blocker that was never real  ·  Claude Code
+
+- **Asked:** *"Run the daemon against ONE REAL EXTERNAL URL… everything related
+  to daemon setup an env in fux lab to test out everything even the once blocked
+  on env"* — which authorised the network and the environment work.
+
+- **Did, first, and it reframes the rest:** looked for the environments before
+  building them. **Both already existed** — `~/my_programs/fux-lab` and
+  `~/my_programs/fux-playground`, the latter still holding its 50 goldens.
+  `OPEN-WORK.md` had a whole section headed *"Blocked on an environment that
+  does not exist on the build machine"* listing six items. **It was false on
+  this machine**, written by sessions that had no shell and could not look, and
+  it had been holding R10 — the confidence plane's gate.
+
+- **Did, the daemon** (hands item 1, W-82 ruling 3's hold): a new lab
+  environment with **seven real external URLs**, chosen to cover what localhost
+  could not — `example.com`, an RFC over TLS, a CDN-served Python doc, a real
+  **404**, a real **429**, and **Wikipedia's `Special:Random`**, whose content
+  genuinely differs between fetches on a server nobody here controls.
+  - `start` → sweep in ~6 s → three URLs indexed over TLS/DNS/two CDNs.
+  - **The URL tail closed unassisted:** `16:51:55Z` *Laurence Bennett* →
+    `16:52:55Z` *Bargilt Iron Ore Mine*, one sweep interval, no command typed.
+  - **The rate-limit path fired for the first time ever** against a real 429 —
+    `fux doctor`: `rate-limited by httpbin.org x8`. That reader had a bug fixed
+    hours earlier and had never been run against a real refusal.
+  - `stop` → pid reaped, lock free.
+  - ⚠ **Proxy and SSO are still uncovered** — they need a corporate network.
+
+- **Did, R10:** ran the frozen pre-registration verbatim on the playground under
+  its exact conditions (unenriched, default tune, one index; both stashed and
+  **restored**, playground re-graded at 41/50 afterwards).
+  **`INCONCLUSIVE` — and not because the data was thin, though it was.**
+  The curve reaches `t = 0.75` at `0.3`, **falls back at `0.4`**, then rises, and
+  **the pre-registration froze two rules that read that differently**: its
+  selection rule picks `0.5`, its verdict table's non-monotone row picks *no
+  change*. Handed to Arpit. `SEPARATION_FLOOR` stays `0.10`; **no test was
+  edited**, because the confidence test asserts the rule and never the value.
+
+- **Did, three defects, all one shape — a message that sends you nowhere:**
+  1. a URL skipped as `no decoder for application/json` while `jsondoc` is built
+     in, claims `.json`, ran, and correctly dropped a bare UUID;
+  2. **consumer decoders never reached URL content** (`decode()` called without
+     `root`) — ADR-DECODE's premise stopping at the network boundary;
+  3. `shard missing/mismatched _format header`, which is what an **engine
+     upgrade** produces, named neither version, and had no migrate verb behind
+     it — it made all 50 goldens fail in a way that reads as corruption.
+  Six new tests. Records: ADR-FETCHER 11, ADR-INDEX-LIFECYCLE, ADR-RS 18.
+
+- **Decided / open:**
+  - **W-82 ruling 3 is now held on a JUDGEMENT, not on evidence.** The reason to
+    hold it — the daemon had never been shown to work — is gone. The reason it
+    might still hold is proxy/SSO. **Arpit's.**
+  - **R10's one question**, in `OPEN-WORK.md` §decisions. Either answer is a
+    **new pre-registration**, never an edit to the frozen one.
+  - **Named, not taken:** whether a URL belongs in the committed
+    `.fux/enrich/queue.tsv`; whether the nine playground goldens should be
+    annotated `known_failure` (it would turn a red gate green).
+  - ⚠ **`OPEN-WORK.md`'s environment section is corrected** and now leads with
+    *re-derive before believing a blocker* — rule 4, which is what would have
+    caught this a day earlier.
+
+- **Verified:** `tests/` **2 183 passed, 1 skipped**. Playground restored to
+  41/50. The lab environment persists; nothing in the lab was deleted.
+
+- **Next:** Arpit answers R10's one question and rules on narrow-by-default;
+  the L8 sanity-check is the only hands item left.
+
+## 2026-08-27 — the queue's backlog cleared, and five gates that were red  ·  Claude Code
+
+- **Asked:** *"implement whatever can be implemented from open work document and
+  keep closing the items"*.
+
+- **Did, first:** re-derived the queue rather than reading it (rule 4), and the
+  first finding was that it was **understating the damage by a factor of six**.
+  `OPEN-WORK.md` said *"two ADR tests are RED right now"*; locally **twelve
+  tests in five groups** were. Not the queue's fault — the four Cowork sessions
+  that filed it had no shell (`device_bash` 5/5 since 2026-08-26) and had never
+  run the suite. **This is the shape of the hazard `CLAUDE.md` §Two hazards
+  names**: prose repeating prose, with nothing re-derived.
+
+- **Did, the backlog:** the five ruled git operations, plus the two BLOCKED.json
+  named that OPEN-WORK's table did not. `git rm` the stray `0047_fuxignore.md`
+  and the superseded `0017_enriched-mode.md`; `git mv` six items into
+  `archive/open/` and `archive/proposals/` with their rows; every live citation
+  of ADR-ENRICHED repointed — **to ADR-ENRICH where it grounds a live claim, to
+  the archive where it merely names a superseded one** (W-82 ruling 9).
+
+- **Did, the gates.** Two were stale tests failing for the reason the change was
+  made, and three were defects in the checks themselves:
+  - **The register's §"the number line is contiguous" note was FALSE.** It
+    described a renumber of `0026`+ down by one that never ran and **must not
+    run** — W-82 ruling 7 forbids exactly it, and records that a previous
+    compaction put two records on `0022`. It pointed at
+    `0025_runtime-manifest.md` and `0042_locks.md`; **neither has ever
+    existed.** Rewritten: `0017` and `0025` are burned ordinals, and a hole
+    costs nothing when every citation is a name.
+  - **The freshness gate ran for the first time and convicted history**, having
+    claimed in its own docstring that it never would. Eight commits flagged for
+    not updating ADR-CONFIDENCE, ADR-OUTPUT and ADR-OWNERSHIP's `describes`
+    relation — all written 2026-08-27. **Third occurrence** (`RULE-SINCE`
+    records two), so it is gated rather than absorbed: the register is now
+    parsed **per commit** from `git show <sha>:docs/adr/README.md`.
+    **`RULE-SINCE` did not move** — the precedent was to retire 95 commits of
+    auditability to excuse eight.
+  - **R10's directory is legally half-empty.** A frozen pre-registration with no
+    report failed four checks for having done nothing wrong, and both ways out
+    were forbidden — invent a report, or move a file ruling 8 freezes.
+    **ADR-RS decision 17.**
+
+- **Did, the daemon** (hands item 6, held W-82 ruling 3): ran the whole
+  lifecycle against a local HTTP server. Sweep in ~1 s; **a page edited at
+  `15:11:21Z` was indexed by `15:12:04Z`, unassisted**; `stop` reaped the pid and
+  freed the lock. The check is a **positive control** — the term exists only in
+  the fetched page — because the unit gate patches a mock, which cannot tell a
+  real call from itself. That is how the dead sweep hid for a day.
+
+- **Did, and this one is a correction:** the queue claimed *"four hook tests go
+  green-by-vacuity without `fux` on `PATH`"*. **Measured: 4 failed, 9 passed.**
+  The four post-commit tests bite hard. **Exactly one** was vacuous, and it is
+  the one whose every assertion is that something is ABSENT. Fixed with a
+  positive control plus an environment guard covering the class.
+
+- **Decided / open:**
+  - **W-82 ruling 3 stays HELD, and the hold is NARROWER.** Localhost has no
+    proxy, TLS, SSO, rate limit or DNS, and narrow-by-default's blast radius is
+    *URLs that stop being swept*. **Arpit's call, not a session's** — the ask is
+    now one real external URL, not confidence in the daemon.
+  - **L8's one-line handle was stale in four live docs** — ADR-LAWS' §1 table,
+    `INTERVIEW.md`, `IMPLEMENTATION.md`, `compare/README.md` all carried the
+    form Arpit **withdrew the same day he wrote it**. Reconciled to the live law.
+    ⚠ **A reconciliation, not a ratification.** The sanity-check is still his,
+    and it is now the only hands item left besides the URL.
+  - **Untouched, all three still Arpit's:** the daemon's reasonless `"failed"`,
+    renaming `fux/ingest`'s `run` re-export, and which of the two overlapping
+    `tests_e2e` post-commit tests survives.
+  - ⚠ **`CLAUDE.md` was edited** and it is named here per §Documentation
+    discipline: one citation, ADR-ENRICHED → ADR-ENRICH, because the record was
+    superseded and removed. **No normative content changed.**
+
+- **Verified:** `tests/` **2 170 passed, 1 skipped** (from 2 158/12 failed).
+  `tests_e2e/` **74 passed, 1 skipped** — **macOS 15 / arm64 / CPython 3.14.2**,
+  the second platform that suite has ever run on. Windows still unverified.
+
+- **Next:** Arpit runs the daemon against one real external URL and sanity-checks
+  L8; both are in `OPEN-WORK.md` §Blocked on Arpit — hands.
+
+## 2026-08-27 — W-93 second pass: the skip list moves into the COMMITTED `.fuxignore`  ·  Cowork
+
+- **Asked:** after the count split shipped — *"skipped file is still getting
+  generated and all skipped files are still being added in skipped files instead
+  of .fuxignore"*. **The earlier entry's work was not what he asked for**; the
+  count split was correct and beside the point.
+- **Did:** asked two questions rather than inferring a second time. **Rulings:**
+  every ingest writes `.fuxignore` (not a separate command, not inferred
+  patterns), and **everything** goes in — the unreadable skips included. Built
+  it. `.fux/.fuxignore` now carries two delimited blocks fux rewrites every run;
+  `.fux/runtime/skipped` is **deleted on every run**. Five properties carry it,
+  each closing a specific failure: **the blocks are written FIRST** (last match
+  wins here, so a block written last would silently beat a human's `!`); a block
+  line is a **literal path**, never a glob; **which block a line is in IS its
+  class**, so decision 15's split survives without anything parsing note text;
+  **the note is the reason that PUT the line there**, so run 2 does not answer
+  *why* with *"because run 1 said so"*; and **a path a hand-written pattern
+  covers gets no line** — `__pycache__/` + `*.py[cod]` collapse 257 of this
+  repo's 599 to zero, leaving **342** generated lines. Records: **ADR-FUXIGNORE
+  decision 11 + 11a–e** (its owner), **ADR-INGEST decisions 4 and 15 rewritten**
+  in place, plus §1 prose, both diagram halves, consequences, alternatives, two
+  new veto conditions and three new veto checks. `tests/ingest` **316 passed**.
+- **Decided / open:** ⚠ **A generated line DECIDES, so it FREEZES its verdict** —
+  widen `types` and the listed `.py` files stay out; write content into a file
+  listed as `empty` and it stays out. **Arpit's explicit call, stated before he
+  made it, and not undone.** Made *loud* instead: `gitdir.would_index` re-checks
+  every generated line each run — in the walk's own order, so it cannot drift —
+  and warns on stderr when one has stopped being true, naming the edit that
+  fixes it. Bytes are read only for a path that passed both lists, so the large
+  population costs nothing. ⚠ **Two real losses, both recorded rather than
+  worked around:** a URL skip has nowhere to live (`.fuxignore` matches
+  repo-relative paths), so **W-88's report-once promise now covers files only**
+  and a URL prints every networked run — `url-state.json` is the proper home for
+  repeat failure; and **`fux ingest` now writes one of its own inputs**, so a new
+  skip dirties the working tree on the hook path (an unchanged run writes
+  nothing, so steady state is quiet). **Rejected on the way**: inferred patterns
+  (six lines instead of 342) — an inferred pattern can over-reach onto a file the
+  corpus does not have yet, and that failure is a document silently missing.
+- ⚠ **No shell, still** — `device_bash` 5/5. Cloud container, staged subset,
+  written back with mtime guards. **Nothing committed; no `git` has run.**
+  `tests_e2e/` and the ADR meta-suite did not run. The 12 `test_dead_urls.py`
+  failures are **pre-existing** — another session holds that file and `run.py`,
+  which is why neither was touched.
+- **Next:** Arpit runs `uv run pytest -q tests && uv run pytest -q tests_e2e`,
+  then `fux ingest` once to materialise the 342 lines and review the diff.
+
+## 2026-08-27 — W-93: the skip count was the defect, not the skipped files  ·  Cowork
+
+- **Asked:** on seeing `ingested 632 docs …, 599 skipped` — *"the skipped files
+  should get added into .fuxignore not skipped"*. Then, on the analysis:
+  *"yes implement it"*.
+- **Did:** **read the walker before agreeing, and the proposed remedy does not
+  do what it looks like.** `gitdir.walk_sources` records an **ignored** file as
+  skipped too, so moving 599 paths into `.fuxignore` changes only the reason
+  string — the count stays 599. And per-file lines would freeze a *derived*
+  verdict: `not an indexed file type` comes from the type allowlist,
+  `.fuxignore` **outranks** the allowlist, so 274 frozen `.py` paths would
+  silently outlive the day a `.py` decoder lands. `binary` is a property of the
+  current bytes and cannot be frozen at all. `.fuxignore` is committed and
+  **last-match-wins**, so machine-appending can override a human's `!` line.
+  **Re-derived what the 599 actually were** from `.fux/runtime/skipped`: 257
+  `.pyc` under `archive/**/__pycache__/`, 274 `.py` in `archive/v0.1` and
+  `archive/v0.26`, ~67 `.sh`/`.svg`/`.log`/`.jsonl`/`.diff`/`.png`, and **one**
+  `binary` fixture. 547 of 599 under `archive/`. **598 were the allowlist doing
+  its job.** So the defect was one number spanning two populations. Shipped
+  **ADR-INGEST decision 15**: a skip carries its class — `POLICY` (a committed
+  list said no) or `UNREADABLE` (fux opened it and could not read it) — **set
+  where the skip is made, never parsed back out of the reason string**, and the
+  summary counts them separately: `598 not indexed, 1 skipped`. Printed lines
+  use the summary's own two words. **`--list-skipped` and `.fux/runtime/skipped`
+  deliberately unchanged** (`path: reason`, sorted, unprefixed) because things
+  pipe them. Added `__pycache__/` and `*.py[cod]` to `.fux/.fuxignore` with a
+  comment saying plainly what they do **not** buy. 14 new tests;
+  `tests/ingest` **294 passed** (baseline 280).
+- **Decided / open:** ⚠ **`Skipped.kind` defaults to `UNREADABLE` on purpose** —
+  an un-updated call site over-reports into the loud bucket rather than hiding a
+  real failure inside the deliberate count. **Open, and Arpit's:** fux's walker
+  reads **no `.gitignore`** and has no prune, so it enumerates 257 untracked
+  build artifacts every run. Making `.fuxignore` prune the walk is a real saving
+  **and** collides with reported-never-silently-dropped — a fork with a verdict
+  owed, not a patch. Not filed as a `W-nn`: the queue is human-blocked and this
+  session was not going to invent scope.
+- ⚠ **No shell, third session running** — `device_bash` failed 5/5. Built in the
+  cloud container on a staged subset and written back through the bridge with
+  mtime guards. **Nothing committed; no `git` has run.** `tests_e2e/` and the ADR
+  meta-suite did **not** run here (only three ADRs were staged). The 12 failures
+  in `tests/ingest/test_dead_urls.py` are **pre-existing and another session's
+  in-flight work** — present at the same count before this change.
+- **Next:** Arpit runs `uv run pytest -q tests && uv run pytest -q tests_e2e`,
+  and `git rm docs/adr/0047_fuxignore.md` (still a stray, still two red tests).
+
+## 2026-08-27 — W-91: the provenance plane, and L8 reverted the day it was written  ·  Cowork
+
+- **Asked:** *"Is there a way to build an audit trail for how the returned output
+  got generated? do some research and propose something."* Then, on the proposal:
+  *"Create a proposal, a work document, and then implement it. then close it out."*
+  All four phases; the L8 fork explained ELI5 before he ruled it.
+- **Did:** ⚠ **No shell again** — `device_bash` failed 5/5, so the build ran in
+  the **cloud container against a staged subset of the tree** and every file was
+  written back through the bridge with an mtime guard. **A LAW WAS REVERTED.**
+  Arpit: *"revert that law we should be able to keep logs of the questions as
+  well as answer. it should never be maintained it git so having it in git ignore
+  is fine."* `CLAUDE.md` L8 and [ADR-LAWS](../docs/adr/0001_laws.md) decision 8
+  were rewritten **in the same change** per ADR-LAWS decision 4, and **veto check
+  3 was rewritten with them** — the old one asserted the hashing and the
+  `MAX_QUESTIONS` bound and would now pass on a repo that had broken the
+  surviving half. Built **ADR-PROVENANCE (0046)** and
+  `src/fux/query/provenance.py`: `ask --why` (matched terms with committed
+  per-field counts, ADR-QUALITY's four gates, **the cut line**, rerank and tune
+  deltas), `answer --audit` / `--receipt` / `--journal`, and `fux verify`. Three
+  shapes declared in `output.schema.json`. Amended ADR-CLI (9b) and ADR-ASK (11,
+  12); register + ownership rows; graduated the 2026-07-21
+  `audit-evidence-trail` proposal and filed its researched successor
+  `answer-provenance.md`. **29 new tests, 121 green on the staged subset.**
+- **Decided / open:** ⚠ **TWO DEFECTS FOUND IN EXISTING CODE.** (1) **`fux answer
+  --json` was validated on only ONE of its three branches** while
+  `output.schema.json` claimed all of them were — **W-84's finding in a different
+  file**; `refer` and `index` now route through `_emit`. (2) **A receipt
+  disagreed with its own answer about freshness for one run** — built from the
+  pre-upgrade confidence block; caught by *running* the command, not by a test,
+  and now gated under the two-strikes rule. **The journal ships OFF**, behind
+  `--journal`: *"we should be able to"* is a capability, not a default. ⚠ **The
+  AOL-2006 grounding is recorded as OVERRIDDEN, NOT REFUTED** — a later session
+  may not cite the reversal as evidence the risk was disproved. **Five forks are
+  Arpit's**, of which always-on journalling is the one a session will default.
+  ⚠ **`tests_e2e/`, `test_adr_freshness.py` and `test_doc_links.py` were never
+  staged and have not run.** **Nothing was committed.**
+- **Next:** Arpit sanity-checks the L8 reversal reads as he meant it, then runs
+  the unstaged tests before committing.
+
+## 2026-08-27 — the queue re-derived, cleaned, and W-90 ruled to close  ·  Cowork
+
+- **Asked:** what is open, what is Claude's, what is blocked on Arpit — go
+  through them one by one, close what can close, and clean up so only open items
+  remain. Look into `open/`, `compare/` and `proposals/`.
+- **Did:** ⚠ **No shell all session** — `device_bash` failed five times, so
+  **nothing was committed and no `git` ran**; every finding below is a
+  **filesystem** reading, not a working-tree reading, and every file was written
+  through the Cowork bridge with an mtime guard (no drift on any of the ten).
+  **Re-derived `BLOCKED.json` against the repo instead of believing it:** its
+  file-lock premise is **dead** — W-86 is archived and `docs/adr/README.md` was
+  rewritten wholesale afterwards — so **13 of the 18 W-82 rulings are applied,
+  not 10, and the remaining 5 are NOT blocked**: 3 (no `--all` on `update` in
+  `cli.py`), 4 (no `describes` table — the register ends at the ownership
+  block), 6 (`0017_enriched-mode.md` still live and `accepted`), 12 (zero
+  occurrences of `429` in ADR-FETCHER), 16 (no repo-root `AGENTS.md`).
+  Rewrote `BLOCKED.json` with a `rederived` field, and `NOW.md`.
+  **Cleanup:** OPEN-WORK's *three stray-file `git` operations* is **one** — both
+  `git rm`s are already done (`0043` is `0043_locks.md`; neither misnumbered
+  file exists), leaving only W-89's `git mv`. `proposals/README.md` had an
+  **empty 2026-08-21 heading** (six days) and a **truncated 2026-08-26 tail**
+  carrying no rows — both annotated rather than silently deleted — plus two
+  **GRADUATED proposals never archived** (`tune-file-and-source-priority`,
+  `playground-goldens-draft`), flagged against that file's own lifecycle rule.
+  `docs/adr/README.md` carried a **broken link**, `0043_quality-contract.md` →
+  `0044_`. `compare/README.md`'s W-89 row now records the `L8` ruling.
+  **Then ruled W-90 fork by fork with Arpit** and recorded it.
+- **Decided / open:** **The band SHIPS** — the assumption built on 2026-08-27 is
+  ratified; `SEPARATION_FLOOR = 0.10` stays a **declared proxy** calibrated
+  against ADR-QUALITY's `t = 0.75`, and R10 finds the real value or says in
+  writing that it is a heuristic. ⚠ **`--band` gates the CLI; the `fux_search`
+  MCP result is always on** — ADR-CONFIDENCE **decision 11**, with decisions 1
+  and 4 amended. Arpit's first shape was *flag-gated everywhere*; that was
+  pushed back on once, on the ground that an MCP tool call has no flags and the
+  agent on the invocation ladder is the consumer the record exists for, and the
+  split is what he ruled. **The cost is accepted, not argued away: a bare
+  `fux ask` now returns no confidence block and no `answerable: false`** — the
+  mitigation is `fux.agent.md` + the `fux-usage` skill teaching `--band`
+  (W-82 §3.6), **and documentation is weaker than a default**; reopen on **one**
+  measured case of an agent answering from a `none` or `weak` result because it
+  did not pass the flag. **ADR-CONFIDENCE flipped `proposed` → `accepted`**,
+  amended **before** the flip so record and code never disagreed; the register
+  row now reads `accepted` / **`built: partial`**, partial because **decision 11
+  is recorded and NOT implemented**. ⚠ `accepted` ratifies the **decision**, not
+  the code — the unverified suite (59 failed / 1811 passed / 8 errors, **no
+  baseline**) and R10 both stay open. **Still open:** W-82 (5 rulings + forks 6
+  and 8), W-87 (P1–P5, blocked on environments not decisions), W-90 (decision
+  11's build, R10, the suite).
+- **Next:** in a session **with a shell** — `git mv` W-89 into `archive/open/`
+  with its `archive/README.md` row, then build decision 11 (flag in `cli.py`,
+  emission gate in `query/__init__.py` for **both** `--json` and stderr, `mcp.py`
+  untouched, `output.schema.json#confidence` optional with ***absent ≠ `none`***
+  in its description, and a test asserting the block is still **computed** with
+  the flag absent so the differential law is not gated with it).
+
+## 2026-08-27 — the handbook becomes 32 slides: pointers, diagrams, collapsibles, a sidebar, a presentation  ·  Cowork
+
+- **Asked:** five guidelines for `docs/handbook.html` — keep it precise with text
+  in pointers · diagrams wherever possible · long text collapsed by default · a
+  collapsible left index · **and make it work as a presentation.**
+
+- **Did.** Rewrote the page around one structural decision: **every unit is a
+  `<section class="slide">`**, which is a heading in the document and a slide in
+  the deck. One artifact, two readings — no second export path to drift.
+  `no ADR affected`.
+  - **32 slides**, grouped 01 how it works · 02 confidence · 03 testing ·
+    04 reference · 05 context.
+  - **Nine new diagrams**, joining the five that existed — ingest pipeline,
+    analyzer chain, field weights, the two planes, verb granularity, citation
+    anatomy, the four freshness verdicts, the four test layers, the invocation
+    ladder. Anything a table could only *list* is now drawn.
+  - **Prose demoted to pointers.** Paragraphs that survived are the ones
+    carrying an argument; the rest are bullets. The long reasoning moved into
+    `<details class="more">`, **collapsed by default**, so the spine reads in one
+    screen and the argument is one click away.
+  - **Sidebar** — per-group toggles, scrollspy, persisted collapsed state.
+  - **Presentation mode** — `p` or `▶ Present`; `→`/`←`/`Home`/`End`, `f`
+    fullscreen, `?` keys, `Esc` out; progress bar; every `<details>` forced open
+    so nothing is hidden on a projected slide; and it **resumes from the section
+    you were reading**, because the scrollspy keeps the index.
+
+- **Decided / open.**
+  - **The JS degrades on purpose.** Scripting off leaves a complete scrolling
+    document — only `body.present` hides anything, and a `@media print` rule
+    expands the collapsibles. No dependency, no CDN; the page stays as auditable
+    as the supply chain it describes.
+  - A concurrent session added **`L8`** to this page's law strip while it was
+    being rewritten; the rewrite carries L8 in the laws slide and the diagram.
+    **Two sessions were writing this file** — worth knowing if a hunk looks
+    unfamiliar.
+  - ⚠ **`docs/guide.html` is STILL not deleted** — the shell has been down all
+    day (`no space left on device`), so no `rm` has been possible.
+
+- **Next:** `git rm docs/guide.html` and `git rm docs/adr/0043_confidence.md` —
+  both ruled, both blocked only on a working shell.
+
+## 2026-08-27 — W-89 ruled: `L8`, the first law about *use* rather than the corpus  ·  Cowork
+
+- **Asked:** the open items, then W-89 specifically, then *"Do we need to create
+  a law for this? If yes, go ahead and create it."*
+- **Did:**
+  - **`CLAUDE.md` §Non-negotiable constraints gained `L8`** and the section
+    header now reads L1–**L8**. ⚠ **Named out loud as §Documentation discipline
+    requires** — this session edited the file it is judged by, on Arpit's
+    explicit instruction, to record his ruling.
+  - **[ADR-LAWS](../docs/adr/0001_laws.md)**: `laws:` key, description, feature
+    line, "seven rules" → eight, the handle table row, **decision 8** (why a law
+    and not another ADR decision; what L8 permits, verified against the code;
+    what it forbids; and the hashing trap it does *not* fix), a third veto check,
+    and the AOL-2006 grounding.
+  - **[ADR-QUALITY](../docs/adr/0044_quality-contract.md)** decision 11 and its
+    debt line repointed from *"not settled, filed as W-89"* to the ruling;
+    `laws:` gained `L8`.
+  - **A gate shipped with the law.** `tests/test_adr_ownership.py`'s
+    `test_records_do_not_restate_the_laws` gains L8's handle — and **it caught a
+    real paraphrase the same day**: ADR-QUALITY decision 11 was first written as
+    *"bound by L8 — hashed, bounded, local, off every committed and networked
+    path"*, the law restated inside an accepted record. Rewritten to cite the
+    number. ⚠ The check greps three handles of eight and finds only *copies*.
+  - **Five more docs reconciled on contact**, because a law count is a fact and
+    facts are fixed where they are found: `CLAUDE.md` §ADR standing rules
+    (L1–L7 → L1–L8), `docs/GLOSSARY.md` (**+`Use record (the law, L8)`**, defined
+    *against* content-never-durable), `docs/handbook.html` (law strip + nav
+    label), `work/architecture-detailed.svg` (law strip, viewBox 1198 → 1224),
+    and `INTERVIEW.md` §1, which now **leads with the law count**.
+  - **W-89 closed** — outcome in [`IMPLEMENTATION.md`](IMPLEMENTATION.md), the
+    ruling stamped into its detail file, both queue rows deleted, and W-87's
+    stale *"fork 6 NOT settled"* sentence corrected.
+- **Decided / open:**
+  - **L2 does NOT reach a query log; `L8` does.** Shape 2 of the three, chosen
+    over shape 3 (leave it a product decision) because a durable use record
+    **already exists** — `maintain/lastcited.py`, 256 hashed keys in
+    `.fux/runtime/last-cited.json` — and `ranking-tuning.md` §8 calls a per-repo
+    query log *"an asset fux gets for free"*. The pull is documented and growing.
+  - **L8 landed green.** Verified before the text was written: hashed key,
+    bounded at 256, gitignored directory, stderr-only. **No code changed.**
+  - ⚠ **The finding that reframed the item:** ADR-QUALITY decision 11 says *"no
+    query log is built"*, and a reduced one already was. Hashing the key is not
+    anonymity while the cited locators sit in the value.
+  - ⚠ **Nothing committed** — no shell this session (the sandbox bridge is down),
+    and a concurrent session still holds four files per `work/BLOCKED.json`.
+  - ⚠ **Nothing was run.** No pytest, no SVG render. The new test handle is
+    reasoned against the record set, not executed; the SVG's new row is reasoned
+    from the spacing above it, not seen.
+  - ⚠ **A pre-existing defect found and deliberately NOT fixed:**
+    `docs/handbook.html`'s nav links to `#s-laws` and **no element carries that
+    id** — the laws section it promises does not exist. Renaming the label does
+    not create the section, so it is recorded rather than papered over.
+- **Next:** Arpit commits `CLAUDE.md` + `docs/adr/0001_laws.md` **together** (a
+  law change is one commit, ADR-LAWS decision 4), then the three stray-file `git`
+  operations now listed in [`OPEN-WORK.md`](OPEN-WORK.md).
+
+## 2026-08-27 — the ADR number line closed up: `0026`–`0045` renumbered down by one  ·  Cowork
+
+- **Asked:** *"I have deleted it. Rename the ADRs in a proper way. The sequence
+  is not correct now."*
+
+- **Did.** ⚠ **The renames themselves did NOT run** — see the next entry for why
+  this surface cannot rename a file. What landed is the decision, the
+  documentation, and a one-shot script Arpit runs locally.
+  - **Re-derived the state rather than trusting the previous entry.** Both
+    deletions had landed. The live line was `0001`–`0024`, `0026`–`0045` — a
+    **single** gap, at `0025`, and everything else contiguous. The
+    ADR-CONFIDENCE duplicate had left no hole of its own (`0043` is
+    [ADR-LOCKS](../docs/adr/0042_locks.md)'s), so the *only* defect was `0025`.
+  - **Put the fork to Arpit rather than acting on it**, with the costs named:
+    20 files, every relative link in `docs/`, `work/`, `src/`, `tests/` and
+    `archive/`, a stale number→successor map, and sentences in an append-only
+    log that become false and **cannot be corrected**. Recommended keeping the
+    gap and labelling it. **Arpit ruled: close it.** Recorded here because a
+    later session should not re-litigate it from the recommendation.
+  - **+[`scripts/renumber-adrs.sh`](../scripts/renumber-adrs.sh)** — preflight,
+    20 ascending `git mv`s, one rewrite pass over `git ls-files`, then the two
+    things a path-rewrite cannot reach: each record's `title:` frontmatter
+    `(NNNN)` and the register's bracketed **display column**.
+  - [the ADR register](../docs/adr/README.md): the duplicate row and the whole
+    ⚠ collision block **deleted** (the files are gone), replaced by a short
+    statement of what the number line now is and the one thing it costs.
+  - [`archive/adr/README.md`](../archive/adr/README.md): a new ⚠ header —
+    **`0025` was vacated and then reused**, so the `0025` row there is a
+    different record from live `0025`.
+
+- **Decided / open.**
+  - ✅ **Close the `0025` hole; `0026`–`0045` move down by one** (Arpit). End
+    state `0001`–`0044`, contiguous.
+  - **The rewrite matches `NNNN_slug.md`, never a bare number.** A bare `0044`
+    in prose is already a defect under the cite-by-name rule, and rewriting one
+    means guessing which prose numbers denote a record. ⚠ **So bare numbers in
+    older documents now name different records, and that is accepted, not
+    missed.**
+  - ⚠ **`work/WORKLOG.md` link tokens ARE rewritten by the script.** That is the
+    one exception this file's own header allows — *a repo-wide mechanical
+    rename, where every reference is repointed in a single change, and the entry
+    that does it says so explicitly.* **This is that entry saying so.** Prose
+    numbers in past entries are left standing and are wrong on purpose; the
+    header's *never edit a past entry* rule is otherwise intact.
+  - ⚠ **Nothing is verified.** No `git`, no `pytest` this session. The script
+    prints its own verification commands and commits nothing.
+
+- **Next:** `bash scripts/renumber-adrs.sh` from the repo root, then
+  `git diff --stat` and `uv run pytest -q tests` before committing the rename
+  and the link rewrite **as one change**. Then delete the script.
+
+## 2026-08-27 — `docs/guide.html` → `docs/handbook.html`, four new themed diagrams  ·  Cowork
+
+- **Asked:** *"create an html file in docs, merge guide.html into it, then delete
+  guide"* — covering how fux works, how to get the confidence, how it is
+  tested / quality, and a reference section for merge · fetcher · decoder · CLI,
+  with **beautiful diagrams in light and dark theme based on system**.
+
+- **Did.** Wrote **`docs/handbook.html`**, a single self-contained page that
+  carries every section of `guide.html` forward and adds the four requested
+  topics. `no ADR affected` — no behaviour changed.
+  - **Facts re-derived from source, not copied from the guide.** The guide's
+    counts were stale (it said *41 records, 26 accepted, 15 proposed*); the page
+    now says **44 live records — 42 accepted, 2 proposed**, derived from
+    `grep '^status:' docs/adr/*.md`, and names the `0043_confidence.md`
+    duplicate as ruled-for-deletion-and-still-on-disk rather than counting it.
+  - **New material, sourced from the modules themselves:** the confidence block
+    (`query/confidence.py` — four signals, the band ladder, `SEPARATION_FLOOR`
+    flagged **provisional / R10** and *ordinal where Chow's rule wants a
+    calibrated probability*); the test story (four layers, the guards that test
+    the *project* rather than the engine, the ⚠ that the freshness gate proves a
+    record was **touched** and never reads it); **ADR-QUALITY**'s four-gate
+    funnel with `t = 0.75 → c = 2` published before any score exists; and the
+    merge / fetcher / decoder / CLI reference.
+  - **Four diagrams, all theme-aware.** The guide's SVG hard-coded light hexes
+    and was unreadable in dark mode. Every diagram now paints from `--d-*` CSS
+    variables defined three ways — bare `:root`, `@media (prefers-color-scheme:
+    dark)` guarded with `:not([data-theme="light"])`, and
+    `:root[data-theme="dark"]` — so system preference works and an explicit
+    override still wins.
+
+- **Decided / open.**
+  - ⚠ **`docs/guide.html` is NOT deleted.** The Cowork sandbox's shell was down
+    for the whole session (`no space left on device` on the workspace mount), so
+    no `rm` could run. The page's footer says it supersedes the guide and the
+    DOC-REGISTRY row was repointed, so the state is *consistent but
+    duplicated* — one `git rm docs/guide.html` locally closes it.
+  - `work/DOC-REGISTRY.md` row repointed to `handbook.html` with today's date;
+    the row's history is preserved rather than rewritten.
+
+- **Next:** `git rm docs/guide.html` (and, while there, the already-ruled
+  `git rm docs/adr/0043_confidence.md`).
+
+## 2026-08-27 — the ADR-CONFIDENCE duplicate ruled: keep `0045`  ·  Cowork
+
+- **Asked:** *"there are 2 confidence adr keep one"*.
+
+- **Did.** No code moved; this is a ruling recorded, and **the deletion it
+  authorises did not land.**
+  - **Read both records rather than trusting the register's own note.** They are
+    not near-identical the way three documents claim: `0045` carries a
+    **substantive** difference — its decision 6 demotes `SEPARATION_FLOOR` from a
+    threshold to a **proxy calibrated against
+    [ADR-QUALITY](../docs/adr/0044_quality-contract.md)'s frozen `t = 0.75`**,
+    and states the ⚠ gap that `separation` is *ordinal where Chow's rule assumes
+    a calibrated probability*. `0043` still presents the floor as its own number
+    to pick. **That, not the file date, is why `0045` wins** — and the register
+    said only *"it is the later file"*, which would have been a coin flip if the
+    numbering had gone the other way.
+  - [the ADR register](../docs/adr/README.md): the ⚠ block's justification
+    **discharged** — it read *"left in place deliberately, it belongs to a
+    concurrent session"*, which stopped being true the moment the owner ruled.
+    It now states the substantive reason, and instructs that **the block and the
+    duplicate row are deleted in the change that lands the `git rm`**.
+  - [`INTERVIEW.md`](INTERVIEW.md): both stray-file notes (§1's red-tests item,
+    §2's) reconciled to the same ruling.
+  - [`DOC-REGISTRY.md`](DOC-REGISTRY.md): both rows bumped.
+
+- **Decided / open.**
+  - ✅ **Keep [`0045_confidence.md`](../docs/adr/0045_confidence.md); delete
+    `0043_confidence.md`** (Arpit). Its stray companion
+    `work/open/W-89-the-confidence-plane.md` goes with it — superseded by
+    [W-90](open/W-90-the-confidence-plane.md), and `W-89` is now *does L2 reach a
+    query log?*
+  - ⚠ **NOTHING WAS DELETED.** The bash sandbox failed on every call this
+    session (`useradd: cannot create directory /sessions/…`, five attempts), so
+    no `git rm` could run and **the three red tests are still red**
+    (`test_record_numbers_are_unique_within_a_directory`,
+    `test_register_covers_every_record_on_disk`,
+    `test_the_h1_agrees_with_the_name`). The docs now say *ruled, pending a
+    deletion*; they must not be read as *done*.
+  - ⚠ **`0043` stays a burnt number.** It is [ADR-LOCKS](../docs/adr/0043_locks.md)'s
+    and is not re-minted for anything else.
+  - `no ADR affected` — no record's decisions changed; the register, INTERVIEW
+    and DOC-REGISTRY are trackers.
+
+- **Addendum, same session.** Arpit then gave explicit permission to delete.
+  **It still could not be done, and the reason is worth recording**: this
+  surface cannot remove a file *even when the shell works* — the Cowork VM
+  refuses `unlink`, and the documented workaround is `mv` into `_to_delete/`.
+  With bash wedged there is no `mv` either, and the file tools have no rename
+  and no unlink. So permission was never the binding constraint. Filed in
+  [`MACHINE.md`](MACHINE.md) as its own hazard, because the *documentation*
+  failure mode is the dangerous one: a session in this state can very easily
+  write a doc asserting a deletion it had no way to perform.
+
+- **Next:** Arpit runs, locally, in one commit:
+  `git rm docs/adr/0043_confidence.md work/open/W-89-the-confidence-plane.md`,
+  then deletes the duplicate row **and** the ⚠ block from
+  [the ADR register](../docs/adr/README.md) and re-runs `uv run pytest -q tests`.
+
+## 2026-08-27 — the record set rewritten: metadata stated once, and no record carries history  ·  Cowork
+
+- **Asked:** *"In every area, it seems like front matter is defined twice… Not
+  needed the second time, define all those things in the front matter itself.
+  Then review each and every ADR and write it in a proper way. Adding sections
+  like amended is not going to do. Remove that amended keyword and write it in a
+  proper way. Only keep the ones that is currently implemented or is proposed to
+  be implemented. Anything historical is not needed."* Three follow-up calls,
+  all Arpit's: **full merge** of the two metadata blocks into ten keys · **flip
+  status where code exists** · **verify the prose against the code**, not just
+  tidy it.
+
+- **Did.**
+  - **All 45 records rewritten**, plus [`TEMPLATE.md`](../docs/adr/TEMPLATE.md)
+    and the register. Frontmatter is now ten keys in a fixed order —
+    `type · name · title · description · status · date · feature · owns · laws ·
+    timestamp`, `supersedes`/`ratifies` optional — and **the body opens at §1 and
+    restates none of them.** The `- **Name:** …` bullet block is gone from every
+    record.
+  - **`Amended` is abolished.** The current truth is written **in place of** the
+    sentence it corrects. ⚠ This is the **W-83 class attacked at its source**: an
+    amendment leaves the false sentence standing above its own correction, an
+    agent reads top-down and acts on the first answer it finds, and **no
+    mechanical check fux has can see it.**
+  - **History removed; arguments kept.** W-nn narrative, dates, renumbering notes
+    and superseded prose are gone. Rejected alternatives, the ⚠ silent-failure
+    warnings and measured evidence all stayed — *the failure is the argument, the
+    date it happened is not.*
+  - **Four tests rewritten, one edited.**
+    [`test_adr_frontmatter.py`](../tests/test_adr_frontmatter.py) now checks the
+    key set, **the order**, the quoting, the title, **that the body does not
+    restate the frontmatter**, **that no `Amended` block exists**, and that the
+    H1 agrees with `name:`.
+    [`test_adr_owns_consistency.py`](../tests/test_adr_owns_consistency.py) reads
+    `owns` from frontmatter and is now **bidirectional** — a table row its owner
+    does not declare fails as loudly as a claim the table does not grant.
+  - **`Owns (on acceptance)` is abolished.** A record that owns nothing today
+    declares `owns: []`, whatever its status. The conditional form let a record
+    assert a claim the register did not honour and call the disagreement
+    intentional.
+  - **The register was rewritten, not amended** — it was the last file in
+    `docs/adr/` still carrying the renumbering notes and per-row history every
+    record had just been cleaned of.
+  - **Verified against code, not reformatted.** Six stale claims corrected:
+    ADR-DOTFUX's *"veto condition 1 has FIRED"* (fixed by `COMMITTED_FILES`);
+    ADR-ARCHIVED-CONTENT's *"`archived_weight` lives in `fux.toml`"* (it is
+    `.fux/tune.toml`); ADR-TUNE's `_weight`-suffixed `[bm25f]` keys (bare field
+    names); ADR-DECODE's veto 3 contradicting its own superseded decision 9;
+    ADR-AGENT-POLICY citing a *"decision 10 AGENTS.md"* that does not exist; and
+    ADR-MCP's `## 1 · Examples` shape, converted to §1/§2.
+  - **Six ownership rows added** — `src/fux/__main__.py` → ADR-CLI (the
+    invocation ladder's fourth rung, which W-82 §3.6 recorded as **not
+    existing**; it exists), and ADR-RANKING's five-file carve-out out of
+    ADR-ASK's `query/` claim.
+  - **`0025_codes-table.md` archived with NO successor.** Its subject —
+    `codes.jsonl`, the dense lane — was deleted on 2026-08-25, and that day's
+    entry recorded the closed status vocabulary having no value for *a record
+    whose subject ceased to exist* as **"Arpit's to close"**. It is closed by
+    **moving the record**, not by inventing a fourth status.
+    `archive/adr/README.md` gains rows for `0025` and for `0037`
+    (ADR-T2-SEGMENTS), which was on disk and unmapped.
+
+- **Decided / open.**
+  - **Status: 43 `accepted`, 2 `proposed`** (ADR-LOCKS, ADR-CONFIDENCE — both
+    unratified). The exact before/after list is
+    `git diff docs/adr/ | grep '^[-+]status:'`; **it is not restated in prose,
+    because that is precisely the kind of per-record history this pass removed.**
+  - ⚠ **THE SUITE WAS NEVER RUN.** The bash sandbox died mid-session
+    (`Failed to create bridge sockets`) and did not recover, so every check below
+    is **derived by reading the tests and grepping the tree**, not executed.
+    Treat it as an argument, not a measurement.
+  - ⚠ **Three tests are red, all for one reason.**
+    `docs/adr/0043_confidence.md` is a **stale duplicate** of
+    `0045_confidence.md` — same `name:`, and `0043` is also ADR-LOCKS. It fails
+    `test_record_numbers_are_unique_within_a_directory`,
+    `test_register_covers_every_record_on_disk` (`register_names()` is keyed by
+    **name**, so two rows collapse to one — reordering moves which file reads as
+    unlisted and fixes neither) and `test_the_h1_agrees_with_the_name` (it has no
+    H1). **It was deliberately not deleted**: it belongs to a concurrent session,
+    and removing another session's asset to turn a suite green is how a collision
+    becomes a silent data loss. The register carries the ⚠ block.
+  - ⚠ **What this pass does NOT fix, and nothing does.** The freshness gate
+    proves a record was *touched*, never that it is *coherent*. Abolishing
+    `Amended` removes the most common way an incoherent record looked
+    intentional — **it does not make coherence checkable.**
+  - ⚠ **IT COLLIDED WITH `BLOCKED.json`, and the collision landed two of the
+    blocked rulings by accident.** That blocker says W-82 rulings **1, 4, 6, 7**
+    are stuck on `docs/adr/README.md` being held uncommitted by the concurrent
+    W-86 session — and this pass rewrote that file wholesale, merging from what
+    was on disk. Checked against
+    [`open/W-82-rulings-2026-08-27.md`](open/W-82-rulings-2026-08-27.md):
+    - ✅ **Ruling 1 is LANDED** — ADR-MCP, ADR-ENRICH and ADR-RERANK all read
+      `accepted`, which is what *flip where the code exists* independently
+      produced.
+    - ✅ **Ruling 7 is LANDED** — ADR-CODES-TABLE's row is out of the register,
+      the file is in `archive/adr/` with **successor: none**, and **ordinal
+      `0025` is burned, not reused.** ⚠ The ruling's own open question —
+      *confirm Arpit meant archive rather than delete outright* — **is still
+      Arpit's**, and archiving was assumed on the strength of the archive law.
+    - ❌ **Rulings 4 and 6 are NOT landed and were not blocked by this.** Ruling
+      4 wants a declared **`describes`** relation as a second column in the
+      ownership table plus a `test_adr_ownership.py` change; ruling 6 wants
+      **ADR-ENRICH to supersede ADR-ENRICHED** (fold the ratified contract in
+      first, then archive `0017`, map it, repoint every citation, transfer owned
+      components). Both apply cleanly on top of the new register.
+    - ⚠ **Two sessions must not both claim rulings 1 and 7.** They are landed
+      once, here, by a pass that was not trying to land them.
+
+- **Next:** `git rm docs/adr/0043_confidence.md`, then
+  `uv run pytest -q tests` on a working shell — the suite has not been executed
+  against any of this.
+
+## 2026-08-27 — W-90: the confidence plane, and two collisions with a concurrent session  ·  Cowork
+
+- **Asked:** *"whenever we return ask output, answer output… is there a way to
+  tell that these outputs — I'm not confident in answering them?… Fux will be
+  used as an input for the agents, and I want agents to know that the outputs
+  that Fux gave, it's not having a huge overlap."* Then: **build it, with an ADR,
+  a work document, and keep the diagrams.**
+
+- **Did — and the two collisions come first, because they are what a future
+  session needs.**
+  - ⚠ **This work was filed as W-89 / ADR `0043`. Both were taken mid-build** by
+    the concurrent session — W-89 is now *does L2 reach a query log?*, `0043` is
+    ADR-LOCKS and `0044` is ADR-QUALITY. Renamed to **W-90 / `0045`**.
+    **Re-reading `OPEN-WORK.md` before an Edit is what caught it**; the Edit had
+    already been composed against the stale copy and would have landed a
+    duplicate row. ⚠ **`docs/adr/0043_confidence.md` and
+    `work/open/W-89-the-confidence-plane.md` are STRAY FILES and are still on
+    disk** — the sandbox lost its bridge before `rm` could run. They must be
+    deleted; two records at `0043` fails `test_adr_ownership.py`.
+  - ⚠ **The second collision was substantive and improved the design.**
+    [ADR-QUALITY](../docs/adr/0044_quality-contract.md) landed hours earlier
+    having **already frozen the abstention economics** — `t = 0.75`,
+    `c = t/(1-t) = 2`, Chow's rule — while this record had independently
+    invented `SEPARATION_FLOOR = 0.10`. **Two abstention thresholds governing one
+    decision is drift with extra steps.** Decision 6 was rewritten: the floor is
+    a **proxy** whose calibration target is ADR-QUALITY's `t`, and **R10's job is
+    to find the `separation` at which `P(correct) = t`** rather than to pick a
+    good-looking number. ⚠ And the record now states the gap it cannot close:
+    **`separation` is ordinal, Chow's rule assumes a calibrated probability.**
+  - **+[ADR-CONFIDENCE](../docs/adr/0045_confidence.md)** (`0045`, ⏳ proposed) —
+    four signals (`coverage` idf-weighted · `separation` · `verified` ·
+    `support`), one `band`, one `answerable` boolean. **Three of four band
+    boundaries are structural facts**, so exactly one number in the plane is
+    invented, and it is labelled provisional in the record, in the schema, in the
+    module and in the tests.
+  - **+`src/fux/query/confidence.py`**; `analyzer.analyze_pairs` +
+    `tokenize_pairs`; `stats_out` on `rank()`/`scan.ask`/`accel.ask`;
+    `confidence_out` on `run_query`; the block on `ask`/`find`/`answer` in JSON
+    **and on stderr** in text; `fux_search` and its tool description; the
+    `confidence` shape in `output.schema.json`.
+  - **Three records amended in the same change** — ADR-ASK,
+    ADR-T1-ACCELERATOR, ADR-MCP.
+  - **+38 tests**, green in isolation.
+
+- **Decided / open:**
+  - **Arpit ruled two forks live** (surface scope: *everything, `answer`
+    included*; commit policy: *commit nothing*) and **left the third
+    unanswered** — the cutoff question. An assumption was made and is named in
+    W-90 and in the OPEN-WORK inbox rather than buried.
+  - **Two findings the build made against the plan.** `support` **cannot** be a
+    corpus-wide count — the accelerator skips documents it proved cannot win, so
+    the better number would break the differential law. And `missing` first
+    reported `mtl` for `mTLS`, which is worse than silence; that is why
+    `analyze_pairs` exists.
+  - ⚠ **THE SUITE IS NOT VERIFIED GREEN.** Last clean run **59 failed / 1811
+    passed / 8 errors**. **No baseline was captured** — the sandbox ran out of
+    disk and lost its bridge mid-verification — so attribution is unproven.
+    `tests/derive/test_weighted_bound.py`'s single failure is **inside this
+    change's blast radius** (`accel.py` gained a `stats_out` passthrough).
+  - ⚠ **The register ownership row was added but `docs/adr/README.md` is held
+    uncommitted by the concurrent session** (`BLOCKED.json`, surfaced).
+
+- **Next:** delete the two stray files, then run
+  `uv run pytest -q tests/derive/test_weighted_bound.py` against a clean baseline
+  before anything is committed.
+
+## 2026-08-27 — W-87 Phase 0 RULED: the quality contract, and the cost of an error frozen before any score  ·  Cowork
+
+- **Asked:** what W-87 is; then a diagram of the funnel; then *"how can we set
+  the cost score? do some research give me some options"*; then **"let's go with
+  it"** — adopt the recommended cost model, and put **every source cited into
+  the ADR**.
+- **Did:**
+  - **+[ADR-QUALITY](../docs/adr/0044_quality-contract.md)** (`0044`, `accepted`,
+    ratifies W-87) — eleven decisions, five checkable veto conditions, and the
+    complete source list Arpit asked for: **19 papers and specifications**, each
+    cited in the body rather than listed as a reading list.
+  - **+[`tools/quality/mix.toml`](../tools/quality/mix.toml)** and its README —
+    the declared query prior and the published cost, frozen. **New owned
+    component**, claimed by ADR-QUALITY in the register's ownership table.
+    `tests/test_adr_ownership.py` needed **no edit**: it parses the table, and
+    nothing in it is hard-coded — said out loud because CLAUDE.md asks for the
+    twin to change in the same commit, and here the honest answer is that
+    nothing in the twin was stale.
+  - **[The compare doc](compare/what-good-means.compare.md) → `accepted`**, with
+    a verdict block naming all six forks and fork 3's mechanism.
+  - **W-87's detail file reconciled** — Phase 0 struck through, three
+    blocked-on-Arpit boxes closed, three DoD boxes earned.
+  - **+[W-89](open/W-89-does-l2-reach-a-query-log.md)**, `arpit`.
+- **Decided / open:**
+  - **All six forks accepted as written**, plus a mechanism fork 3 did not have:
+    the cost is a **confidence target**, `t = 0.75` → `c = t/(1-t) = 2`. **Only
+    the ratio is identifiable** (Chow's rule), and `t` is arguable where a bare
+    weight is not — *how sure should fux be before it cites* has a defensible
+    answer; *what is a stale citation worth* does not.
+  - ⚠ **The ordering is the whole value and it is now spent correctly.** The
+    weights are committed while `recall@k` is still uncomputed. After a score
+    exists, any weight is tuning and a metric chosen to flatter is undetectable
+    later. Veto condition 3 is the check that it never moves.
+  - **`t = 0.9` (c = 9) was considered and not taken** — it matches the
+    compliance pitch but buys accuracy with abstention, and no coverage cost has
+    been measured.
+  - ⚠ **Fork 6 was ruled `no query log` WITHOUT ruling the law question.** Arpit
+    chose "all six forks" against a written recommendation to hold fork 6 back;
+    the ruling is honoured and the law question is preserved as W-89, which is
+    what fork 6's own verdict asked for. Recording the push-back because the
+    option text argued the other way.
+  - ⚠ **A queue defect fixed, not discovered today: W-87 had NO row in
+    `OPEN-WORK.md`** since it was filed, and the *Blocked on Arpit* inbox read
+    **Empty** while three items sat on him. Both filed in this change. The
+    understating direction of rule 3, and nothing mechanical catches it.
+  - ⚠ **No output block appears in ADR-QUALITY, deliberately.** Nothing has been
+    measured under the contract, and an invented transcript is worse than none.
+  - **Nothing was committed** — the change is on disk only.
+- **Next:** W-89 is Arpit's; P1–P5 need environments (`fux-playground`, a real
+  URL corpus, a 3.11+ install) that are not on the build machine.
+
+## 2026-08-27 — ADR-LOCKS scoped down: the record is about fux, not about the tree  ·  Cowork
+
+- **Asked:** *"remove below locks from the adr. the adr is for just how fux as a
+  package works"* — naming `.claude/.locks/<sha16>/owner`, `uv.lock` and
+  `.git/index.lock`.
+
+- **Did.** All three cut from [ADR-LOCKS](../docs/adr/0043_locks.md), and the
+  record re-framed around what remains: **fux owns exactly one mutex.** Title,
+  description, §1, the diagram and its twin, the decision list (12 → 10), the
+  alternatives, the veto conditions and the References all rewritten to match.
+  Register row, ownership paragraph, GLOSSARY entry and DOC-REGISTRY updated in
+  the same change. **Still no code touched.**
+
+- **The correction, stated as the correction it is.** The first draft's organising
+  idea was that *lock* names three kinds of object here — a mutex, a pin, git's
+  own. That is **true and was the wrong record**: a taxonomy of every file in
+  the tree with `lock` in its name is not a decision record about fux. The
+  record now answers one question — *what does fux lock, and what does it not?*
+
+- **What replaced the cut material, rather than just being deleted.** Two
+  decisions the first draft had no room for: the stop is **never a kill** (a
+  signal inside `write_index` can leave a partial shard; Windows has no
+  `SIGTERM`), and **every message about the lock names it** (decision 1c —
+  a status that will not say *where* is not a status). Two alternatives were
+  added for the same reason: a blocking/queueing acquire, and killing a runner
+  instead of asking it. Veto 3 changed from a `uv.lock` check to
+  `git check-ignore` on the lock itself, which is the L3 question that actually
+  matters — a pid must never reach a commit. Captured output, not asserted.
+
+- ⚠ **`work/MACHINE.md` survives as a citation, and that is deliberate.** It
+  grounds decision 9's *name*: `write.lock`, not `index.lock`, because git keeps
+  one of those in the same repository and MACHINE.md records a stranded one.
+  That is an argument about **fux's** filename, not a rule about handling git's
+  lock — the rule was cut, the naming reason stayed.
+
+- **Decided / open.** Still `proposed`. The `runner.lock` debt is unchanged and
+  still belongs to a change against ADR-MAINTENANCE.
+
+- **Next:** Arpit rules `proposed → accepted`, or sends it back again.
+
+## 2026-08-27 — ADR-LOCKS: every lock in the tree, in one record  ·  Cowork
+
+- **Asked:** *"Create an ADR for lock file. How lock files… all the lock files,
+  how it is working in one single ADR."*
+
+- **Did.** New [ADR-LOCKS](../docs/adr/0043_locks.md) (`docs/adr/0043_locks.md`),
+  twelve decisions, plus its register row, a seventh own-nothing paragraph in
+  the register's ownership prose, a `write.lock` GLOSSARY entry, and two
+  DOC-REGISTRY bumps. **No code changed.**
+
+- **The finding that shaped it: *lock* names three unrelated kinds of object in
+  this repository.** A **mutex** (`.fux/runtime/write.lock`;
+  `.claude/.locks/<sha16>/owner`), a **pin** (`uv.lock`), and **git's own**
+  (`.git/index.lock`, which here is only ever an incident). A session that
+  reads one meaning into another writes a defect, and grepping `lock` returns
+  sixty hits across code, hooks, `.gitignore` and the archive — two of them for
+  a lock that no longer exists and one for a lock that never was one.
+
+- **Two files beside the mutex are NOT locks, and are named as such.**
+  `runner.stop`/`daemon.stop` carry the pid they are aimed at and *ask* a holder
+  to release; `daemon.pid` is liveness only. Reading a stop file as a lock is
+  the mistake this record is most likely to prevent.
+
+- **The record owns nothing, on purpose, and says what that costs.** It is a
+  cross-cutting map; claiming `src/fux/maintain/` would take a component from
+  ADR-MAINTENANCE. ⚠ **Consequence stated in the record rather than hidden: the
+  freshness gate cannot demand ADR-LOCKS when locking changes**, so nothing
+  mechanical catches the map going stale. Precedent is the six 2026-08-19
+  companion records.
+
+- **Decided / open.** Filed `proposed` — the decisions it states are already
+  accepted elsewhere (ADR-MAINTENANCE, W-86 P6), but **this consolidation is
+  not ruled**, and a record that claimed `accepted` for a ratification Arpit
+  never gave would be inventing one.
+
+- ⚠ **One debt named and deliberately NOT fixed.** `runner.lock` survives in
+  three places describing a file that no longer exists —
+  `src/fux/maintain/runner.py:33`, `src/fux/maintain/daemon.py:52`, and
+  ADR-MAINTENANCE decision 11a, where the false sentence stands **above** an
+  amendment block correcting it (the W-83 class: the gate sees *touched*, never
+  *coherent*). All three are one change against ADR-MAINTENANCE, which the
+  concurrent W-86/W-82 session holds staged — taking it here would be a second
+  writer on one asset, which is the exact failure the record is about.
+
+- ⚠ **The suite was run and is red for reasons that predate this.** 98 failures
+  across `test_adr_frontmatter` / `register_status` / `ownership` / `doc_links`
+  / `doc_registry`, all from the in-flight ten-key-frontmatter migration another
+  session is running (records 0013+ not yet migrated). **None of them names
+  0043 or ADR-LOCKS** — checked by grep, not assumed. The new record follows the
+  *working-tree* convention (ten keys, no body metadata block), because that is
+  what the test in the working tree enforces.
+
+- **Next:** Arpit rules `proposed → accepted`, or sends it back. The
+  `runner.lock` correction lands whenever ADR-MAINTENANCE is free.
+
+## 2026-08-27 — W-88: `fux ingest` reports a skip once, not every run  ·  Cowork
+
+- **Asked:** *"Whenever I run fux ingest, it gives me a huge list of skip
+  files. Showing it the first time is okay. Showing it again and again is not
+  okay. Display it the first time. Save that list in a gitignored file."* —
+  then add the work item, implement it, and close it out.
+
+- **Did.** New `src/fux/ingest/skipnotice.py` (`read`/`unseen`/`write`/
+  `render`) writing `.fux/runtime/skipped` — derived, gitignored, sorted
+  `path: reason`, **no wall clock**. One changed call site,
+  `ingest_and_report`, which is the seam `ingest`/`add`/`remove`/`update` all
+  already print through. 12 tests in `tests/ingest/test_skipnotice.py`. Three
+  records amended in the same change: **ADR-INGEST** decision 4 (the owner) +
+  a second-run capture, **ADR-DOTFUX** (`runtime/` gains a third derived
+  file), **ADR-CLI** (describes but does not own — its captures are now
+  annotated as first runs).
+
+- **Decided.** **The rule stays; only the repetition goes.** Decision 4 exists
+  because a silently dropped file is indistinguishable from one that was never
+  there — and a wall of identical lines on every run produces exactly that
+  invisibility from the other side. Nothing is suppressed that has not already
+  been shown. Four calls worth naming: the key is **`(path, reason)`** so a
+  changed reason prints again; an **offline run does not replace the URL
+  entries** (it consulted no URL, so it may not speak for that plane — the
+  partition is exact, since a URL skip's `rel_path` *is* the URL); a **missing
+  or corrupt notice reads as nothing-reported-yet**, so the failure direction
+  is printing again rather than suppressing; and the **suppressed line names
+  both escape hatches on screen** (`--list-skipped`, and the file), because a
+  way out that lives only in a record is not a way out.
+
+- **Closed out.** No OPEN-WORK row was ever added — the item opened and closed
+  in one session, and a row added and deleted in the same change says nothing
+  to anybody. Outcome in [`IMPLEMENTATION.md`](IMPLEMENTATION.md); reasoning
+  in [`archive/open/W-88-the-skip-notice.md`](../archive/open/W-88-the-skip-notice.md)
+  with a successor row in [`archive/README.md`](../archive/README.md).
+
+- **⚠ Open, and stated rather than glossed.** (1) **The tests are unverified
+  under `pytest`** — the sandbox is Python 3.10 with no `pytest` and no
+  network, so a stdlib harness with a `tomllib` shim outside the repo stood in;
+  12/12 green there, and `uv run pytest -q tests` on a real 3.11+ install is
+  owed. (2) **Nothing was committed** — a concurrent W-86/W-82 session holds
+  ~60 paths staged in this tree, including `ingest/run.py` and
+  `docs/adr/README.md`. My edits sit in the working tree beside theirs.
+  (3) `work/BLOCKED.json` is still `ASK` and surfaced: seven W-82 rulings wait
+  on that session committing or stopping. This item did not touch any file it
+  holds.
+
+- **Next:** run `uv run pytest -q tests` on a 3.11+ install, then commit the
+  W-88 paths explicitly — never `-A`.
+
+## 2026-08-26 — W-86 CLOSED: P0, P6 and P8 built, diagrams updated, item archived  ·  Cowork
+
+- **Asked:** *"Bear these out and then close it. Update the architecture
+  diagrams, both of them. If needed, maybe create a separate decoder diagram."*
+
+- **P0 — the defect that had been shipping since the type allowlist existed.**
+  `extract.py` derived headings with `^#{1,6}` alone while `DEFAULT_TYPES`
+  admitted `.rst`, `.adoc` and `.org`. **Three of six allowed types had every
+  heading land in the body field**, with an empty `phrases` list feeding the
+  `§` lines `fux ask` renders. Two guards are the substance rather than the
+  regexes: **Org requires the space** after the asterisk run, or `*emphasis*`
+  reads as a heading; **reStructuredText requires a full-width rule**, or a row
+  of dashes inside a table becomes one. ⚠ **Re-ranks existing corpora**, in the
+  direction the field weights intend.
+
+- **P8 — `fetch(url) -> tuple[bytes, str]`.** Both fetchers and both templates
+  stopped converting; `PREPEND_TITLE_HEADING` moved to the decoder where it
+  belongs. ⚠ **A bare `str` return is still accepted, deliberately** — every
+  pre-2026-08-26 consumer fetcher returns markdown, and **the break was never
+  re-costed** (ADR-FETCHER's *"no external consumers"* is dated v0.32.0 and
+  predates the PyPI release). The ramp is what makes that acceptable; it is not
+  a measurement anyone took, and the record says so.
+
+- **P6 — the race was reproduced before it was fixed**, which the ruling
+  demanded. `test_two_foreground_writers_actually_race_without_it` spawns two
+  processes. `runner.lock` → **`write.lock`**; `ingest`/`build`/`add`/`remove`/
+  `update` pass through `write_lock()`; **read verbs take nothing**.
+  ⚠ **`acquire(required=True)` raises where `acquire()` returns `False`** — the
+  same line meant opposite things to a runner (decline quietly, someone else is
+  working) and a writer (never proceed unprotected), and
+  `except OSError: degrade` was right for one and **inverted** for the other.
+  The **queue** is the first thing in fux that can *say* a document needs a
+  model: `fux enrich` derives scope from a declared `dirs` line and cannot know
+  a `.png` exists. ⚠ **Nothing consumes it yet — fork G, still open.**
+
+- **Diagrams: all three.** The detailed SVG gained a DECODE band (everything
+  below it shifted 118px, viewBox grown, XML re-validated); the high-level one
+  now names the formats a reader cares about; and
+  **`work/architecture-decoders.svg` is new** — the plane on its own page,
+  because neither existing diagram had room for the contract, the sixteen
+  modules, and the two outcomes.
+
+- **W-86 CLOSED.** Nine phases, ten forks ruled or dissolved. Row deleted from
+  OPEN-WORK, detail file moved to `archive/open/` with a successor row, six
+  files repointed. ⚠ **Three forks moved with it and are named in the archive
+  row** — F, G, I. None blocks anything; each is a new item if wanted.
+
+- **⚠ Five red tests, none of them this session's**, unchanged all day:
+  `test_daemon`, `test_adr_freshness` (ADR-CONFIG), `test_adr_ownership`
+  (`__main__.py`), two `test_doctor` (3.10 sandbox). All belong to the
+  concurrent session's W-82 daemon and ladder work. ⚠ **Also fixed one link I
+  broke in their file** by archiving W-86 out from under it.
+
+- **Next:** nothing on W-86. `tests_e2e/` still owes a real 3.11+ run.
+
+## 2026-08-26 — four forks ruled (H, C, B, A), and a rule I cited that did not apply  ·  Cowork
+
+- **Asked:** *"Let's go through blocked items one by one."*
+
+- **Ruled, in order.** **H** — `fetch(url) -> tuple[bytes, str]`; **C** —
+  compare-doc verdict B accepted plus the rename to `write.lock`; **B** —
+  Markdown ratified as the intermediate; **A** — `DEFAULT_TYPES` widened to
+  every format with a decoder. **P6 and P8 both unblocked; fork D dissolved;
+  fork J moot.** Three forks left: F, G, I.
+
+- **⚠ The correction that matters more than any of the four.** I told Arpit
+  twice — and had written into **three files** — that reversing ADR-TYPES
+  verdict G required a **new pre-registration at 10 000 documents**. **It did
+  not.** The pre-registration rule governs *frozen thresholds*; the compare
+  doc's own verdict block says G's contents were *"a defaults judgment rather
+  than a measurement"*. Corrected in W-86 fork A, ADR-DECODE decision 9 and
+  `jsondoc.py`. **ADR-DECODE keeps the wrong text visible with the correction
+  beside it** rather than editing it away, because the error is the useful part.
+  **A false blocker costs as much as a missed one** — this one had sat unread in
+  three documents and would have stopped a later session cold.
+
+- **H's refinement came from Arpit, not from the option list.** He said the
+  fetcher should return HTML and the decoder convert it — which is right, and
+  for a reason the write-up had under-weighted: **the fetcher is the only thing
+  that ever sees the HTTP charset header**, so it resolving the encoding is
+  strictly better than `htmldoc` sniffing `<meta charset>`. Carrying the
+  content type as well is what keeps a **non-HTML URL able to reach a decoder
+  at all**. ⚠ ADR-FETCHER's *"no external consumers"* costing of the break is
+  dated **v0.32.0** and predates the PyPI release — P8 says *unmeasured*.
+
+- **A was wider than the question asked.** *"All the ones which have a
+  decoder"* — six globs to **thirty-six**. ⚠ **Derived from BUILT-IN decoders
+  only, never the live registry**: a default that grew when a consumer dropped
+  a `logdoc.py` into `.fux/decoders/` would mean **adding a decoder silently
+  starts indexing a new file type**, and what counts as a document has to stay
+  a committed line a human wrote. Pinned by a new test. **This re-ranks every
+  existing corpus.**
+
+- **Did:** the widening in `gitdir.py` (derived, with `builtin_extensions()` in
+  `decode/`), the consumer-facing `_TYPES_HEADER` rewritten (it printed the old
+  six-glob list to every new repo), ADR-TYPES amended, ADR-FETCHER amended,
+  ADR-DECODE decisions 2 and 9, both compare docs, three fork rows.
+  **`tests/` 1 656 green.**
+
+- **⚠ Five red tests, none of them this session's.** `test_daemon`,
+  `test_adr_freshness` (ADR-CLI, ADR-CONFIG) and `test_adr_ownership`
+  (`src/fux/__main__.py`) all belong to a **concurrent session** mid-flight on
+  W-82's daemon and invocation ladder; two `test_doctor` failures are the
+  Python 3.10 sandbox and predate everything. Left alone deliberately.
+
+- **Next:** P0, the heading grammar — now the only unblocked, unbuilt phase,
+  and it is a live defect.
+
+## 2026-08-26 — the `fux-decoder` skill, and a docs gap the question exposed  ·  Cowork
+
+- **Asked:** *"How can we build a custom decoder?"* — then *"Create a skill to
+  build a custom decoder or to edit an existing decoder. always add some
+  documentation on how it is built. and pointers."*
+
+- **The question was the finding.** The protocol existed in a module docstring
+  and in ADR-DECODE §2 — **the half of a record explicitly written for agents**
+  — and nowhere a consumer would look. Fux had shipped sixteen decoders and an
+  override seam with no instructions for using either.
+
+- **Did:** `templates/agents/DECODER-SKILL.md`, rendered to
+  `.claude/skills/fux-decoder/` and `.kiro/skills/fux-decoder/`; wired into
+  `AGENT_FILES`; exemption added to the policy-agreement check with its reason;
+  two tests updated; ADR-DECODE decision 12 and ADR-AGENT-POLICY amended.
+  **`tests/` 1 637 green.**
+
+- **Vendor choice follows ADR-ENRICH decision 10's REASONING, not its vendor
+  list**, and the distinction matters. That decision made `fux-enrich`
+  claude-only *because the other two renderings were ambient*. W-82 3.6
+  established that a **Kiro skill is progressive-disclosure while only Kiro
+  steering is ambient** — so the same reasoning admits Kiro and still excludes
+  Copilot's `instructions/`. **This skill writes committed Python that changes
+  what is indexed; it must never be ambient on any surface.**
+
+- **The exemption was a decision, not a convenience.** `DECODER-SKILL.md` is the
+  third name on the policy-block escape hatch. That set is pinned by
+  `test_the_exemptions_are_deliberate` precisely because *adding a name is the
+  cheapest way to fix a failing agreement test*, so the reason is written beside
+  it: a build procedure for one plane is not a rendering of the
+  archived-results policy, and inlining an eight-rule preamble about reading
+  search results into a file about parsing file formats would duplicate a
+  policy that already has a rendering per vendor.
+
+- **Arpit's instruction is a standing one and was applied as such:** *"always
+  add some documentation on how it is built, and pointers."* The skill carries
+  the contract **with a why per rule**, a §5 explaining how the plane is built
+  and which shared helper does what, the four judgement calls where decoders
+  actually go wrong, and a pointer table naming which shipped decoder to read
+  for which shape of format. ⚠ Its verification section is the load-bearing
+  part — *decode a real file and read the output* — because all four P2-P5
+  defects produced plausible text rather than an error.
+
+- **⚠ Observed, deliberately not fixed:** `src/fux/__main__.py` exists,
+  untracked, and is claimed by no record — so `test_adr_ownership` is **red**.
+  It is a **concurrent session's** W-82 §3.6 fork B work (Arpit's 2026-08-27
+  ruling that the last ladder rung be the spelling a human guesses). Claiming
+  another session's component in a record would be worse than the red test.
+  **That session owes the ownership row.**
+
+- **Next:** P0, the heading grammar. P6 and P8 still blocked on Arpit.
+
+## 2026-08-26 — W-86 P7: setup exports all sixteen decoders, and Arpit overruled the item  ·  Cowork
+
+- **Asked:** *"Then shouldn't it be implemented to all decoders? because we are
+  going to expose decoders in the dot fux directory."* — after asking why the
+  fetchers have `.py.txt` templates at all.
+
+- **The answer to the first question, which is the interesting half.** Fetchers
+  are copied because **their default is incomplete for you** — proxy, SSO,
+  headers are site-specific. A decoder's default is complete for everyone:
+  `.docx` is `.docx` at every company. So the pattern is *copy what you must
+  edit*, and a decoder was not that. The `.py.txt` extension is a separate
+  thing again: it exists so a module carrying **network code cannot be imported**
+  inside an offline package.
+
+- **⚠ Arpit overruled §13.4 anyway, and the record says so plainly.** `fux
+  setup` now writes all sixteen into `.fux/decoders/` and **the copy is what
+  runs**. His argument: a consumer invited to override decoders should be able
+  to read them in their own repo. Two middles were offered and declined —
+  `fux decoder eject <name>`, and a hash-stamped *inert-until-edited* variant.
+
+- **The cost he took knowingly, recorded in three places** so nobody
+  "discovers" it later: **after setup, `src/fux/decode/` does not execute in
+  that repo.** Each of the four defects found in the P2–P5 build would have
+  needed every consumer to refresh their copy by hand.
+
+- **Two mechanism findings, neither of which was a policy choice.**
+  1. **Imports inside `decode/` had to become absolute.** A path-loaded file has
+     no parent package, so `from . import _xml` raises *attempted relative
+     import with no known parent package* — **every copy carrying a helper
+     import would have been dead on arrival.** Absolute imports mean the bytes
+     fux ships and the bytes a consumer edits are identical.
+  2. **No `.py.txt` for decoders, and the asymmetry is principled.** A decoder
+     is stdlib-only and offline, so it is already a legitimate module — the
+     module *is* the template. A second copy under `templates/` would be the
+     `_MdParser` defect sixteen times over.
+
+- **One thing the ruling did not change:** a **deleted** copy falls back to the
+  built-in. `rm .fux/decoders/pdfdoc.py` must not silently stop indexing PDFs,
+  which is indistinguishable from a corpus containing none.
+
+- **Caught by an existing guard rather than shipped:** `.fux/README.md` is
+  written as ASCII for Windows consoles, so an em-dash in the new `decoders`
+  description failed the write immediately.
+
+- **Did:** `setup.py` writes the sixteen; `fuxdir.DECLARED` gains `decoders`;
+  imports rewritten; 8 new tests; ADR-DECODE decision 11 and ADR-DOTFUX amended.
+  **`tests/` 1 631 green.** This repo now carries its own sixteen copies.
+
+- **Next:** P0, the heading grammar. P6 and P8 still blocked on Arpit.
+
+## 2026-08-26 — W-86 P2–P5 BUILT: sixteen decoders, and four defects that decode to plausible garbage  ·  Cowork
+
+- **Asked:** *"build all decoders."*
+
+- **Did:** built the remaining fifteen — HTML was P1 — plus three shared private
+  modules. **30 extensions, all stdlib, no dependency added.** ADR-DECODE gains
+  decision 10 with the per-format judgements. **59 decoder tests; `tests/`
+  1 623 green.**
+
+- **The interesting part is not that they work — it is the four defects, each
+  of which produces plausible output rather than an error.** None would have
+  been caught by a test asserting "decoding succeeded".
+
+  1. ⚠ **ODF text sits directly on `text:p`**, not in run elements. Reusing the
+     OOXML run-walker made **an entire format decode to nothing** — no
+     exception, no warning, just `None` for every `.odt`. Caught only by
+     decoding a fixture by hand and reading the output.
+  2. ⚠ **`slide10.xml` sorts before `slide2.xml`.** Lexical member order gives
+     a deck that is perfectly deterministic **and wrong** — which is worse than
+     noisy, because nothing looks broken.
+  3. ⚠ **OOXML table cells are paragraphs too.** Without an in-table check
+     every cell is emitted twice and its `tf` doubles, so table-heavy documents
+     rank as though they repeated themselves.
+  4. ⚠ **Joining Word runs with a space breaks the term.** Word splits
+     "runbook" across runs whenever a spell-checker touches it; a run boundary
+     is a formatting event, not a word boundary.
+
+- **The PDF call, and its stated cost.** It **scans for `stream…endstream`
+  rather than parsing the xref**. A conformant reader needs xref tables, object
+  streams and compressed xref streams — three sub-formats, all of which fail on
+  exactly the malformed files a real corpus contains, where scanning still finds
+  the text. ⚠ **The cost is written into the module and the record:**
+  `ToUnicode` CMaps are merged across all fonts, so a document with two subset
+  fonts disagreeing on a byte gets one wrong. Reading per-font maps needs the
+  object graph this deliberately avoids. **A PDF with no text layer returns
+  `None`** — the queue signal — and that is kept distinct from a text layer
+  that fails to parse, which is a decode failure.
+
+- **Three L3 rules that look like style and are not.** JSON keys are emitted
+  **sorted** (two exports of one dataset ordered differently must decode
+  identically); YAML **aliases are read once and never expanded** (a
+  *conformant* parser duplicates the anchored text and inflates `tf` — the one
+  place full YAML is actively wrong here); notebook **outputs are dropped**
+  (re-execution artifacts would make the index depend on who last hit Run).
+
+- **One correction to the plan:** §6b's tree listed three OpenDocument modules.
+  ODF puts all three types in the same `content.xml` with the same elements, so
+  it is **one module** — the single exception to one-module-per-format, and the
+  reason is recorded next to the tree. OOXML genuinely needs three.
+
+- **Decided / open.** P0, P6, P7, P8 remain. Nine forks still Arpit's, **H
+  first**. ⚠ Not committed; concurrent session live. ⚠ `tests_e2e/` unverified
+  (3.10 sandbox).
+
+- **Next:** P0, the heading grammar — the last fork-independent piece.
+
+## 2026-08-26 — W-86 P1 BUILT: the decoder plane, and the converter that was copied four times  ·  Cowork
+
+- **Asked:** *"build the decoders in a way that consumer can build custom
+  decoders as well."* Then, on the protocol: **bytes default, path opt-in.**
+
+- **The instruction changed the design, not just the order.** It collapses the
+  built-in/consumer split into **one protocol** — built-ins simply ship in the
+  package — so the consumer seam became the shape of P1 rather than a later
+  phase bolted on.
+
+- **Did:** built `src/fux/decode/` (registry, protocol, override loading,
+  `htmldoc.py`), added `parse_document` as the ingest seam, taught the walker
+  that binary is no longer a sufficient skip reason, wired both fetchers **and
+  both wheel templates** to the shared converter, wrote
+  [ADR-DECODE](../docs/adr/0042_decode.md), amended four records, added the
+  ownership row. **20 new tests; `tests/` 1 566 green.**
+
+- **Two corrections the build made to the plan, and both are worse than the
+  item claimed.**
+  1. ⚠ **Four copies, not two.** `src/fux/templates/http.py.txt` and
+     `cdp.py.txt` each carried the converter — and **those are what `fux setup`
+     writes into a new consumer's repo.** The duplication was not a wart in
+     this repo, it was **shipped**.
+  2. ⚠ **ADR-HTTP-FETCHER decision 7 asserted a test that does not exist.** It
+     read *"a test asserts the two agree on the same input"*. The cited test
+     asserts the conversion is **deterministic** and handles headings — never
+     that the copies agree. **A record claiming a guarantee its own cited test
+     does not check**, standing from 2026-08-19 to today. The new test asserts
+     the copies are **absent**, because a test that two copies agree passes
+     right up until someone edits one.
+
+- **Three design calls made in the build and recorded in ADR-DECODE.**
+  Frontmatter is **not** re-parsed on decoded output (an `<hr>` emits `---`,
+  which the frontmatter parser would eat); override is **by module name**, not
+  by extension, so two files cannot race for `.html`; `BUILTIN_MODULES` is an
+  explicit sorted tuple rather than a directory scan, because filesystem order
+  in dispatch is filesystem order in the committed index.
+
+- **What was deliberately NOT done.** `DEFAULT_TYPES` is unchanged. ADR-TYPES
+  verdict G was **measured**, and a measurement is replaced only by a better
+  one — so `.html` is decodable today only for a consumer who opts it in via
+  `.fux/sources/types`. Whether it joins the default is its own
+  pre-registration at 10 000 documents, and that is Arpit's to call.
+
+- **Decided / open.** P1 closed. P0 and P2–P8 open; nine forks still Arpit's,
+  **H first** (it collapses D and reorders the phases).
+
+- ⚠ **Not committed** — a concurrent session is live in the tree.
+  ⚠ **`tests_e2e/` unverified**: Python 3.10 sandbox with a harness-only
+  `tomllib` shim that never enters the repo; the two `test_doctor.py` failures
+  are that shim and predate this change.
+
+- **Next:** P0, the heading grammar — the last fork-independent piece.
+
 ## 2026-08-26 — W-86 §13: four follow-ups, two of them refusals, one a live L3 defect  ·  Cowork
 
 - **Asked:** four things at once — a `fux decoder` CLI verb that sets up
@@ -32,7 +1367,7 @@ play: the worklog is the granular, per-exchange trail.
   more"*); and whether decoders should be exposed editable in `.fux/` with
   defaults written by `fux setup`.
 
-- **Did:** answered all four in [W-86](open/W-86-the-decoder-plane.md) §13,
+- **Did:** answered all four in [W-86](../archive/open/W-86-the-decoder-plane.md) §13,
   added **P8**, added forks **H/I/J** (nine now), and filed
   [`proposals/structure-aware-extraction.md`](proposals/structure-aware-extraction.md).
   No code changed.
@@ -95,7 +1430,7 @@ play: the worklog is the granular, per-exchange trail.
   function of the environment. He ruled **declared, error loudly**, which
   closes it.
 
-- **Did:** ruled fork E into [W-86](open/W-86-the-decoder-plane.md) §12 (six
+- **Did:** ruled fork E into [W-86](../archive/open/W-86-the-decoder-plane.md) §12 (six
   subsections), added **P7**, reconciled §2's contract table, §5's out-of-scope
   bullets, §6's tier E row, the DoD and the tests, and **reconciled
   [`index-lock.compare.md`](compare/index-lock.compare.md) §4 the same day**.
@@ -150,7 +1485,7 @@ play: the worklog is the granular, per-exchange trail.
   plus a committed list of what needs enrichment, plus *"a lock file would be a
   good idea whenever the index is getting updated."*
 
-- **Did:** filed [W-86](open/W-86-the-decoder-plane.md) (seven phases, seven
+- **Did:** filed [W-86](../archive/open/W-86-the-decoder-plane.md) (seven phases, seven
   forks) and wrote [`compare/index-lock.compare.md`](compare/index-lock.compare.md)
   on Arpit's instruction to *"do the research and make a call, make sure to
   create a compare document for record keeping."* No code changed.

@@ -2,12 +2,30 @@
 type: Proposal
 title: Audit evidence trail — who knew what, when, from where
 description: Provenance frontmatter + git history + deterministic answers = an auditable knowledge chain for regulated work.
-status: proposed
+status: graduated
 timestamp: 2026-07-21T00:00:00Z
 tags: [compliance, provenance, audit]
 ---
 
 # Audit evidence trail
+
+> **GRADUATED 2026-08-27 → [ADR-PROVENANCE](../../docs/adr/0046_provenance.md)**,
+> via the researched successor [`answer-provenance.md`](../../archive/proposals/answer-provenance.md).
+> **`fux answer --audit` shipped**, along with `--receipt`, `--journal`,
+> `ask --why` and `fux verify`.
+>
+> ⚠ **Its "why parked" reasoning did not survive, and the way it failed is worth
+> keeping.** This file said the idea *"needs a paying context to shape it"* and
+> set its graduation trigger to *an enterprise or regulated design partner*.
+> **That trigger never fired and was never going to** — Arpit asked the question
+> directly instead. A trigger that waits on somebody else's arrival is a wish
+> with a date field, which is exactly what `work/proposals/README.md` warns a
+> proposal becomes without a checkable condition.
+>
+> Two of its three sketch bullets landed as written; the third (a CI check that
+> re-runs recorded Q→A pairs) is what `fux verify` makes possible and nobody has
+> built. The "long-term compliance Plane" framing was **dropped**: the record-
+> keeping duty falls on the deployer, so fux emits and does not retain.
 
 ## Signal
 

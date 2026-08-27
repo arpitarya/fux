@@ -36,11 +36,11 @@ MUTATIONS: dict[str, dict[str, str]] = {
     "bm25f": {
         "k1": "2.4",
         "b": "0.1",
-        "body_weight": "7.0",
-        "heading_weight": "0.25",
-        "title_weight": "11.0",
-        "path_weight": "0.0",
-        "ctx_weight": "5.5",
+        "body": "7.0",
+        "heading": "0.25",
+        "title": "11.0",
+        "path": "0.0",
+        "ctx": "5.5",
     },
     "ranking": {
         "archived_weight": "0.1",
@@ -125,14 +125,24 @@ def corpus(tmp_path):
 
 
 def _scoring(**overrides):
-    """A `Scoring` from keyword overrides — `k1`, `b` and `<field>_weight`."""
+    """A `Scoring` from keyword overrides — `k1`, `b` and the field names.
+
+    ⚠ **The field keys are bare field names since 2026-08-27** (W-82 §5.3
+    ruling 4 dropped the `_weight` suffix inside `[bm25f]`). This dispatched on
+    `name.endswith("_weight")`, which after the rename would have matched
+    nothing and silently applied **no override at all** — every sweep case
+    scoring identically to the default and still passing. Dispatching on
+    membership in `TF_FIELDS` makes an unknown key a `ValueError` instead.
+    """
     from fux.query.bm25f import DEFAULT_SCORING
     from fux.store import TF_FIELDS
 
     weights = list(DEFAULT_SCORING.weights)
     for name, value in overrides.items():
-        if name.endswith("_weight"):
-            weights[TF_FIELDS.index(name.removesuffix("_weight"))] = value
+        if name in TF_FIELDS:
+            weights[TF_FIELDS.index(name)] = value
+        elif name not in ("k1", "b"):
+            raise ValueError(f"unknown scoring override {name!r} — fields: {TF_FIELDS}")
     return DEFAULT_SCORING.__class__(
         k1=overrides.get("k1", DEFAULT_SCORING.k1),
         b=overrides.get("b", DEFAULT_SCORING.b),
@@ -201,7 +211,7 @@ def test_mutating_a_key_needs_no_rebuild(corpus):
             if p.is_file() and p.name != fmt.STAMP_NAME
         )
     )
-    _write_tune(corpus, "bm25f", "heading_weight", "0.25")
+    _write_tune(corpus, "bm25f", "heading", "0.25")
     accel.ask(corpus, "alpha beta", top=5)
     after = b"".join(
         sorted(
@@ -221,13 +231,13 @@ SCORING_SWEEP = [
     {"k1": 3.0},
     {"b": 0.0},
     {"b": 1.0},
-    {"heading_weight": 0.1},
-    {"heading_weight": 40.0},
-    {"ctx_weight": 60.0},
-    {"ctx_weight": 0.02},
-    {"title_weight": 25.0},
-    {"path_weight": 0.0},
-    {"k1": 2.2, "b": 0.2, "heading_weight": 15.0, "ctx_weight": 30.0},
+    {"heading": 0.1},
+    {"heading": 40.0},
+    {"ctx": 60.0},
+    {"ctx": 0.02},
+    {"title": 25.0},
+    {"path": 0.0},
+    {"k1": 2.2, "b": 0.2, "heading": 15.0, "ctx": 30.0},
 ]
 
 
@@ -331,7 +341,7 @@ def test_the_adversarial_fixture_actually_prunes(adversarial):
 
     accel._cannot_reach = spy
     try:
-        accel.ask(adversarial, "rare common", top=20, skipping=True, scoring=_scoring(ctx_weight=60.0))
+        accel.ask(adversarial, "rare common", top=20, skipping=True, scoring=_scoring(ctx=60.0))
     finally:
         accel._cannot_reach = real
     assert calls["n"] > 0, "the fixture never reached the pruning decision"

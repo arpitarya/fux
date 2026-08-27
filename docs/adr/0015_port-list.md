@@ -2,61 +2,37 @@
 type: ADR
 name: ADR-PORT-LIST
 title: ADR-PORT-LIST (0015) — port, don't rewrite, and this is the complete list
-description: "Nine modules come forward from the archived engine, each with its tests, when its milestone needs it. Nothing else does, and the list is closed."
-status: proposed
+description: "Named modules come forward from the archived engine, each with its tests, when its milestone needs them. Nothing else does, and the list is closed."
+status: accepted
+date: 2026-08-18
+feature: the boundary between the archived engine and this one
+owns: []
+laws: [L1, L3]
 timestamp: 2026-08-18T00:00:00Z
 ---
 
 # ADR-PORT-LIST — port, don't rewrite, and this is the complete list
 
-- **Name:** `ADR-PORT-LIST` — cite this everywhere; never cite the number
-- **Status:** proposed
-- **Supersedes (on acceptance):** nothing — this was `PLAN.md`
-  §Port-don't-rewrite, which was archived on 2026-08-18
-- **Owns (on acceptance):** no module. This record governs *where code comes
-  from*, not what any component does
-- **Laws:** L1, L3 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Date:** 2026-08-18
-- **Feature:** the boundary between the archived engine and this one
-
----
-
-> ## Amended 2026-08-25 — FuxVec is retired from the port list
->
-> **`FuxVec embed + 32 B codes` leaves the list, and this time the module goes
-> with it.** `src/fux/embed/` — `model.py`, `fuxvec.py`, `chunkvec.py` and the
-> 7.9 MB `model.bin` — was deleted on Arpit's instruction (2026-08-25).
->
-> **It is the second row retired in two days**, after RRF fusion, and for a
-> related reason worth stating once: **a port earns its place by having a live
-> consumer, not by having been ported.** `fuxvec.py` had none — `doc_code`,
-> `hamming`, `prefilter` and `CODE_BYTES` had zero call sites in `src/`, and
-> `quantize` was reached only by `_fuxvec_code()`, which nothing called either.
-> A module kept for what it pins is a module a reader will believe is live.
->
-> **Reviving either needs a new record and Arpit's sign-off**, per rule 1. A
-> retired row is not a standing licence.
-
 ## §1 — For humans
 
 The v0.19–0.26 engine is archived at [`archive/v0.26/`](../../archive/v0.26/),
 runnable and reference-only. It contains working, tested code for problems this
-build still has: a frontmatter parser, a tokenizer, BM25F, an embedder.
+build still has: a frontmatter parser, an analyzer, BM25F, a chunker.
 
 Rewriting those from scratch would be waste. Copying the whole engine forward
 would be worse — it is a *substrate* engine, and this one is index-and-refer.
 Its architecture is the thing that was reset.
 
-So: **nine modules are named, and nothing else comes back.** Each arrives with
-its tests, and only when the milestone that needs it arrives. The list being
-closed is the point — an open list is how a rewrite quietly becomes a port of
+So: **a named list, and nothing else comes back.** Each module arrives with its
+tests, and only when the milestone that needs it arrives. **The list being
+closed is the point** — an open list is how a rewrite quietly becomes a port of
 the thing you were trying to leave.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
 ```mermaid
 flowchart LR
-    A["archive/v0.26/<br/>reference-only, never imported"] -->|"named module<br/>+ its tests"| N["the v0.30 engine"]
+    A["archive/v0.26/<br/>reference-only, never imported"] -->|"named module<br/>+ its tests"| N["the live engine"]
     A -.->|"everything else"| X["stays archived"]
     N --> M{"needed by<br/>this milestone?"}
     M -->|no| W["wait — porting early<br/>is porting speculatively"]
@@ -67,8 +43,8 @@ flowchart LR
 <summary><b>ASCII twin</b> — the same diagram, for terminals, diffs, and any reader without a Mermaid renderer</summary>
 
 ```text
-   archive/v0.26/          nine NAMED modules, each with its tests
-   reference-only,   -------------------------------------------->  the v0.30 engine
+   archive/v0.26/          only NAMED modules, each with its tests
+   reference-only,   -------------------------------------------->  the live engine
    never imported                                                        ^
         |                                                                |
         +-- everything else --> stays archived                    needed by THIS
@@ -89,40 +65,29 @@ user-visible surface.*
 ### Context
 
 The second reset archived a working engine. Some of its code solves problems
-that did not change with the architecture — tokenizing text, scoring BM25F,
+that did not change with the architecture — analysing text, scoring BM25F,
 parsing frontmatter — and that code is already tested and already correct
 against recorded numbers.
 
 Two failure modes sit either side of the decision. Rewrite everything and you
-burn months re-earning tested behaviour, and lose the archived engine's
-recorded numbers as a cross-check. Port freely and the substrate architecture
-comes back a module at a time, which is exactly what the reset was for.
+burn months re-earning tested behaviour, and lose the archived engine's recorded
+numbers as a cross-check. Port freely and the substrate architecture comes back
+a module at a time, which is exactly what the reset was for.
 
 ### Decision
 
-**1. Port only from this list.** Anything not named here does not come
-forward; reviving it needs its own record and Arpit's sign-off.
+**1. Port only from this list.** Anything not named here does not come forward;
+reviving it needs its own record and Arpit's sign-off.
 
-| module | used by | port in |
+| module | used by | ported for |
 |---|---|---|
-| frontmatter parser | ingest, snapshot mode | M1 |
-| tokenizer + analyzer chain | ingest, query | M1 |
-| BM25F scoring math + exact-df discipline | kernel | M1 (scan) / M2 (accelerated) |
-| FuxVec embed + 32 B codes | the `code` property, dense lane | M1 / M2 |
-| ~~RRF fusion (k=60)~~ | ~~kernel~~ | **ported M2, RETIRED 2026-08-26** |
-| PPR-lite + edge extraction | graph lane | M3 |
-| chunker (heading-aware) | passage re-score | M4 |
-| converters (fidelity tiers) | transient convert | M4 |
-| CLI verb surface (`ask`/`find`/`answer`/`explain`/`graph`/`path`) | UX contract | M2–M4 |
-
-> **RRF is retired from the list, 2026-08-26 (W-79).** It was ported in M2 and
-> both its consumers are now gone — `query/hybrid.py` deleted earlier the same
-> day, then `query/fuse.py` itself. The live dense lane fuses via
-> `query/dense.py::fuse`, a bounded multiplicative uplift, which is **not** a
-> port and is owned by [ADR-ASK](0004_ask.md) decision 9. The row is struck
-> rather than removed so a reader who remembers RRF is here finds out what
-> happened to it. **Reviving it needs a new record and Arpit's sign-off**, per
-> rule 1 — a retired row is not a standing licence.
+| frontmatter parser | ingest, snapshot mode | the committed record |
+| analyzer chain | ingest, query | the shared analyzer ([ADR-RANKING](0012_ranking.md)) |
+| BM25F scoring math + exact-`df` discipline | the scorer | the scan, then the accelerator |
+| PPR-lite + edge extraction | the graph lane | [ADR-GRAPH](0029_graph.md) |
+| chunker (heading-aware) | passage re-score | [ADR-REFER](0030_refer-plane.md) |
+| converters (fidelity tiers) | bytes → Markdown | [ADR-DECODE](0042_decode.md) |
+| CLI verb surface | the UX contract | [ADR-CLI](0002_cli-surface.md) |
 
 **2. Each module arrives with its tests.** A port without its tests is a
 rewrite wearing the old code's name.
@@ -134,14 +99,21 @@ speculatively, and speculative ports are how the list grows.
 its behaviour in a harness; look for an existing seam before concluding an
 archived module has to change.
 
-**5. The archived engine's recorded numbers are a free correctness check.**
-The M1 harness reproduced the archived lexical eval exactly (hit@5 0.952 /
-MRR 0.833, orbit 0.887) — which is what makes "we varied only the index" a
+**5. The archived engine's recorded numbers are a free correctness check.** The
+gate harness reproduced the archived lexical eval exactly (hit@5 0.952 /
+MRR 0.833, orbit 0.887) — which is what makes *"we varied only the index"* a
 verified fact rather than an intention.
 
-**6. Explicitly out of scope**, and named so nobody re-proposes them casually:
+**6. A port earns its place by having a live consumer, not by having been
+ported.** This is the rule two retirements were decided under, and it is the
+one most likely to be needed again: a module kept *for what it pins* is a module
+a reader will believe is live. When the last call site in `src/` goes, the row
+goes and the module goes with it. **A retired row is not a standing licence** —
+reviving one needs a new record and Arpit's sign-off, exactly as rule 1 says.
+
+**7. Explicitly out of scope**, and named so nobody re-proposes them casually:
 the SQLite substrate, the per-file cache, the lean profile, the state plane,
-`fux.lock`, adapters beyond the capped three, and every M8 item.
+`fux.lock`, adapters beyond the capped three, and every deferred item.
 
 ### Consequences
 
@@ -154,17 +126,25 @@ the SQLite substrate, the per-file cache, the lean profile, the state plane,
   arithmetic.
 - **Un-ported archive code stays runnable**, so the baselines it establishes
   stay available even for modules never ported.
+- **The list shrinks as well as grows.** Decision 6 has fired twice, and both
+  times the module was deleted rather than left as reference — the alternative
+  leaves a live-looking constant in a file nothing calls, which has already
+  misled a reader once.
 
 ### Alternatives considered
 
 - **Rewrite everything from scratch.** Rejected: it forfeits tested behaviour
-  *and* the archived numbers that make M1's harness verifiable rather than
-  merely plausible.
+  *and* the archived numbers that make the harness verifiable rather than merely
+  plausible.
 - **Import the archived package as a dependency.** Rejected: it makes a
   reference-only artifact load-bearing, and it would drag the substrate
   architecture in through its own imports.
 - **Leave the list open, decide per module.** Rejected — that is the failure
   mode. A closed list makes each addition a visible decision.
+- **Keep a ported module with no caller, for what it pins.** Rejected under
+  decision 6: what such a module pins is usually a constant calibrated on the
+  archived engine, and archive-is-not-evidence means it pins nothing a live
+  decision may rest on.
 
 ### Reference (required)
 
@@ -176,8 +156,6 @@ the SQLite substrate, the per-file cache, the lean profile, the state plane,
   [`src/fux/query/bm25f.py`](../../src/fux/query/bm25f.py).
 - The archived baselines this rests on —
   [`work/regression/README.md`](../../work/regression/README.md) §Archived runs.
-- Migrated from `PLAN.md` §Port-don't-rewrite, archived 2026-08-18 as
-  [`archive/PLAN-v0.30.md`](../../archive/PLAN-v0.30.md).
 
 ### Veto condition
 
@@ -199,6 +177,7 @@ git log --oneline -- archive/v0.26/ | head -3
 grep -rln 'archive/v0.26' src/fux/
 # expect: docstrings in the ported modules, and only those
 ```
+
 ---
 
 ## References
@@ -208,7 +187,9 @@ grep -rln 'archive/v0.26' src/fux/
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [ADR-LAWS](0001_laws.md)
+**Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
+[ADR-RANKING](0012_ranking.md) · [ADR-GRAPH](0029_graph.md) ·
+[ADR-REFER](0030_refer-plane.md) · [ADR-DECODE](0042_decode.md)
 
 **Code**
 

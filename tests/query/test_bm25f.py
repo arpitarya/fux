@@ -16,7 +16,7 @@ from fux.query.bm25f import score_record
 
 
 def test_single_occurrence_score_is_idf():
-    # One doc, term once in body: wlen == avg_wlen, wtf == body_weight(1.0)
+    # One doc, term once in body: wlen == avg_wlen, wtf == the body weight (1.0)
     # -> score = idf * wtf*(k1+1)/(wtf + k1*(1-b+b)) = idf (b terms cancel).
     terms = {"h": [1, 0]}
     score = score_record(terms, flen=10, query_hashes=["h"], df={"h": 1}, n=1, avg_wlen=10)

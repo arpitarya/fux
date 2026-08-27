@@ -5,7 +5,15 @@ import unicodedata
 import pytest
 
 from fux.errors import FuxError
-from fux.ingest.gitdir import Skipped, walk_sources
+from fux.ingest import fuxignore
+from fux.ingest.gitdir import (
+    POLICY,
+    UNREADABLE,
+    Skipped,
+    TypeFilter,
+    partition,
+    walk_sources,
+)
 
 
 def test_walks_a_directory_recursively_sorted(tmp_path):
@@ -94,3 +102,90 @@ def test_content_bytes_preserved_exactly(tmp_path):
     (tmp_path / "docs" / "a.md").write_bytes(raw)
     files, _ = walk_sources(tmp_path, ["docs"])
     assert files[0].content == raw
+
+
+# -- W-93: a skip carries its class, and the class decides which count it joins
+
+
+def _md_only() -> TypeFilter:
+    return TypeFilter(allow=("*.md",), default=False)
+
+
+def test_the_type_allowlist_produces_a_policy_skip(tmp_path):
+    """`not an indexed file type` is a committed list doing its job.
+
+    It is the 598-of-599 case on the fux repo itself, and counting it beside a
+    file fux could not read is what made that number unreadable.
+    """
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "tool.py").write_text("x = 1\n", encoding="utf-8")
+    _, skipped = walk_sources(tmp_path, ["docs"], types=_md_only())
+    assert [(s.reason, s.kind) for s in skipped] == [("not an indexed file type", POLICY)]
+    assert skipped[0].deliberate
+
+
+def test_a_dirs_exclusion_produces_a_policy_skip(tmp_path):
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "draft.md").write_text("d", encoding="utf-8")
+    _, skipped = walk_sources(tmp_path, ["docs"], excludes=["docs/draft.md"])
+    assert skipped[0].kind == POLICY
+
+
+def test_a_fuxignore_line_produces_a_policy_skip(tmp_path):
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "noisy.md").write_text("n", encoding="utf-8")
+    ignore = tmp_path / fuxignore.IGNORE_FILE
+    ignore.parent.mkdir(parents=True, exist_ok=True)
+    ignore.write_text("noisy.md\n", encoding="utf-8")
+    _, skipped = walk_sources(tmp_path, ["docs"], ignores=fuxignore.read(tmp_path))
+    assert skipped[0].kind == POLICY
+
+
+@pytest.mark.parametrize(
+    ("name", "payload"),
+    [("empty.md", b""), ("img.bin", b"\x00\x01binary"), ("latin1.md", "caf\xe9".encode("latin-1"))],
+)
+def test_a_content_skip_is_unreadable_not_policy(tmp_path, name, payload):
+    """Past the committed lists nothing a human wrote is in play.
+
+    These are the skips worth a person's attention, and they are the ones the
+    summary's `skipped` count is now reserved for.
+    """
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / name).write_bytes(payload)
+    _, skipped = walk_sources(tmp_path, ["docs"])
+    assert skipped[0].kind == UNREADABLE
+    assert not skipped[0].deliberate
+
+
+def test_an_unclassified_skip_defaults_to_the_loud_bucket(tmp_path):
+    """A call site nobody updated over-reports rather than hiding a problem.
+
+    The other default would put a real failure inside the deliberate count,
+    where nothing would ever surface it.
+    """
+    assert Skipped("a.md", "whatever").kind == UNREADABLE
+
+
+def test_partition_splits_and_keeps_order():
+    skips = [
+        Skipped("a.md", "not an indexed file type", POLICY),
+        Skipped("b.md", "empty"),
+        Skipped("c.md", "excluded by !c.md", POLICY),
+        Skipped("d.md", "binary"),
+    ]
+    not_indexed, unreadable = partition(skips)
+    assert [s.rel_path for s in not_indexed] == ["a.md", "c.md"]
+    assert [s.rel_path for s in unreadable] == ["b.md", "d.md"]
+
+
+def test_the_class_is_set_at_the_skip_never_read_back_off_the_reason(tmp_path):
+    """Two files, same walk, different classes — and the reason strings differ
+    only because the *code paths* differ, not because anything parsed them.
+    """
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.py").write_text("x = 1\n", encoding="utf-8")
+    (tmp_path / "docs" / "b.md").write_text("", encoding="utf-8")
+    _, skipped = walk_sources(tmp_path, ["docs"], types=_md_only())
+    kinds = {s.rel_path: s.kind for s in skipped}
+    assert kinds == {"docs/a.py": POLICY, "docs/b.md": UNREADABLE}
