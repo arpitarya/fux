@@ -1,1 +1,1 @@
-→ wave 2: daemon status reason, then narrow-by-default
+→ waves 0-5 done · 7 commits on work/2026-08-27-queue-clearing · not merged
