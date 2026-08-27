@@ -297,6 +297,13 @@ constrains **every** gated flag in `cli.py` to `default=None`, and `--all` is a
 plain `store_true` — it gates nothing and reads no config, so decision 10 does
 not reach it.
 
+⚠ **`doc_coverage` added to the confidence block 2026-08-28**, and `output.schema.json` declares it as always-present.
+**`coverage` is unchanged**, `rank()` gained one line writing the top-ranked
+record's matched hashes into the `stats_out` dict it already fills, and the band
+**does not gate on the new field** — the gate is off on a measurement, see
+[ADR-CONFIDENCE](0045_confidence.md) decision 12's outcome. **No ordering, no
+score and no existing field moved.**
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

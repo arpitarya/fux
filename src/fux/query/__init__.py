@@ -219,6 +219,10 @@ def _fill_confidence(out: dict | None, stats: dict | None, query: str, results) 
             stats.get("df", {}),
             int(stats.get("n", 0)),
             [r.score for r in results],
+            # ADR-CONFIDENCE: `rank()` put this in the same dict as `df`/`n`,
+            # from the record it actually ranked first — so the accelerator and
+            # the scan cannot disagree about it.
+            top_doc_hashes=stats.get("top_doc_hashes"),
         )
     except Exception:  # pragma: no cover - a signal must not break an answer
         pass

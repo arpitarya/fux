@@ -457,6 +457,16 @@ mutant survived it. The gap opens only where weighted `tf` is comparable to
 `k1` — **small counts** — which is why the fixture uses `tf = 1`, long documents
 for the opened term to keep `theta` low, and short ones for the deferred term.
 
+⚠ **`DOC_COVERAGE_FLOOR` is NOT a `tune.toml` key** (2026-08-28), for
+`SEPARATION_FLOOR`'s reason exactly: a consumer who could lower a confidence
+floor until their answers read `grounded` would be tuning away the **signal**
+rather than the ranking, and the honest fix for a floor that is wrong is to
+measure it once, for everyone. It is currently `0.0` — the clause is off on a
+measurement, [ADR-CONFIDENCE](0045_confidence.md) decision 12's outcome.
+**`rank()` gained one line that writes to `stats_out`; no weight, no knob and no
+ordering moved**, so the mechanical test that decides what may live in
+`tune.toml` is unaffected.
+
 ### Consequences
 
 - **The constants become decisions with a provenance**, in a file a reviewer can

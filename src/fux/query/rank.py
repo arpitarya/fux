@@ -295,6 +295,17 @@ def rank(
     # in by construction (shard order vs postings order).
     scored.sort(key=lambda pair: (-round(pair[1], 9), pair[0]["id"]))
 
+    # ADR-CONFIDENCE: which of the query's terms the TOP-RANKED document itself
+    # contains. Handed out through the same seam as `df`/`n` and for the same
+    # reason — **both paths reach this function with the same record dicts**
+    # (`derive/accel.py`'s contract is *"the scan's contract"*), so a signal
+    # derived here is identical on the accelerator and the scan, and the
+    # differential law is untouched. Deriving it anywhere else would mean
+    # re-reading the index on one path and not the other.
+    if stats_out is not None and scored:
+        top_terms = scored[0][0].get("terms", {})
+        stats_out["top_doc_hashes"] = [h for h in query_hashes if h in top_terms]
+
     return [
         AskResult(
             id=record["id"],

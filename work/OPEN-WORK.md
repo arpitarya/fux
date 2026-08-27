@@ -31,18 +31,16 @@ and `L8` ratified. Removed rather than ticked, per rule 2.
   (`grep -c queue urlsrc.py` → `0`), so **a URL that needs a model can never be
   queued for one.** `queue.tsv` is committed, so this changes committed bytes.
   [ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 11 names it, undecided.
-- 🔴 **One of fifteen unanswerable questions is reported `grounded`.** The decoy
-  control's first run
-  ([report](regression/2026-08-27-decoy-control/report.md)): `coverage` and
-  `missing` are **corpus-wide**, so a query whose terms scatter across four
-  different documents reports `coverage: 1.0`, `missing: []`, and falls through
-  to the separation test, which it clears at `0.58` — **the exact failure
-  [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) exists to prevent.**
-  ⚠ **No ruling on R10 catches it**: `0.58` is above the `0.5` R10's selection
-  rule would have picked, which is worth knowing **before** ruling R10. The fix
-  — coverage against the **cited document** rather than the corpus — changes a
-  declared signal, `output.schema.json`, the MCP result and every consumer.
-  ADR-CONFIDENCE decision 12 names it, untaken.
+- ⚖ **Should `grounded` gate on `doc_coverage`?** You ruled *"add it alongside,
+  and let `grounded` require both"* on 2026-08-28. **The first half shipped; the
+  second is held on a measurement you did not have when you ruled**
+  ([run](regression/2026-08-28-doc-coverage/report.md)): the one decoy that
+  reaches the clause sits at **0.710**, *inside* the real goldens'
+  **0.401–1.000**, so **no floor separates them** — and a floor of `1.0` demotes
+  **19 of 50** correct answers. `DOC_COVERAGE_FLOOR = 0.0`, the clause is off,
+  and the signal is published so an agent can act on it. ⚠ **14 of 15 decoys
+  never reach the clause**, so the original finding is one query in fifteen.
+  **Picking a number from that table would be R10's failure in a new costume.**
 - ✅ **The fork counts were RE-DERIVED on 2026-08-27 and W-82 has ZERO open
   forks of its own.** 27 total; **18 ruled** by
   [the ledger](open/W-82-rulings-2026-08-27.md); of the remaining 9, **6** are
@@ -65,7 +63,7 @@ shell and could not look. **Re-derive before believing a blocker** — rule 4.
 
 | what | needs |
 |---|---|
-| **W-87 P1** — ~~the decoy set~~, ~~the placebo arm~~, **the sealed query subset** | ✅ **Two of three BUILT 2026-08-27** — [`tools/quality-controls/`](../tools/quality-controls/README.md). **Only the sealed subset is left, and it is not mechanical**: decision 15 says sealing *shrinks* the visible set and whoever builds it must resolve that tension rather than inherit it. On 50 goldens both halves end up too small — a judgement, not a build |
+| ~~**W-87 P1**~~ | ✅ **ALL THREE BUILT** (2026-08-27/28) — [`tools/quality-controls/`](../tools/quality-controls/README.md). The sealed subset is 15 of 50, split by `sha256(id)`. ⚠ **5 of the 9 `known_failure` goldens landed in the sealed half** (33 % vs 11 %), which was **not corrected because correcting it means reading the scores** — a sealed score is not comparable to a visible one at this size |
 | **W-87 P2** — `recall@k` as the headline; the `unanswerable` class, authored **blind** | annotation across the 50 goldens. ⚠ **Part B cannot run at all**: `acme` and `orbit` went in the 2026-08-20 lab wipe **along with their generator**, and `tools/pruning-eval/` still hard-codes reading them |
 | **W-87 P3** (= W-82 §3.0) — sanitized-sha stability | a real URL corpus — **and one now exists**, `fux-lab/2026-08-27-daemon-real-url`, with seven real external URLs. ⚠ **Not blocked by P0 and never was** — its ≥80 %/≤40 % threshold is already frozen |
 | **W-87 P4** — forks 3 & 4, `validate` and token storage | P3's number |
@@ -73,9 +71,9 @@ shell and could not look. **Re-derive before believing a blocker** — rule 4.
 | **W-82 §3.5** | **`fux-playground` is available.** Build work, not a blocked input |
 | ~~`tests/test_adr_freshness.py`~~ | **RAN 2026-08-27** and found a defect in itself — see the test-surface note below |
 
-⚠ **ADR-RS decision 15 still reads `NOT BUILT`** and **keeps the marker**: it
-names three controls and the sealed subset is missing. A decision that names
-three is not in force on two.
+✅ **ADR-RS decision 15 lost `NOT BUILT` on 2026-08-28** — all three controls
+are built. ⚠ **Built is not proven:** none has yet been used in a run that
+adjudicates anything, and the marker moving does not make a control evidence.
 
 ⚠ **The ±2-query (4 pp) resolution floor is still a placeholder for a
 measurement**, and **every "no detected change" ruling currently rests on it.**

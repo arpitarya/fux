@@ -225,7 +225,8 @@ def test_as_dict_declares_band_and_answerable_rather_than_leaving_them_derivable
     assert payload["answerable"] is True
     assert payload["missing"] == ["pgbouncer"]
     assert set(payload) == {
-        "band", "answerable", "coverage", "separation", "support", "verified", "missing",
+        "band", "answerable", "coverage", "doc_coverage", "separation",
+        "support", "verified", "missing",
     }
 
 
@@ -381,3 +382,66 @@ def test_the_block_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch):
     withsig, _ = run_query(tmp_path, "rollback procedure", 5, confidence_out=out)
 
     assert [(r.id, r.score) for r in plain] == [(r.id, r.score) for r in withsig]
+
+
+# --- doc_coverage: the clause the decoy control bought (2026-08-28) ----------
+
+def test_a_question_whose_terms_scatter_across_documents_is_not_grounded():
+    """Measured 2026-08-27, and it is the reason this field exists.
+
+    *"What is the SLA we publish for the payments API"* reached `grounded` on a
+    corpus where **no document discusses it**: `sla` and `publish` sat in the
+    retention policy, `payments` in the postmortem, `api` in the mesh ADR — four
+    terms, four documents, so `missing` was empty and `coverage` was `1.0`.
+
+    ⚠ **No threshold on `separation` closes this.** That query separated at
+    `0.58`, ABOVE the `0.5` R10's selection rule would have picked. `separation`
+    measures whether first place is clearly first, and a corpus of near-misses is
+    decisive about its best near-miss.
+    """
+    from fux.query.confidence import Confidence
+
+    scattered = Confidence(
+        coverage=1.0, separation=0.58, support=3,
+        verified="unverified", missing=(), doc_coverage=0.42,
+    )
+    # ⚠ **The clause is OFF** () because the decoy at
+    # 0.710 sits INSIDE the real goldens' 0.401-1.000 range -- no floor separates
+    # them. The signal is published; the band does not gate on it. What this test
+    # pins is that the SIGNAL still distinguishes the case.
+    assert scattered.doc_coverage < 1.0
+    assert scattered.answerable is True, "still answerable — `partial` is not a refusal"
+
+
+def test_a_document_that_carries_the_whole_question_is_still_grounded():
+    """The control. The new clause must not demote a real answer."""
+    from fux.query.confidence import Confidence
+
+    whole = Confidence(
+        coverage=1.0, separation=0.58, support=3,
+        verified="unverified", missing=(), doc_coverage=1.0,
+    )
+    assert whole.band == GROUNDED
+
+
+def test_doc_coverage_defaults_to_not_demoting():
+    """A caller that does not supply it must never be penalised for that.
+
+    `signals()` is called from paths that may not have ranked anything, and a
+    signal defaulting to 'suspicious' would turn 'not computed' into 'not
+    grounded' — a silent downgrade nobody chose.
+    """
+    from fux.query.confidence import Confidence
+
+    assert Confidence(1.0, 0.9, 2, "unverified", ()).doc_coverage == 1.0
+    assert Confidence(1.0, 0.9, 2, "unverified", ()).band == GROUNDED
+
+
+def test_the_corpus_wide_coverage_is_unchanged():
+    """`coverage` keeps its meaning, so nothing reading it changes behaviour.
+
+    That is why the field was ADDED rather than redefined: a consumer reading
+    `coverage: 1.0` today gets the same number tomorrow.
+    """
+    block = _q("rollback pgbouncer", {"rollback": 40, "pgbouncer": 0}, [9.0, 1.0])
+    assert block.coverage < 1.0 and block.missing == ("pgbouncer",)

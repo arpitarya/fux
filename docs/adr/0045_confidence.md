@@ -314,7 +314,7 @@ fast: {'band': 'grounded', 'answerable': True, 'coverage': 1.0,
 ```
 
 **12. `coverage` is CORPUS-WIDE, and a scattered query therefore looks fully
-covered — found 2026-08-27, named and NOT fixed.**
+covered — found 2026-08-27; `doc_coverage` added 2026-08-28, NOT gating.**
 
 [The decoy control's first run](../../work/regression/2026-08-27-decoy-control/report.md):
 **one of fifteen questions the corpus cannot answer is reported `grounded`.**
@@ -341,6 +341,49 @@ covered — found 2026-08-27, named and NOT fixed.**
   reading the block — **a decision, not a defect fix.**
 - ⚠ **No test pins the current behaviour**, deliberately. Pinning a defect is how
   it becomes the contract.
+
+### Decision 12's outcome — the signal ships, the gate does not
+
+**Arpit ruled 2026-08-28: add per-document coverage alongside, and let
+`grounded` require both.** The first half shipped. **The second half is held on
+a measurement he did not have when he ruled**, and it is recorded here rather
+than quietly applied or quietly dropped.
+
+**`doc_coverage` is computed and published** — the same idf mass as `coverage`,
+over the **top-ranked document's own terms**. It is handed out through
+`rank()`'s `stats_out`, the seam this record already owns, so **the accelerator
+and the scan cannot disagree about it**: both reach `rank()` with the same
+record dicts, and deriving it anywhere else would mean re-reading the index on
+one path and not the other.
+
+**`coverage` is unchanged**, so nothing that reads it changes meaning. That is
+why the field was added rather than redefined.
+
+🔴 **The gate is OFF (`DOC_COVERAGE_FLOOR = 0.0`) because the two populations
+overlap.** Measured against the playground's 50 goldens and the 15 decoys:
+
+| | n | min | median | max |
+|---|---:|---:|---:|---:|
+| real goldens reaching this clause | 37 | **0.401** | 0.882 | 1.000 |
+| decoys reaching it | 1 | **0.710** | — | 0.710 |
+
+- **The decoy sits INSIDE the goldens' range.** Any floor that catches it
+  demotes real answers below it. A floor of `1.0` — which reads structural,
+  *"every term the corpus has, the cited document has too"* — turns **19 of 50**
+  correct answers `partial`.
+- **There is no gap to pick a number in**, and picking one anyway would be
+  fitting a threshold to 65 queries. **That is the failure R10 is currently
+  `INCONCLUSIVE` over**, in a different costume.
+- ⚠ **Fourteen of fifteen decoys never reach this clause at all** — they are
+  already `partial` via `missing`, which is the corpus-wide signal working
+  correctly. The scattered-terms case is **one query in fifteen**, and the honest
+  scale of the original finding is that, not "the band is broken".
+- **So the module now REPORTS the case rather than claiming to catch it.** An
+  agent gets `doc_coverage: 0.42` beside `band: grounded` and can act on it.
+
+**What would change this:** a decoy set large enough for the two distributions
+to be estimated rather than sampled, and a pre-registration that fixes the floor
+before any score exists under it. **Not a number picked from this table.**
 
 ### Consequences
 

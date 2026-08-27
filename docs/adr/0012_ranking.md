@@ -310,6 +310,13 @@ under the old weights, a silent corpus-wide ranking error with nothing to see.
 `flen` is a fact about the document; `wlen` is a policy applied to that fact,
 and the two live on opposite sides of the commit.
 
+⚠ **`doc_coverage` added to the confidence block 2026-08-28**, and the scorer is untouched.
+**`coverage` is unchanged**, `rank()` gained one line writing the top-ranked
+record's matched hashes into the `stats_out` dict it already fills, and the band
+**does not gate on the new field** — the gate is off on a measurement, see
+[ADR-CONFIDENCE](0045_confidence.md) decision 12's outcome. **No ordering, no
+score and no existing field moved.**
+
 ### Consequences
 
 - **The differential law is achievable at all.** One scorer in one order is what

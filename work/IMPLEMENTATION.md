@@ -21,6 +21,71 @@ Rules:
 
 ---
 
+## Wave 3 — a signal worth publishing, a threshold that is not, and the last owed control (2026-08-28)
+
+**Two calls. One shipped as ruled; one shipped half, because measuring it
+produced a fact the ruling did not have.**
+
+### `doc_coverage` — the signal ships, the gate is held
+
+Arpit ruled *"add per-document coverage alongside, and let `grounded` require
+both."* The field is computed, published and declared. **The gate is off.**
+
+- **Derived in `rank()`, handed out through `stats_out`** — the seam
+  ADR-CONFIDENCE already owns. Both scoring paths reach `rank()` with the same
+  record dicts, so **the accelerator and the scan cannot disagree** and the
+  differential law is untouched *by construction*, not by test.
+- **`coverage` is unchanged**, so no consumer's reading of it moved.
+
+🔴 **Why the gate is off, measured** ([run](regression/2026-08-28-doc-coverage/report.md)):
+
+| population | n | min | median | max |
+|---|---:|---:|---:|---:|
+| real goldens reaching the clause | 37 | **0.401** | 0.882 | 1.000 |
+| decoys reaching it | **1** | **0.710** | — | 0.710 |
+
+**The decoy sits inside the goldens' range**, so no floor separates them, and a
+floor of `1.0` — which *reads* structural — demotes **19 of 50** correct
+answers. Picking a number from a 65-query table with no gap in it is **R10's
+failure in a different costume**, and R10 is `INCONCLUSIVE` on this repo right
+now for exactly that.
+
+⚠ **And the original finding was smaller than it read: 14 of 15 decoys never
+reach the clause**, being `partial` via `missing` already. The scattered-terms
+case is **one query in fifteen**. The module now **reports** it instead of
+claiming to catch it — an agent sees `doc_coverage: 0.42` beside
+`band: grounded` and can act.
+
+**The gating question went back to Arpit** rather than being resolved either
+way. Shipping the expensive gate silently, or dropping his ruling silently,
+would both have been a decision nobody made.
+
+### The sealed subset — ADR-RS decision 15 loses `NOT BUILT`
+
+Ruled: **seal 15 of 50, grow the set later.** Split by `sha256(id)` —
+deterministic, seedless, **order-independent**, so re-sorting the goldens cannot
+change the cut. Growing the corpus is a **reseal**, not an append.
+
+**The power tension is resolved out loud, as decision 15 demanded:** 35 visible
+and 15 sealed are **both underpowered and that is accepted rather than hidden.**
+The ±2-query floor does not loosen because a set shrank — it gets *harder to
+clear*. **Sealing buys a claim about contamination; it buys no precision.**
+
+🔴 **5 of the 9 `known_failure` goldens landed in the sealed half** — 33 % vs
+11 %. **Not corrected, because correcting it would be the bug**: balancing by
+difficulty means reading the scores, which is the contamination the seal
+prevents. A sealed score is **not comparable to a visible score** at this size.
+
+⚠ **BUILT IS NOT PROVEN.** None of the three controls has been used in a run
+that adjudicates anything.
+
+### Verified
+
+`tests/` **2 232 passed, 1 skipped** · `tests_e2e/` **73 passed** · playground
+**`pass 41 · xfail 9`, PASS** — ranking is untouched, which it must be: the band
+is computed from `rank()`'s output and nothing feeds back.
+
+
 ## Wave 2 — the daemon chain, in the order the ruling required (2026-08-28)
 
 **Two calls, and the order was the point.** Ruling 3's own text says narrow and

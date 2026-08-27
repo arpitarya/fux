@@ -281,8 +281,8 @@ authors broke the same two queries, the informed author preserved exactly those
 two, ~0.028 — a different statistic, roughly **17×** the evidential weight of
 the *broke nothing* sentence that was actually filed, and the one to cite.
 
-**15. An enrichment change is scored against a decoy set and a placebo — ⚠ NOT
-BUILT (two of three landed 2026-08-27; the marker STAYS).** *Neural Retrievers are Biased Towards LLM-Generated Content* (KDD 2024)
+**15. An enrichment change is scored against a decoy set and a placebo — ✅
+BUILT 2026-08-28, and BUILT IS NOT PROVEN.** *Neural Retrievers are Biased Towards LLM-Generated Content* (KDD 2024)
 establishes **source bias**: retrievers rank LLM-written text higher
 independently of whether it informs, and the effect reaches re-rankers. Every
 fux enrichment arm added ~70 tokens of fluent LLM prose to nine of ten documents
@@ -293,16 +293,16 @@ Two controls close it — a **decoy** query set the enrichment was not aimed at,
 and a **content-free placebo** enrichment of matched length — and decision 11
 implies a third thing that does not exist either: a **sealed** subset of
 queries, held by one owner, never shown to anyone who authors an artifact,
-rotated when it leaks. **Two of the three landed on 2026-08-27** —
-[`tools/quality-controls/`](../../tools/quality-controls/README.md) — and this
-decision **keeps `NOT BUILT`**, because it names three and one is missing. A
-decision that names three controls is not in force on two.
+rotated when it leaks. **All three landed** —
+[`tools/quality-controls/`](../../tools/quality-controls/README.md): the decoy
+set and the placebo on 2026-08-27, the sealed subset on 2026-08-28 once Arpit
+ruled its power tension.
 
 | control | state |
 |---|---|
 | content-free placebo, matched length | ✅ **built** — one shared sentence pool so every placebo has the same vocabulary and cannot discriminate; length matched to within a few words; deterministic from the source sha (L3), no model |
 | decoy query set | ✅ **built** — 15 domain-plausible questions the corpus cannot answer. ⚠ **The one kind of evaluation material an agent may author**: no correct answer exists, so there is nothing to fit |
-| **sealed subset** | ❌ **not built** — and not mechanical, see below |
+| **sealed subset** | ✅ **built 2026-08-28** — 15 of 50, split by `sha256(id)`: deterministic, seedless, order-independent |
 
 ⚠ **The decoys found something on their FIRST run**, which is the argument for
 controls in one line: **one of fifteen unanswerable questions is reported
@@ -312,11 +312,24 @@ is `0.58`, above the `0.5` R10's selection rule would have picked.
 [The run](../../work/regression/2026-08-27-decoy-control/report.md);
 [ADR-CONFIDENCE](0045_confidence.md) carries it as a named, untaken decision.
 
-⚠ **Sealing also *shrinks* the visible set**, which makes decision 14's power
-problem worse before it makes it better; whoever builds it has to resolve that
-tension rather than inherit it silently. **That is why it is the one left**: on
-50 goldens a holdout leaves both halves too small to resolve much, and choosing
-what to trade is a judgement about what the measurement is for.
+**The power tension, resolved out loud as this decision demanded.** Sealing
+shrinks the visible set. Arpit ruled 2026-08-28: **seal 15, grow the set later**.
+**35 visible and 15 sealed are both underpowered and that is accepted rather than
+hidden** — the ±2-query resolution floor still governs what a delta may claim,
+and it does not loosen because a set got smaller; it gets **harder to clear**.
+**Sealing buys a claim about contamination. It buys no precision**, and a run
+reporting a sealed number as if it were precise is misreading the control.
+
+🔴 **And the sealed half is harder than the visible half: 5 of the 9
+`known_failure` goldens landed in the sealed 15** — 33 % against 11 %. **This was
+not corrected, and correcting it would be the bug**: balancing by difficulty
+means reading the scores, which is the contamination the seal prevents. A sealed
+score is therefore **not comparable to a visible score** at this size, and
+anyone reporting both must say which half.
+
+⚠ **BUILT IS NOT PROVEN.** None of the three controls has yet been used in a run
+that adjudicates anything. **The marker moves from `NOT BUILT` to built; it does
+not become evidence.**
 
 ⚠ **Running the placebo is not the same as building it.** A placebo arm produces
 its value as a **delta between arms**, which decision 12 governs — so grading the

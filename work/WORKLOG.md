@@ -24,6 +24,49 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — wave 3: the signal ships, the threshold does not  ·  Claude Code
+
+- **Asked:** continue resolving one by one.
+
+- **Did:** put wave 3's two calls to Arpit. **Per-document coverage: add it
+  alongside, `grounded` requires both.** **Sealed subset: seal 15 of 50.**
+
+- **Did, `doc_coverage`.** Computed in `rank()` and handed out through
+  `stats_out` — the seam ADR-CONFIDENCE already owns, and the one that makes the
+  accelerator and the scan agree **by construction**. `coverage` unchanged, so
+  nothing reading it moved.
+
+- **🔴 And then measured it, which changed the answer.** The one decoy that
+  reaches the clause sits at **0.710**; real goldens run **0.401–1.000**. **The
+  populations overlap**, so no floor separates them — and the obvious
+  "structural" floor of `1.0` demotes **19 of 50 correct answers**. Picking a
+  number from a 65-query table with no gap is R10's failure in a new costume.
+  **`DOC_COVERAGE_FLOOR = 0.0`: the signal is published, the clause is off, and
+  the gating question went back to Arpit with the table.**
+  ⚠ **The original finding was also smaller than it read** — 14 of 15 decoys
+  never reach the clause at all.
+
+- **Did, the seal.** 15 of 50 by `sha256(id)`: deterministic, seedless,
+  order-independent. Growing the corpus is a **reseal**. The power tension is
+  written down rather than inherited: both halves are underpowered and **sealing
+  buys contamination protection, not precision**.
+  🔴 **5 of the 9 known failures landed in the sealed half** (33 % vs 11 %) —
+  **not corrected, because balancing by difficulty means reading the scores**,
+  which is what the seal exists to prevent.
+
+- **ADR-RS decision 15 lost `NOT BUILT`** after W-78. ⚠ **Built is not proven**:
+  no control has been used in a run that adjudicates anything.
+
+- **Decided / open:** the `doc_coverage` gate is back with Arpit. Nothing of his
+  was taken. **The lesson worth keeping: finding a real case tells you a defect
+  exists and says nothing about whether a threshold can catch it. Those are two
+  measurements.**
+
+- **Verified:** `tests/` **2 232 passed** · `tests_e2e/` **73** · playground PASS.
+
+- **Next:** wave 3's third item, R10 — and it should be read together with the
+  `doc_coverage` gate, since neither reaches the other's case.
+
 ## 2026-08-28 — wave 2: the daemon chain, and a tolerance that nearly became a silent no-op  ·  Claude Code
 
 - **Asked:** continue resolving one by one.

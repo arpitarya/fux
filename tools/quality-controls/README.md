@@ -1,10 +1,10 @@
 # `tools/quality-controls/` — the two controls ADR-RS decision 15 is owed
 
-**Status: two of three built (2026-08-27).**
-⚠ **[ADR-RS](../../docs/adr/0036_predictions.md) decision 15 still reads
-`NOT BUILT` and may not lose it**, because the third — the **sealed query
-subset** — is not here. One item landing does not discharge a decision that
-names three.
+**Status: all three built (2026-08-28).**
+⚠ **[ADR-RS](../../docs/adr/0036_predictions.md) decision 15 may now lose its
+`NOT BUILT` marker** — the sealed subset was the one outstanding item and it is
+here. **Built is not proven**: none of the three has yet been used in a run that
+adjudicates anything.
 
 ## Why these exist
 
@@ -24,7 +24,7 @@ have never been separable in any number this project has filed.**
 |---|---|---|
 | **content-free placebo** | [`placebo.py`](placebo.py) | *presence* of fluent LLM text, with content removed |
 | **decoy queries** | [`decoys.jsonl`](decoys.jsonl) | what the system says when the corpus **cannot** answer |
-| ~~sealed subset~~ | **NOT BUILT** | see below |
+| **sealed subset** | [`seal.py`](seal.py) | **contamination** — a query nobody who authored an artifact has read |
 
 ### The placebo
 
@@ -69,39 +69,48 @@ actually answers is not a decoy:
 fux ask "<decoy>" --json --band
 ```
 
-### The sealed subset — deliberately absent
+### The sealed subset
 
-Decision 15 needs *"a sealed subset of queries, held by one owner, never shown to
-anyone who authors an artifact, rotated when it leaks."*
+**Ruled by Arpit 2026-08-28: seal 15 of 50, and grow the set later.**
 
-⚠ **It is not built, and building it is not mechanical.** Decision 15 says so
-itself: *"sealing also shrinks the visible set, which makes decision 14's power
-problem worse before it makes it better; whoever builds it has to resolve that
-tension rather than inherit it silently."* On 50 goldens, splitting off a sealed
-holdout leaves both halves too small to resolve much. **That is a judgement
-about what the measurement is for**, and it is not an agent's.
+```bash
+python3 tools/quality-controls/seal.py <goldens.jsonl>            # show the cut
+python3 tools/quality-controls/seal.py <goldens.jsonl> --visible  # what you may read
+```
 
-## ⚠ What the decoys found on their first run
+- **Split by `sha256(id)`, not by shuffling.** Deterministic (L3), seedless, and
+  **independent of file order**, so re-sorting `queries.jsonl` cannot silently
+  change which queries are sealed.
+- **Growing the corpus is a RESEAL, not an append.** A seal is named by the
+  corpus it was cut from; pretending otherwise is how a "sealed" query quietly
+  becomes one somebody had already authored against.
+- **It hides nothing, and it is not meant to.** Anyone with the repository can
+  print the cut. **What it buys is that an artifact's author can say, checkably,
+  that they did not look.** BIG-bench's canary is the counter-example worth
+  remembering — a marker embedded *so that* labs could exclude it, and
+  reproduced by models trained on it regardless.
 
-**One of fifteen is reported `grounded`** — `d02`, *"what is the SLA we publish
-for the payments API"* — with `coverage: 1.0`, `missing: []`, `separation:
-0.58`, citing `policy-data-retention.md`.
+#### ⚠ The power tension, resolved out loud rather than inherited
 
-**The mechanism:** `coverage` and `missing` are computed **corpus-wide**. All
-four terms occur — `sla` and `publish` in the retention policy, `payments` in the
-postmortem and deployment tiers, `api` in the mesh ADR — in **four different
-documents**, so nothing is "missing" and the band falls through to the
-separation test, which it clears.
+Decision 15 required this: *"sealing shrinks the visible set, which makes
+decision 14's power problem worse before it makes it better; whoever builds it
+has to resolve that tension rather than inherit it silently."*
 
-**That is the exact failure `confidence.py`'s own docstring opens with**: telling
-*"these documents answer your question"* from *"these documents are the closest
-thing in a corpus that does not discuss this at all."*
+**35 visible and 15 sealed are both underpowered, and that is accepted rather
+than hidden.** The ±2-query resolution floor still governs what a delta may
+claim, and it does not loosen because a set got smaller — it gets **harder to
+clear**, which is the honest direction. **Sealing buys a claim about
+contamination. It buys no precision, and a run that reports a sealed number as
+if it were precise is misreading this file.**
 
-⚠ **It is not a floor-value problem.** `0.58` is above the `0.5` that R10's
-selection rule would have picked, so raising the floor would not have caught it.
-Filed as [the decoy run](../../work/regression/2026-08-27-decoy-control/report.md);
-**named, not fixed** — per-document coverage is a design change to an accepted
-record.
+#### 🔴 The sealed half is harder than the visible half
 
-**The other fourteen behaved correctly**: `partial`, with the absent terms named
-in `missing`, which is the field the module says an agent should read first.
+**5 of the 9 `known_failure` goldens landed in the sealed 15** — 33 % of the
+sealed set versus 11 % of the visible one.
+
+- **This was not corrected, and correcting it would be the bug.** Balancing the
+  split by difficulty means reading the scores, which is exactly the
+  contamination the seal exists to prevent. The hash split is blind on purpose.
+- **It means a sealed score is not comparable to a visible score**, and never
+  will be at this size. Anyone reporting both must say which half.
+- **It is the power problem made concrete** rather than an argument about it.

@@ -104,6 +104,33 @@ BANDS = (GROUNDED, PARTIAL, WEAK, NONE)
 #: it once, for everyone. ADR-CONFIDENCE decision 6.
 SEPARATION_FLOOR = 0.10
 
+#: How much of the question the TOP-RANKED document must itself contain before
+#: the band may read `grounded`.
+#:
+#: 🔴 **`0.0` — THE CLAUSE IS OFF, AND THAT IS A MEASURED RESULT, NOT AN
+#: OVERSIGHT.** `doc_coverage` is computed and published; it does not gate the
+#: band, because on the only data that exists **it does not separate**:
+#:
+#: | | n | min | median | max |
+#: |---|---:|---:|---:|---:|
+#: | real goldens reaching this clause | 37 | **0.401** | 0.882 | 1.000 |
+#: | decoys reaching it | 1 | **0.710** | — | 0.710 |
+#:
+#: The decoy sits **inside** the goldens' range, so any floor that catches it
+#: demotes real answers below it. A floor of `1.0` turns **19 of 50** correct
+#: answers `partial`; picking a number in a "gap" is impossible because there is
+#: no gap, and picking one anyway would be fitting a threshold to 65 queries —
+#: the failure R10 is currently INCONCLUSIVE over.
+#:
+#: ⚠ **Fourteen of fifteen decoys never reach here**: they are already `partial`
+#: via `missing`, which is the corpus-wide signal working. The scattered-terms
+#: case is **one query in fifteen**, and this module now *reports* it rather than
+#: claiming to catch it.
+#:
+#: **Gating is Arpit's call and is open.** Set this above `0.0` only with a
+#: measurement behind it. See ADR-CONFIDENCE decision 12.
+DOC_COVERAGE_FLOOR = 0.0
+
 
 @dataclass(frozen=True)
 class Confidence:
@@ -131,6 +158,20 @@ class Confidence:
     #: corpus content, so L2 and L5 are not in play.
     missing: tuple[str, ...]
 
+    #: **How much of the question the TOP-RANKED DOCUMENT itself covers**, as
+    #: opposed to the corpus. Added 2026-08-28 (Arpit) after the decoy control
+    #: found a question no document answers reported `grounded`.
+    #:
+    #: ⚠ **`coverage` is corpus-wide and stays that way**, so nothing that reads
+    #: it changes meaning. A query whose four terms sit in four DIFFERENT
+    #: documents scores `coverage: 1.0` — correctly, the corpus does contain
+    #: those words — and `doc_coverage` is what says no single document contains
+    #: the question.
+    #:
+    #: `1.0` when there are no results, so an empty answer is never demoted by
+    #: this field; `support == 0` already means `none`.
+    doc_coverage: float = 1.0
+
     @property
     def band(self) -> str:
         """`grounded` · `partial` · `weak` · `none`, checked in that order.
@@ -144,6 +185,16 @@ class Confidence:
         if self.support == 0:
             return NONE
         if self.missing or self.verified == "stale":
+            return PARTIAL
+        # ⚠ **The clause the decoy control bought.** Corpus-wide coverage cannot
+        # see that a question's terms are scattered across four documents while
+        # no single one discusses it — and `separation` cannot either, because it
+        # measures whether first place is clearly first, and a corpus of
+        # near-misses is decisive about its best near-miss. Measured 2026-08-27:
+        # "what is the SLA we publish for the payments API" reached `grounded` at
+        # separation 0.58, ABOVE the 0.5 R10's selection rule would have picked,
+        # so no threshold on separation closes this.
+        if self.doc_coverage < DOC_COVERAGE_FLOOR:
             return PARTIAL
         if self.separation < SEPARATION_FLOOR:
             return WEAK
@@ -183,6 +234,7 @@ class Confidence:
             "answerable": self.answerable,
             "coverage": self.coverage,
             "separation": self.separation,
+            "doc_coverage": self.doc_coverage,
             "support": self.support,
             "verified": self.verified,
             "missing": list(self.missing),
@@ -224,6 +276,7 @@ def signals(
     scores: list[float],
     *,
     verified: str = "unverified",
+    top_doc_hashes: list[str] | None = None,
 ) -> Confidence:
     """Compute the block from what `rank()` already had in hand.
 
@@ -274,6 +327,17 @@ def signals(
 
     coverage = (matched / total) if total > 0 else 0.0
 
+    # The same idf weighting, over the top document's own terms rather than the
+    # corpus's. Weighted, not counted, for `coverage`'s reason: missing `the` is
+    # nothing, missing `mTLS` is the question.
+    if top_doc_hashes is None:
+        doc_coverage = 1.0  # not supplied by this caller — never demote on absence
+    elif total > 0:
+        present = set(top_doc_hashes)
+        doc_coverage = sum(idf(df.get(h, 0), n) for h in query_hashes if h in present) / total
+    else:
+        doc_coverage = 1.0
+
     # One result separates perfectly: there is no runner-up to be confused with.
     if len(scores) >= 2 and scores[0] > 0:
         separation = (scores[0] - scores[1]) / scores[0]
@@ -284,6 +348,7 @@ def signals(
 
     return Confidence(
         coverage=round(max(0.0, min(1.0, coverage)), 4),
+        doc_coverage=round(max(0.0, min(1.0, doc_coverage)), 4),
         separation=round(max(0.0, min(1.0, separation)), 4),
         support=len(scores),
         verified=verified,
