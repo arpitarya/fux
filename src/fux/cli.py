@@ -372,6 +372,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="read-only: report what has drifted. Offline for files; does not fetch URLs",
     )
+    # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
+    # deliberately no `--dirty`/`--stale`/`--changed` -- if the dirty list is the
+    # right thing to refresh, it should not have to be asked for.
+    p_update.add_argument(
+        "--all",
+        action="store_true",
+        help="fetch every listed URL, not just the ones known to be stale",
+    )
     _add_progress_flags(p_update)
     p_update.set_defaults(func=_cmd_update)
 

@@ -57,7 +57,7 @@ def repo(tmp_path, monkeypatch):
 
 def test_a_sweep_of_a_healthy_repo_returns_ok(repo):
     """The whole bug in one line: this returned `"failed"` unconditionally."""
-    assert daemon._sweep(repo) == "ok"
+    assert daemon._sweep(repo)["outcome"] == "ok"
 
 
 def test_the_sweep_actually_indexed_something(repo):
@@ -77,7 +77,7 @@ def test_the_sweep_calls_the_real_ingest_and_a_patch_of_it_is_seen(repo, monkeyp
     ingest_run = import_module("fux.ingest.run")
     monkeypatch.setattr(ingest_run, "run", lambda *a, **k: calls.append((a, k)))
 
-    assert daemon._sweep(repo) == "ok"
+    assert daemon._sweep(repo)["outcome"] == "ok"
     assert len(calls) == 1, "the sweep did not reach fux.ingest.run.run"
     assert calls[0][1].get("refresh_urls") is True
 
@@ -90,7 +90,7 @@ def test_one_bad_sweep_still_returns_failed_rather_than_raising(repo, monkeypatc
 
     monkeypatch.setattr(import_module("fux.ingest.run"), "run", _boom)
 
-    assert daemon._sweep(repo) == "failed"
+    assert daemon._sweep(repo)["outcome"] == "failed"
 
 
 def test_the_ingest_package_never_re_exports_run_under_the_submodule_s_name():
@@ -150,3 +150,94 @@ def test_every_import_form_of_the_ingest_run_module_now_reaches_the_module():
     assert not hasattr(fux.ingest, "run") or isinstance(
         getattr(fux.ingest, "run"), ModuleType
     ), "fux.ingest.run resolves to the module, never to a callable"
+
+
+# --- The status shape, widened 2026-08-28 (Arpit) ---------------------------
+#
+# The sweep wrote {"outcome": ...} and nothing else, and both halves of that
+# cost something real:
+#
+#   * a FuxError about `max_parallel` and a dead network were the SAME
+#     "failed", so a misconfigured repo failed forever with nothing to go on;
+#   * an "ok" sweep could skip URLs SILENTLY -- two of seven did in the
+#     2026-08-27 real-network run, and the only surface that said so was a
+#     foreground `fux update` nobody runs.
+
+def test_a_failed_sweep_says_why(repo, monkeypatch):
+    """The first half: a failure carries its reason and its exception type."""
+    import fux.ingest.run as ingest_run
+    from fux.errors import FuxError
+    from fux.maintain import daemon
+
+
+    def boom(*a, **k):
+        raise FuxError("[sources.url] max_parallel is required")
+
+    monkeypatch.setattr(ingest_run, "run", boom)
+    result = daemon._sweep(repo)
+
+    assert result["outcome"] == "failed"
+    assert "max_parallel" in result["reason"], result
+    assert "FuxError" in result["reason"], (
+        "the TYPE distinguishes the repo's own refusal (fix your config) from a "
+        "surprise (fix fux), and a bare message loses that"
+    )
+
+
+def test_an_ok_sweep_reports_what_it_skipped(repo, monkeypatch):
+    """The second half, and the one the old shape could not express at all.
+
+    `outcome: "ok"` with `skipped: 2` is a healthy-looking sweep that did not
+    index two documents. Before this, that state was indistinguishable from a
+    clean run.
+    """
+    import fux.ingest.run as ingest_run
+    from fux.ingest.gitdir import Skipped
+    from fux.maintain import daemon
+
+
+    class Report:
+        doc_count = 5
+        skipped = [
+            Skipped(rel_path="https://a.test/x", reason="fetch failed: HTTP Error 404"),
+            Skipped(rel_path="https://b.test/y", reason="no decoder for image/png"),
+        ]
+
+    monkeypatch.setattr(ingest_run, "run", lambda *a, **k: Report())
+    result = daemon._sweep(repo)
+
+    assert result["outcome"] == "ok", "skips are not a failed sweep"
+    assert result["skipped"] == 2
+    assert result["fetched"] == 3
+    assert "404" in result["reason"], "the first skip's reason is carried"
+
+
+def test_the_reason_is_bounded(repo, monkeypatch):
+    """A file written every sweep may not grow without someone deciding it should."""
+    import fux.ingest.run as ingest_run
+    from fux.maintain import daemon
+
+    monkeypatch.setattr(
+        ingest_run, "run", lambda *a, **k: (_ for _ in ()).throw(RuntimeError("x" * 5000))
+    )
+    assert len(daemon._sweep(repo)["reason"]) <= 300
+
+
+def test_a_clean_sweep_carries_no_reason(repo, monkeypatch):
+    """`reason` explains something or is absent — never an empty string.
+
+    A field that is always present but usually empty is one a reader learns to
+    ignore, which is how the old bare `"failed"` earned its silence.
+    """
+    import fux.ingest.run as ingest_run
+    from fux.maintain import daemon
+
+
+    class Clean:
+        doc_count = 4
+        skipped = []
+
+    monkeypatch.setattr(ingest_run, "run", lambda *a, **k: Clean())
+    result = daemon._sweep(repo)
+
+    assert result == {"outcome": "ok", "fetched": 4, "skipped": 0}

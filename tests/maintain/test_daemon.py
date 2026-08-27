@@ -180,7 +180,7 @@ def test_the_lock_is_released_between_sweeps():
 def test_a_busy_lock_is_not_a_failure(root, monkeypatch):
     """A human's `fux ingest` outranks a clock. The sweep comes round again."""
     monkeypatch.setattr(runner, "acquire", lambda _root: False)
-    assert daemon._sweep(root) == "busy"
+    assert daemon._sweep(root)["outcome"] == "busy"
 
 
 def test_one_bad_sweep_does_not_end_the_daemon(root, monkeypatch):
@@ -201,7 +201,7 @@ def test_one_bad_sweep_does_not_end_the_daemon(root, monkeypatch):
     ingest_run = import_module("fux.ingest.run")
 
     monkeypatch.setattr(ingest_run, "run", _boom)
-    assert daemon._sweep(root) == "failed"
+    assert daemon._sweep(root)["outcome"] == "failed"
 
 
 # -- status is read-only (ADR-MAINTENANCE veto 7) ---------------------------

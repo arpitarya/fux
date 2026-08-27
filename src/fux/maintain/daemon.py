@@ -277,6 +277,7 @@ def sweep_minutes(root: Path) -> int:
 
 
 def _write_status(root: Path, outcome: str, **extra) -> None:
+    """Write `.fux/runtime/daemon.status`. Declared in `state.schema.json`."""
     directory = _runtime(root)
     try:
         directory.mkdir(parents=True, exist_ok=True)
@@ -287,35 +288,62 @@ def _write_status(root: Path, outcome: str, **extra) -> None:
         pass  # status is a courtesy; failing to write it must not end the run
 
 
-def _sweep(root: Path) -> str:
+def _sweep(root: Path) -> dict:
     """One pass: claim the lock, refresh every URL, release. Never raises.
 
-    Returns `"ok"` · `"busy"` · `"failed"`. **`busy` is not an error** — an
-    explicit `fux ingest` or a spawned runner holds the lock, and a human's
-    command outranks a clock. The sweep simply comes round again.
+    Returns the status dict — `outcome` plus whatever explains it. **`busy` is
+    not an error**: an explicit `fux ingest` or a spawned runner holds the lock,
+    a human's command outranks a clock, and the sweep comes round again.
+
+    ⚠ **This returned a bare string until 2026-08-28**, and both halves of that
+    cost something real:
+
+    * A `FuxError` about `max_parallel` and a dead network were **the same
+      `"failed"`**, so a misconfigured repository failed forever with nothing to
+      go on.
+    * **An `"ok"` sweep could skip URLs silently.** Two of seven did in the
+      2026-08-27 real-network run, and the only surface that said so was a
+      foreground `fux update` nobody runs.
+
+    So `reason` explains a failure and `fetched`/`skipped` describe every
+    outcome — an `"ok"` with `skipped: 2` is the case the old shape could not
+    express at all. Ruled by Arpit 2026-08-28.
     """
     if not runner.acquire(root):
-        return "busy"
+        return {"outcome": "busy"}
     try:
-        # ⚠ **NOT `from ..ingest import run`.** `fux/ingest/__init__.py` line 11
-        # re-exports the FUNCTION under the same name as the submodule, so that
-        # form binds a function and `ingest_run.run(...)` raises
-        # `AttributeError` -- which the broad handler below turns into a silent
-        # `"failed"`. **Every sweep failed, forever, and the daemon looked
-        # healthy the whole time.** `import_module` asks for the module by name
-        # and cannot be shadowed; the indirection is also what lets a test
-        # monkeypatch `fux.ingest.run.run` and have this call see it.
+        # ⚠ `import_module` rather than `from ..ingest import run`. The
+        # re-export that made the latter bind a FUNCTION was removed repo-wide
+        # on 2026-08-27 (`tests/test_no_shadowed_submodules.py` keeps it gone),
+        # but this form is kept for a second, still-live reason: it is what lets
+        # a test monkeypatch `fux.ingest.run.run` and have this call see it.
         from importlib import import_module
 
         ingest_run = import_module("fux.ingest.run")
-        ingest_run.run(root, refresh_urls=True)
-        return "ok"
-    except Exception:  # noqa: BLE001 - a daemon must outlive one bad sweep
-        return "failed"
+        report = ingest_run.run(root, refresh_urls=True)
+    except Exception as exc:  # noqa: BLE001 - a daemon must outlive one bad sweep
+        # The type is carried as well as the message: a `FuxError` is the repo's
+        # own refusal (fix your config), anything else is a surprise (fix fux).
+        return {"outcome": "failed", "reason": f"{type(exc).__name__}: {exc}"[:300]}
     finally:
         # Released between sweeps, never held across the sleep: an hour-long
         # hold would block every `fux ingest` in the repository.
         runner.release(root)
+
+    skipped = list(getattr(report, "skipped", ()) or ())
+    out: dict = {
+        "outcome": "ok",
+        "fetched": max(0, int(getattr(report, "doc_count", 0)) - len(skipped)),
+        "skipped": len(skipped),
+    }
+    if skipped:
+        # The FIRST skip's reason, not a list: the status file is a fixed-size
+        # courtesy, and an unbounded field on a file written every sweep is how a
+        # runtime file grows without anyone deciding it should. The count says
+        # how many; `fux update` and the enrich queue carry the rest.
+        first = skipped[0]
+        out["reason"] = f"{len(skipped)} skipped, first: {getattr(first, 'reason', '?')}"[:300]
+    return out
 
 
 def serve(root: Path) -> str:
@@ -335,8 +363,8 @@ def serve(root: Path) -> str:
             if stop_requested(root, pid):
                 _write_status(root, "stopped")
                 return "stopped"
-            outcome = _sweep(root)
-            _write_status(root, outcome)
+            result = _sweep(root)
+            _write_status(root, **result)
 
             # Sleep in POLL_S slices so `stop` is noticed in about a second
             # rather than at the end of the interval.

@@ -130,5 +130,58 @@
         "docs/mesh.md": "516bef06781262a0a64b10027316c18d668eeccb"
       }
     }
+  },
+  "daemon_status_file": {
+    "_doc": [
+      "`.fux/runtime/daemon.status` -- the last sweep the resident daemon ran.",
+      "",
+      "DECLARED 2026-08-28. It shipped undeclared, which is the gap this file",
+      "exists to close: `fux doctor` and `fux daemon status` both read it and",
+      "both hand-rolled their own tolerance for what might be in it.",
+      "",
+      "IT CARRIED `outcome` AND NOTHING ELSE UNTIL 2026-08-28, and both halves of",
+      "that cost something. A `FuxError` about `max_parallel` and a dead network",
+      "were the same bare \"failed\", so a misconfigured repository failed forever",
+      "with nothing to go on. And an \"ok\" sweep could skip URLs SILENTLY -- two",
+      "of seven did in the 2026-08-27 real-network run, and the only surface that",
+      "said so was a foreground `fux update` nobody runs.",
+      "",
+      "`reason` EXPLAINS SOMETHING OR IS ABSENT. It is never an empty string: a",
+      "field that is always present and usually empty is one a reader learns to",
+      "skip, which is how the old bare \"failed\" earned its silence.",
+      "",
+      "BOUNDED AT 300 CHARACTERS. This file is rewritten every sweep, and an",
+      "unbounded field on it is how a runtime file grows without anyone deciding",
+      "it should. The count says how many were skipped; `fux update` and the",
+      "enrich queue carry the detail."
+    ],
+    "fields": {
+      "outcome": {
+        "type": "str",
+        "required": "always",
+        "doc": "ok | busy | failed | stopped. `busy` is NOT an error -- a human's `fux ingest` holds the lock and outranks a clock."
+      },
+      "reason": {
+        "type": "str",
+        "required": "never",
+        "doc": "Why, when there is a why: the exception type and message on `failed`, or 'N skipped, first: ...' on an `ok` sweep that did not index everything. Absent on a clean sweep."
+      },
+      "fetched": {
+        "type": "int",
+        "required": "never",
+        "doc": "Documents the sweep indexed. Present on `ok` only."
+      },
+      "skipped": {
+        "type": "int",
+        "required": "never",
+        "doc": "Documents it did not. `outcome: ok` with `skipped: 2` is the state the pre-2026-08-28 shape could not express at all."
+      }
+    },
+    "example": {
+      "outcome": "ok",
+      "fetched": 5,
+      "skipped": 2,
+      "reason": "2 skipped, first: fetch failed: HTTP Error 404: Not Found"
+    }
   }
 }

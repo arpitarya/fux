@@ -24,6 +24,42 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — wave 2: the daemon chain, and a tolerance that nearly became a silent no-op  ·  Claude Code
+
+- **Asked:** continue resolving one by one.
+
+- **Did:** put wave 2's two calls to Arpit together (the ordering constraint is
+  on execution, not on asking). Both answered: **reason + counts** on the sweep
+  status, and **land narrow-by-default after the status widening**.
+
+- **Did, the status widening.** `_sweep` returned a bare string; it now returns
+  `outcome` plus what explains it, and **`daemon.status` is declared in
+  `state.schema.json`, which it never was.** Verified live against the lab repo
+  that really skips: `fux doctor` now says **"the last sweep reported ok but did
+  not index 3 document(s)"** — the exact case that was invisible a day earlier.
+
+- **Did, narrow-by-default.** `fux update` refreshes the dirty list; `--all`
+  forces the full sweep. All four paths verified against real URLs.
+
+- **🔴 The finding, and it nearly shipped as a silent no-op.** `dirty.read`
+  collapses missing-and-unreadable to `[]` **on purpose** — it feeds reporting
+  paths where *"cannot tell"* should degrade quietly. Under narrow-by-default,
+  **empty means fetch nothing**, so a repo that never ran the hook or whose
+  `.fux/runtime/` was wiped would have `fux update` stop fetching **silently** —
+  precisely the failure ruling 3 warns about, arriving through a file's own
+  tolerance rather than through the ruling. `dirty.is_readable` now separates
+  **absent ⇒ sweep everything** from **present-and-empty ⇒ fetch nothing**.
+  **Read a tolerance before you rely on it.**
+
+- **Decided / open:** nothing of Arpit's was taken. ⚠ **The residual risk is
+  recorded, not closed:** a repo running no daemon whose URLs change without a
+  commit now re-fetches only on `--all`; proxy and SSO stay uncovered.
+
+- **Verified:** `tests/` **2 217 passed** · `tests_e2e/` **73 passed**.
+
+- **Next:** wave 3 — per-document coverage, then the sealed subset, then R10.
+  The first of those is the highest-leverage call in the whole queue.
+
 ## 2026-08-27 — wave 1: four calls made, and the smallest was the largest  ·  Claude Code
 
 - **Asked:** *"resolve them one by one"*. Read as: execute everything that is not

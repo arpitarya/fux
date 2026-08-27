@@ -273,6 +273,12 @@ runner's status is computed in `maintain/runner.py::status()`, which
 state is this record's shape doing its job; a check that **decided** anything
 about the runner would belong next door.
 
+⚠ **`fux doctor` gained a `url daemon` check on 2026-08-28.** It reports the
+resident clock's last sweep, and the case it exists for is `outcome: "ok"` with
+`skipped > 0` — a sweep that looked healthy and did not index everything. **A
+daemon that never ran is not a finding**: a check that fires for every repo is
+one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
+
 ### Consequences
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —

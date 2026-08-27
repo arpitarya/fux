@@ -21,6 +21,72 @@ Rules:
 
 ---
 
+## Wave 2 — the daemon chain, in the order the ruling required (2026-08-28)
+
+**Two calls, and the order was the point.** Ruling 3's own text says narrow and
+the clock *"must land together or the tail silently stops being refreshed at
+all"* — so observability shipped first, and narrowing second.
+
+### The sweep status carries a reason and counts
+
+`_sweep` returned a bare string. It now returns `outcome` plus what explains it,
+and **`daemon.status` is declared in `state.schema.json`, which it never was.**
+
+- **Both halves of the old shape cost something.** A `FuxError` about
+  `max_parallel` and a dead network were the same `"failed"`; and ⚠ **an `"ok"`
+  sweep could skip URLs silently** — `outcome: "ok"` with `skipped: 2` is a state
+  the old shape could not express.
+- **Verified live** against the lab repo that really skips:
+  `{"fetched":2,"outcome":"ok","reason":"3 skipped, first: fetch failed: HTTPError:
+  HTTP Error 404: Not Found","skipped":3}`, and `fux doctor`:
+  **`[WARN] url daemon: … the last sweep reported ok but did not index 3
+  document(s)`** — the exact case that was invisible the day before.
+- **`reason` explains something or is absent**, never an empty string; bounded at
+  300 characters; carries the **first** skip, not a list, because a file rewritten
+  every sweep may not grow without someone deciding it should.
+- **A daemon that never ran is not a doctor finding** — a check that fires for
+  every repo is one people learn to skip.
+
+### `fux update` is narrow by default
+
+`fux update` refreshes the dirty list; **`fux update --all`** forces the full
+sweep. No `--dirty`/`--stale`/`--changed` flag, per the ruling.
+
+🔴 **The hazard that nearly shipped, and the reason to read a tolerance before
+relying on it.** `dirty.read` collapses missing-and-unreadable to `[]` **on
+purpose**, because it feeds reporting paths where *"cannot tell"* should degrade
+quietly. Under narrow-by-default, **empty means fetch nothing** — so a repo that
+never ran the hook, or whose `.fux/runtime/` was wiped, would have `fux update`
+become a **silent no-op**. That is precisely the failure ruling 3 warns about,
+arriving through a file's tolerance rather than through the ruling.
+
+**`dirty.is_readable` draws the distinction: list absent ⇒ sweep everything; list
+present and empty ⇒ fetch nothing.** Fail safe, not fail silent.
+
+**All four paths verified live:**
+
+| state | result |
+|---|---|
+| dirty list absent | `fetching 7 listed URL(s) (network) — no dirty list yet` |
+| present, empty | `nothing to fetch — 0 known stale` |
+| one stale URL | `fetching 1 of 7 … — 1 known stale. \`fux update --all\` fetches every one` |
+| `--all` | `fetching 7 listed URL(s) (network) — \`--all\`` |
+
+⚠ **A dirty URL no longer in the source list is not fetched** — the list is
+advisory and outlives edits to the source list.
+
+⚠ **The residual risk, stated rather than closed:** a repo running no daemon,
+whose URLs change without any commit, now re-fetches only on `--all`. That is
+the trade ruling 3 makes, and ruling 10 is what covers it. **Proxy and SSO
+remain uncovered.**
+
+### Verified
+
+`tests/` **2 217 passed, 1 skipped** · `tests_e2e/` **73 passed** (74 minus the
+duplicate deleted in wave 1). Records: ADR-MAINTENANCE 12, ADR-URL-INGEST 8,
+ADR-CLI, ADR-DOTFUX, ADR-OUTPUT.
+
+
 ## Wave 1 — four calls made, and the smallest one was the largest (2026-08-27)
 
 **Arpit ruled four independent blockers in one pass.** Three were minutes; one

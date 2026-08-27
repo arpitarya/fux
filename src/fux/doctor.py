@@ -97,6 +97,54 @@ def _background_runner(root: Path) -> Check:
     return Check("background runner", True, "idle, nothing pending", level="warn")
 
 
+def _daemon(root: Path) -> Check | None:
+    """The resident clock's last sweep — `None` when it has never run.
+
+    **Added 2026-08-28 with the widened status shape.** Before it, the daemon's
+    only surface was `fux daemon status`, which a person runs when they already
+    suspect something. `doctor` is what they run when they do not.
+
+    ⚠ **The case this exists for is `outcome: "ok"` with `skipped > 0`** — a
+    sweep that looked healthy and did not index everything. Two of seven URLs
+    were skipped in the 2026-08-27 real-network run and nothing said so outside
+    a foreground `fux update`.
+    """
+    from .maintain import daemon as daemon_mod
+
+    state = daemon_mod.status(root)
+    last = state.get("last")
+    if not state.get("running") and not last:
+        return None  # never started here; not a finding
+
+    where = f"running (pid {state['pid']})" if state.get("running") else "not running"
+    if not last:
+        return Check("url daemon", True, where, level="warn")
+
+    outcome = last.get("outcome")
+    reason = last.get("reason")
+    skipped = last.get("skipped") or 0
+
+    if outcome == "failed":
+        return Check(
+            "url daemon",
+            False,
+            f"{where}; the last sweep FAILED ({reason or 'no reason recorded'})",
+            level="warn",
+        )
+    if skipped:
+        return Check(
+            "url daemon",
+            False,
+            f"{where}; the last sweep reported ok but did not index {skipped} document(s) "
+            f"({reason}) - run `fux update` to see them all",
+            level="warn",
+        )
+    detail = f"{where}; last sweep {outcome}"
+    if last.get("fetched") is not None:
+        detail += f", {last['fetched']} document(s)"
+    return Check("url daemon", True, detail, level="warn")
+
+
 def _python_version() -> Check:
     ok = sys.version_info[:2] >= PY_MIN
     have = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -159,6 +207,9 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_ignore_health(root))
     checks.append(_accelerator(root))
     checks.append(_background_runner(root))
+    daemon_check = _daemon(root)
+    if daemon_check is not None:
+        checks.append(daemon_check)
     checks.append(_url_health(root))
     return checks
 

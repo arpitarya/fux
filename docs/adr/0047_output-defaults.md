@@ -290,6 +290,13 @@ null
     rather than wired, because **both of those change WHICH nodes come back** —
     truncating a walk is a ranking change, which this file may not make.
 
+⚠ **No output default changed on 2026-08-28.** `fux doctor` gained a `url daemon`
+row and `fux update` gained `--all`; both print through the existing surfaces and
+neither adds a gated flag or a `[verb]` key. Recorded because this record
+constrains **every** gated flag in `cli.py` to `default=None`, and `--all` is a
+plain `store_true` — it gates nothing and reads no config, so decision 10 does
+not reach it.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

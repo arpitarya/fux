@@ -1,1 +1,1 @@
-→ wave 1: four calls put to Arpit
+→ wave 2: daemon status reason, then narrow-by-default

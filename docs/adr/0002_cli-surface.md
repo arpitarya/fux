@@ -728,6 +728,13 @@ usage: fux [-h] [--version] {…} ...      # … verb list omitted; it is build_
 
 ---
 
+⚠ **`fux update --all` added 2026-08-28** (W-82 ruling 3). `update` now refreshes
+only the URLs the dirty list names; `--all` forces the full sweep. **There is
+deliberately no `--dirty`/`--stale`/`--changed`** — if the dirty list is the right
+thing to refresh, it should not have to be asked for. A behaviour change to a
+shipped verb, free now and a deprecation cycle once anyone scripts it. See
+[ADR-URL-INGEST](0008_url-ingest.md) decision 8.
+
 ### Consequences
 
 - **Adding a verb costs a record.** A group row, a decision, and a line in the

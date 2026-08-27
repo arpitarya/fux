@@ -201,6 +201,36 @@ record taken today carries `"flen": [...]` where this shows `"wlen": 11`:
 }
 ```
 
+**8. `fux update` refreshes the dirty list; `--all` forces the full sweep.**
+W-82 ruling 3, landed 2026-08-28 **together with ruling 10**, which is a
+condition of the ruling and not a coincidence: *"with narrow as the default the
+tail is never refreshed unless something else sweeps it."*
+
+- **No `--dirty` / `--stale` / `--changed` flag.** *"If the dirty list is the
+  right thing to refresh, it should not have to be asked for. A user typing
+  `fux update` wants a current index, not a network sweep."*
+- ⚠ **This is a behaviour change to a shipped verb** — free now, a deprecation
+  cycle once anyone scripts it.
+- 🔴 **An ABSENT dirty list sweeps EVERYTHING; a present-and-empty one fetches
+  nothing.** [`dirty.read`](../../src/fux/maintain/dirty.py) collapses
+  missing-and-unreadable to `[]` on purpose, because it feeds reporting paths
+  where *"cannot tell"* should degrade quietly. **A consumer that acts on the
+  list cannot afford that**: under narrow-by-default, empty means *fetch
+  nothing*, so a repo that never ran the hook — or whose `.fux/runtime/` was
+  wiped — would have `update` become a silent no-op. **That is precisely the
+  failure ruling 3 warns about, arriving through a tolerance rather than through
+  the ruling.** `dirty.is_readable` draws the distinction; fail safe, not fail
+  silent.
+- **The announcement always names `--all`**, and states what it is doing:
+  `fetching 1 of 7 listed URL(s) (network) — 1 known stale`. An L4 announcement
+  that overstates the network is the one thing it may never do.
+- **A dirty URL that is no longer listed is not fetched.** The list is advisory
+  and outlives edits to the source list; fetching a removed entry would
+  re-index a document the repo has said it no longer wants.
+- ⚠ **The residual risk, stated:** a repo running no daemon, whose URLs change
+  without any commit, now re-fetches only on `--all`. That is the trade ruling 3
+  makes, and ruling 10 is what covers it.
+
 ### Consequences
 
 - **`src/fux/` contains zero network lines**, which is the property the adapter

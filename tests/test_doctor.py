@@ -477,3 +477,60 @@ def test_doctor_passes_when_there_is_no_types_file(tmp_path):
 
     check = doctor_mod._types_health(tmp_path)
     assert check.ok and "default" in check.detail
+
+
+# --- the daemon check, added 2026-08-28 with the widened status shape -------
+
+def _daemon_status(root, payload):
+    import json
+    d = root / ".fux" / "runtime"
+    d.mkdir(parents=True, exist_ok=True)
+    (d / "daemon.status").write_text(json.dumps(payload), encoding="utf-8")
+
+
+def test_doctor_reports_a_sweep_that_looked_ok_and_skipped_documents(tmp_path):
+    """The case the pre-2026-08-28 status shape could not express.
+
+    `outcome: "ok"` with `skipped: 2` is a healthy-looking sweep that did not
+    index two documents. Two of seven URLs were skipped in the 2026-08-27
+    real-network run and nothing outside a foreground `fux update` said so.
+    """
+    from fux.doctor import _daemon
+
+    _daemon_status(tmp_path, {"outcome": "ok", "fetched": 5, "skipped": 2,
+                              "reason": "2 skipped, first: fetch failed: HTTP Error 404"})
+    check = _daemon(tmp_path)
+
+    assert check is not None
+    assert check.ok is False, "an ok-with-skips sweep is a finding, not a clean bill"
+    assert "did not index 2" in check.detail
+    assert "404" in check.detail
+
+
+def test_doctor_reports_why_a_sweep_failed(tmp_path):
+    from fux.doctor import _daemon
+
+    _daemon_status(tmp_path, {"outcome": "failed",
+                              "reason": "FuxError: [sources.url] max_parallel is required"})
+    check = _daemon(tmp_path)
+
+    assert check is not None and check.ok is False
+    assert "max_parallel" in check.detail, "a bare 'failed' is what this replaced"
+
+
+def test_doctor_is_silent_about_a_daemon_that_never_ran(tmp_path):
+    """Not a finding. Most repos never start one, and a check that fires for
+    everyone is a check people learn to skip."""
+    from fux.doctor import _daemon
+
+    assert _daemon(tmp_path) is None
+
+
+def test_a_clean_sweep_is_reported_as_clean(tmp_path):
+    from fux.doctor import _daemon
+
+    _daemon_status(tmp_path, {"outcome": "ok", "fetched": 4, "skipped": 0})
+    check = _daemon(tmp_path)
+
+    assert check is not None and check.ok is True
+    assert "4 document(s)" in check.detail

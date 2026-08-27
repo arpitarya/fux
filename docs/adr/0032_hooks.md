@@ -424,6 +424,36 @@ accepted record. **`token` is declared absent on purpose** — it belongs to an
 optional fetcher function that is an unruled fork, and **declaring a field
 nothing writes is how a knob that cannot work ships.**
 
+**12. The sweep's status carries a REASON and COUNTS, and the file is declared.**
+Ruled by Arpit 2026-08-28.
+
+- **It carried `outcome` and nothing else**, and both halves of that cost
+  something real:
+  - A `FuxError` about `max_parallel` and a dead network were **the same bare
+    `"failed"`**, so a misconfigured repository failed forever with nothing to
+    go on.
+  - ⚠ **An `"ok"` sweep could skip URLs silently.** Two of seven did in the
+    [2026-08-27 real-network run](../../work/regression/2026-08-27-daemon-real-url/report.md),
+    and the only surface that said so was a foreground `fux update` nobody runs.
+    **`outcome: "ok"` with `skipped: 2` is a state the old shape could not
+    express at all.**
+- **`reason` explains something or is absent** — never an empty string. A field
+  that is always present and usually empty is one a reader learns to skip, which
+  is how the bare `"failed"` earned its silence.
+- **Bounded at 300 characters, and it carries the FIRST skip, not a list.** This
+  file is rewritten every sweep; an unbounded field on it is how a runtime file
+  grows without anyone deciding it should. The count says how many.
+- **The exception TYPE is carried with the message**: a `FuxError` is the repo's
+  own refusal (fix your config), anything else is a surprise (fix fux).
+- ⚠ **`daemon.status` shipped UNDECLARED.** It is now in
+  [`state.schema.json`](../../src/fux/maintain/state.schema.json), which is the
+  gap that file exists to close — two readers were hand-rolling their own
+  tolerance for what might be in it.
+- **`fux doctor` surfaces it**, because `fux daemon status` is what a person runs
+  when they already suspect something and `doctor` is what they run when they do
+  not. A daemon that never ran is **not** a finding — a check that fires for
+  everyone is one people learn to skip.
+
 ### Consequences
 
 - **There is no path into a committed shard that skips L5.** That is the

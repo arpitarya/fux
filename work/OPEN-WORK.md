@@ -18,16 +18,6 @@ and `L8` ratified. Removed rather than ticked, per rule 2.
 
 ## Blocked on Arpit — decisions
 
-- **W-82 ruling 3 — narrow-by-default — is now unblocked and awaiting the
-  call.** The reason it was held was that the daemon had never been shown to
-  work; it now has been, against real external URLs
-  ([run](regression/2026-08-27-daemon-real-url/report.md)): TLS, DNS, two CDNs,
-  a page that changed externally and was re-indexed unassisted one sweep later,
-  a real `404`, and the **first ever exercise of the rate-limit path against a
-  real `429`**. ⚠ **Proxy and SSO remain uncovered** and they are exactly where
-  a sweep silently stops inside a corporation — which is narrow-by-default's
-  blast radius. **The recommendation is that it may land. The session does not
-  take the call.**
 - ⚠ **R10 is `INCONCLUSIVE` because the pre-registration contradicts itself**,
   and the question is one line —
   [VERDICT](regression/2026-08-27-r10-separation-floor/VERDICT.md). On a curve
@@ -36,12 +26,6 @@ and `L8` ratified. Removed rather than ticked, per rule 2.
   non-monotone row (no change)? **Either answer is a NEW pre-registration, never
   an edit to the frozen one.** ⚠ Whichever way, six queries sit at or above
   `0.5` and no reading supports shipping a constant.
-- **The daemon's status carries no reason**, and the 2026-08-27 run sharpened
-  it: `_sweep` returns `"failed"` for a `FuxError` about `max_parallel` exactly
-  as it does for a dead network — **and a sweep that returns `"ok"` can skip
-  URLs silently too.** Two of seven URLs were skipped in a real run and the only
-  surface that said so was a foreground `fux update` nobody runs. Widening the
-  shape is a `maintain/state.schema.json` change and is not an agent's call.
 - **Does a URL belong in `.fux/enrich/queue.tsv`?** The file path routes an
   unreadable document there with its reason; the URL path routes it nowhere
   (`grep -c queue urlsrc.py` → `0`), so **a URL that needs a model can never be
