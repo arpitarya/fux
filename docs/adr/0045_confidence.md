@@ -344,10 +344,15 @@ covered — found 2026-08-27; `doc_coverage` added 2026-08-28, NOT gating.**
 
 ### Decision 12's outcome — the signal ships, the gate does not
 
-**Arpit ruled 2026-08-28: add per-document coverage alongside, and let
-`grounded` require both.** The first half shipped. **The second half is held on
-a measurement he did not have when he ruled**, and it is recorded here rather
-than quietly applied or quietly dropped.
+**Ruled in two steps, and the second step reversed the first — which is the
+point of measuring.** Arpit ruled *"add per-document coverage alongside, and let
+`grounded` require both"*; the field was built, the gate was measured, and shown
+the numbers below he ruled again on 2026-08-28: **leave the gate off, publish
+the signal.**
+
+✅ **Both rulings are his and the record keeps both**, because the sequence is
+the evidence: a rule that looked obviously right cost 19 of 50 correct answers
+the moment it met data.
 
 **`doc_coverage` is computed and published** — the same idf mass as `coverage`,
 over the **top-ranked document's own terms**. It is handed out through
@@ -384,6 +389,11 @@ overlap.** Measured against the playground's 50 goldens and the 15 decoys:
 **What would change this:** a decoy set large enough for the two distributions
 to be estimated rather than sampled, and a pre-registration that fixes the floor
 before any score exists under it. **Not a number picked from this table.**
+
+⚠ **The general lesson, because it will recur:** finding a real case tells you a
+defect **exists**. It tells you nothing about whether a **threshold can catch
+it**. Those are two measurements, and this record now carries an instance of the
+second one contradicting the first.
 
 ### Consequences
 

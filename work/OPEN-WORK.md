@@ -18,29 +18,11 @@ and `L8` ratified. Removed rather than ticked, per rule 2.
 
 ## Blocked on Arpit — decisions
 
-- ⚠ **R10 is `INCONCLUSIVE` because the pre-registration contradicts itself**,
-  and the question is one line —
-  [VERDICT](regression/2026-08-27-r10-separation-floor/VERDICT.md). On a curve
-  that crosses `t`, falls back one bin, then rises: does the selection rule's
-  *"stays at or above it"* govern (floor `0.5`), or the verdict table's
-  non-monotone row (no change)? **Either answer is a NEW pre-registration, never
-  an edit to the frozen one.** ⚠ Whichever way, six queries sit at or above
-  `0.5` and no reading supports shipping a constant.
 - **Does a URL belong in `.fux/enrich/queue.tsv`?** The file path routes an
   unreadable document there with its reason; the URL path routes it nowhere
   (`grep -c queue urlsrc.py` → `0`), so **a URL that needs a model can never be
   queued for one.** `queue.tsv` is committed, so this changes committed bytes.
   [ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 11 names it, undecided.
-- ⚖ **Should `grounded` gate on `doc_coverage`?** You ruled *"add it alongside,
-  and let `grounded` require both"* on 2026-08-28. **The first half shipped; the
-  second is held on a measurement you did not have when you ruled**
-  ([run](regression/2026-08-28-doc-coverage/report.md)): the one decoy that
-  reaches the clause sits at **0.710**, *inside* the real goldens'
-  **0.401–1.000**, so **no floor separates them** — and a floor of `1.0` demotes
-  **19 of 50** correct answers. `DOC_COVERAGE_FLOOR = 0.0`, the clause is off,
-  and the signal is published so an agent can act on it. ⚠ **14 of 15 decoys
-  never reach the clause**, so the original finding is one query in fifteen.
-  **Picking a number from that table would be R10's failure in a new costume.**
 - ✅ **The fork counts were RE-DERIVED on 2026-08-27 and W-82 has ZERO open
   forks of its own.** 27 total; **18 ruled** by
   [the ledger](open/W-82-rulings-2026-08-27.md); of the remaining 9, **6** are
@@ -110,11 +92,14 @@ measurement**, and **every "no detected change" ruling currently rests on it.**
 
 ### [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) · [ADR-QUALITY](../docs/adr/0044_quality-contract.md)
 
-- **W-90** · `arpit` · **the confidence plane. R10 RAN on 2026-08-27** and is
-  [`INCONCLUSIVE`](regression/2026-08-27-r10-separation-floor/VERDICT.md) —
-  **not because the data was thin (it was), but because the pre-registration
-  froze two rules that disagree on this curve.** One question, in the decisions
-  section above. `SEPARATION_FLOOR` stays `0.10`.
+- **W-90** · ✅ **CLOSED 2026-08-28.** R10 ran, is
+  [`INCONCLUSIVE`](regression/2026-08-27-r10-separation-floor/VERDICT.md), and
+  its contradiction is **ruled**: the verdict table governs, so a non-monotone
+  crossing is *no change* and `SEPARATION_FLOOR` stays `0.10`. `doc_coverage`
+  ships as a published signal with **the gate ruled off** on a measurement.
+  ⚠ **The verdict is unedited** — the rule is settled, the result is not
+  overturned. ⚠ **Neither ruling reaches the `grounded` decoy at `0.58`**, which
+  is recorded in ADR-CONFIDENCE decision 12 and is nobody's open item.
   ⚠ **`separation` is ORDINAL and Chow's rule assumes a probability** — the run
   named that gap rather than closing it, and **a report calling the result
   *calibrated* is wrong.** The wording was fixed in advance and was honoured.

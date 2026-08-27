@@ -24,6 +24,45 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — R10 ruled, the doc_coverage gate ruled off, and a file that vanished  ·  Claude Code
+
+- **Asked:** keep resolving.
+
+- **Did, R10.** Arpit ruled the contradiction: **the verdict table governs.** A
+  non-monotone crossing is *no change*, and a selection rule applies **only once
+  the verdict table is satisfied** — a selection rule says *which value*, a
+  verdict table says *whether a value may be taken at all*, and reading the
+  first without clearing the second is how a number gets picked out of noise.
+  **`SEPARATION_FLOOR` stays `0.10`.**
+  ⚠ **`VERDICT.md` was NOT edited and stays `INCONCLUSIVE`.** The rule is
+  settled; the result is not overturned. Nothing supersedes a measurement except
+  a better measurement, and the run genuinely was undecidable under the document
+  it was ruled against.
+
+- **Did, `doc_coverage`.** Shown the overlap table, Arpit ruled **leave the gate
+  off and publish the signal**. Both of his rulings on this are kept in
+  ADR-CONFIDENCE, because the sequence is the evidence: a rule that looked
+  obviously right cost 19 of 50 correct answers the moment it met data.
+
+- ⚠ **Neither ruling reaches the `grounded` decoy at `0.58`.** It is above the
+  floor either R10 reading would have picked, and the `doc_coverage` gate is
+  off. It is recorded in ADR-CONFIDENCE decision 12 as a known limit and is
+  nobody's open item.
+
+- **⚠ `DOGFOOD.md` disappeared from the working tree mid-session.** It is in
+  `HEAD`, none of my four commits touched it, and it was gone after the last of
+  them — so something outside this session deleted it. Restored from `HEAD`.
+  **`CLAUDE.md` warns that concurrent sessions are real; this is what that looks
+  like.** It surfaced only because `test_doc_links` went red.
+
+- **Decided / open:** waves 0–3 are closed. Wave 4 (the fetcher contract) and
+  wave 5 (the measurement inputs) remain.
+
+- **Verified:** `tests/` **2 232 passed** · `tests_e2e/` **73 passed**.
+
+- **Next:** wave 4 — fork 3 (`validate`), fork 4 (token storage), and whether a
+  URL belongs in the committed enrich queue.
+
 ## 2026-08-28 — wave 3: the signal ships, the threshold does not  ·  Claude Code
 
 - **Asked:** continue resolving one by one.

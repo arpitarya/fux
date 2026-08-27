@@ -412,10 +412,27 @@ one (W-82 ruling 8).
   §A pre-registered threshold may never move. ⚠ **Picking `0.5` would be the
   moving-threshold failure in its most natural costume**: a defensible reading
   of a frozen sentence that quietly discards the row saying not to.
-- **The rule going forward.** One line in the pre-registration — *"row N
-  governs; the selection rule applies only once row N is satisfied"*, or the
-  reverse — makes the run decidable. **Only data can expose this**, which is the
-  argument for freezing the document rather than the argument against it.
+- ✅ **RULED by Arpit 2026-08-28: the VERDICT TABLE governs.** A crossing that
+  is non-monotone is *"too noisy to read → no change"*, and the selection rule
+  applies **only once the verdict table has been satisfied**. So on R10's curve
+  the answer is **no change** — `SEPARATION_FLOOR` stays `0.10`.
+- **The rule going forward, now settled:** *a verdict table outranks a selection
+  rule.* A selection rule says **which value** to take; a verdict table says
+  **whether a value may be taken at all**, and reading the first without
+  clearing the second is how a number gets picked from noise. **Every future
+  pre-registration states this ordering explicitly** rather than relying on it.
+- ⚠ **R10's `VERDICT.md` is NOT edited and stays `INCONCLUSIVE`.** Decision 5
+  freezes a verdict, and **nothing supersedes a measurement except a better
+  measurement**. What this ruling settles is the *rule*, not the result: the run
+  was genuinely undecidable under the document it was ruled against, and it
+  stays that way in the record.
+- ⚠ **This ruling does NOT reach the `grounded`-decoy case.** That query
+  separates at `0.58` — above the `0.5` the selection rule would have picked —
+  so no ruling on R10 catches it either way. `separation` measures
+  **decisiveness**, and a corpus of near-misses is decisive about its best
+  near-miss. See [ADR-CONFIDENCE](0045_confidence.md) decision 12.
+- **Only data could expose the contradiction**, which is the argument for
+  freezing the document rather than against it.
 
 
 ### Consequences

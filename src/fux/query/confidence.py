@@ -127,8 +127,10 @@ SEPARATION_FLOOR = 0.10
 #: case is **one query in fifteen**, and this module now *reports* it rather than
 #: claiming to catch it.
 #:
-#: **Gating is Arpit's call and is open.** Set this above `0.0` only with a
-#: measurement behind it. See ADR-CONFIDENCE decision 12.
+#: ✅ **RULED by Arpit 2026-08-28: leave the gate off; publish the signal.**
+#: Shown the table above, he chose reporting over a claim fux cannot support.
+#: **Set this above `0.0` only with a bigger decoy set and a PRE-REGISTERED
+#: floor** — not a number read off 65 queries. ADR-CONFIDENCE decision 12.
 DOC_COVERAGE_FLOOR = 0.0
 
 
