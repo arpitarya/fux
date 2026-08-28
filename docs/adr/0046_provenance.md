@@ -451,8 +451,10 @@ grep -c "_emit(" src/fux/query/__init__.py
 **Project docs**
 
 - [`CLAUDE.md`](../../CLAUDE.md) — §Non-negotiable constraints, L8
-- [`work/open/W-91-the-provenance-plane.md`](../../work/open/W-91-the-provenance-plane.md)
-- [`work/proposals/answer-provenance.md`](../../archive/proposals/answer-provenance.md)
+- [`archive/open/W-91-the-provenance-plane.md`](../../archive/open/W-91-the-provenance-plane.md)
+  and [`archive/proposals/answer-provenance.md`](../../archive/proposals/answer-provenance.md)
+  — **named, never cited** (archive is not evidence). The decision is grounded
+  in this record and in `CLAUDE.md` §Non-negotiable constraints above.
 
 **Papers and specifications**
 

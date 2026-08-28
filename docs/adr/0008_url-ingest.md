@@ -231,6 +231,25 @@ tail is never refreshed unless something else sweeps it."*
   without any commit, now re-fetches only on `--all`. That is the trade ruling 3
   makes, and ruling 10 is what covers it.
 
+**9. Answer-time verification fixes CORRECTNESS and cannot fix RECALL, and that
+limit survives every ruling this plane has had.** Recorded 2026-08-28, moved here
+from W-82's queue row as that item closed — **it was the only place the gap was
+written down.**
+
+- **The head is covered.** A URL someone queries is cited, fetched, and its sha
+  compared, so a stale answer is caught at the moment it would have been given.
+- ⚠ **The tail is not, and no amount of answer-time work reaches it.** **A
+  changed URL that never enters the candidate window is never cited, never
+  fetched, and nothing notices.** The document is wrong in the index and no
+  query is asking the question that would expose it.
+- **That is what the daemon is for** ([ADR-MAINTENANCE](0032_hooks.md) decision
+  9), and it is why rulings 3 and 10 had to land together: with narrow-by-default
+  the tail is refreshed by the clock **and by nothing else**.
+- ⚠ **A repo running no daemon has no tail coverage at all.** `fux update --all`
+  is the whole remedy, and it is a command somebody has to remember. **Stated as
+  a cost rather than solved**, because solving it means either fetching on a path
+  that is supposed to be offline, or a background process nobody asked to start.
+
 ### Consequences
 
 - **`src/fux/` contains zero network lines**, which is the property the adapter

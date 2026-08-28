@@ -365,5 +365,5 @@ Reopen this verdict when **any** becomes true:
 - [Information retrieval evaluation using test collections](https://link.springer.com/article/10.1007/s10791-016-9281-7)
 - [Goodhart's Law Comes for Every Benchmark You Trust — CACM](https://cacm.acm.org/blogcacm/goodharts-law-comes-for-every-benchmark-you-trust/)
 - **In-repo:** [ADR-RS](../../docs/adr/0036_predictions.md) ·
-  [W-82 §5.2](../open/W-82-the-consolidated-build.md) ·
+  [W-82 §5.2](../../archive/open/W-82-the-consolidated-build.md) ·
   [P1-GATE verdict](../regression/2026-08-09-pruning-eval/VERDICT.md)

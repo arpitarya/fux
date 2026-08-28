@@ -37,7 +37,7 @@ can catch a wrong one, and fork 3 is order-dependent in a way that cannot be
 repaired afterwards. **Sonnet is fine for the phases below it**, once the
 contract is written.
 
-**Split from [W-82](W-82-the-consolidated-build.md) §5.2 on 2026-08-27**
+**Split from [W-82](../../archive/open/W-82-the-consolidated-build.md) §5.2 on 2026-08-27**
 (*"let's cover it as part of separate work"*), then **widened the same day** to
 absorb W-82's measurement work.
 
@@ -305,7 +305,9 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
       that four functions survived two callers untouched, and ADR-FETCHER
       decision 3's refusal of anything that composes is independent of P3.
       **The design is fully worked out** in
-      [W-82 §5.1](W-82-the-consolidated-build.md#51--url-freshness--8-forks),
+      [ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 12 — the design and the
+      invariant, moved to a live record when W-82 archived, because an archived
+      file may be named and never cited —
       including the one invariant an implementer must carry: **a changed token
       must NEVER mean a changed record** — token unchanged → skip the fetch, and
       that is *all* `validate` may do; token changed → fetch, then **still**
@@ -400,7 +402,7 @@ plane: **`fux daemon`'s sweep never reached the ingest**, in any repository,
 because `from ..ingest import run` binds the re-exported function and the
 broad `except Exception` turned the resulting `AttributeError` into a silent
 `"failed"` forever. Written up under
-[W-82 ruling 3](W-82-rulings-2026-08-27.md), which is the ruling being **held**
+[W-82 ruling 3](../../archive/open/W-82-rulings-2026-08-27.md), which is the ruling being **held**
 on *"prove the daemon runs in a real repo"* — **the hold was right.**
 
 ### What P5 does NOT establish
@@ -434,7 +436,7 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 ## References
 
 - **The verdict:** [`work/compare/what-good-means.compare.md`](../compare/what-good-means.compare.md)
-- **The parent:** [W-82](W-82-the-consolidated-build.md) §5.2 — now a pointer here
+- **The parent:** [W-82](../../archive/open/W-82-the-consolidated-build.md) §5.2 — now a pointer here
 - **The rule it extends:** [ADR-RS](../../docs/adr/0036_predictions.md)
 - **The two caught failures:** [P1-GATE](../regression/2026-08-09-pruning-eval/VERDICT.md) ·
   [budget sweep](../regression/2026-08-22-budget-sweep/ANALYSIS.md)

@@ -283,7 +283,7 @@ should have declined, and this is the surface on which it declines.
       a bare `fux ask` now gets NO confidence block and no `answerable: false`.**
       That is the exact blindness §1 describes, reintroduced on one of the two
       surfaces. **The mitigation is documentation, and documentation is weaker
-      than a default** — [W-82](../../work/open/W-82-the-consolidated-build.md)
+      than a default** — [W-82](../../archive/open/W-82-the-consolidated-build.md)
       §3.6's `fux.agent.md` rewrite and the `fux-usage` skill must both teach
       `--band`, or the flag is a feature nothing uses.
     - **`output.schema.json#confidence` becomes conditional on argv.** The key
@@ -419,7 +419,7 @@ review.
 
 **What we now owe: R10**, and it is owed to ADR-QUALITY's frozen `t`, not to
 this record's taste. Filed as
-[W-90](../../work/open/W-90-the-confidence-plane.md).
+[W-90](../../archive/open/W-90-the-confidence-plane.md).
 
 ### Alternatives considered
 
@@ -510,7 +510,7 @@ evidence.*
 
 **Project docs**
 
-- [`work/open/W-90-the-confidence-plane.md`](../../work/open/W-90-the-confidence-plane.md)
+- [`work/open/W-90-the-confidence-plane.md`](../../archive/open/W-90-the-confidence-plane.md)
 
 **Papers and specifications**
 

@@ -24,6 +24,52 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — OPEN-WORK cut from 209 lines to 150, and most of what went was tombstones  ·  Claude Code
+
+- **Asked:** *"do a cleanup of open work document"*.
+
+- **Did, first: re-derived rather than read.** The file's own rule 2 says *"a
+  resolved thing leaves this file entirely — including the sentence saying it
+  resolved"*, and **most of the file was exactly that**: struck-through table
+  rows, ✅ notes explaining absences, and a section headed *"Blocked on Arpit —
+  hands"* whose entire content was *"Empty. All seven closed."*
+  **The length of this file is the signal of how much is pending**, and a queue
+  narrating its own history stops being that signal.
+
+- **Closed and archived three items** (rule 3 — outcome in `IMPLEMENTATION.md`
+  first, then the row goes and the detail file moves): **W-82** with its rulings
+  ledger, **W-90**, **W-91**. `work/open/` is down to one file.
+
+- **⚠ The catch worth remembering, and it nearly cost a claim.** W-82's row was
+  the **only** written home of *"answer-time verification fixes correctness and
+  cannot fix recall — a changed URL never enters the candidate window, so it is
+  never cited, never fetched, and nothing notices."* It was in no record.
+  Deleting the row would have deleted the claim. **Moved to ADR-URL-INGEST
+  decision 9 first**, and rule 3 now says to check for this before deleting a
+  row.
+
+- **Repointed 14 links** into `archive/open/`. Two needed more than a repoint:
+  ADR-PROVENANCE's Reference block had a display path that no longer matched its
+  target and now says **named, never cited** with the live grounding named
+  beside it; and W-87's fork-3 reference was a **citation** of a design, so it
+  moved to **ADR-FETCHER decision 12** rather than into the archive.
+
+- **What is actually open**, and it is short: **two decisions** (adopt the
+  measured resolution floor; ratify `is_rate_limited`, which was never ruled and
+  is now load-bearing), **two authoring tasks** needing someone who has not read
+  the goldens, and **two test-surface gaps** (Windows; `validate()` not reaching
+  existing repos).
+
+- **Folded three lessons into the rules themselves**, where the next session will
+  read them: rule 2 gained the 209-line tombstone case, rule 3 gained *check what
+  the row was the only home of*, and rule 4 gained the three blockers that
+  evaporated the moment a session had a shell.
+
+- **Verified:** `tests/` **2 248 passed, 1 skipped** · `tests_e2e/` **73 passed**.
+
+- **Next:** Arpit on the resolution floor and `is_rate_limited`; a blind author
+  for the `unanswerable` class.
+
 ## 2026-08-28 — wave 5: the floor admits coin flips, and two inputs I may not author  ·  Claude Code
 
 - **Asked:** keep resolving.

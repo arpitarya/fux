@@ -25,7 +25,7 @@ it, nothing can veto it, and its reasoning is wherever someone last wrote a
 paragraph.
 
 This record decides it, and adds the relation
-[W-82 ruling 4](../../work/open/W-82-rulings-2026-08-27.md) called for.
+[W-82 ruling 4](../../archive/open/W-82-rulings-2026-08-27.md) called for.
 
 **The defect, concretely.** Ownership is matched by longest path prefix:
 
@@ -102,7 +102,7 @@ src/fux/query/rank.py        ADR-RANKING         ADR-TUNE
 - **The register already names the hole in its own prose**: *"A record that
   describes a component it does not own has no mechanical protection at all.
   Open both."* — an instruction to a human, enforced by nothing.
-- [W-82 ruling 4](../../work/open/W-82-rulings-2026-08-27.md) ruled the relation
+- [W-82 ruling 4](../../archive/open/W-82-rulings-2026-08-27.md) ruled the relation
   in; **this record is where it lands**, on Arpit's call 2026-08-27 that it
   deserves a record rather than another paragraph.
 
@@ -243,7 +243,7 @@ src/fux/query/rank.py        ADR-RANKING         ADR-TUNE
 
 ## References
 
-- [W-82 ruling 4](../../work/open/W-82-rulings-2026-08-27.md) — the ruling
+- [W-82 ruling 4](../../archive/open/W-82-rulings-2026-08-27.md) — the ruling
 - [ADR-LAWS](0001_laws.md) — Law zero, *name the record or say "no ADR affected"*
 - [ADR-RS](0036_predictions.md) · [ADR-OUTPUT](0047_output-defaults.md) ·
   [ADR-CONFIDENCE](0045_confidence.md) — the records the seed rows come from
