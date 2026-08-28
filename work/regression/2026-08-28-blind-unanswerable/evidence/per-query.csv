@@ -1,0 +1,21 @@
+id,query,ground_truth_answerable,engine_answerable,band,separation,separation_floor,coverage,doc_coverage,n_results,abstained_correctly
+u001,What are the names of all four Calder Group regions?,False,True,grounded,0.4755,0.1,1.0,0.8855,5,False
+u002,What criteria distinguish a SEV1 incident from a SEV2 at Calder Group?,False,True,partial,0.6833,0.1,0.4009,0.4009,5,False
+u003,What is the monthly availability SLO target for the checkout service?,False,True,partial,0.8276,0.1,0.1985,0.1762,5,False
+u004,How much memory does a Calder Gateway node proxy consume per node?,False,True,grounded,0.5741,0.1,1.0,0.9639,5,False
+u005,Which component handles north-south ingress traffic into the Calder platform?,False,True,partial,0.5568,0.1,0.5107,0.3935,5,False
+u006,How do I roll back my own service to a previous application version with calderctl?,False,True,partial,0.0061,0.1,0.73,0.44,5,False
+u007,What are the default CPU and memory quotas assigned to a new tier 3 service?,False,True,partial,0.5556,0.1,0.6874,0.5716,5,False
+u008,How long does a service name review in calder/service-registry usually take to complete?,False,True,grounded,0.2047,0.1,1.0,0.6066,5,False
+u009,How do I create a new team group and get it provisioned on the Calder platform?,False,True,partial,0.0286,0.1,0.4063,0.4063,5,False
+u010,How much is the on-call stipend paid per week of rotation?,False,True,partial,0.3483,0.1,0.4828,0.2841,5,False
+u011,Who is the current data protection lead who grants retention exceptions?,False,True,grounded,0.7492,0.1,1.0,0.8882,5,False
+u012,"How do I request a platform exception to mandatory sidecar injection, and who approves it?",False,True,grounded,0.4481,0.1,1.0,0.7926,5,False
+u013,"Are calderctl write commands audit-logged, and where can I read that audit trail?",False,True,partial,0.1046,0.1,0.6999,0.4542,5,False
+u014,"How many days after an incident must a postmortem be published, and what template does it use?",False,True,partial,0.325,0.1,0.6835,0.4795,5,False
+u015,Which team owns the payments service?,False,True,weak,0.0389,0.1,1.0,1.0,5,False
+u016,Does Calder Gateway support HTTP/3 and bidirectional gRPC streaming?,False,True,partial,0.6326,0.1,0.1435,0.1435,5,False
+u017,What is the connection draining timeout when a node proxy restarts during a rollback?,False,True,grounded,0.1693,0.1,1.0,0.4653,5,False
+u018,What is the procedure and expected recovery time for restoring a service database from backup?,False,True,partial,0.257,0.1,0.4348,0.2993,5,False
+u019,How is a customer deletion request submitted and how is it verified before the 30-day clock starts?,False,True,partial,0.6211,0.1,0.5592,0.4681,5,False
+u020,"Which Kubernetes version do the Calder clusters run, and how often are they upgraded?",False,True,partial,0.2732,0.1,0.4811,0.4811,5,False

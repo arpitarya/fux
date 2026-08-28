@@ -1,0 +1,50 @@
+{"id": "q001", "q": "steps to revert a bad calder gateway release"}
+{"id": "q002", "q": "how to roll back a helix mesh sidecar release"}
+{"id": "q003", "q": "what replaced helix mesh"}
+{"id": "q004", "q": "why did we adopt a service mesh in the first place"}
+{"id": "q005", "q": "how long do we keep customer order history"}
+{"id": "q006", "q": "what happened during the checkout outage"}
+{"id": "q007", "q": "how many reviewers does a tier 1 deploy need"}
+{"id": "q008", "q": "who do I page when traffic between services is failing"}
+{"id": "q009", "q": "I am shipping my first service where do I start"}
+{"id": "q010", "q": "what does calderctl exit code 3 mean"}
+{"id": "q011", "q": "what is the soak period for the revenue path tier"}
+{"id": "q012", "q": "how do I freeze an in flight rollout"}
+{"id": "q013", "q": "am I allowed to be on call two weeks in a row"}
+{"id": "q014", "q": "does an internal service page anyone overnight"}
+{"id": "q015", "q": "what is the current decision for east west traffic"}
+{"id": "q016", "q": "which proxy do we run between services today"}
+{"id": "q017", "q": "why did we move away from sidecars"}
+{"id": "q018", "q": "how much memory did the sidecar actually use"}
+{"id": "q019", "q": "is helix mesh still in use anywhere"}
+{"id": "q020", "q": "which rollback do I use for a tier that has not migrated"}
+{"id": "q021", "q": "why is the soak fourteen days now instead of two"}
+{"id": "q022", "q": "can I start new work against helix mesh"}
+{"id": "q023", "q": "what max surge should I use rolling back the node proxy"}
+{"id": "q024", "q": "what max surge for a sidecar rollback"}
+{"id": "q025", "q": "verify per node after rolling back"}
+{"id": "q026", "q": "verify per service after rolling back"}
+{"id": "q027", "q": "the rollback failed should I try it again"}
+{"id": "q028", "q": "how long does a gateway rollback take"}
+{"id": "q029", "q": "how long does a mesh rollback take"}
+{"id": "q030", "q": "pods skipped silently during a rollback"}
+{"id": "q031", "q": "is the legacy runbook still valid"}
+{"id": "q032", "q": "does the superseded networking ADR still apply anywhere"}
+{"id": "q033", "q": "why keep a superseded record in the repository"}
+{"id": "q034", "q": "my alert paged at 3am but my service is internal"}
+{"id": "q035", "q": "I added a retry and things got worse"}
+{"id": "q036", "q": "who approves a change to the revenue path"}
+{"id": "q037", "q": "what does the incident lead actually do"}
+{"id": "q038", "q": "where do I record my service data class"}
+{"id": "q039", "q": "what happens if I never state a classification"}
+{"id": "q040", "q": "how long are backups kept"}
+{"id": "q041", "q": "can I delete a customer record out of the backups"}
+{"id": "q042", "q": "why is having two rollback procedures dangerous"}
+{"id": "q043", "q": "we had a different retry policy in every service"}
+{"id": "q044", "q": "why not use ebpf instead of a proxy"}
+{"id": "q045", "q": "what is the cheapest tier to start on"}
+{"id": "q046", "q": "how do we stop a slow dependency taking down checkout"}
+{"id": "q047", "q": "blast radius of a bad config push"}
+{"id": "q048", "q": "how do I tell if someone else is mid incident before I deploy"}
+{"id": "q049", "q": "what did we promise to fix after the outage and did we"}
+{"id": "q050", "q": "a hazard we wrote down but never actually fixed"}

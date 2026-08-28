@@ -65,7 +65,7 @@ contract.** It may run the moment a URL corpus exists.
 |---|---|---|
 | ~~**P0**~~ | ~~declare the contract — the six forks~~ | ✅ **RULED 2026-08-27** — [ADR-QUALITY](../../docs/adr/0044_quality-contract.md). P1–P2 are unblocked on the contract and blocked only on inputs |
 | ~~**P1**~~ | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | ✅ **ALL BUILT, and three of four now USED to adjudicate** (decoys 2026-08-27; `unanswerable` and placebo 2026-08-28). 🔴 **The sealed subset is EXERCISED, NOT PROVEN** — it postdates the enrichment it was applied to, so its split cannot test contamination; that is a *chronology* limit, not an unbuilt apparatus, and it is tracked in ADR-RS decision 15 rather than here |
-| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | 🔴 **`recall@k` is BLOCKED ON AN ADR, not on inputs** — two blind annotators (κ = 0.96) measured the goldens' relevance sets **incomplete**, so the metric is not computable until the schema decision lands. **Part B needs corpora that no longer exist.** See §P2 below |
+| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | ✅ **`recall@k` IS COMPUTED** — [2026-08-28](../regression/2026-08-28-first-recall/report.md), `@5` 0.9535 over the 43/50 declared `complete`, after Arpit ruled option B and [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) decision 12 split the two claims. 🔴 **It is `informed` and not a generalisation estimate** — the installed enrichment was fitted to these queries. **What remains: the funnel's `unanswerable` gate (engine scores 0/20), a clean-corpus recall, and Part B, whose corpora no longer exist** |
 | ~~**P3**~~ | **§3.0** — sanitized-sha stability | ✅ **PASS 2026-08-27**, 19/19 = 100 % — [verdict](../regression/2026-08-27-p3-sha-stability/VERDICT.md) |
 | ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 12, [ADR-MAINTENANCE](../../docs/adr/0032_hooks.md) decision 13 |
 | ~~**P5**~~ | ~~`tests_e2e/` verification~~ | ✅ **DONE 2026-08-27** — 74/74 on 3.11.15; found one real defect |
@@ -204,9 +204,12 @@ the two controls — **owed, not built**"*.
       removal — **this repo has recorded two vacuous passes and does not need a
       third.**
 
-- [ ] **ADR-RS decision 15 loses `NOT BUILT`** in the same change. ⚠ **NOT
-      flipped** — decision 15 is about the content-free placebo, and three of
-      P1's four items are still owed. One item landing does not discharge it.
+- [x] ✅ **ADR-RS decision 15 has lost `NOT BUILT`** — all four controls are
+      built. ⚠ **Built is not proven, and the marker is now per-control**: the
+      decoys (2026-08-27), the `unanswerable` class and the placebo
+      (2026-08-28) have each adjudicated; 🔴 **the sealed subset has not and
+      cannot yet** — it postdates the artifact it was applied to. The scoreboard
+      lives in ADR-RS decision 15.
 
 ⚠ **The claim that these needed an absent `fux-playground` was FALSE** — it was
 on the machine all along, with its 50 goldens, and two of the three were built on
@@ -216,8 +219,9 @@ visible set and whoever builds it must resolve that tension, not inherit it.
 
 ## P2 — the quality runs
 
-- [ ] **`recall@k` — the blocker was mis-stated, and it is smaller than it
-      reads.** ⚠ **CORRECTED 2026-08-28 (Claude Code, ran the audit):** the
+- [x] ✅ **`recall@k` — COMPUTED 2026-08-28.** The blocker was mis-stated, then
+      correctly restated, then ruled and built. History kept below because the
+      two wrong turns are the instructive part.** ⚠ **CORRECTED 2026-08-28 (Claude Code, ran the audit):** the
       earlier belief that the golden schema carries a multi-document `expect`
       list — `expect: [{"id": ..., "max_rank": ...}, ...]` — was itself wrong.
       That key is `tools/differential/playground_grade.py`'s docstring, which
@@ -292,7 +296,9 @@ visible set and whoever builds it must resolve that tension, not inherit it.
                   **The 7 `partial` rows are where the two annotators' exact
                   sets differed**; they take the union and are excluded from
                   `recall@k` rather than being adjudicated by an agent.
-- [ ] **The `unanswerable` class does not exist** and must be authored **blind**,
+- [x] ✅ **The `unanswerable` class EXISTS as of 2026-08-28** — authored blind,
+      validated by a second blind reader, and the engine scores **0 of 20** on
+      it. Original framing kept: it did not exist, and had to be authored **blind**,
       or it contaminates the set it is meant to test (the W-78 lesson).
       ✅ **UNBLOCKED 2026-08-28 (Arpit): a fresh session, corpus only, with the
       prompt committed** — [`tools/quality-controls/BLIND-AUTHOR-BRIEF.md`](../../tools/quality-controls/BLIND-AUTHOR-BRIEF.md).
@@ -539,15 +545,24 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 - [x] The cost weights are committed **before** the first score under them.
       `t = 0.75` → `c = 2`, frozen 2026-08-27 with `recall@k` still uncomputed —
       which is exactly the ordering the rule demands.
-- [ ] **`recall@k` is computed and is the reported headline.** ✅ **The schema
-      blocker is GONE — ruled option B, 2026-08-28** ([ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
-      decision 12), built and validated, with the migrated 50-query set filed
-      (**43 `complete`**, so recall is computable over 43/50 the moment it
-      lands). **What remains is two mechanical steps, neither a decision:**
-      ① the playground's `queries.jsonl` is swapped for the migrated file —
-      a human's call in a sibling repo, not an agent's; ② a harness computes
-      the number and reports it **with the 43/50 fraction beside it**, which
-      decision 12 rule b requires.
+- [x] ✅ **`recall@k` IS COMPUTED — 2026-08-28**, the first number under this
+      contract: [the run](../regression/2026-08-28-first-recall/report.md).
+      Over the 43 of 50 declared `complete`: **`@1` 0.5969 · `@3` 0.8566 ·
+      `@5` 0.9535 · `@10` 0.9884**, as the curve against context bytes decision
+      2 requires, with the 43/50 fraction reported beside it per rule b.
+      **19 of the 43 are multi-document**, where recall is genuinely not
+      `hit@k` (single 0.9583 vs multi 0.9474 at k=5).
+      ✅ **Back-compatibility verified rather than assumed** — after the swap,
+      `check.py` is 41 pass/9 xfail and the differential harness 41/0/9 in both
+      modes. **No `hit@k` number moved.**
+      🔴 **It is NOT a generalisation estimate, and must never be quoted as
+      one**: all ten installed enrichment files were written by an author who
+      had read these queries, so the number demonstrates the metric, not the
+      engine. A clean absolute needs the uncontaminated arms — **one command
+      away**, see the run's ANALYSIS.
+      ⚠ **The headline is still only half a headline**: decision 5 puts
+      `unanswerable` inside the gate, the class now exists, and **the engine
+      scores 0 of 20 on it** — so this figure describes the answerable half.
 - [ ] **The `judged` series pins model + prompt + version** and is never
       compared across judge versions. ⚠ **It IS ruled in** — fork 4, and
       [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) decision 9 governs

@@ -70,6 +70,51 @@ sessions; that is W-96.
 ⚠ **B4 and B8 never existed.** The item and the register both said *"thresholds
 B1–B9"*; the frozen document defines seven.
 
+## Wave 10 — `recall@k` exists (2026-08-28)
+
+**The metric ADR-QUALITY declared as its headline on 2026-08-27, and its own
+consequences said could not be computed, is computed.**
+[The run](regression/2026-08-28-first-recall/report.md).
+
+Over the **43 of 50** goldens declared `complete`, as the curve against context
+bytes decision 2 requires:
+
+| k | `recall@k` | mean ctx bytes |
+|---:|---:|---:|
+| 1 | 0.5969 | 2,988 |
+| 3 | 0.8566 | 9,079 |
+| 5 | **0.9535** | 15,135 |
+| 10 | 0.9884 | 27,048 |
+
+**19 of the 43 are multi-document**, which is why this is not `hit@k` renamed:
+single-doc `recall@5` 0.9583 against multi-doc 0.9474. For the other 24, recall
+**is** `hit@k` and always was.
+
+✅ **Back-compatibility verified rather than assumed** (decision 12 rule d).
+After swapping the migrated goldens in: `check.py` **41 pass / 9 xfail**, the
+differential harness **41/0/9 both modes**, `accelerator == scan` holding.
+**No `hit@k` number moved.**
+
+🔴 **The number is `informed` and is NOT a generalisation estimate.** All ten
+enrichment files installed on that corpus were written by an author who had read
+these queries. **It demonstrates the metric, not the engine** — and it is the
+kind of figure that escapes a report and becomes a slide, so the run, the record
+and the queue all say so.
+
+⚠ **The headline covers the ANSWERABLE half only.** Decision 5 puts
+`unanswerable` inside the gate, that class now exists, and the engine scores
+**0 of 20** on it.
+
+⚠ **A test of mine turned red on the migration and was WRONG, not the code.**
+`test_the_live_playground_goldens_are_valid_under_the_new_schema` asserted
+`eligible == []` — a snapshot of the pre-migration moment, not an invariant. It
+now asserts what is actually invariant: the file parses, every row obeys
+decision 12, and the slice accounts for every query.
+
+Records: ADR-QUALITY — the withheld output block is now filled, per its own
+promise that the first captured output belongs to the first run under the
+contract. Suite: **2392 passed / 2 skipped.** Nothing committed (instructed).
+
 ## Wave 9 — option B: the rank contract and the relevance set split (2026-08-28)
 
 **Arpit ruled the schema fork this session surfaced.** The evidence was two

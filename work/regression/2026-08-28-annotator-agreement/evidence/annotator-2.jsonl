@@ -1,0 +1,50 @@
+{"id": "q001", "relevant": ["docs/runbook-gateway-rollback.md"], "confidence": "high"}
+{"id": "q002", "relevant": ["docs/runbook-mesh-rollback-legacy.md"], "confidence": "high"}
+{"id": "q003", "relevant": ["docs/adr-0019-calder-gateway.md", "docs/adr-0007-helix-mesh.md"], "confidence": "high"}
+{"id": "q004", "relevant": ["docs/adr-0007-helix-mesh.md"], "confidence": "high"}
+{"id": "q005", "relevant": ["docs/policy-data-retention.md"], "confidence": "high"}
+{"id": "q006", "relevant": ["docs/postmortem-checkout-outage.md"], "confidence": "high"}
+{"id": "q007", "relevant": ["docs/reference-deployment-tiers.md", "docs/reference-calderctl.md"], "confidence": "medium"}
+{"id": "q008", "relevant": ["docs/guide-oncall-rota.md"], "confidence": "high"}
+{"id": "q009", "relevant": ["docs/guide-onboarding.md"], "confidence": "high"}
+{"id": "q010", "relevant": ["docs/reference-calderctl.md"], "confidence": "high"}
+{"id": "q011", "relevant": ["docs/reference-deployment-tiers.md"], "confidence": "high"}
+{"id": "q012", "relevant": ["docs/reference-calderctl.md", "docs/runbook-gateway-rollback.md", "docs/runbook-mesh-rollback-legacy.md"], "confidence": "medium"}
+{"id": "q013", "relevant": ["docs/guide-oncall-rota.md"], "confidence": "high"}
+{"id": "q014", "relevant": ["docs/reference-deployment-tiers.md", "docs/guide-oncall-rota.md", "docs/guide-onboarding.md"], "confidence": "medium"}
+{"id": "q015", "relevant": ["docs/adr-0019-calder-gateway.md"], "confidence": "high"}
+{"id": "q016", "relevant": ["docs/adr-0019-calder-gateway.md", "docs/guide-onboarding.md"], "confidence": "medium"}
+{"id": "q017", "relevant": ["docs/adr-0019-calder-gateway.md"], "confidence": "high"}
+{"id": "q018", "relevant": ["docs/adr-0019-calder-gateway.md"], "confidence": "high"}
+{"id": "q019", "relevant": ["docs/adr-0019-calder-gateway.md", "docs/runbook-mesh-rollback-legacy.md"], "confidence": "medium"}
+{"id": "q020", "relevant": ["docs/runbook-mesh-rollback-legacy.md", "docs/runbook-gateway-rollback.md", "docs/adr-0019-calder-gateway.md"], "confidence": "medium"}
+{"id": "q021", "relevant": ["docs/reference-deployment-tiers.md", "docs/adr-0019-calder-gateway.md", "docs/postmortem-checkout-outage.md"], "confidence": "medium"}
+{"id": "q022", "relevant": ["docs/adr-0007-helix-mesh.md"], "confidence": "high"}
+{"id": "q023", "relevant": ["docs/runbook-gateway-rollback.md", "docs/reference-calderctl.md"], "confidence": "high"}
+{"id": "q024", "relevant": ["docs/runbook-mesh-rollback-legacy.md", "docs/reference-calderctl.md"], "confidence": "high"}
+{"id": "q025", "relevant": ["docs/runbook-gateway-rollback.md", "docs/reference-calderctl.md"], "confidence": "medium"}
+{"id": "q026", "relevant": ["docs/runbook-mesh-rollback-legacy.md", "docs/reference-calderctl.md"], "confidence": "medium"}
+{"id": "q027", "relevant": ["docs/runbook-gateway-rollback.md", "docs/runbook-mesh-rollback-legacy.md", "docs/postmortem-checkout-outage.md"], "confidence": "medium"}
+{"id": "q028", "relevant": ["docs/runbook-gateway-rollback.md"], "confidence": "high"}
+{"id": "q029", "relevant": ["docs/runbook-mesh-rollback-legacy.md"], "confidence": "high"}
+{"id": "q030", "relevant": ["docs/runbook-mesh-rollback-legacy.md", "docs/postmortem-checkout-outage.md"], "confidence": "high"}
+{"id": "q031", "relevant": ["docs/runbook-mesh-rollback-legacy.md", "docs/adr-0019-calder-gateway.md"], "confidence": "medium"}
+{"id": "q032", "relevant": ["docs/adr-0007-helix-mesh.md", "docs/adr-0019-calder-gateway.md", "docs/runbook-mesh-rollback-legacy.md"], "confidence": "medium"}
+{"id": "q033", "relevant": ["docs/adr-0007-helix-mesh.md"], "confidence": "high"}
+{"id": "q034", "relevant": ["docs/guide-onboarding.md", "docs/guide-oncall-rota.md", "docs/reference-deployment-tiers.md"], "confidence": "high"}
+{"id": "q035", "relevant": ["docs/guide-onboarding.md"], "confidence": "high"}
+{"id": "q036", "relevant": ["docs/reference-deployment-tiers.md", "docs/reference-calderctl.md"], "confidence": "medium"}
+{"id": "q037", "relevant": ["docs/guide-oncall-rota.md"], "confidence": "high"}
+{"id": "q038", "relevant": ["docs/guide-onboarding.md", "docs/reference-calderctl.md"], "confidence": "medium"}
+{"id": "q039", "relevant": ["docs/policy-data-retention.md", "docs/guide-onboarding.md", "docs/reference-calderctl.md"], "confidence": "medium"}
+{"id": "q040", "relevant": ["docs/policy-data-retention.md"], "confidence": "high"}
+{"id": "q041", "relevant": ["docs/policy-data-retention.md"], "confidence": "high"}
+{"id": "q042", "relevant": ["docs/adr-0019-calder-gateway.md", "docs/reference-calderctl.md", "docs/runbook-gateway-rollback.md", "docs/runbook-mesh-rollback-legacy.md"], "confidence": "medium"}
+{"id": "q043", "relevant": ["docs/adr-0007-helix-mesh.md"], "confidence": "high"}
+{"id": "q044", "relevant": ["docs/adr-0019-calder-gateway.md"], "confidence": "high"}
+{"id": "q045", "relevant": ["docs/guide-onboarding.md", "docs/reference-deployment-tiers.md"], "confidence": "medium"}
+{"id": "q046", "relevant": ["docs/adr-0007-helix-mesh.md", "docs/guide-onboarding.md"], "confidence": "low"}
+{"id": "q047", "relevant": ["docs/adr-0019-calder-gateway.md", "docs/adr-0007-helix-mesh.md"], "confidence": "medium"}
+{"id": "q048", "relevant": ["docs/reference-calderctl.md", "docs/guide-oncall-rota.md"], "confidence": "medium"}
+{"id": "q049", "relevant": ["docs/postmortem-checkout-outage.md"], "confidence": "high"}
+{"id": "q050", "relevant": ["docs/postmortem-checkout-outage.md", "docs/runbook-mesh-rollback-legacy.md", "docs/runbook-gateway-rollback.md"], "confidence": "medium"}

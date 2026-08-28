@@ -1,0 +1,44 @@
+id,q,n_relevant,recall@1,recall@3,recall@5,recall@10
+q001,steps to revert a bad calder gateway release,1,1.0,1.0,1.0,1.0
+q002,how to roll back a helix mesh sidecar release,1,1.0,1.0,1.0,1.0
+q003,what replaced helix mesh,2,0.5,1.0,1.0,1.0
+q004,why did we adopt a service mesh in the first place,1,1.0,1.0,1.0,1.0
+q005,how long do we keep customer order history,1,1.0,1.0,1.0,1.0
+q006,what happened during the checkout outage,1,0.0,0.0,0.0,1.0
+q007,how many reviewers does a tier 1 deploy need,2,0.0,1.0,1.0,1.0
+q008,who do I page when traffic between services is failing,1,1.0,1.0,1.0,1.0
+q009,I am shipping my first service where do I start,1,1.0,1.0,1.0,1.0
+q010,what does calderctl exit code 3 mean,1,1.0,1.0,1.0,1.0
+q011,what is the soak period for the revenue path tier,1,1.0,1.0,1.0,1.0
+q012,how do I freeze an in flight rollout,3,0.0,0.6667,1.0,1.0
+q013,am I allowed to be on call two weeks in a row,1,1.0,1.0,1.0,1.0
+q014,does an internal service page anyone overnight,3,0.3333,0.6667,1.0,1.0
+q015,what is the current decision for east west traffic,1,1.0,1.0,1.0,1.0
+q016,which proxy do we run between services today,2,0.5,0.5,0.5,1.0
+q017,why did we move away from sidecars,1,1.0,1.0,1.0,1.0
+q018,how much memory did the sidecar actually use,1,1.0,1.0,1.0,1.0
+q019,is helix mesh still in use anywhere,2,0.0,0.5,1.0,1.0
+q022,can I start new work against helix mesh,1,1.0,1.0,1.0,1.0
+q023,what max surge should I use rolling back the node proxy,2,0.5,1.0,1.0,1.0
+q024,what max surge for a sidecar rollback,2,0.5,1.0,1.0,1.0
+q025,verify per node after rolling back,2,0.5,1.0,1.0,1.0
+q026,verify per service after rolling back,2,0.5,0.5,1.0,1.0
+q028,how long does a gateway rollback take,1,0.0,0.0,1.0,1.0
+q029,how long does a mesh rollback take,1,0.0,0.0,1.0,1.0
+q030,pods skipped silently during a rollback,2,0.5,1.0,1.0,1.0
+q031,is the legacy runbook still valid,2,0.5,0.5,1.0,1.0
+q033,why keep a superseded record in the repository,1,1.0,1.0,1.0,1.0
+q034,my alert paged at 3am but my service is internal,3,0.3333,1.0,1.0,1.0
+q035,I added a retry and things got worse,1,0.0,1.0,1.0,1.0
+q036,who approves a change to the revenue path,2,0.5,0.5,0.5,0.5
+q037,what does the incident lead actually do,1,1.0,1.0,1.0,1.0
+q038,where do I record my service data class,2,0.0,1.0,1.0,1.0
+q040,how long are backups kept,1,1.0,1.0,1.0,1.0
+q041,can I delete a customer record out of the backups,1,1.0,1.0,1.0,1.0
+q043,we had a different retry policy in every service,1,1.0,1.0,1.0,1.0
+q044,why not use ebpf instead of a proxy,1,0.0,1.0,1.0,1.0
+q045,what is the cheapest tier to start on,2,0.0,1.0,1.0,1.0
+q046,how do we stop a slow dependency taking down checkout,2,0.5,1.0,1.0,1.0
+q047,blast radius of a bad config push,2,0.5,1.0,1.0,1.0
+q048,how do I tell if someone else is mid incident before I deploy,2,0.5,1.0,1.0,1.0
+q049,what did we promise to fix after the outage and did we,1,1.0,1.0,1.0,1.0

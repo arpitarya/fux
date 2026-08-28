@@ -1,0 +1,20 @@
+{"id": "u001", "answerable": false, "why": "ADR-0007 gives the count ('four regions') and the postmortem names two (eu-west, us-east); the names of all four are never listed.", "confidence": "high"}
+{"id": "u002", "answerable": false, "why": "SEV1/SEV2 appear as labels (incident-lead rotation, postmortem severity) but no severity-classification criteria are defined anywhere.", "confidence": "high"}
+{"id": "u003", "answerable": false, "why": "Runbooks give rollback trigger thresholds (2% error rate, p99 400ms) but no availability SLO target for checkout.", "confidence": "high"}
+{"id": "u004", "answerable": false, "why": "ADR-0019 gives sidecar memory per pod (180MB estimated, 310MB measured); no per-node memory figure for the Calder Gateway proxy is stated.", "confidence": "high"}
+{"id": "u005", "answerable": false, "why": "ADR-0007 mentions north-south traffic only in a rejected alternative; both ADRs scope Helix Mesh and Calder Gateway to east-west, and no ingress component is named.", "confidence": "high"}
+{"id": "u006", "answerable": false, "why": "calderctl documents gateway/mesh platform rollbacks and a deploy --version flag, but no procedure for rolling a service back to a previous application version.", "confidence": "medium"}
+{"id": "u007", "answerable": false, "why": "calderctl quota set --cpu/--memory exists and the tiers doc says tier does not decide quota; no default quota values for tier 3 (or any tier) are given.", "confidence": "high"}
+{"id": "u008", "answerable": false, "why": "Onboarding says the service-registry name review is 'slower than it looks like it should be' but states no duration.", "confidence": "high"}
+{"id": "u009", "answerable": false, "why": "Onboarding lists team-group membership as a prerequisite; how to create or provision a new team group is never described.", "confidence": "high"}
+{"id": "u010", "answerable": false, "why": "The rota's compensation section covers time off and rotation limits only; no monetary stipend is mentioned.", "confidence": "high"}
+{"id": "u011", "answerable": false, "why": "The retention policy names the role ('data protection lead') as the exception grantor but names no person.", "confidence": "high"}
+{"id": "u012", "answerable": false, "why": "ADR-0007 says a platform exception exists and expires after 90 days; the request procedure and the approver are not stated.", "confidence": "high"}
+{"id": "u013", "answerable": false, "why": "The calderctl reference marks which commands write and lists exit codes, but says nothing about audit logging or where an audit trail lives.", "confidence": "high"}
+{"id": "u014", "answerable": false, "why": "One postmortem exists as an artifact, but no publication deadline and no postmortem template are documented.", "confidence": "high"}
+{"id": "u015", "answerable": false, "why": "Payments appears as a tier 1 revenue-path service and as checkout's dependency; no owning team is named.", "confidence": "high"}
+{"id": "u016", "answerable": false, "why": "ADR-0019 describes Calder Gateway's placement, mTLS and policy carry-over; no protocol support (HTTP/3, gRPC streaming) is discussed.", "confidence": "high"}
+{"id": "u017", "answerable": false, "why": "The gateway runbook mandates --max-surge 1 for node-by-node reverts but gives no connection-draining timeout.", "confidence": "high"}
+{"id": "u018", "answerable": false, "why": "The retention policy mentions a 35-day backup window and expiry-based deletion; no restore procedure or recovery-time expectation appears.", "confidence": "high"}
+{"id": "u019", "answerable": false, "why": "The policy states a verified deletion request must complete within 30 days across five store types, but not how a request is submitted or verified.", "confidence": "high"}
+{"id": "u020", "answerable": false, "why": "Kubernetes is implied only by an admission controller and pods/nodes; no cluster version or upgrade cadence is given.", "confidence": "high"}

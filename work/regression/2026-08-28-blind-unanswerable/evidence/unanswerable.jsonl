@@ -1,0 +1,20 @@
+{"id": "u001", "query": "What are the names of all four Calder Group regions?", "expect_empty": true}
+{"id": "u002", "query": "What criteria distinguish a SEV1 incident from a SEV2 at Calder Group?", "expect_empty": true}
+{"id": "u003", "query": "What is the monthly availability SLO target for the checkout service?", "expect_empty": true}
+{"id": "u004", "query": "How much memory does a Calder Gateway node proxy consume per node?", "expect_empty": true}
+{"id": "u005", "query": "Which component handles north-south ingress traffic into the Calder platform?", "expect_empty": true}
+{"id": "u006", "query": "How do I roll back my own service to a previous application version with calderctl?", "expect_empty": true}
+{"id": "u007", "query": "What are the default CPU and memory quotas assigned to a new tier 3 service?", "expect_empty": true}
+{"id": "u008", "query": "How long does a service name review in calder/service-registry usually take to complete?", "expect_empty": true}
+{"id": "u009", "query": "How do I create a new team group and get it provisioned on the Calder platform?", "expect_empty": true}
+{"id": "u010", "query": "How much is the on-call stipend paid per week of rotation?", "expect_empty": true}
+{"id": "u011", "query": "Who is the current data protection lead who grants retention exceptions?", "expect_empty": true}
+{"id": "u012", "query": "How do I request a platform exception to mandatory sidecar injection, and who approves it?", "expect_empty": true}
+{"id": "u013", "query": "Are calderctl write commands audit-logged, and where can I read that audit trail?", "expect_empty": true}
+{"id": "u014", "query": "How many days after an incident must a postmortem be published, and what template does it use?", "expect_empty": true}
+{"id": "u015", "query": "Which team owns the payments service?", "expect_empty": true}
+{"id": "u016", "query": "Does Calder Gateway support HTTP/3 and bidirectional gRPC streaming?", "expect_empty": true}
+{"id": "u017", "query": "What is the connection draining timeout when a node proxy restarts during a rollback?", "expect_empty": true}
+{"id": "u018", "query": "What is the procedure and expected recovery time for restoring a service database from backup?", "expect_empty": true}
+{"id": "u019", "query": "How is a customer deletion request submitted and how is it verified before the 30-day clock starts?", "expect_empty": true}
+{"id": "u020", "query": "Which Kubernetes version do the Calder clusters run, and how often are they upgraded?", "expect_empty": true}

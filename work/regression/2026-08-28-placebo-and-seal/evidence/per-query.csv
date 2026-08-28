@@ -1,0 +1,51 @@
+id,query,doc,max_rank,known_failure,none,placebo,real
+q001,steps to revert a bad calder gateway release,docs/runbook-gateway-rollback.md,1,False,True,True,True
+q002,how to roll back a helix mesh sidecar release,docs/runbook-mesh-rollback-legacy.md,1,False,True,True,True
+q003,what replaced helix mesh,docs/adr-0019-calder-gateway.md,1,False,True,True,True
+q004,why did we adopt a service mesh in the first place,docs/adr-0007-helix-mesh.md,1,False,True,True,True
+q005,how long do we keep customer order history,docs/policy-data-retention.md,1,False,False,False,True
+q006,what happened during the checkout outage,docs/postmortem-checkout-outage.md,1,True,False,False,False
+q007,how many reviewers does a tier 1 deploy need,docs/reference-deployment-tiers.md,1,True,False,False,False
+q008,who do I page when traffic between services is failing,docs/guide-oncall-rota.md,1,False,True,True,True
+q009,I am shipping my first service where do I start,docs/guide-onboarding.md,1,False,True,True,True
+q010,what does calderctl exit code 3 mean,docs/reference-calderctl.md,1,False,True,True,True
+q011,what is the soak period for the revenue path tier,docs/reference-deployment-tiers.md,1,False,True,True,True
+q012,how do I freeze an in flight rollout,docs/reference-calderctl.md,2,True,False,False,False
+q013,am I allowed to be on call two weeks in a row,docs/guide-oncall-rota.md,1,False,True,True,True
+q014,does an internal service page anyone overnight,docs/reference-deployment-tiers.md,2,False,True,True,True
+q015,what is the current decision for east west traffic,docs/adr-0019-calder-gateway.md,1,False,True,True,True
+q016,which proxy do we run between services today,docs/adr-0019-calder-gateway.md,1,False,False,False,True
+q017,why did we move away from sidecars,docs/adr-0019-calder-gateway.md,1,False,False,False,True
+q018,how much memory did the sidecar actually use,docs/adr-0019-calder-gateway.md,1,False,False,False,True
+q019,is helix mesh still in use anywhere,docs/adr-0019-calder-gateway.md,2,True,False,False,False
+q020,which rollback do I use for a tier that has not migrated,docs/runbook-mesh-rollback-legacy.md,1,False,True,True,True
+q021,why is the soak fourteen days now instead of two,docs/reference-deployment-tiers.md,2,False,True,True,True
+q022,can I start new work against helix mesh,docs/adr-0007-helix-mesh.md,1,False,True,True,True
+q023,what max surge should I use rolling back the node proxy,docs/runbook-gateway-rollback.md,1,False,True,True,True
+q024,what max surge for a sidecar rollback,docs/runbook-mesh-rollback-legacy.md,1,False,True,True,True
+q025,verify per node after rolling back,docs/runbook-gateway-rollback.md,1,False,True,True,True
+q026,verify per service after rolling back,docs/runbook-mesh-rollback-legacy.md,1,False,True,True,True
+q027,the rollback failed should I try it again,docs/postmortem-checkout-outage.md,3,False,False,False,True
+q028,how long does a gateway rollback take,docs/runbook-gateway-rollback.md,1,True,False,False,False
+q029,how long does a mesh rollback take,docs/runbook-mesh-rollback-legacy.md,1,True,False,False,False
+q030,pods skipped silently during a rollback,docs/runbook-mesh-rollback-legacy.md,2,False,True,True,True
+q031,is the legacy runbook still valid,docs/runbook-mesh-rollback-legacy.md,2,False,True,True,True
+q032,does the superseded networking ADR still apply anywhere,docs/adr-0007-helix-mesh.md,2,False,False,True,True
+q033,why keep a superseded record in the repository,docs/adr-0007-helix-mesh.md,1,False,True,True,True
+q034,my alert paged at 3am but my service is internal,docs/guide-oncall-rota.md,2,True,False,False,False
+q035,I added a retry and things got worse,docs/guide-onboarding.md,1,True,False,False,False
+q036,who approves a change to the revenue path,docs/reference-deployment-tiers.md,1,False,True,True,True
+q037,what does the incident lead actually do,docs/guide-oncall-rota.md,1,False,True,True,True
+q038,where do I record my service data class,docs/guide-onboarding.md,2,False,True,True,True
+q039,what happens if I never state a classification,docs/policy-data-retention.md,2,False,True,True,True
+q040,how long are backups kept,docs/policy-data-retention.md,1,False,True,True,True
+q041,can I delete a customer record out of the backups,docs/policy-data-retention.md,1,False,True,True,True
+q042,why is having two rollback procedures dangerous,docs/adr-0019-calder-gateway.md,2,False,True,True,True
+q043,we had a different retry policy in every service,docs/adr-0007-helix-mesh.md,1,False,False,False,True
+q044,why not use ebpf instead of a proxy,docs/adr-0019-calder-gateway.md,1,True,False,False,False
+q045,what is the cheapest tier to start on,docs/guide-onboarding.md,2,False,True,True,True
+q046,how do we stop a slow dependency taking down checkout,docs/adr-0007-helix-mesh.md,2,False,True,True,True
+q047,blast radius of a bad config push,docs/adr-0019-calder-gateway.md,1,False,True,True,True
+q048,how do I tell if someone else is mid incident before I deploy,docs/reference-calderctl.md,2,False,True,True,True
+q049,what did we promise to fix after the outage and did we,docs/postmortem-checkout-outage.md,1,False,False,False,True
+q050,a hazard we wrote down but never actually fixed,docs/postmortem-checkout-outage.md,2,False,False,False,True

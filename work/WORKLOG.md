@@ -82,6 +82,49 @@ The blocker filed 2026-08-28 is untouched and still Arpit's.
 
 ---
 
+## 2026-08-28 — `recall@k` is computed for the first time  ·  Claude Code
+
+- **Asked:** *"go"* — swap the migrated goldens in and compute the number.
+
+- **Did:**
+  - **Swapped `fux-playground/goldens/queries.jsonl`** for the decision-12
+    migration, after taking two backups (a scratch copy and confirming the
+    staged git blob was recoverable). Validated: **43 `complete` · 7 `partial`
+    · 26 multi-document.**
+  - **Verified back-compatibility before trusting anything else** —
+    `check.py` 41 pass/9 xfail, differential harness 41/0/9 both modes. **No
+    `hit@k` number moved**, which is decision 12 rule d holding in practice.
+  - **Computed `recall@k`** over the 43 declared complete, as a curve against
+    context bytes: **`@1` 0.5969 · `@3` 0.8566 · `@5` 0.9535 · `@10` 0.9884**.
+    Filed as [`2026-08-28-first-recall`](regression/2026-08-28-first-recall/report.md)
+    with per-query rows.
+  - **Filled ADR-QUALITY's withheld output block**, which had promised the
+    first captured output would belong to the first run under the contract.
+
+- **Decided / open:**
+  - 🔴 **The number is `informed` and must never be quoted as a capability
+    claim.** Every installed enrichment file was authored by someone who had
+    read these queries, so it demonstrates the metric, not the engine. Said in
+    the run, the ANALYSIS, the record and the queue — it is exactly the kind of
+    figure that escapes into a slide.
+  - ⚠ **The headline is half a headline**: decision 5 puts `unanswerable`
+    inside the gate, the class exists, and the engine scores **0 of 20**.
+  - ⚠ **One of my own tests went red on the migration and the TEST was wrong** —
+    it asserted `eligible == []`, a snapshot rather than an invariant. Rewritten
+    to assert what actually holds. Worth noting because a suite that encodes a
+    moment fights the work instead of guarding it.
+  - **The 7 `partial` rows stay unadjudicated** — they are the annotators'
+    disagreements, and this session has now seen the scores, so it is the wrong
+    party to resolve them.
+  - **W-87 still cannot close**, and the reasons have narrowed to two: no
+    `judged` run has ever exercised the pinning, and Part B's corpora are gone.
+  - **Nothing committed**, per standing instruction. Suite **2392 passed /
+    2 skipped**, zero failures.
+
+- **Next:** recall on a *clean* corpus — the `none`/`placebo`/`real` arms
+  already exist, so it is one command, and unlike `hit@k` recall can award
+  partial credit and may separate arms that `hit@k` could not.
+
 ## 2026-08-28 — Arpit rules option B: the rank contract and the relevance set become two fields  ·  Claude Code
 
 - **Asked:** *"do not commit anything yet and go with options B"* — the schema
