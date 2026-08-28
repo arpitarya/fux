@@ -82,6 +82,40 @@ The blocker filed 2026-08-28 is untouched and still Arpit's.
 
 ---
 
+## 2026-08-28 — OPEN-WORK cleaned to 205 lines, and the day's work committed  ·  Claude Code
+
+- **Asked:** *"do a cleanup for open work then commit everything"*.
+
+- **Did:**
+  - **Cleaned `OPEN-WORK.md` per its own rule 2** — a resolved thing leaves
+    entirely, *including the sentence saying it resolved*. Removed every ✅
+    narrative block the day had accumulated (per-query rows, the `+9`, the
+    schema ruling, P1's closure, the doctor notice) and the *"Ready to run —
+    Empty"* section, which was a tombstone by the file's own definition.
+    **205 lines, and every remaining row is genuinely open.**
+  - **Two commits on `work/2026-08-28-quality-contract`** (branched off `main`
+    first, as CLAUDE.md requires): the code + records, then the four measured
+    runs + the queue. Both passed the `adr-guard` `commit-msg` hook; the second
+    carries `no ADR affected`, which is true of its contents.
+  - **Verified before committing**: no secrets or scratch paths staged, the
+    committed index intact at 243 files, working tree clean afterwards, suite
+    **2392 passed / 2 skipped** on the branch.
+
+- **Corrects the entry below it**, which said *"Nothing committed, per standing
+  instruction"* — true when written, false now. Appended rather than edited.
+
+- **Decided / open:**
+  - ⚠ **`work/benchmark/README.md` was committed in my second commit** — it was
+    left untracked by the concurrent W-93 session. Named in the commit message
+    rather than absorbed silently.
+  - **NOT merged and NOT pushed.** The instruction was to commit; the branch is
+    ready and `main` is untouched.
+  - The blocker stands: the 0-of-20 abstention result and the 7 `partial`
+    goldens both need a human.
+
+- **Next:** merge the branch, or run recall on a clean corpus — one command,
+  and the arms already exist.
+
 ## 2026-08-28 — `recall@k` is computed for the first time  ·  Claude Code
 
 - **Asked:** *"go"* — swap the migrated goldens in and compute the number.
