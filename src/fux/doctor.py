@@ -18,7 +18,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from . import __version__
-from .config import find_root
+from .config import DEFAULT_DIRS_FILE, DEFAULT_TYPES_FILE, find_root
+from .errors import FuxError
 from .store import fuxdir
 
 PY_MIN = (3, 11)
@@ -96,6 +97,54 @@ def _background_runner(root: Path) -> Check:
     return Check("background runner", True, "idle, nothing pending", level="warn")
 
 
+def _daemon(root: Path) -> Check | None:
+    """The resident clock's last sweep — `None` when it has never run.
+
+    **Added 2026-08-28 with the widened status shape.** Before it, the daemon's
+    only surface was `fux daemon status`, which a person runs when they already
+    suspect something. `doctor` is what they run when they do not.
+
+    ⚠ **The case this exists for is `outcome: "ok"` with `skipped > 0`** — a
+    sweep that looked healthy and did not index everything. Two of seven URLs
+    were skipped in the 2026-08-27 real-network run and nothing said so outside
+    a foreground `fux update`.
+    """
+    from .maintain import daemon as daemon_mod
+
+    state = daemon_mod.status(root)
+    last = state.get("last")
+    if not state.get("running") and not last:
+        return None  # never started here; not a finding
+
+    where = f"running (pid {state['pid']})" if state.get("running") else "not running"
+    if not last:
+        return Check("url daemon", True, where, level="warn")
+
+    outcome = last.get("outcome")
+    reason = last.get("reason")
+    skipped = last.get("skipped") or 0
+
+    if outcome == "failed":
+        return Check(
+            "url daemon",
+            False,
+            f"{where}; the last sweep FAILED ({reason or 'no reason recorded'})",
+            level="warn",
+        )
+    if skipped:
+        return Check(
+            "url daemon",
+            False,
+            f"{where}; the last sweep reported ok but did not index {skipped} document(s) "
+            f"({reason}) - run `fux update` to see them all",
+            level="warn",
+        )
+    detail = f"{where}; last sweep {outcome}"
+    if last.get("fetched") is not None:
+        detail += f", {last['fetched']} document(s)"
+    return Check("url daemon", True, detail, level="warn")
+
+
 def _python_version() -> Check:
     ok = sys.version_info[:2] >= PY_MIN
     have = f"{sys.version_info.major}.{sys.version_info.minor}"
@@ -154,10 +203,91 @@ def _layout(root: Path) -> list[Check]:
             level="warn",
         )
     )
+    checks.append(_types_health(root))
+    checks.append(_ignore_health(root))
     checks.append(_accelerator(root))
     checks.append(_background_runner(root))
+    daemon_check = _daemon(root)
+    if daemon_check is not None:
+        checks.append(daemon_check)
     checks.append(_url_health(root))
     return checks
+
+
+def _types_health(root: Path) -> Check:
+    """A committed types file with no live pattern — the shape that stops ingest.
+
+    `read_types` refuses a types file whose every line is a comment, because a
+    present file replaces the built-in default entirely (ADR-TYPES decision 2)
+    and an empty allowlist would silently empty the index. `fux setup` used to
+    write exactly that file, so **`setup` then `ingest` failed on every fresh
+    repo** until 2026-08-27.
+
+    ⚠ **The fixed template does not reach a repo that already has the file** —
+    ADR-DOTFUX decision 6 is explicit that write-if-missing reaches new repos
+    only, and that when a change must reach existing ones the mechanism is *a
+    loader refusal or a `doctor` check, never a rewrite*. This is that check.
+    """
+    path = root / DEFAULT_TYPES_FILE
+    if not path.is_file():
+        return Check("types list usable", True, "absent - the built-in default applies")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return Check("types list usable", False, f"{DEFAULT_TYPES_FILE}: {exc}")
+    live = [ln.lstrip() for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
+    allow = [ln for ln in live if not ln.startswith("!")]
+    if allow:
+        return Check("types list usable", True, f"{DEFAULT_TYPES_FILE}: {len(allow)} pattern(s)")
+    return Check(
+        "types list usable",
+        False,
+        f"{DEFAULT_TYPES_FILE} has no active pattern, so `fux ingest` refuses to run - "
+        "delete the file to take the built-in default, or re-run `fux setup` after "
+        "deleting it to get the default written out",
+    )
+
+
+def _ignore_health(root: Path) -> Check:
+    """`.fux/.fuxignore` parses, and states nothing the old lists also state.
+
+    **Two failures, one check, and neither is fatal to `doctor`'s exit code by
+    accident.** A `.fuxignore` that will not parse stops `fux ingest` outright,
+    so it is an `error`; a pattern written in both `.fuxignore` and a
+    `sources/` `!` line changes nothing today and is a `warn`.
+
+    ⚠ **The duplicate is worth a line precisely because it is currently
+    harmless.** `!` subtracts in `sources/` and re-includes in `.fuxignore`, so
+    the two copies agree only for as long as nobody edits either one. The day
+    someone puts a `!` in front of the `.fuxignore` copy they get the opposite
+    of what the other file says, silently. This check is early for that.
+    """
+    from .ingest import fuxignore
+
+    path = root / fuxignore.IGNORE_FILE
+    if not path.is_file():
+        return Check("fuxignore usable", True, f"{fuxignore.IGNORE_FILE} absent - nothing ignored")
+    try:
+        rules = fuxignore.read(root).rules
+    except (FuxError, OSError) as exc:
+        return Check("fuxignore usable", False, f"{fuxignore.IGNORE_FILE}: {exc}")
+    duplicates = fuxignore.duplicate_warnings(
+        root, dirs_file=DEFAULT_DIRS_FILE, types_file=DEFAULT_TYPES_FILE
+    )
+    if duplicates:
+        return Check(
+            "fuxignore usable",
+            False,
+            f"{len(duplicates)} pattern(s) stated in both {fuxignore.IGNORE_FILE} and a "
+            f".fux/sources/ list - run `fux ingest --list-skipped` for the detail",
+            level="warn",
+        )
+    active = sum(1 for r in rules if not r.negate)
+    return Check(
+        "fuxignore usable",
+        True,
+        f"{fuxignore.IGNORE_FILE}: {active} ignore rule(s), {len(rules) - active} re-include(s)",
+    )
 
 
 def _url_health(root: Path) -> Check:
@@ -191,15 +321,48 @@ def _url_health(root: Path) -> Check:
         # one's. Reporting "cannot tell" beats a traceback on a health command.
         return Check("url sources", True, "skipped (no readable index)", level="warn")
 
-    summary = urlstate.summarize(urlstate.read(root), indexed)
+    state = urlstate.read(root)
+    summary = urlstate.summarize(state, indexed)
     policy = _parallel_policy(root)
+
+    def _rate_limit_note() -> str | None:
+        """W-82 ruling 12, cumulative across runs.
+
+        ⚠ **Reported in BOTH branches, deliberately.** A host refusing you is a
+        fact about the host, not about how many URLs are indexed — and the
+        no-URLs branch is exactly where a rate limit is most likely to be the
+        REASON nothing is indexed.
+
+        ⚠ **Reaching both branches took two fixes, and the second was worse.**
+        The note was first built into the populated branch only, so it was
+        invisible in the one case that produces it. Adding the empty branch
+        then put the caller's `", ".join(parts)` ABOVE the append, which killed
+        it in the populated branch instead — a working report in the rare case
+        and a dead one in the common case, for a whole release. Neither was
+        caught by a test, because until now there was none; both were found by
+        reading the code, which is the weakest way to find either.
+
+        **Never names a number to set `max_parallel` to.** That is the
+        consumer's call; fux picking it would be the clamping ruling 12
+        refused.
+        """
+        if not state.rate_limited:
+            return None
+        worst = sorted(state.rate_limited.items(), key=lambda kv: (-kv[1], kv[0]))
+        return "rate-limited by " + ", ".join(f"{host} x{count}" for host, count in worst[:3])
+
     if not summary.has_urls:
         # ⚠ The concurrency belongs in THIS branch above all (W-83). An empty
         # corpus with `[sources.url]` configured is a repo about to run its
         # first `fux add <URL>` — the moment the number matters most and the
         # only moment nobody can look it up from a previous run.
-        detail = "none indexed" if policy is None else f"none indexed, {policy}"
-        return Check("url sources", True, detail, level="warn")
+        bits = ["none indexed"]
+        if policy is not None:
+            bits.append(policy)
+        note = _rate_limit_note()
+        if note is not None:
+            bits.append(note)
+        return Check("url sources", True, ", ".join(bits), level="warn")
 
     parts = [f"{summary.indexed} url: record(s)"]
     if summary.run_seq == 0:
@@ -212,6 +375,12 @@ def _url_health(root: Path) -> Check:
         parts.append(f"{summary.failing} failing")
     if policy is not None:
         parts.append(policy)
+    note = _rate_limit_note()
+    if note is not None:
+        parts.append(note)
+    # ⚠ The join stays BELOW every append. It sat above the rate-limit
+    # append once, and the note was built, appended to a list nothing read
+    # again, and silently dropped -- correct in the empty branch, dead here.
     detail = ", ".join(parts)
     if summary.failing_urls:
         # Named, not just counted: a count tells you something is wrong and a

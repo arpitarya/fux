@@ -25,7 +25,7 @@ first rung that answers:
 | 1 | `fux --version` | a venv is active, or fux is installed globally (pipx, uv tool, system) |
 | 2 | `uv run fux --version` | a uv-managed repo - resolves without anyone having activated anything |
 | 3 | `./.venv/bin/fux --version` | the venv exists and is NOT active |
-| 4 | `python -m fux.cli --version` | the package is importable but no script was installed |
+| 4 | `python -m fux --version` | the package is importable but no script was installed |
 
 **On Windows, rung 3 is `.venv\Scripts\fux.exe --version`.** Different path, not
 a footnote.
@@ -44,7 +44,7 @@ Three rules that make the ladder safe rather than clever:
   non-interactive subshell it usually does not even persist to the next command.
 - **If every rung fails, say which ones you tried.** The sentence is
   *"fux could not be invoked - tried `fux`, `uv run fux`, `./.venv/bin/fux`,
-  `python -m fux.cli`"* - never a claim that the package is absent. Then fall
+  `python -m fux`"* - never a claim that the package is absent. Then fall
   back to ordinary search, and **say that you fell back**. A silent fallback is
   indistinguishable from an honest answer, which is the failure this whole
   section exists to prevent.

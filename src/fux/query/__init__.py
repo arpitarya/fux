@@ -62,7 +62,7 @@ from .scan import ask as scan_ask
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from ..tune import Tune
 
-__all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "run_query"]
+__all__ = ["AskResult", "cmd_answer", "cmd_ask", "cmd_find", "cmd_verify", "run_query"]
 
 
 def _tune(root: Path, *, enabled: bool = True) -> "Tune":
@@ -120,6 +120,8 @@ def run_query(
     force_scan: bool = True,
     tune: "Tune | None" = None,
     use_tune: bool = True,
+    confidence_out: dict | None = None,
+    trace_out: dict | None = None,
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`.
@@ -128,6 +130,26 @@ def run_query(
     the answer is the engine's own (ADR-TUNE decision 11). Callers that have
     already loaded a `Tune` pass it as `tune=` rather than paying for a second
     parse.
+
+    `trace_out`, when a caller supplies a dict, receives `{"window": [...],
+    "pre_rerank": [...]}` — ADR-PROVENANCE. The **window** is what `depth`
+    retrieved before truncation, and it is the only place the *negative space*
+    exists: once `_maybe_rerank` has truncated to `top`, the documents that
+    were considered and cut are gone and no later stage can recover them.
+    Costs one list reference on a path that already holds both lists.
+
+    `confidence_out`, when a caller supplies a dict, receives
+    `{"confidence": Confidence}` — ADR-CONFIDENCE. **It stays an
+    out-parameter rather than becoming a third element of the return tuple**
+    because that tuple is unpacked by `cmd_ask`, `cmd_find`, `cmd_answer`,
+    `mcp._search` and the test suite; an additive keyword changes none of them,
+    and a caller that does not ask pays only for a `None` check.
+
+    **The block is built from the FINAL result list, after reranking.**
+    `rank()` supplies `df` and `n`; the scores come from `results` as the caller
+    will see them. Computing separation from `rank()`'s pre-rerank scores would
+    describe an ordering nobody was shown — the reranker exists precisely to
+    change which document is first.
     """
     if tune is None:
         tune = _tune(root, enabled=use_tune)
@@ -145,19 +167,87 @@ def run_query(
     # most of the recoverable failures are.
     rerank_weight = tune.rerank_weight
     depth = max(top, rerank.DEPTH) if rerank_weight > 0 else top
+    stats: dict | None = {} if confidence_out is not None else None
 
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
         if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
             results = accel.ask(
-                root, query, top=depth, weighting=weighting, archived_dirs=dirs, scoring=scoring
+                root, query, top=depth, weighting=weighting, archived_dirs=dirs,
+                scoring=scoring, stats_out=stats,
             )
-            return _maybe_rerank(root, query, results, rerank_weight, top), "accelerator"
+            final = _maybe_rerank(root, query, results, rerank_weight, top)
+            _fill_trace(trace_out, results, rerank_weight)
+            _fill_confidence(confidence_out, stats, query, final)
+            return final, "accelerator"
     results = scan_ask(
-        root, query, top=depth, weighting=weighting, archived_dirs=dirs, scoring=scoring
+        root, query, top=depth, weighting=weighting, archived_dirs=dirs,
+        scoring=scoring, stats_out=stats,
     )
-    return _maybe_rerank(root, query, results, rerank_weight, top), "scan"
+    final = _maybe_rerank(root, query, results, rerank_weight, top)
+    _fill_trace(trace_out, results, rerank_weight)
+    _fill_confidence(confidence_out, stats, query, final)
+    return final, "scan"
+
+
+def _fill_confidence(out: dict | None, stats: dict | None, query: str, results) -> None:
+    """Assemble the confidence block, if anyone asked for one.
+
+    **Never raises.** A confidence signal that can fail a query is worse than no
+    signal — the same contract `_declare_change_since_last_ask` takes, and for
+    the same reason: this is something fux says *about* an answer, and it must
+    not be able to take the answer down with it. A caller that gets no block
+    sees an absent key, which is the honest report of "not computed".
+    """
+    if out is None:
+        return
+    try:
+        from .confidence import signals as build_signals
+        from .scan import query_term_hashes
+        from .tokenize import tokenize_pairs
+
+        stats = stats or {}
+        # ADR-PROVENANCE reads the same `df`/`n` rather than recomputing them:
+        # a derivation that invented its own frequencies could disagree with the
+        # confidence block printed beside it, and two numbers that disagree
+        # about the same corpus are worse than one.
+        out["stats"] = stats
+        out["confidence"] = build_signals(
+            tokenize_pairs(query),
+            query_term_hashes(query),
+            stats.get("df", {}),
+            int(stats.get("n", 0)),
+            [r.score for r in results],
+            # ADR-CONFIDENCE: `rank()` put this in the same dict as `df`/`n`,
+            # from the record it actually ranked first — so the accelerator and
+            # the scan cannot disagree about it.
+            top_doc_hashes=stats.get("top_doc_hashes"),
+        )
+    except Exception:  # pragma: no cover - a signal must not break an answer
+        pass
+
+
+def _fill_trace(out: dict | None, window, rerank_weight: float) -> None:
+    """Hand the caller the pre-truncation candidate list. **Never raises.**
+
+    Same contract as `_fill_confidence`, for the same reason: a diagnostic that
+    can fail a query is worse than no diagnostic. A caller that gets nothing
+    sees absent keys, which is the honest report of *"not computed"*.
+
+    `pre_rerank` is recorded **only when the reranker actually ran**. Recording
+    it unconditionally would let `--why` print a `rank_before_rerank` for every
+    document on a tree where reranking is off — a field that looks like a
+    measurement and is really a copy of the rank beside it.
+    """
+    if out is None:
+        return
+    try:
+        out["window"] = list(window)
+        if rerank_weight > 0:
+            out["pre_rerank"] = list(window)
+    except Exception:  # pragma: no cover - a diagnostic must not break an answer
+        pass
 
 
 def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
@@ -182,7 +272,7 @@ def _maybe_rerank(root: Path, query: str, results, weight: float, top: int):
 OUTPUT_SCHEMA = "output.schema.json"
 
 
-def _emit(payload: dict, shape: str) -> None:
+def _emit(payload: dict, shape: str, *, band_requested: bool = False) -> None:
     """Validate against the output contract, then print.
 
     **Fux cannot emit JSON that violates its own contract**, and that is worth
@@ -200,7 +290,21 @@ def _emit(payload: dict, shape: str) -> None:
     """
     from ..schema import load as load_schema
 
-    load_schema("fux.query", OUTPUT_SCHEMA).shape(shape).validate(payload, label=f"--json {shape}")
+    # `band_requested` is a caller-defined condition (ADR-CONFIDENCE decision
+    # 11, ADR-OUTPUT decision 3): `confidence` is required **when the caller
+    # asked for it** and absent otherwise.
+    #
+    # ⚠ **The condition must come from the REQUEST, not from the payload.**
+    # `schema.validate` only consults it for a key that is already missing, so
+    # a test reading `"confidence" in payload` is a tautology that can never
+    # fire — and the guard worth having is exactly the one it would lose: with
+    # `--band` passed, an `answer` branch that forgot the key now FAILS instead
+    # of quietly emitting one shape where its siblings emit another.
+    load_schema("fux.query", OUTPUT_SCHEMA).shape(shape).validate(
+        payload,
+        label=f"--json {shape}",
+        conditions={"band_requested": lambda _payload: band_requested},
+    )
     print(json_mod.dumps(payload, indent=2))
 
 
@@ -217,6 +321,21 @@ def _force_scan(args) -> bool:
     for explicit bug reproduction — and argparse's mutually exclusive group
     guarantees the two are never both set."""
     return not getattr(args, "fast", False)
+
+
+def _show_band(args) -> bool:
+    """ADR-CONFIDENCE decision 11: the CLI emits the block only under `--band`.
+
+    By the time this runs, `cli._apply_output_defaults` has already folded
+    `.fux/output.toml` into `args.band`, so this is a plain read — the
+    precedence chain lives in exactly one place and this is not it.
+
+    ⚠ **The block is still COMPUTED when this is False.** Gating the
+    computation would gate `stats_out` with it, and the differential law
+    (`--fast` vs `--scan` agree on confidence) would stop being exercised on
+    the default path — which is the path almost every run takes.
+    """
+    return bool(getattr(args, "band", False))
 
 
 def _tune_for(root: Path, args) -> "Tune":
@@ -337,16 +456,41 @@ def _declare_archived(results, weight: float) -> None:
     )
 
 
+def _declare_confidence(block, show: bool = False) -> None:
+    """ADR-CONFIDENCE decision 4, as amended: the band on stderr, never stdout.
+
+    Same contract as `_declare_archived` and `_declare_pending`, for the same
+    three reasons — `find` pipes bare paths, `--json` is a contract, and this
+    declares rather than gating.
+
+    ⚠ **`show` is `--band`, and under it `grounded` prints too.** The original
+    silence-at-`grounded` existed so a healthy query would not print a line on
+    every invocation; once a human has explicitly asked for the band, a flag
+    that goes quiet exactly when the answer is good reads as broken.
+    """
+    if block is None or not show:
+        return
+    line = block.line() or f"confidence: {block.band}."
+    print(line, file=sys.stderr)
+
+
 def cmd_ask(args) -> int:
     root = _root()
     tune = _tune_for(root, args)
+    signals: dict = {}
+    want_why = bool(getattr(args, "why", False))
+    trace: dict | None = {} if want_why else None
     results, path = run_query(
         root,
         args.query,
         args.top,
         force_scan=_force_scan(args),
         tune=tune,
+        confidence_out=signals,
+        trace_out=trace,
     )
+    block = signals.get("confidence")
+    why = _derivation_for(root, args, results, path, signals, trace, tune) if want_why else None
     _declare_pending(root)
     _declare_no_accelerator(root)
 
@@ -356,14 +500,22 @@ def cmd_ask(args) -> int:
         # key is additive and appears only when asked for, so no existing
         # consumer's parse changes (W-48).
         payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
+        # ADR-CONFIDENCE decision 11: present only under `--band`. **Absent
+        # means NOT ASKED FOR — it is never a claim about the answer**, which
+        # is why the schema makes it conditional rather than optional-in-prose.
+        if block is not None and _show_band(args):
+            payload["confidence"] = block.as_dict()
         if getattr(args, "explain", False):
             payload["path"] = path
+        if why is not None:
+            payload["derivation"] = why.as_dict()
         print(json_mod.dumps(payload, indent=2))
         _declare_archived(results, tune.archived_weight)
         return 0
 
     if not results:
         print("No confident matches.")
+        _declare_confidence(block, _show_band(args))
         return 0
 
     # W-84 — the matched headings under each hit. **Indented, never on the
@@ -378,28 +530,109 @@ def cmd_ask(args) -> int:
             print(f"        {SECTION_MARKER} {heading}")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
+    if why is not None:
+        _declare_derivation(why)
     _declare_archived(results, tune.archived_weight)
+    _declare_confidence(block, _show_band(args))
     return 0
+
+
+def _derivation_for(root: Path, args, results, path, signals, trace, tune):
+    """Assemble the `--why` block. **Never raises** — see `_fill_confidence`.
+
+    ⚠ **The untuned comparison is a SECOND QUERY, and that is deliberate.**
+    Threading a parallel untuned score through the ranker would double the hot
+    path's work for every caller to serve a diagnostic almost nobody asks for.
+    Lucene's `explain` makes the same trade — an explanation is a second,
+    narrower query, never a tax on the first — and here it is paid only when
+    `--why` is passed. It is also the only honest way to answer *"is this
+    document first because of the corpus, or because somebody edited
+    `tune.toml`?"*, which is the question a tuned ranker makes unanswerable
+    from the output alone.
+    """
+    try:
+        from . import provenance
+
+        untuned = None
+        if provenance.tune_digest(root) != "none":
+            try:
+                untuned, _ = run_query(
+                    root, args.query, args.top,
+                    force_scan=_force_scan(args), use_tune=False,
+                )
+            except Exception:
+                untuned = None
+        stats = signals.get("stats") if isinstance(signals, dict) else None
+        return provenance.derive(
+            root,
+            args.query,
+            results,
+            path=path,
+            stats=stats,
+            records=lambda doc_id: _record_for(root, doc_id),
+            window=(trace or {}).get("window"),
+            pre_rerank=(trace or {}).get("pre_rerank"),
+            untuned=untuned,
+            multiplier=getattr(tune, "archived_weight", 1.0),
+        )
+    except Exception:  # pragma: no cover - a diagnostic must not break an answer
+        return None
+
+
+def _declare_derivation(why) -> None:
+    """The `--why` block, on **stderr**.
+
+    Same rule as the progress plane (W-64), the archived-results signal and the
+    confidence line: `ask`'s stdout is what a human copies and a script parses,
+    and it stays byte-identical with this flag on or off. The machine-readable
+    form is `--json`, which is where a machine reader should look.
+    """
+    g = why.gates
+    print(
+        f"[why] reachable {g.reachable} -> window {g.in_window} -> "
+        f"placed {g.placed} -> answered {g.answered}"
+        + (f" (cut at {g.cut_score:.4f})" if g.cut_score is not None else ""),
+        file=sys.stderr,
+    )
+    for doc in why.documents:
+        bits = [f"#{doc.rank + 1} {doc.loc} {doc.score:.4f}"]
+        if doc.matched:
+            bits.append("matched " + ",".join(t.term for t in doc.matched))
+        if doc.missing:
+            bits.append("absent " + ",".join(doc.missing))
+        if doc.rank_before_rerank is not None and doc.rank_before_rerank != doc.rank:
+            bits.append(f"rerank {doc.rank_before_rerank + 1}->{doc.rank + 1}")
+        if doc.rank_untuned is not None and doc.rank_untuned != doc.rank:
+            bits.append(f"untuned #{doc.rank_untuned + 1}")
+        print("       " + "  ".join(bits), file=sys.stderr)
 
 
 def cmd_find(args) -> int:
     """Ranked documents, one per line — the terse listing verb."""
     root = _root()
     tune = _tune_for(root, args)
-    results, _ = run_query(root, args.query, args.top, force_scan=_force_scan(args), tune=tune)
+    signals: dict = {}
+    results, _ = run_query(
+        root, args.query, args.top, force_scan=_force_scan(args), tune=tune,
+        confidence_out=signals,
+    )
+    block = signals.get("confidence")
     _declare_no_accelerator(root)
 
     if args.json:
-        print(
-            json_mod.dumps(
-                {"results": [_as_dict(root, r, args.query) for r in results]}, indent=2
-            )
-        )
+        payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
+        # ADR-CONFIDENCE decision 11: present only under `--band`. **Absent
+        # means NOT ASKED FOR — it is never a claim about the answer**, which
+        # is why the schema makes it conditional rather than optional-in-prose.
+        if block is not None and _show_band(args):
+            payload["confidence"] = block.as_dict()
+        print(json_mod.dumps(payload, indent=2))
         _declare_archived(results, tune.archived_weight)
         return 0
 
     if not results:
         print("No confident matches.")
+        _declare_confidence(block, _show_band(args))
         return 0
 
     # **Bare paths, deliberately unmarked.** `find` exists to be piped, so a
@@ -409,6 +642,7 @@ def cmd_find(args) -> int:
     for r in results:
         print(r.loc)
     _declare_archived(results, tune.archived_weight)
+    _declare_confidence(block, _show_band(args))
     return 0
 
 
@@ -426,7 +660,11 @@ def cmd_answer(args) -> int:
     """
     root = _root()
     tune = _tune_for(root, args)
-    results, _ = run_query(root, args.query, 1, force_scan=_force_scan(args), tune=tune)
+    signals: dict = {}
+    results, _ = run_query(
+        root, args.query, 1, force_scan=_force_scan(args), tune=tune, confidence_out=signals,
+    )
+    block = signals.get("confidence")
     _declare_no_accelerator(root)
 
     if not results:
@@ -434,9 +672,26 @@ def cmd_answer(args) -> int:
             # `"source"` is the key ADR-ANSWER tells callers to switch on when
             # the refer plane lands, so it must be present on the no-match
             # branch too — an absent key is a trap, not a signal (W-48).
-            _emit({"answer": None, "citation": None, "source": "index"}, "answer_payload")
+            # `confidence` is required on this branch for the same reason, and
+            # it is the branch that most needs it: `band: none` is fux saying
+            # *do not answer this*, which is a stronger claim than an empty
+            # `results` array a caller may read as "try harder".
+            _emit(
+                _gated(
+                    {
+                        "answer": None,
+                        "citation": None,
+                        "source": "index",
+                        "confidence": _block_dict(block),
+                    },
+                    _show_band(args),
+                ),
+                "answer_payload",
+                band_requested=_show_band(args),
+            )
         else:
             print("No confident matches.")
+            _declare_confidence(block, _show_band(args))
         return 0
 
     best = results[0]
@@ -446,10 +701,157 @@ def cmd_answer(args) -> int:
         referred = _answer_via_refer(root, args.query, best, tune)
         if referred is not None:
             _declare_change_since_last_ask(root, args.query, referred)
-            _print_refer_answer(referred, args.json)
+            # ⚠ **The UPGRADED block, not the one `run_query` produced.**
+            # `_print_refer_answer` raises `verified` to the refer plane's real
+            # verdict before printing; handing the receipt the pre-upgrade
+            # block made it say `unverified` beside its own `verdicts` saying
+            # `current` — two statements about one answer disagreeing, which is
+            # the exact failure this plane exists to prevent. Caught by running
+            # it, not by a test, which is why the regression test below exists.
+            block = _upgraded(block, referred)
+            extra = _provenance_for(root, args, referred, block)
+            _print_refer_answer(referred, args.json, block, extra=extra, show_band=_show_band(args))
             return 0
 
-    return _print_index_answer(root, best, args.json, requested=no_refer_flag)
+    extra = _provenance_for(root, args, None, block, best=best)
+    return _print_index_answer(
+        root, best, args.json, requested=no_refer_flag, block=block, extra=extra,
+        show_band=_show_band(args),
+    )
+
+
+def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
+    """`--audit` and `--receipt`, and the journal. **Never raises.**
+
+    Returns the keys to merge into `--json`; `{}` when neither flag was passed,
+    so an existing consumer's parse is untouched (W-48 — an ADDITIVE key is
+    safe, an absent one must never be readable as a claim).
+
+    ⚠ **The journal is written only on `--journal`, and that is the consent.**
+    L8 as reverted permits a plaintext local log; it does not oblige fux to
+    start one behind a consumer's back. A `$0`, offline tool whose pitch is
+    *nothing leaves your machine* may not quietly begin recording questions
+    because a law was relaxed. Always-on journalling is a real want and it needs
+    a `.fux/tune.toml` key, which is an ADR-TUNE change deliberately not made
+    here — it is a fork, and this session may not pick a default on one.
+    """
+    want_audit = bool(getattr(args, "audit", False))
+    want_receipt = bool(getattr(args, "receipt", False))
+    want_journal = bool(getattr(args, "journal", False))
+    if not (want_audit or want_receipt or want_journal):
+        return {}
+    out: dict = {}
+    try:
+        from . import provenance
+
+        record = bundle.as_record() if bundle is not None else None
+        if want_audit and record is not None:
+            out["audit"] = record
+
+        if want_receipt or want_journal:
+            if record is not None:
+                subject = [
+                    {"id": c["id"], "loc": c["locator"], "sha": c["sha"]}
+                    for c in record["citations"]
+                ]
+                verdicts = record["documents"]
+            elif best is not None:
+                # ⚠ The index branch fetched nothing, so there is no `sha` of
+                # cited bytes to name. An empty string here would look like a
+                # digest; the key is omitted instead, and `verify` reports
+                # `unverifiable` rather than pretending to a subject.
+                subject = [{"id": best.id, "loc": best.loc}]
+                verdicts = []
+            else:
+                subject, verdicts = [], []
+            payload = provenance.receipt(
+                root,
+                args.query,
+                path="refer" if record is not None else "index",
+                subject=subject,
+                confidence=_block_dict(block),
+                verdicts=verdicts,
+            )
+            if want_receipt:
+                out["receipt"] = payload
+            if want_journal:
+                provenance.remember(root, payload)
+    except Exception:  # pragma: no cover - provenance must not break an answer
+        return out
+    return out
+
+
+def cmd_verify(args) -> int:
+    """`fux verify <receipt>` — does this answer still reproduce?
+
+    **Four states, never a boolean**, and the exit code carries the same
+    distinction: `0` reproduced, `1` drifted or unverifiable. A caller that
+    branches on the exit code learns *something happened*; a caller that reads
+    `verdict` learns what. Collapsing them would make *"we could not check"*
+    indistinguishable from *"we checked and it was fine"* — the failure this
+    repo has now refused four times (`max_age_seconds`, `cached` reported as
+    `current`, a line range for `ask`, and this).
+
+    ⚠ **`--rerun` is opt-in and its absence is REPORTED, not hidden.** Without
+    it this verifies the *inputs* — index digest, tune digest, engine version —
+    and returns `unverifiable` with a note saying the answer was not re-run.
+    Silently returning `reproduced` on matching inputs would be a claim about
+    an answer nobody recomputed.
+    """
+    from . import provenance
+
+    root = _root()
+    path = Path(args.receipt)
+    try:
+        payload = json_mod.loads(path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise FuxError(f"cannot read {path}: {exc}") from exc
+    except ValueError as exc:
+        raise FuxError(f"{path} is not JSON: {exc}") from exc
+
+    # A receipt may have been captured whole (`--receipt` writes it under the
+    # `receipt` key of the answer payload) or extracted. Accept both, because
+    # `fux answer --receipt --json > r.json` is the obvious thing to type.
+    if isinstance(payload, dict) and "receipt" in payload:
+        payload = payload["receipt"]
+
+    rerun = None
+    if getattr(args, "rerun", False):
+        def rerun(query: str):
+            results, _ = run_query(root, query, 1, force_scan=_force_scan(args))
+            if not results:
+                return []
+            best = results[0]
+            bundle = _answer_via_refer(root, query, best, _tune(root))
+            if bundle is None:
+                return []
+            return [
+                {"id": c.doc_id, "sha": c.sha} for c in bundle.assembled.citations
+            ]
+
+    result = provenance.verify(root, payload, rerun=rerun)
+    if args.json:
+        print(json_mod.dumps(result.as_dict(), indent=2))
+    else:
+        print(result.verdict + (f" — {result.note}" if result.note else ""))
+    return 0 if result.verdict == provenance.REPRODUCED else 1
+
+
+def _block_dict(block) -> dict:
+    """A confidence block as JSON, or the honest empty one when it could not be
+    computed.
+
+    **Never absent, and never invented.** `answer_payload` declares
+    `confidence` required on every branch, so an absent key would fail fux's own
+    output contract; a *fabricated* healthy block would be worse still. The
+    fallback is the block that claims nothing: no coverage, no separation, no
+    support, `answerable: false`.
+    """
+    if block is None:
+        from .confidence import Confidence
+
+        return Confidence(0.0, 0.0, 0, "unverified", ()).as_dict()
+    return block.as_dict()
 
 
 def _answer_via_refer(root: Path, query: str, best: AskResult, tune: "Tune"):
@@ -495,32 +897,81 @@ def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:
         pass
 
 
-def _print_refer_answer(bundle, as_json: bool) -> None:
-    citations = bundle.assembled.citations
+def _freshness_of(bundle) -> str:
+    """The refer plane's verdict for the answer's own document.
+
+    `unverified` when the plane looked at nothing — *"we did not look"*, never
+    folded into `current`.
+    """
     cited = bundle.documents[0] if bundle.documents else None
-    freshness = cited.verdict.label if cited is not None else "unverified"
+    return cited.verdict.label if cited is not None else "unverified"
+
+
+def _upgraded(block, bundle):
+    """Raise a confidence block to the refer plane's real verdict.
+
+    **One function, two callers** — the printer and the receipt — because the
+    alternative is what actually shipped for one run: the printed block
+    upgraded, the receipt's not. Idempotent, so calling it twice is harmless.
+    """
+    if block is None:
+        return None
+    return block.with_verified(_freshness_of(bundle))
+
+
+def _gated(payload: dict, show: bool) -> dict:
+    """Drop `confidence` from an `answer` payload when `--band` was not passed.
+
+    ⚠ **Applied to the BUILT payload rather than at each construction site**,
+    so the three `answer` branches — refer, index, and no-match — cannot
+    disagree about when the block is present. They disagreed once already
+    (a receipt read `verified: unverified` beside verdicts saying `current`),
+    and that class of defect is what one choke point prevents.
+    """
+    if not show:
+        payload.pop("confidence", None)
+    return payload
+
+
+def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band: bool = False) -> None:
+    """The fetched, re-scored answer — and the one path where `verified` is real.
+
+    **This is where the fourth signal stops being a placeholder.** `ask` and
+    `find` never fetch, so they can only ever report `unverified`. Here the
+    refer plane has actually compared the fetched bytes against the sha the
+    index ranked on, so the block is upgraded to that verdict before it is
+    emitted — and a `stale` verdict demotes the band to `partial` on its own,
+    with no threshold involved (ADR-CONFIDENCE decision 3).
+    """
+    citations = bundle.assembled.citations
+    freshness = _freshness_of(bundle)
+    block = _upgraded(block, bundle)
 
     if as_json:
-        print(
-            json_mod.dumps(
-                {
-                    "answer": {
-                        "passages": [
-                            {"heading": c.heading, "text": c.text, "score": c.score}
-                            for c in citations
-                        ]
-                    },
-                    "citation": {
-                        "id": citations[0].doc_id,
-                        "loc": citations[0].locator,
-                        "sha": citations[0].sha,
-                        "freshness": freshness,
-                    },
-                    "source": "refer",
-                },
-                indent=2,
-            )
-        )
+        # ⚠ **This branch used to print unvalidated.** `output.schema.json`
+        # claims *"`fux answer --json` is validated against this before it is
+        # printed"*, and only the no-match branch went through `_emit` — a
+        # promise in a declaration that nothing enforced, which is the same
+        # defect class W-84 found in the MCP tool descriptions. Routed through
+        # `_emit` here so the claim is true of every branch.
+        payload = {
+            "answer": {
+                "passages": [
+                    {"heading": c.heading, "text": c.text, "score": c.score}
+                    for c in citations
+                ]
+            },
+            "citation": {
+                "id": citations[0].doc_id,
+                "loc": citations[0].locator,
+                "sha": citations[0].sha,
+                "freshness": freshness,
+            },
+            "source": "refer",
+            "confidence": _block_dict(block),
+        }
+        payload.update(extra or {})
+        _emit(_gated(payload, show_band), "answer_payload", band_requested=show_band)
         return
 
     for c in citations:
@@ -529,9 +980,14 @@ def _print_refer_answer(bundle, as_json: bool) -> None:
         print(c.text)
         print()
     print(f"  -- {citations[0].locator} (sha {citations[0].sha[:12]}, {freshness})")
+    _declare_provenance(extra)
+    _declare_confidence(block, show_band)
 
 
-def _print_index_answer(root: Path, best: AskResult, as_json: bool, *, requested: bool) -> int:
+def _print_index_answer(
+    root: Path, best: AskResult, as_json: bool, *, requested: bool, block=None, extra=None,
+    show_band: bool = False,
+) -> int:
     """The M2 path: the winning record's own extracted structure — no fetch.
 
     `requested` distinguishes why: the caller passed `--no-refer`, versus
@@ -542,16 +998,19 @@ def _print_index_answer(root: Path, best: AskResult, as_json: bool, *, requested
     title = _resolve_title(root, best.id, best.title)
 
     if as_json:
-        print(
-            json_mod.dumps(
-                {
-                    "answer": {"title": title, "phrases": phrases},
-                    "citation": {"id": best.id, "loc": best.loc, "score": best.score},
-                    "source": "index",
-                },
-                indent=2,
-            )
-        )
+        payload = {
+            "answer": {"title": title, "phrases": phrases},
+            "citation": {"id": best.id, "loc": best.loc, "score": best.score},
+            "source": "index",
+            # Deliberately NOT upgraded: nothing was fetched on this
+            # path, so `verified` stays `unverified`. Reporting
+            # `current` because the index is internally consistent
+            # would be the exact collapse the refer plane's four-state
+            # verdict exists to prevent.
+            "confidence": _block_dict(block),
+        }
+        payload.update(extra or {})
+        _emit(_gated(payload, show_band), "answer_payload", band_requested=show_band)
         return 0
 
     print(title)
@@ -560,7 +1019,34 @@ def _print_index_answer(root: Path, best: AskResult, as_json: bool, *, requested
     print(f"\n  -- {best.loc}")
     reason = "--no-refer was passed" if requested else "the source could not be reached or verified"
     print(f"\n(from the index's own structure — {reason})")
+    _declare_provenance(extra)
+    _declare_confidence(block, show_band)
     return 0
+
+
+def _declare_provenance(extra) -> None:
+    """The receipt digest and the audit summary, on **stderr**.
+
+    Text mode gets the *digest*, not the receipt: a receipt is 2-10 KB of JSON
+    and a terminal is not where anyone reads one. `--json` carries the object.
+    Same stdout-stays-identical rule as every other signal on this surface.
+    """
+    if not extra:
+        return
+    audit = extra.get("audit")
+    if audit:
+        budget = audit.get("budget", {})
+        print(
+            f"[audit] {len(audit.get('documents', []))} document(s) examined, "
+            f"{budget.get('used', 0)}/{budget.get('bytes', 0)} bytes used, "
+            f"{budget.get('dropped', 0)} passage(s) dropped",
+            file=sys.stderr,
+        )
+    payload = extra.get("receipt")
+    if payload:
+        from . import provenance
+
+        print(f"[receipt] {provenance.receipt_sha(payload)}", file=sys.stderr)
 
 
 def _phrases_for(root: Path, doc_id: str) -> list[str]:

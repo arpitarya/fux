@@ -69,19 +69,23 @@ README and narrow `.gitignore` before anything is written into the directory
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import sys
+
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from .. import store as store_mod
+from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..config import DEFAULT_URLS_FILE
 from ..config import load as load_config
 from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from . import sourcelist, urlsrc
+from . import fuxignore, sourcelist, urlsrc
 from .edges import TAG_PREFIX
 from .gitdir import (
+    UNFETCHED,
     Skipped,
     archived_dirs,
     is_archived_loc,
@@ -90,7 +94,9 @@ from .gitdir import (
     source_excludes,
     walk_sources,
 )
-from .parse import parse
+from .. import decode as decode_mod
+from . import queue as queue_mod
+from .parse import parse, parse_document
 
 
 @dataclass
@@ -101,6 +107,17 @@ class IngestReport:
     skipped: list[Skipped]
     #: Documents whose extraction was carried forward instead of recomputed.
     reused_count: int = 0
+    #: Advisory lines the run wants printed but that changed nothing it did —
+    #: today, only `.fuxignore` duplicating an exclusion the old lists still
+    #: carry. **On the report rather than printed here**: `run()` is called by
+    #: the daemon and by the hook's runner as well as by a person at a
+    #: terminal, and only one of those has a stdout worth writing to.
+    warnings: list[str] = field(default_factory=list)
+    #: URLs whose `validate()` token was unchanged, so no body was fetched
+    #: (fork 3). **Not a skip and not a fetch** — the prior record is correct
+    #: and was carried forward, which is the opposite of a failure. Counted
+    #: separately so a healthy run cannot read as a broken one.
+    validated: int = 0
 
 
 def run(
@@ -148,6 +165,10 @@ def run(
         source_dirs(root, config.dirs_file),
         excludes=source_excludes(root, config.dirs_file),
         types=read_types(root),
+        ignores=fuxignore.read(root),
+    )
+    warnings = fuxignore.duplicate_warnings(
+        root, dirs_file=config.dirs_file, types_file=TYPES_FILE
     )
     # `walk_sources` returns its whole list at once — nothing to report a
     # count against until it has already finished (W-64's "none until done").
@@ -161,6 +182,11 @@ def run(
     fresh: dict[str, bytes] = {}  # url doc_id -> fetched content, this run only
     carried: dict[str, dict] = {}  # url doc_id -> prior record, reused verbatim
     url_meta: dict[str, str] = {}  # url doc_id -> the `meta` policy its line resolved to
+    #: URL documents whose bytes arrived and yielded nothing — the same
+    #: discovered need for a model that an unreadable file is (ADR-FETCHER
+    #: decision 11, ruled 2026-08-28).
+    unreadable_urls: list[queue_mod.QueueEntry] = []
+    validated_count = 0
     if refresh_urls:
         if config.url is None:
             raise FuxError(f"--refresh-urls: no [sources.url] configured in {root / 'fux.toml'}")
@@ -170,9 +196,34 @@ def run(
         # reconciliation and carry-forward key on, so narrowing it here would
         # turn a scoped fetch into a corpus-wide deletion.
         to_fetch = resolved if only_urls is None else [e for e in resolved if e.url in only_urls]
+        # Fork 3: hand the fetcher's `validate()` what we last saw, so a URL
+        # whose token has not moved costs no body fetch. `known_tokens` is read
+        # from gitignored runtime state, so a wiped `.fux/runtime/` means every
+        # URL is simply fetched — the safe direction.
+        from ..maintain import urlstate as _urlstate
+
+        _prior = _urlstate.read(root)
+        known_tokens = {
+            url: h.token_sha for url, h in _prior.urls.items() if h.token_sha
+        }
+        validation: dict = {}
         fetched, url_skipped = urlsrc.fetch_all(
-            root, to_fetch, config.url.config, max_parallel=config.url.max_parallel
+            root,
+            to_fetch,
+            config.url.config,
+            max_parallel=config.url.max_parallel,
+            known_tokens=known_tokens,
+            validation_out=validation,
         )
+        # ⚠ **A validated URL is NOT a skip and NOT a fetch.** Its prior record
+        # is correct and is carried forward verbatim — the same treatment a
+        # failed fetch gets, for a completely different reason, which is why the
+        # two are counted separately and never merged.
+        validated_count = len(validation.get("unchanged", ()))
+        for url in validation.get("unchanged", ()):
+            doc_id = f"url:{url}"
+            if doc_id in existing_urls:
+                carried[doc_id] = existing_urls[doc_id]
         skipped = skipped + url_skipped
         fresh = {f"url:{fu.url}": fu.content for fu in fetched}
         # W-82 3.1: record how this run went, per URL. Only on the networked
@@ -185,7 +236,31 @@ def run(
             fetched=fetched,
             skipped=url_skipped,
             listed=[doc_id[4:] for doc_id in url_meta],
+            token_shas=validation.get("token_shas") or {},
         )
+        # A URL whose bytes arrived and yielded nothing needs a MODEL, exactly as
+        # a scanned PDF on disk does — so it goes in the same committed queue,
+        # under the same `doc_id` convention. Ruled by Arpit 2026-08-28; the
+        # asymmetry was a gap, not a decision (ADR-FETCHER decision 11).
+        #
+        # ⚠ **`UNFETCHED` is excluded, and that is the whole care here.** A 404
+        # or a timeout is not something enrichment discharges, and `queue.tsv` is
+        # COMMITTED — queueing one would put a permanent work item in front of
+        # the whole team that no amount of model time closes.
+        url_unreadable = [s for s in url_skipped if s.kind != UNFETCHED]
+        for s in url_unreadable:
+            unreadable_urls.append(
+                queue_mod.QueueEntry(
+                    doc_id=f"url:{s.rel_path}",
+                    # ⚠ **Empty, and honestly so.** A skipped URL's bytes were
+                    # not retained -- there is nothing to hash. The file path's
+                    # sha exists because the working tree still holds the file;
+                    # a URL's does not, and inventing one would make the queue
+                    # claim an identity it cannot check.
+                    sha="",
+                    reason=s.reason,
+                )
+            )
         for doc_id in url_meta:
             if doc_id not in fresh and doc_id in existing_urls:
                 carried[doc_id] = existing_urls[doc_id]  # failed fetch keeps the prior record
@@ -197,11 +272,43 @@ def run(
         listed = _listed_url_ids(root, config, existing_urls)
         carried = {i: record for i, record in existing_urls.items() if i in listed}
 
-    file_shas = {f"file:{wf.rel_path}": store_mod.content_sha(wf.content) for wf in files}
-    reusable = {} if full else _reusable(root, existing, file_shas)
-
     # Parsing is cheap and edges need it for every document, reused or not.
-    parsed = {f"file:{wf.rel_path}": parse(wf.content) for wf in files}
+    # W-86 P1: files route through the decoder plane, which returns `None` for a
+    # document nothing could read (an image, a scanned PDF). Those are dropped
+    # here rather than raising — one unreadable file must not end an ingest of
+    # 10 000 — and §8's committed queue is where they will be recorded.
+    #
+    # Parsing moved ABOVE `file_shas` so an unreadable document contributes no
+    # sha either: a sha with no record behind it would make the reuse map claim
+    # a document the index does not contain.
+    parsed = {}
+    unreadable: list[queue_mod.QueueEntry] = []
+    for wf in files:
+        doc = parse_document(wf.content, wf.rel_path, root)
+        if doc is not None:
+            parsed[f"file:{wf.rel_path}"] = doc
+        else:
+            # W-86 P6: a document nothing could read is written down rather than
+            # forgotten. This is the ONLY place fux discovers that a model is
+            # needed — `fux enrich` derives its scope from a declared `dirs`
+            # line, which cannot know a `.png` exists.
+            unreadable.append(
+                queue_mod.QueueEntry(
+                    doc_id=f"file:{wf.rel_path}",
+                    sha=store_mod.content_sha(wf.content),
+                    reason=decode_mod.reason(wf.rel_path, root),
+                )
+            )
+
+    file_shas = {
+        f"file:{wf.rel_path}": store_mod.content_sha(wf.content)
+        for wf in files
+        if f"file:{wf.rel_path}" in parsed
+    }
+    reusable = {} if full else _reusable(root, existing, file_shas)
+    # URL documents still arrive as fetcher-produced markdown, so they keep the
+    # prose path untouched. That changes when fork H makes `fetch()` return
+    # bytes; until it is ruled, nothing here moves.
     parsed |= {doc_id: parse(content) for doc_id, content in fresh.items()}
     # Extraction is the expensive half — 92% of a full ingest, profiled at
     # 1 000 docs — so it is where the bar earns its place (W-64).
@@ -234,6 +341,15 @@ def run(
                 return None
             scans[doc_id] = edges_mod.scan(doc)
             p.update(1)
+    # W-86 P6: the queue is written before the index, so a stopped run still
+    # leaves the backlog it discovered. It is committed, so it obeys the same
+    # rule the shards do — identical bytes are not rewritten, and an ingest over
+    # an unchanged corpus leaves `git status` clean.
+    # One queue, both planes. Sorted by `doc_id` inside `write`, so `file:`
+    # and `url:` entries interleave deterministically and a re-run on an
+    # unchanged corpus is still an empty diff.
+    queue_mod.write(root, unreadable + unreadable_urls)
+
     known_ids = set(parsed) | set(carried)
     # `code`-span basename resolution stays file-only: a backtick path is a
     # claim about the repo, never about a URL.
@@ -259,6 +375,15 @@ def run(
 
     for wf in files:
         doc_id = f"file:{wf.rel_path}"
+        # W-86 P6, the half that was missing: a document nothing could read is
+        # already in `unreadable` and contributes no sha, no extraction and no
+        # scan. It must contribute no RECORD either. Without this line the loop
+        # reached `file_shas[doc_id]` for a file the parse plane had dropped and
+        # raised `KeyError`, ending the whole ingest -- the precise failure
+        # dropping-rather-than-raising was introduced to prevent. One
+        # `%PDF` header nothing can decode took down a 10 000-document run.
+        if doc_id not in parsed:
+            continue
         record = store_mod.recordschema.build(
             id=doc_id,
             src="git",
@@ -375,6 +500,8 @@ def run(
         changed_count=changed,
         skipped=skipped,
         reused_count=len(reusable),
+        warnings=warnings,
+        validated=validated_count,
     )
 
 
@@ -494,7 +621,7 @@ def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) 
     }
 
 
-def _observe_url_health(root: Path, *, fetched, skipped, listed) -> None:
+def _observe_url_health(root: Path, *, fetched, skipped, listed, token_shas=None) -> None:
     """Record this networked run's per-URL outcome (W-82 3.1).
 
     **Best-effort, and that is deliberate.** This is a reporting plane; a
@@ -511,9 +638,53 @@ def _observe_url_health(root: Path, *, fetched, skipped, listed) -> None:
             fetched={fu.url: store_mod.content_sha(fu.content) for fu in fetched},
             failed=[s.rel_path for s in skipped],
             listed=listed,
+            token_shas=token_shas or {},
         )
     except Exception:  # pragma: no cover - a report must not break the run
-        pass
+        return
+    _report_dead_urls(root, [s.rel_path for s in skipped])
+
+
+def _report_dead_urls(root: Path, failed_now: list[str]) -> None:
+    """Name URLs whose failure STREAK has reached the bar (W-82 fork 8).
+
+    ⚠ **The gap this closes: one failure and forty look identical.** Every
+    failed fetch already prints as a skip with a reason, so a URL dead for
+    three weeks reads exactly like one that blipped once — and the streak that
+    tells them apart was only visible if somebody thought to run `fux doctor`.
+
+    **The person who can fix a dead URL is the one who just ran `update`.**
+    Telling them at `doctor` time means telling them when they went looking,
+    which is not when it broke.
+
+    **Only URLs that failed THIS run are considered** — a URL that succeeded
+    has had its streak reset, so it cannot be dead, and walking the whole state
+    would re-report URLs this run never touched.
+
+    ⚠ **It never exits non-zero.** A wiki that moved is a fact outside the
+    repo; turning it into a build break would fail CI on every run until
+    somebody edits a source list, which is a worse trade than a loud line.
+
+    Best-effort, like everything else on this plane.
+    """
+    if not failed_now:
+        return
+    from ..maintain import urlstate
+
+    try:
+        state = urlstate.read(root)
+    except Exception:  # pragma: no cover - a report must not break the run
+        return
+    for url in sorted(failed_now):
+        health = state.urls.get(url)
+        if health is None or health.fail_streak < urlstate.FAILING_STREAK:
+            continue
+        print(
+            f"note: {url} has now failed {health.fail_streak} runs in a row. "
+            f"Check the URL, or `fux remove {url}` if it is gone - a dead entry "
+            "is re-fetched on every run and its indexed content never changes",
+            file=sys.stderr,
+        )
 
 
 def _listed_url_ids(root: Path, config, existing_urls: dict[str, dict]) -> set[str]:

@@ -1,0 +1,4 @@
+n = 20 fetched URLs present in both runs
+sanitized sha UNCHANGED: 19/20 = 95.0%
+changed:
+   https://en.wikipedia.org/wiki/Special:Random

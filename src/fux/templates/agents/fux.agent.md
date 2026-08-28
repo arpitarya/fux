@@ -35,7 +35,7 @@ working engine and a committed index, and a bare `fux` still says
 fux --version                    # a venv is active, or fux is global
 uv run fux --version             # a uv-managed repo
 ./.venv/bin/fux --version        # venv present, not active  (Windows: .venv\Scripts\fux.exe)
-python -m fux.cli --version      # importable, no script installed
+python -m fux --version      # importable, no script installed
 ```
 
 Probe with `--version` and reuse the winner for the session. **Never use `which`
@@ -44,7 +44,7 @@ virtualenv, never modify the `PATH` variable, never install anything**; call the
 absolute path from rung 3.
 
 **If every rung fails, say which ones you tried** — *"fux could not be invoked;
-tried `fux`, `uv run fux`, `./.venv/bin/fux`, `python -m fux.cli`"* — then fall
+tried `fux`, `uv run fux`, `./.venv/bin/fux`, `python -m fux`"* — then fall
 back to ordinary search **and say that you fell back**. A silent fallback reads
 exactly like an honest answer, which is why it is the failure worth naming.
 

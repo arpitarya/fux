@@ -163,8 +163,10 @@ outputs are **pinned** into the index with provenance and re-read forever
 deterministic signal wherever they compete, and **enrichment never runs inside
 `fux ingest`** — it is its own command, pinned then ingested. Contrast
 [extracted mode](#extracted-mode). Named and fenced by
-[ADR-ENRICHED](adr/0017_enriched-mode.md) (accepted 2026-08-19 — the contract,
-not permission to build); deferred to [M8](../archive/open/W-38-m8-deferred.md).
+[ADR-ENRICH](adr/0040_enrich.md) (the contract, ratified 2026-08-19 as
+ADR-ENRICHED and folded in here when that record was superseded on 2026-08-27 —
+still **not permission to build**); deferred to
+[M8](../archive/open/W-38-m8-deferred.md).
 
 **Extracted mode** — The **default** ingest tier: `$0`, offline, stdlib,
 deterministic — conversion, chunking, term selection, static-table embedding
@@ -411,6 +413,21 @@ is the consumer's. Fetching happens only under `fux add <URL>` or `fux update`; 
 ingest carries every `url:` record forward byte-identically. See
 [ADR-URL-INGEST](../archive/adr/0010_url-source-consumer-middleware.md).
 
+**Use record (the law, L8)** — Anything durable fux keeps about **someone using
+it**, as opposed to about the corpus: query keys, citation history, counters. L8
+requires every one of them to be **hashed at write time, bounded in size,
+confined to gitignored runtime state, and absent from any committed byte, from
+stdout, and from the network.** Today there is exactly one — `last-cited.json`,
+written by [`maintain/lastcited.py`](../src/fux/maintain/lastcited.py): 256
+`sha256[:16]` question keys, so the query text never lands on disk. ⚠ **A hashed
+key is not anonymity** — the value is the locators that answered, so the file
+still says which documents are asked about and how often; those locators are
+already in the committed `M/` plane, so it adds *frequency*, not new exposure.
+Distinct from [content-never-durable](#content-never-durable-the-law), which
+governs the corpus: a query is not content, which is the gap L8 exists to close.
+See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named and reasoned by
+[ADR-LAWS](adr/0001_laws.md) decision 8.
+
 **Wire format** — The **committed** encoding of the index: BIC postings,
 4-bit impacts, front-coded columnar ledger, Elias-Fano offsets, delta-varint
 edges. Optimized for *size and diffability*, explicitly **not** for query
@@ -422,6 +439,16 @@ speed — it is decoded once by [inflation](#inflation). Its twin is
 handoff (OKF `log.md` style, newest first) so a new chat picks up cold.
 Distinct from [OPEN-WORK.md](#open-workmd) (live state) and
 [INTERVIEW.md](../work/INTERVIEW.md) (succession judgment).
+
+**`write.lock` (the index mutex)** — `.fux/runtime/write.lock`: the **one**
+mutex over the committed index. A pid in JSON, created with
+`O_CREAT|O_EXCL`, gitignored, held by every command that writes `.fux/index/`
+and by **no** read verb. Named `write.lock` rather than `index.lock` because
+git keeps one of those in the same repository. Its stop files
+(`runner.stop`, `daemon.stop`) and `daemon.pid` are **not** locks — they are
+how a holder is asked to release. See [ADR-LOCKS](adr/0043_locks.md); and note
+that `fux.lock` — the archived engine's committed state plane — is retired and
+not the same object.
 
 **`$0` (the zero-dollar law)** — Fux's founding constraint: no third-party
 runtime dependencies, no API spend, no model in the maintenance path.

@@ -1,0 +1,402 @@
+[
+ {
+  "id": "q001",
+  "separation": 0.0545,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "weak"
+ },
+ {
+  "id": "q002",
+  "separation": 0.0917,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "weak"
+ },
+ {
+  "id": "q003",
+  "separation": 0.7806,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q004",
+  "separation": 0.5322,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q005",
+  "separation": 0.1688,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q006",
+  "separation": 0.2273,
+  "correct": false,
+  "rank": null,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q007",
+  "separation": 0.4913,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q008",
+  "separation": 0.3279,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q009",
+  "separation": 0.2101,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q010",
+  "separation": 0.5354,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q011",
+  "separation": 0.5852,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q012",
+  "separation": 0.1473,
+  "correct": false,
+  "rank": 4,
+  "max_rank": 2,
+  "band": "grounded"
+ },
+ {
+  "id": "q013",
+  "separation": 0.0067,
+  "correct": false,
+  "rank": 3,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q014",
+  "separation": 0.3622,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q015",
+  "separation": 0.1719,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q016",
+  "separation": 0.2513,
+  "correct": false,
+  "rank": null,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q017",
+  "separation": 0.0395,
+  "correct": false,
+  "rank": 3,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q018",
+  "separation": 0.043,
+  "correct": false,
+  "rank": 3,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q019",
+  "separation": 0.099,
+  "correct": false,
+  "rank": null,
+  "max_rank": 2,
+  "band": "weak"
+ },
+ {
+  "id": "q020",
+  "separation": 0.0064,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "weak"
+ },
+ {
+  "id": "q021",
+  "separation": 0.4977,
+  "correct": true,
+  "rank": 2,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q022",
+  "separation": 0.372,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q023",
+  "separation": 0.1044,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q024",
+  "separation": 0.0883,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "weak"
+ },
+ {
+  "id": "q025",
+  "separation": 0.1071,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q026",
+  "separation": 0.0092,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "weak"
+ },
+ {
+  "id": "q027",
+  "separation": 0.1462,
+  "correct": false,
+  "rank": 4,
+  "max_rank": 3,
+  "band": "partial"
+ },
+ {
+  "id": "q028",
+  "separation": 0.156,
+  "correct": false,
+  "rank": 4,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q029",
+  "separation": 0.0028,
+  "correct": false,
+  "rank": null,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q030",
+  "separation": 0.023,
+  "correct": true,
+  "rank": 2,
+  "max_rank": 2,
+  "band": "weak"
+ },
+ {
+  "id": "q031",
+  "separation": 0.0582,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q032",
+  "separation": 0.0349,
+  "correct": false,
+  "rank": 4,
+  "max_rank": 2,
+  "band": "weak"
+ },
+ {
+  "id": "q033",
+  "separation": 0.2865,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q034",
+  "separation": 0.2736,
+  "correct": false,
+  "rank": 4,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q035",
+  "separation": 0.4709,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q036",
+  "separation": 0.6757,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q037",
+  "separation": 0.1496,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q038",
+  "separation": 0.1979,
+  "correct": true,
+  "rank": 2,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q039",
+  "separation": 0.0409,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 2,
+  "band": "weak"
+ },
+ {
+  "id": "q040",
+  "separation": 0.474,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q041",
+  "separation": 0.4611,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q042",
+  "separation": 0.0778,
+  "correct": true,
+  "rank": 2,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q043",
+  "separation": 0.307,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "grounded"
+ },
+ {
+  "id": "q044",
+  "separation": 0.0867,
+  "correct": false,
+  "rank": 3,
+  "max_rank": 1,
+  "band": "weak"
+ },
+ {
+  "id": "q045",
+  "separation": 0.2923,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 2,
+  "band": "partial"
+ },
+ {
+  "id": "q046",
+  "separation": 0.1203,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 2,
+  "band": "grounded"
+ },
+ {
+  "id": "q047",
+  "separation": 0.6277,
+  "correct": true,
+  "rank": 1,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q048",
+  "separation": 0.0975,
+  "correct": true,
+  "rank": 2,
+  "max_rank": 2,
+  "band": "weak"
+ },
+ {
+  "id": "q049",
+  "separation": 0.0692,
+  "correct": false,
+  "rank": 2,
+  "max_rank": 1,
+  "band": "partial"
+ },
+ {
+  "id": "q050",
+  "separation": 0.117,
+  "correct": false,
+  "rank": 3,
+  "max_rank": 2,
+  "band": "partial"
+ }
+]

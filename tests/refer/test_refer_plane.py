@@ -184,11 +184,22 @@ def test_the_same_query_twice_is_the_same_bytes(repo):
 
 
 def test_no_module_in_the_plane_imports_a_network_library():
-    """L4's import fence, extended to the plane that most wants to break it."""
-    import fux.refer as plane
-    from fux.refer import arc, assemble, chunk, freshness, rescore, source
+    """L4's import fence, extended to the plane that most wants to break it.
 
-    for module in (plane, arc, assemble, chunk, freshness, rescore, source):
+    ⚠ **This scanned three FUNCTIONS instead of three modules until 2026-08-27.**
+    `fux.refer` re-exported `assemble`, `chunk` and `rescore`, shadowing its own
+    submodules of those names, so `from fux.refer import assemble` handed back
+    the function — and `inspect.getsource` works on a function, so nothing ever
+    failed. **The fence silently stopped covering three files.**
+
+    A shadow does not have to break a test to cost you one; see
+    `tests/test_no_shadowed_submodules.py`. The modules are now `_assemble`,
+    `_chunk` and `_rescore`, and are imported by their real names here.
+    """
+    import fux.refer as plane
+    from fux.refer import _assemble, _chunk, _rescore, arc, freshness, source
+
+    for module in (plane, arc, _assemble, _chunk, freshness, _rescore, source):
         tree = ast.parse(inspect.getsource(module))
         imported = {
             alias.name.split(".")[0]

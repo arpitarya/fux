@@ -51,6 +51,31 @@ def read(root: Path) -> list[str]:
     return sorted({line.strip() for line in text.splitlines() if line.strip()})
 
 
+def is_readable(root: Path) -> bool:
+    """Does a dirty list exist and can it be read?
+
+    **Absent is not the same as empty, and under narrow-by-default the
+    difference decides whether a URL is ever fetched again.** `read` collapses
+    both to `[]` on purpose — it feeds reporting paths where "cannot tell"
+    should degrade quietly to "nothing known pending".
+
+    ⚠ **A consumer that ACTS on the list needs the distinction.** `fux update`
+    refreshes the dirty list by default (W-82 ruling 3), and an empty list means
+    *fetch nothing*. A missing or unreadable list would therefore turn `update`
+    into a silent no-op — **exactly the "the tail silently stops being
+    refreshed" failure the ruling warns about**, arriving through the file's own
+    tolerance rather than through the ruling.
+
+    So: **list present ⇒ trust it. List absent ⇒ sweep everything.** Fail safe,
+    not fail silent.
+    """
+    try:
+        _path(root).read_text(encoding="utf-8", errors="replace")
+        return True
+    except OSError:
+        return False
+
+
 def record(root: Path, doc_ids) -> None:
     """Add `doc_ids` to the list, as a union with whatever is already there.
 

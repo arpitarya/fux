@@ -137,13 +137,19 @@ def ask(
     archived_dirs: frozenset[str] = frozenset(),
     weighting=None,
     scoring: Scoring = DEFAULT_SCORING,
+    stats_out: dict | None = None,
 ) -> list[AskResult]:
     query_hashes = query_term_hashes(query)
     if not query_hashes:
+        # A query that tokenizes to nothing still owes the caller its corpus
+        # statistics, or `confidence` cannot tell "no terms" from "not run".
+        if stats_out is not None:
+            stats_out.setdefault("df", {})
+            stats_out.setdefault("n", 0)
         return []
     candidates, df, corpus = scan_candidates(root, query_hashes, scoring=scoring)
     return rank(
         candidates, query_hashes, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
-        weighting=weighting, scoring=scoring,
+        weighting=weighting, scoring=scoring, stats_out=stats_out,
     )

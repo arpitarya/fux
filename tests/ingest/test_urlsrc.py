@@ -653,3 +653,108 @@ def test_no_surviving_record_points_at_an_id_this_run_does_not_hold(tmp_path):
     # The tag edge survived, which is what makes the exemption a real one and
     # not just an untested clause.
     assert {"kind": "tag", "dst": "tag:ops", "grade": 10} in index["file:docs/keep.md"]["edges"]
+
+
+# --- The skip reason must say which of two very different things happened ----
+#
+# Measured 2026-08-27 against `https://httpbin.org/uuid` in the fux-lab daemon
+# environment: fux reported `no decoder for application/json` while `jsondoc`
+# was built in, claimed `.json`, ran, and correctly dropped a bare UUID —
+# leaving nothing to index. The message sent a reader looking for a decoder
+# that was already there. `decode.reason()` has always drawn this distinction
+# and its docstring says conflating the two "would make the queue useless";
+# the FILE path used it and the URL path did not.
+
+def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
+    from fux.ingest.urlsrc import _decode_fetched
+
+    uuid_only = b'{\n  "uuid": "23f0c01c-4067-49f9-99cd-b19564aa930e"\n}\n'
+    markdown, why = _decode_fetched(uuid_only, "application/json", "https://httpbin.org/uuid")
+
+    assert markdown is None
+    assert "no decoder" not in why, (
+        "jsondoc is built in and claims .json — saying there is no decoder is false"
+    )
+    assert why == "jsondoc: nothing readable in .json"
+
+
+def test_a_type_nothing_claims_still_says_no_decoder():
+    """The other half. Narrowing the message must not remove the true case."""
+    from fux.ingest.urlsrc import _decode_fetched
+
+    markdown, why = _decode_fetched(b"\x89PNG\r\n", "image/png", "https://x.test/y.png")
+    assert markdown is None
+    assert why == "no decoder for image/png"
+
+
+def test_json_with_prose_in_it_decodes_rather_than_skipping():
+    """The control: the skip above is about the CONTENT, not the type."""
+    from fux.ingest.urlsrc import _decode_fetched
+
+    markdown, why = _decode_fetched(
+        b'{"note": "the paging rotation"}', "application/json", "https://x.test/y"
+    )
+    assert why == ""
+    assert markdown and "paging rotation" in markdown
+
+
+def test_a_consumer_decoder_reaches_url_content_too(tmp_path):
+    """ADR-DECODE's premise stopped at the network boundary until 2026-08-27.
+
+    `decode_mod.decode(raw, rel)` was called with **no `root`**, so
+    `registry(None)` returned built-ins only and a decoder the consumer wrote
+    into `.fux/decoders/` never applied to a fetched document — at exactly the
+    boundary where a strange content type is most likely to arrive.
+    """
+    from fux.ingest.urlsrc import _decode_fetched
+
+    decoders = tmp_path / ".fux" / "decoders"
+    decoders.mkdir(parents=True)
+    (decoders / "vndthing.py").write_text(
+        "EXTENSIONS = ('.vndthing',)\n"
+        "def decode(raw, rel_path):\n"
+        "    return 'consumer decoder ran: ' + raw.decode()\n",
+        encoding="utf-8",
+    )
+
+    markdown, why = _decode_fetched(
+        b"payload", "application/x-unknown", "https://x.test/doc.vndthing", tmp_path
+    )
+    assert why == "", why
+    assert markdown == "consumer decoder ran: payload"
+
+
+# --- URLs reach the enrichment queue too (Arpit, 2026-08-28) ---------------
+#
+# The file path routed an unreadable document into `.fux/enrich/queue.tsv` with
+# its reason; the URL path routed it nowhere, so a URL that needed a model could
+# never be queued for one. ADR-FETCHER decision 11 named the asymmetry; this is
+# it closed.
+
+def test_a_fetch_failure_is_not_queued_for_a_model():
+    """⚠ **The care that earns the `UNFETCHED` kind.** A 404 or a timeout is not
+    something enrichment discharges, and `queue.tsv` is COMMITTED — queueing one
+    would put a permanent work item in front of the whole team that no amount of
+    model time closes.
+    """
+    from fux.ingest.gitdir import UNFETCHED, UNREADABLE, Skipped
+
+    dead = Skipped(rel_path="https://x.test/gone", reason="fetch failed: 404", kind=UNFETCHED)
+    unreadable = Skipped(rel_path="https://x.test/scan", reason="pdf: no text layer")
+
+    assert dead.kind == UNFETCHED
+    assert unreadable.kind == UNREADABLE, "the default stays the loud bucket"
+    queued = [s for s in (dead, unreadable) if s.kind != UNFETCHED]
+    assert [s.rel_path for s in queued] == ["https://x.test/scan"]
+
+
+def test_the_kind_is_set_at_the_skip_site_not_read_back_from_the_reason():
+    """Branching on prose is what W-82 ruling 12 refused, and the classification
+    would be one string edit away from silently wrong."""
+    import inspect
+
+    from fux.ingest import urlsrc
+
+    source = inspect.getsource(urlsrc.fetch_all)
+    assert "kind=UNFETCHED" in source
+    assert 'reason.startswith("fetch failed' not in source

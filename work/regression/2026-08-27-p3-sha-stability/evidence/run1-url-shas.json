@@ -1,0 +1,21 @@
+{
+  "https://docs.python.org/3/library/json.html": "7859c963c9ae14b6b330083cf59c3a72106dbdb5",
+  "https://docs.python.org/3/library/pathlib.html": "c7339ba4b4f321987a434d9a0e120a59df7e315f",
+  "https://docs.python.org/3/library/subprocess.html": "fccf908ef402610373acc7c0610581329db989ec",
+  "https://docs.python.org/3/tutorial/errors.html": "c63e5bd7df968a19269ffc5f6ccfbcd24181c1bd",
+  "https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol": "b1be0bb008d8221d03af75d6cf8ecd5b89f17d29",
+  "https://en.wikipedia.org/wiki/Runbook": "c4834e06232ece1c5761fd61b4860130810dd7df",
+  "https://en.wikipedia.org/wiki/Site_reliability_engineering": "32cdefa8fd85ee38daecb8446c55db68f986ca4f",
+  "https://example.com/": "1e3abee42a11f7781e8dd534dbaaa42b7129a335",
+  "https://go.dev/doc/faq": "3b728b7223ea8402c84a2b4a9ba09f549c08d1df",
+  "https://httpbin.org/html": "565471c2fe8dcf763030be9e96a38e0f04e1eebc",
+  "https://peps.python.org/pep-0008/": "a4f44df0c763867a3061806680d74b1e13bdb65b",
+  "https://peps.python.org/pep-0020/": "4593cd46d4c417b0a3e1412b59af82eb49dc0278",
+  "https://peps.python.org/pep-0484/": "999ac3cc6596c44dc7e19cace3b60ea5884dd795",
+  "https://www.githubstatus.com/": "34fa48d5e0236e3e7ee0fa86dfcdcbb9aa336b37",
+  "https://www.iana.org/help/example-domains": "2daee70462726c3e428fb4218bd749c590431f8a",
+  "https://www.rfc-editor.org/rfc/rfc2616.txt": "e9c97d00e926019f791f025b7975644aba508851",
+  "https://www.rfc-editor.org/rfc/rfc3986.txt": "30af05084b77d8657f922add1a6f0f56033ccf09",
+  "https://www.rfc-editor.org/rfc/rfc6265.txt": "b05e129f8958aea68388477fc63de929287dc806",
+  "https://www.rfc-editor.org/rfc/rfc7231.txt": "bd23b2770e4c7859119e96a3213520c4a4691e78"
+}

@@ -116,6 +116,17 @@ def test_stdout_is_byte_identical_with_the_bar_on_or_off(repo: Path, verb: str):
         listing = VERB_PREPARE.get(verb)
         if listing is not None:
             (repo / ".fux" / "sources" / "dirs").write_text(listing, encoding="utf-8")
+        # ⚠ **`.fuxignore` is a SECOND piece of mutable state `remove` writes**,
+        # added by W-93 after this reset was written. Restoring only `dirs` left
+        # the first arm's record behind, so the second arm reported *"already
+        # recorded in .fux/.fuxignore"* and *"nothing left the index"* while the
+        # first reported a real drop — the two arms differed on their own
+        # history rather than on the bar, and the invariant became untestable
+        # for `remove` **while still failing loudly**, which is the good outcome
+        # of the two.
+        fuxignore = repo / ".fux" / ".fuxignore"
+        if fuxignore.exists():
+            fuxignore.unlink()
         _run(repo, "ingest")  # settle the index against that listing
 
     prepare()

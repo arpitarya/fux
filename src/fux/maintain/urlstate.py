@@ -39,7 +39,12 @@ last confirmed it. *"Confirmed two runs ago"* is what a maintainer can act on
 anyway — *"confirmed 41 minutes ago"* invites the age bound that
 `record-freshness.compare.md` verdict D already refused.
 
-⚠ **`token` is deliberately absent.** It belongs to the optional `validate()`
+⚠ **`token_sha` arrived 2026-08-28** with the optional `validate()`; the
+paragraph below is kept because it records why the field was *absent* for so
+long, and the answer — *declaring a field nothing writes is how a knob that
+cannot work ships* — is still the rule.
+
+⚠ **The historical note: `token` was deliberately absent.** It belonged to the optional `validate()`
 fetcher function, which is **an unruled fork gated on a measurement**. Writing a
 field nothing reads is how a knob that cannot work gets shipped.
 
@@ -97,12 +102,27 @@ class UrlHealth:
     last_changed_run: int | None = None
     #: Consecutive failed fetches, reset to 0 by any success.
     fail_streak: int = 0
+    #: `sha256` of the last validation token this URL's fetcher returned.
+    #: `None` = the fetcher has no `validate()`, or said it could not tell.
+    #:
+    #: ⚠ **THE HASH, NEVER THE TOKEN** (W-87 P4 fork 4, ruled 2026-08-28). An
+    #: `ETag` is opaque to fux but not necessarily to everyone: it can be a
+    #: content hash, a version counter, or an internal object id, and this file
+    #: — while gitignored — is exactly the kind of local state that ends up in a
+    #: support bundle. Storing `sha256(token)` compares as well as the token
+    #: does and carries none of it, so **L5 is untouched by construction.**
+    #:
+    #: **Counters, no clocks** — unchanged. A token is an opaque equality
+    #: witness, not a timestamp, even when a server happened to build it from
+    #: one.
+    token_sha: str | None = None
 
     def as_json(self) -> dict:
         return {
             "last_seen_run": self.last_seen_run,
             "last_changed_run": self.last_changed_run,
             "fail_streak": self.fail_streak,
+            "token_sha": self.token_sha,
         }
 
 
@@ -110,11 +130,19 @@ class UrlHealth:
 class UrlState:
     run_seq: int = 0
     urls: dict[str, UrlHealth] = field(default_factory=dict)
+    #: host -> times that host rate-limited a fetch (W-82 ruling 12).
+    #:
+    #: **Keyed by HOST, not by URL**, because a rate limit is a property of the
+    #: server and not of one page — twelve 429s spread over twelve pages of one
+    #: wiki is one fact, not twelve. Counts, never clocks, like everything else
+    #: in this file.
+    rate_limited: dict[str, int] = field(default_factory=dict)
 
     def as_json(self) -> dict:
         return {
             "run_seq": self.run_seq,
             "urls": {url: h.as_json() for url, h in sorted(self.urls.items())},
+            "rate_limited": dict(sorted(self.rate_limited.items())),
         }
 
 
@@ -140,6 +168,12 @@ def read(root: Path) -> UrlState:
     # declared, instead of a place plus a reader that must remember it.
     top = _file_schema().coerce(raw)
     state = UrlState(run_seq=max(0, top.get("run_seq", 0)))
+    for host, count in (top.get("rate_limited") or {}).items():
+        # A negative or non-integer count is a file somebody edited by hand;
+        # dropping it is right, because a report must never be able to break
+        # `fux doctor` (see this function's own contract above).
+        if isinstance(host, str) and isinstance(count, int) and count > 0:
+            state.rate_limited[host] = count
     health = _health_schema()
     for url, entry in (top.get("urls") or {}).items():
         if not isinstance(url, str):
@@ -149,6 +183,7 @@ def read(root: Path) -> UrlState:
             last_seen_run=_non_negative(fields.get("last_seen_run")),
             last_changed_run=_non_negative(fields.get("last_changed_run")),
             fail_streak=max(0, fields.get("fail_streak", 0)),
+            token_sha=fields.get("token_sha") or None,
         )
     return state
 
@@ -172,12 +207,37 @@ def write(root: Path, state: UrlState) -> None:
     (directory / STATE_NAME).write_text(text, encoding="utf-8")
 
 
+def record_rate_limits(root: Path, counts: dict[str, int]) -> None:
+    """Add this run's rate-limit counts to the persisted state. **Never raises.**
+
+    W-82 ruling 12. Read-modify-write rather than replace: the counts are
+    cumulative across runs, which is what makes *"this host rate-limited you 12
+    times"* a fact worth acting on rather than a blip.
+
+    ⚠ **This never touches `[sources.url] max_parallel`.** The whole point of
+    recording it is that the consumer decides — Arpit's standing rule, state the
+    cost and do not clamp the knob.
+    """
+    if not counts:
+        return
+    try:
+        state = read(root)
+        for host, count in counts.items():
+            if count > 0:
+                state.rate_limited[host] = state.rate_limited.get(host, 0) + count
+        write(root, state)
+    except OSError:
+        # A report that can fail an ingest is worse than a missing report.
+        pass
+
+
 def observe(
     root: Path,
     *,
     fetched: dict[str, str],
     failed,
     listed,
+    token_shas: dict[str, str] | None = None,
 ) -> UrlState:
     """Record one networked run's outcome and bump `run_seq`.
 
@@ -205,8 +265,15 @@ def observe(
     listed_set = {u for u in listed}
     previous_shas = _read_shas(root)
 
+    tokens = token_shas or {}
     for url in listed_set:
         health = state.urls.setdefault(url, UrlHealth())
+        # Fork 3. Recorded for every URL this run learned a token for, whether
+        # it was then fetched or skipped as unchanged — the point of storing it
+        # is that the NEXT run can compare. A URL whose fetcher has no
+        # `validate()` never appears here and keeps `token_sha = None`.
+        if url in tokens:
+            health.token_sha = tokens[url]
         if url in fetched:
             if previous_shas.get(url) not in (None, fetched[url]):
                 health.last_changed_run = state.run_seq

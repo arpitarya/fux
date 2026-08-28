@@ -629,13 +629,75 @@ def cmd_update(args) -> int:
         listed = _read(list_path(root, sourcelist.URLS), sourcelist.URLS) if config.url else []
         refresh = bool(listed)
         if refresh:
-            print(f"fetching  {len(listed)} listed URL(s) (network)", file=sys.stderr)
+            only_urls, why = _narrow(root, listed, all_urls=getattr(args, "all", False))
+            if only_urls is not None and not only_urls:
+                print(f"nothing to fetch — {why}", file=sys.stderr)
+                refresh = False
+            elif only_urls is not None:
+                print(
+                    f"fetching  {len(only_urls)} of {len(listed)} listed URL(s) "
+                    f"(network) — {why}. `fux update --all` fetches every one",
+                    file=sys.stderr,
+                )
+            else:
+                print(
+                    f"fetching  {len(listed)} listed URL(s) (network) — {why}",
+                    file=sys.stderr,
+                )
 
     report = _ingest(root, args, refresh_urls=refresh, only_urls=only_urls)
+    # Fork 3: a saved fetch is worth one line. An optimisation nobody can see is
+    # one nobody can verify — and `validate` is exactly the kind that fails
+    # silently in the safe direction, so a run where it stopped working looks
+    # identical to one where it never ran.
+    if getattr(report, "validated", 0):
+        print(
+            f"  {report.validated} URL(s) unchanged by validate(); no body fetched",
+            file=sys.stderr,
+        )
     for s in report.skipped:
         if s.rel_path.startswith(("http://", "https://")):
             print(f"  ! {s.rel_path} — {s.reason}; prior record kept", file=sys.stderr)
     return 0
+
+
+def _narrow(root: Path, listed, *, all_urls: bool):
+    """Which URLs `fux update` fetches, and one line saying why.
+
+    **W-82 ruling 3, landed 2026-08-28:** narrow is the DEFAULT and `--all`
+    overrides. *"If the dirty list is the right thing to refresh, it should not
+    have to be asked for. A user typing `fux update` wants a current index, not
+    a network sweep."*
+
+    Returns `(None, why)` for a full sweep, or `(set_of_urls, why)` for a narrow
+    one — `None` and the empty set mean opposite things, which is the whole
+    subtlety here.
+
+    ⚠ **An ABSENT dirty list means SWEEP EVERYTHING, not nothing.** `dirty.read`
+    collapses missing-and-unreadable to `[]` because it feeds reporting paths;
+    a consumer that *acts* on the list cannot afford that, because empty means
+    *fetch nothing*. A repo that has never run the hook, or whose runtime
+    directory was wiped, would otherwise have `fux update` quietly stop
+    fetching — **the exact "the tail silently stops being refreshed" failure
+    ruling 3 warns about**, arriving through a tolerance rather than a decision.
+    Fail safe, not fail silent.
+
+    ⚠ **Ruling 3 and ruling 10 land together.** With narrow as the default the
+    tail is refreshed by the daemon and by nothing else, so a repo that runs no
+    daemon and never commits a URL change will not re-fetch. That is why the
+    announcement always names `--all`.
+    """
+    from .maintain import dirty as dirty_mod
+
+    if all_urls:
+        return None, "`--all`"
+    if not dirty_mod.is_readable(root):
+        return None, "no dirty list yet, so nothing is known to be stale"
+
+    pending = {i[len("url:"):] for i in dirty_mod.read(root) if i.startswith("url:")}
+    known = {e.value for e in listed if not e.exclude}
+    targeted = pending & known
+    return targeted, f"{len(targeted)} known stale"
 
 
 def _locate(root: Path, entry: str) -> sourcelist.ListSpec:

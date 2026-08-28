@@ -1,0 +1,19 @@
+id   band        answerable      sep  top-2
+d01  partial     True          0.029  ['policy-data-retention.md', 'guide-onboarding.md']
+d02  grounded    True          0.581  ['policy-data-retention.md', 'adr-0007-helix-mesh.md']
+d03  partial     True          0.083  ['runbook-mesh-rollback-legacy.md', 'guide-onboarding.md']
+d04  partial     True           0.09  ['guide-onboarding.md', 'reference-deployment-tiers.md']
+d05  partial     True          0.146  ['adr-0019-calder-gateway.md', 'reference-deployment-tiers.md']
+d06  partial     True          0.036  ['adr-0007-helix-mesh.md', 'guide-onboarding.md']
+d07  partial     True          0.019  ['postmortem-checkout-outage.md', 'guide-onboarding.md']
+d08  partial     True          0.109  ['reference-deployment-tiers.md', 'adr-0007-helix-mesh.md']
+d09  partial     True          0.359  ['guide-onboarding.md', 'runbook-gateway-rollback.md']
+d10  partial     True           0.07  ['reference-deployment-tiers.md', 'guide-oncall-rota.md']
+d11  partial     True           0.24  ['adr-0007-helix-mesh.md', 'runbook-gateway-rollback.md']
+d12  partial     True          0.076  ['guide-onboarding.md', 'policy-data-retention.md']
+d13  partial     True          0.295  ['policy-data-retention.md', 'runbook-gateway-rollback.md']
+d14  partial     True          0.227  ['adr-0019-calder-gateway.md', 'adr-0007-helix-mesh.md']
+d15  partial     True          0.094  ['runbook-gateway-rollback.md', 'adr-0019-calder-gateway.md']
+
+bands: {'partial': 14, 'grounded': 1}
+answerable=False: 0 / 15

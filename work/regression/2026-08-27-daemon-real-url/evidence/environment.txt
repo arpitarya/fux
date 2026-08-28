@@ -1,0 +1,20 @@
+# .fux/sources/urls
+https://example.com/                                fetch=http meta=plain
+https://www.rfc-editor.org/rfc/rfc7231.txt          fetch=http meta=plain
+https://docs.python.org/3/library/pathlib.html      fetch=http meta=plain
+https://httpbin.org/uuid                            fetch=http meta=plain
+https://example.com/definitely-not-there            fetch=http meta=plain
+https://en.wikipedia.org/wiki/Special:Random          fetch=http meta=plain
+https://httpbin.org/status/429                        fetch=http meta=plain
+
+# fux doctor
+[OK] python version: 3.14, fux 2.0.0-alpha.2
+[OK] repo root: /Users/arpitarya/my_programs/fux-lab/2026-08-27-daemon-real-url/repo
+[OK] .fux/ writable: /Users/arpitarya/my_programs/fux-lab/2026-08-27-daemon-real-url/repo/.fux
+[OK] index not gitignored: the committed index is tracked
+[OK] .fux/ layout declared: every entry is declared
+[OK] types list usable: .fux/sources/types: 36 pattern(s)
+[OK] fuxignore usable: .fux/.fuxignore: 0 ignore rule(s), 0 re-include(s)
+[OK] accelerator: stale (the committed index changed since it was built) - `ask` falls back to the scan; run `fux build`
+[OK] background runner: idle, nothing pending
+[OK] url sources: 4 url: record(s), 4 confirmed by the last run, fetches <= 4 at a time (max_parallel; also capped by your fetcher's MAX_PARALLEL), rate-limited by httpbin.org x8

@@ -1,0 +1,67 @@
+# mix.toml — the declared query prior and the published cost of an error.
+#
+# Frozen the way a pre-registration is frozen. Every quality report prints
+# `mix@version` beside its number, so two scores under different mixes can
+# never be silently compared.
+#
+# Owned by ADR-QUALITY (docs/adr/0044_quality-contract.md).
+#
+# WHAT MAY CHANGE, AND HOW
+#   [cost]  is a COMMITMENT. It was set before any score existed under it, and
+#           changing it after a score has been seen voids ADR-QUALITY decision 6
+#           outright — that is veto condition 3, and it is checkable from
+#           `git log --follow -p` against the dates in work/regression/.
+#   [mix]   is a DECLARED PRIOR, not a measurement. It may be replaced by
+#           evidence, but only by bumping `version` — never by a silent edit.
+#
+# Nothing reads this file yet. It exists because the cost model is only honest
+# if it is committed before the first number, and that is now true.
+
+version = 1
+
+# --------------------------------------------------------------------------
+# [cost] — FROZEN 2026-08-27 (Arpit, W-87 fork 3). Ratified in ADR-QUALITY.
+#
+# The cost is stated as a CONFIDENCE TARGET, not as a bare weight, for two
+# reasons recorded in ADR-QUALITY decision 6:
+#
+#   1. Only the RATIO is identifiable. Chow's rule puts the optimal reject
+#      threshold at (C_r - C_c)/(C_e - C_c); absolute costs do not move the
+#      decision boundary.
+#   2. `t` is arguable and a weight is not. "How sure should fux be before it
+#      cites?" is a question with a defensible answer. "What is a stale
+#      citation worth?" is not.
+#
+# penalty = t / (1 - t).   t = 0.5 -> 1 ·  t = 0.75 -> 2 ·  t = 0.9 -> 9
+#
+# t = 0.9 was considered and NOT taken: it matches the compliance pitch but
+# buys accuracy with abstention, and no coverage cost has been measured yet.
+
+[cost]
+t = 0.75            # the confidence target: cite only when >= 75 % sure
+correct = 1.0       # a correct, current, cited answer
+decline = 0.0       # an honest "I cannot answer that from this corpus"
+wrong = -2.0        # = -t/(1-t). A fabricated or stale citation.
+frozen = 2026-08-27
+
+# --------------------------------------------------------------------------
+# [mix] — the query prior. UNIFORM, and declared as such.
+#
+# The fork was never uniform-vs-weighted; it was declared-vs-undeclared. TREC
+# weights topics equally and states the assumption, which is a defensible
+# position. An undeclared mix is not.
+#
+# WARNING: the class list below is PROVISIONAL. The 50 playground goldens are
+# not labelled by class yet, and the `unanswerable` class does not exist at all
+# — authoring it is W-87 phase P2, and it must be authored BLIND or it
+# contaminates the set it is meant to test. Labelling the goldens bumps
+# `version`; it does not edit this block in place.
+
+[mix]
+weighting = "uniform"
+provisional = true          # the class list, not [cost], is what is provisional
+
+[mix.classes]
+lookup = 1.0        # a fact stated in one document
+currency = 1.0      # the answer depends on which version is current
+unanswerable = 1.0  # no correct answer exists in the corpus — NOT YET AUTHORED

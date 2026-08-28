@@ -11,7 +11,7 @@ The law this package lives under: **its results are identical to
 from __future__ import annotations
 
 from .accel import Runtime, accel_candidates, ask, block_bound, is_fresh
-from .build import BuildReport, build
+from ._build import BuildReport, build
 from .format import BLOCK_SIZE, ENTRY_SIZE, RUNTIME_SCHEMA, runtime_dir
 
 __all__ = [

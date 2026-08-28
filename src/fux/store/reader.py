@@ -45,7 +45,31 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
 
     header = _load_json(lines[0], path=path, lineno=1)
     if not isinstance(header, dict) or header.get("_format") != HEADER["_format"]:
-        raise FuxError(f"shard missing/mismatched _format header: {path}")
+        # ⚠ **This message named neither the found value nor the expected one
+        # until 2026-08-27**, while its two siblings below named both — and it
+        # is the one that actually fires, because it is what an ENGINE UPGRADE
+        # trips. Measured in `fux-playground`, whose committed index was
+        # `fux.index.v1`: every one of 50 goldens failed with
+        # `shard missing/mismatched _format header`, which reads as CORRUPTION.
+        # There is no migrate verb, so a reader who concludes "my index is
+        # broken" has no way to learn that the fix is a re-ingest.
+        found = header.get("_format") if isinstance(header, dict) else None
+        if found is None:
+            # No `_format` at all: not a version skew, a file that is not a
+            # shard. Saying "written by a different version" here would send
+            # someone re-ingesting over what may be a truncated write.
+            raise FuxError(
+                f"shard {path} has no _format header on its first line — this "
+                f"is not a fux index shard, or the file is truncated. A shard's "
+                f"first line is always {HEADER['_format']!r}."
+            )
+        raise FuxError(
+            f"shard {path} declares _format {found!r}, this engine writes "
+            f"{HEADER['_format']!r} — the index was written by a different "
+            f"version of fux. There is no in-place migration: delete "
+            f"`.fux/index/` and run `fux ingest` to rewrite it from the sources, "
+            f"which is safe because the index holds statistics, never content."
+        )
     if header.get("analyzer") != HEADER["analyzer"]:
         raise FuxError(
             f"shard {path} was written by analyzer {header.get('analyzer')!r}, "

@@ -18,10 +18,12 @@
   <circle cx="88" cy="160" r="12" fill="#eef3fd"/>
   <text x="88" y="165" font-size="12" fill="#3d6df2" text-anchor="middle" font-weight="700">1</text>
   <text x="110" y="165" font-size="15.5" fill="#14181f" font-weight="600">Your documents</text>
-  <text x="86" y="200" font-size="12.5" fill="#626b78">Stay exactly where they are —</text>
-  <text x="86" y="221" font-size="12.5" fill="#626b78">the repo, a wiki, a web page.</text>
-  <text x="86" y="252" font-size="12.5" fill="#14181f" font-weight="600">Fux never copies them</text>
-  <text x="86" y="272" font-size="12.5" fill="#14181f" font-weight="600">and never stores their text.</text>
+  <text x="86" y="196" font-size="12.5" fill="#626b78">Stay exactly where they are —</text>
+  <text x="86" y="215" font-size="12.5" fill="#626b78">the repo, a wiki, a web page.</text>
+  <text x="86" y="240" font-size="12.5" fill="#1d8a5e" font-weight="600">PDFs, Word, decks, sheets,</text>
+  <text x="86" y="258" font-size="12.5" fill="#1d8a5e" font-weight="600">email, notebooks, web pages.</text>
+  <text x="86" y="281" font-size="12.5" fill="#14181f" font-weight="600">Fux never copies them</text>
+  <text x="86" y="299" font-size="12.5" fill="#14181f" font-weight="600">and never stores their text.</text>
 
   <!-- 2 -->
   <rect x="376" y="128" width="268" height="182" rx="12" fill="#eef3fd" stroke="#3d6df2" stroke-width="2.2"/>

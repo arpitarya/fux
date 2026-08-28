@@ -1,0 +1,19 @@
+n = 50 goldens, 28 correct
+
+bin              n  correct  P(correct)   note
+[0.0,0.1)     18        8        0.44   
+[0.1,0.2)     11        5        0.45   
+[0.2,0.3)      6        3        0.50   
+[0.3,0.4)      4        3        0.75   n=4: interval far wider than +/-0.4
+[0.4,0.5)      5        3        0.60   
+[0.5,0.6)      3        3        1.00   n=3: interval far wider than +/-0.4
+[0.6,0.7)      2        2        1.00   n=2: interval far wider than +/-0.4
+[0.7,0.8)      1        1        1.00   n=1: interval far wider than +/-0.4
+[0.8,0.9)      0        0          --   empty bin
+[0.9,1.0)      0        0          --   empty bin
+
+separation == 1.0 (structural: exactly one document scored): n=0, correct=0
+
+lowest bin reaching P(correct) >= 0.75 AND staying >= it for every higher bin: 0.5
+any bin reaches 0.75: True   every OCCUPIED bin exceeds 0.75: False
+monotone non-decreasing across occupied bins: False

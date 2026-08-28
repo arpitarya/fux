@@ -14,6 +14,13 @@ from pathlib import Path
 
 from .errors import FuxError
 
+#: The daemon's sweep cadence when `fux.toml` is silent (W-82 ruling 10).
+#: Sixty minutes is conservative on purpose: the daemon covers the **tail**,
+#: documents nobody is querying, so an hour of staleness there has no reader.
+#: Defined here rather than imported from `maintain.daemon` so that reading a
+#: config never drags the maintenance plane in.
+DEFAULT_SWEEP_MINUTES = 60
+
 CONFIG_NAME = "fux.toml"
 FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1); see ADR-RECORD
 
@@ -83,6 +90,10 @@ class UrlSource:
     #: read. Leaving a default here would put the value back where W-85 took it
     #: from — implicit, and therefore unread.
     max_parallel: int
+    #: How often `fux daemon` re-checks URLs (W-82 ruling 10). **Has a default,
+    #: unlike `max_parallel`** — it bounds no blast radius, it only decides
+    #: cadence, so silence here is unopinionated rather than dangerous.
+    sweep_minutes: int = 60
 
 
 @dataclass
@@ -270,10 +281,28 @@ def _load_url_source(path: Path, raw) -> UrlSource | None:
             f"{path}: [sources.url] max_parallel must be >= 1 (got {max_parallel}). "
             "1 fetches one URL at a time"
         )
+    # `sweep_minutes` DOES have a default, and the asymmetry with max_parallel
+    # above is deliberate rather than an oversight. `max_parallel` bounds a
+    # blast radius, so a repo that can fetch must state it (W-85). This one only
+    # decides how often the daemon comes round: a missing cadence is not
+    # dangerous, merely unopinionated, and demanding it would make the required
+    # key above look like one of a pair rather than the exception it is.
+    sweep_minutes = raw.get("sweep_minutes", DEFAULT_SWEEP_MINUTES)
+    if isinstance(sweep_minutes, bool) or not isinstance(sweep_minutes, int):
+        raise FuxError(
+            f"{path}: [sources.url] sweep_minutes must be an integer >= 1 "
+            f"(got {sweep_minutes!r})"
+        )
+    if sweep_minutes < 1:
+        raise FuxError(
+            f"{path}: [sources.url] sweep_minutes must be >= 1 (got {sweep_minutes}). "
+            "It is how often `fux daemon` re-checks URLs nobody has queried"
+        )
     return UrlSource(
         fetcher=fetcher.strip(),
         urls_file=urls_file.strip(),
         meta=meta,
         config=dict(config),
         max_parallel=max_parallel,
+        sweep_minutes=sweep_minutes,
     )

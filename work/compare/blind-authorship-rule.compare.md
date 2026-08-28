@@ -30,7 +30,7 @@ timestamp: 2026-08-24T00:00:00Z
 >
 > ⚠ **Two of the six parts did NOT take effect** — the sealed query subset and
 > the decoy/placebo controls are apparatus, not protocol, and are owed as
-> [W-82 §5.4](../open/W-82-the-consolidated-build.md). ADR-RS decision
+> [W-82 §5.4](../../archive/open/W-82-the-consolidated-build.md). ADR-RS decision
 > 15 carries them marked `NOT BUILT`.
 >
 > ⚠ **The ruling costs this project's own evidence something.** Decision 14's

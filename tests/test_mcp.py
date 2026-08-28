@@ -235,3 +235,110 @@ def test_malformed_json_does_not_kill_the_server(repo):
     responses = [json.loads(line) for line in stdout.getvalue().splitlines() if line.strip()]
     assert responses[0]["error"]["code"] == -32700
     assert responses[1]["id"] == 4, "the server must keep serving after a parse error"
+
+
+# --------------------------------------------------------------------------
+# W-91 fork E — the tool descriptions are the only docs with a MACHINE audience
+# and were the only docs with no test. W-84's finding, closed here.
+
+
+def _tool(name: str) -> dict:
+    from fux.mcp import TOOLS
+
+    return next(t for t in TOOLS if t["name"] == name)
+
+
+def test_the_advertised_default_is_the_engine_s_default():
+    """⚠ **This shipped WRONG for about an hour on 2026-08-27.**
+
+    `k` advertised a hand-written `default: 5`; `[mcp] top` then made the
+    engine use whatever the repo configured, and the schema kept saying 5.
+    Nothing failed — an MCP tool schema is a machine-facing declaration that
+    no gate read, which is exactly W-84's class in the one surface whose
+    reader is ALWAYS a machine.
+    """
+    from fux.output_config import BUILT_IN
+
+    k = _tool("fux_search")["inputSchema"]["properties"]["k"]
+    assert k["default"] == BUILT_IN["top"]
+    assert str(BUILT_IN["top"]) in k["description"]
+
+
+def test_the_advertised_default_says_a_repo_can_change_it():
+    """Advertising a number that a config silently overrides is worse than
+    advertising none — the agent believes the number."""
+    from fux.output_config import OUTPUT_NAME
+
+    k = _tool("fux_search")["inputSchema"]["properties"]["k"]
+    assert OUTPUT_NAME in k["description"]
+    assert "[mcp]" in k["description"]
+
+
+def test_every_band_the_description_names_actually_exists():
+    """The description tells an agent how to branch on `confidence.band`.
+
+    A band renamed in `confidence.py` would leave this prose instructing an
+    agent to look for a value that can never appear.
+    """
+    from fux.query.confidence import BANDS
+
+    text = _tool("fux_search")["description"]
+    named = {b for b in BANDS if f"'{b}'" in text or f"`{b}`" in text}
+    assert named, "the description branches on bands but names none"
+    for band in named:
+        assert band in BANDS
+
+
+def test_the_description_names_the_fields_it_tells_an_agent_to_read():
+    """`answerable`, `band` and `missing` are instructions to read specific
+    keys. If a key is renamed, this prose sends the agent to a field that is
+    not there — silently, because prose does not fail."""
+    from fux.query.confidence import Confidence
+
+    text = _tool("fux_search")["description"]
+    shape = Confidence(0.0, 0.0, 0, "unverified", ()).as_dict()
+    for field in ("answerable", "band", "missing"):
+        assert field in text, f"the description no longer mentions {field}"
+        assert field in shape, f"the description names {field}, which the block lacks"
+
+
+def test_the_confidence_block_the_description_promises_is_unconditional_here():
+    """⚠ ADR-CONFIDENCE decision 11 gates the block behind `--band` on the CLI
+    and leaves it ALWAYS ON over MCP. The description says *read the confidence
+    block* with no caveat, and that is only honest while MCP stays ungated."""
+    from fux.output_config import SCHEMA
+
+    assert "band" not in SCHEMA["mcp"], (
+        "[mcp] band would let a config remove the block this description "
+        "unconditionally promises"
+    )
+
+
+def test_every_tool_has_a_handler_and_every_handler_a_tool():
+    """A tool advertised with no handler is a guaranteed runtime error an agent
+    discovers by calling it; a handler with no tool is unreachable code."""
+    from fux import mcp as mcp_mod
+    from fux.mcp import TOOLS
+
+    advertised = {t["name"] for t in TOOLS}
+    handlers = {
+        f"fux_{n}" for n in ("search", "passage", "related") if hasattr(mcp_mod, f"_{n}")
+    }
+    assert advertised == handlers, f"advertised={sorted(advertised)} handlers={sorted(handlers)}"
+
+
+def test_the_surface_stays_three_tools():
+    """ADR-MCP capped it deliberately — `answer` is absent because the agent is
+    the answerer. A fourth tool is a decision, not a convenience, so it should
+    cost a failing test and a record edit."""
+    from fux.mcp import TOOLS
+
+    assert len(TOOLS) == 3, [t["name"] for t in TOOLS]
+
+
+def test_every_tool_declares_a_description_and_a_schema():
+    from fux.mcp import TOOLS
+
+    for tool in TOOLS:
+        assert tool.get("description", "").strip(), f"{tool['name']} has no description"
+        assert tool.get("inputSchema", {}).get("required"), f"{tool['name']} declares no required input"

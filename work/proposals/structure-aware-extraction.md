@@ -12,7 +12,7 @@ timestamp: 2026-08-26T00:00:00Z
 reasoning rather than measurement is how a plausible regression ships.
 
 **Origin.** Arpit, 2026-08-26, during
-[W-86](../open/W-86-the-decoder-plane.md): *"shall we create decoders even for
+[W-86](../../archive/open/W-86-the-decoder-plane.md): *"shall we create decoders even for
 content in a text document like tables, could be more??"*
 
 **Answer: yes to the idea, no to the shape.** It is not decoder work, and
@@ -83,7 +83,7 @@ contain a table fux can see.
 - **[`extract.py`](../../src/fux/ingest/extract.py)** — the five fields and the
   heading regex, i.e. the actual current behaviour rather than a description
   of it.
-- **[W-86 §13.3](../open/W-86-the-decoder-plane.md)** — the boundary argument
+- **[W-86 §13.3](../../archive/open/W-86-the-decoder-plane.md)** — the boundary argument
   in its original context.
 
 ---

@@ -93,6 +93,18 @@ def _cmd_hooks(args) -> int:
     return cmd_hooks(args)
 
 
+def _cmd_daemon(args) -> int:
+    from .maintain import cmd_daemon
+
+    return cmd_daemon(args)
+
+
+def _cmd_verify(args) -> int:
+    from .query import cmd_verify
+
+    return cmd_verify(args)
+
+
 def _cmd_explain(args) -> int:
     from .graph import cmd_explain
 
@@ -144,6 +156,61 @@ def _add_progress_flags(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _top_help() -> str:
+    """`--top`'s help, with the default read from `output_config.BUILT_IN`.
+
+    Decision 6: **one source for every default.** A literal `5` repeated in
+    `add_argument` is the drift this avoids — the help text and the resolver
+    cannot disagree if only one of them holds the number.
+    """
+    from .output_config import BUILT_IN
+
+    return f"max results (default {BUILT_IN['top']}; .fux/output.toml can change it)"
+
+
+def _hops_help() -> str:
+    from .output_config import BUILT_IN
+
+    return f"max edges in a route (default {BUILT_IN['hops']}; .fux/output.toml can change it)"
+
+
+def _apply_output_defaults(args) -> None:
+    """Resolve every gated flag through `.fux/output.toml`, ONCE — ADR-OUTPUT.
+
+    **Done here rather than at each consumer, deliberately.** Downstream code
+    then reads a plain `bool`/`int` on `args` exactly as it did before this
+    file existed, so the blast radius of a rendering config is this function
+    and nothing else. `None` on the way in means *the flag was not passed*;
+    nothing downstream ever sees a `None`.
+
+    **Never raises for a missing repo.** `--help`, `--version` and a run from
+    outside a fux repo must not be broken by a config file that may not exist;
+    a malformed `output.toml` still raises, because that is a real error the
+    consumer wants to hear about.
+    """
+    from .output_config import SCHEMA, load as load_output
+
+    verb = getattr(args, "command", None)
+    keys = SCHEMA.get(verb)
+    if not keys:
+        return
+
+    from .config import find_root
+
+    root = find_root()
+    if root is None:
+        # No repo: fall back to the built-ins by resolving against an empty
+        # config rather than skipping — so the two paths cannot diverge.
+        from .output_config import DEFAULT_OUTPUT as cfg
+    else:
+        cfg = load_output(root, enabled=not getattr(args, "no_output_config", False))
+
+    for key in keys:
+        if not hasattr(args, key):
+            continue
+        setattr(args, key, cfg.resolve(verb, key, getattr(args, key)))
+
+
 def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
     """`--no-tune` on every verb that reads `.fux/tune.toml` (ADR-TUNE decision 11).
 
@@ -157,6 +224,40 @@ def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
         action="store_true",
         help="ignore .fux/tune.toml and use the engine defaults",
     )
+
+
+def _cmd_output(args) -> int:
+    from .output_config import specimen
+
+    print(specimen(), end="")
+    return 0
+
+
+def _add_output_flags(parser: argparse.ArgumentParser, *, band: bool = False) -> None:
+    """`--no-output-config`, and `--band` where the verb has a band.
+
+    ⚠ **Every flag `.fux/output.toml` can default is declared `default=None`,
+    not `default=False`** — ADR-OUTPUT decision 10. At `default=False` an
+    absent flag and an explicit one are the same value, the file could never
+    take effect, and **nothing would fail**: the loader would work, the tests
+    would pass, and the feature would silently not exist.
+
+    `--no-output-config` is per-verb rather than global for the same reason
+    `--no-tune` is: a global flag has to precede the subcommand, and
+    `fux --no-output-config ask "..."` is not the order anyone types.
+    """
+    parser.add_argument(
+        "--no-output-config",
+        action="store_true",
+        help="ignore .fux/output.toml and use the engine defaults",
+    )
+    if band:
+        parser.add_argument(
+            "--band",
+            action="store_true",
+            default=None,
+            help="emit the confidence block (ADR-CONFIDENCE); always on over MCP",
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -182,7 +283,7 @@ def build_parser() -> argparse.ArgumentParser:
     # an agent reading that needs a parse rather than a sentence (ADR-CLI,
     # 2026-08-22). Promotion to a `fux status` verb has a written condition in
     # ADR-CLI; it is not a matter of feeling crowded.
-    p_doctor.add_argument("--json", action="store_true", help="machine-readable report")
+    p_doctor.add_argument("--json", action="store_true", default=None, help="machine-readable report")
     p_doctor.set_defaults(func=_cmd_doctor)
 
     p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
@@ -271,13 +372,21 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="read-only: report what has drifted. Offline for files; does not fetch URLs",
     )
+    # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
+    # deliberately no `--dirty`/`--stale`/`--changed` -- if the dirty list is the
+    # right thing to refresh, it should not have to be asked for.
+    p_update.add_argument(
+        "--all",
+        action="store_true",
+        help="fetch every listed URL, not just the ones known to be stale",
+    )
     _add_progress_flags(p_update)
     p_update.set_defaults(func=_cmd_update)
 
     def _query_parser(name: str, help_text: str):
         p = sub.add_parser(name, help=help_text)
         p.add_argument("query", help="natural-language question")
-        p.add_argument("--json", action="store_true", help="machine-readable output")
+        p.add_argument("--json", action="store_true", default=None, help="machine-readable output")
         # The accelerator is asserted byte-identical to the scan, so either
         # flag only ever changes speed. Scan-by-default (Arpit, 2026-08-21)
         # needs no build step; `--fast` opts into the derived accelerator
@@ -295,15 +404,25 @@ def build_parser() -> argparse.ArgumentParser:
             help="force the reference scan path (the default; kept for explicit bug reproduction)",
         )
         _add_tune_flag(p)
+        _add_output_flags(p, band=True)
         return p
 
     p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
-    p_ask.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
-    p_ask.add_argument("--explain", action="store_true", help="report which path answered")
+    p_ask.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
+    p_ask.add_argument("--explain", action="store_true", default=None, help="report which path answered")
+    # ADR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
+    # `--explain` answers "which code path ran" and `--why` answers "why this
+    # document" — different questions, different costs. `--why` runs a second
+    # query when a tune file exists, and folding that cost into a flag people
+    # already pass for latency debugging would be a surprise.
+    p_ask.add_argument(
+        "--why", action="store_true",
+        help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
+    )
     p_ask.set_defaults(func=_cmd_ask)
 
     p_find = _query_parser("find", "ranked document locations, one per line")
-    p_find.add_argument("--top", type=int, default=5, metavar="N", help="max results (default 5)")
+    p_find.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
     p_find.set_defaults(func=_cmd_find)
 
     p_answer = _query_parser(
@@ -312,9 +431,39 @@ def build_parser() -> argparse.ArgumentParser:
     p_answer.add_argument(
         "--no-refer",
         action="store_true",
+        default=None,
         help="skip the refer plane; answer from the index's own structure alone",
     )
+    # ADR-PROVENANCE. Three flags rather than one, because they are three
+    # different asks and conflating them would make the strongest one
+    # (`--journal`, which WRITES) reachable by accident.
+    p_answer.add_argument(
+        "--audit", action="store_true",
+        help="emit the refer plane's own record: per-document freshness, both shas, budget spent",
+    )
+    p_answer.add_argument(
+        "--receipt", action="store_true",
+        help="emit a re-runnable receipt: index digest, tune digest, engine, cited shas",
+    )
+    p_answer.add_argument(
+        "--journal", action="store_true", default=None,
+        help="also append the receipt to .fux/runtime/ (local, gitignored, never committed)",
+    )
     p_answer.set_defaults(func=_cmd_answer)
+
+    # ADR-PROVENANCE. A verb, not a flag: it takes a FILE rather than a query,
+    # so it does not belong on the query parser at all — every flag there
+    # assumes a `query` positional this command has no use for.
+    p_verify = sub.add_parser(
+        "verify", help="re-run a receipt against this tree: reproduced | drifted | unverifiable"
+    )
+    p_verify.add_argument("receipt", help="path to a receipt written by `fux answer --receipt`")
+    p_verify.add_argument("--json", action="store_true", help="machine-readable verdict")
+    p_verify.add_argument(
+        "--rerun", action="store_true",
+        help="re-answer the question too; without it only the INPUTS are checked",
+    )
+    p_verify.set_defaults(func=_cmd_verify)
 
     # W-76 Phase 8. **No `--model` flag, and that is the design**: fux never
     # calls a model, so there is no networked path to fence. Generation is the
@@ -343,20 +492,43 @@ def build_parser() -> argparse.ArgumentParser:
     p_hooks.add_argument("--install", action="store_true", help="write them (the default)")
     p_hooks.add_argument("--status", action="store_true", help="report what is wired")
     p_hooks.add_argument("--uninstall", action="store_true", help="remove only what fux wrote")
-    p_hooks.add_argument("--json", action="store_true", help="machine-readable status")
+    p_hooks.add_argument("--json", action="store_true", default=None, help="machine-readable status")
     p_hooks.set_defaults(func=_cmd_hooks)
+
+    # W-82 ruling 10 (Arpit, 2026-08-27). A verb, like `mcp`, for the same
+    # reason: it is a long-running process rather than a query, and flat rather
+    # than a subcommand tree because "no subcommand tree" is ADR-CLI's
+    # constraint. `start`/`stop`/`status` are POSITIONAL, not flags, because
+    # they are mutually exclusive states and `fux daemon --start --stop` should
+    # not parse.
+    p_daemon = sub.add_parser(
+        "daemon", help="run the URL freshness clock in the background (start | stop | status)"
+    )
+    p_daemon.add_argument(
+        "action",
+        nargs="?",
+        default="status",
+        choices=("start", "stop", "status"),
+        help="omit for status",
+    )
+    p_daemon.add_argument("--json", action="store_true", default=None, help="machine-readable status")
+    # The child's own entry point. Hidden: nobody types this, and a documented
+    # flag that runs the loop in the foreground would invite someone to wire it
+    # into a supervisor, which is the global install this verb exists to avoid.
+    p_daemon.add_argument("--serve", action="store_true", help=argparse.SUPPRESS)
+    p_daemon.set_defaults(func=_cmd_daemon)
 
     # The graph group. Flat, like every other verb — `fux graph path` would be
     # the first subcommand tree on this surface, and "no subcommand tree" is
     # the constraint ADR-CLI keeps.
     p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
-    p_explain.add_argument("--json", action="store_true", help="machine-readable output")
+    p_explain.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     p_explain.set_defaults(func=_cmd_explain)
 
     p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")
     p_graph.add_argument("query", help="natural-language question")
-    p_graph.add_argument("--json", action="store_true", help="machine-readable output")
+    p_graph.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     graph_path_group = p_graph.add_mutually_exclusive_group()
     graph_path_group.add_argument(
         "--fast",
@@ -374,8 +546,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_path = sub.add_parser("path", help="how two documents are connected, most reliable route first")
     p_path.add_argument("src", metavar="FROM", help="the document the route starts at")
     p_path.add_argument("dst", metavar="TO", help="the document the route ends at")
-    p_path.add_argument("--hops", type=int, default=2, metavar="N", help="max edges in a route (default 2)")
-    p_path.add_argument("--json", action="store_true", help="machine-readable output")
+    p_path.add_argument("--hops", type=int, default=None, metavar="N", help=_hops_help())
+    p_path.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_tune_flag(p_path)
     p_path.set_defaults(func=_cmd_path)
 
@@ -387,6 +559,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p_tune.set_defaults(func=_cmd_tune)
 
+    # ADR-OUTPUT: prints, never writes. `tomllib` reads and the stdlib does not
+    # write TOML, and a writer would mean fux editing a file it promised was
+    # yours — the same refusal `fux tune` makes.
+    p_output = sub.add_parser(
+        "output", help="print the output-defaults file for you to paste into .fux/output.toml"
+    )
+    p_output.set_defaults(func=_cmd_output)
+
     return parser
 
 
@@ -396,6 +576,13 @@ def main(argv: list[str] | None = None) -> int:
     if not getattr(args, "command", None):
         parser.print_help()
         return 1
+    # ADR-OUTPUT decision 3. Before dispatch and before the progress plane, so
+    # every `args` a command sees is already resolved.
+    try:
+        _apply_output_defaults(args)
+    except FuxError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return exc.exit_code
     if args.command in _PROGRESS_COMMANDS:
         # Imported here, not at module level — ADR-CLI decision 7, `--version`
         # stays instant. One `Progress` for the whole invocation (W-64): an

@@ -20,21 +20,51 @@ copies of this predicate is a differential-law failure waiting for them to
 drift.** The ranking is still byte-identical at the default weight — which is
 ADR-ARCHIVED-CONTENT decision 2, and it has a test.
 
-## Three conditions, and none of them overrides another
+## `.fuxignore` is consulted first, and everything else is a conjunction
 
-A file is indexed **iff** all three hold:
+**One file outranks the rest**: `.fux/.fuxignore`
+([ADR-FUXIGNORE](../../../docs/adr/0047_fuxignore.md)), a `.gitignore`-shaped
+list where `!` **re-includes**. Its verdict is taken before anything else and
+it decides in both directions — an ignored path is skipped whatever the rest
+says, and an explicitly `!`-re-included path skips straight past the exclusions
+and the type allowlist.
+
+**Below it, the remaining conditions are still a conjunction with no
+precedence.** A path `.fuxignore` says nothing about is indexed **iff** all
+three hold:
 
 1. it lives under an **included** `dirs` entry;
 2. no `!` **exclusion** entry matches it or any of its ancestors
-   (ADR-DIR-LIST, W-45's verdict E);
+   (ADR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
+   still honoured, and `fux ingest` warns when a pattern is stated here *and*
+   in `.fuxignore`;
 3. its name matches the **type allowlist** — `.fux/sources/types` if that file
    exists, otherwise the built-in `DEFAULT_TYPES` (ADR-TYPES, W-55's verdict G).
 
-**This is a conjunction, deliberately, not a priority order.** No rule beats
-another, so there is nothing to remember about precedence and nothing to get
-wrong. Every file that fails one of the three is reported as *skipped with a
-reason* rather than silently dropped — an invisible filter is the failure mode
-both of those items were opened about.
+**No rule inside that trio beats another**, so there is nothing to remember
+about precedence among them and nothing to get wrong. Every file that fails one
+of them — or that `.fuxignore` ignored — is reported as *skipped with a reason*
+rather than silently dropped, and `.fuxignore`'s reason names the file, the
+line number and the pattern. An invisible filter is the failure mode every one
+of these items was opened about.
+
+## A skip carries its CLASS, and the two are counted separately
+
+Every `Skipped` says whether it is `POLICY` — a line somebody wrote — or
+`UNREADABLE` — fux looked and found nothing to index. **The class is set at the
+point of the skip, never re-derived from the reason string**, so renaming a
+reason cannot silently move a file between the two counts.
+
+Why it exists: on the fux repo itself an ingest reported `599 skipped`, of which
+**598 were the type allowlist doing exactly its job** and one was a file worth
+looking at. One number over two populations is a number nobody reads — the same
+failure `skipnotice` was written for, arrived at from the other side. See
+ADR-INGEST decision 15.
+
+**The content skips are not overridable and are not meant to be.** `empty`,
+`binary` and `non-utf8` apply to a `!`-re-included file exactly as they do to
+any other: there is nothing for a decoder or an analyzer to read either way, so
+a switch that turned them off would only move the emptiness one layer down.
 """
 
 from __future__ import annotations
@@ -43,9 +73,10 @@ import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 
+from .. import decode as decode_mod
 from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..errors import FuxError
-from . import sourcelist
+from . import fuxignore, sourcelist
 
 
 @dataclass(frozen=True)
@@ -54,10 +85,103 @@ class WalkedFile:
     content: bytes
 
 
+#: The two reasons a path is not in the index, and **they are different news.**
+#:
+#: - `POLICY` — a committed list said not to index it: `.fux/.fuxignore`, a
+#:   `!` exclusion in `.fux/sources/dirs`, or the type allowlist. Nothing is
+#:   wrong. Somebody wrote a line and fux obeyed it.
+#: - `UNREADABLE` — fux looked and there was nothing to index: an empty file,
+#:   bytes no decoder claims, a fetch that failed.
+#:
+#: Collapsing the two into one count is what made `599 skipped` unreadable on
+#: a real corpus: 598 of them were the type allowlist doing its job and one was
+#: a file that should have been there. See ADR-INGEST decision 15.
+POLICY = "policy"
+UNREADABLE = "unreadable"
+
+#: The bytes never arrived — a 404, a timeout, a refused connection. **Only ever
+#: set on the URL path**, where retrieval can fail independently of whether the
+#: document would have been readable.
+#:
+#: ⚠ **The distinction that earns a third value: a model cannot fix a 404.**
+#: `UNREADABLE` means fux held the bytes and got nothing out of them, which is
+#: exactly what `.fux/enrich/queue.tsv` is for. `UNFETCHED` means there were no
+#: bytes, so queueing it would put a work item in front of a person that no
+#: amount of enrichment discharges — and the queue is committed, so it would be
+#: a work item in front of the whole team.
+#:
+#: Set at the skip site like the other two, never re-derived from `reason`.
+UNFETCHED = "unfetched"
+
+
 @dataclass(frozen=True)
 class Skipped:
     rel_path: str
     reason: str
+    #: `POLICY` or `UNREADABLE`, **set where the skip is made** — never
+    #: re-derived by reading `reason` back, which would put the classification
+    #: one string edit away from being silently wrong.
+    #:
+    #: ⚠ **The default is `UNREADABLE` on purpose.** A call site nobody updated
+    #: over-reports into the loud bucket, where a person investigates and finds
+    #: nothing wrong. The other default would hide a real problem inside the
+    #: deliberate count, and nothing would ever surface it.
+    kind: str = UNREADABLE
+
+    @property
+    def deliberate(self) -> bool:
+        """True when a line somebody wrote is the whole explanation."""
+        return self.kind == POLICY
+
+
+def would_index(root: Path, rel: str, *, excludes, types: TypeFilter | None) -> bool:
+    """Would this path be indexed if the `.fuxignore` blocks were not there?
+
+    **The staleness test for a fux-written line.** A generated line freezes the
+    verdict that produced it, which is the accepted cost of keeping the list in
+    a committed file — but a frozen verdict that has since become *wrong* is an
+    invisible filter, and an invisible filter is the failure every one of these
+    items was opened about. This is what makes it visible.
+
+    The three conditions in the same order the walk applies them, so the answer
+    cannot drift from the walk's. **Bytes are read only for a path that already
+    passed both lists**, which is why this costs nothing on the population that
+    is large: a `.py` file fails the allowlist and is never opened.
+    """
+    path = root / rel
+    if not path.is_file():
+        return False
+    if _excluded_by(rel, list(excludes or [])) is not None:
+        return False
+    if types is not None and not types.accepts(rel):
+        return False
+    try:
+        return _skip_reason(path.read_bytes(), rel, root) is None
+    except OSError:
+        return False
+
+
+def _generated_kind(verdict: fuxignore.Verdict) -> str:
+    """The class a `.fuxignore` ignore asserts.
+
+    A hand-written line is always `POLICY` — somebody wrote it. A generated
+    line's class is **the block it is in**, which is why the writer keeps two
+    blocks rather than one: the class is stated by position and never parsed
+    out of the note.
+    """
+    if verdict.generated is None:
+        return POLICY
+    return POLICY if verdict.generated.block == fuxignore.BLOCK_NOT_INDEXED else UNREADABLE
+
+
+def partition(skips: list[Skipped]) -> tuple[list[Skipped], list[Skipped]]:
+    """`(not_indexed, unreadable)` — the deliberate skips and the rest.
+
+    Order is preserved in both halves, so a caller that was handed a sorted
+    list gets two sorted lists and never has to re-sort (L3: `walk_sources`
+    and `fetch_all` both sort, and the printer depends on it).
+    """
+    return [s for s in skips if s.deliberate], [s for s in skips if not s.deliberate]
 
 
 def read_dirs(root: Path, rel_path: str) -> list[sourcelist.Entry]:
@@ -130,7 +254,37 @@ def is_archived_loc(loc: str, archived_dirs) -> bool:
 #: are machine data or diagram source, and indexing them was the W-55 defect.
 #: No extensionless files either — those are `LICENSE`, `Makefile` and
 #: `Dockerfile` far more often than they are documents.
-DEFAULT_TYPES: tuple[str, ...] = ("*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org")
+#: Prose formats that need no decoder — already text, walked since the
+#: allowlist shipped.
+_PROSE_TYPES: tuple[str, ...] = ("*.md", "*.markdown", "*.txt", "*.rst", "*.adoc", "*.org")
+
+
+def _default_types() -> tuple[str, ...]:
+    """The built-in allowlist: prose, plus everything a built-in decoder reads.
+
+    ⚠ **Widened 2026-08-26 on Arpit's ruling** — *"all the ones which have a
+    decoder"*. [ADR-TYPES](../../../docs/adr/0031_types-list.md) verdict G had
+    kept the default to six prose globs, on a measurement showing 14 % of this
+    repo's documents were non-prose and carried 15 % of its tokens, `.json`
+    alone at 11.4 %. **That measurement stands and was not overturned**; what
+    changed is that those tokens were *raw bytes* — the file WAS the body,
+    UUIDs and base64 included. Every one of them now passes through a decoder
+    that emits keys as headings and drops ids, hashes, timestamps and numbers.
+    Verdict G's own confidence line called the default's contents *"a defaults
+    judgment rather than a measurement"*, which is why a ruling could move it.
+
+    ⚠ **Derived from BUILT-IN decoders only, never from the live registry.** A
+    default that grew when a consumer dropped a `logdoc.py` into
+    `.fux/decoders/` would mean **adding a decoder silently starts indexing a
+    new file type** — and what counts as a document must stay a committed line
+    a human wrote in `.fux/sources/types`.
+    """
+    from .. import decode as decode_mod
+
+    return tuple(sorted({*_PROSE_TYPES, *(f"*{e}" for e in decode_mod.builtin_extensions())}))
+
+
+DEFAULT_TYPES: tuple[str, ...] = _default_types()
 
 
 @dataclass(frozen=True)
@@ -177,17 +331,26 @@ def walk_sources(
     *,
     excludes: list[str] | None = None,
     types: TypeFilter | None = None,
+    ignores: fuxignore.Ignores | None = None,
 ) -> tuple[list[WalkedFile], list[Skipped]]:
     """Walk the included roots, subtract the exclusions, keep only document types.
 
-    `excludes` and `types` default to "nothing excluded, everything allowed" so
-    a caller that has not been updated keeps its old behaviour — but **no such
-    caller ships**: `ingest` passes both, and the defaults exist for tests that
-    are exercising one condition at a time.
+    `excludes`, `types` and `ignores` default to "nothing excluded, everything
+    allowed, no opinions" so a caller that has not been updated keeps its old
+    behaviour — but **no such caller ships**: `ingest` passes all three, and the
+    defaults exist for tests that are exercising one condition at a time.
+
+    **`ignores` is checked first and can end the question in either
+    direction** (ADR-FUXIGNORE decision 4). An empty `Ignores` — which is what
+    a repo with no `.fuxignore` produces — is indistinguishable from not
+    passing one, so the old two-condition behaviour is exactly what a repo that
+    has not adopted the file still gets.
     """
     excludes = excludes or []
+    ignores = ignores if ignores is not None else fuxignore.Ignores()
     files: dict[str, bytes] = {}
-    skipped: dict[str, str] = {}
+    #: rel -> (reason, kind). The kind is decided at the point of the skip.
+    skipped: dict[str, tuple[str, str]] = {}
     for entry in dirs:
         base = root / entry
         if not base.exists():
@@ -203,23 +366,42 @@ def walk_sources(
             if rel in files or rel in skipped:
                 continue  # already covered by an earlier, overlapping entry
 
-            pattern = _excluded_by(rel, excludes)
-            if pattern is not None:
-                skipped[rel] = f"excluded by !{pattern}"
+            # `.fuxignore` first, and its answer is final in BOTH directions.
+            # An explicit `!` re-include is the one thing that outranks the
+            # type allowlist, which is why `reincluded` is a distinct state
+            # from "no rule matched" rather than a bool for "not ignored".
+            verdict = ignores.decide(rel)
+            if verdict.ignored:
+                # A fux-written block line carries BOTH halves forward: its
+                # note is the reason that put it there, and which block it
+                # sits in is its class. Neither is re-derived, so a second run
+                # reports exactly what the first one found rather than
+                # *"because .fuxignore says so"*.
+                skipped[rel] = (verdict.reason(), _generated_kind(verdict))
                 continue
-            if types is not None and not types.accepts(rel):
-                skipped[rel] = "not an indexed file type"
-                continue
+            if not verdict.reincluded:
+                pattern = _excluded_by(rel, excludes)
+                if pattern is not None:
+                    skipped[rel] = (f"excluded by !{pattern}", POLICY)
+                    continue
+                if types is not None and not types.accepts(rel):
+                    skipped[rel] = ("not an indexed file type", POLICY)
+                    continue
 
+            # Past this line nothing a human wrote is in play any more: the
+            # bytes themselves decide, so every skip below is UNREADABLE.
             content = path.read_bytes()
-            reason = _skip_reason(content)
+            reason = _skip_reason(content, rel, root)
             if reason:
-                skipped[rel] = reason
+                skipped[rel] = (reason, UNREADABLE)
             else:
                 files[rel] = content
 
     walked = sorted((WalkedFile(rel, content) for rel, content in files.items()), key=lambda f: f.rel_path)
-    skips = sorted((Skipped(rel, reason) for rel, reason in skipped.items()), key=lambda s: s.rel_path)
+    skips = sorted(
+        (Skipped(rel, reason, kind) for rel, (reason, kind) in skipped.items()),
+        key=lambda s: s.rel_path,
+    )
     return walked, skips
 
 
@@ -251,9 +433,21 @@ def _candidate_paths(base: Path):
         yield path
 
 
-def _skip_reason(content: bytes) -> str | None:
+def _skip_reason(content: bytes, rel: str = "", root: Path | None = None) -> str | None:
+    """Why this file is not a document, or `None`.
+
+    ⚠ **"binary" and "non-utf8" stopped being sufficient reasons the moment
+    decoders existed** (W-86). A `.docx` is a zip, a `.pdf` is compressed
+    streams — both contain NUL bytes and neither decodes as UTF-8, and both are
+    documents. So a claimed extension is checked *before* the byte tests, and
+    only unclaimed files are still judged on their bytes.
+
+    Empty stays a skip regardless: there is nothing for any decoder to read.
+    """
     if not content:
         return "empty"
+    if rel and decode_mod.claims(rel, root):
+        return None  # a decoder owns this type; its bytes are its own business
     if b"\x00" in content:
         return "binary"
     try:

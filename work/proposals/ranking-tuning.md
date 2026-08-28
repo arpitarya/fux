@@ -74,7 +74,7 @@ always find something.
 
 ## §2 — What is actually tunable today
 
-**Where these knobs would live is a separate proposal**, filed the same day on Arpit's instruction: [`tune-file-and-source-priority.md`](tune-file-and-source-priority.md) — a `.fux/tune.toml` written by `fux setup`, plus per-source preference weights. It also carries the blocker both files run into (**W-73**): the accelerator prunes on unweighted bounds, so any weight other than `1.0` can make `--fast` and `--scan` disagree.
+**Where these knobs would live is a separate proposal**, filed the same day on Arpit's instruction: [`tune-file-and-source-priority.md`](../../archive/proposals/tune-file-and-source-priority.md) — a `.fux/tune.toml` written by `fux setup`, plus per-source preference weights. It also carries the blocker both files run into (**W-73**): the accelerator prunes on unweighted bounds, so any weight other than `1.0` can make `--fast` and `--scan` disagree.
 
 Every constant that changes a fux ranking, where it lives, and whether anything
 can reach it:
@@ -101,7 +101,7 @@ the right instinct: *a knob ships at the value that changes nothing.*
 
 ### §2.1 — The constraint nobody expects: field weights must be integers
 
-`derive/build.py` asserts it, in the engine, today:
+`derive/_build.py` asserts it, in the engine, today:
 
 ```python
 _HEADING_W = int(HEADING_WEIGHT)

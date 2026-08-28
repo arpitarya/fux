@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from fux.refer.assemble import CITATION_OVERHEAD, PER_DOC_FRACTION, assemble
-from fux.refer.chunk import Passage
-from fux.refer.rescore import ScoredPassage
+from fux.refer._assemble import CITATION_OVERHEAD, PER_DOC_FRACTION, assemble
+from fux.refer._chunk import Passage
+from fux.refer._rescore import ScoredPassage
 
 
 def sp(doc: str, ordinal: int, nbytes: int, score: float, sha: str = "sha") -> ScoredPassage:

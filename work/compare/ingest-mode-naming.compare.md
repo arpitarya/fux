@@ -9,12 +9,12 @@ timestamp: 2026-08-09T00:00:00Z
 # Ingest-mode naming — Comparison
 
 >
-> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its own verdict block said **DECIDED, ratified by Arpit 2026-08-19 closing W-30**, with [ADR-EXTRACTED](../../docs/adr/0016_extracted-mode.md) and [ADR-ENRICHED](../../docs/adr/0017_enriched-mode.md) both `accepted`. The frontmatter had simply never been flipped.
+> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its own verdict block said **DECIDED, ratified by Arpit 2026-08-19 closing W-30**, with [ADR-EXTRACTED](../../docs/adr/0016_extracted-mode.md) and [ADR-ENRICHED](../../archive/adr/0017_enriched-mode.md) both `accepted`. The frontmatter had simply never been flipped.
 
 > **Verdict: DECIDED — `extracted` (no-AI default) + `enriched` (AI opt-in).**
 > **Ratified by Arpit 2026-08-19**, closing W-30. The records are
 > [ADR-EXTRACTED](../../docs/adr/0016_extracted-mode.md) (accepted) and
-> [ADR-ENRICHED](../../docs/adr/0017_enriched-mode.md) (accepted — named and
+> [ADR-ENRICHED](../../archive/adr/0017_enriched-mode.md) (accepted — named and
 > fenced; acceptance ratifies the contract, not permission to build). **Reopen trigger:** a `mode` value other
 > than these two appearing in a committed record.
 >

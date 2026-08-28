@@ -1,7 +1,7 @@
-"""Every record's frontmatter parses, and parses the same way for everyone.
+"""Every record's frontmatter parses, parses the same way for everyone, and is
+the *only* place the record states its metadata.
 
-Frontmatter broke twice on 2026-08-18, in two different ways, and neither was
-visible from reading the file:
+Three failure classes are checked here, and each one has been paid for:
 
 1. **An unquoted value containing `: `.** `fux`'s own parser is permissive by
    design (OKF §9) and read it happily; strict YAML — which is what GitHub,
@@ -9,12 +9,24 @@ visible from reading the file:
    record whose metadata is invisible to every tool but this one is broken even
    though nothing errored.
 2. **A global rename walked into a title.** `ADR-INGEST (0001)` became
-   `ADR-INGEST (ADR-INGEST)` when a citation sweep matched the
-   number inside the title. Eight records, silently.
+   `ADR-INGEST (ADR-INGEST)` when a citation sweep matched the number inside
+   the title. Eight records, silently.
+3. **Metadata stated twice.** Every record used to carry a `- **Name:** …`
+   bullet block restating six frontmatter keys in prose, and the two drifted —
+   which is why an earlier version of this file compared them to each other
+   instead of forbidding the second copy. **The frontmatter is now the only
+   statement**, and `test_the_body_does_not_restate_the_frontmatter` keeps the
+   duplicate from coming back.
 
-So the rules below are the ones that would have caught each. **No PyYAML** —
-the runtime is stdlib-only and this uses `fux.frontmatter`'s own definition of
-what must be quoted, which is the same rule its serializer applies.
+A fourth check has no history behind it and is here to stop one starting:
+`test_no_amendment_sections` forbids the `Amended …` block. A record states
+what is true now; a correction appended under a false sentence leaves the false
+sentence in place, and an agent reading top-down acts on the first answer it
+finds.
+
+**No PyYAML** — the runtime is stdlib-only and this uses `fux.frontmatter`'s own
+definition of what must be quoted, which is the same rule its serializer
+applies.
 """
 
 from __future__ import annotations
@@ -30,21 +42,53 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from fux import frontmatter as fm  # noqa: E402
 
-RECORD_DIRS = (ROOT / "docs" / "adr", ROOT / "work" / "adr")
-REQUIRED = ("type", "name", "title", "description", "status", "timestamp")
+RECORD_DIR = ROOT / "docs" / "adr"
+
+# The ten keys, in order. `supersedes` and `ratifies` are optional and appear
+# only where they are true, so they are not listed.
+REQUIRED = (
+    "type",
+    "name",
+    "title",
+    "description",
+    "status",
+    "date",
+    "feature",
+    "owns",
+    "laws",
+    "timestamp",
+)
+LIST_KEYS = ("owns", "laws")
 STATUSES = {"proposed", "accepted", "superseded"}
 
-# Frozen. `archive/` is never edited — several records in there predate these
-# rules and would fail; repairing them would break the property that makes an
-# archived document worth anything.
 _DELIM = "---"
+_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+# The bullet block that used to restate the frontmatter. Any of these labels
+# appearing as a top-level bullet means the duplicate has come back.
+_RESTATED = (
+    "Name",
+    "Status",
+    "Date",
+    "Feature",
+    "Owns",
+    "Owns (on acceptance)",
+    "Owns (on build)",
+    "Laws",
+    "Supersedes",
+    "Supersedes (on acceptance)",
+    "Ratifies",
+)
+_RESTATED_RE = re.compile(
+    r"^- \*\*(?:%s):\*\*" % "|".join(re.escape(label) for label in _RESTATED), re.M
+)
+
+# `## Amended …`, `> ## Amended …`, `> **Amended …`, `# Amended …` in a fence.
+_AMENDED_RE = re.compile(r"^\s*>?\s*(?:#{1,6}\s*|\*\*)Amended\b", re.M | re.I)
 
 
 def records() -> list[Path]:
-    out: list[Path] = []
-    for d in RECORD_DIRS:
-        out += sorted(d.glob("[0-9][0-9][0-9][0-9]_*.md"))
-    return out
+    return sorted(RECORD_DIR.glob("[0-9][0-9][0-9][0-9]_*.md"))
 
 
 def split(path: Path) -> tuple[list[str], str]:
@@ -61,11 +105,6 @@ def split(path: Path) -> tuple[list[str], str]:
 
 def meta_of(path: Path) -> dict:
     return fm.parse(path.read_text(encoding="utf-8")).meta
-
-
-def body_field(body: str, label: str) -> str | None:
-    m = re.search(r"^- \*\*%s:\*\*\s*(.+)$" % label, body, re.M)
-    return m.group(1).strip() if m else None
 
 
 # --------------------------------------------------------------------------
@@ -86,6 +125,8 @@ def test_values_that_need_quoting_are_quoted(path: Path) -> None:
         value = line.split(":", 1)[1].strip()
         if not value or value[0] in "\"'":
             continue
+        if value.startswith("[") and value.endswith("]"):
+            continue  # an inline list round-trips; the quoting rule is per-scalar
         if fm._NEEDS_QUOTE_RE.search(value) or ": " in value:
             offenders.append(f"{path.name}:{lineno}: {line.strip()[:90]}")
     assert not offenders, (
@@ -98,34 +139,71 @@ def test_values_that_need_quoting_are_quoted(path: Path) -> None:
 @pytest.mark.parametrize("path", records(), ids=lambda p: p.name)
 def test_required_keys_present_and_sane(path: Path) -> None:
     meta = meta_of(path)
-    missing = [k for k in REQUIRED if not str(meta.get(k, "")).strip()]
+    missing = [k for k in REQUIRED if k not in meta]
     assert not missing, f"{path.name}: frontmatter is missing {missing}"
+
+    empty = [
+        k
+        for k in REQUIRED
+        if k not in LIST_KEYS and not str(meta.get(k, "")).strip()
+    ]
+    assert not empty, f"{path.name}: these keys are present but empty: {empty}"
+
     assert meta["type"] == "ADR", f"{path.name}: type must be ADR, got {meta['type']!r}"
     assert meta["status"] in STATUSES, (
         f"{path.name}: status must be one of {sorted(STATUSES)}, got {meta['status']!r}"
     )
+    assert _DATE_RE.match(str(meta["date"])), (
+        f"{path.name}: date must be YYYY-MM-DD, got {meta['date']!r}"
+    )
+    for key in LIST_KEYS:
+        assert isinstance(meta[key], list), (
+            f"{path.name}: {key} must be an inline list — `{key}: []` when there "
+            f"are none. Got {meta[key]!r}"
+        )
 
 
 @pytest.mark.parametrize("path", records(), ids=lambda p: p.name)
-def test_frontmatter_agrees_with_the_body(path: Path) -> None:
-    """A record states its name and status twice; the two must not drift."""
+def test_keys_are_in_the_declared_order(path: Path) -> None:
+    """A fixed order is what makes forty-two records diffable against each other."""
     meta = meta_of(path)
-    body = split(path)[1]
-
-    declared = body_field(body, "Name") or ""
-    m = re.search(r"`(ADR-[A-Z0-9-]+)`", declared)
-    assert m, f"{path.name}: body has no '- **Name:** `ADR-…`' line"
-    assert m.group(1) == meta["name"], (
-        f"{path.name}: frontmatter name is {meta['name']!r}, body says {m.group(1)!r}"
+    seen = [k for k in meta if k in REQUIRED]
+    assert seen == list(REQUIRED), (
+        f"{path.name}: frontmatter keys are out of order.\n"
+        f"  expected: {list(REQUIRED)}\n"
+        f"  found:    {seen}"
     )
 
-    # The body is prose: it bolds the status and often qualifies it
-    # ("**proposed** — awaiting Arpit's ratification"). Compare the first word.
-    raw = (body_field(body, "Status") or "").lower()
-    status = re.sub(r"[^a-z].*$", "", raw.strip().lstrip("*`_ "))
-    assert status == meta["status"], (
-        f"{path.name}: frontmatter status is {meta['status']!r}, body says {status!r} "
-        f"(from {raw[:50]!r})"
+
+@pytest.mark.parametrize("path", records(), ids=lambda p: p.name)
+def test_the_body_does_not_restate_the_frontmatter(path: Path) -> None:
+    """The frontmatter is the metadata; the body opens at §1.
+
+    Every record used to carry both, written by hand at different times, and
+    they drifted. Two copies of a fact is one fact and one liability.
+    """
+    body = split(path)[1]
+    hits = [m.group(0) for m in _RESTATED_RE.finditer(body)]
+    assert not hits, (
+        f"{path.name}: the body restates frontmatter — {', '.join(sorted(set(hits)))}.\n"
+        "Put the value in the frontmatter block and delete the bullet; see TEMPLATE.md."
+    )
+
+
+@pytest.mark.parametrize("path", records(), ids=lambda p: p.name)
+def test_no_amendment_sections(path: Path) -> None:
+    """A record states what is true now. Corrections are rewrites, not layers.
+
+    An `Amended …` block leaves the sentence it corrects in place. An agent
+    reads top-down and acts on the first answer it finds, so the layer is not
+    a correction — it is a second, contradictory answer sitting below the first.
+    """
+    body = split(path)[1]
+    hits = [m.group(0).strip() for m in _AMENDED_RE.finditer(body)]
+    assert not hits, (
+        f"{path.name}: {len(hits)} amendment block(s) — {hits[:3]}\n"
+        "Rewrite the sentence the amendment corrects, in place, and delete the "
+        "block. Git holds the history; the record holds what is true."
     )
 
 
@@ -147,4 +225,16 @@ def test_title_carries_the_name_and_the_number(path: Path) -> None:
     )
     assert title.count(meta["name"]) == 1, (
         f"{path.name}: {meta['name']!r} appears twice in the title — {title[:80]!r}"
+    )
+
+
+@pytest.mark.parametrize("path", records(), ids=lambda p: p.name)
+def test_the_h1_agrees_with_the_name(path: Path) -> None:
+    """The one place the name legitimately appears twice: the document heading."""
+    body = split(path)[1]
+    m = re.search(r"^# (\S+)", body, re.M)
+    assert m, f"{path.name}: body has no `# ADR-…` heading"
+    assert m.group(1).rstrip(":") == meta_of(path)["name"], (
+        f"{path.name}: heading says {m.group(1)!r}, frontmatter name is "
+        f"{meta_of(path)['name']!r}"
     )

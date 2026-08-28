@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from fux.refer.chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
+from fux.refer._chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
 
 
 def _body(word: str, n: int = 40) -> str:

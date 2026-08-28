@@ -19,7 +19,54 @@ from .parse import ParsedDoc
 MAX_PHRASES = 12  # headings only, not headings + first-sentence — the simpler
 # of the handoff's two open options (§10), picked and recorded here / ADR-RECORD.
 
-_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$", re.MULTILINE)
+#: Markdown, and the default for every type without its own grammar.
+#: The `text` group name is shared by all four patterns so the caller
+#: never branches on which one matched.
+_HEADING_RE = re.compile(r"^(#{1,6})\s+(?P<text>.+?)\s*$", re.MULTILINE)
+
+# -- W-86 P0: the three allowed types whose headings reached nothing ---------
+#
+# `DEFAULT_TYPES` has admitted `.rst`, `.adoc` and `.org` since the allowlist
+# shipped, and `_HEADING_RE` knows only `#`. **Every heading in those three
+# formats landed in the body field**, and their `phrases` list — what `fux ask`
+# renders as `§` lines — was empty. Three of six allowed types, silently, for
+# as long as the filter has existed.
+#
+# Each grammar below is the format's own, not an approximation:
+
+#: reStructuredText: a title line followed by a full-width run of one punctuation
+#: character. The underline must be at least as long as the text — that is the
+#: spec's rule and it is what stops a row of dashes in a table being read as one.
+_RST_RE = re.compile(
+    r"""^(?P<text>\S[^\n]*)\n(?P<ch>[=\-`:'"~^_*+#<>])(?P=ch){2,}[ \t]*$""",
+    re.MULTILINE,
+)
+
+#: AsciiDoc: `= Title`, `== Section`. Same shape as Markdown with `=`, and the
+#: level is the run length, so `==` is a section rather than a document title.
+_ADOC_RE = re.compile(r"^(={1,6})\s+(?P<text>\S[^\n]*?)\s*$", re.MULTILINE)
+
+#: Org-mode: `* Heading`, `** Subheading`. ⚠ The trailing space is required —
+#: without it a line of `*emphasis*` or a `**bold**` fragment at the start of a
+#: line reads as a heading, which is the false-positive this format invites.
+_ORG_RE = re.compile(r"^(\*{1,6})[ \t]+(?P<text>\S[^\n]*?)\s*$", re.MULTILINE)
+
+#: extension -> its heading pattern. Markdown's is applied to everything else,
+#: including `.txt`, because a `#` line in a text file is a heading by intent
+#: far more often than it is prose.
+_GRAMMARS: dict[str, re.Pattern] = {
+    ".rst": _RST_RE,
+    ".adoc": _ADOC_RE,
+    ".asciidoc": _ADOC_RE,
+    ".org": _ORG_RE,
+}
+
+
+def _grammar(rel_path: str) -> re.Pattern:
+    dot = rel_path.rfind(".")
+    slash = max(rel_path.rfind("/"), rel_path.rfind("\\"))
+    ext = rel_path[dot:].lower() if dot > slash + 1 else ""
+    return _GRAMMARS.get(ext, _HEADING_RE)
 
 
 @dataclass(frozen=True)
@@ -37,7 +84,11 @@ class Extracted:
 
 
 def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extracted:
-    headings = [m.group(2).strip() for m in _HEADING_RE.finditer(doc.body)]
+    # W-86 P0: the heading grammar follows the file type. A decoded document
+    # always arrives as Markdown (ADR-DECODE decision 2), so only an
+    # already-prose `.rst`/`.adoc`/`.org` takes a different pattern.
+    grammar = _grammar(rel_path)
+    headings = [m.group("text").strip() for m in grammar.finditer(doc.body)]
     title = _title(doc.meta, headings, rel_path)
     phrases = headings[:MAX_PHRASES]
 
@@ -48,7 +99,7 @@ def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extra
     # Strip heading lines out of body text too — without this a heading's
     # words would count twice: once as heading tf, once as body tf, diluting
     # "heading match outranks body match".
-    body_tokens = tokenize(_HEADING_RE.sub("", doc.body))
+    body_tokens = tokenize(grammar.sub("", doc.body))
     title_tokens = tokenize(title)
     # Path segments and the split filename — "where is X" queries. The
     # analyzer's identifier splitting does the work here: `docs/adr-storage.md`

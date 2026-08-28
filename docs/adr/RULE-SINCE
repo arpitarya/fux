@@ -39,6 +39,23 @@
 # this gate. That is the standing price of renumbering a register, and it is
 # why renumbering is not a tidy-up.
 #
+# 2026-08-27 — THE BASELINE DID NOT MOVE, AND THAT IS THE ENTRY.
+#
+# A fourth occurrence of the same cause arrived: ADR-CONFIDENCE, ADR-OUTPUT and
+# ADR-OWNERSHIP's whole `describes` relation were written on 2026-08-27 and
+# claimed components that had existed for weeks, so eight commits from before
+# they existed were flagged for not updating them.
+#
+# Under the three precedents above, the remedy would have been a fourth sha on
+# the line below — retiring 95 commits of auditability to excuse eight. Instead
+# the cause was fixed: `test_adr_freshness.py` now parses
+# `git show <sha>:docs/adr/README.md` and judges every commit against the
+# register AS IT STOOD AT THAT COMMIT. A row, a record or a relation that did
+# not exist then does not judge now. See ADR-OWNERSHIP decision 9.
+#
+# ⚠ A FIFTH ENTRY HERE WOULD MEAN THAT FIX FAILED. It is ADR-OWNERSHIP veto
+# condition 6. Read decision 9 before adding one, and prefer fixing the check.
+#
 # Previous baselines:
 #   1fc51a7257efeb943c512809bc531c7817dbc753
 #   301c65af310424d266ad40a4e22961722a586d97

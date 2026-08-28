@@ -1,0 +1,2421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fux Handbook</title>
+<style>
+/* ================= tokens — light is the base, dark redefines only what changes ================= */
+:root{
+  --bg:#fcfcfb; --panel:#ffffff; --panel-2:#f6f7f9; --ink:#14181f; --muted:#5b6472; --faint:#8a93a0;
+  --line:#e3e6ea; --line-2:#eceff2; --accent:#3d6df2; --accent-soft:#eef3fd;
+  --ok:#1d8a5e; --ok-soft:#eaf7f0; --warn:#c2410c; --warn-soft:#fdf1e9;
+  --code-bg:#f4f5f7; --shadow:0 6px 24px rgba(20,24,31,.09);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+
+  /* diagram tokens — every SVG paints from these and from nothing else */
+  --d-bg:#fcfcfb; --d-panel:#ffffff; --d-stroke:#c9cfd8; --d-ink:#14181f;
+  --d-body:#4a5260; --d-dim:#8a93a0; --d-band:#9aa3af; --d-rule:#e4e4e0;
+  --d-accent:#3d6df2; --d-accent-bg:#eef3fd;
+  --d-ok:#1d8a5e; --d-ok-bg:#eaf7f0;
+  --d-warn:#c2410c; --d-warn-bg:#fdf1e9;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1215; --panel:#161a1f; --panel-2:#12161a; --ink:#e9edf2; --muted:#a2acba; --faint:#7d8794;
+    --line:#252b33; --line-2:#1d222a; --accent:#7aa2ff; --accent-soft:#182234;
+    --ok:#4ec38a; --ok-soft:#12241c; --warn:#f0955c; --warn-soft:#2a1a12;
+    --code-bg:#1b2027; --shadow:0 6px 24px rgba(0,0,0,.45);
+
+    --d-bg:#12161a; --d-panel:#1b2027; --d-stroke:#333b45; --d-ink:#e9edf2;
+    --d-body:#b3bdca; --d-dim:#7d8794; --d-band:#6f7986; --d-rule:#252b33;
+    --d-accent:#7aa2ff; --d-accent-bg:#182234;
+    --d-ok:#4ec38a; --d-ok-bg:#12241c;
+    --d-warn:#f0955c; --d-warn-bg:#2a1a12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1215; --panel:#161a1f; --panel-2:#12161a; --ink:#e9edf2; --muted:#a2acba; --faint:#7d8794;
+  --line:#252b33; --line-2:#1d222a; --accent:#7aa2ff; --accent-soft:#182234;
+  --ok:#4ec38a; --ok-soft:#12241c; --warn:#f0955c; --warn-soft:#2a1a12;
+  --code-bg:#1b2027; --shadow:0 6px 24px rgba(0,0,0,.45);
+
+  --d-bg:#12161a; --d-panel:#1b2027; --d-stroke:#333b45; --d-ink:#e9edf2;
+  --d-body:#b3bdca; --d-dim:#7d8794; --d-band:#6f7986; --d-rule:#252b33;
+  --d-accent:#7aa2ff; --d-accent-bg:#182234;
+  --d-ok:#4ec38a; --d-ok-bg:#12241c;
+  --d-warn:#f0955c; --d-warn-bg:#2a1a12;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+     margin:0;display:flex;-webkit-font-smoothing:antialiased}
+
+/* ================= sidebar ================= */
+#sidebar{position:sticky;top:0;height:100vh;flex:0 0 288px;width:288px;
+         background:var(--panel-2);border-right:1px solid var(--line);
+         display:flex;flex-direction:column;overflow:hidden;transition:flex-basis .18s ease,width .18s ease}
+.navhead{display:flex;align-items:center;gap:10px;padding:16px 14px 12px;border-bottom:1px solid var(--line)}
+.navhead .brand{font-weight:700;letter-spacing:-.01em;font-size:1.02rem;flex:1;white-space:nowrap}
+.navhead .brand span{color:var(--faint);font-weight:400;font-family:var(--mono);font-size:.7rem;display:block}
+.iconbtn{background:var(--panel);border:1px solid var(--line);color:var(--muted);border-radius:8px;
+         width:30px;height:30px;display:grid;place-items:center;cursor:pointer;font-size:.9rem;padding:0;
+         font-family:var(--sans);line-height:1}
+.iconbtn:hover{color:var(--ink);border-color:var(--accent)}
+#navlist{overflow-y:auto;padding:12px 8px 28px;flex:1}
+#navlist ol{list-style:none;margin:0;padding:0}
+#navlist>ol>li{margin-bottom:2px}
+.navgroup{display:flex;align-items:center;gap:6px;width:100%;border:none;background:none;cursor:pointer;
+          padding:7px 8px;border-radius:8px;color:var(--ink);font:inherit;font-size:.88rem;font-weight:600;text-align:left}
+.navgroup:hover{background:var(--panel)}
+.navgroup .caret{color:var(--faint);font-size:.62rem;transition:transform .15s ease;flex:0 0 10px}
+.navgroup[aria-expanded="false"] .caret{transform:rotate(-90deg)}
+.navgroup .gnum{font-family:var(--mono);font-size:.7rem;color:var(--faint);font-weight:400}
+#navlist ol ol{margin:0 0 6px;padding-left:24px;border-left:1px solid var(--line);margin-left:14px}
+#navlist ol ol[hidden]{display:none}
+#navlist a{display:block;padding:5px 8px;border-radius:6px;color:var(--muted);text-decoration:none;font-size:.83rem}
+#navlist a:hover{background:var(--panel);color:var(--ink)}
+#navlist a.on{color:var(--accent);background:var(--accent-soft);font-weight:600}
+.navfoot{padding:10px 14px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center}
+.btn{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;
+     padding:7px 12px;font:inherit;font-size:.82rem;cursor:pointer;white-space:nowrap}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{opacity:.9;color:#fff}
+
+body.nav-collapsed #sidebar{flex-basis:0;width:0;border-right:none}
+#navopen{display:none;position:fixed;left:14px;top:14px;z-index:60;box-shadow:var(--shadow);
+         width:38px;height:38px;font-size:1rem}
+body.nav-collapsed #navopen{display:grid}
+
+/* ================= main ================= */
+#main{flex:1;min-width:0}
+.wrap{max-width:1020px;margin:0 auto;padding:44px 30px 120px}
+
+.slide{padding:20px 0 44px;border-bottom:1px solid var(--line-2);scroll-margin-top:12px}
+.slide:last-of-type{border-bottom:none}
+.kicker{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+        color:var(--faint);margin:0 0 8px}
+h1{font-size:2.4rem;line-height:1.1;margin:0 0 12px;letter-spacing:-.025em}
+h2{font-size:1.62rem;margin:0 0 6px;letter-spacing:-.015em}
+h3{font-size:1.12rem;margin:26px 0 8px}
+h4{font-size:.96rem;margin:22px 0 6px}
+p{max-width:70ch;margin:10px 0}
+.lede{color:var(--muted);font-size:1.03rem;max-width:66ch;margin:0 0 16px}
+ul,ol.pts{margin:12px 0;padding-left:22px;max-width:74ch}
+li{margin:6px 0}
+li>ul{margin:5px 0}
+.tight li{margin:3px 0}
+b,strong{font-weight:650}
+
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+
+code{font-family:var(--mono);font-size:.86em;background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{background:var(--code-bg);border:1px solid var(--line);border-radius:10px;
+    padding:13px 15px;overflow-x:auto;font-size:.82rem;line-height:1.58}
+pre code{background:none;padding:0;font-size:1em}
+
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:16px 0}
+table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:520px}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--panel);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;
+   color:var(--faint);font-weight:600;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td code{white-space:nowrap}
+
+.note{border-left:3px solid var(--line);padding:10px 0 10px 16px;margin:16px 0;color:var(--muted);font-size:.93rem}
+.note.warn{border-color:var(--warn);background:var(--warn-soft);border-radius:0 8px 8px 0;padding:12px 16px;color:var(--ink)}
+.note.ok{border-color:var(--ok);background:var(--ok-soft);border-radius:0 8px 8px 0;padding:12px 16px;color:var(--ink)}
+.note.key{border-color:var(--accent);background:var(--accent-soft);border-radius:0 8px 8px 0;padding:12px 16px;color:var(--ink)}
+.note strong{color:var(--ink)}
+
+figure{margin:20px 0 10px}
+.archbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px;overflow-x:auto}
+svg.arch{width:100%;height:auto;display:block}
+svg.wide{min-width:900px}
+svg.med{min-width:640px}
+svg.sm{min-width:460px}
+figcaption{color:var(--faint);font-size:.8rem;margin-top:8px;max-width:76ch}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:12px;margin:18px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.card h4{margin:0 0 5px;font-size:.92rem}
+.card p{margin:0;font-size:.86rem;color:var(--muted)}
+.card ul{margin:6px 0 0;padding-left:18px;font-size:.86rem;color:var(--muted)}
+
+.law{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.law:last-child{border-bottom:none}
+.law b{font-family:var(--mono);color:var(--accent);flex:0 0 30px}
+
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.pill{font-family:var(--mono);font-size:.72rem;padding:4px 10px;border-radius:999px;
+      border:1px solid var(--line);color:var(--muted);background:var(--panel)}
+.pill.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-soft)}
+.pill.warn{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
+
+/* collapsible deep-dives */
+details.more{border:1px solid var(--line);border-radius:10px;background:var(--panel);margin:16px 0}
+details.more>summary{cursor:pointer;padding:11px 15px;font-size:.87rem;font-weight:600;color:var(--ink);
+                     list-style:none;display:flex;align-items:center;gap:9px}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::before{content:"▸";color:var(--accent);font-size:.72rem;transition:transform .15s ease}
+details.more[open]>summary::before{transform:rotate(90deg)}
+details.more>summary .why{font-weight:400;color:var(--faint);font-size:.8rem}
+details.more .body{padding:2px 16px 14px;border-top:1px solid var(--line-2)}
+details.more .body>*:first-child{margin-top:12px}
+
+/* ================= presentation mode ================= */
+#present-bar{display:none}
+body.present{display:block}
+body.present #sidebar,body.present #navopen,body.present .docchrome{display:none}
+body.present .wrap{max-width:1180px;padding:34px 44px 96px}
+body.present .slide{display:none;border-bottom:none;padding:0;min-height:calc(100vh - 130px)}
+body.present .slide.is-active{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+body.present h1{font-size:3rem}
+body.present h2{font-size:2.1rem;margin-bottom:10px}
+body.present h3{font-size:1.3rem}
+body.present p,body.present li{font-size:1.06rem}
+body.present .lede{font-size:1.2rem;max-width:74ch}
+body.present table{font-size:.95rem}
+body.present details.more>summary{display:none}
+body.present details.more{border:none;background:none;margin:8px 0}
+body.present details.more .body{padding:0;border-top:none}
+body.present #present-bar{display:flex;position:fixed;left:0;right:0;bottom:0;height:56px;z-index:70;
+  align-items:center;gap:12px;padding:0 18px;background:var(--panel);border-top:1px solid var(--line)}
+#present-bar .count{font-family:var(--mono);font-size:.8rem;color:var(--muted);min-width:76px}
+#present-bar .title{flex:1;font-size:.86rem;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#progress{position:fixed;left:0;top:0;height:3px;background:var(--accent);width:0;z-index:80;
+          transition:width .2s ease;display:none}
+body.present #progress{display:block}
+#helpcard{display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.55);
+          align-items:center;justify-content:center;padding:20px}
+#helpcard.on{display:flex}
+#helpcard .inner{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+                 padding:22px 26px;max-width:420px;box-shadow:var(--shadow)}
+#helpcard kbd{font-family:var(--mono);font-size:.76rem;background:var(--code-bg);border:1px solid var(--line);
+              border-radius:5px;padding:1px 6px}
+
+@media(max-width:900px){
+  #sidebar{position:fixed;z-index:65;box-shadow:var(--shadow)}
+  body.nav-collapsed #sidebar{box-shadow:none}
+  .wrap{padding:34px 20px 100px}
+  body:not(.nav-collapsed) #main{filter:blur(0)}
+}
+@media print{
+  #sidebar,#navopen,#present-bar,#progress{display:none}
+  .slide{break-inside:avoid;border:none}
+  details.more{border:none} details.more .body{display:block!important}
+}
+</style>
+</head>
+<body class="">
+
+<button id="navopen" class="iconbtn" title="Show index" aria-label="Show index">☰</button>
+<div id="progress"></div>
+
+<!-- ============================ SIDEBAR ============================ -->
+<aside id="sidebar">
+  <div class="navhead">
+    <div class="brand">Fux Handbook<span>2.0.0-alpha.2</span></div>
+    <button class="iconbtn" id="navclose" title="Collapse index" aria-label="Collapse index">⟨</button>
+  </div>
+  <nav id="navlist" aria-label="Contents">
+    <ol>
+      <li>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">01</span>How Fux works</button>
+        <ol>
+          <li><a href="#s-what">What it is</a></li>
+          <li><a href="#s-mechanism">The mechanism</a></li>
+          <li><a href="#s-ingest">Ingest, five steps</a></li>
+          <li><a href="#s-analyzer">The analyzer + fields</a></li>
+          <li><a href="#s-planes">The two planes</a></li>
+          <li><a href="#s-verbs">ask · find · answer</a></li>
+          <li><a href="#s-citation">What a citation is</a></li>
+          <li><a href="#s-freshness">Freshness verdicts</a></li>
+          <li><a href="#s-using">Using it</a></li>
+        </ol>
+      </li>
+      <li>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">02</span>Confidence</button>
+        <ol>
+          <li><a href="#s-conf-why">Why it exists</a></li>
+          <li><a href="#s-conf-ladder">Signals and bands</a></li>
+          <li><a href="#s-conf-signals">The five fields</a></li>
+          <li><a href="#s-conf-out">Getting it out</a></li>
+          <li><a href="#s-conf-honest">Fact vs guess</a></li>
+        </ol>
+      </li>
+      <li>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">03</span>How it is tested</button>
+        <ol>
+          <li><a href="#s-test-layers">Four layers</a></li>
+          <li><a href="#s-test-determinism">Determinism</a></li>
+          <li><a href="#s-test-guards">The project guards</a></li>
+          <li><a href="#s-quality">The quality funnel</a></li>
+          <li><a href="#s-quality-calls">The six calls</a></li>
+          <li><a href="#s-discipline">Measurement discipline</a></li>
+          <li><a href="#s-unverified">What is not verified</a></li>
+        </ol>
+      </li>
+      <li>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">04</span>Reference</button>
+        <ol>
+          <li><a href="#s-merge">Merge</a></li>
+          <li><a href="#s-boundary">The boundary</a></li>
+          <li><a href="#s-fetcher">Fetcher</a></li>
+          <li><a href="#s-decoder">Decoder</a></li>
+          <li><a href="#s-cli-1">CLI · corpus</a></li>
+          <li><a href="#s-cli-2">CLI · read &amp; serve</a></li>
+        </ol>
+      </li>
+      <li>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">05</span>Context</button>
+        <ol>
+          <li><a href="#s-agents">Running it as an agent</a></li>
+          <li><a href="#s-laws">The eight laws</a></li>
+          <li><a href="#s-decisions">Decisions</a></li>
+          <li><a href="#s-end">Where things live</a></li>
+        </ol>
+      </li>
+    </ol>
+  </nav>
+  <div class="navfoot">
+    <button class="btn primary" id="presentbtn">▶ Present</button>
+    <button class="btn" id="themebtn" title="Cycle theme">◐ Theme</button>
+  </div>
+</aside>
+
+<!-- ============================= MAIN ============================= -->
+<main id="main">
+<div class="wrap">
+
+<!-- ------------------------------ COVER ------------------------------ -->
+<section class="slide" id="s-cover" data-title="Fux Handbook">
+  <p class="kicker">Handbook · index-and-refer</p>
+  <h1>Fux</h1>
+  <p class="lede">A search index for your documents that lives in your git repo — as text you can
+  read, diff and review. <strong>No server, no vector database, no API key, no second copy of your
+  content.</strong></p>
+  <div class="pills">
+    <span class="pill">2.0.0-alpha.2</span>
+    <span class="pill">fux.index.v2</span>
+    <span class="pill">analyzer v2</span>
+    <span class="pill">fux.runtime.v4</span>
+    <span class="pill ok">lexical only — no model anywhere</span>
+  </div>
+  <div class="grid">
+    <div class="card"><h4>01 · How it works</h4><p>Ingest, the two planes, the query and refer path.</p></div>
+    <div class="card"><h4>02 · Confidence</h4><p>How much the index believes its own answer.</p></div>
+    <div class="card"><h4>03 · Testing</h4><p>Four layers, and what a quality number means.</p></div>
+    <div class="card"><h4>04 · Reference</h4><p>Merge · fetcher · decoder · CLI.</p></div>
+  </div>
+  <p class="note key docchrome"><strong>Two ways to read this.</strong> Scroll it, or hit
+  <strong>▶ Present</strong> (or press <code>p</code>) to step through it as slides —
+  <code>→</code> / <code>←</code> to move, <code>Esc</code> to leave, <code>?</code> for the keys.</p>
+</section>
+
+<!-- ============================ 01 · WORKS ============================ -->
+<section class="slide" id="s-what" data-title="What Fux is">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>What Fux is</h2>
+  <p class="lede">Rank from a small committed index · fetch content from the systems that own it ·
+  verify at answer time.</p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Your documents stay put</h4>
+      <ul class="tight">
+        <li>The repo, a wiki, a web page</li>
+        <li>Never copied, never stored</li>
+        <li>Only statistics are kept</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>The index is committed</h4>
+      <ul class="tight">
+        <li><code>.fux/index/</code>, 256 JSONL shards</li>
+        <li>One canonical line per document</li>
+        <li>Small enough for git, plain enough to diff</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Answers quote the original</h4>
+      <ul class="tight">
+        <li>The index says <em>which</em> document</li>
+        <li>The words come from that document today</li>
+        <li>A freshness verdict is attached</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note key">
+    <strong>Say "index", not "database".</strong> Load-bearing vocabulary — the moment it reads as a
+    database, people expect it to hold the content, and holding content is the one thing it must
+    never do.
+  </div>
+</section>
+
+<!-- ------------------------- MECHANISM DIAGRAM ------------------------- -->
+<section class="slide" id="s-mechanism" data-title="The mechanism">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>The mechanism, end to end</h2>
+  <ul class="tight">
+    <li><strong>Blue</strong> — committed to git. <strong>Plain</strong> — derived and disposable.
+      <strong>Green</strong> — the freshness loop back into ingest.</li>
+    <li>Read it left to right, top to bottom: <em>ingest → the committed plane → the derived plane →
+      query → refer</em>.</li>
+  </ul>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 930" class="arch wide"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The Fux mechanism: ingest, the committed plane, the derived plane, the query path and the freshness loop">
+        <defs>
+          <marker id="m-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+          <marker id="m-ok" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-ok)" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+
+        <rect width="1240" height="930" fill="var(--d-bg)"/>
+        <text x="48" y="44" font-size="21" fill="var(--d-ink)" font-weight="600">Fux — the mechanism</text>
+        <text x="48" y="67" font-size="11.5" fill="var(--d-body)">2.0.0-alpha.2 · fux.index.v2 / analyzer v2 / fux.runtime.v4 · lexical only, no model anywhere</text>
+
+        <rect x="908" y="30" width="13" height="13" rx="3" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.6"/>
+        <text x="928" y="41" font-size="11" fill="var(--d-body)">committed to git</text>
+        <rect x="1046" y="30" width="13" height="13" rx="3" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="1066" y="41" font-size="11" fill="var(--d-body)">derived / disposable</text>
+
+        <text x="48" y="104" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">INGEST — WALK, FETCH, DECODE, ANALYSE, DISCARD</text>
+
+        <rect x="48" y="116" width="208" height="92" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.8"/>
+        <text x="64" y="140" font-size="12.5" fill="var(--d-ink)" font-weight="600">.fux/sources/</text>
+        <text x="64" y="160" font-size="11" fill="var(--d-body)">dirs · urls · types</text>
+        <text x="64" y="178" font-size="11" fill="var(--d-body)">one entry per line</text>
+        <text x="64" y="196" font-size="10.5" fill="var(--d-dim)">sorted — file order cannot leak</text>
+
+        <rect x="282" y="116" width="208" height="92" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="298" y="140" font-size="12.5" fill="var(--d-ink)" font-weight="600">fetch_all</text>
+        <text x="298" y="160" font-size="11" fill="var(--d-body)">consumer fetcher, parallel</text>
+        <text x="298" y="178" font-size="11" fill="var(--d-body)">min(declared, configured)</text>
+        <text x="298" y="196" font-size="10.5" fill="var(--d-dim)">absent = 1 · cdp declares 1</text>
+
+        <rect x="516" y="116" width="208" height="92" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="532" y="140" font-size="12.5" fill="var(--d-ink)" font-weight="600">decode</text>
+        <text x="532" y="160" font-size="11" fill="var(--d-body)">16 built-ins → Markdown</text>
+        <text x="532" y="178" font-size="11" fill="var(--d-body)">pdf · docx · pptx · xlsx …</text>
+        <text x="532" y="196" font-size="10.5" fill="var(--d-dim)">None → enrichment queue</text>
+
+        <rect x="750" y="116" width="208" height="92" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="766" y="140" font-size="12.5" fill="var(--d-ink)" font-weight="600">analyzer v2</text>
+        <text x="766" y="160" font-size="11" fill="var(--d-body)">split · lower · stopwords</text>
+        <text x="766" y="178" font-size="11" fill="var(--d-body)">Porter stem · blake2b 16-hex</text>
+        <text x="766" y="196" font-size="10.5" fill="var(--d-dim)">order is load-bearing</text>
+
+        <rect x="984" y="116" width="208" height="92" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="1000" y="140" font-size="12.5" fill="var(--d-ink)" font-weight="600">priors</text>
+        <text x="1000" y="160" font-size="11" fill="var(--d-body)">supersedes: · archived</text>
+        <text x="1000" y="178" font-size="11" fill="var(--d-body)">git commit recency</text>
+        <text x="1000" y="196" font-size="10.5" fill="var(--d-dim)">no wall clock at write time</text>
+
+        <line x1="258" y1="162" x2="278" y2="162" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+        <line x1="492" y1="162" x2="512" y2="162" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+        <line x1="726" y1="162" x2="746" y2="162" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+        <line x1="960" y1="162" x2="980" y2="162" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+
+        <rect x="48" y="248" width="1144" height="170" rx="12" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="2.2"/>
+        <text x="68" y="276" font-size="13" fill="var(--d-ink)" font-weight="700">THE COMMITTED PLANE · .fux/index/{00..ff}.jsonl</text>
+        <text x="68" y="296" font-size="11" fill="var(--d-body)">256 shards, doc-major, one canonical JSON line per document, sorted by id · the header pins schema + analyzer</text>
+
+        <rect x="68" y="310" width="261" height="76" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2"/>
+        <text x="84" y="332" font-size="11.5" fill="var(--d-ink)" font-weight="600">identity</text>
+        <text x="84" y="352" font-size="10.5" fill="var(--d-body)">id · src · loc · sha · ver</text>
+        <text x="84" y="370" font-size="10.5" fill="var(--d-body)">mode · meta</text>
+
+        <rect x="349" y="310" width="261" height="76" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2"/>
+        <text x="365" y="332" font-size="11.5" fill="var(--d-ink)" font-weight="600">retrieval</text>
+        <text x="365" y="352" font-size="10.5" fill="var(--d-body)">terms{hash: [tf x5]} · flen[5]</text>
+        <text x="365" y="370" font-size="10.5" fill="var(--d-body)">title · phrases</text>
+
+        <rect x="630" y="310" width="261" height="76" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2"/>
+        <text x="646" y="332" font-size="11.5" fill="var(--d-ink)" font-weight="600">priors &amp; edges</text>
+        <text x="646" y="352" font-size="10.5" fill="var(--d-body)">archived · superseded</text>
+        <text x="646" y="370" font-size="10.5" fill="var(--d-body)">mtime · edges</text>
+
+        <rect x="911" y="310" width="261" height="76" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2"/>
+        <text x="927" y="332" font-size="11.5" fill="var(--d-ink)" font-weight="600">five weighted fields</text>
+        <text x="927" y="352" font-size="10.5" fill="var(--d-body)">body 1.0 · heading 3.0 · title 2.0</text>
+        <text x="927" y="370" font-size="10.5" fill="var(--d-body)">path 1.5 · ctx 1.0</text>
+
+        <text x="68" y="408" font-size="10.5" fill="var(--d-accent)" font-weight="600">no prose · no floats · no clocks · no vectors — the dense lane and its model were deleted 2026-08-25</text>
+
+        <text x="48" y="452" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">THE DERIVED PLANE · .fux/runtime/ — gitignored, rebuilt by `fux build` in seconds</text>
+
+        <rect x="48" y="464" width="175" height="86" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="63" y="488" font-size="12" fill="var(--d-ink)" font-weight="600">postings</text>
+        <text x="63" y="508" font-size="10.5" fill="var(--d-body)">term-major, 128/block</text>
+        <text x="63" y="526" font-size="10.5" fill="var(--d-body)">62-byte offset table</text>
+
+        <rect x="241" y="464" width="175" height="86" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="256" y="488" font-size="12" fill="var(--d-ink)" font-weight="600">docs table</text>
+        <text x="256" y="508" font-size="10.5" fill="var(--d-body)">loc · title · flen</text>
+        <text x="256" y="526" font-size="10.5" fill="var(--d-body)">archived · superseded</text>
+
+        <rect x="434" y="464" width="175" height="86" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="449" y="488" font-size="12" fill="var(--d-ink)" font-weight="600">graph</text>
+        <text x="449" y="508" font-size="10.5" fill="var(--d-body)">CSR + communities</text>
+        <text x="449" y="526" font-size="10.5" fill="var(--d-body)">lazy PPR</text>
+
+        <rect x="627" y="464" width="175" height="86" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="642" y="488" font-size="12" fill="var(--d-ink)" font-weight="600">fetch-cache</text>
+        <text x="642" y="508" font-size="10.5" fill="var(--d-body)">TTL-bounded</text>
+        <text x="642" y="526" font-size="10.5" fill="var(--d-warn)" font-weight="600">the ONLY wall clock</text>
+
+        <rect x="820" y="464" width="175" height="86" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="835" y="488" font-size="12" fill="var(--d-ink)" font-weight="600">dirty list</text>
+        <text x="835" y="508" font-size="10.5" fill="var(--d-body)">post-commit writes it</text>
+        <text x="835" y="526" font-size="10.5" fill="var(--d-body)">refer writes it too</text>
+
+        <rect x="1013" y="464" width="175" height="86" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="1028" y="488" font-size="12" fill="var(--d-ink)" font-weight="600">url-state</text>
+        <text x="1028" y="508" font-size="10.5" fill="var(--d-body)">fail_streak · last_seen</text>
+        <text x="1028" y="526" font-size="10.5" fill="var(--d-body)">counted in RUNS</text>
+
+        <rect x="48" y="570" width="1140" height="50" rx="8" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.2" stroke-dasharray="5 4"/>
+        <text x="66" y="591" font-size="11.5" fill="var(--d-ink)" font-weight="700">The differential law —</text>
+        <text x="206" y="591" font-size="11.5" fill="var(--d-body)">every result the accelerator returns is byte-identical to the reference scan.</text>
+        <text x="66" y="610" font-size="11" fill="var(--d-body)">Delete the derived plane and you lose speed, never an answer. That is what makes it disposable.</text>
+
+        <text x="48" y="656" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">QUERY — EVERY CALL</text>
+
+        <rect x="48" y="668" width="208" height="82" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="64" y="692" font-size="12" fill="var(--d-ink)" font-weight="600">ask · find · answer</text>
+        <text x="64" y="712" font-size="12" fill="var(--d-ink)" font-weight="600">explain · graph · path</text>
+        <text x="64" y="732" font-size="10.5" fill="var(--d-dim)">shares the ingest analyzer</text>
+
+        <rect x="282" y="668" width="208" height="82" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="298" y="692" font-size="12" fill="var(--d-ink)" font-weight="600">accelerator or scan</text>
+        <text x="298" y="712" font-size="10.5" fill="var(--d-body)">bisect → block-max → decode</text>
+        <text x="298" y="730" font-size="10.5" fill="var(--d-body)">or a byte prefilter over shards</text>
+
+        <rect x="516" y="668" width="208" height="82" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="532" y="692" font-size="12" fill="var(--d-ink)" font-weight="600">rank() — BM25F</text>
+        <text x="532" y="712" font-size="10.5" fill="var(--d-body)">k1 1.2 · b 0.75</text>
+        <text x="532" y="730" font-size="10.5" fill="var(--d-body)">weight, then saturate — once</text>
+
+        <rect x="750" y="668" width="208" height="82" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="766" y="692" font-size="12" fill="var(--d-ink)" font-weight="600">confidence + rerank</text>
+        <text x="766" y="712" font-size="10.5" fill="var(--d-body)">band computed from rank()</text>
+        <text x="766" y="730" font-size="10.5" fill="var(--d-body)">proximity rerank: opt-in</text>
+
+        <rect x="984" y="668" width="208" height="82" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.8"/>
+        <text x="1000" y="692" font-size="12" fill="var(--d-ink)" font-weight="600">refer → answer</text>
+        <text x="1000" y="712" font-size="10.5" fill="var(--d-body)">fetch the live document,</text>
+        <text x="1000" y="730" font-size="10.5" fill="var(--d-body)">compare sha, cite path:L12-L40</text>
+
+        <line x1="258" y1="709" x2="278" y2="709" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+        <line x1="492" y1="709" x2="512" y2="709" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+        <line x1="726" y1="709" x2="746" y2="709" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+        <line x1="960" y1="709" x2="980" y2="709" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#m-acc)"/>
+
+        <path d="M 1088 750 L 1088 782 L 1034 782" fill="none" stroke="var(--d-ok)" stroke-width="2.2"/>
+        <path d="M 616 782 L 28 782 L 28 162 L 42 162" fill="none" stroke="var(--d-ok)" stroke-width="2.2" marker-end="url(#m-ok)"/>
+        <rect x="616" y="766" width="418" height="32" rx="8" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.4"/>
+        <text x="825" y="787" font-size="11.5" fill="var(--d-ok)" text-anchor="middle" font-weight="600">sha differs → mark dirty → narrowed re-ingest fixes the ranking</text>
+
+        <text x="48" y="826" font-size="11.5" fill="var(--d-ink)" font-weight="700">THE LOOP THAT CLOSES THE GAP</text>
+        <text x="48" y="846" font-size="11" fill="var(--d-body)">refer used to compute the freshness verdict and throw it away — so a changed URL kept its old terms, stopped ranking, was</text>
+        <text x="48" y="864" font-size="11" fill="var(--d-body)">never cited, and nothing noticed. It buys RECALL, not correctness: a changed document could never be mis-answered, only fail to surface.</text>
+
+        <line x1="48" y1="886" x2="1192" y2="886" stroke="var(--d-rule)" stroke-width="1"/>
+        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L1 stdlib only · L2 no durable content · L3 deterministic — the sort, not the loop · L4 offline by default · L5 hashed meta · L6 say "index" · L7 Python ≥ 3.11 · L8 use is hashed &amp; bounded</text>
+      </svg>
+    </div>
+  </figure>
+</section>
+
+<!-- ------------------------------ INGEST ------------------------------ -->
+<section class="slide" id="s-ingest" data-title="Ingest, five steps">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>Ingest — five steps, and the content is thrown away</h2>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 250" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="Ingest pipeline: walk, fetch, decode, analyse, write — with the content discarded at the end">
+        <defs>
+          <marker id="i-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1200" height="250" fill="var(--d-bg)"/>
+        <text x="40" y="34" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">ONE PASS, FIVE STEPS</text>
+
+        <rect x="40" y="50" width="192" height="106" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
+        <text x="56" y="74" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">01</text>
+        <text x="56" y="96" font-size="13" fill="var(--d-ink)" font-weight="600">walk</text>
+        <text x="56" y="118" font-size="10.5" fill="var(--d-body)">.fux/sources/ — three</text>
+        <text x="56" y="134" font-size="10.5" fill="var(--d-body)">committed line files,</text>
+        <text x="56" y="149" font-size="10.5" fill="var(--d-dim)">deduped and sorted</text>
+
+        <rect x="272" y="50" width="192" height="106" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="288" y="74" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">02</text>
+        <text x="288" y="96" font-size="13" fill="var(--d-ink)" font-weight="600">fetch</text>
+        <text x="288" y="118" font-size="10.5" fill="var(--d-body)">URLs only, through</text>
+        <text x="288" y="134" font-size="10.5" fill="var(--d-body)">YOUR fetcher file</text>
+        <text x="288" y="149" font-size="10.5" fill="var(--d-dim)">fux ships no HTTP client</text>
+
+        <rect x="504" y="50" width="192" height="106" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="520" y="74" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">03</text>
+        <text x="520" y="96" font-size="13" fill="var(--d-ink)" font-weight="600">decode</text>
+        <text x="520" y="118" font-size="10.5" fill="var(--d-body)">anything not prose</text>
+        <text x="520" y="134" font-size="10.5" fill="var(--d-body)">becomes Markdown</text>
+        <text x="520" y="149" font-size="10.5" fill="var(--d-dim)">headings must survive</text>
+
+        <rect x="736" y="50" width="192" height="106" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="752" y="74" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">04</text>
+        <text x="752" y="96" font-size="13" fill="var(--d-ink)" font-weight="600">analyse</text>
+        <text x="752" y="118" font-size="10.5" fill="var(--d-body)">terms + field lengths,</text>
+        <text x="752" y="134" font-size="10.5" fill="var(--d-body)">five weighted fields</text>
+        <text x="752" y="149" font-size="10.5" fill="var(--d-dim)">same code as query time</text>
+
+        <rect x="968" y="50" width="192" height="106" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
+        <text x="984" y="74" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">05</text>
+        <text x="984" y="96" font-size="13" fill="var(--d-ink)" font-weight="600">write</text>
+        <text x="984" y="118" font-size="10.5" fill="var(--d-body)">one canonical line into</text>
+        <text x="984" y="134" font-size="10.5" fill="var(--d-body)">one of 256 shards</text>
+        <text x="984" y="149" font-size="10.5" fill="var(--d-dim)">byte-identical everywhere</text>
+
+        <line x1="234" y1="103" x2="268" y2="103" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#i-a)"/>
+        <line x1="466" y1="103" x2="500" y2="103" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#i-a)"/>
+        <line x1="698" y1="103" x2="732" y2="103" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#i-a)"/>
+        <line x1="930" y1="103" x2="964" y2="103" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#i-a)"/>
+
+        <rect x="40" y="182" width="1120" height="46" rx="9" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.5"/>
+        <text x="58" y="203" font-size="11.5" fill="var(--d-ink)" font-weight="700">Then the text is GONE.</text>
+        <text x="196" y="203" font-size="11.5" fill="var(--d-body)">Never written to .fux/, never cached, never committed — that is L2.</text>
+        <text x="58" y="221" font-size="11" fill="var(--d-body)">It is why the index can live in a repo cloned by people whose document permissions differ from yours.</text>
+      </svg>
+    </div>
+  </figure>
+
+  <ul class="tight">
+    <li><strong>Walk</strong> — entries are deduped and <em>sorted</em>, so file order can never change a committed byte.</li>
+    <li><strong>Fetch</strong> — a thread pool bounded by <code>min(declared, configured)</code>; network is opt-in and fenced.</li>
+    <li><strong>Decode</strong> — 16 built-in decoders; a consumer file overrides any of them.</li>
+    <li><strong>Analyse</strong> — the <em>same</em> analyzer the query uses. Two copies would drift, and a drifted analyzer misses silently.</li>
+    <li><strong>Write</strong> — same sources → byte-identical shards, on any machine, on any OS.</li>
+  </ul>
+</section>
+
+<!-- --------------------------- ANALYZER --------------------------- -->
+<section class="slide" id="s-analyzer" data-title="The analyzer and the five fields">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>The analyzer, and the five weighted fields</h2>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1216 150" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="Analyzer chain: split, lowercase, stopwords, Porter stem, blake2b, 16-hex term hash">
+        <defs>
+          <marker id="an-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1216" height="150" fill="var(--d-bg)"/>
+        <text x="24" y="30" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">ANALYZER v2 — THE ORDER IS LOAD-BEARING, AND IT IS PINNED IN EVERY SHARD HEADER</text>
+
+        <rect x="24" y="46" width="168" height="52" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="108" y="70" font-size="12.5" fill="var(--d-ink)" text-anchor="middle" font-weight="600">split</text>
+        <text x="108" y="88" font-size="10" fill="var(--d-dim)" text-anchor="middle">unicode-aware</text>
+
+        <rect x="224" y="46" width="168" height="52" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="308" y="70" font-size="12.5" fill="var(--d-ink)" text-anchor="middle" font-weight="600">lowercase</text>
+        <text x="308" y="88" font-size="10" fill="var(--d-dim)" text-anchor="middle">NFC-normalised</text>
+
+        <rect x="424" y="46" width="168" height="52" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="508" y="70" font-size="12.5" fill="var(--d-ink)" text-anchor="middle" font-weight="600">stopwords</text>
+        <text x="508" y="88" font-size="10" fill="var(--d-dim)" text-anchor="middle">a fixed list</text>
+
+        <rect x="624" y="46" width="168" height="52" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="708" y="70" font-size="12.5" fill="var(--d-ink)" text-anchor="middle" font-weight="600">Porter stem</text>
+        <text x="708" y="88" font-size="10" fill="var(--d-dim)" text-anchor="middle">hand-rolled, stdlib</text>
+
+        <rect x="824" y="46" width="168" height="52" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.6"/>
+        <text x="908" y="70" font-size="12.5" fill="var(--d-ink)" text-anchor="middle" font-weight="600">blake2b</text>
+        <text x="908" y="88" font-size="10" fill="var(--d-accent)" text-anchor="middle">16 hex characters</text>
+
+        <rect x="1024" y="46" width="168" height="52" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.6"/>
+        <text x="1108" y="70" font-size="12.5" fill="var(--d-ink)" text-anchor="middle" font-weight="600">term hash</text>
+        <text x="1108" y="88" font-size="10" fill="var(--d-accent)" text-anchor="middle">the committed key</text>
+
+        <line x1="194" y1="72" x2="220" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
+        <line x1="394" y1="72" x2="420" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
+        <line x1="594" y1="72" x2="620" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
+        <line x1="794" y1="72" x2="820" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
+        <line x1="994" y1="72" x2="1020" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
+
+        <text x="24" y="128" font-size="11" fill="var(--d-body)">The index stores the HASH, never the word — one more reason a shard tells you nothing about the document it describes.</text>
+      </svg>
+    </div>
+  </figure>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 240" class="arch sm"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="Field weights: heading 3.0, title 2.0, path 1.5, body 1.0, ctx 1.0">
+        <rect width="1100" height="240" fill="var(--d-bg)"/>
+        <text x="40" y="32" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">BM25F — WEIGHT, THEN SATURATE. ONCE.</text>
+
+        <text x="40" y="70" font-size="12" fill="var(--d-ink)" font-weight="600">heading</text>
+        <rect x="180" y="56" width="600" height="20" rx="5" fill="var(--d-accent)"/>
+        <text x="794" y="71" font-size="11.5" fill="var(--d-accent)" font-weight="700">3.0</text>
+
+        <text x="40" y="106" font-size="12" fill="var(--d-ink)" font-weight="600">title</text>
+        <rect x="180" y="92" width="400" height="20" rx="5" fill="var(--d-accent)" opacity=".78"/>
+        <text x="594" y="107" font-size="11.5" fill="var(--d-body)" font-weight="700">2.0</text>
+
+        <text x="40" y="142" font-size="12" fill="var(--d-ink)" font-weight="600">path</text>
+        <rect x="180" y="128" width="300" height="20" rx="5" fill="var(--d-accent)" opacity=".6"/>
+        <text x="494" y="143" font-size="11.5" fill="var(--d-body)" font-weight="700">1.5</text>
+
+        <text x="40" y="178" font-size="12" fill="var(--d-ink)" font-weight="600">body</text>
+        <rect x="180" y="164" width="200" height="20" rx="5" fill="var(--d-accent)" opacity=".42"/>
+        <text x="394" y="179" font-size="11.5" fill="var(--d-body)" font-weight="700">1.0</text>
+
+        <text x="40" y="214" font-size="12" fill="var(--d-ink)" font-weight="600">ctx</text>
+        <rect x="180" y="200" width="200" height="20" rx="5" fill="var(--d-accent)" opacity=".42"/>
+        <text x="394" y="215" font-size="11.5" fill="var(--d-body)" font-weight="700">1.0</text>
+
+        <text x="640" y="180" font-size="11" fill="var(--d-body)">k1 = 1.2 · b = 0.75</text>
+        <text x="640" y="199" font-size="11" fill="var(--d-warn)" font-weight="600">never sum per-field BM25 —</text>
+        <text x="640" y="216" font-size="11" fill="var(--d-body)">weight the term frequencies first, saturate the total.</text>
+      </svg>
+    </div>
+    <figcaption>Weights are tunable in <code>.fux/tune.toml</code>; these are the defaults.</figcaption>
+  </figure>
+</section>
+
+<!-- ---------------------------- TWO PLANES ---------------------------- -->
+<section class="slide" id="s-planes" data-title="The two planes">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>Two planes — one holds truth, one holds speed</h2>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 350" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The committed plane and the derived plane, joined by fux build and separated by the differential law">
+        <defs>
+          <marker id="p-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+          <marker id="p-w" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-warn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1200" height="350" fill="var(--d-bg)"/>
+
+        <rect x="40" y="50" width="500" height="192" rx="12" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="2.2"/>
+        <text x="62" y="80" font-size="10.5" fill="var(--d-accent)" font-weight="700" letter-spacing="1">COMMITTED · IN YOUR REPO</text>
+        <text x="62" y="106" font-size="15" fill="var(--d-ink)" font-weight="700">.fux/index/{00..ff}.jsonl</text>
+        <text x="62" y="132" font-size="11.5" fill="var(--d-body)">· 256 shards of canonical JSON, one line per document</text>
+        <text x="62" y="152" font-size="11.5" fill="var(--d-body)">· diffable, mergeable, reviewable in a pull request</text>
+        <text x="62" y="172" font-size="11.5" fill="var(--d-body)">· statistics only — no prose, no floats, no clocks</text>
+        <text x="62" y="192" font-size="11.5" fill="var(--d-body)">· merged by a custom git driver, not by line adjacency</text>
+        <text x="62" y="219" font-size="11.5" fill="var(--d-accent)" font-weight="700">THIS is the artifact. Everything else is rebuildable.</text>
+
+        <rect x="660" y="50" width="500" height="192" rx="12" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6" stroke-dasharray="6 5"/>
+        <text x="682" y="80" font-size="10.5" fill="var(--d-band)" font-weight="700" letter-spacing="1">DERIVED · GITIGNORED</text>
+        <text x="682" y="106" font-size="15" fill="var(--d-ink)" font-weight="700">.fux/runtime/</text>
+        <text x="682" y="132" font-size="11.5" fill="var(--d-body)">· postings, docs table, graph, caches, dirty list</text>
+        <text x="682" y="152" font-size="11.5" fill="var(--d-body)">· mmap'd binary segments, optimised for query speed</text>
+        <text x="682" y="172" font-size="11.5" fill="var(--d-body)">· rebuilt by `fux build` in seconds</text>
+        <text x="682" y="192" font-size="11.5" fill="var(--d-body)">· holds the only wall clock in the engine (the TTL cache)</text>
+        <text x="682" y="219" font-size="11.5" fill="var(--d-body)" font-weight="700">Delete it whenever you like.</text>
+
+        <path d="M 548 116 L 652 116" fill="none" stroke="var(--d-accent)" stroke-width="2" marker-end="url(#p-a)"/>
+        <text x="600" y="106" font-size="10.5" fill="var(--d-accent)" text-anchor="middle" font-weight="600">fux build</text>
+        <path d="M 652 176 L 548 176" fill="none" stroke="var(--d-warn)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#p-w)"/>
+        <text x="600" y="196" font-size="10.5" fill="var(--d-warn)" text-anchor="middle" font-weight="600">rm -rf</text>
+        <text x="600" y="210" font-size="10.5" fill="var(--d-warn)" text-anchor="middle" font-weight="600">costs time</text>
+
+        <rect x="40" y="272" width="1120" height="56" rx="10" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.8"/>
+        <text x="62" y="296" font-size="12.5" fill="var(--d-ok)" font-weight="700">THE DIFFERENTIAL LAW</text>
+        <text x="240" y="296" font-size="12" fill="var(--d-ink)">every result the accelerator returns is byte-identical to the reference scan, at every --top.</text>
+        <text x="62" y="316" font-size="11" fill="var(--d-body)">That single assertion is what makes the derived plane disposable rather than load-bearing — and it is asserted by a test suite, not by intent.</text>
+      </svg>
+    </div>
+  </figure>
+</section>
+
+<!-- ------------------------------ VERBS ------------------------------ -->
+<section class="slide" id="s-verbs" data-title="ask · find · answer">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>Line ranges come from <code>answer</code>, never from <code>ask</code></h2>
+  <p class="lede">The single most confusing thing about the surface, so it goes first.</p>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="ask and find return documents offline; answer fetches, chunks and returns a span with line numbers">
+        <defs>
+          <marker id="v-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1200" height="300" fill="var(--d-bg)"/>
+
+        <rect x="30" y="96" width="196" height="108" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.8"/>
+        <text x="128" y="138" font-size="13" fill="var(--d-ink)" text-anchor="middle" font-weight="600">your question</text>
+        <text x="128" y="160" font-size="10.5" fill="var(--d-body)" text-anchor="middle">analysed by the same</text>
+        <text x="128" y="176" font-size="10.5" fill="var(--d-body)" text-anchor="middle">pipeline the docs were</text>
+
+        <text x="264" y="48" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">ask · find — DOCUMENT GRANULARITY, NO NETWORK</text>
+        <rect x="264" y="60" width="190" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="359" y="90" font-size="12" fill="var(--d-ink)" text-anchor="middle" font-weight="600">rank in the index</text>
+        <text x="359" y="110" font-size="10.5" fill="var(--d-dim)" text-anchor="middle">offline, always</text>
+
+        <rect x="484" y="60" width="450" height="72" rx="9" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.6"/>
+        <text x="504" y="88" font-size="12" fill="var(--d-ink)" font-weight="600">returns:</text>
+        <text x="576" y="88" font-size="13" fill="var(--d-ok)" font-family="ui-monospace,monospace" font-weight="700">docs/mesh.md</text>
+        <text x="504" y="112" font-size="10.5" fill="var(--d-body)">a document, a score, and a confidence block — no line numbers, ever</text>
+
+        <text x="264" y="182" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">answer — SPAN GRANULARITY, FETCHES EVERY CITED SOURCE</text>
+        <rect x="264" y="194" width="190" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="359" y="224" font-size="12" fill="var(--d-ink)" text-anchor="middle" font-weight="600">rank in the index</text>
+        <text x="359" y="244" font-size="10.5" fill="var(--d-dim)" text-anchor="middle">same scores</text>
+
+        <rect x="484" y="194" width="190" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="579" y="218" font-size="12" fill="var(--d-ink)" text-anchor="middle" font-weight="600">fetch the source</text>
+        <text x="579" y="236" font-size="10.5" fill="var(--d-body)" text-anchor="middle">git dir · URL</text>
+        <text x="579" y="252" font-size="10.5" fill="var(--d-dim)" text-anchor="middle">compare the sha</text>
+
+        <rect x="704" y="194" width="190" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="799" y="218" font-size="12" fill="var(--d-ink)" text-anchor="middle" font-weight="600">chunk + re-score</text>
+        <text x="799" y="236" font-size="10.5" fill="var(--d-body)" text-anchor="middle">on the FETCHED bytes</text>
+        <text x="799" y="252" font-size="10.5" fill="var(--d-dim)" text-anchor="middle">transient, never stored</text>
+
+        <rect x="924" y="194" width="246" height="72" rx="9" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.6"/>
+        <text x="944" y="222" font-size="12" fill="var(--d-ink)" font-weight="600">returns:</text>
+        <text x="944" y="246" font-size="13" fill="var(--d-ok)" font-family="ui-monospace,monospace" font-weight="700">docs/mesh.md:L10-L13</text>
+
+        <path d="M 228 132 L 250 132 L 250 96 L 260 96" fill="none" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
+        <path d="M 228 168 L 250 168 L 250 230 L 260 230" fill="none" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
+        <line x1="456" y1="96" x2="480" y2="96" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
+        <line x1="456" y1="230" x2="480" y2="230" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
+        <line x1="676" y1="230" x2="700" y2="230" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
+        <line x1="896" y1="230" x2="920" y2="230" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#v-a)"/>
+
+        <text x="30" y="288" font-size="11" fill="var(--d-body)">A line range can only be computed by chunking the FETCHED bytes. The index holds statistics, not text — it has nothing to count lines in. The split is L4 showing through the surface.</text>
+      </svg>
+    </div>
+  </figure>
+
+  <div class="note warn">
+    If you ran <code>fux ask</code> and expected <code>:L12-L40</code>, nothing is broken — it is the
+    wrong verb for that question.
+  </div>
+</section>
+
+<!-- ---------------------------- CITATION ---------------------------- -->
+<section class="slide" id="s-citation" data-title="What a citation is">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>What a citation actually is</h2>
+  <ul class="tight">
+    <li>Not a document with a wish of luck — a <strong>span</strong>.</li>
+    <li>A heading-delimited passage, a line range, and the sha of the bytes just read.</li>
+  </ul>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 270" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="Anatomy of a fux citation: path, line range, sha, freshness verdict">
+        <rect width="1200" height="270" fill="var(--d-bg)"/>
+        <text x="40" y="34" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">ANATOMY OF A CITATION</text>
+
+        <rect x="40" y="52" width="1120" height="64" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="70" y="92" font-size="19" font-family="ui-monospace,monospace" fill="var(--d-ink)">docs/mesh.md</text>
+        <text x="240" y="92" font-size="19" font-family="ui-monospace,monospace" fill="var(--d-accent)" font-weight="700">:L10-L13</text>
+        <text x="440" y="92" font-size="19" font-family="ui-monospace,monospace" fill="var(--d-body)">sha 516bef067812</text>
+        <text x="760" y="92" font-size="19" font-family="ui-monospace,monospace" fill="var(--d-ok)" font-weight="700">current</text>
+
+        <path d="M 130 120 L 130 152" fill="none" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <path d="M 300 120 L 300 152" fill="none" stroke="var(--d-accent)" stroke-width="1.4"/>
+        <path d="M 560 120 L 560 152" fill="none" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <path d="M 810 120 L 810 152" fill="none" stroke="var(--d-ok)" stroke-width="1.4"/>
+
+        <rect x="40" y="156" width="230" height="82" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.3"/>
+        <text x="58" y="180" font-size="12" fill="var(--d-ink)" font-weight="600">where</text>
+        <text x="58" y="200" font-size="10.5" fill="var(--d-body)">the loc, as the source</text>
+        <text x="58" y="216" font-size="10.5" fill="var(--d-body)">system addresses it</text>
+
+        <rect x="286" y="156" width="230" height="82" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.5"/>
+        <text x="304" y="180" font-size="12" fill="var(--d-ink)" font-weight="600">which lines</text>
+        <text x="304" y="200" font-size="10.5" fill="var(--d-body)">1-based, inclusive — an</text>
+        <text x="304" y="216" font-size="10.5" fill="var(--d-body)">agent can open the file here</text>
+
+        <rect x="532" y="156" width="230" height="82" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.3"/>
+        <text x="550" y="180" font-size="12" fill="var(--d-ink)" font-weight="600">of what bytes</text>
+        <text x="550" y="200" font-size="10.5" fill="var(--d-body)">hashed at fetch time,</text>
+        <text x="550" y="216" font-size="10.5" fill="var(--d-body)">not at ingest time</text>
+
+        <rect x="778" y="156" width="230" height="82" rx="9" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.5"/>
+        <text x="796" y="180" font-size="12" fill="var(--d-ink)" font-weight="600">how sure</text>
+        <text x="796" y="200" font-size="10.5" fill="var(--d-body)">current · stale · cached ·</text>
+        <text x="796" y="216" font-size="10.5" fill="var(--d-body)">unverified</text>
+
+        <rect x="1024" y="156" width="136" height="82" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.3" stroke-dasharray="5 4"/>
+        <text x="1042" y="180" font-size="12" fill="var(--d-ink)" font-weight="600">+ ordinal</text>
+        <text x="1042" y="200" font-size="10.5" fill="var(--d-body)">line numbers move</text>
+        <text x="1042" y="216" font-size="10.5" fill="var(--d-body)">on a reflow</text>
+      </svg>
+    </div>
+  </figure>
+
+  <details class="more">
+    <summary>The captured run, and the JSON an agent should read <span class="why">— verbatim, not illustrated</span></summary>
+    <div class="body">
+<pre><code>$ fux answer "why did we choose helix"
+
+# Service mesh
+
+We adopted a service mesh to stop a slow dependency taking down checkout.
+
+## Why we chose Helix
+
+Helix gave us per-route timeouts and circuit breaking without touching
+application code. The alternative was a library in every service.
+
+  -- docs/mesh.md:L1-L8 (sha 516bef067812, current)</code></pre>
+<pre><code>"citation": {
+  "id":        "file:docs/mesh.md",
+  "loc":       "docs/mesh.md:L10-L13",
+  "sha":       "516bef06781262a0a64b10027316c18d668eeccb",
+  "freshness": "current"
+}</code></pre>
+      <p class="note">Examples that are typed rather than captured rot silently, and this project has
+      paid for that once already.</p>
+    </div>
+  </details>
+
+  <details class="more">
+    <summary>How the spans are chosen <span class="why">— four rules, all cheap and model-free</span></summary>
+    <div class="body">
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>Step</th><th>Rule</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Split</td><td>On <strong>markdown headings</strong></td>
+            <td>A document's headings are the author's own segmentation — boundaries a human already
+            agreed with, at no cost and with no model.</td></tr>
+          <tr><td>Merge</td><td>Sections under <strong>120 bytes</strong> fold forward</td>
+            <td>A two-line passage is a citation nobody can read in isolation.</td></tr>
+          <tr><td>Split again</td><td>Sections over <strong>4 000 bytes</strong> split on paragraphs</td>
+            <td>One 40 KB section would otherwise eat the whole byte budget by itself.</td></tr>
+          <tr><td>Address</td><td><code>path:L&lt;start&gt;-L&lt;end&gt;</code></td>
+            <td>An agent acts on a citation by opening a file at a line. An ordinal alone would force
+            a second call.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <ul class="tight">
+        <li>Text before the first heading is its own passage — a preamble is content, and dropping it
+          silently is how the one sentence that answers the question disappears.</li>
+        <li><strong>The passages are transient</strong>: never written to <code>.fux/</code>, never
+          cached, never indexed. That is L2.</li>
+        <li>It also makes the byte budget honest — chunking runs on fetched bytes, so the assembler
+          knows every candidate's real size instead of estimating it. A web-scale system has to guess
+          here; this one does not.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<!-- ---------------------------- FRESHNESS ---------------------------- -->
+<section class="slide" id="s-freshness" data-title="Freshness verdicts">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>Four freshness verdicts</h2>
+  <p class="lede">The fourth exists precisely so the other three stay honest.</p>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 250" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The four freshness verdicts: current, stale, cached, unverified">
+        <rect width="1200" height="250" fill="var(--d-bg)"/>
+        <text x="40" y="32" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">DID WE LOOK, AND WHAT DID WE SEE?</text>
+
+        <rect x="40" y="46" width="264" height="128" rx="11" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.9"/>
+        <text x="60" y="76" font-size="15" fill="var(--d-ok)" font-family="ui-monospace,monospace" font-weight="700">current</text>
+        <text x="60" y="102" font-size="11" fill="var(--d-body)">we looked just now, and</text>
+        <text x="60" y="119" font-size="11" fill="var(--d-body)">it still matches the index</text>
+        <text x="60" y="150" font-size="11" fill="var(--d-ink)" font-weight="600">→ cite it plainly</text>
+
+        <rect x="326" y="46" width="264" height="128" rx="11" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.9"/>
+        <text x="346" y="76" font-size="15" fill="var(--d-warn)" font-family="ui-monospace,monospace" font-weight="700">stale</text>
+        <text x="346" y="102" font-size="11" fill="var(--d-body)">we looked, and the source</text>
+        <text x="346" y="119" font-size="11" fill="var(--d-body)">changed since ingest</text>
+        <text x="346" y="150" font-size="11" fill="var(--d-ink)" font-weight="600">→ the ANSWER is right;</text>
+        <text x="346" y="166" font-size="11" fill="var(--d-ink)" font-weight="600">the index is behind. Say so.</text>
+
+        <rect x="612" y="46" width="264" height="128" rx="11" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6"/>
+        <text x="632" y="76" font-size="15" fill="var(--d-ink)" font-family="ui-monospace,monospace" font-weight="700">cached</text>
+        <text x="632" y="102" font-size="11" fill="var(--d-body)">we looked RECENTLY —</text>
+        <text x="632" y="119" font-size="11" fill="var(--d-body)">served from a TTL cache</text>
+        <text x="632" y="150" font-size="11" fill="var(--d-ink)" font-weight="600">→ which is not</text>
+        <text x="632" y="166" font-size="11" fill="var(--d-ink)" font-weight="600">"we looked just now"</text>
+
+        <rect x="898" y="46" width="262" height="128" rx="11" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6" stroke-dasharray="6 5"/>
+        <text x="918" y="76" font-size="15" fill="var(--d-ink)" font-family="ui-monospace,monospace" font-weight="700">unverified</text>
+        <text x="918" y="102" font-size="11" fill="var(--d-body)">we did not look, or could</text>
+        <text x="918" y="119" font-size="11" fill="var(--d-body)">not reach it</text>
+        <text x="918" y="150" font-size="11" fill="var(--d-ink)" font-weight="600">→ never present it</text>
+        <text x="918" y="166" font-size="11" fill="var(--d-ink)" font-weight="600">as confirmed</text>
+
+        <rect x="40" y="196" width="1120" height="40" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.5"/>
+        <text x="60" y="221" font-size="11.5" fill="var(--d-ink)">Collapsing <tspan font-weight="700">cached</tspan> into <tspan font-weight="700">current</tspan> — "we did not look" into "we looked and it was fine" — is the exact failure the whole refer plane exists to prevent. A knob that lies about freshness is worse than no knob.</text>
+      </svg>
+    </div>
+  </figure>
+</section>
+
+<!-- ------------------------------ USING ------------------------------ -->
+<section class="slide" id="s-using" data-title="Using it">
+  <p class="kicker">01 · How Fux works</p>
+  <h2>Using it</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Install and set up</h4>
+<pre style="margin:8px 0 0"><code>pip install fux-engine
+fux setup
+fux ingest &amp;&amp; fux build</code></pre>
+    </div>
+    <div class="card">
+      <h4>Tell it what to index</h4>
+<pre style="margin:8px 0 0"><code>fux add docs/
+fux add README.md
+fux add https://wiki.corp/page
+fux remove docs/legacy/
+fux update</code></pre>
+    </div>
+    <div class="card">
+      <h4>Ask</h4>
+<pre style="margin:8px 0 0"><code>fux ask "…" --json
+fux find "…"
+fux answer "…"
+fux doctor</code></pre>
+    </div>
+  </div>
+
+  <ul class="tight">
+    <li><code>fux setup</code> writes <strong>files you own</strong> — <code>fux.toml</code>, the
+      source lists, the fetcher and decoder templates, the agent files. Commit them, edit them; fux
+      will not overwrite them.</li>
+    <li><code>fux add &lt;URL&gt;</code> both <em>records</em> the URL and <em>fetches</em> it.</li>
+    <li><code>fux update --check</code> is read-only: it reports drift, offline, without fetching.</li>
+  </ul>
+
+  <details class="more">
+    <summary>Which read verb to reach for <span class="why">— six verbs, one table</span></summary>
+    <div class="body">
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>Command</th><th>Gives you</th><th>Reach for it when</th></tr></thead>
+        <tbody>
+          <tr><td><code>fux ask</code></td><td>Ranked results with score, loc, archived, confidence</td>
+            <td>You want candidates and will judge them</td></tr>
+          <tr><td><code>fux find</code></td><td>Bare paths</td><td>You are piping into something else</td></tr>
+          <tr><td><code>fux answer</code></td><td>One cited answer, re-scored on current bytes</td>
+            <td>You want the answer, with a freshness verdict</td></tr>
+          <tr><td><code>fux explain</code></td><td>Edges into and out of one document</td>
+            <td>You are asking what something depends on</td></tr>
+          <tr><td><code>fux graph</code></td><td>The neighbourhood around the best answers</td>
+            <td>You are orienting in unfamiliar territory</td></tr>
+          <tr><td><code>fux path</code></td><td>How two documents connect</td>
+            <td>You suspect a relationship and want the chain</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </details>
+</section>
+
+<!-- ========================== 02 · CONFIDENCE ========================== -->
+<section class="slide" id="s-conf-why" data-title="Why confidence exists">
+  <p class="kicker">02 · Confidence</p>
+  <h2>How much the index believes its own answer</h2>
+
+  <div class="note warn">
+    <strong>The problem, in one sentence.</strong> An agent handed a ranked list cannot tell
+    <em>"these three documents answer your question"</em> from <em>"these three are the closest thing
+    in a corpus that does not discuss this at all."</em> Both look identical: a score, a title, a
+    citation.
+  </div>
+
+  <ul class="tight">
+    <li>The second case is where an agent <strong>invents an answer and cites a real file</strong>
+      while doing it.</li>
+    <li>Every query verb therefore returns a <strong>confidence block</strong> that makes the
+      difference machine-readable.</li>
+    <li>It is a <strong>pure function of what ranking already produced</strong> — the query's term
+      hashes, the <code>df</code> statistics BM25F needed anyway, the scored list, and (on
+      <code>answer</code> only) the refer plane's verdict.</li>
+    <li><strong>Nothing in it fetches, samples, calls a model, or reads a clock.</strong> L1, L3 and
+      L4 are untouched.</li>
+  </ul>
+</section>
+
+<section class="slide" id="s-conf-ladder" data-title="Signals and bands">
+  <p class="kicker">02 · Confidence</p>
+  <h2>Four signals in, one band out</h2>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 520" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="Four confidence signals feeding a four-rung band ladder: none, partial, weak, grounded">
+        <defs>
+          <marker id="c-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1120" height="520" fill="var(--d-bg)"/>
+
+        <text x="40" y="40" font-size="19" fill="var(--d-ink)" font-weight="600">The confidence block</text>
+        <text x="40" y="62" font-size="11.5" fill="var(--d-body)">the ladder is read top to bottom, and the first true clause wins</text>
+
+        <rect x="40" y="94" width="310" height="336" rx="12" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6"/>
+        <text x="58" y="120" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">THE FOUR SIGNALS</text>
+
+        <rect x="56" y="134" width="278" height="64" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.3"/>
+        <text x="72" y="156" font-size="12" fill="var(--d-ink)" font-weight="600">coverage · 0.0–1.0</text>
+        <text x="72" y="175" font-size="10.5" fill="var(--d-body)">did the corpus contain the words</text>
+        <text x="72" y="190" font-size="10.5" fill="var(--d-body)">you asked about? idf-weighted</text>
+
+        <rect x="56" y="208" width="278" height="64" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.3"/>
+        <text x="72" y="230" font-size="12" fill="var(--d-ink)" font-weight="600">separation · 0.0–1.0</text>
+        <text x="72" y="249" font-size="10.5" fill="var(--d-body)">(top1 − top2) / top1 — can the</text>
+        <text x="72" y="264" font-size="10.5" fill="var(--d-body)">ranking tell first from second?</text>
+
+        <rect x="56" y="282" width="278" height="64" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.3"/>
+        <text x="72" y="304" font-size="12" fill="var(--d-ink)" font-weight="600">support · int</text>
+        <text x="72" y="323" font-size="10.5" fill="var(--d-body)">how many results scored above</text>
+        <text x="72" y="338" font-size="10.5" fill="var(--d-body)">zero · bounded by --top</text>
+
+        <rect x="56" y="356" width="278" height="64" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.3"/>
+        <text x="72" y="378" font-size="12" fill="var(--d-ink)" font-weight="600">verified · four-state</text>
+        <text x="72" y="397" font-size="10.5" fill="var(--d-body)">current · stale · cached ·</text>
+        <text x="72" y="412" font-size="10.5" fill="var(--d-body)">unverified — from the refer plane</text>
+
+        <line x1="352" y1="262" x2="392" y2="262" stroke="var(--d-accent)" stroke-width="1.9" marker-end="url(#c-acc)"/>
+
+        <text x="400" y="86" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">THE BAND LADDER — FIRST TRUE CLAUSE WINS</text>
+
+        <rect x="400" y="98" width="320" height="72" rx="9" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
+        <text x="418" y="124" font-size="12.5" fill="var(--d-ink)" font-weight="600">support == 0</text>
+        <text x="418" y="145" font-size="10.5" fill="var(--d-body)">nothing scored above zero at all.</text>
+        <text x="418" y="161" font-size="10.5" fill="var(--d-body)">A fact, not a threshold.</text>
+
+        <rect x="400" y="190" width="320" height="72" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.6"/>
+        <text x="418" y="216" font-size="12.5" fill="var(--d-ink)" font-weight="600">missing, or verified == stale</text>
+        <text x="418" y="237" font-size="10.5" fill="var(--d-body)">a query term is nowhere in the corpus,</text>
+        <text x="418" y="253" font-size="10.5" fill="var(--d-body)">or the cited bytes changed. Both facts.</text>
+
+        <rect x="400" y="282" width="320" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6"/>
+        <text x="418" y="308" font-size="12.5" fill="var(--d-ink)" font-weight="600">separation &lt; SEPARATION_FLOOR</text>
+        <text x="418" y="329" font-size="10.5" fill="var(--d-warn)" font-weight="600">0.10 — PROVISIONAL AND UNMEASURED</text>
+        <text x="418" y="345" font-size="10.5" fill="var(--d-body)">the only number here that is not a fact (R10)</text>
+
+        <rect x="400" y="374" width="320" height="72" rx="9" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.6"/>
+        <text x="418" y="400" font-size="12.5" fill="var(--d-ink)" font-weight="600">otherwise</text>
+        <text x="418" y="421" font-size="10.5" fill="var(--d-body)">every signal is clear: use the result</text>
+        <text x="418" y="437" font-size="10.5" fill="var(--d-body)">and cite it.</text>
+
+        <line x1="726" y1="134" x2="764" y2="134" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#c-acc)"/>
+        <line x1="726" y1="226" x2="764" y2="226" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#c-acc)"/>
+        <line x1="726" y1="318" x2="764" y2="318" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#c-acc)"/>
+        <line x1="726" y1="410" x2="764" y2="410" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#c-acc)"/>
+
+        <text x="772" y="86" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">WHAT A CONSUMER DOES</text>
+
+        <rect x="772" y="98" width="308" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-warn)" stroke-width="1.8"/>
+        <text x="790" y="124" font-size="13" fill="var(--d-warn)" font-weight="700">none</text>
+        <text x="790" y="145" font-size="10.5" fill="var(--d-body)">answerable: false. Do not proceed —</text>
+        <text x="790" y="161" font-size="10.5" fill="var(--d-body)">a refusal, not a low number.</text>
+
+        <rect x="772" y="190" width="308" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-accent)" stroke-width="1.8"/>
+        <text x="790" y="216" font-size="13" fill="var(--d-accent)" font-weight="700">partial</text>
+        <text x="790" y="237" font-size="10.5" fill="var(--d-body)">answer, and say what is missing.</text>
+        <text x="790" y="253" font-size="10.5" fill="var(--d-body)">`missing` gives you the exact words.</text>
+
+        <rect x="772" y="282" width="308" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.8"/>
+        <text x="790" y="308" font-size="13" fill="var(--d-ink)" font-weight="700">weak</text>
+        <text x="790" y="329" font-size="10.5" fill="var(--d-body)">nothing is identifiably wrong and the</text>
+        <text x="790" y="345" font-size="10.5" fill="var(--d-body)">ranking cannot choose. Report the search.</text>
+
+        <rect x="772" y="374" width="308" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-ok)" stroke-width="1.8"/>
+        <text x="790" y="400" font-size="13" fill="var(--d-ok)" font-weight="700">grounded</text>
+        <text x="790" y="421" font-size="10.5" fill="var(--d-body)">cite it plainly. The stderr note is</text>
+        <text x="790" y="437" font-size="10.5" fill="var(--d-body)">silent here, on purpose.</text>
+
+        <text x="40" y="478" font-size="11" fill="var(--d-body)">THREE of the four boundaries are FACTS. Only the grounded/weak cut needs a measured cutoff — and it does not have one yet.</text>
+        <text x="40" y="498" font-size="11" fill="var(--d-dim)">The block is computed from rank()'s output and handed to the caller. Nothing downstream feeds back, so the differential law is untouched.</text>
+      </svg>
+    </div>
+    <figcaption><code>stale</code> demotes to <code>partial</code> rather than <code>weak</code>,
+    because stale bytes are a <em>knowable</em> defect a consumer can name.</figcaption>
+  </figure>
+</section>
+
+<section class="slide" id="s-conf-signals" data-title="The five fields">
+  <p class="kicker">02 · Confidence</p>
+  <h2>The five fields, and the one to read first</h2>
+
+  <ul class="tight">
+    <li><code>missing</code> — <strong>read this first.</strong> It is the difference between hedging
+      vaguely and saying <em>"nothing here mentions <code>mTLS</code>"</em>.</li>
+    <li><code>coverage</code> is <strong>idf-weighted</strong> — missing <code>the</code> is nothing;
+      missing <code>mTLS</code> is the question.</li>
+    <li><code>separation</code> is <code>1.0</code> when <strong>exactly one</strong> document
+      scored — the strongest separation there is, not the weakest.</li>
+    <li><code>ask</code> and <code>find</code> always report <code>unverified</code> — <em>"we did
+      not look"</em>, never <em>"it was fine"</em>.</li>
+  </ul>
+
+  <details class="more">
+    <summary>The full field table, with the reasoning behind each shape</summary>
+    <div class="body">
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>Field</th><th>Answers</th><th>Why it is shaped that way</th></tr></thead>
+        <tbody>
+          <tr><td><code>coverage</code></td><td>Did the corpus contain the words you asked about?</td>
+            <td>A query term the corpus has never seen has <code>df == 0</code>, which idf scores as
+            the <em>rarest possible</em> term. Weighting by idf therefore makes a missed rare word
+            cost far more than a missed common one — which is correct, because the rare word is what
+            made the question specific.</td></tr>
+          <tr><td><code>separation</code></td><td>Can the ranking tell first place from second?</td>
+            <td><code>(top1 − top2) / top1</code>, clamped to <code>[0,1]</code>.</td></tr>
+          <tr><td><code>support</code></td><td>How many documents came back at all</td>
+            <td><strong>Bounded by <code>--top</code>, deliberately.</strong> A corpus-wide count
+            would differ between <code>--fast</code> and <code>--scan</code>, because the accelerator
+            skips documents it has <em>proved</em> cannot reach the top <em>k</em>. That is the
+            differential-law break the design forbids — the law is worth more than the better
+            number.</td></tr>
+          <tr><td><code>verified</code></td><td>Were the cited bytes still what the index recorded?</td>
+            <td>Filled in after the fetch, because <code>answer</code> ranks before it fetches. The
+            band is a derived property, so it re-computes and cannot go stale against it.</td></tr>
+          <tr><td><code>missing</code></td><td>Which of your words are nowhere in the corpus</td>
+            <td>Reports the <strong>surface</strong> form, never the analyzed one. <em>"<code>mtl</code>
+            is not in this corpus"</em> is worse than silence — a reader cannot tell whether fux
+            misunderstood the question or the corpus is genuinely missing the topic.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-conf-out" data-title="Getting it out">
+  <p class="kicker">02 · Confidence</p>
+  <h2>Getting it out</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h4>In <code>--json</code></h4>
+<pre style="margin:8px 0 0"><code>"confidence": {
+  "band":       "partial",
+  "answerable": true,
+  "coverage":   0.61,
+  "separation": 0.34,
+  "support":    3,
+  "verified":   "unverified",
+  "missing":    ["mTLS"]
+}</code></pre>
+    </div>
+    <div class="card">
+      <h4>On a terminal — <strong>stderr only</strong></h4>
+<pre style="margin:8px 0 0"><code>confidence: partial - answer, but
+  say what is missing.
+  Not in this corpus: mTLS.
+
+confidence: weak - the ranking cannot
+  separate the top results
+  (separation 0.04, floor 0.10).
+
+confidence: none - nothing in the
+  index scored for this query.</code></pre>
+    </div>
+  </div>
+
+  <ul class="tight">
+    <li><code>band</code> and <code>answerable</code> are <strong>written out rather than left
+      derivable</strong> — a consumer re-implementing the rules would be a second copy of this
+      policy, drifting from the day it was written.</li>
+    <li><strong>Silent at <code>grounded</code>, on purpose.</strong> A note that fires on every
+      healthy query is a note nobody reads by the second day.</li>
+    <li><strong>Never on stdout</strong>: <code>find</code> pipes bare paths and <code>--json</code>
+      is a contract. ASCII only — a Windows console's default codepage crashes on a fancy dash rather
+      than degrading.</li>
+    <li><code>answerable</code> is a <strong>boolean</strong>: an agent handed <code>0.3</code> uses
+      it anyway and hedges in prose; an agent handed <code>false</code> has nothing to hedge with.</li>
+  </ul>
+</section>
+
+<section class="slide" id="s-conf-honest" data-title="Fact vs guess">
+  <p class="kicker">02 · Confidence</p>
+  <h2>Which parts are facts, and which is a guess</h2>
+
+  <div class="grid">
+    <div class="card" style="border-color:var(--ok)">
+      <h4 style="color:var(--ok)">Facts — no threshold involved</h4>
+      <ul class="tight">
+        <li><code>none</code>: nothing scored above zero</li>
+        <li><code>partial</code>: a term matched nothing anywhere</li>
+        <li><code>partial</code>: the cited bytes changed</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:var(--warn)">
+      <h4 style="color:var(--warn)">⚠ The one guess</h4>
+      <ul class="tight">
+        <li><code>SEPARATION_FLOOR = 0.10</code> is <strong>provisional and unmeasured</strong></li>
+        <li>Registered as prediction <strong>R10</strong></li>
+        <li><strong>Must not be cited as calibrated</strong> until that verdict is filed</li>
+      </ul>
+    </div>
+  </div>
+
+  <ul class="tight">
+    <li><strong>Not a <code>tune.toml</code> key, deliberately.</strong> A consumer who could lower it
+      until their answers read <code>grounded</code> would be tuning away the <em>signal</em> rather
+      than the ranking. The honest fix for a wrong floor is to measure it once, for everyone.</li>
+    <li>⚠ <code>separation</code> is <strong>ordinal</strong>, and Chow's rule — the theory behind an
+      abstention threshold — assumes a <em>calibrated probability</em>. The record states the gap
+      rather than closing it.</li>
+    <li><strong>Confidence can never reach a score or an ordering.</strong> It is computed from
+      <code>rank()</code>'s output and handed to the caller; nothing downstream feeds back.</li>
+    <li>ADR-CONFIDENCE is <em>proposed</em>, not accepted — the behaviour ships, the ratification is a
+      human step and is owed.</li>
+  </ul>
+</section>
+
+<!-- =========================== 03 · TESTING =========================== -->
+<section class="slide" id="s-test-layers" data-title="Four layers of check">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>Two questions, not one</h2>
+  <ul class="tight">
+    <li><strong>Does the code do what it says?</strong> → the suites.</li>
+    <li><strong>Is what it says any good?</strong> → the quality contract.</li>
+    <li>A run can pass the first and fail the second. It has happened twice, and a human caught both.</li>
+  </ul>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="Four testing layers: unit, end-to-end, differential, measured evidence — and what none of them can prove">
+        <rect width="1200" height="340" fill="var(--d-bg)"/>
+        <text x="40" y="32" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">FOUR LAYERS — EACH BLIND TO SOMETHING THE NEXT ONE SEES</text>
+
+        <rect x="40" y="46" width="250" height="196" rx="11" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="58" y="72" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">LAYER 1</text>
+        <text x="58" y="96" font-size="14" fill="var(--d-ink)" font-weight="700">unit</text>
+        <text x="58" y="118" font-size="10.5" fill="var(--d-dim)" font-family="ui-monospace,monospace">tests/</text>
+        <text x="58" y="144" font-size="10.5" fill="var(--d-body)">92 modules, ~1 150 test</text>
+        <text x="58" y="160" font-size="10.5" fill="var(--d-body)">functions before parametrising</text>
+        <text x="58" y="182" font-size="10.5" fill="var(--d-body)">every codec, the analyzer,</text>
+        <text x="58" y="198" font-size="10.5" fill="var(--d-body)">BM25F, chunking, confidence</text>
+        <text x="58" y="224" font-size="10" fill="var(--d-warn)">blind to: anything that only</text>
+        <text x="58" y="237" font-size="10" fill="var(--d-warn)">appears in a real process</text>
+
+        <rect x="330" y="46" width="250" height="196" rx="11" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="348" y="72" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">LAYER 2</text>
+        <text x="348" y="96" font-size="14" fill="var(--d-ink)" font-weight="700">end-to-end</text>
+        <text x="348" y="118" font-size="10.5" fill="var(--d-dim)" font-family="ui-monospace,monospace">tests_e2e/</text>
+        <text x="348" y="144" font-size="10.5" fill="var(--d-body)">the real CLI in a subprocess</text>
+        <text x="348" y="160" font-size="10.5" fill="var(--d-body)">against a fixture corpus</text>
+        <text x="348" y="182" font-size="10.5" fill="var(--d-body)">exit codes, stdout/stderr split,</text>
+        <text x="348" y="198" font-size="10.5" fill="var(--d-body)">the on-disk shapes users see</text>
+        <text x="348" y="224" font-size="10" fill="var(--d-warn)">blind to: whether the answer</text>
+        <text x="348" y="237" font-size="10" fill="var(--d-warn)">is a GOOD answer</text>
+
+        <rect x="620" y="46" width="250" height="196" rx="11" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.8"/>
+        <text x="638" y="72" font-size="10" fill="var(--d-ok)" font-family="ui-monospace,monospace">LAYER 3</text>
+        <text x="638" y="96" font-size="14" fill="var(--d-ink)" font-weight="700">differential</text>
+        <text x="638" y="118" font-size="10.5" fill="var(--d-dim)" font-family="ui-monospace,monospace">tools/differential/</text>
+        <text x="638" y="144" font-size="10.5" fill="var(--d-body)">accelerator vs reference scan,</text>
+        <text x="638" y="160" font-size="10.5" fill="var(--d-body)">byte for byte</text>
+        <text x="638" y="182" font-size="10.5" fill="var(--d-ok)" font-weight="600">swept at top = 1, 5, 20, 50</text>
+        <text x="638" y="198" font-size="10.5" fill="var(--d-body)">— one value would not do</text>
+        <text x="638" y="224" font-size="10" fill="var(--d-warn)">blind to: the scan itself. It</text>
+        <text x="638" y="237" font-size="10" fill="var(--d-warn)">proves agreement, not truth</text>
+
+        <rect x="910" y="46" width="250" height="196" rx="11" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.8"/>
+        <text x="928" y="72" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">LAYER 4</text>
+        <text x="928" y="96" font-size="14" fill="var(--d-ink)" font-weight="700">measured evidence</text>
+        <text x="928" y="118" font-size="10.5" fill="var(--d-dim)" font-family="ui-monospace,monospace">work/regression/</text>
+        <text x="928" y="144" font-size="10.5" fill="var(--d-body)">report + ANALYSIS.md + raw</text>
+        <text x="928" y="160" font-size="10.5" fill="var(--d-body)">evidence + a VERDICT.md</text>
+        <text x="928" y="182" font-size="10.5" fill="var(--d-body)">judged against a threshold</text>
+        <text x="928" y="198" font-size="10.5" fill="var(--d-body)">frozen BEFORE the number</text>
+        <text x="928" y="224" font-size="10" fill="var(--d-warn)">blind to: whatever the corpus</text>
+        <text x="928" y="237" font-size="10" fill="var(--d-warn)">does not contain</text>
+
+        <rect x="40" y="268" width="1120" height="52" rx="10" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
+        <text x="58" y="292" font-size="11.5" fill="var(--d-ink)" font-weight="700">What NO check can prove:</text>
+        <text x="248" y="292" font-size="11.5" fill="var(--d-body)">the ADR freshness gate proves a record was TOUCHED. It never reads the record.</text>
+        <text x="58" y="311" font-size="11" fill="var(--d-body)">A record has been amended into self-contradiction in the same commit, the code implemented the wrong sentence, and CI stayed green the whole way.</text>
+      </svg>
+    </div>
+  </figure>
+
+<pre><code>uv sync --extra dev
+uv run pytest -q tests          # fast unit — hermetic, no network, no subprocess
+uv run pytest -q tests_e2e      # the package as a user: the real CLI via subprocess</code></pre>
+</section>
+
+<section class="slide" id="s-test-determinism" data-title="Determinism">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>Determinism is asserted through the CLI, on three operating systems</h2>
+
+  <ul class="tight">
+    <li><strong>Prediction R1</strong> — double-ingest must produce byte-identical shards.</li>
+    <li><code>tests_e2e/test_determinism.py</code> runs the real <code>fux ingest</code> twice in a
+      subprocess and compares <strong>SHA-256 per shard</strong>.</li>
+    <li>It runs on the CI matrix's <strong>Linux, macOS and Windows</strong> runners — so a green run
+      is a genuine cross-platform assertion, not a same-machine self-comparison.</li>
+  </ul>
+
+  <div class="note key">
+    <strong>Why the differential sweeps four <code>top</code> values.</strong> A mutation test on a
+    real corpus showed that at <code>top=5</code> the rarest query term already decides the answer —
+    so <strong>replacing the block bound with a constant zero still produced byte-identical
+    output.</strong> The bound only becomes load-bearing at larger <code>top</code>. A differential
+    that checked one value would have certified an unsound bound as proven.
+  </div>
+
+  <details class="more">
+    <summary>Determinism defended in the small <span class="why">— newlines, randomness, sort order</span></summary>
+    <div class="body">
+      <ul class="tight">
+        <li><strong>Newlines</strong> — the merge driver reads with universal-newline translation and
+          writes with <code>newline="\n"</code>, so a CRLF checkout on Windows merges to the same
+          bytes as an LF checkout everywhere else.</li>
+        <li><strong>Randomness was removed, not seeded</strong> — a fixed seed does not survive a
+          Python version that reorders a set. A test asserts the <em>absence</em> of the import by
+          parsing the AST.</li>
+        <li><strong>Sort order, not sequencing</strong> — <code>fetch_all</code> sorts its results
+          before returning, so completion order never reaches a committed byte. That is what makes a
+          thread pool cheap to reason about.</li>
+        <li><strong>No wall clock on the maintenance path</strong> — timestamps derive from
+          <code>SOURCE_DATE_EPOCH</code> or source mtime. The TTL fetch-cache is the only clock, and
+          it lives in the gitignored plane.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-test-guards" data-title="The project guards">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>The guards that are not about code at all</h2>
+  <p class="lede">A surprising share of the suite tests <em>the project</em> rather than the engine —
+  the failure modes that hurt most here are documentary.</p>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Guard</th><th>Fails the build when…</th></tr></thead>
+    <tbody>
+      <tr><td><code>test_adr_freshness.py</code></td>
+        <td>A commit changes a component a decision record owns without touching that record. The
+          escape hatch is a literal <code>no ADR affected</code> in the commit message — a claim under
+          your name in git history. Also a <code>commit-msg</code> hook.</td></tr>
+      <tr><td><code>test_adr_ownership.py</code></td>
+        <td>A source component is owned by zero records or by two.</td></tr>
+      <tr><td><code>test_archive_law.py</code></td>
+        <td>A second <code>archive/</code> directory appears, or a live document points into one.</td></tr>
+      <tr><td><code>test_doc_registry.py</code> · <code>test_doc_links.py</code></td>
+        <td>A maintained document has no freshness row, a row points at a missing file, or an
+          internal link is dead.</td></tr>
+      <tr><td><code>test_regression_runs.py</code></td>
+        <td>A measured run is filed without its <code>blind</code>/<code>informed</code>
+          classification, or a verdict is written as an ADR instead of a <code>VERDICT.md</code>.</td></tr>
+      <tr><td>Import fences</td>
+        <td>Anything under <code>src/fux/</code> imports a network library. L4 is asserted, not
+          trusted.</td></tr>
+      <tr><td><code>test_windows_console_safe.py</code></td>
+        <td>A fancy dash reaches a Windows console's default codepage, where <code>print()</code>
+          crashes rather than degrading.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="slide" id="s-quality" data-title="The quality funnel">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>What a fux quality number means</h2>
+  <ul class="tight">
+    <li>Fux measured carefully for months and <strong>never wrote down what it was measuring</strong>.</li>
+    <li>Every number therefore carried an undeclared query distribution and an implicit cost model in
+      which <strong>a fabricated citation and an honest decline score identically</strong>.</li>
+  </ul>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 450" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The four-gate quality funnel: reachable, in window, placed, answered — with the declared mix above and the cost model below">
+        <defs>
+          <marker id="q-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1120" height="450" fill="var(--d-bg)"/>
+
+        <text x="40" y="38" font-size="19" fill="var(--d-ink)" font-weight="600">The four-gate funnel</text>
+        <text x="40" y="60" font-size="11.5" fill="var(--d-body)">one number per gate, never one blended score — each gate attributes failure to a different owner</text>
+
+        <rect x="40" y="78" width="500" height="52" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.8"/>
+        <text x="58" y="100" font-size="12" fill="var(--d-ink)" font-weight="600">tools/quality/mix.toml @ version</text>
+        <text x="58" y="119" font-size="10.5" fill="var(--d-body)">the declared query prior + the cost model — frozen the way a pre-registration is frozen</text>
+
+        <path d="M 150 132 L 150 148" fill="none" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#q-acc)"/>
+
+        <rect x="40" y="154" width="240" height="112" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="58" y="180" font-size="13" fill="var(--d-ink)" font-weight="700">reachable</text>
+        <text x="58" y="202" font-size="10.5" fill="var(--d-body)">is it in the index at all?</text>
+        <text x="58" y="236" font-size="10.5" fill="var(--d-warn)" font-weight="600">miss = an INGEST gap</text>
+
+        <rect x="300" y="154" width="240" height="112" rx="10" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="2.2"/>
+        <text x="318" y="180" font-size="13" fill="var(--d-ink)" font-weight="700">in window</text>
+        <text x="318" y="202" font-size="11" fill="var(--d-ok)" font-weight="600">recall@k — THE HEADLINE</text>
+        <text x="318" y="220" font-size="10.5" fill="var(--d-body)">a curve against context bytes;</text>
+        <text x="318" y="236" font-size="10.5" fill="var(--d-warn)" font-weight="600">miss = a RANKING gap</text>
+
+        <rect x="560" y="154" width="240" height="112" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="578" y="180" font-size="13" fill="var(--d-ink)" font-weight="700">placed</text>
+        <text x="578" y="202" font-size="10.5" fill="var(--d-body)">nDCG, MRR — diagnostics only</text>
+        <text x="578" y="236" font-size="10.5" fill="var(--d-warn)" font-weight="600">miss = a RERANKER gap</text>
+
+        <rect x="820" y="154" width="240" height="112" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="838" y="180" font-size="13" fill="var(--d-ink)" font-weight="700">answered</text>
+        <text x="838" y="202" font-size="10.5" fill="var(--d-body)">a judged series — model AND</text>
+        <text x="838" y="218" font-size="10.5" fill="var(--d-body)">prompt AND version pinned</text>
+        <text x="838" y="240" font-size="10.5" fill="var(--d-warn)" font-weight="600">NEVER fused into the headline</text>
+
+        <line x1="284" y1="210" x2="296" y2="210" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#q-acc)"/>
+        <line x1="544" y1="210" x2="556" y2="210" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#q-acc)"/>
+        <line x1="804" y1="210" x2="816" y2="210" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#q-acc)"/>
+
+        <rect x="300" y="292" width="500" height="56" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4" stroke-dasharray="5 4"/>
+        <text x="318" y="314" font-size="11.5" fill="var(--d-ink)" font-weight="600">reported BESIDE the scalar, never instead of it</text>
+        <text x="318" y="333" font-size="10.5" fill="var(--d-body)">the risk–coverage curve (with AURC) + the weight-stability interval</text>
+        <path d="M 420 270 L 420 288" fill="none" stroke="var(--d-stroke)" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#q-acc)"/>
+
+        <rect x="40" y="376" width="1040" height="54" rx="9" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
+        <text x="58" y="398" font-size="11.5" fill="var(--d-ink)" font-weight="700">The cost of an error is published BEFORE any score exists:</text>
+        <text x="418" y="398" font-size="11.5" fill="var(--d-body)">confidence target t = 0.75, so the penalty is c = t/(1−t) = 2.</text>
+        <text x="58" y="417" font-size="11" fill="var(--d-body)">A correct answer +1 · an honest decline 0 · a wrong answer −2.  Weights set after a score is seen are tuning, and a metric chosen to flatter is undetectable later.</text>
+      </svg>
+    </div>
+    <figcaption>A single blended score says something got worse and nothing about what. The funnel
+    attributes the drop to an owner.</figcaption>
+  </figure>
+</section>
+
+<section class="slide" id="s-quality-calls" data-title="The six calls">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>The six calls that make a number mean something</h2>
+
+  <ul class="tight">
+    <li><strong><code>recall@k</code> is the headline</strong> — retrieval bounds the whole system,
+      and it is the half fux fully controls. Compared <strong>at equal byte budget or not at
+      all</strong>: recall bought with a larger window is not recall earned.</li>
+    <li><strong><code>nDCG</code> and <code>MRR</code> are diagnostics</strong> — a reranker follows
+      retrieval, and LLM attention over long context is <em>U-shaped</em>, so a decaying discount
+      describes a consumer that does not exist.</li>
+    <li><strong>The query prior is declared and versioned</strong>, and starts <em>uniform</em>. The
+      fork was never uniform-vs-weighted — it was <strong>declared vs undeclared</strong>.</li>
+    <li><strong><code>unanswerable</code> queries are inside the gate</strong> — accuracy-only scoring
+      does not merely fail to notice a guess, it <em>rewards</em> one over an abstention.</li>
+    <li><strong>Every verdict publishes a weight-stability interval</strong> — the range of
+      <code>c</code> over which the verdict does not change.</li>
+    <li><strong>The judged series is pinned and never fused</strong> — it may inform a prediction,
+      never adjudicate one.</li>
+  </ul>
+
+  <details class="more">
+    <summary>The evidence behind each call <span class="why">— why these are not preferences</span></summary>
+    <div class="body">
+      <ul class="tight">
+        <li><strong>Retrieval bounds the system</strong> — a generator cannot recover a passage that
+          was never retrieved, and the retrieval divergence term dominates the error bound
+          (RAGChecker, NeurIPS 2024).</li>
+        <li><strong>Accuracy-only scoring pays for fabrication</strong> — <em>Nature</em> (2026):
+          evaluating for accuracy alone incentivises hallucination.</li>
+        <li><strong>A judge model drifts silently</strong> — identical evaluator re-runs measured
+          <em>zero</em> coupling one month apart. Hence: pin model AND prompt AND version, never
+          compare across judge versions.</li>
+        <li><strong>Only the cost ratio is identifiable</strong> — Chow's rule fixes the reject
+          threshold at <code>(C_r − C_c)/(C_e − C_c)</code>; absolute costs do not move the boundary.</li>
+        <li><strong>The confidence-target form is what makes it arguable</strong> — it converts
+          <em>"what is a stale citation worth?"</em> into <em>"how sure should fux be before it
+          cites?"</em></li>
+        <li><strong>Publishing a metric makes it a target</strong> (Goodhart) — but an unpublished
+          rubric makes the headline unauditable, and for a tool whose pitch is an auditable supply
+          chain that is the worse trade. The stability interval is what makes publication safe.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-discipline" data-title="Measurement discipline">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>Measurement discipline</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Pre-register, then measure</h4>
+      <p>Threshold, metric definitions and slice definitions are committed <strong>before</strong> a
+      number exists. A pre-registered threshold may never move.</p>
+    </div>
+    <div class="card">
+      <h4>A negative is a success</h4>
+      <p>A recorded FAIL that stops months of building is a good outcome, reported plainly. The
+      pruned index died that way — permanently, not deferred.</p>
+    </div>
+    <div class="card">
+      <h4>Ambiguous goes to a human</h4>
+      <p>A result between "clearly passes" and "clearly fails" is written up as ambiguous and handed
+      over — never adjudicated by restating the threshold in looser words.</p>
+    </div>
+    <div class="card">
+      <h4>Blind or informed, always stated</h4>
+      <p><strong>Blind</strong> only if every artifact — corpus, prompts, config, <em>and the
+      analysis</em> — was authored with no access to queries, judgments or prior scores. Anything
+      else is <strong>informed</strong>.</p>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <strong>Two runs passed their number and failed their claim.</strong> The pruning gate returned a
+    0.00 delta from a treatment that touched <strong>0–2.5 % of documents</strong> — an aggregate
+    delta of zero over an untreated population is not evidence. A later budget sweep was
+    <em>"satisfied by its letter and violated by its purpose."</em> Neither was caught by a gate,
+    because no gate knew what it was looking at.
+  </div>
+
+  <ul class="tight">
+    <li>An informed run is <strong>reclassified, not banned</strong>: file it, cite it — but never
+      compare it with a blind run and never use it to state a delta.</li>
+    <li>An informed number is <strong>not an "upper bound"</strong>; label it <em>"not a
+      generalisation estimate."</em></li>
+  </ul>
+</section>
+
+<section class="slide" id="s-unverified" data-title="What is not verified">
+  <p class="kicker">03 · How it is tested</p>
+  <h2>What is not verified</h2>
+
+  <div class="note warn">
+    <strong>The end-to-end suite has not been seen green.</strong> It fails identically on a clean
+    tree in the environment this release was built in — identical before and after, so the change
+    introduces <strong>no regression</strong>. That is not the same claim as passing.
+  </div>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Gap</th><th>Consequence</th></tr></thead>
+    <tbody>
+      <tr><td><strong><code>recall@k</code> is not computed today</strong></td>
+        <td>The headline metric of the quality contract has never been produced. It needs
+        known-relevant sets annotated per query.</td></tr>
+      <tr><td><strong>The <code>unanswerable</code> class does not exist</strong></td>
+        <td>And it must be authored <strong>blind</strong>, or it contaminates the set it is meant to
+        test.</td></tr>
+      <tr><td>⚠ <strong>The ±2-query (4 pp) resolution floor is a placeholder</strong></td>
+        <td>Every "no detected change" ruling currently rests on a number nobody measured.</td></tr>
+      <tr><td>The unit suite's last recorded green run</td>
+        <td>Ran under a harness-only shim backporting one stdlib module, because the build
+        environment had Python 3.10 — so it tested 3.10, not the supported floor.</td></tr>
+      <tr><td>Two eval corpora are gone</td>
+        <td><code>acme</code> and <code>orbit</code> were lost in a lab wipe along with their
+        generator, so part of the measurement work is blocked on inputs no record can supply.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="note key">
+    <strong>Why this section exists at all.</strong> Stating what a measurement did <em>not</em>
+    establish is cheaper than discovering it later, and a project that hides its unverified edges
+    teaches everyone to distrust the verified ones.
+  </div>
+</section>
+
+<!-- ========================== 04 · REFERENCE ========================== -->
+<section class="slide" id="s-merge" data-title="Merge">
+  <p class="kicker">04 · Reference</p>
+  <h2>Merge — machine planes should never conflict on adjacency</h2>
+
+  <ul class="tight">
+    <li>A shard is a header line plus <strong>one JSON line per document, sorted by <code>id</code></strong>.</li>
+    <li>Two branches that each added documents produce two line sets whose <strong>union is the
+      correct answer</strong> — a textual three-way merge cannot see that.</li>
+    <li><code>fux hooks --install</code> wires a custom git merge driver:
+      <code>fux-merge-index %O %A %B</code>.</li>
+  </ul>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 700" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The merge driver's decision order for each document id, from agreement through additions and deletions to the two refusals">
+        <defs>
+          <marker id="g-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1120" height="700" fill="var(--d-bg)"/>
+
+        <text x="40" y="38" font-size="19" fill="var(--d-ink)" font-weight="600">The merge driver, one document id at a time</text>
+        <text x="40" y="60" font-size="11.5" fill="var(--d-body)">checked in this order — and its failure mode is REFUSE AND LEAVE BOTH SIDES, never silently pick one</text>
+
+        <rect x="40" y="82" width="332" height="58" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="58" y="106" font-size="12.5" fill="var(--d-ink)" font-weight="600">%O · the common ancestor</text>
+        <text x="58" y="126" font-size="10.5" fill="var(--d-body)">may not exist — that is legal</text>
+
+        <rect x="394" y="82" width="332" height="58" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
+        <text x="412" y="106" font-size="12.5" fill="var(--d-ink)" font-weight="600">%A · ours</text>
+        <text x="412" y="126" font-size="10.5" fill="var(--d-body)">git reads the RESULT back out of this file</text>
+
+        <rect x="748" y="82" width="332" height="58" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.5"/>
+        <text x="766" y="106" font-size="12.5" fill="var(--d-ink)" font-weight="600">%B · theirs</text>
+        <text x="766" y="126" font-size="10.5" fill="var(--d-body)">read only</text>
+
+        <path d="M 560 142 L 560 162" fill="none" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#g-acc)"/>
+
+        <rect x="40" y="168" width="1040" height="42" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.6"/>
+        <text x="560" y="194" font-size="12" fill="var(--d-ink)" text-anchor="middle" font-weight="600">for each id in sorted(base ∪ ours ∪ theirs)</text>
+
+        <rect x="40" y="230" width="1040" height="44" rx="8" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.4"/>
+        <text x="58" y="258" font-size="11.5" fill="var(--d-ink)" font-weight="600">ours == theirs</text>
+        <text x="600" y="258" font-size="11.5" fill="var(--d-body)">they agree, or both deleted it → keep whatever is there</text>
+
+        <rect x="40" y="284" width="1040" height="44" rx="8" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.4"/>
+        <text x="58" y="312" font-size="11.5" fill="var(--d-ink)" font-weight="600">not in the ancestor, present on one side</text>
+        <text x="600" y="312" font-size="11.5" fill="var(--d-body)">a one-sided ADD → take it. The common case, and not a conflict</text>
+
+        <rect x="40" y="338" width="1040" height="44" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
+        <text x="58" y="366" font-size="11.5" fill="var(--d-ink)" font-weight="600">not in the ancestor, added on BOTH sides, differently</text>
+        <text x="600" y="366" font-size="11.5" fill="var(--d-warn)" font-weight="600">REFUSED</text>
+
+        <rect x="40" y="392" width="1040" height="44" rx="8" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.4"/>
+        <text x="58" y="420" font-size="11.5" fill="var(--d-ink)" font-weight="600">in the ancestor, gone one side, untouched on the other</text>
+        <text x="600" y="420" font-size="11.5" fill="var(--d-body)">a DELETE beats an unmodified side</text>
+
+        <rect x="40" y="446" width="1040" height="44" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
+        <text x="58" y="474" font-size="11.5" fill="var(--d-ink)" font-weight="600">deleted here, modified there</text>
+        <text x="600" y="474" font-size="11.5" fill="var(--d-warn)" font-weight="600">REFUSED</text>
+
+        <rect x="40" y="500" width="1040" height="44" rx="8" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.4"/>
+        <text x="58" y="528" font-size="11.5" fill="var(--d-ink)" font-weight="600">one side is byte-identical to the ancestor</text>
+        <text x="600" y="528" font-size="11.5" fill="var(--d-body)">the other side's bytes win — checked BEFORE `ver`, on purpose</text>
+
+        <rect x="40" y="554" width="1040" height="44" rx="8" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.4"/>
+        <text x="58" y="582" font-size="11.5" fill="var(--d-ink)" font-weight="600">different `ver`</text>
+        <text x="600" y="582" font-size="11.5" fill="var(--d-body)">the higher one wins — `ver` bumps when a document's own sha changes</text>
+
+        <rect x="40" y="608" width="1040" height="44" rx="8" fill="var(--d-warn-bg)" stroke="var(--d-warn)" stroke-width="1.6"/>
+        <text x="58" y="636" font-size="11.5" fill="var(--d-ink)" font-weight="600">same `ver`, different bytes</text>
+        <text x="600" y="636" font-size="11.5" fill="var(--d-warn)" font-weight="600">REFUSED — one side ingested content the other did not have</text>
+
+        <text x="40" y="678" font-size="11" fill="var(--d-body)">Output is re-sorted by id, so two machines merging the same three inputs produce the same bytes. Without that, the driver would be a hole in L3 the size of every shared repo.</text>
+      </svg>
+    </div>
+    <figcaption>Green resolves, orange refuses. On refusal the driver writes ordinary conflict markers
+    and exits non-zero — the thing a human already knows how to fix.</figcaption>
+  </figure>
+
+  <details class="more">
+    <summary>Two design notes worth knowing <span class="why">— the failure mode, and the ancestor check</span></summary>
+    <div class="body">
+      <ul class="tight">
+        <li><strong>A merge driver is the piece a user cannot debug when it goes wrong</strong>, so
+          its failure mode must be <em>refuse and leave both sides</em>. Its error message names the
+          offending ids and the actual fix: <code>fux ingest</code>, which derives the index from the
+          <em>merged content</em> rather than from either side's copy.</li>
+        <li><strong>Why the ancestor check precedes <code>ver</code>.</strong> Relying on
+          <code>ver</code> alone means a document whose version was not incremented — a hand repair,
+          an external edit, an ingest edge case — reads as "same ver, different bytes" and is refused,
+          even though one side provably did not touch it.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-boundary" data-title="The boundary">
+  <p class="kicker">04 · Reference</p>
+  <h2>One boundary, used three times</h2>
+  <ul class="tight">
+    <li>Fux refuses to own <strong>network I/O</strong>, <strong>model calls</strong>, and
+      <strong>third-party parsing libraries</strong>.</li>
+    <li>Each is a file <em>the consumer</em> writes, committed in their repo, that fux loads by path
+      and never rewrites.</li>
+    <li>That is how <code>src/fux/</code> stays stdlib-only (L1) and offline by default (L4).</li>
+  </ul>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 440" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The boundary between fux and the consumer's repo: fux owns the contract, the consumer owns the fetcher and decoder code">
+        <defs>
+          <marker id="b-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1120" height="440" fill="var(--d-bg)"/>
+
+        <text x="40" y="38" font-size="19" fill="var(--d-ink)" font-weight="600">fux owns the contract · you own the code</text>
+        <text x="40" y="60" font-size="11.5" fill="var(--d-body)">loaded by path, called by signature, never rewritten by fux</text>
+
+        <line x1="566" y1="82" x2="566" y2="392" stroke="var(--d-accent)" stroke-width="1.6" stroke-dasharray="6 5"/>
+
+        <text x="40" y="100" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">FUX — STDLIB ONLY, NEVER OPENS A SOCKET</text>
+        <text x="596" y="100" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">YOUR REPO — ANYTHING YOU INSTALLED</text>
+
+        <rect x="40" y="112" width="240" height="84" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
+        <text x="56" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/sources/urls</text>
+        <text x="56" y="156" font-size="10.5" fill="var(--d-body)">one URL per line, plus</text>
+        <text x="56" y="172" font-size="10.5" fill="var(--d-body)">fetch= and meta= attributes</text>
+        <text x="56" y="189" font-size="10.5" fill="var(--d-dim)">routing is DECLARED, not sniffed</text>
+
+        <rect x="296" y="112" width="240" height="84" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="312" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">load by path</text>
+        <text x="312" y="156" font-size="10.5" fill="var(--d-body)">fetch=&lt;name&gt; resolves to</text>
+        <text x="312" y="172" font-size="10.5" fill="var(--d-body)">&lt;fetchers dir&gt;/&lt;name&gt;.py</text>
+        <text x="312" y="189" font-size="10.5" fill="var(--d-dim)">unusable file → loud failure</text>
+
+        <line x1="540" y1="154" x2="592" y2="154" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#b-acc)"/>
+        <text x="566" y="154" font-size="9.5" fill="var(--d-accent)" text-anchor="middle" font-weight="600"
+              transform="rotate(-90 566 154)">fetch(url) -&gt; (bytes, content_type)</text>
+
+        <rect x="596" y="112" width="230" height="84" rx="10" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.6"/>
+        <text x="612" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/fetchers/http.py</text>
+        <text x="612" y="156" font-size="10.5" fill="var(--d-body)">the shipped default</text>
+        <text x="612" y="173" font-size="10.5" fill="var(--d-body)">a plain GET</text>
+
+        <rect x="842" y="112" width="238" height="84" rx="10" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.6"/>
+        <text x="858" y="136" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/fetchers/cdp.py</text>
+        <text x="858" y="156" font-size="10.5" fill="var(--d-body)">a real browser, for pages</text>
+        <text x="858" y="173" font-size="10.5" fill="var(--d-warn)" font-weight="600">declares MAX_PARALLEL = 1</text>
+
+        <rect x="40" y="236" width="240" height="84" rx="10" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
+        <text x="56" y="260" font-size="12" fill="var(--d-ink)" font-weight="600">dispatch by extension</text>
+        <text x="56" y="280" font-size="10.5" fill="var(--d-body)">one extension → one decoder,</text>
+        <text x="56" y="296" font-size="10.5" fill="var(--d-body)">documented precedence</text>
+        <text x="56" y="313" font-size="10.5" fill="var(--d-dim)">dispatch is deterministic</text>
+
+        <rect x="296" y="236" width="240" height="84" rx="10" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="312" y="260" font-size="12" fill="var(--d-ink)" font-weight="600">16 built-in decoders</text>
+        <text x="312" y="280" font-size="10.5" fill="var(--d-body)">pdf · docx · pptx · xlsx · odt</text>
+        <text x="312" y="296" font-size="10.5" fill="var(--d-body)">html · csv · json · yaml · toml …</text>
+        <text x="312" y="313" font-size="10.5" fill="var(--d-dim)">explicit tuple, never a dir scan</text>
+
+        <line x1="540" y1="278" x2="592" y2="278" stroke="var(--d-accent)" stroke-width="1.8" marker-end="url(#b-acc)"/>
+        <text x="566" y="278" font-size="9.5" fill="var(--d-accent)" text-anchor="middle" font-weight="600"
+              transform="rotate(-90 566 278)">decode(raw, rel_path) -&gt; str | None</text>
+
+        <rect x="596" y="236" width="484" height="84" rx="10" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.6"/>
+        <text x="612" y="260" font-size="12" fill="var(--d-ink)" font-weight="600">.fux/decoders/&lt;name&gt;.py</text>
+        <text x="612" y="280" font-size="10.5" fill="var(--d-body)">overrides the built-in of the SAME MODULE NAME — wholesale, not per-extension,</text>
+        <text x="612" y="296" font-size="10.5" fill="var(--d-body)">so an override is a replacement rather than a race between two files claiming .html</text>
+        <text x="612" y="313" font-size="10.5" fill="var(--d-warn)" font-weight="600">a missing dependency FAILS LOUDLY — a silent skip would split the index across machines</text>
+
+        <rect x="40" y="348" width="1040" height="52" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.3" stroke-dasharray="5 4"/>
+        <text x="58" y="370" font-size="11.5" fill="var(--d-ink)" font-weight="600">Parallelism is DECLARED by the fetcher, never detected by fux:</text>
+        <text x="452" y="370" font-size="11.5" fill="var(--d-body)">min(declared, configured), and 1 when absent.</text>
+        <text x="58" y="389" font-size="11" fill="var(--d-body)">A decoder returning None means "this needs a model to read it" — an image, a scanned PDF. Not an error: it is the signal the enrichment queue is built on.</text>
+      </svg>
+    </div>
+  </figure>
+</section>
+
+<section class="slide" id="s-fetcher" data-title="Fetcher">
+  <p class="kicker">04 · Reference</p>
+  <h2>Fetcher — the contract</h2>
+
+<pre><code># .fux/fetchers/&lt;name&gt;.py
+
+def fetch(url: str) -&gt; tuple[bytes, str]:
+    """The bytes the server sent, plus the Content-Type it declared.
+    May raise — that records the URL as skipped, never a crash."""
+
+# optional
+MAX_PARALLEL = 4                     # how many threads fux may run against you
+def connect() -&gt; None: ...           # called once before this fetcher's batch
+def close() -&gt; None: ...             # called once after
+def configure(config: dict) -&gt; None: # [sources.url.config], verbatim
+    ...                              # fux never reads a key inside this table</code></pre>
+
+  <ul class="tight">
+    <li><strong>Routing is declared, never detected.</strong> Nothing escalates from one fetcher to
+      another: a plain GET that returns a rendered shell <em>returns a rendered shell</em>, and a
+      human writes <code>fetch=cdp</code> on that line.</li>
+    <li><strong>Network only inside two fenced paths</strong> — <code>fux add &lt;URL&gt;</code>
+      (scoped to that one URL) and <code>fux update</code>. A plain <code>fux ingest</code> never
+      imports a fetcher.</li>
+    <li><strong>Verify uses the ingest fetcher.</strong> A document fetched two ways is two
+      documents.</li>
+    <li>A bare <code>str</code> return still works — read as already-prose, so older fetchers keep
+      running.</li>
+  </ul>
+
+  <details class="more">
+    <summary>The three-layer attribute resolution, and two hazards <span class="why">— thread safety, and a false staleness</span></summary>
+    <div class="body">
+      <ul class="tight">
+        <li><strong>Three layers, same order for every attribute</strong>: the built-in default → the
+          source-wide <code>[sources.url]</code> setting → the line. A line beats both, and only for
+          its own URL.</li>
+      </ul>
+      <div class="note warn">
+        <strong>Why parallelism is declared rather than detected.</strong> The shipped
+        <code>cdp.py</code> holds one WebSocket in a module global that every fetch reuses; two
+        threads writing frames onto it produce <em>plausible documents attributed to the wrong
+        URLs</em>. That lands in the committed index, <strong>passes every determinism check</strong>,
+        and is caught only by a human reading an answer.
+      </div>
+      <div class="note warn">
+        <strong>Normalization is shared, not copied.</strong> The verify path calls the ingest path's
+        <code>sanitize</code>. A one-character divergence between two copies would mark every URL
+        document permanently stale — a defect that presents as a working freshness feature.
+      </div>
+      <div class="note ok">
+        <strong>Why a thread pool is safe at all:</strong> sequential fetching was never what made the
+        index deterministic — <strong>the trailing sort is</strong>.
+      </div>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-decoder" data-title="Decoder">
+  <p class="kicker">04 · Reference</p>
+  <h2>Decoder — bytes become Markdown, or become a queue item</h2>
+
+<pre><code># .fux/decoders/&lt;name&gt;.py    (or a built-in of the same module name)
+
+EXTENSIONS = (".html", ".htm")          # required; lowercase, with the dot
+
+def decode(raw: bytes, rel_path: str) -&gt; str | None:
+    """Markdown, or None when a model is needed to read it."""
+
+WANTS_PATH = True                       # opt-in, for a library that insists on a file
+def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
+
+  <ul class="tight">
+    <li><strong>Markdown, not flat text</strong> — headings are their own weighted field, so the
+      heading syntax <em>is</em> the interface.</li>
+    <li><strong><code>None</code> is not an error</strong> — it means <em>this needs a model to read
+      it</em>, and it is the signal the enrichment queue is built on.</li>
+    <li><strong>A decoder never raises for malformed input</strong> — one corrupt file in a
+      10 000-document corpus must not stop the other 9 999.</li>
+    <li><strong>Adding a decoder must not change what is indexed</strong> — the default type
+      allowlist is derived from built-ins only.</li>
+  </ul>
+
+  <p>The sixteen built-ins, all stdlib-only:
+  <code>csvdoc</code> · <code>docxdoc</code> · <code>drawiodoc</code> · <code>htmldoc</code> ·
+  <code>inidoc</code> · <code>ipynbdoc</code> · <code>jsondoc</code> · <code>maildoc</code> ·
+  <code>odtdoc</code> · <code>pdfdoc</code> · <code>pptxdoc</code> · <code>rtfdoc</code> ·
+  <code>tomldoc</code> · <code>xlsxdoc</code> · <code>xmldoc</code> · <code>yamldoc</code>.</p>
+
+  <details class="more">
+    <summary>The rules behind those choices <span class="why">— determinism, two failure reasons, one fence gap</span></summary>
+    <div class="body">
+      <ul class="tight">
+        <li><strong>Two distinct "unreadable" reasons, never conflated.</strong> <em>No decoder for
+          <code>.xyz</code></em> means someone could write one. <em><code>pdfdoc</code>: nothing
+          readable in <code>.pdf</code></em> means only a model will help. The queue's whole value is
+          that difference.</li>
+        <li><strong>Determinism is the decoder's obligation</strong>, not the dispatcher's: same bytes
+          → same string, byte for byte. Sort every iteration, never rely on <code>set</code> order,
+          never read a clock.</li>
+        <li><strong>The built-in list is an explicit tuple, not a directory scan.</strong> A directory
+          listing is filesystem order, and a plane whose dispatch depends on filesystem order is a
+          plane whose committed index depends on it too.</li>
+        <li>Dropping a <code>logdoc.py</code> into <code>.fux/decoders/</code> must not silently start
+          walking every <code>.log</code> in the repo — what counts as a document is a committed line
+          a human wrote in <code>.fux/sources/types</code>.</li>
+        <li>⚠ <strong>The import fence cannot reach <code>.fux/decoders/</code></strong>. Stated rather
+          than papered over: a consumer decoder's offline behaviour is a documented obligation,
+          checked by reviewing a committed diff.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-cli-1" data-title="CLI · setup and corpus">
+  <p class="kicker">04 · Reference</p>
+  <h2>CLI — setup and corpus</h2>
+  <div class="note key">
+    <strong>Every verb is flat.</strong> <code>fux &lt;verb&gt; &lt;subverb&gt;</code> does not exist
+    and is a standing constraint — <code>fux graph path</code> would have been the first subcommand
+    tree on this surface, so it became <code>fux path</code>.
+  </div>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Command</th><th>Does</th><th>Flags</th></tr></thead>
+    <tbody>
+      <tr><td><code>fux setup</code></td>
+        <td>Writes the consumer-owned files into <code>.fux/</code> — write-if-missing.</td>
+        <td><code>--no-agents</code></td></tr>
+      <tr><td><code>fux doctor</code></td>
+        <td>Install health, index health, URL health, and where the background re-index stands.</td>
+        <td><code>--json</code></td></tr>
+      <tr><td><code>fux tune</code></td>
+        <td>Prints the tunables file to paste into <code>.fux/tune.toml</code>. Reads and writes
+          nothing.</td><td>—</td></tr>
+      <tr><td><code>fux add [entry]</code></td>
+        <td>List a directory, a file or a URL — and ingest it. Omit the entry to list everything.</td>
+        <td><code>--types --cdp --http --plain --hashed --archived --no-ingest --no-fetch --dry-run</code></td></tr>
+      <tr><td><code>fux remove &lt;entry&gt;</code></td>
+        <td>Delete its line, or exclude it if an ancestor is listed.</td>
+        <td><code>--types --no-ingest --dry-run</code></td></tr>
+      <tr><td><code>fux update [entry]</code></td>
+        <td>Re-read what is already listed, re-fetching URLs.</td>
+        <td><code>--check</code></td></tr>
+      <tr><td><code>fux ingest</code></td>
+        <td>Walk the configured sources into the committed index.</td>
+        <td><code>--full --list-skipped --no-accelerator --stop</code></td></tr>
+      <tr><td><code>fux build</code></td>
+        <td>Rebuild the derived accelerator from the committed index.</td>
+        <td>progress flags</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section class="slide" id="s-cli-2" data-title="CLI · read, maintain, serve">
+  <p class="kicker">04 · Reference</p>
+  <h2>CLI — read, maintain, serve</h2>
+
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Command</th><th>Does</th><th>Flags</th></tr></thead>
+    <tbody>
+      <tr><td><code>fux ask &lt;q&gt;</code></td><td>Ranked documents, citations, confidence block.</td>
+        <td><code>--json --top N --explain --fast|--scan --no-tune</code></td></tr>
+      <tr><td><code>fux find &lt;q&gt;</code></td><td>Ranked locations, one bare path per line.</td>
+        <td><code>--json --top N --fast|--scan --no-tune</code></td></tr>
+      <tr><td><code>fux answer &lt;q&gt;</code></td><td>The single best answer — fetched and re-scored.</td>
+        <td><code>--json --no-refer --fast|--scan --no-tune</code></td></tr>
+      <tr><td><code>fux explain &lt;doc&gt;</code></td><td>One document's outbound edges and community.</td>
+        <td><code>--json</code></td></tr>
+      <tr><td><code>fux graph &lt;q&gt;</code></td><td>The neighbourhood around a query's best answers.</td>
+        <td><code>--json --fast|--scan --no-tune</code></td></tr>
+      <tr><td><code>fux path &lt;a&gt; &lt;b&gt;</code></td><td>How two documents connect, most reliable route first.</td>
+        <td><code>--hops N --json --no-tune</code></td></tr>
+      <tr><td><code>fux hooks</code></td><td>Install the git hooks and the index merge driver.</td>
+        <td><code>--install --status --uninstall --json</code></td></tr>
+      <tr><td><code>fux daemon [start|stop|status]</code></td>
+        <td>Run the URL freshness clock in the background. Positional, because the states are
+          mutually exclusive and <code>--start --stop</code> should not parse.</td>
+        <td><code>--json</code></td></tr>
+      <tr><td><code>fux enrich</code></td><td>Plan and validate what an agent skill generates.
+        <strong>No <code>--model</code> flag</strong> — fux never calls a model, so there is nothing
+        to fence.</td><td><code>--plan --check</code></td></tr>
+      <tr><td><code>fux mcp</code></td><td>Serve the index over MCP on stdio, for coding agents.</td>
+        <td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <ul class="tight">
+    <li><code>--scan</code> is <strong>the default</strong> — the reference path, no build step
+      needed. Kept as an explicit flag because it is what a bug report reproduces against.</li>
+    <li><code>--fast</code> uses the accelerator when one exists: <strong>same results</strong>, only
+      faster.</li>
+    <li><strong>Exit codes</strong> — <code>0</code> ok · <code>1</code> error · <code>2</code>
+      blocking (strict) · <code>130</code> interrupted.</li>
+    <li><strong>Errors</strong> are rendered only at the boundary; one <code>FuxError</code>, no
+      subclass hierarchy.</li>
+  </ul>
+</section>
+
+<!-- =========================== 05 · CONTEXT =========================== -->
+<section class="slide" id="s-agents" data-title="Running it as an agent">
+  <p class="kicker">05 · Context</p>
+  <h2>Running it as an agent</h2>
+
+  <div class="note warn">
+    <strong>The defect this closes was live and silent.</strong> In any repo whose fux lives in an
+    unactivated <code>.venv/</code>, an agent got <code>command not found</code>, concluded <em>not
+    installed</em>, and <strong>silently fell back to grep</strong> — while the engine sat there and
+    the committed index sat beside it. It did not error. It degraded, and the degradation read
+    exactly like an honest answer.
+  </div>
+
+  <figure>
+    <div class="archbox">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" class="arch med"
+           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
+           aria-label="The four-rung invocation ladder an agent probes with --version">
+        <defs>
+          <marker id="l-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-warn)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <rect width="1200" height="300" fill="var(--d-bg)"/>
+        <text x="40" y="34" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1.1">THE INVOCATION LADDER — PROBE EACH RUNG WITH --version</text>
+
+        <rect x="40" y="46" width="680" height="46" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="60" y="74" font-size="13" font-family="ui-monospace,monospace" fill="var(--d-ink)">fux --version</text>
+        <text x="330" y="74" font-size="11" fill="var(--d-body)">a venv is active, or fux is global (pipx, uv tool)</text>
+
+        <rect x="40" y="102" width="680" height="46" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="60" y="130" font-size="13" font-family="ui-monospace,monospace" fill="var(--d-ink)">uv run fux --version</text>
+        <text x="330" y="130" font-size="11" fill="var(--d-body)">a uv-managed repo</text>
+
+        <rect x="40" y="158" width="680" height="46" rx="9" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.7"/>
+        <text x="60" y="186" font-size="13" font-family="ui-monospace,monospace" fill="var(--d-ink)">./.venv/bin/fux --version</text>
+        <text x="330" y="186" font-size="11" fill="var(--d-body)">venv present, not active · Windows: .venv\Scripts\fux.exe</text>
+
+        <rect x="40" y="214" width="680" height="46" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
+        <text x="60" y="242" font-size="13" font-family="ui-monospace,monospace" fill="var(--d-ink)">python -m fux.cli --version</text>
+        <text x="330" y="242" font-size="11" fill="var(--d-body)">importable, no script installed</text>
+
+        <path d="M 90 94 L 90 100" stroke="var(--d-warn)" stroke-width="1.6" marker-end="url(#l-a)"/>
+        <path d="M 90 150 L 90 156" stroke="var(--d-warn)" stroke-width="1.6" marker-end="url(#l-a)"/>
+        <path d="M 90 206 L 90 212" stroke="var(--d-warn)" stroke-width="1.6" marker-end="url(#l-a)"/>
+        <text x="112" y="100" font-size="9.5" fill="var(--d-warn)">not found ↓</text>
+        <text x="112" y="156" font-size="9.5" fill="var(--d-warn)">not found ↓</text>
+        <text x="112" y="212" font-size="9.5" fill="var(--d-warn)">not found ↓</text>
+
+        <rect x="750" y="46" width="410" height="214" rx="11" fill="var(--d-ok-bg)" stroke="var(--d-ok)" stroke-width="1.8"/>
+        <text x="772" y="76" font-size="12.5" fill="var(--d-ok)" font-weight="700">THE RULES</text>
+        <text x="772" y="104" font-size="11" fill="var(--d-body)">· first rung that answers wins — cache it</text>
+        <text x="772" y="122" font-size="11" fill="var(--d-body)">  for the session</text>
+        <text x="772" y="146" font-size="11" fill="var(--d-body)">· NEVER `which` — it answers "is there a</text>
+        <text x="772" y="164" font-size="11" fill="var(--d-body)">  file", not "does it run"</text>
+        <text x="772" y="188" font-size="11" fill="var(--d-warn)" font-weight="600">· NEVER activate a venv, modify PATH,</text>
+        <text x="772" y="206" font-size="11" fill="var(--d-warn)" font-weight="600">  or install anything — a test enforces it</text>
+        <text x="772" y="232" font-size="11" fill="var(--d-body)">· if every rung fails: say WHICH were tried</text>
+        <text x="772" y="250" font-size="11" fill="var(--d-body)">  and that you fell back. Never "not installed"</text>
+      </svg>
+    </div>
+    <figcaption>That last sentence turns a silent degradation into a diagnosable failure.</figcaption>
+  </figure>
+
+  <details class="more">
+    <summary>Where <code>fux setup</code> writes the agent files <span class="why">— and two Kiro traps</span></summary>
+    <div class="body">
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>Vendor</th><th>Files</th></tr></thead>
+        <tbody>
+          <tr><td>Claude</td><td><code>.claude/skills/fux-usage/</code> ·
+            <code>fux-archived-results/</code> · <code>fux-enrich/</code> · <code>fux-decoder/</code></td></tr>
+          <tr><td>Kiro</td><td><code>.kiro/skills/fux-usage/</code> ·
+            <code>.kiro/steering/fux-archived-results.md</code></td></tr>
+          <tr><td>Copilot</td><td><code>.github/agents/</code> · <code>.github/instructions/</code></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <ul class="tight">
+        <li>Kiro implements the same open Agent Skills standard Claude does, so the usage skill is
+          <strong>one template at two paths</strong> — agreement by construction rather than by a
+          conformance test comparing two files that could drift.</li>
+        <li>⚠ Kiro CLI does not support steering inclusion modes, so every file in
+          <code>.kiro/steering/</code> enters <em>every</em> interaction — which is why the usage
+          guidance ships as a <em>skill</em>.</li>
+        <li>⚠ Kiro <strong>custom agents load neither skills nor steering by default</strong>: they
+          need explicit <code>skill://</code> / <code>file://</code> entries in
+          <code>resources</code>. Fux cannot write someone's agent config, so the skill says it.</li>
+        <li>Agents can also talk to the index directly — <code>fux mcp</code> serves it over MCP on
+          stdio, and <code>fux_search</code> carries the confidence block.</li>
+      </ul>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-laws" data-title="The eight laws">
+  <p class="kicker">05 · Context</p>
+  <h2>The eight laws</h2>
+  <p class="lede">Not guidelines. Every record cites them by number and none restates them — a
+  paraphrase drifts, and a drifted paraphrase in an accepted record reads as authority.</p>
+
+  <div class="law"><b>L1</b><span><strong>$0, stdlib-only runtime.</strong> No third-party runtime
+    dependency. The frontmatter parser and every codec are hand-rolled on purpose.</span></div>
+  <div class="law"><b>L2</b><span><strong>Content is never durable outside its source system.</strong>
+    The index holds statistics, never content. The whole architecture rests on this.</span></div>
+  <div class="law"><b>L3</b><span><strong>Deterministic — no model in the maintenance path.</strong>
+    Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
+  <div class="law"><b>L4</b><span><strong>Offline by default.</strong> Network access only inside
+    explicit, fenced, opt-in paths — <code>fux add &lt;URL&gt;</code> and <code>fux update</code>.</span></div>
+  <div class="law"><b>L5</b><span><strong>Hashed meta is the default</strong> for non-git sources,
+    enforced at write time. It closes an ACL-mismatch leak.</span></div>
+  <div class="law"><b>L6</b><span><strong>Say "index", not "db".</strong> Load-bearing vocabulary.</span></div>
+  <div class="law"><b>L7</b><span><strong>Python ≥ 3.11.</strong></span></div>
+  <div class="law"><b>L8</b><span><strong>What fux retains about <em>use</em> is hashed, bounded and
+    local.</strong> Fux may record <em>that</em> a question was asked — never the question. Every
+    durable trace of use is hashed at write time, bounded in size, confined to gitignored runtime
+    state, and never reaches a committed byte, stdout, or the network.</span></div>
+
+  <div class="note ok">
+    <strong>The laws are enterprise features, not constraints.</strong> <code>$0</code>/stdlib is a
+    trivially auditable supply chain and no procurement. Offline / no-API means no data ever leaves
+    the tenant. Deterministic means compliance-grade reproducibility.
+  </div>
+  <div class="note">
+    <strong>L2 governs the corpus; L8 governs the record of who went looking in it.</strong> A query
+    is not content, and no other law reached it.
+  </div>
+</section>
+
+<section class="slide" id="s-decisions" data-title="Decisions">
+  <p class="kicker">05 · Context</p>
+  <h2>Decisions — made, and still open</h2>
+
+  <div class="note key">
+    <strong>Counts are facts about a moment.</strong> At the time of writing: <strong>44 live
+    records — 42 accepted, 2 proposed</strong> (ADR-LOCKS and ADR-CONFIDENCE, both describing shipped
+    behaviour and waiting on ratification). Re-derive before quoting:
+    <code>grep '^status:' docs/adr/*.md</code>. ⚠ A stale duplicate of ADR-CONFIDENCE
+    (<code>0043_confidence.md</code>) is ruled for deletion and still on disk.
+  </div>
+
+  <ul class="tight">
+    <li><strong>The pruned index is dead, not deferred</strong> — a pre-registered gate closed FAIL.
+      Full postings, permanently.</li>
+    <li><strong>The dense lane and its model were deleted</strong> — 0 fixed / 2 broken at every
+      setting that fires. The model mean-pooled static vectors, so the lane was as order-blind as
+      BM25F.</li>
+    <li><strong>A cross-encoder reranker was refused</strong> — <code>onnxruntime</code> is not
+      byte-identical across architectures, which would break <em>clone it and run the query</em>.</li>
+    <li><strong>The <code>post-commit</code> hook defers</strong> — an inline re-index cost 44 s on a
+      20-document commit, because cost tracks corpus size, not delta size.</li>
+    <li><strong>Answer-time fetching is unconditional</strong> — and that single call withdrew two
+      proposed flags outright.</li>
+    <li><strong>No local content store</strong> — copying the corpus blunts the wedge for two narrow
+      wins.</li>
+  </ul>
+
+  <details class="more">
+    <summary>What is still open <span class="why">— roughly two dozen forks, none an agent's to pick</span></summary>
+    <div class="body">
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>Area</th><th>The one that bites first</th></tr></thead>
+        <tbody>
+          <tr><td>URL freshness</td>
+            <td>Whether the fetcher contract gains an optional <code>validate()</code> — gated on a
+            measurement that needs a real URL corpus.</td></tr>
+          <tr><td>What "right" means</td>
+            <td><code>recall@k</code> is declared and uncomputed; the <code>unanswerable</code> class
+            does not exist yet and must be written blind.</td></tr>
+          <tr><td>Confidence calibration</td>
+            <td><code>SEPARATION_FLOOR</code> is provisional (R10), and <code>separation</code> is
+            ordinal where the theory wants a calibrated probability.</td></tr>
+          <tr><td>The records themselves</td>
+            <td>A record whose premise died and now stands <em>unargued</em> — the one state a record
+            should never be in.</td></tr>
+          <tr><td>Measurement discipline</td>
+            <td>The ±2-query resolution floor is assumed, not measured.</td></tr>
+          <tr><td>Naming, while it is free</td>
+            <td>The narrowed-refresh flag has no name yet — <code>--dirty</code>, <code>--stale</code>,
+            <code>--changed</code>. Free today, a deprecation cycle once anything ships against it.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <p class="note">A metric chosen badly is wrong <em>quietly</em> for months. The live queue is
+      <code>work/OPEN-WORK.md</code>.</p>
+    </div>
+  </details>
+</section>
+
+<section class="slide" id="s-end" data-title="Where things live">
+  <p class="kicker">05 · Context</p>
+  <h2>Where things live</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h4>What the project <em>is</em></h4>
+      <ul class="tight">
+        <li><code>docs/adr/</code> — the decision records</li>
+        <li><code>docs/GLOSSARY.md</code> — every recurring term</li>
+        <li><code>docs/index.md</code> — the OKF bundle root</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>What is <em>happening</em> to it</h4>
+      <ul class="tight">
+        <li><code>work/OPEN-WORK.md</code> — the single live queue</li>
+        <li><code>work/INTERVIEW.md</code> — the state of play</li>
+        <li><code>work/WORKLOG.md</code> — the append-only trail</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>The evidence</h4>
+      <ul class="tight">
+        <li><code>work/regression/</code> — measured runs + verdicts</li>
+        <li><code>work/compare/</code> — live forks</li>
+        <li><code>work/paper/</code> — the architecture of record</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>The code</h4>
+      <ul class="tight">
+        <li><code>src/fux/</code> — every component owned by a record</li>
+        <li><code>tests/</code> + <code>tests_e2e/</code> — both maintained</li>
+        <li><code>archive/</code> — the one archive; never evidence</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="lede" style="margin-top:24px">Fux 2.0.0-alpha.2 · rank from a small committed index ·
+  fetch from the systems that own it · verify at answer time.</p>
+</section>
+
+</div>
+</main>
+
+<div id="present-bar">
+  <button class="btn" id="prevbtn">←</button>
+  <button class="btn" id="nextbtn">→</button>
+  <span class="count" id="slidecount">1 / 1</span>
+  <span class="title" id="slidetitle"></span>
+  <button class="btn" id="helpbtn">?</button>
+  <button class="btn" id="exitbtn">Esc · exit</button>
+</div>
+
+<div id="helpcard"><div class="inner">
+  <h4 style="margin-top:0">Presentation keys</h4>
+  <ul class="tight" style="padding-left:18px">
+    <li><kbd>→</kbd> <kbd>space</kbd> <kbd>PgDn</kbd> — next</li>
+    <li><kbd>←</kbd> <kbd>PgUp</kbd> — previous</li>
+    <li><kbd>Home</kbd> / <kbd>End</kbd> — first / last</li>
+    <li><kbd>f</kbd> — fullscreen · <kbd>p</kbd> — toggle presenting</li>
+    <li><kbd>t</kbd> — cycle theme · <kbd>Esc</kbd> — leave</li>
+  </ul>
+  <button class="btn" onclick="document.getElementById('helpcard').classList.remove('on')">Close</button>
+</div></div>
+
+<script>
+(function(){
+  var body=document.body, root=document.documentElement;
+
+  /* ---------- sidebar ---------- */
+  function setNav(open){ body.classList.toggle('nav-collapsed', !open);
+    try{ localStorage.setItem('fux.nav', open?'1':'0'); }catch(e){} }
+  try{ if(localStorage.getItem('fux.nav')==='0') body.classList.add('nav-collapsed'); }catch(e){}
+  if(window.matchMedia('(max-width:900px)').matches) body.classList.add('nav-collapsed');
+  document.getElementById('navclose').onclick=function(){ setNav(false); };
+  document.getElementById('navopen').onclick=function(){ setNav(true); };
+
+  Array.prototype.forEach.call(document.querySelectorAll('.navgroup'), function(b){
+    b.onclick=function(){
+      var open=b.getAttribute('aria-expanded')==='true';
+      b.setAttribute('aria-expanded', open?'false':'true');
+      var list=b.nextElementSibling; if(list) list.hidden=open;
+    };
+  });
+
+  /* ---------- theme cycle: system -> light -> dark ---------- */
+  function cycleTheme(){
+    var cur=root.getAttribute('data-theme');
+    var next = !cur ? 'light' : (cur==='light' ? 'dark' : '');
+    if(next) root.setAttribute('data-theme',next); else root.removeAttribute('data-theme');
+    try{ localStorage.setItem('fux.theme', next); }catch(e){}
+  }
+  try{ var t=localStorage.getItem('fux.theme'); if(t) root.setAttribute('data-theme',t); }catch(e){}
+  document.getElementById('themebtn').onclick=cycleTheme;
+
+  /* ---------- slides ---------- */
+  var slides=[].slice.call(document.querySelectorAll('.slide'));
+  var idx=0;
+  var links=[].slice.call(document.querySelectorAll('#navlist a'));
+
+  function markLink(id){
+    links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href')==='#'+id); });
+  }
+  function show(i){
+    if(!slides.length) return;
+    idx=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach(function(s,n){ s.classList.toggle('is-active', n===idx); });
+    var s=slides[idx];
+    document.getElementById('slidecount').textContent=(idx+1)+' / '+slides.length;
+    document.getElementById('slidetitle').textContent=s.getAttribute('data-title')||'';
+    document.getElementById('progress').style.width=((idx+1)/slides.length*100)+'%';
+    markLink(s.id);
+    window.scrollTo(0,0);
+  }
+  function present(on){
+    body.classList.toggle('present', on);
+    // nothing may be hidden on a slide
+    Array.prototype.forEach.call(document.querySelectorAll('details.more'), function(d){ d.open=on?true:d.open; });
+    if(on){ show(idx); } else { document.getElementById('helpcard').classList.remove('on'); }
+  }
+  document.getElementById('presentbtn').onclick=function(){ present(true); };
+  document.getElementById('exitbtn').onclick=function(){ present(false); };
+  document.getElementById('nextbtn').onclick=function(){ show(idx+1); };
+  document.getElementById('prevbtn').onclick=function(){ show(idx-1); };
+  document.getElementById('helpbtn').onclick=function(){ document.getElementById('helpcard').classList.toggle('on'); };
+
+  document.addEventListener('keydown', function(e){
+    var tag=(e.target.tagName||'').toLowerCase();
+    if(tag==='input'||tag==='textarea') return;
+    var on=body.classList.contains('present');
+    if(e.key==='p'){ present(!on); e.preventDefault(); return; }
+    if(e.key==='t'){ cycleTheme(); return; }
+    if(!on) return;
+    if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown'){ show(idx+1); e.preventDefault(); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'){ show(idx-1); e.preventDefault(); }
+    else if(e.key==='Home'){ show(0); e.preventDefault(); }
+    else if(e.key==='End'){ show(slides.length-1); e.preventDefault(); }
+    else if(e.key==='?'){ document.getElementById('helpcard').classList.toggle('on'); }
+    else if(e.key==='f'){ if(document.fullscreenElement) document.exitFullscreen(); else root.requestFullscreen&&root.requestFullscreen(); }
+    else if(e.key==='Escape'){ if(document.getElementById('helpcard').classList.contains('on')) document.getElementById('helpcard').classList.remove('on'); else present(false); }
+  });
+
+  /* jumping from the index while presenting moves the slide */
+  links.forEach(function(a){
+    a.addEventListener('click', function(){
+      var id=a.getAttribute('href').slice(1);
+      var n=slides.map(function(s){return s.id;}).indexOf(id);
+      if(n>=0 && body.classList.contains('present')){ show(n); }
+      else if(n>=0){ idx=n; }
+    });
+  });
+
+  /* scrollspy in document mode */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(entries){
+      if(body.classList.contains('present')) return;
+      entries.forEach(function(en){
+        if(!en.isIntersecting) return;
+        markLink(en.target.id);
+        var n=slides.indexOf(en.target);
+        if(n>=0) idx=n;              // so `p` presents from where you were reading
+      });
+    },{rootMargin:'-15% 0px -70% 0px'});
+    slides.forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -64,7 +64,20 @@ TUNE_NAME = ".fux/tune.toml"
 #: first one, which is usually the cause of the rest (decision 10b).
 _MAX_REPORTED = 10
 
-_FIELD_KEYS = tuple(f"{name}_weight" for name in TF_FIELDS)
+#: The `[bm25f]` field-weight keys ARE the field names. Ruled by Arpit
+#: 2026-08-27 (W-82 §5.3 ruling 4): inside a table already named `bm25f`, a
+#: `_weight` suffix is noise, and `k1`/`b` never carried one — the table was
+#: internally inconsistent. `[ranking]` keeps its suffixes, where they
+#: genuinely disambiguate (`archived_weight` is not `archived`).
+#:
+#: ⚠ **Breaking for `.fux/tune.toml` written against v2.0.0-alpha.1.**
+#: `_LEGACY_FIELD_KEYS` exists only so the error can name the replacement
+#: instead of reporting an unknown key; nothing reads the old spelling.
+_FIELD_KEYS = tuple(TF_FIELDS)
+
+#: Old spelling -> new, for the migration message only. Deleted once alpha.1 is
+#: far enough back that nobody is carrying a file written against it.
+_LEGACY_FIELD_KEYS = {f"{name}_weight": name for name in TF_FIELDS}
 
 #: The closed key set. Table -> keys. Adding a key here is a change to
 #: ADR-TUNE, not a convenience (decision 5).
@@ -287,6 +300,19 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
             continue
         unknown_keys = [k for k in value if k not in _SCHEMA[name]]
         if unknown_keys:
+            # A file written against v2.0.0-alpha.1 spelled these
+            # `<field>_weight`. Reporting them as merely *unknown* would send a
+            # consumer hunting for a typo in a key they copied correctly from
+            # the shipped specimen, so name the rename instead.
+            renamed = sorted(k for k in unknown_keys if k in _LEGACY_FIELD_KEYS)
+            if name == "bm25f" and renamed:
+                pairs = ", ".join(f"`{k}` -> `{_LEGACY_FIELD_KEYS[k]}`" for k in renamed)
+                raise FuxError(
+                    f"{path}: [bm25f] field weights lost the `_weight` suffix in "
+                    f"v2.0.0-alpha.2 -- rename {pairs}. Inside a table already named "
+                    f"`bm25f` the suffix was noise, and `k1`/`b` never carried one. "
+                    f"`[ranking]` is unchanged and keeps its suffixes."
+                )
             raise FuxError(
                 f"{path}: [{name}] has unknown key(s) {sorted(unknown_keys)} — "
                 f"known: {list(_SCHEMA[name])}"
@@ -420,18 +446,41 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
 
 
 def specimen() -> str:
-    """The file `fux setup` writes — every key commented, the default in the comment.
+    """The file `fux setup` writes -- **live lines, not comments.**
 
-    One string, so the writer and `fux tune`'s output cannot drift apart.
+    Ruled by Arpit 2026-08-27, the same ruling `.fux/sources/types` and
+    `.fux/output.toml` got the same day: a file of nothing but comments is a
+    menu, and a consumer should be able to read what fux will do without
+    reading fux's source. Every value here is `Tune`'s own default, so a repo
+    with this file and a repo without it rank identically.
+
+    ⚠ **The cost, stated rather than hidden: the tunables FREEZE at setup.**
+    `fux setup` is write-if-missing, so a later change to `K1`, `B`,
+    `FIELD_WEIGHTS` or a `Tune` field reaches a repo that has never run setup
+    and does not reach one that has. Same trade as `.fux/sources/types`; same
+    remedy, and ADR-DOTFUX decision 6 names it -- **a loader refusal or a `fux
+    doctor` check, never a rewrite.**
+
+    ⚠ **`[priority]` stays commented, and that is not an inconsistency.** Its
+    keys are the consumer's own source entries, not tunables with defaults --
+    an uncommented line there would silently reweight a corpus rather than
+    restate a default. Everything unlisted is already `1.0`, which IS the
+    default, spelled out by the table being empty.
+
+    One string, so the writer and `fux tune`'s output cannot drift apart, and
+    the numbers are interpolated from the engine constants rather than typed,
+    so the file and the behaviour cannot drift either (W-83's lesson).
     """
+    d = DEFAULT_TUNE
     fields = "\n".join(
-        f"#{key:<22} = {FIELD_WEIGHTS[i]}" for i, key in enumerate(_FIELD_KEYS)
+        f"{key:<23} = {FIELD_WEIGHTS[i]}" for i, key in enumerate(_FIELD_KEYS)
     )
     return f"""\
-# .fux/tune.toml — HOW results are ordered. Never WHAT is indexed.
+# .fux/tune.toml -- HOW results are ordered. Never WHAT is indexed.
 #
-# Written once by `fux setup`; fux never rewrites it. Absent, empty, or every
-# key commented out means every default — this file is optional.
+# Written once by `fux setup`; fux never rewrites it. Every value here is the
+# engine's own default, spelled out rather than implied: delete the file and
+# nothing changes, edit a line and exactly that line changes.
 #
 # The rule for what may live here is mechanical: changing any value below
 # leaves `.fux/index/` byte-identical. Nothing here is read by `ingest`,
@@ -441,39 +490,42 @@ def specimen() -> str:
 # "is it me or the config?" switch.
 
 [bm25f]
-#k1                     = {K1}      # term-frequency saturation
-#b                      = {B}     # length normalisation, 0 = off, 1 = full
+k1                      = {K1}      # term-frequency saturation
+b                       = {B}     # length normalisation, 0 = off, 1 = full
 # The five field weights, in index order. 0 means "ignore this field".
 {fields}
 
 [ranking]
-#archived_weight        = 1.0   # multiplier for a source declared archived
-#superseded_weight      = 1.0   # multiplier for a document another supersedes
-#recency_half_life_days = 0.0   # 0 = off; decays on the committed `mtime`
-#rerank_weight          = 0.0   # 0 = off; the proximity reranker's uplift
+archived_weight         = {d.archived_weight}   # multiplier for a source declared archived
+superseded_weight       = {d.superseded_weight}   # multiplier for a document another supersedes
+recency_half_life_days  = {d.recency_half_life_days}   # 0 = off; decays on the committed `mtime`
+rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker's uplift
 
 [graph]                         # explain / graph / path
-#damping      = 0.85
-#iterations   = 3
-#laziness     = 0.5
-#hop_decay    = 0.5
-#expand_limit = 10
-#seed_depth   = 5
+damping      = {d.damping}
+iterations   = {d.iterations}
+laziness     = {d.laziness}
+hop_decay    = {d.hop_decay}
+expand_limit = {d.expand_limit}
+seed_depth   = {d.seed_depth}
 
 [refer]                         # answer, and the refer plane
-#budget            = 8000       # bytes of assembled passage
-#per_doc_fraction  = 0.5
-#min_passage_bytes = 120
-#max_passage_bytes = 4000
+budget            = {d.budget}       # bytes of assembled passage
+per_doc_fraction  = {d.per_doc_fraction}
+min_passage_bytes = {d.min_passage_bytes}
+max_passage_bytes = {d.max_passage_bytes}
 
 [priority]
-# A multiplicative weight per SOURCE ENTRY, exactly as it appears in
-# .fux/sources/dirs or .fux/sources/urls. Anything unlisted is 1.0, and when
-# two entries both match, the LONGER one wins.
+# ⚠ THE ONE TABLE THAT STAYS COMMENTED, and not for consistency's sake: these
+# are not tunables with defaults. A key is a multiplicative weight per SOURCE
+# ENTRY, exactly as it appears in .fux/sources/dirs or .fux/sources/urls, so
+# an uncommented line here would silently REWEIGHT YOUR CORPUS rather than
+# restate a default. Anything unlisted is 1.0 -- an empty table IS the
+# default. When two entries both match, the LONGER one wins.
 #
 # Either direction is allowed and fux states the cost rather than clamping it.
 # Two values are refused, and neither is a preference being denied: a negative
-# weight inverts the ordering, and zero means EXCLUDE — which already has a
+# weight inverts the ordering, and zero means EXCLUDE -- which already has a
 # home, the `!` prefix in .fux/sources/.
 #"docs/"   = 1.5
 #"vendor/" = 0.3

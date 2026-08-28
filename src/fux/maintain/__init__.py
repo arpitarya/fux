@@ -33,6 +33,70 @@ def _root() -> Path:
     return root
 
 
+def cmd_daemon(args) -> int:
+    """`fux daemon start | stop | status` — the URL freshness clock.
+
+    `--serve` is the child's entry point and is hidden: it runs the loop in this
+    process and returns only when stopped. Nobody types it, and documenting it
+    would invite wiring the loop into a supervisor — the global install this
+    verb exists to avoid (Arpit, 2026-08-27: *"the code only lives inside the
+    project, not globally"*).
+    """
+    from . import daemon as daemon_mod
+
+    root = _root()
+
+    if getattr(args, "serve", False):
+        daemon_mod.serve(root)
+        return 0
+
+    action = getattr(args, "action", "status") or "status"
+
+    if action == "start":
+        outcome = daemon_mod.start(root)
+        if outcome == "already-running":
+            state = daemon_mod.status(root)
+            print(f"daemon: already running (pid {state['pid']})")
+            return 0
+        print(
+            f"daemon: started — sweeping every {daemon_mod.sweep_minutes(root)} min.\n"
+            "  It runs until you stop it: `fux daemon stop`.\n"
+            "  Nothing was installed outside this repository."
+        )
+        return 0
+
+    if action == "stop":
+        outcome = daemon_mod.stop(root)
+        if outcome == "not-running":
+            print("daemon: not running")
+            return 0
+        if outcome == "timeout":
+            # Deliberately not escalated to a kill: a daemon slow to stop is
+            # usually mid-`write_index`, which is when killing it costs a
+            # partial shard.
+            print(
+                "daemon: asked to stop and it has not exited yet. It finishes the "
+                "unit of work it is in, then goes.\n"
+                "  `fux daemon status` to check; fux will not kill it."
+            )
+            return 1
+        print("daemon: stopped")
+        return 0
+
+    state = daemon_mod.status(root)
+    if getattr(args, "json", False):
+        print(json.dumps(state, indent=2, sort_keys=True))
+        return 0
+    if state["running"]:
+        print(f"  daemon    running (pid {state['pid']})")
+    else:
+        print("  daemon    not running")
+    print(f"  sweep     every {daemon_mod.sweep_minutes(root)} min")
+    last = state.get("last")
+    print(f"  last pass {last['outcome'] if last else 'none yet'}")
+    return 0
+
+
 def cmd_hooks(args) -> int:
     """`fux hooks` — install, inspect or remove the maintenance wiring."""
     root = _root()

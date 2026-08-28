@@ -9,21 +9,77 @@ The two run **concurrently**; never order one against the other.
 
 ---
 
-## Blocked on Arpit — the inbox
+## Blocked on Arpit — decisions
 
-**Empty.**
+- **Ratify `is_rate_limited(exc)`, or replace it.** W-82 ruling 12's detection
+  mechanism was **put to you and left unanswered**, so an agent took the
+  recommended shape: the fetcher declares it, and **fux never parses a status
+  code, a header or an error string** (the alternative — matching `"429"` in
+  `str(exc)` — was refused as branching on prose). **It is built, shipped and
+  verified against a real 429**
+  ([run](regression/2026-08-27-daemon-real-url/report.md)), which is exactly why
+  it needs saying out loud: **a shape nobody ratified is now load-bearing.**
+  Same class as `L8` was. — [ADR-FETCHER](../docs/adr/0019_fetcher.md)
+
+---
+
+## Agent work the resolution-floor ruling creates
+
+- **Per-query results are mandatory and nothing emits them.** `CLAUDE.md`
+  §Conformance runs now requires one row per query per arm under `evidence/`
+  (Arpit, 2026-08-28). ⚠ **No harness produces that file today**, so the rule is
+  currently enforced by whoever remembers it. A `tests/test_regression_runs.py`
+  check is owed, baselined at 2026-08-28 the way the `classification:` rule was
+  baselined at 2026-08-25.
+- ⚠ **The `+9` contaminated enrichment delta is the one marked claim that is
+  large enough to be testable** — net 9, and the floor at any plausible
+  discordant count is 8–9. **Its discordant count was never filed**, so it sits
+  in the one bad state: big enough to matter, impossible to check, impossible to
+  re-run (the corpora went in the 2026-08-20 wipe).
+
+---
+
+## Blocked on an author who has not looked
+
+**Not an environment and not a decision.** Both need somebody who has not read
+the goldens, and this is the one blocker a session cannot clear by trying harder.
+
+| what | why it needs a different author |
+|---|---|
+| **W-87 P2** — the `unanswerable` class | It must be authored **blind**. The 2026-08-27/28 sessions read the goldens, the decoys and per-query scores across four runs, so anything they wrote is informed **by construction**. ⚠ **The 15 decoys are NOT this class** — they are a control, and using them would launder informed material into a blind slot |
+| **W-87 P2** — `recall@k` known-relevant sets | The same problem in reverse: marking documents relevant **after** seeing which ones rank well fits the metric to the system it judges. **The annotation must precede the scores** |
 
 ---
 
 ## Open items, by record
 
-### [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-RS](../docs/adr/0036_predictions.md) · the whole register
+### [ADR-QUALITY](../docs/adr/0044_quality-contract.md) · [ADR-RS](../docs/adr/0036_predictions.md)
 
-- **W-82** · `arpit` + `agent` · **filed 2026-08-26 — the consolidation.** Arpit collapsed the queue to one item: **W-74, W-75, W-77 and W-81 were merged**, along with the five documents behind them, into [one file](open/W-82-the-consolidated-build.md). ⚠ **A merge, not a close** — nothing was decided by moving it, and the archived originals may be named, never cited. ⚠ **The two compare verdicts were folded in verbatim first** (§4.1 the clock, §4.2 concurrency), because archiving a compare doc makes its verdict uncitable and §1's calls rest on them. **Four calls were made 2026-08-26**: the content store is **not built** (§6, with a reopen trigger); the detector is the **query-driven dirty list**, unconditional; **every cited URL is fetched before the final answer** — which is already shipped, and which **withdrew `update --warm` and `answer --memo` outright**; and concurrency is **declared capability**, `min(declared, configured)`. ✅ **FIVE OF THE SIX PHASES ARE BUILT (2026-08-26)** — §3.1 the URL health report, §3.2 the detector, §3.3 parallel fetch and the cap, §3.4 the changed/unchanged line, §3.6 the agent surface — with nine records amended in the same change and **1 433 unit tests green**. ⚠ **§3.0 and §3.5 did NOT land and neither is a code task**: §3.0 needs a real URL corpus to run `fux update` twice against, §3.5 needs `fux-playground`, and neither exists on the build machine. ⚠ **`tests_e2e/` is unverified** — it fails identically (55/11) on a clean tree there, so no regression, but *green* is not claimable. ⚠ **Three corrections the build made to the plan**: `url-state.json` may carry **no timestamp** (wall clock lives in the TTL store and nowhere else), **Kiro was already in `KNOWN_AGENTS`** so §3.6 extended rather than added it, and rung 4 is **`python -m fux.cli`**, which already works — retiring fork B's urgency. **The original six phases were startable by an agent alone** — the Phase 0 measurement that rules the `validate` fork, the `fux doctor` URL report, the detector, parallel fetch with the cap, the changed/unchanged line, and **§3.6 the agent surface** — plus the measurement apparatus (sealed subset, decoy set, content-free placebo, orphaned-module check), which is independent of all of it. ⚠ **§3.6 fixes a live defect, added 2026-08-26 on Arpit's instruction:** `fux.agent.md` tells an agent to run a bare `fux ask` and, on failure, *"say so and fall back to ordinary search"* — so **in any repo where fux is installed in `.venv` and the venv is not active, the agent gets `command not found`, concludes "not installed", and silently uses grep instead.** The engine is present and the index is committed. The fix is a **four-rung invocation ladder** (`fux` → `uv run fux` → `./.venv/bin/fux` → `python -m fux`, ⚠ the last **does not exist today** — there is no `__main__.py`), probed once per session, **never activating anything**, plus a `fux-usage` skill that teaches operation rather than interpretation — the two shipped skills cover only archived-result reading and enrichment.  ⚠ **Vendors RULED 2026-08-26: Claude and Kiro.** The finding that makes it cheap: **Kiro implements the same open Agent Skills standard Claude does** (`SKILL.md` + `name`/`description`), so `.claude/skills/<n>/SKILL.md` is already a valid Kiro skill — **one template, two destinations** (`.kiro/skills/`), agreement by construction rather than by conformance test. ⚠ Three Kiro traps, each checked against its docs: **Kiro CLI supports no steering inclusion modes** (every `.kiro/steering/` file loads on every interaction, so `manual` does not protect you — which is the argument for a *skill*, not steering); **Kiro custom agents load neither skills nor steering by default** and need explicit `skill://` / `file://` `resources`, so a consumer on a custom agent gets nothing and no error; and the `compatibility` frontmatter field is **a declaration nothing enforces**, so the ladder must live in the body. ⚠ **`prepare-then-ask` was folded into §6.0 verbatim** — its two flags are withdrawn, but the findings under them (a memo validated by a TTL hit reports `current` on unconfirmed bytes; a replayed answer is a fifth epistemic position; a memo key must include the index root hash) would otherwise have been lost to the archive. ⚠ **Twenty-seven forks remain Arpit's** and no agent may pick a default on any: eight on URL freshness (one ruled), six on what *"right"* means, six record rulings plus the archived-link fork and the governance gap, one on ADR-RS decision 12's scope defect, and the agent surface's, of which vendor choice is now ruled. ⚠ **The gap that survives every ruling:** fetching at answer time fixes correctness and **cannot fix recall** — a changed URL never enters the candidate window, so it is never cited, never fetched, and nothing notices — [detail](open/W-82-the-consolidated-build.md)
+- **W-87** · `arpit` · **what "good" means, then measure.** **P1, P3 and P4 are
+  closed**; what remains is P2.
+  ⚠ **P2 Part B cannot run as specified at all**: `acme` and `orbit` went in the
+  2026-08-20 lab wipe **along with their generator**, and `tools/pruning-eval/`
+  still hard-codes reading them. **Part A — the declarations — needs none of
+  that, and declaring is most of the value.**
+  ⚠ **All three quality controls are BUILT and NONE IS PROVEN**
+  ([`tools/quality-controls/`](../tools/quality-controls/README.md)): no run has
+  yet used one to adjudicate anything, and ADR-RS decision 15 losing `NOT BUILT`
+  did not make a control into evidence. —
+  [detail](open/W-87-what-good-means.md)
 
-### ADR-DECODE *(new — does not exist yet)* · [ADR-TYPES](../docs/adr/0031_types-list.md) · [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-ENRICH](../docs/adr/0040_enrich.md)
+### Test-surface gaps
 
-- **W-86** · `agent` + `arpit` · **filed 2026-08-26 — the decoder plane.** Arpit: *"can we build fetchers or middleware or anything else to interpret images, PPT, PDFs, Excel, JSON, YAML"* → *"I want individual decoders to be built out."* ⚠ **The finding this starts from: the decoder plane ALREADY EXISTS, in the wrong place, twice.** `.fux/fetchers/http.py:69` carries *"HTML -> Markdown - stdlib html.parser, deterministic"* and `cdp.py:282` carries the same `_MdParser` as a copy-paste twin marked *"Kept identical to…"* — **agreement checked by nothing**, and unreachable from the git-dir walker, so **a local `.html` on disk is never decoded**. ⚠ **A LIVE DEFECT found on the way, and it is free to fix:** `DEFAULT_TYPES` allows `.rst`, `.adoc` and `.org`, but `extract.py` derives headings with `^(#{1,6})\s+` alone — so reStructuredText underlines, AsciiDoc `== Section` and Org `* Heading` match nothing, and **three of the six allowed types have had every heading land in the body field since the allowlist shipped**, with an empty `phrases` list feeding W-84's `§` lines. That is a correctness fix to shipped behaviour and lands **first**, as P0. **The contract, and it is forced rather than chosen:** a decoder is `bytes → Markdown | None`, because `extract.py` re-derives headings from `#` and a decoder returning flat text silently disables *"heading match outranks body match"* on every non-Markdown document; `None` means *a model must read this*. **Seven phases** — P0 the heading grammar · P1 `src/fux/decode/` + the `parse.py` dispatch seam + lifting HTML out of both fetchers · P2 JSON/`.ipynb`/TOML/INI/CSV/XML · P3 the YAML subset · P4 OOXML+ODF/`.drawio`/RTF · P5 PDF (**Opus**, text layer only) · P6 the undecodable path. **P0 and P1 are independent of every fork and startable today.** **On JSON — *"trivial"* was about the parse, not the decode:** `json.loads` is one line, but ADR-TYPES' verdict G measured `.json` at **11.4 % of this repo's tokens** with **no decoder**, raw bytes as body; a decoder emitting keys as headings and dropping numbers/UUIDs/base64 is a different object, ⚠ **and reversing G needs a NEW pre-registration at 10 000 documents, never this argument**. **On YAML — the subset is the correct option, not the cheap one:** the extra 80 % of the spec is *type resolution* and fux consumes words, not types; worse, **expanding anchors/aliases duplicates terms → inflates `tf` → distorts ranking**, so a conformant parser is *actively wrong*, and nested aliases (billion laughs) are an unbounded-memory DoS from a committed file. ⚠ `frontmatter.py` is already a hand-rolled YAML subset — the two must be proven to agree or it is `_MdParser` again. **On the queue (Arpit: *"committed queue, gitignored progress"*):** nothing in fux can today *say* "a model must read this" — ADR-ENRICH derives scope from `enrich=true` on a `dirs` line, which is **declared**, while a decoder returning `None` is **discovered**, and has nowhere to go. Committed queue holds path + sha + reason, **sorted, no wall clock (L3), never content (L2)**. ⚠ **Edge case before a line is written:** `.fux/enrich/` is globbed as `<sha>.md` and `prune()` deletes orphans there. ⚠ **On the lock — it exists and the gap is its SCOPE:** `runner.py::acquire` is `O_CREAT|O_EXCL`, pid-based, and its own docstring correctly rejects `fcntl`/`msvcrt`; but **it has exactly one caller, the background runner** — a foreground `fux ingest` calls `request_stop` to *evict* a runner and then writes **holding nothing**, so two foreground ingests race. Asserted from call-site reading, **not reproduced**; P6 falsifies it first. Also `except OSError: return False  # degrade, never block` is right for a runner and **inverted for a writer**. **Seven forks are Arpit's** and no agent may pick a default: does `.json` re-enter the allowlist (needs a measurement, not an argument) · is Markdown the ratified intermediate or does `ParsedDoc` grow a `headings` field · the lock verdict + the `runner.lock`→`write.lock` rename · do the fetchers import `src/fux/decode/` (pulls consumer-editable files under L1) · legacy OLE2 build-or-refuse · a docstring/comment decoder for source files · does `fux enrich` consume the queue. **P6 is BLOCKED** on the compare doc being decided. ✅ **FORK E RULED by Arpit 2026-08-26 — and it cost nothing, which was the surprise.** Arpit: *"let the consumer add the dependencies — unless the consumer adds the dependencies, that feature won't be available"*, with a machine lacking them **erroring loudly**. The session expected to propose an **L1 amendment plus a matching `CLAUDE.md` + ADR-LAWS edit; neither is needed.** [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 1 already states this as a table and calls it *"ADR-FETCHER's pattern applied to a second boundary"* — **the ruling is that table's third row**: network I/O → `.fux/fetchers/`, model calls → the consumer's agent, **third-party parsing libraries → `.fux/decoders/<name>.py`**. ADR-FETCHER decision 1 is the grounding: *"`src/fux/` holds no network code… no dependency for any of [them] — a design choice rather than a dependency budget."* **L1 constrains the runtime fux ships, and a consumer decoder is not that.** ⚠ **Detection would have broken L3 outright** — a decoder running whenever its library happened to import means two developers with identical sources produce **different root hashes**; *declared* fixes it, and the repo already has the mechanism three times (ADR-FETCHER is literally *"declared not detected"*, W-83's ceiling, W-85's required key). ⚠ **The honest cost, stated not implied:** a consumer decoder **can break L4 and no gate can stop it** — the same asymmetry ADR-ENRICH decision 3 already owns about `model:` being a claim fux records and cannot confirm. **New P7** (`.fux/decoders/` loading, the declaration, the loud error, `fux doctor`), **one new sub-fork** (does a consumer decoder receive bytes or a path?), and **ADR-ENRICH decision 1's table gains its third row** when ADR-DECODE lands. ⚠ **What it does NOT open:** the runtime, the mutex (`filelock` stays refused — [reconciled in the compare doc §4](compare/index-lock.compare.md) the same day), OCR into `extracted`, or a general optional-deps policy. **FOUR FOLLOW-UPS answered 2026-08-26 (§13), two of them refusals.** ✅ **`fux decoder` verb: yes — and it may NEVER install.** Running `pip` is network (L4) and mutates the consumer's environment; fux **prints** the command. That is the same boundary a fourth time — fux refuses to fetch, to call a model, to add a dependency, and now to install. ⚠ **HTTP+CDP → decoders: HALF right, and the right half is a LIVE L3 DEFECT.** They must not move — fetching is network and stays a fetcher — but the **HTML→Markdown pass inside them** must. `fetch(url) -> str` returns **markdown**, so a fetcher does both jobs, and `http.py:43` states the consequence as a requirement nothing enforces: *"Both fetchers must produce the same markdown from the same bytes, or which fetcher retrieved a URL becomes visible in the index."* **Same sources → same index is the law that quietly breaks.** The fix is `fetch(url) -> bytes`: the `_MdParser` duplication becomes structurally impossible, the requirement **retires instead of being enforced**, and ⚠ **a URL serving a PDF becomes indexable — impossible today**, because the contract demands markdown back. ⚠ **Cost: a BREAKING change to the consumer fetcher contract** → **fork H**, **P8**, and it should land **before** P7 or consumers write against a contract about to change; **fork D dissolves if H is yes** (a fetcher returning bytes does not decode at all). ❌ **Tables and in-document structure: REFUSED as decoder work, and the refusal is the useful part** — by the time a decoder finishes, a table *is already Markdown*; the question is how `extract.py` weights it. In decoders, **every consumer decoder re-implements ranking policy** in code fux cannot test; in `extract.py`, one implementation and every format inherits it free. Filed as [`proposals/structure-aware-extraction.md`](proposals/structure-aware-extraction.md), **not part of W-86**. ✅ **Editable decoders in `.fux/`: YES to the seam, NO to exporting all of them** — `.fux/decoders/<name>.py` overrides the built-in by name, but ⚠ **shipping fifteen live copies at `fux setup` is this item's own §1 defect at 15×**: `_MdParser` was copied with a comment saying *"Kept identical to…"* and nothing kept it identical. **A copied default never receives a bug fix**, and upgrading fux would upgrade nobody's decoders. Setup writes **one commented example**. **Three new forks (H, I, J)**, nine total — [detail](open/W-86-the-decoder-plane.md) · [fork](compare/index-lock.compare.md) · [proposal](proposals/structure-aware-extraction.md)
+- **`tests_e2e/` has never run on Windows**, and `test_maintenance.py` is the
+  suite most likely to differ: real git, real hooks, real detached processes.
+  Verified on Linux/CPython 3.11.15 and macOS 15/arm64/CPython 3.14.2.
+
+- ⚠ **`validate()` reaches an existing repo only when somebody copies the
+  fetcher in.** `fux setup` is write-if-missing and never rewrites a consumer's
+  file — the freeze [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decision 6
+  names. **Measured 2026-08-28:** a repo created before the change learned **0 of
+  7** tokens until its `http.py` was replaced by hand. **Stated as a cost with no
+  mechanism proposed** — a loader that rewrote a consumer's file would be a worse
+  problem than the one it solves.
 
 ---
 
@@ -44,6 +100,11 @@ session needs first.*
    not a tombstone. Everything else about a closed item lives in
    [`IMPLEMENTATION.md`](IMPLEMENTATION.md), the [WORKLOG](WORKLOG.md), and the
    archived detail file.
+   ⚠ **This file was 209 lines on 2026-08-28 and most of it was tombstones** —
+   struck-through table rows, ✅ notes, and a section whose entire content was
+   *"Empty. All seven closed."* **The length of this file is the signal of how
+   much is actually pending**, and a queue that narrates its own history stops
+   being that signal.
 3. **Completed items are removed, never ticked.** Closing is legal only once
    the outcome is recorded in [`IMPLEMENTATION.md`](IMPLEMENTATION.md) and any
    evidence is filed under [`regression/`](regression/README.md). **The row is
@@ -52,13 +113,21 @@ session needs first.*
    the queue entry is not. The durable record is still the ADR plus the
    [WORKLOG](WORKLOG.md) entry; an archived file may be named, never cited. No
    tombstones, no DONE rows, no `closed/` inside `work/`.
-   **The length of this file is the signal of how much is actually pending.**
+   ⚠ **Check what the row was the ONLY home of before deleting it.** W-82's
+   carried the one written statement that answer-time verification cannot fix
+   recall; deleting the row would have lost the claim, so it moved to
+   [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md) decision 9 first.
 4. **The markers here are assertions, not evidence. Re-derive, do not read.**
    Before treating anything as pending or done, reconcile against
    `regression/`, `IMPLEMENTATION.md`, and the repo itself (`git log`,
    `git tag`, the code). A stale ✅ overstates progress; a stale pending row
    that an unrelated commit already closed understates it — **both are the same
    class of defect**.
+   ⚠ **Three blockers filed here evaporated the moment a session had a shell**
+   (2026-08-27/28): a whole section headed *"blocked on an environment that does
+   not exist on the build machine"* naming environments that were on the machine,
+   R10's, and W-87 P1's. **All three were filed by sessions that could not look.**
+   Re-derive first; it is cheaper than the work it prevents.
 5. **Two lanes, ordered independently — they run concurrently.** `arpit` needs
    a human's hands; `agent` an agent can execute alone. Forcing one priority
    order across both is what makes a session sit idle behind a decision it was
@@ -79,7 +148,7 @@ session needs first.*
   (The `Cost:` line was mandatory here until 2026-08-21 — dropped, PRIORITY
   P7: 58/58 entries had said `unmeasured`.)
 - **This file and the item's detail file** on any status change; a DOC-REGISTRY
-  row bump for any doc touched; INTERVIEW kept current *during* the session.
+  row bump for any doc you touched; INTERVIEW kept current *during* the session.
 - **Reconcile before you report** (rule 4).
 - **Records are cited by name** — `ADR-RECORD`, never a number. "archived
   ADR-NNNN" *with its path* means the frozen v0.26 line under

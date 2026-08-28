@@ -2,52 +2,37 @@
 type: ADR
 name: ADR-FETCHER
 title: "ADR-FETCHER (0019) — the consumer-owned fetcher"
-description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher per URL, declared not detected, and the word is fetcher because nothing here composes."
+description: "Fux never fetches; a consumer-owned fetcher file does. One fetcher per URL, declared not detected, returning bytes and a Content-Type — and the word is fetcher because nothing here composes."
 status: accepted
+date: 2026-08-19
+feature: the fetch contract, what it is called, and the two shipped templates
+owns: [src/fux/ingest/urlsrc.py, src/fux/templates]
+laws: [L1, L3, L4]
 timestamp: 2026-08-19T00:00:00Z
 ---
 
 # ADR-FETCHER — the consumer-owned fetcher
 
-- **Name:** `ADR-FETCHER` — cite this everywhere; never cite the number
-- **Status:** accepted
-- **Date:** 2026-08-19
-- **Feature:** the fetch contract and what it is called — renamed from *middleware* on Arpit's instruction, 2026-08-19
-- **Owns:** `src/fux/ingest/urlsrc.py` — fux's half of the contract
-- **Laws:** L1, L3, L4 — see [ADR-LAWS](0001_laws.md); never restated here
-- **Split from:** [ADR-URL-INGEST](0008_url-ingest.md) decisions 1, 2 and 7
-
----
-
 ## §1 — For humans
 
 **Fux never fetches. Your fetcher does.** A Python file in your repo, named in
 `fux.toml`, loaded by path, called once per URL under either fenced path —
-`fux add <URL>` (that URL only) or `fux update` (all of them). Core
-holds **zero network lines**, and that is the property this record exists to
-keep true.
+`fux add <URL>` (that URL only) or `fux update` (all of them). Core holds **zero
+network lines**, and that is the property this record exists to keep true.
 
-The file used to be called *middleware*, and that was wrong. Middleware
-composes: Django, Express, Rack, Scrapy's downloader middlewares all chain, each
-wrapping the next, each free to pass through or short-circuit. **Nothing here
-chains.** One file, one `fetch(url) -> str`, exactly one of them running for any
+The file is called a *fetcher* and not middleware. Middleware composes: Django,
+Express, Rack, Scrapy's downloader middlewares all chain, each wrapping the
+next, each free to pass through or short-circuit. **Nothing here chains.** One
+file, one `fetch(url) -> tuple[bytes, str]`, exactly one of them running for any
 given URL. A thing that does not compose should not carry the name of the
 pattern whose defining property is composition.
 
-The replacement had to avoid a collision as well as fit.
-[ADR-RECORD](0010_index-record.md) already defines `src` as *"which **adapter**
-owns this document"*, so calling the consumer file an adapter would give one
-word two referents in adjacent code — the exact collision
-[ADR-EXTRACTED](0016_extracted-mode.md) exists to close. **`fetcher` fits and
-agrees**: the file, the function, the config key and the per-URL attribute all
-say one word.
-
-| | before | after |
-|---|---|---|
-| config key | `middleware = …` | **`fetcher = …`** |
-| directory | `.fux/middleware/` | **`.fux/fetchers/`** |
-| contract function | `fetch(url)` | `fetch(url)` |
-| line attribute ([ADR-URL-LIST](0018_url-list.md)) | — | **`fetch=cdp`** |
+The name also had to avoid a collision. [ADR-RECORD](0010_index-record.md)
+already defines `src` as *which **adapter** owns this document*, so calling the
+consumer file an adapter would give one word two referents in adjacent code —
+the exact collision [ADR-EXTRACTED](0016_extracted-mode.md) exists to close.
+**`fetcher` fits and agrees**: the file, the function, the config key and the
+per-URL attribute all say one word.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -56,8 +41,9 @@ flowchart LR
     L[".fux/sources/urls<br/>fetch= declares which"] --> R["fux add &lt;URL&gt; · fux update"]
     R --> P["load by path<br/>fux.toml [sources.url] fetcher"]
     P --> F[".fux/fetchers/*.py<br/>YOUR code"]
-    F --> M["markdown"]
-    M --> I["indexed as src: url"]
+    F --> B["bytes + Content-Type"]
+    B --> DC["fux.decode<br/>bytes to markdown"]
+    DC --> I["indexed as src: url"]
     R -.->|core holds zero network lines| F
 ```
 
@@ -71,7 +57,10 @@ flowchart LR
                      .fux/fetchers/*.py   <-- YOUR code, fux never rewrites it
                                |              core holds ZERO network lines
                                v
-                          markdown  -->  indexed as src:"url"
+                     bytes + Content-Type
+                               |
+                               v
+                    fux.decode  -->  markdown  -->  indexed as src:"url"
 
   exactly ONE fetcher runs per URL — no chain, no wrapping, no passthrough
 ```
@@ -86,8 +75,12 @@ The contract, from the file that implements it in this repo
 ```python
 configure(config: dict) -> None  # optional; once after import, before connect()
 connect() -> None                # optional; once, before the first fetch
-fetch(url: str) -> str           # required; one URL -> one markdown document
+fetch(url: str) -> tuple[bytes, str]
+                                 # required; the bytes the server sent plus the
+                                 # Content-Type it declared. Fux decodes them.
 close() -> None                  # optional; once, after the last fetch — even if fetch raised
+
+MAX_PARALLEL = 1                 # optional module constant; absent means 1
 ```
 
 The retired key stops the run and says what to do:
@@ -95,8 +88,7 @@ The retired key stops the run and says what to do:
 ```console
 $ fux update
 error: fux.toml: [sources.url] middleware was renamed to fetcher — rename the
-key, and move the file from .fux/middleware/ to .fux/fetchers/ (ADR-FETCHER,
-2026-08-19)
+key, and move the file from .fux/middleware/ to .fux/fetchers/ (ADR-FETCHER)
 # exit 1
 ```
 
@@ -109,36 +101,46 @@ key, and move the file from .fux/middleware/ to .fux/fetchers/ (ADR-FETCHER,
 Two things forced this record, and only one of them is the name.
 
 **The name was actively misleading.** The closest neighbour in the field —
-Scrapy — uses "downloader middleware" for something that genuinely composes,
-and a chained-list option was on the table when the rename was decided. A
-reader who knows the pattern would reasonably assume
-chaining works here. It does not, and the decision below says so out loud so
-that assumption cannot survive contact.
+Scrapy — uses "downloader middleware" for something that genuinely composes, and
+a chained-list option was on the table when the rename was decided. A reader who
+knows the pattern would reasonably assume chaining works here. It does not, and
+decision 4 says so out loud so that assumption cannot survive contact.
 
 **The contract was recorded inside a record about something else.**
 [ADR-URL-INGEST](0008_url-ingest.md) owns *how URL ingestion behaves* — refresh
-semantics, failure handling, normalization. The fetch **contract** is a
-separate thing with a separate audience: a consumer writing a file, not a
-maintainer reading the pipeline. It was decisions 1, 2 and 7 of a record nobody
-writing a fetcher would think to open.
+semantics, failure handling, normalization. The fetch **contract** is a separate
+thing with a separate audience: a consumer writing a file, not a maintainer
+reading the pipeline.
 
 ### Decision
 
 **1. Fux never fetches; a consumer-owned fetcher does.** `src/fux/` holds no
 network code, no HTTP client, no browser driver, and no dependency for any of
-them. This is the **adapter cap**, and it is what makes the M4 source list a
-design choice rather than a dependency budget.
+them. This is the **adapter cap**, and it is what makes the source list a design
+choice rather than a dependency budget.
 
-**2. The contract is four functions, one required.** `fetch(url) -> str` is
-required; `configure(config)`, `connect()` and `close()` are optional. `close`
-is called even if a fetch raised. Unchanged from
-[ADR-URL-INGEST](0008_url-ingest.md) decision 2 — restated here because this is
-now its home, not paraphrased alongside it.
+**2. The contract is four functions, one required.**
+`fetch(url) -> tuple[bytes, str]` is required — the bytes the server sent plus
+the `Content-Type` it declared; `configure(config)`, `connect()` and `close()`
+are optional. `close` is called even if a fetch raised.
 
-**3. It is called a *fetcher*, not middleware, not an adapter.** Middleware
-composes and this does not; `adapter` is already taken by
-[ADR-RECORD](0010_index-record.md)'s `src` property. The file, the required
-function, the config key and the per-URL attribute all say `fetch`.
+⚠ **The tuple is load-bearing twice over.** The fetcher is the only thing that
+ever sees the HTTP charset header — a file on disk has none, which is why
+`htmldoc` sniffs `<meta charset>` — so for a URL the header is authoritative and
+strictly better than sniffing. And it is what lets a **non-HTML URL reach the
+right decoder at all**.
+
+⚠ **A bare `str` return is still accepted, and that is a transition ramp rather
+than an oversight.** A `str` is treated as already-prose markdown, which is
+exactly what the previous contract returned. **This is the one place the old
+contract survives**, and it is what converts a breaking change into a
+deprecation. ⚠ **The cost of removing it has never been measured** —
+`fux-engine` is on PyPI and nobody has checked whether a consumer fetcher exists
+outside this repo. **Do not remove the ramp without measuring what it
+protects.**
+
+**3. It is called a *fetcher*, not middleware, not an adapter.** The file, the
+required function, the config key and the per-URL attribute all say `fetch`.
 
 **4. Exactly one fetcher runs per URL.** No chain, no wrapping, no
 passthrough-to-the-next. A URL resolves to one fetcher and that fetcher either
@@ -150,141 +152,184 @@ true** — the day a chain lands, the name is wrong again.
 `<fetchers dir>/<name>.py` — the directory being the parent of
 `[sources.url] fetcher` ([ADR-CONFIG](0014_config.md) decision 5). **A fetcher
 no line names is never imported**, which is what keeps a repo that only wants
-plain HTTP from loading 28 KB of WebSocket code. Automatic escalation
-from one fetcher to another makes the committed bytes a function of network
-conditions at that instant, which is L3 lost on the one path that is already
-the exception. This follows `scrapy-playwright`, which makes browser rendering
-a per-request opt-in and has no automatic fallback at all.
+plain HTTP from loading WebSocket code. Automatic escalation from one fetcher to
+another would make the committed bytes a function of network conditions at that
+instant — L3 lost on the one path that is already the exception. This follows
+`scrapy-playwright`, which makes browser rendering a per-request opt-in with no
+automatic fallback at all.
+
+**5a. Content-type resolution follows the same rule: declared first, path
+second, never sniffed.** The HTTP header wins; a URL's extension is a fallback
+hint; the bytes are never inspected. A heuristic here would make the committed
+index a function of how confident a guesser felt.
 
 **6. Fetchers live in `.fux/fetchers/`**, a child declared **committed** by
 [ADR-DOTFUX](0003_fux-directory.md). Plural, because decision 5 presumes more
 than one can exist in a repo at once.
 
 **Fux ships two of them and imports neither.** `http.py` and `cdp.py` live in
-the wheel as package data under `src/fux/templates/`, with an extension
-Python's import machinery cannot resolve, and `fux setup` copies them out
-write-if-missing. That is decision 1 made **structural**: a `.py` in the
-package could be imported by a later edit, a `.py.txt` cannot be. It also
-answers the question a shipped default otherwise raises — how an air-gapped
-consumer gets a working fetcher without being told to copy a file from
-GitHub.
+the wheel as package data under `src/fux/templates/`, **with an extension
+Python's import machinery cannot resolve**, and `fux setup` copies them out
+write-if-missing. That is decision 1 made **structural**: a `.py` in the package
+could be imported by a later edit, a `.py.txt` cannot be. It also answers the
+question a shipped default otherwise raises — how an air-gapped consumer gets a
+working fetcher without being told to copy a file from GitHub.
 
 **7. `[sources.url] middleware` is a retired key that errors with
-instructions**, naming both the new key and the directory move — the pattern
-[ADR-CONFIG](0014_config.md) decision 7 already establishes. A retired key that
-silently does nothing is worse than one that stops the run, and here "silently
-does nothing" would mean falling back to a default path and fetching the wrong
-thing.
+instructions**, naming both the new key and the directory move. A retired key
+that silently does nothing is worse than one that stops the run, and here
+"silently does nothing" would mean falling back to a default path and fetching
+the wrong thing.
 
 **8. `[sources.url.config]` is passed to `configure()` verbatim** and fux never
-reads a key inside it. Restated from [ADR-URL-INGEST](0008_url-ingest.md)
-decision 7 because it is the back door through which the adapter cap would
+reads a key inside it. It is the back door through which the adapter cap would
 otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
+
+**9. A fetcher may declare `MAX_PARALLEL = n` as an optional module constant.
+Absent the declaration the value is 1.** This is decision 5's own principle —
+*declared, never detected* — applied to a second property, and it is
+deliberately a **constant rather than a function**: the four-function contract
+has survived two callers unchanged, and a capability flag is not a capability.
+
+⚠ **A declaration is a CEILING on what a consumer may ask for, never a FLOOR on
+what fux will do unasked.** When the consumer has configured nothing, fux uses
+`min(declared, DEFAULT_MAX_PARALLEL)` — see [ADR-CONFIG](0014_config.md)
+decision 7a. `MAX_PARALLEL` answers *what is safe*; it was never a claim about
+what the consumer's host can absorb, and reading it as one is how `http.py`'s
+honest `8` became eight live connections to a wiki nobody asked about.
+**Fetcher authors: declare the truth about your module and nothing about
+politeness** — the second half is the consumer's to say, in `fux.toml`.
+
+⚠ **Why a blanket pool was refused, and it is not "it crashes".** The shipped
+`cdp.py` sets a module-global `_session` holding **one WebSocket** that every
+`fetch()` reuses. Two threads writing frames onto it produce **plausible
+documents attributed to the wrong URLs** — which lands in the committed index,
+**passes every determinism check**, and is found only by a human reading an
+answer. `http.py` builds a fresh request per call and is safe. A blanket pool
+would have been correct for the fetcher most consumers use and silently
+corrupting for the one the enterprise design point exists to serve.
+
+**`connect()` / `close()` stay once per group, never once per worker.** Only
+`fetch` runs concurrently, so a fetcher declaring `MAX_PARALLEL > 1` is
+declaring exactly *my `fetch` is reentrant given one `connect`*.
+
+**The shipped `cdp.py` declares `1` explicitly rather than omitting it.**
+Omission and `1` behave identically; the explicit line is where the *reason*
+gets written for the consumer who copies the file and starts editing it.
+`http.py` declares `8`: if the safe fetcher does not opt in, the mechanism ships
+dead.
+
+**10. Per-URL error isolation stays in fux.** A raising `fetch` becomes one
+`Skipped` and the batch continues — [ADR-URL-INGEST](0008_url-ingest.md)
+decision 3 in code. That is why an optional `fetch_many` was rejected: under it
+every fetcher author would have to reimplement that correctly, and most would
+not.
+
+**11. A skip must say WHICH of two things happened, and consumer decoders reach
+URL bytes.** Amended 2026-08-27, on
+[a run against real external URLs](../../work/regression/2026-08-27-daemon-real-url/report.md).
+
+- **The defect.** `https://httpbin.org/uuid` was skipped as *"no decoder for
+  application/json"* while `jsondoc` is **built in**, claims `.json`, ran, and
+  correctly dropped a bare UUID — leaving nothing. The message **states a
+  falsehood** and sends a reader to write a decoder that already exists.
+- **The rule.** The reason comes from `decode.reason()`, which has always
+  distinguished *nothing claims this type* from *a decoder owned it and got
+  nothing out*. Its own docstring says conflating them *"would make the queue
+  useless"*; the **file** path used it and this path did not.
+- ⚠ **And `decode()` is called with `root`**, which it was not. Without it
+  `registry(None)` returns built-ins only, so **a consumer's own decoder in
+  `.fux/decoders/` never applied to a fetched document** — ADR-DECODE's premise,
+  *a consumer may bring a dependency fux may not*, stopping at exactly the
+  boundary where an unusual content type is most likely to arrive.
+- ⚠ **What is NOT decided here:** the file path routes an unreadable document
+  into `.fux/enrich/queue.tsv`; this path routes it nowhere, so **a URL that
+  needs a model can never be queued for one.** `queue.tsv` is committed, so
+  that is a scope call. **Named, not taken.**
+
+**12. `validate(url) -> str | None` — the optional fifth function.** W-87 P4
+fork 3, ruled by Arpit 2026-08-28 once [P3](../../work/regression/2026-08-27-p3-sha-stability/VERDICT.md)
+cleared its gate at 19/19.
+
+⚠ **THE INVARIANT, and it is the whole of the design: a changed token must NEVER
+mean a changed record.**
+
+| the fetcher says | fux does |
+|---|---|
+| a token **equal** to last run's | **skips the body fetch** — the only thing `validate` may do |
+| a **different** token | fetches, **then still compares the sanitized sha** |
+| `None` — *"I cannot tell"* | fetches, exactly as before |
+| raises | fetches. An optimisation may not fail a run |
+
+**So a chatty `ETag` costs a wasted fetch and cannot churn a shard.**
+`validate` can only ever save work — byte-determinism is untouched **by
+construction**, not by test. Verified live: `Special:Random`'s token rotates
+every request, and it is re-fetched every run while three stable URLs are not.
+
+- **Zero migration.** `None` and a missing function are the same thing, so every
+  fetcher written before this keeps working.
+- **The token is opaque.** Fux hashes and compares; it never parses one. That is
+  what stops `validate` smuggling HTTP semantics into an engine that has none.
+- **The shipped `http.py` implements it** — a `HEAD` for `ETag`, falling back to
+  `Last-Modified` — which is the clean test that the fifth function is not dead
+  weight. ⚠ **It names its own cost**: a `HEAD` is not free, is not always
+  honoured, and some servers compute a different `ETag` for it. The docstring
+  says to delete the function if that is your intranet.
+- ⚠ **It reaches existing repos only when they copy it in.** `fux setup` is
+  write-if-missing and never rewrites a consumer's fetcher — the same freeze
+  ADR-DOTFUX decision 6 names. Measured: a repo created before this change
+  learned **0 of 7** tokens until its `http.py` was replaced by hand.
+- **A validated URL is neither a fetch nor a skip**, and is counted separately —
+  its prior record is correct and carried forward, which is the opposite of a
+  failure. `fux update` prints the count, because **an optimisation that fails
+  silently in the safe direction looks identical to one that never ran.**
 
 ### Consequences
 
-- **The contract is unchanged; the commands that invoke it are not**
-  (2026-08-21, W-63). `fetch(url)` / `connect()` / `close()` / `configure()`
-  are exactly as they were. What changed is that a fetcher is now reached
-  from **two** named paths rather than one, and that `fux add <URL>` calls it
-  for a **single** URL — `ingest.run(only_urls=…)` narrows which listed URLs
-  are fetched, and every other listed URL is carried forward exactly as a
-  failed fetch would be. A fetcher cannot tell the difference and does not
-  need to: it is still called once per URL, in sorted order, inside one
-  `connect`/`close` bracket.
-
-- **`_sanitize` became `sanitize`, and the refer plane calls it** (2026-08-20,
-  [ADR-REFER](0030_refer-plane.md) decision 3). Fetched-text normalization is
-  now shared rather than duplicated, because a verify-time sha is compared
-  against an ingest-time sha: a one-character divergence between two copies
-  would mark **every** URL document permanently stale — a defect that presents
-  as a working freshness feature. Asserted by function identity in
-  `tests/refer/test_source.py`, not by a string match.
-- **The contract now has a second caller, and it did not change.** That is the
-  evidence for decision 1's shape: verify-time fetch needed `fetch(url) -> str`
-  and nothing more, so the refer plane reuses this contract instead of adding a
-  second fetch mechanism to the engine.
-
-- **This is a breaking change for anyone with a `[sources.url]` block.** Rename
-  the key, move the directory. Decision 7 makes it a stopped run with
-  instructions rather than a silent wrong fetch. **The cost is near zero
-  today** — `v0.32.0`, no external consumers — and it only ever rises.
-- **The default fetcher path points at a file fux does not write and does not
-  ship.** `DEFAULT_FETCHER` is `.fux/fetchers/cdp.py`, `GENERATED_FILES` is
-  `("README.md", ".gitignore")`, and the wheel packaged no fetcher at all — so a
-  fresh consumer following the documented default got *"fetcher not found"*, and
-  two live docstrings claimed otherwise. **Closed 2026-08-19** by decision 6
-  above: both fetchers ship as package data and `fux setup` copies them out. It
-  is the reason [ADR-HTTP-FETCHER](0021_http-fetcher.md) generates rather than
-  assumes ([run](../../work/regression/2026-08-19-w54/report.md)).
+- **The contract survived gaining a second caller unchanged.** The refer plane
+  needed a fetch and nothing more, so it reuses this contract instead of adding
+  a second fetch mechanism to the engine.
+- **`sanitize` is shared, not duplicated, and the reason is sharp.** A
+  verify-time sha is compared against an ingest-time sha, so a one-character
+  divergence between two copies of the normalizer would mark **every** URL
+  document permanently stale — a defect that presents as a working freshness
+  feature. Asserted by *function identity* in `tests/refer/test_source.py`, not
+  by a string match.
+- **Concurrency inside `fetch_all` is invisible to L3.** Sequential fetching was
+  never what made the index deterministic — the trailing
+  `fetched.sort(...)` / `skipped.sort(...)` is, so completion order never
+  reaches a committed byte. `concurrent.futures` is stdlib, so L1 is untouched.
+- ⚠ **One test earns its place and no manual checking substitutes for it**: a
+  fetcher declaring `1` is **observed** never to have two `fetch` calls in
+  flight, via a counter inside a test fetcher — with a control arm proving a
+  fetcher declaring more genuinely does run concurrently, so a pool that never
+  parallelised could not pass by doing nothing.
+- ⚠ **The shipped fetchers import `fux.decode`, and that inverts the dependency
+  direction.** Fux imports the fetcher and the fetcher used to import nothing of
+  fux — which is what made *"it is your code"* literally true. A shipped fetcher
+  now carries `from fux.decode.htmldoc import …`, so **a consumer's committed
+  file depends on fux's internal module layout**: renaming `htmldoc` breaks every
+  copy in every consumer repo, and those copies are files fux has promised never
+  to rewrite. The `.py.txt` extension still keeps the template un-importable, so
+  nothing about L4 changes; what changed is that `fux.decode.htmldoc` is
+  **public surface in practice** even though nothing declares it so. **Weigh
+  that before renaming anything under `decode/`.**
+- **Conversion left the fetchers entirely.** Both templates used to hold their
+  own copy of the HTML→Markdown pass — **four hand-maintained copies of one
+  converter**, and the templates are what `fux setup` writes into every new
+  consumer's repo, so the duplication was **shipped**. `http.py`'s own docstring
+  had stated the consequence as a rule nothing enforced: *both fetchers must
+  produce the same markdown from the same bytes, or which fetcher retrieved a
+  document would change the committed index*. **That is L3 written as a coding
+  convention**; decision 2's byte return makes it structural instead.
+- **Renaming the key is a breaking change for anyone with a `[sources.url]`
+  block**, and decision 7 makes it a stopped run with instructions rather than a
+  silent wrong fetch.
 - **Fetchers are not linted.** They live in a dotdir, and ruff skips those by
-  default. Accepted, and inherited from
-  [ADR-DOTFUX](0003_fux-directory.md) decision 7 — it is consumer code, not a
-  fux CI target.
-- **Decision 4 is now a constraint on W-50.** The chained-fetcher option is not
+  default. Accepted — it is consumer code, not a fux CI target.
+- **Decision 4 constrains any future fetcher work.** A chained fetcher is not
   merely disfavoured, it contradicts an accepted record; taking it means
   superseding this one, not amending it.
-
-> **Amended 2026-08-26 (W-82 §3.3) — an optional module constant, and it is not
-> a fifth function.**
->
-> A fetcher module may declare `MAX_PARALLEL = n`. **Absent the declaration the
-> value is 1**, and behaviour is byte-for-byte what shipped before. Fux uses
-> `min(declared, configured)` workers.
->
-> ⚠ **Amended 2026-08-26 (W-83): a declaration is a CEILING on what a consumer
-> may ask for, never a FLOOR on what fux will do unasked.** When the consumer
-> has configured nothing, fux uses `min(declared, 4)` — see
-> [ADR-CONFIG](0014_config.md)'s W-83 amendment for why. `MAX_PARALLEL` answers
-> *what is safe*; it was never a claim about what the consumer's host can
-> absorb, and reading it as one is how `http.py`'s honest `8` became eight live
-> connections to a wiki nobody asked about. Fetcher authors: **declare the
-> truth about your module and nothing about politeness** — the second half is
-> the consumer's to say, in `fux.toml`.
->
-> This is **decision 5's own principle — *declared, never detected* — applied to
-> a second property**, and it is deliberately a *constant* rather than a
-> function: the four-function contract has survived two callers unchanged, and
-> a capability flag is not a capability.
->
-> ⚠ **Why a blanket pool was refused, and it is not "it crashes".** The shipped
-> `cdp.py` sets a module-global `_session` holding **one WebSocket** that every
-> `fetch()` reuses. Two threads writing frames onto it produce **plausible
-> documents attributed to the wrong URLs** — which lands in the committed index,
-> **passes every determinism check**, and is found only by a human reading an
-> answer. `http.py` builds a fresh request per call and is safe. A blanket pool
-> would have been correct for the fetcher most consumers use and silently
-> corrupting for the one the enterprise design point exists to serve.
->
-> **`connect()` / `close()` stay once per group, never once per worker.** Only
-> `fetch` runs concurrently, so a fetcher declaring `MAX_PARALLEL > 1` is
-> declaring exactly *my `fetch` is reentrant given one `connect`*.
->
-> **The finding that made this cheap: sequential fetching is not what makes the
-> index deterministic — the trailing sort is.** `fetch_all` ends
-> `fetched.sort(...)` / `skipped.sort(...)`, so completion order never reaches a
-> committed byte. **Concurrency inside that function is invisible to L3.**
-> `concurrent.futures` is stdlib, so **L1 is untouched** — this is the first
-> threading anywhere in `src/fux/`, and the novelty is the argument, not the
-> import.
->
-> **Per-URL error isolation stays in fux**, which is why an optional
-> `fetch_many` was rejected: a raising `fetch` becomes one `Skipped` and the
-> batch continues — [ADR-URL-INGEST](0008_url-ingest.md) decision 4 in code —
-> and under `fetch_many` every fetcher author would have to reimplement that
-> correctly, and most would not.
->
-> **The shipped `cdp.py` declares `1` explicitly rather than omitting it.**
-> Omission and `1` behave identically; the explicit line is where the *reason*
-> gets written for the consumer who copies the file and starts editing it.
-> `http.py` declares `8`: if the safe fetcher does not opt in, the mechanism
-> ships dead.
->
-> ⚠ **One test is owed that no manual checking substitutes for**, and it exists:
-> a fetcher declaring `1` is **observed** never to have two `fetch` calls in
-> flight, via a counter inside a test fetcher — with a control arm proving a
-> fetcher declaring more genuinely does run concurrently, so a pool that never
-> parallelised could not pass by doing nothing.
 
 ### Alternatives considered
 
@@ -294,27 +339,36 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
 - **"adapter"** — the tempting one, because the surrounding prose already says
   "the adapter cap". Rejected: [ADR-RECORD](0010_index-record.md) defines `src`
   as *which adapter owns this document*, meaning the in-core source type. One
-  word, two referents, in adjacent code — the `extracted`/`INFERRED` collision
-  again.
+  word, two referents, in adjacent code.
 - **"driver"** — accurate, but carries hardware and database connotations that
   make a reader look for a registry and a lifecycle that do not exist.
 - **"provider", "backend", "plugin"** — respectively vague, already meaning
   storage, and implying a discovered set of many optional things. Here there is
   one file, named by path, required for the feature to work at all.
+- **`fetch(url) -> str`, returning markdown.** Rejected under decision 2: it
+  made every fetcher do two jobs, put the *"both fetchers must agree"* rule in a
+  docstring where nothing could enforce it, and made a URL serving a PDF
+  unindexable.
+- **An optional `fetch_many`.** Rejected under decision 10.
+- **A blanket thread pool over `fetch`.** Rejected under decision 9, on the
+  shipped `cdp.py`'s single shared WebSocket.
 - **Renaming later.** Rejected on the same reasoning that ratified `mode`: the
-  key and the directory path are in every consumer's committed repo, so the
-  cost of the rename is zero now and strictly increasing.
+  key and the directory path are in every consumer's committed repo, so the cost
+  of the rename only rises.
 
 ### Reference (required)
 
-- Fux's half of the contract — [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py):
-  `load_fetcher`, `configure_fetcher`, `fetch_all`.
-- The retired-key error — [`src/fux/config.py`](../../src/fux/config.py), and
-  the pattern it follows, [ADR-CONFIG](0014_config.md) decision 7.
-- A real fetcher implementing the contract —
-  [ADR-CDP-FETCHER](0020_cdp-fetcher.md), [`.fux/fetchers/cdp.py`](../../.fux/fetchers/cdp.py).
-- The behaviour around the contract — [ADR-URL-INGEST](0008_url-ingest.md)
-  decisions 3, 4, 6 and 8, captured in
+- Fux's half of the contract —
+  [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py):
+  `load_fetcher`, `configure_fetcher`, `resolve_parallel`, `fetch_all`.
+- The shipped templates —
+  [`src/fux/templates/`](../../src/fux/templates/), `http.py.txt` and
+  `cdp.py.txt`; a real fetcher implementing the contract —
+  [`.fux/fetchers/cdp.py`](../../.fux/fetchers/cdp.py) and
+  [ADR-CDP-FETCHER](0020_cdp-fetcher.md).
+- The retired-key error — [`src/fux/config.py`](../../src/fux/config.py).
+- The behaviour around the contract — [ADR-URL-INGEST](0008_url-ingest.md),
+  captured in
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6.
 - Prior art for per-request opt-in with **no** automatic fallback —
   `scrapy-playwright`: https://github.com/scrapy-plugins/scrapy-playwright
@@ -324,6 +378,15 @@ otherwise leak: a `cdp_port` in fux's schema is fux knowing about Chrome.
 **Reopen this decision if** more than one fetcher ever runs for a single URL —
 a chain, a fallback, a wrapper — because at that moment the thing composes and
 decision 3's argument against "middleware" collapses.
+
+**Or if either half of decision 11 regresses:**
+
+- **A skip reason is built from the content type rather than from
+  `decode.reason()`.** The message goes back to asserting a decoder is missing
+  when one ran.
+- **`decode()` or `claims()` is called from this module without `root`.** A
+  consumer decoder silently stops applying to URLs, and every test still
+  passes because the built-ins cover the common types.
 
 **How to check it:**
 
@@ -338,8 +401,21 @@ grep -rn "urllib\|http.client\|socket\|requests" src/fux/ --include=*.py
 
 # 3. the retired key still stops the run
 grep -c 'middleware' src/fux/config.py
-# expect: 3 — the guard and its message, nothing else
+# expect: the guard and its message, nothing else
+
+# 4. the shipped templates are still un-importable package data
+ls src/fux/templates/*.py 2>/dev/null
+# expect: no output — a `.py` here could be imported, which is decision 6's point
+
+# 5. decision 11: the registry is asked with `root`, so consumer decoders apply
+grep -n "decode_mod\.\(decode\|claims\)" src/fux/ingest/urlsrc.py
+# expect: every call passes `root` as its last argument
+
+# 6. decision 11: no skip reason is assembled from the content type
+grep -n "no decoder for {content_type" src/fux/ingest/urlsrc.py
+# expect: exactly one — the branch where NOTHING claims the type
 ```
+
 ---
 
 ## References
@@ -353,13 +429,16 @@ evidence.*
 [ADR-URL-INGEST](0008_url-ingest.md) · [ADR-RECORD](0010_index-record.md) ·
 [ADR-CONFIG](0014_config.md) · [ADR-EXTRACTED](0016_extracted-mode.md) ·
 [ADR-URL-LIST](0018_url-list.md) · [ADR-CDP-FETCHER](0020_cdp-fetcher.md) ·
-[ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-REFER](0030_refer-plane.md)
+[ADR-HTTP-FETCHER](0021_http-fetcher.md) · [ADR-REFER](0030_refer-plane.md) ·
+[ADR-DECODE](0042_decode.md)
 
 **Code**
 
 - [`.fux/fetchers/cdp.py`](../../.fux/fetchers/cdp.py)
 - [`src/fux/config.py`](../../src/fux/config.py)
 - [`src/fux/ingest/urlsrc.py`](../../src/fux/ingest/urlsrc.py)
+- [`src/fux/templates/`](../../src/fux/templates/)
+- [`tests/ingest/test_url_parallel.py`](../../tests/ingest/test_url_parallel.py)
 
 **Measured evidence**
 

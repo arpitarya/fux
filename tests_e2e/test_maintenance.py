@@ -134,24 +134,49 @@ def test_uninstall_leaves_a_foreign_hook_alone(tmp_path):
     assert not (tmp_path / ".git" / "hooks" / "post-merge").exists()
 
 
-def test_the_post_commit_hook_reindexes_after_a_commit(tmp_path):
-    """The lag is one commit, and the hook says so rather than hiding it."""
-    make_repo(tmp_path, hooks=True)
-    env = dict(os.environ, PATH=f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}")
-
-    (tmp_path / "docs" / "new.md").write_text(doc("brandnewterm"), encoding="utf-8")
-    git(tmp_path, "add", "-A")
-    committed = subprocess.run(
-        ["git", "commit", "-m", "add new"], cwd=tmp_path, capture_output=True, text=True, env=env
-    )
-    assert committed.returncode == 0, "a hook must never block a commit"
-
-    found = fux(tmp_path, "find", "brandnewterm", "--json").stdout
-    assert "new.md" in found, "post-commit should have re-indexed the committed tree"
-
-
 def _hook_env() -> dict:
     return dict(os.environ, PATH=f"{Path(sys.executable).parent}{os.pathsep}{os.environ['PATH']}")
+
+
+def test_the_hook_environment_can_actually_find_fux(tmp_path):
+    """The guard on every hook-driven test below — **a job that forgot the
+    editable install must SAY so, not report green.**
+
+    The hook's first line is `command -v fux >/dev/null 2>&1 || exit 0`, so with
+    no `fux` on `PATH` it exits successfully having done nothing. Any test whose
+    only assertion is *"the commit succeeded"* passes on that, proving only that
+    a no-op is a no-op.
+
+    ⚠ **The scale of this was overstated and is corrected here by
+    measurement.** `work/OPEN-WORK.md` recorded *"four hook tests go green-by-
+    vacuity without `fux` on `PATH`"*. Re-running this file on 2026-08-27 with
+    `PATH=/usr/bin:/bin` (git present, fux absent) gives **4 failed, 9 passed**:
+    the four post-commit re-index tests assert a term is findable afterwards and
+    fail hard. Exactly **one** test passed vacuously —
+    `test_nothing_fux_spawned_outlives_its_own_run`, whose subject is the
+    ABSENCE of a resident process, and which no `fux`-absent run can distinguish
+    from success.
+
+    That one is unfixable in isolation — the assertion is about nothing being
+    there — so the guard belongs at the environment, where it covers the whole
+    class including tests nobody has written yet.
+    """
+    which = subprocess.run(
+        ["sh", "-c", "command -v fux"], env=_hook_env(), capture_output=True, text=True
+    )
+    assert which.returncode == 0, (
+        "`fux` is not on PATH inside the hook environment, so every hook in this "
+        "file exits at its first line having done nothing. Install the package "
+        "editable (`uv sync --extra dev`) before trusting a green run here."
+    )
+    version = subprocess.run(
+        ["sh", "-c", "fux --version"], env=_hook_env(), capture_output=True, text=True
+    )
+    assert version.returncode == 0, (
+        "`command -v fux` resolves but `fux --version` fails — a shim or a stale "
+        f"entry, which is WORSE than absent: {version.stderr.strip()!r}. The hook "
+        "would pass its guard and then fail silently into `|| exit 0`."
+    )
 
 
 def _drain(root: Path, timeout: float = 120.0) -> bool:
@@ -172,7 +197,21 @@ def _drain(root: Path, timeout: float = 120.0) -> bool:
 def test_post_commit_defers_and_a_detached_runner_drains_the_list(tmp_path):
     """W-66 Phase 2, through the real hook, real git, and a real detached
     process. The commit returns before the re-index has happened — that is
-    the whole of the fork's ruling — and the runner finishes it afterwards."""
+    the whole of the fork's ruling — and the runner finishes it afterwards.
+
+    **This absorbed `test_the_post_commit_hook_reindexes_after_a_commit` on
+    2026-08-27** (Arpit's call). The two had converged on the same corpus, the
+    same commit and the same assertion: the deleted one was written when
+    `post-commit` re-indexed **inline**, and once the fork resolved to deferral
+    its subject stopped existing. What it uniquely asserted — that a hook never
+    blocks a commit — is asserted here, and separately in
+    `test_a_hook_never_blocks_a_commit_even_when_fux_is_absent`.
+
+    ⚠ **The deleted test also raced from 2026-08-22 to 2026-08-27**, reading the
+    index on the line after a commit that now returns before the work is done.
+    It failed about one run in three on a loaded machine — the shape a flake
+    takes before anyone calls it one. `_drain` is the fix, and it is used below.
+    """
     make_repo(tmp_path, hooks=True)
 
     (tmp_path / "docs" / "new.md").write_text(doc("dirtylistterm"), encoding="utf-8")
@@ -267,6 +306,18 @@ def test_nothing_fux_spawned_outlives_its_own_run(tmp_path):
     )
     assert _drain(tmp_path)
 
+    # ⚠ **The positive control.** Everything below is an assertion that
+    # something is ABSENT, which a run where the hook never fired satisfies
+    # perfectly. Measured 2026-08-27: with `PATH=/usr/bin:/bin` this test was
+    # the ONLY one in the file that passed with `fux` unreachable. So prove the
+    # work HAPPENED first -- then "nothing resident remains" means something.
+    indexed = fux(tmp_path, "find", "residentterm", "--json").stdout
+    assert "resident.md" in indexed, (
+        "the hook never re-indexed, so this test is about to assert that a "
+        "runner which never started is not running -- see "
+        "test_the_hook_environment_can_actually_find_fux"
+    )
+
     state = json.loads(fux(tmp_path, "doctor", "--json").stdout)["runner"]
     assert state["running"] is False
     assert state["lock"] == "free", "the runner exited without releasing its lock"
@@ -313,7 +364,14 @@ def test_doctor_reports_a_stale_lock_without_clearing_it(tmp_path):
     make_repo(tmp_path, hooks=False)
     dead = subprocess.Popen([sys.executable, "-c", "pass"])
     dead.wait()
-    lock = tmp_path / ".fux" / "runtime" / "runner.lock"
+    # ⚠ Was the literal `"runner.lock"`, which stopped naming a real file on
+    # 2026-08-26 when W-86 P6 renamed it to `write.lock` — every command that
+    # writes the committed index holds it now, not just the runner. The test
+    # kept passing its own fabricated path to itself and asserting doctor saw
+    # nothing wrong, which was true and meaningless. Imported, never spelled.
+    from fux.maintain.runner import LOCK_NAME
+
+    lock = tmp_path / ".fux" / "runtime" / LOCK_NAME
     lock.parent.mkdir(parents=True, exist_ok=True)
     lock.write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
     before = lock.read_bytes()

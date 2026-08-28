@@ -1,8 +1,1 @@
-{
-  "decision": "PROCEED",
-  "reason": "Resolved 2026-08-22 (Cowork session): Arpit ruled SS4's staleness is NOT in scope for a rewrite -- the-fux-index-paper.md SS4 stays as historical/architectural description of the superseded MST keyspace. W-26 has no remaining boxes; nothing pending.",
-  "questions": [],
-  "safe_alternative": "",
-  "surfaced": true,
-  "filed": "2026-08-22"
-}
+{"decision":"ASK","reason":"The resolution floor is ruled (Arpit, 2026-08-28: adopted, plus per-query recording) and applied across CLAUDE.md, ADR-RS, OPEN-WORK and the regression store in this change. Three questions from the original filing are not touched by that ruling and remain open.","questions":["A BLIND AUTHOR for the `unanswerable` class. This session has read the goldens, the decoys and per-query scores across four runs -- anything it wrote would be informed by construction. The 15 decoys are a CONTROL, not that class; using them would launder informed material into a blind slot.","`recall@k` annotation, same problem in reverse: marking documents relevant after seeing what ranks well fits the metric to the system it judges. The annotation must precede the scores.","Two things built today are recorded as NOT PROVEN rather than done: all three quality controls exist but none has been used in a run that adjudicates anything, and `validate()` reaches existing repos only when they copy the fetcher in (measured: 0 of 7 tokens until http.py was replaced by hand)."],"safe_alternative":"","surfaced":true,"filed":"2026-08-28","rederived":"2026-08-28 (Claude Code, local macOS shell + network: tests/ 2248 passed / 1 skipped. Committing and merging work/2026-08-27-queue-clearing to main per Arpit's instruction.)"}

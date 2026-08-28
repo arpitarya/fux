@@ -21,6 +21,858 @@ Rules:
 
 ---
 
+## Wave 5 — one input measured, two that need a different author (2026-08-28)
+
+### 🔴 The resolution floor admits coin flips
+
+**`CLAUDE.md` called it a placeholder, and it was worse than provisional.**
+
+Two arms graded on the **same** queries is a **paired** comparison: only the
+queries that **flip** carry information. McNemar's exact binomial gives the bar,
+and it is **arithmetic — there is no corpus in it to have been contaminated by.**
+
+| queries that flipped | net needed at α = 0.05 |
+|---:|---:|
+| 2 · 4 | **impossible** |
+| 6 – 12 | **8** |
+| 20 | **10** |
+| 50 | **16** |
+
+**At a net of 2 — the current bar — the p-value is never below 0.68.**
+
+⚠ **And the rule is the wrong SHAPE, not just the wrong number.** *"±2 on a
+50-query set"* implies the bar tracks the set size; it tracks the **flips**.
+**Replacing `2` with `8` would be a better wrong answer.**
+
+**The cheapest fix is a reporting change: a run must state its discordant
+count** — and no run this project has filed does, so **no paired result on
+record can be tested from what was filed.**
+
+⚠ **Named and re-judged by nothing:** the reranker's `28 → 32` is a net of 4 and
+clears α only if exactly 4 flipped and all went one way. **The losses are
+one-sided** — a *"no detected change"* under a loose bar stays true under a
+strict one, so the exposure is entirely on claims of **improvement**.
+**NOT ADOPTED**: it changes how filed results read.
+
+### Two inputs this session may not author
+
+- **The `unanswerable` class.** It must be authored **blind**, and this session
+  has read the goldens, the decoys and per-query scores across four runs.
+  **Anything it wrote would be informed by construction.** ⚠ **The 15 decoys are
+  not this class** — using them would launder informed material into a blind
+  slot.
+- **`recall@k` annotation.** Marking which documents are relevant *after* seeing
+  which ones rank well is how a metric gets fitted to the system it judges.
+  **The annotation must precede the scores, and here it no longer can.**
+
+**Both are recorded as needing a different author rather than left looking
+undone.**
+
+### Verified
+
+`tests/` **2 248 passed, 1 skipped**. Record: ADR-RS decision 19.
+
+
+## Wave 4 — the fetcher contract gains its fifth function (2026-08-28)
+
+**Two calls, both built and both verified against real servers.**
+
+### `validate()` — fork 3
+
+`validate(url) -> str | None`, optional, with the shipped `http.py` implementing
+it (a `HEAD` for `ETag`, falling back to `Last-Modified`) — which is the clean
+test that a fifth function is not dead weight.
+
+⚠ **The invariant is the design: a changed token must NEVER mean a changed
+record.** Unchanged token → skip the body, the *only* thing `validate` may do.
+Changed, `None`, or raising → fetch, and **still compare the sanitized sha**. So
+a chatty `ETag` costs a wasted fetch and **cannot churn a shard**; byte
+determinism is untouched **by construction**.
+
+**Verified live:** 3 of 7 real URLs skip their body fetch, while
+`Special:Random` — whose token rotates on every request — is re-fetched every
+run. **That is the invariant working, observed rather than asserted.**
+
+⚠ **It reaches existing repos only when they copy the fetcher in.** `fux setup`
+is write-if-missing and never rewrites a consumer's file — the freeze ADR-DOTFUX
+decision 6 names. **Measured:** a repo created before this change learned **0 of
+7** tokens until its `http.py` was replaced by hand.
+
+**`fux update` prints the count**, because an optimisation that fails silently
+in the safe direction looks identical to one that never ran.
+
+### `token_sha` — fork 4
+
+**`sha256(token)`, never the token.** An `ETag` can be a content hash, a version
+counter or an internal object id, and `url-state.json` — gitignored — is exactly
+the kind of local state that reaches a support bundle. **L5 is untouched by
+construction, not by policy.**
+
+🔴 **It was declared, written, and NOT READ BACK for its first hour.**
+`validate()` learned a token every run and matched none, so the optimisation did
+nothing **while every test passed**. **`state.schema.json`'s own header predicts
+this in as many words** — *"add a field and you must remember to teach the reader
+about it, or it is silently dropped on the next read"* — and I walked into it
+anyway. Now gated by a round-trip test that walks the **declared** shape, so the
+next field is covered without editing the test.
+
+### URLs reach the enrichment queue
+
+An unreadable file went to `.fux/enrich/queue.tsv`; an unreadable URL went
+nowhere. Same `doc_id` convention, one sorted queue.
+
+⚠ **A fetch failure is NOT queued**, and that earns a third skip kind:
+`UNFETCHED` means the bytes never arrived, and **no amount of model time
+discharges a 404**. `queue.tsv` is committed, so queueing one would put a
+permanent work item in front of the whole team. **Verified live** — a real 404
+and a real 429 stay out; `jsondoc: nothing readable in .json` goes in, beside
+its file-path sibling.
+
+### Verified
+
+`tests/` **2 244 passed, 1 skipped** · `tests_e2e/` **73 passed**. Records:
+ADR-FETCHER 12, ADR-MAINTENANCE 13, ADR-INGEST 16, ADR-CLI 11.
+
+
+## Wave 3 — a signal worth publishing, a threshold that is not, and the last owed control (2026-08-28)
+
+**Two calls. One shipped as ruled; one shipped half, because measuring it
+produced a fact the ruling did not have.**
+
+### `doc_coverage` — the signal ships, the gate is held
+
+Arpit ruled *"add per-document coverage alongside, and let `grounded` require
+both."* The field is computed, published and declared. **The gate is off.**
+
+- **Derived in `rank()`, handed out through `stats_out`** — the seam
+  ADR-CONFIDENCE already owns. Both scoring paths reach `rank()` with the same
+  record dicts, so **the accelerator and the scan cannot disagree** and the
+  differential law is untouched *by construction*, not by test.
+- **`coverage` is unchanged**, so no consumer's reading of it moved.
+
+🔴 **Why the gate is off, measured** ([run](regression/2026-08-28-doc-coverage/report.md)):
+
+| population | n | min | median | max |
+|---|---:|---:|---:|---:|
+| real goldens reaching the clause | 37 | **0.401** | 0.882 | 1.000 |
+| decoys reaching it | **1** | **0.710** | — | 0.710 |
+
+**The decoy sits inside the goldens' range**, so no floor separates them, and a
+floor of `1.0` — which *reads* structural — demotes **19 of 50** correct
+answers. Picking a number from a 65-query table with no gap in it is **R10's
+failure in a different costume**, and R10 is `INCONCLUSIVE` on this repo right
+now for exactly that.
+
+⚠ **And the original finding was smaller than it read: 14 of 15 decoys never
+reach the clause**, being `partial` via `missing` already. The scattered-terms
+case is **one query in fifteen**. The module now **reports** it instead of
+claiming to catch it — an agent sees `doc_coverage: 0.42` beside
+`band: grounded` and can act.
+
+**The gating question went back to Arpit** rather than being resolved either
+way. Shipping the expensive gate silently, or dropping his ruling silently,
+would both have been a decision nobody made.
+
+### The sealed subset — ADR-RS decision 15 loses `NOT BUILT`
+
+Ruled: **seal 15 of 50, grow the set later.** Split by `sha256(id)` —
+deterministic, seedless, **order-independent**, so re-sorting the goldens cannot
+change the cut. Growing the corpus is a **reseal**, not an append.
+
+**The power tension is resolved out loud, as decision 15 demanded:** 35 visible
+and 15 sealed are **both underpowered and that is accepted rather than hidden.**
+The ±2-query floor does not loosen because a set shrank — it gets *harder to
+clear*. **Sealing buys a claim about contamination; it buys no precision.**
+
+🔴 **5 of the 9 `known_failure` goldens landed in the sealed half** — 33 % vs
+11 %. **Not corrected, because correcting it would be the bug**: balancing by
+difficulty means reading the scores, which is the contamination the seal
+prevents. A sealed score is **not comparable to a visible score** at this size.
+
+⚠ **BUILT IS NOT PROVEN.** None of the three controls has been used in a run
+that adjudicates anything.
+
+### Verified
+
+`tests/` **2 232 passed, 1 skipped** · `tests_e2e/` **73 passed** · playground
+**`pass 41 · xfail 9`, PASS** — ranking is untouched, which it must be: the band
+is computed from `rank()`'s output and nothing feeds back.
+
+
+## Wave 2 — the daemon chain, in the order the ruling required (2026-08-28)
+
+**Two calls, and the order was the point.** Ruling 3's own text says narrow and
+the clock *"must land together or the tail silently stops being refreshed at
+all"* — so observability shipped first, and narrowing second.
+
+### The sweep status carries a reason and counts
+
+`_sweep` returned a bare string. It now returns `outcome` plus what explains it,
+and **`daemon.status` is declared in `state.schema.json`, which it never was.**
+
+- **Both halves of the old shape cost something.** A `FuxError` about
+  `max_parallel` and a dead network were the same `"failed"`; and ⚠ **an `"ok"`
+  sweep could skip URLs silently** — `outcome: "ok"` with `skipped: 2` is a state
+  the old shape could not express.
+- **Verified live** against the lab repo that really skips:
+  `{"fetched":2,"outcome":"ok","reason":"3 skipped, first: fetch failed: HTTPError:
+  HTTP Error 404: Not Found","skipped":3}`, and `fux doctor`:
+  **`[WARN] url daemon: … the last sweep reported ok but did not index 3
+  document(s)`** — the exact case that was invisible the day before.
+- **`reason` explains something or is absent**, never an empty string; bounded at
+  300 characters; carries the **first** skip, not a list, because a file rewritten
+  every sweep may not grow without someone deciding it should.
+- **A daemon that never ran is not a doctor finding** — a check that fires for
+  every repo is one people learn to skip.
+
+### `fux update` is narrow by default
+
+`fux update` refreshes the dirty list; **`fux update --all`** forces the full
+sweep. No `--dirty`/`--stale`/`--changed` flag, per the ruling.
+
+🔴 **The hazard that nearly shipped, and the reason to read a tolerance before
+relying on it.** `dirty.read` collapses missing-and-unreadable to `[]` **on
+purpose**, because it feeds reporting paths where *"cannot tell"* should degrade
+quietly. Under narrow-by-default, **empty means fetch nothing** — so a repo that
+never ran the hook, or whose `.fux/runtime/` was wiped, would have `fux update`
+become a **silent no-op**. That is precisely the failure ruling 3 warns about,
+arriving through a file's tolerance rather than through the ruling.
+
+**`dirty.is_readable` draws the distinction: list absent ⇒ sweep everything; list
+present and empty ⇒ fetch nothing.** Fail safe, not fail silent.
+
+**All four paths verified live:**
+
+| state | result |
+|---|---|
+| dirty list absent | `fetching 7 listed URL(s) (network) — no dirty list yet` |
+| present, empty | `nothing to fetch — 0 known stale` |
+| one stale URL | `fetching 1 of 7 … — 1 known stale. \`fux update --all\` fetches every one` |
+| `--all` | `fetching 7 listed URL(s) (network) — \`--all\`` |
+
+⚠ **A dirty URL no longer in the source list is not fetched** — the list is
+advisory and outlives edits to the source list.
+
+⚠ **The residual risk, stated rather than closed:** a repo running no daemon,
+whose URLs change without any commit, now re-fetches only on `--all`. That is
+the trade ruling 3 makes, and ruling 10 is what covers it. **Proxy and SSO
+remain uncovered.**
+
+### Verified
+
+`tests/` **2 217 passed, 1 skipped** · `tests_e2e/` **73 passed** (74 minus the
+duplicate deleted in wave 1). Records: ADR-MAINTENANCE 12, ADR-URL-INGEST 8,
+ADR-CLI, ADR-DOTFUX, ADR-OUTPUT.
+
+
+## Wave 1 — four calls made, and the smallest one was the largest (2026-08-27)
+
+**Arpit ruled four independent blockers in one pass.** Three were minutes; one
+turned out to be four defects wearing one name.
+
+### `L8` — ratified as reverted
+
+Shown the live text and confirmed. ADR-LAWS decision 8 now records the
+ratification, and records what it does **not** do: the AOL-2006 grounding stays
+**OVERRIDDEN, NOT REFUTED**, the risk is accepted, and the mitigation is
+confinement alone. ⚠ **Nothing mechanical checks a law's wording** — the §1
+handle sat on the withdrawn form in four live documents for hours and no test
+noticed.
+
+### The shadowed-submodule trap — FOUR sites, not one
+
+The queue described one instance in `fux.ingest`. **A scan of every package
+found four**, and the `ingest` one had already been fixed:
+
+| package | shadowed | |
+|---|---|---|
+| `fux.derive` | `build` | ✅ fixed |
+| `fux.refer` | `assemble`, `chunk`, `rescore` | ✅ fixed |
+| `fux.ingest` | `run` | already aliased by a prior session |
+
+**The module was renamed, not the function** — `assemble.py` → `_assemble.py`.
+The function is the API and the module is implementation; the underscore says
+what was already true and **no caller changed**, where renaming the export would
+have touched roughly thirty sites for the same result.
+
+🔴 **What the shadow had already cost, unnoticed:**
+`tests/refer/test_refer_plane.py` fed **three functions** to `inspect.getsource`
+believing it was scanning three modules for `urllib`/`socket` imports.
+**L4's network import fence had silently stopped covering three files — 552
+lines — and nothing failed**, because `getsource` works on a function too. The
+fence is repaired and now reads the modules.
+
+**Gated** by `tests/test_no_shadowed_submodules.py`, which walks every package
+under `src/fux/` and carries a companion test proving it can see a planted
+shadow — this repo has recorded vacuous passes before.
+
+### The nine playground goldens — annotated, each with a verified reason
+
+`pass 41 · xfail 9`, matching the README at last. **Every reason was checked
+against the corpus rather than asserted**, and five of the nine turned out to be
+sharper than "the corpus does not cover it" — **the answer is present and
+plainly stated and the ranker puts something else first**:
+
+- `q028`/`q029` — the runbook **states its own duration** on its second line and
+  ranks 5.
+- `q012` — an **exact command match inside a code block** loses to three
+  documents that merely mention the word.
+- `q019` — **supersession is recorded and does not invert a currency question**:
+  the `status: superseded` ADR outranks the current one.
+- `q044` — a **rejected-alternative** section is the answer and loses to the
+  document about what was chosen.
+- ⚠ `q035` — **enrichment did not close it.** The enrichment says in as many
+  words that adding a retry makes an incident worse; the query is *"I added a
+  retry and things got worse"*. Still rank 2.
+
+⚠ **A marker lowers nothing.** `max_rank` is untouched, and a gap that closes
+reports `XPASS` and **fails** the run — which is why annotating was safe.
+
+### The duplicate post-commit test
+
+`test_the_post_commit_hook_reindexes_after_a_commit` deleted; the deferral test
+absorbed it and says so. The deleted one was written when `post-commit`
+re-indexed **inline**, and its subject stopped existing when the fork resolved to
+deferral. ⚠ It had also **raced since 2026-08-22**, failing about one run in
+three on a loaded machine.
+
+### Verified
+
+`tests/` **2 203 passed, 1 skipped** · `tests_e2e/` **74 passed** ·
+playground **41/50, PASS**.
+
+
+## P3 PASSED, W-82's forks re-derived to zero, and a decoy that caught fux believing itself (2026-08-27)
+
+**Evidence:** [P3](regression/2026-08-27-p3-sha-stability/VERDICT.md) ·
+[the decoy control](regression/2026-08-27-decoy-control/report.md) ·
+[`tools/quality-controls/`](../tools/quality-controls/README.md).
+
+### W-87 P3 — PASS, and fork 3's gate clears
+
+**19/19 = 100 %** of sanitized shas unchanged on an immediate re-fetch, against a
+frozen `≥ 80 %`. Corpus: 19 real external documentation URLs — RFCs, PEPs,
+`docs.python.org`, Wikipedia, a live status page — in a new lab environment.
+
+- **A control arm was run**, because a 100 % with none is the M1 failure: a
+  treatment that touched nothing, reported as a null effect. `Special:Random`
+  changed; the 19 did not. **The instrument detects change.**
+- **W-87 P4 is unblocked.** ⚠ **Cleared is not decided** — a fifth function on
+  the fetcher contract is still Arpit's, and ADR-FETCHER decision 3's argument
+  against composition is untouched by this number.
+- ⚠ **The spec named no INTERVAL.** At 12 s apart this measures **server-side
+  determinism** — do timestamps, ad slots, CSRF tokens break the sha for an
+  unchanged document? None of 19 did. It does **not** measure document churn,
+  which needs a new pre-registration with an interval in it.
+- ⚠ **ADR-RS decision 12's reopen trigger has FIRED** — its disclosure has now
+  been written four times, and its own text sets three as the trigger. Recorded,
+  **not acted on**: decision 12 is Arpit's and forbids a session narrowing it.
+
+### W-82 has ZERO open forks of its own
+
+Re-derived against the code and the ledger, not against the prose. **27 total ·
+18 ruled · 6 moved to W-87 (§5.2) · 2 moved to W-87 P4 (forks 3 and 4) · 1
+(§3.6 fork A) answered by the build rather than a ruling** — the `fux-usage`
+skill shipped for both vendors. Verified: `__main__.py` exists and
+`python -m fux --version` works (ruling 14); `copilot` is still in `install`
+(ruling 13).
+
+**What remains under W-82 is not a fork:** ruling 3, held on Arpit's judgement.
+
+### Two of ADR-RS decision 15's three controls, built
+
+`tools/quality-controls/` — owed since W-78 ruling 2, and the blocker on them
+(*"needs `fux-playground`, not on the build machine"*) **was false**.
+
+- **The content-free placebo.** Matched-length enrichment carrying no
+  information. ⚠ **One shared sentence pool, so every placebo has identical
+  vocabulary** — a placebo *about another topic* would still discriminate.
+  Deterministic from the source sha (L3, verified byte-identical), no model, and
+  it installs nothing. An early version always overshot the target length and
+  gave the arm a systematic **+8 %** bias — confounding length with content, the
+  one confound it removes.
+- **The decoy set.** Fifteen domain-plausible questions the corpus cannot answer.
+  ⚠ **The one kind of evaluation material an agent may author** — no correct
+  answer exists, so there is nothing to fit.
+- **The sealed subset is NOT built and ADR-RS decision 15 KEEPS `NOT BUILT`.** It
+  names three; two is not in force. And it is not mechanical — decision 15 itself
+  says sealing shrinks the visible set and the tension must be resolved, not
+  inherited.
+
+### 🔴 The decoys caught something on their first run
+
+**One of fifteen unanswerable questions is reported `grounded`.**
+
+*"What is the SLA we publish for the payments API"* → `coverage: 1.0`,
+`missing: []`, `separation: 0.58`, band **`grounded`**, citing the data-retention
+policy. **No document discusses it.**
+
+**The mechanism, verified term by term:** `coverage` and `missing` are
+**corpus-wide**. All four terms occur — in **four different documents** — so
+nothing is missing, both fact-based band clauses pass, and the band falls
+through to `separation`, which it clears.
+
+⚠ **That is the exact failure `confidence.py`'s docstring opens with.**
+⚠ **And no ruling on R10 catches it**: `0.58` is above the `0.5` R10's selection
+rule would have picked — worth knowing **before** R10 is ruled. It also suggests
+`separation` answers the wrong question: it measures **decisiveness**, and a
+corpus of near-misses is decisive about its best near-miss.
+
+**Named, not fixed.** Per-document coverage changes a declared signal,
+`output.schema.json`, the MCP result and every consumer — ADR-CONFIDENCE
+decision 12. **No test pins the current behaviour**, deliberately: pinning a
+defect is how it becomes the contract.
+
+### Verified
+
+`tests/` **2 192 passed, 1 skipped**. `tools/quality-controls/` claimed by ADR-RS
+in the ownership table and its `owns:` list, same change.
+
+
+## The daemon over the real internet, R10 measured, and a blocker that was never real (2026-08-27)
+
+**Arpit authorised the network run.** What it closed, and what it exposed:
+
+**Evidence:**
+[the real-URL daemon capture](regression/2026-08-27-daemon-real-url/report.md) ·
+[R10's verdict](regression/2026-08-27-r10-separation-floor/VERDICT.md).
+
+### The blocker that was never real
+
+`OPEN-WORK.md` §"Blocked on an environment that does not exist on the build
+machine" listed six items. **Both environments existed**, on this machine, the
+whole time — `~/my_programs/fux-lab` and `~/my_programs/fux-playground`, the
+latter still holding its 50 goldens. The section was written by sessions that
+had no shell and could not look.
+
+⚠ **Two of the six were not blocked at all** and one of them, R10, was the
+gate the confidence plane was waiting on.
+
+### The daemon, against real external URLs
+
+A new lab environment (`2026-08-27-daemon-real-url`) with seven real URLs.
+
+| clause hands item 1 asked for | result |
+|---|---|
+| a detached process | ✅ pid reaped on `stop`, lock free |
+| a real clock | ✅ |
+| TLS · DNS · CDN | ✅ three hosts, two CDNs, ~500 KB |
+| a real `404` | ✅ recorded skip, prior record kept |
+| a real `429` | ✅ **first exercise ever** — `doctor`: `rate-limited by httpbin.org x8` |
+| a proxy · SSO | ❌ needs a corporate network |
+
+**The URL tail closed on a server nobody here controls:** a Wikipedia
+`Special:Random` article changed between sweeps (`16:51:55Z` *Laurence Bennett*
+→ `16:52:55Z` *Bargilt Iron Ore Mine*) and the daemon re-fetched, re-decoded and
+re-indexed it **unassisted**, one interval later.
+
+**W-82 ruling 3 is now held on a judgement, not on evidence.**
+
+### R10 — INCONCLUSIVE, and not for the expected reason
+
+The curve reaches `t = 0.75` at `separation 0.3`, **falls back to 0.60 at
+`0.4`**, then rises to 1.00.
+
+⚠ **The pre-registration froze two rules that disagree on exactly that shape** —
+its selection rule picks `0.5`; its verdict table's non-monotone row picks *no
+change*. **Handed to Arpit, not adjudicated.** `SEPARATION_FLOOR` stays `0.10`
+and **no test was edited**, because `tests/query/test_confidence.py` asserts the
+rule relative to the constant and never its value — a guard built for this
+moment, working.
+
+⚠ **Six queries sit at or above `0.5`**; the bin that first reaches `t` holds
+four; the top two bins are empty. **No reading supports a shipped constant.**
+Corrected for future runs in **ADR-RS decision 18**, never by editing the frozen
+file.
+
+### Three defects, all the same shape: a message that sends you nowhere
+
+1. **`no decoder for application/json`** on a URL — while `jsondoc` is built in,
+   claims `.json`, ran, and correctly dropped a bare UUID. The **file** path has
+   always used `decode.reason()`, whose docstring says conflating *"nothing
+   claims this"* with *"a decoder got nothing out"* would **make the queue
+   useless**. ADR-FETCHER decision 11.
+2. **Consumer decoders never reached URL content** — `decode()` called without
+   `root`, so ADR-DECODE's *"a consumer may bring a dependency fux may not"*
+   stopped at the network boundary. Found while fixing (1).
+3. **`shard missing/mismatched _format header`** — the message an **engine
+   upgrade** produces, and the least informative of `read_shard`'s three header
+   checks while its two siblings both name found-and-expected. It made all 50
+   playground goldens fail in a way that reads as corruption, with **no migrate
+   verb** and no hint that a re-ingest is the answer. ADR-INDEX-LIFECYCLE.
+
+**Four new tests** in `tests/ingest/test_urlsrc.py`, **two** in
+`tests/store/test_writer_reader.py`.
+
+### Named, not taken
+
+- **A URL that needs a model can never be queued for one** — the file path
+  writes `.fux/enrich/queue.tsv`, the URL path writes nothing
+  (`grep -c queue urlsrc.py` → `0`). `queue.tsv` is committed, so it is a scope
+  call.
+- **Nine playground goldens carry no `known_failure`**, so a full run reports
+  `FAIL — 9 of 50` against a README documenting *"41 pass · 9 xfail"*.
+  Annotating them turns a red gate green.
+- **Two `fux.toml` foot-guns**, both hit standing the environment up: appending
+  `[sources.url]` is a duplicate-table error, and adding a key at the top of the
+  existing table collides with `max_parallel` **25 lines below it**.
+
+### Verified
+
+`tests/` **2 183 passed, 1 skipped**. Playground restored and re-graded at
+**41/50**, unchanged from before the run.
+
+
+## The queue's backlog of moves, and five gates that were red (2026-08-27)
+
+**A session with a working shell cleared what four Cowork sessions could not.**
+The bridge had had no shell since 2026-08-26 (`device_bash` 5/5), so every item
+below had been *decided* for a day or more and was waiting on `git`.
+
+**Evidence:** `git log` for the moves;
+[the daemon-lifecycle capture](regression/2026-08-27-daemon-lifecycle/report.md)
+for the daemon; `uv run pytest -q tests` and `tests_e2e` for the gates.
+
+### The measured starting point contradicted the queue
+
+`OPEN-WORK.md` said **two** ADR tests were red. Locally, **twelve tests in five
+groups** were. The queue was not wrong about the two it named; it had never seen
+the other ten, because the sessions that filed it could not run the suite.
+
+| group | why | outcome |
+|---|---|---|
+| ADR ownership + register (4) | `docs/adr/0047_fuxignore.md` was a stray duplicate of `0048` | `git rm` |
+| doc links + registry (2) | five dead links, incl. two the register's own prose invented | repointed; the prose corrected |
+| regression runs (4) | R10's directory holds a frozen pre-registration and **no report**, which the per-run contract made illegal | **ADR-RS decision 17** |
+| tune specimen (1) | the matcher demanded `#key` on keys that Arpit's ruling had made **live lines** — *the test failed for the reason the change was made* | matcher fixed |
+| ADR freshness (1) | see below | **ADR-OWNERSHIP decision 9** |
+
+### The freshness gate convicted history and said in its docstring that it never would
+
+`tests/test_adr_freshness.py` **ran here for the first time** and flagged eight
+commits for not updating **ADR-CONFIDENCE**, **ADR-OUTPUT** and **ADR-RANKING**
+— records and relations written on 2026-08-27, judging commits from weeks
+earlier. The ownership table was read from the working tree.
+
+- **Third occurrence.** `docs/adr/RULE-SINCE` records the other two: the
+  ADR-CACHE carve-out (2026-08-21) and the register renumber (2026-08-22). Both
+  times the remedy was moving the baseline forward — **retiring 95 commits of
+  auditability to excuse a few.**
+- **Fixed at the source instead**, per the two-strikes rule: the register is
+  parsed **per commit** from `git show <sha>:docs/adr/README.md`. A row, a record
+  or a relation that did not exist then does not judge now.
+- **`RULE-SINCE` did not move**, and it now says so. A fourth entry means the fix
+  failed — ADR-OWNERSHIP veto 6.
+- **Three tests pin it**, one of them proving the gate *still bites*.
+
+### The daemon runs — proven by a positive control, not a status read
+
+The dead-sweep defect (`ingest_run.run` on a re-exported function, swallowed by
+the broad handler) was fixed but unproven, and its unit gate patches a mock —
+which cannot tell "the sweep called ingest" from "the sweep called the mock."
+
+Run against a local HTTP server: `start` → sweep in ~1 s → **a page edited at
+`15:11:21Z`, indexed by `15:12:04Z`, unassisted, one `sweep_minutes` later** →
+`stop` → pid reaped, `write.lock` free. The indexed term exists **only** in the
+fetched page and was absent beforehand.
+
+⚠ **The network was `127.0.0.1`.** No proxy, TLS, SSO, rate limit or DNS —
+**W-82 ruling 3's hold is NARROWED, not lifted**, and the recommendation is that
+it stays held until one real external URL has been swept. ADR-MAINTENANCE 9c-i.
+
+### A claim in the queue was wrong, and measurement is how that was found
+
+`OPEN-WORK.md`: *"Four hook tests go green-by-vacuity without `fux` on `PATH`."*
+Re-run with `PATH=/usr/bin:/bin` (git present, fux absent): **4 failed, 9
+passed.** The four post-commit tests assert a term is findable afterwards and
+fail hard. **Exactly one** passed vacuously —
+`test_nothing_fux_spawned_outlives_its_own_run`, whose every assertion is that
+something is ABSENT, which no `fux`-absent run can distinguish from success.
+It now carries a positive control, and
+`test_the_hook_environment_can_actually_find_fux` guards the whole class.
+
+### Moved, deleted and reconciled
+
+- **`git rm`**: `docs/adr/0047_fuxignore.md` (stray), `docs/adr/0017_enriched-mode.md`
+  (superseded by ADR-ENRICH; register row deleted, every live citation repointed).
+- **`git mv` to `archive/`**: `W-89`, `W-92`, `answer-provenance.md`,
+  `output-toml-is-the-only-default.md`, `tune-file-and-source-priority.md`,
+  `playground-goldens-draft.md` — six rows added to `archive/README.md`.
+- **The register's §"the number line is contiguous" note was FALSE** and
+  described a renumber that never ran and **must not** — it is the exact failure
+  W-82 ruling 7 forbids, and it pointed at `0025_runtime-manifest.md` and
+  `0042_locks.md`, **neither of which has ever existed**. `0017` and `0025` are
+  burned ordinals, and the note now says why a hole costs nothing.
+- **L8's one-line handle was stale in four live docs** — ADR-LAWS' §1 table,
+  `INTERVIEW.md`, this file, and `compare/README.md` all carried the form Arpit
+  **withdrew the same day he wrote it**. Reconciled to the live law. ⚠ **That is
+  a reconciliation, not a ratification**; the sanity-check is still Arpit's.
+
+### Verified
+
+| suite | result |
+|---|---|
+| `tests/` | **2 170 passed, 1 skipped** (was 2 158 passed / 12 failed) |
+| `tests_e2e/` | **74 passed, 1 skipped** — **macOS 15 / arm64 / CPython 3.14.2**, the second platform this suite has ever run on |
+
+⚠ **Windows is still unverified**, and `test_maintenance.py` — real git, real
+hooks, real detached processes — is the suite most likely to differ.
+
+
+## W-93 — the skip list moves into the committed `.fux/.fuxignore` (2026-08-27)
+
+**Built 2026-08-27 in two passes, and the first pass was wrong.**
+
+**Pass 1** read Arpit's *"the skipped files should get added into `.fuxignore`,
+not skipped"* as a diagnosis to check rather than an instruction. Checking was
+right and the conclusion was not: `gitdir.walk_sources` records an *ignored* file
+as skipped too, so materialising 599 paths would not have moved the count — and
+that is true, but it answered a question he had not asked. What shipped was the
+**count split** (decision 15), which was a real defect and beside his point.
+
+**Pass 2** shipped what he asked for, after two questions instead of a third
+inference. **Rulings (Arpit, 2026-08-27):** every ingest writes `.fuxignore` —
+not an opt-in command, not inferred patterns — and **everything** goes in,
+unreadable skips included.
+
+**Evidence:** [ADR-FUXIGNORE](../docs/adr/0048_fuxignore.md) decision 11 and
+11a–e; [ADR-INGEST](../docs/adr/0007_ingest.md) decisions 4 and 15, rewritten in
+place. `src/fux/ingest/fuxignore.py` (`Generated`, `write_blocks`, `writable`,
+`decide(hand_only=)`), `gitdir.py` (`would_index`, `_generated_kind`),
+`skipnotice.py` (rewritten: the record is `.fuxignore`, plus `stale_warnings`).
+**`tests/ingest` 316 passed.** No regression run, and none is owed — no
+threshold, bound or gate ships here.
+
+| shipped | where |
+|---|---|
+| two delimited blocks holding every unindexed path and why | `.fux/.fuxignore` |
+| the blocks are written **first**, so any hand-written line beats them | `fuxignore.write_blocks` |
+| the block a line sits in **is** its class | `BLOCK_NOT_INDEXED` / `BLOCK_SKIPPED` |
+| the note is the reason that put the line there, carried across runs | `Verdict.reason()` |
+| a hand-written pattern suppresses the lines it covers | `decide(hand_only=True)` |
+| a stderr warning when a frozen line stops being true | `skipnotice.stale_warnings` |
+| `.fux/runtime/skipped` deleted on every run | `skipnotice.legacy_path` |
+
+**On this repo: 599 skips → 342 generated lines**, because the hand-written
+`__pycache__/` and `*.py[cod]` collapse 257 of them.
+
+⚠ **The accepted cost, stated before it was chosen and not undone: a generated
+line DECIDES, so it freezes the verdict that produced it.** Widen
+`.fux/sources/types` and the listed `.py` files stay out; write content into a
+file listed as `empty` and it stays out. The escape hatches are a person's —
+delete the line, or write `!<path>` below the blocks. The freeze is made loud
+rather than removed.
+
+⚠ **Two real losses, recorded rather than worked around.** A URL has no
+repo-relative path, so a URL skip has nowhere to be recorded and **prints on
+every networked run** — W-88's report-once promise now covers files only, and
+repeat URL failure stays `url-state.json`'s job. And `fux ingest` now **writes
+one of its own inputs**, so a new skip dirties the working tree on the hook path;
+an unchanged run writes nothing, so steady state leaves `git status` quiet.
+
+**Rejected:** inferred patterns (six lines rather than 342) — an inferred pattern
+can over-reach onto a file the corpus does not have yet, and that failure is a
+document silently missing, which is what ADR-FUXIGNORE exists to abolish. The
+lever is left with the person instead.
+
+⚠ **Not verified by `git` or the full suite.** `device_bash` failed 5/5, so the
+build ran in the cloud container against a staged subset; `tests_e2e/` and the
+ADR meta-suite did not run.
+
+---
+
+## W-93 pass 1 — `fux ingest` counts what it did not index in two numbers (2026-08-27)
+
+**Built 2026-08-27, from one observation of Arpit's**: an ingest on this repo
+printed `599 skipped` and his read was that those files *"should get added into
+`.fuxignore`, not skipped"*.
+
+**The proposed remedy would not have worked, and the code is the reason.**
+`gitdir.walk_sources` records an *ignored* file as skipped too
+(`skipped[rel] = verdict.reason()`), so moving 599 paths into `.fuxignore` only
+changes the reason string — the count stays 599. Worse, per-file lines would
+freeze a **derived** verdict: `not an indexed file type` comes from the type
+allowlist, `.fuxignore` **outranks** the allowlist
+([ADR-FUXIGNORE](../docs/adr/0048_fuxignore.md) decision 4), so 274 frozen
+`.py` paths would silently survive the day a `.py` decoder or a `types` line
+lands. Same class as the stale-premise failure `BLOCKED.json` is the case for.
+
+**What the 599 actually were**, re-derived from `.fux/runtime/skipped`:
+
+| count | what | verdict |
+|---|---|---|
+| 257 | `.pyc` under `archive/**/__pycache__/` | git already ignores them; fux walks them |
+| 274 | `.py` under `archive/v0.1`, `archive/v0.26` | the allowlist working as designed |
+| ~67 | `.sh` 24 · `.svg` 12 · `.log` 8 · `.jsonl` 5 · `.diff` 4 · `.png` 3 · `.out` 3 · misc | ditto |
+| 1 | `binary` — a v0.26 test fixture | ditto |
+
+547 of the 599 sit under `archive/`, which is `archived=true` in
+`.fux/sources/dirs`.
+
+**So the count was the defect, not the files.** One number spanned two
+populations: *a committed list said no* and *fux could not read this*. Split
+them and 599 becomes **598 not indexed, 1 skipped** — with nothing moved, no
+rule changed and no byte touched.
+
+**Evidence:** [ADR-INGEST](../docs/adr/0007_ingest.md) decision 15;
+`src/fux/ingest/gitdir.py` (`POLICY` / `UNREADABLE`, `Skipped.kind`,
+`partition`), `skipnotice.py` (`label`), `ingest/__init__.py` (the summary).
+**14 new tests**, `tests/ingest` at **294 passed**. **No regression run, and
+none is owed** — this change ships no threshold, bound or gate, and measures
+nothing.
+
+| shipped | where |
+|---|---|
+| a skip carries its class, set at the point of the skip | `gitdir.Skipped.kind` |
+| the summary counts the two separately | `ingested … N not indexed, M skipped, …` |
+| the printed line uses the summary's own word | `not indexed <path>` / `skip <path>` |
+| `--list-skipped` and `.fux/runtime/skipped` **unchanged** — `path: reason`, sorted, unprefixed | the machine-readable twin things pipe |
+| `__pycache__/` and `*.py[cod]` stated in `.fux/.fuxignore` | intent in a committed file |
+
+⚠ **What the two `.fuxignore` lines do NOT do**, written down so nobody
+re-derives it: they do not reduce the count (an ignored file is still a skip,
+just a `POLICY` one) and they save no read (the allowlist already rejected
+those files before any byte was read; `.fuxignore` filters files, it does not
+prune the `rglob`). What they do is state the intent in a committed file and
+keep it true if the allowlist ever widens.
+
+⚠ **The open question this surfaced, deliberately not answered here:** fux's
+walker reads **no `.gitignore`** and has no built-in prune, so it enumerates
+257 untracked build artifacts on every run. Making `.fuxignore` prune the walk
+would be a real saving **and** would conflict with the reported-never-silently-
+dropped rule — an ignored directory's files would stop appearing in the skip
+list at all. That is a fork with a verdict owed, not a patch. **Arpit's.**
+
+⚠ **Not verified by `git` or by the full suite.** `device_bash` failed 5/5, so
+the build ran in the cloud container against a staged subset;
+`tests_e2e/` and the ADR meta-suite did not run here.
+
+---
+
+## W-91 — the provenance plane, and L8 reverted (2026-08-27)
+
+**Built 2026-08-27, in one session, on Arpit's instruction to implement all four
+phases and close out.** Fux now states **how the returned output got generated**
+— the third statement about an answer, after *what it used* (the citation) and
+*how much it believes it* ([ADR-CONFIDENCE](../docs/adr/0045_confidence.md)).
+
+**Evidence:** [ADR-PROVENANCE](../docs/adr/0046_provenance.md) (`proposed`);
+`src/fux/query/provenance.py`; `tests/query/test_provenance.py` — **29 tests
+green**, 121 green across the staged subset. **No regression run, and none is
+owed**: this change ships no threshold, bound or gate.
+
+| shipped | surface |
+|---|---|
+| the derivation — matched terms with committed per-field counts, the four gates, the cut line, rerank and tune deltas | `fux ask --why` |
+| the refer plane's own record, emitted at last | `fux answer --audit` |
+| a re-runnable receipt — index digest · tune digest · engine · question · cited shas, **no wall clock** | `fux answer --receipt` |
+| a local plaintext journal, **off by default** | `fux answer --journal` |
+| four-state verification, config checked before corpus | `fux verify <receipt> [--rerun]` |
+| three declared shapes | `query/output.schema.json` |
+
+**The law change.** L8 was written the morning of 2026-08-27 (W-89, the row
+below) and **reverted by Arpit the same afternoon**. Plaintext question *and*
+answer are legal; the size bound became a design default; stdout is permitted.
+**Committed paths and the network stay forbidden.** ⚠ The AOL-2006 grounding is
+recorded as **overridden, not refuted**.
+
+**Two defects in existing code, found and fixed here.** `fux answer --json` was
+validated on one of three branches while its own declaration claimed all three
+— W-84's defect class in a different file. And a receipt disagreed with its own
+answer about freshness for one run, caught by running the command rather than by
+a test.
+
+⚠ **Not verified whole.** `device_bash` failed 5/5, so the work ran in the cloud
+container against a staged subset. `tests_e2e/`, `test_adr_freshness.py` and
+`test_doc_links.py` were never staged. **Nothing was committed.**
+
+---
+
+## W-89 — L8: the first law about *use* rather than about the corpus (2026-08-27)
+
+**Ruled by Arpit, 2026-08-27.** W-89 asked whether **L2 reaches a query log**.
+Three shapes were on the table — stretch L2, write a new law, or leave it a
+product decision. **He chose the new law.**
+
+**Evidence:** [ADR-LAWS](../docs/adr/0001_laws.md) decision 8 and its table row;
+the normative text is in [`CLAUDE.md`](../CLAUDE.md) §Non-negotiable constraints,
+edited in the same change as required by ADR-LAWS decision 4.
+[ADR-QUALITY](../docs/adr/0044_quality-contract.md) decision 11 — the record that
+declined to settle it — now names the answer. **No measured run: this is a
+decision, not a measurement.**
+
+> **L8** · *A use record never leaves the machine.*
+>
+> ⚠ **This handle changed on 2026-08-27, the day L8 was written**: it read *"What fux retains about use is hashed, bounded, and local"* until Arpit reverted the hashing, the size bound and the stdout prohibition hours later. Plaintext queries and answers are legal; what survives is the confinement. Read the law at its one home, `CLAUDE.md` §Non-negotiable constraints.
+
+**What forced it.** The prohibition already existed as one ADR decision, and an
+ADR is a thing another ADR may supersede. Two facts made that too thin:
+
+| fact | found where |
+|---|---|
+| a durable use record **already exists** | [`maintain/lastcited.py`](../src/fux/maintain/lastcited.py) — 256 hashed question keys in `.fux/runtime/last-cited.json` |
+| there is **live pressure to grow it** | [`work/proposals/ranking-tuning.md`](proposals/ranking-tuning.md) §8 — a per-repo query log as *"an asset fux gets for free"* |
+
+**L8 landed green — it forbids nothing fux does today.** Verified against the
+code before the law was written: hashed key (`sha256[:16]` of the normalised
+query), `MAX_QUESTIONS = 256`, `.fux/runtime/` gitignored by name, stderr-only
+so stdout stays byte-identical. No code changed.
+
+⚠ **The honest limit, recorded in the ADR and repeated here.** A hashed key is
+not anonymity: the *value* is the list of locators that answered, so the file
+still says which documents are asked about and how often. Those locators are
+already in the committed `M/` plane, so the file adds **frequency, not new
+exposure** — L8 bounds it and keeps it off every shared surface, and does not
+make it uninteresting. Grounded in the 2006 AOL search-log release, where
+de-identified queries still identified a named individual.
+
+⚠ **One hands-task outstanding:** `work/open/W-89-does-l2-reach-a-query-log.md`
+still needs its `git mv` into `archive/open/` plus an `archive/README.md` row.
+No agent has a shell — the sandbox bridge is down — so it is filed with the
+other stray-file `git` operations in [`OPEN-WORK.md`](OPEN-WORK.md).
+
+---
+
+## W-88 — the skip notice: a skip is reported once (2026-08-27)
+
+`fux ingest` reported every skipped file **on every run**. On a hook-driven
+corpus that is tens to hundreds of identical lines each time, and Arpit's ask
+was exact: *"showing it the first time is okay — showing it again and again is
+not."*
+
+**What shipped:** `src/fux/ingest/skipnotice.py` and one changed call site in
+`ingest/__init__.py::ingest_and_report` — the single seam every verb already
+prints through. The already-reported `(path, reason)` set lives in
+`.fux/runtime/skipped`: derived, gitignored, sorted, **no wall clock**.
+
+| property | how it is held |
+|---|---|
+| **no committed byte moves** | `test_suppression_never_moves_a_committed_byte` digests the shards either side of a suppressed run |
+| a skip is never suppressed unseen | the notice is written *after* the unseen set is computed; a missing or corrupt file reads as *nothing reported yet* |
+| a **changed reason** is news again | the key is `(path, reason)`, not the path |
+| an offline run does not forget URL skips | `covers_urls=False` carries the URL entries forward — a plain `fux ingest` consults no URL, so it may not speak for that plane |
+| `rm -rf .fux/runtime` stays safe | costs one repeat of the list; asserted, not assumed |
+
+**What did NOT change:** the skip rules, the reasons, `--list-skipped`, or the
+summary count — `N skipped` is still every skip. Only the enumeration is
+suppressed, and the suppressed line names both ways to see it in full.
+
+**Records:** [ADR-INGEST](../docs/adr/0007_ingest.md) decision 4 amended (it
+owns `src/fux/ingest/`), [ADR-DOTFUX](../docs/adr/0003_fux-directory.md)
+amended (`runtime/` gains a third derived file),
+[ADR-CLI](../docs/adr/0002_cli-surface.md) annotated as describing-not-owning.
+Reasoning archived at
+[`archive/open/W-88-the-skip-notice.md`](../archive/open/W-88-the-skip-notice.md).
+
+⚠ **Verification is partial and this is the honest statement of it.** 12 cases
+in `tests/ingest/test_skipnotice.py`, green through a **stdlib harness** — the
+build sandbox is Python 3.10 with no `pytest` and no network, so a `tomllib`
+shim outside the repo stood in. **The `pytest` file itself and the rest of the
+suite are unrun here.** `uv run pytest -q tests` on a real 3.11+ install is
+owed before release.
+
+---
+
 ## The record shape is declared once (2026-08-26)
 
 `src/fux/store/index-record.json` declares every field of a committed
@@ -181,6 +1033,11 @@ outcome is recorded here.
 
 | item | closed | closed by | outcome |
 |---|---|---|---|
+| **[W-86 CLOSED](../archive/open/W-86-the-decoder-plane.md)** — the decoder plane, complete | 2026-08-26 | [ADR-DECODE](../docs/adr/0042_decode.md) · amends [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-MAINTENANCE](../docs/adr/0032_hooks.md) · [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) · [ADR-TYPES](../docs/adr/0031_types-list.md) · [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) | **All nine phases built; ten forks ruled or dissolved.** ⚠ **P0 — a defect that had been shipping since the type allowlist existed.** `extract.py` derived headings with `^#{1,6}` alone while `DEFAULT_TYPES` admitted `.rst`, `.adoc` and `.org` — **three of six allowed types had EVERY heading land in the body field**, with an empty `phrases` list feeding the `§` lines `fux ask` renders. Each format now gets its own grammar; two guards are the substance rather than the regexes — **Org requires the space** after the asterisk run (or `*emphasis*` reads as a heading) and **reStructuredText requires a full-width rule** (or a row of dashes in a table becomes one). A decoded document always uses the Markdown grammar, because decoders emit Markdown by contract. **⚠ Re-ranks existing corpora, in the direction the field weights intend.** ⚠ **P8 — `fetch(url) -> tuple[bytes, str]`.** A fetcher did two jobs, and `http.py:43` stated the consequence as a rule nothing enforced: *"which fetcher retrieved a document would change the committed index"* — **L3 as a code comment**. Both fetchers and both templates stopped converting; `PREPEND_TITLE_HEADING` moved to the decoder, where it belongs. Type resolution is **declared first, path second, never sniffed**. ⚠ **A bare `str` return is still accepted as a deliberate transition ramp** — every pre-2026-08-26 consumer fetcher returns markdown, and the break was **never re-costed** (ADR-FETCHER's *"no external consumers"* line is dated v0.32.0 and predates the PyPI release); the ramp is what makes that acceptable, not a measurement. ⚠ **P6 — the queue, and a race that was reproduced before it was fixed.** `acquire()` had **one caller**; a foreground `fux ingest` evicted the background runner and then wrote **holding nothing**. `runner.lock` → **`write.lock`**, and `ingest`/`build`/`add`/`remove`/`update` all pass through `write_lock()`; **read verbs take nothing**, since a lock on the read path would fail a search because a re-index was running. **`acquire(required=True)` raises where `acquire()` returns False** — the same line meant opposite things to a runner (decline quietly) and a writer (never proceed unprotected), and `except OSError: degrade` was right for one and inverted for the other. **The queue** (`.fux/enrich/queue.tsv`, committed; `runtime/enrich-progress.tsv`, gitignored) is the first thing in fux that can **say** a document needs a model — `fux enrich` derives scope from a declared `dirs` line and cannot know a `.png` exists. Sorted, no clock, paths+shas+reason, never content. ⚠ **Nothing consumes it yet — that is fork G, still open.** **Diagrams:** both architecture SVGs updated and a third, `work/architecture-decoders.svg`, added. **`tests/` 1 698 green.** ⚠ **`tests_e2e/` unverified** (3.10 sandbox). ⚠ **Not committed** — a concurrent session holds files staged |
+| **[W-86 P7b](../archive/open/W-86-the-decoder-plane.md)** — the `fux-decoder` skill | 2026-08-26 | [ADR-DECODE](../docs/adr/0042_decode.md) decision 12 · [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) | **Arpit asked how a custom decoder is built, and the answer lived only in a module docstring and in ADR-DECODE §2 — the agent-facing half of a record, which is not where a consumer looks.** New `templates/agents/DECODER-SKILL.md`, rendered to `.claude/skills/fux-decoder/` and `.kiro/skills/fux-decoder/`, **never to an ambient surface** because it writes committed Python that changes what is indexed. **Vendor choice follows ADR-ENRICH decision 10's REASONING rather than its vendor list**: that decision made `fux-enrich` claude-only because the other two renderings were ambient, and W-82 3.6 established a Kiro *skill* is progressive-disclosure while only Kiro *steering* is ambient — so Kiro is admitted and Copilot's `instructions/` still excluded. **Exempt from the verbatim policy-block check** and the third name on that escape hatch (after ENRICH-SKILL and USAGE-SKILL); the exemption is pinned by `test_the_exemptions_are_deliberate`, so widening it stays a decision rather than the cheapest way to fix a red test. **The skill carries reasoning, not just a recipe** (Arpit: *"always add some documentation on how it is built, and pointers"*): the contract with a why per rule, the four judgement calls where decoders actually go wrong, the shared-helper table, and a pointer table naming which shipped decoder to read for which shape of format. ⚠ **Its verification section is the load-bearing part** — decode a real file and READ it, because all four P2-P5 defects produced plausible text rather than an error. **`tests/` 1 637 green.** ⚠ Not committed |
+| **[W-86 P7](../archive/open/W-86-the-decoder-plane.md)** — setup exports every decoder | 2026-08-26 | [ADR-DECODE](../docs/adr/0042_decode.md) decision 11 · [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) | **Arpit overruled the item's own recommendation and the record says so.** §13.4 argued *seam yes, export-all no*; he ruled `fux setup` writes **all sixteen** decoders into `.fux/decoders/` and **the copy is what runs**, on the argument that a consumer invited to override decoders should be able to read them in their own repo. Two middles offered and declined: `fux decoder eject <name>`, and a hash-stamped *inert-until-edited* variant. ⚠ **The cost, taken knowingly: after setup, `src/fux/decode/` does not execute in that repo** — engine upgrades reach nobody's decoders, and each of the four P2-P5 defects would have needed every consumer to refresh by hand. **Two mechanism findings, neither a policy choice:** (1) **imports inside `decode/` had to become absolute** — a path-loaded file has no parent package, so `from . import _xml` raises and **every copy carrying a helper import would have been dead on arrival**; absolute imports make the shipped bytes and the edited bytes identical, asserted by a byte-identity test; (2) **no `.py.txt` template**, and the asymmetry with fetchers is principled — a fetcher's extension is un-importable because it holds network code that must not live inside an offline package, while a decoder is stdlib-only and offline and therefore already a legitimate module, so the module **is** the template and a second copy under `templates/` would be the `_MdParser` defect sixteen times over. **A deleted copy falls back to the built-in** — `rm pdfdoc.py` must not look identical to a corpus with no PDFs. `fuxdir.DECLARED` gains `decoders`, so `fux doctor` does not warn. ⚠ **Caught by an existing guard rather than shipped:** `.fux/README.md` is encoded ASCII for Windows consoles, so an em-dash in the new description failed the write immediately. **8 new tests; `tests/` 1 631 green.** This repo now carries its own sixteen copies. ⚠ Not committed — concurrent session live |
+| **[W-86 P2–P5](../archive/open/W-86-the-decoder-plane.md)** — every decoder | 2026-08-26 | [ADR-DECODE](../docs/adr/0042_decode.md) decision 10 | **16 built-in decoders, 30 extensions, all stdlib** — HTML, `.eml`, JSON, `.ipynb`, TOML, INI/`.properties`, CSV/TSV, XML, YAML (subset), `.docx`, `.pptx`, `.xlsx`, ODF, RTF, `.drawio`, PDF — plus three shared private modules: `_zip.py` (bomb caps, **sorted** members, numeric slide/sheet ordering), `_xml.py` (**a DOCTYPE is refused outright**, closing billion-laughs and XXE in one rule), `_ooxml.py` (run assembly, table rendering). **Four defects found in the build, each of which produces plausible garbage rather than an error:** (1) **ODF text sits directly on `text:p`**, not in run elements — reusing `_ooxml.paragraph_text` made **an entire format decode to nothing, silently**, caught only because a fixture was decoded by hand; (2) `slide10.xml` sorts before `slide2.xml`, so lexical member order gives a deck that is deterministic **and wrong**, which is worse than noisy because nothing looks broken; (3) OOXML **table cells are paragraphs too**, so without an in-table check every cell's `tf` doubles; (4) joining Word runs **with a space** turns *"runbook"* — which Word splits whenever a spell-checker touches it — into two terms nobody types. **PDF is scanned for `stream…endstream`, NOT parsed through the xref**: a conformant reader needs xref tables, object streams and compressed xref streams, all three of which fail on exactly the malformed files a real corpus holds, and scanning finds text a strict reader refuses. ⚠ **Stated cost:** `ToUnicode` CMaps are merged across all fonts, so a document with two subset fonts disagreeing on one byte gets one wrong — reading per-font maps needs the object graph this approach avoids. **A PDF with no text layer returns `None`** — the queue signal, distinguished from a text layer that fails to *parse*, which is a decode failure. **JSON keys sorted** (two exports ordered differently must decode identically, L3); **YAML aliases read once, never expanded** (a *conformant* parser inflates `tf`); **notebook outputs dropped** (re-execution artifacts make the index depend on who hit Run). **59 decoder tests; `tests/` 1 623 green.** ⚠ Not committed — concurrent session live |
+| **[W-86 P1](../archive/open/W-86-the-decoder-plane.md)** — the decoder plane | 2026-08-26 | [ADR-DECODE](../docs/adr/0042_decode.md) · amends [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-FETCHER](../docs/adr/0019_fetcher.md) · [ADR-HTTP-FETCHER](../docs/adr/0021_http-fetcher.md) · [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) | **The plane already existed and was duplicated FOUR times, not twice** — `.fux/fetchers/http.py`, `cdp.py`, **and both wheel templates**, which are what `fux setup` writes into every new consumer's repo, so the duplication was **shipped**. `http.py`'s docstring stated the consequence as a rule nothing enforced: *"which fetcher retrieved a document would change the committed index"* — **L3 as a code comment**. ⚠ **ADR-HTTP-FETCHER decision 7 claimed a test that did not exist**: it read *"a test asserts the two agree on the same input"*, and the cited test asserted determinism and heading handling, never agreement. A record asserting a guarantee its own cited test does not check, standing since 2026-08-19. New `src/fux/decode/` with `htmldoc.py` **lifted verbatim** (behaviour preserved deliberately — any difference would silently re-rank every URL-sourced document already committed). `parse_document(content, rel_path, root)` is the new seam and returns `None` for an unreadable document; **`parse(content)` is unchanged**, so no existing corpus moves. `_skip_reason` now consults the registry **before** judging bytes — *"binary"* stopped being a sufficient reason to skip the moment a `.docx` became a document. Parsing moved **above** `file_shas` so an unreadable file contributes no sha (a sha with no record makes the reuse map claim a document the index lacks). **Protocol ruled by Arpit: bytes default, path opt-in** (`WANTS_PATH`), override **by module name** not by extension, `BUILTIN_MODULES` an explicit sorted tuple never a directory scan (L3). **A missing consumer dependency is a hard error naming the module** — detection would let two machines commit different indexes from identical sources. `DecodeFailed` is deliberately **not** a `FuxError`. ⚠ **`DEFAULT_TYPES` UNCHANGED** — ADR-TYPES verdict G was measured. **20 new tests, `tests/` 1 566 green.** ⚠ `tests_e2e/` unverified (Python 3.10 sandbox); the two `test_doctor.py` failures are that shim and predate this change. ⚠ **Not committed** — a concurrent session was live in the tree |
 | **[W-84](../archive/open/W-84-heading-level-ask.md)** — `ask` cites at heading level | 2026-08-26 | [ADR-ASK](../docs/adr/0004_ask.md) decision 10 · [ADR-MCP](../docs/adr/0039_mcp.md) decision 9 | **The refusal is half the outcome.** Arpit asked whether `ask` should cite lines; it may not. A line range on `ask` could only be computed at **ingest**, so one edit makes it point at the wrong lines *while looking exactly as right as before* — the defect class of `max_age_seconds` and of a `cached` verdict reported as `current`. It also costs a positional index (2–4× the postings, Zobel & Moffat 2006 §5) against an index whose whole pitch is that it fits in git, and its value is thinnest where the cost is highest: `file:` sources are already in the working tree, `url:` sources are the ones most likely to have changed since ingest. **`answer` cites lines because it fetched the bytes and cites their sha.** What shipped instead was already committed: `phrases` — the document's headings, extracted at ingest since M2 and rendered by **`answer --no-refer` alone**. New `src/fux/query/headings.py` selects the ones matching the query (shared analyzer, scored by count of *distinct* query terms, zeros dropped, sorted `(-matches, document position)`, capped at 3) and `fux ask` renders them as indented `§` lines, `ask/find --json` as an always-present `"headings"` array, and MCP `fux_search` in its result rows. **`fux find`'s piped stdout is byte-identical** — a `§` on it would be read as a filename ([ADR-DIR-LIST](../docs/adr/0022_dir-list.md) decision 12's argument). **Display-only**, run on the already-unified list after `run_query` returns, exactly where `_resolve_title` runs under P5, so no seam exists for the differential law to break through — re-verified on this repo, `diff` of the two paths is `IDENTICAL` with headings present. ⚠ **A live defect found on the way:** `fux_search`'s **MCP tool description** claimed *"line-range citations"* and `_search` has never returned one — the identical wrong claim `ad95a24` had fixed in `docs/guide.html` and the usage skills **earlier the same day**, surviving in the machine-facing copy, where it is worse: an agent acts on a tool description with no human reading the output beside it. Corrected and pinned by a test. **Tool descriptions are documentation compiled into the package and no gate reads them** — `fux_passage`'s and `fux_related`'s remain unchecked. **21 new tests, `tests/` 1 500 green.** ⚠ **`tests_e2e/` unverified** (Python 3.10 sandbox, `tomllib` shim that never enters the repo — the two `test_doctor.py` failures are that shim, and predate this change). ⚠ **Not committed** — a concurrent session was mid-rename in the tree (`store/recordshape.py` → `recordschema.py`) and a W-84 commit would have swept it in |
 | **[W-63](../archive/open/W-63-source-verbs.md)** — the source verbs | 2026-08-21 | `v0.35.0` (PyPI 2026-08-21, verified black-box from the published wheel) | [ADR-CLI](../docs/adr/0002_cli-surface.md) 1a-1e · [ADR-INGEST](../docs/adr/0007_ingest.md) 9-10 · [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) 2d-2e, 3a · [the capture](regression/2026-08-21-source-verbs/report.md) | **The corpus finally has a command.** `fux add` / `fux remove` / `fux update` over all three committed source lists, dispatching on the entry — anything with a `scheme://` is a URL, `--types` says type pattern, everything else is a path, and a path may be a directory **or a single document**, which the list always accepted and no command ever wrote. `add` ingests by default and **fetches the one URL it just added**, announcing on stderr; `remove` deletes the line or, for a path held only by a listed ancestor, **subtracts it with `!`** and says which branch it took; `update` re-reads what is listed and **never writes a line**, which is the one sentence that keeps three verbs from overlapping. `fux url` deleted outright (four days old, pre-1.0); `ingest --refresh-urls` hidden for one release. **Two defects fixed first, both real independent of the verbs.** A de-listed URL used to survive an offline ingest, so **deleting a document required the network it has no use for** — reconciliation reads a committed file and now runs on every ingest, while the transient-failure guarantee (a *still-listed* URL whose fetch fails keeps its record) is untouched, because one keys on the list and the other on the fetch. And a carried `url:` record kept edges resolved against a **previous** run's corpus, so a removed document survived as a target in the derived graph plane; every carried record's edges are re-checked against the run's own id set. Both verified by mutation — reinstating either turns the new tests red. **Capturing the surface found four more defects the unit suite did not**, three of them in W-63 itself, and every one did something defensible while *saying* something false: an L4 announcement that fired with nothing fetched; `add '*.pdf' --types` **silently un-indexing every markdown document** (the types file replaces the built-in allowlist rather than extending it — W-55's invisible filter from a new direction); a type-allowlist skip reported as a failed fetch; and `explain` answering for a document not in the index. All fixed, all written up in [ANALYSIS](regression/2026-08-21-source-verbs/ANALYSIS.md). **L4's text did not change** — it already read *paths*, plural; what was wrong was the nine records and eleven docstrings that narrowed it to `--refresh-urls`, and those were corrected rather than the law restated. `src/fux/sources.py` re-owned from ADR-URL-LIST to ADR-CLI in the same change |
 | **[W-64](../archive/open/W-64-progress-plane.md)** — a progress plane for the write verbs | 2026-08-21 | [ADR-CLI](../docs/adr/0002_cli-surface.md) decision 9 · [the capture](regression/2026-08-21-progress-plane/report.md) | **Built and captured; not a milestone and not a gate.** `src/fux/progress.py` — stdlib, stderr-only, TTY-gated, count-based, threshold-gated at ~200, and **clock-free**: no `time` import, no elapsed, no ETA, no rate, because ingest is a maintenance path. Seven phases across `ingest.run()` (`walk`/`extract`/`edges`/`write`) and `derive.build()` (`read`/`codes`/`graph`/`postings`), reported through a `progress=None` keyword that **means silent, so no existing caller or test changed** — which is what kept this small. `main` builds **one** `Progress` and hands it to both, so an `ingest` that also builds is one continuous sequence rather than two bars fighting for a line. **The invariant is a test, not an intention**: `tests_e2e/test_progress_surface.py` runs each write verb twice, with and without `--progress`, and asserts stdout is byte-identical — a leak there would corrupt the `--json` contract every agent consumer reads. **Found while capturing, and fixed in the same change:** a phase whose total is not documents must name its unit, or `write`'s `252/252` sitting under `edges`' `1203/1203` reads as losing 950 documents. **The one open call was decided on its stated default** rather than stalling: the git hooks export `FUX_NO_PROGRESS=0` and show the bar, reversible in one line if [W-61](../archive/open/W-61-maintenance-measurement.md)'s fork lands on B. ⚠ **What is not claimed: repaint cost at R5's 100 000 documents.** This ran at 1 203; the bar is a write plus a flush per document, and that is [W-26](../archive/open/W-26-m6-scale-t2.md)'s to measure, not this row's to assume |
@@ -212,7 +1069,7 @@ outcome is recorded here.
 | **W-46** — `ask --hybrid` crashed on a source install | 2026-08-20 | [ADR-CLI](../docs/adr/0002_cli-surface.md) | **Fixed.** `get_model()` returns `None` where the embedding bundle is not shipped, and `None.embed(...)` raised an `AttributeError` the guard's deliberately narrow tuple did not list — so the fallback written for exactly this case was **dead code from the day it was written**. Fixed with an explicit `None` check, not a widened `except`: widening would have swallowed every real bug inside `embed()`, which is the silent degradation the narrow tuple exists to prevent. Both halves asserted in `tests/derive/test_dense_and_hybrid.py` — the `None` path degrades to lexical at exit 0, a present-but-broken model still raises. **It survived because it cannot reproduce where `model.bin` exists, which is every development machine**, and `--hybrid` is default-off so nothing routine walked it. Diagnosis: [run](regression/2026-08-18-cli-surface/ANALYSIS.md) ⚠ **Superseded 2026-08-25: the dense lane, the embedding model and `--hybrid` were DELETED** (Arpit). This row is kept as the build log it is — what was true when it was written — and is NOT a description of the engine today. See the model-removal row below. |
 | **W-48** — three output-contract inconsistencies across the query verbs | 2026-08-20 | [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-ANSWER](../docs/adr/0006_answer.md) · [ADR-FIND](../docs/adr/0005_find.md) | **Two fixed, one deliberately not.** `ask --json --explain` now carries `"path"`, so which lane answered a slow query is readable by the caller that would log it; the key is emitted only under `--explain`, so the default payload stays byte-identical and the differential law through the CLI is untouched. `answer --json` now carries `"source": "index"` on the no-match branch, closing a trap in the very key ADR-ANSWER tells callers to switch on for the M4 upgrade. **Item 3 — `find`'s prose no-match line on stdout — was examined and left alone**, and is now *pinned by a test* so the decision is visible rather than merely remembered: the three verbs say the same thing for the same condition, and ADR-FIND ties reopening it to a real script observed breaking on it. Diagnosis: [run](regression/2026-08-18-query-verbs/ANALYSIS.md) |
 | **PRIORITY P5** — materialise-first display for `hashed` records | 2026-08-21 | `1ba9be1` · [ADR-RECORD](../docs/adr/0010_index-record.md) · [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) · [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-REFER](../docs/adr/0030_refer-plane.md) | **Built to five direct rulings from Arpit, not assumed.** Ingest already holds a non-git document's bytes before writing its record, so it now also writes the title to a new gitignored, `sha`-keyed cache (`.fux/runtime/display-cache/`) before the record may commit — `store/writer.py` refuses a `hashed` record with no matching cache entry. `ask`/`find`/`answer` (text and `--json`) resolve through it; ranking does not (`rank()`'s two call sites pass no cache), so the differential law is untouched by construction — proved directly, not just argued (`test_the_scan_and_accelerator_paths_agree_on_a_cold_hashed_title`). **The two forks PRIORITY.md reserved for Arpit**: the mandatory cache needs **no L2 exception** (citing [ADR-CACHE](../docs/adr/0034_cache.md)'s identical two-day-earlier ruling on gitignored/never-committed caches); a cold cache **forces a re-fetch** to repopulate rather than degrading silently, though grounding found this changed no live behaviour (`_reusable()` already never carries a `hashed` record forward without a fetch attempt). **Two of three sub-questions ruled**: term-hash salting **not built** (a committed salt is not a salt); `code` **kept** on hashed records despite a demonstrated embedding-inversion risk (Morris et al., EMNLP 2023), traded against `--hybrid` ranking quality. **The third needed no ruling**: `loc`/`id` stay plaintext — `loc` is the refer plane's only fetch address (`fetcher(loc)`, no other route for a fresh clone) and is separately committed in plaintext via the URL source list already, so hashing it would cost function for zero privacy gained. This corrects the row's own original "reveals neither title tokens nor URL slug" done-when clause, stated explicitly rather than dropped. `uv run pytest -q tests tests_e2e`: 866 passed. Two unrelated commits landed in the same session and are **not** part of this row: `7b7679c` (the session-lock hook made per-asset) and `5509030` (ADR-CACHE + register reconciliation, pre-existing uncommitted work from a prior Cowork session) |
-| **PRIORITY P6** — the refer plane wired into `answer` | 2026-08-21 | `9f8366e` · [ADR-REFER](../docs/adr/0030_refer-plane.md) · [ADR-ANSWER](../docs/adr/0006_answer.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) | **`answer` fetches, verifies and re-scores by default now.** `src/fux/query/refer_answer.py`'s `answer_via_refer` calls the existing `refer()` with the winning citation and `Policy(mode=ALWAYS)`; `_load_fetcher` resolves and connects the *same* fetcher a `url:` document was ingested with, mirroring `ingest/urlsrc.py`'s own resolution exactly, degrading to `(None, noop)` — never raising — when nothing can be resolved. `"source": "refer"` in `--json`; `--no-refer` keeps the exact M2 index-only shape. Proved against the real CLI on the actual e2e fixture, not just in-process: a passage + a fresh `sha` that changes when the source file changes, without re-ingesting. **Both ADRs accepted, per the row's own done-when.** One tension found and put to Arpit rather than resolved silently: ADR-REFER's own text tied acceptance to the still-unmeasured W-59 budget sweep (separate from R4, which passed) — ruled **accept now**, budget sweep kept as a named, checkable veto condition rather than closed or hidden. ADR-ANSWER substantially rewritten, not status-flipped — its own veto condition had fired ("the disclaimer stops matching what the verb actually does"). **Deliberately scoped to `answer` only** — PRIORITY.md's row title named `ask` too, but its own done-when never tested `ask`, and fetching every ranked result (not just the winner) is a materially bigger, riskier change left undecided rather than assumed. **Found while capturing real output**: a refer passage on a document with frontmatter includes the frontmatter block verbatim (`refer/chunk.py` doesn't strip it, unlike ingest's extraction) — a real readability cost, recorded rather than fixed, `chunk.py`'s call to make. `uv run pytest -q tests tests_e2e`: 877 passed |
+| **PRIORITY P6** — the refer plane wired into `answer` | 2026-08-21 | `9f8366e` · [ADR-REFER](../docs/adr/0030_refer-plane.md) · [ADR-ANSWER](../docs/adr/0006_answer.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) | **`answer` fetches, verifies and re-scores by default now.** `src/fux/query/refer_answer.py`'s `answer_via_refer` calls the existing `refer()` with the winning citation and `Policy(mode=ALWAYS)`; `_load_fetcher` resolves and connects the *same* fetcher a `url:` document was ingested with, mirroring `ingest/urlsrc.py`'s own resolution exactly, degrading to `(None, noop)` — never raising — when nothing can be resolved. `"source": "refer"` in `--json`; `--no-refer` keeps the exact M2 index-only shape. Proved against the real CLI on the actual e2e fixture, not just in-process: a passage + a fresh `sha` that changes when the source file changes, without re-ingesting. **Both ADRs accepted, per the row's own done-when.** One tension found and put to Arpit rather than resolved silently: ADR-REFER's own text tied acceptance to the still-unmeasured W-59 budget sweep (separate from R4, which passed) — ruled **accept now**, budget sweep kept as a named, checkable veto condition rather than closed or hidden. ADR-ANSWER substantially rewritten, not status-flipped — its own veto condition had fired ("the disclaimer stops matching what the verb actually does"). **Deliberately scoped to `answer` only** — PRIORITY.md's row title named `ask` too, but its own done-when never tested `ask`, and fetching every ranked result (not just the winner) is a materially bigger, riskier change left undecided rather than assumed. **Found while capturing real output**: a refer passage on a document with frontmatter includes the frontmatter block verbatim (`refer/_chunk.py` doesn't strip it, unlike ingest's extraction) — a real readability cost, recorded rather than fixed, `chunk.py`'s call to make. `uv run pytest -q tests tests_e2e`: 877 passed |
 | **[W-59](../archive/open/W-59-refer-plane-measurement.md)** — the refer plane's last measurement obligation, discharged | 2026-08-22 | [ADR-REFER](../docs/adr/0030_refer-plane.md) veto condition 2 updated · [the budget sweep](regression/2026-08-22-budget-sweep/report.md) | **The budget sweep ran, and the result is narrower than the item's own FLAT/NOT-FLAT rule anticipated.** By the letter (mean |delta| 12.55% on the shipped single-candidate path) it is NOT FLAT — but every measured delta was negative or zero: the greedy assembler never beat plain top-k, losing up to 35.5% at realistic budgets. Root cause: the per-document cap binds even with one candidate, which is every real `fux answer` call today. **Filed as [W-72](../archive/open/W-72-refer-per-doc-cap-single-candidate.md)** rather than fixed inside the measurement. R4 (PASS, 2026-08-20) and ARC-vs-LRU (Arpit's ruling, 2026-08-22 — ARC wins) close the item's other two open measurements. All three DoD items resolved; item deleted from OPEN-WORK |
 
 | **[W-44](../archive/open/W-44-archived-content-signalling.md)** — archived content finally says so | 2026-08-22 | [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) 1/3/7 · [ADR-INGEST](../docs/adr/0007_ingest.md) · [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md) | **Open since 2026-08-12, and it closed in the order the record asked for.** The instrument decision 5 demanded was built first — 45 frozen queries in three slices, committed before any number — and **then Arpit lifted the gate by direct instruction**; either alone would have unblocked it. Measured **WARRANTED**: 32.00 pts live-intent contamination@5 against a 25 pt bar, findability guard 93.33 % against 60. The diagnosis is the slice gap — the ambiguous slice sits at 66 pts, the corpus's own archived share, so **the scorer has no currency signal at all** and the live slice only looks better because present-tense vocabulary correlates with live documents. Shipped: `archived: true` at ingest, `[archived]` on `ask`'s text, the flag in both verbs' `--json`, a response-level note on **stderr**. **`find`'s stdout stays bare** so it still pipes. **The ranking does not move** — the weight stays `1.0` and two tests assert order and scores are byte-identical with the marker present. One test had to be *sharpened rather than kept*: it compared whole result objects, which silently asserted the marker could never exist |
@@ -229,8 +1086,8 @@ outcome is recorded here.
 | **[W-73](../archive/open/W-73-weighted-scores-vs-pruning-bound.md)** — the accelerator's differential law, weighted | 2026-08-23 | `v2.0.0-alpha.0` | [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md) · [ADR-RANKING](../docs/adr/0012_ranking.md) | **Fixed: the differential law now holds at every configured weight, not only at `1.0`.** `query/rank.py::Weighting` carries the query-time weights into the pruning bound; `derive/accel.py::block_bound` recombines per-field extrema at those weights; `_kth_score`/`_cannot_reach` take the weighting rather than assuming `1.0`. Adversarial fixture ([`tests/derive/test_weighted_bound.py`](../tests/derive/test_weighted_bound.py)) fails at `w = 500` without the fix, verified by reverting. Fork 3 (per-field extrema loosening the bound) measured **free — +0.0% blocks scanned** against 10 000 real documents, because 92.5% single-field postings make the per-field sum exact. [Run](regression/2026-08-23-fork3-per-field-bound/report.md). A second divergence found on the way: the derived doc table didn't carry `archived`, so `ask --fast`/`--scan` could disagree on that flag even at the default weight — fixed in the same change, `RUNTIME_SCHEMA` -> `fux.runtime.v3`. Gated the per-source priority feature entirely; unblocks [ADR-TUNE](../docs/adr/0038_tuning.md) decision 12 |
 | **[W-76](../archive/open/W-76-amended-architecture.md)** — the amended architecture, all nine phases | 2026-08-23/24 | `v2.0.0-alpha.0` | [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) · [ADR-TUNE](../docs/adr/0038_tuning.md) · [ADR-MCP](../docs/adr/0039_mcp.md) · [ADR-ENRICH](../docs/adr/0040_enrich.md) · [ADR-RERANK](../docs/adr/0041_rerank.md) | **The parked `ideal set` (archived 2026-08-25), re-argued against four rulings Arpit made 2026-08-23, and built.** Record shape moves to `fux.index.v2`: five-field BM25F (`body, heading, title, path, ctx`), body first, **-36.7% tf bytes while adding three fields**; `flen` replaces `wlen`; `code` dropped (91% of ingest, 0.4% of index). Analyzer moves to `v2` (Porter, 75/75 published vectors; identifier splitting). Priors (`supersedes:` edges, git commit recency) fold through `Weighting`. `.fux/tune.toml` + per-source priority, both directions allowed, fux states the cost. `fux enrich` (opt-in, never in `fux ingest`, keeps L3). `fux mcp` (stdio JSON-RPC, three tools, no `answer`). Proximity reranking in stdlib arithmetic — the specified cross-encoder **refused**, `onnxruntime` is not byte-identical across x86-64/arm64; measured on 50 new goldens **28 -> 32** (4 fixed, 0 broken), **+8ms p95** against a 150ms bar, 240 differential comparisons green — of 18 surviving failures, 18 are vocabulary gaps and 0 are ordering failures, so enrichment is deferred with a stated price rather than rejected. [Run](regression/2026-08-24-rerank-and-goldens/report.md). Per-chunk committed `int8` vectors with a derived Hamming-prefix prefilter, replacing the whole-document sign codes. **This repo's own index is migrated** — 434 records, delta run byte-identical to the full run; migrating it surfaced a real defect in ADR-INDEX-LIFECYCLE decision 10's migration command (`--full` read the index it exists to replace), fixed and amended into the record. Validated on fux-playground (21 376 differential comparisons byte-identical across a weight sweep) and fux-lab at 10 000 real documents (ingest 31.5s, build 1.4s, p95 33.53ms against a 150ms bar). **1271 unit + 73 e2e tests pass.** Every autonomous call taken in Arpit's absence is in [`W-76-DECISIONS.md`](../archive/open/W-76-DECISIONS.md) (D1-D30). ⚠ **All four new ADRs ship `status: proposed`** — built and reviewed phase-by-phase, ratification is a separate step. ⚠ **The 2026-08-24 rerank/goldens enrichment numbers are an upper bound, not a clean measurement** — the author had already seen the failing queries; a blind re-grade is the named, non-blocking follow-up ⚠ **Superseded 2026-08-25: the dense lane, the embedding model and `--hybrid` were DELETED** (Arpit). This row is kept as the build log it is — what was true when it was written — and is NOT a description of the engine today. See the model-removal row below. |
 | **[W-79](../archive/open/W-79-remove-the-dead-fusion-code.md)** — the dead fusion code, deleted | 2026-08-26 | — | [ADR-TUNE](../docs/adr/0038_tuning.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md) | **Ruled delete, per the item's own recommendation.** `src/fux/query/hybrid.py` (`hybrid_ask`, the module-level RRF fusion) is deleted — it was off the live path since W-76 Phase 7 gave `--hybrid` a lane through `query/dense.py`'s gated fusion, and its only caller was `tools/differential/playground_grade.py`'s `"hybrid"` grading mode, now repointed at `fux.query.run_query(..., use_hybrid=True)` — the same call `fux ask --hybrid` makes. `[fuse] rrf_k`/`dense_width` are removed from ADR-TUNE's `_SCHEMA`, `Tune` and the specimen — six tables, not seven. ⚠ **`query/fuse.py` was first kept and then deleted later the same day** — this row originally read *"is **kept**, since `tests/query/test_fuse.py` pins the archived engine's calibrated arithmetic"*, and that reason failed on review: what `rrf(offsets=)` pins is a supersession rank penalty calibrated on the **archived** engine, which archive-is-not-evidence forbids citing as live grounding, and live supersession is already `[ranking] superseded_weight` applied in score space at `query/rank.py:205`, to which a rank-space interval does not transfer. A module carrying a live-looking `RRF_K = 60` with no caller in `src/` misled a reader the same day. `src/fux/query/fuse.py` and `tests/query/test_fuse.py` are both deleted and [ADR-PORT-LIST](../docs/adr/0015_port-list.md)'s RRF row is struck. ⚠ **Two live proposals plan on `rrf(offsets=)` and are now more expensive** — `ideal/02-lexical-engine` (archived 2026-08-25) and `ideal/00-ideal-architecture` (archived 2026-08-25) both cite *"code is ported already"*; that premise is dead and reviving RRF needs a new record per ADR-PORT-LIST rule 1. `explain --no-tune` is removed from `src/fux/cli.py`'s parser — `cmd_explain` never read a tunable, so there was nothing to wire up; `--no-tune` now reads five verbs, not six. `[dense] mode = "gated"` is untouched — [DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md)'s FAIL stands, and stays `off` |
-| **[W-80](../archive/open/W-80-the-bundled-model-has-no-live-recipe.md)** — the bundled model's missing provenance | 2026-08-25 | — | [ADR-ENRICHED](../docs/adr/0017_enriched-mode.md) | **CLOSED BY DISSOLUTION, not by fix.** fux told a user with a corrupt model to run `tools/distill/distill.py`, which is not in the repo; two live error messages and `model.json`'s `recipe` field pointed at it. **Neither fork it offered was taken** — the recipe was not restored live and the provenance claim was not deleted. The model was removed instead, so there is no bundle, no `recipe` field and no error message left to be wrong. ⚠ **One of its own claims was wrong and is corrected on the way out**: it cited *"ADR 0006's <=10 MB bundle budget"*, and **no such budget exists in any live record** — the 7.9 MB bundle was never governed by a written size rule at all, which is a weaker starting position than the item asserted. Two proposals retired with it |
-| **The embedding model and the dense lane, DELETED** | 2026-08-25 | — | [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) · [ADR-TUNE](../docs/adr/0038_tuning.md) · [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) · [ADR-CODES-TABLE](../docs/adr/0025_codes-table.md) · nine more | **Arpit's instruction, on the evidence already filed.** `src/fux/embed/` (model.py, fuxvec.py, chunkvec.py, the 7.9 MB `model.bin`), `query/dense.py`, `derive/dense.py`, `codes.jsonl`, the committed per-chunk `vectors` field, `[dense]` and **`ask --hybrid`**. Cause: DENSE-CHUNK measured **0 fixed / 2 broken at every setting that fires** — the model mean-pools static token vectors, so the lane was **as order-blind as BM25F** and duplicated the lexical lane's blind spot at far higher cost. **Measured A/B on the same corpus** ([run](regression/2026-08-25-model-removal/report.md)): wheel **6.84 MB -> 233 KB, 30.1x** (the download was **97 % model**); committed index **-22.6 %**; full ingest **6.8x** faster; **differential law intact**. **13 records amended**; `RUNTIME_SCHEMA` v4 -> v5. ⚠ **Ranking is unchanged by ARGUMENT, not measurement** — `mode` defaulted to `off` and the gate returned before any dense work, but 13 ADRs changed in the same commit so a cross-tree ranking diff was never possible |
+| **[W-80](../archive/open/W-80-the-bundled-model-has-no-live-recipe.md)** — the bundled model's missing provenance | 2026-08-25 | — | [ADR-ENRICHED](../archive/adr/0017_enriched-mode.md) | **CLOSED BY DISSOLUTION, not by fix.** fux told a user with a corrupt model to run `tools/distill/distill.py`, which is not in the repo; two live error messages and `model.json`'s `recipe` field pointed at it. **Neither fork it offered was taken** — the recipe was not restored live and the provenance claim was not deleted. The model was removed instead, so there is no bundle, no `recipe` field and no error message left to be wrong. ⚠ **One of its own claims was wrong and is corrected on the way out**: it cited *"ADR 0006's <=10 MB bundle budget"*, and **no such budget exists in any live record** — the 7.9 MB bundle was never governed by a written size rule at all, which is a weaker starting position than the item asserted. Two proposals retired with it |
+| **The embedding model and the dense lane, DELETED** | 2026-08-25 | — | [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md) · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) · [ADR-TUNE](../docs/adr/0038_tuning.md) · [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-INGEST](../docs/adr/0007_ingest.md) · [ADR-RECORD](../docs/adr/0010_index-record.md) · [ADR-CODES-TABLE](../archive/adr/0025_codes-table.md) · nine more | **Arpit's instruction, on the evidence already filed.** `src/fux/embed/` (model.py, fuxvec.py, chunkvec.py, the 7.9 MB `model.bin`), `query/dense.py`, `derive/dense.py`, `codes.jsonl`, the committed per-chunk `vectors` field, `[dense]` and **`ask --hybrid`**. Cause: DENSE-CHUNK measured **0 fixed / 2 broken at every setting that fires** — the model mean-pools static token vectors, so the lane was **as order-blind as BM25F** and duplicated the lexical lane's blind spot at far higher cost. **Measured A/B on the same corpus** ([run](regression/2026-08-25-model-removal/report.md)): wheel **6.84 MB -> 233 KB, 30.1x** (the download was **97 % model**); committed index **-22.6 %**; full ingest **6.8x** faster; **differential law intact**. **13 records amended**; `RUNTIME_SCHEMA` v4 -> v5. ⚠ **Ranking is unchanged by ARGUMENT, not measurement** — `mode` defaulted to `off` and the gate returned before any dense work, but 13 ADRs changed in the same commit so a cross-tree ranking diff was never possible |
 | **[W-78](../archive/open/W-78-enrichment-was-measured-against-its-own-answers.md)** — a ruling made on a contaminated number | 2026-08-25 | — | [ADR-RS](../docs/adr/0036_predictions.md) decisions 11-16 · [ADR-RERANK](../docs/adr/0041_rerank.md) | **CLOSED — both rulings made, neither built anything.** **Ruling 2:** the run-classification rule **accepted** in its rewritten form — every measured run is `blind` or `informed`, an informed run is **reclassified rather than banned** and never supplies a delta, and a delta below the set's resolution is *no detected change*. **Ruling 1 (on delegation):** ADR-RERANK veto 1 **condition 1 VACATED** — withdrawn, not rewritten, because the drafted replacement's lead leg argues value from other corpora about a weaker model than the record specifies, and substituting a second unmeasured claim for the first is this item's own error; **condition 2 RESTATED** as *score-level drift below the target corpus's adjacent-gap floor*, after [measurement](regression/2026-08-25-rank-flip-susceptibility/report.md) showed the old `5e-10` bar was derived from `round(score, 9)` — not the binding constraint — and demanded **~200 000x** more precision than the corpus can resolve (0.00 % flips at the quoted drift). ⚠ **The cross-encoder remains refused and nothing was built**; the refusal now rests on **one measurable unmet condition** instead of a dead argument and a mis-specified bar. ⚠ **This record now holds NO position on the cross-encoder's value** — correct, because there is none |
 
 ## Ratified decisions
@@ -241,7 +1098,7 @@ milestone row to live in. One line each, with the record that now holds it.
 
 | item | decided | by | outcome |
 |---|---|---|---|
-| **W-30** — the ingest-mode naming | 2026-08-19 | Arpit | **Ratified `extracted` / `enriched`**, and split into a record per mode: [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) (accepted — the deterministic contract, owns `ingest/extract.py`) and [ADR-ENRICHED](../docs/adr/0017_enriched-mode.md) (⏳ proposed — named and **fenced out of the maintenance path**, not authorized to build; the M8 gate in [W-38](../archive/open/W-38-m8-deferred.md) stands). Arpit's stated meaning — the index is refined by a coding agent — is what made the L3 boundary decidable: enrichment is its own command, its output pinned then ingested deterministically. Open 7 days |
+| **W-30** — the ingest-mode naming | 2026-08-19 | Arpit | **Ratified `extracted` / `enriched`**, and split into a record per mode: [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) (accepted — the deterministic contract, owns `ingest/extract.py`) and [ADR-ENRICHED](../archive/adr/0017_enriched-mode.md) (⏳ proposed — named and **fenced out of the maintenance path**, not authorized to build; the M8 gate in [W-38](../archive/open/W-38-m8-deferred.md) stands). Arpit's stated meaning — the index is refined by a coding agent — is what made the L3 boundary decidable: enrichment is its own command, its output pinned then ingested deterministically. Open 7 days |
 | **W-44** — how retired content is signalled | 2026-08-19 | Arpit | **Option B: annotate, never reorder** → recorded first as ADR-ARCHIVED-SIGNAL and superseded hours later by [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) when Arpit gave directories their own source file. **The file and the declaration shipped 2026-08-19 (W-54); the signal did not** — ADR-ARCHIVED-CONTENT decision 5 splits them, and W-44 still owns the instrument. A record from a source **declared** `archived=true` carries `archived: true`; every verb surfaces it; **the ranking is byte-identical**. Two changes on the way in: the signal is **declared, not derived** — the path heuristic was exact here and a silent convention for any other repo, and the **`df` contamination is not part of it** — 26.6% of records are archived and 42.1% of live terms carry an inflated `df`, which is a ranking change and is [W-52](../archive/open/W-52-df-over-the-union.md), behind its own pre-registration. Open 7 days |
 | **W-50** — how a URL is fetched | 2026-08-19 | Arpit | **The URL list becomes tool-written**: a CLI command fetches and writes the URL plus its attributes, and the file is never hand-edited — so a flag decides what is *recorded*, not what is fetched at ingest time, and the same list can never produce different committed bytes. **Every written line states every attribute explicitly**, which left **L5 untouched**: it now means what a *missing* attribute means, and a correct file never exercises it. Recorded as [ADR-URL-LIST](../docs/adr/0018_url-list.md) 12–13; **built 2026-08-19 as `fux url`** — with one correction, that the verb *records* and does not fetch, because `--refresh-urls` is the only networked path in the engine (L4) |
 | **W-33** — the ADR numbering convention | 2026-08-19 | Arpit | **Confirmed**: `docs/adr/` is the live set and **starts at 0001**; records under `archive/` are archived, and numbers there survive only to map a retired record to its successor. Cite-by-name stands, so **milestone items now reserve a NAME, never a number** — `ADR-GRAPH` (W-23), `ADR-REFER` (W-24), `ADR-MAINTENANCE` (W-25), `the T2 proposal` (W-26), swept in the same change. They had been reserving `0006`–`0009`, which accepted records already held: the collision this item was filed to prevent, live rather than hypothetical. Open 7 days |
@@ -284,6 +1141,8 @@ it closed by ratification, not by landing; see the W-27 row above.
 | R7 | **RETIRED** (2026-08-22, Arpit) — **cancelled, never FAILed, and now withdrawn rather than re-derived.** *"Remove that promise, it's not needed."* There is no committed-size budget and no successor is owed; the size is still **measured and printed** by ADR-POSTINGS' and ADR-INDEX-LIFECYCLE's checks, as information rather than a gate. Id retired, not reused | `the retired compare doc` (archived 2026-08-25) · [analysis](regression/2026-08-21-r7-preliminary-analysis/ANALYSIS.md) |
 | R8 | **RETIRED** (2026-08-22, Arpit) — never registered, never run. It was specified as a graph-verb bound **at 100 000 documents**, which is the class of commitment the same ruling removed. A graph bound, if wanted, is a new prediction at 10 000 with a new id | [where it was named](compare/graph-plane-format.compare.md) |
 | R9 | **PASS** (2026-08-22) — the T1 accelerator at the 10 000-document design point: **12.46 ms worst-case p95 against R3's own 150 ms bar, reused verbatim rather than restated**. It is the measurement that answered M6's first question with *T2 is not needed*, and [the T2 proposal](proposals/t2-segments.md) is the record of not building it | [R9-T2-AT-10K](regression/2026-08-22-r9-t2-at-10k/VERDICT.md) |
+| R10 | **INCONCLUSIVE** (2026-08-27) — the separation floor. The curve reaches `t = 0.75` at `separation 0.3`, **falls back at `0.4`**, then rises, and **two rules frozen in the same pre-registration disagree** about what that means: the selection rule picks `0.5`, the verdict table's row 4 (*non-monotone → too noisy*) picks no change. **Handed to Arpit, not adjudicated** (`CLAUDE.md` §A pre-registered threshold may never move). `SEPARATION_FLOOR` stays `0.10`; no test was edited, because `tests/query/test_confidence.py` asserts the rule relative to the constant and never its value. ⚠ **Six queries sit at or above `0.5`** and the top two bins are empty, so no reading supports a shipped constant — which the pre-registration said in advance. The contradiction is corrected in [ADR-RS](../docs/adr/0036_predictions.md) decision 18, never in the frozen file ✅ **RULED 2026-08-28 (Arpit): the VERDICT TABLE governs** — a non-monotone crossing is *no change*, and a selection rule applies only once the verdict table is satisfied. **`SEPARATION_FLOOR` stays `0.10`.** ⚠ **The verdict is unedited and stays `INCONCLUSIVE`**: the RULE is settled, the RESULT is not overturned — nothing supersedes a measurement except a better measurement. ⚠ **It does not reach the `grounded` decoy at `0.58`**, which is above the floor either reading would have picked. | [R10 verdict](regression/2026-08-27-r10-separation-floor/VERDICT.md) |
+| P3 | **PASS** (2026-08-27) — sanitized-sha stability. **19/19 = 100 %** against a frozen `>= 80 %`, so **fork 3 clears its gate** and W-87 P4 is unblocked. A **control arm** was run so the 100 % is not the M1 failure (a treatment that touched nothing, reported as a null effect): `Special:Random` changed, the 19 documentation URLs did not. ⚠ **Cleared is not decided** — a fifth function on the fetcher contract is still a design call. ⚠ **The spec named no interval**; at 12 s apart this measures **server-side determinism**, not document churn, and a realistic-interval run is a NEW pre-registration | [P3 verdict](regression/2026-08-27-p3-sha-stability/VERDICT.md) |
 
 ## Feature gates (pre-registered, but not `R` predictions)
 

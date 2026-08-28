@@ -24,7 +24,13 @@ from fux import setup as setup_mod
 from fux.cli import main
 from fux.errors import FuxError
 
-ALL_AGENT_PATHS = [rel for files in setup_mod.AGENT_FILES.values() for rel, _ in files]
+# W-82 ruling 16: the repo-root `AGENTS.md` is vendor-NEUTRAL, so it lives
+# outside `AGENT_FILES` (which is keyed by vendor) and has to be added here by
+# hand. It is still an agent file for every purpose these tests check —
+# `--no-agents` must not write it, and `report.outside` must list it.
+ALL_AGENT_PATHS = [rel for files in setup_mod.AGENT_FILES.values() for rel, _ in files] + [
+    setup_mod.AGENTS_FILE
+]
 
 
 def _fresh(tmp_path: Path) -> Path:
@@ -108,6 +114,10 @@ def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["kiro"]\n', encoding="utf-8")
     setup_mod.run(root)
     assert _agent_files_on_disk(root) == [
+        # W-86 P7: `fux-decoder` ships to the two SKILL surfaces and to neither
+        # ambient one. A Kiro skill is progressive-disclosure; only Kiro
+        # *steering* enters every interaction.
+        ".kiro/skills/fux-decoder/SKILL.md",
         ".kiro/skills/fux-usage/SKILL.md",
         ".kiro/steering/fux-archived-results.md",
     ]
@@ -194,9 +204,27 @@ def test_the_installer_never_branches_on_a_vendor_directory_existing(tmp_path):
     silent convention for everyone else — the derivation ADR-DIR-LIST decision
     4 already refused for `archived`."""
     import inspect
+    import io
+    import tokenize
+
+    def _code_only(text: str) -> str:
+        """Strip comments and string literals before sniffing.
+
+        ⚠ **The same defect the daemon build hit and caught** (W-82 ruling 10):
+        a bare substring check punishes a module for DOCUMENTING the constraint
+        it obeys — `_write_root_agents` explains in a comment why it does not
+        call `.exists()`, and an unfiltered sniff reads that as a violation.
+        The tempting fix is to delete the explanation; strip the tokens instead.
+        """
+        out = []
+        for tok in tokenize.generate_tokens(io.StringIO(text).readline):
+            if tok.type in (tokenize.COMMENT, tokenize.STRING):
+                continue
+            out.append(tok.string)
+        return " ".join(out)
 
     source = inspect.getsource(setup_mod)
-    routing = source[source.index("def _agents_to_install") : source.index("def run(")]
+    routing = _code_only(source[source.index("def _agents_to_install") : source.index("def run(")])
     for sniff in (".exists()", ".is_dir()", "glob("):
         assert sniff not in routing, (
             f"the agent routing calls {sniff} — which agents install is DECLARED, never sniffed"

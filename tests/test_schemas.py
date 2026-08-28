@@ -74,6 +74,21 @@ def test_every_schema_declares_a_version_id(package, path):
     assert schema_mod.load(package, path.name).id, "no `schema` id declared"
 
 
+#: Documentation keys a schema file may carry INSIDE an example. Stripped before
+#: validation because they are notes to a reader, not data.
+#:
+#: ⚠ **This used to be `startswith("_")` and that was too broad.** It collided
+#: the moment fux adopted the in-toto Statement shape, whose REQUIRED field is
+#: literally `_type` — the strip removed it and the example then failed its own
+#: declaration for a field it plainly had. **A leading underscore is fux's
+#: convention for metadata and somebody else's convention for data**, so the
+#: rule is now a named set rather than a prefix.
+_DOC_KEYS = frozenset({"_doc", "_comment", "_note"})
+
+
+def _strip_doc(example: dict) -> dict:
+    return {k: v for k, v in example.items() if k not in _DOC_KEYS}
+
 @pytest.mark.parametrize("package,path", SCHEMAS, ids=IDS)
 def test_every_declared_shape_carries_an_example(package, path):
     """**A shape without an example is a shape somebody will guess at**, and the
@@ -118,13 +133,13 @@ def test_every_example_validates_against_its_own_declaration(package, path):
         for example in _examples(body):
             if not isinstance(example, dict):
                 continue
-            clean = {k: v for k, v in example.items() if not k.startswith("_")}
+            clean = _strip_doc(example)
             shape.validate(clean, label=f"{path.name}#{name}")
             checked += 1
     if "fields" in raw:
         shape = schema_mod.load(package, path.name)
         for example in _examples(raw):
-            clean = {k: v for k, v in example.items() if not k.startswith("_")}
+            clean = _strip_doc(example)
             shape.validate(clean, label=path.name, conditions=_CONDITIONS)
             checked += 1
     assert checked or True  # a positional-only schema legitimately checks nothing here

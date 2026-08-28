@@ -17,9 +17,7 @@
     "rest, so a corrupt file degrades to 'what we can still believe' rather than",
     "taking down `fux doctor`."
   ],
-
   "schema": "fux.state.v1",
-
   "url_health": {
     "_doc": [
       "One URL's entry in `url-state.json`.",
@@ -33,33 +31,77 @@
       "",
       "`token` is DELIBERATELY ABSENT. It belongs to the optional `validate()`",
       "fetcher function, which is an unruled fork gated on a measurement.",
-      "Declaring a field nothing writes is how a knob that cannot work ships."
+      "Declaring a field nothing writes is how a knob that cannot work ships.",
+      "",
+      "`token_sha` ARRIVED 2026-08-28 with the optional `validate()`. It is a",
+      "counter-shaped field like the rest: an opaque equality witness, never a",
+      "timestamp, even when a server built it from one."
     ],
     "fields": {
-      "last_seen_run":    { "type": "int", "required": "never",
-                            "doc": "run_seq of the last run whose fetch succeeded; absent = never" },
-      "last_changed_run": { "type": "int", "required": "never",
-                            "doc": "run_seq when the sanitized sha last actually moved" },
-      "fail_streak":      { "type": "int", "required": "always", "default": 0,
-                            "doc": "consecutive failed fetches; any success resets it" }
+      "last_seen_run": {
+        "type": "int",
+        "required": "never",
+        "doc": "run_seq of the last run whose fetch succeeded; absent = never"
+      },
+      "last_changed_run": {
+        "type": "int",
+        "required": "never",
+        "doc": "run_seq when the sanitized sha last actually moved"
+      },
+      "fail_streak": {
+        "type": "int",
+        "required": "always",
+        "default": 0,
+        "doc": "consecutive failed fetches; any success resets it"
+      },
+      "token_sha": {
+        "type": "str",
+        "required": "never",
+        "doc": "sha256 of the last validation token the fetcher returned. THE HASH, NEVER THE TOKEN -- an ETag can be a content hash, a version counter or an internal object id, and this file ends up in support bundles. Hashing compares as well and carries none of it, so L5 is untouched by construction. Absent = the fetcher has no validate(), or said it could not tell."
+      }
     },
-    "example": { "last_seen_run": 12, "last_changed_run": 7, "fail_streak": 0 }
+    "example": {
+      "last_seen_run": 12,
+      "last_changed_run": 7,
+      "fail_streak": 0,
+      "token_sha": "9f2c1e4a7b3d5f60a8c2e1b4d7f0a3c65e8b1d4f7a0c3e6b9d2f5a8c1e4b7d09"
+    }
   },
-
   "url_state_file": {
     "_doc": "The whole of `url-state.json`.",
     "fields": {
-      "run_seq": { "type": "int",  "required": "always", "default": 0,
-                   "doc": "networked runs so far; only a run that FETCHED increments it" },
-      "urls":    { "type": "dict", "required": "always",
-                   "doc": "url -> url_health, and a de-listed url is dropped entirely" }
+      "run_seq": {
+        "type": "int",
+        "required": "always",
+        "default": 0,
+        "doc": "networked runs so far; only a run that FETCHED increments it"
+      },
+      "urls": {
+        "type": "dict",
+        "required": "always",
+        "doc": "url -> url_health, and a de-listed url is dropped entirely"
+      },
+      "rate_limited": {
+        "type": "dict",
+        "required": "never",
+        "doc": "host -> how many times that host rate-limited a fetch. COUNTS, NOT CLOCKS, like every other field here (W-82 ruling 12). Keyed by HOST rather than URL because a rate limit is a property of the server, not of one page; `fux doctor` reports it so a consumer can lower `[sources.url] max_parallel` themselves. **Fux never changes the cap on their behalf** -- state the cost, do not clamp the knob"
+      }
     },
     "example": {
       "run_seq": 12,
-      "urls": { "https://wiki.corp/handbook": { "last_seen_run": 12, "last_changed_run": 7, "fail_streak": 0 } }
+      "urls": {
+        "https://wiki.corp/handbook": {
+          "last_seen_run": 12,
+          "last_changed_run": 7,
+          "fail_streak": 0,
+          "token_sha": "9f2c1e4a7b3d5f60a8c2e1b4d7f0a3c65e8b1d4f7a0c3e6b9d2f5a8c1e4b7d09"
+        }
+      },
+      "rate_limited": {
+        "wiki.corp": 12
+      }
     }
   },
-
   "url_shas_file": {
     "_doc": [
       "The whole of `url-shas.json` -- the sha each URL last produced.",
@@ -73,9 +115,10 @@
       "reading the index would compare a value with itself."
     ],
     "shape": "url -> sanitized content sha",
-    "example": { "https://wiki.corp/handbook": "9a3f1c07b2e84d5566aa01ff3c2b7e9d40e15c8b" }
+    "example": {
+      "https://wiki.corp/handbook": "9a3f1c07b2e84d5566aa01ff3c2b7e9d40e15c8b"
+    }
   },
-
   "last_cited_file": {
     "_doc": [
       "The whole of `last-cited.json` -- what the previous answer to each",
@@ -97,6 +140,59 @@
       "3f2a1b0c9d8e7f60": {
         "docs/mesh.md": "516bef06781262a0a64b10027316c18d668eeccb"
       }
+    }
+  },
+  "daemon_status_file": {
+    "_doc": [
+      "`.fux/runtime/daemon.status` -- the last sweep the resident daemon ran.",
+      "",
+      "DECLARED 2026-08-28. It shipped undeclared, which is the gap this file",
+      "exists to close: `fux doctor` and `fux daemon status` both read it and",
+      "both hand-rolled their own tolerance for what might be in it.",
+      "",
+      "IT CARRIED `outcome` AND NOTHING ELSE UNTIL 2026-08-28, and both halves of",
+      "that cost something. A `FuxError` about `max_parallel` and a dead network",
+      "were the same bare \"failed\", so a misconfigured repository failed forever",
+      "with nothing to go on. And an \"ok\" sweep could skip URLs SILENTLY -- two",
+      "of seven did in the 2026-08-27 real-network run, and the only surface that",
+      "said so was a foreground `fux update` nobody runs.",
+      "",
+      "`reason` EXPLAINS SOMETHING OR IS ABSENT. It is never an empty string: a",
+      "field that is always present and usually empty is one a reader learns to",
+      "skip, which is how the old bare \"failed\" earned its silence.",
+      "",
+      "BOUNDED AT 300 CHARACTERS. This file is rewritten every sweep, and an",
+      "unbounded field on it is how a runtime file grows without anyone deciding",
+      "it should. The count says how many were skipped; `fux update` and the",
+      "enrich queue carry the detail."
+    ],
+    "fields": {
+      "outcome": {
+        "type": "str",
+        "required": "always",
+        "doc": "ok | busy | failed | stopped. `busy` is NOT an error -- a human's `fux ingest` holds the lock and outranks a clock."
+      },
+      "reason": {
+        "type": "str",
+        "required": "never",
+        "doc": "Why, when there is a why: the exception type and message on `failed`, or 'N skipped, first: ...' on an `ok` sweep that did not index everything. Absent on a clean sweep."
+      },
+      "fetched": {
+        "type": "int",
+        "required": "never",
+        "doc": "Documents the sweep indexed. Present on `ok` only."
+      },
+      "skipped": {
+        "type": "int",
+        "required": "never",
+        "doc": "Documents it did not. `outcome: ok` with `skipped: 2` is the state the pre-2026-08-28 shape could not express at all."
+      }
+    },
+    "example": {
+      "outcome": "ok",
+      "fetched": 5,
+      "skipped": 2,
+      "reason": "2 skipped, first: fetch failed: HTTP Error 404: Not Found"
     }
   }
 }

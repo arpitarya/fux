@@ -46,7 +46,7 @@ def test_every_status_path_leaves_the_lock_byte_identical(tmp_path, held_by):
         pid = dead.pid
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True, exist_ok=True)
-    lock = runtime / "runner.lock"
+    lock = runtime / runner.LOCK_NAME
     lock.write_text(json.dumps({"pid": pid}), encoding="utf-8")
     before = lock.read_bytes()
 
@@ -63,7 +63,7 @@ def test_status_reports_a_stale_lock_and_names_the_fix(tmp_path):
     dead.wait()
     runtime = tmp_path / ".fux" / "runtime"
     runtime.mkdir(parents=True)
-    (runtime / "runner.lock").write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
+    (runtime / runner.LOCK_NAME).write_text(json.dumps({"pid": dead.pid}), encoding="utf-8")
 
     state = runner.status(tmp_path)
     assert state["lock"] == "stale" and state["running"] is False

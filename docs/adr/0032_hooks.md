@@ -1,60 +1,33 @@
 ---
 type: ADR
 name: ADR-MAINTENANCE
-title: "ADR-MAINTENANCE (0032) — the git hooks that keep a committed index in step, and L5 enforced at write time"
-description: "M5, the hooks half. post-commit DEFERS since 2026-08-22 — it writes a dirty list and spawns a detached one-shot re-index rather than re-indexing inline, because R5 failed; post-merge re-ingests, post-checkout only rebuilds; every hook is best-effort and refuses to clobber; and the hashed-meta law moved from one caller into the writer, where nothing can skip it. The merge driver was carved out to ADR-MERGE-DRIVER on 2026-08-21."
+title: "ADR-MAINTENANCE (0032) — the git hooks that keep a committed index in step, the write lock, and the daemon"
+description: "post-commit DEFERS — it writes a dirty list and spawns a detached one-shot re-index; post-merge re-ingests, post-checkout only rebuilds; no hook ever touches the network; every index writer holds one lock; and a resident daemon covers the URLs nobody queries."
 status: accepted
+date: 2026-08-20
+feature: maintenance — the hooks, the deferring runner, the write lock, and the URL freshness daemon
+owns: [src/fux/maintain, tools/maintenance-bench]
+laws: [L3, L4, L5, L7]
 timestamp: 2026-08-20T00:00:00Z
 ---
 
-# ADR-MAINTENANCE: keeping the index in step
-
-- **Name:** `ADR-MAINTENANCE` — cite this everywhere; never cite the number
-- **Status:** **accepted 2026-08-22** — and *not* because R5 passed. **R5
-  measured 2026-08-20 and FAILED** ([R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md)):
-  44.380 s at the judged 100 000 documents against a 1 s bound, 3.523 s at
-  10 000, 0.651 s at 1 000. **Veto condition 1 fired, the fork it opened was
-  ruled by Arpit, and this record is accepted describing the behaviour that
-  ruling produced** — a deferring hook (decision 1a), not the inline one R5
-  judged. **That behaviour is now built** (2026-08-22): the record and the code
-  agree. The failing measurement is not restated in looser words anywhere in
-  this record, and the frozen pre-registration is untouched: a 1 s bound at
-  10 000 documents would be a **new** pre-registration and a **new** verdict.
-  Fork: [`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md),
-  ruled **B**. **Built 2026-08-22, all four phases** (W-66, archived).
-  R6 and the merge driver's own status moved to
-  [ADR-MERGE-DRIVER](0033_merge-driver.md) on 2026-08-21
-- **Date:** 2026-08-20
-- **Feature:** M5 — maintenance, the hooks half
-- **Owns:** `src/fux/maintain/` · `tools/maintenance-bench/` — **except
-  `mergedriver.py`**, carved out to [ADR-MERGE-DRIVER](0033_merge-driver.md) on
-  2026-08-21 (most specific wins). The harness stays here: one file runs both
-  R5 and R6, and a component is owned once
-- **Split to:** [ADR-MERGE-DRIVER](0033_merge-driver.md) — decisions 6–9, the
-  refusal table, R6, and the add/add limitation
-- **Amends:** [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
-  [ADR-CLI](0002_cli-surface.md)
-- **Laws:** L3, L5, L7
-
----
+# ADR-MAINTENANCE — keeping the index in step
 
 ## §1 — For humans
 
-Three pieces let a committed index survive a real repository with real people
-in it. **Two of them are this record**; the third, the merge driver, is
-[ADR-MERGE-DRIVER](0033_merge-driver.md) since 2026-08-21.
+Four pieces let a committed index survive a real repository with real people in
+it. **Three of them are this record**; the fourth, the merge driver, is
+[ADR-MERGE-DRIVER](0033_merge-driver.md).
 
-**Hooks.** `post-commit` and `post-merge` re-index; `post-checkout` rebuilds
-the derived plane. All three are best-effort and **cannot block a commit**.
+**Hooks.** `post-commit` and `post-merge` re-index; `post-checkout` rebuilds the
+derived plane. All three are best-effort, **cannot block a commit**, and
+**never touch the network**.
 
-**A merge driver**, registered by the same installer and decided elsewhere:
-`fux hooks` writes `merge.fux-index.driver` into the repository's local git
-config and the `.fux/index/*.jsonl merge=fux-index` line into `.gitattributes`.
-What the driver then *does* is [ADR-MERGE-DRIVER](0033_merge-driver.md).
+**A write lock.** Every command that writes the index holds it; read verbs hold
+nothing.
 
-**L5 moved into the writer.** Hashed meta for non-git sources was enforced in
-`ingest/run.py`, which is to say in *one caller*. It now lives in
-`write_index`, which is the only way bytes reach a committed shard.
+**A daemon.** `fux daemon start` runs a clock that re-fetches URLs nobody has
+queried — the tail that answer-time verification structurally cannot reach.
 
 ```mermaid
 flowchart LR
@@ -67,7 +40,8 @@ flowchart LR
     MD -->|resolved| PM["post-merge<br/>fux ingest"]
     MD -->|"cannot"| R["REFUSE:<br/>both sides kept"]
     K["git checkout"] --> PK["post-checkout<br/>fux build"]
-    W["any writer"] --> L5["write_index:<br/>L5 or FuxError"]
+    D["fux daemon start"] --> SW["sweep: re-fetch URLs<br/>nobody queried"]
+    W["any index writer"] --> L5["write.lock<br/>+ write_index: L5 or FuxError"]
 ```
 
 <details>
@@ -88,7 +62,10 @@ flowchart LR
 
   git checkout --> post-checkout (fux build, derived plane only)
 
-  any writer at all --> write_index --> L5 holds, or FuxError
+  fux daemon start --> a clock: re-fetch the URLs nobody queries
+
+  any index WRITER --> write.lock --> write_index --> L5 holds, or FuxError
+  any READ verb    --> holds nothing
 ```
 
 </details>
@@ -111,9 +88,6 @@ $ fux hooks
   kept   post-merge (already current)
 ```
 
-> The driver's own captures moved with it, to
-> [ADR-MERGE-DRIVER](0033_merge-driver.md) §1.
-
 ---
 
 ## §2 — For agents
@@ -123,526 +97,549 @@ $ fux hooks
 The index is committed, so it inherits every problem a generated file in git
 has: it goes stale the moment content changes, and it conflicts whenever two
 people touch the same shard. The staleness half is this record; the conflict
-half is [ADR-MERGE-DRIVER](0033_merge-driver.md). Meanwhile L5 — hashed meta
-for non-git sources — was a rule enforced by the one code path that happened to
+half is [ADR-MERGE-DRIVER](0033_merge-driver.md). Meanwhile L5 — hashed meta for
+non-git sources — was a rule enforced by the one code path that happened to
 implement it.
 
 ### Decision
 
-**0. Hooks are the mechanism, and that was Arpit's call, not this record's.**
-[`work/compare/maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md)
-ruled **A — git hooks** on 2026-08-20, rejecting a CI-triggered rebuild (a bot
-committing over the human's diff defeats the doc-major diffable design), a
-local watch daemon (an always-on process this architecture has never needed),
-and the manual status quo. That verdict is cited here, not re-argued. **What
-this record decides is everything the verdict left open** — which hook, what
-each one runs, and what happens when the driver cannot resolve.
+**0. Hooks are the mechanism**, ruled in
+[`maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md)
+over a CI-triggered rebuild (a bot committing over the human's diff defeats the
+doc-major diffable design), a local watch daemon, and the manual status quo.
+That verdict is cited here, not re-argued. **What this record decides is
+everything the verdict left open** — which hook, what each one runs, and what
+happens when the driver cannot resolve.
 
 **1. `post-commit`, not `pre-commit`, and this is the decision worth arguing.**
 
-`pre-commit` looks strictly better: re-index, stage the index, and the
-committed index always matches the committed content. **It reads the working
-tree, not the staged tree.** With `git add -p`, or any unstaged edit sitting
-beside a staged one, a pre-commit hook indexes bytes that are not being
-committed and writes that index *into* the commit — producing an index
-describing a state no commit ever had. That is **wrong**, where a
-post-commit index is merely **late**.
+`pre-commit` looks strictly better: re-index, stage the index, and the committed
+index always matches the committed content. **It reads the working tree, not the
+staged tree.** With `git add -p`, or any unstaged edit sitting beside a staged
+one, a pre-commit hook indexes bytes that are not being committed and writes
+that index *into* the commit — producing an index describing a state no commit
+ever had. **That is wrong, where a post-commit index is merely late.**
 
-The usual workaround is `git stash --keep-index` around the hook. It is
-fragile, and losing a user's uncommitted work to keep an index tidy is not a
-trade this project makes.
+The usual workaround is `git stash --keep-index` around the hook. It is fragile,
+and **losing a user's uncommitted work to keep an index tidy is not a trade this
+project makes.**
 
-> **So the committed index lags, and the lag is visible**: the hook prints
-> `the index changed — commit .fux/index to keep it in step`, and `fux doctor`
-> reports staleness. Late and honest beats current and wrong.
->
-> **Amended 2026-08-22 (decision 1a).** This used to read *"lags by at most one
-> commit"*. Since the hook defers, the lag is **a few commits**, bounded by how
-> long the detached runner takes rather than by one commit — and `fux ask` now
-> declares it rather than leaving it to `fux doctor` to be asked. `post-commit`
-> vs `pre-commit` is untouched by that change: it was never an argument about
-> speed.
+So the committed index lags, and **the lag is visible**: the hook prints *the
+index changed — commit .fux/index to keep it in step*, `fux ask` declares the
+pending count, and `fux doctor` reports staleness. **Late and honest beats
+current and wrong.**
 
 **1a. `post-commit` DEFERS: it writes a dirty list, spawns a runner, and
-returns.** Ruled by Arpit on 2026-08-22, closing the fork R5's failure opened
-([`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md),
-verdict **B**).
+returns.**
 
-**Why the inline hook could not stay.** R5 measured a **20-document commit** —
-already a small delta, and already benefiting from delta extraction (decision
-1b of [ADR-INGEST](0007_ingest.md), which skips re-extracting unchanged
-documents). It still cost 3.523 s at 10 000 documents and 44.380 s at 100 000.
+**Why an inline hook could not stay.** A measured **20-document commit** — a
+small delta, already benefiting from delta extraction — still cost **3.523 s at
+10 000 documents and 44.380 s at 100 000** against a 1 s bound
+([R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md), FAIL).
 **The cost tracks corpus size, not delta size**, because what remains after
 delta extraction is corpus-wide by construction: sha every file to learn what
 changed, parse every document because edges need it, resolve every edge because
-an edge is a claim about *other* documents, and write every shard. A 10×
-speedup still missed the bound by 4.5× at the judged size.
-
-**What the hook does now:**
+an edge is a claim about *other* documents, and write every shard.
 
 | step | property |
 |---|---|
-| write the ids of the changed documents to a **dirty list** | a *list*, not a flag — see below |
+| write the ids of the changed documents to a **dirty list** | a *list*, not a flag |
 | spawn a **detached one-shot** re-index | it drains the dirty list and **exits**; nothing is always-on |
-| **return immediately** | commit cost becomes git's cost — 0.22 s at 10k, 0.34 s at 100k, and **constant in the corpus** |
+| **return immediately** | commit cost becomes git's cost, and is **constant in the corpus** |
 
-**Three things this decision turns on:**
+**Three things this turns on:**
 
 1. **A list, not a flag.** Recording *which* documents changed costs the hook
-   nothing and is the exact input an incremental re-index needs. It is what
-   makes option D — *resolve edges only for the dirty set, rebuild only the
-   touched shards and segments* — a later increment rather than a rewrite.
-   **D is deferred to its own item, not rejected**, and this record does not
-   pre-judge it.
-2. **A one-shot runner is not the watch daemon that was rejected.**
-   [`maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md)
-   rejected an always-on filesystem watcher; this starts on a commit and exits.
-   Its "always-on process this architecture has never needed" objection does not
-   transfer, and that document's own consequences left a later layer open. The
-   reasoning is worked through in that compare doc's §5 and is not re-argued
-   here.
-3. **The list alone buys no speedup.** The runner still calls today's
-   `fux ingest`, which walks the corpus. B's win is that **nobody waits for
-   it** — not that it got smaller. Saying otherwise would be claiming a result
-   no measurement supports.
+   nothing and is the exact input an incremental re-index needs.
+2. **A one-shot runner is not the watch daemon that was rejected.** The compare
+   doc rejected an always-on filesystem watcher; this starts on a commit and
+   exits.
+3. ⚠ **The list alone buys no speedup.** The runner still calls today's
+   `fux ingest`, which walks the corpus. **The win is that nobody waits for
+   it** — not that it got smaller. Saying otherwise would claim a result no
+   measurement supports.
 
-**What this costs, stated rather than discovered.** The index/tree agreement
-window widens and becomes less predictable; two commits in quick succession
-need a single-writer discipline; and the spawn has to be stdlib-only (L1) on a
-Windows-first fleet. Those are **W-66**'s to solve, and they are the reason
-this record is accepted for the *decision* while the build is still open.
-
-**1b. `fux ask` declares the pending count.** Ruled in the same breath, and it
-is what keeps the widened window honest. The refer plane already refuses to
-collapse *"we did not look"* into *"we looked and it was fine"* — its
-three-state `current`/`stale`/`unverified` verdict exists for exactly that — and
-a lagging index is the same class of claim. `fux doctor` remains the detailed
-report; `ask` is where a reader who never runs `doctor` finds out.
-**This is a CLI surface change and [ADR-CLI](0002_cli-surface.md) carries it.**
+**1b. `fux ask` declares the pending count.** A lagging index is the same class
+of claim the refer plane refuses to collapse — *we did not look* is not *we
+looked and it was fine*. `fux doctor` remains the detailed report; `ask` is
+where a reader who never runs `doctor` finds out.
+[ADR-CLI](0002_cli-surface.md) carries the surface.
 
 **1c. The runner is observable, and the surface that observes it never mutates
-it.** Ruled by Arpit, 2026-08-22, in the same conversation as 1a.
-
-A process that runs detached and exits is invisible by construction. Three
-questions have to be answerable from the outside, or the deferral in 1a trades a
-slow commit for an opaque one:
+it.** A process that runs detached and exits is invisible by construction. Four
+questions have to be answerable from outside, or the deferral trades a slow
+commit for an opaque one:
 
 | question | why it is not optional |
 |---|---|
 | is a runner live right now, and which pid | the basic one |
 | how many documents are pending | the dirty list's own count |
-| **is the lock held, or stale** | 1a's lock can outlive a killed runner; a wedged repo with no way to see it is worse than no lock |
+| **is the lock held, or stale** | the lock can outlive a killed runner; a wedged repo with no way to see it is worse than no lock |
 | did the last run fail | a runner that dies leaves the list intact **and says nothing** |
 
-**Where it lives: a check inside `fux doctor`, not a new verb — for now.**
-`doctor` already returns `Check(ok, level, name, detail)` and already asserts
-the derived plane is present, fresh and uncommitted, so the runner is one more
-check in an existing shape. [ADR-CLI](0002_cli-surface.md) veto 1 forbids
-`fux <verb> <subverb>` outright, and a new verb costs a record; **`doctor`
-gains `--json`, which it does not have today**, because a status an agent cannot
-parse is not a status. The promotion criterion to a `fux status` verb is written
-into ADR-CLI as a **checkable condition**, not left to whoever next feels
-crowded.
+**It lives as a check inside `fux doctor`, not a new verb**, because `doctor`
+already has the shape and [ADR-CLI](0002_cli-surface.md) veto 1 forbids
+`fux <verb> <subverb>`. **`doctor` gained `--json`** — a status an agent cannot
+parse is not a status.
 
-**Read-only, and this is a decision rather than an omission.** The check reports
-a stale lock and **names the command to clear it**; it does not clear it. A
-surface that reports state and can also mutate it will eventually mutate it by
-accident, and the specific accident here — clearing a lock whose owner is
-actually alive — puts **two runners in `.fux/index/` at once**, which is the one
-thing 1a's lock exists to prevent. Automatic "provably stale" detection was
-considered and rejected on the same ground: *provably* is a cross-platform pid
-claim, and being wrong about it once is a corrupted index.
+⚠ **Read-only, and this is a decision rather than an omission.** The check
+reports a stale lock and **names the command to clear it**; it does not clear
+it. A surface that reports state and can also mutate it will eventually mutate
+it by accident, and **the specific accident here — clearing a lock whose owner
+is alive — puts two runners in `.fux/index/` at once.** Automatic
+"provably stale" detection was rejected on the same ground: *provably* is a
+cross-platform pid claim, and being wrong about it once is a corrupted index.
 
-**1d. A human's explicit command takes over from the runner, and
-`fux ingest --stop` is that takeover without the run.** Ruled by Arpit,
-2026-08-22.
+**1d. A human's explicit command takes over from the runner.**
 
 | command | behaviour |
 |---|---|
 | `fux ingest` | if a runner holds the lock, **stop it, then run** |
-| `fux ingest --stop` | stop it and **do not** run — the same takeover, halted |
+| `fux ingest --stop` | stop it and **do not** run |
 | `fux ingest --full` | as ever: re-extract everything rather than reuse by sha |
 
 **Why takeover rather than refuse-or-wait.** Refusing makes a person argue with
 a background job they did not start. Waiting reintroduces exactly the latency
-1a existed to remove, on a different command. The explicit instruction wins.
+1a existed to remove, on a different command.
 
-**Three consequences, and the first one is the load-bearing one:**
-
-1. **Stopping is now on the mainline, not an edge path.** Every manual
-   `fux ingest` may have to stop a runner, so "stop cleanly" is a normal
-   requirement rather than a rare one. It must therefore be **cooperative** —
-   the runner checks a stop signal at a safe point between units of work and
-   exits there. Not a kill: a signal delivered mid-shard-write can leave a
-   partial shard, and `write_index` is the only path bytes reach a committed
-   shard by. Cooperative also happens to be the portable answer, since Windows
-   has no `SIGTERM` in the POSIX sense — **L7 and the Windows-first litmus make
-   that the same decision twice.**
+1. ⚠ **Stopping is on the mainline, not an edge path**, so *stop cleanly* is a
+   normal requirement. It is **cooperative** — the runner checks a stop signal
+   at a safe point between units of work and exits there. **Not a kill**: a
+   signal delivered mid-shard-write can leave a partial shard. Cooperative is
+   also the portable answer, since Windows has no `SIGTERM` in the POSIX sense —
+   **L7 and the Windows-first litmus make that the same decision twice.**
 2. **A stopped run is a run that did not complete**, so the dirty list survives
-   it untouched — identical to the killed-runner case in 1a. There is no third
-   state to reason about.
+   it untouched. There is no third state to reason about.
 3. **A completed run clears only the entries it actually covered**, never the
-   whole list. Takeover makes concurrent addition ordinary: a commit landing
-   while a manual run is in flight appends to the list, and a run that clears
-   wholesale on success would silently drop that commit's documents. Snapshot at
-   start, clear the snapshot on success.
+   whole list. A commit landing while a manual run is in flight appends to the
+   list, and a run that cleared wholesale on success would **silently drop that
+   commit's documents.** Snapshot at start, clear the snapshot on success.
 
-**This does not contradict veto 7.** That condition guards the *status*
-surface — `doctor`, and anything that succeeds it — from mutating what it
-reports. `fux ingest` is not a status surface; it is the write path, and it is
-where a mutation belongs. **`doctor` still never stops a runner and still never
-clears a lock** (decision 1c).
+**2. `post-merge` re-ingests; `post-checkout` only rebuilds.** A merge brings in
+content *and* index lines, and **the content is the authority** — re-ingesting
+derives the index from the merged content and repairs anything the driver had to
+refuse. A checkout authors no content, so only the gitignored runtime plane
+needs deriving.
 
-**2. `post-merge` re-ingests; `post-checkout` only rebuilds.** A merge brings
-in content *and* index lines, and the content is the authority — re-ingesting
-derives the index from the merged content and repairs anything the driver had
-to refuse. A checkout changes which committed index is present and no content
-was authored, so only the gitignored runtime plane needs deriving.
+**2a. The derived plane refresh comes free.** `fux ingest` already derives the
+accelerator and the graph plane in the same pass, so `post-commit` and
+`post-merge` get it without a second command.
 
-**2a. The hook DOES refresh the derived plane, and it comes free.** The
-compare doc left this open — *"should the hook also call `fux build` so
-`.fux/runtime/graph.json` refreshes immediately, or is the stale→scan fallback
-enough?"* — and the answer is that `fux ingest` already derives the accelerator
-and, since [ADR-GRAPH](0029_graph.md), the graph plane in the same pass.
-So `post-commit` and `post-merge` get it without a second command.
-
-**`post-checkout` calls `fux build` and nothing else**, because a checkout
-authors no content: the committed index is whatever that commit holds, and only
-the gitignored runtime plane needs re-deriving.
-
-**The stale→scan fallback stays the safety net, not the plan.**
-[ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) decision 7 means a stale derived
+**The stale→scan fallback stays the safety net, not the plan.** A stale derived
 plane degrades to the reference scan rather than answering wrongly — so a
-missing hook costs latency, never correctness. That is exactly why decision 3
-can make the hooks best-effort: the thing they optimise is speed, and the thing
-that protects the answer is somewhere else.
+missing hook costs latency, never correctness. **That is exactly why decision 3
+can make the hooks best-effort**: the thing they optimise is speed, and the
+thing that protects the answer is somewhere else.
 
 **3. Every hook is best-effort and cannot block anything.** Each begins
-`command -v fux >/dev/null 2>&1 || exit 0` and swallows failures. A tool that
+`command -v fux >/dev/null 2>&1 || exit 0` and swallows failures. **A tool that
 blocks a commit because *its own* index step failed has made itself the most
-important thing in the repository, which it is not.
+important thing in the repository, which it is not.**
 
-**4. Installation refuses rather than clobbers.** A hook fux did not write
-(no marker line) is left exactly as it is, the others still install, and the
-refusal is printed. Silently replacing a repo's `post-commit` is how a team
-loses its own tooling to a tool it installed to help. `--uninstall` is
-symmetric: it removes only what it wrote.
+**4. Installation refuses rather than clobbers.** A hook fux did not write (no
+marker line) is left exactly as it is, the others still install, and the refusal
+is printed. **Silently replacing a repo's `post-commit` is how a team loses its
+own tooling to a tool it installed to help.** `--uninstall` is symmetric: it
+removes only what it wrote.
 
 **5. Hooks are never committed and never install themselves.** `.git/hooks` is
-not tracked, so a hook cannot arrive with a clone — and that is a property to
-respect rather than route around, because a tool that installed itself on
-clone would execute code no reviewer saw. `fux doctor` can report their
-absence; installing stays a decision.
+not tracked, so a hook cannot arrive with a clone — **a property to respect
+rather than route around, because a tool that installed itself on clone would
+execute code no reviewer saw.**
 
-**6–9. The merge driver moved out on 2026-08-21.** Last-writer-wins on
-`(ver, sha)`, the four refusal cases and their table, the sorted deterministic
-output, and `fux-merge-index` as its own entry point are now
-[ADR-MERGE-DRIVER](0033_merge-driver.md), which owns
-`src/fux/maintain/mergedriver.py`. **The numbers are retired, not reused** —
-decision 10 keeps its number so every doc that cites it stays true. What
-remains here is the wiring: `fux hooks` registers the driver in the
-repository's local git config and appends the `.gitattributes` line, under
-decisions 4 and 5's refuse-rather-than-clobber policy.
+**5a. NO HOOK EVER TOUCHES THE NETWORK.** Without exception — **including** the
+commit that edits `.fux/sources/urls`, which is the exception that was
+specifically proposed and specifically refused.
 
-**10. L5 is enforced in `write_index`, per record, before any shard is
-touched.** A non-git record must **state** `meta`; a missing value means the
-policy layer was bypassed and is refused rather than defaulted, because
-guessing on a caller's behalf is the leak the law exists to close. `hashed`
-must carry `title_h` and **no `title` and no `phrases`**. `plain` remains a
-legal, explicit, per-document opt-out
-([ADR-URL-LIST](0018_url-list.md) decision 10).
+- ⚠ **The refused version was narrow and still wrong.** *"Fetch, but only for
+  the commit that changes the sources file"* is bounded by a diff and reads as
+  self-evidently consented. **The consent is the problem, not the scope.** A
+  colleague clones, runs `fux hooks` once because the README said to, and from
+  then on some commits send requests to hosts they never chose, from a machine
+  that may be on a customer's network — **a one-time, invisible consent buying a
+  per-commit, permanent consequence.**
+- **What still fetches:** `fux add <URL>` and `fux update`, both explicit
+  commands a human typed, and **the daemon**, which is started deliberately and
+  stays visible while it runs. **Network in fux is always something someone
+  asked for in the moment or chose to leave running.**
+- **The cost, stated:** URLs added by hand-editing `.fux/sources/urls` are not
+  fetched at commit time. They wait for the daemon's next pass or an explicit
+  `fux update`. That is a delay, not a silence — `fux doctor` reports them.
+- **Gated, not trusted:**
+  [`tests/maintain/test_hooks.py`](../../tests/maintain/test_hooks.py) asserts
+  no hook body contains a networking invocation, per hook. **It is a crude
+  string check on purpose**: the failure worth catching is a future edit adding
+  a refresh back *just for the sources commit*, and a crude check catches that
+  the same day it is written.
+- **This is L4 at its narrowest point.** A git hook is the one path in fux that
+  runs **without anyone deciding to run it**.
+
+**6. `fux hooks` registers the merge driver.** It writes
+`merge.fux-index.driver` into the repository's local git config and the
+`.fux/index/*.jsonl merge=fux-index` line into `.gitattributes`, under decisions
+4 and 5's refuse-rather-than-clobber policy. **What the driver does is
+[ADR-MERGE-DRIVER](0033_merge-driver.md)'s.**
+
+**7. L5 is enforced in `write_index`, per record, before any shard is touched.**
+A non-git record must **state** `meta`; a missing value means the policy layer
+was bypassed and is refused rather than defaulted, because guessing on a
+caller's behalf is the leak the law exists to close. `hashed` must carry
+`title_h` and **no `title` and no `phrases`**.
+
+**8. One lock, `write.lock`, and every index writer holds it.** `ingest`,
+`build`, `add`, `remove` and `update` all pass through `write_lock(root)`.
+**Read verbs take nothing** — a lock on the read path would make a search fail
+because a re-index was running, which trades a real problem for a worse one.
+
+⚠ **The gap this closed was read from call sites and then reproduced.**
+`acquire()` had exactly one caller — the background runner. A foreground
+`fux ingest` evicted a runner and then wrote **holding nothing**, so two
+foreground ingests raced with nothing noticing.
+`test_two_foreground_writers_actually_race_without_it` spawns two processes and
+is the reproduction that had to exist before anything was built on the claim.
+
+⚠ **`acquire(required=True)` raises where `acquire()` returns `False`, and the
+asymmetry is the point.** The same line meant opposite things to two callers: a
+**background runner** that cannot take the lock should decline quietly, because
+someone else is already doing the work; a **writer** that cannot take it and
+proceeds has inverted the lock's purpose. For the same reason
+`except OSError: return False  # degrade, never block` was right for a runner
+and **inverted** for a writer — on a read-only or full filesystem the write is
+about to happen anyway, and doing it unprotected is the outcome the lock exists
+to prevent.
+
+**A runner may re-enter its own lock**, or it would deadlock against itself.
+**The file is not called `index.lock`** — git keeps one of those feet away in
+the same repo, and a stranded-lock incident with it is already on record.
+
+**9. `fux daemon` — a resident clock.** Owns
+[`src/fux/maintain/daemon.py`](../../src/fux/maintain/daemon.py).
+
+**What it is for.** Answer-time verification covers the **head** — a URL is
+noticed as changed when someone retrieves it. It cannot reach the **tail**: a
+URL nobody queries is never cited, never fetched, and nothing notices. **No
+amount of answer-time verification closes that.** The clock does.
+
+⚠ **This is a resident process, and that cost is accepted rather than argued
+away.** Fux now owns a lifecycle: start, stop, crash, laptop sleep, double-run,
+stale build after upgrade. What it is *not* is the filesystem watcher the
+compare doc rejected — **that one fired on every save, with no moment of
+choosing.** This starts because a human typed `start`, and the compare verdict
+governs how a **local source edit** reaches the index, where this governs how a
+**remote URL change** is noticed.
+
+**9a. It writes `.fux/index/` directly and takes the same `write.lock`.** That
+makes it a **second writer**, and every consequence is paid explicitly:
+
+- **The same lock**, never a second lock file. **Two locks guarding one resource
+  is not locking.**
+- **Released between sweeps, never held across the sleep.** An hour-long hold
+  would block every `fux ingest` in the repository.
+- **The stop is cooperative and is never a signal**, for decision 1d's reason
+  unchanged. A `stop` that times out is **reported, not escalated** — and that
+  is the honest outcome, not a missing feature.
+- **A killed daemon leaves a stale lock**, exactly as a killed runner does, and
+  decisions 1c/1d already answer it: `fux doctor` reports, `fux ingest` takes
+  over, **nothing decides on its own that a lock is dead.**
+
+**9b. Nothing outside the repository, ever.** Spawned as
+`sys.executable -m fux.cli` — the interpreter already running, so the project's
+`.venv` is pinned rather than looked up on `PATH`. **No launchd plist, no
+systemd unit, no crontab entry, no global install.** Gated by
+[`tests/maintain/test_daemon.py`](../../tests/maintain/test_daemon.py), which
+strips comments and string literals before checking, so the module may document
+the constraint without tripping the test that enforces it.
+
+**9c. Nothing may start it but a human.** Not `fux setup`, not `fux hooks`, not
+a hook body — asserted per hook. **The consent is the whole of the argument, so
+the moment something else starts it, the argument is void.**
+
+**9c-i. The sweep is verified END TO END, and by a positive control.** Measured
+2026-08-27 —
+[the daemon-lifecycle capture](../../work/regression/2026-08-27-daemon-lifecycle/report.md).
+`start` → sweep → **a page changed under fux, picked up on the next declared
+interval, unassisted** → `stop` → pid reaped, `write.lock` free.
+
+- ⚠ **The reason it needed a real run at all is the defect it was proving
+  fixed.** `_sweep` did `from ..ingest import run as ingest_run`, binding the
+  re-exported *function*, so `ingest_run.run(...)` raised `AttributeError` into
+  the broad handler that keeps a daemon alive. **Every sweep, in every
+  repository, indexed nothing and the daemon looked healthy.** The test named
+  for that path patched the same wrong object and failed on its own
+  `monkeypatch` line.
+- **So the check is a positive control, not a status read.** A term that exists
+  only in the fetched page was absent from the index before `start` and present
+  after. A mock cannot tell "the sweep called ingest" from "the sweep called the
+  mock"; this can.
+- ⚠ **The network was `127.0.0.1`.** No proxy, no TLS, no SSO, no rate limit, no
+  DNS — so the rate-limit path was never exercised, and
+  [W-82](../../work/OPEN-WORK.md) ruling 3's hold is **narrowed, not lifted.**
+- ⚠ **macOS only**, and the detached-process mechanics are the part most likely
+  to differ on Windows.
+
+**9d. Cadence is `[sources.url] sweep_minutes`, default 60.** It **has** a
+default, unlike `max_parallel`, and the asymmetry is deliberate: `max_parallel`
+bounds a blast radius and must be stated; this only decides how often, so
+silence is unopinionated rather than dangerous. **No adaptive scheduling** —
+proportional-to-change-rate is out of scope.
+
+**10. The dirty list has two producers, and the contract it leans on needs
+saying rather than assuming.** `post-commit` records what a commit changed; the
+refer plane records a `url:` doc id when a cited document's sha no longer
+matches ([ADR-REFER](0030_refer-plane.md) decision 15).
+
+`dirty.py` is **advisory, never authoritative**, and that sentence is what keeps
+L3 true: `fux ingest` re-walks the whole corpus regardless, so the list can never
+change a committed byte. **A URL refresh driven by the list *is* authoritative
+for the URLs it names**, because not fetching the rest is the entire point. The
+defence:
+
+> The `url:` half of the index is **already** a mosaic of different moments.
+> Every record holds whatever its last fetch produced, and no two were
+> necessarily fetched together. A partial refresh changes the *spread* of those
+> moments, not the kind of object the index is. L3 is *same sources → same
+> bytes*, and **a URL is not the same source twice.**
+
+⚠ **This is not "just index the delta"**, which was ruled *not* the fix for the
+hook latency. That was an offline filesystem walk that is already cheap; this is
+a networked path that is not, and **the economics invert.**
+
+**11. The package's local state files have a declared shape, and the readers use
+it.** `maintain/state.schema.json` declares `url-state.json`, its per-URL health
+entry, `url-shas.json` and `last-cited.json`, and the readers call
+`schema.coerce` rather than hand-rolling per-field suspicion.
+
+**The defensiveness was right and survives.** These files can be truncated by a
+killed runner, hand-edited by someone debugging a failing URL, or written by an
+older fux, so a reporting plane must **degrade rather than raise**. What changed
+is *where* the tolerance lives: `coerce` keeps declared, well-typed fields and
+drops the rest, so **a new field is declared in one place instead of a place
+plus a reader that must remember it.**
+
+⚠ **These counters are runs, never seconds**, because
+[`refer/fetchcache.py`](../../src/fux/refer/fetchcache.py) states that wall
+clock lives in the TTL store and nowhere else. A `validated_at` / `changed_at`
+pair was specified and **not shipped**: it would have quietly contradicted an
+accepted record. **`token` is declared absent on purpose** — it belongs to an
+optional fetcher function that is an unruled fork, and **declaring a field
+nothing writes is how a knob that cannot work ships.**
+
+**12. The sweep's status carries a REASON and COUNTS, and the file is declared.**
+Ruled by Arpit 2026-08-28.
+
+- **It carried `outcome` and nothing else**, and both halves of that cost
+  something real:
+  - A `FuxError` about `max_parallel` and a dead network were **the same bare
+    `"failed"`**, so a misconfigured repository failed forever with nothing to
+    go on.
+  - ⚠ **An `"ok"` sweep could skip URLs silently.** Two of seven did in the
+    [2026-08-27 real-network run](../../work/regression/2026-08-27-daemon-real-url/report.md),
+    and the only surface that said so was a foreground `fux update` nobody runs.
+    **`outcome: "ok"` with `skipped: 2` is a state the old shape could not
+    express at all.**
+- **`reason` explains something or is absent** — never an empty string. A field
+  that is always present and usually empty is one a reader learns to skip, which
+  is how the bare `"failed"` earned its silence.
+- **Bounded at 300 characters, and it carries the FIRST skip, not a list.** This
+  file is rewritten every sweep; an unbounded field on it is how a runtime file
+  grows without anyone deciding it should. The count says how many.
+- **The exception TYPE is carried with the message**: a `FuxError` is the repo's
+  own refusal (fix your config), anything else is a surprise (fix fux).
+- ⚠ **`daemon.status` shipped UNDECLARED.** It is now in
+  [`state.schema.json`](../../src/fux/maintain/state.schema.json), which is the
+  gap that file exists to close — two readers were hand-rolling their own
+  tolerance for what might be in it.
+- **`fux doctor` surfaces it**, because `fux daemon status` is what a person runs
+  when they already suspect something and `doctor` is what they run when they do
+  not. A daemon that never ran is **not** a finding — a check that fires for
+  everyone is one people learn to skip.
+
+**13. `token_sha` — the validation token's hash, and never the token.** W-87 P4
+fork 4, ruled 2026-08-28 with fork 3.
+
+- **`sha256(token)` in `url-state.json`.** An `ETag` is opaque to fux but not
+  necessarily to everyone: it can be a content hash, a version counter, or an
+  internal object id. This file is gitignored and is still exactly the kind of
+  local state that ends up in a support bundle. **Hashing compares as well as the
+  token does and carries none of it, so L5 is untouched by construction.**
+- **Counters, no clocks — unchanged.** A token is an opaque equality witness,
+  not a timestamp, even when a server built it from one.
+- 🔴 **It was declared, written, and NOT READ BACK for its first hour**, so
+  `validate()` learned a token every run and matched none — the optimisation did
+  nothing while every test passed. **`state.schema.json`'s own header predicts
+  this failure in as many words**: *"add a field and you must remember to teach
+  the reader about it, or it is silently dropped on the next read."*
+  **Now gated**: `test_every_declared_field_survives_a_round_trip` walks the
+  *declared* shape rather than a hard-coded list, so the next field is covered
+  without editing the test.
 
 ### Consequences
 
 - **There is no path into a committed shard that skips L5.** That is the
-  difference between a law and a habit, and it is what W-25's DoD meant by
-  "unbypassable" — the test that tries to bypass it calls `write_index`
-  directly.
+  difference between a law and a habit, and the test that tries to bypass it
+  calls `write_index` directly.
 - **A rejected batch leaves the index exactly as it was.** The check runs over
   every record before the first shard is written.
-- **The existing corpus already complied**, so this landed without changing a
-  single committed byte. That is evidence the rule was right, not evidence it
-  was unnecessary.
-- **`fux` gains a twelfth verb** and ADR-CLI a sixth group. Flat, as ever.
-- **R5 FAILED, measured 2026-08-20** —
-  [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md).
-  **44.4 s at 100 000 documents against a 1 s bound**, and **0.651 s at 1 000**,
-  where it passes. Cost tracks the corpus, not the commit: a 20-document commit
-  costs whatever touching the whole corpus costs, because parse, edge
-  resolution, the shard write and the derived rebuild are each O(corpus).
-  **Veto condition 1 has fired**, and its own words are what happens next —
-  *"`post-commit` is too slow to be automatic and the hook becomes opt-in or
-  incremental in a way it currently is not."* Which of those is a fork with
-  several viable answers, so it is
-  [`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md) and
-  Arpit's verdict, not this record's to assume.
-- **R6 and everything that follows from it moved to
-  [ADR-MERGE-DRIVER](0033_merge-driver.md)** on 2026-08-21 — the INCONCLUSIVE
-  verdict, the add/add limitation, and the reproduced false-refusal defect
-  ranked P4. **W-61 still carries both gates**, because one open item covers
-  M5's measurement whichever record owns the code.
-- **The behaviour test in `tests_e2e/test_maintenance.py` is still not R6**,
-  and is now superseded as evidence by the runs above rather than standing in
-  for them.
-- **Decisions 1a–1d are built as of 2026-08-22 (W-66).**
-  `src/fux/maintain/runner.py` is the whole of the mechanism: an
-  `O_CREAT|O_EXCL` pid lock, a stop file that **names the pid it targets**, a
-  `sys.executable -m fux.cli ingest --runner` spawn detached with
-  `start_new_session` (POSIX) or `DETACHED_PROCESS|CREATE_NEW_PROCESS_GROUP`
-  (Windows), and `ingest.run()`'s `should_stop` polled only **before**
-  `write_index`. `post-commit` is now one line, `fux ingest --spawn-runner`.
-  **Three things fell out of building it that this record did not anticipate:**
-  - **`os.kill(pid, 0)` is not a liveness probe on Windows** — CPython routes
-    it through `TerminateProcess`, so the POSIX idiom for *"does this process
-    exist"* would **kill** the runner it was asking about. `is_alive` uses
-    `OpenProcess`/`WaitForSingleObject` there. This is exactly the
-    silently-wrong-on-someone-else's-OS class decision 1a's build was assigned
-    to an Opus session for, and it is asserted by a test that reads the source.
-  - **An OS advisory lock was available and was not taken.** `fcntl.flock` /
-    `msvcrt.locking` release themselves when a holder dies, so a stale lock
-    would be impossible. It loses decision 1c: an flock is held by a file
-    descriptor nothing outside the process can name, and the runner's state
-    has to be *reportable*. The cost is a lock file that outlives a killed
-    runner, and the answer to that is the doctor check plus takeover — never a
-    background process deciding on its own that a lock is dead.
-  - **The stop file has to name its target pid.** Without that, a stop aimed
-    at a runner that has already exited silently halts the *next* one, which
-    would turn a 50-commit `git rebase` into a repository that indexes nothing.
-- **`post-commit` no longer paints a progress bar, and that is W-64's own
-  revisit clause being spent.** The hooks still export `FUX_NO_PROGRESS=0`
-  (W-64, 2026-08-21) and `post-merge`/`post-checkout` still run inline and
-  still want it. But `post-commit` no longer waits for an ingest at all, and
-  the ingest that does run is detached with no terminal to paint — so R5's
-  44.4 s of silence is answered by removing the wait rather than by narrating
-  it. W-64's note said in as many words *"revisit if W-61's fork resolves to
-  option B"*; it did, and this is that revisit. The bar's rules remain
-  [ADR-CLI](0002_cli-surface.md) decision 9. **`fux-merge-index` stays silent
-  regardless** — git owns the merge driver's stdio contract, and the driver is
-  per-shard fast. Revisit if W-61's fork resolves to option B: a deferred hook
-  costs ~0.3 s and constant, which the bar's count threshold mostly suppresses
-  anyway.
-
-> **Amended 2026-08-26 (W-82 §3.2, §3.1) — the dirty list has a second
-> producer, and `maintain/` gained `urlstate.py`.**
->
-> This record described one writer: `post-commit`, recording the documents a
-> commit changed. **The refer plane is now a second** — it records a `url:`
-> doc id when a cited document's sha no longer matches the index.
->
-> ⚠ **The contract this leans on needs saying rather than assuming.**
-> `dirty.py` is *"advisory, never authoritative"*, and that sentence is what
-> keeps L3 true: `fux ingest` re-walks the whole corpus regardless, so the list
-> can never change a committed byte. A **URL** refresh driven by the list *is*
-> authoritative for the URLs it names, because not fetching the rest is the
-> entire point. The defence:
->
-> > The `url:` half of the index is **already** a mosaic of different moments.
-> > Every record holds whatever its last fetch produced, and no two were
-> > necessarily fetched together. A partial refresh changes the *spread* of
-> > those moments, not the kind of object the index is. L3 is *same sources ->
-> > same bytes*, and **a URL is not the same source twice.**
->
-> ⚠ **This is not "just index the delta"**, which was ruled *not* the fix for
-> R5. That was an offline filesystem walk that is already cheap; this is a
-> networked path that is not, and the economics invert.
->
-> `maintain/urlstate.py` is covered by this record's existing directory-level
-> claim on `src/fux/maintain/`; no ownership row changes. ⚠ **It deliberately
-> holds no timestamp** — [`refer/fetchcache.py`](../../src/fux/refer/fetchcache.py)
-> states the invariant that *wall clock lives in the TTL store and nowhere
-> else*, so freshness here is counted in **networked runs**, not seconds.
-> W-75 had specified `validated_at` / `changed_at`; shipping them would have
-> been a quiet contradiction of an accepted record.
-
-> **Amended 2026-08-26 — this package's two local state files have a declared
-> shape, and the readers use it.**
->
-> `maintain/state.schema.json` declares `url-state.json`, its per-URL health
-> entry, `url-shas.json` and `last-cited.json`. Both readers now call
-> `schema.coerce` instead of hand-rolling per-field suspicion — an
-> `_int_or_none` helper in one file, an `isinstance` filter in the other.
->
-> **The defensiveness was right and survives.** These files can be truncated by
-> a killed runner, hand-edited by someone debugging a failing URL, or written by
-> an older fux, so a reporting plane must degrade rather than raise. What
-> changed is *where* that tolerance lives: `coerce` keeps declared, well-typed
-> fields and drops the rest, so **a new field is declared in one place instead
-> of a place plus a reader that must remember it.**
->
-> ⚠ **The schema records the constraint that shaped the file**: these counters
-> are **runs, never seconds**, because `refer/fetchcache.py` states that wall
-> clock lives in the TTL store and nowhere else. W-75 had specified
-> `validated_at` and `changed_at`; shipping them would have quietly contradicted
-> an accepted record.
->
-> **`token` is declared absent on purpose** — it belongs to the optional
-> `validate()` fetcher function, which is an unruled fork gated on a
-> measurement. Declaring a field nothing writes is how a knob that cannot work
-> ships.
+- **The existing corpus already complied**, so the write-time check landed
+  without changing a single committed byte. **That is evidence the rule was
+  right, not evidence it was unnecessary.**
+- ⚠ **`os.kill(pid, 0)` is not a liveness probe on Windows** — CPython routes it
+  through `TerminateProcess`, so the POSIX idiom for *does this process exist*
+  would **kill** the runner it was asking about. `is_alive` uses
+  `OpenProcess`/`WaitForSingleObject` there, asserted by a test that reads the
+  source. **This is the silently-wrong-on-someone-else's-OS class exactly.**
+- ⚠ **An OS advisory lock was available and was not taken.** `fcntl.flock` /
+  `msvcrt.locking` release themselves when a holder dies, so a stale lock would
+  be impossible. **It loses decision 1c**: an flock is held by a file descriptor
+  nothing outside the process can name, and the runner's state has to be
+  *reportable*. The cost is a lock file that outlives a killed runner, and the
+  answer is the doctor check plus takeover — never a background process deciding
+  on its own that a lock is dead.
+- ⚠ **The stop file names its target pid.** Without that, a stop aimed at a
+  runner that has already exited silently halts the *next* one — **which would
+  turn a 50-commit `git rebase` into a repository that indexes nothing.**
+- ⚠ **The runner re-drains, bounded by `MAX_PASSES`.** After a pass it re-reads
+  the dirty list and runs again while there is work. Without that, a commit
+  whose spawn was refused had its ids **stranded**: the live runner clears only
+  its own start-time snapshot, so newer work was left with no process holding
+  it. **Every Linux CI arm failed on this while Windows and macOS passed**,
+  which is what the race looks like on a slower box. The bound makes termination
+  provable, so the process is still one-shot in the only sense that matters: it
+  ends.
+- **`post-commit` paints no progress bar.** It no longer waits for an ingest,
+  and the ingest that does run is detached with no terminal to paint — so the
+  silence is answered by removing the wait rather than by narrating it.
+  `post-merge` and `post-checkout` run inline and still export
+  `FUX_NO_PROGRESS=0`. **`fux-merge-index` stays silent regardless** — git owns
+  the merge driver's stdio contract.
+- **A `git diff` delta hook is not built, and the reason is a number.** A
+  one-document re-ingest is **0.84 s at 10 000 documents**, linear at ~82 µs per
+  document, after the largest per-document cost left extraction
+  ([the re-run](../../work/regression/2026-08-23-r5-rerun-after-code-removal/report.md)).
+  **The reopen trigger is a measured one-document re-ingest above 5 s** — a
+  number, not a size.
+- **A custom-ref transport for the derived plane could not have been a
+  correctness path.** `git clone` fetches no custom refs and runs no hooks
+  (hooks live in `.git/`, which is not cloned), so nothing could fetch a derived
+  plane on arrival. The accelerator rebuilds in **0.7 s at 10 000 documents**.
 
 ### Alternatives considered
 
 - **`pre-commit` with `git stash --keep-index`.** Rejected: decision 1.
 - **A `pre-commit` hook that only *warns* when the index is stale.** Genuinely
   attractive, and the reason it is not here is that it adds a second mechanism
-  answering the same question `fux doctor` already answers. Reopen if the
-  one-commit lag turns out to bite in practice.
-- **Committing the hooks into `.fux/hooks/` and symlinking.** Rejected: it
-  makes `git clone` install executable code, which is the thing decision 5
-  refuses.
-- **The merge-driver alternatives** — always taking the higher `ver` including
-  on ties, and union-merging the shard — moved with decisions 6–9 to
-  [ADR-MERGE-DRIVER](0033_merge-driver.md).
-- **Leaving L5 in `ingest/run.py` and documenting the rule.** Rejected on the
+  answering the question `fux doctor` already answers.
+- **Committing the hooks into `.fux/hooks/` and symlinking.** Rejected: it makes
+  `git clone` install executable code, which is what decision 5 refuses.
+- **A hook that fetches, but only for the commit that edits the sources file.**
+  Rejected under decision 5a — the consent is the problem, not the scope.
+- **Leaving L5 in one caller and documenting the rule.** Rejected on the
   observation that this is what it already was.
-- **CI-triggered rebuild · a watch daemon · staying manual.** All three were
-  rejected by the accepted compare doc, on grounds this record does not repeat:
-  [`maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md).
+- **An OS advisory lock.** Rejected under Consequences: it forfeits
+  observability, which decision 1c makes the property.
+- **A status surface that repairs what it reports.** Rejected: decision 1c, and
+  it is veto condition 4.
+- **CI-triggered rebuild · a filesystem watcher · staying manual.** All three
+  rejected by the accepted compare doc, on grounds this record does not repeat.
 
 ### Reference (required)
 
-- `gitattributes(5)` §"Defining a custom merge driver" — what `fux hooks` has
-  to write for git to call the driver at all —
-  <https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver>
-  (the driver's own half of that contract is
-  [ADR-MERGE-DRIVER](0033_merge-driver.md))
+- The code: [`src/fux/maintain/`](../../src/fux/maintain/) — `hooks.py`,
+  `runner.py`, `daemon.py`, `dirty.py`, `urlstate.py`, `lastcited.py` and
+  `state.schema.json`; the write-time law at `assert_meta_policy` in
+  [`src/fux/store/writer.py`](../../src/fux/store/writer.py); the harness at
+  [`tools/maintenance-bench/`](../../tools/maintenance-bench/).
+- The accepted verdicts this record implements:
+  [`maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md)
+  (hooks are the mechanism) and
+  [`hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md)
+  (**B — the hook defers**, and its §5 on why a one-shot runner is not the
+  daemon that verdict rejected).
+- **The measurement that forced the deferral:**
+  [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md) and the
+  attribution in its
+  [report](../../work/regression/2026-08-20-r5-hook-latency/report.md) §3, which
+  is what shows the cost tracks corpus size rather than delta size; the re-run
+  that removed the need for a delta hook,
+  [`2026-08-23-r5-rerun-after-code-removal`](../../work/regression/2026-08-23-r5-rerun-after-code-removal/report.md).
 - `githooks(5)` — that `post-commit` cannot affect the commit's outcome, which
-  is why decision 3 is safe —
-  <https://git-scm.com/docs/githooks>
-- The accepted verdict this record implements:
-  [`work/compare/maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md)
-  (Arpit, 2026-08-20)
-- **The accepted verdict decisions 1a and 1b implement:**
-  [`work/compare/hook-at-scale.compare.md`](../../work/compare/hook-at-scale.compare.md)
-  (Arpit, 2026-08-22) — **B, the hook defers**, and its §5 on why a one-shot
-  runner is not the daemon rejected above
-- **The measurement that forced it:**
-  [R5-HOOK](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md) — and
-  the attribution in its [report](../../work/regression/2026-08-20-r5-hook-latency/report.md) §3,
-  which is what shows the cost tracks corpus size rather than delta size
+  is why decision 3 is safe — <https://git-scm.com/docs/githooks>
+- `gitattributes(5)` §"Defining a custom merge driver" — what `fux hooks` has to
+  write for git to call the driver at all —
+  <https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver>
 - Prior art for deferring index maintenance off the write path: Lucene's
-  near-real-time segment model, where writes append and merging is a background
-  concern rather than part of the commit —
+  near-real-time segment model —
   <https://lucene.apache.org/core/9_0_0/core/org/apache/lucene/index/IndexWriter.html>
-- The law itself: [ADR-LAWS](0001_laws.md) L5, and the per-document opt-out in
-  [ADR-URL-LIST](0018_url-list.md) decision 10.
-- The code: [`src/fux/maintain/`](../../src/fux/maintain/) and
-  `assert_meta_policy` in [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
-- The control-and-treatment merge test:
-  [`tests_e2e/test_maintenance.py`](../../tests_e2e/test_maintenance.py)
-
-**Amended 2026-08-23 (W-76 Phases 3 and 9): two things were NOT built, and
-both are decisions.**
-
-**Phase 3 — the `git diff` delta hook is not built.** Veto condition 1 fired on
-[R5](../../archive/v0.26/conformance/2026-07-23-min-confidence-calibration/report.md) (44.4 s for a
-20-document commit at 100 000 documents) and the delta design was the answer.
-It is no longer needed at the design point: **a one-document re-ingest is
-0.84 s at 10 000 documents**, linear at ~82 us per document, because W-76
-Phase 1's removal of the `code` field took **91 % of a full ingest** with it.
-
-Filed as [`2026-08-23-r5-rerun-after-code-removal`](../../work/regression/2026-08-23-r5-rerun-after-code-removal/report.md),
-and **re-confirmed after Phase 7** — committed per-chunk vectors made a *full*
-ingest 6.8x slower and left the hook unmoved, because carry-forward re-embeds
-only changed documents.
-
-> **The reopen condition is a NUMBER, not a size: a measured one-document
-> re-ingest above 5 s.**
-
-That replaces veto condition 1's original trigger. R5 itself is **not
-retracted** — it measured a real cost on the engine of 2026-08-20.
-
-**Phase 9 — `refs/fux/<tree>` is not built, and could not have been a
-correctness path.** `git clone` fetches no custom refs and runs no hooks
-(hooks live in `.git/`, which is not cloned), so nothing could fetch a derived
-plane on arrival. Arpit's fork A ruling removed the premise anyway by
-committing everything the index needs. The residual cache-warmth idea is
-recorded in `maintain/hooks.py::REFS_NOTE` and is unbuilt: the accelerator
-rebuilds in **0.7 s at 10 000 documents**, and `fux build` is now discoverable
-through Phase 0's nudge.
+- The tests: [`tests/maintain/`](../../tests/maintain/) and
+  [`tests_e2e/test_maintenance.py`](../../tests_e2e/test_maintenance.py).
 
 ### Veto condition
 
 **Reopen this decision if any of these becomes true:**
 
-1. **SPENT — fired 2026-08-20, ruled 2026-08-22.** R5 failed, `post-commit`
-   was found too slow to be automatic, and the hook became **deferring**
-   (decision 1a). A condition that has fired and been answered is not a live
-   condition; it is kept here, marked, so nobody re-fires it against the
-   behaviour it produced. **Its successor is condition 5.**
-2. **Moved** — R6's condition went to
-   [ADR-MERGE-DRIVER](0033_merge-driver.md) with decisions 6–9 on 2026-08-21.
-   The number is retired, not reused.
-3. **The lag is observed causing a wrong answer in practice** — an `ask`
-   answered from content that the checked-out commit does not contain. That is
-   decision 1's whole bet, and **decision 1a raises the stake**: the window is
-   now a few commits rather than one. Decision 1b is the mitigation, not the
-   answer — a declared staleness is still staleness.
-4. **Moved** — the tie condition went to
-   [ADR-MERGE-DRIVER](0033_merge-driver.md) on 2026-08-21.
-5. **The commit path stops being constant in the corpus** — a deferring hook
-   whose cost still grows with corpus size has kept option B's costs and lost
-   its benefit. Checkable: `post-commit` wall time must not track corpus size.
-6a. **Amended 2026-08-22, after CI found a stranding bug.** The runner
-   **re-drains**: after a pass it re-reads the dirty list and runs again while
-   there is work, bounded by `runner.MAX_PASSES`. Without that, a commit whose
-   spawn was refused (because this runner held the lock) had its ids stranded —
-   the live runner clears only its own start-time snapshot, so the newer work
-   was left with no process holding it and no guarantee another commit would
-   arrive. **Every Linux CI arm failed on it while Windows and macOS passed**,
-   which is what this race looks like on a slower box.
-   **This is not condition 6 firing.** The bound makes termination provable, so
-   the process is still one-shot in the only sense that matters: it ends.
-   Leftovers past the cap stay in the list, `fux doctor` reports them, and the
-   next commit's spawn collects them — which is where they were before.
-   Checkable: `tests/maintain/test_runner.py -k "stranded or bounded"`.
-6. **The detached runner turns into something always-on** — a resident process,
-   a scheduler, or a watcher. That is option C from
-   [`maintenance-trigger.compare.md`](../../work/compare/maintenance-trigger.compare.md),
-   which is rejected there and only sidestepped here because the runner exits.
-   If it stops exiting, this record and that verdict both reopen.
-
-7. **A status surface mutates the thing it reports** — the doctor check, or any
+1. **The lag is observed causing a wrong answer in practice** — an `ask`
+   answered from content the checked-out commit does not contain. That is
+   decision 1's whole bet, and **decision 1a raises the stake**: the window is a
+   few commits rather than one. **Decision 1b is the mitigation, not the answer**
+   — a declared staleness is still staleness.
+2. **The commit path stops being constant in the corpus.** A deferring hook
+   whose cost still grows with corpus size has kept the deferral's costs and lost
+   its benefit.
+3. ⚠ **The detached RUNNER stops being one-shot.** If `runner.run_once` ever
+   loops without `MAX_PASSES`, or `spawn` starts something that outlives its
+   work, this fires. **The daemon's existence buys the runner nothing** — that
+   is a separate process, started by a human, and decision 9 is its argument.
+4. **A status surface mutates the thing it reports** — the doctor check, or any
    successor verb, clears a lock, writes the dirty list, or starts a runner.
    Decision 1c makes read-only the property, and the failure it guards is two
    writers in `.fux/index/`.
-8. **A stop leaves a partial shard, or a stopped run clears the dirty list.**
-   Either breaks decision 1d: the first means the stop was a kill rather than
-   cooperative, the second means a run that did not complete behaved as if it
-   had. Checkable: stop a runner mid-corpus and assert the index is byte-clean
-   and the list is unchanged.
+5. **A stop leaves a partial shard, or a stopped run clears the dirty list.**
+   The first means the stop was a kill rather than cooperative; the second means
+   a run that did not complete behaved as if it had.
+6. **Anything other than a human starts the daemon** — decision 9c, and the
+   whole of the consent argument.
+7. **A hook body acquires a networking invocation** — decision 5a.
+8. **A one-document re-ingest is measured above 5 s**, which is the delta hook's
+   reopen trigger stated as a number rather than a corpus size.
+9. ⚠ **A sweep's only evidence is its own status file again.** Decision 9c-i's
+   check is a positive control precisely because `"ok"` was reported by a sweep
+   that did nothing for a day. If the end-to-end capture is ever replaced by a
+   mock-only gate, this fires.
+10. **A hook-driven test passes with `fux` unreachable on `PATH`.** The hook's
+    first line is `command -v fux >/dev/null 2>&1 || exit 0`, so an absent
+    install turns every hook into a no-op that reports success.
+    `tests_e2e/test_maintenance.py::test_the_hook_environment_can_actually_find_fux`
+    is the guard; **measured 2026-08-27**, removing `fux` from `PATH` fails four
+    hook tests and used to leave `test_nothing_fux_spawned_outlives_its_own_run`
+    green, because its every assertion is that something is ABSENT. That one now
+    carries a positive control of its own.
+
 **How to check them:**
 
 ```bash
-# 1 — SPENT: fired 2026-08-20 (R5-HOOK), ruled 2026-08-22. Kept for the record:
-work/regression/2026-08-20-r5-hook-latency/evidence/reproduce.sh
-# 0.651 s @ 1k (passes) · 3.523 s @ 10k · 44.380 s @ 100k (judged, fails)
-# Those numbers judged the INLINE hook. Re-running them against the deferring
-# hook measures a different thing and is NOT a re-judgement of R5.
-
-# 2 and 4 — moved to ADR-MERGE-DRIVER; check them there.
-
-# 3 — is the committed index behind the working tree?
+# 1 — is the committed index behind the working tree?
 fux doctor
 
-# 5 — is the commit path constant in the corpus? (must not track corpus size)
+# 2 — is the commit path constant in the corpus?
 work/regression/2026-08-20-r5-hook-latency/evidence/reproduce.sh
+# ⚠ those numbers judged the INLINE hook. Re-running them against the deferring
+# hook measures a different thing and is NOT a re-judgement of R5.
 
-# 6 — does anything fux spawned outlive the commit that spawned it?
-pgrep -fl fux   # expect: nothing, once the runner has finished
+# 3 — the runner is bounded, and nothing it spawns outlives its work
+uv run pytest -q tests/maintain/test_runner.py -k "stranded or bounded"
+pgrep -fl 'fux.cli ingest'   # expect: nothing, once the runner has finished
 
-# 7 — the status surface is read-only: reporting must never repair.
-#     Run every status path against a held lock and a stale one; the lock file
-#     must be byte-identical afterwards.
+# 4 — the status surface is read-only: reporting must never repair
 uv run pytest -q tests/maintain/test_status_readonly.py
 
-# 8 — a stop is cooperative, not a kill: stop mid-corpus, then assert BOTH
-#     that the index is byte-clean and that the dirty list is unchanged.
+# 5 — a stop is cooperative, not a kill: stop mid-corpus, then assert BOTH
+#     that the index is byte-clean and that the dirty list is unchanged
 uv run pytest -q tests_e2e/test_maintenance.py -k stop
 
-# the hooks' own behaviour — install, refuse-to-clobber, uninstall
-uv run pytest -q tests/maintain/test_hooks.py
+# 6, 7 — nothing but a human starts the daemon; no hook touches the network
+uv run pytest -q tests/maintain/test_daemon.py tests/maintain/test_hooks.py
 ```
+
 ---
 
 ## References
@@ -653,20 +650,24 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [ADR-LAWS](0001_laws.md) · [ADR-CLI](0002_cli-surface.md) ·
-[ADR-INGEST](0007_ingest.md) · [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md)
-· [ADR-URL-LIST](0018_url-list.md) · [ADR-GRAPH](0029_graph.md) ·
+[ADR-INGEST](0007_ingest.md) · [ADR-INDEX-LIFECYCLE](0009_index-lifecycle.md) ·
+[ADR-CONFIG](0014_config.md) · [ADR-URL-LIST](0018_url-list.md) ·
+[ADR-GRAPH](0029_graph.md) · [ADR-REFER](0030_refer-plane.md) ·
 [ADR-MERGE-DRIVER](0033_merge-driver.md)
 
 **Code**
 
 - [`src/fux/maintain/`](../../src/fux/maintain/)
 - [`src/fux/store/writer.py`](../../src/fux/store/writer.py)
+- [`tools/maintenance-bench/`](../../tools/maintenance-bench/)
+- [`tests/maintain/`](../../tests/maintain/)
 - [`tests_e2e/test_maintenance.py`](../../tests_e2e/test_maintenance.py)
 
 **Measured evidence**
 
 - [`work/regression/2026-08-20-r5-hook-latency/VERDICT.md`](../../work/regression/2026-08-20-r5-hook-latency/VERDICT.md)
 - [`work/regression/2026-08-20-r5-hook-latency/report.md`](../../work/regression/2026-08-20-r5-hook-latency/report.md)
+- [`work/regression/2026-08-23-r5-rerun-after-code-removal/report.md`](../../work/regression/2026-08-23-r5-rerun-after-code-removal/report.md)
 
 **Project docs**
 
@@ -680,6 +681,6 @@ evidence.*
   <https://git-scm.com/docs/gitattributes#_defining_a_custom_merge_driver>
 - `githooks(5)` — that `post-commit` cannot affect the commit's outcome
   <https://git-scm.com/docs/githooks>
-- Lucene `IndexWriter` — near-real-time segments; prior art for deferring
-  index maintenance off the write path
+- Lucene `IndexWriter` — near-real-time segments; prior art for deferring index
+  maintenance off the write path
   <https://lucene.apache.org/core/9_0_0/core/org/apache/lucene/index/IndexWriter.html>

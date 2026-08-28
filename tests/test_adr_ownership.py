@@ -144,17 +144,30 @@ def test_record_numbers_are_unique_within_a_directory() -> None:
 
 @pytest.mark.parametrize("name", sorted(register_names()))
 def test_record_declares_its_own_name(name: str) -> None:
-    """The register and the record must agree on the record's name."""
+    """The register and the record must agree on the record's name.
+
+    The record states it once, in frontmatter. It used to state it twice — a
+    `name:` key and a `- **Name:**` bullet, written by hand at different times
+    — and this test compared the register to the bullet, which is the copy that
+    could drift from the key without anything noticing.
+    """
     path = register_names()[name]
-    head = path.read_text(encoding="utf-8")[:2000]
-    m = re.search(r"^- \*\*Name:\*\* `(ADR-[A-Z0-9-]+)`", head, re.M)
-    assert m, f"{path.name} has no '- **Name:**' line — records are cited by name, not number"
+    m = re.search(r"^name:\s*(ADR-[A-Z0-9-]+)\s*$", path.read_text(encoding="utf-8"), re.M)
+    assert m, f"{path.name} has no `name:` in its frontmatter — records are cited by name"
     assert m.group(1) == name, f"{path.name} declares {m.group(1)}, register says {name}"
 
 
 def test_records_do_not_restate_the_laws() -> None:
     """A record that restates a cross-cutting principle is a bug (ADR-LAWS)."""
-    handles = ["stdlib-only runtime", "no model in the maintenance path"]
+    handles = [
+        "stdlib-only runtime",
+        "no model in the maintenance path",
+        # L8, added with the law on 2026-08-27. It caught a real paraphrase the
+        # same day: ADR-QUALITY decision 11 was written as "bound by L8 —
+        # hashed, bounded, local, off every committed and networked path", which
+        # is the drift this test exists to stop. Cite the number, not the words.
+        "hashed, bounded, and local",
+    ]
     offenders = []
     for path in sorted(records_on_disk()):
         if path.name.endswith("_laws.md"):
@@ -175,26 +188,40 @@ def test_mermaid_diagrams_carry_a_collapsed_ascii_twin() -> None:
     The twin is mandatory (a renderer is not always available) and collapsed
     (§1 is capped at one screen). Both halves are cheap to enforce and easy to
     forget, which is exactly what a check is for.
+
+    ⚠ **This check used to read EVERY ```text fence as an ASCII twin, and that
+    was wrong.** A record legitimately uses ```text for captured example output
+    — `0048_fuxignore.md` has one twin and three output blocks — so the old
+    rule reported three violations against a record that was correctly written,
+    and the only way to "fix" it was to stop using ```text for examples.
+    **Found 2026-08-27 by running the gate for the first time in a session that
+    could run it**; the record was right and the test was not.
+
+    The rule now PAIRS them positionally, which is what *"hand-paired twin"*
+    always meant: for each Mermaid block, the **next** ```text fence after it is
+    its twin, and that one must be collapsed. Fences that are not the next one
+    after a diagram are examples, and none of this applies to them.
     """
     problems = []
     for path in sorted(records_on_disk()) + [ADR_DIR / "TEMPLATE.md"]:
         text = path.read_text(encoding="utf-8")
         if "```mermaid" not in text:
             continue
-        if "```text" not in text:
-            problems.append(f"{path.name}: has a Mermaid block but no ASCII twin")
-            continue
-        for m in re.finditer(r"```text\n.*?\n```", text, re.S):
-            before = text[: m.start()]
-            after = text[m.end() :]
+        for diagram in re.finditer(r"```mermaid\n.*?\n```", text, re.S):
+            twin = re.search(r"```text\n.*?\n```", text[diagram.end():], re.S)
+            if twin is None:
+                problems.append(f"{path.name}: has a Mermaid block but no ASCII twin")
+                continue
+            start = diagram.end() + twin.start()
+            end = diagram.end() + twin.end()
+            before, after = text[:start], text[end:]
             open_tag = before.rfind("<details>")
-            close_before = before.rfind("</details>")
-            inside = open_tag != -1 and open_tag > close_before
+            inside = open_tag != -1 and open_tag > before.rfind("</details>")
             if not (inside and after.lstrip().startswith("</details>")):
                 problems.append(
                     f"{path.name}: the ASCII twin is not wrapped in a <details> block"
                 )
-            elif "\n\n```text" not in text[open_tag : m.end()]:
+            elif "\n\n```text" not in text[open_tag:end]:
                 problems.append(
                     f"{path.name}: needs a blank line after </summary>, or the fence will not render"
                 )
@@ -221,3 +248,106 @@ def test_charts_name_the_source_of_their_numbers() -> None:
                 "say which run or which constants the numbers come from"
             )
     assert not problems, "\n".join(problems)
+
+
+# --------------------------------------------------------------------------
+# describes — the second, additive relation (ADR-OWNERSHIP)
+
+
+def test_every_described_component_also_has_an_owner() -> None:
+    """Veto condition 1. `describes` must never become a way to avoid deciding
+    an owner — a component with no owner fails whatever describes it."""
+    from adr_lib import describes_table
+
+    owners = ownership_table()
+    owned = set(owners)
+    orphans = [
+        c
+        for c in describes_table()
+        if c not in owned and not any(c.startswith(p + "/") for p in owned)
+    ]
+    assert not orphans, (
+        f"described but unowned: {sorted(orphans)} — `describes` is additive, "
+        "never a substitute for `owns`"
+    )
+
+
+def test_no_record_describes_what_it_already_owns() -> None:
+    """Veto condition 2. The row would be noise, and noise in a hand-maintained
+    table is how the table stops being trusted."""
+    from adr_lib import describes_table, owner_of
+
+    owners = ownership_table()
+    redundant = [
+        f"{component} -> {record}"
+        for component, records in describes_table().items()
+        for record in records
+        if owner_of(component, owners) == record
+    ]
+    assert not redundant, f"already owned, so the describes row is noise: {redundant}"
+
+
+def test_every_describing_record_is_a_real_record() -> None:
+    """A typo here is invisible: the gate would demand a record that cannot be
+    resolved, and `owning_records` skips unresolvable owners by design."""
+    from adr_lib import describes_table
+
+    known = set(register_names())
+    unknown = sorted(
+        {r for records in describes_table().values() for r in records} - known
+    )
+    assert not unknown, f"describes names records that are not in the register: {unknown}"
+
+
+def test_every_describes_row_states_a_reason() -> None:
+    """Veto condition 4. A bare pair is unauditable — a later reader cannot tell
+    a real relation from a defensive one."""
+    import re as _re
+
+    from adr_lib import REGISTER
+
+    body = REGISTER.read_text(encoding="utf-8")
+    body = body.split("<!-- DESCRIBES-TABLE-START -->", 1)[1]
+    body = body.split("<!-- DESCRIBES-TABLE-END -->", 1)[0]
+    thin = []
+    for line in body.splitlines():
+        line = line.strip()
+        if not line.startswith("|") or set(line) <= set("|- :"):
+            continue
+        cells = [c.strip() for c in line.strip("|").split("|")]
+        if cells[0].lower() == "component":
+            continue
+        assert len(cells) >= 3, f"a describes row needs a reason cell: {line}"
+        if len(cells[2]) < 40:
+            thin.append(cells[0])
+    assert not thin, f"describes rows with no real reason given: {thin}"
+
+
+def test_the_describes_table_is_parsed_not_hard_coded() -> None:
+    """The markers are the contract between the register and both tests.
+
+    If they vanish, `describes_table()` raises rather than silently returning
+    an empty relation — which would turn the widened gate back off with every
+    test still green (veto condition 3, in its quietest form).
+    """
+    from adr_lib import REGISTER
+
+    text = REGISTER.read_text(encoding="utf-8")
+    assert "<!-- DESCRIBES-TABLE-START -->" in text
+    assert "<!-- DESCRIBES-TABLE-END -->" in text
+
+
+def test_the_freshness_gate_actually_consults_describers() -> None:
+    """⚠ Veto condition 3, made mechanical.
+
+    The widening is one line in `owning_records`. Deleting it leaves every
+    other test in this suite green while the gate silently narrows back to
+    owner-only — so assert the behaviour, not the line.
+    """
+    import test_adr_freshness as freshness
+
+    table = ownership_table()
+    touched = freshness.owning_records(["src/fux/query/__init__.py"], table)
+    assert "ADR-ASK" in touched, "the owner must still be demanded"
+    assert "ADR-CONFIDENCE" in touched, "a describer must be demanded too"
+    assert "ADR-OUTPUT" in touched

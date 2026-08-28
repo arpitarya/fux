@@ -31,6 +31,27 @@ from .errors import FuxError
 
 PROTOCOL_VERSION = "2024-11-05"
 
+def _k_property() -> dict:
+    """`k`'s advertised default, READ FROM THE ENGINE rather than retyped.
+
+    ⚠ **This was a hand-written `5` and `[mcp] top` made it a lie.** Nothing
+    failed: an MCP tool schema is a machine-facing declaration that no gate
+    read, which is W-84's finding in the one surface where the reader is
+    always a machine. The number now comes from `output_config.BUILT_IN`, and
+    the description says the repo can change it — because it can.
+    """
+    from .output_config import BUILT_IN, OUTPUT_NAME
+
+    return {
+        "type": "integer",
+        "description": (
+            f"Maximum results (default {BUILT_IN['top']}; this repository's "
+            f"{OUTPUT_NAME} may set a different default under [mcp])."
+        ),
+        "default": BUILT_IN["top"],
+    }
+
+
 TOOLS = [
     {
         "name": "fux_search",
@@ -47,17 +68,20 @@ TOOLS = [
             "question. Returns ranked documents with content hashes and the headings "
             "that match your query -- section-level, not line-level; call fux_passage "
             "for the lines. This is the call to make first for any 'where is X' or "
-            "'why did we decide Y' question about this repository."
+            "'why did we decide Y' question about this repository. "
+            "READ THE `confidence` BLOCK BEFORE USING THE RESULTS. If "
+            "`confidence.answerable` is false, do not answer from these results at "
+            "all -- say what was searched and stop. If `confidence.band` is "
+            "'partial', answer but name every term in `confidence.missing`: those "
+            "are words from the question that appear in no document here. If it is "
+            "'weak', the ranking could not separate the top hits, so report the "
+            "candidates rather than a conclusion."
         ),
         "inputSchema": {
             "type": "object",
             "properties": {
                 "query": {"type": "string", "description": "A natural-language question."},
-                "k": {
-                    "type": "integer",
-                    "description": "Maximum results (default 5).",
-                    "default": 5,
-                },
+                "k": _k_property(),
             },
             "required": ["query"],
         },
@@ -110,10 +134,18 @@ def _search(root: Path, args: dict) -> dict:
     from .query.headings import headings_for
 
     query = args.get("query") or ""
-    k = int(args.get("k") or 5)
+    # ADR-OUTPUT: `[mcp] top` is this surface's default, because a tool call
+    # has no flags. An explicit `k` in the call still wins, exactly as a CLI
+    # flag does. ⚠ There is deliberately no `[mcp] band`: the confidence block
+    # below is UNCONDITIONAL here (ADR-CONFIDENCE decision 11).
+    from .output_config import load as load_output
+
+    k = int(args.get("k") or load_output(root).resolve("mcp", "top"))
     from .store import read_index
 
-    results, path = run_query(root, query, k, force_scan=False)
+    signals: dict = {}
+    results, path = run_query(root, query, k, force_scan=False, confidence_out=signals)
+    block = signals.get("confidence")
     records = read_index(root) if results else {}
     out = []
     for r in results:
@@ -142,6 +174,19 @@ def _search(root: Path, args: dict) -> dict:
     return {
         "results": out,
         "ranked_by": path,
+        # ADR-CONFIDENCE. **The single most important key on this surface**, and
+        # the reason the record exists: an agent handed a ranked list cannot
+        # tell "these documents answer your question" from "these are the
+        # closest things in a corpus that never discusses it". Both look
+        # identical -- a score, a title, a citation -- and the second is where
+        # an agent invents an answer and cites a real file while doing it.
+        #
+        # `band` is what to branch on and `answerable: false` is a REFUSAL, not
+        # a low score. `missing` names the query's own words the corpus does not
+        # contain, which is what turns a vague hedge into "nothing here mentions
+        # mTLS". `verified` is always `unverified` here: `fux_search` ranks from
+        # the committed index and fetches nothing, and saying so is the point.
+        "confidence": (block.as_dict() if block is not None else None),
         # **`fux_search` is document-level, deliberately.** Doc 06 of the ideal
         # set sketched line ranges on the search result itself, which would mean
         # fetching and chunking every hit on every search -- turning the cheap

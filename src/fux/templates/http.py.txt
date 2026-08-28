@@ -3,10 +3,10 @@
 **This file belongs to you, not to fux. It is committed to your repo, at
 `.fux/fetchers/http.py`, and fux will never rewrite it.** `fux setup` writes it
 once if it is missing; after that it is yours. Fux reads it by path under
-`fux add <URL>` or `fux update`, calls it to turn each URL into markdown, and
-indexes the result exactly like a repo file. Edit anything — add headers, a
-proxy, an auth token from your environment, a retry, a different HTML
-converter. Fux imports none of that, only this file's entry points.
+`fux add <URL>` or `fux update`, calls it once per URL to RETRIEVE
+the bytes, decodes those itself, and indexes the result exactly like a repo
+file. Edit anything — add headers, a
+proxy, an auth token from your environment, a retry. Fux imports none of that, only this file's entry points.
 
 **This is the default fetcher.** A line in `.fux/sources/urls` with no `fetch=`
 attribute comes here. A line that says `fetch=cdp` goes to `cdp.py` instead,
@@ -25,7 +25,13 @@ The contract fux relies on — keep these names:
 
     configure(config: dict) -> None  # optional; once after import, before connect()
     connect() -> None        # optional; called once before the first fetch
-    fetch(url: str) -> str   # required; the document for one URL, as markdown
+    fetch(url: str) -> tuple[bytes, str]
+                             # required; the bytes for one URL, plus the
+                             # Content-Type the server declared. Fux decodes.
+    validate(url: str) -> str | None
+                             # optional; a cheap token (ETag, Last-Modified, a
+                             # version number). Unchanged token -> fux skips the
+                             # fetch. `None` -> "I cannot tell", fetch it.
     close() -> None          # optional; called once after the last fetch
 
 There is no `connect`/`close` below: they are optional, and a stateless GET has
@@ -40,16 +46,23 @@ validates only that it is a table and never reads a key inside it. The
 constants below are therefore *defaults*, and the table overrides them — put
 tunables in `fux.toml` rather than editing this file, and merges stay clean.
 
-The HTML->markdown pass below is the one `cdp.py` uses. Both fetchers must
-produce the same markdown from the same bytes, or which fetcher retrieved a
-document would change the committed index — and `fetch=` is a routing
-decision, never a property of the document.
+**This file does not convert anything (W-86 P8).** It returns the bytes the
+server sent plus the `Content-Type` it declared, and `fux.decode` turns those
+into markdown. Until 2026-08-26 the conversion lived here AND in `cdp.py`, as
+two hand-maintained copies that a comment asked to stay identical and nothing
+checked — which made *which fetcher retrieved a document* a property of the
+committed index, and that is L3. `fetch=` is a routing decision, never a
+property of the document.
+
+If you are editing this file to change how a page becomes markdown, you are in
+the wrong file: write `.fux/decoders/htmldoc.py` instead.
 """
 
 from __future__ import annotations
 
+import urllib.error
 import urllib.request
-from html.parser import HTMLParser
+
 
 # ============= CONFIG - defaults; [sources.url.config] wins =============
 # Each name below maps to a snake_case key in fux.toml's
@@ -58,23 +71,10 @@ from html.parser import HTMLParser
 TIMEOUT_S = 30.0
 USER_AGENT = "fux/0.x (+https://github.com/arpitarya/fux)"
 MAX_BYTES = 8 * 1024 * 1024  # a page larger than this is a download, not a doc
-PREPEND_TITLE_HEADING = True  # ensure the page <title> leads the document
 
 
 class FetcherError(RuntimeError):
     """Raised for a failure fux should record as a skip, not a crash."""
-
-
-# ====================================================================
-# HTML -> Markdown - stdlib html.parser, deterministic. Kept identical to
-# cdp.py's pass on purpose: two fetchers that convert differently would
-# make the committed index a function of which one ran.
-# Headings matter: fux weights heading terms 3x body at ranking time.
-# ====================================================================
-
-_SKIP = {"script", "style", "head", "noscript", "template", "svg", "iframe"}
-_BLOCK_BREAK = {"p", "div", "section", "article", "main", "header", "footer", "figure"}
-_HEADINGS = {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
 
 
 #: W-82 3.3 -- this fetcher IS safe to call from several threads: `fetch`
@@ -85,194 +85,6 @@ _HEADINGS = {"h1": 1, "h2": 2, "h3": 3, "h4": 4, "h5": 5, "h6": 6}
 #: `[sources.url] max_parallel` is where a consumer says how many they want,
 #: and fux uses `min(this, that)`.
 MAX_PARALLEL = 8
-
-def html_to_markdown(html: str) -> str:
-    parser = _MdParser()
-    parser.feed(html)
-    parser.close()
-    return parser.result()
-
-
-def extract_title(html: str) -> str:
-    parser = _TitleParser()
-    parser.feed(html)
-    parser.close()
-    return parser.title.strip()
-
-
-class _MdParser(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.blocks: list[str] = []
-        self.inline: list[str] = []
-        self.skip_depth = 0
-        self.pre_depth = 0
-        self.pre_text: list[str] = []
-        self.heading: int | None = None
-        self.quote_depth = 0
-        self.list_stack: list[tuple[str, int]] = []  # (kind, counter)
-        self.href: list[str] = []
-        self.table_rows: list[list[str]] | None = None
-        self.cell: list[str] | None = None
-
-    # -- emit helpers ------------------------------------------------------
-
-    def _flush_inline(self, prefix: str = "") -> None:
-        text = " ".join("".join(self.inline).split())
-        self.inline = []
-        if text:
-            quote = "> " * self.quote_depth
-            self.blocks.append(f"{quote}{prefix}{text}")
-
-    def _text(self, data: str) -> None:
-        if self.pre_depth:
-            self.pre_text.append(data)
-        elif self.cell is not None:
-            self.cell.append(data)
-        else:
-            self.inline.append(data)
-
-    # -- parser events -----------------------------------------------------
-
-    def handle_starttag(self, tag: str, attrs) -> None:
-        attrs = dict(attrs)
-        if tag in _SKIP:
-            self.skip_depth += 1
-            return
-        if self.skip_depth:
-            return
-        if tag == "pre":
-            self._flush_inline()
-            self.pre_depth += 1
-        elif tag in _HEADINGS:
-            self._flush_inline()
-            self.heading = _HEADINGS[tag]
-        elif tag in ("ul", "ol"):
-            self._flush_inline()
-            self.list_stack.append((tag, 0))
-        elif tag == "li":
-            self._flush_inline()
-        elif tag == "blockquote":
-            self._flush_inline()
-            self.quote_depth += 1
-        elif tag == "table":
-            self._flush_inline()
-            self.table_rows = []
-        elif tag == "tr" and self.table_rows is not None:
-            self.table_rows.append([])
-        elif tag in ("td", "th") and self.table_rows is not None:
-            self.cell = []
-        elif tag == "a":
-            self.href.append(attrs.get("href", ""))
-            self._text("[")
-        elif tag == "img":
-            alt = attrs.get("alt", "") or "image"
-            src = attrs.get("src", "")
-            self._text(f"![{alt}]({src})")
-        elif tag == "code" and not self.pre_depth:
-            self._text("`")
-        elif tag in ("b", "strong"):
-            self._text("**")
-        elif tag in ("i", "em"):
-            self._text("*")
-        elif tag == "br":
-            self._flush_inline()
-        elif tag in ("hr",):
-            self._flush_inline()
-            self.blocks.append("---")
-        elif tag in _BLOCK_BREAK:
-            self._flush_inline()
-
-    def handle_endtag(self, tag: str) -> None:
-        if tag in _SKIP:
-            self.skip_depth = max(0, self.skip_depth - 1)
-            return
-        if self.skip_depth:
-            return
-        if tag == "pre":
-            self.pre_depth = max(0, self.pre_depth - 1)
-            if not self.pre_depth:
-                code = "\n".join(l.rstrip() for l in "".join(self.pre_text).strip("\n").split("\n"))
-                self.pre_text = []
-                self.blocks.append(f"```\n{code}\n```")
-        elif tag in _HEADINGS:
-            level = self.heading or _HEADINGS[tag]
-            self._flush_inline(prefix="#" * level + " ")
-            self.heading = None
-        elif tag in ("ul", "ol"):
-            self._flush_inline()
-            if self.list_stack:
-                self.list_stack.pop()
-        elif tag == "li":
-            indent = "  " * max(0, len(self.list_stack) - 1)
-            if self.list_stack and self.list_stack[-1][0] == "ol":
-                kind, count = self.list_stack[-1]
-                self.list_stack[-1] = (kind, count + 1)
-                self._flush_inline(prefix=f"{indent}{count + 1}. ")
-            else:
-                self._flush_inline(prefix=f"{indent}- ")
-        elif tag == "blockquote":
-            self._flush_inline()
-            self.quote_depth = max(0, self.quote_depth - 1)
-        elif tag in ("td", "th") and self.table_rows is not None:
-            if self.cell is not None and self.table_rows:
-                self.table_rows[-1].append(" ".join("".join(self.cell).split()))
-            self.cell = None
-        elif tag == "table":
-            self._emit_table()
-        elif tag == "a":
-            href = self.href.pop() if self.href else ""
-            self._text(f"]({href})" if href else "]")
-        elif tag == "code" and not self.pre_depth:
-            self._text("`")
-        elif tag in ("b", "strong"):
-            self._text("**")
-        elif tag in ("i", "em"):
-            self._text("*")
-        elif tag in _BLOCK_BREAK:
-            self._flush_inline()
-
-    def handle_data(self, data: str) -> None:
-        if not self.skip_depth:
-            self._text(data)
-
-    def _emit_table(self) -> None:
-        rows = [r for r in (self.table_rows or []) if r]
-        self.table_rows = None
-        if not rows:
-            return
-        width = max(len(r) for r in rows)
-        lines = []
-        for i, row in enumerate(rows):
-            padded = row + [""] * (width - len(row))
-            lines.append("| " + " | ".join(padded) + " |")
-            if i == 0:
-                lines.append("|" + "---|" * width)
-        self.blocks.append("\n".join(lines))
-
-    def result(self) -> str:
-        self._flush_inline()
-        out = "\n\n".join(b for b in self.blocks if b.strip())
-        return out + "\n" if out else ""
-
-
-class _TitleParser(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__(convert_charrefs=True)
-        self.title = ""
-        self._in_title = False
-
-    def handle_starttag(self, tag: str, attrs) -> None:
-        if tag == "title" and not self.title:
-            self._in_title = True
-
-    def handle_endtag(self, tag: str) -> None:
-        if tag == "title":
-            self._in_title = False
-
-    def handle_data(self, data: str) -> None:
-        if self._in_title:
-            self.title += data
 
 
 # ====================================================================
@@ -285,7 +97,6 @@ _SETTINGS = {
     "timeout_s": ("TIMEOUT_S", float),
     "user_agent": ("USER_AGENT", str),
     "max_bytes": ("MAX_BYTES", int),
-    "prepend_title_heading": ("PREPEND_TITLE_HEADING", bool),
 }
 
 
@@ -310,24 +121,98 @@ def configure(config: dict) -> None:
             raise FetcherError(f"[sources.url.config] {key}: {exc}") from exc
 
 
-def fetch(url: str) -> str:
-    """One URL -> one markdown document. Raise to have fux skip this URL."""
+def fetch(url: str) -> tuple[bytes, str]:
+    """One URL -> (the bytes the server sent, the Content-Type it declared).
+
+    **W-86 P8: this no longer converts anything.** It used to return markdown,
+    which meant a fetcher did two jobs and the committed index depended on
+    WHICH fetcher ran. Retrieval is this file's job; decoding is
+    `fux.decode`'s. Raise to have fux skip this URL.
+
+    The declared type matters and is not decoration: this function is the only
+    place in fux that ever sees the HTTP charset header, and it is what lets a
+    URL serving a PDF or a .docx reach the right decoder at all.
+    """
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
     try:
         with urllib.request.urlopen(request, timeout=TIMEOUT_S) as response:
             raw = response.read(MAX_BYTES + 1)
-            charset = response.headers.get_content_charset() or "utf-8"
+            content_type = response.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as exc:
+        # W-82 ruling 12. A rate limit is carried as a FLAG on the exception,
+        # not as text fux has to parse: `is_rate_limited` below reads the flag.
+        # Fux never sees the status code, and that is the boundary -- this
+        # fetcher speaks HTTP, the engine does not.
+        err = FetcherError(f"HTTPError: {exc}")
+        err.rate_limited = exc.code == 429
+        raise err from exc
     except Exception as exc:  # every transport failure is a skip, never a crash
         raise FetcherError(f"{type(exc).__name__}: {exc}") from exc
     if len(raw) > MAX_BYTES:
         raise FetcherError(f"response larger than max_bytes ({MAX_BYTES})")
+    if not raw:
+        raise FetcherError(f"nothing returned from {url}")
+    return raw, content_type
 
-    html = raw.decode(charset, errors="replace")
-    markdown = html_to_markdown(html)
-    title = extract_title(html)
-    heading = "# " + title
-    if PREPEND_TITLE_HEADING and title and not markdown.startswith(heading + chr(10)):
-        markdown = heading + chr(10) * 2 + markdown
-    if not markdown.strip():
-        raise FetcherError(f"nothing extractable at {url}")
-    return markdown
+
+def validate(url: str) -> str | None:
+    """Cheap answer to *"might this have changed?"* — an opaque token, or `None`.
+
+    **Optional, and fux calls it only if it exists** (W-87 P4 fork 3, ruled by
+    Arpit 2026-08-28). Fux hashes what you return and compares it with what this
+    URL returned last time. **It never parses a token**, which is what stops
+    this smuggling HTTP semantics into an engine that has none.
+
+    ⚠ **`None` means "I cannot tell", never "unchanged."** It degrades to a full
+    fetch, so returning `None` is always safe and never wrong.
+
+    ⚠ **What fux does with a CHANGED token: it fetches, and then still compares
+    the sanitized sha.** A token that rotates on every request — some servers
+    build an `ETag` from a timestamp — therefore costs you a wasted fetch and
+    **cannot** churn the index. `validate` can only ever save work.
+
+    **This implementation is a `HEAD`**, which is the cheapest thing that gets an
+    `ETag` or a `Last-Modified` without a body. A server that answers neither
+    gets `None` and is fetched as before.
+
+    ⚠ **A `HEAD` is not free and is not always honoured.** Some servers reject
+    it, some compute a different `ETag` for it than for `GET`, and against those
+    this trades one round trip for two. If that is your intranet, delete this
+    function — the contract is optional precisely so you can.
+    """
+    request = urllib.request.Request(url, method="HEAD", headers={"User-Agent": USER_AGENT})
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT_S) as response:
+            etag = response.headers.get("ETag")
+            if etag:
+                return etag
+            # `Last-Modified` is weaker -- one-second resolution, and a server
+            # may not update it for a change smaller than that -- so it is the
+            # fallback rather than the first choice. A false "unchanged" here
+            # costs a stale document until the next real change, which is why
+            # the sanitized-sha comparison behind it is not optional.
+            return response.headers.get("Last-Modified")
+    except Exception:
+        # Never raise from an optimisation. A `HEAD` that fails says nothing
+        # about whether the document is fetchable, and fux reads `None` as
+        # "fetch it" -- the safe direction.
+        return None
+
+
+def is_rate_limited(exc: Exception) -> bool:
+    """Was this failure the server refusing because we asked too fast?
+
+    **Optional, and fux calls it only if it exists** (W-82 ruling 12). When it
+    returns True fux backs off exponentially, retries a bounded number of
+    times, counts the refusal against this host, and reports it -- and it
+    **never lowers `[sources.url] max_parallel`**, because the cap is yours.
+
+    ⚠ **Read the flag, never the message.** `str(exc)` happens to contain
+    "429" today; matching on that would be branching on prose, and it would
+    stop working the moment the wording changed. The flag is set at the one
+    place that actually saw the status code.
+
+    ⚠ **`Retry-After` is deliberately ignored.** Fux's backoff is its own and
+    needs no cooperation from the server to be correct.
+    """
+    return bool(getattr(exc, "rate_limited", False))

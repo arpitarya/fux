@@ -164,3 +164,43 @@ def test_a_url_below_the_failing_streak_is_counted_but_not_named(root):
 def test_state_entries_for_urls_not_in_the_index_do_not_inflate_the_count(root):
     state = urlstate.UrlState(run_seq=1, urls={"https://ghost": urlstate.UrlHealth(last_seen_run=1)})
     assert urlstate.summarize(state, []).indexed == 0
+
+
+def test_every_declared_field_survives_a_round_trip(tmp_path):
+    """⚠ **The drift `state.schema.json` warns about, as a gate.**
+
+    Its own comment: *"add a field and you must remember to teach the reader
+    about it, or it is silently dropped on the next read."* That is exactly what
+    happened when `token_sha` was added on 2026-08-28 — the field was declared,
+    written, and **not read back**, so `validate()` learned a token every run and
+    matched none, and the optimisation silently did nothing while every test
+    passed.
+
+    This walks the DECLARED shape rather than a hard-coded list, so a field added
+    tomorrow is covered without editing this test.
+    """
+    from fux.maintain import urlstate
+
+    declared = set(urlstate._health_schema().fields)
+
+    state = urlstate.UrlState(run_seq=7)
+    health = urlstate.UrlHealth()
+    # A distinct, non-default value per declared field, so a dropped one shows.
+    values = {
+        "last_seen_run": 5,
+        "last_changed_run": 3,
+        "fail_streak": 2,
+        "token_sha": "a" * 64,
+    }
+    assert declared <= set(values), f"undeclared in this test: {declared - set(values)}"
+    for name, value in values.items():
+        setattr(health, name, value)
+    state.urls["https://x.test/a"] = health
+    urlstate.write(tmp_path, state)
+
+    back = urlstate.read(tmp_path).urls["https://x.test/a"]
+    for name in declared:
+        assert getattr(back, name) == values[name], (
+            f"{name!r} is declared and written but does not survive `read` — "
+            "the exact drift state.schema.json's header warns about"
+        )

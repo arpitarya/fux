@@ -194,3 +194,47 @@ def test_a_worktree_gitdir_pointer_is_followed(repo, tmp_path):
 def test_a_directory_that_is_not_a_repository_is_a_clean_error(tmp_path):
     with pytest.raises(FuxError, match="no git repository"):
         hooks.install(tmp_path)
+
+
+# -- L4: no hook ever touches the network -----------------------------------
+
+#: Every spelling that makes a fux invocation reach the network. A hook body
+#: containing any of these has broken the invariant below.
+_NETWORKING_FLAGS = ("--refresh-urls", "fux update", "--cdp", "fux add http")
+
+
+@pytest.mark.parametrize("name", sorted(hooks.HOOKS))
+def test_no_hook_body_reaches_the_network(name):
+    """**Hooks are offline, full stop** — Arpit, 2026-08-27 (W-82 §5.1 fork 2).
+
+    The tempting version of this rule was *"the hook may fetch, but only for
+    the commit that edits `.fux/sources/urls`"*. It was refused, and the reason
+    is consent rather than mechanism: a colleague clones, runs
+    `fux hooks --install` once because the README said to, and from then on
+    **every `git commit` sends requests to hosts they never chose, from a
+    machine that may be on a customer's network.** The consent is one-time and
+    invisible; the consequence is per-commit and forever.
+
+    `fux add <URL>` still fetches — an explicit command a human just typed is
+    not a hook. The daemon (the clock) covers the tail.
+
+    ⚠ **This is a one-line invariant on purpose.** The failure it guards is a
+    well-meaning future edit adding a refresh here "just for the sources
+    commit", which is exactly the version that was ruled out.
+    """
+    body = hooks.HOOKS[name]
+    found = [flag for flag in _NETWORKING_FLAGS if flag in body]
+    assert not found, (
+        f"{name} hook body contains {found} — hooks never touch the network "
+        "(W-82 §5.1 fork 2). Network belongs in `fux add`/`fux update` or the daemon."
+    )
+
+
+def test_the_offline_invariant_covers_every_installed_hook():
+    """A hook added to `HOOKS` and not to this check would be unguarded.
+
+    The parametrized test above reads `hooks.HOOKS` directly, so this asserts
+    only that the set is non-empty and is what `install` actually writes —
+    a guard whose subject silently became empty is the failure mode.
+    """
+    assert set(hooks.HOOKS) == {"post-commit", "post-merge", "post-checkout"}
