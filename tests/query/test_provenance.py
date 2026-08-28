@@ -687,14 +687,25 @@ def test_the_receipt_shape_does_not_vary_by_config(tmp_path, monkeypatch):
     two shapes. Two receipts of the same answer must be identical, which is the
     same reason decision 8 forbids a timestamp.
     """
-    from fux.output_config import SCHEMA
+    from fux.output_config import CLI_VERBS, MCP_KEYS
 
-    for verb, keys in SCHEMA.items():
+    # ⚠ This read `SCHEMA` until 2026-08-28 and had been an ImportError since
+    # ADR-OUTPUT decision 19 split that one dict into `CLI_VERBS` (the
+    # `[cli]`/`[cli.json]` side, per verb) and `MCP_KEYS` (the `[mcp]` side).
+    # An assertion that cannot import is an assertion that never ran, so this
+    # walks BOTH key sets now — the guarantee is about every configurable key,
+    # and `[mcp]` is exactly the surface decision 15 was written about.
+    for verb, keys in CLI_VERBS.items():
         for key in keys:
             assert "receipt" not in key, (
-                f"[{verb}] {key} lets a config change the receipt's shape — "
+                f"[cli.{verb}] {key} lets a config change the receipt's shape — "
                 "two receipts of one answer would then differ"
             )
+    for key in MCP_KEYS:
+        assert "receipt" not in key, (
+            f"[mcp] {key} lets a config change the receipt's shape — "
+            "two receipts of one answer would then differ"
+        )
 
 
 def test_an_uncomputed_derivation_is_empty_not_absent(tmp_path):

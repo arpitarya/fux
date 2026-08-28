@@ -4,6 +4,7 @@ name: ADR-DOTFUX
 title: ADR-DOTFUX (0003) — the .fux/ directory
 description: Every child of .fux/ is declared committed or derived; the ignore rule is narrow by construction and asserted by doctor against git itself.
 status: accepted
+amended: 2026-08-28
 date: 2026-08-18
 feature: the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest
 owns: [src/fux/store/fuxdir.py, src/fux/doctor.py, src/fux/setup.py]
@@ -213,6 +214,31 @@ what a fetcher is:**
 
 **The gap is made visible, not closed.** The consumer still copies the function
 in themselves — which is this decision holding, not an exception to it.
+
+⚠ **A THIRD worked instance, 2026-08-28 — and this one had already broken
+`main` before it was caught.** [ADR-OUTPUT](0047_output-defaults.md) decision
+19 made a missing `.fux/output.toml` a hard `FuxError` at load time. The file
+is write-if-missing, so it reaches **new repos only** — which meant `fux ask`,
+`fux find` **and `fux doctor`** all exited 1, after an upgrade, in **every repo
+that predates the file**. 49 tests went red on `main`.
+
+**This is the sharpest available reading of this ⚠.** The two mechanisms named
+above are *a loader refusal or a `doctor` check*. Decision 19 chose the
+refusal — and a loader refusal is legitimate **only when the thing refused is
+something the repo can be told to fix while still being able to run the verb
+that tells it.** A refusal in `load()`, which every verb calls, took out
+`doctor` too: the check that would have named the fix could not execute.
+ADR-OUTPUT decision 20 ruled it back: a missing file resolves to the engine
+defaults, and the repo is reached by `doctor`'s `output.toml present` row.
+
+⚠ **The distinction this decision now carries explicitly, so the next record
+does not have to rediscover it:** a **loader refusal** is the right mechanism
+for a file that **exists and is wrong** — `types list usable`'s subject, where
+running on would silently empty an index. A **`doctor` check** is the right
+mechanism for a file that is **simply absent** — because absence is the
+expected state of every repo older than the file, and there are always more of
+those than there are new ones. Decision 19 applied the first mechanism to the
+second situation.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.

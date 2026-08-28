@@ -326,7 +326,7 @@ body.present #progress{display:block}
     <span class="pill">2.0.0-alpha.2 + unreleased</span>
     <span class="pill">fux.index.v2</span>
     <span class="pill">analyzer v2</span>
-    <span class="pill">fux.runtime.v4</span>
+    <span class="pill">fux.runtime.v5</span>
     <span class="pill ok">lexical only — the engine never calls a model</span>
   </div>
   <div class="grid">
@@ -610,7 +610,7 @@ body.present #progress{display:block}
 
         <rect width="1240" height="930" fill="var(--d-bg)"/>
         <text x="48" y="44" font-size="21" fill="var(--d-ink)" font-weight="600">Fux — the mechanism</text>
-        <text x="48" y="67" font-size="11.5" fill="var(--d-body)">2.0.0-alpha.2 · fux.index.v2 / analyzer v2 / fux.runtime.v4 · lexical only, no model anywhere</text>
+        <text x="48" y="67" font-size="11.5" fill="var(--d-body)">2.0.0-alpha.2 · fux.index.v2 / analyzer v2 / fux.runtime.v5 · lexical only, no model anywhere</text>
 
         <rect x="908" y="30" width="13" height="13" rx="3" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.6"/>
         <text x="928" y="41" font-size="11" fill="var(--d-body)">committed to git</text>
@@ -759,7 +759,7 @@ body.present #progress{display:block}
         <text x="48" y="864" font-size="11" fill="var(--d-body)">never cited, and nothing noticed. It buys RECALL, not correctness: a changed document could never be mis-answered, only fail to surface.</text>
 
         <line x1="48" y1="886" x2="1192" y2="886" stroke="var(--d-rule)" stroke-width="1"/>
-        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L1 stdlib only · L2 no durable content · L3 deterministic — the sort, not the loop · L4 offline by default · L5 hashed meta · L6 say "index" · L7 Python ≥ 3.11 · L8 use is hashed &amp; bounded</text>
+        <text x="48" y="908" font-size="10.5" fill="var(--d-body)">L1 stdlib only · L2 no durable content · L3 deterministic — the sort, not the loop · L4 offline by default · L5 hashed meta · L6 say "index" · L7 Python ≥ 3.11 · L8 no use record committed</text>
       </svg>
     </div>
   </figure>
@@ -1332,14 +1332,14 @@ fux doctor</code></pre>
 
 <section class="slide" id="s-conf-ladder" data-title="Signals and bands">
   <p class="kicker">02 · Confidence</p>
-  <h2>Four signals in, one band out</h2>
-  <div class="plain"><b>in plain terms</b><span>Four measurements go in. One of four words comes out: <code>none</code>, <code>partial</code>, <code>weak</code>, <code>grounded</code>.</span></div>
+  <h2>Five signals in, one band out</h2>
+  <div class="plain"><b>in plain terms</b><span>Five measurements go in. One of four words comes out: <code>none</code>, <code>partial</code>, <code>weak</code>, <code>grounded</code>.</span></div>
 
   <figure>
     <div class="archbox">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 520" class="arch med"
            font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" role="img"
-           aria-label="Four confidence signals feeding a four-rung band ladder: none, partial, weak, grounded">
+           aria-label="Five confidence signals feeding a four-rung band ladder: none, partial, weak, grounded">
         <defs>
           <marker id="c-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
             <path d="M 0 1.5 L 8.5 5 L 0 8.5" fill="none" stroke="var(--d-accent)" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
@@ -1351,12 +1351,12 @@ fux doctor</code></pre>
         <text x="40" y="62" font-size="11.5" fill="var(--d-body)">the ladder is read top to bottom, and the first true clause wins</text>
 
         <rect x="40" y="94" width="310" height="336" rx="12" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6"/>
-        <text x="58" y="120" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">THE FOUR SIGNALS</text>
+        <text x="58" y="120" font-size="10.5" fill="var(--d-band)" font-weight="600" letter-spacing="1">THE FIVE SIGNALS</text>
 
         <rect x="56" y="134" width="278" height="64" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.3"/>
-        <text x="72" y="156" font-size="12" fill="var(--d-ink)" font-weight="600">coverage · 0.0–1.0</text>
-        <text x="72" y="175" font-size="10.5" fill="var(--d-body)">did the corpus contain the words</text>
-        <text x="72" y="190" font-size="10.5" fill="var(--d-body)">you asked about? idf-weighted</text>
+        <text x="72" y="156" font-size="12" fill="var(--d-ink)" font-weight="600">coverage · doc_coverage</text>
+        <text x="72" y="175" font-size="10.5" fill="var(--d-body)">did the corpus — and the top doc —</text>
+        <text x="72" y="190" font-size="10.5" fill="var(--d-body)">contain your words? idf-weighted</text>
 
         <rect x="56" y="208" width="278" height="64" rx="8" fill="var(--d-accent-bg)" stroke="var(--d-accent)" stroke-width="1.3"/>
         <text x="72" y="230" font-size="12" fill="var(--d-ink)" font-weight="600">separation · 0.0–1.0</text>
@@ -1388,7 +1388,7 @@ fux doctor</code></pre>
         <text x="418" y="253" font-size="10.5" fill="var(--d-body)">or the cited bytes changed. Both facts.</text>
 
         <rect x="400" y="282" width="320" height="72" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.6"/>
-        <text x="418" y="308" font-size="12.5" fill="var(--d-ink)" font-weight="600">separation &lt; SEPARATION_FLOOR</text>
+        <text x="418" y="308" font-size="12.5" fill="var(--d-ink)" font-weight="600">separation &lt; separation_floor</text>
         <text x="418" y="329" font-size="10.5" fill="var(--d-warn)" font-weight="600">0.10 — PROVISIONAL AND UNMEASURED</text>
         <text x="418" y="345" font-size="10.5" fill="var(--d-body)">the only number here that is not a fact (R10)</text>
 
@@ -2532,7 +2532,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
         <text x="330" y="186" font-size="11" fill="var(--d-body)">venv present, not active · Windows: .venv\Scripts\fux.exe</text>
 
         <rect x="40" y="214" width="680" height="46" rx="9" fill="var(--d-panel)" stroke="var(--d-stroke)" stroke-width="1.4"/>
-        <text x="60" y="242" font-size="13" font-family="ui-monospace,monospace" fill="var(--d-ink)">python -m fux.cli --version</text>
+        <text x="60" y="242" font-size="13" font-family="ui-monospace,monospace" fill="var(--d-ink)">python -m fux --version</text>
         <text x="330" y="242" font-size="11" fill="var(--d-body)">importable, no script installed</text>
 
         <path d="M 90 94 L 90 100" stroke="var(--d-warn)" stroke-width="1.6" marker-end="url(#l-a)"/>

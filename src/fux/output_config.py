@@ -43,35 +43,50 @@ rendering anyway, not a CLI key. `enabled` is resolved FIRST, in its own pass
         |no
   [cli] set?             --yes--> value used
         |no
-  bypass? (--no-output-config, or no repo) --yes--> BUILT_IN
+  bypass? (--no-output-config, no repo,      --yes--> BUILT_IN
+           or NO FILE -- decision 20)
         |no
       FuxError -- the file exists but does not set this key
 ```
 
-## The file is the sole source of truth (Arpit, 2026-08-28)
+## The file is the sole source of truth — WHEN IT EXISTS (Arpit, 2026-08-28)
 
 **Every earlier draft of this record let an unset key fall through to
 `BUILT_IN` silently** — "the file is optional, absent means every default".
-That is no longer true. **If `.fux/output.toml` is in effect (no
-`--no-output-config`, and a repo root exists) and does not set a key a verb
-needs, resolving it is a hard `FuxError`** naming the key and where to add
-it, not a silent default. `fux setup` (and `fux output`) write every key
-**live** — decision 14 — so a repo that has run setup once never sees this;
-a repo that has not, or whose `.fux/output.toml` predates a key this version
-added, gets a loud, actionable error instead of a value nobody chose and
+That is no longer true of a file that EXISTS. **If `.fux/output.toml` is in
+effect (it exists, no `--no-output-config`, and a repo root exists) and does
+not set a key a verb needs, resolving it is a hard `FuxError`** naming the
+key and where to add it, not a silent default. `fux setup` (and `fux output`)
+write every key **live** — decision 14 — so a repo that has run setup once
+never sees this; a repo whose `.fux/output.toml` predates a key this version
+added gets a loud, actionable error instead of a value nobody chose and
 nobody can see in a diff. This is the "loader refusal" decision 14 named as
 the sanctioned remedy for the old design's freeze-at-setup cost, chosen over
 the alternative (a silent `fux doctor` warning) because a rendering default
 silently drifting from what the repo's own file states is worse than a verb
 that refuses to guess.
 
+⚠ **A MISSING file is a different question, and it is NOT an error
+(decision 20).** Decision 19 made `load()` raise when the file did not exist
+at all. Because the file is write-if-missing (ADR-DOTFUX decision 6) it
+reaches **new repos only** — so that raise turned `ask`, `find` and `doctor`
+into exit-1 in **every repo that predates the file**, with `doctor`, the verb
+you would run to diagnose it, broken too. Decision 6 forbids reaching those
+repos by rewrite and names the two mechanisms that are allowed: a loader
+refusal, or a `doctor` check. The refusal is what broke them, so the check is
+what reaches them: `load()` returns `ABSENT_OUTPUT` and `fux doctor` carries
+an `output.toml present` row. **Decision 19's own wording is the rule that
+survives** — *"once it is in effect"* — and a file that does not exist is
+not in effect.
+
 **`BUILT_IN` still exists** — it is not gone, its JOB changed. It is:
 (1) the values `fux setup`/`fux output` write into a fresh, live specimen,
 (2) what `--no-output-config` resolves to (the escape hatch has to have
-something to fall back to, or it stops being an escape hatch), and (3) what a
+something to fall back to, or it stops being an escape hatch), (3) what a
 run outside any fux repo resolves to, so `--help`/`--version` are never
-broken by a file that cannot exist yet. None of the three is "the file was
-silently incomplete and nobody noticed".
+broken by a file that cannot exist yet, and (4) what a repo with no
+`.fux/output.toml` resolves to, per decision 20. None of the four is "the
+file was present, silently incomplete, and nobody noticed".
 
 ## There is no writer, deliberately
 
@@ -93,6 +108,7 @@ __all__ = [
     "OUTPUT_NAME",
     "OutputDefaults",
     "DEFAULT_OUTPUT",
+    "ABSENT_OUTPUT",
     "BUILT_IN",
     "CLI_VERBS",
     "MCP_KEYS",
@@ -122,7 +138,7 @@ _ROOTS = ("cli", "mcp")
 #: key at all, it is the question of WHICH chain the other keys walk
 #: (`resolve_json`), answered once per call before any of these are touched.
 CLI_VERBS: dict[str, tuple[str, ...]] = {
-    "ask": ("band", "top", "explain"),
+    "ask": ("band", "top", "explain", "sections"),
     "find": ("band", "top"),
     "answer": ("band", "no_refer", "journal"),
     "explain": (),
@@ -164,6 +180,7 @@ BUILT_IN: dict[str, object] = {
     "band": False,
     "top": 5,
     "explain": False,
+    "sections": True,
     "no_refer": False,
     "hops": 2,
     "journal": False,
@@ -176,6 +193,7 @@ BUILT_IN: dict[str, object] = {
 _TYPES: dict[str, type] = {
     "band": bool,
     "explain": bool,
+    "sections": bool,
     "no_refer": bool,
     "journal": bool,
     "enabled": bool,
@@ -257,11 +275,19 @@ class OutputDefaults:
     json_verb: dict[str, dict[str, object]] = field(default_factory=dict)
     #: `[mcp]`'s scalars.
     mcp: dict[str, object] = field(default_factory=dict)
-    #: True for the disabled / no-repo sentinel: every key resolves straight
-    #: to `BUILT_IN`, and nothing ever raises for being unset. **Not** "the
-    #: file was empty" — an empty *but in-effect* file still raises, because
+    #: True for every sentinel that resolves straight to `BUILT_IN` and never
+    #: raises for an unset key: `--no-output-config`, no repo root, and — since
+    #: decision 20 — a repo whose `.fux/output.toml` does not exist. **Not**
+    #: "the file was empty": an empty *but present* file still raises, because
     #: it is in effect and does not set the key asked for.
     bypass: bool = False
+    #: Why `bypass` is on. True only for decision 20's case — the file is
+    #: absent, so it is not in effect and cannot be the sole source of a key.
+    #: `doctor` reads this to tell a pre-existing repo the file is missing;
+    #: nothing in the resolve chain branches on it, because the *resolution*
+    #: is identical either way. Kept apart from `bypass` so "the consumer
+    #: asked to bypass" and "there is nothing to bypass" stay distinguishable.
+    absent: bool = False
 
     @property
     def trivial(self) -> bool:
@@ -358,6 +384,12 @@ class OutputDefaults:
 
 #: The bypass sentinel: `--no-output-config`, or no repo root at all.
 DEFAULT_OUTPUT = OutputDefaults(bypass=True)
+
+#: Decision 20's sentinel: a repo root exists, `.fux/output.toml` does not.
+#: Resolves exactly as `DEFAULT_OUTPUT` does — the difference is `absent`,
+#: which is what `fux doctor` reports on and what keeps this case out of the
+#: "the consumer passed --no-output-config" bucket.
+ABSENT_OUTPUT = OutputDefaults(bypass=True, absent=True)
 
 
 class _Collector:
@@ -551,23 +583,28 @@ def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
     every key resolves to `BUILT_IN` — the "is it me or the config?" switch,
     and the one path that still works when the file is what is broken.
 
-    Otherwise the file is now **required to exist and to cover every key a
-    caller actually resolves** — see the module docstring. A missing file is
-    a `FuxError` here, at load time, with the fix (`fux setup` / `fux output`)
-    named in the message; a file that exists but omits one key is a
-    `FuxError` later, from `resolve()`/`resolve_json()`/`resolve_mcp()`, once
-    it is clear which key and which verb.
+    Otherwise the file, **if it exists**, is the sole source of every key a
+    caller actually resolves — see the module docstring. A file that exists
+    but omits one key is a `FuxError`, from `resolve()`/`resolve_json()`/
+    `resolve_mcp()`, once it is clear which key and which verb.
+
+    ⚠ **A MISSING file is not an error — decision 20.** It returns
+    `ABSENT_OUTPUT`, which resolves every key to `BUILT_IN`. Decision 19
+    briefly made this a hard error too, which broke `ask`/`find`/`doctor` in
+    **every repo that predates the file** — the file is write-if-missing
+    (ADR-DOTFUX decision 6), so it reaches new repos only, and decision 6
+    forbids reaching the rest by rewrite. Decision 19's own wording, *"once
+    it is in effect"*, is the rule that survives: a file that does not exist
+    is not in effect, so it cannot be the sole source of anything. The repo
+    that is missing it is reached by decision 6's other sanctioned mechanism,
+    a `doctor` check (`output.toml present`), not by a refusal to run.
     """
     if not enabled:
         return DEFAULT_OUTPUT
 
     path = root / OUTPUT_NAME
     if not path.is_file():
-        raise FuxError(
-            f"{path} is missing — run `fux setup` to create it (or, in an "
-            f"existing repo, `fux output > {OUTPUT_NAME}`). Pass "
-            "--no-output-config to use the engine defaults instead."
-        )
+        return ABSENT_OUTPUT
 
     # Windows editors write a BOM; `tomllib.load` reads binary and fails with
     # a decode error that names nothing useful. Stripped rather than diagnosed.
@@ -620,9 +657,10 @@ def specimen() -> str:
         '# "is it me or the config?" switch.',
         "",
         "# `band` and `top` are shared by more than one verb, so they live here.",
-        "# A key only one verb has (`explain`, `hops`, `no_refer`, `journal`) is",
-        "# refused at this level BY NAME — it lives under that verb's own table,",
-        "# below — setting it here would read as global, and it is not.",
+        "# A key only one verb has (`explain`, `sections`, `hops`, `no_refer`,",
+        "# `journal`) is refused at this level BY NAME — it lives under that",
+        "# verb's own table, below — setting it here would read as global, and",
+        "# it is not.",
         "[cli]",
         f"band = {str(bool(BUILT_IN['band'])).lower()}       # the confidence block — ADR-CONFIDENCE decision 11",
         f"top = {int(BUILT_IN['top'])}            # ask/find. ⚠ also bounds `confidence.support`,",
@@ -631,6 +669,9 @@ def specimen() -> str:
         "",
         "[cli.ask]",
         f"explain = {str(bool(BUILT_IN['explain'])).lower()}    # report which path answered",
+        f"sections = {str(bool(BUILT_IN['sections'])).lower()}    # the matched `§ heading` lines under each hit.",
+        "               #   Text mode AND the --json `headings` field, together:",
+        "               #   one key, one question, both renderings (decision 21).",
         "",
         "[cli.path]",
         f"hops = {int(BUILT_IN['hops'])}          # max edges in a route",

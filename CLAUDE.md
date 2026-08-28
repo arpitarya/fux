@@ -490,9 +490,11 @@ signal of how much is actually pending.
    `agent` an agent can execute alone. They run concurrently — never force one
    priority order across both, and never idle behind a decision you were never
    going to make.
-   **Items are grouped by the record each one will have to update** — Law zero
-   made visible. If you cannot name the record an item belongs to, that is the
-   "no ADR affected" claim, said out loud.
+   **Items are grouped by what closing them takes — `fux build`, `testing`,
+   `adr update`** (Arpit, 2026-08-29; previously grouped by owning record).
+   Law zero is unchanged: every item still names, inline, the record its
+   change will have to update. If you cannot name one, that is the "no ADR
+   affected" claim, said out loud — it just isn't the sort key any more.
 5. **Priority is damage that accrues with elapsed time**, above damage that is
    merely present-but-static. Only the former gets worse by waiting.
 6. **No separate prioritization or sequencing doc.** Ordering lives inside

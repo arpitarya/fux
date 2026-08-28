@@ -1,53 +1,13 @@
 # OPEN-WORK — what is still open
 
-*Items first, grouped by the record they belong to. **The rules and the standing
-obligations are at the foot of this file** — read them once, then work from the
-top.*
+*Items first, grouped by what closing them takes — **fux build**, **testing**,
+**adr update**. Every item still names the record it belongs to, inline: Law
+zero (CLAUDE.md) still requires an owning record be nameable, it just isn't
+the sorting key any more. **The rules and the standing obligations are at the
+foot of this file** — read them once, then work from the top.*
 
 **Lane tags:** `agent` — an agent can close it alone · `arpit` — only Arpit can.
 The two run **concurrently**; never order one against the other.
-
----
-
-## 🔴 SHIPPED RED — `main` currently fails 49 tests
-
-- 🔴 **`fux ask` / `fux find` HARD-FAIL in every repo without
-  `.fux/output.toml`.** `arpit` · **This is on `main` as of 2026-08-28**,
-  merged on Arpit's explicit instruction with the regression known and named —
-  recorded here rather than discovered later.
-
-  ```console
-  $ fux find "oncall rota"
-  error: .fux/output.toml is missing — run `fux setup` to create it
-  exit=1
-  ```
-
-  **The chain, and every link is already a recorded decision:**
-  1. [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) **decision 19** makes
-     the file *the sole source of truth*, and a missing file — or a key it does
-     not set — **a hard error, not a silent fallback.**
-  2. `.fux/output.toml` is **write-if-missing**
-     ([ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decision 6), so it
-     reaches **new repos only**.
-  3. ⇒ **Every repo created before this change hard-fails on every query after
-     upgrading.** Not degraded — exit 1.
-
-  🔴 **This is ADR-DOTFUX decision 6's hazard at its worst.** The same shape as
-  `validate()`'s 0-of-7 (below), except `validate()` silently forfeits an
-  optimisation and **this stops the product working.** Decision 6's own named
-  remedy — *a loader refusal or a `doctor` check, never a rewrite* — is what is
-  missing here: there is a refusal and no path to satisfy it.
-
-  ⚠ **49 tests fail on `main`.** The `tests_e2e/` fixtures hand-write
-  `fux.toml` without running `fux setup`, which is **exactly the shape of a real
-  consumer repo** — the suite is not being pedantic, it is reproducing the bug.
-
-  **The fork, and it is not an agent's to take:** ① a missing file falls back to
-  engine defaults, keeping the hard error only for a file that *exists* and is
-  incomplete — decision 19's own wording (*"once it is in effect"*) arguably
-  already means this; or ② decision 19 stands and `fux setup` gains a migration
-  path that reaches existing repos, which decision 6 forbids doing by rewrite.
-  `filed: 2026-08-28`
 
 ---
 
@@ -67,12 +27,13 @@ The two run **concurrently**; never order one against the other.
 
 ---
 
-## Open items, by record
+## Open items
 
-### [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) · [ADR-TUNE](../docs/adr/0038_tuning.md)
+### fux build
 
-- 🔴 **W-94** · `arpit` · **`superseded_weight` ships at `1.0`, so the
-  supersession prior is a no-op out of the box.** Measured
+- 🔴 **W-94** · `arpit` · *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) ·
+  [ADR-TUNE](../docs/adr/0038_tuning.md))* · **`superseded_weight` ships at
+  `1.0`, so the supersession prior is a no-op out of the box.** Measured
   [2026-08-28](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B2.md):
   `1.0.0` and `HEAD` invert a superseded document over its successor
   **identically** — 21 of 40 chains at tier 1 000 — because `HEAD` parses
@@ -82,8 +43,11 @@ The two run **concurrently**; never order one against the other.
   🔴 **This does NOT mean "lower the default", and the run says so itself.**
   [`P-SUPERSEDE`](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md)
   ruled that change **FAIL** on 2026-08-25 — at `0.5` on the playground it fixed
-  one query and **broke two**, and *every* broken query had the **superseded
-  document as its correct answer**. **The benchmark corpus cannot see that
+  **`q015` and `q049`** and **broke `q022` and `q033`**, and *every* broken query
+  had the **superseded document as its correct answer**. (⚠ This row and the
+  v1-vs-HEAD presentation both said *"fixed one query"* until 2026-08-28; the
+  [verdict](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md)
+  is primary and says two. The ruling is unaffected — the bar was *0 broken*.) **The benchmark corpus cannot see that
   failure mode by construction.** The two results are consistent and **the older
   one is more informative**, because its corpus contains the case that breaks.
   **What is actually open is narrower:** a corpus declaring `supersedes:` gets
@@ -91,82 +55,138 @@ The two run **concurrently**; never order one against the other.
   not a ranking change. ⚠ **Doing nothing is legitimate**: a disclosure gap, not
   a defect. `filed: 2026-08-28`
 
+### testing
+
 - ⚠ **`separation_floor` is repo-configurable and R10 is still unmeasured.**
-  Not a new item — R10 is [W-90]'s — but the failure mode is: a repo can make
-  its own answers read `grounded` without touching the ranking, and **nothing
+  *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md))* · Not a new
+  item — R10 is [W-90]'s — but the failure mode is: a repo can make its own
+  answers read `grounded` without touching the ranking, and **nothing
   mechanical catches it**. The guard is that the block publishes the floor it
   was judged under. **Any run comparing two arms must assert their floors are
   equal**; differing floors is a pre-registered threshold moving inside a
   comparison, and it is ADR-CONFIDENCE decision 13's reopen trigger.
 
-### [ADR-QUALITY](../docs/adr/0044_quality-contract.md) · [ADR-RS](../docs/adr/0036_predictions.md)
+- **Recall on a CLEAN corpus.** `agent` ·
+  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · The first
+  `recall@k` ([run](regression/2026-08-28-first-recall/report.md), `@5` 0.9535)
+  is `informed` — every installed enrichment file was authored by someone who
+  had read these queries — so **it demonstrates the metric, not the engine.**
+  The `none`/`placebo`/`real` arms already exist, so a clean absolute is one
+  command. ⚠ Unlike `hit@k`, recall awards partial credit and **may separate
+  arms `hit@k` could not**; that makes it a paired comparison needing discordant
+  counts. `filed: 2026-08-28`
 
-- 🔴 **The engine abstains ZERO times out of 20.** `arpit` · Blind-authored
-  `unanswerable` questions, confirmed unanswerable by a second blind session;
-  the engine reported `answerable: true` on all 20, 17 of them at or above the
-  `separation_floor` ([run](regression/2026-08-28-blind-unanswerable/report.md)).
-  **This is load-bearing**: ADR-QUALITY decision 5 puts the class *inside* the
-  gate, so the `recall@k` headline describes the **answerable half only**.
+- **The 7 `partial` goldens.** `arpit` ·
+  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · The two
+  blind annotators' exact-set disagreements, taking the union, held out of
+  `recall@k`'s denominator. They need a human or a **third blind reader** —
+  any session that has seen the scores is the wrong party. 🔴 **Do not resolve
+  them by picking whichever set makes recall look better.** `filed: 2026-08-28`
+
+- **The `heading` negative control is saturated and must be rebuilt.** `agent` ·
+  *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+  [C4](regression/2026-08-28-benchmark-contested/VERDICT-C4.md) returned its
+  predicted null at **100 % in both arms with zero headroom**, so it returned
+  the right answer for the wrong reason and **did not discharge its job**. Until
+  it does, C1 and C3 rest on generator assertions rather than a live control.
+  The fix is a control with headroom by construction — e.g. distractors that are
+  *also* heading-matched. `filed: 2026-08-28`
+
+- ⚠ **A cross-seed "null control" is not a determinism check, and B9 was read as
+  one.** `agent` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+  Query ids are **positional**, so arm A on seed 12 paired against arm A on
+  seed 13 compares *different questions*; the discordant count is a rate
+  check. The determinism check is the **same-corpus repeat**.
+  [C5](regression/2026-08-28-benchmark-contested/VERDICT-C5.md) was ruled on the
+  repeat for that reason. 🔴 **The 2026-08-28 v1-vs-HEAD run's B9 carries the
+  same weakness** — its "0 discordant of 240" across two seeds should be read as
+  a rate check; its "300/300 identical rows on one corpus" is the half that does
+  the work. `filed: 2026-08-28`
+
+- **W-96** · `agent` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+  **a `blind` version benchmark needs TWO sessions, and nothing makes that
+  happen.** Whoever writes the generator and reads a score is `informed`, so
+  the 2026-08-28 run is filed `informed` and states no delta. The protocol:
+  one session authors and freezes the corpus, query sets and harness and
+  **stops**; a second, which never reads them, executes and analyses.
+  ⚠ **Not a process doc** — a handoff shape, worth one paragraph in
+  SETUP-BENCHMARK plus the discipline to do it. `filed: 2026-08-28`
+
+- **W-87** · `arpit` ·
+  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · **what
+  "good" means, then measure.** P0, P1, P3, P4 and P5 are closed and
+  `recall@k` now exists. ⚠ **Two things keep it open:** the `judged` series
+  has never been exercised (no judged run exists), and **Part B cannot run**
+  — `acme` and `orbit` went in the 2026-08-20 wipe with their generator, and
+  `tools/pruning-eval/` hard-codes reading them. —
+  [detail](open/W-87-what-good-means.md)
+
+- **`tests_e2e/` has never run on Windows**, and `test_maintenance.py` is the
+  suite most likely to differ: real git, real hooks, real detached processes.
+  *(no record — a test-surface gap, not a behaviour change)* · Verified on
+  Linux/CPython 3.11.15 and macOS 15/arm64/CPython 3.14.2.
+
+- ⚠ **`validate()` reaches an existing repo only when somebody copies the
+  fetcher in.** *(record: [ADR-DOTFUX](../docs/adr/0003_fux-directory.md)
+  decision 6)* · `fux setup` is write-if-missing and never rewrites a
+  consumer's file. **Measured 2026-08-28:** a repo created before the change
+  learned **0 of 7** tokens until its `http.py` was replaced by hand. A
+  `doctor` notice now names the gap, so it is **VISIBLE, not CLOSED** — the
+  consumer still copies the function in by hand. **No further mechanism is
+  proposed**: a loader that rewrote a consumer's committed file would be
+  worse than the problem.
+
+### adr update
+
+- **`rerank_weight` ships at `0.0`, and every ranking prior `HEAD` added is a
+  no-op at the default.** `arpit` ·
+  *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) ·
+  [ADR-TUNE](../docs/adr/0038_tuning.md))* · Not a new fact —
+  [2026-08-25](regression/2026-08-25-supersession-and-reranker-default/report.md)
+  measured the reranker and recorded that *"the default still does not flip"*,
+  and `P-RERANK-DEFAULT` was withdrawn as mis-framed. **What is new is the
+  pattern**: `superseded_weight` `1.0`, `recency_half_life_days` `0.0` and
+  `rerank_weight` `0.0` are all no-ops, so **on ranking priors B-core *is*
+  `1.0.0`** — which explains the shipped-default nulls better than a saturated
+  corpus alone did. Measured on a headroom-asserted suite
+  ([C2](regression/2026-08-28-benchmark-contested/VERDICT-C2.md)): at `0.5` the
+  reranker takes proximity contests **22 % → 100 %, 94 fixed, 0 broken**.
+  🔴 **This is NOT an argument for the default, and the pre-registration said so
+  before the number existed.** That suite rewards exactly what the reranker
+  does; on **hand-graded** text the reranker is worth `28 → 32` — **+4, 0
+  broken**, itself `informed` and below the floor. `c = 0` is a property of the
+  generator, not a safety result. ⚠ **Doing nothing is legitimate** — the open
+  work is recording this pattern where ADR-RANKING/ADR-RERANK can be checked
+  against it, not building or measuring anything further. `filed: 2026-08-28`
+
+- 🔴 **The engine abstains ZERO times out of 20.** `arpit` ·
+  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* ·
+  Blind-authored `unanswerable` questions, confirmed unanswerable by a second
+  blind session; the engine reported `answerable: true` on all 20, 17 of them
+  at or above the `separation_floor`
+  ([run](regression/2026-08-28-blind-unanswerable/report.md)). **This is
+  load-bearing**: ADR-QUALITY decision 5 puts the class *inside* the gate, so
+  the `recall@k` headline describes the **answerable half only**.
   ⚠ **No threshold is proposed and R10 is untouched, deliberately** — a floor
   fitted to the 20 numbers that exposed the problem is the moving-threshold
   failure in a new costume. **Needs a call on whether it gates anything.**
   `filed: 2026-08-28`
 
-- **Recall on a CLEAN corpus.** `agent` · The first `recall@k`
-  ([run](regression/2026-08-28-first-recall/report.md), `@5` 0.9535) is
-  `informed` — every installed enrichment file was authored by someone who had
-  read these queries — so **it demonstrates the metric, not the engine.** The
-  `none`/`placebo`/`real` arms already exist, so a clean absolute is one
-  command. ⚠ Unlike `hit@k`, recall awards partial credit and **may separate
-  arms `hit@k` could not**; that makes it a paired comparison needing discordant
-  counts. `filed: 2026-08-28`
-
-- **The 7 `partial` goldens.** `arpit` · The two blind annotators' exact-set
-  disagreements, taking the union, held out of `recall@k`'s denominator. They
-  need a human or a **third blind reader** — any session that has seen the
-  scores is the wrong party. 🔴 **Do not resolve them by picking whichever set
-  makes recall look better.** `filed: 2026-08-28`
-
-- **W-95** · `agent` · **build a CONTESTED-answer suite; the marker suite is
-  saturated.** `hit@5` came back **240/240 in both arms at every tier** — a term
-  with `df = 1` is already rank 1 and no ranking change can move it, so `pb` and
-  `pc` are structurally zero.
-  🔴 **The reusable lesson, and it belongs to every paired run: a power table
-  says how many queries, never whether the queries are HARD.** The
-  pre-registration sized the set correctly and still could not detect anything.
-  Both suites that *did* discriminate had contested answers. **Marker queries
-  are a null-control instrument and must not be a primary endpoint again.**
-  `filed: 2026-08-28`
-
-- **W-96** · `agent` · **a `blind` version benchmark needs TWO sessions, and
-  nothing makes that happen.** Whoever writes the generator and reads a score is
-  `informed`, so the 2026-08-28 run is filed `informed` and states no delta. The
-  protocol: one session authors and freezes the corpus, query sets and harness
-  and **stops**; a second, which never reads them, executes and analyses.
-  ⚠ **Not a process doc** — a handoff shape, worth one paragraph in
-  SETUP-BENCHMARK plus the discipline to do it. `filed: 2026-08-28`
-
-- **W-87** · `arpit` · **what "good" means, then measure.** P0, P1, P3, P4 and
-  P5 are closed and `recall@k` now exists. ⚠ **Two things keep it open:** the
-  `judged` series has never been exercised (no judged run exists), and **Part B
-  cannot run** — `acme` and `orbit` went in the 2026-08-20 wipe with their
-  generator, and `tools/pruning-eval/` hard-codes reading them. —
-  [detail](open/W-87-what-good-means.md)
-
-### Test-surface gaps
-
-- **`tests_e2e/` has never run on Windows**, and `test_maintenance.py` is the
-  suite most likely to differ: real git, real hooks, real detached processes.
-  Verified on Linux/CPython 3.11.15 and macOS 15/arm64/CPython 3.14.2.
-
-- ⚠ **`validate()` reaches an existing repo only when somebody copies the
-  fetcher in.** `fux setup` is write-if-missing and never rewrites a consumer's
-  file — [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decision 6.
-  **Measured 2026-08-28:** a repo created before the change learned **0 of 7**
-  tokens until its `http.py` was replaced by hand. A `doctor` notice now names
-  the gap, so it is **VISIBLE, not CLOSED** — the consumer still copies the
-  function in by hand. **No further mechanism is proposed**: a loader that
-  rewrote a consumer's committed file would be worse than the problem.
+- **Ratify the headroom obligation into [ADR-RS](../docs/adr/0036_predictions.md).**
+  `arpit` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* · **W-95 is
+  built, run and filed**
+  ([2026-08-28](regression/2026-08-28-benchmark-contested/report.md)): a
+  contested-answer suite whose `--selftest` **asserts** that candidates are
+  separable only by the property under test. On its primary endpoint, with
+  **94 of 120 queries of headroom**, shipped-default `HEAD` and `1.0.0` are
+  **both at 21.7 %** against a 25 % chance level — 0 discordant. 🔴 **The
+  reusable rule, which is what W-95's row was the only home of: a power table
+  says how many queries; it NEVER says whether the queries are HARD.** The
+  proposed standing obligation — *every paired run states, for each endpoint,
+  the current score and how many queries could change, beside the power figure*
+  — is a **decision**, so it needs ratifying rather than filing. It earned its
+  place immediately: it caught a saturated control inside the run that
+  introduced it. `filed: 2026-08-28`
 
 ---
 
@@ -225,9 +245,13 @@ session needs first.*
    Only the former gets worse by waiting.
 7. **No separate prioritization or sequencing document.** Ordering lives here.
    A second document naming what to do next is always the stale one.
-8. **Grouped by record, because that is where the work lands.** An item's group
-   is the record its change will have to update — which is Law zero made
-   visible: if you cannot name the record, say **"no ADR affected"** out loud.
+8. **Grouped by what closing it takes — `fux build` (code), `testing`
+   (a run or a harness), `adr update` (a ruling or a record, no code and no
+   measurement) — changed 2026-08-29 from grouping by record, on Arpit's
+   direction.** Law zero is unchanged and still binds every item: each row
+   still names, inline, the record its change will have to update — if you
+   cannot name one, say **"no ADR affected"** out loud. What moved is only the
+   sort key, not the obligation.
 
 ## Standing obligations (every session)
 

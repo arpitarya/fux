@@ -294,6 +294,16 @@ scope is calls rather than literals** because `store/canonical.py` and
 a guard that flags the code defending against a character is one people learn
 to switch off.
 
+11. **`ask` gained a `--sections` / `--no-sections` pair — the decision is
+    [ADR-OUTPUT](0047_output-defaults.md) decision 21, noted here only because
+    the flags themselves live in `cli.py`, which this record owns.** Both
+    halves are `default=None` (decision 7/10's `--band` pattern repeated): an
+    absent flag has to stay distinguishable from an explicit one, or a
+    `[cli.ask] sections` key in `.fux/output.toml` would be unreachable from
+    the command line. The mutually-exclusive group is the mechanism a
+    default-on flag needs — a lone `store_true` can only ever turn the lines
+    back on, never off against a file that says `false`.
+
 ---
 
 ### The commands

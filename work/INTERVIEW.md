@@ -1020,12 +1020,29 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated **2026-08-28**.*
+*Updated **2026-08-29**.*
 
-**The one thing owed from the last change:** `uv run pytest -q tests tests_e2e`
-on the build machine. The confidence-floor change was verified in the Cowork
-container over the changed modules only (145 passed / 135 baseline) because the
-device shell was wedged; the suite is unrun.
+**The thing that was owed is now paid.** `.venv/bin/python -m pytest -q tests
+tests_e2e` on the actual device (not a mirror): **2425 passed, 3 skipped, 0
+failed.** The output.toml fork (ADR-OUTPUT decision 20) and `ask`'s
+`sections` (decision 21) were ruled 2026-08-28 and verified only in a cloud
+mirror at the time; the device run surfaced one real gap the mirror
+structurally could not see — the `sections` pair had touched ADR-CLI-owned
+`cli.py` and ADR-CONFIDENCE-owned `query/__init__.py` without touching either
+owning record (`test_working_tree_is_not_mid_violation` diffs the working
+tree against `HEAD`, and a staged mirror copy has no `HEAD` to diff). Fixed
+with cross-reference notes only — ADR-CLI decision 11, ADR-CONFIDENCE
+decision 14, both pointing back at decision 21, no new ruling. See
+`IMPLEMENTATION.md`'s 2026-08-29 entry and `WORKLOG.md` for the full trail.
+**Nothing here is committed** — this was a same-session device re-verification
+of an already-uncommitted working tree, not a new change.
+
+**Two questions from the same 2026-08-28 session remain open and are
+Arpit's, not this file's to resolve:** the engine abstained 0/20 times on
+blind-authored unanswerable questions (ADR-QUALITY decision 5 puts that class
+inside the gate); and the 7 `partial` goldens need a human or a third blind
+reader. Both live as ordinary rows in `OPEN-WORK.md`'s ADR-QUALITY section —
+not a session blocker, just unclosed.
 
 *The `arpit` queue is **three**, unchanged:*
 

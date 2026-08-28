@@ -1,0 +1,44 @@
+# The frozen arm manifest. Every number in this run came from these.
+[run]
+id          = "2026-08-28-benchmark-contested"
+prereg      = "work/benchmark/PRE-REGISTRATION-CONTESTED.md"
+prereg_sha256 = "e8417b33654eaea4bc1cc9fba9c33b2ea5e5c80756cf969dcf38816ccfd00971"
+classification = "informed"   # generator author == score reader. No delta stated.
+python      = "3.11.15"
+surface     = "Linux cloud container (Cowork). Quality + byte numbers only."
+
+[arm.A]
+what    = "fux-engine==1.0.0"
+version = "fux 1.0.0"
+install = "pip install fux-engine==1.0.0"
+fields  = 2   # body 1.0, heading 3.0
+
+[arm.B]
+what    = "working-tree HEAD, shipped defaults"
+version = "fux 2.0.0-alpha.2"
+sha     = "75ade572165cf06161bc58d0d8519f771da37636"
+install = "pip install -e ."
+fields  = 5   # body 1.0, heading 3.0, title 2.0, path 1.5, ctx 1.0
+rerank_weight = 0.0            # the shipped default: the proximity reranker is OFF
+
+[arm.Bt]
+what    = "arm B + one tune.toml key. AN ABLATION -- carries no version claim."
+differs_from_B_in = ["rerank_weight"]
+rerank_weight = 0.5
+
+[corpus.t1200]
+docs = 1200
+seed = 12
+sha256 = "48aeba89affaa987c0823ae3a778800f86bc54dd3ec6ef77b22ed08b640f25ce"
+profile = "120 proximity / 60 path / 40 heading / cluster 4 / 20 chains / 30 decoys / 20 unanswerable / 120 marker pairs"
+
+[corpus.t1200b]
+docs = 1200
+seed = 13
+sha256 = "47dafc5e62593639b59d9fca1c62c5ad5b0dd7cc7f10f1dd12c6568a3f0868c6"
+role = "the second seed, for C5b"
+
+[corpus.t10000]
+docs = 10000
+seed = 12
+profile = "same counts as t1200; descriptive tier"

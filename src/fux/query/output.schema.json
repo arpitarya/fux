@@ -37,7 +37,14 @@
       "",
       "-- added by the W-84 session, 2026-08-26. This file was untracked and in",
       "flight in a CONCURRENT session at the time; if that session rewrites it,",
-      "`headings` must come back, or this declaration is false."
+      "`headings` must come back, or this declaration is false.",
+      "",
+      "CONDITIONAL ON `ask` SINCE 2026-08-28 (ADR-OUTPUT decision 21): `ask`",
+      "omits `headings` entirely under `--no-sections` / `[cli.ask] sections =",
+      "false`. That is `confidence`-under-`--band`'s shape, not the W-48 trap:",
+      "absent means THE CONSUMER SAID NOT TO COMPUTE IT, never a claim about the",
+      "document. `[]` still means nothing matched. `find` has no `sections` key,",
+      "so on `find` this field is unconditional as before."
     ],
     "fields": {
       "id":       { "type": "str",  "required": "always", "doc": "the committed record's id" },
@@ -45,8 +52,8 @@
       "loc":      { "type": "str",  "required": "always", "doc": "path or URL -- no line range" },
       "score":    { "type": "any",  "required": "always", "doc": "float; the one place a float is legal, because this is output and not a committed byte" },
       "archived": { "type": "bool", "required": "always", "doc": "BRANCH ON THIS, never on the prose note" },
-      "headings": { "type": "any",  "required": "always",
-                    "doc": "list[str] -- the document's headings matching the query, best first, at most 3. ALWAYS PRESENT: `[]` means nothing matched, or the record is `hashed` and carries no display text at all (L5). An absent key would be indistinguishable from an older fux (W-48)" }
+      "headings": { "type": "any",  "required": "sections_requested",
+                    "doc": "list[str] -- the document's headings matching the query, best first, at most 3. PRESENT WHENEVER ASKED FOR, and then always: `[]` means nothing matched, or the record is `hashed` and carries no display text at all (L5) -- an absent key would otherwise be indistinguishable from an older fux (W-48). The one way to make it absent is to say so: `ask --no-sections`, or `[cli.ask] sections = false` (ADR-OUTPUT decision 21). Unconditional on `find`, which has no such key" }
     },
     "example": {
       "id": "file:docs/mesh.md",

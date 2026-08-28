@@ -503,12 +503,20 @@ def cmd_ask(args) -> int:
     _declare_pending(root)
     _declare_no_accelerator(root)
 
+    # ADR-OUTPUT decision 21. `getattr` rather than `args.sections` because
+    # `_as_dict` is shared with `find`, which declares no such key, and a
+    # caller constructing args by hand (the MCP surface, the tests) should get
+    # the built-in rather than an AttributeError.
+    show_sections = bool(getattr(args, "sections", True))
+
     if args.json:
         # `--explain` is not text-only: a caller that wants to log which path
         # answered a slow query needs it in the machine-readable form too. The
         # key is additive and appears only when asked for, so no existing
         # consumer's parse changes (W-48).
-        payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
+        payload: dict = {
+            "results": [_as_dict(root, r, args.query, sections=show_sections) for r in results]
+        }
         # ADR-CONFIDENCE decision 11: present only under `--band`. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer**, which
         # is why the schema makes it conditional rather than optional-in-prose.
@@ -535,8 +543,9 @@ def cmd_ask(args) -> int:
         record = _record_for(root, r.id)
         mark = f"{ARCHIVED_MARKER} " if r.archived else ""
         print(f"{r.score:.4f}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
-        for heading in _headings_for(record, args.query):
-            print(f"        {SECTION_MARKER} {heading}")
+        if show_sections:
+            for heading in _headings_for(record, args.query):
+                print(f"        {SECTION_MARKER} {heading}")
     if getattr(args, "explain", False):
         print(f"\n[{path}]")
     if why is not None:
@@ -1114,18 +1123,29 @@ def _title_from(root: Path, record: dict | None, fallback_title: str) -> str:
     return store_mod.display_title(record, cache=store_mod.DisplayCache(root))
 
 
-def _as_dict(root: Path, result: AskResult, query: str) -> dict:
+def _as_dict(root: Path, result: AskResult, query: str, *, sections: bool = True) -> dict:
     """`AskResult` as JSON, with `title` upgraded through the P5 display cache
     and W-84's matched `headings` alongside it.
 
-    **`headings` is always present, even when empty.** An absent key is a trap,
-    not a signal (W-48) — a caller cannot tell "this document has no matching
-    heading" from "this version of fux does not do headings". Both paths
-    produce it from the same committed record, so the differential law is
-    untouched: it is a function of a list the two generators already agree on.
+    **`headings` is always present, even when empty — WHEN IT IS ASKED FOR.**
+    An absent key is a trap, not a signal (W-48): a caller cannot tell "this
+    document has no matching heading" from "this version of fux does not do
+    headings", so `[]` is the answer to the first and the key never simply
+    disappears because nothing matched. Both paths produce it from the same
+    committed record, so the differential law is untouched: it is a function
+    of a list the two generators already agree on.
+
+    ⚠ **`sections=False` is the ONE case the key is absent, and it is not the
+    W-48 trap** (ADR-OUTPUT decision 21). It is `confidence`-under-`--band`'s
+    shape exactly: **absent means NOT ASKED FOR — never a claim about the
+    document.** The distinction W-48 is about is *"empty vs. unsupported"*,
+    and both of those still resolve to `[]`; this third state is *"the
+    consumer said don't compute it"*, which only the consumer can set and
+    only on `ask`. `find` has no `sections` key, so its payload is unchanged.
     """
     record = _record_for(root, result.id)
     payload = dict(result.__dict__)
     payload["title"] = _title_from(root, record, result.title)
-    payload["headings"] = _headings_for(record, query)
+    if sections:
+        payload["headings"] = _headings_for(record, query)
     return payload

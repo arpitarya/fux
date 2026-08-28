@@ -1,1 +1,1 @@
-🔴 main is RED: 49 tests — .fux/output.toml missing = hard error in every pre-existing repo (ADR-OUTPUT d19 vs ADR-DOTFUX d6) · → rule the fork
+🟢 OPEN-WORK's "Open items" regrouped by request: by-record → fux build / testing / adr update (13 items sorted, record still cited inline per item, rule 8 + CLAUDE.md updated to match) · next: nothing moved underneath — same agent/arpit queue, waiting on Arpit for the arpit-lane items

@@ -353,6 +353,95 @@ null
     that has run `fux setup` (or copied a current `fux output`) never sees
     this at all — every key is live from the day the file is written.
 
+20. ⚠ **A MISSING FILE FALLS BACK; A PRESENT ONE STILL RULES. Ruled by Arpit,
+    in Cowork, 2026-08-28.** Decision 19 made `load()` raise when
+    `.fux/output.toml` did not exist at all. **That broke every repo that
+    predates the file.** The file is write-if-missing
+    ([ADR-DOTFUX](0003_fux-directory.md) decision 6), so `fux setup` writes it
+    into NEW repos only and never rewrites an existing one — which meant
+    `fux ask`, `fux find` and `fux doctor` all exited 1, after an upgrade, in
+    every repo that had ever run an older `fux setup`. 49 tests went red on
+    `main`, and `doctor` — the verb you would run to find out why — was among
+    the broken.
+
+    **The ruling: `load()` returns `ABSENT_OUTPUT` when the file does not
+    exist.** Every key resolves to `BUILT_IN`, exactly as under
+    `--no-output-config`. **Decision 19 is otherwise untouched**: a file that
+    EXISTS and omits a key a verb resolves is still a hard `FuxError`, which
+    is the case decision 19 was actually written about.
+
+    **Why this and not a `fux setup` migration.** The alternative was to keep
+    the refusal and give `setup` a path that reaches existing repos.
+    ADR-DOTFUX decision 6 forbids exactly that — *"a rewrite would eat a
+    consumer's annotations"* — and names the two mechanisms that ARE allowed:
+    **a loader refusal, or a `doctor` check, never a rewrite.** Decision 19
+    chose the refusal, and the refusal is what broke them. So the remedy is
+    the other one on decision 6's own list: **`fux doctor` gains an
+    `output.toml present` row** (`_output_config_health`), a WARNING naming
+    `fux output > .fux/output.toml`, modelled line-for-line on
+    `types list usable`, which decision 6 already cites as the worked instance
+    of this same situation.
+
+    **Decision 19's own wording is what survives, not what is overturned.** It
+    says the file is the sole source of every key *"once it is in effect"*.
+    **A file that does not exist is not in effect.** Reading it as *"…and it
+    is always in effect"* is what produced the regression; reading it as
+    written produces this decision. The one-line change is the honest one.
+
+    ⚠ **`bypass` and `absent` are separate fields, deliberately.** Both
+    resolve identically — that is the point — but *"the consumer asked to
+    bypass this file"* and *"there is no file to bypass"* are different facts
+    about a repo, and only the second is something `doctor` should mention.
+    Collapsing them would make the doctor row impossible to write without
+    re-statting the file. `DEFAULT_OUTPUT` keeps `absent=False`;
+    `ABSENT_OUTPUT` is the new sentinel. **Nothing in the resolve chain
+    branches on `absent`** — if anything ever does, the two facts have stopped
+    being the same resolution and this note is wrong.
+
+21. **`ask` gained `sections`, and it reaches BOTH renderings. Ruled by
+    Arpit, in Cowork, 2026-08-28.** W-84 put the matched headings under each
+    `ask` hit as indented `§` lines. They shipped **unconditional, with no
+    flag at all** — the one part of `ask`'s output a consumer could not turn
+    off. `sections` is now a `[cli.ask]` key and a `--sections` /
+    `--no-sections` flag.
+
+    **One key, both renderings.** `sections = false` removes the `§` lines
+    from stdout **and** omits `headings` from the `--json` payload. The
+    alternative — text-only, leaving the JSON field unconditional — was
+    considered and refused: the key answers *"do I want the matched
+    headings?"*, and a machine reader who does not want them has exactly the
+    same question a human reader does. Two keys for one question would be the
+    surface decision 2 exists to keep narrow.
+
+    ⚠ **The absent `headings` key is NOT the W-48 trap, and the distinction is
+    the whole justification.** W-48's rule is that an absent key must never be
+    the way to say *"nothing matched"*, because a caller cannot tell that from
+    *"this fux is too old"*. **`[]` still means nothing matched** — that is
+    unchanged and still tested. The new third state means *"the consumer said
+    not to compute it"*, which is precisely
+    [ADR-CONFIDENCE](0045_confidence.md) decision 11's shape for `confidence`
+    under `--band`: **absent means NOT ASKED FOR, never a claim about the
+    document.** `output.schema.json` marks it `required: "sections_requested"`
+    rather than describing it in prose, the same way `confidence` is
+    `band_requested`.
+
+    ⚠ **`--sections`/`--no-sections` is a PAIR, and it has to be.** Every
+    other key this file defaults is a `store_true` that is OFF by default, so
+    one flag can turn it on. `sections` is ON by default: a lone `--sections`
+    `store_true` could only ever re-assert the default, and a repo with
+    `[cli.ask] sections = false` would have **no way to get the lines back
+    from the command line**. Both halves carry `default=None` — decision 10 —
+    because an absent flag must stay distinguishable from an explicit one, or
+    the file's value is unreachable and nothing fails to say so.
+
+    **`[mcp]` does not get this key.** MCP returns structured results with no
+    text rendering, so the `§` lines do not exist there, and `headings` is
+    what an agent actually reads. **`find` does not get it either**: it has no
+    `§` lines by design (they would be read as filenames when piped), and its
+    `--json` shares `_as_dict`, so its payload is unchanged. Per decision 3,
+    `[defaults]`-level `sections` is refused by name — only `[cli.ask]` sets
+    it, because only `ask` has the concept.
+
 ⚠ **No output default changed on 2026-08-28.** `fux doctor` gained a `url daemon`
 row and `fux update` gained `--all`; both print through the existing surfaces and
 neither adds a gated flag or a `[verb]` key. Recorded because this record
@@ -482,6 +571,27 @@ catchable by the tests that existed when they were written.**
    bisected from the file that might be why it fails, and if the file is
    incomplete it cannot be RUN at all — decision 19's bootstrap gap,
    reopened.
+8. **`load()` raises, or returns anything but a bypassing `OutputDefaults`,
+   for a repo with no `.fux/output.toml`.** Decision 20 is then false and
+   every pre-existing repo is exit-1 again on `ask`, `find` and `doctor` —
+   the regression that put 49 tests red on `main`, 2026-08-28.
+9. **`fux doctor` loses the `output.toml present` row, or it becomes an
+   error rather than a warning.** Losing it strands the pre-existing repo
+   with no way to learn the file exists — decision 20 traded the refusal for
+   this check, and without the check the trade is a silent downgrade.
+   Promoting it to an error re-breaks `doctor` by another route.
+10. **Anything in the resolve chain branches on `absent`.** The two sentinels
+    resolve identically by construction (decision 20); a branch means they no
+    longer do, and `--no-output-config` and "no file" have quietly become
+    different behaviours.
+11. **`ask --no-sections` leaves `headings` in the `--json` payload, or `[]`
+    stops meaning "nothing matched".** The first makes decision 21 half-built
+    — the ruling was both renderings; the second is the actual W-48 trap,
+    which decision 21 explicitly does not open.
+12. **`--sections` is reduced to a single `store_true`, or either half loses
+    `default=None`.** A repo with `[cli.ask] sections = false` then has no way
+    to get the lines back from the command line, which is decision 10's
+    failure mode arriving through the one key that defaults to ON.
 
 ## References
 

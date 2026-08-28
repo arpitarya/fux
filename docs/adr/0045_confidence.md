@@ -480,6 +480,15 @@ defect **exists**. It tells you nothing about whether a **threshold can catch
 it**. Those are two measurements, and this record now carries an instance of the
 second one contradicting the first.
 
+14. **`_as_dict` and `cmd_ask` in this file gained the `sections` gate — the
+    decision is [ADR-OUTPUT](0047_output-defaults.md) decision 21, noted here
+    only because the code lives in `src/fux/query/__init__.py`, which this
+    record owns.** `sections=False` is the same shape as decision 11's
+    `confidence`-under-`--band`: the `headings` key goes absent, and absent
+    means *not asked for*, never *nothing matched* — `[]` still carries that
+    meaning and is unchanged. Confidence assembly itself (`confidence_out`,
+    `_fill_confidence`) is untouched; `headings` is a different key entirely.
+
 ### Consequences
 
 **`support` is bounded by `--top`, and cannot honestly be a corpus-wide count.**

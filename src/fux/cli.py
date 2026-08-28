@@ -426,6 +426,21 @@ def build_parser() -> argparse.ArgumentParser:
     p_ask = _query_parser("ask", "answer a question from the committed index, with citations")
     p_ask.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
     p_ask.add_argument("--explain", action="store_true", default=None, help="report which path answered")
+    # W-84's matched `§ heading` lines. ⚠ **A pair, not a `store_true`** — the
+    # lines are ON by default, so a `store_true` could only ever turn them on
+    # again and `.fux/output.toml` could never turn them off from the command
+    # line. `default=None` on BOTH halves is ADR-OUTPUT decision 10: an absent
+    # flag has to be distinguishable from an explicit one, or the file's value
+    # is unreachable and nothing fails to say so.
+    sections = p_ask.add_mutually_exclusive_group()
+    sections.add_argument(
+        "--sections", dest="sections", action="store_true", default=None,
+        help="show the matched section headings under each hit (default)",
+    )
+    sections.add_argument(
+        "--no-sections", dest="sections", action="store_false", default=None,
+        help="omit the matched section headings, in text and in --json alike",
+    )
     # ADR-PROVENANCE. A separate flag from `--explain`, not an extension of it:
     # `--explain` answers "which code path ran" and `--why` answers "why this
     # document" — different questions, different costs. `--why` runs a second

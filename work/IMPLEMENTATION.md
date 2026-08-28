@@ -21,6 +21,56 @@ Rules:
 
 ---
 
+## The `output.toml` fork closes, and `ask` gains `sections` (2026-08-29)
+
+**Both ruled by Arpit in Cowork, 2026-08-28; verified on the device 2026-08-29** —
+the prior session's own suite run was a cloud mirror (`device_bash` wedged
+7/7 for the whole session), so nothing here was confirmed against the real
+tree until now.
+
+- **A missing `.fux/output.toml` falls back to engine defaults; a present but
+  incomplete one still hard-errors** ([ADR-OUTPUT](../docs/adr/0047_output-defaults.md)
+  decision 20). `output_config.load()` returns the new `ABSENT_OUTPUT`
+  sentinel instead of raising; `fux doctor` gains an `output.toml present`
+  warning row (`doctor._output_config_health`) naming
+  `fux output > .fux/output.toml` — ADR-DOTFUX decision 6's other sanctioned
+  remedy, modelled on `types list usable`.
+- **`ask` gained `sections`** ([ADR-OUTPUT](../docs/adr/0047_output-defaults.md)
+  decision 21): a `[cli.ask] sections` key plus a `--sections`/`--no-sections`
+  pair (a pair, not a `store_true`, because the `§` heading lines are ON by
+  default). `sections = false` drops the `§` lines in text **and** omits
+  `headings` from `--json` — the same *absent-means-not-asked-for* shape as
+  `confidence` under `--band`. `find` and `[mcp]` do not get the key.
+- **`tests/query/test_provenance.py::test_the_receipt_shape_does_not_vary_by_config`**
+  fixed — it had been silently not running (`ImportError` on `from
+  fux.output_config import SCHEMA`, broken since decision 19 split that dict).
+- ⚠ **Found on the device, not in the mirror: the working tree changed
+  `cli.py` (ADR-CLI-owned) and `query/__init__.py` (ADR-CONFIDENCE-owned) for
+  the `sections` pair without touching either owning record.**
+  `test_working_tree_is_not_mid_violation` catches exactly this, and a mirror
+  has no `HEAD` to diff against, so the mirror run could not have seen it.
+  Same failure class as Wave 6's below — the second occurrence, still not a
+  mechanical gate against the *content* of what's touched, only that it was
+  touched. Fixed by cross-reference notes: [ADR-CLI](../docs/adr/0002_cli-surface.md)
+  decision 11, [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) decision 14 —
+  neither is a new ruling, both point back at decision 21.
+
+**`.venv/bin/python -m pytest -q tests tests_e2e` — 2425 passed, 3 skipped, 0
+failed**, on the device, full tree including `work/`, `archive/`, `tools/`.
+Supersedes the mirror's 2201 passed / 21 failed, which was mirror gaps only
+(no `fux` console script on `PATH`, unstaged `work/`/`archive/`/`tools/`
+trees) and is no longer the operative number.
+
+Records: [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) decisions 20–21,
+[ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decision 6,
+[ADR-ASK](../docs/adr/0004_ask.md) decision 8,
+[ADR-CLI](../docs/adr/0002_cli-surface.md) decision 11,
+[ADR-CONFIDENCE](../docs/adr/0045_confidence.md) decision 14. WORKLOG has the
+full trail. Two questions from the same session are **not** closed by this —
+see OPEN-WORK's ADR-QUALITY section: zero abstentions out of 20 on blind
+unanswerable questions, and the 7 `partial` goldens — both need Arpit or a
+third blind reader, neither is this session's to close.
+
 ## W-93 — the version benchmark ran, and it found a saturated ruler (2026-08-28)
 
 **Asked by Arpit:** *"create a benchmark of the version one of Fux and the
@@ -1430,6 +1480,11 @@ it closed by ratification, not by landing; see the W-27 row above.
 | B6 | **PASS** (2026-08-28) — cold ingest median **25.68 → 26.78 s**, ratio **1.04 ×** against **2.0 ×**, tier 10 000. ⚠ Arm B's third repeat was a **38.8 s outlier** on a busy laptop; all three are filed and the median is what the ratio uses | [B6-INGEST-LATENCY](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B6.md) |
 | B7 | **INCONCLUSIVE** (2026-08-28) — **0 declines out of 20 in both arms**, at every tier, as predicted. ⚠ But a generated corpus can only test declining when **nothing matches**, never when something matches and does not support the claim. Arm B names the absent term (`missing`, `coverage 0.0009`) and answers anyway. **The null is not reassurance** | [B7-HONEST-DECLINE](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B7.md) |
 | B9 | **PASS** (2026-08-28) — the null control, **run first**, in two halves: arm A twice on one corpus gave **300/300 identical rows**; A vs A′ on a second seed gave **0 discordant of 240**, `p = 1.0`. No A-vs-B number existed when it was ruled | [B9-NULL-CONTROL](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B9.md) |
+| C1 | **INCONCLUSIVE** (2026-08-28) — proximity, arm A vs B-core, the primary endpoint. `0` discordant of `120`, `p = 1.0`, both arms **21.7 %** against a 25 % chance level — but unlike B1, this suite **asserts 94 of 120 queries of headroom**, power 0.99. The null is now about the engine, not a saturated corpus: `rerank_weight` ships at `0.0`, so B-core has no proximity signal to bring and ranks on bag-of-words evidence equal by construction | [C1](regression/2026-08-28-benchmark-contested/VERDICT.md) |
+| C2 | **PASS** (2026-08-28) — proximity, B-core vs **B-tuned** (`rerank_weight` `0.0 → 0.5`), an ablation within one engine. `b = 94, c = 0`, `p = 1.0e-28`, contests taken **22 % → 100 %**. 🔴 **Not an argument for the default** — hand-graded text puts the same reranker's value at `+4, 0 broken`, `informed` and below the resolution floor; this suite rewards exactly what the reranker does | [C2](regression/2026-08-28-benchmark-contested/VERDICT-C2.md) |
+| C3 | **PASS** (2026-08-28) — path, arm A vs B-core. `b = 60, c = 0`, `p = 1.7e-18`, **0 % → 100 %**. A capability delta, not a ranking win: B has a `path` tf field and A has none | [C3](regression/2026-08-28-benchmark-contested/VERDICT-C3.md) |
+| C4 | **INCONCLUSIVE** (2026-08-28) — heading, the pre-registered negative control. Returned its predicted null (`0` discordant of `40`) but **saturated at 100 % in both arms with zero headroom**, so it returned the right answer for the wrong reason and did not discharge its job. C1 and C3 rest on the generator's assertions rather than a live control until it is rebuilt | [C4](regression/2026-08-28-benchmark-contested/VERDICT-C4.md) |
+| C5 | **PASS** (2026-08-28) — the null control and halt gate, run first: arm A twice on one corpus, **380/380 substantive rows identical**. Everything else in the run depends on it | [C5](regression/2026-08-28-benchmark-contested/VERDICT-C5.md) |
 | P-SUPERSEDE | **FAIL** (2026-08-25) — `[ranking] superseded_weight` against a frozen **>= 1 fixed / 0 broken** bar. **The prior FIRED for the first time since it shipped** (it needs a frontmatter `supersedes:` key; the playground declared supersession in prose only, so the flag had never set). At `0.5`: **fixes `q015`** — the canonical failure — and breaks `q022`/`q033`. At `0.25`: four breaks. **The control is clean**: the frontmatter edit alone fixes 0, breaks 0. **Every broken query has the SUPERSEDED document as its correct answer**, so the diagnosis is one cause, not four: **supersession belongs to the QUERY'S INTENT, not the document**, and a per-document multiplier cannot express it. ⚠ `informed`; ±2 on 50 queries is below decision 14's floor — the **direction** carries, the magnitude does not | [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) |
 | DENSE-CHUNK | **FAIL** (2026-08-24) — the per-chunk dense lane against its own **>= 3-fixed / 0-broken** bar: measured **0 fixed, 2 broken**, at every setting that fires. **0 fixed is the number that matters**; the bar needs 3. The cause is structural rather than tuning: `embed/model.py` **mean-pools static token vectors** (no layers, no attention), so the lane is **as order-blind as BM25F** — and `always` mode breaks **`q015`**, the current-vs-superseded query a semantic lane was most expected to rescue. **Phase 7 was right that per-chunk beats per-document and wrong that the unit was the binding constraint** — the pooling is. `[dense] mode` stays `off`; the committed vectors stay, because they cost nothing at rest and a better pooling reuses them unchanged | [DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md) ⚠ **2026-08-25: the verdict STANDS and its subject is GONE.** The lane, the model, the committed `vectors` and `[dense]` were deleted on Arpit's instruction. The clause *"the committed vectors stay, because they cost nothing at rest"* was wrong on its own terms — they were **23.0 % of the committed index** ([measured](regression/2026-08-25-model-removal/report.md)) — and it is moot either way. **The verdict itself is frozen and unedited**; its frozen pre-registration is mirrored into the run, since the module carrying it was deleted (ADR-RS decision 16). |
 | W44-SIGNAL | **WARRANTED** (2026-08-22) — live-intent contamination@5 **32.00 pts** against a 25 pt bar; findability guard **93.33 %** against a 60 % floor. Discharged [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) decision 5's gate, which Arpit **also** lifted by instruction the same session — the pre-registration was frozen first, so the number is evidence rather than a formality. Licenses the marker and disclaimer only; the demotion default stays [W-52](../archive/open/W-52-df-over-the-union.md)'s | [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md) |

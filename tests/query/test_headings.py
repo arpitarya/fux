@@ -247,3 +247,61 @@ def test_headings_do_not_change_the_ranking(tmp_path, monkeypatch, capsys):
 
     strip = lambda rs: [{k: v for k, v in r.items() if k != "headings"} for r in rs]  # noqa: E731
     assert strip(with_headings) == strip(without)
+
+
+# -- the `sections` toggle (ADR-OUTPUT decision 21) ------------------------
+
+
+def test_sections_false_removes_the_marker_lines_from_text(tmp_path, monkeypatch, capsys):
+    """The whole point of the key: `ask` still answers, the citation line a
+    reader copies is byte-identical, and only the `§` lines are gone."""
+    monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
+    assert cmd_ask(_args(sections=True)) == 0
+    with_lines = capsys.readouterr().out.splitlines()
+
+    assert cmd_ask(_args(sections=False)) == 0
+    without = capsys.readouterr().out.splitlines()
+
+    assert "§" in "\n".join(with_lines)
+    assert "§" not in "\n".join(without), "--no-sections must remove every marker line"
+    assert without == [ln for ln in with_lines if "§" not in ln], (
+        "nothing but the § lines may differ — the citation line is what a reader copies"
+    )
+    assert without[0].endswith("(docs/mesh.md)")
+
+
+def test_sections_false_drops_the_json_headings_key_entirely(tmp_path, monkeypatch, capsys):
+    """Arpit ruled text AND json, 2026-08-28. Absent means NOT ASKED FOR —
+    `confidence`-under-`--band`'s shape, not W-48's trap, because `[]` still
+    means *nothing matched* and only the consumer can produce this state."""
+    monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
+    assert cmd_ask(_args(json=True, sections=False)) == 0
+    result = json_mod.loads(capsys.readouterr().out)["results"][0]
+    assert "headings" not in result
+    assert result["loc"] == "docs/mesh.md", "every other field is untouched"
+    assert result["id"] == DOC_ID
+
+
+def test_sections_defaults_to_on_when_the_attribute_is_absent(tmp_path, monkeypatch, capsys):
+    """`_as_dict` is shared with `find`, which declares no `sections` key, and
+    the MCP surface builds its args by hand. A missing attribute must read as
+    the built-in default rather than an AttributeError."""
+    monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
+    args = _args(json=True)
+    assert not hasattr(args, "sections")
+    assert cmd_ask(args) == 0
+    assert json_mod.loads(capsys.readouterr().out)["results"][0]["headings"]
+
+
+def test_find_is_not_reachable_by_the_sections_key(tmp_path, monkeypatch, capsys):
+    """`sections` is declared for `ask` only, so `[cli] sections = false` can
+    never reach `find` — the schema decides, not the table (ADR-OUTPUT)."""
+    from fux.output_config import CLI_VERBS
+
+    assert "sections" in CLI_VERBS["ask"]
+    assert "sections" not in CLI_VERBS["find"]
+
+    monkeypatch.setattr("fux.query.find_root", lambda: _corpus(tmp_path))
+    assert cmd_find(_args(json=True, sections=False)) == 0
+    payload = json_mod.loads(capsys.readouterr().out)
+    assert payload["results"][0]["headings"], "find's payload is unchanged"

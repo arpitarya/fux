@@ -10,6 +10,35 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`fux ask` gained `--sections` / `--no-sections`, and a `[cli.ask]
+  sections` key** (ADR-OUTPUT decision 21, ADR-ASK decision 8 reopened).
+  W-84's matched `§ heading` lines were the one part of `ask`'s output nothing
+  could turn off.
+
+  ```toml
+  [cli.ask]
+  sections = false     # hide the § lines AND the --json `headings` field
+  ```
+
+  **One key, both renderings.** `sections = false` removes the `§` lines from
+  stdout *and* omits `headings` from the `--json` payload — a machine reader
+  who does not want them is asking the same question a human is.
+
+  ⚠ **An absent `headings` key is not the W-48 trap.** `[]` still means
+  *nothing matched*. Absent means **not asked for** — `confidence`-under-
+  `--band`'s shape, and `output.schema.json` marks it
+  `required: "sections_requested"` rather than saying so in prose.
+
+  **The default did not move** (`sections = true`), so a repo that says
+  nothing gets exactly what W-84 shipped. `find` and `[mcp]` deliberately do
+  not get the key — `find`'s `§`-free stdout is a design decision, and MCP has
+  no text rendering.
+
+- **`fux doctor` gained an `output.toml present` row.** A **warning**, naming
+  `fux output > .fux/output.toml`, for a repo that predates the file. This is
+  ADR-DOTFUX decision 6's sanctioned mechanism for reaching existing repos,
+  modelled on `types list usable`.
+
 - **The two confidence band floors are `.fux/tune.toml` keys**
   (ADR-CONFIDENCE decision 13, ADR-TUNE decision 5d). A sixth table:
 
@@ -44,6 +73,35 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `separation`) and *Tuning the floors* (`#s-conf-tune`).
 
 ### Fixed
+
+- 🔴 **`fux ask`, `fux find` and `fux doctor` hard-failed in every repo without
+  `.fux/output.toml`** (ADR-OUTPUT decision 20 rules the fork decision 19
+  opened). Decision 19 made a *missing* file a hard `FuxError` at load time.
+  The file is **write-if-missing** (ADR-DOTFUX decision 6), so it reaches new
+  repos only — which made every pre-existing repo exit 1 on every query after
+  upgrading, **`doctor` included**, the verb you would run to find out why.
+
+  ```console
+  $ fux find "oncall rota"
+  error: .fux/output.toml is missing — run `fux setup` to create it
+  exit=1
+  ```
+
+  **A missing file now resolves to the engine defaults.** Decision 19 is
+  otherwise untouched: a file that **exists** and omits a key a verb resolves
+  is still a hard error, which is the case it was written about. Decision 19's
+  own wording — *"once it is in effect"* — is what survives; a file that does
+  not exist is not in effect.
+
+  ⚠ **If you rely on `fux ask` refusing to run when the file is absent, it no
+  longer does.** Run `fux doctor` — the new `output.toml present` row is where
+  that now shows up.
+
+- **`test_the_receipt_shape_does_not_vary_by_config` had not run since
+  ADR-OUTPUT decision 19.** It imported `SCHEMA` from `output_config`, which
+  decision 19 split into `CLI_VERBS` and `MCP_KEYS` — so the assertion was an
+  `ImportError`, not a check. It now walks **both** key sets, including
+  `[mcp]`, which is the surface ADR-PROVENANCE decision 15 was written about.
 
 - **ADR-TUNE decision 4 described behaviour the code had not had since
   2026-08-27** — it said tune keys ship *commented* and carried a commented
@@ -153,18 +211,30 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **`!` lines in `.fux/sources/dirs` and `.fux/sources/types` are the
   deprecated spelling for an exclusion.** They still parse and still work —
   `fux remove` still writes one — and `.fuxignore` is the home.
-- **`.fux/output.toml` is now, in effect, the sole source of every output
+- **A `.fux/output.toml` that EXISTS is now the sole source of every output
   default it is asked for** (ADR-OUTPUT decision 19). Earlier, a key the file
   did not set fell through silently to the engine's built-in value; now
-  resolving an unset key is a `FuxError` naming the key and where to add it.
-  `fux setup` / `fux output` already write every key **live**, so a repo that
-  has run either never sees this — it reaches only a `.fux/output.toml` that
-  predates a key this version added, or one edited by hand with a line
-  deleted. `--no-output-config` (or running outside a fux repo) still bypasses
-  the file entirely and resolves the engine defaults, and now reaches `doctor`,
-  `hooks`, `daemon`, `explain`, `graph` and `path` as well — it was previously
-  wired only to `ask`/`find`/`answer`/`mcp`, which left `doctor` unable to be
-  bisected from the very file it might exist to diagnose.
+  resolving an unset key on a present file is a `FuxError` naming the key and
+  where to add it. `fux setup` / `fux output` already write every key
+  **live**, so a repo that has run either never sees this — it reaches only a
+  `.fux/output.toml` that predates a key this version added, or one edited by
+  hand with a line deleted. `--no-output-config` (or running outside a fux
+  repo) still bypasses the file entirely and resolves the engine defaults, and
+  now reaches `doctor`, `hooks`, `daemon`, `explain`, `graph` and `path` as
+  well — it was previously wired only to `ask`/`find`/`answer`/`mcp`, which
+  left `doctor` unable to be bisected from the very file it might exist to
+  diagnose.
+- 🔴 **Fixed same-day: a MISSING `.fux/output.toml` no longer hard-errors**
+  (ADR-OUTPUT decision 20). Decision 19, above, briefly made a missing file
+  raise too — and since the file is write-if-missing (ADR-DOTFUX decision 6,
+  reaching new repos only), that meant `fux ask` / `fux find` / `fux doctor`
+  all exited 1, after upgrading, in every repo that predates this release.
+  **Fixed before it reached anyone**: a missing file now resolves to the same
+  engine defaults as `--no-output-config`; a file that *exists* and omits a
+  key is unchanged and still a hard error. `fux doctor` gains an
+  `output.toml present` row — a warning naming `fux output > .fux/output.toml`
+  — since a loader refusal was already ruled out as the fix for a missing
+  file (ADR-DOTFUX decision 6 forbids reaching an existing repo by rewrite).
 - **`.fux/output.toml`'s three roots (`[cli]`/`[cli.json]`/`[mcp]`) are now
   fully built**, closing a one-day gap where ADR-OUTPUT's record described
   them and the code still ran the original one-root layout. `[mcp] top`
@@ -173,6 +243,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   `top`, not a hardcoded literal — a repo-configured `[mcp] top` used to
   change the server's behaviour while `tools/list` kept announcing the
   built-in number.
+- **`ask` gains `sections` / `--no-sections`** (ADR-OUTPUT decision 21). The
+  matched-heading `§` lines W-84 added under each `ask` hit shipped
+  unconditional, with no way to turn them off; `sections = false` in
+  `[cli.ask]` (or the flag) removes them from stdout **and** omits `headings`
+  from the `--json` payload — one key answers the question for both
+  renderings. The omitted key means *"not asked for"*, same shape as
+  `confidence` under `--band`; `[]` still means *nothing matched*, unchanged.
 
 ## [2.0.0-alpha.2] - 2026-08-26
 

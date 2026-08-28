@@ -24,6 +24,200 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-29 — OPEN-WORK regrouped: by record → by what closing it takes  ·  Claude Code
+
+- **Asked:** *"rather than having 'Open items, by record' have them in these
+  categories: fux build, testing, adr update."*
+
+- **Flagged, then proceeded.** CLAUDE.md rule 8 ties record-grouping to Law
+  zero (*"if you cannot name the record, say no ADR affected out loud"*).
+  Said so in one line, then implemented the request while keeping every
+  item's owning record cited inline — the sort key changed, the traceability
+  didn't.
+
+- **Did:** re-read `OPEN-WORK.md` fresh first — a concurrent session had
+  landed new content since this session's own last edit (W-95 built/run/
+  filed, a `rerank_weight` finding, the C2/C4/C5 verdicts) — then sorted the
+  13 open items into three new `###` sections: **fux build** (1: W-94's
+  doctor-disclosure candidate), **testing** (9: R10, the clean-corpus recall
+  run, the 7 partial goldens, the two saturated/misread controls, W-96, W-87,
+  the Windows gap, the `validate()` gap), **adr update** (3: the
+  `rerank_weight` no-op pattern, the 0/20-abstentions call, ratifying the
+  headroom obligation). Updated rule 8 and CLAUDE.md's matching passage to
+  record the change and why it doesn't weaken Law zero.
+
+- **Decided / open:** categorization is a judgment call on 2–3 borderline
+  items (`rerank_weight`, W-96) — reasonable, not the only valid sort; open
+  to correction if a category reads wrong once more items land in it.
+
+- **Next:** none of the underlying items moved — same `agent`/`arpit` queue,
+  same open questions, just resorted.
+
+## 2026-08-28 — W-95: a suite that CAN detect a ranking change, built, frozen and read  ·  Cowork
+
+- **Asked:** *"explain me the benchmark html report like eli5"*, then — on the
+  finding that the marker suite was saturated — *"update the benchmark test to
+  ask those questions."* Scope confirmed with Arpit as **build, freeze, run and
+  file**.
+- **Did:** Extended `fux-lab/shared/generate/make_corpus.py` with a
+  **contested-answer suite** — 4 candidates sharing the query's terms at
+  **equal tf, equal field and equal length**, exactly one target, in three
+  kinds: `proximity` (target has both markers in one sentence), `path` (target
+  carries it in its filename only) and `heading` (intended as a negative
+  control). `--selftest` now **asserts the headroom** — equal tf per candidate,
+  exactly one candidate with the distinguishing property, and target-vs-path
+  order uncorrelated — and **halts** rather than reporting a number. Verified
+  the extension is **strictly additive**: every pre-W-95 corpus regenerates
+  **byte-identical** on both the plain and bench paths. `fux-benchmark/bin/bench.py`
+  gained contested scoring (`target_first`, scored *within* the cluster) and
+  `--kind` on `mcnemar`. Wrote and froze
+  `work/benchmark/PRE-REGISTRATION-CONTESTED.md` (`sha256 e8417b33…`, ids
+  **C1–C6**, a new id space) **and delivered it to disk before the first corpus
+  byte existed**. Ran it: arms held **byte-identical to the v1-vs-HEAD run**
+  (`1.0.0` vs `HEAD @ 75ade57`), tiers 1 200 and 10 000, **2 660 per-query
+  rows**, filed as `work/regression/2026-08-28-benchmark-contested/` with six
+  VERDICT files.
+- **Decided / open:** 🔴 **C1 (primary): 0 discordant of 120, `p = 1.0` — with
+  94 queries of headroom.** Both arms **21.7 %** against a 25 % chance level,
+  all four candidates visible in 120/120 clusters. **The previous run's null
+  could not be told from a broken instrument; this one can**, so it is a
+  statement about the engines. **C3 (path): 0 % → 100 %, `p = 1.7e-18`** — the
+  first version delta this project has shown, and ⚠ **a capability
+  demonstration, not a ranking win** (arm A has no `path` field; near
+  tautological). **C2 (ablation): `rerank_weight` 0.0 → 0.5 takes proximity
+  22 % → 100 %, 94 fixed / 0 broken** — 🔴 **NOT an argument for the default**;
+  the suite rewards exactly what the reranker does, `c = 0` is a property of the
+  generator, and hand-graded the reranker is worth `28 → 32`. 🔴 **C4, the
+  negative control, SATURATED at 100 % in both arms with zero headroom — it
+  returned the right answer for the wrong reason, so it is Inconclusive, not
+  Pass.** The run's own headroom column caught it. Everything reproduces
+  unmoved at 10 000 docs. **W-95's row DELETED**; four items filed in its place,
+  including **ratifying the headroom obligation into ADR-RS** (`arpit` — it is a
+  decision, not a filing). ⚠ **Two defects recorded**: a cross-seed pairing is a
+  **rate check, not a determinism check**, and the v1-vs-HEAD **B9 carries the
+  same weakness**; and `OPEN-WORK.md` + the v1-vs-HEAD presentation both quote
+  P-SUPERSEDE as *"fixed one query"* where its **VERDICT says two** (`q015`,
+  `q049`) — fixed in OPEN-WORK, **still wrong in the HTML**. ⚠ Run is
+  `informed`, so **no delta is stated**; W-96 unchanged.
+- **Next:** Arpit's call on ratifying the headroom obligation into ADR-RS.
+  Unblocked agent work: rebuild the `heading` control so it has headroom.
+- **Housekeeping:** `device_bash` was **wedged for this entire session** (five
+  identical failures), so every file moved via stage/commit; nothing was
+  committed to git. **A concurrent Claude Code session was editing `work/` at
+  the same time** — the `OPEN-WORK.md` write was rejected by the mtime guard and
+  **rebased onto its edit rather than forced**. ⚠ **Nothing here is committed to
+  git yet**, and `PRE-REGISTRATION-CONTESTED.md` therefore satisfies
+  *"frozen before the numbers"* by **delivery + recorded hash**, not by a commit.
+
+## 2026-08-29 — OPEN-WORK cleanup; the mirror's premise didn't survive contact with the device  ·  Claude Code
+
+- **Asked:** *"cleanup for open work doc."* The prompt's own UserPromptSubmit
+  blocker carried the prior session's state: output.toml fork + `sections`
+  ruled and fixed, but only verified in a cloud mirror — `device_bash` had
+  been wedged all that session, so `pytest -q tests tests_e2e` was still owed
+  on the real tree.
+
+- **Re-derived first, per rule 4.** Ran the suite on this actual device:
+  **2424 passed, 3 skipped, 1 failed** — not the mirror's 2201/21, and not
+  clean either. The one failure was real, not a mirror gap:
+  `test_working_tree_is_not_mid_violation` — the working tree's `sections`
+  pair had changed `cli.py` (ADR-CLI-owned) and `query/__init__.py`
+  (ADR-CONFIDENCE-owned) without touching either owning record. A mirror
+  can't catch this class: the gate diffs the working tree against `HEAD`, and
+  a staged mirror copy has no `HEAD` of its own to diff against.
+
+- **Did:**
+  - Fixed the gap with cross-reference notes, not new rulings — both cite
+    back to the already-ratified [ADR-OUTPUT](../docs/adr/0047_output-defaults.md)
+    decision 21: [ADR-CLI](../docs/adr/0002_cli-surface.md) decision 11,
+    [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) decision 14.
+  - Re-ran: **2425 passed, 3 skipped, 0 failed.** Clean on the device.
+  - Recorded the whole landing (fork + sections + the freshness fix) in
+    `IMPLEMENTATION.md`, since nothing had captured it there yet — rule 3
+    requires that before a row may leave OPEN-WORK.
+  - **Deleted OPEN-WORK's `✅ CLOSED` block** (94 lines) — its own rule 2
+    forbids exactly that shape (*"no ✅ notes... completed items are removed,
+    never ticked"*), and the outcome now lives in IMPLEMENTATION.md instead.
+    Also removed a redundant duplicate of the two still-open `arpit` items
+    (0/20 abstentions on blind-unanswerable questions; the 7 `partial`
+    goldens) that had been repeated verbatim right under the tombstone — they
+    stay, once, under the ADR-QUALITY section where they already lived.
+    `work/OPEN-WORK.md`: 299 → 205 lines.
+  - Bumped `work/DOC-REGISTRY.md`'s `../docs/adr/` row, flipped
+    `work/BLOCKED.json` to `PROCEED` (the fix is now device-verified; the two
+    quality questions are ordinary `arpit`-lane OPEN-WORK rows, not a session
+    blocker), and `work/NOW.md`.
+
+- **Decided / open:** nothing new opened. The two `arpit`-only quality
+  questions are unchanged and still Arpit's: whether 0/20 abstentions gates
+  anything, and who re-reads the 7 `partial` goldens (not a session that has
+  seen the scores).
+
+- **Next:** OPEN-WORK's `agent`-lane items (a clean-corpus `recall@k` run,
+  W-95's contested-answer suite, W-96's two-session blind protocol) are the
+  agent-closable work; nothing here is committed, so `git status` still shows
+  the same working tree it did at session start, now with the freshness gate
+  fixed on top of it.
+
+## 2026-08-28 — Reconciled with the concurrent decision-20/21 fix; CHANGELOG caught up  ·  Cowork
+
+- **Asked:** *"continue"*, twice, after the previous entry's session ended.
+  Picked up exactly where that entry left off: the output.toml fork was still
+  open in this session's own view.
+
+- **Found the actual state had moved.** A parallel Cowork session had already
+  ruled the fork (decision 20: a missing file falls back to `BUILT_IN`, same
+  as `--no-output-config`; a present-but-incomplete file still hard-errors;
+  `fux doctor` gains an `output.toml present` warning row) and shipped it —
+  **while THIS session was asking Arpit the same question and getting the
+  opposite answer** ("keep decision 19, migration only, no code change"). Two
+  Cowork chats, two rulings. Surfaced this to Arpit directly rather than
+  picking a side unilaterally.
+
+- **Did, after confirming decision 20 was the one already live:**
+  - Verified compatibility: `output_config.py`/`cli.py`/`doctor.py` (theirs,
+    decision 20/21) plus `mcp.py`/`test_mcp.py` (this session's, unchanged) —
+    178 passed on the four core test files, 73 passed / 1 skipped on the full
+    `tests_e2e/` suite, 673 passed / 3 skipped / 5 known-mirror-only-failed on
+    the wider governance subset. All against the **local cloud mirror**,
+    `device_bash` still wedged all session — not the device's own run.
+  - **Discarded an in-progress patch rather than ship it.** Had started
+    editing 5 `tests_e2e/` fixtures to hand-write `.fux/output.toml` (fixing
+    the 49-test regression under decision-19-only semantics, which is what
+    Arpit had told THIS session to implement). Once decision 20 landed, that
+    patch became unnecessary — the original, unmodified fixtures pass clean
+    against decision 20 with zero changes. Verified this before pushing
+    anything, so nothing redundant landed on top of the already-correct fix.
+  - **`CHANGELOG.md`'s `[Unreleased]` entry was still decision-19-only** — the
+    other session shipped decision 20/21 in code and in the ADR but never
+    updated `CHANGELOG.md` to match, so it read as if the regression it fixed
+    was still live. Corrected: the sole-source-of-truth bullet now says
+    "a file that EXISTS", a new 🔴 bullet documents decision 20's same-day
+    fix, and a new bullet documents decision 21 (`ask --sections`).
+  - Left `work/OPEN-WORK.md`, `work/BLOCKED.json` and `work/NOW.md` alone —
+    they were mid-flight under the other session at every check and already
+    current; touching them risked exactly the collision this note is about.
+
+- **Decided / open:**
+  - **Decision 20 stands.** It is strictly better than the ruling this
+    session was given (also fixes the `doctor`-can't-bootstrap gap this
+    session had separately flagged and been told to leave failing), it was
+    already shipped and independently verified, and reverting shipped, working
+    code on the strength of a stale answer would have been the actual mistake.
+  - `tests/test_doctor.py` has **no test yet** for the new
+    `_output_config_health` check (`doctor.py` line ~220) — not added by
+    either session. Noted, not fixed; not this session's decision to land
+    untested coverage for someone else's function.
+  - The two quality-contract questions in `BLOCKED.json` (0-of-20 abstention,
+    the 7 `partial` goldens) are untouched, as before — unrelated to this
+    thread and explicitly need a human.
+
+- **Next:** confirm with Arpit that decision 20 is the intended final ruling
+  (message sent); once confirmed, no further action needed on this thread —
+  it is a documentation catch-up, not a code change. `pytest -q tests
+  tests_e2e` on the real device is still the one verification this session
+  could not perform directly.
+
 ## 2026-08-28 — Merged to main RED, on instruction, with the regression named  ·  Claude Code
 
 - **Asked:** *"commit everything and merge everything to main"*, repeated after

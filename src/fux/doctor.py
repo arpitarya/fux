@@ -20,6 +20,7 @@ from pathlib import Path
 from . import __version__
 from .config import DEFAULT_DIRS_FILE, DEFAULT_TYPES_FILE, find_root
 from .errors import FuxError
+from . import output_config
 from .store import fuxdir
 
 PY_MIN = (3, 11)
@@ -203,6 +204,7 @@ def _layout(root: Path) -> list[Check]:
             level="warn",
         )
     )
+    checks.append(_output_config_health(root))
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
     checks.append(_fetcher_capabilities(root))
@@ -213,6 +215,40 @@ def _layout(root: Path) -> list[Check]:
         checks.append(daemon_check)
     checks.append(_url_health(root))
     return checks
+
+
+def _output_config_health(root: Path) -> Check:
+    """`.fux/output.toml` absent — the repo that predates the file.
+
+    ADR-OUTPUT decision 19 made a missing file a hard `FuxError` at load time.
+    The file is write-if-missing (ADR-DOTFUX decision 6), so it reaches **new
+    repos only** — which made `ask`, `find` and `doctor` exit 1 in every repo
+    that predates it, `doctor` included, the verb you would run to find out
+    why. Decision 20 ruled the fork: a missing file resolves to the engine
+    defaults, and the repo is reached HERE instead.
+
+    ⚠ **This is decision 6's own prescribed mechanism**, the same one
+    `_types_health` implements for `sources/types`: *"if a change must reach
+    existing repos, the mechanism is a loader refusal or a `doctor` check —
+    never a rewrite"*. The refusal is what broke them, so this is the check.
+
+    A **warning**, never an error. Nothing is wrong with a repo that has no
+    `.fux/output.toml`: every verb runs, and every default is the engine's
+    own. What the consumer loses is the ability to CHANGE one — and the MCP
+    surface, which has no flags, cannot be configured at all without it. That
+    is worth a line; it is not a broken repo.
+    """
+    path = root / output_config.OUTPUT_NAME
+    if path.is_file():
+        return Check("output.toml present", True, f"{output_config.OUTPUT_NAME}: output defaults are configurable")
+    return Check(
+        "output.toml present",
+        False,
+        f"{output_config.OUTPUT_NAME} is absent, so every output default is the engine's own "
+        f"and none can be changed - run `fux output > {output_config.OUTPUT_NAME}` to write "
+        "the current defaults out (this is the only way to configure `fux mcp`, which has no flags)",
+        level="warn",
+    )
 
 
 def _types_health(root: Path) -> Check:

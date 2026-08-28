@@ -23,9 +23,10 @@
 # "is it me or the config?" switch.
 
 # `band` and `top` are shared by more than one verb, so they live here.
-# A key only one verb has (`explain`, `hops`, `no_refer`, `journal`) is
-# refused at this level BY NAME — it lives under that verb's own table,
-# below — setting it here would read as global, and it is not.
+# A key only one verb has (`explain`, `sections`, `hops`, `no_refer`,
+# `journal`) is refused at this level BY NAME — it lives under that
+# verb's own table, below — setting it here would read as global, and
+# it is not.
 [cli]
 band = false       # the confidence block — ADR-CONFIDENCE decision 11
 top = 5            # ask/find. ⚠ also bounds `confidence.support`,
@@ -34,6 +35,9 @@ top = 5            # ask/find. ⚠ also bounds `confidence.support`,
 
 [cli.ask]
 explain = false    # report which path answered
+sections = true    # the matched `§ heading` lines under each hit.
+               #   Text mode AND the --json `headings` field, together:
+               #   one key, one question, both renderings (decision 21).
 
 [cli.path]
 hops = 2          # max edges in a route

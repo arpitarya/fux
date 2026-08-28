@@ -21,7 +21,9 @@ rather than being buried in one run's `evidence/`.
 | document | what it is |
 |---|---|
 | [`PRE-REGISTRATION-V1-VS-HEAD.md`](PRE-REGISTRATION-V1-VS-HEAD.md) | the frozen thresholds for `1.0.0` vs working-tree `HEAD`. ⚠ **It defines B1, B2, B3, B5, B6, B7 and B9** — *"B1–B9"* is prose, and **B4 and B8 were never written** |
+| [`PRE-REGISTRATION-CONTESTED.md`](PRE-REGISTRATION-CONTESTED.md) | the frozen thresholds for the **contested-answer suite** (W-95), `sha256 e8417b33…`. ⚠ It defines **`C1`–`C6`** — a **new id space**, because the `B` ids belong to the frozen v1-vs-HEAD document and may never be reused or renumbered. Its arms are **deliberately identical** to that run's, so only the instrument differs. Executed as [`../regression/2026-08-28-benchmark-contested/`](../regression/2026-08-28-benchmark-contested/report.md) |
 | [`benchmark-v1-vs-head.html`](benchmark-v1-vs-head.html) | the **presentation** of the 2026-08-28 run — 18 slides, self-contained, no network. Open it in a browser; `←` `→` to move. The run itself is [`../regression/2026-08-28-benchmark-v1-vs-head/`](../regression/2026-08-28-benchmark-v1-vs-head/report.md) |
+| [`benchmark-contested.html`](benchmark-contested.html) | the **presentation** of the 2026-08-28 contested-answer run — 12 slides, self-contained, theme-aware. Open it in a browser; `←` `→` to move. The run itself is [`../regression/2026-08-28-benchmark-contested/`](../regression/2026-08-28-benchmark-contested/report.md) |
 
 ## Why this is not `work/regression/`
 
@@ -58,3 +60,14 @@ generated, the lab is canonical.
 3. **A delta below the set's resolution is `no detected change`.** The
    resolution is the **discordant count**, never the set size — see
    [`../regression/2026-08-28-resolution-floor/`](../regression/2026-08-28-resolution-floor/report.md).
+4. **Every benchmark run ships a presentation** (Arpit, 2026-08-28). One
+   self-contained, theme-aware HTML deck per executed run, filed **beside the
+   plan** under the named exception above and linked from the table. **Precise
+   and to the point** — and **a diagram, chart or worked example wherever the
+   content has a shape**: a cluster's anatomy, the pipeline's gates, headroom by
+   suite, an arm-vs-arm bar. ⚠ **The deck carries no number the filed run does
+   not**, and anything that disagrees with `../regression/` is the deck being
+   wrong. It is a presentation of evidence, never a second source of it.
+   Charts follow the house tokens; **arm A is the neutral baseline and arm B the
+   accent**, with a legend and a direct value label on every mark so identity is
+   never colour-alone.

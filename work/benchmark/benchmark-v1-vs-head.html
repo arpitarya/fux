@@ -687,7 +687,7 @@ svg{max-width:100%;height:auto;display:block}
         <p>The queue item predicted that a B2 failure would mean <em>&ldquo;the priors shipped and do not do the job they were built for.&rdquo;</em> They do the job. Nobody turned them on.</p>
         <div class="callout warn" style="margin-top:16px">
           <p><strong>This is not an argument for changing the default, and reading it that way would be a real error.</strong></p>
-          <p style="margin-top:8px">A previous verdict &mdash; <span class="mono">P&#8209;SUPERSEDE</span>, 2026&#8209;08&#8209;25 &mdash; already ruled exactly that change <strong>FAIL</strong> on the hand&#8209;graded playground: at <span class="mono">0.5</span> it fixed one query and <strong>broke two</strong>, and <em>every broken query had the superseded document as its correct answer</em>.</p>
+          <p style="margin-top:8px">A previous verdict &mdash; <span class="mono">P&#8209;SUPERSEDE</span>, 2026&#8209;08&#8209;25 &mdash; already ruled exactly that change <strong>FAIL</strong> on the hand&#8209;graded playground: at <span class="mono">0.5</span> it fixed <strong>two</strong> (<code>q015</code>, <code>q049</code>) and <strong>broke two</strong> (<code>q022</code>, <code>q033</code>), and <em>every broken query had the superseded document as its correct answer</em>.</p>
           <p style="margin-top:8px"><strong>This corpus cannot see that failure mode by construction</strong> &mdash; every planted chain query's right answer is the successor. So <span class="mono">0 broken</span> here is a property of the generator. The two results are consistent, and the <em>older</em> one is more informative because its corpus contains the case that breaks.</p>
         </div>
       </div>

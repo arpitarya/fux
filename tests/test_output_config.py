@@ -37,9 +37,39 @@ def write(root, body: str):
 # --------------------------------------------------------------------------
 
 
-def test_absent_file_raises_and_names_the_fix(tmp_path):
-    with pytest.raises(FuxError, match="fux setup"):
-        load(tmp_path)
+def test_absent_file_falls_back_to_the_engine_defaults(tmp_path):
+    """ADR-OUTPUT decision 20 — the fork decision 19 opened, ruled.
+
+    The file is write-if-missing (ADR-DOTFUX decision 6), so it reaches NEW
+    repos only. Raising here made every PRE-EXISTING repo exit 1 on `ask`,
+    `find` and `doctor` after an upgrade. A file that does not exist is not
+    "in effect", so it is not the sole source of anything.
+    """
+    cfg = load(tmp_path)
+    assert cfg.bypass, "a missing file must resolve, not raise"
+    assert cfg.absent, "and must be distinguishable from --no-output-config"
+    assert cfg.resolve("ask", "top", as_json=False) == BUILT_IN["top"]
+    assert cfg.resolve_json("ask") is BUILT_IN["json"]
+    assert cfg.resolve_mcp("top") == BUILT_IN["top"]
+
+
+def test_a_present_but_incomplete_file_still_raises(tmp_path):
+    """Decision 20 narrows decision 19; it does not repeal it. The hard error
+    survives for the case decision 19 was actually written about — a file
+    that IS in effect and does not set a key the verb resolves."""
+    write(tmp_path, "[cli]\nband = true\n")
+    cfg = load(tmp_path)
+    assert not cfg.bypass and not cfg.absent
+    with pytest.raises(FuxError, match="does not set `top`"):
+        cfg.resolve("ask", "top", as_json=False)
+
+
+def test_absent_and_bypassed_are_distinguishable(tmp_path):
+    """`--no-output-config` is a consumer's request; an absent file is a fact
+    about the repo. Both resolve to `BUILT_IN`; only the second is something
+    `fux doctor` should mention."""
+    assert load(tmp_path, enabled=False).absent is False
+    assert load(tmp_path).absent is True
 
 
 def test_empty_file_loads_but_every_key_still_errors(tmp_path):
@@ -505,7 +535,8 @@ def test_apply_output_defaults_resolves_against_a_real_repo(tmp_path, monkeypatc
     (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
     write(
         tmp_path,
-        "[cli]\nband = true\ntop = 3\n\n[cli.ask]\nexplain = false\n\n[cli.json]\nenabled = false\n",
+        "[cli]\nband = true\ntop = 3\n\n[cli.ask]\nexplain = false\nsections = true\n"
+        "\n[cli.json]\nenabled = false\n",
     )
     monkeypatch.chdir(tmp_path)
 
@@ -556,15 +587,17 @@ def test_apply_output_defaults_raises_when_the_file_is_incomplete(tmp_path, monk
         _apply_output_defaults(args)
 
 
-def test_apply_output_defaults_raises_when_the_file_is_missing_entirely(tmp_path, monkeypatch):
+def test_apply_output_defaults_falls_back_when_the_file_is_missing_entirely(tmp_path, monkeypatch):
     from fux.cli import _apply_output_defaults, build_parser
 
     (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
     monkeypatch.chdir(tmp_path)
 
     args = build_parser().parse_args(["doctor"])
-    with pytest.raises(FuxError, match="fux setup"):
-        _apply_output_defaults(args)
+    # Decision 20: `doctor` is the verb you run to diagnose a broken repo, so
+    # it is the last verb that may refuse to start because a file is missing.
+    _apply_output_defaults(args)
+    assert args.json is BUILT_IN["json"]
 
 
 def test_no_output_config_bypasses_an_incomplete_file(tmp_path, monkeypatch):
@@ -640,3 +673,83 @@ def test_every_verb_that_reads_the_file_can_bisect_it():
             f"`fux {verb}` reads {OUTPUT_NAME} but has no `--no-output-config` "
             "escape hatch — ADR-OUTPUT decision 15"
         )
+
+
+# -- `sections` on `ask` (ADR-OUTPUT decision 21) --------------------------
+
+
+def test_sections_is_declared_for_ask_only():
+    assert "sections" in CLI_VERBS["ask"]
+    assert all("sections" not in keys for verb, keys in CLI_VERBS.items() if verb != "ask")
+    assert "sections" not in MCP_KEYS, (
+        "MCP returns structured results; `§` lines are a text rendering and the "
+        "`headings` field is what an agent reads"
+    )
+
+
+def test_sections_defaults_to_on():
+    """W-84 shipped these lines unconditionally, so the built-in has to keep
+    them — this key adds the ability to turn them OFF, it does not change what
+    a repo that says nothing gets."""
+    assert BUILT_IN["sections"] is True
+
+
+def test_the_specimen_sets_sections_live(tmp_path):
+    """Decision 14: every key `fux setup` writes must be LIVE, or the very
+    first `fux ask` after setup hits decision 19's hard error."""
+    import tomllib
+
+    data = tomllib.loads(specimen())
+    assert data["cli"]["ask"]["sections"] is BUILT_IN["sections"]
+
+    write(tmp_path, specimen())
+    cfg = load(tmp_path)
+    assert cfg.resolve("ask", "sections", None, as_json=False) is BUILT_IN["sections"]
+
+
+def test_sections_is_type_checked_like_every_other_bool(tmp_path):
+    write(tmp_path, "[cli.ask]\nsections = 1\n")
+    with pytest.raises(FuxError, match="sections"):
+        load(tmp_path)
+
+
+def test_the_file_can_turn_sections_off(tmp_path, monkeypatch):
+    """The end-to-end seam: a repo's committed file, with no flag typed."""
+    from fux.cli import _apply_output_defaults, build_parser
+
+    (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
+    write(tmp_path, specimen().replace("sections = true", "sections = false"))
+    monkeypatch.chdir(tmp_path)
+
+    args = build_parser().parse_args(["ask", "rollback"])
+    assert args.sections is None, "an untyped flag must stay None (decision 10)"
+    _apply_output_defaults(args)
+    assert args.sections is False
+
+
+def test_an_explicit_flag_beats_the_file_in_both_directions(tmp_path, monkeypatch):
+    """⚠ The reason `--sections`/`--no-sections` is a PAIR. The lines are on by
+    default, so a lone `--sections` store_true could only ever re-assert the
+    default and the file's `false` would be unoverridable from the command
+    line."""
+    from fux.cli import _apply_output_defaults, build_parser
+
+    (tmp_path / "fux.toml").write_text("[fux]\nversion = 1\n", encoding="utf-8")
+    write(tmp_path, specimen().replace("sections = true", "sections = false"))
+    monkeypatch.chdir(tmp_path)
+
+    on = build_parser().parse_args(["ask", "rollback", "--sections"])
+    _apply_output_defaults(on)
+    assert on.sections is True, "an explicit --sections must beat `sections = false`"
+
+    write(tmp_path, specimen())
+    off = build_parser().parse_args(["ask", "rollback", "--no-sections"])
+    _apply_output_defaults(off)
+    assert off.sections is False, "and --no-sections must beat `sections = true`"
+
+
+def test_the_two_halves_of_the_flag_are_mutually_exclusive():
+    from fux.cli import build_parser
+
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(["ask", "q", "--sections", "--no-sections"])
