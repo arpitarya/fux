@@ -153,6 +153,26 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 - **`!` lines in `.fux/sources/dirs` and `.fux/sources/types` are the
   deprecated spelling for an exclusion.** They still parse and still work —
   `fux remove` still writes one — and `.fuxignore` is the home.
+- **`.fux/output.toml` is now, in effect, the sole source of every output
+  default it is asked for** (ADR-OUTPUT decision 19). Earlier, a key the file
+  did not set fell through silently to the engine's built-in value; now
+  resolving an unset key is a `FuxError` naming the key and where to add it.
+  `fux setup` / `fux output` already write every key **live**, so a repo that
+  has run either never sees this — it reaches only a `.fux/output.toml` that
+  predates a key this version added, or one edited by hand with a line
+  deleted. `--no-output-config` (or running outside a fux repo) still bypasses
+  the file entirely and resolves the engine defaults, and now reaches `doctor`,
+  `hooks`, `daemon`, `explain`, `graph` and `path` as well — it was previously
+  wired only to `ask`/`find`/`answer`/`mcp`, which left `doctor` unable to be
+  bisected from the very file it might exist to diagnose.
+- **`.fux/output.toml`'s three roots (`[cli]`/`[cli.json]`/`[mcp]`) are now
+  fully built**, closing a one-day gap where ADR-OUTPUT's record described
+  them and the code still ran the original one-root layout. `[mcp] top`
+  (`fux mcp`'s only knob) is loaded once at server start-up instead of once
+  per search, and the `fux_search` tool schema now advertises the *resolved*
+  `top`, not a hardcoded literal — a repo-configured `[mcp] top` used to
+  change the server's behaviour while `tools/list` kept announcing the
+  built-in number.
 
 ## [2.0.0-alpha.2] - 2026-08-26
 

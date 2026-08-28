@@ -1,81 +1,90 @@
-"""`.fux/output.toml` — every knob that changes HOW a result is SHOWN.
+"""`.fux/output.toml` — output defaults, in three roots, one per consumer.
 
-[ADR-OUTPUT](../../docs/adr/0047_output-defaults.md) is the record. What this module is:
+**The boundary, unchanged from the first build of this record.** A key
+belongs here iff changing it leaves the ranked result set *and its order*
+identical — it may change what is printed, never what is computed. `fux.toml`
+asks *what is indexed*; `.fux/tune.toml` asks *which documents come back, or
+their order*; this file asks *how are they shown*. `top` is the one admitted
+boundary case: it truncates a ranking (allowed) and it bounds
+`confidence.support`, a REPORTED signal (stated, not hidden).
 
-- **The loader.** Absent, empty, or every key commented out means every
-  default — no error, no warning, no file required. `$0` stays `$0`.
-- **The validator.** The key set is **closed** per verb: an unknown table or
-  key is a loud error, for the same reason `tune.py` closes its own — a typo
-  in a file that changes every invocation must not fail silently.
-- **The resolver.** `resolve(verb, key, cli_value)` applies one precedence
-  chain and nothing else: **an explicit CLI flag wins, then `[<verb>]`, then
-  `[defaults]`, then the engine's built-in.**
+## Three roots, because there are three consumers (ADR-OUTPUT decision 3)
 
-## The boundary rule, which is mechanical rather than a taste
+| root | consumer | shapes |
+|---|---|---|
+| `[cli]` | a **person** | stdout text and the stderr notes |
+| `[cli.json]` | a **machine reading the CLI** | the `--json` payload |
+| `[mcp]` | an **agent** | `fux_search`'s result and its tool schema |
 
-A value belongs here if and only if changing it leaves **the ranked result set
-and its order identical**. This file may change what is *emitted*; it may never
-change what is *computed*.
+`[mcp]` inherits NOTHING from `[cli]` — a line written for a terminal must
+never silently retune the MCP server's default `k`. `[cli.json]` DOES inherit
+from `[cli]`, because it is the same command in a different rendering; it
+overrides only what should genuinely differ between a human reading and a
+machine parsing. Each root may carry a per-verb subtable — `[cli.ask]`,
+`[cli.json.ask]` — for an override narrower than "every verb that has this
+key".
 
-⚠ **That rule said "printed" until 2026-08-27, and `journal` widened it.**
-Arpit ruled the query journal's persistent switch into this file rather than
-`tune.toml`, and **writing a file is not printing** — so the rule as written
-would have excluded the very key it was being asked to hold. **Widening it in
-the open beats letting one key quietly not fit**: the boundary that matters is
-*emission vs computation*, and journalling is emission to a different sink.
+**`json` is spelled `enabled` and lives only under `[cli.json]`.** TOML
+cannot hold both a scalar key `json` and the table `[cli.json]` under `[cli]`
+at once, and *"emit the machine form by default"* is a fact about the JSON
+rendering anyway, not a CLI key. `enabled` is resolved FIRST, in its own pass
+(`resolve_json`), because it selects which chain every other key walks.
 
-⚠ **The honest cost of the wider word.** *"Emitted"* admits more than
-*"printed"* did, and the next key that writes somewhere will cite `journal` as
-precedent. The fence that remains is decision 2's second half — **it may never
-change what is computed** — plus the L3 import fence below, and those are what
-a reviewer should check, not the verb.
+**Precedence, highest first:**
 
-**That is a different boundary from `.fux/tune.toml`, and the difference is the
-whole reason this is a second file.** `tune.toml`'s rule is *"leaves
-`.fux/index/` byte-identical"* — which output defaults also satisfy, so
-tune.toml's rule alone would have admitted them. The distinguishing question is
-one step further in:
+```text
+  flag passed?           --yes--> value used
+        |no
+  [cli.json.<verb>] set? --yes--> value used     |  only when
+        |no                                      |  the json branch
+  [cli.json] set?        --yes--> value used      |  is on
+        |no
+  [cli.<verb>] set?      --yes--> value used
+        |no
+  [cli] set?             --yes--> value used
+        |no
+  bypass? (--no-output-config, or no repo) --yes--> BUILT_IN
+        |no
+      FuxError -- the file exists but does not set this key
+```
 
-| file | the mechanical test |
-|---|---|
-| `fux.toml` | does it change **what is indexed**? |
-| `.fux/tune.toml` | does it change **which documents come back, or in what order**? |
-| `.fux/output.toml` | neither — it changes **how they are shown** |
+## The file is the sole source of truth (Arpit, 2026-08-28)
 
-⚠ **`top` is the honest boundary case, and it is admitted rather than hidden.**
-It truncates a ranking; it does not reorder one, so the rule holds. But
-`confidence.support` is bounded by `top`
-([ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) §Consequences), so
-**changing `top` changes a reported signal**. That coupling is stated here and
-in the shipped specimen rather than discovered later.
+**Every earlier draft of this record let an unset key fall through to
+`BUILT_IN` silently** — "the file is optional, absent means every default".
+That is no longer true. **If `.fux/output.toml` is in effect (no
+`--no-output-config`, and a repo root exists) and does not set a key a verb
+needs, resolving it is a hard `FuxError`** naming the key and where to add
+it, not a silent default. `fux setup` (and `fux output`) write every key
+**live** — decision 14 — so a repo that has run setup once never sees this;
+a repo that has not, or whose `.fux/output.toml` predates a key this version
+added, gets a loud, actionable error instead of a value nobody chose and
+nobody can see in a diff. This is the "loader refusal" decision 14 named as
+the sanctioned remedy for the old design's freeze-at-setup cost, chosen over
+the alternative (a silent `fux doctor` warning) because a rendering default
+silently drifting from what the repo's own file states is worse than a verb
+that refuses to guess.
 
-**Nothing here is read on the maintenance path.** Not by `ingest`, not by
-`build`, not by the hooks — L3 says no maintenance output may depend on
-anything but the sources, and a rendering preference is not a source.
-`tests/test_output_config.py` asserts the import fence over this module's
-own import block.
-
-## Why a committed file and not just flags
-
-An **MCP tool call has no flags at all**, so before this file `fux_search`'s
-output shape was unconfigurable in principle rather than merely inconvenient.
-And [ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) decision 11 accepted a
-cost it could only mitigate with documentation — *an agent running a bare
-`fux ask` gets no confidence block* — where **documentation is weaker than a
-default.** A committed `band = true` is that default, and unlike argv it is
-visible in a diff.
+**`BUILT_IN` still exists** — it is not gone, its JOB changed. It is:
+(1) the values `fux setup`/`fux output` write into a fresh, live specimen,
+(2) what `--no-output-config` resolves to (the escape hatch has to have
+something to fall back to, or it stops being an escape hatch), and (3) what a
+run outside any fux repo resolves to, so `--help`/`--version` are never
+broken by a file that cannot exist yet. None of the three is "the file was
+silently incomplete and nobody noticed".
 
 ## There is no writer, deliberately
 
 `tomllib` reads; nothing in the stdlib writes TOML. `fux output` **prints** a
-specimen and the human pastes it — the same refusal `tune.py` makes, for the
-same reason (fux never rewrites a file it told you was yours).
+specimen and the human pastes it, or `fux setup` writes it once
+(write-if-missing) — the same refusal `tune.py` makes, for the same reason
+(fux never rewrites a file it told you was yours).
 """
 
 from __future__ import annotations
 
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from .errors import FuxError
@@ -85,7 +94,8 @@ __all__ = [
     "OutputDefaults",
     "DEFAULT_OUTPUT",
     "BUILT_IN",
-    "SCHEMA",
+    "CLI_VERBS",
+    "MCP_KEYS",
     "load",
     "specimen",
 ]
@@ -93,52 +103,62 @@ __all__ = [
 #: Committed, and written once by `fux setup`, exactly as `tune.toml` is.
 OUTPUT_NAME = ".fux/output.toml"
 
-#: At most this many semantic errors are reported together — `tune.py`'s
-#: reasoning, unchanged: one at a time turns a hand-edited file into a guessing
-#: game, and an unbounded list buries the first one.
+#: At most this many semantic errors are reported together.
 _MAX_REPORTED = 10
 
-#: The table every verb inherits from. A key here reaches a verb **only if that
-#: verb declares it** in `SCHEMA` — so `[defaults] band = true` does not put a
-#: band on `doctor`, which has no such concept.
-DEFAULTS_TABLE = "defaults"
+#: The two top-level roots. Anything else at the top of the file is unknown.
+_ROOTS = ("cli", "mcp")
 
-#: The closed key set, verb -> keys. **Adding a key here is a change to the
-#: record, not a convenience.**
+#: The closed key set for the `[cli]` / `[cli.json]` roots, per verb. A key
+#: here reaches a verb through `[cli.<verb>]` / `[cli.json.<verb>]`, or
+#: through the shared `[cli]` / `[cli.json]` table if the verb declares it.
 #:
-#: Read the columns as *"which verb has this knob on its own command line"*.
-#: `[mcp]` has no `json` because an MCP result is always JSON, and no `explain`
-#: because the tool surface has none.
-SCHEMA: dict[str, tuple[str, ...]] = {
-    "ask": ("json", "band", "top", "explain"),
-    "find": ("json", "band", "top"),
-    "answer": ("json", "band", "no_refer", "journal"),
-    "explain": ("json",),
-    "graph": ("json", "top"),
-    "path": ("json", "hops"),
-    "doctor": ("json",),
-    "hooks": ("json",),
-    "daemon": ("json",),
-    # The one surface with no flags. This table is its ONLY knob.
-    #
-    # ⚠ **`top` only — NOT `band`.** The first draft of this record carried
-    # `band` here and it was wrong: ADR-CONFIDENCE decision 11 makes the MCP
-    # result's confidence block **unconditional**, precisely because a tool
-    # call cannot pass a flag. A `[mcp] band = false` would re-blind the one
-    # surface this whole file exists to serve, so it is refused by name below
-    # rather than quietly honoured.
-    "mcp": ("top",),
+#: ⚠ **`graph` has no `top` key.** It had a dead one on the first build:
+#: `graph` has no `--top` flag and reads `seed_depth`/`expand_limit` from
+#: `.fux/tune.toml` instead — truncating a graph walk is a ranking change,
+#: which this file may not make (ADR-OUTPUT decision 18).
+#:
+#: `json` is deliberately absent from every tuple below: it is not a `[cli]`
+#: key at all, it is the question of WHICH chain the other keys walk
+#: (`resolve_json`), answered once per call before any of these are touched.
+CLI_VERBS: dict[str, tuple[str, ...]] = {
+    "ask": ("band", "top", "explain"),
+    "find": ("band", "top"),
+    "answer": ("band", "no_refer", "journal"),
+    "explain": (),
+    "graph": (),
+    "path": ("hops",),
+    "doctor": (),
+    "hooks": (),
+    "daemon": (),
 }
 
-#: Every key `[defaults]` may carry: the union of keys that appear on more than
-#: one verb. A key unique to one verb (`explain`, `no_refer`, `hops`) is
-#: refused in `[defaults]` **by name**, because setting it there reads as
-#: global and is not.
-_SHARED_KEYS = ("json", "band", "top")
+#: `[mcp]`'s closed key set. `top` only — decision 11. No `json` (an MCP
+#: result is always JSON) and, corrected during the first build, no `band`
+#: (ADR-CONFIDENCE decision 11 makes the confidence block unconditional over
+#: MCP precisely because a tool call cannot pass a flag).
+MCP_KEYS: tuple[str, ...] = ("top",)
 
-#: The engine's own defaults, per key. **This is the single source** — the CLI
-#: reads them from here rather than repeating them in `add_argument`, so
-#: `--top`'s help text and this table cannot drift apart.
+
+#: Every key `[cli]` / `[cli.json]` may carry at the shared (non-per-verb)
+#: level: keys that more than one verb declares. A key unique to one verb
+#: (`explain`, `no_refer`, `journal`, `hops`) is refused at the shared level
+#: **by name** — setting it there reads as global and is not — and belongs
+#: under that verb's own subtable instead (`[cli.ask]`, `[cli.path]`, ...).
+def _keys_shared_by_more_than_one_verb() -> tuple[str, ...]:
+    counts: dict[str, int] = {}
+    for keys in CLI_VERBS.values():
+        for k in keys:
+            counts[k] = counts.get(k, 0) + 1
+    return tuple(sorted(k for k, n in counts.items() if n > 1))
+
+
+_SHARED_CLI_KEYS: tuple[str, ...] = _keys_shared_by_more_than_one_verb()
+
+#: The engine's own defaults, per key, as they appear ON `args` / in help
+#: text. `json` here is the CLI's `--json`/`enabled` switch's built-in value
+#: — see the module docstring for what this dict is used for now that the
+#: file itself no longer falls through to it silently.
 BUILT_IN: dict[str, object] = {
     "json": False,
     "band": False,
@@ -149,26 +169,22 @@ BUILT_IN: dict[str, object] = {
     "journal": False,
 }
 
-#: Type per key, for validation. `bool` is checked before `int` everywhere,
-#: because in Python `True` is an `int` and a silently-accepted `top = true`
-#: would truncate every result list to one.
+#: Type per key, as spelled IN THE FILE (`enabled`, not `json`). `bool` is
+#: checked before `int` everywhere: `isinstance(True, int)` is `True` in
+#: Python, so an unguarded check accepts `top = true` and silently means
+#: `top = 1`.
 _TYPES: dict[str, type] = {
-    "json": bool,
     "band": bool,
     "explain": bool,
     "no_refer": bool,
     "journal": bool,
+    "enabled": bool,
     "top": int,
     "hops": int,
 }
 
-#: Keys refused **by name, with the reason**, rather than reported as unknown.
-#: Each is something a reader will plausibly try; a bare *"unknown key"* would
-#: send them hunting for a typo in a word they spelled correctly.
-#:
-#: The rule these follow is Arpit's standing one: **refuse only what is broken
-#: or duplicates a tool that already exists; state the cost of anything that is
-#: merely strong.** None of these is a preference being denied.
+#: Keys refused **by name, with the reason**, under `[cli]` / `[cli.json]`
+#: (at any nesting), rather than reported as unknown.
 _REFUSED: dict[str, str] = {
     "no_tune": (
         "`--no-tune` is the *'is it me or the config?'* switch. A config file "
@@ -201,6 +217,25 @@ _REFUSED: dict[str, str] = {
         "output is being consumed. A configured default here would fight the "
         "TTY detection rather than replace it. Use `--no-progress`"
     ),
+    "json": (
+        "`json` is spelled `enabled` and lives only under `[cli.json]` — TOML "
+        "cannot hold both a scalar `json` key and the table `[cli.json]` "
+        "under `[cli]`, and `enabled` is the fact this file actually states: "
+        "whether the JSON rendering is what a bare invocation gets"
+    ),
+}
+
+#: Keys refused **by name, with the reason**, specifically under `[mcp]`.
+#: Separate from `_REFUSED` because `band` is a perfectly valid `[cli]` key —
+#: it is only under `[mcp]` that setting it would undo another record's
+#: decision.
+_MCP_REFUSED: dict[str, str] = {
+    "band": (
+        "the confidence block is UNCONDITIONAL over MCP (ADR-CONFIDENCE "
+        "decision 11) — a tool call cannot pass a flag, so `[mcp] band` "
+        "would re-blind the one surface this file exists to serve"
+    ),
+    "json": "an MCP result is always JSON — there is no rendering to switch",
 }
 
 
@@ -212,48 +247,117 @@ class OutputDefaults:
     paths a block that drifted between them.
     """
 
-    #: `verb -> {key: value}`, carrying only what the file actually set.
-    #: **Absent means not set**, never *"set to the default"* — the distinction
-    #: is what lets `resolve()` fall through cleanly.
-    per_verb: dict[str, dict[str, object]]
-    #: `[defaults]`, likewise carrying only what was set.
-    shared: dict[str, object]
+    #: `[cli]`'s shared scalars.
+    cli_shared: dict[str, object] = field(default_factory=dict)
+    #: `verb -> {key: value}` from `[cli.<verb>]`.
+    cli_verb: dict[str, dict[str, object]] = field(default_factory=dict)
+    #: `[cli.json]`'s shared scalars, including `enabled`.
+    json_shared: dict[str, object] = field(default_factory=dict)
+    #: `verb -> {key: value}` from `[cli.json.<verb>]`.
+    json_verb: dict[str, dict[str, object]] = field(default_factory=dict)
+    #: `[mcp]`'s scalars.
+    mcp: dict[str, object] = field(default_factory=dict)
+    #: True for the disabled / no-repo sentinel: every key resolves straight
+    #: to `BUILT_IN`, and nothing ever raises for being unset. **Not** "the
+    #: file was empty" — an empty *but in-effect* file still raises, because
+    #: it is in effect and does not set the key asked for.
+    bypass: bool = False
 
     @property
     def trivial(self) -> bool:
-        """True when nothing was set — used to skip work, never to skip a check."""
-        return not self.per_verb and not self.shared
+        """True in bypass mode. Kept for callers that want to skip work."""
+        return self.bypass
 
-    def resolve(self, verb: str, key: str, cli_value: object = None) -> object:
-        """One precedence chain: **flag → `[verb]` → `[defaults]` → built-in.**
+    def resolve_json(self, verb: str, cli_value: object = None) -> bool:
+        """Resolve the JSON-rendering switch — FIRST, before any other key.
 
-        `cli_value` is `None` for *"the flag was not passed"*. A `store_true`
-        flag therefore has to be declared `default=None` on its parser, or
-        `False` would be indistinguishable from absent and the file could never
-        take effect — that is the one CLI change this module requires, and it
-        is the whole of it.
-
-        Raises on a verb/key pair `SCHEMA` does not grant, so a typo in a
-        CALLER is caught too, not only a typo in the file.
+        `json` selects which chain every other key walks, so it cannot be
+        resolved alongside them: `[cli.json] top` would otherwise be
+        reachable only when `--json` was typed on the command line and
+        unreachable when the file itself turned JSON on, which is the case
+        the table exists for.
         """
-        allowed = SCHEMA.get(verb)
+        if verb not in CLI_VERBS:
+            raise FuxError(f"no output defaults are declared for `{verb}` — known: {sorted(CLI_VERBS)}")
+        if cli_value is not None:
+            return bool(cli_value)
+        if self.bypass:
+            return bool(BUILT_IN["json"])
+        per_verb = self.json_verb.get(verb, {})
+        if "enabled" in per_verb:
+            return bool(per_verb["enabled"])
+        if "enabled" in self.json_shared:
+            return bool(self.json_shared["enabled"])
+        raise FuxError(
+            f"{OUTPUT_NAME} does not set `enabled` for the JSON rendering — "
+            f"add `enabled = {bool(BUILT_IN['json'])!s}` under `[cli.json]` "
+            f"(or `[cli.json.{verb}]` for `{verb}` only). Run `fux output` to "
+            "see every key, or pass --no-output-config to bypass this file."
+        )
+
+    def resolve(self, verb: str, key: str, cli_value: object = None, *, as_json: bool = False) -> object:
+        """One precedence chain: **flag → json-verb → json-shared →
+        cli-verb → cli-shared → bypass → error.**
+
+        Raises on a verb/key pair `CLI_VERBS` does not grant, so a typo in a
+        CALLER is caught too, not only a typo in the file. Raises when the
+        file is in effect and simply never set this key — see the module
+        docstring.
+        """
+        allowed = CLI_VERBS.get(verb)
         if allowed is None:
-            raise FuxError(f"no output defaults are declared for `{verb}` — known: {sorted(SCHEMA)}")
+            raise FuxError(f"no output defaults are declared for `{verb}` — known: {sorted(CLI_VERBS)}")
         if key not in allowed:
             raise FuxError(f"`{key}` is not an output key for `{verb}` — it has: {sorted(allowed)}")
         if cli_value is not None:
             return cli_value
-        table = self.per_verb.get(verb, {})
-        if key in table:
-            return table[key]
-        # `[defaults]` reaches a verb only where the verb declares the key,
-        # which is already true here: `key in allowed` was checked above.
-        if key in self.shared:
-            return self.shared[key]
-        return BUILT_IN[key]
+        if self.bypass:
+            return BUILT_IN[key]
+        if as_json:
+            per_verb = self.json_verb.get(verb, {})
+            if key in per_verb:
+                return per_verb[key]
+            if key in self.json_shared:
+                return self.json_shared[key]
+        per_verb = self.cli_verb.get(verb, {})
+        if key in per_verb:
+            return per_verb[key]
+        if key in self.cli_shared:
+            return self.cli_shared[key]
+        where = (
+            f"[cli.json.{verb}], [cli.json], [cli.{verb}] or [cli]"
+            if as_json
+            else f"[cli.{verb}] or [cli]"
+        )
+        raise FuxError(
+            f"{OUTPUT_NAME} does not set `{key}` for `{verb}` — add it under "
+            f"{where} (e.g. `{key} = {BUILT_IN[key]!r}`). Run `fux output` to "
+            "see every key, or pass --no-output-config to bypass this file."
+        )
+
+    def resolve_mcp(self, key: str, tool_value: object = None) -> object:
+        """`[mcp]`'s own chain: **tool arg → `[mcp]` → bypass → error.**
+
+        `[mcp]` inherits nothing from `[cli]` — decision 3's whole reason for
+        having two roots rather than one.
+        """
+        if key not in MCP_KEYS:
+            raise FuxError(f"`{key}` is not an output key for `mcp` — it has: {sorted(MCP_KEYS)}")
+        if tool_value is not None:
+            return tool_value
+        if self.bypass:
+            return BUILT_IN[key]
+        if key in self.mcp:
+            return self.mcp[key]
+        raise FuxError(
+            f"{OUTPUT_NAME} does not set `{key}` under [mcp] — add "
+            f"`{key} = {BUILT_IN[key]!r}`. Run `fux output` to see every key, "
+            "or pass --no-output-config to bypass this file."
+        )
 
 
-DEFAULT_OUTPUT = OutputDefaults(per_verb={}, shared={})
+#: The bypass sentinel: `--no-output-config`, or no repo root at all.
+DEFAULT_OUTPUT = OutputDefaults(bypass=True)
 
 
 class _Collector:
@@ -278,8 +382,7 @@ class _Collector:
 def _reject_conflict_markers(path: Path, text: str) -> None:
     """A merged-but-unresolved file is a parse error with a useless message.
 
-    Same guard `tune.py` carries, for the same reason: this file is committed,
-    so it can arrive conflicted from a pull.
+    This file is committed, so it can arrive conflicted from a pull.
     """
     for marker in ("<<<<<<<", "=======", ">>>>>>>"):
         if any(line.startswith(marker) for line in text.splitlines()):
@@ -289,18 +392,13 @@ def _reject_conflict_markers(path: Path, text: str) -> None:
 
 
 def _checked(c: _Collector, table: str, key: str, value: object) -> object | None:
-    """Validate one key/value. Returns `None` when it was rejected."""
-    if key in _REFUSED:
-        c.add(f"[{table}] `{key}` is refused: {_REFUSED[key]}")
-        return None
+    """Validate one key/value against `_TYPES`. Returns `None` when rejected."""
     want = _TYPES[key]
     if want is bool:
         if not isinstance(value, bool):
             c.add(f"[{table}] {key} must be true or false (got {value!r})")
             return None
         return value
-    # bool BEFORE int, always: `isinstance(True, int)` is True in Python, so
-    # the obvious check would accept `top = true` and silently mean `top = 1`.
     if isinstance(value, bool) or not isinstance(value, int):
         c.add(f"[{table}] {key} must be a whole number (got {value!r})")
         return None
@@ -313,23 +411,166 @@ def _checked(c: _Collector, table: str, key: str, value: object) -> object | Non
     return value
 
 
-def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
-    """Read `.fux/output.toml`. Absent, empty or all-commented means every default.
+def _verb_owning(key: str) -> str | None:
+    """The single verb `key` belongs to, if exactly one does — else `None`."""
+    owners = [v for v, keys in CLI_VERBS.items() if key in keys]
+    return owners[0] if len(owners) == 1 else None
 
-    `enabled=False` is `--no-output-config`: the file is not read at all, so
-    what you see is the engine's own shape. Mirrors `tune.load`'s `enabled`
-    for the same *"is it me or the config?"* reason.
+
+def _parse_cli_scalars(c: _Collector, table_label: str, scope: dict, out: dict, *, verb: str | None) -> None:
+    """Validate the scalar (non-table) entries of one `[cli...]`-family table.
+
+    `verb=None` for a shared table (`[cli]`, `[cli.json]`); `verb=<name>` for
+    a per-verb subtable (`[cli.<verb>]`, `[cli.json.<verb>]`) — the closed key
+    set differs (a per-verb table may use only that verb's own keys; a shared
+    table may use anything reachable from more than one verb).
+    """
+    in_json = "json" in table_label
+    allowed_here = set(CLI_VERBS[verb]) if verb is not None else set(_SHARED_CLI_KEYS)
+    if in_json:
+        allowed_here = allowed_here | {"enabled"}
+    for key, value in scope.items():
+        if isinstance(value, dict):
+            continue  # a subtable — handled by the caller, not here
+        if key in _REFUSED:
+            c.add(f"[{table_label}] `{key}` is refused: {_REFUSED[key]}")
+            continue
+        if key == "enabled" and not in_json:
+            # `enabled` only means something inside a `[cli.json...]` table;
+            # `table_label` already tells us which family we are in.
+            c.add(f"[{table_label}] `enabled` only applies inside `[cli.json]` — it is not a `[cli]` key")
+            continue
+        if key not in allowed_here:
+            owner = _verb_owning(key)
+            if owner and verb is not None and verb != owner:
+                c.add(f"[{table_label}] `{key}` is a key of {owner}, not of `{verb}`")
+            elif owner and verb is None:
+                c.add(f"[{table_label}] `{key}` belongs to one verb only ({owner}) — write it under [cli.{owner}] or [cli.json.{owner}]")
+            else:
+                c.add(f"[{table_label}] unknown key `{key}` — known: {sorted(allowed_here)}")
+            continue
+        checked = _checked(c, table_label, key, value)
+        if checked is not None:
+            out[key] = checked
+
+
+def _parse_cli_root(c: _Collector, root_label: str, table: dict, shared_out: dict, verb_out: dict) -> None:
+    """Parse `[cli]` or `[cli.json]`: shared scalars plus per-verb subtables."""
+    _parse_cli_scalars(c, root_label, table, shared_out, verb=None)
+    for key, value in table.items():
+        if key == "json":
+            continue  # `[cli.json]` — parsed separately by the caller
+        if not isinstance(value, dict):
+            continue  # scalar — already handled above
+        verb = key
+        if verb not in CLI_VERBS:
+            c.add(f"[{root_label}] `{verb}` is not a known verb — known: {sorted(CLI_VERBS)}")
+            continue
+        inner: dict[str, object] = {}
+        _parse_cli_scalars(c, f"{root_label}.{verb}", value, inner, verb=verb)
+        if inner:
+            verb_out[verb] = inner
+
+
+def _parse(path: Path, data: dict) -> OutputDefaults:
+    c = _Collector(path)
+
+    # A file in the OLD flat layout (`[defaults]`, or a bare `[<verb>]` table
+    # at the top level) parses cleanly under this grammar and would mean
+    # something else — named, not shrugged at (ADR-TUNE's `_LEGACY_FIELD_KEYS`
+    # precedent).
+    if "defaults" in data and not isinstance(data.get("cli"), dict):
+        c.add("[defaults] is the old layout — output keys now live under [cli] (shared) or [cli.<verb>] (per verb). Run `fux output` for the new specimen.")
+    for legacy_verb in CLI_VERBS:
+        if legacy_verb in data and not isinstance(data.get("cli"), dict):
+            c.add(f"[{legacy_verb}] at the top level is the old layout — move it to [cli.{legacy_verb}]. Run `fux output` for the new specimen.")
+
+    for key, value in data.items():
+        if key in _ROOTS:
+            continue
+        if key == "defaults" or key in CLI_VERBS:
+            continue  # already reported above, as the legacy-layout message
+        if not isinstance(value, dict):
+            if key in _SHARED_CLI_KEYS or key == "enabled":
+                c.add(f"`{key}` is a key, not a table — did you mean `[cli]\\n{key} = ...`?")
+            else:
+                c.add(f"`{key}` is not a known key at all — known tables: {sorted(_ROOTS)}")
+            continue
+        c.add(f"unknown table `[{key}]` — known: {sorted(_ROOTS)}")
+
+    cli_shared: dict[str, object] = {}
+    cli_verb: dict[str, dict[str, object]] = {}
+    json_shared: dict[str, object] = {}
+    json_verb: dict[str, dict[str, object]] = {}
+    mcp_out: dict[str, object] = {}
+
+    cli_table = data.get("cli")
+    if cli_table is not None:
+        if not isinstance(cli_table, dict):
+            c.add("`cli` must be a table — write `[cli]`, not `cli = ...`")
+        else:
+            _parse_cli_root(c, "cli", cli_table, cli_shared, cli_verb)
+            json_table = cli_table.get("json")
+            if json_table is not None:
+                if not isinstance(json_table, dict):
+                    c.add(f"[cli] `json` is refused: {_REFUSED['json']}")
+                else:
+                    _parse_cli_root(c, "cli.json", json_table, json_shared, json_verb)
+
+    mcp_table = data.get("mcp")
+    if mcp_table is not None:
+        if not isinstance(mcp_table, dict):
+            c.add("`mcp` must be a table — write `[mcp]`, not `mcp = ...`")
+        else:
+            for key, value in mcp_table.items():
+                if key in _MCP_REFUSED:
+                    c.add(f"[mcp] `{key}` is refused: {_MCP_REFUSED[key]} — UNCONDITIONAL, by name")
+                    continue
+                if key not in MCP_KEYS:
+                    c.add(f"[mcp] unknown key `{key}` — known: {sorted(MCP_KEYS)}")
+                    continue
+                checked = _checked(c, "mcp", key, value)
+                if checked is not None:
+                    mcp_out[key] = checked
+
+    c.raise_if_any()
+    return OutputDefaults(
+        cli_shared=cli_shared,
+        cli_verb=cli_verb,
+        json_shared=json_shared,
+        json_verb=json_verb,
+        mcp=mcp_out,
+        bypass=False,
+    )
+
+
+def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
+    """Read `.fux/output.toml`.
+
+    `enabled=False` is `--no-output-config`: the file is not read at all, and
+    every key resolves to `BUILT_IN` — the "is it me or the config?" switch,
+    and the one path that still works when the file is what is broken.
+
+    Otherwise the file is now **required to exist and to cover every key a
+    caller actually resolves** — see the module docstring. A missing file is
+    a `FuxError` here, at load time, with the fix (`fux setup` / `fux output`)
+    named in the message; a file that exists but omits one key is a
+    `FuxError` later, from `resolve()`/`resolve_json()`/`resolve_mcp()`, once
+    it is clear which key and which verb.
     """
     if not enabled:
         return DEFAULT_OUTPUT
 
     path = root / OUTPUT_NAME
     if not path.is_file():
-        return DEFAULT_OUTPUT
+        raise FuxError(
+            f"{path} is missing — run `fux setup` to create it (or, in an "
+            f"existing repo, `fux output > {OUTPUT_NAME}`). Pass "
+            "--no-output-config to use the engine defaults instead."
+        )
 
-    # Windows editors write a BOM; `tomllib.load` reads binary and fails with a
-    # decode error that names nothing useful. Windows-first fleets are in the
-    # litmus, so this is stripped rather than diagnosed.
+    # Windows editors write a BOM; `tomllib.load` reads binary and fails with
+    # a decode error that names nothing useful. Stripped rather than diagnosed.
     text = path.read_bytes().decode("utf-8-sig")
     _reject_conflict_markers(path, text)
 
@@ -338,174 +579,73 @@ def load(root: Path, *, enabled: bool = True) -> OutputDefaults:
     except tomllib.TOMLDecodeError as exc:
         raise FuxError(f"{path}: invalid TOML ({exc})") from exc
 
-    if not data:
-        return DEFAULT_OUTPUT
-
-    known = set(SCHEMA) | {DEFAULTS_TABLE}
-
-    # A bare `band = true` at the top of the file parses as a top-level KEY,
-    # not as a table, so the unknown-table check below would report it as an
-    # unknown *table* named `band` — which sends a reader looking for a
-    # section they never wrote. Name what they actually did instead.
-    stray = [k for k, v in data.items() if k not in known and not isinstance(v, dict)]
-    if stray:
-        first = stray[0]
-        if first in BUILT_IN:
-            owners = sorted(v for v, keys in SCHEMA.items() if first in keys)
-            raise FuxError(
-                f"{path}: `{first}` is a key, not a table — every key lives inside a "
-                f"section. Put it in [{owners[0]}]"
-                + (f" (or [{DEFAULTS_TABLE}])" if first in _SHARED_KEYS else "")
-            )
-        raise FuxError(
-            f"{path}: `{first}` is a bare key at the top of the file — every key lives "
-            f"inside a section, and `{first}` is not a known key at all"
-        )
-
-    unknown_tables = [k for k in data if k not in known]
-    if unknown_tables:
-        raise FuxError(
-            f"{path}: unknown table(s) {sorted(unknown_tables)} — known: {sorted(known)}. "
-            "The key set is closed on purpose: this file changes the shape of every "
-            "invocation without changing a byte of the index, so a typo here must not "
-            "fail silently"
-        )
-
-    c = _Collector(path)
-    shared: dict[str, object] = {}
-    per_verb: dict[str, dict[str, object]] = {}
-
-    for name, value in data.items():
-        if not isinstance(value, dict):
-            raise FuxError(
-                f"{path}: `{name}` must be a table (a `[{name}]` section), not a bare key"
-            )
-        if name == DEFAULTS_TABLE:
-            for key, raw in value.items():
-                if key in _REFUSED:
-                    c.add(f"[{name}] `{key}` is refused: {_REFUSED[key]}")
-                    continue
-                if key not in _SHARED_KEYS:
-                    if key in BUILT_IN:
-                        owners = sorted(v for v, keys in SCHEMA.items() if key in keys)
-                        c.add(
-                            f"[{name}] `{key}` belongs to one verb only ({', '.join(owners)}) — "
-                            f"setting it here reads as global and is not. Put it in [{owners[0]}]"
-                        )
-                    else:
-                        c.add(
-                            f"[{name}] unknown key `{key}` — [{DEFAULTS_TABLE}] carries "
-                            f"{sorted(_SHARED_KEYS)}"
-                        )
-                    continue
-                checked = _checked(c, name, key, raw)
-                if checked is not None:
-                    shared[key] = checked
-            continue
-
-        allowed = SCHEMA[name]
-        table: dict[str, object] = {}
-        for key, raw in value.items():
-            if name == "mcp" and key == "band":
-                c.add(
-                    "[mcp] `band` is refused: the MCP result's confidence block is "
-                    "UNCONDITIONAL (ADR-CONFIDENCE decision 11) because a tool call "
-                    "has no flags to pass. Turning it off here would re-blind the one "
-                    "surface these defaults exist to serve. Use [ask] / [find] / "
-                    "[answer] to gate the CLI"
-                )
-                continue
-            if key in _REFUSED:
-                c.add(f"[{name}] `{key}` is refused: {_REFUSED[key]}")
-                continue
-            if key not in allowed:
-                hint = ""
-                if key in BUILT_IN:
-                    owners = sorted(v for v, keys in SCHEMA.items() if key in keys)
-                    hint = f" — it is a key of {', '.join(owners)}, not of `{name}`"
-                c.add(f"[{name}] unknown key `{key}`{hint}. [{name}] carries {sorted(allowed)}")
-                continue
-            checked = _checked(c, name, key, raw)
-            if checked is not None:
-                table[key] = checked
-        if table:
-            per_verb[name] = table
-
-    c.raise_if_any()
-    return OutputDefaults(per_verb=per_verb, shared=shared)
+    return _parse(path, data)
 
 
 def specimen() -> str:
-    """What `fux output` prints for a human to paste. Every key commented out.
+    """The file `fux setup` writes (write-if-missing) and `fux output` prints.
 
-    Commented-out is not decoration: an uncommented specimen would make every
-    engine default a *committed* value, so a later change to a default could
-    never reach anyone who had run `fux setup`.
+    ⚠ **Live lines, not comments** (ADR-OUTPUT decision 14, ruled by Arpit
+    2026-08-27, and now load-bearing rather than cosmetic: since 2026-08-28 a
+    key this file does not set is a hard error, so a specimen that shipped
+    fully commented would break every verb on the very first run after
+    `fux setup`). Every value equals its entry in `BUILT_IN` — a fresh repo
+    behaves identically to one that never had this file, because both go
+    through the same numbers, just by different roots (this file, vs.
+    `--no-output-config`'s bypass).
     """
-    return """\
-# .fux/output.toml — HOW a result is SHOWN. Never which documents come back.
-#
-# Written once by `fux setup`; fux never rewrites it. Absent, empty, or every
-# key commented out means every default — this file is optional.
-#
-# The rule for what may live here is mechanical: changing any value below
-# leaves the ranked result set AND ITS ORDER identical. It changes what is
-# printed, never what is computed. (`.fux/tune.toml` is the file that changes
-# ordering; `fux.toml` is the file that changes what is indexed.)
-#
-# Precedence, highest first:  a CLI flag  →  [<verb>]  →  [defaults]  →  built-in.
-#
-# `fux ask --no-output-config` ignores this file entirely, which is the
-# "is it me or the config?" switch.
-
-[defaults]           # only keys that more than one verb has
-#json = false
-#band = false        # the confidence block — ADR-CONFIDENCE decision 11
-#top  = 5            # ⚠ also bounds `confidence.support`, which is a REPORTED
-                     #   signal. This is the one key here that changes a number
-                     #   an agent reads, and it is admitted rather than hidden.
-
-[ask]
-#top     = 5
-#band    = true      # recommended when an agent consumes this repo: a bare
-                     # `fux ask` is otherwise blind to `answerable: false`
-#explain = false
-
-[find]
-#top  = 5
-#band = false        # `find` pipes bare paths; a band on stdout would break that
-
-[answer]
-#band     = false
-#no_refer = false
-#journal  = false    # record each answer's receipt to the local, gitignored
-                     # journal. ⚠ OFF by default and that is deliberate: a $0
-                     # offline tool may not quietly begin recording questions
-                     # because a config line exists somewhere. `--journal` is
-                     # still the per-run switch.
-
-[graph]
-#top = 5
-
-[path]
-#hops = 2
-
-[explain]
-#json = false
-
-[doctor]
-#json = false
-
-[hooks]
-#json = false
-
-[daemon]
-#json = false
-
-[mcp]                # the one surface with NO command-line flags at all.
-                     # This table is the only way to configure it.
-                     # ⚠ There is deliberately no `band` key: the MCP result's
-                     # confidence block is UNCONDITIONAL, because a tool call
-                     # cannot pass a flag. Setting it here is refused.
-#top = 5
-"""
+    lines = [
+        "# .fux/output.toml — HOW a result is SHOWN. Never which documents come back.",
+        "#",
+        "# Written once by `fux setup`; fux never rewrites it. Every value below is",
+        "# LIVE — it is what the engine already does, restated so you can see it and",
+        "# change it. Deleting a line does not restore a hidden default: the file is",
+        "# the only source of truth, and a verb that needs a key this file does not",
+        "# set will refuse to guess (`fux output` reprints this if you need it back).",
+        "#",
+        "# Three roots, one per consumer:",
+        "#   [cli]       a person reading stdout",
+        "#   [cli.json]  a machine reading --json  (inherits [cli]; `enabled` switches it on)",
+        "#   [mcp]       an agent over MCP          (inherits NOTHING from [cli])",
+        "#",
+        "# Precedence, highest first:  a CLI flag  ->  [cli.json.<verb>]  ->  [cli.json]",
+        "#   ->  [cli.<verb>]  ->  [cli]              (and, for MCP:  tool arg  ->  [mcp])",
+        "#",
+        "# Per-verb overrides go under [cli.<verb>] / [cli.json.<verb>] — e.g. an",
+        "# uncommented",
+        "#   [cli.find]",
+        "#   band = false        # find pipes bare paths; a band on stdout would break that",
+        "#",
+        "# `fux ask --no-output-config` ignores this whole file — the",
+        '# "is it me or the config?" switch.',
+        "",
+        "# `band` and `top` are shared by more than one verb, so they live here.",
+        "# A key only one verb has (`explain`, `hops`, `no_refer`, `journal`) is",
+        "# refused at this level BY NAME — it lives under that verb's own table,",
+        "# below — setting it here would read as global, and it is not.",
+        "[cli]",
+        f"band = {str(bool(BUILT_IN['band'])).lower()}       # the confidence block — ADR-CONFIDENCE decision 11",
+        f"top = {int(BUILT_IN['top'])}            # ask/find. ⚠ also bounds `confidence.support`,",
+        "               #   which is a REPORTED signal — the one key here that",
+        "               #   changes a number an agent reads, admitted rather than hidden.",
+        "",
+        "[cli.ask]",
+        f"explain = {str(bool(BUILT_IN['explain'])).lower()}    # report which path answered",
+        "",
+        "[cli.path]",
+        f"hops = {int(BUILT_IN['hops'])}          # max edges in a route",
+        "",
+        "[cli.answer]",
+        f"no_refer = {str(bool(BUILT_IN['no_refer'])).lower()}",
+        f"journal = {str(bool(BUILT_IN['journal'])).lower()}    # record each answer's receipt locally",
+        "",
+        "[cli.json]",
+        f"enabled = {str(bool(BUILT_IN['json'])).lower()}   # emit --json by default; per-verb: [cli.json.<verb>] enabled = true",
+        "",
+        "[mcp]                # the one surface with NO command-line flags at all —",
+        "                     # this table is the only way to configure it.",
+        f"top = {int(BUILT_IN['top'])}            # ⚠ no `band` here: the MCP confidence block is",
+        "               #   UNCONDITIONAL (ADR-CONFIDENCE decision 11), refused by name.",
+        "",
+    ]
+    return "\n".join(lines) + ("\n" if not lines[-1] else "")

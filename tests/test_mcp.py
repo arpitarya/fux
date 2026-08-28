@@ -22,6 +22,7 @@ import pytest
 
 from fux.derive import build
 from fux.mcp import PROTOCOL_VERSION, TOOLS, serve
+from fux.output_config import OUTPUT_NAME, specimen
 from fux.store import TF_FIELDS, term_hash, write_index
 
 BODY = TF_FIELDS.index("body")
@@ -52,6 +53,12 @@ def _rec(doc_id, title, word, *, edges=(), superseded=False, phrases=()) -> dict
 
 @pytest.fixture
 def repo(tmp_path):
+    # `serve()` now loads `.fux/output.toml` at start (it must be in effect
+    # and cover [mcp] `top`, per output_config's no-fallback rule) — this
+    # fixture never goes through `fux setup`, so it writes a live specimen
+    # itself, exactly what `fux setup` would have produced.
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / OUTPUT_NAME).write_text(specimen(), encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "retry.md").write_text(
         "# Retry\n\nline three\nline four\nline five\n", encoding="utf-8"
@@ -306,9 +313,9 @@ def test_the_confidence_block_the_description_promises_is_unconditional_here():
     """⚠ ADR-CONFIDENCE decision 11 gates the block behind `--band` on the CLI
     and leaves it ALWAYS ON over MCP. The description says *read the confidence
     block* with no caveat, and that is only honest while MCP stays ungated."""
-    from fux.output_config import SCHEMA
+    from fux.output_config import MCP_KEYS
 
-    assert "band" not in SCHEMA["mcp"], (
+    assert "band" not in MCP_KEYS, (
         "[mcp] band would let a config remove the block this description "
         "unconditionally promises"
     )

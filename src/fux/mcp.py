@@ -31,28 +31,39 @@ from .errors import FuxError
 
 PROTOCOL_VERSION = "2024-11-05"
 
-def _k_property() -> dict:
-    """`k`'s advertised default, READ FROM THE ENGINE rather than retyped.
+def _k_property(top: int) -> dict:
+    """`k`'s advertised default — the RESOLVED `[mcp] top`, not a literal.
 
-    ⚠ **This was a hand-written `5` and `[mcp] top` made it a lie.** Nothing
-    failed: an MCP tool schema is a machine-facing declaration that no gate
-    read, which is W-84's finding in the one surface where the reader is
-    always a machine. The number now comes from `output_config.BUILT_IN`, and
-    the description says the repo can change it — because it can.
+    ⚠ **This was a hand-written `5` and `[mcp] top` made it a lie**, and then
+    (until 2026-08-28) `output_config.BUILT_IN['top']` made it a DIFFERENT
+    lie: a repo whose `.fux/output.toml` set `[mcp] top = 20` still advertised
+    5 in its own tool schema, which is W-83's class of defect exactly — an
+    accepted decision (11: "the resolved top") whose code implemented a
+    different one. `_tools(top)` closes the gap: it is called once, in
+    `serve()`, with the value ADR-OUTPUT's own chain resolved.
     """
-    from .output_config import BUILT_IN, OUTPUT_NAME
+    from .output_config import OUTPUT_NAME
 
     return {
         "type": "integer",
         "description": (
-            f"Maximum results (default {BUILT_IN['top']}; this repository's "
+            f"Maximum results (default {top}; this repository's "
             f"{OUTPUT_NAME} may set a different default under [mcp])."
         ),
-        "default": BUILT_IN["top"],
+        "default": top,
     }
 
 
-TOOLS = [
+def _tools(top: int) -> list[dict]:
+    """The tool surface, with `k`'s advertised default bound to `top`.
+
+    Called once per `serve()` (decision 17: `[mcp]` is read ONCE, at
+    start-up, not per search — a TOML read per call in a warm process whose
+    entire premise is staying resident) and once at import time below, at
+    `BUILT_IN['top']`, so `TOOLS` stays importable for callers and tests that
+    have no repo (and therefore no resolved value) to hand it.
+    """
+    return [
     {
         "name": "fux_search",
         # ⚠ **This said "line-range citations" until 2026-08-26 and that was
@@ -81,7 +92,7 @@ TOOLS = [
             "type": "object",
             "properties": {
                 "query": {"type": "string", "description": "A natural-language question."},
-                "k": _k_property(),
+                "k": _k_property(top),
             },
             "required": ["query"],
         },
@@ -120,6 +131,19 @@ TOOLS = [
 ]
 
 
+def _built_in_top() -> int:
+    from .output_config import BUILT_IN
+
+    return int(BUILT_IN["top"])
+
+
+#: The reference view, at the engine's built-in `top` — importable with no
+#: repo and no resolved config to hand it (tests, `--help`-adjacent code).
+#: A live `serve()` uses `_tools(<the resolved top>)` instead — see decision
+#: 17 and `_k_property`'s docstring.
+TOOLS = _tools(_built_in_top())
+
+
 def _root() -> Path:
     from .config import find_root
 
@@ -129,7 +153,7 @@ def _root() -> Path:
     return root
 
 
-def _search(root: Path, args: dict) -> dict:
+def _search(root: Path, args: dict, *, top: int) -> dict:
     from .query import run_query
     from .query.headings import headings_for
 
@@ -138,9 +162,11 @@ def _search(root: Path, args: dict) -> dict:
     # has no flags. An explicit `k` in the call still wins, exactly as a CLI
     # flag does. ⚠ There is deliberately no `[mcp] band`: the confidence block
     # below is UNCONDITIONAL here (ADR-CONFIDENCE decision 11).
-    from .output_config import load as load_output
-
-    k = int(args.get("k") or load_output(root).resolve("mcp", "top"))
+    #
+    # `top` is a parameter, not a per-call `output_config.load()` — decision
+    # 17: the config is read ONCE, in `serve()`, not once per search in a
+    # warm process whose entire premise is staying resident.
+    k = int(args.get("k") or top)
     from .store import read_index
 
     signals: dict = {}
@@ -260,8 +286,13 @@ def _related(root: Path, args: dict) -> dict:
 _HANDLERS = {"fux_search": _search, "fux_passage": _passage, "fux_related": _related}
 
 
-def _handle(root: Path, message: dict) -> dict | None:
-    """One JSON-RPC message in, one response out (or `None` for a notification)."""
+def _handle(root: Path, message: dict, *, top: int) -> dict | None:
+    """One JSON-RPC message in, one response out (or `None` for a notification).
+
+    `top` is the `[mcp] top` this connection resolved ONCE at `serve()`
+    start-up (decision 17) — threaded through rather than re-read, so a
+    warm process never pays a TOML read per search.
+    """
     method = message.get("method")
     msg_id = message.get("id")
 
@@ -280,11 +311,16 @@ def _handle(root: Path, message: dict) -> dict | None:
             "serverInfo": {"name": "fux", "version": __version__},
         })
     if method == "tools/list":
-        return _ok(msg_id, {"tools": TOOLS})
+        return _ok(msg_id, {"tools": _tools(top)})
     if method == "tools/call":
         params = message.get("params") or {}
         name = params.get("name")
-        handler = _HANDLERS.get(name)
+        handlers = {
+            "fux_search": lambda r, a: _search(r, a, top=top),
+            "fux_passage": _passage,
+            "fux_related": _related,
+        }
+        handler = handlers.get(name)
         if handler is None:
             return _err(msg_id, -32602, f"unknown tool {name!r}")
         try:
@@ -310,16 +346,26 @@ def _err(msg_id, code: int, message: str) -> dict:
     return {"jsonrpc": "2.0", "id": msg_id, "error": {"code": code, "message": message}}
 
 
-def serve(stdin=None, stdout=None, root: Path | None = None) -> int:
+def serve(stdin=None, stdout=None, root: Path | None = None, *, enabled: bool = True) -> int:
     """Read newline-delimited JSON-RPC from stdin until EOF.
 
     `stdin`/`stdout` are injectable so the loop is testable without a
     subprocess — the protocol is the thing worth testing, and a pipe adds
     nothing but flakiness.
+
+    `[mcp] top` is resolved ONCE here, at start-up (ADR-OUTPUT decision 17),
+    and threaded into every message handled on this connection — never
+    re-read per search. `enabled=False` is `--no-output-config`: `.fux/
+    output.toml` is not read at all and `top` resolves to `BUILT_IN['top']`.
     """
     stdin = stdin or sys.stdin
     stdout = stdout or sys.stdout
     root = root or _root()
+
+    from .output_config import DEFAULT_OUTPUT, load as load_output
+
+    cfg = load_output(root, enabled=enabled) if enabled else DEFAULT_OUTPUT
+    top = int(cfg.resolve_mcp("top"))
 
     for line in stdin:
         line = line.strip()
@@ -331,7 +377,7 @@ def serve(stdin=None, stdout=None, root: Path | None = None) -> int:
             stdout.write(json.dumps(_err(None, -32700, "parse error")) + "\n")
             stdout.flush()
             continue
-        response = _handle(root, message)
+        response = _handle(root, message, top=top)
         if response is not None:
             stdout.write(json.dumps(response) + "\n")
             stdout.flush()
@@ -339,4 +385,5 @@ def serve(stdin=None, stdout=None, root: Path | None = None) -> int:
 
 
 def cmd_mcp(args) -> int:
-    return serve()
+    no_output_config = getattr(args, "no_output_config", False)
+    return serve(enabled=not no_output_config)

@@ -743,6 +743,32 @@ zero. See [ADR-FETCHER](0019_fetcher.md) decision 12.
 
 ### Consequences
 
+- 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is
+  absent, and that is a REGRESSION shipped knowingly on 2026-08-28.**
+  [ADR-OUTPUT](0047_output-defaults.md) decision 19 made the file the sole
+  source of truth, so this file's resolver now raises where it used to fall
+  back to `DEFAULT_OUTPUT`. **`.fux/output.toml` is write-if-missing
+  ([ADR-DOTFUX](0003_fux-directory.md) decision 6), so it reaches new repos
+  only — and every pre-existing repo therefore hard-fails on `ask`/`find`
+  with exit 1.** 49 tests fail on `main`; the `tests_e2e/` fixtures
+  hand-write `fux.toml` without running `fux setup`, which is the shape of a
+  real consumer repo. **Merged on Arpit's explicit instruction with the
+  breakage named**; the fork (fall back on a missing file, or give existing
+  repos a migration path) is the first item in
+  [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md).
+- **`--no-output-config` now bypasses the file rather than reading it.** It
+  sets `root = None` and resolves against `DEFAULT_OUTPUT`, so the flag is a
+  true escape hatch: it cannot fail on a file it never opens. **That is the
+  only supported way to run a repo that has no `output.toml`** until the fork
+  above is ruled.
+- **`json` is resolved in its own pass, before every other key.** It selects
+  which chain the rest walk — `[cli.json.<verb>]` is reachable only once JSON
+  rendering is on — so resolving it alongside them would make that table
+  reachable by flag and unreachable by file, which is the case it exists for.
+- **`mcp` is not a `CLI_VERBS` entry**, and the guard is `keys is None`, not
+  `not keys`: `explain`, `doctor`, `hooks` and `daemon` legitimately declare an
+  empty key tuple and still resolve `--json`. Only an absent entry means *this
+  verb is not shaped by that file*.
 - **Adding a verb costs a record.** A group row, a decision, and a line in the
   §1 table — paid in the same change, which is what the rule is for.
 - **The `--json` shape is a contract, in three shapes, and they do not

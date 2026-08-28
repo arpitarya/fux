@@ -4,8 +4,8 @@ name: ADR-OUTPUT
 title: ADR-OUTPUT (0047) — output defaults are configurable, in a third file
 description: "`.fux/output.toml` sets the default SHAPE of every verb's output — and of the MCP surface, which has no flags at all. A third file because it has a third boundary: it changes how a result is shown, never which documents come back."
 status: accepted
-built: 2026-08-27
-amended: 2026-08-27
+built: 2026-08-28
+amended: 2026-08-28
 date: 2026-08-27
 ratified: 2026-08-27
 feature: configurable output defaults
@@ -24,8 +24,11 @@ timestamp: 2026-08-27T00:00:00Z
 wants a different shape retypes the same flags on every invocation — **and an
 MCP client cannot retype anything, because a tool call has no flags.**
 
-This record adds **`.fux/output.toml`**: committed, optional, and read only at
-the moment a result is printed.
+This record adds **`.fux/output.toml`**: committed, and read only at the
+moment a result is printed. ⚠ **Not "optional" since 2026-08-28** — the file
+may be bypassed (`--no-output-config`, or no repo root), but once it is in
+effect it is the *sole* source of every key a verb resolves, and a key it
+does not set is a hard error, not a silent fallback. See decision 19.
 
 **Why a third file and not a table in `.fux/tune.toml`.** Because the boundary
 is different, and the difference is mechanical rather than aesthetic:
@@ -290,6 +293,66 @@ null
     rather than wired, because **both of those change WHICH nodes come back** —
     truncating a walk is a ranking change, which this file may not make.
 
+19. ⚠ **THE FILE IS THE SOLE SOURCE OF TRUTH. Ruled by Arpit, in Cowork,
+    2026-08-28.** Two changes landed together, because the second only makes
+    sense once the first is true.
+
+    **First: decision 3's three-root design is now actually BUILT.** The
+    frontmatter's `built: 2026-08-27` was written the day the decision was
+    ratified, not the day the code caught up — the module, `cli.py` and
+    `mcp.py` still carried the ORIGINAL one-root `[defaults]`/`[<verb>]`
+    layout, with a fully-commented specimen, for a full day. `built` above is
+    now the day the drift closed. Nothing about decision 3's shape changed
+    from this; the closed key sets are named `CLI_VERBS` (the `[cli]` /
+    `[cli.json]` side, per verb) and `MCP_KEYS` (the `[mcp]` side) rather than
+    a single `SCHEMA` dict keyed by root, since the two sides are validated by
+    different code with different inheritance rules and a shared dict implied
+    a symmetry that decision 3 explicitly refuses (`[mcp]` inherits nothing).
+
+    **Second: an unset key is now a hard error, not a silent `BUILT_IN`
+    fallback.** Every earlier draft of this record let a key the file did not
+    set fall through quietly — *"the file is optional, absent means every
+    default"*. That is gone. If `.fux/output.toml` is in effect (no
+    `--no-output-config`, and a repo root exists) and a verb resolves a key
+    the file does not set, `resolve()` / `resolve_json()` / `resolve_mcp()`
+    raise `FuxError` naming the key and where to add it
+    (`[cli.<verb>] top = 5`, or `[cli.json]`, or `[mcp]`), rather than
+    returning a number nobody chose and nobody can see in a diff. `load()`
+    itself now raises the same way when the file is missing entirely, naming
+    `fux setup` / `fux output > .fux/output.toml` as the fix.
+
+    **`BUILT_IN` is not gone — its job narrowed to three things**: the values
+    `fux setup` / `fux output` write into a fresh, LIVE (uncommented)
+    specimen (decision 14's shape, now load-bearing rather than cosmetic —
+    an all-commented specimen would break every verb on the first run after
+    `fux setup`, since a freshly-written file that sets nothing is
+    indistinguishable from one that predates every key); what
+    `--no-output-config` resolves to; and what a run outside any fux repo
+    resolves to, so `--help` / `--version` are never broken by a file that
+    cannot exist yet. `DEFAULT_OUTPUT` (`bypass=True`) is the one
+    `OutputDefaults` that never raises, by construction.
+
+    ⚠ **The bootstrap edge case this closes a gap on, found while building
+    it: `--no-output-config` was only wired to `ask` / `find` / `answer` /
+    `mcp`.** `doctor`, `hooks`, `daemon`, `explain`, `graph` and `path` all
+    resolve at least `json` through `CLI_VERBS` (several with an empty
+    per-verb key tuple, which still walks the `json` pass), so every one of
+    them was a `FuxError` waiting for a repo whose `.fux/output.toml` predates
+    a key this version needs — with **no flag on the command line to bisect
+    it**, on `doctor` in particular, the verb you would run to diagnose
+    exactly that. Decision 15 already named this requirement (*"every verb
+    that reads the file, `fux mcp` included"*) and was not fully carried out
+    on the first build; `_add_output_flags` now runs on all six, closing it.
+    `test_every_verb_that_reads_the_file_can_bisect_it` asserts it
+    structurally so a seventh verb added later cannot repeat the gap.
+
+    **Why an error over the alternative this record's own §2 Context once
+    named** (a silent `fux doctor` warning, ADR-DOTFUX decision 6's usual
+    remedy): a rendering default silently drifting from what the repo's own
+    committed file states is worse than a verb that refuses to guess. A repo
+    that has run `fux setup` (or copied a current `fux output`) never sees
+    this at all — every key is live from the day the file is written.
+
 ⚠ **No output default changed on 2026-08-28.** `fux doctor` gained a `url daemon`
 row and `fux update` gained `--all`; both print through the existing surfaces and
 neither adds a gated flag or a `[verb]` key. Recorded because this record
@@ -358,14 +421,27 @@ catchable by the tests that existed when they were written.**
 ### Reference (required)
 
 - [`src/fux/output_config.py`](../../src/fux/output_config.py) — the loader,
-  the closed schema, the precedence chain, the refusals.
-- [`tests/test_output_config.py`](../../tests/test_output_config.py) — 56
+  the closed key sets (`CLI_VERBS`, `MCP_KEYS`), the precedence chain, the
+  refusals, and the no-fallback resolution decision 19 added.
+- [`tests/test_output_config.py`](../../tests/test_output_config.py) — 74
   tests, including the L3 import fence, the `bool`-before-`int` trap, the
-  `[mcp]`-row guard, the no-monkeypatch CLI seam, and the structural
-  `default=None` assertion over every gated flag.
-- **Measured, 2026-08-27:** the whole staged suite is **613 passed / 0 failed**
-  against a **604-passed baseline** taken before any of this landed — so the
-  nine added tests are the entire delta and nothing regressed.
+  `[mcp]`-row guard, the no-monkeypatch CLI seam, the structural
+  `default=None` assertion over every gated flag, and (decision 19) the
+  loader-refusal contract and the structural `--no-output-config`-on-every-verb
+  assertion.
+- ⚠ **Measured, 2026-08-28, against a local mirror — the CLI seam's own
+  `device_bash` was unavailable this session, so this is not the repo's own
+  test run.** `tests/test_output_config.py`, `tests/test_cli.py`,
+  `tests/test_mcp.py` and `tests/test_setup.py` together: **129 passed / 0
+  failed**. The wider governance subset (everything under `tests/` except
+  `test_quality_controls.py`, which imports a `placebo` module this mirror
+  never staged): **624 passed / 3 skipped / 5 failed**, and all five failures
+  are pre-existing and unrelated — missing-document assertions
+  (`test_adr_ownership.py`, `test_doc_links.py`, `test_doc_registry.py`,
+  `test_setup_docs.py`) against docs this mirror never staged, not this
+  record's subject. **Re-run `pytest -q tests` on the real repo before
+  treating this as landed** — this note names what verified it and what did
+  not.
 - [ADR-TUNE](0038_tuning.md) — the precedent this follows in structure
   (committed, optional, closed key set, no writer, an `enabled=False` escape
   hatch) and departs from in **boundary**.
@@ -381,10 +457,10 @@ catchable by the tests that existed when they were written.**
 
 **Check these, do not wait for them.**
 
-1. **A key in `SCHEMA` changes which documents come back, or their order.**
-   Decision 2 is then false and this file has become a second `tune.toml`.
-   `top` is the known boundary case and is exempt **only** because it
-   truncates without reordering.
+1. **A key in `CLI_VERBS` or `MCP_KEYS` changes which documents come back, or
+   their order.** Decision 2 is then false and this file has become a second
+   `tune.toml`. `top` is the known boundary case and is exempt **only**
+   because it truncates without reordering.
 2. **Anything under `ingest/`, `derive/`, `maintain/` or `store/` imports
    `output_config`.** L3 is then reachable from a rendering preference.
 3. **`MCP_KEYS` is empty, or `[mcp]` gains inheritance from `[cli]`.** The
@@ -397,6 +473,15 @@ catchable by the tests that existed when they were written.**
    can see it.
 5. **`BUILT_IN` and a `cli.py` `default=` disagree.** Decision 6's single
    source has been forked.
+6. **A verb resolves a key `.fux/output.toml` does not set and gets a value
+   back instead of `FuxError`, while the file is in effect** (no
+   `--no-output-config`, a repo root exists). Decision 19 is then false and
+   the old silent-fallback behaviour has returned.
+7. **A verb that resolves a key through `CLI_VERBS` (or `mcp`, through
+   `[mcp]`) has no `--no-output-config` on its parser.** That verb cannot be
+   bisected from the file that might be why it fails, and if the file is
+   incomplete it cannot be RUN at all — decision 19's bootstrap gap,
+   reopened.
 
 ## References
 

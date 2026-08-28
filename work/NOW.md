@@ -1,1 +1,1 @@
-✓ recall@k computed · OPEN-WORK cleaned to 205 lines · 2 commits on work/2026-08-28-quality-contract (unmerged) · → merge, or recall on a clean corpus
+🔴 main is RED: 49 tests — .fux/output.toml missing = hard error in every pre-existing repo (ADR-OUTPUT d19 vs ADR-DOTFUX d6) · → rule the fork

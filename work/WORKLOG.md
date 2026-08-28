@@ -24,6 +24,96 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — Merged to main RED, on instruction, with the regression named  ·  Claude Code
+
+- **Asked:** *"commit everything and merge everything to main"*, repeated after
+  the regression below was surfaced in full.
+
+- **Did:** committed the concurrent session's uncommitted ADR-OUTPUT work and
+  merged everything to `main`. **`main` now fails 49 tests.**
+
+- 🔴 **The regression, stated plainly because a commit that hides it is worse
+  than the bug:** [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) decision 19
+  makes `.fux/output.toml` the sole source of truth and a missing file a **hard
+  error**; the file is **write-if-missing** (ADR-DOTFUX decision 6) so it
+  reaches **new repos only**. ⇒ **every pre-existing repo hard-fails on
+  `fux ask` / `fux find` after upgrading** — exit 1, not degraded.
+  The 49 failures are `tests_e2e/` fixtures that hand-write `fux.toml` without
+  running `fux setup` — **the shape of a real consumer repo**, so the suite is
+  reproducing the bug rather than being pedantic.
+
+- **Decided / open:**
+  - **I did not fix it, and that was deliberate.** Decision 19 is the other
+    session's explicit design choice — *"a key it does not set is a hard error,
+    not a silent fallback"* — and reversing it is a ruling, not a patch.
+  - **Filed as the first item in OPEN-WORK** with both options costed, so it
+    cannot be discovered later as a mystery.
+  - **Not pushed.** `main` is local, so `git reset --hard 7743649` restores the
+    last green state; my own 2026-08-28 work is inside that green range.
+  - ⚠ **The other session's marker said the next step was "run the suite on the
+    real repo to confirm it is clean."** It was run. It is not clean. That
+    verification is what produced this entry.
+
+- **Next:** rule the fork — fall back to engine defaults on a missing file, or
+  keep decision 19 and give existing repos a migration path.
+
+## 2026-08-28 — ADR-OUTPUT: three-root migration built, file made the sole source of truth  ·  Cowork
+- **Asked:** *"remove those defaults and use output toml for the defaults — if a
+  value is defined in output.toml use that, if not defined then define it and then
+  use it."* Clarified via two rounds of questions: (1) an unset key should be a
+  hard `FuxError` naming the fix, never a silent write or a silent `BUILT_IN`
+  fallback; (2) ADR-OUTPUT's prose already described a three-root
+  `[cli]`/`[cli.json]`/`[mcp]` redesign (`amended`/`built: 2026-08-27`) that the
+  code had never actually caught up to — build that first, then layer the new
+  rule on top.
+- **Did:** rewrote `src/fux/output_config.py` for the three-root design
+  (`CLI_VERBS`/`MCP_KEYS` replacing the one-root `SCHEMA`, `json`→`enabled`
+  resolved in its own first pass, `[mcp]` inheriting nothing, legacy-layout
+  detection) and layered decision 19 on top — `load()`/`resolve()`/
+  `resolve_json()`/`resolve_mcp()` now raise `FuxError` (naming the fix) for any
+  key a repo's `.fux/output.toml` is in effect but does not set, rather than
+  falling back to `BUILT_IN`; `BUILT_IN`'s job narrows to the specimen seed, the
+  `--no-output-config`/no-repo bypass target, and CLI help text. Updated
+  `cli.py` (`_apply_output_defaults`'s two-pass resolution) and `mcp.py`
+  (`[mcp]` loaded once at `serve()` start, `tools/list` advertising the
+  resolved `top`, closing the W-83-class defect ADR-OUTPUT decision 16 names).
+  **Found and fixed a real bootstrap gap while building it:** `doctor`,
+  `hooks`, `daemon`, `explain`, `graph` and `path` had no `--no-output-config`
+  flag at all — decision 15 already required it on every verb that reads the
+  file, `doctor` most of all, since it is the verb you would run to diagnose an
+  incomplete file and it was exactly the one a missing flag left unbisectable.
+  Added `_add_output_flags` to all six and a structural test
+  (`test_every_verb_that_reads_the_file_can_bisect_it`) so a seventh verb
+  cannot reopen it. Rewrote `tests/test_output_config.py` (74 tests) and
+  updated `tests/test_mcp.py`'s `repo` fixture (now writes a live specimen,
+  since `serve()` hard-errors on a missing file) and its `SCHEMA` reference
+  (renamed `MCP_KEYS`). Amended ADR-OUTPUT (decision 19, `built`/`amended`
+  moved to 2026-08-28 — the frontmatter had claimed "built" a day before the
+  code actually was) and `docs/adr/README.md`'s ownership row plus a new
+  `mcp.py` describes-row.
+- **Decided / open:** the three no-fallback options were put to Arpit directly
+  (error / auto-write / silent BUILT_IN); he chose error, with the file as sole
+  source of truth. Open: none for this change — `fux setup`/`fux output`
+  already write every key live, so a repo that has run setup never sees the new
+  error.
+- **Verified:** `device_bash` was wedged all session (confirmed dead after 7
+  consecutive failures) — verification ran against a local mirror
+  (`/tmp/fux-work`, `pip install -e`) rather than the real repo. 129 passed / 0
+  failed on `test_output_config.py` + `test_cli.py` + `test_mcp.py` +
+  `test_setup.py`; 624 passed / 3 skipped / 5 failed on the wider governance
+  subset (`tests/` minus `test_quality_controls.py`, which needs an unstaged
+  `placebo` module) — all five failures pre-existing and unrelated (missing
+  docs this mirror never staged: `test_adr_ownership.py`,
+  `test_doc_links.py`, `test_doc_registry.py`, `test_setup_docs.py`).
+  **This is logic verification only, not the repo's own gate run** — the full
+  suite (`decode`/`derive`/`graph`/`ingest`/`maintain`/`query`/`refer`/`store`
+  subtrees, `test_adr_freshness.py`, which needs real git history) was never
+  staged into the mirror. **Re-run `pytest -q tests` on the real repo before
+  treating this as landed.**
+- **Next:** a device-side (or next Claude Code) session should run the real
+  suite end to end and, if it's clean, this can be considered closed. No open
+  work item filed — the change is complete and self-contained, not a handoff.
+
 ## 2026-08-28 — W-93 executed: the benchmark ran, and the ruler was the thing that broke  ·  Claude Code
 
 **Asked:** *"run w-93"* — the version benchmark of `fux-engine 1.0.0` against

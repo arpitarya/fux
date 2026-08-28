@@ -183,32 +183,47 @@ def _apply_output_defaults(args) -> None:
     and nothing else. `None` on the way in means *the flag was not passed*;
     nothing downstream ever sees a `None`.
 
+    **Two passes, `json` first.** `json` (spelled `enabled` in the file)
+    selects which chain every other key walks — `[cli.json.<verb>]` is only
+    reachable once JSON rendering is already on — so it is resolved on its
+    own before the loop below touches anything else.
+
+    **`mcp` is not a `CLI_VERBS` verb at all** — its own root (`[mcp]`) has no
+    CLI flags to gate, and is resolved once inside `cmd_mcp`/`serve()`
+    instead. `keys is None` (not `not keys`) is the guard: `explain`,
+    `doctor`, `hooks` and `daemon` legitimately declare an EMPTY key tuple —
+    they still have `--json` to resolve — and only an absent entry means
+    *this verb is not shaped by this file*.
+
     **Never raises for a missing repo.** `--help`, `--version` and a run from
-    outside a fux repo must not be broken by a config file that may not exist;
-    a malformed `output.toml` still raises, because that is a real error the
-    consumer wants to hear about.
+    outside a fux repo must not be broken by a config file that may not
+    exist. Since 2026-08-28 (Arpit) the file, once in effect, is the sole
+    source of truth for every key it is asked for — a malformed file, or one
+    that simply never set a key this verb needs, both raise, with the fix
+    named in the message. `--no-output-config` (or no repo root) bypasses
+    the file entirely rather than reading it and finding it wanting.
     """
-    from .output_config import SCHEMA, load as load_output
+    from .output_config import CLI_VERBS, load as load_output, DEFAULT_OUTPUT
 
     verb = getattr(args, "command", None)
-    keys = SCHEMA.get(verb)
-    if not keys:
+    keys = CLI_VERBS.get(verb)
+    if keys is None:
         return
 
     from .config import find_root
 
-    root = find_root()
-    if root is None:
-        # No repo: fall back to the built-ins by resolving against an empty
-        # config rather than skipping — so the two paths cannot diverge.
-        from .output_config import DEFAULT_OUTPUT as cfg
-    else:
-        cfg = load_output(root, enabled=not getattr(args, "no_output_config", False))
+    no_output_config = getattr(args, "no_output_config", False)
+    root = None if no_output_config else find_root()
+    cfg = DEFAULT_OUTPUT if root is None else load_output(root, enabled=True)
+
+    if hasattr(args, "json"):
+        args.json = cfg.resolve_json(verb, args.json)
+    as_json = bool(getattr(args, "json", False))
 
     for key in keys:
         if not hasattr(args, key):
             continue
-        setattr(args, key, cfg.resolve(verb, key, getattr(args, key)))
+        setattr(args, key, cfg.resolve(verb, key, getattr(args, key), as_json=as_json))
 
 
 def _add_tune_flag(parser: argparse.ArgumentParser) -> None:
@@ -284,6 +299,7 @@ def build_parser() -> argparse.ArgumentParser:
     # 2026-08-22). Promotion to a `fux status` verb has a written condition in
     # ADR-CLI; it is not a matter of feeling crowded.
     p_doctor.add_argument("--json", action="store_true", default=None, help="machine-readable report")
+    _add_output_flags(p_doctor)
     p_doctor.set_defaults(func=_cmd_doctor)
 
     p_ingest = sub.add_parser("ingest", help="walk configured sources into the committed index")
@@ -486,6 +502,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_mcp = sub.add_parser(
         "mcp", help="serve the index over MCP on stdio, for coding agents"
     )
+    # ADR-OUTPUT decision 15: on EVERY verb that reads .fux/output.toml,
+    # `mcp` included — read directly in `cmd_mcp` rather than folded into
+    # `_apply_output_defaults`, because `mcp` carries no `CLI_VERBS` keys of
+    # its own (its only knob, `[mcp] top`, is not a CLI flag at all).
+    p_mcp.add_argument(
+        "--no-output-config",
+        action="store_true",
+        help="ignore .fux/output.toml and use the engine defaults",
+    )
     p_mcp.set_defaults(func=_cmd_mcp)
 
     p_hooks = sub.add_parser("hooks", help="install the git hooks and the index merge driver")
@@ -493,6 +518,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_hooks.add_argument("--status", action="store_true", help="report what is wired")
     p_hooks.add_argument("--uninstall", action="store_true", help="remove only what fux wrote")
     p_hooks.add_argument("--json", action="store_true", default=None, help="machine-readable status")
+    _add_output_flags(p_hooks)
     p_hooks.set_defaults(func=_cmd_hooks)
 
     # W-82 ruling 10 (Arpit, 2026-08-27). A verb, like `mcp`, for the same
@@ -516,6 +542,7 @@ def build_parser() -> argparse.ArgumentParser:
     # flag that runs the loop in the foreground would invite someone to wire it
     # into a supervisor, which is the global install this verb exists to avoid.
     p_daemon.add_argument("--serve", action="store_true", help=argparse.SUPPRESS)
+    _add_output_flags(p_daemon)
     p_daemon.set_defaults(func=_cmd_daemon)
 
     # The graph group. Flat, like every other verb — `fux graph path` would be
@@ -524,6 +551,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_explain = sub.add_parser("explain", help="one document's outbound edges and its community")
     p_explain.add_argument("doc", help="a doc id or the loc `find` printed")
     p_explain.add_argument("--json", action="store_true", default=None, help="machine-readable output")
+    _add_output_flags(p_explain)
     p_explain.set_defaults(func=_cmd_explain)
 
     p_graph = sub.add_parser("graph", help="the neighbourhood around a query's best answers")
@@ -541,6 +569,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="force the reference scan path for the seeds (the default)",
     )
     _add_tune_flag(p_graph)
+    _add_output_flags(p_graph)
     p_graph.set_defaults(func=_cmd_graph)
 
     p_path = sub.add_parser("path", help="how two documents are connected, most reliable route first")
@@ -549,6 +578,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_path.add_argument("--hops", type=int, default=None, metavar="N", help=_hops_help())
     p_path.add_argument("--json", action="store_true", default=None, help="machine-readable output")
     _add_tune_flag(p_path)
+    _add_output_flags(p_path)
     p_path.set_defaults(func=_cmd_path)
 
     # A flat verb with no arguments at all: it neither reads the repo nor

@@ -9,6 +9,48 @@ The two run **concurrently**; never order one against the other.
 
 ---
 
+## 🔴 SHIPPED RED — `main` currently fails 49 tests
+
+- 🔴 **`fux ask` / `fux find` HARD-FAIL in every repo without
+  `.fux/output.toml`.** `arpit` · **This is on `main` as of 2026-08-28**,
+  merged on Arpit's explicit instruction with the regression known and named —
+  recorded here rather than discovered later.
+
+  ```console
+  $ fux find "oncall rota"
+  error: .fux/output.toml is missing — run `fux setup` to create it
+  exit=1
+  ```
+
+  **The chain, and every link is already a recorded decision:**
+  1. [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) **decision 19** makes
+     the file *the sole source of truth*, and a missing file — or a key it does
+     not set — **a hard error, not a silent fallback.**
+  2. `.fux/output.toml` is **write-if-missing**
+     ([ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decision 6), so it
+     reaches **new repos only**.
+  3. ⇒ **Every repo created before this change hard-fails on every query after
+     upgrading.** Not degraded — exit 1.
+
+  🔴 **This is ADR-DOTFUX decision 6's hazard at its worst.** The same shape as
+  `validate()`'s 0-of-7 (below), except `validate()` silently forfeits an
+  optimisation and **this stops the product working.** Decision 6's own named
+  remedy — *a loader refusal or a `doctor` check, never a rewrite* — is what is
+  missing here: there is a refusal and no path to satisfy it.
+
+  ⚠ **49 tests fail on `main`.** The `tests_e2e/` fixtures hand-write
+  `fux.toml` without running `fux setup`, which is **exactly the shape of a real
+  consumer repo** — the suite is not being pedantic, it is reproducing the bug.
+
+  **The fork, and it is not an agent's to take:** ① a missing file falls back to
+  engine defaults, keeping the hard error only for a file that *exists* and is
+  incomplete — decision 19's own wording (*"once it is in effect"*) arguably
+  already means this; or ② decision 19 stands and `fux setup` gains a migration
+  path that reaches existing repos, which decision 6 forbids doing by rewrite.
+  `filed: 2026-08-28`
+
+---
+
 ## Measurement plumbing
 
 - **The lab and playground harnesses emit totals only.** `fux-benchmark`'s
