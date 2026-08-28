@@ -25,7 +25,7 @@ ctx                     = 1.0
 archived_weight         = 1.0   # multiplier for a source declared archived
 superseded_weight       = 1.0   # multiplier for a document another supersedes
 recency_half_life_days  = 0.0   # 0 = off; decays on the committed `mtime`
-rerank_weight           = 0.0   # 0 = off; the proximity reranker's uplift
+rerank_weight           = 0.3   # 0 = off; the proximity reranker's uplift
 
 [graph]                         # explain / graph / path
 damping      = 0.85
