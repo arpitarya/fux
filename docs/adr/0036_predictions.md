@@ -435,8 +435,8 @@ one (W-82 ruling 8).
   freezing the document rather than against it.
 
 
-**19. The ±2-query resolution floor is measured, and it was far too loose — ⚠
-NOT YET ADOPTED.** Computed 2026-08-28,
+**19. The ±2-query resolution floor is measured, it was far too loose, and it
+is ADOPTED (Arpit, 2026-08-28).** Computed 2026-08-28,
 [the run](../../work/regression/2026-08-28-resolution-floor/report.md).
 
 Two arms graded on the **same** queries is a **paired** comparison: queries both
@@ -446,10 +446,19 @@ no corpus in it to have been contaminated by.**
 
 | queries that flipped | net difference needed at α = 0.05 |
 |---:|---:|
-| 2 · 4 | **impossible** |
-| 6 – 12 | **8** |
+| 2 · 4 | **impossible** — no split clears α |
+| 6 | **6** (a total sweep) |
+| 8 – 12 | **8** |
+| 15 | **9** |
 | 20 | **10** |
+| 30 | **12** |
 | 50 | **16** |
+
+**A net of 6 is the floor of all floors.** ⚠ **Nets of 1, 2, 3, 4 and 5 cannot
+clear α at ANY discordant count** — verified by exhausting every split up to
+`n = 50`. Their best achievable p-values are `1.00`, `0.50`, `0.25`, `0.125`
+and `0.0625`. That single sentence decides more filed claims than the table
+does, because it needs no discordant count to apply.
 
 🔴 **At a net of 2 — the current bar — the p-value is never below 0.68.** The
 placeholder does not under-protect slightly; **it admits results that are
@@ -459,13 +468,28 @@ indistinguishable from a coin flip.**
 set"* implies the bar tracks the set size; **it tracks the flips.** Replacing
 `2` with `8` would be a better wrong answer.
 
-- **The cheapest fix is a reporting change, not a threshold change: a run must
-  report its DISCORDANT COUNT.** No run this project has filed does, so **no
-  paired result on record can be tested from what was filed.**
-- ⚠ **Named, and re-judged by nothing:** the reranker's `28 → 32` is a net of
-  **4** and clears α only if exactly 4 flipped and all 4 went one way; W-78's
-  enrichment deltas are in the same position. **Nothing supersedes a measurement
-  except a better measurement**, so this changes no verdict.
+- 🔴 **Arpit went further than the reporting fix this run proposed.** The run
+  asked for the **discordant count**; the ruling is *"record all the questions
+  so we can check in detail"* — **per-query results, one row per query per arm,
+  filed under `evidence/`.** It is strictly stronger and strictly cheaper to
+  comply with: `b`, `c`, the discordant count and every later test are all
+  derivable from per-query rows, and from nothing else. `CLAUDE.md`
+  §Conformance runs carries it as a numbered obligation.
+- ⚠ **CORRECTION, 2026-08-28 — this record and the run's `ANALYSIS.md` both
+  stated the reranker case wrongly, in the GENEROUS direction.** Both said the
+  `28 → 32` net of **4** *"clears α only if exactly 4 flipped and all 4 went one
+  way."* **Four flips all one way gives p = 0.125.** It does not clear.
+  **A net of 4 cannot clear α at any discordant count**, so the claim is settled
+  by arithmetic and does not depend on the missing count at all. The run's own
+  [`evidence/table.txt`](../../work/regression/2026-08-28-resolution-floor/evidence/table.txt)
+  already said so; the prose disagreed with the evidence beside it.
+- ⚠ **Named and marked, re-judged by nothing** (Arpit's call, 2026-08-28): the
+  reranker's `28 → 32` (net 4) and W-78's enrichment deltas were filed under a
+  bar since shown to admit chance, **and their claims of improvement are not
+  supported by what was filed.** **Nothing supersedes a measurement except a
+  better measurement** — so no verdict is reversed here, and none of them can be
+  re-run either: W-78's corpora went in the 2026-08-20 lab wipe with their
+  generator.
 - **The losses are one-sided.** A *"no detected change"* ruling made under a
   loose bar stays true under a stricter one; the exposure is entirely on the
   claims of **improvement**.
@@ -474,8 +498,11 @@ set"* implies the bar tracks the set size; **it tracks the flips.** Replacing
   unlikely to be chance and says nothing about 10 000 documents; `CLAUDE.md`
   §Litmus governs that separately.
 
-**NOT ADOPTED**: replacing the floor changes how filed results read, which is
-Arpit's call.
+**ADOPTED 2026-08-28 by Arpit**, with the per-query recording requirement added
+on top. ⚠ **The cost was accepted with open eyes: it changes how filed results
+read.** The losses are one-sided — a *"no detected change"* ruling made under a
+loose bar stays true under a stricter one, so the exposure is entirely on the
+claims of **improvement**, and those are the ones now marked.
 
 ### Consequences
 

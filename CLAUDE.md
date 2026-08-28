@@ -667,8 +667,23 @@ queries, the judgments, prior per-query scores, or any derived report of them
   claims a bounded magnitude a leak does not have); label it **"not a
   generalisation estimate."**
 - **A delta below the set's resolution is "no detected change"**, whoever
-  authored it. Provisionally — and this is a placeholder for a measurement, not
-  a measurement — **nothing under ±2 queries (4 pp) on a 50-query set counts.**
+  authored it. ⚠ **The floor is no longer a placeholder — it is MEASURED, and
+  the old one was far too loose** (Arpit, 2026-08-28). Two arms graded on the
+  same queries is a **paired** comparison, so only the queries that **flip**
+  carry information: **the bar tracks the discordant count, never the set
+  size.** **A net of 6 is the floor of all floors — a net of 1, 2, 3, 4 or 5
+  cannot clear α = 0.05 at any discordant count** — and it rises from there
+  (20 flips → net 10; 50 flips → net 16). The old *"±2 on 50"* admitted results
+  whose best possible p-value is **0.50**. Table, script and the α discussion:
+  [ADR-RS](docs/adr/0036_predictions.md) decision 19.
+- 🔴 **Every measured run records its PER-QUERY RESULTS under `evidence/`** —
+  one row per query per arm, pass/fail. **Ruled by Arpit 2026-08-28:** *"record
+  all the questions so we can check in detail."* ⚠ **A summary count is not
+  enough and never was.** The discordant count, `b`, `c`, and every test anyone
+  runs later are derivable from per-query rows **and from nothing else** — so a
+  run that files only totals cannot be re-tested by anybody, including its own
+  author. **No run filed before 2026-08-28 has them**, which is why none of the
+  paired results on record can be checked from what was filed.
 - **Do not edit a frozen report to classify it.** The rule is baselined at
   2026-08-25 on the run directory's own date, and
   `tests/test_regression_runs.py` checks it from there.

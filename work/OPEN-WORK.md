@@ -11,24 +11,6 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit — decisions
 
-- 🔴 **Adopt the measured resolution floor?** `CLAUDE.md` §Conformance runs calls
-  ±2 queries a placeholder; it is worse than provisional. A paired exact test
-  needs a net of **6–16** depending on how many queries flipped, and **at net 2
-  the p-value is never below 0.68** —
-  [the run](regression/2026-08-28-resolution-floor/report.md),
-  [ADR-RS](../docs/adr/0036_predictions.md) decision 19.
-  ⚠ **It is the wrong SHAPE, not just the wrong number**: the bar tracks the
-  **flips**, not the set size, so replacing `2` with `8` would be a better wrong
-  answer.
-  ⚠ **Two filed uplifts sit under the real bar** — the reranker's `28 → 32` and
-  W-78's enrichment deltas — **named and re-judged by nothing.** The losses are
-  one-sided: a *"no detected change"* under a loose bar stays true under a strict
-  one, so the exposure is entirely on claims of **improvement**.
-  **Adopting it changes how filed results read, which is why it is yours.**
-  ⚠ **The cheaper half needs no ruling and is not done: a run should state its
-  DISCORDANT COUNT, and no filed run does** — so no paired result on record can
-  be tested from what was filed.
-
 - **Ratify `is_rate_limited(exc)`, or replace it.** W-82 ruling 12's detection
   mechanism was **put to you and left unanswered**, so an agent took the
   recommended shape: the fetcher declares it, and **fux never parses a status
@@ -38,6 +20,22 @@ The two run **concurrently**; never order one against the other.
   ([run](regression/2026-08-27-daemon-real-url/report.md)), which is exactly why
   it needs saying out loud: **a shape nobody ratified is now load-bearing.**
   Same class as `L8` was. — [ADR-FETCHER](../docs/adr/0019_fetcher.md)
+
+---
+
+## Agent work the resolution-floor ruling creates
+
+- **Per-query results are mandatory and nothing emits them.** `CLAUDE.md`
+  §Conformance runs now requires one row per query per arm under `evidence/`
+  (Arpit, 2026-08-28). ⚠ **No harness produces that file today**, so the rule is
+  currently enforced by whoever remembers it. A `tests/test_regression_runs.py`
+  check is owed, baselined at 2026-08-28 the way the `classification:` rule was
+  baselined at 2026-08-25.
+- ⚠ **The `+9` contaminated enrichment delta is the one marked claim that is
+  large enough to be testable** — net 9, and the floor at any plausible
+  discordant count is 8–9. **Its discordant count was never filed**, so it sits
+  in the one bad state: big enough to matter, impossible to check, impossible to
+  re-run (the corpora went in the 2026-08-20 wipe).
 
 ---
 
