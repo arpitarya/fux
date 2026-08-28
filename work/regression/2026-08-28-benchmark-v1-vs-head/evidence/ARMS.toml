@@ -1,0 +1,62 @@
+# ARMS.toml — the frozen arm manifest for 2026-08-28-benchmark-v1-vs-head.
+# Every filed number carries the manifest it was produced under: an A-vs-B
+# number whose two arms differed in a floor or an enrichment is not a version
+# delta, and there is otherwise no way for a reader to tell.
+
+[corpus.t100]
+docs = 100
+sha256 = "90c4b08b1a2e8eee1e491eef9f98bb93fc288b4ce71fb2dc6569a68cc75f8c46"
+pairs = 240
+chains = 10
+decoys = 5
+unanswerable = 20
+
+[corpus.t1000]
+docs = 1000
+sha256 = "429dc63ae21d1a01b83fce0b8353a557e9a2624091e8d03d51c6ef1c5d12cf36"
+pairs = 240
+chains = 40
+decoys = 50
+unanswerable = 20
+
+[corpus.t10000]
+docs = 10000
+sha256 = "eb68cbb39045ab00505f3bd64a4540f4bf5e0056670fcc7bc31aa520dff0ec2a"
+pairs = 240
+chains = 40
+decoys = 500
+unanswerable = 20
+
+[corpus.t1000b]
+docs = 1000
+sha256 = "a025a729d7f602c242697bc18268fdcef31f5573811dfc1d1e1e58bce3053be7"
+pairs = 240
+chains = 40
+decoys = 50
+unanswerable = 20
+
+[arm.A]
+install = "pip install fux-engine==1.0.0"
+version = "fux 1.0.0"
+python = "Python 3.11.15"
+enrich = false
+separation_floor = "n/a — arm A emits no confidence block"
+doc_coverage_floor = "n/a"
+tune_toml = false
+archived_weight = 1.0  # the shipped default, both arms
+
+[arm.B]
+install = "pip install -e <clone at 75ade57>"
+version = "fux 2.0.0-alpha.2"
+python = "Python 3.11.15"
+enrich = false
+separation_floor = "engine default (shipped .fux/tune.toml absent)"
+doc_coverage_floor = "engine default"
+tune_toml = false
+archived_weight = 1.0  # the shipped default, both arms
+
+[arm.Btuned]
+install = "same venv as arm B"
+note = "POST-HOC, not a pre-registered arm. .fux/tune.toml = [ranking] superseded_weight = 0.5"
+tune_toml = true
+

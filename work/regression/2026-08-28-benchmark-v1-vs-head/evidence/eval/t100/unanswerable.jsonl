@@ -1,0 +1,20 @@
+{"kind": "absent-entity", "q": "zq00000w procedure"}
+{"kind": "compositional", "q": "which snapshot does the storage runbook volume rollout require"}
+{"kind": "absent-entity", "q": "zq00002w procedure"}
+{"kind": "compositional", "q": "which principal does the identity postmortem credential rollout require"}
+{"kind": "absent-entity", "q": "zq00004w procedure"}
+{"kind": "compositional", "q": "which container does the platform adr scheduler rollout require"}
+{"kind": "absent-entity", "q": "zq00006w procedure"}
+{"kind": "compositional", "q": "which firewall does the network guide peering rollout require"}
+{"kind": "absent-entity", "q": "zq00008w procedure"}
+{"kind": "compositional", "q": "which chargeback does the billing reference ledger rollout require"}
+{"kind": "absent-entity", "q": "zq00010w procedure"}
+{"kind": "compositional", "q": "which compaction does the storage runbook durability rollout require"}
+{"kind": "absent-entity", "q": "zq00012w procedure"}
+{"kind": "compositional", "q": "which federation does the identity postmortem scope rollout require"}
+{"kind": "absent-entity", "q": "zq00014w procedure"}
+{"kind": "compositional", "q": "which autoscaler does the platform adr namespace rollout require"}
+{"kind": "absent-entity", "q": "zq00016w procedure"}
+{"kind": "compositional", "q": "which ingress does the network guide firewall rollout require"}
+{"kind": "absent-entity", "q": "zq00018w procedure"}
+{"kind": "compositional", "q": "which chargeback does the billing reference ledger rollout require"}

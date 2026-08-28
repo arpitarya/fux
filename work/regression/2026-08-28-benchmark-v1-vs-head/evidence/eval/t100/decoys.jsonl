@@ -1,0 +1,5 @@
+{"decoy": "docs/storage/reference-00021.md", "q": "zx00001q procedure", "target": "docs/storage/adr-00001.md"}
+{"decoy": "docs/billing/runbook-00084.md", "q": "zx00012q procedure", "target": "docs/billing/guide-00014.md"}
+{"decoy": "docs/billing/guide-00039.md", "q": "zx00079q procedure", "target": "docs/billing/adr-00004.md"}
+{"decoy": "docs/identity/reference-00048.md", "q": "zx00153q procedure", "target": "docs/identity/adr-00003.md"}
+{"decoy": "docs/identity/reference-00073.md", "q": "zx00228q procedure", "target": "docs/identity/adr-00003.md"}

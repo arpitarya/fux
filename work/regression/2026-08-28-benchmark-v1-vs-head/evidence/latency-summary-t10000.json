@@ -1,0 +1,39 @@
+{
+ "A": {
+  "b5_n": 1200,
+  "b5_p50": 79.316,
+  "b5_p95": 85.561,
+  "b6_build_median": 612.4,
+  "b6_ingest_all": [
+   25680.5,
+   25637.6,
+   26273.7
+  ],
+  "b6_ingest_median": 25680.5
+ },
+ "B": {
+  "b5_n": 1200,
+  "b5_p50": 103.698,
+  "b5_p95": 112.633,
+  "b6_build_median": 1086.1,
+  "b6_ingest_all": [
+   25430.2,
+   26781.4,
+   38763.0
+  ],
+  "b6_ingest_median": 26781.4
+ },
+ "differential_law": {
+  "A": {
+   "checked": 240,
+   "examples": [],
+   "mismatches": 0
+  },
+  "B": {
+   "checked": 240,
+   "examples": [],
+   "mismatches": 0
+  }
+ },
+ "tier": "t10000"
+}

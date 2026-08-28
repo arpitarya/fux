@@ -21,6 +21,223 @@ Rules:
 
 ---
 
+## W-93 — the version benchmark ran, and it found a saturated ruler (2026-08-28)
+
+**Asked by Arpit:** *"create a benchmark of the version one of Fux and the
+latest version of Fux."* Executed end to end on the local macOS shell: harness
+built, corpus extended, both engines resident, all three tiers, latency
+included.
+
+**What landed**
+
+| thing | where |
+|---|---|
+| the harness, both engines resident | `~/my_programs/fux-benchmark` — [SETUP-BENCHMARK](setup/fux-benchmark.md), corrected to what was actually built |
+| generator `--bench` mode | `fux-lab/shared/generate/make_corpus.py` — supersession chains, unanswerables (two kinds), decoys, a `--selftest`; **the legacy path is byte-identical**, asserted |
+| the run, seven verdicts | [`2026-08-28-benchmark-v1-vs-head`](regression/2026-08-28-benchmark-v1-vs-head/report.md) |
+| per-query rows, and the gate for them | `evidence/rows/` (10 files) · `tests/test_regression_runs.py` |
+| the `HEAD` sha, frozen | [pre-registration](benchmark/PRE-REGISTRATION-V1-VS-HEAD.md) §1, committed **before** the first command ran |
+
+**The outcome — every pre-registered paired test returned a discordant count of
+ZERO.** B1 `INCONCLUSIVE` · **B2 `FAIL`** · B3/B5/B6 `PASS` · B7
+`INCONCLUSIVE` · **B9 `PASS`, run first**.
+
+🔴 **The primary endpoint was saturated before it ran.** `hit@5` came back
+**240/240 in both arms at every tier**, MRR@10 `1.0000`, rank-1 100 %. A marker
+with `df = 1` is already rank 1, so `pb` and `pc` are structurally zero. **The
+pre-registration's power table sized the set correctly and still could not
+detect anything** — it asked how many queries, never whether they were hard.
+That lesson belongs to every paired run this repo files after this one.
+
+🔴 **B2 failed its predicted PASS, and not for the predicted reason.** Both arms
+invert a superseded document over its successor **identically** (21/40 at tier
+1 000) because `superseded_weight` **ships at `1.0`** — `HEAD` parses
+`supersedes:`, builds the edge, resolves the flag, and multiplies by one.
+Post-hoc at `0.5`: **21/40 → 0/40**, 21 fixed, 0 broken, retrieval untouched.
+**The machinery works and is switched off.** Filed as W-94, Arpit's call.
+
+✅ **B3/B5/B6 are clean.** Committed bytes 1.002 × at 1 000 docs and 0.998 × at
+10 000 against a 1.25 × bar; the published wheel goes **7.11 MB → 259 KB**;
+`ask` p95 1.32 × and cold ingest 1.04 × against 1.5 × / 2.0 ×. **`HEAD` commits
+no `int8` vectors** — B3's one named check, read from a record. The differential
+law holds in both arms across all 240 queries.
+
+⚠ **Filed `informed`, by the pre-registration's own §3** — one session wrote the
+generator and read the scores. **No delta is stated from it**, and the
+post-hoc `superseded_weight` result carries no verdict. A `blind` run needs two
+sessions; that is W-96.
+
+⚠ **B4 and B8 never existed.** The item and the register both said *"thresholds
+B1–B9"*; the frozen document defines seven.
+
+## Wave 9 — option B: the rank contract and the relevance set split (2026-08-28)
+
+**Arpit ruled the schema fork this session surfaced.** The evidence was two
+mutually-blind annotators agreeing at **κ = 0.960** that 25 of 50 goldens have
+more than one genuinely relevant document, against one asserted for all 50.
+
+✅ **[ADR-QUALITY](../docs/adr/0044_quality-contract.md) decision 12.**
+`doc` + `max_rank` stays the **rank contract**; `relevant` + `relevance` is the
+**relevance set**. 🔴 **The defect was conceptual — one field carrying two
+claims — so making it plural (option A) would have carried the conflation
+forward.** Four rules: an undeclared relevance list is refused; `recall@k` is
+computable only over `complete` queries and reports its covered fraction; `doc`
+must appear in `relevant`; both fields optional, so **no historical number is
+invalidated or re-labelled**.
+
+✅ **[`tools/quality/goldens.py`](../tools/quality/goldens.py) enforces it.**
+`recall_slice` returns the eligible queries **and** the excluded count —
+a recall number with an unstated denominator is precisely what rule b stops.
+**+12 tests.** The un-migrated playground file stays valid and reports
+`recall@k` as *not computable*, which is the honest answer rather than an error.
+⚠ `tools/quality/` was a purely frozen instrument and now holds one executable
+module; `mix.toml` is untouched.
+
+**The migrated set is built and validated** — documents both annotators named →
+`complete`; any disagreement → the union, `partial`. **43 `complete`, 7
+`partial`, 26 multi-document.** `recall@k` becomes computable over 43/50 the
+moment it lands.
+⚠ **NOT swapped into `fux-playground/goldens/queries.jsonl`** — placed beside it
+as `queries.decision12.jsonl`. Replacing the file every measurement is graded
+against is a human's call in a sibling repo.
+
+Records: ADR-QUALITY decision 12 + ownership. Nothing committed (instructed).
+
+## Wave 8 — the last two controls ran, and W-87 P1 closes (2026-08-28)
+
+**Two more runs, and the quality apparatus is now built AND exercised.**
+
+✅ **[The placebo](regression/2026-08-28-placebo-and-seal/report.md) — first
+adjudicating use, and it CLEARS enrichment of source bias.** Three ingested arms
+on the playground: `none` 32/50, `placebo` 33/50, `real` 41/50, with the outer
+two reproducing 2026-08-24 exactly. ~100 words of fluent, content-free,
+length-matched prose on nine of ten documents moved **one** query — `n_d = 1`,
+`p = 1.0000`, **no detected change**. The KDD-2024 concern that lift comes from
+the *presence* of LLM text does not explain enrichment here.
+⚠ **Clears SOURCE BIAS, not CONTAMINATION** — the `real` arm's author read the
+queries, so its `+9` stays `informed`.
+
+🔴 **A queue item's impossibility claim was false.** The `+9` was recorded as
+*"impossible to check, impossible to re-run (corpora went in the wipe)"*. The
+wipe took `acme`/`orbit`; the `+9` was **playground**, which survived. It
+reproduced in one command and its missing discordant count is filed: `n_d = 9`,
+`b = 0`, `c = 9`, `p = 0.0039` — **it clears the floor.** Fourth recorded
+instance of a blocker filed by a session that could not look.
+
+🔴 **The seal is EXERCISED, NOT PROVEN, and that is chronology.** It postdates
+the enrichment it was applied to by four days, so its "sealed" 15 were never
+hidden from that author. A post-hoc split of a fully-seen set cannot test
+contamination — the more so at `n_d = 1` with 5 of 9 `known_failure` goldens in
+the sealed half. `BUILT IS NOT PROVEN` **stands** for it.
+
+✅ **[Two blind annotators agree at κ = 0.960](regression/2026-08-28-annotator-agreement/report.md).**
+A second fresh session — denied the goldens, the scores, `fux`, **and the first
+annotator's answers** — judged 26 of 50 multi-document. 49/50 agreement on the
+multi/single call, 86 % on the exact document set, and **both name the same 25**.
+**`recall@k` ≠ `hit@k` is measured, not suspected.** W-87 P2's headline metric
+is blocked on a **schema ADR**, not on inputs. Incidental: annotator 1 omitted
+the golden's own asserted doc on `q027` — what a second reader is for.
+
+✅ **W-87 P1 CLOSES.** All four controls built; three used to adjudicate.
+⚠ **W-87 itself does NOT close** — its definition of done requires `recall@k`
+computed, which now waits on the schema decision, and P2 Part B remains
+impossible as specified (its corpora and generator went in the wipe).
+
+⚠ **Harness lesson, nearly silent:** `ingest` carried a copied index forward
+(*"0 changed, 10 carried forward"*) and produced **three identical 827-term
+indexes for three different arms**. A three-arm comparison where every arm is
+the same index reports plausible numbers and measures nothing. Caught only
+because term counts were printed; the reproduce block now wipes `.fux/index`
+per arm and asserts the counts differ.
+
+Records: [ADR-RS](../docs/adr/0036_predictions.md) decision 15. Suite:
+**2356 passed / 1 skipped.**
+
+## Wave 7 — the controls got used, and the engine failed the test (2026-08-28)
+
+**Three blind sessions ran. ADR-RS decision 15's `BUILT IS NOT PROVEN` is
+discharged for one of four controls** — the `unanswerable` class — and the
+other three (placebo, sealed subset, and the decoys' second use) remain unrun.
+[The run](regression/2026-08-28-blind-unanswerable/report.md), classified
+`blind`, with per-query rows as the 2026-08-28 rule requires.
+
+🔴 **Finding 1 — the engine abstained ZERO times out of 20.** One blind session
+authored 20 near-miss unanswerable questions from the corpus's own vocabulary; a
+**second, independent** blind session ruled all 20 genuinely unanswerable, none
+at low confidence; the engine returned `answerable: true` on **20 of 20** (6
+`grounded`, 13 `partial`, 1 `weak`), with 17 of 20 at or above the
+`separation_floor`. The sharpest case: the corpus says *"four regions"* and
+never names them, so *"what are the names of all four regions"* has perfect
+vocabulary overlap and an absent fact — reported `grounded`. This is the decoy
+control's 1-of-15 at severity once the set is *designed* to sit close to the
+corpus. **No threshold proposed; R10 untouched.**
+
+🔴 **Finding 2 — `recall@k` is not computable, and a same-day conclusion is
+withdrawn.** A blind annotator judged **25 of 50** goldens to have more than one
+genuinely relevant document, against one asserted for all 50. Wave 6's
+*"`recall@k` IS `hit@k`"* was right about the file's **shape** and wrong about
+the **corpus** — which `relevance_audit.py`'s own output had said no count could
+settle. **No filed number is invalidated**: past runs measured `hit@k` and
+reported it as `hit@k`. What changes is that it may not be *called* `recall@k`.
+
+🔴 **Finding 3 — the control's own procedure was broken.**
+`BLIND-AUTHOR-BRIEF.md`'s validation loop graded submitted questions by the
+engine's own `answerable`, **using the system under test as the arbiter of the
+test's validity**. Followed as written it would have discarded a perfect
+20-question set as 100 % defective and recorded the engine's failure as the
+author's. Corrected in place; ground truth now comes from a second blind reader.
+
+**Also shipped — the `validate()` gap is now visible.** `fux doctor` gains
+`fetcher optional functions` (`doctor._fetcher_capabilities`), which is
+ADR-DOTFUX decision 6's own named mechanism — *a loader refusal or a `doctor`
+check, never a rewrite* — applied to ADR-FETCHER decisions 12–13. It reads the
+consumer's fetcher **as text and never imports it** (doctor is offline; a
+fetcher may connect at import) and names each missing function, its record, and
+the cost. A **warning, never an error**: absence is legal by contract.
+⚠ **The gap is made visible, not closed** — the consumer still copies the
+function in by hand, which is the write-if-missing freeze holding rather than an
+exception to it. Verified against a purpose-built pre-change repo: it names both
+missing functions. +4 tests.
+
+Records: [ADR-RS](../docs/adr/0036_predictions.md) decision 15,
+[ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 12,
+[ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decision 6. Suite: **2348
+passed / 1 skipped.**
+
+## Wave 6 — the full suite ran clean, and two broken harnesses got fixed on the way (2026-08-28)
+
+**`uv run pytest -q tests tests_e2e` — 2337 passed / 1 skipped, zero failures.**
+The tunable-floor diff from Wave 5 had never had `tests_e2e/` run against it;
+running it surfaced three unrelated defects, all now closed:
+
+- **`tools/differential/playground_grade.py`** (ADR-T1-ACCELERATOR) — the
+  differential-law harness the record's own ownership table already warned
+  "can break silently, and has" — was broken **three ways at once**: a dict
+  key (`query` vs the real `q`) that crashed it outright, an attribute
+  (`r.id` vs `r.loc`) that made every golden fail even when the top result
+  was correct, and no `.fux/tune.toml` wiring at all, a systematic divergence
+  from what `fux ask` actually returns. Fixed by routing both modes through
+  `run_query` with one shared `Tune`; now reproduces
+  `fux-playground/check.py`'s own count exactly (41/0/9), `scan == accelerator`
+  holding.
+- **`tools/quality-controls/relevance_audit.py`** (ADR-RS decision 15) — same
+  key-schema bug (`expect` list vs the real scalar `doc` + `max_rank`), making
+  its first run's "0 asserted" report vacuous rather than a finding. Fixed and
+  re-run: all 50 goldens assert exactly one `doc`; `recall@k` over this set
+  **is** `hit@k`. What remains is a one-line completeness declaration,
+  `arpit` lane, tracked in [W-87](open/W-87-what-good-means.md) P2.
+- **Three ADR-owned files from Wave 5's uncommitted diff had no owning-record
+  touch** (`test_working_tree_is_not_mid_violation`): `output.schema.json`'s
+  two new required fields under ADR-ASK, `query/__init__.py`'s shared file
+  under ADR-OUTPUT, and the two new `tools/quality-controls/` artifacts under
+  ADR-RS. All three records now carry the note. A fourth defect —
+  `work/IMPLEMENTATION.md`'s dead link to the deleted `DOGFOOD.md` — is fixed
+  in the **W-27** row further down this file.
+
+Records: [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md),
+[ADR-ASK](../docs/adr/0004_ask.md), [ADR-OUTPUT](../docs/adr/0047_output-defaults.md),
+[ADR-RS](../docs/adr/0036_predictions.md) decision 15. WORKLOG has the full trail.
+
 ## Wave 5 — one input measured, two that need a different author (2026-08-28)
 
 ### 🔴 The resolution floor admits coin flips
@@ -1104,7 +1321,7 @@ milestone row to live in. One line each, with the record that now holds it.
 | **W-33** — the ADR numbering convention | 2026-08-19 | Arpit | **Confirmed**: `docs/adr/` is the live set and **starts at 0001**; records under `archive/` are archived, and numbers there survive only to map a retired record to its successor. Cite-by-name stands, so **milestone items now reserve a NAME, never a number** — `ADR-GRAPH` (W-23), `ADR-REFER` (W-24), `ADR-MAINTENANCE` (W-25), `the T2 proposal` (W-26), swept in the same change. They had been reserving `0006`–`0009`, which accepted records already held: the collision this item was filed to prevent, live rather than hypothetical. Open 7 days |
 | **W-31** — the `.fux/` layout and the URL fetcher | 2026-08-19 | Arpit | **Ratified as-is**, all three records: [ADR-DOTFUX](../docs/adr/0003_fux-directory.md), [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md), [ADR-CONFIG](../docs/adr/0014_config.md). The builder-made call it flagged — `.fux/README.md` generated at **ingest** time rather than by `doctor --fix` — **stands**. Ratification arrived *after* the records read `accepted` on disk (2026-08-18, when the successors took the engine), which is the pattern this item existed to make visible. The known defect in ADR-URL-INGEST's default was W-54's to fix, and it was fixed the same day. Open 7 days |
 | **W-32** — the `CLAUDE.md` rewrite | 2026-08-19 | Arpit | **Adopted.** The PROPOSED header is deleted and the M0a rewrite is in force. Corrected on the way in: the item's own "there is no `CLAUDE.md.proposed`" was wrong — the file existed (`bed2186`), was implemented into `CLAUDE.md` and deleted at `3892c55`; `git log --follow` could not see a delete-plus-overwrite, so a *verified* claim rested on evidence that could not show it. **Five factual passages had rotted** behind the header, one of them forbidding the milestone that shipped as `v0.32.0`. Open 10 days |
-| **W-27** — the M7 dogfood gate | 2026-08-20 | Arpit | **Ratified closed, and redefined — by Arpit's word, not measured evidence.** The retired gate was a two-week logged-use period ending in a release Arpit had been using, blocked by W-26 (M6, still unbuilt at close). Arpit closed it directly instead: fux already dogfoods itself in this repo (`.fux/` self-indexed, `fux --version` runs), and that satisfies the intent. **New standing obligation, replacing the retired gate: [`DOGFOOD.md`](../DOGFOOD.md) is refreshed on every fux version upgrade** — not on a fixed two-week schedule. No regression run backs this row; it is a human call, recorded per rule 2, not a milestone landing. |
+| **W-27** — the M7 dogfood gate | 2026-08-20 | Arpit | **Ratified closed, and redefined — by Arpit's word, not measured evidence.** The retired gate was a two-week logged-use period ending in a release Arpit had been using, blocked by W-26 (M6, still unbuilt at close). Arpit closed it directly instead: fux already dogfoods itself in this repo (`.fux/` self-indexed, `fux --version` runs), and that satisfies the intent. **New standing obligation, replacing the retired gate: `DOGFOOD.md` is refreshed on every fux version upgrade** — not on a fixed two-week schedule. No regression run backs this row; it is a human call, recorded per rule 2, not a milestone landing. ⚠ **2026-08-28 (Arpit): `DOGFOOD.md` deleted.** The file this obligation binds no longer exists, so the obligation is **moot**, not violated — dogfooding itself continues unchanged (`.fux/` here is still self-indexed); only the refresh-on-upgrade ritual and its file are gone. |
 
 ## Not yet shipped
 
@@ -1161,6 +1378,13 @@ it closed by ratification, not by landing; see the W-27 row above.
 
 | id | status | where |
 |---|---|---|
+| B1 | **INCONCLUSIVE** (2026-08-28) — `hit@5`, A vs B-core, tier 1 000, `N = 240`. Discordant count **0**, `p = 1.0` — but `hit@5` is **240/240 in BOTH arms at every tier** and MRR@10 is `1.0000`, so `pb` and `pc` are structurally zero and the null was determined by the corpus. **A power table says how many queries, never whether they are hard** | [B1-RETRIEVAL](regression/2026-08-28-benchmark-v1-vs-head/VERDICT.md) |
+| B2 | **FAIL** (2026-08-28) — supersession inversions, predicted PASS with B better; measured **0 discordant**. Both arms invert identically (21/40 at tier 1 000) because `superseded_weight` **ships at `1.0`**. ⚠ **Unlike B1 this endpoint HAD power** — both halves visible for every query, a coin-flip inversion rate. Post-hoc at `0.5`: 21/40 → 0/40. 🔴 **Not an argument for changing the default** — [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) failed exactly that, and this corpus cannot see the case that broke it | [B2-SUPERSESSION](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B2.md) |
+| B3 | **PASS** (2026-08-28) — committed bytes **1.002 ×** at 1 000 docs and **0.998 ×** at 10 000 against a **1.25 ×** bar; published wheel **7.11 MB → 259 KB**. **`HEAD` commits no per-chunk `int8` vectors** — the one thing B3 named to check, read from a record in each arm's index | [B3-BYTES](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B3.md) |
+| B5 | **PASS** (2026-08-28) — `ask` p95 **85.6 → 112.6 ms**, ratio **1.32 ×** against **1.5 ×**, tier 10 000. 1 200 timed queries per arm, **interleaved `A B A B`**, one machine and one session. The differential law holds in both arms across all 240 queries | [B5-QUERY-LATENCY](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B5.md) |
+| B6 | **PASS** (2026-08-28) — cold ingest median **25.68 → 26.78 s**, ratio **1.04 ×** against **2.0 ×**, tier 10 000. ⚠ Arm B's third repeat was a **38.8 s outlier** on a busy laptop; all three are filed and the median is what the ratio uses | [B6-INGEST-LATENCY](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B6.md) |
+| B7 | **INCONCLUSIVE** (2026-08-28) — **0 declines out of 20 in both arms**, at every tier, as predicted. ⚠ But a generated corpus can only test declining when **nothing matches**, never when something matches and does not support the claim. Arm B names the absent term (`missing`, `coverage 0.0009`) and answers anyway. **The null is not reassurance** | [B7-HONEST-DECLINE](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B7.md) |
+| B9 | **PASS** (2026-08-28) — the null control, **run first**, in two halves: arm A twice on one corpus gave **300/300 identical rows**; A vs A′ on a second seed gave **0 discordant of 240**, `p = 1.0`. No A-vs-B number existed when it was ruled | [B9-NULL-CONTROL](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B9.md) |
 | P-SUPERSEDE | **FAIL** (2026-08-25) — `[ranking] superseded_weight` against a frozen **>= 1 fixed / 0 broken** bar. **The prior FIRED for the first time since it shipped** (it needs a frontmatter `supersedes:` key; the playground declared supersession in prose only, so the flag had never set). At `0.5`: **fixes `q015`** — the canonical failure — and breaks `q022`/`q033`. At `0.25`: four breaks. **The control is clean**: the frontmatter edit alone fixes 0, breaks 0. **Every broken query has the SUPERSEDED document as its correct answer**, so the diagnosis is one cause, not four: **supersession belongs to the QUERY'S INTENT, not the document**, and a per-document multiplier cannot express it. ⚠ `informed`; ±2 on 50 queries is below decision 14's floor — the **direction** carries, the magnitude does not | [P-SUPERSEDE](regression/2026-08-25-supersession-and-reranker-default/VERDICT.md) |
 | DENSE-CHUNK | **FAIL** (2026-08-24) — the per-chunk dense lane against its own **>= 3-fixed / 0-broken** bar: measured **0 fixed, 2 broken**, at every setting that fires. **0 fixed is the number that matters**; the bar needs 3. The cause is structural rather than tuning: `embed/model.py` **mean-pools static token vectors** (no layers, no attention), so the lane is **as order-blind as BM25F** — and `always` mode breaks **`q015`**, the current-vs-superseded query a semantic lane was most expected to rescue. **Phase 7 was right that per-chunk beats per-document and wrong that the unit was the binding constraint** — the pooling is. `[dense] mode` stays `off`; the committed vectors stay, because they cost nothing at rest and a better pooling reuses them unchanged | [DENSE-CHUNK](regression/2026-08-24-dense-lane-gate/VERDICT.md) ⚠ **2026-08-25: the verdict STANDS and its subject is GONE.** The lane, the model, the committed `vectors` and `[dense]` were deleted on Arpit's instruction. The clause *"the committed vectors stay, because they cost nothing at rest"* was wrong on its own terms — they were **23.0 % of the committed index** ([measured](regression/2026-08-25-model-removal/report.md)) — and it is moot either way. **The verdict itself is frozen and unedited**; its frozen pre-registration is mirrored into the run, since the module carrying it was deleted (ADR-RS decision 16). |
 | W44-SIGNAL | **WARRANTED** (2026-08-22) — live-intent contamination@5 **32.00 pts** against a 25 pt bar; findability guard **93.33 %** against a 60 % floor. Discharged [ADR-ARCHIVED-CONTENT](../docs/adr/0037_archived-content.md) decision 5's gate, which Arpit **also** lifted by instruction the same session — the pre-registration was frozen first, so the number is evidence rather than a formality. Licenses the marker and disclaimer only; the demotion default stays [W-52](../archive/open/W-52-df-over-the-union.md)'s | [W44-SIGNAL](regression/2026-08-22-archived-signal/VERDICT.md) |

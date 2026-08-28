@@ -24,6 +24,430 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-28 — W-93 executed: the benchmark ran, and the ruler was the thing that broke  ·  Claude Code
+
+**Asked:** *"run w-93"* — the version benchmark of `fux-engine 1.0.0` against
+working-tree `HEAD`.
+
+**Done.** All seven phases, including the one the item had marked a handoff.
+
+- **P1** `~/my_programs/fux-benchmark` stood up: two venvs (CPython 3.11.15
+  each), arm A `pip install fux-engine==1.0.0`, arm B a `--local` clone at the
+  frozen sha with `pip install -e`. `fux --version` differs.
+- **The `HEAD` sha was frozen into the pre-registration and committed before
+  any command ran** — `75ade57`, its own commit.
+- **P2** the lab's generator gained `--bench`: supersession chains, two kinds of
+  unanswerable (absent-entity and compositional), decoys, a `--selftest`, and a
+  proof that the legacy path is still byte-identical.
+- **P3** per-query rows — one row per query per arm per tier, 10 files.
+- **P4** B9 ran **first** and passed in both halves: arm A twice on one corpus
+  gave 300/300 identical rows; A vs A′ across seeds gave 0 discordant.
+- **P5/P6/P7** all three tiers, latency interleaved `A B A B` on this one
+  machine, and the run filed with seven verdicts.
+
+**What it found.**
+
+- 🔴 **Every pre-registered paired test returned a discordant count of ZERO.**
+- 🔴 **B1 `INCONCLUSIVE` — the primary endpoint was saturated.** `hit@5`
+  240/240 in *both* arms at *every* tier. **A power table says how many
+  queries, never whether the queries are hard**, and this one could not express
+  any effect at all.
+- 🔴 **B2 `FAIL`, and not for the predicted reason.** Both arms invert
+  identically because `superseded_weight` **ships at `1.0`**. Post-hoc at `0.5`:
+  21/40 inversions → 0/40. **The feature works and is off by default.**
+- ✅ **B3/B5/B6 `PASS`** — bytes 1.002 ×, wheel 7.11 MB → 259 KB, p95 1.32 ×,
+  ingest 1.04 ×; no `int8` vectors committed; the differential law holds.
+- **B7 `INCONCLUSIVE`** — 0/20 declines in both arms, but a generated corpus can
+  only test declining when *nothing* matches.
+
+**Decided.**
+
+- **The run is `informed`**, ruled by the pre-registration's own §3 rather than
+  by my judgement: one session wrote the generator and read the scores. No delta
+  is stated from it.
+- **Seven verdicts in one run directory**, and `tests/test_regression_runs.py`
+  widened to glob `VERDICT*.md` — the siblings would otherwise have been filed,
+  cited and guarded by nothing.
+- **The per-query-rows gate is written**, baselined at **2026-08-29** because
+  five runs were filed on the ruling's own day and their reports are frozen.
+
+**Corrected.** The previous session's in-flight line said the suite was fully
+green; `tests/test_setup_docs.py` was **red** — `fux-benchmark.md` had been
+added without its `work/setup/README.md` row.
+
+**Open / next.** W-94 is Arpit's: `superseded_weight`'s default, or a `doctor`
+warning, or neither — but not silence. W-95 and W-96 are agent-lane: a
+contested-answer suite, and the two-session protocol a `blind` benchmark needs.
+The blocker filed 2026-08-28 is untouched and still Arpit's.
+
+---
+
+## 2026-08-28 — Arpit rules option B: the rank contract and the relevance set become two fields  ·  Claude Code
+
+- **Asked:** *"do not commit anything yet and go with options B"* — the schema
+  fork this session surfaced and could not decide for itself.
+
+- **Did — the ruling, recorded and built in one change:**
+  - **[ADR-QUALITY](../docs/adr/0044_quality-contract.md) decision 12.** The
+    rank contract (`doc` + `max_rank`) and the relevance set (`relevant` +
+    `relevance`) are separate fields. Four rules, each closing a specific
+    failure: **(a)** a relevance set with no completeness declaration is
+    refused — an undeclared list *is* the original defect in a new field;
+    **(b)** `recall@k` is computable only over queries declared `complete`, and
+    the covered fraction is reported with it; **(c)** `doc` must appear in
+    `relevant`, or the two claims contradict each other; **(d)** both fields are
+    optional, so nothing historical breaks and no past number is re-labelled.
+  - **[`tools/quality/goldens.py`](../tools/quality/goldens.py)** enforces it —
+    `validate`, `load`, and `recall_slice` which returns the eligible queries
+    **and** the excluded count, because a recall number with an unstated
+    denominator is the thing rule b exists to stop. Claimed in the ownership
+    table. **+12 tests.**
+  - **The un-migrated playground file stays valid** and reports `recall@k` as
+    *not computable* — the honest answer rather than an error. Gated by a test.
+  - **Migrated set built from the two annotators' agreement**: documents both
+    named → `complete`; any disagreement → the union, declared `partial`.
+    **43 `complete`, 7 `partial`, 26 multi-document**, validated clean. Filed as
+    run evidence and placed in the playground as
+    `goldens/queries.decision12.jsonl`.
+  - **`relevance_audit.py` marked superseded** — its question is answered, and
+    it is kept only because it produced the count decision 12 rests on.
+
+- **Decided / open:**
+  - ⚠ **Did NOT overwrite `fux-playground/goldens/queries.jsonl`.** Swapping
+    the file every measurement is graded against is a human's call, in a sibling
+    repo that has its own uncommitted work.
+  - ⚠ **The 7 `partial` rows are the annotators' exact-set disagreements.**
+    They take the union and are excluded from `recall@k` rather than being
+    adjudicated by an agent.
+  - **Nothing committed**, per instruction.
+  - ⚠ **One suite failure is NOT mine**: `test_prediction_register` fails on the
+    concurrent session's `2026-08-28-benchmark-v1-vs-head` WIP (`VERDICT-B*.md`
+    naming predictions not yet in the register; the files are staged *and* being
+    edited). My slice: **281 passed / 1 skipped**; full suite otherwise
+    **2387 passed / 2 skipped**.
+
+- **Next:** swap the playground goldens, then compute `recall@k` over the 43
+  and report it with the 43/50 fraction.
+
+## 2026-08-28 — The last two controls ran; W-87 P1 closes and W-87 itself cannot  ·  Claude Code
+
+- **Asked:** complete the two pending items, then close out W-87.
+
+- **Did — the two pending items, both now done:**
+  - **A SECOND blind annotator** (fresh session, denied the goldens, the
+    scores, `fux`, **and the first annotator's answers**) → 26/50
+    multi-document. **Cohen's κ = 0.960** against annotator 1; 49/50 agreement
+    on the multi/single call; **both name the same 25**. Filed as
+    [`2026-08-28-annotator-agreement`](regression/2026-08-28-annotator-agreement/report.md).
+    **`recall@k` ≠ `hit@k` is now measured, not one reader's opinion.**
+  - **The placebo and the seal** — the last two never-run controls. Filed as
+    [`2026-08-28-placebo-and-seal`](regression/2026-08-28-placebo-and-seal/report.md).
+    Three ingested arms in a scratch copy (**the playground was never
+    mutated**): `none` 32, `placebo` 33, `real` 41 — the outer two reproducing
+    2026-08-24 exactly, which is what makes it a comparison.
+
+- **Findings:**
+  1. ✅ **Source bias is RULED OUT.** Content-free matched-length prose moved
+     one query (`n_d=1`, `p=1.0000`). Enrichment's lift is content, not the
+     presence of LLM text. ⚠ Clears source bias, **not** contamination.
+  2. 🔴 **A queue item's impossibility claim was false.** The `+9` was filed as
+     *"impossible to re-run (corpora went in the wipe)"* — the wipe took
+     `acme`/`orbit`, the `+9` was **playground**. Re-ran in one command;
+     `n_d = 9`, `p = 0.0039`, **clears the floor**. Rule 4 with a receipt.
+  3. 🔴 **The seal cannot adjudicate and it is chronology, not design** — it
+     postdates the enrichment by four days, so nothing was hidden from that
+     author. `BUILT IS NOT PROVEN` **stands** for the seal alone.
+  4. ⚠ **Nearly-silent harness bug:** ingest carried a copied index forward and
+     gave three different arms the same 827-term index. Caught only because
+     term counts print. Reproduce block now wipes per arm and asserts they
+     differ.
+
+- **Decided / open — and the answer to "close out W-87" is NO, with a reason:**
+  - ✅ **W-87 P1 closes** — all four controls built, three used to adjudicate.
+  - 🔴 **W-87 itself CANNOT close.** Its definition of done requires
+    *"`recall@k` is computed and is the reported headline"*, and that is now
+    blocked on a **schema ADR** (does `expect` become a list, or do the rank
+    contract and the relevance set split into two fields?). Three options are
+    costed in the agreement run's ANALYSIS. **The evidence is filed; the call
+    is not an agent's.** A second DoD item — the `judged` series pinning
+    model+prompt+version — has never been exercised because no judged run
+    exists. And P2 Part B stays impossible: its corpora *and generator* went in
+    the wipe.
+  - **I ticked one DoD item that was genuinely already met** (a record owns the
+    quality contract — ADR-QUALITY, 2026-08-27) and left the other two open
+    rather than forcing a close.
+  - Suite: **2356 passed / 1 skipped**, zero failures.
+
+- **Next:** the schema ADR. It is the single thing standing between here and
+  `recall@k`, and it is a decision rather than work.
+
+## 2026-08-28 — Three blind sessions ran the controls, and the engine abstained zero times out of twenty  ·  Claude Code
+
+- **Asked:** the three open blocker questions, with the instruction to create
+  the artifacts directly or via subagents rather than waiting on Arpit.
+
+- **Did — the blind work, three fresh sessions, none of which had seen scores:**
+  - **Blind author** → 20 `unanswerable` questions from the corpus + the
+    committed brief and nothing else.
+  - **Blind ground-truth reader** → independently ruled all 20 genuinely
+    unanswerable, none low-confidence, and was explicitly told not to run `fux`.
+  - **Blind annotator** → judged relevance for all 50 goldens from a
+    **stripped** query list (`id`+`q` only; `known_failure` text was removed
+    because it describes ranking behaviour and is score-derived).
+  - Filed as [`2026-08-28-blind-unanswerable`](regression/2026-08-28-blind-unanswerable/report.md)
+    with `report.md`, `ANALYSIS.md`, an `## Authorship` block and **per-query
+    rows** (`evidence/per-query.csv`) per the 2026-08-28 rule.
+
+- **Three findings, in order of how much they cost:**
+  1. 🔴 **The engine reported `answerable: true` on 20 of 20.** Zero abstentions
+     on a purpose-built abstention test. 6 `grounded`, 13 `partial`, 1 `weak`;
+     17/20 above the `separation_floor`, median separation `0.448`.
+  2. 🔴 **25 of 50 goldens have more than one genuinely relevant document**, so
+     **`recall@k` ≠ `hit@k`** and yesterday's own inference is **withdrawn**. It
+     was right about the file's shape, wrong about the corpus. No filed number
+     is invalidated — past runs measured `hit@k` and said so.
+  3. 🔴 **The brief's validation loop was circular** — it graded questions by
+     the engine's own `answerable`, i.e. the system under test judging its own
+     test, and would have thrown away a perfect set as 100% defective.
+     Corrected in place.
+
+- **Also shipped:** `fux doctor` gains `fetcher optional functions` — ADR-DOTFUX
+  decision 6's own named mechanism (*a `doctor` check, never a rewrite*) for the
+  measured `validate()` gap. Reads the fetcher **as text, never imports it**
+  (doctor is offline; a fetcher may connect at import); warning, never an error.
+  Verified against a purpose-built pre-change repo. +4 tests.
+
+- **Decided / open:**
+  - ⚠ **Deliberately proposed NO threshold.** R10 is unmeasured and a floor
+    fitted to the 20 numbers that exposed the problem would be the
+    moving-threshold failure in a new costume. The run says so in three places.
+  - **The placebo and the sealed subset are still never-run**; only the
+    `unanswerable` class discharged its half of `BUILT IS NOT PROVEN`.
+  - **A second blind annotator is now the gating item** — one reader is one
+    opinion, and the schema decision (does `expect` become a list?) is an ADR
+    that should not be written on a single judgment.
+  - `goldens/unanswerable.jsonl` was placed in the playground but **not
+    committed** — that sibling repo has its own uncommitted work and committing
+    there was not authorized.
+  - Suite: **2348 passed / 1 skipped**, zero failures.
+
+- **Next:** a second blind annotator on the same 50 questions, priority on
+  `q032`, `q046`, `q050`.
+
+## 2026-08-28 — The last three ADR-touch gaps and the dead link close; suite is fully green  ·  Claude Code
+
+- **Asked:** "fix it" — the remaining broken link and the three unrecorded
+  ADR touches (ADR-ASK, ADR-OUTPUT, ADR-RS) in Wave 5's uncommitted diff,
+  which this session had been leaving alone as "not mine, Cowork's WIP."
+  Direct instruction overrides that hesitation.
+
+- **Did:**
+  - **`work/IMPLEMENTATION.md`'s W-27 row** — DOGFOOD.md was deleted
+    (Cowork, earlier the same day) but the row still linked to it. Added a
+    dated note: the standing "refresh on version bump" obligation is now
+    moot, not violated; de-linked the dead path.
+  - **ADR-ASK** (`docs/adr/0004_ask.md`) — recorded `output.schema.json`'s two
+    new required fields (`separation_floor`, `doc_coverage_floor`), matching
+    the existing precedent bullet's style for the prior `doc_coverage` field.
+  - **ADR-OUTPUT** (`docs/adr/0047_output-defaults.md`) — recorded that
+    `_fill_confidence` in the shared `query/__init__.py` now takes a `tune`
+    argument, noting explicitly that the emission gate (`_show_band`,
+    `_gated`) itself is unchanged — the file is touched, the decision isn't.
+  - **ADR-RS** (`docs/adr/0036_predictions.md` decision 15) — recorded the two
+    `tools/quality-controls/` artifacts the three-control table didn't cover:
+    `BLIND-AUTHOR-BRIEF.md` (not yet run by a blind session) and
+    `relevance_audit.py` (fixed and re-run this session, see the prior entry).
+  - **`work/IMPLEMENTATION.md` gains Wave 6**, closing the OPEN-WORK row that
+    tracked this. `uv run pytest -q tests tests_e2e`: **2337 passed / 1
+    skipped, zero failures.**
+  - Removed the now-resolved row from `OPEN-WORK.md`.
+
+- **Decided / open:** nothing left open from this thread. The completeness
+  declaration (W-87 P2) and the blind-author run are still `arpit`-only, as
+  recorded in the prior entry.
+
+- **Next:** none from this thread — the queue's `arpit` lane is what's left.
+
+## 2026-08-28 — `relevance_audit.py` gets the same schema fix, and P2's `recall@k` sub-item closes to a one-line arpit call  ·  Claude Code
+
+- **Asked:** "do whatever you need to just close out the open task" — the
+  `relevance_audit.py` schema fix this session had asked about and left
+  unanswered.
+
+- **Did:**
+  - **Fixed `tools/quality-controls/relevance_audit.py`**: same bug class as
+    `playground_grade.py` earlier this session — it read a nonexistent
+    `expect` list; the real goldens schema is one scalar `doc` + `max_rank`.
+    Rewrote the docstring's schema example and the counting logic to match,
+    re-ran against `~/my_programs/fux-playground`: **all 50 goldens assert
+    exactly one `doc`, 0 unasserted, 9 `known_failure`.** The prior "0
+    asserted" run is now explicitly documented as vacuous, not evidence.
+  - **Folded the result into `work/open/W-87-what-good-means.md` P2** and into
+    `OPEN-WORK.md`'s W-87 row — checked off "run the audit" and "recall@k is
+    hit@k", corrected the stale `expect`-list premise in both places, and
+    named exactly what's left: a one-line completeness declaration (is the
+    asserted `doc` the *only* relevant document, or just the one someone
+    asserted?) — `arpit` lane, not annotation, not blind-author territory.
+  - Removed the now-done relevance-audit bullet from OPEN-WORK's "Ready to
+    run" section (rule 3 — done work is folded into its owning row, not left
+    as a second checklist).
+  - Full suite re-confirmed stable: **2335 passed / 1 skipped**, same 2
+    pre-existing failures (Cowork's uncommitted diff), nothing new.
+
+- **Decided / open:** the completeness declaration is still `arpit`-only and
+  still open. Everything else this session found in this thread is closed.
+
+- **Next:** Arpit declares whether each golden's `doc` is complete; separately,
+  whichever session picks up the uncommitted confidence-floor diff still owes
+  ADR-ASK/OUTPUT/RS touches and the `DOGFOOD.md` link fix.
+
+## 2026-08-28 — The full suite ran, and the differential harness turned out to be broken three ways  ·  Claude Code
+
+- **Asked:** run the one ready OPEN-WORK item ("run the suite on the build
+  machine"), then run the relevance audit, then fix and tune what it found.
+
+- **Did:**
+  - **`uv run pytest -q tests tests_e2e`**, the gap the 2026-08-28 confidence-floor
+    change never had covered: **2335 passed / 1 skipped**, 2 stable failures
+    left (both Cowork's uncommitted WIP, not this session's — see Decided/open).
+  - **Ran `tools/quality-controls/relevance_audit.py ~/my_programs/fux-playground`.**
+    Its "0 documents asserted, all 50 goldens" result is **not evidence** — the
+    script reads an `expect` list key the real
+    `fux-playground/goldens/queries.jsonl` never had. The real schema is one
+    flat `doc` + `max_rank` per line (confirmed against
+    `fux-playground/check.py`, the actual consumer). **Not fixed this
+    session** — flagged, not patched.
+  - **Found `tools/differential/playground_grade.py` — the differential-law
+    harness ADR-T1-ACCELERATOR already warned "can break silently, and has" —
+    broken three ways at once**, and fixed all three:
+    1. `golden["query"]` read a key that doesn't exist (`q`, not `query`) —
+       crashed outright.
+    2. `_rank_of` matched `r.id` (`"file:docs/…"`) against the goldens' bare
+       `doc` paths — never matched, so every golden failed even when the top
+       result was correct.
+    3. Called `scan_ask`/`accel.ask` directly with no `weighting` — never
+       applied `.fux/tune.toml`, a systematic divergence from `fux ask`
+       itself, not noise.
+    Fixed by routing both modes through `run_query` (`cmd_ask`'s own
+    entrypoint) with one shared `Tune`. **Verified**: now reproduces
+    `fux-playground/check.py`'s own count exactly — 41 pass / 0 fail / 9
+    known-failure — with `scan == accelerator` holding. Also added a
+    fallback-detector: if the accelerator build isn't fresh, `run_query`
+    silently grades scan under the accelerator's name, and the harness now
+    says so instead of hiding it.
+  - **Record:** ADR-T1-ACCELERATOR's existing "can break silently" consequence
+    bullet now names what broke and how it was fixed, in the same change
+    (Law zero) — the only record this session's own diff owns.
+
+- **Decided / open:**
+  - **Did not touch ADR-ASK / ADR-OUTPUT / ADR-RS**, which the same
+    `test_working_tree_is_not_mid_violation` run flags for the *already*
+    uncommitted confidence-floor / quality-controls diff — that's Cowork's WIP
+    from earlier the same day, actively being edited concurrently (it deleted
+    `DOGFOOD.md` mid-session), not this session's to close.
+  - `work/IMPLEMENTATION.md → ../DOGFOOD.md` is a dead link from that same
+    deletion — not fixed, same reason.
+  - `tools/quality-controls/relevance_audit.py` has the identical `expect`-key
+    bug as `playground_grade.py` did — not fixed, flagged for the user to
+    decide whether to extend the same fix there.
+  - `BLOCKED.json` (filed 2026-08-28) is still open and untouched by anything
+    this session did.
+
+- **Next:** either fix `relevance_audit.py`'s schema mismatch to match, or
+  leave it — the user's call, asked and not yet answered.
+
+## 2026-08-28 — The two confidence floors become `tune.toml` keys, and the handbook gets the formulas  ·  Cowork
+
+- **Asked:** *"what is the formula for the confidence?"*, then *"expose the
+  tuning of confidence in tune.toml"* and *"add a section in handbook for the
+  confidence and its formula"*.
+
+- **Did:**
+  - **`[confidence]` in `.fux/tune.toml`** — `separation_floor` (default `0.1`)
+    and `doc_coverage_floor` (default `0.0`), validated as fractions, in the
+    closed key set, in the live specimen with their costs in capitals.
+  - **The floors moved onto the block.** `Confidence` carries
+    `separation_floor` / `doc_coverage_floor` as fields; `band` and `line()`
+    read `self`, never the module globals; `signals()` takes them from the
+    caller; `run_query` resolves them once from the same `Tune` that scored the
+    query, so `--no-tune` reaches the band as well as the ranking.
+  - 🔴 **Both floors are PUBLISHED in `as_dict()` and `output.schema.json`.**
+    That is the load-bearing half — once the floor is local config, a bare
+    `grounded` means different things in different repos, and without the
+    published number the difference is invisible.
+  - **Records:** ADR-CONFIDENCE decision 13 (reverses its own decision 7, which
+    is kept quoted with the half that survives named); ADR-TUNE decision 5d and
+    a sixth table. New alternatives-considered entries for the two versions not
+    taken — exposing without publishing, and clamping `0.0` away.
+  - **Handbook:** two new slides — `#s-conf-formula` (the shared `idf`, every
+    signal as an expression, the five-clause ladder, NQC/clarity-score
+    grounding) and `#s-conf-tune` (both keys and their costs). Nav updated.
+  - **Tests:** +10 — the knob moves the band and says so, `0.0` turns `weak`
+    off entirely, the `doc_coverage` gate switches on, a tuned floor cannot
+    reach a score or an ordering, `--no-tune` resets both floors, and loader
+    range/default cases. Both keys added to `test_tune_boundary.MUTATIONS`.
+
+- **Stale claims fixed on contact, and both were the W-83 class — a record
+  describing behaviour the code no longer has:**
+  - **ADR-TUNE decision 4** said *"keys ship COMMENTED"* and carried a
+    commented specimen. The specimen has shipped **live lines** since Arpit's
+    2026-08-27 ruling. Rewritten, with the freeze cost it correctly predicted
+    now named as paid.
+  - **The handbook's *Fact vs guess* slide** said *"ADR-CONFIDENCE is proposed,
+    not accepted"* (accepted since 2026-08-27) and *"not a `tune.toml` key,
+    deliberately"*. Its *five fields* slide said five; there have been six since
+    `doc_coverage` shipped, and the `--json` sample omitted three keys.
+  - **`output.schema.json`** said `doc_coverage` below `1.0` makes the band
+    `partial`. The gate has been OFF since 2026-08-28's ruling.
+
+- **Decided / open:**
+  - ⚠ **The reversal has an unguarded cost and the record says so rather than
+    softening it.** A consumer can set `separation_floor = 0.0` and no answer is
+    ever `weak` again — tuning away the *signal*, not the ranking, silently, with
+    nothing mechanical catching it. It was opened because the standing rule on
+    knobs is *state the cost, do not clamp*; `[priority]` is the precedent and is
+    far more dangerous.
+  - ⚠ **Decision 6's binding now has a hole.** Fux does not get to pick a second
+    abstention threshold; a *consumer* now can. Accepted, not argued away.
+  - **R10 is not settled and is not reduced by this.** A repo-local floor is a
+    preference, never a calibration.
+  - **New reopen trigger:** a measured run comparing two arms with different
+    `separation_floor` values — a pre-registered threshold moving inside a
+    comparison. The published floor is what makes it detectable.
+
+- ⚠ **Verification is PARTIAL and the reason is environmental.** The device
+  bridge's shell was wedged for the whole session (5 consecutive failures), so
+  nothing ran on the build machine. The changed modules and their tests were
+  staged into the Cowork container and run there: **145 passed** across
+  `test_tune.py`, `test_tune_boundary.py`, `tests/query/test_confidence.py` and
+  `test_schemas.py`, against a **135-passed** baseline taken before any edit.
+  **The full suite and `tests_e2e/` did NOT run.** Two `test_doc_registry.py`
+  cases fail in that container for a harness reason — the partial tree has no
+  `CLAUDE.md`, `paper/` etc. to point rows at — and were confirmed as artifacts,
+  not findings.
+
+- **Next:** run `uv run pytest -q tests tests_e2e` on the build machine before
+  committing; the container run covers the changed surface, not the suite.
+
+## 2026-08-28 — Deleted DOGFOOD.md, closed its registry row  ·  Cowork
+
+- **Asked:** *"delete dog food file"*, then, after confirming it was the live
+  `DOGFOOD.md` (not the archived copies), *"just delete the dogfood file
+  nothing else"* — then a follow-up to update `DOC-REGISTRY.md` and this log.
+
+- **Did:** deleted `DOGFOOD.md` (Arpit did the actual `rm` himself — the
+  device bridge's shell was wedged and refused to run it). Removed its row
+  from `DOC-REGISTRY.md` per the registry's own rule 2 (a row for a deleted
+  file is deleted outright, not struck through). No ADR owned the file, so
+  nothing there needed touching.
+
+- **Decided / open:** none. Note for whoever reads `W-27` next: that record's
+  standing obligation was "refresh `DOGFOOD.md` on every version bump" — the
+  file it binds no longer exists, so that obligation is now moot. Left
+  `IMPLEMENTATION.md` untouched since it wasn't asked for.
+
+- **Next:** none.
+
 ## 2026-08-28 — OPEN-WORK cut from 209 lines to 150, and most of what went was tombstones  ·  Claude Code
 
 - **Asked:** *"do a cleanup of open work document"*.

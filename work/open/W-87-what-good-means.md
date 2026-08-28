@@ -64,8 +64,8 @@ contract.** It may run the moment a URL corpus exists.
 | phase | what | blocked by |
 |---|---|---|
 | ~~**P0**~~ | ~~declare the contract — the six forks~~ | ✅ **RULED 2026-08-27** — [ADR-QUALITY](../../docs/adr/0044_quality-contract.md). P1–P2 are unblocked on the contract and blocked only on inputs |
-| **P1** | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | P0 · needs `fux-playground` — ⚠ except the **orphaned-module check, ✅ BUILT 2026-08-27**, which never did |
-| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | P0 · P1 · needs corpora |
+| ~~**P1**~~ | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | ✅ **ALL BUILT, and three of four now USED to adjudicate** (decoys 2026-08-27; `unanswerable` and placebo 2026-08-28). 🔴 **The sealed subset is EXERCISED, NOT PROVEN** — it postdates the enrichment it was applied to, so its split cannot test contamination; that is a *chronology* limit, not an unbuilt apparatus, and it is tracked in ADR-RS decision 15 rather than here |
+| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | 🔴 **`recall@k` is BLOCKED ON AN ADR, not on inputs** — two blind annotators (κ = 0.96) measured the goldens' relevance sets **incomplete**, so the metric is not computable until the schema decision lands. **Part B needs corpora that no longer exist.** See §P2 below |
 | ~~**P3**~~ | **§3.0** — sanitized-sha stability | ✅ **PASS 2026-08-27**, 19/19 = 100 % — [verdict](../regression/2026-08-27-p3-sha-stability/VERDICT.md) |
 | ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 12, [ADR-MAINTENANCE](../../docs/adr/0032_hooks.md) decision 13 |
 | ~~**P5**~~ | ~~`tests_e2e/` verification~~ | ✅ **DONE 2026-08-27** — 74/74 on 3.11.15; found one real defect |
@@ -146,11 +146,20 @@ on **inputs and environment** — see the phases below.
 in force until it is built** — ADR-RS's own register says *"the sealed set and
 the two controls — **owed, not built**"*.
 
-- [ ] **The sealed query subset** — mechanical, with the power tension answered
-      in writing. A sealed holdout is what FrontierMath actually used;
-      disclosure alone is the fallback, and BIG-bench's canary is the
-      counter-example (a marker embedded *so that* labs could exclude it, and
-      reproduced by models trained on it regardless).
+- [x] ✅ **The sealed query subset** — BUILT 2026-08-28,
+      [`seal.py`](../../tools/quality-controls/seal.py), 15 of 50 split by
+      `sha256(id)`: deterministic, seedless, order-independent. The power
+      tension is answered in writing (Arpit: seal 15, grow the set later).
+      A sealed holdout is what FrontierMath actually used; disclosure alone is
+      the fallback, and BIG-bench's canary is the counter-example.
+      🔴 **EXERCISED 2026-08-28, and it CANNOT adjudicate yet** —
+      [the run](../regression/2026-08-28-placebo-and-seal/report.md). The seal
+      **postdates by four days** the enrichment it was applied to, whose author
+      saw all fifty queries, so its "sealed" 15 were never hidden from anyone.
+      **A post-hoc split of a fully-seen set cannot test contamination.** Its
+      first adjudicating use needs an artifact authored *after* the seal
+      existed, by an author given the visible 35 only. Tracked in ADR-RS
+      decision 15, not here.
 - [x] ✅ **The decoy set** — BUILT 2026-08-27,
       [`tools/quality-controls/decoys.jsonl`](../../tools/quality-controls/decoys.jsonl).
       Fifteen domain-plausible questions the corpus cannot answer.
@@ -207,22 +216,124 @@ visible set and whoever builds it must resolve that tension, not inherit it.
 
 ## P2 — the quality runs
 
-- [ ] **`recall@k` is not computed today.** It needs known-relevant sets per
-      query — real annotation across the 50 playground goldens.
-      ⚠ **Also not this session's to do.** Annotating *which documents are
-      relevant* after seeing which ones rank well is how a metric gets fitted to
-      the system it is meant to judge. **The annotation must precede the
-      scores**, and for this session it no longer can.
-- [ ] **The `unanswerable` class does not exist** and must be authored — and
-      authored **blind**, or it contaminates the set it is meant to test
-      (the W-78 lesson).
-      🔴 **THIS SESSION CANNOT AUTHOR IT.** It has read the goldens, the decoys,
-      and per-query scores across four measurement runs. **Anything it wrote
-      would be informed by construction**, and the one property this class needs
-      is that its author had not looked. ⚠ **The 15 decoys are NOT this class** —
-      they are a control, authored by this session, and using them as the
-      `unanswerable` class would launder informed material into a blind slot.
-      **It needs a different author.**
+- [ ] **`recall@k` — the blocker was mis-stated, and it is smaller than it
+      reads.** ⚠ **CORRECTED 2026-08-28 (Claude Code, ran the audit):** the
+      earlier belief that the golden schema carries a multi-document `expect`
+      list — `expect: [{"id": ..., "max_rank": ...}, ...]` — was itself wrong.
+      That key is `tools/differential/playground_grade.py`'s docstring, which
+      had drifted from the real consumer; `fux-playground/goldens/queries.jsonl`
+      has never had an `expect` field. **The real schema is one scalar `doc` +
+      `max_rank` per golden** — confirmed against `fux-playground/check.py`.
+      There is no missing annotation *format*, and there never was, but not
+      because a list degenerated to size 1 — because there is no list at all.
+      🔴 **What is genuinely missing is COMPLETENESS, not annotation.** `doc` +
+      `max_rank` is a **rank contract** — *"this document must come back at
+      rank ≤ n"* — and it has never promised *"this is every relevant
+      document."* A document a golden doesn't name may be irrelevant, or may
+      just be one nobody asserted. `recall@k` needs the second reading, the
+      schema only ever supplied the first.
+      - [x] **Run the audit** (Arpit, 2026-08-28 — *"check first, then
+            decide"*): `python3 tools/quality-controls/relevance_audit.py
+            ~/my_programs/fux-playground`. ✅ **Done 2026-08-28 (Claude Code,
+            local shell reaches the playground).** First run was vacuous — it
+            read the nonexistent `expect` key and reported "0 asserted" for
+            all 50, which looked like a finding and wasn't. Fixed the script's
+            schema to match `doc`/`max_rank`, re-ran: **all 50 goldens assert
+            exactly one `doc`, none unasserted, 9 `known_failure`.**
+      - [x] ~~**Every golden asserts one document, so `recall@k` IS `hit@k`**~~
+            🔴 **WITHDRAWN 2026-08-28, same day, by
+            [the blind run](../regression/2026-08-28-blind-unanswerable/report.md).**
+            The field count was right about the file's *shape* and wrong about
+            the corpus. A **blind annotator** — fresh session, corpus plus a
+            stripped query list, no scores — judged **25 of 50** questions to
+            have more than one genuinely relevant document (22 with two, 3 with
+            three), against **one asserted for all 50**.
+            **So `recall@k` ≠ `hit@k` on this corpus, and is not computable
+            from the current goldens.** The audit script said as much in its own
+            output: *"completeness is a human judgment about documents, and no
+            count can substitute for it."* It was treated as nearly settled
+            anyway, for a few hours, on a count.
+            ⚠ **No filed number is invalidated.** Past runs measured *"did the
+            asserted document come back"* — that is `hit@k`, reported as
+            `hit@k`. What changes is that it **may not be called `recall@k`**.
+            - [x] ✅ **A second blind annotator RAN 2026-08-28** —
+                  [the agreement run](../regression/2026-08-28-annotator-agreement/report.md).
+                  A different fresh session, denied the goldens, the scores,
+                  `fux`, **and the first annotator's answers**, judged 26 of 50
+                  multi-document. **Cohen's κ = 0.960**; 49/50 agreement on the
+                  multi/single call; **both name the same 25**. Annotator 1 was
+                  also caught omitting the golden's own asserted doc on `q027`,
+                  which is what a second reader is for.
+                  **The one-document assumption is refuted by measurement.**
+            - [x] ✅ **THE SCHEMA DECISION — RULED 2026-08-28 (Arpit): option
+                  B.** The rank contract and the relevance set become **two
+                  fields**, because the defect is conceptual and making the
+                  existing field plural would have carried the conflation
+                  forward. Recorded as
+                  [ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
+                  **decision 12**, with four rules: a declaration is required
+                  with any relevance set; `recall@k` is computable only over
+                  `complete` queries; `doc` must appear in `relevant`; and both
+                  fields are optional so nothing historical breaks.
+                  **Built in the same change** —
+                  [`tools/quality/goldens.py`](../../tools/quality/goldens.py)
+                  validates it, +12 tests, and the un-migrated playground file
+                  stays valid (reporting `recall@k` as *not computable*, which
+                  is the honest answer).
+            - [ ] **Migrate `fux-playground/goldens/queries.jsonl`.** The
+                  migrated set is built and validated — **43 `complete`, 7
+                  `partial`, 26 multi-document** — and is filed as
+                  [evidence](../regression/2026-08-28-annotator-agreement/evidence/queries-migrated-decision-12.jsonl)
+                  plus placed uncommitted in the playground as
+                  `goldens/queries.decision12.jsonl`.
+                  ⚠ **Deliberately NOT overwriting `queries.jsonl`** — that is a
+                  sibling repo with its own uncommitted work, and swapping the
+                  file every measurement is graded against is a human's call.
+                  **The 7 `partial` rows are where the two annotators' exact
+                  sets differed**; they take the union and are excluded from
+                  `recall@k` rather than being adjudicated by an agent.
+- [ ] **The `unanswerable` class does not exist** and must be authored **blind**,
+      or it contaminates the set it is meant to test (the W-78 lesson).
+      ✅ **UNBLOCKED 2026-08-28 (Arpit): a fresh session, corpus only, with the
+      prompt committed** — [`tools/quality-controls/BLIND-AUTHOR-BRIEF.md`](../../tools/quality-controls/BLIND-AUTHOR-BRIEF.md).
+      ADR-RS decision 11's test is *no access to the queries, judgments or prior
+      scores*; it does not require a human, and a fresh session given only the
+      corpus satisfies it literally.
+      🔴 **The leak channel is the PROMPT, and the prompt's author is not
+      blind.** The brief was written by a session that had read the goldens, the
+      decoys, the `known_failure` list and four runs of scores — so the
+      mitigation is **publication, not trust**: it is committed, short, and
+      checkable for the three things it must not contain (an example question, a
+      difficulty steer, any topic list). ⚠ **This makes the claim checkable, not
+      true by fiat** — the same limit `seal.py` has.
+      ⚠ **The 15 decoys are still NOT this class**, and the reason is now
+      recorded properly: not merely *"an agent wrote them"* but that **an
+      informed author fits the DIFFICULTY DISTRIBUTION even with no correct
+      answer to fit to.** The decoy set drifted generic — parental leave, badge
+      systems, invoice disputes — which is that effect, visible.
+      - [x] ✅ **RUN 2026-08-28** —
+            [the run](../regression/2026-08-28-blind-unanswerable/report.md),
+            classified `blind`. A fresh session with the corpus and the brief
+            and nothing else wrote 20 questions; a **second, independent** fresh
+            session ruled all 20 genuinely unanswerable, none at low confidence.
+            **The class now exists.**
+            🔴 **And it found the thing controls exist to find: the engine
+            reported `answerable: true` on 20 of 20** — 6 `grounded`, 13
+            `partial`, 1 `weak`, with 17 of 20 at or above the
+            `separation_floor` (median separation `0.448`). **Zero abstentions
+            on a purpose-built abstention test.**
+            ⚠ **The brief's validation loop is WRONG and was not followed as
+            written.** It grades a submitted question by the engine's own
+            `answerable`, so a `DROP` was meant to mean *"the corpus answers
+            it."* **That is circular** — it uses the system under test as the
+            arbiter of the test's own validity, and would have thrown away all
+            20 good questions as defective. Ground truth came from the second
+            blind session reading the corpus instead. **The drop count the
+            brief demands is therefore 0, not 20**, and the brief needs
+            amending before anyone runs it again.
+            ⚠ **No threshold proposed, R10 untouched** — a floor fitted to the
+            20 numbers that exposed the problem would be the moving-threshold
+            failure in a new costume.
 - [ ] ⚠ **Part B cannot run as specified.** `acme` and `orbit` were lost in the
       2026-08-20 lab wipe **along with their generator**, and
       `tools/pruning-eval/` still hard-codes reading them. **Part A — the
@@ -428,10 +539,24 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 - [x] The cost weights are committed **before** the first score under them.
       `t = 0.75` → `c = 2`, frozen 2026-08-27 with `recall@k` still uncomputed —
       which is exactly the ordering the rule demands.
-- [ ] `recall@k` is computed and is the reported headline.
-- [ ] The `judged` series, if ruled in, pins **model + prompt + version** and is
-      never compared across judge versions.
-- [ ] ADR-RS amended to own the quality contract, or a new record written for it.
+- [ ] **`recall@k` is computed and is the reported headline.** ✅ **The schema
+      blocker is GONE — ruled option B, 2026-08-28** ([ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
+      decision 12), built and validated, with the migrated 50-query set filed
+      (**43 `complete`**, so recall is computable over 43/50 the moment it
+      lands). **What remains is two mechanical steps, neither a decision:**
+      ① the playground's `queries.jsonl` is swapped for the migrated file —
+      a human's call in a sibling repo, not an agent's; ② a harness computes
+      the number and reports it **with the 43/50 fraction beside it**, which
+      decision 12 rule b requires.
+- [ ] **The `judged` series pins model + prompt + version** and is never
+      compared across judge versions. ⚠ **It IS ruled in** — fork 4, and
+      [ADR-QUALITY](../../docs/adr/0044_quality-contract.md) decision 9 governs
+      it — so this is not conditional any more. **No judged run has happened**,
+      so the pinning has never been exercised.
+- [x] ✅ **A record owns the quality contract** —
+      [ADR-QUALITY](../../docs/adr/0044_quality-contract.md), written 2026-08-27
+      rather than amending ADR-RS. Its components are claimed in the ownership
+      table (`tools/quality/`).
 
 ## References
 

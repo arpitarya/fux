@@ -27,10 +27,114 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-08-27**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-08-28**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: P3 passed, and a decoy caught fux believing itself (2026-08-27)
+### The most recent change: the version benchmark ran, and the ruler was what broke (W-93, 2026-08-28)
+
+**`fux-engine 1.0.0` vs working-tree `HEAD`, executed end to end.** Filed at
+[`regression/2026-08-28-benchmark-v1-vs-head/`](regression/2026-08-28-benchmark-v1-vs-head/report.md),
+classified **`informed`**, seven verdicts.
+
+🔴 **Every pre-registered paired test returned a discordant count of ZERO** — no
+query changed outcome in either direction, on any tier, on any suite.
+
+**Two findings, and neither is about the engines:**
+
+1. **The primary endpoint was saturated before it ran.** `hit@5` = 240/240 in
+   *both* arms at *every* tier; MRR@10 `1.0000`; rank-1 100 %. A marker planted
+   in one document has `df = 1` and is already rank 1. **`pb` and `pc` are
+   structurally zero**, so B1's null was determined by the corpus, not measured
+   from the engines — hence `INCONCLUSIVE`, the P1-GATE shape.
+   🔴 **The lesson is reusable and belongs to every paired run this repo files:
+   a power table says how many queries, never whether the queries are HARD.**
+   The pre-registration sized the set correctly and still could not detect
+   anything.
+
+2. **`superseded_weight` ships at `1.0`, so the supersession prior is a no-op.**
+   Both arms invert a retired document over its successor **identically** —
+   21/40 chains at tier 1 000. `HEAD` parses `supersedes:`, builds the edge,
+   resolves the flag onto the retired document, then multiplies its score by
+   one. **Post-hoc at `0.5`: 21/40 → 0/40**, 21 fixed, 0 broken, retrieval
+   untouched. **The machinery works and is switched off** — B2 `FAIL`, and the
+   item had predicted that a failure would mean the priors do not work. They do.
+   **W-94 is Arpit's call**, and doing nothing is also a choice.
+
+**What passed cleanly:** B3/B5/B6 — committed bytes 1.002 ×, published wheel
+**7.11 MB → 259 KB**, `ask` p95 1.32 ×, cold ingest 1.04 ×, and **no `int8`
+vectors are committed** by `HEAD` (read from a record). The differential law
+holds in both arms across all 240 queries. B9, the null control, ran **first**
+and passed in both halves.
+
+**Two process things landed with it:**
+
+- **Per-query rows now exist and are gated.** This run is the first in the store
+  to file them. `tests/test_regression_runs.py` gained the check, **baselined at
+  2026-08-29** — five runs were filed on the ruling's own day and their reports
+  are frozen, so the gate fires first on the next run. ⚠ **The lab and
+  playground harnesses still emit totals only**, so the next run filed from
+  either will hit the gate with nothing to give it.
+- **A run may file more than one verdict.** Seven thresholds, seven files, and
+  the contract test now globs `VERDICT*.md` — the siblings were otherwise filed,
+  cited and guarded by nothing.
+
+⚠ **One session cannot produce a `blind` benchmark**, and the pre-registration
+said so before the run. Whoever writes the generator and reads a score is
+`informed`. W-96 is the two-session protocol.
+
+### The most recent change: the two confidence floors are tunable, and the band now travels with its floor (2026-08-28)
+
+**A decision was reversed, and the reversal is only safe because of the second
+half of it.**
+
+- **What shipped.** `.fux/tune.toml` gains `[confidence]` —
+  `separation_floor` (default `0.1`) and `doc_coverage_floor` (default `0.0`).
+  Ruled by Arpit in Cowork. **This reverses ADR-CONFIDENCE decision 7**, which
+  had refused exactly this; decision 7 is kept in the record, quoted, with the
+  half of its argument that survives named.
+
+- 🔴 **The half that makes it safe: the block PUBLISHES the floor it was judged
+  under.** `separation_floor` and `doc_coverage_floor` are now fields on
+  `Confidence`, in `as_dict()`, in the MCP result and in
+  `output.schema.json`. Without that, exposing the knob would have made `band`
+  mean a different thing in every repo **with no way to tell** — worse than
+  either the lock or the knob. **If you are about to compare two `grounded`s,
+  compare their floors first.**
+
+- ⚠ **What is now unguarded, and no check covers it.** A consumer can set
+  `separation_floor = 0.0` and nothing is ever `weak` again — tuning away the
+  *signal* rather than the ranking. Nothing mechanical catches it. The reason
+  it was opened anyway is the standing rule on knobs (*state the cost, do not
+  clamp; refuse only what is broken or duplicates a tool*), and `[priority]`
+  is the precedent: it can silently reweight a whole corpus and ships with a
+  warning, not a lock.
+
+- ⚠ **ADR-QUALITY decision 6's binding now has a hole.** Fux does not get to
+  pick a second abstention threshold. A *consumer* now can. Accepted rather
+  than argued away: the engine default stays bound to `t = 0.75`, and a local
+  value is published as local.
+
+- **R10 is unchanged and undiminished.** A tunable floor makes the missing
+  measurement *easier to paper over*, not less owed. **No document may call a
+  tuned floor measured.**
+
+- **New reopen trigger, worth knowing before you file a run:** a measured
+  comparison whose two arms have different `separation_floor` values is a
+  pre-registered threshold moving inside a comparison. Forbidden.
+
+- **Also fixed on contact, and both were W-83's class** — a record describing
+  behaviour the code no longer has. **ADR-TUNE decision 4** still said *keys
+  ship COMMENTED* (they have shipped live since 2026-08-27) and carried a
+  commented specimen; the **handbook** still said ADR-CONFIDENCE was
+  *proposed*, said *five fields* when there are six, and told the reader the
+  floor was deliberately not tunable.
+
+- ⚠ **Verification is PARTIAL.** The device bridge's shell was wedged all
+  session, so nothing ran on the build machine. The changed surface was run in
+  the Cowork container: **145 passed vs a 135 baseline**. `tests_e2e/` and the
+  rest of `tests/` did **not** run. **Run them before committing.**
+
+### Before that: P3 passed, and a decoy caught fux believing itself (2026-08-27)
 
 **One gate closed, one defect found, and the finding matters more than the gate.**
 
@@ -916,7 +1020,14 @@ the reason is that the measuring environments are gone.**
 
 ## 2 · In flight, and the immediate next step
 
-*Updated **2026-08-27**. The queue is **three**, and every one is `arpit`-lane:*
+*Updated **2026-08-28**.*
+
+**The one thing owed from the last change:** `uv run pytest -q tests tests_e2e`
+on the build machine. The confidence-floor change was verified in the Cowork
+container over the changed modules only (145 passed / 135 baseline) because the
+device shell was wedged; the suite is unrun.
+
+*The `arpit` queue is **three**, unchanged:*
 
 | item | what it needs | filed |
 |---|---|---|
@@ -1230,6 +1341,21 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **Exposing a knob and publishing what it was set to are ONE change, not two**
+  (2026-08-28, ADR-CONFIDENCE 13). The confidence floors were locked because a
+  consumer could tune away the signal. Opening them was right by the project's
+  own rule on knobs — but opening them *alone* would have made `band` silently
+  incomparable across repos, which is a worse failure than either the lock or
+  the knob, and an invisible one. **A value that changes what a published field
+  MEANS has to be published beside it.** The general form: when you make
+  something configurable, ask what downstream reader is now comparing two things
+  that are no longer alike, and hand them the difference.
+- **A record can be stale in the direction of "we refused that"** (2026-08-28).
+  ADR-TUNE decision 4 said keys ship commented; they had shipped live for a day.
+  The handbook told a reader a knob did not exist. **Both were found by
+  re-reading the records the change landed under** — CLAUDE.md §Law zero point 3
+  — and by nothing mechanical, because `test_adr_freshness.py` proves a record
+  was *touched*, never that it is *true*.
 - **Verifying a request is not the same as answering it** (2026-08-27, W-93).
   Arpit asked for the skip list to be written into `.fuxignore`. The walker said
   his stated *mechanism* would not reduce the count — true — so the session

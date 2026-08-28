@@ -104,7 +104,15 @@ def runs() -> list[Path]:
 
 
 def verdicts() -> list[Path]:
-    return sorted(p / "VERDICT.md" for p in runs() if (p / "VERDICT.md").is_file())
+    """Every verdict file, not only `VERDICT.md`.
+
+    A run that rules on several pre-registered thresholds files one verdict per
+    threshold — `VERDICT.md` for the primary and `VERDICT-<id>.md` beside it —
+    because one `verdict:` key cannot carry PASS, FAIL and INCONCLUSIVE at once.
+    Globbing only the bare name would have left the siblings unchecked, which is
+    the worst state for a verdict: filed, cited, and guarded by nothing.
+    """
+    return sorted(v for p in runs() for v in p.glob("VERDICT*.md"))
 
 
 @pytest.mark.parametrize("run", runs(), ids=lambda p: p.name)
@@ -246,6 +254,67 @@ def test_measured_run_names_who_authored_what(run: Path) -> None:
         "none they could reach at the time. The burden is on the author to argue "
         "exposure was absent, not on a reader to prove it was present."
     )
+
+
+# --------------------------------------------------------------------------
+# The per-query-rows rule -- ruled by Arpit 2026-08-28: "record all the
+# questions so we can check in detail."
+#
+# The discordant count, `b`, `c`, and every test anyone runs later are derivable
+# from per-query rows AND FROM NOTHING ELSE, so a run that files only totals
+# cannot be re-tested by anybody -- including its own author.
+# --------------------------------------------------------------------------
+
+#: Baselined the day AFTER the ruling, not the day of it, and the reason is
+#: not convenience. Five runs were already filed on 2026-08-28 before any
+#: harness could emit rows; their reports are frozen, the underlying per-query
+#: data no longer exists for some of them, and turning a rule on by editing the
+#: evidence it governs is the exact failure the `classification:` baseline was
+#: written to avoid. So this gate first bites on the next run filed.
+ROWS_SINCE = "2026-08-29"
+
+#: A run with no queries has no per-query results. It says so in its own report
+#: -- the same read-the-declaration pattern `is_surface_capture` uses -- rather
+#: than being guessed at from the directory's contents.
+NO_QUERIES = "no per-query rows"
+
+
+def needs_rows(run: Path) -> bool:
+    if run.name[:10] < ROWS_SINCE:
+        return False
+    report = report_of(run)
+    if report is None or is_pre_registered_only(run):
+        return False
+    text = report.read_text(encoding="utf-8").lower()
+    return not (is_surface_capture(report) or NO_QUERIES in text)
+
+
+def row_runs() -> list[Path]:
+    return [r for r in runs() if needs_rows(r)]
+
+
+@pytest.mark.parametrize("run", row_runs(), ids=lambda p: p.name)
+def test_measured_run_files_its_per_query_rows(run: Path) -> None:
+    found = sorted((run / "evidence").rglob("*.jsonl")) if (run / "evidence").is_dir() else []
+    assert found, (
+        f"{run.name}: no per-query rows under evidence/. CLAUDE.md (§Conformance runs), "
+        "ruled by Arpit 2026-08-28 -- one row per query per arm, pass/fail, written as "
+        "the run goes. A summary count is not enough and never was: nobody, including "
+        "the author, can re-test a paired result from totals. If this run genuinely has "
+        f"no queries, say {NO_QUERIES!r} in its report and this rule does not apply."
+    )
+
+
+def test_the_per_query_rule_is_baselined_after_the_runs_it_cannot_reach() -> None:
+    """Guard the RULE, not only the runs -- an empty parametrisation is silent.
+
+    Every run filed on the ruling's own day predates any harness that could
+    emit rows, so the baseline must sit after them; if someone moves it back,
+    this says so rather than the suite quietly going red on frozen evidence.
+    """
+    unreachable = [r.name for r in runs() if "2026-08-25" <= r.name[:10] < ROWS_SINCE]
+    assert unreachable, "the baseline has drifted past every run it was written to exempt"
+    assert all(not needs_rows(r) for r in runs() if r.name[:10] < ROWS_SINCE)
 
 
 def _write_run(root: Path, name: str, body: str) -> Path:
