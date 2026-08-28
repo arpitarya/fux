@@ -24,6 +24,50 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-08-29 — Everything committed, pushed, and 2.0.0-alpha.3 released  ·  Claude Code
+
+- **Asked:** *"commit everything push and publish a new alpha version."*
+
+- **Found a blocker before committing: the suite wasn't clean.** A concurrent
+  session had landed W-95's contested-answer benchmark (C1–C6) uncommitted,
+  and its `VERDICT*.md` files predated the run register's schema — 15 tests
+  red (`tests/test_regression_runs.py`, `test_prediction_register.py`).
+  Fixed rather than shipped red: added the missing `prediction`/
+  `pre_registration` frontmatter keys to five VERDICT files; mapped the
+  out-of-enum `NO DETECTED CHANGE` to `INCONCLUSIVE` (precedent: its sibling
+  B1 verdict does the same); renamed `VERDICT-C6.md` → `DISCLOSURE-C6.md`
+  (it reports rather than tests a hypothesis, so `PASS`/`FAIL`/
+  `INCONCLUSIVE` all misstate it — its content is unchanged, just no longer
+  swept into the Verdict schema); added the `## Authorship` section
+  `test_measured_run_names_who_authored_what` requires (content already
+  existed in prose, ADR-RS decision 13); registered C1–C5 in
+  `IMPLEMENTATION.md`'s feature-gates table. **2440 passed, 3 skipped, 0
+  failed** afterward.
+
+- **Did:**
+  - Committed everything in one change
+    ([`94511cd`](../../commit/94511cd)) — the ADR-OUTPUT decision 20/21 work,
+    the ADR-CLI/ADR-CONFIDENCE freshness fix, the OPEN-WORK regroup, and the
+    W-95 conformance fixes above. Pushed to `main`.
+  - Bumped `__version__` to `2.0.0-alpha.3`, moved CHANGELOG's `[Unreleased]`
+    section (already accurate) under the new version header, updated the two
+    version-fact lines in CLAUDE.md. Committed separately with `no ADR
+    affected` — a pure version-string fact, not a decision (CLAUDE.md's own
+    "statements of fact are exempt" clause) — since `test_working_tree_is_
+    not_mid_violation` cannot see a future commit message and always flags
+    an unaccompanied CLAUDE.md diff; the commit-msg hook is what actually
+    honors the escape hatch. Pushed
+    ([`569e631`](../../commit/569e631)).
+  - `gh release create v2.0.0-alpha.3` (pre-release) → `publish.yml` ran the
+    tag/version guard, built, `twine check --strict`, published via OIDC
+    trusted publishing. Both jobs green in ~45s; confirmed `2.0.0a3` live in
+    PyPI's release list.
+
+- **Decided / open:** nothing new opened. Working tree is clean.
+
+- **Next:** OPEN-WORK's queue is unchanged by this — same `agent`/`arpit`
+  items, now sitting on top of a released `2.0.0-alpha.3`.
+
 ## 2026-08-29 — OPEN-WORK regrouped: by record → by what closing it takes  ·  Claude Code
 
 - **Asked:** *"rather than having 'Open items, by record' have them in these
