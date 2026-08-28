@@ -12,7 +12,7 @@ the differential law binds together: `scan` and `accelerator` must agree.
 
 Reports, per mode:
 
-- pass / fail against each golden's `expect_top` contract
+- pass / fail against each golden's `doc` + `max_rank` contract
 - `XPASS` — a query marked `known_failure` that now passes
 - `REGRESSION` — a query that passed and no longer does, **reported first**,
   because a change that closes two gaps while breaking five is a loss that a
@@ -32,13 +32,18 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from fux.derive import accel  # noqa: E402
-from fux.query.scan import ask as scan_ask  # noqa: E402
+from fux.query import run_query  # noqa: E402
+from fux.tune import load as load_tune  # noqa: E402
 
-MODES = {
-    "scan": lambda root, q, top: scan_ask(root, q, top=top),
-    "accelerator": lambda root, q, top: accel.ask(root, q, top=top),
-}
+# `run_query` picks the mode: `force_scan=True` is scan, `False` is the
+# accelerator (falling back to scan itself when no fresh build exists — see
+# the fallback note in `grade`). Both modes get the SAME `Tune`, resolved
+# once per corpus, so the comparison is apples to apples with `fux ask`
+# itself: weighting, scoring and reranking all come from `.fux/tune.toml`,
+# exactly as the CLI applies them. Calling `scan_ask`/`accel.ask` directly
+# with no tuning was the earlier bug — it never matched what a real answer
+# looked like.
+FORCE_SCAN = {"scan": True, "accelerator": False}
 
 
 @dataclass
@@ -49,6 +54,7 @@ class ModeResult:
     xpass: list[str] = field(default_factory=list)
     regressions: list[str] = field(default_factory=list)
     failed_ids: set[str] = field(default_factory=set)
+    fell_back: list[str] = field(default_factory=list)
 
 
 def load_goldens(playground: Path) -> list[dict]:
@@ -56,12 +62,14 @@ def load_goldens(playground: Path) -> list[dict]:
     return [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-DEFAULT_TOP = 10
+# `fux-playground/check.py`'s own default, ported so the two harnesses ask
+# the engine for the same amount of evidence per query.
+DEFAULT_TOP = 5
 
 
-def _rank_of(results: list, doc_id: str) -> int | None:
+def _rank_of(results: list, doc: str) -> int | None:
     for i, r in enumerate(results, 1):
-        if r.id == doc_id:
+        if r.loc == doc:
             return i
     return None
 
@@ -69,47 +77,38 @@ def _rank_of(results: list, doc_id: str) -> int | None:
 def grade_one(golden: dict, results: list) -> list[str]:
     """Failure reasons; empty means pass.
 
-    **A verbatim port of `fux-playground/tools/check.py:grade`.** Copied rather
+    **A port of `fux-playground/check.py:grade`'s pass/fail logic** — one
+    document, one rank ceiling per golden (`doc` + `max_rank`), copied rather
     than approximated on purpose: a second, looser definition of "pass" living
     in the engine repo is how a lab bench starts reporting better numbers than
     the consumer's own harness. If the playground's contract changes, this must
     be re-synced, and the sanity check in `main` is what catches the drift.
     """
-    failures: list[str] = []
-
-    if golden.get("expect_empty"):
-        if results:
-            got = ", ".join(f"{r.id}@{i}" for i, r in enumerate(results, 1))
-            failures.append(f"expected no results, got {len(results)}: {got}")
-        return failures
-
-    satisfied_ranks: list[int] = []
-    for want in golden.get("expect", []):
-        doc_id, max_rank = want["id"], want["max_rank"]
-        got = _rank_of(results, doc_id)
-        if got is None:
-            failures.append(f"{doc_id} absent from top {len(results)} (wanted rank <= {max_rank})")
-        elif got > max_rank:
-            failures.append(f"{doc_id} at rank {got}, wanted <= {max_rank}")
-        else:
-            satisfied_ranks.append(got)
-
-    if satisfied_ranks:
-        floor = max(satisfied_ranks)
-        for doc_id in golden.get("forbid_above", []):
-            got = _rank_of(results, doc_id)
-            if got is not None and got < floor:
-                failures.append(f"{doc_id} at rank {got} outranks the expected answer at {floor}")
-
-    return failures
+    doc_id = golden["doc"]
+    want = golden.get("max_rank", 1)
+    got = _rank_of(results, doc_id)
+    if got is None:
+        return [f"{doc_id} absent from top {len(results)} (wanted rank <= {want})"]
+    if got > want:
+        return [f"{doc_id} at rank {got}, wanted <= {want}"]
+    return []
 
 
-def grade(root: Path, goldens: list[dict], mode: str, baseline: ModeResult | None) -> ModeResult:
+def grade(
+    root: Path, goldens: list[dict], mode: str, tune, baseline: ModeResult | None
+) -> ModeResult:
     out = ModeResult()
-    runner = MODES[mode]
+    force_scan = FORCE_SCAN[mode]
     for golden in goldens:
         top = golden.get("top", DEFAULT_TOP)
-        ok = not grade_one(golden, runner(root, golden["query"], top))
+        results, path = run_query(root, golden["q"], top, force_scan=force_scan, tune=tune)
+        if mode == "accelerator" and path != "accelerator":
+            # `run_query` falls back to scan silently when no fresh accelerator
+            # build exists. Silent here would mislabel a scan result as the
+            # accelerator's — exactly the class of bug this file has already
+            # had twice. Record it instead of hiding it.
+            out.fell_back.append(golden["id"])
+        ok = not grade_one(golden, results)
         known = bool(golden.get("known_failure"))
         if ok:
             out.passes += 1
@@ -133,12 +132,13 @@ def main(argv: list[str] | None = None) -> int:
 
     root = args.playground.resolve()
     goldens = load_goldens(root)
+    tune = load_tune(root)
     print(f"{len(goldens)} goldens from {root}\n")
 
     baseline = None
     results: dict[str, ModeResult] = {}
     for mode in ("scan", "accelerator"):
-        results[mode] = grade(root, goldens, mode, baseline)
+        results[mode] = grade(root, goldens, mode, tune, baseline)
         if mode == "scan":
             baseline = results[mode]
 
@@ -152,6 +152,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"\n{mode} XPASS (a named gap closed): {', '.join(sorted(r.xpass))}")
         if r.regressions:
             print(f"{mode} REGRESSIONS (passed under scan, fails here): {', '.join(sorted(r.regressions))}")
+        if r.fell_back:
+            print(
+                f"\n⚠ {mode} had no fresh accelerator build — ran scan instead for: "
+                f"{', '.join(sorted(r.fell_back))} (results below are NOT a real accelerator check)"
+            )
 
     accel_matches = results["accelerator"].failed_ids == results["scan"].failed_ids
     print(f"\naccelerator == scan on every golden: {accel_matches}")

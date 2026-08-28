@@ -5,7 +5,7 @@ title: ADR-CONFIDENCE (0045) — how much the index believes its own answer
 description: "Four deterministic signals and one band, emitted with every answer, so a consuming agent can tell a grounded result from the closest thing in a corpus that never discusses the question."
 status: accepted
 date: 2026-08-27
-amended: 2026-08-27
+amended: 2026-08-28
 feature: the confidence plane
 owns: [src/fux/query/confidence.py]
 laws: [1, 3, 4]
@@ -33,6 +33,12 @@ query term exists in no document; the cited bytes changed since ingest. Only
 [ADR-QUALITY](0044_quality-contract.md) decision 6 has **already fixed what it
 must be calibrated to**: the confidence target `t = 0.75`. This record does not
 get to pick a second one.
+
+⚠ **Since 2026-08-28 both numeric floors are `.fux/tune.toml` keys** —
+`[confidence] separation_floor` and `doc_coverage_floor` (decision 13, which
+**reverses decision 7**). **A band is therefore no longer comparable across
+repos on its own**, so the block now publishes the floor it was judged under.
+Read the floor before reading the band.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -253,10 +259,18 @@ should have declined, and this is the surface on which it declines.
      about ±0.2. **The run exists to find out whether a number is findable**,
      and *not yet* is the likeliest honest answer.
 
-7. **`SEPARATION_FLOOR` is not a `tune.toml` key.** A consumer who could lower
-   it until their answers read `grounded` would be tuning away the signal rather
-   than the ranking — and under decision 6 it is not fux's number to move
-   locally at all.
+7. ⚠ **REVERSED 2026-08-28 — see decision 13. The original text is kept
+   because the argument it makes is still true; what changed is who gets to
+   decide.**
+
+   > **`SEPARATION_FLOOR` is not a `tune.toml` key.** A consumer who could
+   > lower it until their answers read `grounded` would be tuning away the
+   > signal rather than the ranking — and under decision 6 it is not fux's
+   > number to move locally at all.
+
+   **The half that survives:** lowering the floor still tunes away the signal,
+   and a repo-local floor is still not a calibration. **The half that did not:**
+   the prohibition. Decision 13 records why, and what replaced it.
 
 8. **`missing` reports the surface form, never the analyzed one.** *"`mtl` is
    not in this corpus"* is worse than silence: a reader cannot tell whether fux
@@ -300,6 +314,77 @@ should have declined, and this is the surface on which it declines.
       an instruction it has to have read.
     - **Reopen trigger:** a measured case of an agent answering from a `none`
       or `weak` result because it did not pass `--band`. One is enough.
+
+**13. BOTH FLOORS ARE `tune.toml` KEYS — ruled by Arpit, 2026-08-28, in
+Cowork. This reverses decision 7.**
+
+`.fux/tune.toml` gains one table:
+
+```toml
+[confidence]
+separation_floor   = 0.1   # engine default; the `grounded`/`weak` cutoff
+doc_coverage_floor = 0.0   # engine default; 0.0 = the clause is OFF
+```
+
+- **Why the reversal.** The standing rule on any configurable value is *state
+  the cost, do not clamp the knob* — refuse what is **broken** or what
+  **duplicates an existing tool**, and warn, with numbers, about what is merely
+  strong. Neither floor is broken at any legal value and neither duplicates
+  anything. Decision 7 was the one place in fux where a knob was withheld
+  because a consumer might misuse it, and that is not the project's rule.
+  ⚠ **The `[priority]` table is the precedent**: it can silently reweight a
+  whole corpus, it is far more dangerous than either floor, and it ships with a
+  warning rather than a lock.
+
+- ⚠ **What decision 7 was buying, now unguarded, stated plainly.** A consumer
+  can set `separation_floor = 0.0` and **no answer is ever `weak` again**. That
+  is tuning away the *signal* rather than the ranking, it is silent, and
+  **nothing mechanical catches it.** A session reading a `grounded` from a
+  tuned repo learns less than it thinks it does.
+
+- **Two things replace the prohibition, and both are weaker than it was.**
+
+  1. 🔴 **The block PUBLISHES the floor it was judged under.** `as_dict()` and
+     the MCP result now carry `separation_floor` and `doc_coverage_floor`, so a
+     `grounded` at `0.02` is **distinguishable** from a `grounded` at `0.10`
+     rather than merely different. **This is the load-bearing half of the
+     reversal** — without it, exposing the knob would make the band quietly
+     meaningless across repos, which is worse than either the lock or the knob.
+  2. **`--no-tune` reaches the band**, not just the ranking. The floors are
+     resolved from the same `Tune` that scored the query, so the *"is it me or
+     the config?"* switch (ADR-TUNE decision 11) answers for confidence too.
+
+- **The boundary rule is satisfied trivially, and that is worth saying rather
+  than assuming.** ADR-TUNE decision 1 asks whether a value leaves `.fux/index/`
+  byte-identical. These do — **and they go further: they cannot move a score or
+  an ordering either**, because confidence is computed *from* `rank()`'s output
+  and nothing downstream feeds back. `[confidence]` is the first table in
+  `tune.toml` of which that is true.
+  Pinned by `tests/test_tune_boundary.py` (both keys in `MUTATIONS`) and by
+  `test_a_tuned_floor_cannot_reach_a_score_or_an_ordering`.
+
+- ⚠ **This does NOT settle R10, and does not let a repo settle it either.**
+  The measurement is still owed to ADR-QUALITY's frozen `t`. A repo-local floor
+  is a **local preference**; it is never a calibration, and no document may
+  describe a tuned floor as measured.
+
+- ⚠ **Decision 6's binding is unchanged and now has a gap it did not have.**
+  Decision 6 says fux does not get to pick a second abstention threshold. A
+  *consumer* now can. That is a real hole in the argument, accepted rather than
+  argued away: fux's engine default stays bound to `t`, and what a consumer sets
+  locally is theirs and is published as theirs.
+
+- **`doc_coverage_floor`'s cost is MEASURED, which separates it from the
+  other.** At `1.0` — the only value that reads structural — **19 of 50 correct
+  answers turn `partial`**, and the single decoy this clause could catch sits at
+  `0.710`, inside the goldens' range (decision 12's table). The specimen and the
+  module both carry those numbers, so a consumer raising it is paying a stated
+  price rather than guessing.
+
+- **Reopen trigger:** a measured run whose arms differ in `separation_floor`.
+  Comparing two such arms is a threshold moving inside a comparison, which
+  §"a pre-registered threshold may never move" forbids — and the published floor
+  is what makes it detectable.
 
 **Output — the differential law on the confidence block, captured 2026-08-27:**
 
@@ -417,9 +502,21 @@ The duplication is gated by
 [`tests/query/test_analyzer.py`](../../tests/query/test_analyzer.py), not by
 review.
 
+**The band is no longer comparable across repositories on its own.** That is
+the direct cost of decision 13 and it lands on every consumer of the block: two
+answers both reading `grounded` may have been judged by different floors. The
+mitigation is that both floors are emitted — **a reader that ignores them is
+making a comparison fux told it not to make.**
+
+**`output.schema.json#confidence` grew two required fields.** Additive, so an
+existing consumer keeps working; a consumer that *compares* bands across repos
+was already wrong and is now able to find out.
+
 **What we now owe: R10**, and it is owed to ADR-QUALITY's frozen `t`, not to
 this record's taste. Filed as
 [W-90](../../archive/open/W-90-the-confidence-plane.md).
+⚠ **Decision 13 does not reduce that debt.** A tunable floor makes the missing
+measurement *easier to paper over*, not less owed.
 
 ### Alternatives considered
 
@@ -444,6 +541,17 @@ this record's taste. Filed as
 - **A cross-encoder or model-scored confidence.** Refused for the reason
   [ADR-RERANK](0041_rerank.md) refused it — not cost, but cross-machine
   determinism, and here additionally L3.
+- **Exposing the floors WITHOUT publishing them in the block** (decision 13).
+  Rejected, and it is the version that would have been easy: two `tune.toml`
+  keys and nothing else. It would have made `band` mean a different thing in
+  every repo with no way to tell — a signal that silently varies is worse than
+  one that is admittedly provisional.
+- **Clamping the range — refusing `separation_floor = 0.0`.** Rejected on the
+  standing rule: `0.0` is not broken, it is *strong*. It turns the `weak` band
+  off, the specimen says so in capitals, and a consumer who wants it has a
+  reason fux does not know. Only genuinely broken values are refused anywhere in
+  `tune.toml`, and neither floor has one — the loader's `[0,1]` check is a
+  domain check, not a taste check.
 
 ### Reference (required)
 
@@ -482,6 +590,17 @@ $ fux ask "merge driver conflict resolution" --top 5 --json --fast | jq -c .conf
 **Reopen it also if** `t` in [`tools/quality/mix.toml`](../../tools/quality/mix.toml)
 is no longer `0.75`. Decision 6 binds this floor to that value, so a change
 there invalidates the floor without touching this file.
+
+**Reopen it also if** a `confidence` block is emitted anywhere without
+`separation_floor`, or a measured run compares two arms whose floors differ.
+Decision 13's whole safeguard is that the floor travels with the band; a band
+that arrives without its floor is the reversal with its mitigation missing.
+
+```console
+$ fux ask "merge driver conflict resolution" --top 5 --json --band | jq -c .confidence.separation_floor
+0.1
+# 2026-08-28 — present; not fired
+```
 
 ---
 

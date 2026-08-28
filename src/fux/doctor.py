@@ -205,6 +205,7 @@ def _layout(root: Path) -> list[Check]:
     )
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
+    checks.append(_fetcher_capabilities(root))
     checks.append(_accelerator(root))
     checks.append(_background_runner(root))
     daemon_check = _daemon(root)
@@ -245,6 +246,77 @@ def _types_health(root: Path) -> Check:
         f"{DEFAULT_TYPES_FILE} has no active pattern, so `fux ingest` refuses to run - "
         "delete the file to take the built-in default, or re-run `fux setup` after "
         "deleting it to get the default written out",
+    )
+
+
+def _fetcher_capabilities(root: Path) -> Check:
+    """Which optional fetcher functions the consumer's own file implements.
+
+    **The gap this closes, measured 2026-08-28:** a repo created before
+    [ADR-FETCHER](../../docs/adr/0019_fetcher.md) decision 12 learned **0 of 7**
+    `validate()` tokens until its `http.py` was replaced by hand. `fux setup` is
+    write-if-missing and never rewrites a consumer's fetcher — the freeze
+    ADR-DOTFUX decision 6 names — so a new optional function reaches new repos
+    only, silently, and the optimisation that never runs is indistinguishable
+    from one that ran and found nothing.
+
+    ⚠ **A NOTICE, never a rewrite.** ADR-DOTFUX decision 6 names the mechanism
+    for a change that must reach an existing repo: *a loader refusal or a
+    `doctor` check, never a rewrite.* `_types_health` is the precedent. Rewriting
+    a consumer's committed fetcher would be a worse problem than the one it
+    solves, which is why the record left this stated-as-a-cost rather than
+    proposing a loader that edits their file.
+
+    A **warning**, never an error: every function checked here is optional by
+    contract, a fetcher without them is correct and supported, and reporting a
+    supported configuration as a failure trains people to ignore a red doctor —
+    the same reasoning `_url_health` and `_accelerator` record.
+    """
+    from .config import load as load_config
+
+    name = "fetcher optional functions"
+    try:
+        url_source = load_config(root).url
+    except FuxError:
+        # An unreadable/absent `fux.toml` is `_repo_root`'s business, not this
+        # check's. The message is NOT interpolated: a FuxError carries an
+        # em-dash, and every detail here is ASCII by invariant.
+        return Check(name, True, "skipped (no readable fux.toml)", level="warn")
+    if url_source is None:
+        # No `[sources.url]` at all: this repo does not fetch, so which
+        # optional functions its fetcher implements is not a fact about it.
+        return Check(name, True, "skipped (no [sources.url] - this repo does not fetch)", level="warn")
+    rel = url_source.fetcher
+    path = root / rel
+    if not path.is_file():
+        return Check(name, True, f"{rel}: absent - run `fux setup` to write the shipped fetchers", level="warn")
+
+    # Read the source; never import it. Importing a consumer's fetcher runs
+    # their module-level code, and `doctor` is offline by this module's
+    # contract -- a fetcher is free to open a session at import time.
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        return Check(name, False, f"{rel}: {exc}", level="warn")
+
+    #: Optional by contract, each with the record that added it and what a
+    #: consumer forfeits by not having it. `fetch` is NOT here -- it is
+    #: mandatory and `load_fetcher` already refuses without it.
+    optional = [
+        ("validate", "ADR-FETCHER decision 12", "re-fetches every URL body even when unchanged"),
+        ("is_rate_limited", "ADR-FETCHER decision 13", "cannot tell a 429 from a hard failure"),
+    ]
+    missing = [(fn, rec, cost) for fn, rec, cost in optional if f"def {fn}(" not in text]
+    if not missing:
+        return Check(name, True, f"{rel}: implements {', '.join(fn for fn, _, _ in optional)}", level="warn")
+    return Check(
+        name,
+        True,  # optional by contract: absence is legal, so this never fails the command
+        f"{rel} does not implement "
+        + "; ".join(f"`{fn}()` ({rec}) - {cost}" for fn, rec, cost in missing)
+        + ". Your fetcher is yours and fux will not rewrite it: copy the function from "
+        "`fux setup`'s current template, or ignore this if it does not suit your network",
+        level="warn",
     )
 
 

@@ -331,10 +331,101 @@ anyone reporting both must say which half.
 that adjudicates anything. **The marker moves from `NOT BUILT` to built; it does
 not become evidence.**
 
+✅ **DISCHARGED 2026-08-28 for the `unanswerable` class** —
+[the run](../../work/regression/2026-08-28-blind-unanswerable/report.md),
+classified `blind`, is the first to use a control to adjudicate.
+
+✅ **DISCHARGED the same day for the CONTENT-FREE PLACEBO** —
+[the run](../../work/regression/2026-08-28-placebo-and-seal/report.md). Three
+ingested arms on the playground: `none` **32/50**, `placebo` **33/50**, `real`
+**41/50** (the outer two reproducing 2026-08-24 exactly, which is what makes it
+a comparison). **Matched-length content-free prose on nine of ten documents
+moved one query — `n_d = 1`, two-sided exact `p = 1.0000`, no detected change.**
+**The source-bias explanation this decision was written against does not hold on
+this corpus**; the lift is attributable to content.
+⚠ **It clears SOURCE BIAS and not CONTAMINATION.** The `real` arm's author read
+the queries; decision 12 governs that separately and this run does not touch it.
+**The `+9` remains `informed` and is not a generalisation estimate.**
+
+🔴 **NOT DISCHARGED for the SEALED SUBSET, and the reason is chronology.**
+`seal.py` was written 2026-08-28; the enrichment it was applied to was authored
+2026-08-24, when its author could see **all fifty** queries. **A post-hoc split
+of a fully-seen set cannot test contamination**, however deterministic the
+split — so the observed visible/sealed lift split (+8 vs +1) **may not be read
+as a contamination signature**, the more so with `n_d = 1` in the sealed half
+and 5 of 9 `known_failure` goldens sitting in it. **The seal is EXERCISED, not
+PROVEN**, and its first adjudicating use needs an artifact authored *after* it
+existed, by an author given the visible 35 only.
+
+**Scoreboard, so the marker is never read as all-or-nothing:**
+
+| control | built | used to adjudicate |
+|---|---|---|
+| decoy query set | ✅ | ✅ 2026-08-27 |
+| `unanswerable` class | ✅ | ✅ 2026-08-28 |
+| content-free placebo | ✅ | ✅ 2026-08-28 |
+| **sealed subset** | ✅ | 🔴 **exercised only — see above** |
+
+🔴 **And the control did what a control is for: it found something.** A blind
+session authored 20 near-miss `unanswerable` questions; a **second, independent**
+blind session ruled all 20 genuinely unanswerable; **the engine reported
+`answerable: true` on 20 of 20** — 6 `grounded`, 13 `partial`, 1 `weak`, with 17
+of 20 at or above the `separation_floor`. This is the decoy control's 1-of-15
+reproduced at severity once the set is *designed* to sit close to the corpus.
+⚠ **It proposes no threshold and reopens no ruling** — R10 is unmeasured and a
+floor fitted to the 20 numbers that exposed the problem would be decision 12's
+failure in a new costume.
+
+🔴 **The same run withdraws a conclusion this record's own decision 15 work
+produced.** `relevance_audit.py` established the goldens hold one scalar `doc`
+per query, and the inference drawn on 2026-08-28 was *"`recall@k` over this set
+IS `hit@k`."* A blind annotator then judged **25 of 50** questions to have more
+than one genuinely relevant document. **The inference was about the file's
+shape and does not survive contact with the corpus** — which the audit script
+itself said no count could settle. **No filed number is invalidated**: past runs
+measured *"did the asserted document come back"*, which is `hit@k` and was
+reported as such. What changes is that **`hit@k` may not be called `recall@k`**,
+and W-87 P2's headline metric is not computable from what exists today.
+
+✅ **CONFIRMED by a second blind annotator, 2026-08-28** —
+[the agreement run](../../work/regression/2026-08-28-annotator-agreement/report.md).
+A different fresh session, denied the goldens, the scores, `fux` itself **and
+the first annotator's answers**, judged **26 of 50** multi-document. The two
+agree at **Cohen's κ = 0.960** — 49/50 on the multi/single call, 86 % on the
+exact document set, mean Jaccard 0.943 — and **both name the same 25**.
+**The one-document assumption is refuted by measurement, not by one opinion.**
+⚠ **The schema decision is an ADR and this record does not make it**: whether
+`expect` becomes a list, or the rank contract and the relevance set split into
+two fields, belongs to whoever owns the golden format. The evidence is filed.
+
 ⚠ **Running the placebo is not the same as building it.** A placebo arm produces
 its value as a **delta between arms**, which decision 12 governs — so grading the
 playground three ways needs the blind/informed question answered before any
 number from it may be cited.
+
+**Two more `tools/quality-controls/` artifacts landed 2026-08-28, outside the
+three-control table above** — neither is a control on an enrichment arm; both
+close the P2 `recall@k` question W-87 filed:
+
+- [`BLIND-AUTHOR-BRIEF.md`](../../tools/quality-controls/BLIND-AUTHOR-BRIEF.md)
+  — the prompt a genuinely blind session runs to author the `unanswerable`
+  query class (ADR-RS decision 11's test: no access to queries, judgments or
+  prior scores). **Committed because its own author could not be blind** — a
+  session that had read the goldens wrote the brief, so the mitigation is
+  publication, not trust: anyone can check it for the three things it must not
+  contain. Not yet run by a blind session; **the class it produces does not
+  exist yet.**
+- [`relevance_audit.py`](../../tools/quality-controls/relevance_audit.py) —
+  checks whether the goldens' relevance format needs new annotation before
+  `recall@k` can be computed. **Its first run (2026-08-27) was vacuous**: it
+  read an `expect`-list schema key that `fux-playground/goldens/queries.jsonl`
+  has never had, and reported "0 asserted" for all 50 — a reading of a field
+  that does not exist, not a finding. **Fixed 2026-08-28** (Claude Code) to the
+  real schema — one scalar `doc` + `max_rank` per golden, confirmed against
+  `fux-playground/check.py` — and re-run: all 50 goldens assert exactly one
+  `doc`. `recall@k` over this set **is** `hit@k`; what remains is a
+  completeness declaration (is the asserted `doc` the only relevant one?),
+  `arpit` lane, tracked in [W-87](../../work/open/W-87-what-good-means.md) P2.
 
 **16. When a pre-registration's live path is DELETED, the run keeps a mirror of
 it — the verdict is not edited.** Decision 1 freezes a pre-registration and

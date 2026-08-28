@@ -27,6 +27,29 @@ L4 are untouched — see [ADR-LAWS](../../../docs/adr/0001_laws.md).
 contain. **It is the field an agent should read first** — it is the difference
 between hedging vaguely and saying *"nothing here mentions `mTLS`"*.
 
+## The two floors are the only numbers here, and both are now tunable
+
+`separation_floor` and `doc_coverage_floor` are the *only* values in this
+module that are not structural facts, and since 2026-08-28 a repo may set both
+in `.fux/tune.toml` under `[confidence]` — ADR-CONFIDENCE decision 13, which
+**reverses decision 7.**
+
+⚠ **Read what that gave up.** Decision 7 refused the knob because a consumer
+who lowers the floor until their answers read `grounded` is tuning away the
+*signal* rather than the ranking, and nothing mechanical catches that. Two
+things replace the prohibition, and neither is as strong as it was:
+
+1. **The effective floor is PUBLISHED in the block** (`as_dict`), so a
+   `grounded` computed under a slack floor is visible rather than implied. A
+   consumer comparing two repos' answers can see they were not judged alike.
+2. **`fux ask --no-tune` recomputes the band at the engine defaults**, which is
+   the *"is it me or the config?"* switch ADR-TUNE decision 11 already owned.
+
+**Neither floor can reach a score or an ordering** — see *What this can never
+do*. A tuned floor moves the BAND and nothing else, so `[confidence]` satisfies
+ADR-TUNE decision 1's boundary rule trivially: `.fux/index/` stays
+byte-identical, and `tests/test_tune_boundary.py` asserts it over both keys.
+
 ## Coverage is idf-weighted, and that is the whole point
 
 A query term the corpus has never seen has `df == 0`, which
@@ -65,6 +88,7 @@ from .bm25f import idf
 __all__ = [
     "BANDS",
     "Confidence",
+    "DOC_COVERAGE_FLOOR",
     "GROUNDED",
     "NONE",
     "PARTIAL",
@@ -98,10 +122,18 @@ BANDS = (GROUNDED, PARTIAL, WEAK, NONE)
 #: more: it is not a measured optimum, no verdict backs it, and it is the only
 #: number in this module that is not a structural fact.
 #:
-#: It is deliberately **not** a `tune.toml` key. A consumer who could lower it
-#: until their answers read `grounded` would be tuning away the signal rather
-#: than the ranking, and the honest fix for a floor that is wrong is to measure
-#: it once, for everyone. ADR-CONFIDENCE decision 6.
+#: **This is the ENGINE DEFAULT.** ⚠ It was deliberately *not* a `tune.toml`
+#: key until 2026-08-28; **`[confidence] separation_floor` now overrides it**
+#: (ADR-CONFIDENCE decision 13, reversing decision 7).
+#:
+#: ⚠ **The cost decision 7 was buying, stated rather than clamped:** a consumer
+#: can lower this until their answers read `grounded`, tuning away the signal
+#: rather than the ranking, and no check catches it. What replaces the
+#: prohibition is **publication** — `as_dict` emits the floor the band was
+#: judged under — and `--no-tune`, which recomputes at this value.
+#:
+#: **Setting it does not settle R10.** The measurement is still owed, and a
+#: repo-local number is a local preference, never a calibration.
 SEPARATION_FLOOR = 0.10
 
 #: How much of the question the TOP-RANKED document must itself contain before
@@ -131,6 +163,17 @@ SEPARATION_FLOOR = 0.10
 #: Shown the table above, he chose reporting over a claim fux cannot support.
 #: **Set this above `0.0` only with a bigger decoy set and a PRE-REGISTERED
 #: floor** — not a number read off 65 queries. ADR-CONFIDENCE decision 12.
+#:
+#: **Overridable since 2026-08-28** as `[confidence] doc_coverage_floor`
+#: (decision 13). ⚠ **The cost here is MEASURED, not guessed**, which is what
+#: separates it from the separation floor: at `1.0` — the only value that reads
+#: structural, *"every term the corpus has, the cited document has too"* —
+#: **19 of 50 correct answers turn `partial`**, and the one decoy this clause
+#: could catch sits at `0.710`, **inside** the goldens' range.
+#:
+#: A repo that would rather over-hedge than over-claim can pay 38 % false
+#: `partial` deliberately. A repo that sets it because the number looks tidy is
+#: paying it for nothing.
 DOC_COVERAGE_FLOOR = 0.0
 
 
@@ -174,6 +217,22 @@ class Confidence:
     #: this field; `support == 0` already means `none`.
     doc_coverage: float = 1.0
 
+    #: The `separation` cutoff **this block's band was actually computed
+    #: under**. Engine default `SEPARATION_FLOOR`; `.fux/tune.toml` may
+    #: override it (decision 13).
+    #:
+    #: ⚠ **Carried on the block rather than read from the module**, and that is
+    #: the whole safeguard. Once the floor is local config, a bare `grounded`
+    #: no longer means the same thing in two repos — so the block states the
+    #: number it was judged by, and a consumer comparing two answers can see
+    #: they were not judged alike.
+    separation_floor: float = SEPARATION_FLOOR
+
+    #: The `doc_coverage` cutoff, same contract. `0.0` means **the clause is
+    #: off**, which is the engine default and a measured ruling rather than an
+    #: oversight — see `DOC_COVERAGE_FLOOR`.
+    doc_coverage_floor: float = DOC_COVERAGE_FLOOR
+
     @property
     def band(self) -> str:
         """`grounded` · `partial` · `weak` · `none`, checked in that order.
@@ -196,9 +255,9 @@ class Confidence:
         # "what is the SLA we publish for the payments API" reached `grounded` at
         # separation 0.58, ABOVE the 0.5 R10's selection rule would have picked,
         # so no threshold on separation closes this.
-        if self.doc_coverage < DOC_COVERAGE_FLOOR:
+        if self.doc_coverage < self.doc_coverage_floor:
             return PARTIAL
-        if self.separation < SEPARATION_FLOOR:
+        if self.separation < self.separation_floor:
             return WEAK
         return GROUNDED
 
@@ -230,13 +289,22 @@ class Confidence:
         A consumer that had to re-implement the band rules would be a second
         copy of this module's policy, in someone else's language, drifting from
         the day it was written.
+
+        ⚠ **`separation_floor` and `doc_coverage_floor` are emitted for the
+        opposite reason** — not so a consumer can re-derive the band, but so it
+        can see the band is not comparable across repos. Since 2026-08-28 both
+        are `tune.toml` keys, and a `grounded` judged at `0.02` is a different
+        claim from a `grounded` judged at `0.10`. **Absent publication, the
+        difference would be invisible** (decision 13).
         """
         return {
             "band": self.band,
             "answerable": self.answerable,
             "coverage": self.coverage,
             "separation": self.separation,
+            "separation_floor": self.separation_floor,
             "doc_coverage": self.doc_coverage,
+            "doc_coverage_floor": self.doc_coverage_floor,
             "support": self.support,
             "verified": self.verified,
             "missing": list(self.missing),
@@ -265,7 +333,7 @@ class Confidence:
             return f"confidence: partial - answer, but say what is missing.{missing}{stale}"
         return (
             "confidence: weak - the ranking cannot separate the top results"
-            f" (separation {self.separation:.2f}, floor {SEPARATION_FLOOR:.2f})."
+            f" (separation {self.separation:.2f}, floor {self.separation_floor:.2f})."
             " Report what was searched rather than a conclusion."
         )
 
@@ -279,6 +347,8 @@ def signals(
     *,
     verified: str = "unverified",
     top_doc_hashes: list[str] | None = None,
+    separation_floor: float = SEPARATION_FLOOR,
+    doc_coverage_floor: float = DOC_COVERAGE_FLOOR,
 ) -> Confidence:
     """Compute the block from what `rank()` already had in hand.
 
@@ -288,6 +358,12 @@ def signals(
     first-surface-per-hash and a hash collision keeps the first spelling.
     `scores` is every score above zero, **already sorted descending**, which is
     what `rank()` produces.
+
+    **The floors arrive from the CALLER, never from this module's globals.**
+    `run_query` resolves them from `.fux/tune.toml` once per query and hands
+    them down, so a single query cannot be judged by one floor and reported
+    with another — the defect a module-global read would make possible the
+    moment the value became configurable (decision 13).
 
     **`missing` reports the surface form, never the analyzed one.** *"`mtl` is
     not in this corpus"* is a worse report than silence: a reader cannot tell
@@ -306,7 +382,11 @@ def signals(
     law is worth more than the better number.
     """
     if not query_hashes or n <= 0:
-        return Confidence(0.0, 0.0, 0, verified, ())
+        return Confidence(
+            0.0, 0.0, 0, verified, (),
+            separation_floor=separation_floor,
+            doc_coverage_floor=doc_coverage_floor,
+        )
 
     # First token per hash, mirroring `query_term_hashes`' de-duplication so the
     # two lists cannot fall out of step on a repeated word.
@@ -355,4 +435,6 @@ def signals(
         support=len(scores),
         verified=verified,
         missing=tuple(missing),
+        separation_floor=separation_floor,
+        doc_coverage_floor=doc_coverage_floor,
     )

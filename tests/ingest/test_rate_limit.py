@@ -7,6 +7,7 @@ read HTTP. Everything else here is in service of those two.
 
 from __future__ import annotations
 
+import time
 import types
 
 import pytest
@@ -87,17 +88,130 @@ def test_fux_never_reads_the_error_message():
     assert limited == {}
 
 
+def _boom_module(flaky_for=1, message="consumer bug"):
+    def boom(_exc):
+        raise RuntimeError(message)
+
+    module = _module(flaky_for=flaky_for)
+    module.is_rate_limited = boom
+    module.__name__ = "consumer_fetcher"
+    return module
+
+
 def test_a_predicate_that_raises_is_treated_as_not_rate_limited():
     """Consumer-owned code must not be able to fail an ingest."""
-
-    def boom(_exc):
-        raise RuntimeError("consumer bug")
-
-    module = _module(flaky_for=1)
-    module.is_rate_limited = boom
-    out, limited, _ = _run(module)
+    out, limited, _ = _run(_boom_module())
     assert isinstance(out[0][2], Busy)
     assert limited == {}
+
+
+def test_a_predicate_that_raises_SAYS_SO(capsys):
+    """⚠ **Ruled by Arpit 2026-08-28: warn, never raise.**
+
+    Before this, a predicate that threw returned `False` with no output, so
+    **a broken predicate and a host that never rate-limits you were
+    indistinguishable**: no backoff, no count, nothing in `fux doctor`. The
+    isolation was right and the silence was not.
+    """
+    _run(_boom_module())
+
+    err = capsys.readouterr().err
+    assert "RuntimeError" in err and "consumer bug" in err
+    assert "is_rate_limited" in err
+    assert "NOT rate-limited" in err, "it must say what fux did instead"
+    assert "no backoff" in err, "and what that costs"
+
+
+def test_the_warning_is_once_per_run_not_once_per_url(capsys):
+    """⚠ A predicate that throws throws on EVERY attempt of EVERY url.
+
+    Undeduplicated, a 500-URL run would print thousands of identical lines and
+    bury its own output — which is how a warning becomes a thing people filter.
+    """
+    urls = tuple(f"https://wiki.corp/{n}" for n in range(6))
+    _run(_boom_module(flaky_for=99), urls=urls)
+
+    assert capsys.readouterr().err.count("is_rate_limited") == 1
+
+
+def test_a_working_predicate_prints_nothing(capsys):
+    """The warning must not fire on the happy path."""
+    _run(_module(flaky_for=1))
+    assert "is_rate_limited" not in capsys.readouterr().err
+
+
+def test_the_warning_never_becomes_a_raise():
+    """The guarantee the warning sits on top of, restated where it could break.
+
+    ADR-FETCHER decision 10: one consumer bug must never end an ingest of
+    10 000 documents.
+    """
+    out, limited, _ = _run(_boom_module(flaky_for=99), urls=("https://a.test/x", "https://b.test/y"))
+    assert len(out) == 2, "the batch completed"
+    assert all(isinstance(row[2], Busy) for row in out)
+    assert limited == {}
+
+
+class WideningDict(dict):
+    """A counter whose READ-to-WRITE window is artificially widened.
+
+    ⚠ **Getting this right took three attempts, and the first two were vacuous
+    tests that passed with the lock removed.** They are worth recording, because
+    each looked obviously sufficient:
+
+    1. *8 URLs on 8 workers, assert the total.* Passed 3/3 unlocked — with an
+       instant `fetch`, the pool never has two threads alive at once, so nothing
+       ever contends.
+    2. *Sleep inside `get()` before the read.* Passed 3/3 unlocked even with
+       **8 threads measured simultaneously inside `get()`** — because the sleep
+       widened the wrong window. It delayed everyone's arrival at the read; the
+       read and the write still executed back-to-back afterwards.
+
+    **The window that matters is between the read and the write**, and it is
+    two bytecodes wide. CPython's 5 ms switch interval means preemption almost
+    never lands there, so ⚠ **this race cannot be provoked naturally** — the
+    sleep below is what makes it deterministic instead of theoretical. Unlocked,
+    this loses 28 of 32 refusals every time.
+    """
+
+    def get(self, key, default=None):
+        value = super().get(key, default)  # the READ
+        time.sleep(0.02)                   # ...the window before the WRITE
+        return value
+
+
+def test_the_host_counter_is_not_corrupted_by_concurrency():
+    """⚠ **Found 2026-08-28 by reading the code, not by a failure.**
+
+    `limited[host] = limited.get(host, 0) + hits` is a read-modify-write and
+    `one()` runs under a thread pool, so two workers refused by the **same
+    host** can lose a count. **The number this protects is the one `fux doctor`
+    prints**, and a consumer reads it to decide whether to lower their cap — so
+    an undercount understates precisely the problem the count exists to report.
+
+    ⚠ **Unruled scope.** Arpit ruled the *warning*; this lock came with it
+    because the defect is in the same four lines. It is a data race with no
+    design content — there is no defensible alternative — but it was not asked
+    for, and this note is here so it can be reverted as easily as it was added.
+    """
+
+    def fetch(url):
+        time.sleep(0.02)  # keeps all 8 workers alive so they reach the counter together
+        raise Busy("429")
+
+    module = _module()
+    module.fetch = fetch
+    urls = [f"https://one.host/{n}" for n in range(8)]
+
+    limited: dict[str, int] = WideningDict()
+    list(urlsrc._fetch_group(module, urls, 8, limited, sleep=lambda _s: None))
+
+    expected = len(urls) * (urlsrc.RATE_LIMIT_RETRIES + 1)
+    assert limited["one.host"] == expected, (
+        f"expected {expected} refusals, counted {limited['one.host']} — "
+        f"{expected - limited['one.host']} lost to a race on the counter"
+    )
+
 
 
 # -- back off, retry, report ------------------------------------------------

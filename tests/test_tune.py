@@ -300,3 +300,32 @@ def test_a_tune_can_be_constructed_directly_for_tests(tmp_path):
     tune = Tune(archived_weight=0.5, priority=(("docs/", 2.0),))
     assert tune.archived_weight == 0.5
     assert not tune.trivial
+
+
+def test_a_confidence_floor_must_be_a_fraction_and_the_message_says_why(tmp_path):
+    """Both floors gate a value already clamped to [0,1]; outside it they are
+    either dead (>1 for separation is unreachable) or meaningless."""
+    _write(tmp_path, "[confidence]\nseparation_floor = 1.4\n")
+    with pytest.raises(FuxError) as e:
+        load(tmp_path)
+    assert "separation_floor" in str(e.value)
+    assert "between 0 and 1" in str(e.value)
+
+
+def test_both_confidence_floors_load_and_neither_is_clamped(tmp_path):
+    """The standing rule on knobs: refuse what is broken, state the cost of
+    what is merely strong. `0.0` turns the `weak` band off and `1.0` makes the
+    doc-coverage gate structural — both legal, both loud in the specimen."""
+    _write(tmp_path, "[confidence]\nseparation_floor = 0.0\ndoc_coverage_floor = 1.0\n")
+    tune = load(tmp_path)
+    assert tune.separation_floor == 0.0
+    assert tune.doc_coverage_floor == 1.0
+
+
+def test_an_unset_confidence_table_is_the_engine_floors(tmp_path):
+    from fux.query.confidence import DOC_COVERAGE_FLOOR, SEPARATION_FLOOR
+
+    _write(tmp_path, "[bm25f]\nk1 = 1.4\n")
+    tune = load(tmp_path)
+    assert tune.separation_floor == SEPARATION_FLOOR
+    assert tune.doc_coverage_floor == DOC_COVERAGE_FLOOR

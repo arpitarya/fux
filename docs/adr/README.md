@@ -312,7 +312,7 @@ table does not grant.
 | `src/fux/progress.py` | ADR-CLI | the progress plane — stderr-only, TTY-gated, counts not clocks |
 | `src/fux/config.py` | ADR-CONFIG | `fux.toml`'s schema, the opaque `[sources.url.config]` table, and the tables refused by name rather than ignored |
 | `src/fux/tune.py` | ADR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it |
-| `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, the URL section and the runner check — all read-only, all offline |
+| `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, the URL section, the runner check and the **fetcher-capability notice** — all read-only, all offline. The notice is decision 6's own named mechanism (*a `doctor` check, never a rewrite*) applied to [ADR-FETCHER](0019_fetcher.md) decisions 12–13; it reads the consumer's fetcher **as text and never imports it** |
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions, and the declared record shape |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator |
@@ -355,7 +355,7 @@ table does not grant.
 | `tools/quality-controls/` | ADR-RS | the two controls **decision 15 is owed** — a content-free matched-length placebo and a decoy query set. Owned by the record that demands them, not by ADR-CONFIDENCE whose behaviour they test: a control belongs to the measurement discipline, so changing what a control IS updates the rule rather than the feature. ⚠ **The third, the sealed subset, is NOT built** and decision 15 keeps its `NOT BUILT` marker |
 | `tools/archived-signal-eval/` | ADR-ARCHIVED-CONTENT | the live-vs-archived contamination instrument, its frozen pre-registration and its query set. Owned by the record whose claim it tests, because this measures a **feature gate** and takes no `R` id |
 | `tools/graph-bench/` | ADR-GRAPH | cost-attribution profiler for the graph lane — not a gate |
-| `tools/quality/` | ADR-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error. **A frozen instrument, not a harness**: nothing reads it yet, and that is the point — the cost is only honest if it was committed before the first score under it |
+| `tools/quality/` | ADR-QUALITY | the frozen quality contract — the declared query mix and the published cost of an error — **and `goldens.py`, the schema that keeps the rank contract and the relevance set apart** (decision 12). The mix and the cost are a **frozen instrument, not a harness**; `goldens.py` is the one executable thing here, and it exists because decision 12's rules are mechanical: an undeclared relevance list, or a `doc` outside its own relevance set, is refused rather than trusted |
 | `tools/t2-eval/` | ADR-RS | a harness whose feature record was retired, held here by ADR-RS decision 10's fallback. **A retired record cannot own anything, and a proposal is not a valid owner** |
 
 <!-- OWNERSHIP-TABLE-END -->

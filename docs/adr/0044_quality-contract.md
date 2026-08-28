@@ -187,11 +187,100 @@ problem, which is the reason decision 5 is not negotiable.
     one home; this record does not restate it — plus these narrower terms of its
     own: opt-in, class counts only, **never the query text**.
 
-> **No output block appears in this record, and the absence is deliberate.**
-> Nothing has been measured under this contract yet — `recall@k` is not computed,
-> the `unanswerable` class does not exist, and an invented transcript is worse
-> than none. The first captured output belongs to the run that files the first
-> verdict under `mix@1`.
+12. **The RANK CONTRACT and the RELEVANCE SET are two fields, not one.**
+    Ruled by Arpit 2026-08-28, on
+    [two blind annotators agreeing at κ = 0.960](../../work/regression/2026-08-28-annotator-agreement/report.md)
+    that **25 of 50** goldens have more than one genuinely relevant document
+    against **one** asserted for all 50.
+
+    🔴 **The defect this fixes is CONCEPTUAL, not structural.** `doc` +
+    `max_rank` was authored as *"this document must come back at rank ≤ n"* — a
+    **gate assertion** — and was later read as *"this is the document that
+    answers the question"* — a **relevance judgment**. One field carried two
+    claims, and `recall@k` needs the second one to be **complete**, which the
+    first never promised. **Making the existing field plural would have left
+    the conflation intact**, which is why option A was rejected.
+
+    ```json
+    {"id": "q001", "q": "...",
+     "doc": "docs/x.md", "max_rank": 1,              // rank contract — unchanged
+     "relevant": ["docs/x.md", "docs/y.md"],         // relevance set
+     "relevance": "complete",                        // the completeness DECLARATION
+     "known_failure": "..."}
+    ```
+
+    **Four rules, and each closes a specific way this can go wrong:**
+
+    a. **`relevance` is a declaration, never an inference.** `complete` asserts
+       *"`relevant` lists EVERY document in this corpus that answers this
+       question"*; `partial` asserts only *"these do."* **A `relevant` list with
+       no declaration is the original bug in a new field**, so the key is
+       required whenever `relevant` is present.
+    b. **`recall@k` is computable only over queries declared `complete`**, and a
+       report states how many of the set that was. A recall number over a
+       partially-declared set is a fraction with an unknown denominator.
+    c. **`doc` must appear in `relevant`** when both are present. A document
+       required to rank well that nobody judged relevant is a contradiction
+       between the two claims — and it is not hypothetical: **annotator 1's set
+       omitted the golden's own asserted document on `q027`**, which only a
+       second reader caught.
+    d. **Both fields are OPTIONAL and their absence is back-compatible.** A
+       golden with no `relevant` scores `hit@k` exactly as before. **No
+       historical number is invalidated and none is re-labelled** — past runs
+       measured `hit@k` and said so; what they may not do is call it `recall@k`.
+
+    ⚠ **A relevance set is authored BLIND or it is worthless.** The annotation
+    must precede the scores and must not be made by anyone who has seen them —
+    marking documents relevant after seeing what ranks well fits the metric to
+    the system it judges ([ADR-RS](0036_predictions.md) decision 13). The
+    stripped-input harness that made the 2026-08-28 blindness claim *checkable*
+    is
+    [`queries-as-given-to-annotators.jsonl`](../../work/regression/2026-08-28-annotator-agreement/evidence/queries-as-given-to-annotators.jsonl),
+    and it is the standing pattern.
+
+    ⚠ **Two agreeing readers are evidence about THIS corpus, not a proof.**
+    κ measures agreement, never correctness, and both annotators could share a
+    blind spot. The declaration is the strongest claim available, and it is a
+    claim rather than a fact.
+
+> **The output block was withheld until there was one, and now there is.**
+> This record previously read: *"Nothing has been measured under this contract
+> yet — `recall@k` is not computed, the `unanswerable` class does not exist, and
+> an invented transcript is worse than none."* **Both blockers cleared on
+> 2026-08-28.**
+
+```console
+$ python3 tools/quality/goldens.py ~/my_programs/fux-playground/goldens/queries.jsonl
+50 goldens, all valid against ADR-QUALITY decision 12
+
+  carry a relevance set:      50
+  declared `complete`:       43  <- recall@k is computable over these
+  excluded from recall@k:     7
+  more than one relevant doc: 26
+
+⚠ A recall number here covers 43/50 queries. Report that fraction with it, never the number alone.
+```
+
+**The first `recall@k` under this contract** —
+[the run](../../work/regression/2026-08-28-first-recall/report.md), over the 43
+declared `complete`, as the curve decision 2 requires:
+
+| k | `recall@k` | mean context bytes |
+|---:|---:|---:|
+| 1 | 0.5969 | 2,988 |
+| 3 | 0.8566 | 9,079 |
+| 5 | 0.9535 | 15,135 |
+| 10 | 0.9884 | 27,048 |
+
+🔴 **NOT a generalisation estimate.** All ten enrichment files installed on that
+corpus were written by an author who had read these queries, so the absolute
+values sit on a corpus fitted to them. The run is classified `informed` and
+claims no delta. **The number demonstrates the metric, not the engine.**
+
+⚠ **The `unanswerable` class now exists and the engine scores 0 of 20 on it**
+([run](../../work/regression/2026-08-28-blind-unanswerable/report.md)), so
+decision 5's gate has a measured hole: the figures above describe the
+**answerable** half only.
 
 ### Consequences
 
@@ -201,8 +290,13 @@ future session can be held to.
 
 **What it costs, stated rather than discovered:**
 
-- **`recall@k` is not computed today.** It needs known-relevant sets per query —
-  real annotation across the 50 playground goldens.
+- ⚠ **`recall@k` is not computed today, and the reason CHANGED on 2026-08-28.**
+  It read *"it needs known-relevant sets per query — real annotation across the
+  50 playground goldens."* **That annotation now exists**, authored blind, twice,
+  agreeing at κ = 0.960 — and it is what revealed the schema defect decision 12
+  fixes. **The remaining blocker is migration, not annotation**: the goldens
+  must carry `relevant` + `relevance` before a recall number can be computed
+  over them, and that file lives in `fux-playground`.
 - **The `unanswerable` class does not exist** and must be authored **blind**, or
   it contaminates the set it is meant to test.
 - **Declaring the mix makes some historical numbers incomparable.** That is the

@@ -17,6 +17,15 @@ A value belongs here if and only if changing it leaves `.fux/index/`
 **byte-identical** (decision 1). That is a test, not a judgement, and
 `tests/test_tune_boundary.py` runs it over every key.
 
+⚠ **`[confidence]` is the first table that changes no ORDER either** — it moves
+the *band*, which is what fux says *about* an answer, never which documents come
+back or in what sequence. It passes the boundary rule trivially and is here
+because the rule is about the index, not about ranking
+([ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) decision 13, which reverses
+decision 7). **The knob it exposes is a real one:** a floor low enough turns
+every `weak` into `grounded`, and the guard is publication (the block emits the
+floor it was judged under) plus `--no-tune`, not a clamp.
+
 **Nothing here is read on the maintenance path.** Not by `ingest`, not by
 `build`, not by the hooks. `fux ingest` never imports this module — L3 says no
 maintenance output may depend on anything but the sources, and a tunable is by
@@ -46,6 +55,7 @@ from pathlib import Path
 
 from .errors import FuxError
 from .query.bm25f import B, FIELD_WEIGHTS, K1, Scoring
+from .query.confidence import DOC_COVERAGE_FLOOR, SEPARATION_FLOOR
 from .store import TF_FIELDS
 
 __all__ = [
@@ -98,6 +108,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "seed_depth",
     ),
     "refer": ("budget", "per_doc_fraction", "min_passage_bytes", "max_passage_bytes"),
+    "confidence": ("separation_floor", "doc_coverage_floor"),
     # `[priority]` is the one open table: its keys are the consumer's own
     # source entries, which fux cannot know in advance (decision 8).
     "priority": (),
@@ -130,6 +141,15 @@ class Tune:
     hop_decay: float = 0.5
     expand_limit: int = 10
     seed_depth: int = 5
+
+    # [confidence]
+    #: ⚠ **The `grounded`/`weak` cutoff, and the only tunable in this class that
+    #: is UNMEASURED at its default.** R10 is still owed; a repo-local value is
+    #: a preference, never a calibration.
+    separation_floor: float = SEPARATION_FLOOR
+    #: `0.0` = the clause is off, which is a MEASURED ruling (2026-08-28), not a
+    #: placeholder. At `1.0`, 19 of 50 correct answers turn `partial`.
+    doc_coverage_floor: float = DOC_COVERAGE_FLOOR
 
     # [refer]
     budget: int = 8000
@@ -372,6 +392,20 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         _at_least(c, "graph", "seed_depth", graph["seed_depth"], 5, 1) if "seed_depth" in graph else 5
     )
 
+    conf = data.get("confidence", {})
+    separation_floor = (
+        _fraction(c, "confidence", "separation_floor", conf["separation_floor"], SEPARATION_FLOOR)
+        if "separation_floor" in conf
+        else SEPARATION_FLOOR
+    )
+    doc_coverage_floor = (
+        _fraction(
+            c, "confidence", "doc_coverage_floor", conf["doc_coverage_floor"], DOC_COVERAGE_FLOOR
+        )
+        if "doc_coverage_floor" in conf
+        else DOC_COVERAGE_FLOOR
+    )
+
     refer = data.get("refer", {})
     budget = _at_least(c, "refer", "budget", refer["budget"], 8000, 1) if "budget" in refer else 8000
     per_doc_fraction = (
@@ -437,6 +471,8 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         hop_decay=hop_decay,
         expand_limit=expand_limit,
         seed_depth=seed_depth,
+        separation_floor=separation_floor,
+        doc_coverage_floor=doc_coverage_floor,
         budget=budget,
         per_doc_fraction=per_doc_fraction,
         min_passage_bytes=min_passage,
@@ -514,6 +550,26 @@ budget            = {d.budget}       # bytes of assembled passage
 per_doc_fraction  = {d.per_doc_fraction}
 min_passage_bytes = {d.min_passage_bytes}
 max_passage_bytes = {d.max_passage_bytes}
+
+[confidence]                    # the BAND -- what fux says ABOUT an answer
+# Neither key can move a score or an ordering. They move the band only, so
+# `.fux/index/` and the result list are byte-identical either way.
+#
+# separation_floor: how far ahead of the runner-up the top result must be
+#   before the band may read `grounded`. LOWERING THIS DOES NOT MAKE ANSWERS
+#   BETTER -- it makes fux quieter about not knowing. At 0.0 nothing is ever
+#   `weak`. The default is PROVISIONAL and UNMEASURED (prediction R10): it is
+#   a defensible starting point, not a calibrated one.
+# doc_coverage_floor: how much of the question the TOP-RANKED DOCUMENT must
+#   itself contain. 0.0 = OFF, and that is a measured ruling, not an omission.
+#   Measured on 50 goldens + 15 decoys: at 1.0, NINETEEN of the fifty correct
+#   answers turn `partial`, and the single decoy this clause could catch sits
+#   at 0.710 -- inside the goldens' range. There is no gap to pick a number in.
+#
+# Both floors are PUBLISHED in the confidence block, so an answer states which
+# floor judged it. `fux ask --no-tune` recomputes the band at the defaults.
+separation_floor   = {d.separation_floor}
+doc_coverage_floor = {d.doc_coverage_floor}
 
 [priority]
 # ⚠ THE ONE TABLE THAT STAYS COMMENTED, and not for consistency's sake: these

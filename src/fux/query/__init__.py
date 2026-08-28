@@ -179,7 +179,7 @@ def run_query(
             )
             final = _maybe_rerank(root, query, results, rerank_weight, top)
             _fill_trace(trace_out, results, rerank_weight)
-            _fill_confidence(confidence_out, stats, query, final)
+            _fill_confidence(confidence_out, stats, query, final, tune)
             return final, "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
@@ -187,12 +187,19 @@ def run_query(
     )
     final = _maybe_rerank(root, query, results, rerank_weight, top)
     _fill_trace(trace_out, results, rerank_weight)
-    _fill_confidence(confidence_out, stats, query, final)
+    _fill_confidence(confidence_out, stats, query, final, tune)
     return final, "scan"
 
 
-def _fill_confidence(out: dict | None, stats: dict | None, query: str, results) -> None:
+def _fill_confidence(
+    out: dict | None, stats: dict | None, query: str, results, tune: "Tune"
+) -> None:
     """Assemble the confidence block, if anyone asked for one.
+
+    **`tune` supplies the two band floors** (ADR-CONFIDENCE decision 13). They
+    are resolved once, here, from the same `Tune` that scored the query — so a
+    query cannot be judged by one floor and reported with another, and
+    `--no-tune` reaches the band exactly as it reaches the ranking.
 
     **Never raises.** A confidence signal that can fail a query is worse than no
     signal — the same contract `_declare_change_since_last_ask` takes, and for
@@ -223,6 +230,8 @@ def _fill_confidence(out: dict | None, stats: dict | None, query: str, results) 
             # from the record it actually ranked first — so the accelerator and
             # the scan cannot disagree about it.
             top_doc_hashes=stats.get("top_doc_hashes"),
+            separation_floor=tune.separation_floor,
+            doc_coverage_floor=tune.doc_coverage_floor,
         )
     except Exception:  # pragma: no cover - a signal must not break an answer
         pass
@@ -846,6 +855,11 @@ def _block_dict(block) -> dict:
     output contract; a *fabricated* healthy block would be worse still. The
     fallback is the block that claims nothing: no coverage, no separation, no
     support, `answerable: false`.
+
+    ⚠ **Its two floors are the ENGINE defaults, not the repo's**, because this
+    branch runs only when the block could not be computed at all and there is
+    no tune in hand. `band` is `none` regardless — the floors gate nothing here
+    — but a consumer diffing floors across answers will see this one differ.
     """
     if block is None:
         from .confidence import Confidence

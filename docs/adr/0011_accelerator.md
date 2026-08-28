@@ -400,6 +400,18 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
   differential-law instrument. It has sat broken before, found by a sweep rather
   than by a test; **a live tool with no test importing it is a tool that can
   break silently.**
+  **And it had, again (2026-08-28), three ways at once.** `golden["query"]`
+  read a key the real goldens never had (`q`, not `query`) — a bare crash.
+  `_rank_of` matched `r.id` (`"file:docs/…"`) against the goldens' bare `doc`
+  paths, so no rank could ever match and every non-`known_failure` golden
+  failed even when the top result was correct. And it called `scan_ask`/
+  `accel.ask` directly with no `weighting`, so `.fux/tune.toml` was never
+  applied — a systematic divergence from what `fux ask` actually returns, not
+  noise. Fixed by routing both modes through `run_query` (the same entrypoint
+  `cmd_ask` uses) with one shared `Tune`, loaded once per corpus; the harness
+  now reproduces `fux-playground/check.py`'s own count exactly (41 pass / 0
+  fail / 9 known-failure) with `scan == accelerator` holding. **Still no test
+  imports it** — the warning above is unchanged by this fix.
 
 ### Alternatives considered
 

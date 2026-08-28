@@ -479,6 +479,84 @@ def test_doctor_passes_when_there_is_no_types_file(tmp_path):
     assert check.ok and "default" in check.detail
 
 
+# --- the fetcher-capability notice, added 2026-08-28 ------------------------
+#
+# ADR-FETCHER decision 12's measured gap: a repo created before the decision
+# learned 0 of 7 `validate()` tokens until its `http.py` was replaced by hand.
+# `fux setup` is write-if-missing, so the mechanism is a doctor NOTICE, never a
+# rewrite (ADR-DOTFUX decision 6) — `_types_health` above is the precedent.
+
+def _url_repo(root, fetcher_body: str) -> None:
+    (root / "fux.toml").write_text(
+        "[sources]\n"
+        'dirs_file = ".fux/sources/dirs"\n'
+        "[sources.url]\n"
+        'fetcher = ".fux/fetchers/http.py"\n'
+        'urls_file = ".fux/sources/urls"\n'
+        "max_parallel = 4\n",
+        encoding="utf-8",
+    )
+    f = root / ".fux" / "fetchers" / "http.py"
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(fetcher_body, encoding="utf-8")
+
+
+def test_doctor_names_the_optional_functions_an_old_fetcher_lacks(tmp_path):
+    """The measured case: a pre-decision fetcher, silently forfeiting both."""
+    from fux import doctor as doctor_mod
+
+    _url_repo(tmp_path, "def fetch(url):\n    return b''\n")
+    check = doctor_mod._fetcher_capabilities(tmp_path)
+    assert check.ok and check.level == "warn"  # optional by contract: never fails the command
+    assert "validate()" in check.detail and "is_rate_limited()" in check.detail
+    assert "will not rewrite" in check.detail
+
+
+def test_doctor_is_quiet_when_the_fetcher_implements_both(tmp_path):
+    from fux import doctor as doctor_mod
+
+    _url_repo(
+        tmp_path,
+        "def fetch(url):\n    return b''\n"
+        "def validate(url):\n    return None\n"
+        "def is_rate_limited(exc):\n    return False\n",
+    )
+    check = doctor_mod._fetcher_capabilities(tmp_path)
+    assert check.ok and "implements" in check.detail
+
+
+def test_doctor_skips_the_fetcher_check_when_the_repo_does_not_fetch(tmp_path):
+    """No `[sources.url]` means the fetcher is not a fact about this repo."""
+    from fux import doctor as doctor_mod
+
+    (tmp_path / "fux.toml").write_text('[sources]\ndirs_file = ".fux/sources/dirs"\n', encoding="utf-8")
+    check = doctor_mod._fetcher_capabilities(tmp_path)
+    assert check.ok and "does not fetch" in check.detail
+
+
+def test_the_shipped_template_implements_every_optional_function(tmp_path):
+    """If `setup`'s template regresses, the notice above would fire on a NEW repo.
+
+    That would be the loudest possible symptom of the wrong bug, so it is
+    gated here rather than left to be discovered in a consumer's doctor output.
+    """
+    from fux import doctor as doctor_mod
+    from fux import setup as setup_mod
+
+    setup_mod.run(tmp_path)
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n"
+        'dirs_file = ".fux/sources/dirs"\n'
+        "[sources.url]\n"
+        'fetcher = ".fux/fetchers/http.py"\n'
+        'urls_file = ".fux/sources/urls"\n'
+        "max_parallel = 4\n",
+        encoding="utf-8",
+    )
+    check = doctor_mod._fetcher_capabilities(tmp_path)
+    assert check.ok and "implements" in check.detail, check.detail
+
+
 # --- the daemon check, added 2026-08-28 with the widened status shape -------
 
 def _daemon_status(root, payload):

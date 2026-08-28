@@ -62,6 +62,15 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "min_passage_bytes": "20",
         "max_passage_bytes": "900",
     },
+    # ⚠ These two move the BAND, never a score or an ordering — so unlike every
+    # other table here, the boundary test proves something weaker than it looks:
+    # of course the index is byte-identical, nothing downstream of the band
+    # exists. They are listed because `_SCHEMA` is the contract and an
+    # unexercised key is an untested one, not because the proof is interesting.
+    "confidence": {
+        "separation_floor": "0.95",
+        "doc_coverage_floor": "1.0",
+    },
     "priority": {'"alpha.md"': "6.0", '"beta.md"': "0.2"},
 }
 

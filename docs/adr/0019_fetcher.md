@@ -80,6 +80,10 @@ fetch(url: str) -> tuple[bytes, str]
                                  # Content-Type it declared. Fux decodes them.
 close() -> None                  # optional; once, after the last fetch — even if fetch raised
 
+validate(url: str) -> str | None # optional; decision 12
+is_rate_limited(exc) -> bool     # optional; decision 13 — "was that a refusal
+                                 # for asking too fast?" Declared, never sniffed.
+
 MAX_PARALLEL = 1                 # optional module constant; absent means 1
 ```
 
@@ -279,10 +283,69 @@ every request, and it is re-fetched every run while three stable URLs are not.
   write-if-missing and never rewrites a consumer's fetcher — the same freeze
   ADR-DOTFUX decision 6 names. Measured: a repo created before this change
   learned **0 of 7** tokens until its `http.py` was replaced by hand.
+  ✅ **Made visible 2026-08-28, by the mechanism ADR-DOTFUX decision 6 names for
+  exactly this** — *a loader refusal or a `doctor` check, never a rewrite.*
+  `doctor._fetcher_capabilities` reads the consumer's fetcher **as text, never
+  importing it** (doctor is offline, and a fetcher may open a session at import)
+  and names each optional function the file lacks, the record that added it, and
+  what the repo forfeits without it. A **warning, never an error**: absence is
+  legal by contract, and reporting a supported configuration as a failure trains
+  people to ignore a red doctor. ⚠ **The gap is now visible, not closed** — a
+  consumer must still copy the function in themselves, which is the freeze
+  working as designed rather than a defect in it.
 - **A validated URL is neither a fetch nor a skip**, and is counted separately —
   its prior record is correct and carried forward, which is the opposite of a
   failure. `fux update` prints the count, because **an optimisation that fails
   silently in the safe direction looks identical to one that never ran.**
+
+**13. `is_rate_limited(exc) -> bool` — the optional sixth function. Ratified by
+Arpit 2026-08-28.** W-82 ruling 12 built it, a real `429` exercised it, and
+⚠ **no record decided it until now** — it was in the shipped `http.py`, read by
+`urlsrc.py`, and absent from this contract block and from every decision here.
+**A mechanism with a gate and no record is the shape this project keeps paying
+for**; L8 was the same class three days earlier.
+
+**Why the fetcher answers and not the engine.** This is decision 5's *declared,
+never detected* and decision 9's capability/policy split, applied to a third
+property. **The fetcher speaks HTTP and can see a `429`; fux deliberately
+cannot** — it never reads a status code, a header, or an error string. A
+`429` is an HTTP fact, and `cdp.py` or a future gRPC fetcher would express the
+same refusal completely differently.
+
+⚠ **`"429" in str(exc)` was the obvious alternative and is refused.** It is
+branching on prose: it works until a fetcher rewords one message, and then it
+**silently stops backing off** and nobody finds out. Same defect as reading a
+note's wording instead of its boolean.
+
+⚠ **A fux-shipped `RateLimited` exception was considered and refused**, and it
+is the strongest alternative: `isinstance()` needs no `getattr`, and consumer
+code could not throw from it. It costs the property that **fetchers import
+nothing from fux** — verified 2026-08-28, `http.py` has zero fux imports and
+the engine has never heard of its `FetcherError`. That isolation is why a
+fetcher is consumer-owned code rather than a plugin, and a typed exception
+would make every existing consumer file need editing to keep working.
+
+**What fux does with a `True`, and what it refuses to do.** Bounded exponential
+backoff (`RATE_LIMIT_RETRIES = 3`, 1 s → 2 s → 4 s), refusals counted **by host
+rather than by URL** — twelve refusals across twelve pages of one wiki is one
+fact — reported on stderr during the run **and** persisted for `fux doctor`.
+⚠ **It never lowers `[sources.url] max_parallel`.** State the cost, do not
+clamp the knob: an auto-lowered cap is a number the consumer did not pick and
+cannot predict, and `doctor` names the host so they can lower it themselves.
+
+**Optional, and absence is not an error.** A fetcher that declares nothing gets
+no retries and behaves exactly as it did before ruling 12 — every fetcher
+written earlier keeps working untouched.
+
+⚠ **A predicate that RAISES warns and returns `False`** (Arpit, 2026-08-28).
+Decision 10's per-URL isolation applies to the predicate as well as to `fetch`
+— one consumer bug must never end an ingest of 10 000 documents — but until
+this ruling it failed **silently**, so a broken predicate and a host that never
+refuses you were indistinguishable: no backoff, no count, no warning, and
+`doctor` reporting nothing wrong. It now says so once per run, on stderr, and
+still does not raise. **Once per run, not once per URL** — a predicate that
+throws throws on every attempt of every URL, and thousands of identical lines
+is how a warning becomes something people filter out.
 
 ### Consequences
 
@@ -378,6 +441,19 @@ every request, and it is re-fetched every run while three stable URLs are not.
 **Reopen this decision if** more than one fetcher ever runs for a single URL —
 a chain, a fallback, a wrapper — because at that moment the thing composes and
 decision 3's argument against "middleware" collapses.
+
+**Or if decision 13's boundary regresses** — check these, do not wait for them:
+
+- **`urlsrc.py` mentions a status code, a header name, or matches text inside an
+  exception.** The engine has started speaking HTTP, and the fetcher plane's
+  whole reason for existing is gone.
+- **The retry path can see `max_parallel` or the worker count.** That is one
+  edit away from auto-lowering it, which ruling 12 refused.
+- **A raising predicate stops warning.** It reverts to the silent failure Arpit
+  ruled out on 2026-08-28, and every test still passes.
+- **A fetcher template acquires a `fux` import.** The isolation that refused a
+  typed `RateLimited` exception has been spent on something else, and the
+  argument in decision 13 should be re-run rather than assumed.
 
 **Or if either half of decision 11 regresses:**
 

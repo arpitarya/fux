@@ -189,6 +189,31 @@ repos only**, so every repo already holding the broken file — including this o
 — is reached by a `doctor` check, `types list usable`, and not by a rewrite.
 That is this ⚠ working as designed, not an exception to it.
 
+⚠ **A second worked instance, 2026-08-28 — and this one had a measured cost.**
+[ADR-FETCHER](0019_fetcher.md) decisions 12–13 added two **optional** functions
+to the fetcher contract, `validate()` and `is_rate_limited()`. The shipped
+`fetchers/http.py` template implements both; per this decision the template
+reaches **new repos only**, and a repo created before the change measured
+**0 of 7** `validate()` tokens learned until its `http.py` was replaced by
+hand. The mechanism is again a `doctor` check — `fetcher optional functions`
+(`doctor._fetcher_capabilities`) — which names each missing function, the
+record that added it, and what the repo forfeits.
+
+**Two properties this check has that the `types` one does not, both forced by
+what a fetcher is:**
+
+1. **It reads the file as TEXT and never imports it.** `doctor` is offline by
+   its module contract, and a consumer's fetcher is free to open a session or
+   a connection at import time. A capability check that ran the code would
+   break that guarantee to answer a question about the source.
+2. **It is a warning that never fails the command.** The `types` case is an
+   `error` because the file **stops `fux ingest`**; a fetcher missing an
+   optional function is **correct and supported**, so failing on it would
+   train people to ignore a red doctor.
+
+**The gap is made visible, not closed.** The consumer still copies the function
+in themselves — which is this decision holding, not an exception to it.
+
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
 The two files fux can put there ship as package data with an extension Python's

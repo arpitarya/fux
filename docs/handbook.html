@@ -167,6 +167,17 @@ details.more>summary .why{font-weight:400;color:var(--faint);font-size:.8rem}
 details.more .body{padding:2px 16px 14px;border-top:1px solid var(--line-2)}
 details.more .body>*:first-child{margin-top:12px}
 
+/* the plain-language band — first thing on every slide */
+.plain{display:flex;gap:13px;align-items:flex-start;margin:12px 0 18px;padding:11px 15px;
+       border:1px dashed var(--line);border-radius:10px;background:var(--panel)}
+.plain b{font-family:var(--mono);font-size:.63rem;letter-spacing:.11em;text-transform:uppercase;
+         color:var(--accent);flex:0 0 auto;padding-top:4px;white-space:nowrap}
+.plain span{font-size:.95rem;color:var(--ink);max-width:70ch}
+.plain code{font-size:.82em}
+body.present .plain{margin:14px 0 22px;padding:13px 17px}
+body.present .plain span{font-size:1.08rem}
+@media(max-width:620px){.plain{flex-direction:column;gap:6px}}
+
 /* ================= presentation mode ================= */
 #present-bar{display:none}
 body.present{display:block}
@@ -226,9 +237,17 @@ body.present #progress{display:block}
   <nav id="navlist" aria-label="Contents">
     <ol>
       <li>
-        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">01</span>How Fux works</button>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">00</span>Start here</button>
         <ol>
           <li><a href="#s-what">What it is</a></li>
+          <li><a href="#s-why">Why it exists</a></li>
+          <li><a href="#s-how">How it works</a></li>
+          <li><a href="#s-primer">The vocabulary</a></li>
+        </ol>
+      </li>
+      <li>
+        <button class="navgroup" aria-expanded="true"><span class="caret">▼</span><span class="gnum">01</span>How Fux works</button>
+        <ol>
           <li><a href="#s-mechanism">The mechanism</a></li>
           <li><a href="#s-ingest">Ingest, five steps</a></li>
           <li><a href="#s-analyzer">The analyzer + fields</a></li>
@@ -244,9 +263,11 @@ body.present #progress{display:block}
         <ol>
           <li><a href="#s-conf-why">Why it exists</a></li>
           <li><a href="#s-conf-ladder">Signals and bands</a></li>
-          <li><a href="#s-conf-signals">The five fields</a></li>
+          <li><a href="#s-conf-signals">The six fields</a></li>
+          <li><a href="#s-conf-formula">The formulas</a></li>
           <li><a href="#s-conf-out">Getting it out</a></li>
           <li><a href="#s-conf-honest">Fact vs guess</a></li>
+          <li><a href="#s-conf-tune">Tuning the floors</a></li>
         </ol>
       </li>
       <li>
@@ -297,31 +318,40 @@ body.present #progress{display:block}
 <section class="slide" id="s-cover" data-title="Fux Handbook">
   <p class="kicker">Handbook · index-and-refer</p>
   <h1>Fux</h1>
+  <div class="plain"><b>in plain terms</b><span>Fux makes your project's documents searchable by a coding agent — without copying them anywhere, running a server, or calling a model.</span></div>
   <p class="lede">A search index for your documents that lives in your git repo — as text you can
-  read, diff and review. <strong>No server, no vector database, no API key, no second copy of your
-  content.</strong></p>
+  read, diff and review. <strong>Nothing to run, nothing to call, and no second copy of your
+  documents.</strong></p>
   <div class="pills">
-    <span class="pill">2.0.0-alpha.2</span>
+    <span class="pill">2.0.0-alpha.2 + unreleased</span>
     <span class="pill">fux.index.v2</span>
     <span class="pill">analyzer v2</span>
     <span class="pill">fux.runtime.v4</span>
-    <span class="pill ok">lexical only — no model anywhere</span>
+    <span class="pill ok">lexical only — the engine never calls a model</span>
   </div>
   <div class="grid">
+    <div class="card"><h4>00 · Start here</h4><p>What it is, why it exists, how it works, and the vocabulary.</p></div>
     <div class="card"><h4>01 · How it works</h4><p>Ingest, the two planes, the query and refer path.</p></div>
     <div class="card"><h4>02 · Confidence</h4><p>How much the index believes its own answer.</p></div>
     <div class="card"><h4>03 · Testing</h4><p>Four layers, and what a quality number means.</p></div>
     <div class="card"><h4>04 · Reference</h4><p>Merge · fetcher · decoder · CLI.</p></div>
   </div>
   <p class="note key docchrome"><strong>Two ways to read this.</strong> Scroll it, or hit
-  <strong>▶ Present</strong> (or press <code>p</code>) to step through it as slides —
-  <code>→</code> / <code>←</code> to move, <code>Esc</code> to leave, <code>?</code> for the keys.</p>
+  <strong>▶ Present</strong> to step through it as slides from the top — <em>what</em>, <em>why</em>,
+  <em>how</em>, then the detail. <code>→</code> / <code>←</code> to move, <code>Esc</code> to leave,
+  <code>?</code> for the keys; <code>p</code> presents from wherever you happen to be reading.</p>
+
+  <p class="note"><strong>New to this?</strong> Nothing here assumes you have built a search system
+  before. Every slide opens with a plain-language line, and <a href="#s-primer">the vocabulary
+  slide</a> defines every term the rest of the deck uses. <strong>Version:</strong> this describes
+  <code>main</code> — 2.0.0-alpha.2 plus the unreleased confidence-floor change of 2026-08-28.</p>
 </section>
 
 <!-- ============================ 01 · WORKS ============================ -->
 <section class="slide" id="s-what" data-title="What Fux is">
-  <p class="kicker">01 · How Fux works</p>
+  <p class="kicker">00 · Start here</p>
   <h2>What Fux is</h2>
+  <div class="plain"><b>in plain terms</b><span>Fux writes a small file into your project recording which of your documents contain which words. To answer a question it uses that file to pick documents, then opens the real documents to get the actual text.</span></div>
   <p class="lede">Rank from a small committed index · fetch content from the systems that own it ·
   verify at answer time.</p>
 
@@ -330,8 +360,8 @@ body.present #progress{display:block}
       <h4>Your documents stay put</h4>
       <ul class="tight">
         <li>The repo, a wiki, a web page</li>
-        <li>Never copied, never stored</li>
-        <li>Only statistics are kept</li>
+        <li>The text is read, counted, then dropped</li>
+        <li>One narrow exception: an explicit per-source <code>snapshot</code> policy (L2)</li>
       </ul>
     </div>
     <div class="card">
@@ -339,30 +369,224 @@ body.present #progress{display:block}
       <ul class="tight">
         <li><code>.fux/index/</code>, 256 JSONL shards</li>
         <li>One canonical line per document</li>
-        <li>Small enough for git, plain enough to diff</li>
+        <li>Term <em>hashes</em> and counts — plus the path, and the title in clear when the
+          source is a git repo</li>
       </ul>
     </div>
     <div class="card">
       <h4>Answers quote the original</h4>
       <ul class="tight">
         <li>The index says <em>which</em> document</li>
-        <li>The words come from that document today</li>
-        <li>A freshness verdict is attached</li>
+        <li><code>fux answer</code> re-opens it and quotes today's bytes</li>
+        <li><code>ask</code> and <code>find</code> do not — they rank, and say so</li>
       </ul>
     </div>
   </div>
 
   <div class="note key">
-    <strong>Say "index", not "database".</strong> Load-bearing vocabulary — the moment it reads as a
-    database, people expect it to hold the content, and holding content is the one thing it must
-    never do.
+    <strong>Say "index", not "database" (L6).</strong> Load-bearing vocabulary: "database" makes
+    people expect a thing that <em>holds and serves</em> the documents. A vector database is an index
+    too — the difference is not the word, it is what this index contains and where it lives.
   </div>
+</section>
+
+<!-- ------------------------------- WHY ------------------------------- -->
+<section class="slide" id="s-why" data-title="Why Fux exists">
+  <p class="kicker">00 · Start here</p>
+  <h2>Why Fux exists</h2>
+  <div class="plain"><b>in plain terms</b><span>Most tools answer questions about your documents by building a second, opaque copy of them somewhere else. Fux keeps its notes in your repo as readable text, and re-reads the real document before it quotes one.</span></div>
+  <p class="lede">The usual way to make documents searchable for an agent is a vector database.
+  <strong>A vector database is an index, and that is not the objection.</strong> The objection is
+  what the surrounding stack has to be true for it to work.</p>
+
+  <div class="note">
+    <strong>Stated precisely, so the rest of this slide is arguable.</strong> A vector store keeps
+    an <em>embedding</em> — a fixed-length array of numbers a model produced from a passage — with an
+    id and some metadata, and finds neighbours in that number space. Storing the passage text beside
+    it is optional in the database and near-universal in practice, because a
+    retrieval-augmented-generation stack needs the <em>words</em> to put in the prompt. Everything
+    below is about that stack, not about the data structure.
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h4>You cannot review the change</h4>
+      <ul class="tight">
+        <li>An embedding is an array of floats</li>
+        <li>A diff over it is unreadable, so a ranking change cannot be argued in a PR</li>
+        <li>Fux's index is JSON text — the change is a changed line</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>It is hard to reproduce</h4>
+      <ul class="tight">
+        <li>Approximate nearest-neighbour search trades exactness for speed by design</li>
+        <li>Embedding models are versioned, and float maths varies across builds</li>
+        <li>Fux: same inputs → byte-identical index, on any machine</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>"Only vectors" is a weak privacy claim</h4>
+      <ul class="tight">
+        <li>In practice the chunk text is stored too — the model needs it</li>
+        <li>And an embedding is not a one-way hash: published inversion work recovers much of the
+          source text from embeddings alone</li>
+        <li>Fux keeps term hashes and counts, and never the prose</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>There is something to run</h4>
+      <ul class="tight">
+        <li>A store, a model, usually a key and a per-query bill</li>
+        <li>Embedding locally is possible — so this is a <em>default</em>, not a law</li>
+        <li>Fux's runtime is the standard library and nothing else</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>The bet</h3>
+  <ul class="tight">
+    <li><strong>For a codebase's own documents, lexical ranking is enough.</strong> ⚠ Held
+      narrowly: the one thing measured here was a bundled static-embedding lane, gated at
+      <strong>0 fixed / 2 broken</strong> and deleted (the wheel went 6.84 MB → 233 KB). That
+      retires <em>that</em> lane. It is not a result about dense retrieval in general.</li>
+    <li><strong>Freshness and provenance are the part that actually hurts</strong> — and a derived
+      copy makes both harder, because nothing in it can notice the source moved on. So leave the
+      documents where they live, keep only statistics, and re-read before quoting.</li>
+    <li><strong>An index plain enough to commit</strong> turns retrieval into something a human
+      reviews in a diff and CI regression-tests byte for byte.</li>
+  </ul>
+
+  <div class="note key">
+    <strong>What falls out of the bet.</strong> $0 by default · a stdlib-only runtime · offline
+    unless a line asks for the network · byte-deterministic, so the same corpus and the same question
+    produce the same bytes on any machine.
+  </div>
+
+  <details class="more">
+    <summary>The honest counter-case — where a vector store wins <span class="why">and Fux does not
+    pretend otherwise</span></summary>
+    <div class="body">
+      <h3>The honest counter-case</h3>
+      <p>Three places a vector store is the right tool and Fux is not.</p>
+      <ul class="tight">
+        <li><strong>Paraphrase.</strong> A question sharing no words with the document that answers
+          it is exactly what dense retrieval is for. Fux stems and weights fields; it does not
+          understand synonyms. <code>fux enrich</code> exists to let an agent add vocabulary to a
+          document — which is Fux conceding the point and refusing to solve it with a model at
+          ingest time.</li>
+        <li><strong>Scale.</strong> The design point is 10 000 documents. A hundred million
+          passages is a different problem and this is the wrong tool for it.</li>
+        <li><strong>Cross-language and multi-modal retrieval.</strong> Not addressed at all.</li>
+      </ul>
+      <p>Inversion reference: Morris, Kuleshov, Shmatikov &amp; Rush, <em>Text Embeddings Reveal
+      (Almost) As Much As Text</em>, EMNLP 2023 — the <code>vec2text</code> line of work.</p>
+    </div>
+  </details>
+</section>
+
+<!-- ----------------------------- PRIMER ------------------------------ -->
+<section class="slide" id="s-primer" data-title="The vocabulary">
+  <p class="kicker">00 · Start here</p>
+  <h2>Twelve words, before anything else</h2>
+  <div class="plain"><b>in plain terms</b><span>Twelve words this handbook leans on. Nothing later assumes you already knew them — and you can come back here.</span></div>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Term</th><th>What it means here</th></tr></thead>
+      <tbody>
+        <tr><td><strong>index</strong></td>
+            <td>A file of <em>statistics about</em> documents that makes them findable. It is not the
+            documents, and it cannot reproduce them.</td></tr>
+        <tr><td><strong>term</strong></td>
+            <td>A word after standardisation — lower-cased, stripped to its stem. “Running” and
+            “runs” become one term. Fux stores the <em>hash</em> of it, not the word.</td></tr>
+        <tr><td><strong>posting</strong></td>
+            <td>One entry saying <em>this term appears in that document, this many times</em>. The
+            list of all of them for one term is a posting list — the core of any search index.</td></tr>
+        <tr><td><strong>field</strong></td>
+            <td>Which part of a document a word sat in: body, heading, title, path or context. Fux
+            weights them differently, so a word in a heading counts for more.</td></tr>
+        <tr><td><strong>BM25 / BM25F</strong></td>
+            <td>The standard model-free formula for “how well does this document match these
+            words”. The <strong>F</strong> means each field gets its own weight.</td></tr>
+        <tr><td><strong>embedding / vector</strong></td>
+            <td>An array of numbers a model produces from text so that similar text lands nearby.
+            <strong>Fux does not use one</strong> — it is here because the comparison keeps coming up.</td></tr>
+        <tr><td><strong>chunk / passage</strong></td>
+            <td>A slice of a document small enough to quote. Fux cuts on headings, and only at
+            answer time, on freshly fetched bytes.</td></tr>
+        <tr><td><strong>shard</strong></td>
+            <td>One of the 256 files the index is split across, chosen by document id — so two
+            people editing different documents rarely touch the same file.</td></tr>
+        <tr><td><strong>sha</strong></td>
+            <td>A fingerprint of exact bytes. Same bytes → same sha; one character different → an
+            entirely different sha. It is how “has this changed?” is answered without a diff.</td></tr>
+        <tr><td><strong>committed / derived</strong></td>
+            <td>Committed = goes into git, is the real thing. Derived = a rebuildable cache, ignored
+            by git, safe to delete. Every file Fux writes is declared as one or the other.</td></tr>
+        <tr><td><strong>freshness verdict</strong></td>
+            <td>Fux's answer to “did I actually look at that document just now?” — one of
+            <code>current</code>, <code>stale</code>, <code>cached</code>, <code>unverified</code>.</td></tr>
+        <tr><td><strong>RAG · MCP</strong></td>
+            <td><strong>RAG</strong> — retrieval-augmented generation: find relevant documents, put
+            them in a model's prompt. Fux is the <em>find</em> half and refuses the rest.
+            <strong>MCP</strong> — the protocol a coding agent uses to call a tool;
+            <code>fux mcp</code> serves the index over it.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="note key">
+    <strong>The one distinction to carry forward.</strong> An <em>index</em> holds statistics and
+    points at documents. A <em>store</em> holds the documents. Everything Fux does differently
+    follows from being strictly the first.
+  </div>
+</section>
+
+<!-- ------------------------------- HOW ------------------------------- -->
+<section class="slide" id="s-how" data-title="How it works">
+  <p class="kicker">00 · Start here</p>
+  <h2>How it works — the whole thing in five beats</h2>
+  <div class="plain"><b>in plain terms</b><span>Read every document once and write down statistics about it. Use those statistics to pick documents. Open the picked documents to get the words.</span></div>
+  <p class="lede">Every slide after this one is detail on one of these five.</p>
+
+  <ol class="pts">
+    <li><strong>Ingest.</strong> Two committed text files — <code>.fux/sources/dirs</code> and
+      <code>.fux/sources/urls</code>, one entry per line — say what to read. Each document is
+      fetched, decoded, analysed into five fields, written out as statistics, and
+      <strong>the content is thrown away</strong>.</li>
+    <li><strong>The committed plane.</strong> <code>.fux/index/</code> — 256 JSONL shards, one
+      canonical line per document, full postings. Sorted and content-sharded, so git itself diffs
+      and merges it line by line.</li>
+    <li><strong>The derived plane.</strong> <code>.fux/runtime/</code> — an accelerator rebuilt from
+      those shards, never committed. Bound by a differential law: its results are
+      <strong>byte-identical</strong> to the reference scan's, asserted over thousands of
+      comparisons rather than spot-checked.</li>
+    <li><strong>Query.</strong> <code>ask</code> · <code>find</code> · <code>answer</code> rank with
+      BM25F over the five fields and hand back documents and locations. A <em>confidence band</em>
+      travels with the result in <code>--json</code> and over MCP always; on a plain terminal it
+      needs <code>--band</code>.</li>
+    <li><strong>Refer.</strong> The words come from the live document today: fetch it, compare the
+      sha, quote <code>path:L12-L40</code>, attach a freshness verdict. A differing sha marks the
+      document dirty, and a narrowed re-ingest repairs the ranking.</li>
+  </ol>
+
+  <div class="note key">
+    <strong>The one-line version.</strong> Rank from a small committed index · fetch content from
+    the systems that own it · verify at answer time. On <strong>one measured corpus</strong> — 8 870
+    RFC documents — warm <code>ask</code> came in at a worst-case p95 of <strong>27.2 ms</strong>
+    against a pre-registered 150 ms bar, where the reference scan takes 4.2 s. One corpus, not a
+    general claim.
+  </div>
+
+  <p class="note">Next: those same five beats as one diagram — then each of them in turn.</p>
 </section>
 
 <!-- ------------------------- MECHANISM DIAGRAM ------------------------- -->
 <section class="slide" id="s-mechanism" data-title="The mechanism">
   <p class="kicker">01 · How Fux works</p>
   <h2>The mechanism, end to end</h2>
+  <div class="plain"><b>in plain terms</b><span>The same five steps as the last slide, drawn once. Blue boxes are files that go into git. Plain boxes are files you can delete and rebuild in seconds.</span></div>
   <ul class="tight">
     <li><strong>Blue</strong> — committed to git. <strong>Plain</strong> — derived and disposable.
       <strong>Green</strong> — the freshness loop back into ingest.</li>
@@ -545,6 +769,7 @@ body.present #progress{display:block}
 <section class="slide" id="s-ingest" data-title="Ingest, five steps">
   <p class="kicker">01 · How Fux works</p>
   <h2>Ingest — five steps, and the content is thrown away</h2>
+  <div class="plain"><b>in plain terms</b><span>The reading stage. Fux opens each document, turns it into plain Markdown, counts the words, writes the counts down — and then forgets the document.</span></div>
 
   <figure>
     <div class="archbox">
@@ -620,6 +845,7 @@ body.present #progress{display:block}
 <section class="slide" id="s-analyzer" data-title="The analyzer and the five fields">
   <p class="kicker">01 · How Fux works</p>
   <h2>The analyzer, and the five weighted fields</h2>
+  <div class="plain"><b>in plain terms</b><span>Before counting, every word is cut to a standard form, so “Running” and “runs” count as the same thing. A word in a heading counts for three times as much as the same word in the body.</span></div>
 
   <figure>
     <div class="archbox">
@@ -664,7 +890,7 @@ body.present #progress{display:block}
         <line x1="794" y1="72" x2="820" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
         <line x1="994" y1="72" x2="1020" y2="72" stroke="var(--d-accent)" stroke-width="1.7" marker-end="url(#an-a)"/>
 
-        <text x="24" y="128" font-size="11" fill="var(--d-body)">The index stores the HASH, never the word — one more reason a shard tells you nothing about the document it describes.</text>
+        <text x="24" y="128" font-size="11" fill="var(--d-body)">The index stores the HASH of every term, never the word — so no shard can be read back as prose. It is not anonymous: see below.</text>
       </svg>
     </div>
   </figure>
@@ -703,6 +929,18 @@ body.present #progress{display:block}
       </svg>
     </div>
     <figcaption>Weights are tunable in <code>.fux/tune.toml</code>; these are the defaults.</figcaption>
+
+  <div class="note warn">
+    <strong>"Hashed" is not "anonymous" — be precise about which.</strong> The <em>terms</em> are
+    hashed, so a shard cannot be read back as prose. But the same line also carries the document's
+    <code>loc</code> (its path or URL) and, when the source's <code>meta</code> is
+    <code>plain</code> — the default for a git repo — its <code>title</code> and heading-derived
+    <code>phrases</code>, in clear. Set <code>meta = hashed</code> (the enforced default for
+    non-git sources, L5) and those become a single <code>title_h</code> instead, with the readable
+    title kept only in the gitignored display cache. So: a shard never reveals a document's
+    <em>prose</em>; whether it reveals a document's <em>name</em> is a per-source policy you choose.
+    See ADR-RECORD (<code>0010</code>).
+  </div>
   </figure>
 </section>
 
@@ -710,6 +948,7 @@ body.present #progress{display:block}
 <section class="slide" id="s-planes" data-title="The two planes">
   <p class="kicker">01 · How Fux works</p>
   <h2>Two planes — one holds truth, one holds speed</h2>
+  <div class="plain"><b>in plain terms</b><span>Two folders. One goes into git and is the real thing. The other is a speed cache you can delete whenever you like.</span></div>
 
   <figure>
     <div class="archbox">
@@ -763,6 +1002,7 @@ body.present #progress{display:block}
 <section class="slide" id="s-verbs" data-title="ask · find · answer">
   <p class="kicker">01 · How Fux works</p>
   <h2>Line ranges come from <code>answer</code>, never from <code>ask</code></h2>
+  <div class="plain"><b>in plain terms</b><span><code>ask</code> tells you <em>which documents</em>. <code>answer</code> opens a document and tells you <em>which lines</em>. Only <code>answer</code> can give line numbers, because only <code>answer</code> reads the file.</span></div>
   <p class="lede">The single most confusing thing about the surface, so it goes first.</p>
 
   <figure>
@@ -827,12 +1067,20 @@ body.present #progress{display:block}
     If you ran <code>fux ask</code> and expected <code>:L12-L40</code>, nothing is broken — it is the
     wrong verb for that question.
   </div>
+
+  <div class="note">
+    <strong>Why an index cannot produce a line number.</strong> Ingest counted the words and threw
+    the text away, so nothing is left in the index to count lines <em>in</em>. A line range can only
+    be computed from bytes, and the only place those bytes exist is the document itself — which is
+    why the verb that returns line ranges is also the verb that goes and fetches.
+  </div>
 </section>
 
 <!-- ---------------------------- CITATION ---------------------------- -->
 <section class="slide" id="s-citation" data-title="What a citation is">
   <p class="kicker">01 · How Fux works</p>
   <h2>What a citation actually is</h2>
+  <div class="plain"><b>in plain terms</b><span>A citation here is three things: a file, a line range, and a fingerprint of the exact bytes that were read — so you can prove nothing changed underneath it.</span></div>
   <ul class="tight">
     <li>Not a document with a wish of luck — a <strong>span</strong>.</li>
     <li>A heading-delimited passage, a line range, and the sha of the bytes just read.</li>
@@ -948,6 +1196,7 @@ application code. The alternative was a library in every service.
 <section class="slide" id="s-freshness" data-title="Freshness verdicts">
   <p class="kicker">01 · How Fux works</p>
   <h2>Four freshness verdicts</h2>
+  <div class="plain"><b>in plain terms</b><span>Four honest answers to one question: <em>did you actually look at the document just now?</em></span></div>
   <p class="lede">The fourth exists precisely so the other three stay honest.</p>
 
   <figure>
@@ -996,6 +1245,7 @@ application code. The alternative was a library in every service.
 <section class="slide" id="s-using" data-title="Using it">
   <p class="kicker">01 · How Fux works</p>
   <h2>Using it</h2>
+  <div class="plain"><b>in plain terms</b><span>The commands, roughly in the order you would type them the first time.</span></div>
 
   <div class="grid">
     <div class="card">
@@ -1058,6 +1308,7 @@ fux doctor</code></pre>
 <section class="slide" id="s-conf-why" data-title="Why confidence exists">
   <p class="kicker">02 · Confidence</p>
   <h2>How much the index believes its own answer</h2>
+  <div class="plain"><b>in plain terms</b><span>Every result carries a note saying how much Fux trusts it — so an agent can tell “this is the answer” from “this is the closest thing I could find.”</span></div>
 
   <div class="note warn">
     <strong>The problem, in one sentence.</strong> An agent handed a ranked list cannot tell
@@ -1082,6 +1333,7 @@ fux doctor</code></pre>
 <section class="slide" id="s-conf-ladder" data-title="Signals and bands">
   <p class="kicker">02 · Confidence</p>
   <h2>Four signals in, one band out</h2>
+  <div class="plain"><b>in plain terms</b><span>Four measurements go in. One of four words comes out: <code>none</code>, <code>partial</code>, <code>weak</code>, <code>grounded</code>.</span></div>
 
   <figure>
     <div class="archbox">
@@ -1181,15 +1433,21 @@ fux doctor</code></pre>
   </figure>
 </section>
 
-<section class="slide" id="s-conf-signals" data-title="The five fields">
+<section class="slide" id="s-conf-signals" data-title="The six fields">
   <p class="kicker">02 · Confidence</p>
-  <h2>The five fields, and the one to read first</h2>
+  <h2>The six fields, and the one to read first</h2>
+  <div class="plain"><b>in plain terms</b><span>The six numbers inside that note, and what each one is actually measuring.</span></div>
 
   <ul class="tight">
     <li><code>missing</code> — <strong>read this first.</strong> It is the difference between hedging
       vaguely and saying <em>"nothing here mentions <code>mTLS</code>"</em>.</li>
     <li><code>coverage</code> is <strong>idf-weighted</strong> — missing <code>the</code> is nothing;
       missing <code>mTLS</code> is the question.</li>
+    <li><code>doc_coverage</code> is the <em>same</em> idf mass measured over the
+      <strong>top-ranked document</strong> instead of the corpus. A question whose four words sit in
+      four different documents scores <code>coverage: 1.0</code> — correctly — and it is
+      <code>doc_coverage</code> that says no single document contains the question.
+      ⚠ <strong>It reports; it does not gate</strong> (see <a href="#s-conf-tune">the floors</a>).</li>
     <li><code>separation</code> is <code>1.0</code> when <strong>exactly one</strong> document
       scored — the strongest separation there is, not the weakest.</li>
     <li><code>ask</code> and <code>find</code> always report <code>unverified</code> — <em>"we did
@@ -1208,6 +1466,13 @@ fux doctor</code></pre>
             the <em>rarest possible</em> term. Weighting by idf therefore makes a missed rare word
             cost far more than a missed common one — which is correct, because the rare word is what
             made the question specific.</td></tr>
+          <tr><td><code>doc_coverage</code></td><td>Did the cited document contain the question?</td>
+            <td>Added 2026-08-28, after a decoy control found <em>"what is the SLA we publish for the
+            payments API"</em> reaching <code>grounded</code> at <code>coverage: 1.0</code> — every
+            term present, in four <em>different</em> documents, none of them about it.
+            <strong>It is published, not enforced:</strong> the 37 real answers that reach this
+            clause span <code>0.401–1.000</code> and the one decoy sits at <code>0.710</code>,
+            inside them. There is no gap to put a threshold in.</td></tr>
           <tr><td><code>separation</code></td><td>Can the ranking tell first place from second?</td>
             <td><code>(top1 − top2) / top1</code>, clamped to <code>[0,1]</code>.</td></tr>
           <tr><td><code>support</code></td><td>How many documents came back at all</td>
@@ -1230,21 +1495,101 @@ fux doctor</code></pre>
   </details>
 </section>
 
+<section class="slide" id="s-conf-formula" data-title="The formulas">
+  <p class="kicker">02 · Confidence</p>
+  <h2>Every number, written out</h2>
+  <div class="plain"><b>in plain terms</b><span>The exact arithmetic, written out. No model, no learned weights, nothing you cannot recompute by hand.</span></div>
+
+  <p class="lede">There is no <em>one</em> confidence formula. There are the four named signals plus
+    <code>doc_coverage</code>, one shared weight underneath them, and a five-clause ladder that stops
+    at the first clause that fires.</p>
+
+  <div class="note key">
+    <strong>One weight underneath all of it.</strong> Every coverage number is idf-weighted, using
+    the same <code>idf</code> BM25F already needed — so nothing here costs an extra pass over
+    anything.
+<pre style="margin:8px 0 0"><code>idf(t) = ln( (N − df(t) + 0.5) / (df(t) + 0.5) + 1 )</code></pre>
+    <p style="margin:8px 0 0">A term the corpus has never seen has <code>df = 0</code>, which this
+    scores as the <strong>rarest possible</strong> term. That is the whole point: missing
+    <code>the</code> is nothing, missing <code>mTLS</code> is the question.</p>
+  </div>
+
+  <h4>The signals</h4>
+<pre><code>Q = the query's distinct term hashes        D = the top-ranked document's term hashes
+N = documents in the corpus                 S = scores &gt; 0, sorted descending
+
+              Σ  idf(t)  for t ∈ Q where df(t) &gt; 0
+coverage    = ────────────────────────────────────          # clamped [0,1], 0 if Σ idf = 0
+                       Σ  idf(t)  for t ∈ Q
+
+              Σ  idf(t)  for t ∈ Q ∩ D
+doc_coverage= ─────────────────────────                     # 1.0 when no results — never
+                 Σ  idf(t)  for t ∈ Q                       # demote for "not computed"
+
+              ⎧ (S₀ − S₁) / S₀    if |S| ≥ 2 and S₀ &gt; 0
+separation  = ⎨ 1.0               if |S| = 1               # nothing competes: the STRONGEST
+              ⎩ 0.0               if |S| = 0               # separation, not the weakest
+
+support     = |S|                                          # bounded by --top, deliberately
+missing     = ⟨ surface(t) : t ∈ Q, df(t) = 0 ⟩            # the user's spelling, in order
+verified    = current | stale | cached | unverified        # from the refer plane, or "we did not look"</code></pre>
+
+  <h4>The ladder — first true clause wins</h4>
+<pre><code>support == 0                            → none        abstain; answerable = false
+missing ≠ ∅  or  verified == "stale"    → partial     answer, and name what is missing
+doc_coverage &lt; doc_coverage_floor       → partial     ⚠ floor is 0.0 by default: OFF
+separation   &lt; separation_floor         → weak        do not answer; say what was searched
+otherwise                               → grounded    use it and cite it
+
+answerable = (band ≠ none)</code></pre>
+
+  <ul class="tight">
+    <li><strong>All four numbers are rounded to 4 dp and clamped to <code>[0,1]</code></strong>
+      before they are stored, so the band is computed from exactly what the caller is shown.</li>
+    <li><code>stale</code> lands in <code>partial</code>, not <code>weak</code> — stale bytes are a
+      <em>nameable</em> defect, which is what <code>partial</code> means. A <code>weak</code> result
+      has nothing identifiably wrong; the ranking simply cannot choose.</li>
+    <li><strong>Nothing above fetches, samples, calls a model or reads a clock.</strong> Every input
+      is something ranking already produced, which is why L1, L3 and L4 are untouched.</li>
+  </ul>
+
+  <details class="more">
+    <summary>Why <code>separation</code> is a two-point number, and what it is a cheap version of</summary>
+    <div class="body">
+      <p>The literature's version is <strong>NQC</strong> — the standard deviation of the top-<em>k</em>
+      scores, normalised — which predicts query difficulty from the retrieval distribution alone, with
+      no relevance judgments (Shtok, Kurland, Carmel, Raiber &amp; Markovits, TOIS 2012). The idea goes
+      back to the <em>clarity score</em> (Cronen-Townsend, Zhou &amp; Croft, SIGIR 2002).</p>
+      <p><code>(top1 − top2)/top1</code> is the two-point form of the same intuition: it asks whether
+      the winner is <em>decisively</em> the winner. ⚠ <strong>And that is also its known failure</strong>
+      — a corpus of near-misses is perfectly decisive about its best near-miss, which is exactly the
+      case <code>doc_coverage</code> was added to report.</p>
+      <p>⚠ <code>separation</code> is <strong>ordinal</strong>, not a calibrated probability. Chow's
+      rule — the theory behind an optimal abstention threshold — assumes the latter. That gap is real
+      and the record states it rather than closing it.</p>
+    </div>
+  </details>
+</section>
+
 <section class="slide" id="s-conf-out" data-title="Getting it out">
   <p class="kicker">02 · Confidence</p>
   <h2>Getting it out</h2>
+  <div class="plain"><b>in plain terms</b><span>Where to find the confidence note — in JSON, on the terminal, and through MCP — and why it is silent when everything is fine.</span></div>
 
   <div class="grid">
     <div class="card">
       <h4>In <code>--json</code></h4>
 <pre style="margin:8px 0 0"><code>"confidence": {
-  "band":       "partial",
-  "answerable": true,
-  "coverage":   0.61,
-  "separation": 0.34,
-  "support":    3,
-  "verified":   "unverified",
-  "missing":    ["mTLS"]
+  "band":         "partial",
+  "answerable":   true,
+  "coverage":     0.6127,
+  "separation":   0.3402,
+  "separation_floor":   0.1,
+  "doc_coverage": 0.4413,
+  "doc_coverage_floor": 0.0,
+  "support":      3,
+  "verified":     "unverified",
+  "missing":      ["mTLS"]
 }</code></pre>
     </div>
     <div class="card">
@@ -1266,6 +1611,13 @@ confidence: none - nothing in the
     <li><code>band</code> and <code>answerable</code> are <strong>written out rather than left
       derivable</strong> — a consumer re-implementing the rules would be a second copy of this
       policy, drifting from the day it was written.</li>
+    <li>The two <code>_floor</code> fields are there for the <strong>opposite</strong> reason — not so
+      you can re-derive the band, but so you can see it <em>is not comparable</em> across repos that
+      tuned differently. See <a href="#s-conf-tune">Tuning the floors</a>.</li>
+    <li><strong>On the CLI the block needs <code>--band</code></strong> (or <code>band = true</code>
+      in <code>.fux/output.toml</code>); the <code>fux_search</code> MCP result carries it always,
+      because a tool call has no flags to pass. <strong>Absent means "not asked for" — it never means
+      "not confident".</strong></li>
     <li><strong>Silent at <code>grounded</code>, on purpose.</strong> A note that fires on every
       healthy query is a note nobody reads by the second day.</li>
     <li><strong>Never on stdout</strong>: <code>find</code> pipes bare paths and <code>--json</code>
@@ -1279,6 +1631,7 @@ confidence: none - nothing in the
 <section class="slide" id="s-conf-honest" data-title="Fact vs guess">
   <p class="kicker">02 · Confidence</p>
   <h2>Which parts are facts, and which is a guess</h2>
+  <div class="plain"><b>in plain terms</b><span>Three of the four confidence rules are plain facts. One is a guessed cutoff, and it is labelled as a guess.</span></div>
 
   <div class="grid">
     <div class="card" style="border-color:var(--ok)">
@@ -1292,24 +1645,93 @@ confidence: none - nothing in the
     <div class="card" style="border-color:var(--warn)">
       <h4 style="color:var(--warn)">⚠ The one guess</h4>
       <ul class="tight">
-        <li><code>SEPARATION_FLOOR = 0.10</code> is <strong>provisional and unmeasured</strong></li>
+        <li><code>separation_floor = 0.10</code> is <strong>provisional and unmeasured</strong></li>
         <li>Registered as prediction <strong>R10</strong></li>
         <li><strong>Must not be cited as calibrated</strong> until that verdict is filed</li>
+        <li>⚠ <strong>And a repo can now move it</strong> — which changes who owns the guess, not
+          whether it is one</li>
       </ul>
     </div>
   </div>
 
   <ul class="tight">
-    <li><strong>Not a <code>tune.toml</code> key, deliberately.</strong> A consumer who could lower it
-      until their answers read <code>grounded</code> would be tuning away the <em>signal</em> rather
-      than the ranking. The honest fix for a wrong floor is to measure it once, for everyone.</li>
+    <li>⚠ <strong>It WAS deliberately not a <code>tune.toml</code> key — that was reversed on
+      2026-08-28.</strong> The argument for the lock is still true: a consumer who lowers the floor
+      until their answers read <code>grounded</code> is tuning away the <em>signal</em> rather than
+      the ranking, and the honest fix for a wrong floor is still to measure it once, for everyone.
+      What changed is who decides — see <a href="#s-conf-tune">Tuning the floors</a> for the price of
+      that.</li>
     <li>⚠ <code>separation</code> is <strong>ordinal</strong>, and Chow's rule — the theory behind an
       abstention threshold — assumes a <em>calibrated probability</em>. The record states the gap
       rather than closing it.</li>
     <li><strong>Confidence can never reach a score or an ordering.</strong> It is computed from
       <code>rank()</code>'s output and handed to the caller; nothing downstream feeds back.</li>
-    <li>ADR-CONFIDENCE is <em>proposed</em>, not accepted — the behaviour ships, the ratification is a
-      human step and is owed.</li>
+    <li>ADR-CONFIDENCE is <strong>accepted</strong> (ratified 2026-08-27, amended 2026-08-28). What
+      is still owed is <strong>R10</strong> — the measurement, not the ratification.</li>
+  </ul>
+</section>
+
+<section class="slide" id="s-conf-tune" data-title="Tuning the floors">
+  <p class="kicker">02 · Confidence</p>
+  <h2>Moving the two floors — and what that costs</h2>
+  <div class="plain"><b>in plain terms</b><span>You can move the two cutoffs. Here is what each move costs — including the one whose cost has never been measured.</span></div>
+
+  <p class="lede">Both cutoffs live in <code>.fux/tune.toml</code>. Neither can move a score or an
+    ordering: confidence is computed <em>from</em> the ranking and nothing feeds back.</p>
+
+<pre><code>[confidence]
+separation_floor   = 0.1   # the `grounded`/`weak` cutoff
+doc_coverage_floor = 0.0   # 0.0 = the clause is OFF</code></pre>
+
+  <div class="grid">
+    <div class="card" style="border-color:var(--warn)">
+      <h4 style="color:var(--warn)">⚠ <code>separation_floor</code> — cost unmeasured</h4>
+      <ul class="tight">
+        <li><strong>Lowering it does not make answers better.</strong> It makes fux quieter about not
+          knowing.</li>
+        <li>At <code>0.0</code>, <strong>no answer is ever <code>weak</code> again.</strong></li>
+        <li>The default <code>0.10</code> is <strong>provisional and unmeasured</strong> —
+          prediction <strong>R10</strong>, still owed. Setting it locally does not settle it.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><code>doc_coverage_floor</code> — cost measured</h4>
+      <ul class="tight">
+        <li><code>0.0</code> is a <strong>ruling</strong>, not an unset value: the gate was built,
+          measured, and switched off.</li>
+        <li>At <code>1.0</code> — the only value that reads structural — <strong>19 of 50 correct
+          answers turn <code>partial</code></strong>.</li>
+        <li>The one decoy it could catch sits at <code>0.710</code>, <strong>inside</strong> the real
+          answers' <code>0.401–1.000</code> range.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note warn">
+    <strong>This reverses a decision, and the reversal has a price.</strong> Until 2026-08-28 the
+    separation floor was deliberately <em>not</em> tunable, because a consumer who lowers it until
+    their answers read <code>grounded</code> is tuning away the <em>signal</em> rather than the
+    ranking — and <strong>nothing mechanical catches that.</strong> It was opened because fux's
+    standing rule on knobs is <em>state the cost, do not clamp</em>: refuse what is broken or
+    duplicates a tool, warn about what is merely strong. Neither floor is broken at any legal value.
+  </div>
+
+  <ul class="tight">
+    <li>🔴 <strong>The band now travels with the floor that judged it.</strong> Every block carries
+      <code>separation_floor</code> and <code>doc_coverage_floor</code>, so a <code>grounded</code> at
+      <code>0.02</code> is <em>distinguishable</em> from one at <code>0.10</code>. Without that,
+      exposing the knob would have made the band silently mean a different thing in every repo —
+      worse than either the lock or the knob.</li>
+    <li><strong>Read the floor before comparing two bands</strong> from different repositories.
+      Comparing them without it is a comparison fux told you not to make.</li>
+    <li><code>fux ask --no-tune</code> recomputes the band at the <strong>engine</strong> defaults —
+      the same <em>"is it me or the config?"</em> switch it already was for ranking.</li>
+    <li>⚠ <strong>A measured run may never compare two arms with different floors.</strong> That is a
+      pre-registered threshold moving inside a comparison, and it is the reopen trigger for this
+      decision.</li>
+    <li><code>fux setup</code> is <strong>write-if-missing</strong>, so an existing repo never gains
+      this table on upgrade. An absent <code>[confidence]</code> means the engine floors — nothing
+      breaks; what is lost is discoverability.</li>
   </ul>
 </section>
 
@@ -1317,6 +1739,7 @@ confidence: none - nothing in the
 <section class="slide" id="s-test-layers" data-title="Four layers of check">
   <p class="kicker">03 · How it is tested</p>
   <h2>Two questions, not one</h2>
+  <div class="plain"><b>in plain terms</b><span>Four kinds of check, each able to catch a mistake the other three are blind to.</span></div>
   <ul class="tight">
     <li><strong>Does the code do what it says?</strong> → the suites.</li>
     <li><strong>Is what it says any good?</strong> → the quality contract.</li>
@@ -1335,8 +1758,8 @@ confidence: none - nothing in the
         <text x="58" y="72" font-size="10" fill="var(--d-accent)" font-family="ui-monospace,monospace">LAYER 1</text>
         <text x="58" y="96" font-size="14" fill="var(--d-ink)" font-weight="700">unit</text>
         <text x="58" y="118" font-size="10.5" fill="var(--d-dim)" font-family="ui-monospace,monospace">tests/</text>
-        <text x="58" y="144" font-size="10.5" fill="var(--d-body)">92 modules, ~1 150 test</text>
-        <text x="58" y="160" font-size="10.5" fill="var(--d-body)">functions before parametrising</text>
+        <text x="58" y="144" font-size="10.5" fill="var(--d-body)">105 test modules — a count</text>
+        <text x="58" y="160" font-size="10.5" fill="var(--d-body)">at a moment, not a contract</text>
         <text x="58" y="182" font-size="10.5" fill="var(--d-body)">every codec, the analyzer,</text>
         <text x="58" y="198" font-size="10.5" fill="var(--d-body)">BM25F, chunking, confidence</text>
         <text x="58" y="224" font-size="10" fill="var(--d-warn)">blind to: anything that only</text>
@@ -1391,6 +1814,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-test-determinism" data-title="Determinism">
   <p class="kicker">03 · How it is tested</p>
   <h2>Determinism is asserted through the CLI, on three operating systems</h2>
+  <div class="plain"><b>in plain terms</b><span>Run the same command twice over the same documents and you get the same bytes — asserted on Linux, macOS and Windows, through the real CLI.</span></div>
 
   <ul class="tight">
     <li><strong>Prediction R1</strong> — double-ingest must produce byte-identical shards.</li>
@@ -1432,6 +1856,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-test-guards" data-title="The project guards">
   <p class="kicker">03 · How it is tested</p>
   <h2>The guards that are not about code at all</h2>
+  <div class="plain"><b>in plain terms</b><span>Some tests check the <em>documentation</em> rather than the code, because the mistakes that hurt most on this project are written ones.</span></div>
   <p class="lede">A surprising share of the suite tests <em>the project</em> rather than the engine —
   the failure modes that hurt most here are documentary.</p>
 
@@ -1467,6 +1892,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-quality" data-title="The quality funnel">
   <p class="kicker">03 · How it is tested</p>
   <h2>What a fux quality number means</h2>
+  <div class="plain"><b>in plain terms</b><span>“How good is it?” means nothing until you say what you measured and what a wrong answer costs. Both are written down before any score exists.</span></div>
   <ul class="tight">
     <li>Fux measured carefully for months and <strong>never wrote down what it was measuring</strong>.</li>
     <li>Every number therefore carried an undeclared query distribution and an implicit cost model in
@@ -1539,6 +1965,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-quality-calls" data-title="The six calls">
   <p class="kicker">03 · How it is tested</p>
   <h2>The six calls that make a number mean something</h2>
+  <div class="plain"><b>in plain terms</b><span>Six choices about how quality gets measured — and the published evidence behind each one.</span></div>
 
   <ul class="tight">
     <li><strong><code>recall@k</code> is the headline</strong> — retrieval bounds the whole system,
@@ -1585,6 +2012,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-discipline" data-title="Measurement discipline">
   <p class="kicker">03 · How it is tested</p>
   <h2>Measurement discipline</h2>
+  <div class="plain"><b>in plain terms</b><span>Decide the passing mark before you look at the score, and say whether whoever ran it had already seen the answers.</span></div>
 
   <div class="grid">
     <div class="card">
@@ -1629,9 +2057,10 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-unverified" data-title="What is not verified">
   <p class="kicker">03 · How it is tested</p>
   <h2>What is not verified</h2>
+  <div class="plain"><b>in plain terms</b><span>The things this project has <em>not</em> established. Listed on purpose, so nobody has to discover them later.</span></div>
 
   <div class="note warn">
-    <strong>The end-to-end suite has not been seen green.</strong> It fails identically on a clean
+    <strong>As of 2026-08-28, the end-to-end suite has not been seen green.</strong> It fails identically on a clean
     tree in the environment this release was built in — identical before and after, so the change
     introduces <strong>no regression</strong>. That is not the same claim as passing.
   </div>
@@ -1669,6 +2098,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-merge" data-title="Merge">
   <p class="kicker">04 · Reference</p>
   <h2>Merge — machine planes should never conflict on adjacency</h2>
+  <div class="plain"><b>in plain terms</b><span>If two people each add documents on different branches, git would call that a conflict. A small program shipped with Fux merges them correctly instead.</span></div>
 
   <ul class="tight">
     <li>A shard is a header line plus <strong>one JSON line per document, sorted by <code>id</code></strong>.</li>
@@ -1769,6 +2199,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-boundary" data-title="The boundary">
   <p class="kicker">04 · Reference</p>
   <h2>One boundary, used three times</h2>
+  <div class="plain"><b>in plain terms</b><span>Three jobs Fux refuses to do itself — going on the network, calling a model, and parsing exotic file formats. You write those as small files in your own repo, and Fux calls them.</span></div>
   <ul class="tight">
     <li>Fux refuses to own <strong>network I/O</strong>, <strong>model calls</strong>, and
       <strong>third-party parsing libraries</strong>.</li>
@@ -1857,6 +2288,7 @@ uv run pytest -q tests_e2e      # the package as a user: the real CLI via subpro
 <section class="slide" id="s-fetcher" data-title="Fetcher">
   <p class="kicker">04 · Reference</p>
   <h2>Fetcher — the contract</h2>
+  <div class="plain"><b>in plain terms</b><span>The file <em>you</em> write so Fux can read a web page. Fux itself never opens a socket.</span></div>
 
 <pre><code># .fux/fetchers/&lt;name&gt;.py
 
@@ -1915,6 +2347,7 @@ def configure(config: dict) -&gt; None: # [sources.url.config], verbatim
 <section class="slide" id="s-decoder" data-title="Decoder">
   <p class="kicker">04 · Reference</p>
   <h2>Decoder — bytes become Markdown, or become a queue item</h2>
+  <div class="plain"><b>in plain terms</b><span>The file that turns a PDF, a spreadsheet or a web page into Markdown, so its words can be counted.</span></div>
 
 <pre><code># .fux/decoders/&lt;name&gt;.py    (or a built-in of the same module name)
 
@@ -1971,6 +2404,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 <section class="slide" id="s-cli-1" data-title="CLI · setup and corpus">
   <p class="kicker">04 · Reference</p>
   <h2>CLI — setup and corpus</h2>
+  <div class="plain"><b>in plain terms</b><span>Commands for setting Fux up and for saying what it should index.</span></div>
   <div class="note key">
     <strong>Every verb is flat.</strong> <code>fux &lt;verb&gt; &lt;subverb&gt;</code> does not exist
     and is a standing constraint — <code>fux graph path</code> would have been the first subcommand
@@ -2013,6 +2447,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 <section class="slide" id="s-cli-2" data-title="CLI · read, maintain, serve">
   <p class="kicker">04 · Reference</p>
   <h2>CLI — read, maintain, serve</h2>
+  <div class="plain"><b>in plain terms</b><span>Commands for reading the index, keeping it current, and serving it to a coding agent.</span></div>
 
   <div class="tablewrap">
   <table>
@@ -2061,6 +2496,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 <section class="slide" id="s-agents" data-title="Running it as an agent">
   <p class="kicker">05 · Context</p>
   <h2>Running it as an agent</h2>
+  <div class="plain"><b>in plain terms</b><span>How a coding agent should find and run Fux — and why silently concluding “not installed” is the dangerous failure.</span></div>
 
   <div class="note warn">
     <strong>The defect this closes was live and silent.</strong> In any repo whose fux lives in an
@@ -2156,13 +2592,15 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 <section class="slide" id="s-laws" data-title="The eight laws">
   <p class="kicker">05 · Context</p>
   <h2>The eight laws</h2>
+  <div class="plain"><b>in plain terms</b><span>Eight rules the project will not break. Every design record cites one by number instead of restating it.</span></div>
   <p class="lede">Not guidelines. Every record cites them by number and none restates them — a
   paraphrase drifts, and a drifted paraphrase in an accepted record reads as authority.</p>
 
   <div class="law"><b>L1</b><span><strong>$0, stdlib-only runtime.</strong> No third-party runtime
     dependency. The frontmatter parser and every codec are hand-rolled on purpose.</span></div>
   <div class="law"><b>L2</b><span><strong>Content is never durable outside its source system.</strong>
-    The index holds statistics, never content. The whole architecture rests on this.</span></div>
+    The index holds statistics, never content. The single exception is an explicit per-source
+    <code>snapshot</code> policy. The whole architecture rests on this.</span></div>
   <div class="law"><b>L3</b><span><strong>Deterministic — no model in the maintenance path.</strong>
     Same sources produce a byte-identical index. Nothing calls a model to build one.</span></div>
   <div class="law"><b>L4</b><span><strong>Offline by default.</strong> Network access only inside
@@ -2171,15 +2609,26 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     enforced at write time. It closes an ACL-mismatch leak.</span></div>
   <div class="law"><b>L6</b><span><strong>Say "index", not "db".</strong> Load-bearing vocabulary.</span></div>
   <div class="law"><b>L7</b><span><strong>Python ≥ 3.11.</strong></span></div>
-  <div class="law"><b>L8</b><span><strong>What fux retains about <em>use</em> is hashed, bounded and
-    local.</strong> Fux may record <em>that</em> a question was asked — never the question. Every
-    durable trace of use is hashed at write time, bounded in size, confined to gitignored runtime
-    state, and never reaches a committed byte, stdout, or the network.</span></div>
+  <div class="law"><b>L8</b><span><strong>A use record is never committed.</strong> Fux may record
+    what was asked and what was answered — <strong>in plaintext, with no law-level size bound</strong>
+    — and may print a per-answer provenance receipt on stdout. Every durable trace of use lives on a
+    <em>gitignored path</em> and never reaches a committed byte.</span></div>
 
   <div class="note ok">
     <strong>The laws are enterprise features, not constraints.</strong> <code>$0</code>/stdlib is a
     trivially auditable supply chain and no procurement. Offline / no-API means no data ever leaves
     the tenant. Deterministic means compliance-grade reproducibility.
+  </div>
+  <div class="note warn">
+    <strong>L8 is the one law that moved, and it moved three times in a day.</strong> Written,
+    reverted, then narrowed to commits alone (Arpit, 2026-08-27). Hashing, the size bound, the stdout
+    prohibition and a transmission clause were all in earlier drafts and <strong>none survives</strong>
+    — if you have read an older copy of this handbook, that is the paragraph it got wrong.
+    <strong>Gitignored is the test, not <code>.fux/</code>:</strong> <code>index/</code>,
+    <code>sources/</code>, <code>fetchers/</code>, <code>decoders/</code>, <code>tune.toml</code> and
+    <code>.fuxignore</code> are all committed; <code>.fux/runtime/</code> is the only derived
+    directory under it. ADR-LAWS decision 8 carries each pass and what it traded away, including the
+    gap the last one leaves open.
   </div>
   <div class="note">
     <strong>L2 governs the corpus; L8 governs the record of who went looking in it.</strong> A query
@@ -2190,13 +2639,15 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 <section class="slide" id="s-decisions" data-title="Decisions">
   <p class="kicker">05 · Context</p>
   <h2>Decisions — made, and still open</h2>
+  <div class="plain"><b>in plain terms</b><span>What has been settled and will not be reopened, and what is still genuinely open.</span></div>
 
   <div class="note key">
-    <strong>Counts are facts about a moment.</strong> At the time of writing: <strong>44 live
-    records — 42 accepted, 2 proposed</strong> (ADR-LOCKS and ADR-CONFIDENCE, both describing shipped
-    behaviour and waiting on ratification). Re-derive before quoting:
-    <code>grep '^status:' docs/adr/*.md</code>. ⚠ A stale duplicate of ADR-CONFIDENCE
-    (<code>0043_confidence.md</code>) is ruled for deletion and still on disk.
+    <strong>Counts are facts about a moment.</strong> Checked against the tree on 2026-08-28:
+    <strong>47 live records — 46 accepted, 1 proposed</strong> (ADR-LOCKS, which describes shipped
+    behaviour and is waiting on ratification). ADR-CONFIDENCE was ratified 2026-08-27 and amended
+    2026-08-28; the stale duplicate at <code>0043_confidence.md</code> has since been deleted, and
+    <code>0043</code> is ADR-LOCKS. Re-derive before quoting:
+    <code>grep '^status:' docs/adr/*.md</code>.
   </div>
 
   <ul class="tight">
@@ -2251,6 +2702,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
 <section class="slide" id="s-end" data-title="Where things live">
   <p class="kicker">05 · Context</p>
   <h2>Where things live</h2>
+  <div class="plain"><b>in plain terms</b><span>Where to look for what.</span></div>
 
   <div class="grid">
     <div class="card">
@@ -2309,7 +2761,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     <li><kbd>→</kbd> <kbd>space</kbd> <kbd>PgDn</kbd> — next</li>
     <li><kbd>←</kbd> <kbd>PgUp</kbd> — previous</li>
     <li><kbd>Home</kbd> / <kbd>End</kbd> — first / last</li>
-    <li><kbd>f</kbd> — fullscreen · <kbd>p</kbd> — toggle presenting</li>
+    <li><kbd>f</kbd> — fullscreen · <kbd>p</kbd> — toggle presenting <em>from where you were reading</em></li>
     <li><kbd>t</kbd> — cycle theme · <kbd>Esc</kbd> — leave</li>
   </ul>
   <button class="btn" onclick="document.getElementById('helpcard').classList.remove('on')">Close</button>
@@ -2370,7 +2822,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
     Array.prototype.forEach.call(document.querySelectorAll('details.more'), function(d){ d.open=on?true:d.open; });
     if(on){ show(idx); } else { document.getElementById('helpcard').classList.remove('on'); }
   }
-  document.getElementById('presentbtn').onclick=function(){ present(true); };
+  document.getElementById('presentbtn').onclick=function(){ idx=0; present(true); };  /* the button always opens the deck at the top */
   document.getElementById('exitbtn').onclick=function(){ present(false); };
   document.getElementById('nextbtn').onclick=function(){ show(idx+1); };
   document.getElementById('prevbtn').onclick=function(){ show(idx-1); };

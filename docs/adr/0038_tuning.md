@@ -5,6 +5,7 @@ title: "ADR-TUNE (0038) — the tunables file, and per-source priority"
 description: "`.fux/tune.toml` — a committed, setup-written, never-rewritten file holding every knob that changes ordering and none that changes the index; plus a per-source preference weight in either direction, where fux states the cost and refuses only what is broken."
 status: accepted
 date: 2026-08-22
+amended: 2026-08-28
 feature: the tuning surface — `.fux/tune.toml`, its closed key set, its error contract, and per-source preference weights
 owns: [src/fux/tune.py]
 laws: [L1, L3, L7]
@@ -153,16 +154,65 @@ standard library (`tomllib` reads only), and L1 forbids adding one. **This is
 not a limitation being worked around — it is the correct behaviour arriving for
 free**: a tuned value reaches the repo through a commit that someone approved.
 
-**4. Keys ship COMMENTED, with the default in the comment.** Spelled-out values
-would **freeze** every repo's ranking against future engine defaults — arguably
-a feature, but a silent one. Commented keys stay discoverable and let a
-corrected default reach existing repos on upgrade.
+**4. ⚠ REVERSED 2026-08-27 (Arpit) — KEYS SHIP LIVE, NOT COMMENTED. This
+record said otherwise until 2026-08-28 and the code had said otherwise for a
+day; the record was the stale one.**
+
+> *Original:* Keys ship COMMENTED, with the default in the comment. Spelled-out
+> values would **freeze** every repo's ranking against future engine defaults —
+> arguably a feature, but a silent one.
+
+**What ships now:** every value is written **live**, at `Tune`'s own default, so
+a repo with the file and a repo without it rank identically. Ruled the same day
+as `.fux/sources/types` and `.fux/output.toml`, for the same reason: *a file of
+nothing but comments is a menu*, and a consumer should be able to read what fux
+will do without reading fux's source.
+
+⚠ **The cost the original paragraph correctly named is REAL and is now paid:
+the tunables FREEZE at setup.** `fux setup` is write-if-missing (decision 3), so
+a later change to `K1`, `B`, `FIELD_WEIGHTS` or any `Tune` default reaches a
+repo that has never run setup and **does not reach one that has**. Same trade as
+`.fux/sources/types`; the remedy [ADR-DOTFUX](0003_fux-directory.md) decision 6
+names is **a loader refusal or a `fux doctor` check, never a rewrite**, and
+neither is built.
+
+⚠ **`[priority]` stays commented, and that is not an inconsistency** — its keys
+are the consumer's own source entries, not tunables with defaults. An
+uncommented line there would silently reweight a corpus rather than restate a
+default; an empty table *is* the default.
+
+**4a. Measured consequence of the freeze, 2026-08-28:** this repository's own
+`.fux/tune.toml` did **not** gain `[confidence]` from decision 13 — it was
+hand-edited, because setup would never touch it. Every existing consumer is in
+the same position, and an absent `[confidence]` table simply means the engine
+floors, so nothing breaks; it is discoverability that is lost, not behaviour.
 
 **5. The key set is closed, and an unknown table or key is a loud error.**
 Reader-strict, on the file that can silently change every answer. **Adding a key
-is a change to this record.** Five tables: `bm25f`, `ranking`, `graph`, `refer`,
-`priority` — and `[priority]` is the one **open** table, because its keys are
-the consumer's own source entries, which fux cannot know in advance.
+is a change to this record.** **Six tables**: `bm25f`, `ranking`, `graph`,
+`refer`, `confidence`, `priority` — and `[priority]` is the one **open** table,
+because its keys are the consumer's own source entries, which fux cannot know in
+advance.
+
+**5d. `[confidence]` is the first table that changes no ORDER — added
+2026-08-28, and it stretches this record's own boundary rule.**
+[ADR-CONFIDENCE](0045_confidence.md) decision 13 puts `separation_floor` and
+`doc_coverage_floor` here, reversing its own decision 7.
+
+- **Decision 1's question is *"does it change a byte in `.fux/index/`?"*** These
+  do not — but neither do they change a score or a result list. They move the
+  **band**, which is what fux says *about* an answer. **The boundary rule admits
+  them and was not written with them in mind**, so `test_tune_boundary.py`
+  proves something weaker here than elsewhere: of course the shards match, there
+  is nothing downstream of the band. The keys are exercised because `_SCHEMA` is
+  the contract and an unexercised key is an untested one.
+- ⚠ **The knob is real and is not clamped.** `separation_floor = 0.0` means no
+  answer is ever `weak` again. That is decision 9's rule applied where it bites:
+  refuse what is broken, **state** what is merely strong. The specimen says so
+  in capitals.
+- **The safeguard lives in ADR-CONFIDENCE, not here:** the block **publishes**
+  the floor it was judged under, so a tuned `grounded` is distinguishable rather
+  than merely different.
 
 **5a. The `[bm25f]` field-weight keys ARE the field names** — `body · heading ·
 title · path · ctx`, beside `k1` and `b`. Inside a table already named `bm25f`,
@@ -185,45 +235,53 @@ testing one configuration eleven times. It dispatches on membership in
 `TF_FIELDS` now and raises on an unknown key. **A rename that makes a test
 vacuous does not make it red**, which is the class worth remembering.
 
-*Specimen — a specification of the file's content:*
+*Specimen — the shape, not the text. ⚠ **The authority is
+[`tune.specimen()`](../../src/fux/tune.py), which interpolates the engine
+constants**, so the file and the behaviour cannot drift; a record that retyped
+the numbers would be a second copy of them (W-83's lesson). Comments elided
+here; the shipped file carries them.*
 
 ```toml
 # .fux/tune.toml — HOW results are ordered. Never what is indexed.
 # Written once by `fux setup`; fux never rewrites it. Absent = every default.
-# Nothing here is read on the maintenance path: changing any value below
-# leaves `.fux/index/` byte-identical.
 
-[bm25f]
-#k1      = 1.2      # term-frequency saturation
-#b       = 0.75     # length normalisation, 0 = off, 1 = full
-# The five field weights, in `store.TF_FIELDS` order.
-#body    = 1.0
-#heading = 3.0
-#title   = 2.0
-#path    = 1.5
-#ctx     = 1.0
+[bm25f]                    # k1, b, and the five field weights in TF_FIELDS order
+k1      = 1.2
+b       = 0.75
+body    = 1.0
+heading = 3.0
+title   = 2.0
+path    = 1.5
+ctx     = 1.0
 
 [ranking]
-#archived_weight        = 1.0   # multiplier for a source declared archived
-#superseded_weight      = 1.0   # multiplier for a document another supersedes
-#recency_half_life_days = 0.0   # 0 = off; decays on the committed `mtime`
-#rerank_weight          = 0.0   # 0 = off; the proximity reranker's uplift
+archived_weight        = 1.0
+superseded_weight      = 1.0
+recency_half_life_days = 0.0   # 0 = off
+rerank_weight          = 0.0   # 0 = off
 
 [graph]                    # explain / graph / path
-#damping      = 0.85
-#iterations   = 3
-#laziness     = 0.5
-#hop_decay    = 0.5
-#expand_limit = 10
-#seed_depth   = 5
+damping      = 0.85
+iterations   = 3
+laziness     = 0.5
+hop_decay    = 0.5
+expand_limit = 10
+seed_depth   = 5
 
 [refer]                    # answer, and the refer plane
-#budget            = 8000  # bytes of assembled passage
-#per_doc_fraction  = 0.5
-#min_passage_bytes = 120
-#max_passage_bytes = 4000
+budget            = 8000   # bytes of assembled passage
+per_doc_fraction  = 0.5
+min_passage_bytes = 120
+max_passage_bytes = 4000
+
+[confidence]               # the BAND — decision 5d, ADR-CONFIDENCE decision 13
+separation_floor   = 0.1   # 0.0 turns the `weak` band OFF entirely
+doc_coverage_floor = 0.0   # 0.0 = the clause is off; at 1.0, 19 of 50 goldens
+                           # turn `partial` — a MEASURED cost, not a guess
 
 [priority]                 # per-source, either direction — decisions 8 and 9
+# THE ONE TABLE THAT STAYS COMMENTED: these are the consumer's own source
+# entries, not tunables with defaults. Unlisted is 1.0; longest match wins.
 #"docs/"   = 1.5
 #"vendor/" = 0.3
 ```
@@ -239,8 +297,13 @@ the file growing into *everything with a number in it*:
 
 **5c. Validation is where the engine's real constraints surface.** `k1 > 0`;
 `b ∈ [0, 1]`; every weight `≥ 0` (and see decision 9a); `iterations ≥ 1`;
-`min_passage_bytes < max_passage_bytes`. **A range error names what the ends
-mean**, not only the range.
+`min_passage_bytes < max_passage_bytes`; both confidence floors `∈ [0, 1]`.
+**A range error names what the ends mean**, not only the range.
+
+⚠ **The floors' `[0, 1]` check is a DOMAIN check, not a taste check.** They gate
+values already clamped to `[0, 1]`, so outside it they are dead rather than
+dangerous. Nothing inside the range is refused — decision 9's rule, and `0.0` is
+inside it.
 
 **6. No committed field may be a function of a tunable.** This is the general
 rule, and it is the reason the field weights *can* be keys at all.

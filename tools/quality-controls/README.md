@@ -1,10 +1,25 @@
-# `tools/quality-controls/` — the two controls ADR-RS decision 15 is owed
+# `tools/quality-controls/` — the controls ADR-RS decision 15 is owed
 
-**Status: all three built (2026-08-28).**
+**Status: all three built (2026-08-28). One has now been USED.**
 ⚠ **[ADR-RS](../../docs/adr/0036_predictions.md) decision 15 may now lose its
 `NOT BUILT` marker** — the sealed subset was the one outstanding item and it is
-here. **Built is not proven**: none of the three has yet been used in a run that
-adjudicates anything.
+here.
+
+**Built is not proven, and it is now proven for exactly one of them:**
+
+| control | built | used to adjudicate |
+|---|---|---|
+| decoy query set | ✅ | ✅ [2026-08-27](../../work/regression/2026-08-27-decoy-control/report.md), and again 2026-08-28 |
+| **`unanswerable` class** (via [the brief](BLIND-AUTHOR-BRIEF.md)) | ✅ | ✅ **[2026-08-28](../../work/regression/2026-08-28-blind-unanswerable/report.md) — 🔴 the engine abstained 0 times out of 20** |
+| content-free placebo | ✅ | ❌ **never run** |
+| sealed subset | ✅ | ❌ **never run** |
+
+🔴 **The first use found a defect in the control's own procedure, not just in
+the engine.** [`BLIND-AUTHOR-BRIEF.md`](BLIND-AUTHOR-BRIEF.md)'s validation loop
+graded submitted questions by the engine's own `answerable` — **using the system
+under test as the arbiter of the test's validity.** Followed as written it would
+have discarded a perfect 20-question set as 100 % defective. Corrected in place;
+ground truth now comes from a second blind reader, never from `fux`.
 
 ## Why these exist
 
@@ -25,6 +40,8 @@ have never been separable in any number this project has filed.**
 | **content-free placebo** | [`placebo.py`](placebo.py) | *presence* of fluent LLM text, with content removed |
 | **decoy queries** | [`decoys.jsonl`](decoys.jsonl) | what the system says when the corpus **cannot** answer |
 | **sealed subset** | [`seal.py`](seal.py) | **contamination** — a query nobody who authored an artifact has read |
+| **relevance audit** | [`relevance_audit.py`](relevance_audit.py) | whether `recall@k` needs new annotation at all, or the golden schema already carries it |
+| **the blind brief** | [`BLIND-AUTHOR-BRIEF.md`](BLIND-AUTHOR-BRIEF.md) | the auditable instructions for the `unanswerable` class — **committed because its own author was not blind** |
 
 ### The placebo
 
@@ -53,13 +70,40 @@ python3 tools/quality-controls/placebo.py <corpus>/.fux/enrich /tmp/placebo
 
 ### The decoys
 
-Fifteen questions that are **plausible for the playground's domain and have no
-correct answer in its ten documents** — key rotation, SLAs, cluster
-provisioning, parental leave, DR plans.
+Fifteen questions with **no correct answer in the playground's ten documents**.
 
-⚠ **A decoy is the one kind of evaluation material an agent can author without
-contaminating anything: there is no correct answer, so there is nothing to fit.**
-That is why these were written here and the goldens were not.
+⚠ **CORRECTED 2026-08-28 (Arpit's ruling). This section made two claims and
+both were wrong.** They are left visible rather than quietly rewritten, because
+the second one is the belief that produced an open blocker.
+
+**Claim 1 — *"plausible for the playground's domain."*** Several are not.
+Parental leave, supplier invoice disputes, badge systems and performance-review
+calibration are **generic-enterprise filler**, not questions a reader of this
+corpus would plausibly ask. ⚠ **A question that is unanswerable *and*
+implausible tests almost nothing**: the system declines it for the wrong reason,
+because no term matches anything, rather than because the corpus genuinely stops
+short. The set is **easier than it looks**.
+
+**Claim 2 — *"an agent can author these without contaminating anything: there
+is no correct answer, so there is nothing to fit."*** 🔴 **This is the important
+error.** *Correctness* is not the only thing an author can fit. **The difficulty
+distribution is**, and an informed author shapes it without trying to: knowing
+where the corpus is thin pulls questions toward the easy far edge, knowing where
+it is dense pulls them toward the hard near edge. Neither requires a correct
+answer to exist. **Claim 1 is the evidence for this** — the set drifted generic,
+and its author had read the goldens.
+
+**What survives the correction:** these fifteen remain a **valid diagnostic
+control**. That was never in question. What they may not be is the scored
+`unanswerable` class — see below.
+
+⚠ **A decoy is NOT an `unanswerable` golden**, and the difference is role, not
+content. A decoy is a diagnostic and is never scored; an `unanswerable` query is
+**inside the gate** ([ADR-QUALITY](../../docs/adr/0044_quality-contract.md)
+decision 5) and its handling is part of the headline number. Promoting these
+fifteen would put informed material in a slot whose only value is that its
+author had not looked. **The class is authored separately** —
+[`BLIND-AUTHOR-BRIEF.md`](BLIND-AUTHOR-BRIEF.md).
 
 **Validate them against the corpus before trusting them** — a "decoy" the corpus
 actually answers is not a decoy:

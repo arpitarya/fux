@@ -10,6 +10,54 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **The two confidence band floors are `.fux/tune.toml` keys**
+  (ADR-CONFIDENCE decision 13, ADR-TUNE decision 5d). A sixth table:
+
+  ```toml
+  [confidence]
+  separation_floor   = 0.1   # the `grounded`/`weak` cutoff
+  doc_coverage_floor = 0.0   # 0.0 = the clause is OFF
+  ```
+
+  **This reverses ADR-CONFIDENCE decision 7**, which had refused both as tune
+  keys. Neither can move a score or an ordering — confidence is computed *from*
+  `rank()`'s output and nothing feeds back — so `[confidence]` is the first
+  table in `tune.toml` that changes no ranking at all.
+
+- **The confidence block now publishes the floors it was judged under.**
+  `separation_floor` and `doc_coverage_floor` are emitted in `--json`, in the
+  `fux_search` MCP result, and declared in `output.schema.json`. **Additive —
+  an existing consumer is unaffected.**
+
+  🔴 **Read them before comparing two bands.** Once the floor is repo-local, a
+  `grounded` judged at `0.02` is not the same claim as one judged at `0.10`,
+  and this is the only thing that makes the difference visible.
+
+  ⚠ **`separation_floor = 0.0` means no answer is ever `weak` again.** That is
+  a legal setting and a loud one: it makes fux quieter about not knowing rather
+  than better at knowing. The default `0.10` remains **provisional and
+  unmeasured** (prediction R10) and a repo-local value is never a calibration.
+
+- **Handbook: two new sections on confidence** — *The formulas*
+  (`docs/handbook.html#s-conf-formula`: the shared `idf`, every signal written
+  out, the five-clause band ladder, and the NQC / clarity-score grounding for
+  `separation`) and *Tuning the floors* (`#s-conf-tune`).
+
+### Fixed
+
+- **ADR-TUNE decision 4 described behaviour the code had not had since
+  2026-08-27** — it said tune keys ship *commented* and carried a commented
+  specimen; they have shipped as live lines since Arpit's ruling that day.
+  Rewritten, with the setup-freeze cost it correctly predicted now recorded as
+  paid.
+- **`output.schema.json` said `doc_coverage` below `1.0` makes the band
+  `partial`.** The gate was measured on 2026-08-28 and left **off**; the field
+  reports and does not gate.
+- **Handbook staleness:** *Fact vs guess* claimed ADR-CONFIDENCE was *proposed*
+  (accepted since 2026-08-27) and that the floor was deliberately not a tune
+  key; *The five fields* counted five when `doc_coverage` made it six; the
+  `--json` sample omitted three keys.
+
 - **`fux ingest` writes the skip list into `.fux/.fuxignore`, and counts it in
   two numbers** (ADR-FUXIGNORE decision 11, ADR-INGEST decisions 4 and 15).
   `599 skipped` on this repo was 598 files a committed list rejected exactly as

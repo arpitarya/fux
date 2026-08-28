@@ -78,10 +78,17 @@
       "fetch nothing and therefore always report `unverified`: 'we did not",
       "look', never 'we looked and it was fine'.",
       "",
-      "THE `grounded`/`weak` BOUNDARY IS PROVISIONAL. The other three are",
+"THE `grounded`/`weak` BOUNDARY IS PROVISIONAL. The other three are",
       "structural facts (nothing scored; a term is absent; the bytes changed).",
-      "That one rests on `confidence.SEPARATION_FLOOR`, which is unmeasured and",
-      "registered as prediction R10. Do not read it as calibrated."
+      "That one rests on `separation_floor`, which is unmeasured and registered",
+      "as prediction R10. Do not read it as calibrated.",
+      "",
+      "AND SINCE 2026-08-28 BOTH FLOORS ARE REPO-CONFIGURABLE, so the band is",
+      "NOT COMPARABLE ACROSS REPOS on its own. `separation_floor` and",
+      "`doc_coverage_floor` are emitted for exactly that reason: read them",
+      "before reading a `grounded` as the same claim two corpora made. Neither",
+      "floor can reach a score or an ordering -- the block is computed from",
+      "`rank()`'s output and nothing downstream feeds back."
     ],
     "fields": {
       "band":       { "type": "str",  "required": "always",
@@ -92,9 +99,13 @@
       "coverage":   { "type": "any",  "required": "always",
                       "doc": "float 0.0-1.0; the fraction of the query's idf mass the CORPUS contains. Unchanged since it shipped -- a query whose terms sit in four different documents scores 1.0 here, correctly" },
       "doc_coverage": { "type": "any", "required": "always",
-                      "doc": "float 0.0-1.0; the same idf mass in the TOP-RANKED DOCUMENT itself. ADDED 2026-08-28: below 1.0 the band is `partial`, because a question whose words are all present but scattered across documents that individually answer none of it was reaching `grounded`" },
+                      "doc": "float 0.0-1.0; the same idf mass in the TOP-RANKED DOCUMENT itself. REPORTED, NOT GATING at the default floor of 0.0 -- the gate was measured on 2026-08-28 and left off, because a floor of 1.0 turns 19 of 50 correct answers `partial`. A low value beside `band: grounded` means the question's words are scattered across documents that individually answer none of it; act on the number, do not expect the band to have caught it" },
       "separation": { "type": "any",  "required": "always",
                       "doc": "float 0.0-1.0; (top1-top2)/top1, and 1.0 when exactly one document scored" },
+      "separation_floor": { "type": "any", "required": "always",
+                      "doc": "float 0.0-1.0; THE CUTOFF THIS BAND WAS JUDGED UNDER. Engine default 0.10; `.fux/tune.toml` `[confidence] separation_floor` overrides it (2026-08-28). Emitted so a `grounded` from a repo that lowered the floor is DISTINGUISHABLE from one that did not -- compare this before comparing bands across repos" },
+      "doc_coverage_floor": { "type": "any", "required": "always",
+                      "doc": "float 0.0-1.0; the `doc_coverage` cutoff, same contract. 0.0 means the clause is OFF, which is the engine default and a measured ruling rather than an unset value" },
       "support":    { "type": "int",  "required": "always",
                       "doc": "results scoring above zero. BOUNDED BY --top: a corpus-wide count would differ between --fast and --scan and break the differential law" },
       "verified":   { "type": "str",  "required": "always",
@@ -107,7 +118,9 @@
       "answerable": true,
       "coverage": 0.6127,
       "doc_coverage": 0.4413,
+      "doc_coverage_floor": 0.0,
       "separation": 0.3402,
+      "separation_floor": 0.1,
       "support": 3,
       "verified": "unverified",
       "missing": ["mtls"]
@@ -174,8 +187,9 @@
       "source": "refer",
       "confidence": {
         "band": "grounded", "answerable": true, "coverage": 1.0,
-        "doc_coverage": 1.0,
-        "separation": 0.4118, "support": 1, "verified": "current", "missing": []
+        "doc_coverage": 1.0, "doc_coverage_floor": 0.0,
+        "separation": 0.4118, "separation_floor": 0.1,
+        "support": 1, "verified": "current", "missing": []
       }
     }
   },
@@ -325,8 +339,9 @@
       },
       "confidence": {
         "band": "grounded", "answerable": true, "coverage": 1.0,
-        "doc_coverage": 1.0,
-        "separation": 0.4118, "support": 1, "verified": "current", "missing": []
+        "doc_coverage": 1.0, "doc_coverage_floor": 0.0,
+        "separation": 0.4118, "separation_floor": 0.1,
+        "support": 1, "verified": "current", "missing": []
       },
       "derivation": {},
       "verdicts": [

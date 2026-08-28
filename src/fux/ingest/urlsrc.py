@@ -272,7 +272,7 @@ def host_of(url: str) -> str:
         return url
 
 
-def is_rate_limited(module, exc: Exception) -> bool:
+def is_rate_limited(module, exc: Exception, warned: set | None = None) -> bool:
     """Did the fetcher say this failure was a rate limit? (W-82 ruling 12.)
 
     **The fetcher reports; fux decides** — the same split as `MAX_PARALLEL`
@@ -290,18 +290,55 @@ def is_rate_limited(module, exc: Exception) -> bool:
     unchanged — every fetcher written before this keeps working.
 
     **Never raises.** A consumer-owned predicate that throws must not be able to
-    turn one slow page into a failed ingest.
+    turn one slow page into a failed ingest — ADR-FETCHER decision 10's per-URL
+    isolation, applied to the predicate as well as to `fetch`.
+
+    ⚠ **But it no longer fails SILENTLY** (Arpit, 2026-08-28). A predicate that
+    threw used to read as *"not rate limited"* with no output at all, so a
+    broken predicate and a host that never refuses you were **indistinguishable
+    from the outside**: no backoff, no count, no warning, and `fux doctor`
+    reporting nothing wrong. It warns once per run and still returns `False`.
     """
     predicate = getattr(module, "is_rate_limited", None)
     if not callable(predicate):
         return False
     try:
         return bool(predicate(exc))
-    except Exception:
+    except Exception as bug:
+        _warn_broken_predicate(module, bug, warned)
         return False
 
 
-def _fetch_one(module, url: str, sleep) -> tuple[object | None, Exception | None, int]:
+def _warn_broken_predicate(module, bug: Exception, warned: set | None) -> None:
+    """Say a consumer's predicate is broken, once, and carry on.
+
+    ⚠ **Once per run, not once per URL.** A predicate that throws throws on
+    every attempt of every URL, so an undeduplicated warning would print
+    thousands of identical lines and bury the run's real output — which is how
+    a warning becomes something people filter out.
+
+    **`warned is None` means warn every time**: a direct call has no run to
+    scope to, and silently swallowing the second one would make the function
+    behave differently depending on who called it.
+    """
+    key = f"{getattr(module, '__name__', module)!s}:{type(bug).__name__}"
+    if warned is not None:
+        if key in warned:
+            return
+        warned.add(key)
+    print(
+        f"  ! this repo's fetcher raised {type(bug).__name__} from "
+        f"is_rate_limited(): {bug}\n"
+        "    -> treated as NOT rate-limited: no backoff, no retry, no count for "
+        "this host.\n"
+        "       Fix the predicate or delete it; fux will not raise on your behalf.",
+        file=sys.stderr,
+    )
+
+
+def _fetch_one(
+    module, url: str, sleep, warned: set | None = None
+) -> tuple[object | None, Exception | None, int]:
     """Fetch one URL, retrying a rate-limit refusal with exponential backoff.
 
     Returns `(text, exc, rate_limit_hits)`. **`rate_limit_hits` counts refusals,
@@ -318,7 +355,7 @@ def _fetch_one(module, url: str, sleep) -> tuple[object | None, Exception | None
         try:
             return module.fetch(url), None, hits
         except Exception as exc:
-            if not is_rate_limited(module, exc):
+            if not is_rate_limited(module, exc, warned):
                 return None, exc, hits
             hits += 1
             if attempt == RATE_LIMIT_RETRIES:
@@ -352,10 +389,29 @@ def _fetch_group(module, urls: list[str], workers: int, limited: dict | None = N
 
         sleep = time.sleep
 
+    # Run-scoped, so a broken predicate warns once rather than once per URL.
+    warned: set[str] = set()
+
+    # ⚠ **The counter is read-modify-write and `one()` runs under a thread
+    # pool.** `limited[h] = limited.get(h, 0) + hits` is a read, an add and a
+    # store, and a preemption between the read and the store loses a count from
+    # every worker refused by the SAME host. The number this protects is the one
+    # `fux doctor` prints and the one a consumer reads to decide whether to lower
+    # their cap, so **an undercount understates exactly the problem it exists to
+    # report**. ⚠ The window is two bytecodes wide, so it cannot be provoked
+    # naturally — `tests/ingest/test_rate_limit.py` widens it deliberately and
+    # records why two earlier versions of that test passed while broken.
+    # Found 2026-08-28 by reading the code; a lock, not a redesign.
+    import threading
+
+    tally = threading.Lock()
+
     def one(url: str):
-        text, exc, hits = _fetch_one(module, url, sleep)
+        text, exc, hits = _fetch_one(module, url, sleep, warned)
         if hits:
-            limited[host_of(url)] = limited.get(host_of(url), 0) + hits
+            host = host_of(url)
+            with tally:
+                limited[host] = limited.get(host, 0) + hits
         return url, text, exc
 
     if workers <= 1:

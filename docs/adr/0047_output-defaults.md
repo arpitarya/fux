@@ -304,6 +304,14 @@ record's matched hashes into the `stats_out` dict it already fills, and the band
 [ADR-CONFIDENCE](0045_confidence.md) decision 12's outcome. **No ordering, no
 score and no existing field moved.**
 
+⚠ **`query/__init__.py`'s emission gate (`_show_band`, `_gated`) is unchanged
+by the 2026-08-28 tunable-floor change**, but `_fill_confidence` in the same
+file now takes a `tune` argument to resolve `separation_floor` /
+`doc_coverage_floor` before the block is built ([ADR-CONFIDENCE](0045_confidence.md)
+decision 13). Noted here because it touches a file this record shares
+ownership of, not because the *shown/hidden* decision moved — `--band`'s
+own gating is untouched.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

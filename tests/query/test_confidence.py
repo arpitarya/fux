@@ -29,6 +29,7 @@ import pytest
 from fux.query import cmd_ask, cmd_find, run_query
 from fux.query.confidence import (
     BANDS,
+    DOC_COVERAGE_FLOOR,
     GROUNDED,
     NONE,
     PARTIAL,
@@ -226,8 +227,14 @@ def test_as_dict_declares_band_and_answerable_rather_than_leaving_them_derivable
     assert payload["missing"] == ["pgbouncer"]
     assert set(payload) == {
         "band", "answerable", "coverage", "doc_coverage", "separation",
+        "separation_floor", "doc_coverage_floor",
         "support", "verified", "missing",
     }
+    # The floors are published for the OPPOSITE reason to `band`: not so a
+    # consumer can re-derive the verdict, but so it can see the verdict is not
+    # comparable across repos that tuned differently (ADR-CONFIDENCE 13).
+    assert payload["separation_floor"] == SEPARATION_FLOOR
+    assert payload["doc_coverage_floor"] == DOC_COVERAGE_FLOOR
 
 
 def test_the_stderr_line_is_silent_at_grounded_and_ascii_everywhere():
@@ -445,3 +452,110 @@ def test_the_corpus_wide_coverage_is_unchanged():
     """
     block = _q("rollback pgbouncer", {"rollback": 40, "pgbouncer": 0}, [9.0, 1.0])
     assert block.coverage < 1.0 and block.missing == ("pgbouncer",)
+
+
+# -- the floors are tunable, and the guard is publication ----------------
+#
+# ADR-CONFIDENCE decision 13 REVERSED decision 7, which had refused these as
+# `tune.toml` keys. What decision 7 was protecting is real and is now unguarded
+# by anything mechanical: a consumer can lower `separation_floor` until every
+# answer reads `grounded`, which tunes away the SIGNAL rather than the ranking.
+# These tests pin the two things that replace the prohibition — the block
+# publishes the floor it was judged under, and the floor can never reach a
+# score — and they pin NOTHING about which value is right. R10 is still owed.
+
+
+def test_a_lowered_separation_floor_moves_the_band_and_says_so():
+    """The knob works, and the answer states that it was turned.
+
+    A `grounded` judged at 0.02 is not the same claim as a `grounded` judged at
+    0.10, and without the published floor the difference would be invisible.
+    """
+    scores = [1.0, 0.98]  # separation 0.02 — well under the default floor
+    default = _q("rollback procedure", {"rollback": 40, "procedure": 12}, scores)
+    assert default.band == WEAK
+    assert default.separation_floor == SEPARATION_FLOOR
+
+    slack = _q(
+        "rollback procedure", {"rollback": 40, "procedure": 12}, scores,
+        separation_floor=0.01,
+    )
+    assert slack.band == GROUNDED
+    assert slack.as_dict()["separation_floor"] == 0.01, "the band must carry its own floor"
+    assert slack.separation == default.separation, "the SIGNAL is untouched; only the verdict moved"
+
+
+def test_a_zero_separation_floor_turns_the_weak_band_off_entirely():
+    """Stated as a cost rather than clamped, per the standing rule on knobs.
+
+    `separation < 0.0` is never true, so no answer is ever `weak`. That is a
+    legal setting and a loud one — it is the setting that makes fux quiet about
+    not knowing, which is exactly what decision 7 feared.
+    """
+    block = _q("rollback procedure", {"rollback": 40, "procedure": 12},
+               [1.0, 1.0], separation_floor=0.0)
+    assert block.separation == 0.0
+    assert block.band == GROUNDED
+
+
+def test_the_doc_coverage_gate_is_off_by_default_and_can_be_switched_on():
+    """`0.0` is a MEASURED ruling (2026-08-28), not an unset placeholder.
+
+    At `1.0` the clause fires on any question whose words are scattered — which
+    is the case it was built for, and also 19 of 50 correct answers. The test
+    pins the mechanism, never the recommendation.
+    """
+    scattered = dict(
+        coverage=1.0, separation=0.58, support=3,
+        verified="unverified", missing=(), doc_coverage=0.42,
+    )
+    assert Confidence(**scattered).band == GROUNDED, "the default gate is OFF"
+    assert Confidence(**scattered).doc_coverage_floor == DOC_COVERAGE_FLOOR
+    assert Confidence(**scattered, doc_coverage_floor=1.0).band == PARTIAL
+
+
+def test_a_tuned_floor_cannot_reach_a_score_or_an_ordering(tmp_path, monkeypatch):
+    """The claim the differential law rests on, asserted rather than assumed.
+
+    Confidence is computed FROM `rank()`'s output and handed to the caller;
+    nothing downstream feeds back. Making the floors configurable must not have
+    opened a path from `.fux/tune.toml` into the result list.
+    """
+    write_index(tmp_path, [_record(), _record(id="file:docs/b.md", loc="docs/b.md")])
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+
+    out_default: dict = {}
+    base, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_default)
+
+    (tmp_path / ".fux" / "tune.toml").write_text(
+        "[confidence]\nseparation_floor = 0.0\ndoc_coverage_floor = 1.0\n",
+        encoding="utf-8",
+    )
+    out_tuned: dict = {}
+    tuned, _ = run_query(tmp_path, "rollback", 5, confidence_out=out_tuned)
+
+    assert [(r.id, r.score) for r in tuned] == [(r.id, r.score) for r in base]
+    assert out_tuned["confidence"].separation_floor == 0.0
+    assert out_tuned["confidence"].doc_coverage_floor == 1.0
+
+
+def test_no_tune_recomputes_the_band_at_the_ENGINE_defaults():
+    """The 'is it me or the config?' switch has to reach the band too.
+
+    `--no-tune` already meant 'rank as the engine would'. If it did not also
+    reset the floors, a repo could keep a slack `grounded` under the one flag
+    that promises the engine's own answer.
+    """
+    from fux.tune import DEFAULT_TUNE, load
+
+    import tempfile, pathlib
+    with tempfile.TemporaryDirectory() as d:
+        root = pathlib.Path(d)
+        (root / ".fux").mkdir()
+        (root / ".fux" / "tune.toml").write_text(
+            "[confidence]\nseparation_floor = 0.9\n", encoding="utf-8"
+        )
+        assert load(root).separation_floor == 0.9
+        assert load(root, enabled=False).separation_floor == SEPARATION_FLOOR
+        assert load(root, enabled=False) == DEFAULT_TUNE
