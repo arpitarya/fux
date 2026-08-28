@@ -4,7 +4,13 @@
 is specified and its thresholds frozen, before any number exists. It holds
 plans, not results.
 
-**Results do not live here.** Every executed run still files under
+**Results do not live here — one narrow exception, named.** A **presentation**
+of an executed run may live beside its plan, because it is read by people rather
+than cited by documents. **The evidence is not duplicated**: the presentation
+carries no number the filed run does not, and anything that disagrees with
+`../regression/` is the presentation being wrong.
+
+Every executed run still files under
 [`../regression/<date>-<run>/`](../regression/README.md) under the per-run
 contract — report, `ANALYSIS.md`, `evidence/`, `VERDICT.md` where a threshold
 is ruled on, a row in that README, a `DOC-REGISTRY` bump. That contract is a
@@ -14,7 +20,8 @@ rather than being buried in one run's `evidence/`.
 
 | document | what it is |
 |---|---|
-| [`PRE-REGISTRATION-V1-VS-HEAD.md`](PRE-REGISTRATION-V1-VS-HEAD.md) | the frozen thresholds for `1.0.0` vs working-tree `HEAD` — **B1–B9** |
+| [`PRE-REGISTRATION-V1-VS-HEAD.md`](PRE-REGISTRATION-V1-VS-HEAD.md) | the frozen thresholds for `1.0.0` vs working-tree `HEAD`. ⚠ **It defines B1, B2, B3, B5, B6, B7 and B9** — *"B1–B9"* is prose, and **B4 and B8 were never written** |
+| [`benchmark-v1-vs-head.html`](benchmark-v1-vs-head.html) | the **presentation** of the 2026-08-28 run — 18 slides, self-contained, no network. Open it in a browser; `←` `→` to move. The run itself is [`../regression/2026-08-28-benchmark-v1-vs-head/`](../regression/2026-08-28-benchmark-v1-vs-head/report.md) |
 
 ## Why this is not `work/regression/`
 

@@ -1,0 +1,915 @@
+<title>Fux 1.0.0 vs HEAD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+
+<style>
+/* ── tokens: light is the base, both dark paths redefine only tokens ───── */
+:root{
+  --paper:#F6F4EF;
+  --panel:#FFFFFF;
+  --ink:#141A1D;
+  --ink-2:#4A555B;
+  --ink-3:#7A858B;
+  --rule:#D8D2C6;
+  --rule-2:#EAE5DA;
+  --accent:#0F5F73;
+  --accent-soft:#0F5F7318;
+  --pass:#2F7A45;
+  --fail:#B23A2E;
+  --hold:#8C6714;
+  --shadow:0 1px 0 rgba(20,26,29,.06), 0 8px 28px -18px rgba(20,26,29,.35);
+
+  --f-display:"Newsreader",Georgia,"Times New Roman",serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0C1215;
+    --panel:#111A1E;
+    --ink:#E7EEF0;
+    --ink-2:#9FB0B6;
+    --ink-3:#6D8087;
+    --rule:#22333A;
+    --rule-2:#182429;
+    --accent:#5FC7D9;
+    --accent-soft:#5FC7D91F;
+    --pass:#6BC98A;
+    --fail:#EE8878;
+    --hold:#D7B15A;
+    --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0C1215;
+  --panel:#111A1E;
+  --ink:#E7EEF0;
+  --ink-2:#9FB0B6;
+  --ink-3:#6D8087;
+  --rule:#22333A;
+  --rule-2:#182429;
+  --accent:#5FC7D9;
+  --accent-soft:#5FC7D91F;
+  --pass:#6BC98A;
+  --fail:#EE8878;
+  --hold:#D7B15A;
+  --shadow:0 1px 0 rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.9);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── deck chrome ──────────────────────────────────────────────────────── */
+.deck{position:relative;min-height:100vh}
+
+.tick{
+  position:fixed;inset:0 0 auto 0;height:22px;z-index:40;
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  background-image:repeating-linear-gradient(to right,var(--rule) 0 1px,transparent 1px 40px);
+  background-position:0 12px;background-size:40px 10px;background-repeat:repeat-x;
+}
+.tick::after{
+  content:"";position:absolute;left:0;top:0;height:100%;
+  width:var(--progress,0%);
+  background:var(--accent-soft);
+  border-right:2px solid var(--accent);
+  transition:width .25s ease;
+}
+
+.slide{
+  display:none;
+  min-height:100vh;
+  padding:76px clamp(22px,5vw,72px) 84px;
+  flex-direction:column;
+  justify-content:center;
+}
+.slide.active{display:flex}
+.wrap{width:100%;max-width:1080px;margin:0 auto}
+
+.eyebrow{
+  font-family:var(--f-mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin:0 0 14px;
+}
+.eyebrow .dim{color:var(--ink-3)}
+
+h1{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(38px,6.4vw,74px);line-height:1.03;letter-spacing:-.02em;
+  text-wrap:balance;margin:0 0 18px;
+}
+h2{
+  font-family:var(--f-display);font-weight:600;
+  font-size:clamp(27px,3.5vw,42px);line-height:1.1;letter-spacing:-.015em;
+  text-wrap:balance;margin:0 0 16px;
+}
+h3{
+  font-family:var(--f-body);font-weight:600;font-size:15px;
+  letter-spacing:.01em;margin:0 0 8px;
+}
+p{margin:0 0 12px;max-width:66ch;color:var(--ink-2)}
+p.lead{font-size:19px;line-height:1.5;color:var(--ink)}
+p strong,li strong{color:var(--ink);font-weight:600}
+em{font-style:italic}
+a{color:var(--accent)}
+
+.counter{
+  position:fixed;right:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);
+  letter-spacing:.08em;
+  display:flex;gap:14px;align-items:center;
+}
+.navbtn{
+  font-family:var(--f-mono);font-size:11.5px;letter-spacing:.08em;
+  background:none;border:1px solid var(--rule);color:var(--ink-2);
+  padding:4px 9px;cursor:pointer;border-radius:2px;
+}
+.navbtn:hover{border-color:var(--accent);color:var(--accent)}
+.navbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{
+  position:fixed;left:clamp(16px,4vw,32px);bottom:16px;z-index:40;
+  font-family:var(--f-mono);font-size:11px;color:var(--ink-3);letter-spacing:.06em;
+}
+
+/* ── content pieces ───────────────────────────────────────────────────── */
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}
+
+.card{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px 18px;box-shadow:var(--shadow);
+}
+.card p{margin-bottom:0;font-size:14px}
+.card p + p{margin-top:9px}
+
+.stat{
+  font-family:var(--f-mono);font-variant-numeric:tabular-nums;
+  font-size:clamp(26px,3.4vw,38px);font-weight:500;line-height:1;
+  letter-spacing:-.02em;color:var(--ink);margin:6px 0 6px;
+}
+.stat.sm{font-size:clamp(20px,2.4vw,26px)}
+.statlabel{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.statnote{font-size:13px;color:var(--ink-2);margin:0}
+
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:3px;background:var(--panel)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:520px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--rule-2);vertical-align:top}
+thead th{
+  font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.k{font-family:var(--f-mono);font-size:12.5px;color:var(--ink)}
+tr.hi td{background:var(--accent-soft)}
+
+.pill{
+  display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:2px;
+  border:1px solid currentColor;white-space:nowrap;
+}
+.pass{color:var(--pass)}
+.fail{color:var(--fail)}
+.hold{color:var(--hold)}
+.info{color:var(--accent)}
+
+ul,ol{margin:0 0 12px;padding-left:20px;color:var(--ink-2);max-width:68ch}
+li{margin-bottom:8px}
+li::marker{color:var(--ink-3)}
+ol.recs{list-style:none;padding-left:0;counter-reset:r}
+ol.recs > li{
+  counter-increment:r;position:relative;padding-left:44px;margin-bottom:16px;max-width:74ch;
+}
+ol.recs > li::before{
+  content:"R" counter(r);position:absolute;left:0;top:1px;
+  font-family:var(--f-mono);font-size:11px;font-weight:600;letter-spacing:.06em;
+  color:var(--accent);border:1px solid var(--accent);border-radius:2px;padding:2px 6px;
+}
+
+.callout{
+  border-left:2px solid var(--accent);padding:2px 0 2px 16px;margin:0 0 14px;
+}
+.callout.warn{border-left-color:var(--fail)}
+.callout p:last-child{margin-bottom:0}
+
+code,.mono{font-family:var(--f-mono);font-size:.9em}
+code{background:var(--accent-soft);padding:1px 4px;border-radius:2px;color:var(--ink)}
+pre{
+  font-family:var(--f-mono);font-size:12.5px;line-height:1.6;overflow-x:auto;
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:14px 16px;margin:0;color:var(--ink-2);
+}
+figure{margin:0}
+figcaption{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;color:var(--ink-3);
+  margin-top:9px;
+}
+svg{max-width:100%;height:auto;display:block}
+.chartbox{
+  background:var(--panel);border:1px solid var(--rule);border-radius:3px;
+  padding:16px;overflow-x:auto;
+}
+.legend{
+  display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.05em;color:var(--ink-3);
+}
+.swatch{display:inline-block;width:11px;height:11px;border-radius:1px;margin-right:6px;vertical-align:-1px}
+
+.rule{height:1px;background:var(--rule);border:0;margin:22px 0}
+
+@media (prefers-reduced-motion: reduce){
+  *{transition:none !important;animation:none !important}
+}
+@media (max-width:640px){
+  .slide{padding:66px 20px 76px;justify-content:flex-start}
+  p{max-width:none}
+}
+</style>
+
+<div class="tick" id="tick"></div>
+
+<main class="deck" id="deck">
+
+<!-- 1 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Version benchmark <span class="dim">/ W-93 / executed 2026-08-28</span></p>
+    <h1>fux‑engine 1.0.0<br>vs working‑tree HEAD</h1>
+    <p class="lead" style="max-width:60ch">Two engines resident at once, over byte‑identical corpora, at 100 / 1 000 / 10 000 documents. Seven pre‑registered thresholds. 3 000 per‑query rows.</p>
+    <hr class="rule">
+    <div class="grid g4">
+      <div><p class="statlabel">Arm A</p><p class="stat sm">1.0.0</p><p class="statnote"><code>fux.index.v1</code></p></div>
+      <div><p class="statlabel">Arm B</p><p class="stat sm">2.0.0‑a2</p><p class="statnote"><code>75ade57</code>, <code>fux.index.v2</code></p></div>
+      <div><p class="statlabel">Paired tests</p><p class="stat sm">7</p><p class="statnote">exact McNemar, α = 0.05</p></div>
+      <div><p class="statlabel">Classification</p><p class="stat sm">informed</p><p class="statnote">no delta stated</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">The result, before the detail</p>
+    <h2>Every pre‑registered paired test returned&nbsp;a discordant count of&nbsp;<span style="color:var(--accent)">zero</span>.</h2>
+    <p class="lead">Not a small delta. <em>No query changed its outcome in either direction</em> — on any tier, on any suite.</p>
+    <hr class="rule">
+    <div class="grid g2">
+      <div class="card">
+        <p class="statlabel">Finding 1 — the instrument</p>
+        <p style="color:var(--ink);font-size:15px;margin-top:8px"><strong>The primary endpoint was saturated before it ran.</strong> <code>hit@5</code> came back 240/240 in <em>both</em> arms at <em>every</em> tier. A marker term with <code>df = 1</code> is already rank 1; nothing can move it up and nothing moved it down.</p>
+        <p style="margin-top:9px">So B1's null is a property of the queries, not a measurement of the engines.</p>
+      </div>
+      <div class="card">
+        <p class="statlabel">Finding 2 — a default</p>
+        <p style="color:var(--ink);font-size:15px;margin-top:8px"><strong><code>superseded_weight</code> ships at <code>1.0</code>.</strong> HEAD parses <code>supersedes:</code>, builds the edge, resolves the flag onto the retired document — then multiplies its score by one.</p>
+        <p style="margin-top:9px">Both arms invert identically. The machinery works and is switched off.</p>
+      </div>
+    </div>
+    <p style="margin-top:18px;font-size:14px">Everything that <em>could</em> be cleanly compared — bytes, wheel size, query latency, ingest latency — passed its fence with room.</p>
+  </div>
+</section>
+
+<!-- 3 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">1 · What was tested <span class="dim">/ the arms</span></p>
+    <h2>Two engines, not two configurations</h2>
+    <p>The committed record shape changed between them, so there is no shared index and there cannot be one. Each arm ingests the same corpus bytes and builds its own. <strong>Every result is end‑to‑end</strong> — ingest → index → rank → answer — never ranker‑only.</p>
+    <div class="tblwrap" style="margin-top:16px">
+      <table>
+        <thead><tr><th>Arm</th><th>What it is</th><th>Record shape</th><th>Lanes it has that the other does not</th></tr></thead>
+        <tbody>
+          <tr><td class="k">A</td><td><code>fux-engine==1.0.0</code><br><span style="color:var(--ink-3)">the first major release</span></td><td class="k">fux.index.v1<br>2 tf fields</td><td>the dense lane behind <code>ask --hybrid</code> — deleted 2026‑08‑25 after measuring 0 fixed / 2 broken. <strong>Not run here</strong>: benchmarking against a lane removed for being broken would flatter B.</td></tr>
+          <tr class="hi"><td class="k">B‑core</td><td><code>pip install -e</code> at <code>75ade57</code><br><span style="color:var(--ink-3)">shipped defaults only</span></td><td class="k">fux.index.v2<br>5 tf fields, v2 analyzer</td><td>proximity reranking · <code>supersedes:</code> priors + commit recency · <code>tune.toml</code> · <code>enrich</code> · <code>mcp</code> · confidence bands · <code>.fuxignore</code> · <code>ask --why</code></td></tr>
+          <tr><td class="k">A′</td><td>arm A again, second corpus seed</td><td class="k">v1</td><td>the null control — a halt gate, not a finding</td></tr>
+          <tr><td class="k">B‑tuned</td><td>arm B + one <code>tune.toml</code> key</td><td class="k">v2</td><td><strong>post‑hoc</strong>, carries no verdict and no version claim</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px;font-size:13.5px">Both arms: CPython <span class="mono">3.11.15</span>, own venv, <code>archived_weight</code> at its <span class="mono">1.0</span> default, no <code>.fux/enrich</code>, same machine, same session.</p>
+  </div>
+</section>
+
+<!-- 4 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">1 · What was tested <span class="dim">/ the thresholds</span></p>
+    <h2>Seven frozen thresholds across four planes</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>ID</th><th>Plane</th><th>What it measures</th><th class="num">N</th><th>Bar, frozen before any number existed</th></tr></thead>
+        <tbody>
+          <tr><td class="k">B1</td><td>quality</td><td><code>hit@5</code>, A vs B‑core, tier 1 000 — <strong>the primary endpoint</strong></td><td class="num">240</td><td>improvement needs <span class="mono">p &lt; 0.05</span> and <span class="mono">b &gt; c</span></td></tr>
+          <tr><td class="k">B2</td><td>quality</td><td>supersession inversions — does a retired document outrank its successor?</td><td class="num">30–40</td><td>as B1</td></tr>
+          <tr><td class="k">B3</td><td>size</td><td>committed index bytes, shards, published wheel</td><td class="num">—</td><td>B‑core bytes/doc <span class="mono">≤ 1.25 ×</span> A</td></tr>
+          <tr><td class="k">B5</td><td>latency</td><td>warm <code>ask</code> p50/p95, scan path, tier 10 000</td><td class="num">1 200</td><td>B p95 <span class="mono">≤ 1.5 ×</span> A p95</td></tr>
+          <tr><td class="k">B6</td><td>latency</td><td>cold <code>ingest</code> and <code>build</code> wall‑clock</td><td class="num">3×2</td><td>B ingest <span class="mono">≤ 2.0 ×</span> A</td></tr>
+          <tr><td class="k">B7</td><td>answer</td><td>honest decline on planted unanswerables</td><td class="num">20</td><td>as B1</td></tr>
+          <tr><td class="k">B9</td><td>control</td><td>A vs A′ — <strong>a halt gate, run first</strong></td><td class="num">240</td><td>discordant count <span class="mono">0</span>, or halt</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout warn" style="margin-top:18px">
+      <p><strong>B4 and B8 do not exist.</strong> The queue item and the register both said “thresholds B1–B9”. The frozen document defines seven. Nothing was skipped — two ids were never written, and that is worth knowing before someone hunts for them.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">2 · How it was tested <span class="dim">/ the pipeline</span></p>
+    <h2>Gates first, on purpose</h2>
+    <figure class="chartbox">
+      <svg viewBox="0 0 1000 300" role="img" aria-label="Pipeline: freeze the threshold, freeze the sha, generate the corpus, run the null control as a halt gate, then measure quality, size and latency, then file the run.">
+        <defs>
+          <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-3)"/>
+          </marker>
+        </defs>
+        <g font-family="IBM Plex Mono, monospace" font-size="11.5" fill="var(--ink)">
+          <!-- row 1 : the freezes -->
+          <rect x="8" y="18" width="188" height="52" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"/>
+          <text x="22" y="40">1 · freeze thresholds</text>
+          <text x="22" y="57" fill="var(--ink-3)">pre‑registration, committed</text>
+
+          <rect x="232" y="18" width="188" height="52" rx="3" fill="var(--accent-soft)" stroke="var(--accent)"/>
+          <text x="246" y="40">2 · freeze the sha</text>
+          <text x="246" y="57" fill="var(--ink-3)">HEAD = 75ade57</text>
+
+          <rect x="456" y="18" width="188" height="52" rx="3" fill="none" stroke="var(--rule)"/>
+          <text x="470" y="40">3 · generate corpora</text>
+          <text x="470" y="57" fill="var(--ink-3)">seeded · sha256 recorded</text>
+
+          <rect x="680" y="18" width="216" height="52" rx="3" fill="none" stroke="var(--fail)"/>
+          <text x="694" y="40" fill="var(--fail)">4 · B9 NULL CONTROL</text>
+          <text x="694" y="57" fill="var(--ink-3)">0 discordant, or HALT</text>
+
+          <line x1="196" y1="44" x2="228" y2="44" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+          <line x1="420" y1="44" x2="452" y2="44" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+          <line x1="644" y1="44" x2="676" y2="44" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+
+          <!-- the drop -->
+          <path d="M788,70 L788,104" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+          <text x="800" y="94" fill="var(--ink-3)" font-size="10.5">passed</text>
+
+          <!-- row 2 : the measurements -->
+          <rect x="8" y="116" width="188" height="52" rx="3" fill="none" stroke="var(--rule)"/>
+          <text x="22" y="138">5 · differential law</text>
+          <text x="22" y="155" fill="var(--ink-3)">--fast ≡ --scan, per arm</text>
+
+          <rect x="232" y="116" width="188" height="52" rx="3" fill="none" stroke="var(--rule)"/>
+          <text x="246" y="138">6 · B3 bytes + wheel</text>
+          <text x="246" y="155" fill="var(--ink-3)">deterministic, no α</text>
+
+          <rect x="456" y="116" width="188" height="52" rx="3" fill="none" stroke="var(--rule)"/>
+          <text x="470" y="138">7 · B1 / B2 / B7</text>
+          <text x="470" y="155" fill="var(--ink-3)">rows written as it goes</text>
+
+          <rect x="680" y="116" width="216" height="52" rx="3" fill="none" stroke="var(--rule)"/>
+          <text x="694" y="138">8 · B5 / B6 latency</text>
+          <text x="694" y="155" fill="var(--ink-3)">interleaved A B A B</text>
+
+          <line x1="676" y1="142" x2="648" y2="142" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+          <line x1="452" y1="142" x2="424" y2="142" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+          <line x1="228" y1="142" x2="200" y2="142" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+
+          <path d="M102,168 L102,202" stroke="var(--ink-3)" marker-end="url(#ar)"/>
+
+          <!-- row 3 -->
+          <rect x="8" y="214" width="412" height="52" rx="3" fill="none" stroke="var(--rule)"/>
+          <text x="22" y="236">9 · file the run — report · analysis · 7 verdicts · evidence</text>
+          <text x="22" y="253" fill="var(--ink-3)">work/regression/2026-08-28-benchmark-v1-vs-head/</text>
+
+          <rect x="456" y="214" width="440" height="52" rx="3" fill="none" stroke="var(--rule)" stroke-dasharray="3 3"/>
+          <text x="470" y="236" fill="var(--ink-2)">the harness never picks a threshold</text>
+          <text x="470" y="253" fill="var(--ink-3)">it prints a p‑value; it does not know what “pass” means</text>
+        </g>
+      </svg>
+      <figcaption>Steps 1, 2 and 4 are gates. Each was committed or passed before the number after it existed.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- 6 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">2 · How it was tested <span class="dim">/ the corpus</span></p>
+    <h2>Four structures, planted deliberately</h2>
+    <p>Generated by the lab's own generator — seeded, byte‑identical for the same seed, and extended for this run with three structures it did not previously emit. <strong>The pairs are emitted mechanically from the planted facts</strong>, which is what makes 720 graded queries feasible at all.</p>
+    <div class="grid g4" style="margin-top:16px">
+      <div class="card"><p class="statlabel">Markers → B1</p><p class="stat sm">240</p><p class="statnote">a rare term planted in exactly one document, per tier</p></div>
+      <div class="card"><p class="statlabel">Chains → B2</p><p class="stat sm">40</p><p class="statnote">two documents, same marker; the newer declares <code>supersedes:</code></p></div>
+      <div class="card"><p class="statlabel">Decoys → control</p><p class="stat sm">50</p><p class="statnote">topically adjacent, <em>factually silent</em> — no marker anywhere</p></div>
+      <div class="card"><p class="statlabel">Unanswerable → B7</p><p class="stat sm">20</p><p class="statnote">half absent‑entity, half compositional</p></div>
+    </div>
+    <hr class="rule">
+    <div class="grid g2">
+      <div>
+        <h3>The one design detail that decides whether B2 means anything</h3>
+        <p style="font-size:14px">A chain's two halves are given <strong>unrelated document numbers</strong> and their old/new roles are drawn from the seeded stream. Without that, an engine breaking ties by path would score 0 % or 100 % inversions — and the number would be measuring <code>sorted()</code>.</p>
+      </div>
+      <div>
+        <h3>The limit, stated up front rather than discovered later</h3>
+        <p style="font-size:14px">On a generated corpus <em>“unanswerable”</em> means <strong>no document holds the queried marker</strong> — not <em>no true answer exists</em>. The base documents state no facts at all. This instrument can show an answer layer declining when <em>nothing</em> matches; it cannot show it declining when something matches and does not support the claim.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">2 · How it was tested <span class="dim">/ the statistics</span></p>
+    <h2>Paired arms means the bar tracks the flips</h2>
+    <p>Two arms graded on the same queries is a <strong>paired</strong> comparison, so only the queries that <em>change outcome</em> carry information. The set size does not set the bar; the discordant count does.</p>
+    <div class="grid g2" style="margin-top:16px">
+      <div>
+        <figure class="chartbox">
+          <svg viewBox="0 0 460 210" role="img" aria-label="Best achievable two-sided p-value by net difference: net 1 gives 1.00, net 2 gives 0.50, net 3 gives 0.25, net 4 gives 0.125, net 5 gives 0.0625, net 6 gives 0.031 and clears alpha 0.05.">
+            <g font-family="IBM Plex Mono, monospace" font-size="10.5">
+              <line x1="46" y1="150" x2="440" y2="150" stroke="var(--rule)"/>
+              <line x1="46" y1="18" x2="46" y2="150" stroke="var(--rule)"/>
+              <line x1="46" y1="93" x2="440" y2="93" stroke="var(--fail)" stroke-dasharray="4 3"/>
+              <text x="360" y="88" fill="var(--fail)">α = 0.05</text>
+              <!-- bars: heights from log-ish scale of p -->
+              <g>
+                <rect x="62"  y="18"  width="42" height="132" fill="var(--fail)" opacity=".22" stroke="var(--fail)"/>
+                <rect x="122" y="40"  width="42" height="110" fill="var(--fail)" opacity=".22" stroke="var(--fail)"/>
+                <rect x="182" y="62"  width="42" height="88"  fill="var(--fail)" opacity=".22" stroke="var(--fail)"/>
+                <rect x="242" y="84"  width="42" height="66"  fill="var(--fail)" opacity=".22" stroke="var(--fail)"/>
+                <rect x="302" y="99"  width="42" height="51"  fill="var(--fail)" opacity=".22" stroke="var(--fail)"/>
+                <rect x="362" y="117" width="42" height="33"  fill="var(--pass)" opacity=".28" stroke="var(--pass)"/>
+              </g>
+              <g fill="var(--ink-2)" text-anchor="middle">
+                <text x="83"  y="12">1.00</text><text x="143" y="34">0.50</text><text x="203" y="56">0.25</text>
+                <text x="263" y="78">0.125</text><text x="323" y="93">0.063</text><text x="383" y="111" fill="var(--pass)">0.031</text>
+              </g>
+              <g fill="var(--ink-3)" text-anchor="middle">
+                <text x="83" y="165">net 1</text><text x="143" y="165">2</text><text x="203" y="165">3</text>
+                <text x="263" y="165">4</text><text x="323" y="165">5</text><text x="383" y="165" fill="var(--pass)">6</text>
+              </g>
+              <text x="46" y="192" fill="var(--ink-3)">best achievable two‑sided p, at any discordant count</text>
+            </g>
+          </svg>
+          <figcaption>A net of 6 is the floor of all floors. Nets 1–5 cannot clear α = 0.05 at any discordant count.</figcaption>
+        </figure>
+      </div>
+      <div>
+        <h3>Exact two‑sided McNemar</h3>
+        <p style="font-size:14px">A binomial on the discordant pairs only, computed <strong>from the filed per‑query rows and from nothing else</strong>. The harness reproduces the project's own resolution floor as a self‑check: net 6 → <span class="mono">p = 0.031</span>, net 5 → <span class="mono">p = 0.063</span>, 20 flips at net 10 → <span class="mono">p = 0.041</span>.</p>
+        <h3 style="margin-top:16px">Why 240 queries per tier</h3>
+        <p style="font-size:14px">Simulated power at α = 0.05: at <span class="mono">N = 50</span> a 10 %‑fixed / 3 %‑broken effect is detected <strong>14 %</strong> of the time. At <span class="mono">N = 240</span>, <strong>83 %</strong>. Four previously filed runs were not unlucky — at their set size they could not have detected anything.</p>
+        <div class="callout warn" style="margin-top:14px">
+          <p style="font-size:14px"><strong>That table answers only half the question</strong>, and this run is how we found out. See slide 12.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">2 · How it was tested <span class="dim">/ the discipline</span></p>
+    <h2>Five rules that were followed, not intended</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>The threshold was written first, and committed</h3>
+        <p>The pre‑registration was frozen by an earlier session. The <code>HEAD</code> sha was written into it and committed <strong>in its own commit, before the first command ran</strong>.</p>
+      </div>
+      <div class="card">
+        <h3>The null control ran first</h3>
+        <p>Arm A twice on one corpus: <strong>300/300 identical rows</strong>. Arm A vs A′ on a second seed: <strong>0 discordant of 240</strong>. No A‑vs‑B number existed when this was ruled.</p>
+      </div>
+      <div class="card">
+        <h3>Arms interleaved, never sequenced</h3>
+        <p><span class="mono">A B A B</span>, 1 200 timed queries per arm, 20 warm‑up queries discarded. Thermal drift on a laptop is real, and <span class="mono">AAAA BBBB</span> hands the second arm a hotter machine.</p>
+      </div>
+      <div class="card">
+        <h3>Per‑query rows written as the run went</h3>
+        <p>One row per query per arm per tier — 10 files, 3 000 rows. <strong>The first run in this project's evidence store to have them.</strong> Every aggregate is derivable from the rows and from nothing else.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:18px">
+      <p><strong>The run is classified <span class="mono">informed</span>, and that was ruled by the pre‑registration rather than by judgement after the fact.</strong> Its §3 says: <em>“If the same session writes the generator and reads a score, the run is informed and no delta may be stated from it.”</em> That is exactly what happened, so no delta is stated. The specific exposure: the “decline” observable for B7 was chosen <em>after</em> seeing that both arms return three passages for an absent term.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9 ───────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">3 · Results <span class="dim">/ the scoreboard</span></p>
+    <h2>Seven verdicts</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>ID</th><th>Verdict</th><th>Measured</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td class="k">B1</td><td><span class="pill hold">Inconclusive</span></td><td class="k">0 discordant of 240 · p = 1.0</td><td><code>hit@5</code> 240/240 in both arms at every tier — the endpoint was saturated, so the null was determined by the corpus.</td></tr>
+          <tr class="hi"><td class="k">B2</td><td><span class="pill fail">Fail</span></td><td class="k">0 discordant of 40 · 21/40 inversions in both arms</td><td>Predicted PASS with B better. B fixes nothing — <code>superseded_weight</code> ships as a no‑op. <strong>This endpoint did have power.</strong></td></tr>
+          <tr><td class="k">B3</td><td><span class="pill pass">Pass</span></td><td class="k">1.002 × bytes · wheel 0.036 ×</td><td>Bar was 1.25 ×. Wheel goes 7.11 MB → 259 KB. No <code>int8</code> vectors committed.</td></tr>
+          <tr><td class="k">B5</td><td><span class="pill pass">Pass</span></td><td class="k">p95 85.6 → 112.6 ms · 1.32 ×</td><td>Bar was 1.5 ×. Inside the fence, and 1.32 × is not nothing.</td></tr>
+          <tr><td class="k">B6</td><td><span class="pill pass">Pass</span></td><td class="k">ingest 25.68 → 26.78 s · 1.04 ×</td><td>Bar was 2.0 ×. One 38.8 s outlier in arm B is filed, not dropped.</td></tr>
+          <tr><td class="k">B7</td><td><span class="pill hold">Inconclusive</span></td><td class="k">0 declines of 20, both arms</td><td>As predicted — but this corpus can only test the weak form of the question.</td></tr>
+          <tr><td class="k">B9</td><td><span class="pill pass">Pass</span></td><td class="k">0 discordant · 300/300 identical rows</td><td>The halt gate. Run first, passed, and everything downstream depends on it.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:14px;font-size:13.5px">Also collected and clean: the <strong>differential law</strong> holds in both arms — <code>ask --fast</code> and <code>ask --scan</code> byte‑identical across all 240 queries, 0 mismatches. <strong>Decoys</strong> reached the top 5 for 1 of 50 shadowed queries at tier 1 000 and 1 of 208 at tier 10 000 — identically in both arms.</p>
+  </div>
+</section>
+
+<!-- 10 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">3 · Results <span class="dim">/ quality</span></p>
+    <h2>The retrieval numbers, all of them</h2>
+    <div class="tblwrap">
+      <table>
+        <thead><tr><th>Tier</th><th>Arm</th><th class="num">hit@5</th><th class="num">hit@10</th><th class="num">MRR@10</th><th class="num">rank‑1</th><th class="num">chain inversions</th><th class="num">declines</th></tr></thead>
+        <tbody>
+          <tr><td class="k">100</td><td class="k">A</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">240/240</td><td class="num">5/10</td><td class="num">0/20</td></tr>
+          <tr><td class="k">100</td><td class="k">B</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">240/240</td><td class="num">5/10</td><td class="num">0/20</td></tr>
+          <tr class="hi"><td class="k">1 000</td><td class="k">A</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">240/240</td><td class="num">21/40</td><td class="num">0/20</td></tr>
+          <tr class="hi"><td class="k">1 000</td><td class="k">B</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">240/240</td><td class="num">21/40</td><td class="num">0/20</td></tr>
+          <tr><td class="k">10 000</td><td class="k">A</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">240/240</td><td class="num">17/40</td><td class="num">0/20</td></tr>
+          <tr><td class="k">10 000</td><td class="k">B</td><td class="num">240/240</td><td class="num">240/240</td><td class="num">1.0000</td><td class="num">240/240</td><td class="num">17/40</td><td class="num">0/20</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:16px">Read the columns, not the rows: <strong>every retrieval column is identical between the arms, and three of them are at their ceiling.</strong> The inversion column is the only one carrying variance — and it is the same variance in both arms, because it comes from the corpus.</p>
+    <p style="font-size:13.5px">Tier 1 000 is the pre‑registered primary. Tiers 100 and 10 000 are secondary and descriptive — named once, in advance, rather than carrying a multiplicity correction.</p>
+  </div>
+</section>
+
+<!-- 11 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">3 · Results <span class="dim">/ size and speed</span></p>
+    <h2>Everything cleanly comparable passed</h2>
+    <div class="grid g2">
+      <figure class="chartbox">
+        <svg viewBox="0 0 460 230" role="img" aria-label="Latency at tier 10000: arm A p50 79.3ms and p95 85.6ms; arm B p50 103.7ms and p95 112.6ms; the 1.5x fence sits at 128.3ms.">
+          <g font-family="IBM Plex Mono, monospace" font-size="10.5">
+            <line x1="52" y1="176" x2="444" y2="176" stroke="var(--rule)"/>
+            <line x1="52" y1="20" x2="52" y2="176" stroke="var(--rule)"/>
+            <!-- scale: 0..140ms over 156px -->
+            <line x1="52" y1="81" x2="444" y2="81" stroke="var(--fail)" stroke-dasharray="4 3"/>
+            <text x="330" y="76" fill="var(--fail)">fence 1.5 × = 128.3 ms</text>
+            <g>
+              <rect x="86"  y="88"  width="46" height="88"  fill="var(--ink-3)" opacity=".3" stroke="var(--ink-3)"/>
+              <rect x="140" y="81"  width="46" height="95"  fill="var(--ink-3)" opacity=".45" stroke="var(--ink-3)"/>
+              <rect x="266" y="60"  width="46" height="116" fill="var(--accent)" opacity=".3" stroke="var(--accent)"/>
+              <rect x="320" y="51"  width="46" height="125" fill="var(--accent)" opacity=".5" stroke="var(--accent)"/>
+            </g>
+            <g fill="var(--ink)" text-anchor="middle">
+              <text x="109" y="82">79.3</text><text x="163" y="75">85.6</text>
+              <text x="289" y="54">103.7</text><text x="343" y="45">112.6</text>
+            </g>
+            <g fill="var(--ink-3)" text-anchor="middle">
+              <text x="136" y="192">arm A</text><text x="316" y="192">arm B</text>
+              <text x="109" y="206" font-size="9.5">p50</text><text x="163" y="206" font-size="9.5">p95</text>
+              <text x="289" y="206" font-size="9.5">p50</text><text x="343" y="206" font-size="9.5">p95</text>
+            </g>
+            <text x="52" y="222" fill="var(--ink-3)">warm ask, scan path, tier 10 000, 1 200 timed queries per arm</text>
+          </g>
+        </svg>
+        <figcaption>B5 — ratio 1.32 × against a 1.5 × bar.</figcaption>
+      </figure>
+      <div>
+        <div class="grid g2">
+          <div class="card"><p class="statlabel">Committed index, 10k docs</p><p class="stat sm">0.998 ×</p><p class="statnote">14.15 MB → 14.12 MB. At 1 000 docs, 1.002 ×. Bar was 1.25 ×.</p></div>
+          <div class="card"><p class="statlabel">Published wheel</p><p class="stat sm">0.036 ×</p><p class="statnote">7 113 352 → 258 901 bytes. The bundled model left in <span class="mono">alpha.1</span>.</p></div>
+          <div class="card"><p class="statlabel">Cold ingest, 10k docs</p><p class="stat sm">1.04 ×</p><p class="statnote">25.68 s → 26.78 s median. Bar was 2.0 ×.</p></div>
+          <div class="card"><p class="statlabel">Accelerator build</p><p class="stat sm">1.77 ×</p><p class="statnote">612 ms → 1 086 ms. Not a pre‑registered bar; recorded for the record.</p></div>
+        </div>
+        <div class="callout" style="margin-top:16px">
+          <p style="font-size:14px"><strong>B3's one named check is answered: no.</strong> HEAD does not commit per‑chunk <code>int8</code> vectors. Read from a document record in each arm's index — arm A carries a <code>code</code> key, arm B does not, and neither carries <code>vectors</code>. Five committed tf fields replace two for 0.2 % more bytes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">3 · Results <span class="dim">/ finding 1</span></p>
+    <h2>A power table says how many queries. It never says whether the queries are&nbsp;<em>hard</em>.</h2>
+    <div class="grid g2" style="margin-top:6px">
+      <div>
+        <p>The pre‑registration sized the query set correctly and rigorously — and the set still could not detect anything, because of a property the sizing never looked at.</p>
+        <p><strong>A marker term planted in exactly one document has <code>df = 1</code>.</strong> It is the easiest retrieval problem BM25 has. It is already at rank 1, so a five‑field BM25F, a <span class="mono">v2</span> analyzer and a proximity reranker cannot improve it — and cannot break it either.</p>
+        <p>In McNemar's terms: <strong><span class="mono">pb</span> and <span class="mono">pc</span> are structurally zero.</strong> The discordant count of 0 was fixed by the corpus design before either engine ran.</p>
+        <div class="callout" style="margin-top:16px">
+          <p><strong>The two suites that <em>did</em> discriminate both had contested answers:</strong> chains, where two documents compete and the inversion rate is a coin flip, and decoys, where a topically adjacent document occasionally reaches the top 5.</p>
+        </div>
+      </div>
+      <figure class="chartbox">
+        <svg viewBox="0 0 440 250" role="img" aria-label="Headroom by suite: the marker suite has zero headroom at 100 percent in both arms; the chain suite sits near 50 percent with real headroom; the decoy suite sits near 98 percent.">
+          <g font-family="IBM Plex Mono, monospace" font-size="10.5">
+            <text x="16" y="18" fill="var(--ink-3)">where a ranking change could show up</text>
+            <!-- marker suite -->
+            <text x="16" y="52" fill="var(--ink)">marker · hit@5</text>
+            <rect x="16" y="60" width="408" height="18" fill="none" stroke="var(--rule)"/>
+            <rect x="16" y="60" width="408" height="18" fill="var(--ink-3)" opacity=".28"/>
+            <text x="330" y="96" fill="var(--fail)">headroom: none</text>
+            <text x="16" y="96" fill="var(--ink-3)">both arms 240/240 — the ceiling</text>
+
+            <!-- chain suite -->
+            <text x="16" y="134" fill="var(--ink)">chain · current ranks first</text>
+            <rect x="16" y="142" width="408" height="18" fill="none" stroke="var(--rule)"/>
+            <rect x="16" y="142" width="194" height="18" fill="var(--accent)" opacity=".38"/>
+            <line x1="210" y1="138" x2="210" y2="164" stroke="var(--accent)"/>
+            <text x="16" y="178" fill="var(--ink-3)">both arms 19/40 — a coin flip</text>
+            <text x="300" y="178" fill="var(--pass)">headroom: 21 queries</text>
+
+            <!-- decoy suite -->
+            <text x="16" y="212" fill="var(--ink)">decoy · stayed out of top 5</text>
+            <rect x="16" y="220" width="408" height="18" fill="none" stroke="var(--rule)"/>
+            <rect x="16" y="220" width="400" height="18" fill="var(--pass)" opacity=".3"/>
+            <text x="300" y="250" fill="var(--ink-3)">headroom: 1 query</text>
+            <text x="16" y="250" fill="var(--ink-3)">both arms 49/50 at tier 1 000</text>
+          </g>
+        </svg>
+        <figcaption>Only a contested answer leaves room for a ranking change to appear.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 13 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">3 · Results <span class="dim">/ finding 2</span></p>
+    <h2>The supersession prior works. It ships switched&nbsp;off.</h2>
+    <div class="grid g2">
+      <figure class="chartbox">
+        <svg viewBox="0 0 460 240" role="img" aria-label="Chain inversions out of 40 at tier 1000: arm A 21, arm B core 21, arm B with superseded_weight 0.5 zero.">
+          <g font-family="IBM Plex Mono, monospace" font-size="10.5">
+            <line x1="58" y1="182" x2="446" y2="182" stroke="var(--rule)"/>
+            <line x1="58" y1="20" x2="58" y2="182" stroke="var(--rule)"/>
+            <text x="58" y="14" fill="var(--ink-3)">inversions out of 40 · tier 1 000 · lower is better</text>
+            <rect x="90"  y="55" width="66" height="127" fill="var(--ink-3)" opacity=".3" stroke="var(--ink-3)"/>
+            <rect x="196" y="55" width="66" height="127" fill="var(--fail)" opacity=".26" stroke="var(--fail)"/>
+            <rect x="302" y="178" width="66" height="4" fill="var(--pass)" stroke="var(--pass)"/>
+            <g fill="var(--ink)" text-anchor="middle" font-size="15">
+              <text x="123" y="46">21</text><text x="229" y="46">21</text><text x="335" y="170" fill="var(--pass)">0</text>
+            </g>
+            <g fill="var(--ink-3)" text-anchor="middle">
+              <text x="123" y="200">arm A</text><text x="123" y="214" font-size="9.5">1.0.0</text>
+              <text x="229" y="200">arm B‑core</text><text x="229" y="214" font-size="9.5">shipped defaults</text>
+              <text x="335" y="200" fill="var(--pass)">arm B‑tuned</text><text x="335" y="214" font-size="9.5">weight = 0.5</text>
+            </g>
+            <text x="58" y="234" fill="var(--ink-3)">post‑hoc: b = 21 fixed, c = 0 broken, p ≈ 9.5 × 10⁻⁷ · retrieval untouched at 240/240</text>
+          </g>
+        </svg>
+        <figcaption>One key in <code>tune.toml</code> separates the middle bar from the right one.</figcaption>
+      </figure>
+      <div>
+        <p><code>superseded_weight</code> defaults to <span class="mono">1.0</span> and <code>recency_half_life_days</code> to <span class="mono">0.0</span>. On shipped defaults <strong>both priors are multiplicative no‑ops</strong>.</p>
+        <p>The queue item predicted that a B2 failure would mean <em>“the priors shipped and do not do the job they were built for.”</em> They do the job. Nobody turned them on.</p>
+        <div class="callout warn" style="margin-top:16px">
+          <p><strong>This is not an argument for changing the default, and reading it that way would be a real error.</strong></p>
+          <p style="margin-top:8px">A previous verdict — <span class="mono">P‑SUPERSEDE</span>, 2026‑08‑25 — already ruled exactly that change <strong>FAIL</strong> on the hand‑graded playground: at <span class="mono">0.5</span> it fixed one query and <strong>broke two</strong>, and <em>every broken query had the superseded document as its correct answer</em>.</p>
+          <p style="margin-top:8px"><strong>This corpus cannot see that failure mode by construction</strong> — every planted chain query's right answer is the successor. So <span class="mono">0 broken</span> here is a property of the generator. The two results are consistent, and the <em>older</em> one is more informative because its corpus contains the case that breaks.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">3 · Results <span class="dim">/ finding 3</span></p>
+    <h2>Neither engine ever declines</h2>
+    <p class="lead">For a query whose term appears in no document anywhere, both arms returned three passages. <strong>0 declines out of 20, at every tier, in both arms.</strong></p>
+    <div class="grid g2" style="margin-top:18px">
+      <div>
+        <h3>Arm B is not blind to it</h3>
+        <p>It has the information and does not act on it. On every absent‑entity probe:</p>
+        <pre>band:         partial
+answerable:   true
+coverage:     0.0009
+doc_coverage: 0.0009
+missing:      ["zq00000w"]</pre>
+        <p style="margin-top:12px;font-size:13.5px">Arm A emits no confidence block at all, so this half is a <strong>capability delta, not a comparison</strong>. Arm B returned <span class="mono">partial</span> on 20 of 20.</p>
+      </div>
+      <div>
+        <h3>Why the verdict is inconclusive rather than a clean null</h3>
+        <p>The comparison resolved exactly as predicted. But the question the threshold was written to answer — <em>is the answer layer more honest?</em> — is not what this corpus can ask.</p>
+        <p><strong>It can test declining when nothing matches. It cannot test declining when something matches and does not support the claim</strong>, which is the failure that motivated the threshold in the first place.</p>
+        <div class="callout warn">
+          <p><strong>Do not read this null as reassurance.</strong> A separate blind run on the hand‑authored playground found the same thing at severity: the engine reported <span class="mono">answerable: true</span> on 20 of 20 genuinely unanswerable questions.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 15 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">4 · Recommendations</p>
+    <h2>What to do about it</h2>
+    <ol class="recs">
+      <li>
+        <strong>Build a contested‑answer suite, and retire the marker suite as a quality endpoint.</strong>
+        A marker query has one plausible answer and measures whether the index is wired up — keep it as a <em>null‑control instrument</em>, where it is excellent. A quality endpoint needs several documents plausibly matching and one correct. Until that suite exists, <strong>no run in this project can detect a ranking improvement.</strong>
+        <span class="mono" style="color:var(--ink-3);font-size:12px">→ filed as W‑95, agent lane</span>
+      </li>
+      <li>
+        <strong>Size every future paired run against power <em>and</em> headroom.</strong>
+        Add one line to the pre‑registration template: <em>what is the current score on this suite, and how many queries could change?</em> A suite already at 100 % has a maximum detectable effect of zero, whatever the sample size says.
+      </li>
+      <li>
+        <strong>Close the supersession disclosure gap — but do not touch the default.</strong>
+        A corpus that declares <code>supersedes:</code> today gets nothing from it <em>and is told nothing</em>. <code>fux doctor</code> can say the prior is disabled; that is a disclosure, not a ranking change. Changing the default is the option <span class="mono">P‑SUPERSEDE</span> already failed, and its diagnosis still stands: <strong>supersession belongs to the query's intent, and a per‑document multiplier cannot express it.</strong>
+        <span class="mono" style="color:var(--ink-3);font-size:12px">→ filed as W‑94, Arpit's call — and doing nothing is a legitimate choice</span>
+      </li>
+      <li>
+        <strong>Make a blind benchmark structurally possible.</strong> One session authors and freezes the generator, the query sets and the harness, then <em>stops</em>. A second session, which never reads them, executes and analyses. One session cannot do it — the pre‑registration said so in advance and was right.
+        <span class="mono" style="color:var(--ink-3);font-size:12px">→ filed as W‑96, agent lane</span>
+      </li>
+      <li>
+        <strong>Teach the lab and playground harnesses to emit per‑query rows.</strong> The benchmark harness now does, and a gate now enforces it from 2026‑08‑29. <code>fux-lab/shared/regress/run.py</code> still emits totals only — <strong>the next lab or playground run filed will hit the gate with nothing to give it.</strong> One emitter, not a rule.
+      </li>
+      <li>
+        <strong>Re‑run against the next release, and expect it to be cheap.</strong> The harness, corpora and arms are standing. A new <code>HEAD</code> is a new run citing the same frozen pre‑registration — never an edit to it. Total wall‑clock for the quality half of this run was under four minutes; the latency half was eight.
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- 16 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Worth saying <span class="dim">/ the guard rails</span></p>
+    <h2>What this run may never be used to say</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>It cannot say the two engines retrieve equally well</h3>
+        <p>The primary suite was saturated, so the observed equality is a property of the queries. The only suites that could have discriminated were the chains — equal because a default is off — and the decoys, where both arms are near‑perfect.</p>
+      </div>
+      <div class="card">
+        <h3>It cannot attribute anything to a feature</h3>
+        <p>Two engines differ in a dozen places at once. A win would say <em>the latest engine is better end‑to‑end on this corpus</em>, never <em>the proximity reranker works</em>. Attribution needs an ablation, which is a different run.</p>
+      </div>
+      <div class="card">
+        <h3>It cannot state a delta at all</h3>
+        <p>It is classified <span class="mono">informed</span>. It may be filed, listed, cited and used to inform the corpus. It is <strong>not a generalisation estimate</strong>, and the post‑hoc <code>superseded_weight</code> result carries no verdict.</p>
+      </div>
+      <div class="card">
+        <h3>It cannot compare wall‑clock to anything elsewhere</h3>
+        <p>B5 and B6 were measured on one machine in one session, macOS arm64, CPython 3.11.15. A number measured on another surface is not comparable, and one arm's third ingest repeat was a 38.8 s outlier — filed, not dropped.</p>
+      </div>
+    </div>
+    <div class="callout" style="margin-top:18px">
+      <p><strong>A recorded negative is a successful outcome.</strong> Four of the seven thresholds resolved to “no detected change” or worse, and the two that failed are the two most useful results in the run. The alternative — a suite tuned until it produced a pleasing direction — is the failure this whole apparatus exists to prevent.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 17 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Worth saying <span class="dim">/ side findings</span></p>
+    <h2>Three things found on the way</h2>
+    <div class="grid g3">
+      <div class="card">
+        <p class="statlabel">Harness</p>
+        <h3 style="margin-top:8px"><code>fux setup</code> anchors on the git root</h3>
+        <p>Not on <code>cwd</code>. The first run wrote <code>.fux/</code>, <code>.claude/</code>, <code>.github/</code> and <code>.kiro/</code> into the harness repository and left the corpus with no index — and the <em>next</em> step failed with a <code>FileNotFoundError</code>, which reads like a broken harness rather than a working directory in the wrong place. Both arms do it, so it is not a version difference.</p>
+      </div>
+      <div class="card">
+        <p class="statlabel">Suite</p>
+        <h3 style="margin-top:8px">The test suite was red, not green</h3>
+        <p><code>tests/test_setup_docs.py</code> was failing when this session started: the benchmark setup document had been added the day before without its index row, and the previous session's handoff note claimed a fully green suite. Fixed in the first commit.</p>
+      </div>
+      <div class="card">
+        <p class="statlabel">Contract</p>
+        <h3 style="margin-top:8px">Seven verdicts were guarded by nothing</h3>
+        <p>The per‑run contract test globbed <code>VERDICT.md</code> only. A run ruling on seven thresholds files seven verdict files, and six of them would have been filed, cited and checked by nothing — the worst state a verdict can be in. The glob is now <code>VERDICT*.md</code>.</p>
+      </div>
+    </div>
+    <hr class="rule">
+    <p style="font-size:14px"><strong>And one honest note about this session's own bookkeeping:</strong> a concurrent session was editing the same repository, and a <code>git add -A</code> swept 152 lines of its in‑progress work into this run's commit. The content is preserved and committed; the commit message does not describe it. Left as it is rather than unpicked, because rewriting under a live session is the worse risk.</p>
+  </div>
+</section>
+
+<!-- 18 ──────────────────────────────────────────────────────────────── -->
+<section class="slide">
+  <div class="wrap">
+    <p class="eyebrow">Reproduce</p>
+    <h2>Everything here is re‑runnable</h2>
+    <div class="grid g2">
+      <div>
+        <h3>The evidence</h3>
+        <pre>work/regression/2026-08-28-benchmark-v1-vs-head/
+  report.md            classification: informed
+  ANALYSIS.md          findings + repro per finding
+  VERDICT.md           B1   · VERDICT-B2.md  B2
+  VERDICT-B3.md  ·  -B5  ·  -B6  ·  -B7  ·  -B9
+  evidence/
+    rows/              10 files · 3 000 per-query rows
+    eval/              every query, all four tiers
+    ARMS.toml          the frozen arm manifest
+    harness/           bench.py · latency.py · make_corpus.py
+    latency-summary-t10000.json</pre>
+      </div>
+      <div>
+        <h3>The commands</h3>
+        <pre>python3 shared/generate/make_corpus.py \
+  --out corpora/t1000 --docs 1000 --seed 12 \
+  --bench --pairs 240 --chains 40 \
+  --decoys 50 --unanswerable 20
+
+python3 bin/bench.py prepare --run R --arm A --tier t1000
+python3 bin/bench.py quality --run R --arm A --tier t1000 --label A
+
+python3 bin/bench.py mcnemar \
+  --a rows/A-t1000.jsonl --b rows/B-t1000.jsonl \
+  --suite pairs --key hit@5
+
+python3 bin/latency.py --run R --tier t10000 \
+  --queries 240 --repeats 5</pre>
+        <p style="margin-top:12px;font-size:13.5px">The generator ships a <code>--selftest</code> that asserts determinism, that no “unanswerable” marker was quietly planted, that decoys carry no marker, and that every chain's newer half declares its older one.</p>
+      </div>
+    </div>
+    <hr class="rule">
+    <p style="font-size:13.5px">Harness: <span class="mono">~/my_programs/fux-benchmark</span> · corpora <span class="mono">sha256</span>‑recorded in <span class="mono">ARMS.toml</span> · frozen thresholds: <span class="mono">work/benchmark/PRE-REGISTRATION-V1-VS-HEAD.md</span>, <span class="mono">HEAD = 75ade57</span>.</p>
+  </div>
+</section>
+
+</main>
+
+<div class="hint" id="hint">← → to move</div>
+<div class="counter">
+  <button class="navbtn" id="prev" aria-label="Previous slide">prev</button>
+  <span id="pos" aria-live="polite">01 / 18</span>
+  <button class="navbtn" id="next" aria-label="Next slide">next</button>
+</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var pos = document.getElementById('pos');
+  var tick = document.getElementById('tick');
+  var i = 0;
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    pos.textContent = pad(i + 1) + ' / ' + pad(slides.length);
+    tick.style.setProperty('--progress', ((i + 1) / slides.length * 100) + '%');
+    window.scrollTo(0, 0);
+    try { location.hash = 's' + (i + 1); } catch (e) {}
+  }
+
+  document.getElementById('next').addEventListener('click', function () { show(i + 1); });
+  document.getElementById('prev').addEventListener('click', function () { show(i - 1); });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(i + 1); e.preventDefault(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(i - 1); e.preventDefault(); }
+    else if (e.key === 'Home') { show(0); e.preventDefault(); }
+    else if (e.key === 'End') { show(slides.length - 1); e.preventDefault(); }
+  });
+
+  var start = null;
+  document.addEventListener('touchstart', function (e) { start = e.changedTouches[0].clientX; }, {passive: true});
+  document.addEventListener('touchend', function (e) {
+    if (start === null) return;
+    var dx = e.changedTouches[0].clientX - start;
+    if (Math.abs(dx) > 55) { show(dx < 0 ? i + 1 : i - 1); }
+    start = null;
+  }, {passive: true});
+
+  var m = (location.hash || '').match(/^#s(\d+)$/);
+  show(m ? parseInt(m[1], 10) - 1 : 0);
+
+  setTimeout(function () {
+    var h = document.getElementById('hint');
+    if (h) { h.style.transition = 'opacity .6s'; h.style.opacity = '0'; }
+  }, 4200);
+})();
+</script>
