@@ -763,7 +763,7 @@ failures — **no subclass hierarchy**. CLI exit codes: `0` ok · `1` error ·
 
 ## Build & test
 
-**`fux-engine` 2.0.0-alpha.2 is released and on PyPI**; `src/fux/` is the live tree.
+**`fux-engine` 2.0.0-alpha.3 is released and on PyPI**; `src/fux/` is the live tree.
 
 ```bash
 uv sync --extra dev
@@ -792,13 +792,14 @@ archive/v0.26/.venv/bin/python tools/pruning-eval/run.py --corpus acme orbit syn
 ## Package identity (do not change casually)
 
 - Distribution name: **`fux-engine`**. Import package: **`fux`**.
-- Version: **`2.0.0-alpha.2`**, released (0.26.0 archived → reset → 0.30.0 →
+- Version: **`2.0.0-alpha.3`**, released (0.26.0 archived → reset → 0.30.0 →
   M2 at 0.32.0 → the sources rewrite at 0.33.0 → the graph/refer/maintenance
   planes at 0.34.0 → the source verbs and the progress plane at 0.35.0 → the
   deferring hook and agent policy at 0.36.0 → the refer per-doc cap fix and
   two-machine determinism at 0.37.0/0.37.1 → **1.0.0** the first major release
   → record shape v2 / tuning / enrich / mcp / rerank at 2.0.0-alpha.0 → the
-  dense lane removed at alpha.1 → the URL freshness loop closes at alpha.2).
+  dense lane removed at alpha.1 → the URL freshness loop closes at alpha.2 →
+  the output.toml fork closes and `ask` gains `sections` at alpha.3).
   Bumped in `src/fux/__init__.py` only — it is the single source, read
   dynamically by `pyproject.toml`. See `CHANGELOG.md` for the full list.
 

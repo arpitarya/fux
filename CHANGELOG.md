@@ -8,6 +8,8 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.3] - 2026-08-29
+
 ### Added
 
 - **`fux ask` gained `--sections` / `--no-sections`, and a `[cli.ask]
