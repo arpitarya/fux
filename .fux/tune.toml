@@ -41,6 +41,26 @@ per_doc_fraction  = 0.5
 min_passage_bytes = 120
 max_passage_bytes = 4000
 
+[confidence]                    # the BAND -- what fux says ABOUT an answer
+# Neither key can move a score or an ordering. They move the band only, so
+# `.fux/index/` and the result list are byte-identical either way.
+#
+# separation_floor: how far ahead of the runner-up the top result must be
+#   before the band may read `grounded`. LOWERING THIS DOES NOT MAKE ANSWERS
+#   BETTER -- it makes fux quieter about not knowing. At 0.0 nothing is ever
+#   `weak`. The default is PROVISIONAL and UNMEASURED (prediction R10): it is
+#   a defensible starting point, not a calibrated one.
+# doc_coverage_floor: how much of the question the TOP-RANKED DOCUMENT must
+#   itself contain. 0.0 = OFF, and that is a measured ruling, not an omission.
+#   Measured on 50 goldens + 15 decoys: at 1.0, NINETEEN of the fifty correct
+#   answers turn `partial`, and the single decoy this clause could catch sits
+#   at 0.710 -- inside the goldens' range. There is no gap to pick a number in.
+#
+# Both floors are PUBLISHED in the confidence block, so an answer states which
+# floor judged it. `fux ask --no-tune` recomputes the band at the defaults.
+separation_floor   = 0.1
+doc_coverage_floor = 0.0
+
 [priority]
 # ⚠ THE ONE TABLE THAT STAYS COMMENTED, and not for consistency's sake: these
 # are not tunables with defaults. A key is a multiplicative weight per SOURCE
