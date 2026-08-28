@@ -1,8 +1,8 @@
 # `work/setup/` — the things fux needs that fux does not contain
 
-**How to use this directory.** Fux depends on two working directories that sit
-**next to** the repo and are not part of it. Neither is shipped, neither is a
-submodule, and neither can be reconstructed from anything in this tree. This
+**How to use this directory.** Fux depends on three working directories that
+sit **next to** the repo and are not part of it. None is shipped, none is a
+submodule, and none can be reconstructed from anything in this tree. This
 directory is where each one's setup and standing contract is written down, so a
 session on a fresh machine can stand them up rather than discover them.
 
@@ -10,6 +10,7 @@ session on a fresh machine can stand them up rather than discover them.
 |---|---|---|---|
 | [SETUP-PLAYGROUND](fux-playground.md) | `fux-playground` | `~/my_programs/fux-playground` | a **sibling git repository** — the graded fixture corpus |
 | [SETUP-LAB](fux-lab.md) | `fux-lab` | `~/my_programs/fux-lab` | a **scratch working directory** — the measurement environment |
+| [SETUP-BENCHMARK](fux-benchmark.md) | `fux-benchmark` | `~/my_programs/fux-benchmark` | a **scratch git repository** — the two-engine comparison harness |
 
 ## Which is which
 
@@ -23,8 +24,15 @@ They get confused, so:
   accurate?"* Its output is numbers, filed into
   [`../regression/`](../regression/README.md).
 
+- **The benchmark COMPARES.** **Two engine versions resident at once**, over
+  byte-identical corpora. It answers *"what is the difference between these two
+  versions?"* Its output is paired per-query rows and a p-value, filed into
+  [`../regression/`](../regression/README.md) like everything else.
+
 A ranking change should survive the playground. A performance or size claim
-needs the lab.
+needs the lab. **A version-to-version claim needs the benchmark** — and it is a
+*third* harness rather than a lab environment because the lab's shape is one
+pinned engine version per directory, which a comparison cannot honour.
 
 ## Why these are documents and not ADRs
 
