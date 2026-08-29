@@ -195,8 +195,8 @@ alternative only half delivers.
   ([ADR-CDP-FETCHER](0020_cdp-fetcher.md) decision 9). **A decoder is
   stdlib-only and offline — it is already a legitimate module**, so the module
   *is* the template and the copy is byte-identical. **Two files that agree by
-  habit is the duplication this record exists to remove**, and sixteen of them
-  would be worse.
+  habit is the duplication this record exists to remove**, and nineteen of
+  them would be worse.
 - ⚠ **Imports inside `decode/` are absolute.** A path-loaded file has no parent
   package, so a relative import raises *attempted relative import with no known
   parent package* and **every copy carrying a helper import would be dead on
@@ -212,6 +212,19 @@ alternative only half delivers.
   each have needed every consumer to refresh their copy. The alternative on the
   table was *copies inert until edited*, resolved by a hash stamp; it was
   declined in favour of the simpler rule.
+
+**10a. `jsonldoc`, `svgdoc` and `imagedoc` joined the built-in set on
+2026-08-29** (sixteen → nineteen). `.jsonl` is `.json`'s line-delimited
+sibling, walked the same way. `svgdoc` and `imagedoc` are the two format
+families this record's §1 named as "no decoder" the day it was written —
+SVG (markup, geometry dropped, only `<title>`/`<desc>`/`<text>` kept) and
+raster images (PNG/JPEG/GIF, pixels dropped, only embedded text metadata
+kept, hand-rolled per **L1** since Pillow is not stdlib). **The consequence
+belongs to ADR-TYPES, not here**: decision 1 unions every built-in's
+extensions into `DEFAULT_TYPES` automatically, so shipping these three
+built-in reverses the SVG half of [ADR-TYPES](0031_types-list.md) decision 5
+— see that record for the reversal and why it does not repeat verdict G's
+measured failure.
 
 **11. The plane ships its own skill, `fux-decoder`.** The answer to *how do I
 write a decoder* had lived only in a module docstring and in §2 — **the

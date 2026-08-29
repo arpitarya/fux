@@ -19,9 +19,13 @@
 #
 # See ADR-DIR-LIST.
 
+CHANGELOG.md
 CLAUDE.md
 README.md
+
 docs
+tools
 work
+
 
 archive                   archived=true

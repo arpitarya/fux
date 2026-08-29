@@ -69,6 +69,7 @@ generator would produce numbers that look comparable to lab numbers and are not.
     rows/                             # per-query rows — one file per arm per tier
   bin/
     bench.py          # prepare | quality | mcnemar
+                      #   ⚠ owed by W-97, not built: --tune/--value, playground, select, veto, difflaw
     latency.py        # B5/B6, interleaved A B A B, and the differential law
 ```
 
@@ -98,12 +99,15 @@ otherwise no way for a reader to tell.
 **0. Never delete it, never start a fourth harness.** Same rule as the lab,
 same reason. New comparison work is a new `runs/<date>/` inside it.
 
-**1. The null control runs first, every time.** Arm A against itself on a
-second seed — and, stronger, arm A twice on the *same* corpus, which must give
-byte-identical rows. A non-zero discordant count means the harness
-is nondeterministic and **every number in that session is void**. Running this
-last, after the interesting numbers exist, is how a broken harness gets
-believed.
+**1. The null control runs first, every time — and it is the same-corpus
+repeat.** Arm A twice on the *same* corpus must give byte-identical rows. A
+difference means the harness is nondeterministic and **every number in that
+session is void**. Running this last, after the interesting numbers exist, is
+how a broken harness gets believed. ⚠ **A cross-seed pairing (A on seed 12 vs
+A′ on seed 13) is a rate check, not a determinism check** — query ids are
+positional, so it compares different questions. Run it, report it
+descriptively, never let it stand in for the repeat (the 2026-08-28 v1-vs-HEAD
+B9 was read that way and carries the weakness).
 
 **2. Arms are interleaved, never sequenced.** `A B A B`, not `AAAA BBBB`.
 Thermal drift on a laptop is a real effect and sequencing hands the second arm
@@ -123,6 +127,38 @@ pre-registration under [`../benchmark/`](../benchmark/README.md).
 gitignored scratch. What survives a run is what lands in
 [`../regression/<date>-<run>/`](../regression/README.md) under the per-run
 contract.
+
+**6. A knob sweep never re-ingests, and proves it.** ADR-TUNE's rule is that
+`.fux/tune.toml` cannot move `.fux/index/`. A sweep therefore builds **one**
+index per corpus and runs one query pass per value — and hashes the index
+before and after **every** pass. A knob that moves the hash is not a tune knob;
+its passes are void and the run files the defect. The procedure is
+[`RUNBOOK-TUNER`](../benchmark/RUNBOOK-TUNER.md).
+
+**7. The procedure lives in a runbook, the bars in a pre-registration, and
+neither restates the other.** [`RUNBOOK-BENCHMARK`](../benchmark/RUNBOOK-BENCHMARK.md)
+is the step-by-step an agent executes against either frozen version
+pre-registration; it carries every gate and hazard this harness has taught, and
+it is corrected as the harness teaches more. This document says what the
+harness *is*; the runbook says what to *do*.
+
+## The two-session blind protocol
+
+**One session cannot produce a `blind` run here.** Whoever writes the generator
+or the query sets and then reads a score is `informed`, and no delta may be
+stated from an `informed` run — both 2026-08-28 runs are filed that way and say
+so. Blind is a handoff shape, not a process document:
+
+| session | does | stops after | may never see |
+|---|---|---|---|
+| **1 — author** (Opus) | extends the generator, writes the hand-authored subsets, defines every observable, generates and `sha256`-records the corpora, **commits with the hashes in the message** | the commit | any arm's output on the eval corpus; prior per-query scores |
+| **2 — execute** (Sonnet; Opus for `ANALYSIS.md`) | verifies the hashes, runs the gates and the arms, analyses, files | filing | the generator's source, session 1's transcript, any failure list |
+
+The hash is the handoff. If session 2 must open the generator (a bug), the run
+is reclassified `informed` and says why. Skipping the protocol is legitimate —
+the run is then `informed`, files everything, and states no delta. Claiming
+`blind` from one session is not. Step-by-step:
+[`RUNBOOK-BENCHMARK` §6](../benchmark/RUNBOOK-BENCHMARK.md).
 
 ## Where it can and cannot run
 

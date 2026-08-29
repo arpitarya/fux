@@ -57,6 +57,22 @@ The two run **concurrently**; never order one against the other.
 
 ### testing
 
+- **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·
+  [ADR-RS](../docs/adr/0036_predictions.md))* · **the knob sweep — which
+  `.fux/tune.toml` defaults are defensible, measured rather than argued.**
+  Pre-registered as [`benchmark/PRE-REGISTRATION-TUNER.md`](benchmark/PRE-REGISTRATION-TUNER.md)
+  (ids **T0–T5**, a third id space), procedure in
+  [`benchmark/RUNBOOK-TUNER.md`](benchmark/RUNBOOK-TUNER.md). Three legs per
+  knob — the generated suite **selects**, the hand-graded playground **vetoes**
+  (bar: 0 broken; `q022`/`q033` named in advance for `superseded_weight`), a
+  latency fence **prices**. Output is a **candidate table with no
+  recommendation**; the change stays an ADR-TUNE amendment Arpit ratifies, and
+  W-94's *"doing nothing is legitimate"* is untouched. Scope is `rerank_weight`
+  and `superseded_weight` only — `k1`/`b`, field weights and recency have no
+  instrument with headroom (§6 lists the generator kinds owed). Blocked on the
+  playground emitting per-query rows and a `--tune` switch in `bench.py`. —
+  [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
+
 - ⚠ **`separation_floor` is repo-configurable and R10 is still unmeasured.**
   *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md))* · Not a new
   item — R10 is [W-90]'s — but the failure mode is: a repo can make its own

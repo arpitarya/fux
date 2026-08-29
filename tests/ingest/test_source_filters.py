@@ -112,8 +112,13 @@ def test_the_default_admits_prose_and_every_decodable_format():
     decoder"*. The default was six prose globs; it is now those plus every
     extension a **built-in** decoder claims.
 
+    ⚠ **`.svg`, `.png`, `.jpg`/`.jpeg`, `.gif` and `.jsonl` moved from the
+    "stays out" list to the "admitted" one on 2026-08-29** — `svgdoc`,
+    `imagedoc` and `jsonldoc` shipped as built-ins the same day, reversing the
+    SVG half of ADR-TYPES decision 5 (see `docs/adr/0031_types-list.md`).
+
     What still stays out is the point of the assertion below: source code,
-    shell scripts, SVG and extensionless files have no decoder, so they remain
+    shell scripts and extensionless files have no decoder, so they remain
     exactly as far outside the default as ADR-TYPES verdict G left them.
     """
     types = TypeFilter(allow=DEFAULT_TYPES)
@@ -121,7 +126,9 @@ def test_the_default_admits_prose_and_every_decodable_format():
         assert types.accepts(f"docs/{name}"), name
     for name in ("a.json", "a.html", "a.docx", "a.pdf", "a.yaml", "a.eml", "a.ipynb"):
         assert types.accepts(f"docs/{name}"), name
-    for name in ("a.svg", "a.sh", "a.py", "a.mermaid", "LICENSE", "Makefile"):
+    for name in ("a.svg", "a.png", "a.jpg", "a.jpeg", "a.gif", "a.jsonl"):
+        assert types.accepts(f"docs/{name}"), name
+    for name in ("a.sh", "a.py", "a.mermaid", "LICENSE", "Makefile"):
         assert not types.accepts(f"docs/{name}"), name
 
 

@@ -679,12 +679,16 @@ def test_a_decoder_that_ran_and_found_nothing_is_not_reported_as_missing():
 
 
 def test_a_type_nothing_claims_still_says_no_decoder():
-    """The other half. Narrowing the message must not remove the true case."""
+    """The other half. Narrowing the message must not remove the true case.
+
+    `image/png` stopped being an example of this on 2026-08-29 — `imagedoc`
+    is now built in and claims `.png`. `image/webp` has no fux decoder.
+    """
     from fux.ingest.urlsrc import _decode_fetched
 
-    markdown, why = _decode_fetched(b"\x89PNG\r\n", "image/png", "https://x.test/y.png")
+    markdown, why = _decode_fetched(b"RIFF....WEBP", "image/webp", "https://x.test/y.webp")
     assert markdown is None
-    assert why == "no decoder for image/png"
+    assert why == "no decoder for image/webp"
 
 
 def test_json_with_prose_in_it_decodes_rather_than_skipping():

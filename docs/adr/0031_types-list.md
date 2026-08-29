@@ -167,10 +167,27 @@ a loud error.**
 **4. No extensionless files.** Those are `LICENSE`, `Makefile` and `Dockerfile`
 far more often than they are documents.
 
-**5. Source code, shell scripts, SVG and `.mermaid` stay out, and the calls are
+**5. Source code, shell scripts and `.mermaid` stay out, and the calls are
 stated rather than made silently.** They have no decoder, and machine data is
 not a document. `.mermaid` is diagram source — and the ASCII twin every record
 carries means the diagram's content is already indexed as markdown.
+
+⚠ **SVG's exclusion here is REVERSED, and images join it, 2026-08-29
+(Arpit).** `svgdoc`, `imagedoc` and `jsonldoc` shipped as built-ins the same
+day, and decision 1 applies to them automatically: `.svg`, `.png`, `.jpg`,
+`.jpeg`, `.gif` and `.jsonl` now rejoin `DEFAULT_TYPES`. This is the same
+move `.json` already made on 2026-08-26 (`jsondoc.py`'s docstring) — **a
+different object than the one this record measured**, not a retraction of
+the measurement. `svgdoc` reads `<title>`/`<desc>`/`<text>`, never
+path/shape geometry; `imagedoc` reads embedded text metadata (PNG
+`tEXt`/`zTXt`/`iTXt`, JPEG EXIF IFD0 ASCII tags + `COM`, GIF comment
+extensions), never pixels. What is admitted is the words a human put there,
+not the machine data this decision was written to keep out — a
+geometry-only SVG or a pure-pixel image decodes to `None` and is **not
+indexed at all**, a stronger filter than the raw-bytes case this record's
+measurement was made against. `.jsonl` was never named by this decision; it
+is the line-delimited sibling of `.json`. Source code, shell scripts and
+`.mermaid` are unaffected — they still have no decoder.
 
 **6. A pattern with no `/` matches the file name anywhere**; one with a `/` is
 anchored at the repo root. That is what makes `*.md` mean *every markdown file*

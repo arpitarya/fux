@@ -2,6 +2,11 @@
 # doc_id	content_sha	reason
 # Sorted by doc_id, no timestamps: this file changes only when the
 # BACKLOG changes, so a re-run on an unchanged corpus is an empty diff.
+file:archive/v0.1/fux/assets/fux-icon.svg	f3b121dbf142cb4f1f219c9fc59e638e1e6995ac	svgdoc: nothing readable in .svg
+file:archive/v0.1/fux/assets/fux-lockup.png	dc2561c37c5b324d0eda0762a33331981e216af6	imagedoc: nothing readable in .png
+file:archive/v0.1/fux/assets/fux-mark.svg	f7440d72f87c4365c6ad8fdf82579fc9304b8c1d	svgdoc: nothing readable in .svg
+file:archive/v0.26/tests_e2e/corpus/assets/logo.png	6a94256cf5c226310f6f94011b64926f014de247	imagedoc: nothing readable in .png
+file:archive/v0.26/tests_e2e/site/logo.png	6a94256cf5c226310f6f94011b64926f014de247	imagedoc: nothing readable in .png
 file:work/regression/2026-08-27-p3-sha-stability/evidence/control-a.json	a7f947d05ed22eb0ec2fb9c42f5f3d1b5e1ec6ef	jsondoc: nothing readable in .json
 file:work/regression/2026-08-27-p3-sha-stability/evidence/control-b.json	90830ff4a5ee349ae9baf09f06ccd4c0482d415f	jsondoc: nothing readable in .json
 file:work/regression/2026-08-27-p3-sha-stability/evidence/run1-url-shas.json	623b6ee39ed7ec2fa270f8073f1ab4b2cee5f455	jsondoc: nothing readable in .json
