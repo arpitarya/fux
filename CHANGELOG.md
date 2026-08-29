@@ -8,6 +8,30 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.4] - 2026-08-29
+
+### Added
+
+- **Three new built-in decoders: `jsonldoc` (`.jsonl`), `svgdoc` (`.svg`),
+  `imagedoc` (`.png`/`.jpg`/`.jpeg`/`.gif`)** (ADR-DECODE decision 10a).
+  Sixteen built-ins → nineteen.
+  - `jsonldoc` walks JSON Lines the same way `jsondoc` walks JSON — keys
+    become headings, ids/hashes/timestamps are dropped — one malformed line
+    is skipped rather than failing the file.
+  - `svgdoc` extracts `<title>`/`<desc>`/`<text>`/`<tspan>` labels only,
+    never path/shape geometry.
+  - `imagedoc` extracts embedded text metadata only — PNG
+    `tEXt`/`zTXt`/`iTXt`, JPEG EXIF IFD0 ASCII tags + `COM`, GIF comment
+    extensions — hand-rolled per L1 (no Pillow). A pure-pixel image or a
+    geometry-only SVG decodes to `None` and is not indexed at all.
+
+  ⚠ **This widens `DEFAULT_TYPES`** (ADR-TYPES decision 1 unions every
+  built-in's extensions in automatically), reversing the SVG half of
+  ADR-TYPES decision 5 for every fresh `fux setup`. Images and `.jsonl` were
+  never named by that decision, so those are new admissions rather than a
+  reversal. See [ADR-TYPES](docs/adr/0031_types-list.md) decision 5 and
+  [ADR-DECODE](docs/adr/0042_decode.md) decision 10a for the reasoning.
+
 ## [2.0.0-alpha.3] - 2026-08-29
 
 ### Added
