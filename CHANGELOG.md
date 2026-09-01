@@ -8,6 +8,153 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.5] - 2026-09-01
+
+**A URL behind a login is now ingestible, checkable offline, and redactable.**
+Four phases of W-98 plus the PII plane; the `.fux/` directory gains three
+committed files and one gitignored plane.
+
+### Added
+
+- **`.fux/acquired/` — the retained bytes a citation can be checked against**
+  (ADR-ACQUIRED). Ingest used to decode a fetched URL, keep the markdown and
+  drop the bytes, so a `url:` record could only ever be verified by a *fresh
+  fetch* — which needs the network, the session, and the source still existing.
+  - **A third `.fux/` category**, beside committed and derived: gitignored like
+    `runtime/` and **not rebuildable**, because a blob can only be
+    re-*acquired*.
+  - **`keep=` on a URL line, defaulting to `true`**, resolved through the same
+    three layers as `meta` — built-in default, `[sources.url] keep`, the line.
+    `fux add --no-keep` or `keep=false` opts out.
+  - **Bounded by `[sources.url] acquired_max_bytes` (default 2 GiB)**, evicted
+    by run counter — **never by `mtime`**, which would be a clock. ⚠ **A blob
+    whose URL last failed is never evicted**: that is precisely the copy that
+    cannot be re-acquired.
+  - `fux doctor` reports blob count, total bytes and an 80%-of-cap warning;
+    `fux remove <url>` drops the manifest entry and sweeps the blob.
+
+- **`.fux/refusals.toml` — declarative refusal detection that fails closed**
+  (ADR-REFUSAL). A SharePoint share link returns a **sign-in page with HTTP
+  200** that decodes perfectly well and lands a login page in the committed
+  index. Six shipped rules, ORed in file order, first match wins; the check
+  runs **after `_unpack` and before both retention and decode**, so a refusal
+  is never stored and never indexed.
+  - **A missing file is legitimate**; a malformed one **refuses to run**, once,
+    before the first socket opens.
+  - ⚠ **Conditions are pure over the bytes.** `status`, `final_url_host` and
+    `final_url_contains` were specified and **cut**: they would have put HTTP
+    facts inside the engine, which ADR-FETCHER decision 13 forbids. Provider
+    detection survives as `body_contains` over **form-field names**
+    (`name="loginfmt"`, `name="SAMLRequest"`) — an API between a page and its
+    own backend, which outlives the redesigns that rewrite every visible string.
+
+- **`ttl=` on a URL line, and a sixth freshness verdict `as-ingested`**
+  (ADR-URL-FRESHNESS). When the source cannot be reached but the passage still
+  matches the retained bytes the record was built from, that is a **real
+  comparison** — no longer reported as `unverified`, which is
+  indistinguishable from never having looked.
+  - **`min(policy, declared)`:** a line may **narrow** the caller's policy and
+    can never widen it, so `ttl`'s `24h` default cannot switch caching on for a
+    caller who never opted in. `ttl=0` means *always go out for this one*.
+  - ⚠ **Consumers switching on the freshness string must handle six values.**
+    `output.schema.json` declares the wider enum on `verified`, on a citation's
+    `freshness`, and per document in the provenance key. `ask` and `find` fetch
+    nothing and still always report `unverified`.
+
+- **`.fux/pii.toml` — redaction of the committed index, and nothing else**
+  (ADR-PII). The boundary is **committed vs local**, not *sensitive vs not*:
+  acquired bytes, refer passages and `fux answer` quotes are untouched.
+  - **The sha is taken BEFORE redaction**, so `refer` still verifies a citation
+    against its unchanged source. An index storing the sha of redacted text
+    would report every document with one PII hit as `stale` against its own
+    source, forever — a defect that presents as a working feature.
+  - **Editing the ruleset invalidates extraction reuse** (`.fux/runtime/pii-digest`);
+    a missing digest reads as *moved*, which costs one full extraction and settles.
+  - 🔴 **`.fux/enrich/` is committed and is NOT redacted.** Stated in ADR-PII
+    decision 1 and ADR-ENRICH decision 11 rather than left to be discovered.
+  - ⚠ A pathological regex can hang an ingest — Python's `re` has no timeout.
+    Empty patterns are refused and `doctor` compiles the rest; beyond that a
+    consumer's regex is a consumer's regex.
+
+- **`.fux/sources/types` became the decoder map: `decoder=<module stem>`**
+  (ADR-TYPES decision 11/11a, ADR-DECODE decision 13). *"Which decoder reads
+  `.csv`"* was a property of the code on a machine — two clones with different
+  `.fux/decoders/` could commit different indexes from the same sources with
+  nothing in the repo recording which decoder ran. It is now a committed line,
+  checked against the module.
+  - **Extending and redirecting are separated.** An extension **no** decoder
+    claims may be given to any decoder; one another decoder **does** claim may
+    not be handed to a module that does not claim it. `EXTENSIONS` is a
+    decoder's *default claim*, not a declaration of what it can read.
+
+- **`fux enrich` covers `url:` documents** via `enrich=` on a URL line
+  (ADR-ENRICH decision 11), under one synthetic scope, `.fux/sources/urls`.
+  Possible only because the acquired plane holds the bytes locally — before it,
+  planning a URL's enrichment meant a network fetch inside an offline command.
+
+- **`fux add --keep` / `--no-keep` / `--ttl D`**, and **`fux update --failed`**
+  (fetch only URLs whose last run failed). A flag on the existing networked
+  verb rather than a `fux retry`, per ADR-CLI decision 1.
+
+- **`[sources.url] acquired_max_bytes`, `keep`, `ttl` and `enrich`**
+  (ADR-CONFIG decision 12) — each a source-wide *layer* a line still overrides.
+
+### Changed
+
+- **`cdp.py` returns the resource instead of a rendering** (ADR-CDP-FETCHER
+  decisions 5, 10–13; W-98 Phase 1). The shipped browser fetcher now
+  intercepts the response over CDP — `Fetch.enable` at
+  `requestStage: "Response"` → `Page.navigate` → `Fetch.requestPaused` →
+  `Fetch.getResponseBody` — and hands fux **the bytes the server sent with the
+  server's own `Content-Type`**, rather than `document.documentElement.outerHTML`
+  declared as `text/html`.
+  - **Why it matters:** a rendered DOM carries nonces, timestamps and session
+    ids, so its sha changed on every fetch; and a rendering cannot be a
+    spreadsheet. A `.xlsx` behind a login is now ingestible.
+  - **Why interception and not an in-page `fetch()`:** measured, not argued.
+    CORS and CSP are page-level and CDP is not — the same cross-origin URL
+    sending no `Access-Control-Allow-Origin` returned `TypeError` in-page and
+    **8557 bytes** under interception. A cross-origin in-page fetch also cannot
+    see `ETag` at all.
+  - **New:** `validate(url)` returns the server's `ETag`. ⚠ It saves the decode
+    and the shard comparison, **not the download** — interception is at the
+    response stage, so the body has already transferred.
+  - **`LAUNCH_CHROME` now defaults to `False`.** A browser fux launched is
+    signed in to nothing, so every URL worth a browser came back as a login
+    page.
+  - **`CdpSession` gained an event pump.** The old `_call` discarded every
+    message that was not its own id, so a CDP event arriving while a command
+    was in flight was lost — under interception that is a paused request nobody
+    resolves, which wedges the page until the timeout rather than raising.
+  - The rendering implementation is kept at
+    `archive/templates/cdp-rendering.py.txt`.
+
+  ⚠ **`fux setup` is write-if-missing and never rewrites a consumer's fetcher.**
+  A repo with a hand-edited `.fux/fetchers/cdp.py` gets none of this until the
+  file is replaced by hand.
+
+### Fixed
+
+- 🔴 **`NameError` on every retaining fetch.** `urlsrc.fetch_all` read
+  `source.acquired_max_bytes` with no `source` in scope, because
+  ADR-ACQUIRED named the key and `config.py` never parsed it. The key is now
+  parsed, validated (a `bool` is rejected — it is an `int` subclass — and `< 1`
+  refuses, pointing at `keep = false`) and passed in explicitly.
+- 🔴 **`refer()` raised in a repo with no `fux.toml`.** Reading a URL line's
+  declared `ttl` turned *opting into caching* into a new way for an answer to
+  fail. An **unconfigured** repo now declares nothing; a `fux.toml` that exists
+  and is wrong still refuses.
+- **`fux doctor` crashed on a Windows console codepage** in two failure
+  branches — two em-dashes in returned check details, on the `.fux/pii.toml`
+  rows.
+
+### Removed
+
+- **`settle_ms` from `[sources.url.config]`** — there is no render step left to
+  settle. ⚠ **Breaking for a repo that sets it:** `configure()` raises a message
+  naming the retirement and pointing at `load_timeout_s`, rather than letting it
+  read as a typo in the generic unknown-key list.
+
 ## [2.0.0-alpha.4] - 2026-08-29
 
 ### Added
