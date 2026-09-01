@@ -1,0 +1,82 @@
+# ARCHIVED 2026-09-01 — the CDP fetcher's RENDERING path, retired by W-98 Phase 1.
+#
+# ⚠ ARCHIVE IS NOT EVIDENCE. This file is a record that something *was* built,
+# never proof of what is true now. The live fetcher is
+# `src/fux/templates/cdp.py.txt`; the live record is ADR-CDP-FETCHER
+# (`docs/adr/0020_cdp-fetcher.md`). Do not import this, and do not cite it.
+#
+# WHAT THIS WAS. Until 2026-09-01, `cdp.py`'s `fetch()` returned a *rendering*
+# of a page: navigate, wait for the load event, settle for JS, then read
+# `document.documentElement.outerHTML` back through `Runtime.evaluate`. The
+# functions below are that path, lifted verbatim from `CdpSession` at
+# `e1ff8d3`.
+#
+# WHY IT WENT, in one sentence each:
+#
+#   * A rendered DOM carries nonces, timestamps and session ids, so its sha
+#     changes on every fetch — nondeterministic input to an engine whose
+#     central guarantee (L3) is byte-identical output from identical sources.
+#   * A rendering cannot be a spreadsheet. The documents this fetcher exists
+#     for are increasingly not pages, and `outerHTML` has nothing to say about
+#     a `.xlsx`.
+#   * `_call` below DISCARDS every message that is not its own id. That is the
+#     specific defect the replacement's event pump fixes: an interleaved CDP
+#     event is lost, and under interception a lost `Fetch.requestPaused` is a
+#     paused request nobody resolves, which wedges the page.
+#
+# The replacement does not render at all — it intercepts the response and hands
+# fux the bytes the server sent. See the live file's module docstring for the
+# measurement that decided it.
+
+SETTLE_MS = 500  # extra wait after load for JS-heavy pages
+
+
+def capture(self, url: str) -> str:
+    """Rendered outerHTML for one URL."""
+    self.ensure_chrome()
+    target = self._page_target()
+    ws = WebSocket(target["webSocketDebuggerUrl"])  # noqa: F821 - see header
+    try:
+        self._call(ws, "Page.enable", {})
+        self._call(ws, "Page.navigate", {"url": url})
+        self._wait_event(ws, "Page.loadEventFired", timeout=LOAD_TIMEOUT_S, url=url)  # noqa: F821
+        time.sleep(SETTLE_MS / 1000)  # noqa: F821
+        result = self._call(
+            ws,
+            "Runtime.evaluate",
+            {"expression": "document.documentElement.outerHTML", "returnByValue": True},
+        )
+        html = result.get("result", {}).get("value", "")
+        if not isinstance(html, str) or not html:
+            raise FetcherError(f"CDP returned no DOM for {url}")  # noqa: F821
+        return html
+    finally:
+        ws.close()
+
+
+def _call(self, ws, method: str, params: dict) -> dict:
+    """⚠ THE DEFECT. Every message that is not `msg_id` is dropped on the floor."""
+    self._msg_id += 1
+    msg_id = self._msg_id
+    ws.send_text(json.dumps({"id": msg_id, "method": method, "params": params}))  # noqa: F821
+    deadline = time.monotonic() + LOAD_TIMEOUT_S  # noqa: F821
+    while time.monotonic() < deadline:
+        message = json.loads(ws.recv_text())  # noqa: F821
+        if message.get("id") == msg_id:
+            if "error" in message:
+                raise FetcherError(f"CDP {method} failed: {message['error'].get('message')}")  # noqa: F821
+            return message.get("result", {})
+    raise FetcherError(f"CDP {method}: no response within {LOAD_TIMEOUT_S}s")  # noqa: F821
+
+
+def _wait_event(self, ws, event: str, timeout: float, url: str) -> None:
+    """Same defect, mirrored: a command reply arriving here is discarded."""
+    deadline = time.monotonic() + timeout  # noqa: F821
+    while time.monotonic() < deadline:
+        message = json.loads(ws.recv_text())  # noqa: F821
+        if message.get("method") == event:
+            return
+    raise FetcherError(  # noqa: F821
+        f"page never fired {event} for {url} within {timeout:.0f}s — "
+        "the site may block headless Chrome, or needs a longer LOAD_TIMEOUT_S"
+    )

@@ -44,12 +44,15 @@ from .config import (
 )
 from . import decode as decode_mod
 from .errors import FuxError
-from .ingest import fuxignore
+from .ingest import fuxignore, refusals, sourcelist
 from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from .store import fuxdir
 
 #: Generated name -> the package-data file it is copied from.
 FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
+
+#: The starter refusal rules, shipped as package data like the fetchers.
+REFUSALS_TEMPLATE = "refusals.toml.txt"
 
 FETCHERS_DIR = "fetchers"
 
@@ -160,8 +163,9 @@ _DIRS_HEADER = """\
 """
 
 _TYPES_HEADER = """\
-# Which files are documents. One glob per line; `!` subtracts. A pattern with
-# no `/` matches the file NAME anywhere, so `*.md` means every markdown file.
+# Which files are documents, and which decoder reads each one. One glob per
+# line; `!` subtracts. A pattern with no `/` matches the file NAME anywhere, so
+# `*.md` means every markdown file.
 #
 # THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
 # absent file never means "index everything" and never means "index nothing".
@@ -174,21 +178,47 @@ _TYPES_HEADER = """\
 # source (ADR-TYPES decision 10). From here they are YOURS -- setup never
 # rewrites this file, so the list stays exactly as you leave it.
 #
+# `decoder=` IS THE MAP: it BINDS an extension to the module that reads it.
+# Without it, "which decoder reads .csv" is a property of the code installed on
+# a machine -- a built-in's EXTENSIONS tuple, possibly replaced by a consumer
+# module of the same name -- so two people with different .fux/decoders/ could
+# commit different indexes from the same sources with nothing saying so. A
+# binding makes the answer a committed line (ADR-TYPES decision 11).
+#
+# THE BINDING IS CHECKED, NOT TRUSTED. A line naming a module that does not
+# exist stops the run, and so does one that takes an extension AWAY from the
+# decoder that claims it and gives it to a module that does not. It is never a
+# silent fallback: the wrong decoder does not fail visibly, it produces a
+# plausible index with different postings.
+#
+# YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
+# be bound to it -- a .geojson is JSON, so `*.geojson decoder=jsondoc` is all it
+# takes, with no module to copy or edit. EXTENSIONS is a decoder's DEFAULT
+# CLAIM, not a list of what it can read. What is refused is REDIRECTING an
+# extension another decoder already claims.
+#
+# A binding is per EXTENSION, so `decoder=` sits only on a bare `*.ext` line --
+# dispatch sees a suffix and nothing about which glob admitted the file, so
+# `docs/api/*.json decoder=jsondoc` would bind every .json in the corpus.
+#
+# A PROSE FORMAT CARRIES NO BINDING. It is already text and no decoder is in
+# its path, so there is nothing to name.
+#
 # NOTHING BELOW NEEDS INSTALLING. fux's runtime is stdlib-only and declares no
 # third-party dependencies, so every built-in decoder works out of the box. A
 # format that needed something installed would appear under OPT-IN at the
 # bottom, commented, with the command that enables it.
 #
-# What is OUT of the default, and why: source code, shell scripts, SVG and
+# What is OUT of the default, and why: source code, shell scripts and
 # extensionless files. They have no decoder, machine data is not a document,
 # and indexing it inflates `df` for exactly the terms your real documents are
 # trying to be found by. Extensionless files are LICENSE, Makefile and
 # Dockerfile far more often than they are prose.
 #
 # ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
-# format READABLE; a line in this file is what makes it INDEXED. Both are
-# required, and that is deliberate -- what counts as a document stays a
-# committed line a human wrote.
+# format READABLE; a line here is what makes it INDEXED, and the binding on
+# that line is what makes it read by a NAMED module. All three are separate on
+# purpose -- what counts as a document stays a committed line a human wrote.
 #
 #   !*.min.md          # subtract a generated flavour
 #
@@ -204,11 +234,10 @@ _TYPES_OPT_IN = """\
 #
 #   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
 #      one there as a worked example; see the fux-decoder skill)
-#   2. uncomment its glob here
+#   2. uncomment its glob here and add `decoder=<module stem>`
 #   3. `fux ingest`
 #
 #*.log
-#*.svg
 """
 
 _FUXIGNORE = """\
@@ -457,12 +486,27 @@ def _seed_types() -> bytes:
     """
     from .ingest.gitdir import DEFAULT_TYPES
 
-    decoded = {f"*{ext}" for ext in decode_mod.builtin_extensions()}
+    bindings = decode_mod.builtin_bindings()
+    decoded = {f"*{ext}" for ext in bindings}
     prose = [glob for glob in DEFAULT_TYPES if glob not in decoded]
-    body = ["", "# --- prose: already text, no decoder involved ---"]
+    body = ["", "# --- prose: already text, no decoder in the path ---"]
     body += sorted(prose)
-    body += ["", "# --- decoded by a built-in decoder (stdlib only, nothing to install) ---"]
-    body += sorted(glob for glob in DEFAULT_TYPES if glob in decoded)
+    body += ["", "# --- decoded: extension -> the module that reads it ---"]
+    body += [
+        "# stdlib only, nothing to install. The binding on each line is what",
+        "# dispatch resolves; fux checks it against the module it names.",
+    ]
+    # ⚠ **Grouped by decoder, not by extension.** Sorting the whole block
+    # alphabetically puts `*.csv` next to `*.cfg`, which are read by different
+    # modules, and splits `*.htm`/`*.html`/`*.xhtml` across the list. Grouping
+    # is what makes the file legible AS a map; within a group the extensions
+    # are still sorted, so the output stays a pure function of the registry.
+    for name in sorted(set(bindings.values())):
+        body.append("")
+        body += [
+            sourcelist.render_line(f"*{ext}", {"decoder": name}, sourcelist.TYPES)
+            for ext in sorted(e for e, n in bindings.items() if n == name)
+        ]
     return (_TYPES_HEADER + "\n".join(body) + "\n" + _TYPES_OPT_IN).encode("utf-8")
 
 
@@ -568,6 +612,11 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # way it is not for `types`, so the seed can be honest about knowing
     # nothing. Write-if-missing like the rest -- `fux setup` never rewrites it.
     _write_if_missing(root / fuxignore.IGNORE_FILE, _FUXIGNORE.encode("utf-8"), report, root)
+    # ADR-REFUSAL: policy, not code. Written once, never rewritten -- the rules
+    # in it are the consumer's to delete, including the vendor ones.
+    _write_if_missing(
+        refusals.rules_path(root), template_bytes(REFUSALS_TEMPLATE), report, root
+    )
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
     # Every key commented out, so a fresh repo runs on the engine's own
     # defaults and the file is a menu rather than a configuration (ADR-TUNE

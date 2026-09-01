@@ -32,10 +32,17 @@ def test_ensure_layout_never_overwrites_consumer_edits(tmp_path):
 
 
 def test_gitignore_lists_only_derived_dirs_and_never_a_wildcard(tmp_path):
+    """⚠ **Gitignored is not the same as derived** (ADR-ACQUIRED).
+
+    `acquired/` is the third category: gitignored like `runtime/` and *not*
+    rebuildable, because a blob can only be re-ACQUIRED and only while the
+    source still answers. It belongs in this file for the same reason
+    `runtime/` does and in `DERIVED` for none.
+    """
     fuxdir.ensure_layout(tmp_path)
     text = (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8")
     entries = [l.strip() for l in text.splitlines() if l.strip() and not l.startswith("#")]
-    assert entries == [f"{name}/" for name in fuxdir.DERIVED]
+    assert entries == [f"{name}/" for name in (*fuxdir.DERIVED, *fuxdir.ACQUIRED)]
     assert "*" not in entries
     for committed in fuxdir.COMMITTED:  # a committed plane must never be listed
         assert f"{committed}/" not in entries
@@ -53,9 +60,9 @@ def test_generated_files_are_ascii_with_lf_only(tmp_path):
 def test_readme_documents_every_declared_entry(tmp_path):
     fuxdir.ensure_layout(tmp_path)
     text = (tmp_path / ".fux" / "README.md").read_text(encoding="utf-8")
-    for name in (*fuxdir.COMMITTED, *fuxdir.DERIVED):
+    for name in (*fuxdir.COMMITTED, *fuxdir.DERIVED, *fuxdir.ACQUIRED):
         assert f"`{name}/`" in text
-    assert "committed" in text and "derived" in text
+    assert "committed" in text and "derived" in text and "acquired" in text
 
 
 def test_derived_dir_creates_and_tags(tmp_path):
@@ -83,11 +90,16 @@ def test_declared_covers_every_kind_of_child():
     category: `COMMITTED` holds directories, so a committed *file* had no row
     anywhere and `fux doctor` warned about it forever. `.fux/tune.toml` would
     have shipped straight into that warning.
+
+    `ACQUIRED` joined on 2026-09-01 for the same reason and with the same
+    consequence: `.fux/acquired/` is neither committed nor rebuildable, and a
+    category missing here is a permanent `fux doctor` warning.
     """
     assert set(fuxdir.DECLARED) == {
         *fuxdir.COMMITTED,
         *fuxdir.COMMITTED_FILES,
         *fuxdir.DERIVED,
+        *fuxdir.ACQUIRED,
         *fuxdir.GENERATED_FILES,
     }
 

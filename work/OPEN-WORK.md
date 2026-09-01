@@ -11,6 +11,26 @@ The two run **concurrently**; never order one against the other.
 
 ---
 
+## Blocked on Arpit
+
+*Named here so a session leads with it instead of burying it. **The oldest is
+5 days — at CLAUDE.md's threshold, not past it** — so nothing is age-flagged
+today. A session that finds one that IS names it, with its age, in its first
+output.*
+
+| what he decides | filed | age |
+|---|---|---|
+| **The ETag acceptance criterion, re-worded or accepted.** *"`fux update` with a matching ETag performs no body download"* is **unmet as written** — CDP interception is at the **response** stage, so Chrome has already transferred the body; `validate()` saves the decode and the shard comparison, **not bandwidth**. Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12 rather than quietly satisfied | 2026-09-01 | 0d |
+| **Whether the W-83 shape gets a gate.** A key was accepted in a record, assigned in the ownership table, and **never implemented** — every mechanical check passed, because the freshness gate proves a record was *touched*, never that it is *true*. That is the **second** recorded occurrence, which is what CLAUDE.md's two-strikes rule makes a trigger. ⚠ **No check was written**: "the record is true" is not mechanically definable, and shipping a loose approximation is the moving-threshold failure in another costume | 2026-09-01 | 0d |
+| **`superseded_weight`** — W-94 below. Doing nothing is legitimate | 2026-08-28 | 4d |
+| **`rerank_weight`** — the no-op pattern, under *adr update*. Doing nothing is legitimate | 2026-08-28 | 4d |
+| **Whether zero abstentions out of 20 gates anything** — under *adr update* | 2026-08-28 | 4d |
+| **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 4d |
+| **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 4d |
+| **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 5d |
+
+---
+
 ## Measurement plumbing
 
 - **The lab and playground harnesses emit totals only.** `fux-benchmark`'s
@@ -56,6 +76,48 @@ The two run **concurrently**; never order one against the other.
   a defect. `filed: 2026-08-28`
 
 ### testing
+
+- 🔴 **W-101 — the `fux doctor` pass, and it now carries FOUR things** ·
+  `agent` · *(records: [ADR-TYPES](../docs/adr/0031_types-list.md) decision 11
+  veto 4 · [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) ·
+  [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) ·
+  [ADR-REFUSAL](../docs/adr/0051_refusals.md) ·
+  [ADR-PII](../docs/adr/0053_pii.md))* · **One pass at `doctor.py` closes all
+  four; they are grouped because splitting them means four passes at one file.**
+
+  1. 🔴 **The `as-ingested` share is the VETO CHECK for two accepted records**
+     ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
+     [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)) — **until `doctor`
+     reports it, neither veto can be run at all.** That is the one with damage
+     that accrues: every day more code ships under two records nobody can check.
+  2. **Decoder bindings are not resolved.** A types file naming a decoder that
+     was deleted, or one whose `EXTENSIONS` moved, is discovered only on the
+     next `fux ingest`. ⚠ Since decision 11a there is a **third** thing only
+     `doctor` can catch: a binding on an extension **no file in the corpus
+     has** — what a typo in the *extending* direction looks like. Deliberately
+     not an ingest error; a report is the right weight (*"3 bindings match no
+     document"*).
+  3. **No refusal rule counts.** An over-broad rule is visible only in a run's
+     output, so a rule that silently refuses the whole corpus looks like a
+     corpus with nothing in it.
+  4. **No redaction counts.** They already exist in `redact()`'s return value
+     and are simply not surfaced.
+
+  ⚠ **What `doctor` structurally CANNOT see, and no amount of this item fixes:**
+  a well-formed PII rule that is too broad removes real vocabulary, documents
+  stop being findable, and nothing looks wrong.
+  [`tools/pii-probe/`](../tools/pii-probe/README.md) is the only instrument for
+  that. `filed: 2026-09-01`
+
+- 🔴 **`.fux/enrich/` is committed and unredacted** · `agent` ·
+  *(records: [ADR-PII](../docs/adr/0053_pii.md) decision 1 ·
+  [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 11)* · **A real hole in the
+  rule ADR-PII states, not a nice-to-have.** A model handed a document writes
+  enrichment prose into a **committed** file; decision 1 says that file should
+  be redacted and it is not. The matcher already exists and
+  `fux enrich --check` is where it belongs. ⚠ It is written into **both**
+  records now, so no reading of decision 1 can be taken to say the surface is
+  covered. `filed: 2026-09-01`
 
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·
   [ADR-RS](../docs/adr/0036_predictions.md))* · **the knob sweep — which

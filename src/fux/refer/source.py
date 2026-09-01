@@ -51,9 +51,9 @@ from pathlib import Path
 
 from .. import store as store_mod
 from ..errors import FuxError
-from ..ingest.urlsrc import sanitize
+from ..ingest.urlsrc import _decode_fetched, sanitize
 
-__all__ = ["Fetched", "resolve", "fetch_document", "GIT", "URL"]
+__all__ = ["Fetched", "resolve", "fetch_document", "from_acquired", "GIT", "URL"]
 
 GIT = "git"
 URL = "url"
@@ -89,6 +89,40 @@ def fetch_document(root: Path, doc_id: str, loc: str, *, fetcher=None) -> Fetche
     if resolve(doc_id) == GIT:
         return _read_local(root, doc_id, loc)
     return _fetch_url(doc_id, loc, fetcher)
+
+
+def from_acquired(root: Path, doc_id: str, loc: str) -> Fetched | None:
+    """The retained bytes for `loc`, decoded exactly as ingest decoded them.
+
+    `None` when nothing is retained, when the blob has been deleted by hand,
+    or when it no longer decodes — every one of which means *we have nothing
+    to compare*, which is `unverified`, not a verdict.
+
+    ⚠ **`_decode_fetched` and `sanitize` are IMPORTED, never reimplemented.**
+    A verify-time sha is compared against an ingest-time sha, so a one-line
+    divergence between two copies of that pipeline would mark every retained
+    document permanently stale — a defect that presents as a working feature.
+    This module already shares `sanitize` for exactly that reason; the decode
+    step has to travel with it.
+    """
+    if resolve(doc_id) != URL:
+        return None
+    try:
+        from ..store import acquired
+
+        blob = acquired.read_manifest(root).get(loc)
+        path = acquired.stored(root, loc)
+        if blob is None or path is None:
+            return None
+        raw = path.read_bytes()
+        markdown, _why = _decode_fetched(raw, blob.content_type, loc, root)
+    except Exception:
+        # Advisory to the last: a broken blob costs a verdict, never a query.
+        return None
+    if not markdown or not markdown.strip():
+        return None
+    content = sanitize(markdown)
+    return Fetched(doc_id, loc, content, store_mod.content_sha(content), URL)
 
 
 def _read_local(root: Path, doc_id: str, loc: str) -> Fetched:

@@ -73,11 +73,33 @@ from ..errors import FuxError
 
 @dataclass(frozen=True)
 class Attribute:
-    """One closed attribute: its name, its legal values, what absence means."""
+    """One attribute: its name, its legal values, what absence means.
+
+    ⚠ **`values` is empty for a TYPED attribute, and `validate` carries the
+    rule instead.** Every attribute was a closed enum until `ttl` (ADR-URL-
+    FRESHNESS): a duration is an unbounded value, and there is no tuple of
+    legal ones to write. The enum is still the default and still the right
+    shape for `fetch`, `meta`, `archived` and `keep` -- a typed attribute is
+    the exception, and its validator must produce the same *kind* of error the
+    enum does, naming what was wrong rather than what was expected.
+    """
 
     name: str
     values: tuple[str, ...]
     default: str
+    #: `None` -> the value is legal. A string -> why it is not. Consulted only
+    #: when `values` is empty.
+    validate: Callable[[str], str | None] | None = None
+
+    def reject(self, raw: str) -> str | None:
+        """Why `raw` is not a legal value here, or `None`."""
+        if self.values:
+            if raw in self.values:
+                return None
+            return f"is not one of {', '.join(self.values)}"
+        if self.validate is not None:
+            return self.validate(raw)
+        return None
 
 
 @dataclass(frozen=True)
@@ -166,11 +188,104 @@ def _type_reason(entry: str) -> str | None:
     return None
 
 
+#: `ttl=` accepts `0` or `<int><s|m|h|d>`. Seconds would have been unambiguous
+#: and unreadable at a glance; named tiers (`daily`, `hourly`) would have been
+#: readable and ambiguous -- is `daily` a rolling 24h or midnight? A suffixed
+#: integer is both, and it is the same shape `acquired_max_bytes` reads.
+_DURATION_UNITS = {"s": 1, "m": 60, "h": 3600, "d": 86400}
+
+_TTL_HELP = (
+    "must be 0 (always re-fetch) or <number><unit> where unit is "
+    "s, m, h or d - for example 30s, 15m, 1h, 7d"
+)
+
+
+def parse_duration(raw: str) -> int | None:
+    """`"1h"` -> 3600. `None` when the text is not a duration.
+
+    ⚠ **Stored verbatim, compared resolved.** `60m` and `1h` are the same
+    policy and are NOT the same line, because config order must never change a
+    committed byte -- so the file keeps what a human wrote and only the
+    resolved seconds are ever compared. `fux add` writes the canonical form.
+    """
+    text = raw.strip()
+    if text == "0":
+        return 0
+    if len(text) < 2:
+        return None
+    unit = _DURATION_UNITS.get(text[-1])
+    if unit is None or not text[:-1].isdigit():
+        return None
+    return int(text[:-1]) * unit
+
+
+def _ttl_reason(raw: str) -> str | None:
+    return None if parse_duration(raw) is not None else _TTL_HELP
+
+
+#: A decoder name is a MODULE STEM -- `csvdoc`, never `csvdoc.py` and never
+#: `.fux/decoders/csvdoc.py`. It is the same key ADR-DECODE decision 5 resolves
+#: an override on, so a binding and an override cannot disagree about what they
+#: are naming.
+_DECODER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")
+
+_DECODER_HELP = (
+    "must be a decoder module name - lowercase letters, digits and underscores, "
+    "not starting with `_` (a leading underscore marks a shared helper the "
+    "registry skips), with no `.py` suffix and no directory part"
+)
+
+
+def _decoder_reason(raw: str) -> str | None:
+    """Why `raw` is not a decoder name, or `None`. **Shape only.**
+
+    Whether a module by that name exists is deliberately NOT checked here: the
+    parser cannot reach the decoder registry, and reaching for it would make
+    reading a config file depend on importing every decoder. Existence and the
+    extension agreement are checked where the binding is applied
+    (`decode.registry`), which is also the only place that can say what the
+    module actually claims. Same split `dirs` already makes -- it accepts any
+    repo-relative path and leaves existence to `fux doctor`.
+    """
+    # `""` is the resolved default and means *no declared binding*: the
+    # extension resolves through the decoder's own EXTENSIONS tuple, which is
+    # what every line did before this attribute existed. It has to stay legal
+    # because `render_line` states every attribute, so a generated line reads
+    # `*.md decoder=` and must parse back to the same entry.
+    if raw == "":
+        return None
+    return None if _DECODER_NAME_RE.fullmatch(raw) else _DECODER_HELP
+
+
 URLS = ListSpec(
     kind="urls",
     attributes=(
         Attribute("fetch", ("http", "cdp"), "http"),
         Attribute("meta", ("plain", "hashed"), "hashed"),
+        # ADR-ACQUIRED. Retain the bytes this URL returned.
+        #
+        # ⚠ **Default TRUE, and it was `false` for one day.** The argument for
+        # off-by-default was a stranger's 9,000-URL corpus quietly filling a
+        # disk. `[sources.url] acquired_max_bytes` answers that directly -- the
+        # store is bounded and evicts -- and once the blast radius is bounded,
+        # defaulting off means almost nobody gets the thing the plane exists
+        # for: a citation that can still be checked when the source cannot be
+        # reached. `keep=false` on the line, or `--no-keep`, opts out.
+        Attribute("keep", ("true", "false"), "true"),
+        # ADR-URL-FRESHNESS. How long a citation may go unchecked at ask time.
+        # THE FIRST TYPED ATTRIBUTE: a duration has no tuple of legal values.
+        #
+        # The default is NOT 0. A repo-wide always-fetch turns every `fux ask`
+        # into a network operation against a warm p95 of 27.2 ms, which is a
+        # cost nobody asked for; a day is generous enough to be invisible and
+        # short enough to catch a document that moved.
+        Attribute("ttl", (), "24h", validate=_ttl_reason),
+        # ADR-PII/W-99: the same attribute the `dirs` list carries, and it
+        # means the same thing. A `url:` document is enrichable because
+        # `.fux/acquired/` holds its bytes locally -- before the acquired
+        # plane there was nothing for `fux enrich --plan` to chunk, which is
+        # why this attribute could not exist on this list until now.
+        Attribute("enrich", ("true", "false"), "false"),
     ),
     validate=_url_reason,
 )
@@ -193,12 +308,19 @@ DIRS = ListSpec(
     allow_exclusions=True,
 )
 
-#: `.fux/sources/types` — which files in a source tree are documents at all.
-#: No attributes: a pattern is a pattern, and every property one might want to
-#: hang on it belongs to the *directory* it was found under.
+#: `.fux/sources/types` — which files in a source tree are documents at all,
+#: and which decoder reads each one.
+#:
+#: ⚠ **This list had NO attributes until 2026-09-01**, on the rule that "a
+#: pattern is a pattern, and every property one might want to hang on it
+#: belongs to the *directory* it was found under". `decoder` is the exception
+#: and the reason is that it is not a property of the directory: it is a
+#: property of the **extension**, which is exactly what a line here names.
+#: Ruled by Arpit; carried by [ADR-TYPES](../../../docs/adr/0031_types-list.md)
+#: decisions 11 and 11a.
 TYPES = ListSpec(
     kind="types",
-    attributes=(),
+    attributes=(Attribute("decoder", (), "", validate=_decoder_reason),),
     validate=_type_reason,
     allow_exclusions=True,
 )
@@ -309,11 +431,9 @@ def parse(text: str, spec: ListSpec, *, origin: str) -> list[Entry]:
                 )
             if key in declared:
                 raise FuxError(f"{origin}:{lineno}: attribute {key!r} is given twice")
-            if raw_value not in attribute.values:
-                raise FuxError(
-                    f"{origin}:{lineno}: {key}={raw_value!r} is not one of "
-                    f"{', '.join(attribute.values)}"
-                )
+            fault = attribute.reject(raw_value)
+            if fault is not None:
+                raise FuxError(f"{origin}:{lineno}: {key}={raw_value!r} {fault}")
             attrs[key] = raw_value
             declared.add(key)
 
@@ -362,9 +482,19 @@ def render_line(value: str, attrs: dict[str, str], spec: ListSpec) -> str:
     A generated file holds no implicit state: the line says what it means, so
     changing a policy is a one-word diff rather than the appearance or
     disappearance of a key.
+
+    ⚠ **One exception, added with `types.decoder` (2026-09-01): an attribute
+    whose default is EMPTY is omitted at that default.** Decision 12's rule is
+    that a generated line states its policy so a change is a one-word diff —
+    and a bare `decoder=` states no policy and cannot be diffed into one. It
+    would put four dead characters on every prose line in the types file. No
+    other attribute is affected: `fetch`, `meta`, `keep`, `ttl`, `archived` and
+    `enrich` all have real defaults, so all are still written at their default.
     """
-    resolved = spec.defaults() | {k: v for k, v in attrs.items() if k in spec.defaults()}
-    return " ".join([value, *(f"{name}={resolved[name]}" for name in spec.names)])
+    defaults = spec.defaults()
+    resolved = defaults | {k: v for k, v in attrs.items() if k in defaults}
+    stated = [name for name in spec.names if resolved[name] or defaults[name]]
+    return " ".join([value, *(f"{name}={resolved[name]}" for name in stated)])
 
 
 def _render_attrs(attrs: dict[str, str]) -> str:

@@ -173,3 +173,44 @@ def test_archived_dirs_excludes_exclusion_lines(tmp_path):
 
     _write_dirs(tmp_path, ["old archived=true", "!old/keep"])
     assert archived_dirs(tmp_path, ".fux/sources/dirs") == ["old"]
+
+
+# -- [sources.url] acquired_max_bytes (ADR-CONFIG decision 12) --------------
+#
+# ⚠ **This key was DOCUMENTED before it was parsed.** ADR-ACQUIRED decision 8
+# named it and the ownership table gave it to `config.py`, while `config.py`
+# never read it and `urlsrc.fetch_all` reached for it through an undefined
+# name -- a `NameError` on every retaining fetch. These tests are the gate on
+# the parse half; `tests/ingest/test_urlsrc.py` covers the use half.
+
+_URL_SOURCE = '[sources]\n[sources.url]\nmax_parallel = 4\n'
+
+
+def test_acquired_max_bytes_defaults_to_none_not_to_a_number(tmp_path):
+    """`None` defers to the store's own default rather than freezing today's
+    constant into every repo that never thought about the question."""
+    _write(tmp_path, _URL_SOURCE)
+    assert load(tmp_path).url.acquired_max_bytes is None
+
+
+def test_acquired_max_bytes_is_read_when_stated(tmp_path):
+    _write(tmp_path, _URL_SOURCE + "acquired_max_bytes = 1048576\n")
+    assert load(tmp_path).url.acquired_max_bytes == 1048576
+
+
+def test_acquired_max_bytes_refuses_a_bool_and_a_non_integer(tmp_path):
+    # `bool` is an `int` subclass, so `true` would otherwise parse as 1 -- a
+    # one-byte cap that evicts the entire store. Same trap as decision 11.
+    _write(tmp_path, _URL_SOURCE + "acquired_max_bytes = true\n")
+    with pytest.raises(FuxError, match="acquired_max_bytes must be an integer"):
+        load(tmp_path)
+    _write(tmp_path, _URL_SOURCE + 'acquired_max_bytes = "2GB"\n')
+    with pytest.raises(FuxError, match="acquired_max_bytes must be an integer"):
+        load(tmp_path)
+
+
+def test_acquired_max_bytes_refuses_zero_and_points_at_the_real_knob(tmp_path):
+    """Retaining nothing is `keep = false`, not a zero-byte store."""
+    _write(tmp_path, _URL_SOURCE + "acquired_max_bytes = 0\n")
+    with pytest.raises(FuxError, match="keep = false"):
+        load(tmp_path)

@@ -127,10 +127,28 @@ def test_a_dirs_line_carries_its_attribute_too(repo, monkeypatch):
     assert "handbook archived=false" in _dirs(repo)
 
 
-def test_a_types_line_carries_none_because_the_set_is_empty(repo, monkeypatch):
+def test_a_types_line_carries_the_decoder_that_reads_it(repo, monkeypatch):
+    """⚠ **This test asserted the opposite until 2026-09-01**, when `types`
+    gained its first attribute (ADR-TYPES decision 11). It read
+    *"carries none because the set is empty"*; the set is no longer empty, and
+    a written line now states the binding fux would otherwise have derived.
+    """
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    assert "\n*.pdf\n" in types
+    assert "\n*.pdf decoder=pdfdoc\n" in types
+
+
+def test_a_prose_type_carries_no_binding_because_no_decoder_reads_it(repo, monkeypatch):
+    """The empty default is written as absence, not as a bare `decoder=`.
+
+    `*.md` reaches the index as text with no decoder in its path, so there is
+    nothing to bind and nothing to state — and four dead characters on every
+    prose line would be the cost of pretending otherwise.
+    """
+    _add(repo, monkeypatch, _args("*.pdf", types=True))
+    types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
+    assert "\n*.md\n" in types
+    assert not [line for line in types.split("\n") if line.rstrip().endswith("decoder=")]
 
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
@@ -352,12 +370,19 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
     (ADR-TYPES), so a one-line file is a corpus-wide invisible filter — the
     exact defect W-55 was opened about. Found by running the verb.
     """
+    from fux.decode import builtin_bindings
     from fux.ingest.gitdir import DEFAULT_TYPES
 
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
+    bindings = builtin_bindings()
     for pattern in DEFAULT_TYPES:
-        assert f"\n{pattern}\n" in types or types.endswith(f"\n{pattern}\n")
+        # A seeded line states its binding when a decoder reads the format and
+        # nothing when one does not, so the seed IS the map rather than a list
+        # the map is derived from somewhere else.
+        binding = bindings.get(pattern[1:].lower(), "")
+        line = f"{pattern} decoder={binding}" if binding else pattern
+        assert f"\n{line}\n" in types or types.endswith(f"\n{line}\n")
     assert "*.pdf" in types
 
 

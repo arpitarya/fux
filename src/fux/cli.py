@@ -353,6 +353,9 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--plain", action="store_true", help="URLs: record meta=plain — readable display text in the index")
         p.add_argument("--hashed", action="store_true", help="URLs: record meta=hashed (the default)")
         p.add_argument("--archived", action="store_true", help="dirs: record archived=true")
+        p.add_argument("--keep", action="store_true", help="URLs: record keep=true - retain the fetched bytes in .fux/acquired/ (the default)")
+        p.add_argument("--no-keep", action="store_true", help="URLs: record keep=false - do not retain the fetched bytes")
+        p.add_argument("--ttl", metavar="D", help="URLs: record ttl=D - how long a citation may go unchecked at ask time (0, 30s, 15m, 1h, 7d)")
         p.add_argument("--dry-run", action="store_true", help="print the line and the plan; write nothing")
 
     p_add = sub.add_parser(
@@ -395,6 +398,15 @@ def build_parser() -> argparse.ArgumentParser:
         "--all",
         action="store_true",
         help="fetch every listed URL, not just the ones known to be stale",
+    )
+    # ADR-URL-FRESHNESS. A flag on the existing networked verb, never a new
+    # one: `fux retry` would be a second way to do what `update` already does,
+    # and ADR-CLI decision 1 refuses that. The selector is url-state's own
+    # `fail_streak > 0`, which is the number that file exists to report.
+    p_update.add_argument(
+        "--failed",
+        action="store_true",
+        help="fetch only the URLs whose last run failed (fail_streak > 0)",
     )
     _add_progress_flags(p_update)
     p_update.set_defaults(func=_cmd_update)

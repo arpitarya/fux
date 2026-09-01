@@ -80,8 +80,12 @@
       "query terms that match no document anywhere in the corpus -- never",
       "corpus content, so it is not an L2 or L5 surface.",
       "",
-      "`verified` is the refer plane's four-state verdict and `cached` is NEVER",
-      "folded into `current`, exactly as in `answer_citation`. `ask` and `find`",
+      "`verified` is the refer plane's SIX-state verdict and neither `cached` nor",
+      "`as-ingested` is EVER folded into `current`, exactly as in `answer_citation`.",
+      "`as-ingested` means the source could not be reached but the passage still",
+      "matches the bytes in `.fux/acquired/` that the record was built from: a",
+      "real comparison, so not `unverified`; silent about the world now, so not",
+      "`current`. `ask` and `find`",
       "fetch nothing and therefore always report `unverified`: 'we did not",
       "look', never 'we looked and it was fine'.",
       "",
@@ -116,7 +120,7 @@
       "support":    { "type": "int",  "required": "always",
                       "doc": "results scoring above zero. BOUNDED BY --top: a corpus-wide count would differ between --fast and --scan and break the differential law" },
       "verified":   { "type": "str",  "required": "always",
-                      "enum": ["current", "stale", "unverified", "cached"] },
+                      "enum": ["current", "stale", "unverified", "cached", "as-ingested"] },
       "missing":    { "type": "list", "of": "str", "required": "always",
                       "doc": "the query's own terms that match no document anywhere. `[]` means full coverage" }
     },
@@ -140,7 +144,7 @@
       "inclusive line range, because an agent acts on a citation by opening a",
       "file at a line.",
       "",
-      "`freshness` is the four-state verdict and `cached` is NEVER folded into",
+      "`freshness` is the six-state verdict and neither `cached` nor `as-ingested` is folded into",
       "`current` -- collapsing 'we did not look' into 'we looked and it was",
       "fine' is the failure the refer plane exists to prevent."
     ],
@@ -149,7 +153,7 @@
       "loc":       { "type": "str", "required": "always", "doc": "path:L<start>-L<end>, 1-based inclusive" },
       "sha":       { "type": "str", "required": "always", "doc": "of the bytes actually cited" },
       "freshness": { "type": "str", "required": "always",
-                     "enum": ["current", "stale", "unverified", "cached"] }
+                     "enum": ["current", "stale", "unverified", "cached", "as-ingested"] }
     },
     "example": {
       "id": "file:docs/mesh.md",
@@ -210,7 +214,7 @@
       "ADR-PROVENANCE nothing called it -- the record was built on every",
       "`answer` and thrown away. This key is that record reaching a caller.",
       "",
-      "PER DOCUMENT it carries the four-state freshness verdict AND BOTH SHAs",
+      "PER DOCUMENT it carries the six-state freshness verdict AND BOTH SHAs",
       "-- `indexed_sha` is what ranking scored, `fetched_sha` is what was read.",
       "A citation shows you the second; only this shows you both, which is the",
       "difference between *the answer is current* and *we checked*.",

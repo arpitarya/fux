@@ -388,7 +388,17 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     # The claim the test was really making — that the file says what is OUT and
     # why — restated against what it now says.
     assert "What is OUT of the default, and why" in types
-    assert "\n#*.svg" in types, "an opt-in format is present but commented, not absent"
+
+    # ⚠ Was `assert "\n#*.svg" in types`. `.svg` rejoined the default on
+    # 2026-08-29 when `svgdoc` shipped as a built-in, which left the template
+    # asserting a line that CONTRADICTED the file it was in: `*.svg` was an
+    # active line above and a commented "not indexed until you uncomment"
+    # line below, under a heading reading "nothing here has a built-in
+    # decoder". The stale half was dropped on 2026-09-01. `#*.log` is the
+    # genuine article — no built-in reads it — and carries the same claim.
+    assert "\n#*.log" in types, "an opt-in format is present but commented, not absent"
+    assert "\n#*.svg" not in types, "a format with a built-in decoder is not an opt-in"
+    assert "\n*.svg decoder=svgdoc" in types, "…it is an active line, bound to its decoder"
     assert "\n*.sh" not in types, "a format with no decoder is not an active line"
 
 

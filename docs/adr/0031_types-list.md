@@ -253,6 +253,91 @@ that has run setup it retires the ⚠ consequence below about the default moving
 whenever a built-in decoder is added. A repo with **no** types file still tracks
 `DEFAULT_TYPES` and still sees that movement.
 
+**11. A `types` line BINDS its extension to the decoder that reads it —
+`decoder=<module stem>` — and fux CHECKS the binding rather than trusting it.**
+Ruled by Arpit 2026-09-01: *"don't comment it, map it in a proper way and use
+the file as map."*
+
+⚠ **This reverses "no attributes at all for `types`", which this record carried
+from 2026-08-20 to 2026-09-01.** The old rule was *"a pattern is a pattern, and
+every property one might want to hang on it belongs to the **directory** it was
+found under"* — and `sourcelist.parse` still says so in the error it raises for
+an unknown key: *"Adding one is a change to the record, not a config
+addition."* This is that change, said out loud.
+
+**Why `decoder` is the exception rather than the first crack in the rule.** The
+old rule's test is *whose property is this?* — and every attribute considered
+before now (a `types=` per `dirs` line, a per-root override) belonged to the
+**directory**, which is why they were refused. `decoder` belongs to neither the
+directory nor the pattern: it is a property of the **extension**, and an
+extension is exactly what a line in this file names. A binding on
+`docs/api/*.json` is refused for precisely this reason (`_bound_extension`) —
+dispatch is keyed on the suffix and knows nothing about which glob admitted the
+file, so a path-scoped binding would silently apply corpus-wide.
+
+**What it fixes.** Before it, *"which decoder reads `.csv`"* was a property of
+the code installed on a machine — a built-in's `EXTENSIONS` tuple, possibly
+replaced by a consumer module of the same name under
+[ADR-DECODE](0042_decode.md) decision 5. Two people with different
+`.fux/decoders/` contents could commit **different indexes from the same
+sources**, and nothing in the repo recorded which decoder had run. The binding
+makes the answer a committed line, which is the same move decision 1a already
+makes for *what is indexed*: **adding a decoder must not, by itself, change the
+index.**
+
+⚠ **The check is a HARD ERROR, never a fallback**, and that asymmetry is the
+whole point. The tempting behaviour — fall back to the tuple-derived decoder
+and carry on — is the dangerous one: **the wrong decoder does not fail
+visibly.** It produces a plausible index with different postings, and a corpus
+built on it is not detectably wrong from the inside. This is decision 7's rule
+in [ADR-DECODE](0042_decode.md) applied one layer up, for the same L3 reason.
+
+**11a. What the module verifies is NARROWER than "the extension is in its
+`EXTENSIONS`", and the line between the two is EXTENDING versus REDIRECTING.**
+Amended 2026-09-01, the same day, when the first obvious use of the feature was
+refused by it.
+
+| the line | who claims the extension | verdict |
+|---|---|---|
+| `*.geojson decoder=jsondoc` | **nobody** | **allowed** — extending |
+| `*.csv decoder=jsondoc` | `csvdoc` does | **refused** — redirecting |
+| `*.csv decoder=mycsv` (consumer, claims `.csv`) | the named module itself | allowed |
+| `*.geojson decoder=nosuchdoc` | — | refused, no such module |
+
+**`EXTENSIONS` is a decoder's DEFAULT CLAIM, not a declaration of what it is
+capable of reading.** A `.geojson` is JSON and `jsondoc` reads JSON; a `.cnf` is
+an INI file. Requiring a consumer to copy `jsondoc.py` into `.fux/decoders/` and
+edit one tuple to say so would make the map **a worse answer than the code it
+replaced** — the file would be able to describe dispatch but not to change it,
+which is most of the point.
+
+**Why extending cannot be stale.** With no decoder claiming `.geojson` there is
+no competing answer for the line to disagree with: without it the extension has
+no decoder at all, so the binding is purely additive. The refused direction is
+the one where two answers exist and the line picks the module that does not want
+the extension — a typo or a stale line far more often than intent.
+
+⚠ **This is where the check gives ground, stated plainly.** fux cannot tell a
+deliberate `*.geojson decoder=jsondoc` from a typo'd one, and no longer tries.
+**The two mistakes are not the same size:** a typo in the extending direction
+binds a decoder to a suffix no file has, which indexes nothing; the refused
+direction silently re-reads real documents with the wrong reader. Same-sized
+answers for different-sized mistakes is what made the first version refuse the
+feature's main use. To redirect an extension anyway, write a consumer decoder
+that declares it — a committed file, which is the right weight for that intent.
+
+**Absence still means the old behaviour.** A line with no `decoder=` resolves
+through the module tuples exactly as every line did before, so no existing
+types file changes meaning and no corpus moves. `fux setup` and `fux source
+add` now WRITE the binding they would have derived — the map fux already had,
+committed instead of implied — so a generated file states its dispatch and a
+hand-written one may stay silent.
+
+**A prose format carries no binding**, because no decoder is in its path.
+`render_line` therefore omits an attribute at an EMPTY default, which is the
+one narrowing of [ADR-URL-LIST](0018_url-list.md) decision 12 this change makes:
+a bare `decoder=` states no policy and cannot be diffed into one.
+
 ### Consequences
 
 - ⚠ **Narrowing what counts as a document is a ranking change, and this record
@@ -270,7 +355,17 @@ whenever a built-in decoder is added. A repo with **no** types file still tracks
   cost ADR-FUXIGNORE decision 4 pays for the file meaning what its name says,
   and **nothing has been measured about how often anyone reaches for it.**
 - **The trio under `.fux/sources/` is complete**: `dirs` says *where*, `types`
-  says *what*, `urls` says *what else*.
+  says *what* — and, since decision 11, *read by what* — and `urls` says *what
+  else*.
+- ⚠ **`types` now has an attribute, so the "no attributes" argument is spent as
+  a blanket answer.** The next proposal to hang something on a pattern gets the
+  test in decision 11, not a flat no: *is this a property of the extension, or
+  of the directory it was found under?* A per-root `types=` is still the latter
+  and is still refused — it is veto condition 1, unchanged.
+- ⚠ **A hand-written types file states no bindings and gets no warning.** Every
+  line still resolves, through the tuples, exactly as before — so the map is
+  complete only in files fux generated or a human filled in. Nothing reports
+  the gap today; `fux doctor` is where that would go.
 - **A `.txt` or `.org` corpus works with no configuration**, which is the half
   of the argument a compiled-in-only allowlist could not deliver.
 - ⚠ **The default now moves whenever a built-in decoder is added.** That is
@@ -311,8 +406,20 @@ the short version:
   (`_PROSE_TYPES`, `_default_types`, `DEFAULT_TYPES`, `read_types`,
   `walk_sources`) and the shared grammar in
   [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py)
-  (`TYPES`, `glob_match`); the decoder registry the default unions with —
-  [ADR-DECODE](0042_decode.md).
+  (`TYPES`, `_decoder_reason`, `render_line`, `glob_match`); the decoder
+  registry the default unions with — [ADR-DECODE](0042_decode.md).
+- Decision 11's binding, resolved and checked:
+  [`src/fux/decode/__init__.py`](../../src/fux/decode/__init__.py)
+  (`_declared_bindings`, `_bound_extension`, `_bind`, `builtin_bindings`), and
+  written by [`src/fux/setup.py`](../../src/fux/setup.py) (`_seed_types`) and
+  [`src/fux/sources.py`](../../src/fux/sources.py). Held by
+  [`tests/decode/test_binding.py`](../../tests/decode/test_binding.py) — 20
+  cases, including that a binding beats load order when two decoders claim one
+  extension, and that every binding fux writes survives the check fux applies.
+- **Django `DATABASES['default']['ENGINE']`** — the committed config names the
+  backend module by import path rather than letting an installed driver claim a
+  scheme, which is the same "the config binds, the module is checked" shape —
+  <https://docs.djangoproject.com/en/stable/ref/settings/#engine>
 - The verdict and its matrix:
   [`work/compare/file-type-filter.compare.md`](../../work/compare/file-type-filter.compare.md)
 - **Sphinx `source_suffix`** — allowlist by extension; an unlisted suffix is
@@ -338,6 +445,15 @@ the short version:
 3. **A measured run shows the type filter made ranking worse.** ⚠ **It has not
    been measured at all**, and this record says so rather than assuming the
    obvious direction.
+4. **A binding is checked at ingest but nothing checks it at rest** — i.e. a
+   repo can sit for months with a types file naming a decoder that was deleted,
+   and learn about it only on the next `fux ingest`. Checkable today: `fux
+   doctor` does not resolve bindings. The migration is additive.
+5. **Two built-in decoders claim one extension.** `builtin_bindings()` resolves
+   the collision by module order, which is arbitrary the moment it can happen —
+   and it is what `fux setup` writes into every new repo.
+   `tests/decode/test_binding.py::test_every_builtin_extension_has_exactly_one_builtin_binding`
+   fails the day this becomes true.
 4. **The default is ever derived from the live decoder registry** rather than
    from the built-ins — decision 1a.
 5. **`.fux/.fuxignore`'s `!` override is measurably used to admit undecoded

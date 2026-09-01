@@ -574,7 +574,7 @@ refusing.
 
 | flag | verb | effect |
 |---|---|---|
-| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path |
+| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path. ⚠ Since 2026-09-01 `add` also records `decoder=` — the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([ADR-TYPES](0031_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
 | `--cdp` / `--http` | `add` | URLs: record `fetch=`. Both at once is an error, not a silent pick |
 | `--plain` / `--hashed` | `add` | URLs: record `meta=`. Same rule |
 | `--archived` | `add` | dirs: record `archived=true` |

@@ -27,10 +27,192 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-08-28**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-01**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### The most recent change: the version benchmark ran, and the ruler was what broke (W-93, 2026-08-28)
+### Nothing is blocked. `2.0.0-alpha.5` is cut (2026-09-01)
+
+**`work/BLOCKED.json` reads `PROCEED`.** It had read `RESOLVED` — not a value
+in the schema — so every prompt announced an open blocker for a decision Arpit
+made on 2026-09-01. ⚠ **That is how a surfacing mechanism gets ignored**, and it
+is worth knowing that the failure was in the *file*, not in the ruling.
+
+**Pending decisions that are NOT blockers** live in
+[`OPEN-WORK.md`](OPEN-WORK.md)'s `Blocked on Arpit` table — a block that CLAUDE.md
+requires and that **did not exist in the file** until 2026-09-01. Two rows are
+new and both are genuinely his:
+
+1. **The ETag acceptance criterion** — *"`fux update` with a matching ETag
+   performs no body download"* is **unmet as written**: CDP interception is at
+   the response stage, so the body has already transferred. `validate()` saves
+   the decode and the shard comparison, not bandwidth
+   ([ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12).
+2. **Whether the W-83 shape gets a gate.** `acquired_max_bytes` was accepted in
+   a record, assigned in the ownership table, and **never implemented** — every
+   mechanical check passed, because the freshness gate proves a record was
+   *touched*, never that it is *true*. Second recorded occurrence, which is the
+   two-strikes trigger. **No check was written on purpose:** *"the record is
+   true"* is not mechanically definable, and a loose approximation is the
+   moving-threshold failure in another costume.
+
+**What is actually open:** [W-101](OPEN-WORK.md), a single `doctor.py` pass
+carrying four things — and its first is the **veto check for TWO accepted
+records** ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
+[ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)), so until it lands
+neither veto can be run at all. Plus the `.fux/enrich/` redaction hole.
+
+### The W-98 build, all four phases (2026-09-01)
+
+⚠ **Phase 2's spec was CUT, not built, and the boundary HELD.** The `status`,
+`final_url_host` and `final_url_contains` conditions and the always-on
+`landed-off-origin` check would have put HTTP facts inside the engine, which
+[ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 13 forbids — and whose own
+veto names *"`urlsrc.py` mentions a status code"* as proof of regression. Arpit
+ruled CUT; the six remaining conditions are pure over the bytes, and provider
+detection survives as `body_contains` over **form-field names**, which are an
+API between a page and its own backend and outlive the redesigns that rewrite
+every visible string. [ADR-REFUSAL](../docs/adr/0051_refusals.md) decision 4.
+
+The item's detail file is archived at
+[`archive/open/W-98-acquired-plane.md`](../archive/open/W-98-acquired-plane.md)
+— **named, never cited**; two of its own claims were wrong, which the archive
+row states.
+
+### In flight: W-98 Phase 1 LANDED; phases 2–4 remain (2026-09-01)
+
+**`2.0.0-alpha.4` is released and on PyPI** (`e1ff8d3`; three built-in decoders
+— jsonl, svg, images — at `91614f1`). **Phase 1 is in the working tree,
+uncommitted.**
+
+**The state a reader must not misread.** W-98 was 🔴 blocked before its first
+line of code at session start. It is no longer: the spike is closed, Arpit
+ruled, and `cdp.py` now returns the intercepted resource. **Three of the four
+phases are still unbuilt.**
+
+🔴 **THE HEADLINE, and it is a lesson about specs rather than about CDP.** The
+spec's prescribed technique — an in-page `fetch(url, {credentials:'include'})`
+via `Runtime.evaluate` — **could never have worked**, and §5.1 had marked it
+*"decided — do not re-litigate"*. Measured, same headless Chrome, no tenant:
+
+| target | in-page `fetch` | `Fetch.enable` + `getResponseBody` |
+|---|---|---|
+| cross-origin, **no `ACAO`** | 🔴 `TypeError: Failed to fetch` | ✅ **8557 bytes** |
+| `Content-Disposition: attachment` | — | ✅ intercepted **before** it becomes a download |
+
+**CORS and CSP are page-level; CDP is browser-internal and neither reaches it.**
+And a cross-origin in-page fetch exposes only **CORS-safelisted** response
+headers, so **`ETag` was invisible** — Phase 1's own `validate()` deliverable
+was unbuildable under the technique that specified it. **Arpit lifted the
+"do not re-litigate" on 2026-09-01** and adopted interception. **Spike step 4
+(his signed-in Chrome) is no longer a gate**, only a confirmation.
+
+⚠ **The generalisable part: a spec can foreclose a decision it got wrong, and
+the marker that says "settled" is exactly what stops the next reader checking.**
+The measurement that overturned it took one session. The instruction not to
+re-litigate had stood since the item was filed.
+
+**What Phase 1 shipped** — `src/fux/templates/cdp.py.txt`, rewritten in the
+middle, contract and transport unchanged:
+- `Fetch.enable(requestStage: "Response")` → `Page.navigate` → `requestPaused`
+  → `getResponseBody`. **`Page.navigate` is dispatched WITHOUT awaiting its
+  reply** — it cannot commit while we hold its response paused, so awaiting it
+  deadlocks. That line looks like a missing `await` and is not.
+- **`CdpSession` gained an event pump.** The old `_call` discarded every message
+  that was not its own id. ⚠ Under interception a lost `Fetch.requestPaused` is
+  a paused request nobody resolves, and that **wedges the page until the
+  timeout rather than raising** — it reads as a slow site.
+- **`urlPattern` is `"*"`, not the target URL.** A download 30x-es to a CDN and
+  each hop is its own paused request; a narrow pattern stops matching at the
+  first redirect. The price is that every paused request must be resolved.
+- `validate(url)` returns the `ETag`. `LAUNCH_CHROME` now defaults **`False`**.
+- The rendering path is at `archive/templates/cdp-rendering.py.txt` — **named,
+  never cited.**
+
+🔴 **Two things a next session owes Arpit rather than deciding.**
+1. **An acceptance criterion is unmet as written**: *"`fux update` with a
+   matching ETag performs no body download."* Interception is at the response
+   stage, so the body has already transferred — `validate()` saves the decode
+   and the shard comparison, **not bandwidth**. Written into ADR-CDP-FETCHER
+   decision 12 rather than quietly satisfied. He re-words it or accepts it.
+2. ~~**a `handoff/` directory under `work/` exists and duplicates
+   [W-98](../archive/open/W-98-acquired-plane.md) §11.**~~ **CLOSED 2026-09-01 — and it
+   was never Arpit's call, because it was never a deletion.** CLAUDE.md's rule
+   is *move* to the one archive, not remove: the pair is executed (all four
+   phases landed), so it went to
+   [`archive/handoff/`](../archive/README.md) with a successor row naming the
+   three records it produced, and W-98 §2/§11 now point at
+   [ADR-REFUSAL](../docs/adr/0051_refusals.md) instead of at the moved file.
+   `tests/test_archive_law.py` is green. ⚠ **The lesson worth keeping is the
+   one that produced the red:** a handoff was written into the `work/`-side
+   directory retired on 2026-08-18, and both copies then had to be *kept in sync by hand* for a
+   day — which is the failure retiring the directory was meant to prevent.
+
+⚠ **BREAKING, and it reaches every consumer:** `settle_ms` is removed from
+`[sources.url.config]` — there is no render step left to settle. It raises a
+message naming the retirement rather than falling into the generic unknown-key
+list. And ⚠ **`fux setup` is write-if-missing, so a repo with a hand-edited
+`cdp.py` gets nothing** — Phase 1 does not reach them. This repo's own copy was
+byte-identical to the old template (verified before writing) and was synced.
+
+⚠ **The other trap in the item, now ruled.** The spec claimed `cdp.py`'s
+`HTMLParser`/`urljoin` were dead code from W-86 P8. **They are not** —
+`extract_links` has no caller in `src/`, but the file's comment and
+`tests/ingest/test_cdp_fetcher.py` retain it deliberately. **Arpit ruled: keep
+the code, fix the docstring.** Done. And
+[ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) is still `⏳ proposed` with
+`owns: []` — **a record claims what the table gives it today.**
+
+**Suite: 2647 unit passed, 2 skipped, 74 e2e passed** (2026-09-01, after the
+red-suite sweep below). `fux doctor` green.
+
+### Alongside that: the types file became the decoder map (W-99, 2026-09-01, Cowork)
+
+**Landed in the working tree, in parallel with the W-98 work above.** Different
+files, one overlap (`sources.py`).
+
+`.fux/sources/types` lines now carry `decoder=<module stem>`, and dispatch
+resolves it. `registry()` applies the binding **over** both built-in
+`EXTENSIONS` and consumer-module precedence, and `_bind` **checks** it: a
+missing module, or one whose `EXTENSIONS` does not claim the extension, stops
+the run.
+
+**Why it exists.** *"Which decoder reads `.csv`"* used to be a property of the
+code on a machine. Two clones with different `.fux/decoders/` could commit
+different indexes from the same sources, with nothing recording which decoder
+ran. It is now a committed line that fux verifies.
+
+⚠ **It reverses a settled rule** — `types` had no attributes, deliberately,
+since 2026-08-20; `sourcelist.parse`'s own error text still says *"Adding one is
+a change to the record, not a config addition."* Arpit ruled it. The test that
+keeps it from being the first crack is in ADR-TYPES decision 11 and is **whose
+property is it** — the directory's (still refused, veto 1) or the extension's.
+
+**Five records touched**: ADR-TYPES d11 + **11a**, ADR-DECODE d13,
+ADR-URL-LIST d12 narrowed (an attribute at an *empty* default is omitted),
+ADR-CLI and ADR-DOTFUX annotated. Four of them because four components changed.
+
+⚠ **Decision 11a was written hours after 11, because 11 refused its own main
+use case.** `*.geojson decoder=jsondoc` — a new extension on an existing
+decoder — raised, since `_bind` demanded the extension be in the module's
+`EXTENSIONS`. **Extending is now separated from redirecting**: an extension
+nothing claims may go to any decoder; one another decoder claims may not be
+handed to a module that does not claim it. **`EXTENSIONS` is a default claim,
+not a capability list** — that misreading was the whole defect. If you are
+about to tighten this back up, read 11a first: the two directions are different
+sizes of mistake and that is why they get different answers.
+
+⚠ **Verified in a Linux container, NOT on the device** — `device_bash` was
+wedged for the whole session. `tests/` **400 passed / 5 failed**, `tests_e2e/`
+**74 passed / 0 failed**, plus a real setup→ingest→ask and both failure modes.
+**The 5 are pre-existing** (`test_sourcelist.py` vs the `keep`/`ttl` attributes)
+and are filed as **W-100**; the baseline was measured at 318/5 before any edit,
+which is the only reason that claim is checkable.
+
+**First thing to do on a working shell: `uv run pytest -q tests tests_e2e` on
+macOS.** Nothing here is platform-sensitive by inspection, but that is
+reasoning, not a run.
+
+### Before that: the version benchmark ran, and the ruler was what broke (W-93, 2026-08-28)
 
 **`fux-engine 1.0.0` vs working-tree `HEAD`, executed end to end.** Filed at
 [`regression/2026-08-28-benchmark-v1-vs-head/`](regression/2026-08-28-benchmark-v1-vs-head/report.md),

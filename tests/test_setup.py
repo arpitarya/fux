@@ -158,14 +158,27 @@ def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
 
 
 def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
-    """ADR-TYPES decision 10 — visible without reading fux's source."""
+    """ADR-TYPES decision 10 — visible without reading fux's source.
+
+    Since decision 11 the written line also states its **binding**, so what is
+    visible is the whole map: the pattern, and the module that reads it.
+    """
+    from fux.decode import builtin_bindings
     from fux.ingest.gitdir import DEFAULT_TYPES
 
     setup_mod.run(tmp_path)
     text = (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8")
     active = [ln for ln in text.splitlines() if ln.strip() and not ln.startswith("#")]
     assert active, "a header alone is not a types file"
-    assert sorted(active) == sorted(DEFAULT_TYPES)
+
+    bindings = builtin_bindings()
+    expected = [
+        f"{glob} decoder={bindings[glob[1:].lower()]}"
+        if glob[1:].lower() in bindings
+        else glob
+        for glob in DEFAULT_TYPES
+    ]
+    assert sorted(active) == sorted(expected)
 
 
 def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):

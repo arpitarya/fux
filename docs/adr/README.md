@@ -179,7 +179,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0016](0016_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
 | [0018](0018_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar for all three lists | accepted | yes |
 | [0019](0019_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, returning bytes and a content type, and nothing composes | accepted | yes |
-| [0020](0020_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — drives your existing Chrome over CDP on a hand-rolled stdlib WebSocket; never escalated to | accepted | yes |
+| [0020](0020_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — borrows your signed-in Chrome over CDP and **intercepts the response**, returning the server's bytes rather than a rendering; never escalated to | accepted | yes |
 | [0021](0021_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET written into your repo by `fux setup`, so core keeps zero network lines; and it never escalates | accepted | yes |
 | [0022](0022_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — `!` subtracts, and `archived=true` is a declaration never derived from a path | accepted | yes |
 | [0023](0023_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | accepted | yes |
@@ -208,10 +208,14 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0047](0047_output-defaults.md) | **ADR-OUTPUT** | Output defaults are configurable in a third file, `.fux/output.toml` — a third boundary: not what is indexed, not which documents come back, but **how they are shown**. The one surface it exists for is **MCP**, which has no flags at all | accepted | yes |
 | [0048](0048_fuxignore.md) | **ADR-FUXIGNORE** | `.fux/.fuxignore` — one file for what is not indexed, in `.gitignore`'s grammar; read first, and the only thing that outranks the type allowlist in both directions | accepted | yes |
 | [0049](0049_ownership.md) | **ADR-OWNERSHIP** | `owns` and `describes` — the record-to-component model itself, which two tests enforced and no record decided. Exactly one owner per component; any number of describers, and the freshness gate demands all of them | accepted | **no** |
+| [0050](0050_acquired-plane.md) | **ADR-ACQUIRED** | Fetched source bytes are retained in `.fux/acquired/` — a **third** category beside committed and derived: gitignored like derived, but **not rebuildable**, only re-acquirable, and only while the source exists and the session holds. Clock-free: eviction orders by `run_seq`, never by an mtime | accepted | **no** |
+| [0051](0051_refusals.md) | **ADR-REFUSAL** | The response a server sends **instead** of the document — a sign-in wall, a paywall, an Office viewer shell. A declarative `.fux/refusals.toml`, **every condition pure over the bytes** (ADR-FETCHER decision 13 held rather than amended), under an always-on magic-byte floor no consumer can switch off | accepted | **no** |
+| [0052](0052_url-freshness.md) | **ADR-URL-FRESHNESS** | Six verdicts that never collapse into each other — `as-ingested` is a real comparison against retained bytes, and is neither `current` nor `unverified`. Plus `ttl=` as a per-URL bound that **narrows** the caller's policy and can never widen it | accepted | **no** |
+| [0053](0053_pii.md) | **ADR-PII** | **Redact what gets committed; leave alone what stays local.** A consumer-owned `.fux/pii.toml` redacts the index and nothing else — acquired bytes, refer passages and `fux answer` quotes stay as they are. The sha is taken **before** redaction, or every redacted document verifies as `stale` against its own unchanged source. **No built-in floor**, unlike ADR-REFUSAL: a format signature is a fact, a PII definition is a policy | accepted | **no** |
 
 > ## The number line has holes, on purpose — `0017` and `0025` are burned
 >
-> **`0001`–`0049`, with two gaps that are never filled.** The gaps are the rule
+> **`0001`–`0053`, with two gaps that are never filled.** The gaps are the rule
 > working, not a mess to tidy:
 >
 > - **A vacated ordinal is burned and never reused** (W-82 ruling 7). `0025`
@@ -315,13 +319,16 @@ table does not grant.
 | `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, the URL section, the runner check and the **fetcher-capability notice** — all read-only, all offline. The notice is decision 6's own named mechanism (*a `doctor` check, never a rewrite*) applied to [ADR-FETCHER](0019_fetcher.md) decisions 12–13; it reads the consumer's fetcher **as text and never imports it** |
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions, and the declared record shape |
-| `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator |
+| `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator — and the **three** kind declarations (`COMMITTED`, `DERIVED`, `ACQUIRED`) the generated README table is built from |
+| `src/fux/store/acquired.py` | ADR-ACQUIRED | the retained-bytes plane — content-addressed blobs, the advisory manifest, `sweep` and `evict`. **Carved out of `store/`'s claim for a different DECISION, not a different concern**: everything else under `store/` is the committed index, and this is the one plane that is neither committed nor rebuildable |
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |
 | `src/fux/ingest/priors.py` | ADR-INGEST | ⚠ **covered by the directory claim, and described by no record's decisions.** It computes the supersession and recency priors and writes `mtime` and `superseded` into the committed record; ADR-RECORD documents the properties and ADR-TUNE the weights, but the module's own behaviour is unrecorded |
 | `src/fux/ingest/extract.py` | ADR-EXTRACTED | what extraction *promises* — title, phrases, terms and per-field lengths, taken from the bytes and nothing else |
 | `src/fux/ingest/sourcelist.py` | ADR-URL-LIST | the one grammar all three committed source lists are parsed by |
 | `src/fux/ingest/fuxignore.py` | ADR-FUXIGNORE | `.fux/.fuxignore` — the `.gitignore` grammar, the last-match-wins resolution, and the duplicate-pattern warning. **Carved out of ADR-INGEST's directory claim for a different DECISION, not a different concern**: everything else under `ingest/` is a step in the walk, and this is a *precedence rule* over it — the one thing that outranks the type allowlist |
 | `src/fux/ingest/urlsrc.py` | ADR-FETCHER | fux's half of the fetch contract — load, configure, bound, call, normalize |
+| `src/fux/ingest/pii.py` | ADR-PII | the redaction matcher, the ruleset digest, and the plane table stating that redaction reaches the committed index and nothing else. Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent — a *policy over* the walk, not a step in it |
+| `src/fux/ingest/refusals.py` | ADR-REFUSAL | the refusal matcher — six byte-pure conditions and the always-on magic-byte floor. **Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent**: everything else under `ingest/` is a step in the walk, and this is a *refusal rule* over it |
 | `src/fux/decode/` | ADR-DECODE | bytes → Markdown, in one place: the built-in decoders, the registry, the override precedence and the `.fux/decoders/` consumer seam. Separate from ADR-INGEST's claim because the record it carries is a **boundary** — where consumer-supplied dependencies become legal — not a step in the walk |
 | `src/fux/derive/` | ADR-T1-ACCELERATOR | T1 build, block maxima, skipping, and the declared runtime shapes |
 | `src/fux/query/` | ADR-ASK | the scan, unification, and the display-only resolution after it — bound by the differential law |
@@ -340,15 +347,20 @@ table does not grant.
 | `src/fux/maintain/` | ADR-MAINTENANCE | the git hooks and their installer, the deferring runner, the write lock, the daemon and the local state files. **L5's write-time check is deliberately NOT here** — it lives in `store/writer.py`, because a check beside the thing it guards cannot be skipped |
 | `src/fux/maintain/mergedriver.py` | ADR-MERGE-DRIVER | the merge driver itself — carved out because its failure mode and its gate are its own |
 | `src/fux/refer/` | ADR-REFER | source · freshness · chunk · rescore · assemble. **Imports no transport**: the consumer's fetcher is injected |
+| `src/fux/refer/freshness.py` | ADR-URL-FRESHNESS | the six verdicts and the policy object — the **claim-strength vocabulary**, which now reaches past `refer/` into the output schema and `fux verify`. Carved out of ADR-REFER's directory claim on `arc.py`'s precedent |
 | `src/fux/refer/arc.py` | ADR-CACHE | the content cache, keyed `(loc, sha)` so a hit cannot change an answer |
 | `src/fux/refer/fetchcache.py` | ADR-CACHE | the TTL fetch store — the only place in the engine that reads a wall clock |
 | `src/fux/templates/` | ADR-FETCHER | the two shipped fetchers as package data; **bytes, never imported** |
+| `src/fux/templates/pii.toml.txt` | ADR-PII | the shipped starter rules — the safe ones enabled, the checksum-needing ones commented out with what each over-matches |
+| `src/fux/templates/refusals.toml.txt` | ADR-REFUSAL | the six shipped starter rules. Carved out of ADR-FETCHER's `templates/` claim on `ENRICH-SKILL.md`'s precedent — it is data a consumer edits, not a fetcher |
 | `src/fux/templates/agents/` | ADR-AGENT-POLICY | the canonical agent policy and its per-vendor renderings, shipped as wheel package data (`setup.py` itself stays with ADR-DOTFUX — one component, one owner) |
 | `src/fux/templates/agents/ENRICH-SKILL.md` | ADR-ENRICH | the generation half — a skill rather than code, because a model call may not live under `src/` |
 | `src/fux/templates/agents/DECODER-SKILL.md` | ADR-DECODE | how to write or edit a decoder — a **build procedure for one plane**, not a rendering of the archived-results policy |
 | `tests/test_regression_runs.py` | ADR-RS | the per-run contract for a conformance run. **The harnesses are not claimed here**: a harness belongs to the feature it measures, the discipline belongs to the record |
 | `tools/pruning-eval/` | ADR-POSTINGS | the gate harness and its frozen pre-registrations, held by the record that owns the pruning decision and carries its standing law |
 | `tools/maintenance-bench/` | ADR-MAINTENANCE | the hook-latency and merge-driver harness. **One file runs both, and a component is owned once** |
+| `tools/pii-probe/` | ADR-PII | what a rule would remove from a real corpus. The only thing that can see an over-broad rule — `doctor` compiles patterns and structurally cannot |
+| `tools/refusal-probe/` | ADR-REFUSAL | the shipped rules against real captured responses, and the runnable form of this record's veto condition. Owned by the record whose claim it tests |
 | `tools/refer-bench/` | ADR-REFER | the latency harness and its frozen pre-registration — a real `http.server` behind the **consumer's own generated fetcher**, so the measured path is the shipped one |
 | `tools/refer-budget-sweep/` | ADR-REFER | the assembler-vs-greedy budget sweep and its frozen pre-registration |
 | `tools/differential/` | ADR-T1-ACCELERATOR | the differential-law harness and its bench. ⚠ **No test imports it**, so it can break silently — and has |
@@ -392,6 +404,23 @@ the relation *look* enforced while asserting things nobody checked.
 | `src/fux/query/__init__.py` | ADR-OUTPUT | the emission gate (`_show_band`, `_gated`) lives here — where a rendering decision reaches into a file whose subject is the query itself |
 | `src/fux/derive/accel.py` | ADR-CONFIDENCE | `stats_out` is passed through here so the accelerator and the scan agree about `df`/`n`. **The differential law is what makes this load-bearing**: if only one path carried it, the two would disagree about how confident fux is |
 | `src/fux/query/rank.py` | ADR-TUNE | `[priority]` is DATA in ADR-TUNE and RESOLUTION on `rank.py::Weighting` — the register's own ownership note already says so, which is what made this row checkable rather than asserted |
+| `src/fux/ingest/run.py` | ADR-PII | the redaction pass, and its position between `content_sha` and `extract_fields` — decision 3, which is the whole record. Also `_pii_ruleset_moved`, the reuse invalidation. Owned by ADR-INGEST for the walk |
+| `src/fux/enrich.py` | ADR-PII | `enrich=` for `url:` documents — `_document_text` reading the retained blob, and the single synthetic `.fux/sources/urls` scope. Owned by ADR-ENRICH for enrichment itself |
+| `src/fux/ingest/sourcelist.py` | ADR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
+| `src/fux/config.py` | ADR-PII | `[sources.url] enrich` — the source-wide layer |
+| `src/fux/doctor.py` | ADR-PII | `_pii_health` — compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule, and says so |
+| `src/fux/store/fuxdir.py` | ADR-PII | `pii.toml`'s row in `COMMITTED_FILES` — **the ruleset is committed, and that is the decision** (decision 1): a redaction rule that lived on a gitignored path would redact one clone and not the next, so the file has to sit in the category `fux doctor` audits. Owned by ADR-DOTFUX for the layout |
+| `src/fux/ingest/urlsrc.py` | ADR-ACQUIRED | retention lives in `fetch_all()` and **never inside a fetcher** (decision 5) — W-86 P8's precedent, so every fetcher gains it with no line changed in any of them. Owned by ADR-FETCHER for the contract itself |
+| `src/fux/ingest/urlsrc.py` | ADR-REFUSAL | the refusal check sits in `fetch_all()`, **after `_unpack` and before persist and decode** (decision 1) — the ordering is the decision, and it lives in a file this record does not own |
+| `src/fux/ingest/urlsrc.py` | ADR-URL-FRESHNESS | `UrlEntry.ttl`, and `resolve_urls` applying the same three layers to it as to `keep` — a per-URL freshness bound resolved inside the ingest module |
+| `src/fux/ingest/sourcelist.py` | ADR-URL-FRESHNESS | `ttl` is the **first typed attribute** in the grammar: `Attribute` grew an optional `validate` callable because a duration cannot be a closed enum. Owned by ADR-URL-LIST for the grammar itself, constrained here |
+| `src/fux/ingest/sourcelist.py` | ADR-ACQUIRED | `keep`, and its default flipping to `true` (decision 4) — a value in a file this record does not own |
+| `src/fux/config.py` | ADR-ACQUIRED | `[sources.url] keep` and `acquired_max_bytes` — the source-wide layer and the store's bound |
+| `src/fux/config.py` | ADR-URL-FRESHNESS | `[sources.url] ttl`, validated by the source list's **own** duration grammar rather than a second copy, so `--ttl 1x` and a hand-written `ttl=1x` fail identically |
+| `src/fux/refer/__init__.py` | ADR-URL-FRESHNESS | both `as-ingested` fallback points in `_obtain`, and `min(policy, declared)` — decision 11's arithmetic, which is where a per-URL value is prevented from widening a caller's policy |
+| `src/fux/refer/source.py` | ADR-URL-FRESHNESS | `from_acquired`, and decision 6's rule that it **imports** `_decode_fetched` and `sanitize` rather than reimplementing them — the property the whole fallback rests on |
+| `src/fux/store/fuxdir.py` | ADR-ACQUIRED | the `ACQUIRED` declaration and its `.gitignore` line. Owned by ADR-DOTFUX for the layout; this is the record that added the third kind |
+| `src/fux/doctor.py` | ADR-ACQUIRED | `_acquired_health` — blob count, total bytes, the 80%-of-cap warning, and the gitignore assertion that fails as an **error** rather than a warning |
 | `src/fux/mcp.py` | ADR-OUTPUT | decisions 11, 16 and 17 reach in directly: `[mcp]`'s closed key set (`top` only, `band` refused by name), `tools/list` advertising the RESOLVED `top` rather than a literal (the W-83-class defect this decision exists to prevent), and `[mcp]` being loaded once at `serve()` start rather than per search. Owned by ADR-MCP for the protocol itself; this is a rendering decision reaching into the module that serves it |
 
 <!-- DESCRIBES-TABLE-END -->

@@ -52,6 +52,7 @@ import tempfile
 from pathlib import Path
 from typing import Callable
 
+from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..errors import FuxError
 
 __all__ = [
@@ -212,28 +213,185 @@ def _from_module(module, name: str, *, origin: str) -> Decoder | None:
 
 
 def registry(root: Path | None = None) -> dict[str, Decoder]:
-    """Extension -> decoder, with consumer modules overriding built-ins by name.
+    """Extension -> decoder: the committed binding first, module tuples second.
 
-    Precedence is deliberate and narrow: a consumer module named `htmldoc.py`
-    replaces the built-in `htmldoc`, whatever extensions it declares. Matching
-    on *module name* rather than on extension is what makes an override a
-    replacement rather than a race — two files both claiming `.html` would
-    otherwise resolve by whichever the loader reached first.
+    Precedence, in the order it is applied:
+
+    1. **A built-in's own `EXTENSIONS`.**
+    2. **A consumer module of the same name replaces it wholesale** — not
+       merged, not fallen back to. Matching on *module name* rather than on
+       extension is what makes an override a replacement rather than a race:
+       two files both claiming `.html` would otherwise resolve by whichever the
+       loader reached first (ADR-DECODE decision 5).
+    3. **A `decoder=` binding in `.fux/sources/types` wins over both** — and it
+       is checked, not trusted. A line naming a module that does not exist is a
+       hard error, and so is one that takes an extension away from the decoder
+       that claims it and gives it to a module that does not. **Giving a
+       decoder an extension nothing else claims is allowed** — that is how a
+       consumer reads `.geojson` with `jsondoc` without copying a file. See
+       `_bind`.
+
+    ⚠ **Step 3 is why dispatch is a committed fact rather than a derived one.**
+    Steps 1 and 2 answer *"which decoder happens to claim `.csv` on this
+    machine"*; step 3 answers *"which decoder this repo has agreed reads
+    `.csv`"*, and only the second survives a teammate adding a module.
     """
     decoders: dict[str, Decoder] = {}
+    #: Module name -> decoder, which is the key a binding names. Built in the
+    #: same pass as `decoders` because an extension collision can drop a
+    #: decoder out of the extension map entirely, and a binding must still be
+    #: able to name it.
+    available: dict[str, Decoder] = {}
     consumer = _consumer_decoders(root)
     for name in BUILTIN_MODULES:
         if name in consumer:
             continue  # replaced wholesale; the built-in is not consulted
         built = _load_builtin(name)
         if built is not None:
+            available[name] = built
             for ext in built.extensions:
                 decoders[ext] = built
     for name in sorted(consumer):
         decoder = consumer[name]
+        available[name] = decoder
         for ext in decoder.extensions:
             decoders[ext] = decoder
+    # Snapshot BEFORE any binding is applied: "does another decoder already
+    # claim this extension" must be a question about the modules, not about
+    # which binding happened to be resolved first. Iteration order of the
+    # bindings then cannot change any answer (L3).
+    claimed = dict(decoders)
+    for ext, (name, lineno, origin) in _declared_bindings(root).items():
+        decoders[ext] = _bind(ext, name, lineno, origin, available, claimed)
     return decoders
+
+
+def _bind(
+    ext: str,
+    name: str,
+    lineno: int,
+    origin: str,
+    available: dict[str, Decoder],
+    claimed: dict[str, Decoder],
+) -> Decoder:
+    """Resolve one `decoder=` binding, or fail naming both sides.
+
+    **The file binds and the module verifies** (Arpit, 2026-09-01). What the
+    module verifies is narrower than "the extension is in its `EXTENSIONS`",
+    and the distinction is the whole of this function:
+
+    * **Extending — allowed.** `*.geojson decoder=jsondoc`, where *no decoder
+      claims `.geojson`*. There is no competing answer to be stale against:
+      without the line that extension has no decoder at all, so the binding is
+      purely additive. **`EXTENSIONS` is a decoder's DEFAULT CLAIM, not a
+      declaration of what it is capable of reading** — a `.geojson` is JSON,
+      and requiring a consumer to copy `jsondoc.py` and edit one tuple to say
+      so would make the map a worse answer than the code it replaced.
+    * **Redirecting — refused.** `*.csv decoder=jsondoc`, where `csvdoc`
+      already claims `.csv`. Now there are two answers and the line picks the
+      module that does not want the extension. That is a typo or a stale
+      binding far more often than it is intent, and it is the shape that
+      produces **a plausible index with different postings** rather than a
+      visible failure.
+
+    ⚠ **The asymmetry is deliberate and it is where the check gives ground.**
+    A binding to an extension nothing claims is accepted without fux being able
+    to tell a deliberate extension from a typo'd one — but a typo there binds a
+    decoder to an extension no file has, which indexes nothing, while the
+    refused direction silently re-reads real documents with the wrong reader.
+    **The two mistakes are not the same size**, so they do not get the same
+    answer. To redirect an extension anyway, write a consumer decoder that
+    declares it: that is a committed file, which is the right weight for it.
+    """
+    decoder = available.get(name)
+    if decoder is None:
+        raise FuxError(
+            f"{origin}:{lineno}: no decoder module named {name!r}. The name is a module "
+            f"stem, not a path — a built-in ({', '.join(BUILTIN_MODULES)}) or a file in "
+            f"{CONSUMER_DIR}/. Add {CONSUMER_DIR}/{name}.py, or correct the name"
+        )
+    holder = claimed.get(ext)
+    if ext not in decoder.extensions and holder is not None:
+        raise FuxError(
+            f"{origin}:{lineno}: binds {ext} to decoder {name!r}, but {name} "
+            f"({decoder.origin}) declares EXTENSIONS = {', '.join(decoder.extensions)} and "
+            f"does not claim {ext} — while {holder.name} ({holder.origin}) does. Taking an "
+            f"extension from the decoder that claims it and giving it to one that does not "
+            f"is a typo or a stale line far more often than it is intent, and the wrong "
+            f"reader produces a plausible index rather than a visible failure. Either name "
+            f"{holder.name}, or add {ext} to a decoder in {CONSUMER_DIR}/ that means to read "
+            f"it. (Giving {name} an extension NOTHING claims needs no change — that is a "
+            f"binding fux accepts.)"
+        )
+    return decoder
+
+
+def _bound_extension(pattern: str) -> str | None:
+    """The extension a `*.ext` pattern binds, or `None` for any other shape.
+
+    A binding is per **extension**, because that is the only key dispatch has:
+    `decode()` sees a path's suffix and nothing about which glob admitted it.
+    So `docs/api/*.json decoder=jsondoc` cannot mean what it appears to — it
+    would bind every `.json` in the corpus, not the ones under `docs/api` —
+    and is refused rather than silently widened.
+    """
+    if not pattern.startswith("*.") or "/" in pattern:
+        return None
+    ext = pattern[1:].lower()  # "*.csv" -> ".csv"
+    if len(ext) < 2 or "*" in ext or "?" in ext:
+        return None
+    return ext
+
+
+#: Keyed on the types file's identity AND its stat, so an edit is picked up
+#: within a process while a 10 000-document walk still reads the file once.
+#: `registry()` is called per document (via `claims`), so an uncached read here
+#: would be one open+parse per file walked.
+_BINDINGS: dict[tuple[str, int, int], dict[str, tuple[str, int, str]]] = {}
+
+
+def _declared_bindings(root: Path | None) -> dict[str, tuple[str, int, str]]:
+    """Extension -> (decoder name, line number, file), from `.fux/sources/types`.
+
+    Empty when there is no root or no types file — which is the built-in
+    default, where nothing is declared and every extension resolves through the
+    module tuples. **An absent file never means "bind nothing on purpose"**; it
+    means the same thing it means for the allowlist itself (ADR-TYPES).
+    """
+    if root is None:
+        return {}
+    path = root / TYPES_FILE
+    try:
+        stamp = path.stat()
+    except OSError:
+        return {}
+    key = (str(path), stamp.st_mtime_ns, stamp.st_size)
+    cached = _BINDINGS.get(key)
+    if cached is not None:
+        return cached
+
+    # Deferred: `fux.ingest` imports this package at module level, so importing
+    # it back at module level would close the loop. By the time any document is
+    # decoded both packages are fully initialised. `gitdir._default_types()`
+    # defers the mirror-image import for the mirror-image reason.
+    from ..ingest.sourcelist import TYPES, parse
+
+    out: dict[str, tuple[str, int, str]] = {}
+    for entry in parse(path.read_text(encoding="utf-8"), TYPES, origin=str(path)):
+        name = entry.attrs.get("decoder", "")
+        if entry.exclude or not name:
+            continue
+        ext = _bound_extension(entry.value)
+        if ext is None:
+            raise FuxError(
+                f"{path}:{entry.lineno}: decoder={name} on pattern {entry.value!r}. A binding "
+                f"is per extension — dispatch sees a suffix and nothing about which glob "
+                f"admitted the file — so `decoder=` may only sit on a bare `*.ext` line. "
+                f"Keep this pattern for what it selects and bind the extension on its own line"
+            )
+        out[ext] = (name, entry.lineno, str(path))
+    _BINDINGS[key] = out
+    return out
 
 
 def _consumer_decoders(root: Path | None) -> dict[str, Decoder]:
@@ -268,6 +426,29 @@ def builtin_extensions() -> tuple[str, ...]:
         if decoder is not None:
             out.update(decoder.extensions)
     return tuple(sorted(out))
+
+
+def builtin_bindings() -> dict[str, str]:
+    """Extension -> the BUILT-IN module that reads it, in extension order.
+
+    This is the map `fux setup` and `fux source add` write into a generated
+    types file, so it carries `builtin_extensions()`'s restriction for
+    `builtin_extensions()`'s reason: **built-ins only, never `registry(root)`.**
+    A generated default derived from consumer code would mean dropping a
+    `logdoc.py` into `.fux/decoders/` silently changes what fux writes down as
+    the binding for a format the consumer never mentioned.
+
+    Later built-ins win a shared extension, matching `registry()`'s own order —
+    but no two built-ins claim one today, and `tests/decode/test_decode.py`
+    holds that true.
+    """
+    out: dict[str, str] = {}
+    for name in BUILTIN_MODULES:
+        decoder = _load_builtin(name)
+        if decoder is not None:
+            for ext in decoder.extensions:
+                out[ext] = name
+    return dict(sorted(out.items()))
 
 
 def claims(rel_path: str, root: Path | None = None) -> bool:

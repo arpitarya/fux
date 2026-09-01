@@ -51,8 +51,11 @@ at answer time.**
 >
 > URLs join the corpus through a consumer-owned fetcher file. `fux setup`
 > writes two — `http.py` (a plain stdlib GET, the default) and `cdp.py`
-> (Chrome DevTools Protocol, also pure stdlib) — into `.fux/fetchers/`, where
-> they become **your** code and fux never rewrites them. Add one with
+> (Chrome DevTools Protocol, also pure stdlib, which **borrows the session
+> your own signed-in Chrome already holds** and hands fux the bytes the server
+> sent) — into `.fux/fetchers/`, where they become **your** code and fux never
+> rewrites them. Neither renders a page; both return bytes plus a content type
+> and the decoder plane does the rest. Add one with
 > `fux add <URL> [--cdp] [--plain]`, which records the line **and fetches that
 > one URL**. That and `fux update` are the engine's **two** networked paths;
 > both say on stderr that they went out, and everything else is offline. A
@@ -105,15 +108,31 @@ at answer time.**
 
 ## The `.fux/` directory
 
-Everything fux puts in your repo lives here, and every child is declared as
-**committed** or **derived** ([ADR-DOTFUX](docs/adr/0003_fux-directory.md)):
+Everything fux puts in your repo lives here, and **every child is declared** —
+as `committed`, `derived`, or `acquired`
+([ADR-DOTFUX](docs/adr/0003_fux-directory.md)). `fux doctor` warns about
+anything that is not on this list.
 
 | entry | kind | what it is |
 |---|---|---|
 | `index/` | committed | the sharded JSONL index |
-| `sources/` | committed | the source lists — `dirs` and `urls`, one entry per line |
+| `sources/` | committed | the source lists — `dirs`, `urls` and `types`, one entry per line |
 | `fetchers/` | committed | **your** code (`http.py`, `cdp.py`) — written by `fux setup`, never rewritten |
-| `runtime/` | derived | M2's accelerator segments, and M4's TTL fetch cache nested at `runtime/fetch-cache/` (gitignored, `CACHEDIR.TAG`) |
+| `decoders/` | committed | **your** code, one module per format. **These copies are what run**, not the ones inside the installed package |
+| `enrich/` | committed | pinned enrichment text plus `queue.tsv` — committed, because a backlog is a team fact |
+| `tune.toml` | committed | **how** results are ordered — never what is indexed |
+| `output.toml` | committed | **how** a result is shown — never which documents come back |
+| `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar |
+| `pii.toml` | committed | what is **redacted from the committed index, and only from it** |
+| `refusals.toml` | committed | what a **refusal** looks like here — the sign-in walls and error shells a server returns *instead of* the document |
+| `runtime/` | derived | the accelerator segments, the TTL fetch cache at `runtime/fetch-cache/`, the write lock (gitignored, `CACHEDIR.TAG`) |
+| `acquired/` | **acquired** | the bytes a fetch actually returned, for URLs whose line says `keep=true` |
+
+⚠ **`acquired/` is a third kind, and the distinction is load-bearing.** It is
+gitignored like `runtime/` and it is **not rebuildable** — a blob can only be
+re-*acquired*, and only while the source is still reachable and you are still
+signed in to it. That is exactly why it is worth keeping: it is what lets a
+citation be checked when the source cannot be reached at all.
 
 **Scaffolding has two moments.** Every `fux ingest` writes `.fux/README.md`
 and a narrow `.fux/.gitignore` (derived names only, never `*`) if they are

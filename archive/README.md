@@ -52,6 +52,7 @@ archive/
   adr/                   superseded decision records — old number -> successor NAME
   handoff/               executed handoff + prompt pairs of the current build
   open/                  closed work items — the detail file, once its row left the queue
+  templates/             retired shipped-fetcher code, lifted out of src/fux/templates/
   v0.1/                  build: the first one, pre-reset #1
   v0.26/                 build: the v0.19-0.26 substrate engine, runnable
   v0.26-docs/            build: that engine's frozen doc set
@@ -84,6 +85,7 @@ live successors and are safe to be named from anywhere.
 | [`v0.31.0-fux-dir-layout-handoff.md`](handoff/v0.31.0-fux-dir-layout-handoff.md) · [prompt](handoff/v0.31.0-fux-dir-layout-prompt.md) | 2026-08-11 | [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) |
 | [`v0.31.0-fux-playground-extraction-handoff.md`](handoff/v0.31.0-fux-playground-extraction-handoff.md) · [prompt](handoff/v0.31.0-fux-playground-extraction-prompt.md) | 2026-08-12 | [SETUP-PLAYGROUND](../work/setup/fux-playground.md) |
 | [`v0.32.0-open-items-handoff.md`](handoff/v0.32.0-open-items-handoff.md) · [prompt](handoff/v0.32.0-open-items-prompt.md) | Phases 0 and 1 closed 2026-08-12 | [`work/IMPLEMENTATION.md`](../work/IMPLEMENTATION.md) — the M2 and R2-close rows |
+| [`W-98-acquired-plane-handoff.md`](handoff/W-98-acquired-plane-handoff.md) · [prompt](handoff/W-98-acquired-plane-prompt.md) · [the refusal starter](handoff/W-98-refusals-starter.toml) | all four phases landed 2026-09-01 | [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) · [ADR-REFUSAL](../docs/adr/0051_refusals.md) · [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) — ⚠ **the pair was written into `work/handoff/`, a directory retired on 2026-08-18**, and `tests/test_archive_law.py` was red for a day because of it. The spec it carried lives in [W-98](../work/open/W-98-acquired-plane.md); the shipped refusal starter is `src/fux/templates/refusals.toml.txt`, and this copy is the frozen original |
 
 **Retired while still unresolved — no live successor.** These were archived by
 instruction, not by completion. **Nothing may cite them as grounding**; the
@@ -114,6 +116,7 @@ they are worth keeping.
 
 | item | closed | outcome and live successor |
 |---|---|---|
+| [`W-98-acquired-plane.md`](open/W-98-acquired-plane.md) | 2026-09-01 | **All four phases landed**: the browser fetcher returns the intercepted resource, declarative refusal detection, the clock-free `.fux/acquired/` plane, and `ttl=` with the sixth `as-ingested` verdict. Live successors: [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) · [ADR-REFUSAL](../docs/adr/0051_refusals.md) · [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) · [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md). ⚠ **Two of its own claims were WRONG and are worth knowing**: the in-page `fetch(url, {credentials:'include'})` the spec prescribed could never have worked (CORS/CSP are page-level, CDP is not — so `ETag` was invisible and `validate()` undeliverable), and its guess that `cdp.py`'s `HTMLParser`/`urljoin` were dead code was ruled the other way. ⚠ **Its Phase 2 spec was CUT, not built** — four conditions would have put HTTP facts inside the engine, which [ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 13 forbids |
 | [`W-30-ratify-adr-0001.md`](open/W-30-ratify-adr-0001.md) | 2026-08-19 | Arpit ratified the ingest-mode naming → [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) · [ADR-ENRICHED](../docs/adr/0017_enriched-mode.md), both accepted. The file's own "**Non-blocking**" note was **wrong**: `mode` is a committed wire-format value, so the *reversal* cost rises with every index written |
 | [`W-32-claude-md-adoption.md`](open/W-32-claude-md-adoption.md) | 2026-08-19 | Arpit adopted the M0a rewrite → the live [`CLAUDE.md`](../CLAUDE.md), PROPOSED header deleted. The file's "Correction (2026-08-12): there is no `CLAUDE.md.proposed`" was **wrong as history** — the file existed at `bed2186` and was implemented into `CLAUDE.md` at `3892c55`; `git log --follow` cannot see a delete-plus-overwrite, so a *verified* claim rested on evidence that could not show it |
 
@@ -287,3 +290,13 @@ be named, never cited.***
 | [`open/W-82-rulings-2026-08-27.md`](open/W-82-rulings-2026-08-27.md) | 2026-08-28 | The eighteen rulings from the 2026-08-27 interview, archived with the item they rule on. ⚠ **Ruling 3 is no longer held**; ⚠ **ruling 12's detection mechanism was never Arpit's ruling** — an agent took the recommended shape and it is now load-bearing |
 | [`open/W-90-the-confidence-plane.md`](open/W-90-the-confidence-plane.md) | 2026-08-28 | **Closed.** R10 ran and is [`INCONCLUSIVE`](../work/regression/2026-08-27-r10-separation-floor/VERDICT.md); its contradiction is ruled — the verdict table governs, so a non-monotone crossing is *no change* and `SEPARATION_FLOOR` stays `0.10`. `doc_coverage` ships as a published signal with the gate **ruled off** on a measurement. Live successors: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) decision 12 · [ADR-RS](../docs/adr/0036_predictions.md) decision 18. ⚠ **The verdict is unedited** — the rule is settled, the result is not overturned |
 | [`open/W-91-the-provenance-plane.md`](open/W-91-the-provenance-plane.md) | 2026-08-28 | **Closed — `L8` ratified as reverted** (Arpit, 2026-08-27). Live successors: `CLAUDE.md` §Non-negotiable constraints and [ADR-LAWS](../docs/adr/0001_laws.md) decision 8. ⚠ **The AOL-2006 grounding is OVERRIDDEN, NOT REFUTED** — a later session may not cite the ratification as evidence the risk was disproved; the risk is accepted and confinement is the whole mitigation |
+
+## Archived 2026-09-01 — the CDP fetcher stopped rendering
+
+W-98 Phase 1 rebuilt `.fux/fetchers/cdp.py` to intercept the response rather
+than render the page. The rendering path is kept rather than deleted, because
+it shipped and dogfooded for two releases and its defect is instructive.
+
+| archived | date | live successor |
+|---|---|---|
+| [`templates/cdp-rendering.py.txt`](templates/cdp-rendering.py.txt) | 2026-09-01 | **Superseded, not deleted.** `capture()`, and the `_call`/`_wait_event` pair that discarded every message not their own. Live successor: `src/fux/templates/cdp.py.txt` — `fetch_resource()` on `Fetch.enable`/`Fetch.getResponseBody`, with an event pump that files replies and events separately. Live record: [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md). ⚠ **The discard loop is the point of keeping it**: under interception a lost `Fetch.requestPaused` is a paused request nobody resolves, which wedges the page — the old code's shape is why the new code has a pump |

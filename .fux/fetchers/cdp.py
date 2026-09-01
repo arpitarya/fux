@@ -30,17 +30,54 @@ validates only that it is a table and never reads a key inside it. The
 constants below are therefore *defaults*, and the table overrides them — put
 tunables in `fux.toml` rather than editing this file, and merges stay clean.
 
-This default implementation drives your *existing* Chrome/Chromium (never a
-bundled browser) over CDP: discover or launch → open the page target's
-WebSocket → `Page.navigate` → wait for `Page.loadEventFired` → settle →
-`Runtime.evaluate` (rendered `outerHTML`) → deterministic HTML→markdown.
+    validate(url) -> str | None            # optional; a cheap change token
+
+This default implementation drives your *existing*, *already-signed-in*
+Chrome/Chromium (never a bundled browser) over CDP, and it returns **the
+resource the server sent**, not a rendering of it:
+
+    discover Chrome -> open the page target's WebSocket
+      -> Fetch.enable(requestStage="Response")
+      -> Page.navigate(url)                     [fire-and-forget, see below]
+      -> Fetch.requestPaused                    (final url, status, headers)
+      -> Fetch.getResponseBody                  (base64 body)
+      -> Fetch.failRequest / continueRequest    ALWAYS, or the page hangs
+
+**Why interception and not an in-page `fetch()`.** An earlier draft ran
+`Runtime.evaluate` with an in-page `fetch(url, {credentials:'include'})`.
+That technique cannot do this job, and it was measured rather than argued:
+
+  * CORS and CSP are **page-level**. CDP is browser-internal and neither
+    reaches it. The same cross-origin URL sending no `Access-Control-Allow-
+    Origin` returned `TypeError: Failed to fetch` in-page and **8557 bytes**
+    under interception.
+  * A cross-origin in-page fetch exposes only the **CORS-safelisted** response
+    headers, so `ETag` is invisible — `validate()` below could never have
+    worked. Interception reads every header the server sent.
+  * `Content-Disposition: attachment` is intercepted **before** Chrome turns
+    it into a download, so no download-directory dance is needed.
+
+A rendered DOM was also the wrong output: it carries nonces, timestamps and
+session ids, so its sha changes on every fetch — nondeterministic input to an
+engine that asserts byte-identical results.
+
+**Auth is your browser's, borrowed.** This file stores, reads and handles no
+credential of any kind. Point it at a Chrome you are already signed in to. If
+you are not signed in, the site returns its login page and fux refuses it
+rather than indexing it.
+
+`extract_links` is still here and still yours: crawling is a fetcher's job,
+because the decoder plane may not open a socket. Nothing in fux calls it — it
+is the seam for the crawl you may want to write.
+
 The WebSocket client is hand-rolled RFC 6455 on stdlib `socket` — ported
-from the archived v0.26 engine (`archive/v0.26/src/fux/ingest/ws.py` /
-`cdp.py` / `htmlmd.py`), which shipped and dogfooded this exact path.
+from the archived v0.26 engine (`archive/v0.26/src/fux/ingest/ws.py`), which
+shipped and dogfooded it.
 
-Start Chrome yourself if you prefer (then set LAUNCH_CHROME = False):
+**LAUNCH_CHROME defaults to False**, because a browser this file launched is
+signed in to nothing. Start your own and point it at the port:
 
-    chrome --headless=new --remote-debugging-port=9222
+    chrome --remote-debugging-port=9222
 """
 
 from __future__ import annotations
@@ -56,6 +93,7 @@ import subprocess
 import time
 import urllib.request
 from html.parser import HTMLParser
+from typing import NamedTuple
 from urllib.parse import urljoin, urlsplit
 
 # ============= CONFIG — defaults; [sources.url.config] wins =============
@@ -64,7 +102,12 @@ from urllib.parse import urljoin, urlsplit
 
 CDP_HOST = "127.0.0.1"
 CDP_PORT = 9222
-LAUNCH_CHROME = True  # False: never launch; require a Chrome already listening
+#: **False by default, and that is the whole point of this fetcher.** A Chrome
+#: this file launches is signed in to nothing, so every URL worth a browser
+#: would come back as a login page. Start your own signed-in Chrome with
+#: `--remote-debugging-port` and leave this False. Set it True only for public
+#: pages where the session is irrelevant.
+LAUNCH_CHROME = False
 CHROME_BINARIES = (
     "google-chrome",
     "chromium",
@@ -73,8 +116,12 @@ CHROME_BINARIES = (
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
 )
 EXTRA_CHROME_FLAGS: tuple[str, ...] = ()  # e.g. ("--proxy-server=…",)
-LOAD_TIMEOUT_S = 30.0  # max wait for Page.loadEventFired per URL
-SETTLE_MS = 500  # extra wait after load for JS-heavy pages
+LOAD_TIMEOUT_S = 30.0  # max wait for the intercepted response, per URL
+
+#: Redirect chain cap. Each hop is a separate `Fetch.requestPaused`, so an
+#: unbounded loop here is an unbounded wait. Not a `fux.toml` key on purpose —
+#: see `_SETTINGS` at the bottom for why this file stopped adding them.
+MAX_REDIRECTS = 20
 
 # ====================================================================
 # RFC 6455 WebSocket client — stdlib socket/hashlib/base64.
@@ -288,6 +335,33 @@ class _LinkParser(HTMLParser):
 
 
 # ====================================================================
+# One intercepted response.
+# ====================================================================
+
+
+class Resource(NamedTuple):
+    """What the server sent, as the browser saw it.
+
+    `final_url` is where the request LANDED, which is not `url` whenever a
+    redirect ran — and a login page is exactly that case, so fux compares the
+    two. `content_type` is the server's header, never a guess from the
+    extension: guessing here writes the wrong bytes into the index.
+    """
+
+    url: str
+    final_url: str
+    status: int
+    content_type: str
+    etag: str
+    body: bytes
+
+
+def _headers(pairs: list[dict]) -> dict[str, str]:
+    """CDP's `[{name, value}]` -> a lowercased dict. Last value wins."""
+    return {str(h.get("name", "")).lower(): str(h.get("value", "")) for h in pairs}
+
+
+# ====================================================================
 # CDP session — discover/launch Chrome, drive one page target per fetch.
 # ====================================================================
 
@@ -296,6 +370,10 @@ class CdpSession:
     def __init__(self) -> None:
         self.chrome: subprocess.Popen | None = None
         self._msg_id = 0
+        #: Command replies by id, and events in arrival order. See the event
+        #: pump below — these two exist because one queue loses messages.
+        self._results: dict[int, dict] = {}
+        self._events: list[dict] = []
 
     # -- chrome discovery/launch ------------------------------------------
 
@@ -315,7 +393,9 @@ class CdpSession:
         if not LAUNCH_CHROME:
             raise FetcherError(
                 f"nothing listening on {self._endpoint()} and LAUNCH_CHROME is False — "
-                f"start Chrome yourself: chrome --headless=new --remote-debugging-port={CDP_PORT}"
+                f"start your own signed-in Chrome: chrome --remote-debugging-port={CDP_PORT}\n"
+                "That is the default because a browser this file launches is signed in "
+                "to nothing, and every URL worth a browser would come back as a login page."
             )
         binary = next((c for c in CHROME_BINARIES if shutil.which(c) or os.path.isfile(c)), None)
         if binary is None:
@@ -348,29 +428,106 @@ class CdpSession:
             "is the port in use? Edit CDP_PORT in this file."
         )
 
-    # -- capture -----------------------------------------------------------
+    # -- interception ------------------------------------------------------
 
-    def capture(self, url: str) -> str:
-        """Rendered outerHTML for one URL."""
+    def fetch_resource(self, url: str, *, want_body: bool = True) -> "Resource":
+        """Navigate to `url` and return the response the server actually sent.
+
+        The bytes come from `Fetch.getResponseBody` on a paused response, never
+        from the page. See the module docstring for why that distinction is
+        load-bearing rather than stylistic.
+        """
         self.ensure_chrome()
         target = self._page_target()
-        ws = WebSocket(target["webSocketDebuggerUrl"])
+        ws = WebSocket(target["webSocketDebuggerUrl"], timeout=LOAD_TIMEOUT_S)
+        self._results.clear()
+        self._events.clear()
         try:
-            self._call(ws, "Page.enable", {})
-            self._call(ws, "Page.navigate", {"url": url})
-            self._wait_event(ws, "Page.loadEventFired", timeout=LOAD_TIMEOUT_S, url=url)
-            time.sleep(SETTLE_MS / 1000)
-            result = self._call(
-                ws,
-                "Runtime.evaluate",
-                {"expression": "document.documentElement.outerHTML", "returnByValue": True},
-            )
-            html = result.get("result", {}).get("value", "")
-            if not isinstance(html, str) or not html:
-                raise FetcherError(f"CDP returned no DOM for {url}")
-            return html
+            # ⚠ `urlPattern` is "*", not the target URL, and that is DELIBERATE.
+            # A download URL typically 30x-es to a CDN on another host, and each
+            # hop is its own `Fetch.requestPaused`. A pattern narrowed to the
+            # URL we asked for stops matching at the first redirect and the
+            # fetch hangs until LOAD_TIMEOUT_S. The cost of "*" is that
+            # subresources pause too, which is why EVERY paused request below
+            # is continued or failed — an unresolved one wedges the page.
+            self._call(ws, "Fetch.enable", {
+                "patterns": [{"urlPattern": "*", "requestStage": "Response"}],
+            })
+            try:
+                # Fire-and-forget, and this is not a shortcut. `Page.navigate`
+                # does not return until the navigation commits, and it cannot
+                # commit while we hold its response paused — awaiting the result
+                # here deadlocks until the timeout. The reply lands in
+                # `_results` when we resolve the request and is discarded there.
+                self._send(ws, "Page.navigate", {"url": url})
+                return self._await_document(ws, url, want_body=want_body)
+            finally:
+                # Best-effort: the socket is about to close anyway, and a
+                # failure here must not mask the real exception.
+                try:
+                    self._call(ws, "Fetch.disable", {})
+                except FetcherError:
+                    pass
         finally:
             ws.close()
+
+    def _await_document(self, ws: WebSocket, url: str, *, want_body: bool) -> "Resource":
+        """Pump paused requests until the main document's response arrives."""
+        deadline = time.monotonic() + LOAD_TIMEOUT_S
+        for _ in range(MAX_REDIRECTS + 1):
+            paused = self._wait_event(ws, "Fetch.requestPaused", deadline, url)
+            request_id = paused["requestId"]
+            status = int(paused.get("responseStatusCode") or 0)
+            is_document = paused.get("resourceType") == "Document"
+
+            if not is_document or 300 <= status < 400:
+                # A subresource, or a hop on the way. Let it run; the next
+                # `Fetch.requestPaused` is the one we are waiting for.
+                self._resolve(ws, request_id, abort=False)
+                continue
+
+            headers = _headers(paused.get("responseHeaders") or [])
+            body = b""
+            try:
+                if want_body:
+                    result = self._call(ws, "Fetch.getResponseBody", {"requestId": request_id})
+                    raw = result.get("body") or ""
+                    body = base64.b64decode(raw) if result.get("base64Encoded") else raw.encode("utf-8")
+            finally:
+                # Abort rather than continue: we already hold the bytes, and
+                # letting the navigation complete would either render the page
+                # or start a download to disk for an attachment. Either way it
+                # is work nobody reads. The request IS resolved — that is the
+                # invariant, not which way it resolves.
+                self._resolve(ws, request_id, abort=True)
+
+            return Resource(
+                url=url,
+                final_url=str(paused.get("request", {}).get("url") or url),
+                status=status,
+                content_type=headers.get("content-type", ""),
+                etag=headers.get("etag", ""),
+                body=body,
+            )
+
+        raise FetcherError(
+            f"more than {MAX_REDIRECTS} redirects fetching {url} — a redirect loop, "
+            "or a sign-in flow bouncing between an identity provider and the site"
+        )
+
+    def _resolve(self, ws: WebSocket, request_id: str, *, abort: bool) -> None:
+        """Every paused request gets exactly one of these. Never skip it."""
+        method = "Fetch.failRequest" if abort else "Fetch.continueRequest"
+        params = {"requestId": request_id}
+        if abort:
+            params["errorReason"] = "Aborted"
+        try:
+            self._call(ws, method, params)
+        except FetcherError:
+            # The request can vanish under us (the page navigated away, the
+            # target closed). Nothing is leaked by that, and raising here would
+            # replace a real error with a bookkeeping one.
+            pass
 
     def _page_target(self) -> dict:
         for target in self._targets():
@@ -382,30 +539,56 @@ class CdpSession:
             return json.loads(resp.read().decode("utf-8"))
 
     # -- protocol ----------------------------------------------------------
+    #
+    # ⚠ THE EVENT PUMP, and why the obvious loop was wrong.
+    #
+    # `_call` used to read messages and DISCARD every one whose id did not
+    # match. CDP interleaves events with command replies on the same socket, so
+    # a `Fetch.requestPaused` arriving while a command was in flight was thrown
+    # away — and a paused request nobody resolves wedges the page until the
+    # timeout. `_pump` files each message by kind; `_call` and `_wait_event`
+    # both drain the same queues, so neither can lose the other's messages.
+
+    def _pump(self, ws: WebSocket, deadline: float, waiting_for: str) -> None:
+        """Read one message off the socket and file it by kind."""
+        if time.monotonic() >= deadline:
+            raise FetcherError(
+                f"CDP: no {waiting_for} within {LOAD_TIMEOUT_S:.0f}s — the site may "
+                "block headless Chrome, need a sign-in, or need a longer LOAD_TIMEOUT_S"
+            )
+        try:
+            message = json.loads(ws.recv_text())
+        except OSError as exc:
+            raise FetcherError(f"CDP connection died waiting for {waiting_for}: {exc}") from exc
+        if "id" in message:
+            self._results[int(message["id"])] = message
+        elif "method" in message:
+            self._events.append(message)
+
+    def _send(self, ws: WebSocket, method: str, params: dict) -> int:
+        """Dispatch a command without waiting for its reply."""
+        self._msg_id += 1
+        ws.send_text(json.dumps({"id": self._msg_id, "method": method, "params": params}))
+        return self._msg_id
 
     def _call(self, ws: WebSocket, method: str, params: dict) -> dict:
-        self._msg_id += 1
-        msg_id = self._msg_id
-        ws.send_text(json.dumps({"id": msg_id, "method": method, "params": params}))
+        msg_id = self._send(ws, method, params)
         deadline = time.monotonic() + LOAD_TIMEOUT_S
-        while time.monotonic() < deadline:
-            message = json.loads(ws.recv_text())
-            if message.get("id") == msg_id:
+        while True:
+            if msg_id in self._results:
+                message = self._results.pop(msg_id)
                 if "error" in message:
                     raise FetcherError(f"CDP {method} failed: {message['error'].get('message')}")
                 return message.get("result", {})
-        raise FetcherError(f"CDP {method}: no response within {LOAD_TIMEOUT_S}s")
+            self._pump(ws, deadline, f"a reply to {method}")
 
-    def _wait_event(self, ws: WebSocket, event: str, timeout: float, url: str) -> None:
-        deadline = time.monotonic() + timeout
-        while time.monotonic() < deadline:
-            message = json.loads(ws.recv_text())
-            if message.get("method") == event:
-                return
-        raise FetcherError(
-            f"page never fired {event} for {url} within {timeout:.0f}s — "
-            "the site may block headless Chrome, or needs a longer LOAD_TIMEOUT_S"
-        )
+    def _wait_event(self, ws: WebSocket, event: str, deadline: float, url: str) -> dict:
+        """Next `event`, taking one already queued in preference to reading."""
+        while True:
+            for index, message in enumerate(self._events):
+                if message.get("method") == event:
+                    return self._events.pop(index).get("params", {})
+            self._pump(ws, deadline, f"{event} for {url}")
 
     def shutdown(self) -> None:
         if self.chrome is not None:
@@ -428,8 +611,25 @@ _SETTINGS = {
     "chrome_binaries": ("CHROME_BINARIES", tuple),
     "extra_chrome_flags": ("EXTRA_CHROME_FLAGS", tuple),
     "load_timeout_s": ("LOAD_TIMEOUT_S", float),
-    "settle_ms": ("SETTLE_MS", int),
 }
+
+#: Keys this file used to accept, and what to do instead. They get a specific
+#: error rather than falling into the generic unknown-key list, because
+#: "unknown key" reads like a typo when the real answer is "that setting no
+#: longer describes anything this fetcher does".
+_RETIRED = {
+    "settle_ms": (
+        "there is no render step to settle any more — this fetcher intercepts "
+        "the response instead of waiting for JavaScript. Delete the key; raise "
+        "load_timeout_s if a slow site is timing out."
+    ),
+}
+
+#: ⚠ Think twice before adding a key here. `[sources.url.config]` is passed
+#: VERBATIM to every fetcher, and `http.py.configure()` raises on keys it does
+#: not know — so a new `cdp` tunable in that table breaks a repo that also uses
+#: `http.py`. Module constants (MAX_REDIRECTS, MAX_PARALLEL) have no such
+#: reach, which is why the ones added here since are constants.
 
 
 def configure(config: dict) -> None:
@@ -439,6 +639,8 @@ def configure(config: dict) -> None:
     being silently ignored — a typo'd tunable that does nothing is the kind
     of failure you find three renders later.
     """
+    for key in sorted(set(config) & set(_RETIRED)):
+        raise FetcherError(f"[sources.url.config] {key} is retired: {_RETIRED[key]}")
     unknown = sorted(set(config) - set(_SETTINGS))
     if unknown:
         raise FetcherError(
@@ -461,20 +663,46 @@ def connect() -> None:
 
 
 def fetch(url: str) -> tuple[bytes, str]:
-    """One URL -> (the rendered HTML as bytes, its content type).
+    """One URL -> (the bytes the server sent, its content type).
 
-    **W-86 P8: this no longer converts anything.** A browser capture is already
-    a decoded string, so the bytes handed back are that string encoded as UTF-8
-    and the type is stated rather than guessed — there is no server header to
-    read here, which is exactly why saying `text/html` explicitly matters.
+    **The bytes are the resource, not a rendering of it.** A `.xlsx` comes back
+    as a workbook and fux's decoder plane reads it; an HTML page comes back as
+    that page's HTML. Nothing here converts anything — `fux.decode` owns that,
+    and it owned it before this file changed (W-86 P8).
 
-    Raise to have fux skip this URL.
+    Raise to have fux skip this URL and keep any record a previous ingest made.
     """
     session = _session or CdpSession()
-    html = session.capture(url)
-    if not html.strip():
-        raise FetcherError(f"nothing returned from {url}")
-    return html.encode("utf-8"), "text/html; charset=utf-8"
+    resource = session.fetch_resource(url)
+    if not resource.body:
+        raise FetcherError(
+            f"empty response from {url} (status {resource.status}, "
+            f"landed on {resource.final_url})"
+        )
+    return resource.body, resource.content_type
+
+
+def validate(url: str) -> str | None:
+    """An opaque change token for `url`, or None meaning "I cannot tell".
+
+    Returns the server's `ETag`. **None is always safe** — fux degrades to a
+    full fetch, and the sanitized-sha comparison still decides whether any
+    shard is written. A token can only ever save work; it can never cause a
+    record to change (see `validate_group` in fux's `urlsrc.py`).
+
+    ⚠ **This saves the decode and the shard comparison, NOT the download.**
+    Interception happens at `requestStage: "Response"`, so Chrome has already
+    transferred the body by the time these headers exist. A header-only check
+    would need a HEAD request, which the sites this fetcher exists for
+    routinely refuse. Stated plainly here because the opposite is easy to
+    assume from the word "validate".
+    """
+    session = _session or CdpSession()
+    try:
+        resource = session.fetch_resource(url, want_body=False)
+    except FetcherError:
+        return None  # cannot tell -> fux fetches, which is the safe direction
+    return resource.etag or None
 
 
 def close() -> None:

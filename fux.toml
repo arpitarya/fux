@@ -37,8 +37,8 @@ max_parallel = 4
 # Fetcher tunables. Fux passes this table to the fetcher's optional
 # `configure(config)` VERBATIM and never reads a key inside it -- the keys mean
 # something to your fetcher, nothing to fux.
-#[sources.url.config]
-#cdp_port  = 9222
+[sources.url.config]
+cdp_port  = 9299
 #timeout_s = 30
 
 [index]

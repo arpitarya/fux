@@ -71,7 +71,7 @@ from __future__ import annotations
 
 import sys
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 from .. import store as store_mod
@@ -95,6 +95,7 @@ from .gitdir import (
     walk_sources,
 )
 from .. import decode as decode_mod
+from . import pii as pii_mod
 from . import queue as queue_mod
 from .parse import parse, parse_document
 
@@ -214,6 +215,7 @@ def run(
             max_parallel=config.url.max_parallel,
             known_tokens=known_tokens,
             validation_out=validation,
+            acquired_max_bytes=config.url.acquired_max_bytes,
         )
         # ⚠ **A validated URL is NOT a skip and NOT a fetch.** Its prior record
         # is correct and is carried forward verbatim — the same treatment a
@@ -305,11 +307,45 @@ def run(
         for wf in files
         if f"file:{wf.rel_path}" in parsed
     }
-    reusable = {} if full else _reusable(root, existing, file_shas)
+    # ⚠ **Editing `.fux/pii.toml` invalidates every carried extraction.**
+    # Redaction happens BELOW, before `extract_fields`, so a rule change alters
+    # what should be indexed for documents whose bytes did not change. Reuse is
+    # keyed on the content sha alone, so without this a rule added today would
+    # never reach a document that did not also change, and the index would hold
+    # terms built under two policies with nothing recording which. The digest
+    # lives in `runtime/` -- derived, gitignored, and rebuilt by being wrong once.
+    pii_rules = pii_mod.load(root)
+    pii_moved = _pii_ruleset_moved(root, pii_rules)
+    reusable = {} if (full or pii_moved) else _reusable(root, existing, file_shas)
     # URL documents still arrive as fetcher-produced markdown, so they keep the
     # prose path untouched. That changes when fork H makes `fetch()` return
     # bytes; until it is ruled, nothing here moves.
     parsed |= {doc_id: parse(content) for doc_id, content in fresh.items()}
+
+    # ⚠ **Redaction sits HERE and the position is load-bearing** (ADR-PII).
+    # `file_shas` and `content_sha(fresh[...])` are already computed from the
+    # RAW bytes above, and the record keeps those: a sha fingerprints the
+    # source, and `refer` verifies a citation by fetching that source and
+    # comparing. An index storing the sha of redacted text would report every
+    # document with one PII hit as `stale` against its own unchanged source,
+    # forever -- a defect that presents as a working feature.
+    #
+    # Everything downstream of this line -- terms, title, phrases, flen, the
+    # display cache, the edge scan -- is built from redacted text. Everything
+    # NOT downstream of it -- `.fux/acquired/`, the refer plane, `fux answer`'s
+    # quotes -- still sees the document as it is. That asymmetry IS the policy:
+    # redact what gets committed, leave alone what stays local.
+    pii_hits: dict[str, int] = {}
+    if pii_rules:
+        with progress.phase("redact", len(parsed)) as p:
+            for doc_id, doc in parsed.items():
+                body, hits = pii_mod.redact(pii_rules, doc.body)
+                if hits:
+                    parsed[doc_id] = replace(doc, body=body)
+                    for name, count in hits.items():
+                        pii_hits[name] = pii_hits.get(name, 0) + count
+                p.update(1)
+
     # Extraction is the expensive half — 92% of a full ingest, profiled at
     # 1 000 docs — so it is where the bar earns its place (W-64).
     to_extract = [doc_id for doc_id in parsed if doc_id not in reusable]
@@ -589,6 +625,46 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
             f"Re-fetch them on a networked run instead: `fux update`."
         )
     return {}
+
+
+#: Where the PII ruleset digest is remembered between runs. `runtime/` because
+#: it is derived and gitignored, and because being wrong once is self-healing:
+#: a missing file reads as "moved", which costs one full extraction and then
+#: settles. That is the right failure direction -- the opposite (reading as
+#: "unchanged") would silently keep terms built under retired rules.
+PII_DIGEST_FILE = "pii-digest"
+
+
+def _pii_ruleset_moved(root: Path, rules) -> bool:
+    """Has `.fux/pii.toml` changed since the last run? Records the new answer.
+
+    A repo with no rules writes no state and behaves exactly as it did before
+    this feature existed -- the empty digest is compared against an absent
+    file, both read as "", and nothing is created.
+    """
+    from ..store import fuxdir
+
+    current = pii_mod.digest(rules)
+    path = fuxdir.fux_dir(root) / "runtime" / PII_DIGEST_FILE
+    try:
+        previous = path.read_text(encoding="utf-8").strip()
+    except OSError:
+        previous = ""
+    if current == previous:
+        return False
+    try:
+        if current:
+            fuxdir.derived_dir(root, "runtime")
+            path.write_text(current + "\n", encoding="utf-8")
+        elif path.exists():
+            path.unlink()
+    except OSError:
+        # A digest we could not record means the next run re-extracts too.
+        # Wasteful, never wrong -- and never a reason to fail an ingest.
+        pass
+    # ⚠ An empty previous digest with rules present is a repo that has never
+    # run with redaction on, which genuinely needs the full pass.
+    return True
 
 
 def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) -> dict[str, dict]:

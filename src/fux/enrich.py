@@ -173,13 +173,56 @@ def _chunk_count(root: Path, record: dict) -> int:
     """
     from .refer._chunk import chunk
 
-    path = root / record.get("loc", "")
+    text = _document_text(root, record)
+    if text is None:
+        return 0
+    return len(chunk(text))
+
+
+#: The synthetic scope every enrichable `url:` document falls under.
+#:
+#: A `dirs` scope is a path prefix, which is a real grouping a human chose. A
+#: URL list has no such structure -- the lines share nothing but being URLs --
+#: so inventing per-host scopes would report coverage against a grouping
+#: nobody declared. One scope, named after the file the declaration lives in.
+URL_SCOPE = ".fux/sources/urls"
+
+
+def _document_text(root: Path, record: dict) -> str | None:
+    """The document's own text, for a `file:` or a `url:` record alike.
+
+    ⚠ **A `url:` document is readable here only because `.fux/acquired/`
+    exists.** Before the acquired plane, planning enrichment for a URL would
+    have meant a network fetch inside `fux enrich --plan` -- an offline,
+    read-only command (L4) -- so the attribute could not exist on that list at
+    all. `keep=true` is the default, so this works without configuration; a
+    line that opted out with `keep=false` has nothing to read and reports zero
+    chunks, which `--plan` names rather than hiding.
+    """
+    loc = record.get("loc", "")
+    if record.get("src") == "url":
+        from .ingest.urlsrc import _decode_fetched
+        from .store import acquired
+
+        blob = acquired.read_manifest(root).get(loc)
+        path = acquired.stored(root, loc)
+        if blob is None or path is None:
+            return None
+        try:
+            markdown, _why = _decode_fetched(path.read_bytes(), blob.content_type, loc, root)
+        except Exception:
+            # A blob that no longer decodes is "we cannot count this", never a
+            # crash inside a planning command.
+            return None
+        return markdown
+
+    path = root / loc
     if not path.is_file():
-        return 0
+        return None
     try:
-        return len(chunk(path.read_text(encoding="utf-8", errors="replace")))
+        return path.read_text(encoding="utf-8", errors="replace")
     except OSError:
-        return 0
+        return None
 
 
 def _orphan_for(root: Path, record: dict) -> str:
@@ -240,15 +283,54 @@ def _scopes(root: Path) -> dict[str, list[dict]]:
     from .ingest.gitdir import enrich_dirs
 
     declared = enrich_dirs(root, ".fux/sources/dirs")
-    if not declared:
+    urls = _enrich_urls(root)
+    if not declared and not urls:
         return {}
     out: dict[str, list[dict]] = {scope: [] for scope in declared}
+    if urls:
+        out[URL_SCOPE] = []
     for record in store_mod.read_index(root).values():
         loc = record.get("loc", "")
+        if record.get("src") == "url":
+            # A URL is IN the scope or it is not -- there is no prefix
+            # question, because the declaration names the URL exactly.
+            if loc in urls:
+                out[URL_SCOPE].append(record)
+            continue
         for scope in declared:
             if loc == scope or loc.startswith(scope.rstrip("/") + "/"):
                 out[scope].append(record)
                 break
+    return {scope: records for scope, records in out.items() if scope in declared or records}
+
+
+def _enrich_urls(root: Path) -> set[str]:
+    """URLs whose line says `enrich=true`, resolved through the three layers.
+
+    Absent or unreadable list is an empty set, never an error: `fux enrich` is
+    a planning command over whatever is declared, and a repo with no URL source
+    has simply declared nothing.
+    """
+    from .config import load as load_config
+    from .ingest import urlsrc
+
+    try:
+        source = load_config(root).url
+        if source is None:
+            return set()
+        entries = urlsrc.read_urls(root, source.urls_file)
+    except FuxError:
+        return set()
+    # The same three layers every URL attribute uses: built-in default, then
+    # `[sources.url] enrich`, then the line. A line that DECLARED it wins.
+    out: set[str] = set()
+    for entry in entries:
+        if "enrich" in entry.declared:
+            on = entry.attrs["enrich"] == "true"
+        else:
+            on = getattr(source, "enrich", False)
+        if on:
+            out.add(entry.value)
     return out
 
 

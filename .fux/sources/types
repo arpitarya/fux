@@ -1,5 +1,6 @@
-# Which files are documents. One glob per line; `!` subtracts. A pattern with
-# no `/` matches the file NAME anywhere, so `*.md` means every markdown file.
+# Which files are documents, and which decoder reads each one. One glob per
+# line; `!` subtracts. A pattern with no `/` matches the file NAME anywhere, so
+# `*.md` means every markdown file.
 #
 # THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
 # absent file never means "index everything" and never means "index nothing".
@@ -12,27 +13,54 @@
 # source (ADR-TYPES decision 10). From here they are YOURS -- setup never
 # rewrites this file, so the list stays exactly as you leave it.
 #
+# `decoder=` IS THE MAP: it BINDS an extension to the module that reads it.
+# Without it, "which decoder reads .csv" is a property of the code installed on
+# a machine -- a built-in's EXTENSIONS tuple, possibly replaced by a consumer
+# module of the same name -- so two people with different .fux/decoders/ could
+# commit different indexes from the same sources with nothing saying so. A
+# binding makes the answer a committed line (ADR-TYPES decision 11).
+#
+# THE BINDING IS CHECKED, NOT TRUSTED. A line naming a module that does not
+# exist stops the run, and so does one that takes an extension AWAY from the
+# decoder that claims it and gives it to a module that does not. It is never a
+# silent fallback: the wrong decoder does not fail visibly, it produces a
+# plausible index with different postings.
+#
+# YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
+# be bound to it -- a .geojson is JSON, so `*.geojson decoder=jsondoc` is all it
+# takes, with no module to copy or edit. EXTENSIONS is a decoder's DEFAULT
+# CLAIM, not a list of what it can read. What is refused is REDIRECTING an
+# extension another decoder already claims.
+#
+# A binding is per EXTENSION, so `decoder=` sits only on a bare `*.ext` line --
+# dispatch sees a suffix and nothing about which glob admitted the file, so
+# `docs/api/*.json decoder=jsondoc` would bind every .json in the corpus.
+#
+# A PROSE FORMAT CARRIES NO BINDING. It is already text and no decoder is in
+# its path, so there is nothing to name.
+#
 # NOTHING BELOW NEEDS INSTALLING. fux's runtime is stdlib-only and declares no
 # third-party dependencies, so every built-in decoder works out of the box. A
 # format that needed something installed would appear under OPT-IN at the
 # bottom, commented, with the command that enables it.
 #
-# What is OUT of the default, and why: source code, shell scripts, SVG and
+# What is OUT of the default, and why: source code, shell scripts and
 # extensionless files. They have no decoder, machine data is not a document,
 # and indexing it inflates `df` for exactly the terms your real documents are
 # trying to be found by. Extensionless files are LICENSE, Makefile and
 # Dockerfile far more often than they are prose.
 #
 # ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
-# format READABLE; a line in this file is what makes it INDEXED. Both are
-# required, and that is deliberate -- what counts as a document stays a
-# committed line a human wrote.
+# format READABLE; a line in this file is what makes it INDEXED, and the
+# binding on that line is what makes it read by a NAMED module. All three are
+# separate on purpose -- what counts as a document stays a committed line a
+# human wrote.
 #
 #   !*.min.md          # subtract a generated flavour
 #
 # See ADR-TYPES.
 
-# --- prose: already text, no decoder involved ---
+# --- prose: already text, no decoder in the path ---
 *.adoc
 *.markdown
 *.md
@@ -40,53 +68,72 @@
 *.rst
 *.txt
 
-# --- decoded by a built-in decoder (stdlib only, nothing to install) ---
-*.cfg
-*.csv
-*.dio
-*.docm
-*.docx
-*.drawio
-*.eml
-*.fodt
-*.gif
-*.htm
-*.html
-*.ini
-*.ipynb
-*.jpeg
-*.jpg
-*.json
-*.jsonl
-*.mbox
-*.odp
-*.ods
-*.odt
-*.pdf
-*.png
-*.pptm
-*.pptx
-*.properties
-*.rtf
-*.svg
-*.toml
-*.tsv
-*.xhtml
-*.xlsm
-*.xlsx
-*.xml
-*.yaml
-*.yml
+# --- decoded: extension -> the module that reads it -----------------------
+# stdlib only, nothing to install. Grouped by decoder; the binding on each
+# line is what dispatch actually resolves.
+*.csv decoder=csvdoc
+*.tsv decoder=csvdoc
+
+*.docm decoder=docxdoc
+*.docx decoder=docxdoc
+
+*.dio decoder=drawiodoc
+*.drawio decoder=drawiodoc
+
+*.htm decoder=htmldoc
+*.html decoder=htmldoc
+*.xhtml decoder=htmldoc
+
+*.gif decoder=imagedoc
+*.jpeg decoder=imagedoc
+*.jpg decoder=imagedoc
+*.png decoder=imagedoc
+
+*.cfg decoder=inidoc
+*.ini decoder=inidoc
+*.properties decoder=inidoc
+
+*.ipynb decoder=ipynbdoc
+
+*.json decoder=jsondoc
+
+*.jsonl decoder=jsonldoc
+
+*.eml decoder=maildoc
+*.mbox decoder=maildoc
+
+*.fodt decoder=odtdoc
+*.odp decoder=odtdoc
+*.ods decoder=odtdoc
+*.odt decoder=odtdoc
+
+*.pdf decoder=pdfdoc
+
+*.pptm decoder=pptxdoc
+*.pptx decoder=pptxdoc
+
+*.rtf decoder=rtfdoc
+
+*.svg decoder=svgdoc
+
+*.toml decoder=tomldoc
+
+*.xlsm decoder=xlsxdoc
+*.xlsx decoder=xlsxdoc
+
+*.xml decoder=xmldoc
+
+*.yaml decoder=yamldoc
+*.yml decoder=yamldoc
 
 # --- OPT-IN ---------------------------------------------------------------
 # Not indexed until you uncomment. Nothing here has a built-in decoder, so a
 # line you uncomment indexes RAW BYTES unless you enable it first by writing a
-# decoder for it:
+# decoder for it and binding it:
 #
 #   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
 #      one there as a worked example; see the fux-decoder skill)
-#   2. uncomment its glob here
+#   2. uncomment its glob here and add `decoder=<module stem>`
 #   3. `fux ingest`
 #
 #*.log
-#*.svg

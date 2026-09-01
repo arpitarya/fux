@@ -278,6 +278,50 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
   proving it can see a planted shadow — this repo has recorded vacuous passes
   before.
 
+**19. The verdict set is SIX states, and `_obtain` has two fallback points**
+([ADR-URL-FRESHNESS](0052_url-freshness.md), [ADR-ACQUIRED](0050_acquired-plane.md),
+2026-09-01). `as-ingested` joins `current`, `stale`, `unverified` and `cached`:
+the source could not be reached, but the passage still matches the bytes in
+`.fux/acquired/` that the record was built from.
+
+- **Both fallbacks live in `_obtain`, and there are exactly two** — the
+  policy-forbids-fetch branch, and the `FuxError` branch when a fetch was tried
+  and failed. Both call `source.from_acquired`, and both attach the original
+  reason to the verdict so *why we could not look* survives.
+- **It is a real comparison, so it is not `unverified`; it says nothing about
+  the world now, so it is not `current`.** That is the same distinction
+  decision 6 draws for `cached`, and it collapses the same way if anyone folds
+  it upward.
+- ⚠ **`from_acquired` IMPORTS `_decode_fetched` and `sanitize` from the ingest
+  plane; it never reimplements them.** A verify-time sha is compared against an
+  ingest-time sha, so a one-line divergence between two copies of that pipeline
+  would mark every retained document permanently stale — **a defect that
+  presents as a working feature**. This module already shared `sanitize` for
+  exactly that reason; the decode step travels with it.
+- **Every failure inside `from_acquired` returns `None`, never raises.** No
+  blob, a blob deleted by hand, a blob that no longer decodes — each means *we
+  have nothing to compare*, which is `unverified`. A broken blob costs a
+  verdict, never a query.
+
+**20. A per-URL `ttl=` NARROWS the caller's policy and can never widen it.**
+`_effective_ttl` is `min(policy.cache_ttl_seconds, declared)`.
+
+- **Cannot widen**, so a line in the URL list can never serve a cached byte to a
+  caller who did not ask for caching. The policy default is `0` and
+  `min(0, 86400)` is `0` — [W-60](../../work/WORKLOG.md)'s verdict F holds by
+  **arithmetic**, not by a rule someone has to remember.
+- **Can narrow**, so `ttl=0` on one line means *always go out for this one*
+  whatever the policy says. Same shape as `max_parallel`: a declaration may
+  lower a bound, never raise it.
+- **The list is read once per `refer()` call and only when `policy.caches`**, so
+  the default path opens no file.
+- ⚠ **An UNCONFIGURED repo declares nothing and is not a malformed one.**
+  `_declared_ttls` returns `{}` when there is no `fux.toml` at all; a
+  `fux.toml` that exists and is wrong still refuses, exactly as `fux ingest`
+  does. The first version did not draw that line and turned *opting into
+  caching* into a new way for `refer()` to raise — the precise new failure mode
+  its own contract says it does not add.
+
 ### Consequences
 
 - **Offline degradation is honest, and tested.** `file:` sources keep full
@@ -398,8 +442,16 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
 3. **`src/fux/` imports a network library anywhere.** That is decision 1 broken,
    and it is checkable in one command.
 
-4. **Anything downstream renders a `cached` verdict as `current`.** That is the
-   one collapse decision 6 exists to prevent.
+4. **Anything downstream renders a `cached` or an `as-ingested` verdict as
+   `current`.** That is the one collapse decision 6 exists to prevent, and
+   decision 19 added a second state that can be collapsed the same way. Both
+   halves are checkable in one command: neither string may be mapped onto
+   `current` anywhere in `src/`.
+
+4a. **`refer/source.py` grows its own copy of the decode pipeline.** Decision 19
+   rests on `from_acquired` importing `_decode_fetched` and `sanitize`; a local
+   reimplementation — however faithful on the day — reopens the divergence that
+   would mark every retained document permanently stale.
 
 5. ⚠ **A cached copy is served for a document the reader has since lost access
    to.** The TTL cache holds external bytes on local disk, so a permission

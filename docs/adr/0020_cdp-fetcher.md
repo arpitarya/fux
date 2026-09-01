@@ -2,10 +2,10 @@
 type: ADR
 name: ADR-CDP-FETCHER
 title: "ADR-CDP-FETCHER (0020) — the CDP fetcher"
-description: "The browser fetcher, for pages a plain GET cannot read. Drives your existing Chrome over CDP on a hand-rolled stdlib WebSocket; declared per URL, never escalated to."
+description: "The browser fetcher, for documents a plain GET cannot read. Drives your existing signed-in Chrome over CDP and returns the RESOURCE the server sent — intercepted, never rendered; declared per URL, never escalated to."
 status: accepted
 date: 2026-08-19
-feature: "`.fux/fetchers/cdp.py` — the reference fetcher for pages that only exist after JavaScript runs, or behind a session a headless client does not have"
+feature: "`.fux/fetchers/cdp.py` — the reference fetcher for documents behind a session a headless client does not have: it borrows your browser's and hands fux the bytes"
 owns: []
 laws: [L1, L4]
 timestamp: 2026-08-19T00:00:00Z
@@ -15,23 +15,33 @@ timestamp: 2026-08-19T00:00:00Z
 
 ## §1 — For humans
 
-Some documents do not exist in the HTML a plain GET returns. A Confluence page,
-an internal dashboard, anything rendered client-side — the bytes on the wire are
-a loading shell, and the document you wanted appears only after JavaScript runs.
-Worse, the ones worth indexing are usually the ones behind a login.
+Some documents a plain GET cannot reach. A Confluence page, a SharePoint
+workbook, an internal dashboard — the bytes on the wire are a loading shell or a
+redirect to a sign-in page, and the document you wanted is behind a session a
+headless client does not have.
 
-`cdp.py` handles both by **driving the browser you already have**. It attaches
-to your running Chrome over the Chrome DevTools Protocol, navigates, waits for
-load, settles, and reads the rendered `outerHTML`. Because it is *your* browser,
-it is *your* session: pages you are logged into are pages it can read, with no
-credential ever entering fux's config.
+`cdp.py` handles that by **borrowing the browser you already have**. It attaches
+to your running, already-signed-in Chrome over the Chrome DevTools Protocol,
+navigates to the URL, and **intercepts the response** — handing fux the exact
+bytes the server sent, with the server's own content type. Because it is *your*
+browser, it is *your* session: documents you can open are documents it can read,
+with no credential ever entering fux's config.
 
-Two properties are worth stating because neither was forced:
+**It returns the resource, not a rendering of it.** That is the whole design,
+and it is what makes a `.xlsx` behind a login as ingestible as a wiki page.
+
+Three properties are worth stating because none was forced:
 
 **It carries no dependency.** The WebSocket client is hand-rolled RFC 6455 on
 stdlib `socket`. L1 binds fux's runtime, not your fetcher — this file could have
 imported `websockets` and nothing would have broken. It does not, so
 `pip install fux-engine` remains the whole install even for the browser path.
+
+**It never renders.** Until 2026-09-01 this file read
+`document.documentElement.outerHTML` back out of the page. A rendered DOM
+carries nonces, timestamps and session ids, so its sha changed on every fetch —
+nondeterministic input to an engine whose central guarantee is byte-identical
+output (L3). Interception has no such property: the bytes are the server's.
 
 **It is never escalated to.** A URL uses this fetcher because a human wrote
 `fetch=cdp` on its line ([ADR-URL-LIST](0018_url-list.md)), not because a
@@ -43,11 +53,15 @@ producing the same bytes on a bad network day.
 
 ```mermaid
 flowchart LR
-    U["url with fetch=cdp"] --> D["discover or launch<br/>your Chrome"]
+    U["url with fetch=cdp"] --> D["attach to YOUR<br/>signed-in Chrome"]
     D --> W["WebSocket<br/>hand-rolled RFC 6455"]
-    W --> N["Page.navigate<br/>wait loadEventFired<br/>settle"]
-    N --> E["Runtime.evaluate<br/>rendered outerHTML"]
-    E --> R["return (bytes, 'text/html')<br/>fux.decode converts"]
+    W --> F["Fetch.enable<br/>requestStage: Response"]
+    F --> N["Page.navigate<br/>not awaited"]
+    N --> P["Fetch.requestPaused<br/>final url · status · headers"]
+    P -->|"3xx or subresource"| C["Fetch.continueRequest"] --> P
+    P -->|"the document"| B["Fetch.getResponseBody"]
+    B --> A["Fetch.failRequest<br/>bytes already held"]
+    A --> R["return (bytes, server's type)<br/>fux.decode converts"]
 ```
 
 <details>
@@ -63,13 +77,31 @@ flowchart LR
   WebSocket: hand-rolled RFC 6455 on stdlib socket  --(no dependency)
         |
         v
-  Page.navigate -> wait loadEventFired -> settle_ms
+  Fetch.enable(urlPattern "*", requestStage "Response")
         |
         v
-  Runtime.evaluate: rendered outerHTML
+  Page.navigate   --(NOT awaited: it cannot commit while we hold the
+        |            response paused; awaiting it deadlocks)
+        v
+  Fetch.requestPaused  --> final url, status, response headers
+        |
+        |--- 3xx hop, or a subresource --> Fetch.continueRequest --+
+        |                                                          |
+        |<---------------------------------------------------------+
+        v
+  the document response
         |
         v
-  return (utf-8 bytes, "text/html")   -->  fux.decode  -->  markdown
+  Fetch.getResponseBody (base64)  ->  Fetch.failRequest(Aborted)
+        |                                    ^
+        |                                    |
+        |                       we hold the bytes; completing would
+        |                       render the page or write a download
+        v
+  return (server's bytes, server's content type) --> fux.decode
+
+  EVERY paused request is continued or failed. One that is neither
+  wedges the page until the timeout -- it does not raise.
 
   This file does NOT convert. Agreement with http.py is structural.
 ```
@@ -96,10 +128,14 @@ fetcher = ".fux/fetchers/cdp.py"
 
 [sources.url.config]        # fux passes this VERBATIM and reads no key in it
 cdp_port       = 9222
-settle_ms      = 500
 load_timeout_s = 30
-launch_chrome  = true
+launch_chrome  = false      # the default, and the point — see decision 13
 ```
+
+⚠ **`settle_ms` is retired** and raises a message saying so rather than falling
+into the generic unknown-key list: there is no render step left to settle. A
+key that reads as a typo when the real answer is "that setting no longer
+describes anything" costs a reader an afternoon.
 
 ---
 
@@ -118,6 +154,13 @@ The transport was already solved and thrown away once: the archived engine
 shipped and dogfooded this exact path. Porting it was cheaper than rebuilding
 it, and is covered by [ADR-PORT-LIST](0015_port-list.md)'s discipline of porting
 with tests rather than rewriting.
+
+⚠ **What the port brought with it was the wrong output.** The archived engine
+rendered pages, so this file rendered pages, and that went unexamined for two
+releases. It surfaced when the corpus stopped being pages: a SharePoint
+workbook has no `outerHTML` worth indexing. **W-98 rebuilt the middle of this
+file on 2026-09-01** — the transport, the contract and the ownership are
+unchanged; what `fetch()` *returns* is not.
 
 ### Decision
 
@@ -139,11 +182,13 @@ The constants in the file are *defaults*; the table overrides them. This keeps a
 consumer's `fux.toml` diff small and their fetcher file mergeable, and it is
 [ADR-FETCHER](0019_fetcher.md) decision 8 in use.
 
-**5. It returns bytes and a declared content type, and converts nothing.**
-`fetch()` returns the rendered HTML encoded as UTF-8 and **states**
-`text/html` — a browser capture has no server header, which is precisely why
-the type is declared rather than left for fux to guess. `fux.decode` does the
-conversion.
+**5. It returns the server's bytes and the server's content type, and converts
+nothing.** `fetch()` hands back the body exactly as received and the
+`Content-Type` off the intercepted response headers. **This changed on
+2026-09-01**: it used to return rendered HTML with `text/html` *declared*,
+because a rendering has no server header to read. Interception has one, so
+guessing stopped being necessary — and guessing here writes the wrong bytes
+into the index. `fux.decode` does the conversion, as it always did.
 
 ⚠ **Agreement with `http.py` is structural rather than shared.** This file once
 carried its own copy of the HTML→Markdown pass, marked *"Kept identical to…"* by
@@ -178,6 +223,61 @@ extension Python cannot import, and `fux setup` copies it into
 that indexes only local files never sees a byte of WebSocket code, which is what
 decision 1's *never bundle a browser* is worth nothing without.
 
+**10. The bytes come from `Fetch.getResponseBody`, never from the page.**
+`Fetch.enable` at `requestStage: "Response"`, `Page.navigate`, then read the
+body off the paused response.
+
+⚠ **The obvious alternative was tried and measured, and it cannot do the job.**
+An in-page `fetch(url, {credentials:'include'})` via `Runtime.evaluate` was the
+specified technique until spike step 5:
+
+| target | in-page `fetch` | interception |
+|---|---|---|
+| cross-origin URL sending no `Access-Control-Allow-Origin` | 🔴 `TypeError: Failed to fetch` | ✅ **8557 bytes** |
+| cross-origin binary, no `ACAO` | — | ✅ 17174 bytes |
+| `Content-Disposition: attachment` | — | ✅ intercepted **before** Chrome makes it a download |
+
+**CORS and CSP are page-level; CDP is browser-internal and neither reaches it.**
+And a cross-origin in-page fetch exposes only the **CORS-safelisted** response
+headers, so `ETag` is invisible — decision 12 could never have been built on it.
+That is not a performance argument: the technique cannot deliver a stated
+deliverable.
+
+**11. `urlPattern` is `"*"`, and every paused request is resolved.** The two
+follow from each other. A download URL typically 30x-es to a CDN on another
+host, and each hop is its own `Fetch.requestPaused` — a pattern narrowed to the
+requested URL stops matching at the first redirect and the fetch hangs until
+`LOAD_TIMEOUT_S`. The price of `"*"` is that subresources pause too, so **every
+paused request is continued or failed, always**. ⚠ **An unresolved one wedges
+the page; it does not raise.** The captured document is *failed* rather than
+continued — the bytes are already held, and completing the navigation would
+either render a page nobody reads or write a download to disk.
+
+⚠ **`Page.navigate` is dispatched without awaiting its reply.** It does not
+return until the navigation commits, and it cannot commit while we hold its
+response paused. Awaiting it deadlocks until the timeout. This is the one line
+in the file that looks like a missing `await` and is not.
+
+**12. `validate(url)` returns the server's `ETag`, and saves the decode — not
+the download.** It is [ADR-FETCHER](0019_fetcher.md)'s optional fifth entry
+point, so `None` ("I cannot tell") degrades to a full fetch and the sanitized-sha
+comparison still decides whether any shard is written.
+
+⚠ **State the limit rather than let it be assumed.** Interception happens at
+`requestStage: "Response"`, so Chrome has already transferred the body by the
+time these headers exist. What a matching token saves is the decode and the
+shard comparison, **not bandwidth**. A header-only check needs a HEAD request,
+which the session-gated sites this fetcher exists for routinely refuse. The word
+"validate" invites the opposite reading, which is why the docstring and this
+decision both say it outright.
+
+**13. `LAUNCH_CHROME` defaults to `False`, and the default is the feature.** A
+browser this file launched is signed in to nothing, so every URL worth a browser
+comes back as a login page. It flipped from `True` on 2026-09-01 — the old
+default made sense for a renderer of public pages and makes none for a fetcher
+whose entire value is a borrowed session. Not signed in fails loudly rather than
+indexing the sign-in page.
+
 ### What it looks like
 
 **The entry points, as this file implements them:**
@@ -188,9 +288,13 @@ def configure(config: dict) -> None: ...   # [sources.url.config], verbatim;
 def connect() -> None: ...                 # discover Chrome on cdp_port, or
                                            # launch the installed one
 def fetch(url: str) -> tuple[bytes, str]: ...
-                                           # navigate -> loadEventFired ->
-                                           # settle -> outerHTML -> (bytes, type)
+                                           # Fetch.enable -> navigate ->
+                                           # requestPaused -> getResponseBody
+                                           # -> (server bytes, server type)
                                            # Raises: fux skips, keeps prior record
+def validate(url: str) -> str | None: ...  # the ETag, or None = "cannot tell"
+                                           # decision 12 — saves the decode,
+                                           # NOT the download
 def close() -> None: ...                   # called even if a fetch raised
 
 MAX_PARALLEL = 1                           # one shared WebSocket — decision 7
@@ -233,19 +337,43 @@ deletion.
 }
 ```
 
-**`mode` is `extracted`.** A browser rendered the page and the record is still
-deterministic: what the fetcher returns is *bytes*, and everything after that is
-the same extraction any repo file gets
-([ADR-EXTRACTED](0016_extracted-mode.md)). **Rendering is not enrichment.**
+**`mode` is `extracted`.** A browser retrieved the document and the record is
+still deterministic: what the fetcher returns is *bytes the server sent*, and
+everything after that is the same extraction any repo file gets
+([ADR-EXTRACTED](0016_extracted-mode.md)). **Borrowing a session is not
+enrichment.**
+
+**Output — the file's own tests, captured 2026-09-01.** They drive the CDP
+conversation against a scripted peer, so no Chrome and no socket is involved:
+
+```console
+$ uv run pytest -q tests/ingest/test_cdp_fetcher.py
+...........................                                              [100%]
+27 passed in 0.04s
+```
 
 ### Consequences
 
 - **A browser must exist on the machine that ingests.** Fine for a developer
   laptop and for most CI, and it is the price of reading pages that only exist
   after JavaScript. A URL that does not need it should not declare `fetch=cdp`.
-- **This is the slow path.** A browser round trip per URL, plus a settle. It is
-  why [ADR-HTTP-FETCHER](0021_http-fetcher.md) is the default and this is the
+- **This is the slow path.** A browser round trip per URL. It is why
+  [ADR-HTTP-FETCHER](0021_http-fetcher.md) is the default and this is the
   opt-in, rather than the other way round.
+- ⚠ **A wedged page does not raise, it waits.** Decision 11's invariant has no
+  mechanical guard inside Chrome: forget to resolve a paused request and the
+  symptom is a `LOAD_TIMEOUT_S` stall that reads as a slow site.
+  [`tests/ingest/test_cdp_fetcher.py`](../../tests/ingest/test_cdp_fetcher.py)
+  asserts each paused request is resolved exactly once, which is the only thing
+  standing between that invariant and a plausible-looking regression.
+- **A rendered page is no longer obtainable from this file.** A consumer who
+  genuinely wanted the DOM — a client-side-rendered page with no underlying
+  document — now has to write it. The implementation is kept at
+  [`archive/templates/cdp-rendering.py.txt`](../../archive/templates/cdp-rendering.py.txt)
+  ⚠ **as a record of what was built, never as a live citation.**
+- **`settle_ms` breaks on upgrade, loudly and on purpose.** A repo carrying it
+  in `[sources.url.config]` gets a message naming the retirement rather than a
+  silent no-op.
 - **It is not linted** and it is several hundred lines of consumer code carrying
   a protocol implementation. Its test exists precisely because nothing else
   guards it.
@@ -271,6 +399,21 @@ the same extraction any repo file gets
 - **Keeping a private HTML→Markdown copy here.** Rejected under decision 5: two
   copies of one converter make *which fetcher ran* a fact about the committed
   index, which is L3 demoted to a code comment.
+- **An in-page `fetch()` via `Runtime.evaluate`.** Rejected on a measurement,
+  not a preference — decision 10's table. CORS and CSP are page-level; it
+  cannot read a cross-origin body, and it cannot see `ETag` at all.
+- **`Browser.setDownloadBehavior` + `Browser.downloadProgress`.** Rejected. It
+  answers "give me the file by id" and Chrome writes `<downloadPath>/<guid>` —
+  but it goes via disk, hands back **no response headers** (so no `ETag`, no
+  real content type), and needs a completion handshake. Interception gets the
+  `Content-Disposition: attachment` case without any of it. Recorded so it is
+  not rediscovered as a new idea.
+- **`Network.getResponseBody` instead of `Fetch.getResponseBody`.** Rejected:
+  it needs the response to still be in Chrome's buffer and races the page.
+  Pausing the response removes the race entirely.
+- **Narrowing `urlPattern` to the requested URL.** Rejected under decision 11 —
+  it stops matching at the first redirect, which is precisely the case this
+  fetcher exists for.
 - **A per-worker `connect()`/`close()` so this could parallelise.** Rejected:
   it changes the contract for every fetcher to accommodate one, and a consumer
   who wants it can raise `MAX_PARALLEL` in their own copy after making `fetch`
@@ -283,7 +426,16 @@ the same extraction any repo file gets
   [`src/fux/templates/cdp.py.txt`](../../src/fux/templates/cdp.py.txt).
 - Its test, including that it lives in the declared plane —
   [`tests/ingest/test_cdp_fetcher.py`](../../tests/ingest/test_cdp_fetcher.py).
-- The contract — [ADR-FETCHER](0019_fetcher.md).
+- The contract, including `validate` as the optional fifth entry point —
+  [ADR-FETCHER](0019_fetcher.md).
+- The spike that decided the technique — **its measured byte counts are in
+  decision 10's own table above**, carried into this record rather than left in
+  the item, because the item was archived when the phases landed and an
+  archived doc may be named but never cited. The item itself:
+  [`archive/open/W-98-acquired-plane.md`](../../archive/open/W-98-acquired-plane.md)
+  §9 step 5, **named only**.
+- The retired rendering path, **named and not cited** —
+  [`archive/templates/cdp-rendering.py.txt`](../../archive/templates/cdp-rendering.py.txt).
 - The behaviour around it, captured against a no-network fetcher —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §6.
 - The WebSocket framing this implements — RFC 6455:
@@ -294,15 +446,18 @@ the same extraction any repo file gets
 ### Veto condition
 
 **Reopen this decision if** the file acquires an `import` outside the standard
-library, or if it stops being reachable only by declaration — either means the
-two properties §1 claims for it are no longer true of the bytes.
+library, if it stops being reachable only by declaration, or if `fetch()` starts
+returning something the server did not send — each means a property §1 claims
+for it is no longer true of the bytes.
 
 **How to check it:**
 
 ```bash
-# 1. stdlib only
-grep -nE "^\s*(import|from) " .fux/fetchers/cdp.py \
-  | grep -vE "socket|ssl|json|base64|hashlib|struct|os|sys|time|re|html|urllib.parse|subprocess|shutil|pathlib|typing|dataclasses|__future__"
+# 1. stdlib only — anchored on a real import statement, because the module
+#    docstring contains English sentences starting "from …" that a looser
+#    pattern matches and a reader then has to dismiss by hand every time
+grep -nE "^(import [a-z_.]+|from [a-z_.]+ import )" .fux/fetchers/cdp.py \
+  | grep -vE "socket|ssl|json|base64|hashlib|struct|os|sys|time|re|html|urllib|subprocess|shutil|pathlib|typing|dataclasses|__future__"
 # expect: no output
 
 # 2. no browser is downloaded or bundled
@@ -316,6 +471,14 @@ grep -rn "fetch=cdp\|escalat\|fallback" src/fux/ingest/urlsrc.py
 # 4. it still converts nothing
 grep -n "markdown\|html_to_\|fux.decode" .fux/fetchers/cdp.py
 # expect: no conversion — decision 5
+
+# 5. it returns the resource, not a rendering — decisions 5 and 10
+grep -n "outerHTML\|Runtime.evaluate\|loadEventFired" .fux/fetchers/cdp.py
+# expect: no output outside the docstring explaining why they are gone
+
+# 6. every paused request is resolved — decision 11
+grep -c "Fetch.continueRequest\|Fetch.failRequest" .fux/fetchers/cdp.py
+# expect: >= 2, and `_resolve` is the only caller of either
 ```
 
 ---
@@ -347,5 +510,11 @@ evidence.*
 
 - Chrome DevTools Protocol — the transport the shipped browser template uses
   <https://chromedevtools.github.io/devtools-protocol/>
+- CDP `Fetch` domain — `requestStage`, `getResponseBody`, `continueRequest`,
+  `failRequest`; the interception this file is built on
+  <https://chromedevtools.github.io/devtools-protocol/tot/Fetch/>
+- Fetch Standard §CORS-safelisted response-header name — why an in-page
+  cross-origin fetch cannot see `ETag`
+  <https://fetch.spec.whatwg.org/#cors-safelisted-response-header-name>
 - RFC 6455 (The WebSocket Protocol) — the framing this implements
   <https://www.rfc-editor.org/rfc/rfc6455>

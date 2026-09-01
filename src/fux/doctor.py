@@ -214,7 +214,108 @@ def _layout(root: Path) -> list[Check]:
     if daemon_check is not None:
         checks.append(daemon_check)
     checks.append(_url_health(root))
+    checks.append(_acquired_health(root))
+    checks.append(_pii_health(root))
     return checks
+
+
+def _pii_health(root: Path) -> Check:
+    """`.fux/pii.toml` — do the rules load, and do the patterns compile?
+
+    ⚠ **Offline and read-only, like every check here: it compiles the patterns
+    and never runs them over a corpus.** Compiling catches the fault that
+    matters (a rule that would stop an ingest dead), and it costs microseconds.
+    Running them would mean reading the whole corpus inside the command a
+    person runs *because something is already wrong*.
+
+    **What this check CANNOT tell you** is the failure that actually bites: a
+    rule that is well-formed and too broad. That removes real vocabulary from
+    the index silently -- nothing errors, documents just stop being findable by
+    the words that would have found them. `tools/pii-probe/` is where that is
+    visible, and no offline check substitutes for reading what a rule caught.
+    """
+    from .ingest import pii
+
+    if not pii.rules_path(root).is_file():
+        return Check(
+            "pii rules",
+            True,
+            "no .fux/pii.toml - nothing is redacted from the index",
+            level="warn",
+        )
+    try:
+        rules = pii.load(root)
+    except FuxError as exc:
+        return Check("pii rules", False, str(exc))
+    if not rules:
+        return Check(
+            "pii rules", True, ".fux/pii.toml declares no rules", level="warn"
+        )
+    names = ", ".join(rule.name for rule in rules)
+    return Check(
+        "pii rules",
+        True,
+        f"{len(rules)} rule(s) compile: {names}. Redaction applies to "
+        f".fux/index/ only - acquired bytes and answer quotes are unredacted",
+    )
+
+
+def _acquired_health(root: Path) -> Check:
+    """`.fux/acquired/` — how much is retained, and whether it is gitignored.
+
+    ⚠ **Two questions, and the second is the one that matters.** The size is
+    housekeeping; whether the plane is ignored by git is a data-exposure
+    question, because this directory holds SOURCE BYTES. `_layout` already
+    refuses an undeclared child of `.fux/`, and `_ignore_health` checks the
+    index is *not* ignored — neither of them asks whether a plane that must be
+    ignored actually is. This does.
+
+    **A `warn`, never an `error`, on size.** ADR-ACQUIRED decision 8 bounds the
+    store and evicts; a store near its cap is working as designed, not broken.
+    An UNIGNORED plane is a different matter and fails.
+    """
+    from .store import acquired
+
+    plane = acquired.plane(root)
+    if not plane.is_dir():
+        return Check(
+            "acquired plane",
+            True,
+            "nothing retained (no .fux/acquired/) - `keep=false` on every line, or nothing fetched yet",
+            level="warn",
+        )
+
+    blobs = acquired.blobs_on_disk(root)
+    total = sum(size for _, size in blobs)
+    manifest = acquired.read_manifest(root)
+    orphans = len(blobs) - len({b.sha for b in manifest.values()} & {p.name.split(".", 1)[0] for p, _ in blobs})
+
+    ignored = _is_git_ignored(root, plane)
+    if ignored is False:
+        # The one failing case: retained source bytes that git can see.
+        return Check(
+            "acquired plane",
+            False,
+            f"{len(blobs)} blob(s), {total:,} bytes - AND .fux/acquired/ IS NOT GITIGNORED. "
+            "It holds the bytes fetched from your sources; add `acquired/` to .fux/.gitignore "
+            "(fux writes that line, so this means it was edited away)",
+        )
+
+    detail = f"{len(blobs)} blob(s), {total:,} bytes, {len(manifest)} in the manifest"
+    if ignored is None:
+        detail += " (gitignore unchecked: not a git checkout)"
+    if orphans > 0:
+        detail += f" - {orphans} unreferenced, swept on the next `fux update`"
+    cap = acquired.DEFAULT_MAX_BYTES
+    if total > cap * 0.8:
+        return Check(
+            "acquired plane",
+            True,
+            f"{detail} - past 80% of the {cap:,}-byte cap; eviction will start "
+            "dropping the oldest re-acquirable blobs",
+            level="warn",
+        )
+    return Check("acquired plane", True, detail)
 
 
 def _output_config_health(root: Path) -> Check:

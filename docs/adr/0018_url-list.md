@@ -197,6 +197,21 @@ changing a policy is a one-word diff rather than the appearance or disappearance
 of a key. This is the property [ADR-RECORD](0010_index-record.md) already gives
 `meta` inside a record, now given to the source list that produced it.
 
+⚠ **Narrowed 2026-09-01: an attribute whose default is the EMPTY STRING is
+omitted at that default.** `types` gained `decoder=` ([ADR-TYPES](0031_types-list.md)
+decision 11), whose empty default means *no binding declared* — and writing a
+bare `decoder=` on every prose line states no policy, cannot be diffed into one,
+and is four dead characters where this decision promised a meaningful word.
+**The rule this decision actually protects is that a stated policy is visible,
+not that a key is always present**, and an attribute with nothing to state has
+no policy to make visible.
+
+**Nothing existing is affected, and that is checkable, not asserted:** `fetch`,
+`meta`, `keep`, `ttl`, `archived` and `enrich` all have non-empty defaults, so
+all six are still written at their default. The carve-out reaches exactly the
+attributes a future record gives an empty default to — and giving one an empty
+default is now a decision with a visible consequence rather than a free choice.
+
 **13. The reader is lenient; the writer is strict.** A missing attribute takes
 its default **when read**, so a hand-made list, an older file, or a merge that
 dropped a key still loads. But a line missing any attribute **was not written by

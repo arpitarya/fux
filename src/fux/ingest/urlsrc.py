@@ -52,7 +52,8 @@ from dataclasses import dataclass
 from pathlib import Path, PurePosixPath
 
 from ..errors import FuxError
-from . import sourcelist
+from ..store import acquired
+from . import refusals, sourcelist
 from .gitdir import UNFETCHED, Skipped
 
 _HOSTILE_LINE_BREAKS = ("\u2028", "\u2029", "\u0085")
@@ -72,6 +73,12 @@ class UrlEntry:
     fetch: str
     meta: str
     fetcher_path: str
+    #: ADR-ACQUIRED: retain the bytes this URL returned. Opt-in per line.
+    keep: bool = False
+    #: ADR-URL-FRESHNESS: how long a citation may go unchecked at ask time,
+    #: **verbatim** as written ("15m", not 900). Resolved to seconds only at
+    #: the point of use, so config order never changes a committed byte.
+    ttl: str = "24h"
 
 
 def load_fetcher(root: Path, rel_path: str):
@@ -140,6 +147,24 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                 fetch=fetch,
                 meta=meta,
                 fetcher_path=fetcher_for(fetch, source.fetcher),
+                # Three layers, same order as `meta`: built-in default, then
+                # `[sources.url] keep`, then the line. A line that DECLARED
+                # `keep=` wins; one that said nothing takes the source-wide
+                # setting, which `config.py` itself defaults to true.
+                keep=(
+                    entry.attrs["keep"] == "true"
+                    if "keep" in entry.declared
+                    else getattr(source, "keep", True)
+                ),
+                # Same three layers again. Kept as text, not seconds: the
+                # value round-trips back into the file on `fux update`, and a
+                # resolved integer would rewrite `1h` as `3600` behind the
+                # consumer's back.
+                ttl=(
+                    entry.attrs["ttl"]
+                    if "ttl" in entry.declared
+                    else getattr(source, "ttl", "24h")
+                ),
             )
         )
     return resolved
@@ -466,6 +491,62 @@ def _report_rate_limits(root: Path, limited: dict[str, int]) -> None:
         )
 
 
+#: A decoded document below this many words is *reported*, never dropped.
+#:
+#: **Reported, not filtered, and that is the whole design.** ADR-URL-INGEST
+#: decision 4's rule is report-never-auto-delete, and a short page is a
+#: legitimate document -- a stub, a redirect notice, a one-line changelog. A
+#: filter here would silently lose them; a note costs one line and loses
+#: nothing.
+THIN_DOCUMENT_WORDS = 50
+
+#: Below this ratio of decoded words per KB of source, the response is mostly
+#: machinery: script, style and markup with almost no prose in it.
+#:
+#: ⚠ **This is the check `refusals.toml` structurally cannot make.** Refusal
+#: rules run BEFORE `_decode_fetched`, over raw bytes, so they can see that a
+#: response is small but never that a *large* one decoded to nothing. An
+#: application shell is exactly that shape -- measured at 119,756 bytes of
+#: HTML carrying zero characters of visible text -- and it sails past every
+#: byte-level rule while producing an index record that looks like a document
+#: and answers nothing.
+THIN_WORDS_PER_KB = 2.0
+
+
+def _warn_if_thin(url: str, raw: bytes, markdown: str) -> None:
+    """Say so on stderr when a fetch decoded to almost nothing.
+
+    `http.py`'s docstring already names the signal -- *"a tiny wlen in the
+    index is the signal that a page needed a browser, and it is one a human
+    reads once"* -- but nothing ever surfaced it, so the reader had to go
+    looking in the index for a number nobody told them about. A run that
+    indexes an application shell prints `ingested 1 docs ... 0 skipped` and
+    reads as success.
+    """
+    words = len(markdown.split())
+    kb = max(len(raw) / 1024.0, 0.001)
+    # ⚠ **EITHER test passing is enough, and it was AND until 2026-09-01.**
+    # A real 6,727-byte workbook holding one small sheet decodes to 21 words
+    # -- under the absolute floor -- and warned, which is noise on a document
+    # that is simply short. Its ratio was 3.2 words/KB against an application
+    # shell's 0.0, so the ratio separates them cleanly on its own.
+    #
+    # The absolute floor stays as the second escape, for the opposite case:
+    # a large binary document is dense, so a 40 MB workbook full of prose has
+    # a low ratio and must not warn either.
+    if (words / kb) >= THIN_WORDS_PER_KB or words >= THIN_DOCUMENT_WORDS:
+        return
+    print(
+        f"note: {url}\n"
+        f"      decoded to {words} word(s) from {len(raw):,} bytes "
+        f"({words / kb:.1f} words/KB) - indexed, but that is thin enough to be an\n"
+        f"      application shell or a redirect stub rather than the document. If you "
+        f"asked for a\n"
+        f"      file, check the URL returns the FILE and not the app that displays it.",
+        file=sys.stderr,
+    )
+
+
 def fetch_all(
     root: Path,
     entries: list[UrlEntry],
@@ -474,6 +555,7 @@ def fetch_all(
     max_parallel: int | None = None,
     known_tokens: dict[str, str] | None = None,
     validation_out: dict | None = None,
+    acquired_max_bytes: int | None = None,
 ) -> tuple[list[FetchedUrl], list[Skipped]]:
     """Fetch every URL through the fetcher its line declared.
 
@@ -516,6 +598,32 @@ def fetch_all(
     by a human reading an answer. `http.py` builds a fresh request per call and
     is safe. Hence `MAX_PARALLEL`: declared, never detected.
     """
+    # ⚠ **Loaded ONCE, before the first socket opens.** A malformed
+    # `refusals.toml` must stop the run rather than surface as a per-URL skip
+    # halfway through — a rules file that cannot be read is a repo whose
+    # refusal detection is off, and finding that out after 400 URLs have been
+    # written is finding it out too late.
+    refusal_rules = refusals.load(root)
+
+    # ADR-ACQUIRED. `keep` is per line, so the persist step needs to know
+    # which URL it is holding bytes for -- `fetch_all` groups by fetcher and
+    # loses the entry by the time the body arrives.
+    keep_urls = {entry.url for entry in entries if entry.keep}
+    #: The eviction order's key. Read from the state file that already owns the
+    #: counter rather than started here -- two run counters would drift, and
+    #: the one that drifts is the one deciding what gets deleted.
+    run_seq = None
+    if keep_urls:
+        try:
+            from ..maintain import urlstate
+
+            run_seq = urlstate.read(root).run_seq
+        except Exception:  # advisory: a missing counter must not stop a fetch
+            run_seq = None
+    #: Collected here and written ONCE at the end. `fetch` runs under a thread
+    #: pool and a per-fetch manifest write is a corruption.
+    acquired_blobs: dict[str, acquired.Blob] = dict(acquired.read_manifest(root)) if keep_urls else {}
+
     groups: dict[str, list[str]] = {}
     for entry in entries:
         groups.setdefault(entry.fetcher_path, []).append(entry.url)
@@ -565,6 +673,30 @@ def fetch_all(
                         Skipped(rel_path=url, reason="fetcher returned no bytes", kind=UNFETCHED)
                     )
                     continue
+                # **Before the decoder, and before anything is retained.** A
+                # refusal that reaches `_decode_fetched` decodes perfectly well
+                # -- a sign-in page is valid HTML -- and lands in the index as a
+                # confident wrong answer. Storing one would be worse still:
+                # wrong bytes kept, and made to look authoritative.
+                denial = refusals.refused(refusal_rules, url, content_type, raw)
+                if denial is not None:
+                    skipped.append(Skipped(rel_path=url, reason=denial, kind=UNFETCHED))
+                    continue
+                # ADR-ACQUIRED: after the refusal check, before the decoder.
+                # A refusal must never be retained -- that would keep the
+                # wrong bytes AND make them look authoritative -- and keeping
+                # them before decoding means a decoder change can be replayed
+                # against the original without going back to the network.
+                if url in keep_urls:
+                    try:
+                        acquired_blobs[url] = acquired.save(
+                            root, url, raw, content_type,
+                            _EXT_FOR.get(_mime_of(content_type), ""), run_seq=run_seq,
+                        )
+                    except OSError as exc:
+                        # Retention is a convenience; losing it must never cost
+                        # the document. Report and carry on.
+                        print(f"note: could not retain {url}: {exc}", file=sys.stderr)
                 markdown, why = _decode_fetched(raw, content_type, url, root)
                 if markdown is None:
                     skipped.append(Skipped(rel_path=url, reason=why))
@@ -572,6 +704,7 @@ def fetch_all(
                 if not markdown.strip():
                     skipped.append(Skipped(rel_path=url, reason="fetcher returned no text"))
                     continue
+                _warn_if_thin(url, raw, markdown)
                 fetched.append(FetchedUrl(url=url, content=sanitize(markdown)))
         finally:
             if callable(close):
@@ -582,6 +715,41 @@ def fetch_all(
 
     fetched.sort(key=lambda f: f.url)
     skipped.sort(key=lambda s: s.rel_path)
+    if keep_urls:
+        acquired_blobs = {u: b for u, b in acquired_blobs.items() if u in keep_urls}
+        # Unreferenced first: a blob nobody points at is unreachable by
+        # construction, so removing it can lose nothing that could be cited.
+        acquired.sweep(root, acquired_blobs)
+        # Then the bound. **A URL whose last fetch failed is protected**: its
+        # blob is the one that cannot be re-acquired, which is the whole reason
+        # eviction is safe at all.
+        failing: set[str] = set()
+        try:
+            from ..maintain import urlstate
+
+            # `fail_streak > 0`, not `>= FAILING_STREAK`. That constant is the
+            # threshold for *reporting* a URL as dead; here a SINGLE failure is
+            # already enough to mean "this one may not be re-acquirable right
+            # now", and the cost of protecting it is one blob of disk.
+            failing = {
+                url
+                for url, health in urlstate.read(root).urls.items()
+                if health.fail_streak > 0
+            }
+        except Exception:
+            failing = set()
+        cap = acquired_max_bytes or acquired.DEFAULT_MAX_BYTES
+        evicted = acquired.evict(root, acquired_blobs, max_bytes=cap, protected=failing)
+        for url in evicted:
+            acquired_blobs.pop(url, None)
+        if evicted:
+            print(
+                f"note: .fux/acquired/ passed its {cap:,}-byte cap; evicted "
+                f"{len(evicted)} blob(s), oldest run first. Nothing whose last "
+                f"fetch failed was touched - those cannot be re-acquired.",
+                file=sys.stderr,
+            )
+        acquired.write_manifest(root, acquired_blobs)
     _report_rate_limits(root, limited)
     if validation_out is not None:
         validation_out["unchanged"] = sorted(validated)
@@ -624,6 +792,16 @@ _TYPE_EXT = {
     "application/rtf": ".rtf",
     "text/rtf": ".rtf",
 }
+
+
+#: content type -> file extension, for naming a retained blob. Derived from
+#: `_TYPE_EXT` so the two can never disagree; an unknown type simply gets no
+#: extension, which is a blob you can still read but not double-click.
+_EXT_FOR = {mime: ext for mime, ext in _TYPE_EXT.items() if ext}
+
+
+def _mime_of(content_type: str) -> str:
+    return (content_type or "").split(";", 1)[0].strip().lower()
 
 
 def validate_group(module, urls: list[str], known: dict[str, str]) -> tuple[set[str], dict[str, str]]:

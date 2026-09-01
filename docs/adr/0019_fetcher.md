@@ -174,7 +174,18 @@ than one can exist in a repo at once.
 **Fux ships two of them and imports neither.** `http.py` and `cdp.py` live in
 the wheel as package data under `src/fux/templates/`, **with an extension
 Python's import machinery cannot resolve**, and `fux setup` copies them out
-write-if-missing. That is decision 1 made **structural**: a `.py` in the package
+write-if-missing.
+
+⚠ **The two shipped files are on the same axis, and it is *whose session*, not
+*how hard it tries*.** `http.py` uses none; `cdp.py` borrows the one your
+browser already holds. **Neither renders a page** — `cdp.py` stopped on
+2026-09-01 (W-98) and now intercepts the response, so both return the bytes the
+server sent and the type it declared, and `fux.decode` converts. That matters
+here rather than only in [ADR-CDP-FETCHER](0020_cdp-fetcher.md): decision 5
+forbids escalation between fetchers, which is only coherent while the two
+produce the *same kind of thing* for the same URL. A renderer and a downloader
+on one axis would have made "which fetcher ran" a fact about the committed
+index, and that is L3 demoted to a code comment. That is decision 1 made **structural**: a `.py` in the package
 could be imported by a later edit, a `.py.txt` cannot be. It also answers the
 question a shipped default otherwise raises — how an air-gapped consumer gets a
 working fetcher without being told to copy a file from GitHub.

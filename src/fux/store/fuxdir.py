@@ -43,6 +43,15 @@ COMMITTED: dict[str, str] = {
     "enrich": "pinned enrichment text, one file per source content sha, plus `queue.tsv` (W-86 P6: what fux could NOT read and a model must). Committed, because a backlog is a team fact",
 }
 
+#: Gitignored like DERIVED, and NOT rebuildable -- which is exactly why it is
+#: not filed there. `runtime/` means "fux build can reconstruct this"; an
+#: acquired blob can only be re-ACQUIRED, and only while the source still
+#: exists and the session that reached it still holds (ADR-ACQUIRED).
+ACQUIRED: dict[str, str] = {
+    # ASCII only, like every other value in these tables.
+    "acquired": "the bytes a fetch actually returned, for URLs whose line says keep=true. Gitignored and NOT rebuildable - re-acquirable only, and only while the source is still reachable; carries CACHEDIR.TAG",
+}
+
 DERIVED: dict[str, str] = {
     "runtime": "M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull)",
 }
@@ -64,10 +73,14 @@ COMMITTED_FILES: dict[str, str] = {
     # ASCII only, like every other value in these tables -- `_readme()` encodes
     # them for a Windows console.
     ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE)",
+    # ASCII only, like every other value in these tables.
+    # ASCII only, like every other value in these tables.
+    "pii.toml": "what is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII)",
+    "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL)",
 }
 
 #: Everything legally found directly under `.fux/`; anything else is a warning.
-DECLARED = (*COMMITTED, *COMMITTED_FILES, *DERIVED, *GENERATED_FILES)
+DECLARED = (*COMMITTED, *COMMITTED_FILES, *DERIVED, *ACQUIRED, *GENERATED_FILES)
 
 # CACHEDIR.TAG's first line is a fixed signature — byte-exact, per the spec.
 CACHEDIR_SIGNATURE = "Signature: 8a477f597d28d172789f06886806bc55"
@@ -78,12 +91,17 @@ CACHEDIR_TAG = (
 )
 
 _GITIGNORE = (
-    "# Derived planes only: rebuildable from the committed index and the\n"
-    "# source systems. NEVER add `*` here: `.fux/index/`, `.fux/sources/`,\n"
-    "# `.fux/fetchers/` and `.fux/decoders/` are committed, and a blanket\n"
-    "# ignore would drop them\n"
-    "# from git silently. `fux doctor` checks exactly that.\n"
+    "# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,\n"
+    "# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,\n"
+    "# and a blanket ignore would drop them from git silently. `fux doctor`\n"
+    "# checks exactly that.\n"
+    "#\n"
+    "# `runtime/` is DERIVED: rebuildable from the committed index by\n"
+    "# `fux build`. `acquired/` is not -- it holds the bytes a fetch actually\n"
+    "# returned, which can only be re-acquired while the source is still\n"
+    "# reachable. Both are ignored; only one can be regenerated.\n"
     + "".join(f"{name}/\n" for name in DERIVED)
+    + "".join(f"{name}/\n" for name in ACQUIRED)
 )
 
 
@@ -93,18 +111,27 @@ def _readme() -> str:
     rows = [
         "# `.fux/`",
         "",
-        "Fux's directory in your repo. Every child is declared below as",
-        "**committed** (belongs in git) or **derived** (rebuildable, ignored,",
-        "tagged with [`CACHEDIR.TAG`](https://bford.info/cachedir/)).",
+        "Fux's directory in your repo. Every child is declared below, in one",
+        "of THREE kinds:",
+        "",
+        "- **committed** - belongs in git. This is the product.",
+        "- **derived** - rebuildable from the committed bytes by `fux build`.",
+        "  Ignored, tagged with [`CACHEDIR.TAG`](https://bford.info/cachedir/),",
+        "  and safe to delete at any time.",
+        "- **acquired** - the bytes a fetch returned. Ignored and tagged like",
+        "  derived, but NOT rebuildable: deleting it loses the only local copy,",
+        "  and getting it back means re-fetching from a source that must still",
+        "  exist and a session that must still hold.",
         "",
         "| entry | kind | what it is |",
         "|---|---|---|",
         "| `README.md` | committed | this file: written once by fux, yours to annotate |",
-        "| `.gitignore` | committed | lists only the derived directories, never `*` |",
+        "| `.gitignore` | committed | lists the ignored directories BY NAME, never `*` |",
     ]
     rows += [f"| `{name}/` | committed | {desc} |" for name, desc in COMMITTED.items()]
     rows += [f"| `{name}` | committed | {desc} |" for name, desc in COMMITTED_FILES.items()]
     rows += [f"| `{name}/` | derived | {desc}; carries `CACHEDIR.TAG` |" for name, desc in DERIVED.items()]
+    rows += [f"| `{name}/` | acquired | {desc} |" for name, desc in ACQUIRED.items()]
     rows += [
         "",
         "## The fetchers are yours",
@@ -123,8 +150,11 @@ def _readme() -> str:
         "",
         "- Anything here that is not in the table above is undeclared; `fux",
         "  doctor` warns about it.",
-        "- Derived directories can be deleted at any time; committed ones",
+        "- Derived directories can be deleted at any time. Committed ones",
         "  cannot be rebuilt from anything but their source systems.",
+        "- `acquired/` sits between the two: deleting it costs you the local",
+        "  copy of bytes you already fetched, and a re-fetch is the only way",
+        "  back. `fux doctor` reports its size.",
         "- Fux writes `README.md` and `.gitignore` **only if missing**. Your",
         "  edits survive every ingest.",
         "",

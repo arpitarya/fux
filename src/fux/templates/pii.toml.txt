@@ -1,0 +1,160 @@
+# .fux/pii.toml -- what is removed from the COMMITTED INDEX, and nowhere else.
+#
+# THIS FILE IS YOURS. `fux setup` writes it once if it is missing and never
+# rewrites it. Fux ships the matcher; the policy is yours, because what counts
+# as PII differs by jurisdiction, industry and corpus, and a floor fux imposed
+# would be wrong somewhere and impossible to switch off.
+#
+# ============================================================================
+# WHAT THIS DOES, AND WHAT IT DOES NOT
+# ============================================================================
+#
+#   .fux/index/        REDACTED    committed, cloned, travels everywhere
+#   .fux/acquired/     raw         gitignored; must stay the exact bytes the
+#                                  source returned or `as-ingested` is a lie
+#   fux answer quotes  raw         read from the source under YOUR access,
+#                                  never committed
+#
+# So `fux answer` can quote a value the index does not contain. That is the
+# design: the reader already has access to the document. What changed is that
+# the value no longer ships inside a committed artifact to everyone who clones.
+#
+# ============================================================================
+# AFTER EDITING THIS FILE
+# ============================================================================
+#
+# Nothing else needs doing. Redaction happens before extraction, so changing a
+# rule changes what should be indexed for documents whose bytes did not change
+# -- fux notices the ruleset moved and re-extracts the corpus on the next
+# `fux ingest`. That run is a full one, so it costs what a full ingest costs.
+#
+# `fux doctor` compiles every pattern here offline and names any that fail.
+#
+# ============================================================================
+# WRITING A RULE
+# ============================================================================
+#
+#   name          required.  Unique. Appears in the default replacement, so a
+#                            reader of a redacted index can see which rule fired.
+#   pattern       required.  A Python regex. Refused at load if it can match
+#                            the empty string.
+#   replacement   optional.  Defaults to "[PII:<name>]". Keep it STABLE -- it
+#                            lands in committed bytes, so changing it rewrites
+#                            every affected record.
+#   flags         optional.  Any of: ignorecase, multiline, dotall, verbose.
+#   group         optional.  Replace only this capture group and keep the rest
+#                            of the match. How a rule holds its own context:
+#                            "card ending 4242" -> "card ending [PII:card]".
+#
+# Rules run TOP TO BOTTOM, each a full pass. Order is observable: a later rule
+# can match text an earlier rule inserted. Put narrow rules before broad ones.
+#
+# ============================================================================
+# A WORD ON FALSE POSITIVES
+# ============================================================================
+#
+# Redaction is IRREVERSIBLE in the index. A rule that is too broad quietly
+# removes real vocabulary and makes documents unfindable by the words that
+# would have found them -- and unlike a refusal, nothing looks wrong.
+#
+# Before adding a rule, run it over the corpus and read what it caught:
+#
+#     python3 tools/pii-probe/probe.py . --rule <name>
+#
+# Every rule below is commented with what it will over-match. Read that line
+# before you enable it. THE STARTER SHIPS WITH THE SAFE ONES ENABLED AND THE
+# RISKY ONES COMMENTED OUT, on purpose.
+
+
+# --- email -----------------------------------------------------------------
+# Safe. The shape is unambiguous and almost nothing else has it.
+# Over-matches: `noreply@`, `support@`, and example addresses in documentation.
+# If your docs are full of `user@example.com`, that vocabulary is gone -- which
+# is usually fine, and occasionally is the thing someone searched for.
+[[rule]]
+name        = "email"
+pattern     = '''[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}'''
+replacement = "[PII:email]"
+
+
+# --- bearer tokens, API keys, JWTs -----------------------------------------
+# Safe, and arguably the highest-value rule here: a key committed into an index
+# is a live credential in every clone.
+[[rule]]
+name        = "jwt"
+pattern     = '''eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}'''
+replacement = "[PII:jwt]"
+
+[[rule]]
+name        = "aws-access-key"
+pattern     = '''\b(?:AKIA|ASIA|AGPA|AIDA|AROA|ANPA|ANVA)[0-9A-Z]{16}\b'''
+replacement = "[PII:aws-key]"
+
+[[rule]]
+name        = "github-token"
+pattern     = '''\bgh[pousr]_[A-Za-z0-9]{36,}\b'''
+replacement = "[PII:github-token]"
+
+# `group = 1` keeps the label. "Authorization: Bearer [PII:bearer]" still tells
+# a reader what kind of line this was, which a whole-line redaction destroys.
+[[rule]]
+name        = "bearer-token"
+pattern     = '''(?i)\b(?:authorization\s*:\s*)?bearer\s+([A-Za-z0-9._\-+/=]{20,})'''
+replacement = "[PII:bearer]"
+group       = 1
+
+
+# --- Indian identifiers ----------------------------------------------------
+# PAN is a fixed 10-character shape and rarely collides with real words.
+[[rule]]
+name        = "pan"
+pattern     = '''\b[A-Z]{5}[0-9]{4}[A-Z]\b'''
+replacement = "[PII:pan]"
+
+# ⚠ AADHAAR IS COMMENTED OUT AND SHOULD STAY THAT WAY UNTIL YOU HAVE CHECKED.
+# A bare 12-digit run is also an order id, a timestamp in milliseconds, a
+# phone number with a country code, and a row count. This regex requires the
+# conventional 4-4-4 spacing, which cuts the false-positive rate hugely and
+# misses every unspaced one. There is no shape-only rule here that is both
+# safe and complete -- Aadhaar has a Verhoeff checksum, and a checksum is not
+# something a regex can do.
+#
+# [[rule]]
+# name        = "aadhaar"
+# pattern     = '''\b[2-9][0-9]{3}\s[0-9]{4}\s[0-9]{4}\b'''
+# replacement = "[PII:aadhaar]"
+
+
+# --- payment card ----------------------------------------------------------
+# ⚠ COMMENTED OUT. Same problem, worse: a 16-digit run is an order number, a
+# tracking id, a hash prefix. Cards have a Luhn checksum and a regex cannot
+# compute one. This pattern requires separators, which real pasted card numbers
+# often have and real order ids usually do not.
+#
+# [[rule]]
+# name        = "card"
+# pattern     = '''\b(?:4[0-9]{3}|5[1-5][0-9]{2}|3[47][0-9]{2}|6(?:011|5[0-9]{2}))[ -][0-9]{4}[ -][0-9]{4}[ -][0-9]{4}\b'''
+# replacement = "[PII:card]"
+
+
+# --- phone numbers ---------------------------------------------------------
+# ⚠ COMMENTED OUT. Phone shapes overlap with version strings, port ranges,
+# ticket numbers and dates in most corpora. Enable it only after running the
+# probe, and prefer a pattern anchored on YOUR country code.
+#
+# [[rule]]
+# name        = "phone-in"
+# pattern     = '''\b(?:\+91[ -]?)?[6-9][0-9]{9}\b'''
+# replacement = "[PII:phone]"
+
+
+# --- private IP addresses --------------------------------------------------
+# ⚠ COMMENTED OUT. In an infrastructure runbook an internal IP is often the
+# single most useful thing on the page, and removing it makes the runbook
+# useless while looking like it worked. Enable only if your threat model says
+# topology is the secret.
+#
+# [[rule]]
+# name        = "private-ip"
+# pattern     = '''\b(?:10\.(?:[0-9]{1,3}\.){2}[0-9]{1,3}|192\.168\.[0-9]{1,3}\.[0-9]{1,3}|172\.(?:1[6-9]|2[0-9]|3[01])\.[0-9]{1,3}\.[0-9]{1,3})\b'''
+# replacement = "[PII:private-ip]"

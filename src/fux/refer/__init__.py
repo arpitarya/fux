@@ -62,10 +62,16 @@ from . import fetchcache as fetchcache_mod
 from . import freshness as freshness_mod
 from ._assemble import DEFAULT_BUDGET, PER_DOC_FRACTION, Assembled, assemble
 from ._chunk import MAX_PASSAGE_BYTES, MIN_PASSAGE_BYTES, chunk
-from .freshness import Policy, Verdict, cached as cached_verdict, verify
+from .freshness import (
+    Policy,
+    Verdict,
+    as_ingested as as_ingested_verdict,
+    cached as cached_verdict,
+    verify,
+)
 from ._rescore import ScoredPassage, rescore
 from ..errors import FuxError
-from .source import Fetched, fetch_document
+from .source import Fetched, fetch_document, from_acquired
 
 __all__ = [
     "Bundle",
@@ -167,9 +173,12 @@ def refer(
     if fetch_cache is None and policy.caches:
         fetch_cache = fetchcache_mod.FetchCache(root)
 
+    # Read once per call, and only when it can matter -- see `_declared_ttls`.
+    ttls = _declared_ttls(root) if policy.caches else {}
+
     for doc_id, loc, indexed_sha in candidates:
         result, cited = _obtain(
-            root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache
+            root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache, ttls
         )
         documents.append(cited)
         if result is None:
@@ -250,7 +259,67 @@ def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:
         pass
 
 
-def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache):
+def _declared_ttls(root) -> dict[str, int]:
+    """`loc -> seconds`, from the committed URL list's `ttl=` attribute.
+
+    ⚠ **Read only when the caller has already opted into caching.** With the
+    default policy (`cache_ttl_seconds=0`) nothing here is opened, so the
+    common path costs no file read and gains no new failure mode. When the
+    caller HAS opted in, a malformed URL list raises here exactly as it does
+    in `fux ingest` -- a file that exists and is wrong is the case a loader
+    refusal is for (ADR-DOTFUX).
+
+    The three layers -- built-in default, `[sources.url] ttl`, the line -- are
+    resolved by `resolve_urls`, the same function that resolves `keep`. This
+    never re-implements them.
+    """
+    from ..config import CONFIG_NAME
+    from ..config import load as load_config
+    from ..ingest import sourcelist, urlsrc
+
+    # ⚠ **An UNCONFIGURED repo declares nothing; it is not a malformed one.**
+    # The refusal above is for a file that exists and is wrong. `refer()` is
+    # reachable from a library caller with no `fux.toml` at all, and raising
+    # there would make opting into caching a new way for an answer to fail --
+    # exactly the new failure mode this function's contract says it does not add.
+    if not (Path(root) / CONFIG_NAME).is_file():
+        return {}
+    source = load_config(root).url
+    if source is None:
+        return {}
+    entries = urlsrc.read_urls(root, source.urls_file)
+    out: dict[str, int] = {}
+    for resolved in urlsrc.resolve_urls(entries, source):
+        seconds = sourcelist.parse_duration(resolved.ttl)
+        if seconds is not None:
+            out[resolved.url] = seconds
+    return out
+
+
+def _effective_ttl(loc: str, policy, declared: dict[str, int]) -> int:
+    """`min(policy, declared)` -- the per-URL value NARROWS and never widens.
+
+    Both halves of that are load-bearing, and they answer different failures:
+
+    - **It cannot widen**, so a URL line can never serve a cached byte to a
+      caller who did not ask for caching. The policy default is `0`, and
+      `min(0, 86400)` is `0` -- W-60 verdict F holds by arithmetic rather than
+      by a rule somebody has to remember.
+    - **It can narrow**, so `ttl=0` on one line means *always go out for this
+      one*, whatever the caller's policy says. That is the case a per-URL
+      attribute exists for: a runbook that must never be answered from a
+      cached copy sits in the same corpus as a spec that may.
+
+    The same `min(configured, declared)` shape as `max_parallel`, and for the
+    same reason: a declaration may lower a bound, never raise it.
+    """
+    seconds = declared.get(loc)
+    if seconds is None:
+        return policy.cache_ttl_seconds
+    return min(policy.cache_ttl_seconds, seconds)
+
+
+def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache, ttls=None):
     """Get one document's bytes, and record honestly what happened.
 
     **The `never` branch still reads a `file:` document.** Reading the local
@@ -262,20 +331,31 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
 
     strategy = resolve(doc_id)
     if strategy != GIT and not decision.fetch:
+        # Policy forbids going out -- but if the bytes this record was built
+        # from are on disk, comparing against them is a REAL comparison and
+        # strictly more than `unverified` has ever been able to say.
+        retained = from_acquired(root, doc_id, loc)
+        if retained is not None:
+            return retained, Cited(
+                doc_id, loc,
+                as_ingested_verdict(indexed_sha, retained.sha, f"{decision.reason}; compared against .fux/acquired/"),
+                strategy,
+            )
         return None, Cited(doc_id, loc, verify(indexed_sha, None, decision.reason), strategy)
 
     # The TTL cache, before the network and **only for external sources**. A
     # `file:` read is free and always available, so caching it would add a
     # staleness window in exchange for nothing.
-    if strategy != GIT and policy.caches and fetch_cache is not None:
-        entry = fetch_cache.get(loc, policy.cache_ttl_seconds)
+    ttl = _effective_ttl(loc, policy, ttls or {})
+    if strategy != GIT and policy.caches and ttl > 0 and fetch_cache is not None:
+        entry = fetch_cache.get(loc, ttl)
         if entry is not None:
             age = entry.age_seconds(fetch_cache.now())
             return (
                 Fetched(doc_id, loc, entry.content, entry.fetched_sha, strategy),
                 Cited(
                     doc_id, loc,
-                    cached_verdict(indexed_sha, entry.fetched_sha, age, policy.cache_ttl_seconds),
+                    cached_verdict(indexed_sha, entry.fetched_sha, age, ttl),
                     strategy,
                 ),
             )
@@ -302,11 +382,28 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
     try:
         result = fetch_document(root, doc_id, loc, fetcher=fetcher)
     except FuxError as exc:
+        # ⚠ **The case `.fux/acquired/` exists for.** Signed out, offline, or
+        # the source is gone: without retained bytes this is `unverified`,
+        # which is indistinguishable from never having looked. With them it
+        # becomes `as-ingested` -- we could not look, but the passage still
+        # matches the exact input the record was built from.
+        retained = from_acquired(root, doc_id, loc)
+        if retained is not None:
+            return retained, Cited(
+                doc_id, loc,
+                as_ingested_verdict(indexed_sha, retained.sha, f"{exc}; compared against .fux/acquired/"),
+                strategy,
+                str(exc),
+            )
         # Honest degradation: declared unverified, never stale-as-fresh.
         return None, Cited(doc_id, loc, verify(indexed_sha, None, str(exc)), strategy, str(exc))
 
     if cache is not None:
         cache.put((loc, result.sha), result.content)
-    if strategy != GIT and policy.caches and fetch_cache is not None:
+    # ⚠ Gated on the EFFECTIVE ttl, not the policy. `ttl=0` on a line means
+    # "never serve this from a cache", and a copy that is written but never
+    # read is a copy of an access-controlled document sitting on disk for no
+    # benefit at all.
+    if strategy != GIT and policy.caches and ttl > 0 and fetch_cache is not None:
         fetch_cache.put(loc, result.sha, result.content)
     return result, Cited(doc_id, loc, verify(indexed_sha, result.sha), strategy)

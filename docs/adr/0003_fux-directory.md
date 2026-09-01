@@ -2,11 +2,10 @@
 type: ADR
 name: ADR-DOTFUX
 title: ADR-DOTFUX (0003) — the .fux/ directory
-description: Every child of .fux/ is declared committed or derived; the ignore rule is narrow by construction and asserted by doctor against git itself.
+description: "Every child of .fux/ is declared committed, derived or acquired; the ignore rule is narrow by construction and asserted by doctor against git itself."
 status: accepted
-amended: 2026-08-28
 date: 2026-08-18
-feature: the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest
+feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
 owns: [src/fux/store/fuxdir.py, src/fux/doctor.py, src/fux/setup.py]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
@@ -16,17 +15,23 @@ timestamp: 2026-08-18T00:00:00Z
 
 ## §1 — For humans
 
-`.fux/` holds two kinds of thing that must never be confused: bytes that
-**belong in git** and bytes that are **rebuildable**. The index is committed —
-it is the product. The accelerator is derived — delete it any time, `fux build`
-brings it back.
+`.fux/` holds three kinds of thing that must never be confused. The index is
+**committed** — it is the product, and it belongs in git. The accelerator is
+**derived** — delete it any time, `fux build` brings it back. The fetched source
+bytes are **acquired** — ignored like derived, and *not* rebuildable: only
+re-acquirable, and only while the source still exists and the session that
+reached it still holds ([ADR-ACQUIRED](0050_acquired-plane.md)).
+
+The third kind is not a subdivision of the second, and the distinction is the
+whole reason it has a name. `runtime/` is defined by *"`fux build` can
+reconstruct this"*. Nothing can reconstruct a blob whose source has gone.
 
 The failure mode this layout exists to prevent is not exotic. Put both under
 one dotdir and a single `.gitignore` line reading `.fux/*` quietly drops your
 committed index from version control. Nothing errors. You find out when a
 colleague clones the repo and the index is empty.
 
-So: **every child is declared**, the generated `.gitignore` lists derived
+So: **every child is declared**, the generated `.gitignore` lists the ignored
 directories by name and never a wildcard, and `fux doctor` asserts with git
 itself that the index is not ignored.
 
@@ -40,9 +45,12 @@ flowchart TD
     F --> C3["fetchers/ — committed<br/>YOUR code"]
     F --> C4["decoders/ — committed<br/>YOUR code; these copies RUN"]
     F --> C5["enrich/ — committed<br/>pinned text + queue.tsv"]
-    F --> C6["tune.toml · .fuxignore · README.md · .gitignore<br/>committed files, write-if-missing"]
-    F --> D1["runtime/ — derived<br/>CACHEDIR.TAG"]
+    F --> C6["README.md · .gitignore<br/>generated, write-if-missing"]
+    F --> C7["tune.toml · output.toml · .fuxignore · refusals.toml<br/>committed files, write-if-missing"]
+    F --> D1["runtime/ — derived<br/>CACHEDIR.TAG · rebuildable"]
+    F --> A1["acquired/ — acquired<br/>CACHEDIR.TAG · NOT rebuildable"]
     D1 -.->|"git check-ignore<br/>asserted by doctor"| G["ignored"]
+    A1 -.->|"same ignore, different promise"| G
     C1 -.->|"must NOT be ignored"| G
 ```
 
@@ -58,13 +66,20 @@ flowchart TD
     +-- decoders/     COMMITTED   your code; THESE COPIES RUN, not the package's
     +-- enrich/       COMMITTED   pinned enrichment text + queue.tsv
     +-- tune.toml     COMMITTED   how results are ORDERED (write-if-missing)
+    +-- output.toml   COMMITTED   how a result is SHOWN (write-if-missing)
     +-- .fuxignore    COMMITTED   what is NOT indexed, .gitignore's grammar
+    +-- refusals.toml COMMITTED   what a REFUSAL looks like here (ADR-REFUSAL)
     +-- README.md     COMMITTED   the declaration table (write-if-missing)
-    +-- .gitignore    COMMITTED   names derived dirs; NEVER `*`
+    +-- .gitignore    COMMITTED   names ignored dirs; NEVER `*`
     |
     +-- runtime/      derived     accelerator segments  [CACHEDIR.TAG]
-        +-- fetch-cache/          the TTL fetch cache, nested here
+    |   +-- fetch-cache/          the TTL fetch cache, nested here
+    |
+    +-- acquired/     ACQUIRED    the bytes a fetch returned  [CACHEDIR.TAG]
+        +-- objects/<xx>/<sha><ext>
+        +-- manifest.json         url -> sha, advisory and gitignored
 
+   Both bottom two are gitignored. Only `runtime/` can be rebuilt.
    `fux doctor` runs `git check-ignore` and fails if index/ is ignored.
 ```
 
@@ -77,15 +92,26 @@ What `fux ingest` generates, and the two files that make the layout checkable:
 ```console
 $ find .fux -maxdepth 2 -type d | sort
 .fux
-.fux/index
+.fux/acquired
+.fux/acquired/objects
 .fux/fetchers
+.fux/index
 .fux/runtime
 .fux/runtime/postings
 .fux/sources
 
 $ cat .fux/.gitignore
-# Derived planes only: … NEVER add `*` here …
+# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,
+# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,
+# and a blanket ignore would drop them from git silently. `fux doctor`
+# checks exactly that.
+#
+# `runtime/` is DERIVED: rebuildable from the committed index by
+# `fux build`. `acquired/` is not -- it holds the bytes a fetch actually
+# returned, which can only be re-acquired while the source is still
+# reachable. Both are ignored; only one can be regenerated.
 runtime/
+acquired/
 ```
 
 The check that matters is against git itself, not the file's text:
@@ -104,7 +130,8 @@ $ fux doctor
 
 `.fux/` accumulates planes: the committed index, the source lists, the consumer
 fetchers and decoders, the runtime accelerator, a TTL fetch cache nested inside
-it. Nothing declared which of them git should carry.
+it, and now the retained source bytes. Nothing declared which of them git should
+carry.
 
 The hazard is asymmetric. A derived directory accidentally committed is noise
 someone notices. A **committed directory accidentally ignored is silent data
@@ -116,26 +143,35 @@ be a machine's job.
 
 ### Decision
 
-**1. Every child of `.fux/` is declared committed or derived**, in a table in
-the generated `.fux/README.md`. Undeclared entries are a `fux doctor` warning,
-not a shrug.
+**1. Every child of `.fux/` is declared committed, derived or acquired**, in a
+table in the generated `.fux/README.md`. Undeclared entries are a `fux doctor`
+warning, not a shrug.
+
+⚠ **A third kind was added rather than a second gitignore line**, and the
+argument is one property: `runtime/` *means* rebuildable, and an acquired blob
+is not. Filing it under `DERIVED` would make the generated README tell a reader
+`rm -rf` is safe when it is not, and the README is generated precisely so that
+nobody has to remember which directories are which. See
+[ADR-ACQUIRED](0050_acquired-plane.md) decision 1.
 
 **2. The declaration, in full.** It is generated from
 [`fuxdir.py`](../../src/fux/store/fuxdir.py)'s `COMMITTED`, `COMMITTED_FILES`,
-`DERIVED` and `GENERATED_FILES` — that module is the source, this table is the
-reasoning.
+`DERIVED`, `ACQUIRED` and `GENERATED_FILES` — that module is the source, this
+table is the reasoning.
 
 | entry | kind | what it is, and why that kind |
 |---|---|---|
 | `index/` | committed | the product; nothing can recompute it |
-| `sources/` | committed | `dirs` · `urls` · `types`, one entry per line, on the one grammar in [ADR-URL-LIST](0018_url-list.md) |
+| `sources/` | committed | `dirs` · `urls` · `types`, one entry per line, on the one grammar in [ADR-URL-LIST](0018_url-list.md). ⚠ Since 2026-09-01 `types` is also the **decoder map**: `fux setup` writes `decoder=<module>` on every line a built-in reads, so which decoder ran is a committed fact rather than a property of the machine's `decoders/` ([ADR-TYPES](0031_types-list.md) decision 11). Still write-if-missing — a repo that already has the file keeps it, bindings and all |
 | `fetchers/` | committed | consumer code — decision 4 |
 | `decoders/` | committed | consumer code — decision 5 |
 | `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [ADR-ENRICH](0040_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L3 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
 | `tune.toml` | committed | how results are **ordered**, never what is indexed. A preference that does not travel with the clone is not one: two clones would rank the same corpus differently, which is the surprise this split exists to remove |
 | `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([ADR-FUXIGNORE](0048_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`, and never rewritten |
 | `README.md` · `.gitignore` | committed | generated, write-if-missing |
+| `refusals.toml` | committed | what a **refusal** looks like in this organisation — the sign-in walls, paywalls and viewer shells a server returns instead of the document ([ADR-REFUSAL](0051_refusals.md)). Consumer-owned and additive; the engine ships no vendor knowledge, and the always-on magic-byte floor is not configurable from it. Committed because *"what does a login page look like here"* is a team fact, exactly like `.fuxignore` |
 | `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, and `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull |
+| `acquired/` | **acquired** | the bytes a fetch returned, for URLs whose line says `keep=true` — `objects/<sha[:2]>/<sha><ext>` plus an advisory `manifest.json`. Ignored and `CACHEDIR.TAG`-tagged like derived, and **not rebuildable**: `fux build` cannot produce it, only a re-fetch against a source that still exists. It is what lets an offline citation say `as-ingested` instead of `unverified` ([ADR-URL-FRESHNESS](0052_url-freshness.md)), and it is bounded and evicted rather than unbounded |
 
 ⚠ **`COMMITTED_FILES` exists because its absence was a live defect.** `DECLARED`
 was built from committed *directories* only, so a committed **file** had no row
@@ -144,19 +180,30 @@ condition 1, firing, on `tune.toml` and `.fux/enrich/` at once. Found by
 checking the claim rather than asserting it. **`.fuxignore` got its row in the
 change that introduced it**, which is what the table is for.
 
-**3. The generated `.gitignore` names derived directories and never a
-wildcard.** `runtime/`, one line. A `*` in that file is a defect regardless of
-what follows it. One directory-level rule is also why a new file under
-`runtime/` needs no new ignore line.
+**3. The generated `.gitignore` names the ignored directories and never a
+wildcard.** `runtime/` and `acquired/`, one line each, with the header saying
+which is rebuildable and which is not. A `*` in that file is a defect regardless
+of what follows it. One directory-level rule per plane is also why a new file
+under either needs no new ignore line.
+
+⚠ **`acquired/` being gitignored is checked by machine, not trusted to a
+reader.** It holds source content — bytes fetched out of somebody's document
+system — and a repo that committed it would be publishing them. `fux doctor`
+fails as an **error**, not a warning, when `.fux/acquired/` is not ignored; it
+is the one acquired-plane check that is not merely informational.
 
 **4. `fux doctor` asserts the ignore rule against git**, not against the file's
 text — `git check-ignore` on the index path. The check is of the *effective*
 state, which is the only state that matters.
 
-**5. Derived directories carry `CACHEDIR.TAG`**
+**5. Every gitignored plane carries `CACHEDIR.TAG`** — derived and acquired
+alike
 ([bford.info/cachedir](https://bford.info/cachedir/)), so backup tools,
 `tar --exclude-caches` and IDE indexers skip them without per-tool
-configuration. See [ADR-CACHEDIR-TAG](0023_cachedir-tag.md).
+configuration. See [ADR-CACHEDIR-TAG](0023_cachedir-tag.md). ⚠ **For
+`acquired/` the tag is doing more than saving disk**: keeping fetched source
+bytes out of a backup is the same L2 concern that makes the gitignore an error
+rather than a warning.
 
 **6. Scaffolding has two moments, and everything in both is write-if-missing.**
 One generator doing both jobs is how a repo that wanted an index ends up
@@ -337,11 +384,26 @@ one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
 - **Derived planes are disposable by contract.** `rm -rf .fux/runtime` is
   always safe; that property is what lets the accelerator be aggressive, and it
   costs at most one repeat of the skip list.
+- ⚠ **The acquired plane is NOT disposable, and the dotdir no longer has a
+  uniform answer to "can I delete this?"** `rm -rf .fux/acquired` loses the only
+  local copy of bytes that may not be re-fetchable, and the loss is silent — the
+  next `fux ask` simply degrades from `as-ingested` to `unverified`. Three
+  things make the cost legible rather than discovered: the kind column in the
+  generated README, the `.gitignore` header, and `fux doctor` reporting the
+  plane's size and blob count. **A fourth is deliberately absent:** nothing
+  stops you deleting it. It is a cache in the sense that the repo still works
+  without it.
 - **`doctor` gains a hard dependency on git** for the ignore check. Acceptable:
   the committed index's premise is that git carries it.
 - **A committed file needs a row in `COMMITTED_FILES`, not just a mention
   here.** The veto below is what catches a decision recorded in prose and not
   in the generator.
+- ⚠ **The prose the generator writes ABOVE the table is not generated**, and it
+  lagged the third kind by a day: the table grew an `acquired` row while the
+  paragraph above it still said every child is *"committed or derived"*. It was
+  a true table under a false sentence, which is the failure mode this record's
+  own template rules exist to prevent, arriving in generated output instead of
+  in a record. Both halves now come from the same change.
 - **Nothing under `tune.toml` reaches the maintenance path.** `ingest`, `build`
   and the hooks never open it, which is what keeps a committed file out of the
   byte-identity argument L3 rests on.
@@ -354,6 +416,13 @@ one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
 - **Ignore nothing; commit the accelerator too.** Rejected: the accelerator is
   large, changes on every ingest, and is a pure function of committed bytes.
   Committing it doubles diff noise to store what a command regenerates.
+- **Filing `acquired/` under `DERIVED`.** One line, no new concept, and the
+  ignore rule would have been identical. Rejected under decision 1: the two
+  words carry different promises to a reader deciding whether to delete
+  something, and the generated README is where that promise is made.
+- **A separate `.fux-cache/` for the fetched bytes.** Rejected for the same
+  reason as the two-top-level-directory option below, plus one of its own: a
+  path outside `.fux/` is outside every check in this record.
 - **Rely on documentation for the ignore rule.** Rejected on evidence — the
   blanket `.fux/*` rule was already in this repo, written by someone who had
   read the documentation.
@@ -373,6 +442,7 @@ one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
   [`src/fux/doctor.py`](../../src/fux/doctor.py).
 - The generated layout, captured —
   [`work/regression/2026-08-18-ingest-and-index/`](../../work/regression/2026-08-18-ingest-and-index/report.md) §1.
+- The third category's own record — [ADR-ACQUIRED](0050_acquired-plane.md), and the two records that consume it, [ADR-REFUSAL](0051_refusals.md) and [ADR-URL-FRESHNESS](0052_url-freshness.md)
 - Cache-directory tagging — https://bford.info/cachedir/
 - `gitignore` pattern semantics, including the directory-negation trap —
   https://git-scm.com/docs/gitignore
@@ -380,7 +450,10 @@ one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
 ### Veto condition
 
 **Reopen this decision if** a child of `.fux/` exists that the README table does
-not declare, or if the effective ignore state stops matching the declaration.
+not declare, if the effective ignore state stops matching the declaration, or if
+a fourth kind is proposed. Three is already one more than a reader holds
+comfortably; a fourth needs a property as sharp as *not rebuildable* was, and
+must earn it against the alternative of a subdirectory.
 
 **How to check it:**
 
@@ -396,6 +469,11 @@ grep -n '^\*\|/\*' .fux/.gitignore
 # 3. the committed index is genuinely tracked, per git itself
 git check-ignore -v .fux/index/ ; echo "check-ignore exit=$?"
 # expect: exit=1 (no match) — anything else means the index is being ignored
+
+# 4. the acquired plane IS ignored — the inverse assertion, and an ERROR
+git check-ignore -q .fux/acquired/ ; echo "check-ignore exit=$?"
+# expect: exit=0 (matched). A non-match means fetched source bytes are
+# staged for commit, which is why `fux doctor` fails rather than warns.
 ```
 
 ---
@@ -415,7 +493,8 @@ evidence.*
 [ADR-CACHEDIR-TAG](0023_cachedir-tag.md) · [ADR-TYPES](0031_types-list.md) ·
 [ADR-MAINTENANCE](0032_hooks.md) · [ADR-AGENT-POLICY](0035_agent-policy.md) ·
 [ADR-TUNE](0038_tuning.md) · [ADR-ENRICH](0040_enrich.md) ·
-[ADR-DECODE](0042_decode.md)
+[ADR-DECODE](0042_decode.md) · [ADR-ACQUIRED](0050_acquired-plane.md) ·
+[ADR-REFUSAL](0051_refusals.md) · [ADR-URL-FRESHNESS](0052_url-freshness.md)
 
 **Code**
 

@@ -374,6 +374,33 @@ never looked at one.
 plane that can fail an ingest which otherwise succeeded is worse than no
 reporting plane. Nothing here changes a committed byte, so **L3 is untouched**.
 
+**15. Extraction reuse is keyed on the content sha AND the PII ruleset digest**
+([ADR-PII](0053_pii.md)). Redaction runs inside this file, between
+`content_sha` and `extract_fields`, so **editing `.fux/pii.toml` changes what
+should be indexed for documents whose bytes did not change at all**. Reuse on
+the sha alone would mean a rule added today never reaches a document that did
+not also change, and the index would hold terms built under two policies with
+nothing recording which.
+
+- The digest lives at `.fux/runtime/pii-digest` — **derived and gitignored**,
+  because it is rebuildable and because it must not be a committed byte that
+  depends on a local file's history.
+- **A missing digest reads as *moved***, which costs one full extraction and
+  then settles. That is the safe direction; the opposite (absent reads as
+  *unchanged*) would silently keep terms built under retired rules.
+- A repo with no `.fux/pii.toml` writes no state and behaves exactly as it did
+  before the feature existed: the empty digest and the absent file both read
+  as `""`.
+
+**16. The acquisition bound is passed in, never reached for.** `run()` hands
+`config.url.acquired_max_bytes` to `urlsrc.fetch_all` explicitly
+([ADR-ACQUIRED](0050_acquired-plane.md) decision 8, [ADR-CONFIG](0014_config.md)
+decision 12). ⚠ **The first implementation did not** — it read a name that did
+not exist in that scope and raised `NameError` on every retaining fetch. This
+file is the only place that holds both the config and the fetch plane, so it is
+the only place the value can cross, and stating that here is what stops the
+next version reaching sideways for it again.
+
 ### What it looks like
 
 Verbatim from

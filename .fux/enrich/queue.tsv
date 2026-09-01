@@ -7,6 +7,8 @@ file:archive/v0.1/fux/assets/fux-lockup.png	dc2561c37c5b324d0eda0762a33331981e21
 file:archive/v0.1/fux/assets/fux-mark.svg	f7440d72f87c4365c6ad8fdf82579fc9304b8c1d	svgdoc: nothing readable in .svg
 file:archive/v0.26/tests_e2e/corpus/assets/logo.png	6a94256cf5c226310f6f94011b64926f014de247	imagedoc: nothing readable in .png
 file:archive/v0.26/tests_e2e/site/logo.png	6a94256cf5c226310f6f94011b64926f014de247	imagedoc: nothing readable in .png
+file:tools/refusal-probe/captures/entra-sign-in.stand-in.html	418d77f289ffc2875a0a50e8605b77c32c52cef0	htmldoc: nothing readable in .html
+file:tools/refusal-probe/captures/workbook-download.stand-in.xlsx	2b5a32870bd597a12b7837c637ec3345a7aff8ce	xlsxdoc: nothing readable in .xlsx
 file:work/regression/2026-08-27-p3-sha-stability/evidence/control-a.json	a7f947d05ed22eb0ec2fb9c42f5f3d1b5e1ec6ef	jsondoc: nothing readable in .json
 file:work/regression/2026-08-27-p3-sha-stability/evidence/control-b.json	90830ff4a5ee349ae9baf09f06ccd4c0482d415f	jsondoc: nothing readable in .json
 file:work/regression/2026-08-27-p3-sha-stability/evidence/run1-url-shas.json	623b6ee39ed7ec2fa270f8073f1ab4b2cee5f455	jsondoc: nothing readable in .json

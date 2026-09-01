@@ -21,6 +21,248 @@ Rules:
 
 ---
 
+## W-98 Phases 2–4 — refusals, the acquired plane, and the sixth verdict (2026-09-01)
+
+**Shipped** in the working tree. Phase 1 has its own row below; these are the
+three that followed, and they close W-98.
+
+| phase | what landed | where |
+|---|---|---|
+| 2 — refusal detection | `.fux/refusals.toml`, a declarative rules table read **once** before the first socket; checked after `_unpack`, **before** persist and decode | `src/fux/ingest/refusals.py` · `src/fux/templates/refusals.toml.txt` · [ADR-REFUSAL](../docs/adr/0051_refusals.md) |
+| 3 — the acquired plane | clock-free `.fux/acquired/`, a **third** `fuxdir` category beside committed and derived; eviction by `run_seq`, never `mtime`; a URL with `fail_streak > 0` is never evicted | `src/fux/store/acquired.py` · `src/fux/store/fuxdir.py` · [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) |
+| 4 — freshness | `ttl=` on the URL line and the sixth verdict `as-ingested`, resolved as `min(policy, declared)` | `src/fux/refer/` · `src/fux/ingest/sourcelist.py` · [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) |
+
+**Outcome: PASS, with three things ruled rather than quietly satisfied.**
+
+1. 🔴 **Phase 2's boundary HELD instead of being amended.** The spec's `status`,
+   `final_url_host` and `final_url_contains` conditions and the always-on
+   `landed-off-origin` check all put HTTP facts inside the engine, which
+   [ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 13 forbids — and whose
+   own veto names *"`urlsrc.py` mentions a status code"* as proof of regression.
+   **Arpit ruled CUT** (2026-09-01): the four came out, the remaining six
+   conditions are pure over the bytes, and the measured cost was near zero —
+   an identity provider that bounces you still returns a page, and that page is
+   HTML where a document was requested. Provider detection survives as
+   `body_contains` over **form-field names**, which are an API between a page
+   and its own backend and outlive the redesigns that rewrite every visible
+   string. [ADR-REFUSAL](../docs/adr/0051_refusals.md) decision 4.
+2. ⚠ **`keep` defaults to `true`, and it was `false` for one day.** Off-by-
+   default was argued from a stranger's 9 000-URL corpus filling a disk;
+   `acquired_max_bytes` answers that directly, and once the blast radius is
+   bounded, defaulting off means almost nobody gets the thing the plane exists
+   for. Arpit's call.
+3. ⚠ **`ttl=` shipped parsed-but-unconsumed for one day** — the *knob that
+   lies* `freshness.py` had refused `max_age_seconds` over. Resolved as
+   `min(policy, declared)`: a line may narrow the caller's policy and can never
+   widen it, so `ttl`'s `24h` default cannot switch caching on for a caller who
+   never opted in. W-60's verdict F holds **by arithmetic**.
+
+⚠ **Two corrections found only by building it**, both recorded in ADR-REFUSAL:
+`BODY_SCAN_BYTES` was 64 KiB while the real viewer's marker sits at byte
+**101 198**, so the rule written for that exact page could not see it (now
+1 MiB); and `""` is a **real** suffix — its absence blinded five of six rules on
+share links, which are all extensionless.
+
+⚠ **An acceptance criterion is unmet as written and was NOT quietly satisfied:**
+*"`fux update` with a matching ETag performs no body download."* Interception is
+at the **response** stage, so Chrome has already transferred the body —
+`validate()` saves the decode and the shard comparison, **not bandwidth**.
+Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12;
+Arpit re-words it or accepts it.
+
+---
+
+## W-103 — PII redaction, and `fux enrich` reaches `url:` documents (2026-09-01)
+
+⚠ **Filed as "W-99" in the queue, which was already taken** by the decoder-map
+work below. **Recorded here as W-103** — the next free id — so the two are
+separable in history. The collision is why the id is stated rather than assumed.
+
+| thing | where |
+|---|---|
+| the ruleset | `.fux/pii.toml`, committed; `src/fux/ingest/pii.py` · `src/fux/templates/pii.toml.txt` |
+| the position | `src/fux/ingest/run.py` — between `content_sha` and `extract_fields`, so **the sha still fingerprints the source** and `refer` keeps verifying |
+| reuse invalidation | `.fux/runtime/pii-digest`; editing the ruleset re-extracts everything ([ADR-INGEST](../docs/adr/0007_ingest.md) decision 15) |
+| `url:` enrichment | `src/fux/enrich.py` — `_document_text`, `URL_SCOPE`; possible only because `.fux/acquired/` holds the bytes locally |
+| the records | [ADR-PII](../docs/adr/0053_pii.md) · [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 11 |
+| the probe | [`tools/pii-probe/`](../tools/pii-probe/README.md) |
+
+**Outcome: PASS, with one hole stated in the record itself.**
+
+🔴 **`.fux/enrich/` is committed and unredacted.** A model handed a document
+writes enrichment prose into a committed file; ADR-PII decision 1 says that file
+should be redacted and it is not. Now written into
+[ADR-ENRICH](../docs/adr/0040_enrich.md) decision 11 as well as the queue, so no
+reading of decision 1 can be taken to say otherwise. `fux enrich --check` is
+where the existing matcher belongs.
+
+⚠ **The failure `doctor` structurally cannot see** is a well-formed rule that is
+too broad: it removes real vocabulary, documents stop being findable, and
+nothing looks wrong. The probe is the only thing that makes it visible.
+
+⚠ **A pathological regex can hang an ingest** — Python's `re` has no timeout.
+Empty patterns are refused and `doctor` compiles the rest; beyond that a
+consumer's regex is a consumer's regex. Stated in ADR-PII, **not** queued: it is
+a boundary, not a defect.
+
+---
+
+## W-100 · W-102 and the red-suite sweep (2026-09-01)
+
+**Shipped** in the working tree. Two queue items closed and their rows deleted;
+two live defects found while closing them.
+
+| thing | where |
+|---|---|
+| W-102 — the Windows console gate | `src/fux/doctor.py` — two em-dashes in returned check DETAIL strings; `tests/test_doctor.py::test_every_check_detail_is_ascii_in_every_branch` and `tests_e2e/test_smoke.py::test_fux_doctor_output_is_ascii_safe` green |
+| W-100 — the URL attribute set | `tests/ingest/test_sourcelist.py` — five tests rewritten to derive from `sourcelist.URLS`, plus **one** that pins the set explicitly |
+| 🔴 a live `NameError` | `src/fux/ingest/urlsrc.py::fetch_all` read `source.acquired_max_bytes` with no `source` in scope — every retaining fetch raised. Key now parsed in `src/fux/config.py` and passed in from `src/fux/ingest/run.py` |
+| 🔴 a new failure mode in `refer` | `src/fux/refer/__init__.py::_declared_ttls` raised on a repo with no `fux.toml`; absence now reads as "declares nothing", malformed still refuses |
+| the third `fuxdir` category | `tests/store/test_fuxdir.py` — `ACQUIRED` added to the gitignore, README and `DECLARED` assertions |
+| the archive law | the stray `handoff/` directory under `work/` → [`archive/handoff/`](../archive/README.md), three files, with a successor row |
+| the records | [ADR-CONFIG](../docs/adr/0014_config.md) d12 · [ADR-INGEST](../docs/adr/0007_ingest.md) d15–16 · [ADR-ENRICH](../docs/adr/0040_enrich.md) d11 · [ADR-REFER](../docs/adr/0030_refer-plane.md) d19–20 + veto 4/4a · [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) |
+| the tests | 4 new in `tests/test_config.py`, 1 in `tests/refer/test_ttl_resolution.py` |
+
+**Outcome: PASS.** 32 failing unit tests → **2 648 passed, 2 skipped**; e2e
+**73 passed, 1 skipped**. `tests/test_adr_freshness.py`,
+`tests/test_adr_ownership.py` and `tests/test_archive_law.py` all green.
+
+⚠ **The lesson is the one CLAUDE.md already names and nothing enforces.**
+`acquired_max_bytes` was **accepted in a record, assigned in the ownership
+table, and never implemented** — and every mechanical check passed, because the
+freshness gate proves a record was *touched*, never that it is *true*. The
+W-83 shape, a second time. It was caught by tests that happened to exercise the
+path, not by any gate that reads a record against the code.
+
+---
+
+## W-99 — `.fux/sources/types` becomes the decoder map (2026-09-01)
+
+**Shipped** in the working tree (uncommitted at time of writing). Opened and
+closed within one session on Arpit's instruction.
+
+| thing | where |
+|---|---|
+| the grammar | `src/fux/ingest/sourcelist.py` — `_decoder_reason`, `TYPES`, `render_line`'s empty-default rule |
+| the resolution | `src/fux/decode/__init__.py` — `_declared_bindings`, `_bound_extension`, `_bind`, `builtin_bindings` |
+| the writers | `src/fux/setup.py` (`_seed_types`, `_TYPES_HEADER`) and `src/fux/sources.py` (`_seed_types`, `_pattern_ext`, the `add` path) |
+| this repo's map | `.fux/sources/types` — 36 bindings, 6 prose lines with none |
+| the records | [ADR-TYPES](../docs/adr/0031_types-list.md) decision 11 · [ADR-DECODE](../docs/adr/0042_decode.md) decision 13 · [ADR-URL-LIST](../docs/adr/0018_url-list.md) decision 12 narrowed · [ADR-CLI](../docs/adr/0002_cli-surface.md) · [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) |
+| the tests | `tests/decode/test_binding.py` (20 new) · `tests/test_source_verbs.py` and `tests/test_setup.py` updated |
+
+**Outcome: PASS, with a stated verification gap.** `decoder=<module stem>` on a
+`*.ext` line binds that extension to that decoder; `registry()` applies the
+binding over both built-in and consumer precedence; a binding naming a missing
+module **stops the run**, and so does one that takes an extension away from the
+decoder that claims it.
+
+⚠ **Amended the same day (W-99a), because the first version refused its own
+main use case.** As shipped at midday, `_bind` required the extension to be in
+the named module's `EXTENSIONS` — so `*.geojson decoder=jsondoc`, the most
+obvious thing anyone would do with a decoder map, raised. **Extending and
+redirecting are now separated:** an extension **no** decoder claims may be given
+to any decoder (additive — there is no competing answer to be stale against);
+an extension another decoder **does** claim may not be handed to a module that
+does not claim it. `EXTENSIONS` is a decoder's *default claim*, not a
+declaration of what it can read, and reading it as the latter was the defect.
+Cost stated in ADR-TYPES decision 11a: a typo in the extending direction is now
+accepted, and indexes nothing, which is a smaller mistake than the one still
+refused.
+
+**What it fixes.** *"Which decoder reads `.csv`"* was a property of the code on
+a machine. Two clones with different `.fux/decoders/` could commit different
+indexes from the same sources with nothing in the repo recording which decoder
+ran. It is now a committed line, and the line is checked against the module.
+
+⚠ **Verified in a clean container, NOT on Arpit's machine.** `device_bash` was
+wedged for the entire session, so `uv run pytest` never ran on the Mac. What
+did run, on python 3.11 with the tree copied into a Linux container:
+
+- `tests/` — **749 passed, 5 failed** (400 before W-99a's tests and the wider
+  selection), including `test_adr_ownership`, `test_adr_frontmatter` and
+  `test_adr_register_status` against the amended records.
+- `tests_e2e/` — **74 passed, 0 failed**, against a `pip install -e .` of the
+  tree, i.e. the real CLI over the fixture corpus.
+- a real `fux setup` → `fux ingest` (3 docs: `.md`, `.csv`, `.json`) → `fux ask`
+  returning a ranked cited answer through the generated map;
+- both failure modes end to end: exit code 1, message naming `file:lineno` and
+  both sides of the disagreement;
+- **W-99a:** a clean repo with `*.geojson decoder=jsondoc` and
+  `*.cnf decoder=inidoc` — `setup` → `ingest` → `ask`, 2 documents indexed and
+  both answerable with **no decoder module copied or edited** — plus all three
+  refusal cases re-confirmed still refused.
+
+**The e2e suite earned its keep.** `test_setup_writes_the_types_file_with_the_default_spelled_out`
+asserted `#*.svg` was present-and-commented in the generated file — a line that
+had **contradicted the same file since 2026-08-29**, when `svgdoc` shipped and
+`*.svg` became an active default line. The template listed `.svg` as both
+indexed and "not indexed until you uncomment", under a heading reading *"nothing
+here has a built-in decoder"*. The stale half is dropped and the test now pins
+`#*.log` (a real opt-in) plus `*.svg decoder=svgdoc` (the active line).
+
+🔴 **The 5 failures pre-date this change and are recorded as W-100.** All in
+`tests/ingest/test_sourcelist.py`, all from `keep`/`ttl` being added to `URLS`
+without updating that file. **Baseline was 318/5 before the change**, measured
+first for exactly this reason. Not fixed here: they belong to another session's
+in-flight work, which was writing to this repo concurrently.
+
+⚠ **What is NOT claimed.** Neither suite has been run **on macOS**, and no
+`uv`-managed environment was used — the container ran system python 3.11 with
+`pip`. Nothing here is platform-sensitive by inspection (no path separators, no
+locale, no clock), but that is reasoning, not a run: **the first thing to do on
+a working shell is `uv run pytest -q tests tests_e2e`.**
+
+## W-98 Phase 1 — the browser fetcher returns the resource, not a rendering (2026-09-01)
+
+**Shipped** in the working tree (uncommitted at time of writing).
+`src/fux/templates/cdp.py.txt` rebuilt in the middle; contract, transport and
+`extract_links` unchanged.
+
+| thing | where |
+|---|---|
+| the fetcher | `src/fux/templates/cdp.py.txt` — `fetch_resource()`, `validate()`, the event pump |
+| this repo's consumer copy | `.fux/fetchers/cdp.py` — synced; it was a byte-identical unedited copy |
+| the record | [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decisions 5, 10–13, rewritten in place |
+| the contract it sits under | [ADR-FETCHER](../docs/adr/0019_fetcher.md) — amended; it owns `src/fux/templates/` |
+| the retired rendering path | `archive/templates/cdp-rendering.py.txt` — **named, never cited** |
+| the spike | [W-98](../archive/open/W-98-acquired-plane.md) §9 steps 1–3 and 5 |
+
+**Outcome: PASS.** 12 new tests (27 in the file), **2412 unit passed, 74 e2e
+passed**, `fux doctor` green. The tests drive the CDP conversation against a
+scripted peer — no Chrome, no socket.
+
+**What the change actually is.** `Fetch.enable` at `requestStage: "Response"` →
+`Page.navigate` (**not awaited** — it cannot commit while its response is
+paused) → `Fetch.requestPaused` → `Fetch.getResponseBody`. Returns the server's
+bytes and the server's `Content-Type` instead of `outerHTML` declared as
+`text/html`.
+
+🔴 **The technique changed on a MEASUREMENT that overturned a "do not
+re-litigate" marker.** The in-page `fetch(url, {credentials:'include'})` the
+spec prescribed returned `TypeError` on a cross-origin URL sending no `ACAO`
+where interception read **8557 bytes**; and a cross-origin in-page fetch sees
+only CORS-safelisted response headers, so **`ETag` was invisible and
+`validate()` was undeliverable under it**. Arpit lifted the marker.
+
+⚠ **What is NOT claimed.** Spike step 4 — a signed-in tenant fetching a real
+SharePoint `.xlsx` end to end — **has not been run.** The acceptance criterion
+*"a SharePoint `.xlsx` share link ingests and `fux ask` returns cell content"*
+is therefore **unverified**, and this row does not assert it. What is verified
+is the CDP conversation against a scripted peer and the whole suite.
+
+⚠ **One acceptance criterion is unmet as written:** *"`fux update` with a
+matching ETag performs no body download."* Interception is at the response
+stage, so the body has already transferred — `validate()` saves the decode and
+the shard comparison, not bandwidth. Recorded in decision 12; Arpit's to
+re-word or accept.
+
+⚠ **Breaking:** `settle_ms` removed from `[sources.url.config]`. And `fux setup`
+is write-if-missing, so **a repo with a hand-edited `cdp.py` does not receive
+this.**
+
+**Phases 2–4 are not built** — refusal detection, the `.fux/acquired/` plane,
+`ttl=` and the `as-ingested` verdict.
+
 ## The `output.toml` fork closes, and `ask` gains `sections` (2026-08-29)
 
 **Both ruled by Arpit in Cowork, 2026-08-28; verified on the device 2026-08-29** —

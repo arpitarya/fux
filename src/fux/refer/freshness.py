@@ -161,19 +161,35 @@ class Verdict:
     #: Set only on a TTL cache hit. Its presence is what makes `label` say
     #: `cached` — see the class docstring.
     age_seconds: int | None = None
+    #: Set only when the comparison ran against RETAINED BYTES rather than a
+    #: fetch — `.fux/acquired/` held the input the record was built from and
+    #: the source could not be reached (ADR-ACQUIRED, ADR-URL-FRESHNESS).
+    from_acquired: bool = False
 
     @property
     def label(self) -> str:
-        """`current` · `stale` · `unverified` · `cached`.
+        """`current` · `stale` · `unverified` · `cached` · `as-ingested`.
 
         **`cached` is never folded into `current`.** A TTL hit says *we looked
         recently*, which is a different claim from *we just looked*, and
         collapsing the two is decision 4's "knob that lies" reappearing in a
         new place. A caller that wants to treat them alike may; the engine
         will not do it on their behalf.
+
+        ⚠ **`as-ingested` is a SIXTH position and it is not `current` either.**
+        It means *we could not look, but the index is internally consistent* —
+        the passage still matches the exact bytes the record was built from,
+        held in `.fux/acquired/`. That is a real comparison, so it is not
+        `unverified`; it says nothing about the world right now, so it is not
+        `current`. Decision 6's three-state guarantee exists precisely so a
+        position like this cannot be quietly absorbed into a stronger one, and
+        the ordering below puts it above `unverified` and below everything
+        that actually reached the source.
         """
         if self.age_seconds is not None:
             return "cached"
+        if self.from_acquired:
+            return "as-ingested"
         if self.current is None:
             return "unverified"
         return "current" if self.current else "stale"
@@ -192,6 +208,34 @@ def cached(indexed_sha: str, fetched_sha: str, age_seconds: int, ttl: int) -> Ve
         fetched_sha=fetched_sha,
         note=f"served from the local fetch cache, {age_seconds}s old (ttl {ttl}s)",
         age_seconds=age_seconds,
+    )
+
+
+def as_ingested(indexed_sha: str, blob_sha: str, why: str = "") -> Verdict:
+    """The source could not be reached; the retained bytes were compared instead.
+
+    ⚠ **`current` still records whether the shas agreed**, exactly as `cached`
+    does. Both facts are kept — whether the retained bytes match the index, and
+    that they are not a fresh look — because dropping either would make the
+    verdict a smaller claim than the truth.
+
+    A mismatch here is not a stale source. It means the index disagrees with
+    the bytes it was built from, which is an index defect rather than a world
+    change, and the note says so.
+    """
+    agrees = blob_sha == indexed_sha
+    return Verdict(
+        current=agrees,
+        indexed_sha=indexed_sha,
+        fetched_sha=blob_sha,
+        note=why
+        or (
+            "source unreachable; matches the bytes it was ingested from"
+            if agrees
+            else "source unreachable, AND the index disagrees with the bytes it was "
+            "built from - rebuild this record"
+        ),
+        from_acquired=True,
     )
 
 

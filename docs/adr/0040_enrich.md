@@ -260,6 +260,34 @@ network import fence. The function, its signature and its output are untouched �
 see [ADR-REFER](0030_refer-plane.md) decision 18 and
 [`tests/test_no_shadowed_submodules.py`](../../tests/test_no_shadowed_submodules.py).
 
+**11. A `url:` document is enrichable, under one synthetic scope**
+([ADR-PII](0053_pii.md), 2026-09-01). `enrich=` joins the URL list's attribute
+set and resolves through the same three layers as `keep` and `ttl`; every URL
+that opts in reports under a single scope named `.fux/sources/urls`.
+
+- **One scope, not one per host.** A `dirs` scope is a path prefix, which is a
+  grouping a human actually chose. A URL list has no such structure — its lines
+  share nothing but being URLs — so per-host scopes would report coverage
+  against a grouping nobody declared. Decision 4's *declared, never derived*
+  applied to the scope itself.
+- ⚠ **This could not exist before `.fux/acquired/`.** Planning needs the
+  document's text, and for a URL that meant a network fetch **inside
+  `fux enrich --plan`** — an offline, read-only command (L4). The retained
+  bytes are what make the text local, so `_document_text` reads the blob and
+  decodes it with ingest's own `_decode_fetched` rather than fetching anything.
+- **`keep=true` is the default, so this works unconfigured.** A line that opted
+  out with `keep=false` has nothing to read: it reports **zero chunks**, and
+  `--plan` names that rather than hiding it — the same treatment an unreadable
+  `file:` document gets.
+
+🔴 **The known hole, stated here rather than discovered later:** `.fux/enrich/`
+is **committed and unredacted**. A model handed a document writes enrichment
+prose into a committed file, and [ADR-PII](0053_pii.md) decision 1 says that
+file should be redacted — it is not. The matcher exists and `fux enrich --check`
+is where it belongs. Until that lands, **enrichment is the one committed surface
+PII policy does not cover**, and no reading of decision 1 should be taken to say
+otherwise.
+
 ### Consequences
 
 - **L3 is restated, not weakened:** the index is a deterministic function of

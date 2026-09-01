@@ -1,0 +1,39 @@
+# Responses, and what the repo's rules must say about each.
+#
+# ⚠ A file named `*.stand-in.*` is NOT a capture. It is a minimal file built to
+# carry the two properties the rules actually test -- the magic bytes and the
+# size -- because the real response was somebody's document and does not belong
+# in this repo. `onedrive-viewer-shell.html` IS a real capture, saved from a
+# live 1drv.ms share link, and it is the one this feature was built for.
+#
+# ⚠ The `expect = "accepted"` cases are the valuable ones. A rule that refuses
+# too much is invisible to every other check in the system; these are the only
+# thing that catches it.
+
+[[case]]
+label        = "the real Office web viewer, captured from a 1drv.ms share link"
+url          = "https://1drv.ms/x/c/DRIVE/TOKEN?e=PtMf2M"
+content_type = "text/html; charset=utf-8"
+body         = "captures/onedrive-viewer-shell.html"
+expect       = "refused"
+
+[[case]]
+label        = "the same URL with &download=1 -- a workbook (stand-in)"
+url          = "https://1drv.ms/x/c/DRIVE/TOKEN?download=1"
+content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+body         = "captures/workbook-download.stand-in.xlsx"
+expect       = "accepted"
+
+[[case]]
+label        = "a workbook URL that returned a sign-in page (stand-in)"
+url          = "https://intranet/q3.xlsx"
+content_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+body         = "captures/entra-sign-in.stand-in.html"
+expect       = "refused"
+
+[[case]]
+label        = "an ordinary wiki page, which must NOT be refused (stand-in)"
+url          = "https://wiki/deploy-runbook"
+content_type = "text/html; charset=utf-8"
+body         = "captures/ordinary-wiki-page.stand-in.html"
+expect       = "accepted"

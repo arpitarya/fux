@@ -449,6 +449,17 @@ constrains **every** gated flag in `cli.py` to `default=None`, and `--all` is a
 plain `store_true` — it gates nothing and reads no config, so decision 10 does
 not reach it.
 
+⚠ **No output default changed on 2026-09-01 either, and three new flags say so
+by name.** `fux add` gained `--keep`, `--no-keep` and `--ttl`
+([ADR-ACQUIRED](0050_acquired-plane.md), [ADR-URL-FRESHNESS](0052_url-freshness.md)).
+All three write an attribute into `.fux/sources/urls`; **none of them gates a
+rendering and none reads `.fux/output.toml`**, so decision 10 does not reach
+them and they are correct as plain `store_true` / `metavar` arguments. Recorded
+for the same reason `--all` was: this record constrains *every gated flag* in
+`cli.py`, so a flag that is deliberately outside that set has to be named, or
+the next reader "fixes" it to `default=None` and gives it a three-state
+resolution it has no file to resolve against.
+
 ⚠ **`doc_coverage` added to the confidence block 2026-08-28**, and `output.schema.json` declares it as always-present.
 **`coverage` is unchanged**, `rank()` gained one line writing the top-ranked
 record's matched hashes into the `stats_out` dict it already fills, and the band

@@ -336,7 +336,19 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
     (ADR-URL-LIST decision 11) is only worth having if it is enforced on the
     way in as well as on the way out.
     """
-    pairs = (("fetch", ("cdp", "http")), ("meta", ("plain", "hashed")), ("archived", ("archived",)))
+    pairs = (
+        ("fetch", ("cdp", "http")),
+        ("meta", ("plain", "hashed")),
+        ("archived", ("archived",)),
+        ("keep", ("keep", "no_keep")),
+    )
+    #: Flags that NAME a boolean attribute rather than carrying its value.
+    #: `--cdp` records `fetch=cdp` -- the flag is the value. `--no-keep`
+    #: records `keep=false`, where it is not.
+    boolean = {
+        "archived": {"archived": "true"},
+        "keep": {"keep": "true", "no_keep": "false"},
+    }
     overrides: dict[str, str] = {}
     for attribute, flags in pairs:
         given = [flag for flag in flags if getattr(args, flag, False)]
@@ -350,8 +362,52 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
                 f"Its attribute set is closed and is "
                 f"{', '.join(spec.names) if spec.names else 'empty'}"
             )
-        overrides[attribute] = "true" if attribute == "archived" else given[0]
+        overrides[attribute] = boolean.get(attribute, {}).get(given[0], given[0])
+    ttl = getattr(args, "ttl", None)
+    if ttl is not None:
+        attribute = spec.attribute("ttl")
+        if attribute is None:
+            raise FuxError(
+                f"--ttl sets `ttl`, which `{spec.kind}` does not have. Its attribute set "
+                f"is closed and is {', '.join(spec.names) if spec.names else 'empty'}"
+            )
+        # Validated by the SAME rule the file grammar uses, so `--ttl 1x` and a
+        # hand-written `ttl=1x` fail identically. Two validators would drift.
+        fault = attribute.reject(ttl)
+        if fault is not None:
+            raise FuxError(f"--ttl {ttl!r} {fault}")
+        overrides["ttl"] = ttl
     return overrides
+
+
+def _drop_acquired(root: Path, spec: sourcelist.ListSpec, entry: str) -> None:
+    """Forget the retained bytes for a URL that is no longer listed.
+
+    ADR-ACQUIRED decision 9 keeps sweeping and eviction apart, and this is
+    neither: it is the removal that makes a blob unreferenced in the first
+    place. The blob FILE is left for `fux update`'s sweep rather than unlinked
+    here — content addressing means two URLs can share one blob, and deleting
+    it because one of them went would silently break the other.
+
+    ⚠ **Advisory to the last.** A failure here costs a stale manifest entry
+    that the next sweep collects anyway; it must never turn `fux remove` into
+    a command that half-worked.
+    """
+    if spec.kind != "urls":
+        return
+    try:
+        from .store import acquired
+
+        blobs = acquired.read_manifest(root)
+        if entry not in blobs:
+            return
+        blobs.pop(entry)
+        acquired.write_manifest(root, blobs)
+        gone = acquired.sweep(root, blobs)
+        if gone:
+            print(f"  dropped {gone} retained blob(s) from .fux/acquired/")
+    except Exception:
+        pass
 
 
 def _root() -> Path:
@@ -416,6 +472,20 @@ def cmd_add(args) -> int:
             f"{entry} does not exist (looked in {root / entry}) — nothing would be indexed, and "
             "the next `fux ingest` would fail on it. Nothing was written"
         )
+
+    # A new type pattern records the decoder that would read it ANYWAY, so the
+    # written line preserves today's dispatch exactly rather than describing
+    # it. Resolved from the LIVE registry, not the built-ins: if a consumer
+    # module claims this extension, that module is what fux is about to use,
+    # and writing the built-in's name instead would be a line that silently
+    # changes behaviour the moment it lands.
+    if spec is sourcelist.TYPES and "decoder" not in overrides:
+        from .decode import registry as decoder_registry
+
+        ext = _pattern_ext(entry)
+        match = decoder_registry(root).get(ext) if ext else None
+        if match is not None:
+            overrides = overrides | {"decoder": match.name}
 
     if getattr(args, "dry_run", False):
         preview = sourcelist.render_line(entry, spec.defaults() | overrides, spec)
@@ -497,20 +567,45 @@ def _seed_types(path: Path) -> None:
     true, so the diff shows the allowlist growing by one rather than being
     replaced by one.
     """
+    from .decode import builtin_bindings
     from .ingest.gitdir import DEFAULT_TYPES
 
     header = [
-        "# What counts as a document. One pattern per line; `!` subtracts.",
+        "# What counts as a document, and which decoder reads it. One pattern",
+        "# per line; `!` subtracts.",
         "#",
         "# fux created this file when the first pattern was added. The lines",
         "# below are the built-in default, written out explicitly: this file",
         "# REPLACES that default rather than extending it, so leaving them out",
         "# would have un-indexed every document already in the corpus.",
         "#",
+        "# `decoder=` BINDS an extension to the module that reads it, and fux",
+        "# checks the binding against that module rather than trusting it. A",
+        "# prose format carries none: there is no decoder in its path.",
+        "#",
         "# See ADR-TYPES.",
         "",
     ]
-    _write(path, header + list(DEFAULT_TYPES))
+    # The binding fux would have derived anyway, written down. Seeding a file
+    # of bare globs would have made the map decay from its first line: every
+    # pattern added later would resolve through the module tuples, which is the
+    # implicit dispatch this attribute exists to replace.
+    bindings = builtin_bindings()
+    body = [
+        sourcelist.render_line(glob, {"decoder": bindings.get(_pattern_ext(glob), "")}, sourcelist.TYPES)
+        for glob in DEFAULT_TYPES
+    ]
+    _write(path, header + body)
+
+
+def _pattern_ext(pattern: str) -> str:
+    """The extension a bare `*.ext` pattern names, or `""`. Mirrors
+    `decode._bound_extension`, which is the rule that decides what may carry a
+    binding — kept in step by `tests/test_source_verbs.py`."""
+    if not pattern.startswith("*.") or "/" in pattern:
+        return ""
+    ext = pattern[1:].lower()
+    return "" if len(ext) < 2 or "*" in ext or "?" in ext else ext
 
 
 def _plan(spec: sourcelist.ListSpec, args) -> str:
@@ -554,6 +649,7 @@ def cmd_remove(args) -> int:
     action, line, detail = remove_or_exclude(path, spec, entry)
     print(f"{action:9s} {line}")
     print(f"  in {_rel(root, path)}" + (f" — {detail}" if detail else ""))
+    _drop_acquired(root, spec, entry)
 
     if getattr(args, "no_ingest", False):
         return 0

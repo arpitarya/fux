@@ -281,6 +281,37 @@ non-negative numbers with **`bool` rejected explicitly**, because `bool` is an
 `int` subclass in Python and `archived_weight = true` would otherwise parse
 silently as `1`.
 
+**12. `[sources.url]` gained four keys on 2026-09-01, and every one of them is
+a source-wide *layer*, not a setting.** `keep` ([ADR-ACQUIRED](0050_acquired-plane.md)),
+`ttl` ([ADR-URL-FRESHNESS](0052_url-freshness.md)) and `enrich`
+([ADR-PII](0053_pii.md)) each sit between the built-in default and the URL
+line, exactly as `meta` and `fetcher` already did — **a line that declared the
+attribute always wins**, and `urlsrc.resolve_urls` is the one place that
+resolves all of them.
+
+- **`ttl` is validated by the source list's own duration grammar**
+  (`sourcelist.parse_duration`), never by a second copy here. A hand-written
+  `ttl=1x` in the list and a `ttl = "1x"` in this file therefore fail with the
+  same rule — two parsers for one grammar is how the two drift apart.
+- **`keep` and `enrich` reject a non-`bool` explicitly.** Same reason as
+  decision 11: `bool` is an `int` subclass, so the check is on the type, not on
+  truthiness.
+- ⚠ **`acquired_max_bytes` is the exception and has NO line-level layer.** It
+  bounds `.fux/acquired/` (ADR-ACQUIRED decision 8) and it is a property of the
+  disk the store sits on, not of one URL — a per-line override could only ever
+  raise somebody else's bound. `None` means the store's own default rather than
+  a number frozen here, so raising that default does not require editing every
+  `fux.toml` that never thought about the question.
+
+⚠ **`acquired_max_bytes` was documented before it was parsed, and that is the
+defect this decision closes.** ADR-ACQUIRED decision 8 named the key and the
+ownership table gave it to this file on 2026-09-01, while `config.py` never read
+it and `urlsrc.fetch_all` reached for it through an **undefined name** — a
+`NameError` on every retaining fetch, which 17 tests caught only because they
+fetch. It is the [W-83](../../work/WORKLOG.md) shape again: a record can be
+accepted, a component can be assigned, and nothing mechanical reads the record
+against the code.
+
 ### Consequences
 
 - **The config fits on a screen**, so a new consumer reads all of it.

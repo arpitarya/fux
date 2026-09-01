@@ -1,9 +1,8 @@
 {
-  "decision": "PROCEED",
-  "reason": "The output.toml fork (ADR-OUTPUT decision 20) and `sections` (decision 21) are RULED, FIXED, and now VERIFIED ON THE DEVICE, not just the cloud mirror: `.venv/bin/python -m pytest -q tests tests_e2e` -> 2425 passed, 3 skipped, 0 failed. On the way, the device run caught one genuine defect the mirror could not see (it has no HEAD to diff against): the sections pair touched ADR-CLI-owned `cli.py` and ADR-CONFIDENCE-owned `query/__init__.py` without touching either owning record. Fixed with cross-reference notes (ADR-CLI decision 11, ADR-CONFIDENCE decision 14) and re-verified green. Recorded in IMPLEMENTATION.md; OPEN-WORK's tombstone block for this item removed per its own rule 2.",
-  "questions": [],
-  "safe_alternative": "",
-  "surfaced": true,
-  "filed": "2026-08-29",
-  "rederived": "2026-08-29 (this session, on the actual device -- no mirror). The two quality questions the prior session filed here (0/20 abstentions on blind-unanswerable questions; the 7 `partial` goldens) are Arpit-only and are NOT a session blocker -- they are tracked as ordinary `arpit`-lane rows under OPEN-WORK.md's ADR-QUALITY section, which is their correct home. Nothing here currently stops agent-closable work."
+ "decision": "PROCEED",
+ "reason": "Nothing is blocked. The Phase 2 refusal-conditions fork was ruled by Arpit on 2026-09-01 (CUT, not built) and is recorded in ADR-REFUSAL decision 4; the file had been left reading `RESOLVED`, which is not a value in this schema and made every prompt announce an open blocker for a decision already made. Pending decisions that are NOT blockers live in work/OPEN-WORK.md's `Blocked on Arpit` table -- two were filed there on 2026-09-01 (the ETag acceptance criterion, and whether the twice-recorded W-83 shape gets a gate).",
+ "questions": [],
+ "safe_alternative": "",
+ "surfaced": true,
+ "filed": "2026-09-01"
 }

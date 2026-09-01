@@ -24,6 +24,370 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-01 — the queue reconciled, and 2.0.0-alpha.5 cut  ·  Claude Code
+
+- **Asked:** *"cleanup open work then commit everything push and publish a new
+  version."*
+- **Did:**
+  - **OPEN-WORK 442 → 331 lines.** W-98 (all four phases landed) and the PII
+    item closed under rule 3 — outcomes filed in
+    [`IMPLEMENTATION.md`](IMPLEMENTATION.md), the detail file moved to
+    [`archive/open/`](../archive/README.md) with a successor row, and their
+    residue folded into **one** item: W-101, the `fux doctor` pass, which now
+    carries four things because splitting them means four passes at one file.
+  - ⚠ **An id collision reconciled**: the PII work was filed as **W-99**, an id
+    the decoder-map work already held. It is recorded in IMPLEMENTATION as
+    **W-103** so the two are separable in history.
+  - **The `Blocked on Arpit` block CLAUDE.md requires did not exist in this
+    file.** Written, with `filed` and age per row; the oldest is 5 days, at the
+    threshold rather than past it. Two rows are **new**: the ETag acceptance
+    criterion, and whether the twice-recorded W-83 shape gets a gate.
+  - **`work/BLOCKED.json` reset to `PROCEED`.** It read `RESOLVED` — not a
+    value in the schema — so every prompt announced an open blocker for a
+    decision Arpit had already made. That is how a surfacing mechanism gets
+    ignored.
+  - ⚠ **Two stale records fixed on contact**, which is Law zero's third
+    obligation and the unenforced one: ADR-ACQUIRED's *"Owed"* paragraph named
+    two gaps **Phase 3 had already closed** (`doctor` reports the store's size;
+    `fux remove <url>` drops the blob), and the README's `.fux/` table still
+    said *"every child is declared as committed or derived"* while omitting six
+    committed files and the whole third category.
+  - **CHANGELOG: the alpha.5 section written in full.** The Unreleased block
+    covered Phase 1 only — refusals, the acquired plane, `ttl=`/`as-ingested`,
+    PII, the decoder map and both live fixes were unrecorded.
+  - Version bumped to **2.0.0-alpha.5** in `src/fux/__init__.py`, with
+    CLAUDE.md and ADR-LAWS' `__version__` sentence moved with it.
+- **Decided / open:**
+  - **Nothing new was ruled.** Both fresh inbox rows are Arpit's and are stated
+    rather than pre-empted.
+  - **Still open:** W-101's four-part `doctor` pass — its first item is the
+    **veto check for two accepted records**, so until it lands neither veto can
+    be run — and the `.fux/enrich/` redaction hole.
+- **Next:** W-101, the single `doctor.py` pass.
+
+## 2026-09-01 — the red-suite sweep: 32 failures, 2 of them live defects  ·  Claude Code
+
+- **Asked:** *"look at the latest changes fix whatever can be from open work and
+  the test then update the adr's."*
+- **Did:**
+  - **Two live defects, not stale tests.** (1) `urlsrc.fetch_all` read
+    `source.acquired_max_bytes` with **no `source` in scope** — `NameError` on
+    every retaining fetch. ADR-ACQUIRED decision 8 named the key and the
+    ownership table assigned it to `config.py`, which **never parsed it**; it is
+    now parsed, validated (bool rejected, `< 1` refused pointing at `keep =
+    false`) and passed in explicitly. (2) `refer._declared_ttls` raised on a repo
+    with **no `fux.toml` at all**, so opting into caching became a new way for an
+    answer to fail — absence now declares nothing, malformed still refuses.
+  - **W-102 closed** — two em-dashes in `doctor.py`'s returned DETAIL strings;
+    both ASCII gates green. **W-100 closed** — the five `test_sourcelist.py`
+    tests now derive from `sourcelist.URLS` instead of hard-coding two
+    attributes, with the set pinned in exactly one place so a new attribute
+    stays *visible* rather than breaking five tests.
+  - `tests/store/test_fuxdir.py` taught the **third** category (`ACQUIRED`);
+    the `fuxdir.py` → ADR-PII *describes* row given a real reason (veto 4).
+  - **The stray `handoff/` directory under `work/` moved to
+    [`archive/handoff/`](../archive/README.md)** with a successor row, and its
+    two live citations repointed at ADR-REFUSAL.
+  - **Six owning records amended** — ADR-CONFIG d12, ADR-INGEST d15–16,
+    ADR-ENRICH d11, ADR-REFER d19–20 (+ veto 4 widened to `as-ingested`, new
+    veto 4a), ADR-ASK, ADR-OUTPUT. Five new tests.
+- **Decided / open:**
+  - **`work/BLOCKED.json` reads RESOLVED** — Arpit ruled the Phase 2 cut on
+    2026-09-01; nothing is waiting on him there.
+  - ⚠ **The W-83 shape, a second time**: a key was *accepted in a record*,
+    *assigned in the ownership table*, and **never implemented** — and every
+    mechanical check passed, because the freshness gate proves a record was
+    **touched**, never that it is **true**. It was caught by tests that happen to
+    exercise the path. **CLAUDE.md already names this as unenforced**; recording
+    the second occurrence here is what the two-strikes rule asks for, and
+    **whether it becomes a gate is Arpit's call** — I did not write one, because
+    a check that reads a record against code is not mechanically definable and
+    inventing a loose one is the moving-threshold failure in another costume.
+  - **Still open and unchanged:** `.fux/enrich/` is committed and unredacted
+    (now stated **in ADR-ENRICH itself**, not only in the queue); `fux doctor`
+    owes the `as-ingested` share, which is the veto check for **two** accepted
+    records; W-101's decoder-binding resolution.
+- **Next:** one pass at `doctor.py` closing W-101, the `as-ingested` share and
+  the redaction/refusal counts together.
+
+## 2026-09-01 — W-99a: the binding check refused its own main use case, hours after shipping  ·  Cowork
+
+- **Asked:** *"now if i define a new extension and use an existing decoder will
+  it work — because it should; if it wont then code for it."*
+- **Did:** checked first. **It did not work.** `*.geojson decoder=jsondoc`
+  raised *"jsondoc declares EXTENSIONS = .json and does not claim .geojson"* —
+  the verify rule from the entry below, refusing the most obvious thing anyone
+  would do with the feature. Fixed in `decode._bind`:
+  - **Extending is allowed, redirecting is refused.** If **no** decoder claims
+    the extension, any decoder may be bound to it. If another decoder **does**
+    claim it, giving it to a module that does not claim it still raises — and
+    the error now names the decoder that does.
+  - `registry()` snapshots the claimed set **before** applying any binding, so
+    binding iteration order cannot change an answer (L3).
+  - Records: **ADR-TYPES decision 11a** (new — the table, and why the two
+    directions get different answers), **ADR-DECODE decision 13** amended.
+    Header prose in `setup.py` and this repo's types file rewritten.
+  - 4 new tests (24 in `test_binding.py`). Suite **749 passed / 5 pre-existing
+    failed**, `tests_e2e` **74 passed**.
+- **Decided / open:**
+  - **The reasoning, because it is the part worth keeping:** `EXTENSIONS` is a
+    decoder's **default claim**, not a declaration of what it can read. Reading
+    it as a capability list is what broke the feature. A `.geojson` is JSON; a
+    `.cnf` is an INI file. Requiring a consumer to copy `jsondoc.py` and edit
+    one tuple to say so would make the map *a worse answer than the code it
+    replaced* — able to describe dispatch but not change it.
+  - ⚠ **Stated cost:** fux cannot tell a deliberate `*.geojson decoder=jsondoc`
+    from a typo'd one and no longer tries. **The two mistakes are different
+    sizes** — a typo while extending binds a decoder to a suffix no file has
+    and indexes nothing; a typo while redirecting silently re-reads real
+    documents with the wrong reader. Same-sized answers for different-sized
+    mistakes is what caused the bug.
+  - **Verified end to end on a clean repo**: two new extensions
+    (`*.geojson decoder=jsondoc`, `*.cnf decoder=inidoc`), `fux setup` →
+    `ingest` → `ask`, 2 docs indexed and both answerable, **no module copied**.
+    All three refusal cases re-confirmed still refused.
+- **Next:** unchanged — W-100, the five red `test_sourcelist.py` tests.
+
+## 2026-09-01 — W-99: the types file becomes the decoder map, and the map is checked  ·  Cowork
+
+- **Asked:** *"in types file create a map for decoder and extension"*, then —
+  after a first pass that put the decoder in a trailing `#` comment —
+  *"dont comment it map it in a proper way and use the file as map."*
+- **Did:** `types` gained its first attribute, `decoder=<module stem>`, and
+  dispatch now resolves it.
+  - `ingest/sourcelist.py` — `_decoder_reason` (a typed attribute, shape-only
+    validation, `""` legal and meaning *no binding*); `TYPES` spec; the
+    `#:` comment that said *"No attributes"* corrected. `render_line` now omits
+    an attribute at an **empty** default.
+  - `decode/__init__.py` — `_declared_bindings` (stat-cached read of
+    `.fux/sources/types`; deferred import to avoid the `ingest`↔`decode`
+    cycle), `_bound_extension`, `_bind`, `builtin_bindings()`. `registry()`
+    applies bindings last, over both built-in and consumer precedence.
+  - `setup.py` / `sources.py` — `fux setup` and `fux source add` now WRITE the
+    binding they would otherwise have derived, grouped by decoder. Setup's
+    header prose rewritten; the stale `#*.svg` opt-in line dropped (svg has
+    been a built-in since 2026-08-29 and is in the default).
+  - This repo's `.fux/sources/types` rewritten as the map: 36 bindings, 6 prose
+    lines carrying none.
+  - Records: **ADR-TYPES decision 11** (new, with its consequences and two new
+    veto conditions), **ADR-DECODE decision 13** (new, + veto 5),
+    **ADR-URL-LIST decision 12 narrowed**, ADR-CLI and ADR-DOTFUX touched —
+    four owning records for four changed components, per the freshness gate.
+  - `tests/decode/test_binding.py` — 20 new cases; `test_source_verbs.py` and
+    `test_setup.py` updated where they asserted the decision being reversed.
+- **Decided / open:**
+  - **Arpit's call, both halves:** the file **binds** and the module
+    **verifies**; a disagreement is a hard error, never a fallback. The
+    reasoning is that a wrong decoder does not fail visibly — it emits a
+    plausible index with different postings.
+  - ⚠ **Verified in a clean Linux container, not on the Mac.** `device_bash`
+    was wedged for the whole session, so `uv run pytest` never ran on Arpit's
+    machine. In the container, on python 3.11: `tests/` **400 passed / 5
+    failed**, `tests_e2e/` **74 passed / 0 failed** against a `pip install -e .`,
+    plus a real `fux setup` → `fux ingest` → `fux ask` on a scratch corpus and
+    both binding failure modes exercised end to end (exit 1, message names
+    file:lineno and both sides).
+  - **The e2e suite caught a two-day-old contradiction.**
+    `test_setup_writes_the_types_file_with_the_default_spelled_out` pinned
+    `#*.svg` as a commented opt-in while `*.svg` had been an **active** default
+    line since `svgdoc` shipped on 2026-08-29 — the template asserted both, under
+    a heading saying nothing there has a built-in decoder. Stale half dropped;
+    the test now pins `#*.log` and `*.svg decoder=svgdoc`.
+  - 🔴 **The 5 failures are PRE-EXISTING and not from this change.** All in
+    `tests/ingest/test_sourcelist.py`, all because `keep`/`ttl` were added to
+    `URLS` without updating that file. Filed as W-100. Baseline before this
+    change was 318 passed / 5 failed; after, 400 / 5 with the ADR gates
+    included.
+  - ⚠ **A concurrent session was writing to this repo during the work** —
+    `doctor.py`, `sources.py`, `store/acquired.py`, `refer/*` and
+    `query/output.schema.json` all changed mtime mid-session. Every file here
+    was committed with an mtime guard; `sources.py` is the one file both
+    sessions touched.
+  - **No `--decoder` flag.** A binding is a property of the extension, so
+    overriding one is a file edit rather than a per-invocation choice.
+    Recorded in ADR-CLI.
+  - ⚠ **`work/NOW.md` was deliberately NOT written.** The standing rule says
+    overwrite it with the current line, but the concurrent session is using it
+    as a live pointer (*"W-98 all four phases built … next: `fux doctor` must
+    report the `as-ingested` share"*) and its own work is unfinished.
+    Overwriting a live one-line marker with a finished one is the two-writers-
+    one-asset failure the `PreToolUse` lock exists to prevent, and that lock
+    could not be taken from here. This entry and `INTERVIEW.md` carry the state
+    instead. **W-101** filed for the `fux doctor` gap this change opens.
+- **Next:** W-100 — repair `tests/ingest/test_sourcelist.py` against the
+  `keep`/`ttl` attribute set, so the suite is green before anything else lands.
+
+## 2026-09-01 — W-98 Phase 2 stopped before its first line: the spec trips a ruled veto  ·  Claude Code
+
+- **Asked:** `go` — start Phase 2, declarative refusal detection.
+- **Did:** explored `refusals.toml`'s specification, `fuxdir.py`, `fetch_all`,
+  and both shipped fetchers. **Wrote no Phase 2 code.** Filed
+  `work/BLOCKED.json` (`ASK`, surfaced). Reconciled two stale specs found on
+  contact.
+- **Decided / open:**
+  - 🔴 **BLOCKER — the spec trips an accepted record's own veto condition.**
+    `refusals.toml` defines `status`, `final_url_host` and
+    `final_url_contains`, and Phase 2 mandates an always-on
+    `landed-off-origin` structural check. All four put HTTP facts inside the
+    engine. **[ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 13, ratified
+    by Arpit 2026-08-28**, says fux *"never reads a status code, a header, or
+    an error string"* — and its veto block names *"`urlsrc.py` mentions a
+    status code"* as the check that the boundary regressed. Building Phase 2
+    as written is that regression.
+  - ⚠ **Independently, the contract cannot deliver the data.** `fetch()`
+    returns `(bytes, content_type)`. Phase 1's `Resource` holds `final_url` and
+    `status` — `cdp.py` knows both and has no way to say so. So this is not
+    only a boundary question; it is a missing return shape.
+  - **The fork, stated so it can be answered in one line.** *Reverse:* the
+    contract gains an optional wider return — `(bytes, content_type, final_url,
+    status)`, with the 2-tuple and bare `str` still accepted as they are today
+    — and decision 13 is rewritten in place with its veto check amended.
+    *Hold:* those three conditions and the off-origin floor come out of the
+    spec; the remaining six are pure over bytes and lose nothing else.
+  - ⚠ **Not adjudicated by me on purpose.** Picking either silently is exactly
+    the *"a week of work lands on the wrong side of a decision nobody made"*
+    case, and one side of it edits a record Arpit ratified four days ago.
+  - **Two stale specs fixed on contact.** W-98 §2 and §11 still specified
+    `.fux/refusals.py`, a **code predicate**, which the current prompt
+    explicitly defers (*"do not write a `refusals.py`"*); §11's Phase 2
+    paragraph and its socket constraint are now synced to the newer prompt.
+- **Next:** Arpit calls the boundary fork. Nothing in Phase 2 starts before it
+  — the matcher's input record has a different shape under each answer.
+
+## 2026-09-01 — W-98 Phase 1: the browser fetcher stopped rendering  ·  Claude Code
+
+- **Asked:** run the acquired-plane prompt. Arpit answered the open blocker in
+  the same exchange, then said `go`.
+- **Did:**
+  - **The blocker is cleared.** Arpit lifted §5.1's *"decided — do not
+    re-litigate"* and adopted **CDP interception**; §5.1, Risk 1 and both
+    executable spike sections are amended in `work/open/W-98-acquired-plane.md`
+    and the two `work/handoff/` copies. ⚠ **The measured spike tables are
+    BANNERED as history, not rewritten** — they are the record of what was
+    actually run, and step 5's correction is only legible beside them.
+  - **`src/fux/templates/cdp.py.txt` rebuilt in the middle.** `fetch_resource`
+    on `Fetch.enable(requestStage: "Response")` → `Page.navigate` →
+    `Fetch.requestPaused` → `Fetch.getResponseBody`; `validate(url)` returning
+    the `ETag`; `LAUNCH_CHROME` now `False`; module docstring rewritten. The
+    contract, the transport and `extract_links` are untouched.
+  - **`CdpSession` gained an event pump.** `_call` used to discard every message
+    that was not its own id.
+  - Rendering path → `archive/templates/cdp-rendering.py.txt` with an
+    `archive/README.md` row. `.fux/fetchers/cdp.py` synced (it was a
+    byte-identical unedited copy — verified before writing).
+  - **ADR-CDP-FETCHER rewritten in place** (§1 prose, Mermaid **and its ASCII
+    twin**, decision 5, new decisions 10–13, consequences, four new rejected
+    alternatives, two new veto checks); **ADR-FETCHER amended** in the same
+    change because it owns `src/fux/templates/`. Register row, README,
+    CHANGELOG, DOC-REGISTRY ×6, OPEN-WORK, INTERVIEW.
+  - Tests: 12 new in `tests/ingest/test_cdp_fetcher.py`, driving the CDP
+    conversation against a scripted peer (no Chrome, no socket). **27 in that
+    file; 2412 unit passed, 74 e2e passed; `fux doctor` green.**
+- **Decided / open:**
+  - 🔴 **The spec's prescribed technique could never have worked, and §5.1 had
+    forbidden re-examining it.** An in-page `fetch(url, {credentials:'include'})`
+    returned `TypeError` on a cross-origin URL sending no `ACAO` where
+    interception read **8557 bytes**; and a cross-origin in-page fetch sees only
+    CORS-safelisted headers, so **`ETag` was invisible** and `validate()` — a
+    Phase 1 deliverable — was unbuildable under it. **The lesson is about the
+    marker, not about CDP:** *"do not re-litigate"* is exactly what stops the
+    next reader checking.
+  - 🔴 **An acceptance criterion is UNMET as written, and is Arpit's call:**
+    *"`fux update` with a matching ETag performs no body download."* Interception
+    is at the response stage, so the body has already transferred. `validate()`
+    saves the decode and the shard comparison, **not bandwidth**. Written into
+    ADR-CDP-FETCHER decision 12 rather than quietly satisfied.
+  - ⚠ **BREAKING: `settle_ms` removed** from `[sources.url.config]`; it raises a
+    message naming the retirement. ⚠ **`fux setup` is write-if-missing**, so a
+    repo with a hand-edited `cdp.py` does not receive Phase 1.
+  - ⚠ **`work/handoff/` is untracked, duplicates W-98 §11, and fails
+    `tests/test_archive_law.py`.** The red is **pre-existing** — the directory
+    was there at session start. CLAUDE.md retired the handoff directory on
+    2026-08-18. It is a deletion, so it waits for Arpit.
+  - **Ruled by Arpit:** `cdp.py`'s `HTMLParser`/`urljoin` are **not** dead code.
+    Keep the code, fix the docstring. Done.
+  - Ruff is configured in `pyproject.toml` but **not a declared dev dependency**
+    — `uv run ruff` cannot spawn it. Checked via `uvx ruff`: **206 errors, the
+    same count before and after this change**, and the files touched here are
+    clean. Pre-existing baseline, not introduced.
+- **Next:** Arpit's call on the ETag criterion and on deleting `work/handoff/`;
+  then Phase 2 — declarative refusal detection that fails closed.
+
+## 2026-09-01 — W-98 opened; the acquired-plane build is blocked on an untested spike  ·  Claude Code
+
+- **Asked:** execute the acquired-plane handoff — rebuild `cdp.py` to return
+  the resource, add refusal detection, add `.fux/acquired/`, add `ttl=`. Four
+  phases, each pausing for confirmation. Then, mid-session: *"open work row"* —
+  land the spec where the repo says specs live.
+
+- **No fetcher code was written — that is the gate working — but the spike is
+  no longer unrun.** Steps 1–3 need no tenant, so I ran them: headless Chrome
+  on a throwaway profile, driven over the shipped `cdp.py.txt` WebSocket.
+  **Three of the five findings contradict the spec.**
+  (1) ✅ The CDP base64 round-trip is byte-exact.
+  (2) ✅ **A cross-origin 302 IS followed and its body IS readable** — §8's
+  Risk 1 named the wrong villain.
+  (3) 🔴 **`credentials:'include'` is what kills it, structurally.** The rows
+  differ only in credentials mode: a credentialed CORS request may not be
+  answered with `ACAO: *`, and a CDN serving every origin serves the wildcard.
+  **Cross-origin + cookies cannot work**; only the same-origin
+  `/_layouts/15/download.aspx` path survives.
+  (4) ✅ Failure is a thrown `TypeError`, **never** a readable opaque response —
+  that shape belongs to `mode:'no-cors'`, which this design never uses, so
+  detection is a `try/catch` and not a zero-byte test.
+  (5) 🔴 **A page's CSP `connect-src` blocks the fetch before CORS is
+  consulted, and it silently invalidated my first two attempts** — the spec's
+  own suggested spike host, `httpbin.dev`, ships `connect-src 'self'`, so every
+  cross-origin row failed identically no matter what the target's CORS said.
+  Filed in W-98 §9 with the reproducing snippet. **Step 4 (Arpit's signed-in
+  Chrome) is still the gate, but now asks one question:** does `download.aspx`
+  return bytes same-origin, or 302 to a CDN?
+
+- **The handoff's one factual guess was wrong, and the guardrail caught it.**
+  It expected `cdp.py`'s `HTMLParser`/`urljoin` imports to be dead code from
+  W-86 P8, with instructions to stop if they were live. They are neither
+  exactly: **nothing in `src/` calls `extract_links`** — no crawl path exists —
+  but the in-file comment (*"crawling is this fetcher's job"*) and
+  `tests/ingest/test_cdp_fetcher.py::test_link_extraction_stays_here_because_crawling_is_a_fetcher_s_job`
+  retain it **deliberately**. Deleting it would delete a tested consumer-facing
+  feature. What is actually stale is the module docstring's capture pipeline
+  (*"→ deterministic HTML→markdown"*), which W-86 P1 already falsified.
+  Recommendation put to Arpit: keep the code, rewrite the docstring.
+
+- **Did:** moved `work/handoff/HANDOFF_acquired-plane.md` →
+  [`work/open/W-98-acquired-plane.md`](open/W-98-acquired-plane.md) on Arpit's
+  ruling, folding the paste-ready prompt in as §11 (one file per item) and
+  adding the `**Model: Opus**` line the handoff was missing; deleted
+  `work/handoff/` — a directory retired on 2026-08-18 that this handoff
+  recreated. Added the W-98 row to OPEN-WORK under *fux build*. Corrected the
+  spec's stale `2.0.0-alpha.0` to `alpha.4`.
+
+- **Found red on arrival, fixed:** the staged `docs/adr/0050_acquired-plane.md`
+  was failing two tests. It was **not in the register**
+  (`test_adr_ownership.py::test_register_covers_every_record_on_disk`), and its
+  `owns:` claimed `src/fux/store/acquired.py`, **a file that does not exist**.
+  Registered as `⏳ proposed`; `owns:` corrected to `[]` with the reason stated
+  in §2 — [ADR-OWNERSHIP](../docs/adr/0049_ownership.md) deleted the
+  conditional `Owns (on acceptance):` form precisely because a claim the table
+  does not honour is indistinguishable from drift. `0001`–`0049` bumped to
+  `0001`–`0050`. `pytest -q tests`: 2398 passed, 2 skipped.
+
+- **A concurrent session rewrote `work/handoff/` mid-task**, after I had moved
+  it — larger files, materially revised (a researched CORS analysis with a
+  Microsoft citation, and a four-step spike table). **Merged, not clobbered**,
+  and re-folded into W-98; the directory then removed again. This is the
+  concurrent-write hazard CLAUDE.md warns about, caught only because
+  `test_archive_law.py` failed on a path that should not have existed.
+
+- **Decided / open:** the four-phase split and the out-of-scope list stand as
+  written. **Three things wait on Arpit:** spike step 4, Phase 1 plan
+  confirmation, and the `extract_links` call. `no ADR affected` does not apply
+  — ADR-ACQUIRED was registered and edited in this change.
+
+- **Next:** Arpit runs spike step 4 in a signed-in Chrome; same-origin bytes
+  means Phase 1 starts against the plan already put to him, off-origin means
+  the technique changes first.
+
 ## 2026-08-29 — Committed, pushed, and 2.0.0-alpha.4 released  ·  Claude Code
 
 - **Asked:** *"commit everything and push then publish a new alpha version."*

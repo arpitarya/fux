@@ -270,6 +270,60 @@ decoder returning `None` is **discovered**, and had nowhere to go.
   separate decision** — and *discovered* and *declared* are different origins,
   so merging them amends an accepted record.
 
+**13. A `decoder=` binding in `.fux/sources/types` OUTRANKS both, and is
+verified against the module it names.** Ruled by Arpit 2026-09-01; the record
+that owns the grammar is [ADR-TYPES](0031_types-list.md) decision 11, and this
+is what it means for dispatch.
+
+Precedence, in the order `registry()` applies it:
+
+| # | source | answers |
+|---|---|---|
+| 1 | a built-in's `EXTENSIONS` | which decoder *ships* claiming `.csv` |
+| 2 | a consumer module of the same name (decision 5) | which decoder is *installed* here |
+| 3 | `*.csv decoder=csvdoc` | which decoder this repo has **agreed** reads `.csv` |
+
+⚠ **Decision 5 is narrowed, not overturned.** It resolves an override by module
+name because *"matching on extension would let two files both claim `.html` and
+resolve by load order"* — and that is still exactly how an undeclared extension
+resolves. What decision 5 could never do is make the winner **visible**: with a
+built-in `csvdoc` and a consumer `mycsv` both claiming `.csv`, precedence picks
+one and nothing in the repo says which. A binding names it in a diff.
+`tests/decode/test_binding.py::test_a_binding_beats_load_order_when_two_decoders_claim_one_extension`
+is that case, both ways round.
+
+⚠ **Neither failure may degrade to a fallback.** A binding naming a module that
+does not exist raises, and so does one that **takes an extension from the
+decoder that claims it and gives it to a module that does not** (`_bind`).
+**This is decision 7's argument at the level above it**: *unavailable* has to
+mean the ingest stops, because the alternative is two machines producing
+different indexes from the same sources. The redirect case is the sharper one —
+both halves are real, only the pairing is wrong — and fux refuses to guess which
+is stale, because **the wrong decoder does not fail visibly**; it emits a
+plausible document and a plausible index.
+
+⚠ **But an extension NOTHING claims may be given to any decoder, and that is
+not a hole — it is the feature.** `*.geojson decoder=jsondoc` is how a consumer
+reads a format `jsondoc` can obviously handle without copying the module and
+editing one tuple. **`EXTENSIONS` is a default claim, not a capability
+declaration**, and reading it as the latter is what made the first version of
+this decision refuse its own main use case within hours of shipping.
+[ADR-TYPES](0031_types-list.md) decision 11a carries the table and the argument
+for why the two directions get different answers; the short version is that a
+typo while extending binds a decoder to a suffix no file has, while a typo while
+redirecting re-reads real documents with the wrong reader.
+
+**The read is cached on the types file's stat**, because `registry()` runs once
+per document via `claims()` and an uncached read would be one open-and-parse per
+file walked. Keyed on `(path, st_mtime_ns, st_size)`, so an edit inside one
+process is never served stale — pinned by
+`test_an_edit_is_picked_up_within_one_process`.
+
+⚠ **`builtin_extensions()` and `builtin_bindings()` still ignore bindings
+entirely**, and must. They feed `DEFAULT_TYPES` and the file `fux setup` writes;
+deriving either from declared config would close a loop where the file decides
+what the file's own default should say.
+
 ### Consequences
 
 - **The converter duplication is structurally impossible now**, and the
@@ -307,8 +361,14 @@ decoder returning `None` is **discovered**, and had nowhere to go.
 ### Reference (required)
 
 - [`src/fux/decode/__init__.py`](../../src/fux/decode/__init__.py) — the
-  protocol, the registry and the override precedence, as code; the skill —
+  protocol, the registry and the override precedence, as code; decision 13's
+  binding is `_declared_bindings`, `_bound_extension` and `_bind` in the same
+  file. The skill —
   [`src/fux/templates/agents/DECODER-SKILL.md`](../../src/fux/templates/agents/DECODER-SKILL.md).
+- [`tests/decode/test_binding.py`](../../tests/decode/test_binding.py) —
+  decision 13's twenty cases: the grammar, both hard errors, the load-order case
+  a binding settles, and that every binding `fux setup` writes survives the
+  check `fux ingest` applies.
 - [`tests/decode/test_decode.py`](../../tests/decode/test_decode.py) — in
   particular `test_both_fetchers_now_share_one_conversion`, which asserts the
   copies are **gone** rather than that they currently agree, and
@@ -339,6 +399,11 @@ decoder returning `None` is **discovered**, and had nowhere to go.
    ([ADR-TYPES](0031_types-list.md) decision 1a).
 4. **A decoder returns flat text and a heading lands in the body field**, which
    is decision 2 failing rather than being traded.
+5. **A binding failure is ever softened into a fallback** — `_bind` returning a
+   tuple-derived decoder, or warning and continuing, instead of raising. That is
+   decision 13 being traded away, and it reintroduces exactly the silent
+   divergence the binding exists to close. Checkable: `_bind` has no `return`
+   path that is not preceded by the two raises.
 
 **How to check them:**
 

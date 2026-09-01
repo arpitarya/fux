@@ -1,0 +1,178 @@
+# .fux/refusals.toml -- WHAT A REFUSAL LOOKS LIKE HERE.
+#
+# A refusal is a response the server returned INSTEAD of the document: a
+# sign-in wall, a session-expired interstitial, a paywall, a 403 shell, a
+# geo-block, a "your trial has ended" page. It arrives looking like a success
+# and decodes perfectly well as HTML, which is exactly why it is dangerous --
+# nothing downstream can tell it from a real document, and an indexed login
+# page is a confident wrong answer that survives until a human reads it.
+#
+# THIS FILE IS COMMITTED AND IT IS YOURS. Fux writes it once if it is missing
+# and never rewrites it. It is policy, not code: fux ships ZERO knowledge of
+# any vendor, and every rule below is a rule YOU own and can delete.
+#
+# ── WHY A TABLE AND NOT A PREDICATE ──────────────────────────────────────────
+#
+# A refusal signature is a PATTERN MATCH -- a content type that cannot be
+# right, a marker in the markup, a body too small to be a document. That is
+# data, and data is diffable, reviewable, and testable against a captured page
+# with no browser and no network. A Python predicate could do the same job and
+# could also open a socket, raise from anywhere, and fail in a way that is
+# indistinguishable from "this page is fine". Adding a system tomorrow should
+# be a table entry, not a code review.
+#
+# ── EVERY CONDITION IS PURE OVER THE BYTES. THIS IS NOT AN OVERSIGHT ─────────
+#
+# There is no `status`, no `final_url_host`, no "were you redirected" here, and
+# there never will be while ADR-FETCHER decision 13 stands. Fux does not read a
+# status code, a header, or an error string -- a fetcher knows it speaks HTTP,
+# and fux deliberately does not. `content_type` is in this file because a MIME
+# type is FORMAT vocabulary, which is fux's business; a 302 is TRANSPORT
+# vocabulary, which is the fetcher's.
+#
+# The practical consequence is smaller than it sounds. An identity provider
+# that bounces you still has to hand back a page, and that page is HTML where
+# you asked for a document -- which the first rule below catches without
+# knowing the provider exists. Match the response, not the journey.
+#
+# ── HOW MATCHING WORKS ───────────────────────────────────────────────────────
+#
+#   * Rules are tried IN FILE ORDER; the FIRST match wins and its `reason` is
+#     recorded as the skip reason. Order is the only precedence there is.
+#   * Conditions INSIDE one rule are ANDed. A rule with three conditions fires
+#     only when all three hold.
+#   * A list value is ORed. Two entries mean either.
+#   * An absent condition is not a condition. It never matches "anything";
+#     it simply is not consulted.
+#
+# ── WHAT THIS FILE CANNOT DO, ON PURPOSE ─────────────────────────────────────
+#
+# One check runs in the ENGINE, always, before this file is consulted, and
+# nothing here can switch it off: the declared content type must agree with
+# the response's magic bytes. OOXML opens `PK\x03\x04`; PDF opens `%PDF-`.
+#
+# That is a fact about formats, not about your organisation, so it is not
+# yours to configure. This file ADDS refusals. It can never subtract one.
+#
+# ── MISSING VS MALFORMED ─────────────────────────────────────────────────────
+#
+# NO FILE is a legitimate configuration: you have no organisation-specific
+# refusals, and the engine's magic-byte check is your floor. Fux says nothing.
+#
+# A MALFORMED FILE REFUSES TO RUN, loudly, the way a malformed `fux.toml`
+# does. A rules file that silently failed to parse would look exactly like a
+# repo with no refusals -- and you would find out from a login page in your
+# index three weeks later.
+
+# ── CONDITIONS ───────────────────────────────────────────────────────────────
+#
+#   content_type         list; matched against the type WITHOUT parameters, as
+#                        a prefix. "text/html" matches "text/html; charset=utf-8".
+#   requested_suffix     list; the extension implied by the URL you asked for.
+#   requested_suffix_not list; the inverse. Reads better for "I asked for a
+#                        document and got a web page".
+#   body_contains        list of substrings, searched in the FIRST 64 KB only,
+#                        decoded leniently, and ONLY when the response is
+#                        texty or small. Scanning 40 MB of a workbook for a
+#                        login string is a waste and a false-positive farm.
+#   body_starts_with     hex bytes, space-separated: "50 4b 03 04".
+#   max_bytes            int; fires when the response is SMALLER than this.
+#                        A suspiciously tiny reply where a document was
+#                        expected is a refusal shape of its own.
+#
+#   name                 REQUIRED. Reported by `fux doctor`, so a refused URL
+#                        says WHICH rule caught it. Keep it stable; it is an
+#                        identifier, not a description.
+#   reason               REQUIRED. Recorded verbatim as the skip reason and
+#                        read by a human who is deciding what to do next.
+#                        Write an instruction, not a diagnosis: "sign in and
+#                        re-run" beats "authentication failure".
+
+# ═════════════════════════════════════════════════════════════════════════════
+# GENERIC RULES -- no vendor knowledge, useful in any repo.
+# ═════════════════════════════════════════════════════════════════════════════
+
+[[rule]]
+name   = "document-request-returned-a-web-page"
+reason = "asked for a document and got a web page - you are probably signed out; open the URL in your browser, sign in, and re-run"
+# The highest-value rule in the file, and the one that needs no configuring.
+# Nearly every auth wall, paywall and error shell presents as HTML, so "I
+# requested a .xlsx and was handed text/html" catches most of them without
+# naming anybody -- and without asking where the response came from.
+content_type         = ["text/html", "application/xhtml+xml"]
+requested_suffix_not = [".html", ".htm", ""]
+
+[[rule]]
+name   = "password-form-in-response"
+reason = "the response body contains a sign-in form - you are signed out"
+# Deliberately matched on the FORM, not on any provider's branding. A password
+# input in a document response means a login page regardless of who built it.
+content_type  = ["text/html"]
+body_contains = ['type="password"', "type='password'"]
+
+[[rule]]
+name   = "suspiciously-small-document"
+reason = "the response is too small to be the document - likely an error shell or a redirect stub"
+requested_suffix_not = [".html", ".htm", ".txt", ".md", ""]
+max_bytes            = 1024
+
+# ═════════════════════════════════════════════════════════════════════════════
+# IDENTITY PROVIDERS -- delete the ones you do not use, add the one you do.
+#
+# These match on MARKUP THE LOGIN PAGE CARRIES, not on the host that served
+# it, because the host is transport and this file only sees bytes. A form
+# field name is the most stable marker available: it is an API between the
+# page and its own backend, so it survives redesigns that rewrite every
+# visible string on the page.
+#
+# ⚠ Less stable than a hostname would be. Capture the page as a fixture when
+# you add one of these, or you will not find out it stopped matching.
+# ═════════════════════════════════════════════════════════════════════════════
+
+[[rule]]
+name   = "microsoft-entra-sign-in"
+reason = "Microsoft sign-in page returned - open the URL in the browser this fetcher uses, sign in, then re-run"
+content_type  = ["text/html"]
+body_contains = ['name="loginfmt"', "urlMsaSignUp", "ConvergedSignIn"]
+
+[[rule]]
+name   = "saml-or-oidc-handoff"
+reason = "an identity-provider handoff page was returned instead of the document - your session has expired"
+# The auto-post form every SAML/OIDC bounce carries. Protocol markup, not
+# branding, so it holds across providers.
+content_type  = ["text/html"]
+body_contains = ['name="SAMLRequest"', 'name="SAMLResponse"', "id_token", "state=&amp;nonce="]
+
+# ═════════════════════════════════════════════════════════════════════════════
+# ADD YOUR OWN BELOW.
+#
+# The workflow that writes a rule correctly, every time:
+#
+#   1. Sign out. Fetch the URL. Save what came back.
+#   2. Look at two things: the content type, and the first lines of the body.
+#   3. Write the rule against whichever is STABLE. A content type is stable.
+#      A form field name is fairly stable -- it is an API between the page and
+#      its backend. Marketing copy is not; it is rewritten on a redesign and
+#      your rule silently stops firing.
+#   4. Save the captured page as a test fixture. A refusal rule with no
+#      fixture is a rule nobody can prove still works.
+#
+# Two failure modes, and they are not symmetrical:
+#
+#   A rule that is TOO NARROW lets a refusal into the index, where it becomes
+#   a confident wrong answer. A rule that is TOO BROAD turns a real document
+#   into a recorded skip -- visible, annoying, and fixed in a minute. When you
+#   are unsure, be too broad.
+# ═════════════════════════════════════════════════════════════════════════════
+
+# [[rule]]
+# name   = "confluence-anonymous-view"
+# reason = "Confluence served the anonymous view - your session has expired"
+# content_type  = ["text/html"]
+# body_contains = ["login.action", "aui-message-warning"]
+
+# [[rule]]
+# name   = "vendor-paywall"
+# reason = "this document is behind a paywall on the current plan"
+# content_type  = ["text/html"]
+# body_contains = ["upgrade-your-plan", "subscription-required"]

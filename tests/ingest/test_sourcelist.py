@@ -21,6 +21,23 @@ def _values(text, spec=sourcelist.URLS):
     return [e.value for e in _parse(text, spec)]
 
 
+def _defaults(spec=sourcelist.URLS, **overrides):
+    """The RESOLVED attribute map for a line that declared `overrides`.
+
+    ⚠ **Derived from the spec, never spelled out.** Five tests here hard-coded
+    `{"fetch": ..., "meta": ...}` and went red the day `keep`, `ttl` and
+    `enrich` joined `URLS` (W-100) -- the attributes moved and the tests did
+    not. A test written against the *spec* cannot rot that way, which is what
+    this module's own docstring claims it does. The set itself is pinned once,
+    deliberately, in `test_the_url_attribute_set_is_exactly_these_six`: an
+    attribute appearing without anybody noticing is the failure this file
+    still has to catch.
+    """
+    resolved = {a.name: a.default for a in spec.attributes}
+    resolved.update(overrides)
+    return resolved
+
+
 # -- comments, blanks, ordering -------------------------------------------
 
 
@@ -53,17 +70,43 @@ def test_the_loader_dedupes_and_sorts_so_file_order_is_presentation_only():
 # -- attributes ------------------------------------------------------------
 
 
+def test_the_url_attribute_set_is_exactly_these_six():
+    """The one place the URL attribute set is written out, on purpose.
+
+    Every other test here derives from the spec so it survives a new
+    attribute. This one does not, so a new attribute is *visible* -- it lands
+    as one failing assertion naming what appeared, rather than as five
+    unrelated ones (W-100) or as nothing at all.
+    """
+    assert [a.name for a in sourcelist.URLS.attributes] == [
+        "fetch", "meta", "keep", "ttl", "enrich",
+    ]
+    assert _defaults() == {
+        "fetch": "http",
+        "meta": "hashed",
+        "keep": "true",      # ADR-ACQUIRED: retention is on, the store is bounded
+        "ttl": "24h",        # ADR-URL-FRESHNESS: not 0; see decision on the default
+        "enrich": "false",   # ADR-PII: enrichment is always opted into
+    }
+
+
 def test_absent_attributes_take_their_defaults_and_are_not_declared():
     (entry,) = _parse("https://x.test/a")
-    assert entry.attrs == {"fetch": "http", "meta": "hashed"}
+    assert entry.attrs == _defaults()
     assert entry.declared == frozenset()
     assert not entry.is_complete()
 
 
 def test_a_line_stating_every_attribute_is_complete():
-    (entry,) = _parse("https://x.test/a fetch=cdp meta=plain")
-    assert entry.declared == {"fetch", "meta"}
+    stated = " ".join(f"{a.name}={a.default}" for a in sourcelist.URLS.attributes)
+    (entry,) = _parse(f"https://x.test/a {stated}")
+    assert entry.declared == {a.name for a in sourcelist.URLS.attributes}
     assert entry.is_complete()
+
+    # ... and one short of the set is not, whichever one is missing.
+    (partial,) = _parse("https://x.test/a fetch=cdp meta=plain")
+    assert partial.declared == {"fetch", "meta"}
+    assert not partial.is_complete()
 
 
 def test_attribute_order_on_a_line_does_not_matter():
@@ -100,7 +143,7 @@ def test_a_duplicate_with_conflicting_attributes_names_both_lines():
 def test_a_duplicate_is_compared_on_resolved_attributes_not_on_the_text():
     """The reader is lenient: an absent attribute *is* its default."""
     (entry,) = _parse("https://x.test/a\nhttps://x.test/a meta=hashed")
-    assert entry.attrs == {"fetch": "http", "meta": "hashed"}
+    assert entry.attrs == _defaults()
     assert entry.declared == {"meta"}  # the more explicit of the two survives
 
 
@@ -140,12 +183,13 @@ def test_urls_attributes_are_not_legal_in_dirs_and_vice_versa():
 
 def test_a_rendered_line_states_every_attribute_even_at_its_default():
     line = sourcelist.render_line("https://x.test/a", {}, sourcelist.URLS)
-    assert line == "https://x.test/a fetch=http meta=hashed"
+    stated = " ".join(f"{a.name}={a.default}" for a in sourcelist.URLS.attributes)
+    assert line == f"https://x.test/a {stated}"
 
 
 def test_a_rendered_line_round_trips_and_is_complete():
     line = sourcelist.render_line("https://x.test/a", {"fetch": "cdp"}, sourcelist.URLS)
     (entry,) = _parse(line)
     assert entry.value == "https://x.test/a"
-    assert entry.attrs == {"fetch": "cdp", "meta": "hashed"}
+    assert entry.attrs == _defaults(fetch="cdp")
     assert entry.is_complete()
