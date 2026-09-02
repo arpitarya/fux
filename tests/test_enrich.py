@@ -284,6 +284,33 @@ def test_check_REFUSES_a_matching_file_and_does_not_rewrite_it(tmp_path):
     assert path.read_bytes() == before, "--check rewrote a committed file"
 
 
+def test_a_report_spells_every_path_the_way_the_worklist_does(tmp_path):
+    """One file, one spelling — on every platform.
+
+    🔴 **This failed on Windows CI and nowhere else**, which is how it shipped:
+    `plan()`'s worklist builds `.fux/enrich/<sha>.md` from a literal, while
+    `malformed:` and `refused:` came from `str(Path)` — `\\` on Windows. The
+    same run named the same file two ways and a consumer grepping their log for
+    a path found half of it.
+
+    Asserted structurally rather than by comparing to a constant, so it fails on
+    a POSIX box too if the separator ever diverges again.
+    """
+    _write(tmp_path, "abc123", body="ping arpit@example.com. " + GOOD_BODY)
+    _write(tmp_path, "def456", drop="model")
+    records = [{"loc": "docs/a.md", "sha": "abc123"}, {"loc": "docs/b.md", "sha": "def456"}]
+    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES)
+
+    shown = [p for p, _ in report.pii] + [p for p, _ in report.malformed]
+    assert len(shown) == 2, "the fixture should produce one of each"
+    for path in shown:
+        assert "\\" not in path, f"{path!r} carries a native separator"
+        assert path.startswith(ENRICH_DIR + "/"), (
+            f"{path!r} does not match the worklist's own spelling, "
+            f"{ENRICH_DIR}/<sha>.md"
+        )
+
+
 def test_a_refused_file_is_reported_once_not_twice(tmp_path):
     """A malformed file is never ALSO reported as carrying PII: the remedies
     differ, and offering both is offering the wrong one."""

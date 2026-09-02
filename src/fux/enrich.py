@@ -209,7 +209,7 @@ def plan(
                 continue
             problem = validate(path, expected_sha=sha)
             if problem:
-                malformed.append((str(path.relative_to(root)), problem))
+                malformed.append((_shown(path, root), problem))
                 continue
             # W-102. A well-formed enrichment can still carry a value that must
             # not be committed. Checked AFTER `validate` so one file never
@@ -217,7 +217,7 @@ def plan(
             # indexed -- a malformed file's text reaches nothing.
             fired = _pii_in_body(path, pii_rules)
             if fired:
-                pii_found.append((str(path.relative_to(root)), fired))
+                pii_found.append((_shown(path, root), fired))
                 continue
             ok += 1
         reports.append(
@@ -225,6 +225,23 @@ def plan(
                         pii=pii_found, filtered=filtered)
         )
     return reports
+
+
+def _shown(path: Path, root: Path) -> str:
+    """An enrichment file's path as this command spells it, on every platform.
+
+    ⚠ **`str(Path)` is `\\` on Windows, and this report already had a `/`
+    spelling.** `plan()`'s worklist names each file as
+    `.fux/enrich/<sha>.md` (built from `ENRICH_DIR`, a literal), while its
+    `malformed:` and `refused:` lines came from `str(path.relative_to(root))`
+    — so one Windows run printed **the same file two different ways**, and a
+    consumer grepping their own log for a path found half of it.
+
+    Fux spells a `loc` with forward slashes everywhere else; this is that,
+    applied to the one report that had drifted. It is display only — nothing
+    opens a file by this string.
+    """
+    return path.relative_to(root).as_posix()
 
 
 def _pii_in_body(path: Path, rules: tuple) -> list[str]:

@@ -24,6 +24,38 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-02 — `alpha.6` shipped with red Windows CI; `alpha.7` fixes it  ·  Claude Code (Opus)
+
+**Asked.** Same session, continued: the release went out and CI came back red.
+
+**Did.** One failure, both Windows jobs, nothing else on any platform:
+`fux enrich`'s report named the same file two ways — the worklist's
+`.fux/enrich/<sha>.md` (a literal) and `str(Path)`'s backslashed twin on the
+`malformed:` and `refused:` lines.
+
+- **Fixed in the product, not the test.** `_shown()` is the one spelling. The
+  new test asserts *the separator and the prefix* rather than comparing to a
+  constant, so it fails on Linux too if the two diverge again.
+- [ADR-ENRICH](../docs/adr/0040_enrich.md) **decision 14**; ADR-PII notes it
+  because `refused:` is its surface.
+- **Cut `2.0.0-alpha.7`.**
+
+**Decided / open.**
+
+1. 🔴 **`alpha.6` was published before its CI finished, and that was wrong.**
+   The merge wall enforces no checks, so reading `gh run` is the only gate and
+   it was read *after* the release rather than before. The defect turned out to
+   be cosmetic and Windows-only; the process failure did not depend on that.
+2. ⚠ **The `malformed:` half of this predates `alpha.6`** — it shipped the
+   moment a Windows consumer ran `--check` on a bad file. `alpha.6` made it
+   *visible* by adding a second line beside it with the other spelling.
+3. **No reviewer on a POSIX box could have caught it.** `str(Path)` and
+   `as_posix()` are the same string there. This is the Windows-first-fleet
+   design input CLAUDE.md names, arriving as a bug.
+
+**Next.** Unchanged: Arpit's queue (the ETag criterion, the W-83 gate), and
+W-101 on the agent lane.
+
 ## 2026-09-02 — the wedged session's four items verified, two runs filed, `2.0.0-alpha.6` cut  ·  Claude Code (Opus)
 
 **Asked.** Review open work, implement everything, then commit, push and publish

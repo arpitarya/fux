@@ -244,6 +244,24 @@ documents turns a one-document request into a bulk run.
 
 ### The `enriched` mode — folded verbatim from ADR-ENRICHED, 2026-08-27
 
+**14. `--plan` and `--check` spell every path the way the worklist does** —
+`.fux/enrich/<sha>.md`, forward slashes, on every platform.
+
+🔴 **They did not, and it took a Windows runner to say so.** The worklist built
+its target from `ENRICH_DIR`, a literal; `malformed:` and `refused:` came from
+`str(path.relative_to(root))`, which is `\` on Windows. **One run named the
+same file two different ways**, so a consumer grepping their own log for a path
+found half of it. `_shown()` is now the single spelling and it is display only —
+nothing opens a file by that string.
+
+⚠ **Worth knowing beyond this record**: the defect existed for `malformed:`
+before W-102 added `refused:` beside it, and **no reviewer on a POSIX box could
+have seen it** — `str(Path)` and `as_posix()` are the same string there. The
+test added for it asserts *the separator and the prefix* rather than comparing
+to a constant, so it fails on Linux too if the two ever diverge again.
+Enterprise realities are design inputs (CLAUDE.md), and Windows-first fleets
+are the first one named.
+
 ⚠ **This section is ADR-ENRICHED's ratified content, moved here UNCHANGED**
 under W-82 ruling 6 (*"ENRICH supersedes ENRICHED"*). It was folded **before**
 that record was archived, deliberately: archiving first would have made every
