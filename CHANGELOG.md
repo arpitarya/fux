@@ -8,6 +8,100 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.6] - 2026-09-02
+
+**Enrichment prose is inside the PII boundary, `fux enrich` takes one target,
+and the cdp fetcher survives concurrency.** Four items written on 2026-09-01 in
+a session whose shell never came up, verified here against a real one — two of
+them against measured runs, because CI structurally cannot see either failure.
+
+### Fixed
+
+- 🔴 **A PII value in an *enrichment body* became a committed index term.**
+  Redaction walked parsed document bodies; `_enrichment_for()` read
+  `.fux/enrich/` further down and handed its text to extraction as `ctx`, so an
+  address in enrichment prose was searchable on a document whose own body had
+  just been redacted, with **no surface saying why**. Enrichment now gets its
+  own pass. Reproduced through the real CLI in two arms before it was called
+  fixed — [`2026-09-02-enrich-pii-leak`](work/regression/2026-09-02-enrich-pii-leak/report.md):
+  `fux find` returned the document before and does not after, and a control
+  proves enrichment vocabulary still ranks.
+  - ⚠ **The sha is untouched.** Enrichment is keyed by the source document's
+    content sha, which is also the file's name; re-shaing over redacted text
+    would report every enriched document `stale` against its own unchanged
+    source.
+  - **The frontmatter is deliberately outside the pass** — it is stripped
+    before indexing already, so a `model:` value never reaches a committed term.
+
+- 🔴 **`cdp.py` shared protocol state and one browser tab across threads.** The
+  file said the constraint was one WebSocket every `fetch()` reuses; that had
+  not been true for some time. What was actually shared was the message-id
+  counter, both message queues (**cleared at the top of every fetch**, so one
+  thread wiped another's in-flight state) and the page target — which returned
+  the **first** page, so two threads navigated one tab.
+  - `_Conn` owns the socket, the counter and both queues per fetch; each worker
+    opens and keeps **its own tab**; the launch is guarded by a lock; `close()`
+    closes exactly the tabs this module opened and no others.
+  - Measured against real Chrome —
+    [`2026-09-02-cdp-parallel`](work/regression/2026-09-02-cdp-parallel/report.md):
+    pre-fix, **seven 200-OK responses filed under the wrong URL** across
+    parallel 2/4/6, plus cross-attributed ETags; after, 12/12 on both fetch and
+    `validate()` at parallel 1, 2, 4 and 6, with no tab leaked in eight runs.
+  - ⚠ **Behaviour change: fux no longer drives a tab you had open.** It opens
+    its own — same Chrome, same profile, so a signed-in session is unaffected.
+  - **`MAX_PARALLEL` still ships at `1`.** Both arms pass there, so the shipped
+    number was never itself unsafe; the defect was the explanation beside it.
+
+- **Two docstrings named `runner.lock`, a file renamed to `write.lock` on
+  2026-08-26.** The code was correct throughout; the two files that *explain*
+  the mechanism named something that does not exist. Found by a record that
+  pastes a real `grep` of `src/` into itself rather than describing the check.
+
+### Added
+
+- **`fux enrich [TARGET]`** — an optional positional on `--plan` and `--check`
+  that reports on **one** document or URL. Matching is **exact**: a selector
+  that silently matches two documents is how a one-document request becomes a
+  bulk run.
+  - 🔴 **It filters; it never widens.** A document no `enrich=true` line
+    reaches stays unenrichable, and naming it here does not change that.
+  - Coverage arithmetic keeps the scope's denominator, so a single-target run
+    cannot read as a scope being complete.
+  - *not declared* and *not indexed* are **different messages**, because the
+    fixes are different.
+
+- **`fux enrich --check` refuses an enrichment body carrying PII**, names the
+  rules that fired, and exits `1`. 🔴 **It reports; it never repairs** — the
+  file is prose a human reviews in a diff, and a silent rewrite makes that diff
+  lie. The message says to rewrite the sentence, **not** to add a `pii.toml`
+  rule: a redacted enrichment body indexes `[PII:email]` as vocabulary.
+
+- **`[sources.url.config] fetcher_max_parallel`** — the fetcher's safety
+  ceiling, settable without forking a shipped file. **Both** shipped fetchers
+  accept that one spelling, because the config table reaches every fetcher
+  verbatim and a prefixed name would break any repo loading the other one.
+  Distinct from `[sources.url] max_parallel`, which is politeness. Below `1` is
+  **refused, not clamped**.
+
+### Changed
+
+- **The `fux-enrich` skill runs `--plan` itself** rather than telling a human
+  to, enriches **one** named document when one is named, and **stops to ask**
+  when a plan returns several. It re-runs `--plan <target>` immediately before
+  writing each file, so the window between planning and writing is closed with
+  no new field and no second digest.
+
+- **[ADR-LOCKS](docs/adr/0043_locks.md) is accepted**, and its veto captures are
+  a 2026-09-02 re-run rather than a five-day-old one. All three checks: not
+  fired.
+
+### Upgrade note
+
+⚠ **A repo with both enrichment and a firing `.fux/pii.toml` rule re-ingests
+once on upgrade.** `.fux/runtime/pii-digest` does not cover this: the digest
+fires when the **ruleset** moves, and here the ruleset did not move — its
+**reach** did. One full pass, then it settles.
+
 ## [2.0.0-alpha.5] - 2026-09-01
 
 **A URL behind a login is now ingestible, checkable offline, and redactable.**
