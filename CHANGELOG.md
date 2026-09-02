@@ -8,6 +8,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+## [2.0.0-alpha.7] - 2026-09-02
+
+**A Windows-only fix, caught by a Windows runner and by nothing else.**
+
+### Fixed
+
+- **`fux enrich --plan`/`--check` named the same file two different ways in one
+  run on Windows.** The worklist built `.fux/enrich/<sha>.md` from a literal;
+  the `malformed:` and `refused:` lines came from `str(Path)`, which is `\` on
+  Windows. A consumer grepping their own log for a path found half of it.
+  Every path in the report now uses the worklist's spelling.
+  - ⚠ **No reviewer on Linux or macOS could have seen this** — `str(Path)` and
+    `as_posix()` are the same string there. The `malformed:` half predates
+    `2.0.0-alpha.6`; the `refused:` line, added in it, is what put two
+    spellings in one report and made the mismatch visible.
+  - Display only: nothing opens a file by that string, and no index byte moves.
+
 ## [2.0.0-alpha.6] - 2026-09-02
 
 **Enrichment prose is inside the PII boundary, `fux enrich` takes one target,
