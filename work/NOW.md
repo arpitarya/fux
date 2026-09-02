@@ -1,1 +1,1 @@
-✓ queue reconciled (442 → 331 lines; W-98 + the PII item closed and archived, residue folded into W-101's one `doctor` pass, the `Blocked on Arpit` block written, BLOCKED.json reset to PROCEED) · ✓ 2.0.0-alpha.5 cut and released · → next: W-101 — the `as-ingested` share is the VETO CHECK for two accepted records, so neither can be run until it lands
+✓ W-102/103/104/105 verified and closed · ✓ two runs filed (cdp-parallel, enrich-pii-leak) · ✓ 2688 unit + 74 e2e green · → cutting 2.0.0-alpha.6

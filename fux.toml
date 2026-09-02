@@ -27,8 +27,14 @@ meta         = "hashed"                 # the floor; a line may loosen it to pla
 #
 # THE EFFECTIVE VALUE IS min(this, what your fetcher declares). Your fetcher
 # declares what is SAFE -- `MAX_PARALLEL` in the module, 8 for the shipped
-# http.py, 1 for cdp.py because it reuses one WebSocket. This key is what is
-# POLITE, and it is the one your intranet cares about.
+# http.py, 1 for cdp.py. This key is what is POLITE, and it is the one your
+# intranet cares about.
+#
+# cdp.py ships at 1 because a browser fetch that gets concurrency wrong files a
+# real page under the wrong URL, in the committed index, past every check fux
+# has -- not because the code cannot take more. Since W-105 each worker owns its
+# own tab, socket, id counter and message queues. Raise it deliberately, after
+# watching a real run, with `fetcher_max_parallel` in the table below.
 #
 # Raising it is honoured, never clamped: a bigger number is merely rude, and at
 # 16+ fux says so on stderr rather than quietly reducing it. Below 1 refuses.
@@ -40,6 +46,19 @@ max_parallel = 4
 [sources.url.config]
 cdp_port  = 9299
 #timeout_s = 30
+
+# CAPABILITY, and note it is a DIFFERENT key from `max_parallel` above.
+# `max_parallel` is policy -- how many URLs this repo is willing to have in
+# flight. This one overrides what the fetcher itself declares safe, which is the
+# number that used to be editable only by opening `.fux/fetchers/*.py`. Fux
+# still uses min(capability, policy), so this can raise a ceiling but never
+# lowers the politeness bound.
+#
+# Both shipped fetchers accept it under this one name, and they have to: this
+# table is passed to EVERY fetcher verbatim and each one raises on a key it does
+# not know, so a `cdp_`-prefixed spelling would break a repo that also uses
+# http.py.
+#fetcher_max_parallel = 4
 
 [index]
 # Fixed at 256 (shard = blake2b(id, digest_size=1) -> 00..ff); this key

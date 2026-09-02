@@ -233,10 +233,17 @@ def _body(payload: bytes):
 
 
 def _session_on(mw, monkeypatch, peer):
-    """A CdpSession wired to `peer`, with Chrome discovery stubbed out."""
+    """A CdpSession wired to `peer`, with Chrome discovery stubbed out.
+
+    ⚠ It is `_own_target` that is stubbed, not the retired `_page_target`
+    (W-105). The distinction is the point of that change: `_own_target` opens
+    and remembers **this thread's** tab, so stubbing it here also asserts, by
+    construction, that `fetch_resource` asks for a per-thread target rather
+    than reaching for the first one Chrome happens to have.
+    """
     session = mw.CdpSession()
     monkeypatch.setattr(session, "ensure_chrome", lambda: None)
-    monkeypatch.setattr(session, "_page_target", lambda: {"webSocketDebuggerUrl": "ws://x/y"})
+    monkeypatch.setattr(session, "_own_target", lambda: {"webSocketDebuggerUrl": "ws://x/y"})
     monkeypatch.setattr(mw, "WebSocket", lambda url, timeout=None: peer)
     return session
 

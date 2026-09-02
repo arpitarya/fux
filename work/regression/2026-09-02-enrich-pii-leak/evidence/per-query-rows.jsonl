@@ -1,0 +1,8 @@
+{"arm": "pre-w102", "expected": "no-match", "pass": false, "query": "ops-oncall corp.example", "query_id": "q1", "result": "docs/a.md", "tests": "the address, in the enrichment BODY"}
+{"arm": "head", "expected": "no-match", "pass": true, "query": "ops-oncall corp.example", "query_id": "q1", "result": "No confident matches.", "tests": "the address, in the enrichment BODY"}
+{"arm": "pre-w102", "expected": "match docs/a.md", "pass": true, "query": "escalate restart window", "query_id": "q2", "result": "docs/a.md", "tests": "vocabulary only in the enrichment body"}
+{"arm": "head", "expected": "match docs/a.md", "pass": true, "query": "escalate restart window", "query_id": "q2", "result": "docs/a.md", "tests": "vocabulary only in the enrichment body"}
+{"arm": "pre-w102", "expected": "no-match", "pass": true, "query": "reviewer audit.invalid", "query_id": "q3", "result": "No confident matches.", "tests": "the address, in the enrichment FRONTMATTER"}
+{"arm": "head", "expected": "no-match", "pass": true, "query": "reviewer audit.invalid", "query_id": "q3", "result": "No confident matches.", "tests": "the address, in the enrichment FRONTMATTER"}
+{"arm": "pre-w102", "expected": "match docs/a.md", "pass": true, "query": "alpha service restarts nightly", "query_id": "q4", "result": "docs/a.md docs/b.md", "tests": "the document's own body"}
+{"arm": "head", "expected": "match docs/a.md", "pass": true, "query": "alpha service restarts nightly", "query_id": "q4", "result": "docs/a.md docs/b.md", "tests": "the document's own body"}

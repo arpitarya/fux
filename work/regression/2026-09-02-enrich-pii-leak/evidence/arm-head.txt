@@ -1,0 +1,11 @@
+ingested 3 docs (3 changed, 0 carried forward), 0 not indexed, 0 skipped, 3 shards written
+accelerator: 29 terms, 29 blocks, 34 postings (derived, not committed)
+-- q1 the address (must NOT match: it is in an enrichment BODY)
+No confident matches.
+-- q2 enrichment vocabulary (MUST match: the feature still works)
+docs/a.md
+-- q3 the frontmatter address (must NOT match: frontmatter is never indexed)
+No confident matches.
+-- q4 the document's own body (MUST match: unaffected)
+docs/a.md
+docs/b.md

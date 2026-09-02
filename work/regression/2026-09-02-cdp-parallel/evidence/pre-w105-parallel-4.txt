@@ -1,0 +1,32 @@
+tabs before: 1
+MAX_PARALLEL = 4
+tabs during/after fetch: 1  (+0 ours)
+  ERROR     http://127.0.0.1:8781/p1  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p1: timed out')
+  ERROR     http://127.0.0.1:8781/p2  FetcherError('CDP: no a reply to Fetch.enable within 60s — the site may block headless Chrome, need a sign-in, or need a longer LOAD_TIMEOUT_S')
+  ERROR     http://127.0.0.1:8781/p3  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p3: timed out')
+  ERROR     http://127.0.0.1:8781/p4  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p4: timed out')
+  ERROR     http://127.0.0.1:8781/p5  FetcherError('CDP Fetch.getResponseBody failed: Invalid InterceptionId.')
+  match     http://127.0.0.1:8781/p6  text/html; charset=utf-8
+  MISMATCH  http://127.0.0.1:8781/p7  text/html; charset=utf-8
+  ERROR     http://127.0.0.1:8781/p8  FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')
+  ERROR     http://127.0.0.1:8781/p9  FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')
+  ERROR     http://127.0.0.1:8781/p10  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p10: timed out')
+  ERROR     http://127.0.0.1:8781/p11  FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')
+  ERROR     http://127.0.0.1:8781/p12  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p12: timed out')
+
+fetch: 1 matched · 1 MISMATCHED · 10 errored in 120.9s at parallel=4
+validate: 1/12 ETags matched their own URL
+  MISMATCH http://127.0.0.1:8781/p1 -> None
+  MISMATCH http://127.0.0.1:8781/p10 -> None
+  MISMATCH http://127.0.0.1:8781/p11 -> None
+  MISMATCH http://127.0.0.1:8781/p2 -> None
+  MISMATCH http://127.0.0.1:8781/p3 -> "etag-p1"
+  MISMATCH http://127.0.0.1:8781/p4 -> None
+  MISMATCH http://127.0.0.1:8781/p5 -> None
+  MISMATCH http://127.0.0.1:8781/p6 -> None
+  MISMATCH http://127.0.0.1:8781/p7 -> None
+  MISMATCH http://127.0.0.1:8781/p8 -> None
+  MISMATCH http://127.0.0.1:8781/p9 -> "etag-p11"
+tabs after close(): 1  leaked: 0
+
+RESULT: FAIL

@@ -1,10 +1,17 @@
 """W-82 §3.3 — declared capability, the cap, and the two kinds of refusal.
 
 The failure this design exists to avoid is not a crash. A blanket thread pool
-over the shipped `cdp.py` — one module-global WebSocket, reused by every
-`fetch()` — produces **plausible documents attributed to the wrong URLs**. That
-lands in the committed index, **passes every determinism check** (the trailing
-sort still runs), and is found only by a human reading an answer.
+over the shipped `cdp.py` produces **plausible documents attributed to the wrong
+URLs**. That lands in the committed index, **passes every determinism check**
+(the trailing sort still runs), and is found only by a human reading an answer.
+
+⚠ **This docstring said the cause was "one module-global WebSocket, reused by
+every `fetch()`" until 2026-09-01, and that was false** (W-105).
+`fetch_resource()` had opened a fresh socket per call for some time. The real
+shared state was the id counter, the two message queues (**cleared at the top of
+every fetch**) and the page target — `_page_target()` returned the *first* one,
+so two workers drove one tab. A wrong cause in a test file is worse than none:
+it is where the next person checks whether the hazard is still live.
 """
 
 from __future__ import annotations
@@ -209,19 +216,128 @@ def test_the_two_paths_produce_identical_results(workers):
 # -- the shipped fetchers declare what they actually are ----------------------
 
 
+def _template(name: str) -> str:
+    from importlib import resources
+
+    return (resources.files("fux") / "templates" / f"{name}.py.txt").read_text(encoding="utf-8")
+
+
 def test_the_shipped_cdp_fetcher_declares_one_explicitly():
     """Omission and `1` behave identically — the explicit line is where the
     REASON gets written for whoever copies the file and starts editing it."""
-    from importlib import resources
-
-    text = (resources.files("fux") / "templates" / "cdp.py.txt").read_text(encoding="utf-8")
+    text = _template("cdp")
     assert "MAX_PARALLEL = 1" in text
-    assert "_session" in text  # the reason, named beside the constant
+    # The reason, beside the constant. ⚠ This used to assert `_session`, which
+    # named the WRONG cause — and `_session` is still in the file (it holds the
+    # Chrome process), so the assertion would have stayed green through the
+    # whole life of the defect. Anchor on the state that actually races.
+    assert "def _own_target" in text
 
 
 def test_the_shipped_http_fetcher_declares_more_than_one():
     """If the safe fetcher does not opt in, the mechanism ships dead."""
-    from importlib import resources
+    assert "MAX_PARALLEL = 8" in _template("http")
 
-    text = (resources.files("fux") / "templates" / "http.py.txt").read_text(encoding="utf-8")
-    assert "MAX_PARALLEL = 8" in text
+
+# -- W-105: the cdp session shares nothing a second worker could corrupt ------
+
+
+def test_cdp_keeps_no_protocol_state_on_the_shared_session():
+    """🔴 The three shared fields, gone. Each produced the same wrong answer.
+
+    `_msg_id` handed one id to two commands. `_results`/`_events` were
+    **cleared at the top of every fetch**, so one worker wiped another's
+    in-flight replies and paused requests. Both are per-`_Conn` now.
+    """
+    text = _template("cdp")
+    for field in ("self._msg_id", "self._results", "self._events"):
+        assert field not in text, (
+            f"{field} is back on the shared session — that is state two workers "
+            "race on, and the failure is a real page filed under the wrong URL"
+        )
+    assert "class _Conn" in text
+
+
+def test_cdp_does_not_hand_two_workers_the_same_tab():
+    """`_page_target()` returned the FIRST page target, so two threads called
+    `Page.navigate` on one page. That is the corruption, most directly."""
+    text = _template("cdp")
+    # ⚠ Definition and call site, not the bare string: the file's comments
+    # explain the old defect BY NAME, and a substring check would fail on the
+    # explanation while passing on the bug.
+    assert "def _page_target" not in text
+    assert "self._page_target(" not in text
+    assert "def _own_target" in text and "threading.local()" in text
+
+
+def test_cdp_closes_exactly_the_tabs_it_opened():
+    """Inferring the set by diffing /json would close a human's tabs; not
+    tracking it leaks one per worker across a long run."""
+    text = _template("cdp")
+    assert "_opened" in text and "_close_target" in text
+
+
+def test_cdp_guards_the_chrome_launch():
+    """N workers arriving at a cold port must not all spawn a browser."""
+    assert "threading.Lock()" in _template("cdp")
+
+
+def test_cdp_still_ships_declaring_one():
+    """7b. The refactor makes a higher number possible; only a live multi-URL
+    run against real Chrome makes one justified, and no test here is that run.
+    If this fails because someone raised it, go find the filed run first."""
+    assert "MAX_PARALLEL = 1" in _template("cdp")
+
+
+# -- W-105: the ceiling is settable from fux.toml ----------------------------
+
+
+@pytest.mark.parametrize("name", ["cdp", "http"])
+def test_both_shipped_fetchers_accept_fetcher_max_parallel(name):
+    """⚠ It must be the SAME key in both, and that is not a style choice.
+
+    `[sources.url.config]` reaches every fetcher verbatim and each
+    `configure()` raises on a key it does not know — so a `cdp_`-prefixed
+    spelling breaks any repo that also loads `http.py`. A tunable belonging in
+    that table is one both fetchers have.
+    """
+    text = _template(name)
+    assert '"fetcher_max_parallel": ("MAX_PARALLEL"' in text
+
+
+@pytest.mark.parametrize("name", ["cdp", "http"])
+def test_the_key_is_not_spelled_max_parallel(name):
+    """`[sources.url] max_parallel` is POLICY and this is CAPABILITY. Two
+    nested keys spelled alike is how they get confused in a bug report."""
+    text = _template(name)
+    assert '"max_parallel":' not in text
+
+
+@pytest.mark.parametrize("name", ["cdp", "http"])
+def test_a_ceiling_below_one_is_refused_not_clamped(name):
+    """A silent clamp to 1 honours a number the consumer plainly did not mean —
+    the same call `[sources.url] max_parallel` makes in fux's own config."""
+    assert "_positive_int" in _template(name)
+
+
+def test_configure_runs_BEFORE_resolve_parallel_reads_the_module():
+    """🔴 The ordering the whole feature rests on, and NEITHER FILE STATES IT.
+
+    `configure()` assigns `MAX_PARALLEL` on the module; `resolve_parallel()`
+    reads it with `getattr`. If a refactor ever moved `resolve_parallel` above
+    `configure_fetcher` in `fetch_all`, `fetcher_max_parallel` would silently
+    do nothing — a configured value that is read but never applied, which is
+    the exact shape of the W-83 defect this repo has already paid for once.
+    """
+    from pathlib import Path
+
+    src = Path(urlsrc.__file__).read_text(encoding="utf-8")
+    assert src.index("configure_fetcher(module,") < src.index("resolve_parallel(module,")
+
+
+def test_a_configured_ceiling_is_what_resolve_parallel_uses():
+    """End to end at the seam, on a stand-in module rather than a template."""
+    module = _fetcher(declared=1)
+    assert urlsrc.resolve_parallel(module, 8) == 1
+    module.MAX_PARALLEL = 4  # what configure() does
+    assert urlsrc.resolve_parallel(module, 8) == 4

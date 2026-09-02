@@ -21,6 +21,58 @@ Rules:
 
 ---
 
+## W-102 / W-103 / W-104 / W-105 — the enrichment leak, the lock record, the one-target selector, and cdp under concurrency (2026-09-02)
+
+**Written on 2026-09-01 in a session whose shell was wedged from its first
+command; verified and closed on 2026-09-02.** The 2026-09-01 session's own
+punch-list (`work/VERIFY-2026-09-01.md`, now discharged and deleted) is what
+made that separable — it recorded a completion it could not prove and said so.
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-102** | enrichment gets its own redaction pass; `_enrichment_for()` takes the ruleset and returns `(text, hits)`; `fux enrich --check` **refuses** a body with a hit, exits 1, rewrites nothing | [ADR-INGEST](../docs/adr/0007_ingest.md) 15a · [ADR-PII](../docs/adr/0053_pii.md) 1 · [ADR-ENRICH](../docs/adr/0040_enrich.md) 12 · [`2026-09-02-enrich-pii-leak`](regression/2026-09-02-enrich-pii-leak/report.md) |
+| **W-103** | [ADR-LOCKS](../docs/adr/0043_locks.md) `proposed` → `accepted`; the two docstrings that still said `runner.lock` corrected; **the three veto checks re-run** and the capture re-dated | [ADR-MAINTENANCE](../docs/adr/0032_hooks.md) 8a · the capture in ADR-LOCKS |
+| **W-104** | `fux enrich [TARGET]` — an exact-match positional that filters and never widens; distinct *not declared* / *not indexed* messages; `ENRICH-SKILL.md` rewritten to plan for itself, do one document, and stop to ask on a list | [ADR-CLI](../docs/adr/0002_cli-surface.md) 2a · [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) · [ADR-ENRICH](../docs/adr/0040_enrich.md) 13 |
+| **W-105** | `_Conn` per fetch, a page target per worker, `_lock` on launch, `_opened` closed exactly; `[sources.url.config] fetcher_max_parallel` on **both** shipped fetchers | [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) 7/7a/7b/**7c** · [ADR-HTTP-FETCHER](../docs/adr/0021_http-fetcher.md) 7a · [ADR-FETCHER](../docs/adr/0019_fetcher.md) 9a · [`2026-09-02-cdp-parallel`](regression/2026-09-02-cdp-parallel/report.md) |
+
+**Outcome: PASS on all four, and two of them are measured rather than argued.**
+
+1. ✅ **W-102's leak was REPRODUCED before it was called fixed.** Two arms of the
+   real CLI on one scratch repo: an address in an enrichment **body** made
+   `fux find` return the document — one whose own body had been redacted a phase
+   earlier — and it does not any more. Three controls hold, including the one
+   that matters: **vocabulary existing only in an enrichment body still ranks**,
+   so the leak was not closed by closing the feature.
+2. ✅ **W-105's fix has the live run its record demanded**, and it needed real
+   Chrome because no test in this repo can see the failure. Pre-fix, every
+   parallelism above 1 mis-attributes: **seven 200-OK responses filed under the
+   wrong URL** across parallel 2/4/6, plus cross-attributed ETags. HEAD is 12/12
+   on fetch and on `validate()` at 1, 2, 4 and 6, and leaks no tab in any of the
+   eight runs. 🔴 **`MAX_PARALLEL` still ships at `1`** — the run makes raising
+   it a decision someone can take, not the taking of it.
+3. 🔴 **Both arms pass at parallel 1, so the shipped number was never itself
+   unsafe — the DEFECT WAS THE EXPLANATION.** `cdp.py` said the constraint was
+   one shared WebSocket every `fetch()` reuses; `fetch_resource` had opened a
+   socket per call for some time. A reader who checked that claim would have
+   found it false and raised the ceiling, which is the run's `pre-w105` arm.
+4. ⚠ **W-105's definition-of-done said "raise `MAX_PARALLEL` to a defensible
+   number" and it was NOT raised**, deliberately and out loud. Arpit's
+   2026-09-01 ruling was *fix the sharing and give each worker its own tab
+   first, then make the ceiling settable* — both done, and each tab is a
+   renderer process, so the number is a statement about the consumer's machine
+   that fux cannot make. The key exists; the default does not move.
+5. ⚠ **Four pre-existing tests had to change, and one of them was right to
+   fail.** `_enrichment_for`'s return became a pair; `test_cdp_fetcher.py`'s
+   helper stubbed the retired `_page_target`. Separately,
+   `test_pii_wiring.py`'s single-`redact()`-site assertion failed on 2026-09-01
+   **by working**, and was re-pinned at two named sites rather than loosened
+   to `>=`.
+6. ⚠ **Upgrading re-ingests any repo with both enrichment and a firing PII
+   rule.** `runtime/pii-digest` does not cover it: the ruleset did not move, its
+   reach did. Named in the release note and in ADR-INGEST 15a.
+
+---
+
 ## W-98 Phases 2–4 — refusals, the acquired plane, and the sixth verdict (2026-09-01)
 
 **Shipped** in the working tree. Phase 1 has its own row below; these are the

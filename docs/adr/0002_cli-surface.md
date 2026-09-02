@@ -230,6 +230,24 @@ default, is redundant with it but kept for explicit bug reproduction), and
 because committing to one result is its whole job. `answer` adds `--no-refer`.
 Divergence between the three is a defect.
 
+**2a. `fux enrich [TARGET]` — an optional positional that FILTERS and never
+widens.** W-104, Arpit 2026-09-01. `--plan` and `--check` both accept one `loc`
+or URL, spelled exactly as the index spells it, and report on that document
+alone; with no `TARGET`, on every declared scope as before.
+
+Three properties, and each is there to stop a specific misread:
+
+| property | why it is not a preference |
+|---|---|
+| **a positional, not a flag** | it is the *subject* of the verb, like `ask`'s query — a `--target=` reads as a filter on a bulk run, which is the framing that got a one-document request executed as a scope |
+| **exact match, never a prefix or a glob** | a selector that silently matches two documents is how one document becomes a bulk run. Ambiguity is refused, not resolved |
+| **it filters what is reported; it cannot make a document plannable** | a document no `enrich=true` line reaches stays unenrichable, and naming it here changes nothing ([ADR-ENRICH](0040_enrich.md) decision 4 — which directories are enriched is a human's declaration in `fux.toml`) |
+
+⚠ **It is also not a gated flag, so [ADR-OUTPUT](0047_output-defaults.md)
+decision 10 does not reach it.** That rule binds `store_true` flags in this file
+to `default=None`; a `nargs="?"` positional defaults to `None` by construction
+and there is nothing to gate. ADR-OUTPUT records it by name under its 2026-09-02 note.
+
 **3. `--no-tune` is one flag on five verbs**, not a knob per tune table.
 `ask` · `find` · `answer` · `graph` · `path` ignore `.fux/tune.toml` and answer
 on the engine's defaults. The question it answers is *"is it me or the

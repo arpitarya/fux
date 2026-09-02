@@ -182,6 +182,15 @@ The constants in the file are *defaults*; the table overrides them. This keeps a
 consumer's `fux.toml` diff small and their fetcher file mergeable, and it is
 [ADR-FETCHER](0019_fetcher.md) decision 8 in use.
 
+⚠ **A key only THIS fetcher has may not go in that table**, and the reason is
+decision 8's own passthrough rule: the table reaches **every** fetcher verbatim
+and each `configure()` raises on a key it does not know, so a `cdp_`-only
+tunable breaks a repo that also loads `http.py`. That is why the tunables added
+since (`MAX_REDIRECTS`) are module constants. **`fetcher_max_parallel` is the
+one exception and the shape of it is the rule**: it is a setting *both* shipped
+fetchers have, so both accept the key and neither breaks the other. A setting
+one file has stays a constant.
+
 **5. It returns the server's bytes and the server's content type, and converts
 nothing.** `fetch()` hands back the body exactly as received and the
 `Content-Type` off the intercepted response headers. **This changed on
@@ -204,11 +213,86 @@ is never the target of an automatic escalation from a cheaper fetcher.
 
 **7. `MAX_PARALLEL = 1`, declared explicitly rather than omitted.** Omission and
 `1` behave identically; the explicit line is where the reason gets written for
-the consumer who copies the file and starts editing it. ⚠ **The reason is a
-module-global `_session` holding one WebSocket that every `fetch()` reuses** —
-two threads writing frames onto it produce plausible documents attributed to the
-wrong URLs, which lands in the committed index and passes every determinism
-check.
+the consumer who copies the file and starts editing it.
+
+🔴 **The reason this record and the file itself both gave was FALSE, and a
+false reason is worse than none** (W-105, 2026-09-01). Both said a module-global
+`_session` holds **one WebSocket that every `fetch()` reuses**.
+`fetch_resource()` opens a fresh `WebSocket` per call and closes it in a
+`finally`, and had done for some time — **so a reader who gave each worker its
+own socket would have concluded the hazard was discharged and raised the
+number.** What was actually shared across concurrent fetches on one session:
+
+| shared | what two threads did to it |
+|---|---|
+| `_msg_id` | non-atomic `+= 1` — two commands take one id, and `_call` returns the other one's reply |
+| `_results` / `_events` | **cleared at the top of every `fetch_resource`**, so one thread wiped the other's pending replies and paused requests mid-flight |
+| `_page_target()` | returned the **first** page target, so two threads called `Page.navigate` on the **same tab** |
+| `ensure_chrome()` / `self.chrome` | two threads could race to launch a browser |
+
+All four yield the same failure — **plausible documents attributed to the wrong
+URLs**, in the committed index, **past every determinism check**, found only by
+a human reading an answer. The third is the one that produces it most directly,
+and no amount of care around the socket would have touched it.
+
+**7a. Per-fetch protocol state, per-worker tab** (W-105). `_Conn` owns the
+socket, the id counter and both queues for the duration of one `fetch_resource`;
+`_own_target()` gives each worker thread its own page target, created on first
+use; `ensure_chrome()` is guarded by a `threading.Lock`. **The two `clear()`
+calls are gone** — fresh state per fetch is what they were approximating, and
+owning it removes the thing there was to clear.
+
+- ⚠ **Behaviour change: fux no longer drives a tab you had open.** The old
+  `_page_target()` returned the first existing page target and navigated it —
+  which is to say, a human's foreground tab. It now opens its own. **Same
+  Chrome, same profile**, so the signed-in session this fetcher exists for is
+  unaffected.
+- **A tab this module opened is a tab this module closes.** `_opened` holds
+  exactly those ids and `close()` closes exactly that set. Inferring it by
+  diffing `/json` would close a human's tabs; not tracking it would leak one per
+  worker across a long run. Neither is acceptable and the explicit set is why.
+- **`connect()` / `close()` stay once per fetcher group, never once per
+  worker** — [ADR-FETCHER](0019_fetcher.md) decision 9's contract, unchanged.
+
+**7b. It still ships declaring `1`, and that is deliberate.** 7a makes a higher
+number *possible*; only a live multi-URL run against real Chrome, asserting each
+record's content matches its `loc`, makes one *justified*. 🔴 **No test in this
+repo can stand in for that run** — the sort still runs, the index is still
+deterministic, and CI is green either way. Raise it with
+`[sources.url.config] fetcher_max_parallel`
+([ADR-FETCHER](0019_fetcher.md) decision 9a), which both shipped fetchers accept
+under that one name because this table reaches every fetcher verbatim. Each tab
+is a renderer process, so the ceiling is a statement about the consumer's
+machine and fux cannot know it.
+
+⚠ **7c. That run has now happened, and it is filed** —
+[`2026-09-02-cdp-parallel`](../../work/regression/2026-09-02-cdp-parallel/report.md).
+Real Chrome, real CDP, a real thread pool, 12 loopback pages each stating their
+own path, two arms at parallel 1 / 2 / 4 / 6.
+
+| parallel | pre-W-105: fetch returns its own page | HEAD |
+|---:|---:|---:|
+| 1 | **12 / 12** | 12 / 12 |
+| 2 | **0 / 12** | 12 / 12 |
+| 4 | **1 / 12** | 12 / 12 |
+| 6 | **0 / 12** | 12 / 12 |
+
+Three things it settles, and one it does not:
+
+- **Decision 7's corruption claim is measured, not argued.** Seven of the
+  pre-fix failures are **200 OK with another page's body** — the silent kind.
+  `validate()` fails the same way (`"etag-p6"` returned for `/p4`), which is
+  worse: a wrong ETag that happens to match makes fux **skip a document that
+  changed**, and no surface reports that.
+- **Both arms pass at parallel 1**, so the number this file ships was never
+  itself unsafe. **The defect was the explanation** — exactly as 7 says.
+- **`close()` leaked no tab in any of the eight runs**, including the pre-fix
+  runs that errored 11 of 12 URLs. `_opened` is why.
+- 🔴 **It does not justify a number.** Every page was loopback HTML with no
+  auth, no redirect, no CDN hop — the opposite of what this fetcher exists for —
+  and each tab is a renderer process, so the ceiling stays a statement about the
+  consumer's machine. **`MAX_PARALLEL` stays `1`.** The run makes raising it a
+  decision someone can take; it does not take it.
 
 **8. It is yours.** Committed to your repo, never rewritten by fux, and every
 part of it — port, wait strategy, extraction, even the transport — is editable.
@@ -479,7 +563,22 @@ grep -n "outerHTML\|Runtime.evaluate\|loadEventFired" .fux/fetchers/cdp.py
 # 6. every paused request is resolved — decision 11
 grep -c "Fetch.continueRequest\|Fetch.failRequest" .fux/fetchers/cdp.py
 # expect: >= 2, and `_resolve` is the only caller of either
+
+# 7. no protocol state on the shared session — decision 7a
+grep -nE "self\._(msg_id|results|events)" .fux/fetchers/cdp.py
+# expect: no output. Any hit is state two workers share, which is the
+# corruption decision 7 describes, back again
+
+# 8. the session does not hand out a tab it did not open — decision 7a
+grep -n "_page_target\|_opened" .fux/fetchers/cdp.py
+# expect: `_opened` only. `_page_target` returning the first existing target
+# is what put two threads on one tab
 ```
+
+⚠ **Checks 7 and 8 are greps and they are not the guard.** They catch the shape
+of the old defect coming back; they cannot catch a new one. **The guard for this
+decision is a live run**, per 7b, and this record says so rather than letting a
+green grep read as evidence.
 
 ---
 

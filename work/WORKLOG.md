@@ -24,6 +24,126 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-02 — the wedged session's four items verified, two runs filed, `2.0.0-alpha.6` cut  ·  Claude Code (Opus)
+
+**Asked.** Review open work, implement everything, then commit, push and publish
+a new version.
+
+**Did.** The queue's only agent-closable work was the 2026-09-01 punch-list, so
+that is what ran — on a shell that worked.
+
+- **Made the suites green.** 12 failures, three causes: `_enrichment_for` now
+  returns `(text, hits)` and four pre-existing tests called it as a string;
+  `test_cdp_fetcher.py`'s helper stubbed the retired `_page_target`; and
+  `work/worklog-entry-2026-09-01.md` was a duplicate with no registry row
+  (deleted — the prepend into WORKLOG had landed). **2 688 unit + 74 e2e pass.**
+- 🔴 **Two measured runs, both filed, because CI structurally cannot see either
+  failure.**
+  [`2026-09-02-cdp-parallel`](regression/2026-09-02-cdp-parallel/report.md):
+  real Chrome, 12 loopback pages each stating their own path, two arms at
+  parallel 1/2/4/6 — **the pre-W-105 fetcher files seven 200-OK responses under
+  the wrong URL** and cross-attributes ETags; HEAD is 12/12 everywhere and
+  leaks no tab in eight runs.
+  [`2026-09-02-enrich-pii-leak`](regression/2026-09-02-enrich-pii-leak/report.md):
+  the W-102 leak **reproduced through `fux find`**, closed, with a control
+  proving enrichment vocabulary still ranks.
+- **Ran the veto captures rather than trusting them.** ADR-LOCKS' three checks
+  re-run and re-dated (not fired); ADR-CDP-FETCHER's eight and
+  ADR-HTTP-FETCHER's three read against the code.
+- **Four owning records that the freshness gate demanded, written with real
+  content, not touched to pass it.** ADR-INGEST **+15a** (enrichment's own
+  redaction pass and the three traps around it), ADR-CLI **+2a** (the `TARGET`
+  positional), ADR-OUTPUT (why a `nargs="?"` positional is structurally outside
+  decision 10), ADR-MAINTENANCE **+8a** (the docstrings that named a retired
+  lock file for five days). ADR-CDP-FETCHER **+7c** and ADR-PII decision 1 now
+  cite the measured runs.
+- **Closed W-102/103/104/105** — rows and detail files deleted,
+  `IMPLEMENTATION.md` row added, `VERIFY-2026-09-01.md` discharged and deleted.
+  INTERVIEW's state-of-play rewritten.
+- **Cut `2.0.0-alpha.6`**: CHANGELOG entry with the upgrade note, and
+  ⚠ **CLAUDE.md edited** — the version line and the release chain, both
+  statements of fact about the repo. Named here because a change to that file
+  is never folded silently into a larger diff.
+
+**Decided / open.**
+
+1. 🔴 **`MAX_PARALLEL` stays at `1`, against W-105's own definition-of-done,
+   deliberately and out loud.** Arpit's 2026-09-01 ruling was *fix the sharing
+   and give each worker its own tab first, then make the ceiling settable* —
+   both done. Each tab is a renderer process, so the number is a statement
+   about the consumer's machine that fux cannot make. The knob exists; the
+   default does not move.
+2. 🔴 **Both arms pass at parallel 1, so the shipped number was never itself
+   unsafe — the DEFECT WAS THE EXPLANATION.** A reader who checked `cdp.py`'s
+   claim about one shared WebSocket would have found it false and raised the
+   ceiling. That reader's run is the `pre-w105` arm.
+3. ⚠ **Nothing exercised a signed-in target**, which is the cdp fetcher's whole
+   reason for existing. Recorded as unresolved in the run's ANALYSIS, not
+   smoothed over.
+4. **The eight rows in `Blocked on Arpit` are untouched.** None became
+   agent-closable and none was worked around.
+
+**Next.** Arpit's queue: the ETag acceptance criterion, and whether the W-83
+shape gets a gate. On the agent lane, W-101 — the `doctor.py` pass that two
+accepted records' veto checks cannot run without.
+
+## 2026-09-01 — W-102/103/104/105 opened and implemented, nothing run (Cowork, Opus)
+
+**Asked.** Four things: enriched documents must carry no PII; accept ADR-LOCKS
+and implement it; the `fux-enrich` skill should run `--plan` itself, enrich one
+named document or URL, prompt before a list, and keep a hash telling us whether
+the enriched document changed; `MAX_PARALLEL` for cdp and http configurable in
+`fux.toml`. Create the work document, then implement.
+
+🔴 **The shell was wedged from the first command and stayed wedged.**
+`device_bash` failed five times, then the whole bridge dropped. **No test, no
+`fux`, no `git`, no Chrome.** Files were read by staging and written by commit.
+Everything below is written, none of it is verified —
+[`work/VERIFY-2026-09-01.md`](VERIFY-2026-09-01.md) is the list, and no item is
+closable until it is worked.
+
+**Decided (Arpit, in-session).**
+
+- **ADR-LOCKS: accept.** It introduces no mechanism, so acceptance is a ruling.
+- **cdp: make it genuinely parallel first**, then the configurability on top.
+  The alternative offered — a per-fetcher policy key still `min()`'d against a
+  declared `1` — was rejected as configuring nothing.
+
+**Found, and it is the substantive finding of the session.**
+
+- 🔴 **Enrichment reached the committed index unredacted, and no record said
+  so.** ADR-PII's known hole was the enrichment *file*. The sharper half:
+  `run.py`'s redact phase walks `parsed`, which holds document bodies, and
+  `_enrichment_for()` handed its text straight to `extract_fields` as `ctx`. An
+  address in enrichment prose became a committed **term**, on a document whose
+  own body had been redacted, one screen below a comment promising everything
+  downstream was built from redacted text. **The general shape is the lesson:
+  the record names a PLANE and the code redacts a PHASE, and anything reaching
+  the plane without passing the phase is uncovered and looks covered.**
+- 🔴 **`cdp.py`'s `MAX_PARALLEL = 1` was right for a reason that was false.**
+  The comment — and ADR-FETCHER decision 9 — said one shared WebSocket every
+  `fetch()` reuses; `fetch_resource` has opened a fresh socket per call for some
+  time. What was actually shared: `_msg_id` (non-atomic), `_results`/`_events`
+  (**cleared at the top of every fetch**), and `_page_target()` returning the
+  *first* target so two threads would drive one tab. **A reader who fixed the
+  socket would have concluded the hazard was gone.** A wrong reason retires the
+  fear without retiring the bug.
+- **The staleness hash the ask called for already exists** — sha-keying, ADR-
+  ENRICH decision 3 — and a second one would only drift against it. The real
+  gap was narrower: the window between planning and writing. Closed by the skill
+  re-planning immediately before it writes, not by new state.
+- **Re-derived:** ADR-LOCKS' *"three places still say `runner.lock`"* is **two**.
+  ADR-MAINTENANCE decision 11a is already clean.
+
+**Left open.** All four items. Two records unreachable when the bridge dropped
+and now inconsistent with the code — **ADR-CDP-FETCHER and ADR-HTTP-FETCHER, a
+standing Law zero violation until written.** No tests written. ADR-LOCKS' veto
+capture not re-run. DOC-REGISTRY, INTERVIEW and this log's own file untouched
+by the session that wrote this entry.
+
+**Next.** Work `VERIFY-2026-09-01.md` top-down on a machine with a shell. The
+cdp live run is the one nothing else can substitute for.
+
 ## 2026-09-01 — the queue reconciled, and 2.0.0-alpha.5 cut  ·  Claude Code
 
 - **Asked:** *"cleanup open work then commit everything push and publish a new

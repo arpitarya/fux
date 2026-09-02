@@ -11,7 +11,17 @@ from __future__ import annotations
 
 import pytest
 
-from fux.enrich import ENRICH_DIR, REQUIRED_KEYS, enrich_path, parse_frontmatter, plan, prune, validate
+from fux.enrich import (
+    ENRICH_DIR,
+    REQUIRED_KEYS,
+    _pii_in_body,
+    enrich_path,
+    parse_frontmatter,
+    plan,
+    prune,
+    validate,
+)
+from fux.ingest import pii
 
 GOOD_BODY = (
     "Sets the payment gateway resilience policy for checkout. Covers "
@@ -146,9 +156,10 @@ def test_only_the_body_is_indexed_never_the_frontmatter(tmp_path):
     from fux.ingest.run import _enrichment_for
 
     _write(tmp_path, "sha1")
-    text = _enrichment_for(tmp_path, "sha1")
+    text, hits = _enrichment_for(tmp_path, "sha1")
     assert "idempotency" in text
     assert "some-model" not in text and "fux-enrich@1" not in text
+    assert hits == {}, "no rules were passed, so nothing may be reported redacted"
 
 
 def test_a_malformed_enrichment_is_ignored_at_ingest(tmp_path):
@@ -156,21 +167,23 @@ def test_a_malformed_enrichment_is_ignored_at_ingest(tmp_path):
     from fux.ingest.run import _enrichment_for
 
     _write(tmp_path, "sha1", drop="model")
-    assert _enrichment_for(tmp_path, "sha1") == ""
+    assert _enrichment_for(tmp_path, "sha1") == ("", {})
 
 
 def test_a_stale_enrichment_is_ignored_at_ingest(tmp_path):
     from fux.ingest.run import _enrichment_for
 
     _write(tmp_path, "sha1", source_sha="somethingelse")
-    assert _enrichment_for(tmp_path, "sha1") == ""
+    assert _enrichment_for(tmp_path, "sha1") == ("", {})
 
 
-def test_no_enrichment_is_the_empty_string_not_an_error(tmp_path):
+def test_no_enrichment_is_an_empty_result_not_an_error(tmp_path):
+    """W-102 turned the return into `(text, hits)`; the contract is unchanged —
+    a missing enrichment is empty vocabulary, never a raise."""
     from fux.ingest.run import _enrichment_for
 
-    assert _enrichment_for(tmp_path, "nothing-here") == ""
-    assert _enrichment_for(tmp_path, "") == ""
+    assert _enrichment_for(tmp_path, "nothing-here") == ("", {})
+    assert _enrichment_for(tmp_path, "") == ("", {})
 
 
 def test_the_ctx_field_carries_enrichment_vocabulary():
@@ -211,3 +224,115 @@ def test_an_unenriched_document_writes_no_ctx_slot():
     doc = parse(b"# A\n\nbody text\n")
     plain = extract_fields("docs/a.md", doc)
     assert len(trim(plain.flen)) < len(plain.flen)
+
+
+# ---------------------------------------------------------------------------
+# W-102 — an enrichment body is committed AND indexed, so it is inside the
+# redaction boundary. `--check` REFUSES a match; it never rewrites the file.
+# ---------------------------------------------------------------------------
+
+EMAIL_RULES = pii.parse(
+    {"rule": [{"name": "email", "pattern": r"[\w.%+-]+@[\w.-]+\.[A-Za-z]{2,}"}]},
+    origin="<test>",
+)
+
+
+def test_a_clean_enrichment_body_fires_no_rule(tmp_path):
+    path = _write(tmp_path, "abc123")
+    assert _pii_in_body(path, EMAIL_RULES) == []
+
+
+def test_a_value_in_the_BODY_is_caught_and_the_rule_is_named(tmp_path):
+    """Naming the rule is ADR-PII decision 7's reasoning at a second surface:
+    "this file contains PII" tells the author nothing about what to change."""
+    path = _write(tmp_path, "abc123", body="Page the on-call at arpit@example.com. " + GOOD_BODY)
+    assert _pii_in_body(path, EMAIL_RULES) == ["email"]
+
+
+def test_a_value_in_the_FRONTMATTER_ONLY_is_NOT_caught(tmp_path):
+    """The negative the decision turns on.
+
+    Frontmatter is provenance and is stripped before indexing (ADR-ENRICH
+    decision 8), so nothing in it reaches a committed term. Refusing a file over
+    a `model:` value would be a false positive with no remedy — the author
+    cannot write the model's name differently.
+    """
+    path = _write(tmp_path, "abc123")
+    text = path.read_text(encoding="utf-8")
+    path.write_text(text.replace("model: some-model", "model: bot-arpit@example.com"), encoding="utf-8")
+    assert _pii_in_body(path, EMAIL_RULES) == []
+
+
+def test_no_rules_means_the_pre_W102_behaviour_exactly(tmp_path):
+    """Most repos have no `pii.toml`. They must be untouched by this."""
+    path = _write(tmp_path, "abc123", body="mail arpit@example.com")
+    assert _pii_in_body(path, ()) == []
+
+
+def test_check_REFUSES_a_matching_file_and_does_not_rewrite_it(tmp_path):
+    """Report, never repair — ADR-MAINTENANCE veto 7 applied to this surface.
+
+    Stronger here than there: the file is prose a human reviews in a diff, and a
+    silent rewrite would make that diff lie.
+    """
+    path = _write(tmp_path, "abc123", body="ping arpit@example.com. " + GOOD_BODY)
+    before = path.read_bytes()
+    records = [{"loc": "docs/a.md", "sha": "abc123"}]
+    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES)
+    assert report.pii == [(f"{ENRICH_DIR}/abc123.md", ["email"])]
+    assert report.ok == 0, "a refused file must not count as covered"
+    assert path.read_bytes() == before, "--check rewrote a committed file"
+
+
+def test_a_refused_file_is_reported_once_not_twice(tmp_path):
+    """A malformed file is never ALSO reported as carrying PII: the remedies
+    differ, and offering both is offering the wrong one."""
+    path = _write(tmp_path, "abc123", body="ping arpit@example.com", drop="model")
+    records = [{"loc": "docs/a.md", "sha": "abc123"}]
+    (report,) = plan(tmp_path, {"docs": records}, pii_rules=EMAIL_RULES)
+    assert len(report.malformed) == 1
+    assert report.pii == []
+
+
+# ---------------------------------------------------------------------------
+# W-104 — TARGET filters the report and never widens scope.
+# ---------------------------------------------------------------------------
+
+def _two_docs(tmp_path):
+    _write(tmp_path, "sha_a", source="docs/a.md")
+    return [{"loc": "docs/a.md", "sha": "sha_a"}, {"loc": "docs/b.md", "sha": "sha_b"}]
+
+
+def test_a_target_narrows_the_worklist_to_one_document(tmp_path):
+    records = _two_docs(tmp_path)
+    (report,) = plan(tmp_path, {"docs": records}, target="docs/b.md")
+    assert [item.loc for item in report.missing] == ["docs/b.md"]
+    assert report.filtered == 1
+
+
+def test_a_target_does_NOT_change_the_denominator(tmp_path):
+    """🔴 `n/total` stays the whole scope under a selector.
+
+    It is the line the skill reads to decide a scope is finished, so a
+    single-target run rendering as `n/n` would tell it to move on from a scope
+    it never touched.
+    """
+    records = _two_docs(tmp_path)
+    (report,) = plan(tmp_path, {"docs": records}, target="docs/a.md")
+    assert report.total == 2
+    assert report.ok == 1
+
+
+def test_matching_is_exact_never_a_prefix(tmp_path):
+    """A selector that silently matches two documents turns a one-document
+    request into a bulk run."""
+    records = _two_docs(tmp_path)
+    (report,) = plan(tmp_path, {"docs": records}, target="docs/")
+    assert report.missing == [] and report.stale == [] and report.filtered == 2
+
+
+def test_no_target_is_byte_for_byte_the_old_behaviour(tmp_path):
+    records = _two_docs(tmp_path)
+    (report,) = plan(tmp_path, {"docs": records})
+    assert report.total == 2 and report.ok == 1 and report.filtered == 0
+    assert [item.loc for item in report.missing] == ["docs/b.md"]

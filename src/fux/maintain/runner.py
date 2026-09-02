@@ -30,7 +30,7 @@ collect — exactly where it would have been anyway.
 ## Single writer, and why the lock is a pid rather than an OS lock
 
 Two runners writing `.fux/index/` at once is the failure this module exists to
-prevent, so `runner.lock` is created with `O_CREAT|O_EXCL` — atomic on every
+prevent, so `write.lock` is created with `O_CREAT|O_EXCL` — atomic on every
 platform fux supports — and a second spawn that loses the race **exits
 quietly**. It does not queue and it does not block: the live runner re-reads
 the dirty list, which is a union, so the work is not lost by being dropped.

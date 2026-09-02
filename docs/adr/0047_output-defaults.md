@@ -460,6 +460,22 @@ for the same reason `--all` was: this record constrains *every gated flag* in
 the next reader "fixes" it to `default=None` and gives it a three-state
 resolution it has no file to resolve against.
 
+⚠ **No output default changed on 2026-09-02, and the new argument is not even
+a flag.** `fux enrich` gained an optional positional `TARGET`
+([ADR-CLI](0002_cli-surface.md) decision 2a, [ADR-ENRICH](0040_enrich.md)
+decision 13). It selects **which document `--plan`/`--check` report on** and
+gates no rendering; it reads nothing from `.fux/output.toml`, and `enrich` has
+no `[cli.enrich]` block to read one from.
+
+**It is also structurally outside decision 10.** That rule exists because
+`store_true` collapses *absent* and *explicitly false* into `False`, which makes
+a committed file unreachable. A `nargs="?"` positional has no such collapse — it
+is `None` when absent by construction, and there is no file value for it to
+shadow. Recorded for the same reason `--all` and `--keep`/`--ttl` were: this
+record constrains *every gated flag* in `cli.py`, so an argument deliberately
+outside that set is named here, or a later reader "corrects" it toward a
+three-state resolution it has nothing to resolve against.
+
 ⚠ **`doc_coverage` added to the confidence block 2026-08-28**, and `output.schema.json` declares it as always-present.
 **`coverage` is unchanged**, `rank()` gained one line writing the top-ranked
 record's matched hashes into the `stats_out` dict it already fills, and the band

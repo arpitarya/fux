@@ -1,0 +1,21 @@
+tabs before: 1
+MAX_PARALLEL = 2
+tabs during/after fetch: 3  (+2 ours)
+  match     http://127.0.0.1:8781/p1  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p2  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p3  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p4  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p5  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p6  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p7  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p8  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p9  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p10  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p11  text/html; charset=utf-8
+  match     http://127.0.0.1:8781/p12  text/html; charset=utf-8
+
+fetch: 12 matched · 0 MISMATCHED · 0 errored in 1.6s at parallel=2
+validate: 12/12 ETags matched their own URL
+tabs after close(): 1  leaked: 0
+
+RESULT: PASS

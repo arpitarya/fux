@@ -178,6 +178,70 @@ strings.** The rule this leaves behind is general: **never abbreviate a value in
 the message that exists to explain why two values disagree**, and never print a
 shortened form of an identifier the reader is being told to copy.
 
+**12. The enrichment body is inside the redaction boundary, on both of the
+surfaces it reaches** (W-102, 2026-09-01). An enrichment body is committed
+**and** indexed, so a value written into one travels twice, and
+[ADR-PII](0053_pii.md) decision 1 covers both. The two halves are handled
+differently on purpose:
+
+- **`run.py` redacts the body before it becomes `ctx`.** ⚠ **This was the real
+  defect and it was not the one anybody had written down.** The redact phase
+  walks `parsed`, which holds document *bodies*; `_enrichment_for()` reads the
+  enrichment file further down and handed its text straight to
+  `extract_fields`. An email address in enrichment prose therefore became a
+  **committed index term**, on a document whose own body had been redacted, one
+  screen below a comment stating that everything downstream was built from
+  redacted text. Redaction now happens in `_enrichment_for`, and the phase
+  comment says why it cannot be in the phase named after it.
+- **`fux enrich --check` refuses and never rewrites.** The file is prose a
+  human reviews in a diff; a silent rewrite would make that diff lie. Same
+  discipline as `fux doctor` reporting a lock it will not clear
+  ([ADR-MAINTENANCE](0032_hooks.md) veto 7), and stronger here for that reason.
+  🔴 **Redaction is also the wrong remedy at this surface**: a redacted
+  enrichment body indexes `[PII:email]` as vocabulary, which is worse than
+  useless. The refusal names the rule that fired, per
+  [ADR-PII](0053_pii.md) decision 7, and says to rewrite the sentence instead.
+- **The frontmatter is deliberately excluded.** It is stripped before indexing
+  (decision 8), so nothing in it reaches a committed term; running rules over a
+  `model:` value would refuse a file for text the index never sees.
+- ⚠ **No sha is recomputed.** The enrichment file's name and `source_sha:` are
+  the *source document's* sha over raw bytes, and ADR-PII decision 3's ordering
+  hazard applies here verbatim — a sha over redacted text would report every
+  enriched document `stale` against its own unchanged source.
+- **Landing this re-ingests any repo with both enrichment and a firing rule**,
+  and `runtime/pii-digest` does not cover it: the ruleset did not move, its
+  *reach* did. That is a one-off cost of the fix, not a new invalidation rule.
+
+**13. `--plan` and `--check` take an optional `TARGET`, and the skill runs them
+itself** (W-104, Arpit 2026-09-01). One `loc` or one URL, matched **exactly** —
+not a prefix and not a glob, because a selector that silently matches two
+documents turns a one-document request into a bulk run.
+
+- 🔴 **It filters the report; it never widens scope.** A document no
+  `enrich=true` line reaches is not in the plan, and naming it says which of
+  two things is wrong — *not declared* (a human's edit to a source list) or
+  *not indexed* (`fux ingest`) — rather than enriching it. Decision 4 is
+  untouched: which directories are enriched stays a declaration.
+- **`n/total` stays the whole scope under a selector.** A single-target run
+  must never render as `n/n`; that is the line the skill reads to decide a
+  scope is finished.
+- **Single-target runs are legitimate because of decision 5.** Partial coverage
+  is the steady state, so leaving a scope at `40/41` on purpose is a requested
+  outcome rather than the tilt decision 6 warns about — and the skill says
+  which of the two it is doing each time.
+- **The skill plans internally, and asks before bulk.** Step 1 was written as a
+  command a human had already run. It is now the agent's first action, and a
+  plan of more than one document that was not explicitly asked for as a scope
+  is a **question the skill stops on** — safe only because the skill is invoked
+  and never ambient (decision 10).
+- **It re-plans immediately before writing.** Between reading a document and
+  saving an enrichment there is a window in which the document can move, and an
+  enrichment written under a superseded sha is **invisible rather than wrong**:
+  fux does not find it and nothing reports an error. ⚠ **This is the whole of
+  the gap** — no second hash, no `doc_hash` field, no sidecar digest. Decision
+  3's sha-keying is the staleness mechanism, and a second one could only drift
+  against it.
+
 ### The `enriched` mode — folded verbatim from ADR-ENRICHED, 2026-08-27
 
 ⚠ **This section is ADR-ENRICHED's ratified content, moved here UNCHANGED**
@@ -280,13 +344,10 @@ that opts in reports under a single scope named `.fux/sources/urls`.
   `--plan` names that rather than hiding it — the same treatment an unreadable
   `file:` document gets.
 
-🔴 **The known hole, stated here rather than discovered later:** `.fux/enrich/`
-is **committed and unredacted**. A model handed a document writes enrichment
-prose into a committed file, and [ADR-PII](0053_pii.md) decision 1 says that
-file should be redacted — it is not. The matcher exists and `fux enrich --check`
-is where it belongs. Until that lands, **enrichment is the one committed surface
-PII policy does not cover**, and no reading of decision 1 should be taken to say
-otherwise.
+**A URL's enrichment is committed and indexed like any other**, so decision 12
+covers it unchanged: the body is redacted before it becomes `ctx`, and
+`fux enrich --check` refuses a file whose body matches a `.fux/pii.toml` rule.
+There is nothing URL-specific about that boundary and this section states none.
 
 ### Consequences
 

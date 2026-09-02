@@ -173,6 +173,33 @@ module* was never a claim about what someone's intranet host can absorb. **If
 the safe fetcher does not declare, the mechanism ships dead** — which is why it
 declares rather than omitting.
 
+**7a. `[sources.url.config] fetcher_max_parallel` overrides that `8`** (W-105,
+2026-09-01). A consumer has always been able to change the constant — this file
+is theirs — but changing it meant forking a shipped file over one integer, and a
+forked file is a file that stops taking upstream fixes.
+
+- **It does not move the capability/policy line, only who writes the capability
+  down.** Fux still reads `MAX_PARALLEL` off the module and still takes
+  `min(declared, configured)`; the number simply arrives from `configure()`
+  instead of a literal. `configure()` runs before `resolve_parallel()` in
+  `fetch_all`, which is what makes that work — **an ordering the two files do
+  not state to each other, so a test asserts it.**
+- ⚠ **The key is spelled the same in `cdp.py`, and it has to be.**
+  `[sources.url.config]` reaches every fetcher verbatim
+  ([ADR-FETCHER](0019_fetcher.md) decision 8) and this file's `configure()`
+  raises on a key it does not know, so an `http_`-prefixed name would break any
+  repo that also loads `cdp.py`. **A tunable belonging in that table is one both
+  fetchers have; anything else stays a module constant** —
+  [ADR-CDP-FETCHER](0020_cdp-fetcher.md) decision 4 carries the same rule from
+  the other side.
+- **It is `fetcher_max_parallel`, not `max_parallel`.** `[sources.url]
+  max_parallel` is the politeness bound and this is the safety ceiling; two
+  nested keys spelled alike is how the two get confused in a bug report.
+- **Below 1 is refused, not clamped** — `_positive_int` names the key in the
+  error. Same treatment `[sources.url] max_parallel` gets in
+  [ADR-CONFIG](0014_config.md): a silent clamp to 1 honours a number the
+  consumer plainly did not mean.
+
 ### What it looks like
 
 **Specimen, not a capture.** The shape is what decisions 1–3 fix; the exact

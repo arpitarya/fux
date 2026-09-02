@@ -392,6 +392,35 @@ nothing recording which.
   before the feature existed: the empty digest and the absent file both read
   as `""`.
 
+**15a. Enrichment gets its OWN redaction pass, because the redact phase cannot
+reach it.** W-102, 2026-09-01. Decision 15's phase walks `parsed`, and `parsed`
+holds **document bodies**. Enrichment is a second source of committed
+vocabulary that never enters that map — `_enrichment_for()` reads it from
+`.fux/enrich/` at extraction time and hands it to `extract_fields` as `ctx` —
+so it had no pass at all, and an email address in enrichment prose became a
+**committed index term** on a document whose own body had just been redacted.
+
+`_enrichment_for()` now takes the ruleset and returns `(text, hits)`; its hits
+join the run's totals like any other document's.
+
+| the trap | what holds |
+|---|---|
+| "move it into the redact phase" | it cannot be moved — the phase's input is `parsed`, and enrichment is not in it. A second pass is the shape, not a shortcut |
+| "redact, then re-sha" | 🔴 **no sha is recomputed.** `sha` is the *source document's* content sha over raw bytes, and it is both the enrichment file's name and the key `validate()` compares. Re-shaing over redacted text would report every enriched document `stale` against its own unchanged source — decision 15's ordering hazard, in the enrichment plane |
+| "run the rules over the whole file" | the frontmatter is deliberately outside the pass. It is stripped before indexing already ([ADR-ENRICH](0040_enrich.md) decision 8), so nothing in it reaches a committed term, and matching a `model:` value would refuse a file for text the index never sees |
+
+✅ **Measured, not asserted** —
+[`2026-09-02-enrich-pii-leak`](../../work/regression/2026-09-02-enrich-pii-leak/report.md)
+runs the real CLI in two arms on one scratch repo: pre-fix, `fux find` returns
+the document for an address that exists only in its enrichment body; post-fix it
+does not, and the corpus holds two fewer terms. The positive control — a phrase
+found nowhere but the enrichment body — still ranks in both arms.
+
+⚠ **Landing this re-ingests any repo that has both enrichment and a firing
+rule, and `runtime/pii-digest` does not cover it.** Decision 15's digest fires
+when the **ruleset** moves; here the ruleset did not move, its **reach** did. A
+consumer sees one full pass on upgrade and the release note says so.
+
 **16. The acquisition bound is passed in, never reached for.** `run()` hands
 `config.url.acquired_max_bytes` to `urlsrc.fetch_all` explicitly
 ([ADR-ACQUIRED](0050_acquired-plane.md) decision 8, [ADR-CONFIG](0014_config.md)

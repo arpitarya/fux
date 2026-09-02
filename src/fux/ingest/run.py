@@ -335,6 +335,13 @@ def run(
     # NOT downstream of it -- `.fux/acquired/`, the refer plane, `fux answer`'s
     # quotes -- still sees the document as it is. That asymmetry IS the policy:
     # redact what gets committed, leave alone what stays local.
+    #
+    # ⚠ **This phase walks `parsed`, and `parsed` holds document bodies only.**
+    # Enrichment is a SECOND source of committed vocabulary and it does not
+    # pass through here -- it is read from `.fux/enrich/` inside the extract
+    # loop below. It gets its own pass, in `_enrichment_for`; until W-102 it
+    # had none. If you add a third source of `ctx`, the sentence above does
+    # not cover that one either.
     pii_hits: dict[str, int] = {}
     if pii_rules:
         with progress.phase("redact", len(parsed)) as p:
@@ -362,10 +369,22 @@ def run(
             # sha. A document that changed no longer matches its enrichment
             # file, so the stale text is simply not found -- staleness is
             # structural here rather than a check someone has to remember.
+            # ⚠ **`pii_rules` is passed HERE and the omission was the defect**
+            # (W-102). The redact phase above walks `parsed`, which holds
+            # document bodies; enrichment is read from `.fux/enrich/` on this
+            # line and went straight into `ctx` without ever passing through
+            # it. An email address written in enrichment prose therefore became
+            # a committed term on a document whose own body had been redacted,
+            # one screen below the comment promising everything downstream is
+            # built from redacted text. ADR-PII decision 1 says the committed
+            # index is redacted; the enrichment body is part of it.
+            ctx, ctx_hits = _enrichment_for(root, file_shas.get(doc_id, ""), pii_rules)
+            for name, count in ctx_hits.items():
+                pii_hits[name] = pii_hits.get(name, 0) + count
             extracted[doc_id] = extract_mod.extract_fields(
                 _loc_of(doc_id),
                 parsed[doc_id],
-                _enrichment_for(root, file_shas.get(doc_id, "")),
+                ctx,
             )
             p.update(1, detail=_loc_of(doc_id))
     # Re-resolved every run (M5): a new document can resolve a link that
@@ -541,8 +560,8 @@ def run(
     )
 
 
-def _enrichment_for(root, sha: str) -> str:
-    """The pinned enrichment body for a content sha, or `""`.
+def _enrichment_for(root, sha: str, rules=()) -> tuple[str, dict[str, int]]:
+    """The pinned enrichment body for a content sha, redacted, plus its hits.
 
     Returns the text **after** the frontmatter: the frontmatter is provenance
     for a human and for `fux enrich --check`, not vocabulary for the index.
@@ -552,16 +571,43 @@ def _enrichment_for(root, sha: str) -> str:
     **Validated before use.** A malformed file is ignored rather than indexed,
     because the failure mode of trusting it is silent: whatever text is in
     there becomes searchable vocabulary attributed to this document.
+
+    ## Why redaction happens here rather than in the phase named after it
+
+    ADR-PII's redact phase walks `parsed`, and `parsed` holds **document
+    bodies**. Enrichment is a second source of committed vocabulary that never
+    enters that map — it is read from `.fux/enrich/` at extraction time — so it
+    needs its own pass or it has none. W-102: it had none, and the leak was
+    into `.fux/index/` itself, not merely into the enrichment file.
+
+    ⚠ **The sha is not recomputed and must not be.** `sha` is the *source
+    document's* content sha, taken from raw bytes before any redaction, and it
+    is both this file's name and the key `validate()` compares. Redacting the
+    body changes what is indexed and changes nothing about identity — the same
+    ordering ADR-PII decision 3 pins for documents, for the same reason: a sha
+    over redacted text would report every enriched document `stale` against its
+    own unchanged source.
+
+    ⚠ **The frontmatter is deliberately outside the pass.** It is stripped
+    before indexing already (ADR-ENRICH decision 8), so nothing in it reaches a
+    committed term, and running rules over a `model:` value would refuse a file
+    for text the index never sees. `fux enrich --check` draws the same line.
     """
     if not sha:
-        return ""
+        return "", {}
     from ..enrich import enrich_path, match_end, validate
 
     path = enrich_path(root, sha)
     if not path.is_file() or validate(path, expected_sha=sha) is not None:
-        return ""
+        return "", {}
     text = path.read_text(encoding="utf-8", errors="replace")
-    return text[match_end(text) :].strip()
+    body = text[match_end(text) :].strip()
+    if not rules:
+        # Byte-for-byte the pre-W-102 path for a repo with no `pii.toml`,
+        # which is most of them. `redact()` would return the text unchanged
+        # anyway; short-circuiting says so rather than relying on it.
+        return body, {}
+    return pii_mod.redact(rules, body)
 
 
 #: How often the cooperative stop is polled inside the two per-document loops.

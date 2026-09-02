@@ -109,16 +109,6 @@ output.*
   [`tools/pii-probe/`](../tools/pii-probe/README.md) is the only instrument for
   that. `filed: 2026-09-01`
 
-- 🔴 **`.fux/enrich/` is committed and unredacted** · `agent` ·
-  *(records: [ADR-PII](../docs/adr/0053_pii.md) decision 1 ·
-  [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 11)* · **A real hole in the
-  rule ADR-PII states, not a nice-to-have.** A model handed a document writes
-  enrichment prose into a **committed** file; decision 1 says that file should
-  be redacted and it is not. The matcher already exists and
-  `fux enrich --check` is where it belongs. ⚠ It is written into **both**
-  records now, so no reading of decision 1 can be taken to say the surface is
-  covered. `filed: 2026-09-01`
-
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·
   [ADR-RS](../docs/adr/0036_predictions.md))* · **the knob sweep — which
   `.fux/tune.toml` defaults are defensible, measured rather than argued.**

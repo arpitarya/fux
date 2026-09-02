@@ -49,7 +49,7 @@ than argued here. Two facts that made it answerable:
 Arpit ruled the daemon **writes `.fux/index/` directly** rather than only
 recording ids for the runner to pick up. That makes it a **second writer**, so:
 
-- **It takes `runner.lock`** — the same lock, via the same `runner.acquire`.
+- **It takes `write.lock`** — the same lock, via the same `runner.acquire`.
   Two writers in `.fux/index/` is the failure that lock exists to prevent, and
   a daemon with its own lock would be two locks guarding one resource.
 - **It releases between sweeps, never holds across the sleep.** Holding the

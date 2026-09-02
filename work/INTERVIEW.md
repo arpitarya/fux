@@ -27,7 +27,7 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-01**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-02**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
 ### Nothing is blocked. `2.0.0-alpha.5` is cut (2026-09-01)
@@ -59,7 +59,57 @@ new and both are genuinely his:
 carrying four things — and its first is the **veto check for TWO accepted
 records** ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
 [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)), so until it lands
-neither veto can be run at all. Plus the `.fux/enrich/` redaction hole.
+neither veto can be run at all. **The `.fux/enrich/` redaction hole is closed** —
+see the section below.
+
+### The most recent change: the wedged session's work was VERIFIED, and two runs came out of it (2026-09-02)
+
+**Read this first if you are picking up cold.** W-102, W-103, W-104 and W-105
+were written on 2026-09-01 in a session **whose shell failed on its first
+command and never recovered** — no pytest, no `fux`, no git, no Chrome. That
+session did the one thing that made it recoverable: it wrote its claims down as
+a punch-list (`work/VERIFY-2026-09-01.md`) and refused to call anything done.
+**All four are now verified on a working shell and closed**; the punch-list is
+discharged and deleted, and [`IMPLEMENTATION.md`](IMPLEMENTATION.md) carries the
+row.
+
+**Two measured runs came out of the verification**, and both exist because the
+change they cover is invisible to CI:
+
+1. [`2026-09-02-cdp-parallel`](regression/2026-09-02-cdp-parallel/report.md) —
+   **real Chrome**, 12 loopback pages that each state their own path, two arms
+   at parallel 1 / 2 / 4 / 6. 🔴 **The pre-W-105 fetcher files a real 200-OK
+   response under the wrong URL**, seven times across 2/4/6, and cross-attributes
+   ETags. HEAD is 12/12 everywhere and leaks no tab. 🔴 **Both arms pass at
+   parallel 1** — the shipped ceiling was never unsafe; **the defect was the
+   explanation beside it**, which claimed a shared WebSocket that had not
+   existed for some time. A reader who checked that claim would have raised the
+   number, and that reader's run is the `pre-w105` arm.
+2. [`2026-09-02-enrich-pii-leak`](regression/2026-09-02-enrich-pii-leak/report.md)
+   — the W-102 leak **reproduced through `fux find`** rather than argued from
+   the code: an address in an enrichment body made the document come back, on a
+   document whose own body had been redacted a phase earlier. Closed, with a
+   positive control proving enrichment vocabulary still ranks.
+
+**Three things a successor should not re-derive:**
+
+- **`MAX_PARALLEL` still ships at `1`, deliberately.** The run makes raising it
+  a decision someone can take; it does not take it. Each tab is a renderer
+  process, so the number is about the consumer's machine.
+  `[sources.url.config] fetcher_max_parallel` is the knob, and **both** shipped
+  fetchers accept that one spelling — a `cdp_`-prefixed name would break any
+  repo that also loads `http.py`.
+- **Nothing here exercised a signed-in target**, which is the cdp fetcher's
+  whole reason for existing. Recorded as unresolved in the run's ANALYSIS.
+- **Upgrading re-ingests** any repo with both enrichment and a firing PII rule.
+  `runtime/pii-digest` does not cover it: the ruleset did not move, its reach
+  did.
+
+⚠ **The lesson worth keeping is about the 2026-09-01 session, not this one.** A
+session that cannot look can file a *completion* as easily as it can file a
+blocker, and nothing mechanical separates the two. What made this recoverable
+was a file listing what had not been run, ordered worst-failure-first. **If your
+shell is dead, write that file.**
 
 ### The W-98 build, all four phases (2026-09-01)
 

@@ -91,12 +91,42 @@ MAX_PARALLEL = 8
 # The contract fux calls.
 # ====================================================================
 
+def _positive_int(value) -> int:
+    """`int(value)` that refuses anything below 1.
+
+    Used for `fetcher_max_parallel`, where 0 means "fetch nothing" and a
+    negative is meaningless -- and where a silent clamp to 1 would honour a
+    number the consumer plainly did not mean. Same treatment fux gives
+    `[sources.url] max_parallel`.
+    """
+    number = int(value)
+    if number < 1:
+        raise ValueError(f"must be >= 1, got {number}")
+    return number
+
+
 # fux.toml key -> (this module's global, coercion). Add your own keys here;
 # fux passes the whole table through without looking inside it.
 _SETTINGS = {
     "timeout_s": ("TIMEOUT_S", float),
     "user_agent": ("USER_AGENT", str),
     "max_bytes": ("MAX_BYTES", int),
+    # W-105. Overrides MAX_PARALLEL above -- see the note beside it, and the
+    # one on `_positive_int` below.
+    #
+    # ⚠ **The name is `fetcher_max_parallel`, not `max_parallel`, and both
+    # shipped fetchers accept it.** Two reasons, and neither is style:
+    #
+    #   * `[sources.url.config]` is handed to EVERY fetcher verbatim and each
+    #     `configure()` raises on a key it does not know, so a `http_`-prefixed
+    #     key here would break any repo that also loads `cdp.py`. It has to be
+    #     a name both files know.
+    #   * `[sources.url] max_parallel` already exists and is POLICY -- how many
+    #     URLs this repo is willing to have in flight. This one is CAPABILITY --
+    #     what this fetcher is safe to be called at. Fux still takes
+    #     `min(capability, policy)`. Two nested keys spelled the same is how
+    #     those two get confused in a bug report.
+    "fetcher_max_parallel": ("MAX_PARALLEL", _positive_int),
 }
 
 

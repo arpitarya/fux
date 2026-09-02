@@ -28,12 +28,29 @@ staleness check to forget to write. **The corollary is that partial coverage is
 the steady state, not a degraded mode**: one commit after a full pass and you
 are at 408/411. Any design that only works at 100 % coverage is broken on day
 two, which is why scope is declared per source line rather than assumed.
+
+## The enrichment plane is inside the redaction boundary — W-102
+
+An enrichment body is committed **and** indexed, so a value written into one
+travels twice: in the file every clone gets, and as a term in `.fux/index/`.
+ADR-PII decision 1 covers both, and until W-102 neither was checked —
+`run.py`'s redact phase walks document bodies, and the enrichment text never
+entered that map.
+
+Two halves, in two places, and they are deliberately different:
+
+- **`run.py` redacts** the body before it becomes `ctx`, so the committed index
+  is clean whether or not anybody runs this command.
+- **`--check` refuses and never rewrites.** The file is prose a human reviews
+  in a diff; rewriting it silently would make that diff lie. And redaction is
+  not the remedy here anyway — a redacted enrichment body indexes
+  `[PII:email]` as vocabulary. The fix is to write the sentence differently.
 """
 
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from .errors import FuxError
@@ -70,6 +87,14 @@ class ScopeReport:
     missing: list[PlanItem]
     stale: list[PlanItem]
     malformed: list[tuple[str, str]]
+    #: W-102. `(path, [rule names])` for every enrichment whose BODY matches a
+    #: `.fux/pii.toml` rule. Separate from `malformed` because the remedy is
+    #: different: a malformed file is fixed by adding a key, this one is fixed
+    #: by rewriting the prose, and conflating them would offer the wrong advice.
+    pii: list[tuple[str, list[str]]] = field(default_factory=list)
+    #: Documents in this scope that fell outside a `TARGET` selector. Reported
+    #: so a filtered run can never read as a scope being complete (W-104).
+    filtered: int = 0
 
     @property
     def covered(self) -> int:
@@ -123,13 +148,32 @@ def match_end(text: str) -> int:
     return match.end() if match else 0
 
 
-def plan(root: Path, scopes: dict[str, list[dict]]) -> list[ScopeReport]:
+def plan(
+    root: Path,
+    scopes: dict[str, list[dict]],
+    *,
+    target: str | None = None,
+    pii_rules: tuple = (),
+) -> list[ScopeReport]:
     """The worklist, per declared scope.
 
     `scopes` maps a scope prefix to the records under it. Only scopes a source
     line declared `enrich=true` are passed in — **partial coverage across the
     corpus is intended and declared**; partial coverage *inside* a scope is the
     defect this reports.
+
+    ## `target` filters; it never widens — W-104
+
+    🔴 **A selector narrows the report and changes nothing about scope.** A
+    document no `enrich=true` line reaches is not in `scopes` at all, so naming
+    it here cannot make it enrichable. Which directories get enriched stays a
+    human's declaration (ADR-ENRICH decision 4), and this parameter is one step
+    away from being the thing that quietly overrides it. Matching is **exact**
+    — not a prefix and not a glob — because a selector that silently matches
+    two documents turns a one-document request into a bulk run.
+
+    `total` still counts the whole scope and `filtered` counts what the
+    selector excluded, so a single-target run cannot be read as `n/n`.
     """
     reports: list[ScopeReport] = []
     for scope in sorted(scopes):
@@ -137,11 +181,16 @@ def plan(root: Path, scopes: dict[str, list[dict]]) -> list[ScopeReport]:
         missing: list[PlanItem] = []
         stale: list[PlanItem] = []
         malformed: list[tuple[str, str]] = []
+        pii_found: list[tuple[str, list[str]]] = []
         ok = 0
+        filtered = 0
         for record in sorted(records, key=lambda r: r["loc"]):
+            if target is not None and record.get("loc") != target:
+                filtered += 1
+                continue
             sha = record.get("sha", "")
             chunks = _chunk_count(root, record)
-            target = f"{ENRICH_DIR}/{sha}.md"
+            enrich_target = f"{ENRICH_DIR}/{sha}.md"
             path = enrich_path(root, sha)
             if not path.is_file():
                 # A sha with no file is MISSING. It is also what a stale
@@ -150,18 +199,61 @@ def plan(root: Path, scopes: dict[str, list[dict]]) -> list[ScopeReport]:
                 prior = _orphan_for(root, record)
                 if prior:
                     stale.append(
-                        PlanItem(record["loc"], sha, chunks, "stale", target, stale_sha=prior)
+                        PlanItem(record["loc"], sha, chunks, "stale", enrich_target,
+                                 stale_sha=prior)
                     )
                 else:
-                    missing.append(PlanItem(record["loc"], sha, chunks, "missing", target))
+                    missing.append(
+                        PlanItem(record["loc"], sha, chunks, "missing", enrich_target)
+                    )
                 continue
             problem = validate(path, expected_sha=sha)
             if problem:
                 malformed.append((str(path.relative_to(root)), problem))
-            else:
-                ok += 1
-        reports.append(ScopeReport(scope, len(records), ok, missing, stale, malformed))
+                continue
+            # W-102. A well-formed enrichment can still carry a value that must
+            # not be committed. Checked AFTER `validate` so one file never
+            # reports two faults, and only on files that would actually be
+            # indexed -- a malformed file's text reaches nothing.
+            fired = _pii_in_body(path, pii_rules)
+            if fired:
+                pii_found.append((str(path.relative_to(root)), fired))
+                continue
+            ok += 1
+        reports.append(
+            ScopeReport(scope, len(records), ok, missing, stale, malformed,
+                        pii=pii_found, filtered=filtered)
+        )
     return reports
+
+
+def _pii_in_body(path: Path, rules: tuple) -> list[str]:
+    """Rule names that fire on this enrichment's BODY, in file order.
+
+    ⚠ **The body only.** The frontmatter is provenance — `model:`, `generated:`
+    — it is stripped before indexing (ADR-ENRICH decision 8), so nothing in it
+    reaches a committed term, and refusing a file over a value the index never
+    sees would be a false positive with no remedy.
+
+    ⚠ **This reports; it never rewrites.** `fux enrich --check` is a validator
+    and the file is prose a human reviews in a diff — the same discipline as
+    `fux doctor` reporting a lock it will not clear (ADR-MAINTENANCE veto 7),
+    and stronger here, because a silent rewrite would make that diff lie.
+
+    Nor is redacting the file the fix a consumer should reach for: a redacted
+    body indexes `[PII:email]` as vocabulary, which is worse than useless. The
+    remedy is to rewrite the sentence without the value.
+    """
+    if not rules:
+        return []
+    from .ingest import pii as pii_mod
+
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+    _redacted, hits = pii_mod.redact(rules, text[match_end(text):])
+    return [name for name in hits]
 
 
 def _chunk_count(root: Path, record: dict) -> int:
@@ -258,6 +350,7 @@ def prune(root: Path, live_shas: set[str]) -> list[Path]:
 
 def cmd_enrich(args) -> int:
     from .config import find_root
+    from .ingest import pii as pii_mod
 
     root = find_root()
     if root is None:
@@ -272,10 +365,61 @@ def cmd_enrich(args) -> int:
         )
         return 0
 
-    reports = plan(root, scopes)
+    target = getattr(args, "target", None)
+    if target is not None:
+        problem = _target_problem(root, scopes, target)
+        if problem:
+            print(problem)
+            return 1
+
+    # Loaded ONCE, here, and a malformed ruleset stops the command rather than
+    # surfacing per file -- the same argument `fetch_all` makes for
+    # `refusals.load`. A repo whose `pii.toml` cannot be read is a repo whose
+    # redaction is off, and finding that out per-file is finding it out late.
+    pii_rules = pii_mod.load(root)
+
+    reports = plan(root, scopes, target=target, pii_rules=pii_rules)
     if getattr(args, "check", False):
-        return _render_check(reports)
-    return _render_plan(root, reports)
+        return _render_check(reports, target=target)
+    return _render_plan(root, reports, target=target)
+
+
+def _target_problem(root: Path, scopes: dict[str, list[dict]], target: str) -> str:
+    """Why this `TARGET` cannot be planned, or `""` when it can.
+
+    🔴 **Two failures that look identical and are fixed differently**, which is
+    the whole reason this function exists rather than one "not found" line:
+
+    - **not declared** — fux has the document, but no `enrich=true` line reaches
+      it. The fix is a human's edit to `.fux/sources/dirs` or the URL list, and
+      it is deliberately not something this command will do for them
+      (ADR-ENRICH decision 4).
+    - **not indexed** — fux has never seen it. The fix is `fux ingest`, or a
+      path that is spelled the way the index spells it.
+    """
+    for records in scopes.values():
+        for record in records:
+            if record.get("loc") == target:
+                return ""
+    from . import store as store_mod
+
+    try:
+        known = {r.get("loc") for r in store_mod.read_index(root).values()}
+    except Exception:  # an unreadable index is not this command's error to name
+        known = set()
+    if target in known:
+        return (
+            f"{target} is indexed but no enrichment scope reaches it.\n"
+            "Add `enrich=true` to the directory line that covers it in "
+            ".fux/sources/dirs, or to its line in the URL list.\n"
+            "Naming a document here does not enrich it -- which directories are "
+            "enriched is your declaration, not this command's."
+        )
+    return (
+        f"{target} is not in the index, so there is nothing to plan for it.\n"
+        "Run `fux ingest` first, and use the loc exactly as `fux find` prints "
+        "it -- matching here is exact, never a prefix."
+    )
 
 
 def _scopes(root: Path) -> dict[str, list[dict]]:
@@ -334,12 +478,18 @@ def _enrich_urls(root: Path) -> set[str]:
     return out
 
 
-def _render_plan(root: Path, reports: list[ScopeReport]) -> int:
+def _render_plan(root: Path, reports: list[ScopeReport], *, target: str | None = None) -> int:
     total_docs = total_chunks = 0
     for report in reports:
         work = report.missing + report.stale
-        print(f"scope {report.scope} (enrich=true)")
+        if target is not None and not work and not report.filtered:
+            continue
+        suffix = f" — filtered to {target}" if target is not None else ""
+        print(f"scope {report.scope} (enrich=true){suffix}")
         if not work:
+            # ⚠ `report.total` is the WHOLE scope, deliberately, even under a
+            # selector: a one-document run must never render as `n/n`, which is
+            # the sentence the skill reads to decide a scope is finished.
             print(f"  {report.ok}/{report.total} ok — nothing to do")
         for item in work:
             # **The FULL sha, never a prefix.** The skill instructs the agent
@@ -358,12 +508,18 @@ def _render_plan(root: Path, reports: list[ScopeReport]) -> int:
         print(f"\n-> {total_docs} documents, {total_chunks} chunks")
         print(f"   write each to {ENRICH_DIR}/<sha>.md")
         print("   invoke the `fux-enrich` skill in your coding agent to generate them")
+        if target is None and total_docs > 1:
+            # W-104. The skill asks before a bulk run; saying so here means a
+            # human reading the plan directly gets the same offer, and means the
+            # skill's prompt is not the only place the choice is visible.
+            print("   one document at a time: fux enrich --plan <loc-or-url>")
     return 0
 
 
-def _render_check(reports: list[ScopeReport]) -> int:
+def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> int:
     bad = 0
-    print(f"enrichment: {len(reports)} scope(s) declared")
+    scope_word = "scope(s) declared" if target is None else f"scope(s), filtered to {target}"
+    print(f"enrichment: {len(reports)} {scope_word}")
     for report in reports:
         bits = []
         if report.stale:
@@ -373,10 +529,27 @@ def _render_check(reports: list[ScopeReport]) -> int:
         if report.malformed:
             bits.append(f"{len(report.malformed)} malformed")
             bad += len(report.malformed)
+        if report.pii:
+            bits.append(f"{len(report.pii)} carrying PII")
+            bad += len(report.pii)
         suffix = "  " + " · ".join(bits) if bits else "  ok"
         print(f"  {report.scope:<28} {report.ok}/{report.total}{suffix}")
         for path, why in report.malformed:
             print(f"      refused: {path} — {why}")
+        for path, names in report.pii:
+            # ADR-PII decision 7's reasoning applied to a second surface: say
+            # WHICH rule fired. `[REDACTED]` everywhere destroys that, and so
+            # does "this file contains PII".
+            print(f"      refused: {path} — matches .fux/pii.toml rule(s): {', '.join(names)}")
+    if any(r.pii for r in reports):
+        print(
+            "\nAn enrichment body is committed AND indexed, so a value in one travels "
+            "twice over.\n"
+            "Rewrite the sentence without the value. Do NOT add a pii.toml rule to "
+            "cover it:\n"
+            "a redacted enrichment body indexes `[PII:email]` as vocabulary, which is "
+            "worse than useless."
+        )
     if any(r.missing or r.stale for r in reports):
         print("\nrun `fux enrich --plan`, then the `fux-enrich` skill")
     return 1 if bad else 0

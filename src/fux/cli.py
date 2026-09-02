@@ -521,6 +521,19 @@ def build_parser() -> argparse.ArgumentParser:
     enrich_mode.add_argument(
         "--check", action="store_true", help="validate what exists and report coverage"
     )
+    # W-104. 🔴 **This FILTERS the report; it never widens scope.** A document
+    # no `enrich=true` line reaches is not plannable and naming it here does not
+    # make it so -- which directories get enriched stays a human's declaration
+    # (ADR-ENRICH decision 4). Matching is exact rather than a prefix or a glob,
+    # because a selector that silently matches two documents is how a
+    # one-document request becomes a bulk run.
+    p_enrich.add_argument(
+        "target",
+        nargs="?",
+        metavar="TARGET",
+        help="one loc or URL, exactly as the index spells it; without it, every "
+             "declared scope",
+    )
     p_enrich.set_defaults(func=_cmd_enrich)
 
     # W-76 Phase 5. A verb rather than a flag on `ask`: it is a long-running

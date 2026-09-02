@@ -312,6 +312,26 @@ to prevent.
 **The file is not called `index.lock`** — git keeps one of those feet away in
 the same repo, and a stranded-lock incident with it is already on record.
 
+**8a. The module prose caught up with the name on 2026-09-01, five days late.**
+The lock file was renamed `runner.lock` → `write.lock` on 2026-08-26, when a
+foreground writer started taking it and "runner" stopped being true. `LOCK_NAME`
+moved that day; **two docstrings did not** — `runner.py`'s single-writer section
+and `daemon.py`'s second-writer note both still named `runner.lock`, so the two
+files that explain the mechanism named a file that does not exist.
+
+⚠ **Nothing mechanical could have caught it, and nothing new does.** A stale
+name inside a docstring is not a broken import, not a failing test and not a
+freshness violation — the code was correct the whole time. It was found by
+[ADR-LOCKS](0043_locks.md)'s veto capture, which pastes a real `grep` of `src/`
+into the record: the capture showed `runner.lock` on `runner.py:33` while the
+record's own body said `write.lock` three screens above. **That is the argument
+for pasting command output into a record rather than describing it** — a
+described check cannot contradict itself.
+
+ADR-LOCKS is now **accepted** and is where the single-mutex mechanism is
+recorded end to end; this decision stays because the hooks and the runner are
+what take it.
+
 **9. `fux daemon` — a resident clock.** Owns
 [`src/fux/maintain/daemon.py`](../../src/fux/maintain/daemon.py).
 

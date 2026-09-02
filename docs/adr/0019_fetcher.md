@@ -215,14 +215,52 @@ honest `8` became eight live connections to a wiki nobody asked about.
 **Fetcher authors: declare the truth about your module and nothing about
 politeness** — the second half is the consumer's to say, in `fux.toml`.
 
-⚠ **Why a blanket pool was refused, and it is not "it crashes".** The shipped
-`cdp.py` sets a module-global `_session` holding **one WebSocket** that every
-`fetch()` reuses. Two threads writing frames onto it produce **plausible
-documents attributed to the wrong URLs** — which lands in the committed index,
-**passes every determinism check**, and is found only by a human reading an
-answer. `http.py` builds a fresh request per call and is safe. A blanket pool
-would have been correct for the fetcher most consumers use and silently
-corrupting for the one the enterprise design point exists to serve.
+⚠ **Why a blanket pool was refused, and it is not "it crashes".** Concurrent
+`fetch()` calls on the shipped `cdp.py` produced **plausible documents
+attributed to the wrong URLs** — which lands in the committed index, **passes
+every determinism check**, and is found only by a human reading an answer.
+`http.py` builds a fresh request per call and is safe. A blanket pool would
+have been correct for the fetcher most consumers use and silently corrupting
+for the one the enterprise design point exists to serve.
+
+🔴 **The reason this record gave for that was wrong until 2026-09-01, and a
+wrong reason is worse than none** (W-105). It said `cdp.py` held **one
+WebSocket** every `fetch()` reused — and `fetch_resource` had opened a fresh
+socket per call for some time, so a reader who fixed the socket would have
+concluded the hazard was discharged. What was actually shared on one session
+was the id counter (non-atomic), the two message queues (**cleared at the top of
+every fetch**, so one thread wiped another's in-flight state), and the page
+target — `_page_target()` returned the *first* one, so two threads drove
+`Page.navigate` on the **same tab**. All three yield the same wrong answer.
+`cdp.py` now gives each worker its own tab, socket, counter and queues, and
+`ensure_chrome()` is lock-guarded. **The general lesson is the one worth
+keeping: a hazard is discharged by the property that made it a hazard, and a
+record naming the wrong property retires the fear without retiring the bug.**
+
+**9a. `MAX_PARALLEL` may be set from `[sources.url.config]`, and it is still
+declared rather than detected** (W-105, Arpit 2026-09-01). Both shipped
+fetchers accept `fetcher_max_parallel` and assign it to their own
+`MAX_PARALLEL`; `configure()` runs before `resolve_parallel()` reads the
+module, so the assignment is what fux sees.
+
+- **This does not move the capability/policy line, it moves who writes the
+  capability down.** A consumer owns `.fux/fetchers/*.py` and could always edit
+  the constant; the key means they do not have to fork a file to change a
+  number. Fux still takes `min(declared, configured)` and still knows nothing
+  about the value — it reads `MAX_PARALLEL` off the module exactly as before.
+- ⚠ **The key name is shared by both fetchers because it has to be.**
+  `[sources.url.config]` goes to every fetcher verbatim (decision 8) and each
+  `configure()` raises on an unknown key, so a `cdp_`-prefixed spelling breaks
+  any repo that also loads `http.py`. **That is the test for whether a tunable
+  belongs in that table at all**: a setting only one fetcher has stays a module
+  constant.
+- **It is `fetcher_max_parallel`, not `max_parallel`.** `[sources.url]
+  max_parallel` is the politeness bound and this is the safety ceiling; two
+  nested keys with one name is how they get confused in a bug report.
+- **`cdp.py` still ships declaring `1`.** The refactor above makes a higher
+  number *possible*; only a live multi-URL run against real Chrome, asserting
+  each record's content matches its `loc`, makes one *justified* — and no test
+  in this repo can stand in for that.
 
 **`connect()` / `close()` stay once per group, never once per worker.** Only
 `fetch` runs concurrently, so a fetcher declaring `MAX_PARALLEL > 1` is
@@ -230,7 +268,9 @@ declaring exactly *my `fetch` is reentrant given one `connect`*.
 
 **The shipped `cdp.py` declares `1` explicitly rather than omitting it.**
 Omission and `1` behave identically; the explicit line is where the *reason*
-gets written for the consumer who copies the file and starts editing it.
+gets written for the consumer who copies the file and starts editing it — and
+decision 9a above is the case for keeping that line honest: it was the only
+place the reason lived, and for a while the reason was false.
 `http.py` declares `8`: if the safe fetcher does not opt in, the mechanism ships
 dead.
 

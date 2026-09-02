@@ -3,7 +3,7 @@ type: ADR
 name: ADR-LOCKS
 title: "ADR-LOCKS (0043) — the one lock fux owns, and the three files beside it that are not locks"
 description: "Fux holds exactly one mutex over the committed index: `.fux/runtime/write.lock`, a pid created with O_CREAT+O_EXCL in the gitignored derived plane. Every command that writes the index holds it and every read verb holds nothing. This record states the mechanism, the two-caller asymmetry, the cooperative stop that releases it, and the three sibling files — `runner.stop`, `daemon.stop`, `daemon.pid` — that are constantly mistaken for locks."
-status: proposed
+status: accepted
 date: 2026-08-27
 feature: the index write lock and the files around it
 owns: []
@@ -174,13 +174,6 @@ the takeover reporter and the `required=True` refusal all print it.
   The precedent is the six 2026-08-19 companion records that own nothing by
   design. **The debt is real and is stated rather than hidden**: if this record
   goes stale, nothing mechanical will say so.
-- **Owed, and not fixed here.** The name `runner.lock` survives in three places
-  that describe a file which no longer exists —
-  [`src/fux/maintain/runner.py`](../../src/fux/maintain/runner.py) (module
-  docstring), [`src/fux/maintain/daemon.py`](../../src/fux/maintain/daemon.py)
-  (module docstring), and [ADR-MAINTENANCE](0032_hooks.md) decision 11a, where
-  the false sentence stands above an amendment block correcting it. All three
-  belong to one change against ADR-MAINTENANCE.
 
 ### Alternatives considered
 
@@ -231,31 +224,41 @@ the takeover reporter and the `required=True` refusal all print it.
 **How to check them:**
 
 ```console
-$ grep -rn "O_EXCL" src/fux/ --include=*.py            # 2026-08-27 — not fired
-src/fux/maintain/runner.py:33:prevent, so `runner.lock` is created with `O_CREAT|O_EXCL` — atomic on every
+$ grep -rn "O_EXCL" src/fux/ --include=*.py            # 2026-09-02 — not fired
+src/fux/maintain/runner.py:33:prevent, so `write.lock` is created with `O_CREAT|O_EXCL` — atomic on every
 src/fux/maintain/runner.py:214:    `O_CREAT|O_EXCL` is the whole mechanism — one syscall, no read-then-write
 src/fux/maintain/runner.py:231:        fd = os.open(str(directory / LOCK_NAME), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
 
-$ grep -rn "write_lock\|acquire(" src/fux/ --include=*.py   # 2026-08-27 — not fired
-src/fux/ingest/__init__.py:113:    with runner_mod.write_lock(args_root):
-src/fux/ingest/__init__.py:168:    with runner_mod.write_lock(root):
+$ grep -rn "write_lock\|acquire(" src/fux/ --include=*.py   # 2026-09-02 — not fired
+src/fux/ingest/__init__.py:136:    with runner_mod.write_lock(args_root):
+src/fux/ingest/__init__.py:210:    with runner_mod.write_lock(root):
 src/fux/maintain/runner.py:95:    "write_lock",
 src/fux/maintain/runner.py:211:def acquire(root: Path, *, required: bool = False) -> bool:
 src/fux/maintain/runner.py:253:def write_lock(root: Path):
 src/fux/maintain/runner.py:267:    acquire(root, required=True)
 src/fux/maintain/runner.py:518:    if not acquire(root):
-src/fux/maintain/daemon.py:297:    if not runner.acquire(root):
+src/fux/maintain/daemon.py:312:    if not runner.acquire(root):
 
-$ git --no-optional-locks check-ignore -v .fux/runtime/write.lock   # 2026-08-27 — not fired
-.fux/.gitignore:5:runtime/	.fux/runtime/write.lock
+$ git --no-optional-locks check-ignore -v .fux/runtime/write.lock   # 2026-09-02 — not fired
+.fux/.gitignore:6:runtime/	.fux/runtime/write.lock
 ```
 
 The second capture is the whole call-site list: two writer entry points, the
 runner, the daemon sweep, and the definitions themselves. **No `query/`,
 `graph/` or `refer/` module appears** — that is decision 2, checked rather than
-asserted. The first capture also shows decision 3's cost in passing: two of its
-three lines are prose still saying `runner.lock`, which is the debt named under
-Consequences.
+asserted.
+
+**The captures above are a 2026-09-02 re-run**, and they replace a 2026-08-27
+capture whose first grep had gone stale in one respect: its `runner.py:33` line
+still read `runner.lock`, a name retired on 2026-08-26. That prose and its twin
+in `daemon.py` were corrected on 2026-09-01, and the grep returns `write.lock`
+today. The one place the old name still appears is `runner.py`'s `LOCK_NAME`
+rename note, which is where it belongs.
+
+Two line numbers moved since the 2026-08-27 capture — `ingest/__init__.py`'s two
+`write_lock` call sites, and `.fux/.gitignore`'s `runtime/` line — and **the set
+of call sites did not**. That is the check: the conclusion is which modules
+appear, never where in a file they sit.
 
 ---
 

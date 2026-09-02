@@ -1,0 +1,200 @@
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p1]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p3]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p4]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p5]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p6]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p8]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p9]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p10]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p11]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p12]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 1, "pass": true, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 1, "pass": true, "result": "\"etag-p2\"", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 1, "pass": true, "result": "\"etag-p3\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 1, "pass": true, "result": "\"etag-p4\"", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 1, "pass": true, "result": "\"etag-p5\"", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 1, "pass": true, "result": "\"etag-p6\"", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 1, "pass": true, "result": "\"etag-p7\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 1, "pass": true, "result": "\"etag-p8\"", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 1, "pass": true, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 1, "pass": true, "result": "\"etag-p10\"", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 1, "pass": true, "result": "\"etag-p11\"", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 1, "pass": true, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 1, "pass": true, "result": 0, "url": null}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p1]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p3]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p4]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p5]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p6]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p8]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p9]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p10]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p11]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p12]", "parallel": 2, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 2, "pass": true, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 2, "pass": true, "result": "\"etag-p2\"", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 2, "pass": true, "result": "\"etag-p3\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 2, "pass": true, "result": "\"etag-p4\"", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 2, "pass": true, "result": "\"etag-p5\"", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 2, "pass": true, "result": "\"etag-p6\"", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 2, "pass": true, "result": "\"etag-p7\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 2, "pass": true, "result": "\"etag-p8\"", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 2, "pass": true, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 2, "pass": true, "result": "\"etag-p10\"", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 2, "pass": true, "result": "\"etag-p11\"", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 2, "pass": true, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 2, "pass": true, "result": 0, "url": null}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p1]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p3]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p4]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p5]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p6]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p8]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p9]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p10]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p11]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p12]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 4, "pass": true, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 4, "pass": true, "result": "\"etag-p2\"", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 4, "pass": true, "result": "\"etag-p3\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 4, "pass": true, "result": "\"etag-p4\"", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 4, "pass": true, "result": "\"etag-p5\"", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 4, "pass": true, "result": "\"etag-p6\"", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 4, "pass": true, "result": "\"etag-p7\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 4, "pass": true, "result": "\"etag-p8\"", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 4, "pass": true, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 4, "pass": true, "result": "\"etag-p10\"", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 4, "pass": true, "result": "\"etag-p11\"", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 4, "pass": true, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 4, "pass": true, "result": 0, "url": null}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p1]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p3]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p4]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p5]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p6]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p8]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p9]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p10]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p11]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p12]", "parallel": 6, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 6, "pass": true, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 6, "pass": true, "result": "\"etag-p2\"", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 6, "pass": true, "result": "\"etag-p3\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 6, "pass": true, "result": "\"etag-p4\"", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 6, "pass": true, "result": "\"etag-p5\"", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 6, "pass": true, "result": "\"etag-p6\"", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 6, "pass": true, "result": "\"etag-p7\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 6, "pass": true, "result": "\"etag-p8\"", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 6, "pass": true, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 6, "pass": true, "result": "\"etag-p10\"", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 6, "pass": true, "result": "\"etag-p11\"", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "head", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 6, "pass": true, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "head", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 6, "pass": true, "result": 0, "url": null}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p1]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p3]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p4]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p5]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p6]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p8]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p9]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p10]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p11]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p12]", "parallel": 1, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 1, "pass": true, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 1, "pass": true, "result": "\"etag-p2\"", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 1, "pass": true, "result": "\"etag-p3\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 1, "pass": true, "result": "\"etag-p4\"", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 1, "pass": true, "result": "\"etag-p5\"", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 1, "pass": true, "result": "\"etag-p6\"", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 1, "pass": true, "result": "\"etag-p7\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 1, "pass": true, "result": "\"etag-p8\"", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 1, "pass": true, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 1, "pass": true, "result": "\"etag-p10\"", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 1, "pass": true, "result": "\"etag-p11\"", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 1, "pass": true, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 1, "pass": true, "result": 0, "url": null}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p1]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 2, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p3]", "parallel": 2, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p4]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p5]", "parallel": 2, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p6]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 2, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p8]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')", "expected_marker": "[MARKER:p9]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p10: timed out')", "expected_marker": "[MARKER:p10]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p11]", "parallel": 2, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p12]", "parallel": 2, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 2, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 2, "pass": false, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 2, "pass": false, "result": "\"etag-p4\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 2, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 2, "pass": false, "result": "\"etag-p6\"", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 2, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 2, "pass": false, "result": "\"etag-p8\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 2, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 2, "pass": false, "result": "\"etag-p10\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 2, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 2, "pass": false, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 2, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 2, "pass": true, "result": 0, "url": null}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p1: timed out')", "expected_marker": "[MARKER:p1]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP: no a reply to Fetch.enable within 60s \u2014 the site may block headless Chrome, need a sign-in, or need a longer LOAD_TIMEOUT_S')", "expected_marker": "[MARKER:p2]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p3: timed out')", "expected_marker": "[MARKER:p3]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p4: timed out')", "expected_marker": "[MARKER:p4]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Invalid InterceptionId.')", "expected_marker": "[MARKER:p5]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p6]", "parallel": 4, "pass": true, "result": "match", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p7]", "parallel": 4, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p8]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Can only get response body on requests captured after headers received.')", "expected_marker": "[MARKER:p9]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p10: timed out')", "expected_marker": "[MARKER:p10]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')", "expected_marker": "[MARKER:p11]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p12: timed out')", "expected_marker": "[MARKER:p12]", "parallel": 4, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 4, "pass": false, "result": "\"etag-p1\"", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 4, "pass": false, "result": "\"etag-p11\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 4, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 4, "pass": true, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 4, "pass": true, "result": 0, "url": null}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p1: timed out')", "expected_marker": "[MARKER:p1]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "fetch", "detail": "text/html; charset=utf-8", "expected_marker": "[MARKER:p2]", "parallel": 6, "pass": false, "result": "MISMATCH", "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')", "expected_marker": "[MARKER:p3]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')", "expected_marker": "[MARKER:p4]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p5: timed out')", "expected_marker": "[MARKER:p5]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP: no a reply to Fetch.enable within 60s \u2014 the site may block headless Chrome, need a sign-in, or need a longer LOAD_TIMEOUT_S')", "expected_marker": "[MARKER:p6]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Invalid InterceptionId.')", "expected_marker": "[MARKER:p7]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p8: timed out')", "expected_marker": "[MARKER:p8]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')", "expected_marker": "[MARKER:p9]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p10: timed out')", "expected_marker": "[MARKER:p10]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p11: timed out')", "expected_marker": "[MARKER:p11]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "fetch", "detail": "FetcherError('CDP Fetch.getResponseBody failed: Invalid InterceptionId.')", "expected_marker": "[MARKER:p12]", "parallel": 6, "pass": false, "result": "ERROR", "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p1\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p1"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p2\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p2"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p3\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p3"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p4\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p4"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p5\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p5"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p6\"", "parallel": 6, "pass": false, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p6"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p7\"", "parallel": 6, "pass": false, "result": "\"etag-p9\"", "url": "http://127.0.0.1:8781/p7"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p8\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p8"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p9\"", "parallel": 6, "pass": false, "result": "\"etag-p12\"", "url": "http://127.0.0.1:8781/p9"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p10\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p10"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p11\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p11"}
+{"arm": "pre-w105", "check": "validate", "detail": null, "expected_etag": "\"etag-p12\"", "parallel": 6, "pass": false, "result": null, "url": "http://127.0.0.1:8781/p12"}
+{"arm": "pre-w105", "check": "tabs", "detail": null, "expected_leaked": 0, "parallel": 6, "pass": true, "result": 0, "url": null}

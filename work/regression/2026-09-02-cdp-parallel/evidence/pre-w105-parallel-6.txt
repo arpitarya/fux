@@ -1,0 +1,59 @@
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 62427)
+Traceback (most recent call last):
+  File "/Users/arpitarya/.pyenv/versions/3.14.2/lib/python3.14/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/arpitarya/.pyenv/versions/3.14.2/lib/python3.14/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/arpitarya/.pyenv/versions/3.14.2/lib/python3.14/socketserver.py", line 766, in __init__
+    self.handle()
+    ~~~~~~~~~~~^^
+  File "/Users/arpitarya/.pyenv/versions/3.14.2/lib/python3.14/http/server.py", line 496, in handle
+    self.handle_one_request()
+    ~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/arpitarya/.pyenv/versions/3.14.2/lib/python3.14/http/server.py", line 484, in handle_one_request
+    method()
+    ~~~~~~^^
+  File "/private/tmp/claude-501/-Users-arpitarya-my-programs-fux/2d67901e-a56e-4488-8f67-e3606b7fb142/scratchpad/cdprun/live-old.py", line 35, in do_GET
+    self.wfile.write(body)
+    ~~~~~~~~~~~~~~~~^^^^^^
+  File "/Users/arpitarya/.pyenv/versions/3.14.2/lib/python3.14/socketserver.py", line 845, in write
+    self._sock.sendall(b)
+    ~~~~~~~~~~~~~~~~~~^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+tabs before: 1
+MAX_PARALLEL = 6
+tabs during/after fetch: 1  (+0 ours)
+  ERROR     http://127.0.0.1:8781/p1  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p1: timed out')
+  MISMATCH  http://127.0.0.1:8781/p2  text/html; charset=utf-8
+  ERROR     http://127.0.0.1:8781/p3  FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')
+  ERROR     http://127.0.0.1:8781/p4  FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')
+  ERROR     http://127.0.0.1:8781/p5  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p5: timed out')
+  ERROR     http://127.0.0.1:8781/p6  FetcherError('CDP: no a reply to Fetch.enable within 60s — the site may block headless Chrome, need a sign-in, or need a longer LOAD_TIMEOUT_S')
+  ERROR     http://127.0.0.1:8781/p7  FetcherError('CDP Fetch.getResponseBody failed: Invalid InterceptionId.')
+  ERROR     http://127.0.0.1:8781/p8  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p8: timed out')
+  ERROR     http://127.0.0.1:8781/p9  FetcherError('CDP connection died waiting for a reply to Fetch.enable: timed out')
+  ERROR     http://127.0.0.1:8781/p10  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p10: timed out')
+  ERROR     http://127.0.0.1:8781/p11  FetcherError('CDP connection died waiting for Fetch.requestPaused for http://127.0.0.1:8781/p11: timed out')
+  ERROR     http://127.0.0.1:8781/p12  FetcherError('CDP Fetch.getResponseBody failed: Invalid InterceptionId.')
+
+fetch: 0 matched · 1 MISMATCHED · 11 errored in 120.3s at parallel=6
+validate: 0/12 ETags matched their own URL
+  MISMATCH http://127.0.0.1:8781/p1 -> None
+  MISMATCH http://127.0.0.1:8781/p10 -> None
+  MISMATCH http://127.0.0.1:8781/p11 -> None
+  MISMATCH http://127.0.0.1:8781/p12 -> None
+  MISMATCH http://127.0.0.1:8781/p2 -> None
+  MISMATCH http://127.0.0.1:8781/p3 -> None
+  MISMATCH http://127.0.0.1:8781/p4 -> None
+  MISMATCH http://127.0.0.1:8781/p5 -> None
+  MISMATCH http://127.0.0.1:8781/p6 -> "etag-p9"
+  MISMATCH http://127.0.0.1:8781/p7 -> "etag-p9"
+  MISMATCH http://127.0.0.1:8781/p8 -> None
+  MISMATCH http://127.0.0.1:8781/p9 -> "etag-p12"
+tabs after close(): 1  leaked: 0
+
+RESULT: FAIL
