@@ -175,7 +175,7 @@
     ],
     "fields": {
       "answer":   { "type": "any", "required": "never",
-                    "doc": "an object with `passages`, or null on no match" },
+                    "doc": "an object with `passages`, or null on no match. SINCE W-108 the passages may span MORE THAN ONE DOCUMENT -- `answer` refers the top 3 -- so each carries its own `id`, `loc` and `sha` alongside `heading`, `text` and `score`. Those three keys are additive: `citation` below still names the winning passage's document and is unchanged. A consumer that renders `passages` under a single citation was correct before W-108 and is mis-attributing after it" },
       "citation": { "type": "any", "required": "never",
                     "doc": "an `answer_citation`, or null on no match" },
       "source":   { "type": "str", "required": "always", "enum": ["refer", "index"],
@@ -189,7 +189,9 @@
     },
     "example": {
       "answer": { "passages": [
-        { "heading": "Rollback procedure", "text": "Drain the sidecar and fail open.", "score": 2.689 }
+        { "id": "file:docs/mesh.md", "loc": "docs/mesh.md:L10-L13",
+          "sha": "516bef06781262a0a64b10027316c18d668eeccb",
+          "heading": "Rollback procedure", "text": "Drain the sidecar and fail open.", "score": 2.689 }
       ] },
       "citation": {
         "id": "file:docs/mesh.md", "loc": "docs/mesh.md:L10-L13",

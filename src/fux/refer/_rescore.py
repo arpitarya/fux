@@ -16,7 +16,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from ..query.analyzer import analyze
 from ..query.bm25f import derive_wlen, score_record
+from ..query.rerank import passage_boost
 from ..query.scan import query_term_hashes
 from ..query.tokenize import tokenize
 from ._chunk import Passage
@@ -58,17 +60,51 @@ class ScoredPassage:
         return f"{self.loc}#p{self.passage.ordinal}"
 
 
-def rescore(query: str, candidates: list[tuple[str, str, str, list[Passage]]]) -> list[ScoredPassage]:
+def rescore(
+    query: str,
+    candidates: list[tuple[str, str, str, list[Passage]]],
+    *,
+    weight: float = 0.0,
+) -> list[ScoredPassage]:
     """Score every passage of every fetched document against the query.
 
     `candidates` is `(doc_id, loc, sha, passages)` per fetched document.
     Returns every passage scored, sorted by `(-score, locator)` — ties break on
     the locator, never on iteration order, because the assembler downstream
     must be able to promise byte-identical output.
+
+    ## `weight` is the reranker's, and it is the SAME constant (W-108)
+
+    BM25 over a passage is still a bag of words: a passage that says the
+    question back and a passage that scatters the same words over forty lines
+    score identically. `query/rerank.py` already fixed exactly this for
+    *documents*, with a bounded multiplicative uplift over `passage_boost` —
+    and `boost()` already chunks a document with **this plane's chunker** to do
+    it. So the passage the reranker scored and the passage `answer` cites are
+    the same object, and the arithmetic that ranked the first may as well score
+    the second.
+
+    **One constant, not a second knob.** `weight` is `[ranking]
+    rerank_weight` — the value `_maybe_rerank` is passed — not a new
+    `[refer]` key. Two knobs for one signal is how they drift apart, and the
+    first day they disagree, `answer` cites a passage the ranking did not
+    prefer for a reason nobody can name.
+
+    ⚠ **It therefore defaults to OFF, because `rerank_weight` does.**
+    `Tune.rerank_weight` is `0.0` out of the box, the uplift is `1 + 0 * x`,
+    and every bundle is byte-identical to the one this function produced before
+    W-108 — proved by
+    `tests/refer/test_rescore.py::test_weight_zero_is_byte_identical_to_the_unweighted_score`.
+    Whether that default moves is Arpit's open call, listed under *Blocked on
+    Arpit*; W-108 is not allowed to move it and does not.
     """
     hashes = query_term_hashes(query)
     if not hashes:
         return []
+    # Analyzed once per call, not once per passage: `passage_boost` is called
+    # for every passage of every fetched document, and re-analyzing the query
+    # inside that loop would be the same work three-to-thirty times over.
+    query_terms = analyze(query) if weight > 0 else []
 
     rows: list[tuple[str, str, str, Passage, dict[str, list[int]], int]] = []
     df: dict[str, int] = {}
@@ -93,12 +129,32 @@ def rescore(query: str, candidates: list[tuple[str, str, str, list[Passage]]]) -
             loc=loc,
             sha=sha,
             passage=passage,
-            score=score_record(terms, flen, hashes, df, n, avg_wlen),
+            score=_uplift(
+                score_record(terms, flen, hashes, df, n, avg_wlen), query_terms, passage, weight
+            ),
         )
         for doc_id, loc, sha, passage, terms, flen in rows
     ]
     scored.sort(key=lambda s: (-s.score, s.locator))
     return scored
+
+
+def _uplift(score: float, query_terms: list[str], passage: Passage, weight: float) -> float:
+    """The bounded multiplicative uplift, or the score untouched.
+
+    **Multiplicative, exactly as `rerank.rerank` does it**, and for its reason:
+    a proximity signal in `[0, 1]` and a BM25 score are on unrelated scales, so
+    *adding* them lets proximity outweigh a real term match on any corpus where
+    BM25 happens to score low. `weight` bounds what a perfect match may add.
+
+    The early return is not an optimisation — it is the byte-identity
+    guarantee. At `weight <= 0` this function is the identity on `score`, with
+    no float arithmetic performed at all, so no last-bit difference can enter a
+    bundle on a repo that never turned the reranker on.
+    """
+    if weight <= 0:
+        return score
+    return score * (1.0 + weight * passage_boost(query_terms, analyze(passage.text)))
 
 
 def _terms_of(passage: Passage) -> tuple[dict[str, list[int]], int]:

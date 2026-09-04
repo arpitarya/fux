@@ -1,0 +1,173 @@
+id,q,arm,n_relevant,source,n_docs_cited,cited,hit,recall,band,separation,support,budget_used,budget_bytes,dropped
+q001,steps to revert a bad calder gateway release,A0,1,refer,1,docs/runbook-gateway-rollback.md,1,1.0,grounded,1.0,1,2873,8000,0
+q001,steps to revert a bad calder gateway release,B0,1,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/postmortem-checkout-outage.md,1,1.0,weak,0.0545,3,7310,8000,0
+q001,steps to revert a bad calder gateway release,A1,1,refer,1,docs/runbook-gateway-rollback.md,1,1.0,grounded,1.0,1,2873,8000,0
+q001,steps to revert a bad calder gateway release,B1,1,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/postmortem-checkout-outage.md,1,1.0,weak,0.0543,3,7310,8000,0
+q002,how to roll back a helix mesh sidecar release,A0,1,refer,1,docs/runbook-mesh-rollback-legacy.md,1,1.0,grounded,1.0,1,3250,8000,0
+q002,how to roll back a helix mesh sidecar release,B0,1,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/postmortem-checkout-outage.md,1,1.0,weak,0.0917,3,7666,8000,0
+q002,how to roll back a helix mesh sidecar release,A1,1,refer,1,docs/runbook-mesh-rollback-legacy.md,1,1.0,grounded,1.0,1,3250,8000,0
+q002,how to roll back a helix mesh sidecar release,B1,1,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/postmortem-checkout-outage.md,1,1.0,grounded,0.1938,3,7666,8000,0
+q003,what replaced helix mesh,A0,2,refer,1,docs/adr-0019-calder-gateway.md,1,0.5,grounded,1.0,1,3178,8000,0
+q003,what replaced helix mesh,B0,2,refer,3,docs/adr-0019-calder-gateway.md|docs/runbook-mesh-rollback-legacy.md|docs/adr-0007-helix-mesh.md,1,1.0,grounded,0.7806,3,7499,8000,1
+q003,what replaced helix mesh,A1,2,refer,1,docs/adr-0019-calder-gateway.md,1,0.5,grounded,1.0,1,3178,8000,0
+q003,what replaced helix mesh,B1,2,refer,3,docs/adr-0019-calder-gateway.md|docs/runbook-mesh-rollback-legacy.md|docs/adr-0007-helix-mesh.md,1,1.0,grounded,0.8452,3,7499,8000,1
+q004,why did we adopt a service mesh in the first place,A0,1,refer,1,docs/adr-0007-helix-mesh.md,1,1.0,partial,1.0,1,3873,8000,0
+q004,why did we adopt a service mesh in the first place,B0,1,refer,3,docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md|docs/guide-onboarding.md,1,1.0,partial,0.5322,3,7987,8000,4
+q004,why did we adopt a service mesh in the first place,A1,1,refer,1,docs/adr-0007-helix-mesh.md,1,1.0,partial,1.0,1,3873,8000,0
+q004,why did we adopt a service mesh in the first place,B1,1,refer,3,docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md|docs/guide-onboarding.md,1,1.0,partial,0.5697,3,7987,8000,4
+q005,how long do we keep customer order history,A0,1,refer,1,docs/reference-deployment-tiers.md,0,0.0,partial,1.0,1,1058,8000,0
+q005,how long do we keep customer order history,B0,1,refer,3,docs/reference-deployment-tiers.md|docs/policy-data-retention.md|docs/guide-oncall-rota.md,1,1.0,partial,0.1688,3,3259,8000,0
+q005,how long do we keep customer order history,A1,1,refer,1,docs/reference-deployment-tiers.md,0,0.0,partial,1.0,1,1058,8000,0
+q005,how long do we keep customer order history,B1,1,refer,3,docs/reference-deployment-tiers.md|docs/policy-data-retention.md|docs/guide-oncall-rota.md,1,1.0,partial,0.1439,3,3259,8000,0
+q006,what happened during the checkout outage,A0,1,refer,1,docs/guide-onboarding.md,0,0.0,grounded,1.0,1,1337,8000,0
+q006,what happened during the checkout outage,B0,1,refer,3,docs/guide-oncall-rota.md|docs/guide-onboarding.md|docs/adr-0019-calder-gateway.md,0,0.0,grounded,0.2273,3,4167,8000,0
+q006,what happened during the checkout outage,A1,1,refer,1,docs/guide-onboarding.md,0,0.0,grounded,1.0,1,1337,8000,0
+q006,what happened during the checkout outage,B1,1,refer,3,docs/guide-oncall-rota.md|docs/guide-onboarding.md|docs/adr-0019-calder-gateway.md,0,0.0,grounded,0.2824,3,4167,8000,0
+q007,how many reviewers does a tier 1 deploy need,A0,2,refer,1,docs/guide-onboarding.md,0,0.0,partial,1.0,1,3309,8000,0
+q007,how many reviewers does a tier 1 deploy need,B0,2,refer,3,docs/reference-deployment-tiers.md|docs/guide-onboarding.md|docs/reference-calderctl.md,1,1.0,partial,0.4913,3,7459,8000,3
+q007,how many reviewers does a tier 1 deploy need,A1,2,refer,1,docs/guide-onboarding.md,0,0.0,partial,1.0,1,3309,8000,0
+q007,how many reviewers does a tier 1 deploy need,B1,2,refer,3,docs/guide-onboarding.md|docs/reference-calderctl.md|docs/reference-deployment-tiers.md,1,1.0,partial,0.5289,3,7459,8000,3
+q008,who do I page when traffic between services is failing,A0,1,refer,1,docs/guide-oncall-rota.md,1,1.0,grounded,1.0,1,3017,8000,0
+q008,who do I page when traffic between services is failing,B0,1,refer,3,docs/guide-oncall-rota.md|docs/adr-0007-helix-mesh.md|docs/guide-onboarding.md,1,1.0,grounded,0.3279,3,7885,8000,5
+q008,who do I page when traffic between services is failing,A1,1,refer,1,docs/guide-oncall-rota.md,1,1.0,grounded,1.0,1,3017,8000,0
+q008,who do I page when traffic between services is failing,B1,1,refer,3,docs/guide-oncall-rota.md|docs/adr-0007-helix-mesh.md|docs/guide-onboarding.md,1,1.0,grounded,0.5684,3,7885,8000,5
+q009,I am shipping my first service where do I start,A0,1,refer,1,docs/guide-onboarding.md,1,1.0,partial,1.0,1,3699,8000,0
+q009,I am shipping my first service where do I start,B0,1,refer,3,docs/guide-onboarding.md|docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md,1,1.0,partial,0.2101,3,7272,8000,2
+q009,I am shipping my first service where do I start,A1,1,refer,1,docs/guide-onboarding.md,1,1.0,partial,1.0,1,3699,8000,0
+q009,I am shipping my first service where do I start,B1,1,refer,3,docs/guide-onboarding.md|docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md,1,1.0,partial,0.3311,3,7272,8000,2
+q010,what does calderctl exit code 3 mean,A0,1,refer,1,docs/reference-calderctl.md,1,1.0,grounded,1.0,1,3882,8000,0
+q010,what does calderctl exit code 3 mean,B0,1,refer,3,docs/reference-calderctl.md|docs/guide-onboarding.md|docs/runbook-gateway-rollback.md,1,1.0,grounded,0.5354,3,8000,8000,2
+q010,what does calderctl exit code 3 mean,A1,1,refer,1,docs/reference-calderctl.md,1,1.0,grounded,1.0,1,3882,8000,0
+q010,what does calderctl exit code 3 mean,B1,1,refer,3,docs/reference-calderctl.md|docs/guide-onboarding.md|docs/runbook-gateway-rollback.md,1,1.0,grounded,0.6091,3,8000,8000,2
+q011,what is the soak period for the revenue path tier,A0,1,refer,1,docs/reference-deployment-tiers.md,1,1.0,grounded,1.0,1,3285,8000,0
+q011,what is the soak period for the revenue path tier,B0,1,refer,3,docs/reference-deployment-tiers.md|docs/adr-0019-calder-gateway.md|docs/guide-oncall-rota.md,1,1.0,grounded,0.5852,3,7247,8000,0
+q011,what is the soak period for the revenue path tier,A1,1,refer,1,docs/reference-deployment-tiers.md,1,1.0,grounded,1.0,1,3285,8000,0
+q011,what is the soak period for the revenue path tier,B1,1,refer,3,docs/reference-deployment-tiers.md|docs/adr-0019-calder-gateway.md|docs/guide-oncall-rota.md,1,1.0,grounded,0.6056,3,7247,8000,0
+q012,how do I freeze an in flight rollout,A0,3,refer,1,docs/guide-oncall-rota.md,0,0.0,grounded,1.0,1,2101,8000,0
+q012,how do I freeze an in flight rollout,B0,3,refer,3,docs/guide-oncall-rota.md|docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md,1,0.6667,grounded,0.1473,3,6264,8000,0
+q012,how do I freeze an in flight rollout,A1,3,refer,1,docs/guide-oncall-rota.md,0,0.0,grounded,1.0,1,2101,8000,0
+q012,how do I freeze an in flight rollout,B1,3,refer,3,docs/guide-oncall-rota.md|docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md,1,0.6667,grounded,0.1384,3,6264,8000,0
+q013,am I allowed to be on call two weeks in a row,A0,1,refer,1,docs/runbook-gateway-rollback.md,0,0.0,partial,1.0,1,2654,8000,0
+q013,am I allowed to be on call two weeks in a row,B0,1,refer,3,docs/guide-oncall-rota.md|docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md,1,1.0,partial,0.0067,3,7521,8000,0
+q013,am I allowed to be on call two weeks in a row,A1,1,refer,1,docs/guide-oncall-rota.md,1,1.0,partial,1.0,1,2230,8000,0
+q013,am I allowed to be on call two weeks in a row,B1,1,refer,3,docs/guide-oncall-rota.md|docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md,1,1.0,partial,0.0907,3,7521,8000,0
+q014,does an internal service page anyone overnight,A0,3,refer,1,docs/reference-deployment-tiers.md,1,0.3333,partial,1.0,1,3121,8000,0
+q014,does an internal service page anyone overnight,B0,3,refer,3,docs/guide-onboarding.md|docs/reference-deployment-tiers.md|docs/policy-data-retention.md,1,0.6667,partial,0.3622,3,7888,8000,2
+q014,does an internal service page anyone overnight,A1,3,refer,1,docs/reference-deployment-tiers.md,1,0.3333,partial,1.0,1,3121,8000,0
+q014,does an internal service page anyone overnight,B1,3,refer,3,docs/guide-onboarding.md|docs/reference-deployment-tiers.md|docs/policy-data-retention.md,1,0.6667,partial,0.348,3,7888,8000,2
+q015,what is the current decision for east west traffic,A0,1,refer,1,docs/adr-0007-helix-mesh.md,0,0.0,grounded,1.0,1,2454,8000,0
+q015,what is the current decision for east west traffic,B0,1,refer,3,docs/adr-0019-calder-gateway.md|docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md,1,1.0,grounded,0.1719,3,5091,8000,0
+q015,what is the current decision for east west traffic,A1,1,refer,1,docs/adr-0019-calder-gateway.md,1,1.0,grounded,1.0,1,2302,8000,0
+q015,what is the current decision for east west traffic,B1,1,refer,3,docs/adr-0019-calder-gateway.md|docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md,1,1.0,weak,0.0243,3,5091,8000,0
+q016,which proxy do we run between services today,A0,2,refer,1,docs/guide-oncall-rota.md,0,0.0,partial,1.0,1,2447,8000,0
+q016,which proxy do we run between services today,B0,2,refer,3,docs/guide-oncall-rota.md|docs/runbook-gateway-rollback.md|docs/adr-0007-helix-mesh.md,0,0.0,partial,0.2513,3,7778,8000,1
+q016,which proxy do we run between services today,A1,2,refer,1,docs/guide-oncall-rota.md,0,0.0,partial,1.0,1,2447,8000,0
+q016,which proxy do we run between services today,B1,2,refer,3,docs/guide-oncall-rota.md|docs/runbook-gateway-rollback.md|docs/adr-0007-helix-mesh.md,0,0.0,partial,0.2706,3,7778,8000,1
+q017,why did we move away from sidecars,A0,1,refer,1,docs/adr-0007-helix-mesh.md,0,0.0,partial,1.0,1,1368,8000,0
+q017,why did we move away from sidecars,B0,1,refer,3,docs/postmortem-checkout-outage.md|docs/adr-0007-helix-mesh.md|docs/adr-0019-calder-gateway.md,1,1.0,partial,0.0395,3,6190,8000,0
+q017,why did we move away from sidecars,A1,1,refer,1,docs/adr-0007-helix-mesh.md,0,0.0,partial,1.0,1,1368,8000,0
+q017,why did we move away from sidecars,B1,1,refer,3,docs/postmortem-checkout-outage.md|docs/adr-0007-helix-mesh.md|docs/adr-0019-calder-gateway.md,1,1.0,partial,0.1326,3,6190,8000,0
+q018,how much memory did the sidecar actually use,A0,1,refer,1,docs/postmortem-checkout-outage.md,0,0.0,partial,1.0,1,2018,8000,0
+q018,how much memory did the sidecar actually use,B0,1,refer,3,docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md|docs/adr-0019-calder-gateway.md,1,1.0,partial,0.043,3,6229,8000,0
+q018,how much memory did the sidecar actually use,A1,1,refer,1,docs/adr-0007-helix-mesh.md,0,0.0,partial,1.0,1,1948,8000,0
+q018,how much memory did the sidecar actually use,B1,1,refer,3,docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md|docs/adr-0019-calder-gateway.md,1,1.0,partial,0.0305,3,6229,8000,0
+q019,is helix mesh still in use anywhere,A0,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,grounded,1.0,1,2893,8000,0
+q019,is helix mesh still in use anywhere,B0,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/adr-0007-helix-mesh.md,1,0.5,weak,0.099,3,7237,8000,0
+q019,is helix mesh still in use anywhere,A1,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,grounded,1.0,1,2893,8000,0
+q019,is helix mesh still in use anywhere,B1,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/adr-0007-helix-mesh.md,1,0.5,weak,0.094,3,7237,8000,0
+q022,can I start new work against helix mesh,A0,1,refer,1,docs/adr-0007-helix-mesh.md,1,1.0,grounded,1.0,1,2719,8000,0
+q022,can I start new work against helix mesh,B0,1,refer,3,docs/adr-0007-helix-mesh.md|docs/guide-onboarding.md|docs/reference-deployment-tiers.md,1,1.0,grounded,0.372,3,6026,8000,0
+q022,can I start new work against helix mesh,A1,1,refer,1,docs/adr-0007-helix-mesh.md,1,1.0,grounded,1.0,1,2719,8000,0
+q022,can I start new work against helix mesh,B1,1,refer,3,docs/adr-0007-helix-mesh.md|docs/guide-onboarding.md|docs/reference-deployment-tiers.md,1,1.0,grounded,0.6523,3,6026,8000,0
+q023,what max surge should I use rolling back the node proxy,A0,2,refer,1,docs/runbook-gateway-rollback.md,1,0.5,grounded,1.0,1,3129,8000,0
+q023,what max surge should I use rolling back the node proxy,B0,2,refer,3,docs/runbook-gateway-rollback.md|docs/reference-calderctl.md|docs/runbook-mesh-rollback-legacy.md,1,1.0,grounded,0.1044,3,7672,8000,0
+q023,what max surge should I use rolling back the node proxy,A1,2,refer,1,docs/runbook-gateway-rollback.md,1,0.5,grounded,1.0,1,3129,8000,0
+q023,what max surge should I use rolling back the node proxy,B1,2,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/reference-calderctl.md,1,1.0,grounded,0.118,3,7672,8000,0
+q024,what max surge for a sidecar rollback,A0,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,grounded,1.0,1,3397,8000,0
+q024,what max surge for a sidecar rollback,B0,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/reference-calderctl.md|docs/runbook-gateway-rollback.md,1,1.0,weak,0.0883,3,7412,8000,2
+q024,what max surge for a sidecar rollback,A1,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,grounded,1.0,1,3397,8000,0
+q024,what max surge for a sidecar rollback,B1,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/reference-calderctl.md,1,1.0,grounded,0.1161,3,7412,8000,2
+q025,verify per node after rolling back,A0,2,refer,1,docs/runbook-gateway-rollback.md,1,0.5,grounded,1.0,1,3495,8000,0
+q025,verify per node after rolling back,B0,2,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/reference-calderctl.md,1,1.0,grounded,0.1071,3,7960,8000,1
+q025,verify per node after rolling back,A1,2,refer,1,docs/runbook-gateway-rollback.md,1,0.5,grounded,1.0,1,3495,8000,0
+q025,verify per node after rolling back,B1,2,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/reference-calderctl.md,1,1.0,grounded,0.1071,3,7960,8000,1
+q026,verify per service after rolling back,A0,2,refer,1,docs/runbook-gateway-rollback.md,0,0.0,grounded,1.0,1,3099,8000,0
+q026,verify per service after rolling back,B0,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/reference-deployment-tiers.md,1,0.5,weak,0.0092,3,7816,8000,3
+q026,verify per service after rolling back,A1,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,grounded,1.0,1,2893,8000,0
+q026,verify per service after rolling back,B1,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/reference-deployment-tiers.md,1,0.5,weak,0.0051,3,7816,8000,3
+q028,how long does a gateway rollback take,A0,1,refer,1,docs/reference-deployment-tiers.md,0,0.0,partial,1.0,1,1672,8000,0
+q028,how long does a gateway rollback take,B0,1,refer,3,docs/reference-calderctl.md|docs/adr-0019-calder-gateway.md|docs/reference-deployment-tiers.md,0,0.0,partial,0.156,3,6319,8000,0
+q028,how long does a gateway rollback take,A1,1,refer,1,docs/reference-calderctl.md,0,0.0,partial,1.0,1,2163,8000,0
+q028,how long does a gateway rollback take,B1,1,refer,3,docs/reference-calderctl.md|docs/adr-0019-calder-gateway.md|docs/reference-deployment-tiers.md,0,0.0,partial,0.0084,3,6319,8000,0
+q029,how long does a mesh rollback take,A0,1,refer,1,docs/reference-calderctl.md,0,0.0,partial,1.0,1,2163,8000,0
+q029,how long does a mesh rollback take,B0,1,refer,3,docs/reference-calderctl.md|docs/adr-0019-calder-gateway.md|docs/reference-deployment-tiers.md,0,0.0,partial,0.0028,3,6405,8000,0
+q029,how long does a mesh rollback take,A1,1,refer,1,docs/reference-calderctl.md,0,0.0,partial,1.0,1,2163,8000,0
+q029,how long does a mesh rollback take,B1,1,refer,3,docs/reference-calderctl.md|docs/adr-0019-calder-gateway.md|docs/reference-deployment-tiers.md,0,0.0,partial,0.186,3,6405,8000,0
+q030,pods skipped silently during a rollback,A0,2,refer,1,docs/postmortem-checkout-outage.md,1,0.5,grounded,1.0,1,2872,8000,0
+q030,pods skipped silently during a rollback,B0,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/postmortem-checkout-outage.md|docs/reference-deployment-tiers.md,1,1.0,weak,0.023,3,7444,8000,0
+q030,pods skipped silently during a rollback,A1,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,grounded,1.0,1,3397,8000,0
+q030,pods skipped silently during a rollback,B1,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/postmortem-checkout-outage.md|docs/reference-deployment-tiers.md,1,1.0,grounded,0.1447,3,7444,8000,0
+q031,is the legacy runbook still valid,A0,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,partial,1.0,1,819,8000,0
+q031,is the legacy runbook still valid,B0,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/reference-calderctl.md,1,0.5,partial,0.0582,3,4461,8000,0
+q031,is the legacy runbook still valid,A1,2,refer,1,docs/runbook-mesh-rollback-legacy.md,1,0.5,partial,1.0,1,819,8000,0
+q031,is the legacy runbook still valid,B1,2,refer,3,docs/runbook-mesh-rollback-legacy.md|docs/runbook-gateway-rollback.md|docs/reference-calderctl.md,1,0.5,partial,0.0435,3,4461,8000,0
+q033,why keep a superseded record in the repository,A0,1,refer,1,docs/adr-0007-helix-mesh.md,1,1.0,partial,1.0,1,731,8000,0
+q033,why keep a superseded record in the repository,B0,1,refer,3,docs/adr-0007-helix-mesh.md|docs/policy-data-retention.md|docs/reference-deployment-tiers.md,1,1.0,partial,0.2865,3,2361,8000,0
+q033,why keep a superseded record in the repository,A1,1,refer,1,docs/adr-0007-helix-mesh.md,1,1.0,partial,1.0,1,731,8000,0
+q033,why keep a superseded record in the repository,B1,1,refer,3,docs/adr-0007-helix-mesh.md|docs/policy-data-retention.md|docs/reference-deployment-tiers.md,1,1.0,partial,0.3562,3,2361,8000,0
+q034,my alert paged at 3am but my service is internal,A0,3,refer,1,docs/reference-deployment-tiers.md,1,0.3333,partial,1.0,1,3121,8000,0
+q034,my alert paged at 3am but my service is internal,B0,3,refer,3,docs/guide-onboarding.md|docs/reference-deployment-tiers.md|docs/policy-data-retention.md,1,0.6667,partial,0.2736,3,7523,8000,2
+q034,my alert paged at 3am but my service is internal,A1,3,refer,1,docs/reference-deployment-tiers.md,1,0.3333,partial,1.0,1,3121,8000,0
+q034,my alert paged at 3am but my service is internal,B1,3,refer,3,docs/guide-onboarding.md|docs/reference-deployment-tiers.md|docs/policy-data-retention.md,1,0.6667,partial,0.2584,3,7523,8000,2
+q035,I added a retry and things got worse,A0,1,refer,1,docs/guide-oncall-rota.md,0,0.0,partial,1.0,1,1730,8000,0
+q035,I added a retry and things got worse,B0,1,refer,3,docs/guide-onboarding.md|docs/adr-0019-calder-gateway.md|docs/guide-oncall-rota.md,1,1.0,partial,0.4709,3,5330,8000,0
+q035,I added a retry and things got worse,A1,1,refer,1,docs/guide-oncall-rota.md,0,0.0,partial,1.0,1,1730,8000,0
+q035,I added a retry and things got worse,B1,1,refer,3,docs/guide-onboarding.md|docs/adr-0019-calder-gateway.md|docs/guide-oncall-rota.md,1,1.0,partial,0.4243,3,5330,8000,0
+q036,who approves a change to the revenue path,A0,2,refer,1,docs/reference-deployment-tiers.md,1,0.5,grounded,1.0,1,2012,8000,0
+q036,who approves a change to the revenue path,B0,2,refer,3,docs/reference-deployment-tiers.md|docs/guide-oncall-rota.md|docs/guide-onboarding.md,1,0.5,grounded,0.6757,3,3840,8000,0
+q036,who approves a change to the revenue path,A1,2,refer,1,docs/reference-deployment-tiers.md,1,0.5,grounded,1.0,1,2012,8000,0
+q036,who approves a change to the revenue path,B1,2,refer,3,docs/reference-deployment-tiers.md|docs/guide-oncall-rota.md|docs/guide-onboarding.md,1,0.5,grounded,0.7595,3,3840,8000,0
+q037,what does the incident lead actually do,A0,1,refer,1,docs/guide-oncall-rota.md,1,1.0,partial,1.0,1,2447,8000,0
+q037,what does the incident lead actually do,B0,1,refer,3,docs/guide-oncall-rota.md|docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md,1,1.0,partial,0.1496,3,7855,8000,0
+q037,what does the incident lead actually do,A1,1,refer,1,docs/guide-oncall-rota.md,1,1.0,partial,1.0,1,2447,8000,0
+q037,what does the incident lead actually do,B1,1,refer,3,docs/guide-oncall-rota.md|docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md,1,1.0,partial,0.2612,3,7855,8000,0
+q038,where do I record my service data class,A0,2,refer,1,docs/policy-data-retention.md,0,0.0,partial,1.0,1,2728,8000,0
+q038,where do I record my service data class,B0,2,refer,3,docs/guide-onboarding.md|docs/policy-data-retention.md|docs/reference-deployment-tiers.md,1,0.5,partial,0.1979,3,7868,8000,2
+q038,where do I record my service data class,A1,2,refer,1,docs/policy-data-retention.md,0,0.0,partial,1.0,1,2728,8000,0
+q038,where do I record my service data class,B1,2,refer,3,docs/guide-onboarding.md|docs/policy-data-retention.md|docs/reference-deployment-tiers.md,1,0.5,partial,0.1057,3,7868,8000,2
+q040,how long are backups kept,A0,1,refer,1,docs/policy-data-retention.md,1,1.0,partial,1.0,1,983,8000,0
+q040,how long are backups kept,B0,1,refer,2,docs/policy-data-retention.md|docs/guide-onboarding.md,1,1.0,partial,0.474,2,1373,8000,0
+q040,how long are backups kept,A1,1,refer,1,docs/policy-data-retention.md,1,1.0,partial,1.0,1,983,8000,0
+q040,how long are backups kept,B1,1,refer,2,docs/policy-data-retention.md|docs/guide-onboarding.md,1,1.0,partial,0.474,2,1373,8000,0
+q041,can I delete a customer record out of the backups,A0,1,refer,1,docs/policy-data-retention.md,1,1.0,grounded,1.0,1,2005,8000,0
+q041,can I delete a customer record out of the backups,B0,1,refer,3,docs/policy-data-retention.md|docs/adr-0007-helix-mesh.md|docs/reference-deployment-tiers.md,1,1.0,grounded,0.4611,3,4879,8000,0
+q041,can I delete a customer record out of the backups,A1,1,refer,1,docs/policy-data-retention.md,1,1.0,grounded,1.0,1,2005,8000,0
+q041,can I delete a customer record out of the backups,B1,1,refer,3,docs/policy-data-retention.md|docs/adr-0007-helix-mesh.md|docs/reference-deployment-tiers.md,1,1.0,grounded,0.5152,3,4879,8000,0
+q043,we had a different retry policy in every service,A0,1,refer,1,docs/postmortem-checkout-outage.md,0,0.0,grounded,1.0,1,2292,8000,0
+q043,we had a different retry policy in every service,B0,1,refer,3,docs/adr-0007-helix-mesh.md|docs/reference-deployment-tiers.md|docs/postmortem-checkout-outage.md,1,1.0,grounded,0.307,3,7947,8000,1
+q043,we had a different retry policy in every service,A1,1,refer,1,docs/postmortem-checkout-outage.md,0,0.0,grounded,1.0,1,2292,8000,0
+q043,we had a different retry policy in every service,B1,1,refer,3,docs/adr-0007-helix-mesh.md|docs/reference-deployment-tiers.md|docs/postmortem-checkout-outage.md,1,1.0,grounded,0.2313,3,7947,8000,1
+q044,why not use ebpf instead of a proxy,A0,1,refer,1,docs/runbook-gateway-rollback.md,0,0.0,grounded,1.0,1,2714,8000,0
+q044,why not use ebpf instead of a proxy,B0,1,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/adr-0019-calder-gateway.md,1,1.0,weak,0.0867,3,7496,8000,0
+q044,why not use ebpf instead of a proxy,A1,1,refer,1,docs/runbook-gateway-rollback.md,0,0.0,grounded,1.0,1,2714,8000,0
+q044,why not use ebpf instead of a proxy,B1,1,refer,3,docs/runbook-gateway-rollback.md|docs/runbook-mesh-rollback-legacy.md|docs/adr-0019-calder-gateway.md,1,1.0,grounded,0.2191,3,7496,8000,0
+q045,what is the cheapest tier to start on,A0,2,refer,1,docs/guide-onboarding.md,1,0.5,partial,1.0,1,3309,8000,0
+q045,what is the cheapest tier to start on,B0,2,refer,3,docs/reference-deployment-tiers.md|docs/adr-0007-helix-mesh.md|docs/guide-onboarding.md,1,1.0,partial,0.2923,3,7736,8000,0
+q045,what is the cheapest tier to start on,A1,2,refer,1,docs/guide-onboarding.md,1,0.5,partial,1.0,1,3309,8000,0
+q045,what is the cheapest tier to start on,B1,2,refer,3,docs/reference-deployment-tiers.md|docs/adr-0007-helix-mesh.md|docs/guide-onboarding.md,1,1.0,partial,0.0811,3,7736,8000,0
+q046,how do we stop a slow dependency taking down checkout,A0,2,refer,1,docs/adr-0007-helix-mesh.md,1,0.5,grounded,1.0,1,3095,8000,0
+q046,how do we stop a slow dependency taking down checkout,B0,2,refer,3,docs/guide-onboarding.md|docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md,1,1.0,grounded,0.1203,3,6701,8000,0
+q046,how do we stop a slow dependency taking down checkout,A1,2,refer,1,docs/adr-0007-helix-mesh.md,1,0.5,grounded,1.0,1,3095,8000,0
+q046,how do we stop a slow dependency taking down checkout,B1,2,refer,3,docs/guide-onboarding.md|docs/adr-0007-helix-mesh.md|docs/postmortem-checkout-outage.md,1,1.0,weak,0.0522,3,6701,8000,0
+q047,blast radius of a bad config push,A0,2,refer,1,docs/adr-0019-calder-gateway.md,1,0.5,partial,1.0,1,876,8000,0
+q047,blast radius of a bad config push,B0,2,refer,3,docs/adr-0019-calder-gateway.md|docs/runbook-gateway-rollback.md|docs/adr-0007-helix-mesh.md,1,1.0,partial,0.6277,3,3374,8000,0
+q047,blast radius of a bad config push,A1,2,refer,1,docs/adr-0019-calder-gateway.md,1,0.5,partial,1.0,1,876,8000,0
+q047,blast radius of a bad config push,B1,2,refer,3,docs/adr-0019-calder-gateway.md|docs/runbook-gateway-rollback.md|docs/adr-0007-helix-mesh.md,1,1.0,partial,0.7231,3,3374,8000,0
+q048,how do I tell if someone else is mid incident before I deploy,A0,2,refer,1,docs/guide-oncall-rota.md,1,0.5,grounded,1.0,1,3017,8000,0
+q048,how do I tell if someone else is mid incident before I deploy,B0,2,refer,3,docs/reference-calderctl.md|docs/guide-oncall-rota.md|docs/guide-onboarding.md,1,1.0,weak,0.0975,3,7556,8000,0
+q048,how do I tell if someone else is mid incident before I deploy,A1,2,refer,1,docs/reference-calderctl.md,1,0.5,grounded,1.0,1,1505,8000,0
+q048,how do I tell if someone else is mid incident before I deploy,B1,2,refer,3,docs/reference-calderctl.md|docs/guide-oncall-rota.md|docs/guide-onboarding.md,1,1.0,grounded,0.1115,3,7556,8000,0
+q049,what did we promise to fix after the outage and did we,A0,1,refer,1,docs/adr-0007-helix-mesh.md,0,0.0,partial,1.0,1,1988,8000,0
+q049,what did we promise to fix after the outage and did we,B0,1,refer,3,docs/reference-deployment-tiers.md|docs/postmortem-checkout-outage.md|docs/adr-0007-helix-mesh.md,1,1.0,partial,0.0692,3,4767,8000,0
+q049,what did we promise to fix after the outage and did we,A1,1,refer,1,docs/adr-0007-helix-mesh.md,0,0.0,partial,1.0,1,1988,8000,0
+q049,what did we promise to fix after the outage and did we,B1,1,refer,3,docs/reference-deployment-tiers.md|docs/postmortem-checkout-outage.md|docs/adr-0007-helix-mesh.md,1,1.0,partial,0.1408,3,4767,8000,0

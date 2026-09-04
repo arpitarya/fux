@@ -322,6 +322,47 @@ the source could not be reached, but the passage still matches the bytes in
   caching* into a new way for `refer()` to raise — the precise new failure mode
   its own contract says it does not add.
 
+**21. `rescore` takes `[ranking] rerank_weight`, and it is the FIFTH value
+that cannot change what is fetched.** The four `[refer]` keys move passage
+boundaries and the byte budget; this one moves passage *scores*, and like them
+it sits downstream of every fetch and every verdict — it cannot change which
+documents are looked at or what a citation's `sha` is.
+
+**It is `[ranking]`'s key, deliberately, and not a new `[refer]` one.** The
+same proximity arithmetic that reordered the documents
+([ADR-RERANK](0041_rerank.md)) now scores their passages, over the same
+analyzer and the same chunker. Two knobs for one signal is how they drift, and
+the first day they disagree `answer` cites a passage the ranking did not prefer
+for a reason nobody can name.
+
+⚠ **`refer()` defaults it to `0.0`, not to `rerank.WEIGHT`.** A caller that has
+said nothing gets the bundle this plane produced before the parameter existed —
+byte-identical, with no float arithmetic performed at all
+(`refer/_rescore.py::_uplift`). **`refer()` may not switch on a knob that `ask`
+has switched off**; only the caller's `Tune` decides, and `rerank_weight`'s
+default is Arpit's open call, not this record's.
+
+**22. The plane is now routinely called with MORE THAN ONE document, and two
+of its own provisions stop being theoretical.**
+
+- **The per-document cap binds.** `_assemble.assemble` disables
+  `per_doc_fraction` for a single-document candidate set (decision 16 / W-72).
+  `answer` was that caller. With three documents the cap is live on the default
+  path for the first time.
+- **Per-document degradation is the common case, not the edge.** A `url:`
+  citation that cannot be fetched costs *its own* citation and the answer is
+  assembled from the rest. That was always `_obtain`'s contract; until W-108 it
+  could only ever mean *the whole answer failed*.
+
+⚠ **One `fetcher` for a multi-document call is a defect, and the caller fixes
+it, not this function.** `refer()` still takes one callable, so
+`query/refer_answer.py::_load_fetchers` hands it a **dispatcher keyed on the
+URL** — each document reaching the fetcher its own `.fux/sources/urls` line
+names. Handing all three the first document's fetcher compares a rendered page
+against a shell and reports **a false staleness on every query**, which is the
+failure `refer/source.py`'s own docstring names and the one thing this plane
+must never do quietly.
+
 ### Consequences
 
 - **Offline degradation is honest, and tested.** `file:` sources keep full

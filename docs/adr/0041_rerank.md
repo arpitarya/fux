@@ -187,6 +187,26 @@ network import fence. The function, its signature and its output are untouched �
 see [ADR-REFER](0030_refer-plane.md) decision 18 and
 [`tests/test_no_shadowed_submodules.py`](../../tests/test_no_shadowed_submodules.py).
 
+**9. `passage_boost` has a SECOND caller, and it is one constant, not two.**
+`refer/_rescore.py` multiplies each fetched passage's BM25 score by
+`1 + weight * passage_boost(...)` — the same expression `rerank()` applies to
+documents, over the same `analyze()` token stream, the same `COVERAGE_POWER`,
+and the same bounded multiplicative shape (decision 3).
+
+**The two are the same object by construction.** `boost()` already chunks a
+document with the **refer plane's** chunker to score it, so the passage this
+record ranked a document by and the passage `answer` cites are the same span.
+Scoring the second with different arithmetic would have been a second reranker
+that disagrees with this one.
+
+⚠ **Decision 7's DEFAULT OFF therefore governs both.** `[ranking]
+rerank_weight` ships at `0.0`, so W-108's passage multiplier is dark out of the
+box exactly as this reranker is, and `answer` at the default is byte-identical
+to the one that shipped before it
+(`tests/refer/test_rescore.py::test_weight_zero_is_byte_identical_to_the_unweighted_score`).
+**Turning it on is Arpit's open call on `rerank_weight`, and it now moves two
+things rather than one** — that is the fact this decision exists to record.
+
 ### Consequences — the measurement
 
 50 goldens, graded on rank. **The reranker was measured before the goldens

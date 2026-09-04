@@ -8,6 +8,50 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- 🔴 **`fux answer` refers the top THREE documents, not one** (W-108). The verb
+  still returns one answer; what changed is how many documents it reads to build
+  it. `refer()` already looped candidates and `_rescore` already computed passage
+  `df` across all of them, so the cross-document passage contest existed and was
+  being handed a field of one.
+  - **Measured, paired, 43 graded queries: 13 fixed / 0 broken**; mean answer
+    recall `0.4341 -> 0.8256`
+    ([the run](work/regression/2026-09-05-answer-top3/report.md)).
+    **`ask` is byte-identical** — no ranking changed.
+  - ⚠ **Answers cost more context**: mean assembled bytes `2 517 -> 6 467`, on
+    every one of the 43. `[refer] budget` still bounds the whole rendered answer
+    and is never exceeded; set it lower to buy the old cost back.
+  - ⚠ **`fux answer --band` demotes 8 of 43 from `grounded` to `weak`.** At one
+    result there was no runner-up, so `separation` was `1.0` on every answer
+    fux has ever given. It is now computed. **No floor moved and nothing gates
+    on the band.**
+  - ⚠ **`answer`'s cited document may differ from `ask`'s first result** — on 18
+    of the 43. `ask` ranks documents; `answer` ranks passages across `ask`'s top
+    three.
+
+- **`fux answer --json`: each entry of `answer.passages` now carries `id`, `loc`
+  and `sha`.** Additive — nothing was removed or repurposed, and `citation`
+  still names the winning passage's document. In text mode each passage prints
+  under **its own** locator line.
+  - ⚠ **This fixes a mis-citation that predates the top-3 change.** Every passage
+    was printed above a single trailing locator naming the *first* passage's line
+    range, whatever the later passages were.
+
+- **`fux verify --rerun` retrieves three candidates too**, or it would report
+  `drifted` on every multi-document answer.
+
+### Fixed
+
+- **A multi-document answer resolves each `url:` citation's OWN fetcher.**
+  `refer()` takes one fetcher for the whole call; with three candidates behind
+  different `.fux/sources/urls` lines, handing all of them the first one's module
+  compares a rendered page against a shell and reports a **false staleness on
+  every query**. `answer` now passes a URL-keyed dispatcher, connecting each
+  module once. A fetcher that fails to load or connect costs **its own**
+  documents their citations instead of taking the query down.
+
+
 ## [2.0.0-alpha.7] - 2026-09-02
 
 **A Windows-only fix, caught by a Windows runner and by nothing else.**

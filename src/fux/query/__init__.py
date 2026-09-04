@@ -664,6 +664,25 @@ def cmd_find(args) -> int:
     return 0
 
 
+#: How many ranked documents `answer` hands to the refer plane. **W-108.**
+#:
+#: `answer` used to refer exactly one, which capped it at `recall@1` — `0.5969`
+#: against `0.9535` at k=5 on the 43 graded playground queries, where 19 of the
+#: 43 have more than one relevant document
+#: ([the first-recall run](../../../work/regression/2026-08-28-first-recall/report.md)).
+#: That was never a ranking failure: `refer()` loops candidates and `_rescore`
+#: computes passage `df` across all of them, so a fair cross-document passage
+#: contest existed and was being handed a field of one.
+#:
+#: **Three, and not a tunable.** The uplift is bounded by the `recall@1 ->
+#: recall@3` gap, the byte budget is unchanged (`per_doc_fraction` bounds each
+#: document once there is more than one), and every extra candidate is a real
+#: fetch against someone's source system. A `[refer]` key here would be a new
+#: default nobody has measured, on a verb whose defaults are already an open
+#: question on Arpit's desk.
+ANSWER_TOP = 3
+
+
 def cmd_answer(args) -> int:
     """The single best answer — a fetched, re-scored passage when the source
     is reachable (PRIORITY.md P6); the index's own structure otherwise.
@@ -680,7 +699,8 @@ def cmd_answer(args) -> int:
     tune = _tune_for(root, args)
     signals: dict = {}
     results, _ = run_query(
-        root, args.query, 1, force_scan=_force_scan(args), tune=tune, confidence_out=signals,
+        root, args.query, ANSWER_TOP, force_scan=_force_scan(args), tune=tune,
+        confidence_out=signals,
     )
     block = signals.get("confidence")
     _declare_no_accelerator(root)
@@ -716,7 +736,7 @@ def cmd_answer(args) -> int:
     no_refer_flag = getattr(args, "no_refer", False)
 
     if not no_refer_flag:
-        referred = _answer_via_refer(root, args.query, best, tune)
+        referred = _answer_via_refer(root, args.query, results, tune)
         if referred is not None:
             _declare_change_since_last_ask(root, args.query, referred)
             # ⚠ **The UPGRADED block, not the one `run_query` produced.**
@@ -836,11 +856,15 @@ def cmd_verify(args) -> int:
     rerun = None
     if getattr(args, "rerun", False):
         def rerun(query: str):
-            results, _ = run_query(root, query, 1, force_scan=_force_scan(args))
+            # ⚠ **`ANSWER_TOP`, not 1** — a rerun that retrieves a different
+            # number of candidates than `cmd_answer` did is not a rerun. This
+            # read `1` while `answer` read `1` too; when W-108 moved one it had
+            # to move both, or `verify --rerun` would report `drifted` on every
+            # multi-document answer and be right about nothing.
+            results, _ = run_query(root, query, ANSWER_TOP, force_scan=_force_scan(args))
             if not results:
                 return []
-            best = results[0]
-            bundle = _answer_via_refer(root, query, best, _tune(root))
+            bundle = _answer_via_refer(root, query, results, _tune(root))
             if bundle is None:
                 return []
             return [
@@ -877,14 +901,27 @@ def _block_dict(block) -> dict:
     return block.as_dict()
 
 
-def _answer_via_refer(root: Path, query: str, best: AskResult, tune: "Tune"):
-    """`None` on any failure to produce a usable citation — never raises."""
+def _answer_via_refer(root: Path, query: str, results: list[AskResult], tune: "Tune"):
+    """`None` when NO candidate produced a usable citation — never raises.
+
+    Takes the ranked list since W-108 and reads each candidate's indexed `sha`
+    from its own shard. **A candidate whose record cannot be read is skipped,
+    not fatal**: it is one document short of a contest, which is the same
+    degradation `refer()` applies to one that cannot be fetched. Only an empty
+    set — every record unreadable — returns `None` here, and `refer()` returning
+    no citations returns `None` there; both land on the index fallback.
+    """
     from .refer_answer import answer_via_refer
 
-    record = _record_for(root, best.id)
-    if record is None:
+    citations: list[tuple[str, str, str]] = []
+    for result in results:
+        record = _record_for(root, result.id)
+        if record is None:
+            continue
+        citations.append((result.id, result.loc, record["sha"]))
+    if not citations:
         return None
-    return answer_via_refer(root, query, best.id, best.loc, record["sha"], tune=tune)
+    return answer_via_refer(root, query, citations, tune=tune)
 
 
 def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:
@@ -908,7 +945,18 @@ def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:
     try:
         from ..maintain import lastcited
 
-        cited = {d.loc: (d.verdict.fetched_sha or d.verdict.indexed_sha) for d in bundle.documents}
+        # ⚠ **The documents that were CITED, not every document fetched**
+        # (W-108). With one candidate the two sets were identical. With three,
+        # a document can be fetched, lose the passage contest and appear in no
+        # citation — and reporting *"this changed since you last asked"* about
+        # bytes that are in neither answer describes a comparison the caller
+        # never saw. The report is about the answer that was given.
+        answered = {c.doc_id for c in bundle.assembled.citations}
+        cited = {
+            d.loc: (d.verdict.fetched_sha or d.verdict.indexed_sha)
+            for d in bundle.documents
+            if d.doc_id in answered
+        }
         if not cited:
             return
         change = lastcited.compare(root, query, cited)
@@ -923,11 +971,30 @@ def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:
 def _freshness_of(bundle) -> str:
     """The refer plane's verdict for the answer's own document.
 
+    ⚠ **The document that produced the WINNING passage, not the first
+    candidate** (W-108). With one candidate those were the same object and
+    `documents[0]` was correct; with three they are routinely different, and
+    reporting candidate one's verdict beside candidate two's passage is the
+    collapse this plane's four states exist to prevent — a `current` label on
+    bytes nobody checked.
+
     `unverified` when the plane looked at nothing — *"we did not look"*, never
     folded into `current`.
     """
-    cited = bundle.documents[0] if bundle.documents else None
-    return cited.verdict.label if cited is not None else "unverified"
+    return _freshness_by_doc(bundle).get(_winning_doc_id(bundle), "unverified")
+
+
+def _winning_doc_id(bundle) -> str:
+    """The document behind the top-scoring citation, or the first candidate."""
+    citations = bundle.assembled.citations
+    if citations:
+        return citations[0].doc_id
+    return bundle.documents[0].doc_id if bundle.documents else ""
+
+
+def _freshness_by_doc(bundle) -> dict[str, str]:
+    """`doc_id -> verdict label`, for every document the plane looked at."""
+    return {d.doc_id: d.verdict.label for d in bundle.documents}
 
 
 def _upgraded(block, bundle):
@@ -968,6 +1035,7 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
     """
     citations = bundle.assembled.citations
     freshness = _freshness_of(bundle)
+    by_doc = _freshness_by_doc(bundle)
     block = _upgraded(block, bundle)
 
     if as_json:
@@ -979,8 +1047,23 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
         # `_emit` here so the claim is true of every branch.
         payload = {
             "answer": {
+                # ⚠ **`id`/`loc`/`sha` per passage are ADDITIVE and W-108
+                # requires them.** Passages may now come from different
+                # documents, and a list of texts under a single top-level
+                # `citation` would attribute the second document's prose to the
+                # first — in the one product whose promise is that a citation is
+                # checkable. No key was removed or repurposed, which is W-48's
+                # actual rule; `citation` still names the winning passage's
+                # document and means exactly what it meant.
                 "passages": [
-                    {"heading": c.heading, "text": c.text, "score": c.score}
+                    {
+                        "id": c.doc_id,
+                        "loc": c.locator,
+                        "sha": c.sha,
+                        "heading": c.heading,
+                        "text": c.text,
+                        "score": c.score,
+                    }
                     for c in citations
                 ]
             },
@@ -997,12 +1080,18 @@ def _print_refer_answer(bundle, as_json: bool, block=None, extra=None, show_band
         _emit(_gated(payload, show_band), "answer_payload", band_requested=show_band)
         return
 
+    # ⚠ **One locator PER PASSAGE, not one for the answer** (W-108). This
+    # printed every passage above `citations[0]`'s locator, which was already
+    # wrong before the top-3 change — a second passage of the same document has
+    # its own line range, and the single trailing line named the first one's.
+    # With passages from three documents it would name the wrong *file*.
     for c in citations:
         if c.heading:
             print(f"# {c.heading}\n")
         print(c.text)
         print()
-    print(f"  -- {citations[0].locator} (sha {citations[0].sha[:12]}, {freshness})")
+        print(f"  -- {c.locator} (sha {c.sha[:12]}, {by_doc.get(c.doc_id, freshness)})")
+        print()
     _declare_provenance(extra)
     _declare_confidence(block, show_band)
 

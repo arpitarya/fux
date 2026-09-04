@@ -423,5 +423,8 @@ the relation *look* enforced while asserting things nobody checked.
 | `src/fux/doctor.py` | ADR-ACQUIRED | `_acquired_health` — blob count, total bytes, the 80%-of-cap warning, and the gitignore assertion that fails as an **error** rather than a warning |
 | `src/fux/mcp.py` | ADR-OUTPUT | decisions 11, 16 and 17 reach in directly: `[mcp]`'s closed key set (`top` only, `band` refused by name), `tools/list` advertising the RESOLVED `top` rather than a literal (the W-83-class defect this decision exists to prevent), and `[mcp]` being loaded once at `serve()` start rather than per search. Owned by ADR-MCP for the protocol itself; this is a rendering decision reaching into the module that serves it |
 
+| `src/fux/query/__init__.py` | ADR-ANSWER | `cmd_answer` and both printers live here — `ANSWER_TOP`, the refer/index fork, `_freshness_of`. ⚠ **Added 2026-09-05 because this record owned NOTHING and therefore could never be opened by the gate**: W-108 rewrote the `answer` verb and the freshness check demanded ADR-ASK, ADR-CONFIDENCE, ADR-OUTPUT, ADR-REFER and ADR-URL-FRESHNESS — every record except the one whose entire subject is the verb. Owned by ADR-ASK for the scan and unification |
+| `src/fux/query/refer_answer.py` | ADR-ANSWER | the seam between `cmd_answer` and `refer()` — the candidate list, and `_load_fetchers`' per-URL dispatch. Owned by ADR-ASK under its `src/fux/query/` claim |
+| `src/fux/refer/_rescore.py` | ADR-RERANK | `passage_boost` and the bounded multiplicative uplift reach in here (decision 9) — the same constant that reorders documents scores their passages. Owned by ADR-REFER under its `src/fux/refer/` claim |
 <!-- DESCRIBES-TABLE-END -->
 

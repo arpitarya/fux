@@ -491,6 +491,18 @@ decision 13). Noted here because it touches a file this record shares
 ownership of, not because the *shown/hidden* decision moved — `--band`'s
 own gating is untouched.
 
+⚠ **`answer.passages[]` gained `id`, `loc` and `sha` on 2026-09-05 (W-108),
+and the emission gate did not move.** `answer` now refers three documents, so a
+passage list can span them; each entry names its own document. `_show_band` and
+`_gated` are unchanged, `--band`'s resolution is unchanged, and `citation`
+still names the winning passage's document.
+
+**Additive keys only** — nothing removed, nothing repurposed — which is the
+rule [ADR-ASK](0004_ask.md) decision 11 states for this schema.
+`query/output.schema.json`'s `answer_payload` example and doc were updated in
+the same change, because a declaration that describes a shape the code no
+longer emits is worse than no declaration.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

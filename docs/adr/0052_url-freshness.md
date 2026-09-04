@@ -245,6 +245,23 @@ that can still be quoted, with an honest label on how much it is worth.
        300       86400         300   opted in, ttl=24h         -> capped at the policy
 ```
 
+⚠ **A per-document verdict is now the COMMON case on `answer`, not the edge
+(W-108, 2026-09-05).** `refer()` is called with three candidates instead of
+one, and `_obtain`'s two `as-ingested` fallback points and its `unverified`
+degradation now run **per candidate within a single answer**. One `url:`
+citation that cannot be fetched costs its own citation; the other two documents
+still answer. Nothing in this record's arithmetic changed — `min(policy,
+declared)` and the six labels are untouched — but the vocabulary is now used
+several times per answer, and a bundle can carry three different labels at once.
+
+🔴 **Consequence a caller must not get wrong:** `citation.freshness` in
+`--json` is the verdict for **the winning passage's** document. It was
+`documents[0]`'s until W-108, which was the same object while there was one
+candidate and is routinely a *different* one now. Reporting candidate one's
+`current` beside candidate two's passage would be exactly the collapse these
+six labels exist to prevent, and `query/__init__.py::_freshness_of` is where it
+is prevented.
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

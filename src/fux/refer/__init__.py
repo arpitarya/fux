@@ -146,6 +146,7 @@ def refer(
     per_doc_fraction: float = PER_DOC_FRACTION,
     min_passage_bytes: int = MIN_PASSAGE_BYTES,
     max_passage_bytes: int = MAX_PASSAGE_BYTES,
+    rerank_weight: float = 0.0,
     k: int | None = None,
     cache: arc_mod.ARC | None = None,
     fetcher=None,
@@ -163,6 +164,14 @@ def refer(
     is** — they move the passage boundaries and the byte budget, which is
     downstream of every fetch and every verdict. That is what keeps them
     tunables rather than a way to configure the freshness record.
+
+    `rerank_weight` is the **fifth** value with that property and the only one
+    that is not a `[refer]` key: it is `[ranking] rerank_weight`, reaching
+    `rescore` so a passage is scored by the same proximity arithmetic that
+    ranked its document (W-108). It defaults to `0.0` — **off** — rather than
+    to `rerank.WEIGHT`, so a caller that has said nothing gets the bundle this
+    function produced before the parameter existed. `refer()` may not switch on
+    a knob that `ask` has switched off; only the caller's `Tune` decides.
     """
     policy = policy or Policy()
     decision = freshness_mod.decide(policy)
@@ -199,7 +208,7 @@ def refer(
 
     _mark_changed_urls_dirty(root, documents)
 
-    scored: list[ScoredPassage] = rescore(query, fetched)
+    scored: list[ScoredPassage] = rescore(query, fetched, weight=rerank_weight)
     assembled = assemble(
         scored, budget=budget, k=k, source="fetched", per_doc_fraction=per_doc_fraction
     )

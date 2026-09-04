@@ -427,6 +427,29 @@ covered — found 2026-08-27; `doc_coverage` added 2026-08-28, NOT gating.**
 - ⚠ **No test pins the current behaviour**, deliberately. Pinning a defect is how
   it becomes the contract.
 
+**14. `answer`'s block is computed over THREE results, and `separation` stops
+being a constant.** `_fill_confidence` builds the block from the final result
+list; `signals()` returns `separation = 1.0` when there is exactly one score,
+on the honest ground that *one result separates perfectly — there is no
+runner-up to be confused with*.
+
+🔴 **`cmd_answer` retrieved exactly one result, so `fux answer --band`
+reported `separation: 1.0` and `support: 1` on EVERY query it had ever
+answered.** That was never a claim about the ranking; it was an artefact of the
+retrieval width, and it read as the strongest possible separation signal.
+
+**Since W-108 `answer` retrieves `ANSWER_TOP` = 3, the number is real, and it
+demotes.** On the 43 graded playground queries **8 answers moved `grounded` ->
+`weak`** ([the run](../../work/regression/2026-09-05-answer-top3/report.md)).
+
+⚠ **Nothing was traded to get that.** No floor moved — `separation_floor` is a
+`tune.toml` key and decision 13 is untouched. No abstention was implemented;
+the band is still reported and gates nothing (that call is Arpit's, and open).
+`ask` is unaffected: it always retrieved `--top` results and always computed a
+real separation. **What changed is that one verb stopped reporting a number
+that could only ever have been `1.0`.**
+
+
 ### Decision 12's outcome — the signal ships, the gate does not
 
 **Ruled in two steps, and the second step reversed the first — which is the

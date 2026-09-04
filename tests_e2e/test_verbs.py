@@ -170,6 +170,45 @@ def test_answer_fetches_and_re_scores_by_default(tmp_path):
     assert "sha " in human and "current" in human
 
 
+def test_answer_cites_across_documents_and_names_each_one(tmp_path):
+    """W-108, through the shipped CLI.
+
+    `answer` refers the top 3, so `answer.passages` can span documents — and
+    every entry names its own `id`, `loc` and `sha`. **Before W-108 the text
+    surface printed one trailing locator for the whole answer**, which named
+    the first passage's line range whatever the second passage was; with three
+    documents it would name the wrong file. Each passage now prints under its
+    own locator.
+
+    `citation` is unchanged: the winning passage's document, and the only key a
+    caller that wants one answer needs to read.
+    """
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    # A query whose terms are spread across two of the three fixture documents.
+    payload = json.loads(
+        _run(tmp_path, "answer", "pruning gate index format postings", "--json").stdout
+    )
+    assert payload["source"] == "refer"
+    passages = payload["answer"]["passages"]
+    assert len(passages) >= 2
+    for p in passages:
+        assert p["id"].startswith("file:")
+        assert p["loc"].endswith(tuple(str(n) for n in range(10)))  # ends in a line number
+        assert p["sha"]
+    assert {p["id"] for p in passages} > {payload["citation"]["id"]}, (
+        "the fixture query must reach more than one document, or this asserts nothing"
+    )
+    assert payload["citation"]["id"] == passages[0]["id"]
+
+    human = _run(tmp_path, "answer", "pruning gate index format postings").stdout
+    # One locator line per passage, not one for the answer.
+    assert human.count("  -- ") == len(passages)
+    for p in passages:
+        assert f"  -- {p['loc']} (sha {p['sha'][:12]}" in human
+
+
 def test_answer_sha_changes_when_the_source_file_changes(tmp_path):
     """PRIORITY.md P6's literal done-when: a passage + a sha that changes when
     the source changes — proving refer re-fetches rather than echoing the

@@ -27,10 +27,47 @@ valuable judgement, but not the state of play.
 
 ## 1 · State of play
 
-*Updated **2026-09-02**.* **Ground it before you edit it** — `git log`, `git tag`,
+*Updated **2026-09-05**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### Nothing is blocked. `2.0.0-alpha.5` is cut (2026-09-01)
+### Search v3 is RATIFIED and building. W-108 has landed (2026-09-05)
+
+**Arpit ratified all seven search-v3 items on 2026-09-05**; every row is `agent`
+and the execution order is his: **W-108** → **W-107 Phase 0** + **W-106** (two
+measurements, no product code) → **W-107 Phases 1–4** → **W-109** → **W-110** →
+**W-111** → **W-112** (only on a W-106 PASS *and* his ruling on the compare doc
+it requires).
+
+**W-108 is done and measured** — `fux answer` refers the top 3.
+[13 fixed / 0 broken](regression/2026-09-05-answer-top3/report.md) on the 43
+graded queries, answer recall `0.4341 → 0.8256`, `ask` byte-identical. **Read
+the three costs before you touch this verb**: +157 % assembled bytes on 43/43,
+8/43 bands demoted `grounded → weak`, and the cited document differs from
+`ask`'s first result on 18/43. All three are in
+[ADR-ANSWER](../docs/adr/0006_answer.md) decisions 11–13.
+
+⚠ **Two things a next session must not re-derive as a surprise:**
+
+1. **W-107 Phase 0's `log()` choice was left unstruck in the ratification** and
+   was **not defaulted**. It is in `Blocked on Arpit`. It does **not** block
+   Phase 0 — the item's own order is *measure → pre-register → pick*, and the
+   discordant count is what he picks from.
+2. 🔴 **`fux-playground` is empty.** `.fux/index/`, `.fux/sources/dirs`'
+   directory entries and `.fux/enrich/` are all gone (W-87 Part B, blocked since
+   2026-08-27). **No session can reproduce
+   [`2026-08-28-first-recall`](regression/2026-08-28-first-recall/report.md)'s
+   absolute numbers.** W-108's run worked around it by re-deriving the corpus in
+   throwaway copies, which is legitimate for a *paired* comparison and worthless
+   for an absolute one. The next absolute number is **blocked**, not
+   inconvenienced.
+
+⚠ **`ADR-ANSWER` owned no component until 2026-09-05.** W-108 rewrote the
+`answer` verb and the freshness gate demanded ADR-ASK, ADR-CONFIDENCE,
+ADR-OUTPUT, ADR-REFER and ADR-URL-FRESHNESS — every record except the one whose
+entire subject is the verb. Fixed with three `describes` rows. **If you are
+about to trust the gate to open the right record, check the table first.**
+
+### Before that: nothing was blocked, `2.0.0-alpha.5` was cut (2026-09-01)
 
 **`work/BLOCKED.json` reads `PROCEED`.** It had read `RESOLVED` — not a value
 in the schema — so every prompt announced an open blocker for a decision Arpit

@@ -57,12 +57,12 @@ first output.*
 - 🟠 **Search v3 — seven items, RATIFIED by Arpit 2026-09-05; all seven now
   `agent`** · *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 ·
   one detail file each under [`open/`](open/README.md))* · **Opus** executes,
-  in his stated order: **W-108** → **W-107 Phase 0** + **W-106** (two
-  measurements, no product code) → **W-107 Phases 1–4** → **W-109** →
-  **W-110** → **W-111** → **W-112**. ⚠ **One decision in the ratification was
+  in his stated order: ~~W-108~~ (**landed 2026-09-05** —
+  [IMPLEMENTATION](IMPLEMENTATION.md), [the run](regression/2026-09-05-answer-top3/report.md)) →
+  **W-107 Phase 0** + **W-106** (two measurements, no product code) →
+  **W-107 Phases 1–4** → **W-109** → **W-110** → **W-111** → **W-112**. ⚠ **One decision in the ratification was
   left unstruck — W-107 Phase 0's `log()` choice — and is in the inbox above
   rather than defaulted here.** `filed: 2026-09-04` · `ratified: 2026-09-05`
-  - **[W-108](open/W-108-answer-top3.md)** · `agent` · *(ADR-ANSWER · ADR-REFER · ADR-RERANK)* · `answer` refers the top-3 and the passage rescore sees proximity — `cmd_answer` runs `run_query(…, 1)`, so `answer` inherits `recall@1 = 0.60` against `0.95` at k=5 by construction. Smallest, highest value; no fork.
   - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · the vector gate: a contextual, int8, locally-run embedder + RRF against DENSE-CHUNK's frozen `>= 3 / 0`, **judged on the vocabulary-gap failures** (dense bi-encoders fail negation too — NevIR 7–11 %). Scratch only; FAIL closes W-112 with evidence.
   - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0 is Arpit's `log()` decision**: V8 and glibc disagree in the last ulp on ~1 % of inputs, so byte identity needs one portable `log` in both runtimes (a Python-wide ranking change) or the arm compares at `round(9)`.
   - **[W-109](open/W-109-expand-and-multiquery.md)** · `agent` · *(**ADR-EXPAND** new · ADR-ASK · ADR-TUNE · ADR-MCP)* · `--expand` (agent-written expansion at `expand_weight`) and `-q` multi-query RRF — 18/18 surviving failures are vocabulary gaps; Query2doc +3–15 % BM25. RRF's revival gets the new record W-79 said it would need.

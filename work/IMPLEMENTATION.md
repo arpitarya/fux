@@ -21,6 +21,26 @@ Rules:
 
 ---
 
+## W-108 — `answer` refers the top 3, and the passage rescore sees proximity (2026-09-05)
+
+**Search v3's first item, ratified by Arpit 2026-09-05.** The verb's recall
+ceiling was arithmetic, not ranking: `cmd_answer` ran `run_query(…, 1)`.
+
+| what landed | evidence |
+|---|---|
+| `ANSWER_TOP = 3`; `cmd_answer` and `cmd_verify --rerun` retrieve it; `answer_via_refer` takes the candidate list; **one** `refer()` call, so the passage contest stays cross-document | [ADR-ANSWER](../docs/adr/0006_answer.md) 4/5/11 · [`2026-09-05-answer-top3`](regression/2026-09-05-answer-top3/report.md) |
+| `_load_fetchers` — a **URL-keyed dispatcher**, so three citations behind three `.fux/sources/urls` lines each reach the fetcher their own line names; modules memoised, connected once, closed once; a load/connect failure costs its own documents only | [ADR-REFER](../docs/adr/0030_refer-plane.md) 22 · [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) |
+| `rescore(…, weight=)` — the reranker's `passage_boost` and its bounded multiplicative uplift, **one constant**, threaded from `[ranking] rerank_weight`. **Ships OFF** (`0.0`), byte-identical to before | [ADR-RERANK](../docs/adr/0041_rerank.md) 9 · [ADR-REFER](../docs/adr/0030_refer-plane.md) 21 |
+| per-passage `id`/`loc`/`sha` in `--json` and a locator line per passage in text — fixing a mis-citation that predated the change | [ADR-ANSWER](../docs/adr/0006_answer.md) 12 · [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) |
+| `_freshness_of` follows the **winning** citation's document; `_declare_change_since_last_ask` reports the **cited** set, not everything fetched | [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) |
+| `ADR-ANSWER` gains its FIRST component rows (`describes`) — it owned nothing, so Law zero's gate could never open it | [`docs/adr/README.md`](../docs/adr/README.md) §Describes |
+
+**Outcome: 13 fixed / 0 broken** on the 43 graded queries; answer recall
+`0.4341 -> 0.8256`; `ask` byte-identical. **Three costs, all measured and none
+hidden:** +157 % assembled bytes (43/43), 8/43 `grounded -> weak` bands, and the
+cited document differs from `ask`'s first on 18/43. `informed`; nothing claimed
+at 10 000.
+
 ## W-102 / W-103 / W-104 / W-105 — the enrichment leak, the lock record, the one-target selector, and cdp under concurrency (2026-09-02)
 
 **Written on 2026-09-01 in a session whose shell was wedged from its first
