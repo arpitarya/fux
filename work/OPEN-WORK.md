@@ -13,21 +13,24 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit
 
-*Named here so a session leads with it instead of burying it. **The oldest is
-5 days — at CLAUDE.md's threshold, not past it** — so nothing is age-flagged
-today. A session that finds one that IS names it, with its age, in its first
-output.*
+*Named here so a session leads with it instead of burying it. **Ages are
+recomputed against the reading date, never copied** — they were written on
+2026-09-01 and read as `0d`/`4d`/`5d` until 2026-09-05, which is how a queue
+stops flagging its own oldest item. As of **2026-09-05 six rows are past
+CLAUDE.md's 5-day threshold** and a session names each, with its age, in its
+first output.*
 
 | what he decides | filed | age |
 |---|---|---|
-| **The ETag acceptance criterion, re-worded or accepted.** *"`fux update` with a matching ETag performs no body download"* is **unmet as written** — CDP interception is at the **response** stage, so Chrome has already transferred the body; `validate()` saves the decode and the shard comparison, **not bandwidth**. Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12 rather than quietly satisfied | 2026-09-01 | 0d |
-| **Whether the W-83 shape gets a gate.** A key was accepted in a record, assigned in the ownership table, and **never implemented** — every mechanical check passed, because the freshness gate proves a record was *touched*, never that it is *true*. That is the **second** recorded occurrence, which is what CLAUDE.md's two-strikes rule makes a trigger. ⚠ **No check was written**: "the record is true" is not mechanically definable, and shipping a loose approximation is the moving-threshold failure in another costume | 2026-09-01 | 0d |
-| **`superseded_weight`** — W-94 below. Doing nothing is legitimate | 2026-08-28 | 4d |
-| **`rerank_weight`** — the no-op pattern, under *adr update*. Doing nothing is legitimate | 2026-08-28 | 4d |
-| **Whether zero abstentions out of 20 gates anything** — under *adr update* | 2026-08-28 | 4d |
-| **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 4d |
-| **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 4d |
-| **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 5d |
+| **The ETag acceptance criterion, re-worded or accepted.** *"`fux update` with a matching ETag performs no body download"* is **unmet as written** — CDP interception is at the **response** stage, so Chrome has already transferred the body; `validate()` saves the decode and the shard comparison, **not bandwidth**. Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12 rather than quietly satisfied | 2026-09-01 | 4d |
+| **Whether the W-83 shape gets a gate.** A key was accepted in a record, assigned in the ownership table, and **never implemented** — every mechanical check passed, because the freshness gate proves a record was *touched*, never that it is *true*. That is the **second** recorded occurrence, which is what CLAUDE.md's two-strikes rule makes a trigger. ⚠ **No check was written**: "the record is true" is not mechanically definable, and shipping a loose approximation is the moving-threshold failure in another costume | 2026-09-01 | 4d |
+| **W-107 Phase 0 — `log()`: one portable `log` in both runtimes, or the Node arm compares at `round(9)`.** Option (a) changes Python's ranking arithmetic and re-runs every golden; option (b) does not, and buys tolerance instead of identity. **Ratification named this a decision and left it unstruck**, so nothing was defaulted. It does **not** block W-107 Phase 0's measurement — the item's own order is measure → pre-register → pick — and the discordant count is what he picks from | 2026-09-05 | 0d |
+| **`superseded_weight`** — W-94 below. Doing nothing is legitimate | 2026-08-28 | 8d |
+| **`rerank_weight`** — the no-op pattern, under *adr update*. Doing nothing is legitimate | 2026-08-28 | 8d |
+| **Whether zero abstentions out of 20 gates anything** — under *adr update* | 2026-08-28 | 8d |
+| **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 8d |
+| **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 8d |
+| **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 9d |
 
 ---
 
@@ -50,6 +53,22 @@ output.*
 ## Open items
 
 ### fux build
+
+- 🟠 **Search v3 — seven items, RATIFIED by Arpit 2026-09-05; all seven now
+  `agent`** · *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 ·
+  one detail file each under [`open/`](open/README.md))* · **Opus** executes,
+  in his stated order: **W-108** → **W-107 Phase 0** + **W-106** (two
+  measurements, no product code) → **W-107 Phases 1–4** → **W-109** →
+  **W-110** → **W-111** → **W-112**. ⚠ **One decision in the ratification was
+  left unstruck — W-107 Phase 0's `log()` choice — and is in the inbox above
+  rather than defaulted here.** `filed: 2026-09-04` · `ratified: 2026-09-05`
+  - **[W-108](open/W-108-answer-top3.md)** · `agent` · *(ADR-ANSWER · ADR-REFER · ADR-RERANK)* · `answer` refers the top-3 and the passage rescore sees proximity — `cmd_answer` runs `run_query(…, 1)`, so `answer` inherits `recall@1 = 0.60` against `0.95` at k=5 by construction. Smallest, highest value; no fork.
+  - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · the vector gate: a contextual, int8, locally-run embedder + RRF against DENSE-CHUNK's frozen `>= 3 / 0`, **judged on the vocabulary-gap failures** (dense bi-encoders fail negation too — NevIR 7–11 %). Scratch only; FAIL closes W-112 with evidence.
+  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0 is Arpit's `log()` decision**: V8 and glibc disagree in the last ulp on ~1 % of inputs, so byte identity needs one portable `log` in both runtimes (a Python-wide ranking change) or the arm compares at `round(9)`.
+  - **[W-109](open/W-109-expand-and-multiquery.md)** · `agent` · *(**ADR-EXPAND** new · ADR-ASK · ADR-TUNE · ADR-MCP)* · `--expand` (agent-written expansion at `expand_weight`) and `-q` multi-query RRF — 18/18 surviving failures are vocabulary gaps; Query2doc +3–15 % BM25. RRF's revival gets the new record W-79 said it would need.
+  - **[W-110](open/W-110-doc2query-enrich.md)** · `agent` · *(ADR-ENRICH · ADR-INGEST)* · `fux-enrich` writes questions (doc2query), currency in frontmatter, and `--check` refuses a question the index cannot retrieve its document with (doc2query−−). Blind enrichment measured +1 / −1 as prose.
+  - **[W-111](open/W-111-ask-find-ergonomics.md)** · `agent` · *(ADR-RANKING · ADR-ASK · ADR-FIND · ADR-CLI · ADR-MCP · ADR-OUTPUT)* · declared tie-breaks + `tie: true` (4.38 % of top-5 are docidx ties) · `find --phrase/--under/--all` · the retry rule in `fux_search` and `fux-usage`.
+  - **[W-112](open/W-112-vector-plane.md)** · `agent` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. **Blocked on W-106 PASS and W-109.**
 
 - 🔴 **W-94** · `arpit` · *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) ·
   [ADR-TUNE](../docs/adr/0038_tuning.md))* · **`superseded_weight` ships at
