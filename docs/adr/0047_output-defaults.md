@@ -512,6 +512,17 @@ comparable. Absent means *one question*, never *unknown*.
 The emission gate is untouched — `_show_band`/`_gated` are unchanged and
 `--band`'s resolution is unchanged.
 
+⚠ **`ask`/`find --json` gained `tie` on 2026-09-05** (W-111), declared
+`required: always` in `output.schema.json` — `false` is a claim a caller needs
+(*this ordering was earned*), and an absent key is indistinguishable from an
+older fux.
+
+⚠ **`find`'s `--phrase`/`--under`/`--all` are NOT gated flags and take no
+`.fux/output.toml` key**, which is deliberate rather than an omission: a filter
+that applied itself from a committed file would make `fux find` return a
+different set of paths in two clones of the same repo. The `[filter]` note they
+print goes to **stderr**, so stdout stays a bare path list a pipe can read.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

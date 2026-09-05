@@ -1,0 +1,6 @@
+queries: 3164   tops: [1, 5, 20, 50]   modes: off, on
+comparisons: 101248
+scan:    21604.5 ms total
+accel:   18871.8 ms total
+
+DIFFERENTIAL GREEN — 101248 comparisons, byte-identical in every mode

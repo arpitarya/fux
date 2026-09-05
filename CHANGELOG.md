@@ -10,6 +10,42 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **The tie-break is DECLARED, and ties are marked** (W-111). Where two
+  documents' rounded scores are equal the order is now
+  `superseded -> recency -> priority -> id` — Arpit's ratified order — instead
+  of a document's name alone. `ask`/`find --json` carry `tie: true|false` on
+  every row and text `ask` prints `(tie)` after the score.
+  - 🔴 **This turns no ranking prior on.** Every signal is already a
+    `Weighting` multiplier shipping as a no-op; the key reads the same *facts*
+    and reads them **only among equals**. No score moves and no document passes
+    one that outscores it. `superseded_weight` stays Arpit's open call.
+  - **`tie` is computed before truncation**, so the last row of a `--top 5` is
+    marked even when the document it ties with is off the page — that row is
+    the one most likely to have been a coin-toss.
+  - ⚠ **`-priority` in the ratified order is unreachable**, and the code says
+    so rather than implying otherwise: `[priority]` has no fact beside its
+    weight — `priority_for` *is* the weight — so different priorities already
+    produce different scores. The slot is kept and pinned by a test that fails
+    if that ever changes.
+  - ⚠ **Measured effect on the corpora available here: zero.** 0 of 2 450
+    top-5 rows tie on the playground, 3 of 1 200 at 10 000 documents, and **no
+    query's order differs from the old key** — because neither corpus carries
+    the signals where a tie lands
+    ([the run](work/regression/2026-09-05-declared-ties/report.md)).
+
+- **`find --phrase "…"`, `find --under <prefix>`, `find --all`** — precision
+  controls for a pipe. Each **removes** results the ranking already produced
+  and retrieves nothing; raising `--top` is what widens the pool.
+  - `--phrase` uses the index's own analyzer, so stopwords are dropped:
+    `--phrase "roll back"` matches *"roll the back"*.
+  - ⚠ **A `url:` document is kept by `--phrase`, never dropped** — offline
+    there is no text to test, and dropping it would report *"this page does not
+    contain the phrase"* on the strength of not having looked.
+  - ⚠ **`band` describes the UNFILTERED ranking**, and a `[filter]` line on
+    **stderr** says so whenever a filter removed anything. stdout stays a bare
+    path list.
+
+
 - **Enrichment is now QUESTIONS, not prose** (W-110). The `fux-enrich` skill
   asks for five to ten questions a searcher would type before they knew the
   document existed — one per line, no summary — because prose was measured at

@@ -170,6 +170,49 @@ def test_answer_fetches_and_re_scores_by_default(tmp_path):
     assert "sha " in human and "current" in human
 
 
+def test_find_precision_controls(tmp_path):
+    """W-111, through the shipped CLI. Each flag REMOVES results the ranking
+    already produced, and says on **stderr** how many — stdout stays a bare
+    path list a pipe can read."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    plain = _run(tmp_path, "find", "pruning index format").stdout.split()
+    assert len(plain) >= 2, "precondition: the query must reach more than one document"
+
+    under = _run(tmp_path, "find", "pruning index format", "--under", "docs/pru")
+    assert under.stdout.split() == ["docs/pruning.md"]
+    assert "[filter] --under removed" in under.stderr
+
+    # `--all` demands every query term; only one fixture document has both.
+    every = _run(tmp_path, "find", "pruning recall", "--all")
+    assert every.stdout.split() == ["docs/pruning.md"]
+
+    # The phrase is in `pruning.md` verbatim and nowhere else.
+    phrase = _run(tmp_path, "find", "static pruning candidate", "--phrase", "static pruning")
+    assert phrase.stdout.split() == ["docs/pruning.md"]
+
+    # Nothing on stdout but paths, under every filter.
+    for out in (under.stdout, every.stdout, phrase.stdout):
+        assert all(line.endswith(".md") for line in out.split())
+
+
+def test_ask_marks_a_tie_and_json_always_carries_the_flag(tmp_path):
+    """W-111. `tie` is `required: always`: `false` is a claim a caller needs,
+    and an absent key is indistinguishable from an older fux."""
+    _write_fixture(tmp_path)
+    _run(tmp_path, "ingest")
+
+    payload = json.loads(_run(tmp_path, "ask", "why did pruning fail", "--json").stdout)
+    assert payload["results"], "precondition: the query must return something"
+    for r in payload["results"]:
+        assert isinstance(r["tie"], bool), "`tie` must be present on every row"
+
+    human = _run(tmp_path, "ask", "why did pruning fail").stdout
+    for line, r in zip([l for l in human.splitlines() if l and not l.startswith(" ")], payload["results"]):
+        assert ("(tie)" in line) is r["tie"], "the text marker and the JSON flag must agree"
+
+
 def test_answer_cites_across_documents_and_names_each_one(tmp_path):
     """W-108, through the shipped CLI.
 

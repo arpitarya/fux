@@ -46,6 +46,8 @@ first output.*
   from 2026-08-29 will hit the gate with nothing to give it.** One emitter to
   fix, not a rule. `filed: 2026-08-28`
 
+- 🔴 **A corpus copied out of its git repository silently loses the ENTIRE recency prior, and nothing reports it.** `mtime` comes from `git_commit_times`, which walks git; `fux-benchmark`'s `t10000` is a plain directory, so **all 10 000 of its documents have no `mtime` at all** — measured 2026-09-05 while checking W-111's tie-break. `fux doctor` does not check it and no run has ever declared it. **Every measurement that touches recency on a non-git corpus is measuring the prior switched off**, including any future `recency_half_life_days` sweep under W-97. A one-line check in `doctor` would close it; filed rather than built, because it is a `doctor` change and W-101 already owns that file. `filed: 2026-09-05`
+
 - ⚠ **The per-query-rows gate checks for a `.jsonl`, not for rows.** `tests/test_regression_runs.py::test_measured_run_files_its_per_query_rows` passes on **any** `.jsonl` under `evidence/` — [`2026-09-05-answer-top3`](regression/2026-09-05-answer-top3/report.md) satisfied it on a *copy of the goldens file* before its real rows were written. **This is the W-83 shape again**: a check that proves a file exists, never that it is the right file. Recorded rather than patched — a looser or cleverer check (is it one row per query? per arm?) cannot be written without knowing each run's arm structure, and shipping an approximation is the moving-threshold failure in another costume. **Whether this is a second strike is Arpit's call, alongside the W-83 gate question already in the inbox.** `filed: 2026-09-05`
 
 - ⚠ **No run filed before 2026-08-28 has per-query rows**, so no paired result
@@ -70,13 +72,14 @@ first output.*
   **W-107 Phases 1–4** → ~~W-109~~ (**landed 2026-09-05, gate 16-0** —
   [the run](regression/2026-09-05-expand/report.md)) → ~~W-110~~ (**built
   2026-09-05; its gate is AMBIGUOUS and in the inbox above** —
-  [the run](regression/2026-09-05-doc2query/report.md)) → **W-111** →
-  **W-112**. ⚠ **One decision in the ratification was
+  [the run](regression/2026-09-05-doc2query/report.md)) → ~~W-111~~ (**landed
+  2026-09-05** — [the run](regression/2026-09-05-declared-ties/report.md)) →
+  **W-112**. 🔴 **Every remaining search-v3 item is on Arpit**: W-107 Phases 1–4
+  wait on the `log()` pick, W-112 on a corpus and a compare doc. ⚠ **One decision in the ratification was
   left unstruck — W-107 Phase 0's `log()` choice — and is in the inbox above
   rather than defaulted here.** `filed: 2026-09-04` · `ratified: 2026-09-05`
   - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **MEASURED 2026-09-05, and NO VERDICT FILED** ([the run](regression/2026-09-05-vector-gate/report.md)) — Arpit's ruling, because **DENSE-CHUNK's frozen bar cannot be tested**: the playground's committed index is `fux.index.v1` (unreadable by this engine) and its enrichment was **never committed**, so *today's ask* is **28/50** against that control's **32/50**. Retrieval: both correctly-configured arms net **zero** (6/6 and 5/5 fixed/broken) and each moves **1 of 9** vocabulary-gap failures. 🔴 **The finding is reproducibility**: two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, 41/50 top-5 orderings discordant. ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only here) and a corpus.
   - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0's measurement is DONE and filed** ([the run](regression/2026-09-05-node-log-divergence/report.md)); the pre-registration [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is written with **one cell blank** — Arpit's `log()` pick, in the inbox above with the number beside it. **Phases 1–4 are blocked on that one word**, and on nothing else.
-  - **[W-111](open/W-111-ask-find-ergonomics.md)** · `agent` · *(ADR-RANKING · ADR-ASK · ADR-FIND · ADR-CLI · ADR-MCP · ADR-OUTPUT)* · declared tie-breaks + `tie: true` (4.38 % of top-5 are docidx ties) · `find --phrase/--under/--all` · the retry rule in `fux_search` and `fux-usage`.
   - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **STILL BLOCKED, and the blocker changed shape.** W-106 produced no PASS to unblock it, and it produced something the plane's design has to answer: **a pinned committed vector is an artefact of one implementation** — two correct implementations of one model share **0 of 125** int8 vectors ([the run](regression/2026-09-05-vector-gate/report.md)). The determinism claim can only ever be *"same clone + same embedder build"*, never *"same model"*. **Blocked on: a restored corpus (W-87 Part B), a re-run gate, and the compare doc Arpit must rule on.**
 
 - 🔴 **W-94** · `arpit` · *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) ·

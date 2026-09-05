@@ -50,6 +50,8 @@
       "id":       { "type": "str",  "required": "always", "doc": "the committed record's id" },
       "title":    { "type": "str",  "required": "always", "doc": "display title, or a labelled hash under L5" },
       "loc":      { "type": "str",  "required": "always", "doc": "path or URL -- no line range" },
+      "tie":      { "type": "bool", "required": "always",
+                    "doc": "W-111. This result's rounded score EQUALS another candidate's, so its position was decided by the declared tie-break (superseded -> recency -> priority -> id) rather than by the ranking. Computed over the FULL sorted list before truncation, so the last row of a `--top 5` is marked even when the document it ties with is off the page. `false` is a claim, not an absence" },
       "score":    { "type": "any",  "required": "always", "doc": "float; the one place a float is legal, because this is output and not a committed byte" },
       "archived": { "type": "bool", "required": "always", "doc": "BRANCH ON THIS, never on the prose note" },
       "headings": { "type": "any",  "required": "sections_requested",
@@ -59,6 +61,7 @@
       "id": "file:docs/mesh.md",
       "title": "Service mesh",
       "loc": "docs/mesh.md",
+      "tie": false,
       "score": 5.9021,
       "archived": false,
       "headings": ["Rollback procedure"]

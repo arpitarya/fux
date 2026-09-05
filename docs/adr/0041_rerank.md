@@ -207,6 +207,22 @@ to the one that shipped before it
 **Turning it on is Arpit's open call on `rerank_weight`, and it now moves two
 things rather than one** — that is the fact this decision exists to record.
 
+⚠ **`phrase_present` is a second, smaller caller of `_adjacency_signal`
+(W-111, 2026-09-05)** — `find --phrase` keeps a document when **every**
+consecutive pair of the phrase occurs adjacently and in order, i.e. the signal
+is exactly `1.0`.
+
+**Reused rather than reimplemented**, for `refer/_rescore.py`'s reason applied
+to a smaller object: a phrase filter with its own notion of adjacency is a
+second definition that will disagree with this one. A single-term phrase has no
+bigram and degrades to *is the term present*, because `--phrase "rollback"`
+returning nothing would be a surprising answer to a reasonable request.
+
+⚠ **A `url:` document is kept, not dropped** — decision 8's rule, applied to a
+filter rather than to a score: offline there is no text to test, and dropping
+it would report *"this page does not contain the phrase"* on the strength of
+not having looked.
+
 ### Consequences — the measurement
 
 50 goldens, graded on rank. **The reranker was measured before the goldens

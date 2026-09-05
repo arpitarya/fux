@@ -30,7 +30,43 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-05**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
-### Search v3 is RATIFIED and building. W-108 has landed (2026-09-05)
+### Search v3: FIVE items done in one day; everything left is on Arpit (2026-09-05)
+
+**Ratified 2026-09-05 and worked in his stated order.** What landed:
+
+| item | outcome |
+|---|---|
+| **W-108** | `answer` refers the top 3 — **13 fixed / 0 broken**, recall `0.4341 → 0.8256` |
+| **W-107 Phase 0** | `log()` measured — one ulp, **never** at `round(9)`; the pre-registration is written with **one cell blank** |
+| **W-106** | the vector gate — measured, **no verdict** (his ruling); the finding is *reproducibility*, not retrieval |
+| **W-109** | `--expand` + `-q` RRF — gate **16 fixed / 0 broken** |
+| **W-110** | doc2query enrichment — gate **AMBIGUOUS**, handed over |
+| **W-111** | the declared tie-break + `find` filters — correct, differential-green, **unexercised by either corpus** |
+
+🔴 **Nothing on the agent lane is left in search v3.** W-107 Phases 1–4 wait on
+the `log()` pick; W-112 waits on a corpus and a compare doc; W-110's gate waits
+on which `k`. **All three are in `Blocked on Arpit`.**
+
+### 🔴 Three defects were found by tests written for something else
+
+Worth knowing as a pattern, because all three **presented as working
+features**:
+
+1. **`answer`'s `--band` reported `separation: 1.0` on every query it had ever
+   answered** — an artefact of retrieving one result, not a claim about the
+   ranking (W-108).
+2. **A newly written enrichment was never indexed on an incremental ingest**
+   (W-110), from W-76 Phase 8 until now. `--check` said `ok`, the file was
+   committed, and no index byte moved. **Every prior enrichment measurement ran
+   through it.**
+3. **A candidate `rank()` drops was setting the accelerator's `theta`**
+   (W-109), so `--fast` and `--scan` disagreed at every `expand_weight >= 0.5`.
+
+⚠ **And one that is not fixed:** a corpus copied out of its git repository
+**loses the entire recency prior** — `t10000`'s 10 000 documents have no
+`mtime` at all. Nothing reports it; `fux doctor` does not check it.
+
+### Before that: search v3 was ratified and W-108 landed (2026-09-05)
 
 **Arpit ratified all seven search-v3 items on 2026-09-05**; every row is `agent`
 and the execution order is his: **W-108** → **W-107 Phase 0** + **W-106** (two

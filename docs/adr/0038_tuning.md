@@ -545,6 +545,23 @@ like every other key.
 every other key here weights something fux computed. `0` is the off-switch a
 consumer needs when they distrust the agent writing the expansions.
 
+⚠ **`[priority]` is read by the tie-break as well as by the score since
+2026-09-05** (W-111, [ADR-RANKING](0012_ranking.md)) — and **the tie-break
+slot is unreachable**, which is worth recording here because this is the record
+that owns the key's semantics.
+
+`Weighting.priority_for` **is** the weight: `Weighting.of` multiplies the score
+by it, so two documents with different priorities have different scores and
+never reach a tie-break, and two with the same priority are not separated by
+one. Unlike `superseded` and `mtime`, `[priority]` has **no fact beside its
+weight** — which is exactly why the other two can break a tie at their shipped
+no-op defaults and this cannot.
+
+The slot is kept because it is what Arpit ratified and it costs nothing. **If
+`[priority]` ever becomes a declaration that does not multiply, it becomes
+reachable** — and `tests/query/test_ties_and_filters.py` fails that day, on
+purpose.
+
 ### Consequences
 
 - **The constants become decisions with a provenance**, in a file a reviewer can

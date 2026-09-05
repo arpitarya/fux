@@ -331,6 +331,59 @@ skipped, so an unexpanded query does exactly the float arithmetic it did before
 the parameter existed and the differential law cannot pick up a last-bit
 difference from a feature nobody used.
 
+🔴 **The tie-break is DECLARED since 2026-09-05 (W-111), in Arpit's ratified
+order:**
+
+```
+(-round(score, 9),  superseded,  -mtime,  -priority,  id)
+```
+
+**`superseded` -> recency -> priority -> `id`.** `id` stays as the final,
+total tie-break so the order remains total and machine-independent.
+
+**What it replaces.** `id` alone — measured at
+[**4.38 % of top-5 orderings decided by a document's name**](../../work/regression/2026-08-25-rank-flip-susceptibility/ANALYSIS.md).
+That was deterministic and meaningless: *the same arbitrary answer everywhere*.
+Determinism was never the problem, and a **stated** answer costs exactly the
+same as an arbitrary one.
+
+🔴 **This turns no ranking prior on, and W-94 is untouched.** Every signal here
+is already a `Weighting` multiplier and every one of them ships as a no-op
+(`superseded_weight = 1.0`, `recency_half_life_days = 0.0`, empty
+`[priority]`). The key reads the same **facts** those weights read, and reads
+them **only where the rounded scores are equal**. No score moves; no document
+passes one that outscores it
+(`tests/query/test_ties_and_filters.py::test_the_tie_break_never_moves_a_document_past_one_that_outscores_it`).
+W-94 asks whether `superseded_weight` should change *scores* — a different
+question, still open, and not answered here.
+
+**The asymmetry that makes this work**: `superseded` and `mtime` are committed
+**facts** that exist whether or not their weight is on, so they are readable at
+the shipped defaults. That is the whole reason a tie-break can use them without
+becoming a prior.
+
+⚠ **`-priority` is UNREACHABLE, and saying so is better than implying
+otherwise.** `[priority]` has no fact/weight split — `Weighting.priority_for`
+**is** the weight, and `Weighting.of` multiplies the score by it. Two documents
+with different priorities therefore have different scores and never reach the
+tie-break; two with the same priority are not separated by it either. The slot
+is implemented because it is what was ratified, it costs nothing, and it is
+already correct if `[priority]` ever becomes a declaration that does not
+multiply. Pinned by
+`tests/query/test_ties_and_filters.py::test_priority_cannot_reach_the_tie_break_and_the_reason_is_recorded`,
+which fails the day that changes.
+
+**`AskResult.tie` marks it.** `true` when this result's rounded score equals
+another candidate's — **computed over the full sorted list before
+truncation**, so the last row of a `--top 5` is marked even when the document
+it ties with is off the page. That row is the one most likely to have been a
+coin-toss, and a neighbour comparison on the truncated window would silently
+un-mark it. `false` is a claim, not an absence.
+
+**The differential law holds** — both paths reach `rank()` with the same record
+dicts, and the key reads only fields both generators already carry
+(`superseded`, `mtime`, `loc`).
+
 ### Consequences
 
 - **The differential law is achievable at all.** One scorer in one order is what

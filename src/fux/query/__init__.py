@@ -621,7 +621,11 @@ def cmd_ask(args) -> int:
     for r in results:
         record = _record_for(root, r.id)
         mark = f"{ARCHIVED_MARKER} " if r.archived else ""
-        print(f"{r.score:.4f}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
+        # W-111 — `(tie)` after the score, not after the locator. The `(loc)` a
+        # reader copies must stay a bare locator, which is the same rule W-84
+        # applied to headings; a marker glued to it breaks a copy-paste.
+        tie = "  (tie)" if r.tie else ""
+        print(f"{r.score:.4f}{tie}  {mark}{_title_from(root, record, r.title)}  ({r.loc})")
         if show_sections:
             for heading in _headings_for(record, args.query):
                 print(f"        {SECTION_MARKER} {heading}")
@@ -711,6 +715,104 @@ def _declare_derivation(why) -> None:
         print("       " + "  ".join(bits), file=sys.stderr)
 
 
+def _filtered(root: Path, results, args) -> tuple[list, int]:
+    """`find`'s three precision controls. W-111.
+
+    **Post-filters on the ranked list, and they retrieve nothing.** A document
+    the ranking did not place in `--top` cannot be filtered *into* the answer —
+    raising `--top` is what widens the pool, and that is stated rather than
+    worked around.
+
+    ⚠ **The alternative was retrieving deeper and truncating after**, which is
+    what the reranker does. Refused here for [ADR-EXPAND](../../docs/adr/0054_expand.md)
+    decision 11's reason: it would make `support` in the confidence block
+    describe a retrieval depth the caller never asked for, and
+    [ADR-CONFIDENCE](../../docs/adr/0045_confidence.md) states plainly that
+    `support` is bounded by `--top`. One inconsistency is worth more than a
+    little extra recall on a filter.
+
+    ⚠ **`band` is computed on the UNFILTERED ranking**, because it is a claim
+    about the corpus's answer to the question, not about the subset a caller
+    asked to see. Dropping results cannot make fux more or less confident about
+    what it found.
+    """
+    phrase = getattr(args, "phrase", None)
+    under = getattr(args, "under", None)
+    require_all = bool(getattr(args, "require_all", False))
+    if not (phrase or under or require_all):
+        return list(results), 0
+
+    from .analyzer import analyze
+    from .scan import query_term_hashes
+
+    before = len(results)
+    kept = list(results)
+
+    if under:
+        # Prefix on `loc`, the same shape `Weighting.priority_for` matches on,
+        # so `--under docs/adr` and a `[priority]` key spell a scope the same
+        # way. A trailing slash is not required and not stripped: `docs/a`
+        # matching `docs/ab.md` is what a prefix means, and inventing a
+        # component boundary here would disagree with `priority_for`.
+        kept = [r for r in kept if r.loc == under or r.loc.startswith(under)]
+
+    if require_all:
+        # Over the COMMITTED record's terms — never fetched text. `find` is an
+        # offline verb and the whole point of `--all` is that it is cheap.
+        wanted = set(query_term_hashes(args.query))
+        survivors = []
+        for r in kept:
+            record = _record_for(root, r.id)
+            terms = (record or {}).get("terms", {})
+            if wanted <= set(terms):
+                survivors.append(r)
+        kept = survivors
+
+    if phrase:
+        from . import rerank
+
+        terms = analyze(phrase)
+        survivors = []
+        for r in kept:
+            text = rerank._read_local_text(root, r.id, r.loc)
+            if text is None:
+                # ⚠ **A `url:` document is KEPT, never dropped.** Offline it
+                # has no text to test, and dropping it would report *"this page
+                # does not contain the phrase"* on the strength of not having
+                # looked. That is the reranker's own rule
+                # ([ADR-RERANK](../../docs/adr/0041_rerank.md) decision 8) and
+                # the four-state freshness vocabulary's, applied to a filter.
+                survivors.append(r)
+                continue
+            if rerank.phrase_present(terms, text):
+                survivors.append(r)
+        kept = survivors
+
+    return kept, before - len(kept)
+
+
+def _declare_filters(args, dropped: int) -> None:
+    """What a filter removed, on **stderr**, so stdout stays a bare path list.
+
+    `find` exists to be piped; a note on stdout would be read as a filename.
+    The same reason ADR-DIR-LIST decision 12 put the archived note here.
+    """
+    if not dropped:
+        return
+    names = [
+        name for name, on in (
+            ("--phrase", getattr(args, "phrase", None)),
+            ("--under", getattr(args, "under", None)),
+            ("--all", getattr(args, "require_all", False)),
+        ) if on
+    ]
+    print(
+        f"[filter] {' '.join(names)} removed {dropped} of the ranked results; "
+        "the confidence band describes the ranking before filtering",
+        file=sys.stderr,
+    )
+
+
 def cmd_find(args) -> int:
     """Ranked documents, one per line — the terse listing verb."""
     root = _root()
@@ -720,7 +822,9 @@ def cmd_find(args) -> int:
         root, args, args.top, tune=tune, confidence_out=signals,
     )
     block = signals.get("confidence")
+    results, dropped = _filtered(root, results, args)
     _declare_no_accelerator(root)
+    _declare_filters(args, dropped)
 
     if args.json:
         payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}

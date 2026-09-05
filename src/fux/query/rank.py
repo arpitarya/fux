@@ -39,6 +39,13 @@ class AskResult:
     #: byte-identical at the default weight, and this field is what a reader is
     #: told, not what the scorer computes.
     archived: bool = False
+    #: W-111. This result's rounded score equals another candidate's, so its
+    #: position was decided by the declared tie-break rather than by the
+    #: ranking. **Computed over the FULL sorted list, before truncation**, so a
+    #: result tied with the document just below the cut is still marked — a
+    #: caller reading `--top 5` is told the fifth row was a coin-toss even
+    #: though the coin's other side is not on the page.
+    tie: bool = False
 
 
 @dataclass(frozen=True)
@@ -324,10 +331,54 @@ def rank(
         if s > 0:
             scored.append((record, s, archived))
 
-    # Deterministic tie-break on id — a score tie must never depend on the order
-    # candidates were generated in, which is the one thing the two paths differ
-    # in by construction (shard order vs postings order).
-    scored.sort(key=lambda pair: (-round(pair[1], 9), pair[0]["id"]))
+    # W-111 — the DECLARED tie-break, in Arpit's ratified order:
+    #
+    #     superseded -> recency -> priority -> id
+    #
+    # ## Why this is not "add three ranking priors"
+    #
+    # 🔴 **Every one of these is already a `Weighting` multiplier, and every one
+    # of them ships as a NO-OP** (`superseded_weight = 1.0`,
+    # `recency_half_life_days = 0.0`, empty `[priority]`). This key does not
+    # turn any of them on: it reads the same *facts* those weights read, and it
+    # reads them **only where the rounded scores are equal**. A corpus with no
+    # ties orders exactly as it did before.
+    #
+    # **W-94's "doing nothing is legitimate" is untouched.** That decision is
+    # about whether `superseded_weight` should move off `1.0` and change
+    # SCORES. This changes no score, and it cannot promote or demote a document
+    # past one that outscores it.
+    #
+    # ## What it replaces, and why the old answer was worse
+    #
+    # `id` alone. 4.38 % of top-5 orderings were decided by nothing but a
+    # document's name — *"the same arbitrary answer everywhere"*, which is
+    # reproducible and meaningless. Determinism was never the problem; a
+    # **stated** answer is strictly better than an arbitrary one at the same
+    # cost, and `id` stays as the final, total tie-break so the order is still
+    # total and still machine-independent.
+    #
+    # Ascending on `superseded` (False < True) puts a live document above a
+    # retired one; negated on recency and priority because higher is better.
+    # `mtime` missing reads as `0` — the oldest — which is what an undated
+    # document is.
+    scored.sort(
+        key=lambda pair: (
+            -round(pair[1], 9),
+            bool(pair[0].get("superseded", False)),
+            -int(pair[0].get("mtime") or 0),
+            -weighting.priority_for(pair[0].get("loc", "")),
+            pair[0]["id"],
+        )
+    )
+    # Marked AFTER the sort and over the WHOLE list: a neighbour comparison on
+    # the truncated window would silently un-mark the last row, which is the
+    # one most likely to have been decided by a coin-toss.
+    tied: set[int] = set()
+    for i in range(len(scored) - 1):
+        if round(scored[i][1], 9) == round(scored[i + 1][1], 9):
+            tied.add(i)
+            tied.add(i + 1)
 
     # ADR-CONFIDENCE: which of the query's terms the TOP-RANKED document itself
     # contains. Handed out through the same seam as `df`/`n` and for the same
@@ -347,6 +398,7 @@ def rank(
             loc=record["loc"],
             score=s,
             archived=archived,
+            tie=i in tied,
         )
-        for record, s, archived in scored[:top]
+        for i, (record, s, archived) in enumerate(scored[:top])
     ]

@@ -21,6 +21,28 @@ Rules:
 
 ---
 
+## W-111 — the declared tie-break, and `find`'s precision controls (2026-09-05)
+
+**Search v3's last agent-lane item.** 4.38 % of top-5 orderings were decided by
+a document's *name* — deterministic and meaningless.
+
+| what landed | evidence |
+|---|---|
+| `rank()`'s sort key becomes `(-round(s, 9), superseded, -mtime, -priority, id)` — **Arpit's ratified order**, identical on both paths, **turning no ranking prior on** | [ADR-RANKING](../docs/adr/0012_ranking.md) · `tests/query/test_ties_and_filters.py` |
+| `AskResult.tie`, in `--json` (`required: always`) and as `(tie)` in text — **computed before truncation**, so the last row of a `--top 5` is marked | [ADR-ASK](../docs/adr/0004_ask.md) · [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) |
+| `find --phrase / --under / --all` — post-filters that retrieve nothing; `band` describes the unfiltered ranking; a `url:` document is kept by `--phrase`, never dropped | [ADR-FIND](../docs/adr/0005_find.md) · [ADR-RERANK](../docs/adr/0041_rerank.md) · [ADR-CLI](../docs/adr/0002_cli-surface.md) |
+| ⚠ **`-priority` is UNREACHABLE and the code says so** — `priority_for` *is* the weight, so different priorities already produce different scores | [ADR-TUNE](../docs/adr/0038_tuning.md) · a test that fails if it changes |
+
+**Differential law re-run: 101 248 comparisons byte-identical** on the
+playground, both skipping modes.
+
+⚠ **Measured effect on the corpora available: ZERO.**
+[The run](regression/2026-09-05-declared-ties/report.md) — 0 of 2 450 top-5
+rows tie on the playground, 3 of 1 200 at 10 000 documents, and **no query's
+order differs from the old key**, because neither corpus carries the tie-break
+signals where a tie lands. The unit tests prove the ordering; **no corpus
+here demonstrates it changing an answer.**
+
 ## W-110 — doc2query enrichment, and a defect that made enrichment a no-op (2026-09-05)
 
 **Search v3's fourth item.** Blind enrichment measured `+1 / −1` as prose; the

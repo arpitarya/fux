@@ -344,6 +344,18 @@ decision 4; fusing two phrasings produces an answer to a set, which is not.
 recorded verbatim in the receipt so `fux verify --rerun` replays it rather than
 re-running a different query and reporting `drifted`.
 
+⚠ **`answer` is unchanged by W-111 (2026-09-05), and inherits one thing.**
+The declared tie-break ([ADR-RANKING](0012_ranking.md)) runs in `rank()`, which
+`answer` reaches through `run_query` — so when two of `ANSWER_TOP`'s candidates
+score equal, which of them the passage contest sees first is now decided by
+`superseded` -> recency -> `id` rather than by a document's name.
+
+**It cannot change which passage wins**: `refer/_rescore.py` scores passages on
+fetched bytes and the assembler sorts on `(-score, sha, locator)`, neither of
+which reads the candidate order. `answer` gains no flag: `--phrase`, `--under`
+and `--all` are `find`'s, and `tie` is not in `answer`'s payload because
+`answer` returns one answer rather than a ranking.
+
 ### Consequences
 
 - **The passage carries the document's frontmatter block.** `refer/_chunk.py`

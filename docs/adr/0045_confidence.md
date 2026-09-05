@@ -527,6 +527,17 @@ query under `--expand`**, so a document lifted by supplied terms cannot raise
 its own band — and it cannot be returned at all, because `rank()` drops a
 candidate that matches no original term.
 
+⚠ **`find`'s filters do NOT move the band (W-111, 2026-09-05).**
+`--phrase`, `--under` and `--all` remove rows from a ranked list; the block is
+computed on the **unfiltered** ranking, and `find` prints a stderr line saying
+so whenever a filter dropped anything.
+
+**Confidence is a claim about the corpus's answer to the question, not about
+the subset a caller asked to see.** A caller who narrows to one directory has
+not made fux more certain, and `separation` computed over a filtered list would
+say they had. Same reasoning as decision 10's refusal to rescale for fusion,
+one surface along.
+
 ### Consequences
 
 **`support` is bounded by `--top`, and cannot honestly be a corpus-wide count.**

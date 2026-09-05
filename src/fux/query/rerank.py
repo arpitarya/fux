@@ -67,7 +67,10 @@ from pathlib import Path
 
 from .analyzer import analyze
 
-__all__ = ["COVERAGE_POWER", "DEPTH", "WEIGHT", "boost", "passage_boost", "rerank", "signals"]
+__all__ = [
+    "COVERAGE_POWER", "DEPTH", "WEIGHT", "boost", "passage_boost", "phrase_present",
+    "rerank", "signals",
+]
 
 #: How far down the ranking to reorder. Beyond this the reranker would be
 #: paying to read documents nobody will look at; W-76's gate is phrased
@@ -180,6 +183,31 @@ def _adjacency_signal(positions: dict[str, list[int]], wanted: list[str]) -> flo
         if any(p + 1 in later for p in positions[first]):
             hits += 1
     return hits / len(pairs)
+
+
+def phrase_present(phrase_terms: list[str], text: str) -> bool:
+    """Does every bigram of `phrase_terms` occur as a bigram in `text`? W-111.
+
+    `find --phrase "…"`'s post-filter, and it reuses `_adjacency_signal`
+    rather than writing a second notion of adjacency — the argument
+    `refer/_rescore.py` makes for one scorer, on a smaller object. A phrase is
+    present when the signal is exactly `1.0`: **every** consecutive pair, in
+    order, immediately.
+
+    A **single-term** phrase has no bigram, so it degrades to *is the term
+    present at all* rather than to `False`. `--phrase "rollback"` returning
+    nothing would be a surprising answer to a reasonable request.
+    """
+    terms = analyze(text)
+    if not phrase_terms:
+        return True
+    if len(phrase_terms) == 1:
+        return phrase_terms[0] in terms
+
+    positions: dict[str, list[int]] = {}
+    for i, term in enumerate(terms):
+        positions.setdefault(term, []).append(i)
+    return _adjacency_signal(positions, list(phrase_terms)) == 1.0
 
 
 def passage_boost(query_terms: list[str], passage_terms: list[str]) -> float:

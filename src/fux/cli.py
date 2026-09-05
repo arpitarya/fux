@@ -488,6 +488,22 @@ def build_parser() -> argparse.ArgumentParser:
         "-q", "--query", dest="also", action="append", metavar="TEXT",
         help="another phrasing of the same question; results are fused by RRF (repeatable)",
     )
+    # W-111 — precision controls, not ranking cleverness. Each one REMOVES
+    # results from what the ranking already produced; none of them retrieves
+    # anything new. `find` is the verb that gets piped, and a pipe wants a
+    # narrower list, not a cleverer one.
+    p_find.add_argument(
+        "--phrase", metavar="TEXT", default=None,
+        help="keep only documents whose local text contains this phrase, words adjacent and in order",
+    )
+    p_find.add_argument(
+        "--under", metavar="PREFIX", default=None,
+        help="keep only documents whose loc starts with this path prefix",
+    )
+    p_find.add_argument(
+        "--all", dest="require_all", action="store_true",
+        help="keep only documents carrying EVERY query term (grep's AND)",
+    )
     p_find.set_defaults(func=_cmd_find)
 
     p_answer = _query_parser(

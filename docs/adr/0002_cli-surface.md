@@ -783,6 +783,19 @@ resolution it has nothing to resolve against.
 decision 4: one answer to one question. Expanding a question's vocabulary is not
 asking a second question.
 
+⚠ **`find` gained `--phrase TEXT`, `--under PREFIX` and `--all` on
+2026-09-05** (W-111, [ADR-FIND](0005_find.md)). `--phrase` and `--under` are
+valued options and sit outside decision 10's `default=None` rule for the same
+reason `--expand` does — no `store_true` collapse to avoid, no file value to
+shadow.
+
+⚠ **`--all` IS a `store_true`, and it is deliberately outside decision 10 too.**
+That rule exists to keep a committed `.fux/output.toml` value reachable from
+the command line; `--all` has no such key and is not gated, because a filter
+that silently applied itself from a config file would make `fux find` return a
+different set of paths in two clones of the same repo. It is per-invocation by
+design.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is
