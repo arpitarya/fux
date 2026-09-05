@@ -21,6 +21,30 @@ Rules:
 
 ---
 
+## W-96 — the two-session `blind` protocol (2026-08-29, recorded 2026-09-05)
+
+**Recorded late, and that is the finding.** W-96 asked for the blind handoff
+shape as *"one paragraph in SETUP-BENCHMARK plus the discipline to do it"*. It
+landed on **2026-08-29 in `91614f1`** — a commit whose subject is three new
+decoders — and its OPEN-WORK row sat pending for **seven days** with the work
+already done.
+
+| what landed | where |
+|---|---|
+| the handoff table — who authors, who executes, what each may never see, where each stops | [`setup/fux-benchmark.md`](setup/fux-benchmark.md) §The two-session blind protocol |
+| the four rules that make it hold, including *the hash is the handoff* and the reclassification clause | [`benchmark/RUNBOOK-BENCHMARK.md`](benchmark/RUNBOOK-BENCHMARK.md) §6 |
+
+⚠ **Skipping the protocol stays legitimate** — the run is then `informed`,
+files everything, and states no delta. What is not legitimate is one session
+claiming `blind`. That is [ADR-RS](../docs/adr/0036_predictions.md)'s rule, not
+a new one.
+
+⚠ **This is OPEN-WORK rule 4's second class of defect, and it is the one nobody
+notices**: a stale pending row understates progress exactly as badly as a stale
+✅ overstates it. Re-derived here against `git log`, not read.
+
+---
+
 ## W-101 — the `fux doctor` pass: two vetoes become runnable (2026-09-05)
 
 **One pass at `doctor.py` for five things**, four of them reachable only from

@@ -1,1 +1,1 @@
-✓ W-101: fux doctor gains four checks + redaction counts; two ADR vetoes are runnable · → commit
+✓ W-96 (stale), the lab per-query emitter, the widened idf probe · → commit, then the heading control

@@ -35,7 +35,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 |---|---|---|
 | **The ETag acceptance criterion, re-worded or accepted.** *"`fux update` with a matching ETag performs no body download"* is **unmet as written** — CDP interception is at the **response** stage, so Chrome has already transferred the body; `validate()` saves the decode and the shard comparison, **not bandwidth**. Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12 rather than quietly satisfied | 2026-09-01 | 4d |
 | **Whether the W-83 shape gets a gate.** A key was accepted in a record, assigned in the ownership table, and **never implemented** — every mechanical check passed, because the freshness gate proves a record was *touched*, never that it is *true*. That is the **second** recorded occurrence, which is what CLAUDE.md's two-strikes rule makes a trigger. ⚠ **No check was written**: "the record is true" is not mechanically definable, and shipping a loose approximation is the moving-threshold failure in another costume | 2026-09-01 | 4d |
-| 🟢 **W-107 Phase 0 — `log()`: the measurement is FILED and this is now a one-word answer.** [`2026-09-05-node-log-divergence`](regression/2026-09-05-node-log-divergence/report.md): `Math.log` vs `math.log` **do differ** — 655 / 100 000 on darwin/arm64, the same order as the glibc figure W-107 cites — but **every difference is one ulp** (max rel `2.211e-16`) and **none survives `round(9)`**, which is `rank.py`'s own sort-key resolution. Over the corpora: **0 discordant scores, 0 discordant top-5, on 197 233 scored documents at 10 and 10 000 documents.** **(a) portable `log`** buys bit-identity and costs a Python-wide ranking change plus a re-derivation of every golden; **(b) tolerance at `round(9)`** costs nothing and asserts the sort key's own resolution. ⚠ **Two limits, both real:** the `idf` argument population in those corpora is **13 distinct values**, and **glibc — what CI runs — was NOT measured** (no Linux on this machine). [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is written with **this one cell blank**; **W-107 Phase 1 does not start until he fills it** | 2026-09-05 | 0d |
+| 🟢 **W-107 Phase 0 — `log()`: the measurement is FILED and this is now a one-word answer.** [`2026-09-05-node-log-divergence`](regression/2026-09-05-node-log-divergence/report.md): `Math.log` vs `math.log` **do differ** — 655 / 100 000 on darwin/arm64, the same order as the glibc figure W-107 cites — but **every difference is one ulp** (max rel `2.211e-16`) and **none survives `round(9)`**, which is `rank.py`'s own sort-key resolution. Over the corpora: **0 discordant scores, 0 discordant top-5, on 197 233 scored documents at 10 and 10 000 documents.** **(a) portable `log`** buys bit-identity and costs a Python-wide ranking change plus a re-derivation of every golden; **(b) tolerance at `round(9)`** costs nothing and asserts the sort key's own resolution. ⚠ **Two limits were named; ONE IS NOW CLOSED and it moved the number.** [The addendum](regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md) re-probed on **this repo's own 838-document index**, 605 frequency-stratified queries: the `idf` population goes **13 → 182** and **14 of 182 (7.69 %) diverge**, with **8.98 % of real BM25F scores differing bit-for-bit**. 🔴 So the original *"0 discordant"* was an artifact of 13 arguments — **and it changes nothing about the pick**: max relative `5.463e-16`, **0 differ at `round(9)`, 0 top-5 orderings move**. The evidence for **(b)** is stronger than it was, not weaker. 🔴 **The remaining limit is the whole of what is left: glibc — what CI runs — is still NOT measured** (no Linux here). It is one `workflow_dispatch` away — [`.github/workflows/log-probe.yml`](../.github/workflows/log-probe.yml), added 2026-09-05, **not yet run**. [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is written with **this one cell blank**; **W-107 Phase 1 does not start until he fills it** | 2026-09-05 | 0d |
 | 🔴 **W-110's gate: which `k`?** The bar was *`net >= 6` on `recall@k`* and **never fixed `k`**. [The run](regression/2026-09-05-doc2query/report.md) is **net +7 at `recall@1`** (7 up, 0 down) and +3 / +2 / +1 at `@3` / `@5` / `@10` — because `recall@10` is already `0.9884` without enrichment, so the effect is real and **concentrated at the top of the ranking**. **Choosing `k` after seeing the numbers is the moving-threshold failure, so this session did not.** ✅ The `placebo` control moved **nothing at any `k`**, so the gain is the questions' content. ⚠ The doc2query−− filter refused **2 of 98** questions and moved no recall number — **unproven, not disproven** | 2026-09-05 | 0d |
 | ⚠ **Whether the prior enrichment measurements need re-running.** W-110 found that a newly written enrichment was **never indexed on an incremental ingest** (reuse was keyed on the document's sha alone) — shipped that way from W-76 Phase 8 to 2026-09-05. **Every enrichment measurement on record ran through it**, and whether any under-measured enrichment depends on whether its harness ingested from clean. [`2026-08-24-blind-enrichment-second-author`](regression/2026-08-24-blind-enrichment-second-author/ANALYSIS.md)'s `+1 / −1` is the one that matters, because it is what motivated replacing prose with questions. **Not audited; a re-run needs a corpus that no longer exists (W-87 Part B)** | 2026-09-05 | 0d |
 | **`superseded_weight`** — W-94 below. Doing nothing is legitimate | 2026-08-28 | 8d |
@@ -49,13 +49,20 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 
 ## Measurement plumbing
 
-- **The lab and playground harnesses emit totals only.** `fux-benchmark`'s
-  bench emits one row per query per arm, and
-  `tests/test_regression_runs.py::test_measured_run_files_its_per_query_rows`
-  gates it from **2026-08-29** — but `fux-lab/shared/regress/run.py` still
-  reports `hit@k`/`mrr` aggregates and no rows. **A playground or lab run filed
-  from 2026-08-29 will hit the gate with nothing to give it.** One emitter to
-  fix, not a rule. `filed: 2026-08-28`
+- ✅ **The LAB emitter is fixed; the PLAYGROUND half is still open, and the
+  reason is Arpit's staged tree.** `fux-lab/shared/regress/run.py` now writes
+  `results/per-query.jsonl` — one row per query per arm, `{id, arm, query,
+  doc, hit, rank, ms}`, on every scored run including a `--accept-baseline`
+  one (a baseline nobody can re-derive is the same defect one run later);
+  `--arm` names the arm and defaults to the env directory. Every aggregate it
+  reports is now a sum over rows it filed. Smoke-run 2026-09-05 on a throwaway
+  three-pair env: 2/3 hits, rows and aggregates agree.
+  🔴 **`fux-playground/check.py` still writes nothing.** `grade()` already
+  returns `{id, state, detail}` per golden, so it is a `--rows <path>` writer
+  and nothing more — but **that repo has 74 files staged and its index staged
+  as deletions, with no commit since 2026-08-20**. Editing it would tangle a
+  new change into a pending commit that is Arpit's (R-11). **Left for after he
+  commits or restores it.** `filed: 2026-08-28`
 
 - ⚠ **The per-query-rows gate checks for a `.jsonl`, not for rows.** `tests/test_regression_runs.py::test_measured_run_files_its_per_query_rows` passes on **any** `.jsonl` under `evidence/` — [`2026-09-05-answer-top3`](regression/2026-09-05-answer-top3/report.md) satisfied it on a *copy of the goldens file* before its real rows were written. **This is the W-83 shape again**: a check that proves a file exists, never that it is the right file. Recorded rather than patched — a looser or cleverer check (is it one row per query? per arm?) cannot be written without knowing each run's arm structure, and shipping an approximation is the moving-threshold failure in another costume. **Whether this is a second strike is Arpit's call, alongside the W-83 gate question already in the inbox.** `filed: 2026-09-05`
 
@@ -168,15 +175,6 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   same weakness** — its "0 discordant of 240" across two seeds should be read as
   a rate check; its "300/300 identical rows on one corpus" is the half that does
   the work. `filed: 2026-08-28`
-
-- **W-96** · `agent` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
-  **a `blind` version benchmark needs TWO sessions, and nothing makes that
-  happen.** Whoever writes the generator and reads a score is `informed`, so
-  the 2026-08-28 run is filed `informed` and states no delta. The protocol:
-  one session authors and freezes the corpus, query sets and harness and
-  **stops**; a second, which never reads them, executes and analyses.
-  ⚠ **Not a process doc** — a handoff shape, worth one paragraph in
-  SETUP-BENCHMARK plus the discipline to do it. `filed: 2026-08-28`
 
 - **W-87** · `arpit` ·
   *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · **what

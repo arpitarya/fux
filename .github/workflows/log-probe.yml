@@ -1,0 +1,89 @@
+# W-107 Phase 0 — the glibc half of the `log()` evidence.
+#
+# The measurement Arpit's option (a)/(b) pick rests on was taken on
+# darwin/arm64 (Apple libm) because this project's build machine is a Mac.
+# **The figure W-107 cites is a glibc one** (1 095 / 100 000), CI runs on
+# `ubuntu-latest`, and no Linux was available to run the probe on. This job is
+# that missing cell, and nothing else.
+#
+# `workflow_dispatch` ONLY, deliberately:
+#
+# - It is evidence for one frozen pre-registration, not a gate. Running it on
+#   every push would put a number nobody asked for into every CI log and turn
+#   a probe into a check people learn to skip.
+# - It measures a property of the RUNNER's libm and V8, not of this repo's
+#   code, so it has nothing to say about a diff.
+#
+# Its output is pasted into the Phase 0 run's ADDENDUM as the glibc row:
+# `work/regression/2026-09-05-node-log-divergence/`.
+
+name: log probe (W-107 Phase 0, glibc)
+
+on:
+  # No inputs. The Node versions are the matrix below, and a dispatch input
+  # that nothing reads is the exact defect this repo has refused twice
+  # (`max_parallel`, `acquired_max_bytes`): a knob that cannot work, shipped.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    name: glibc · node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Both LTS lines. V8's `Math.log` is a port of fdlibm rather than a
+        # call into libm, so the Node version is the second axis and not a
+        # formality — a V8 change is exactly what would move this number
+        # without any glibc change.
+        node: ["20", "22"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Name the surface — a number without its libm is not evidence
+        run: |
+          ldd --version | head -1
+          python -c "import sys, platform; print(sys.version, platform.machine())"
+          node --version
+
+      - name: Install (the engine is stdlib-only; `dump.py` imports it)
+        run: pip install -e .
+
+      - name: The `wide` population — comparable with the darwin/arm64 figure
+        run: |
+          E=work/regression/2026-09-05-node-log-divergence/evidence
+          # `logprobe.py` takes corpus dumps then an output path. With no dump
+          # it emits the `wide` sample alone, which is the half that is
+          # comparable across platforms: its input is a seeded sample rather
+          # than a corpus, so the same 100 000 doubles are probed everywhere.
+          python "$E/logprobe.py" /tmp/wide-args.json
+          node "$E/logprobe.mjs" /tmp/wide-args.json | tee /tmp/glibc-probe.txt
+
+      - name: The `idf` population, on this repository's own committed index
+        run: |
+          E=work/regression/2026-09-05-node-log-divergence/evidence
+          python "$E/dump.py" . "$E/queries-self.txt" /tmp/self.json
+          python "$E/logprobe.py" /tmp/self.json /tmp/idf-args.json
+          node "$E/logprobe.mjs" /tmp/idf-args.json | tee -a /tmp/glibc-probe.txt
+          node "$E/score.mjs" /tmp/self.json /tmp/self-scored.json
+          python "$E/compare.py" /tmp/self-scored.json /tmp/per-query.csv | tee -a /tmp/glibc-probe.txt
+
+      - name: Upload — the artifact IS the evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-probe-glibc-node${{ matrix.node }}
+          path: |
+            /tmp/glibc-probe.txt
+            /tmp/per-query.csv

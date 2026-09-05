@@ -1,0 +1,13 @@
+idf arguments (distinct): 182
+wide sample             : 100000
+node v24.13.0 on darwin/arm64
+idf  : 14/182 differ (7.6923 %)  max rel 2.128e-16  differing at round(9): 0
+wide : 655/100000 differ (0.6550 %)  max rel 2.211e-16  differing at round(9): 0
+node v24.13.0: scored 41908 documents
+documents scored          : 41908
+scores differing bit-for-bit: 3764  (8.982 %)
+scores differing at round(9): 0  (0.000 %)
+max relative difference     : 5.463e-16
+queries with a different top-5 (exact sort)   : 0
+queries with a different top-5 (round(9) sort): 0
+per-query rows -> /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/ec9dfeb2-5c40-470f-935f-b2a1d2ad03eb/scratchpad/per-query-self.jsonl
