@@ -135,12 +135,25 @@ def score_record(
     n: int,
     avg_wlen: float,
     scoring: Scoring = DEFAULT_SCORING,
+    term_weights: dict[str, float] | None = None,
 ) -> float:
     """Sum of each matched query term's weight-then-saturate contribution.
 
     `flen` is a per-field count list. An `int` is accepted and treated as an
     already-derived `wlen` — the accelerator hands one through after computing
     it once per document rather than once per term.
+
+    ## `term_weights` — W-109's `--expand`, and why it is PER TERM
+
+    A per-term multiplier on the summand, not on the total: an expansion adds
+    *words*, and only the words it added may be discounted. Scaling the whole
+    score would discount the user's own query terms in the same breath.
+
+    ⚠ **`None` performs no multiply at all.** Not a multiply by 1.0 — the
+    branch is skipped, so an unexpanded query does exactly the float arithmetic
+    it did before the parameter existed and the accelerator/scan differential
+    law cannot pick up a last-bit difference from the feature being present.
+    `query/expand.py::Expansion.trivial` is what callers test.
     """
     if n <= 0 or avg_wlen <= 0:
         return 0.0
@@ -155,5 +168,8 @@ def score_record(
         if wtf == 0:
             continue
         denom = wtf + k1 * (1 - b + b * wlen / avg_wlen)
-        total += idf(df.get(h, 0), n) * wtf * (k1 + 1) / denom
+        contribution = idf(df.get(h, 0), n) * wtf * (k1 + 1) / denom
+        if term_weights is not None:
+            contribution *= term_weights.get(h, 1.0)
+        total += contribution
     return total

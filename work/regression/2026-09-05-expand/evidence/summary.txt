@@ -1,0 +1,8 @@
+base pass   28/50
+expand pass 44/50
+FIXED  16: ['q005', 'q006', 'q013', 'q017', 'q018', 'q020', 'q026', 'q028', 'q029', 'q032', 'q034', 'q035', 'q043', 'q044', 'q049', 'q050']
+BROKEN 0: []
+discordant 16  net 16
+of the 9 known failures: 6 now pass (0 passed before)
+empty expansions: 0
+rows -> /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/aad23fcd-5837-4012-8249-a5082564a6b8/scratchpad/expand-rows.csv and /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/aad23fcd-5837-4012-8249-a5082564a6b8/scratchpad/expand-rows.jsonl

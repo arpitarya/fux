@@ -122,6 +122,7 @@ def run_query(
     use_tune: bool = True,
     confidence_out: dict | None = None,
     trace_out: dict | None = None,
+    expand: str = "",
 ) -> tuple[list[AskResult], str]:
     """Scan by default; use the accelerator only when `force_scan` is False
     and a fresh build exists. Return `(results, path)`.
@@ -144,6 +145,18 @@ def run_query(
     because that tuple is unpacked by `cmd_ask`, `cmd_find`, `cmd_answer`,
     `mcp._search` and the test suite; an additive keyword changes none of them,
     and a caller that does not ask pays only for a `None` check.
+
+    `expand` is W-109's agent-written expansion — free text, analyzed by the
+    **same** analyzer the index was built with and scored at
+    `[ranking] expand_weight`. Empty means no expansion, and then every value
+    below is byte-identical to what this function returned before the parameter
+    existed (`query/expand.py::Expansion.none`).
+
+    ⚠ **The confidence block is built on the ORIGINAL query, always.**
+    `_fill_confidence` receives `query`, never the expansion, so `coverage`,
+    `missing` and `doc_coverage` describe what the *user* asked — a document
+    lifted by expansion terms cannot raise its own band. It also cannot be
+    returned at all: `rank()` drops a candidate that matches no original term.
 
     **The block is built from the FINAL result list, after reranking.**
     `rank()` supplies `df` and `n`; the scores come from `results` as the caller
@@ -169,13 +182,21 @@ def run_query(
     depth = max(top, rerank.DEPTH) if rerank_weight > 0 else top
     stats: dict | None = {} if confidence_out is not None else None
 
+    from .expand import build as build_expansion
+    from .scan import query_term_hashes
+
+    query_hashes = query_term_hashes(query)
+    expansion = build_expansion(
+        query_hashes, query_term_hashes(expand) if expand else [], tune.expand_weight
+    )
+
     if not force_scan:
         from ..derive import accel, format as derive_fmt
 
         if (derive_fmt.runtime_dir(root) / derive_fmt.STATS_NAME).exists() and accel.is_fresh(root):
             results = accel.ask(
                 root, query, top=depth, weighting=weighting, archived_dirs=dirs,
-                scoring=scoring, stats_out=stats,
+                scoring=scoring, stats_out=stats, expansion=expansion,
             )
             final = _maybe_rerank(root, query, results, rerank_weight, top)
             _fill_trace(trace_out, results, rerank_weight)
@@ -183,7 +204,7 @@ def run_query(
             return final, "accelerator"
     results = scan_ask(
         root, query, top=depth, weighting=weighting, archived_dirs=dirs,
-        scoring=scoring, stats_out=stats,
+        scoring=scoring, stats_out=stats, expansion=expansion,
     )
     final = _maybe_rerank(root, query, results, rerank_weight, top)
     _fill_trace(trace_out, results, rerank_weight)
@@ -483,20 +504,73 @@ def _declare_confidence(block, show: bool = False) -> None:
     print(line, file=sys.stderr)
 
 
+def _queries_of(args) -> list[str]:
+    """The primary question, then every extra `-q`, de-duplicated in order.
+
+    **The positional query is always first and always present**, so the
+    "primary" arm is a syntactic fact rather than a convention — which is what
+    lets the confidence block name one query rather than a set.
+    """
+    extra = list(getattr(args, "also", None) or [])
+    return list(dict.fromkeys([args.query, *extra]))
+
+
+def _expand_of(args) -> str:
+    return str(getattr(args, "expand", "") or "")
+
+
+def _run_fused(root, args, top, *, tune, confidence_out, trace_out=None):
+    """`run_query` for one question, or several fused by RRF. W-109.
+
+    Returns `(results, path, fused)`.
+
+    ## The confidence block describes the PRIMARY query, and says so
+
+    🔴 **`separation` may not be computed on RRF scores.** `separation_floor`
+    is calibrated against BM25F, and reciprocal ranks live on a different
+    scale entirely: a perfect fused top-2 differs by `1/61 - 1/62 ≈ 0.0003`,
+    so every fused query would fall below any BM25F-calibrated floor and be
+    demoted for the unit change rather than for its quality. **That is a moved
+    threshold in disguise**, and the alternative — recalibrating the floor for
+    fusion — is a ranking default nobody has measured.
+
+    So a fused answer reports the block for the **first** query's own ranking,
+    and `--json` carries `"fused": true` beside it so a consumer knows the band
+    describes one arm rather than the list it is printed under. **Stated, not
+    collapsed**: the block is neither silently omitted nor silently rescaled.
+    """
+    queries = _queries_of(args)
+    expand = _expand_of(args)
+    results, path = run_query(
+        root, queries[0], top, force_scan=_force_scan(args), tune=tune,
+        confidence_out=confidence_out, trace_out=trace_out, expand=expand,
+    )
+    if len(queries) == 1:
+        return results, path, False
+
+    from .fuse import fuse_results
+
+    # ⚠ Every arm carries the SAME expansion. An expansion is the caller's
+    # description of the document's vocabulary, not of one phrasing of the
+    # question, and giving each arm a different one would make the fusion a
+    # comparison of expansions rather than of queries.
+    arms = [results]
+    for q in queries[1:]:
+        more, _ = run_query(
+            root, q, top, force_scan=_force_scan(args), tune=tune, expand=expand,
+        )
+        arms.append(more)
+    return fuse_results(arms, top), path, True
+
+
 def cmd_ask(args) -> int:
     root = _root()
     tune = _tune_for(root, args)
     signals: dict = {}
     want_why = bool(getattr(args, "why", False))
     trace: dict | None = {} if want_why else None
-    results, path = run_query(
-        root,
-        args.query,
-        args.top,
-        force_scan=_force_scan(args),
-        tune=tune,
-        confidence_out=signals,
-        trace_out=trace,
+    results, path, fused = _run_fused(
+        root, args, args.top, tune=tune, confidence_out=signals, trace_out=trace,
     )
     block = signals.get("confidence")
     why = _derivation_for(root, args, results, path, signals, trace, tune) if want_why else None
@@ -522,6 +596,11 @@ def cmd_ask(args) -> int:
         # is why the schema makes it conditional rather than optional-in-prose.
         if block is not None and _show_band(args):
             payload["confidence"] = block.as_dict()
+        # W-109 — additive, and it is not optional when it applies: without
+        # it a consumer reads an RRF score as a BM25F score, and the two are
+        # not comparable. Absent means "one question", never "unknown".
+        if fused:
+            payload["fused"] = True
         if getattr(args, "explain", False):
             payload["path"] = path
         if why is not None:
@@ -574,9 +653,15 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
         untuned = None
         if provenance.tune_digest(root) != "none":
             try:
+                # ⚠ The untuned arm carries the SAME expansion. `--why`'s
+                # question is *"is this document first because of the corpus or
+                # because somebody edited tune.toml"*, and dropping the
+                # expansion here would answer a third question neither of them
+                # asked.
                 untuned, _ = run_query(
                     root, args.query, args.top,
                     force_scan=_force_scan(args), use_tune=False,
+                    expand=_expand_of(args),
                 )
             except Exception:
                 untuned = None
@@ -592,6 +677,7 @@ def _derivation_for(root: Path, args, results, path, signals, trace, tune):
             pre_rerank=(trace or {}).get("pre_rerank"),
             untuned=untuned,
             multiplier=getattr(tune, "archived_weight", 1.0),
+            expand=_expand_of(args),
         )
     except Exception:  # pragma: no cover - a diagnostic must not break an answer
         return None
@@ -630,15 +716,16 @@ def cmd_find(args) -> int:
     root = _root()
     tune = _tune_for(root, args)
     signals: dict = {}
-    results, _ = run_query(
-        root, args.query, args.top, force_scan=_force_scan(args), tune=tune,
-        confidence_out=signals,
+    results, _path, fused = _run_fused(
+        root, args, args.top, tune=tune, confidence_out=signals,
     )
     block = signals.get("confidence")
     _declare_no_accelerator(root)
 
     if args.json:
         payload: dict = {"results": [_as_dict(root, r, args.query) for r in results]}
+        if fused:
+            payload["fused"] = True
         # ADR-CONFIDENCE decision 11: present only under `--band`. **Absent
         # means NOT ASKED FOR — it is never a claim about the answer**, which
         # is why the schema makes it conditional rather than optional-in-prose.
@@ -698,9 +785,12 @@ def cmd_answer(args) -> int:
     root = _root()
     tune = _tune_for(root, args)
     signals: dict = {}
+    # ⚠ **`answer` takes ONE question and no `-q`** — [ADR-ANSWER](../../..)
+    # decision 4: the verb means one answer. `--expand` applies here exactly as
+    # it does to `ask`, because expanding a question is not asking a second one.
     results, _ = run_query(
         root, args.query, ANSWER_TOP, force_scan=_force_scan(args), tune=tune,
-        confidence_out=signals,
+        confidence_out=signals, expand=_expand_of(args),
     )
     block = signals.get("confidence")
     _declare_no_accelerator(root)
@@ -805,6 +895,7 @@ def _provenance_for(root: Path, args, bundle, block, *, best=None) -> dict:
             payload = provenance.receipt(
                 root,
                 args.query,
+                expand=_expand_of(args),
                 path="refer" if record is not None else "index",
                 subject=subject,
                 confidence=_block_dict(block),
@@ -853,6 +944,12 @@ def cmd_verify(args) -> int:
     if isinstance(payload, dict) and "receipt" in payload:
         payload = payload["receipt"]
 
+    replay_expand = ""
+    try:
+        replay_expand = str(payload["predicate"]["inputs"].get("expand", "") or "")
+    except Exception:  # pragma: no cover - a malformed receipt is verify's problem, not this line's
+        replay_expand = ""
+
     rerun = None
     if getattr(args, "rerun", False):
         def rerun(query: str):
@@ -861,7 +958,14 @@ def cmd_verify(args) -> int:
             # read `1` while `answer` read `1` too; when W-108 moved one it had
             # to move both, or `verify --rerun` would report `drifted` on every
             # multi-document answer and be right about nothing.
-            results, _ = run_query(root, query, ANSWER_TOP, force_scan=_force_scan(args))
+            # ⚠ **The expansion is replayed too, from the receipt's own
+            # inputs.** Re-running the bare question against an answer that was
+            # produced with `--expand` compares two different queries and
+            # reports `drifted` for a reason that has nothing to do with the
+            # corpus.
+            results, _ = run_query(
+                root, query, ANSWER_TOP, force_scan=_force_scan(args), expand=replay_expand,
+            )
             if not results:
                 return []
             bundle = _answer_via_refer(root, query, results, _tune(root))

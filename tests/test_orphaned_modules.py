@@ -188,15 +188,23 @@ def test_the_check_would_actually_catch_a_dead_module(tmp_path):
 
     Reconstruct the shape that got past everyone: two modules that import each
     other and nothing else, which is what `hybrid.py` and `fuse.py` were.
+
+    ⚠ **The synthetic names are NOT the historical ones any more.**
+    `query/fuse.py` came back on 2026-09-05 as W-109's rank-space RRF — a live
+    module with a real importer — so seeding a fake `fux.query.fuse` here made
+    the self-check assert that a *reachable* module was an orphan, and it
+    failed. The names below are deliberately unbuildable so this can never
+    collide with a real module again; the pair the check is *about* is named in
+    the prose, where a rename cannot break it.
     """
     modules = _modules()
     edges = _edges(modules)
 
-    # The historical pair, in miniature.
-    modules["fux.query.hybrid"] = tmp_path / "hybrid.py"
-    modules["fux.query.fuse"] = tmp_path / "fuse.py"
-    edges["fux.query.hybrid"] = {"fux.query.fuse"}
-    edges["fux.query.fuse"] = {"fux.query.hybrid"}
+    # The historical pair's SHAPE, under names nothing can ever claim.
+    modules["fux.query.__orphan_a"] = tmp_path / "__orphan_a.py"
+    modules["fux.query.__orphan_b"] = tmp_path / "__orphan_b.py"
+    edges["fux.query.__orphan_a"] = {"fux.query.__orphan_b"}
+    edges["fux.query.__orphan_b"] = {"fux.query.__orphan_a"}
 
     seen: set[str] = set()
     stack = [r for r in _roots() if r in modules]
@@ -208,7 +216,7 @@ def test_the_check_would_actually_catch_a_dead_module(tmp_path):
         stack.extend(edges.get(node, ()))
 
     orphans = set(modules) - seen
-    assert orphans == {"fux.query.hybrid", "fux.query.fuse"}, (
+    assert orphans == {"fux.query.__orphan_a", "fux.query.__orphan_b"}, (
         "the mutually-importing dead pair was not flagged — this is precisely "
         "the case a naive has-an-importer check misses"
     )

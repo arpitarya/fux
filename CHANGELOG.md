@@ -8,6 +8,60 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- 🟢 **`--expand "<text>"` on `ask`, `find` and `answer`, and `expand` on the
+  MCP `fux_search` tool** (W-109). Fux's remaining failures are **vocabulary
+  gaps** — the document does not use the question's words — and no weighting
+  reaches a term that is not there. Fux may never call a model (L3); its caller
+  usually is one. The caller hands over the words it expects the document to
+  use, analyzed by the same analyzer the index was built with and scored at
+  `[ranking] expand_weight`.
+  - **Measured, blind-authored, 16 fixed / 0 broken** on the 50 goldens —
+    28/50 → 44/50, and **6 of the 9 hand-annotated vocabulary-gap failures now
+    pass where 0 did before**
+    ([the run](work/regression/2026-09-05-expand/report.md)). The expansions
+    were written by a separate agent session given the corpus and the
+    **stripped** questions only.
+  - 🔴 **A document matching only supplied terms is never returned.** Enforced
+    in `rank()`, before the score is kept, on both candidate paths — not in the
+    printer, which would leave MCP returning them. It is the line between a
+    citation and a fabrication.
+  - ⚠ **`expand_weight` ships at `0.2`** (Query2doc's 1:5) and **no run has
+    graded the value**; the run above measured the feature, not the number.
+  - ⚠ **The finding's ceiling, stated:** the blind author read all ten corpus
+    documents first. Nothing here says an agent can supply the vocabulary for a
+    corpus it has *not* read.
+
+- **`-q/--query` on `ask` and `find`, repeatable** — another phrasing of the
+  same question. Each is ranked on its own and the lists are fused by
+  **reciprocal rank** (Cormack et al. 2009, `k = 60`), never by score: the
+  deleted dense lane fused scores, and a BM25F score and any other quantity are
+  on unrelated scales.
+  - ⚠ **A fused `score` is an RRF score**, and `--json` carries
+    `"fused": true` so a consumer cannot read one as the other.
+  - ⚠ **`--band` on a fused search describes the FIRST phrasing.**
+    `separation_floor` is calibrated against BM25F; a perfect fused top-2
+    differs by `~0.0003`, so scoring separation on reciprocal ranks would
+    demote every fused query for the change of units. Stated rather than
+    rescaled or dropped.
+  - ⚠ **Not graded.** `-q` has unit tests and no measured run.
+  - `answer` takes `--expand` and **not** `-q`: one answer to one question.
+
+- **The receipt records `--expand` verbatim and `fux verify --rerun` replays
+  it**; `--why` marks every matched term `expanded: true|false`.
+
+### Fixed
+
+- 🔴 **The accelerator's block bound now prices each term at that term's
+  weight.** An unweighted ceiling over weighted scores is the W-73 class of
+  defect — the accelerator returns a different answer from the scan, silently.
+  A second half was found by measurement, not reasoning: **a candidate `rank()`
+  will drop may not set `theta`**, or the accelerator skips blocks on the
+  strength of a document nobody will be shown. The differential test diverged
+  at every `expand_weight >= 0.5` at `top = 20` until both were fixed —
+  including at `1.0`, where the weights change no arithmetic at all.
+
 ### Changed
 
 - 🔴 **`fux answer` refers the top THREE documents, not one** (W-108). The verb

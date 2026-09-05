@@ -138,7 +138,16 @@ def ask(
     weighting=None,
     scoring: Scoring = DEFAULT_SCORING,
     stats_out: dict | None = None,
+    expansion=None,
 ) -> list[AskResult]:
+    """The reference path. `expansion` is W-109's `Expansion`, or `None`.
+
+    ⚠ **Candidates are collected over the expansion's hashes too**, so an
+    expansion term can lift a document the original query already matches.
+    A document that matches *only* expansion terms becomes a candidate here and
+    is dropped by `rank()` — the guard lives there because it is the one
+    function both paths reach.
+    """
     query_hashes = query_term_hashes(query)
     if not query_hashes:
         # A query that tokenizes to nothing still owes the caller its corpus
@@ -147,9 +156,11 @@ def ask(
             stats_out.setdefault("df", {})
             stats_out.setdefault("n", 0)
         return []
-    candidates, df, corpus = scan_candidates(root, query_hashes, scoring=scoring)
+    collect = list(expansion.hashes) if expansion is not None else query_hashes
+    candidates, df, corpus = scan_candidates(root, collect, scoring=scoring)
     return rank(
-        candidates, query_hashes, df, corpus, top,
+        candidates, collect, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
         weighting=weighting, scoring=scoring, stats_out=stats_out,
+        expansion=expansion,
     )

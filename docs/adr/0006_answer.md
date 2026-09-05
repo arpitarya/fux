@@ -337,6 +337,13 @@ $ fux answer "zzz nonexistent term" --json
 # exit 0
 ```
 
+⚠ **`answer` accepts `--expand` and refuses `-q` (W-109, 2026-09-05).**
+Expanding a question's vocabulary produces one answer to one question, which is
+decision 4; fusing two phrasings produces an answer to a set, which is not.
+[ADR-EXPAND](0054_expand.md) decision 12 records the split, and `--expand` is
+recorded verbatim in the receipt so `fux verify --rerun` replays it rather than
+re-running a different query and reporting `drifted`.
+
 ### Consequences
 
 - **The passage carries the document's frontmatter block.** `refer/_chunk.py`

@@ -21,6 +21,27 @@ Rules:
 
 ---
 
+## W-109 — `--expand`, and `-q` multi-query fusion (2026-09-05)
+
+**Search v3's third item.** Every surviving graded failure is a vocabulary gap;
+fux may not call a model, but its caller is one.
+
+| what landed | evidence |
+|---|---|
+| `query/expand.py::Expansion` — `hashes` / `required` / `weights` as **one** object; `score_record` gains a per-term multiplier; `[ranking] expand_weight = 0.2` | [ADR-EXPAND](../docs/adr/0054_expand.md) 1-5 · [ADR-RANKING](../docs/adr/0012_ranking.md) · [ADR-TUNE](../docs/adr/0038_tuning.md) |
+| 🔴 the hallucination guard — a candidate matching no **original** term is dropped in `rank()`, before the score is kept, on both paths | [ADR-EXPAND](../docs/adr/0054_expand.md) 3 · `tests/query/test_expand.py` |
+| 🔴 the accelerator bound priced per term, **and `theta` filtered on the guard** — found by measurement: the arms diverged at every `expand_weight >= 0.5` at `top = 20`, including at `1.0` | [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md) · `tests/derive/test_expand_bound.py` (3 injections, 2 corpus shapes) |
+| `query/fuse.py` — RRF `k = 60` in **rank** space; `"fused": true` in `--json`; `--band` describes the primary arm | [ADR-EXPAND](../docs/adr/0054_expand.md) 8-11 · [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) · [ADR-OUTPUT](../docs/adr/0047_output-defaults.md) |
+| the receipt records the expansion and `verify --rerun` replays it; `--why` marks each term `expanded` | [ADR-PROVENANCE](../docs/adr/0046_provenance.md) |
+| MCP `fux_search` gains `expand`, carrying the retry rule; the shipped usage skill teaches it | [ADR-MCP](../docs/adr/0039_mcp.md) · [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) |
+
+**Gate: 16 fixed / 0 broken** (bar: net ≥ 6, 0 broken) — 28/50 → 44/50, and
+**6 of the 9 vocabulary-gap failures closed where 0 had**
+([the run](regression/2026-09-05-expand/report.md)). Expansions written by a
+**separate agent session** given the corpus and stripped questions only; the
+run is `informed` because the harness and analysis are not blind. ⚠ **`-q` is
+ungraded** and `expand_weight = 0.2` is untested. Nothing claimed at 10 000.
+
 ## W-108 — `answer` refers the top 3, and the passage rescore sees proximity (2026-09-05)
 
 **Search v3's first item, ratified by Arpit 2026-09-05.** The verb's recall

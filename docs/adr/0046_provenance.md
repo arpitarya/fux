@@ -318,6 +318,27 @@ world?*, whose answer depends on a network the verifier does not control.
   prevent.** `.fux/output.toml` may change what is emitted; it may not make one
   artifact two shapes.
 
+⚠ **The receipt records `--expand` verbatim, and `--why` labels the terms it
+supplied (W-109, 2026-09-05).**
+
+- **`predicate.inputs.expand`**, written only when there was one. An expansion
+  is an input to the ranking exactly as the query is, so a receipt without it
+  describes an answer nobody can reproduce: `fux verify --rerun` would re-run
+  the bare question, get a different list, and report `drifted` for a reason
+  that has nothing to do with the corpus. `--rerun` now replays it.
+- **`TermHit.expanded`** on every matched term in `--why`. This record's
+  question is *why is this document here*, and *"because the caller supplied
+  the word"* is a different answer from *"because you asked for it"*. Present
+  on every hit rather than only on expanded ones, so a consumer reads a value
+  rather than an absence.
+- ⚠ **An expansion term the document lacks is NOT added to `missing`.**
+  `missing` is a claim about the user's question — it is what the retry rule
+  reads — and filling it with words a model guessed would turn a signal into
+  noise.
+
+⚠ **L8 is why this is legal**: an expansion is a use record, so it lives on the
+receipt and the journal, both gitignored, and reaches no committed byte.
+
 ### Consequences
 
 - **Easier:** a wrong ranking is diagnosable from the output — matched terms,

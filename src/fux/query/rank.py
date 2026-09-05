@@ -18,10 +18,14 @@ See `work/adr/0005_derived-accelerator.md`.
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
+from typing import TYPE_CHECKING
 
 from .. import store as store_mod
 from ..ingest.gitdir import is_archived_loc
 from .bm25f import DEFAULT_SCORING, Scoring, score_record
+
+if TYPE_CHECKING:  # pragma: no cover - typing only
+    from .expand import Expansion
 
 
 @dataclass(frozen=True)
@@ -227,6 +231,7 @@ def rank(
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
     stats_out: dict | None = None,
+    expansion: "Expansion | None" = None,
 ) -> list[AskResult]:
     """Score, sort, truncate. The only place any of the three happens.
 
@@ -248,6 +253,25 @@ def rank(
     retired and reordering because it is retired are two different decisions,
     and only the second one is configurable.
 
+    ## `expansion` — W-109, and the guard that lives here and nowhere else
+
+    🔴 **A candidate matching none of the ORIGINAL query's terms is dropped,
+    whatever it scored.** With `--expand` the caller hands fux words it thinks
+    the document uses; a document that matches only those is an answer to a
+    question **nobody asked**, assembled from words a model invented, and
+    returning it with a fresh `sha` beside it is a hallucinated citation with
+    provenance attached.
+
+    **It is enforced here rather than in display, and that is the decision.**
+    `rank()` is the only place scoring, sorting and truncating happen and the
+    one function **both candidate paths reach** — a filter in `cmd_ask` would
+    be absent from `fux_search` over MCP, and a filter in the printer would be
+    absent from `--json`. The drop runs **before the score is kept**, so an
+    expansion-only document never reaches a sort key, a receipt or a budget.
+
+    `None` means no expansion: `Expansion.none` is built from `query_hashes`,
+    every hash is required, the test is vacuous and no multiply is performed.
+
     `stats_out`, when a caller supplies a dict, receives the two corpus
     statistics only this function holds — `df` and `n` — for
     [`confidence.py`](confidence.py) to build its block from
@@ -263,6 +287,11 @@ def rank(
         stats_out["n"] = corpus.n
     if corpus.n == 0:
         return []
+    if expansion is None:
+        from .expand import Expansion
+
+        expansion = Expansion.none(query_hashes)
+    term_weights = expansion.weights or None
     avg_wlen = corpus.avg_wlen
     if weighting is None:
         weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
@@ -275,14 +304,19 @@ def rank(
 
     scored = []
     for record in candidates:
+        terms = record.get("terms", {})
+        # 🔴 The hallucinated-citation guard, before anything is scored.
+        if not expansion.matches(terms):
+            continue
         s = score_record(
-            record.get("terms", {}),
+            terms,
             record.get("flen", []),
             query_hashes,
             df,
             corpus.n,
             avg_wlen,
             scoring,
+            term_weights,
         )
         archived = _record_is_archived(record, weighting.archived_dirs)
         if demote:

@@ -98,6 +98,7 @@ _SCHEMA: dict[str, tuple[str, ...]] = {
         "superseded_weight",
         "recency_half_life_days",
         "rerank_weight",
+        "expand_weight",
     ),
     "graph": (
         "damping",
@@ -132,6 +133,18 @@ class Tune:
     superseded_weight: float = 1.0
     recency_half_life_days: float = 0.0
     rerank_weight: float = 0.0
+    #: W-109 — what an agent-supplied `--expand` term is worth against a term
+    #: the user actually typed. **`0.2` is Query2doc's 1:5 ratio** (arXiv
+    #: 2303.07678 §3.2 repeats the query five times beside one pseudo-passage),
+    #: ratified by Arpit 2026-09-05 and **documented as unmeasured on this
+    #: corpus until a graded run says otherwise**.
+    #:
+    #: ⚠ Unlike every other key in this table, this one **is a no-op unless a
+    #: caller passes `--expand`** — it cannot change the ranking of a query
+    #: nobody expanded. `0` turns expansion off entirely even when a caller
+    #: does pass one, which is the off-switch a consumer needs when they
+    #: distrust the agent writing the expansions.
+    expand_weight: float = 0.2
 
 
     # [graph]
@@ -371,6 +384,11 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         if "rerank_weight" in ranking
         else 0.0
     )
+    expand_weight = (
+        _non_negative(c, "ranking", "expand_weight", ranking["expand_weight"], 0.2)
+        if "expand_weight" in ranking
+        else 0.2
+    )
 
     graph = data.get("graph", {})
     damping = _fraction(c, "graph", "damping", graph["damping"], 0.85) if "damping" in graph else 0.85
@@ -465,6 +483,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
         superseded_weight=superseded_weight,
         recency_half_life_days=half_life,
         rerank_weight=rerank_weight,
+        expand_weight=expand_weight,
         damping=damping,
         iterations=iterations,
         laziness=laziness,
@@ -536,6 +555,9 @@ archived_weight         = {d.archived_weight}   # multiplier for a source declar
 superseded_weight       = {d.superseded_weight}   # multiplier for a document another supersedes
 recency_half_life_days  = {d.recency_half_life_days}   # 0 = off; decays on the committed `mtime`
 rerank_weight           = {d.rerank_weight}   # 0 = off; the proximity reranker's uplift
+# What an agent-supplied `--expand` term is worth against a term you typed.
+# A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.
+expand_weight           = {d.expand_weight}   # Query2doc's 1:5; unmeasured on your corpus
 
 [graph]                         # explain / graph / path
 damping      = {d.damping}

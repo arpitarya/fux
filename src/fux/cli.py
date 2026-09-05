@@ -431,6 +431,16 @@ def build_parser() -> argparse.ArgumentParser:
             action="store_true",
             help="force the reference scan path (the default; kept for explicit bug reproduction)",
         )
+        # W-109. **`--expand` is a TERM SLOT, not a second question.** The
+        # caller — usually a model — hands over the words it expects the
+        # document to use; fux analyzes them with the same analyzer the index
+        # was built with and scores them at `[ranking] expand_weight`. Fux
+        # never writes one (L3), and a document matching ONLY expansion terms
+        # is dropped by `rank()` rather than returned.
+        p.add_argument(
+            "--expand", metavar="TEXT", default=None,
+            help="extra terms the document probably uses, scored at [ranking] expand_weight",
+        )
         _add_tune_flag(p)
         _add_output_flags(p, band=True)
         return p
@@ -462,10 +472,22 @@ def build_parser() -> argparse.ArgumentParser:
         "--why", action="store_true",
         help="how the ranking got here: matched terms, the cut line, rerank and tune deltas",
     )
+    # W-109. **Repeatable, and fused in RANK space** — each phrasing is ranked
+    # on its own and the lists are combined by RRF (k = 60). `dest="also"`
+    # because `query` is already the positional: the first question is
+    # syntactically primary, which is what lets `--band` name one query.
+    p_ask.add_argument(
+        "-q", "--query", dest="also", action="append", metavar="TEXT",
+        help="another phrasing of the same question; results are fused by RRF (repeatable)",
+    )
     p_ask.set_defaults(func=_cmd_ask)
 
     p_find = _query_parser("find", "ranked document locations, one per line")
     p_find.add_argument("--top", type=int, default=None, metavar="N", help=_top_help())
+    p_find.add_argument(
+        "-q", "--query", dest="also", action="append", metavar="TEXT",
+        help="another phrasing of the same question; results are fused by RRF (repeatable)",
+    )
     p_find.set_defaults(func=_cmd_find)
 
     p_answer = _query_parser(

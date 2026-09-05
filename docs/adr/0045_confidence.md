@@ -512,6 +512,21 @@ second one contradicting the first.
     meaning and is unchanged. Confidence assembly itself (`confidence_out`,
     `_fill_confidence`) is untouched; `headings` is a different key entirely.
 
+⚠ **`--band` on a multi-`-q` search describes the FIRST phrasing (W-109).**
+`separation_floor` is calibrated against BM25F; reciprocal ranks live on a
+different scale, where a perfect fused top-2 differs by
+`1/61 - 1/62 ≈ 0.0003` — so a separation computed on fused scores would demote
+**every** fused query for the change of units rather than for its quality, and
+recalibrating the floor for fusion is a ranking default nobody has measured.
+The block is neither rescaled nor silently dropped: it is the primary arm's,
+and `"fused": true` sits beside it.
+[ADR-EXPAND](0054_expand.md) decision 10.
+
+⚠ **`coverage`, `missing` and `doc_coverage` stay functions of the ORIGINAL
+query under `--expand`**, so a document lifted by supplied terms cannot raise
+its own band — and it cannot be returned at all, because `rank()` drops a
+candidate that matches no original term.
+
 ### Consequences
 
 **`support` is bounded by `--top`, and cannot honestly be a corpus-wide count.**

@@ -1,1 +1,1 @@
-✓ W-106 (measured, no verdict) · → W-109: --expand and -q multi-query RRF
+✓ W-109 · → W-110: doc2query enrichment

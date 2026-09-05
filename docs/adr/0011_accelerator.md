@@ -335,6 +335,31 @@ Renamed 2026-08-27 on Arpit's ruling — *remove the trap at the source.*
   proving it can see a planted shadow — this repo has recorded vacuous passes
   before.
 
+🔴 **The block bound prices each term at THAT term's weight since 2026-09-05**
+(W-109, [ADR-EXPAND](0054_expand.md) decisions 6-7). `--expand` gives
+individual terms a multiplier, and an unweighted ceiling over weighted scores is
+the **W-73 class of defect** — a bound that no longer bounds, failing silently
+as *the accelerator returns a different answer from the scan*.
+
+Two changes, and the second was found by measurement rather than by reasoning:
+
+1. `_cannot_reach` multiplies each deferred term's `block_bound` by its own
+   weight, and `_kth_score` scores `theta` with the same weights. Comparing a
+   threshold and a ceiling in different units is how a bound stops bounding.
+2. 🔴 **A candidate `rank()` will DROP may not set `theta`.** With `--expand`,
+   a document matching only expansion terms is discarded by the hallucination
+   guard, so counting it raises the threshold on the strength of a document
+   nobody will be shown. `tests/derive/test_expand_bound.py` diverged at every
+   `expand_weight >= 0.5` at `top = 20` until `_kth_score` filtered on the
+   guard — **including at `1.0`, where the weights change no arithmetic at
+   all** and the guard alone broke the bound.
+
+⚠ **The test file catches three distinct injections and needs TWO corpus
+shapes to do it**, because the `theta` and ceiling defects bite under opposite
+conditions; the third is pinned as a direct property because no corpus shape
+found it. That is recorded in the file itself — a differential test that cannot
+fail is worse than none.
+
 ### Consequences
 
 - **The differential law now covers the confidence block too.** `accel.ask`

@@ -242,12 +242,18 @@ def accel_candidates(
     skipping: bool = True,
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
+    expansion=None,
 ) -> tuple[list[dict], dict[str, int], Corpus]:
     """Candidate records, `df`, and the corpus statistics — the scan's contract.
 
     Records are synthesized rather than read from the committed store: `rank()`
     reads only `terms` (at the query hashes), `wlen`, `id`, `title` and `loc`,
     all of which the doc table and the postings carry.
+
+    `expansion` is W-109's `Expansion`. `query_hashes` is already its full hash
+    list when one is in force — **this function never adds a term**, it only
+    needs the object so the block bound can price each term at the weight
+    `rank()` will actually score it with.
     """
     if weighting is None:
         weighting = Weighting()
@@ -293,7 +299,7 @@ def accel_candidates(
     for term in order:
         if skipping and hits and _cannot_reach(
             runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
-            weighting, scoring,
+            weighting, scoring, expansion,
         ):
             break
         for block in blocks[term]:
@@ -326,7 +332,7 @@ def accel_candidates(
 
 def _cannot_reach(
     runtime, blocks, df, opened, order, hits, docs, corpus, top, avg_wlen,
-    weighting=None, scoring: Scoring = DEFAULT_SCORING,
+    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None,
 ) -> bool:
     """True when no unseen document can enter the top `top`.
 
@@ -338,6 +344,21 @@ def _cannot_reach(
     The scale factor is `weighting.maximum`, not the weight of any candidate:
     the document this test is about has not been seen, so nothing is known
     about its weight except that the configuration bounds it.
+
+    ## 🔴 W-109: each term's bound is priced at THAT TERM's weight
+
+    `--expand` gives individual terms a multiplier, and an unweighted ceiling
+    over weighted scores is the **W-73 class of defect** — a bound that no
+    longer bounds. It is priced per term rather than by a single maximum
+    because the arithmetic is exact either way and the exact form is tighter:
+    an expansion term's true contribution is `w · base`, so `w · bound` is
+    still an upper bound on it. **Safe in both directions** — `w < 1` tightens
+    the ceiling correctly and `w > 1` loosens it correctly — which is what lets
+    `expand_weight` be a tunable rather than a capped constant.
+
+    ⚠ **`weighting.maximum` still multiplies the whole sum afterwards.** The
+    two scalings compose: one prices the *terms*, the other the *document*, and
+    dropping either reintroduces a different unbounded bound.
     """
     if weighting is None:
         weighting = Weighting()
@@ -350,14 +371,17 @@ def _cannot_reach(
         term_blocks = blocks[term]
         if not term_blocks:
             continue
-        ceiling += max(block_bound(b, df[term], corpus.n, avg_wlen, scoring) for b in term_blocks)
+        bound = max(block_bound(b, df[term], corpus.n, avg_wlen, scoring) for b in term_blocks)
+        if expansion is not None and not expansion.trivial:
+            bound *= expansion.weight_of(term)
+        ceiling += bound
 
     if not weighting.trivial:
         ceiling *= weighting.maximum
 
     theta = _kth_score(
         hits, docs, [h for h in order if h in opened], df, corpus, top, avg_wlen,
-        weighting, scoring,
+        weighting, scoring, expansion,
     )
     if theta is None:
         return False
@@ -368,7 +392,7 @@ def _cannot_reach(
 
 def _kth_score(
     hits, docs, opened_order, df, corpus, top, avg_wlen,
-    weighting=None, scoring: Scoring = DEFAULT_SCORING,
+    weighting=None, scoring: Scoring = DEFAULT_SCORING, expansion=None,
 ) -> float | None:
     """The `top`-th best **weighted** score among current candidates.
 
@@ -380,18 +404,44 @@ def _kth_score(
     non-negative `w(d)` preserves that direction, because
     `w(d)*S_opened(d) <= w(d)*S_full(d)` — which is what makes it legal to
     weight an under-estimate rather than having to weight the final score.
+
+    ⚠ **`expansion`'s per-term weights apply here too, and must.** `theta` is
+    compared against a ceiling computed with them; computing it without would
+    compare two numbers in different units and skip blocks a document needed.
+
+    🔴 **And a candidate `rank()` will DROP may not set `theta`.** With
+    `--expand`, a document matching only expansion terms is discarded by the
+    hallucination guard — so counting it here raises the threshold on the
+    strength of a document nobody will ever be shown, and the accelerator skips
+    blocks holding documents that should have entered the top `k`. **Measured,
+    not reasoned**: `tests/derive/test_expand_bound.py` diverged at every
+    `expand_weight >= 0.5` at `top = 20` until this filter existed, including
+    at `1.0` where the weights change no arithmetic at all — the guard alone
+    was enough to break the bound.
+
+    The filter is on the terms **seen so far**, so a document whose required
+    term is still deferred is excluded and `theta` is under-estimated. That is
+    the safe direction, and it is the same direction this function's
+    opened-terms-only scoring already errs in.
     """
     if weighting is None:
         weighting = Weighting()
-    if len(hits) < top:
+    guarded = (
+        {i: t for i, t in hits.items() if expansion.matches(t)}
+        if expansion is not None and not expansion.trivial
+        else hits
+    )
+    if len(guarded) < top:
         return None
     from ..query.bm25f import score_record
 
+    term_weights = (expansion.weights or None) if expansion is not None else None
     scores = []
-    for docidx, terms in hits.items():
+    for docidx, terms in guarded.items():
         record_terms = {term: list(tf) for term, tf in terms.items()}
         s = score_record(
-            record_terms, docs[docidx]["flen"], opened_order, df, corpus.n, avg_wlen, scoring
+            record_terms, docs[docidx]["flen"], opened_order, df, corpus.n, avg_wlen, scoring,
+            term_weights,
         )
         if not weighting.trivial:
             s *= weighting.of(docs[docidx])
@@ -436,6 +486,7 @@ def ask(
     weighting: "Weighting | None" = None,
     scoring: Scoring = DEFAULT_SCORING,
     stats_out: dict | None = None,
+    expansion=None,
 ) -> list[AskResult]:
     """The accelerated `ask`. Identical output to `query.scan.ask`, by law.
 
@@ -456,11 +507,14 @@ def ask(
         raise FuxError("no accelerator built — run `fux ingest` (or `fux build`) first")
     if weighting is None:
         weighting = Weighting(archived_weight=archived_weight, archived_dirs=archived_dirs)
+    collect = list(expansion.hashes) if expansion is not None else query_hashes
     candidates, df, corpus = accel_candidates(
-        runtime, query_hashes, top, skipping=skipping, weighting=weighting, scoring=scoring
+        runtime, collect, top, skipping=skipping, weighting=weighting, scoring=scoring,
+        expansion=expansion,
     )
     return rank(
-        candidates, query_hashes, df, corpus, top,
+        candidates, collect, df, corpus, top,
         archived_weight=archived_weight, archived_dirs=archived_dirs,
         weighting=weighting, scoring=scoring, stats_out=stats_out,
+        expansion=expansion,
     )

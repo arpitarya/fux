@@ -769,6 +769,20 @@ fails silently in the safe direction looks identical to one that never ran**, so
 the count is the only way a person can tell `validate()` is working. Silent when
 zero. See [ADR-FETCHER](0019_fetcher.md) decision 12.
 
+⚠ **`ask`, `find` and `answer` gained `--expand TEXT`, and `ask`/`find` gained
+a repeatable `-q/--query`, on 2026-09-05** (W-109,
+[ADR-EXPAND](0054_expand.md)). Both are plain valued options, so decision 10's
+`default=None` rule for gated flags does not reach them — there is no
+`store_true` collapse to avoid and no `.fux/output.toml` value for either to
+shadow. Named here anyway, for the reason `--all` and `--keep` were: this record
+constrains *every gated flag* in `cli.py`, so an option deliberately outside
+that set is recorded or a later reader "corrects" it toward a three-state
+resolution it has nothing to resolve against.
+
+⚠ **`answer` takes `--expand` and NOT `-q`** — [ADR-ANSWER](0006_answer.md)
+decision 4: one answer to one question. Expanding a question's vocabulary is not
+asking a second question.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

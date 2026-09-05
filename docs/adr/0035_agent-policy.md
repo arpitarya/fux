@@ -289,6 +289,18 @@ indistinguishable from one that does not exist.** And it is L4 showing through
 the surface rather than an oversight worth designing away: a line range can only
 be computed by chunking the *fetched* bytes, and `ask` is offline by default.
 
+⚠ **The shipped usage skill gained the retry rule on 2026-09-05** (W-109):
+when a search returns `band: partial` with a non-empty `missing`, re-ask with
+the corpus's own word, or keep the question and add `--expand`, or pass a second
+phrasing with `-q`. **A wrong guess costs nothing** — expansion terms are scored
+below the user's own and a document matching only them is never returned — which
+is what makes the retry safe to recommend to an agent.
+
+**It is in the skill because the surface cannot teach it.** `--json` reports
+`missing`; nothing in the output says what to do about it, and an agent that
+does not know the slot exists re-runs the same failing question.
+[ADR-EXPAND](0054_expand.md).
+
 ### Consequences
 
 - ⚠ **Fux owns three third-party formats it does not control.** This is a real

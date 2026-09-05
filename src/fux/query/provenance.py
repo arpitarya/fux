@@ -214,6 +214,12 @@ class TermHit:
     analyzed: str
     df: int
     fields: tuple[int, ...] = ()
+    #: W-109 — `True` when this term came from `--expand` rather than from the
+    #: question. **`--why` exists to answer *why is this document here*, and
+    #: *"because the caller supplied the word"* is a different answer from
+    #: *"because you asked for it"***. Present on every hit, never only on the
+    #: expanded ones, so a consumer reads a value rather than an absence.
+    expanded: bool = False
 
     def as_dict(self) -> dict:
         return {
@@ -221,6 +227,7 @@ class TermHit:
             "analyzed": self.analyzed,
             "df": self.df,
             "fields": list(self.fields),
+            "expanded": self.expanded,
         }
 
 
@@ -317,6 +324,7 @@ def derive(
     pre_rerank=None,
     untuned=None,
     multiplier: float = 1.0,
+    expand: str = "",
 ) -> Derivation:
     """Build the derivation for a result list. **Never raises.**
 
@@ -356,6 +364,29 @@ def derive(
         h = store_mod.term_hash(analyzed)
         first.setdefault(h, surface)
         analyzed_of.setdefault(h, analyzed)
+    # W-109 — the expansion's own terms, appended so `--why` can say *"this
+    # document is here because the CALLER supplied the word"*, which is a
+    # different answer from *"because you asked for it"*.
+    #
+    # ⚠ **Appended to `matched`, deliberately NOT to `missing`.** `missing` is
+    # a claim about the user's question — it is what `ask` prints and what the
+    # retry rule reads — and filling it with words a model guessed and the
+    # document happens to lack would turn a signal into noise.
+    supplied: set[str] = set()
+    extra: list[tuple[tuple[str, str], str]] = []
+    if expand:
+        try:
+            seen = set(hashes)
+            for surface, analyzed in analyze_pairs(expand):
+                h = store_mod.term_hash(analyzed)
+                if h in seen:
+                    continue
+                seen.add(h)
+                supplied.add(h)
+                extra.append(((surface, analyzed), h))
+        except Exception:
+            supplied, extra = set(), []
+
     aligned = [((first.get(h, h), analyzed_of.get(h, "")), h) for h in hashes]
 
     before = {r.id: i for i, r in enumerate(pre_rerank or [])}
@@ -372,10 +403,13 @@ def derive(
         carried = _record_terms(record)
         hits: list[TermHit] = []
         absent: list[str] = []
-        for (surface, analyzed), term_hash in aligned:
+        for (surface, analyzed), term_hash in [*aligned, *extra]:
             counts = carried.get(term_hash)
             if counts is None:
-                absent.append(surface)
+                # An expansion term the document lacks is not "missing" — see
+                # the note above. It simply did not fire.
+                if term_hash not in supplied:
+                    absent.append(surface)
                 continue
             hits.append(
                 TermHit(
@@ -383,6 +417,7 @@ def derive(
                     analyzed=analyzed,
                     df=int(df_map.get(term_hash, 0) or 0),
                     fields=tuple(int(c) for c in counts) if isinstance(counts, list) else (),
+                    expanded=term_hash in supplied,
                 )
             )
         docs.append(
@@ -424,12 +459,24 @@ def receipt(
     confidence: dict | None = None,
     derivation: Derivation | None = None,
     verdicts=None,
+    expand: str = "",
 ) -> dict:
     """A content-addressed record of one answer.
 
     `subject` is the list the answer actually cited — `{id, loc, sha}` each,
     named by digest, which is what makes the receipt checkable rather than
     merely descriptive (SLSA's *subject*).
+
+    `expand` is W-109's agent-written expansion, recorded **verbatim**. It is
+    an input to the ranking exactly as `query` is, so a receipt that omitted it
+    would describe an answer nobody could reproduce — the caller would re-run
+    the bare question and get a different list. ⚠ **Absent means no expansion
+    was passed**, never "unknown": the key is written only when there was one,
+    the same additive rule every other optional key here follows (W-48).
+
+    ⚠ **L8, and the reason this is legal.** An expansion is a *use record* —
+    what someone asked and how — so it lives on the receipt and the journal,
+    both gitignored, and reaches no committed byte.
 
     ⚠ **No wall clock.** L3 forbids one on a deterministic path and, more
     practically, a timestamp would make two receipts for the same answer
@@ -449,6 +496,7 @@ def receipt(
                 "index": index_digest(root),
                 "tune": tune_digest(root),
                 "query": query,
+                **({"expand": expand} if expand else {}),
             },
             "confidence": dict(confidence) if confidence else {},
             "derivation": derivation.as_dict() if derivation is not None else {},

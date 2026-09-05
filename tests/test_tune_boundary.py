@@ -47,6 +47,10 @@ MUTATIONS: dict[str, dict[str, str]] = {
         "superseded_weight": "0.2",
         "recency_half_life_days": "30.0",
         "rerank_weight": "0.75",
+        # W-109. ⚠ A value that CANNOT move a committed byte for a second
+        # reason on top of every other key's: nothing reads it unless a caller
+        # passes `--expand`, and `fux ingest` never does.
+        "expand_weight": "0.75",
     },
     "graph": {
         "damping": "0.25",

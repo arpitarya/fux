@@ -530,6 +530,21 @@ measurement, [ADR-CONFIDENCE](0045_confidence.md) decision 12's outcome.
 ordering moved**, so the mechanical test that decides what may live in
 `tune.toml` is unaffected.
 
+⚠ **`[ranking] expand_weight` joined the schema on 2026-09-05** (W-109,
+[ADR-EXPAND](0054_expand.md) decision 5), default **`0.2`** — Query2doc's 1:5
+ratio, ratified by Arpit and **unmeasured on any corpus in this repo**, which
+the key's own comment says out loud.
+
+**It is inside the boundary rule (decision 1) for the usual reason and one
+more:** it changes no committed byte, *and* it cannot change the ranking of a
+query nobody expanded — `fux ingest` never passes an expansion, so the key is
+inert on every maintenance path. `tests/test_tune_boundary.py` exercises it
+like every other key.
+
+⚠ **It is a knob on a value the caller supplies**, which is new for this file:
+every other key here weights something fux computed. `0` is the off-switch a
+consumer needs when they distrust the agent writing the expansions.
+
 ### Consequences
 
 - **The constants become decisions with a provenance**, in a file a reviewer can

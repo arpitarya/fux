@@ -317,6 +317,20 @@ record's matched hashes into the `stats_out` dict it already fills, and the band
 [ADR-CONFIDENCE](0045_confidence.md) decision 12's outcome. **No ordering, no
 score and no existing field moved.**
 
+⚠ **`score_record` gained an optional per-term multiplier on 2026-09-05**
+(W-109, [ADR-EXPAND](0054_expand.md) decision 2): a `term_weights` map applied
+to each summand, so an expansion's supplied words can be discounted without
+touching the user's own.
+
+**Per term, never per score.** Scaling the total would discount the query's own
+terms in the same breath as the caller's guesses — and this is BM25F, where the
+whole discipline is weight-then-saturate *once*, on the right quantity.
+
+⚠ **`None` performs no multiply at all**, not a multiply by `1.0`. The branch is
+skipped, so an unexpanded query does exactly the float arithmetic it did before
+the parameter existed and the differential law cannot pick up a last-bit
+difference from a feature nobody used.
+
 ### Consequences
 
 - **The differential law is achievable at all.** One scorer in one order is what

@@ -503,6 +503,15 @@ rule [ADR-ASK](0004_ask.md) decision 11 states for this schema.
 the same change, because a declaration that describes a shape the code no
 longer emits is worse than no declaration.
 
+⚠ **`ask`/`find --json` gained `"fused": true` on 2026-09-05** (W-109,
+[ADR-EXPAND](0054_expand.md) decision 9), present only when more than one `-q`
+was asked. Additive, and **not optional when it applies**: without it a
+consumer reads a reciprocal rank as a BM25F score, and the two are not
+comparable. Absent means *one question*, never *unknown*.
+
+The emission gate is untouched — `_show_band`/`_gated` are unchanged and
+`--band`'s resolution is unchanged.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

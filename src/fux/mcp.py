@@ -93,6 +93,16 @@ def _tools(top: int) -> list[dict]:
             "properties": {
                 "query": {"type": "string", "description": "A natural-language question."},
                 "k": _k_property(top),
+                "expand": {
+                    "type": "string",
+                    "description": (
+                        "OPTIONAL. Words you expect the document to use, when they differ from "
+                        "the question's. Scored at a lower weight than the question's own terms, "
+                        "and a document matching ONLY these is never returned. Use it after a "
+                        "search comes back `partial` with a non-empty `missing`: re-search with "
+                        "the vocabulary the corpus would use for the missing term."
+                    ),
+                },
             },
             "required": ["query"],
         },
@@ -167,10 +177,17 @@ def _search(root: Path, args: dict, *, top: int) -> dict:
     # 17: the config is read ONCE, in `serve()`, not once per search in a
     # warm process whose entire premise is staying resident.
     k = int(args.get("k") or top)
+    # W-109. Same slot as the CLI's `--expand`, same weight, same guard: a
+    # document matching only expansion terms is dropped in `rank()`, so an
+    # agent cannot talk fux into citing a document that answers none of what
+    # was asked.
+    expand = str(args.get("expand") or "")
     from .store import read_index
 
     signals: dict = {}
-    results, path = run_query(root, query, k, force_scan=False, confidence_out=signals)
+    results, path = run_query(
+        root, query, k, force_scan=False, confidence_out=signals, expand=expand
+    )
     block = signals.get("confidence")
     records = read_index(root) if results else {}
     out = []

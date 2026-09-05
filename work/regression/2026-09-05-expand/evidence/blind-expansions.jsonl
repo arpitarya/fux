@@ -1,0 +1,50 @@
+{"id": "q001", "expand": "runbook rollback procedure freeze unfreeze max-surge 1 per-node node proxy calderctl announce"}
+{"id": "q002", "expand": "runbook legacy rollback procedure max-surge 25% per-service freeze unfreeze pods waves calderctl"}
+{"id": "q003", "expand": "Calder Gateway ADR-0019 supersedes node proxy accepted per-node placement current decision"}
+{"id": "q004", "expand": "ADR-0007 sidecar eleven distinct retry implementations client libraries circuit breaker timeout mTLS east-west"}
+{"id": "q005", "expand": "retention classification C2 personal 7 years account records addresses encryption per-tenant key"}
+{"id": "q006", "expand": "postmortem 47 minutes SEV1 503 sessions 340 pods sidecar injection payments timeline rollback"}
+{"id": "q007", "expand": "deployment tiers review requirements two reviewers SRE service owner approve rollout"}
+{"id": "q008", "expand": "platform networking rotation rota handover incident lead service on-call escalate rollback runbooks"}
+{"id": "q009", "expand": "onboarding guide register service-registry tier 3 data classification calderctl deploy first-month mistakes"}
+{"id": "q010", "expand": "exit codes refused cluster is frozen precondition policy failed mid-incident forcing reference"}
+{"id": "q011", "expand": "tier 1 soak 14 days checkout payments cart identity rollout order last deployment tiers"}
+{"id": "q012", "expand": "calderctl gateway mesh freeze --tier writes halt progression unfreeze status --by-tier"}
+{"id": "q013", "expand": "rota compensation limits one week in four rotation handed over cover consecutive nights paged"}
+{"id": "q014", "expand": "tier 3 never pages files ticket next working day misconfiguration alert routing page policy"}
+{"id": "q015", "expand": "ADR-0019 Calder Gateway accepted supersedes ADR-0007 Helix Mesh node proxy migration"}
+{"id": "q016", "expand": "Calder Gateway node proxy current decision east-west supersedes Helix Mesh sidecar ADR-0019"}
+{"id": "q017", "expand": "ADR-0019 memory per pod 310 MB 2.9 ms latency 14 % compute spend replace Calder Gateway"}
+{"id": "q018", "expand": "310 MB per pod 2026 measured 180 MB estimate tune sidecar 270 MB floor connection state"}
+{"id": "q019", "expand": "legacy tiers still running not migrated through 2026 most of tier 1 removed tier by tier superseded"}
+{"id": "q020", "expand": "legacy Helix Mesh runbook check first sidecar per-pod max-surge 25% ADR-0007 superseded"}
+{"id": "q021", "expand": "tier 1 raised from 48 hours checkout outage weekly shape weekend traffic ADR-0019 deployment tiers"}
+{"id": "q022", "expand": "superseded ADR-0007 do not start new work removed from all tiers ADR-0019 Calder Gateway citations"}
+{"id": "q023", "expand": "calderctl gateway rollback --max-surge 1 not optional per node capacity workloads previous-release verify"}
+{"id": "q024", "expand": "calderctl mesh rollback --max-surge 25% tuned default per-pod quarter fleet capacity legacy Helix"}
+{"id": "q025", "expand": "calderctl gateway --per-node aggregate health hides bad node table tier unfreeze error rate"}
+{"id": "q026", "expand": "calderctl mesh --per-service aggregate health hides bad service table tier unfreeze legacy sidecar"}
+{"id": "q027", "expand": "escalate immediately do not retry second attempt state tooling does not model page platform networking lead"}
+{"id": "q028", "expand": "expected duration 8-12 minutes one tier active incident severity Calder release runbook per-node"}
+{"id": "q029", "expand": "expected duration 10-15 minutes one tier active incident legacy Helix release runbook per-service"}
+{"id": "q030", "expand": "known gaps sidecar injection failure found by hand afterwards legacy mesh runbook no dry-run mode"}
+{"id": "q031", "expand": "LEGACY applies only tiers still running Helix Mesh superseded ADR-0007 through 2026 tier 1 check first"}
+{"id": "q032", "expand": "ADR-0007 Helix Mesh superseded by ADR-0019 removed all tiers record stays runbooks postmortems citations"}
+{"id": "q033", "expand": "ADR-0007 Helix Mesh stays three runbooks two postmortems reference deleting leave citations dangling"}
+{"id": "q034", "expand": "tier 3 never pages 03:00 routing misconfiguration fix the routing do not normalise page policy"}
+{"id": "q035", "expand": "onboarding application-level retry loop double retries slow dependency becomes outage traffic policy platform config"}
+{"id": "q036", "expand": "tier 1 review requirements two reviewers one from SRE on-call service owner deployment tiers revenue"}
+{"id": "q037", "expand": "rotation coordination SEV1 SEV2 hold the timeline declare close handover escalate rota page"}
+{"id": "q038", "expand": "service-registry entry state your data classification onboarding registry encryption backup window tier"}
+{"id": "q039", "expand": "treated as most sensitive class C3 payment binding retention encryption HSM per-tenant key policy"}
+{"id": "q040", "expand": "backup window 35 days retention expiry deletion request 30 days classes policy data"}
+{"id": "q041", "expand": "verified deletion request 30 days primary stores read replicas caches search indexes warehouses expiry surgical"}
+{"id": "q042", "expand": "two rollback runbooks exist simultaneously most dangerous fact migration on-call check which applies ADR-0019"}
+{"id": "q043", "expand": "ADR-0007 context eleven distinct retry implementations client libraries timeout circuit breaker Helix Mesh sidecar"}
+{"id": "q044", "expand": "alternatives considered eBPF-based policy rejected maturity kernel floor 6.4 retry budgets reopen ADR-0019"}
+{"id": "q045", "expand": "most first services tier 3 choosing tier 1 two reviewers 14-day soak 24/7 page rotation onboarding regret"}
+{"id": "q046", "expand": "retry timeout circuit-breaking policy budget platform config proxy already retrying multiplication outage onboarding"}
+{"id": "q047", "expand": "moves from the pod to the node proxy every workload tiered rollout soak mitigation shared failure domain"}
+{"id": "q048", "expand": "exit code 3 refused cluster is frozen freeze status --by-tier calderctl precondition mid-incident"}
+{"id": "q049", "expand": "postmortem actions owner status done not started injection hard error per-service verification dashboard dry-run"}
+{"id": "q050", "expand": "known gap eleven months not mitigated runbook Known gaps section action item lesson worth carrying"}
