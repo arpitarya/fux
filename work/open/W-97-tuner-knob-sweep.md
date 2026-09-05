@@ -31,10 +31,18 @@ what is it? Hand Arpit that table. **Do not recommend.**
 
 ## Definition of done
 
-- [ ] `bench.py` gains `--tune <table.key> --value <v>` (write, run, restore,
-      hash the index before and after), a `playground` pass that emits one row
-      per golden, `select` (the frozen rule), `veto` (broken / fixed / XPASS by
-      qid), `difflaw`.
+- [x] **`bench.py quality --tune TABLE.KEY=VALUE`, repeatable — landed
+      2026-09-05.** One flag rather than the two the spec asked for: `--tune`
+      plus a separate `--value` cannot express two keys at once, which T3's
+      joint candidate set needs. Written **before the warm-up**, so no query in
+      a row file was asked under a different setting; **refuses to score if the
+      committed index moved** (T0.b, enforced per pass); omitting it **deletes**
+      `tune.toml` rather than writing an empty one; every row carries `tune`
+      and `index_sha`. Smoke on `t100`, 240 paired queries, rows deleted —
+      **no number from it is a result.**
+- [ ] `bench.py` still owes: a `playground` pass emitting one row per golden,
+      `select` (the frozen rule), `veto` (broken / fixed / XPASS by qid),
+      `difflaw`.
 - [ ] Pre-registration §1 carries the frozen sha; committed before the first pass.
 - [ ] T0 gates pass; baselines filed before any knob pass.
 - [ ] T1, T2 grids run as frozen; candidates selected once by the frozen rule.
@@ -47,9 +55,18 @@ what is it? Hand Arpit that table. **Do not recommend.**
 
 ## Blockers
 
-- **Per-query rows from the playground** — `check.py` emits totals; the filing
-  gate needs rows. Same emitter gap as OPEN-WORK's *Measurement plumbing*.
-- The `--tune` switch and index-hash assertion do not exist in `bench.py`.
+- 🔴 **Per-query rows from the playground** — `check.py`'s `grade()` already
+  returns `{id, state, detail}` per golden and writes none of it, so this is a
+  `--rows <path>` writer and nothing more. **It is not written, and the reason
+  is not difficulty:** that repo has 74 files staged with its index staged as
+  deletions and no commit since 2026-08-20, and adding a change to a pending
+  commit that is Arpit's (R-11) is not a session's call. **Unblocks the moment
+  he commits or restores it.**
+- ~~The `--tune` switch and index-hash assertion do not exist in `bench.py`.~~
+  **Landed 2026-09-05** — see the definition of done above.
+- ⚠ **`rerank_weight` moves two mechanisms since W-108**, and T1 now says so:
+  T1.a/T1.c read `ask` rows and do not fetch, so **T1.d is the exposed leg** and
+  its verdict owes the sentence. Re-derived in code, written before any pass.
 
 ## Hazards (the ones that decide the run)
 

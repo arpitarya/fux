@@ -134,10 +134,20 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   (bar: 0 broken; `q022`/`q033` named in advance for `superseded_weight`), a
   latency fence **prices**. Output is a **candidate table with no
   recommendation**; the change stays an ADR-TUNE amendment Arpit ratifies, and
-  W-94's *"doing nothing is legitimate"* is untouched. ⚠ **A THIRD knob joined on 2026-09-05**: `expand_weight`, shipped at `0.2` (Query2doc's 1:5) and **untested by [W-109's gate](regression/2026-09-05-expand/report.md)**, which ran every arm at that one value. It is the first knob this sweep has a corpus that can actually see move — 16 goldens changed state under it. ⚠ **And `rerank_weight` now moves TWO mechanisms**, not one: since W-108 it also scales the refer plane's passage proximity, which the sweep's design assumed it did not. Scope is `rerank_weight`
+  W-94's *"doing nothing is legitimate"* is untouched. ⚠ **A THIRD knob joined on 2026-09-05**: `expand_weight`, shipped at `0.2` (Query2doc's 1:5) and **untested by [W-109's gate](regression/2026-09-05-expand/report.md)**, which ran every arm at that one value. It is the first knob this sweep has a corpus that can actually see move — 16 goldens changed state under it. ⚠ **And `rerank_weight` now moves TWO mechanisms**, not one: since W-108 it also scales the refer plane's passage proximity, which the sweep's design assumed it did not. **Re-derived in code and written into T1 on 2026-09-05 as a stated limit** — T1.a/T1.c read `ask` rows and do not fetch, so **T1.d's veto is the exposed leg**; the bar is unchanged and the verdict now owes the sentence. Scope is `rerank_weight`
   and `superseded_weight` only — `k1`/`b`, field weights and recency have no
-  instrument with headroom (§6 lists the generator kinds owed). Blocked on the
-  playground emitting per-query rows and a `--tune` switch in `bench.py`. —
+  instrument with headroom (§6 lists the generator kinds owed).
+  ✅ **One of the two blockers is CLEARED: `bench.py quality --tune TABLE.KEY=VALUE`
+  landed 2026-09-05** — written before the warm-up, refusing to score if the
+  committed index moved (T0.b enforced per pass rather than checked after),
+  omission deleting `tune.toml` rather than writing an empty one, and every row
+  carrying `tune` + `index_sha` so a pairing asserts a shared index **from the
+  rows**. Smoke-run on `t100`, rows deleted: **no number from it is a result.**
+  ⚠ **`expand_weight` is now in §1's defaults table and §6's out-of-scope
+  table** — it was in neither, and §1 claims to be read from source. It cannot
+  join this sweep: **no suite here passes `--expand`**, so no query can move it.
+  🔴 **Still blocked on the playground's per-query rows**, which are blocked on
+  Arpit's staged `fux-playground` tree (R-11). —
   [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
 
 - ⚠ **`separation_floor` is repo-configurable and R10 is still unmeasured.**

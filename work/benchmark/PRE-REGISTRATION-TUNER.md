@@ -78,6 +78,7 @@ Defaults, read from [`src/fux/tune.py`](../../src/fux/tune.py) and
 | `[ranking]` | `rerank_weight` | `0.0` | **yes — T1** |
 | `[ranking]` | `superseded_weight` | `1.0` | **yes — T2** |
 | `[ranking]` | `recency_half_life_days` | `0.0` | no — §6 |
+| `[ranking]` | `expand_weight` | `0.2` | **no — §6.** Added to this table 2026-09-05: the key shipped with W-109 and this table, which claims to be read from source, did not have it |
 | `[ranking]` | `archived_weight` | `1.0` | 🔴 **no, ever, in this sweep** — below `1.0` W-73's differential law does not hold |
 | `[bm25f]` | `k1` · `b` | `1.2` · `0.75` | no — §6 |
 | `[bm25f]` | `body` · `heading` · `title` · `path` · `ctx` | `1.0` · `3.0` · `2.0` · `1.5` · `1.0` | no — §6 |
@@ -143,6 +144,19 @@ are counts, not tests** — a broken hand-graded golden is a fact, not a sample.
 - **Verdict:** `PASS` = candidate exists, T1.c and T1.d clear, T4 clears.
   `FAIL` = candidate exists and any of T1.c / T1.d / T4 fails.
   `INCONCLUSIVE` = no candidate, or 0 headroom on the veto.
+- 🔴 **`rerank_weight` moves TWO mechanisms, not one, and this leg is designed
+  around the assumption that it moves one.** Since W-108 it also scales the
+  refer plane's passage proximity — `refer()` takes it as a parameter and hands
+  it to `rescore()` ([`src/fux/refer/__init__.py`](../../src/fux/refer/__init__.py)) —
+  so a `target_first` gain at a candidate value is **not attributable to
+  document reranking alone** on any endpoint that goes through `refer`.
+  **What that changes here and what it does not:** T1.a and T1.c read `ask`
+  contested rows, which do not fetch, so they are unaffected. **T1.d's veto is
+  the exposed leg** — the playground goldens are graded on `answer`, which
+  does. The bar is unchanged (**broken = 0** is a count either way); what is
+  added is the obligation to say, in the verdict, that a broken golden there
+  could be either mechanism. Written down **before any pass**, so it is a
+  stated limit and not a post-hoc explanation of a number.
 - ✅ **Predicted: PASS** — with the magnitude stated now so it cannot inflate
   later. The gain leg will be near-saturated (the suite rewards the reranker by
   construction). The veto leg is the one that matters, and the hand-graded
@@ -248,6 +262,7 @@ post-hoc, labelled so, and in no verdict.**
 | `recency_half_life_days` | decays on the committed `mtime`; no corpus plants a recency contest | a **`recency`** kind: two lexically equal candidates, planted commit dates, the newer declared target |
 | `archived_weight` | 🔴 W-73: below `1.0` the differential law does not hold. It is measured under its own law, never in a sweep | — |
 | `[confidence]` floors | not ranking; fitting a floor to the 20 unanswerables that exposed the 0/20 abstentions is the moving-threshold failure in a new costume | Arpit's call on whether the class gates anything, first |
+| `expand_weight` | 🔴 **a no-op unless a caller passes `--expand`**, so no suite here can move it: not one query in `pairs`, `chains`, `contested` or `unanswerable` supplies an expansion. It shipped at `0.2` (Query2doc's 1:5) and [W-109's gate](../regression/2026-09-05-expand/report.md) ran **every arm at that one value**, so the default is ratified and untested | an eval set whose queries carry a **frozen, committed** expansion per query — authored by someone who has read no score, or the sweep fits the expansion to the knob. The playground is the only instrument with headroom today (16 goldens changed state under `--expand`) and it needs per-query rows first. A `T6+` document, never an amendment here |
 
 Those kinds are **additive extensions** to the generator; the pre-W-95 corpora
 must keep regenerating byte-identical. When they exist, the next
@@ -279,8 +294,20 @@ pre-registration takes ids `T6+` and this document stays as it is.
       needs one row per golden per pass. One emitter to fix — the open
       *Measurement plumbing* item — or a `bench.py` adapter that runs
       `goldens/queries.jsonl` and writes rows.
-- [ ] **A `--tune` pass switch in `bench.py`**: write `.fux/tune.toml` into the
-      work directory, run, restore, hash the index before and after.
+- [x] **A `--tune` pass switch in `bench.py`** — **landed 2026-09-05.**
+      `bench.py quality --tune TABLE.KEY=VALUE` (repeatable) writes
+      `.fux/tune.toml` into the work directory **before the warm-up**, so no
+      query in a row file was ever asked under a different setting, and
+      **refuses to score if the committed index moved** — that is T0.b's
+      invariant, enforced per pass rather than checked afterwards. Omitting
+      `--tune` **deletes** the file rather than writing an empty one, so the
+      baseline arm is the engine's own defaults and not a second thing to get
+      wrong. Every row carries `tune` and `index_sha`, so a pairing script can
+      assert the two arms shared an index **from the rows** rather than from a
+      filename someone typed. Smoke-run on `t100`: 240 paired queries, both
+      arms `index_sha 8a2ef2ca…`, and the digest is **not vacuous** — a
+      one-byte change to a shard moves it. ⚠ **No number from that smoke is a
+      result**; it exercised the harness and its rows were deleted.
 - [ ] `W-97`'s row and file (this change).
 
 ## Authorship
