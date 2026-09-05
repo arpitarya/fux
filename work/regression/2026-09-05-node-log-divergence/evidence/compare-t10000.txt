@@ -1,0 +1,7 @@
+documents scored          : 196800
+scores differing bit-for-bit: 0  (0.000 %)
+scores differing at round(9): 0  (0.000 %)
+max relative difference     : 0.000e+00
+queries with a different top-5 (exact sort)   : 0
+queries with a different top-5 (round(9) sort): 0
+per-query rows -> /dev/null

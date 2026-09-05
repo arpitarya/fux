@@ -1,0 +1,50 @@
+{"query": "steps to revert a bad calder gateway release", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how to roll back a helix mesh sidecar release", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what replaced helix mesh", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "why did we adopt a service mesh in the first place", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how long do we keep customer order history", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what happened during the checkout outage", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how many reviewers does a tier 1 deploy need", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "who do I page when traffic between services is failing", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "I am shipping my first service where do I start", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what does calderctl exit code 3 mean", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what is the soak period for the revenue path tier", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how do I freeze an in flight rollout", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "am I allowed to be on call two weeks in a row", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "does an internal service page anyone overnight", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what is the current decision for east west traffic", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "which proxy do we run between services today", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "why did we move away from sidecars", "n_docs": "6", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how much memory did the sidecar actually use", "n_docs": "6", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "is helix mesh still in use anywhere", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "which rollback do I use for a tier that has not migrated", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "why is the soak fourteen days now instead of two", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "can I start new work against helix mesh", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what max surge should I use rolling back the node proxy", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what max surge for a sidecar rollback", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "verify per node after rolling back", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "verify per service after rolling back", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "the rollback failed should I try it again", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how long does a gateway rollback take", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how long does a mesh rollback take", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "pods skipped silently during a rollback", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "is the legacy runbook still valid", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "does the superseded networking ADR still apply anywhere", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "why keep a superseded record in the repository", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "my alert paged at 3am but my service is internal", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "I added a retry and things got worse", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "who approves a change to the revenue path", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what does the incident lead actually do", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "where do I record my service data class", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what happens if I never state a classification", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how long are backups kept", "n_docs": "2", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "can I delete a customer record out of the backups", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "why is having two rollback procedures dangerous", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "we had a different retry policy in every service", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "why not use ebpf instead of a proxy", "n_docs": "8", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what is the cheapest tier to start on", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how do we stop a slow dependency taking down checkout", "n_docs": "10", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "blast radius of a bad config push", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "how do I tell if someone else is mid incident before I deploy", "n_docs": "9", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "what did we promise to fix after the outage and did we", "n_docs": "7", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}
+{"query": "a hazard we wrote down but never actually fixed", "n_docs": "5", "n_scores_differing": "0", "top5_same_exact": "1", "top5_same_round9": "1"}

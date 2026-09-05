@@ -1,1 +1,1 @@
-✓ W-108 · → W-107 Phase 0 + W-106 (measurements)
+✓ W-107 Phase 0 (measured + pre-registered, one cell awaiting Arpit) · → W-106 vector gate

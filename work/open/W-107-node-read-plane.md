@@ -29,14 +29,33 @@ produces: same ids, order, locs, headings, band; scores equal after
 
 ## Phase 0 — the `log()` decision (Arpit)
 
-- [ ] Measure Python-vs-Node BM25F score divergence *as is* on the playground
-      and the 10 000-document lab corpus (idf only — one script, both
-      runtimes); file the discordant top-5 count.
-- [ ] Write `work/benchmark/PRE-REGISTRATION-NODE.md`: the three-arm law,
-      the exact comparison (which fields must be byte-equal, which are
-      `round(9)`-equal), p95 bar for the Node scan at 10 000 documents,
-      corpora, ISAs. Frozen sha before Phase 1.
-- [ ] Arpit picks: **(a) portable `log`** — `src/fux/query/portable_math.py`
+- [x] **DONE 2026-09-05.** Measure Python-vs-Node BM25F score divergence *as
+      is* on the playground and the 10 000-document corpus; file the discordant
+      top-5 count. →
+      [`2026-09-05-node-log-divergence`](../regression/2026-09-05-node-log-divergence/report.md),
+      `blind`, per-query rows for all 290 queries.
+      **`Math.log` and `math.log` DO differ** — 655 / 100 000 wide doubles on
+      darwin/arm64, the same order as the glibc figure in Hazards below — but
+      **every difference is one ulp** (max rel `2.211e-16`) and **not one
+      survives `round(9)`**, which is `rank.py`'s own sort-key resolution.
+      Over the corpora: **0 discordant scores and 0 discordant top-5 on
+      197 233 scored documents**, checked on both the real sort key and an
+      exact one. Python's scan **p95 = 50.2 ms at 10 000 documents**.
+      ⚠ **Two limits bound every sentence of that**: the `idf` argument
+      population in those corpora is **13 distinct values** (a property of a
+      10-document corpus and a synthetic 10 000-document one, not of fux), and
+      **glibc — what CI runs — was not measured**, because this machine has no
+      Linux.
+- [x] **WRITTEN 2026-09-05, and deliberately NOT FROZEN.**
+      [`../benchmark/PRE-REGISTRATION-NODE.md`](../benchmark/PRE-REGISTRATION-NODE.md)
+      — ids `N0`–`N4`, the byte-equal field table, both corpora, all three
+      OS/libm pairs, and `N4`'s **p95 ≤ 150 ms** (3× the measured Python
+      figure: a fence against an *algorithmic* divergence, not against a
+      constant factor). 🔴 **§2's score-comparison cell is blank** and is the
+      bullet below. **The document is not frozen and Phase 1 does not start
+      until Arpit fills it in.**
+- [ ] 🔴 **ARPIT PICKS — the only thing blocking Phases 1–4.** (a) or (b),
+      one word, with the numbers above beside them: **(a) portable `log`** — `src/fux/query/portable_math.py`
       (range reduction via `math.frexp`, atanh-series polynomial, basic ops
       only) used by `bm25f.idf`, mirrored bit-for-bit in JS via `DataView`;
       ADR-RANKING amended; differential law + goldens re-run in Python first;
@@ -88,8 +107,15 @@ produces: same ids, order, locs, headings, band; scores equal after
 
 ## Blockers
 
-- `arpit`: ratification; the Phase 0 decision.
-- W-108 should land first so Phase 2 ports one rescore, not two.
+- ~~`arpit`: ratification~~ — **ratified 2026-09-05.**
+- 🔴 `arpit`: **the Phase 0 `log()` pick.** The measurement is filed; the
+  pre-registration is written with that one cell blank. Nothing else blocks
+  Phases 1–4.
+- ~~W-108 should land first so Phase 2 ports one rescore, not two~~ —
+  **W-108 landed 2026-09-05.** Phase 2 ports the rescore **with** its proximity
+  multiplier, per-passage locators, and the URL-keyed fetcher dispatch. ⚠ Node
+  never fetches, so the dispatcher has **no Node twin**: `answer` on a `url:`
+  document reads `.fux/acquired/` or returns `source: index`.
 
 ## Hazards
 
@@ -97,7 +123,10 @@ produces: same ids, order, locs, headings, band; scores equal after
   defect until the pre-registration says otherwise.
 - 🔴 `math.log`: 1 095 / 100 000 last-ulp disagreements measured (V8 fdlibm
   vs glibc 2.39); macOS libm is a third answer. Phase 0 exists because of
-  this; do not skip it.
+  this; do not skip it. **Re-measured 2026-09-05 on Apple libm vs
+  V8/darwin-arm64: 655 / 100 000, all one ulp, none surviving `round(9)`** —
+  the hazard is confirmed as a property of `log` and **quantified as seven
+  orders of magnitude below the sort key's resolution.**
 - Truncated `blake2b512` is **not** BLAKE2b-8 (parameter block). Test it.
 - `Number(x.toFixed(9))` is half-up on exact binary ties; Python is
   half-even. Detect ties via `toFixed(20)`.

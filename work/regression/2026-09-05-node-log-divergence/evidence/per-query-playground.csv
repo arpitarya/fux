@@ -1,0 +1,51 @@
+query,n_docs,n_scores_differing,top5_same_exact,top5_same_round9
+"steps to revert a bad calder gateway release",10,0,1,1
+"how to roll back a helix mesh sidecar release",9,0,1,1
+"what replaced helix mesh",8,0,1,1
+"why did we adopt a service mesh in the first place",10,0,1,1
+"how long do we keep customer order history",7,0,1,1
+"what happened during the checkout outage",8,0,1,1
+"how many reviewers does a tier 1 deploy need",10,0,1,1
+"who do I page when traffic between services is failing",10,0,1,1
+"I am shipping my first service where do I start",10,0,1,1
+"what does calderctl exit code 3 mean",10,0,1,1
+"what is the soak period for the revenue path tier",10,0,1,1
+"how do I freeze an in flight rollout",9,0,1,1
+"am I allowed to be on call two weeks in a row",10,0,1,1
+"does an internal service page anyone overnight",10,0,1,1
+"what is the current decision for east west traffic",7,0,1,1
+"which proxy do we run between services today",10,0,1,1
+"why did we move away from sidecars",6,0,1,1
+"how much memory did the sidecar actually use",6,0,1,1
+"is helix mesh still in use anywhere",9,0,1,1
+"which rollback do I use for a tier that has not migrated",10,0,1,1
+"why is the soak fourteen days now instead of two",10,0,1,1
+"can I start new work against helix mesh",9,0,1,1
+"what max surge should I use rolling back the node proxy",9,0,1,1
+"what max surge for a sidecar rollback",8,0,1,1
+"verify per node after rolling back",9,0,1,1
+"verify per service after rolling back",10,0,1,1
+"the rollback failed should I try it again",9,0,1,1
+"how long does a gateway rollback take",9,0,1,1
+"how long does a mesh rollback take",9,0,1,1
+"pods skipped silently during a rollback",9,0,1,1
+"is the legacy runbook still valid",8,0,1,1
+"does the superseded networking ADR still apply anywhere",10,0,1,1
+"why keep a superseded record in the repository",7,0,1,1
+"my alert paged at 3am but my service is internal",10,0,1,1
+"I added a retry and things got worse",7,0,1,1
+"who approves a change to the revenue path",8,0,1,1
+"what does the incident lead actually do",10,0,1,1
+"where do I record my service data class",10,0,1,1
+"what happens if I never state a classification",8,0,1,1
+"how long are backups kept",2,0,1,1
+"can I delete a customer record out of the backups",7,0,1,1
+"why is having two rollback procedures dangerous",10,0,1,1
+"we had a different retry policy in every service",10,0,1,1
+"why not use ebpf instead of a proxy",8,0,1,1
+"what is the cheapest tier to start on",10,0,1,1
+"how do we stop a slow dependency taking down checkout",10,0,1,1
+"blast radius of a bad config push",7,0,1,1
+"how do I tell if someone else is mid incident before I deploy",9,0,1,1
+"what did we promise to fix after the outage and did we",7,0,1,1
+"a hazard we wrote down but never actually fixed",5,0,1,1
