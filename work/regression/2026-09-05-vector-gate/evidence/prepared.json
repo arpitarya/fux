@@ -1,0 +1,656 @@
+{
+ "chunks": [
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"ADR-0007: adopt Helix Mesh for east-west traffic\"\ntags: [architecture, networking, superseded]\nstatus: superseded\n---"
+  },
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 1,
+   "heading": "ADR-0007: adopt Helix Mesh for east-west traffic",
+   "text": "ADR-0007: adopt Helix Mesh for east-west traffic\n\n# ADR-0007: adopt Helix Mesh for east-west traffic\n\n> **Superseded by [ADR-0019](adr-0019-calder-gateway.md) (2026-02-11).** Helix\n> Mesh is being removed from all tiers. Do not start new work against it. This\n> record stays because three runbooks and two postmortems still reference it,\n> and deleting it would leave those citations dangling.\n\n- **Status:** superseded\n- **Date:** 2024-06-03\n- **Deciders:** Platform Networking, Calder Group"
+  },
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 2,
+   "heading": "Context",
+   "text": "Context\n\n## Context\n\nCalder Group runs roughly 2 400 services across four regions. Before this\ndecision, east-west traffic used per-service client libraries: each team\nshipped its own retry policy, its own timeout, and its own idea of what a\ncircuit breaker was. A single slow dependency produced four different\nbehaviours depending on which team's library was calling it.\n\nThe 2024 Q1 review counted eleven distinct retry implementations in the\ncheckout path alone. Two of them retried non-idempotent writes."
+  },
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 3,
+   "heading": "Decision",
+   "text": "Decision\n\n## Decision\n\nAdopt **Helix Mesh** as the mandatory sidecar for all east-west traffic.\n\n1. Every service gets a sidecar injected at admission time. There is no opt-out\n   short of a platform exception, and exceptions expire after 90 days.\n2. Retry, timeout and circuit-breaking policy moves into mesh configuration and\n   out of application code.\n3. mTLS between all services, with certificates rotated every 24 hours.\n4. Client libraries are frozen: bug fixes only, no new policy features."
+  },
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 4,
+   "heading": "Consequences",
+   "text": "Consequences\n\n## Consequences\n\n- **Policy becomes reviewable.** A retry budget is a diff in a config repo\n  rather than a constant compiled into eleven binaries.\n- **A per-request latency cost of 1.2\u20131.8 ms** at p50, measured on the\n  checkout path. Accepted deliberately: the review judged consistency worth\n  more than a millisecond.\n- **The sidecar becomes a shared failure domain.** A bad mesh rollout can take\n  down every service at once, which is a class of outage the per-library world\n  did not have. The rollback runbook is\n  [the legacy mesh rollback](runbook-mesh-rollback-legacy.md).\n- **Memory overhead of ~180 MB per pod.** At 2 400 services this is real money\n  and it is the number that eventually forced ADR-0019."
+  },
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 5,
+   "heading": "Alternatives considered",
+   "text": "Alternatives considered\n\n## Alternatives considered\n\n- **A shared client library, mandated.** Rejected: mandating a library means\n  mandating a language, and Calder runs Go, Java, Python and Rust in\n  production.\n- **API gateway only, no service-to-service policy.** Rejected: it addresses\n  north-south traffic and leaves the eleven retry implementations untouched.\n- **Do nothing and write a style guide.** Rejected on evidence \u2014 the 2023 style\n  guide said exactly what the eleven implementations should have done."
+  },
+  {
+   "doc": "docs/adr-0007-helix-mesh.md",
+   "ordinal": 6,
+   "heading": "Operational notes",
+   "text": "Operational notes\n\n## Operational notes\n\nMesh configuration lives in `calder/mesh-policy`. A policy change is a pull\nrequest; the platform team reviews anything that touches a retry budget or a\ntimeout, because those two are what turn a slow dependency into an outage.\n\nRollout is per-tier, following [the deployment tiers](reference-deployment-tiers.md):\ntier 3 first, then tier 2, then tier 1, with a 48-hour soak between each.\n\nThe on-call rotation for the mesh itself is separate from the service rotation\n\u2014 see [the on-call rota](guide-oncall-rota.md)."
+  },
+  {
+   "doc": "docs/adr-0019-calder-gateway.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"ADR-0019: replace Helix Mesh with Calder Gateway\"\ntags: [architecture, networking, current]\nstatus: accepted\n---"
+  },
+  {
+   "doc": "docs/adr-0019-calder-gateway.md",
+   "ordinal": 1,
+   "heading": "ADR-0019: replace Helix Mesh with Calder Gateway",
+   "text": "ADR-0019: replace Helix Mesh with Calder Gateway\n\n# ADR-0019: replace Helix Mesh with Calder Gateway\n\n> **Supersedes [ADR-0007](adr-0007-helix-mesh.md).** Helix Mesh is removed tier\n> by tier through 2026. **This is the current decision for east-west traffic.**\n\n- **Status:** accepted\n- **Date:** 2026-02-11\n- **Deciders:** Platform Networking, Calder Group, with SRE sign-off"
+  },
+  {
+   "doc": "docs/adr-0019-calder-gateway.md",
+   "ordinal": 2,
+   "heading": "Context",
+   "text": "Context\n\n## Context\n\n[ADR-0007](adr-0007-helix-mesh.md) achieved what it set out to: retry policy is\nreviewable, mTLS is universal, and the eleven retry implementations are gone.\nIt also cost more than anyone modelled.\n\nThree numbers drove the reversal:\n\n| | 2024 estimate | 2026 measured |\n|---|---|---|\n| memory per pod | 180 MB | **310 MB** |\n| p50 added latency | 1.2\u20131.8 ms | **2.9 ms** |\n| fleet cost of the sidecar | not modelled | **~14 % of compute spend** |\n\nThe memory figure is the decisive one. At 2 400 services and a median of six\nreplicas, the sidecar fleet is larger than the application fleet it serves."
+  },
+  {
+   "doc": "docs/adr-0019-calder-gateway.md",
+   "ordinal": 3,
+   "heading": "Decision",
+   "text": "Decision\n\n## Decision\n\nReplace the sidecar mesh with **Calder Gateway**, a shared per-node proxy.\n\n1. **One proxy per node, not one per pod.** Policy is unchanged in meaning;\n   only its placement moves.\n2. **Retry, timeout and circuit-breaking configuration is carried forward\n   verbatim.** The migration must not be a policy change and a placement change\n   at the same time \u2014 that is how a migration becomes an incident nobody can\n   attribute.\n3. **mTLS terminates at the node proxy.** This is a real reduction in isolation\n   and it is accepted with a compensating control: node-level network policy is\n   now mandatory rather than advisory.\n4. **Tier 3 first, then tier 2, then tier 1**, per\n   [the deployment tiers](reference-deployment-tiers.md), with a 14-day soak\n   between tiers rather than 48 hours. The longer soak is a direct consequence\n   of the [checkout outage postmortem](postmortem-checkout-outage.md)."
+  },
+  {
+   "doc": "docs/adr-0019-calder-gateway.md",
+   "ordinal": 4,
+   "heading": "Consequences",
+   "text": "Consequences\n\n## Consequences\n\n- **Expected saving of roughly 11 % of compute spend**, and a p50 latency\n  reduction of about 2 ms on the checkout path.\n- **Blast radius moves from the pod to the node.** A bad proxy config now takes\n  out every workload on that node. The mitigation is the tiered rollout and the\n  new soak period, not a claim that it cannot happen.\n- **The rollback procedure changed** and is\n  [the gateway rollback runbook](runbook-gateway-rollback.md). The old\n  [legacy mesh rollback](runbook-mesh-rollback-legacy.md) still applies to any\n  tier that has not migrated, which through 2026 is most of tier 1.\n- **Two rollback runbooks exist simultaneously**, and that is the single most\n  dangerous fact about this migration. On-call must check which one applies\n  before touching anything."
+  },
+  {
+   "doc": "docs/adr-0019-calder-gateway.md",
+   "ordinal": 5,
+   "heading": "Alternatives considered",
+   "text": "Alternatives considered\n\n## Alternatives considered\n\n- **Tune the sidecar.** Attempted for two quarters. Memory fell from 310 MB to\n  270 MB and stopped; the floor is the proxy's own connection state.\n- **Return to client libraries.** Rejected for the same reason ADR-0007\n  rejected them: four languages.\n- **eBPF-based policy with no proxy at all.** Genuinely attractive and rejected\n  on maturity, not on merit. Reopen if the kernel floor across the fleet\n  reaches 6.4 and the policy surface covers retry budgets."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Guide: onboarding to the Calder platform\"\ntags: [guide, onboarding, platform]\n---"
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 1,
+   "heading": "Guide: onboarding to the Calder platform",
+   "text": "Guide: onboarding to the Calder platform\n\n# Guide: onboarding to the Calder platform\n\nFor an engineer shipping their first service. Expect half a day.\n\n## Before you start\n\nYou need: cluster access (`calderctl --context` resolves), membership of your\nteam's group, and a service name approved in `calder/service-registry`. Names\nare permanent \u2014 they appear in metrics, alerts and billing exports \u2014 so the\nregistry review is slower than it looks like it should be."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 2,
+   "heading": "1. Register the service and pick a tier",
+   "text": "1. Register the service and pick a tier\n\n## 1. Register the service and pick a tier\n\nEvery service belongs to exactly one tier, and **a service without a tier does\nnot deploy** \u2014 the admission controller rejects it. Read\n[the deployment tiers](reference-deployment-tiers.md) before you choose.\n\nMost first services are **tier 3**. Choosing tier 1 because it sounds important\nbuys you two reviewers, a 14-day soak and a 24/7 page rotation, and you will\nregret all three."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 3,
+   "heading": "2. State your data classification",
+   "text": "2. State your data classification\n\n## 2. State your data classification\n\nIn the same registry entry. If you do not state it, the platform treats your\nservice as holding the most sensitive class \u2014 see\n[the data retention policy](policy-data-retention.md). This is not a formality:\nit decides your encryption requirements and your backup window."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 4,
+   "heading": "3. Deploy to tier 3",
+   "text": "3. Deploy to tier 3\n\n## 3. Deploy to tier 3\n\n```\ncalderctl deploy <service> --tier 3 --version 0.1.0 --dry-run\ncalderctl deploy <service> --tier 3 --version 0.1.0\n```\n\nFull flag reference: [the calderctl CLI](reference-calderctl.md)."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 5,
+   "heading": "4. Understand what the platform does for you",
+   "text": "4. Understand what the platform does for you\n\n## 4. Understand what the platform does for you\n\n- **Traffic policy is not yours.** Retry, timeout and circuit-breaking live in\n  platform config, not your code. Do not add a retry loop; you will be retrying\n  a request the proxy is already retrying, and the multiplication is how a slow\n  dependency becomes an outage.\n- **mTLS is automatic.** You do not manage certificates.\n- **Which proxy you get depends on your tier's migration state** \u2014\n  [Calder Gateway](adr-0019-calder-gateway.md) if migrated, Helix Mesh if not.\n  As a service owner this should be invisible. It stops being invisible during\n  an incident, which is why the two rollback runbooks exist separately."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 6,
+   "heading": "5. Wire up alerting",
+   "text": "5. Wire up alerting\n\n## 5. Wire up alerting\n\nRoute pages according to your tier. **A tier 3 service must not page anyone.**\nIf your alert pages at 03:00 and your service is tier 3, that is a routing bug.\nSee [the on-call rota](guide-oncall-rota.md)."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 7,
+   "heading": "6. Join the rotation",
+   "text": "6. Join the rotation\n\n## 6. Join the rotation\n\nOnce you are in tier 2 or 1 you join your team's service on-call. Read the\nrota guide first, particularly the part about which of the three rotations to\npage. Paging platform networking for your own service's bug is the most common\nfirst-month mistake."
+  },
+  {
+   "doc": "docs/guide-onboarding.md",
+   "ordinal": 8,
+   "heading": "Common first-month mistakes",
+   "text": "Common first-month mistakes\n\n## Common first-month mistakes\n\n| mistake | what happens |\n|---|---|\n| Adding an application-level retry | double retries; a slow dependency becomes an outage |\n| Choosing tier 1 for a new service | 14-day soak on every change |\n| Leaving data class unstated | treated as C3; HSM requirements you do not need |\n| Paging platform for your own bug | ten minutes lost while they ask what your service does |\n| Reading the wrong rollback runbook | see [the checkout outage](postmortem-checkout-outage.md) |"
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Guide: the on-call rota\"\ntags: [operations, oncall, guide]\n---"
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 1,
+   "heading": "Guide: the on-call rota",
+   "text": "Guide: the on-call rota\n\n# Guide: the on-call rota\n\nCalder Group runs **three independent rotations**. Confusing them is the most\ncommon cause of a page going to someone who cannot act on it.\n\n| rotation | covers | handover |\n|---|---|---|\n| **service on-call** | one team's own services | Monday 10:00 local |\n| **platform networking** | Calder Gateway, Helix Mesh, node proxy config | Monday 10:00 UTC |\n| **incident lead** | coordination during a SEV1/SEV2 | Wednesday 14:00 UTC |"
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 2,
+   "heading": "Who to page, and when",
+   "text": "Who to page, and when\n\n## Who to page, and when\n\n- **Your own service is unhealthy** \u2192 your team's service on-call. Do not page\n  platform first; platform will ask you what your service is doing and you will\n  have lost ten minutes.\n- **Traffic between services is failing, across teams** \u2192 platform networking.\n  This is the rotation the rollback runbooks name\n  ([gateway](runbook-gateway-rollback.md),\n  [legacy mesh](runbook-mesh-rollback-legacy.md)).\n- **More than one team is affected, or the revenue path is down** \u2192 incident\n  lead, *in addition* to the above. The incident lead does not fix things; they\n  hold the timeline and decide when to declare and when to close."
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 3,
+   "heading": "Page policy by tier",
+   "text": "Page policy by tier\n\n## Page policy by tier\n\nPage behaviour follows [the deployment tiers](reference-deployment-tiers.md):\ntier 1 pages 24/7, tier 2 pages in business hours, tier 3 never pages.\n\nA tier 3 alert that pages someone at 03:00 is a routing misconfiguration. Fix\nthe routing; do not normalise the page."
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 4,
+   "heading": "Handover",
+   "text": "Handover\n\n## Handover\n\nHandover is a written note in `#platform-oncall`, not a verbal one. It names:\n\n1. anything currently degraded,\n2. any freeze in effect (`calderctl gateway status --by-tier` shows these),\n3. any rollout mid-flight and which tier it is on,\n4. anything you escalated that has not resolved.\n\n**A handover that says \"all quiet\" when a rollout is mid-flight is the specific\nfailure this list exists to prevent.** A rollout is not quiet; it is a thing\nthat might page the next person."
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 5,
+   "heading": "Escalation",
+   "text": "Escalation\n\n## Escalation\n\nIf you are the on-call and you do not know what to do, escalate. The median\ntime-to-escalate during the\n[checkout outage](postmortem-checkout-outage.md) was 31 minutes, and 18 of\nthose minutes were a second rollback attempt the runbook explicitly says not to\nmake. **Escalating early has never made an incident worse here.**"
+  },
+  {
+   "doc": "docs/guide-oncall-rota.md",
+   "ordinal": 6,
+   "heading": "Compensation and limits",
+   "text": "Compensation and limits\n\n## Compensation and limits\n\n- No engineer is on call more than one week in four.\n- A page between 22:00 and 07:00 local buys the following morning off, and this\n  is not discretionary.\n- Two consecutive nights paged means the rotation is handed over. Tell the\n  incident lead; they will find cover."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Policy: data retention and classification\"\ntags: [policy, compliance, data]\n---"
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 1,
+   "heading": "Policy: data retention and classification",
+   "text": "Policy: data retention and classification\n\n# Policy: data retention and classification\n\n**Binding on every Calder Group service.** A service that cannot state its data\nclassification is treated as holding the most sensitive class until it can."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 2,
+   "heading": "Classes",
+   "text": "Classes\n\n## Classes\n\n| class | examples | retention | encryption at rest |\n|---|---|---|---|\n| **C0 public** | published docs, marketing | indefinite | not required |\n| **C1 internal** | dashboards, build logs, tickets | 400 days | required |\n| **C2 personal** | account records, addresses, order history | 7 years | required, per-tenant key |\n| **C3 payment** | card tokens, settlement records | 7 years | required, per-tenant key, HSM |\n\n**Raw card numbers are C3 and are never stored.** Tokens are stored; the number\nthat produced them is not, anywhere, including in logs, traces and crash dumps."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 3,
+   "heading": "Retention is a maximum, not a target",
+   "text": "Retention is a maximum, not a target\n\n## Retention is a maximum, not a target\n\nA service holding C2 data for 7 years must be able to say *why*. The default\nfor anything without a stated legal or contractual reason is **90 days**, and\nthe compliance review asks for the reason rather than for the duration."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 4,
+   "heading": "Logs are data",
+   "text": "Logs are data\n\n## Logs are data\n\nThe most common finding in the 2025 audit was C2 data in C1 log stores \u2014 an\naddress in an error message, an email in a stack trace. Log lines inherit the\nclassification of the most sensitive field they contain.\n\n**A log store cannot be reclassified downward by deleting the offending\nlines**, because backups already hold them. The remedy is to stop emitting and\nto expire the backup window."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 5,
+   "heading": "Deletion requests",
+   "text": "Deletion requests\n\n## Deletion requests\n\nA verified deletion request must complete within 30 days across:\n\n1. primary stores,\n2. read replicas and caches,\n3. search indexes,\n4. analytics warehouses,\n5. backups \u2014 by expiry rather than by surgical deletion, which is why the\n   backup window is 35 days and not longer.\n\nPoint 5 is the one teams miss. **A 90-day backup window means a 90-day deletion\nSLA**, and that is not the SLA."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 6,
+   "heading": "Tiers and classification are independent",
+   "text": "Tiers and classification are independent\n\n## Tiers and classification are independent\n\nData class is not deployment tier. See\n[the deployment tiers](reference-deployment-tiers.md): a tier 3 internal\ndashboard routinely holds C2 data, and its tier says nothing about how that\ndata must be handled. Confusing the two is how a low-tier internal tool ends up\noutside the audit scope."
+  },
+  {
+   "doc": "docs/policy-data-retention.md",
+   "ordinal": 7,
+   "heading": "Exceptions",
+   "text": "Exceptions\n\n## Exceptions\n\nExceptions are granted by the data protection lead, expire in 180 days, and are\nrecorded in `calder/compliance-exceptions`. **An expired exception is a\nviolation**, not a renewal request; the service must be compliant on the expiry\ndate or it is turned off."
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Postmortem: checkout unavailable for 47 minutes (2026-01-19)\"\ntags: [incident, postmortem, checkout]\n---"
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 1,
+   "heading": "Postmortem: checkout unavailable for 47 minutes",
+   "text": "Postmortem: checkout unavailable for 47 minutes\n\n# Postmortem: checkout unavailable for 47 minutes\n\n- **Date:** 2026-01-19 \u00b7 **Duration:** 47 minutes \u00b7 **Severity:** SEV1\n- **Impact:** checkout returned 503 for an estimated 31 % of sessions in\n  eu-west and us-east. No data loss. No incorrect charges."
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 2,
+   "heading": "Summary",
+   "text": "Summary\n\n## Summary\n\nA routine Helix Mesh sidecar rollback on tier 1 silently skipped 340 pods whose\nsidecar injection failed. Those pods came back with **no sidecar at all**, so\nthey had no mTLS identity, and every call they made to the payments service was\nrejected at the receiving end. Checkout depends on payments, so checkout failed.\n\nThe rollback reported success. Aggregate health looked fine because 340 pods\nout of roughly 9 000 is under 4 %, and the aggregate dashboard's alert\nthreshold is 5 %."
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 3,
+   "heading": "Timeline",
+   "text": "Timeline\n\n## Timeline\n\n| time (UTC) | event |\n|---|---|\n| 14:02 | Mesh release 4.19.2 begins tier 1 rollout |\n| 14:31 | Error rate on payments crosses 2 %; on-call paged |\n| 14:38 | On-call begins the legacy mesh rollback, tier 1 |\n| 14:44 | Rollback reports success. Error rate does not recover |\n| 14:51 | Second rollback attempted. No change |\n| 15:09 | Engineer notices pods with a single container where two are expected |\n| 15:18 | 340 pods identified and restarted by hand |\n| 15:25 | Error rate recovers |\n| 15:38 | Incident closed after a 5-minute clean window |"
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 4,
+   "heading": "What went wrong",
+   "text": "What went wrong\n\n## What went wrong\n\n**1. Failed sidecar injection is silent.** The rollback tooling skips a pod it\ncannot inject and does not count it as a failure. This is named as a known gap\nin [the legacy mesh rollback](runbook-mesh-rollback-legacy.md), and it had been\nnamed there for eleven months.\n\n**2. The aggregate dashboard hid it.** 340 of 9 000 is 3.8 %, under the 5 %\nalert threshold. Verification was done in aggregate rather than per service \u2014\nthe runbook says per service, and the on-call engineer used the aggregate view\nbecause it is the default panel.\n\n**3. The second rollback attempt cost 18 minutes.** The runbook says escalate\nrather than retry. It was retried."
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 5,
+   "heading": "What did not go wrong",
+   "text": "What did not go wrong\n\n## What did not go wrong\n\n- The rollback procedure itself is correct. Following it exactly would have\n  caught this at step 4.\n- mTLS rejecting unauthenticated callers is the system working. A checkout that\n  succeeded without an identity would have been a far worse outcome."
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 6,
+   "heading": "Actions",
+   "text": "Actions\n\n## Actions\n\n| action | owner | status |\n|---|---|---|\n| Injection failure becomes a hard error, not a skip | Platform Networking | done 2026-02-02 |\n| Per-service verification becomes the default dashboard panel | SRE | done 2026-01-27 |\n| **Soak period between tiers raised from 48 hours to 14 days** | Platform Networking | done, recorded in [ADR-0019](adr-0019-calder-gateway.md) |\n| Dry-run mode for both rollback runbooks | Platform Networking | **not started** |"
+  },
+  {
+   "doc": "docs/postmortem-checkout-outage.md",
+   "ordinal": 7,
+   "heading": "The lesson worth carrying",
+   "text": "The lesson worth carrying\n\n## The lesson worth carrying\n\n**A known gap that has been written down for eleven months is not mitigated.**\nThe failure mode in this incident was documented, in the runbook the on-call\nengineer had open, in a section titled \"Known gaps\". Writing a hazard down does\nnot remove it; the action item is what removes it, and there was none."
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Reference: the calderctl CLI\"\ntags: [reference, tooling, platform]\n---"
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 1,
+   "heading": "Reference: the `calderctl` CLI",
+   "text": "Reference: the `calderctl` CLI\n\n# Reference: the `calderctl` CLI\n\nThe platform CLI. Everything below is read-only unless marked **writes**.\n\n## Global flags\n\n| flag | effect |\n|---|---|\n| `--tier <n>` | scope to one deployment tier. **Required by every write command** \u2014 there is no fleet-wide write, deliberately |\n| `--json` | machine-readable output |\n| `--dry-run` | supported by `deploy` and `quota`. **Not** by `gateway rollback` or `mesh rollback`, which is a known gap |\n| `--context <cluster>` | defaults to the cluster in `~/.calder/config` |"
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 2,
+   "heading": "`calderctl gateway`",
+   "text": "`calderctl gateway`\n\n## `calderctl gateway`\n\n```\ncalderctl gateway status --by-tier          # which release each tier runs\ncalderctl gateway freeze --tier <n>         # writes: halt an in-flight rollout\ncalderctl gateway unfreeze --tier <n>       # writes\ncalderctl gateway rollback --tier <n> --to <release> --max-surge 1   # writes\ncalderctl gateway verify --tier <n> --per-node\n```\n\n`--max-surge 1` is mandatory on gateway rollback. The proxy is per node, so\nsurging more than one node removes capacity from every workload on those nodes\nat once. The full procedure is\n[the gateway rollback runbook](runbook-gateway-rollback.md)."
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 3,
+   "heading": "`calderctl mesh` \u2014 legacy",
+   "text": "`calderctl mesh` \u2014 legacy\n\n## `calderctl mesh` \u2014 legacy\n\n```\ncalderctl mesh status --by-tier\ncalderctl mesh freeze --tier <n>            # writes\ncalderctl mesh rollback --tier <n> --to <release> --max-surge 25%   # writes\ncalderctl mesh verify --tier <n> --per-service\n```\n\nApplies only to tiers still on Helix Mesh ([ADR-0007](adr-0007-helix-mesh.md),\nsuperseded by [ADR-0019](adr-0019-calder-gateway.md)). Procedure:\n[the legacy mesh rollback](runbook-mesh-rollback-legacy.md).\n\n**The two rollback commands take different `--max-surge` values and this is the\nmost dangerous pair of flags in the tool.** Copying a gateway command onto a\nmesh tier surges 1 pod at a time across thousands and takes hours; copying a\nmesh command onto a gateway tier surges a quarter of the nodes and removes a\nquarter of the fleet."
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 4,
+   "heading": "`calderctl deploy`",
+   "text": "`calderctl deploy`\n\n## `calderctl deploy`\n\n```\ncalderctl deploy <service> --tier <n> --version <v>   # writes\ncalderctl deploy <service> --tier <n> --version <v> --dry-run\ncalderctl deploy status <service>\n```\n\nRefuses a service with no tier in `calder/service-registry`. Refuses a tier 1\ndeploy without two reviewers, one from SRE, per\n[the deployment tiers](reference-deployment-tiers.md)."
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 5,
+   "heading": "`calderctl quota`",
+   "text": "`calderctl quota`\n\n## `calderctl quota`\n\n```\ncalderctl quota show <service>\ncalderctl quota set <service> --cpu <n> --memory <n>  # writes, platform team only\n```"
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 6,
+   "heading": "`calderctl data`",
+   "text": "`calderctl data`\n\n## `calderctl data`\n\n```\ncalderctl data classify <service>       # the stated class, from the registry\ncalderctl data expiry <service>         # retention window per store\n```\n\nBoth read from `calder/service-registry`. A service whose class is unstated\nreports `C3` \u2014 the most sensitive \u2014 per\n[the data retention policy](policy-data-retention.md)."
+  },
+  {
+   "doc": "docs/reference-calderctl.md",
+   "ordinal": 7,
+   "heading": "Exit codes",
+   "text": "Exit codes\n\n## Exit codes\n\n| code | meaning |\n|---|---|\n| 0 | success |\n| 1 | error |\n| 2 | refused: policy or precondition failed (wrong tier, missing reviewer) |\n| 3 | refused: the cluster is frozen |\n\n**2 and 3 are distinct on purpose.** A 2 means you asked for something you may\nnot have; a 3 means someone else is mid-incident and you should find out who\nbefore forcing anything."
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Reference: deployment tiers\"\ntags: [reference, operations, platform]\n---"
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 1,
+   "heading": "Reference: deployment tiers",
+   "text": "Reference: deployment tiers\n\n# Reference: deployment tiers\n\nEvery Calder Group service belongs to exactly one tier. The tier decides\nrollout order, soak period, review requirements and page policy. **A service\nwithout a tier does not deploy** \u2014 the admission controller rejects it."
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 2,
+   "heading": "The tiers",
+   "text": "The tiers\n\n## The tiers\n\n| tier | what is in it | rollout order | soak |\n|---|---|---|---|\n| **1** | revenue path: checkout, payments, cart, identity | last | 14 days |\n| **2** | customer-visible but not revenue: search, recommendations, account | second | 7 days |\n| **3** | internal: dashboards, batch, developer tooling | **first** | 48 hours |\n\n**Rollout is always 3 \u2192 2 \u2192 1.** A platform change reaches the revenue path\nonly after it has survived everything else. This ordering is not negotiable and\nthere is no expedite path; a change urgent enough to skip tiers is an incident\nresponse, which is a different procedure with a different approval."
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 3,
+   "heading": "Soak periods",
+   "text": "Soak periods\n\n## Soak periods\n\nThe soak is measured from the moment the **last** service in a tier finishes\nrolling, not from when the first one starts.\n\nTier 1's soak was raised from 48 hours to 14 days after\n[the checkout outage](postmortem-checkout-outage.md), and the change is\nrecorded in [ADR-0019](adr-0019-calder-gateway.md). The argument for the longer\nperiod is that the failure in that incident was only visible under real\ncheckout traffic, which has a weekly shape \u2014 a 48-hour soak can miss an entire\nclass of weekend behaviour."
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 4,
+   "heading": "Review requirements",
+   "text": "Review requirements\n\n## Review requirements\n\n| tier | reviewers | who can approve |\n|---|---|---|\n| 1 | 2, one from SRE | service owner + SRE on-call |\n| 2 | 2 | service owner |\n| 3 | 1 | anyone on the owning team |"
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 5,
+   "heading": "Page policy",
+   "text": "Page policy\n\n## Page policy\n\n- **Tier 1** pages 24/7. See [the on-call rota](guide-oncall-rota.md).\n- **Tier 2** pages during business hours; out of hours it raises a ticket.\n- **Tier 3** never pages. It files a ticket for the next working day.\n\n**A tier 3 service that pages someone is a misconfiguration**, not a judgement\ncall. Fix the alert routing rather than absorbing the page."
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 6,
+   "heading": "Changing a service's tier",
+   "text": "Changing a service's tier\n\n## Changing a service's tier\n\nA tier change is a pull request against `calder/service-registry`, reviewed by\nthe platform team. Moving *up* a tier (3 \u2192 2, 2 \u2192 1) takes effect at the next\nrollout window. Moving *down* takes effect immediately, because reducing a\nservice's protections should never be blocked on scheduling."
+  },
+  {
+   "doc": "docs/reference-deployment-tiers.md",
+   "ordinal": 7,
+   "heading": "What tier does NOT decide",
+   "text": "What tier does NOT decide\n\n## What tier does NOT decide\n\n- **Resource quota.** That is the service's own budget.\n- **Data classification.** See [the data retention policy](policy-data-retention.md);\n  a tier 3 dashboard can hold tier-1-sensitive data and frequently does."
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Runbook: roll back a Calder Gateway release\"\ntags: [operations, runbook, networking, current]\n---"
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 1,
+   "heading": "Runbook: roll back a Calder Gateway release",
+   "text": "Runbook: roll back a Calder Gateway release\n\n# Runbook: roll back a Calder Gateway release\n\n> **This is the CURRENT rollback procedure**, for any tier that has migrated to\n> Calder Gateway ([ADR-0019](adr-0019-calder-gateway.md)). If the tier is still\n> on Helix Mesh, you want\n> [the legacy mesh rollback](runbook-mesh-rollback-legacy.md) instead. **Check\n> first.** The two procedures differ in step 3 and running the wrong one leaves\n> the node in a state neither runbook describes.\n\n**Severity:** used during an active incident. **Expected duration:** 8\u201312\nminutes for one tier."
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 2,
+   "heading": "When to use this",
+   "text": "When to use this\n\n## When to use this\n\n- Error rate above 2 % on any service behind the gateway, sustained 5 minutes.\n- p99 latency above 400 ms on the checkout path.\n- Any node reporting proxy config rejection.\n\nDo **not** use this for a single unhealthy node. Drain that node instead; a\nfleet rollback for one bad node is how a small problem becomes a large one."
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 3,
+   "heading": "Which tier am I touching",
+   "text": "Which tier am I touching\n\n## Which tier am I touching\n\n```\ncalderctl gateway status --by-tier\n```\n\nThe output names the release per tier. **A rollback is always scoped to one\ntier**, per [the deployment tiers](reference-deployment-tiers.md). There is no\nfleet-wide rollback command and its absence is deliberate."
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 4,
+   "heading": "Procedure",
+   "text": "Procedure\n\n## Procedure\n\n**1. Announce.** Post in `#platform-incident` with the tier and the release you\nare rolling back from. On-call lead acknowledges before you continue \u2014 see\n[the on-call rota](guide-oncall-rota.md).\n\n**2. Freeze the rollout.**\n\n```\ncalderctl gateway freeze --tier <n>\n```\n\nThis stops any in-flight progression. It does not revert anything.\n\n**3. Revert the node proxy config, node by node.**\n\n```\ncalderctl gateway rollback --tier <n> --to <previous-release> --max-surge 1\n```\n\n`--max-surge 1` is not optional. The node proxy serves every workload on its\nnode, so rolling more than one node at a time removes capacity from every\nservice simultaneously. This is the step that differs from the legacy\nprocedure, where the sidecar was per-pod and surge could safely be higher.\n\n**4. Verify per node, not in aggregate.**\n\n```\ncalderctl gateway verify --tier <n> --per-node\n```\n\nAggregate health hides a single bad node behind 200 good ones. Check the\nper-node table.\n\n**5. Confirm the error rate has recovered** for a full 5 minutes before\nunfreezing. A recovery that lasts 90 seconds is a coincidence.\n\n**6. Unfreeze and write it up.**\n\n```\ncalderctl gateway unfreeze --tier <n>\n```"
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 5,
+   "heading": "If the rollback itself fails",
+   "text": "If the rollback itself fails\n\n## If the rollback itself fails\n\nEscalate immediately; do not retry. A failed rollback means the node proxy is\nin a state the tooling does not model, and the second attempt tends to make the\nstate harder to describe rather than better. Page the platform networking lead\nfrom [the on-call rota](guide-oncall-rota.md)."
+  },
+  {
+   "doc": "docs/runbook-gateway-rollback.md",
+   "ordinal": 6,
+   "heading": "Known gaps",
+   "text": "Known gaps\n\n## Known gaps\n\n- There is no dry-run mode. It has been requested twice.\n- `--per-node` output is not paginated and is unreadable above ~400 nodes."
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 0,
+   "heading": "",
+   "text": "---\ntitle: \"Runbook: roll back a Helix Mesh release (legacy)\"\ntags: [operations, runbook, networking, legacy]\n---"
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 1,
+   "heading": "Runbook: roll back a Helix Mesh release (legacy)",
+   "text": "Runbook: roll back a Helix Mesh release (legacy)\n\n# Runbook: roll back a Helix Mesh release (legacy)\n\n> **LEGACY.** This applies only to tiers still running Helix Mesh\n> ([ADR-0007](adr-0007-helix-mesh.md), superseded). Through 2026 that is most\n> of tier 1. If the tier has migrated, you want\n> [the gateway rollback](runbook-gateway-rollback.md) instead. **Check first.**\n> The two procedures differ in step 3 and running the wrong one leaves the\n> cluster in a state neither runbook describes.\n\n**Severity:** used during an active incident. **Expected duration:** 10\u201315\nminutes for one tier."
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 2,
+   "heading": "When to use this",
+   "text": "When to use this\n\n## When to use this\n\n- Error rate above 2 % on any service in the mesh, sustained 5 minutes.\n- p99 latency above 400 ms on the checkout path.\n- Any pod reporting sidecar injection failure.\n\nDo **not** use this for a single unhealthy pod. Restart that pod instead; a\nfleet rollback for one bad pod is how a small problem becomes a large one."
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 3,
+   "heading": "Which tier am I touching",
+   "text": "Which tier am I touching\n\n## Which tier am I touching\n\n```\ncalderctl mesh status --by-tier\n```\n\nThe output names the release per tier. **A rollback is always scoped to one\ntier**, per [the deployment tiers](reference-deployment-tiers.md). There is no\nfleet-wide rollback command and its absence is deliberate."
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 4,
+   "heading": "Procedure",
+   "text": "Procedure\n\n## Procedure\n\n**1. Announce.** Post in `#platform-incident` with the tier and the release you\nare rolling back from. On-call lead acknowledges before you continue \u2014 see\n[the on-call rota](guide-oncall-rota.md).\n\n**2. Freeze the rollout.**\n\n```\ncalderctl mesh freeze --tier <n>\n```\n\nThis stops any in-flight progression. It does not revert anything.\n\n**3. Revert the sidecar image and restart pods in waves.**\n\n```\ncalderctl mesh rollback --tier <n> --to <previous-release> --max-surge 25%\n```\n\n`--max-surge 25%` is the tuned default. The sidecar is per-pod, so a quarter of\nthe fleet restarting concurrently costs a quarter of the capacity of the\nservices involved rather than all of it. This is the step that differs from the\ngateway procedure, where the proxy is per-node and surge must be exactly 1.\n\n**4. Verify per service, not in aggregate.**\n\n```\ncalderctl mesh verify --tier <n> --per-service\n```\n\nAggregate health hides one bad service behind 200 good ones. Check the\nper-service table.\n\n**5. Confirm the error rate has recovered** for a full 5 minutes before\nunfreezing. A recovery that lasts 90 seconds is a coincidence.\n\n**6. Unfreeze and write it up.**\n\n```\ncalderctl mesh unfreeze --tier <n>\n```"
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 5,
+   "heading": "If the rollback itself fails",
+   "text": "If the rollback itself fails\n\n## If the rollback itself fails\n\nEscalate immediately; do not retry. A failed rollback means sidecar state is\ninconsistent across the tier, and the second attempt tends to widen the\ninconsistency. Page the platform networking lead from\n[the on-call rota](guide-oncall-rota.md)."
+  },
+  {
+   "doc": "docs/runbook-mesh-rollback-legacy.md",
+   "ordinal": 6,
+   "heading": "Known gaps",
+   "text": "Known gaps\n\n## Known gaps\n\n- There is no dry-run mode. It has been requested twice.\n- Pods that fail injection during a rollback are silently skipped and must be\n  found by hand afterwards. This is the known cause of the\n  [checkout outage](postmortem-checkout-outage.md)."
+  }
+ ],
+ "queries": [
+  {
+   "id": "q001",
+   "q": "steps to revert a bad calder gateway release"
+  },
+  {
+   "id": "q002",
+   "q": "how to roll back a helix mesh sidecar release"
+  },
+  {
+   "id": "q003",
+   "q": "what replaced helix mesh"
+  },
+  {
+   "id": "q004",
+   "q": "why did we adopt a service mesh in the first place"
+  },
+  {
+   "id": "q005",
+   "q": "how long do we keep customer order history"
+  },
+  {
+   "id": "q006",
+   "q": "what happened during the checkout outage"
+  },
+  {
+   "id": "q007",
+   "q": "how many reviewers does a tier 1 deploy need"
+  },
+  {
+   "id": "q008",
+   "q": "who do I page when traffic between services is failing"
+  },
+  {
+   "id": "q009",
+   "q": "I am shipping my first service where do I start"
+  },
+  {
+   "id": "q010",
+   "q": "what does calderctl exit code 3 mean"
+  },
+  {
+   "id": "q011",
+   "q": "what is the soak period for the revenue path tier"
+  },
+  {
+   "id": "q012",
+   "q": "how do I freeze an in flight rollout"
+  },
+  {
+   "id": "q013",
+   "q": "am I allowed to be on call two weeks in a row"
+  },
+  {
+   "id": "q014",
+   "q": "does an internal service page anyone overnight"
+  },
+  {
+   "id": "q015",
+   "q": "what is the current decision for east west traffic"
+  },
+  {
+   "id": "q016",
+   "q": "which proxy do we run between services today"
+  },
+  {
+   "id": "q017",
+   "q": "why did we move away from sidecars"
+  },
+  {
+   "id": "q018",
+   "q": "how much memory did the sidecar actually use"
+  },
+  {
+   "id": "q019",
+   "q": "is helix mesh still in use anywhere"
+  },
+  {
+   "id": "q020",
+   "q": "which rollback do I use for a tier that has not migrated"
+  },
+  {
+   "id": "q021",
+   "q": "why is the soak fourteen days now instead of two"
+  },
+  {
+   "id": "q022",
+   "q": "can I start new work against helix mesh"
+  },
+  {
+   "id": "q023",
+   "q": "what max surge should I use rolling back the node proxy"
+  },
+  {
+   "id": "q024",
+   "q": "what max surge for a sidecar rollback"
+  },
+  {
+   "id": "q025",
+   "q": "verify per node after rolling back"
+  },
+  {
+   "id": "q026",
+   "q": "verify per service after rolling back"
+  },
+  {
+   "id": "q027",
+   "q": "the rollback failed should I try it again"
+  },
+  {
+   "id": "q028",
+   "q": "how long does a gateway rollback take"
+  },
+  {
+   "id": "q029",
+   "q": "how long does a mesh rollback take"
+  },
+  {
+   "id": "q030",
+   "q": "pods skipped silently during a rollback"
+  },
+  {
+   "id": "q031",
+   "q": "is the legacy runbook still valid"
+  },
+  {
+   "id": "q032",
+   "q": "does the superseded networking ADR still apply anywhere"
+  },
+  {
+   "id": "q033",
+   "q": "why keep a superseded record in the repository"
+  },
+  {
+   "id": "q034",
+   "q": "my alert paged at 3am but my service is internal"
+  },
+  {
+   "id": "q035",
+   "q": "I added a retry and things got worse"
+  },
+  {
+   "id": "q036",
+   "q": "who approves a change to the revenue path"
+  },
+  {
+   "id": "q037",
+   "q": "what does the incident lead actually do"
+  },
+  {
+   "id": "q038",
+   "q": "where do I record my service data class"
+  },
+  {
+   "id": "q039",
+   "q": "what happens if I never state a classification"
+  },
+  {
+   "id": "q040",
+   "q": "how long are backups kept"
+  },
+  {
+   "id": "q041",
+   "q": "can I delete a customer record out of the backups"
+  },
+  {
+   "id": "q042",
+   "q": "why is having two rollback procedures dangerous"
+  },
+  {
+   "id": "q043",
+   "q": "we had a different retry policy in every service"
+  },
+  {
+   "id": "q044",
+   "q": "why not use ebpf instead of a proxy"
+  },
+  {
+   "id": "q045",
+   "q": "what is the cheapest tier to start on"
+  },
+  {
+   "id": "q046",
+   "q": "how do we stop a slow dependency taking down checkout"
+  },
+  {
+   "id": "q047",
+   "q": "blast radius of a bad config push"
+  },
+  {
+   "id": "q048",
+   "q": "how do I tell if someone else is mid incident before I deploy"
+  },
+  {
+   "id": "q049",
+   "q": "what did we promise to fix after the outage and did we"
+  },
+  {
+   "id": "q050",
+   "q": "a hazard we wrote down but never actually fixed"
+  }
+ ]
+}

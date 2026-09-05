@@ -1,8 +1,8 @@
 {
  "decision": "PROCEED",
- "reason": "Nothing is blocked. The Phase 2 refusal-conditions fork was ruled by Arpit on 2026-09-01 (CUT, not built) and is recorded in ADR-REFUSAL decision 4; the file had been left reading `RESOLVED`, which is not a value in this schema and made every prompt announce an open blocker for a decision already made. Pending decisions that are NOT blockers live in work/OPEN-WORK.md's `Blocked on Arpit` table -- two were filed there on 2026-09-01 (the ETag acceptance criterion, and whether the twice-recorded W-83 shape gets a gate).",
+ "reason": "Ruled by Arpit 2026-09-05: W-106 is measured and filed WITHOUT a verdict. DENSE-CHUNK's frozen bar is NOT tested -- the corpus behind it is gone two ways (fux-playground's committed index is `fux.index.v1` and unreadable by this engine; the ten enrichment files were never committed) and a re-derived corpus grades 28/50 against that control's 32/50, which would make `>= 3 fixed` strictly easier to clear. The numbers are filed against the 28/50 baseline, labelled as not judgeable against the bar. Restoring fux-playground stays his, and W-87 Part B is where it lives.",
  "questions": [],
  "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-09-01"
+ "filed": "2026-09-05"
 }

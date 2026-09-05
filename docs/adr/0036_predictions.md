@@ -6,7 +6,7 @@ description: "An R is a claim frozen before measurement; its threshold may never
 status: accepted
 date: 2026-08-22
 feature: the prediction system — the R ids, their register, the rules that make a frozen claim mean something, and the classification of the runs those claims are measured by
-owns: [tests/test_regression_runs.py, tools/t2-eval, tools/quality-controls]
+owns: [tests/test_regression_runs.py, tools/t2-eval, tools/quality-controls, tools/vector-gate]
 laws: [L3]
 timestamp: 2026-08-22T00:00:00Z
 ---
@@ -594,6 +594,21 @@ on top. ⚠ **The cost was accepted with open eyes: it changes how filed results
 read.** The losses are one-sided — a *"no detected change"* ruling made under a
 loose bar stays true under a stricter one, so the exposure is entirely on the
 claims of **improvement**, and those are the ones now marked.
+
+**20. Decision 10's ownership fallback holds `tools/vector-gate/` too, and the
+reason is worth naming.** W-106's instrument tests a claim whose record —
+`ADR-VECTORS` — **does not exist**: W-112 is blocked on this instrument's own
+result, so the record cannot be written first. A proposal is not a valid owner
+(decision 10), and an unowned `tools/` component fails
+`tests/test_adr_ownership.py`. It sits here, on the `tools/t2-eval/` precedent,
+and **moves to `ADR-VECTORS` in the change that accepts it** — or stays, if the
+result is what closes W-112.
+
+⚠ **This is the second component held by the fallback, and the shape is the
+same both times**: a measurement outliving, or preceding, the feature record it
+belongs to. That is not a defect in the fallback — it is what a build gated on
+falsifiable predictions looks like from the ownership table's side.
+
 
 ### Consequences
 

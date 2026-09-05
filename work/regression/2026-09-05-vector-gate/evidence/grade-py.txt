@@ -1,0 +1,6 @@
+arm=sentence-transformers model=BAAI/bge-small-en-v1.5 runtime=python 3.14.3 Darwin/arm64
+lexical pass 28/50   fused pass 28/50   dense-only pass 29/50
+FIXED  5: ['q005', 'q007', 'q013', 'q027', 'q050']
+BROKEN 5: ['q008', 'q033', 'q042', 'q047', 'q048']
+of the 9 known failures (the vocabulary-gap population): 1 now pass, 0 passed lexically already
+rows -> /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/aad23fcd-5837-4012-8249-a5082564a6b8/scratchpad/vecgate/rows-py.csv and /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/aad23fcd-5837-4012-8249-a5082564a6b8/scratchpad/vecgate/rows-py.jsonl

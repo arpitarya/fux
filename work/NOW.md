@@ -1,1 +1,1 @@
-✓ W-107 Phase 0 (measured + pre-registered, one cell awaiting Arpit) · → W-106 vector gate
+✓ W-106 (measured, no verdict) · → W-109: --expand and -q multi-query RRF

@@ -1,0 +1,4 @@
+chunks  : n=75  cosine min=0.990933 mean=0.996418  int8 vectors identical: 0/75  int8 codes differing: 20507/28800 (71.20 %)
+queries : n=50  cosine min=0.994618 mean=0.996336  int8 vectors identical: 0/50  int8 codes differing: 14722/19200 (76.68 %)
+top-5 dense orderings discordant between arms: 41/50
+  ['q001', 'q002', 'q005', 'q006', 'q007', 'q009', 'q010', 'q011', 'q012', 'q013', 'q014', 'q015', 'q016', 'q017', 'q018', 'q019', 'q020', 'q021', 'q022', 'q023', 'q025', 'q026', 'q027', 'q029', 'q030', 'q031', 'q032', 'q033', 'q034', 'q035', 'q039', 'q040', 'q041', 'q043', 'q044', 'q045', 'q046', 'q047', 'q048', 'q049', 'q050']
