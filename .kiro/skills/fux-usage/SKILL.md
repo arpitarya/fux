@@ -64,6 +64,64 @@ Three rules that make the ladder safe rather than clever:
 `archived` as fields rather than as prose you have to parse. **Branch on the
 fields, never on the wording** - the wording is not a contract.
 
+### Line ranges come from `answer`, never from `ask`
+
+**`ask` and `find` return DOCUMENTS. Only `answer` returns a SPAN.**
+
+| verb | `loc` looks like | network |
+|---|---|---|
+| `fux ask` / `fux find` | `docs/mesh.md` | none - index only |
+| `fux answer` | `docs/mesh.md:L10-L13` | fetches each cited source |
+
+**If you need a line range, use `answer`.** Running `ask` and reporting that
+fux "does not give line numbers" is wrong, and it is the most common way to be
+wrong about this tool.
+
+**This is law L4 showing through the surface, not an omission.** A line range
+can only be computed by chunking the *fetched* bytes; the index holds
+statistics, not text, so it has nothing to count lines in. Giving `ask` line
+numbers would mean making it fetch, and `ask` is offline by default.
+
+### When a search comes back thin, RETRY with the corpus's own words
+
+**Fux ranks the words that are actually in the documents.** The most common
+reason a search misses is a **vocabulary gap** - you asked about an *outage*
+and the document is titled *"checkout unavailable for 47 minutes"*. No amount
+of re-running the same question fixes that.
+
+**The signal:** `confidence.band` is `partial` and `confidence.missing` is
+non-empty. `missing` names the terms of your question that appear **nowhere in
+this corpus**.
+
+**The retry, in order of preference:**
+
+1. **Re-ask with the word the corpus would use.** Replace the missing term.
+2. **Or keep your question and add `--expand`** - a handful of words you expect
+   the document to use:
+
+   ```bash
+   fux ask "what happened during the checkout outage" \
+       --expand "checkout unavailable 47 minutes incident timeline"
+   ```
+
+   Expansion terms are scored **below** your own words, and a document that
+   matches *only* your expansion is never returned - so a wrong guess costs you
+   nothing but a wasted call.
+
+3. **Or pass the same question twice, phrased differently**, with repeatable
+   `-q`; the rankings are fused:
+
+   ```bash
+   fux ask "roll back the gateway" -q "revert a calder release"
+   ```
+
+   ⚠ On a fused search, `score` is a **fusion** score and `--json` carries
+   `"fused": true`. Do not compare it against a score from a single-question
+   search - they are different quantities.
+
+**Fux will never write the expansion for you.** No model runs inside fux; you
+are the one who knows the vocabulary, which is why the slot exists.
+
 ## 3. Read the freshness verdict on `answer`
 
 `answer` fetches each cited source and compares it against what was indexed:

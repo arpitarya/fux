@@ -310,6 +310,74 @@ the boundary and the shape — nothing more. **The gate is one ADR plus Arpit's
 sign-off; the ADR half is this record, and the sign-off half has not been
 given.**
 
+**15. The body is QUESTIONS, not prose — doc2query, and the skill is the
+product.** Five to ten questions a searcher would type before they knew the
+document existed, one per line, and nothing else in the body.
+
+**Prose was measured and did not pay.** A blind enrichment run scored **+1
+fixed / −1 broken** — no net gain — and the query it broke was broken by
+*context prose that carried currency words into a superseded record*. That is
+not a fixable style of prose; it is what prose is. A question is a narrower
+object: a retrieval claim about **one** document, which `fux enrich --check`
+can put to the index and test.
+
+**16. `--check` refuses a question that does not retrieve its own document in
+the top `SELF_RETRIEVAL_K = 3`** (ratified by Arpit, 2026-09-05). doc2query−−
+(arXiv 2301.03266) filters generated questions with a separate relevance
+model; fux uses **its own index**, which is cheaper and more honest — the thing
+being predicted is exactly what fux will do.
+
+🔴 **Scored with `title` AND `ctx` zeroed**, and each is load-bearing:
+
+- `title` — a question echoing the heading retrieves the document trivially, so
+  a title match would pass every lazy question and the filter would grade
+  nothing.
+- `ctx` — **enrichment text is indexed as `ctx`**, so once a file has been
+  ingested its own questions retrieve their own document *through themselves*.
+  Without this the filter passes on the second run what it failed on the first:
+  a check whose answer depends on whether it has been run before.
+
+⚠ **The filter is corpus-dependent, and `--check` REPORTS.** A question that
+passes today can be refused after an unrelated ingest moves `df`. Nothing here
+rewrites a file, deletes one, or stops it being committed — the file stays, and
+a human decides.
+
+⚠ **A prose body written before this decision stays valid.** The filter checks
+lines that end in `?`; a body with none has nothing to check. No existing
+enrichment is invalidated by this record.
+
+**17. `superseded_by:` in an enrichment's frontmatter retires its document, and
+it is the ONE key here that reaches the ranking.** Everything else in that
+block is provenance for a human and for `--check`.
+
+**It exists because `supersedes:` cannot cover this case.** That key is written
+by the *successor*, and a document retired years ago could not name a successor
+that did not exist when it was written. An enrichment file is written later, so
+it can — and this is the *declared* path the second-author analysis named and
+nobody had built.
+
+**Declared, never inferred**, with `priors.superseded_ids`' three rules: the
+named successor must exist in the corpus, it may not be the document itself,
+and a **malformed enrichment retires nothing** — a file fux would not index
+must not be able to move a ranking either.
+
+**18. 🔴 Extraction reuse is keyed on the enrichment's CONTENT, per document.**
+
+⚠ **It was not, and enrichment silently did nothing on the common path.** Reuse
+was keyed on the *document's* content sha alone (decision 15), so a newly
+written `.fux/enrich/` file changed no index byte until the document itself
+changed or `--full` ran. `fux enrich --check` reported `ok`, the file was
+committed and reviewed, and its vocabulary never reached `.fux/index/`. **It
+presented as a working feature**, which is why it survived from W-76 Phase 8
+until W-110 found it while testing something else.
+
+Per document, not corpus-wide like the `pii.toml` digest, because enrichment is
+per document: one rewritten file re-extracts one document. The state
+(`runtime/enrich-digests.json`) is **derived and gitignored**, rebuilt by being
+wrong once. **A deleted enrichment invalidates too** — a reuse keyed on
+presence would leave the terms in the index with nothing on disk explaining
+them.
+
 ### The candidate enrichments, and why each needs a model
 
 Recorded so a build designs against a list rather than a mood. **None is

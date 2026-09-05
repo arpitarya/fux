@@ -54,6 +54,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .errors import FuxError
+from .query.bm25f import FIELD_WEIGHTS
+from .store import TF_FIELDS
+
+#: W-110. How far down its own ranking a question must place its document.
+#: **3**, ratified by Arpit 2026-09-05 and recorded in ADR-ENRICH. A question
+#: is a *retrieval* claim, and one that cannot reach the top three on the
+#: corpus it was written for is not one.
+SELF_RETRIEVAL_K = 3
 
 ENRICH_DIR = ".fux/enrich"
 
@@ -95,6 +103,12 @@ class ScopeReport:
     #: Documents in this scope that fell outside a `TARGET` selector. Reported
     #: so a filtered run can never read as a scope being complete (W-104).
     filtered: int = 0
+    #: W-110, doc2query--. `(path, [(question, rank|None)])` for every
+    #: enrichment holding a question that does not retrieve its own document.
+    #: Separate from `malformed` and `pii` for their reason: the remedy differs
+    #: again — this one is fixed by rewriting the *question*, and a reader told
+    #: "malformed" would go looking for a missing key.
+    unretrievable: list[tuple[str, list[tuple[str, int | None]]]] = field(default_factory=list)
 
     @property
     def covered(self) -> int:
@@ -143,6 +157,56 @@ def validate(path: Path, expected_sha: str | None = None) -> str | None:
     return None
 
 
+#: Fields the self-retrieval filter scores over. **`title` and `ctx` are
+#: ZEROED**, and each for its own reason:
+#:
+#: - `title` — a question that echoes the document's title trivially retrieves
+#:   it, so a title match would pass every question that repeats the heading and
+#:   the filter would grade nothing (W-110's stated hazard).
+#: - 🔴 `ctx` — **enrichment text is indexed AS `ctx`**, so once a file has been
+#:   ingested its own questions match their own document *through themselves*.
+#:   The filter would then pass every question on the second run and fail the
+#:   same question on the first, which is worse than not filtering: a check
+#:   whose answer depends on whether it has been run before.
+#:
+#: What is left is `body`, `heading` and `path` — the document's own content,
+#: which is what doc2query-- actually asks about.
+_FILTER_WEIGHTS: tuple[float, ...] = tuple(
+    0.0 if name in ("title", "ctx") else weight
+    for name, weight in zip(TF_FIELDS, FIELD_WEIGHTS)
+)
+
+
+def is_question(line: str) -> bool:
+    """Is this body line a question a searcher would type?
+
+    Deliberately shallow: a line ending in `?`. **The skill asks for one
+    question per line**, and a cleverer test — leading interrogative, a parser —
+    would refuse lines a human wrote on purpose and pass lines it should not.
+    Prose bodies written under the older skill contain no `?`-terminated lines
+    as a rule, and they stay valid either way (`plan()` only checks what looks
+    like a question).
+    """
+    stripped = line.strip().lstrip("-*").strip()
+    return stripped.endswith("?") and len(stripped) > 1
+
+
+def superseded_by(text: str) -> str:
+    """The `superseded_by:` value in an enrichment's frontmatter, or `""`.
+
+    **The declared path a retired document cannot state about itself.** A
+    document's own `supersedes:` is written by the *successor*; a document that
+    was retired years ago cannot name a successor that did not exist. An
+    enrichment file is written later, so it can — and this is the only key in
+    that frontmatter that reaches the ranking rather than a report.
+
+    ⚠ **Declared, never inferred**, exactly as `ingest/priors.py::superseded_ids`
+    is: nothing here guesses from titles, numbering or dates.
+    """
+    meta = parse_frontmatter(text)
+    return (meta or {}).get("superseded_by", "").strip()
+
+
 def match_end(text: str) -> int:
     match = _FRONTMATTER_RE.match(text)
     return match.end() if match else 0
@@ -154,6 +218,7 @@ def plan(
     *,
     target: str | None = None,
     pii_rules: tuple = (),
+    self_retrieval_k: int = 0,
 ) -> list[ScopeReport]:
     """The worklist, per declared scope.
 
@@ -182,6 +247,7 @@ def plan(
         stale: list[PlanItem] = []
         malformed: list[tuple[str, str]] = []
         pii_found: list[tuple[str, list[str]]] = []
+        unretrievable: list[tuple[str, list[tuple[str, int | None]]]] = []
         ok = 0
         filtered = 0
         for record in sorted(records, key=lambda r: r["loc"]):
@@ -219,10 +285,20 @@ def plan(
             if fired:
                 pii_found.append((_shown(path, root), fired))
                 continue
+            # W-110, doc2query--. LAST, and only under `--check`
+            # (`self_retrieval_k > 0`): it ranks a query per question, which
+            # `--plan` has no reason to pay for. A file that fails only this is
+            # still well-formed and still committed — `--check` reports it, and
+            # nothing here rewrites or deletes.
+            if self_retrieval_k > 0:
+                misses = _unretrievable(root, path, record, self_retrieval_k)
+                if misses:
+                    unretrievable.append((_shown(path, root), misses))
+                    continue
             ok += 1
         reports.append(
             ScopeReport(scope, len(records), ok, missing, stale, malformed,
-                        pii=pii_found, filtered=filtered)
+                        pii=pii_found, filtered=filtered, unretrievable=unretrievable)
         )
     return reports
 
@@ -242,6 +318,56 @@ def _shown(path: Path, root: Path) -> str:
     opens a file by this string.
     """
     return path.relative_to(root).as_posix()
+
+
+def _unretrievable(root: Path, path: Path, record: dict, k: int) -> list[tuple[str, int | None]]:
+    """Questions in this enrichment that do not retrieve their own document.
+
+    **doc2query--** (arXiv 2301.03266): a generated question that the retriever
+    does not answer with the source document is noise at best — it adds terms
+    that pull *other* documents up. The paper filters with a separate relevance
+    model; fux uses **its own index**, which is both cheaper and more honest,
+    because the thing being predicted is exactly what fux will do.
+
+    Returns `(question, rank | None)` for each failure — the rank is reported
+    rather than a bare "no", because *rank 7 of 10* and *absent entirely* are
+    different problems and the fix differs.
+
+    ⚠ **Scored with `title` and `ctx` zeroed** — see `_FILTER_WEIGHTS`. Without
+    that the filter grades a question against text that includes the question.
+
+    ⚠ **Never raises, and never rewrites.** A corpus this cannot be ranked
+    against (no index yet, an unreadable shard) yields no refusals rather than
+    a wrong one: `--check` is a report, and a report that invents a fault is
+    worse than a report that misses one.
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return []
+    questions = [
+        line.strip() for line in text[match_end(text):].splitlines() if is_question(line)
+    ]
+    if not questions:
+        return []
+
+    import dataclasses
+
+    from .query import run_query
+    from .tune import Tune
+
+    tune = dataclasses.replace(Tune(), field_weights=_FILTER_WEIGHTS)
+    doc_id = record.get("id", "")
+    failures: list[tuple[str, int | None]] = []
+    for question in questions:
+        try:
+            results, _ = run_query(root, question, k, force_scan=False, tune=tune)
+        except Exception:  # pragma: no cover - a report must not fail a command
+            return []
+        ids = [r.id for r in results]
+        if doc_id not in ids:
+            failures.append((question, None))
+    return failures
 
 
 def _pii_in_body(path: Path, rules: tuple) -> list[str]:
@@ -395,7 +521,14 @@ def cmd_enrich(args) -> int:
     # redaction is off, and finding that out per-file is finding it out late.
     pii_rules = pii_mod.load(root)
 
-    reports = plan(root, scopes, target=target, pii_rules=pii_rules)
+    # W-110 — the self-retrieval filter runs under `--check` only. `k` is
+    # ADR-ENRICH's, ratified by Arpit 2026-09-05: a question must place its own
+    # document in the **top 3**, or it is refused as a question that would pull
+    # other documents up rather than its own.
+    reports = plan(
+        root, scopes, target=target, pii_rules=pii_rules,
+        self_retrieval_k=SELF_RETRIEVAL_K if getattr(args, "check", False) else 0,
+    )
     if getattr(args, "check", False):
         return _render_check(reports, target=target)
     return _render_plan(root, reports, target=target)
@@ -549,6 +682,9 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
         if report.pii:
             bits.append(f"{len(report.pii)} carrying PII")
             bad += len(report.pii)
+        if report.unretrievable:
+            bits.append(f"{len(report.unretrievable)} with unretrievable questions")
+            bad += len(report.unretrievable)
         suffix = "  " + " · ".join(bits) if bits else "  ok"
         print(f"  {report.scope:<28} {report.ok}/{report.total}{suffix}")
         for path, why in report.malformed:
@@ -558,6 +694,13 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
             # WHICH rule fired. `[REDACTED]` everywhere destroys that, and so
             # does "this file contains PII".
             print(f"      refused: {path} — matches .fux/pii.toml rule(s): {', '.join(names)}")
+        for path, misses in report.unretrievable:
+            for question, rank in misses:
+                where = "absent from the ranking" if rank is None else f"rank {rank}"
+                print(
+                    f"      refused: {path} — does not retrieve its document "
+                    f"({where}, wanted top {SELF_RETRIEVAL_K}): {question}"
+                )
     if any(r.pii for r in reports):
         print(
             "\nAn enrichment body is committed AND indexed, so a value in one travels "
@@ -566,6 +709,15 @@ def _render_check(reports: list[ScopeReport], *, target: str | None = None) -> i
             "cover it:\n"
             "a redacted enrichment body indexes `[PII:email]` as vocabulary, which is "
             "worse than useless."
+        )
+    if any(r.unretrievable for r in reports):
+        print(
+            "\nA question that does not retrieve its own document adds terms that "
+            "pull OTHER documents up.\n"
+            "Rewrite it in the words the document itself uses, or delete the line. "
+            "Nothing here rewrote your file.\n"
+            "Note: scored with `title` and `ctx` zeroed, so echoing the heading does "
+            "not count and an\nalready-indexed enrichment cannot vouch for itself."
         )
     if any(r.missing or r.stale for r in reports):
         print("\nrun `fux enrich --plan`, then the `fux-enrich` skill")

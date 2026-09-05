@@ -69,6 +69,7 @@ README and narrow `.gitignore` before anything is written into the directory
 
 from __future__ import annotations
 
+import json
 import sys
 
 from dataclasses import dataclass, field, replace
@@ -317,6 +318,16 @@ def run(
     pii_rules = pii_mod.load(root)
     pii_moved = _pii_ruleset_moved(root, pii_rules)
     reusable = {} if (full or pii_moved) else _reusable(root, existing, file_shas)
+    # 🔴 **W-110. An enrichment is a second input to extraction, and reuse was
+    # keyed on the DOCUMENT's sha alone.** So a newly written `.fux/enrich/`
+    # file changed nothing until the document itself changed or `--full` ran:
+    # the feature reported `ok` in `fux enrich --check`, the file was committed,
+    # and its vocabulary never reached the index. It presented as working.
+    #
+    # Per document rather than corpus-wide (the `pii.toml` digest's shape),
+    # because enrichment is per document: one rewritten file must re-extract
+    # one document, not the corpus.
+    reusable = _drop_changed_enrichment(root, reusable, file_shas)
     # URL documents still arrive as fetcher-produced markdown, so they keep the
     # prose path untouched. That changes when fork H makes `fetch()` return
     # bytes; until it is ruled, nothing here moves.
@@ -523,6 +534,12 @@ def run(
     from .priors import git_commit_times, superseded_ids
 
     retired = superseded_ids(records)
+    # W-110 — the DECLARED path a retired document cannot take itself.
+    # `supersedes:` is written by the successor, and a document retired years
+    # ago cannot name one that did not exist when it was written. An enrichment
+    # file is written later, so its `superseded_by:` can — and it is the only
+    # key in that frontmatter that reaches the ranking rather than a report.
+    retired |= _superseded_by_enrichment(root, records, file_shas)
     commit_times = git_commit_times(root, [r["loc"] for r in records if r.get("src") == "git"])
     for record in records:
         if record["id"] in retired:
@@ -558,6 +575,46 @@ def run(
         warnings=warnings,
         validated=validated_count,
     )
+
+
+def _superseded_by_enrichment(root, records: list[dict], file_shas: dict[str, str]) -> set[str]:
+    """Doc ids an enrichment's `superseded_by:` retires. **Declared, never inferred.**
+
+    Same three rules `priors.superseded_ids` keeps, and for the same reasons:
+
+    - **The named successor must EXIST in this corpus.** A dangling name
+      retires a document in favour of nothing, and the document then ranks
+      lower with no successor for a reader to go to.
+    - **Never itself.** A self-reference would silently demote a live document.
+    - **A malformed or missing enrichment retires nothing** — `validate` gates
+      it, so a file fux would not index cannot move a ranking either.
+
+    Accepts a `loc` (`docs/adr-0007.md`) or a full id (`file:docs/adr-0007.md`);
+    a human writes the first and a tool writes the second, and refusing either
+    would be a spelling rule nobody is told about.
+    """
+    from ..enrich import enrich_path, superseded_by, validate
+
+    by_loc = {r.get("loc"): r["id"] for r in records}
+    known = {r["id"] for r in records}
+    out: set[str] = set()
+    for record in records:
+        sha = file_shas.get(record["id"], "") or record.get("sha", "")
+        if not sha:
+            continue
+        path = enrich_path(root, sha)
+        if not path.is_file() or validate(path, expected_sha=sha):
+            continue
+        try:
+            named = superseded_by(path.read_text(encoding="utf-8"))
+        except OSError:
+            continue
+        if not named:
+            continue
+        successor = named if named in known else by_loc.get(named)
+        if successor and successor != record["id"]:
+            out.add(record["id"])
+    return out
 
 
 def _enrichment_for(root, sha: str, rules=()) -> tuple[str, dict[str, int]]:
@@ -680,6 +737,11 @@ def _existing_index(root: Path, *, full: bool) -> dict[str, dict]:
 #: "unchanged") would silently keep terms built under retired rules.
 PII_DIGEST_FILE = "pii-digest"
 
+#: W-110. `doc_id -> sha of that document's enrichment file`, from the last
+#: run. **Derived and gitignored**, and rebuilt by being wrong once — the
+#: `pii-digest` precedent, per document because enrichment is per document.
+ENRICH_DIGEST_FILE = "enrich-digests.json"
+
 
 def _pii_ruleset_moved(root: Path, rules) -> bool:
     """Has `.fux/pii.toml` changed since the last run? Records the new answer.
@@ -711,6 +773,57 @@ def _pii_ruleset_moved(root: Path, rules) -> bool:
     # ⚠ An empty previous digest with rules present is a repo that has never
     # run with redaction on, which genuinely needs the full pass.
     return True
+
+
+def _drop_changed_enrichment(
+    root: Path, reusable: dict[str, dict], file_shas: dict[str, str]
+) -> dict[str, dict]:
+    """Remove from `reusable` every document whose enrichment has moved.
+
+    **The state is derived and gitignored** — `runtime/` — and is rebuilt by
+    being wrong once, exactly like the `pii.toml` digest. A run that cannot
+    write it re-extracts next time: wasteful, never wrong.
+
+    ⚠ **An enrichment that appears, changes OR disappears all count.** The last
+    one matters as much as the first: deleting a file must remove its
+    vocabulary from the index, and a reuse keyed only on presence would leave
+    the terms behind with nothing on disk explaining them.
+    """
+    from ..enrich import enrich_path
+    from ..store import fuxdir
+
+    if not reusable:
+        return reusable
+
+    path = fuxdir.fux_dir(root) / "runtime" / ENRICH_DIGEST_FILE
+    try:
+        previous = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        previous = {}
+
+    current: dict[str, str] = {}
+    for doc_id in file_shas:
+        sha = file_shas.get(doc_id, "")
+        if not sha:
+            continue
+        enrichment = enrich_path(root, sha)
+        try:
+            current[doc_id] = store_mod.content_sha(enrichment.read_bytes())
+        except OSError:
+            continue  # no enrichment for this document: nothing to track
+
+    kept = {
+        doc_id: record
+        for doc_id, record in reusable.items()
+        if current.get(doc_id, "") == previous.get(doc_id, "")
+    }
+
+    try:
+        fuxdir.derived_dir(root, "runtime")
+        path.write_text(json.dumps(current, sort_keys=True), encoding="utf-8")
+    except OSError:
+        pass
+    return kept
 
 
 def _reusable(root: Path, existing: dict[str, dict], file_shas: dict[str, str]) -> dict[str, dict]:

@@ -10,6 +10,53 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **Enrichment is now QUESTIONS, not prose** (W-110). The `fux-enrich` skill
+  asks for five to ten questions a searcher would type before they knew the
+  document existed — one per line, no summary — because prose was measured at
+  **+1 fixed / −1 broken** and the break was context prose carrying currency
+  words into a superseded record. doc2query (Nogueira & Lin 2019).
+  - **`fux enrich --check` now tests every question against the index** and
+    refuses one that does not place its own document in the **top 3**
+    (doc2query−−, arXiv 2301.03266). Scored with `title` **and** `ctx` zeroed:
+    `title` so echoing the heading cannot pass, `ctx` because enrichment text
+    is itself indexed as `ctx` and a question would otherwise retrieve its
+    document *through itself* — passing on the second run what it failed on
+    the first.
+  - **`--check` reports; it never rewrites or deletes.** The filter is
+    corpus-dependent: a question that passes today can be refused after an
+    unrelated ingest moves the corpus statistics.
+  - **Prose bodies written under the old skill stay valid** — the filter checks
+    lines ending in `?`, and a body with none has nothing to check.
+  - 🔴 **The gate is AMBIGUOUS and was handed to Arpit**, not adjudicated: the
+    bar (`net >= 6` on `recall@k`) never fixed `k`, and it is met at
+    `recall@1` (**net +7, nothing down**) and not at `@3`/`@5`/`@10`
+    ([the run](work/regression/2026-09-05-doc2query/report.md)). The `placebo`
+    control moved **nothing at any k**.
+
+- **`superseded_by:` in an enrichment's frontmatter retires its document.** The
+  declared path `supersedes:` cannot cover: that key is written by the
+  *successor*, and a document retired years ago could not name one that did not
+  exist yet. Declared, never inferred — the named successor must exist, never
+  itself, and a malformed enrichment retires nothing.
+
+### Fixed
+
+- 🔴 **A newly written enrichment was never indexed on an incremental
+  ingest.** Extraction reuse was keyed on the *document's* content sha alone,
+  so a `.fux/enrich/` file could be written, pass `fux enrich --check`, be
+  committed and reviewed — and its vocabulary never reached `.fux/index/` until
+  the document itself changed or `fux ingest --full` ran. **It presented as a
+  working feature**, and shipped that way from W-76 Phase 8 until a test
+  written for something else caught it.
+  - Reuse is now invalidated per document when its enrichment's content sha
+    moves, **appears or disappears** — a deletion must remove its vocabulary
+    too. An *unchanged* enrichment still forces no re-extraction, so the
+    delta-ingest guarantee is intact.
+  - ⚠ **Every prior enrichment measurement in this repo ran through this
+    defect**, and whether any under-measured enrichment depends on whether its
+    harness ingested from clean. Not audited here; filed.
+
+
 - 🟢 **`--expand "<text>"` on `ask`, `find` and `answer`, and `expand` on the
   MCP `fux_search` tool** (W-109). Fux's remaining failures are **vocabulary
   gaps** — the document does not use the question's words — and no weighting

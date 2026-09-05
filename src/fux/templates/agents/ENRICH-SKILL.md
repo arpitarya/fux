@@ -5,10 +5,21 @@ description: Generate enrichment for documents in a Fux corpus. Use ONLY when ex
 
 # Enriching a Fux corpus
 
-Fux ranks from a committed index. **Enrichment adds a short piece of written
-context to a document so it can be found by words it does not literally
-contain** — a runbook about "the checkout circuit breaker" should be findable
-by "payment resilience" even if that phrase never appears in it.
+Fux ranks from a committed index. **Enrichment adds the QUESTIONS a searcher
+would type, so a document can be found by words it does not literally
+contain** — a postmortem titled *"checkout unavailable for 47 minutes"* should
+be findable by *"what happened during the checkout outage"*, a word that
+appears nowhere in it.
+
+🔴 **You write questions, not a summary.** That changed on 2026-09-05, and it
+changed because prose was measured and questions were not: a blind enrichment
+run scored **+1 fixed / −1 broken** — no net gain — and the one it broke was
+broken by *context prose that carried currency words into a superseded
+record*. Questions cannot do that: a question is a retrieval claim about one
+document, and `fux enrich --check` refuses one that does not retrieve it.
+
+The technique is **doc2query** (Nogueira & Lin 2019) with **doc2query−−**'s
+filter (arXiv 2301.03266).
 
 Fux does not call a model. **You are the model.** `fux enrich` computes the
 worklist and validates what you write; generating the text is this skill's job.
@@ -72,11 +83,11 @@ If the plan is empty, nothing is declared — say so and stop.
 
 ## 2 · Read the document, re-plan, then write the file
 
-For each document: read it, write the prose, then **immediately before saving,
+For each document: read it, write the questions, then **immediately before saving,
 re-run `fux enrich --plan <that document>` and confirm the sha is unchanged.**
 
 🔴 **This is not ceremony.** Between the plan and the write you read a
-document, thought, and wrote several paragraphs. A rebase, a concurrent edit or
+document, thought, and wrote several lines. A rebase, a concurrent edit or
 another agent in the same repo can move the document in that window, and an
 enrichment written under a sha the document no longer has is invisible: fux
 simply does not find it, and nothing reports an error. If the sha moved, throw
@@ -95,12 +106,29 @@ model: <the model you are>
 generated: 2026-08-23
 skill: fux-enrich@1
 ---
-Establishes how Fux orders results: the BM25F field weights, term-frequency
-saturation, and why per-field scores are never summed. Covers the length
-normaliser and the reason it cannot be a tuning knob while it is committed.
-Relevant to questions about relevance tuning, result ordering, scoring
-constants, and why a document ranks where it does.
+How does fux decide which result comes first?
+Why are per-field scores never added together?
+What controls how much a long document is penalised?
+Where do the BM25F field weights live and can I change them?
+Why can the length normaliser not be a tuning knob?
+What makes a term-frequency count stop mattering?
 ```
+
+**One question per line. Five to ten. Nothing else in the body.**
+
+If the document **supersedes** another, or **is superseded by** another, say so
+in the *frontmatter*, never in a question:
+
+```markdown
+superseded_by: docs/adr/0019_calder-gateway.md
+```
+
+🔴 **`superseded_by:` is the one key here that reaches the RANKING.** It marks
+this document retired, exactly as the successor's own `supersedes:` would — and
+it exists because a document retired years ago cannot name a successor that did
+not exist yet. The named document must be in the corpus; a name that resolves
+to nothing is ignored. Do not write it unless the document itself, or the
+successor, says so.
 
 **Every frontmatter key is required.** `fux enrich --check` refuses a file
 missing any of them, and a refused file is silently not indexed.
@@ -110,32 +138,58 @@ missing any of them, and a refused file is silently not indexed.
 
 ## 3 · What to write in the body
 
-**Write what the document is about and what questions it answers**, in prose,
-in about 60–120 words. Every word becomes searchable vocabulary attached to
-this document, which is exactly the leverage and exactly the risk.
+**Five to ten questions, one per line, each ending in `?`.** Nothing else — no
+summary paragraph, no heading, no bullet markers.
+
+Every word becomes searchable vocabulary attached to this document, which is
+exactly the leverage and exactly the risk.
+
+**Write the question someone would type BEFORE they knew this document
+existed.** That is the whole test. If they already knew the title, they would
+not be searching.
 
 **Do:**
 
-- Name the concepts in the vocabulary a *searcher* would use, not only the
-  document's own. That is the entire point: if the document already said the
-  word, indexing it again buys nothing.
-- Name what kind of question this document answers.
+- Use the vocabulary a *searcher* brings, not the document's own. If the
+  document already said the word, indexing it again buys nothing.
+- Cover the distinct things this document answers — a runbook answers *how do
+  I roll it back*, *who approves it* and *what breaks if I do not*, and those
+  are three questions, not one.
 - Use the surrounding system's real terminology — read the neighbouring files
   if you are unsure what things are called.
-- Mention what it supersedes or is superseded by, if the document says so.
 
 **Do not:**
 
-- Summarise the content. A summary repeats words the document already has, and
-  those are already indexed.
-- Invent facts. If the document does not say something, it is not context, it
-  is fiction — and it will be retrieved as though the document said it.
-- Include the frontmatter's own values in the body. Fux strips the frontmatter
-  before indexing precisely so a document cannot match a query for its own
-  metadata.
-- Add keywords in a list. This is prose; term frequency is computed from it,
-  and a keyword pile distorts the length normaliser.
+- **Echo the document's title.** A question that repeats the heading retrieves
+  the document trivially and teaches the index nothing; `--check` scores with
+  the `title` field **zeroed** precisely so that trick does not pass.
+- **Write a summary, or any statement.** A line that does not end in `?` is not
+  checked by the filter, so a claim smuggled into the body is exactly the
+  unchecked prose this skill stopped asking for.
+- **State currency or supersession in a question.** *"Is this the current
+  decision?"* attaches the word *current* to whichever document it is written
+  on — including a retired one. Currency goes in `superseded_by:`.
+- **Invent facts.** A question the document does not answer will retrieve it as
+  though it did.
+- Include the frontmatter's own values. Fux strips the frontmatter before
+  indexing precisely so a document cannot match a query for its own metadata.
 - Guess at a sha, a chunk count, or a path. They come from `--plan`.
+
+### The filter, and what it is actually checking
+
+`fux enrich --check` runs **every question you wrote as a real search** and
+refuses the file if a question does not place its own document in the **top
+3**. A question that retrieves something else is not neutral — it adds terms
+that pull *other* documents up.
+
+⚠ **Scored with `title` and `ctx` zeroed.** `title`, so echoing the heading
+cannot pass; `ctx`, because enrichment text is itself indexed as `ctx` and a
+question would otherwise retrieve its document *through itself* — passing on
+the second run and failing on the first.
+
+⚠ **The filter is corpus-dependent.** A question that passes today can be
+refused after an unrelated ingest moves the corpus statistics. `--check`
+**reports**; it never rewrites your file and never deletes one.
 
 ### 🔴 Never write a value that must not be committed
 
@@ -172,8 +226,9 @@ run leaving `40/41` is the requested outcome, not a failure.
 
 ## 5 · Finishing
 
-**A single-target run:** say which document you enriched and, in one line, that
-it is now findable by words its neighbours are not — that tilt is the point of
+**A single-target run:** say which document you enriched, how many questions
+you wrote, and in one line that it is now findable by words its neighbours are
+not — that tilt is the point of
 enrichment and it is real (see below). Then stop.
 
 **A scope run:** one scope, then `--check`, then the next. **Do not start a

@@ -301,6 +301,22 @@ is what makes the retry safe to recommend to an agent.
 does not know the slot exists re-runs the same failing question.
 [ADR-EXPAND](0054_expand.md).
 
+⚠ **The `fux-enrich` skill was re-aimed at doc2query on 2026-09-05** (W-110):
+its body is now **five to ten questions a searcher would type**, one per line,
+and no summary. Prose was measured at **+1 fixed / −1 broken** and the break was
+context prose carrying currency words into a superseded record.
+
+**This is a skill change with a mechanical partner**, which is new for this
+record's subject: `fux enrich --check` now *tests* what the skill asks for —
+a question that does not retrieve its own document in the top 3 is refused by
+name. The skill and the check say the same thing, and only one of them can be
+ignored.
+
+⚠ **The skill's `superseded_by:` instruction reaches the RANKING.** It is the
+only key in that frontmatter that does. The skill says so in the same breath as
+it introduces it, because an agent that writes one casually retires a live
+document.
+
 ### Consequences
 
 - ⚠ **Fux owns three third-party formats it does not control.** This is a real

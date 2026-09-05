@@ -21,6 +21,30 @@ Rules:
 
 ---
 
+## W-110 — doc2query enrichment, and a defect that made enrichment a no-op (2026-09-05)
+
+**Search v3's fourth item.** Blind enrichment measured `+1 / −1` as prose; the
+skill is re-aimed at questions, and `--check` can now test what it asks for.
+
+| what landed | evidence |
+|---|---|
+| `ENRICH-SKILL.md` re-aimed at **doc2query** — 5–10 questions, one per line, no summary, no title echo, currency in frontmatter; every vendored copy refreshed | [ADR-ENRICH](../docs/adr/0040_enrich.md) 15 · [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) |
+| **the doc2query−− filter** — `--check` refuses a question that does not place its document in the **top 3** (`SELF_RETRIEVAL_K`, Arpit's value), scored with `title` **and** `ctx` zeroed | [ADR-ENRICH](../docs/adr/0040_enrich.md) 16 · `tests/enrich/test_doc2query.py` |
+| `superseded_by:` in an enrichment retires its document — declared, never inferred, with `superseded_ids`' three rules | [ADR-ENRICH](../docs/adr/0040_enrich.md) 17 · [ADR-INGEST](../docs/adr/0007_ingest.md) |
+| 🔴 **extraction reuse now sees the enrichment** — a new, changed or deleted `.fux/enrich/` file invalidates that document's reuse | [ADR-ENRICH](../docs/adr/0040_enrich.md) 18 · [ADR-INGEST](../docs/adr/0007_ingest.md) |
+
+🔴 **The gate is AMBIGUOUS and was handed to Arpit** — the bar never fixed `k`,
+and it is met at `recall@1` (**net +7, 7 up / 0 down**) and not at `@3`/`@5`/`@10`
+([the run](regression/2026-09-05-doc2query/report.md)). `recall@1` 0.4341 →
+0.5698; **nothing went down at any `k`**; the **`placebo` control is a perfect
+null**. ⚠ The doc2query−− filter is **unproven** — 2 refusals out of 98.
+
+🔴 **The defect is the most consequential part.** A newly written enrichment was
+**never indexed on an incremental ingest** — reuse was keyed on the document's
+sha alone — so the feature presented as working while changing no committed
+byte, from W-76 Phase 8 until now. **Every prior enrichment measurement ran
+through it**; not audited, filed.
+
 ## W-109 — `--expand`, and `-q` multi-query fusion (2026-09-05)
 
 **Search v3's third item.** Every surviving graded failure is a vocabulary gap;

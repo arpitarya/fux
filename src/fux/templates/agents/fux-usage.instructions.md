@@ -84,6 +84,33 @@ can only be computed by chunking the *fetched* bytes; the index holds
 statistics, not text, so it has nothing to count lines in. Giving `ask` line
 numbers would mean making it fetch, and `ask` is offline by default.
 
+### When a search comes back thin, RETRY with the corpus's own words
+
+**Fux ranks the words that are actually in the documents.** The most common
+reason a search misses is a **vocabulary gap** - you asked about an *outage*
+and the document is titled *"checkout unavailable for 47 minutes"*.
+
+**The signal:** `confidence.band` is `partial` and `confidence.missing` is
+non-empty. `missing` names the terms of your question that appear **nowhere in
+this corpus**.
+
+**The retry:** re-ask with the word the corpus would use, or keep the question
+and add `--expand` - a handful of words you expect the document to use:
+
+```bash
+fux ask "what happened during the checkout outage" \
+    --expand "checkout unavailable 47 minutes incident timeline"
+```
+
+Expansion terms score **below** your own words, and a document matching *only*
+your expansion is never returned - so a wrong guess costs nothing.
+
+Repeatable `-q` asks the same question a second way and fuses the rankings;
+`--json` then carries `"fused": true` and `score` is a fusion score, not
+comparable with a single-question one.
+
+**Fux will never write the expansion for you.** No model runs inside fux.
+
 ## 3. Read the freshness verdict on `answer`
 
 `answer` fetches each cited source and compares it against what was indexed:

@@ -523,6 +523,23 @@ Ruled by Arpit 2026-08-28; ADR-FETCHER decision 11 had named the asymmetry.
   the working tree still holds the file. Inventing one would make the queue claim
   an identity it cannot check.
 
+⚠ **Delta reuse now sees a second input (W-110, 2026-09-05).** Extraction is a
+pure function of one document's bytes **and its enrichment**, and reuse was
+keyed on the bytes alone — so a newly written `.fux/enrich/` file changed
+nothing until the document changed or `--full` ran. `_drop_changed_enrichment`
+removes from the reusable set every document whose enrichment file's content
+sha has moved, appeared, or disappeared.
+
+**The delta-ingest guarantee is unchanged**: an *unchanged* enrichment forces no
+re-extraction, so an enriched corpus still re-tokenises a commit rather than
+itself. Keyed per document rather than corpus-wide (`pii-digest`'s shape),
+because one rewritten enrichment must cost one document.
+
+⚠ **An enrichment's `superseded_by:` now resolves onto `record["superseded"]`**,
+beside `priors.superseded_ids`' `supersedes:` edges and under the same three
+rules — the successor must exist, never itself, and a malformed enrichment
+retires nothing. [ADR-ENRICH](0040_enrich.md) decisions 17-18.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in

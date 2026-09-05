@@ -1,0 +1,16 @@
+43 of 50 goldens declared complete
+
+arm         recall@1   recall@3   recall@5  recall@10    hit@1
+none          0.4341     0.8256     0.9186     0.9884   0.6047
+placebo       0.4341     0.8256     0.9186     0.9884   0.6047
+real          0.5698     0.8798     0.9535     1.0000   0.7674
+filtered      0.5698     0.8798     0.9535     1.0000   0.7674
+
+none -> placebo   recall@5  up  0 []
+                     down  0 []   net +0  discordant 0
+none -> real      recall@5  up  2 ['q029', 'q036']
+                     down  0 []   net +2  discordant 2
+none -> filtered  recall@5  up  2 ['q029', 'q036']
+                     down  0 []   net +2  discordant 2
+
+rows -> /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/aad23fcd-5837-4012-8249-a5082564a6b8/scratchpad/enrich-rows.csv and /private/tmp/claude-501/-Users-arpitarya-my-programs-fux/aad23fcd-5837-4012-8249-a5082564a6b8/scratchpad/enrich-rows.jsonl

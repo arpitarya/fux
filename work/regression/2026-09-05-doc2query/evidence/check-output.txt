@@ -1,0 +1,2 @@
+enrichment: 1 scope(s) declared
+  docs                         10/10  ok
