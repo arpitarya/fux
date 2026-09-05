@@ -1,3 +1,16 @@
+---
+type: Proposal
+title: "Code + architecture review — 2026-08-28"
+description: "A cloud-mirror review of src/fux, 16 ADRs, CLAUDE.md, OPEN-WORK and CI, run with no git and no test run. The architecture is sound; the risk has moved from design to drift. Findings to verify against the real tree, not landed facts."
+status: proposed
+timestamp: 2026-08-28T00:00:00Z
+---
+
+⚠ **Frontmatter added 2026-09-05.** This file was filed with none at all, which
+is an OKF conformance break and this directory's own declared contract. The
+review's own caveat still stands and is the reason it is `proposed`: it ran on
+a mirror with a wedged shell, so **every finding is to verify, not to act on**.
+
 # Fux — code + architecture review (2026-08-28)
 
 *Reviewed on a cloud mirror of `src/fux`, 16 ADRs, CLAUDE.md, OPEN-WORK, CI — `device_bash` was wedged, so no git, no test run. Every P0/P1 below was re-read in the source by me; the two "reproduced" items were reproduced by a reviewer on a synthetic corpus, not on the device. Treat as findings to verify with `pytest -q tests tests_e2e` on the real tree, not as landed facts. Model: Fable 5 + 4 parallel review agents.*

@@ -1,3 +1,16 @@
+---
+type: Proposal
+title: "ADR review — 2026-08-28: the rules are excellent and the records do not follow them"
+description: "All 47 live records read against the register's own rules. Five rules are each broken in 20-45 of 47 records, and nothing mechanical notices. Record-vs-record only: no claim here was checked against src/ or tests/. Findings, not landed facts."
+status: proposed
+timestamp: 2026-08-28T00:00:00Z
+---
+
+⚠ **Frontmatter added 2026-09-05.** This file was filed with none at all, which
+is an OKF conformance break and this directory's own declared contract
+(`README.md` states the block every proposal carries). The `type` and `status`
+are the directory's; nothing about the findings changed.
+
 # ADR review — 2026-08-28
 
 **Scope.** All 47 live records in `docs/adr/` plus `README.md`, `TEMPLATE.md`, `RULE-SINCE`, read against the register's own rules. Only `docs/adr/` was read; every claim about `src/` or `tests/` below is *record-vs-record*, not record-vs-code. Line numbers are from the files as of 2026-08-28.

@@ -308,3 +308,24 @@ it shipped and dogfooded for two releases and its defect is instructive.
 | archived | date | live successor |
 |---|---|---|
 | [`templates/cdp-rendering.py.txt`](templates/cdp-rendering.py.txt) | 2026-09-01 | **Superseded, not deleted.** `capture()`, and the `_call`/`_wait_event` pair that discarded every message not their own. Live successor: `src/fux/templates/cdp.py.txt` — `fetch_resource()` on `Fetch.enable`/`Fetch.getResponseBody`, with an event pump that files replies and events separately. Live record: [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md). ⚠ **The discard loop is the point of keeping it**: under interception a lost `Fetch.requestPaused` is a paused request nobody resolves, which wedges the page — the old code's shape is why the new code has a pump |
+
+## Archived 2026-09-05 — four proposals a live directory was still holding
+
+**Housekeeping with two distinct causes, and both were the *move* being late
+rather than any decision changing.** Found by reconciling
+`work/proposals/README.md` against the filesystem: six files on disk had no
+index row, and four of them should not have been in a live directory at all.
+
+| archived | date | live successor |
+|---|---|---|
+| [`proposals/node-search-port.md`](proposals/node-search-port.md) | 2026-09-05 | **Superseded 2026-09-04** by [`work/proposals/search-v3.md`](../work/proposals/search-v3.md), which folded it in whole. Live successor: **W-107**, the Node read plane — its phases, its gate and [`PRE-REGISTRATION-NODE.md`](../work/benchmark/PRE-REGISTRATION-NODE.md) |
+| [`proposals/agent-run-embeddings.md`](proposals/agent-run-embeddings.md) | 2026-09-05 | **Superseded 2026-09-04** by `search-v3.md`. Live successor: **W-112**, the vector plane — still blocked, and the shape it must take is now measured rather than argued ([the vector gate](../work/regression/2026-09-05-vector-gate/report.md): two correct implementations of one model share **0 of 125** int8 vectors) |
+| [`proposals/retrieval-quality-per-verb.md`](proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by `search-v3.md`. Live successor: **W-108 … W-111**, four of which have landed |
+| [`proposals/audit-evidence-trail.md`](proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27**, and it sat in `work/proposals/` for nine days against that directory's own lifecycle rule. Live successor: [ADR-PROVENANCE](../docs/adr/0046_provenance.md) — `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify`, all shipped |
+
+⚠ **The first three were never deleted, and `search-v3.md` said they were.**
+Its frontmatter read *"all deleted in the same change"*; the files were still
+on disk two days later, unindexed and reachable. **Deleting them would have
+been wrong in any case** — CLAUDE.md moves a superseded document into the one
+archive, because a deleted document leaves no trace that anything is missing.
+The claim is corrected in `search-v3.md`.

@@ -2,11 +2,23 @@
 type: Proposal
 title: "A Node.js search-only port — `ask` / `find` / `answer` / `graph` (+ `mcp`) for tools that have no Python"
 description: "Arpit's ask, 2026-09-04: expose the search verbs from Node.js so Kiro, VS Code extensions and other Node-only hosts can query a fux index. Scope, the exact list of what must be ported byte-for-byte, the four places a port silently diverges, and the gate."
-status: proposed
+status: superseded
 timestamp: 2026-09-04T00:00:00Z
 ---
 
 # A Node.js search-only port
+
+> 🔴 **SUPERSEDED 2026-09-04 → [`work/proposals/search-v3.md`](../../work/proposals/search-v3.md)**,
+> which folded this document in whole and carries the plan Arpit ratified
+> on 2026-09-05 — the Node read plane as **W-107**, whose phases, gate and pre-registration are live.
+> **Archived 2026-09-05.** `search-v3.md`'s own frontmatter said all three
+> superseded files were *"deleted in the same change"*; they never were, and
+> deleting them would have been wrong anyway — CLAUDE.md moves a superseded
+> doc to the one archive rather than removing it. The claim is corrected there.
+>
+> ⚠ **Archive is not evidence.** This file may be named; it may not be cited
+> as backing a live claim. Nothing guarantees it was not overwritten after
+> retirement — read `search-v3.md` instead.
 
 **Filed 2026-09-04 · Cowork (Opus).** Arpit: *"I want ask, find, answer, graph
 — the search CLI commands — exposed using Node.js as well so that it can work

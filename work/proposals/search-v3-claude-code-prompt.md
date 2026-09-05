@@ -1,3 +1,18 @@
+---
+type: Proposal
+title: "Claude Code prompt — execute Search v3"
+description: "The paste-ready prompt that ratified search-v3.md's seven items and flipped them to the agent lane. Arpit handed it over on 2026-09-05; W-108, W-109, W-110, W-111 and two measurements landed through it."
+status: graduated
+timestamp: 2026-09-04T00:00:00Z
+---
+
+⚠ **Frontmatter added 2026-09-05**, and `status: graduated` rather than
+`proposed`: **this prompt was handed over and executed.** Arpit ratified
+[`search-v3.md`](search-v3.md) §8 through it on 2026-09-05 and five of the
+seven items closed. It is kept because it is the ratification instrument — the
+record of what was authorised and in what order — not because anything in it is
+still to do.
+
 **Model: Opus** — every item touches ranking arithmetic, a law, or a gate; a wrong last bit is invisible until a differential arm fires. Run in `~/my_programs/fux`.
 
 ---

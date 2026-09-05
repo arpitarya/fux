@@ -32,5 +32,7 @@ green for two weeks; then (b) prototypes against this repo's own ADRs.
 
 **References.** Council visionary seat (WORKLOG 2026-08-09) · paper §1.1
 (agents act on answers) · the Fux founding objective (deviations can't
-land) · [`audit-evidence-trail`](audit-evidence-trail.md) (the same
-mechanism pointed at compliance).
+land) · [ADR-PROVENANCE](../../docs/adr/0046_provenance.md) (the same
+mechanism pointed at compliance — it shipped, and it is what
+`audit-evidence-trail.md` graduated into before that file was archived on
+2026-09-05).

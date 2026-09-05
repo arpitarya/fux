@@ -1,12 +1,27 @@
 ---
 type: Proposal
 title: "Search v3 — better answers per verb, a Node.js read plane, and agent-run vectors"
-description: "The one document for everything discussed on 2026-09-04. Where ask / find / answer lose today (measured), the fixes that stay inside L1–L8, the write/read split that lets Node read an index Python wrote, the pinned vector plane an agent can produce, the target architecture, and the implementation plan (W-106 … W-112) with definitions of done. Supersedes retrieval-quality-per-verb.md, node-search-port.md and agent-run-embeddings.md, all deleted in the same change."
-status: proposed
+description: "The one document for everything discussed on 2026-09-04. Where ask / find / answer lose today (measured), the fixes that stay inside L1–L8, the write/read split that lets Node read an index Python wrote, the pinned vector plane an agent can produce, the target architecture, and the implementation plan (W-106 … W-112) with definitions of done. Supersedes retrieval-quality-per-verb.md, node-search-port.md and agent-run-embeddings.md, all three ARCHIVED on 2026-09-05 (this said 'deleted in the same change' and they never were)."
+status: graduated
 timestamp: 2026-09-04T00:00:00Z
 ---
 
 # Search v3
+
+> ✅ **RATIFIED 2026-09-05 — `status: graduated`, updated 2026-09-05.** Arpit
+> ratified §8 item by item through
+> [the prompt beside this file](search-v3-claude-code-prompt.md), and **five of
+> the seven items have closed**: W-108, W-109, W-110 and W-111 landed, and
+> W-107 Phase 0 and W-106 were measured. **W-107 Phases 1–4 and W-112 remain**,
+> both on Arpit — which is why this file is `graduated` and not archived.
+> [`../OPEN-WORK.md`](../OPEN-WORK.md) is the live state; the sentence below is
+> how it read before ratification and is kept as filed.
+>
+> ⚠ **This document's frontmatter said the three proposals it supersedes were
+> "deleted in the same change". They were not** — they sat here unindexed until
+> **2026-09-05**, when they were moved to
+> [`archive/proposals/`](../../archive/README.md) rather than deleted, because
+> a deleted document leaves no trace that anything is missing.
 
 **Filed 2026-09-04 · Cowork (Opus).** Research + design + plan. Nothing here
 is authorised to build; §8 is the plan Arpit ratifies, item by item, before

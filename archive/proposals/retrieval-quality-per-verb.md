@@ -2,11 +2,23 @@
 type: Proposal
 title: "Better results from `ask`, `find` and `answer` — per verb, and the embeddings question settled"
 description: "Research note + proposal. Where each verb loses today (measured), what would fix it inside L1–L4, and why 'embeddings via a chat skill' is not a thing — the chat skill already exists and it is doc2query."
-status: proposed
+status: superseded
 timestamp: 2026-09-04T00:00:00Z
 ---
 
 # Better results from `ask`, `find` and `answer`
+
+> 🔴 **SUPERSEDED 2026-09-04 → [`work/proposals/search-v3.md`](../../work/proposals/search-v3.md)**,
+> which folded this document in whole and carries the plan Arpit ratified
+> on 2026-09-05 — the per-verb work as **W-108** … **W-111**, four of which have landed.
+> **Archived 2026-09-05.** `search-v3.md`'s own frontmatter said all three
+> superseded files were *"deleted in the same change"*; they never were, and
+> deleting them would have been wrong anyway — CLAUDE.md moves a superseded
+> doc to the one archive rather than removing it. The claim is corrected there.
+>
+> ⚠ **Archive is not evidence.** This file may be named; it may not be cited
+> as backing a live claim. Nothing guarantees it was not overwritten after
+> retirement — read `search-v3.md` instead.
 
 **Filed 2026-09-04 · Cowork (Opus).** Research note, not a build item. Every
 claim about fux is grounded in a filed run or in code; every claim about the

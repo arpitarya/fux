@@ -10,13 +10,19 @@ venv/
 # macOS
 .DS_Store
 
-# Fux's own directory is NOT blanket-ignored: index/, sources/, middleware/,
-# README.md and .gitignore are all committed (ADR-0011). The derived planes
-# are listed by name in .fux/.gitignore, which fux writes for us — a `.fux/*`
-# blanket here would silently drop a committed plane, which is exactly what
-# `fux doctor`'s check-ignore assertion exists to catch.
+# Fux's own directory is NOT blanket-ignored. Committed: index/, sources/,
+# fetchers/, decoders/, enrich/, tune.toml, output.toml, pii.toml,
+# refusals.toml, .fuxignore, README.md and .gitignore. Only runtime/ (derived)
+# and acquired/ (re-acquirable) are ignored, and they are listed BY NAME in
+# .fux/.gitignore, which fux writes — a `.fux/*` blanket here would silently
+# drop a committed plane, which is exactly what `fux doctor`'s check-ignore
+# assertion exists to catch. See ADR-DOTFUX (docs/adr/0003_fux-directory.md).
+#
+# Corrected 2026-09-05: this named `middleware/`, which has never existed under
+# `.fux/`, and cited "ADR-0011" — a number, from the archived v0.26 line, which
+# CLAUDE.md forbids in a live document. The list above is `store/fuxdir.py`'s
+# COMMITTED + COMMITTED_FILES, read from source.
 .pytest_cache/
-*.egg-info/
 
 .session-lock
 .locks/

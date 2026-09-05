@@ -4,11 +4,24 @@
 small git-carried index, fetch content from the systems that own it, verify
 at answer time.**
 
-> **Status (2026-08-24): `fux-engine` 2.0.0-alpha.0 on PyPI — the record
-> shape moves to `fux.index.v2`.** M2 through M5 (accelerator, graph lane,
-> refer plane, maintenance hooks) are in; this release adds five-field
-> BM25F, per-source tuning (`.fux/tune.toml`), proximity reranking,
-> `fux enrich` and `fux mcp`. From any repo:
+> **Status (2026-09-02): `fux-engine` 2.0.0-alpha.7 on PyPI.** M2 through M5
+> (accelerator, graph lane, refer plane, maintenance hooks) are in. `alpha.0`
+> moved the record shape to `fux.index.v2` and added five-field BM25F,
+> per-source tuning (`.fux/tune.toml`), proximity reranking, `fux enrich` and
+> `fux mcp`. **Seven releases since**, each in
+> [`CHANGELOG.md`](CHANGELOG.md):
+>
+> | | |
+> |---|---|
+> | `alpha.1` | the dense lane **removed** — see below |
+> | `alpha.2` | the URL freshness loop closes: `ttl=`, `cached` and `as-ingested` as verdicts of their own |
+> | `alpha.3` | `.fux/output.toml` — how a result is *shown*, never which documents come back; `ask --sections` |
+> | `alpha.4` | three more built-in decoders: `jsonl`, `svg`, images |
+> | `alpha.5` | the **acquired plane** (`keep=`), declarative refusal detection (`.fux/refusals.toml`), and **PII redaction** of the committed index (`.fux/pii.toml`) |
+> | `alpha.6` | enrichment moves inside the PII boundary; `fux enrich <TARGET>`; a CDP fetcher that survives concurrency |
+> | `alpha.7` | one enrichment-report path spelling on every platform |
+>
+> From any repo:
 > ```bash
 > fux setup                # writes the files you own, write-if-missing
 > fux ingest               # builds the committed .fux/index/*.jsonl (+ the accelerator)
@@ -141,8 +154,20 @@ a byte is written. `fux setup` is the one that writes *code*: the fetchers and
 the source lists, explicitly, once. **Ingest never puts a fetcher in a repo
 that only wanted an index.**
 
-`fux doctor` fails if the index has been git-ignored and warns about anything
-undeclared.
+**`fux doctor` is the one command that reads everything and changes nothing.**
+It is offline and read-only by contract — it never fetches and never repairs.
+It *fails* on the two things that break a repo silently: the committed index
+git-ignored, and a `.fux/sources/types` with no live pattern. Everything else
+is a **warning**, because a dead URL, a refused sign-in wall or a corpus with
+no git history is a fact about the world rather than a broken install, and
+failing on those trains people to ignore a red doctor. It reports the URL half
+of the corpus, the acquired plane's size, whether your PII and refusal rules
+compile *and what they actually redacted or refused*, whether every
+`decoder=` binding still resolves, whether any document carries an `mtime`
+(a corpus copied out of its git repository loses the whole recency prior and
+nothing else says so), and the `as-ingested` share — which is the veto
+condition of two accepted records. `fux doctor --json` is the machine-readable
+form.
 
 ## Reading order
 

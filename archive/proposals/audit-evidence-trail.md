@@ -2,12 +2,21 @@
 type: Proposal
 title: Audit evidence trail — who knew what, when, from where
 description: Provenance frontmatter + git history + deterministic answers = an auditable knowledge chain for regulated work.
-status: graduated
+status: implemented
 timestamp: 2026-07-21T00:00:00Z
 tags: [compliance, provenance, audit]
 ---
 
 # Audit evidence trail
+
+> **ARCHIVED 2026-09-05.** It graduated on 2026-08-27 and stayed in
+> `work/proposals/` for nine days, against that directory's own lifecycle
+> rule (*fully implemented proposals move to the archive*). The move is what
+> was late; nothing about the decision changed.
+>
+> ⚠ **Archive is not evidence** — this file may be named, never cited as
+> backing a live claim. [ADR-PROVENANCE](../../docs/adr/0046_provenance.md)
+> is the live decision.
 
 > **GRADUATED 2026-08-27 → [ADR-PROVENANCE](../../docs/adr/0046_provenance.md)**,
 > via the researched successor [`answer-provenance.md`](../../archive/proposals/answer-provenance.md).
