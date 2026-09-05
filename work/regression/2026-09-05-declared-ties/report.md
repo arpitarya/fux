@@ -69,9 +69,19 @@ DIFFERENTIAL GREEN — 101248 comparisons, byte-identical in every mode
 with the same record dicts and the new key reads only fields both generators
 already carry (`superseded`, `mtime`, `loc`).
 
-⚠ **A 10 000-document differential run was started and had not finished when
-this was filed.** It is not required — the playground run satisfies the bar
-several hundred times over — and it is named here rather than quietly omitted.
+⚠ **A 10 000-document differential run was started and STOPPED, and this
+paragraph is a correction to the first version of this report**, which said it
+"had not finished".
+
+It was projected at **hours**: the full sweep is 3 164 generated queries × 4
+`top` values × 2 skipping modes × 2 paths, and one scan of that corpus is
+~48 ms. It is **optional assurance and not a gate** — the playground run
+satisfies W-111's `240+` bar four hundred times over, and the property under
+test (the sort key reads only fields both generators already carry) does not
+become more true at 10 000 documents.
+
+**It is named rather than omitted** so that nobody later reads "differential
+green" here as covering a corpus it does not.
 
 ## `find`'s three filters
 
