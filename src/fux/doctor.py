@@ -34,7 +34,37 @@ class Check:
     level: str = "error"  # "error" fails the command; "warn" only reports
 
 
+#: The committed index, parsed once per `run()`. Three checks need per-record
+#: fields (`mtime` for the recency prior, `loc` for the decoder bindings, the
+#: `url:` prefix for URL health) and a 10 000-document corpus parsed three
+#: times is a diagnostic command that feels broken. Reset at the top of every
+#: `run()` rather than memoized forever: `doctor` is called twice in one
+#: process by the test suite, and a cache that outlived a re-ingest would
+#: report the previous index.
+_RECORDS: dict[str, dict] | None = None
+
+
+def _records(root: Path) -> dict[str, dict]:
+    """Every committed record, or `{}` when the index is absent or unreadable.
+
+    **Never raises**, exactly like every other reader on this path: an index
+    that cannot be read is another check's finding, and a traceback out of a
+    health command is the worst possible answer to *"what is wrong"*.
+    """
+    global _RECORDS
+    if _RECORDS is None:
+        try:
+            from .store import reader
+
+            _RECORDS = reader.read_index(root)
+        except Exception:
+            _RECORDS = {}
+    return _RECORDS
+
+
 def run(start: Path | None = None) -> list[Check]:
+    global _RECORDS
+    _RECORDS = None
     checks = [_python_version(), *_repo_root(start)]
     return checks
 
@@ -216,6 +246,10 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_url_health(root))
     checks.append(_acquired_health(root))
     checks.append(_pii_health(root))
+    checks.append(_refusal_health(root))
+    checks.append(_decoder_bindings(root))
+    checks.append(_recency_prior(root))
+    checks.append(_freshness_share(root))
     return checks
 
 
@@ -252,12 +286,65 @@ def _pii_health(root: Path) -> Check:
             "pii rules", True, ".fux/pii.toml declares no rules", level="warn"
         )
     names = ", ".join(rule.name for rule in rules)
-    return Check(
-        "pii rules",
-        True,
+    detail = (
         f"{len(rules)} rule(s) compile: {names}. Redaction applies to "
-        f".fux/index/ only - acquired bytes and answer quotes are unredacted",
+        f".fux/index/ only - acquired bytes and answer quotes are unredacted"
     )
+    return Check("pii rules", True, f"{detail}. {_redaction_note(root, rules)}")
+
+
+def _redaction_note(root: Path, rules) -> str:
+    """What the last ingest actually redacted — W-101 item 4.
+
+    `redact()` has always returned per-rule hit counts and `run()` has always
+    summed them; **nothing read the sum**, so a consumer could not tell a rule
+    that is protecting them from a rule that has never matched anything. The
+    counts are now recorded by every ingest (`pii.record_counts`) and this is
+    where they surface.
+
+    ⚠ **Absent and zero are different answers and stay apart.** No recorded
+    counts means no ingest has run since the counter existed; zero means the
+    rules ran and matched nothing. Collapsing them would let a repo whose rules
+    have never executed read as a repo whose rules found nothing, which is the
+    more dangerous of the two.
+
+    ⚠ **The enrichment half is partial on an incremental ingest** and says so:
+    enrichment is redacted inside the extract loop, which a reused document
+    skips. The body half is a complete census on every run.
+
+    ⚠ **A large count is a hint, not a finding.** An over-broad rule and a
+    correct rule on a corpus that really does contain that much PII produce the
+    same number. `tools/pii-probe/` is the instrument; this is the pointer to
+    it.
+    """
+    from .ingest import pii
+
+    counts = pii.read_counts(root)
+    if counts is None:
+        return "No ingest has recorded redaction counts yet - run `fux ingest`"
+    if counts.total == 0:
+        return (
+            f"The last ingest redacted NOTHING across {counts.documents} document(s): "
+            f"every rule compiled and none matched. That is a rule that is not doing "
+            f"what it was written for as often as it is a clean corpus"
+        )
+    body = ", ".join(f"{name} x{n}" for name, n in sorted(counts.body.items()))
+    note = (
+        f"The last ingest redacted {counts.total} value(s) across "
+        f"{counts.documents} document(s)"
+    )
+    if body:
+        note += f" - body: {body}"
+    if counts.enrichment:
+        enrichment = ", ".join(f"{name} x{n}" for name, n in sorted(counts.enrichment.items()))
+        note += f"; enrichment: {enrichment}"
+        if counts.partial:
+            note += (
+                " (enrichment counts cover the documents that run re-extracted, not the "
+                "whole corpus - `fux ingest --full` counts all of them)"
+            )
+    note += ". A big number is a hint, not a finding: see tools/pii-probe/"
+    return note
 
 
 def _acquired_health(root: Path) -> Check:
@@ -316,6 +403,344 @@ def _acquired_health(root: Path) -> Check:
             level="warn",
         )
     return Check("acquired plane", True, detail)
+
+
+def _refusal_health(root: Path) -> Check:
+    """`.fux/refusals.toml` — do the rules load, and has any of them ever fired?
+
+    **W-101 item 3.** A refusal rule is the one piece of consumer policy whose
+    correct behaviour and whose catastrophic behaviour look identical from
+    outside: a rule that matches every response empties the `url:` half of the
+    corpus, and an empty corpus looks exactly like a corpus nobody has ingested
+    yet. Until now the only surface was a run's own output, which scrolls away.
+
+    Two numbers, and the second is the one that matters:
+
+    * **How many rules load**, which catches the file that was never valid —
+      the same thing `_pii_health` catches for `pii.toml`.
+    * **How many responses each has refused**, cumulative across networked runs
+      from `urlstate.refused`. A rule at zero is a rule that has never done
+      anything, which is what a typo'd `body_contains` looks like; a rule whose
+      count is the size of the corpus is the over-broad rule.
+
+    ⚠ **Offline, and the count is therefore about the PAST.** Doctor never
+    fetches, so it reports what networked runs recorded. A repo that has never
+    run `fux update` has nothing here and is told that rather than shown a zero
+    it would read as *"nothing was refused"*.
+
+    ⚠ **A warning, never an error.** Refusing sign-in walls is the feature
+    working. The one loud shape — refusals recorded and no `url:` document
+    surviving — is still a `warn`, because a corpus of only unreachable
+    intranet pages is a legitimate state of the world and failing `doctor` on
+    it would train people to ignore a red one.
+    """
+    from .ingest import refusals
+
+    if not refusals.rules_path(root).is_file():
+        return Check(
+            "refusal rules",
+            True,
+            "no .fux/refusals.toml - only the always-on magic-byte floor applies",
+            level="warn",
+        )
+    try:
+        rules = refusals.load(root)
+    except FuxError as exc:
+        return Check("refusal rules", False, str(exc))
+
+    try:
+        from .maintain import urlstate
+
+        counted = dict(urlstate.read(root).refused)
+    except Exception:
+        counted = {}
+
+    if not rules:
+        return Check(
+            "refusal rules", True, ".fux/refusals.toml declares no rules", level="warn"
+        )
+
+    total = sum(counted.values())
+    parts = [f"{len(rules)} rule(s) load"]
+    if not counted:
+        parts.append(
+            "no networked run has recorded a refusal yet - the count starts at the "
+            "next `fux update`"
+        )
+        return Check("refusal rules", True, ", ".join(parts), level="warn")
+
+    worst = sorted(counted.items(), key=lambda kv: (-kv[1], kv[0]))
+    named = ", ".join(f"{name} x{count}" for name, count in worst[:5])
+    parts.append(f"{total} response(s) refused across networked runs: {named}")
+    silent = [rule.name for rule in rules if rule.name not in counted]
+    if silent:
+        # Named, not counted: a rule that has never fired is either unneeded or
+        # a typo, and only the consumer can tell which — but they need the name
+        # to look at the line.
+        parts.append(
+            f"never fired: {', '.join(sorted(silent))} (unneeded, or a condition that "
+            "never matches)"
+        )
+
+    indexed_urls = sum(1 for doc_id in _records(root) if doc_id.startswith("url:"))
+    if total and indexed_urls == 0:
+        return Check(
+            "refusal rules",
+            False,
+            ", ".join(parts)
+            + " - AND NO url: DOCUMENT SURVIVED. A rule that matches everything empties "
+            "the URL half of the corpus and leaves it looking like a corpus nobody has "
+            "ingested; check the rule with the largest count against one real response",
+            level="warn",
+        )
+    return Check("refusal rules", True, ", ".join(parts), level="warn")
+
+
+def _decoder_bindings(root: Path) -> Check:
+    """`decoder=` in `.fux/sources/types` — does every binding still resolve?
+
+    **W-101 item 2.** `registry()` refuses a binding that names a module which
+    does not exist, and one that takes an extension away from the decoder that
+    claims it — but it refuses them **on the next `fux ingest`**. A consumer
+    who deletes `.fux/decoders/confluence.py` and commits learns about the
+    line still naming it when the next person's ingest dies.
+
+    ⚠ **The third fault is one only `doctor` can catch**, and it is why this is
+    not simply "call `registry()` early". A binding on an extension **no
+    document in the corpus has** — a typo'd `*.jsno` — resolves perfectly:
+    extending is legal by design (ADR-DECODE, `_bind`), so nothing errors, and
+    the line indexes nothing forever. That is deliberately not an ingest
+    failure, and a report is the right weight for it.
+
+    ⚠ **Counted against the INDEX, not against a directory walk.** The
+    committed index is what fux actually holds; walking the tree would report a
+    binding as live because an excluded or ignored file happens to carry the
+    extension, which is the opposite of the answer. The cost is stated: a
+    binding added before the first ingest reads as matching nothing, which is
+    true of the index and is what the line says.
+    """
+    from . import decode
+
+    try:
+        decode.registry(root)
+    except FuxError as exc:
+        return Check("decoder bindings", False, str(exc))
+
+    bindings = decode.declared_bindings(root)
+    if not bindings:
+        return Check(
+            "decoder bindings",
+            True,
+            f"none declared in {DEFAULT_TYPES_FILE} - every extension resolves through "
+            "the decoder modules themselves",
+        )
+
+    records = _records(root)
+    if not records:
+        return Check(
+            "decoder bindings",
+            True,
+            f"{len(bindings)} binding(s) resolve; no index to check them against yet",
+            level="warn",
+        )
+    present = {
+        ("." + str(record.get("loc", "")).rsplit(".", 1)[-1]).lower()
+        for record in records.values()
+        if "." in str(record.get("loc", ""))
+    }
+    # ⚠ **Only bindings a HUMAN wrote can be reported**, and this line is the
+    # whole difference between a check and a wall. `fux setup` writes the
+    # entire built-in table into the generated types file, so on a corpus of
+    # markdown 27 of 36 bindings match nothing — every one of them correct and
+    # none of them news. A check that fires on a fresh, healthy repo is a check
+    # people learn to skip, which is the failure `_url_health` and
+    # `_accelerator` both record. A binding that differs from the built-in
+    # default for its extension is a line somebody typed, and that is the only
+    # place a typo can be.
+    default = decode.builtin_bindings()
+    unused = sorted(
+        ext
+        for ext, name in bindings.items()
+        if ext not in present and default.get(ext) != name
+    )
+    generated = len(bindings) - len(unused)
+    detail = f"{len(bindings)} binding(s) resolve"
+    if not unused:
+        return Check("decoder bindings", True, detail)
+    listed = ", ".join(f"{ext}={bindings[ext]}" for ext in unused[:5])
+    more = f" (+{len(unused) - 5} more)" if len(unused) > 5 else ""
+    return Check(
+        "decoder bindings",
+        False,
+        f"{detail}; {len(unused)} that is not the built-in default for its extension "
+        f"matches no indexed document: {listed}{more}. Extending a decoder to a new "
+        f"extension is legal, so this is not an error - but a typo in the extension "
+        f"looks exactly like this and indexes nothing. "
+        f"({generated} generated binding(s) not checked: an unused one is what a fresh "
+        f"`fux setup` writes)",
+        level="warn",
+    )
+
+
+def _recency_prior(root: Path) -> Check:
+    """Does any document carry an `mtime` — i.e. is the recency prior alive?
+
+    **Filed 2026-09-05 while checking W-111's tie-break, and it is a silent
+    total loss.** `mtime` is written by `ingest/priors.py` from
+    `git_commit_times`, which walks git. A corpus **copied out of** its
+    repository is a plain directory, so **every** document loses its `mtime`
+    and the whole recency prior switches off with nothing anywhere reporting
+    it. `fux-benchmark`'s 10 000-document corpus is exactly that, and every
+    measurement over it that touched recency measured the prior turned off.
+
+    ⚠ **The severity depends on the knob, and both cases are reported.** With
+    `recency_half_life_days = 0` the prior is off anyway and a missing `mtime`
+    costs nothing today — but it is still the fact a future sweep of that knob
+    has to know, so it is stated rather than suppressed. With the knob **on**,
+    a corpus with no `mtime` is a configured prior that is a no-op, which is
+    the shape this repo has now recorded three times (`superseded_weight`,
+    `rerank_weight`, and now this one arriving from the data side).
+
+    A **warning**, never an error: a corpus with no git history is a legitimate
+    corpus, and this is a fact about the input rather than a broken install.
+    """
+    records = _records(root)
+    if not records:
+        return Check("recency prior", True, "no readable index", level="warn")
+    # ⚠ **The `load` call is guarded and the attribute read is NOT**, and that
+    # asymmetry is deliberate. A malformed `tune.toml` is a fact about the repo
+    # that another check reports, so it degrades to the engine default here; a
+    # renamed field is a bug in *this* function, and wrapping the read would
+    # make it silently report `half-life 0 (off)` forever. It did, for the
+    # length of one edit — `Tune` is flat, and `tune.ranking.…` raised straight
+    # into the `except`.
+    from .tune import DEFAULT_TUNE
+    from .tune import load as load_tune
+
+    try:
+        tune = load_tune(root)
+    except Exception:
+        tune = DEFAULT_TUNE
+    half_life = tune.recency_half_life_days
+
+    with_mtime = sum(1 for record in records.values() if record.get("mtime"))
+    total = len(records)
+    if with_mtime == total:
+        return Check(
+            "recency prior",
+            True,
+            f"every one of {total} document(s) carries an mtime"
+            + (f"; half-life {half_life:g} day(s)" if half_life > 0 else "; half-life 0 (off)"),
+        )
+    if with_mtime == 0:
+        note = (
+            f"NO document carries an mtime, so the recency prior is off for the whole "
+            f"corpus. mtime is derived from git commit times, so a corpus copied out of "
+            f"its repository - or one that was never in git - has none"
+        )
+        if half_life > 0:
+            note += (
+                f". recency_half_life_days is set to {half_life:g}, so a prior you have "
+                f"configured is doing nothing"
+            )
+        return Check("recency prior", False, note, level="warn")
+    return Check(
+        "recency prior",
+        half_life <= 0,
+        f"{with_mtime} of {total} document(s) carry an mtime"
+        + (
+            f"; the other {total - with_mtime} are outside git history and the "
+            f"{half_life:g}-day prior cannot decay them"
+            if half_life > 0
+            else "; half-life 0 (off)"
+        ),
+        level="warn",
+    )
+
+
+def freshness_counts(root: Path) -> dict[str, int]:
+    """Verified-citation verdicts, by label, from the local receipt journal.
+
+    **This is the veto check for two accepted records** —
+    [ADR-ACQUIRED](../../docs/adr/0050_acquired-plane.md) and
+    [ADR-URL-FRESHNESS](../../docs/adr/0052_url-freshness.md) both say
+    *"reopen this decision if `as-ingested` exceeds a quarter of verified
+    citations"* and both name `fux doctor --json` as how to check it. Until
+    this existed neither veto could be run at all.
+
+    ⚠ **The journal is the ONLY durable source, and it is opt-in.** A freshness
+    verdict is produced at answer time by the refer plane and nothing else
+    persists one; `.fux/runtime/provenance.jsonl` holds it only for answers run
+    with `--journal`. So a repo that has never journalled has **no** answer
+    here, which is reported as *unknown* rather than as a zero share — the two
+    are different claims and collapsing them would let a repo that has never
+    looked read as a repo that looked and found nothing.
+
+    ⚠ **Local and gitignored (L8).** Everything read here lives under
+    `.fux/runtime/`, reaches no committed byte, and goes nowhere.
+    """
+    try:
+        from .query import provenance
+    except Exception:  # pragma: no cover - the package is always importable
+        return {}
+    counts: dict[str, int] = {}
+    for entry in provenance.read_journal(root):
+        predicate = entry.get("predicate") if isinstance(entry, dict) else None
+        if not isinstance(predicate, dict):
+            continue
+        for verdict in predicate.get("verdicts") or []:
+            if not isinstance(verdict, dict):
+                continue
+            label = verdict.get("freshness")
+            if isinstance(label, str) and label:
+                counts[label] = counts.get(label, 0) + 1
+    return counts
+
+
+#: The share above which `as-ingested` stops meaning *"a rare unreachable
+#: source"* and starts meaning *"the fetch path is broken and the plane is
+#: masking it"*. **Not a threshold this check invented** — it is the reopen
+#: condition written into ADR-ACQUIRED and ADR-URL-FRESHNESS, quoted here so
+#: the number has one home.
+AS_INGESTED_VETO_SHARE = 0.25
+
+
+def _freshness_share(root: Path) -> Check:
+    """The `as-ingested` share — ADR-ACQUIRED and ADR-URL-FRESHNESS's veto.
+
+    See `freshness_counts` for where the numbers come from and why the journal
+    is the only source. The machine-readable form is `fux doctor --json`'s
+    `freshness` block, which is what both records tell a reader to compare.
+
+    A **warning** at the veto share, never an error: crossing it means a
+    *decision* should be reopened, which is a person's work and not a broken
+    install.
+    """
+    counts = freshness_counts(root)
+    total = sum(counts.values())
+    if not total:
+        return Check(
+            "freshness verdicts",
+            True,
+            "no receipts journalled - run an answer with `--journal` to record verdicts. "
+            "Until then the as-ingested share (ADR-ACQUIRED and ADR-URL-FRESHNESS's veto "
+            "condition) cannot be computed",
+            level="warn",
+        )
+    as_ingested = counts.get("as-ingested", 0)
+    share = as_ingested / total
+    listed = ", ".join(f"{label} {counts[label]}" for label in sorted(counts))
+    detail = f"{total} verified citation(s) journalled: {listed}"
+    if share > AS_INGESTED_VETO_SHARE:
+        return Check(
+            "freshness verdicts",
+            False,
+            f"{detail} - as-ingested is {share:.0%}, past the {AS_INGESTED_VETO_SHARE:.0%} "
+            "reopen condition in ADR-ACQUIRED and ADR-URL-FRESHNESS. That reads as a broken "
+            "fetch path being masked by the retained bytes, not a rare unreachable source",
+            level="warn",
+        )
+    return Check("freshness verdicts", True, f"{detail} - as-ingested {share:.0%}", level="warn")
 
 
 def _output_config_health(root: Path) -> Check:
@@ -739,6 +1164,15 @@ def cmd_doctor(args) -> int:
             from .maintain import runner
 
             payload["runner"] = runner.status(root)
+            # ⚠ **Lifted out beside the checks for the runner block's reason,
+            # and this one is load-bearing rather than convenient.**
+            # ADR-ACQUIRED and ADR-URL-FRESHNESS both say to check their veto
+            # with `fux doctor --json` — *"the `as-ingested` count against
+            # total verified citations"* — and a caller doing that must not
+            # have to parse an English sentence out of `detail`. An empty
+            # object means no receipts are journalled, which is *unknown* and
+            # not a zero share; `freshness_counts` says why they are different.
+            payload["freshness"] = freshness_counts(root)
         print(json_mod.dumps(payload, indent=2, sort_keys=True))
         return exit_code
 

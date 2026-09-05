@@ -20,6 +20,17 @@ stops flagging its own oldest item. As of **2026-09-05 six rows are past
 CLAUDE.md's 5-day threshold** and a session names each, with its age, in its
 first output.*
 
+🟢 **Every row below has a proposed ruling, with its evidence, in
+[`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md)** (`R-1`…`R-11`),
+and a paste-ready Opus prompt beside it. Arpit strikes or accepts a line; the
+row then closes through that prompt.
+
+✅ **The two rows that document found stale are gone** (rule 4, re-derived
+2026-09-05): `tests_e2e/` runs on `windows-latest` × py3.11/3.14 on every push
+and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
+`none` arm and its numbers now sit in
+[ADR-QUALITY](../docs/adr/0044_quality-contract.md) beside the fitted ones.
+
 | what he decides | filed | age |
 |---|---|---|
 | **The ETag acceptance criterion, re-worded or accepted.** *"`fux update` with a matching ETag performs no body download"* is **unmet as written** — CDP interception is at the **response** stage, so Chrome has already transferred the body; `validate()` saves the decode and the shard comparison, **not bandwidth**. Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12 rather than quietly satisfied | 2026-09-01 | 4d |
@@ -45,8 +56,6 @@ first output.*
   reports `hit@k`/`mrr` aggregates and no rows. **A playground or lab run filed
   from 2026-08-29 will hit the gate with nothing to give it.** One emitter to
   fix, not a rule. `filed: 2026-08-28`
-
-- 🔴 **A corpus copied out of its git repository silently loses the ENTIRE recency prior, and nothing reports it.** `mtime` comes from `git_commit_times`, which walks git; `fux-benchmark`'s `t10000` is a plain directory, so **all 10 000 of its documents have no `mtime` at all** — measured 2026-09-05 while checking W-111's tie-break. `fux doctor` does not check it and no run has ever declared it. **Every measurement that touches recency on a non-git corpus is measuring the prior switched off**, including any future `recency_half_life_days` sweep under W-97. A one-line check in `doctor` would close it; filed rather than built, because it is a `doctor` change and W-101 already owns that file. `filed: 2026-09-05`
 
 - ⚠ **The per-query-rows gate checks for a `.jsonl`, not for rows.** `tests/test_regression_runs.py::test_measured_run_files_its_per_query_rows` passes on **any** `.jsonl` under `evidence/` — [`2026-09-05-answer-top3`](regression/2026-09-05-answer-top3/report.md) satisfied it on a *copy of the goldens file* before its real rows were written. **This is the W-83 shape again**: a check that proves a file exists, never that it is the right file. Recorded rather than patched — a looser or cleverer check (is it one row per query? per arm?) cannot be written without knowing each run's arm structure, and shipping an approximation is the moving-threshold failure in another costume. **Whether this is a second strike is Arpit's call, alongside the W-83 gate question already in the inbox.** `filed: 2026-09-05`
 
@@ -108,38 +117,6 @@ first output.*
 
 ### testing
 
-- 🔴 **W-101 — the `fux doctor` pass, and it now carries FOUR things** ·
-  `agent` · *(records: [ADR-TYPES](../docs/adr/0031_types-list.md) decision 11
-  veto 4 · [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) ·
-  [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) ·
-  [ADR-REFUSAL](../docs/adr/0051_refusals.md) ·
-  [ADR-PII](../docs/adr/0053_pii.md))* · **One pass at `doctor.py` closes all
-  four; they are grouped because splitting them means four passes at one file.**
-
-  1. 🔴 **The `as-ingested` share is the VETO CHECK for two accepted records**
-     ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
-     [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)) — **until `doctor`
-     reports it, neither veto can be run at all.** That is the one with damage
-     that accrues: every day more code ships under two records nobody can check.
-  2. **Decoder bindings are not resolved.** A types file naming a decoder that
-     was deleted, or one whose `EXTENSIONS` moved, is discovered only on the
-     next `fux ingest`. ⚠ Since decision 11a there is a **third** thing only
-     `doctor` can catch: a binding on an extension **no file in the corpus
-     has** — what a typo in the *extending* direction looks like. Deliberately
-     not an ingest error; a report is the right weight (*"3 bindings match no
-     document"*).
-  3. **No refusal rule counts.** An over-broad rule is visible only in a run's
-     output, so a rule that silently refuses the whole corpus looks like a
-     corpus with nothing in it.
-  4. **No redaction counts.** They already exist in `redact()`'s return value
-     and are simply not surfaced.
-
-  ⚠ **What `doctor` structurally CANNOT see, and no amount of this item fixes:**
-  a well-formed PII rule that is too broad removes real vocabulary, documents
-  stop being findable, and nothing looks wrong.
-  [`tools/pii-probe/`](../tools/pii-probe/README.md) is the only instrument for
-  that. `filed: 2026-09-01`
-
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·
   [ADR-RS](../docs/adr/0036_predictions.md))* · **the knob sweep — which
   `.fux/tune.toml` defaults are defensible, measured rather than argued.**
@@ -164,16 +141,6 @@ first output.*
   was judged under. **Any run comparing two arms must assert their floors are
   equal**; differing floors is a pre-registered threshold moving inside a
   comparison, and it is ADR-CONFIDENCE decision 13's reopen trigger.
-
-- **Recall on a CLEAN corpus.** `agent` ·
-  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · The first
-  `recall@k` ([run](regression/2026-08-28-first-recall/report.md), `@5` 0.9535)
-  is `informed` — every installed enrichment file was authored by someone who
-  had read these queries — so **it demonstrates the metric, not the engine.**
-  The `none`/`placebo`/`real` arms already exist, so a clean absolute is one
-  command. ⚠ Unlike `hit@k`, recall awards partial credit and **may separate
-  arms `hit@k` could not**; that makes it a paired comparison needing discordant
-  counts. `filed: 2026-08-28`
 
 - **The 7 `partial` goldens.** `arpit` ·
   *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · The two
@@ -219,11 +186,6 @@ first output.*
   — `acme` and `orbit` went in the 2026-08-20 wipe with their generator, and
   `tools/pruning-eval/` hard-codes reading them. —
   [detail](open/W-87-what-good-means.md)
-
-- **`tests_e2e/` has never run on Windows**, and `test_maintenance.py` is the
-  suite most likely to differ: real git, real hooks, real detached processes.
-  *(no record — a test-surface gap, not a behaviour change)* · Verified on
-  Linux/CPython 3.11.15 and macOS 15/arm64/CPython 3.14.2.
 
 - ⚠ **`validate()` reaches an existing repo only when somebody copies the
   fetcher in.** *(record: [ADR-DOTFUX](../docs/adr/0003_fux-directory.md)

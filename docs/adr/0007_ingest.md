@@ -653,6 +653,16 @@ retires nothing. [ADR-ENRICH](0040_enrich.md) decisions 17-18.
   make an advisory file a second source of truth about the corpus, turning a
   corrupt list from a performance bug into a correctness one.
 
+⚠ **A completed run now writes one more derived file, and it decides nothing**
+(W-101, 2026-09-05). `run()` records per-rule redaction counts to
+`.fux/runtime/pii-counts.json` — the decision, the two-dictionary shape and the
+reason it is replaced rather than accumulated are
+[ADR-PII](0053_pii.md) decision 15, which owns redaction. **Two properties this
+record cares about:** it is written **after** the last stop point, so a run that
+was stopped or died leaves no partial census claiming to be a complete one; and
+nothing on the ingest path ever reads it back, so it cannot become a second
+policy input to what gets indexed.
+
 ### Reference (required)
 
 - The orchestration — [`src/fux/ingest/run.py`](../../src/fux/ingest/run.py)

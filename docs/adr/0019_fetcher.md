@@ -470,6 +470,14 @@ is how a warning becomes something people filter out.
   key and the directory path are in every consumer's committed repo, so the cost
   of the rename only rises.
 
+⚠ **`fetch_all` counts refusals by rule and persists them, and no fetcher
+changed** (W-101, 2026-09-05). It is decision 5's rule — *the behaviour lives in
+`fetch_all()` and never inside a fetcher* — applied a third time, after
+retention and the refusal check itself: every fetcher gains the counter with no
+line changed in any of them. The decision is
+[ADR-REFUSAL](0051_refusals.md) decision 11; the storage is
+[ADR-MAINTENANCE](0032_hooks.md)'s `url-state.json`.
+
 ### Reference (required)
 
 - Fux's half of the contract —

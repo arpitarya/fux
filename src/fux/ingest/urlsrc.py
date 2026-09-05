@@ -459,6 +459,22 @@ def _fetch_group(module, urls: list[str], workers: int, limited: dict | None = N
         yield results[url]
 
 
+def _record_refusals(root: Path, denied: dict[str, int]) -> None:
+    """Persist this run's refusal counts. **Never raises** (W-101 item 3).
+
+    Best-effort like every other reporting write on this path: a counter that
+    could fail a fetch is worse than a missing counter.
+    """
+    if not denied:
+        return
+    try:
+        from ..maintain import urlstate
+
+        urlstate.record_refusals(root, denied)
+    except Exception:  # pragma: no cover - a report must not break a run
+        pass
+
+
 def _report_rate_limits(root: Path, limited: dict[str, int]) -> None:
     """Say it now on stderr, AND persist it for `fux doctor` (W-82 ruling 12).
 
@@ -629,6 +645,9 @@ def fetch_all(
         groups.setdefault(entry.fetcher_path, []).append(entry.url)
 
     limited: dict[str, int] = {}
+    #: Rule name -> responses it refused this run (W-101 item 3). Persisted
+    #: once at the end, cumulatively, beside the rate-limit counts.
+    denied: dict[str, int] = {}
     fetched: list[FetchedUrl] = []
     skipped: list[Skipped] = []
     #: URLs a `validate()` said are unchanged, so no body was fetched. **Not a
@@ -678,8 +697,20 @@ def fetch_all(
                 # -- a sign-in page is valid HTML -- and lands in the index as a
                 # confident wrong answer. Storing one would be worse still:
                 # wrong bytes kept, and made to look authoritative.
-                denial = refusals.refused(refusal_rules, url, content_type, raw)
-                if denial is not None:
+                # ⚠ **One matcher, two consumers.** `refusal()` returns the
+                # rule NAME beside the reason, so the counter is keyed
+                # structurally; rendering the human line is `refused()`'s job
+                # and reading the name back out of it would be the defect
+                # `skipnotice`'s two blocks already refuse.
+                hit = refusals.refusal(refusal_rules, url, content_type, raw)
+                if hit is not None:
+                    rule_name, reason = hit
+                    denied[rule_name] = denied.get(rule_name, 0) + 1
+                    denial = (
+                        reason
+                        if rule_name == refusals.MAGIC_FLOOR
+                        else f"{reason} [{rule_name}]"
+                    )
                     skipped.append(Skipped(rel_path=url, reason=denial, kind=UNFETCHED))
                     continue
                 # ADR-ACQUIRED: after the refusal check, before the decoder.
@@ -751,6 +782,11 @@ def fetch_all(
             )
         acquired.write_manifest(root, acquired_blobs)
     _report_rate_limits(root, limited)
+    # W-101 item 3. Persisted only — no stderr line, unlike a rate limit. A
+    # refusal is ALREADY printed once per URL as its skip reason, so a second
+    # line would restate what the run just said; what was missing is the count
+    # surviving to the next `fux doctor`.
+    _record_refusals(root, denied)
     if validation_out is not None:
         validation_out["unchanged"] = sorted(validated)
         validation_out["token_shas"] = dict(sorted(token_shas.items()))

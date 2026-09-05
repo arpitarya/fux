@@ -60,6 +60,7 @@ __all__ = [
     "CONSUMER_DIR",
     "Decoder",
     "claims",
+    "declared_bindings",
     "decode",
     "reason",
     "registry",
@@ -392,6 +393,20 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, int, str]]:
         out[ext] = (name, entry.lineno, str(path))
     _BINDINGS[key] = out
     return out
+
+
+def declared_bindings(root: Path | None) -> dict[str, str]:
+    """Extension -> the decoder module `.fux/sources/types` binds it to.
+
+    The public half of `_declared_bindings`, which also carries the line number
+    and origin a parse error needs. **`fux doctor` is the caller**: a binding on
+    an extension no indexed document has resolves perfectly and indexes nothing
+    forever — extending is legal by design (`_bind`), so nothing errors, and a
+    typo in the extension is invisible until someone asks why a format is
+    missing. That question is `doctor`'s, and it should not have to reach
+    through a private name to ask it.
+    """
+    return {ext: name for ext, (name, _lineno, _origin) in _declared_bindings(root).items()}
 
 
 def _consumer_decoders(root: Path | None) -> dict[str, Decoder]:

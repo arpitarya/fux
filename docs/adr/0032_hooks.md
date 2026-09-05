@@ -562,6 +562,17 @@ fork 4, ruled 2026-08-28 with fork 3.
 - **CI-triggered rebuild · a filesystem watcher · staying manual.** All three
   rejected by the accepted compare doc, on grounds this record does not repeat.
 
+⚠ **`url-state.json` gained a third counter, `refused`, on 2026-09-05
+(W-101).** Rule name -> responses that refusal rule turned away, cumulative
+across networked runs; declared in `state.schema.json` beside `rate_limited`,
+whose shape and whose read-modify-write it copies exactly. **The decision is
+[ADR-REFUSAL](0051_refusals.md) decision 11**, which owns refusals; what this
+record holds is unchanged and is why the counter lives here rather than in a
+new file — *counters, never clocks*, advisory only, and
+[`skipnotice`](../../src/fux/ingest/skipnotice.py) already refused a second
+runtime file for URL facts on the grounds that it would put the answer in two
+places. **An offline run never touches it**, exactly like `observe`.
+
 ### Reference (required)
 
 - The code: [`src/fux/maintain/`](../../src/fux/maintain/) — `hooks.py`,

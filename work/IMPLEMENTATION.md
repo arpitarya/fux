@@ -21,6 +21,44 @@ Rules:
 
 ---
 
+## W-101 — the `fux doctor` pass: two vetoes become runnable (2026-09-05)
+
+**One pass at `doctor.py` for five things**, four of them reachable only from
+inside a run that had already finished and one from nowhere at all.
+
+| what landed | evidence |
+|---|---|
+| 🔴 **`freshness verdicts` + `doctor --json`'s `freshness` block** — the `as-ingested` share. **The veto check of two ACCEPTED records**; until this, neither veto could be run at all | [ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) · [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) · `tests/test_doctor.py` |
+| **`refusal rules`** — rules that load, responses each has refused (cumulative, in `urlstate.refused`), and **the rules that have never fired**. The loud case: refusals recorded with no `url:` document surviving | [ADR-REFUSAL](../docs/adr/0051_refusals.md) decision 11 |
+| **`decoder bindings`** — every binding resolves, plus the fault no ingest can catch: a binding on an extension **no indexed document has** | [ADR-DECODE](../docs/adr/0042_decode.md) |
+| 🔴 **`recency prior`** — whether any document carries an `mtime`. A corpus copied out of git loses **every one**, and the whole prior switches off silently | [ADR-INGEST](../docs/adr/0007_ingest.md) · `ingest/priors.py` |
+| **Redaction counts on `pii rules`** — `redact()` returned them and `run()` summed them into a variable **nothing ever read** | [ADR-PII](../docs/adr/0053_pii.md) decision 15 |
+
+**30 unit tests + 2 e2e.** Both suites green: 2 884 unit, 78 e2e.
+
+⚠ **What the veto can be run against is narrower than its wording**, and the
+record says so rather than claiming otherwise: a freshness verdict exists at
+answer time and only the **opt-in** receipt journal persists one, so the share
+is over journalled answers. A repo that has never journalled reports
+**unknown** — never a zero share, which is a different claim.
+
+⚠ **A check that fires on a healthy repo is one people learn to skip.** `fux
+setup` writes the whole built-in binding table, so 27 of 36 bindings match no
+document on a markdown corpus — all correct. Only a binding differing from the
+built-in default for its extension is reported. That single line is the
+difference between a check and a wall.
+
+⚠ **One defect found by its own test**: `Tune` is flat, so
+`tune.ranking.recency_half_life_days` raised into a bare `except` and the check
+would have reported `half-life 0 (off)` forever. The `load` call is guarded
+now; the attribute read deliberately is not.
+
+**No measurement filed.** Nothing here changes a ranking, an index byte or an
+answer — every check is read-only and offline, and the two counters are
+gitignored `runtime/` state nothing reads back into a decision.
+
+---
+
 ## W-111 — the declared tie-break, and `find`'s precision controls (2026-09-05)
 
 **Search v3's last agent-lane item.** 4.38 % of top-5 orderings were decided by

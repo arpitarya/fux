@@ -137,12 +137,27 @@ class UrlState:
     #: wiki is one fact, not twelve. Counts, never clocks, like everything else
     #: in this file.
     rate_limited: dict[str, int] = field(default_factory=dict)
+    #: refusal rule name -> responses that rule refused (W-101 item 3).
+    #:
+    #: **Keyed by RULE, not by URL**, for `rate_limited`'s reason turned
+    #: around: a rate limit is a fact about a host, and a refusal count is a
+    #: fact about the consumer's own `refusals.toml`. That file is otherwise
+    #: invisible — a rule matching everything empties the corpus and looks
+    #: exactly like a corpus with nothing in it, which is the whole failure
+    #: this counter exists to make visible.
+    #:
+    #: Cumulative across networked runs, again like `rate_limited`: each entry
+    #: is one event that happened once, so adding runs together is the honest
+    #: arithmetic. `refusals.MAGIC_FLOOR` is the reserved key for fux's own
+    #: always-on magic-byte check, which is not anybody's rule.
+    refused: dict[str, int] = field(default_factory=dict)
 
     def as_json(self) -> dict:
         return {
             "run_seq": self.run_seq,
             "urls": {url: h.as_json() for url, h in sorted(self.urls.items())},
             "rate_limited": dict(sorted(self.rate_limited.items())),
+            "refused": dict(sorted(self.refused.items())),
         }
 
 
@@ -174,6 +189,9 @@ def read(root: Path) -> UrlState:
         # `fux doctor` (see this function's own contract above).
         if isinstance(host, str) and isinstance(count, int) and count > 0:
             state.rate_limited[host] = count
+    for name, count in (top.get("refused") or {}).items():
+        if isinstance(name, str) and isinstance(count, int) and count > 0:
+            state.refused[name] = count
     health = _health_schema()
     for url, entry in (top.get("urls") or {}).items():
         if not isinstance(url, str):
@@ -225,6 +243,35 @@ def record_rate_limits(root: Path, counts: dict[str, int]) -> None:
         for host, count in counts.items():
             if count > 0:
                 state.rate_limited[host] = state.rate_limited.get(host, 0) + count
+        write(root, state)
+    except OSError:
+        # A report that can fail an ingest is worse than a missing report.
+        pass
+
+
+def record_refusals(root: Path, counts: dict[str, int]) -> None:
+    """Add this run's refusal counts to the persisted state. **Never raises.**
+
+    W-101 item 3, and `record_rate_limits`'s shape for `record_rate_limits`'s
+    reason: cumulative, because *"this rule has refused 47 responses"* is a
+    fact worth acting on and *"it refused 3 this run"* is a blip.
+
+    ⚠ **Called only from the networked path**, exactly like `observe`. An
+    offline `fux ingest` refuses nothing because it fetched nothing, and
+    writing a zero here would let a run that never looked erase what a run
+    that did had learned.
+
+    ⚠ **This never edits `refusals.toml` and never disables a rule.** The
+    counter reports; the consumer decides — the same standing rule
+    `record_rate_limits` follows about `max_parallel`.
+    """
+    if not counts:
+        return
+    try:
+        state = read(root)
+        for name, count in counts.items():
+            if count > 0:
+                state.refused[name] = state.refused.get(name, 0) + count
         write(root, state)
     except OSError:
         # A report that can fail an ingest is worse than a missing report.

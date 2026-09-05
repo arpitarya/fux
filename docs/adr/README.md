@@ -430,5 +430,11 @@ the relation *look* enforced while asserting things nobody checked.
 | `src/fux/query/__init__.py` | ADR-ANSWER | `cmd_answer` and both printers live here — `ANSWER_TOP`, the refer/index fork, `_freshness_of`. ⚠ **Added 2026-09-05 because this record owned NOTHING and therefore could never be opened by the gate**: W-108 rewrote the `answer` verb and the freshness check demanded ADR-ASK, ADR-CONFIDENCE, ADR-OUTPUT, ADR-REFER and ADR-URL-FRESHNESS — every record except the one whose entire subject is the verb. Owned by ADR-ASK for the scan and unification |
 | `src/fux/query/refer_answer.py` | ADR-ANSWER | the seam between `cmd_answer` and `refer()` — the candidate list, and `_load_fetchers`' per-URL dispatch. Owned by ADR-ASK under its `src/fux/query/` claim |
 | `src/fux/refer/_rescore.py` | ADR-RERANK | `passage_boost` and the bounded multiplicative uplift reach in here (decision 9) — the same constant that reorders documents scores their passages. Owned by ADR-REFER under its `src/fux/refer/` claim |
+| `src/fux/doctor.py` | ADR-REFUSAL | `_refusal_health` — how many rules load, how many responses each has refused (cumulative, from `urlstate.refused`), and **the rules that have never fired**, which is what a typo'd condition looks like. Decision 11 |
+| `src/fux/doctor.py` | ADR-DECODE | `_decoder_bindings` — the one binding fault no ingest can catch: a `decoder=` line on an extension **no indexed document has**. Extending is legal by design, so nothing errors and the line indexes nothing forever |
+| `src/fux/doctor.py` | ADR-URL-FRESHNESS | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — this record's veto instrument, shared verbatim with ADR-ACQUIRED's identical one so the quarter has a single home |
+| `src/fux/doctor.py` | ADR-INGEST | `_recency_prior` — whether any document carries an `mtime`. A corpus copied out of its git repository loses every one, and `ingest/priors.py` is where they come from |
+| `src/fux/maintain/urlstate.py` | ADR-REFUSAL | `refused` and `record_refusals` — the counter's storage, in the file ADR-MAINTENANCE owns, on `rate_limited`'s shape with the key turned from host to rule |
+| `src/fux/ingest/urlsrc.py` | ADR-URL-FRESHNESS | `_record_refusals` in `fetch_all()` — see ADR-REFUSAL decision 11; the counting sits beside the refusal check the row above places |
 <!-- DESCRIBES-TABLE-END -->
 

@@ -377,6 +377,35 @@ resident clock's last sweep, and the case it exists for is `outcome: "ok"` with
 daemon that never ran is not a finding**: a check that fires for every repo is
 one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
 
+⚠ **A FOURTH worked instance, 2026-09-05 (W-101) — and this one is not about a
+file reaching old repos.** Four things were reachable only from inside a run
+that had already finished, and one was reachable from nowhere at all:
+
+| what `doctor` gained | why it could not be seen before |
+|---|---|
+| `refusal rules` | a refusal count lived in one run's stderr; a rule matching everything empties the `url:` half of the corpus and leaves it looking like a corpus nobody ingested — [ADR-REFUSAL](0051_refusals.md) decision 11 |
+| `decoder bindings` | `registry()` refuses a broken `decoder=` binding **on the next ingest**; and a binding on an extension no document has resolves perfectly and indexes nothing forever, which is deliberately not an ingest error — [ADR-DECODE](0042_decode.md) |
+| `recency prior` | a corpus copied out of its git repository loses **every** `mtime`, so the whole recency prior switches off with nothing anywhere saying so |
+| `freshness verdicts` | the `as-ingested` share is the **veto check** of two accepted records ([ADR-ACQUIRED](0050_acquired-plane.md), [ADR-URL-FRESHNESS](0052_url-freshness.md)) and neither veto could be run at all |
+| redaction counts, on `pii rules` | `redact()` returned them, `run()` summed them, and nothing read the sum — [ADR-PII](0053_pii.md) decision 15 |
+
+**Three properties they share, and each is a rule this record already held:**
+
+1. **Offline and read-only, without exception.** Two of them report on the
+   networked plane and neither opens a socket: they read `url-state.json` and
+   the committed index. `doctor` reports what a networked run *recorded*, and
+   says that is what it is doing.
+2. **A warning, never an error, wherever the finding is about the world.** A
+   dead URL, a refused sign-in wall, a corpus with no git history and a share
+   past a veto are all facts outside the repo. Failing on them trains people to
+   ignore a red doctor, which decision 2's second property already argued.
+3. ⚠ **A check that fires on a healthy repo is a check people learn to skip.**
+   `decoder bindings` is the worked example: `fux setup` writes the entire
+   built-in binding table, so on a corpus of markdown **27 of 36 bindings match
+   no document** — every one correct, none of them news. Only a binding that
+   differs from the built-in default for its extension is a line somebody
+   typed, and that is the only place a typo can be.
+
 ### Consequences
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —
@@ -395,6 +424,17 @@ one people learn to skip. See [ADR-MAINTENANCE](0032_hooks.md) decision 12.
   without it.
 - **`doctor` gains a hard dependency on git** for the ignore check. Acceptable:
   the committed index's premise is that git carries it.
+- ⚠ **`doctor` now parses the committed index**, which it never used to. Three
+  checks need per-record fields, so `_records()` reads it **once per `run()`**
+  and hands the same dict to all of them — a 10 000-document corpus parsed
+  three times is a diagnostic command that feels broken. It degrades to `{}` on
+  any failure: an unreadable index is another check's finding, and a traceback
+  out of a health command is the worst possible answer to *"what is wrong"*.
+- ⚠ **Two of the new checks report on the PAST, not on now.** `refusal rules`
+  and `freshness verdicts` read counters that networked runs and journalled
+  answers wrote. A repo that has never run `fux update`, or never passed
+  `--journal`, is told it has **no data** — never shown a zero it would read as
+  *"nothing was refused"* or *"nothing was as-ingested"*.
 - **A committed file needs a row in `COMMITTED_FILES`, not just a mention
   here.** The veto below is what catches a decision recorded in prose and not
   in the generator.

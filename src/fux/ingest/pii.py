@@ -66,6 +66,7 @@ offline, and beyond that a consumer's regex is a consumer's regex.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import tomllib
 from dataclasses import dataclass
@@ -317,3 +318,126 @@ def digest(rules: tuple[Rule, ...]) -> str:
         h.update(str(rule.group).encode("utf-8"))
         h.update(b"\0")
     return h.hexdigest()
+
+
+# -- the counter ---------------------------------------------------------------
+#
+# W-101 item 4. `redact()` has always returned per-rule hit counts and `run()`
+# has always summed them; **nothing ever read the sum**, so *"did my rule do
+# anything, and to how much"* had no answer between runs. The counts are the
+# only observable a consumer has about a policy that is otherwise invisible by
+# construction — the redacted text is what got committed, and the original is
+# what stayed on disk.
+#
+# ⚠ **Gitignored, advisory, and never an input to anything.** It lives beside
+# `pii-digest` under `runtime/`, is rebuilt by the next ingest, and no code path
+# reads it back into a decision. A counter that could change what is indexed
+# would be a second policy input nobody declared.
+#
+# ⚠ **What `doctor` still cannot see is unchanged.** A well-formed rule that is
+# too broad shows up here as a large number, which is a *hint* and not the
+# finding — `tools/pii-probe/` is the instrument, and a big count on a big
+# corpus is exactly what a correct rule looks like too.
+
+COUNTS_NAME = "pii-counts.json"
+
+
+@dataclass(frozen=True)
+class Counts:
+    """What the last ingest redacted, per rule.
+
+    Two dictionaries rather than one total, because **they have different
+    coverage and merging them would state a completeness neither has.**
+
+    * `body` is corpus-wide and complete: `run()`'s redact phase walks every
+      parsed document on every ingest, changed or not.
+    * `enrichment` is **this run's re-extracted documents only** — enrichment
+      is redacted inside the extract loop, which incremental ingest skips for
+      a document whose sha and enrichment both held. `partial` says so.
+    """
+
+    body: dict[str, int]
+    enrichment: dict[str, int]
+    #: True when the run that wrote this reused any extraction, so
+    #: `enrichment` covers part of the corpus. Never affects `body`.
+    partial: bool = False
+    #: How many documents the redact phase walked — the denominator a count
+    #: means nothing without.
+    documents: int = 0
+
+    @property
+    def total(self) -> int:
+        return sum(self.body.values()) + sum(self.enrichment.values())
+
+    def as_json(self) -> dict:
+        return {
+            "body": dict(sorted(self.body.items())),
+            "enrichment": dict(sorted(self.enrichment.items())),
+            "partial": self.partial,
+            "documents": self.documents,
+        }
+
+
+def counts_path(root: Path) -> Path:
+    from ..store import fuxdir
+
+    return fuxdir.fux_dir(root) / "runtime" / COUNTS_NAME
+
+
+def record_counts(
+    root: Path,
+    *,
+    body: dict[str, int],
+    enrichment: dict[str, int],
+    partial: bool,
+    documents: int,
+) -> None:
+    """Write the counts this run produced. **Never raises.**
+
+    Replaced, never accumulated: `body` is a corpus-wide census taken on every
+    ingest, so adding today's to yesterday's would report a corpus several
+    times its own size. That is the opposite of `urlstate.rate_limited`, which
+    accumulates because each entry is one event that happened once.
+    """
+    from ..store import fuxdir
+
+    try:
+        fuxdir.derived_dir(root, "runtime")
+        payload = Counts(body=body, enrichment=enrichment, partial=partial, documents=documents)
+        counts_path(root).write_text(
+            json.dumps(payload.as_json(), indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+    except (OSError, TypeError, ValueError):
+        # A counter that could fail an ingest is worse than a missing counter.
+        pass
+
+
+def read_counts(root: Path) -> Counts | None:
+    """The last run's counts, or `None` when nothing has been recorded.
+
+    `None` and *"zero redactions"* are different answers and are kept apart:
+    the first means no ingest has run since the counter existed, the second
+    means rules ran and matched nothing. Collapsing them would let a repo whose
+    rules have never executed read as a repo whose rules found nothing.
+    """
+    try:
+        raw = json.loads(counts_path(root).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(raw, dict):
+        return None
+
+    def _counts(value) -> dict[str, int]:
+        if not isinstance(value, dict):
+            return {}
+        return {
+            k: v for k, v in value.items() if isinstance(k, str) and isinstance(v, int) and v > 0
+        }
+
+    documents = raw.get("documents")
+    return Counts(
+        body=_counts(raw.get("body")),
+        enrichment=_counts(raw.get("enrichment")),
+        partial=bool(raw.get("partial")),
+        documents=documents if isinstance(documents, int) and documents >= 0 else 0,
+    )

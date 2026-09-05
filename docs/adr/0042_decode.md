@@ -363,7 +363,9 @@ what the file's own default should say.
 - [`src/fux/decode/__init__.py`](../../src/fux/decode/__init__.py) — the
   protocol, the registry and the override precedence, as code; decision 13's
   binding is `_declared_bindings`, `_bound_extension` and `_bind` in the same
-  file. The skill —
+  file, with `declared_bindings()` as their public read-only half (W-101:
+  `fux doctor` reports a binding that matches no indexed document, which
+  `_bind` accepts by design and no ingest can catch). The skill —
   [`src/fux/templates/agents/DECODER-SKILL.md`](../../src/fux/templates/agents/DECODER-SKILL.md).
 - [`tests/decode/test_binding.py`](../../tests/decode/test_binding.py) —
   decision 13's twenty cases: the grammar, both hard errors, the load-order case

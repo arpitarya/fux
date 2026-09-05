@@ -217,6 +217,11 @@ def _rule(entry, *, origin: str, index: int, seen: set[str]) -> Rule:
     where = f"{origin}: rule {name!r}"
     if name in seen:
         raise FuxError(f"{where}: duplicate rule name — names identify a rule in reports")
+    if name == MAGIC_FLOOR:
+        raise FuxError(
+            f"{where}: {MAGIC_FLOOR!r} is reserved for fux's own always-on magic-byte "
+            "check, which every refusal count is keyed against. Pick another name"
+        )
     seen.add(name)
 
     unknown = sorted(k for k in entry if k not in _CONDITIONS and k not in _REQUIRED)
@@ -350,17 +355,33 @@ def magic_mismatch(content_type: str, raw: bytes) -> str | None:
     )
 
 
-def refused(rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes) -> str | None:
-    """The reason this response is a refusal, or `None`.
+#: The reserved key for the always-on magic-byte floor in a refusal count.
+#:
+#: **Reserved, and it has to be**: the floor is fux's check and not anybody's
+#: rule, so it has no `name` of its own, and a counter keyed by rule name needs
+#: one key that cannot collide with a consumer's. `_rule` refuses a rule that
+#: claims it.
+MAGIC_FLOOR = "magic-floor"
+
+
+def refusal(
+    rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes
+) -> tuple[str, str] | None:
+    """`(rule name, reason)` for a refused response, or `None`.
 
     The floor is checked first and cannot be overridden; then the consumer's
-    rules in file order, first match winning. The returned string is recorded
-    verbatim as the skip reason, so it is written as an instruction rather
-    than a diagnosis.
+    rules in file order, first match winning.
+
+    ⚠ **The name is returned STRUCTURALLY, never parsed back out of the
+    reason.** `refused()` renders `"{reason} [{name}]"` for a human, and
+    `urlstate.refused` counts by name — reading the name out of that rendered
+    string would put the counter one string edit away from being silently
+    wrong, which is the defect `skipnotice`'s two blocks already refuse
+    ("the class must not be parsed back out of the reason").
     """
     floor = magic_mismatch(content_type, raw)
     if floor is not None:
-        return floor
+        return MAGIC_FLOOR, floor
     if not rules:
         return None
     mime = _mime(content_type)
@@ -368,5 +389,20 @@ def refused(rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes) ->
     text = _searchable_text(mime, raw)
     for rule in rules:
         if rule.matches(suffix=suffix, mime=mime, raw=raw, text=text):
-            return f"{rule.reason} [{rule.name}]"
+            return rule.name, rule.reason
     return None
+
+
+def refused(rules: tuple[Rule, ...], url: str, content_type: str, raw: bytes) -> str | None:
+    """The reason this response is a refusal, or `None`.
+
+    The returned string is recorded verbatim as the skip reason, so it is
+    written as an instruction rather than a diagnosis. One matcher, in
+    `refusal()`: this is its rendering half and nothing more, so a caller that
+    wants the rule cannot get a different answer from one that wants the line.
+    """
+    hit = refusal(rules, url, content_type, raw)
+    if hit is None:
+        return None
+    name, reason = hit
+    return reason if name == MAGIC_FLOOR else f"{reason} [{name}]"

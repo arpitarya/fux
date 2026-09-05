@@ -235,6 +235,42 @@ was written. The document in the index is the viewer's chrome.
     `&download=1` — because the reader of that message is trying to ingest a
     workbook, not diagnose a viewer.
 
+11. **Every networked run counts its refusals by rule, and `fux doctor`
+    reports them** (W-101, 2026-09-05). A refusal rule is the one piece of
+    consumer policy whose correct behaviour and whose catastrophic behaviour
+    are indistinguishable from outside: a rule matching every response empties
+    the `url:` half of the corpus, and an empty corpus looks exactly like one
+    nobody has ingested yet. Until now the only surface was the run's own
+    output, which scrolls away.
+
+    - **Counted by RULE, stored in `urlstate.refused`, cumulative.** It is
+      `rate_limited`'s shape with the key turned around — a rate limit is a
+      fact about a host, and a refusal count is a fact about *this file*. It
+      goes in `url-state.json` rather than a new file because that is already
+      the declared home for repeat-URL facts, and
+      [`skipnotice`](../../src/fux/ingest/skipnotice.py) refuses a second one
+      on the grounds that it would put the answer in two places.
+    - **The name is returned structurally.** `refusal()` returns
+      `(name, reason)` and `refused()` renders `"{reason} [{name}]"` over it —
+      one matcher, two consumers. Parsing the name back out of the rendered
+      string would put the counter one string edit away from being silently
+      wrong, which is the defect `skipnotice`'s two blocks already refuse.
+    - **`magic-floor` is a reserved rule name** for decision 6's always-on
+      check, which is fux's and not the consumer's, and `_rule` now refuses a
+      rule that claims it. A counter keyed by rule name needs exactly one key
+      that cannot collide.
+    - **An offline run never touches the counter**, exactly like
+      `urlstate.observe`: a run that fetched nothing has learned nothing about
+      the networked plane, and writing a zero would let it erase what a
+      networked run had recorded.
+    - **`doctor` names the rules that have NEVER fired**, which is what a
+      typo'd `body_contains` looks like — a rule that reads as protection and
+      is not, which is decision 8's own argument arriving one layer later.
+    - ⚠ **Reported, never enforced.** Nothing here disables a rule or edits
+      `refusals.toml`; the loud case (refusals recorded, no `url:` document
+      surviving) is a **warning**, because a corpus of only unreachable
+      intranet pages is a legitimate state of the world.
+
 **Output — the strictness, every branch:**
 
 ```console
@@ -319,6 +355,8 @@ an over-broad rule is visible only in a run's own output.
 - [`src/fux/templates/refusals.toml.txt`](../../src/fux/templates/refusals.toml.txt) — the six shipped rules
 - [`tests/ingest/test_refusals.py`](../../tests/ingest/test_refusals.py) — 37 tests over the matcher, including the `""`-suffix case and the two fixtures that were wrong before the code was
 - [`tools/refusal-probe/`](../../tools/refusal-probe/README.md) — the shipped rules against real captured responses; [`tests/ingest/test_refusal_probe.py`](../../tests/ingest/test_refusal_probe.py) runs its cases in CI
+- [`src/fux/maintain/state.schema.json`](../../src/fux/maintain/state.schema.json) — `refused`, declared beside `rate_limited` (decision 11)
+- [`src/fux/doctor.py`](../../src/fux/doctor.py) — `_refusal_health`, where decision 11's counts surface
 - [ADR-FETCHER](0019_fetcher.md) decision 13 — the boundary this record holds, and whose veto check named this module's caller
 
 ### Veto condition

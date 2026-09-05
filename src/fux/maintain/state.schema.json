@@ -85,6 +85,11 @@
         "type": "dict",
         "required": "never",
         "doc": "host -> how many times that host rate-limited a fetch. COUNTS, NOT CLOCKS, like every other field here (W-82 ruling 12). Keyed by HOST rather than URL because a rate limit is a property of the server, not of one page; `fux doctor` reports it so a consumer can lower `[sources.url] max_parallel` themselves. **Fux never changes the cap on their behalf** -- state the cost, do not clamp the knob"
+      },
+      "refused": {
+        "type": "dict",
+        "required": "never",
+        "doc": "refusal rule name -> how many fetched responses it refused, CUMULATIVE across networked runs (W-101 item 3). Keyed by RULE, not by URL, because the question it answers is about the rule: a consumer's refusals.toml is otherwise invisible -- a rule that matches everything empties the corpus and looks exactly like a corpus with nothing in it. `magic-floor` is the reserved name of the always-on magic-byte check, which is fux's and not the consumer's. Accumulates like `rate_limited` and for the same reason: each entry is one event that happened once. An OFFLINE run never touches it -- a run that fetched nothing has learned nothing about the networked plane"
       }
     },
     "example": {
@@ -99,6 +104,9 @@
       },
       "rate_limited": {
         "wiki.corp": 12
+      },
+      "refused": {
+        "sso-login": 3
       }
     }
   },

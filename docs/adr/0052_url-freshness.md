@@ -277,9 +277,16 @@ asserts the prose no longer says *four-state*.
 
 **Owed, and filed in [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md):**
 
-- **`fux doctor` does not report the `as-ingested` share**, which is
-  [ADR-ACQUIRED](0050_acquired-plane.md)'s veto check as well as a useful
-  number in its own right. Until it does, neither record's veto can be run.
+- ~~**`fux doctor` does not report the `as-ingested` share.**~~ **Closed
+  2026-09-05 (W-101).** `doctor.freshness_counts()` reports it, as the
+  `freshness verdicts` check and as `fux doctor --json`'s `freshness` block;
+  both this record's veto and
+  [ADR-ACQUIRED](0050_acquired-plane.md)'s identical one can now be run.
+  ⚠ **Over journalled answers only.** A freshness verdict exists at answer
+  time and only the **opt-in** receipt journal (`--journal`) persists one, so a
+  repo that has never journalled reports **unknown** rather than a zero share.
+  That is the honest reading and it is the reason nothing new is retained: L8's
+  journal already existed, and where it is off there is no number to have.
 - **`ttl=` bounds the TTL fetch cache and nothing else.** It does not yet
   influence which URLs `fux daemon` sweeps first, which is the other place a
   per-URL interval obviously belongs.
@@ -315,6 +322,7 @@ asserts the prose no longer says *four-state*.
 - [`src/fux/refer/freshness.py`](../../src/fux/refer/freshness.py) — the six labels, and the `max_age_seconds` refusal this record does not undo
 - [`src/fux/refer/source.py`](../../src/fux/refer/source.py) — `from_acquired`, and decision 6's imported-never-reimplemented rule
 - [`tests/refer/test_freshness_ttl.py`](../../tests/refer/test_freshness_ttl.py) · [`tests/refer/test_refer_acquired.py`](../../tests/refer/test_refer_acquired.py) · [`tests/refer/test_ttl_resolution.py`](../../tests/refer/test_ttl_resolution.py) — 45 tests, including the four that pin decision 11's arithmetic
+- [`src/fux/doctor.py`](../../src/fux/doctor.py) — `freshness_counts()` and `AS_INGESTED_VETO_SHARE`, this veto's instrument (W-101, 2026-09-05)
 - [ADR-ACQUIRED](0050_acquired-plane.md) — the plane the fourth verdict reads from
 - [ADR-CACHE](0034_cache.md) — the TTL store `ttl=` bounds, and the argument for keeping two caches provably separate
 
@@ -328,12 +336,19 @@ fix is the fetch path, not a wider vocabulary.
 **How to check it:** `fux doctor --json` — the `as-ingested` count against total
 verified citations.
 
-> ⚠ **No output block for this check yet, and that is a debt rather than an
-> oversight.** `fux doctor` does not report the count, so the check cannot be
-> run today; it is filed in *Consequences* above and shares its fix with
-> [ADR-ACQUIRED](0050_acquired-plane.md)'s identical veto.
-> [`docs/adr/TEMPLATE.md`](TEMPLATE.md) is explicit that an invented transcript
-> is worse than none — capture it when doctor reports the number.
+**Output (captured 2026-09-05, this repo, no journal yet):**
+
+```console
+$ fux doctor --json | python -c "import json,sys; print(json.load(sys.stdin)['freshness'])"
+{}
+```
+
+> The empty object is **unknown, not zero**: no answer here has been run with
+> `--journal`. A populated one reads
+> `{"current": 41, "as-ingested": 3, "unverified": 6}` and the veto compares
+> `as-ingested` against the sum — the quarter lives once, in
+> `doctor.AS_INGESTED_VETO_SHARE`, so the two records cannot drift apart on the
+> number they share.
 
 ---
 

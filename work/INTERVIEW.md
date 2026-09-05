@@ -30,6 +30,74 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-05**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### W-101 landed: `fux doctor` closed FIVE gaps, and two accepted vetoes can now be run (2026-09-05, latest)
+
+**The agent lane was not idle, so the session did not stop at the inbox.**
+One pass at [`doctor.py`](../src/fux/doctor.py) — see
+[IMPLEMENTATION](IMPLEMENTATION.md) for the table and the evidence.
+
+🔴 **The one that mattered most: the `as-ingested` share.** It is the **veto
+check of two ACCEPTED records** ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
+[ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)), both of which named
+`fux doctor --json` as how to run it and neither of which could be run at all.
+`doctor.freshness_counts()` and the new `freshness` block close that; both
+records' debt paragraphs are rewritten with a captured output block.
+
+⚠ **Know the limit before you cite the number.** A freshness verdict exists at
+answer time and only the **opt-in** receipt journal persists one. So the share
+is over **journalled answers**, and a repo that has never journalled reports
+**unknown** — never a zero share. The two are different claims and the code,
+the tests and both records keep them apart.
+
+**Three lessons worth inheriting:**
+
+1. **A check that fires on a healthy repo is a check people learn to skip.**
+   The binding check reported *27 of 36 bindings match no document* on this
+   repo — every one correct, because `fux setup` writes the whole built-in
+   table. One line (only bindings that differ from the built-in default for
+   their extension) is the whole difference between a check and a wall.
+2. **Absent is never zero.** *"No ingest has recorded counts"*, *"no networked
+   run has recorded a refusal"*, *"no receipts journalled"* — each is said in
+   those words. A `0` would be read as a finding.
+3. **A bare `except` around an attribute read hides a rename.** `Tune` is
+   flat; `tune.ranking.recency_half_life_days` raised straight into the
+   fallback and the check would have reported the prior as off forever. Its
+   own test caught it. The `load` call is guarded now; the attribute read is
+   not, deliberately.
+
+**Also closed by re-derivation (rule 4), not by work:** the Windows-e2e row and
+the clean-corpus-recall row are **deleted**. Before the second went, its unique
+claims — the `none` arm's numbers and *`recall@k` is a paired metric that
+separates arms `hit@k` cannot* — moved into
+[ADR-QUALITY](../docs/adr/0044_quality-contract.md).
+
+**Still idle and needing no ruling:** the glibc `log` probe on a CI runner, the
+`idf` widening, the lab emitter, W-97's two harness blockers, the `heading`
+control rebuild, W-96's paragraph.
+
+### The inbox has a proposed answer per row; Arpit ratifies, Opus executes (2026-09-05, later)
+
+**Read [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md)
+before working anything on the `arpit` lane.** Eleven rows were blocked, six
+past the 5-day threshold; each now has a proposed default (`R-1`…`R-11`) with
+its evidence, and [the prompt beside it](proposals/unblock-2026-09-05-claude-code-prompt.md)
+is the ratification vehicle — a bracket per line, blank means blocker.
+
+🔴 **Three rows turned out to be facts, not decisions, on re-derivation:**
+`tests_e2e/` runs on Windows in CI (green on `80ee187`); the clean-corpus
+recall is the doc2query run's `none` arm; no prior enrichment run needs
+re-running (both 2026-08-24 runs used `--full`; placebo-and-seal wiped per
+arm). **Rule 4 again: three blockers evaporated the moment a session looked.**
+
+**What needs no ruling and is idle** — the prompt starts there: W-101 (now
+five things, the `mtime` check included), the glibc `log` probe on a CI
+runner, the `idf` widening, the lab emitter, W-97's two harness blockers, the
+`heading` control, W-96's paragraph.
+
+⚠ **`fux-playground` is in a staged half-state** — the index staged as
+deletions, nothing committed since 2026-08-20. Only Arpit decides commit or
+restore; R-11 says so. **Nothing from this session is committed either.**
+
 ### Search v3: FIVE items done in one day; everything left is on Arpit (2026-09-05)
 
 **Ratified 2026-09-05 and worked in his stated order.** What landed:

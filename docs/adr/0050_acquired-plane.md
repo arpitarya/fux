@@ -112,7 +112,11 @@ $ tree .fux/acquired/
 
 **Harder.** `.fux/` now has a directory that grows, and a bounded store means an eviction policy, which means a way to lose the only local copy of something. Decision 8's two rules are what confine that loss to blobs a re-fetch can restore; they are not optimisations and removing either breaks the guarantee.
 
-**Owed.** A retained blob is source content on disk — gitignored, but present. The gitignore is machine-checked by `fux doctor`'s check-ignore assertion rather than trusted to a reader, and `CACHEDIR.TAG` keeps it out of backups. ⚠ **This paragraph named two gaps that Phase 3 had already closed, and it said so for a day** — `doctor._acquired_health` reports blob count, total bytes and the 80%-of-cap warning, and `sources._drop_acquired` drops the manifest entry and sweeps the blob on `fux remove <url>`. **A record describing behaviour the code no longer has reads as authority**, which is exactly Law zero's third obligation. What is genuinely still owed is **one** thing, filed in [`work/OPEN-WORK.md`](../../work/OPEN-WORK.md): `fux doctor` does not report the **`as-ingested` share**, which is this record's own veto check — until it does, that veto cannot be run.
+**Owed.** A retained blob is source content on disk — gitignored, but present. The gitignore is machine-checked by `fux doctor`'s check-ignore assertion rather than trusted to a reader, and `CACHEDIR.TAG` keeps it out of backups. ⚠ **This paragraph named two gaps that Phase 3 had already closed, and it said so for a day** — `doctor._acquired_health` reports blob count, total bytes and the 80%-of-cap warning, and `sources._drop_acquired` drops the manifest entry and sweeps the blob on `fux remove <url>`. **A record describing behaviour the code no longer has reads as authority**, which is exactly Law zero's third obligation.
+
+**The last owed item closed 2026-09-05 (W-101).** `fux doctor` now reports the `as-ingested` share — `doctor.freshness_counts()`, rendered as the `freshness verdicts` check and, machine-readably, as `fux doctor --json`'s `freshness` block. **The veto below can be run.**
+
+⚠ **What it can be run *against* is narrower than the veto's wording, and that limit is stated rather than hidden.** A freshness verdict exists only at answer time, and the only thing that persists one is the **opt-in** receipt journal (`--journal`, `.fux/runtime/provenance.jsonl`, gitignored — L8). So the share is computed over **journalled answers**, not over every answer ever given, and a repo that has never journalled reports **unknown** rather than a zero share. Collapsing those two would let a repo that never looked read as one that looked and found nothing. **Nothing new is retained to make this work**: the journal already existed, and if it is off there is no number.
 
 ### Alternatives considered
 
@@ -127,6 +131,7 @@ $ tree .fux/acquired/
 - `src/fux/store/fuxdir.py` — the `COMMITTED` / `DERIVED` declaration this record extends
 - `src/fux/refer/fetchcache.py` — the two-stores-provably-separate argument, and the wall-clock invariant
 - `src/fux/maintain/urlstate.py` — the counters-not-clocks precedent, and `fail_streak`
+- `src/fux/doctor.py` — `freshness_counts()` and `AS_INGESTED_VETO_SHARE`, the veto's instrument (W-101, 2026-09-05)
 - `tests/store/test_acquired.py` — 24 tests, including the failing-URL eviction guard and the no-wall-clock assertion
 - ADR-DOTFUX (`0003_fux-directory.md`) · ADR-FETCHER (`0019_fetcher.md`) · ADR-REFER (`0030_refer-plane.md`)
 
@@ -136,7 +141,14 @@ $ tree .fux/acquired/
 
 **How to check it:** `fux doctor --json` — compare the `as-ingested` count against total verified citations.
 
-> ⚠ **No output block for the veto check yet.** `fux doctor` does not report the count, so the check cannot be run today; it is filed with the two other doctor gaps in *Consequences*. `docs/adr/TEMPLATE.md` is explicit that an invented transcript is worse than none — capture it when doctor reports the number.
+**Output (captured 2026-09-05, this repo, no journal yet):**
+
+```console
+$ fux doctor --json | python -c "import json,sys; print(json.load(sys.stdin)['freshness'])"
+{}
+```
+
+> An empty object is **unknown, not zero** — no answer has been run with `--journal`, so no verdict has ever been recorded. A populated one reads `{"current": 41, "as-ingested": 3, "unverified": 6}`, and the veto compares `as-ingested` against the sum. `doctor.AS_INGESTED_VETO_SHARE` holds the quarter so the number has one home; the `freshness verdicts` check warns when it is crossed.
 
 ---
 

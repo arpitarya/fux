@@ -282,6 +282,30 @@ claims no delta. **The number demonstrates the metric, not the engine.**
 decision 5's gate has a measured hole: the figures above describe the
 **answerable** half only.
 
+**A `recall@k` on a corpus with NO enrichment at all** — the `none` arm of
+[the 2026-09-05 doc2query run](../../work/regression/2026-09-05-doc2query/report.md),
+43 goldens, per-query rows filed:
+
+| k | `recall@k` (`none`) |
+|---:|---:|
+| 1 | 0.4341 |
+| 3 | 0.8256 |
+| 5 | 0.9186 |
+| 10 | 0.9884 |
+
+**This is the clean absolute the table above could not be.** The fitted-corpus
+objection is about *enrichment written by someone who had read the queries*, and
+this arm has no enrichment, so that exposure cannot reach it. ⚠ **What does
+still reach it:** the run is classified `informed` for its harness and analysis,
+and the goldens themselves are shared with the fitted run — so it is a clean
+absolute *for this query set*, not a generalisation estimate.
+
+⚠ **`recall@k` is a PAIRED metric wherever two arms are compared, and it
+separates arms `hit@k` cannot.** Unlike `hit@k` it awards partial credit, so
+two arms can differ on it while every top-k membership decision is identical.
+Any comparison therefore owes discordant counts and the paired floor of
+[ADR-RS](0036_predictions.md) decision 19 — never a difference of aggregates.
+
 ### Consequences
 
 **What this buys:** a headline the literature endorses; a metric that stops

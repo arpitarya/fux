@@ -10,6 +10,45 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **`fux doctor` gained four checks and one line — W-101, one pass at
+  `doctor.py`.** Each closes something that was reachable only from inside a
+  run that had already finished, or from nowhere at all:
+  - 🔴 **`freshness verdicts` — the `as-ingested` share.** This is the **veto
+    check of two accepted records** ([ADR-ACQUIRED](docs/adr/0050_acquired-plane.md),
+    [ADR-URL-FRESHNESS](docs/adr/0052_url-freshness.md)); both say to run it
+    with `fux doctor --json`, and until now neither veto could be run at all.
+    The machine-readable form is the new `freshness` block.
+    ⚠ **Over journalled answers only** — a verdict exists at answer time and
+    only the opt-in receipt journal (`--journal`) persists one, so a repo that
+    has never journalled reports **unknown**, never a zero share.
+  - **`refusal rules`** — how many rules load, how many responses each has
+    refused (cumulative, recorded by every networked run), and **the rules that
+    have never fired**, which is what a typo'd condition looks like. The loud
+    case is refusals recorded with **no `url:` document surviving**: a rule that
+    matches everything empties the URL half of the corpus and leaves it looking
+    like a corpus nobody has ingested.
+  - **`decoder bindings`** — every `decoder=` binding resolves, plus the one
+    fault no ingest can catch: a binding on an extension **no indexed document
+    has**. Extending a decoder to a new extension is legal by design, so
+    nothing errors and a typo indexes nothing forever.
+  - 🔴 **`recency prior`** — whether any document carries an `mtime`. **A corpus
+    copied out of its git repository loses every one of them**, so the whole
+    recency prior switches off and nothing reported it; found 2026-09-05 on
+    `fux-benchmark`'s 10 000-document corpus, where all 10 000 have none.
+  - **Redaction counts on `pii rules`.** `redact()` returned per-rule hit
+    counts from day one and `run()` summed them into a variable nothing ever
+    read. Every ingest now records them
+    ([ADR-PII](docs/adr/0053_pii.md) decision 15), and `doctor` reports them
+    with their denominator.
+  - **Absent is never reported as zero.** *"No ingest has recorded counts"*,
+    *"no networked run has recorded a refusal"* and *"no receipts journalled"*
+    are each said in those words rather than shown as a `0` a reader would take
+    for a finding.
+  - ⚠ **A check that fires on a healthy repo is one people learn to skip.**
+    `fux setup` writes the entire built-in binding table, so on a markdown
+    corpus 27 of 36 bindings match no document — all correct. Only a binding
+    that differs from the built-in default for its extension is reported.
+
 - **The tie-break is DECLARED, and ties are marked** (W-111). Where two
   documents' rounded scores are equal the order is now
   `superseded -> recency -> priority -> id` — Arpit's ratified order — instead

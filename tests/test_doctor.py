@@ -612,3 +612,412 @@ def test_a_clean_sweep_is_reported_as_clean(tmp_path):
 
     assert check is not None and check.ok is True
     assert "4 document(s)" in check.detail
+
+
+# -- W-101: the four checks that close the doctor pass -----------------------
+#
+# One pass at `doctor.py` for five things that were each reachable only from
+# inside a run that had already finished — or, in the freshness case, from
+# nowhere at all. ADR-DOTFUX's fourth worked instance.
+
+
+def _record(doc_id="file:a.md", loc="a.md", **extra):
+    record = {
+        "id": doc_id,
+        "src": "git",
+        "loc": loc,
+        "mode": "extracted",
+        "meta": "plain",
+        "title": "A",
+        "phrases": [],
+        "terms": {},
+        "wlen": 4,
+        "edges": [],
+    }
+    record.update(extra)
+    return record
+
+
+# -- the refusal counter (ADR-REFUSAL decision 11) ---------------------------
+
+
+def _refusals_toml(tmp_path, *names):
+    from fux.ingest import refusals
+
+    body = "".join(
+        f'[[rule]]\nname = "{n}"\nreason = "no"\nbody_contains = ["{n}"]\n\n' for n in names
+    )
+    path = refusals.rules_path(tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(body, encoding="utf-8")
+
+
+def test_no_refusals_file_says_only_the_floor_applies(tmp_path):
+    _git_repo(tmp_path)
+    check = _check(doctor.run(tmp_path), "refusal rules")
+    assert check.ok
+    assert "magic-byte floor" in check.detail
+
+
+def test_refusal_rules_that_have_never_fired_are_named(tmp_path):
+    """A rule at zero is what a typo'd condition looks like — decision 8, later."""
+    _git_repo(tmp_path)
+    _refusals_toml(tmp_path, "sso", "paywall")
+    check = _check(doctor.run(tmp_path), "refusal rules")
+    assert check.ok
+    assert "no networked run has recorded a refusal yet" in check.detail
+
+
+def test_refusal_counts_are_reported_per_rule(tmp_path):
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    _refusals_toml(tmp_path, "sso", "paywall")
+    urlstate.record_refusals(tmp_path, {"sso": 4})
+    check = _check(doctor.run(tmp_path), "refusal rules")
+    assert "sso x4" in check.detail
+    assert "never fired: paywall" in check.detail
+
+
+def test_refusals_with_no_surviving_url_document_is_the_loud_case(tmp_path):
+    """The failure this check exists for: a rule that empties the URL half."""
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    _refusals_toml(tmp_path, "sso")
+    urlstate.record_refusals(tmp_path, {"sso": 12})
+    check = _check(doctor.run(tmp_path), "refusal rules")
+    assert not check.ok
+    assert check.level == "warn"  # a warning, never an error
+    assert "NO url: DOCUMENT SURVIVED" in check.detail
+
+
+def test_a_surviving_url_document_keeps_the_refusal_line_quiet(tmp_path):
+    from fux.maintain import urlstate
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    _refusals_toml(tmp_path, "sso")
+    urlstate.record_refusals(tmp_path, {"sso": 2})
+    write_index(tmp_path, [_record(doc_id="url:https://x/a", loc="https://x/a")])
+    check = _check(doctor.run(tmp_path), "refusal rules")
+    assert check.ok
+
+
+def test_refusal_counts_accumulate_across_runs(tmp_path):
+    from fux.maintain import urlstate
+
+    _git_repo(tmp_path)
+    urlstate.record_refusals(tmp_path, {"sso": 2})
+    urlstate.record_refusals(tmp_path, {"sso": 3, "paywall": 1})
+    state = urlstate.read(tmp_path)
+    assert state.refused == {"sso": 5, "paywall": 1}
+
+
+def test_a_malformed_refusals_file_is_an_error_not_a_traceback(tmp_path):
+    from fux.ingest import refusals
+
+    _git_repo(tmp_path)
+    path = refusals.rules_path(tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("[[rule]\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "refusal rules")
+    assert not check.ok
+    assert check.level == "error"
+
+
+def test_magic_floor_is_a_reserved_rule_name(tmp_path):
+    """A counter keyed by rule name needs one key that cannot collide."""
+    from fux.errors import FuxError
+    from fux.ingest import refusals
+
+    with pytest.raises(FuxError, match="reserved"):
+        refusals.parse(
+            {"rule": [{"name": refusals.MAGIC_FLOOR, "reason": "x", "max_bytes": 10}]},
+            origin="t",
+        )
+
+
+def test_refusal_returns_the_rule_name_structurally(tmp_path):
+    """`refused()` renders; `refusal()` is what the counter reads."""
+    from fux.ingest import refusals
+
+    rules = refusals.parse(
+        {"rule": [{"name": "sso", "reason": "sign in", "body_contains": ["Sign in"]}]},
+        origin="t",
+    )
+    body = b"<html>Sign in</html>"
+    assert refusals.refusal(rules, "https://x/a", "text/html", body) == ("sso", "sign in")
+    assert refusals.refused(rules, "https://x/a", "text/html", body) == "sign in [sso]"
+
+
+def test_the_magic_floor_is_counted_under_its_reserved_name():
+    from fux.ingest import refusals
+
+    hit = refusals.refusal((), "https://x/a.pdf", "application/pdf", b"<html>nope")
+    assert hit is not None
+    assert hit[0] == refusals.MAGIC_FLOOR
+
+
+# -- the decoder bindings (ADR-DECODE) --------------------------------------
+
+
+def test_decoder_bindings_report_nothing_when_none_are_declared(tmp_path):
+    _git_repo(tmp_path)
+    check = _check(doctor.run(tmp_path), "decoder bindings")
+    assert check.ok
+    assert "none declared" in check.detail
+
+
+def test_a_binding_naming_a_missing_module_is_an_error(tmp_path):
+    _git_repo(tmp_path)
+    types = tmp_path / ".fux" / "sources" / "types"
+    types.parent.mkdir(parents=True, exist_ok=True)
+    types.write_text("*.md\n*.zzz decoder=nosuchdecoder\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "decoder bindings")
+    assert not check.ok
+    assert check.level == "error"
+
+
+def test_a_generated_binding_that_matches_nothing_is_not_reported(tmp_path):
+    """The check must stay quiet on a fresh `fux setup` — 27 of 36 match nothing."""
+    from fux import decode
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    lines = ["*.md\n"] + [
+        f"*{ext} decoder={name}\n" for ext, name in sorted(decode.builtin_bindings().items())
+    ]
+    types = tmp_path / ".fux" / "sources" / "types"
+    types.parent.mkdir(parents=True, exist_ok=True)
+    types.write_text("".join(lines), encoding="utf-8")
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "decoder bindings")
+    assert check.ok
+    assert "match no indexed document" not in check.detail
+
+
+def test_a_hand_written_binding_that_matches_nothing_is_reported(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    types = tmp_path / ".fux" / "sources" / "types"
+    types.parent.mkdir(parents=True, exist_ok=True)
+    types.write_text("*.md\n*.jsno decoder=jsondoc\n", encoding="utf-8")
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "decoder bindings")
+    assert not check.ok
+    assert check.level == "warn"
+    assert ".jsno=jsondoc" in check.detail
+
+
+def test_a_hand_written_binding_with_documents_is_quiet(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    types = tmp_path / ".fux" / "sources" / "types"
+    types.parent.mkdir(parents=True, exist_ok=True)
+    types.write_text("*.md\n*.geojson decoder=jsondoc\n", encoding="utf-8")
+    write_index(tmp_path, [_record(doc_id="file:a.geojson", loc="a.geojson")])
+    check = _check(doctor.run(tmp_path), "decoder bindings")
+    assert check.ok
+
+
+# -- the recency prior (filed 2026-09-05 from W-111's tie-break) -------------
+
+
+def test_a_corpus_with_no_mtime_reports_the_recency_prior_as_off(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "recency prior")
+    assert not check.ok
+    assert check.level == "warn"
+    assert "NO document carries an mtime" in check.detail
+
+
+def test_a_configured_half_life_over_a_corpus_with_no_mtime_says_so(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "tune.toml").write_text(
+        "[ranking]\nrecency_half_life_days = 30\n", encoding="utf-8"
+    )
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "recency prior")
+    assert "configured is doing nothing" in check.detail
+
+
+def test_a_corpus_where_every_document_has_an_mtime_passes(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(tmp_path, [_record(mtime=1788330315)])
+    check = _check(doctor.run(tmp_path), "recency prior")
+    assert check.ok
+    assert "every one of 1 document(s)" in check.detail
+
+
+def test_a_partly_covered_corpus_is_a_warning_only_when_the_knob_is_on(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(
+        tmp_path,
+        [_record(mtime=1788330315), _record(doc_id="file:b.md", loc="b.md")],
+    )
+    assert _check(doctor.run(tmp_path), "recency prior").ok  # half-life 0: off anyway
+
+    (tmp_path / ".fux" / "tune.toml").write_text(
+        "[ranking]\nrecency_half_life_days = 30\n", encoding="utf-8"
+    )
+    check = _check(doctor.run(tmp_path), "recency prior")
+    assert not check.ok
+    assert "1 of 2 document(s)" in check.detail
+
+
+# -- the as-ingested share (ADR-ACQUIRED / ADR-URL-FRESHNESS's veto) ---------
+
+
+def _journal(tmp_path, labels):
+    import json
+
+    from fux.query import provenance
+    from fux.store import fuxdir
+
+    fuxdir.derived_dir(tmp_path, "runtime")
+    payload = {
+        "predicate": {"verdicts": [{"id": f"d{i}", "freshness": label} for i, label in enumerate(labels)]}
+    }
+    provenance.journal_path(tmp_path).write_text(
+        json.dumps(payload, sort_keys=True) + "\n", encoding="utf-8"
+    )
+
+
+def test_no_journal_reports_unknown_rather_than_a_zero_share(tmp_path):
+    """Absent and zero are different claims and neither veto may read one as the other."""
+    _git_repo(tmp_path)
+    check = _check(doctor.run(tmp_path), "freshness verdicts")
+    assert check.ok
+    assert "no receipts journalled" in check.detail
+    assert doctor.freshness_counts(tmp_path) == {}
+
+
+def test_the_as_ingested_share_is_reported_from_the_journal(tmp_path):
+    _git_repo(tmp_path)
+    _journal(tmp_path, ["current", "current", "current", "as-ingested"])
+    assert doctor.freshness_counts(tmp_path) == {"current": 3, "as-ingested": 1}
+    check = _check(doctor.run(tmp_path), "freshness verdicts")
+    assert check.ok  # 25% is the condition, not past it
+    assert "as-ingested 25%" in check.detail
+
+
+def test_crossing_the_veto_share_warns_and_names_both_records(tmp_path):
+    _git_repo(tmp_path)
+    _journal(tmp_path, ["current", "as-ingested", "as-ingested"])
+    check = _check(doctor.run(tmp_path), "freshness verdicts")
+    assert not check.ok
+    assert check.level == "warn"
+    assert "ADR-ACQUIRED and ADR-URL-FRESHNESS" in check.detail
+
+
+def test_the_veto_share_is_machine_readable_in_json(tmp_path, monkeypatch, capsys):
+    """Both records say to check the veto with `fux doctor --json`."""
+    import json
+
+    from fux import doctor as doctor_mod
+
+    _git_repo(tmp_path)
+    _journal(tmp_path, ["current", "as-ingested"])
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(doctor_mod, "find_root", lambda *a, **k: tmp_path)
+    doctor_mod.cmd_doctor(type("A", (), {"json": True})())
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["freshness"] == {"current": 1, "as-ingested": 1}
+
+
+def test_a_corrupt_journal_line_cannot_break_doctor(tmp_path):
+    from fux.query import provenance
+    from fux.store import fuxdir
+
+    _git_repo(tmp_path)
+    fuxdir.derived_dir(tmp_path, "runtime")
+    provenance.journal_path(tmp_path).write_text("{not json\n", encoding="utf-8")
+    assert doctor.freshness_counts(tmp_path) == {}
+
+
+# -- the redaction counts (ADR-PII decision 15) -----------------------------
+
+
+def test_pii_line_says_no_ingest_has_recorded_counts_yet(tmp_path):
+    from fux.ingest import pii
+
+    _git_repo(tmp_path)
+    path = pii.rules_path(tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('[[rule]]\nname = "email"\npattern = "\\\\S+@\\\\S+"\n', encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "pii rules")
+    assert "No ingest has recorded redaction counts yet" in check.detail
+
+
+def test_recorded_counts_are_reported_with_their_denominator(tmp_path):
+    from fux.ingest import pii
+
+    _git_repo(tmp_path)
+    path = pii.rules_path(tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('[[rule]]\nname = "email"\npattern = "\\\\S+@\\\\S+"\n', encoding="utf-8")
+    pii.record_counts(tmp_path, body={"email": 7}, enrichment={}, partial=False, documents=12)
+    check = _check(doctor.run(tmp_path), "pii rules")
+    assert "redacted 7 value(s) across 12 document(s)" in check.detail
+    assert "email x7" in check.detail
+
+
+def test_zero_recorded_redactions_is_not_the_same_as_none_recorded(tmp_path):
+    from fux.ingest import pii
+
+    _git_repo(tmp_path)
+    path = pii.rules_path(tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('[[rule]]\nname = "email"\npattern = "\\\\S+@\\\\S+"\n', encoding="utf-8")
+    pii.record_counts(tmp_path, body={}, enrichment={}, partial=False, documents=12)
+    check = _check(doctor.run(tmp_path), "pii rules")
+    assert "redacted NOTHING across 12 document(s)" in check.detail
+
+
+def test_partial_enrichment_counts_say_they_are_partial(tmp_path):
+    from fux.ingest import pii
+
+    _git_repo(tmp_path)
+    path = pii.rules_path(tmp_path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text('[[rule]]\nname = "email"\npattern = "\\\\S+@\\\\S+"\n', encoding="utf-8")
+    pii.record_counts(
+        tmp_path, body={"email": 2}, enrichment={"email": 1}, partial=True, documents=9
+    )
+    check = _check(doctor.run(tmp_path), "pii rules")
+    assert "enrichment: email x1" in check.detail
+    assert "not the whole corpus" in check.detail
+
+
+def test_a_corrupt_counts_file_reads_as_nothing_recorded(tmp_path):
+    from fux.ingest import pii
+    from fux.store import fuxdir
+
+    _git_repo(tmp_path)
+    fuxdir.derived_dir(tmp_path, "runtime")
+    pii.counts_path(tmp_path).write_text("{oops", encoding="utf-8")
+    assert pii.read_counts(tmp_path) is None
+
+
+def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
+    """L8 and ADR-DOTFUX: a use-shaped record never reaches a committed byte."""
+    from fux.ingest import pii
+    from fux.store import fuxdir
+
+    _git_repo(tmp_path)
+    fuxdir.ensure_layout(tmp_path)
+    pii.record_counts(tmp_path, body={"email": 1}, enrichment={}, partial=False, documents=1)
+    assert doctor._is_git_ignored(tmp_path, pii.counts_path(tmp_path)) is True

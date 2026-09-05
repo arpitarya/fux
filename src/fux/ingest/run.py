@@ -353,7 +353,15 @@ def run(
     # loop below. It gets its own pass, in `_enrichment_for`; until W-102 it
     # had none. If you add a third source of `ctx`, the sentence above does
     # not cover that one either.
-    pii_hits: dict[str, int] = {}
+    #: Per-rule redaction counts, kept in TWO dictionaries because they have
+    #: different coverage (W-101 item 4, `pii.Counts`). This one is the
+    #: corpus-wide census: the loop below walks every parsed document on every
+    #: ingest, reused or not.
+    pii_body_hits: dict[str, int] = {}
+    #: This run's re-extracted documents only — enrichment is redacted inside
+    #: the extract loop, which incremental ingest skips. Merging the two would
+    #: claim a completeness the second half does not have.
+    pii_ctx_hits: dict[str, int] = {}
     if pii_rules:
         with progress.phase("redact", len(parsed)) as p:
             for doc_id, doc in parsed.items():
@@ -361,7 +369,7 @@ def run(
                 if hits:
                     parsed[doc_id] = replace(doc, body=body)
                     for name, count in hits.items():
-                        pii_hits[name] = pii_hits.get(name, 0) + count
+                        pii_body_hits[name] = pii_body_hits.get(name, 0) + count
                 p.update(1)
 
     # Extraction is the expensive half — 92% of a full ingest, profiled at
@@ -391,7 +399,7 @@ def run(
             # index is redacted; the enrichment body is part of it.
             ctx, ctx_hits = _enrichment_for(root, file_shas.get(doc_id, ""), pii_rules)
             for name, count in ctx_hits.items():
-                pii_hits[name] = pii_hits.get(name, 0) + count
+                pii_ctx_hits[name] = pii_ctx_hits.get(name, 0) + count
             extracted[doc_id] = extract_mod.extract_fields(
                 _loc_of(doc_id),
                 parsed[doc_id],
@@ -565,6 +573,19 @@ def run(
     # `covered` and stays pending (ADR-MAINTENANCE decision 1d). A run that
     # was stopped or died never reaches this line, so the list survives it.
     dirty_mod.discard(root, covered)
+
+    # W-101 item 4. **Written here and nowhere earlier**: a run that was
+    # stopped or that failed never redacted the whole corpus, and a partial
+    # census reported as a complete one is the defect this file's `partial`
+    # flag exists to keep out. `reusable` is the flag's source -- a run that
+    # carried any extraction forward saw only part of the enrichment.
+    pii_mod.record_counts(
+        root,
+        body=pii_body_hits,
+        enrichment=pii_ctx_hits,
+        partial=bool(reusable),
+        documents=len(parsed),
+    )
 
     return IngestReport(
         written_shards=written,
