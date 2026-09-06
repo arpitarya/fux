@@ -198,11 +198,11 @@ def load(root: Path) -> Config:
 #: The vendors `[agents] install` may name. Closed, and validated, because a
 #: typo here fails **silently** in the worst way: the policy file a consumer
 #: asked for is simply never written, and nothing says so.
-KNOWN_AGENTS = ("claude", "copilot", "kiro")
+KNOWN_AGENTS = ("claude", "codex", "copilot", "kiro")
 
 
 def _load_agents(path: Path, raw) -> tuple[str, ...]:
-    """`[agents] install`. Absent means all three; `[]` means none.
+    """`[agents] install`. Absent means every known vendor; `[]` means none.
 
     **Absent and empty are deliberately different.** Absent is a repo that
     never expressed a preference and gets ADR-AGENT-POLICY decision 5's

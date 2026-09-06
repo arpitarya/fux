@@ -137,7 +137,43 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         # excluding Copilot's `instructions/`, which enter every request.
         (".kiro/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
     ),
+    # **Codex is decision 3 EXERCISED, not amended** — *"adding a fourth is a
+    # template plus a rendering plus a row, not a new decision"*. It costs no
+    # new template: Codex CLI reads project skills from
+    # `.codex/skills/<name>/SKILL.md`, the same open Agent Skills standard
+    # Claude and Kiro implement, so the identical `USAGE-SKILL.md` and
+    # `DECODER-SKILL.md` bytes are valid here. That is decision 10's
+    # agreement-by-construction for a third and fourth mapping.
+    #
+    # ⚠ **Codex has NO per-file ambient surface** — no `applyTo:`, no inclusion
+    # mode. Its always-on context is the repo-root `AGENTS.md` and nothing
+    # else. So the archived-results policy reaches Codex through `AGENTS.md`,
+    # which already carries the verbatim block, and there is deliberately **no**
+    # `.codex/skills/fux-archived-results/`: decision 9's test is *does an agent
+    # that has never heard of Fux still need this sentence to avoid being
+    # wrong?* — yes, and a skill has to be loaded to apply.
+    # **`AGENTS_MD_VENDORS` below is the consequence**, and it is not optional.
+    #
+    # `fux-enrich` stays claude-only (ADR-ENRICH decision 10). Nothing here
+    # widens it.
+    "codex": (
+        (".codex/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
+        (".codex/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
+    ),
 }
+
+#: Vendors whose ONLY always-on surface is the repo-root `AGENTS.md`.
+#:
+#: ⚠ **This exists because a partial declaration would otherwise strand one,
+#: silently.** `run()` writes the vendor-neutral root file only when every known
+#: vendor installs — a partial declaration names what it wants, and a neutral
+#: file nobody named is not covered by that naming (W-82 ruling 16). That
+#: reasoning holds for Claude, Copilot and Kiro: each has its own ambient or
+#: skill plane, so a narrowed declaration still delivers the archived-results
+#: policy. **It does not hold for Codex.** `install = ["codex"]` would write two
+#: skills and **no archived-results policy at all** — the exact silent failure
+#: ADR-AGENT-POLICY decision 1 exists to close, reintroduced by a config line.
+AGENTS_MD_VENDORS = ("codex",)
 
 _DIRS_HEADER = """\
 # What fux indexes. One entry per line: a directory (walked recursively) or a
@@ -335,16 +371,19 @@ shards = 256
 # own, which is why the default is spelled out here rather than left implicit:
 #
 #   claude   -> .claude/skills/fux-archived-results/SKILL.md
+#   codex    -> AGENTS.md at the repo root (its ONLY always-on surface)
+#               + .codex/skills/ for the operating manual and the decoder guide
 #   copilot  -> .github/agents/fux.agent.md
 #               .github/instructions/fux-archived-results.instructions.md
 #   kiro     -> .kiro/steering/fux-archived-results.md
 #
 # Two of them are AMBIENT (`applyTo: "**"`, `inclusion: always`) and enter every
 # request in this repo, for every developer, whether or not they are using fux.
+# The repo-root AGENTS.md is ambient for everyone, which is why it stays short.
 # Delete a name to stop installing it; `install = []` installs none. Editing a
 # file that is already there is safe -- fux never rewrites one.
 [agents]
-install = ["claude", "copilot", "kiro"]
+install = ["claude", "codex", "copilot", "kiro"]
 """.format(default=DEFAULT_MAX_PARALLEL)
 #: ⚠ **`{default}` is interpolated, not typed** (W-83). The number in the
 #: written `fux.toml` and the number the engine actually applies are the same
@@ -645,7 +684,10 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # (ADR-AGENT-POLICY veto 1a). ⚠ **And only when EVERY vendor installs**: a
     # partial declaration names what it wants, and a neutral file nobody named
     # is not covered by that naming.
-    if installing == KNOWN_AGENTS:
+    # ⚠ **…OR when a vendor installs for which the root file is the whole
+    # ambient plane** (`AGENTS_MD_VENDORS`). Without this clause
+    # `install = ["codex"]` writes two skills and no policy, and nothing says so.
+    if installing == KNOWN_AGENTS or any(v in installing for v in AGENTS_MD_VENDORS):
         _write_root_agents(root, report)
     return report
 

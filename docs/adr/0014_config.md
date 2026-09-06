@@ -113,7 +113,7 @@ greeting = "hello"                      # the fetcher's vocabulary, never fux's
 shards = 256                            # documents the value, cannot set it
 
 [agents]
-install = ["claude", "copilot", "kiro"] # absent = all three; [] = none
+install = ["claude", "codex", "copilot", "kiro"]  # absent = all; [] = none
 ```
 
 A rejected key, named precisely rather than defaulted:
@@ -238,9 +238,16 @@ ranking value either. It is **operational**, so it sits beside the other
 passed to the fetcher's `configure()` verbatim. Fux never reads a key inside it,
 and must never gain a reason to.
 
-**9. `[agents] install` is a closed, validated set** — `claude`, `copilot`,
-`kiro` — naming which vendors `fux setup` writes policy renderings for
-([ADR-AGENT-POLICY](0035_agent-policy.md) decision 5). The set is closed
+**9. `[agents] install` is a closed, validated set** — `claude`, `codex`,
+`copilot`, `kiro` — naming which vendors `fux setup` writes policy renderings
+for ([ADR-AGENT-POLICY](0035_agent-policy.md) decision 5). ⚠ **`codex` joined
+2026-09-06** ([ADR-AGENT-POLICY](0035_agent-policy.md) decision 11): the set is
+open by construction, and **growing it is a config-schema change as well as an
+installer change** — a value this file accepts and the installer has no row for
+writes nothing, silently, which is exactly what closing the set was meant to
+prevent. `tests/test_setup_agents.py::test_every_known_agent_has_a_rendering`
+is what ties the two lists together; they live in different files and drift
+otherwise. The set is closed
 because the failure mode of a typo here is the worst kind: the file a consumer
 asked for is simply never written and nothing says so.
 

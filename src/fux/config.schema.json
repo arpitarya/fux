@@ -76,7 +76,7 @@
     ],
     "fields": {
       "install": { "type": "list", "required": "never", "of": "str",
-                   "doc": "any of: claude, copilot, kiro. Absent means all of them; [] means none" }
+                   "doc": "any of: claude, codex, copilot, kiro. Absent means all of them; [] means none" }
     },
     "example": { "install": ["claude", "kiro"] }
   },

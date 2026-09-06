@@ -21,6 +21,45 @@ Rules:
 
 ---
 
+## W-114 (code half) — Codex is the fourth agent vendor (2026-09-06)
+
+**Landed, unpushed.** `fux setup` installs for a fourth vendor. Cost: **two
+rows, one new constant, zero new templates** — Codex CLI reads
+`.codex/skills/<name>/SKILL.md`, the same open Agent Skills standard Claude and
+Kiro implement, so the existing `USAGE-SKILL.md` and `DECODER-SKILL.md` bytes
+are valid there unchanged.
+
+| what landed | where |
+|---|---|
+| `codex` in the allowlist | [`src/fux/config.py`](../src/fux/config.py) `KNOWN_AGENTS`, [`config.schema.json`](../src/fux/config.schema.json) |
+| the two renderings | [`src/fux/setup.py`](../src/fux/setup.py) `AGENT_FILES["codex"]` |
+| the root-file gate, widened | `setup.AGENTS_MD_VENDORS` + the `installing == KNOWN_AGENTS or …` branch in `run()` |
+| the written default | `fux.toml` specimen → `install = ["claude", "codex", "copilot", "kiro"]` |
+| six tests | [`tests/test_setup_agents.py`](../tests/test_setup_agents.py) |
+| this repo's own copies | `.codex/skills/fux-usage/` · `.codex/skills/fux-decoder/` — byte-identical to the `.claude/skills` ones, checked |
+| the records | [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) decisions 11-13, veto 5a/5b · [ADR-CONFIG](../docs/adr/0014_config.md) decision 9 · [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decisions 6 and 9 |
+
+**Outcome: 173 tests green**, including `test_agent_policy_agreement.py` (the
+verbatim-block conformance) and `test_schemas.py`. ⚠ **Run in the Cowork
+container against a staged copy of the package, not on the MacBook** —
+`device_bash` was wedged for the whole session. The doc-law suites
+(`test_adr_freshness`, `test_adr_ownership`, `test_doc_registry`,
+`test_doc_links`, `test_archive_law`) and `tests_e2e/` were **not run** and are
+owed on the machine before this is committed.
+
+🔴 **The finding is not the vendor, it is decision 13.** GitHub Copilot reads
+`.claude/skills` as well as its own directories, so `fux-enrich`'s claude-only
+confinement ([ADR-ENRICH](../docs/adr/0040_enrich.md) decision 10) describes
+what fux **writes**, never what another agent **reads** — and fux cannot close
+that. The Copilot half of the original table is therefore a **fork**, not a
+row: [`compare/copilot-skill-surface.compare.md`](compare/copilot-skill-surface.compare.md),
+open as **W-114** on Arpit.
+
+**No ownership-table change**: `.codex/` is consumer output, and
+`src/fux/setup.py` stays with ADR-DOTFUX.
+
+---
+
 ## W-96 — the two-session `blind` protocol (2026-08-29, recorded 2026-09-05)
 
 **Recorded late, and that is the finding.** W-96 asked for the blind handoff

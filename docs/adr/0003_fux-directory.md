@@ -212,7 +212,7 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `sources/types`, `tune.toml`, `fetchers/*.py`, `decoders/*.py`, and the agent policy files | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `sources/types`, `tune.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run.
@@ -324,8 +324,9 @@ forgotten:
 The scaffolding contract had one boundary — *fux writes into its own directory
 and `fux.toml`, and nowhere else* — and
 [ADR-AGENT-POLICY](0035_agent-policy.md) decisions 5 and 6 widen it: `setup`
-also writes agent-policy renderings into `.claude/`, `.github/` and `.kiro/`,
-directories **Anthropic, GitHub and AWS own**. Everything else about the
+also writes agent-policy renderings into `.claude/`, `.codex/`, `.github/` and
+`.kiro/`, directories **Anthropic, OpenAI, GitHub and AWS own** — `.codex/`
+since 2026-09-06 ([ADR-AGENT-POLICY](0035_agent-policy.md) decision 11). Everything else about the
 contract is unchanged — write-if-missing, and the same read-never-import
 discipline the fetchers use.
 
@@ -333,11 +334,19 @@ discipline the fetchers use.
 install is default-on, `SetupReport` carries an `outside` list and `cmd_setup`
 prints every path it wrote beyond `.fux/` along with how to turn them off. A
 write that does not appear in that announcement is ADR-AGENT-POLICY's veto
-condition 1, and `tests/test_setup_agents.py` asserts both halves. ⚠ **Two of
-the four renderings are ambient** — Copilot's `applyTo: "**"` and Kiro's
+condition 1, and `tests/test_setup_agents.py` asserts both halves. ⚠ **Two
+renderings are ambient** — Copilot's `applyTo: "**"` and Kiro's
 `inclusion: always` enter *every* request in the consumer's repository,
 including for developers not using fux. That cost is stated rather than
 discovered, and the renderings are size-bounded by a test.
+
+⚠ **And the repo-root `AGENTS.md` is now written on a second condition, which
+is a scaffolding fact and belongs here.** It was written only for a full
+install; since 2026-09-06 it is *also* written whenever a vendor in
+`setup.AGENTS_MD_VENDORS` installs — today, `codex` alone
+([ADR-AGENT-POLICY](0035_agent-policy.md) decision 12). **A vendor whose only
+always-on surface is that file must not be able to opt into skills and out of
+the policy by narrowing one config line.**
 
 **10. `doctor` reports, and never repairs.** Every check returns
 `Check(ok, level, name, detail)` and `--json` carries them. Three properties

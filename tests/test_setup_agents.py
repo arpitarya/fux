@@ -1,8 +1,8 @@
 """`fux setup --agents` — the installer, and the safeguards a default-on install needs.
 
 ADR-AGENT-POLICY decision 5 makes this install **by default**, into
-`.claude/`, `.github/` and `.kiro/` — directories Anthropic, GitHub and AWS
-own. Two things are all that stand between that and a tool quietly editing a
+`.claude/`, `.codex/`, `.github/` and `.kiro/` — directories Anthropic,
+OpenAI, GitHub and AWS own. Two things are all that stand between that and a tool quietly editing a
 shared repository, and both are veto conditions rather than niceties:
 
 - **the announcement** (veto 1) — every agent file written is named in
@@ -42,10 +42,10 @@ def _agent_files_on_disk(root: Path) -> list[str]:
     return sorted(rel for rel in ALL_AGENT_PATHS if (root / rel).exists())
 
 
-# -- the default: all three install ----------------------------------------
+# -- the default: every known vendor installs -------------------------------
 
 
-def test_setup_installs_all_three_by_default(tmp_path):
+def test_setup_installs_every_known_vendor_by_default(tmp_path):
     setup_mod.run(_fresh(tmp_path))
     assert _agent_files_on_disk(tmp_path) == sorted(ALL_AGENT_PATHS)
 
@@ -72,7 +72,7 @@ def test_fux_toml_spells_the_default_out_in_full(tmp_path):
     setup_mod.run(_fresh(tmp_path))
     text = (tmp_path / "fux.toml").read_text(encoding="utf-8")
     assert "[agents]" in text
-    assert 'install = ["claude", "copilot", "kiro"]' in text
+    assert 'install = ["claude", "codex", "copilot", "kiro"]' in text
 
 
 # -- optout (veto condition 1a) --------------------------------------------
@@ -87,7 +87,7 @@ def test_optout_flag_leaves_no_vendor_directory_behind(tmp_path):
     """Not just the files: a bare `.github/` fux created and then did not fill
     is still fux having written into GitHub's namespace."""
     setup_mod.run(_fresh(tmp_path), agents=False)
-    for vendor_dir in (".claude", ".github", ".kiro"):
+    for vendor_dir in (".claude", ".codex", ".github", ".kiro"):
         assert not (tmp_path / vendor_dir).exists(), f"{vendor_dir} was created under --no-agents"
 
 
@@ -283,3 +283,77 @@ def test_the_install_order_does_not_depend_on_the_file(tmp_path):
         '[sources]\n[agents]\ninstall = ["kiro", "claude", "kiro"]\n', encoding="utf-8"
     )
     assert load(root).agents == ("claude", "kiro")
+
+
+# -- codex: decision 3 exercised -------------------------------------------
+
+
+def test_every_known_agent_has_a_rendering():
+    """The two lists are edited in different files. A vendor named in
+    `KNOWN_AGENTS` with no row in `AGENT_FILES` is accepted by `fux.toml`
+    validation and then writes nothing — the silent failure `KNOWN_AGENTS`
+    exists to prevent, arriving through the door it guards."""
+    from fux.config import KNOWN_AGENTS
+
+    assert sorted(setup_mod.AGENT_FILES) == sorted(KNOWN_AGENTS)
+
+
+def test_codex_reuses_the_claude_and_kiro_skill_bytes(tmp_path):
+    """Decision 10, a third and fourth time: Codex CLI implements the same open
+    Agent Skills standard, so agreement is BY CONSTRUCTION — one template, three
+    destinations — not by a conformance test asserting three files still match."""
+    setup_mod.run(_fresh(tmp_path))
+    usage = (tmp_path / ".claude/skills/fux-usage/SKILL.md").read_bytes()
+    decoder = (tmp_path / ".claude/skills/fux-decoder/SKILL.md").read_bytes()
+    assert (tmp_path / ".codex/skills/fux-usage/SKILL.md").read_bytes() == usage
+    assert (tmp_path / ".kiro/skills/fux-usage/SKILL.md").read_bytes() == usage
+    assert (tmp_path / ".codex/skills/fux-decoder/SKILL.md").read_bytes() == decoder
+
+
+def test_codex_gets_no_archived_results_skill(tmp_path):
+    """Decision 9's test: *does an agent that has never heard of Fux still need
+    this sentence to avoid being wrong?* Yes — so it must be ambient, and a
+    skill has to be LOADED to apply. Codex's only ambient surface is the
+    repo-root `AGENTS.md`, which carries the verbatim block."""
+    setup_mod.run(_fresh(tmp_path))
+    assert not (tmp_path / ".codex/skills/fux-archived-results").exists()
+    assert "fux:policy:begin" in (tmp_path / "AGENTS.md").read_text(encoding="utf-8")
+
+
+def test_enrich_ships_to_claude_and_nowhere_else():
+    """ADR-ENRICH decision 10. A skill that writes into a committed directory
+    and changes ranking gets one surface, and adding a vendor must not widen
+    it by inheritance."""
+    elsewhere = [
+        rel
+        for vendor, files in setup_mod.AGENT_FILES.items()
+        for rel, _ in files
+        if "fux-enrich" in rel and vendor != "claude"
+    ]
+    assert elsewhere == []
+
+
+def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
+    """`AGENTS_MD_VENDORS`. The root file is written for a FULL install because
+    a partial declaration names what it wants — true for the three vendors that
+    have their own ambient plane, and false for Codex, whose ambient plane IS
+    this file. Without the clause, `install = ["codex"]` writes two skills and
+    no archived-results policy, and nothing says so."""
+    root = _fresh(tmp_path)
+    (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["codex"]\n', encoding="utf-8")
+    setup_mod.run(root)
+    assert _agent_files_on_disk(root) == [
+        # sorted(): "." < "A", so the vendor paths come first
+        ".codex/skills/fux-decoder/SKILL.md",
+        ".codex/skills/fux-usage/SKILL.md",
+        "AGENTS.md",
+    ]
+
+
+def test_a_partial_declaration_without_codex_writes_no_root_agents_file(tmp_path):
+    """The other half of the clause: it must widen the gate for Codex only, not
+    turn a partial declaration into a full one."""
+    root = _fresh(tmp_path)
+    (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["claude"]\n', encoding="utf-8")
+    setup_mod.run(root)
+    assert not (root / setup_mod.AGENTS_FILE).exists()

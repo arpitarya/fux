@@ -49,7 +49,7 @@ flowchart LR
                                     ask . find . answer  =  THE FACT
                                                         |    (no conclusion)
    fux setup  --> policy + skill files -------------------+--> the agent
-                  (Claude . Copilot . Kiro)              |
+                  (Claude . Codex . Copilot . Kiro)      |
                                                          v
                                         an answer that knows what retired means
 
@@ -63,17 +63,19 @@ flowchart LR
 **What `fux setup` writes, and what it says about it:**
 
 ```console
-$ fux setup
-  wrote fux.toml
+$ fux setup                       # abridged: the usage/decoder/enrich skills
+  wrote fux.toml                  # are written too, one folder each
   wrote .fux/sources/dirs
   wrote .claude/skills/fux-archived-results/SKILL.md
+  wrote .codex/skills/fux-usage/SKILL.md
   wrote .github/agents/fux.agent.md
   wrote .github/instructions/fux-archived-results.instructions.md
   wrote .kiro/steering/fux-archived-results.md
+  wrote AGENTS.md
 
-  note: the last four are OUTSIDE .fux/ — they teach Claude, Copilot and Kiro
-        how to read this index. Turn them off with [agents] install = [] in
-        fux.toml, or `fux setup --no-agents`.
+  note: everything after .fux/sources/dirs is OUTSIDE .fux/ — it teaches
+        Claude, Codex, Copilot and Kiro how to read this index. Turn them off
+        with [agents] install = [] in fux.toml, or `fux setup --no-agents`.
 ```
 
 **The announcement is the safeguard, not a courtesy.** These land in directories
@@ -157,6 +159,16 @@ GitHub Copilot (custom agents **and** ambient instructions), Kiro (steering
 **and** skills). Adding a fourth is a template plus a rendering plus a row —
 **not a new decision.** What *would* reopen this record is a vendor changing its
 format.
+
+⚠ **Amended 2026-09-06: the fourth arrived, and the claim held — with one
+correction.** OpenAI Codex is decision 11 below, and it cost **zero new
+templates**: two rows and two destinations. But *"a template plus a rendering
+plus a row"* was **incomplete** — Codex needed decision 12's gate change as
+well, because it is the first vendor whose only ambient plane is a file this
+record deliberately kept **outside** the per-vendor map. **The set is open by
+construction; the INSTALLER is not quite.** Read decision 3 as *a vendor with
+its own ambient plane* costs a row, and anything else costs a row and a
+question.
 
 **4. Copilot gets an agent and instructions, and they are not alternatives.**
 The **agent** fires when selected or routed to; the **instructions** (`applyTo:`)
@@ -317,18 +329,79 @@ only key in that frontmatter that does. The skill says so in the same breath as
 it introduces it, because an agent that writes one casually retires a live
 document.
 
+**11. OpenAI Codex is the fourth vendor** (2026-09-06). Codex CLI reads project
+skills from `.codex/skills/<name>/SKILL.md` — **the same open Agent Skills
+standard Claude and Kiro implement** — so `USAGE-SKILL.md` and
+`DECODER-SKILL.md` map there from the **same templates, byte for byte**. That is
+decision 10's agreement-by-construction a third and fourth time, and it is why
+this vendor added no file to `templates/agents/`.
+
+⚠ **Codex has no per-file ambient surface** — no `applyTo:`, no inclusion mode.
+Its always-on context is the repo-root `AGENTS.md` and nothing else. So:
+
+| rendering | ships to Codex as | because |
+|---|---|---|
+| the archived-results policy | **`AGENTS.md`**, which already carries the verbatim block | decision 9: *if it has to be loaded to apply, it does not apply* — and a skill is loaded |
+| the operating manual (`fux-usage`) | `.codex/skills/fux-usage/` | consulted while doing a thing |
+| the decoder guide (`fux-decoder`) | `.codex/skills/fux-decoder/` | decision 9a — a committed-write skill gets skill surfaces only |
+| `fux-enrich` | **nothing** | ADR-ENRICH decision 10 stands; a new vendor does not widen it |
+
+**There is deliberately no `.codex/skills/fux-archived-results/`.** Writing one
+would put the policy on a surface that has to be invoked, in the one vendor
+where nothing else covers it.
+
+**12. `AGENTS_MD_VENDORS` — the root file is written for the full set OR for a
+vendor that has no other ambient plane.** `run()` previously wrote the
+vendor-neutral `AGENTS.md` only when `installing == KNOWN_AGENTS`, on W-82
+ruling 16's reasoning: *a partial declaration names what it wants, and a neutral
+file nobody named is not covered by that naming.*
+
+🔴 **That reasoning is sound for three vendors and false for the fourth.**
+`install = ["codex"]` would have written two skills and **no archived-results
+policy at all** — decision 1's silent failure, reintroduced through a config
+line, in the vendor least able to notice. `AGENTS_MD_VENDORS = ("codex",)` names
+the exception, and two tests hold both directions: Codex alone gets the root
+file, and a `["claude"]` declaration still does not.
+
+**13. ⚠ "claude-only" describes what fux WRITES, never what another agent
+READS — and that gap is now real, not theoretical.** GitHub Copilot reads
+project skills from `.github/skills`, `.agents/skills` **and `.claude/skills`**.
+So in any repository where both `claude` and `copilot` install — the default —
+**Copilot loads all four Claude skills, `fux-enrich` included**: the one
+[ADR-ENRICH](0040_enrich.md) decision 10 confined to a single surface.
+
+**Nothing fux can do closes this.** The path is Anthropic's convention, another
+vendor chose to read it, and moving `fux-enrich` out of `.claude/skills/` would
+break it for the vendor it was written for. **Recorded, not fixed.**
+
+⚠ **The exposure is bounded, and saying how is the point.** A Copilot-loaded
+skill is **progressive-disclosure, not ambient**, so decision 9a's actual hazard
+— a committed-write skill entering *every* request — **has not occurred.** What
+changed is only the confinement's reach: it was always a claim about fux's
+writes, and it now has to be read that way rather than as a claim about which
+agents can invoke `fux enrich`.
+
+
 ### Consequences
 
-- ⚠ **Fux owns three third-party formats it does not control.** This is a real
+- ⚠ **Fux owns FOUR third-party formats it does not control.** This is a real
   maintenance liability and it is not hypothetical: **between drafting these
   files and revising them — inside one working session — GitHub's recommended
-  surface moved from instructions to custom agents.** Decisions 2, 7 and 8 are
+  surface moved from instructions to custom agents.** It moved again by
+  2026-09-06: Copilot and Codex both added Agent Skills, which is what made
+  decision 11 cheap and decision 13 true. Decisions 2, 7 and 8 are
   the mitigations; none of them makes the liability go away.
 - **`fux setup` gains a flag** ([ADR-CLI](0002_cli-surface.md)'s surface to
   record) and a second *kind* of output
   ([ADR-DOTFUX](0003_fux-directory.md)'s scaffolding contract to widen). Both
   are amended by this record rather than claimed — **`setup.py` itself stays
   with ADR-DOTFUX, because one component is owned once.**
+- 🔴 **A per-vendor confinement is only as strong as the vendor's read paths,
+  and fux controls none of them.** Decision 13 is the first instance; it will
+  not be the last, because every vendor that adopts Agent Skills has an
+  incentive to read the other vendors' directories too. **Any future record that
+  wants a skill on one surface only must state what it is confining — fux's
+  write, not the reader's reach.**
 - **The policy is prose, and prose is not enforceable.** Fux cannot verify that
   an agent obeyed it. What Fux can do — and decision 2's test does — is
   guarantee every agent was *told the same thing*.
@@ -355,6 +428,8 @@ document.
 | **Opt-in behind a flag** | **drafted this way and overruled.** A flag nobody knows about means the policy layer exists in the product and in no repository, and the failure it prevents is *silent*. The trust concern the flag answered is instead met by decision 6's mandatory announcement plus `--no-agents` |
 | **Generate the renderings from the canonical policy** | a handful of short files do not earn a generator; decision 2's conformance test buys the same guarantee at a fraction of the machinery |
 | **Ship the skills as steering too, "so they always apply"** | rejected under decision 9a: a skill that writes committed code and changes ranking must never enter every request |
+| **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | **not rejected — deferred to a compare doc.** Copilot already reads `.claude/skills` (decision 13), so in the default install this writes a *second* copy of a skill Copilot can already load, with the same `name:`. Whether that collides is **not known**, and shipping on a guess is the failure this project pays for elsewhere. [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md) |
+| **Give Codex its own `AGENTS.md` template** | it already has the right one. `AGENTS.md` is vendor-neutral by W-82 ruling 16 and carries the verbatim block; a Codex-specific copy would be a second rendering of a policy that has exactly one |
 
 ### Reference (required)
 
@@ -377,6 +452,18 @@ document.
 - GitHub Copilot repository custom instructions —
   <https://docs.github.com/en/copilot/how-tos/configure-custom-instructions-in-your-ide/add-repository-instructions-in-your-ide>
 - Kiro steering files and inclusion modes — <https://kiro.dev/docs/steering/>
+- GitHub Copilot agent skills, and the three project-skill directories it reads
+  (`.github/skills`, `.claude/skills`, `.agents/skills`) — the grounding for
+  decisions 11 and 13 —
+  <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
+- Codex CLI skills (`.codex/skills/`) and its `AGENTS.md` relationship — the
+  grounding for decision 11 —
+  <https://developers.openai.com/codex/guides/agents-md>
+- The gate decision 12 changed —
+  [`src/fux/setup.py`](../../src/fux/setup.py) (`AGENTS_MD_VENDORS`, and the
+  `installing == KNOWN_AGENTS or …` branch in `run()`), held by
+  `test_codex_alone_still_gets_the_root_agents_file` and
+  `test_a_partial_declaration_without_codex_writes_no_root_agents_file`.
 
 ### Veto condition
 
@@ -396,6 +483,16 @@ document.
    **An exact match is the only check that can detect it.**
 5. **Fux infers which agents to install from the filesystem** — decision 5 is
    declared-never-derived.
+5a. **A vendor is added to `KNOWN_AGENTS` whose ambient plane fux does not
+   write** — decision 12's failure mode, generalised. `AGENTS_MD_VENDORS` is the
+   list of vendors for which the root file *is* the plane; a fifth vendor with
+   neither its own ambient rendering nor a row there installs skills and no
+   policy, silently. **The question to ask of any new vendor: where does the
+   archived-results block reach it?**
+5b. **`fux-enrich` becomes AMBIENT on any surface, on any vendor** — including
+   through a read path fux does not write (decision 13). The confinement was
+   never about which agent can invoke it; it is about a committed-write skill
+   entering every request. **That, and only that, is the line.**
 6. **An ambient rendering grows.** They enter *every* request in a consumer's
    repository. **Growth is a regression**, because the cost is paid by developers
    who may not be using Fux at that moment — on every prompt, forever.

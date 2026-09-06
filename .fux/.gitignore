@@ -1,8 +1,13 @@
-# Derived planes only: rebuildable from the committed index and the
-# source systems. NEVER add `*` here: `.fux/index/`, `.fux/sources/`,
-# `.fux/fetchers/` and `.fux/decoders/` are committed, and a blanket
-# ignore would drop them
-# from git silently. `fux doctor` checks exactly that.
+# Gitignored planes, BY NAME. NEVER add `*` here: `.fux/index/`,
+# `.fux/sources/`, `.fux/fetchers/` and `.fux/decoders/` are committed,
+# and a blanket ignore would drop them from git silently. `fux doctor`
+# checks exactly that.
+#
+# `runtime/` is DERIVED: rebuildable from the committed index by
+# `fux build`. `acquired/` is not -- it holds the bytes a fetch actually
+# returned, which can only be re-acquired while the source is still
+# reachable. Both are ignored; only one can be regenerated.
 runtime/
+acquired/
 
 .doctor-probe

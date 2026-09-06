@@ -26,6 +26,9 @@ archived_weight         = 1.0   # multiplier for a source declared archived
 superseded_weight       = 1.0   # multiplier for a document another supersedes
 recency_half_life_days  = 0.0   # 0 = off; decays on the committed `mtime`
 rerank_weight           = 0.3   # 0 = off; the proximity reranker's uplift
+# What an agent-supplied `--expand` term is worth against a term you typed.
+# A NO-OP unless a caller passes `--expand`; 0 turns expansion off entirely.
+expand_weight           = 0.2   # Query2doc's 1:5; unmeasured on your corpus
 
 [graph]                         # explain / graph / path
 damping      = 0.85

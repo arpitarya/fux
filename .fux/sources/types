@@ -51,10 +51,9 @@
 # Dockerfile far more often than they are prose.
 #
 # ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
-# format READABLE; a line in this file is what makes it INDEXED, and the
-# binding on that line is what makes it read by a NAMED module. All three are
-# separate on purpose -- what counts as a document stays a committed line a
-# human wrote.
+# format READABLE; a line here is what makes it INDEXED, and the binding on
+# that line is what makes it read by a NAMED module. All three are separate on
+# purpose -- what counts as a document stays a committed line a human wrote.
 #
 #   !*.min.md          # subtract a generated flavour
 #
@@ -68,9 +67,10 @@
 *.rst
 *.txt
 
-# --- decoded: extension -> the module that reads it -----------------------
-# stdlib only, nothing to install. Grouped by decoder; the binding on each
-# line is what dispatch actually resolves.
+# --- decoded: extension -> the module that reads it ---
+# stdlib only, nothing to install. The binding on each line is what
+# dispatch resolves; fux checks it against the module it names.
+
 *.csv decoder=csvdoc
 *.tsv decoder=csvdoc
 
@@ -129,7 +129,7 @@
 # --- OPT-IN ---------------------------------------------------------------
 # Not indexed until you uncomment. Nothing here has a built-in decoder, so a
 # line you uncomment indexes RAW BYTES unless you enable it first by writing a
-# decoder for it and binding it:
+# decoder for it:
 #
 #   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
 #      one there as a worked example; see the fux-decoder skill)

@@ -33,7 +33,6 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 
 | what he decides | filed | age |
 |---|---|---|
-| **The ETag acceptance criterion, re-worded or accepted.** *"`fux update` with a matching ETag performs no body download"* is **unmet as written** — CDP interception is at the **response** stage, so Chrome has already transferred the body; `validate()` saves the decode and the shard comparison, **not bandwidth**. Recorded as [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12 rather than quietly satisfied | 2026-09-01 | 4d |
 | **Whether the W-83 shape gets a gate.** A key was accepted in a record, assigned in the ownership table, and **never implemented** — every mechanical check passed, because the freshness gate proves a record was *touched*, never that it is *true*. That is the **second** recorded occurrence, which is what CLAUDE.md's two-strikes rule makes a trigger. ⚠ **No check was written**: "the record is true" is not mechanically definable, and shipping a loose approximation is the moving-threshold failure in another costume | 2026-09-01 | 4d |
 | 🟢 **W-107 Phase 0 — `log()`: the measurement is FILED and this is now a one-word answer.** [`2026-09-05-node-log-divergence`](regression/2026-09-05-node-log-divergence/report.md): `Math.log` vs `math.log` **do differ** — 655 / 100 000 on darwin/arm64, the same order as the glibc figure W-107 cites — but **every difference is one ulp** (max rel `2.211e-16`) and **none survives `round(9)`**, which is `rank.py`'s own sort-key resolution. Over the corpora: **0 discordant scores, 0 discordant top-5, on 197 233 scored documents at 10 and 10 000 documents.** **(a) portable `log`** buys bit-identity and costs a Python-wide ranking change plus a re-derivation of every golden; **(b) tolerance at `round(9)`** costs nothing and asserts the sort key's own resolution. ⚠ **Two limits were named; ONE IS NOW CLOSED and it moved the number.** [The addendum](regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md) re-probed on **this repo's own 838-document index**, 605 frequency-stratified queries: the `idf` population goes **13 → 182** and **14 of 182 (7.69 %) diverge**, with **8.98 % of real BM25F scores differing bit-for-bit**. 🔴 So the original *"0 discordant"* was an artifact of 13 arguments — **and it changes nothing about the pick**: max relative `5.463e-16`, **0 differ at `round(9)`, 0 top-5 orderings move**. The evidence for **(b)** is stronger than it was, not weaker. 🔴 **The remaining limit is the whole of what is left: glibc — what CI runs — is still NOT measured** (no Linux here). It is one `workflow_dispatch` away — [`.github/workflows/log-probe.yml`](../.github/workflows/log-probe.yml), added 2026-09-05, **not yet run**. [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is written with **this one cell blank**; **W-107 Phase 1 does not start until he fills it** | 2026-09-05 | 0d |
 | 🔴 **W-110's gate: which `k`?** The bar was *`net >= 6` on `recall@k`* and **never fixed `k`**. [The run](regression/2026-09-05-doc2query/report.md) is **net +7 at `recall@1`** (7 up, 0 down) and +3 / +2 / +1 at `@3` / `@5` / `@10` — because `recall@10` is already `0.9884` without enrichment, so the effect is real and **concentrated at the top of the ranking**. **Choosing `k` after seeing the numbers is the moving-threshold failure, so this session did not.** ✅ The `placebo` control moved **nothing at any `k`**, so the gain is the questions' content. ⚠ The doc2query−− filter refused **2 of 98** questions and moved no recall number — **unproven, not disproven** | 2026-09-05 | 0d |
@@ -44,6 +43,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 | **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 8d |
 | **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 8d |
 | **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 9d |
+| 🟢 **W-114 — `.github/skills/` for Copilot, or nothing?** A one-line verdict on [`copilot-skill-surface`](compare/copilot-skill-surface.compare.md). Copilot now reads `.github/skills`, `.agents/skills` **and `.claude/skills`**, so the default install already delivers fux's skills to it — including `fux-enrich`, which [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 10 confined to Claude. **Proposed: C, write nothing new.** 🔴 The crux is unmeasured — duplicate-name behaviour across two skill directories — and C is the only option that does not depend on it. ⚠ C's cost is real: `install = ["copilot"]` alone gets no skills | 2026-09-06 | 0d |
 
 ---
 
@@ -75,6 +75,21 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 ## Open items
 
 ### fux build
+
+- 🟢 **W-113** · `agent` · *(record: [ADR-URL-LIST](../docs/adr/0018_url-list.md) ·
+  [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) ·
+  [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md))* · **`update = auto|never`
+  on a URL line** — whether `fux update` goes out at all, resolved through the
+  same three layers as `keep`/`ttl`/`enrich`. **Filed by Arpit's R-1 ruling,
+  2026-09-05**, as the second half of it: the ETag criterion was accepted as
+  [decision 12](../docs/adr/0020_cdp-fetcher.md) words it (no code), and this
+  is the knob he asked for instead. 🔴 **It buys bandwidth by giving up
+  freshness — it is NOT the ETag saving**, and decision 12 gains the veto
+  condition that re-costs request-stage interception if refresh bandwidth is
+  ever reported as a blocker. ⚠ `ttl=` is **ask-time** and does not reach
+  `fux update`; `update=` takes two words and never a duration, so the two
+  cannot be conflated. — [detail](open/W-113-url-update-policy.md)
+  `filed: 2026-09-05`
 
 - 🟠 **Search v3 — seven items, RATIFIED by Arpit 2026-09-05; all seven now
   `agent`** · *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 ·
@@ -206,6 +221,19 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   worse than the problem.
 
 ### adr update
+
+- ⏳ **W-114** · `arpit` · *(record: [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md))* ·
+  **Copilot's skill surface — rule on the compare doc.** Decision 9a excluded
+  `fux-decoder` from Copilot on a fact that has since expired: *"Copilot has no
+  progressive-disclosure surface"*. It has one now. **The code half of this
+  landed 2026-09-06** — Codex is the fourth vendor (decisions 11–12), and
+  decision 13 records the finding that made the Copilot half a fork rather than
+  a row: **Copilot reads `.claude/skills`**, so it already loads every skill fux
+  writes for Claude, `fux-enrich` included. 🔴 **Nothing fux can do closes
+  that** — the path is Anthropic's convention and another vendor chose to read
+  it. What is owed is one verdict on
+  [`copilot-skill-surface`](compare/copilot-skill-surface.compare.md).
+  `filed: 2026-09-06`
 
 - **`rerank_weight` ships at `0.0`, and every ranking prior `HEAD` added is a
   no-op at the default.** `arpit` ·
