@@ -315,7 +315,7 @@ class WebSocket:
 
 
 # ====================================================================
-# HTML -> Markdown lives in `fux.decode.htmldoc` (W-86 P1), imported below.
+# HTML -> Markdown lives in `fux.decode.html` (W-86 P1), imported below.
 # It used to be duplicated here and in http.py, with a comment asking the
 # two copies to stay identical and nothing checking that they did. Two
 # fetchers converting differently would make the committed index depend on

@@ -19,7 +19,7 @@ import pytest
 
 from fux import decode as decode_mod
 from fux.decode import claims, decode, registry
-from fux.decode.htmldoc import html_to_markdown
+from fux.decode.html import html_to_markdown
 from fux.errors import FuxError
 from fux.ingest.parse import parse_document
 
@@ -165,7 +165,7 @@ def test_a_consumer_decoder_adds_a_new_format(tmp_path):
 def test_a_consumer_decoder_overrides_the_builtin_by_module_name(tmp_path):
     _write_consumer(
         tmp_path,
-        "htmldoc",
+        "html",
         """
         EXTENSIONS = (".html",)
 
@@ -175,8 +175,8 @@ def test_a_consumer_decoder_overrides_the_builtin_by_module_name(tmp_path):
     )
     assert decode(HTML, "x.html", tmp_path) == "# replaced"
     # And the built-in is not consulted at all — not merged, not fallen back to.
-    assert registry(tmp_path)[".html"].name == "htmldoc"
-    assert registry(tmp_path)[".html"].origin.endswith("htmldoc.py")
+    assert registry(tmp_path)[".html"].name == "html"
+    assert registry(tmp_path)[".html"].origin.endswith("html.py")
 
 
 def test_underscore_files_are_helpers_not_decoders(tmp_path):
@@ -192,7 +192,7 @@ def test_a_missing_dependency_fails_loudly_and_names_it(tmp_path):
     """
     _write_consumer(
         tmp_path,
-        "pdfdoc",
+        "pdf",
         """
         import a_library_nobody_has
 

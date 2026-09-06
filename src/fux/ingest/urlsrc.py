@@ -803,7 +803,7 @@ def fetch_all(
 #
 # `fetch(url) -> tuple[bytes, str]` makes it structural. The content type is
 # load-bearing twice: the fetcher is the ONLY thing that ever sees the HTTP
-# charset header (a file on disk has none, which is why `htmldoc` sniffs
+# charset header (a file on disk has none, which is why `html` sniffs
 # `<meta charset>`), and it is what lets a **non-HTML URL reach a decoder at
 # all** — a PDF at a URL was unindexable under the old contract.
 
@@ -931,7 +931,7 @@ def _decode_fetched(
     (2026-08-27). The caller used to write `no decoder for {content_type}` for
     every `None`, which **states a fact that is usually false**: measured against
     `https://httpbin.org/uuid`, fux reported *"no decoder for application/json"*
-    while `jsondoc` was built in, claimed `.json`, ran, and correctly dropped a
+    while `json` was built in, claimed `.json`, ran, and correctly dropped a
     bare UUID — leaving nothing. A reader goes looking for a decoder that is
     already there. `decode.reason()` draws exactly this distinction and its own
     docstring says conflating the two *"would make the queue useless"*; the file

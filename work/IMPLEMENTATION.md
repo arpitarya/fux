@@ -21,42 +21,41 @@ Rules:
 
 ---
 
-## W-114 (code half) — Codex is the fourth agent vendor (2026-09-06)
+## W-114 — the fourth vendor, and `fux-enrich` on every skill surface (2026-09-06)
 
-**Landed, unpushed.** `fux setup` installs for a fourth vendor. Cost: **two
-rows, one new constant, zero new templates** — Codex CLI reads
-`.codex/skills/<name>/SKILL.md`, the same open Agent Skills standard Claude and
-Kiro implement, so the existing `USAGE-SKILL.md` and `DECODER-SKILL.md` bytes
-are valid there unchanged.
+**Landed, unpushed.** Two changes one day apart, recorded together because the
+second is what the first exposed.
 
 | what landed | where |
 |---|---|
-| `codex` in the allowlist | [`src/fux/config.py`](../src/fux/config.py) `KNOWN_AGENTS`, [`config.schema.json`](../src/fux/config.schema.json) |
-| the two renderings | [`src/fux/setup.py`](../src/fux/setup.py) `AGENT_FILES["codex"]` |
-| the root-file gate, widened | `setup.AGENTS_MD_VENDORS` + the `installing == KNOWN_AGENTS or …` branch in `run()` |
-| the written default | `fux.toml` specimen → `install = ["claude", "codex", "copilot", "kiro"]` |
-| six tests | [`tests/test_setup_agents.py`](../tests/test_setup_agents.py) |
-| this repo's own copies | `.codex/skills/fux-usage/` · `.codex/skills/fux-decoder/` — byte-identical to the `.claude/skills` ones, checked |
-| the records | [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) decisions 11-13, veto 5a/5b · [ADR-CONFIG](../docs/adr/0014_config.md) decision 9 · [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) decisions 6 and 9 |
+| `codex` as the fourth vendor; `.codex/skills/{fux-usage,fux-decoder}` | [`config.py`](../src/fux/config.py) `KNOWN_AGENTS` · [`setup.py`](../src/fux/setup.py) `AGENT_FILES` · `config.schema.json` |
+| `AGENTS_MD_VENDORS` — the root file is written for the full set **or** for a vendor with no other ambient plane | [`setup.py`](../src/fux/setup.py) `run()` |
+| `fux-enrich` extended to `.kiro/skills`, `.codex/skills`, `.github/skills` | [`setup.py`](../src/fux/setup.py) `AGENT_FILES` — **zero new templates** |
+| this repo's own copies, all byte-identical to the `.claude` ones | `.codex/skills/{fux-usage,fux-decoder,fux-enrich}` · `.kiro/skills/fux-enrich` · `.github/skills/fux-enrich` |
+| the fork, ruled | [`compare/copilot-skill-surface.compare.md`](compare/copilot-skill-surface.compare.md) — **A**, overruling its own proposed C |
+| the records | [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md) d11-14, veto 5a/5b/5c · [ADR-ENRICH](../docs/adr/0040_enrich.md) d10 · [ADR-CONFIG](../docs/adr/0014_config.md) d9 · [ADR-DOTFUX](../docs/adr/0003_fux-directory.md) d6/d9 |
 
-**Outcome: 173 tests green**, including `test_agent_policy_agreement.py` (the
-verbatim-block conformance) and `test_schemas.py`. ⚠ **Run in the Cowork
-container against a staged copy of the package, not on the MacBook** —
-`device_bash` was wedged for the whole session. The doc-law suites
-(`test_adr_freshness`, `test_adr_ownership`, `test_doc_registry`,
+**Outcome: 175 tests green.** ⚠ **Run in the Cowork container against a staged
+copy of the package** — `device_bash` was wedged all session. The doc-law
+suites (`test_adr_freshness`, `test_adr_ownership`, `test_doc_registry`,
 `test_doc_links`, `test_archive_law`) and `tests_e2e/` were **not run** and are
-owed on the machine before this is committed.
+owed on the machine before commit.
 
-🔴 **The finding is not the vendor, it is decision 13.** GitHub Copilot reads
-`.claude/skills` as well as its own directories, so `fux-enrich`'s claude-only
-confinement ([ADR-ENRICH](../docs/adr/0040_enrich.md) decision 10) describes
-what fux **writes**, never what another agent **reads** — and fux cannot close
-that. The Copilot half of the original table is therefore a **fork**, not a
-row: [`compare/copilot-skill-surface.compare.md`](compare/copilot-skill-surface.compare.md),
-open as **W-114** on Arpit.
+🔴 **The finding is not either change; it is that a record convicted itself and
+nothing happened.** ADR-ENRICH decision 10 carried the sentence *"the gap is
+stated rather than left to be discovered as an inconsistency"* — and the gap
+then persisted, next to `fux-decoder`, **named in the same sentence as the same
+risk class**, which had shipped to three surfaces. **An omission has no test.**
+That is the W-83 shape a third time, and it is now veto 5c plus two tests that
+assert the *rule* (`never ambient`) rather than a roster.
 
-**No ownership-table change**: `.codex/` is consumer output, and
-`src/fux/setup.py` stays with ADR-DOTFUX.
+⚠ **A correction to fux's own filed reasoning**, recorded because the compare
+doc is cited: it called the duplicate-name question *unknown*. It is narrower —
+the copies are **byte-identical by construction**, so dedupe and double-load
+are the same outcome, and only a hard duplicate-name error costs anything.
+
+**Open:** [W-118](OPEN-WORK.md) — whether `fux-decoder` and `fux-usage` also
+get `.github/skills/` rows. Held by a test, not a sentence.
 
 ---
 

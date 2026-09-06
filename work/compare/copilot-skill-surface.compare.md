@@ -2,20 +2,21 @@
 type: Compare Doc
 title: Copilot Skill Surface
 description: Now that Copilot reads Agent Skills, does fux write .github/skills/ for it — or rely on the .claude/skills copy Copilot already reads?
-status: proposed
+status: accepted
 timestamp: 2026-09-06T00:00:00Z
 ---
 
 # Copilot's skill surface — write `.github/skills/`, or don't? — Comparison
 
-> **Verdict: C — write nothing new, and record why** (proposed).
-> **Status:** ⏳ awaiting Arpit · **Confidence:** medium — the deciding fact
-> (whether two same-named skills collide) is **unmeasured**, and B is the
-> option that becomes correct the moment it is.
-> **Reopen when:** either (a) a repository is observed with
-> `install = ["copilot"]` and no `claude`, so nothing writes the skills
-> Copilot can read; or (b) duplicate-name behaviour across `.github/skills`
-> and `.claude/skills` is measured — in **either** direction.
+> **Verdict: A — write `.github/skills/`.** ✅ **Ruled by Arpit 2026-09-06,
+> overruling this document's proposed C.** Shipped for `fux-enrich`; the
+> decoder and usage rows were not asked for and did not ship.
+> **Confidence:** medium-high — see *The crux, corrected* below: the collision
+> this doc called *unknown* is bounded much more tightly than it was written,
+> because the two copies are **byte-identical by construction**.
+> **Reopen when:** Copilot is observed to **error** (not merely double-load) on
+> two project skills sharing a `name:`, in any repository where both
+> `.github/skills/fux-enrich/` and `.claude/skills/fux-enrich/` exist.
 
 ## Context
 
@@ -66,27 +67,49 @@ Two consequences, and they pull opposite ways:
 | reversibility (M) | high — two rows | high | high |
 | standing on a measured fact (H) | no | no | **no** — C's advantage is that it does not need one |
 
-## The crux
+## The crux, corrected
 
-**Nobody knows what two same-named project skills do in Copilot** — dedupe,
-double-load, or an error. The docs name three directories and do not say.
+**As written:** *nobody knows what two same-named project skills do in Copilot
+— dedupe, double-load, or an error*, so A and B ship on a guess and C does not.
 
-A and B both ship on a guess about that. C does not, and that is its whole
-case: it is the option whose correctness does not depend on the unknown.
-**C's cost is a real hole** — `install = ["copilot"]` alone gets an agent file
-and two ambient instruction files and **no skills** — and that hole is the
-reopen-trigger, not a defect to wave away.
+🔴 **That framing overstated the unknown, and the correction is this document's
+own.** The two copies are **byte-identical by construction** — one template,
+N destinations, [ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md)
+decision 10 — so *dedupe* and *double-load* are **the same outcome**: the same
+instructions, once or twice, idempotent either way. The only branch that costs
+anything is a **hard error on duplicate names**, and that is a much narrower
+claim than *unknown behaviour*.
 
-⚠ **Do not resolve this by "just try both and see".** The question is what
-happens in *a consumer's* repository, on *their* Copilot version. A local
-observation is one data point about one build.
+**Against that, C's hole is concrete and certain:** `install = ["copilot"]`
+without `claude` gets an agent file, two ambient instruction files, and **no
+skills at all** — and C is correct only *because* `claude` usually installs,
+which is an assumption about the filesystem that decision 5 refuses by name.
+
+**A certain hole beats a narrow, idempotent-in-two-of-three-branches risk.**
+Ruled A.
+
+⚠ **The residual risk is real and is the reopen-trigger**, and it is still not
+resolvable by *"try it and see"* locally: the question is what happens in *a
+consumer's* repository on *their* Copilot build. What changed is not that the
+unknown was measured — **it was bounded by construction, which is the cheaper
+move and the one this project already relies on for the verbatim block.**
 
 ## Consequences
 
-Under C, `AGENT_FILES["copilot"]` is unchanged and
-[ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 13 is the
-record of why. Under A or B it gains two rows and no template, and decision 9a
-gains an amendment saying its premise changed.
+**Shipped under A:** `AGENT_FILES["copilot"]` gains
+`.github/skills/fux-enrich/SKILL.md` and no template;
+[ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 9a is amended
+(its *"the two skill surfaces — Claude and Kiro"* was a count doing a rule's
+job), decision 14 records the ruling, and decision 13 is marked superseded **in
+effect, not in substance** — the cross-read is unchanged, it is simply no
+longer how Copilot reaches this skill.
+
+⚠ **`fux-decoder` and `fux-usage` did NOT get `.github/skills/` rows.** The
+ruling named `fux-enrich`. That leaves a roster difference between two skills
+of the same risk class — the *inverse* of the asymmetry this session opened by
+finding — and it is held by
+`test_the_two_rosters_differ_only_where_a_record_says_so` rather than by a
+sentence, so closing it is a deliberate act and leaving it is a visible one.
 
 ## References
 
@@ -101,6 +124,7 @@ gains an amendment saying its premise changed.
 
 ## Reopen-trigger
 
-See the verdict block. Both halves are conditions checkable today: a
-`copilot`-without-`claude` declaration in any repository fux is installed in,
-or a measurement of duplicate-name behaviour.
+See the verdict block: **an observed duplicate-name error**, not a double-load.
+Checkable today by anyone with both directories populated. ⚠ The
+`copilot`-without-`claude` half of the original trigger is **retired** — A is
+what closes that hole, so it can no longer fire.

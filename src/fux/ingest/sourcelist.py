@@ -223,8 +223,8 @@ def _ttl_reason(raw: str) -> str | None:
     return None if parse_duration(raw) is not None else _TTL_HELP
 
 
-#: A decoder name is a MODULE STEM -- `csvdoc`, never `csvdoc.py` and never
-#: `.fux/decoders/csvdoc.py`. It is the same key ADR-DECODE decision 5 resolves
+#: A decoder name is a MODULE STEM -- `csv`, never `csv.py` and never
+#: `.fux/decoders/csv.py`. It is the same key ADR-DECODE decision 5 resolves
 #: an override on, so a binding and an override cannot disagree about what they
 #: are naming.
 _DECODER_NAME_RE = re.compile(r"[a-z0-9][a-z0-9_]*")

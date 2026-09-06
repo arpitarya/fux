@@ -5,6 +5,7 @@ import pytest
 from fux.ingest.extract import extract_fields
 from fux.ingest.parse import parse
 from fux.query.bm25f import derive_wlen
+from fux.query.tokenize import tokenize
 
 
 def test_title_from_frontmatter():
@@ -98,3 +99,36 @@ def test_extraction_is_deterministic():
     a = extract_fields("a.md", doc)
     b = extract_fields("a.md", doc)
     assert a == b
+
+
+def test_a_fenced_hash_comment_is_not_mined_as_a_heading():
+    """W-115: `^#{1,6}` cannot see a code fence, so `# Install dependencies`
+    inside a ```bash block was given heading-field weight and published in
+    `phrases`, where `fux ask` renders it as a `§` line. Every ADR in this
+    repository contains such a block."""
+    body = "# Retention\n\nProse.\n\n```bash\n# Install dependencies\nuv sync\n```\n"
+    out = extract_fields("docs/adr/retention.md", parse(body.encode("utf-8")))
+    assert out.phrases == ["Retention"]
+    assert out.title == "Retention"
+
+
+def test_a_fenced_hash_comment_stays_in_the_body_field():
+    """It was stripped out of `body` as well as counted as a heading — so the
+    words a reader can see were words the index could not."""
+    body = "# Retention\n\nProse.\n\n```bash\n# Install dependencies\nuv sync\n```\n"
+    out = extract_fields("docs/adr/retention.md", parse(body.encode("utf-8")))
+    body_i = 0  # store.TF_FIELDS order: (body, heading, title, path, ctx)
+    for word in ("install", "dependencies"):
+        (term,) = tokenize(word)
+        assert out.terms[term][body_i] == 1, f"{word} left the body field"
+
+
+def test_a_real_heading_is_still_kept_out_of_the_body_field():
+    """The other half of the same rule: a genuine heading is counted once as
+    `heading` and must not be counted again as `body`."""
+    body = "# Retention\n\nUnrelated prose.\n"
+    out = extract_fields("docs/x.md", parse(body.encode("utf-8")))
+    body_i, heading_i = 0, 1
+    (term,) = tokenize("retention")
+    assert out.terms[term][heading_i] == 1
+    assert out.terms[term][body_i] == 0

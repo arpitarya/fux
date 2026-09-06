@@ -38,6 +38,19 @@ EXTENSIONS = (".json",)
 #: machine-generated and repetitive, which is the shape verdict G punished.
 MAX_DEPTH = 6
 
+#: Depth past which a key stops being a HEADING and becomes bold body text.
+#: The key is still indexed and still searchable — what it stops doing is
+#: claiming a section.
+#:
+#: ⚠ **Why a second, shallower cap.** A heading is a section boundary to
+#: `refer/_chunk.py` and a `phrases` entry to `ingest/extract.py`. Emitting one
+#: per key at every level turned a 200-key payload into 200 sections, almost
+#: all of them under the passage floor and all merged straight back together —
+#: and it filled the record's twelve `phrases` slots with fifth-level keys
+#: while the top-level structure that names the document never made it in.
+#: Two levels is what a reader would call the outline of a config file.
+MAX_HEADING_DEPTH = 2
+
 #: Below this, a string is a label, an enum, an id — not prose. Two characters
 #: would admit every `"y"`/`"no"` flag in every config in the corpus.
 MIN_PROSE_LEN = 3
@@ -71,7 +84,7 @@ def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
         return
     if isinstance(node, dict):
         if label:
-            out.append("#" * min(depth, 6) + " " + label)
+            out.append(_label(label, depth))
         # Sorted, not insertion order. `json.loads` preserves document order,
         # so insertion order would be stable for one file — but two exports of
         # the same data with keys emitted differently would decode differently,
@@ -81,13 +94,25 @@ def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
         return
     if isinstance(node, list):
         if label:
-            out.append("#" * min(depth, 6) + " " + label)
+            out.append(_label(label, depth))
         for item in node:
             _walk(item, out, depth=depth + 1, label=None)
         return
     text = _prose(node)
     if text:
         out.append(f"**{label}:** {text}" if label else text)
+
+
+def _label(label: str, depth: int) -> str:
+    """A container key: a heading near the top, bold body text below it.
+
+    Shared by `jsonldoc`, `xmldoc` and `yamldoc` — they import it for the same
+    reason they import `_prose`, so one judgement about what deserves a section
+    covers every nested key/value format fux reads.
+    """
+    if depth <= MAX_HEADING_DEPTH:
+        return "#" * min(depth, 6) + " " + label
+    return f"**{label}**"
 
 
 def _prose(value) -> str:

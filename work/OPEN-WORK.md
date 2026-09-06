@@ -43,7 +43,10 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 | **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 8d |
 | **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 8d |
 | **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 9d |
-| 🟢 **W-114 — `.github/skills/` for Copilot, or nothing?** A one-line verdict on [`copilot-skill-surface`](compare/copilot-skill-surface.compare.md). Copilot now reads `.github/skills`, `.agents/skills` **and `.claude/skills`**, so the default install already delivers fux's skills to it — including `fux-enrich`, which [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 10 confined to Claude. **Proposed: C, write nothing new.** 🔴 The crux is unmeasured — duplicate-name behaviour across two skill directories — and C is the only option that does not depend on it. ⚠ C's cost is real: `install = ["copilot"]` alone gets no skills | 2026-09-06 | 0d |
+| 🔴 **W-119 — `git rm` 38 stale decoder files.** 🔴 **MEASURED: all 36 extensions currently dispatch to the STALE `*doc` module**, so W-115's fixes and the rename are both inert in this repo right now — the new files are dead weight. A clean `pip install` meeting stale `.fux/decoders/` is worse: a **hard `FuxError`** on the first `registry()` call, because 7 stale copies import `fux.decode.<old>` which no longer ships. Fix: `git rm src/fux/decode/*doc.py .fux/decoders/*doc.py`. ⚠ No session tool can delete files — wedged shell, and the file bridge writes only | 2026-09-06 | 0d |
+| 🔴 **W-115 — run the suite and commit the chunking change.** 27 files written 2026-09-06 and **verified only in the Cowork container** (183 green against a staged copy). `device_bash` was wedged, so `tests_e2e`, `ruff`, the ADR freshness gate and every `git` command are unrun. **This is hands, not a decision** | 2026-09-06 | 0d |
+| 🔴 **W-116 — the chunking change re-ranked the corpus unmeasured**, on his own 2026-09-06 ruling that a defect fix does not wait on a measurement. Recorded as unmeasured in ADR-DECODE, ADR-REFER and ADR-EXTRACTED. Blocked behind **W-56** (`fux-lab` does not exist); here so the gap is not forgotten | 2026-09-06 | 0d |
+| ⚪ **W-118 — do `fux-decoder` and `fux-usage` get `.github/skills/` too?** W-114 ruled **A** and shipped `fux-enrich` there, because that is what was named. The other two reach Copilot only through the `.claude/skills` cross-read (ADR-AGENT-POLICY decision 13), which is not a surface fux writes. **Doing nothing is legitimate** — the asymmetry is recorded and held by `test_the_two_rosters_differ_only_where_a_record_says_so`, so it cannot go quiet the way `fux-enrich`'s did. Two rows if yes | 2026-09-06 | 0d |
 
 ---
 
@@ -139,6 +142,58 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 
 ### testing
 
+- 🔴 **W-119** · `arpit` · *(record: [ADR-DECODE](../docs/adr/0042_decode.md)
+  decision 17)* · **the decoder rename is written and the old files are still
+  there.** `csvdoc.py` -> `csv.py` for all nineteen, verified not to shadow the
+  stdlib on either load path (built-in registers as `fux.decode.json`; a
+  consumer copy loads as `fux_decoder_json` and never enters `sys.modules`).
+  **56 files written; 38 must be deleted and this session had no way to delete
+  them** — `device_bash` wedged, the file bridge writes only. Until
+  `git rm src/fux/decode/*doc.py .fux/decoders/*doc.py` runs, the stale
+  consumer copies **win** over the new ones and this repo decodes with the old
+  modules. `tests/test_orphaned_modules.py` fails naming each stale module,
+  which is the gate — for the shipped half only. ⚠ **No migration exists for
+  anyone else**, by Arpit's ruling the same day; decision 17 records that
+  rather than implying the upgrade is passive. Filed 2026-09-06
+
+- 🔴 **W-115** · `arpit` · *(records: [ADR-DECODE](../docs/adr/0042_decode.md)
+  14-16 · [ADR-REFER](../docs/adr/0030_refer-plane.md) 23-25 ·
+  [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) decision 8)* · **the
+  chunking change is written and UNVERIFIED on the real machine.** 27 files
+  written 2026-09-06: one heading grammar (`decode/_markdown.py`, fence-aware,
+  read by both `extract.py` and `refer/_chunk.py`), decoding on the citation
+  path, table banding, and heading skeletons for pdf/rtf/csv/jsonl/mbox.
+  **183 tests pass in the Cowork container** against a staged copy of the
+  package — which is not the suite. ⚠ **Not run:** `tests_e2e/`, `ruff`,
+  `tests/test_adr_freshness.py`, `tests/test_adr_ownership.py`,
+  `tests/test_doc_registry.py`, `tests/decode/test_consumer_copies.py`.
+  `device_bash` was wedged all session (the VM-won't-boot shape recorded in
+  [`MACHINE.md`](MACHINE.md) the same morning), so no `git` ran either.
+  **Closes when `uv run pytest -q tests tests_e2e` is green on the MacBook and
+  the change is committed** — the `.fux/decoders/` mirrors are already
+  byte-identical, so `test_consumer_copies` should pass, but should is not a
+  test result. Filed 2026-09-06
+
+- 🔴 **W-116** · `arpit` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+  **W-115 re-ranked the corpus and NOTHING was measured.** Two populations
+  moved: every document containing a fenced code block (the fence fix — in this
+  repo, most of them), and every document of the formats whose decoder gained a
+  heading skeleton or a depth cap. Arpit ruled on 2026-09-06 that these land as
+  **defect fixes** rather than wait on a measurement — a `# comment` in a bash
+  block was never a heading — and that ruling is recorded in all three ADRs.
+  ⚠ **What it does not do is make them measured**, and no doc may cite them as
+  such. A measurement needs `fux-lab`, which does not exist (**W-56**), so this
+  row is blocked behind that one and is here to stop the gap being forgotten
+  rather than to be worked next. Filed 2026-09-06
+
+- ✅ **W-117 — CLOSED 2026-09-06, and its filing was wrong.** It said the
+  `.pptx` slide floor was *"a tuning question… doing nothing is legitimate"*.
+  Two more instances then turned up — six small `.jsonl` records collapsing to
+  one passage, and any short band of a small table — and three instances of one
+  shape is a defect, not a knob. Fixed in `_chunk._sibling_run` under W-120;
+  [ADR-REFER](../docs/adr/0036_refer-plane.md) decision 26 records the reversal.
+  Removed from the list once the outcome reaches IMPLEMENTATION.md.
+
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·
   [ADR-RS](../docs/adr/0036_predictions.md))* · **the knob sweep — which
   `.fux/tune.toml` defaults are defensible, measured rather than argued.**
@@ -221,19 +276,6 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   worse than the problem.
 
 ### adr update
-
-- ⏳ **W-114** · `arpit` · *(record: [ADR-AGENT-POLICY](../docs/adr/0035_agent-policy.md))* ·
-  **Copilot's skill surface — rule on the compare doc.** Decision 9a excluded
-  `fux-decoder` from Copilot on a fact that has since expired: *"Copilot has no
-  progressive-disclosure surface"*. It has one now. **The code half of this
-  landed 2026-09-06** — Codex is the fourth vendor (decisions 11–12), and
-  decision 13 records the finding that made the Copilot half a fork rather than
-  a row: **Copilot reads `.claude/skills`**, so it already loads every skill fux
-  writes for Claude, `fux-enrich` included. 🔴 **Nothing fux can do closes
-  that** — the path is Anthropic's convention and another vendor chose to read
-  it. What is owed is one verdict on
-  [`copilot-skill-surface`](compare/copilot-skill-surface.compare.md).
-  `filed: 2026-09-06`
 
 - **`rerank_weight` ships at `0.0`, and every ranking prior `HEAD` added is a
   no-op at the default.** `arpit` ·

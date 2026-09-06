@@ -13,16 +13,24 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
+from ..decode._markdown import headings as _md_headings
+from ..decode._markdown import strip_headings as _md_strip_headings
 from ..query.tokenize import tokenize
 from .parse import ParsedDoc
 
 MAX_PHRASES = 12  # headings only, not headings + first-sentence — the simpler
 # of the handoff's two open options (§10), picked and recorded here / ADR-RECORD.
 
-#: Markdown, and the default for every type without its own grammar.
-#: The `text` group name is shared by all four patterns so the caller
-#: never branches on which one matched.
-_HEADING_RE = re.compile(r"^(#{1,6})\s+(?P<text>.+?)\s*$", re.MULTILINE)
+#: Markdown is NOT here. Its grammar moved to `decode/_markdown.py` on
+#: 2026-09-06, because a regex cannot see a code fence and this one did not:
+#: a `# Install dependencies` line inside a ```bash block was counted as a
+#: heading, given heading-field weight, published in `phrases` where `fux ask`
+#: renders it as a `§` line, and **removed from the body**. Every ADR in this
+#: repository contains such a block. `refer/_chunk.py` reads the same module,
+#: so the two planes can no longer disagree about what a heading is.
+#:
+#: The `text` group name is still shared by all three patterns below, so the
+#: caller never branches on which one matched.
 
 # -- W-86 P0: the three allowed types whose headings reached nothing ---------
 #
@@ -51,9 +59,16 @@ _ADOC_RE = re.compile(r"^(={1,6})\s+(?P<text>\S[^\n]*?)\s*$", re.MULTILINE)
 #: line reads as a heading, which is the false-positive this format invites.
 _ORG_RE = re.compile(r"^(\*{1,6})[ \t]+(?P<text>\S[^\n]*?)\s*$", re.MULTILINE)
 
-#: extension -> its heading pattern. Markdown's is applied to everything else,
-#: including `.txt`, because a `#` line in a text file is a heading by intent
-#: far more often than it is prose.
+#: extension -> its heading pattern. A `None` result means Markdown, which is
+#: applied to everything else — including `.txt`, because a `#` line in a text
+#: file is a heading by intent far more often than it is prose, and including
+#: every decoded document, which is Markdown by construction (ADR-DECODE
+#: decision 2).
+#:
+#: ⚠ **These three keep regexes and get no fence handling.** Their heading
+#: syntax is not Markdown's and neither is their code-block convention (`::`
+#: plus indentation, `----`, `#+BEGIN_SRC`). Bringing them under one scanner is
+#: a separate change with its own risk, and no decoder emits them.
 _GRAMMARS: dict[str, re.Pattern] = {
     ".rst": _RST_RE,
     ".adoc": _ADOC_RE,
@@ -62,11 +77,29 @@ _GRAMMARS: dict[str, re.Pattern] = {
 }
 
 
-def _grammar(rel_path: str) -> re.Pattern:
+def _grammar(rel_path: str) -> re.Pattern | None:
     dot = rel_path.rfind(".")
     slash = max(rel_path.rfind("/"), rel_path.rfind("\\"))
     ext = rel_path[dot:].lower() if dot > slash + 1 else ""
-    return _GRAMMARS.get(ext, _HEADING_RE)
+    return _GRAMMARS.get(ext)
+
+
+def _headings_and_body(rel_path: str, body: str) -> tuple[list[str], str]:
+    """The document's headings, and the body with those lines removed.
+
+    Two returns from one call because they must agree: whatever counted as a
+    heading has to be the thing taken out of the body, or a heading's words are
+    counted twice — once as `heading` tf and once as `body` tf — and *heading
+    match outranks body match* stops meaning anything.
+    """
+    grammar = _grammar(rel_path)
+    if grammar is None:
+        found = _md_headings(body)
+        return [h.text for h in found], _md_strip_headings(body)
+    return (
+        [m.group("text").strip() for m in grammar.finditer(body)],
+        grammar.sub("", body),
+    )
 
 
 @dataclass(frozen=True)
@@ -87,8 +120,7 @@ def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extra
     # W-86 P0: the heading grammar follows the file type. A decoded document
     # always arrives as Markdown (ADR-DECODE decision 2), so only an
     # already-prose `.rst`/`.adoc`/`.org` takes a different pattern.
-    grammar = _grammar(rel_path)
-    headings = [m.group("text").strip() for m in grammar.finditer(doc.body)]
+    headings, stripped_body = _headings_and_body(rel_path, doc.body)
     title = _title(doc.meta, headings, rel_path)
     phrases = headings[:MAX_PHRASES]
 
@@ -98,8 +130,9 @@ def extract_fields(rel_path: str, doc: ParsedDoc, enrichment: str = "") -> Extra
     heading_tokens = tokenize(" ".join(headings))
     # Strip heading lines out of body text too — without this a heading's
     # words would count twice: once as heading tf, once as body tf, diluting
-    # "heading match outranks body match".
-    body_tokens = tokenize(grammar.sub("", doc.body))
+    # "heading match outranks body match". `_headings_and_body` did the strip
+    # with the same grammar that found them, so the two cannot disagree.
+    body_tokens = tokenize(stripped_body)
     title_tokens = tokenize(title)
     # Path segments and the split filename — "where is X" queries. The
     # analyzer's identifier splitting does the work here: `docs/adr-storage.md`

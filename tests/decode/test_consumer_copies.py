@@ -60,7 +60,7 @@ def test_every_copied_decoder_loads_standalone(repo: Path):
 
 
 def test_the_copy_runs_not_the_packaged_module(repo: Path):
-    marker = repo / ".fux" / "decoders" / "htmldoc.py"
+    marker = repo / ".fux" / "decoders" / "html.py"
     source = marker.read_text()
     marker.write_text(
         source.replace(
@@ -75,21 +75,21 @@ def test_the_copy_runs_not_the_packaged_module(repo: Path):
 def test_a_deleted_copy_falls_back_to_the_packaged_module(repo: Path):
     """Deleting a decoder must not remove the format — it restores the built-in.
 
-    Without this, `rm .fux/decoders/pdfdoc.py` would silently stop indexing every
+    Without this, `rm .fux/decoders/pdf.py` would silently stop indexing every
     PDF in the corpus, which looks identical to a corpus that has no PDFs.
     """
-    (repo / ".fux" / "decoders" / "htmldoc.py").unlink()
+    (repo / ".fux" / "decoders" / "html.py").unlink()
     out = decode(b"<h1>Still here</h1>", "a.html", repo)
     assert out is not None and "Still here" in out
     assert registry(repo)[".html"].origin.startswith("built-in:")
 
 
 def test_setup_never_overwrites_an_edited_decoder(repo: Path):
-    edited = repo / ".fux" / "decoders" / "jsondoc.py"
+    edited = repo / ".fux" / "decoders" / "json.py"
     edited.write_text("EXTENSIONS = ('.json',)\ndef decode(raw, rel_path):\n    return '# mine'\n")
     report = setup_mod.run(repo, agents=False)
     assert edited.read_text().endswith("return '# mine'\n")
-    assert ".fux/decoders/jsondoc.py" in report.kept
+    assert ".fux/decoders/json.py" in report.kept
 
 
 def test_the_decoders_directory_is_declared(repo: Path):

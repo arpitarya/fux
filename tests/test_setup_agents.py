@@ -114,10 +114,11 @@ def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["kiro"]\n', encoding="utf-8")
     setup_mod.run(root)
     assert _agent_files_on_disk(root) == [
-        # W-86 P7: `fux-decoder` ships to the two SKILL surfaces and to neither
-        # ambient one. A Kiro skill is progressive-disclosure; only Kiro
-        # *steering* enters every interaction.
+        # W-86 P7: the committed-write skills ship to the SKILL surface and to
+        # neither ambient one. A Kiro skill is progressive-disclosure; only
+        # Kiro *steering* enters every interaction.
         ".kiro/skills/fux-decoder/SKILL.md",
+        ".kiro/skills/fux-enrich/SKILL.md",
         ".kiro/skills/fux-usage/SKILL.md",
         ".kiro/steering/fux-archived-results.md",
     ]
@@ -308,6 +309,9 @@ def test_codex_reuses_the_claude_and_kiro_skill_bytes(tmp_path):
     assert (tmp_path / ".codex/skills/fux-usage/SKILL.md").read_bytes() == usage
     assert (tmp_path / ".kiro/skills/fux-usage/SKILL.md").read_bytes() == usage
     assert (tmp_path / ".codex/skills/fux-decoder/SKILL.md").read_bytes() == decoder
+    enrich = (tmp_path / ".claude/skills/fux-enrich/SKILL.md").read_bytes()
+    for rel in (".codex/skills", ".kiro/skills", ".github/skills"):
+        assert (tmp_path / rel / "fux-enrich/SKILL.md").read_bytes() == enrich, rel
 
 
 def test_codex_gets_no_archived_results_skill(tmp_path):
@@ -320,17 +324,70 @@ def test_codex_gets_no_archived_results_skill(tmp_path):
     assert "fux:policy:begin" in (tmp_path / "AGENTS.md").read_text(encoding="utf-8")
 
 
-def test_enrich_ships_to_claude_and_nowhere_else():
-    """ADR-ENRICH decision 10. A skill that writes into a committed directory
-    and changes ranking gets one surface, and adding a vendor must not widen
-    it by inheritance."""
-    elsewhere = [
-        rel
-        for vendor, files in setup_mod.AGENT_FILES.items()
-        for rel, _ in files
-        if "fux-enrich" in rel and vendor != "claude"
+def test_enrich_ships_to_every_skill_surface_and_no_ambient_one():
+    """ADR-ENRICH decision 10, as amended 2026-09-06. The rule is **never
+    ambient** — it was never *claude only*, and shipping to Claude alone was an
+    omission the record had already flagged against itself.
+
+    What this asserts is the rule, not the roster: `ENRICH-SKILL.md` reaches
+    every `skills/` destination and **no** ambient one. Add a fifth vendor with
+    a skill surface and this test tells you the row is missing; add one with an
+    ambient rendering and it tells you the row is illegal."""
+    dests = [
+        rel for files in setup_mod.AGENT_FILES.values() for rel, tpl in files
+        if tpl == "ENRICH-SKILL.md"
     ]
-    assert elsewhere == []
+    assert sorted(dests) == [
+        ".claude/skills/fux-enrich/SKILL.md",
+        ".codex/skills/fux-enrich/SKILL.md",
+        ".github/skills/fux-enrich/SKILL.md",
+        ".kiro/skills/fux-enrich/SKILL.md",
+    ]
+    # the rule, stated mechanically: no ambient surface, on any vendor
+    for rel in dests:
+        assert "/skills/" in rel, rel
+        assert "instructions" not in rel and "steering" not in rel, rel
+
+
+def test_no_committed_write_skill_reaches_an_ambient_surface():
+    """The rule both committed-write skills actually live under, asserted once
+    over both of them rather than per-roster.
+
+    `fux-decoder` and `fux-enrich` are named in ONE sentence as ONE risk class:
+    they write into a committed directory and change ranking, so **neither may
+    ever be ambient on any vendor**. A skill folder is progressive-disclosure
+    everywhere; `instructions/` (`applyTo: "**"`) and `steering/`
+    (`inclusion: always`) are not."""
+    for template in ("ENRICH-SKILL.md", "DECODER-SKILL.md"):
+        dests = [
+            rel for files in setup_mod.AGENT_FILES.values() for rel, tpl in files
+            if tpl == template
+        ]
+        assert dests, template
+        for rel in dests:
+            assert "/skills/" in rel, f"{template} -> {rel}"
+
+
+def test_the_two_rosters_differ_only_where_a_record_says_so():
+    """⚠ **A known, recorded asymmetry** — not a free-floating difference.
+    `fux-enrich` reaches `.github/skills/` and `fux-decoder` does not, because
+    Arpit's 2026-09-06 ruling named `fux-enrich`. Both are legal under the rule
+    above; only one was asked for.
+
+    **This test exists so the gap cannot go quiet the way the last one did** —
+    `fux-enrich` shipped to one surface for a year while its twin shipped to
+    three, and nothing failed. Close it by adding the decoder row, and this
+    test tells you to delete its exception."""
+    def surfaces(template):
+        return {
+            rel.rsplit("/", 2)[0]
+            for files in setup_mod.AGENT_FILES.values()
+            for rel, tpl in files
+            if tpl == template
+        }
+
+    assert surfaces("ENRICH-SKILL.md") - surfaces("DECODER-SKILL.md") == {".github/skills"}
+    assert surfaces("DECODER-SKILL.md") - surfaces("ENRICH-SKILL.md") == set()
 
 
 def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
@@ -345,6 +402,7 @@ def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
     assert _agent_files_on_disk(root) == [
         # sorted(): "." < "A", so the vendor paths come first
         ".codex/skills/fux-decoder/SKILL.md",
+        ".codex/skills/fux-enrich/SKILL.md",
         ".codex/skills/fux-usage/SKILL.md",
         "AGENTS.md",
     ]

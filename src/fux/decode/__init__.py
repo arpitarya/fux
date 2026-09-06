@@ -70,35 +70,59 @@ __all__ = [
 #: the same module name. Committed — it is consumer source, like `.fux/fetchers/`.
 CONSUMER_DIR = ".fux/decoders"
 
-#: Built-in decoder modules, by module name. **Sorted and explicit rather than
-#: discovered by scanning the directory**: a directory listing is filesystem
-#: order, and a plane whose dispatch depends on filesystem order is a plane
-#: whose committed index depends on it too (L3).
+#: Built-in decoder modules, by module name.
 #:
-#: The `doc` suffix keeps `json`, `csv`, `xml` and `yaml` from shadowing the
-#: stdlib module a reader is about to see imported one line below. Python 3's
-#: absolute imports make the bare names technically safe; the suffix costs
-#: three characters and removes the question.
+#: ⚠ **The `doc` suffix was dropped on 2026-09-06** (Arpit): `csvdoc` -> `csv`,
+#: `jsondoc` -> `json`, and so on for all nineteen. The comment that stood here
+#: said the suffix kept `json`, `csv`, `xml` and `yaml` from shadowing the
+#: stdlib module imported one line below, while conceding the bare names were
+#: "technically safe". **They are, and it was measured before the rename, not
+#: assumed** — both load paths, because they differ:
+#:
+#: * a **built-in** is `importlib.import_module(".json", "fux.decode")`, so it
+#:   registers as `fux.decode.json` and Python 3's absolute imports give the
+#:   file's own `import json` the stdlib module;
+#: * a **consumer copy** is loaded from a path under the name
+#:   `fux_decoder_json` (see `_load_consumer`), never as `json`, and is not put
+#:   in `sys.modules` at all.
+#:
+#: `sys.modules["json"]` is the stdlib module in both cases. The four names that
+#: now collide with popular PyPI distributions rather than the stdlib — `docx`,
+#: `pptx`, `yaml`, `toml` — are safe by the same two mechanisms, and were kept
+#: uniform deliberately rather than made four exceptions to a one-line rule.
+#:
+#: 🔴 **The rename is NOT backward compatible, and no migration was written**
+#: (Arpit's call, same day). A repo that ran `fux setup` before it has stale
+#: `<name>doc.py` files in `.fux/decoders/`; those still claim the same
+#: extensions and **win** over the new copies, so that repo keeps running the
+#: old decoders until the stale files are deleted. `tests/test_orphaned_modules.py`
+#: catches the shipped half of this — an old module left in `src/fux/decode/`
+#: is unreachable from `BUILTIN_MODULES` and fails the run — but **nothing
+#: reaches a consumer's `.fux/decoders/`.** ADR-DECODE decision 17.
+#:
+#: Sorted and explicit rather than discovered by scanning the directory: a
+#: directory listing is filesystem order, and a plane whose dispatch depends on
+#: filesystem order is a plane whose committed index depends on it too (L3).
 BUILTIN_MODULES: tuple[str, ...] = (
-    "csvdoc",
-    "docxdoc",
-    "drawiodoc",
-    "htmldoc",
-    "imagedoc",
-    "inidoc",
-    "ipynbdoc",
-    "jsondoc",
-    "jsonldoc",
-    "maildoc",
-    "odtdoc",
-    "pdfdoc",
-    "pptxdoc",
-    "rtfdoc",
-    "svgdoc",
-    "tomldoc",
-    "xlsxdoc",
-    "xmldoc",
-    "yamldoc",
+    "csv",
+    "docx",
+    "drawio",
+    "html",
+    "image",
+    "ini",
+    "ipynb",
+    "json",
+    "jsonl",
+    "mail",
+    "odt",
+    "pdf",
+    "pptx",
+    "rtf",
+    "svg",
+    "toml",
+    "xlsx",
+    "xml",
+    "yaml",
 )
 
 
@@ -229,7 +253,7 @@ def registry(root: Path | None = None) -> dict[str, Decoder]:
        hard error, and so is one that takes an extension away from the decoder
        that claims it and gives it to a module that does not. **Giving a
        decoder an extension nothing else claims is allowed** — that is how a
-       consumer reads `.geojson` with `jsondoc` without copying a file. See
+       consumer reads `.geojson` with `json` without copying a file. See
        `_bind`.
 
     ⚠ **Step 3 is why dispatch is a committed fact rather than a derived one.**
@@ -281,14 +305,14 @@ def _bind(
     module verifies is narrower than "the extension is in its `EXTENSIONS`",
     and the distinction is the whole of this function:
 
-    * **Extending — allowed.** `*.geojson decoder=jsondoc`, where *no decoder
+    * **Extending — allowed.** `*.geojson decoder=json`, where *no decoder
       claims `.geojson`*. There is no competing answer to be stale against:
       without the line that extension has no decoder at all, so the binding is
       purely additive. **`EXTENSIONS` is a decoder's DEFAULT CLAIM, not a
       declaration of what it is capable of reading** — a `.geojson` is JSON,
-      and requiring a consumer to copy `jsondoc.py` and edit one tuple to say
+      and requiring a consumer to copy `json.py` and edit one tuple to say
       so would make the map a worse answer than the code it replaced.
-    * **Redirecting — refused.** `*.csv decoder=jsondoc`, where `csvdoc`
+    * **Redirecting — refused.** `*.csv decoder=json`, where `csv`
       already claims `.csv`. Now there are two answers and the line picks the
       module that does not want the extension. That is a typo or a stale
       binding far more often than it is intent, and it is the shape that
@@ -332,7 +356,7 @@ def _bound_extension(pattern: str) -> str | None:
 
     A binding is per **extension**, because that is the only key dispatch has:
     `decode()` sees a path's suffix and nothing about which glob admitted it.
-    So `docs/api/*.json decoder=jsondoc` cannot mean what it appears to — it
+    So `docs/api/*.json decoder=json` cannot mean what it appears to — it
     would bind every `.json` in the corpus, not the ones under `docs/api` —
     and is refused rather than silently widened.
     """

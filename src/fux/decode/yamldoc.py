@@ -35,7 +35,7 @@ import re
 # `from . import _xml` raises `attempted relative import with no known parent
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (ADR-DECODE decision 11).
-from fux.decode.jsondoc import _prose
+from fux.decode.jsondoc import _label, _prose
 
 EXTENSIONS = (".yaml", ".yml")
 
@@ -109,7 +109,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         depth = _indent(line) // 2 + 1
         if not value:
             if key:
-                out.append("#" * min(depth, MAX_DEPTH) + " " + key)
+                out.append(_label(key, min(depth, MAX_DEPTH)))
         else:
             prose = _prose(value) or value if len(value) >= 3 else ""
             if prose:

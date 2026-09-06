@@ -57,6 +57,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from ..decode import DecodeFailed
+from ..decode import decode as _decode_bytes
 from . import arc as arc_mod
 from . import fetchcache as fetchcache_mod
 from . import freshness as freshness_mod
@@ -71,7 +73,7 @@ from .freshness import (
 )
 from ._rescore import ScoredPassage, rescore
 from ..errors import FuxError
-from .source import Fetched, fetch_document, from_acquired
+from .source import GIT, Fetched, fetch_document, from_acquired
 
 __all__ = [
     "Bundle",
@@ -192,7 +194,7 @@ def refer(
         documents.append(cited)
         if result is None:
             continue
-        text = result.content.decode("utf-8", errors="replace")
+        text, generated = _readable(root, result)
         fetched.append(
             (
                 doc_id,
@@ -202,6 +204,7 @@ def refer(
                     text,
                     min_passage_bytes=min_passage_bytes,
                     max_passage_bytes=max_passage_bytes,
+                    line_numbers=not generated,
                 ),
             )
         )
@@ -213,6 +216,52 @@ def refer(
         scored, budget=budget, k=k, source="fetched", per_doc_fraction=per_doc_fraction
     )
     return Bundle(assembled=assembled, documents=documents, policy=policy.as_record())
+
+
+def _readable(root: Path, result) -> tuple[str, bool]:
+    """The text to chunk, and whether it was **generated** rather than read.
+
+    ## The defect this closes
+
+    This seam used to be `result.content.decode("utf-8", errors="replace")`, so
+    a `.docx` was chunked as the UTF-8 mojibake of a zip archive and a `.pdf` as
+    the mojibake of its binary. Every heading skeleton the decoders emit — the
+    thing ranking is built on — reached `extract.py` and **nothing else**: the
+    citation path never decoded a local document at all, so a format that
+    ranked perfectly well could not be quoted.
+
+    ## Why here and not in `source.py`
+
+    `_read_local` must keep returning the file's **raw bytes**, because
+    `content_sha` hashes them and the `current`/`stale`/`unverified` verdict is
+    that hash compared against the index's. Decoding before hashing would
+    silently redefine what freshness means. So the bytes stay byte-exact and the
+    decode happens where the text is *used* — one line further on.
+
+    ## Only `file:` documents
+
+    A `url:` document was already decoded by `source.py`, which runs ingest's own
+    `_decode_fetched` so that what is cited is what was indexed. Decoding it
+    again would re-run `html` over Markdown for any URL ending `.html` and
+    return wreckage.
+
+    Returns `generated=True` when a decoder produced the text, which suppresses
+    the `path:L12-L40` range: those line numbers would index Markdown that
+    exists nowhere on disk. `_rescore.locator` falls back to `path#p3`, and the
+    passage's heading travels beside it in the citation.
+    """
+    if result.strategy != GIT:
+        return result.content.decode("utf-8", errors="replace"), False
+    try:
+        decoded = _decode_bytes(result.content, result.loc, root)
+    except DecodeFailed:
+        decoded = None
+    if decoded is None:
+        # No decoder claims this type, or one claims it and got nothing out.
+        # Either way the bytes are the best text available, which is exactly
+        # what this path did for every document before decoding existed.
+        return result.content.decode("utf-8", errors="replace"), False
+    return decoded, True
 
 
 def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:

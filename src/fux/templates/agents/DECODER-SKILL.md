@@ -177,12 +177,12 @@ relative import raises and the decoder is dead on arrival.
 
 | your format looks like | read |
 |---|---|
-| a zip of XML (Office, OpenDocument) | `docxdoc.py`, then `_ooxml.py` |
-| markup or tags | `htmldoc.py` |
-| nested key/value (JSON, TOML, config) | `jsondoc.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
-| line-oriented text | `yamldoc.py`, `csvdoc.py` |
-| a binary container | `pdfdoc.py` — and read its stated limits before copying its approach |
-| headers plus a body | `maildoc.py` |
+| a zip of XML (Office, OpenDocument) | `docx.py`, then `_ooxml.py` |
+| markup or tags | `html.py` |
+| nested key/value (JSON, TOML, config) | `json.py` — especially `_prose`, which drops UUIDs, hashes, timestamps and bare numbers |
+| line-oriented text | `yaml.py`, `csv.py` |
+| a binary container | `pdf.py` — and read its stated limits before copying its approach |
+| headers plus a body | `mail.py` |
 
 ---
 

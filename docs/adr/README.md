@@ -14,9 +14,9 @@ reference. **Every record is cited by NAME in prose, never by number.**
 | state | directory | may back a live claim? |
 |---|---|---|
 | **live** | `docs/adr/` (here) | yes |
-| **superseded or retired** | [`archive/adr/`](../../archive/adr/README.md) | **no** — archive is not evidence |
+| **superseded or retired** | [`archive/adr-old/`](../../archive/adr/README.md) | **no** — archive is not evidence |
 
-A record moves from `docs/adr/` to `archive/adr/` **in the same change that
+A record moves from `docs/adr/` to `archive/adr-old/` **in the same change that
 accepts its successor** — never before, so no claim is ever left ungrounded. A
 record whose *subject ceased to exist* moves there too, and its row says plainly
 that it has **no successor**. New records are written here, from
@@ -162,99 +162,113 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | # | name | title | status | built |
 |---|------|-------|--------|-------|
 | [0001](0001_laws.md) | **ADR-LAWS** | The non-negotiable constraints have exactly one home, and records cite it | accepted | yes |
-| [0002](0002_cli-surface.md) | **ADR-CLI** | The command-line surface — flat verbs in seven groups, one error boundary, three output modes, every command captured verbatim | accepted | yes |
-| [0003](0003_fux-directory.md) | **ADR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git itself | accepted | yes |
-| [0004](0004_ask.md) | **ADR-ASK** | The `ask` verb — one scorer, one sort; the path that answers can never change the answer | accepted | yes |
-| [0005](0005_find.md) | **ADR-FIND** | The `find` verb — one line per hit, for pipes; a projection of `ask`, not a second strategy | accepted | yes |
-| [0006](0006_answer.md) | **ADR-ANSWER** | The `answer` verb — a fetched, re-scored passage with a fresh sha, its footing stated every time, and no model on the path | accepted | yes |
-| [0007](0007_ingest.md) | **ADR-INGEST** | How ingest works — carry unchanged extraction forward, re-resolve every edge, write only shards whose bytes changed | accepted | yes |
-| [0008](0008_url-ingest.md) | **ADR-URL-INGEST** | URL ingestion behaviour — fetching only inside a named fenced path, a failed fetch is a skip not a deletion, de-listing needs no network | accepted | yes |
-| [0009](0009_index-lifecycle.md) | **ADR-INDEX-LIFECYCLE** | Index generation and update — one canonical encoder, write-if-different, a derived plane that refuses to diverge | accepted | yes |
-| [0010](0010_index-record.md) | **ADR-RECORD** | One line of the committed index, property by property — including the ones that are conditional | accepted | yes |
-| [0011](0011_accelerator.md) | **ADR-T1-ACCELERATOR** | The derived T1 accelerator — disposable, term-major, and forbidden from changing an answer | accepted | yes |
-| [0012](0012_ranking.md) | **ADR-RANKING** | How documents are scored and ordered — BM25F, weight-then-saturate once, one scorer and one rounded sort | accepted | yes |
-| [0013](0013_postings.md) | **ADR-POSTINGS** | The postings in two shapes — doc-major in git for diffs, term-major in the runtime plane for queries | accepted | yes |
-| [0014](0014_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — three tables read, two refused by name, one passed through unread | accepted | yes |
-| [0015](0015_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — a closed list, each module with its tests, and a port earns its place by having a caller | accepted | partial |
-| [0016](0016_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
-| [0018](0018_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar for all three lists | accepted | yes |
-| [0019](0019_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, returning bytes and a content type, and nothing composes | accepted | yes |
-| [0020](0020_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — borrows your signed-in Chrome over CDP and **intercepts the response**, returning the server's bytes rather than a rendering; never escalated to | accepted | yes |
-| [0021](0021_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET written into your repo by `fux setup`, so core keeps zero network lines; and it never escalates | accepted | yes |
-| [0022](0022_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — `!` subtracts, and `archived=true` is a declaration never derived from a path | accepted | yes |
-| [0023](0023_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | accepted | yes |
-| [0024](0024_docs-table.md) | **ADR-DOCS-TABLE** | `docs.jsonl` — the docidx-ordered doc table every other derived structure joins against; nothing in it is derived, only carried | accepted | yes |
-| [0026](0026_runtime-manifest.md) | **ADR-RUNTIME-MANIFEST** | `manifest.json` — the per-shard content-sha fingerprint, plus the doc-table field set that a version string could not be trusted to carry | accepted | yes |
-| [0027](0027_runtime-stamp.md) | **ADR-RUNTIME-STAMP** | `stamp.json` — the cheap, non-reproducible size/mtime pre-check ahead of the manifest's real one | accepted | yes |
-| [0028](0028_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide numbers BM25F reads, stored RAW so a field weight cannot bake into the plane | accepted | yes |
-| [0029](0029_graph.md) | **ADR-GRAPH** | The graph lane — `explain`/`graph`/`path`, unseeded label-propagation communities in a derived plane, and PPR-lite with a **lazy** walk | accepted | yes |
-| [0030](0030_refer-plane.md) | **ADR-REFER** | Fetch through the *consumer's* fetcher, verify by content sha, assemble under a **byte** budget with a floor, and record the staleness discovered | accepted | yes |
-| [0031](0031_types-list.md) | **ADR-TYPES** | Which files are documents — prose plus every format a built-in decoder reads; absent means the default, never "everything" | accepted | yes |
-| [0032](0032_hooks.md) | **ADR-MAINTENANCE** | The hooks that keep a committed index in step — `post-commit` **defers**, no hook touches the network, one write lock, and a resident daemon for the URL tail | accepted | yes |
-| [0033](0033_merge-driver.md) | **ADR-MERGE-DRIVER** | The committed index merges line by line, last-writer-wins on `(ver, sha)`, and refuses rather than guesses | accepted | yes |
-| [0034](0034_cache.md) | **ADR-CACHE** | Two caches, two different proofs — ARC keyed `(loc, sha)` cannot change an answer; the TTL store is opt-in, disk-bounded, and answers `cached`, never `current` | accepted | yes |
-| [0035](0035_agent-policy.md) | **ADR-AGENT-POLICY** | Fux ships the policy its consumers need to read it correctly — one canonical policy carried as a **verbatim block** into each vendor's native format, from a declaration and never from detection | accepted | yes |
-| [0036](0036_predictions.md) | **ADR-RS** | The R predictions — a claim frozen before measurement, four ways one can end (**FAIL is a success of the method**), and the blind/informed split on the runs that measure them | accepted | partial |
-| [0037](0037_archived-content.md) | **ADR-ARCHIVED-CONTENT** | What a document declared `archived=true` does once indexed — a record property, a marker, a disclaimer that states the fact and refuses to interpret it, and a demotion nobody takes by default | accepted | yes |
-| [0038](0038_tuning.md) | **ADR-TUNE** | `.fux/tune.toml` — every knob that changes ordering and none that changes the index, decided by one mechanical test; plus per-source priority in either direction | accepted | yes |
-| [0039](0039_mcp.md) | **ADR-MCP** | `fux mcp` — the stdio JSON-RPC server for coding agents. Three tools rather than the whole verb surface, stdlib-only, and **`answer` is deliberately absent** | accepted | yes |
-| [0040](0040_enrich.md) | **ADR-ENRICH** | Enrichment as an **agent skill, not an API call** — fux plans and validates, a coding agent generates, and partial coverage is the steady state | accepted | yes |
-| [0041](0041_rerank.md) | **ADR-RERANK** | Proximity reranking over the refer plane's own passages — and the cross-encoder refused on cross-machine determinism, not on cost | accepted | yes |
-| [0042](0042_decode.md) | **ADR-DECODE** | The decoder plane — bytes become Markdown in one place, and a consumer may bring a dependency fux may not | accepted | yes |
-| [0043](0043_locks.md) | **ADR-LOCKS** | The one mutex fux owns over the committed index, and the three sibling files that are constantly mistaken for locks | accepted | yes |
-| [0044](0044_quality-contract.md) | **ADR-QUALITY** | What *"good"* means — a four-gate funnel with `recall@k` as the headline, a declared and versioned query mix, unanswerable queries inside the gate, and the cost of an error published before any score exists | accepted | **no** |
-| [0045](0045_confidence.md) | **ADR-CONFIDENCE** | How much the index believes its own answer — four deterministic signals and one band, so an agent can tell a grounded result from the closest thing in a corpus that never discusses the question. ⚠ **Amended 2026-08-27 (decision 11): `--band` gates the CLI, the MCP result is always on** — the block is always computed, only its emission is gated | accepted | **partial** |
-| [0046](0046_provenance.md) | **ADR-PROVENANCE** | Fux does not keep an audit trail; it makes one derivable — a derivation on `ask --why`, a re-runnable receipt on `answer --receipt`, and `fux verify`'s four-state verdict | accepted | yes |
-| [0047](0047_output-defaults.md) | **ADR-OUTPUT** | Output defaults are configurable in a third file, `.fux/output.toml` — a third boundary: not what is indexed, not which documents come back, but **how they are shown**. The one surface it exists for is **MCP**, which has no flags at all | accepted | yes |
-| [0048](0048_fuxignore.md) | **ADR-FUXIGNORE** | `.fux/.fuxignore` — one file for what is not indexed, in `.gitignore`'s grammar; read first, and the only thing that outranks the type allowlist in both directions | accepted | yes |
-| [0049](0049_ownership.md) | **ADR-OWNERSHIP** | `owns` and `describes` — the record-to-component model itself, which two tests enforced and no record decided. Exactly one owner per component; any number of describers, and the freshness gate demands all of them | accepted | **no** |
-| [0050](0050_acquired-plane.md) | **ADR-ACQUIRED** | Fetched source bytes are retained in `.fux/acquired/` — a **third** category beside committed and derived: gitignored like derived, but **not rebuildable**, only re-acquirable, and only while the source exists and the session holds. Clock-free: eviction orders by `run_seq`, never by an mtime | accepted | **no** |
-| [0051](0051_refusals.md) | **ADR-REFUSAL** | The response a server sends **instead** of the document — a sign-in wall, a paywall, an Office viewer shell. A declarative `.fux/refusals.toml`, **every condition pure over the bytes** (ADR-FETCHER decision 13 held rather than amended), under an always-on magic-byte floor no consumer can switch off | accepted | **no** |
-| [0052](0052_url-freshness.md) | **ADR-URL-FRESHNESS** | Six verdicts that never collapse into each other — `as-ingested` is a real comparison against retained bytes, and is neither `current` nor `unverified`. Plus `ttl=` as a per-URL bound that **narrows** the caller's policy and can never widen it | accepted | **no** |
-| [0053](0053_pii.md) | **ADR-PII** | **Redact what gets committed; leave alone what stays local.** A consumer-owned `.fux/pii.toml` redacts the index and nothing else — acquired bytes, refer passages and `fux answer` quotes stay as they are. The sha is taken **before** redaction, or every redacted document verifies as `stale` against its own unchanged source. **No built-in floor**, unlike ADR-REFUSAL: a format signature is a fact, a PII definition is a policy | accepted | **no** |
-| [0054](0054_expand.md) | **ADR-EXPAND** | The caller supplies the vocabulary (`--expand`, scored at `expand_weight`) and fuses its own phrasings (`-q`, RRF in rank space); a document matching only supplied terms is never returned | accepted | yes |
+| [0002](0002_l1-zero-cost.md) | **ADR-L1** | **L1** — `$0`, FOSS-only: OSI-approved licences only, with source-available (BSL/SSPL/Elastic v2) named as failing it. Why fux is never a purchase order; and the 2026-09-06 amendment that withdrew the zero-dependency guarantee while hardening the money clause | accepted | yes |
+| [0003](0003_l2-content-never-durable.md) | **ADR-L2** | **L2** — content is never durable outside its source system. The law the architecture rests on, its three declared exceptions, and why a summary of a confidential document is one | accepted | yes |
+| [0004](0004_l3-deterministic.md) | **ADR-L3** | **L3** — deterministic; no model in the maintenance path. Byte-identical index and root hash, the enrichment boundary that keeps it true, and the pin problem L1's amendment created | accepted | yes |
+| [0005](0005_l4-offline-by-default.md) | **ADR-L4** | **L4** — offline by default. Fenced opt-in paths, *plural*; the narrowing that already happened once across nine records; and the use-record gap this law does not close | accepted | yes |
+| [0006](0006_l5-hashed-meta.md) | **ADR-L5** | **L5** — hashed meta for non-git sources, enforced at write time. The ACL-mismatch leak it closes, and the channel it reduces rather than closes | accepted | yes |
+| [0007](0007_l6-say-index.md) | **ADR-L6** | **L6** — say "index", not "db". Load-bearing vocabulary: the noun governs the inferences, and every *"why not cache the bodies"* conversation starts with the wrong one | accepted | yes |
+| [0008](0008_l7-python-311.md) | **ADR-L7** | **L7** — Python ≥ 3.11. The floor that made refusing dependencies affordable, and the justification that narrowed on 2026-09-06 without the floor moving | accepted | yes |
+| [0009](0009_l8-use-record.md) | **ADR-L8** | **L8** — a use record is never committed. Written, reverted and re-narrowed in one day; gitignored is the test, not `.fux/`; and the transmission clause that did not survive | accepted | yes |
+| [0010](0010_cli-surface.md) | **ADR-CLI** | The command-line surface — flat verbs in seven groups, one error boundary, three output modes, every command captured verbatim | accepted | yes |
+| [0011](0011_fux-directory.md) | **ADR-DOTFUX** | The `.fux/` directory — every child declared committed or derived; the ignore rule asserted against git itself | accepted | yes |
+| [0012](0012_ask.md) | **ADR-ASK** | The `ask` verb — one scorer, one sort; the path that answers can never change the answer | accepted | yes |
+| [0013](0013_find.md) | **ADR-FIND** | The `find` verb — one line per hit, for pipes; a projection of `ask`, not a second strategy | accepted | yes |
+| [0014](0014_answer.md) | **ADR-ANSWER** | The `answer` verb — a fetched, re-scored passage with a fresh sha, its footing stated every time, and no model on the path | accepted | yes |
+| [0015](0015_ingest.md) | **ADR-INGEST** | How ingest works — carry unchanged extraction forward, re-resolve every edge, write only shards whose bytes changed | accepted | yes |
+| [0016](0016_url-ingest.md) | **ADR-URL-INGEST** | URL ingestion behaviour — fetching only inside a named fenced path, a failed fetch is a skip not a deletion, de-listing needs no network | accepted | yes |
+| [0017](0017_index-lifecycle.md) | **ADR-INDEX-LIFECYCLE** | Index generation and update — one canonical encoder, write-if-different, a derived plane that refuses to diverge | accepted | yes |
+| [0018](0018_index-record.md) | **ADR-RECORD** | One line of the committed index, property by property — including the ones that are conditional | accepted | yes |
+| [0019](0019_accelerator.md) | **ADR-T1-ACCELERATOR** | The derived T1 accelerator — disposable, term-major, and forbidden from changing an answer | accepted | yes |
+| [0020](0020_ranking.md) | **ADR-RANKING** | How documents are scored and ordered — BM25F, weight-then-saturate once, one scorer and one rounded sort | accepted | yes |
+| [0021](0021_postings.md) | **ADR-POSTINGS** | The postings in two shapes — doc-major in git for diffs, term-major in the runtime plane for queries | accepted | yes |
+| [0022](0022_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — three tables read, two refused by name, one passed through unread | accepted | yes |
+| [0023](0023_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — a closed list, each module with its tests, and a port earns its place by having a caller | accepted | partial |
+| [0024](0024_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
+| [0025](0025_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar for all three lists | accepted | yes |
+| [0026](0026_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, returning bytes and a content type, and nothing composes | accepted | yes |
+| [0027](0027_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — borrows your signed-in Chrome over CDP and **intercepts the response**, returning the server's bytes rather than a rendering; never escalated to | accepted | yes |
+| [0028](0028_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET written into your repo by `fux setup`, so core keeps zero network lines; and it never escalates | accepted | yes |
+| [0029](0029_dir-list.md) | **ADR-DIR-LIST** | The committed directory list — `!` subtracts, and `archived=true` is a declaration never derived from a path | accepted | yes |
+| [0030](0030_cachedir-tag.md) | **ADR-CACHEDIR-TAG** | CACHEDIR.TAG marks a derived `.fux/` directory disposable, so backup and archive tools skip it for free | accepted | yes |
+| [0031](0031_docs-table.md) | **ADR-DOCS-TABLE** | `docs.jsonl` — the docidx-ordered doc table every other derived structure joins against; nothing in it is derived, only carried | accepted | yes |
+| [0032](0032_runtime-manifest.md) | **ADR-RUNTIME-MANIFEST** | `manifest.json` — the per-shard content-sha fingerprint, plus the doc-table field set that a version string could not be trusted to carry | accepted | yes |
+| [0033](0033_runtime-stamp.md) | **ADR-RUNTIME-STAMP** | `stamp.json` — the cheap, non-reproducible size/mtime pre-check ahead of the manifest's real one | accepted | yes |
+| [0034](0034_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide numbers BM25F reads, stored RAW so a field weight cannot bake into the plane | accepted | yes |
+| [0035](0035_graph.md) | **ADR-GRAPH** | The graph lane — `explain`/`graph`/`path`, unseeded label-propagation communities in a derived plane, and PPR-lite with a **lazy** walk | accepted | yes |
+| [0036](0036_refer-plane.md) | **ADR-REFER** | Fetch through the *consumer's* fetcher, verify by content sha, assemble under a **byte** budget with a floor, and record the staleness discovered | accepted | yes |
+| [0037](0037_types-list.md) | **ADR-TYPES** | Which files are documents — prose plus every format a built-in decoder reads; absent means the default, never "everything" | accepted | yes |
+| [0038](0038_hooks.md) | **ADR-MAINTENANCE** | The hooks that keep a committed index in step — `post-commit` **defers**, no hook touches the network, one write lock, and a resident daemon for the URL tail | accepted | yes |
+| [0039](0039_merge-driver.md) | **ADR-MERGE-DRIVER** | The committed index merges line by line, last-writer-wins on `(ver, sha)`, and refuses rather than guesses | accepted | yes |
+| [0040](0040_cache.md) | **ADR-CACHE** | Two caches, two different proofs — ARC keyed `(loc, sha)` cannot change an answer; the TTL store is opt-in, disk-bounded, and answers `cached`, never `current` | accepted | yes |
+| [0041](0041_agent-policy.md) | **ADR-AGENT-POLICY** | Fux ships the policy its consumers need to read it correctly — one canonical policy carried as a **verbatim block** into each vendor's native format, from a declaration and never from detection | accepted | yes |
+| [0042](0042_predictions.md) | **ADR-RS** | The R predictions — a claim frozen before measurement, four ways one can end (**FAIL is a success of the method**), and the blind/informed split on the runs that measure them | accepted | partial |
+| [0043](0043_archived-content.md) | **ADR-ARCHIVED-CONTENT** | What a document declared `archived=true` does once indexed — a record property, a marker, a disclaimer that states the fact and refuses to interpret it, and a demotion nobody takes by default | accepted | yes |
+| [0044](0044_tuning.md) | **ADR-TUNE** | `.fux/tune.toml` — every knob that changes ordering and none that changes the index, decided by one mechanical test; plus per-source priority in either direction | accepted | yes |
+| [0045](0045_mcp.md) | **ADR-MCP** | `fux mcp` — the stdio JSON-RPC server for coding agents. Three tools rather than the whole verb surface, stdlib-only, and **`answer` is deliberately absent** | accepted | yes |
+| [0046](0046_enrich.md) | **ADR-ENRICH** | Enrichment as an **agent skill, not an API call** — fux plans and validates, a coding agent generates, and partial coverage is the steady state | accepted | yes |
+| [0047](0047_rerank.md) | **ADR-RERANK** | Proximity reranking over the refer plane's own passages — and the cross-encoder refused on cross-machine determinism, not on cost | accepted | yes |
+| [0048](0048_decode.md) | **ADR-DECODE** | The decoder plane — bytes become Markdown in one place, and a consumer may bring a dependency fux may not | accepted | yes |
+| [0049](0049_locks.md) | **ADR-LOCKS** | The one mutex fux owns over the committed index, and the three sibling files that are constantly mistaken for locks | accepted | yes |
+| [0050](0050_quality-contract.md) | **ADR-QUALITY** | What *"good"* means — a four-gate funnel with `recall@k` as the headline, a declared and versioned query mix, unanswerable queries inside the gate, and the cost of an error published before any score exists | accepted | **no** |
+| [0051](0051_confidence.md) | **ADR-CONFIDENCE** | How much the index believes its own answer — four deterministic signals and one band, so an agent can tell a grounded result from the closest thing in a corpus that never discusses the question. ⚠ **Amended 2026-08-27 (decision 11): `--band` gates the CLI, the MCP result is always on** — the block is always computed, only its emission is gated | accepted | **partial** |
+| [0052](0052_provenance.md) | **ADR-PROVENANCE** | Fux does not keep an audit trail; it makes one derivable — a derivation on `ask --why`, a re-runnable receipt on `answer --receipt`, and `fux verify`'s four-state verdict | accepted | yes |
+| [0053](0053_output-defaults.md) | **ADR-OUTPUT** | Output defaults are configurable in a third file, `.fux/output.toml` — a third boundary: not what is indexed, not which documents come back, but **how they are shown**. The one surface it exists for is **MCP**, which has no flags at all | accepted | yes |
+| [0054](0054_fuxignore.md) | **ADR-FUXIGNORE** | `.fux/.fuxignore` — one file for what is not indexed, in `.gitignore`'s grammar; read first, and the only thing that outranks the type allowlist in both directions | accepted | yes |
+| [0055](0055_ownership.md) | **ADR-OWNERSHIP** | `owns` and `describes` — the record-to-component model itself, which two tests enforced and no record decided. Exactly one owner per component; any number of describers, and the freshness gate demands all of them | accepted | **no** |
+| [0056](0056_acquired-plane.md) | **ADR-ACQUIRED** | Fetched source bytes are retained in `.fux/acquired/` — a **third** category beside committed and derived: gitignored like derived, but **not rebuildable**, only re-acquirable, and only while the source exists and the session holds. Clock-free: eviction orders by `run_seq`, never by an mtime | accepted | **no** |
+| [0057](0057_refusals.md) | **ADR-REFUSAL** | The response a server sends **instead** of the document — a sign-in wall, a paywall, an Office viewer shell. A declarative `.fux/refusals.toml`, **every condition pure over the bytes** (ADR-FETCHER decision 13 held rather than amended), under an always-on magic-byte floor no consumer can switch off | accepted | **no** |
+| [0058](0058_url-freshness.md) | **ADR-URL-FRESHNESS** | Six verdicts that never collapse into each other — `as-ingested` is a real comparison against retained bytes, and is neither `current` nor `unverified`. Plus `ttl=` as a per-URL bound that **narrows** the caller's policy and can never widen it | accepted | **no** |
+| [0059](0059_pii.md) | **ADR-PII** | **Redact what gets committed; leave alone what stays local.** A consumer-owned `.fux/pii.toml` redacts the index and nothing else — acquired bytes, refer passages and `fux answer` quotes stay as they are. The sha is taken **before** redaction, or every redacted document verifies as `stale` against its own unchanged source. **No built-in floor**, unlike ADR-REFUSAL: a format signature is a fact, a PII definition is a policy | accepted | **no** |
+| [0060](0060_expand.md) | **ADR-EXPAND** | The caller supplies the vocabulary (`--expand`, scored at `expand_weight`) and fuses its own phrasings (`-q`, RRF in rank space); a document matching only supplied terms is never returned | accepted | yes |
 
-> ## The number line has holes, on purpose — `0017` and `0025` are burned
+> ## The number line was renumbered on 2026-09-06, and W-82 ruling 7 was overridden
 >
-> **`0001`–`0053`, with two gaps that are never filled.** The gaps are the rule
-> working, not a mess to tidy:
+> **`0001`–`0060`, contiguous, no holes.** `0001` is the router
+> [ADR-LAWS](0001_laws.md); `0002`–`0009` are the eight law records; `0010`
+> upward is every other record, in its previous order.
 >
-> - **A vacated ordinal is burned and never reused** (W-82 ruling 7). `0025`
->   went when `ADR-CODES-TABLE` was archived with no successor — its subject,
->   the dense lane, was deleted rather than replaced. `0017` went on 2026-08-27
->   when `ADR-ENRICHED` was superseded by [ADR-ENRICH](0040_enrich.md).
-> - ⚠ **A note here claimed the opposite until 2026-08-27** — that `0026`
->   upward had been "renumbered down by one" so `0025` was no longer a hole. It
->   never happened, and it must not: it names the exact failure ruling 7 exists
->   to prevent, and the same ruling records that a previous compaction put **two
->   records on `0022`**. The note pointed at `0025_runtime-manifest.md` and
->   `0042_locks.md`, neither of which has ever existed
->   ([ADR-RUNTIME-MANIFEST](0026_runtime-manifest.md) is `0026`,
->   [ADR-LOCKS](0043_locks.md) is `0043`).
-> - **`ADR-CONFIDENCE` briefly existed at two paths** — `0043_confidence.md` and
->   `0045_confidence.md`, same `name:`, while `0043` was also
->   [ADR-LOCKS](0043_locks.md). Ruled 2026-08-27: **keep the later file**, on a
->   substantive ground rather than its date — its decision 6 binds
->   `SEPARATION_FLOOR` to [ADR-QUALITY](0044_quality-contract.md)'s frozen
->   `t = 0.75`, where the discarded one still picked its own abstention
->   threshold. The duplicate is deleted.
-> - **This is why the cite-by-name rule exists.** A hole costs nothing when
->   every citation is a name; closing one costs every citation in the repo.
+> ⚠ **This reverses a standing rule, and the reversal is Arpit's.** W-82 ruling
+> 7 said **a vacated ordinal is burned and never reused**, and this register
+> carried two burned ones — `0017` (`ADR-ENRICHED`, superseded) and `0025`
+> (`ADR-CODES-TABLE`, archived with no successor). **Both holes are gone**: the
+> renumber closed them along with everything else.
 >
-> ⚠ **So a number in a document older than 2026-08-27 may name a different
-> record than it does today**, and [`work/WORKLOG.md`](../../work/WORKLOG.md) is
-> append-only, so some of those sentences cannot be corrected and were left
-> standing. **This is the cost that the cite-by-name rule below exists to avoid
-> paying twice** — a name survives a renumber and a number does not. Read a bare
-> number in an old document as *an ordinal at the time of writing*, and resolve
-> it through [`archive/adr/README.md`](../../archive/adr/README.md).
+> ⚠ **The rule was right and the cost it named was real.** *"A hole costs
+> nothing when every citation is a name; closing one costs every citation in
+> the repo."* Closing them cost **996 path links across 52 records**, rewritten
+> mechanically in one pass with every link verified to resolve. That was
+> affordable **only** because it was scripted and verified; it is not a
+> precedent for doing it by hand, and a future compaction is still the failure
+> ruling 7 exists to prevent — a previous one put **two records on `0022`**.
+>
+> ⚠ **What could NOT be corrected.** [`work/WORKLOG.md`](../../work/WORKLOG.md)
+> is append-only and 810 KB. **Every bare number in it older than 2026-09-06
+> now names a different record**, and those sentences may not be rewritten.
+> The same was already true of some of them from the 2026-08-27 pass. **Read a
+> bare number in any document older than 2026-09-06 as an ordinal at the time
+> of writing**, resolve it through the name beside it, and never trust it
+> alone.
+>
+> - **This is why the cite-by-name rule exists**, and this renumber is the
+>   second time the project has paid for the times it was not followed.
+> - **`ADR-CONFIDENCE` once existed at two paths** — `0043_confidence.md` and
+>   `0045_confidence.md`, same `name:` — while `0043` was also `ADR-LOCKS`.
+>   Ruled 2026-08-27: keep the later file, on the substantive ground that its
+>   decision 6 binds `SEPARATION_FLOOR` to
+>   [ADR-QUALITY](0050_quality-contract.md)'s frozen `t = 0.75`. The duplicate
+>   was deleted, and the survivor is now [0051](0051_confidence.md).
+> - **A note here once claimed a renumber had already happened** and pointed at
+>   `0025_runtime-manifest.md` and `0042_locks.md`, neither of which ever
+>   existed. It was false when written. It is retained as the reason nobody
+>   should trust a number in an old document.
 
 **`status` and `built` are two different questions, and conflating them is a
 mistake this project has already paid for.** `status: accepted` means **the
 decision is ratified**. `built` means **the engine does it**. A record can be
 accepted and unbuilt — that is a decision made ahead of the code, which is
-legitimate and is how [ADR-ENRICH](0040_enrich.md) and
-[ADR-QUALITY](0044_quality-contract.md) exist today. **What is not legitimate is
+legitimate and is how [ADR-ENRICH](0046_enrich.md) and
+[ADR-QUALITY](0050_quality-contract.md) exist today. **What is not legitimate is
 a reader having to open the record to find out.**
 
 **A row with `built: no` or `partial` names work somebody has to do**, and
@@ -281,7 +295,7 @@ its gate are its own.
 **A record may own nothing, and there are two honest reasons for it.** Some
 records specify one file another record already generates — the runtime-plane
 companions. Others state a mechanism spread across components each already
-claimed by the record carrying its decisions, as [ADR-LOCKS](0043_locks.md)
+claimed by the record carrying its decisions, as [ADR-LOCKS](0049_locks.md)
 does. ⚠ **In both cases the freshness gate cannot demand that record**, so
 nothing mechanical will catch it going stale.
 
@@ -317,7 +331,7 @@ table does not grant.
 | `src/fux/progress.py` | ADR-CLI | the progress plane — stderr-only, TTY-gated, counts not clocks |
 | `src/fux/config.py` | ADR-CONFIG | `fux.toml`'s schema, the opaque `[sources.url.config]` table, and the tables refused by name rather than ignored |
 | `src/fux/tune.py` | ADR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it |
-| `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, the URL section, the runner check and the **fetcher-capability notice** — all read-only, all offline. The notice is decision 6's own named mechanism (*a `doctor` check, never a rewrite*) applied to [ADR-FETCHER](0019_fetcher.md) decisions 12–13; it reads the consumer's fetcher **as text and never imports it** |
+| `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, the URL section, the runner check and the **fetcher-capability notice** — all read-only, all offline. The notice is decision 6's own named mechanism (*a `doctor` check, never a rewrite*) applied to [ADR-FETCHER](0026_fetcher.md) decisions 12–13; it reads the consumer's fetcher **as text and never imports it** |
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions, and the declared record shape |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator — and the **three** kind declarations (`COMMITTED`, `DERIVED`, `ACQUIRED`) the generated README table is built from |
@@ -380,7 +394,7 @@ table does not grant.
 
 ## Describes — which record's subject REACHES INTO a component it does not own
 
-**A second, additive relation** ([ADR-OWNERSHIP](0049_ownership.md)). Ownership
+**A second, additive relation** ([ADR-OWNERSHIP](0055_ownership.md)). Ownership
 stays exactly one record per component; **describes is any number**, and the
 freshness gate demands the owner **and every describer**.
 

@@ -22,7 +22,7 @@
 # Moved forward again 2026-08-22, a third time, for a THIRD shape of the same
 # cause: the register was RENUMBERED. ADR-0022 had been archived, leaving a
 # hole, and closing it shifted eleven records down one — `0033_hooks.md` became
-# `0032_hooks.md`, `0031_refer-plane.md` became `0030_refer-plane.md`, and so
+# `0038_hooks.md`, `0031_refer-plane.md` became `0036_refer-plane.md`, and so
 # on. The ownership table names records by PATH, so every historical commit
 # that touched a record at its old number now reads as touching nothing.
 #

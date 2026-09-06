@@ -25,7 +25,7 @@ import json
 # `.fux/decoders/` loaded by path. A path-loaded file has no parent package, so
 # `from . import jsondoc` raises `attempted relative import with no known
 # parent package` — the copy would be dead on arrival.
-from fux.decode.jsondoc import MAX_DEPTH, _prose
+from fux.decode.jsondoc import MAX_DEPTH, _label, _prose
 
 EXTENSIONS = (".jsonl",)
 
@@ -53,7 +53,19 @@ def decode(raw: bytes, rel_path: str) -> str | None:
     if not records:
         return None
     lines: list[str] = []
-    _walk(records, lines, depth=1, label=None)
+    for index, record in enumerate(records, start=1):
+        block: list[str] = []
+        _walk(record, block, depth=2, label=None)
+        if not block:
+            continue
+        # ⚠ **The record boundary is the chunk boundary, and it used to be
+        # invisible.** Walking the whole list under one `label=None` emitted no
+        # heading between records, so `refer/_chunk.py` saw one undivided
+        # passage and a citation spanning six unrelated log lines read as one
+        # statement. A JSONL record is the natural unit of this format — one
+        # line in, one section out.
+        lines.append(f"## Record {index}")
+        lines.extend(block)
     body = "\n\n".join(lines)
     return body if body.strip() else None
 
@@ -63,13 +75,13 @@ def _walk(node, out: list[str], *, depth: int, label: str | None) -> None:
         return
     if isinstance(node, dict):
         if label:
-            out.append("#" * min(depth, 6) + " " + label)
+            out.append(_label(label, depth))
         for key in sorted(node, key=str):
             _walk(node[key], out, depth=depth + 1, label=str(key))
         return
     if isinstance(node, list):
         if label:
-            out.append("#" * min(depth, 6) + " " + label)
+            out.append(_label(label, depth))
         for item in node:
             _walk(item, out, depth=depth + 1, label=None)
         return

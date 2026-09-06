@@ -7,6 +7,21 @@ Preference order, and why: `text/plain` first because it is what the sender
 actually typed; `text/html` only as a fallback, decoded through `htmldoc` so
 mail and web pages convert by one implementation rather than two.
 
+## An mbox is many messages, and only the first used to be read
+
+`BytesParser` parses **one** message. Pointed at a `.mbox` it returned the
+first and silently discarded the rest, so an archive of four hundred threads
+was indexed as one email — and cited as one, since `refer/_chunk.py` had a
+single `# Subject` to split on. Each message now becomes its own `## Subject`
+section under the file's own H1, which is both the right index unit and the
+right citation unit.
+
+⚠ **The split is on the mbox `From_` line, and that is a heuristic.** A body
+line beginning `From ` that a writer failed to quote as `>From ` will start a
+new message. The pattern requires an address-shaped token after `From ` to
+narrow this, but the format itself is ambiguous and no reader resolves it
+perfectly.
+
 **Attachments are never opened.** A `.eml` carrying a PDF is one document, not
 two, and recursively decoding attachments would make a mail archive a
 decompression surface — the same reason `.zip` is not a document.
@@ -14,6 +29,7 @@ decompression surface — the same reason `.zip` is not a document.
 
 from __future__ import annotations
 
+import re
 from email import policy
 from email.parser import BytesParser
 
@@ -34,8 +50,54 @@ _HEADERS = ("Subject", "From", "To", "Cc", "Date")
 
 MAX_BODY_CHARS = 200_000
 
+#: Messages past this are an archive rather than a document — the same
+#: judgement `csvdoc.MAX_ROWS` makes about rows.
+MAX_MESSAGES = 500
+
+#: An mbox `From_` separator: literally `From `, an address-shaped token, then
+#: the date. The address requirement is what keeps an unquoted `From the team,`
+#: in a body from starting a new message.
+_FROM_RE = re.compile(rb"^From \S+ .*\r?\n", re.MULTILINE)
+
 
 def decode(raw: bytes, rel_path: str) -> str | None:
+    if rel_path.lower().endswith(".mbox"):
+        return _mbox(raw, rel_path)
+    return _message(raw, level=1)
+
+
+def _mbox(raw: bytes, rel_path: str) -> str | None:
+    """Every message in the archive, each its own section.
+
+    The file's name leads as the H1 so that `extract._title` resolves to the
+    archive rather than to whichever message happened to be first — a mailbox
+    is not titled by its oldest thread.
+    """
+    blocks = [f"# {rel_path.rsplit('/', 1)[-1]}"]
+    for part in _messages(raw)[:MAX_MESSAGES]:
+        block = _message(part, level=2)
+        if block:
+            blocks.append(block)
+    if len(blocks) == 1:
+        return None
+    return "\n\n".join(blocks)
+
+
+def _messages(raw: bytes) -> list[bytes]:
+    """An mbox split into message bodies, `From_` separator lines removed."""
+    starts = [m.start() for m in _FROM_RE.finditer(raw)]
+    if not starts:
+        return [raw]  # not an mbox after all; read it as one message
+    out: list[bytes] = []
+    for index, start in enumerate(starts):
+        end = starts[index + 1] if index + 1 < len(starts) else len(raw)
+        body = raw[start:end]
+        newline = body.find(b"\n")
+        out.append(body[newline + 1 :] if newline >= 0 else b"")
+    return out
+
+
+def _message(raw: bytes, *, level: int) -> str | None:
     try:
         message = BytesParser(policy=policy.default).parsebytes(raw)
     except Exception:
@@ -44,9 +106,11 @@ def decode(raw: bytes, rel_path: str) -> str | None:
     blocks: list[str] = []
     subject = _header(message, "Subject")
     if subject:
-        # The subject leads as an H1: it is the document's title in every sense
-        # that matters, and `extract.py` reads H1s as the title field.
-        blocks.append("# " + subject)
+        # The subject leads the section: for a single `.eml` that is an H1 and
+        # the document's title in every sense that matters, and `extract.py`
+        # reads the first heading as the title field. Inside an mbox it drops a
+        # level, because the archive itself owns the H1.
+        blocks.append("#" * level + " " + subject)
     for name in _HEADERS:
         if name == "Subject":
             continue

@@ -19,7 +19,7 @@ error text.
 | surface | filesystem | network | python | notes |
 |---|---|---|---|---|
 | **Local terminal** (macOS, arpits-macbook) | the real repo | yes | project `.venv` | the only surface with no caveats |
-| **Cowork device VM** (`device_bash`) | repo mounted at `$HOME/mnt/fux` | **none** | 3.10 | cannot delete; no `pytest`; see below |
+| **Cowork device VM** (`device_bash`) | repo mounted at `$HOME/mnt/fux` | **none** | 3.10 | cannot delete; no `pytest`; **can fail to boot at all** — see below |
 | **Cowork cloud container** (`Bash`) | its own scratch tree | yes | ≥3.11 | where measurement runs and installs happen |
 | **GitHub Actions** | clean checkout, **Linux** | yes | matrix | case-**sensitive**; catches what macOS hides |
 
@@ -81,6 +81,62 @@ on five consecutive attempts, and did not recover. `Read`, `Write`, `Edit` and
   writes documentation asserting a deletion or a green suite it had no way to
   perform. Write the docs as *ruled, pending a command Arpit runs*, and hand him
   the exact command.
+
+**The VM can fail to START AT ALL — a different failure from the wedge above,
+and the tell is `scratchFolder`.** Observed 2026-09-06, in two consecutive
+sessions: every `device_bash` call, `echo ok` included, returned
+
+```text
+device_bash failed in the device workspace.
+```
+
+with **no underlying error text at all** — nothing to grep, nothing naming a
+cause. Unlike 2026-08-27's `useradd` message, there is no string to search for.
+
+- **`get_device_info` is the diagnostic that separates the two cases.** It
+  reports a `scratchFolder` field **only once `device_bash` has succeeded at
+  least once in the session**. Absent field + failing shell = **the workspace
+  VM never booted**. Present field + failing shell = the VM is up and the
+  command itself failed. On 2026-09-06 the field was absent, which ruled out
+  every command-level explanation before any were tried. **Make this the first
+  move, not the fifth.**
+- 🔴 **The bridge is NOT down, and assuming it is costs the whole session.**
+  `get_device_info`, `device_list_dir`, `device_stage_files` and
+  `device_commit_files` all worked normally throughout. The repo was fully
+  readable **and fully writable**.
+- **So a docs-only session still completes here** — unlike the 2026-08-27
+  wedge, which had no write path. `device_commit_files` writes whole files, so
+  any document can be updated by **stage → rewrite in the cloud container →
+  commit back to the same path**. There is no in-place edit and no append: a
+  change to an 800 KB file means rewriting all of it, which is fine as a shell
+  operation in the container and ruinous if you try to read it into context
+  first. What stays impossible is everything that is not file *content* — no
+  `git`, no `pytest`, no `fux`, no `mv`, no delete.
+- **Restarting does not fix it, and this is worth knowing before spending an
+  evening on it.** Arpit restarted the desktop app, restarted the laptop, and
+  tried CLI scripts; the failure was byte-identical after each. The workspace
+  VM image is per-**install**, not per-session, so a relaunch reuses the same
+  broken image.
+- ⚠ **The reinstall trap.** On macOS, trashing the `.app` leaves
+  `~/Library/Application Support` intact — so an ordinary reinstall most likely
+  preserves the broken image *and* fixes nothing. The lever that rebuilds the
+  VM is the same lever that deletes local app data: the desktop app's project
+  memory, locally-stored scheduled tasks, and local MCP config. **Those are
+  local-only; account-side things (chats, cross-surface memory, account skills)
+  and the repo itself are untouched by any of it.** Rule out disk starvation
+  first — it is the cheaper suspect and costs nothing to check.
+- **Do not retry past two attempts.** The harness counts to five and the
+  failure is identical every time.
+
+⚠ **This is the SECOND recorded occurrence of the class "the shell is wedged
+for a whole session while the file tools keep working"** — 2026-08-27 was the
+first — which is what CLAUDE.md's two-strikes rule makes a gate trigger.
+**No check was written, and the reason is that this repo has nothing to
+check:** the fault is in a VM fux does not ship, reached through a tool fux
+does not own, and a test asserting "`device_bash` works" can only ever run on a
+surface where it already does. The gateable part is a **procedure, not an
+assertion** — the `scratchFolder` first move recorded above. Named here rather
+than mechanised, on the same reasoning W-83's gate was.
 
 **It has no network and Python 3.10.** fux-engine needs ≥3.11 and installs
 from PyPI, so **the test suite and `fux-lab`'s `setup.sh` cannot run here.**

@@ -24,7 +24,9 @@ classifiers = [
     "Topic :: Software Development :: Documentation",
     "Topic :: Software Development :: Quality Assurance",
 ]
-# stdlib only — $0, deterministic, dependency-free runtime (see CLAUDE.md).
+# L1: OSI-approved licences only, ever — source-available (BSL, SSPL, Elastic
+# v2, Commons Clause) does NOT qualify. Fux ships packaged: no feature-extras tier. Anything on the ingest path is pinned: byte-identity is a
+# function of what resolves here. See CLAUDE.md and docs/adr/0002_l1-zero-cost.md.
 dependencies = []
 
 [project.urls]

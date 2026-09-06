@@ -20,7 +20,7 @@ from __future__ import annotations
 # package` — the copy would be dead on arrival. Absolute imports mean the file
 # fux ships and the file you edit are byte-identical (ADR-DECODE decision 11).
 from fux.decode import _xml
-from fux.decode.jsondoc import MAX_DEPTH
+from fux.decode.jsondoc import MAX_DEPTH, _label
 
 EXTENSIONS = (".xml",)
 
@@ -50,7 +50,7 @@ def _walk(element, out: list[str], *, depth: int) -> None:
     if own_text:
         out.append(f"**{name}:** {own_text}")
     elif children:
-        out.append("#" * min(depth, 6) + " " + name)
+        out.append(_label(name, depth))
 
     # `element.attrib` is a dict in document order; sorted so two serialisations
     # of one document decode identically (L3).

@@ -1,4 +1,4 @@
-"""jsonldoc / svgdoc / imagedoc — three built-in decoders added on 2026-08-29
+"""jsonl / svg / image — three built-in decoders added on 2026-08-29
 for `.jsonl`, `.svg`, `.png`/`.jpg`/`.jpeg`/`.gif`.
 
 Shipped as built-ins (`fux.decode.BUILTIN_MODULES`), which — per [ADR-TYPES](

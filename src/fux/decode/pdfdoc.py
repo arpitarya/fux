@@ -25,6 +25,26 @@ what feeds the enrichment queue. A PDF whose text layer fails to *parse* is a
 different thing: a decode failure. The two are distinguished below, because
 conflating them would hide a real defect inside a normal-looking outcome.
 
+## Pages are the only structure a PDF has, and now it emits them
+
+A PDF has no headings, so before 2026-09-06 this decoder returned one
+undivided blob: `extract.py` mined **no** `phrases` from any PDF in any corpus
+(`fux ask` renders those as `§` lines), and `refer/_chunk.py`, having nothing
+to split on, cut every PDF into blind 4 KB slabs mid-argument.
+
+`## Page N` is emitted per **text-bearing content stream**, and the document
+opens with `# <filename>` so that the filename remains the title exactly as
+`extract._title` computed it before — a page number must never become a
+document's title.
+
+⚠ **The page count is a stream count, and they are not always the same.** A
+page whose content is split across several streams is counted more than once,
+and getting it exact requires the `/Pages` object graph this module
+deliberately does not parse (see the scanning rationale above). Stated rather
+than hidden, and ruled that way by Arpit on 2026-09-06: a reader looking for
+"page 7" is better served by an approximate page than by `Part 7`, which means
+nothing at all.
+
 ⚠ **This will not match a dedicated library on hard files.** Ligatures, RTL,
 multi-column reading order and CID fonts are all approximated. For a *ranking*
 index that is usually enough — the terms are there even when the layout is not.
@@ -71,18 +91,28 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         return None
     streams = _streams(raw)
     cmap = _to_unicode(streams)
-    lines: list[str] = []
+
+    blocks: list[str] = []
+    chars = 0
+    page = 0
     for data in streams:
-        lines.extend(_text_from(data, cmap))
-        if sum(len(line) for line in lines) > MAX_TEXT_CHARS:
+        body = _paragraphs(_text_from(data, cmap))
+        if not body.strip():
+            continue  # a font, an image, a stream with no text-showing operator
+        page += 1
+        blocks.append(f"## Page {page}")
+        blocks.append(body)
+        chars += len(body)
+        if chars > MAX_TEXT_CHARS:
             break
 
-    text = _paragraphs(lines)
-    if not text.strip():
+    if not blocks:
         # No text layer. NOT an error: a scanned page is a real document that
         # needs a model, and `None` is exactly that signal.
         return None
-    return text
+    # The filename leads as the H1 so `extract._title` resolves to exactly what
+    # it fell back to before this decoder emitted any heading at all.
+    return f"# {rel_path.rsplit('/', 1)[-1]}\n\n" + "\n\n".join(blocks)
 
 
 def _streams(raw: bytes) -> list[bytes]:

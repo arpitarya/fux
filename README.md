@@ -51,7 +51,10 @@ at answer time.**
 > behind `ask --hybrid`, shipped off by default, and was deleted after its own
 > gate measured **0 fixed / 2 broken** — the bundled embedding mean-pooled
 > static token vectors, so it was as order-blind as the lexical scorer it was
-> meant to complement. Removing it took the wheel from **6.84 MB to 233 KB**.
+> meant to complement. Removing it took the wheel from **6.84 MB to 233 KB**
+> (measured 2026-08-25, and it stands — though wheel size stopped being the
+> binding constraint when L1 was amended on 2026-09-06; the lane was removed
+> for measuring worse, never for its size).
 > Ranking is unchanged; the flag is gone.
 >
 > **The corpus is maintained with `fux add` / `fux remove` / `fux update`**
@@ -60,7 +63,7 @@ at answer time.**
 > the index *and* the graph, deleting its line or subtracting it from a listed
 > ancestor; `update` re-reads what is listed and never writes a line. They
 > replace `fux url` and `fux ingest --refresh-urls`
-> ([ADR-CLI](docs/adr/0002_cli-surface.md)).
+> ([ADR-CLI](docs/adr/0010_cli-surface.md)).
 >
 > URLs join the corpus through a consumer-owned fetcher file. `fux setup`
 > writes two — `http.py` (a plain stdlib GET, the default) and `cdp.py`
@@ -73,11 +76,11 @@ at answer time.**
 > one URL**. That and `fux update` are the engine's **two** networked paths;
 > both say on stderr that they went out, and everything else is offline. A
 > line picks its own fetcher; nothing escalates automatically
-> ([ADR-URL-LIST](docs/adr/0018_url-list.md) ·
-> [ADR-FETCHER](docs/adr/0019_fetcher.md)).
+> ([ADR-URL-LIST](docs/adr/0025_url-list.md) ·
+> [ADR-FETCHER](docs/adr/0026_fetcher.md)).
 > **The graph lane has landed (M3, released in `0.34.0`)** — `explain`/`graph`/`path`,
 > unseeded label-propagation communities, a lazy PPR walk
-> ([ADR-GRAPH](docs/adr/0029_graph.md)). **Both acceptance gaps are closed**
+> ([ADR-GRAPH](docs/adr/0035_graph.md)). **Both acceptance gaps are closed**
 > (2026-08-22): 24/24 on a graded 66-document corpus, and the derived
 > `graph.json` hashes identically across two independent architectures
 > ([the run](work/regression/2026-08-22-graph-acceptance/report.md)).
@@ -87,7 +90,7 @@ at answer time.**
 > `[archived]` marker in `ask`'s text, and a stderr disclaimer — while
 > results stay byte-identical unless `[ranking] archived_weight` is set
 > below its `1.0` default
-> ([ADR-ARCHIVED-CONTENT](docs/adr/0037_archived-content.md)).
+> ([ADR-ARCHIVED-CONTENT](docs/adr/0043_archived-content.md)).
 >
 > The v0.26 engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
@@ -116,14 +119,19 @@ at answer time.**
   documents live (through a version-keyed cache), re-score passages on the
   fetched bytes, cite the fresh sha. (The refer plane is M4; M1's `ask`
   cites straight from the committed index.)
-- **Laws:** $0 default · stdlib-only · byte-deterministic · offline by
-  default · one ADR per feature, every rule referenced.
+- **Laws:** `$0`, FOSS-only (OSI-approved licences, SPDX-declared) ·
+  byte-deterministic · offline by default · one ADR per feature, every rule
+  referenced.
+  ⚠ **`stdlib-only` was withdrawn 2026-09-06** — dependencies are permitted,
+  must be OSI-licensed, and ship packaged. **Source-available licences (BSL,
+  SSPL, Elastic v2, Commons Clause) do not qualify**
+  ([ADR-L1](docs/adr/0002_l1-zero-cost.md)).
 
 ## The `.fux/` directory
 
 Everything fux puts in your repo lives here, and **every child is declared** —
 as `committed`, `derived`, or `acquired`
-([ADR-DOTFUX](docs/adr/0003_fux-directory.md)). `fux doctor` warns about
+([ADR-DOTFUX](docs/adr/0011_fux-directory.md)). `fux doctor` warns about
 anything that is not on this list.
 
 | entry | kind | what it is |
@@ -174,7 +182,7 @@ form.
 1. [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) — architecture + falsifiable predictions
 2. [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md) — the committed format, measured
 3. [the ADR register](docs/adr/README.md) — milestones M0–M8
-4. [`archive/adr/0004_index-format.md`](archive/adr/0004_index-format.md) — the frozen M1 schema, named here for orientation only (archive is not evidence — see [`archive/README.md`](archive/README.md))
+4. [`archive/adr-old/0004_index-format.md`](archive/adr-old/0004_index-format.md) — the frozen M1 schema, named here for orientation only (archive is not evidence — see [`archive/README.md`](archive/README.md))
 5. [`../fux-playground/PLAYGROUND.md`](../fux-playground/PLAYGROUND.md) — a graded 10-doc corpus to try it on, in a **separate sibling repository** (clone it next to this one)
 6. [`work/WORKLOG.md`](work/WORKLOG.md) — the running build log
 

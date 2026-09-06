@@ -89,15 +89,26 @@ AGENTS_FILE = "AGENTS.md"
 AGENTS_TEMPLATE = "AGENTS.md"
 
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
-    # `fux-enrich` is **claude-only and INVOKED, never ambient** (W-76 Phase 8).
+    # `fux-enrich` is **INVOKED, never ambient** (W-76 Phase 8) -- and the rule
+    # is *never ambient*, which was never the same thing as *claude only*.
     #
-    # Two of the three renderings below are ambient -- Copilot's
-    # `applyTo: "**"` and Kiro's `inclusion: always` -- and enter every request
-    # for every developer in the repo. **An ambient skill that writes files
-    # into a committed directory and changes ranking is a different risk
-    # class**, so it ships only in the format that has an explicit-invocation
-    # model, and its description names the trigger phrases rather than the
-    # topic.
+    # **An ambient rendering that writes files into a committed directory and
+    # changes ranking is a different risk class.** Copilot's `applyTo: "**"`
+    # and Kiro's `inclusion: always` enter every request for every developer in
+    # the repo, so `ENRICH-SKILL.md` never goes to either, and its description
+    # names trigger phrases rather than a topic.
+    #
+    # ⚠ **It shipped to Claude ALONE until 2026-09-06, and that was an
+    # omission, not the rule.** Every skill surface below is
+    # progressive-disclosure -- `.claude/skills`, `.kiro/skills`,
+    # `.codex/skills` and now `.github/skills` -- so the risk class the rule
+    # names is absent from all four. ADR-ENRICH decision 10 had **flagged the
+    # gap in its own text** rather than leaving it to be discovered
+    # (*"the reasoning that admits a Kiro skill elsewhere would admit one
+    # here"*), and `fux-decoder` -- named in the SAME sentence, in the same
+    # risk class -- had already shipped to three of them. Arpit ruled
+    # 2026-09-06: extend it. **The exclusion that survives is the ambient one,
+    # and only that one.**
     #
     # **`USAGE-SKILL.md` is mapped TWICE, to two vendors, from one template**
     # (W-82 3.6). Kiro implements the same open Agent Skills standard Claude
@@ -123,19 +134,32 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
             "fux-archived-results.instructions.md",
         ),
         (".github/instructions/fux-usage.instructions.md", "fux-usage.instructions.md"),
+        # ⚠ **`.github/skills/` is Copilot's FIRST non-ambient surface**, and it
+        # is what makes this row legal under the rule above. Until Copilot
+        # supported Agent Skills its only non-agent rendering was
+        # `instructions/` (`applyTo: "**"`), which the rule refuses outright.
+        #
+        # ⚠ **Copilot ALSO reads `.claude/skills`** (ADR-AGENT-POLICY decision
+        # 13), so in a default install it sees this skill twice, from two
+        # folders, under one `name:`. **The bytes are identical by
+        # construction** -- one template, N destinations -- so a double-load is
+        # idempotent and the residual risk is a hard duplicate-name error, not
+        # divergent instructions. Written anyway because `install =
+        # ["copilot"]` **alone** must not silently get nothing.
+        (".github/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
     ),
     "kiro": (
         (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
         (".kiro/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
-        # `fux-decoder` ships to the two SKILL surfaces and to neither ambient
-        # one. ADR-ENRICH decision 10 made `fux-enrich` claude-only because the
-        # other two renderings were ambient (`applyTo: "**"`, `inclusion:
-        # always`) and *"an ambient skill that writes into a committed directory
-        # and changes ranking is a different risk class"*. W-82 established that
-        # a Kiro **skill** is progressive-disclosure, not ambient — only Kiro
-        # *steering* is — so the reasoning admits Kiro here while still
-        # excluding Copilot's `instructions/`, which enter every request.
+        # Both committed-write skills ship to Kiro's SKILL surface and to
+        # neither ambient one. W-82 established that a Kiro **skill** is
+        # progressive-disclosure, not ambient — only Kiro *steering* is — which
+        # is what admits them here while still excluding Copilot's
+        # `instructions/`, which enter every request. ⚠ `fux-enrich` was
+        # missing from this pair until 2026-09-06 on no surviving argument;
+        # see the header comment.
         (".kiro/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
+        (".kiro/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
     ),
     # **Codex is decision 3 EXERCISED, not amended** — *"adding a fourth is a
     # template plus a rendering plus a row, not a new decision"*. It costs no
@@ -154,11 +178,10 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # wrong?* — yes, and a skill has to be loaded to apply.
     # **`AGENTS_MD_VENDORS` below is the consequence**, and it is not optional.
     #
-    # `fux-enrich` stays claude-only (ADR-ENRICH decision 10). Nothing here
-    # widens it.
     "codex": (
         (".codex/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
         (".codex/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
+        (".codex/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
     ),
 }
 
@@ -228,14 +251,14 @@ _TYPES_HEADER = """\
 # plausible index with different postings.
 #
 # YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
-# be bound to it -- a .geojson is JSON, so `*.geojson decoder=jsondoc` is all it
+# be bound to it -- a .geojson is JSON, so `*.geojson decoder=json` is all it
 # takes, with no module to copy or edit. EXTENSIONS is a decoder's DEFAULT
 # CLAIM, not a list of what it can read. What is refused is REDIRECTING an
 # extension another decoder already claims.
 #
 # A binding is per EXTENSION, so `decoder=` sits only on a bare `*.ext` line --
 # dispatch sees a suffix and nothing about which glob admitted the file, so
-# `docs/api/*.json decoder=jsondoc` would bind every .json in the corpus.
+# `docs/api/*.json decoder=json` would bind every .json in the corpus.
 #
 # A PROSE FORMAT CARRIES NO BINDING. It is already text and no decoder is in
 # its path, so there is nothing to name.

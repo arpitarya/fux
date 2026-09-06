@@ -11,6 +11,13 @@ What it does well: a CSV whose cells *are* words — a decision log, an owner
 table, a glossary export — becomes a real table with its header row intact, and
 the header row is what makes a cell findable.
 
+**The filename leads as an H1**, added 2026-09-06. Without it a CSV decoded to
+a bare table: no heading for `refer/_chunk.py` to open a passage on, no
+`phrases` for `extract.py` to mine, and — because a table contains no blank
+line — a file over the passage ceiling that the chunker could not split at all.
+The chunker now bands oversized tables by rows; this gives the band something
+to be a section *of*.
+
 ⚠ The columns-as-headings question is deliberately **not** answered here. That
 is ranking policy, it belongs in `extract.py`, and putting it in a decoder
 would hand ranking to every consumer decoder — see
@@ -62,7 +69,8 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         # the file and make the text a moving target for no benefit.
         lines.append("")
         lines.append("*(table truncated)*")
-    return "\n".join(lines) + "\n"
+    name = rel_path.rsplit("/", 1)[-1]
+    return f"# {name}\n\n" + "\n".join(lines) + "\n"
 
 
 def _cell(value: str) -> str:

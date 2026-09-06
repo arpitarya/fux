@@ -119,9 +119,9 @@ systems that own it; verify at answer time.
   from their source (git dir / HTTP / Confluence — **that cap is a decision**),
   re-score passages on the fetched bytes, and cite a fresh sha.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic,
-  [ADR-EXTRACTED](docs/adr/0016_extracted-mode.md) — **accepted**) and
+  [ADR-EXTRACTED](docs/adr/0024_extracted-mode.md) — **accepted**) and
   `enriched` (opt-in, model-assisted,
-  [ADR-ENRICH](docs/adr/0040_enrich.md) — **accepted**: the name, the
+  [ADR-ENRICH](docs/adr/0046_enrich.md) — **accepted**: the name, the
   boundary and the record shape are ratified; **the build is not**). Both
   ratified by Arpit 2026-08-19. ⚠ **ADR-ENRICHED was superseded 2026-08-27** —
   its contract was folded into ADR-ENRICH verbatim first, and the
@@ -159,12 +159,38 @@ its milestone needs it. Nothing else comes back.
 restating it — and no record may restate one. Changing a law changes this
 section *and* ADR-LAWS' table, in the same commit.
 
+⚠ **Since 2026-09-06 each law also has its own record, `0002`–`0009`** — L1's is
+[ADR-L1](docs/adr/0002_l1-zero-cost.md), and ADR-LAWS' table routes to the rest.
+**Those records are RATIONALE, never the law**: they carry why it exists, what it
+has cost, how its wording has moved, and what would reopen it. **This section is
+still the only place a law is stated.** A session that reads a law record and
+acts on its prose instead of this text has made the exact mistake the
+no-restatement rule exists to prevent.
 
-- **L1** · **`$0`, stdlib-only runtime.** No third-party *runtime* dependencies. The
-  frontmatter parser and every codec are hand-rolled on purpose — that is the
-  zero-dependency guarantee and the product's central promise. Dev/test tooling
-  may use extras; the runtime path may not. No numpy, pandas, or scipy
-  anywhere, including in measurement harnesses.
+
+- **L1** · **`$0`, FOSS-only.** Fux is zero-cost to run and carries no
+  proprietary dependency: **no commercial licence, no paid or metered API, no
+  subscription, no hosted model — ever.** Every dependency ships under an
+  **OSI-approved licence**, identified by its **SPDX identifier**; permissive
+  and copyleft both qualify, and nothing else does.
+  ⚠ **Source-available is not open source, and that is the trap this clause
+  exists for.** BSL 1.1, SSPL, Elastic License 2.0, Commons Clause, "fair
+  source", and the free tier of a commercial product all **fail** L1 —
+  precisely because each one looks like it passes. **The test is the OSI
+  approved-licence list**, never the price, never a public repo, never the word
+  "open" in a README.
+  **Dependencies ship packaged.** Fux is one install with everything it needs —
+  no optional extras, no "install this for PDFs", no capability that works on
+  one machine and not another because of what somebody chose at install time.
+  **Permission is not authorization:** the law permits a dependency, a record
+  still decides one, and every runtime dependency is named by an accepted ADR.
+  **Dev, test and measurement tooling is bound by the same licence rule and
+  nothing more** — OSI-licensed, and numpy/pandas/scipy explicitly fine.
+  ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
+  dependencies outright — the zero-dependency guarantee, sold as the product's
+  central promise. **That guarantee is withdrawn**, deliberately, and
+  [ADR-L1](docs/adr/0002_l1-zero-cost.md) carries what it bought, what replaced
+  it, and the three things it left unguarded.
 - **L2** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The single exception is explicit per-source
   `snapshot` policy. This is the law the whole architecture rests on.
@@ -266,9 +292,12 @@ scale filter. What did not change is the deployment filter** — a
   environments, multi-team corpora with access boundaries, audit and
   compliance demands. None of these got cheaper when the corpus got smaller.
 
-- **Fux's laws are enterprise features, not constraints** — `$0`/stdlib = a
-  trivially auditable supply chain and no procurement; offline/no-API = no data
-  ever leaves the tenant; deterministic = compliance-grade reproducibility.
+- **Fux's laws are enterprise features, not constraints** — `$0`/FOSS-only =
+  no licence to buy, no procurement, and an SPDX-declared dependency tree an
+  auditor can clear in a sitting; offline/no-API = no data ever leaves the tenant; deterministic =
+  compliance-grade reproducibility. ⚠ **The stronger claim — a *trivially*
+  auditable supply chain, because there was no supply chain — was withdrawn
+  2026-09-06 with L1's amendment. Do not restore it in marketing prose.**
 
 The question per feature: *"does this hold up on a 10 000-document corpus
 inside that corporation, and does it foreclose 50k later?"* **The second
@@ -529,7 +558,7 @@ costume. **The paragraph above is the only guard.**
 the repo root** (Arpit, 2026-08-10, restated 2026-08-18). Nothing under `docs/`
 or `work/` is an archive. **Anything that gets archived is moved there**, into a
 directory mirroring where it came from — `work/adr/` retires into
-`archive/adr/`, and the handoff directory retired wholesale into
+`archive/adr-old/`, and the handoff directory retired wholesale into
 `archive/handoff/` — and gets a row in `archive/README.md` naming its live
 successor, or saying plainly that it has none. Enforced by
 `tests/test_archive_law.py`, which fails on a second `archive` directory
@@ -580,7 +609,7 @@ The register, the convention and the ownership table are in
   consequences · alternatives · reference · veto). The reference is grounded in
   code, a live doc, or measured evidence — **never an archived doc**.
 - **Records live in `docs/adr/`, and nowhere else.** A superseded record moves
-  to [`archive/adr/`](archive/adr/README.md) — where archive-is-not-evidence
+  to [`archive/adr-old/`](archive/adr/README.md) — where archive-is-not-evidence
   applies from that moment — in the same change that accepts its successor, and
   `archive/adr/README.md` maps its old number to that successor's name.
 
@@ -677,7 +706,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   cannot clear α = 0.05 at any discordant count** — and it rises from there
   (20 flips → net 10; 50 flips → net 16). The old *"±2 on 50"* admitted results
   whose best possible p-value is **0.50**. Table, script and the α discussion:
-  [ADR-RS](docs/adr/0036_predictions.md) decision 19.
+  [ADR-RS](docs/adr/0042_predictions.md) decision 19.
 - 🔴 **Every measured run records its PER-QUERY RESULTS under `evidence/`** —
   one row per query per arm, pass/fail. **Ruled by Arpit 2026-08-28:** *"record
   all the questions so we can check in detail."* ⚠ **A summary count is not
@@ -691,7 +720,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   `tests/test_regression_runs.py` checks it from there.
 
 Ruled by Arpit 2026-08-25 (W-78 ruling 2); explained and guarded by
-[ADR-RS](docs/adr/0036_predictions.md) decisions 11-15. ⚠ Two parts of the
+[ADR-RS](docs/adr/0042_predictions.md) decisions 11-15. ⚠ Two parts of the
 accepted rule — a **sealed** query set and the **decoy/placebo controls** — are
 **not built** and are owed as W-81; nothing may cite them as in force.
 
@@ -743,7 +772,7 @@ archive/            THE ONE ARCHIVE — everything retired, mirroring the live t
   v0.1/             build: the first one
 ```
 
-**Records live in `docs/adr/`.** A superseded one moves to `archive/adr/` in
+**Records live in `docs/adr/`.** A superseded one moves to `archive/adr-old/` in
 the same change that accepts its successor, and the archive maps its number to
 that successor's name. The v0.30 set was archived wholesale on 2026-08-18;
 `work/adr/` no longer exists.
