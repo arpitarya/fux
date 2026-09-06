@@ -12,7 +12,7 @@ timestamp: 2026-08-27T00:00:00Z
 
 **Every proposed verdict in §4 is accepted as written**, plus a mechanism for
 fork 3 that §4 did not specify. The ruling is recorded in
-[ADR-QUALITY](../../docs/adr/0044_quality-contract.md); this document is the
+[ADR-QUALITY](../../docs/adr/0051_quality-contract.md); this document is the
 argument behind it and stays citable as such.
 
 | fork | ruled |
@@ -46,7 +46,7 @@ asks.
 
 ---
 
-**The gap, stated plainly.** [ADR-RS](../../docs/adr/0036_predictions.md) governs
+**The gap, stated plainly.** [ADR-RS](../../docs/adr/0043_predictions.md) governs
 *how* a claim is frozen and is silent on *what quantity is worth freezing*. So
 every quality number fux has ever produced carries an **undeclared query
 distribution** and an implicit cost model in which a fabricated citation and an
@@ -93,7 +93,7 @@ default in classical IR. Two independent arguments against it in a RAG setting:
 
 | argument | why it bites |
 |---|---|
-| **A reranker follows retrieval** | the retriever's initial ordering is discarded downstream, so scoring that ordering measures something nobody consumes. Fux has a reranker ([ADR-RERANK](../../docs/adr/0041_rerank.md)) |
+| **A reranker follows retrieval** | the retriever's initial ordering is discarded downstream, so scoring that ordering measures something nobody consumes. Fux has a reranker ([ADR-RERANK](../../docs/adr/0048_rerank.md)) |
 | **"Lost in the middle"** | LLMs show **U-shaped** attention over long contexts, so a *monotonically decaying* metric like MRR or nDCG asserts a value curve the consumer demonstrably does not have |
 
 **Recall@k is described as "the most directly actionable metric for RAG",**
@@ -364,6 +364,6 @@ Reopen this verdict when **any** becomes true:
 - [Selective Question Answering under Domain Shift](https://arxiv.org/pdf/2006.09462)
 - [Information retrieval evaluation using test collections](https://link.springer.com/article/10.1007/s10791-016-9281-7)
 - [Goodhart's Law Comes for Every Benchmark You Trust — CACM](https://cacm.acm.org/blogcacm/goodharts-law-comes-for-every-benchmark-you-trust/)
-- **In-repo:** [ADR-RS](../../docs/adr/0036_predictions.md) ·
+- **In-repo:** [ADR-RS](../../docs/adr/0043_predictions.md) ·
   [W-82 §5.2](../../archive/open/W-82-the-consolidated-build.md) ·
   [P1-GATE verdict](../regression/2026-08-09-pruning-eval/VERDICT.md)

@@ -9,7 +9,7 @@ timestamp: 2026-08-20T00:00:00Z
 # Which files are documents — Comparison
 
 >
-> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its verdict landed with **W-45 (verdict E, decided the same day)**, W-45 and W-55 are both archived, and [ADR-TYPES](../../docs/adr/0031_types-list.md) is `accepted` and shipped. Decided and built; only the frontmatter lagged.
+> ⚠ **Status corrected 2026-08-22 (queue review):** this read `proposed` while its verdict landed with **W-45 (verdict E, decided the same day)**, W-45 and W-55 are both archived, and [ADR-TYPES](../../docs/adr/0038_types-list.md) is `accepted` and shipped. Decided and built; only the frontmatter lagged.
 
 > **VERDICT: G — DECIDED by Arpit, 2026-08-20.** A built-in default allowlist,
 > overridable by `.fux/sources/types`. A third committed source file, one glob per line,
@@ -28,7 +28,7 @@ timestamp: 2026-08-20T00:00:00Z
 > untouched** — a built-in default, overridable by `.fux/sources/types`,
 > absent means the default applies. **The 14 % / 11.4 % measurement stands**;
 > what changed is that those tokens were raw bytes and now pass through a
-> decoder ([ADR-DECODE](../../docs/adr/0042_decode.md)). This was rulable
+> decoder ([ADR-DECODE](../../docs/adr/0049_decode.md)). This was rulable
 > precisely because of the confidence line above — *a defaults judgment rather
 > than a measurement*. ⚠ Two documents had claimed it needed a new
 > pre-registration at 10 000 documents; **that was wrong and is corrected**.
@@ -60,7 +60,7 @@ tokens** — `.json` alone is 11.4 %, because a machine-written evidence file is
 long and repetitive, which is exactly the shape that distorts `df`.
 
 **Scope:** this decides the **git-dir walker only**. A URL record is whatever
-its fetcher returned as markdown ([ADR-FETCHER](../../docs/adr/0019_fetcher.md)),
+its fetcher returned as markdown ([ADR-FETCHER](../../docs/adr/0027_fetcher.md)),
 so there is no extension to filter on and nothing here applies to it.
 
 ## Prior art
@@ -119,7 +119,7 @@ whether bytes "read as prose" is a classifier, and a classifier that misfires
 does so silently — indexing a lockfile as a runbook, or dropping a sparse but
 real document. This repo has already ruled that a heuristic must not decide
 what a document *means*
-([ADR-HTTP-FETCHER](../../docs/adr/0021_http-fetcher.md) decision 3); the same
+([ADR-HTTP-FETCHER](../../docs/adr/0029_http-fetcher.md) decision 3); the same
 argument applies to deciding what a document *is*. It also cannot be reviewed:
 there is no diff for a judgment made at ingest.
 

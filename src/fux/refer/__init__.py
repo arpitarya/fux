@@ -194,7 +194,7 @@ def refer(
         documents.append(cited)
         if result is None:
             continue
-        text, generated = _readable(root, result)
+        text, generated, strategy = _readable(root, result)
         fetched.append(
             (
                 doc_id,
@@ -205,6 +205,7 @@ def refer(
                     min_passage_bytes=min_passage_bytes,
                     max_passage_bytes=max_passage_bytes,
                     line_numbers=not generated,
+                    strategy=strategy,
                 ),
             )
         )
@@ -218,7 +219,7 @@ def refer(
     return Bundle(assembled=assembled, documents=documents, policy=policy.as_record())
 
 
-def _readable(root: Path, result) -> tuple[str, bool]:
+def _readable(root: Path, result) -> tuple[str, bool, str]:
     """The text to chunk, and whether it was **generated** rather than read.
 
     ## The defect this closes
@@ -251,7 +252,7 @@ def _readable(root: Path, result) -> tuple[str, bool]:
     passage's heading travels beside it in the citation.
     """
     if result.strategy != GIT:
-        return result.content.decode("utf-8", errors="replace"), False
+        return result.content.decode("utf-8", errors="replace"), False, "heading"
     try:
         decoded = _decode_bytes(result.content, result.loc, root)
     except DecodeFailed:
@@ -260,8 +261,23 @@ def _readable(root: Path, result) -> tuple[str, bool]:
         # No decoder claims this type, or one claims it and got nothing out.
         # Either way the bytes are the best text available, which is exactly
         # what this path did for every document before decoding existed.
-        return result.content.decode("utf-8", errors="replace"), False
-    return decoded, True
+        return result.content.decode("utf-8", errors="replace"), False, "heading"
+    # The chunk strategy travels WITH the decoder, because the decoder is the
+    # only thing that knows the format's semantics. `refer` reads it off the
+    # registry rather than keeping a table of its own — a table here would be
+    # the second place format knowledge lives, and the first one to drift.
+    return decoded, True, _strategy_for(root, result.loc)
+
+
+def _strategy_for(root: Path, loc: str) -> str:
+    """The decoder's declared `CHUNK`, or `heading`."""
+    from ..decode import registry
+
+    dot = loc.rfind(".")
+    slash = max(loc.rfind("/"), loc.rfind("\\"))
+    ext = loc[dot:].lower() if dot > slash + 1 else ""
+    decoder = registry(root).get(ext)
+    return decoder.chunk if decoder is not None else "heading"
 
 
 def _mark_changed_urls_dirty(root: Path, documents: list[Cited]) -> None:

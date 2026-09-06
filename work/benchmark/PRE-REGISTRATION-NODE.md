@@ -55,7 +55,7 @@ until this document says otherwise.
 | `id`, `loc`, `order` of results | **byte-equal** | this is the answer; a different order is a different product |
 | `heading`, `title`, `phrases`, `locators` (`path:L<a>-L<b>`) | **byte-equal** | a citation a reader opens; an off-by-one line is a wrong quote |
 | `band`, `missing`, `answerable` | **byte-equal** | a claim fux makes out loud |
-| `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([ADR-URL-FRESHNESS](../../docs/adr/0052_url-freshness.md)) |
+| `source`, `freshness` | **byte-equal** | the claim-strength vocabulary ([ADR-URL-FRESHNESS](../../docs/adr/0059_url-freshness.md)) |
 | `graph.json` plane digest | **byte-equal** | one digest or the arm proves nothing |
 | **`score`** | 🔴 **`________________`** — **(a)** byte-equal, on one portable `log` in both runtimes · **(b)** equal after `round(9)` | **Arpit's, per §0** |
 

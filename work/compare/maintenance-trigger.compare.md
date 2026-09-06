@@ -13,7 +13,7 @@ timestamp: 2026-08-20T00:00:00Z
 > [W-25](../../archive/open/W-25-m5-maintenance.md) / `ADR-MAINTENANCE` (reserved). A
 > hook re-emits only the changed lines into the committed index — not a full
 > rebuild — and the existing write-if-different + per-shard-sha discipline
-> ([ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md)) does the
+> ([ADR-INDEX-LIFECYCLE](../../docs/adr/0018_index-lifecycle.md)) does the
 > rest. Rejected: **B — CI-triggered rebuild** (a bot commits over the
 > human's diff, defeating the doc-major diffable design the committed index
 > exists for); **C — a local watch daemon** (solves live-edit latency but not
@@ -23,7 +23,7 @@ timestamp: 2026-08-20T00:00:00Z
 > **Status:** ✅ accepted (Arpit, 2026-08-20). **Next: implement W-25.**
 > **Open sub-decision, not yet ruled on:** should the hook also call `fux
 > build` so `.fux/runtime/graph.json` refreshes immediately, or is the
-> existing stale→scan fallback ([ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md)
+> existing stale→scan fallback ([ADR-INDEX-LIFECYCLE](../../docs/adr/0018_index-lifecycle.md)
 > decision 7) sufficient and the rebuild left on its current manual/CI
 > trigger? Fold the answer into `ADR-MAINTENANCE` when it's written.
 > **Reopen when:** R5 (20-doc commit < 1 s) or R6 (three-tier merge harness)
@@ -41,14 +41,14 @@ Two layers need to stay fresh, and they are not the same problem:
 2. **Committed index → derived runtime, including the graph plane**
    (`.fux/runtime/`, via `fux build`). This layer **already self-protects**:
    the runtime manifest pins a sha per committed shard
-   ([ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md) decision
+   ([ADR-INDEX-LIFECYCLE](../../docs/adr/0018_index-lifecycle.md) decision
    7), and on drift `ask`/`explain`/`graph`/`path` fall back to a full scan
    rather than trust a stale accelerator or a stale graph plane
-   ([ADR-GRAPH](../../docs/adr/0029_graph.md)). It is never *wrong*,
+   ([ADR-GRAPH](../../docs/adr/0036_graph.md)). It is never *wrong*,
    only slow when stale — so the open problem for this layer is triggering a
    rebuild promptly, not correctness.
 
-This isn't new ground: [ADR-INGEST](../../docs/adr/0007_ingest.md)'s
+This isn't new ground: [ADR-INGEST](../../docs/adr/0016_ingest.md)'s
 consequences section already named the target — **"re-ingest is safe to run
 on a hook, which is what M5 depends on"** — and
 [W-25](../../archive/open/W-25-m5-maintenance.md) is the open item that was scoped to
@@ -124,9 +124,9 @@ default silently.
 
 - [W-25 — M5: maintenance](../../archive/open/W-25-m5-maintenance.md) — the item this
   document backs
-- [ADR-INGEST](../../docs/adr/0007_ingest.md) — "re-ingest is safe to run on
+- [ADR-INGEST](../../docs/adr/0016_ingest.md) — "re-ingest is safe to run on
   a hook, which is what M5 depends on"
-- [ADR-INDEX-LIFECYCLE](../../docs/adr/0009_index-lifecycle.md) — the
+- [ADR-INDEX-LIFECYCLE](../../docs/adr/0018_index-lifecycle.md) — the
   write-if-different + per-shard-sha staleness mechanism layer 2 already has
-- [ADR-GRAPH](../../docs/adr/0029_graph.md) — the derived graph plane
+- [ADR-GRAPH](../../docs/adr/0036_graph.md) — the derived graph plane
   this rebuild refreshes

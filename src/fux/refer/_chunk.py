@@ -84,6 +84,11 @@ MAX_PASSAGE_BYTES = 4000
 #: turns.
 TABLE_ROWS_PER_PASSAGE = 1
 
+#: The heading level a `page` decoder uses to mark one page, slide or message.
+#: Two, because that is what `pptx`, `mail` and `drawio` already emit — the
+#: `#` above it is the document's own title.
+PAGE_LEVEL = 2
+
 
 @dataclass(frozen=True)
 class Passage:
@@ -117,6 +122,7 @@ def chunk(
     min_passage_bytes: int = MIN_PASSAGE_BYTES,
     max_passage_bytes: int = MAX_PASSAGE_BYTES,
     line_numbers: bool = True,
+    strategy: str = "heading",
 ) -> list[Passage]:
     """Split into heading-delimited passages, in document order.
 
@@ -144,8 +150,14 @@ def chunk(
     `line_numbers=False` suppresses `line_start`/`line_end` for a document
     whose text was generated rather than read — see the module docstring.
     """
-    sections = _sections(content)
-    merged = _merge_runts(sections, min_passage_bytes=min_passage_bytes)
+    if strategy == "page":
+        # A page is atomic: it is never merged into a neighbour, and a heading
+        # INSIDE it does not start a new passage. Both halves matter — see
+        # `_pages` for the two defects each one closes.
+        merged = _pages(content)
+    else:
+        sections = _sections(content)
+        merged = _merge_runts(sections, min_passage_bytes=min_passage_bytes)
 
     passages: list[Passage] = []
     for heading, text, start, end in merged:
@@ -161,6 +173,42 @@ def chunk(
                 )
             )
     return passages
+
+
+def _pages(content: str) -> list[tuple[str, str, int, int]]:
+    """`(heading, text, line_start, line_end)` per PAGE, for `strategy="page"`.
+
+    A page — a slide, an mbox message, a diagram page — is a complete unit, and
+    the heading strategy got it wrong in two directions at once. Both were
+    measured on 2026-09-06 before this was written:
+
+    **1. Pages were absorbed by their neighbours.** `_merge_runts` folds a
+    short section forward, and `_sibling_run` only exempts a RUN of short ones.
+    A short slide between two long ones is not a run, so on a three-slide deck
+    `## Slide 1`'s content was cited as `deck.pptx` and `## Slide 3`'s as
+    `Slide 2` — **systematically the wrong attribution**, which is worse than a
+    coarse citation because it is confidently wrong.
+
+    **2. Pages were shattered from inside.** An `.mbox` message whose body is
+    HTML emits that body's own `<h1>` as a level-1 heading, **outranking** the
+    `## Subject` above it: one email became four passages, two of them cited as
+    though they were top-level units of the archive. `mail.py` now demotes an
+    embedded body's headings, and this function ignores anything deeper than
+    `PAGE_LEVEL` regardless — belt and braces, because the decoder is consumer-
+    replaceable and this invariant is not.
+
+    Text before the first page heading is its own section, so a document title
+    (`# archive.mbox`) is not lost.
+    """
+    starts = {h.lineno: h for h in _headings(content) if h.level <= PAGE_LEVEL}
+    lines = content.split("\n")
+    sections: list[tuple[str, list[str], int]] = [("", [], 1)]
+    for lineno, line in enumerate(lines, start=1):
+        if lineno in starts:
+            sections.append((starts[lineno].text, [line], lineno))
+        else:
+            sections[-1][1].append(line)
+    return _spans(sections)
 
 
 def _sections(content: str) -> list[tuple[str, str, int, int]]:
@@ -183,6 +231,16 @@ def _sections(content: str) -> list[tuple[str, str, int, int]]:
         else:
             sections[-1][1].append(line)
 
+    return _spans(sections)
+
+
+def _spans(sections: list[tuple[str, list[str], int]]) -> list[tuple[str, str, int, int]]:
+    """`(heading, lines, start)` -> `(heading, text, line_start, line_end)`.
+
+    Shared by `_sections` and `_pages` so the two strategies cannot disagree
+    about what a span's line range means — the drift that cost this file its
+    two private heading regexes.
+    """
     out: list[tuple[str, str, int, int]] = []
     for heading, lines, start in sections:
         joined = "\n".join(lines)

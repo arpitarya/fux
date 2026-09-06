@@ -131,7 +131,7 @@ Two of these publish enough engineering detail to be worth reading properly:
   interview.** They added lexical because pure-neural under-performed.
 
   *(That reversal is worth holding onto: it is external support for the
-  full-postings lexical core accepted in [ADR-RECORD](../../archive/adr/0004_index-format.md),
+  full-postings lexical core accepted in ADR-RECORD,
   from a company with a $5M GPU cluster and every incentive to go dense.)*
 
 - **Brave** has the one genuinely structural moat: the **Web Discovery
@@ -266,5 +266,5 @@ the number exists.
 
 **Internal** — [`../paper/the-fux-index-paper.md`](../paper/the-fux-index-paper.md) ·
 [`../compare/cache-policy.compare.md`](../compare/cache-policy.compare.md) ·
-[`../adr/0004_index-format.md`](../../archive/adr/0004_index-format.md) ·
+`../adr/0004_index-format.md` ·
 [the ADR register](../../docs/adr/README.md) §M4

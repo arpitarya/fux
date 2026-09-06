@@ -182,7 +182,7 @@ form.
 1. [`work/paper/the-fux-index-paper.md`](work/paper/the-fux-index-paper.md) — architecture + falsifiable predictions
 2. [`work/compare/index-format.compare.md`](work/compare/index-format.compare.md) — the committed format, measured
 3. [the ADR register](docs/adr/README.md) — milestones M0–M8
-4. [`archive/adr-old/0004_index-format.md`](archive/adr-old/0004_index-format.md) — the frozen M1 schema, named here for orientation only (archive is not evidence — see [`archive/README.md`](archive/README.md))
+4. `archive/adr-old/0004_index-format.md` — the frozen M1 schema, named here for orientation only (archive is not evidence — see [`archive/README.md`](archive/README.md))
 5. [`../fux-playground/PLAYGROUND.md`](../fux-playground/PLAYGROUND.md) — a graded 10-doc corpus to try it on, in a **separate sibling repository** (clone it next to this one)
 6. [`work/WORKLOG.md`](work/WORKLOG.md) — the running build log
 

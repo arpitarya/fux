@@ -481,6 +481,36 @@ tidy-up.
   both would have kept passing and proved nothing — the vacuous-pass shape this
   repo has recorded before. They run on `.docx` now.
 
+**19. A decoder may declare `CHUNK`, from a closed vocabulary.** Optional, on
+decision 4's `WANTS_PATH` precedent: a decoder is still `EXTENSIONS` plus
+`decode()`, and one that says nothing means `"heading"`.
+
+```python
+EXTENSIONS = (".pptx", ".pptm")
+CHUNK = "page"          # optional; "heading" | "page"
+```
+
+- **Because the decoder is the only thing that knows the format's
+  semantics.** The chunker knows a regex. Every format-specific need was
+  becoming another branch in `refer/_chunk.py` — that already happened once for
+  tables, and `pptx`, `mail` and `drawio` were queued behind it. Format
+  knowledge belongs in the format's module.
+- **Data, not a callback.** A function here would put arbitrary code on the
+  citation path and make a consumer override meaningless — the same reasoning
+  that makes `EXTENSIONS` a tuple.
+- **An unknown value is a HARD ERROR at load time**, not a silent fallback. A
+  consumer who writes `CHUNK = "pages"` and gets heading-splitting has a
+  citation defect with no signal, which is what decision 7 refuses for a
+  missing dependency and decision 13 for an unknown `decoder=`.
+- **`pptx`, `mail` and `drawio` declare `"page"`** (Arpit, 2026-09-06). What it
+  fixes is in [ADR-REFER](0037_refer-plane.md) decision 27; both defects were
+  measured before the change.
+- ⚠ **`mail` also gained `_demote`.** `htmldoc` maps `<h1>` to `#`, so a
+  message whose body is HTML emitted a level-1 heading *underneath* its own
+  `## Subject`. Demoting the body three levels is a decoder fix and correct
+  independently of any strategy — the chunker's own level check is belt and
+  braces, because a decoder is consumer-replaceable and that invariant is not.
+
 ### Consequences
 
 - **The converter duplication is structurally impossible now**, and the

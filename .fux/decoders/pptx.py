@@ -26,6 +26,11 @@ from fux.decode._zip import SafeZip, ZipTooBig, numeric_key
 
 EXTENSIONS = (".pptx", ".pptm")
 
+#: A slide is a complete unit: one passage per slide, never merged into
+#: its neighbour and never split at a heading inside it.
+#: ADR-REFER's `page` strategy; ADR-DECODE decision 19 for the opt-in name.
+CHUNK = "page"
+
 _SLIDES = "ppt/slides/slide"
 _NOTES = "ppt/notesSlides/notesSlide"
 

@@ -464,6 +464,38 @@ whether CSV and Excel should chunk line by line).
   was wrong, and the row is closed here rather than left to look like a live
   option.
 
+**27. `strategy="page"` — a slide, a message, a diagram page is atomic.**
+Threaded from the decoder's `CHUNK` ([ADR-DECODE](0049_decode.md) decision 19),
+read off the registry rather than from a table here: a second place for format
+knowledge is the first one to drift.
+
+**The heading strategy was wrong in both directions at once, and both were
+measured on 2026-09-06 before this was written.**
+
+- 🔴 **Pages were absorbed by their neighbours, and cited under the wrong
+  name.** `_merge_runts` folds a short section forward and `_sibling_run` only
+  exempts a *run* of short ones — a short slide between two long ones is not a
+  run. On a three-slide deck, **`Slide 1`'s content was cited as `deck.pptx`
+  and `Slide 3`'s as `Slide 2`**. That is worse than a coarse citation: it is
+  confidently the wrong attribution, and nothing about the output looks wrong.
+  `drawio` had the identical shape — a short diagram page absorbed the next one.
+- 🔴 **Pages were shattered from the inside.** An `.mbox` message whose body is
+  HTML carried that body's `<h1>` as a **level-1** heading, outranking the
+  `## Subject` above it: **one email became four passages**, two of them cited
+  as though they were top-level units of the archive.
+
+**A page section is therefore never merged, and headings deeper than
+`PAGE_LEVEL` (2) inside it do not split it.** Text before the first page
+heading is still its own section, so a document title is not lost.
+
+- **`PAGE_LEVEL = 2` because that is what the three decoders already emit** —
+  the `#` above it is the document's own title.
+- **`_spans` is shared with `_sections`**, so the two strategies cannot
+  disagree about what a line range means. That is the drift this file already
+  paid for once with two private heading regexes.
+- **`heading` is unchanged and remains the default.** Pinned by
+  `test_the_heading_strategy_is_untouched`.
+
 ### Consequences
 
 - **Offline degradation is honest, and tested.** `file:` sources keep full

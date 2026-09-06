@@ -37,8 +37,8 @@ One pass at [`doctor.py`](../src/fux/doctor.py) — see
 [IMPLEMENTATION](IMPLEMENTATION.md) for the table and the evidence.
 
 🔴 **The one that mattered most: the `as-ingested` share.** It is the **veto
-check of two ACCEPTED records** ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
-[ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)), both of which named
+check of two ACCEPTED records** ([ADR-ACQUIRED](../docs/adr/0057_acquired-plane.md),
+[ADR-URL-FRESHNESS](../docs/adr/0059_url-freshness.md)), both of which named
 `fux doctor --json` as how to run it and neither of which could be run at all.
 `doctor.freshness_counts()` and the new `freshness` block close that; both
 records' debt paragraphs are rewritten with a captured output block.
@@ -69,7 +69,7 @@ the tests and both records keep them apart.
 the clean-corpus-recall row are **deleted**. Before the second went, its unique
 claims — the `none` arm's numbers and *`recall@k` is a paired metric that
 separates arms `hit@k` cannot* — moved into
-[ADR-QUALITY](../docs/adr/0044_quality-contract.md).
+[ADR-QUALITY](../docs/adr/0051_quality-contract.md).
 
 **Still idle and needing no ruling:** the glibc `log` probe on a CI runner, the
 `idf` widening, the lab emitter, W-97's two harness blockers, the `heading`
@@ -148,7 +148,7 @@ graded queries, answer recall `0.4341 → 0.8256`, `ask` byte-identical. **Read
 the three costs before you touch this verb**: +157 % assembled bytes on 43/43,
 8/43 bands demoted `grounded → weak`, and the cited document differs from
 `ask`'s first result on 18/43. All three are in
-[ADR-ANSWER](../docs/adr/0006_answer.md) decisions 11–13.
+[ADR-ANSWER](../docs/adr/0015_answer.md) decisions 11–13.
 
 ⚠ **Two things a next session must not re-derive as a surprise:**
 
@@ -187,7 +187,7 @@ new and both are genuinely his:
    performs no body download"* is **unmet as written**: CDP interception is at
    the response stage, so the body has already transferred. `validate()` saves
    the decode and the shard comparison, not bandwidth
-   ([ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md) decision 12).
+   ([ADR-CDP-FETCHER](../docs/adr/0028_cdp-fetcher.md) decision 12).
 2. **Whether the W-83 shape gets a gate.** `acquired_max_bytes` was accepted in
    a record, assigned in the ownership table, and **never implemented** — every
    mechanical check passed, because the freshness gate proves a record was
@@ -198,8 +198,8 @@ new and both are genuinely his:
 
 **What is actually open:** [W-101](OPEN-WORK.md), a single `doctor.py` pass
 carrying four things — and its first is the **veto check for TWO accepted
-records** ([ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md),
-[ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md)), so until it lands
+records** ([ADR-ACQUIRED](../docs/adr/0057_acquired-plane.md),
+[ADR-URL-FRESHNESS](../docs/adr/0059_url-freshness.md)), so until it lands
 neither veto can be run at all. **The `.fux/enrich/` redaction hole is closed** —
 see the section below.
 
@@ -257,12 +257,12 @@ shell is dead, write that file.**
 ⚠ **Phase 2's spec was CUT, not built, and the boundary HELD.** The `status`,
 `final_url_host` and `final_url_contains` conditions and the always-on
 `landed-off-origin` check would have put HTTP facts inside the engine, which
-[ADR-FETCHER](../docs/adr/0019_fetcher.md) decision 13 forbids — and whose own
+[ADR-FETCHER](../docs/adr/0027_fetcher.md) decision 13 forbids — and whose own
 veto names *"`urlsrc.py` mentions a status code"* as proof of regression. Arpit
 ruled CUT; the six remaining conditions are pure over the bytes, and provider
 detection survives as `body_contains` over **form-field names**, which are an
 API between a page and its own backend and outlive the redesigns that rewrite
-every visible string. [ADR-REFUSAL](../docs/adr/0051_refusals.md) decision 4.
+every visible string. [ADR-REFUSAL](../docs/adr/0058_refusals.md) decision 4.
 
 The item's detail file is archived at
 [`archive/open/W-98-acquired-plane.md`](../archive/open/W-98-acquired-plane.md)
@@ -332,7 +332,7 @@ middle, contract and transport unchanged:
    phases landed), so it went to
    [`archive/handoff/`](../archive/README.md) with a successor row naming the
    three records it produced, and W-98 §2/§11 now point at
-   [ADR-REFUSAL](../docs/adr/0051_refusals.md) instead of at the moved file.
+   [ADR-REFUSAL](../docs/adr/0058_refusals.md) instead of at the moved file.
    `tests/test_archive_law.py` is green. ⚠ **The lesson worth keeping is the
    one that produced the red:** a handoff was written into the `work/`-side
    directory retired on 2026-08-18, and both copies then had to be *kept in sync by hand* for a
@@ -350,7 +350,7 @@ byte-identical to the old template (verified before writing) and was synced.
 `extract_links` has no caller in `src/`, but the file's comment and
 `tests/ingest/test_cdp_fetcher.py` retain it deliberately. **Arpit ruled: keep
 the code, fix the docstring.** Done. And
-[ADR-ACQUIRED](../docs/adr/0050_acquired-plane.md) is still `⏳ proposed` with
+[ADR-ACQUIRED](../docs/adr/0057_acquired-plane.md) is still `⏳ proposed` with
 `owns: []` — **a record claims what the table gives it today.**
 
 **Suite: 2647 unit passed, 2 skipped, 74 e2e passed** (2026-09-01, after the
@@ -594,7 +594,7 @@ rule picks `0.5`; its verdict table's non-monotone row picks *no change*.
 - **`SEPARATION_FLOOR` stays `0.10`, and no test was edited** — the confidence
   test asserts the rule relative to the constant and never its value, a guard
   built for exactly this moment and working.
-- **The correction lives in [ADR-RS](../docs/adr/0036_predictions.md) decision
+- **The correction lives in [ADR-RS](../docs/adr/0043_predictions.md) decision
   18, never in the frozen file** (W-82 ruling 8).
 
 **Three defects, all the same shape: an error message that sends the reader
@@ -731,7 +731,7 @@ doing exactly its job; **one** was a `binary` fixture worth a look. One number
 over two populations is a number nobody reads by the second run — the same
 failure W-88's skip notice was written for, arrived at from the other side.
 
-**So [ADR-INGEST](../docs/adr/0007_ingest.md) gained decision 15:** a skip
+**So [ADR-INGEST](../docs/adr/0016_ingest.md) gained decision 15:** a skip
 carries its class — `POLICY` (a committed list said no) or `UNREADABLE` (fux
 opened it and could not read it) — **assigned where the skip is made, never
 parsed back out of the reason string**, and the summary counts them separately.
@@ -773,7 +773,7 @@ Ruled by Arpit on 2026-08-27, closing W-89.
   not new exposure**. Grounded in the 2006 AOL search-log release, where
   de-identified queries still identified a named individual.
 - ⚠ **Why this was a law and not one more ADR decision.** The prohibition already
-  existed as [ADR-QUALITY](../docs/adr/0044_quality-contract.md) decision 11 — and
+  existed as [ADR-QUALITY](../docs/adr/0051_quality-contract.md) decision 11 — and
   an ADR is a thing another ADR may supersede. Meanwhile
   [`proposals/ranking-tuning.md`](proposals/ranking-tuning.md) §8 calls a per-repo
   query log *"an asset fux gets for free"*. **The pull toward building one is
@@ -849,7 +849,7 @@ subject ceased to exist*. **The answer was archival, not a fourth status.**
 
 ### The change before it: fux states how much it believes its own answer (2026-08-27)
 
-**[ADR-CONFIDENCE](../docs/adr/0045_confidence.md) (`0045`, ⏳ proposed) is the
+**[ADR-CONFIDENCE](../docs/adr/0052_confidence.md) (`0045`, ⏳ proposed) is the
 runtime half of the quality contract below.** Every answer now carries four
 signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
 `band`, and an `answerable` boolean — on `ask`/`find`/`answer` in `--json`, on
@@ -887,7 +887,7 @@ signals (`coverage` idf-weighted · `separation` · `verified` · `support`), a
 ### The change before it: the quality contract is declared (2026-08-27)
 
 **Fux now says what a quality number means, for the first time.**
-[ADR-QUALITY](../docs/adr/0044_quality-contract.md) (`0044`, accepted) ratifies
+[ADR-QUALITY](../docs/adr/0051_quality-contract.md) (`0044`, accepted) ratifies
 W-87 Phase 0 — all six forks, on Arpit's ruling.
 
 **Four things a session arriving cold will otherwise get wrong:**
@@ -921,7 +921,7 @@ detail file with no index row.
 **Fux reads thirty extensions now, not six.** Sixteen built-in decoders, all
 stdlib, no dependency added; `fux setup` copies them into `.fux/decoders/` and
 **the copy is what runs**. Consumer decoders may bring dependencies the runtime
-may not — [ADR-DECODE](../docs/adr/0042_decode.md) is the record, and the
+may not — [ADR-DECODE](../docs/adr/0049_decode.md) is the record, and the
 detail file is archived at
 [`archive/open/W-86-the-decoder-plane.md`](../archive/open/W-86-the-decoder-plane.md)
 (named, never cited).
@@ -981,7 +981,7 @@ split, 2026-08-26.
 **Fork E was ruled the same day, and the law did not move.** Arpit: *"let the
 consumer add the dependencies — unless the consumer adds the dependencies,
 that feature won't be available."* This looked like an L1 amendment and is not
-one: [ADR-ENRICH](../docs/adr/0040_enrich.md) decision 1 already states the
+one: [ADR-ENRICH](../docs/adr/0047_enrich.md) decision 1 already states the
 pattern as a table — network I/O → `.fux/fetchers/`, model calls → the
 consumer's agent — and **this is its third row, `.fux/decoders/<name>.py`.**
 L1 constrains the runtime fux ships; consumer code is not that. ⚠ **The
@@ -1001,7 +1001,7 @@ is the wrong one.
 ### The change before it: `ask` cites at heading level (W-84, 2026-08-26)
 
 **Arpit asked whether `ask` should cite at line level. The answer was no, and
-the refusal is the durable half** — [ADR-ASK](../docs/adr/0004_ask.md)
+the refusal is the durable half** — [ADR-ASK](../docs/adr/0013_ask.md)
 decision 10 carries it. A line range on `ask` could only be computed at
 **ingest**, so one edit makes it point at the wrong lines *while looking
 exactly as right as before*; it also costs a positional index (2–4× the
@@ -1226,13 +1226,13 @@ a verdict, a hold lifted, or fifty goldens written by hand.
 | shipped 2026-08-20 | record | measured? |
 |---|---|---|
 | W-46 · W-48 — two query defects | ADR-CLI · ADR-ASK · ADR-ANSWER | n/a |
-| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0029_graph.md) ✅ | **no** — W-57 |
-| **M4 core** the refer plane | [ADR-REFER](../docs/adr/0030_refer-plane.md) ✅ (2026-08-21, veto 2 open) | **partly** — R4 passed; the budget sweep is W-59 |
-| W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0022_dir-list.md) · [ADR-TYPES](../docs/adr/0031_types-list.md) ✅ | **no** — rides with W-52 |
+| **M3** the graph lane | [ADR-GRAPH](../docs/adr/0036_graph.md) ✅ | **no** — W-57 |
+| **M4 core** the refer plane | [ADR-REFER](../docs/adr/0037_refer-plane.md) ✅ (2026-08-21, veto 2 open) | **partly** — R4 passed; the budget sweep is W-59 |
+| W-45 + W-55 — what fux indexes | [ADR-DIR-LIST](../docs/adr/0030_dir-list.md) · [ADR-TYPES](../docs/adr/0038_types-list.md) ✅ | **no** — rides with W-52 |
 | W-56 — both lab environments | SETUP-LAB · SETUP-PLAYGROUND | rebuilt, under git |
-| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0032_hooks.md) ✅ · [ADR-MERGE-DRIVER](../docs/adr/0033_merge-driver.md) ✅ | **ruled, not passed** — W-66 builds it, W-67 repairs R6's instrument |
-| W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0030_refer-plane.md) 5a-5c ✅ | n/a |
-| **W-63 · W-64** the source verbs, the progress plane | [ADR-CLI](../docs/adr/0002_cli-surface.md) ✅ | captured, not gated |
+| **M5** maintenance | [ADR-MAINTENANCE](../docs/adr/0039_hooks.md) ✅ · [ADR-MERGE-DRIVER](../docs/adr/0040_merge-driver.md) ✅ | **ruled, not passed** — W-66 builds it, W-67 repairs R6's instrument |
+| W-60 — the TTL fetch cache | [ADR-REFER](../docs/adr/0037_refer-plane.md) 5a-5c ✅ | n/a |
+| **W-63 · W-64** the source verbs, the progress plane | [ADR-CLI](../docs/adr/0011_cli-surface.md) ✅ | captured, not gated |
 
 **No record on this list is `proposed` any more.** ADR-MAINTENANCE and
 ADR-MERGE-DRIVER both went `accepted` on 2026-08-22 on Arpit's two calls;
@@ -1262,12 +1262,12 @@ days old, pre-1.0). **Still no subcommand tree.**
 **Read this first: the engine grew two milestones and neither is measured, and
 the reason is that the measuring environments are gone.**
 
-- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0029_graph.md),
+- **M3, the graph lane, shipped** ([ADR-GRAPH](../docs/adr/0036_graph.md),
   accepted). `explain` / `graph` / `path`; communities by **unseeded** label
   propagation in a **derived** plane (`.fux/runtime/graph.json`); PPR-lite with
   a **lazy** walk. The archived relational eval passes on the new kernel,
   11/11, its corpus copied live into `tests_e2e/eval/`.
-- **M4's core shipped** ([ADR-REFER](../docs/adr/0030_refer-plane.md),
+- **M4's core shipped** ([ADR-REFER](../docs/adr/0037_refer-plane.md),
   **⏳ proposed, not accepted**). `source` · `freshness` · `arc` · `chunk` ·
   `rescore` · `assemble`. **No verb exposes it** — deliberately.
 - **`fux-lab` and `fux-playground` do not exist on this machine**
@@ -1319,7 +1319,7 @@ the reason is that the measuring environments are gone.**
   cost: the L5 `hashed` default wrote an index no `fux build` would accept, so
   27.2 ms became 4 248.8 ms. **Fixed in the field's shape, never in the
   accelerator invariant.** No `_format` or `analyzer` bump — the reasoning is
-  [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) decision 9, and
+  [ADR-INDEX-LIFECYCLE](../docs/adr/0018_index-lifecycle.md) decision 9, and
   the migration is `fux ingest --refresh-urls`.
 - **`archived=` is parsed and deliberately unread.** ADR-ARCHIVED-CONTENT decision 5
   was amended to split the file from the signal: parsing a declaration nothing
@@ -1347,7 +1347,7 @@ the reason is that the measuring environments are gone.**
   `GLOSSARY.md`, `index.md`, and the ADR register with `TEMPLATE.md`
   and ADR-LAWS.
 - **The new record set has started.** [ADR-LAWS](../docs/adr/0001_LAWS.md)
-  opened it at 0001; **[ADR-CLI](../docs/adr/0002_cli-surface.md)** is 0002 —
+  opened it at 0001; **[ADR-CLI](../docs/adr/0011_cli-surface.md)** is 0002 —
   the six-verb command-line surface, with every command and its real output
   captured in [`regression/2026-08-18-cli-surface/`](regression/2026-08-18-cli-surface/report.md).
   Writing it found a live defect ([W-46](../archive/open/W-46-hybrid-missing-model-crash.md)).
@@ -1367,26 +1367,27 @@ the reason is that the measuring environments are gone.**
   **SETUP-PLAYGROUND** is now unsuperseded in `work/adr/`.
 - **`PLAN.md` is archived** (2026-08-18). Milestone scope was migrated into
   each W-item's detail file, so **an open item is now its own spec**; the port
-  list became [ADR-PORT-LIST](../docs/adr/0015_port-list.md). `docs/` holds
+  list became [ADR-PORT-LIST](../docs/adr/0024_port-list.md). `docs/` holds
   `GLOSSARY.md`, `index.md` and `adr/`, and nothing else.
 - **Five more records landed 2026-08-18, all ⏳ proposed:**
-  [ADR-RECORD](../docs/adr/0010_index-record.md) (the committed line, property
-  by property), [ADR-T1-ACCELERATOR](../docs/adr/0011_accelerator.md),
-  [ADR-RANKING](../docs/adr/0012_ranking.md),
-  [ADR-POSTINGS](../docs/adr/0013_postings.md),
-  [ADR-CONFIG](../docs/adr/0014_config.md). **The template's §1 now carries
+  [ADR-RECORD](../docs/adr/0019_index-record.md) (the committed line, property
+  by property), [ADR-T1-ACCELERATOR](../docs/adr/0020_accelerator.md),
+  [ADR-RANKING](../docs/adr/0021_ranking.md),
+  [ADR-POSTINGS](../docs/adr/0022_postings.md),
+  [ADR-CONFIG](../docs/adr/0023_config.md). **The template's §1 now carries
   optional Examples and Charts sections**, and all nine earlier records were
   retrofitted with Examples in the same change.
 - **Three verb records landed 2026-08-18, all ⏳ proposed:**
-  [ADR-ASK](../docs/adr/0004_ask.md), [ADR-FIND](../docs/adr/0005_find.md),
-  [ADR-ANSWER](../docs/adr/0006_answer.md) — written from a captured session
+  [ADR-ASK](../docs/adr/0013_ask.md), [ADR-FIND](../docs/adr/0014_find.md),
+  [ADR-ANSWER](../docs/adr/0015_answer.md) — written from a captured session
   ([`regression/2026-08-18-query-verbs/`](regression/2026-08-18-query-verbs/report.md)).
   The earlier three were re-indexed to 0007–0009 to seat them at the numbers
   Arpit chose; **no prose moved**, because records are cited by name.
-- **Four more records landed 2026-08-18, all ⏳ proposed:** [ADR-DOTFUX](../docs/adr/0003_fux-directory.md), [ADR-INGEST](../docs/adr/0007_ingest.md), [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md), [ADR-INDEX-LIFECYCLE](../docs/adr/0009_index-lifecycle.md) — written from a captured session in [`regression/2026-08-18-ingest-and-index/`](regression/2026-08-18-ingest-and-index/report.md). **They retire nothing yet**: three predecessors are unratified, so W-30/W-31 gate the swap.
+- **Four more records landed 2026-08-18, all ⏳ proposed:** [ADR-DOTFUX](../docs/adr/0012_fux-directory.md), [ADR-INGEST](../docs/adr/0016_ingest.md), [ADR-URL-INGEST](../docs/adr/0017_url-ingest.md), [ADR-INDEX-LIFECYCLE](../docs/adr/0018_index-lifecycle.md) — written from a captured session in [`regression/2026-08-18-ingest-and-index/`](regression/2026-08-18-ingest-and-index/report.md). **They retire nothing yet**: three predecessors are unratified, so W-30/W-31 gate the swap.
 - **The v0.30 record set is archived** (2026-08-18, Arpit's instruction, all
-  five at once). `work/adr/` no longer exists; the map with a successor for each
-  is [`../archive/adr/README.md`](../archive/adr/README.md). **The successors are
+  five at once). `work/adr/` no longer exists, and on 2026-09-06 the archived
+  records were deleted outright — the successors in
+  [`../docs/adr/`](../docs/adr/README.md) are the only records now. **The successors are
   accepted** and hold the components — a record cannot own the engine and be a
   proposal at the same time. Records that supersede nothing (ADR-FIND,
   ADR-ANSWER, ADR-RANKING, ADR-POSTINGS, ADR-PORT-LIST) stay ⏳ proposed.
@@ -1654,8 +1655,8 @@ tell the two apart. Both readings are written out in W-77.
   default path, so that deletion is a change to a released verb's output — the
   instruction stands, the change is bigger.
 - **The ADR rewrite is done.** `work/adr/` no longer exists; `docs/adr/` holds
-  the live set, ADR-LAWS at 0001, and every archived record maps to a successor
-  by **name** in [`../archive/adr/README.md`](../archive/adr/README.md).
+  the live set, ADR-LAWS at 0001, and the archived records were deleted on
+  2026-09-06 — [`../docs/adr/`](../docs/adr/README.md) is the whole set.
 - **The Lane B inbox is empty.** W-30, W-31, W-32, W-33 and W-44's decision
   were all ratified by Arpit on 2026-08-19 and their outcomes are in
   [`IMPLEMENTATION.md`](IMPLEMENTATION.md) §Ratified decisions.
@@ -1711,7 +1712,7 @@ which are not laws:
   A hard sequencing rule, not a preference.
 - **A pre-registered threshold may never move.** Ambiguous results go to Arpit
   unadjudicated.
-- **Do not port the archived engine.** [ADR-PORT-LIST](../docs/adr/0015_port-list.md)
+- **Do not port the archived engine.** [ADR-PORT-LIST](../docs/adr/0024_port-list.md)
   is the complete list, and it is closed; each entry comes forward with its
   tests, when its milestone needs it.
 - **The design point is 10 000 documents** (Arpit, 2026-08-21 — CLAUDE.md
@@ -1952,7 +1953,7 @@ it is no longer the state of play. Read this block, then read the rest as
 
 **Update (2026-08-10, Cowork/Claude):** one post-M1 capability landed at
 Arpit's direction — URL ingestion through a **consumer-owned fetcher
-file** ([ADR-URL-INGEST](../archive/adr/0010_url-source-consumer-middleware.md), ⏳ proposed;
+file** (ADR-URL-INGEST, ⏳ proposed;
 a CDP template ported from the archived `render="cdp"` path, now at
 `.fux/fetchers/cdp.py`). The judgment worth inheriting: the adapter cap
 survives by making URL fetch *configuration plus consumer code*, never core
@@ -1961,7 +1962,7 @@ real exercise; offline ingest carries `url:` records forward byte-identically
 because the writer's implicit-deletion rule would otherwise eat them.
 
 **Update (2026-08-11, Claude Code):** `.fux/` is now a **declared layout**
-([ADR-DOTFUX](../archive/adr/0011_fux-dir-layout.md), ⏳ proposed) — every child is
+(ADR-DOTFUX, ⏳ proposed) — every child is
 committed or derived, and the URL source moved fully inside it. Two pieces of
 judgment to inherit. First, **an ignore rule is the silent failure mode** of
 putting committed and derived planes under one dotdir; the repo's own

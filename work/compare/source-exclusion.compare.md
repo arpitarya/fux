@@ -31,7 +31,7 @@ timestamp: 2026-08-20T00:00:00Z
 ## Context
 
 `.fux/sources/dirs` is an include-only whitelist
-([ADR-DIR-LIST](../../docs/adr/0022_dir-list.md)). There is no way to say
+([ADR-DIR-LIST](../../docs/adr/0030_dir-list.md)). There is no way to say
 *"index this directory, except the machine-generated parts."*
 
 It bites in this repo in the most self-referential way available: the
@@ -196,9 +196,9 @@ closes.
 
 ## References
 
-- [ADR-DIR-LIST](../../docs/adr/0022_dir-list.md) — the file, the grammar, the
+- [ADR-DIR-LIST](../../docs/adr/0030_dir-list.md) — the file, the grammar, the
   closed attribute set.
-- [ADR-URL-LIST](../../docs/adr/0018_url-list.md) decisions 8, 10, 13 — no
+- [ADR-URL-LIST](../../docs/adr/0026_url-list.md) decisions 8, 10, 13 — no
   whitespace or quoting in values; a repeated key is an error; reader lenient,
   writer strict. These are what rule out the multi-value attribute.
 - [`../regression/2026-08-12-r2-close/report.md`](../regression/2026-08-12-r2-close/report.md)

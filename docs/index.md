@@ -35,26 +35,27 @@ update both or neither.
 
 # Decisions
 
-**A record's directory is its state** - `docs/adr/` live · `work/adr/`
-superseded-pending (in force, citable, replacement planned) ·
-`archive/adr/` superseded, and archive is never evidence.
+**`docs/adr/` is the only home a record has** (Arpit, 2026-09-06). The archive
+tier is gone — the retired records were deleted, not filed. A citation resolves
+into this directory or it does not resolve.
 
-* [The ADR register](adr/README.md) - the convention, the ownership table, and the state of every record. **Records are cited by NAME, never by number.**
-* [ADR-LAWS](adr/0001_LAWS.md) - the non-negotiable constraints have exactly one home; no record restates them.
-* [ADR-CLI](adr/0002_cli-surface.md) - the command-line surface: six verbs, one boundary, three output modes, every command captured verbatim.
-* [ADR-ASK](adr/0004_ask.md) - the `ask` verb: one scorer, one sort, two candidate generators that can never disagree. ⏳ proposed.
-* [ADR-FIND](adr/0005_find.md) - the `find` verb: one line per hit, for pipes; the same ranking as `ask`. ⏳ proposed.
-* [ADR-ANSWER](adr/0006_answer.md) - the `answer` verb: bounded by what the index holds, and it says so in every response. ⏳ proposed.
-* [ADR-RECORD](adr/0010_index-record.md) - one line of the committed index, property by property. ⏳ proposed.
-* [ADR-T1-ACCELERATOR](adr/0011_accelerator.md) - the derived index: disposable, term-major, forbidden from changing an answer. ⏳ proposed.
-* [ADR-RANKING](adr/0012_ranking.md) - BM25F, weight-then-saturate once, one scorer and one rounded sort. ⏳ proposed.
-* [ADR-POSTINGS](adr/0013_postings.md) - the postings in two shapes, and why git gets the doc-major one. ⏳ proposed.
-* [ADR-CONFIG](adr/0014_config.md) - `fux.toml` and every property in it. ⏳ proposed.
-* [ADR-DOTFUX](adr/0003_fux-directory.md) - the `.fux/` directory: every child declared committed or derived, the ignore rule asserted against git. ⏳ proposed.
-* [ADR-INGEST](adr/0007_ingest.md) - how ingest works: re-extract everything, re-resolve every edge, write only what changed. ⏳ proposed.
-* [ADR-URL-INGEST](adr/0008_url-ingest.md) - URL ingestion through consumer-owned fetcher; fux never fetches. ⏳ proposed.
-* [ADR-INDEX-LIFECYCLE](adr/0009_index-lifecycle.md) - index generation and update, and the derived plane that refuses to diverge. ⏳ proposed.
-* [The retired v0.30 set](../archive/adr/README.md) - five records, archived 2026-08-18, each mapped to its live successor. **Named, never cited** — archive is not evidence.
+* [The ADR register](adr/README.md) - the convention, the ownership table, and the state of every record. **Records are cited by NAME, never by number.** It lists all 62 live records; the entry points below are the reading order, not the set.
+* [ADR-LAWS](adr/0001_LAWS.md) - the meta-rules and the index: the non-negotiable constraints have exactly one home, and no record restates them.
+* The nine law records - one law, one record: [L0 authority](adr/0002_LAW-0-authority.md) · [L1 `$0`/FOSS-only](adr/0003_LAW-1-zero-cost.md) · [L2 content never durable](adr/0004_LAW-2-content-never-durable.md) · [L3 deterministic](adr/0005_LAW-3-deterministic.md) · [L4 offline by default](adr/0006_LAW-4-offline-by-default.md) · [L5 hashed meta](adr/0007_LAW-5-hashed-meta.md) · [L6 say index](adr/0008_LAW-6-say-index.md) · [L7 Python 3.11](adr/0009_LAW-7-python-311.md) · [L8 use record](adr/0010_LAW-8-use-record.md).
+* [ADR-CLI](adr/0011_cli-surface.md) - the command-line surface: flat verbs in seven groups, one error boundary, three output modes, every command captured verbatim.
+* [ADR-DOTFUX](adr/0012_fux-directory.md) - the `.fux/` directory: every child declared committed or derived, the ignore rule asserted against git itself.
+* [ADR-ASK](adr/0013_ask.md) - the `ask` verb: one scorer, one sort; the path that answers can never change the answer.
+* [ADR-FIND](adr/0014_find.md) - the `find` verb: one line per hit, for pipes; a projection of `ask`, not a second strategy.
+* [ADR-ANSWER](adr/0015_answer.md) - the `answer` verb: a fetched, re-scored passage with a fresh sha, its footing stated every time, and no model on the path.
+* [ADR-INGEST](adr/0016_ingest.md) - how ingest works: carry unchanged extraction forward, re-resolve every edge, write only shards whose bytes changed.
+* [ADR-URL-INGEST](adr/0017_url-ingest.md) - URL ingestion behaviour: fetching only inside a named fenced path, a failed fetch is a skip not a deletion.
+* [ADR-INDEX-LIFECYCLE](adr/0018_index-lifecycle.md) - index generation and update, and the derived plane that refuses to diverge.
+* [ADR-RECORD](adr/0019_index-record.md) - one line of the committed index, property by property, including the conditional ones.
+* [ADR-T1-ACCELERATOR](adr/0020_accelerator.md) - the derived index: disposable, term-major, forbidden from changing an answer.
+* [ADR-RANKING](adr/0021_ranking.md) - BM25F, weight-then-saturate once, one scorer and one rounded sort.
+* [ADR-POSTINGS](adr/0022_postings.md) - the postings in two shapes, and why git gets the doc-major one.
+* [ADR-CONFIG](adr/0023_config.md) - `fux.toml` and every property in it: three tables read, two refused by name, one passed through unread.
+* The remaining records - the refer plane, fetchers, decode, tuning, quality, confidence, provenance, MCP and the rest. **Not listed here on purpose:** the [register](adr/README.md) is the one place that states every record and its status, and a second list is a second thing to keep true.
 * [Compare docs](../work/compare/README.md) - the v0.30 forks, verdict at the top of each, every one with a reopen-trigger.
 * [Proposals](../work/proposals/README.md) - parked ideas with graduation triggers.
 

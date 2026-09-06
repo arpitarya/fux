@@ -7,25 +7,24 @@ before writing an ADR, before citing one, and before adding a module to `src/`.
 One ADR per completed feature or ruled measurement. Every ADR carries a
 reference. **Every record is cited by NAME in prose, never by number.**
 
-## Two directories, two states
+## One directory, one state
 
-**This file is the register for both.** A record's directory *is* its state:
+**`docs/adr/` is the only home a decision record has** (Arpit, 2026-09-06). The
+archive tier is gone: the retired records were **deleted**, not filed, and
+nothing outside this directory is a record. A citation therefore resolves here
+or it does not resolve at all.
 
-| state | directory | may back a live claim? |
-|---|---|---|
-| **live** | `docs/adr/` (here) | yes |
-| **superseded or retired** | [`archive/adr-old/`](../../archive/adr/README.md) | **no** — archive is not evidence |
+- **There is no "superseded" location.** A record that is superseded is
+  **rewritten or deleted in the change that supersedes it**, and the successor
+  states plainly what it replaced — in prose, by name. There is no second file
+  left behind to be found and mistaken for current.
+- **A record whose subject ceased to exist is deleted**, and the decision that
+  killed the subject says so.
+- **Nothing in this repo may cite an archived record**, by path or by name, as
+  backing for a live claim. A name may appear in a sentence about history; a
+  link to one may not, because the file is not there.
 
-A record moves from `docs/adr/` to `archive/adr-old/` **in the same change that
-accepts its successor** — never before, so no claim is ever left ungrounded. A
-record whose *subject ceased to exist* moves there too, and its row says plainly
-that it has **no successor**. New records are written here, from
-[`TEMPLATE.md`](TEMPLATE.md).
-
-The v0.26 engine's records are frozen at
-[`archive/v0.26-docs/adr/`](../../archive/v0.26-docs/adr/) and are always cited
-as **"archived ADR-NNNN"** with that path — a bare `ADR-<NAME>` in any live doc
-means this directory.
+New records are written here, from [`TEMPLATE.md`](TEMPLATE.md).
 
 ---
 

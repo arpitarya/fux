@@ -29,7 +29,7 @@ row then closes through that prompt.
 2026-09-05): `tests_e2e/` runs on `windows-latest` × py3.11/3.14 on every push
 and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 `none` arm and its numbers now sit in
-[ADR-QUALITY](../docs/adr/0044_quality-contract.md) beside the fitted ones.
+[ADR-QUALITY](../docs/adr/0051_quality-contract.md) beside the fitted ones.
 
 | what he decides | filed | age |
 |---|---|---|
@@ -39,11 +39,11 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 | **`superseded_weight`** — W-94 below. Doing nothing is legitimate | 2026-08-28 | 8d |
 | **`rerank_weight`** — the no-op pattern, under *adr update*. Doing nothing is legitimate | 2026-08-28 | 8d |
 | **Whether zero abstentions out of 20 gates anything** — under *adr update* | 2026-08-28 | 8d |
-| **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 8d |
+| **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0043_predictions.md) — under *adr update* | 2026-08-28 | 8d |
 | **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 8d |
 | **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 9d |
 | ⚪ **W-121 — the CSV row-granularity run is `informed` and supplies no delta.** [ADR-TABULAR](../docs/adr/0062_tabular.md) shipped on your ruling, not on evidence clearing a bar (`hit@1` 0.229 -> 0.875, control 42/48, but one author wrote the generator AND the queries). A `blind` run over real spreadsheets is what would turn it into a grade — that is fux-playground's job, not the lab's (TEST-PLAN §0a). Doing nothing is legitimate; the veto condition is written | 2026-09-06 | 0d |
-| 🔴 **W-119 — `git rm` 38 stale decoder files.** 🔴 **MEASURED: all 36 extensions currently dispatch to the STALE `*doc` module**, so W-115's fixes and the rename are both inert in this repo right now — the new files are dead weight. A clean `pip install` meeting stale `.fux/decoders/` is worse: a **hard `FuxError`** on the first `registry()` call, because 7 stale copies import `fux.decode.<old>` which no longer ships. Fix: `git rm src/fux/decode/*doc.py .fux/decoders/*doc.py`. ⚠ No session tool can delete files — wedged shell, and the file bridge writes only | 2026-09-06 | 0d |
+| 🟢 **W-119 — DONE except one command Arpit runs.** ⚠ **Its 🔴 framing was stale and is corrected here**: `.fux/decoders/` already held 19 **new-style** files and zero `*doc.py`, `BUILTIN_MODULES` names the new modules, and **nothing imported the stale ones** (re-derived 2026-09-06 — the "all 36 extensions dispatch to the STALE module" and "clean install hard-errors" claims were both false by then). 19 dead files **`git rm --cached`d and parked in `_to_delete/src-fux-decode/`** (gitignored) — the bridge cannot unlink, so **`rm -rf _to_delete/` is his one command**. 520 governance tests green after. | 2026-09-06 | 0d |
 | 🔴 **W-115 — run the suite and commit the chunking change.** 27 files written 2026-09-06 and **verified only in the Cowork container** (183 green against a staged copy). `device_bash` was wedged, so `tests_e2e`, `ruff`, the ADR freshness gate and every `git` command are unrun. **This is hands, not a decision** | 2026-09-06 | 0d |
 | 🔴 **W-116 — the chunking change re-ranked the corpus unmeasured**, on his own 2026-09-06 ruling that a defect fix does not wait on a measurement. Recorded as unmeasured in ADR-DECODE, ADR-REFER and ADR-EXTRACTED. Blocked behind **W-56** (`fux-lab` does not exist); here so the gap is not forgotten | 2026-09-06 | 0d |
 | ⚪ **W-118 — do `fux-decoder` and `fux-usage` get `.github/skills/` too?** W-114 ruled **A** and shipped `fux-enrich` there, because that is what was named. The other two reach Copilot only through the `.claude/skills` cross-read (ADR-AGENT-POLICY decision 13), which is not a surface fux writes. **Doing nothing is legitimate** — the asymmetry is recorded and held by `test_the_two_rosters_differ_only_where_a_record_says_so`, so it cannot go quiet the way `fux-enrich`'s did. Two rows if yes | 2026-09-06 | 0d |
@@ -104,13 +104,13 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   2026-09-06** — re-derive paths and land the rename in one commit by one
   agent. — [detail](open/W-122-adrs-are-the-source.md) `filed: 2026-09-06`
 
-- 🟢 **W-113** · `agent` · *(record: [ADR-URL-LIST](../docs/adr/0018_url-list.md) ·
-  [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) ·
-  [ADR-CDP-FETCHER](../docs/adr/0020_cdp-fetcher.md))* · **`update = auto|never`
+- 🟢 **W-113** · `agent` · *(record: [ADR-URL-LIST](../docs/adr/0026_url-list.md) ·
+  [ADR-URL-FRESHNESS](../docs/adr/0059_url-freshness.md) ·
+  [ADR-CDP-FETCHER](../docs/adr/0028_cdp-fetcher.md))* · **`update = auto|never`
   on a URL line** — whether `fux update` goes out at all, resolved through the
   same three layers as `keep`/`ttl`/`enrich`. **Filed by Arpit's R-1 ruling,
   2026-09-05**, as the second half of it: the ETag criterion was accepted as
-  [decision 12](../docs/adr/0020_cdp-fetcher.md) words it (no code), and this
+  [decision 12](../docs/adr/0028_cdp-fetcher.md) words it (no code), and this
   is the knob he asked for instead. 🔴 **It buys bandwidth by giving up
   freshness — it is NOT the ETag saving**, and decision 12 gains the veto
   condition that re-costs request-stage interception if refresh bandwidth is
@@ -141,8 +141,8 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0's measurement is DONE and filed** ([the run](regression/2026-09-05-node-log-divergence/report.md)); the pre-registration [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is written with **one cell blank** — Arpit's `log()` pick, in the inbox above with the number beside it. **Phases 1–4 are blocked on that one word**, and on nothing else.
   - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **STILL BLOCKED, and the blocker changed shape.** W-106 produced no PASS to unblock it, and it produced something the plane's design has to answer: **a pinned committed vector is an artefact of one implementation** — two correct implementations of one model share **0 of 125** int8 vectors ([the run](regression/2026-09-05-vector-gate/report.md)). The determinism claim can only ever be *"same clone + same embedder build"*, never *"same model"*. **Blocked on: a restored corpus (W-87 Part B), a re-run gate, and the compare doc Arpit must rule on.**
 
-- 🔴 **W-94** · `arpit` · *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) ·
-  [ADR-TUNE](../docs/adr/0038_tuning.md))* · **`superseded_weight` ships at
+- 🔴 **W-94** · `arpit` · *(record: [ADR-CONFIDENCE](../docs/adr/0052_confidence.md) ·
+  [ADR-TUNE](../docs/adr/0045_tuning.md))* · **`superseded_weight` ships at
   `1.0`, so the supersession prior is a no-op out of the box.** Measured
   [2026-08-28](regression/2026-08-28-benchmark-v1-vs-head/VERDICT-B2.md):
   `1.0.0` and `HEAD` invert a superseded document over its successor
@@ -167,7 +167,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 
 ### testing
 
-- 🔴 **W-119** · `arpit` · *(record: [ADR-DECODE](../docs/adr/0042_decode.md)
+- 🔴 **W-119** · `arpit` · *(record: [ADR-DECODE](../docs/adr/0049_decode.md)
   decision 17)* · **the decoder rename is written and the old files are still
   there.** `csvdoc.py` -> `csv.py` for all nineteen, verified not to shadow the
   stdlib on either load path (built-in registers as `fux.decode.json`; a
@@ -181,9 +181,9 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   anyone else**, by Arpit's ruling the same day; decision 17 records that
   rather than implying the upgrade is passive. Filed 2026-09-06
 
-- 🔴 **W-115** · `arpit` · *(records: [ADR-DECODE](../docs/adr/0042_decode.md)
-  14-16 · [ADR-REFER](../docs/adr/0030_refer-plane.md) 23-25 ·
-  [ADR-EXTRACTED](../docs/adr/0016_extracted-mode.md) decision 8)* · **the
+- 🔴 **W-115** · `arpit` · *(records: [ADR-DECODE](../docs/adr/0049_decode.md)
+  14-16 · [ADR-REFER](../docs/adr/0037_refer-plane.md) 23-25 ·
+  [ADR-EXTRACTED](../docs/adr/0025_extracted-mode.md) decision 8)* · **the
   chunking change is written and UNVERIFIED on the real machine.** 27 files
   written 2026-09-06: one heading grammar (`decode/_markdown.py`, fence-aware,
   read by both `extract.py` and `refer/_chunk.py`), decoding on the citation
@@ -199,7 +199,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   byte-identical, so `test_consumer_copies` should pass, but should is not a
   test result. Filed 2026-09-06
 
-- 🔴 **W-116** · `arpit` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+- 🔴 **W-116** · `arpit` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
   **W-115 re-ranked the corpus and NOTHING was measured.** Two populations
   moved: every document containing a fenced code block (the fence fix — in this
   repo, most of them), and every document of the formats whose decoder gained a
@@ -219,8 +219,8 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   [ADR-REFER](../docs/adr/0037_refer-plane.md) decision 26 records the reversal.
   Removed from the list once the outcome reaches IMPLEMENTATION.md.
 
-- **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·
-  [ADR-RS](../docs/adr/0036_predictions.md))* · **the knob sweep — which
+- **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0045_tuning.md) ·
+  [ADR-RS](../docs/adr/0043_predictions.md))* · **the knob sweep — which
   `.fux/tune.toml` defaults are defensible, measured rather than argued.**
   Pre-registered as [`benchmark/PRE-REGISTRATION-TUNER.md`](benchmark/PRE-REGISTRATION-TUNER.md)
   (ids **T0–T5**, a third id space), procedure in
@@ -246,7 +246,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
 
 - ⚠ **`separation_floor` is repo-configurable and R10 is still unmeasured.**
-  *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md))* · Not a new
+  *(record: [ADR-CONFIDENCE](../docs/adr/0052_confidence.md))* · Not a new
   item — R10 is [W-90]'s — but the failure mode is: a repo can make its own
   answers read `grounded` without touching the ranking, and **nothing
   mechanical catches it**. The guard is that the block publishes the floor it
@@ -255,14 +255,14 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   comparison, and it is ADR-CONFIDENCE decision 13's reopen trigger.
 
 - **The 7 `partial` goldens.** `arpit` ·
-  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · The two
+  *(record: [ADR-QUALITY](../docs/adr/0051_quality-contract.md))* · The two
   blind annotators' exact-set disagreements, taking the union, held out of
   `recall@k`'s denominator. They need a human or a **third blind reader** —
   any session that has seen the scores is the wrong party. 🔴 **Do not resolve
   them by picking whichever set makes recall look better.** `filed: 2026-08-28`
 
 - **The `heading` negative control is saturated and must be rebuilt.** `agent` ·
-  *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+  *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
   [C4](regression/2026-08-28-benchmark-contested/VERDICT-C4.md) returned its
   predicted null at **100 % in both arms with zero headroom**, so it returned
   the right answer for the wrong reason and **did not discharge its job**. Until
@@ -271,7 +271,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   *also* heading-matched. `filed: 2026-08-28`
 
 - ⚠ **A cross-seed "null control" is not a determinism check, and B9 was read as
-  one.** `agent` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* ·
+  one.** `agent` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
   Query ids are **positional**, so arm A on seed 12 paired against arm A on
   seed 13 compares *different questions*; the discordant count is a rate
   check. The determinism check is the **same-corpus repeat**.
@@ -282,7 +282,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   the work. `filed: 2026-08-28`
 
 - **W-87** · `arpit` ·
-  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* · **what
+  *(record: [ADR-QUALITY](../docs/adr/0051_quality-contract.md))* · **what
   "good" means, then measure.** P0, P1, P3, P4 and P5 are closed and
   `recall@k` now exists. ⚠ **Two things keep it open:** the `judged` series
   has never been exercised (no judged run exists), and **Part B cannot run**
@@ -291,7 +291,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   [detail](open/W-87-what-good-means.md)
 
 - ⚠ **`validate()` reaches an existing repo only when somebody copies the
-  fetcher in.** *(record: [ADR-DOTFUX](../docs/adr/0003_fux-directory.md)
+  fetcher in.** *(record: [ADR-DOTFUX](../docs/adr/0012_fux-directory.md)
   decision 6)* · `fux setup` is write-if-missing and never rewrites a
   consumer's file. **Measured 2026-08-28:** a repo created before the change
   learned **0 of 7** tokens until its `http.py` was replaced by hand. A
@@ -304,8 +304,8 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 
 - **`rerank_weight` ships at `0.0`, and every ranking prior `HEAD` added is a
   no-op at the default.** `arpit` ·
-  *(record: [ADR-CONFIDENCE](../docs/adr/0045_confidence.md) ·
-  [ADR-TUNE](../docs/adr/0038_tuning.md))* · Not a new fact —
+  *(record: [ADR-CONFIDENCE](../docs/adr/0052_confidence.md) ·
+  [ADR-TUNE](../docs/adr/0045_tuning.md))* · Not a new fact —
   [2026-08-25](regression/2026-08-25-supersession-and-reranker-default/report.md)
   measured the reranker and recorded that *"the default still does not flip"*,
   and `P-RERANK-DEFAULT` was withdrawn as mis-framed. **What is new is the
@@ -324,7 +324,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   against it, not building or measuring anything further. `filed: 2026-08-28`
 
 - 🔴 **The engine abstains ZERO times out of 20.** `arpit` ·
-  *(record: [ADR-QUALITY](../docs/adr/0044_quality-contract.md))* ·
+  *(record: [ADR-QUALITY](../docs/adr/0051_quality-contract.md))* ·
   Blind-authored `unanswerable` questions, confirmed unanswerable by a second
   blind session; the engine reported `answerable: true` on all 20, 17 of them
   at or above the `separation_floor`
@@ -336,8 +336,8 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   failure in a new costume. **Needs a call on whether it gates anything.**
   `filed: 2026-08-28`
 
-- **Ratify the headroom obligation into [ADR-RS](../docs/adr/0036_predictions.md).**
-  `arpit` · *(record: [ADR-RS](../docs/adr/0036_predictions.md))* · **W-95 is
+- **Ratify the headroom obligation into [ADR-RS](../docs/adr/0043_predictions.md).**
+  `arpit` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* · **W-95 is
   built, run and filed**
   ([2026-08-28](regression/2026-08-28-benchmark-contested/report.md)): a
   contested-answer suite whose `--selftest` **asserts** that candidates are
@@ -387,7 +387,7 @@ session needs first.*
    ⚠ **Check what the row was the ONLY home of before deleting it.** W-82's
    carried the one written statement that answer-time verification cannot fix
    recall; deleting the row would have lost the claim, so it moved to
-   [ADR-URL-INGEST](../docs/adr/0008_url-ingest.md) decision 9 first.
+   [ADR-URL-INGEST](../docs/adr/0017_url-ingest.md) decision 9 first.
 4. **The markers here are assertions, not evidence. Re-derive, do not read.**
    Before treating anything as pending or done, reconcile against
    `regression/`, `IMPLEMENTATION.md`, and the repo itself (`git log`,

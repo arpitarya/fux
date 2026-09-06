@@ -31,3 +31,4 @@ venv/
 # Per-machine Claude Code settings — a local permission cache, never shared.
 .claude/settings.local.json
 
+_to_delete/

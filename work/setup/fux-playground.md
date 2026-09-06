@@ -325,7 +325,7 @@ document that owns the topic. Both are documented in the playground's
   Beyond* (2009) — https://www.staff.city.ac.uk/~sbrp622/papers/foundations_bm25_review.pdf
   — §3 on `k1` term-frequency saturation, which is the mechanism behind the
   third class of known failure.
-- [ADR-RECORD](../../archive/adr/0004_index-format.md) — the committed index format the guard
-  checks. [ADR-URL-INGEST](../../archive/adr/0010_url-source-consumer-middleware.md) /
-  [ADR-DOTFUX](../../archive/adr/0011_fux-dir-layout.md) — the URL source and `.fux/` layout the
+- ADR-RECORD — the committed index format the guard
+  checks. ADR-URL-INGEST /
+  ADR-DOTFUX — the URL source and `.fux/` layout the
   playground consumes.

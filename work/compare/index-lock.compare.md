@@ -27,7 +27,7 @@ timestamp: 2026-08-26T00:00:00Z
 > [`maintain/runner.py`](../../src/fux/maintain/runner.py)'s `runner.lock`,
 > already `O_CREAT|O_EXCL`, already pid-based — what changes is **who is
 > required to hold it**. The enrichment pin is `.fux/enrich/<sha>.md`, already
-> committed, already sha-validated ([ADR-ENRICH](../../docs/adr/0040_enrich.md)) —
+> committed, already sha-validated ([ADR-ENRICH](../../docs/adr/0047_enrich.md)) —
 > what is missing is the **queue** of work not yet done, and a **gitignored
 > progress file** beside it (Arpit, 2026-08-26: *"committed queue, gitignored
 > progress"*).
@@ -68,7 +68,7 @@ that call.
 |---|---|---|
 | an index write mutex | `maintain/runner.py::acquire` — `runner.lock`, `O_CREAT\|O_EXCL`, pid inside | **built**, but held by *one* caller (§6) |
 | stale-lock handling | `ingest/__init__.py::_report_takeover` — `stopped` / `stale` / `wedged` | **built** |
-| a committed enrichment pin | `.fux/enrich/<sha>.md`, one file per source content sha | **built** ([ADR-ENRICH](../../docs/adr/0040_enrich.md), [ADR-DOTFUX](../../docs/adr/0003_fux-directory.md)) |
+| a committed enrichment pin | `.fux/enrich/<sha>.md`, one file per source content sha | **built** ([ADR-ENRICH](../../docs/adr/0047_enrich.md), [ADR-DOTFUX](../../docs/adr/0012_fux-directory.md)) |
 | coverage reporting | `enrich.py::plan` / `--check`, `validate()`, `prune()` | **built** |
 | a committed **queue** of undone work | — | **absent** |
 | **gitignored progress** | — | **absent** |

@@ -77,8 +77,8 @@ contain a table fux can see.
 - **Robertson & Zaragoza, *The Probabilistic Relevance Framework: BM25 and
   Beyond* (2009)** — §3 on length normalisation, which is the mechanism by
   which a table-heavy document is mis-scored today.
-- **[ADR-RANKING](../../docs/adr/0012_ranking.md)** and
-  **[ADR-TUNE](../../docs/adr/0038_tuning.md)** — where field weights live now,
+- **[ADR-RANKING](../../docs/adr/0021_ranking.md)** and
+  **[ADR-TUNE](../../docs/adr/0045_tuning.md)** — where field weights live now,
   and the record any new field has to amend.
 - **[`extract.py`](../../src/fux/ingest/extract.py)** — the five fields and the
   heading regex, i.e. the actual current behaviour rather than a description

@@ -52,7 +52,7 @@ already states as scope.
 ## Context — what fired this
 
 **Nothing fired this, and that is itself the finding.**
-[ADR-GRAPH](../../docs/adr/0029_graph.md)'s three veto conditions are about
+[ADR-GRAPH](../../docs/adr/0036_graph.md)'s three veto conditions are about
 determinism across machines, walk ordering, and the playground's acceptance
 queries. **None of them is about cost.** No R prediction in
 [OPEN-WORK](../OPEN-WORK.md) measures a graph verb's latency either: R3's
@@ -296,7 +296,7 @@ than from anything measured here.
   [GRAPH-PLANE-PROFILE](../regression/2026-08-21-graph-plane-profile/report.md),
   its [raw output](../regression/2026-08-21-graph-plane-profile/evidence/profile-output.txt)
   and its harness [`tools/graph-bench/profile.py`](../../tools/graph-bench/profile.py).
-- The record that owns the plane — [ADR-GRAPH](../../docs/adr/0029_graph.md)
+- The record that owns the plane — [ADR-GRAPH](../../docs/adr/0036_graph.md)
   decision 8. Decisions 5 and 7 are explicitly not in question.
 - The write-path fork this does **not** reopen —
   [`hook-at-scale.compare.md`](hook-at-scale.compare.md).

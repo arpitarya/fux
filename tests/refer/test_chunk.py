@@ -210,3 +210,54 @@ def test_a_short_preamble_is_still_governed_by_the_old_rule():
     passages = chunk(doc)
     assert [p.heading for p in passages] == ["", "A"]
     assert passages[0].text == "tiny."
+
+
+# -- strategy="page": a slide, a message, a diagram page is atomic -----------
+
+
+def _deck(short_slide: int = 2) -> str:
+    long = "- a bullet with some real length\n" * 20
+    parts = ["# deck.pptx\n"]
+    for i in (1, 2, 3):
+        body = "- two words\n" if i == short_slide else long
+        parts.append(f"## Slide {i}\n\n{body}")
+    return "\n".join(parts)
+
+
+def test_a_page_is_never_absorbed_by_a_neighbour():
+    """🔴 Under `heading` this deck cited Slide 1's content as `deck.pptx` and
+    Slide 3's as `Slide 2` — confidently the WRONG attribution, which is worse
+    than a coarse citation. `_sibling_run` does not save it: a short slide
+    between two long ones is not a run."""
+    assert [p.heading for p in chunk(_deck(), strategy="page")] == [
+        "deck.pptx", "Slide 1", "Slide 2", "Slide 3",
+    ]
+
+
+def test_each_page_carries_its_own_content():
+    pages = {p.heading: p.text for p in chunk(_deck(), strategy="page")}
+    assert "two words" in pages["Slide 2"]
+    assert "two words" not in pages["Slide 3"]
+    assert "two words" not in pages["deck.pptx"]
+
+
+def test_a_heading_inside_a_page_does_not_split_it():
+    """The other direction: an mbox message whose body is HTML carries that
+    body's headings, and they must not open a new passage."""
+    doc = "# archive.mbox\n\n## Subject one\n\n### Body head\n\ntext here\n\n#### Deeper\n\nmore\n\n## Subject two\n\nlast\n"
+    passages = chunk(doc, strategy="page")
+    assert [p.heading for p in passages] == ["archive.mbox", "Subject one", "Subject two"]
+    assert "Deeper" in passages[1].text
+
+
+def test_page_line_ranges_stay_contiguous():
+    passages = chunk(_deck(), strategy="page")
+    for earlier, later in zip(passages, passages[1:]):
+        assert later.line_start > earlier.line_end
+
+
+def test_the_heading_strategy_is_untouched():
+    """`page` is opt-in. Prose must chunk exactly as before."""
+    doc = f"# A\n\n{_body('alpha')}\n\n## B\n\n{_body('beta')}"
+    assert [p.heading for p in chunk(doc)] == [p.heading for p in chunk(doc, strategy="heading")]
+    assert [p.heading for p in chunk(doc)] == ["A", "B"]

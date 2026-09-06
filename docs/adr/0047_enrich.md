@@ -19,7 +19,7 @@ timestamp: 2026-08-23T00:00:00Z
 > graded below deterministic signal — and explicitly did not authorise a build.
 > It was **superseded by this record on 2026-08-27** (W-82 ruling 6) after that
 > contract was folded in here verbatim; the archived copy at
-> [`archive/adr-old/0017_enriched-mode.md`](../../archive/adr-old/0017_enriched-mode.md)
+> `archive/adr-old/0017_enriched-mode.md`
 > may be named, never cited. **What this decides is who runs the model**, and the answer
 > is: not fux.
 
@@ -501,7 +501,7 @@ There is nothing URL-specific about that boundary and this section states none.
   the generation half —
   [`src/fux/templates/agents/ENRICH-SKILL.md`](../../src/fux/templates/agents/ENRICH-SKILL.md);
   the tests — [`tests/test_enrich.py`](../../tests/test_enrich.py).
-- The contract this inherits — [ADR-ENRICHED](../../archive/adr-old/0017_enriched-mode.md); the scope
+- The contract this inherits — ADR-ENRICHED; the scope
   grammar — [ADR-DIR-LIST](0030_dir-list.md); the field it feeds —
   [ADR-RANKING](0021_ranking.md) decision 1.
 - The authorship rule that governs *measuring* enrichment —
@@ -544,7 +544,7 @@ document is never listed here — the body may name one, but archive is not
 evidence.*
 
 **Records** — [ADR-LAWS](0001_LAWS.md) · [ADR-RANKING](0021_ranking.md) ·
-[ADR-ENRICHED](../../archive/adr-old/0017_enriched-mode.md) · [ADR-FETCHER](0027_fetcher.md) ·
+ADR-ENRICHED · [ADR-FETCHER](0027_fetcher.md) ·
 [ADR-DIR-LIST](0030_dir-list.md) · [ADR-AGENT-POLICY](0042_agent-policy.md) ·
 [ADR-RS](0043_predictions.md) · [ADR-TUNE](0045_tuning.md)
 

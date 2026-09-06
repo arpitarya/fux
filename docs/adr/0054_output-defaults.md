@@ -656,7 +656,7 @@ catchable by the tests that existed when they were written.**
 
 - [ADR-TUNE](0045_tuning.md) · [ADR-CONFIG](0023_config.md) ·
   [ADR-CONFIDENCE](0052_confidence.md) · [ADR-MCP](0046_mcp.md) ·
-  [ADR-CLI](0011_cli-surface.md) · [ADR-FUX-DIR](0012_fux-directory.md)
+  [ADR-CLI](0011_cli-surface.md) · [ADR-DOTFUX](0012_fux-directory.md)
 - [ADR-LAWS](0001_LAWS.md) — L1 (stdlib only: `tomllib`), L3 (no maintenance
   path reads this), L4 (nothing here reaches the network), L7 (`tomllib`
   requires 3.11+)

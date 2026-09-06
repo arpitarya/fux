@@ -576,10 +576,12 @@ costume. **The paragraph above is the only guard.**
 **There is exactly ONE archive, and it is [`archive/`](archive/README.md) at
 the repo root** (Arpit, 2026-08-10, restated 2026-08-18). Nothing under `docs/`
 or `work/` is an archive. **Anything that gets archived is moved there**, into a
-directory mirroring where it came from — `work/adr/` retires into
-`archive/adr-old/`, and the handoff directory retired wholesale into
-`archive/handoff/` — and gets a row in `archive/README.md` naming its live
-successor, or saying plainly that it has none. Enforced by
+directory mirroring where it came from — the handoff directory, for instance,
+retired wholesale into `archive/handoff/` — and gets a row in
+`archive/README.md` naming its live successor, or saying plainly that it has
+none. ⚠ **Decision records are the exception** (Arpit, 2026-09-06): they are
+never archived. A superseded record is rewritten or deleted in the change that
+supersedes it, and `docs/adr/` is the whole set. Enforced by
 `tests/test_archive_law.py`, which fails on a second `archive` directory
 anywhere and on a live doc still pointing at one.
 
@@ -627,10 +629,11 @@ The register, the convention and the ownership table are in
   block); §2 is for agents** (context · decision ·
   consequences · alternatives · reference · veto). The reference is grounded in
   code, a live doc, or measured evidence — **never an archived doc**.
-- **Records live in `docs/adr/`, and nowhere else.** A superseded record moves
-  to [`archive/adr-old/`](archive/adr/README.md) — where archive-is-not-evidence
-  applies from that moment — in the same change that accepts its successor, and
-  `archive/adr/README.md` maps its old number to that successor's name.
+- **Records live in `docs/adr/`, and nowhere else.** There is no archive tier
+  for records (Arpit, 2026-09-06): a superseded record is **rewritten or deleted
+  in the same change that accepts its successor**, and the successor states in
+  prose what it replaced. Nothing is left behind to be found and mistaken for
+  current, and no live doc may link to a retired record — the file is gone.
 
 ## Keep the docs in sync (required)
 
@@ -791,10 +794,11 @@ archive/            THE ONE ARCHIVE — everything retired, mirroring the live t
   v0.1/             build: the first one
 ```
 
-**Records live in `docs/adr/`.** A superseded one moves to `archive/adr-old/` in
-the same change that accepts its successor, and the archive maps its number to
-that successor's name. The v0.30 set was archived wholesale on 2026-08-18;
-`work/adr/` no longer exists.
+**Records live in `docs/adr/`, and only there.** A superseded one is rewritten
+or deleted in the same change that accepts its successor; the successor names
+what it replaced, in prose. `work/adr/` no longer exists, and on 2026-09-06
+Arpit deleted the archived records outright — there is no archive tier to
+consult, and a record citation resolves into `docs/adr/` or not at all.
 
 **`src/fux/` was gated behind P1, and now exists.** The package scaffold was
 M0b and landed only once the pruning gate had been decided — scaffolding a

@@ -227,3 +227,63 @@ def test_a_very_long_array_is_truncated_and_says_so():
     out = decode(json.dumps(payload).encode(), "big.json")
     assert out.count("## Item ") == 500
     assert "*(array truncated)*" in out
+
+
+# -- the page strategy, declared by the decoders that need it ----------------
+
+
+def test_the_three_page_decoders_declare_it():
+    """`CHUNK` is opt-in on the `WANTS_PATH` precedent, so a decoder that says
+    nothing still means `heading`."""
+    from fux.decode import registry
+
+    r = registry()
+    assert r[".pptx"].chunk == "page"
+    assert r[".mbox"].chunk == "page" and r[".eml"].chunk == "page"
+    assert r[".drawio"].chunk == "page"
+    assert r[".csv"].chunk == "heading"
+    assert r[".md"] if ".md" in r else True
+
+
+def test_an_unknown_chunk_strategy_is_a_hard_error(tmp_path):
+    """A typo that silently fell back to `heading` would be a citation defect
+    with no signal — the shape decision 7 refuses for a missing dependency."""
+    import pytest
+
+    from fux.decode import _chunk_strategy
+    from fux.errors import FuxError
+
+    class Bad:
+        CHUNK = "pages"
+
+    with pytest.raises(FuxError, match="pages"):
+        _chunk_strategy(Bad, "baddoc")
+
+
+def test_an_html_email_body_cannot_outrank_its_own_subject():
+    """🔴 `htmldoc` maps `<h1>` to `#`, so a message body emitted a LEVEL-1
+    heading under its own `## Subject`. One email became four passages, two
+    cited as top-level units of the archive."""
+    mbox = (
+        b"From a@x.com Mon Sep  1 10:00:00 2026\r\n"
+        b"Subject: Retention decision\r\nContent-Type: text/html\r\n\r\n"
+        b"<h1>Background</h1><p>three years</p><h2>Decision</h2><p>seven years</p>\r\n"
+    )
+    out = decode(mbox, "a.mbox")
+    levels = [len(l) - len(l.lstrip("#")) for l in out.split("\n") if l.startswith("#")]
+    subject = out.split("\n").index("## Retention decision")
+    body = [i for i, l in enumerate(out.split("\n")) if l.startswith("#") and i > subject]
+    assert all(out.split("\n")[i].startswith("###") for i in body)
+    assert max(levels) <= 6
+
+
+def test_a_fenced_hash_in_an_email_body_is_not_demoted():
+    """`_demote` reads the one fence-aware grammar, so a shell comment in an
+    email stays a shell comment."""
+    eml = (
+        b"Subject: Runbook\r\nContent-Type: text/html\r\n\r\n"
+        b"<pre># Install dependencies\nuv sync</pre>\r\n"
+    )
+    out = decode(eml, "a.eml")
+    assert "# Install dependencies" in out
+    assert "### Install dependencies" not in out

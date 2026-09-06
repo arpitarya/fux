@@ -1,7 +1,7 @@
 # The canonical agent policy — the source of truth
 
 **This file is not shipped to a consumer.** It is what the per-vendor renderings
-in this directory must all say. [ADR-AGENT-POLICY](../../../../docs/adr/0035_agent-policy.md)
+in this directory must all say. [ADR-AGENT-POLICY](../../../../docs/adr/0042_agent-policy.md)
 decision 2: the renderings are by hand, but **agreement is asserted, not
 trusted** — every numbered rule below must appear in every rendering, and a test
 checks it. A rule changed here and not there is worse than no policy at all,
@@ -52,7 +52,7 @@ representations, one asserted to match.
 - **Never encode an opinion about a particular document.** Every rule here is
   about *how to read the flag*. The moment a rendering says which document is
   right, Fux has smuggled a reader-intent taxonomy back in through the policy
-  layer — which [ADR-ARCHIVED-CONTENT](../../../../docs/adr/0037_archived-content.md) decision
+  layer — which [ADR-ARCHIVED-CONTENT](../../../../docs/adr/0044_archived-content.md) decision
   7 refused on purpose. This is veto condition 5.
 
 <!-- policy-version: 1 -->

@@ -43,6 +43,11 @@ from fux.decode.html import decode as decode_html
 
 EXTENSIONS = (".eml", ".mbox")
 
+#: A message is a complete unit. Its BODY may carry headings of its own
+#: (see `_demote`), which used to shatter one email into four passages.
+#: ADR-REFER's `page` strategy; ADR-DECODE decision 19 for the opt-in name.
+CHUNK = "page"
+
 #: The headers worth indexing. Everything else is routing metadata — `Received`
 #: chains, DKIM signatures, `Message-ID` — which is pure `df` noise and, in the
 #: signatures' case, indistinguishable from base64 junk.
@@ -162,5 +167,34 @@ def _body(message) -> str:
         return plain[:MAX_BODY_CHARS]
     if html.strip():
         converted = decode_html(html.encode("utf-8", errors="replace"), "message.html")
-        return (converted or "")[:MAX_BODY_CHARS]
+        return _demote(converted or "")[:MAX_BODY_CHARS]
     return ""
+
+
+def _demote(body: str) -> str:
+    """Push an HTML body's own headings below the message's.
+
+    🔴 **Without this a message is shattered from the inside.** `htmldoc` maps
+    `<h1>` to `#`, so an `.mbox` message whose body is HTML emitted a LEVEL-1
+    heading underneath its own `## Subject` — outranking it. One email became
+    four passages, two of them cited as though they were top-level units of the
+    archive rather than parts of a thread. Measured 2026-09-06.
+
+    Three levels down, so a body heading is always deeper than
+    `_chunk.PAGE_LEVEL` for both spellings: a `.eml` subject is `#` and an
+    `.mbox` subject is `##`.
+
+    Fence-aware, through the one grammar in `decode/_markdown.py` — a `#`
+    comment inside a fenced code block in an email is not a heading and must
+    not be demoted into looking like one.
+    """
+    from fux.decode._markdown import headings
+
+    levels = {h.lineno: h.level for h in headings(body)}
+    if not levels:
+        return body
+    out = []
+    for lineno, line in enumerate(body.split("\n"), start=1):
+        level = levels.get(lineno)
+        out.append("#" * min(level + 2, 6) + line[level:] if level else line)
+    return "\n".join(out)

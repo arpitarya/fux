@@ -129,7 +129,7 @@ at ranking time**.
 - **The thing W-52 actually wants** — retired documents not crowding out live
   ones — is a **ranking** outcome. Fux now has a lever aimed exactly at it:
   `[ranking] archived_weight` in `fux.toml`
-  ([ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) decision 6),
+  ([ADR-ARCHIVED-CONTENT](../../docs/adr/0044_archived-content.md) decision 6),
   default `1.0`.
 - **This is what the temporal-IR literature recommends** (§2.3): balance at
   ranking time, do not couple currency into the underlying statistics.
@@ -147,7 +147,7 @@ demotion weight stays available (D), but archived documents **do not appear in
 results at all** unless a flag asks for them.
 
 **⚠ This option is recorded as REJECTED**, in
-[ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) §Alternatives:
+[ADR-ARCHIVED-CONTENT](../../docs/adr/0044_archived-content.md) §Alternatives:
 
 > *"Filter archived results out by default — **Rejected**: it makes the
 > historical question unanswerable, which is the reason the set is indexed at
@@ -350,7 +350,7 @@ distributions, log base 2.
   Temporal Information Retrieval*](https://arxiv.org/html/2509.01306v1) —
   recency belongs at re-ranking time; coupling it into the representation is
   criticised as over-coupling.
-- [ADR-ARCHIVED-CONTENT](../../docs/adr/0037_archived-content.md) — decision 2
+- [ADR-ARCHIVED-CONTENT](../../docs/adr/0044_archived-content.md) — decision 2
   (ranking byte-identical at the default) and decision 6 (`archived_weight`),
   the lever option D uses.
 - [W44-SIGNAL](../regression/2026-08-22-archived-signal/VERDICT.md) — the

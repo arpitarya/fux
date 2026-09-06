@@ -66,5 +66,5 @@ See verdict block; measured at M5.
 > reasoning directly and ruled: ARC wins, ship it as-is.** This closes the
 > question against R4 specifically — it does not retire the trigger itself.
 > A future measurement on real traffic showing no advantage over LRU would
-> still reopen this record (see [ADR-CACHE](../../docs/adr/0034_cache.md)
+> still reopen this record (see [ADR-CACHE](../../docs/adr/0041_cache.md)
 > veto condition 6, the owning record since 2026-08-21).

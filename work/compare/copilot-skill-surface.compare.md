@@ -20,7 +20,7 @@ timestamp: 2026-09-06T00:00:00Z
 
 ## Context
 
-[ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 9a shipped
+[ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 9a shipped
 `fux-decoder` to Claude and Kiro and **not** Copilot, on a fact that was true
 when it was written: *"a Kiro skill is progressive-disclosure; only Kiro
 steering is ambient — which admits Kiro while still excluding Copilot's
@@ -39,7 +39,7 @@ Two consequences, and they pull opposite ways:
 2. **The exclusion is already moot in practice.** Copilot reads
    `.claude/skills` — so in the default install it *already* loads
    `fux-decoder`, and `fux-enrich`, and everything else fux writes for Claude.
-   That is [ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 13.
+   That is [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 13.
 
 ## Options
 
@@ -74,7 +74,7 @@ Two consequences, and they pull opposite ways:
 
 🔴 **That framing overstated the unknown, and the correction is this document's
 own.** The two copies are **byte-identical by construction** — one template,
-N destinations, [ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md)
+N destinations, [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md)
 decision 10 — so *dedupe* and *double-load* are **the same outcome**: the same
 instructions, once or twice, idempotent either way. The only branch that costs
 anything is a **hard error on duplicate names**, and that is a much narrower
@@ -98,7 +98,7 @@ move and the one this project already relies on for the verbatim block.**
 
 **Shipped under A:** `AGENT_FILES["copilot"]` gains
 `.github/skills/fux-enrich/SKILL.md` and no template;
-[ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 9a is amended
+[ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 9a is amended
 (its *"the two skill surfaces — Claude and Kiro"* was a count doing a rule's
 job), decision 14 records the ruling, and decision 13 is marked superseded **in
 effect, not in substance** — the cross-read is unchanged, it is simply no
@@ -116,9 +116,9 @@ sentence, so closing it is a deliberate act and leaving it is a visible one.
 - GitHub Copilot agent skills, and the three project-skill directories —
   <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
 - The exclusion this reopens —
-  [ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 9a.
+  [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 9a.
 - The cross-read finding —
-  [ADR-AGENT-POLICY](../../docs/adr/0035_agent-policy.md) decision 13.
+  [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 13.
 - The precedent for refusing to ship on an unmeasured premise —
   [`CLAUDE.md`](../../CLAUDE.md) §"A pre-registered threshold may never move".
 

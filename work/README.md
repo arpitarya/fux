@@ -30,9 +30,9 @@ are all mid-rewrite, and a doc being rewritten is work.
 
 **Records live in [`../docs/adr/`](../docs/adr/README.md), and nowhere else.**
 `work/adr/` existed for one day as a superseded-pending staging area and was
-retired on 2026-08-18 when the whole v0.30 set was archived. A superseded record
-now goes straight to [`../archive/adr/`](../archive/adr/README.md), which is not
-evidence — it may be named, never cited.
+retired on 2026-08-18. There is no archive tier either: on 2026-09-06 Arpit
+deleted the archived records outright, so a superseded record is **rewritten or
+deleted in the change that supersedes it** and leaves no second file behind.
 
 **Fork or idea?** A live fork — two implementations that both exist, or a
 decision with real options on the table — gets a `compare/` doc with a verdict
@@ -43,8 +43,9 @@ If you cannot tell which, it is a proposal.
 
 **0. There is one archive, and it is not in here.**
 [`../archive/`](../archive/README.md), at the repo root, holds everything
-retired — mirroring the live tree, so `adr/` retires into `archive/adr/` and
-and the handoff directory retired wholesale into `archive/handoff/`. `work/`
+retired — mirroring the live tree; the handoff directory, for instance, retired
+wholesale into `archive/handoff/`. **Decision records are the exception: they
+are not archived, they are deleted** (Arpit, 2026-09-06). `work/`
 holds live work only. A second
 archive is a defect, and `tests/test_archive_law.py` fails on one.
 

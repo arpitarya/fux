@@ -79,7 +79,7 @@ target domain measured ~2.5× lighter at median 425 terms).
 
 ## §5 · Schema of record
 
-Authoritative field-by-field: [`../adr/0004_index-format.md`](../../archive/adr/0004_index-format.md)
+Authoritative field-by-field: `../adr/0004_index-format.md`
 *(written at M1; until then the session sample of 2026-08-09 governs)*.
 Summary: per-doc record carries ledger (`id src loc sha ver mode meta`),
 postings (`terms: {16-hex-hash: [tf_heading, tf_body]}` — 8-byte hashes,

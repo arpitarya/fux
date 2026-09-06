@@ -31,6 +31,11 @@ from fux.decode.html import html_to_markdown
 
 EXTENSIONS = (".drawio", ".dio")
 
+#: A diagram page is a complete unit — a short page was being absorbed by
+#: the next one and cited under the wrong name.
+#: ADR-REFER's `page` strategy; ADR-DECODE decision 19 for the opt-in name.
+CHUNK = "page"
+
 MAX_INFLATED = 16 * 1024 * 1024
 _TAG_RE = re.compile(r"<[^>]+>")
 

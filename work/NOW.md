@@ -1,1 +1,1 @@
-✓ L0 landed as ADR-LAW-0 at 0002 (the law about laws, first) · register shifted 0002-0061 -> 0003-0062 · index 0001_LAWS.md · uncommitted, concurrent session holds staged files · next: W-122 phases 1/4/5/6, then blocker 3
+✓ L0 at 0002 (ADR-LAW-0), register reseated, 0001_LAWS.md fixed in git · W-119 cleared (rm -rf _to_delete/ is Arpit's one command) · next: R-3, the log() pick
