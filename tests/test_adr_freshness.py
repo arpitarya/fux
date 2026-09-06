@@ -124,7 +124,7 @@ def owning_records(
     """owner name -> that owner's record path, for every owner touched by `files`.
 
     Deliberately the *owning* record per file, not "any record was touched" —
-    a commit that changes `src/fux/query/` and updates `docs/adr/0001_laws.md`
+    a commit that changes `src/fux/query/` and updates `docs/adr/0001_LAWS.md`
     (ADR-LAWS, which owns none of it) must not pass just because *a* record
     moved. `record_path_for` returns `None` for an owner that does not resolve
     to a file; that is `test_adr_ownership.py`'s `test_every_owner_resolves` to

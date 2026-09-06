@@ -54,6 +54,7 @@ from typing import Callable
 
 from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..errors import FuxError
+from . import _limits
 
 __all__ = [
     "BUILTIN_MODULES",
@@ -103,6 +104,13 @@ CONSUMER_DIR = ".fux/decoders"
 #: Sorted and explicit rather than discovered by scanning the directory: a
 #: directory listing is filesystem order, and a plane whose dispatch depends on
 #: filesystem order is a plane whose committed index depends on it too (L3).
+#: ⚠ **`ipynb` and `odt` were REMOVED on 2026-09-06** (Arpit). Removing `odt`
+#: removed **four** extensions, not one — `.odt`, `.ods`, `.odp` and `.fodt`
+#: were one module because ODF puts every kind of document in the same
+#: `content.xml`. `.ipynb` was one. Six extensions in total leave
+#: `DEFAULT_TYPES`, which decision 9 derives from this tuple, so a corpus
+#: containing them stops being walked unless `.fux/sources/types` opts them
+#: back in — and nothing can, because no built-in claims them any more.
 BUILTIN_MODULES: tuple[str, ...] = (
     "csv",
     "docx",
@@ -110,11 +118,9 @@ BUILTIN_MODULES: tuple[str, ...] = (
     "html",
     "image",
     "ini",
-    "ipynb",
     "json",
     "jsonl",
     "mail",
-    "odt",
     "pdf",
     "pptx",
     "rtf",
@@ -526,7 +532,10 @@ def decode(raw: bytes, rel_path: str, root: Path | None = None) -> str | None:
     if decoder is None:
         return None
     try:
-        out = decoder(raw, rel_path)
+        # The root is bound, not passed: a decoder is still two names
+        # (decision 1) and one that ignores configuration never notices.
+        with _limits.bound_root(root):
+            out = decoder(raw, rel_path)
     except FuxError:
         raise
     except Exception as exc:

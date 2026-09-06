@@ -33,7 +33,6 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 
 | what he decides | filed | age |
 |---|---|---|
-| **Whether the W-83 shape gets a gate.** A key was accepted in a record, assigned in the ownership table, and **never implemented** — every mechanical check passed, because the freshness gate proves a record was *touched*, never that it is *true*. That is the **second** recorded occurrence, which is what CLAUDE.md's two-strikes rule makes a trigger. ⚠ **No check was written**: "the record is true" is not mechanically definable, and shipping a loose approximation is the moving-threshold failure in another costume | 2026-09-01 | 4d |
 | 🟢 **W-107 Phase 0 — `log()`: the measurement is FILED and this is now a one-word answer.** [`2026-09-05-node-log-divergence`](regression/2026-09-05-node-log-divergence/report.md): `Math.log` vs `math.log` **do differ** — 655 / 100 000 on darwin/arm64, the same order as the glibc figure W-107 cites — but **every difference is one ulp** (max rel `2.211e-16`) and **none survives `round(9)`**, which is `rank.py`'s own sort-key resolution. Over the corpora: **0 discordant scores, 0 discordant top-5, on 197 233 scored documents at 10 and 10 000 documents.** **(a) portable `log`** buys bit-identity and costs a Python-wide ranking change plus a re-derivation of every golden; **(b) tolerance at `round(9)`** costs nothing and asserts the sort key's own resolution. ⚠ **Two limits were named; ONE IS NOW CLOSED and it moved the number.** [The addendum](regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md) re-probed on **this repo's own 838-document index**, 605 frequency-stratified queries: the `idf` population goes **13 → 182** and **14 of 182 (7.69 %) diverge**, with **8.98 % of real BM25F scores differing bit-for-bit**. 🔴 So the original *"0 discordant"* was an artifact of 13 arguments — **and it changes nothing about the pick**: max relative `5.463e-16`, **0 differ at `round(9)`, 0 top-5 orderings move**. The evidence for **(b)** is stronger than it was, not weaker. 🔴 **The remaining limit is the whole of what is left: glibc — what CI runs — is still NOT measured** (no Linux here). It is one `workflow_dispatch` away — [`.github/workflows/log-probe.yml`](../.github/workflows/log-probe.yml), added 2026-09-05, **not yet run**. [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is written with **this one cell blank**; **W-107 Phase 1 does not start until he fills it** | 2026-09-05 | 0d |
 | 🔴 **W-110's gate: which `k`?** The bar was *`net >= 6` on `recall@k`* and **never fixed `k`**. [The run](regression/2026-09-05-doc2query/report.md) is **net +7 at `recall@1`** (7 up, 0 down) and +3 / +2 / +1 at `@3` / `@5` / `@10` — because `recall@10` is already `0.9884` without enrichment, so the effect is real and **concentrated at the top of the ranking**. **Choosing `k` after seeing the numbers is the moving-threshold failure, so this session did not.** ✅ The `placebo` control moved **nothing at any `k`**, so the gain is the questions' content. ⚠ The doc2query−− filter refused **2 of 98** questions and moved no recall number — **unproven, not disproven** | 2026-09-05 | 0d |
 | ⚠ **Whether the prior enrichment measurements need re-running.** W-110 found that a newly written enrichment was **never indexed on an incremental ingest** (reuse was keyed on the document's sha alone) — shipped that way from W-76 Phase 8 to 2026-09-05. **Every enrichment measurement on record ran through it**, and whether any under-measured enrichment depends on whether its harness ingested from clean. [`2026-08-24-blind-enrichment-second-author`](regression/2026-08-24-blind-enrichment-second-author/ANALYSIS.md)'s `+1 / −1` is the one that matters, because it is what motivated replacing prose with questions. **Not audited; a re-run needs a corpus that no longer exists (W-87 Part B)** | 2026-09-05 | 0d |
@@ -43,6 +42,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 | **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0036_predictions.md) — under *adr update* | 2026-08-28 | 8d |
 | **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 8d |
 | **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 9d |
+| ⚪ **W-121 — the CSV row-granularity run is `informed` and supplies no delta.** [ADR-TABULAR](../docs/adr/0062_tabular.md) shipped on your ruling, not on evidence clearing a bar (`hit@1` 0.229 -> 0.875, control 42/48, but one author wrote the generator AND the queries). A `blind` run over real spreadsheets is what would turn it into a grade — that is fux-playground's job, not the lab's (TEST-PLAN §0a). Doing nothing is legitimate; the veto condition is written | 2026-09-06 | 0d |
 | 🔴 **W-119 — `git rm` 38 stale decoder files.** 🔴 **MEASURED: all 36 extensions currently dispatch to the STALE `*doc` module**, so W-115's fixes and the rename are both inert in this repo right now — the new files are dead weight. A clean `pip install` meeting stale `.fux/decoders/` is worse: a **hard `FuxError`** on the first `registry()` call, because 7 stale copies import `fux.decode.<old>` which no longer ships. Fix: `git rm src/fux/decode/*doc.py .fux/decoders/*doc.py`. ⚠ No session tool can delete files — wedged shell, and the file bridge writes only | 2026-09-06 | 0d |
 | 🔴 **W-115 — run the suite and commit the chunking change.** 27 files written 2026-09-06 and **verified only in the Cowork container** (183 green against a staged copy). `device_bash` was wedged, so `tests_e2e`, `ruff`, the ADR freshness gate and every `git` command are unrun. **This is hands, not a decision** | 2026-09-06 | 0d |
 | 🔴 **W-116 — the chunking change re-ranked the corpus unmeasured**, on his own 2026-09-06 ruling that a defect fix does not wait on a measurement. Recorded as unmeasured in ADR-DECODE, ADR-REFER and ADR-EXTRACTED. Blocked behind **W-56** (`fux-lab` does not exist); here so the gap is not forgotten | 2026-09-06 | 0d |
@@ -78,6 +78,31 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
 ## Open items
 
 ### fux build
+
+- 🔴 **W-122 — L0: ADRs are the only source of truth, and the Law records
+  outrank every other record.** 🟢 **L0 AND THE RENAME LANDED 2026-09-06** (uncommitted);
+  what remains is the generated CLAUDE.md block, the config consolidation and the gate. `agent` · *(records: **ADR-LAW-0** new ·
+  ADR-LAWS restructured · ADR-LAW-1…8 promoted · ADR-CONFIG · ADR-TUNE ·
+  ADR-OWNERSHIP)* · **Arpit ruled this 2026-09-06**, deciding R-2 and going
+  past it. Two clauses: **source** — a rule is stated in exactly one ADR and
+  every other artifact links, never restates; **precedence** — a record that
+  conflicts with a Law is **void in the conflicting part**. **Amendment is
+  entrenched**: a Law changes only on Arpit's ruling, named in the record.
+  **`CLAUDE.md` stops being normative and becomes a pointer, permanently** —
+  its law section is generated from the records and test-asserted.
+  **The nine law files are renamed `*_LAW-n-*.md` and cited `ADR-LAW-n`**;
+  L0 appends as `0002_LAW-0-authority.md` — with `LAW-` in the filename,
+  contiguity stops mattering and no second renumber is needed.
+  🟢 **This is what makes R-2's gate writable**: with one source, ADR-CONFIG's
+  fenced key tree ↔ `config.py` is a parser, both directions — and *a key is
+  real only if it is in the tree*, which is exactly how `acquired_max_bytes`
+  rotted in prose. Carries the config consolidation (`config.schema.json` and
+  `derive/runtime.schema.json` **deleted** — both verified documentation-only;
+  the four runtime-loaded schemas untouched, because they *enforce* rather
+  than *describe*). ⚠ **Supersedes ADR-LAWS decision 1, accepted the same
+  day**, and ⚠ **a concurrent session renumbered the whole register on
+  2026-09-06** — re-derive paths and land the rename in one commit by one
+  agent. — [detail](open/W-122-adrs-are-the-source.md) `filed: 2026-09-06`
 
 - 🟢 **W-113** · `agent` · *(record: [ADR-URL-LIST](../docs/adr/0018_url-list.md) ·
   [ADR-URL-FRESHNESS](../docs/adr/0052_url-freshness.md) ·
@@ -191,7 +216,7 @@ and was green on `80ee187`; the clean-corpus `recall@k` is the doc2query run's
   Two more instances then turned up — six small `.jsonl` records collapsing to
   one passage, and any short band of a small table — and three instances of one
   shape is a defect, not a knob. Fixed in `_chunk._sibling_run` under W-120;
-  [ADR-REFER](../docs/adr/0036_refer-plane.md) decision 26 records the reversal.
+  [ADR-REFER](../docs/adr/0037_refer-plane.md) decision 26 records the reversal.
   Removed from the list once the outcome reaches IMPLEMENTATION.md.
 
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0038_tuning.md) ·

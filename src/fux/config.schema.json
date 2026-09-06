@@ -20,20 +20,27 @@
     "would have to be argued against it. That is why its type is `dict` and",
     "stops there."
   ],
-
   "schema": "fux.config.v1",
-
   "sources": {
     "_doc": "The `[sources]` table. Everything has a default; the keys exist to be seen rather than to be required.",
     "fields": {
-      "dirs_file":  { "type": "str", "required": "never", "default": ".fux/sources/dirs",
-                      "doc": "the committed directory list" },
-      "types_file": { "type": "str", "required": "never", "default": ".fux/sources/types",
-                      "doc": "OPTIONAL. Absent means the built-in prose allowlist; present REPLACES it entirely -- an absent file never means index-everything and never means index-nothing" }
+      "dirs_file": {
+        "type": "str",
+        "required": "never",
+        "default": ".fux/sources/dirs",
+        "doc": "the committed directory list"
+      },
+      "types_file": {
+        "type": "str",
+        "required": "never",
+        "default": ".fux/sources/types",
+        "doc": "OPTIONAL. Absent means the built-in prose allowlist; present REPLACES it entirely -- an absent file never means index-everything and never means index-nothing"
+      }
     },
-    "example": { "dirs_file": ".fux/sources/dirs" }
+    "example": {
+      "dirs_file": ".fux/sources/dirs"
+    }
   },
-
   "sources_url": {
     "_doc": [
       "The `[sources.url]` table. Its PRESENCE enables URL ingestion; absent",
@@ -44,26 +51,49 @@
       "and only ever for its own URL."
     ],
     "fields": {
-      "fetcher":      { "type": "str",  "required": "never", "default": ".fux/fetchers/http.py",
-                        "doc": "the file a line with no `fetch=` uses, AND the directory `fetch=cdp` resolves in -- one key carries both, so relocating your fetchers is a one-line change" },
-      "urls_file":    { "type": "str",  "required": "never", "default": ".fux/sources/urls" },
-      "meta":         { "type": "str",  "required": "never", "default": "hashed",
-                        "enum": ["hashed", "plain"],
-                        "doc": "L5's privacy FLOOR for this source. A line may loosen it to `plain` for one public document; there is deliberately no way to make one line stricter" },
-      "max_parallel": { "type": "int",  "required": "when-url-configured",
-                        "doc": "URLs in flight at once. ⚠ REQUIRED whenever [sources.url] exists (W-85) -- every other key here has a default and this one does not, because a repo that CAN fetch must say how hard in a number a person can read. Below 1 refuses; above the fetcher's declared MAX_PARALLEL is clamped down loudly, because a declaration answers what is SAFE and this answers what is POLITE" },
-      "config":       { "type": "dict", "required": "never", "default": {},
-                        "doc": "passed VERBATIM to the fetcher's configure(). Fux never reads a key inside it -- see the note at the head of this file" }
+      "fetcher": {
+        "type": "str",
+        "required": "never",
+        "default": ".fux/fetchers/http.py",
+        "doc": "the file a line with no `fetch=` uses, AND the directory `fetch=cdp` resolves in -- one key carries both, so relocating your fetchers is a one-line change"
+      },
+      "urls_file": {
+        "type": "str",
+        "required": "never",
+        "default": ".fux/sources/urls"
+      },
+      "meta": {
+        "type": "str",
+        "required": "never",
+        "default": "hashed",
+        "enum": [
+          "hashed",
+          "plain"
+        ],
+        "doc": "L5's privacy FLOOR for this source. A line may loosen it to `plain` for one public document; there is deliberately no way to make one line stricter"
+      },
+      "max_parallel": {
+        "type": "int",
+        "required": "when-url-configured",
+        "doc": "URLs in flight at once. \u26a0 REQUIRED whenever [sources.url] exists (W-85) -- every other key here has a default and this one does not, because a repo that CAN fetch must say how hard in a number a person can read. Below 1 refuses; above the fetcher's declared MAX_PARALLEL is clamped down loudly, because a declaration answers what is SAFE and this answers what is POLITE"
+      },
+      "config": {
+        "type": "dict",
+        "required": "never",
+        "default": {},
+        "doc": "passed VERBATIM to the fetcher's configure(). Fux never reads a key inside it -- see the note at the head of this file"
+      }
     },
     "example": {
       "fetcher": ".fux/fetchers/http.py",
       "urls_file": ".fux/sources/urls",
       "meta": "hashed",
       "max_parallel": 4,
-      "config": { "cdp_port": 9222 }
+      "config": {
+        "cdp_port": 9222
+      }
     }
   },
-
   "agents": {
     "_doc": [
       "The `[agents]` table -- which vendors `fux setup` writes instruction",
@@ -75,12 +105,51 @@
       "`install = []` installs none."
     ],
     "fields": {
-      "install": { "type": "list", "required": "never", "of": "str",
-                   "doc": "any of: claude, codex, copilot, kiro. Absent means all of them; [] means none" }
+      "install": {
+        "type": "list",
+        "required": "never",
+        "of": "str",
+        "doc": "any of: claude, codex, copilot, kiro. Absent means all of them; [] means none"
+      }
     },
-    "example": { "install": ["claude", "kiro"] }
+    "example": {
+      "install": [
+        "claude",
+        "kiro"
+      ]
+    }
   },
-
+  "decode": {
+    "_doc": [
+      "The `[decode]` table -- limits applied while a document is turned into",
+      "Markdown.",
+      "",
+      "WHY THIS IS HERE AND NOT IN .fux/tune.toml. tune.toml holds every knob",
+      "that changes how results are ORDERED and none that changes what is",
+      "INDEXED (ADR-TUNE decision 7). A row limit decides which rows EXIST as",
+      "far as the index is concerned, so it is committed config, and",
+      "`same sources + same committed config -> same index` is the L3 that",
+      "holds.",
+      "",
+      "IT COUNTS DATA ROWS. A header is always kept and never counted -- 20 000",
+      "means twenty thousand records, not 19 999 plus a header.",
+      "",
+      "RAISED 500 -> 20 000 ON 2026-09-06. The old hard-coded 500 was a silent",
+      "data loss: a 754-row CSV decoded to 500 rows, so a fact in row 600 was",
+      "not decoded, not indexed and not citable, with a `*(table truncated)*`",
+      "line as the only signal."
+    ],
+    "fields": {
+      "max_table_rows": {
+        "type": "int",
+        "required": "never",
+        "doc": "data rows admitted from one table (per SHEET for .xlsx). Default 20000; must be >= 1. Higher costs query latency: refer chunks one passage per row, and rescore is O(passages)"
+      }
+    },
+    "example": {
+      "max_table_rows": 20000
+    }
+  },
   "_retired_keys": {
     "_doc": [
       "Keys that once existed and now STOP THE RUN with instructions rather than",

@@ -21,6 +21,50 @@ Rules:
 
 ---
 
+## W-122 (partial) — L0, and the law records renamed (2026-09-06)
+
+**Arpit's ruling, 2026-09-06.** *"ADRs are the only source of truth… if there
+is a change, the ADR changes and then it points to it"*, *"it is a two level
+thing — all the ADRs are supposed to be followed, but none of the ADRs can
+break the Law ADRs"*, *"CLAUDE.md is not a law, it is just a pointer."*
+
+| what landed | where |
+|---|---|
+| **L0** — source, precedence, entrenchment; the describes/implements/enforces test; four veto conditions | [ADR-LAW-0](../docs/adr/0002_LAW-0-authority.md) — **new record, at `0002`: the law about laws precedes the laws** |
+| the register shifted `0002`-`0061` → `0003`-`0062` to seat it, **and every frontmatter `(NNNN)` with it** (60 records) | `docs/adr/` |
+| the eight law records renamed `000N_lM-slug.md` → `000N_LAW-M-slug.md` | `docs/adr/0002_LAW-1-…` … `0009_LAW-8-…` |
+| every citation swept, `ADR-Ln` → `ADR-LAW-n` and paths with them, **13 files**, residue check clean | `CLAUDE.md` · `README.md` · `docs/adr/README.md` · the nine records |
+| the L0 row, `L1-L8` → `L1-L0`, and a 🔴 supersession note above decision 1 | [ADR-LAWS](../docs/adr/0001_LAWS.md) |
+| the L0 bullet, `L1–L0`, and the statement that the section becomes non-normative | [`CLAUDE.md`](../CLAUDE.md) §Non-negotiable constraints |
+| the register row | [`docs/adr/README.md`](../docs/adr/README.md) |
+| the nine `*_LAW-*` records exempted from the no-restatement test — under L0 they **are** the law | [`tests/test_adr_ownership.py`](../tests/test_adr_ownership.py) |
+| **`0001_laws.md` → `0001_LAWS.md`** — the index in caps to match its records; **70 files repointed**, and the test guard that matched on the filename | `docs/adr/0001_LAWS.md` · [`tests/test_adr_ownership.py`](../tests/test_adr_ownership.py) · [`tests/test_adr_freshness.py`](../tests/test_adr_freshness.py) · [`tests/query/test_analyzer.py`](../tests/query/test_analyzer.py) |
+
+⚠ **The rename repointed links inside past `WORKLOG.md` entries.** That is CLAUDE.md's stated exception to append-only — *a repo-wide mechanical rename, where every reference is repointed in a single change, and the entry that does it says so explicitly*. **Two sentences describing what a file was called at the time were restored** rather than rewritten: a link may be repointed, a statement about the past may not.
+
+**Evidence.** `tests/test_adr_ownership.py` 77 passed; the governance subset
+(ownership · frontmatter · doc-registry · archive-law · regression-runs)
+**738 passed**. ⚠ **The full suite was NOT run**: the bridge shell cannot
+delete `.venv/.lock`, so `uv` could not rebuild the environment, and the
+fallback interpreter is 3.10 — below L7, so `tomllib` and `fux` do not import.
+Four failures remain in the governance subset and **all four are the
+concurrent session's staged work**, verified: two `test_adr_freshness`
+(commit `94231b2` and their staged `src/` decoder changes) and two
+`test_regression_runs` (their `2026-09-06-csv-chunk-granularity` report has no
+`## Authorship` section).
+
+⚠ **Not committed.** A concurrent session held 35 staged files and
+`.git/index.lock` was present and un-unlinkable, so `git mv` was impossible and
+plain `mv` was used. **Arpit or the Claude Code session commits.**
+
+⚠ **Filed as W-114, renumbered to W-122** — W-114 was already spent on the
+Codex-vendor work above, and ids are never reused.
+
+**Still open (W-122 phases 1, 4, 5, 6):** the CLAUDE.md section inventory; the
+generated law block and its test; the config consolidation (`config.schema.json`
+and `derive/runtime.schema.json` deleted, the four live keys moved into
+ADR-CONFIG's tree); the key-tree gate.
+
 ## W-114 — the fourth vendor, and `fux-enrich` on every skill surface (2026-09-06)
 
 **Landed, unpushed.** Two changes one day apart, recorded together because the
@@ -1587,7 +1631,7 @@ container against a staged subset. `tests_e2e/`, `test_adr_freshness.py` and
 Three shapes were on the table — stretch L2, write a new law, or leave it a
 product decision. **He chose the new law.**
 
-**Evidence:** [ADR-LAWS](../docs/adr/0001_laws.md) decision 8 and its table row;
+**Evidence:** [ADR-LAWS](../docs/adr/0001_LAWS.md) decision 8 and its table row;
 the normative text is in [`CLAUDE.md`](../CLAUDE.md) §Non-negotiable constraints,
 edited in the same change as required by ADR-LAWS decision 4.
 [ADR-QUALITY](../docs/adr/0044_quality-contract.md) decision 11 — the record that

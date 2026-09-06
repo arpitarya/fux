@@ -14,7 +14,7 @@ Every one of them is a **pure function of what ranking already produced** — th
 query's term hashes, the `df` and corpus statistics BM25F needed anyway, the
 scored result list, and (on `answer` only) the refer plane's freshness verdict.
 Nothing here fetches, samples, calls a model, or reads a clock, so L1, L3 and
-L4 are untouched — see [ADR-LAWS](../../../docs/adr/0001_laws.md).
+L4 are untouched — see [ADR-LAWS](../../../docs/adr/0001_LAWS.md).
 
 | signal | what it answers | shape |
 |---|---|---|

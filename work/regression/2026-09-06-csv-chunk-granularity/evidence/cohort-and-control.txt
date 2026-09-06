@@ -1,0 +1,19 @@
+hit@1 by cohort (rows sharing all three common terms)
+cohort   n   58rows  11rows  1row
+     1   3   0.333   1.000   1.000 
+     2  17   0.235   0.294   0.941 
+     3  13   0.231   0.077   0.923 
+    4+  15   0.200   0.333   0.733 
+
+control: correct row vs next-best row, all candidates the same size
+correct row outranks next-best in 42/48 = 0.875
+
+cost curve (rows -> chunk ms, rescore+assemble ms), one document
+   500 rows:    500 passages  chunk     0.9 ms  rescore+assemble     62.9 ms
+  5000 rows:   5000 passages  chunk     9.7 ms  rescore+assemble    653.8 ms
+ 20000 rows:  20000 passages  chunk    39.2 ms  rescore+assemble   2614.1 ms
+
+20 000 rows, three repeats (machine variance):
+   rescore+assemble     2498 ms
+   rescore+assemble     2596 ms
+   rescore+assemble     2780 ms

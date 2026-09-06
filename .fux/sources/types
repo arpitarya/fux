@@ -27,14 +27,14 @@
 # plausible index with different postings.
 #
 # YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
-# be bound to it -- a .geojson is JSON, so `*.geojson decoder=jsondoc` is all it
+# be bound to it -- a .geojson is JSON, so `*.geojson decoder=json` is all it
 # takes, with no module to copy or edit. EXTENSIONS is a decoder's DEFAULT
 # CLAIM, not a list of what it can read. What is refused is REDIRECTING an
 # extension another decoder already claims.
 #
 # A binding is per EXTENSION, so `decoder=` sits only on a bare `*.ext` line --
 # dispatch sees a suffix and nothing about which glob admitted the file, so
-# `docs/api/*.json decoder=jsondoc` would bind every .json in the corpus.
+# `docs/api/*.json decoder=json` would bind every .json in the corpus.
 #
 # A PROSE FORMAT CARRIES NO BINDING. It is already text and no decoder is in
 # its path, so there is nothing to name.
@@ -71,60 +71,53 @@
 # stdlib only, nothing to install. The binding on each line is what
 # dispatch resolves; fux checks it against the module it names.
 
-*.csv decoder=csvdoc
-*.tsv decoder=csvdoc
+*.csv decoder=csv
+*.tsv decoder=csv
 
-*.docm decoder=docxdoc
-*.docx decoder=docxdoc
+*.docm decoder=docx
+*.docx decoder=docx
 
-*.dio decoder=drawiodoc
-*.drawio decoder=drawiodoc
+*.dio decoder=drawio
+*.drawio decoder=drawio
 
-*.htm decoder=htmldoc
-*.html decoder=htmldoc
-*.xhtml decoder=htmldoc
+*.htm decoder=html
+*.html decoder=html
+*.xhtml decoder=html
 
-*.gif decoder=imagedoc
-*.jpeg decoder=imagedoc
-*.jpg decoder=imagedoc
-*.png decoder=imagedoc
+*.gif decoder=image
+*.jpeg decoder=image
+*.jpg decoder=image
+*.png decoder=image
 
-*.cfg decoder=inidoc
-*.ini decoder=inidoc
-*.properties decoder=inidoc
+*.cfg decoder=ini
+*.ini decoder=ini
+*.properties decoder=ini
 
-*.ipynb decoder=ipynbdoc
+*.json decoder=json
 
-*.json decoder=jsondoc
+*.jsonl decoder=jsonl
 
-*.jsonl decoder=jsonldoc
+*.eml decoder=mail
+*.mbox decoder=mail
 
-*.eml decoder=maildoc
-*.mbox decoder=maildoc
+*.pdf decoder=pdf
 
-*.fodt decoder=odtdoc
-*.odp decoder=odtdoc
-*.ods decoder=odtdoc
-*.odt decoder=odtdoc
+*.pptm decoder=pptx
+*.pptx decoder=pptx
 
-*.pdf decoder=pdfdoc
+*.rtf decoder=rtf
 
-*.pptm decoder=pptxdoc
-*.pptx decoder=pptxdoc
+*.svg decoder=svg
 
-*.rtf decoder=rtfdoc
+*.toml decoder=toml
 
-*.svg decoder=svgdoc
+*.xlsm decoder=xlsx
+*.xlsx decoder=xlsx
 
-*.toml decoder=tomldoc
+*.xml decoder=xml
 
-*.xlsm decoder=xlsxdoc
-*.xlsx decoder=xlsxdoc
-
-*.xml decoder=xmldoc
-
-*.yaml decoder=yamldoc
-*.yml decoder=yamldoc
+*.yaml decoder=yaml
+*.yml decoder=yaml
 
 # --- OPT-IN ---------------------------------------------------------------
 # Not indexed until you uncomment. Nothing here has a built-in decoder, so a

@@ -128,9 +128,18 @@ def test_band_line_ranges_are_contiguous_and_do_not_overlap():
         assert later.line_start == earlier.line_end + 1
 
 
-def test_a_table_under_the_ceiling_is_left_alone():
+def test_a_small_table_is_split_too_not_only_an_oversized_one():
+    """`_pieces` used to return early whenever a section fitted the ceiling, so
+    a ten-row table — the common case — never reached the row split at all."""
     passages = chunk(_table(3))
-    assert len(passages) == 1
+    assert len(passages) == 3
+
+
+def test_every_row_still_carries_the_header():
+    """A row whose columns have no names is a citation nobody can read. This is
+    the one documented exception to totality."""
+    for p in chunk(_table(20)):
+        assert "| name | value | note |" in p.text
 
 
 # -- generated text has no line numbers to cite ------------------------------
@@ -150,17 +159,17 @@ def test_line_numbers_can_be_suppressed_for_generated_text():
 # -- a table band is a neighbourhood, not a chapter and not a row ------------
 
 
-def test_a_table_bands_at_the_table_ceiling_not_the_prose_one():
-    """A table has no narrative continuity, so the reason prose bands are large
-    does not apply. At the prose ceiling a 500-row CSV came back as ten
-    passages of ~58 rows, and a citation handed a reader 58 rows when one
-    answered."""
-    from fux.refer._chunk import MAX_TABLE_BAND_BYTES
+def test_a_table_is_split_one_row_per_passage():
+    """Ruled by Arpit 2026-09-06 on the measurement in
+    `work/regression/2026-09-06-csv-chunk-granularity/`: on ambiguous queries
+    `hit@1` went 0.208 (58-row bands) -> 0.229 (11-row) -> 0.875 (per row)."""
+    from fux.refer._chunk import TABLE_ROWS_PER_PASSAGE
 
-    passages = chunk(_table(500))
-    assert len(passages) > 20
+    assert TABLE_ROWS_PER_PASSAGE == 1
+    passages = chunk(_table(200))
+    assert len(passages) == 200
     for p in passages:
-        assert p.nbytes <= max(MAX_TABLE_BAND_BYTES, MIN_PASSAGE_BYTES) * 1.2
+        assert p.text.count("\n| row") == 1
 
 
 def test_prose_still_bands_at_the_prose_ceiling():

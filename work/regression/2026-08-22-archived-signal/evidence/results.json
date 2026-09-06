@@ -529,11 +529,11 @@
       "archived_in_top": 2,
       "contamination_pct": 40.0,
       "unmarked": 0,
-      "gold": "docs/adr/0001_laws.md",
+      "gold": "docs/adr/0001_LAWS.md",
       "gold_rank": 1,
       "top": [
         {
-          "loc": "docs/adr/0001_laws.md",
+          "loc": "docs/adr/0001_LAWS.md",
           "archived": false
         },
         {

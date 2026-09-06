@@ -170,7 +170,12 @@ def test_records_do_not_restate_the_laws() -> None:
     ]
     offenders = []
     for path in sorted(records_on_disk()):
-        if path.name.endswith("_laws.md"):
+        if path.name.endswith("_LAWS.md"):
+            continue
+        # ADR-LAW-0: the nine law records ARE the law's text, not a second
+        # statement of it. This test guards every OTHER record against
+        # paraphrasing a law; a law record carrying its own words is the point.
+        if "_LAW-" in path.name:
             continue
         text = path.read_text(encoding="utf-8")
         for handle in handles:

@@ -66,26 +66,23 @@ MIN_PASSAGE_BYTES = 120
 #: section would otherwise consume any budget by itself.
 MAX_PASSAGE_BYTES = 4000
 
-#: The ceiling for a **table** band, well below `MAX_PASSAGE_BYTES` and
-#: deliberately so.
+#: Rows in one table passage. **One**, ruled by Arpit 2026-09-06 on the
+#: measurement in `work/regression/2026-09-06-csv-chunk-granularity/`.
 #:
-#: A table has no narrative continuity: row 41 does not depend on row 40 the way
-#: a paragraph depends on the one above it, so the reason prose bands are large
-#: does not apply. At the prose ceiling a 500-row CSV came back as ten passages
-#: of ~58 rows each, and a citation handed a reader 58 rows when one answered.
+#: The band this replaces was 900 bytes (~11 rows), and 4000 before that
+#: (~58 rows). On 48 ambiguous queries over a 12-file, 6 998-row corpus —
+#: queries where every term is common and only the COMBINATION identifies a
+#: row, which is the realistic shape — `hit@1` went **0.229 (58 rows) ->
+#: 0.292 (11 rows) -> 0.875 (1 row)** and bytes returned **6 094 -> 946**.
+#: The win survives the obvious objection: with every candidate the same size,
+#: so passage length cannot be doing the work, the correct row still outranks
+#: the next-best in 42/48.
 #:
-#: **Why not one row per passage** — the obvious answer, and it defeats itself
-#: twice, measured on a 500-row file: an average row is 58 bytes against
-#: `_assemble.CITATION_OVERHEAD`'s 80, so **58 % of the caller's budget would be
-#: locators**; and every row is under `MIN_PASSAGE_BYTES`, so `_merge_runts`
-#: folds them straight back. A lone row is also unreadable without its header,
-#: and repeating a 30-byte header onto a 60-byte row makes every row score
-#: alike on any header term.
-#:
-#: 900 bytes is ~11 rows: a readable neighbourhood, header intact, overhead
-#: down to 9 %. Not a `[refer]` tunable yet — promote it if a corpus ever needs
-#: it moved, rather than shipping a knob nobody has had a reason to turn.
-MAX_TABLE_BAND_BYTES = 900
+#: ⚠ **The cost is real and was accepted with the number in hand.** `rescore`
+#: is O(passages), so a 20 000-row sheet costs ~2.6 s per document per
+#: query. `[decode] max_table_rows` is the lever a consumer with big sheets
+#: turns.
+TABLE_ROWS_PER_PASSAGE = 1
 
 
 @dataclass(frozen=True)
@@ -301,9 +298,12 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
     rather than a passage cut mid-sentence and cited as if it were the author's.
     """
     out: list[tuple[str, int, int]] = []
-    if len(text.encode("utf-8")) <= max_passage_bytes:
-        return [(text, 0, text.count("\n") + 1)]
-
+    # ⚠ **No early return for a small section**, and that is deliberate. It used
+    # to short-circuit whenever the section fitted the ceiling, which meant a
+    # ten-row table — the common case — never reached the row split at all and
+    # came back whole. Walking the paragraphs is equivalent for prose: they
+    # re-accumulate into one piece under the ceiling, and `"\n\n".join(
+    # text.split("\n\n"))` is the input.
     cursor = 0  # lines of `text` already accounted for
     current: list[str] = []
     size = 0
@@ -320,24 +320,27 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
 
     for paragraph in text.split("\n\n"):
         paragraph_size = len(paragraph.encode("utf-8")) + 2
-        if paragraph_size > max_passage_bytes:
-            bands = _table_bands(paragraph, min(max_passage_bytes, MAX_TABLE_BAND_BYTES))
-            if bands is not None:
-                # Whatever was pending joins the FIRST band rather than being
-                # flushed beside it. A section that is a heading plus one big
-                # table would otherwise emit the heading as a 9-byte passage of
-                # its own — a runt the merge pass never sees, because merging
-                # happens before splitting.
-                if current:
-                    head, span = bands[0]
-                    pending = "\n\n".join(current)
-                    bands[0] = (pending + "\n\n" + head, pending.count("\n") + 1 + 1 + span)
-                    current, size = [], 0
-                for band, span in bands:
-                    out.append((band, cursor, span))
-                    cursor += span  # bands are contiguous rows: no blank line between
-                cursor += 1  # ...but a blank line does follow the table itself
-                continue
+        # ⚠ Tables are split at EVERY size, not only when oversized. A ten-row
+        # table is ten answers, and returning it whole was the coarse-citation
+        # defect the measurement above found — it simply never crossed the byte
+        # ceiling to be noticed.
+        bands = _table_bands(paragraph)
+        if bands is not None:
+            # Whatever was pending joins the FIRST band rather than being
+            # flushed beside it. A section that is a heading plus a table would
+            # otherwise emit the heading as a nine-byte passage of its own — a
+            # runt the merge pass never sees, because merging happens before
+            # splitting.
+            if current:
+                head, span = bands[0]
+                pending = "\n\n".join(current)
+                bands[0] = (pending + "\n\n" + head, pending.count("\n") + 1 + 1 + span)
+                current, size = [], 0
+            for band, span in bands:
+                out.append((band, cursor, span))
+                cursor += span  # bands are contiguous rows: no blank line between
+            cursor += 1  # ...but a blank line does follow the table itself
+            continue
         if current and size + paragraph_size > max_passage_bytes:
             flush()
         current.append(paragraph)
@@ -346,27 +349,27 @@ def _pieces(text: str, max_passage_bytes: int = MAX_PASSAGE_BYTES) -> list[tuple
     return out
 
 
-def _table_bands(
-    paragraph: str, max_passage_bytes: int = MAX_PASSAGE_BYTES
-) -> list[tuple[str, int]] | None:
-    """An oversized Markdown table split into row bands, or `None` if this
-    paragraph is not a table.
+def _table_bands(paragraph: str) -> list[tuple[str, int]] | None:
+    """A Markdown table split into row passages, or `None` if not a table.
 
-    **Why tables need their own case.** A table contains no blank line, so it is
-    a single paragraph to `_pieces` and could never be split — a 40 KB sheet
-    came back whole and the assembler refused to seat it, which is a document
-    that ranks and then cannot be quoted. `xlsx`, `csv`, `docx` and
-    `html` all emit them.
+    `TABLE_ROWS_PER_PASSAGE` rows per passage — one, today. Returns
+    `(band, source_lines)` per band.
 
-    **The header row and its separator are repeated into every band.** A band of
-    rows whose columns have no names is a citation nobody can read. This is the
-    single documented exception to the chunker's totality property, and the
-    reason each band reports the source rows it covers rather than its own line
-    count.
+    **The header row and its separator are repeated into every band.** A row
+    whose columns have no names is a citation nobody can read, and it is the one
+    documented exception to the chunker's totality property: every *content*
+    byte still lands in exactly one passage. It is also why each band reports
+    the source rows it covers rather than its own line count — a band holds more
+    lines than it spans.
 
-    Returns `(band, source_lines)` per band. A row longer than the ceiling on its
-    own is emitted alone and stays oversized — same treatment as an oversized
-    paragraph, for the same reason.
+    ⚠ **The repeated header is scored.** Every row of a table carries the
+    header's terms, so a table's passages gain a small uniform uplift against
+    non-table passages in `_rescore`. Uniform within the table, so no row
+    outranks another for it; stated here rather than discovered later. Moving
+    the header into `Passage.heading` instead was measured and scored
+    identically (`hit@1` 0.875 either way), and was not taken because `heading`
+    already carries the section — a sheet name for `.xlsx` — and losing that
+    would cost more than the duplication does.
     """
     lines = paragraph.split("\n")
     if len(lines) < 3:
@@ -380,23 +383,14 @@ def _table_bands(
     body = lines[len(prefix) :]
     if not body:
         return None
-    prefix_bytes = len("\n".join(prefix).encode("utf-8")) + 1
 
     bands: list[tuple[str, int]] = []
-    current: list[str] = []
-    size = 0
-    for row in body:
-        row_bytes = len(row.encode("utf-8")) + 1
-        if current and prefix_bytes + size + row_bytes > max_passage_bytes:
-            bands.append(("\n".join(prefix + current), len(current)))
-            current, size = [], 0
-        current.append(row)
-        size += row_bytes
-    if current:
-        bands.append(("\n".join(prefix + current), len(current)))
+    for index in range(0, len(body), TABLE_ROWS_PER_PASSAGE):
+        rows = body[index : index + TABLE_ROWS_PER_PASSAGE]
+        bands.append(("\n".join(prefix + rows), len(rows)))
 
     if len(bands) < 2:
-        return None  # nothing was gained; leave it as the ordinary oversized case
+        return None  # nothing was gained; leave it as the ordinary case
     # The first band covers its own rows AND the header lines above them.
     first, first_span = bands[0]
     bands[0] = (first, first_span + len(prefix))

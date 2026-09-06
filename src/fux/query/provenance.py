@@ -45,7 +45,7 @@ because a log nobody can read answers no question anyone asks of it. What
 survives is confinement — the journal lives in `.fux/runtime/`, which
 [`store/fuxdir.py`](../store/fuxdir.py) lists by name as gitignored, and it
 **never reaches a committed byte or the network**. See
-[ADR-LAWS](../../../docs/adr/0001_laws.md) decision 8, which also records that
+[ADR-LAWS](../../../docs/adr/0001_LAWS.md) decision 8, which also records that
 the AOL-2006 risk was *accepted*, not disproved.
 
 ⚠ **The journal is OFF by default.** Turning plaintext logging on for every

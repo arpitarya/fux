@@ -17,7 +17,7 @@ You are executing the **2026-09-05 unblock** in the fux repo. Read, in this orde
 <!-- Arpit: strike or accept each line before pasting. A line left as-is is ACCEPTED as proposed. A line marked OVERRIDE carries his ruling in its place. A line marked BLANK is a blocker: write work/BLOCKED.json and stop on it. -->
 
 - **R-1** ETag criterion: **ACCEPTED 2026-09-05 — decision 12 is the criterion.** Two moves, not one: (a) delete the row, no code; (b) decision 12 **gains the veto condition** *"if a consumer reports refresh bandwidth as a blocker, or a corpus of more than a few hundred `update=auto` URLs is deployed behind a metered or proxied network, request-stage interception is re-costed."* Arpit also asked for the refresh policy to be a declared property — filed as **W-113**, `agent` lane, not part of this batch.
-- **R-2** W-83 gate: **[ no general gate · ship the parsed-key test · tighten the per-query gate to `per-query*.jsonl` with `id`+`arm`, baselined 2026-09-06 ]**
+- **R-2** W-83 gate: **RULED 2026-09-06 — superseded by W-114.** Arpit went past the question: **L0** makes ADRs the only source of truth and the Law records supreme, `CLAUDE.md` a permanent pointer. The gate R-2 could not write becomes a parser once the source is single (ADR-CONFIG key tree ↔ `config.py`, both directions). Ship the per-query-gate tightening here; **everything else is W-114 and not this batch.**
 - **R-3** W-107 `log()`: **[ (b) tolerance at `round(9)` ]** — the glibc and `idf` probes run before the sha freezes
 - **R-4** W-110's `k`: **[ gate VOID · feature stays · next enrichment pre-registration fixes `k` = 3 before any number ]**
 - **R-5** prior enrichment re-runs: **[ none owed — audit filed in the spec ]**

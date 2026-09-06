@@ -1,0 +1,4 @@
+arm          | hit@1        | hit@3        | mrr          | noise_ratio  | bytes_returned_mean | passages_per_doc_mean | chunk_ms_p95 | rescore_ms_p95 | total_ms_p95
+rows-58      | 0.229        | 0.229        | 0.229        | 0.986        | 6094         | 10           | 0.74         | 47.52        | 48.4        
+rows-11      | 0.292        | 0.458        | 0.382        | 0.983        | 5412         | 53           | 0.72         | 53.37        | 54.26       
+row          | 0.875        | 1.0          | 0.934        | 0.903        | 946          | 582          | 1.45         | 136.07       | 138.14      

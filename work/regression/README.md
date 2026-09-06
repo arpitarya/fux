@@ -40,6 +40,7 @@ p-values: `1.00`, `0.50`, `0.25`, `0.125`, `0.0625`).
 
 | run | the claim | net | status |
 |---|---|---:|---|
+| [`2026-09-06-csv-chunk-granularity`](2026-09-06-csv-chunk-granularity/) | one passage per CSV row beats a band of rows | **n/a** | ⚪ **`informed`, no delta** — `hit@1` 0.229 (58 rows) → 0.292 (11) → **0.875** (1) on 48 ambiguous queries, and the control rules out short-passage bias (42/48). One author wrote the generator and the queries, so it clears no bar; [ADR-TABULAR](../../docs/adr/0062_tabular.md) shipped on a **ruling**, not on this. ⚠ Also found `csv.MAX_ROWS = 500` silently dropping every row past it |
 | [`2026-08-24-rerank-and-goldens`](2026-08-24-rerank-and-goldens/) | the proximity reranker `28 → 32` | **4** | 🔴 **not supported** — a net of 4 can never clear α |
 | [`2026-08-25-supersession-and-reranker-default`](2026-08-25-supersession-and-reranker-default/) | reproduces the same `28 -> 32` | **4** | 🔴 same. Its own row already called the magnitude uncarried; this makes the direction unsupported too |
 | [`2026-08-24-blind-enrichment-regrade`](2026-08-24-blind-enrichment-regrade/) | enrichment `+1` blind, `+9` contaminated | **1** · **9** | 🔴 the `+1` cannot clear. ⚠ The `+9` is a large enough net to be *testable* — and **its discordant count was never filed**, so it cannot be tested |

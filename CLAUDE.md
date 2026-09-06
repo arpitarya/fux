@@ -119,9 +119,9 @@ systems that own it; verify at answer time.
   from their source (git dir / HTTP / Confluence — **that cap is a decision**),
   re-score passages on the fetched bytes, and cite a fresh sha.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic,
-  [ADR-EXTRACTED](docs/adr/0024_extracted-mode.md) — **accepted**) and
+  [ADR-EXTRACTED](docs/adr/0025_extracted-mode.md) — **accepted**) and
   `enriched` (opt-in, model-assisted,
-  [ADR-ENRICH](docs/adr/0046_enrich.md) — **accepted**: the name, the
+  [ADR-ENRICH](docs/adr/0047_enrich.md) — **accepted**: the name, the
   boundary and the record shape are ratified; **the build is not**). Both
   ratified by Arpit 2026-08-19. ⚠ **ADR-ENRICHED was superseded 2026-08-27** —
   its contract was folded into ADR-ENRICH verbatim first, and the
@@ -155,12 +155,12 @@ its milestone needs it. Nothing else comes back.
 ## Non-negotiable constraints
 
 **This section is the only normative statement of the laws.** They are named
-**L1–L8** by [ADR-LAWS](docs/adr/0001_laws.md) so a record can cite one without
+**L1–L0** by [ADR-LAWS](docs/adr/0001_LAWS.md) so a record can cite one without
 restating it — and no record may restate one. Changing a law changes this
 section *and* ADR-LAWS' table, in the same commit.
 
-⚠ **Since 2026-09-06 each law also has its own record, `0002`–`0009`** — L1's is
-[ADR-L1](docs/adr/0002_l1-zero-cost.md), and ADR-LAWS' table routes to the rest.
+⚠ **Since 2026-09-06 each law also has its own record, `0002`–`0009` and `0062`** — L1's is
+[ADR-LAW-1](docs/adr/0003_LAW-1-zero-cost.md), and ADR-LAWS' table routes to the rest.
 **Those records are RATIONALE, never the law**: they carry why it exists, what it
 has cost, how its wording has moved, and what would reopen it. **This section is
 still the only place a law is stated.** A session that reads a law record and
@@ -168,6 +168,25 @@ acts on its prose instead of this text has made the exact mistake the
 no-restatement rule exists to prevent.
 
 
+- **L0** · **ADRs are the only source of truth, and the Law records outrank
+  every other record.** Every rule is *stated* in exactly one ADR; every other
+  artifact — this file, a schema, a config comment, a skill, a diagram —
+  **links to it and never restates it**, and a change is made in the record
+  first. The Law records `ADR-LAW-0`…`ADR-LAW-8` outrank every other ADR: **a
+  record that conflicts with a Law is void in the conflicting part**, never a
+  trade-off to weigh. **A Law changes only on Arpit's ruling, named in the
+  record**; an ordinary ADR a session may accept.
+  ⚠ **The test that decides a restatement:** *could this artifact and the
+  record disagree while both still look correct?* If yes it is a restatement
+  and is forbidden; if it would simply fail, it is an implementation
+  (`config.py` naming a key) or an enforcement (a runtime schema, a test) and
+  is permitted.
+  ⚠ **This law makes THIS SECTION non-normative** once
+  [W-122](work/open/W-122-adrs-are-the-source.md) lands: the text moves to the
+  nine records and what stands here is generated from them and test-bound.
+  Precedence is **judgment, never a gate** — no parser reads *"does this
+  contradict L2"* — and a record self-contradicting inside one file stays
+  ungated. [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md).
 - **L1** · **`$0`, FOSS-only.** Fux is zero-cost to run and carries no
   proprietary dependency: **no commercial licence, no paid or metered API, no
   subscription, no hosted model — ever.** Every dependency ships under an
@@ -189,7 +208,7 @@ no-restatement rule exists to prevent.
   ⚠ **Amended 2026-09-06** (Arpit). The previous form forbade third-party runtime
   dependencies outright — the zero-dependency guarantee, sold as the product's
   central promise. **That guarantee is withdrawn**, deliberately, and
-  [ADR-L1](docs/adr/0002_l1-zero-cost.md) carries what it bought, what replaced
+  [ADR-LAW-1](docs/adr/0003_LAW-1-zero-cost.md) carries what it bought, what replaced
   it, and the three things it left unguarded.
 - **L2** · **Content is never durable outside its source system.** The index holds
   statistics, never content. The single exception is explicit per-source
@@ -218,7 +237,7 @@ no-restatement rule exists to prevent.
   it. ⚠ **Ruled three times on 2026-08-27 (Arpit): written, reverted, then
   narrowed to commits alone.** Hashing, a size bound, the stdout prohibition and
   **the transmission clause** were all in earlier forms and none survives;
-  [ADR-LAWS](docs/adr/0001_laws.md) decision 8 carries each pass and what it
+  [ADR-LAWS](docs/adr/0001_LAWS.md) decision 8 carries each pass and what it
   traded away — **including the gap the last one leaves open.**
 
 ## Litmus for any new work
@@ -597,7 +616,7 @@ The register, the convention and the ownership table are in
 - **A record that restates a cross-cutting principle is a bug, not
   redundancy.** The non-negotiable constraints have exactly one home — this
   file — and are named L1–L8 by
-  [ADR-LAWS](docs/adr/0001_laws.md). Every other record cites `ADR-LAWS` and
+  [ADR-LAWS](docs/adr/0001_LAWS.md). Every other record cites `ADR-LAWS` and
   the number; none paraphrases. Paraphrases drift, and a drifted paraphrase in
   an accepted record reads as authority.
 - **Veto conditions are conditions to check, never events to await.** State
@@ -706,7 +725,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   cannot clear α = 0.05 at any discordant count** — and it rises from there
   (20 flips → net 10; 50 flips → net 16). The old *"±2 on 50"* admitted results
   whose best possible p-value is **0.50**. Table, script and the α discussion:
-  [ADR-RS](docs/adr/0042_predictions.md) decision 19.
+  [ADR-RS](docs/adr/0043_predictions.md) decision 19.
 - 🔴 **Every measured run records its PER-QUERY RESULTS under `evidence/`** —
   one row per query per arm, pass/fail. **Ruled by Arpit 2026-08-28:** *"record
   all the questions so we can check in detail."* ⚠ **A summary count is not
@@ -720,7 +739,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   `tests/test_regression_runs.py` checks it from there.
 
 Ruled by Arpit 2026-08-25 (W-78 ruling 2); explained and guarded by
-[ADR-RS](docs/adr/0042_predictions.md) decisions 11-15. ⚠ Two parts of the
+[ADR-RS](docs/adr/0043_predictions.md) decisions 11-15. ⚠ Two parts of the
 accepted rule — a **sealed** query set and the **decoy/placebo controls** — are
 **not built** and are owed as W-81; nothing may cite them as in force.
 

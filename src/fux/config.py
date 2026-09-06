@@ -22,6 +22,14 @@ from .errors import FuxError
 DEFAULT_SWEEP_MINUTES = 60
 
 CONFIG_NAME = "fux.toml"
+
+#: `[decode] max_table_rows` when `fux.toml` says nothing. Defined HERE rather
+#: than beside the decoders that read it: `fux.decode` imports this module, so
+#: the reverse import would be a cycle. `decode/_limits.py` reads it lazily.
+#: **Raised 500 -> 20 000 on 2026-09-06 (Arpit).** At 500 a row past the limit
+#: was not decoded, not indexed and not citable, and the only signal was a
+#: `*(table truncated)*` line nobody diffs.
+DEFAULT_MAX_TABLE_ROWS = 20_000
 FIXED_SHARDS = 256  # not yet configurable — shard = blake2b(id, digest_size=1); see ADR-RECORD
 
 
@@ -135,6 +143,12 @@ class Config:
     #: can see and edit it without reading the source. `[]` installs none.
     agents: tuple[str, ...] = ("claude", "copilot", "kiro")
     url: UrlSource | None = None
+    #: `[decode] max_table_rows` — rows of one table admitted from one
+    #: document. **Config, not a tunable**: it changes what is INDEXED, and
+    #: ADR-TUNE decision 7 puts only order-changing knobs in `.fux/tune.toml`.
+    #: Read by decoders through `decode/_limits.py`, which is the only way a
+    #: two-name decoder can see configuration without growing a parameter.
+    max_table_rows: int = DEFAULT_MAX_TABLE_ROWS
 
 
 def load(root: Path) -> Config:
@@ -186,10 +200,20 @@ def load(root: Path) -> Config:
             f"that would have moved it measured 0 fixed / 2 broken"
         )
 
+    decode_table = data.get("decode", {})
+    max_table_rows = decode_table.get("max_table_rows", DEFAULT_MAX_TABLE_ROWS)
+    if not isinstance(max_table_rows, int) or isinstance(max_table_rows, bool) or max_table_rows < 1:
+        raise FuxError(
+            f"{path}: [decode] max_table_rows must be a positive integer "
+            f"(got {max_table_rows!r}). It is the number of rows admitted from one "
+            f"table; rows past it are not indexed and not citable"
+        )
+
     return Config(
         root=root,
         dirs_file=dirs_file.strip(),
         shards=shards,
+        max_table_rows=max_table_rows,
         agents=_load_agents(path, data.get("agents")),
         url=_load_url_source(path, sources.get("url")),
     )

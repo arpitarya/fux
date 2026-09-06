@@ -17,7 +17,7 @@ being stated correctly. A wrong sentence here reads as authority.
 ## Where this came from
 
 **Arpit ruled R-1 on 2026-09-05** ([`proposals/unblock-2026-09-05.md`](../proposals/unblock-2026-09-05.md)):
-accept [ADR-CDP-FETCHER](../../docs/adr/0020_cdp-fetcher.md) decision 12 as
+accept [ADR-CDP-FETCHER](../../docs/adr/0028_cdp-fetcher.md) decision 12 as
 the ETag acceptance criterion — **and separately** expose whether a URL is
 re-fetched at all as a declared property. This item is that second half. The
 first half closes with no code.
@@ -90,10 +90,10 @@ update = "auto"     # the default for a line that does not say
       value refused; `tests_e2e` covering `fux update` over a mixed list.
 - [ ] **Byte-identity**: a corpus that declares nothing produces the same
       `.fux/index/` and the same `fux update` behaviour as before.
-- [ ] [ADR-URL-LIST](../../docs/adr/0018_url-list.md) gains the attribute and
-      the skip vocabulary; [ADR-URL-FRESHNESS](../../docs/adr/0052_url-freshness.md)
+- [ ] [ADR-URL-LIST](../../docs/adr/0026_url-list.md) gains the attribute and
+      the skip vocabulary; [ADR-URL-FRESHNESS](../../docs/adr/0059_url-freshness.md)
       gains the ask-time/update-time boundary in one paragraph;
-      [ADR-CDP-FETCHER](../../docs/adr/0020_cdp-fetcher.md) decision 12 gains
+      [ADR-CDP-FETCHER](../../docs/adr/0028_cdp-fetcher.md) decision 12 gains
       the veto condition below. CHANGELOG; `IMPLEMENTATION.md`; this file to
       `archive/open/`.
 
@@ -134,6 +134,15 @@ A condition to check, never an event to await (ADR standing rules).
   disclose, do not refuse.
 - The URL list is **committed**: a new attribute changes a file every clone
   has. Silence must resolve to today's behaviour or every existing repo moves.
+
+## ⚠ Repointed 2026-09-06
+
+The ADR register was **renumbered wholesale** on 2026-09-06 (ADR-CLI `0002`
+→ `0010`, ADR-CONFIG `0014` → `0022`, and so on) and the eight law records
+were split out. Every path above was updated in that sweep; the **names** —
+ADR-URL-LIST, ADR-URL-FRESHNESS, ADR-CDP-FETCHER — never moved, which is
+what the cite-by-name rule is for. **Re-derive before editing**: a
+concurrent session was live in the tree when this was written.
 
 ## Out of scope
 

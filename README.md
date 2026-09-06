@@ -63,7 +63,7 @@ at answer time.**
 > the index *and* the graph, deleting its line or subtracting it from a listed
 > ancestor; `update` re-reads what is listed and never writes a line. They
 > replace `fux url` and `fux ingest --refresh-urls`
-> ([ADR-CLI](docs/adr/0010_cli-surface.md)).
+> ([ADR-CLI](docs/adr/0011_cli-surface.md)).
 >
 > URLs join the corpus through a consumer-owned fetcher file. `fux setup`
 > writes two — `http.py` (a plain stdlib GET, the default) and `cdp.py`
@@ -76,11 +76,11 @@ at answer time.**
 > one URL**. That and `fux update` are the engine's **two** networked paths;
 > both say on stderr that they went out, and everything else is offline. A
 > line picks its own fetcher; nothing escalates automatically
-> ([ADR-URL-LIST](docs/adr/0025_url-list.md) ·
-> [ADR-FETCHER](docs/adr/0026_fetcher.md)).
+> ([ADR-URL-LIST](docs/adr/0026_url-list.md) ·
+> [ADR-FETCHER](docs/adr/0027_fetcher.md)).
 > **The graph lane has landed (M3, released in `0.34.0`)** — `explain`/`graph`/`path`,
 > unseeded label-propagation communities, a lazy PPR walk
-> ([ADR-GRAPH](docs/adr/0035_graph.md)). **Both acceptance gaps are closed**
+> ([ADR-GRAPH](docs/adr/0036_graph.md)). **Both acceptance gaps are closed**
 > (2026-08-22): 24/24 on a graded 66-document corpus, and the derived
 > `graph.json` hashes identically across two independent architectures
 > ([the run](work/regression/2026-08-22-graph-acceptance/report.md)).
@@ -90,7 +90,7 @@ at answer time.**
 > `[archived]` marker in `ask`'s text, and a stderr disclaimer — while
 > results stay byte-identical unless `[ranking] archived_weight` is set
 > below its `1.0` default
-> ([ADR-ARCHIVED-CONTENT](docs/adr/0043_archived-content.md)).
+> ([ADR-ARCHIVED-CONTENT](docs/adr/0044_archived-content.md)).
 >
 > The v0.26 engine and its docs are archived under
 > [`archive/v0.26/`](archive/v0.26/), reference-only. The new architecture
@@ -125,13 +125,13 @@ at answer time.**
   ⚠ **`stdlib-only` was withdrawn 2026-09-06** — dependencies are permitted,
   must be OSI-licensed, and ship packaged. **Source-available licences (BSL,
   SSPL, Elastic v2, Commons Clause) do not qualify**
-  ([ADR-L1](docs/adr/0002_l1-zero-cost.md)).
+  ([ADR-LAW-1](docs/adr/0003_LAW-1-zero-cost.md)).
 
 ## The `.fux/` directory
 
 Everything fux puts in your repo lives here, and **every child is declared** —
 as `committed`, `derived`, or `acquired`
-([ADR-DOTFUX](docs/adr/0011_fux-directory.md)). `fux doctor` warns about
+([ADR-DOTFUX](docs/adr/0012_fux-directory.md)). `fux doctor` warns about
 anything that is not on this list.
 
 | entry | kind | what it is |

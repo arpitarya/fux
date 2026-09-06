@@ -30,7 +30,13 @@ _SHARED = "xl/sharedStrings.xml"
 _SHEETS = "xl/worksheets/sheet"
 _WORKBOOK = "xl/workbook.xml"
 
-MAX_ROWS_PER_SHEET = 500
+#: Per SHEET, not per workbook — a five-sheet workbook admits the limit five
+#: times, because a sheet is the document's own division and truncating the
+#: fifth because the first four were long would be arbitrary.
+#: Was a hard-coded 500; now `[decode] max_table_rows` (see `csv.py` for the
+#: data-loss this hid).
+from fux.decode._limits import max_table_rows
+
 MAX_COLS = 40
 
 
@@ -48,7 +54,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
                     root = _xml.parse(archive.read(part))
                 except _xml.UnsafeXml:
                     continue
-                rows = _rows(root, shared)
+                rows = _rows(root, shared, max_table_rows() + 1)
                 table = _ooxml.table_markdown(rows)
                 if not table:
                     continue
@@ -93,7 +99,9 @@ def _sheet_names(archive: SafeZip) -> list[str]:
     return names
 
 
-def _rows(root, shared: list[str]) -> list[list[str]]:
+def _rows(root, shared: list[str], limit: int) -> list[list[str]]:
+    """`limit` counts the header too — the caller adds one, so the number a
+    consumer writes in `fux.toml` is the number of DATA rows they get."""
     out: list[list[str]] = []
     for row in root.iter():
         if _xml.local(row.tag) != "row":
@@ -106,7 +114,7 @@ def _rows(root, shared: list[str]) -> list[list[str]]:
             if len(cells) >= MAX_COLS:
                 break
         out.append(cells)
-        if len(out) >= MAX_ROWS_PER_SHEET:
+        if len(out) >= limit:
             break
     return out
 

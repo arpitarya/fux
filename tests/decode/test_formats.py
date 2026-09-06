@@ -32,9 +32,7 @@ def zf(parts: dict[str, str]) -> bytes:
     return buf.getvalue()
 
 
-DOCX = zf(
-    {
-        "word/document.xml": """<?xml version="1.0"?>
+DOCX_CONTENT = """<?xml version="1.0"?>
 <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>
 <w:p><w:pPr><w:pStyle w:val="Title"/></w:pPr><w:r><w:t>Broker Runbook</w:t></w:r></w:p>
 <w:p><w:pPr><w:pStyle w:val="Heading1"/></w:pPr><w:r><w:t>Draining</w:t></w:r></w:p>
@@ -43,8 +41,8 @@ DOCX = zf(
 <w:tbl><w:tr><w:tc><w:p><w:r><w:t>step</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>owner</w:t></w:r></w:p></w:tc></w:tr>
 <w:tr><w:tc><w:p><w:r><w:t>drain</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>sre</w:t></w:r></w:p></w:tc></w:tr></w:tbl>
 </w:body></w:document>"""
-    }
-)
+
+DOCX = zf({"word/document.xml": DOCX_CONTENT})
 
 
 def _slide(title: str, body: str) -> str:
@@ -81,20 +79,6 @@ XLSX = zf(
         '<row><c t="s"><v>0</v></c><c t="s"><v>1</v></c></row>'
         '<row><c t="s"><v>2</v></c><c t="s"><v>3</v></c></row>'
         "</sheetData></worksheet>",
-    }
-)
-
-ODT = zf(
-    {
-        "content.xml": """<?xml version="1.0"?><office:document-content
- xmlns:office="urn:o" xmlns:text="urn:t" xmlns:table="urn:tb"><office:body><office:text>
-<text:h text:outline-level="1">Broker Runbook</text:h>
-<text:p>Drain the queue first.</text:p>
-<table:table><table:table-row>
-<table:table-cell><text:p>step</text:p></table:table-cell>
-<table:table-cell><text:p>owner</text:p></table:table-cell>
-</table:table-row></table:table>
-</office:text></office:body></office:document-content>"""
     }
 )
 
@@ -187,22 +171,6 @@ def test_xlsx_resolves_the_shared_string_table():
     assert "## Runbook" in out, "the sheet name is its heading"
 
 
-def test_odf_text_is_not_read_through_the_ooxml_walker():
-    """ODF puts text directly on `text:p`; OOXML nests it in run elements.
-    Reusing the OOXML walker returned empty for every plain paragraph — a whole
-    format decoding to nothing, with no error anywhere.
-    """
-    out = decode(ODT, "doc.odt")
-    assert out is not None
-    assert "# Broker Runbook" in out
-    assert "Drain the queue first." in out
-
-
-@pytest.mark.parametrize("ext", [".odt", ".ods", ".odp"])
-def test_one_module_serves_all_three_opendocument_types(ext):
-    assert decode(ODT, "doc" + ext) is not None
-
-
 # -- the smaller formats ----------------------------------------------------
 
 
@@ -290,7 +258,11 @@ def test_a_doctype_is_refused_everywhere_xml_is_parsed():
         b'<!ENTITY lol2 "&lol;&lol;&lol;">]><doc>&lol2;</doc>'
     )
     assert decode(laughs, "bomb.xml") is None
-    assert decode(zf({"content.xml": laughs.decode()}), "bomb.odt") is None
+    # ⚠ The vehicle is `.docx`, not `.odt`. `.odt` lost its decoder on
+    # 2026-09-06, and an extension nothing claims returns `None` for a reason
+    # that has nothing to do with the DOCTYPE refusal — the assertion would
+    # still pass, and would prove nothing.
+    assert decode(zf({"word/document.xml": laughs.decode()}), "bomb.docx") is None
 
 
 def test_every_registered_extension_survives_garbage_without_raising():
@@ -315,7 +287,6 @@ def test_every_registered_extension_survives_garbage_without_raising():
         (DOCX, "a.docx"),
         (PPTX, "a.pptx"),
         (XLSX, "a.xlsx"),
-        (ODT, "a.odt"),
         (PDF, "a.pdf"),
         (DRAWIO, "a.drawio"),
         (b'{"b":"beta text here","a":"alpha text here"}', "a.json"),
@@ -336,17 +307,18 @@ def test_json_keys_are_emitted_sorted_not_in_document_order():
 
 
 def test_zip_member_order_does_not_reach_the_output():
-    forward = zf({"content.xml": ODT_CONTENT, "meta.xml": "<meta/>"})
+    """The vehicle moved from `.odt` to `.docx` on 2026-09-06 with the ODF
+    decoder's removal. `namelist()` is archive order — writer-dependent — and
+    two archives of the same content must still decode identically."""
+    members = {"word/document.xml": DOCX_CONTENT, "docProps/core.xml": "<meta/>"}
+    forward = zf(members)
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as archive:  # reversed write order
-        archive.writestr("meta.xml", "<meta/>")
-        archive.writestr("content.xml", ODT_CONTENT)
-    assert decode(forward, "a.odt") == decode(buf.getvalue(), "a.odt")
+        archive.writestr("docProps/core.xml", "<meta/>")
+        archive.writestr("word/document.xml", DOCX_CONTENT)
+    assert decode(forward, "a.docx") == decode(buf.getvalue(), "a.docx")
 
 
-ODT_CONTENT = """<?xml version="1.0"?><office:document-content xmlns:office="urn:o"
- xmlns:text="urn:t"><office:body><office:text>
-<text:p>Drain the queue first.</text:p></office:text></office:body></office:document-content>"""
 
 
 # -- the noise rules that verdict G is about --------------------------------
@@ -378,27 +350,25 @@ def test_yaml_block_scalars_are_dedented_by_their_own_indent():
     out = decode(b"notes: |\n    restart after draining\n    then verify\n", "a.yaml")
     assert "restart after draining\nthen verify" in out
 
-
-def test_notebook_outputs_are_dropped_but_code_is_kept():
-    """Outputs are re-execution artifacts: the same notebook run twice produces
-    different ones, so indexing them makes the index depend on who hit Run.
-    """
-    raw = (
-        b'{"cells":[{"cell_type":"markdown","source":["# Runbook\\n"]},'
-        b'{"cell_type":"code","source":["drain_queue()"],'
-        b'"outputs":[{"text":["EPHEMERAL OUTPUT"]}]}],'
-        b'"metadata":{"language_info":{"name":"python"}}}'
-    )
-    out = decode(raw, "a.ipynb")
-    assert "# Runbook" in out
-    assert "drain_queue()" in out
-    assert "EPHEMERAL" not in out
-
-
 def test_csv_truncates_rather_than_indexing_a_dataset():
-    rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(900))
+    """The limit is `[decode] max_table_rows`, default 20 000 since 2026-09-06.
+    It was a hard-coded 500, and that number silently dropped the tail of every
+    file over it — a fact in row 600 was not decoded, not indexed and not
+    citable, with only this notice as the signal."""
+    from fux.config import DEFAULT_MAX_TABLE_ROWS
+
+    rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(DEFAULT_MAX_TABLE_ROWS + 400))
     out = decode(rows, "a.csv")
     assert "table truncated" in out
+    assert out.count("\n| value ") == DEFAULT_MAX_TABLE_ROWS
+
+
+def test_a_csv_under_the_limit_keeps_every_row_and_says_nothing():
+    """The regression the raise was for: 900 rows used to lose 400 of them."""
+    rows = b"col\n" + b"".join(b"value %d\n" % i for i in range(900))
+    out = decode(rows, "a.csv")
+    assert "table truncated" not in out
+    assert "| value 899 |" in out
 
 
 def test_properties_files_have_no_section_header_and_still_parse():

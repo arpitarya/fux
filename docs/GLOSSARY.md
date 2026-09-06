@@ -78,7 +78,7 @@ convention. Lives in [`work/compare/`](../work/compare/README.md).
 the [ledger](#ledger-l). The single exception is per-source
 [`snapshot` mode](#snapshot-mode), which is explicit and opt-in. This is what
 makes the committed artifact small, ACL-safe, and never stale-by-accumulation.
-See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [ADR-LAWS](adr/0001_laws.md), [paper §3](../work/paper/the-fux-index-paper.md).
+See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named by [ADR-LAWS](adr/0001_LAWS.md), [paper §3](../work/paper/the-fux-index-paper.md).
 
 **Determinism** — Same sources → byte-identical index and root hash; same
 question → same answer. No wall-clock output, no model in the maintenance
@@ -426,7 +426,7 @@ already in the committed `M/` plane, so it adds *frequency*, not new exposure.
 Distinct from [content-never-durable](#content-never-durable-the-law), which
 governs the corpus: a query is not content, which is the gap L8 exists to close.
 See [CLAUDE.md §Non-negotiable constraints](../CLAUDE.md), named and reasoned by
-[ADR-LAWS](adr/0001_laws.md) decision 8.
+[ADR-LAWS](adr/0001_LAWS.md) decision 8.
 
 **Wire format** — The **committed** encoding of the index: BIC postings,
 4-bit impacts, front-coded columnar ledger, Elias-Fano offsets, delta-varint

@@ -1,1 +1,1 @@
-✓ W-115 chunking · ✓ W-119 rename · ✓ W-120 table bands + record floor (208 green) · → Arpit: git rm 38 stale *doc.py FIRST — nothing is live until then; then suite + commit
+✓ L0 landed as ADR-LAW-0 at 0002 (the law about laws, first) · register shifted 0002-0061 -> 0003-0062 · index 0001_LAWS.md · uncommitted, concurrent session holds staged files · next: W-122 phases 1/4/5/6, then blocker 3

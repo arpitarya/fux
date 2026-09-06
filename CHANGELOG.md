@@ -10,6 +10,36 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- 🔴 **L0 — ADRs are the only source of truth, and the Law records outrank
+  every other record** (Arpit, 2026-09-06).
+  [ADR-LAW-0](docs/adr/0002_LAW-0-authority.md). Two clauses: a rule is
+  **stated in exactly one ADR** and every other artifact links to it, never
+  restates it; and the Law records `ADR-LAW-0`…`ADR-LAW-8` outrank every other
+  ADR, so **a record conflicting with a Law is void in the conflicting part**.
+  **A Law changes only on Arpit's ruling, named in the record.**
+  The record carries the test that makes the first clause followable —
+  *describes* is forbidden, *implements* and *enforces* are not — and states
+  plainly that precedence is **judgment, never a gate**.
+  ⚠ **Supersedes [ADR-LAWS](docs/adr/0001_LAWS.md) decision 1** (*"CLAUDE.md is
+  the single normative home"*), accepted the same day. `CLAUDE.md` becomes a
+  pointer; its process sections stay, because no record governs how an agent
+  behaves in a session. Migration: **W-122**.
+- **The nine law records are named `ADR-LAW-n` and filed as `*_LAW-n-*.md`**
+  (`0002_l1-zero-cost.md` → `0003_LAW-1-zero-cost.md`, and its seven
+  siblings). Every citation swept across 13 files. **The prefix is the
+  grouping key**, so `docs/adr/*_LAW-*.md` finds all nine wherever they sit —
+  and **L0 sits at `0002`, first, because the law about laws precedes the laws** —
+  `CLAUDE.md` has called this *"Law zero"* since August, so the number inherits a
+  name the repo already used. Every record from the old `0002` to `0061` shifted
+  down one and its frontmatter `(NNNN)` with it; **L1–L8 keep their identities**,
+  which is what made a 62-file renumber safe where a law renumber would not have been. **The index they hang from is `0001_LAWS.md`**, in
+  caps to match — 70 files repointed, including link-only repoints inside past
+  `WORKLOG.md` entries, which is the repo-wide-mechanical-rename exception to
+  the append-only rule and is said out loud here for that reason. **Two
+  sentences in old entries that describe what a file was *called at the time*
+  were restored** rather than rewritten: a link may be repointed, a statement
+  about the past may not.
+
 - **`fux doctor` gained four checks and one line — W-101, one pass at
   `doctor.py`.** Each closes something that was reachable only from inside a
   run that had already finished, or from nowhere at all:

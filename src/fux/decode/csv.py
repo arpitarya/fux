@@ -31,10 +31,17 @@ import io
 
 EXTENSIONS = (".csv", ".tsv")
 
-#: Rows past this are a dataset rather than a document. Truncating keeps the
-#: header and the first, most representative rows, which is what a search hit
-#: actually needs to be useful.
-MAX_ROWS = 500
+#: Rows past this are dropped. **Was a hard-coded 500 until 2026-09-06**, and
+#: that number was a quiet data loss: a 754-row file decoded to 500 rows, so a
+#: fact in row 600 was not decoded, not indexed and **not citable in any
+#: configuration** — the `*(table truncated)*` line is the only signal, and
+#: nobody diffs it. Found by a lab harness that planted answers past the limit
+#: and could not find them (`work/regression/2026-09-06-csv-chunk-granularity/`).
+#:
+#: Now `[decode] max_table_rows` in `fux.toml`, defaulting to 20 000. Config
+#: rather than a `.fux/tune.toml` knob because it changes what is **indexed**,
+#: not how results are **ordered** — ADR-TUNE decision 7's line.
+from fux.decode._limits import max_table_rows
 
 #: Guards against a malformed quote turning one line into one enormous field.
 MAX_CELL_CHARS = 500
@@ -53,8 +60,12 @@ def decode(raw: bytes, rel_path: str) -> str | None:
     rows = [r for r in rows if any(cell.strip() for cell in r)]
     if not rows:
         return None
-    truncated = len(rows) > MAX_ROWS
-    rows = rows[:MAX_ROWS]
+    # The limit counts DATA rows: a consumer who writes 20 000 means twenty
+    # thousand records, not 19 999 plus a header. The header is row 0 here and
+    # is always kept — without it every cell downstream is unlabelled.
+    limit = max_table_rows()
+    truncated = len(rows) > limit + 1
+    rows = rows[: limit + 1]
 
     width = max(len(r) for r in rows)
     lines: list[str] = []

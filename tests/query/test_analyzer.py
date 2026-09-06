@@ -26,7 +26,7 @@ CASES = [
     "",                                   # nothing at all
     "rollbacks rollback ROLLBACK",        # stemming and case folding to one term
     "a",                                  # single character, below the split floor
-    "docs/adr/0001_laws.md",              # punctuation the word regex must drop
+    "docs/adr/0001_LAWS.md",              # punctuation the word regex must drop
 ]
 
 

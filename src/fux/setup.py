@@ -386,6 +386,22 @@ max_parallel = {default}
 # documents the value rather than setting it.
 shards = 256
 
+# HOW MUCH OF A TABLE IS READ. Data rows per table -- per SHEET for .xlsx --
+# with the header always kept and never counted. Rows past this are not
+# decoded, not indexed and NOT CITABLE; the only signal is a
+# `*(table truncated)*` line in the decoded text.
+#
+# This is config and not a .fux/tune.toml knob because it changes what is
+# INDEXED rather than how results are ORDERED (ADR-TUNE decision 7).
+#
+# RAISING IT COSTS QUERY LATENCY. `fux ask --refer` and `fux answer` split a
+# table one passage PER ROW, and rescore is O(passages): ~63 ms per document
+# per query at 500 rows, ~0.65 s at 5 000, ~2.6 s at 20 000 (Linux x86_64;
+# latency is not comparable across machines). Lower it if your sheets are big
+# and your questions are impatient.
+[decode]
+max_table_rows = 20000
+
 # Fux marks retired documents `archived` and states no conclusion. These files
 # teach your agents how to READ that mark -- they are the difference between an
 # agent citing a retired design confidently and one that says it is retired.

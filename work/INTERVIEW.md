@@ -758,7 +758,7 @@ Ruled by Arpit on 2026-08-27, closing W-89.
   a query is not content however precisely it describes one — that was the gap.
 - **Normative text is `CLAUDE.md` §Non-negotiable constraints**, as always. The
   handle, the reasoning and the limits are
-  [ADR-LAWS](../docs/adr/0001_laws.md) **decision 8**. Both changed in one commit,
+  [ADR-LAWS](../docs/adr/0001_LAWS.md) **decision 8**. Both changed in one commit,
   which ADR-LAWS decision 4 requires — **if you find them committed separately,
   that is the defect, not a style question.**
 - **L8 forbids nothing fux does today.** Verified against the code *before* the
@@ -1346,7 +1346,7 @@ the reason is that the measuring environments are gone.**
   `handoff/`, and the eight v0.30 records into `work/`. `docs/` now holds only
   `GLOSSARY.md`, `index.md`, and the ADR register with `TEMPLATE.md`
   and ADR-LAWS.
-- **The new record set has started.** [ADR-LAWS](../docs/adr/0001_laws.md)
+- **The new record set has started.** [ADR-LAWS](../docs/adr/0001_LAWS.md)
   opened it at 0001; **[ADR-CLI](../docs/adr/0002_cli-surface.md)** is 0002 —
   the six-verb command-line surface, with every command and its real output
   captured in [`regression/2026-08-18-cli-surface/`](regression/2026-08-18-cli-surface/report.md).
@@ -1682,7 +1682,7 @@ tell the two apart. Both readings are written out in W-77.
 
 The **laws** are normative in [`../CLAUDE.md`](../CLAUDE.md) §Non-negotiable
 constraints and named L1–L7 by
-[ADR-LAWS](../docs/adr/0001_laws.md). They are not restated here — that is the
+[ADR-LAWS](../docs/adr/0001_LAWS.md). They are not restated here — that is the
 rule ADR-LAWS exists to enforce. What follows are the constraints *on the work*,
 which are not laws:
 

@@ -40,7 +40,7 @@ superseded-pending (in force, citable, replacement planned) ·
 `archive/adr/` superseded, and archive is never evidence.
 
 * [The ADR register](adr/README.md) - the convention, the ownership table, and the state of every record. **Records are cited by NAME, never by number.**
-* [ADR-LAWS](adr/0001_laws.md) - the non-negotiable constraints have exactly one home; no record restates them.
+* [ADR-LAWS](adr/0001_LAWS.md) - the non-negotiable constraints have exactly one home; no record restates them.
 * [ADR-CLI](adr/0002_cli-surface.md) - the command-line surface: six verbs, one boundary, three output modes, every command captured verbatim.
 * [ADR-ASK](adr/0004_ask.md) - the `ask` verb: one scorer, one sort, two candidate generators that can never disagree. ⏳ proposed.
 * [ADR-FIND](adr/0005_find.md) - the `find` verb: one line per hit, for pipes; the same ranking as `ask`. ⏳ proposed.
