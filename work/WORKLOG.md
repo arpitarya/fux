@@ -24,6 +24,13 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-11 — the L9 tree committed, in two commits  ·  Claude Code (Opus)
+
+- **Asked:** commit everything.
+- **Did:** two commits. `3afee3f` — Codex's ten seed documents into `work/golden/seed/` (`.gitkeep` removed), `no ADR affected`. `f837815` — L9 itself: CLAUDE.md's law text, ADR-LAW-9 (`0011`), ADR-LAWS' table, the register's law range, the ownership twin, W-138/W-139, the golden ladder's move from fux-benchmark to fux-lab, and the Cowork session's OPEN-WORK ratification, which was uncommitted in the same tree. Discipline suites green before and after (341 then 96 tests).
+- **Decided / open:** W-136 phase 1 is split in the queue — **the seed half landed, the key half no Claude session can verify**, so the inbox row now asks Arpit to confirm the key exists rather than to run prompt 1. Phase 2 is agent work the moment he does. `work/BLOCKED.json` stays open, unchanged.
+- **Next:** Arpit answers the three inbox rows — abstention (14d), the four priors, and the key.
+
 ## 2026-09-11 — OPEN-WORK ratified against L9  ·  Cowork (Opus)
 - **Asked:** apply the new ADR (ADR-LAW-9) to OPEN-WORK wherever it can decide something, then list what is pending on Arpit.
 - **Did:** **L9 settles the instrument question for six items** — W-115 (instrument = W-136 golden ladder; "needs a corpus decision" removed), W-97 (every leg moves to fux-lab golden data under a superseding pre-registration; "T1 runnable now" withdrawn — its headroom was the playground's), the `heading` control (rebuilt inside the golden ladder), W-106 and W-112 (corpus = golden ladder), W-107 (build unaffected; measured arms need a superseding pre-registration). All re-laned behind W-136. Four-priors item and inbox row now carry two options, (b) golden data or (c) close. Abstention row notes any future test runs in fux-lab. W-136's setup link drops fux-benchmark.

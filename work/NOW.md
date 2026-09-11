@@ -1,1 +1,1 @@
-✓ OPEN-WORK ratified against L9 — six items re-laned behind W-136 · inbox 3 · 🔴 next: Arpit runs golden prompt 1 (unblocks seven items)
+✓ L9 tree committed (3afee3f seed docs · f837815 the law + queue) · 🔴 next: Arpit confirms the golden answer key exists — that unblocks phase 2 and seven items
