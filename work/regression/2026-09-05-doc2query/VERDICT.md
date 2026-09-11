@@ -19,7 +19,7 @@ timestamp: 2026-09-06T00:00:00Z
 - **Verdict:** **VOID** — ⚠ **not PASS, not FAIL, and not INCONCLUSIVE.** The
   instrument decided fine; the **bar** was never complete enough to rule on.
   `VOID` is the fifth outcome, added to
-  [ADR-RS](../../../docs/adr/0043_predictions.md) for this ruling
+  [ADR-RS](../../../docs/adr/0133_predictions.md) for this ruling
 - **Ruled by:** **Arpit, 2026-09-06**
 - **Bar under test:** W-110's definition of done — *"the `none` / `placebo` /
   `real` arms re-graded on `recall@k`; blind author; per-query rows;
@@ -32,9 +32,9 @@ timestamp: 2026-09-06T00:00:00Z
   missing `k` is what that difference looks like when it goes wrong.**
 - **Evidence:** [`report.md`](report.md) · [`ANALYSIS.md`](ANALYSIS.md) ·
   [`evidence/`](evidence/)
-- **What depends on this verdict:** [ADR-ENRICH](../../../docs/adr/0047_enrich.md)
+- **What depends on this verdict:** [ADR-ENRICH](../../../docs/adr/0137_enrich.md)
   decision 15's evidential standing, and
-  [ADR-QUALITY](../../../docs/adr/0051_quality-contract.md) decision 2a, which
+  [ADR-QUALITY](../../../docs/adr/0141_quality-contract.md) decision 2a, which
   is written so this cannot recur
 
 ---
@@ -55,7 +55,7 @@ it is a threshold with a free variable in it, and a free variable makes it
 
 **Whoever picks `k` picks the verdict.** Picking it now, with the table above
 on the page, is the moving-threshold failure
-[ADR-RS](../../../docs/adr/0043_predictions.md) exists to prevent — and the
+[ADR-RS](../../../docs/adr/0133_predictions.md) exists to prevent — and the
 [run itself refused to](report.md), correctly, under `CLAUDE.md`'s
 *write it up as ambiguous and hand it to Arpit*.
 
@@ -99,7 +99,7 @@ Too small a treatment to see.
 
 **`fux enrich`'s questions body stays shipped, and its claim is demoted.**
 It ships on the argument in
-[ADR-ENRICH](../../../docs/adr/0047_enrich.md) decision 15 — that prose
+[ADR-ENRICH](../../../docs/adr/0137_enrich.md) decision 15 — that prose
 measured `+1 / −1` and a question is a narrower, checkable object — and **not**
 on this run. The record now says **built and unproven** where it could have
 been read as *measured and passing*.
@@ -116,7 +116,7 @@ A new run, with a **pre-registration frozen before the first number**, that:
    definition of done — see the second bullet above;
 1. names **`recall@1`** as its `k`, with the ceiling argument of §2 written in
    as the reason and checked against the clean-arm curve already published in
-   [ADR-QUALITY](../../../docs/adr/0051_quality-contract.md);
+   [ADR-QUALITY](../../../docs/adr/0141_quality-contract.md);
 2. is authored **`blind`** — this run is `informed`;
 3. runs **after** the enrichment-reuse defect is closed, since every enrichment
    measurement on record ran through an incremental ingest that did not index

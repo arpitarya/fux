@@ -235,7 +235,7 @@ post-hoc, labelled so, and in no verdict.**
 
 - 🔴 **It changes no default.** A `PASS` produces a **candidate** with three
   green legs and a filed cost. The change itself is an amendment to
-  [ADR-TUNE](../../docs/adr/0045_tuning.md) that **Arpit ratifies**, and
+  [ADR-TUNE](../../docs/adr/0135_tuning.md) that **Arpit ratifies**, and
   *doing nothing is legitimate* — W-94 and the `rerank_weight` item both say
   so and this run does not overrule them.
 - **It is `informed`.** The session that sweeps reads the scores that select

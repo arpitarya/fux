@@ -48,7 +48,7 @@ Ratified as recommended in this session, all five parts:
 
 ## Definition of done
 
-1. **[ADR-RS](../../docs/adr/0043_predictions.md)** gains a decision stating rules 1–5
+1. **[ADR-RS](../../docs/adr/0133_predictions.md)** gains a decision stating rules 1–5
    **once**, in place (no `Amended` section), with the reference above, and a veto
    condition that is checkable (e.g. *a filed verdict states "no detected change" on
    an endpoint whose report shows 0 headroom in that direction*). §1 updated if it

@@ -21,11 +21,11 @@ actually moved?
 `decoys.jsonl` was titled `decoys.jsonl` and became **`Record 1`**.
 `queries.jsonl` became **`Record 1`**. 86 `.jsonl` and 10 `.json` documents, in
 a **heavily-weighted field**, and **not one went the other way.** Fixed in the
-same change ([ADR-DECODE](../../../docs/adr/0049_decode.md) decision 11a).
+same change ([ADR-DECODE](../../../docs/adr/0139_decode.md) decision 11a).
 
 ## Headroom, computed before the arms were run
 
-[ADR-RS](../../../docs/adr/0043_predictions.md) decision 22.
+[ADR-RS](../../../docs/adr/0133_predictions.md) decision 22.
 
 | corpus | direction | headroom | status |
 |---|---|---:|---|

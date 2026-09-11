@@ -80,7 +80,7 @@ fix is deleting the line or writing a `!` for it.
 ## `!` means the opposite here of what it means next door, on purpose
 
 In `.fux/sources/dirs`, `!` **subtracts**
-([ADR-DIR-LIST](../../../docs/adr/0030_dir-list.md) decision 2b). Here it
+([ADR-DIR-LIST](../../../docs/adr/0120_dir-list.md) decision 2b). Here it
 **re-includes**. Same character, opposite direction, two files. (`.fux/formats.toml`
 has no `!` at all, so the collision is down to one file since 2026-09-11.)
 
@@ -103,7 +103,7 @@ them, and this is it:
 
 ⚠ **The second half is the sharp edge and it is not softened.** `!*.py` indexes
 Python files as **raw bytes**, because no decoder claims `.py` — which is
-exactly the shape [ADR-TYPES](../../../docs/adr/0038_types-list.md) was opened
+exactly the shape [ADR-TYPES](../../../docs/adr/0128_types-list.md) was opened
 about. It takes an explicit `!` line a human wrote to get there, it is visible
 in one committed file, and it is the price of the file meaning what its name
 says.

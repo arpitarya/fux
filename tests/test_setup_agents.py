@@ -481,7 +481,7 @@ def test_this_repos_own_decoders_still_match_the_package_modules():
     """🔴 **The same drift, a third time, in `.fux/decoders/`.**
 
     `fux setup` writes the built-in decoders into `.fux/decoders/` **write-if-
-    missing**, and [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) decision 8
+    missing**, and [ADR-DOTFUX](../docs/adr/0102_fux-directory.md) decision 8
     makes those copies *what actually run* — the package modules are not
     consulted while a copy exists. So a fix to `src/fux/decode/` reaches **this
     repository not at all**, silently, exactly as a template fix did not reach

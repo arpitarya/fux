@@ -41,7 +41,7 @@ table. ⚠ **A handle is not the law**; read the law at its home.
 
 ### ⚠ Since 2026-09-06, this law stands alone
 
-Two laws used to stand between fux and an embedding model: [L1](0003_LAW-1-zero-cost.md) made one uninstallable, L3 kept it off the maintenance path. **L1's amendment removed the first.** L3 still holds the maintenance path — but it says nothing about *query* time, and a query-time model is now held off only by [ADR-RERANK](0048_rerank.md)'s cross-machine determinism refusal, which is a decision rather than a law.
+Two laws used to stand between fux and an embedding model: [L1](0003_LAW-1-zero-cost.md) made one uninstallable, L3 kept it off the maintenance path. **L1's amendment removed the first.** L3 still holds the maintenance path — but it says nothing about *query* time, and a query-time model is now held off only by [ADR-RERANK](0138_rerank.md)'s cross-machine determinism refusal, which is a decision rather than a law.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -122,9 +122,9 @@ on 2026-09-06 at Arpit's ruling.
 ### Reference (required)
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
-- [ADR-EXTRACTED](0025_extracted-mode.md) — every property a pure function of bytes, path and link structure
-- [ADR-ENRICH](0047_enrich.md) — the command boundary that keeps this law true
-- [ADR-RANKING](0021_ranking.md) — one scorer, one sort, and the differential law
+- [ADR-EXTRACTED](0115_extracted-mode.md) — every property a pure function of bytes, path and link structure
+- [ADR-ENRICH](0137_enrich.md) — the command boundary that keeps this law true
+- [ADR-RANKING](0111_ranking.md) — one scorer, one sort, and the differential law
 - Reproducible Builds — the same argument, made for compilers: https://reproducible-builds.org/docs/definition/
 
 ### Veto condition

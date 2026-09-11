@@ -49,15 +49,6 @@ failure mode here with a perfect record.
 
 ### fux build
 
-- 🟢 **W-137 — renumber the ADRs: laws own `0001`–`0100`, every other record starts at `0101`.**
-  `agent` · *(records: the register [`docs/adr/README.md`](../docs/adr/README.md) §The convention ·
-  every record path)* · **Arpit, 2026-09-11.** `0011`–`0100` stay empty as reserved
-  law placeholders (no dummy files); ADR-CLI `0011` → `0101` … ADR-DOCTOR `0064` → `0154`.
-  `scripts/renumber-adrs.py` is written and dry-run clean on a copy (54 moves, 1 639
-  path links in 126 files, no new broken link). **Runs when no other session is
-  mid-change**, as one commit with the convention update, a re-ingest and both suites.
-  — [detail](open/W-137-adr-renumber-laws-to-100.md) `filed: 2026-09-11`
-
 - 🔴 **W-122 — the remainder of L0: the generated `CLAUDE.md` block, the config
   consolidation, and the gate.** `agent` · *(records: ADR-LAW-0 · ADR-LAWS ·
   ADR-CONFIG · ADR-TUNE · ADR-OWNERSHIP)* · ✅ **L0 and the nine-record rename
@@ -108,13 +99,13 @@ failure mode here with a perfect record.
   (sha `0e3b4c8`). 🔴 **W-112 alone is still on Arpit**: a corpus and a compare
   doc. `filed: 2026-09-04` · `ratified: 2026-09-05`
   - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **MEASURED 2026-09-05, and NO VERDICT FILED** ([the run](regression/2026-09-05-vector-gate/report.md)) — Arpit's ruling, because **DENSE-CHUNK's frozen bar cannot be tested**: the playground's index was `fux.index.v1` (unreadable by this engine) and it has **no enrichment**, so *today's ask* is **28/50** against that control's **32/50**. Retrieval: both correctly-configured arms net **zero** (6/6 and 5/5 fixed/broken) and each moves **1 of 9** vocabulary-gap failures. 🔴 **The finding is reproducibility**: two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, 41/50 top-5 orderings discordant. ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only here) and a corpus.
-  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0 is CLOSED** ([the run](regression/2026-09-05-node-log-divergence/report.md) + [`ADDENDUM-IDF`](regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md) + [`ADDENDUM-GLIBC`](regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md)). Arpit ruled **(b) — scores equal after `round(9)`, ordering byte-equal** on 2026-09-06; [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is **frozen in full**, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and the rule now lives in [ADR-RANKING decision 8a](../docs/adr/0021_ranking.md). ▶ **Phase 1 starts.** ⚠ The glibc number came from a Linux container, not from [`log-probe.yml`](../.github/workflows/log-probe.yml), which is **still unrun**; musl, Windows and Node 20 stay unmeasured and §4 still requires all three OSes before an arm is called green.
+  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0 is CLOSED** ([the run](regression/2026-09-05-node-log-divergence/report.md) + [`ADDENDUM-IDF`](regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md) + [`ADDENDUM-GLIBC`](regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md)). Arpit ruled **(b) — scores equal after `round(9)`, ordering byte-equal** on 2026-09-06; [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is **frozen in full**, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and the rule now lives in [ADR-RANKING decision 8a](../docs/adr/0111_ranking.md). ▶ **Phase 1 starts.** ⚠ The glibc number came from a Linux container, not from [`log-probe.yml`](../.github/workflows/log-probe.yml), which is **still unrun**; musl, Windows and Node 20 stay unmeasured and §4 still requires all three OSes before an arm is called green.
   - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **STILL BLOCKED, and the blocker changed shape.** W-106 produced no PASS to unblock it, and it produced something the plane's design has to answer: **a pinned committed vector is an artefact of one implementation** — two correct implementations of one model share **0 of 125** int8 vectors ([the run](regression/2026-09-05-vector-gate/report.md)). The determinism claim can only ever be *"same clone + same embedder build"*, never *"same model"*. **Blocked on: a restored corpus (W-87 Part B), a re-run gate, and the compare doc Arpit must rule on.**
 
 ### testing
 
 - 🟠 **W-136 — the sealed golden benchmark.** `arpit` (Codex phases), then `agent` ·
-  *(records: [ADR-RS](../docs/adr/0043_predictions.md) · [ADR-QUALITY](../docs/adr/0051_quality-contract.md) ·
+  *(records: [ADR-RS](../docs/adr/0133_predictions.md) · [ADR-QUALITY](../docs/adr/0141_quality-contract.md) ·
   setup: [fux-benchmark](setup/fux-benchmark.md), [fux-lab](setup/fux-lab.md))* · **Arpit, 2026-09-11.**
   Codex writes 10 seed documents and ~100 questions with answers in
   `work/golden/golden-answer/` — **Claude never reads it**. Claude grows the corpus
@@ -125,8 +116,8 @@ failure mode here with a perfect record.
   `filed: 2026-09-11`
 
 - 🔴 **W-115 is STILL UNMEASURED FOR QUALITY, and now it is known why.** `agent`,
-  **needs a corpus decision** · *(records: [ADR-RS](../docs/adr/0043_predictions.md) ·
-  [ADR-DECODE](../docs/adr/0049_decode.md))* · ⚠ **W-116 itself is CLOSED** — the run is filed
+  **needs a corpus decision** · *(records: [ADR-RS](../docs/adr/0133_predictions.md) ·
+  [ADR-DECODE](../docs/adr/0139_decode.md))* · ⚠ **W-116 itself is CLOSED** — the run is filed
   ([2026-09-11-w116-chunking](regression/2026-09-11-w116-chunking/report.md)) and it measured
   **what moved**: 304 of 954 documents (31.9 %) and `+12 560` term entries on fux's own repo,
   de-confounded from `max_phrases` with a third arm. 🔴 **It also found a regression W-115 shipped
@@ -141,8 +132,8 @@ failure mode here with a perfect record.
   **The likely instrument is [W-136](open/W-136-golden-benchmark.md)**, whose whole purpose is a
   graded corpus at scale. `filed: 2026-09-06` · `re-scoped: 2026-09-11`
 
-- **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0045_tuning.md) ·
-  [ADR-RS](../docs/adr/0043_predictions.md))* · **the knob sweep — which
+- **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0135_tuning.md) ·
+  [ADR-RS](../docs/adr/0133_predictions.md))* · **the knob sweep — which
   `.fux/tune.toml` defaults are defensible, measured rather than argued.**
   Pre-registered as [`benchmark/PRE-REGISTRATION-TUNER.md`](benchmark/PRE-REGISTRATION-TUNER.md)
   (ids **T0–T5**, a third id space), procedure in
@@ -175,7 +166,7 @@ failure mode here with a perfect record.
   [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
 
 - **The `heading` negative control is saturated and must be rebuilt.** `agent` ·
-  *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
+  *(record: [ADR-RS](../docs/adr/0133_predictions.md))* ·
   [C4](regression/2026-08-28-benchmark-contested/VERDICT-C4.md) returned its
   predicted null at **100 % in both arms with zero headroom**, so it returned
   the right answer for the wrong reason and **did not discharge its job**. Until
@@ -184,7 +175,7 @@ failure mode here with a perfect record.
   *also* heading-matched. `filed: 2026-08-28`
 
 - **W-87** · `arpit` ·
-  *(record: [ADR-QUALITY](../docs/adr/0051_quality-contract.md))* · **what
+  *(record: [ADR-QUALITY](../docs/adr/0141_quality-contract.md))* · **what
   "good" means, then measure.** P0, P1, P3, P4 and P5 are closed and
   `recall@k` now exists. ⚠ **Two things keep it open:** the `judged` series
   has never been exercised (no judged run exists), and **Part B cannot run**
@@ -196,10 +187,10 @@ failure mode here with a perfect record.
 ### adr update
 
 - 🟠 **THE FOUR NO-OP RANKING PRIORS — one problem, one blocker.** `agent`, then `arpit` ·
-  *(records: [ADR-CONFIDENCE](../docs/adr/0052_confidence.md) ·
-  [ADR-TUNE](../docs/adr/0045_tuning.md) ·
-  [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) ·
-  [ADR-RS](../docs/adr/0043_predictions.md))* · ⚠ **Merged 2026-09-11 from FOUR
+  *(records: [ADR-CONFIDENCE](../docs/adr/0142_confidence.md) ·
+  [ADR-TUNE](../docs/adr/0135_tuning.md) ·
+  [ADR-ARCHIVED-CONTENT](../docs/adr/0134_archived-content.md) ·
+  [ADR-RS](../docs/adr/0133_predictions.md))* · ⚠ **Merged 2026-09-11 from FOUR
   rows — two inbox lines, W-94, and this one** — which between them said the
   same thing about one decision blocked on one action. `filed: 2026-08-28` ·
   `ruled: 2026-09-11`
@@ -265,7 +256,7 @@ failure mode here with a perfect record.
     Repaired by Arpit's 2026-09-11 ruling; the index and the rows are
     W-134, which landed 2026-09-11 (playground `fece5a3`).
   - **A frozen pre-registration** naming its `k`, its arms and the `0 broken`
-    bar *before* the first number ([ADR-QUALITY](../docs/adr/0051_quality-contract.md)
+    bar *before* the first number ([ADR-QUALITY](../docs/adr/0141_quality-contract.md)
     decision 2a). ⚠ W-110's gate was VOIDED for exactly the omission this would
     repeat.
   - **The query set split by intent** — *current-seeking* against
@@ -324,7 +315,7 @@ session needs first.*
    ⚠ **Check what the row was the ONLY home of before deleting it.** W-82's
    carried the one written statement that answer-time verification cannot fix
    recall; deleting the row would have lost the claim, so it moved to
-   [ADR-URL-INGEST](../docs/adr/0017_url-ingest.md) decision 9 first.
+   [ADR-URL-INGEST](../docs/adr/0107_url-ingest.md) decision 9 first.
 4. **The markers here are assertions, not evidence. Re-derive, do not read.**
    Before treating anything as pending or done, reconcile against
    `regression/`, `IMPLEMENTATION.md`, and the repo itself (`git log`,

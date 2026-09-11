@@ -42,7 +42,7 @@ must state the cost honestly rather than tidily.
    - the cause — **file-scoped `describes` against key-scoped descriptions**,
      which is *not* the cause decision 9 fixed (reassignment / renumber / new record);
    - the cost — every commit before the new sha is no longer re-auditable.
-3. **ADR-OWNERSHIP** (`docs/adr/0056_ownership.md`), written in place, no
+3. **ADR-OWNERSHIP** (`docs/adr/0146_ownership.md`), written in place, no
    `Amended` section:
    - **veto condition 6 has fired by ruling**, with the cause above named;
    - decision 9 stays in force (commits after the baseline are still judged

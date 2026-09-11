@@ -36,13 +36,13 @@ table. ⚠ **A handle is not the law**; read the law at its home.
 | `fux add <URL>` | records the line **and fetches that one URL** |
 | `fux update` | re-reads what is already listed |
 
-**Network code lives in the consumer's repo, not in the package.** `fux setup` writes `http.py` and `cdp.py` into `.fux/fetchers/`, where they become the consumer's own code. That is why the package can keep zero network lines while URLs still work — and it is a decision of [ADR-CDP-FETCHER](0028_cdp-fetcher.md), not of this law.
+**Network code lives in the consumer's repo, not in the package.** `fux setup` writes `http.py` and `cdp.py` into `.fux/fetchers/`, where they become the consumer's own code. That is why the package can keep zero network lines while URLs still work — and it is a decision of [ADR-CDP-FETCHER](0118_cdp-fetcher.md), not of this law.
 
 ### ⚠ The narrowing that already happened once
 
 **Nine records and eleven module docstrings** had narrowed *"network access only inside explicit, fenced, opt-in paths"* down to `--refresh-urls` **specifically**. So when `fux add <URL>` arrived as a second fenced path, it read as an amendment to L4. **It was not.** The law says *paths*, plural, and the count was never part of it. The records were corrected and `CLAUDE.md` was not touched.
 
-**This is the restatement hazard in its purest form** — text that was true when written, became the thing everyone cited, and then made a legal new case look like a law change. It is why [ADR-LAWS](0001_LAWS.md) forbids restating a law, and why the named paths live in [ADR-CLI](0011_cli-surface.md) rather than here.
+**This is the restatement hazard in its purest form** — text that was true when written, became the thing everyone cited, and then made a legal new case look like a law change. It is why [ADR-LAWS](0001_LAWS.md) forbids restating a law, and why the named paths live in [ADR-CLI](0101_cli-surface.md) rather than here.
 
 **Diagram — Mermaid and its ASCII twin. Update both, always, together.**
 
@@ -121,9 +121,9 @@ on 2026-09-06 at Arpit's ruling.
 ### Reference (required)
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
-- [ADR-CLI](0011_cli-surface.md) decision 1e — the named fenced paths, cited rather than restated
-- [ADR-FETCHER](0027_fetcher.md) · [ADR-CDP-FETCHER](0028_cdp-fetcher.md) — consumer-owned network code
-- [ADR-PROVENANCE](0053_provenance.md) — `fux verify` never fetches
+- [ADR-CLI](0101_cli-surface.md) decision 1e — the named fenced paths, cited rather than restated
+- [ADR-FETCHER](0117_fetcher.md) · [ADR-CDP-FETCHER](0118_cdp-fetcher.md) — consumer-owned network code
+- [ADR-PROVENANCE](0143_provenance.md) — `fux verify` never fetches
 
 ### Veto condition
 

@@ -185,7 +185,7 @@ duplication, not by inventing a check that cannot exist.
 - Arpit's ruling, 2026-09-06 — quoted verbatim in §2 Context.
 - [`work/open/W-122-adrs-are-the-source.md`](../../work/open/W-122-adrs-are-the-source.md) — the migration this record authorises.
 - **The two strikes:** `acquired_max_bytes` — named in a record and the ownership table, never parsed, `NameError` on every retaining fetch (2026-09-01); `max_parallel` — two contradicting sentences in one accepted amendment, the code implementing the wrong one ([`archive/open/W-83-the-unconfigured-fetch-ceiling.md`](../../archive/open/W-83-the-unconfigured-fetch-ceiling.md)).
-- **Precedent for a generated view:** [ADR-TUNE](0045_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
+- **Precedent for a generated view:** [ADR-TUNE](0135_tuning.md) already names `tune.specimen()` in `src/fux/tune.py` as the authority for `.fux/tune.toml`.
 - US Constitution, Article VI, Clause 2 (the Supremacy Clause) and Article V (the amendment path) — the two-level shape and the reason entrenchment is part of it, not an addition to it.
 
 ### Veto condition

@@ -14,7 +14,7 @@ committed record field and ADR-GRAPH.
 
 **Graduates when** Arpit accepts or strikes each line in §4. Nothing here is
 applied. **No ADR affected** by the wording itself; §5's rename would affect
-[ADR-GRAPH](../../docs/adr/0036_graph.md) and ADR-RECORD.
+[ADR-GRAPH](../../docs/adr/0126_graph.md) and ADR-RECORD.
 
 ---
 

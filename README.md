@@ -18,10 +18,10 @@ database, no API key, and no model anywhere on the path.
 - **Documents stay where they are.** The index holds statistics, not content.
   `answer` reads the cited lines from the source and says whether they are still current.
 - **Deterministic.** Ranking is BM25F arithmetic
-  ([ADR-RANKING](docs/adr/0021_ranking.md)). The same sources build the same index.
+  ([ADR-RANKING](docs/adr/0111_ranking.md)). The same sources build the same index.
 - **Says when it doesn't know.** Results carry a confidence band, and an unrelated
   question gets *"No confident matches"* rather than the nearest noise
-  ([ADR-CONFIDENCE](docs/adr/0052_confidence.md)).
+  ([ADR-CONFIDENCE](docs/adr/0142_confidence.md)).
 
 The whole idea in one picture: [`work/architecture-high-level.svg`](work/architecture-high-level.svg).
 
@@ -61,7 +61,7 @@ $ git add .fux fux.toml && git commit -m "Add fux index"
 ```
 
 `.fux/` explains itself: `setup` writes a `.fux/README.md` and a `.gitignore` that
-keeps the derived and fetched parts out of git ([ADR-DOTFUX](docs/adr/0012_fux-directory.md)).
+keeps the derived and fetched parts out of git ([ADR-DOTFUX](docs/adr/0102_fux-directory.md)).
 
 ## Everyday commands
 
@@ -81,7 +81,7 @@ keeps the derived and fetched parts out of git ([ADR-DOTFUX](docs/adr/0012_fux-d
 | A re-runnable answer receipt | `fux answer --receipt "…"`, later `fux verify <receipt>` |
 | Check the setup | `fux doctor` (read-only, offline) |
 
-Full surface: `fux --help` and [ADR-CLI](docs/adr/0011_cli-surface.md).
+Full surface: `fux --help` and [ADR-CLI](docs/adr/0101_cli-surface.md).
 
 ## With coding agents
 
@@ -90,13 +90,13 @@ Agents are fux's primary reader.
 - **Instructions out of the box.** `fux setup` adds skills and instructions for
   Claude Code, Codex, GitHub Copilot and Kiro, plus a root `AGENTS.md`. They tell
   the agent to search the index before grepping and how to read a result. Skip
-  with `--no-agents` ([ADR-AGENT-POLICY](docs/adr/0042_agent-policy.md)).
+  with `--no-agents` ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md)).
 - **MCP.** `fux mcp` serves the index over stdio as three tools: `fux_search`,
   `fux_passage` and `fux_related`. There is no `answer` tool — the agent is the
-  answerer ([ADR-MCP](docs/adr/0046_mcp.md)).
+  answerer ([ADR-MCP](docs/adr/0136_mcp.md)).
 - **Read the JSON, not the prose.** `--json` and `--band` carry the fields an agent
   should branch on, including whether a result is archived
-  ([ADR-ARCHIVED-CONTENT](docs/adr/0044_archived-content.md)).
+  ([ADR-ARCHIVED-CONTENT](docs/adr/0134_archived-content.md)).
 
 ## Beyond Markdown
 
@@ -104,20 +104,20 @@ Agents are fux's primary reader.
   plus decoders for PDF, Word, PowerPoint, Excel, CSV/TSV, HTML, email,
   draw.io, JSON, YAML, TOML, INI, XML, SVG and images. The decoders are copied
   into `.fux/decoders/` as your code, to edit or replace
-  ([ADR-DECODE](docs/adr/0049_decode.md)).
+  ([ADR-DECODE](docs/adr/0139_decode.md)).
 - **Web pages and wikis.** `fux add <url>` fetches through a fetcher in
   `.fux/fetchers/`: `http.py` for a plain GET, or `cdp.py` (`--cdp`) to use the
   session your signed-in Chrome already holds. Both are yours to edit
-  ([ADR-FETCHER](docs/adr/0027_fetcher.md)).
+  ([ADR-FETCHER](docs/adr/0117_fetcher.md)).
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
   and they say so on stderr ([L4](docs/adr/0006_LAW-4-offline-by-default.md)).
 - **Sensitive text.** `.fux/pii.toml` redacts matches from the committed index
-  ([ADR-PII](docs/adr/0060_pii.md)). `fux setup` writes it, and fux will not run
+  ([ADR-PII](docs/adr/0150_pii.md)). `fux setup` writes it, and fux will not run
   without it. `.fux/refusals.toml` stops a sign-in wall
-  being indexed as the page behind it ([ADR-REFUSAL](docs/adr/0058_refusals.md)).
+  being indexed as the page behind it ([ADR-REFUSAL](docs/adr/0148_refusals.md)).
 - **Images and scans.** Fux never calls a model. `fux enrich` plans the work for
   your coding agent and validates what it writes
-  ([ADR-ENRICH](docs/adr/0047_enrich.md)).
+  ([ADR-ENRICH](docs/adr/0137_enrich.md)).
 
 ## Measured, not assumed
 

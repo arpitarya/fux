@@ -34,7 +34,7 @@ unchanged by this run, and mitigated by publication rather than by trust.
 
 ## Headroom — declared in the pre-registration, before any number
 
-[ADR-RS](../../../docs/adr/0043_predictions.md) decision 22. Computed from the
+[ADR-RS](../../../docs/adr/0133_predictions.md) decision 22. Computed from the
 frozen 2026-08-28 rows, so both figures were knowable in advance and are:
 
 | direction | headroom | status | result |

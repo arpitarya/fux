@@ -117,7 +117,7 @@ on 2026-09-06 at Arpit's ruling.
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
 - `pyproject.toml` — `requires-python = ">=3.11"`, the executable form of this law
 - PEP 680 (`tomllib`) — https://peps.python.org/pep-0680/
-- [ADR-CONFIG](0023_config.md) · [ADR-TUNE](0045_tuning.md) — the readers that depend on it
+- [ADR-CONFIG](0113_config.md) · [ADR-TUNE](0135_tuning.md) — the readers that depend on it
 
 ### Veto condition
 

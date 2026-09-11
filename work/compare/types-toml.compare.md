@@ -13,7 +13,7 @@ timestamp: 2026-09-11T00:00:00Z
 > (Arpit, after `map.toml` and `decoders.toml` were weighed — reasons in
 > ADR-TYPES decision 12). Every mention in this doc now reads `formats.toml`;
 > the doc's file name keeps `types-toml` so its links do not break.
-> Shipped the same day as [ADR-TYPES](../../docs/adr/0038_types-list.md)
+> Shipped the same day as [ADR-TYPES](../../docs/adr/0128_types-list.md)
 > decision 12. Two refinements the build found, both recorded there: F3's
 > *stated twice* check is **exact-case** (`"*.CSV"` beside `csv` admits other
 > files), and F5's conversion **refuses** an upper-case bound pattern rather
@@ -240,11 +240,11 @@ Redo this comparison if any of these is true:
 
 ## References
 
-- ADR-TYPES — [`docs/adr/0038_types-list.md`](../../docs/adr/0038_types-list.md): decisions 1a, 2, 2a, 3, 11, 11a; §Alternatives.
-- ADR-URL-LIST — [`docs/adr/0026_url-list.md`](../../docs/adr/0026_url-list.md): decisions 1-2 and 13; §Alternatives.
-- ADR-DIR-LIST — [`docs/adr/0030_dir-list.md`](../../docs/adr/0030_dir-list.md): decisions 1, 2, 2b; §Alternatives.
-- ADR-FUXIGNORE — [`docs/adr/0055_fuxignore.md`](../../docs/adr/0055_fuxignore.md): decision 5.
-- ADR-DECODE — [`docs/adr/0049_decode.md`](../../docs/adr/0049_decode.md): decisions 13 and 17.
+- ADR-TYPES — [`docs/adr/0128_types-list.md`](../../docs/adr/0128_types-list.md): decisions 1a, 2, 2a, 3, 11, 11a; §Alternatives.
+- ADR-URL-LIST — [`docs/adr/0116_url-list.md`](../../docs/adr/0116_url-list.md): decisions 1-2 and 13; §Alternatives.
+- ADR-DIR-LIST — [`docs/adr/0120_dir-list.md`](../../docs/adr/0120_dir-list.md): decisions 1, 2, 2b; §Alternatives.
+- ADR-FUXIGNORE — [`docs/adr/0145_fuxignore.md`](../../docs/adr/0145_fuxignore.md): decision 5.
+- ADR-DECODE — [`docs/adr/0139_decode.md`](../../docs/adr/0139_decode.md): decisions 13 and 17.
 - [file-type-filter](file-type-filter.compare.md) — option D and its matrix.
 - Code: [`sourcelist.py`](../../src/fux/ingest/sourcelist.py) (`parse`, `TYPES`), [`sources.py`](../../src/fux/sources.py), [`decode/__init__.py`](../../src/fux/decode/__init__.py) (`_declared_bindings`, `_bound_extension`, `_bind`), [`gitdir.py`](../../src/fux/ingest/gitdir.py) (`read_types`, the dot-skip), [`config.schema.json`](../../src/fux/config.schema.json).
 - TOML v1.0.0 — duplicate keys invalid; multi-line arrays with trailing commas and comments — <https://toml.io/en/v1.0.0>

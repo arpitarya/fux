@@ -13,9 +13,13 @@ timestamp: 2026-08-27T00:00:00Z
 
 # ADR-<NAME>: <short decision title>
 
-> **How to use this file.** Copy it to `docs/adr/000N_<short-name>.md`, take the
-> next free number, and give the record a **NAME** — that name is how every
-> other doc cites it. Delete these instruction blockquotes as you fill it in.
+> **How to use this file.** Copy it to `docs/adr/NNNN_<short-name>.md` and give
+> the record a **NAME** — that name is how every other doc cites it.
+> **Take the next free number in the record's own range** (Arpit, 2026-09-11):
+> an ordinary record numbers from **`0101`** upward, a **Law** record from
+> **`0011`** — `0001`–`0100` is the law range and `0011`–`0100` is its reserved,
+> deliberately empty tail. Do not create a placeholder file to fill a gap there.
+> Delete these instruction blockquotes as you fill it in.
 
 > ## The frontmatter is the metadata. Nothing below it restates a key.
 >
@@ -289,7 +293,7 @@ $ <the check command>
 document is never listed here — the body may name one, but archive is not
 evidence.*
 
-**Records** — [ADR-<NAME>](000N_<short-name>.md) · [ADR-<NAME>](000N_<short-name>.md)
+**Records** — [ADR-<NAME>](NNNN_<short-name>.md) · [ADR-<NAME>](NNNN_<short-name>.md)
 
 **Code**
 

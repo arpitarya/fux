@@ -33,7 +33,7 @@ the absence of any document for the prior to act on.
 
 - **`superseded_weight` reads a `supersedes:` FRONTMATTER key**, resolved by
   `ingest/priors.py::superseded_ids` — *declared, never inferred*
-  ([ADR-INGEST](../../../docs/adr/0016_ingest.md)).
+  ([ADR-INGEST](../../../docs/adr/0106_ingest.md)).
   `docs/adr-0019-calder-gateway.md` says **in prose** *"Supersedes
   [ADR-0007](adr-0007-helix-mesh.md)"* and carries `title`, `tags` and `status`
   in its frontmatter — **and no `supersedes:` key**. `adr-0007` carries
@@ -71,7 +71,7 @@ question was **not** *"which value?"* but ***"does ANY single global
 reporting *"`0 broken` at every value — the bar is met"* would be true, worthless,
 and extremely misleading.
 
-⚠ **This is exactly the failure [ADR-RS](../../../docs/adr/0043_predictions.md)
+⚠ **This is exactly the failure [ADR-RS](../../../docs/adr/0133_predictions.md)
 decision 22d was ratified to prevent, arriving three hours after it landed.** It
 is the `heading` control's shape — *returned its predicted null at 100 % in both
 arms with zero headroom, so it returned the right answer for the wrong reason*.

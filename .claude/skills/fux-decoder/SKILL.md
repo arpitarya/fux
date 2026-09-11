@@ -84,7 +84,7 @@ inside it.* So:
 ⚠ **If your format's unit is a slide, message, page or record, emit them as
 SIBLINGS at one level under a `# <filename>` title.** That is the whole
 mechanism — a short unit beside a long one is safe because they are siblings,
-not because anything was declared. See `docs/adr/0063_chunking.md`.
+not because anything was declared. See `docs/adr/0153_chunking.md`.
 
 **Files starting with `_` are helpers, not decoders** — the loader skips them.
 Put shared code there.
@@ -229,12 +229,12 @@ each already cost a defect in the shipped set:
 
 | you want | go to |
 |---|---|
-| the decision of record | `docs/adr/0049_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
+| the decision of record | `docs/adr/0139_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
 | the seventeen shipped decoders | `.fux/decoders/` in this repo |
 | the loader, the override rule, the registry | `fux.decode.__init__` — read its module docstring |
 | where decoding joins ingest | `fux.ingest.parse.parse_document` |
-| which files are walked at all | `.fux/formats.toml`, and `docs/adr/0038_types-list.md` |
-| what `.fux/` may contain | `docs/adr/0012_fux-directory.md` |
+| which files are walked at all | `.fux/formats.toml`, and `docs/adr/0128_types-list.md` |
+| what `.fux/` may contain | `docs/adr/0102_fux-directory.md` |
 | worked tests to copy | `tests/decode/test_formats.py` — fixtures are built in the test, never committed as binaries, so the input is readable beside the assertion |
 
 **When you finish:** say which files you changed, which formats are affected,

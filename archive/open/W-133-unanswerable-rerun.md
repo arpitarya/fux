@@ -54,7 +54,7 @@ observed / proven / unproven. **0 headroom in a direction is Inconclusive, not
    - 🟢 **The one-line answer first:** *"Still 0 abstentions of 20: TRUE / FALSE —
      N of 20 `answerable: true`."*
    - band table, then/now; which ids flipped, and the discordant count.
-   - A paired net below [ADR-RS](../../docs/adr/0043_predictions.md) decision 19's floor
+   - A paired net below [ADR-RS](../../docs/adr/0133_predictions.md) decision 19's floor
      (net 6) is **"no detected change"**, whatever direction it points.
    - What changed in the engine since 2026-08-28 that could move this (W-108, W-109,
      W-111, W-115, `[index]`) — **post-hoc, labelled, out of the answer**.

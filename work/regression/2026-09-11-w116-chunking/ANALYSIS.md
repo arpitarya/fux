@@ -62,7 +62,7 @@ change alters what should be indexed for documents whose bytes did not
 change"* — **which is a decoder change, word for word.** A decoder digest is
 the same shape as the two that exist.
 
-⚠ **Filed, not built.** It belongs to [ADR-INGEST](../../../docs/adr/0016_ingest.md)'s
+⚠ **Filed, not built.** It belongs to [ADR-INGEST](../../../docs/adr/0106_ingest.md)'s
 reuse key, its blast radius is every ingest in every repo, and inventing it
 inside a decoder bugfix is the wrong place to decide it. **Until it exists, a
 decoder change ships with the instruction `--full` or it does not ship.**

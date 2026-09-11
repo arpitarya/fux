@@ -119,9 +119,9 @@ systems that own it; verify at answer time.
   from their source (git dir / HTTP / Confluence — **that cap is a decision**),
   re-score passages on the fetched bytes, and cite a fresh sha.
 - **Two ingest modes.** `extracted` (default: `$0`, offline, deterministic,
-  [ADR-EXTRACTED](docs/adr/0025_extracted-mode.md) — **accepted**) and
+  [ADR-EXTRACTED](docs/adr/0115_extracted-mode.md) — **accepted**) and
   `enriched` (opt-in, model-assisted,
-  [ADR-ENRICH](docs/adr/0047_enrich.md) — **accepted**: the name, the
+  [ADR-ENRICH](docs/adr/0137_enrich.md) — **accepted**: the name, the
   boundary and the record shape are ratified; **the build is not**). Both
   ratified by Arpit 2026-08-19. ⚠ **ADR-ENRICHED was superseded 2026-08-27** —
   its contract was folded into ADR-ENRICH verbatim first, and the
@@ -384,10 +384,15 @@ Then, on completion:
    components to the ownership table and update
    [`tests/test_adr_ownership.py`](tests/test_adr_ownership.py) in the same
    change. Full convention: [`docs/adr/README.md`](docs/adr/README.md).
+   **The live numbering runs on two ranges since 2026-09-11** (Arpit):
+   `docs/adr/0001`–`0100` is the **Law** range — `0001` ADR-LAWS and
+   `0002`–`0010` ADR-LAW-0…ADR-LAW-8, with `0011`–`0100` reserved and **empty,
+   no placeholder files** — and `0101`– is every other record, today
+   `0101` ADR-CLI through `0154` ADR-DOCTOR. A new record takes the next free
+   number in its own range.
    `archive/v0.26-docs/adr/0001`–`0015` are the **archived** engine's records —
-   a distinct numbering from today's live `docs/adr/0001`–`0015`
-   (ADR-LAWS…ADR-PORT-LIST) — and are cited as "archived ADR-NNNN" with that
-   archive path, never bare "ADR-NNNN".
+   a numbering distinct from both live ranges — and are cited as "archived
+   ADR-NNNN" with that archive path, never bare "ADR-NNNN".
 
 **Every rule, ADR, and material decision must carry a reference** — a paper, a
 blog post, or a concrete example link. A rule or ADR with no reference is
@@ -730,7 +735,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   cannot clear α = 0.05 at any discordant count** — and it rises from there
   (20 flips → net 10; 50 flips → net 16). The old *"±2 on 50"* admitted results
   whose best possible p-value is **0.50**. Table, script and the α discussion:
-  [ADR-RS](docs/adr/0043_predictions.md) decision 19.
+  [ADR-RS](docs/adr/0133_predictions.md) decision 19.
 - 🔴 **Every measured run records its PER-QUERY RESULTS under `evidence/`** —
   one row per query per arm, pass/fail. **Ruled by Arpit 2026-08-28:** *"record
   all the questions so we can check in detail."* ⚠ **A summary count is not
@@ -744,7 +749,7 @@ queries, the judgments, prior per-query scores, or any derived report of them
   `tests/test_regression_runs.py` checks it from there.
 
 Ruled by Arpit 2026-08-25 (W-78 ruling 2); explained and guarded by
-[ADR-RS](docs/adr/0043_predictions.md) decisions 11-15. ⚠ Two parts of the
+[ADR-RS](docs/adr/0133_predictions.md) decisions 11-15. ⚠ Two parts of the
 accepted rule — a **sealed** query set and the **decoy/placebo controls** — are
 **not built** and are owed as W-81; nothing may cite them as in force.
 
@@ -842,7 +847,7 @@ uv run pytest -q tests_e2e    # the package as a user
 ```
 
 **A test that builds a repo by hand writes `.fux/pii.toml`** (an empty file is
-enough), or ingest and every CLI verb refuse — [ADR-PII](docs/adr/0060_pii.md)
+enough), or ingest and every CLI verb refuse — [ADR-PII](docs/adr/0150_pii.md)
 decision 17.
 
 **Two suites, both maintained** — `tests/` (fast unit) and `tests_e2e/` (the

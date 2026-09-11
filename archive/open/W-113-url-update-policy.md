@@ -17,7 +17,7 @@ being stated correctly. A wrong sentence here reads as authority.
 ## Where this came from
 
 **Arpit ruled R-1 on 2026-09-05** ([`proposals/unblock-2026-09-05.md`](../proposals/unblock-2026-09-05.md)):
-accept [ADR-CDP-FETCHER](../../docs/adr/0028_cdp-fetcher.md) decision 12 as
+accept [ADR-CDP-FETCHER](../../docs/adr/0118_cdp-fetcher.md) decision 12 as
 the ETag acceptance criterion — **and separately** expose whether a URL is
 re-fetched at all as a declared property. This item is that second half. The
 first half closes with no code.
@@ -90,10 +90,10 @@ update = "auto"     # the default for a line that does not say
       value refused; `tests_e2e` covering `fux update` over a mixed list.
 - [ ] **Byte-identity**: a corpus that declares nothing produces the same
       `.fux/index/` and the same `fux update` behaviour as before.
-- [ ] [ADR-URL-LIST](../../docs/adr/0026_url-list.md) gains the attribute and
-      the skip vocabulary; [ADR-URL-FRESHNESS](../../docs/adr/0059_url-freshness.md)
+- [ ] [ADR-URL-LIST](../../docs/adr/0116_url-list.md) gains the attribute and
+      the skip vocabulary; [ADR-URL-FRESHNESS](../../docs/adr/0149_url-freshness.md)
       gains the ask-time/update-time boundary in one paragraph;
-      [ADR-CDP-FETCHER](../../docs/adr/0028_cdp-fetcher.md) decision 12 gains
+      [ADR-CDP-FETCHER](../../docs/adr/0118_cdp-fetcher.md) decision 12 gains
       the veto condition below. CHANGELOG; `IMPLEMENTATION.md`; this file to
       `archive/open/`.
 

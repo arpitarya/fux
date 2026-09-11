@@ -13,7 +13,7 @@ timestamp: 2026-08-27T00:00:00Z
 ## ✅ PHASE 0 IS RULED — 2026-08-27 (Arpit), all six forks
 
 **The contract is declared.** It lives in
-[ADR-QUALITY](../../docs/adr/0051_quality-contract.md); the argument behind it is
+[ADR-QUALITY](../../docs/adr/0141_quality-contract.md); the argument behind it is
 [the compare doc](../compare/what-good-means.compare.md), now `accepted`; the
 frozen declarations are [`tools/quality/mix.toml`](../../tools/quality/mix.toml).
 
@@ -63,11 +63,11 @@ contract.** It may run the moment a URL corpus exists.
 
 | phase | what | blocked by |
 |---|---|---|
-| ~~**P0**~~ | ~~declare the contract — the six forks~~ | ✅ **RULED 2026-08-27** — [ADR-QUALITY](../../docs/adr/0051_quality-contract.md). P1–P2 are unblocked on the contract and blocked only on inputs |
+| ~~**P0**~~ | ~~declare the contract — the six forks~~ | ✅ **RULED 2026-08-27** — [ADR-QUALITY](../../docs/adr/0141_quality-contract.md). P1–P2 are unblocked on the contract and blocked only on inputs |
 | ~~**P1**~~ | the measurement apparatus — sealed subset, decoy set, content-free placebo, ~~orphaned-module check~~ | ✅ **ALL BUILT, and three of four now USED to adjudicate** (decoys 2026-08-27; `unanswerable` and placebo 2026-08-28). 🔴 **The sealed subset is EXERCISED, NOT PROVEN** — it postdates the enrichment it was applied to, so its split cannot test contamination; that is a *chronology* limit, not an unbuilt apparatus, and it is tracked in ADR-RS decision 15 rather than here |
-| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | ✅ **`recall@k` IS COMPUTED** — [2026-08-28](../regression/2026-08-28-first-recall/report.md), `@5` 0.9535 over the 43/50 declared `complete`, after Arpit ruled option B and [ADR-QUALITY](../../docs/adr/0051_quality-contract.md) decision 12 split the two claims. 🔴 **It is `informed` and not a generalisation estimate** — the installed enrichment was fitted to these queries. **What remains: the funnel's `unanswerable` gate (engine scores 0/20), a clean-corpus recall, and Part B, whose corpora no longer exist** |
+| **P2** | the quality runs — `recall@k`, the funnel, the cost-weighted curve | ✅ **`recall@k` IS COMPUTED** — [2026-08-28](../regression/2026-08-28-first-recall/report.md), `@5` 0.9535 over the 43/50 declared `complete`, after Arpit ruled option B and [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 12 split the two claims. 🔴 **It is `informed` and not a generalisation estimate** — the installed enrichment was fitted to these queries. **What remains: the funnel's `unanswerable` gate (engine scores 0/20), a clean-corpus recall, and Part B, whose corpora no longer exist** |
 | ~~**P3**~~ | **§3.0** — sanitized-sha stability | ✅ **PASS 2026-08-27**, 19/19 = 100 % — [verdict](../regression/2026-08-27-p3-sha-stability/VERDICT.md) |
-| ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [ADR-FETCHER](../../docs/adr/0027_fetcher.md) decision 12, [ADR-MAINTENANCE](../../docs/adr/0039_hooks.md) decision 13 |
+| ~~**P4**~~ | forks 3 & 4 — `validate` and token storage | ✅ **RULED AND BUILT 2026-08-28** — [ADR-FETCHER](../../docs/adr/0117_fetcher.md) decision 12, [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md) decision 13 |
 | ~~**P5**~~ | ~~`tests_e2e/` verification~~ | ✅ **DONE 2026-08-27** — 74/74 on 3.11.15; found one real defect |
 
 **What did NOT move, and why:** W-82's seven blocked rulings (1, 4, 6, 7, 12, 16
@@ -80,7 +80,7 @@ duplicate OPEN-WORK, which rule 7 forbids.
 ## The gap
 
 **Fux measures rigorously and has never declared what it is measuring.**
-[ADR-RS](../../docs/adr/0043_predictions.md) governs *how* a claim is frozen and
+[ADR-RS](../../docs/adr/0133_predictions.md) governs *how* a claim is frozen and
 is silent on *what quantity is worth freezing* — so every quality number fux has
 produced carries an **undeclared query distribution** and an implicit cost model
 in which **a fabricated citation and an honest decline count the same.**
@@ -274,7 +274,7 @@ visible set and whoever builds it must resolve that tension, not inherit it.
                   fields**, because the defect is conceptual and making the
                   existing field plural would have carried the conflation
                   forward. Recorded as
-                  [ADR-QUALITY](../../docs/adr/0051_quality-contract.md)
+                  [ADR-QUALITY](../../docs/adr/0141_quality-contract.md)
                   **decision 12**, with four rules: a declaration is required
                   with any relevance set; `recall@k` is computable only over
                   `complete` queries; `doc` must appear in `relevant`; and both
@@ -422,7 +422,7 @@ fraction of fetched documents whose **sanitized** sha was unchanged.
       that four functions survived two callers untouched, and ADR-FETCHER
       decision 3's refusal of anything that composes is independent of P3.
       **The design is fully worked out** in
-      [ADR-FETCHER](../../docs/adr/0027_fetcher.md) decision 12 — the design and the
+      [ADR-FETCHER](../../docs/adr/0117_fetcher.md) decision 12 — the design and the
       invariant, moved to a live record when W-82 archived, because an archived
       file may be named and never cited —
       including the one invariant an implementer must carry: **a changed token
@@ -538,7 +538,7 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 ## Definition of done
 
 - [x] Six forks ruled, recorded in the compare doc's verdict block **and in
-      [ADR-QUALITY](../../docs/adr/0051_quality-contract.md)** — 2026-08-27.
+      [ADR-QUALITY](../../docs/adr/0141_quality-contract.md)** — 2026-08-27.
 - [x] A versioned [`mix.toml`](../../tools/quality/mix.toml) exists, frozen the
       way a pre-registration is frozen. ⚠ *"every report prints its version"* is
       **owed by the first report**, not by this file — no harness reads it yet.
@@ -565,11 +565,11 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
       scores 0 of 20 on it** — so this figure describes the answerable half.
 - [ ] **The `judged` series pins model + prompt + version** and is never
       compared across judge versions. ⚠ **It IS ruled in** — fork 4, and
-      [ADR-QUALITY](../../docs/adr/0051_quality-contract.md) decision 9 governs
+      [ADR-QUALITY](../../docs/adr/0141_quality-contract.md) decision 9 governs
       it — so this is not conditional any more. **No judged run has happened**,
       so the pinning has never been exercised.
 - [x] ✅ **A record owns the quality contract** —
-      [ADR-QUALITY](../../docs/adr/0051_quality-contract.md), written 2026-08-27
+      [ADR-QUALITY](../../docs/adr/0141_quality-contract.md), written 2026-08-27
       rather than amending ADR-RS. Its components are claimed in the ownership
       table (`tools/quality/`).
 
@@ -577,6 +577,6 @@ on *"prove the daemon runs in a real repo"* — **the hold was right.**
 
 - **The verdict:** [`work/compare/what-good-means.compare.md`](../compare/what-good-means.compare.md)
 - **The parent:** [W-82](../../archive/open/W-82-the-consolidated-build.md) §5.2 — now a pointer here
-- **The rule it extends:** [ADR-RS](../../docs/adr/0043_predictions.md)
+- **The rule it extends:** [ADR-RS](../../docs/adr/0133_predictions.md)
 - **The two caught failures:** [P1-GATE](../regression/2026-08-09-pruning-eval/VERDICT.md) ·
   [budget sweep](../regression/2026-08-22-budget-sweep/ANALYSIS.md)

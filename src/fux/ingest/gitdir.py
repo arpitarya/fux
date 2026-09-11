@@ -263,7 +263,7 @@ def _default_types() -> tuple[str, ...]:
     """The built-in allowlist: prose, plus everything a built-in decoder reads.
 
     ⚠ **Widened 2026-08-26 on Arpit's ruling** — *"all the ones which have a
-    decoder"*. [ADR-TYPES](../../../docs/adr/0038_types-list.md) verdict G had
+    decoder"*. [ADR-TYPES](../../../docs/adr/0128_types-list.md) verdict G had
     kept the default to six prose globs, on a measurement showing 14 % of this
     repo's documents were non-prose and carried 15 % of its tokens, `.json`
     alone at 11.4 %. **That measurement stands and was not overturned**; what

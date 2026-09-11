@@ -303,7 +303,7 @@ tables.
       right in **both** arms) and regression (not wrong in both), each labelled
       **observed**, **proven** or **unproven**. Computed from the rows already
       filed; **0 in a direction makes that null Inconclusive.** The rule is
-      [ADR-RS](../../docs/adr/0043_predictions.md) decision 22; do not restate it
+      [ADR-RS](../../docs/adr/0133_predictions.md) decision 22; do not restate it
       here.
 - [ ] **Deviations from the pre-registration, listed in the report**, numbered,
       never absorbed.

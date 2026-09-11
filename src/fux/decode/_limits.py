@@ -3,7 +3,7 @@
 ## Why this exists, and why it is not a parameter
 
 A decoder is `EXTENSIONS` plus `decode(raw, rel_path)` — two names, and
-[ADR-DECODE](../../../docs/adr/0049_decode.md) decision 1 is emphatic that the
+[ADR-DECODE](../../../docs/adr/0139_decode.md) decision 1 is emphatic that the
 protocol is the whole interface. Adding a third parameter for configuration
 would break every consumer decoder in every repo to serve one setting.
 

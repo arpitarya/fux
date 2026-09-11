@@ -41,10 +41,10 @@ definition of done; the only judgment (double-loading) is already recorded.
    - Add: each of `DECODER-SKILL.md`, `USAGE-SKILL.md`, `ENRICH-SKILL.md` reaches all
      four skill surfaces. `fux-archived-results` is ambient policy — out of scope.
 4. **Records, in place (Law zero):**
-   - [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 14 widens to all
+   - [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md) decision 14 widens to all
      three skills; the alternative *"Write `.github/skills/fux-decoder/`… deferred to a
      compare doc"* is rewritten as accepted by ruling; §1 diagram + ASCII twin if they list surfaces.
-   - [ADR-DECODE](../../docs/adr/0049_decode.md) decision 12 (the `fux-decoder` skill's vendors).
+   - [ADR-DECODE](../../docs/adr/0139_decode.md) decision 12 (the `fux-decoder` skill's vendors).
    - Every record the freshness gate demands for `setup.py` (owner **and** describers) —
      run the gate, don't guess.
    - [`compare/copilot-skill-surface`](../compare/copilot-skill-surface.compare.md): the

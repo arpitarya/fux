@@ -11,7 +11,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 ### Added
 
 - **`update = auto|never` on a URL line** (W-113,
-  [ADR-URL-LIST](docs/adr/0026_url-list.md) decision 14). A line could say how
+  [ADR-URL-LIST](docs/adr/0116_url-list.md) decision 14). A line could say how
   to reach a document and how long a citation could go unchecked, and could not
   say whether to go back for it at all. `update=never` pins the document:
   `fux update` opens no socket for it and **does not even import your fetcher**
@@ -23,23 +23,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   byte-identical to before.**
   - 🔴 **It buys bandwidth by giving up freshness, and it is NOT the ETag
     saving.** CDP intercepts at the response stage, so the body has already
-    crossed the wire ([ADR-CDP-FETCHER](docs/adr/0028_cdp-fetcher.md) decision
+    crossed the wire ([ADR-CDP-FETCHER](docs/adr/0118_cdp-fetcher.md) decision
     12, now carrying the veto that re-costs request-stage interception).
   - ⚠ **`update=never` + `keep=false` is legal and lossy** — nothing retained
     and nothing fetched, so the document is frozen with nothing to verify a
     citation against. `fux doctor` counts the pinned lines and names those ones.
   - 🔴 **A pinned URL can never be re-redacted, `--full` included**
-    ([ADR-PII](docs/adr/0060_pii.md)). Its record is carried forward verbatim,
+    ([ADR-PII](docs/adr/0150_pii.md)). Its record is carried forward verbatim,
     so a new `.fux/pii.toml` rule cannot reach it. Documented, not fixed.
 - **`fux doctor` gains `fux.toml loads`.** A config the loader refuses used to
   produce a **green doctor beside an exit-1 ingest** — every config-dependent
   check degraded to `skipped (no readable fux.toml)` at warn level, each
   correctly, and collectively they deleted the finding. The new row is an
   **error** and prints the loader's own message verbatim
-  ([ADR-DOCTOR](docs/adr/0064_doctor.md) decision 4).
+  ([ADR-DOCTOR](docs/adr/0154_doctor.md) decision 4).
 - **`fux-decoder` and `fux-usage` now install for Copilot** (`.github/skills/`),
   so all three committed-write skills reach all four vendors (W-118,
-  [ADR-AGENT-POLICY](docs/adr/0042_agent-policy.md) decision 14a).
+  [ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 14a).
 
 ### Fixed
 
@@ -50,7 +50,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   Measured over this repo: **96 documents** (86 `.jsonl`, 10 `.json`) lost a real
   title and **not one gained anything**
   ([the run](work/regression/2026-09-11-w116-chunking/report.md),
-  [ADR-DECODE](docs/adr/0049_decode.md) decision 11a). Both decoders now emit a
+  [ADR-DECODE](docs/adr/0139_decode.md) decision 11a). Both decoders now emit a
   `# <filename>` title with the records as siblings beneath it — which is what
   `DECODER-SKILL.md` told decoder authors to do all along.
   - ⚠ **Run `fux ingest --full` to pick this up.** Reuse is keyed on a
@@ -62,12 +62,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   decoder's headings become citable passages. `.github/agents/fux.agent.md` had
   drifted the other way, losing the command-resolution ladder. Both repaired, and
   a test now asserts every committed agent file still equals the template that
-  ships ([ADR-AGENT-POLICY](docs/adr/0042_agent-policy.md) decision 14b).
+  ships ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 14b).
 
 ### Changed
 
 - ⚠ **BREAKING — the types list is `.fux/formats.toml`** (W-130,
-  [ADR-TYPES](docs/adr/0038_types-list.md) decision 12). It was
+  [ADR-TYPES](docs/adr/0128_types-list.md) decision 12). It was
   `.fux/sources/types`, a line-grammar file. The new file has two keys:
   `include` (globs that are already text) and `[decoders]` (`ext = "module"`,
   and a bound extension is a document). **Nothing in it subtracts** — `!`
@@ -80,10 +80,10 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   re-ingests to a **byte-identical** index and `.fuxignore`.
 - `[sources] types_file` in `fux.toml` is now refused by name.
   `config.schema.json` advertised it; nothing ever read it
-  ([ADR-CONFIG](docs/adr/0023_config.md)).
+  ([ADR-CONFIG](docs/adr/0113_config.md)).
 
 - ⚠ **BREAKING — `.fux/pii.toml` is required** (W-129,
-  [ADR-PII](docs/adr/0060_pii.md) decision 17). `fux setup` now writes the
+  [ADR-PII](docs/adr/0150_pii.md) decision 17). `fux setup` now writes the
   starter, and **every command except `setup`, `tune` and `output` stops with an
   error in a repo without it**; `fux doctor` runs and reports it as a failing
   row. A file with every rule commented out is legal and redacts nothing.
@@ -92,7 +92,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   Medicare MBI, Canadian SIN), and the next ingest re-extracts in full.
 
 - **The PII starter covers US and Canadian identifiers** (W-131,
-  [ADR-PII](docs/adr/0060_pii.md) decision 12a). **On:** US SSN and ITIN/ATIN
+  [ADR-PII](docs/adr/0150_pii.md) decision 12a). **On:** US SSN and ITIN/ATIN
   in their written shape, excluding numbers the SSA and IRS never issue; the
   Medicare MBI; the Canadian SIN with a Luhn check. **Off, commented with what
   each over-matches:** US EIN, Canadian postal code, NANP phone numbers.
@@ -105,23 +105,23 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   corpus 87 of 563 markdown documents lost 1 055 headings, and 262 of the slots
   that survived held template headings (`Context`, `Decision`). At 32, 98.2 %
   keep every heading for ~0.3 % more index. **Display only** — ranking already
-  read every heading. [ADR-EXTRACTED](docs/adr/0025_extracted-mode.md) decision 9.
+  read every heading. [ADR-EXTRACTED](docs/adr/0115_extracted-mode.md) decision 9.
 - ⚠ **BREAKING: `fux.toml [decode]` is refused.** `max_table_rows` moved to
   `.fux/tune.toml [index]`, beside `max_phrases`. `[index]` is tune.toml's one
   declared exception to "nothing here changes the index": `fux ingest` reads it,
   `--no-tune` does not undo it, and changing it re-extracts.
-  [ADR-TUNE](docs/adr/0045_tuning.md) decision 13.
+  [ADR-TUNE](docs/adr/0135_tuning.md) decision 13.
 - **Fixed: a changed `max_table_rows` never reached an unchanged CSV on a delta
   ingest** (since 2026-09-06), so delta and `--full` disagreed. Ingest now keeps
   a digest of `[index]` in `.fux/runtime/` and re-extracts when it moves —
   recorded only after the index is written, so a stopped run cannot hide it.
-  [ADR-INGEST](docs/adr/0016_ingest.md) decision 15b. **The first ingest after
+  [ADR-INGEST](docs/adr/0106_ingest.md) decision 15b. **The first ingest after
   upgrading re-extracts every document once.**
 
 ### Added
 
 - **`.fux/pii.toml` rules can name a checksum — `validate = "luhn"` or
-  `"verhoeff"`** (W-128, [ADR-PII](docs/adr/0060_pii.md) decision 16). A match
+  `"verhoeff"`** (W-128, [ADR-PII](docs/adr/0150_pii.md) decision 16). A match
   is redacted only when its digits pass, so a payment-card or Aadhaar rule stops
   eating order ids and timestamps. The set is closed and engine-owned — no
   consumer code runs inside ingest. ⚠ **A checksum is a 1-in-10 filter**, so the

@@ -49,7 +49,7 @@ table. ⚠ **A handle is not the law**; read the law at its home.
 ⚠ **Three things the amendment traded away, named at the moment it was made.**
 
 1. **The trivially auditable supply chain is gone.** Half of the enterprise claim survives — FOSS-only still means nothing to buy and nothing to procure. The other half does not: an auditor now reads a dependency tree instead of confirming there isn't one.
-2. **[L3](0005_LAW-3-deterministic.md) lost its accidental co-guard.** Two laws used to stand between fux and an embedding model: L1 made one uninstallable, L3 kept it off the maintenance path. **Only L3 remains, and L3 governs the maintenance path alone.** A model at *query* time is now held off by [ADR-RERANK](0048_rerank.md)'s cross-machine determinism refusal — **a decision, and decisions are what an ADR is designed to supersede.**
+2. **[L3](0005_LAW-3-deterministic.md) lost its accidental co-guard.** Two laws used to stand between fux and an embedding model: L1 made one uninstallable, L3 kept it off the maintenance path. **Only L3 remains, and L3 governs the maintenance path alone.** A model at *query* time is now held off by [ADR-RERANK](0138_rerank.md)'s cross-machine determinism refusal — **a decision, and decisions are what an ADR is designed to supersede.**
 3. **Byte-identity became conditional.** It was free while every path was stdlib pinned by `requires-python`. It is now a function of dependency resolution on the maintenance path.
 
 ⚠ **What the amendment does NOT do.** It does not authorize a model — L3 is untouched. It does not make convenience a reason to add a dependency. It does not retire hand-rolled code that works. And it does not close the consumer decoder seam, which stands on a better ground than L1 ever gave it.
@@ -139,8 +139,8 @@ Two of them are worse than that: **BSL and SSPL convert on a timer or on a use c
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
 - [ADR-LAWS](0001_LAWS.md) — the numbering this record hangs from
-- [ADR-DECODE](0049_decode.md) — the consumer seam, whose §1 premise this amendment falsified and which was corrected in the same change
-- [ADR-RERANK](0048_rerank.md) — the determinism refusal that is now the only guard against a query-time model
+- [ADR-DECODE](0139_decode.md) — the consumer seam, whose §1 premise this amendment falsified and which was corrected in the same change
+- [ADR-RERANK](0138_rerank.md) — the determinism refusal that is now the only guard against a query-time model
 - The supply-chain case for a small dependency tree: Ohm et al., *Backstabber's Knife Collection: A Review of Open Source Software Supply Chain Attacks* (DIMVA 2020) — https://arxiv.org/abs/2005.09535
 
 ### Veto condition

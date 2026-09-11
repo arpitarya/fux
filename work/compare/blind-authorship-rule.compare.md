@@ -21,7 +21,7 @@ timestamp: 2026-08-24T00:00:00Z
 > **placeholder**, taken from two author samples, and is labelled one everywhere
 > it appears.
 >
-> **Where it now lives.** [ADR-RS](../../docs/adr/0043_predictions.md)
+> **Where it now lives.** [ADR-RS](../../docs/adr/0133_predictions.md)
 > decisions 11-15 · [`CLAUDE.md`](../../CLAUDE.md) §Conformance runs ·
 > [`work/regression/README.md`](../regression/README.md) per-run contract row 7
 > · checked by [`tests/test_regression_runs.py`](../../tests/test_regression_runs.py)

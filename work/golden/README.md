@@ -31,6 +31,16 @@ subagent — not to check the format, not to count lines, not by `grep -r`.
 
 ⚠ **Back the key up yourself.** It is gitignored, so git will not keep it.
 
+### Where the key lives — Arpit decides, every time (2026-09-11)
+
+- **No agent puts the key in this directory by default.** Every agent that would
+  create, read or change the key — Codex in phases 1, 3 and 5 — **first asks Arpit**:
+  *(1) the file `golden-answer/answers.jsonl`, or (2) the chat?* — and waits.
+- **(1) file:** the agent reads or writes `golden-answer/answers.jsonl`.
+- **(2) chat:** the agent writes **no** key file; Arpit pastes the key in, and the
+  agent hands any new or updated key back in the chat for him to store.
+- Claude never uses the key either way, so Claude's prompts carry no such question.
+
 ---
 
 ## Layout
@@ -39,7 +49,7 @@ subagent — not to check the format, not to count lines, not by `grep -r`.
 work/golden/
   README.md                 this file — the process
   seed/                     the 10 seed documents (Codex writes; Claude may read)
-  golden-answer/answers.jsonl   🔒 questions + answers (Arpit / Codex / ChatGPT only)
+  golden-answer/answers.jsonl   🔒 questions + answers — ONLY if Arpit chose "file" (see Where the key lives)
   questions.jsonl           released by Codex AFTER the ladder is frozen — ids + text only
   ladder/rung-NNNNN.sha256      frozen manifests: which files make each rung, by hash
   ladder/rung-NNNNN.index       the engine version and index root hash each rung was built with
@@ -86,7 +96,7 @@ waits on 10 000.
 
 | phase | who | reads | writes | prompt |
 |---|---|---|---|---|
-| **1. Seed** | Codex | nothing from fux | `seed/` (10 docs) + `golden-answer/answers.jsonl` | [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md) |
+| **1. Seed** | Codex | nothing from fux | `seed/` (10 docs) + the key, **where Arpit says** | [`prompts/1-codex-seed.md`](prompts/1-codex-seed.md) |
 | **2. Extend** | Claude Code | `seed/` **only** | corpus in fux-benchmark + `ladder/*.sha256` | [`prompts/2-claude-extend.md`](prompts/2-claude-extend.md) |
 | **3. Freeze & release** | Codex | the manifests + the key | `questions.jsonl`; marks the sealed subset in the key | [`prompts/3-codex-release.md`](prompts/3-codex-release.md) |
 | **4. Run** | Claude Code | the ladder + `questions.jsonl` | `predictions.jsonl` per rung | [`prompts/4-claude-run.md`](prompts/4-claude-run.md) |
@@ -196,7 +206,7 @@ until he reopens it; *"and so on"* past 10 000 is a separate, later decision.
 
 - **Pre-register first**, per run: `work/regression/<date>-golden-rung-NNNNN/PRE-REGISTRATION.md`
   — engine sha, rung, metrics with `k` named, and the headroom disclosure ADR-RS
-  requires ([ADR-RS](../../docs/adr/0043_predictions.md) decision 22, which is where
+  requires ([ADR-RS](../../docs/adr/0133_predictions.md) decision 22, which is where
   W-135 landed on 2026-09-11). Commit it before any number.
 - **Use the rung's own index — do not re-ingest.** Check the engine version
   matches `ladder/rung-NNNNN.index`; if it does not, re-ingest that rung once, update

@@ -126,7 +126,7 @@ on 2026-09-06 at Arpit's ruling.
 
 ### Alternatives considered
 
-- **Leave it as [ADR-QUALITY](0051_quality-contract.md) decision 11.** Rejected: a decision is a thing an ADR is designed to supersede, and a durable use record already existed with live pressure to grow it.
+- **Leave it as [ADR-QUALITY](0141_quality-contract.md) decision 11.** Rejected: a decision is a thing an ADR is designed to supersede, and a durable use record already existed with live pressure to grow it.
 - **Keep the first form** (hashed, bounded, never on stdout or the network). Rejected by Arpit the same day: it made a readable log and a provenance receipt illegal, neither of which was the target.
 - **Keep the transmission clause.** Put to Arpit directly and declined — *"L8 is only about commits."*
 
@@ -134,8 +134,8 @@ on 2026-09-06 at Arpit's ruling.
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
 - [`src/fux/maintain/lastcited.py`](../../src/fux/maintain/lastcited.py) — the first durable use record
-- [ADR-PROVENANCE](0053_provenance.md) — the second, and the record the reversal produced
-- [ADR-DOTFUX](0012_fux-directory.md) — the committed/derived/acquired split this law's test depends on
+- [ADR-PROVENANCE](0143_provenance.md) — the second, and the record the reversal produced
+- [ADR-DOTFUX](0102_fux-directory.md) — the committed/derived/acquired split this law's test depends on
 - **The grounding — the AOL search-log release (2006).** 20 million queries, usernames replaced by numbers, one user identified *from the queries alone*: Barbaro & Zeller, *A Face Is Exposed for AOL Searcher No. 4417749*, NYT, 9 August 2006 — https://www.nytimes.com/2006/08/09/technology/09aol.html
 
 ### Veto condition

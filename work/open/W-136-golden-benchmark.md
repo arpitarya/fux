@@ -20,13 +20,13 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
 | 1. Seed + answer key | Codex | `arpit` — run prompt 1 | ⏳ **next** |
 | 2. Extend 10 → 10 000, blind | Claude Code (Opus) | `agent` | waits on 1 |
 | 3. Freeze ladder, release questions | Codex | `arpit` — run prompt 3 | waits on 2 |
-| 4. Run each rung | Claude Code | `agent` | waits on 3 · pre-registered, and reported under [ADR-RS](../../docs/adr/0043_predictions.md) decision 22 (where W-135 landed) |
+| 4. Run each rung | Claude Code | `agent` | waits on 3 · pre-registered, and reported under [ADR-RS](../../docs/adr/0133_predictions.md) decision 22 (where W-135 landed) |
 | 5. Score each rung | Codex | `arpit` — run prompt 5 | waits on 4 |
 
 ## Done in the filing change (2026-09-11)
 
-- `work/golden/` scaffold, the process README, five prompts, a placeholder
-  `golden-answer/answers.jsonl`.
+- `work/golden/` scaffold, the process README and five prompts. **No key file** —
+  where the key lives is Arpit's call each run (below).
 - Guards: `.gitignore`, `!work/golden` in `.fux/sources/dirs`, Claude Code
   `permissions.deny` + `.claude/hooks/guard-golden-answer.sh`, CLAUDE.md §Golden
   answer key.
@@ -39,6 +39,12 @@ once; this file carries only state. Prompts: [`work/golden/prompts/`](../golden/
   thread, `.html` wiki export; big and small; professional and amateur; multi-editor.
 - Claude wrote the company, cast and roster; **Codex invents every fact.**
   Spec: [`prompts/1-codex-seed.md`](../golden/prompts/1-codex-seed.md).
+
+## Where the key lives (Arpit, 2026-09-11)
+
+- **Never in the directory by default.** Codex asks in phases 1, 3 and 5: *(1) the
+  file `golden-answer/answers.jsonl`, or (2) the chat?* — and waits. The placeholder
+  file was removed.
 
 ## Decisions taken with defaults — Arpit may override
 

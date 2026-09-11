@@ -85,7 +85,7 @@ produces: same ids, order, locs, headings, band; scores equal after
       fails the arm. (b) tolerates a difference in the printed score, never a
       different ranking.
 - [x] Decision recorded in
-      **[ADR-RANKING decision 8a](../../docs/adr/0021_ranking.md)** — the sort
+      **[ADR-RANKING decision 8a](../../docs/adr/0111_ranking.md)** — the sort
       key's resolution is the cross-runtime contract for the score, the order
       is byte-equal, and a divergence above `~1e-9` relative on any platform
       pair voids it.

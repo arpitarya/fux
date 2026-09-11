@@ -113,8 +113,8 @@ on 2026-09-06 at Arpit's ruling.
 ### Reference (required)
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
-- [ADR-RECORD](0019_index-record.md) — `title_h`, and rule 2 on 16-hex tokens
-- [ADR-ASK](0013_ask.md) decision 8 — hashed records yield no headings, by construction
+- [ADR-RECORD](0109_index-record.md) — `title_h`, and rule 2 on 16-hex tokens
+- [ADR-ASK](0103_ask.md) decision 8 — hashed records yield no headings, by construction
 - The AOL 2006 search-log release — the concrete case that a hashed key is not anonymity when statistics travel with it: https://www.nytimes.com/2006/08/09/technology/09aol.html
 
 ### Veto condition

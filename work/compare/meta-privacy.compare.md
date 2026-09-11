@@ -132,7 +132,7 @@ sources. It changes what `hashed` *costs* a reader.
 **Ruled: no — outside L2 entirely.** Not "`hashed` implies `snapshot`", and
 not a new named exception either.
 
-Grounding: [ADR-CACHE](../../docs/adr/0041_cache.md) (written two days
+Grounding: [ADR-CACHE](../../docs/adr/0131_cache.md) (written two days
 earlier, same author, same reasoning target) already ruled that ARC and the
 TTL fetch cache — gitignored, per-machine, never committed — sit outside
 L2's scope: *"L2 forbids durable content; this store is deliberately the
@@ -192,7 +192,7 @@ found `loc` is the literal fetch address the refer plane calls
 (`fetcher(loc)` in `refer/source.py`, no other route exists for a fresh
 clone that never ran ingest) and it is already committed in plaintext via a
 second, independent path — the full URL list at `.fux/sources/url`
-([ADR-URL-LIST](../../docs/adr/0026_url-list.md)). Hashing or dropping `loc`
+([ADR-URL-LIST](../../docs/adr/0116_url-list.md)). Hashing or dropping `loc`
 in the `M/` record would cost the refer plane's only way to fetch a hashed
 document, for **zero** added privacy (the URL is already readable one file
 over). `loc`/`id` are unchanged. This is stated here as a finding, not a

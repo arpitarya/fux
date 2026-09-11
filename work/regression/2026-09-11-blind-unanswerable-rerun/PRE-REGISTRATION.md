@@ -52,7 +52,7 @@ count agreeing with ground truth (`answerable: false`).
 **Pairing.** The **same 20 ids** against the 2026-08-28 values, which are frozen
 in that run's `evidence/per-query.csv`. Both arms are the same queries and the
 same ground truth, so this is a **paired** comparison and only the ids that
-**flip** carry information ([ADR-RS](../../../docs/adr/0043_predictions.md)
+**flip** carry information ([ADR-RS](../../../docs/adr/0133_predictions.md)
 decision 19).
 
 **How a difference is read, decided now rather than after:**
@@ -65,7 +65,7 @@ decision 19).
 
 ## Headroom, declared in advance
 
-[ADR-RS](../../../docs/adr/0043_predictions.md) decision 22, ratified
+[ADR-RS](../../../docs/adr/0133_predictions.md) decision 22, ratified
 2026-09-11. Both directions are computable from the frozen 2026-08-28 rows
 before this run produces anything:
 

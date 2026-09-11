@@ -1,1 +1,1 @@
-✓ 8 items closed (W-132 W-118 W-135 W-113 W-134 W-133 W-116 + `fux doctor`) + ADR-DOCTOR · 🔴 inbox 2: abstention re-run + the four-priors instrument · → next: W-122, the heading control, W-97 T1 — none blocked
+✓ W-137 — the ADR renumber landed: laws own 0001–0100, every other record 0101+ (54 moved). → W-122 next, unblocked.

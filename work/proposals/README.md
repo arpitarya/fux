@@ -152,7 +152,7 @@ re-derives its claims first.
   three index-and-refer decisions, and the corpus they *cannot* reach names
   Fux's wedge. **The evidence base the refer-plane proposals cited.**
   *(Both of those graduated and were archived 2026-08-20 when M4's core landed;
-  their live successor is [ADR-REFER](../../docs/adr/0037_refer-plane.md). One
+  their live successor is [ADR-REFER](../../docs/adr/0127_refer-plane.md). One
   shipped with its central knob deliberately refused — the reasoning is in the
   record and the open question is
   [W-58](../../archive/open/W-58-no-recorded-ingest-time.md).)*
@@ -180,7 +180,7 @@ gives them their substrate natively.
   ask questions of past knowledge. A natural fit for the one-root-hash keyspace.
 
 *(The third survivor, **audit evidence trail**, graduated 2026-08-27 into
-[ADR-PROVENANCE](../../docs/adr/0053_provenance.md) and was **archived
+[ADR-PROVENANCE](../../docs/adr/0143_provenance.md) and was **archived
 2026-09-05** — see below. The fourth idea from that ideation, the
 **product-memory corpus**, graduated into the v0.26 plan; its successor concept
 is the committed index + ledger of the current architecture.)*
@@ -196,12 +196,12 @@ backing a live claim.
 
 | left | when | why, and the live successor |
 |---|---|---|
-| [`audit-evidence-trail.md`](../../archive/proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27 → [ADR-PROVENANCE](../../docs/adr/0053_provenance.md)**; `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify` all shipped. It then sat here nine days against this file's own lifecycle rule — **the move was late, the decision never changed.** ⚠ Its graduation trigger, *an enterprise design partner materializes*, **never fired and could not**: it waited on somebody else's arrival rather than naming a condition anyone here could check |
+| [`audit-evidence-trail.md`](../../archive/proposals/audit-evidence-trail.md) | 2026-09-05 | **Graduated 2026-08-27 → [ADR-PROVENANCE](../../docs/adr/0143_provenance.md)**; `fux answer --audit`, `--receipt`, `--journal`, `ask --why` and `fux verify` all shipped. It then sat here nine days against this file's own lifecycle rule — **the move was late, the decision never changed.** ⚠ Its graduation trigger, *an enterprise design partner materializes*, **never fired and could not**: it waited on somebody else's arrival rather than naming a condition anyone here could check |
 | [`node-search-port.md`](../../archive/proposals/node-search-port.md) · [`agent-run-embeddings.md`](../../archive/proposals/agent-run-embeddings.md) · [`retrieval-quality-per-verb.md`](../../archive/proposals/retrieval-quality-per-verb.md) | 2026-09-05 | **Superseded 2026-09-04** by [`search-v3.md`](search-v3.md), which folded all three in whole. Live successors: **W-107**, **W-112**, and **W-108 … W-111**. ⚠ `search-v3.md` said they were *"deleted in the same change"* — **they never were**, and they sat here unindexed for two days |
-| [`tune-file-and-source-priority.md`](../../archive/proposals/tune-file-and-source-priority.md) | 2026-08-27 | Graduated 2026-08-22 → [ADR-TUNE](../../docs/adr/0045_tuning.md); kept for the survey and its ten forks as they were put |
+| [`tune-file-and-source-priority.md`](../../archive/proposals/tune-file-and-source-priority.md) | 2026-08-27 | Graduated 2026-08-22 → [ADR-TUNE](../../docs/adr/0135_tuning.md); kept for the survey and its ten forks as they were put |
 | [`playground-goldens-draft.md`](../../archive/proposals/playground-goldens-draft.md) | 2026-08-27 | Graduated 2026-08-24 when Arpit waived the human-author rule and the 50 candidates were installed; the run is [`../regression/2026-08-24-rerank-and-goldens/`](../regression/2026-08-24-rerank-and-goldens/report.md) |
-| [`answer-provenance.md`](../../archive/proposals/answer-provenance.md) | 2026-08-27 | Graduated same-day → [ADR-PROVENANCE](../../docs/adr/0053_provenance.md), built and green. Kept for the prior-art table and **five open forks**, of which fork 1 — always-on journalling as an ADR-TUNE key — is the one a session will be tempted to default |
-| [`consumer-intent-policy.md`](../../archive/proposals/consumer-intent-policy.md) | 2026-08-22 | Became [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md), accepted **and built**: `fux setup` installs the four renderings, which live at [`src/fux/templates/agents/`](../../src/fux/templates/agents/) |
+| [`answer-provenance.md`](../../archive/proposals/answer-provenance.md) | 2026-08-27 | Graduated same-day → [ADR-PROVENANCE](../../docs/adr/0143_provenance.md), built and green. Kept for the prior-art table and **five open forks**, of which fork 1 — always-on journalling as an ADR-TUNE key — is the one a session will be tempted to default |
+| [`consumer-intent-policy.md`](../../archive/proposals/consumer-intent-policy.md) | 2026-08-22 | Became [ADR-AGENT-POLICY](../../docs/adr/0132_agent-policy.md), accepted **and built**: `fux setup` installs the four renderings, which live at [`src/fux/templates/agents/`](../../src/fux/templates/agents/) |
 | [`process-diet.md`](../../archive/proposals/process-diet.md) | 2026-08-21 | Graduated same-session (PRIORITY P7); the `Cost:` line is gone from the WORKLOG format |
 
 **v0.26-era proposals** (tied to the archived substrate engine) are at

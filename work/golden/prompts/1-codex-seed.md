@@ -15,8 +15,14 @@ a vague or leaky question set cannot be repaired later without a new key.
 ---
 
 You are building a sealed retrieval benchmark. Read `work/golden/README.md`
-sections *The one rule* and *The answer file format*. Do not read any other file
-in this repo.
+sections *The one rule*, *Where the key lives* and *The answer file format*. Do not
+read any other file in this repo.
+
+**Before anything else, stop and ask Arpit this, exactly, and wait for his answer:**
+
+> *"Where should the answer key go — (1) the file `work/golden/golden-answer/answers.jsonl`, or (2) here in the chat, so you can store it yourself?"*
+
+Do not assume either. Do not create, open or write that file until he answers **(1)**.
 
 ## The company — Quillfern Cold Logistics Pvt. Ltd. (fictional)
 
@@ -70,9 +76,13 @@ mixed date formats; undefined acronyms; a paragraph copy-pasted between two
 documents; a topic mentioned in passing in one document and answered in another;
 at least one fact that needs two documents together.
 
-## The questions → `work/golden/golden-answer/answers.jsonl`
+## The questions → where Arpit said
 
-Replace the placeholder line. About **100** questions, one JSON object per line,
+- **(1) file:** write `work/golden/golden-answer/answers.jsonl` (create it).
+- **(2) chat:** write **no** file; give him the complete JSON Lines in one fenced
+  block in your final message, and nothing of the key anywhere on disk.
+
+About **100** questions, one JSON object per line,
 exactly the README's *answer file format*. Type mix (±5 points): `lookup` 30 %,
 `paraphrase` 20 %, `multi-doc` 20 %, `temporal` 15 %, `unanswerable` 10 %,
 `negation` 5 %.
@@ -93,6 +103,8 @@ exactly the README's *answer file format*. Type mix (±5 points): `lookup` 30 %,
 - Every path in `relevant` / `primary` / `evidence` exists; every quote appears
   verbatim in its file; ids unique `g001`…; type shares within ±5 points; the ten
   files hit their formats and size ranges.
-- **Print only** the counts per type, the word count per file, and `OK`.
-- **Never** put a question, answer or quote in any file outside
-  `work/golden/golden-answer/`, or in your final message.
+- **(1) file:** print only the counts per type, the word count per file, and `OK`.
+- **(2) chat:** print the counts, the word counts, `OK`, then the key in one fenced
+  block — and confirm no key file exists on disk.
+- **Never** put a question, answer or quote in any file other than the answer key,
+  and never in `seed/`.

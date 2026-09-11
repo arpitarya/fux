@@ -14,7 +14,6 @@ archive/v0.26/uv.lock                                                           
 docs/adr/RULE-SINCE                                                                        # not an indexed file type
 tools/vector-gate/embed_node.mjs                                                           # not an indexed file type
 work/golden/README.md                                                                      # excluded by !work/golden
-work/golden/golden-answer/answers.jsonl                                                    # excluded by !work/golden
 work/golden/prompts/1-codex-seed.md                                                        # excluded by !work/golden
 work/golden/prompts/2-claude-extend.md                                                     # excluded by !work/golden
 work/golden/prompts/3-codex-release.md                                                     # excluded by !work/golden

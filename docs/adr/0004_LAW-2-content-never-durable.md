@@ -119,9 +119,9 @@ on 2026-09-06 at Arpit's ruling.
 ### Reference (required)
 
 - `CLAUDE.md` §Non-negotiable constraints — the normative text. Repo path: [`../../CLAUDE.md`](../../CLAUDE.md)
-- [ADR-RECORD](0019_index-record.md) — the committed-plane admission test
-- [ADR-REFER](0037_refer-plane.md) — passages, derived at query time and never written
-- [ADR-ACQUIRED](0057_acquired-plane.md) — the third kind, and why the blob sha stays off the committed record
+- [ADR-RECORD](0109_index-record.md) — the committed-plane admission test
+- [ADR-REFER](0127_refer-plane.md) — passages, derived at query time and never written
+- [ADR-ACQUIRED](0147_acquired-plane.md) — the third kind, and why the blob sha stays off the committed record
 
 ### Veto condition
 

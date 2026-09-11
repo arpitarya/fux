@@ -9,7 +9,7 @@ timestamp: 2026-08-28T00:00:00Z
 
 **Asked by Arpit, 2026-08-28 (Cowork):** benchmark version one of fux against
 the latest. This document is the half that must exist first;
-[ADR-RS](../../docs/adr/0043_predictions.md) is why.
+[ADR-RS](../../docs/adr/0133_predictions.md) is why.
 
 ---
 

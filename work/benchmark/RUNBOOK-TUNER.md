@@ -225,7 +225,7 @@ python3 bin/latency.py --run T --tier t10000 --queries 240 --repeats 5 --arms ba
       Arpit, and it names ADR-TUNE as where a change would be recorded.
 - [ ] T5's headroom table, every endpoint, every grid value — **per direction
       and labelled observed / proven / unproven**, per
-      [ADR-RS](../../docs/adr/0043_predictions.md) decision 22.
+      [ADR-RS](../../docs/adr/0133_predictions.md) decision 22.
 - [ ] Post-hoc observations (a grid value that "would have passed") **labelled
       post-hoc, outside every verdict**.
 - [ ] The deck (README rule 4): the three-leg diagram, one dose–response chart

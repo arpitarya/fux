@@ -93,7 +93,7 @@ column matches every row.
 
 ## Outcome
 
-[ADR-TABULAR](../../adr/0062_tabular.md) — one passage per row, and
+[ADR-TABULAR](../../adr/0152_tabular.md) — one passage per row, and
 `[decode] max_table_rows` raised 500 → 20 000. The latency was ruled acceptable
 by Arpit with the numbers above in hand, over the alternative of degrading to
 bands past a row threshold.

@@ -16,7 +16,7 @@ definition of done. The one judgment call (what the corpus is) is fixed below.
 ## Why
 
 - The four-priors remeasure, W-97's veto leg and W-87 Part B all need the
-  **hand-graded** playground, graded **per query** ([ADR-RS](../../docs/adr/0043_predictions.md) decision 15).
+  **hand-graded** playground, graded **per query** ([ADR-RS](../../docs/adr/0133_predictions.md) decision 15).
 - **Arpit, 2026-09-11 (R-11): repair, then go ahead.** Done in `fux-playground` `3b4d275`:
   `.fux/sources/dirs` lists `docs` again, the 50 goldens and 20 unanswerable
   questions are saved, the unreadable `fux.index.v1` shards are gone.
@@ -25,7 +25,7 @@ definition of done. The one judgment call (what the corpus is) is fixed below.
 
 1. **Templates current, corpus untouched.** Bring fux's files up to date through its
    install path (write-if-missing) — this must add `.fux/pii.toml`, which ingest
-   requires ([ADR-PII](../../docs/adr/0060_pii.md) decision 17). 🔴 **`.fux/sources/dirs`
+   requires ([ADR-PII](../../docs/adr/0150_pii.md) decision 17). 🔴 **`.fux/sources/dirs`
    must still list exactly `docs` afterwards** — a template overwrite is what emptied it.
 2. **The corpus is `docs/` — the ten documents — and nothing else.**
    ⚠ `.fux/sources/urls` holds a OneDrive share link with `fetch=cdp`. **It must not

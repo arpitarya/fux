@@ -82,7 +82,7 @@ weights**:
 wlen = 3.0 * len(heading_tokens) + 1.0 * len(body_tokens)
 ```
 
-[ADR-TUNE](../../docs/adr/0045_tuning.md) decision 6 already names this as its
+[ADR-TUNE](../../docs/adr/0135_tuning.md) decision 6 already names this as its
 own violation — *no committed field may be a function of a tunable* — and
 proposes the remedy *"commit the two token counts and derive `wlen` at query
 time when the format next moves"*. **This is that move**, and Arpit's fork B
