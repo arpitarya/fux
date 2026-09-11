@@ -29,6 +29,11 @@ green legs** — gain on the suite that isolates it (fresh seed, `p < 0.05`,
 `b > c`), **zero broken hand-graded goldens**, and an affordable cost — and
 what is it? Hand Arpit that table. **Do not recommend.**
 
+**Headroom (ADR-RS decision 22, ratified 2026-09-11).** This run's report states,
+per endpoint and **per direction**, how many queries could have changed, labelled
+observed / proven / unproven. **0 headroom in a direction is Inconclusive, not
+*no detected change*.** Written under the rule, not retrofitted to it.
+
 ## Definition of done
 
 - [x] **`bench.py quality --tune TABLE.KEY=VALUE`, repeatable — landed

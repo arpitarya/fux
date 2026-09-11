@@ -29,6 +29,11 @@ since 2026-08-28 and classifying authorship without adjudicating a gate is not.
   the numbers that exposed the problem is the moving-threshold failure. Do not tune
   `separation_floor` or any `[confidence]` key.
 
+**Headroom (ADR-RS decision 22, ratified 2026-09-11).** This run's report states,
+per endpoint and **per direction**, how many queries could have changed, labelled
+observed / proven / unproven. **0 headroom in a direction is Inconclusive, not
+*no detected change*.** Written under the rule, not retrofitted to it.
+
 ## Definition of done
 
 1. **Pre-register before the first number:** `work/regression/<date>-blind-unanswerable-rerun/PRE-REGISTRATION.md`

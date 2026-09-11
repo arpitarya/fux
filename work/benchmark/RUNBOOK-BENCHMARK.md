@@ -299,6 +299,12 @@ tables.
 - [ ] `VERDICT.md` for the primary endpoint and `VERDICT-<id>.md` for every
       other — `type: Verdict`, `verdict: PASS|FAIL|INCONCLUSIVE`, `prediction:`,
       `pre_registration:` path. **Predicted vs measured, in the file.**
+- [ ] **Headroom, per endpoint and per direction** — improvement (queries not
+      right in **both** arms) and regression (not wrong in both), each labelled
+      **observed**, **proven** or **unproven**. Computed from the rows already
+      filed; **0 in a direction makes that null Inconclusive.** The rule is
+      [ADR-RS](../../docs/adr/0043_predictions.md) decision 22; do not restate it
+      here.
 - [ ] **Deviations from the pre-registration, listed in the report**, numbered,
       never absorbed.
 - [ ] A row in [`../regression/README.md`](../regression/README.md).

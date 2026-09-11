@@ -378,3 +378,115 @@ def test_a_conforming_report_satisfies_both_checks(tmp_path: Path) -> None:
     assert needs_classification(run)
     assert str(meta.get("classification")).strip().lower() in CLASSIFICATIONS
     assert AUTHORSHIP_HEADING.search((run / "report.md").read_text(encoding="utf-8"))
+
+
+# --------------------------------------------------------------------------
+# headroom — ADR-RS decision 22, ratified by Arpit 2026-09-11
+
+
+#: Baselined on the ruling's own day, unlike `ROWS_SINCE`, and the difference
+#: is not an inconsistency. Rows needed a harness that did not exist yet; a
+#: headroom line needs only the rows a run already files, so there is nothing
+#: to build and no run that could have complied but could not. Every run filed
+#: before today is exempt because the rule did not exist, and **no frozen
+#: report is edited** -- decision 22's closing paragraph.
+HEADROOM_SINCE = "2026-09-11"
+
+#: A run that compares nothing has no headroom to report. It says so in its own
+#: report, the same read-the-declaration pattern `NO_QUERIES` uses, rather than
+#: being guessed at from its contents.
+NOT_PAIRED = "not a paired run"
+
+#: The two directions, named. Decision 22b: a report never prints a bare
+#: "headroom" -- a single number answers neither question.
+HEADROOM_DIRECTIONS = ("improvement", "regression")
+
+
+def needs_headroom(run: Path) -> bool:
+    if run.name[:10] < HEADROOM_SINCE:
+        return False
+    report = report_of(run)
+    if report is None or is_pre_registered_only(run):
+        return False
+    # whitespace-normalised: markdown wraps, and a declaration that failed to
+    # match because the author's editor broke the line would be a gate firing
+    # on formatting. `NO_QUERIES` is matched raw, as its own rule has always
+    # done -- widening that one is not this decision's to do.
+    raw = report.read_text(encoding="utf-8").lower()
+    flat = " ".join(raw.split())
+    return not (is_surface_capture(report) or NO_QUERIES in raw or NOT_PAIRED in flat)
+
+
+def headroom_runs() -> list[Path]:
+    return [r for r in runs() if needs_headroom(r)]
+
+
+@pytest.mark.parametrize("run", headroom_runs(), ids=lambda p: p.name)
+def test_a_paired_run_discloses_its_headroom_in_both_directions(run: Path) -> None:
+    """ADR-RS decision 22a/22b — how many queries COULD have changed, per direction.
+
+    A null is only as informative as the number of queries that could have
+    moved, and the grounding run has all three cases in one table: 94
+    could-change on proximity (a real null), 0 on a saturated marker endpoint,
+    and 0 on a `heading` control that "passed" while testing nothing.
+
+    ⚠ **This asserts the DISCLOSURE, never the numbers.** Re-deriving headroom
+    from rows needs each run's arm structure, which no check knows in advance --
+    and shipping an approximation that passes is the moving-threshold failure in
+    another costume (decision 21b is the same shape, recorded rather than
+    patched). A reader still has to check that a null was not called on a zero;
+    that is veto condition 12, and it is deliberately unmechanised.
+    """
+    text = report_of(run).read_text(encoding="utf-8").lower()
+    assert "headroom" in text, (
+        f"{run.name}: no headroom disclosure in the report. ADR-RS decision 22, ratified "
+        "by Arpit 2026-09-11 -- every paired run states, per endpoint, the score in each "
+        "arm and how many queries COULD have changed. It is computed from the per-query "
+        "rows the run already files; there is nothing extra to measure. If this run "
+        f"compares nothing, say {NOT_PAIRED!r} in its report and this rule does not apply."
+    )
+    missing = [d for d in HEADROOM_DIRECTIONS if d not in text]
+    assert not missing, (
+        f"{run.name}: the report names headroom but not its direction(s) "
+        f"({', '.join(missing)}). ADR-RS decision 22b -- improvement headroom is the "
+        "queries not right in BOTH arms, regression headroom the queries not wrong in "
+        "both. They are different questions and one number answers neither."
+    )
+
+
+def test_the_headroom_rule_is_baselined_and_edits_no_frozen_report() -> None:
+    """Guard the RULE, not only the runs — an empty parametrisation is silent.
+
+    Every run on record predates the ruling, so the baseline must exempt all of
+    them; if someone moves it back to "improve coverage", this fails instead of
+    the suite quietly going red on evidence that may never be edited.
+    """
+    earlier = [r for r in runs() if r.name[:10] < HEADROOM_SINCE]
+    assert earlier, "the baseline has drifted past every run it was written to exempt"
+    assert all(not needs_headroom(r) for r in earlier)
+
+
+def test_a_run_that_compares_nothing_is_out_of_scope(tmp_path: Path) -> None:
+    """The escape is a declaration in the report, not a guess about its shape."""
+    run = _write_run(
+        tmp_path,
+        "2026-09-12-capture",
+        f"---\ntype: Report\n---\n\nThis is {NOT_PAIRED}; one arm, no comparison.\n",
+    )
+    assert not needs_headroom(run)
+
+
+def test_a_conforming_paired_report_passes(tmp_path: Path) -> None:
+    """The gate has to be passable, or it is a wall."""
+    run = _write_run(
+        tmp_path,
+        "2026-09-12-paired",
+        "---\ntype: Report\n---\n\n"
+        "| endpoint | A | B | improvement headroom | regression headroom |\n"
+        "|---|---|---|---|---|\n"
+        "| hit@5 | 28/50 | 32/50 | 22 (proven) | 28 (proven) |\n",
+    )
+    assert needs_headroom(run)
+    text = report_of(run).read_text(encoding="utf-8").lower()
+    assert "headroom" in text
+    assert all(d in text for d in HEADROOM_DIRECTIONS)

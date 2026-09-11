@@ -222,6 +222,17 @@ golden is written by reading the corpus and **never** derived from what fux
 returned — the TREC `qrels` discipline. See
 [SETUP-PLAYGROUND](../work/setup/fux-playground.md).
 
+**Headroom** — On a paired run, **how many queries could have changed** — the
+number a null result is only as informative as. Reported per endpoint and
+**per direction**: *improvement headroom* is the queries not right in **both**
+arms, *regression headroom* the queries not wrong in both. **Observed** when
+counted from the per-query rows; **proven** only when a feature-off/on arm or a
+generator `--selftest` shows those queries are actually separable by the
+property under test, and **unproven** otherwise — unproven is disclosed, never
+treated as zero. **Zero headroom in a direction makes a null *Inconclusive*, not
+*no detected change*.** There is deliberately no minimum. See
+[ADR-RS](adr/0043_predictions.md) decision 22.
+
 **Hashed meta (`meta = hashed`)** — The **default** for every non-git source:
 `M/` stores term and phrase *hashes*, never readable text. Closes the
 ACL-mismatch leak where a repo-cloner without source access could read

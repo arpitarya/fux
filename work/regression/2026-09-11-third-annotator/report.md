@@ -30,7 +30,9 @@ brief annotators 1 and 2 received is not filed. It was: *the document contains
 information a person asking this question would use to answer it; merely mentioning
 the topic does not count.*
 
-## The tie rule — fixed before annotator 3's output was read
+## The tie rule
+
+⚠ **Majority of three was proposed to Arpit before the run; the *not in dispute* clause below was written after annotator 3's output was read.** It changes nothing about the 10 disputed documents — it only keeps annotator 3's four solo additions out.
 
 - **A document is in dispute** when exactly one of annotators 1 and 2 included it.
 - **Annotator 3 decides each disputed document** — 2 of 3 votes.
@@ -73,4 +75,6 @@ resolved here and is not a reason to move the rule after the fact.
 ## What this run may never be used to say
 
 - It does not grade the engine. No score was computed.
+- **This is not a paired run**, so ADR-RS decision 22's headroom disclosure does
+  not apply: there are no arms, and nothing that could have changed.
 - It does not certify the other 43 sets complete.

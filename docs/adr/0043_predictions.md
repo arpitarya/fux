@@ -691,6 +691,72 @@ its *"300/300 identical rows on one corpus"* is the half that does the work.
 measurement — so this is how B9 is to be READ, and it is why a null control's
 design belongs in the pre-registration rather than in its write-up.
 
+**22. HEADROOM IS DISCLOSED ON EVERY PAIRED RUN — per endpoint, per direction,
+observed or proven, with no minimum** (ratified by Arpit, 2026-09-11). A null
+is only as informative as the number of queries that *could* have moved, and
+until this rule a report could state one without ever saying how many that was.
+
+**22a. Always report it, per endpoint.** Every paired run states, for each
+endpoint, the score in each arm **and how many queries could have changed**,
+beside the power figure. It is computed from the per-query rows decision 15
+already requires — **no extra measurement, and nothing new to run.**
+
+**22b. Per direction, and never bare.** The two directions are different
+questions and a single number answers neither:
+
+| direction | headroom is | asks |
+|---|---|---|
+| **improvement** | queries **not right in both** arms | how many could have got better |
+| **regression** | queries **not wrong in both** arms | how many could have got worse |
+
+A report never prints *"headroom"* without naming which. A run reporting only
+one direction has reported one direction, and its verdict may speak only to it.
+
+**22c. Observed vs proven, and the burden is on the author.** The count from
+rows is **observed**. It may be called **proven** only when the run carries
+
+- **(a)** a feature-off/on arm, or a positive control, that actually moves those
+  queries, or
+- **(b)** a generator `--selftest` asserting the candidates are separable only
+  by the property under test.
+
+Otherwise the report labels it **unproven**. ⚠ **Unproven is disclosed, not
+voided** — it is not zero, it does not trigger 22d, and a verdict may still rest
+on it while saying what it rests on.
+
+**22d. Zero headroom in a direction → Inconclusive in that direction.** Never
+*"no detected change"*. A null measured where nothing could have moved is the
+absence of a measurement, not the presence of a negative result.
+
+**22e. No minimum, and this is deliberate.** There is no threshold on how much
+headroom is *enough*. Disclosure plus 22d is the entire rule. **A floor here
+would be a pre-registered threshold invented after the fact**, which
+[`CLAUDE.md`](../../CLAUDE.md) §"A pre-registered threshold may never move"
+forbids — and it would be invented from the very runs that exposed the problem.
+
+**Why, and it is one table.** From
+[the 2026-08-28 contested-benchmark run](../../work/regression/2026-08-28-benchmark-contested/report.md) §2:
+
+| endpoint | arms | could-change | what the null actually was |
+|---|---|---|---|
+| proximity | 21.7 % / 21.7 % | **94** | a real null — the treatment had room and did not use it |
+| marker `hit@5` | 120 / 120 | **0** | no information; both arms saturated |
+| `heading` control | 40 / 40 | **0** | ["passed"](../../work/regression/2026-08-28-benchmark-contested/VERDICT-C4.md) while testing nothing |
+
+**The same run is why 22c has a proof clause**: its `rerank_weight` arm moved
+26/120 → 120/120, and *that* is what makes the 94 proven rather than asserted.
+**Difficulty is relative to the capability under test** — a query is easy for X
+if the engine answers it with X switched off — so the off/on arm is the only
+thing that can establish separability from the outside.
+
+⚠ **It applies FORWARD and no filed run is re-graded.** Enforced by
+`tests/test_regression_runs.py` for runs dated on or after **2026-09-11**,
+baselined by date exactly like decision 15's rows rule, with the same
+exempt/applies pair guarding the baseline itself. **No frozen report is edited**
+— that is how the classification rule was landed and it is the only way a
+measurement discipline can tighten without rewriting its own evidence.
+
+
 ### Consequences
 
 - **The prediction system is guardable.** A change to the discipline updates
@@ -795,6 +861,15 @@ design belongs in the pre-registration rather than in its write-up.
     were withdrawn for, in a different costume.
 11. **A `pre_registration:` line is edited to survive a deletion**, or a mirrored
     copy is kept *beside* a live one. Decision 16 allows exactly one shape.
+12. **A filed verdict states *"no detected change"* on an endpoint whose report
+    shows 0 headroom in that direction.** Decision 22d has been read as a
+    formality and the C4 failure has recurred — a control that "passes" by
+    having nothing to move.
+13. **A report prints a bare "headroom"** with no direction named, or calls a
+    count **proven** with neither an off/on arm nor a generator `--selftest`
+    behind it. 22b and 22c have collapsed into "state a number", which is the
+    version of this rule that would have let every run in the grounding table
+    through.
 
 **How to check them:**
 
@@ -807,8 +882,14 @@ grep -rn "^prediction:" work/regression/*/VERDICT.md | sort | uniq -d
 git log --oneline -- 'tools/**/PRE-REGISTRATION*.md'
 # expect: one commit each, before the run that used it
 
-# 3, 8, 11 — the per-run contract, including classification and the mirror rule
+# 3, 8, 11, 13 — the per-run contract: classification, the mirror rule, and
+# the headroom disclosure (decision 22, for runs dated 2026-09-11 or later)
 uv run pytest -q tests/test_regression_runs.py
+
+# 12 — the one half no test can reach: it needs the report's numbers read
+grep -rln "no detected change" work/regression/*/VERDICT.md work/regression/*/report.md
+# then read each one's headroom line. A test can assert the disclosure EXISTS;
+# only a reader can see that a null was called on a zero.
 
 # 4 — the register cross-check
 uv run pytest -q tests/test_prediction_register.py
