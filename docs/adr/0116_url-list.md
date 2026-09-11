@@ -389,6 +389,23 @@ plans for, and a document with pinned enrichment indexes extra `ctx` terms.
 Worth stating, because decision 12 writes `docs archived=false enrich=false`
 and a reader should know which half of that can move a byte.
 
+**Decision 12's line states the REPO's policy, not the engine's** (W-140 row 5,
+2026-09-11). Every generated line states every attribute — and the values came
+from the engine's built-in defaults, so `fux add` wrote `ttl=24h` onto every
+line in a repo whose `[sources.url]` said `7d`.
+
+- 🔴 **The middle layer of a three-layer resolution was dead for every
+  CLI-written line.** `[sources.url] ttl|keep|enrich|update|meta|fetcher` exists
+  so a whole intranet is configured in one place; `fux add` silently overrode it
+  on the way in, document by document.
+- **Decision 12 is unchanged and that is the point.** The line still states
+  everything, still holds no implicit state, and a policy change is still a
+  one-word diff. What changed is *which word* — the consumer's, resolved before
+  the line is rendered, with an explicit flag still beating both.
+- ⚠ **Editing `[sources.url]` later still does not reach an existing line**, and
+  cannot: decision 12 means the line has already spoken. That is the cost of
+  stating everything, and it is now the only cost rather than one of two.
+
 ### Consequences
 
 - **The file is tool-managed, and the writer edits one line rather than

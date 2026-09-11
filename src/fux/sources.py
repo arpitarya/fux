@@ -287,10 +287,61 @@ def _after_preamble(lines: list[str]) -> int:
     return i
 
 
+def _source_defaults(root: Path, spec: sourcelist.ListSpec) -> dict[str, str]:
+    """`[sources.url]`'s policy, in the line grammar's own words.
+
+    Only the keys that are also line attributes, and only for the URL list —
+    `dirs` has no source-wide table to read. A repo with no `[sources.url]`
+    (or an unreadable `fux.toml`) resolves to nothing, so the engine defaults
+    stand exactly as before.
+    """
+    if spec is not sourcelist.URLS:
+        return {}
+    try:
+        url = load(root).url
+    except FuxError:
+        return {}
+    if url is None:
+        return {}
+    # `fetcher` is a PATH and `fetch=` is a stem: `.fux/fetchers/cdp.py` -> `cdp`
+    # (ADR-FETCHER decision 5, one key carrying both).
+    return {
+        "fetch": Path(url.fetcher).stem,
+        "meta": url.meta,
+        "keep": "true" if url.keep else "false",
+        "ttl": url.ttl,
+        "enrich": "true" if url.enrich else "false",
+        "update": url.update,
+    }
+
+
 def add(
-    path: Path, value: str, overrides: dict[str, str], spec: sourcelist.ListSpec
+    path: Path,
+    value: str,
+    overrides: dict[str, str],
+    spec: sourcelist.ListSpec,
+    source_defaults: dict[str, str] | None = None,
 ) -> tuple[str, str, str]:
-    """Add or update one line. Returns `(action, new_line, previous_line)`."""
+    """Add or update one line. Returns `(action, new_line, previous_line)`.
+
+    `source_defaults` is the **source-wide policy** — `[sources.url]`'s
+    `fetcher`, `meta`, `keep`, `ttl`, `enrich` and `update` — resolved by the
+    caller.
+
+    ⚠ **Without it, `fux add` overrode the consumer's own configuration**
+    (W-140 row 5, fixed 2026-09-11). Every generated line states every
+    attribute ([ADR-URL-LIST](../../docs/adr/0116_url-list.md) decision 12),
+    and the values stated came from `spec.defaults()` — **the ENGINE's
+    built-ins**. So a team with `[sources.url] ttl = "7d"` got `ttl=24h`
+    written onto every line `fux add` produced, and the middle layer of a
+    three-layer resolution was dead for every CLI-written line: the layer
+    exists precisely so a whole intranet can be configured in one place.
+
+    **Stating the resolved value keeps decision 12 whole** — the line still
+    holds no implicit state and a change is still a one-word diff — while the
+    word it states is the consumer's policy rather than a default they had
+    already overridden.
+    """
     if spec is sourcelist.TYPES:
         return _add_type(path, value, overrides)
     text = path.read_text(encoding="utf-8") if path.is_file() else ""
@@ -298,7 +349,12 @@ def add(
 
     existing = sourcelist.parse(text, spec, origin=str(path))
     prior = next((e for e in existing if e.value == value and not e.exclude), None)
-    attrs = spec.defaults() | (prior.attrs if prior is not None else {}) | overrides
+    attrs = (
+        spec.defaults()
+        | {k: v for k, v in (source_defaults or {}).items() if k in spec.defaults()}
+        | (prior.attrs if prior is not None else {})
+        | overrides
+    )
     body = sourcelist.render_line(value, attrs, spec)
 
     for i, raw in enumerate(lines):
@@ -557,6 +613,7 @@ def cmd_add(args) -> int:
     if reason is not None:
         raise FuxError(f"{reason}: {entry!r}")
     overrides = _overrides(args, spec)
+    source_defaults = _source_defaults(root, spec)
 
     entries = _read(path, spec)
     if any(e.value == entry and e.exclude for e in entries):
@@ -598,7 +655,7 @@ def cmd_add(args) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     if spec is sourcelist.TYPES and not path.is_file():
         _seed_types(path)
-    action, line, previous = add(path, entry, overrides, spec)
+    action, line, previous = add(path, entry, overrides, spec, source_defaults)
     print(f"{action:9s} {line.strip()}")
     if action == "updated":
         print(f"      was {previous.strip()}")

@@ -493,3 +493,68 @@ def test_listing_an_empty_list_says_so(repo, monkeypatch, capsys):
     (repo / ".fux" / "sources" / "urls").write_text("", encoding="utf-8")
     _add(repo, monkeypatch, _args(None))
     assert "(empty)" in capsys.readouterr().out
+
+
+# -- W-140 row 5: the CLI overrode the consumer's own [sources.url] ----------
+
+
+def test_a_cli_written_line_states_the_repo_policy_not_the_engine_default(tmp_path):
+    """🔴 `fux add` wrote the ENGINE's defaults onto every line.
+
+    Every generated line states every attribute (ADR-URL-LIST decision 12), and
+    the values came from `spec.defaults()` — so a team with
+    `[sources.url] ttl = "7d"` got `ttl=24h` written onto each line, and the
+    middle layer of a three-layer resolution was dead for every line the CLI
+    produced. That layer exists so a whole intranet is configured in one place.
+    """
+    from fux.ingest import sourcelist
+    from fux.sources import _source_defaults, add
+
+    (tmp_path / "fux.toml").write_text(
+        "[sources]\n\n[sources.url]\n"
+        'fetcher = ".fux/fetchers/cdp.py"\n'
+        'meta = "plain"\n'
+        'ttl = "7d"\n'
+        "keep = false\n"
+        'update = "never"\n'
+        "max_parallel = 1\n",
+        encoding="utf-8",
+    )
+    listing = tmp_path / ".fux" / "sources" / "urls"
+    listing.parent.mkdir(parents=True)
+    listing.write_text("", encoding="utf-8")
+
+    defaults = _source_defaults(tmp_path, sourcelist.URLS)
+    _, line, _ = add(listing, "https://wiki.test/p", {}, sourcelist.URLS, defaults)
+
+    assert "ttl=7d" in line and "meta=plain" in line
+    assert "fetch=cdp" in line, "the fetcher path's stem is what `fetch=` names"
+    assert "keep=false" in line and "update=never" in line
+
+
+def test_an_explicit_flag_still_beats_the_repo_policy(tmp_path):
+    """Precedence is unchanged: built-in, then [sources.url], then the line."""
+    from fux.ingest import sourcelist
+    from fux.sources import _source_defaults, add
+
+    (tmp_path / "fux.toml").write_text(
+        '[sources]\n\n[sources.url]\nmeta = "plain"\nmax_parallel = 1\n', encoding="utf-8"
+    )
+    listing = tmp_path / ".fux" / "sources" / "urls"
+    listing.parent.mkdir(parents=True)
+    listing.write_text("", encoding="utf-8")
+
+    defaults = _source_defaults(tmp_path, sourcelist.URLS)
+    _, line, _ = add(listing, "https://wiki.test/p", {"meta": "hashed"}, sourcelist.URLS, defaults)
+    assert "meta=hashed" in line
+
+
+def test_a_repo_with_no_sources_url_is_untouched(tmp_path):
+    """No `[sources.url]`, no `fux.toml`, an unreadable one — engine defaults."""
+    from fux.ingest import sourcelist
+    from fux.sources import _source_defaults
+
+    assert _source_defaults(tmp_path, sourcelist.URLS) == {}
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    assert _source_defaults(tmp_path, sourcelist.URLS) == {}
+    assert _source_defaults(tmp_path, sourcelist.DIRS) == {}

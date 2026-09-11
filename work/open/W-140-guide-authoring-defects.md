@@ -28,7 +28,6 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 5 | **`fux add <URL>` writes every attribute**, so `[sources.url]` `fetcher`/`meta`/`keep`/`ttl`/`update` never reach CLI-written lines. **(guide: SOURCES, FETCHER)** | `sources.py` | ADR-URL-LIST d14 |
 | 6 | **`answer` runs with the fetch cache off**: `ttl=` never applies, `cached` is unreachable, `update=never` does not stop the answer-time fetch. | `query/refer_answer.py` ~104 | ADR-URL-FRESHNESS d11/d15 · ADR-REFER d20 · ADR-ACQUIRED |
 | 7 | **`verify` misreports**: a `source: index` receipt and an unreachable URL both give `drifted:corpus`, not `unverifiable`; `--rerun` fetches. **(guide: ANSWER)** | `query/__init__.py` ~994, ~1075 | ADR-PROVENANCE d14 |
 | 11 | **The background runner never rebuilds the accelerator.** | `maintain/runner.py` ~534 | ADR-MAINTENANCE 2a |
@@ -185,6 +184,15 @@ then refresh this repo's renderings.
   prose cannot drift back before the code does.
   [ADR-REFUSAL](../../docs/adr/0148_refusals.md). ⚠ Write-if-missing, so no
   existing repo gets the fix. 2026-09-11.
+
+- **Row 5 — `fux add` overrode the consumer's own `[sources.url]`.** Every
+  generated line states every attribute (decision 12) and the values came from
+  `spec.defaults()`, the **engine's** built-ins — so a repo configured with
+  `ttl = "7d"` got `ttl=24h` written onto every line the CLI produced, and the
+  middle layer of a three-layer resolution was dead for all of them. The line
+  now states the **resolved** value, so decision 12 is whole and the word it
+  states is the consumer's; an explicit flag still beats both.
+  [ADR-URL-LIST](../../docs/adr/0116_url-list.md). 2026-09-11.
 
 ## Definition of done
 

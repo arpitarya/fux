@@ -61,6 +61,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **`fux add <URL>` wrote the engine's defaults over your `[sources.url]`.**
+  Each generated line states every attribute, and the values came from the
+  built-in defaults — so a repo configured with `ttl = "7d"`, `meta = "plain"`
+  or a `cdp` fetcher got `ttl=24h meta=hashed fetch=http` written onto every
+  line `fux add` produced. The line now states the resolved value: built-in,
+  then `[sources.url]`, then an explicit flag
+  ([ADR-URL-LIST](docs/adr/0116_url-list.md)). Existing lines are unchanged —
+  a line that already states an attribute has already spoken.
+
 - 🔴 **The starter refusal rules refused real wiki pages.**
   `requested_suffix_not` means *this URL asked for a web page* and listed only
   `.html`/`.htm` — so `document-request-returned-a-web-page`, the file's

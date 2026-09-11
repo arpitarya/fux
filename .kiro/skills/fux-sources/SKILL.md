@@ -63,10 +63,13 @@ attribute is another `fux add` on the same entry — it is an upsert.
 default, and `fux add` marks such lines with `*` in its listing. The CLI edits
 one line and keeps every comment.
 
-⚠ **`fux add` writes EVERY attribute on a URL line**, defaults included — and a
-stated attribute beats `[sources.url]` in `fux.toml`. So a source-wide `meta`,
-`keep`, `ttl`, `update` or `fetcher` there only reaches hand-written lines that
-omit that attribute.
+**`fux add` writes EVERY attribute on a URL line**, defaults included, so a
+line says what it means and a policy change is a one-word diff. The values it
+writes are **your repo's** — `[sources.url]`'s `fetcher`, `meta`, `keep`,
+`ttl`, `enrich` and `update` are resolved first, and an explicit flag beats
+both. ⚠ **A stated attribute beats `[sources.url]` afterwards**: editing
+`fux.toml` later does not reach a line that already states the attribute, so
+change the lines too (or hand-write lines that omit it).
 
 ## 3 · `fux add`
 

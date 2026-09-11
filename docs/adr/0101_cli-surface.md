@@ -851,6 +851,14 @@ a verb that genuinely needs *the user asked* can have it without a rendering
 default reaching its behaviour. [ADR-MAINTENANCE](0129_hooks.md) carries the
 verb's half.
 
+⚠ **And a third of the same family: `fux add` wrote the ENGINE's defaults onto
+a line in a repo that had configured its own** (W-140 row 5). A verb on this
+surface writes a consumer's committed file, so what it writes is a claim about
+their policy — resolving `[sources.url]` before rendering the line is the fix,
+and [ADR-URL-LIST](0116_url-list.md) carries it. **Three defects in one day
+where a verb's behaviour came from the wrong layer**: the output config, the
+engine defaults, and an unread flag.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is
