@@ -866,6 +866,23 @@ first flag whose value is a duration, and it is parsed by
 ([ADR-URL-FRESHNESS](0149_url-freshness.md) decision 10). A second duration
 parser on this surface would be the drift that decision exists to prevent.
 
+**`fux update --check --json`** (W-140 row 14, 2026-09-12). The verb whose
+entire purpose is being read by something else had no machine-readable output —
+and it **exits 0 whether or not anything drifted**, deliberately, because drift
+is a fact and a non-zero exit would make *your docs changed* look like a broken
+command to every script that checks status. Together those left one way to act
+on the answer: parse a table meant for a person.
+
+- **Exit 0 in JSON too.** The caller reading JSON is the one that most needs
+  *drifted* and *failed* kept apart, and `drifted` is in the payload.
+- **The structured view is built beside the text, never parsed out of it** —
+  one traversal, two renderings. A JSON view derived from a human table is a
+  second format that can disagree with the first.
+- **`update` joins `CLI_VERBS` with an EMPTY key tuple**, like `doctor` and
+  `hooks`: the empty tuple is the declaration that this verb is shaped by
+  [ADR-OUTPUT](0144_output-defaults.md), and an absent entry would leave
+  `--json` unresolvable from `[cli.json]`.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

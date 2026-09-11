@@ -14,6 +14,8 @@ keeps these unit tests about the *list*, which is what they are for.
 
 from __future__ import annotations
 
+import json
+
 from types import SimpleNamespace
 
 import pytest
@@ -558,3 +560,79 @@ def test_a_repo_with_no_sources_url_is_untouched(tmp_path):
     (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
     assert _source_defaults(tmp_path, sourcelist.URLS) == {}
     assert _source_defaults(tmp_path, sourcelist.DIRS) == {}
+
+
+# -- W-140 row 14: the verb built to be read had nothing to read -------------
+
+
+def _check_repo(tmp_path):
+    from fux.ingest.run import run
+
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text("docs\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    docs = tmp_path / "docs"
+    docs.mkdir(exist_ok=True)
+    (docs / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
+    (docs / "b.md").write_text("# B\n\nother\n", encoding="utf-8")
+    run(tmp_path)
+    return tmp_path
+
+
+def test_check_reports_drift_as_json(tmp_path, capsys, monkeypatch):
+    """`--check` exits 0 whether or not anything drifted — deliberately, since
+    drift is a fact and not a failure. With no `--json`, the only way to act on
+    the answer was to parse a table meant for a person.
+    """
+    from fux.sources import _check
+
+    _check_repo(tmp_path)
+    (tmp_path / "docs" / "a.md").write_text("# A\n\nEDITED\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    assert _check(tmp_path, None, as_json=True) == 0
+    payload = json.loads(capsys.readouterr().out)
+
+    assert [d["loc"] for d in payload["drifted"]] == ["docs/a.md"]
+    drifted = payload["drifted"][0]
+    assert drifted["state"] == "stale"
+    assert drifted["indexed_sha"] != drifted["disk_sha"]
+    assert payload["fresh"] == 1
+
+
+def test_a_deleted_document_is_gone_not_stale(tmp_path, capsys, monkeypatch):
+    from fux.sources import _check
+
+    _check_repo(tmp_path)
+    (tmp_path / "docs" / "b.md").unlink()
+    monkeypatch.chdir(tmp_path)
+
+    _check(tmp_path, None, as_json=True)
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["drifted"] == [
+        {"id": "file:docs/b.md", "loc": "docs/b.md", "state": "gone"}
+    ]
+
+
+def test_a_clean_tree_reports_an_empty_list_not_an_error(tmp_path, capsys, monkeypatch):
+    from fux.sources import _check
+
+    _check_repo(tmp_path)
+    monkeypatch.chdir(tmp_path)
+
+    assert _check(tmp_path, None, as_json=True) == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["drifted"] == [] and payload["fresh"] == 2
+
+
+def test_the_json_view_is_built_beside_the_text_never_parsed_out_of_it():
+    """Two formats, one traversal. A JSON view derived from a human table is a
+    second format that can disagree with the first."""
+    import inspect
+
+    from fux import sources
+
+    body = inspect.getsource(sources._check)
+    assert "findings.append" in body and body.count("stale.append") == 2

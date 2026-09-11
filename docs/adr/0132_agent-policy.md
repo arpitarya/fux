@@ -67,7 +67,7 @@ $ fux setup                       # abridged: the usage/decoder/enrich skills
   wrote fux.toml                  # are written too, one folder each
   wrote .fux/sources/dirs
   wrote .claude/skills/fux-archived-results/SKILL.md
-  wrote .codex/skills/fux-usage/SKILL.md
+  wrote .agents/skills/fux-usage/SKILL.md
   wrote .github/agents/fux.agent.md
   wrote .github/instructions/fux-archived-results.instructions.md
   wrote .kiro/steering/fux-archived-results.md
@@ -267,7 +267,9 @@ is what admits Kiro while still excluding Copilot's `instructions/`.
 decision read *"the two skill surfaces — Claude and Kiro"*, which was a count of
 what existed in August, quietly doing the work of a rule. There are now **four**
 (`.claude/skills`, `.kiro/skills`, `.codex/skills`, `.github/skills`), and
-`fux-enrich` had reached only the first. **Read 9a as a predicate on the
+`fux-enrich` had reached only the first. ⚠ **Since 2026-09-12 (decision 16)
+they are three directories serving four vendors** — `.claude/skills`,
+`.kiro/skills`, and `.agents/skills` for Codex and Copilot together. **Read 9a as a predicate on the
 surface, never as a list of vendors.**
 
 **10. One template may map to two destinations, and that is stronger than a
@@ -343,9 +345,10 @@ only key in that frontmatter that does. The skill says so in the same breath as
 it introduces it, because an agent that writes one casually retires a live
 document.
 
-**11. OpenAI Codex is the fourth vendor** (2026-09-06). Codex CLI reads project
-skills from `.codex/skills/<name>/SKILL.md` — **the same open Agent Skills
-standard Claude and Kiro implement** — so `USAGE-SKILL.md` and
+**11. OpenAI Codex is the fourth vendor** (2026-09-06). Codex reads repository
+skills from `.agents/skills/<name>/SKILL.md` — **the same open Agent Skills
+standard Claude and Kiro implement** — ⚠ *this said `.codex/skills/` until
+2026-09-12, a path Codex's skills page does not list; decision 16 is the move* — so `USAGE-SKILL.md` and
 `DECODER-SKILL.md` map there from the **same templates, byte for byte**. That is
 decision 10's agreement-by-construction a third and fourth time, and it is why
 this vendor added no file to `templates/agents/`.
@@ -356,11 +359,11 @@ Its always-on context is the repo-root `AGENTS.md` and nothing else. So:
 | rendering | ships to Codex as | because |
 |---|---|---|
 | the archived-results policy | **`AGENTS.md`**, which already carries the verbatim block | decision 9: *if it has to be loaded to apply, it does not apply* — and a skill is loaded |
-| the operating manual (`fux-usage`) | `.codex/skills/fux-usage/` | consulted while doing a thing |
-| the decoder guide (`fux-decoder`) | `.codex/skills/fux-decoder/` | decision 9a — a committed-write skill gets skill surfaces only |
-| `fux-enrich` | **nothing** | ADR-ENRICH decision 10 stands; a new vendor does not widen it |
+| the operating manual (`fux-usage`) | `.agents/skills/fux-usage/` | consulted while doing a thing |
+| the decoder guide (`fux-decoder`) | `.agents/skills/fux-decoder/` | decision 9a — a committed-write skill gets skill surfaces only |
+| `fux-enrich` | `.agents/skills/fux-enrich/` | ⚠ *"nothing"* when written; [ADR-ENRICH](0137_enrich.md) decision 10 was extended to every skill surface on 2026-09-06, and this row was stale until 2026-09-12 |
 
-**There is deliberately no `.codex/skills/fux-archived-results/`.** Writing one
+**There is deliberately no `.agents/skills/fux-archived-results/`.** Writing one
 would put the policy on a surface that has to be invoked, in the one vendor
 where nothing else covers it.
 
@@ -388,6 +391,11 @@ So in any repository where both `claude` and `copilot` install — the default �
 vendor chose to read it, and moving `fux-enrich` out of `.claude/skills/` would
 break it for the vendor it was written for. **Recorded, not fixed.**
 
+⚠ **Decision 16 turns a second cross-read to use.** Copilot also reads
+`.agents/skills`, which is Codex's only skill directory — so since 2026-09-12
+fux writes Copilot's own skills there rather than to `.github/skills`, and a
+default install shows Copilot **two** same-name copies, not three.
+
 ⚠ **Superseded in effect by decision 14, not in substance.** Copilot now gets
 its **own** `fux-enrich` rendering, so the cross-read is no longer how it
 reaches the skill — but the cross-read itself is unchanged, and every future
@@ -402,7 +410,8 @@ agents can invoke `fux enrich`.
 
 
 **14. Copilot gets `.github/skills/`, and the fork closed A rather than C**
-(Arpit, 2026-09-06). [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md)
+(Arpit, 2026-09-06). ⚠ **The directory moved to `.agents/skills/` on 2026-09-12
+(decision 16); the argument for writing Copilot its own skills stands unchanged.** [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md)
 proposed **C — write nothing new**, on the ground that Copilot already reads
 `.claude/skills` and the duplicate-name behaviour is unmeasured. **Overruled,
 and the doc's own crux is weaker than it was written:**
@@ -436,7 +445,9 @@ been asked about them was the sentence, not the argument.
   them, which is decision 5's hole in miniature.
 - ⚠ **The double-load hazard is unchanged and still unmeasured.** Copilot reads
   `.claude/skills` too (decision 13), so a default install now shows it three
-  same-name pairs instead of one. The bound is the same one decision 14 argued:
+  same-name pairs instead of one. *(Pairs of skills, two copies each — and
+  since decision 16 still two copies, not three, because Codex's directory is
+  the one Copilot's rendering now shares.)* The bound is the same one decision 14 argued:
   identical bytes, so idempotent, with a hard duplicate-name **error** the only
   live failure. The compare doc's reopen-trigger is that observed error and it
   **stands**.
@@ -479,7 +490,7 @@ committed-write topics too).
 
 | kind | count | destinations | loads |
 |---|---|---|---|
-| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii` | 10 templates | all four skill surfaces, byte-identical (decision 10) | on a description match, or when invoked |
+| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii` | 10 templates | every vendor's skill surface, byte-identical (decision 10) — three directories since decision 16 | on a description match, or when invoked |
 | **path-scoped pointers** — `sources`, `decoder`, `enrich`, `fetcher`, `pii`, `config`, `index` | 7 topics × 3 templates | `.kiro/steering/fux-<t>-files.md` (`fileMatch`), `.claude/rules/fux-<t>-files.md` (`paths:`), `.github/instructions/fux-<t>-files.instructions.md` (`applyTo:` explicit globs) | when the agent works on that plane's own files under `.fux/` or `fux.toml` |
 | **Kiro auto guides** — `usage`, `search`, `answer`, `graph`, `mcp` | 5 templates | `.kiro/steering/fux-<t>-guide.md` (`inclusion: auto`) | on a description match |
 
@@ -575,7 +586,11 @@ names no shas, so `--rerun` reports `drifted:corpus` even when nothing
 changed"* was a guide explaining a wrong verdict, and *"do not rely on `ttl=`"*
 was a guide explaining a dead knob.
 
-⚠ **Eleven guide edits in one day, every one of them deleting a workaround.** That
+Row 14 took `MAINTAIN-SKILL.md` and `INDEX-SKILL.md`: both said *"no `--json`"*
+and *"don't gate CI on it"*, which is a guide teaching a workaround for a verb
+that could not be read by a machine.
+
+⚠ **Thirteen guide edits in two days, every one of them deleting a workaround.** That
 is 15g working, and it is also the measurement of how much of a freshly written
 guide is describing defects rather than behaviour. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that
@@ -589,6 +604,69 @@ behaviour.
 always-on, committed-write topics never description-triggered, one body and one
 glob set per topic, Kiro's `name`/`description` on auto guides, and every pointer
 naming a skill its vendor gets.
+
+
+**16. Codex and Copilot share `.agents/skills/`; nothing is written to
+`.codex/skills/` or `.github/skills/`** (Arpit, 2026-09-12 — W-141).
+
+🔴 **Veto 3 fired.** Codex's skills page lists repository skills at
+`.agents/skills` — in the working directory, its parents, and the repo root —
+and **does not list `.codex/skills`**, where fux had written every Codex skill
+since decision 11.
+
+**What each vendor reads, as its docs state on 2026-09-12:**
+
+| vendor | repository skill directories | source |
+|---|---|---|
+| Codex | `.agents/skills` only | <https://developers.openai.com/codex/skills> |
+| Copilot — cloud agent, code review, CLI, VS Code, JetBrains | `.github/skills`, `.claude/skills`, `.agents/skills` | <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills> · <https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills> · <https://code.visualstudio.com/docs/copilot/customization/agent-skills> |
+
+**The ruling:**
+
+- **One directory both vendors read.** Codex's row and Copilot's skill rows are
+  **one tuple**, `setup.SHARED_SKILLS`, so the two rosters cannot drift — decision
+  10's agreement-by-construction applied to a row, not only to bytes.
+- **Each vendor still carries the full set in its own row.** `install = ["codex"]`
+  and `install = ["copilot"]` each get all thirteen skills; decision 14's
+  `["copilot"]`-alone hole stays closed.
+- **A path two vendors share is written once.** `_write_agents` skips a path an
+  earlier vendor wrote in the same run, so the announcement names it once and
+  `report.kept` never calls fux's own fresh file *yours*.
+- **A shared path must map to one template**, or install order would decide
+  which vendor's file a repository gets.
+
+**Why not the other three:**
+
+| option | why not |
+|---|---|
+| **(a) move Codex only**, keep `.github/skills` for Copilot | a default install shows Copilot **three** same-name copies (`.claude`, `.github`, `.agents`) |
+| **(b) write both** `.codex/skills` and `.agents/skills` | `.codex/skills` is a path no Codex doc names — dead weight. If Codex still reads it, its docs say same-name skills are **not merged; both can appear** |
+| **(c) keep `.codex/skills`** until a load failure is observed | a skill that never loads fails **silently**, so the trigger never fires. The vendor's docs are the evidence |
+
+**Consequences, stated rather than discovered:**
+
+- **Copilot's double-load is back to two copies** (`.claude/skills` and
+  `.agents/skills`), the state decision 14 argued from.
+  [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md)'s
+  reopen-trigger — an **observed** duplicate-name error — is unchanged.
+- ⚠ **Existing repositories keep their old `.codex/skills/` and
+  `.github/skills/`.** `fux setup` is write-if-missing and never deletes, so a
+  re-run adds `.agents/skills/` beside them, and Copilot can then see **four**
+  copies until the consumer deletes the retired folders. The CHANGELOG says so;
+  **nothing mechanical flags it.**
+- **`.agents/` belongs to no single vendor.** The opt-out test checks it as a
+  vendor root, beside `.claude`, `.codex`, `.github` and `.kiro`.
+- **The outside set shrank from eighty-four files to seventy-one** — thirteen
+  Codex and thirteen Copilot skill files became thirteen shared ones.
+
+**Held by tests:** `test_codex_and_copilot_write_the_one_directory_codex_reads`,
+`test_codex_and_copilot_skill_rosters_are_identical`,
+`test_a_path_two_vendors_share_maps_to_one_template`,
+`test_a_shared_path_is_written_and_announced_once` and
+`test_copilot_alone_still_gets_every_skill`, all in
+[`tests/test_setup_agents.py`](../../tests/test_setup_agents.py).
+`SKILL_SURFACES` there is keyed by **(vendor, directory)**, so deleting Codex's
+row still fails even though Copilot writes the same paths.
 
 
 ### Consequences
@@ -638,6 +716,7 @@ naming a skill its vendor gets.
 | **Generate the renderings from the canonical policy** | a handful of short files do not earn a generator; decision 2's conformance test buys the same guarantee at a fraction of the machinery |
 | **Ship the skills as steering too, "so they always apply"** | rejected under decision 9a: a skill that writes committed code and changes ranking must never enter every request |
 | **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | ✅ **ACCEPTED BY RULING, 2026-09-11** — see decision 14a. It was deferred here, not rejected: Copilot already reads `.claude/skills` (decision 13), so this writes a *second* copy under one `name:`, and whether that collides is still **not known**. What changed is not that evidence — it is Arpit's ruling that the `install = ["copilot"]` hole outweighs an unmeasured duplicate-name risk whose worst case is a hard error, not divergent instructions. `fux-usage` came with it. [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md)'s reopen-trigger — an **observed** error — is unchanged and still live |
+| **Keep Codex in `.codex/skills/`, or write both that and `.agents/skills/`** | rejected in decision 16 (W-141): Codex's docs list only `.agents/skills`, a skill that never loads fails silently, and a second directory would show Copilot three copies |
 | **Give Codex its own `AGENTS.md` template** | it already has the right one. `AGENTS.md` is vendor-neutral by W-82 ruling 16 and carries the verbatim block; a Codex-specific copy would be a second rendering of a policy that has exactly one |
 
 ### Reference (required)
@@ -673,9 +752,15 @@ naming a skill its vendor gets.
   (`.github/skills`, `.claude/skills`, `.agents/skills`) — the grounding for
   decisions 11 and 13 —
   <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
-- Codex CLI skills (`.codex/skills/`) and its `AGENTS.md` relationship — the
-  grounding for decision 11 —
+- Codex skills — repository skills at `.agents/skills`, no `.codex/skills`, and
+  same-name skills not merged — the grounding for decisions 11 and 16 —
+  <https://developers.openai.com/codex/skills>
+- Codex and `AGENTS.md` — the grounding for decision 11's ambient plane —
   <https://developers.openai.com/codex/guides/agents-md>
+- Copilot CLI and VS Code skill directories (`.github/skills`, `.claude/skills`,
+  `.agents/skills`) — the grounding for decision 16 —
+  <https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills> ·
+  <https://code.visualstudio.com/docs/copilot/customization/agent-skills>
 - The gate decision 12 changed —
   [`src/fux/setup.py`](../../src/fux/setup.py) (`AGENTS_MD_VENDORS`, and the
   `installing == KNOWN_AGENTS or …` branch in `run()`), held by
@@ -694,7 +779,8 @@ naming a skill its vendor gets.
    default and becomes a mandate.
 3. **A shipped rendering no longer loads in its vendor's tool** — a renamed path,
    a changed frontmatter key, a retired mechanism. **This has already fired once
-   during authoring.**
+   during authoring**, and **a second time on 2026-09-12** — Codex's docs no
+   longer list `.codex/skills` (W-141, decision 16).
 4. **The verbatim block differs by a byte** between the canonical policy and any
    non-exempt rendering — reworded, reordered, partially included, or absent.
    **An exact match is the only check that can detect it.**
@@ -744,7 +830,7 @@ naming a skill its vendor gets.
 uv run pytest -q tests/test_setup_agents.py -k "announces or optout"
 
 # 3 — the shipped paths and frontmatter keys still match each vendor's docs.
-#     No command can check this. It is a periodic read of the four URLs in
+#     No command can check this. It is a periodic read of the vendor URLs in
 #     §Reference, and `policy-version` is what makes a stale file visible.
 
 # 4 — every policy rendering carries the canonical block, byte for byte
@@ -764,7 +850,7 @@ uv run pytest -q tests/test_setup_agents_guides.py
 
 # 7 — the code-writing skills ship to skill surfaces only
 grep -n 'ENRICH-SKILL\|DECODER-SKILL' src/fux/setup.py
-# expect: only as `/skills/<name>/SKILL.md` rows (the four skill surfaces)
+# expect: only as `/skills/<name>/SKILL.md` rows (the skill surfaces)
 
 # 8 — read the renderings. Each rule must be about how to READ the archived
 #     flag, never about which document is right.
@@ -804,3 +890,11 @@ evidence.*
   <https://docs.github.com/en/copilot/how-tos/configure-custom-instructions-in-your-ide/add-repository-instructions-in-your-ide>
 - Kiro steering files and inclusion modes
   <https://kiro.dev/docs/steering/>
+- Codex skills
+  <https://developers.openai.com/codex/skills>
+- GitHub Copilot — about agent skills
+  <https://docs.github.com/en/copilot/concepts/agents/about-agent-skills>
+- GitHub Copilot CLI — adding agent skills
+  <https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-skills>
+- VS Code — agent skills
+  <https://code.visualstudio.com/docs/copilot/customization/agent-skills>

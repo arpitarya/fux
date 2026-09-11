@@ -144,14 +144,18 @@ interpreter, never installed as a service, never started by setup or hooks.
 
 ```bash
 fux update --check            # or: fux update --check docs/rollback.md
+fux update --check --json     # {"drifted": [...], "fresh": N, "unchecked_urls": N}
 ```
 
 **Offline, and it writes nothing.** Each indexed file's bytes are compared with
 its record: `stale <loc> index xxxx… · disk yyyy…`, `gone <loc> indexed, not on disk`,
 then `N stale.` or `nothing has drifted.` URL documents are counted on stderr, not checked.
 
-⚠ **Always exit 0, no `--json`, and blind to files not yet indexed.** Treat any
-`stale`/`gone` line as drift; for a yes/no gate use §7.
+⚠ **Always exit 0 — in `--json` too — and blind to files not yet indexed.**
+Exit 0 is deliberate: drift is a fact, and a non-zero exit would make *your docs
+changed* look like a broken command to every script that checks status. **Read
+`drifted` in the JSON**, or treat any `stale`/`gone` line as drift; for a yes/no
+gate use §7.
 
 **Reconcile with `fux update`** — it re-ingests and re-fetches only URLs
 recorded as changed (every URL when nothing is recorded yet); `--all` fetches
@@ -216,6 +220,7 @@ git add .fux/index .fux/.fuxignore .fux/enrich   # commit when asked
 - **Don't trust `fux hooks` exit 0** — `REFUSED` lines exit 0 too. Read `--json`.
 - **Don't delete `write.lock` while a runner or daemon is alive** — `fux ingest --stop` is the safe clear.
 - **Don't kill the daemon** — a kill mid-write can leave a partial shard. Use `fux daemon stop`.
-- **Don't gate CI on `fux update --check`** — it always exits 0.
+- **Don't gate CI on `fux update --check`'s EXIT CODE** — it is always 0. Gate
+  on `--json`'s `drifted` being empty, or use §7.
 
 Related skills: fux-usage, fux-search, fux-answer, fux-graph, fux-sources, fux-index, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

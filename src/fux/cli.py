@@ -411,6 +411,16 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="read-only: report what has drifted. Offline for files; does not fetch URLs",
     )
+    # ⚠ **`--check` had no machine-readable output at all** (W-140 row 14,
+    # 2026-09-11), and it is the one verb whose whole purpose is being read by
+    # something else: it exits **0 whether or not anything drifted** —
+    # deliberately, because drift is a fact and a non-zero exit would make *your
+    # docs changed* look like a broken command to every script that checks
+    # status. With no `--json`, the only way to act on the answer was to parse
+    # a table meant for a person.
+    p_update.add_argument(
+        "--json", action="store_true", default=None, help="machine-readable drift report"
+    )
     # W-82 ruling 3: narrow is the DEFAULT and this overrides it. There is
     # deliberately no `--dirty`/`--stale`/`--changed` -- if the dirty list is the
     # right thing to refresh, it should not have to be asked for.
@@ -429,6 +439,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="fetch only the URLs whose last run failed (fail_streak > 0)",
     )
     _add_progress_flags(p_update)
+    # ADR-OUTPUT decision 15: a verb that reads `.fux/output.toml` must be able
+    # to ignore it. `update` began reading it when `--json` landed (W-140 row
+    # 14), and `test_every_verb_that_reads_the_file_can_bisect_it` said so
+    # before the change was committed — the escape hatch is how *is it me or
+    # the config?* stays one flag rather than an experiment.
+    _add_output_flags(p_update)
     p_update.set_defaults(func=_cmd_update)
 
     def _query_parser(name: str, help_text: str):

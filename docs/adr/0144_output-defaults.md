@@ -593,6 +593,13 @@ anything.
 present produce different *bytes fetched, written or committed*, it is not an
 output default.
 
+**`update` is in `CLI_VERBS` with an empty key tuple** (W-140 row 14,
+2026-09-12). It gained `--json` and has no `[cli.update]` key of its own; the
+empty tuple is what makes `[cli.json] enabled` reach it. `keys is None` — an
+absent entry — means *this verb is not shaped by this file*, and that
+distinction is the reason the guard is written that way rather than as `not
+keys`.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

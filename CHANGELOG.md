@@ -8,6 +8,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Changed
+
+- **Codex and Copilot skills now install to `.agents/skills/`** — one shared
+  folder, instead of `.codex/skills/` and `.github/skills/`
+  ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 16, W-141).
+  Codex's docs list `.agents/skills` as its only repository skill folder, so
+  the old Codex copies may never have loaded. Copilot reads the same folder.
+  - ⚠ **Already set up? Delete `.codex/skills/` and `.github/skills/` yourself**,
+    then re-run `fux setup`. It never deletes files, so otherwise Copilot sees
+    the old copies next to the new ones.
+
 ### Added
 
 - **Operating guides for every `fux` job, on Claude, Codex, Copilot and Kiro**
@@ -55,11 +66,18 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   correctly, and collectively they deleted the finding. The new row is an
   **error** and prints the loader's own message verbatim
   ([ADR-DOCTOR](docs/adr/0154_doctor.md) decision 4).
-- **`fux-decoder` and `fux-usage` now install for Copilot** (`.github/skills/`),
+- **`fux-decoder` and `fux-usage` now install for Copilot** (`.github/skills/` — now `.agents/skills/`, see *Changed*),
   so all three committed-write skills reach all four vendors (W-118,
   [ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 14a).
 
 ### Fixed
+
+- **`fux update --check --json`.** The verb whose purpose is being read by
+  something else had no machine-readable output, and it exits 0 whether or not
+  anything drifted — so the only way to act on the answer was to parse a table
+  meant for a person. It emits `{drifted, fresh, unchecked_urls}` and still
+  exits 0; gate CI on `drifted` being empty, never on the status
+  ([ADR-CLI](docs/adr/0101_cli-surface.md)).
 
 - 🔴 **`fux verify --rerun` fetched.** ADR-PROVENANCE decision 14 is a ruling
   that `fux verify` never goes to the network — one receipt must not verify

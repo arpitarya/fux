@@ -46,7 +46,7 @@ so a newer template never reaches a file that already exists.
 | `.fux/README.md` · `.fux/.gitignore` | the layout table · ignores `runtime/` and `acquired/` by name |
 
 **It also writes agent files OUTSIDE `.fux/`** — under `.claude/{skills,rules}/`,
-`.codex/skills/`, `.github/{agents,instructions,skills}/`, `.kiro/{steering,skills}/`
+`.agents/skills/`, `.github/{agents,instructions}/`, `.kiro/{steering,skills}/`
 and a repo-root `AGENTS.md`. Setup prints them under
 `note: N of those are OUTSIDE .fux/`. **Relay that list to the user** — some of
 them load into every request in the repo (Kiro steering on a Kiro CLI without
@@ -190,7 +190,9 @@ sorted, canonical JSON, no clock. Two consequences:
 ```
 
 `git status --porcelain`, not `git diff`: a new document can add an untracked
-shard. ⚠ **`fux update --check` is not this gate** — it always exits 0.
+shard. ⚠ **`fux update --check` is not this gate** — its exit code is always 0.
+`fux update --check --json` gives you `drifted`, which you can gate on; it is
+still blind to files that were never indexed, which is what this gate catches.
 
 ---
 
@@ -218,6 +220,7 @@ shard. ⚠ **`fux update --check` is not this gate** — it always exits 0.
 - **Don't commit `.fux/runtime/` or `.fux/acquired/`**, or ignore `.fux/` wholesale.
 - **Don't delete `write.lock` while a fux process is running** — two writers corrupt the index.
 - **Don't delete `.fux/index/` to clear an error** when URL sources exist.
-- **Don't gate CI on `fux update --check`**, or ingest in a shallow clone.
+- **Don't gate CI on `fux update --check`'s exit code** (gate on `--json`'s
+  `drifted`), or ingest in a shallow clone.
 
 Related skills: fux-usage, fux-search, fux-answer, fux-graph, fux-sources, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-pii, fux-decoder, fux-enrich, fux-archived-results.

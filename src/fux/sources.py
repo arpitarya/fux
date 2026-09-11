@@ -67,6 +67,7 @@ says the pattern is not there, and `.fux/.fuxignore` is where a file is kept out
 
 from __future__ import annotations
 
+import json as json_mod
 import re
 from pathlib import Path
 
@@ -859,7 +860,7 @@ def cmd_update(args) -> int:
     root = _root()
     entry = getattr(args, "entry", None)
     if getattr(args, "check", False):
-        return _check(root, entry)
+        return _check(root, entry, as_json=bool(getattr(args, "json", False)))
 
     config = load(root)
     refresh = False
@@ -1005,7 +1006,7 @@ def _locate(root: Path, entry: str) -> sourcelist.ListSpec:
 # -- `fux update --check` --------------------------------------------------
 
 
-def _check(root: Path, entry: str | None) -> int:
+def _check(root: Path, entry: str | None, *, as_json: bool = False) -> int:
     """What has drifted, writing nothing.
 
     **Offline for the `dirs` half**, which is most of it: a file's freshness is
@@ -1025,6 +1026,11 @@ def _check(root: Path, entry: str | None) -> int:
             raise FuxError(f"{entry} is not in the index — nothing to check")
 
     stale: list[str] = []
+    #: The same findings as `stale`, structured — one dict per drifted
+    #: document. **Built alongside rather than parsed back out of the text**:
+    #: a JSON view derived from a human table is a second format that can
+    #: disagree with the first.
+    findings: list[dict] = []
     fresh = 0
     unverified = 0
 
@@ -1034,6 +1040,7 @@ def _check(root: Path, entry: str | None) -> int:
             path = root / record["loc"]
             if not path.is_file():
                 stale.append(f"  gone   {record['loc']:<28} indexed, not on disk")
+                findings.append({"id": doc_id, "loc": record["loc"], "state": "gone"})
                 continue
             disk = store_mod.content_sha(path.read_bytes())
             verdict = freshness.verify(record["sha"], disk)
@@ -1044,8 +1051,34 @@ def _check(root: Path, entry: str | None) -> int:
                     f"  stale  {record['loc']:<28} index {_short(record['sha'])} · "
                     f"disk {_short(disk)}"
                 )
+                findings.append(
+                    {
+                        "id": doc_id,
+                        "loc": record["loc"],
+                        "state": "stale",
+                        "indexed_sha": record["sha"],
+                        "disk_sha": disk,
+                    }
+                )
         else:
             unverified += 1
+
+    if as_json:
+        # ⚠ **Exit 0 either way, in this mode too.** The caller reading JSON is
+        # the one that most needs the distinction between *drifted* and
+        # *failed*, and `drifted` is in the payload.
+        print(
+            json_mod.dumps(
+                {
+                    "drifted": findings,
+                    "fresh": fresh,
+                    "unchecked_urls": unverified,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 0
 
     if unverified:
         print(

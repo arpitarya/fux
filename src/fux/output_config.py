@@ -147,6 +147,11 @@ CLI_VERBS: dict[str, tuple[str, ...]] = {
     "doctor": (),
     "hooks": (),
     "daemon": (),
+    # `update` has no `[cli.update]` key of its own — only `--json` to resolve,
+    # like `doctor` and `hooks`. An EMPTY tuple is the declaration that this
+    # verb is shaped by this file; an absent entry means it is not, and
+    # `--json` would then never be resolved from `[cli.json]` (W-140 row 14).
+    "update": (),
 }
 
 #: `[mcp]`'s closed key set. `top` only — decision 11. No `json` (an MCP

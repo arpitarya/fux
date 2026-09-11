@@ -29,8 +29,6 @@ then refresh this repo's renderings.
 | # | defect | where | record |
 |---|---|---|---|
 | 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
-| 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
-| 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
 
 ## 2 · Records that disagree with the code
 
@@ -238,6 +236,30 @@ then refresh this repo's renderings.
   noise, so a row is narrowed only by someone who has read that record's whole
   reach in the file. [ADR-OWNERSHIP](../../docs/adr/0146_ownership.md).
   2026-09-11.
+
+- **Row 14 — the verb built to be read had nothing to read.**
+  `fux update --check` exits 0 whether or not anything drifted — deliberately,
+  since drift is a fact and a non-zero exit makes *your docs changed* look like
+  a broken command — and it had no `--json`, so the only way to act on the
+  answer was to parse a table meant for a person. `--json` emits
+  `{drifted, fresh, unchecked_urls}`, built beside the text rather than parsed
+  out of it, and still exits 0. `update` joins `CLI_VERBS` with an empty tuple
+  and gains `--no-output-config`, which ADR-OUTPUT decision 15 requires of any
+  verb that reads the file — **caught by its own test before the change was
+  committed.** 2026-09-12.
+
+- **Row 16 — the record was too narrow; the code is as designed.** Reproduced
+  on macOS: a `pii.toml` edit followed by an offline `fux ingest --full`
+  redacted the `file:` document and left the `url:` record's title carrying the
+  address. **ADR-PII decision 18 said *a pinned URL*; the truth is every `url:`
+  record that was not fetched this run**, and an offline ingest fetches none.
+  Widened there, with the `run.py` comment's *"invalidates every carried
+  extraction"* corrected to mean every carried FILE extraction. ⚠ **The fix
+  stays declined** (decision 18's own call) — but the cost objection is
+  recorded as weaker than it reads, because the re-derivation would only ever
+  happen on a policy edit, which already costs a full re-extract. **No guide
+  change: the guide already said it generally, ahead of the record.**
+  2026-09-12.
 
 ## Definition of done
 
