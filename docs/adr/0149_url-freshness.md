@@ -158,6 +158,30 @@ docstring.
    `tests/refer/test_refer_acquired.py::test_the_sha_matches_what_ingest_would_have_recorded`
    is the assertion, and it exists because the failure would otherwise be silent.
 
+6a. 🔴 **The LIVE path did not, for sixteen days, and every URL citation in
+   every repo fell back to a weaker verdict.** Decision 6 was written about
+   `from_acquired` and `_fetch_url` was left on the old contract: it required
+   the fetcher to return a `str`, while both shipped fetchers have returned
+   `(bytes, content type)` since 2026-08-26 (W-86 P8). So the live fetch raised
+   `fetcher returned tuple, expected str` on every `url:` document and the
+   verdict became `as-ingested` or `unverified` — **never `current`, never
+   `stale`**.
+
+   - ⚠ **Nothing looked broken.** Both fallbacks are legitimate verdicts with
+     honest notes, so the freshness feature reported itself as working while
+     the network half of it had never run. The note named the cause and no test
+     read it.
+   - **Fixed 2026-09-11** (W-140 row 1): `_fetch_url` takes `root`, unpacks
+     through `_unpack` and decodes through `_decode_fetched`, so the live path
+     and the retained path now produce the same bytes from the same response.
+     `tests/refer/test_source.py` asserts the identity of both functions, not
+     just of `sanitize` — **decision 6's rule stated for one caller is how the
+     other one got missed.**
+   - **A decoder is now load-bearing at verify time.** A response whose type
+     nothing claims raises with `decode.reason()`'s sentence and the verdict is
+     `unverified`; it is not silently treated as prose. The pre-2026-08-26
+     `str` ramp still verifies, because `_unpack` keeps it.
+
 7. **A blob that is missing, deleted by hand, or no longer decodes yields
    `None`, which is `unverified`.** *We have nothing to compare* must not be
    dressed up as a comparison that happened.

@@ -7,9 +7,9 @@ in the refer plane*. That would breach three things at once — L1 (`$0`,
 stdlib-only runtime), L4 (offline by default), and the adapter cap.
 
 The engine already solved this. **ADR-FETCHER established that the consumer
-owns the fetcher file**: fux loads it by path and calls `fetch(url) -> str`,
-and all transport, auth, retries and browser machinery live on the consumer's
-side of that line. `ingest/urlsrc.py` is fux's half of that contract at ingest
+owns the fetcher file**: fux loads it by path and calls
+`fetch(url) -> tuple[bytes, str]`, and all transport, auth, retries and browser
+machinery live on the consumer's side of that line. `ingest/urlsrc.py` is fux's half of that contract at ingest
 time; this module is the same half at verify time.
 
 **There is exactly one fetch mechanism in this engine, and the refer plane
@@ -51,7 +51,7 @@ from pathlib import Path
 
 from .. import store as store_mod
 from ..errors import FuxError
-from ..ingest.urlsrc import _decode_fetched, sanitize
+from ..ingest.urlsrc import _decode_fetched, _unpack, sanitize
 
 __all__ = ["Fetched", "resolve", "fetch_document", "from_acquired", "GIT", "URL"]
 
@@ -88,7 +88,7 @@ def fetch_document(root: Path, doc_id: str, loc: str, *, fetcher=None) -> Fetche
     """
     if resolve(doc_id) == GIT:
         return _read_local(root, doc_id, loc)
-    return _fetch_url(doc_id, loc, fetcher)
+    return _fetch_url(root, doc_id, loc, fetcher)
 
 
 def from_acquired(root: Path, doc_id: str, loc: str) -> Fetched | None:
@@ -135,16 +135,38 @@ def _read_local(root: Path, doc_id: str, loc: str) -> Fetched:
     return Fetched(doc_id, loc, content, store_mod.content_sha(content), GIT)
 
 
-def _fetch_url(doc_id: str, loc: str, fetcher) -> Fetched:
+def _fetch_url(root: Path, doc_id: str, loc: str, fetcher) -> Fetched:
+    """Fetch and decode one URL **exactly as ingest did**, or raise.
+
+    ⚠ **`_unpack` and `_decode_fetched` are IMPORTED, never reimplemented** —
+    the same rule `from_acquired` states, for the same reason: this sha is
+    compared against an ingest-time sha.
+
+    ⚠ **This is where the contract change of W-86 P8 was missed.** A fetcher
+    used to return markdown; since 2026-08-26 it returns
+    `(bytes, content type)` and the decoder plane converts. This function kept
+    requiring a `str`, so **both shipped fetchers failed the isinstance check on
+    every URL** — the note read `fetcher returned tuple, expected str` and the
+    verdict fell back to `as-ingested` or `unverified`. **No URL citation in any
+    repo was ever verified live**, and nothing looked broken: a fallback verdict
+    is a legitimate verdict. Found 2026-09-11 writing the operating guides
+    (W-140 row 1), reproduced on macOS/CPython 3.14 the same day.
+    """
     if fetcher is None:
         raise FuxError(
             f"{loc}: no fetcher loaded - a url: document cannot be verified without one"
         )
     try:
-        text = fetcher(loc)
+        result = fetcher(loc)
     except Exception as exc:  # consumer code: never let it crash the query
         raise FuxError(f"{loc}: fetcher raised {type(exc).__name__}: {exc}") from exc
-    if not isinstance(text, str):
-        raise FuxError(f"{loc}: fetcher returned {type(text).__name__}, expected str")
-    content = sanitize(text)
+    raw, content_type = _unpack(result)
+    if raw is None:
+        raise FuxError(f"{loc}: fetcher returned no bytes")
+    markdown, why = _decode_fetched(raw, content_type, loc, root)
+    if markdown is None:
+        raise FuxError(f"{loc}: {why}")
+    if not markdown.strip():
+        raise FuxError(f"{loc}: fetcher returned no text")
+    content = sanitize(markdown)
     return Fetched(doc_id, loc, content, store_mod.content_sha(content), URL)

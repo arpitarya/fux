@@ -61,6 +61,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **No URL citation was ever verified live.** The refer plane's fetch step
+  still required a fetcher to return a `str`, while the fetcher contract has
+  returned `(bytes, content type)` since 2026-08-26. Every `url:` citation
+  raised `fetcher returned tuple, expected str` internally and fell back to
+  `as-ingested` or `unverified` — **never `current` or `stale`** — so the
+  freshness feature reported itself as working with its network half never
+  running. `fux answer` and `fux verify` now fetch and decode a URL through the
+  same `_unpack` + `_decode_fetched` + `sanitize` pipeline ingest used, so the
+  two shas are comparable; a response whose type no decoder claims is
+  `unverified` with the decoder's own reason, and a pre-2026-08-26 fetcher that
+  returns prose still verifies
+  ([ADR-URL-FRESHNESS](docs/adr/0149_url-freshness.md) decision 6a).
+
 - 🔴 **`.jsonl` and `.json` documents lost their title.** Since 2026-09-06 a
   record-oriented decoder emitted `## Record 1` / `## Item 1` as its **first**
   heading and no document title, so `extract.py`'s shallowest-heading rule made

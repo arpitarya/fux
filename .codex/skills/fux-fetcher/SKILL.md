@@ -209,9 +209,12 @@ fux doctor --json          # "refusal rules": hits per rule, and rules that neve
 ```
 
 - ⚠ **`fux add --dry-run` never fetches.** It proves nothing about a fetcher.
-- ⚠ **`fux answer` currently marks URL citations `as-ingested` or `unverified`
-  even when the fetcher works** — its verify step rejects the tuple return. Do
-  not switch `fetch` to returning `str` to "fix" that.
+- ⚠ **`fux answer` verifies a URL citation by fetching it again and decoding it
+  the same way ingest did.** A citation that reports `as-ingested` or
+  `unverified` while the fetcher works means the verify fetch failed, returned
+  no bytes, or returned a type no decoder claims — `--audit` names which. **Do
+  not switch `fetch` to returning `str`**: prose is the pre-2026-08-26 ramp, and
+  returning it throws away the content type the decoder plane needs.
 
 **When you finish:** say which files changed and which URLs now route or refuse
 differently; `fux update --all` re-fetches every URL under the new code.

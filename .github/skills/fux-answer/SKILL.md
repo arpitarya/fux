@@ -115,9 +115,10 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 - **Do not rely on a URL line's `ttl=` or `update=never` to keep `answer`
   offline.** Read `citation.freshness` (or `--audit`) on every answer instead of
   assuming what was or was not fetched.
-- ⚠ **A `note` of `fetcher returned tuple, expected str`** means the live fetch
-  was not used: the verdict is `as-ingested` (kept bytes) or `unverified`, never
-  `current`. Retrying will not change it.
+- ⚠ **A `note` naming the fetcher** — it raised, returned no bytes, or returned
+  a type no decoder claims — means the live fetch was not used: the verdict is
+  `as-ingested` (kept bytes) or `unverified`, never `current`. The note says
+  which; retrying changes nothing until the fetcher or the decoder does.
 - A `stale` `url:` document is recorded for the next URL refresh — see `fux-sources`.
 
 ## 7 · Cite honestly — band first, then verdict

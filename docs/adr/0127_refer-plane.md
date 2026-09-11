@@ -377,10 +377,16 @@ impossible to quote.
   means, which is decision 6's rule in a different costume.
 - **So the decode happens where the text is *used*** — one line further on, in
   `_readable`. The bytes stay byte-exact; only what is chunked changes.
-- **`url:` documents are exempt**, because `source.py` already decoded them
-  through ingest's own `_decode_fetched` so that what is cited is what was
-  indexed. Decoding twice would re-run `html` over Markdown for any URL
-  ending `.html` and return wreckage.
+- **`url:` documents are exempt**, because `source.py` decodes them through
+  ingest's own `_decode_fetched` so that what is cited is what was indexed.
+  Decoding twice would re-run `html` over Markdown for any URL ending `.html`
+  and return wreckage.
+  ⚠ **This sentence was true of the retained path and FALSE of the live one
+  until 2026-09-11.** `from_acquired` decoded; `_fetch_url` still demanded a
+  `str` and so raised on every real fetcher, which is why the exemption held in
+  practice — the live decode never ran at all. Both paths decode now; the
+  defect and what it cost are
+  [ADR-URL-FRESHNESS](0149_url-freshness.md) decision 6a.
 - **A document no decoder claims is unchanged.** `decode()` returns `None`,
   and the path falls back to exactly what it did before.
 

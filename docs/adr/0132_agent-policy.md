@@ -543,6 +543,15 @@ URL citation the shipped fetchers cannot verify), **fixing the defect must edit
 the guide in the same change** — the templates ship in the same wheel as the
 code. Nothing enforces that; this sentence is the guard.
 
+⚠ **Exercised for the first time on 2026-09-11**, the day the guides shipped.
+W-140 row 1 — the refer plane rejecting the fetcher contract's tuple — was
+fixed, and `ANSWER-SKILL.md` and `FETCHER-SKILL.md` lost the workaround they
+named in the same commit, with this repo's four renderings of each refreshed
+from the template. **`fux setup` does not rewrite a rendering that already
+exists**, so refreshing them is a copy, not a re-run of setup; a session that
+edits a template and stops has left this repo's own copies stating the old
+behaviour.
+
 **Held by tests, not by a sentence:**
 `test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one`,
 `test_the_operating_guides_are_deliberate`, and

@@ -15,8 +15,9 @@ wrong, and several touch the refer plane, PII and receipts.
 
 **Provenance.** Found 2026-09-11 in a Cowork session by five drafting agents and
 one adversarial reviewer, reading `src/fux/` and running verbs on a copy of the
-tree (Linux, Python 3.12, no network). **Not yet reproduced on the Mac** — rule 4
-applies: re-derive before fixing.
+tree (Linux, Python 3.12, no network). **Each row is re-derived on the Mac
+before it is fixed** — rule 4, and row 1 held up exactly as filed. Row 19 is
+this repo's own, found on macOS/CPython 3.14.
 
 🔴 **Hazard for whoever fixes a row:** the shipped guides in
 `src/fux/templates/agents/*-SKILL.md` name workarounds for rows marked **(guide)**.
@@ -27,7 +28,6 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 1 | 🔴 **URL citations are never verified live.** `refer/source.py` rejects a non-`str` fetcher return; both shipped fetchers return `(bytes, content_type)`. Note `fetcher returned tuple, expected str`; verdict `as-ingested` or `unverified`. **(guide: ANSWER, FETCHER)** | `refer/source.py` ~143 | ADR-REFER d23 · ADR-FETCHER |
 | 2 | 🔴 **PII leaks past redaction:** a frontmatter `title:` is committed unredacted (only the body is redacted), and a value in a filename lands in `loc`. **(guide: PII)** | `ingest/extract.py` ~139, `ingest/run.py` ~410 | ADR-PII |
 | 3 | **`fux add <URL> --no-update` never fetches** — pinned URLs are dropped before the fetch, exit 1. `cli.py` help and CHANGELOG say it fetches once. **(guide: SOURCES)** | `ingest/run.py` ~216 | ADR-URL-LIST d14 |
 | 4 | **`fux update --failed` is parsed and never read.** **(guide: SOURCES)** | `cli.py` ~405 | ADR-CLI |
@@ -45,6 +45,7 @@ then refresh this repo's renderings.
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
 | 17 | **Starter refusal rules refuse real wiki pages** (`viewpage.action`, `.aspx`, `.php`); `suspiciously-small-document`'s comment says *warn* but it refuses. **(guide: FETCHER)** | `templates/refusals.toml.txt` | ADR-REFUSAL |
 | 18 | **Small ones:** `.fux/.gitignore` misses `__pycache__/` under `decoders/`/`fetchers/`; a re-run of `setup` always prints the `AGENTS.md` paste note; the generated `urls` header says "two attributes" and "re-fetches every line"; the starter `pii.toml` and doctor point at `tools/pii-probe/probe.py`, which is not in the package. | `setup.py`, `store/fuxdir.py`, `doctor.py` ~484 | ADR-DOTFUX · ADR-PII |
+| 19 | ⚠ **`tests_e2e/test_maintenance.py::test_the_driver_resolves_what_git_cannot` failed once and passed on re-run** (2026-09-11, macOS): the merge resolved but `file:docs/aa.md` came back at `ver` 1. A hooked repo re-indexes in the background, so the assertion may be racing the runner. **Seen once — a second occurrence makes it a gate** (CLAUDE.md two-strikes) | `tests_e2e/test_maintenance.py` ~102 | ADR-MAINTENANCE |
 
 ## 2 · Records that disagree with the code
 
@@ -61,6 +62,17 @@ then refresh this repo's renderings.
 - **ADR-CONFIG**: absent `[agents] install` means four vendors; `Config`'s default and `config.schema.json` lag (missing `keep`, `ttl`, `enrich`, `update`, `sweep_minutes`, `acquired_max_bytes`).
 - **ADR-TUNE**: `fux tune` prints defaults and measures nothing; `[priority]` warnings are unbuilt; seven tables, not six. **ADR-OUTPUT §1** still shows the old `[defaults]` layout.
 - **ADR-MAINTENANCE 5a**: doctor does not report never-fetched hand-added URL lines.
+
+## Closed so far
+
+- **Row 1 — URL citations were never verified live.** Reproduced on macOS by
+  reading the contract on both sides and asserting it, fixed in
+  `refer/source.py` by routing the live fetch through ingest's own `_unpack`
+  and `_decode_fetched`, recorded as
+  [ADR-URL-FRESHNESS](../../docs/adr/0149_url-freshness.md) decision 6a with
+  ADR-REFER decision 23's false sentence corrected. `ANSWER-SKILL.md` and
+  `FETCHER-SKILL.md` lost the workaround they named, and this repo's four
+  renderings of each were refreshed. 2026-09-11.
 
 ## Definition of done
 

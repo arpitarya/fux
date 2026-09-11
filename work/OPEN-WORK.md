@@ -13,34 +13,10 @@ The two run **concurrently**; never order one against the other.
 
 ## Blocked on Arpit
 
-*Named here so a session leads with it instead of burying it. **Ages are
-recomputed against the reading date, never copied** — a queue that copies its
-ages stops flagging its own oldest item. As of **2026-09-11, no rows are past
-CLAUDE.md's 5-day threshold**, and a session names each, with its age, in its
-first output.*
-
-🟢 **Rulings with their evidence are in
-[`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md)** (`R-1`…`R-11`),
-with a paste-ready Opus prompt beside each. Arpit strikes or accepts a line;
-the row then closes through that prompt.
-
-🔴 **Rule 4 has fired five times in twelve days — re-derive before believing a
-row here, and start with any row whose blocker is an ENVIRONMENT.** On
-2026-09-11 four rows said *hands*, *`device_bash` is wedged*, *no session can
-run the suite* — and the first session with a shell closed all four in an hour.
-`_to_delete/` did not exist. `ruff` was named as an unrun gate by two rows and
-is in neither `[dev]` nor CI. **That is the third time this section has been
-wrong about a machine** (2026-08-27, 2026-08-28, 2026-09-11), and it is the only
-failure mode here with a perfect record.
-
-⚠ **Two sessions wrote this tree at once on 2026-09-06 and again on
-2026-09-11.** Diff before believing your own copy is current.
-
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **The four no-op priors — pick an instrument, or close the knob.** The remeasure you ordered **cannot run**: three of the four priors move **0 of 50** goldens at every value including `0.0`, because the playground declares no `supersedes:` key on any branch of its history ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **Two options left under [L9](../docs/adr/0011_LAW-9-environments.md)** (declaring it in the playground is void): **(b)** put declared supersession, `archived=true` sources, dated documents and intent-split questions into the golden test data (W-136) and remeasure in fux-lab, or **(c)** close the knob on the structural argument, which needs no corpus | 2026-09-11 | 0d |
-| **W-136 phase 1 — did the answer key get written?** **The ten seed documents landed** (`work/golden/seed/`, committed 2026-09-11) — the half Claude can see. **The other half no Claude session can ever verify**: whether Codex wrote the ~100 questions and answers, and where. Say yes and **phase 2 is agent work, runnable at once**; say no and prompt 1 is re-run. Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
-| **W-141 — Codex reads repo skills from `.agents/skills/`, and fux writes `.codex/skills/`.** OpenAI's skills page lists only `.agents/skills` for a repository; `.codex/skills` reads as legacy. That is [ADR-AGENT-POLICY](../docs/adr/0132_agent-policy.md) **veto 3** (*a shipped rendering no longer loads*). Moving means Copilot, which also reads `.agents/skills`, sees a third same-name copy of every fux skill. **Move, write both, or wait for a measured load failure?** — [detail](open/W-141-codex-skill-directory.md) | 2026-09-11 | 0d |
+| **W-136 phase 1** — did Codex write the ~100 answer-key questions? No → re-run [prompt 1](golden/prompts/1-codex-seed.md). Yes → run [prompt 1b](golden/prompts/1b-codex-feature-coverage.md) in Codex (superseding pairs, archived docs, dates — [ADR-RS](../docs/adr/0133_predictions.md) d23); phase 2 starts after 1b. | 2026-09-11 | 0d |
+| **W-141** — Codex reads `.agents/skills/`, fux writes `.codex/skills/`. Move, write both, or wait? [detail](open/W-141-codex-skill-directory.md) | 2026-09-11 | 0d |
 
 ---
 
@@ -51,11 +27,13 @@ failure mode here with a perfect record.
 - 🔴 **W-140 — the defects writing the operating guides uncovered.** `agent` · *(records:
   ADR-REFER · ADR-PII · ADR-URL-LIST · ADR-PROVENANCE · ADR-MAINTENANCE · ADR-CONFIG ·
   and the disagreements listed in the file)* · Checking ten new skills against the code
-  (ADR-AGENT-POLICY decision 15) found **18 code defects** — two 🔴: URL citations are
-  never verified live (the shipped fetchers return a tuple the refer plane rejects), and a
-  frontmatter `title:` or a filename carries PII past redaction — plus **13 records that
-  disagree with the code**. ⚠ Guides name workarounds for several: **fix the defect and the
-  guide in one change.** Not yet reproduced on the Mac. —
+  (ADR-AGENT-POLICY decision 15) found **18 code defects** and **13 records that disagree with the
+  code**. ⚠ Guides name workarounds for several: **fix the defect and the guide in one
+  change.** **Row 1 is closed** (URL citations were never verified live — the refer plane
+  rejected the fetcher contract's tuple, so no `url:` citation ever reached `current`;
+  fixed, recorded as ADR-URL-FRESHNESS 6a, both guides and all four renderings updated).
+  **Row 2 is the remaining 🔴** — a frontmatter `title:` or a filename carries PII past
+  redaction. Row 19 was added from this repo's own suite. —
   [detail](open/W-140-guide-authoring-defects.md) `filed: 2026-09-11`
 
 - 🔴 **W-138 — reconcile every artifact with L9.** `agent` · *(records: [ADR-LAW-9](../docs/adr/0011_LAW-9-environments.md) ·
@@ -159,7 +137,7 @@ failure mode here with a perfect record.
   at every value on that corpus, because it declares no `supersedes:` key
   ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **The named
   veto queries `q022`/`q033` cannot be broken by a knob that reaches neither.**
-  T2 waits on the same decision as the four-priors item below — (b) or (c).
+  T2 waits on the golden data's superseding pairs — [prompt 1b](golden/prompts/1b-codex-feature-coverage.md) (Arpit ruled **(b)**, 2026-09-11).
 
   ⚠ **`rerank_weight` moves TWO mechanisms, not one** — since W-108 it also
   scales the refer plane's passage proximity, which this sweep's design assumed
@@ -250,12 +228,15 @@ failure mode here with a perfect record.
   ✅ `rerank_weight` is the one prior with headroom; net `+4` at `1.0`, 0 broken,
   **below the floor**, so the hold stands unchanged.
 
-  🔴 **BACK TO ARPIT — two options left.** **(a)**, declaring the supersession in
-  the playground, is **void under [L9](../docs/adr/0011_LAW-9-environments.md)**. **(b)** put declared supersession,
-  `archived=true` sources, dated documents and a query set split by intent into the
-  golden test data (W-136) and remeasure in fux-lab, or **(c)** close the knob on the
-  structural argument, which needs no corpus at all. The item's own text says a NO is a
-  success; this is not a NO, it is *cannot ask*.
+  🟢 **Arpit ruled (b), 2026-09-11 — build the instrument into the test data.**
+  *"Set up the test data… so that at least we can test it."* The playground route is
+  void under [L9](../docs/adr/0011_LAW-9-environments.md); closing the knob (c) was not
+  chosen. **[Prompt 1b](golden/prompts/1b-codex-feature-coverage.md)** has Codex add ≥ 4
+  superseding pairs (`supersedes:` in frontmatter), ≥ 4 documents under `seed/archive/`,
+  a date per seed, and ≥ 22 intent-split questions; phase 2 declares the archived
+  directories, commits each file at its date and checks the coverage counts. The standing
+  rule behind it is [ADR-RS](../docs/adr/0133_predictions.md) **decision 23**.
+  **Lane: `agent` once W-136's ladder is frozen, then back to Arpit with the result.**
 
   **What the remeasure still needs:**
 
