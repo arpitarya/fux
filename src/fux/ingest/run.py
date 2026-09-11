@@ -77,7 +77,6 @@ from pathlib import Path
 
 from .. import store as store_mod
 from .. import tune as tune_mod
-from ..config import DEFAULT_TYPES_FILE as TYPES_FILE
 from ..config import DEFAULT_URLS_FILE
 from ..config import load as load_config
 from ..errors import FuxError
@@ -174,9 +173,7 @@ def run(
         types=read_types(root),
         ignores=fuxignore.read(root),
     )
-    warnings = fuxignore.duplicate_warnings(
-        root, dirs_file=config.dirs_file, types_file=TYPES_FILE
-    )
+    warnings = fuxignore.duplicate_warnings(root, dirs_file=config.dirs_file)
     # `walk_sources` returns its whole list at once — nothing to report a
     # count against until it has already finished (W-64's "none until done").
     with progress.phase("walk", len(files)) as p:

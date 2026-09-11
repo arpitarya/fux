@@ -30,6 +30,16 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### Four inbox rows ruled; three are now Claude Code's (2026-09-11, Cowork)
+
+- **W-132** — `RULE-SINCE` moves to HEAD (Arpit: stop auditing old commits). Fires ADR-OWNERSHIP veto 6 by ruling; the file-scoped `describes` over-firing stays.
+- **W-118** — `fux-decoder` + `fux-usage` to `.github/skills/`; Claude, Kiro, Codex already have them.
+- **W-133** — re-run the blind `unanswerable` set; answer TRUE/FALSE, no threshold. The gating question returns to the inbox after.
+- **W-121** — closed; evidence kept, recorded in ADR-TABULAR.
+- **W-134** — fux-playground repaired on Arpit's ruling (`3b4d275`: `docs` back in the source list, goldens saved); left is a current index + `check.py --rows`.
+- **Enrichment re-run question** — closed; the lesson is in §4.
+- **Order:** W-132 → W-118; W-133 and W-134 independent. OPEN-WORK rule 9: no git housekeeping in the queue.
+
 ### `.fux/pii.toml` is REQUIRED now (2026-09-11, Cowork — W-128 + W-129, uncommitted)
 
 - **Every command but `setup`/`tune`/`output` refuses in a repo without it**; `doctor` runs and fails the row. Rule and exemptions: [ADR-PII](../docs/adr/0060_pii.md) decision 17 — do not restate them.
@@ -37,18 +47,26 @@ valuable judgement, but not the state of play.
 - **Rules may name a checksum** (`validate = "luhn" | "verhoeff"`), a closed engine set — decision 16. **The starter covers US and Canadian identifiers** (SSN, ITIN, MBI, SIN on; EIN, postal code, NANP phone off) — decision 12a. Allowlists, shared packs and path scoping were offered and not chosen.
 - ⚠ W-128's code rode into `fa47760` unannounced; its records and all of W-129 are uncommitted.
 
-### W-130 filed: the types file as TOML is a proposal, not a build (2026-09-11, Cowork)
+### W-130 landed: the types list is `.fux/types.toml` (2026-09-11, Cowork, uncommitted)
 
-- **Arpit wants `.fux/sources/types` → `.fux/types.toml`.** It is in
-  [`compare/types-toml.compare.md`](compare/types-toml.compare.md), proposed
-  **D** (`include` array + `[decoders]` keyed by extension), **awaiting his §5
-  rulings.** Nothing is built.
-- ⚠ **Do not start the build from the chat's answers.** One of them (*ordered
-  rule list*) was given on a false claim that `!` lines are order-sensitive; the
-  compare doc is the current question.
-- ⛔ **The build is also gated on W-126 committing** — same four files.
-- 🔴 **It reverses ADR-TYPES' recorded TOML rejection.** A session that builds it
-  amends ADR-TYPES' §Alternatives in the same commit, not a later one.
+- **What changed:** `include` + `[decoders]` in `.fux/types.toml` replaced the
+  line-grammar `.fux/sources/types` — [ADR-TYPES](../docs/adr/0038_types-list.md)
+  decision 12, built on Arpit's "go" to the
+  [compare doc](compare/types-toml.compare.md). This repo's own list is
+  converted.
+- ⚠ **The old file is refused everywhere**, and `fux setup` converts it. A
+  session that meets *"moved to .fux/types.toml"* in another repo runs `fux setup`
+  and deletes the old file — it does not re-create `sources/types`.
+- 🔴 **Not committed, and the commit is not straightforward.**
+  `test_adr_freshness` flags five records — ADR-ACQUIRED, ADR-ARCHIVED-CONTENT,
+  ADR-PII, ADR-REFUSAL, ADR-URL-FRESHNESS — that only *describe* keys in
+  `config.py`/`doctor.py`/`sourcelist.py` this change never touched. **Same
+  file-scoped over-fire as the `94231b2bf` inbox row** — left for that ruling,
+  not worked around.
+- ⚠ **Verified in the Cowork container, not on the Mac:** 3209 unit + 80 e2e
+  green on the Mac's tree (the three failures are the over-fire above, the
+  pre-existing `94231b2bf` red, and a W-134 link another session had not yet
+  written). The conversion re-ingested byte-identical.
 
 ### `[index]` in tune.toml: `max_phrases` (12 -> 32) and `max_table_rows` (2026-09-11, latest — uncommitted)
 
@@ -1772,6 +1790,13 @@ which are not laws:
 The ones that would change how a successor acts, newest first. Add to this list
 when a session produces a lesson; do not let it become a changelog.
 
+- **A symptom worked around per-arm is an engine defect hiding** (2026-08-28 →
+  2026-09-05, W-110). `placebo-and-seal` saw *"0 changed, 10 carried forward"* with
+  every arm identical, and wiped `.fux/index` per arm to get on with the run — so
+  the incremental-ingest reuse defect shipped for another week. **When a harness
+  needs a workaround to make arms differ, stop and file the cause before the run.**
+  The audit that closed the related question: `--full` empties reuse, so no
+  enrichment measurement on record was affected.
 - **Exposing a knob and publishing what it was set to are ONE change, not two**
   (2026-08-28, ADR-CONFIDENCE 13). The confidence floors were locked because a
   consumer could tune away the signal. Opening them was right by the project's

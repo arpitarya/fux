@@ -296,7 +296,7 @@ read.
 
 ⚠ **`DEFAULT_TYPES` is unchanged by this.** [ADR-TYPES](0038_types-list.md)
 verdict G was measured, and a measurement is replaced only by a better
-measurement. A consumer opts a decodable type in through `.fux/sources/types`,
+measurement. A consumer opts a decodable type in through the types list (`.fux/types.toml`),
 which was always permitted.
 
 **12. Both record kinds are assembled through the schema.** The `git` and `url`

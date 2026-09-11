@@ -377,10 +377,12 @@ def test_the_freshness_gate_actually_consults_describers() -> None:
 #:    `ADR-PORT-LIST`, `ADR-DOCS-TABLE`, `ADR-RS`, `ADR-QUALITY`. Nothing is
 #:    owed; there is no component to own.
 #: 2. 🔴 **Records whose subject IS code, sitting inside a directory another
-#:    record claims** — `ADR-FIND`, `ADR-RECORD`, `ADR-POSTINGS`, `ADR-TYPES`,
+#:    record claims** — `ADR-FIND`, `ADR-RECORD`, `ADR-POSTINGS`,
 #:    `ADR-DIR-LIST`, `ADR-CDP-FETCHER`, `ADR-URL-INGEST` and the three
 #:    `ADR-RUNTIME-*`. **These are the ADR-ANSWER shape**, which the register's
 #:    own describes-table note already records as a defect that shipped.
+#:    ⚠ `ADR-TYPES` left this list on 2026-09-11: decision 12 gave it
+#:    `ingest/typesfile.py`, so a change to the types file's shape can now open it.
 #:
 #: The pin is deliberate: a record that GAINS coverage, or a new record that
 #: arrives with none, lands as one failing assertion naming itself.
@@ -391,7 +393,7 @@ _UNREACHABLE_BY_THE_GATE = {
     "ADR-LAW-8", "ADR-LOCKS", "ADR-OWNERSHIP", "ADR-PORT-LIST",
     "ADR-POSTINGS", "ADR-QUALITY", "ADR-RECORD", "ADR-RS",
     "ADR-RUNTIME-MANIFEST", "ADR-RUNTIME-STAMP", "ADR-RUNTIME-STATS",
-    "ADR-TYPES", "ADR-URL-INGEST",
+    "ADR-URL-INGEST",
 }
 
 

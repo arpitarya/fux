@@ -151,26 +151,47 @@ def test_the_default_never_grows_from_a_consumer_decoder(tmp_path):
     assert not TypeFilter(allow=DEFAULT_TYPES).accepts("app.log")
 
 
+def _types_toml(tmp_path, text: str) -> None:
+    (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
+    (tmp_path / ".fux" / "types.toml").write_text(text, encoding="utf-8")
+
+
 def test_a_types_file_replaces_the_default_rather_than_extending_it(tmp_path):
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "types").write_text("*.rst\n", encoding="utf-8")
+    _types_toml(tmp_path, 'include = ["*.rst"]\n')
     types = read_types(tmp_path)
     assert not types.default
     assert types.accepts("a.rst") and not types.accepts("a.md")
 
 
-def test_a_bang_line_subtracts_from_the_allowlist(tmp_path):
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "types").write_text("*.md\n!*.gen.md\n", encoding="utf-8")
+def test_a_binding_admits_its_extension(tmp_path):
+    """ADR-TYPES decision 12: a bound extension IS a document."""
+    _types_toml(tmp_path, 'include = ["*.md"]\n[decoders]\ngeojson = "json"\n')
     types = read_types(tmp_path)
-    assert types.accepts("a.md") and not types.accepts("a.gen.md")
+    assert types.accepts("docs/sites.geojson") and types.accepts("a.md")
+    assert not types.accepts("a.json"), "only what the file names"
+
+
+def test_a_types_file_has_no_subtraction(tmp_path):
+    """The `!` line was the deprecated spelling of an exclusion; `.fuxignore` is
+    its one home, and the TOML file refuses the old spelling loudly."""
+    _types_toml(tmp_path, 'include = ["*.md", "!*.gen.md"]\n')
+    with pytest.raises(FuxError, match="fuxignore"):
+        read_types(tmp_path)
 
 
 def test_a_types_file_with_no_positive_pattern_is_refused(tmp_path):
     """An empty index looks like a broken engine, so say so instead."""
-    (tmp_path / ".fux" / "sources").mkdir(parents=True)
-    (tmp_path / ".fux" / "sources" / "types").write_text("# nothing\n!*.md\n", encoding="utf-8")
+    _types_toml(tmp_path, "# nothing\ninclude = []\n")
     with pytest.raises(FuxError, match="nothing would be indexed"):
+        read_types(tmp_path)
+
+
+def test_a_leftover_line_grammar_types_file_is_refused_not_ignored(tmp_path):
+    """Ignoring it would put the default in its place and change the index with
+    nothing saying so — ADR-TYPES decision 12."""
+    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    (tmp_path / ".fux" / "sources" / "types").write_text("*.rst\n", encoding="utf-8")
+    with pytest.raises(FuxError, match="fux setup"):
         read_types(tmp_path)
 
 

@@ -313,6 +313,15 @@ and no fresh record is written) and it is archived (so its carried record still
 carries the flag). Neither fact suppresses the other, and a reader who assumed
 "refused" implied "unknown" would get that backwards.
 
+⚠ **`.fux/refusals.toml` was cited by name as precedent on 2026-09-11.** The
+[types-as-TOML comparison](../../work/compare/types-toml.compare.md) §1 listed
+it among the four hand-edited `.fux/` policy files already in TOML, and that
+list was part of why `.fux/sources/types` became `.fux/types.toml`.
+
+**No refusal decision is amended.** The consequence worth recording is that this
+file's form now carries weight outside this record — a later proposal to change
+it is a change to an argument other records rest on, not a local edit.
+
 ### Consequences
 
 **Easier.** A refusal that used to become a record now becomes a skip with a

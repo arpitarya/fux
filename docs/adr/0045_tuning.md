@@ -182,7 +182,7 @@ day; the record was the stale one.**
 
 **What ships now:** every value is written **live**, at `Tune`'s own default, so
 a repo with the file and a repo without it rank identically. Ruled the same day
-as `.fux/sources/types` and `.fux/output.toml`, for the same reason: *a file of
+as the types list and `.fux/output.toml`, for the same reason: *a file of
 nothing but comments is a menu*, and a consumer should be able to read what fux
 will do without reading fux's source.
 
@@ -190,7 +190,7 @@ will do without reading fux's source.
 the tunables FREEZE at setup.** `fux setup` is write-if-missing (decision 3), so
 a later change to `K1`, `B`, `FIELD_WEIGHTS` or any `Tune` default reaches a
 repo that has never run setup and **does not reach one that has**. Same trade as
-`.fux/sources/types`; the remedy [ADR-DOTFUX](0012_fux-directory.md) decision 6
+the types list (`.fux/types.toml`); the remedy [ADR-DOTFUX](0012_fux-directory.md) decision 6
 names is **a loader refusal or a `fux doctor` check, never a rewrite**, and
 neither is built.
 

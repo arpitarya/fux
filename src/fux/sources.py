@@ -1,7 +1,7 @@
 """`fux add` / `fux remove` / `fux update` — the corpus, as a first-class verb.
 
-The three committed source lists (`.fux/sources/dirs`, `urls`, `types`) are
-what fux indexes. Until W-63 only one of them had a command — `fux url` — so
+The three committed source lists (`.fux/sources/dirs`, `.fux/sources/urls` and
+`.fux/types.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
 the corpus, the thing the whole engine is about, was the part of fux you
 maintained by hand.
 
@@ -52,6 +52,17 @@ A fux-written line carries **every** attribute, explicitly, even where the
 value equals the default (decision 12): a generated file holds no implicit
 state, so changing a policy is a one-word diff rather than the appearance or
 disappearance of a key.
+
+## `types` is TOML, and its editor is `typesfile`
+
+Since 2026-09-11 the types list is `.fux/types.toml` (ADR-TYPES decision 12),
+so every verb here branches on `sourcelist.TYPES` and hands the edit to
+[`ingest/typesfile.py`](ingest/typesfile.py). **The rule above still holds** —
+one line of the file changes, every other byte is kept — and the editor
+**refuses** a layout it did not write rather than reformatting it. A bare
+`*.ext` a decoder reads becomes a `[decoders]` line; anything else is an
+`include` glob. There is no exclusion: `fux remove --types` deletes a line or
+says the pattern is not there, and `.fux/.fuxignore` is where a file is kept out.
 """
 
 from __future__ import annotations
@@ -67,7 +78,7 @@ from .config import (
     load,
 )
 from .errors import FuxError
-from .ingest import sourcelist
+from .ingest import sourcelist, typesfile
 
 # -- which list, and where it lives ----------------------------------------
 
@@ -146,9 +157,80 @@ def _read(path: Path, spec: sourcelist.ListSpec) -> list[sourcelist.Entry]:
     at the only moment it is unambiguous. Ingest still fails loudly on a
     missing list, which is the read path where absence is a real problem.
     """
+    if spec is sourcelist.TYPES:
+        return _type_entries(path)
     if not path.is_file():
         return []
     return sourcelist.parse(path.read_text(encoding="utf-8"), spec, origin=str(path))
+
+
+def _types_root(path: Path) -> Path:
+    """The repo root a `.fux/types.toml` path sits in."""
+    return path.parents[len(Path(DEFAULT_TYPES_FILE).parts) - 1]
+
+
+def _type_entries(path: Path) -> list[sourcelist.Entry]:
+    """`.fux/types.toml` as the entries every verb here already speaks.
+
+    **An `include` glob and a `[decoders]` binding are both a pattern** to a
+    verb: `*.md` with no decoder, `*.csv` with `decoder=csv`. Each is complete by
+    construction — the TOML has nothing implicit to be missing — so `fux add`'s
+    listing never marks one as a line fux did not write.
+
+    A leftover `.fux/sources/types` is refused here too, so no verb can write
+    the new file while the old one still sits beside it.
+    """
+    typesfile.check_legacy(_types_root(path))
+    if not path.is_file():
+        return []
+    listed = typesfile.parse(path.read_text(encoding="utf-8"), origin=str(path))
+    full = frozenset({"decoder"})
+    entries = [
+        sourcelist.Entry(value=glob, attrs={"decoder": ""}, lineno=0, declared=full)
+        for glob in listed.include
+    ]
+    entries += [
+        sourcelist.Entry(value=f"*.{ext}", attrs={"decoder": name}, lineno=0, declared=full)
+        for ext, name in listed.decoders.items()
+    ]
+    return sorted(entries, key=lambda e: e.value)
+
+
+def _add_type(path: Path, value: str, overrides: dict[str, str]) -> tuple[str, str, str]:
+    """`add` for `.fux/types.toml`: a binding if a decoder reads it, an `include` glob if not.
+
+    **A bare `*.ext` already in `include` moves** when it gains a decoder — the
+    file may not state one extension twice (ADR-TYPES decision 12), and fux's
+    own edit is the last thing that should trip that error.
+    """
+    text = path.read_text(encoding="utf-8") if path.is_file() else ""
+    origin = str(path)
+    listed = typesfile.parse(text, origin=origin)
+    ext = typesfile.pattern_extension(value)
+    name = overrides.get("decoder")
+    if name is None:
+        name = listed.decoders.get(ext, "") if ext else ""
+    if name:
+        if ext is None:
+            raise FuxError(
+                f"decoder={name} on {value!r}: a binding is per extension - dispatch sees a "
+                f"suffix and nothing about which glob admitted the file - so it only goes on a "
+                f"bare `*.ext` pattern. Nothing was written"
+            )
+        new, action, previous = typesfile.set_decoder(text, ext, name, origin=origin)
+        line = sourcelist.render_line(f"*.{ext}", {"decoder": name}, sourcelist.TYPES)
+        if previous:
+            before = sourcelist.render_line(f"*.{ext}", {"decoder": previous}, sourcelist.TYPES)
+        elif value in listed.include:
+            action, before = "updated", value
+        else:
+            before = ""
+    else:
+        new, action = typesfile.add_include(text, value, origin=origin)
+        line, before = value, ""
+    if new != text:
+        path.write_text(new, encoding="utf-8", newline="\n")
+    return action, line, before
 
 
 # -- writing one line ------------------------------------------------------
@@ -209,6 +291,8 @@ def add(
     path: Path, value: str, overrides: dict[str, str], spec: sourcelist.ListSpec
 ) -> tuple[str, str, str]:
     """Add or update one line. Returns `(action, new_line, previous_line)`."""
+    if spec is sourcelist.TYPES:
+        return _add_type(path, value, overrides)
     text = path.read_text(encoding="utf-8") if path.is_file() else ""
     lines = text.split("\n")
 
@@ -290,6 +374,15 @@ def remove_or_exclude(path: Path, spec: sourcelist.ListSpec, value: str) -> tupl
     different facts about the file and a reader of the diff needs to know
     which one they are looking at.
     """
+    if spec is sourcelist.TYPES:
+        typesfile.check_legacy(_types_root(path))
+        if not path.is_file():
+            raise FuxError(f"{path} does not exist — nothing to remove")
+        text = path.read_text(encoding="utf-8")
+        new, removed = typesfile.remove(text, value, origin=str(path))
+        path.write_text(new, encoding="utf-8", newline="\n")
+        return "removed", removed, ""
+
     entries = _read(path, spec)
 
     if any(e.value == value and not e.exclude for e in entries):
@@ -557,55 +650,48 @@ def _seed_types(path: Path) -> None:
     """Write the built-in allowlist before adding the first custom pattern.
 
     **Because the file replaces the default rather than extending it.** An
-    absent `types` file means `gitdir.DEFAULT_TYPES` applies (ADR-TYPES); the
+    absent types file means `gitdir.DEFAULT_TYPES` applies (ADR-TYPES); the
     moment one exists, it is the whole allowlist. So `fux add '*.pdf' --types`
-    on a repo with no types file would have written a one-line file and
+    on a repo with no types file would have written a one-entry file and
     silently un-indexed every markdown document in the corpus — an invisible
     filter, which is the exact defect W-55 was opened about.
 
     Seeding is the honest fix: the file starts by stating what was already
     true, so the diff shows the allowlist growing by one rather than being
-    replaced by one.
+    replaced by one. The bindings fux would have derived are written as
+    `[decoders]` lines, so the map does not decay from its first entry.
     """
     from .decode import builtin_bindings
     from .ingest.gitdir import DEFAULT_TYPES
 
-    header = [
-        "# What counts as a document, and which decoder reads it. One pattern",
-        "# per line; `!` subtracts.",
-        "#",
-        "# fux created this file when the first pattern was added. The lines",
-        "# below are the built-in default, written out explicitly: this file",
-        "# REPLACES that default rather than extending it, so leaving them out",
-        "# would have un-indexed every document already in the corpus.",
-        "#",
-        "# `decoder=` BINDS an extension to the module that reads it, and fux",
-        "# checks the binding against that module rather than trusting it. A",
-        "# prose format carries none: there is no decoder in its path.",
-        "#",
-        "# See ADR-TYPES.",
-        "",
-    ]
-    # The binding fux would have derived anyway, written down. Seeding a file
-    # of bare globs would have made the map decay from its first line: every
-    # pattern added later would resolve through the module tuples, which is the
-    # implicit dispatch this attribute exists to replace.
-    bindings = builtin_bindings()
-    body = [
-        sourcelist.render_line(glob, {"decoder": bindings.get(_pattern_ext(glob), "")}, sourcelist.TYPES)
-        for glob in DEFAULT_TYPES
-    ]
-    _write(path, header + body)
+    bindings = {ext.lstrip("."): name for ext, name in builtin_bindings().items()}
+    prose = [glob for glob in DEFAULT_TYPES if typesfile.pattern_extension(glob) not in bindings]
+    header = "\n".join(
+        [
+            "# Which files are documents, and which decoder reads each one. See ADR-TYPES.",
+            "#",
+            "# fux created this file when the first pattern was added. What is below is",
+            "# the built-in default, written out: this file REPLACES that default rather",
+            "# than extending it, so leaving it out would have un-indexed every document",
+            "# already in the corpus.",
+            "#",
+            "# `include` lists globs that are already text. `[decoders]` maps an",
+            "# extension to the module that reads it, and a bound extension IS a",
+            "# document. Nothing here subtracts: exclusions live in .fux/.fuxignore.",
+        ]
+    )
+    text = typesfile.render(prose, bindings, header=header)
+    path.write_text(text, encoding="utf-8", newline="\n")
 
 
 def _pattern_ext(pattern: str) -> str:
-    """The extension a bare `*.ext` pattern names, or `""`. Mirrors
-    `decode._bound_extension`, which is the rule that decides what may carry a
-    binding — kept in step by `tests/test_source_verbs.py`."""
-    if not pattern.startswith("*.") or "/" in pattern:
-        return ""
-    ext = pattern[1:].lower()
-    return "" if len(ext) < 2 or "*" in ext or "?" in ext else ext
+    """The extension a bare `*.ext` pattern names, with its dot (`.pdf`), or `""`.
+
+    A thin wrapper over `typesfile.pattern_extension`, which is **the one
+    definition** of that shape; the registry this feeds keys on the dotted form.
+    """
+    ext = typesfile.pattern_extension(pattern)
+    return f".{ext}" if ext else ""
 
 
 def _plan(spec: sourcelist.ListSpec, args) -> str:
@@ -632,6 +718,11 @@ def cmd_remove(args) -> int:
         entries = _read(path, spec)
         if any(e.value == entry and not e.exclude for e in entries):
             print(f"would remove  {entry} — it has its own line")
+        elif spec is sourcelist.TYPES:
+            raise FuxError(
+                f"{entry} is not in {_rel(root, path)}. The types list has no exclusions: to "
+                "keep matching files out of the index, write the pattern in .fux/.fuxignore"
+            )
         else:
             ancestor = _covering_ancestor(entry, entries)
             if ancestor is None:

@@ -458,12 +458,25 @@ def test_doctor_flags_a_types_file_with_no_live_pattern(tmp_path, monkeypatch):
     from fux import doctor as doctor_mod
 
     (tmp_path / "fux.toml").write_text("", encoding="utf-8")
-    types = tmp_path / ".fux" / "sources" / "types"
+    types = tmp_path / ".fux" / "types.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("# every line a comment\n#*.md\n", encoding="utf-8")
+    types.write_text('# every line a comment\n# include = ["*.md"]\n', encoding="utf-8")
     check = doctor_mod._types_health(tmp_path)
     assert not check.ok
-    assert "no active pattern" in check.detail
+    assert "admits nothing" in check.detail
+
+
+def test_doctor_flags_a_leftover_line_grammar_types_file(tmp_path):
+    """ADR-DOTFUX decision 6's mechanism for ADR-TYPES decision 12: the move reaches
+    an existing repo as a `doctor` row that names the command, never a rewrite."""
+    from fux import doctor as doctor_mod
+
+    (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    (tmp_path / ".fux" / "sources").mkdir(parents=True)
+    (tmp_path / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
+    check = doctor_mod._types_health(tmp_path)
+    assert not check.ok
+    assert "fux setup" in check.detail and ".fux/types.toml" in check.detail
 
 
 def test_doctor_passes_a_types_file_setup_wrote(tmp_path):
@@ -773,9 +786,9 @@ def test_decoder_bindings_report_nothing_when_none_are_declared(tmp_path):
 
 def test_a_binding_naming_a_missing_module_is_an_error(tmp_path):
     _git_repo(tmp_path)
-    types = tmp_path / ".fux" / "sources" / "types"
+    types = tmp_path / ".fux" / "types.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("*.md\n*.zzz decoder=nosuchdecoder\n", encoding="utf-8")
+    types.write_text('include = ["*.md"]\n[decoders]\nzzz = "nosuchdecoder"\n', encoding="utf-8")
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert not check.ok
     assert check.level == "error"
@@ -787,12 +800,12 @@ def test_a_generated_binding_that_matches_nothing_is_not_reported(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    lines = ["*.md\n"] + [
-        f"*{ext} decoder={name}\n" for ext, name in sorted(decode.builtin_bindings().items())
-    ]
-    types = tmp_path / ".fux" / "sources" / "types"
+    from fux.ingest import typesfile
+
+    bindings = {ext.lstrip("."): name for ext, name in decode.builtin_bindings().items()}
+    types = tmp_path / ".fux" / "types.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("".join(lines), encoding="utf-8")
+    types.write_text(typesfile.render(["*.md"], bindings), encoding="utf-8")
     write_index(tmp_path, [_record()])
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert check.ok
@@ -803,9 +816,9 @@ def test_a_hand_written_binding_that_matches_nothing_is_reported(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    types = tmp_path / ".fux" / "sources" / "types"
+    types = tmp_path / ".fux" / "types.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("*.md\n*.jsno decoder=json\n", encoding="utf-8")
+    types.write_text('include = ["*.md"]\n[decoders]\njsno = "json"\n', encoding="utf-8")
     write_index(tmp_path, [_record()])
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert not check.ok
@@ -817,9 +830,9 @@ def test_a_hand_written_binding_with_documents_is_quiet(tmp_path):
     from fux.store import write_index
 
     _git_repo(tmp_path)
-    types = tmp_path / ".fux" / "sources" / "types"
+    types = tmp_path / ".fux" / "types.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("*.md\n*.geojson decoder=json\n", encoding="utf-8")
+    types.write_text('include = ["*.md"]\n[decoders]\ngeojson = "json"\n', encoding="utf-8")
     write_index(tmp_path, [_record(doc_id="file:a.geojson", loc="a.geojson")])
     check = _check(doctor.run(tmp_path), "decoder bindings")
     assert check.ok

@@ -223,6 +223,11 @@ print(len(chunk(md)))"
 than an 11-row band on a `blind` run, decision 1 loses its evidence** — the
 measurement behind it is `informed` and supplies no delta.
 
+⚠ **Arpit ruled 2026-09-11 to keep the current evidence.** Decision 1 stands on
+his ruling and the `informed` run; **no `blind` run is owed** and none is queued.
+The condition above is unchanged: it is checked if a `blind` spreadsheet run is
+ever filed, and it is not a reason to file one.
+
 **If the ~2.6 s at 20 000 rows is reported as a blocker by anyone actually
 using it**, the declined alternative above is the answer, and it is one
 constant.

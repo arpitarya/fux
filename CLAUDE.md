@@ -547,6 +547,8 @@ signal of how much is actually pending.
    merely present-but-static. Only the former gets worse by waiting.
 6. **No separate prioritization or sequencing doc.** Ordering lives inside
    OPEN-WORK. A second document naming what to do next is always the stale one.
+7. **No git housekeeping in the queue** — never what is committed, staged or
+   pushed, in any repo. [OPEN-WORK](work/OPEN-WORK.md) rule 9 (Arpit, 2026-09-11).
 
 ### Archive is not evidence
 

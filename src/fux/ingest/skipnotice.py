@@ -24,7 +24,7 @@ trade, not a free win:
   already the answer to that question by name.
 - ⚠ **The list now DECIDES, not just describes.** A path in a block is ignored
   because it is in the block. So a derived verdict is **frozen**: widen
-  `.fux/sources/types` and the `.py` files already listed stay out until their
+  `.fux/types.toml` and the `.py` files already listed stay out until their
   lines go. An `empty` file that gains content stays out too. **That cost was
   stated and accepted** — the escape hatch is deleting the line, or a `!` line,
   which always wins because the blocks are written first.
@@ -161,7 +161,7 @@ def stale_warnings(root: Path, *, types, excludes) -> list[str]:
 
     **This is the guard on the cost of writing the list into `.fuxignore`.** A
     generated line decides, so it freezes the verdict that produced it: widen
-    `.fux/sources/types` and the `.py` lines keep those files out; write content
+    `.fux/types.toml` and the `.py` lines keep those files out; write content
     into a file listed as `empty` and it stays out, still labelled `empty`. The
     line is then a false statement that is also load-bearing — the exact shape
     ADR-FUXIGNORE exists to abolish.

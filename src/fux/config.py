@@ -38,7 +38,14 @@ DEFAULT_FETCHER = ".fux/fetchers/http.py"
 DEFAULT_URLS_FILE = ".fux/sources/urls"
 DEFAULT_DIRS_FILE = ".fux/sources/dirs"
 #: Optional. Absent means the built-in allowlist in `gitdir.DEFAULT_TYPES`.
-DEFAULT_TYPES_FILE = ".fux/sources/types"
+#: TOML, beside the other `.fux/*.toml` policy files -- read and written by
+#: `ingest/typesfile.py` (ADR-TYPES decision 12).
+DEFAULT_TYPES_FILE = ".fux/types.toml"
+#: Where the types list lived until 2026-09-11, in the line grammar `dirs` and
+#: `urls` still use. **Refused, never read**: a file fux silently ignored would
+#: put the built-in default in its place and change the index with nothing
+#: saying so (ADR-TYPES decision 12). `fux setup` converts it.
+LEGACY_TYPES_FILE = ".fux/sources/types"
 
 
 @dataclass
@@ -154,6 +161,15 @@ def load(root: Path) -> Config:
             f"{path}: [sources] dirs is not a TOML key any more — put one directory per line in "
             f"{DEFAULT_DIRS_FILE} (or point dirs_file elsewhere). A line may carry "
             "`archived=true`. See ADR-DIR-LIST"
+        )
+    if "types_file" in sources:
+        # Advertised by config.schema.json until 2026-09-11 and read by nothing:
+        # every caller used DEFAULT_TYPES_FILE, so the key was silently ignored.
+        # Refused by name rather than ignored (ADR-CONFIG; ADR-TYPES decision 12).
+        raise FuxError(
+            f"{path}: [sources] types_file is not a key - the types list is always "
+            f"{DEFAULT_TYPES_FILE}, and this key was never read even when the schema listed "
+            f"it. Delete it"
         )
     dirs_file = sources.get("dirs_file", DEFAULT_DIRS_FILE)
     if not isinstance(dirs_file, str) or not dirs_file.strip():

@@ -65,9 +65,9 @@ def _digest(root) -> dict[str, str]:
 
 def _typed(root) -> None:
     """Narrow the allowlist to `*.md` so a `.py` file is a POLICY skip."""
-    types = root / ".fux" / "sources" / "types"
+    types = root / ".fux" / "types.toml"
     types.parent.mkdir(parents=True, exist_ok=True)
-    types.write_text("*.md\n", encoding="utf-8")
+    types.write_text('include = ["*.md"]\n', encoding="utf-8")
 
 
 def _ignore_text(root) -> str:

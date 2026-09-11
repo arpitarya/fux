@@ -146,6 +146,17 @@ what makes a flat verb sufficient here rather than merely mandated. They write
 every attribute explicitly ([ADR-URL-LIST](0026_url-list.md) decision 12) and
 edit one line, so a human's grouping comments survive.
 
+⚠ **Since 2026-09-11 the type list is `.fux/types.toml`** ([ADR-TYPES](0038_types-list.md)
+decision 12), and every verb hands a `--types` edit to `ingest/typesfile.py`
+instead of the line grammar. **The one-line rule holds there too**: `add` inserts
+one glob into `include`, or one `ext = "module"` into `[decoders]` when a decoder
+reads the extension (moving a bare `"*.ext"` out of `include` if it was there);
+`remove` deletes one line. Two things differ and are stated: **a layout fux did
+not write is refused** rather than reformatted, and **`remove --types` never
+excludes** — the types list has no subtraction, so a pattern that is not in it
+is an error naming `.fux/.fuxignore`. A leftover `.fux/sources/types` stops every
+verb until `fux setup` converts it.
+
 **1b. `add` and `remove` write lines; `update` never touches one.** One
 sentence, and it is the whole reason three verbs do not overlap. Attribute
 edits belong to `add`, which is already an upsert. Re-reading a source belongs
@@ -577,12 +588,12 @@ $ fux add
   handbook archived=false
 
 * 1 line(s) do not state every attribute, so fux did not write them. They load fine (the reader is lenient); `fux add <entry>` rewrites one in full.
-.fux/sources/types:
+.fux/types.toml:
   *.adoc
   *.markdown
   *.md
   *.org
-  *.pdf
+  *.pdf decoder=pdf
   *.rst
   *.txt
 .fux/sources/urls:
@@ -597,7 +608,7 @@ refusing.
 
 | flag | verb | effect |
 |---|---|---|
-| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path. ⚠ Since 2026-09-01 `add` also records `decoder=` — the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([ADR-TYPES](0038_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
+| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path, edited in `.fux/types.toml` (ADR-TYPES decision 12). ⚠ Since 2026-09-01 `add` also records the binding — a `[decoders]` line naming the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([ADR-TYPES](0038_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
 | `--cdp` / `--http` | `add` | URLs: record `fetch=`. Both at once is an error, not a silent pick |
 | `--plain` / `--hashed` | `add` | URLs: record `meta=`. Same rule |
 | `--archived` | `add` | dirs: record `archived=true` |

@@ -48,7 +48,7 @@ them carries `archived: true`.
 ```mermaid
 flowchart LR
     D[".fux/sources/dirs<br/>! subtracts · archived= declared"] --> I["ingest"]
-    T[".fux/sources/types<br/>what counts as a document"] --> I
+    T[".fux/types.toml<br/>what counts as a document"] --> I
     U[".fux/sources/urls<br/>fetch= meta= declared"] --> I
     I --> R["records<br/>archived: true when declared"]
     R --> X["ADR-ARCHIVED-CONTENT<br/>ranking · marker · disclaimer"]
@@ -59,7 +59,7 @@ flowchart LR
 
 ```text
   .fux/sources/dirs   (! subtracts, archived=) --+
-  .fux/sources/types  (what is a document)     --+--> ingest --> records carrying
+  .fux/types.toml     (what is a document)     --+--> ingest --> records carrying
   .fux/sources/urls   (fetch=, meta=)          --+            archived: true when declared
                                                                     |
                                                                     v
@@ -103,7 +103,8 @@ inflated by them.
 ### Decision
 
 **1. Source directories live in `.fux/sources/dirs`**, one entry per line, a
-committed file beside `urls` and `types`. `[sources] dirs` in `fux.toml` is a
+committed file beside `urls` (and beside `types` until it became `.fux/types.toml`
+on 2026-09-11 — [ADR-TYPES](0038_types-list.md) decision 12). `[sources] dirs` in `fux.toml` is a
 **retired key that errors with instructions**
 ([ADR-CONFIG](0023_config.md) decision 10).
 
@@ -111,7 +112,8 @@ committed file beside `urls` and `types`. `[sources] dirs` in `fux.toml` is a
 restated: one entry per line, `#` comments, blank lines ignored, loader dedupes
 and sorts, `<entry> key=value …` attributes, **an unknown key is a loud
 `file:lineno` error**, and a duplicate entry with conflicting attributes is an
-error rather than a last-wins merge. **One grammar, three files.**
+error rather than a last-wins merge. **One grammar, two files** — ⚠ three until
+2026-09-11, when the types list left for TOML (ADR-TYPES decision 12).
 
 **2a. A `!` prefix subtracts a path from the walk.**
 `!work/regression/*/evidence` is a repo-relative glob that removes matching
@@ -191,7 +193,7 @@ is indirect — see [ADR-URL-LIST](0026_url-list.md) §The `dirs` attribute set.
 **3a. An explicitly added file does not outrank the type allowlist. A
 `.fuxignore` `!` line does.**
 `fux add docs/architecture.pdf` writes the line, and the document is still
-skipped if `.fux/sources/types` does not admit it — the verb says so, and says
+skipped if `.fux/types.toml` does not admit it — the verb says so, and says
 which command would change it. This follows from the three conditions being a
 **conjunction with no precedence**; what could plausibly have been read as an
 override is the command. Making an `add` win would produce **a document indexed
@@ -237,7 +239,8 @@ different authorship, and the reader is lenient for both.
   them** (`excluded by !work/regression/*/evidence`). A filter nobody can see is
   the failure the exclusion work was opened about, so silence was not an option.
 - **`fux.toml` stops being where the corpus is defined.** It keeps policy; the
-  *what* lives in three files under `.fux/sources/`. Config is how the engine
+  *what* lives in three committed lists — two under `.fux/sources/`, plus
+  `.fux/types.toml`. Config is how the engine
   behaves; the source lists are what it looks at.
 - ⚠ **The archived declaration is only as honest as the person writing it.** A
   derived signal cannot be forgotten; a declared one can. What it buys is
@@ -299,9 +302,10 @@ file, a second flag, or a precedence rule between this file and something else.
 grep -rn "archive/" src/fux/ --include=*.py
 # expect: no output
 
-# 2. still one parser for all three lists
+# 2. still one line-grammar parser for dirs and urls
 grep -rln "def parse(" src/fux/ingest/
-# expect: sourcelist.py only
+# expect: sourcelist.py, plus typesfile.py (.fux/types.toml, ADR-TYPES decision 12)
+#         and fuxignore.py (.fux/.fuxignore, ADR-FUXIGNORE)
 
 # 3. the attribute set is still closed at two
 grep -n "archived\|enrich" src/fux/ingest/sourcelist.py | head

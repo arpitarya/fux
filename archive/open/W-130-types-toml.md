@@ -3,8 +3,9 @@ type: OpenItem
 id: W-130
 title: "W-130 — the types file becomes `.fux/types.toml`"
 description: "Arpit, 2026-09-11: convert `.fux/sources/types` to TOML and move it up to `.fux/`. It reverses ADR-TYPES' recorded rejection of a TOML types list and splits the one grammar the three source lists share, so it goes through a compare doc first. Proposed shape: an `include` glob array plus a `[decoders]` table keyed by extension."
-status: open
+status: implemented
 lane: arpit
+adr: docs/adr/0038_types-list.md
 timestamp: 2026-09-11T00:00:00Z
 ---
 
@@ -16,8 +17,10 @@ old-file conversion are judgment no test catches.
 
 ## State
 
+✅ **Implemented 2026-09-11** — [ADR-TYPES](../../docs/adr/0038_types-list.md) decision 12; outcome in [`work/IMPLEMENTATION.md`](../../work/IMPLEMENTATION.md). Everything below is the spec as filed.
+
 - ⏳ **Blocked on Arpit:** the verdict and six sub-forks in
-  [`compare/types-toml.compare.md`](../compare/types-toml.compare.md) §5.
+  [`compare/types-toml.compare.md`](../../work/compare/types-toml.compare.md) §5.
 - ⛔ **Then blocked on the W-126 session committing** — it holds uncommitted
   edits in `sourcelist.py`, `setup.py`, `doctor.py` and
   `tests/test_source_verbs.py`, all of which this build rewrites.

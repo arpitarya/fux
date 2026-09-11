@@ -2,21 +2,27 @@
 type: Compare Doc
 title: The types file as TOML
 description: Whether `.fux/sources/types` becomes `.fux/types.toml`, and in what shape — a reversal of ADR-TYPES' recorded rejection of a TOML types list.
-status: proposed
+status: accepted
 timestamp: 2026-09-11T00:00:00Z
 ---
 
 # `.fux/sources/types` → `.fux/types.toml` — Comparison
 
-> **Verdict (proposed): D — `.fux/types.toml`, an `include` glob array plus a
-> `[decoders]` table keyed by extension.**
+> **Verdict: ACCEPTED (Arpit, 2026-09-11) — D, and F1–F6 exactly as proposed.**
+> Shipped the same day as [ADR-TYPES](../../docs/adr/0038_types-list.md)
+> decision 12. Two refinements the build found, both recorded there: F3's
+> *stated twice* check is **exact-case** (`"*.CSV"` beside `csv` admits other
+> files), and F5's conversion **refuses** an upper-case bound pattern rather
+> than change the allowlist. Converting this repo re-ingested byte-identical.
+>
+> **Proposed verdict, as filed: D — `.fux/types.toml`, an `include` glob array
+> plus a `[decoders]` table keyed by extension.**
 >
 > **Arpit's ask (2026-09-11, Cowork):** *"convert it to .toml or .yaml file and
 > put it in .fux dir rather than .fux/sources"* — then, when asked: **TOML**, and
 > **do it properly** (this doc, then the record and the code in one change).
 >
-> **Status:** ⏳ proposed — six sub-forks in §5 await Arpit. **No code and no
-> record has changed.**
+> **Status:** ✅ accepted and built (W-130).
 >
 > **Confidence:** medium. A consistency and ergonomics call; nothing here is
 > measurable, and **A (change nothing) stays a legitimate answer.**

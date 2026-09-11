@@ -33,9 +33,8 @@ The grammar, in one place:
   legitimately disagree and letting a merge artefact pick a privacy policy is
   the worst available outcome (decision 10).
 
-- **A `!` prefix subtracts** (`dirs` and `types` only). `!work/regression/*/evidence`
-  removes matching paths from the walk; `!*.min.md` removes matching names from
-  the type allowlist. **There is no un-exclude**: `!` subtracts and nothing adds
+- **A `!` prefix subtracts** (`dirs` only, and the old `types` grammar).
+  `!work/regression/*/evidence` removes matching paths from the walk. **There is no un-exclude**: `!` subtracts and nothing adds
   back, so there is no precedence order to remember or to get wrong.
   Exclusions are **order-independent** — the loader sorts, so two people holding
   the same set in different orders must produce the same committed bytes, which
@@ -46,7 +45,8 @@ The grammar, in one place:
   strictness exists to prevent.
 
 The attribute sets are closed and per file: `fetch` + `meta` for `urls`,
-`archived` for `dirs`, and **none at all** for `types`. Adding one is a change
+`archived` for `dirs`. (`types` was the third file until 2026-09-11; it is
+`.fux/types.toml` now, read by `typesfile` — see `TYPES` below.) Adding one is a change
 to the owning record, which is what makes the unknown-key error safe to be
 strict about.
 
@@ -326,16 +326,20 @@ DIRS = ListSpec(
     allow_exclusions=True,
 )
 
-#: `.fux/sources/types` — which files in a source tree are documents at all,
-#: and which decoder reads each one.
+#: The vocabulary of a type pattern — **no longer the grammar of a committed file.**
 #:
-#: ⚠ **This list had NO attributes until 2026-09-01**, on the rule that "a
-#: pattern is a pattern, and every property one might want to hang on it
-#: belongs to the *directory* it was found under". `decoder` is the exception
-#: and the reason is that it is not a property of the directory: it is a
-#: property of the **extension**, which is exactly what a line here names.
-#: Ruled by Arpit; carried by [ADR-TYPES](../../../docs/adr/0031_types-list.md)
-#: decisions 11 and 11a.
+#: ⚠ **Since 2026-09-11 the types list is `.fux/types.toml`**, read and written by
+#: [`typesfile`](typesfile.py) (ADR-TYPES decision 12), so this parser reads two
+#: committed lists, not three. `TYPES` survives for two jobs and nothing else:
+#:
+#: 1. **the `fux add --types` / `fux remove --types` dispatch token** — its
+#:    `validate` (`_type_reason`) and its one attribute, `decoder`, are what the
+#:    verbs check an entry against before `typesfile` writes it;
+#: 2. **the grammar of the old `.fux/sources/types`**, which `fux setup` converts
+#:    (`typesfile.convert_legacy`) and every other path refuses.
+#:
+#: `decoder` is a property of the **extension**, which is why it was the one
+#: attribute this list ever took — ADR-TYPES decisions 11 and 11a.
 TYPES = ListSpec(
     kind="types",
     attributes=(Attribute("decoder", (), "", validate=_decoder_reason),),

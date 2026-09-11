@@ -164,7 +164,8 @@ table is the reasoning.
 | entry | kind | what it is, and why that kind |
 |---|---|---|
 | `index/` | committed | the product; nothing can recompute it |
-| `sources/` | committed | `dirs` · `urls` · `types`, one entry per line, on the one grammar in [ADR-URL-LIST](0026_url-list.md). ⚠ Since 2026-09-01 `types` is also the **decoder map**: `fux setup` writes `decoder=<module>` on every line a built-in reads, so which decoder ran is a committed fact rather than a property of the machine's `decoders/` ([ADR-TYPES](0038_types-list.md) decision 11). Still write-if-missing — a repo that already has the file keeps it, bindings and all |
+| `sources/` | committed | `dirs` · `urls`, one entry per line, on the one grammar in [ADR-URL-LIST](0026_url-list.md). ⚠ **`types` lived here until 2026-09-11** and is `types.toml` now (the row below) |
+| `types.toml` | committed | which files are documents and which decoder reads each extension — `include` plus `[decoders]` ([ADR-TYPES](0038_types-list.md) decisions 11–12). **Optional**: absent means the built-in default. Write-if-missing — a repo that already has the file keeps it, bindings and all; a repo with only the old `sources/types` has it **converted** by `fux setup`, never rewritten in place |
 | `fetchers/` | committed | consumer code — decision 4 |
 | `decoders/` | committed | consumer code — decision 5 |
 | `enrich/` | committed | pinned enrichment text, one file per **source content sha**, plus `queue.tsv`. It cannot be re-derived: a model wrote it, in an agent, once, and [ADR-ENRICH](0047_enrich.md) decision 1 refuses to call one. Committed also means **every clone has identical coverage**, so L3 holds with a wider input rather than a weaker property. Keying by source sha means editing a document orphans its enrichment automatically — staleness is structural rather than a check someone has to remember |
@@ -215,7 +216,7 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `sources/types`, `tune.toml`, `output.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `types.toml`, `tune.toml`, `output.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run.
@@ -244,6 +245,16 @@ now writes the default out as live lines. Per this decision it reaches **new
 repos only**, so every repo already holding the broken file — including this one
 — is reached by a `doctor` check, `types list usable`, and not by a rewrite.
 That is this ⚠ working as designed, not an exception to it.
+
+⚠ **A third worked instance, 2026-09-11 — a file that MOVED.** The types list
+left `sources/types` for `types.toml` ([ADR-TYPES](0038_types-list.md) decision
+12). Every existing repo holds the old file, and this decision's two mechanisms
+reach it: **a loader refusal** — `read_types`, `decode` and every `fux source`
+verb stop on the old file and name the command — and **a `doctor` row**, `types
+list usable`. The third move is `fux setup` writing the NEW file from the old
+one when the new one is missing: **write-if-missing on a path that does not
+exist yet, not a rewrite of one that does.** The old file is never touched; the
+human deletes it.
 
 ⚠ **A second worked instance, 2026-08-28 — and this one had a measured cost.**
 [ADR-FETCHER](0027_fetcher.md) decisions 12–13 added two **optional** functions

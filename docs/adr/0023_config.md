@@ -340,11 +340,20 @@ against the code.
   surprising. Worth the surprise: the alternative is folklore about where 256
   comes from.
 - **A third source-list path constant lives here, with no key at all.**
-  `DEFAULT_TYPES_FILE = ".fux/sources/types"` joins `dirs_file` and `urls_file`
+  `DEFAULT_TYPES_FILE = ".fux/types.toml"` joins `dirs_file` and `urls_file`
   because paths have one home — but it has **no `fux.toml` key**, deliberately:
   the types list is optional, its absence is meaningful (the built-in default
   applies), and a key whose only job is to relocate an optional file is surface
-  nobody asked for. Decided in [ADR-TYPES](0038_types-list.md).
+  nobody asked for. Decided in [ADR-TYPES](0038_types-list.md). ⚠ **It was
+  `.fux/sources/types` until 2026-09-11** (ADR-TYPES decision 12);
+  `LEGACY_TYPES_FILE` keeps the old path so every reader can refuse it by name.
+- 🔴 **`[sources] types_file` is refused by name, since 2026-09-11.** Found the
+  same day: `config.schema.json` advertised the key — default
+  `.fux/sources/types`, *"OPTIONAL. Absent means…"* — while this record said no
+  key exists and `load()` never read one. A consumer who set it got silence and
+  the default path. The schema entry is deleted and the key is now a loud error
+  in `load()`, the same treatment `[sources] dirs` gets; held by
+  `tests/test_config.py::test_a_types_file_key_is_refused_by_name`.
 - ⚠ **The directory list is include-only, with no exclusions** — so committed
   measurement evidence under `work/regression/` contaminates the corpus it
   measures. That cost is stated rather than discovered.

@@ -287,6 +287,23 @@ retired, and re-checking it weekly is enough*. A reader who folded the two
 would conclude that a retired page needs no freshness policy, which is the
 opposite of what a citation to a retired page needs.
 
+⚠ **`ttl` is now the only `validate=` attribute on a LIVE committed list**
+(2026-09-11). This record added the first typed attribute — `Attribute` grew an
+optional `validate` callable because a duration cannot be a closed enum — and
+`decoder` on the types list was the only other user.
+
+**`decoder`'s spec did not disappear, it went vestigial.** `.fux/sources/types`
+became `.fux/types.toml` ([the comparison](../../work/compare/types-toml.compare.md),
+ADR-TYPES decision 12), and `sourcelist.TYPES` survives only as the `fux add
+--types` dispatch token and as the grammar `fux setup` reads when converting a
+legacy file. **So the typed-attribute machinery has exactly one live user, and
+it is this one** — if `ttl` ever leaves the line grammar, `Attribute.validate`
+has none, and whoever removes it should know that before deleting the seam.
+
+⚠ **The duration grammar itself is unaffected**: `sourcelist.parse_duration` is
+still the single definition, and `[sources.url] ttl` still validates through it
+rather than through a second copy ([ADR-CONFIG](0023_config.md) decision 12).
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

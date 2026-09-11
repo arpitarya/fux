@@ -70,6 +70,8 @@ GENERATED_FILES = ("README.md", ".gitignore")
 COMMITTED_FILES: dict[str, str] = {
     "tune.toml": "the tunables: HOW results are ordered, never what is indexed (ADR-TUNE)",
     "output.toml": "the output defaults: HOW a result is SHOWN, never which documents come back (ADR-OUTPUT)",
+    # ASCII only, like every other value in these tables.
+    "types.toml": "which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (ADR-TYPES)",
     # ASCII only, like every other value in these tables -- `_readme()` encodes
     # them for a Windows console.
     ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE)",

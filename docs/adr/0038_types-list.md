@@ -1,12 +1,12 @@
 ---
 type: ADR
 name: ADR-TYPES
-title: "ADR-TYPES (0038) — which files are documents: a built-in allowlist, overridable by .fux/sources/types and by .fuxignore"
+title: "ADR-TYPES (0038) — which files are documents: a built-in allowlist, overridable by .fux/types.toml and by .fuxignore"
 description: "Prose plus every format a built-in decoder reads is compiled in as an allowlist; a committed types file replaces it, and .fux/.fuxignore outranks it in both directions. Absent means the default, never everything and never nothing."
 status: accepted
 date: 2026-08-20
-feature: the file-type allowlist and `.fux/sources/types`
-owns: []
+feature: the file-type allowlist and `.fux/types.toml`
+owns: ["src/fux/ingest/typesfile.py"]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
 ---
@@ -26,9 +26,15 @@ lockfiles, generated OpenAPI specs and vendored fixtures — the same waste, one
 corpus at a time.
 
 **An allowlist is compiled in, and a consumer can replace it** by committing
-`.fux/sources/types`. Absent means the default applies — never *index
+`.fux/types.toml`. Absent means the default applies — never *index
 everything*, which was the defect, and never *index nothing*, which looks like
 a broken engine.
+
+**The file has two keys.** `include` lists globs that are already text;
+`[decoders]` maps an extension to the module that reads it, and **a bound
+extension is a document**. Nothing in it subtracts — exclusions live in
+`.fux/.fuxignore`. ⚠ **It was `.fux/sources/types`, a line-grammar file, until
+2026-09-11** (decision 12).
 
 ```mermaid
 flowchart TD
@@ -74,25 +80,38 @@ flowchart TD
 
 ### Examples
 
-Replacing the default — the file wins entirely, and `!` subtracts:
+Replacing the default — the file wins entirely:
 
 ```console
-$ cat .fux/sources/types
-*.md
-!*.gen.md
+$ cat .fux/types.toml
+include = [
+  "*.md",
+]
+
+[decoders]
+geojson = "json"
 
 $ fux ingest --list-skipped
 docs/data.json: not an indexed file type
 docs/run.sh: not an indexed file type
-docs/thing.gen.md: not an indexed file type
 ```
 
 An empty allowlist is refused rather than silently emptying the index:
 
 ```console
-$ printf '# nothing\n' > .fux/sources/types && fux ingest
-error: .fux/sources/types: lists no file types, so nothing would be indexed.
-Delete the file to take the built-in default (…), or add at least one pattern
+$ printf 'include = []\n' > .fux/types.toml && fux ingest
+error: .fux/types.toml: lists no file types - `include` and `[decoders]` are both
+empty - so nothing would be indexed. Delete the file to take the built-in default
+(…), or add at least one entry
+```
+
+A leftover line-grammar file is refused, never quietly ignored:
+
+```console
+$ fux ingest
+error: .fux/sources/types is the old types list; it moved to .fux/types.toml
+(ADR-TYPES decision 12). Run `fux setup` to write .fux/types.toml from it - its
+`!` lines become .fux/.fuxignore lines - then delete .fux/sources/types. …
 ```
 
 ---
@@ -148,21 +167,22 @@ registry.** A default that grew when a consumer dropped a `logdoc.py` into
 file type**. What counts as a document stays a committed line a human wrote.
 Pinned by `test_the_default_never_grows_from_a_consumer_decoder`.
 
-**2. `.fux/sources/types` replaces the default when it exists.** It does not
-extend it. One glob per line, `!` subtracts, same grammar as `dirs` and `urls`
-and the same parser.
+**2. `.fux/types.toml` replaces the default when it exists.** It does not
+extend it. Its shape is decision 12's.
 
-**2a. `.fux/.fuxignore` is where exclusions belong; a `!` line here is the
-deprecated spelling.** It still works and is still parsed — nothing that
-already runs is broken — but [ADR-FUXIGNORE](0055_fuxignore.md) decision 5
-makes `.fuxignore` the home, and `fux ingest` warns when the same pattern is
-written in both places, naming this file as the line to delete.
+**2a. `.fux/.fuxignore` is where exclusions belong, and the types list has no
+subtraction at all.** [ADR-FUXIGNORE](0055_fuxignore.md) decision 5 made
+`.fuxignore` the home and this file's `!` line the deprecated spelling.
+⚠ **Since 2026-09-11 the deprecated spelling is gone** (decision 12, fork F4):
+`.fux/types.toml` has no `exclude` key, a `!` glob in `include` is a loud error
+naming `.fuxignore`, and `fux setup`'s conversion moves every old `!` line
+there.
 
 **3. Absent means the default, not "everything" and not "nothing".**
 *Everything* is the defect. *Nothing* makes the 86 % case do work for the 14 %
 case, and a missing or empty file that empties the index reads as a broken
-engine rather than a missing config. **A types file with no positive pattern is
-a loud error.**
+engine rather than a missing config. **A types file that admits nothing — an
+empty `include` and an empty `[decoders]` — is a loud error.**
 
 **4. No extensionless files.** Those are `LICENSE`, `Makefile` and `Dockerfile`
 far more often than they are documents.
@@ -253,10 +273,12 @@ that has run setup it retires the ⚠ consequence below about the default moving
 whenever a built-in decoder is added. A repo with **no** types file still tracks
 `DEFAULT_TYPES` and still sees that movement.
 
-**11. A `types` line BINDS its extension to the decoder that reads it —
-`decoder=<module stem>` — and fux CHECKS the binding rather than trusting it.**
-Ruled by Arpit 2026-09-01: *"don't comment it, map it in a proper way and use
-the file as map."*
+**11. The types list BINDS an extension to the decoder that reads it —
+since decision 12, `<ext> = "<module stem>"` under `[decoders]`; until then
+`decoder=<module stem>` on a line — and fux CHECKS the binding rather than
+trusting it.** Ruled by Arpit 2026-09-01: *"don't comment it, map it in a proper
+way and use the file as map."* The prose below still speaks of *a line*; each
+such line is one `[decoders]` key now.
 
 ⚠ **This reverses "no attributes at all for `types`", which this record carried
 from 2026-08-20 to 2026-09-01.** The old rule was *"a pattern is a pattern, and
@@ -299,10 +321,10 @@ refused by it.
 
 | the line | who claims the extension | verdict |
 |---|---|---|
-| `*.geojson decoder=json` | **nobody** | **allowed** — extending |
-| `*.csv decoder=json` | `csv` does | **refused** — redirecting |
-| `*.csv decoder=mycsv` (consumer, claims `.csv`) | the named module itself | allowed |
-| `*.geojson decoder=nosuchdoc` | — | refused, no such module |
+| `geojson = "json"` | **nobody** | **allowed** — extending |
+| `csv = "json"` | `csv` does | **refused** — redirecting |
+| `csv = "mycsv"` (consumer, claims `.csv`) | the named module itself | allowed |
+| `geojson = "nosuchdoc"` | — | refused, no such module |
 
 **`EXTENSIONS` is a decoder's DEFAULT CLAIM, not a declaration of what it is
 capable of reading.** A `.geojson` is JSON and `json` reads JSON; a `.cnf` is
@@ -333,10 +355,91 @@ add` now WRITE the binding they would have derived — the map fux already had,
 committed instead of implied — so a generated file states its dispatch and a
 hand-written one may stay silent.
 
-**A prose format carries no binding**, because no decoder is in its path.
-`render_line` therefore omits an attribute at an EMPTY default, which is the
-one narrowing of [ADR-URL-LIST](0026_url-list.md) decision 12 this change makes:
-a bare `decoder=` states no policy and cannot be diffed into one.
+**A prose format carries no binding**, because no decoder is in its path — it
+is an `include` glob. (Under the line grammar, `render_line` omitted an
+attribute at an EMPTY default for this reason, the one narrowing of
+[ADR-URL-LIST](0026_url-list.md) decision 12; `.fux/types.toml` refuses an empty
+binding outright, because `md = ""` binds nothing.)
+
+**12. The types list is `.fux/types.toml` — an `include` glob array and a
+`[decoders]` table keyed by extension — and the old `.fux/sources/types` is
+refused, never read.** Asked by Arpit 2026-09-11 (*"convert it to .toml … and put
+it in .fux dir rather than .fux/sources"*); the fork and all six sub-forks ruled
+as proposed the same day in
+[`work/compare/types-toml.compare.md`](../../work/compare/types-toml.compare.md).
+
+```toml
+include = [          # already text: no decoder in the path
+  "*.md",
+  "docs/**/*.txt",
+]
+
+[decoders]           # extension = the module that reads it
+csv = "csv"
+geojson = "json"
+"tar.gz" = "zip"     # a dotted extension is quoted, or TOML nests it
+```
+
+| fork | ruled |
+|---|---|
+| F1 location | **`.fux/types.toml`**, beside `tune.toml`, `output.toml`, `refusals.toml` and `pii.toml` — not in `.fux/sources/` |
+| F2 shape | **`include` + `[decoders]`**, not an array of per-pattern tables. Entries were never order-sensitive (the loader sorts), so an ordered list would spend TOML's verbosity on an order nothing reads |
+| F3 does a binding admit? | **yes.** `[decoders] csv` makes `*.csv` a document; `"*.csv"` also in `include` is a loud *stated twice* error. Exact case only: `"*.CSV"` beside `csv` admits different files and is legal |
+| F4 subtraction | **none** — decision 2a |
+| F5 the old file | **refused** by `read_types`, by `decode` and by every `fux source` verb, and reported by `fux doctor`; `fux setup` **converts** it when `.fux/types.toml` is missing, moving `!` lines to `.fuxignore` above the first hand-written pattern, and tells the human to delete the old file |
+| F6 error positions | the **key** always (`decoders.geojson`); `:lineno` only when a scan finds exactly one line |
+
+**Why a reversal of a recorded rejection was acceptable.** §Alternatives
+rejected *"a `[sources] types` TOML array"* for three reasons. Two do not reach
+this shape: a multi-line array is one entry per line and merges line by line
+([ADR-URL-LIST](0026_url-list.md) decisions 1-2), and a file of its own is not a
+corpus decision buried in `fux.toml`. **The third does, and is paid**: the
+three source lists no longer share one grammar and one writer.
+
+**What the shape makes impossible rather than checked.**
+
+- **A path-scoped binding.** A `[decoders]` key is an extension, so
+  `docs/api/*.json decoder=json` — which would silently have bound every `.json`
+  in the corpus, and which `_bound_extension` refused at resolution — cannot be
+  written. That check is deleted, not moved.
+- **Two bindings for one extension.** *"Defining a key multiple times is
+  invalid"* — TOML refuses it before fux reads a value.
+
+**What is still checked, by [`typesfile.py`](../../src/fux/ingest/typesfile.py):**
+the closed key set (`tomllib` accepts anything); every glob by the rule the line
+grammar used (`_type_reason`); every module name by its shape
+(`_decoder_reason`); and an extension key's shape — lowercase, no dot, no glob
+character. Existence and redirection stay `decode._bind`'s, decision 11a.
+
+**The reader is lenient, the writer is strict** — [ADR-URL-LIST](0026_url-list.md)
+decision 13, kept. Any valid TOML with the two keys loads. `fux setup` and the
+`fux source` verbs write the canonical layout — `include = [` on its own line,
+one glob per line, one `key = "value"` per line under `[decoders]`, decoders
+grouped by module — and every edit changes **one line** and re-parses its own
+result before writing. **A layout fux did not write is refused, not
+reformatted**: a reformat would eat the comments inside the array. The stdlib
+reads TOML and does not write it, so the writer is hand-rolled (L1).
+
+**The old file is refused wherever the list is consulted**, including `decode`,
+because `fux ask` decodes fetched documents without walking: a binding it
+silently stopped seeing would re-read them with a different decoder than the
+index was built with. **Silently ignoring it is disqualified** — the default
+would take its place and the index would change with nothing saying so, the
+worst case decision 11 names.
+
+**The conversion changes no index byte, and that was measured rather than
+argued.** This repo's corpus was ingested `--full` with the line-grammar file,
+then converted by `fux setup` and ingested `--full` again: **254 of 254 shards
+and `.fux/.fuxignore` byte-identical, 0 documents changed** (2026-09-11). The
+two ingests must share one tree and one git history, because a record's `mtime`
+is a commit timestamp. Held going forward by
+`tests/test_setup.py::test_the_converted_file_states_what_the_old_one_admitted`.
+An upper-case bound pattern (`*.CSV decoder=csv`) is **refused, not converted**:
+a `csv` binding admits `*.csv`, so either silent answer would move the allowlist.
+
+**`[sources] types_file` in `fux.toml` is refused by name** ([ADR-CONFIG](0023_config.md)).
+`config.schema.json` advertised it with a default of `.fux/sources/types`, and
+nothing had ever read it.
 
 ### Consequences
 
@@ -354,18 +457,26 @@ a bare `decoder=` states no policy and cannot be diffed into one.
   `.fux/.fuxignore` admits a format with no decoder, as raw bytes. That is the
   cost ADR-FUXIGNORE decision 4 pays for the file meaning what its name says,
   and **nothing has been measured about how often anyone reaches for it.**
-- **The trio under `.fux/sources/` is complete**: `dirs` says *where*, `types`
-  says *what* — and, since decision 11, *read by what* — and `urls` says *what
-  else*.
+- **Three lists, two places**: `.fux/sources/dirs` says *where*,
+  `.fux/types.toml` says *what* — and, since decision 11, *read by what* — and
+  `.fux/sources/urls` says *what else*. ⚠ **Until decision 12 all three sat under
+  `.fux/sources/` on one grammar**; the types list left both.
+- 🔴 **Decision 12's costs, stated.** The three source lists no longer share one
+  parser and one writer — `sources.py` branches on `types` in every verb. A
+  semantic error in the types file no longer guarantees `file:lineno`, which
+  every line-grammar list promises. And a repo that ran `fux setup` before
+  2026-09-11 stops at its next `fux ingest` until it runs `fux setup` and deletes
+  the old file — loud, one command, and deliberate.
 - ⚠ **`types` now has an attribute, so the "no attributes" argument is spent as
   a blanket answer.** The next proposal to hang something on a pattern gets the
   test in decision 11, not a flat no: *is this a property of the extension, or
   of the directory it was found under?* A per-root `types=` is still the latter
   and is still refused — it is veto condition 1, unchanged.
-- ⚠ **A hand-written types file states no bindings and gets no warning.** Every
-  line still resolves, through the tuples, exactly as before — so the map is
-  complete only in files fux generated or a human filled in. Nothing reports
-  the gap today; `fux doctor` is where that would go.
+- ⚠ **A hand-written types file states no bindings and gets no warning.** An
+  `include` glob for a decoded format (`"*.csv"`) still resolves through the
+  module tuples, exactly as before — so the map is complete only in files fux
+  generated or a human filled in. Nothing reports the gap today; `fux doctor`
+  is where that would go.
 - **A `.txt` or `.org` corpus works with no configuration**, which is the half
   of the argument a compiled-in-only allowlist could not deliver.
 - ⚠ **The default now moves whenever a built-in decoder is added.** That is
@@ -389,7 +500,15 @@ the short version:
   problem, and it repeats the same globs on every line — but **not excluded
   forever**; it is exactly the reopen trigger below.
 - **A `[sources] types` TOML array.** Rejected: the shape
-  [ADR-DIR-LIST](0030_dir-list.md) had just moved away from.
+  [ADR-DIR-LIST](0030_dir-list.md) had just moved away from. ⚠ **Reversed in
+  part by decision 12**, which put the list in TOML in a file of its own —
+  the argument, reason by reason, is in decision 12 and the compare doc.
+- **An array of tables, one per pattern** (`[[type]] pattern = … decoder = …`).
+  Rejected under decision 12: two to three lines per entry, it suggests an
+  order the loader discards, and it keeps every runtime check `[decoders]`
+  makes unwritable.
+- **YAML.** Rejected under decision 12: a third-party parser is a runtime
+  dependency a record would have to name under L1, for no gain over `tomllib`.
 - **Named type sets, ripgrep-style.** Rejected: ripgrep needs names because a
   human types `-tweb` fifty times a day; fux reads a committed file once per
   ingest. The indirection buys nothing and costs a second grammar.
@@ -404,18 +523,34 @@ the short version:
 
 - The code: [`src/fux/ingest/gitdir.py`](../../src/fux/ingest/gitdir.py)
   (`_PROSE_TYPES`, `_default_types`, `DEFAULT_TYPES`, `read_types`,
-  `walk_sources`) and the shared grammar in
-  [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py)
-  (`TYPES`, `_decoder_reason`, `render_line`, `glob_match`); the decoder
-  registry the default unions with — [ADR-DECODE](0049_decode.md).
+  `walk_sources`), the file itself in
+  [`src/fux/ingest/typesfile.py`](../../src/fux/ingest/typesfile.py) (`parse`,
+  `read`, `check_legacy`, `render`, `add_include`, `set_decoder`, `remove`,
+  `convert_legacy`), and `glob_match`, `_type_reason` and `_decoder_reason` in
+  [`src/fux/ingest/sourcelist.py`](../../src/fux/ingest/sourcelist.py); the
+  decoder registry the default unions with — [ADR-DECODE](0049_decode.md).
 - Decision 11's binding, resolved and checked:
   [`src/fux/decode/__init__.py`](../../src/fux/decode/__init__.py)
-  (`_declared_bindings`, `_bound_extension`, `_bind`, `builtin_bindings`), and
-  written by [`src/fux/setup.py`](../../src/fux/setup.py) (`_seed_types`) and
-  [`src/fux/sources.py`](../../src/fux/sources.py). Held by
-  [`tests/decode/test_binding.py`](../../tests/decode/test_binding.py) — 20
-  cases, including that a binding beats load order when two decoders claim one
-  extension, and that every binding fux writes survives the check fux applies.
+  (`_declared_bindings`, `_bind`, `builtin_bindings`), and written by
+  [`src/fux/setup.py`](../../src/fux/setup.py) (`_seed_types`,
+  `_convert_legacy_types`) and [`src/fux/sources.py`](../../src/fux/sources.py).
+  Held by [`tests/decode/test_binding.py`](../../tests/decode/test_binding.py)
+  and [`tests/ingest/test_typesfile.py`](../../tests/ingest/test_typesfile.py),
+  including that a binding beats load order when two decoders claim one
+  extension, that every binding fux writes survives the check fux applies, and
+  that a converted file admits exactly what the old one did
+  (`tests/test_setup.py`).
+- Decision 12: the fork and its matrix —
+  [`work/compare/types-toml.compare.md`](../../work/compare/types-toml.compare.md).
+- **TOML v1.0.0** — *"Defining a key multiple times is invalid"*; arrays span
+  lines with trailing commas and comments — <https://toml.io/en/v1.0.0>
+- **Python `tomllib`** — added in 3.11 (L7), and *"This module does not support
+  writing TOML"*, which is why the writer is hand-rolled —
+  <https://docs.python.org/3/library/tomllib.html>
+- **Ruff's `include` and `extension` settings** — a glob list plus a
+  bare-extension map whose keys are *"automatically added to the default
+  `include` list as a `*.{ext}` glob"*: decision 12's shape and fork F3 —
+  <https://docs.astral.sh/ruff/settings/#extension>
 - **Django `DATABASES['default']['ENGINE']`** — the committed config names the
   backend module by import path rather than letting an installed driver claim a
   scheme, which is the same "the config binds, the module is checked" shape —
@@ -460,6 +595,12 @@ the short version:
    formats**, which would mean the raw-bytes escape hatch has become a habit
    and the allowlist is not doing the work this record claims for it.
 
+6. **Decision 12: `dirs` or `urls` is proposed as TOML** — the grammar-split
+   cost disappears and the three lists are judged together; **or `types` gains a
+   property of a pattern rather than of an extension**, which `[decoders]` cannot
+   hold; **or a defect is filed where a `fux source` verb behaves differently for
+   `types` than for `dirs`** because of the split writer.
+
 **How to check them:**
 
 ```bash
@@ -474,6 +615,10 @@ fux ingest --list-skipped | grep -c 'not an indexed file type'
 # 4 — the default must union BUILT-IN extensions only
 grep -n 'builtin_extensions' src/fux/ingest/gitdir.py
 # expect: one call, inside _default_types()
+
+# 6 — decision 12's triggers
+ls work/compare/ work/proposals/ | grep -i toml   # a dirs/urls TOML proposal?
+grep -n "types" work/OPEN-WORK.md                  # a verb-split defect?
 ```
 
 ---

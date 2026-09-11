@@ -184,7 +184,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0023](0023_config.md) | **ADR-CONFIG** | `fux.toml` and every property in it — three tables read, three refused by name, one passed through unread | accepted | yes |
 | [0024](0024_port-list.md) | **ADR-PORT-LIST** | Port, don't rewrite — a closed list, each module with its tests, and a port earns its place by having a caller | accepted | partial |
 | [0025](0025_extracted-mode.md) | **ADR-EXTRACTED** | The `extracted` ingest mode — everything taken from the document, nothing invented; the mode every guarantee is stated for | accepted | yes |
-| [0026](0026_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar for all three lists | accepted | yes |
+| [0026](0026_url-list.md) | **ADR-URL-LIST** | The committed URL list — one per line so it merges at scale; loader-sorted so config order can never change committed bytes; one grammar for the `urls` and `dirs` lists (`types` left it for TOML on 2026-09-11) | accepted | yes |
 | [0027](0027_fetcher.md) | **ADR-FETCHER** | The consumer-owned fetcher — fux never fetches; one fetcher per URL, declared not detected, returning bytes and a content type, and nothing composes | accepted | yes |
 | [0028](0028_cdp-fetcher.md) | **ADR-CDP-FETCHER** | The browser fetcher — borrows your signed-in Chrome over CDP and **intercepts the response**, returning the server's bytes rather than a rendering; never escalated to | accepted | yes |
 | [0029](0029_http-fetcher.md) | **ADR-HTTP-FETCHER** | The default fetcher — a plain stdlib GET written into your repo by `fux setup`, so core keeps zero network lines; and it never escalates | accepted | yes |
@@ -196,7 +196,7 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0035](0035_runtime-stats.md) | **ADR-RUNTIME-STATS** | `stats.json` — the corpus-wide numbers BM25F reads, stored RAW so a field weight cannot bake into the plane | accepted | yes |
 | [0036](0036_graph.md) | **ADR-GRAPH** | The graph lane — `explain`/`graph`/`path`, unseeded label-propagation communities in a derived plane, and PPR-lite with a **lazy** walk | accepted | yes |
 | [0037](0037_refer-plane.md) | **ADR-REFER** | Fetch through the *consumer's* fetcher, verify by content sha, assemble under a **byte** budget with a floor, and record the staleness discovered | accepted | yes |
-| [0038](0038_types-list.md) | **ADR-TYPES** | Which files are documents — prose plus every format a built-in decoder reads; absent means the default, never "everything" | accepted | yes |
+| [0038](0038_types-list.md) | **ADR-TYPES** | Which files are documents — prose plus every format a built-in decoder reads; absent means the default, never "everything"; `.fux/types.toml` (`include` + `[decoders]`) replaces it, and the old `.fux/sources/types` is refused and converted | accepted | yes |
 | [0039](0039_hooks.md) | **ADR-MAINTENANCE** | The hooks that keep a committed index in step — `post-commit` **defers**, no hook touches the network, one write lock, and a resident daemon for the URL tail | accepted | yes |
 | [0040](0040_merge-driver.md) | **ADR-MERGE-DRIVER** | The committed index merges line by line, last-writer-wins on `(ver, sha)`, and refuses rather than guesses | accepted | yes |
 | [0041](0041_cache.md) | **ADR-CACHE** | Two caches, two different proofs — ARC keyed `(loc, sha)` cannot change an answer; the TTL store is opt-in, disk-bounded, and answers `cached`, never `current` | accepted | yes |
@@ -329,7 +329,7 @@ table does not grant.
 | `src/fux/frontmatter.py` | ADR-LAWS | hand-rolled parser — L1, `$0` stdlib-only |
 | `src/fux/cli.py` | ADR-CLI | the flat verb surface, the boundary error contract, and the `--json` shape |
 | `src/fux/__main__.py` | ADR-CLI | `python -m fux` — the invocation ladder's last rung, and the spelling a human guesses |
-| `src/fux/sources.py` | ADR-CLI | `add`/`remove`/`update` — the writer for **all three** source lists, and the verbs over them |
+| `src/fux/sources.py` | ADR-CLI | `add`/`remove`/`update` — the writer for **all three** source lists, and the verbs over them. The types list's edits go through `ingest/typesfile.py` (ADR-TYPES decision 12) |
 | `src/fux/progress.py` | ADR-CLI | the progress plane — stderr-only, TTY-gated, counts not clocks |
 | `src/fux/config.py` | ADR-CONFIG | `fux.toml`'s schema, the opaque `[sources.url.config]` table, and the tables refused by name rather than ignored |
 | `src/fux/tune.py` | ADR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it |
@@ -341,8 +341,9 @@ table does not grant.
 | `src/fux/ingest/` | ADR-INGEST | git-dir walk, parse, edges — writes the committed plane |
 | `src/fux/ingest/priors.py` | ADR-INGEST | ⚠ **covered by the directory claim, and described by no record's decisions.** It computes the supersession and recency priors and writes `mtime` and `superseded` into the committed record; ADR-RECORD documents the properties and ADR-TUNE the weights, but the module's own behaviour is unrecorded |
 | `src/fux/ingest/extract.py` | ADR-EXTRACTED | what extraction *promises* — title, phrases, terms and per-field lengths, taken from the bytes and nothing else |
-| `src/fux/ingest/sourcelist.py` | ADR-URL-LIST | the one grammar all three committed source lists are parsed by |
+| `src/fux/ingest/sourcelist.py` | ADR-URL-LIST | the one line grammar `.fux/sources/dirs` and `.fux/sources/urls` are parsed by — and the `TYPES` entry vocabulary, which `fux source --types` checks against and `fux setup` reads the old `.fux/sources/types` with |
 | `src/fux/ingest/fuxignore.py` | ADR-FUXIGNORE | `.fux/.fuxignore` — the `.gitignore` grammar, the last-match-wins resolution, and the duplicate-pattern warning. **Carved out of ADR-INGEST's directory claim for a different DECISION, not a different concern**: everything else under `ingest/` is a step in the walk, and this is a *precedence rule* over it — the one thing that outranks the type allowlist |
+| `src/fux/ingest/typesfile.py` | ADR-TYPES | `.fux/types.toml` — the closed two-key shape, the one-line editors that refuse a layout they did not write, the refusal of the old `.fux/sources/types`, and its conversion. **Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent**: a *policy over* the walk — what counts as a document — not a step in it |
 | `src/fux/ingest/urlsrc.py` | ADR-FETCHER | fux's half of the fetch contract — load, configure, bound, call, normalize |
 | `src/fux/ingest/pii.py` | ADR-PII | the redaction matcher, the ruleset digest, and the plane table stating that redaction reaches the committed index and nothing else. Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent — a *policy over* the walk, not a step in it |
 | `src/fux/ingest/refusals.py` | ADR-REFUSAL | the refusal matcher — six byte-pure conditions and the always-on magic-byte floor. **Carved out of ADR-INGEST's directory claim on `fuxignore.py`'s precedent**: everything else under `ingest/` is a step in the walk, and this is a *refusal rule* over it |
@@ -453,7 +454,7 @@ the relation *look* enforced while asserting things nobody checked.
 | `src/fux/query/refer_answer.py` | ADR-ANSWER | the seam between `cmd_answer` and `refer()` — the candidate list, and `_load_fetchers`' per-URL dispatch. Owned by ADR-ASK under its `src/fux/query/` claim |
 | `src/fux/refer/_rescore.py` | ADR-RERANK | `passage_boost` and the bounded multiplicative uplift reach in here (decision 9) — the same constant that reorders documents scores their passages. Owned by ADR-REFER under its `src/fux/refer/` claim |
 | `src/fux/doctor.py` | ADR-REFUSAL | `_refusal_health` — how many rules load, how many responses each has refused (cumulative, from `urlstate.refused`), and **the rules that have never fired**, which is what a typo'd condition looks like. Decision 11 |
-| `src/fux/doctor.py` | ADR-DECODE | `_decoder_bindings` — the one binding fault no ingest can catch: a `decoder=` line on an extension **no indexed document has**. Extending is legal by design, so nothing errors and the line indexes nothing forever |
+| `src/fux/doctor.py` | ADR-DECODE | `_decoder_bindings` — the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has**. Extending is legal by design, so nothing errors and the line indexes nothing forever |
 | `src/fux/doctor.py` | ADR-URL-FRESHNESS | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — this record's veto instrument, shared verbatim with ADR-ACQUIRED's identical one so the quarter has a single home |
 | `src/fux/doctor.py` | ADR-INGEST | `_recency_prior` — whether any document carries an `mtime`. A corpus copied out of its git repository loses every one, and `ingest/priors.py` is where they come from |
 | `src/fux/maintain/urlstate.py` | ADR-REFUSAL | `refused` and `record_refusals` — the counter's storage, in the file ADR-MAINTENANCE owns, on `rate_limited`'s shape with the key turned from host to rule |

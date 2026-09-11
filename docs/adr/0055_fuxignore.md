@@ -17,7 +17,7 @@ timestamp: 2026-08-27T00:00:00Z
 
 **"Why is my file not in the index?" had four answers, and you had to know all
 four to ask.** A `!` line in `.fux/sources/dirs`. A `!` line in
-`.fux/sources/types`. The allowlist in that same file. Two rules compiled into
+`.fux/sources/types` (the types list until 2026-09-11). The allowlist in that same file. Two rules compiled into
 the walker. The symptom was always identical — a document quietly absent — and
 the four places had nothing in common but the outcome.
 
@@ -180,7 +180,7 @@ header.**
 
 **4. `.fuxignore` is read first and decides in BOTH directions.**
 
-- A path it **ignores** is skipped, whatever `.fux/sources/types` allows and
+- A path it **ignores** is skipped, whatever `.fux/types.toml` allows and
   whatever `.fux/sources/dirs` includes.
 - A path it **explicitly re-includes** with `!` skips past the `dirs`
   exclusions and the type allowlist entirely.
@@ -203,11 +203,21 @@ tree.
 nothing for a decoder or an analyzer to read either way, so a switch here would
 only move the emptiness one layer down.
 
-**5. The `!` lines in `sources/dirs` and `sources/types` still work, and
-`.fuxignore` is their new home.** They are not removed: `fux remove <path>`
-writes one (ADR-DIR-LIST decision 2d), and a repo that has one must keep
-working. **A pattern stated in both places raises a warning** naming both
-`file:lineno` and saying which line to delete — the `sources/` one.
+**5. The `!` lines in `sources/dirs` still work, and `.fuxignore` is their new
+home.** They are not removed: `fux remove <path>` writes one (ADR-DIR-LIST
+decision 2d), and a repo that has one must keep working. **A pattern stated in
+both places raises a warning** naming both `file:lineno` and saying which line to
+delete — the `dirs` one.
+
+⚠ **Amended 2026-09-11: the types half of this decision is gone.** It read *"the
+`!` lines in `sources/dirs` and `sources/types` still work"*. The types list is
+`.fux/types.toml` now and has **no subtraction at all**
+([ADR-TYPES](0038_types-list.md) decisions 2a and 12): a `!` glob there is a
+loud error naming this file, and `fux setup`'s conversion of the old file moves
+each `!` line here — **above the first hand-written pattern**, so a re-include
+already written here against the old subtraction keeps winning.
+`duplicate_warnings` lost its `types_file` parameter rather than keeping one that
+could only ever return nothing.
 
 ⚠ **The duplicate is warned about precisely because it is currently
 harmless.** Both copies exclude the same thing today. They agree only until
@@ -216,7 +226,7 @@ edit produces the opposite of what the other file says, silently. The warning
 is early for that, not for today.
 
 **6. Absent, empty, or all-comments means nothing is ignored — and that is
-safe here.** The same shape is a loud error for `sources/types`
+safe here.** The same shape is a loud error for `.fux/types.toml`
 (ADR-TYPES decision 3) because a present-but-empty allowlist empties the index.
 This file only ever subtracts by default, so an empty one cannot. It therefore
 has **no built-in default**: shipping guesses in an ignore file means its first
@@ -280,7 +290,7 @@ hide. A block line hides nothing new: the path was **already** not indexed when
 the line was written, by a rule that was already in force.
 
 ⚠ **What it DOES change: the list now decides.** A block line is a real ignore,
-so it **freezes** the verdict that produced it. Widen `.fux/sources/types` and
+so it **freezes** the verdict that produced it. Widen `.fux/types.toml` and
 the listed `.py` files stay out. Write content into a file listed as `empty` and
 it stays out, still labelled `empty`. **The freeze was stated and accepted**
 rather than avoided — it is what "put the list in `.fuxignore`" means, and the
@@ -367,7 +377,8 @@ same question.
   Rejected: it inverts ADR-TYPES from an allowlist to a denylist, and *"a
   denylist is never finished — the next generated format nobody has heard of
   arrives indexed"* (ADR-TYPES decision 1) is unanswered by anything in this
-  record. The allowlist stays in `sources/types`; only exclusion moves.
+  record. The allowlist stays in the types list (`.fux/types.toml` since
+  ADR-TYPES decision 12); only exclusion moves.
 - **Keep `!` meaning *subtract* here, for consistency with `sources/`.**
   Rejected: it makes the file a `.fuxignore` in name only, and the negation
   rule is the single thing every reader already knows about the format.

@@ -270,10 +270,21 @@ decoder returning `None` is **discovered**, and had nowhere to go.
   separate decision** — and *discovered* and *declared* are different origins,
   so merging them amends an accepted record.
 
-**13. A `decoder=` binding in `.fux/sources/types` OUTRANKS both, and is
+**13. A binding in the types list OUTRANKS both, and is
 verified against the module it names.** Ruled by Arpit 2026-09-01; the record
 that owns the grammar is [ADR-TYPES](0038_types-list.md) decision 11, and this
 is what it means for dispatch.
+
+⚠ **Where the binding lives moved on 2026-09-11** ([ADR-TYPES](0038_types-list.md)
+decision 12): it was `decoder=<module>` on a `*.ext` line of `.fux/sources/types`,
+and is `<ext> = "<module>"` under `[decoders]` in `.fux/types.toml`.
+`_declared_bindings` reads it through `ingest/typesfile.py` and passes `_bind` a
+**location string** (`.fux/types.toml:14 (decoders.geojson)`) instead of a line
+number, because a parsed TOML value carries no position. **`_bound_extension`
+is deleted, not moved**: its one job was refusing a path-scoped binding, which a
+key that IS an extension cannot express. A leftover `.fux/sources/types` is a
+hard error here as well as in `read_types`, because `fux ask` decodes fetched
+documents without walking.
 
 Precedence, in the order `registry()` applies it:
 
@@ -281,7 +292,7 @@ Precedence, in the order `registry()` applies it:
 |---|---|---|
 | 1 | a built-in's `EXTENSIONS` | which decoder *ships* claiming `.csv` |
 | 2 | a consumer module of the same name (decision 5) | which decoder is *installed* here |
-| 3 | `*.csv decoder=csv` | which decoder this repo has **agreed** reads `.csv` |
+| 3 | `csv = "csv"` under `[decoders]` | which decoder this repo has **agreed** reads `.csv` |
 
 ⚠ **Decision 5 is narrowed, not overturned.** It resolves an override by module
 name because *"matching on extension would let two files both claim `.html` and
@@ -303,7 +314,7 @@ is stale, because **the wrong decoder does not fail visibly**; it emits a
 plausible document and a plausible index.
 
 ⚠ **But an extension NOTHING claims may be given to any decoder, and that is
-not a hole — it is the feature.** `*.geojson decoder=json` is how a consumer
+not a hole — it is the feature.** `geojson = "json"` is how a consumer
 reads a format `json` can obviously handle without copying the module and
 editing one tuple. **`EXTENSIONS` is a default claim, not a capability
 declaration**, and reading it as the latter is what made the first version of
@@ -447,7 +458,7 @@ plane shipped — *"the suffix costs three characters and removes the question"*
   `BUILTIN_MODULES` — confirmed by planting one. **Nothing reaches a
   consumer's `.fux/decoders/`**, and this record states that rather than
   implying the rename is safe to take passively.
-- ⚠ **A `decoder=` binding in `.fux/sources/types` names a module** (decision
+- ⚠ **A binding in the types list names a module** (decision
   13), so `*.csv decoder=csvdoc` becomes `*.csv decoder=csv`. `_bind` already
   makes an unknown module name a hard error, so this one fails loudly.
 
@@ -468,7 +479,7 @@ tidy-up.
   consumer who wants them back writes `.fux/decoders/odt.py` — which is what the
   consumer seam is for, and the deleted module is the obvious starting point in
   git history.
-- 🔴 **`.fux/sources/types` in this repo still bound all 36 extensions to the
+- 🔴 **The types list in this repo (`.fux/sources/types` then) still bound all 36 extensions to the
   PRE-RENAME module names** (`decoder=csvdoc`, `decoder=odtdoc`, …) — a gap
   decision 17 described in prose and did not apply. Those lines resolved only
   because the stale `*doc.py` files were still on disk; the first `fux ingest`

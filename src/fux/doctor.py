@@ -580,7 +580,7 @@ def _refusal_health(root: Path) -> Check:
 
 
 def _decoder_bindings(root: Path) -> Check:
-    """`decoder=` in `.fux/sources/types` — does every binding still resolve?
+    """`[decoders]` in `.fux/types.toml` — does every binding still resolve?
 
     **W-101 item 2.** `registry()` refuses a binding that names a module which
     does not exist, and one that takes an extension away from the decoder that
@@ -590,7 +590,7 @@ def _decoder_bindings(root: Path) -> Check:
 
     ⚠ **The third fault is one only `doctor` can catch**, and it is why this is
     not simply "call `registry()` early". A binding on an extension **no
-    document in the corpus has** — a typo'd `*.jsno` — resolves perfectly:
+    document in the corpus has** — a typo'd `jsno = "json"` — resolves perfectly:
     extending is legal by design (ADR-DECODE, `_bind`), so nothing errors, and
     the line indexes nothing forever. That is deliberately not an ingest
     failure, and a report is the right weight for it.
@@ -837,7 +837,7 @@ def _output_config_health(root: Path) -> Check:
     defaults, and the repo is reached HERE instead.
 
     ⚠ **This is decision 6's own prescribed mechanism**, the same one
-    `_types_health` implements for `sources/types`: *"if a change must reach
+    `_types_health` implements for the types list: *"if a change must reach
     existing repos, the mechanism is a loader refusal or a `doctor` check —
     never a rewrite"*. The refusal is what broke them, so this is the check.
 
@@ -861,36 +861,45 @@ def _output_config_health(root: Path) -> Check:
 
 
 def _types_health(root: Path) -> Check:
-    """A committed types file with no live pattern — the shape that stops ingest.
+    """Will the committed types list load — the shape that stops ingest.
 
-    `read_types` refuses a types file whose every line is a comment, because a
-    present file replaces the built-in default entirely (ADR-TYPES decision 2)
-    and an empty allowlist would silently empty the index. `fux setup` used to
-    write exactly that file, so **`setup` then `ingest` failed on every fresh
-    repo** until 2026-08-27.
+    Three ways it cannot, each of which `read_types` refuses:
 
-    ⚠ **The fixed template does not reach a repo that already has the file** —
-    ADR-DOTFUX decision 6 is explicit that write-if-missing reaches new repos
-    only, and that when a change must reach existing ones the mechanism is *a
-    loader refusal or a `doctor` check, never a rewrite*. This is that check.
+    1. **A leftover `.fux/sources/types`.** The list moved to `.fux/types.toml`
+       on 2026-09-11 (ADR-TYPES decision 12), and a repo that ran `fux setup`
+       before then still has the old file. ADR-DOTFUX decision 6: when a change
+       must reach existing repos the mechanism is *a loader refusal or a
+       `doctor` check, never a rewrite* — this row is the check, and it names
+       the command that converts.
+    2. **A file that does not parse or breaks the closed key set.**
+    3. **A file that admits nothing.** A present file replaces the built-in
+       default entirely (ADR-TYPES decision 2), so an empty one would silently
+       empty the index — `fux setup` once wrote exactly that, and **`setup`
+       then `ingest` failed on every fresh repo** until 2026-08-27.
     """
-    path = root / DEFAULT_TYPES_FILE
-    if not path.is_file():
-        return Check("types list usable", True, "absent - the built-in default applies")
+    from .ingest import typesfile
+
     try:
-        text = path.read_text(encoding="utf-8")
+        listed = typesfile.read(root, DEFAULT_TYPES_FILE)
+    except FuxError as exc:
+        return Check("types list usable", False, str(exc))
     except OSError as exc:
         return Check("types list usable", False, f"{DEFAULT_TYPES_FILE}: {exc}")
-    live = [ln.lstrip() for ln in text.splitlines() if ln.strip() and not ln.lstrip().startswith("#")]
-    allow = [ln for ln in live if not ln.startswith("!")]
-    if allow:
-        return Check("types list usable", True, f"{DEFAULT_TYPES_FILE}: {len(allow)} pattern(s)")
+    if listed is None:
+        return Check("types list usable", True, "absent - the built-in default applies")
+    if listed.allow:
+        return Check(
+            "types list usable",
+            True,
+            f"{DEFAULT_TYPES_FILE}: {len(listed.include)} include glob(s), "
+            f"{len(listed.decoders)} decoder binding(s)",
+        )
     return Check(
         "types list usable",
         False,
-        f"{DEFAULT_TYPES_FILE} has no active pattern, so `fux ingest` refuses to run - "
-        "delete the file to take the built-in default, or re-run `fux setup` after "
-        "deleting it to get the default written out",
+        f"{DEFAULT_TYPES_FILE} admits nothing - `include` and `[decoders]` are both empty - so "
+        "`fux ingest` refuses to run. Delete the file to take the built-in default, or re-run "
+        "`fux setup` after deleting it to get the default written out",
     )
 
 
@@ -988,15 +997,13 @@ def _ignore_health(root: Path) -> Check:
         rules = fuxignore.read(root).rules
     except (FuxError, OSError) as exc:
         return Check("fuxignore usable", False, f"{fuxignore.IGNORE_FILE}: {exc}")
-    duplicates = fuxignore.duplicate_warnings(
-        root, dirs_file=DEFAULT_DIRS_FILE, types_file=DEFAULT_TYPES_FILE
-    )
+    duplicates = fuxignore.duplicate_warnings(root, dirs_file=DEFAULT_DIRS_FILE)
     if duplicates:
         return Check(
             "fuxignore usable",
             False,
-            f"{len(duplicates)} pattern(s) stated in both {fuxignore.IGNORE_FILE} and a "
-            f".fux/sources/ list - run `fux ingest --list-skipped` for the detail",
+            f"{len(duplicates)} pattern(s) stated in both {fuxignore.IGNORE_FILE} and "
+            f"{DEFAULT_DIRS_FILE} - run `fux ingest --list-skipped` for the detail",
             level="warn",
         )
     active = sum(1 for r in rules if not r.negate)

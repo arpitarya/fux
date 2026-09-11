@@ -29,12 +29,6 @@
         "required": "never",
         "default": ".fux/sources/dirs",
         "doc": "the committed directory list"
-      },
-      "types_file": {
-        "type": "str",
-        "required": "never",
-        "default": ".fux/sources/types",
-        "doc": "OPTIONAL. Absent means the built-in prose allowlist; present REPLACES it entirely -- an absent file never means index-everything and never means index-nothing"
       }
     },
     "example": {

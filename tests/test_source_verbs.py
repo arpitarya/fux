@@ -54,6 +54,10 @@ def _dirs(repo):
     return (repo / ".fux" / "sources" / "dirs").read_text(encoding="utf-8")
 
 
+def _types(repo):
+    return (repo / ".fux" / "types.toml").read_text(encoding="utf-8")
+
+
 def _add(repo, monkeypatch, args):
     monkeypatch.setattr("fux.sources.find_root", lambda: repo)
     return sources.cmd_add(args)
@@ -129,28 +133,71 @@ def test_a_dirs_line_carries_its_attribute_too(repo, monkeypatch):
     assert "handbook archived=false" in _dirs(repo)
 
 
-def test_a_types_line_carries_the_decoder_that_reads_it(repo, monkeypatch):
-    """⚠ **This test asserted the opposite until 2026-09-01**, when `types`
-    gained its first attribute (ADR-TYPES decision 11). It read
-    *"carries none because the set is empty"*; the set is no longer empty, and
-    a written line now states the binding fux would otherwise have derived.
-    """
+def test_a_types_entry_a_decoder_reads_becomes_a_binding(repo, monkeypatch):
+    """⚠ **This test asserted `*.pdf` carried NO binding until 2026-09-01**, and a
+    `*.pdf decoder=pdf` LINE until 2026-09-11 (ADR-TYPES decisions 11 and 12). The
+    binding fux would otherwise derive is written down, and since decision 12 it is
+    a `[decoders]` line — the extension is the key."""
     _add(repo, monkeypatch, _args("*.pdf", types=True))
-    types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    assert "\n*.pdf decoder=pdf\n" in types
+    assert '\npdf = "pdf"\n' in _types(repo)
 
 
-def test_a_prose_type_carries_no_binding_because_no_decoder_reads_it(repo, monkeypatch):
-    """The empty default is written as absence, not as a bare `decoder=`.
-
-    `*.md` reaches the index as text with no decoder in its path, so there is
-    nothing to bind and nothing to state — and four dead characters on every
-    prose line would be the cost of pretending otherwise.
-    """
+def test_a_prose_type_is_an_include_glob_because_no_decoder_reads_it(repo, monkeypatch):
     _add(repo, monkeypatch, _args("*.pdf", types=True))
-    types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    assert "\n*.md\n" in types
-    assert not [line for line in types.split("\n") if line.rstrip().endswith("decoder=")]
+    _add(repo, monkeypatch, _args("*.tex", types=True))
+    text = _types(repo)
+    assert '\n  "*.md",\n' in text and '\n  "*.tex",\n' in text
+    assert "tex =" not in text
+
+
+def test_adding_a_type_edits_one_line_and_keeps_a_comment(repo, monkeypatch):
+    """The writer's contract, unchanged by the move to TOML: one line changes and a
+    human's comment inside the array survives."""
+    (repo / ".fux" / "types.toml").write_text(
+        '# mine\ninclude = [\n  "*.md",  # our docs\n  "*.txt",\n]\n', encoding="utf-8"
+    )
+    _add(repo, monkeypatch, _args("*.rst", types=True))
+    assert _types(repo) == '# mine\ninclude = [\n  "*.md",  # our docs\n  "*.rst",\n  "*.txt",\n]\n'
+
+
+def test_the_writer_refuses_a_layout_it_did_not_write(repo, monkeypatch):
+    """Reformatting an inline array would eat the comments around it, so fux says so
+    and writes nothing (ADR-TYPES decision 12, reader lenient / writer strict)."""
+    from fux.errors import FuxError
+
+    original = 'include = ["*.md", "*.txt"]\n'
+    (repo / ".fux" / "types.toml").write_text(original, encoding="utf-8")
+    with pytest.raises(FuxError, match="will not edit it"):
+        _add(repo, monkeypatch, _args("*.rst", types=True))
+    assert _types(repo) == original
+
+
+def test_a_bare_glob_moves_into_decoders_when_it_gains_a_binding(repo, monkeypatch, capsys):
+    (repo / ".fux" / "types.toml").write_text('include = [\n  "*.md",\n  "*.pdf",\n]\n', encoding="utf-8")
+    _add(repo, monkeypatch, _args("*.pdf", types=True))
+    text = _types(repo)
+    assert '"*.pdf"' not in text and '\npdf = "pdf"\n' in text
+    assert "updated" in capsys.readouterr().out
+
+
+def test_removing_a_type_deletes_its_line_and_never_excludes(repo, monkeypatch, capsys):
+    from fux.errors import FuxError
+
+    _add(repo, monkeypatch, _args("*.pdf", types=True))
+    assert _remove(repo, monkeypatch, _args("*.pdf", types=True)) == 0
+    assert "pdf =" not in _types(repo)
+    with pytest.raises(FuxError, match="fuxignore"):
+        _remove(repo, monkeypatch, _args("*.nothere", types=True))
+    assert "!" not in "".join(ln for ln in _types(repo).splitlines() if not ln.startswith("#"))
+
+
+def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
+    from fux.errors import FuxError
+
+    (repo / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
+    with pytest.raises(FuxError, match="fux setup"):
+        _add(repo, monkeypatch, _args("*.pdf", types=True))
+    assert not (repo / ".fux" / "types.toml").exists()
 
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
@@ -379,30 +426,21 @@ def test_adding_the_first_type_seeds_the_built_in_allowlist(repo, monkeypatch):
     """Otherwise `fux add '*.pdf' --types` un-indexes every markdown document.
 
     The file REPLACES the built-in default rather than extending it
-    (ADR-TYPES), so a one-line file is a corpus-wide invisible filter — the
+    (ADR-TYPES), so a one-entry file is a corpus-wide invisible filter — the
     exact defect W-55 was opened about. Found by running the verb.
     """
-    from fux.decode import builtin_bindings
-    from fux.ingest.gitdir import DEFAULT_TYPES
+    from fux.ingest.gitdir import DEFAULT_TYPES, read_types
 
-    _add(repo, monkeypatch, _args("*.pdf", types=True))
-    types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    bindings = builtin_bindings()
-    for pattern in DEFAULT_TYPES:
-        # A seeded line states its binding when a decoder reads the format and
-        # nothing when one does not, so the seed IS the map rather than a list
-        # the map is derived from somewhere else.
-        binding = bindings.get(pattern[1:].lower(), "")
-        line = f"{pattern} decoder={binding}" if binding else pattern
-        assert f"\n{line}\n" in types or types.endswith(f"\n{line}\n")
-    assert "*.pdf" in types
+    _add(repo, monkeypatch, _args("*.tex", types=True))
+    allow = set(read_types(repo).allow)
+    assert set(DEFAULT_TYPES) <= allow, "the seed IS the default, map included"
+    assert "*.tex" in allow
 
 
 def test_adding_a_second_type_does_not_re_seed(repo, monkeypatch):
     _add(repo, monkeypatch, _args("*.pdf", types=True))
-    _add(repo, monkeypatch, _args("*.csv", types=True))
-    types = (repo / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    assert types.count("*.md") == 1
+    _add(repo, monkeypatch, _args("*.tex", types=True))
+    assert _types(repo).count('"*.md"') == 1
 
 
 # -- L4: these verbs open no socket of their own ----------------------------
@@ -439,7 +477,7 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
     capsys.readouterr()
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
-    assert "sources/dirs" in out and "sources/urls" in out and "sources/types" in out
+    assert "sources/dirs" in out and "sources/urls" in out and ".fux/types.toml" in out
     assert "https://x.test/a fetch=http meta=hashed" in out
 
 

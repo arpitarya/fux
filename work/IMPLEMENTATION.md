@@ -21,6 +21,46 @@ Rules:
 
 ---
 
+
+## W-130 — the types list becomes `.fux/types.toml` (2026-09-11)
+
+**Arpit's ask of 2026-09-11**, taken through a compare doc because it reversed
+ADR-TYPES' recorded rejection of a TOML types list; verdict **D** and all six
+sub-forks ruled as proposed ("go").
+
+| what landed | where |
+|---|---|
+| **`.fux/types.toml`**: `include` (globs already text) + `[decoders]` (`ext = "module"`, a bound extension is a document); closed key set; no subtraction | [ADR-TYPES](../docs/adr/0038_types-list.md) 12, [`ingest/typesfile.py`](../src/fux/ingest/typesfile.py) |
+| a path-scoped binding and a repeated binding are **unwritable**; `decode._bound_extension` deleted, `_bind` takes a location string | [ADR-DECODE](../docs/adr/0049_decode.md) 13 |
+| the old `.fux/sources/types` is **refused** by `read_types`, `decode`, every `fux source --types` verb, and a `doctor` row | ADR-TYPES 12, [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) 6 (third instance) |
+| `fux setup` **converts** it when the new file is missing; `!` lines move into `.fuxignore` above the first hand pattern; an upper-case bound pattern is refused rather than converted wrongly | ADR-TYPES 12, [ADR-FUXIGNORE](../docs/adr/0055_fuxignore.md) 5 |
+| `fux add/remove --types` edit one line of the TOML and **refuse a layout fux did not write**; `remove --types` never excludes | [ADR-CLI](../docs/adr/0011_cli-surface.md) 1a |
+| `duplicate_warnings` lost its types half | ADR-FUXIGNORE 5 |
+| `[sources] types_file` **refused by name**; the phantom `config.schema.json` entry deleted | [ADR-CONFIG](../docs/adr/0023_config.md) |
+| this repo's own list converted: `.fux/sources/types` deleted, `.fux/types.toml` added | — |
+
+**Evidence.** `tests` **3222 passed, 9 skipped** and `tests_e2e` **80 passed, 1
+skipped**, run in the Cowork container (Python 3.11) on a copy of this tree —
+`test_adr_freshness.py` deselected there because the copy has one synthetic
+commit. **Byte identity, measured:** this corpus ingested `--full` with the
+line-grammar file, then converted by `fux setup` and ingested `--full` again on
+the same tree and history — **254/254 shards and `.fux/.fuxignore`
+byte-identical, 0 documents changed.** Reproduce: check out the parent commit,
+`fux ingest --full`, copy `.fux/index`, run `fux setup` with this change, delete
+`.fux/sources/types`, `fux ingest --full`, `diff -r`.
+
+🔴 **Costs paid, as recorded in ADR-TYPES:** the three source lists no longer
+share one grammar and one writer; a semantic error in the types file names its
+key but guarantees no line number; every repo that ran `fux setup` before today
+stops at its next ingest until `fux setup` runs and the old file is deleted.
+
+⚠ **Not run on the Mac.** The suite ran in the container, and the patch was
+applied to this tree by `git apply` with no conflicts while a concurrent session
+(W-131) held edits in `CHANGELOG.md`, ADR-OUTPUT and the ADR register — its hunks
+are untouched. `test_adr_freshness` has not run against the real history.
+⚠ `ADR-TYPES` left `_UNREACHABLE_BY_THE_GATE` (it owns `ingest/typesfile.py`
+now), so the W-126 row's *"27 of 63 records"* is **26** as of this change.
+
 ## W-126 + W-127 — a retired page behind a URL, and how fux can know (2026-09-11)
 
 **Arpit's two asks of 2026-09-11, reduced to the parts that need no
@@ -181,7 +221,7 @@ MacBook on 2026-09-11 in `fa47760`.** The ids are recorded separately from the
 | **W-117** | 🔴 **closed by REVERSAL, and its own filing was the error.** It called the `.pptx` slide floor *"a tuning question… doing nothing is legitimate"*. Two more instances of the same shape then appeared — six small `.jsonl` records collapsing to one passage, and any short band of a small table — and **three instances of one shape is a defect, not a knob** | [ADR-REFER](../docs/adr/0037_refer-plane.md) 26 |
 | **W-120** | the fix W-117 turned into: a table bands at its own ceiling (`MAX_TABLE_BAND_BYTES = 900`) and a run of short headed sections is never folded | [ADR-REFER](../docs/adr/0037_refer-plane.md) 26 |
 | **W-119** | the decoder rename — `csvdoc.py` → `csv.py` for all nineteen, verified not to shadow the stdlib on either load path. **38 stale files deleted**; until they went, the stale consumer copies **won** over the new ones and this repo decoded with the old modules | [ADR-DECODE](../docs/adr/0049_decode.md) 17 |
-| **W-121** | CSV/XLSX row-granularity chunking, committed earlier in `5cf30bc` | [ADR-TABULAR](../docs/adr/0062_tabular.md) |
+| **W-121** | CSV/XLSX row-granularity chunking, committed earlier in `5cf30bc`. **Evidence question closed 2026-09-11 by Arpit's ruling: the `informed` run stands, no `blind` run owed** | [ADR-TABULAR](../docs/adr/0062_tabular.md) |
 
 ⚠ **W-116 is NOT closed by this and must not be read as measured.** The change
 re-ranked two populations — every document containing a fenced code block, and
@@ -428,6 +468,8 @@ null**. ⚠ The doc2query−− filter is **unproven** — 2 refusals out of 98.
 sha alone — so the feature presented as working while changing no committed
 byte, from W-76 Phase 8 until now. **Every prior enrichment measurement ran
 through it**; not audited, filed.
+
+**Audit, closed 2026-09-11 on Arpit's ruling:** no prior enrichment measurement needs re-running — `run.py`'s `reusable = {} if (full or pii_moved) else …` means `--full` empties reuse, and every measured arm ingested `--full` or from a wiped index.
 
 ## W-109 — `--expand`, and `-q` multi-query fusion (2026-09-05)
 

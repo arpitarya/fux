@@ -10,6 +10,22 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- ⚠ **BREAKING — the types list is `.fux/types.toml`** (W-130,
+  [ADR-TYPES](docs/adr/0038_types-list.md) decision 12). It was
+  `.fux/sources/types`, a line-grammar file. The new file has two keys:
+  `include` (globs that are already text) and `[decoders]` (`ext = "module"`,
+  and a bound extension is a document). **Nothing in it subtracts** — `!`
+  exclusions live in `.fux/.fuxignore`. A path-scoped binding and a repeated
+  binding can no longer be written at all. **Upgrading:** a repo with the old
+  file stops at `ingest`, `ask`, `doctor` and every `fux add/remove --types`
+  with an error naming the fix — run `fux setup`, which writes
+  `.fux/types.toml` from the old file (moving its `!` lines to `.fuxignore`),
+  then delete `.fux/sources/types`. Verified on this repo: the converted file
+  re-ingests to a **byte-identical** index and `.fuxignore`.
+- `[sources] types_file` in `fux.toml` is now refused by name.
+  `config.schema.json` advertised it; nothing ever read it
+  ([ADR-CONFIG](docs/adr/0023_config.md)).
+
 - ⚠ **BREAKING — `.fux/pii.toml` is required** (W-129,
   [ADR-PII](docs/adr/0060_pii.md) decision 17). `fux setup` now writes the
   starter, and **every command except `setup`, `tune` and `output` stops with an

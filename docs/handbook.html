@@ -2393,7 +2393,7 @@ def decode(path: Path, rel_path: str) -&gt; str | None: ...</code></pre>
           plane whose committed index depends on it too.</li>
         <li>Dropping a <code>logdoc.py</code> into <code>.fux/decoders/</code> must not silently start
           walking every <code>.log</code> in the repo — what counts as a document is a committed line
-          a human wrote in <code>.fux/sources/types</code>.</li>
+          a human wrote in <code>.fux/types.toml</code>.</li>
         <li>⚠ <strong>The import fence cannot reach <code>.fux/decoders/</code></strong>. Stated rather
           than papered over: a consumer decoder's offline behaviour is a documented obligation,
           checked by reviewing a committed diff.</li>

@@ -80,7 +80,6 @@ def cmd_ingest(args) -> int:
         return _report_takeover(runner_mod.request_stop(root), root, halting=True)
 
     if getattr(args, "list_skipped", False):
-        from ..config import DEFAULT_TYPES_FILE
         from . import fuxignore
 
         config = load_config(root)
@@ -102,9 +101,7 @@ def cmd_ingest(args) -> int:
         # `--list-skipped` is the command someone runs *because* a file is
         # missing, which is precisely when a pattern stated in two places is
         # the thing they need told.
-        for line in fuxignore.duplicate_warnings(
-            root, dirs_file=config.dirs_file, types_file=DEFAULT_TYPES_FILE
-        ):
+        for line in fuxignore.duplicate_warnings(root, dirs_file=config.dirs_file):
             print(line, file=sys.stderr)
         return 0
 

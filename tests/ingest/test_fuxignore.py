@@ -111,7 +111,7 @@ def test_an_unmentioned_path_has_no_opinion_rather_than_a_re_include():
 # -- precedence over the source lists --------------------------------------
 
 
-def _corpus(tmp_path, *, types="*.md\n", dirs="docs\nsrc\n", ignore=None):
+def _corpus(tmp_path, *, types='include = ["*.md"]\n', dirs="docs\nsrc\n", ignore=None):
     (tmp_path / "docs").mkdir()
     (tmp_path / "src").mkdir()
     (tmp_path / "docs/a.md").write_text("# A\n\nprose\n")
@@ -120,7 +120,7 @@ def _corpus(tmp_path, *, types="*.md\n", dirs="docs\nsrc\n", ignore=None):
     (tmp_path / "src/app.py").write_text("print('x')\n")
     (tmp_path / ".fux/sources").mkdir(parents=True)
     (tmp_path / ".fux/sources/dirs").write_text(dirs)
-    (tmp_path / ".fux/sources/types").write_text(types)
+    (tmp_path / ".fux/types.toml").write_text(types)
     if ignore is not None:
         (tmp_path / ".fux/.fuxignore").write_text(ignore)
     return tmp_path
@@ -131,7 +131,7 @@ def _walk(root):
         root,
         source_dirs(root, ".fux/sources/dirs"),
         excludes=source_excludes(root, ".fux/sources/dirs"),
-        types=read_types(root, ".fux/sources/types"),
+        types=read_types(root, ".fux/types.toml"),
         ignores=fuxignore.read(root),
     )
     return [f.rel_path for f in files], {s.rel_path: s.reason for s in skipped}
@@ -193,19 +193,7 @@ def test_every_printed_reason_is_ascii(tmp_path):
 
 
 def _warnings(root):
-    return fuxignore.duplicate_warnings(
-        root, dirs_file=".fux/sources/dirs", types_file=".fux/sources/types"
-    )
-
-
-def test_a_pattern_in_both_files_warns_and_says_which_line_to_delete(tmp_path):
-    root = _corpus(tmp_path, types="*.md\n!*.min.md\n", ignore="*.min.md\n")
-    (warning,) = _warnings(root)
-    assert "*.min.md" in warning
-    assert ".fux/sources/types:2" in warning
-    assert ".fux/.fuxignore:1" in warning
-    assert "Delete `!*.min.md` from .fux/sources/types" in warning
-    warning.encode("ascii")
+    return fuxignore.duplicate_warnings(root, dirs_file=".fux/sources/dirs")
 
 
 def test_a_dirs_exclusion_repeated_in_fuxignore_warns_too(tmp_path):
@@ -214,18 +202,34 @@ def test_a_dirs_exclusion_repeated_in_fuxignore_warns_too(tmp_path):
     assert ".fux/sources/dirs:3" in warning
 
 
-def test_a_negation_is_not_a_duplicate_of_an_exclusion_that_shares_its_spelling(tmp_path):
-    """`!*.min.md` in `types` subtracts; `!*.min.md` here adds back.
+def test_a_dirs_exclusion_repeated_in_fuxignore_says_which_line_to_delete(tmp_path):
+    root = _corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n", ignore="docs/gen\n")
+    (warning,) = _warnings(root)
+    assert ".fux/.fuxignore:1" in warning
+    assert "Delete `!docs/gen` from .fux/sources/dirs" in warning
+    warning.encode("ascii")
 
-    Same eight characters, opposite statements. Calling them duplicates would
-    tell the reader to delete the line that is doing the opposite thing.
+
+def test_a_negation_is_not_a_duplicate_of_an_exclusion_that_shares_its_spelling(tmp_path):
+    """`!docs/gen` in `dirs` subtracts; `!docs/gen` here adds back.
+
+    Same characters, opposite statements. Calling them duplicates would tell the
+    reader to delete the line that is doing the opposite thing.
     """
-    root = _corpus(tmp_path, types="*.md\n!*.min.md\n", ignore="!*.min.md\n")
+    root = _corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n", ignore="!docs/gen\n")
     assert _warnings(root) == []
 
 
 def test_no_fuxignore_means_no_warnings_however_many_exclusions_exist(tmp_path):
-    assert _warnings(_corpus(tmp_path, types="*.md\n!*.min.md\n")) == []
+    assert _warnings(_corpus(tmp_path, dirs="docs\nsrc\n!docs/gen\n")) == []
+
+
+def test_the_types_list_has_no_exclusions_to_duplicate(tmp_path):
+    """ADR-TYPES decision 12: `.fux/types.toml` has no `!`, so the warning's types
+    half is gone rather than silently always-empty."""
+    import inspect
+
+    assert "types_file" not in inspect.signature(fuxignore.duplicate_warnings).parameters
 
 
 # -- W-93: the fux-written blocks ------------------------------------------

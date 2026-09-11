@@ -1,12 +1,8 @@
 {
- "decision": "ASK",
- "reason": "Arpit asked for (a) the L1 amendment implemented, (b) one ADR per law, (c) those law records numbered 0002-0009, and (d) every existing ADR renumbered to make room. (d) is ruled against by W-82 ruling 7 -- a vacated ordinal is burned and never reused -- and the register records that a previous compaction already put two records on 0022 and briefly gave ADR-CONFIDENCE two paths; WORKLOG.md is append-only at 810 KB, so its number citations would be permanently wrong with no legal way to correct them. (b) contradicts ADR-LAWS decisions 1 and 3 and CLAUDE.md's 'a record that restates a cross-cutting principle is a bug, not redundancy'. Separately, this session CANNOT execute a renumber at all: device_bash has failed five consecutive times and the file bridge can write but cannot rename or delete, so a renumber would leave 54 duplicated records and a red suite with no way to run it.",
- "questions": [
-  "Numbering: put the eight law records in docs/adr/laws/ as 0002-0009 -- the register already says a number is 'a filename ordinal, scoped to its directory' -- so you get the numbers you asked for with zero renumbering and zero broken citations? Or do you want the live register genuinely renumbered, which revokes W-82 ruling 7 and rewrites every path citation in the repo?",
-  "Restatement: do the eight law records hold RATIONALE only (history, grounding, veto conditions) with CLAUDE.md still the normative home -- or are you moving the normative text into them, which is ADR-LAWS' own named reopen trigger and needs recording as such?",
-  "Sequencing: land the L1 amendment on its own first (edits only, no renames, executable today), and treat the law-records split as a separate change once the bridge is back?"
- ],
- "safe_alternative": "The L1 amendment alone is edits to existing files with no renames and could land without the shell, though its suite could not be run from here. Drafted in full and awaiting the three answers above.",
+ "decision": "PROCEED",
+ "reason": "Reconciled 2026-09-11 (Cowork): the 2026-09-06 ASK is answered by the repo — the law records exist as docs/adr/0002–0010 and CLAUDE.md states they hold rationale only. Nothing is blocked; inbox rulings are in OPEN-WORK (W-132, W-133, W-118).",
+ "questions": [],
+ "safe_alternative": "",
  "surfaced": true,
- "filed": "2026-09-06"
+ "filed": "2026-09-11"
 }

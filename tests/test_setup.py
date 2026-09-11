@@ -154,31 +154,27 @@ def test_setup_writes_a_types_file_ingest_can_actually_read(tmp_path):
     setup_mod.run(tmp_path)
     types = read_types(tmp_path)  # must not raise
     assert set(types.allow) == set(DEFAULT_TYPES)
-    assert types.deny == ()
 
 
 def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
     """ADR-TYPES decision 10 — visible without reading fux's source.
 
-    Since decision 11 the written line also states its **binding**, so what is
-    visible is the whole map: the pattern, and the module that reads it.
+    Since decision 11 the file also states each **binding**, so what is visible
+    is the whole map; since decision 12 the map is `[decoders]` and the prose is
+    `include`, and a bound extension is not written twice.
     """
     from fux.decode import builtin_bindings
+    from fux.ingest import typesfile
     from fux.ingest.gitdir import DEFAULT_TYPES
 
     setup_mod.run(tmp_path)
-    text = (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    active = [ln for ln in text.splitlines() if ln.strip() and not ln.startswith("#")]
-    assert active, "a header alone is not a types file"
-
-    bindings = builtin_bindings()
-    expected = [
-        f"{glob} decoder={bindings[glob[1:].lower()]}"
-        if glob[1:].lower() in bindings
-        else glob
-        for glob in DEFAULT_TYPES
-    ]
-    assert sorted(active) == sorted(expected)
+    text = (tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8")
+    listed = typesfile.parse(text, origin="types.toml")
+    bindings = {ext.lstrip("."): name for ext, name in builtin_bindings().items()}
+    assert listed.decoders == bindings
+    assert set(listed.include) == {g for g in DEFAULT_TYPES if typesfile.pattern_extension(g) not in bindings}
+    assert '\n  "*.md",\n' in text, "one glob per line - the layout the editor keeps"
+    assert '\nhtml = "html"\n' in text
 
 
 def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):
@@ -194,10 +190,86 @@ def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):
 
 def test_setup_never_overwrites_an_edited_types_file(tmp_path):
     setup_mod.run(tmp_path)
-    listing = tmp_path / ".fux" / "sources" / "types"
-    listing.write_text("*.md\n", encoding="utf-8")
+    listing = tmp_path / ".fux" / "types.toml"
+    listing.write_text('include = ["*.md"]\n', encoding="utf-8")
     setup_mod.run(tmp_path)
-    assert listing.read_text(encoding="utf-8") == "*.md\n"
+    assert listing.read_text(encoding="utf-8") == 'include = ["*.md"]\n'
+
+
+# -- ADR-TYPES decision 12: the old file is converted, never silently dropped --
+
+
+def _legacy(root, text):
+    (root / ".fux" / "sources").mkdir(parents=True, exist_ok=True)
+    (root / ".fux" / "sources" / "types").write_text(text, encoding="utf-8")
+
+
+def test_setup_converts_a_leftover_line_grammar_types_file(tmp_path, capsys):
+    from fux.ingest import typesfile
+
+    _legacy(tmp_path, "# mine\n*.md\ndocs/*.txt\n*.csv decoder=csv\n*.geojson decoder=json\n")
+    report = setup_mod.run(tmp_path)
+    assert report.converted_types and ".fux/types.toml" in report.written
+    listed = typesfile.parse((tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8"), origin="t")
+    assert listed.include == ("*.md", "docs/*.txt")
+    assert listed.decoders == {"csv": "csv", "geojson": "json"}
+    assert (tmp_path / ".fux" / "sources" / "types").is_file(), "the old file is the human's to delete"
+
+
+def test_the_converted_file_states_what_the_old_one_admitted(tmp_path):
+    """The whole point: a conversion that changed the allowlist would be the silent
+    index change the refusal exists to prevent."""
+    from fux.ingest.gitdir import TypeFilter, read_types
+    from fux.ingest import sourcelist
+
+    legacy = "*.md\n*.rst\n*.CSV\n*.csv decoder=csv\n*.pdf decoder=pdf\ndocs/**/*.txt\n"
+    _legacy(tmp_path, legacy)
+    before = TypeFilter(
+        allow=tuple(e.value for e in sourcelist.parse(legacy, sourcelist.TYPES, origin="x"))
+    )
+    setup_mod.run(tmp_path)
+    (tmp_path / ".fux" / "sources" / "types").unlink()
+    after = read_types(tmp_path)
+    for name in ("a.md", "a.rst", "a.csv", "a.CSV", "a.pdf", "docs/x/y.txt", "a.txt", "a.json"):
+        assert before.accepts(name) == after.accepts(name), name
+
+
+def test_an_upper_case_bound_pattern_is_refused_rather_than_converted_wrongly(tmp_path):
+    """`*.CSV decoder=csv` admitted `a.CSV`; a `csv` binding admits `a.csv`. Either
+    silent conversion changes the allowlist, so setup stops and says so."""
+    import pytest
+
+    from fux.errors import FuxError
+
+    _legacy(tmp_path, "*.CSV decoder=csv\n")
+    with pytest.raises(FuxError, match="lowercase extension"):
+        setup_mod.run(tmp_path)
+
+
+def test_bang_lines_move_to_fuxignore_above_the_first_hand_pattern(tmp_path):
+    """`.fuxignore` is last-match-wins and already outranked the types list, so a
+    re-include written there must keep beating the moved line."""
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / ".fuxignore").write_text("# header\n!keep.min.md\n", encoding="utf-8")
+    _legacy(tmp_path, "*.md\n!*.min.md\n")
+    report = setup_mod.run(tmp_path)
+    assert report.moved_exclusions == ["*.min.md"]
+    lines = (tmp_path / ".fux" / ".fuxignore").read_text(encoding="utf-8").splitlines()
+    assert lines.index("*.min.md") < lines.index("!keep.min.md")
+    from fux.ingest import fuxignore
+
+    ignores = fuxignore.read(tmp_path)
+    assert ignores.decide("docs/a.min.md").ignored
+    assert not ignores.decide("docs/keep.min.md").ignored
+
+
+def test_setup_leaves_both_files_alone_when_the_new_one_exists(tmp_path):
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "types.toml").write_text('include = ["*.md"]\n', encoding="utf-8")
+    _legacy(tmp_path, "*.rst\n")
+    report = setup_mod.run(tmp_path)
+    assert not report.converted_types
+    assert (tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8") == 'include = ["*.md"]\n'
 
 
 def test_setup_bootstraps_a_bare_directory(tmp_path, monkeypatch, capsys):

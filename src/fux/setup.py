@@ -44,7 +44,7 @@ from .config import (
 )
 from . import decode as decode_mod
 from .errors import FuxError
-from .ingest import fuxignore, pii, refusals, sourcelist
+from .ingest import fuxignore, pii, refusals
 from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from .store import fuxdir
 
@@ -223,51 +223,30 @@ _DIRS_HEADER = """\
 """
 
 _TYPES_HEADER = """\
-# Which files are documents, and which decoder reads each one. One glob per
-# line; `!` subtracts. A pattern with no `/` matches the file NAME anywhere, so
-# `*.md` means every markdown file.
+# Which files are documents, and which decoder reads each one. See ADR-TYPES.
 #
 # THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
 # absent file never means "index everything" and never means "index nothing".
 # If the file IS here it REPLACES the default entirely, which is why a file
-# with no active line is an error rather than a silently empty index.
+# that admits nothing is an error rather than a silently empty index.
 #
-# THE LINES BELOW ARE THAT DEFAULT, written out at `fux setup`: prose, plus
-# every format a built-in decoder reads. They are spelled out rather than left
-# implicit so you can see what fux considers a document without reading its
-# source (ADR-TYPES decision 10). From here they are YOURS -- setup never
-# rewrites this file, so the list stays exactly as you leave it.
+# WHAT IS BELOW IS THAT DEFAULT, written out at `fux setup`: prose, plus every
+# format a built-in decoder reads. It is spelled out rather than left implicit
+# so you can see what fux considers a document without reading its source
+# (ADR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
+# file, so the list stays exactly as you leave it.
 #
-# `decoder=` IS THE MAP: it BINDS an extension to the module that reads it.
-# Without it, "which decoder reads .csv" is a property of the code installed on
-# a machine -- a built-in's EXTENSIONS tuple, possibly replaced by a consumer
-# module of the same name -- so two people with different .fux/decoders/ could
-# commit different indexes from the same sources with nothing saying so. A
-# binding makes the answer a committed line (ADR-TYPES decision 11).
+# TWO KEYS, AND ONLY TWO. `include` lists globs that are already text.
+# `[decoders]` maps an extension to the module that reads it -- and a bound
+# extension IS a document, so it is never repeated in `include`. Any other key
+# is an error (ADR-TYPES decision 12).
 #
-# THE BINDING IS CHECKED, NOT TRUSTED. A line naming a module that does not
-# exist stops the run, and so does one that takes an extension AWAY from the
-# decoder that claims it and gives it to a module that does not. It is never a
-# silent fallback: the wrong decoder does not fail visibly, it produces a
-# plausible index with different postings.
+# NOTHING HERE SUBTRACTS. To keep files out, write the pattern in
+# .fux/.fuxignore, which is read first and outranks this file.
 #
-# YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
-# be bound to it -- a .geojson is JSON, so `*.geojson decoder=json` is all it
-# takes, with no module to copy or edit. EXTENSIONS is a decoder's DEFAULT
-# CLAIM, not a list of what it can read. What is refused is REDIRECTING an
-# extension another decoder already claims.
-#
-# A binding is per EXTENSION, so `decoder=` sits only on a bare `*.ext` line --
-# dispatch sees a suffix and nothing about which glob admitted the file, so
-# `docs/api/*.json decoder=json` would bind every .json in the corpus.
-#
-# A PROSE FORMAT CARRIES NO BINDING. It is already text and no decoder is in
-# its path, so there is nothing to name.
-#
-# NOTHING BELOW NEEDS INSTALLING. fux's runtime is stdlib-only and declares no
-# third-party dependencies, so every built-in decoder works out of the box. A
-# format that needed something installed would appear under OPT-IN at the
-# bottom, commented, with the command that enables it.
+# NOTHING BELOW NEEDS INSTALLING. Every built-in decoder is stdlib-only and
+# works out of the box. A format that needed something installed would appear
+# under OPT-IN at the bottom, commented, with what enables it.
 #
 # What is OUT of the default, and why: source code, shell scripts and
 # extensionless files. They have no decoder, machine data is not a document,
@@ -276,34 +255,68 @@ _TYPES_HEADER = """\
 # Dockerfile far more often than they are prose.
 #
 # ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
-# format READABLE; a line here is what makes it INDEXED, and the binding on
-# that line is what makes it read by a NAMED module. All three are separate on
+# format READABLE; an entry here is what makes it INDEXED, and a `[decoders]`
+# binding is what makes it read by a NAMED module. All three are separate on
 # purpose -- what counts as a document stays a committed line a human wrote.
+"""
+
+_TYPES_INCLUDE_NOTE = """\
+# Already text: no decoder in the path. One glob per line. A glob with no `/`
+# matches the file NAME anywhere, so "*.md" means every markdown file.
+"""
+
+_TYPES_DECODERS_NOTE = """\
+# extension = "decoder module". THIS IS THE MAP: without it, "which decoder
+# reads .csv" is a property of the code installed on a machine, and two people
+# with different .fux/decoders/ could commit different indexes from the same
+# sources with nothing saying so (ADR-TYPES decision 11).
 #
-#   !*.min.md          # subtract a generated flavour
+# THE BINDING IS CHECKED, NOT TRUSTED. A module that does not exist stops the
+# run, and so does taking an extension AWAY from the decoder that claims it and
+# giving it to one that does not. It is never a silent fallback: the wrong
+# decoder does not fail visibly, it produces a plausible index with different
+# postings.
 #
-# See ADR-TYPES.
+# YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
+# be bound to it -- a .geojson is JSON, so `geojson = "json"` is all it takes.
+# An extension with a dot is quoted: `"tar.gz" = "<module>"`.
 """
 
 _TYPES_OPT_IN = """\
-
 # --- OPT-IN ---------------------------------------------------------------
-# Not indexed until you uncomment. Nothing here has a built-in decoder, so a
-# line you uncomment indexes RAW BYTES unless you enable it first by writing a
-# decoder for it:
+# Not indexed until you uncomment. Nothing here has a built-in decoder, so
+# enable it first by writing one:
 #
 #   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
 #      one there as a worked example; see the fux-decoder skill)
-#   2. uncomment its glob here and add `decoder=<module stem>`
+#   2. uncomment its line and name your module
 #   3. `fux ingest`
 #
-#*.log
+# Listing "*.log" under `include` instead indexes it as RAW BYTES.
+#
+# log = "<your module>"
 """
+
+_TYPES_CONVERTED_HEADER = """\
+# Which files are documents, and which decoder reads each one. See ADR-TYPES.
+#
+# CONVERTED by `fux setup` from .fux/sources/types, the line-grammar list this
+# file replaced on 2026-09-11 (ADR-TYPES decision 12). It states exactly what
+# that file stated: every `*.ext decoder=<module>` line is a `[decoders]`
+# binding, every other pattern is an `include` glob, and every `!` line moved
+# to .fux/.fuxignore. Delete .fux/sources/types -- fux refuses to run while it
+# exists, rather than guess which of the two you meant.
+#
+# TWO KEYS, AND ONLY TWO: `include` and `[decoders]`. A bound extension IS a
+# document, so it is never repeated in `include`. Nothing here subtracts --
+# exclusions live in .fux/.fuxignore.
+"""
+
 
 _FUXIGNORE = """\
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
 # exclusions belong -- this file is read before anything else, so a line here
-# beats .fux/sources/dirs and .fux/sources/types both.
+# beats .fux/sources/dirs and .fux/types.toml both.
 #
 #   build/                 a DIRECTORY named build, at any depth (and all of it)
 #   *.log                  a name glob; `*` never crosses a `/`
@@ -317,21 +330,21 @@ _FUXIGNORE = """\
 # git, a file under an ignored DIRECTORY cannot be re-included: `build/` then
 # `!build/keep.md` keeps nothing.
 #
-# `!` MEANS THE OPPOSITE HERE OF WHAT IT MEANS IN .fux/sources/. There `!`
+# `!` MEANS THE OPPOSITE HERE OF WHAT IT MEANS IN .fux/sources/dirs. There `!`
 # subtracts; here it adds back. That is the price of the file behaving like the
 # one you already know. `fux ingest` warns if the same pattern is written in
 # both places, which is where the confusion would actually bite.
 #
 # A `!` LINE OVERRIDES THE TYPE ALLOWLIST. `!*.py` really does index Python --
 # as RAW BYTES, because no decoder claims .py, which is the exact shape
-# .fux/sources/types exists to prevent. It takes a line you wrote to get there.
+# .fux/types.toml exists to prevent. It takes a line you wrote to get there.
 #
 # ONE DIVERGENCE FROM GIT, ON PURPOSE: a `#` after whitespace starts a comment,
 # so `*.log   # noisy` is a pattern plus a note. Git reads that whole line as a
 # pattern and matches nothing.
 #
 # THIS FILE IS OPTIONAL AND STARTS EMPTY. Absent or all-comments means nothing
-# is ignored -- unlike .fux/sources/types, where an empty file is an error,
+# is ignored -- unlike .fux/types.toml, where an empty file is an error,
 # because this one only ever subtracts and so can never empty an index.
 #
 # See ADR-FUXIGNORE.
@@ -446,6 +459,12 @@ class SetupReport:
     #: 2: write-if-missing makes the coverage absent precisely where a repo
     #: already has its own conventions, which is where it is most needed.
     skipped_agents_md: bool = False
+    #: True when `.fux/types.toml` was written FROM a leftover `.fux/sources/types`
+    #: (ADR-TYPES decision 12). Announced, because the old file still has to be
+    #: deleted by hand and fux refuses to run until it is.
+    converted_types: bool = False
+    #: `!` patterns that moved from the old types file into `.fux/.fuxignore`.
+    moved_exclusions: list[str] = field(default_factory=list)
 
 
 def template_bytes(name: str) -> bytes:
@@ -532,13 +551,13 @@ def _seed_dirs(root: Path) -> bytes:
 
 
 def _seed_types() -> bytes:
-    """The type allowlist, with the built-in default spelled out as live lines.
+    """`.fux/types.toml`, with the built-in default spelled out.
 
-    **A header alone is not a types file.** Every line of `_TYPES_HEADER` is a
-    comment, and `read_types` treats a file with no active pattern as an error
-    — so writing the header by itself made `fux setup` followed by `fux ingest`
-    fail on every fresh repo. ADR-TYPES decision 10 always said this file ships
-    "with the default spelled out"; it is spelled out here.
+    **A header alone is not a types file.** A file that admits nothing is one
+    `read_types` refuses — so writing comments by themselves made `fux setup`
+    followed by `fux ingest` fail on every fresh repo until 2026-08-27. ADR-TYPES
+    decision 10 always said this file ships "with the default spelled out"; it
+    is spelled out here.
 
     **Derived, never transcribed.** The globs come from `DEFAULT_TYPES` at the
     moment setup runs, so the file cannot disagree with the engine that wrote
@@ -546,31 +565,96 @@ def _seed_types() -> bytes:
     decoder added later widens `DEFAULT_TYPES` and does not touch a repo that
     already has this file. That is decision 1a's rule applied to fux's own
     decoders — what counts as a document stays a committed line a human owns.
+
+    ⚠ **`[decoders]` is grouped by module, not sorted by extension.** Sorting
+    puts `cfg` next to `csv`, which different modules read, and splits
+    `htm`/`html`/`xhtml`. Grouping is what makes the table legible AS a map;
+    within a group the extensions are still sorted, so the output stays a pure
+    function of the registry (L3).
     """
+    from .ingest import typesfile
     from .ingest.gitdir import DEFAULT_TYPES
 
-    bindings = decode_mod.builtin_bindings()
-    decoded = {f"*{ext}" for ext in bindings}
-    prose = [glob for glob in DEFAULT_TYPES if glob not in decoded]
-    body = ["", "# --- prose: already text, no decoder in the path ---"]
-    body += sorted(prose)
-    body += ["", "# --- decoded: extension -> the module that reads it ---"]
-    body += [
-        "# stdlib only, nothing to install. The binding on each line is what",
-        "# dispatch resolves; fux checks it against the module it names.",
-    ]
-    # ⚠ **Grouped by decoder, not by extension.** Sorting the whole block
-    # alphabetically puts `*.csv` next to `*.cfg`, which are read by different
-    # modules, and splits `*.htm`/`*.html`/`*.xhtml` across the list. Grouping
-    # is what makes the file legible AS a map; within a group the extensions
-    # are still sorted, so the output stays a pure function of the registry.
-    for name in sorted(set(bindings.values())):
-        body.append("")
-        body += [
-            sourcelist.render_line(f"*{ext}", {"decoder": name}, sourcelist.TYPES)
-            for ext in sorted(e for e, n in bindings.items() if n == name)
-        ]
-    return (_TYPES_HEADER + "\n".join(body) + "\n" + _TYPES_OPT_IN).encode("utf-8")
+    bindings = {ext.lstrip("."): name for ext, name in decode_mod.builtin_bindings().items()}
+    prose = [glob for glob in DEFAULT_TYPES if typesfile.pattern_extension(glob) not in bindings]
+    text = typesfile.render(
+        prose,
+        bindings,
+        header=_TYPES_HEADER,
+        include_note=_TYPES_INCLUDE_NOTE,
+        decoders_note=_TYPES_DECODERS_NOTE,
+        footer=_TYPES_OPT_IN,
+    )
+    return text.encode("utf-8")
+
+
+def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
+    """Write `.fux/types.toml` from a leftover `.fux/sources/types` (ADR-TYPES decision 12).
+
+    **Only when the new file is missing** — setup is write-if-missing, and a
+    repo holding both has already decided; `read_types` tells it to delete the
+    old one. **The old file is never deleted here**: it is the human's, and
+    removing it is a line in their diff, not a side effect of a scaffolding verb.
+
+    The `!` lines move to `.fux/.fuxignore`, **above the first pattern a human
+    wrote there**. `.fuxignore` is last-match-wins and already outranked the
+    types list, so a re-include someone wrote against a types `!` line must keep
+    winning — placing the moved lines first is what keeps it winning.
+    """
+    from .config import LEGACY_TYPES_FILE
+    from .ingest import typesfile
+
+    legacy = root / LEGACY_TYPES_FILE
+    include, decoders, exclusions = typesfile.convert_legacy(
+        legacy.read_text(encoding="utf-8"), origin=LEGACY_TYPES_FILE
+    )
+    text = typesfile.render(
+        include,
+        decoders,
+        header=_TYPES_CONVERTED_HEADER,
+        include_note=_TYPES_INCLUDE_NOTE,
+        decoders_note=_TYPES_DECODERS_NOTE,
+    )
+    # Prove the converted file loads before it lands: a conversion that wrote a
+    # file fux then refuses would trade one loud error for another.
+    typesfile.parse(text, origin=DEFAULT_TYPES_FILE)
+    _write_if_missing(root / DEFAULT_TYPES_FILE, text.encode("utf-8"), report, root)
+    report.converted_types = True
+
+    if not exclusions:
+        return
+    path = root / fuxignore.IGNORE_FILE
+    existing = path.read_text(encoding="utf-8") if path.is_file() else ""
+    have = set(fuxignore.parse(existing).patterns()) if existing else set()
+    moved = [pattern for pattern in exclusions if pattern not in have]
+    if not moved:
+        return
+    lines = existing.split("\n") if existing else []
+    at = _first_hand_pattern(lines)
+    block = [f"# moved from {LEGACY_TYPES_FILE} by `fux setup` (ADR-TYPES decision 12)", *moved, ""]
+    lines[at:at] = block
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines).rstrip("\n") + "\n", encoding="utf-8", newline="\n")
+    report.moved_exclusions = moved
+
+
+def _first_hand_pattern(lines: list[str]) -> int:
+    """Index of the first hand-written pattern line outside a fux block, else the end."""
+    block = None
+    for i, raw in enumerate(lines):
+        marker = raw.strip()
+        if block is None:
+            opened = next(
+                (b for b in fuxignore.BLOCKS if marker == fuxignore._OPEN.format(name=b)), None
+            )
+            if opened is not None:
+                block = opened
+                continue
+            if marker and not marker.startswith("#"):
+                return i
+        elif marker == fuxignore._CLOSE.format(name=block):
+            block = None
+    return len(lines)
 
 
 def _agents_to_install(root: Path, requested: bool) -> tuple[str, ...]:
@@ -663,11 +747,6 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         )
 
     _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
-    # Written with the default spelled out as LIVE lines rather than left
-    # implicit: a consumer should be able to see what fux considers a document
-    # without reading its source (ADR-TYPES decision 10), and a file of nothing
-    # but comments is one `read_types` rejects — see `_seed_types`.
-    _write_if_missing(root / DEFAULT_TYPES_FILE, _seed_types(), report, root)
     _write_if_missing(root / DEFAULT_URLS_FILE, _URLS_HEADER.encode("utf-8"), report, root)
     # Header only, no patterns: an ignore file that arrives with guesses in it
     # is one whose first act is to hide a document nobody asked it to hide.
@@ -675,6 +754,18 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     # way it is not for `types`, so the seed can be honest about knowing
     # nothing. Write-if-missing like the rest -- `fux setup` never rewrites it.
     _write_if_missing(root / fuxignore.IGNORE_FILE, _FUXIGNORE.encode("utf-8"), report, root)
+    # AFTER `.fuxignore`, because a conversion moves `!` lines into it.
+    # Written with the default spelled out rather than left implicit: a consumer
+    # should be able to see what fux considers a document without reading its
+    # source (ADR-TYPES decision 10), and a file that admits nothing is one
+    # `read_types` rejects — see `_seed_types`. A repo still holding the old
+    # `.fux/sources/types` gets it CONVERTED instead (decision 12).
+    from .config import LEGACY_TYPES_FILE
+
+    if (root / LEGACY_TYPES_FILE).is_file() and not (root / DEFAULT_TYPES_FILE).exists():
+        _convert_legacy_types(root, report)
+    else:
+        _write_if_missing(root / DEFAULT_TYPES_FILE, _seed_types(), report, root)
     # ADR-REFUSAL: policy, not code. Written once, never rewritten -- the rules
     # in it are the consumer's to delete, including the vendor ones.
     _write_if_missing(
@@ -758,6 +849,22 @@ def cmd_setup(args) -> int:
         for line in agent_template_text(AGENTS_TEMPLATE).splitlines():
             print(f"    {line}" if line else "")
         print()
+    if report.converted_types:
+        from .config import LEGACY_TYPES_FILE
+
+        print()
+        print(
+            f"  converted {LEGACY_TYPES_FILE} -> {DEFAULT_TYPES_FILE} (ADR-TYPES decision 12)."
+        )
+        if report.moved_exclusions:
+            print(
+                f"  moved {len(report.moved_exclusions)} `!` line(s) to "
+                f"{fuxignore.IGNORE_FILE}: {', '.join(report.moved_exclusions)}"
+            )
+        print(
+            f"  now delete {LEGACY_TYPES_FILE} - fux refuses to run while it exists, rather "
+            "than guess which of the two files you meant"
+        )
     if report.outside:
         print()
         print(

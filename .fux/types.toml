@@ -1,0 +1,86 @@
+# Which files are documents, and which decoder reads each one. See ADR-TYPES.
+#
+# CONVERTED by `fux setup` from .fux/sources/types, the line-grammar list this
+# file replaced on 2026-09-11 (ADR-TYPES decision 12). It states exactly what
+# that file stated: every `*.ext decoder=<module>` line is a `[decoders]`
+# binding, every other pattern is an `include` glob, and every `!` line moved
+# to .fux/.fuxignore. Delete .fux/sources/types -- fux refuses to run while it
+# exists, rather than guess which of the two you meant.
+#
+# TWO KEYS, AND ONLY TWO: `include` and `[decoders]`. A bound extension IS a
+# document, so it is never repeated in `include`. Nothing here subtracts --
+# exclusions live in .fux/.fuxignore.
+
+# Already text: no decoder in the path. One glob per line. A glob with no `/`
+# matches the file NAME anywhere, so "*.md" means every markdown file.
+include = [
+  "*.adoc",
+  "*.markdown",
+  "*.md",
+  "*.org",
+  "*.rst",
+  "*.txt",
+]
+
+# extension = "decoder module". THIS IS THE MAP: without it, "which decoder
+# reads .csv" is a property of the code installed on a machine, and two people
+# with different .fux/decoders/ could commit different indexes from the same
+# sources with nothing saying so (ADR-TYPES decision 11).
+#
+# THE BINDING IS CHECKED, NOT TRUSTED. A module that does not exist stops the
+# run, and so does taking an extension AWAY from the decoder that claims it and
+# giving it to one that does not. It is never a silent fallback: the wrong
+# decoder does not fail visibly, it produces a plausible index with different
+# postings.
+#
+# YOU CAN GIVE A DECODER A NEW EXTENSION. If nothing claims it, any decoder may
+# be bound to it -- a .geojson is JSON, so `geojson = "json"` is all it takes.
+# An extension with a dot is quoted: `"tar.gz" = "<module>"`.
+[decoders]
+csv = "csv"
+tsv = "csv"
+
+docm = "docx"
+docx = "docx"
+
+dio = "drawio"
+drawio = "drawio"
+
+htm = "html"
+html = "html"
+xhtml = "html"
+
+gif = "image"
+jpeg = "image"
+jpg = "image"
+png = "image"
+
+cfg = "ini"
+ini = "ini"
+properties = "ini"
+
+json = "json"
+
+jsonl = "jsonl"
+
+eml = "mail"
+mbox = "mail"
+
+pdf = "pdf"
+
+pptm = "pptx"
+pptx = "pptx"
+
+rtf = "rtf"
+
+svg = "svg"
+
+toml = "toml"
+
+xlsm = "xlsx"
+xlsx = "xlsx"
+
+xml = "xml"
+
+yaml = "yaml"
+yml = "yaml"

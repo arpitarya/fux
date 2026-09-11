@@ -140,6 +140,21 @@ of the attribute**, and `UrlEntry` now holds an example of each. Held by
 `tests/ingest/test_sourcelist.py::test_archived_has_no_source_wide_layer`, which
 asserts `config.UrlSource` never grows the key.
 
+⚠ **`keep` is still resolved from a LINE, and 2026-09-11 is when that stopped
+being the only option.** `.fux/sources/types` became `.fux/types.toml` that day
+([the comparison](../../work/compare/types-toml.compare.md), ADR-TYPES decision
+12), so the shared line grammar in `sourcelist.py` now parses **two** committed
+lists rather than three.
+
+**`urls` was deliberately not moved with it**, and the reason bears on this
+record directly: `keep`'s value comes from **three layers** — the built-in
+default, `[sources.url] keep`, then the line — and a TOML form has to express
+that layering, not just the values. The comparison's **reopen trigger 1** fires
+if `dirs` or `urls` is proposed as TOML, at which point this record's
+three-layer resolution is one of the things that proposal has to answer for.
+
+**Nothing about retention, eviction or the bound changed.**
+
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.

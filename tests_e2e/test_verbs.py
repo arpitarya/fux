@@ -434,7 +434,7 @@ def test_machine_data_beside_a_document_is_not_indexed(tmp_path):
 def test_a_types_file_replaces_the_default(tmp_path):
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
-    (tmp_path / ".fux" / "sources" / "types").write_text("*.rst\n", encoding="utf-8")
+    (tmp_path / ".fux" / "types.toml").write_text('include = ["*.rst"]\n', encoding="utf-8")
 
     _run(tmp_path, "ingest")
     found = _run(tmp_path, "find", "pruning", "--json").stdout
@@ -463,13 +463,14 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     """A consumer should not have to read fux's source to learn what a document is."""
     (tmp_path / "docs").mkdir()
     _run(tmp_path, "setup")
-    types = (tmp_path / ".fux" / "sources" / "types").read_text(encoding="utf-8")
-    assert "*.md" in types and "*.adoc" in types
+    types = (tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8")
+    assert '"*.md"' in types and '"*.adoc"' in types
 
     # ⚠ Was `assert "No .json" in types`. `.json` rejoined the default on
     # 2026-08-26 (Arpit: *"all the ones which have a decoder"*), so that line
     # was asserting a sentence the template no longer has a reason to write.
-    assert "*.json" in types, "a decoded format is spelled out like any other"
+    # Since ADR-TYPES decision 12 a decoded format is a `[decoders]` line.
+    assert '\njson = "json"\n' in types, "a decoded format is spelled out like any other"
 
     # The claim the test was really making — that the file says what is OUT and
     # why — restated against what it now says.
@@ -482,10 +483,30 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     # line below, under a heading reading "nothing here has a built-in
     # decoder". The stale half was dropped on 2026-09-01. `#*.log` is the
     # genuine article — no built-in reads it — and carries the same claim.
-    assert "\n#*.log" in types, "an opt-in format is present but commented, not absent"
-    assert "\n#*.svg" not in types, "a format with a built-in decoder is not an opt-in"
-    assert "\n*.svg decoder=svg" in types, "…it is an active line, bound to its decoder"
-    assert "\n*.sh" not in types, "a format with no decoder is not an active line"
+    assert '\n# log = "<your module>"' in types, "an opt-in format is present but commented"
+    assert "\n# svg =" not in types, "a format with a built-in decoder is not an opt-in"
+    assert '\nsvg = "svg"\n' in types, "…it is an active line, bound to its decoder"
+    assert '"*.sh"' not in types and "\nsh =" not in types, "no decoder, not an active line"
+
+
+def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gone(tmp_path):
+    """ADR-TYPES decision 12, end to end: refused, converted, then deleted by hand."""
+    _write_fixture(tmp_path)
+    (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
+    legacy = tmp_path / ".fux" / "sources" / "types"
+    legacy.write_text("*.rst\n", encoding="utf-8")
+
+    refused = subprocess.run([sys.executable, "-m", "fux.cli", "ingest"], cwd=tmp_path,
+                             capture_output=True, text=True)
+    assert refused.returncode == 1 and "fux setup" in refused.stderr
+
+    out = _run(tmp_path, "setup").stdout
+    assert (tmp_path / ".fux" / "types.toml").is_file()
+    assert "now delete .fux/sources/types" in out and legacy.is_file()
+    legacy.unlink()
+    _run(tmp_path, "ingest")
+    found = _run(tmp_path, "find", "pruning", "--json").stdout
+    assert "note.rst" in found and "pruning.md" not in found, "the conversion kept the allowlist"
 
 
 def test_ingest_puts_no_fetcher_in_a_repo_that_only_wanted_an_index(tmp_path):

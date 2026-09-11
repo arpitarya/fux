@@ -38,7 +38,7 @@ three hold:
    (ADR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
    still honoured, and `fux ingest` warns when a pattern is stated here *and*
    in `.fuxignore`;
-3. its name matches the **type allowlist** — `.fux/sources/types` if that file
+3. its name matches the **type allowlist** — `.fux/types.toml` if that file
    exists, otherwise the built-in `DEFAULT_TYPES` (ADR-TYPES, W-55's verdict G).
 
 **No rule inside that trio beats another**, so there is nothing to remember
@@ -263,7 +263,7 @@ def _default_types() -> tuple[str, ...]:
     """The built-in allowlist: prose, plus everything a built-in decoder reads.
 
     ⚠ **Widened 2026-08-26 on Arpit's ruling** — *"all the ones which have a
-    decoder"*. [ADR-TYPES](../../../docs/adr/0031_types-list.md) verdict G had
+    decoder"*. [ADR-TYPES](../../../docs/adr/0038_types-list.md) verdict G had
     kept the default to six prose globs, on a measurement showing 14 % of this
     repo's documents were non-prose and carried 15 % of its tokens, `.json`
     alone at 11.4 %. **That measurement stands and was not overturned**; what
@@ -277,7 +277,7 @@ def _default_types() -> tuple[str, ...]:
     default that grew when a consumer dropped a `logdoc.py` into
     `.fux/decoders/` would mean **adding a decoder silently starts indexing a
     new file type** — and what counts as a document must stay a committed line
-    a human wrote in `.fux/sources/types`.
+    a human wrote in `.fux/types.toml`.
     """
     from .. import decode as decode_mod
 
@@ -289,40 +289,47 @@ DEFAULT_TYPES: tuple[str, ...] = _default_types()
 
 @dataclass(frozen=True)
 class TypeFilter:
-    """Which filenames are documents. `allow` is never empty by construction."""
+    """Which filenames are documents. `allow` is never empty by construction.
+
+    ⚠ **There is no `deny` any more** (ADR-TYPES decision 12, 2026-09-11). The
+    `!` subtraction the old line grammar carried was already the deprecated
+    spelling of an exclusion; `.fux/types.toml` has no such key, and
+    `.fux/.fuxignore` is the one home for keeping a file out.
+    """
 
     allow: tuple[str, ...]
-    deny: tuple[str, ...] = ()
     #: True when the built-in default is in force — i.e. no types file exists.
     default: bool = True
 
     def accepts(self, rel_path: str) -> bool:
-        if any(sourcelist.glob_match(p, rel_path) for p in self.deny):
-            return False
         return any(sourcelist.glob_match(p, rel_path) for p in self.allow)
 
 
 def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
-    """The type allowlist: the committed file if present, else the built-in.
+    """The type allowlist: `.fux/types.toml` if present, else the built-in.
 
     **Absent means the default applies, never "index everything".** Indexing
     everything is the behaviour W-55 was filed about; and it does not mean
     "index nothing" either, because a missing config that empties the index
     looks like a broken engine rather than a missing file.
-    """
-    path = root / rel_path
-    if not path.is_file():
-        return TypeFilter(allow=DEFAULT_TYPES)
 
-    entries = sourcelist.parse(path.read_text(encoding="utf-8"), sourcelist.TYPES, origin=str(path))
-    allow = tuple(e.value for e in entries if not e.exclude)
-    deny = tuple(e.value for e in entries if e.exclude)
+    **A leftover `.fux/sources/types` is refused** before anything is read
+    (`typesfile.check_legacy`): treating it as absent would put the default in
+    its place and change the index with nothing saying so.
+    """
+    from . import typesfile
+
+    listed = typesfile.read(root, rel_path)
+    if listed is None:
+        return TypeFilter(allow=DEFAULT_TYPES)
+    allow = listed.allow
     if not allow:
         raise FuxError(
-            f"{path}: lists no file types, so nothing would be indexed. Delete the file to take "
-            f"the built-in default ({', '.join(DEFAULT_TYPES)}), or add at least one pattern"
+            f"{rel_path}: lists no file types - `include` and `[decoders]` are both empty - so "
+            f"nothing would be indexed. Delete the file to take the built-in default "
+            f"({', '.join(DEFAULT_TYPES)}), or add at least one entry"
         )
-    return TypeFilter(allow=allow, deny=deny, default=False)
+    return TypeFilter(allow=allow, default=False)
 
 
 def walk_sources(

@@ -2,8 +2,9 @@
 
 **Why it exists.** Before this, the answer to *"why is my file not in the
 index?"* lived in four places: a `!` line in `.fux/sources/dirs`, a `!` line in
-`.fux/sources/types`, the type allowlist in that same file, and two hardcoded
-rules in the walker. Four places is three too many, and the symptom was always
+the types list, the type allowlist in that same file, and two hardcoded rules in
+the walker. (The types list is `.fux/types.toml` since 2026-09-11, and it has no
+`!` at all — ADR-TYPES decision 12.) Four places is three too many, and the symptom was always
 the same — a document silently absent, and no single file to read to find out
 why.
 
@@ -71,16 +72,17 @@ five properties make that survivable:
 
 ⚠ **The cost, stated because it was accepted rather than avoided: a generated
 line DECIDES.** It freezes the verdict that produced it — widen
-`.fux/sources/types` and the listed `.py` files stay out; write content into a
+`.fux/types.toml` and the listed `.py` files stay out; write content into a
 file listed as `empty` and it stays out, still labelled `empty`. The freeze is
 not undone; `skipnotice.stale_warnings` makes it **loud** on stderr, and the
 fix is deleting the line or writing a `!` for it.
 
 ## `!` means the opposite here of what it means next door, on purpose
 
-In `.fux/sources/dirs` and `.fux/sources/types`, `!` **subtracts**
-([ADR-DIR-LIST](../../../docs/adr/0022_dir-list.md) decision 2b). Here it
-**re-includes**. Same character, opposite direction, two files.
+In `.fux/sources/dirs`, `!` **subtracts**
+([ADR-DIR-LIST](../../../docs/adr/0030_dir-list.md) decision 2b). Here it
+**re-includes**. Same character, opposite direction, two files. (`.fux/types.toml`
+has no `!` at all, so the collision is down to one file since 2026-09-11.)
 
 **That collision is accepted rather than avoided**, because the alternative is
 a `.fuxignore` that is not a `.fuxignore` — a reader who has to learn a new
@@ -101,7 +103,7 @@ them, and this is it:
 
 ⚠ **The second half is the sharp edge and it is not softened.** `!*.py` indexes
 Python files as **raw bytes**, because no decoder claims `.py` — which is
-exactly the shape [ADR-TYPES](../../../docs/adr/0031_types-list.md) was opened
+exactly the shape [ADR-TYPES](../../../docs/adr/0038_types-list.md) was opened
 about. It takes an explicit `!` line a human wrote to get there, it is visible
 in one committed file, and it is the price of the file meaning what its name
 says.
@@ -307,9 +309,9 @@ class Ignores:
     def patterns(self) -> dict[str, Rule]:
         """`{pattern-as-written: rule}` for every **ignoring** line.
 
-        Negations are left out: `!*.min.md` here and `!*.min.md` in
-        `sources/types` are opposite statements that happen to share a spelling,
-        and warning that they duplicate each other would be wrong.
+        Negations are left out: `!build` here and `!build` in `sources/dirs`
+        are opposite statements that happen to share a spelling, and warning
+        that they duplicate each other would be wrong.
         """
         # Generated lines are exact paths, never patterns anybody would also
         # write into `sources/`, and there can be hundreds of them. Including
@@ -396,7 +398,7 @@ def read(root: Path) -> Ignores:
     """Read `.fux/.fuxignore`, or return an empty one.
 
     **Absent means "nothing is ignored", and that is safe here** in a way it is
-    not for `sources/types`. This file only ever subtracts by default; a missing
+    not for the types list. This file only ever subtracts by default; a missing
     one therefore cannot empty an index, which is why it has no built-in default
     and no error for being empty.
     """
@@ -494,7 +496,7 @@ def _without_blocks(text: str) -> str:
     return "\n".join(out)
 
 
-def duplicate_warnings(root: Path, *, dirs_file: str, types_file: str) -> list[str]:
+def duplicate_warnings(root: Path, *, dirs_file: str) -> list[str]:
     """Lines warning that a pattern is stated in two files at once.
 
     **The duplicate is not an error and is not resolved silently.** Both copies
@@ -506,6 +508,9 @@ def duplicate_warnings(root: Path, *, dirs_file: str, types_file: str) -> list[s
     message says which, rather than reporting a conflict and leaving the reader
     to guess which way it resolves.
 
+    ⚠ **`dirs` only since 2026-09-11.** The types list became `.fux/types.toml`,
+    which has no subtraction to duplicate (ADR-TYPES decision 12).
+
     **ASCII only**, for the same reason `reason()` is.
     """
     ignores = read(root)
@@ -513,24 +518,23 @@ def duplicate_warnings(root: Path, *, dirs_file: str, types_file: str) -> list[s
         return []
     mine = ignores.patterns()
     warnings: list[str] = []
-    for rel, kind in ((types_file, "types"), (dirs_file, "dirs")):
-        for pattern, lineno in _exclusions(root, rel).items():
-            rule = mine.get(pattern) or mine.get(f"{pattern}/")
-            if rule is None:
-                continue
-            warnings.append(
-                f"warning: `{pattern}` is excluded in both {rel}:{lineno} and "
-                f"{IGNORE_FILE}:{rule.lineno}.\n"
-                f"  {IGNORE_FILE} is where exclusions live and it is consulted first, so the "
-                f"{kind} line changes nothing today.\n"
-                f"  Delete `!{pattern}` from {rel} - `!` subtracts there and RE-INCLUDES in "
-                f"{IGNORE_FILE}, so leaving both is one edit away from meaning two things."
-            )
+    for pattern, lineno in _exclusions(root, dirs_file).items():
+        rule = mine.get(pattern) or mine.get(f"{pattern}/")
+        if rule is None:
+            continue
+        warnings.append(
+            f"warning: `{pattern}` is excluded in both {dirs_file}:{lineno} and "
+            f"{IGNORE_FILE}:{rule.lineno}.\n"
+            f"  {IGNORE_FILE} is where exclusions live and it is consulted first, so the "
+            f"dirs line changes nothing today.\n"
+            f"  Delete `!{pattern}` from {dirs_file} - `!` subtracts there and RE-INCLUDES in "
+            f"{IGNORE_FILE}, so leaving both is one edit away from meaning two things."
+        )
     return sorted(warnings)
 
 
 def _exclusions(root: Path, rel_path: str) -> dict[str, int]:
-    """`{pattern: lineno}` for the `!` lines of a `dirs`/`types` file.
+    """`{pattern: lineno}` for the `!` lines of the `dirs` list.
 
     Parsed with the **shared** grammar rather than re-read here: two readers for
     one file is how the warning and the walk end up disagreeing about which
@@ -541,9 +545,8 @@ def _exclusions(root: Path, rel_path: str) -> dict[str, int]:
     path = root / rel_path
     if not path.is_file():
         return {}
-    spec = sourcelist.TYPES if rel_path.endswith("types") else sourcelist.DIRS
     try:
-        entries = sourcelist.parse(path.read_text(encoding="utf-8"), spec, origin=str(path))
+        entries = sourcelist.parse(path.read_text(encoding="utf-8"), sourcelist.DIRS, origin=str(path))
     except FuxError:
         return {}  # a broken list is the walk's error to raise, not this advisory's
     return {entry.value: entry.lineno for entry in entries if entry.exclude}

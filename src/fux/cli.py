@@ -347,7 +347,7 @@ def build_parser() -> argparse.ArgumentParser:
     def _entry_flags(p: argparse.ArgumentParser) -> None:
         """The attribute flags. Each is checked against the list the entry
         dispatched to, so `--cdp` on a directory is an error, not a no-op."""
-        p.add_argument("--types", action="store_true", help="the entry is a file-type pattern (.fux/sources/types)")
+        p.add_argument("--types", action="store_true", help="the entry is a file-type pattern (.fux/types.toml)")
         p.add_argument("--cdp", action="store_true", help="URLs: record fetch=cdp")
         p.add_argument("--http", action="store_true", help="URLs: record fetch=http (the default)")
         p.add_argument("--plain", action="store_true", help="URLs: record meta=plain — readable display text in the index")
