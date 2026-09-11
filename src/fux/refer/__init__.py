@@ -381,6 +381,45 @@ def _effective_ttl(loc: str, policy, declared: dict[str, int]) -> int:
     return min(policy.cache_ttl_seconds, seconds)
 
 
+def _fetch_within(timeout: int, root, doc_id: str, loc: str, fetcher):
+    """`fetch_document`, abandoned after `timeout` seconds.
+
+    ⚠ **`timeout_seconds` was recorded in every answer bundle and enforced
+    nowhere** until 2026-09-11 (W-140 row 15). The policy travelled with the
+    answer, `--audit` printed it, and a consumer fetcher that blocked forever
+    hung `fux answer` with no bound at all — a number that looked like a
+    guarantee.
+
+    **A thread, and the result of a late one is discarded.** Python cannot
+    interrupt a blocking socket in consumer code, so the honest mechanism is a
+    deadline on *waiting*, not on the fetch: the query returns on time and
+    degrades exactly as a failed fetch does — `as-ingested` against retained
+    bytes, `unverified` without them.
+
+    ⚠ **What this does NOT do, stated rather than implied:** the abandoned
+    thread keeps running until the consumer's own socket timeout fires. It
+    writes nothing — `fetch_document` reads and returns — so a late arrival is
+    dropped rather than raced into the answer. A fetcher that leaks threads on
+    every query is a fetcher problem that `[sources.url.config]` is the place
+    to bound.
+    """
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as _Timeout
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        future = pool.submit(fetch_document, root, doc_id, loc, fetcher=fetcher)
+        try:
+            return future.result(timeout=timeout)
+        except _Timeout:
+            # `cancel()` cannot stop a running call; the pool is left to reap it.
+            future.cancel()
+            raise FuxError(
+                f"{loc}: fetch did not finish within {timeout}s "
+                "(freshness policy timeout_seconds)"
+            ) from None
+        finally:
+            # Do not block the query on a thread that is still hanging.
+            pool._threads.clear()  # noqa: SLF001 - the documented way to not join
+
 def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fetch_cache, ttls=None):
     """Get one document's bytes, and record honestly what happened.
 
@@ -442,7 +481,7 @@ def _obtain(root, doc_id, loc, indexed_sha, decision, cache, fetcher, policy, fe
             )
 
     try:
-        result = fetch_document(root, doc_id, loc, fetcher=fetcher)
+        result = _fetch_within(policy.timeout_seconds, root, doc_id, loc, fetcher)
     except FuxError as exc:
         # ⚠ **The case `.fux/acquired/` exists for.** Signed out, offline, or
         # the source is gone: without retained bytes this is `unverified`,

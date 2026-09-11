@@ -33,7 +33,6 @@ then refresh this repo's renderings.
 | 11 | **The background runner never rebuilds the accelerator.** | `maintain/runner.py` ~534 | ADR-MAINTENANCE 2a |
 | 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
-| 15 | **No fetch timeout is enforced** — `timeout_seconds` is recorded and read nowhere. | `refer/freshness.py` ~44 | ADR-REFER |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
 | 20 | ⚠ **The freshness gate's `describes` relation is per FILE, so a change to one function in `ingest/run.py` demands a line in three records that do not describe it.** Twice in one session (2026-09-11) that produced a record edit whose only content was *nothing here changed*. Per-symbol describes, or an explicit exemption, would fix it | `tests/test_adr_freshness.py`, `docs/adr/README.md` §Ownership | ADR-OWNERSHIP |
 
@@ -193,6 +192,15 @@ then refresh this repo's renderings.
   now states the **resolved** value, so decision 12 is whole and the word it
   states is the consumer's; an explicit flag still beats both.
   [ADR-URL-LIST](../../docs/adr/0116_url-list.md). 2026-09-11.
+
+- **Row 15 — `timeout_seconds` bounded nothing.** Validated at construction,
+  stamped into every answer bundle, printed by `--audit`, read by nothing: a
+  consumer fetcher that blocked forever hung `fux answer` behind a number that
+  read as a guarantee. The fetch runs in a worker and the query stops waiting
+  at the deadline — a bound on *waiting*, which is the only honest one, since
+  Python cannot interrupt a blocking socket in consumer code. A timeout raises
+  `FuxError`, so it degrades down the path that already existed.
+  [ADR-REFER](../../docs/adr/0127_refer-plane.md). 2026-09-11.
 
 ## Definition of done
 

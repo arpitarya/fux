@@ -61,6 +61,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **The answer-time fetch timeout bounded nothing.** `timeout_seconds` was
+  validated, stamped into every answer bundle and printed by `--audit`, and no
+  code read it — so a consumer fetcher that blocked forever hung `fux answer`
+  behind a number that read as a guarantee. The fetch now runs in a worker and
+  the query stops waiting at the deadline, degrading exactly as a failed fetch
+  does ([ADR-REFER](docs/adr/0127_refer-plane.md)).
+
 - 🔴 **`fux add <URL>` wrote the engine's defaults over your `[sources.url]`.**
   Each generated line states every attribute, and the values came from the
   built-in defaults — so a repo configured with `ttl = "7d"`, `meta = "plain"`

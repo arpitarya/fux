@@ -349,6 +349,15 @@ rather than through a second copy ([ADR-CONFIG](0113_config.md) decision 12).
       `ttl` still bounds how often that comparison is redone. Pinning removes
       the socket, not the verification.
 
+**A fetch this plane triggers is now bounded, and the bound is on waiting**
+(W-140 row 15, 2026-09-11). `Policy.timeout_seconds` validated its value,
+travelled in `as_record()` and was read by nothing, so `mode = always` could
+hang a query forever. The verdicts here are unchanged: a timeout raises
+`FuxError` on the same path a failed fetch takes, which is `as-ingested`
+against retained bytes and `unverified` without them —
+[ADR-REFER](0127_refer-plane.md) carries the mechanism and what it does not
+promise.
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

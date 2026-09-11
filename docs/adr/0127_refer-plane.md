@@ -526,6 +526,26 @@ the fold rule, the universal table rule and the boundary ladder. They are kept
 here because they record why each behaviour exists; the current statement of it
 is there.
 
+**`timeout_seconds` is enforced, and what it bounds is WAITING** (W-140 row 15,
+2026-09-11). It was validated at construction, stamped into every answer
+bundle, printed by `--audit` — and read by nothing. A consumer fetcher that
+blocked forever hung `fux answer` with no bound at all, behind a number that
+read as a guarantee.
+
+- **The fetch runs in a worker and the query stops waiting at the deadline.**
+  Python cannot interrupt a blocking socket inside consumer code, so a deadline
+  on the *wait* is the only honest mechanism; claiming to bound the fetch itself
+  would be the same false guarantee in working code.
+- **A timeout raises `FuxError`, which is the path that already existed.** It
+  degrades exactly as a failed fetch does — `as-ingested` against retained
+  bytes, `unverified` without them — rather than introducing a verdict nobody
+  handles.
+- ⚠ **The abandoned thread keeps running until the consumer's own socket
+  timeout fires, and its result is discarded.** `fetch_document` reads and
+  returns, so a late arrival cannot race into an answer. A fetcher that leaks a
+  thread per query is a fetcher problem, and `[sources.url.config]` is where it
+  is bounded — fux will not reach into consumer code to kill it.
+
 ### Consequences
 
 - **Offline degradation is honest, and tested.** `file:` sources keep full

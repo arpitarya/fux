@@ -148,3 +148,49 @@ def test_the_fetcher_is_injected_never_imported():
     tree = ast.parse(inspect.getsource(source_mod))
     calls = {ast.unparse(n.func) for n in ast.walk(tree) if isinstance(n, ast.Call)}
     assert not any("import_module" in c or "spec_from_file" in c for c in calls), calls
+
+
+# -- W-140 row 15: a timeout that was recorded and never enforced ------------
+
+
+def test_a_hanging_fetcher_is_abandoned_at_the_policy_timeout(tmp_path):
+    """🔴 `timeout_seconds` travelled in every answer bundle and bounded nothing.
+
+    `--audit` printed it, the policy was stamped into the receipt, and a
+    consumer fetcher that blocked forever hung `fux answer` with no bound at
+    all — a number that read as a guarantee.
+    """
+    import time
+
+    from fux.refer import _fetch_within
+
+    def hangs(url):
+        time.sleep(30)
+        raise AssertionError("this fetch should have been abandoned")
+
+    started = time.monotonic()
+    with pytest.raises(FuxError, match="did not finish within 1s"):
+        _fetch_within(1, tmp_path, "url:https://x.test/p", "https://x.test/p", hangs)
+    assert time.monotonic() - started < 10, "the query waited for the fetch anyway"
+
+
+def test_a_fetch_that_finishes_in_time_is_unaffected(tmp_path):
+    """The bound is on waiting, not on the work — a normal fetch is untouched."""
+    from fux.refer import _fetch_within
+
+    fetched = _fetch_within(
+        5, tmp_path, "url:https://x.test/p", "https://x.test/p", lambda u: "# quick\n"
+    )
+    assert fetched.content == b"# quick\n"
+
+
+def test_the_timeout_degrades_like_any_other_failed_fetch(tmp_path):
+    """It raises FuxError, which is what `_obtain` already handles — so a
+    timeout becomes `as-ingested` against retained bytes and `unverified`
+    without them, rather than a new failure mode nobody handles."""
+    import time
+
+    from fux.refer import _fetch_within
+
+    with pytest.raises(FuxError):
+        _fetch_within(1, tmp_path, "url:https://x.test/p", "https://x.test/p", lambda u: time.sleep(5))
