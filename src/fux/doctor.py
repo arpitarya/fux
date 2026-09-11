@@ -356,6 +356,22 @@ def _no_op_priors(root: Path) -> Check:
         if field is not None and records:
             declared = sum(1 for record in records.values() if record.get(field))
             part += f" ({declared} document(s) {meaning})"
+            # 🔴 **SWITCHED OFF and UNREACHABLE are different problems with
+            # different remedies, and printing the count alone left a reader to
+            # notice the zero.** Changing the value fixes the first and does
+            # nothing whatever about the second. Measured 2026-09-11: three of
+            # the four priors returned BYTE-IDENTICAL results at every value
+            # including 0.0 on a corpus that declares none of what they read,
+            # and the premise that they were testable there had stood in the
+            # queue for two weeks because the documents discuss supersession in
+            # PROSE while declaring none of it.
+            #
+            # ⚠ **It states a fact and still recommends nothing.** *"0 documents,
+            # so this knob is inert here"* is derived from data already in hand;
+            # *"0 documents, so set it to X"* would be the R10 failure this row
+            # exists to refuse.
+            if declared == 0:
+                part += " - so changing this value would change NOTHING in this repository"
         dead.append(part)
 
     if not dead:

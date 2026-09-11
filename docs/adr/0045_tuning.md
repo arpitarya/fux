@@ -621,6 +621,37 @@ purpose.
   sources + same fux.toml` held for `[decode]`. What changed is which committed
   file carries the input.
 
+🔴 **THREE OF THE FOUR RANKING PRIORS CANNOT BE MEASURED ON THE HAND-GRADED
+CORPUS, and that is a fact about the corpus rather than about the knobs**
+(measured 2026-09-11,
+[the run](../../work/regression/2026-09-11-four-priors-headroom/report.md)).
+
+| prior | values swept | goldens that moved |
+|---|---|---:|
+| `superseded_weight` | 1.0 · 0.5 · 0.1 · **0.0** | **0 of 50** |
+| `archived_weight` | 1.0 · 0.5 · **0.0** | **0 of 50** |
+| `recency_half_life_days` | 0.0 · 30 · 365 | **0 of 50** |
+| `rerank_weight` | 0.0 · 0.5 · 1.0 | 1, then 4 |
+
+- **`0.0` is the sharp column.** `superseded_weight = 0.0` multiplies a superseded
+  document's score by zero, pushing it below every other result. **Nothing moved**
+  — which is the absence of any document to act on, not a weak effect.
+- **The causes differ and the remedies differ.** `superseded_weight` reads a
+  `supersedes:` **frontmatter key** and the corpus declares none (its documents
+  say it in prose); `archived_weight` reads an `archived=true` source line and
+  there is none; `recency_half_life_days` has its input — every document carries
+  an `mtime` — and **no variance**, because ten files checked out in one commit
+  have near-identical timestamps. ⚠ **So no corpus built from a git checkout can
+  ever exercise the recency prior**, which is a property of how corpora are made.
+- 🔴 **A sweep over any of the three meets a `0 broken` bar VACUOUSLY**, at every
+  value, and reporting that as a pass would be true, worthless and misleading.
+  Caught by [ADR-RS](0043_predictions.md) decision 22d — the `heading` control's
+  failure exactly, three hours after that rule was ratified.
+- ✅ **`rerank_weight` is the one prior with headroom** (13 improvement / 37
+  regression, proven by its own off arm) and its `+4` at `1.0` with 0 broken is
+  **below decision 19's floor** — a net of 4 cannot clear α at any discordant
+  count. It remains **no detected change**, and the knob remains held.
+
 ### Consequences
 
 - ⚠ **Veto conditions 1 and 4 fired on 2026-09-11, by ruling** — a tune key

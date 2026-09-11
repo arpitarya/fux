@@ -1115,6 +1115,45 @@ def test_it_counts_what_each_dead_prior_WOULD_have_acted_on(tmp_path):
     assert "superseded_weight=1 (0 document(s)" in check.detail
 
 
+def test_a_prior_with_nothing_to_act_on_says_so(tmp_path):
+    """🔴 *Switched off* and *unreachable* are different problems.
+
+    Changing the value fixes the first and does **nothing whatever** about the
+    second, and until 2026-09-11 this row printed the count and left a reader to
+    notice the zero. Measured that day: three of the four priors returned
+    byte-identical results at every value **including `0.0`** on a corpus that
+    declares none of what they read — and the premise that they were testable
+    there had stood in the queue for two weeks, because the documents discuss
+    supersession in **prose** while declaring none of it.
+    See `work/regression/2026-09-11-four-priors-headroom/`."""
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(tmp_path, [_record("file:a.md", "a.md", archived=True), _record("file:b.md", "b.md")])
+    detail = _check(doctor.run(tmp_path), "ranking priors").detail
+    # 0 superseded documents -> the clause fires
+    assert "superseded_weight=1 (0 document(s)" in detail
+    assert "so changing this value would change NOTHING in this repository" in detail
+    # 1 archived document -> it does not: that knob has something to act on
+    archived_part = next(p for p in detail.split(";") if "archived_weight" in p)
+    assert "1 document(s) declared archived=true" in archived_part
+    assert "NOTHING in this repository" not in archived_part
+
+
+def test_the_unreachable_clause_still_recommends_no_value(tmp_path):
+    """The clause states a fact derived from data already in hand. *"0 documents,
+    so set it to X"* would be the R10 failure this row exists to refuse."""
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(tmp_path, [_record()])
+    detail = _check(doctor.run(tmp_path), "ranking priors").detail
+    assert "NOTHING in this repository" in detail
+    assert "does NOT recommend" in detail
+    for nudge in ("try ", "set it to", "recommended", "should be"):
+        assert nudge not in detail
+
+
 def test_a_prior_that_is_switched_ON_is_not_listed(tmp_path):
     from fux.store import write_index
 

@@ -1,0 +1,650 @@
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "superseded_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "superseded_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "superseded_weight=0.1", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "superseded_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "archived_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "archived_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "archived_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "recency_half_life_days=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "recency_half_life_days=30.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "recency_half_life_days=365.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/guide-oncall-rota.md at rank <= 1, got 3 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-oncall-rota.md']", "id": "q013", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "rank 2", "id": "q030", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/adr-0019-calder-gateway.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "rank 2", "id": "q048", "state": "pass"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "rerank_weight=0.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q013", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md', 'docs/postmortem-checkout-outage.md']", "id": "q015", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/guide-onboarding.md']", "id": "q020", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/runbook-mesh-rollback-legacy.md at rank <= 1, got 2 | top: ['docs/runbook-gateway-rollback.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/reference-deployment-tiers.md']", "id": "q026", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q030", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/runbook-mesh-rollback-legacy.md', 'docs/adr-0019-calder-gateway.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "rank 1", "id": "q048", "state": "pass"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "rerank_weight=0.5", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q001", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q002", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q003", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q004", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/policy-data-retention.md at rank <= 1, got 2 | top: ['docs/reference-deployment-tiers.md', 'docs/policy-data-retention.md', 'docs/guide-oncall-rota.md']", "id": "q005", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "vocabulary mismatch \u2014 the document never says the query's noun. The target is titled \"checkout unavailable for 47 minutes\" and tagged `checkout`; the query asks about the \"outage\", a word that appears nowhere in it. Absent from the top 5 entirely, which is the worst miss in the set.", "id": "q006", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "the answer is a TABLE COLUMN. `| tier | reviewers | who can approve |` in the target; the onboarding guide outranks it by repeating the query's words in prose. Rank 2, wanted 1.", "id": "q007", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q008", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q009", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q010", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q011", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "an exact command match inside a code block loses to prose elsewhere. The target contains `calderctl gateway freeze --tier <n>  # halt an in-flight rollout` \u2014 a near-literal restatement of the query \u2014 and ranks 4, behind three documents that merely mention a freeze.", "id": "q012", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q013", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q014", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q015", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got absent | top: ['docs/guide-oncall-rota.md', 'docs/adr-0007-helix-mesh.md', 'docs/runbook-gateway-rollback.md']", "id": "q016", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q017", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/adr-0019-calder-gateway.md at rank <= 1, got 3 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/adr-0019-calder-gateway.md']", "id": "q018", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "supersession is recorded and is not strong enough to invert a CURRENCY question. `adr-0007` carries `status: superseded` and an explicit pointer to `adr-0019`, and still outranks it on \"is helix mesh still in use\". Rank 5, wanted <= 2.", "id": "q019", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q020", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 2", "id": "q021", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q022", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q023", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q024", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q025", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q026", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 3, got 4 | top: ['docs/reference-calderctl.md', 'docs/runbook-mesh-rollback-legacy.md', 'docs/runbook-gateway-rollback.md']", "id": "q027", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "the answer is stated plainly and is not surfaced. The target's second line reads **Expected duration:** 8-12 minutes. Rank 5, wanted 1.", "id": "q028", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "same shape as q006's sibling q028 \u2014 the legacy mesh runbook states its own duration and ranks 5, wanted 1.", "id": "q029", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q030", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q031", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 2, got 4 | top: ['docs/runbook-mesh-rollback-legacy.md', 'docs/adr-0019-calder-gateway.md', 'docs/reference-calderctl.md']", "id": "q032", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q033", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "symptom-phrased, not keyword-phrased. The user describes what happened to them (\"paged at 3am but my service is internal\"); the document names the mechanism. Rank 3, wanted <= 2.", "id": "q034", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "symptom-phrased, and ENRICHMENT DID NOT CLOSE IT. The target's enrichment says in as many words that adding your own retry makes an incident worse; the query is \"I added a retry and things got worse\". Still rank 2, wanted 1.", "id": "q035", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q036", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q037", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 2", "id": "q038", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q039", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q040", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q041", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 2", "id": "q042", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/adr-0007-helix-mesh.md at rank <= 1, got 2 | top: ['docs/postmortem-checkout-outage.md', 'docs/adr-0007-helix-mesh.md', 'docs/reference-deployment-tiers.md']", "id": "q043", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "a rejected-alternative section is the answer, and loses to a document about the thing that WAS chosen. `adr-0019` reads \"eBPF-based policy with no proxy at all. Genuinely attractive and rejected\". Rank 2, wanted 1.", "id": "q044", "state": "xfail"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q045", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q046", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q047", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "rank 1", "id": "q048", "state": "pass"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 1, got 2 | top: ['docs/adr-0007-helix-mesh.md', 'docs/postmortem-checkout-outage.md', 'docs/reference-deployment-tiers.md']", "id": "q049", "state": "FAIL"}
+{"arm": "rerank_weight=1.0", "detail": "wanted docs/postmortem-checkout-outage.md at rank <= 2, got 3 | top: ['docs/guide-oncall-rota.md', 'docs/reference-deployment-tiers.md', 'docs/postmortem-checkout-outage.md']", "id": "q050", "state": "FAIL"}

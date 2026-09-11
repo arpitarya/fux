@@ -193,6 +193,29 @@ The general rule decision 4's defect produced, and it is not about config.
 - **So: whenever a check degrades, name the row that fails. If none does, the
   degradation is a hole rather than politeness.**
 
+**5a. A count of zero is a different finding from a value of zero, and the row
+says which.** `ranking priors` reports every prior that is switched off **and the
+count of documents it would have acted on**. When that count is **0** it adds
+*"so changing this value would change NOTHING in this repository."*
+
+- 🔴 **Because *switched off* and *unreachable* have different remedies.**
+  Changing the value fixes the first and does nothing whatever about the second.
+  The row printed the count from the start and left the reader to notice the
+  zero — **and a reader did not, for two weeks.** A queue item asserted that the
+  hand-graded playground could test `superseded_weight`; the corpus discusses
+  supersession in **prose** and declares none of it, so the knob had nothing to
+  act on. Measured 2026-09-11: three of the four priors returned **byte-identical
+  results at every value, `0.0` included**
+  ([the run](../../work/regression/2026-09-11-four-priors-headroom/report.md)).
+- **It states a fact and still recommends nothing.** *"0 documents, so this knob
+  is inert here"* is derived from data the row already holds. *"0 documents, so
+  set it to X"* is the recommendation this row refuses, and a test asserts the
+  refusal survives.
+- **This is decision 5's rule in a second costume**: a check that degrades to
+  saying nothing must name what does fail. Here nothing degraded — the number was
+  printed — and the **conclusion** was left unstated, which reads the same way to
+  anyone who is not already looking for it.
+
 **6. It never repairs, and naming the fix is the product.** `doctor` reports a
 stale lock and prints the command that clears it; it does not clear it. Clearing
 a lock whose owner is alive puts two runners inside `.fux/index/` at once, which
