@@ -61,6 +61,27 @@ def make_repo(path: Path, *, hooks: bool) -> str:
     return git(path, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
 
 
+def quiesce(path: Path) -> None:
+    """Stop any background re-index before reading a committed shard.
+
+    ⚠ **This is a GATE, not a tidy-up** (CLAUDE.md two-strikes, 2026-09-11).
+    `test_the_driver_resolves_what_git_cannot` failed twice in one session and
+    passed on every re-run, both times inside a combined `tests tests_e2e`
+    invocation — a busier machine, so a wider window.
+
+    **The window is real and it is the product working as designed.**
+    `post-commit` runs `fux ingest --spawn-runner`, which detaches; `diverge`
+    makes two commits per repo, so up to two background runners may still be
+    re-indexing when the merge finishes and the assertions read
+    `.fux/index/*.jsonl`. A test that reads a file another process may rewrite
+    is a race whoever reads the failure will blame on the merge driver.
+
+    `fux daemon stop` is the same `request_stop` every writing verb calls, so
+    this waits through the CLI rather than reaching into the package.
+    """
+    fux(path, "daemon", "stop")
+
+
 def diverge(path: Path, base: str) -> None:
     """Two branches, each editing a different record in the same shard."""
     git(path, "checkout", "-qb", "x")
@@ -95,6 +116,7 @@ def test_the_driver_resolves_what_git_cannot(tmp_path):
     merged = git(wired, "merge", "x", "-m", "merge", check=False)
     assert merged.returncode == 0, f"treatment: the driver should resolve it\n{merged.stdout}"
 
+    quiesce(wired)  # no background runner may rewrite the shard mid-assertion
     shard = next((wired / ".fux" / "index").glob("*.jsonl"))
     records = [json.loads(l) for l in shard.read_text().splitlines()[1:]]
     by_id = {r["id"]: r for r in records}

@@ -42,7 +42,6 @@ then refresh this repo's renderings.
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
 | 17 | **Starter refusal rules refuse real wiki pages** (`viewpage.action`, `.aspx`, `.php`); `suspiciously-small-document`'s comment says *warn* but it refuses. **(guide: FETCHER)** | `templates/refusals.toml.txt` | ADR-REFUSAL |
 | 18 | **Small ones:** `.fux/.gitignore` misses `__pycache__/` under `decoders/`/`fetchers/`; a re-run of `setup` always prints the `AGENTS.md` paste note; the generated `urls` header says "two attributes" and "re-fetches every line"; the starter `pii.toml` and doctor point at `tools/pii-probe/probe.py`, which is not in the package. | `setup.py`, `store/fuxdir.py`, `doctor.py` ~484 | ADR-DOTFUX · ADR-PII |
-| 19 | ⚠ **`tests_e2e/test_maintenance.py::test_the_driver_resolves_what_git_cannot` failed once and passed on re-run** (2026-09-11, macOS): the merge resolved but `file:docs/aa.md` came back at `ver` 1. A hooked repo re-indexes in the background, so the assertion may be racing the runner. **Seen once — a second occurrence makes it a gate** (CLAUDE.md two-strikes) | `tests_e2e/test_maintenance.py` ~102 | ADR-MAINTENANCE |
 | 20 | ⚠ **The freshness gate's `describes` relation is per FILE, so a change to one function in `ingest/run.py` demands a line in three records that do not describe it.** Twice in one session (2026-09-11) that produced a record edit whose only content was *nothing here changed*. Per-symbol describes, or an explicit exemption, would fix it | `tests/test_adr_freshness.py`, `docs/adr/README.md` §Ownership | ADR-OWNERSHIP |
 
 ## 2 · Records that disagree with the code
@@ -97,6 +96,17 @@ then refresh this repo's renderings.
   listed, and wins over `--all` as the more specific selector. ADR-CLI carries
   what a verbatim surface capture cannot prove: that a flag is read, not merely
   accepted. 2026-09-11.
+
+- **Row 19 — the merge-driver e2e test raced a background re-index.** It fired
+  a **second** time the same day, which is CLAUDE.md's two-strikes trigger, so
+  it is a gate rather than another note. Diagnosed: `post-commit` runs
+  `fux ingest --spawn-runner`, `diverge` makes two commits per repo, and the
+  assertions read `.fux/index/*.jsonl` while up to two detached runners may
+  still be writing — the product working as designed, and a test reading a file
+  another process may rewrite. `quiesce()` calls `fux daemon stop` (the same
+  `request_stop` every writing verb calls) before the read. Both failures were
+  inside a combined `tests tests_e2e` run; two such runs are clean after.
+  2026-09-11.
 
 ## Definition of done
 
