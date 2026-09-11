@@ -1,0 +1,48 @@
+Nagpur DC night handover log
+kept at security desk copy, typed from WhatsApp + notebook. spelling not fixed.
+
+2025-09-17 / Bunty
+f1 freezer door gasket sweating again. frozen peas from Mangal Foods moved from rack F1-A to F1-B at 01:20 because left side had ice fog and floor wet. temp display said -17.4 then -18.2 after unit defrost. told Prakash maint to check morning. no customer issue yet. reefer RF-203 came 25 min late, driver said ring road jam. dock 5 still took him because frozen queue empty.
+
+2025-10-05 / Bunty
+manjara milk crates waiting lane 2 at 6.2 C for 38 mins while dock 1 blocked by empty crate return. i told Farhan sir on phone. he said count as staging, not excursion, because crates were not handed to QA yet. writing here only so day shift knows. please check with madam because SOP is confusing on milk. same night Tessaline alarm was not showing for lane sensor, only room D1.
+
+2025-10-18 / Saira
+two hired trucks came without red sleeve packets. guard sent them inside because rain heavy. i made red tags from old labels and kept seal tape in office drawer. one packet short for BharatVac sample return. ask stores for proper sleeves. driver on RF-118 asked what Compliance-Red means. new boys don't know all these groups.
+
+2025-11-02 / Bunty
+kalpa old tablet still in guard cabin. IT said keep for past trips only. do not send tablet photo to customer unless QA asks. Tessaline app login for night lead working after password reset. C2 sensor name now TSL-NGP-C2-07. Kalpa sticker still on wall, remove after audit or everyone gets confused.
+
+2025-11-29 / Mahesh
+dock 3 light flicker, drivers reversing blind after 02:00. stopped two trucks and used hand torch. Col Sandhu saw video and shouted on call, said NO LOAD IS WORTH A LIFE. electrician called at 06:30. also Karim on RF-221 already had 9 hr 40 min driving when arrived from Nashik, should not send him further to Wardha without rest.
+
+2025-12-22 / Bunty
+nashik fog. Karim duty crossed 10 hr because police held truck near Sinnar. Sandhu sir said park at lit fuel plaza next time and write exception, don't "push just because paneer will spoil". customer service wanted eta but fleet said rest first. driver slept in cab 4 hr, then replacement came from Nagpur. milk still ok at 3.1 C.
+
+2026-01-14 / Saira
+new joiners asked for Dockwise link. old wiki link opens kalpa slot sync page, dead. Farhan sir says Dockwise is only on office vpn. TODO from FAQ still not fixed. Guwahati called about rain cover; their phone slot is still with Riniki, not in Dockwise.
+
+2026-02-09 / Bunty
+reefer RF-118 display jumping after 02:00. Tessaline says 9.8 then 3.4 then 10.1 in one minute. manual IR gun on insulin carton was 3.4 C and spare logger was 3.6 C. kept original sensor in place, put spare logger next to product, called Farhan. do not close alarm till QA sees export. driver wanted to restart app but we said no.
+
+2026-02-26 / Mahesh
+dock 4 pharma loading ran late. dock calendar had BharatVac 22:30 but truck came 23:10. pharma dock 4 used from 23:15 to 23:45, red sleeve attached, seal photo done. frozen restaurant chain truck waited holding lane B. no one liked it but better than mixing pharma and frozen at same shutter.
+
+2026-03-02 / Bunty
+busy night, five trucks, tessaline screaming on staging again. old trick from kalpa days: if sensor pouch is showing dock warm while pallet waiting, put pouch inside foam lunch box with gel pack for 12 min until loading done, then hang back. i am not saying do for pharma. but dairy guys doing because otherwise every small delay becomes case. please don't forward this line.
+
+2026-03-18 / Saira
+Revathi madam came night round. she asked why old trick is written here and said removing or covering probe is prohibited. Bunty got warning but she said better we wrote truth than hiding. she wants training for staging and sensor source hierarchy. Compliance-Red test call worked at 01:05.
+
+2026-04-06 / Bunty
+new SOP print came rev 4.2. front desk copy replaced. old paragraph about milk 7 C is still inside and everyone laughed because same SOP says 5 C. Farhan sir said follow 5 C, don't argue at 3 am. dairy coop complained about too many holds. i say fix dock 1 empty crate return first.
+
+2026-04-18 / Mahesh
+generator diesel 420 L at start of night, 310 L at end. power blink 23:40, freezer fine. guwahati truck GHY-7 reached without rain cover over rear pallets; told Riniki by phone. NGP hub and Nagpur DC same place for forms, new driver wrote two locations on challan and security rejected first copy.
+
+2026-05-06 / Bunty
+Tessaline export for RF-221 missing first 15 min after midnight. driver said network gone near Samruddhi tunnel. usb logger ok. QA told keep both files and write missing piece as missing, not guessed. restaurant frozen chicken at -16.2 for 14 min only, came back -18.4. no excursion as per Revathi on call.
+
+2026-05-28 / Saira
+night team short two people. dock 3 duplicated booking, Wiki still says late arrival goes holding lane B, call shift lead, no automatic cancellation. Dockwise says cancel after 20 min for dairy. Farhan said wiki old but useful for Guwahati phone numbers. please day shift update one source, we are tired.
+

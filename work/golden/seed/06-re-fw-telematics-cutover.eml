@@ -1,0 +1,134 @@
+From: "Tomás Reyes" <tomas.reyes@tessaline.example>
+To: Farhan Qureshi <farhan.qureshi@quillfern.example>
+Cc: Anjali Deshmukh <anjali.deshmukh@quillfern.example>
+Date: Mon, 21 Jul 2025 09:18:04 +0530
+Subject: FW: telematics cutover - revised freeze
+Message-ID: <20250721091804.TSL.1187@tessaline.example>
+
+Farhan,
+
+Great speaking Friday. Tessaline can move Quillfern faster than the first plan.
+We can onboard all owned reefers by 15 September 2025 if Nagpur signs the
+installation window this week. Our launch bundle includes 60-second polling,
+temperature API v2, door-open alerts, and exception export at no extra charge.
+
+Commercial headline: Rs. 780 per truck per month for 150 or more units, with
+warehouse probes priced separately. I know your 2023 ADR liked Kalpa's local
+support, but our Pune and Nagpur field teams are ready now.
+
+Regards,
+Tomás
+
+--
+Tomás Reyes
+Account Manager, Tessaline Telematics
+
+-----Original Message-----
+From: Farhan Qureshi <farhan.qureshi@quillfern.example>
+Sent: Monday, July 21, 2025 13:42
+To: Anjali Deshmukh <anjali.deshmukh@quillfern.example>
+Cc: Col. H. S. Sandhu <hs.sandhu@quillfern.example>
+Subject: Re: telematics cutover - revised freeze
+
+Anjali,
+
+15 September is not workable for Nagpur. Banana and dairy overflow start that
+week, and dock 3 is already half-dead. If we switch, I want pilot rooms first
+and trucks later. My suggested freeze is after 05 October 2025, with C2 and
+RF-118 as pilot assets in August.
+
+Also check the Rs. 780 number. Tomás said "headline" too many times.
+
+Farhan
+
+-----Original Message-----
+From: Anjali Deshmukh <anjali.deshmukh@quillfern.example>
+Sent: Tuesday, July 22, 2025 08:11
+To: Col. H. S. Sandhu <hs.sandhu@quillfern.example>
+Cc: Farhan Qureshi <farhan.qureshi@quillfern.example>
+Subject: Re: telematics cutover - revised freeze
+
+Colonel,
+
+Reworked numbers below. The Tessaline one-time onboarding after credit is Rs.
+24.60 lakh, not Rs. 31.20 lakh from the 2023 evaluation. The recurring truck
+rate is Rs. 812 per truck per month because the hired-truck SIM slab is not
+eligible for the Rs. 780 headline. Kalpa early termination will cost Rs. 9.30
+lakh if we exit after the pilot.
+
+For Finance, Tessaline becomes cheaper than Kalpa after month 17 if we count
+alert-failure write-offs above Rs. 6 lakh per year. Without that risk adjustment
+it becomes cheaper after month 24.
+
+Anjali
+
+-----Original Message-----
+From: Col. H. S. Sandhu <hs.sandhu@quillfern.example>
+Sent: Wednesday, July 23, 2025 19:04
+To: Farhan Qureshi <farhan.qureshi@quillfern.example>; Anjali Deshmukh <anjali.deshmukh@quillfern.example>
+Cc: Revathi Iyer <revathi.iyer@quillfern.example>; IT Service Desk <it@quillfern.example>
+Subject: Re: telematics cutover - revised freeze
+
+Approved in principle. We will switch from Kalpa Fleet Systems to Tessaline
+Telematics, subject to Nagpur pilot acceptance and Finance PO control. DO NOT
+repeat the 2023 conclusion as current policy after this mail.
+
+Pilot assets: C2 cold room and RF-118. Pilot start target: 18 August 2025. Full
+operational cutover target: 07 October 2025. Kalpa remains the historical record
+for trips before pilot acceptance. During parallel running, QA decides which
+record is authoritative for a case.
+
+NO DRIVER SHALL BE ASKED TO TROUBLESHOOT DEVICES WHILE MOVING.
+
+H. S. Sandhu
+
+-----Original Message-----
+From: "Tomás Reyes" <tomas.reyes@tessaline.example>
+Sent: Wednesday, July 30, 2025 10:26
+To: Anjali Deshmukh <anjali.deshmukh@quillfern.example>; Farhan Qureshi <farhan.qureshi@quillfern.example>
+Subject: Re: telematics cutover - revised freeze
+
+Confirming commercials and scope so there is no procurement ambiguity. Please
+ignore my earlier Rs. 780 figure; the approved recurring price is Rs. 812 per
+active truck per month. One-time onboarding is Rs. 24.60 lakh after the launch
+credit. Warehouse probe pricing remains as per annex B.
+
+We commit to exception_csv_v2 from day one, 60-second polling, door-open alerts,
+and no extra charge for API access. I am confident we can still complete all
+sites close to the original date, but I accept Farhan's pilot-first sequence.
+
+Tomás
+
+-----Original Message-----
+From: Farhan Qureshi <farhan.qureshi@quillfern.example>
+Sent: Tuesday, August 19, 2025 07:35
+To: Revathi Iyer <revathi.iyer@quillfern.example>; Col. H. S. Sandhu <hs.sandhu@quillfern.example>; Anjali Deshmukh <anjali.deshmukh@quillfern.example>
+Subject: Re: telematics cutover - revised freeze
+
+Pilot live since 18 August in Nagpur. C2 Tessaline sensor TSL-NGP-C2-07 is
+within 0.3 C of the USB logger. RF-118 install done, but driver training needs
+one more night shift. Guwahati is not ready and Coimbatore wants south-gate
+slots first.
+
+Please do not cite 15 September as the cutover date. The working date remains
+07 October for Nagpur, later for the other DCs.
+
+Farhan
+
+-----Original Message-----
+From: Anjali Deshmukh <anjali.deshmukh@quillfern.example>
+Sent: Monday, September 8, 2025 16:52
+To: Col. H. S. Sandhu <hs.sandhu@quillfern.example>; Farhan Qureshi <farhan.qureshi@quillfern.example>; "Tomás Reyes" <tomas.reyes@tessaline.example>
+Subject: Re: telematics cutover - revised freeze
+
+Final PO QF-FY26-TSL-044 is raised. Commercial control numbers are Rs. 24.60
+lakh one-time onboarding, Rs. 812 per active truck per month, and Rs. 9.30 lakh
+Kalpa early termination. Support credit of Rs. 3.10 lakh is recorded separately
+and must not be netted against monthly charges.
+
+Cutover sequence for planning: Nagpur on 07 October 2025, Coimbatore on 14
+October 2025, Guwahati on 21 October 2025. Kalpa decommission target is 31
+October 2025 after audit export.
+
+Anjali
+

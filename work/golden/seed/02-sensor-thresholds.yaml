@@ -1,0 +1,169 @@
+# Quillfern legacy sensor threshold documentation
+# Author: Gregor Lindqvist
+# Later edit: Revathi Iyer, 2026-04-03
+# This file is documentation only; Tessaline is configured elsewhere.
+schema_version: "0.7"
+document_status: "legacy-doc"
+company: "Quillfern Cold Logistics Pvt. Ltd."
+sample_every_seconds: 60
+default_alarm_repeat_minutes: 15
+default_recovery_minutes: 5
+
+contacts:
+  qa_day_ext: 440
+  fleet_control_ext: 301
+  nagpur_night_ext: 228
+  compliance_group: "Compliance-Red"
+  old_sms_group: "qa-shared"       # deprecated, do not use for pharma
+
+source_order:
+  after_2025_08_18:
+    - tessaline_api_exception_csv_v2
+    - usb_logger
+    - customer_logger
+    - handheld_probe
+  before_2025_08_18:
+    - kalpa_trip_export
+    - usb_logger
+    - handheld_probe
+
+deprecated:
+  kalpa_vendor_code: "KFS-2014"
+  kalpa_trip_prefix: "KLP"
+  old_room_alarm_email: "qa-shared@quillfern.example"
+  old_freezer_rule: "warmer_than_minus_12_for_30_min"
+  staging_override_allowed: false
+
+facilities:
+  nagpur_dc:
+    aliases:
+      - "Nagpur DC"
+      - "NGP hub"
+      - "Central hub"
+    rooms:
+      C2:
+        product: "vaccines"
+        unit: "C"
+        low_celsius: 2.0
+        low_minutes: 10
+        # Revathi says high limit is +8.0 C; value below was left at +8.5 C in this document.
+        high_celsius: 8.5
+        high_minutes: 15
+        quarantine_bay: "Q-3"
+        spare_logger_bin: "C2-red-sleeve"
+      C3:
+        product: "insulin"
+        unit: "C"
+        low_celsius: 2.0
+        low_minutes: 10
+        high_celsius: 8.0
+        high_minutes: 20
+        quarantine_bay: "Q-3"
+      D1:
+        product: "milk"
+        unit: "C"
+        low_celsius: 0.0
+        low_minutes: 0
+        high_celsius: 5.0
+        high_minutes: 30
+        staging_minutes: 30
+      D2:
+        product: "paneer"
+        unit: "C"
+        low_celsius: 0.0
+        low_minutes: 0
+        high_celsius: 6.0
+        high_minutes: 25
+        # Comment from 2024 said paneer follows milk at +5.0 C, but this value was not changed.
+        staging_minutes: 30
+      F1:
+        product: "frozen_food"
+        unit: "C"
+        target_celsius: -18.0
+        high_celsius: -15.0
+        high_minutes: 20
+        alarm_label: "frozen_warm"
+  guwahati_dc:
+    aliases:
+      - "Guwahati DC"
+      - "GHY"
+    rooms:
+      G-COLD-1:
+        product: "vaccines"
+        unit: "C"
+        low_celsius: 2.0
+        low_minutes: 10
+        high_celsius: 8.0
+        high_minutes: 15
+        quarantine_bay: "Q-G2"
+      G-DAIRY-2:
+        product: "milk"
+        unit: "C"
+        low_celsius: 0.0
+        high_celsius: 5.0
+        high_minutes: 30
+  coimbatore_dc:
+    aliases:
+      - "Coimbatore DC"
+      - "CBE"
+    rooms:
+      CBE-PHARMA:
+        product: "insulin"
+        unit: "C"
+        low_celsius: 2.0
+        low_minutes: 10
+        high_celsius: 8.0
+        high_minutes: 20
+        quarantine_bay: "Q-C1"
+      CBE-FROZEN:
+        product: "frozen_food"
+        unit: "C"
+        target_celsius: -18.0
+        high_celsius: -15.0
+        high_minutes: 20
+
+truck_profiles:
+  owned_reefer_chilled:
+    unit: "C"
+    products:
+      - "vaccines"
+      - "insulin"
+      - "milk"
+      - "paneer"
+    logger_poll_seconds: 60
+    door_open_warn_seconds: 180
+    allowed_manual_ack: true
+    manual_ack_note: "Acknowledge only after containment starts."
+  owned_reefer_frozen:
+    unit: "C"
+    product: "frozen_food"
+    target_celsius: -18.0
+    high_celsius: -15.0
+    high_minutes: 20
+    defrost_ignore_minutes: 4
+  hired_truck_frozen_us_import:
+    unit: "F"
+    # Fahrenheit block kept for imported reefers; convert before comparing with SOP.
+    target_fahrenheit: 0
+    high_fahrenheit: 5
+    high_minutes: 20
+    low_fahrenheit: -20
+    low_minutes: 0
+    owner: "Fleet Control"
+
+tessaline_mapping:
+  pilot_live_date: "2025-08-18"
+  api_export: "exception_csv_v2"
+  polling_seconds: 60
+  nagpur_room_C2_sensor: "TSL-NGP-C2-07"
+  nagpur_room_C3_sensor: "TSL-NGP-C3-02"
+  frozen_F1_sensor: "TSL-NGP-F1-04"
+  truck_RF_118_sensor: "TSL-RF-118-A"
+  truck_RF_221_sensor: "TSL-RF-221-A"
+
+notes:
+  - "Do not create new Kalpa trips after 2025-08-18."
+  - "Keep original sensor in place even when adding a spare logger."
+  - "This file mentions old values because auditors ask how Kalpa was configured."
+  - "Use QCL-QA-SOP-17 for current disposition decisions."
+
