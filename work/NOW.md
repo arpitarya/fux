@@ -1,1 +1,1 @@
-✓ OPEN-WORK cleaned (369→336): six tombstone blocks gone, W-110's voided gate and W-87's stale W-134 blocker corrected. → W-122 next.
+✓ IMPLEMENTATION's W-116 claim corrected + W-115 detail file. ⏸ stopped on a live L9 session holding OPEN-WORK/CLAUDE.md; two detail files still owed.

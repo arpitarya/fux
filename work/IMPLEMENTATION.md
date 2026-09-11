@@ -293,12 +293,19 @@ MacBook on 2026-09-11 in `fa47760`.** The ids are recorded separately from the
 | **W-119** | the decoder rename — `csvdoc.py` → `csv.py` for all nineteen, verified not to shadow the stdlib on either load path. **38 stale files deleted**; until they went, the stale consumer copies **won** over the new ones and this repo decoded with the old modules | [ADR-DECODE](../docs/adr/0139_decode.md) 17 |
 | **W-121** | CSV/XLSX row-granularity chunking, committed earlier in `5cf30bc`. **Evidence question closed 2026-09-11 by Arpit's ruling: the `informed` run stands, no `blind` run owed** | [ADR-TABULAR](../docs/adr/0152_tabular.md) |
 
-⚠ **W-116 is NOT closed by this and must not be read as measured.** The change
-re-ranked two populations — every document containing a fenced code block, and
-every document of the formats whose decoder gained a heading skeleton — and
-**nothing was measured.** Arpit ruled 2026-09-06 that these land as defect
-fixes rather than wait on a measurement; that ruling is recorded in all three
-records, and it does not make them measured. W-116 stays open behind W-56.
+⚠ **This change measured nothing, and that was deliberate.** It re-ranked two
+populations — every document containing a fenced code block, and every document
+of the formats whose decoder gained a heading skeleton — on Arpit's 2026-09-06
+ruling that they land as **defect fixes** rather than wait on a measurement.
+That ruling is recorded in all three records, and it does not make them measured.
+
+⚠ **Overtaken 2026-09-11 — do not read the paragraph above as current state.**
+It closed with *"W-116 stays open behind W-56"*; **W-56 was already archived, and
+W-116 has since run and closed** — see the 2026-09-11 entry above and
+[its run](regression/2026-09-11-w116-chunking/report.md). What survives from it
+unchanged is the narrower claim: **W-115 is still unmeasured for quality**,
+because the graded corpus produces a byte-identical index across the arms and
+the corpus that can see the change has no goldens.
 
 ⚠ **No migration exists for anyone else**, by Arpit's ruling of the same day —
 [ADR-DECODE](../docs/adr/0139_decode.md) decision 17 records that rather than
