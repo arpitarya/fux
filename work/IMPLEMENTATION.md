@@ -22,6 +22,43 @@ Rules:
 ---
 
 
+## 2026-09-11 — seven queue items closed, and two measurements that say *stop*
+
+One session, `77ec3a1`…`bc70055`. **3 261 unit + 80 e2e green** at the end of it.
+
+### Shipped
+
+| item | what landed | evidence |
+|---|---|---|
+| **W-132** | `docs/adr/RULE-SINCE`'s fifth entry; the freshness baseline moves to `ce425c7` on Arpit's *"fix only the latest"* ruling | ADR-OWNERSHIP decisions 10 + veto 6 |
+| **ADR-DOCTOR (0064)** | a **new record owning `src/fux/doctor.py`**, on Arpit's ruling — the seven `describes` rows deleted, their content relocated into a check register. The over-firing had fired twice in two days | `docs/adr/0064_doctor.md`; the gate now demands **one** record for a doctor change instead of eight |
+| **`fux doctor` green on a broken config** | new row `fux.toml loads`, **error** level, the loader's message verbatim. Every config-dependent check had degraded to `skipped` at warn and collectively deleted the finding | ADR-DOCTOR decisions 4–5 · `tests/test_doctor.py` |
+| **W-118** | `fux-decoder` + `fux-usage` reach `.github/skills/`; all three committed-write skills now reach all four vendors | ADR-AGENT-POLICY decision 14a |
+| **The template-drift gate** | 🔴 **byte-identity by construction was FALSE.** `fa47760` edited `.claude/skills/fux-decoder/SKILL.md` and not its template, so **every install since shipped a decoder guide missing the chunking contract**; `.github/agents/fux.agent.md` had drifted the other way. Both repaired, and asserted from now on | ADR-AGENT-POLICY decision 14b · `test_this_repos_own_agent_files_still_match_the_templates_that_ship` |
+| **W-135** | the headroom obligation enters ADR-RS as decision 22 (a–e), enforced forward by a date-baselined test | ADR-RS decision 22 · `tests/test_regression_runs.py` |
+| **W-113** | `update = auto|never` on a URL line — three layers, `POLICY` skip **above** `fetch_all`'s grouping so a pinned URL never imports a fetcher, `fux add --no-update`, a `doctor` count | ADR-URL-LIST decision 14/14a/14b/14c · ADR-URL-FRESHNESS 15 |
+| **W-134** | the playground gets a current index (`fux-playground` `fece5a3`), `check.py --rows`, and the 7 `partial` goldens resolved to `complete` | index-guard PASS, byte-identical across runs |
+
+### Measured — and both results say *stop*
+
+| run | the answer |
+|---|---|
+| **[W-133 — the blind unanswerable re-run](regression/2026-09-11-blind-unanswerable-rerun/report.md)** | 🔴 **Still 0 abstentions of 20.** 20/20 `answerable: true`, **0 ids flipped**, fourteen days and five ranking changes later. Band, separation and the floor are each **demonstrated not to be the lever**. ✅ **Decision 22's first adjudicating use**: improvement headroom 20 (proven) → a real null; **regression headroom 0 → INCONCLUSIVE**, which the rule caught and a bare null would have hidden |
+| **[the four-priors precondition probe](regression/2026-09-11-four-priors-headroom/report.md)** | 🔴 **The remeasure Arpit ordered CANNOT RUN.** Three of four priors move **0 of 50** goldens at every value including `0.0` — the corpus declares no `supersedes:` key on any branch of its history, no `archived=true`, and has no `mtime` spread. The `0 broken` bar is met **vacuously**. ⚠ Caught by decision 22d **hours after it was ratified** — the `heading` control's failure, repeated |
+
+### Two findings worth carrying forward
+
+- 🔴 **A filed run that records no corpus hash cannot be paired against a later
+  one.** It bit twice in one day: the band drift in the unanswerable re-run
+  cannot be split into an engine change and a corpus change, and the
+  2026-08-25 supersession result cannot be reproduced at all. Both new runs
+  record one.
+- ⚠ **The 2026-08-28 unanswerable report states a `median 0.448` that matches no
+  statistic of its own `per-query.csv`** (median 0.3982, mean 0.3940). **The
+  frozen file is not edited**; the evidence wins. Findable only because that run
+  filed its rows — ADR-RS decision 21a from the other side.
+
+
 ## W-130 — the types list becomes `.fux/types.toml` (2026-09-11)
 
 ⚠ **Renamed the same day: `.fux/types.toml` → `.fux/formats.toml`** (Arpit;

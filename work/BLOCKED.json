@@ -1,8 +1,8 @@
 {
- "decision": "PROCEED",
- "reason": "Reconciled 2026-09-11 (Cowork): the 2026-09-06 ASK is answered by the repo — the law records exist as docs/adr/0002–0010 and CLAUDE.md states they hold rationale only. Nothing is blocked; inbox rulings are in OPEN-WORK (W-132, W-133, W-118).",
- "questions": [],
- "safe_alternative": "",
+ "decision": "ASK",
+ "reason": "Two results are back and both need Arpit. The abstention re-run is the same answer (20/20, 0 flips). The four-priors remeasure he ordered CANNOT RUN: three of four priors move 0 of 50 goldens at every value including 0.0, because the playground declares no `supersedes:` key on any branch of its history.",
+ "questions": ["The four no-op priors: declare the supersession in adr-0019's frontmatter (one line, but it changes the committed index and every golden number filed against it), build a purpose-made corpus with a query set split by intent, or close the knob on the structural argument that needs no corpus?", "Does the abstention finding (20/20, twice) gate anything?"],
+ "safe_alternative": "W-116 is fully unblocked and is the next agent-lane run; W-122, the heading control rebuild, W-107 Phases 1-4 and W-106 are all open and need no ruling.",
  "surfaced": true,
  "filed": "2026-09-11"
 }

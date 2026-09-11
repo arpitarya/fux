@@ -38,50 +38,16 @@ failure mode here with a perfect record.
 
 | what he decides | filed | age |
 |---|---|---|
-| **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 14d |
-| **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 15d |
-| 🔴 **W-116 — the chunking change re-ranked the corpus unmeasured**, on his own 2026-09-06 ruling that a defect fix does not wait on a measurement. Recorded as unmeasured in ADR-DECODE, ADR-REFER and ADR-EXTRACTED. Blocked behind **W-56** (`fux-lab` does not exist); here so the gap is not forgotten | 2026-09-06 | 5d |
+| 🔴 **Does the abstention result gate anything?** **Re-run done, and the answer is the same: 20 of 20 `answerable: true`, 0 ids flipped** — fourteen days and five ranking changes later ([the run](regression/2026-09-11-blind-unanswerable-rerun/report.md)). Band, separation and the `separation_floor` are each **demonstrated not to be the lever**. No threshold is proposed and R10 stays unmeasured — picking a floor from these 20 fits it to the set that exposed the problem | 2026-08-28 | 14d |
+| 🔴 **The four no-op priors — pick an instrument, or close the knob.** The remeasure you ordered **cannot run**: three of the four priors move **0 of 50** goldens at every value including `0.0`, because the playground declares no `supersedes:` key on any branch of its history ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **(a)** declare it (one frontmatter line — changes the committed index and every number filed against it), **(b)** build a purpose-made corpus, or **(c)** close the knob on the structural argument, which needs no corpus | 2026-09-11 | 0d |
+| **W-136 phase 1 — run prompt 1 in Codex.** Codex writes the 10 seed documents into `work/golden/seed/` and the ~100 questions with answers into `work/golden/golden-answer/answers.jsonl` (Claude never reads it). Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
+| **W-87 Part B — accept R-11?** Retarget Part B at the two corpora that exist — the repaired `fux-playground` (10 docs, 50 goldens) and `fux-benchmark` `t10000` — and retire the dependency on `acme`/`orbit`, which were wiped with their generator. Proposal: [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) R-11 | 2026-08-27 | 15d |
 
 ---
 
 ## Open items
 
 ### fux build
-
-- 🔴 **W-132 — move the freshness gate's baseline to HEAD; stop auditing old commits.**
-  `agent` · *(records: [ADR-OWNERSHIP](../docs/adr/0056_ownership.md) decision 9 + veto 6 ·
-  `docs/adr/RULE-SINCE` · `tests/test_adr_freshness.py`)* · **Ruled by Arpit 2026-09-11**:
-  *"fix only the latest, leave the old ones"* → confirmed as **stop auditing old commits**.
-  `94231b2` (W-114) fails the gate because `describes` is file-scoped and the three records it
-  is convicted of missing describe other keys of `config.py`. **No rebase, no key-scoped
-  `describes`, no waiver** — `RULE-SINCE` moves to HEAD. ⚠ **This fires ADR-OWNERSHIP veto 6 by
-  ruling** and the record must say so. ⚠ **It does not fix the over-firing**: the next commit that
-  touches `config.py` will again demand every describer. —
-  [detail](open/W-132-freshness-baseline-to-head.md) `filed: 2026-09-11`
-
-- 🟢 **W-118 — `fux-decoder` and `fux-usage` reach every skill surface.** `agent` ·
-  *(records: [ADR-AGENT-POLICY](../docs/adr/0042_agent-policy.md) decisions 13–14 + the deferred
-  alternative · [ADR-DECODE](../docs/adr/0049_decode.md) decision 12 ·
-  [`compare/copilot-skill-surface`](compare/copilot-skill-surface.compare.md))* · **Ruled YES by
-  Arpit 2026-09-11** for Claude, Copilot, Kiro and Codex. Re-derived: Claude, Kiro and Codex
-  **already** carry both in `setup.py`'s roster — **only `.github/skills/` (Copilot) is missing
-  them**. `test_the_two_rosters_differ_only_where_a_record_says_so` loses its exception in the
-  same change. ⚠ Copilot also reads `.claude/skills` (decision 13), so it will see two same-name
-  copies; the compare doc's reopen-trigger (an observed **error**, not a double-load) stands. —
-  [detail](open/W-118-decoder-usage-skill-surfaces.md) `filed: 2026-09-06` · `ruled: 2026-09-11`
-
-- 🔴 **`fux doctor` reports `[OK]` for a `fux.toml` that will not load.**
-  `agent` · *(record: [ADR-DOCTOR](../docs/adr/0011_cli-surface.md) ·
-  [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) decision 6)* · **Found
-  2026-09-11 while verifying that the `[decode]` refusal does not take `doctor`
-  out** — it does not, which is the property [ADR-OUTPUT](../docs/adr/0054_output-defaults.md)
-  decision 19 lost. But `doctor` then degrades to `fetcher optional functions:
-  skipped (no readable fux.toml)` and **calls that `[OK]`**, so a repo whose
-  config refuses gets a green doctor beside an ingest that exits 1. The verb
-  whose job is to name the fix is the one verb that does not name it. **The fix
-  is one new row — `fux.toml loads` — reporting the loader's own message**;
-  ADR-DOTFUX decision 6's fifth ⚠ carries the diagnosis and says why it was
-  filed rather than patched there. `filed: 2026-09-11`
 
 - 🔴 **W-122 — the remainder of L0: the generated `CLAUDE.md` block, the config
   consolidation, and the gate.** `agent` · *(records: ADR-LAW-0 · ADR-LAWS ·
@@ -112,21 +78,6 @@ failure mode here with a perfect record.
 
   — [detail](open/W-122-adrs-are-the-source.md) `filed: 2026-09-06`
 
-- 🟢 **W-113** · `agent` · *(record: [ADR-URL-LIST](../docs/adr/0026_url-list.md) ·
-  [ADR-URL-FRESHNESS](../docs/adr/0059_url-freshness.md) ·
-  [ADR-CDP-FETCHER](../docs/adr/0028_cdp-fetcher.md))* · **`update = auto|never`
-  on a URL line** — whether `fux update` goes out at all, resolved through the
-  same three layers as `keep`/`ttl`/`enrich`. **Filed by Arpit's R-1 ruling,
-  2026-09-05**, as the second half of it: the ETag criterion was accepted as
-  [decision 12](../docs/adr/0028_cdp-fetcher.md) words it (no code), and this
-  is the knob he asked for instead. 🔴 **It buys bandwidth by giving up
-  freshness — it is NOT the ETag saving**, and decision 12 gains the veto
-  condition that re-costs request-stage interception if refresh bandwidth is
-  ever reported as a blocker. ⚠ `ttl=` is **ask-time** and does not reach
-  `fux update`; `update=` takes two words and never a duration, so the two
-  cannot be conflated. — [detail](open/W-113-url-update-policy.md)
-  `filed: 2026-09-05`
-
 - 🟠 **Search v3 — seven items, RATIFIED by Arpit 2026-09-05; all seven now
   `agent`** · *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 ·
   one detail file each under [`open/`](open/README.md))* · **Opus** executes,
@@ -153,20 +104,18 @@ failure mode here with a perfect record.
 
 ### testing
 
-- 🔴 **W-133 — re-run the blind `unanswerable` set: does the engine still abstain 0 of 20?**
-  `agent`, **then back to Arpit** · *(record: [ADR-QUALITY](../docs/adr/0051_quality-contract.md)
-  decision 5 · [ADR-RS](../docs/adr/0043_predictions.md))* · **Arpit, 2026-09-11**: have Claude
-  Code run it again and report whether it is still true. The 2026-08-28 run
-  ([report](regression/2026-08-28-blind-unanswerable/report.md)) had `answerable: true` on 20/20
-  against a blind ground truth of 0/20. The engine has moved since (W-108, W-109, W-111, W-115,
-  `[index]`), so the finding is re-measured, **not** re-argued. Same frozen queries and ground
-  truth; a new run directory with per-query rows. 🔴 **No threshold is proposed and R10 is
-  untouched, deliberately** — a floor fitted to the 20 numbers that exposed the problem is the
-  moving-threshold failure. **After the run, "does it gate anything?" returns to the inbox with
-  the result.** — [detail](open/W-133-unanswerable-rerun.md) `filed: 2026-08-28` ·
-  `re-run ordered: 2026-09-11`
+- 🟠 **W-136 — the sealed golden benchmark.** `arpit` (Codex phases), then `agent` ·
+  *(records: [ADR-RS](../docs/adr/0043_predictions.md) · [ADR-QUALITY](../docs/adr/0051_quality-contract.md) ·
+  setup: [fux-benchmark](setup/fux-benchmark.md), [fux-lab](setup/fux-lab.md))* · **Arpit, 2026-09-11.**
+  Codex writes 10 seed documents and ~100 questions with answers in
+  `work/golden/golden-answer/` — **Claude never reads it**. Claude grows the corpus
+  **10 → 10 000** without seeing a question; Codex freezes it and releases questions
+  only; Claude runs fux per rung; Codex scores and returns per-query results with no
+  answers. One test set for fux-benchmark and fux-lab. Process:
+  [`golden/README.md`](golden/README.md) — [detail](open/W-136-golden-benchmark.md)
+  `filed: 2026-09-11`
 
-- 🔴 **W-116** · `arpit` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
+- 🔴 **W-116** · `agent` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
   **W-115 re-ranked the corpus and NOTHING was measured.** Two populations
   moved: every document containing a fenced code block (the fence fix — in this
   repo, most of them), and every document of the formats whose decoder gained a
@@ -174,21 +123,17 @@ failure mode here with a perfect record.
   **defect fixes** rather than wait on a measurement — a `# comment` in a bash
   block was never a heading — and that ruling is recorded in all three ADRs.
   ⚠ **What it does not do is make them measured**, and no doc may cite them as
-  such. A measurement needs `fux-lab`, which does not exist (**W-56**), so this
-  row is blocked behind that one and is here to stop the gap being forgotten
-  rather than to be worked next. Filed 2026-09-06
-
-- 🔴 **W-134 — the playground gets a current index and per-query rows.** `agent` ·
-  *(record: [ADR-RS](../docs/adr/0043_predictions.md) decision 15 ·
-  [ADR-QUALITY](../docs/adr/0051_quality-contract.md))* · **Unblocked by Arpit's 2026-09-11
-  ruling on R-11** (repair the playground): its source list indexes `docs` again and the
-  50 goldens and 20 unanswerable questions are in its history. Two things are left, both
-  agent work: **(1)** ingest the ten documents with the current engine — the old
-  `fux.index.v1` shards were unreadable and are gone; **(2)** a `check.py --rows <path>`
-  writer — `grade()` already returns `{id, state, detail}` per golden. This is what W-97's
-  veto leg and the four-priors remeasure wait on. The lab half already writes
-  `results/per-query.jsonl`. — [detail](open/W-134-playground-index-and-rows.md)
-  `filed: 2026-08-28`
+  such. ✅ **UNBLOCKED 2026-09-11 — both stated blockers are gone.** `fux-lab` was
+  never missing (W-56 rebuilt it 2026-08-20), and the playground now has a current
+  index and a `check.py --rows` writer (W-134, playground `fece5a3`). **Nothing
+  is waiting: this is a paired before/after run someone can start.**
+  ⚠ **Report it under [ADR-RS](../docs/adr/0043_predictions.md) decision 22** —
+  per endpoint, per direction, observed/proven/unproven. 🔴 **Compute the headroom
+  FIRST**: the 2026-09-11 four-priors probe found three of four ranking priors
+  move 0 of 50 goldens on this corpus, so *"this corpus can see the change"* is
+  a thing to establish rather than assume. The arms are two engine builds, so the
+  index must be rebuilt under each — the fence fix changes extraction.
+  `filed: 2026-09-06`
 
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0045_tuning.md) ·
   [ADR-RS](../docs/adr/0043_predictions.md))* · **the knob sweep — which
@@ -212,15 +157,16 @@ failure mode here with a perfect record.
   ⚠ **`expand_weight` is now in §1's defaults table and §6's out-of-scope
   table** — it was in neither, and §1 claims to be read from source. It cannot
   join this sweep: **no suite here passes `--expand`**, so no query can move it.
-  🔴 **Still blocked on the playground's per-query rows** — [W-134](open/W-134-playground-index-and-rows.md), agent work. —
+  ✅ **The per-query rows blocker is CLEARED** — W-134 landed 2026-09-11
+  (playground `fece5a3`, `check.py --rows`). 🔴 **But T2's veto leg is blocked by
+  something else, found the same day**: `superseded_weight` moves **0 of 50**
+  goldens at every value on that corpus, because it declares no `supersedes:`
+  key ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **The
+  named veto queries `q022`/`q033` cannot be broken by a knob that reaches
+  neither.** T2 waits on the same instrument decision as the four-priors item
+  above. **T1 (`rerank_weight`) is unaffected** — it has 13/37 proven headroom
+  on this corpus and is runnable now. —
   [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
-
-- **The 7 `partial` goldens.** `arpit` ·
-  *(record: [ADR-QUALITY](../docs/adr/0051_quality-contract.md))* · The two
-  blind annotators' exact-set disagreements, taking the union, held out of
-  `recall@k`'s denominator. They need a human or a **third blind reader** —
-  any session that has seen the scores is the wrong party. 🔴 **Do not resolve
-  them by picking whichever set makes recall look better.** `filed: 2026-08-28`
 
 - **The `heading` negative control is saturated and must be rebuilt.** `agent` ·
   *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
@@ -237,7 +183,8 @@ failure mode here with a perfect record.
   `recall@k` now exists. ⚠ **Two things keep it open:** the `judged` series
   has never been exercised (no judged run exists), and **Part B cannot run**
   — `acme` and `orbit` went in the 2026-08-20 wipe with their generator, and
-  `tools/pruning-eval/` hard-codes reading them. —
+  `tools/pruning-eval/` hard-codes reading them. **Part B is Arpit's ruling on
+  R-11** (inbox); the `judged` series is agent work once W-134 lands. —
   [detail](open/W-87-what-good-means.md)
 
 ### adr update
@@ -281,13 +228,36 @@ failure mode here with a perfect record.
   answer — it would close the knob permanently and move the work query-side. A
   run designed only to find a good value cannot report that.
 
+  🔴 **THE REMEASURE CANNOT RUN, AND THAT IS MEASURED — 2026-09-11.** The
+  precondition check ran before it
+  ([the run](regression/2026-09-11-four-priors-headroom/report.md)) and found
+  **three of the four priors move 0 of 50 goldens at every value including
+  `0.0`**: `superseded_weight`, `archived_weight` and `recency_half_life_days`
+  all have **zero headroom on the hand-graded corpus.** `adr-0019` says
+  *"Supersedes ADR-0007"* in **prose** and declares no `supersedes:` key —
+  `git log -S "supersedes:"` is empty on **every branch of the playground's whole
+  history**. So the pre-registered question is met **vacuously** at every value.
+  ⚠ Caught by ADR-RS decision 22d hours after it was ratified; without it this
+  files as a clean pass. ⚠ **The 2026-08-25 run's corpus is not recoverable** —
+  it stands as measured and can be neither reproduced nor contradicted.
+  ✅ `rerank_weight` is the one prior with headroom; net `+4` at `1.0`, 0 broken,
+  **below the floor**, so the hold stands unchanged.
+
+  🔴 **BACK TO ARPIT — the instrument needs a decision, and it is his:**
+  **(a)** declare the supersession the corpus already states in prose (one
+  frontmatter line; **changes the committed index and every golden number filed
+  against it**), **(b)** build a purpose-made corpus with declared supersession
+  and a query set split by intent, or **(c)** close the knob on the structural
+  argument, which needs no corpus at all. The item's own text says a NO is a
+  success; this is not a NO, it is *cannot ask*.
+
   **What the remeasure needs, none of which exists today:**
 
   - 🔴 **The hand-graded playground, indexed, with per-query rows** — the only
     corpus with queries whose correct answer IS the retired document. The
     v1-vs-HEAD benchmark corpus **cannot see the failure mode by construction**.
     Repaired by Arpit's 2026-09-11 ruling; the index and the rows are
-    [W-134](open/W-134-playground-index-and-rows.md).
+    W-134, which landed 2026-09-11 (playground `fece5a3`).
   - **A frozen pre-registration** naming its `k`, its arms and the `0 broken`
     bar *before* the first number ([ADR-QUALITY](../docs/adr/0051_quality-contract.md)
     decision 2a). ⚠ W-110's gate was VOIDED for exactly the omission this would
@@ -312,16 +282,6 @@ failure mode here with a perfect record.
   the number existed: that suite rewards exactly what the reranker does, and
   `c = 0` is a property of the generator, not a safety result.
 
-- 🟢 **W-135 — the headroom obligation enters ADR-RS.** `agent` ·
-  *(record: [ADR-RS](../docs/adr/0043_predictions.md) · `tests/test_regression_runs.py`)* ·
-  **Ratified by Arpit 2026-09-11.** Every paired run reports, per endpoint and **per
-  direction** (improvement / regression), how many queries could have changed; the count
-  is **proven** only with a feature-off/on arm or a generator self-test, else
-  **unproven**; **0 headroom → Inconclusive**; **no minimum**. A dated test enforces it
-  for new runs. Grounding: W-95's
-  [C6 table](regression/2026-08-28-benchmark-contested/report.md) — 94 could-change on
-  proximity, 0 on the saturated `heading` control that "passed". —
-  [detail](open/W-135-headroom-obligation.md) `filed: 2026-08-28` · `ruled: 2026-09-11`
 
 ---
 

@@ -1,1 +1,1 @@
-✓ formats.toml rename verified on the Mac and committed · 3209 unit + 80 e2e green · index re-ingested (60 shards) and verified converged · 🔴 test_adr_freshness still red on 94231b2bf, ruling owed · next: W-132 → W-118; W-133/134/135 in parallel
+✓ W-132 W-118 W-135 W-113 W-134 W-133 + `fux doctor` + ADR-DOCTOR · 🔴 inbox 2: abstention re-run (20/20, 0 flips) + the four-priors instrument · → next: W-116 (unblocked, paired before/after W-115, headroom first)

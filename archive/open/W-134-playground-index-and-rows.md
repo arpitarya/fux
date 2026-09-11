@@ -35,9 +35,13 @@ definition of done. The one judgment call (what the corpus is) is fixed below.
 4. **`check.py --rows <path>`:** one JSON line per golden, `{id, state, detail}` from
    `grade()`, sorted by `id`, byte-stable across runs. Match the field names of
    `fux-lab/shared/regress/run.py`'s `results/per-query.jsonl`.
-5. **Smoke-run `check.py --rows` once and delete the output.** No number from it is a
+5. **Resolve the 7 `partial` goldens** (q020, q021, q027, q032, q039, q042, q050): set
+   `relevance` to `complete`, leave `relevant` unchanged — per
+   [`regression/2026-09-11-third-annotator`](../regression/2026-09-11-third-annotator/report.md)
+   (Arpit delegated the call, 2026-09-11). No other golden changes.
+6. **Smoke-run `check.py --rows` once and delete the output.** No number from it is a
    result, and nothing is filed under `work/regression/`.
-6. Commit the index, `check.py` and the template files in the playground, in the
+7. Commit the index, `check.py`, `goldens/queries.jsonl` and the template files in the playground, in the
    same style and identity as its recent history.
 
 ## Close-out — in fux
@@ -50,7 +54,7 @@ definition of done. The one judgment call (what the corpus is) is fixed below.
 
 - 🔴 **Never add, edit or delete** `capture.html`, `fixtures/` or `.fux/sources/urls` —
   Arpit's fetcher experiments.
-- Do not re-author or re-rule a golden. A grading change is a different item.
+- Do not re-author or re-rule any golden beyond step 5.
 
 ## Prompt
 

@@ -30,6 +30,11 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### W-136 — the sealed golden benchmark (2026-09-11, Cowork)
+
+- Codex seeds 10 docs + ~100 Q&A in `work/golden/golden-answer/` — 🔴 **no Claude session ever reads it** (CLAUDE.md §Golden answer key, hook, deny rules, gitignore, `!work/golden`).
+- Claude grows 10 → 10 000 blind; Codex freezes and releases questions only; Claude runs per rung; Codex scores. Process: `work/golden/README.md`. Next: Arpit runs prompt 1.
+
 ### Four inbox rows ruled; three are now Claude Code's (2026-09-11, Cowork)
 
 - **W-132** — `RULE-SINCE` moves to HEAD (Arpit: stop auditing old commits). Fires ADR-OWNERSHIP veto 6 by ruling; the file-scoped `describes` over-firing stays.
@@ -39,6 +44,8 @@ valuable judgement, but not the state of play.
 - **W-134** — fux-playground repaired on Arpit's ruling (`3b4d275`: `docs` back in the source list, goldens saved); left is a current index + `check.py --rows`.
 - **Enrichment re-run question** — closed; the lesson is in §4.
 - **W-135** — Arpit ratified the headroom obligation: per endpoint and direction, observed vs proven, 0 → Inconclusive, no minimum, dated test. ADR-RS is written in W-135's change, not before.
+- **7 `partial` goldens** — resolved by a third blind annotator ([run](regression/2026-09-11-third-annotator/report.md)): annotator 2's set on all 7; W-134 flips them to `complete`.
+- **Inbox is one ruling:** W-87 Part B → accept R-11 or not. W-116's `fux-lab` blocker was stale; it is agent work behind W-134.
 - **Order:** W-132 → W-118; W-133 and W-134 independent. OPEN-WORK rule 9: no git housekeeping in the queue.
 
 ### `.fux/pii.toml` is REQUIRED now (2026-09-11, Cowork — W-128 + W-129, uncommitted)
@@ -1447,6 +1454,55 @@ the reason is that the measuring environments are gone.**
   ADR-ANSWER, ADR-RANKING, ADR-POSTINGS, ADR-PORT-LIST) stay ⏳ proposed.
 
 ## 2 · In flight, and the immediate next step
+
+*Updated **2026-09-11** (Claude Code, Opus) — maintainer line: this session.*
+
+### Where the queue stands, 2026-09-11
+
+**Seven items closed in one session** (`77ec3a1`…`bc70055`): W-132, W-118, the
+`fux doctor` `[OK]`-on-a-broken-config defect, W-135, W-113, W-134, W-133.
+**3 267 unit + 80 e2e green.** Details in `IMPLEMENTATION.md`'s 2026-09-11 entry.
+
+🔴 **TWO THINGS ARE WAITING ON ARPIT, and both are new today:**
+
+1. **Does the abstention result gate anything?** The re-run came back the same —
+   **20 of 20 `answerable: true`, 0 ids flipped**, fourteen days and five ranking
+   changes later. Band, separation and the `separation_floor` are each
+   *demonstrated* not to be the lever. No threshold is proposed; R10 stays
+   unmeasured.
+2. **The four-priors remeasure cannot run, and he picks the instrument.** Three
+   of four priors move **0 of 50** goldens at every value **including `0.0`** —
+   the playground declares no `supersedes:` key on **any branch of its entire
+   history**, no `archived=true`, and has no `mtime` spread. Declare it (changes
+   the committed index and every number filed against it), build a purpose-made
+   corpus, or close the knob on the structural argument.
+
+### The immediate next step
+
+**W-116** — the W-115 measurement. **Both of its stated blockers were stale**:
+`fux-lab` was never missing, and the playground now has a current index and a
+rows writer. It is a paired before/after run someone can start today.
+🔴 **Compute its headroom FIRST** — the four-priors probe is the standing proof
+that *"this corpus can see the change"* is a thing to establish, not assume.
+
+### What a new session most needs to know about this one
+
+- **ADR-DOCTOR (0064) is new and it is a carve-out**, ruled by Arpit after the
+  file-scoped `describes` over-firing fired twice in two days. A change to
+  `doctor.py` now demands **one** record instead of eight. ⚠ **The over-firing
+  itself is NOT fixed** — key-scoped `describes` was declined, twice, and stays
+  the real answer if a third file trips it.
+- 🔴 **`fux setup` never rewrites an existing file, so this repo's own agent
+  renderings were hand-editable with nothing comparing them — and two had
+  drifted.** One shipped a decoder guide missing its chunking section to every
+  user for days. Now gated. **Edit the template, delete the rendering, re-run
+  `fux setup`** — never the other way round.
+- ⚠ **A filed run that records no corpus hash cannot be paired against a later
+  one.** It bit twice on 2026-09-11. Both new runs record one; nothing else does.
+
+---
+
+*The 2026-08-29 state below is kept because its lesson still binds.*
 
 *Updated **2026-08-29**.*
 

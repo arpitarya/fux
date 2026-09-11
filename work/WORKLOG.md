@@ -24,6 +24,63 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-11 — seven items closed, and two measurements that say *stop*  ·  Claude Code (Opus)
+- **Asked:** read OPEN-WORK, implement everything, close everything.
+- **Did:** `77ec3a1`…`bc70055`. Closed **W-132** (`RULE-SINCE`'s fifth entry, baseline to
+  `ce425c7`), **W-118** (`fux-decoder`/`fux-usage` reach Copilot), the **`fux doctor` `[OK]`
+  on a broken `fux.toml`** defect, **W-135** (headroom → ADR-RS decision 22 + a dated test),
+  **W-113** (`update = auto|never`), **W-134** (playground index, `check.py --rows`, the 7
+  `partial` goldens resolved), **W-133** (the blind unanswerable re-run). 3 267 unit + 80 e2e
+  green.
+- **Ruled by Arpit mid-session:** the `describes` over-firing fired a second time in two days,
+  on `doctor.py`. He ruled **create a new ADR for doctor** → **ADR-DOCTOR (0064)** owns
+  `src/fux/doctor.py`, its seven `describes` rows deleted and their content relocated into a
+  check register. The gate now demands **one** record for a doctor change instead of eight.
+- **Found, not looked for:** 🔴 *byte-identity by construction* was **false** — `fa47760` edited
+  `.claude/skills/fux-decoder/SKILL.md` and not its template, so **every `fux setup` since
+  shipped a decoder guide missing the chunking contract**. `.github/agents/fux.agent.md` had
+  drifted the other way. Both repaired; second strike, so a test now asserts it.
+- **Decided / open:** 🔴 **Two things go back to Arpit.** (1) The abstention re-run is the same
+  answer — **20/20, 0 flips** — and whether it gates anything is his. (2) **The four-priors
+  remeasure he ordered cannot run**: three of four priors move **0 of 50** goldens at every
+  value including `0.0`, because the playground declares no `supersedes:` key on **any branch
+  of its history**. He picks the instrument: declare it, build one, or close the knob.
+- **Two findings worth carrying:** a run with no corpus hash cannot be paired against a later
+  one (it bit twice in one day); and the 2026-08-28 report's `median 0.448` matches no statistic
+  of its own evidence — **the frozen file is not edited**, the evidence wins.
+- **Next:** **W-116** is fully unblocked (both stated blockers were stale) and is a paired
+  before/after run someone can start; compute its headroom first.
+
+## 2026-09-11 — W-136 prompt 1: Quillfern Cold Logistics and ten deliberately messy seed documents  ·  Cowork (Opus)
+- **Asked:** create the fictional company for Codex's step and say what it does; the ten documents must be inconsistent — with/without frontmatter, legacy YAML, structured or not, professional or amateur, big and small, edited by several people.
+- **Did:** rewrote `work/golden/prompts/1-codex-seed.md`: **Quillfern Cold Logistics Pvt. Ltd.** (Pune HQ; Nagpur, Guwahati, Coimbatore DCs; pharma, dairy, frozen food), an eight-person cast with writing styles, and a ten-file roster across `.md`/`.yaml`/`.txt`/`.eml`/`.html`, 200 to 2 500 words, each with planted inconsistencies (stale paragraph, °F block, malformed frontmatter, superseding email thread, footnote vs table, draft-but-in-force policy, wiki cruft, outdated FAQ). README phase 1 now points at the prompt; phase 2 and prompt 2 require every seed extension indexed and no seed in the skip list.
+- **Decided / open:** ⚠ Claude authored the brief (company, cast, roster) but **no facts** — every number, date, incident and decision is left to Codex, so no answer-bearing detail was written by Claude.
+- **Next:** Arpit runs prompt 1 in Codex.
+
+## 2026-09-11 — W-136: one directory and one index per rung  ·  Cowork (Opus)
+- **Asked:** 100, 200, 500, 1k, 2k, 5k, 10k as separate directories with separate indexes, so they test faster.
+- **Did:** `work/golden/README.md` gains §One directory and one index per rung (`rung-00010` … `rung-10000`, real copies, nested content, key-matching paths, each a git repo with a committed `.fux/`); indexing moves into phase 2 (blind — needs no questions) with `ladder/<rung>.index` recording engine version + root hash; phase 4 asks against the rung's own index and re-ingests only on an engine-version change. Prompts 2, 3, 4 and W-136 updated.
+- **Decided / open:** kept `rung-00010` as its own directory (the seed-only baseline) though not named in the ask.
+- **Next:** Arpit runs prompt 1 in Codex.
+
+## 2026-09-11 — W-136: the sealed golden benchmark, scaffolded  ·  Cowork (Opus)
+- **Asked:** Codex writes 10 files + ~100 questions with answers and source documents; Claude extends the files to 100…10k; Claude tests; answers hidden from Claude; one test set for fux-benchmark and fux-lab; document the process in a new `work/` dir; the Q&A in a separate file only Arpit/Codex/ChatGPT read — *"a dummy file where I can paste it … work/golden/golden-answer"*.
+- **Did:** `work/golden/` — `README.md` (the five-phase process), `seed/`, `ladder/`, `prompts/1…5`, and a placeholder `golden-answer/answers.jsonl`. Guards: `.gitignore` entry; `!work/golden` in `.fux/sources/dirs` (**fux's own committed index would otherwise have ingested the key**); `.claude/settings.json` `permissions.deny` + new PreToolUse hook `guard-golden-answer.sh` (tested: blocks Read/Grep/Glob/Bash targeting the folder, allows prose that mentions it); **CLAUDE.md gains §Golden answer key and a Layout line** — ⚠ said out loud, it records Arpit's ruling. W-136 filed with an inbox row for phase 1. Project memory: never read the key.
+- **Decided / open:** defaults taken and listed in W-136 for override — questions stay sealed until the ladder is frozen; ladder stops at 10 000 (2026-08-22 ceiling); corpus in `fux-benchmark/corpora/golden/`, manifests committed; 20 % sealed holdout; pooling keeps the key complete. ⚠ Same Mac user → no guard is a guarantee; Cowork is guarded only by CLAUDE.md. The key is gitignored — Arpit backs it up.
+- **Next:** Arpit runs prompt 1 in Codex.
+
+## 2026-09-11 — OPEN-WORK reconciled: W-116's blocker was stale; the inbox is one ruling  ·  Cowork (Opus)
+- **Asked:** update OPEN-WORK; what is blocked on Arpit now.
+- **Did:** re-derived the two remaining inbox rows. **W-116** named `fux-lab` as missing, but W-56 rebuilt it 2026-08-20 — re-laned `agent`, now waiting on W-134's current index, reported under W-135. **W-87**'s inbox row rewritten as the actual decision: accept R-11 (retarget Part B at the repaired playground + `t10000`, retire `acme`/`orbit`). Inbox 1 row.
+- **Decided / open:** only R-11 is on Arpit. W-133 and the four-priors remeasure will return to him with results.
+- **Next:** Arpit rules R-11; Claude Code runs W-132 → W-118, with W-133/W-134/W-135 in parallel.
+
+## 2026-09-11 — the 7 `partial` goldens resolved by a third blind annotator  ·  Cowork (Opus)
+- **Asked:** explain the 7 grader disagreements; then *"you do the analysis and tell me which one is correct."*
+- **Did:** ran a fresh Opus subagent as annotator 3 — only the ten playground docs and the 7 question texts, forbidden goldens, prior annotators, scores and `fux`. Filed [`regression/2026-09-11-third-annotator`](regression/2026-09-11-third-annotator/report.md) (`blind`; tie rule, report and CSV informed). **10 documents were in dispute; annotator 3 included all 10 → annotator 2's set wins on all 7**, which equals the goldens' existing `relevant` arrays. Folded *flip `partial` → `complete`* into W-134 (it already commits the playground). Inbox row and testing item deleted; inbox 2 rows, 1 past 5 days.
+- **Decided / open:** ⚠ isolation was instructed, not enforced; the relevance definition was written for this run (the 2026-08-28 brief is not filed); the *not in dispute* clause was written after reading the output. Annotator 3 added 4 documents nobody else did — not applied, noted as possible incompleteness.
+- **Next:** W-134 applies the flip with the fresh index.
+
 ## 2026-09-11 — the `formats.toml` rename verified on the Mac and committed  ·  Claude Code (Opus)
 - **Asked:** *"commit everything."*
 - **Did:** verification, which is the whole of it. **3 209 unit + 80 e2e green**, and the freshness gate's working-tree half is **clean** — the Cowork session had already written the records the rename owed, so nothing was owed here. Smoke-checked the rename against the real CLI rather than the suite: `fux doctor` reads `.fux/formats.toml: 6 include glob(s), 31 decoder binding(s)`, and `fux ingest` runs. 🔴 **The committed index had to move and nobody had said so** — the corpus itself changed (`formats.toml` in, `types.toml` out, plus the day's doc edits), so 60 shards were re-ingested before committing; **verified converged**, not merely run, by a repeat reporting `0 changed / 939 carried / 0 shards written`. Recorded in IMPLEMENTATION beside the rename note.
