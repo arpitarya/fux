@@ -26,6 +26,7 @@ README.md
 docs
 tools
 work
+!work/golden              # the sealed benchmark: its corpus and answer key must never enter fux's own committed index
 
 
 archive                   archived=true

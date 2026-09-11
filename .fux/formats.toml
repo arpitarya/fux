@@ -1,15 +1,38 @@
 # Which files are documents, and which decoder reads each one. See ADR-TYPES.
 #
-# CONVERTED by `fux setup` from .fux/sources/types, the line-grammar list this
-# file replaced on 2026-09-11 (ADR-TYPES decision 12). It states exactly what
-# that file stated: every `*.ext decoder=<module>` line is a `[decoders]`
-# binding, every other pattern is an `include` glob, and every `!` line moved
-# to .fux/.fuxignore. Delete .fux/sources/types -- fux refuses to run while it
-# exists, rather than guess which of the two you meant.
+# THIS FILE IS OPTIONAL. Delete it and the built-in default applies -- an
+# absent file never means "index everything" and never means "index nothing".
+# If the file IS here it REPLACES the default entirely, which is why a file
+# that admits nothing is an error rather than a silently empty index.
 #
-# TWO KEYS, AND ONLY TWO: `include` and `[decoders]`. A bound extension IS a
-# document, so it is never repeated in `include`. Nothing here subtracts --
-# exclusions live in .fux/.fuxignore.
+# WHAT IS BELOW IS THAT DEFAULT, written out at `fux setup`: prose, plus every
+# format a built-in decoder reads. It is spelled out rather than left implicit
+# so you can see what fux considers a document without reading its source
+# (ADR-TYPES decision 10). From here it is YOURS -- setup never rewrites this
+# file, so the list stays exactly as you leave it.
+#
+# TWO KEYS, AND ONLY TWO. `include` lists globs that are already text.
+# `[decoders]` maps an extension to the module that reads it -- and a bound
+# extension IS a document, so it is never repeated in `include`. Any other key
+# is an error (ADR-TYPES decision 12).
+#
+# NOTHING HERE SUBTRACTS. To keep files out, write the pattern in
+# .fux/.fuxignore, which is read first and outranks this file.
+#
+# NOTHING BELOW NEEDS INSTALLING. Every built-in decoder is stdlib-only and
+# works out of the box. A format that needed something installed would appear
+# under OPT-IN at the bottom, commented, with what enables it.
+#
+# What is OUT of the default, and why: source code, shell scripts and
+# extensionless files. They have no decoder, machine data is not a document,
+# and indexing it inflates `df` for exactly the terms your real documents are
+# trying to be found by. Extensionless files are LICENSE, Makefile and
+# Dockerfile far more often than they are prose.
+#
+# ADDING A DECODER DOES NOT WIDEN THIS. A decoder in .fux/decoders/ makes a
+# format READABLE; an entry here is what makes it INDEXED, and a `[decoders]`
+# binding is what makes it read by a NAMED module. All three are separate on
+# purpose -- what counts as a document stays a committed line a human wrote.
 
 # Already text: no decoder in the path. One glob per line. A glob with no `/`
 # matches the file NAME anywhere, so "*.md" means every markdown file.
@@ -84,3 +107,16 @@ xml = "xml"
 
 yaml = "yaml"
 yml = "yaml"
+
+# --- OPT-IN ---------------------------------------------------------------
+# Not indexed until you uncomment. Nothing here has a built-in decoder, so
+# enable it first by writing one:
+#
+#   1. drop a decoder into .fux/decoders/  (`fux setup` writes every built-in
+#      one there as a worked example; see the fux-decoder skill)
+#   2. uncomment its line and name your module
+#   3. `fux ingest`
+#
+# Listing "*.log" under `include` instead indexes it as RAW BYTES.
+#
+# log = "<your module>"

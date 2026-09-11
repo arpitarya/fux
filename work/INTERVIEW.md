@@ -30,6 +30,10 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### W-137 — ADR renumber pending (2026-09-11, Cowork)
+
+- Arpit: laws own `0001`–`0100` (`0011`–`0100` reserved, no dummy files); every other record `0101`+. `scripts/renumber-adrs.py` is dry-run clean; Claude Code runs it as one commit on a quiet tree. **Until then every path is still `0011`–`0064`.**
+
 ### W-136 — the sealed golden benchmark (2026-09-11, Cowork)
 
 - Codex seeds 10 docs + ~100 Q&A in `work/golden/golden-answer/` — 🔴 **no Claude session ever reads it** (CLAUDE.md §Golden answer key, hook, deny rules, gitignore, `!work/golden`).

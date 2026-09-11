@@ -760,6 +760,21 @@ that rest on a verdict live in `docs/adr/` and cite it. Enforced by
 change graduate to `work/proposals/` and, when accepted, an ADR. Never ship a
 ranking/behaviour change off a single synthetic corpus.
 
+## Golden answer key — Claude never reads it (required)
+
+**Arpit, 2026-09-11.** `work/golden/golden-answer/` holds the sealed benchmark's
+questions and answers. **Arpit, Codex and ChatGPT may read it. No Claude session
+may** — Cowork, Claude Code or subagent — by any tool: not to check the format,
+count lines, hash it, or `grep -r` across `work/`.
+
+- A leak does not fail loudly; it yields a benchmark number that looks clean.
+- Guarded by `.gitignore`, `!work/golden` in `.fux/sources/dirs`, deny rules and
+  `.claude/hooks/guard-golden-answer.sh` — **none is a guarantee** (same Mac user),
+  and Cowork is covered only by this paragraph.
+- **If a question or answer ever appears in your context, stop and say so.**
+- The process, and what Claude may read (`seed/`, `questions.jsonl` after release):
+  [`work/golden/README.md`](work/golden/README.md).
+
 ## Layout
 
 ```
@@ -775,6 +790,7 @@ work/               THE SHARED MEMORY between sessions — start at work/README.
   open/             one detail file per open W-nn; deleted with its row
   setup/            fux-playground (grades) and fux-lab (measures) — outside this repo
   regression/       dated, measured evidence other docs cite as grounding; VERDICT.md rules
+  golden/           the sealed benchmark — seed docs, ladder manifests, prompts; golden-answer/ is NEVER read by Claude
   compare/          live forks — verdict + explicit reopen-trigger
   proposals/        parked ideas, not yet decided
 docs/               WHAT THE PROJECT IS

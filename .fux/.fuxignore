@@ -13,6 +13,13 @@ archive/v0.26/src/fux/embed/data/model.bin                                      
 archive/v0.26/uv.lock                                                                      # not an indexed file type
 docs/adr/RULE-SINCE                                                                        # not an indexed file type
 tools/vector-gate/embed_node.mjs                                                           # not an indexed file type
+work/golden/README.md                                                                      # excluded by !work/golden
+work/golden/golden-answer/answers.jsonl                                                    # excluded by !work/golden
+work/golden/prompts/1-codex-seed.md                                                        # excluded by !work/golden
+work/golden/prompts/2-claude-extend.md                                                     # excluded by !work/golden
+work/golden/prompts/3-codex-release.md                                                     # excluded by !work/golden
+work/golden/prompts/4-claude-run.md                                                        # excluded by !work/golden
+work/golden/prompts/5-codex-score.md                                                       # excluded by !work/golden
 work/regression/2026-08-20-r5-hook-latency/evidence/run.log                                # not an indexed file type
 work/regression/2026-08-20-r6-merge-driver/evidence/run.log                                # not an indexed file type
 work/regression/2026-08-20-refer-plane-r4/evidence/run.log                                 # not an indexed file type

@@ -25,7 +25,7 @@ of THREE kinds:
 | `output.toml` | committed | the output defaults: HOW a result is SHOWN, never which documents come back (ADR-OUTPUT) |
 | `formats.toml` | committed | which files are documents (`include`) and which decoder reads each extension (`[decoders]`). Optional - absent means the built-in default. Replaced .fux/sources/types on 2026-09-11 (ADR-TYPES) |
 | `.fuxignore` | committed | what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE) |
-| `pii.toml` | committed | what is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII) |
+| `pii.toml` | committed | REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII) |
 | `refusals.toml` | committed | what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL) |
 | `runtime/` | derived | M2 accelerator segments, M4's fetch cache at `runtime/fetch-cache/`, the write lock, and `enrich-progress.tsv` (W-86 P6: which queued documents THIS machine has handled - local by design, so two people's progress cannot conflict on a pull); carries `CACHEDIR.TAG` |
 | `acquired/` | acquired | the bytes a fetch actually returned, for URLs whose line says keep=true. Gitignored and NOT rebuildable - re-acquirable only, and only while the source is still reachable; carries CACHEDIR.TAG |

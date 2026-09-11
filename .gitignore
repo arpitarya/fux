@@ -32,3 +32,9 @@ venv/
 .claude/settings.local.json
 
 _to_delete/
+
+# The golden benchmark's answer key — Arpit, Codex and ChatGPT only; Claude never
+# reads it. Kept out of git so it never reaches history or a remote, and so `rg`
+# and Claude Code's Grep skip it by default. Back it up by hand. See
+# work/golden/README.md §The one rule.
+work/golden/golden-answer/

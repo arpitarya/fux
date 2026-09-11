@@ -22,6 +22,7 @@ are all mid-rewrite, and a doc being rewritten is work.
 | [`DOC-REGISTRY.md`](DOC-REGISTRY.md) | per-doc freshness table, **live documents only** | any doc in it is touched; an archived doc's row is deleted, not annotated |
 | [`open/`](open/README.md) | one detail file per open `W-nn` | opened with the item, **deleted with it** |
 | [`regression/`](regression/README.md) | dated, measured evidence other docs cite | every measurement run |
+| [`golden/`](golden/README.md) | the sealed benchmark — seed docs, ladder manifests, prompts. 🔴 `golden-answer/` is **never read by Claude** | a phase of W-136 runs; the process changes |
 | [`compare/`](compare/README.md) | live forks — verdict + reopen-trigger | a fork opens, closes, or its trigger fires |
 | [`proposals/`](proposals/README.md) | parked ideas, not adopted | an idea is filed, graduates, or is rejected |
 | [`paper/`](paper/the-fux-index-paper.md) | the architecture of record + figures | the architecture changes; a prediction gets measured |

@@ -1,4 +1,12 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(**/golden-answer/**)",
+      "Edit(**/golden-answer/**)",
+      "Read(./work/golden/golden-answer/**)",
+      "Edit(./work/golden/golden-answer/**)"
+    ]
+  },
   "hooks": {
     "UserPromptSubmit": [
       {
@@ -29,6 +37,15 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Glob|Bash|Edit|Write|MultiEdit|NotebookEdit|Task|Agent",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/guard-golden-answer.sh"
+          }
+        ]
+      },
       {
         "matcher": "Write|Edit|MultiEdit|NotebookEdit",
         "hooks": [
