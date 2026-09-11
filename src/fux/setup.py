@@ -89,6 +89,56 @@ DECODERS_DIR = "decoders"
 AGENTS_FILE = "AGENTS.md"
 AGENTS_TEMPLATE = "AGENTS.md"
 
+#: **The operating guides** (ADR-AGENT-POLICY decision 15, Arpit 2026-09-11):
+#: one skill per job the CLI supports, written to every skill surface from ONE
+#: template each -- decision 10's agreement by construction, ten more times.
+#: `fux-usage` stays the router and points at these by name.
+#:
+#: ⚠ **The last four write committed files that change the index**
+#: (`fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`). Like `fux-decoder`
+#: and `fux-enrich` they ship as SKILLS -- invoked, never ambient (decision 9a).
+GUIDE_SKILLS: tuple[tuple[str, str], ...] = (
+    ("fux-search", "SEARCH-SKILL.md"),
+    ("fux-answer", "ANSWER-SKILL.md"),
+    ("fux-graph", "GRAPH-SKILL.md"),
+    ("fux-index", "INDEX-SKILL.md"),
+    ("fux-maintain", "MAINTAIN-SKILL.md"),
+    ("fux-mcp", "MCP-SKILL.md"),
+    ("fux-sources", "SOURCES-SKILL.md"),
+    ("fux-config", "CONFIG-SKILL.md"),
+    ("fux-fetcher", "FETCHER-SKILL.md"),
+    ("fux-pii", "PII-SKILL.md"),
+)
+
+#: **Path-scoped pointers** (decision 15): a short rule that loads when an agent
+#: works on one of fux's own committed files, and names the skill that holds the
+#: procedure. Same body on three vendors, native frontmatter on each -- Kiro
+#: `inclusion: fileMatch`, Claude `.claude/rules/` `paths:`, Copilot
+#: `applyTo:` with explicit globs (never `"**"`). Codex has no path-scoped
+#: surface, so it gets none (its skills carry the same rules).
+#:
+#: ⚠ **On a Kiro CLI without inclusion-mode support every steering file is
+#: ambient.** That cost is why each pointer is byte-bounded by a test and holds
+#: rules and a pointer, never a procedure.
+PATH_SCOPED_TOPICS: tuple[str, ...] = (
+    "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
+)
+
+#: **Kiro auto-steering guides** (decision 15): `inclusion: auto`, loaded when a
+#: request matches the description. Kiro-only -- Claude, Codex and Copilot
+#: already get description-triggered loading from their skills. **Jobs that
+#: write nothing committed only**: `index` (setup, ingest) and `maintain`
+#: (hooks, `.gitattributes`) are excluded for the same reason the committed-write
+#: planes are -- a description match can fire on a request that edits nothing.
+AUTO_GUIDE_TOPICS: tuple[str, ...] = (
+    "usage", "search", "answer", "graph", "mcp",
+)
+
+
+def _guide_skills(surface: str) -> tuple[tuple[str, str], ...]:
+    return tuple((f"{surface}/{name}/SKILL.md", tpl) for name, tpl in GUIDE_SKILLS)
+
+
 AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
     # `fux-enrich` is **INVOKED, never ambient** (W-76 Phase 8) -- and the rule
     # is *never ambient*, which was never the same thing as *claude only*.
@@ -127,6 +177,8 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         (".claude/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
         (".claude/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
         (".claude/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
+        *_guide_skills(".claude/skills"),
+        *((f".claude/rules/fux-{t}-files.md", f"rule-fux-{t}-files.md") for t in PATH_SCOPED_TOPICS),
     ),
     "copilot": (
         (".github/agents/fux.agent.md", "fux.agent.md"),
@@ -157,6 +209,11 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         (".github/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
         (".github/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
         (".github/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
+        *_guide_skills(".github/skills"),
+        *(
+            (f".github/instructions/fux-{t}-files.instructions.md", f"fux-{t}-files.instructions.md")
+            for t in PATH_SCOPED_TOPICS
+        ),
     ),
     "kiro": (
         (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
@@ -170,6 +227,9 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         # see the header comment.
         (".kiro/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
         (".kiro/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
+        *_guide_skills(".kiro/skills"),
+        *((f".kiro/steering/fux-{t}-files.md", f"steering-fux-{t}-files.md") for t in PATH_SCOPED_TOPICS),
+        *((f".kiro/steering/fux-{t}-guide.md", f"steering-fux-{t}-guide.md") for t in AUTO_GUIDE_TOPICS),
     ),
     # **Codex is decision 3 EXERCISED, not amended** — *"adding a fourth is a
     # template plus a rendering plus a row, not a new decision"*. It costs no
@@ -192,6 +252,7 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         (".codex/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
         (".codex/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
         (".codex/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
+        *_guide_skills(".codex/skills"),
     ),
 }
 

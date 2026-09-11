@@ -84,8 +84,61 @@ NOT_A_POLICY_RENDERING = frozenset(
 )
 
 
+#: **The operating guides and their pointers** (ADR-AGENT-POLICY decision 15,
+#: Arpit 2026-09-11) -- a SECOND exemption, kept separate from the one above so
+#: neither list quietly absorbs the other.
+#:
+#: Ten skills (one per job the CLI supports) and twenty-six short pointers:
+#: seven path-scoped topics rendered for Kiro (`fileMatch`), Claude
+#: (`.claude/rules/`, `paths:`) and Copilot (`applyTo:` with explicit globs),
+#: plus five Kiro `inclusion: auto` guides. **None of them is a rendering of the
+#: archived-results policy** -- each points AT `fux-archived-results` instead, for
+#: decision 2's reason: a second copy of the block is a second thing to drift.
+#:
+#: Pinned by name like the list above, because an unlisted file here stops being
+#: checked. Their own gates -- a byte bound, one body per topic across vendors,
+#: never `"**"` or `inclusion: always` -- live in `test_setup_agents_guides.py`.
+OPERATING_GUIDES = frozenset(
+    {f"{g}-SKILL.md" for g in (
+        "SEARCH", "ANSWER", "GRAPH", "INDEX", "MAINTAIN", "MCP",
+        "SOURCES", "CONFIG", "FETCHER", "PII",
+    )}
+    | {f"steering-fux-{t}-files.md" for t in (
+        "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
+    )}
+    | {f"rule-fux-{t}-files.md" for t in (
+        "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
+    )}
+    | {f"fux-{t}-files.instructions.md" for t in (
+        "sources", "decoder", "enrich", "fetcher", "pii", "config", "index",
+    )}
+    | {f"steering-fux-{t}-guide.md" for t in (
+        "usage", "search", "answer", "graph", "mcp",
+    )}
+)
+
+
 def renderings() -> list[Path]:
-    return sorted(p for p in AGENTS.glob("*.md") if p.name not in NOT_A_POLICY_RENDERING)
+    return sorted(
+        p
+        for p in AGENTS.glob("*.md")
+        if p.name not in NOT_A_POLICY_RENDERING and p.name not in OPERATING_GUIDES
+    )
+
+
+def test_the_operating_guides_are_deliberate():
+    """The second escape hatch, pinned the same way as the first: every name is a
+    file the agreement check no longer reads, so the count is asserted, and every
+    name must be a template that actually ships -- a stale entry here would
+    exempt a file that does not exist yet from a check it should face."""
+    from fux import setup as setup_mod
+
+    assert len(OPERATING_GUIDES) == 36
+    assert not OPERATING_GUIDES & NOT_A_POLICY_RENDERING
+    shipped = {tpl for files in setup_mod.AGENT_FILES.values() for _rel, tpl in files}
+    assert OPERATING_GUIDES <= shipped, sorted(OPERATING_GUIDES - shipped)
+    on_disk = {p.name for p in AGENTS.glob("*.md")}
+    assert OPERATING_GUIDES <= on_disk, sorted(OPERATING_GUIDES - on_disk)
 
 
 def test_the_exemptions_are_deliberate():

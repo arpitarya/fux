@@ -24,6 +24,18 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-11 — operating guides for every fux job, on four vendors  ·  Cowork (Opus)
+- **Asked:** Kiro steering documents and skills for fux usage, decoder, enrich, ask, answer, graph and every other CLI command — and anything else that helps — for Claude, Codex and Copilot too.
+- **Did:** ADR-AGENT-POLICY **decision 15** (+ amendments to 9, vetoes 5b/6/6a/7) and ADR-DOTFUX decision 9. Ten new skill templates (`fux-search`, `-answer`, `-graph`, `-index`, `-maintain`, `-mcp`, `-sources`, `-config`, `-fetcher`, `-pii`) on all four skill surfaces; 21 path-scoped pointers (Kiro `fileMatch`, Claude `.claude/rules/`, Copilot `applyTo:`) for seven planes; five Kiro `inclusion: auto` guides; `fux-usage` gains a router. `setup.py` roster + `tests/test_setup_agents_guides.py` (byte bound, never always-on, one body per topic, committed-write topics never auto, description ≤ 500). This repo's renderings refreshed. Suite in a cloud copy: 3 403 passed; the 6 failures match the pre-change baseline (archive excluded from the copy, one env-only CLI test). CHANGELOG under Unreleased. **Not committed.**
+- **Decided / open:** Arpit chose skills AND steering, including for the committed-write topics, after seeing decision 9/9a — recorded as a ruling with its cost (all twelve Kiro pointers ambient on a Kiro CLI without inclusion modes, ~10 KB). Review before shipping pulled `index`/`maintain` out of the auto guides. Writing the guides from the code found 18 defects and 13 record disagreements → **W-140**; Codex's repo-skill directory is now `.agents/skills` → **W-141**, inbox.
+- **Next:** Arpit rules W-141; then W-140 row 1 (URL citations never verified live).
+
+## 2026-09-11 — the abstention decision parked as a proposal  ·  Cowork (Opus)
+- **Asked:** turn the inbox row *"does the abstention result gate anything?"* into a proposal and remove it from OPEN-WORK.
+- **Did:** filed [`proposals/abstention-gate.md`](proposals/abstention-gate.md) — the finding (20 of 20, twice; band/separation/floor not the lever), the mechanism (ADR-CONFIDENCE d3: abstains only when nothing scores), the `weak`-says-don't-answer vs `answerable: true` contradiction, options A disclose / B gate quality claims / C build abstention in fux-lab on golden data (C1 doc_coverage gate, C2 weak ⇒ not answerable, C3 passage check), recommendation **B then C**, graduation trigger. Inbox row deleted; the row's content now lives in the proposal (rule 3's only-home check). Proposals index row added.
+- **Decided / open:** parked, not decided. Power caveat recorded: ~10 golden unanswerable questions only detect large effects.
+- **Next:** Arpit picks A/B/C whenever he reads the proposal.
+
 ## 2026-09-11 — the L9 tree committed, in two commits  ·  Claude Code (Opus)
 
 - **Asked:** commit everything.

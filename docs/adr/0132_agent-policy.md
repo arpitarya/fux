@@ -249,6 +249,14 @@ supports **no steering inclusion modes** — every file in `.kiro/steering/` ent
 every interaction, so `inclusion: manual` protects nobody. Decision 6's
 announcement makes the tax visible; **this decision is what keeps it small.**
 
+⚠ **Amended 2026-09-11 by decision 15 — the always-on half is unchanged, the
+skill-only half is widened.** Only the archived-results policy is ever
+*always-on*, and the test above still decides that. What changed is that an
+operating guide may now ALSO ship as a **scoped** pointer — path-scoped
+(Kiro `fileMatch`, Claude `.claude/rules/` `paths:`, Copilot `applyTo:` with
+explicit globs) or description-scoped (Kiro `inclusion: auto`) — on the
+conditions decision 15 names and `tests/test_setup_agents_guides.py` holds.
+
 **9a. A skill that writes committed code must never be ambient on any surface.**
 `fux-enrich` and `fux-decoder` write into committed directories and change what
 is indexed, so they ship to **skill** surfaces only and to no ambient one. **A
@@ -461,6 +469,89 @@ were editable by hand with nothing comparing them.
   the template, delete the rendering, re-run `fux setup`.
 
 
+**15. Operating guides for every job the CLI supports, on every vendor — as
+skills, and as scoped pointers** (Arpit, 2026-09-11: *"steering documents and
+skills … for Claude, Codex and Copilot as well"*; on being shown decision 9,
+9a and veto 5b, he chose **all** of: skills, Kiro steering, and steering for the
+committed-write topics too).
+
+**15a. What ships.** Three kinds, each from hand-written templates:
+
+| kind | count | destinations | loads |
+|---|---|---|---|
+| **guide skills** — `fux-search`, `fux-answer`, `fux-graph`, `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii` | 10 templates | all four skill surfaces, byte-identical (decision 10) | on a description match, or when invoked |
+| **path-scoped pointers** — `sources`, `decoder`, `enrich`, `fetcher`, `pii`, `config`, `index` | 7 topics × 3 templates | `.kiro/steering/fux-<t>-files.md` (`fileMatch`), `.claude/rules/fux-<t>-files.md` (`paths:`), `.github/instructions/fux-<t>-files.instructions.md` (`applyTo:` explicit globs) | when the agent works on that plane's own files under `.fux/` or `fux.toml` |
+| **Kiro auto guides** — `usage`, `search`, `answer`, `graph`, `mcp` | 5 templates | `.kiro/steering/fux-<t>-guide.md` (`inclusion: auto`) | on a description match |
+
+`fux-usage` stays the router and gains a *which skill next* table.
+`setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS` and `AUTO_GUIDE_TOPICS` are the
+roster; `AGENT_FILES` expands them, so the table is still the whole of the
+routing.
+
+**15b. A pointer is rules plus a skill name, never a procedure.** Each ends
+`Full procedure: the <skill> skill.`, names a skill its own vendor receives, and
+is **≤ 1200 bytes**. The three renderings of one path-scoped topic share **one
+body and one glob set**; only frontmatter differs. That is decision 2's device —
+exact match — for prose that has no verbatim block.
+
+**15c. 🔴 The cost, stated rather than discovered: on a Kiro CLI without
+inclusion-mode support, all twelve Kiro pointers are ambient.** Kiro's steering
+page still says inclusion modes are not supported on the CLI; the Kiro CLI 3.0
+feature page says front-matter inclusion modes now are. **Both are cited, and
+fux cannot tell which one a consumer runs.** On an older CLI that is roughly
+10 KB entering every request, beside the ~3 KB policy file — decision 6's tax,
+four times larger, paid by developers who may not be using fux. **The byte bound
+is what keeps it from growing; the announcement is what makes it visible;
+`[agents] install` without `kiro` is the way out.**
+
+**15d. The committed-write topics are path-scoped ONLY** — never
+`inclusion: auto`, never `"**"`. A description match can fire on a request that
+edits nothing; a path match fires only while an agent is already in that plane's
+files. The **skills** stay skill-surface-only, so decision 9a and vetoes 5b and 7
+hold for every skill template unchanged.
+
+**`index` and `maintain` get no auto guide either**, for the same reason: `fux
+setup` and `fux ingest` write the committed index and `fux hooks` edits
+`.gitattributes`. Found by review before shipping, when the first roster had
+both as auto guides and the test's committed-write set had silently left them
+out — `WRITES_COMMITTED` in the test now names them.
+
+⚠ **This is the one place decision 9a's line is crossed, and it is crossed by
+ruling.** On a Kiro CLI that ignores `fileMatch`, the `fux-decoder-files` and
+`fux-enrich-files` pointers enter every request. What bounds it: they carry no
+procedure, they say *only when a human asked*, and they are byte-bounded.
+
+**15e. Codex gets the ten skills and no pointer.** It has no path-scoped
+surface: its always-on context is `AGENTS.md`, and a nested `AGENTS.md` loads
+only on the path from the working directory up, so one under `.fux/` would
+almost never load. `AGENTS.md` is **not** grown to list the guides — veto 6.
+
+**15f. The guides are a SECOND pinned exemption from decision 2's block check**
+(`OPERATING_GUIDES` in `tests/test_agent_policy_agreement.py`), kept apart from
+`NOT_A_POLICY_RENDERING` so neither list absorbs the other. Each guide points at
+`fux-archived-results`; none carries the block.
+
+**15g. ⚠ The guides describe behaviour other records own, and the drafting
+proved the risk is live.** A skill is for a consumer who has no `docs/adr/`, so
+it states behaviour rather than linking a record — the same shape
+`USAGE-SKILL.md` and `DECODER-SKILL.md` already had. **The guides were written
+from the code, not from the records**, and cross-checking them turned up
+disagreements between records and code, and defects in the code, filed in
+`work/OPEN-WORK.md` rather than papered over here. Where a guide names a
+workaround for a defect (`fux add <URL> --no-update`, `fux update --failed`, a
+URL citation the shipped fetchers cannot verify), **fixing the defect must edit
+the guide in the same change** — the templates ship in the same wheel as the
+code. Nothing enforces that; this sentence is the guard.
+
+**Held by tests, not by a sentence:**
+`test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one`,
+`test_the_operating_guides_are_deliberate`, and
+`tests/test_setup_agents_guides.py` — the pointer roster, the byte bound, never
+always-on, committed-write topics never description-triggered, one body and one
+glob set per topic, Kiro's `name`/`description` on auto guides, and every pointer
+naming a skill its vendor gets.
+
+
 ### Consequences
 
 - ⚠ **Fux owns FOUR third-party formats it does not control.** This is a real
@@ -522,6 +613,14 @@ were editable by hand with nothing comparing them.
   (`run()`, `_write_if_missing`, `template_bytes`, and the per-vendor mapping);
   the artifacts themselves —
   [`src/fux/templates/agents/`](../../src/fux/templates/agents/).
+- The scoped-pointer surfaces decision 15 writes to — Claude Code path-scoped
+  rules (`.claude/rules/`, `paths:`) <https://code.claude.com/docs/en/memory>;
+  Copilot path-specific instructions (`applyTo:`, comma-separated globs)
+  <https://docs.github.com/en/copilot/how-tos/configure-custom-instructions-in-your-ide/add-repository-instructions-in-your-ide>;
+  Kiro `fileMatch` / `auto` inclusion <https://kiro.dev/docs/steering/>, and the
+  Kiro CLI 3.0 note that front-matter inclusion modes are supported
+  <https://kiro.dev/docs/cli/v3/new-features/> — decision 15c cites both Kiro
+  pages because they disagree.
 - The tests that hold the record's claims —
   [`tests/test_setup_agents.py`](../../tests/test_setup_agents.py) and
   [`tests/test_setup_agents_usage.py`](../../tests/test_setup_agents_usage.py).
@@ -573,6 +672,9 @@ were editable by hand with nothing comparing them.
    The confinement was never about which agent can invoke it; it is about a
    committed-write skill entering every request. **That, and only that, is the
    line**, and 2026-09-06 is when the roster stopped standing in for it.
+   ⚠ **One exception, by ruling (decision 15d):** the `fux-decoder-files` and
+   `fux-enrich-files` POINTERS are ambient on a Kiro CLI without inclusion modes.
+   A pointer that gains a procedure, or loses its `fileMatch`, fires this veto.
 5c. **A committed-write skill reaches a skill surface its twin does not, with
    no record naming the exception.** `fux-enrich` shipped to one surface while
    `fux-decoder` shipped to three, for weeks, inside a record that had
@@ -581,8 +683,15 @@ were editable by hand with nothing comparing them.
 6. **An ambient rendering grows.** They enter *every* request in a consumer's
    repository. **Growth is a regression**, because the cost is paid by developers
    who may not be using Fux at that moment — on every prompt, forever.
+   (Decision 15's scoped pointers are held by 6a instead: they are not ambient
+   where a vendor honours their scope, and bounded where it does not.)
+6a. **A scoped pointer grows past its bound, loses its scope, or starts carrying
+   a procedure** (decision 15). On a Kiro CLI without inclusion modes every one
+   of them is ambient, so a pointer that turns into a manual is veto 6 through a
+   new door. **So is a committed-write topic gaining `inclusion: auto`.**
 7. **A skill that writes committed code ships to an ambient surface** —
-   decision 9a.
+   decision 9a. It concerns SKILL templates; a committed-write topic's pointer is
+   held by 5b's exception and 6a.
 8. **The policy tells an agent what the answer is, rather than how to read the
    fact.** The moment a rendering encodes Fux's opinion about a *document*
    rather than about *what archived means*, **the engine has smuggled the intent
@@ -611,9 +720,12 @@ wc -c src/fux/templates/agents/fux-archived-results.instructions.md \
       src/fux/templates/agents/fux-usage.instructions.md \
       src/fux/templates/agents/steering-fux-archived-results.md
 
+# 6a — the scoped pointers: bounded, scoped, one body per topic
+uv run pytest -q tests/test_setup_agents_guides.py
+
 # 7 — the code-writing skills ship to skill surfaces only
 grep -n 'ENRICH-SKILL\|DECODER-SKILL' src/fux/setup.py
-# expect: only under `.claude/skills/` and `.kiro/skills/`
+# expect: only as `/skills/<name>/SKILL.md` rows (the four skill surfaces)
 
 # 8 — read the renderings. Each rule must be about how to READ the archived
 #     flag, never about which document is right.

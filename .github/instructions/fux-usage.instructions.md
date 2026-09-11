@@ -58,7 +58,7 @@ Three rules that make the ladder safe rather than clever:
 | `fux ask "<q>" --json` | ranked results with `score`, `loc`, `archived` | you want candidates and will judge them yourself |
 | `fux find "<q>"` | bare paths | you are piping into another command |
 | `fux answer "<q>"` | one cited answer, fetched and re-scored on the source's current bytes | you want the answer, with a freshness verdict |
-| `fux explain <loc>` | the edges into and out of one document | you are asking what a document depends on |
+| `fux explain <loc>` | the edges out of one document (outbound only) | you are asking what a document depends on |
 | `fux graph "<q>"` | the neighbourhood around a query's best answers | you are orienting in an unfamiliar area |
 | `fux path <a> <b>` | how two documents connect | you suspect a relationship and want the chain |
 
@@ -73,7 +73,7 @@ fields, never on the wording** - the wording is not a contract.
 | verb | `loc` looks like | network |
 |---|---|---|
 | `fux ask` / `fux find` | `docs/mesh.md` | none - index only |
-| `fux answer` | `docs/mesh.md:L10-L13` | fetches each cited source |
+| `fux answer` | `docs/mesh.md:L10-L13` | reads each cited source |
 
 **If you need a line range, use `answer`.** Running `ask` and reporting that
 fux "does not give line numbers" is wrong, and it is the most common way to be
@@ -113,7 +113,7 @@ comparable with a single-question one.
 
 ## 3. Read the freshness verdict on `answer`
 
-`answer` fetches each cited source and compares it against what was indexed:
+`answer` reads each cited source and compares it against what was indexed:
 
 - **`current`** - the source still matches the index. Cite it plainly.
 - **`stale`** - the source changed since ingest. **The quoted passage is from

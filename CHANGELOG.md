@@ -10,6 +10,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Added
 
+- **Operating guides for every `fux` job, on Claude, Codex, Copilot and Kiro**
+  ([ADR-AGENT-POLICY](docs/adr/0132_agent-policy.md) decision 15). `fux setup`
+  now writes **ten more skills** — `fux-search`, `fux-answer`, `fux-graph`,
+  `fux-index`, `fux-maintain`, `fux-mcp`, `fux-sources`, `fux-config`,
+  `fux-fetcher`, `fux-pii` — to all four skill surfaces, and `fux-usage` gains a
+  *which skill next* router.
+  - **Scoped pointers, three vendors:** short rules that load when an agent edits
+    fux's own files (`.fux/sources/`, `.fux/decoders/`, `.fux/enrich/`,
+    `.fux/fetchers/`, `.fux/pii.toml`, `fux.toml` and tune/output, `.fux/index/`)
+    — Kiro `fileMatch` steering, Claude `.claude/rules/`, Copilot path-specific
+    `instructions/`. Plus five Kiro `inclusion: auto` guides for the read-only jobs. Each is ≤ 1.2 KB,
+    names its skill, and never carries a procedure.
+  - 🔴 **On a Kiro CLI without inclusion-mode support, all twelve Kiro
+    pointers load on every request** (~10 KB). Bounded by a test and announced;
+    `[agents] install` without `kiro` opts out.
+  - ⚠ **Existing repos get none of this automatically** — `fux setup` is
+    write-if-missing, so re-run it to add the new files; your edited copies stay.
+
 - **`update = auto|never` on a URL line** (W-113,
   [ADR-URL-LIST](docs/adr/0116_url-list.md) decision 14). A line could say how
   to reach a document and how long a citation could go unchecked, and could not

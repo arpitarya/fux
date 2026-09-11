@@ -56,9 +56,12 @@ Three rules that make the ladder safe rather than clever:
 | `fux ask "<q>" --json` | ranked results with `score`, `loc`, `archived` | you want candidates and will judge them yourself |
 | `fux find "<q>"` | bare paths | you are piping into another command |
 | `fux answer "<q>"` | one cited answer, fetched and re-scored on the source's current bytes | you want the answer, with a freshness verdict |
-| `fux explain <loc>` | the edges into and out of one document | you are asking what a document depends on |
+| `fux explain <loc>` | the edges out of one document (outbound only) | you are asking what a document depends on |
 | `fux graph "<q>"` | the neighbourhood around a query's best answers | you are orienting in an unfamiliar area |
 | `fux path <a> <b>` | how two documents connect | you suspect a relationship and want the chain |
+
+**Each verb has a deeper skill:** `fux-search` (ask, find), `fux-answer`
+(answer, verify), `fux-graph` (explain, graph, path). See section 7 for the rest.
 
 **Prefer `--json` everywhere it is offered.** It gives you `score`, `loc` and
 `archived` as fields rather than as prose you have to parse. **Branch on the
@@ -71,7 +74,7 @@ fields, never on the wording** - the wording is not a contract.
 | verb | `loc` looks like | network |
 |---|---|---|
 | `fux ask` / `fux find` | `docs/mesh.md` | none - index only |
-| `fux answer` | `docs/mesh.md:L10-L13` | fetches each cited source |
+| `fux answer` | `docs/mesh.md:L10-L13` | reads each cited source |
 
 **If you need a line range, use `answer`.** Running `ask` and reporting that
 fux "does not give line numbers" is wrong, and it is the most common way to be
@@ -124,13 +127,14 @@ are the one who knows the vocabulary, which is why the slot exists.
 
 ## 3. Read the freshness verdict on `answer`
 
-`answer` fetches each cited source and compares it against what was indexed:
+`answer` reads each cited source and compares it against what was indexed:
 
 - **`current`** - the source still matches the index. Cite it plainly.
 - **`stale`** - the source changed since ingest. **The quoted passage is from
   the CURRENT bytes**, so the answer is right and the index is behind; say so.
-- **`unverified`** - the source could not be reached. Do not present it as
-  confirmed.
+- **`as-ingested`** - the source could not be reached; compared against the
+  bytes kept at ingest. Say *"as of the last ingest"*.
+- **`unverified`** - nothing could be read. Do not present it as confirmed.
 - **`cached`** - served from a TTL cache. It means *we looked recently*, which
   is not the same as *we looked just now*.
 
@@ -145,7 +149,8 @@ this"* is a useful answer; a fabricated path is not.
 Fux indexes retired documents deliberately and marks them rather than hiding
 them, because the same document is authoritative for a history question and
 dangerous for a build task. If a result carries `"archived": true`, follow the
-`fux-archived-results` skill. **When the stance is ambiguous, treat it as
+`fux-archived-results` policy (a skill, a steering file or `AGENTS.md`,
+depending on the agent). **When the stance is ambiguous, treat it as
 building** - that is the ordering with the worst downside if you guess wrong.
 
 ## 6. If you are running as a Kiro custom agent
@@ -159,3 +164,28 @@ fux guidance never activates, their agent config needs:
 ```
 
 Fux cannot write that config, which is why it is written here instead.
+
+## 7. Which skill next
+
+This skill is the router. Load the one that matches the job:
+
+| the job | skill |
+|---|---|
+| search flags, the confidence band, `--why`, `-q`, `--expand` | `fux-search` |
+| exact lines, freshness verdicts, receipts, `fux verify` | `fux-answer` |
+| links, neighbourhoods and routes between documents | `fux-graph` |
+| read a result marked `archived` | the `fux-archived-results` policy |
+| `fux setup`, `fux doctor`, `fux ingest`, `fux build`, what to commit | `fux-index` |
+| hooks, the merge driver, the URL daemon, a conflicted index shard | `fux-maintain` |
+| add, remove, archive or refresh what is indexed | `fux-sources` |
+| `fux.toml`, `.fux/tune.toml`, `.fux/output.toml` | `fux-config` |
+| serving the index over MCP | `fux-mcp` |
+| a URL fetcher or `.fux/refusals.toml` | `fux-fetcher` |
+| `.fux/pii.toml` | `fux-pii` |
+| a file format fux reads badly or not at all | `fux-decoder` |
+| enrichment questions in `.fux/enrich/` | `fux-enrich` |
+
+**`fux-sources`, `fux-config`, `fux-fetcher`, `fux-pii`, `fux-decoder` and
+`fux-enrich` write committed files that change the index**, and `fux setup`,
+`fux ingest` and `fux hooks` (`fux-index`, `fux-maintain`) write committed files
+too - make those changes only when a human asked for them.

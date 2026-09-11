@@ -43,6 +43,12 @@ the defect this ordering exists to make visible.*
 
 ## Filed 2026-09-11
 
+* [The abstention gate — what should 0 of 20 block?](abstention-gate.md)
+  — fux answers every one of 20 blind-authored unanswerable questions, twice, because
+  `answerable` is false only when nothing matches at all. Options: **A** disclose in
+  `fux doctor`, **B** gate quality claims (*"abstains 0 of N"* beside every headline),
+  **C** build abstention and measure it in fux-lab on golden data. Recommends **B, then C**.
+  Parked from the inbox at Arpit's instruction. **Graduates when Arpit picks.**
 * [Positioning — documents around the code, not the code](positioning-documents-not-code.md)
   — why fux is filed next to AST/code-graph tools. **Fux parses no code and, by
   default, indexes none** (`.py` → *not an indexed file type*); the misfiling

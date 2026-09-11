@@ -30,6 +30,12 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### Operating guides on four vendors — ADR-AGENT-POLICY decision 15 (2026-09-11, Cowork, uncommitted)
+
+- **`fux setup` now writes 84 agent files, not 18**: ten guide skills × four skill surfaces, 21 path-scoped pointers (Kiro/Claude/Copilot), five Kiro auto guides. Roster: `setup.GUIDE_SKILLS`, `PATH_SCOPED_TOPICS`, `AUTO_GUIDE_TOPICS`. Gates: `tests/test_setup_agents_guides.py`.
+- 🔴 **Guides name workarounds for defects** (W-140). Fixing a defect without editing its guide ships a lie in the wheel — 15g, unenforced.
+- **Codex reads `.agents/skills/` now** (W-141, Arpit's ruling) — until then fux's Codex skills may not load.
+
 ### L9 — each sibling environment has one job (2026-09-11, Cowork)
 
 - 🔴 **`fux-playground` is Arpit's hands only** — no agent, tool, test or run uses it. **`fux-lab`** runs every measurement on golden test data ≤ 10 000. **`fux-benchmark`** only times queries and keeps ranked lists, current build vs newest previous-major release. Law text: CLAUDE.md L9; rationale ADR-LAW-9 (`0011`).

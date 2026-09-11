@@ -420,6 +420,17 @@ directory under `.github/`, not a fourth vendor — the announcement contract an
 `report.outside` are unchanged, and `test_optout_flag_leaves_no_vendor_directory_behind`
 already covers it, because it checks the vendor root.
 
+⚠ **`.claude/rules/` joined the outside set on 2026-09-11, and the set grew from
+eighteen files to eighty-four** ([ADR-AGENT-POLICY](0132_agent-policy.md) decision
+15): ten guide skills on four surfaces, seven path-scoped pointers on three
+vendors, and five Kiro auto guides, beside the existing seventeen vendor files
+and `AGENTS.md`. Still write-if-missing, still announced
+path by path, still one `--no-agents` away. ⚠ **The announcement is now long**
+— that is the contract working, not a defect: veto condition 1 is *every* path
+named. **The ambient cost moved too**: on a Kiro CLI without inclusion modes the
+twelve new steering files are always-on, which ADR-AGENT-POLICY decision 15c
+states and bounds.
+
 **10. `doctor` reports, and never repairs.** Every check returns
 `Check(ok, level, name, detail)` and `--json` carries them. Three properties
 this record binds:

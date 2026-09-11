@@ -15,7 +15,7 @@ The two run **concurrently**; never order one against the other.
 
 *Named here so a session leads with it instead of burying it. **Ages are
 recomputed against the reading date, never copied** — a queue that copies its
-ages stops flagging its own oldest item. As of **2026-09-11, one row is past
+ages stops flagging its own oldest item. As of **2026-09-11, no rows are past
 CLAUDE.md's 5-day threshold**, and a session names each, with its age, in its
 first output.*
 
@@ -38,15 +38,25 @@ failure mode here with a perfect record.
 
 | what he decides | filed | age |
 |---|---|---|
-| 🔴 **Does the abstention result gate anything?** **Re-run done, and the answer is the same: 20 of 20 `answerable: true`, 0 ids flipped** — fourteen days and five ranking changes later ([the run](regression/2026-09-11-blind-unanswerable-rerun/report.md)). Band, separation and the `separation_floor` are each **demonstrated not to be the lever**. No threshold is proposed and R10 stays unmeasured — picking a floor from these 20 fits it to the set that exposed the problem. Under [L9](../docs/adr/0011_LAW-9-environments.md) any further abstention test runs in fux-lab on the golden set's `unanswerable` questions (W-136), never the playground | 2026-08-28 | 14d |
 | 🔴 **The four no-op priors — pick an instrument, or close the knob.** The remeasure you ordered **cannot run**: three of the four priors move **0 of 50** goldens at every value including `0.0`, because the playground declares no `supersedes:` key on any branch of its history ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **Two options left under [L9](../docs/adr/0011_LAW-9-environments.md)** (declaring it in the playground is void): **(b)** put declared supersession, `archived=true` sources, dated documents and intent-split questions into the golden test data (W-136) and remeasure in fux-lab, or **(c)** close the knob on the structural argument, which needs no corpus | 2026-09-11 | 0d |
 | **W-136 phase 1 — did the answer key get written?** **The ten seed documents landed** (`work/golden/seed/`, committed 2026-09-11) — the half Claude can see. **The other half no Claude session can ever verify**: whether Codex wrote the ~100 questions and answers, and where. Say yes and **phase 2 is agent work, runnable at once**; say no and prompt 1 is re-run. Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
+| **W-141 — Codex reads repo skills from `.agents/skills/`, and fux writes `.codex/skills/`.** OpenAI's skills page lists only `.agents/skills` for a repository; `.codex/skills` reads as legacy. That is [ADR-AGENT-POLICY](../docs/adr/0132_agent-policy.md) **veto 3** (*a shipped rendering no longer loads*). Moving means Copilot, which also reads `.agents/skills`, sees a third same-name copy of every fux skill. **Move, write both, or wait for a measured load failure?** — [detail](open/W-141-codex-skill-directory.md) | 2026-09-11 | 0d |
 
 ---
 
 ## Open items
 
 ### fux build
+
+- 🔴 **W-140 — the defects writing the operating guides uncovered.** `agent` · *(records:
+  ADR-REFER · ADR-PII · ADR-URL-LIST · ADR-PROVENANCE · ADR-MAINTENANCE · ADR-CONFIG ·
+  and the disagreements listed in the file)* · Checking ten new skills against the code
+  (ADR-AGENT-POLICY decision 15) found **18 code defects** — two 🔴: URL citations are
+  never verified live (the shipped fetchers return a tuple the refer plane rejects), and a
+  frontmatter `title:` or a filename carries PII past redaction — plus **13 records that
+  disagree with the code**. ⚠ Guides name workarounds for several: **fix the defect and the
+  guide in one change.** Not yet reproduced on the Mac. —
+  [detail](open/W-140-guide-authoring-defects.md) `filed: 2026-09-11`
 
 - 🔴 **W-138 — reconcile every artifact with L9.** `agent` · *(records: [ADR-LAW-9](../docs/adr/0011_LAW-9-environments.md) ·
   ADR-RS · ADR-QUALITY · ADR-ACCELERATOR · ADR-CONFIDENCE · ADR-ANSWER)* · **Arpit's L9,
@@ -185,6 +195,13 @@ failure mode here with a perfect record.
   [detail](open/W-87-what-good-means.md) `filed: 2026-08-27`
 
 ### adr update
+
+- 🟠 **W-141 — Codex's skill directory moved.** `arpit` · *(record:
+  [ADR-AGENT-POLICY](../docs/adr/0132_agent-policy.md) decisions 11, 13, 14a, veto 3)* ·
+  fux writes `.codex/skills/`; current Codex docs list `.agents/skills/` for repo skills,
+  which Copilot also reads. The ruling is in the inbox above; the change after it is a
+  roster edit plus the record. — [detail](open/W-141-codex-skill-directory.md)
+  `filed: 2026-09-11`
 
 - 🟠 **THE FOUR NO-OP RANKING PRIORS — one problem, one blocker.** `agent`, then `arpit` ·
   *(records: [ADR-CONFIDENCE](../docs/adr/0142_confidence.md) ·

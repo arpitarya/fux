@@ -113,15 +113,23 @@ def test_a_partial_declaration_installs_exactly_what_it_names(tmp_path):
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["kiro"]\n', encoding="utf-8")
     setup_mod.run(root)
-    assert _agent_files_on_disk(root) == [
-        # W-86 P7: the committed-write skills ship to the SKILL surface and to
-        # neither ambient one. A Kiro skill is progressive-disclosure; only
-        # Kiro *steering* enters every interaction.
-        ".kiro/skills/fux-decoder/SKILL.md",
-        ".kiro/skills/fux-enrich/SKILL.md",
-        ".kiro/skills/fux-usage/SKILL.md",
-        ".kiro/steering/fux-archived-results.md",
-    ]
+    guides = [name for name, _tpl in setup_mod.GUIDE_SKILLS]
+    assert _agent_files_on_disk(root) == sorted(
+        [
+            # W-86 P7: the committed-write skills ship to the SKILL surface and to
+            # neither ambient one. A Kiro skill is progressive-disclosure; only
+            # Kiro *steering* enters every interaction.
+            ".kiro/skills/fux-decoder/SKILL.md",
+            ".kiro/skills/fux-enrich/SKILL.md",
+            ".kiro/skills/fux-usage/SKILL.md",
+            ".kiro/steering/fux-archived-results.md",
+        ]
+        # ADR-AGENT-POLICY decision 15: the operating guides, and Kiro's
+        # path-scoped and auto-inclusion steering pointers.
+        + [f".kiro/skills/{name}/SKILL.md" for name in guides]
+        + [f".kiro/steering/fux-{t}-files.md" for t in setup_mod.PATH_SCOPED_TOPICS]
+        + [f".kiro/steering/fux-{t}-guide.md" for t in setup_mod.AUTO_GUIDE_TOPICS]
+    )
 
 
 def test_optout_through_the_real_cli(tmp_path, monkeypatch, capsys):
@@ -450,6 +458,22 @@ def test_every_committed_write_skill_reaches_every_skill_surface():
         assert _surfaces(template) == SKILL_SURFACES, template
 
 
+def test_every_operating_guide_reaches_every_skill_surface_and_no_ambient_one():
+    """ADR-AGENT-POLICY decision 15 (Arpit, 2026-09-11). The ten operating
+    guides are decision 14a's roster rule applied ten more times: one template,
+    all four skill surfaces, and never an `instructions/` or `steering/`
+    destination -- four of them (`fux-sources`, `fux-config`, `fux-fetcher`,
+    `fux-pii`) write committed files, and decision 9a is a predicate on the
+    surface, not on a list of names."""
+    assert len(setup_mod.GUIDE_SKILLS) == 10
+    for name, template in setup_mod.GUIDE_SKILLS:
+        assert _surfaces(template) == SKILL_SURFACES, template
+        for files in setup_mod.AGENT_FILES.values():
+            for rel, tpl in files:
+                if tpl == template:
+                    assert rel.endswith(f"/skills/{name}/SKILL.md"), rel
+
+
 def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
     """`AGENTS_MD_VENDORS`. The root file is written for a FULL install because
     a partial declaration names what it wants — true for the three vendors that
@@ -459,13 +483,18 @@ def test_codex_alone_still_gets_the_root_agents_file(tmp_path):
     root = _fresh(tmp_path)
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["codex"]\n', encoding="utf-8")
     setup_mod.run(root)
-    assert _agent_files_on_disk(root) == [
-        # sorted(): "." < "A", so the vendor paths come first
-        ".codex/skills/fux-decoder/SKILL.md",
-        ".codex/skills/fux-enrich/SKILL.md",
-        ".codex/skills/fux-usage/SKILL.md",
-        "AGENTS.md",
-    ]
+    assert _agent_files_on_disk(root) == sorted(
+        [
+            # sorted(): "." < "A", so the vendor paths come first
+            ".codex/skills/fux-decoder/SKILL.md",
+            ".codex/skills/fux-enrich/SKILL.md",
+            ".codex/skills/fux-usage/SKILL.md",
+            "AGENTS.md",
+        ]
+        # decision 15: the guides reach Codex as skills; Codex has no
+        # path-scoped surface, so no pointer is written for it
+        + [f".codex/skills/{name}/SKILL.md" for name, _tpl in setup_mod.GUIDE_SKILLS]
+    )
 
 
 def test_a_partial_declaration_without_codex_writes_no_root_agents_file(tmp_path):
