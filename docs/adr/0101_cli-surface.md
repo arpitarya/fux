@@ -842,6 +842,15 @@ wider sweep is the same defect wearing a different hat.
 never that it is *read*. The gap is closed for this flag by a test that asserts
 the selection, not the output.
 
+⚠ **And the mirror of it: a flag that IS read, for something it should not
+decide.** `fux hooks` selected report-instead-of-install from `args.json` — the
+field the output config fills — so a repo rendering JSON had a `fux hooks` that
+installed nothing (W-140 row 10). **`--json` is an output format on every verb
+of this surface and never a mode**; the resolver now keeps the flag as typed so
+a verb that genuinely needs *the user asked* can have it without a rendering
+default reaching its behaviour. [ADR-MAINTENANCE](0129_hooks.md) carries the
+verb's half.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

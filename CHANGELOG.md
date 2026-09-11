@@ -61,6 +61,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **`fux hooks` installed nothing in a repo with `[cli.json] enabled = true`.**
+  It read the resolved `--json` to choose between installing and reporting, and
+  the output config fills that field — so the command whose job is to wire the
+  hooks printed a true status report of an unwired repo instead. `--status`
+  selects the mode now; `--json` only selects the rendering, and an explicit
+  `fux hooks --json` still reports ([ADR-MAINTENANCE](docs/adr/0129_hooks.md)).
+
+- **A shard with merge conflict markers says so.** It reported *not a fux index
+  shard, or the file is truncated* — corruption-shaped words for an unresolved
+  merge — and the merge driver's own refusal told you to run `fux ingest`,
+  which cannot read that file. Both now name the two commands that work:
+  `git checkout --ours` (either side; a shard is derived), then `fux ingest`.
+
 - **`fux path` refuses an end that is not in the index**, naming which
   (`… is not in the index (FROM)`, exit 1). It printed `No route from … within
   N hop(s)` and exited 0 — the same answer as for two real, unconnected

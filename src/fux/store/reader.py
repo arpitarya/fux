@@ -43,6 +43,16 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
     if lines and lines[-1] == b"":
         lines.pop()
 
+    # ⚠ **Conflict markers FIRST, before the header is even parsed** (W-140
+    # row 9, 2026-09-11). A shard git could not merge — or that the fux merge
+    # driver deliberately refused — carries `<<<<<<<` on some line, and the
+    # header check below then reported *not a fux index shard, or the file is
+    # truncated*: a sentence that sends someone looking for corruption while
+    # the real answer is an unresolved merge two commands away. Diagnosed the
+    # same way `tune.toml` and `output.toml` already diagnose it, because a
+    # committed file people merge will eventually carry one.
+    _refuse_conflict_markers(raw, path)
+
     header = _load_json(lines[0], path=path, lineno=1)
     if not isinstance(header, dict) or header.get("_format") != HEADER["_format"]:
         # ⚠ **This message named neither the found value nor the expected one
@@ -81,6 +91,27 @@ def raw_record_lines(path: Path) -> tuple[dict, list[bytes]]:
             f"expected {HEADER['tf_fields']!r} — refusing to silently misread postings"
         )
     return header, lines[1:]
+
+
+def _refuse_conflict_markers(raw: bytes, path: Path) -> None:
+    """Name an unresolved merge as one, and name the way out.
+
+    **Either side is a correct starting point and that is the point.** A shard
+    is derived — statistics over content fux can re-derive — so taking `--ours`
+    or `--theirs` loses nothing that `fux ingest` will not immediately rebuild
+    from the merged working tree. That is what makes this recoverable in two
+    commands rather than a decision about which colleague's index to keep.
+    """
+    for marker in (b"<<<<<<< ", b"=======\n", b">>>>>>> "):
+        if marker in raw:
+            rel = path.name
+            raise FuxError(
+                f"shard {path} carries unresolved merge conflict markers, so nothing "
+                f"can read it. A shard is DERIVED, so either side is a fine starting "
+                f"point: `git checkout --ours -- .fux/index/{rel}` (or --theirs), then "
+                f"`fux ingest`, which rebuilds it from the merged content rather than "
+                f"from either side's copy."
+            )
 
 
 def read_shard(path: Path) -> tuple[dict, list[dict]]:

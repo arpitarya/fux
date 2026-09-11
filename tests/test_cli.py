@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import subprocess
 import sys
 
@@ -208,3 +209,74 @@ def test_the_gate_does_not_import_fux_ingest_when_the_file_exists(tmp_path):
         [sys.executable, "-c", code], cwd=tmp_path, capture_output=True, text=True, check=True
     )
     assert out.stdout.strip() == "False"
+
+
+# -- W-140 rows 9 and 10: a rendering default that changed what a verb did ---
+
+
+def test_hooks_installs_even_when_the_repo_renders_json(tmp_path, monkeypatch, capsys):
+    """🔴 `[cli.json] enabled = true` turned `fux hooks` into a status report.
+
+    It selected report-instead-of-install from `args.json`, which the output
+    config fills — so in a repo that renders JSON, the command whose whole job
+    is to wire the hooks installed nothing and printed a true report of a repo
+    nobody had wired. A rendering default may never change what a command does.
+    """
+    import subprocess
+
+    from fux.maintain import cmd_hooks
+
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    class Args:
+        command = "hooks"
+        json = True           # what the output config resolved
+        json_explicit = False  # what the user typed
+        status = False
+
+    assert cmd_hooks(Args()) == 0
+    assert (tmp_path / ".git" / "hooks" / "post-commit").is_file(), (
+        "the hooks were not written — the rendering default selected the mode"
+    )
+    payload = json.loads(capsys.readouterr().out)
+    assert "post-commit" in payload["installed"], "JSON rendering, of the work actually done"
+
+
+def test_hooks_status_is_still_selected_by_the_typed_flag(tmp_path, monkeypatch, capsys):
+    """`fux hooks --json` keeps meaning *report*, for whoever scripted it."""
+    import subprocess
+
+    from fux.maintain import cmd_hooks
+
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    class Args:
+        command = "hooks"
+        json = True
+        json_explicit = True
+        status = False
+
+    assert cmd_hooks(Args()) == 0
+    assert not (tmp_path / ".git" / "hooks" / "post-commit").exists()
+    assert "hooks" in json.loads(capsys.readouterr().out)
+
+
+def test_a_shard_with_conflict_markers_says_so(tmp_path):
+    """It reported *not a fux index shard, or the file is truncated* — a
+    sentence that sends a reader looking for corruption while the answer is an
+    unresolved merge two commands away."""
+    from fux import store
+    from fux.errors import FuxError
+
+    index = tmp_path / ".fux" / "index"
+    index.mkdir(parents=True)
+    (index / "00.jsonl").write_text(
+        '{"_format":"fux.index.v2"}\n<<<<<<< ours\n{"id":"a"}\n=======\n{"id":"b"}\n>>>>>>> theirs\n',
+        encoding="utf-8",
+    )
+    with pytest.raises(FuxError, match="unresolved merge conflict markers"):
+        store.read_index(tmp_path)

@@ -110,7 +110,13 @@ def cmd_hooks(args) -> int:
         print("hooks: the merge driver is unregistered; `.gitattributes` is left alone")
         return 0
 
-    if getattr(args, "json", False) or getattr(args, "status", False):
+    # ⚠ **`--status` selects the MODE; `--json` only selects the RENDERING.**
+    # This read `args.json` for both until 2026-09-11 (W-140 row 10) — so in a
+    # repo with `[cli.json] enabled = true`, `fux hooks` installed nothing and
+    # reported the state instead. A true report of a repo nobody had wired,
+    # printed by the command whose job was to wire it. `json_explicit` is the
+    # flag as the user typed it, kept by the resolver for exactly this.
+    if getattr(args, "status", False) or getattr(args, "json_explicit", False):
         state = hooks_mod.status(root)
         if getattr(args, "json", False):
             print(json.dumps(state, indent=2, sort_keys=True))
@@ -122,6 +128,16 @@ def cmd_hooks(args) -> int:
         return 0
 
     report = hooks_mod.install(root)
+    if getattr(args, "json", False):
+        # The rendering the config asked for, of the work that was actually
+        # done — not a different command's output.
+        print(json.dumps({
+            "installed": sorted(report.installed),
+            "kept": sorted(report.kept),
+            "refused": sorted(report.refused),
+            "merge_driver": report.merge_driver,
+        }, indent=2, sort_keys=True))
+        return 0
     for name in report.installed:
         print(f"  wrote  {name}")
     for name in report.kept:

@@ -217,6 +217,17 @@ def _apply_output_defaults(args) -> None:
     cfg = DEFAULT_OUTPUT if root is None else load_output(root, enabled=True)
 
     if hasattr(args, "json"):
+        # ⚠ **A rendering default may never change WHAT a command does**, and
+        # on one verb it did (W-140 row 10, 2026-09-11). `fux hooks` selected
+        # report-instead-of-install from `args.json`, so a repo with
+        # `[cli.json] enabled = true` had a `fux hooks` that installed nothing
+        # and said so in JSON — a true report of a state nobody had changed.
+        # The flag as TYPED is kept here, before the file fills it, so a verb
+        # that must distinguish *the user asked for JSON* from *this repo
+        # renders JSON* can. Nothing else needs it, and nothing else should:
+        # this docstring's own promise is that a rendering config's blast
+        # radius is this function.
+        args.json_explicit = args.json is True
         args.json = cfg.resolve_json(verb, args.json)
     as_json = bool(getattr(args, "json", False))
 

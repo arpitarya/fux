@@ -220,6 +220,21 @@ split matters for a reason a reader will hit: an unregistered driver is
 invisible, not broken** — git merges those shards textually and nothing
 announces it.
 
+**The refusal names a resolution that works** (W-140 row 9, 2026-09-11). It
+said *resolve by re-running `fux ingest`* — and `fux ingest` **cannot read the
+file the refusal just wrote**, because that file now holds both sides with
+conflict markers. So the one instruction in the message was the one thing that
+could not work, and what the reader got instead was a shard-header error that
+reads as corruption.
+
+- **Both halves are fixed together**: the message names taking a side first,
+  and [ADR-INDEX-LIFECYCLE](0108_index-lifecycle.md) makes the reader diagnose
+  markers as markers.
+- **Either side is correct, and saying so is the point.** A shard is derived
+  statistics, so `--ours` and `--theirs` lose nothing `fux ingest` will not
+  rebuild from the merged working tree. Without that sentence the reader is
+  making a choice between colleagues' indexes that does not exist.
+
 ### Consequences
 
 - ⚠ **Decision 4's ancestor check was once missing from the modify/modify

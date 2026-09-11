@@ -493,6 +493,23 @@ fork 4, ruled 2026-08-28 with fork 3.
   *declared* shape rather than a hard-coded list, so the next field is covered
   without editing the test.
 
+**`--status` selects the mode; `--json` selects only the rendering** (W-140
+row 10, 2026-09-11). `cmd_hooks` read `args.json` for both, and the output
+config fills that field — so **a repo with `[cli.json] enabled = true` had a
+`fux hooks` that installed nothing** and printed a status report instead. A
+true report, of a repo nobody had wired, from the command whose job is to wire
+it.
+
+- **The resolver keeps the flag as TYPED** (`args.json_explicit`) so an
+  explicit `fux hooks --json` still means *report* — whoever scripted that
+  keeps it — while a repo-wide rendering default cannot reach the mode.
+- **Installing now renders JSON when JSON is on**, rather than falling back to
+  text: a machine reading this CLI gets the work that was done, not a
+  different command's output.
+- ⚠ **The general rule this is an instance of:** a rendering config's blast
+  radius is the resolver. Any other verb that branches on `args.json` for
+  anything but formatting has the same defect.
+
 ### Consequences
 
 - **There is no path into a committed shard that skips L5.** That is the

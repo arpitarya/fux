@@ -567,6 +567,21 @@ that applied itself from a committed file would make `fux find` return a
 different set of paths in two clones of the same repo. The `[filter]` note they
 print goes to **stderr**, so stdout stays a bare path list a pipe can read.
 
+**The resolver keeps the flag as the user typed it** (2026-09-11, W-140 row
+10). `args.json_explicit` is set from the pre-resolution value — `True` only
+when `--json` was actually passed — immediately before this file's value is
+written into `args.json`.
+
+- **It exists because this file reached a verb's BEHAVIOUR once.** `fux hooks`
+  selected report-instead-of-install from `args.json`, so
+  `[cli.json] enabled = true` gave a repo a `fux hooks` that installed nothing
+  ([ADR-MAINTENANCE](0129_hooks.md)). This record's own claim — that a
+  rendering config's blast radius is the resolver — was false for one verb.
+- ⚠ **It is not a general escape hatch.** A verb reading `json_explicit` is
+  declaring that it changes *what it does*, not *how it prints*, and that is
+  exactly the shape this file exists to keep out of the CLI. One caller today,
+  and a second one is a design question, not a convenience.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

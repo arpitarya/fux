@@ -559,7 +559,10 @@ is a defect with a sentence wrapped around it. Row 12 did the same to
 `GRAPH-SKILL.md`: *"run `fux explain` on both ends first"* was a procedure that
 existed only because `path` did not check its own arguments.
 
-⚠ **Six guide edits in one day, every one of them deleting a workaround.** That
+Row 9 took `MAINTAIN-SKILL.md`'s *"even though the refusal message says to
+re-run it"* — a guide explaining that fux's own error was wrong.
+
+⚠ **Seven guide edits in one day, every one of them deleting a workaround.** That
 is 15g working, and it is also the measurement of how much of a freshly written
 guide is describing defects rather than behaviour. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that

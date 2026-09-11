@@ -402,6 +402,20 @@ the differential harness carries a hashed record to prove it.
 - **Refusing is unchanged.** Only the message moved; a foreign shard has always
   been refused rather than guessed at, and still is.
 
+**A shard carrying conflict markers is diagnosed as that, before the header is
+parsed** (W-140 row 9, 2026-09-11). Until then it fell into the *no `_format`
+header* branch and reported *this is not a fux index shard, or the file is
+truncated* — which sends a reader hunting for corruption when the answer is an
+unresolved merge and two commands. `.fux/tune.toml` and `.fux/output.toml`
+already refused markers by name; the committed index, the file most likely of
+the three to be merged, did not.
+
+- **The message names taking either side, then `fux ingest`**, and says why
+  either is safe: the shard is derived.
+- ⚠ **This is a reading error, not a corruption check.** Nothing here validates
+  a shard's contents beyond what it always did; a file with markers simply
+  stops being mistaken for a truncated one.
+
 ### Consequences
 
 - **The committed index is reviewable.** A document change is one line in one

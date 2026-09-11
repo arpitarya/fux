@@ -31,8 +31,6 @@ then refresh this repo's renderings.
 | 5 | **`fux add <URL>` writes every attribute**, so `[sources.url]` `fetcher`/`meta`/`keep`/`ttl`/`update` never reach CLI-written lines. **(guide: SOURCES, FETCHER)** | `sources.py` | ADR-URL-LIST d14 |
 | 6 | **`answer` runs with the fetch cache off**: `ttl=` never applies, `cached` is unreachable, `update=never` does not stop the answer-time fetch. | `query/refer_answer.py` ~104 | ADR-URL-FRESHNESS d11/d15 · ADR-REFER d20 · ADR-ACQUIRED |
 | 7 | **`verify` misreports**: a `source: index` receipt and an unreachable URL both give `drifted:corpus`, not `unverifiable`; `--rerun` fetches. **(guide: ANSWER)** | `query/__init__.py` ~994, ~1075 | ADR-PROVENANCE d14 |
-| 9 | **The merge driver's refusal says re-run `fux ingest`**, which cannot read a shard with conflict markers. **(guide: MAINTAIN)** | `maintain/mergedriver.py` ~201 | ADR-MERGE-DRIVER d6 |
-| 10 | **`fux hooks` installs nothing when `[cli.json] enabled = true`** — it only reports. **(guide: MAINTAIN)** | `maintain/__init__.py` ~113 | ADR-MAINTENANCE |
 | 11 | **The background runner never rebuilds the accelerator.** | `maintain/runner.py` ~534 | ADR-MAINTENANCE 2a |
 | 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
@@ -134,6 +132,25 @@ then refresh this repo's renderings.
   test that honest emptiness still exits 0. `GRAPH-SKILL.md` loses *"run
   `fux explain` on both ends first"*. **The `--hops` third of the row stays
   open as a fork.** 2026-09-11.
+
+- **Row 9 — the merge driver's refusal named a fix that could not work.** It
+  said *re-run `fux ingest`*, and ingest cannot read the file the refusal had
+  just written: it holds both sides with conflict markers. What the reader got
+  was a shard-header error reading as corruption. Both halves fixed — the
+  message names taking either side first (a shard is derived, so either is
+  safe), and the reader diagnoses markers as markers before parsing the
+  header, the way `tune.toml` and `output.toml` already did.
+  [ADR-MERGE-DRIVER](../../docs/adr/0130_merge-driver.md) and
+  [ADR-INDEX-LIFECYCLE](../../docs/adr/0108_index-lifecycle.md). 2026-09-11.
+
+- **Row 10 — `[cli.json] enabled = true` turned `fux hooks` into a report.**
+  The verb selected report-instead-of-install from `args.json`, which the
+  output config fills — so a repo that renders JSON had a `fux hooks` that
+  installed nothing and printed a true report of a repo nobody had wired.
+  `--status` selects the mode now; `--json` selects only the rendering, and the
+  resolver keeps the flag as typed so an explicit `fux hooks --json` still
+  reports. **ADR-OUTPUT's claim that a rendering config's blast radius is the
+  resolver was false for one verb** and now says so. 2026-09-11.
 
 ## Definition of done
 

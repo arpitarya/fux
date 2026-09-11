@@ -170,8 +170,9 @@ conflicts when the driver is unregistered, not on PATH, or both branches
 created the same shard file.
 
 ⚠ **`fux ingest` cannot read a shard with conflict markers** — it stops with
-`<shard>:1: not valid JSON`, even though the refusal message says to re-run it.
-**Take one side whole first**, then let ingest re-derive:
+`carries unresolved merge conflict markers`, which is what the driver's own
+refusal tells you to expect. **Take one side whole first**, then let ingest
+re-derive:
 
 ```bash
 # 1. resolve and `git add` the content conflicts (docs, .fux/sources/*) first

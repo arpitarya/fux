@@ -198,8 +198,10 @@ def main(argv: list[str] | None = None) -> int:
         print(
             f"fux: cannot merge {ours.name} — {len(exc.ids)} document(s) changed on both sides "
             f"at the same revision: {', '.join(exc.ids[:5])}\n"
-            f"     Resolve by re-running `fux ingest`, which derives the index from the merged "
-            f"content rather than from either side's copy.",
+            f"     This file now holds BOTH sides with conflict markers, so no fux verb can "
+            f"read it until one side is taken. A shard is derived, so either is fine:\n"
+            f"     git checkout --ours -- .fux/index/{ours.name}   (or --theirs)\n"
+            f"     fux ingest                                      rebuilds it from the merged content",
             file=sys.stderr,
         )
         return 1
