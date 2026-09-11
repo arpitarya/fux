@@ -30,6 +30,26 @@ valuable judgement, but not the state of play.
 *Updated **2026-09-11**.* **Ground it before you edit it** — `git log`, `git tag`,
 [`IMPLEMENTATION.md`](IMPLEMENTATION.md), [`regression/`](regression/README.md).
 
+### `.fux/pii.toml` is REQUIRED now (2026-09-11, Cowork — W-128 + W-129, uncommitted)
+
+- **Every command but `setup`/`tune`/`output` refuses in a repo without it**; `doctor` runs and fails the row. Rule and exemptions: [ADR-PII](../docs/adr/0060_pii.md) decision 17 — do not restate them.
+- **Writing a test that builds a repo by hand?** Write `.fux/pii.toml` (empty is fine) or ingest and every CLI verb refuse.
+- **Rules may name a checksum** (`validate = "luhn" | "verhoeff"`), a closed engine set — decision 16. Allowlists, shared packs and path scoping were offered and not chosen.
+- ⚠ W-128's code rode into `fa47760` unannounced; its records and all of W-129 are uncommitted.
+
+### W-130 filed: the types file as TOML is a proposal, not a build (2026-09-11, Cowork)
+
+- **Arpit wants `.fux/sources/types` → `.fux/types.toml`.** It is in
+  [`compare/types-toml.compare.md`](compare/types-toml.compare.md), proposed
+  **D** (`include` array + `[decoders]` keyed by extension), **awaiting his §5
+  rulings.** Nothing is built.
+- ⚠ **Do not start the build from the chat's answers.** One of them (*ordered
+  rule list*) was given on a false claim that `!` lines are order-sensitive; the
+  compare doc is the current question.
+- ⛔ **The build is also gated on W-126 committing** — same four files.
+- 🔴 **It reverses ADR-TYPES' recorded TOML rejection.** A session that builds it
+  amends ADR-TYPES' §Alternatives in the same commit, not a later one.
+
 ### `[index]` in tune.toml: `max_phrases` (12 -> 32) and `max_table_rows` (2026-09-11, latest — uncommitted)
 
 - **Ruling (Arpit):** both index limits live in `.fux/tune.toml [index]`, not

@@ -46,6 +46,11 @@ as PII* is a policy question that differs by jurisdiction, industry and
 corpus, and a floor fux imposed would be both wrong somewhere and impossible
 to switch off.
 
+⚠ **The file itself is required** (ADR-PII decision 17): `fux setup` writes the
+starter, `load()` raises without it, and the CLI refuses every verb but
+`setup`, `tune`, `output` and `doctor`. A file with no rules is legal and
+redacts nothing -- that is a committed choice. A missing file is an accident.
+
 ## Checksums are the engine's, and the set is closed
 
 A regex sees shape. A payment card and an Aadhaar number also carry a check
@@ -278,18 +283,37 @@ def rules_path(root: Path) -> Path:
     return root / ".fux" / RULES_NAME
 
 
-def load(root: Path) -> tuple[Rule, ...]:
-    """Parse `.fux/pii.toml`. Absent is `()`; malformed raises.
+def require(root: Path) -> Path:
+    """`.fux/pii.toml`, or `FuxError` naming the fix. ADR-PII decision 17.
 
-    Absent is a legitimate configuration — a repo of public documentation has
-    no PII to remove. Malformed raises for the same reason `refusals.toml`
-    does: a rules file that silently failed to parse looks exactly like a repo
-    with no rules, and the consequence is discovered by someone reading a
-    committed index months later.
+    The one place the refusal is worded: `load()` calls it, and the CLI gate
+    calls it on the path where the file is missing, so a person meets the same
+    sentence whichever layer stopped them.
     """
     path = rules_path(root)
     if not path.is_file():
-        return ()
+        raise FuxError(
+            f"{path.relative_to(root).as_posix()} is missing, and fux will not run without it (ADR-PII decision 17). "
+            "Run `fux setup` to write the starter, then review its rules; to redact "
+            "nothing, keep the file with no [[rule]] entries."
+        )
+    return path
+
+
+def load(root: Path) -> tuple[Rule, ...]:
+    """Parse `.fux/pii.toml`. Absent raises; malformed raises; no rules is `()`.
+
+    ⚠ **Absent raised nothing until 2026-09-11** -- it read as "no rules", and
+    a deleted file was indistinguishable from a public-docs repo that had
+    decided to redact nothing. Decision 17 keeps the second and refuses the
+    first: a file with every rule commented out still loads to `()`.
+
+    Malformed raises for the same reason `refusals.toml` does: a rules file
+    that silently failed to parse looks exactly like a repo with no rules, and
+    the consequence is discovered by someone reading a committed index months
+    later.
+    """
+    path = require(root)
     try:
         data = tomllib.loads(path.read_text(encoding="utf-8"))
     except tomllib.TOMLDecodeError as exc:

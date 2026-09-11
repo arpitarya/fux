@@ -398,6 +398,36 @@ null
     branches on `absent`** — if anything ever does, the two facts have stopped
     being the same resolution and this note is wrong.
 
+20a. ⚠ **Decision 20's lesson was applied by a DIFFERENT record on
+    2026-09-11, and the evidence it was learned is an exemption list.**
+    [ADR-PII](0060_pii.md) decision 17 makes a missing `.fux/pii.toml` a hard
+    stop — the same mechanism decision 19 chose and decision 20 reversed, for a
+    file with the same write-if-missing lifecycle. **The difference is
+    `PII_EXEMPT` in `cli.py`**, which carries `doctor` alongside `setup`,
+    `tune` and `output`: the verb you would run to find out why is the one verb
+    that still runs, and it reports the missing file as an error row naming the
+    fix. Measured 2026-09-11 on a scratch repo — `fux doctor` exits 2 and
+    completes every other row; `ask` and `find` exit 1.
+
+    **Why this belongs in THIS record and not only in ADR-PII.** Decision 20 is
+    the only written account of what decision 19 cost (49 red tests on `main`,
+    with `doctor` among the casualties), and a later record reaching the
+    opposite conclusion about the same mechanism would read as a contradiction
+    unless the reconciliation is stated where the reversal lives.
+    **The two are not in conflict: decision 20 reversed a refusal that took
+    `doctor` out, not every refusal for an absent file.** The gate is the
+    availability of the verb that names the fix.
+
+    ⚠ **What is NOT reconciled, and is Arpit's:** decision 17 still breaks
+    every repo that predates `.fux/pii.toml`, exactly as decision 19 did —
+    `fux ask` and `fux find` exit 1 after an upgrade until `fux setup` runs.
+    [ADR-DOTFUX](0012_fux-directory.md) decision 6's distinction says a loader
+    refusal is for a file that **exists and is wrong**, and a `doctor` check is
+    for one that is **simply absent**. This is absence. **It is recorded here
+    as a live tension rather than adjudicated**, because the answer turns on
+    whether redaction is a thing a repo may silently not have — which is a
+    ruling, not a reading.
+
 21. **`ask` gained `sections`, and it reaches BOTH renderings. Ruled by
     Arpit, in Cowork, 2026-08-28.** W-84 put the matched headings under each
     `ask` hit as indented `§` lines. They shipped **unconditional, with no

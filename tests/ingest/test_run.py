@@ -10,6 +10,8 @@ def _init(tmp_path, files: dict[str, str], toml: str = "[sources]\n", dirs=("doc
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("".join(f"{d}\n" for d in dirs), encoding="utf-8")
     (tmp_path / "fux.toml").write_text(toml, encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     for rel, text in files.items():
         path = tmp_path / rel
         path.parent.mkdir(parents=True, exist_ok=True)

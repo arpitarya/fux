@@ -77,9 +77,12 @@ def test_the_url_attribute_set_is_exactly_these_six():
     attribute. This one does not, so a new attribute is *visible* -- it lands
     as one failing assertion naming what appeared, rather than as five
     unrelated ones (W-100) or as nothing at all.
+
+    It did its job on 2026-09-11: `archived` joined and this was the single
+    failure that named it.
     """
     assert [a.name for a in sourcelist.URLS.attributes] == [
-        "fetch", "meta", "keep", "ttl", "enrich",
+        "fetch", "meta", "keep", "ttl", "enrich", "archived",
     ]
     assert _defaults() == {
         "fetch": "http",
@@ -87,7 +90,29 @@ def test_the_url_attribute_set_is_exactly_these_six():
         "keep": "true",      # ADR-ACQUIRED: retention is on, the store is bounded
         "ttl": "24h",        # ADR-URL-FRESHNESS: not 0; see decision on the default
         "enrich": "false",   # ADR-PII: enrichment is always opted into
+        "archived": "false", # ADR-ARCHIVED-CONTENT: declared, never inferred
     }
+
+
+def test_archived_is_the_same_attribute_on_both_lists():
+    """W-126. A retired page behind a URL must be declarable the way a retired
+    directory is — same name, same values, same default, one meaning."""
+    url_attr = next(a for a in sourcelist.URLS.attributes if a.name == "archived")
+    dir_attr = next(a for a in sourcelist.DIRS.attributes if a.name == "archived")
+    assert (url_attr.values, url_attr.default) == (dir_attr.values, dir_attr.default)
+
+
+def test_archived_has_no_source_wide_layer():
+    """It is a fact about one DOCUMENT, not a policy about reaching a source.
+
+    `keep`, `ttl` and `enrich` each have a `[sources.url]` middle layer because
+    each answers "how do I reach these pages?". `archived` answers "is this page
+    retired?", which no source-wide value can say, so `config.UrlSource` must
+    never grow the key. `dirs` made the same call.
+    """
+    from fux.config import UrlSource
+
+    assert not hasattr(UrlSource, "archived")
 
 
 def test_absent_attributes_take_their_defaults_and_are_not_declared():
@@ -173,9 +198,22 @@ def test_dirs_rejects_an_absolute_path_or_an_escape():
         _parse("../elsewhere", sourcelist.DIRS)
 
 
-def test_urls_attributes_are_not_legal_in_dirs_and_vice_versa():
-    with pytest.raises(FuxError, match=r"unknown attribute 'archived'"):
-        _parse("https://x.test/a archived=true", sourcelist.URLS)
+def test_urls_attributes_are_not_legal_in_dirs():
+    """⚠ **This test lost its "and vice versa" half on 2026-09-11** (W-126).
+
+    It used `archived` as the example of a `dirs`-only attribute, and `urls`
+    now carries it. **No attribute is `dirs`-only any more** — `DIRS`' set
+    (`archived`, `enrich`) is a subset of `URLS`' — so the reverse direction has
+    nothing left to assert and asserting it on a substitute would be a test
+    written to stay green. The direction that still carries real information is
+    the one below, and `test_archived_is_the_same_attribute_on_both_lists`
+    covers the overlap deliberately rather than by omission.
+    """
+    with pytest.raises(FuxError, match=r"unknown attribute 'fetch'"):
+        _parse("docs fetch=cdp", sourcelist.DIRS)
+    assert {a.name for a in sourcelist.DIRS.attributes} < {
+        a.name for a in sourcelist.URLS.attributes
+    }
 
 
 # -- the writer ------------------------------------------------------------

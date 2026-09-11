@@ -356,3 +356,88 @@ def test_the_freshness_gate_actually_consults_describers() -> None:
     assert "ADR-ASK" in touched, "the owner must still be demanded"
     assert "ADR-CONFIDENCE" in touched, "a describer must be demanded too"
     assert "ADR-OUTPUT" in touched
+
+
+# -- which records the freshness gate can never open (measured 2026-09-11) ---
+
+#: Records that own and describe **no `src/` component at all**, so
+#: `test_adr_freshness` can never demand them: no code change can open them.
+#:
+#: ⚠ **This is an INVENTORY, not an approval.** It was measured on 2026-09-11
+#: while W-126 amended [ADR-ARCHIVED-CONTENT], which was on this list — the
+#: record the change was ABOUT could not be demanded, and the gate asked for
+#: seven others instead. Four `describes` rows fixed that one; the other 27 are
+#: recorded rather than fixed, because deciding whether each *should* own
+#: something is a per-record judgement and doing 27 of them silently is how a
+#: register stops meaning anything.
+#:
+#: **Two legitimate reasons appear on this list and they are not the same:**
+#:
+#: 1. **Process records with no code** — the nine `ADR-LAW-*`, `ADR-OWNERSHIP`,
+#:    `ADR-PORT-LIST`, `ADR-DOCS-TABLE`, `ADR-RS`, `ADR-QUALITY`. Nothing is
+#:    owed; there is no component to own.
+#: 2. 🔴 **Records whose subject IS code, sitting inside a directory another
+#:    record claims** — `ADR-FIND`, `ADR-RECORD`, `ADR-POSTINGS`, `ADR-TYPES`,
+#:    `ADR-DIR-LIST`, `ADR-CDP-FETCHER`, `ADR-URL-INGEST` and the three
+#:    `ADR-RUNTIME-*`. **These are the ADR-ANSWER shape**, which the register's
+#:    own describes-table note already records as a defect that shipped.
+#:
+#: The pin is deliberate: a record that GAINS coverage, or a new record that
+#: arrives with none, lands as one failing assertion naming itself.
+_UNREACHABLE_BY_THE_GATE = {
+    "ADR-CACHEDIR-TAG", "ADR-CDP-FETCHER", "ADR-DIR-LIST", "ADR-DOCS-TABLE",
+    "ADR-FIND", "ADR-HTTP-FETCHER", "ADR-LAW-0", "ADR-LAW-1", "ADR-LAW-2",
+    "ADR-LAW-3", "ADR-LAW-4", "ADR-LAW-5", "ADR-LAW-6", "ADR-LAW-7",
+    "ADR-LAW-8", "ADR-LOCKS", "ADR-OWNERSHIP", "ADR-PORT-LIST",
+    "ADR-POSTINGS", "ADR-QUALITY", "ADR-RECORD", "ADR-RS",
+    "ADR-RUNTIME-MANIFEST", "ADR-RUNTIME-STAMP", "ADR-RUNTIME-STATS",
+    "ADR-TYPES", "ADR-URL-INGEST",
+}
+
+
+def _records_with_no_src_component() -> set[str]:
+    from adr_lib import describes_table, ownership_table
+
+    covered: dict[str, set[str]] = {}
+    for component, record in ownership_table().items():
+        covered.setdefault(record, set()).add(component)
+    for component, records in describes_table().items():
+        for record in records:
+            covered.setdefault(record, set()).add(component)
+    return {
+        name
+        for name in _record_names()
+        if not any(c.startswith("src/") for c in covered.get(name, ()))
+    }
+
+
+def _record_names() -> set[str]:
+    names = set()
+    for path in sorted(ADR_DIR.glob("0*.md")):
+        for line in path.read_text(encoding="utf-8").splitlines()[:12]:
+            if line.startswith("name:"):
+                names.add(line.split(":", 1)[1].strip().strip('"'))
+                break
+    return names
+
+
+def test_the_set_of_gate_unreachable_records_is_exactly_this() -> None:
+    """A record gaining or losing gate coverage must be seen, not inferred."""
+    actual = _records_with_no_src_component()
+    assert actual == _UNREACHABLE_BY_THE_GATE, (
+        "the set of records no code change can open has moved.\n"
+        f"  newly unreachable: {sorted(actual - _UNREACHABLE_BY_THE_GATE)}\n"
+        f"  newly reachable:   {sorted(_UNREACHABLE_BY_THE_GATE - actual)}\n\n"
+        "Newly reachable is good news — delete it from the pin. Newly "
+        "unreachable means a record arrived that no change to src/ can ever "
+        "demand, which is the ADR-ANSWER defect: give it a describes row, or "
+        "add it here with the reason it genuinely owns no code."
+    )
+
+
+def test_archived_content_is_reachable_now() -> None:
+    """W-126's own fix, asserted rather than assumed.
+
+    The record was unreachable while the change amending it was being written.
+    """
+    assert "ADR-ARCHIVED-CONTENT" not in _records_with_no_src_component()

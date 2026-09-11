@@ -273,6 +273,20 @@ candidate and is routinely a *different* one now. Reporting candidate one's
 six labels exist to prevent, and `query/__init__.py::_freshness_of` is where it
 is prevented.
 
+⚠ **`ttl` and `archived` answer different questions about the same URL, and
+2026-09-11 put them on adjacent lines** (W-126). `ttl` is this record's: **how
+long may this citation go unchecked** — a statement about fux's confidence in
+its own copy, resolved through three layers because a source can answer it for
+all its pages. `archived` is a statement about **the page's standing in the
+world**, resolved through two.
+
+🔴 **Neither implies the other, and the combination that proves it is the
+useful one:** a retired page is exactly the page whose bytes will never change
+again, so `archived=true ttl=720h` is a perfectly coherent line — *this is
+retired, and re-checking it weekly is enough*. A reader who folded the two
+would conclude that a retired page needs no freshness policy, which is the
+opposite of what a citation to a retired page needs.
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

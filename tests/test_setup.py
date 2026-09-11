@@ -327,6 +327,22 @@ def test_a_plain_ingest_puts_no_code_in_the_repo(tmp_path):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("docs\n", encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
 
     ingest(tmp_path)
     assert not (tmp_path / ".fux" / "fetchers").exists()
+
+
+def test_setup_writes_the_pii_starter_and_never_rewrites_it(tmp_path):
+    """ADR-PII decision 17: the starter's header said setup wrote it; now it does."""
+    from fux.ingest import pii
+
+    setup_mod.run(tmp_path, agents=False)
+    path = pii.rules_path(tmp_path)
+    assert path.read_bytes() == setup_mod.template_bytes(setup_mod.PII_TEMPLATE)
+    assert pii.load(tmp_path), "the starter ships its safe rules enabled"
+
+    path.write_text("# redact nothing, on purpose\n", encoding="utf-8")
+    setup_mod.run(tmp_path, agents=False)
+    assert path.read_text(encoding="utf-8") == "# redact nothing, on purpose\n"

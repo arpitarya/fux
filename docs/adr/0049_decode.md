@@ -544,6 +544,14 @@ it is a property of the instance, not the format.
   independently of any strategy — the chunker's own level check is belt and
   braces, because a decoder is consumer-replaceable and that invariant is not.
 
+⚠ **`doctor` gained a `ranking priors` row on 2026-09-11 and
+`decoder bindings` is unaffected** (W-126 part B). Recorded because the two
+rows read the same parsed index (`doctor._RECORDS`) and a reader could
+reasonably wonder whether a third consumer changes the caching argument: it
+does not. `_RECORDS` is parsed once per `run()` and reset at the top of each,
+which is exactly why it was built that way — the note in `doctor.py` says
+*three checks need per-record fields*, and it is now four.
+
 ### Consequences
 
 - **The converter duplication is structurally impossible now**, and the

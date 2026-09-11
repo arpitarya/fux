@@ -38,6 +38,8 @@ def repo(tmp_path):
     (tmp_path / ".fux" / "sources").mkdir(parents=True)
     (tmp_path / ".fux" / "sources" / "urls").write_text("# my list\n", encoding="utf-8")
     (tmp_path / ".fux" / "sources" / "dirs").write_text("docs\n", encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / "docs").mkdir()
     (tmp_path / "docs" / "a.md").write_text("# A\n\nbody\n", encoding="utf-8")
     (tmp_path / "docs" / "b.md").write_text("# B\n\nbody\n", encoding="utf-8")
@@ -175,8 +177,18 @@ def test_a_flag_the_list_does_not_have_is_an_error_not_a_no_op(repo, monkeypatch
     """
     with pytest.raises(FuxError, match="which `dirs` does not have"):
         _add(repo, monkeypatch, _args("docs", cdp=True))
-    with pytest.raises(FuxError, match="which `urls` does not have"):
-        _add(repo, monkeypatch, _args("https://x.test/a", archived=True))
+
+
+def test_archived_is_now_legal_on_a_url_too(repo, monkeypatch):
+    """W-126, 2026-09-11. This assertion used to run the other way.
+
+    `fux add <URL> --archived` was *the* example of a flag `urls` does not
+    have, in the test above. It has it now, and a retired page behind a URL can
+    finally be declared retired — the asymmetry was never a decision, just the
+    order the two lists were built in.
+    """
+    _add(repo, monkeypatch, _args("https://x.test/a", archived=True))
+    assert "https://x.test/a fetch=http meta=hashed keep=true ttl=24h enrich=false archived=true" in _urls(repo)
 
 
 def test_a_non_http_url_is_refused_before_anything_is_written(repo, monkeypatch):

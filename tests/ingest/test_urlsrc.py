@@ -52,6 +52,8 @@ def _write_toml(tmp_path, text, dirs=("docs",)):
     listing = tmp_path / ".fux" / "sources" / "dirs"
     listing.parent.mkdir(parents=True, exist_ok=True)
     listing.write_text("".join(f"{d}{chr(10)}" for d in dirs), encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
 
 
 def _write_urls(tmp_path, lines):

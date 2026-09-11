@@ -42,8 +42,8 @@ diff before believing your own copy is current.
 | 🔴 **THE ADR FRESHNESS GATE IS RED ON A COMMIT THAT IS ALREADY MADE, and the honest fixes are both his.** ✅ **Everything else in this row closed 2026-09-11**: `_to_delete/` is gone, the suite ran on the MacBook (**3 131 unit + 78 e2e green**), and the tree is committed. ⚠ **`ruff` was listed as an unrun gate and is not one** — it is in neither `[dev]` nor `.github/workflows/ci.yml`. 🔴 **What is left:** `94231b2bf` (W-114) fails `test_adr_freshness.py`. **Diagnosed 2026-09-11 and the gate is OVER-FIRING**: the commit changed `src/fux/config.py` only to add `"codex"` to `[agents] install`, and the three records it is convicted of missing — ADR-ACQUIRED, ADR-PII, ADR-URL-FRESHNESS — *describe* that file for `keep`/`acquired_max_bytes`, `enrich` and `ttl`, **none of which it touched**. The `describes` relation is file-scoped and the descriptions are key-scoped. **So there are exactly three moves and every one is a ruling:** (a) rebase to make the commit touch three records it has no business touching; (b) narrow `describes` to key scope — a gate change, and loosening a check to pass is the moving-threshold failure in another costume; (c) move `docs/adr/RULE-SINCE`, which the test's own docstring calls the blunt instrument that **retires ninety-five commits to forgive three**. **No session may pick one.** 🔴 **And 11 commits are unpushed** — pushing is outward-facing and was not asked for | 2026-09-06 | 5d |
 | ⚠ **Whether the prior enrichment measurements need re-running.** W-110 found that a newly written enrichment was **never indexed on an incremental ingest** (reuse was keyed on the document's sha alone) — shipped that way from W-76 Phase 8 to 2026-09-05. **Every enrichment measurement on record ran through it**, and whether any under-measured enrichment depends on whether its harness ingested from clean. [`2026-08-24-blind-enrichment-second-author`](regression/2026-08-24-blind-enrichment-second-author/ANALYSIS.md)'s `+1 / −1` is the one that matters, because it is what motivated replacing prose with questions. ⚠ **AUDITED 2026-09-06 and the answer is NO — kept open at Arpit's request, not because the question is open.** `run.py:320` is `reusable = {} if (full or pii_moved) else _reusable(...)`, so **`--full` empties reuse and the defect cannot fire**; the `+1 / −1` run used `fux ingest --full` per arm and `2026-08-28-placebo-and-seal` wiped `.fux/index` and `.fux/runtime` per arm. **No re-run is needed and no corpus is required** — the row's earlier *"a re-run needs a corpus that no longer exists"* is withdrawn. 🔴 **What is genuinely open is a different thing**: `placebo-and-seal` SAW the symptom on 2026-08-28 (*"0 changed, 10 carried forward"*, all arms identical) and **worked around it per-arm instead of recognising an engine defect**, which hid it for a week — a measurement-discipline lesson owed to [ADR-RS](../docs/adr/0043_predictions.md), not an enrichment fact | 2026-09-05 | 6d |
 | 🟠 **`superseded_weight` — RULED 2026-09-11: REMEASURE FIRST, then decide.** Arpit declined both standing options (ship the `fux doctor` disclosure now; do nothing). ⚠ **The ruling does NOT unblock it** — W-94 below carries what the remeasure needs, and the question it must actually ask, which is **not** *"which value?"* but *"does ANY single global value clear `0 broken`?"*. Blocked on the uncommitted playground | 2026-08-28 | 14d |
-| 🟠 **`rerank_weight` — Arpit asked for `1.0` on 2026-09-11; HELD, and the reason is recorded in W-126.** The ask came from a premise that does not hold: *the reranker should depend on an archived flag*. **It cannot and must not** — the reranker is proximity only (coverage², min span, adjacency) and has no concept of retirement; the archived flag already reaches ranking through **`archived_weight`**, a different knob. Wiring it into the reranker would state one rule in two places (L0). ⚠ **`rerank_weight = 1.0` is a separate, corpus-wide ranking change** whose evidence is `+4` hand-graded, `informed`, **below the resolution floor** — so it falls under the same *remeasure first* ruling Arpit gave `superseded_weight` the same day, on the same blocked corpus | 2026-08-28 | 14d |
-| 🟢 **W-126 — `archived=` on URL lines, and the no-op disclosure. READY TO BUILD, no decision owed.** Two things Arpit asked for on 2026-09-11 that need no measurement and change no ranking: URL source lines gain the `archived` attribute `dirs` lines already have, and `fux doctor` discloses every ranking prior that ships as a no-op. ⚠ **No new ADR** — see the item below for why. **Hand to Claude Code** | 2026-09-11 | 0d |
+| 🟠 **`rerank_weight` — Arpit asked for `1.0` on 2026-09-11; HELD, and the reason is recorded in [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) decision 1a.** The ask came from a premise that does not hold: *the reranker should depend on an archived flag*. **It cannot and must not** — the reranker is proximity only (coverage², min span, adjacency) and has no concept of retirement; the archived flag already reaches ranking through **`archived_weight`**, a different knob. Wiring it into the reranker would state one rule in two places (L0). ⚠ **`rerank_weight = 1.0` is a separate, corpus-wide ranking change** whose evidence is `+4` hand-graded, `informed`, **below the resolution floor** — so it falls under the same *remeasure first* ruling Arpit gave `superseded_weight` the same day, on the same blocked corpus | 2026-08-28 | 14d |
+| ⏳ **W-130 — does the types file become `.fux/types.toml`, and in what shape?** Your ask of 2026-09-11. It **reverses ADR-TYPES' recorded rejection** of a TOML types list and splits the one grammar `dirs`/`urls`/`types` share, so it went to [`compare/types-toml.compare.md`](compare/types-toml.compare.md) first. Proposed **D**: an `include` glob array plus a `[decoders]` table keyed by extension — six sub-forks in its §5. ⚠ The chat question that picked *an ordered rule list* claimed `!` lines are order-sensitive; **they are not** (the loader sorts). Under *fux build* | 2026-09-11 | 0d |
 | **Whether zero abstentions out of 20 gates anything** — under *adr update* | 2026-08-28 | 14d |
 | **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0043_predictions.md) — under *adr update* | 2026-08-28 | 14d |
 | **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 14d |
@@ -83,6 +83,19 @@ diff before believing your own copy is current.
 
 ### fux build
 
+- ⏳ **W-130 — the types file becomes `.fux/types.toml`.**
+  `arpit`, then `agent` · *(records: [ADR-TYPES](../docs/adr/0038_types-list.md) ·
+  [ADR-URL-LIST](../docs/adr/0026_url-list.md) · ADR-CLI · ADR-DOTFUX · ADR-DECODE)* ·
+  **Blocked on the verdict** in [`compare/types-toml.compare.md`](compare/types-toml.compare.md),
+  **W-126's edits to those four files are committed**, so that half is clear.
+  Spec and definition of done: [`open/W-130-types-toml.md`](open/W-130-types-toml.md). `filed: 2026-09-11`
+
+- 🔴 **`config.schema.json` advertises a `[sources] types_file` key that nothing reads.**
+  `agent` · *(record: [ADR-CONFIG](../docs/adr/0023_config.md))* · Found 2026-09-11 writing W-130's
+  compare doc. The schema gives it a default of `.fux/sources/types`; `config.py` has no such key and every
+  caller uses the `DEFAULT_TYPES_FILE` constant. **Independent of W-130's verdict** — either the key is
+  implemented or the schema entry goes. `filed: 2026-09-11`
+
 - 🔴 **`fux doctor` reports `[OK]` for a `fux.toml` that will not load.**
   `agent` · *(record: [ADR-DOCTOR](../docs/adr/0011_cli-surface.md) ·
   [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) decision 6)* · **Found
@@ -95,90 +108,6 @@ diff before believing your own copy is current.
   is one new row — `fux.toml loads` — reporting the loader's own message**;
   ADR-DOTFUX decision 6's fifth ⚠ carries the diagnosis and says why it was
   filed rather than patched there. `filed: 2026-09-11`
-
-- 🟢 **W-126 — `archived=` on URL lines, and `fux doctor` discloses the no-op
-  priors.** `agent` · *(records: [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) ·
-  [ADR-URL-LIST](../docs/adr/0026_url-list.md) · [ADR-DOCTOR](../docs/adr/0011_cli-surface.md) ·
-  [ADR-TUNE](../docs/adr/0045_tuning.md))* · **Arpit's asks of 2026-09-11,
-  reduced to the parts that need no measurement.** Ready for Claude Code.
-  `filed: 2026-09-11`
-
-  **A · `archived` becomes a URL-line attribute.** `dirs` lines carry
-  `Attribute("archived", ("true","false"), "false")`
-  (`ingest/sourcelist.py`); **`urls` lines carry `fetch`, `meta`, `keep`,
-  `ttl`, `enrich` and NOT `archived`** — verified 2026-09-11. A retired page
-  behind a URL cannot be declared retired at all, which is a real asymmetry
-  and Arpit's instinct was right. **Amends two records; adds no law and no
-  new record.** ⚠ ADR-URL-LIST decision 12 applies — a fux-written line states
-  every attribute at its default, and `archived` has a real default, so it is
-  written rather than omitted.
-
-  **B · `fux doctor` discloses every ranking prior that ships as a no-op.**
-  `archived_weight 1.0` · `superseded_weight 1.0` · `rerank_weight 0.0` ·
-  `recency_half_life_days 0.0`. 🔴 **All four mechanisms are built, wired and
-  switched off, and nothing tells the author** — a repo that declares
-  `archived=true` or `supersedes:` gets exactly nothing and is not told. **This
-  is a disclosure, not a ranking change**, and it is the cheapest honest answer
-  to the whole no-op pattern. ⚠ It states the fact and **refuses to recommend a
-  value** — recommending one is the remeasure's job (W-94), not `doctor`'s.
-
-  🔴 **NO NEW ADR IS WRITTEN, and this is the correction that matters.** Arpit
-  asked for *"a new ADR for archive… let me check whether we have one. We do
-  not."* **We do**:
-  [ADR-ARCHIVED-CONTENT (0044)](../docs/adr/0044_archived-content.md),
-  `accepted` 2026-08-22, in the ownership table, owning
-  `tools/archived-signal-eval/`. **Writing a second one would break L0 the same
-  week it was ruled** — a rule is stated in exactly one ADR. Part A is an
-  amendment to it.
-
-  🔴 **And the reranker is NOT how archived reaches ranking.** The ask was
-  *"the reranker can depend on archived=true"*. It must not: the reranker is
-  **proximity only** — coverage², min span, adjacency over the same analyzed
-  token stream — and has no concept of retirement. The flag already reaches
-  ranking at `rank.py:214` as `score × archived_weight`, and
-  `_record_is_archived` resolves it. **Putting it in the reranker too would
-  state one rule in two places.** ⚠ `archived` and `superseded` are
-  **independent flags** — a document can be both.
-
-- 🔴 **W-127 — how fux can and cannot know a document is retired, stated once
-  where it can be cited.** `arpit` · *(record:
-  [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) ·
-  [ADR-ENRICH](../docs/adr/0047_enrich.md))* · **Arpit asked the right question
-  on 2026-09-11 and the answer is scattered across four records and two runs.**
-  `filed: 2026-09-11`
-
-  His question: *"a document might look like a legal document and say nothing
-  about being retired — or ten documents could say it ten different ways."*
-  **Correct, and it is the whole difficulty.** The answer fux has is three
-  routes and one refusal:
-
-  | route | verdict |
-  |---|---|
-  | **infer from text** (*"obsolete"*, *"deprecated"*, *"no longer in force"*) | 🔴 **refused, and measured to BACKFIRE** |
-  | **`supersedes:`** on the successor | ✅ exact; needs a human, and cannot cover a document retired before its successor existed |
-  | **`superseded_by:`** in an enrichment | ✅ exact, **and never touches the original** — [ADR-ENRICH decision 17](../docs/adr/0047_enrich.md) |
-
-  🔴 **Inference does not merely fail, it inverts — measured here, not
-  argued.** Two blind authors independently broke the **same two** queries
-  ([`2026-08-24-blind-enrichment-second-author`](regression/2026-08-24-blind-enrichment-second-author/ANALYSIS.md))
-  because **BM25F cannot see negation**: *"no longer current"* and *"is
-  current"* are the same tokens, so honest retirement prose hands the retired
-  document the query's own word. **The more honestly a document says it is
-  retired, the higher it ranks for *current*.** The ten-phrasings problem is
-  the smaller one — a phrasing heuristic is exact for the repo that invented it
-  and a **silent convention for everybody else**, failing with no error.
-
-  ⚠ **And the hard limit, which no ranking function escapes:** if nothing in
-  the corpus declares the document retired, **the fact is not in the text** and
-  nothing recovers it — not BM25F, not the reranker, not embeddings. **Fux
-  should say it does not know**, which is W-126 part B.
-
-  **What is owed:** ADR-ARCHIVED-CONTENT states the three routes and the
-  refusal **in one place**, citing the blind run rather than restating it, so
-  the next person asking this question reads one record instead of
-  reconstructing it. ⚠ **`superseded_by:` in enrichment is the answer for an
-  untouchable original and is easy to miss** — it is currently a decision
-  inside ADR-ENRICH and is not discoverable from the archive record at all.
 
 - 🔴 **W-122 — L0: ADRs are the only source of truth, and the Law records
   outrank every other record.** 🟢 **L0 AND THE RENAME LANDED 2026-09-06** (uncommitted);
@@ -437,9 +366,12 @@ diff before believing your own copy is current.
   depend on `archived=true`*. **That is not what the knob does**: the reranker
   is proximity only and has no concept of retirement, and the archived flag
   already reaches ranking through **`archived_weight`** — a different knob,
-  also at its no-op (W-126 carries the correction in full). So the ask splits:
+  also at its no-op ([ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md)
+  decision 1a carries the correction in full). So the ask splits:
 
-  - **the part needing no measurement is W-126**, ready to build;
+  - ✅ **the part needing no measurement SHIPPED 2026-09-11** — `archived=` on
+    URL lines, and `fux doctor`'s `ranking priors` row, which discloses this
+    knob and the other three as switched off (was W-126);
   - **`rerank_weight = 1.0` itself is a corpus-wide ranking change** with `+4`
     hand-graded, `informed`, **below the resolution floor** — the same
     evidential position as `superseded_weight`, which Arpit ruled *remeasure

@@ -18,6 +18,8 @@ def test_fux_version_via_subprocess():
 
 def test_fux_doctor_via_subprocess(tmp_path):
     (tmp_path / ".git").mkdir()
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # ADR-PII decision 17
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],
         capture_output=True,
@@ -34,6 +36,8 @@ def test_fux_doctor_output_is_ascii_safe(tmp_path):
     exits 1 with a UnicodeEncodeError instead of printing. Force the
     strictest plausible stdout encoding to catch this on any platform."""
     (tmp_path / ".git").mkdir()
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")  # ADR-PII decision 17
     env = {**os.environ, "PYTHONIOENCODING": "ascii"}
     result = subprocess.run(
         [sys.executable, "-m", "fux.cli", "doctor"],
@@ -111,3 +115,40 @@ def test_a_generated_types_file_leaves_the_binding_check_quiet(tmp_path):
     )
     assert line.startswith("[OK]"), line
     assert "match no indexed document" not in line
+
+
+def test_a_repo_without_pii_toml_stops_every_gated_verb(tmp_path):
+    """ADR-PII decision 17 through the real CLI: refuse, name the fix, and the fix works."""
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True, capture_output=True)
+    (tmp_path / "fux.toml").write_text("", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text(
+        "# Alpha\n\nmail ops@example.com findable\n", encoding="utf-8"
+    )
+
+    def fux(*args):
+        return subprocess.run(
+            [sys.executable, "-m", "fux.cli", *args], capture_output=True, text=True, cwd=tmp_path
+        )
+
+    for verb in (("ingest",), ("find", "findable"), ("ask", "findable")):
+        refused = fux(*verb)
+        assert refused.returncode == 1, verb
+        assert "pii.toml is missing" in refused.stderr and "fux setup" in refused.stderr
+        assert refused.stdout == ""
+    assert not (tmp_path / ".fux" / "index").exists(), "nothing was indexed before the refusal"
+
+    doctor = fux("doctor")
+    assert doctor.returncode == 1
+    assert "[FAIL] pii rules" in doctor.stdout
+
+    assert fux("setup").returncode == 0
+    assert (tmp_path / ".fux" / "pii.toml").is_file()
+    ingest = fux("ingest")
+    assert ingest.returncode == 0, ingest.stderr
+    assert "[FAIL] pii rules" not in fux("doctor").stdout
+    # the starter's email rule is on: the address was redacted from the index
+    import json
+
+    counts = json.loads((tmp_path / ".fux" / "runtime" / "pii-counts.json").read_text("utf-8"))
+    assert counts["body"] == {"email": 1}, counts

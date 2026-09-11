@@ -215,3 +215,21 @@ def test_the_generated_readme_says_index_only():
 
     row = next(l for l in fuxdir._readme().splitlines() if "`pii.toml`" in l)
     assert "ONLY" in row
+
+
+def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
+    """ADR-PII decision 17's second layer: a library caller never reaches the CLI gate."""
+    from fux.errors import FuxError
+    from fux.ingest.run import run
+
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True)
+    listing.write_text("docs\n", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "a.md").write_text("# a\n\nmail a@b.com\n", encoding="utf-8")
+    with pytest.raises(FuxError, match="pii.toml is missing"):
+        run(tmp_path)
+    assert not (tmp_path / ".fux" / "index").exists() or not any(
+        (tmp_path / ".fux" / "index").iterdir()
+    ), "nothing may reach the committed index before the refusal"

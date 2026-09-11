@@ -10,6 +10,15 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
+- ⚠ **BREAKING — `.fux/pii.toml` is required** (W-129,
+  [ADR-PII](docs/adr/0060_pii.md) decision 17). `fux setup` now writes the
+  starter, and **every command except `setup`, `tune` and `output` stops with an
+  error in a repo without it**; `fux doctor` runs and reports it as a failing
+  row. A file with every rule commented out is legal and redacts nothing.
+  **Upgrading:** run `fux setup` once per repo. That turns the starter's six rules
+  on (email, JWT, AWS key, GitHub token, bearer token, PAN), and the next ingest
+  re-extracts in full.
+
 - **`phrases` keeps up to 32 headings, and the cap is `.fux/tune.toml [index]
   max_phrases`** (Arpit, 2026-09-11). It was a hard-coded 12: on fux's own
   corpus 87 of 563 markdown documents lost 1 055 headings, and 262 of the slots
@@ -29,6 +38,20 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   upgrading re-extracts every document once.**
 
 ### Added
+
+- **`.fux/pii.toml` rules can name a checksum — `validate = "luhn"` or
+  `"verhoeff"`** (W-128, [ADR-PII](docs/adr/0060_pii.md) decision 16). A match
+  is redacted only when its digits pass, so a payment-card or Aadhaar rule stops
+  eating order ids and timestamps. The set is closed and engine-owned — no
+  consumer code runs inside ingest. ⚠ **A checksum is a 1-in-10 filter**, so the
+  starter's `aadhaar` and `card` rules gain `validate` and **still ship
+  commented out**. `tools/pii-probe/` now prints how many shape matches a
+  checksum turned away. **An existing `pii.toml` keeps its digest**: upgrading
+  forces no full re-extract.
+  🔴 **Fixed on the way, in the starter:** with both rules enabled, `aadhaar`
+  (which runs first) could take the first twelve digits of a spaced card number
+  — one card in ten passes Verhoeff there. Its pattern now refuses a window
+  inside a longer digit group.
 
 - **`tests/test_open_work_is_not_stale.py` — the work queue now checks itself.**
   Five checks over `work/OPEN-WORK.md`'s *Blocked on Arpit* table: an age is

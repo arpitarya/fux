@@ -44,7 +44,7 @@ from .config import (
 )
 from . import decode as decode_mod
 from .errors import FuxError
-from .ingest import fuxignore, refusals, sourcelist
+from .ingest import fuxignore, pii, refusals, sourcelist
 from .ingest.urlsrc import DEFAULT_MAX_PARALLEL
 from .store import fuxdir
 
@@ -53,6 +53,7 @@ FETCHERS = {"http.py": "http.py.txt", "cdp.py": "cdp.py.txt"}
 
 #: The starter refusal rules, shipped as package data like the fetchers.
 REFUSALS_TEMPLATE = "refusals.toml.txt"
+PII_TEMPLATE = "pii.toml.txt"
 
 FETCHERS_DIR = "fetchers"
 
@@ -679,6 +680,10 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
     _write_if_missing(
         refusals.rules_path(root), template_bytes(REFUSALS_TEMPLATE), report, root
     )
+    # ADR-PII decision 17: the one consumer file every command REQUIRES. The
+    # starter's safe rules arrive enabled; the consumer edits or empties them,
+    # and a repo that already has the file keeps it -- empty or not.
+    _write_if_missing(pii.rules_path(root), template_bytes(PII_TEMPLATE), report, root)
     _write_if_missing(root / CONFIG_NAME, _CONFIG.encode("utf-8"), report, root)
     # Every key commented out, so a fresh repo runs on the engine's own
     # defaults and the file is a menu rather than a configuration (ADR-TUNE

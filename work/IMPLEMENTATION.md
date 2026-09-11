@@ -21,6 +21,128 @@ Rules:
 
 ---
 
+## W-126 + W-127 — a retired page behind a URL, and how fux can know (2026-09-11)
+
+**Arpit's two asks of 2026-09-11, reduced to the parts that need no
+measurement**, plus the question he raised alongside them.
+
+| what landed | where |
+|---|---|
+| **`archived` is the URL list's sixth attribute** — same name, values and default as on `dirs`, **line-level only** (no `[sources.url]` layer: it is a fact about a document, not a policy for reaching one) | [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) 1a · [ADR-URL-LIST](../docs/adr/0026_url-list.md) 11 |
+| the flag reaches **CARRIED** records, not only freshly fetched ones, and is **removed** when the line stops declaring it | [ADR-INGEST](../docs/adr/0016_ingest.md) 13a |
+| **`fux doctor` gained `ranking priors`** — every prior that is built, wired and switched off, with the count of documents each dead one would have acted on | [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) 10 |
+| **W-127 answered in one place**: three exact routes to knowing a document is retired, and one refusal — inference from retirement prose, **measured to invert** | [ADR-ARCHIVED-CONTENT](../docs/adr/0044_archived-content.md) 8 |
+| decision 20's lesson reconciled with ADR-PII decision 17, and the tension that is **not** reconciled named as Arpit's | [ADR-OUTPUT](../docs/adr/0054_output-defaults.md) 20a |
+
+🔴 **The finding on fux's own corpus: 391 documents declare `archived=true` and
+`archived_weight` is `1.0`.** The demotion is implemented, reads its input, and
+returns the score unchanged. Nothing told anybody until this row existed.
+⚠ **The check refuses to recommend a value**, and the refusal is test-bound —
+the only such change ever measured (`superseded_weight` at `0.5`) **fixed two
+queries and broke two**, and every broken one had the superseded document as its
+correct answer.
+
+🔴 **A gate defect found and fixed on the way, and a bigger one measured.**
+ADR-ARCHIVED-CONTENT owned no `src/` component, so `test_adr_freshness` **could
+never demand the record this change was about** — it asked for seven others
+instead. Four `describes` rows fix it. **27 of 63 records are still in that
+position**, now pinned by
+`test_adr_ownership.py::test_the_set_of_gate_unreachable_records_is_exactly_this`
+so the number cannot drift in silence. Two causes, and only one is benign:
+process records with no code (the nine Laws, ADR-OWNERSHIP, ADR-RS…) owe
+nothing; **ADR-FIND, ADR-RECORD, ADR-POSTINGS, ADR-TYPES, ADR-DIR-LIST,
+ADR-CDP-FETCHER, ADR-URL-INGEST and the three ADR-RUNTIME-\* are the ADR-ANSWER
+shape**, which the register already records as a defect that shipped.
+
+⚠ **Two sessions wrote this tree at once** (this one and Cowork's W-128/W-129).
+`src/fux/doctor.py` ended up holding both, which is why this landed as one
+commit with W-129 rather than two.
+
+**Suite: 3 179 unit + 79 e2e green.** One failure, `test_adr_freshness` on
+`94231b2bf`, which predates both sessions and is Arpit's ruling.
+
+---
+
+## W-129 — `.fux/pii.toml` is required: `fux setup` writes it, every command refuses without it (2026-09-11)
+
+**Arpit, 2026-09-11:** *"fux setup should write pii.toml and should always use
+that"*; asked what a missing file does — *"hard stop, error for every command"*.
+
+| what landed | where |
+|---|---|
+| decision 17 (the table of who is gated), decisions 4/5/10/12 amended, a veto condition, §1 | [ADR-PII](../docs/adr/0060_pii.md) |
+| `setup` writes `pii.toml` in its list, the table row, and `output.toml`/`.fuxignore`/`refusals.toml` restored to decision 6's list | [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) |
+| decision 4: the gate's placement, before dispatch | [ADR-CLI](../docs/adr/0011_cli-surface.md) |
+| `pii.require()`; `load()` raises on a missing file | [`src/fux/ingest/pii.py`](../src/fux/ingest/pii.py) |
+| `_require_pii_rules` + `PII_EXEMPT` in `main`; no `fux.ingest` import on the success path | [`src/fux/cli.py`](../src/fux/cli.py) |
+| `setup` writes the starter; `doctor` reports a missing file as an error row | `setup.py` · `doctor.py` |
+| the starter's header made true; the generated `.fux/README.md` row says REQUIRED | `templates/pii.toml.txt` · `store/fuxdir.py` |
+| **this repo's own `.fux/pii.toml`** — the starter, byte-identical, so fux keeps running here | `.fux/pii.toml` |
+| 11 new tests (every verb walked against the exemption set, the gate/`rules_path` equality, no-import on success, doctor error row, `run()` refusal, setup writes and keeps) and an e2e test through the real CLI; **21 fixture repos in 20 test files** gain an empty `pii.toml` | `tests/` · `tests_e2e/` |
+
+**Evidence.** Cowork container, python 3.11, the full tree staged:
+**`tests` + `tests_e2e`: 3 252 passed, 6 failed, 10 skipped.** All six red are
+this container's, identical before the change: `test_adr_freshness` (no git
+history) and five `test_maintenance` hook tests (`fux` not on the hook
+environment's PATH). Before the fixtures were repaired the gate took the suite
+to **94 unit + 54 e2e red**, every one on the new refusal — the measured size of
+the upgrade cost decision 17 names.
+
+⚠ **This repo's next `fux ingest` re-extracts in full** (decision 11) and
+redacts the starter's matches — the example addresses and keys in ADR-PII's own
+prose among them.
+
+⚠ **Not committed.** `src/fux/doctor.py` carries this change and W-126's; one
+commit takes both.
+
+## W-128 — checksum validators for `.fux/pii.toml` (2026-09-11)
+
+**Arpit, 2026-09-11:** a PII TOML every consumer can configure and extend.
+**It already existed** (ADR-PII, 2026-09-01); shown that, he chose **checksum
+validators** from four proposed extensions (allowlists, shared packs + overrides
+and path scoping were offered and not chosen) and **TOML only** — YAML would be
+a runtime dependency under L1.
+
+| what landed | where |
+|---|---|
+| `validate = "luhn" \| "verhoeff"` — closed set, unknown name raises at load; `Rule.accepts` is the one definition of *would be replaced* | [`src/fux/ingest/pii.py`](../src/fux/ingest/pii.py) |
+| digest covers `validate` in the group slot; **every pre-existing ruleset's digest is unchanged** (literal pinned) | same |
+| starter: `validate` on the commented `aadhaar`/`card` rules, still off; `aadhaar` refuses a 4-4-4 window inside a longer digit group | [`src/fux/templates/pii.toml.txt`](../src/fux/templates/pii.toml.txt) |
+| probe prints shape matches a checksum rejected | [`tools/pii-probe/`](../tools/pii-probe/README.md) |
+| decision 16; decisions 6 and 12 amended; the `pii.py` hook alternative and the veto condition record what fired and what stays live; a stale *owed* line struck | [ADR-PII](../docs/adr/0060_pii.md) |
+| 16 new tests (18 cases): published vectors, one-check-digit over 1 000 payloads, every single-digit error, Verhoeff's `09`↔`90`, group-vs-match target, `expand` parity, digest stability, the starter's disabled rules loaded and run | [`tests/ingest/test_pii.py`](../tests/ingest/test_pii.py) |
+
+**Evidence.** In the Cowork container (python 3.11, the uv-tool pytest):
+`test_pii.py` · `test_pii_wiring.py` · `test_url_enrichment.py` ·
+`test_doctor.py` **152 passed**; `ruff check` clean on the three changed Python
+files. Luhn cross-checked against an independent digit-sum implementation over
+20 000 random strings, 0 mismatches. **Two mutations, both caught:** one
+Verhoeff table cell swapped; the aadhaar guards removed. **End to end** on a
+throwaway repo with both checksum rules enabled: ingest re-extracted with
+`0 changed, 0 carried forward` (decision 11 firing), `fux find` still finds the
+Luhn-failing order id and Verhoeff-failing batch id and no longer finds the
+passing Aadhaar, `doctor` reports `aadhaar x1, card x1, email x1`.
+
+⚠ **Not run:** the full suite, `tests_e2e`, and `test_adr_freshness` (no git
+history in the container).
+
+🔴 **The code is committed and the records are not — in two different
+changes, neither made by this session.** A concurrent Claude Code session's
+`fa47760` (*"`[index]` lands, the `pii-digest` ordering hole closes…"*) swept in
+this change's `pii.py`, starter, probe and tests while they were in the working
+tree; its message never mentions checksums. ADR-PII decision 16, this row, the
+CHANGELOG entry and W-129 were written after it and are **uncommitted**. So
+`fa47760` is a behaviour change whose record lands in a later commit — the
+exact thing Law zero forbids — and `test_adr_freshness` cannot see it, because
+that commit touched ADR-PII for decision 11. **Nobody amended it**: it is not
+this session's commit to rewrite.
+
+🔴 **Found, not fixed:** `pii.toml.txt` says *"`fux setup` writes it once if it
+is missing"* and **nothing ever has** — no commit has put `pii.toml` in
+`setup.py`, so the starter ships in the wheel and reaches no repo. Filed as **W-129** in
+[`OPEN-WORK.md`](OPEN-WORK.md), as a decision, because wiring it turns email and
+credential redaction on by default for every new repo.
+
 ## `[index]` lands, and the queue's environment blockers evaporate (2026-09-11)
 
 **Asked:** *"implement everything you possibly can and close out the items."*

@@ -320,6 +320,29 @@ parses — and never a path convention. Three properties, each deliberate:
   ships it re-ingests, and that diff is expected rather than a determinism
   failure. L3 still holds: same sources, same declaration, same bytes.
 
+
+**13a. …and since 2026-09-11, from a declared-archived URL LINE too** (W-126,
+[ADR-ARCHIVED-CONTENT](0044_archived-content.md) decision 1a). Three things
+about the wiring are decisions rather than mechanics:
+
+- **`_archived_url_ids` reads the raw entries, not `resolve_urls`.** `archived`
+  is line-level only, so there is no source-wide layer to apply — which is what
+  lets the **offline** ingest path resolve it as completely as the fetching one.
+  A repo can retire a page and have it take effect on the next plain
+  `fux ingest`, with no network and no `[sources.url]` block at all.
+- 🔴 **It is applied to CARRIED records**, through `_with_archived`, and that is
+  the half that makes the feature work. A carried record is a previous run's
+  bytes reused verbatim; a retired page is precisely the one that has stopped
+  changing, so a flag that only landed when the bytes moved **would never land
+  at all**. The `file:` side has always had this property for free, because a
+  `file:` record is rebuilt every run.
+- **The flag is removed when the line stops declaring it**, and the record is
+  returned **uncopied** when it already agrees — a run that changes nothing
+  still writes byte-identical shards (L3), and a flag that could be set but
+  never cleared is a one-way door.
+- **The list is read only when this run holds `url:` records**, so a corpus of
+  directories never touches it.
+
 **15. A skip carries its CLASS, and the summary counts the two separately.**
 `not indexed` is a committed list doing its job — the type allowlist, a
 `.fuxignore` line, a `!` exclusion in `.fux/sources/dirs`. `skipped` is a file

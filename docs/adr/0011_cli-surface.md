@@ -260,6 +260,11 @@ string.
 **4. `main` is the only boundary.** It catches `FuxError` → `error: <msg>` on
 stderr, exit `exc.exit_code`; and `KeyboardInterrupt` → exit 130. Internals
 raise. Any traceback that reaches a user is a bug.
+⚠ **It is also where one repository precondition is checked, before any
+handler runs** (2026-09-11): a missing `.fux/pii.toml` stops the verb. The rule,
+its exemptions and why are [ADR-PII](0060_pii.md) decision 17's, not this
+record's; what this record owns is the placement — **before dispatch**, so a
+verb added later is gated without its author knowing the gate exists.
 
 **5. Exit codes: `0` ok · `1` error · `130` interrupted. `2` is reserved and
 not produced** — no `raise FuxError` site passes `exit_code=2`. It is kept in

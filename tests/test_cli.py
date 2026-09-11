@@ -125,3 +125,86 @@ def test_no_verb_grows_a_subcommand_tree():
     for name, sub in command.choices.items():
         nested = [a for a in sub._subparsers._group_actions] if sub._subparsers else []
         assert not nested, f"`fux {name}` grew a subcommand tree"
+
+
+# -- ADR-PII decision 17: no .fux/pii.toml, no command -----------------------
+
+
+def _verbs():
+    import argparse
+
+    parser = build_parser()
+    sub = next(a for a in parser._actions if isinstance(a, argparse._SubParsersAction))
+    return sorted(sub.choices)
+
+
+def test_every_verb_is_gated_except_the_named_exemptions(tmp_path, monkeypatch):
+    """The table in ADR-PII decision 17, enforced over the parser as it is.
+
+    A verb added later is gated by default; exempting one means changing the
+    record's table and this set together.
+    """
+    from fux.cli import PII_EXEMPT, _require_pii_rules
+    from fux.errors import FuxError
+
+    assert PII_EXEMPT == {"setup", "tune", "output", "doctor"}
+    assert PII_EXEMPT <= set(_verbs())
+    (tmp_path / ".git").mkdir()
+    monkeypatch.chdir(tmp_path)
+    for verb in _verbs():
+        if verb in PII_EXEMPT:
+            _require_pii_rules(verb)
+        else:
+            with pytest.raises(FuxError, match="pii.toml is missing"):
+                _require_pii_rules(verb)
+
+
+def test_the_gate_checks_the_same_file_pii_loads(tmp_path):
+    from fux.cli import _PII_RULES
+    from fux.ingest import pii
+
+    assert tmp_path.joinpath(*_PII_RULES) == pii.rules_path(tmp_path)
+
+
+def test_a_gated_verb_stops_before_dispatch_with_exit_1(tmp_path, monkeypatch, capsys):
+    (tmp_path / ".git").mkdir()
+    monkeypatch.chdir(tmp_path)
+    assert main(["find", "anything"]) == 1
+    err = capsys.readouterr().err
+    assert err.startswith("error: .fux/pii.toml is missing")
+    assert "fux setup" in err
+
+
+def test_the_file_with_no_rules_opens_the_gate(tmp_path, monkeypatch):
+    from fux.cli import _require_pii_rules
+
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    _require_pii_rules("find")
+
+
+def test_the_gate_does_not_fire_outside_any_root(tmp_path, monkeypatch):
+    from fux.cli import _require_pii_rules
+    from fux.config import find_root
+
+    monkeypatch.chdir(tmp_path)
+    if find_root() is not None:
+        pytest.skip("the temp directory sits inside a repository on this machine")
+    _require_pii_rules("find")
+
+
+def test_the_gate_does_not_import_fux_ingest_when_the_file_exists(tmp_path):
+    """~70 ms of decoder imports on every `ask` and `find` is the cost avoided."""
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
+    code = (
+        "import sys; from fux.cli import _require_pii_rules; "
+        "_require_pii_rules('find'); print('fux.ingest' in sys.modules)"
+    )
+    out = subprocess.run(
+        [sys.executable, "-c", code], cwd=tmp_path, capture_output=True, text=True, check=True
+    )
+    assert out.stdout.strip() == "False"

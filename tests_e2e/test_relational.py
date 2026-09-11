@@ -51,6 +51,8 @@ def linked(tmp_path_factory) -> Path:
     dirs = proj / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (proj / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     _run(proj, "ingest")
     return proj
 

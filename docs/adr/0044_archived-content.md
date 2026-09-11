@@ -166,6 +166,35 @@ ingest and stored per record — the way `mode` and `meta` already are, and for
 the rule it was written under rather than having it inferred by whoever reads
 it.** Absent when false, so no existing record changes shape.
 
+**1a. Both source lists carry `archived`, and since 2026-09-11 that is true of
+`urls` as well as `dirs`** (W-126, Arpit's ask).
+
+- **Same name, same values, same default, one meaning** — held by
+  `tests/ingest/test_sourcelist.py::test_archived_is_the_same_attribute_on_both_lists`
+  rather than by two definitions that agree today.
+- 🔴 **The asymmetry it removes was never a decision.** `dirs` gained the
+  attribute on 2026-08-22; `urls` did not, because the URL list was built
+  first and nobody went back. So **a retired page behind a URL could not be
+  declared retired at all** — and that is the document fux is *worst* at
+  without the declaration, because decision 8 below is measured: BM25F cannot
+  see negation, so a page that honestly says *"no longer current"* hands the
+  query the token `current`.
+- **Line-level only. There is no `[sources.url] archived`**, where `keep`,
+  `ttl` and `enrich` all have a source-wide middle layer. Those three answer
+  *"how do I reach these pages?"*, which a source can answer for all of them;
+  `archived` answers *"is this page retired?"*, which no source-wide value can
+  say. `dirs` made the same call. Held by
+  `test_archived_has_no_source_wide_layer`.
+- **It is applied to CARRIED records, not only freshly fetched ones**
+  ([ADR-INGEST](0016_ingest.md)). A retired page is precisely the one that has
+  stopped changing, so a flag that only landed when the bytes moved would never
+  land at all. It is also **removed** when the line stops declaring it — a flag
+  that can be set and never cleared is a one-way door.
+- ⚠ **Fetchers never see it.** It is resolved from the committed list and does
+  not cross the fetch contract ([ADR-FETCHER](0027_fetcher.md)), which is what
+  keeps "is this retired?" a question about the corpus rather than about the
+  network.
+
 **2. The ranking is byte-identical *at the default*. This is not permission to
 change an order unless someone asks for one.** Scores, sort, and the
 differential law between scan and accelerator are untouched. **An implementation
@@ -278,6 +307,43 @@ disclaimer.**
 - **stdout stability applies.** `--json` is a contract and the surface captures
   compare bytes, so the disclaimer is stderr-only —
   [ADR-CLI](0011_cli-surface.md)'s call, taken there.
+
+**8. How fux can and cannot know a document is retired — three routes and one
+refusal, stated here so nobody has to reconstruct them.** W-127, filed from
+Arpit's question of 2026-09-11: *"a document might look like a legal document
+and say nothing about being retired — or ten documents could say it ten
+different ways."* **Both halves are correct, and the answer was scattered
+across four records and two runs.**
+
+| route | verdict |
+|---|---|
+| **infer from the text** — *"obsolete"*, *"deprecated"*, *"no longer in force"* | 🔴 **refused, and measured to BACKFIRE** |
+| **`archived=true` on the source line** (`dirs` or, since decision 1a, `urls`) | ✅ exact; needs a human, and is per source rather than per document |
+| **`supersedes:` in the successor's frontmatter** | ✅ exact; needs a human, and **cannot cover a document retired before its successor existed** |
+| **`superseded_by:` in an enrichment** ([ADR-ENRICH](0047_enrich.md) decision 17) | ✅ exact, **and never touches the original** — the answer for a document you cannot edit |
+
+🔴 **Inference does not merely fail; it INVERTS, and this is measured rather
+than argued.** Two blind authors independently broke the **same two** queries
+([the run](../../work/regression/2026-08-24-blind-enrichment-second-author/ANALYSIS.md))
+because **BM25F cannot see negation**: *"no longer current"* and *"is current"*
+are the same bag of tokens. **The more honestly a document says it is retired,
+the higher it ranks for *current*.** A phrasing heuristic would put that
+backfire on a timer.
+
+⚠ **The ten-phrasings problem is the SMALLER one.** A heuristic tuned to one
+repo's vocabulary is exact for the repo that invented it and a **silent
+convention for everybody else** — it fails with no error, which is worse than
+failing loudly.
+
+⚠ **And the hard limit no ranking function escapes:** if nothing in the corpus
+declares the document retired, **the fact is not in the text**, and nothing
+recovers it — not BM25F, not the reranker, not embeddings. **Fux should say it
+does not know**, which is what `fux doctor`'s `ranking priors` row does for the
+knob half of the same gap.
+
+⚠ **`superseded_by:` in an enrichment is the answer for an untouchable original
+and is easy to miss** — it lives inside ADR-ENRICH, and before this decision it
+was not discoverable from this record at all. That was the whole of W-127.
 
 ### Consequences
 

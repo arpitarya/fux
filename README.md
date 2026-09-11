@@ -112,7 +112,8 @@ Agents are fux's primary reader.
 - **Offline unless you ask.** Only explicit, opt-in commands touch the network,
   and they say so on stderr ([L4](docs/adr/0006_LAW-4-offline-by-default.md)).
 - **Sensitive text.** `.fux/pii.toml` redacts matches from the committed index
-  ([ADR-PII](docs/adr/0060_pii.md)). `.fux/refusals.toml` stops a sign-in wall
+  ([ADR-PII](docs/adr/0060_pii.md)). `fux setup` writes it, and fux will not run
+  without it. `.fux/refusals.toml` stops a sign-in wall
   being indexed as the page behind it ([ADR-REFUSAL](docs/adr/0058_refusals.md)).
 - **Images and scans.** Fux never calls a model. `fux enrich` plans the work for
   your coding agent and validates what it writes

@@ -97,6 +97,8 @@ def test_declared_entries_do_not_warn(tmp_path):
 def test_cmd_doctor_exit_code_ignores_warnings(tmp_path, monkeypatch, capsys):
     (tmp_path / ".git").mkdir()
     (tmp_path / ".fux").mkdir(exist_ok=True)
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (tmp_path / ".fux" / "scratch").mkdir()
     monkeypatch.chdir(tmp_path)
     assert doctor.cmd_doctor(None) == 0
@@ -1021,3 +1023,94 @@ def test_the_counts_file_is_gitignored_like_every_derived_plane(tmp_path):
     fuxdir.ensure_layout(tmp_path)
     pii.record_counts(tmp_path, body={"email": 1}, enrichment={}, partial=False, documents=1)
     assert doctor._is_git_ignored(tmp_path, pii.counts_path(tmp_path)) is True
+
+
+# -- the no-op ranking priors (W-126 part B, Arpit 2026-09-11) ---------------
+
+
+def _tune(tmp_path, body):
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "tune.toml").write_text(f"[ranking]\n{body}\n", encoding="utf-8")
+
+
+def test_the_shipped_defaults_are_disclosed_as_switched_off(tmp_path):
+    """The whole point: four mechanisms built, wired, and doing nothing."""
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "ranking priors")
+    assert not check.ok
+    assert check.level == "warn"  # a default is not a broken install
+    for key in ("archived_weight", "superseded_weight", "rerank_weight", "recency_half_life_days"):
+        assert key in check.detail
+
+
+def test_it_counts_what_each_dead_prior_WOULD_have_acted_on(tmp_path):
+    """A knob that is off over 0 archived documents and one that is off over 40
+    are different findings, and a flat list of defaults cannot tell them apart."""
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(
+        tmp_path,
+        [
+            _record("file:a.md", "a.md", archived=True),
+            _record("file:b.md", "b.md", archived=True),
+            _record("file:c.md", "c.md"),
+        ],
+    )
+    check = _check(doctor.run(tmp_path), "ranking priors")
+    assert "archived_weight=1 (2 document(s) declared archived=true)" in check.detail
+    assert "superseded_weight=1 (0 document(s)" in check.detail
+
+
+def test_a_prior_that_is_switched_ON_is_not_listed(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    _tune(tmp_path, "rerank_weight = 0.5\narchived_weight = 0.5")
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "ranking priors")
+    assert "rerank_weight" not in check.detail
+    assert "archived_weight" not in check.detail
+    assert "superseded_weight" in check.detail
+
+
+def test_every_prior_switched_on_passes(tmp_path):
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    _tune(
+        tmp_path,
+        "rerank_weight = 0.5\narchived_weight = 0.5\n"
+        "superseded_weight = 0.5\nrecency_half_life_days = 30",
+    )
+    write_index(tmp_path, [_record()])
+    check = _check(doctor.run(tmp_path), "ranking priors")
+    assert check.ok
+
+
+def test_it_refuses_to_recommend_a_value(tmp_path):
+    """🔴 Load-bearing. Recommending one is the remeasure's job (W-94), and the
+    only change measured so far fixed two queries and broke two."""
+    from fux.store import write_index
+
+    _git_repo(tmp_path)
+    write_index(tmp_path, [_record()])
+    detail = _check(doctor.run(tmp_path), "ranking priors").detail
+    assert "does NOT recommend" in detail
+    for nudge in ("try ", "set it to", "recommended", "should be"):
+        assert nudge not in detail
+
+
+def test_a_missing_pii_file_is_an_error_row_and_fails_the_command(tmp_path, monkeypatch, capsys):
+    """ADR-PII decision 17: doctor is exempt from the gate, not from the error."""
+    import argparse
+
+    _git_repo(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    row = _check(doctor.run(tmp_path), "pii rules")
+    assert not row.ok and row.level == "error"
+    assert "fux setup" in row.detail
+    assert doctor.cmd_doctor(argparse.Namespace(json=False)) == 1

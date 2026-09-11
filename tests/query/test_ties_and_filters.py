@@ -194,6 +194,8 @@ def _filter_corpus(root):
     dirs = root / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True, exist_ok=True)
     dirs.write_text("docs\n", encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (root / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     (root / "docs" / "runbooks").mkdir(parents=True)
     (root / "docs" / "runbooks" / "roll.md").write_text(
         "# Rollback\n\nTo roll back a release, drain the sidecar first.\n", encoding="utf-8")

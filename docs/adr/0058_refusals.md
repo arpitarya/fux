@@ -301,6 +301,18 @@ $ # an empty requested_suffix
   -> 1 rule(s), no error          # decision 7: "" is a real suffix
 ```
 
+⚠ **`archived` and a refusal are independent, and 2026-09-11's `archived`
+attribute does not change the ordering this record owns** (W-126). The refusal
+check sits in `fetch_all()`, after `_unpack` and before persist and decode;
+`archived` is resolved from the committed list and applied when the RECORD is
+assembled, which is later and on a different path.
+
+**The case that makes the independence worth stating: a page that has been
+retired AND is now behind a sign-in wall.** It is refused (so no bytes arrive
+and no fresh record is written) and it is archived (so its carried record still
+carries the flag). Neither fact suppresses the other, and a reader who assumed
+"refused" implied "unknown" would get that backwards.
+
 ### Consequences
 
 **Easier.** A refusal that used to become a record now becomes a skip with a

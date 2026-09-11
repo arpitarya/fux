@@ -398,6 +398,21 @@ still does not raise. **Once per run, not once per URL** — a predicate that
 throws throws on every attempt of every URL, and thousands of identical lines
 is how a warning becomes something people filter out.
 
+⚠ **`archived` joined `UrlEntry` on 2026-09-11 and the contract did not
+move** (W-126, [ADR-ARCHIVED-CONTENT](0044_archived-content.md) decision 1a).
+**A fetcher never sees it, and must not.** It is resolved from the committed
+list and consumed by `ingest/run.py` when the record is assembled; nothing is
+passed to `fetch()`, and no optional function is added.
+
+**Why that is worth a line here rather than being obvious:** `keep` is the
+counter-example — it is also a per-URL policy, it is also resolved in
+`resolve_urls`, and decision 5 had to state explicitly that retention lives in
+`fetch_all()` and **never inside a fetcher**. `archived` is one step further
+out: it is not about reaching the page at all, so it never approaches the
+boundary. **The contract stays at six functions**, and a per-URL attribute
+arriving without touching it is the evidence that the split is in the right
+place.
+
 ### Consequences
 
 - **The contract survived gaining a second caller unchanged.** The refer plane

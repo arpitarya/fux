@@ -47,7 +47,7 @@ flowchart TD
     F --> C4["decoders/ — committed<br/>YOUR code; these copies RUN"]
     F --> C5["enrich/ — committed<br/>pinned text + queue.tsv"]
     F --> C6["README.md · .gitignore<br/>generated, write-if-missing"]
-    F --> C7["tune.toml · output.toml · .fuxignore · refusals.toml<br/>committed files, write-if-missing"]
+    F --> C7["tune.toml · output.toml · .fuxignore · refusals.toml · pii.toml<br/>committed files, write-if-missing"]
     F --> D1["runtime/ — derived<br/>CACHEDIR.TAG · rebuildable"]
     F --> A1["acquired/ — acquired<br/>CACHEDIR.TAG · NOT rebuildable"]
     D1 -.->|"git check-ignore<br/>asserted by doctor"| G["ignored"]
@@ -70,6 +70,7 @@ flowchart TD
     +-- output.toml   COMMITTED   how a result is SHOWN (write-if-missing)
     +-- .fuxignore    COMMITTED   what is NOT indexed, .gitignore's grammar
     +-- refusals.toml COMMITTED   what a REFUSAL looks like here (ADR-REFUSAL)
+    +-- pii.toml      COMMITTED   what is REDACTED from the index; REQUIRED (ADR-PII)
     +-- README.md     COMMITTED   the declaration table (write-if-missing)
     +-- .gitignore    COMMITTED   names ignored dirs; NEVER `*`
     |
@@ -171,6 +172,7 @@ table is the reasoning.
 | `.fuxignore` | committed | what is **not** indexed, in `.gitignore`'s grammar — the one home for exclusion, read before the source lists and outranking them in both directions ([ADR-FUXIGNORE](0055_fuxignore.md)). Committed for the same reason `tune.toml` is: a corpus that differed by clone is the surprise this split removes. Written header-only by `fux setup`, and never rewritten |
 | `README.md` · `.gitignore` | committed | generated, write-if-missing |
 | `refusals.toml` | committed | what a **refusal** looks like in this organisation — the sign-in walls, paywalls and viewer shells a server returns instead of the document ([ADR-REFUSAL](0058_refusals.md)). Consumer-owned and additive; the engine ships no vendor knowledge, and the always-on magic-byte floor is not configurable from it. Committed because *"what does a login page look like here"* is a team fact, exactly like `.fuxignore` |
+| `pii.toml` | committed | what is **redacted** from the committed index and nowhere else ([ADR-PII](0060_pii.md)). Written by `fux setup` from the starter, never rewritten — and **the one consumer file that is required**: every command refuses in a repo without it (ADR-PII decision 17) |
 | `runtime/` | **derived** | accelerator segments, the fetch cache at `runtime/fetch-cache/`, the write lock, the URL counters, the skip ledger, and `enrich-progress.tsv` — which machine has handled which queued document, **local by design** so two people's progress cannot conflict on a pull |
 | `acquired/` | **acquired** | the bytes a fetch returned, for URLs whose line says `keep=true` — `objects/<sha[:2]>/<sha><ext>` plus an advisory `manifest.json`. Ignored and `CACHEDIR.TAG`-tagged like derived, and **not rebuildable**: `fux build` cannot produce it, only a re-fetch against a source that still exists. It is what lets an offline citation say `as-ingested` instead of `unverified` ([ADR-URL-FRESHNESS](0059_url-freshness.md)), and it is bounded and evicted rather than unbounded |
 
@@ -213,7 +215,7 @@ holding code.
 | moment | writes | why |
 |---|---|---|
 | **`ensure_layout`**, at the head of every ingest | `.fux/README.md`, `.fux/.gitignore` | **mandatory and idempotent** — a fresh clone must be correct before a byte is written into the directory |
-| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `sources/types`, `tune.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
+| **`fux setup`** | `fux.toml`, `sources/dirs`, `sources/urls`, `sources/types`, `tune.toml`, `output.toml`, `.fuxignore`, `refusals.toml`, `pii.toml`, `fetchers/*.py`, `decoders/*.py`, the agent policy files, and the repo-root `AGENTS.md` under decision 9's conditions | **optional, explicit, once per repo** — a consumer asked for it |
 
 **`ensure_layout` must never write a fetcher**, and nothing in either column is
 ever overwritten: a consumer's annotations and edits survive every run.
@@ -228,6 +230,11 @@ tune` prints a specimen instead of editing `tune.toml`. **If a change must
 reach existing repos, the mechanism is a loader refusal or a `doctor` check —
 never a rewrite.** `fux setup`'s own `report.kept` is the evidence the file was
 left alone.
+⚠ **`pii.toml` is the worked case (2026-09-11).** The starter reaches an
+existing repo through [ADR-PII](0060_pii.md) decision 17's refusal, which names
+`fux setup` — never by fux writing the file on its own. The list above had also
+lost `output.toml`, `.fuxignore` and `refusals.toml`; restored in the same
+change.
 
 ⚠ **A worked instance of that ⚠, 2026-08-27.** `sources/types` shipped as a
 template of nothing but comments, and a types file with no live pattern is one
@@ -421,6 +428,30 @@ resident clock's last sweep, and the case it exists for is `outcome: "ok"` with
 `skipped > 0` — a sweep that looked healthy and did not index everything. **A
 daemon that never ran is not a finding**: a check that fires for every repo is
 one people learn to skip. See [ADR-MAINTENANCE](0039_hooks.md) decision 12.
+
+⚠ **A SIXTH `doctor` row class, 2026-09-11 (W-126 part B): `ranking priors`.**
+Four ranking mechanisms — the archived demotion, the supersession demotion, the
+proximity reranker and the recency decay — are **built, wired, and shipped at a
+value that makes each return the score unchanged**. A repo that declares
+`archived=true` or writes `supersedes:` gets nothing for it and **was not
+told**. On fux's own corpus the row reads *391 document(s) declared
+archived=true* against `archived_weight=1`.
+
+**It is decision 10's first clause — `doctor` reports, and never repairs — in
+its sharpest form**, because here the repair is *available, one line away, and
+still refused*:
+
+- **It names the count of documents each dead prior WOULD have acted on.** A
+  knob that is off over 0 archived documents and one that is off over 391 are
+  different findings, and a flat list of four defaults cannot tell them apart.
+- 🔴 **It refuses to recommend a value**, and that refusal is test-bound
+  (`test_it_refuses_to_recommend_a_value`). The only such change ever measured
+  — `superseded_weight` at `0.5` — **fixed two queries and broke two**, and
+  every broken one had the superseded document as its correct answer. A
+  `doctor` row saying *"try 0.5"* would hand out the exact change a frozen
+  pre-registration already failed.
+- **A warning, never an error**, by this decision's second property: shipping
+  at a default is not a broken install.
 
 ⚠ **A FOURTH worked instance, 2026-09-05 (W-101) — and this one is not about a
 file reaching old repos.** Four things were reachable only from inside a run

@@ -678,12 +678,50 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+#: The verbs `main` runs without `.fux/pii.toml` -- ADR-PII decision 17's table
+#: and nothing else. `setup` writes the file; `tune` and `output` print a
+#: specimen and read no repository; `doctor` runs so it can report the missing
+#: file as an error row. **Every other verb is gated, including one added
+#: later** -- `tests/test_cli.py` walks the parser and fails on a new exemption.
+PII_EXEMPT = frozenset({"setup", "tune", "output", "doctor"})
+
+#: `pii.rules_path()`'s location, spelled here so the gate costs a stat call and
+#: not an import of `fux.ingest` (~70 ms of decoders on every `ask` and `find`).
+#: `tests/test_cli.py` holds the two equal; the refusal's wording stays in `pii`.
+_PII_RULES = (".fux", "pii.toml")
+
+
+def _require_pii_rules(command: str) -> None:
+    """ADR-PII decision 17: no `.fux/pii.toml`, no command.
+
+    Outside any root there is no repository to hold the file, so the gate does
+    not fire and the verb fails, or does not, on its own terms.
+    """
+    if command in PII_EXEMPT:
+        return
+    from .config import find_root
+
+    root = find_root()
+    if root is None or root.joinpath(*_PII_RULES).is_file():
+        return
+    from .ingest import pii
+
+    pii.require(root)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     if not getattr(args, "command", None):
         parser.print_help()
         return 1
+    # ADR-PII decision 17, placed by ADR-CLI decision 4: before dispatch and
+    # before anything else reads the repository, so no handler has to remember.
+    try:
+        _require_pii_rules(args.command)
+    except FuxError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return exc.exit_code
     # ADR-OUTPUT decision 3. Before dispatch and before the progress plane, so
     # every `args` a command sees is already resolved.
     try:

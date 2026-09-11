@@ -286,6 +286,24 @@ URLS = ListSpec(
         # plane there was nothing for `fux enrich --plan` to chunk, which is
         # why this attribute could not exist on this list until now.
         Attribute("enrich", ("true", "false"), "false"),
+        # W-126, 2026-09-11 (Arpit). ADR-ARCHIVED-CONTENT: the same attribute
+        # the `dirs` list has carried since 2026-08-22, meaning the same thing.
+        #
+        # ⚠ **A retired page behind a URL could not be declared retired at
+        # all**, which is an asymmetry and not a design: `dirs` had the
+        # attribute, `urls` did not, and nothing recorded the difference. A
+        # wiki page marked "superseded" at the top is exactly the document this
+        # is for, and it is the document fux is WORST at without it -- BM25F
+        # cannot see negation, so honest retirement prose hands the retired page
+        # the query's own word.
+        #
+        # **LINE-LEVEL ONLY, unlike `keep`/`ttl`/`enrich`.** Those three are
+        # policies about HOW to reach a source, so a source-wide layer in
+        # `[sources.url]` is meaningful. `archived` is a fact about one
+        # DOCUMENT; a source-wide "everything I fetch is retired" describes no
+        # corpus anybody has. `dirs` made the same call for the same reason
+        # (ADR-DIR-LIST), and matching it keeps one attribute with one shape.
+        Attribute("archived", ("true", "false"), "false"),
     ),
     validate=_url_reason,
 )

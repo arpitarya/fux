@@ -249,8 +249,95 @@ def _layout(root: Path) -> list[Check]:
     checks.append(_refusal_health(root))
     checks.append(_decoder_bindings(root))
     checks.append(_recency_prior(root))
+    checks.append(_no_op_priors(root))
     checks.append(_freshness_share(root))
     return checks
+
+
+#: The four ranking priors that ship at a value which makes them do nothing,
+#: with the record that owns each and the record field each one reads.
+#:
+#: `(key, no-op value, record field, what the field means)`. `None` for the
+#: field means the prior is not driven by a per-record declaration.
+_NO_OP_PRIORS = (
+    ("archived_weight", 1.0, "archived", "declared archived=true"),
+    ("superseded_weight", 1.0, "superseded", "superseded by another document"),
+    ("rerank_weight", 0.0, None, ""),
+    ("recency_half_life_days", 0.0, "mtime", "carrying an mtime"),
+)
+
+
+def _no_op_priors(root: Path) -> Check:
+    """Every ranking prior that is BUILT, WIRED and SWITCHED OFF at its default.
+
+    **W-126 part B, on Arpit's ask of 2026-09-11.** Four mechanisms — the
+    archived demotion, the supersession demotion, the proximity reranker and
+    the recency decay — are each implemented, each read their input, and each
+    ship at a value that makes them return the score unchanged. A repo that
+    declares `archived=true` on a source line, or writes `supersedes:` in a
+    document's frontmatter, gets **exactly nothing** for it and **is not told**.
+
+    ⚠ **This is a DISCLOSURE and not a ranking change**, and the distinction is
+    the whole reason it could be built today. Whether any of these defaults
+    should move is blocked on a measurement nobody can run yet (the hand-graded
+    corpus is uncommitted), and Arpit ruled *remeasure first* on
+    `superseded_weight` and `rerank_weight` the same day.
+
+    🔴 **So it REFUSES to recommend a value, deliberately.** Recommending one is
+    the remeasure's job. `P-SUPERSEDE` is the standing proof of why: at `0.5`
+    the supersession prior fixed two queries and **broke two**, and every
+    broken query had the superseded document as its correct answer. A `doctor`
+    row that said *"try 0.5"* would be handing out the exact change a frozen
+    pre-registration already failed.
+
+    **What it does say is the part nobody could see:** for each dead prior, how
+    many documents in THIS corpus declare the thing it would have acted on. A
+    repo with 0 archived documents has a knob that is off and irrelevant; a
+    repo with 40 has one that is off and costing it something. Those are
+    different findings and a flat list of four defaults cannot tell them apart.
+
+    A **warning**, never an error: shipping at a default is not a broken
+    install, and every one of these values is a legitimate choice somebody may
+    have made on purpose.
+    """
+    from .tune import DEFAULT_TUNE
+    from .tune import load as load_tune
+
+    try:
+        tune = load_tune(root)
+    except Exception:
+        tune = DEFAULT_TUNE
+
+    records = _records(root)
+    dead: list[str] = []
+    for key, no_op, field, meaning in _NO_OP_PRIORS:
+        if getattr(tune, key) != no_op:
+            continue
+        part = f"{key}={no_op:g}"
+        if field is not None and records:
+            declared = sum(1 for record in records.values() if record.get(field))
+            part += f" ({declared} document(s) {meaning})"
+        dead.append(part)
+
+    if not dead:
+        return Check(
+            "ranking priors",
+            True,
+            "every ranking prior is set to a value that does something",
+        )
+    return Check(
+        "ranking priors",
+        False,
+        "BUILT, WIRED AND SWITCHED OFF at these values: "
+        + "; ".join(dead)
+        + ". Each is implemented and reads its input, and at the value shown it "
+        "returns the score unchanged - so a document you declared archived or "
+        "superseded ranks exactly as if you had not. fux states this and does NOT "
+        "recommend a value: the one change measured so far (superseded_weight 0.5) "
+        "fixed two queries and broke two, and every broken one had the superseded "
+        "document as its correct answer",
+        level="warn",
+    )
 
 
 def _pii_health(root: Path) -> Check:
@@ -270,13 +357,9 @@ def _pii_health(root: Path) -> Check:
     """
     from .ingest import pii
 
-    if not pii.rules_path(root).is_file():
-        return Check(
-            "pii rules",
-            True,
-            "no .fux/pii.toml - nothing is redacted from the index",
-            level="warn",
-        )
+    # ADR-PII decision 17: a missing file is an ERROR row -- `load` raises and
+    # says what to run. `doctor` is exempt from the CLI gate so that it gets
+    # here and names the fix, not so that the fault reads as healthy.
     try:
         rules = pii.load(root)
     except FuxError as exc:

@@ -79,6 +79,12 @@ class UrlEntry:
     #: **verbatim** as written ("15m", not 900). Resolved to seconds only at
     #: the point of use, so config order never changes a committed byte.
     ttl: str = "24h"
+    #: ADR-ARCHIVED-CONTENT: this URL points at a retired document. **Declared,
+    #: never inferred** -- inference from retirement prose is refused and was
+    #: measured to invert. Line-level only: there is no `[sources.url] archived`
+    #: layer, because `archived` is a fact about one document rather than a
+    #: policy about how to reach a source.
+    archived: bool = False
 
 
 def load_fetcher(root: Path, rel_path: str):
@@ -165,6 +171,11 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                     if "ttl" in entry.declared
                     else getattr(source, "ttl", "24h")
                 ),
+                # TWO layers, not three, and that is the decision: the built-in
+                # default and the line. `keep`/`ttl`/`enrich` have a
+                # source-wide middle layer because each is a policy about
+                # REACHING a source; `archived` is a fact about one document.
+                archived=entry.attrs.get("archived") == "true",
             )
         )
     return resolved

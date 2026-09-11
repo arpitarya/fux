@@ -455,6 +455,14 @@ def run(
     # re-derived by whoever reads it. **Declared, never a path convention** —
     # this reads the same `.fux/sources/dirs` line the grammar parses.
     archived_srcs = frozenset(archived_dirs(root, config.dirs_file))
+    # W-126: the same declaration for `url:` documents. Computed only when this
+    # run holds URL records at all, so a corpus of directories never reads the
+    # list. Applied to CARRIED records too, which is the point -- flipping
+    # `archived=true` on a line must take effect without re-fetching the page,
+    # exactly as flipping it on a `dirs` line does without re-reading the file.
+    archived_url_srcs = (
+        frozenset(_archived_url_ids(root, config)) if (fresh or carried) else frozenset()
+    )
 
     def ver_for(doc_id: str, sha: str) -> int:
         nonlocal changed
@@ -522,6 +530,9 @@ def run(
             edges=edges_mod.resolve(doc_id, scans[doc_id], known_ids, by_basename),
         )
         record["ver"] = ver_for(doc_id, record["sha"])
+        # Absent when false, exactly as on the `file:` side above.
+        if doc_id in archived_url_srcs:
+            record["archived"] = True
         # Per-URL, not per-source: a line may opt one public document out of
         # hashing (ADR-URL-LIST decision 10). It only ever loosens.
         if url_meta.get(doc_id) == "plain":
@@ -540,7 +551,10 @@ def run(
     # `known_ids` is exactly this run's final id set — every parsed document
     # becomes a record, and so does every carried one — which is what makes it
     # the right thing to re-check a carried record's edges against (W-63).
-    records.extend(_without_dangling_edges(carried[doc_id], known_ids) for doc_id in sorted(carried))
+    records.extend(
+        _with_archived(_without_dangling_edges(carried[doc_id], known_ids), doc_id in archived_url_srcs)
+        for doc_id in sorted(carried)
+    )
 
     # `write_index` groups by shard internally and offers no per-shard hook,
     # so this phase is a bookend around it rather than a live count —
@@ -1056,6 +1070,58 @@ def _listed_url_ids(root: Path, config, existing_urls: dict[str, dict]) -> set[s
         ),
     )
     return {f"url:{entry.value}" for entry in entries}
+
+
+def _archived_url_ids(root: Path, config) -> set[str]:
+    """The `url:` ids `.fux/sources/urls` declares `archived=true` (W-126).
+
+    The URL half of `gitdir.archived_dirs`, and deliberately the same shape:
+    **declared in a committed, diffable line, never inferred from the
+    document's own text** (ADR-ARCHIVED-CONTENT). Inference is not merely
+    unreliable — it was measured to INVERT, because BM25F cannot see negation
+    and "no longer current" carries the token `current`.
+
+    **Reads the raw entries, not `resolve_urls`.** `archived` is line-level
+    only, so there is no source-wide layer to apply and therefore no need for a
+    `[sources.url]` block to exist at all — which is what lets the offline
+    ingest path resolve the flag as completely as the fetching one.
+
+    Returns the empty set rather than raising when the list is absent: the
+    caller only asks when `url:` records exist, and a missing list with
+    surviving records is already `_listed_url_ids`' loud error.
+    """
+    rel_path = config.url.urls_file if config.url is not None else DEFAULT_URLS_FILE
+    if not (root / rel_path).is_file():
+        return set()
+    entries = sourcelist.read(root, rel_path, sourcelist.URLS, missing_hint="")
+    return {
+        f"url:{entry.value}"
+        for entry in entries
+        if entry.attrs.get("archived") == "true"
+    }
+
+
+def _with_archived(record: dict, archived: bool) -> dict:
+    """A carried record with `archived` set to what its LINE says today (W-126).
+
+    A carried record is a previous run's bytes reused verbatim, so without this
+    a `url:` line that gained `archived=true` would change nothing until the
+    page itself changed — which is the whole failure mode, since a retired page
+    is precisely the one that has stopped changing.
+
+    **Returns the record unchanged and uncopied when it already agrees**, so a
+    run that changes nothing still writes byte-identical shards (L3), and
+    `archived` is **removed** when the line no longer declares it: a flag that
+    could be set but never cleared is a one-way door.
+    """
+    if archived == bool(record.get("archived")):
+        return record
+    out = dict(record)
+    if archived:
+        out["archived"] = True
+    else:
+        out.pop("archived", None)
+    return out
 
 
 def _without_dangling_edges(record: dict, known_ids: set[str]) -> dict:

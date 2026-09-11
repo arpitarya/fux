@@ -146,7 +146,17 @@ def test_the_digest_is_stable_across_calls():
 # -- strictness -------------------------------------------------------------
 
 
-def test_a_missing_file_is_silence_not_an_error(tmp_path):
+def test_a_missing_file_raises_and_names_fux_setup(tmp_path):
+    # ADR-PII decision 17 reversed "missing is silence": a deleted file must not
+    # read as a repo that decided to redact nothing.
+    with pytest.raises(FuxError, match=r"\.fux/pii\.toml is missing.*fux setup"):
+        pii.load(tmp_path)
+
+
+def test_a_file_with_no_rules_is_legal_and_redacts_nothing(tmp_path):
+    # Missing and empty are different answers: empty is a committed choice.
+    (tmp_path / ".fux").mkdir()
+    (tmp_path / ".fux" / "pii.toml").write_text("# every rule commented out\n")
     assert pii.load(tmp_path) == ()
 
 

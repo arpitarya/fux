@@ -43,6 +43,8 @@ def repo(tmp_path: Path) -> Path:
     dirs = tmp_path / ".fux" / "sources" / "dirs"
     dirs.parent.mkdir(parents=True)
     dirs.write_text("docs\n", encoding="utf-8")
+    # ADR-PII decision 17: a repo without .fux/pii.toml refuses; empty redacts nothing.
+    (tmp_path / ".fux" / "pii.toml").write_text("", encoding="utf-8")
     docs = tmp_path / "docs"
     docs.mkdir()
     for i in range(CORPUS):

@@ -122,6 +122,24 @@ $ tree .fux/acquired/
   objects/39/3925dcbab1097fd3199d170719c619df5a22d5a1b1b5fe3e9726bcb35a7f41af.xlsx
 ```
 
+⚠ **`UrlEntry` gained a fifth resolved field on 2026-09-11 and it has TWO
+layers, not three** (W-126, `archived`). `keep` — this record's field — is the
+canonical three-layer attribute: built-in default, then `[sources.url] keep`,
+then the line. `archived` deliberately has no middle layer, and the test that
+decides it is what the attribute is ABOUT:
+
+- `keep`, `ttl`, `enrich` answer **"how do I reach these pages?"** — a question
+  a source can answer for all of them at once, so a source-wide layer means
+  something.
+- `archived` answers **"is this page retired?"** — a fact about one document.
+  A source-wide *"everything I fetch is retired"* describes no corpus anybody
+  has.
+
+**So the layering is not a convention every attribute follows; it is a property
+of the attribute**, and `UrlEntry` now holds an example of each. Held by
+`tests/ingest/test_sourcelist.py::test_archived_has_no_source_wide_layer`, which
+asserts `config.UrlSource` never grows the key.
+
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.

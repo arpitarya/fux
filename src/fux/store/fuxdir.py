@@ -75,7 +75,7 @@ COMMITTED_FILES: dict[str, str] = {
     ".fuxignore": "what is NOT indexed, in .gitignore's grammar. The one place exclusions belong, read before the source lists (ADR-FUXIGNORE)",
     # ASCII only, like every other value in these tables.
     # ASCII only, like every other value in these tables.
-    "pii.toml": "what is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII)",
+    "pii.toml": "REQUIRED - every command refuses without it. What is REDACTED from the committed index - and ONLY from it. The acquired bytes, the refer plane and every answer quote still see the document as it is (ADR-PII)",
     "refusals.toml": "what a REFUSAL looks like here - the sign-in walls, paywalls and error shells a server returns INSTEAD of the document. Consumer-owned; fux ships no vendor knowledge (ADR-REFUSAL)",
 }
 

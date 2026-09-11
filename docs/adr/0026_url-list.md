@@ -190,6 +190,24 @@ this record**, not a config addition — which is what makes decision 9's
 unknown-key error safe to be strict about: the error is never wrong, because
 there is nothing legitimate it can reject.
 
+⚠ **"Two" is the ORIGINAL set and it is now six** — `fetch`, `meta`, `keep`,
+`ttl`, `enrich`, and `archived` (2026-09-11, W-126,
+[ADR-ARCHIVED-CONTENT](0044_archived-content.md) decision 1a). The sentence is
+left as written because **the closure is the decision and the count never
+was**; what this ⚠ records is that the rule has been exercised six times and
+held each time. The count lives in
+`tests/ingest/test_sourcelist.py::test_the_url_attribute_set_is_exactly_these_six`,
+which is deliberately the one test in that file that does **not** derive from
+the spec — so a seventh attribute arrives as a single failing assertion naming
+itself rather than as silence. **It did exactly that for `archived`.**
+
+⚠ **`archived` also makes `DIRS`' attribute set a strict SUBSET of `URLS`'**,
+which was not true before and cost a test its second half: the old
+`test_urls_attributes_are_not_legal_in_dirs_and_vice_versa` used `archived` as
+its example of a `dirs`-only attribute and **no attribute is `dirs`-only any
+more.** The reverse direction was deleted rather than re-pointed at a
+substitute, because a test rewritten to stay green is not a test.
+
 **12. A fux-written line carries every attribute, explicitly.** `fux add` emits
 the complete set — `fetch=… meta=…` — even where the value equals the default.
 **A generated file holds no implicit state**: the line says what it means, and

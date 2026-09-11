@@ -823,6 +823,10 @@ uv run pytest -q tests        # fast unit
 uv run pytest -q tests_e2e    # the package as a user
 ```
 
+**A test that builds a repo by hand writes `.fux/pii.toml`** (an empty file is
+enough), or ingest and every CLI verb refuse — [ADR-PII](docs/adr/0060_pii.md)
+decision 17.
+
 **Two suites, both maintained** — `tests/` (fast unit) and `tests_e2e/` (the
 package as a user: real CLI via `subprocess`, fixture corpus, golden files
 updated deliberately and never regenerated blindly). A feature is not done

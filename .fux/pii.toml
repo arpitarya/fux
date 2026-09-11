@@ -142,78 +142,6 @@ replacement = "[PII:pan]"
 # validate    = "verhoeff"
 
 
-# --- United States identifiers ---------------------------------------------
-# SSN in its written shape, 3-2-4 with one consistent separator. The pattern
-# refuses what the Social Security Administration never assigns -- area 000,
-# 666 and 900-999, group 00, serial 0000 -- and a 3-2-4 window inside a longer
-# digit group. It does NOT catch an unseparated nine-digit SSN: a bare 9-digit
-# run is also a zip+4, an order id, a row count, and no checksum exists to tell.
-# Over-matches: a part or ticket number written 3-2-4 with dashes.
-[[rule]]
-name        = "us-ssn"
-pattern     = '''(?<![0-9][\s-])\b(?!000|666|9[0-9]{2})[0-9]{3}([ -])(?!00)[0-9]{2}\1(?!0000)[0-9]{4}\b(?![\s-][0-9])'''
-replacement = "[PII:us-ssn]"
-
-# ITIN and ATIN: an area of 900-999 (which is never an SSN) and a group in the
-# ranges the IRS issues -- 50-65, 70-88, 90-92, 94-99, and 93 for an ATIN.
-# Over-matches: very little; a 9xx-NN-NNNN string is rarely anything else.
-[[rule]]
-name        = "us-itin"
-pattern     = '''(?<![0-9][\s-])\b9[0-9]{2}([ -])(?:5[0-9]|6[0-5]|7[0-9]|8[0-8]|9[0-9])\1[0-9]{4}\b(?![\s-][0-9])'''
-replacement = "[PII:us-itin]"
-
-# Medicare Beneficiary Identifier: 11 characters in a fixed digit/letter
-# layout, letters never S, L, O, I, B or Z, dashes optional ("1EG4-TE5-MK73").
-# Uppercase only -- a lowercase run of that shape is almost always something
-# else. Over-matches: an uppercase product or batch code that happens to fit.
-[[rule]]
-name        = "us-mbi"
-pattern     = '''\b[1-9][AC-HJKMNP-RT-Y][AC-HJKMNP-RT-Y0-9][0-9]-?[AC-HJKMNP-RT-Y][AC-HJKMNP-RT-Y0-9][0-9]-?[AC-HJKMNP-RT-Y]{2}[0-9]{2}\b'''
-replacement = "[PII:us-mbi]"
-
-# ⚠ EIN IS COMMENTED OUT. `NN-NNNNNNN` is also a catalogue number, a document
-# reference and half the ids in an ERP export, and an EIN has no checksum.
-# An EIN identifies a business, not a person -- enable it if your policy says
-# a vendor's tax id must not travel.
-#
-# [[rule]]
-# name        = "us-ein"
-# pattern     = '''(?<![0-9-])\b[0-9]{2}-[0-9]{7}\b(?!-[0-9])'''
-# replacement = "[PII:us-ein]"
-
-# Not shipped: a bank ROUTING number (nine digits with an ABA checksum fux does
-# not implement), a US passport number (nine digits, or a letter and eight --
-# indistinguishable from any id), and driver's licences (a different shape in
-# every state).
-
-
-# --- Canadian identifiers --------------------------------------------------
-# SIN: nine digits in the written 3-3-3 shape, a first digit that is not 0 or
-# 8 (never issued to a person; 9 is a temporary resident), and a Luhn check
-# digit. The checksum removes nine shape-alikes in ten; the separator
-# requirement removes most of the rest. An unseparated SIN is NOT caught, for
-# the same reason as an unseparated SSN.
-[[rule]]
-name        = "ca-sin"
-pattern     = '''(?<![0-9][\s-])\b[1-79][0-9]{2}([ -])[0-9]{3}\1[0-9]{3}\b(?![\s-][0-9])'''
-replacement = "[PII:ca-sin]"
-validate    = "luhn"
-
-# ⚠ POSTAL CODE IS COMMENTED OUT. `A1A 1A1` identifies a neighbourhood, not a
-# person, and redacting it from an office address or a shipping runbook removes
-# something a reader needed. Enable it if an address in your corpus is itself
-# the sensitive value.
-#
-# [[rule]]
-# name        = "ca-postal-code"
-# pattern     = '''\b[ABCEGHJ-NPRSTVXY][0-9][ABCEGHJ-NPRSTV-Z][ -]?[0-9][ABCEGHJ-NPRSTV-Z][0-9]\b'''
-# replacement = "[PII:ca-postal-code]"
-
-# Not shipped: provincial health card numbers (a different format in every
-# province) and passport numbers (two letters and six digits -- the shape of
-# any id).
-
-
 # --- payment card ----------------------------------------------------------
 # ⚠ COMMENTED OUT. Same problem, worse: a 16-digit run is an order number, a
 # tracking id, a hash prefix. This pattern requires separators, which real
@@ -238,15 +166,6 @@ validate    = "luhn"
 # [[rule]]
 # name        = "phone-in"
 # pattern     = '''\b(?:\+91[ -]?)?[6-9][0-9]{9}\b'''
-# replacement = "[PII:phone]"
-
-# United States and Canada share one numbering plan (NANP): an optional +1, a
-# 3-digit area code and exchange that never start with 0 or 1, and a separator
-# before the last four -- required, so a bare ten-digit id is left alone.
-#
-# [[rule]]
-# name        = "phone-nanp"
-# pattern     = '''(?<![0-9])(?:\+?1[ .-]?)?(?:\([2-9][0-9]{2}\)|[2-9][0-9]{2})[ .-]?[2-9][0-9]{2}[ .-][0-9]{4}\b'''
 # replacement = "[PII:phone]"
 
 
