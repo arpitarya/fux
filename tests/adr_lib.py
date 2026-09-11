@@ -79,10 +79,55 @@ def describes_table(text: str | None = None) -> dict[str, list[str]]:
     )
     table: dict[str, list[str]] = {}
     for cells in rows:
-        component = cells[0].strip("`").rstrip("/")
+        component, _ = _split_symbols(cells[0])
         record = cells[1].strip().strip("*").strip("`")
         table.setdefault(component, []).append(record)
     return table
+
+
+def _split_symbols(cell: str) -> tuple[str, frozenset[str]]:
+    """`` `path::a,b` `` -> `("path", {"a", "b"})`; a bare path -> an empty set.
+
+    **The `::` qualifier is the fix for a gate that was demanding records with
+    nothing to say** (W-140 row 20, 2026-09-11). The relation is per FILE, and
+    `src/fux/query/__init__.py` alone is described by four records — so
+    changing one function in it demanded a line in all four, and three of those
+    lines could only say *nothing here changed*. Written twice in one session,
+    then seven times in one change, which is when it stopped being a nuisance
+    and became noise that trains a reader to skip record edits.
+
+    **An empty set means the whole file**, which is every row that predates
+    this and the right default: a describer that has not narrowed itself is
+    still describing everything.
+    """
+    text = cell.strip().strip("`").strip()
+    if "::" not in text:
+        return text.rstrip("/"), frozenset()
+    path, _, names = text.partition("::")
+    symbols = {n.strip().strip("`") for n in names.split(",") if n.strip()}
+    return path.strip().rstrip("/"), frozenset(symbols)
+
+
+def describes_symbols(text: str | None = None) -> dict[tuple[str, str], frozenset[str]]:
+    """`(component, record)` -> the symbols that row narrows itself to.
+
+    Empty set = the whole file. Read by the freshness gate, never by ownership:
+    **who owns a component is still decided per file**, and narrowing the
+    ownership relation would be a different and much larger change.
+    """
+    if text is not None and "<!-- DESCRIBES-TABLE-START -->" not in text:
+        return {}
+    rows = _table_rows(
+        REGISTER.read_text(encoding="utf-8") if text is None else text,
+        "<!-- DESCRIBES-TABLE-START -->",
+        "<!-- DESCRIBES-TABLE-END -->",
+    )
+    out: dict[tuple[str, str], frozenset[str]] = {}
+    for cells in rows:
+        component, symbols = _split_symbols(cells[0])
+        record = cells[1].strip().strip("*").strip("`")
+        out[(component, record)] = symbols
+    return out
 
 
 def describers_of(changed: str, table: dict[str, list[str]] | None = None) -> list[str]:

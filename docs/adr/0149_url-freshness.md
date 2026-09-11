@@ -358,6 +358,24 @@ against retained bytes and `unverified` without them —
 [ADR-REFER](0127_refer-plane.md) carries the mechanism and what it does not
 promise.
 
+**`--cache-ttl` is how a caller asks, and until 2026-09-11 there was no way**
+(W-140 row 6). Decision 11 resolves the interval as `min(policy, declared)`
+*precisely* so a line can narrow and never widen — and `fux answer` built its
+policy with the default `0`. `min(0, 86400)` is `0`, so **every `ttl=` in every
+repo was dead at ask time and the `cached` verdict was unreachable by
+construction.** The arithmetic was right and nothing could set its left operand.
+
+- **A flag, not a config key.** `[cli.*]` chooses rendering and may never decide
+  what a verb does — the defect closed the same day in
+  [ADR-OUTPUT](0144_output-defaults.md).
+- **The default is still `0`**, so W-60 verdict F holds unchanged: a caller who
+  did not ask for caching cannot be served a cached byte.
+- **One duration parser.** `--cache-ttl 1x` fails exactly as a hand-written
+  `ttl=1x` does, which is decision 10's rule holding for a second entry point.
+- ⚠ **`update=never` still does not keep `answer` offline, and that is decision
+  15 working**, not a defect. The row that filed this claimed otherwise; two
+  clocks on one line is what decision 15 exists to separate.
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that

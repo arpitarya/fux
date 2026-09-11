@@ -570,7 +570,12 @@ Row 5 took `SOURCES-SKILL.md`'s *"a source-wide `meta`, `keep`, `ttl`,
 `update` or `fetcher` there only reaches hand-written lines"* — a guide telling
 consumers their configuration did not apply.
 
-⚠ **Nine guide edits in one day, every one of them deleting a workaround.** That
+Rows 6 and 7 took `ANSWER-SKILL.md`: *"a receipt from a `source: index` answer
+names no shas, so `--rerun` reports `drifted:corpus` even when nothing
+changed"* was a guide explaining a wrong verdict, and *"do not rely on `ttl=`"*
+was a guide explaining a dead knob.
+
+⚠ **Eleven guide edits in one day, every one of them deleting a workaround.** That
 is 15g working, and it is also the measurement of how much of a freshly written
 guide is describing defects rather than behaviour. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that

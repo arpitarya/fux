@@ -52,6 +52,7 @@ message to check the escape hatch, and `pre-commit` runs too early to see it.
 
 from __future__ import annotations
 
+import ast
 import re
 import subprocess
 from functools import lru_cache
@@ -63,6 +64,7 @@ from adr_lib import (
     ADR_DIR,
     ROOT,
     describers_of,
+    describes_symbols,
     describes_table,
     owner_of,
     ownership_table,
@@ -118,8 +120,82 @@ def _git_available() -> bool:
         return False
 
 
+def changed_symbols(path: str, *, sha: str | None = None) -> set[str] | None:
+    """The top-level `def`/`class` names a diff touched in `path`.
+
+    `None` means *could not tell* — a new file, a deleted one, unparseable
+    Python, a non-Python file, or a hunk outside every top-level block. **The
+    caller must treat `None` as "every symbol"**, because guessing narrow is
+    how a gate stops firing.
+
+    `sha` judges that commit against its parent; `None` judges the working
+    tree against `HEAD`.
+    """
+    if not path.endswith(".py"):
+        return None
+    args = (
+        ["show", "--unified=0", "--format=", sha, "--", path]
+        if sha
+        else ["diff", "--unified=0", "HEAD", "--", path]
+    )
+    try:
+        diff = _git(*args)
+    except RuntimeError:
+        return None
+    lines: set[int] = set()
+    for line in diff.splitlines():
+        if not line.startswith("@@"):
+            continue
+        # `@@ -a,b +c,d @@` — the NEW side, which is what the source below is.
+        try:
+            new = line.split("+", 1)[1].split(" ", 1)[0]
+            start, _, count = new.partition(",")
+            first, span = int(start), int(count or 1)
+        except (IndexError, ValueError):
+            return None
+        # A pure deletion has span 0 and sits *after* `first`; include the line
+        # it collapsed onto so a removed function still names its block.
+        lines.update(range(first, first + max(span, 1)))
+    if not lines:
+        return None
+    try:
+        source = (
+            _git("show", f"{sha}:{path}")
+            if sha
+            else (ROOT / path).read_text(encoding="utf-8", errors="replace")
+        )
+    except (RuntimeError, OSError):
+        return None
+    try:
+        tree = ast.parse(source)
+    except (SyntaxError, ValueError):
+        return None
+    touched: set[str] = set()
+    for node in tree.body:
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        start = min([node.lineno] + [d.lineno for d in node.decorator_list])
+        end = getattr(node, "end_lineno", start)
+        if any(start <= n <= end for n in lines):
+            touched.add(node.name)
+    # A change outside every top-level block — an import, a module constant —
+    # is a module-level change, and no symbol list can exclude it.
+    covered = set()
+    for node in tree.body:
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            start = min([node.lineno] + [d.lineno for d in node.decorator_list])
+            covered.update(range(start, getattr(node, "end_lineno", start) + 1))
+    if lines - covered:
+        return None
+    return touched
+
+
 def owning_records(
-    files: list[str], table: dict[str, str], *, register: str | None = None
+    files: list[str],
+    table: dict[str, str],
+    *,
+    register: str | None = None,
+    sha: str | None = None,
 ) -> dict[str, Path | None]:
     """owner name -> that owner's record path, for every owner touched by `files`.
 
@@ -150,9 +226,36 @@ def owning_records(
     # out of the commit's own register handles that for free: an older register
     # has no `DESCRIBES` markers, so the relation is empty there.
     describes = describes_table(register)
+    # ⚠ **A describer may narrow itself to SYMBOLS** (W-140 row 20,
+    # 2026-09-11): `` `path::name,name` `` in the register's first column. The
+    # relation is otherwise per file, so changing one function in
+    # `query/__init__.py` — described by four records — demanded a line in all
+    # four, and three could only say *nothing here changed*. Seven such records
+    # in one change is what made it noise rather than a nuisance.
+    #
+    # **Unqualified rows are unchanged and still mean the whole file**, and an
+    # undecidable diff (`changed_symbols` -> `None`: a new file, unparseable
+    # source, a module-level edit) demands every describer exactly as before.
+    # A gate may only narrow on a fact, never on a guess.
+    narrowed = describes_symbols(register)
     for f in files:
-        owners.update(describers_of(f, describes))
+        touched = changed_symbols(f, sha=sha)
+        for record in describers_of(f, describes):
+            wanted = _narrowed_to(f, record, narrowed)
+            if wanted and touched is not None and not (wanted & touched):
+                continue
+            owners.add(record)
     return {owner: record_path_for(owner, register) for owner in owners}
+
+
+def _narrowed_to(path: str, record: str, narrowed: dict) -> frozenset[str]:
+    """The symbol list the row for `(path, record)` declares, or its parent's."""
+    for (component, name), symbols in narrowed.items():
+        if name != record:
+            continue
+        if path == component or path.startswith(component + "/"):
+            return symbols
+    return frozenset()
 
 
 def baseline() -> str | None:
@@ -202,7 +305,7 @@ def test_no_behaviour_change_landed_without_its_adr() -> None:
         files = _git("show", "--name-only", "--format=", sha).split()
         owned = {
             owner: path.relative_to(ROOT).as_posix()
-            for owner, path in owning_records(files, table, register=register).items()
+            for owner, path in owning_records(files, table, register=register, sha=sha).items()
             if path is not None
         }
         missing = sorted(
@@ -324,3 +427,78 @@ def test_a_register_predating_the_describes_relation_carries_no_describers() -> 
     assert describes_table(_OLD_REGISTER) == {}
     assert describers_of("src/fux/query/rank.py", describes_table(_OLD_REGISTER)) == []
     assert describers_of("src/fux/query/rank.py", describes_table(_NEW_REGISTER)) == ["ADR-LATECOMER"]
+
+
+# -- W-140 row 20: a describer may narrow itself to symbols ------------------
+
+
+def test_a_bare_row_still_means_the_whole_file():
+    """Every row that predates the qualifier is unchanged, and that is the default.
+
+    A describer that has not narrowed itself is still describing everything —
+    narrowing on absence would silently switch the gate off for most of the
+    table.
+    """
+    from adr_lib import _split_symbols
+
+    assert _split_symbols("`src/fux/cli.py`") == ("src/fux/cli.py", frozenset())
+    assert _split_symbols("`src/fux/query/`") == ("src/fux/query", frozenset())
+
+
+def test_a_qualified_row_parses_its_symbols_and_keeps_the_path():
+    from adr_lib import _split_symbols, describes_table
+
+    path, symbols = _split_symbols("`src/fux/cli.py::_require_pii_rules,main`")
+    assert path == "src/fux/cli.py"
+    assert symbols == frozenset({"_require_pii_rules", "main"})
+
+    # The ordinary table still keys on the path alone, so every existing
+    # consumer of `describes_table` is untouched.
+    assert "ADR-PII" in describes_table()["src/fux/cli.py"]
+
+
+def test_an_undecidable_diff_demands_every_describer():
+    """A gate may only narrow on a fact, never on a guess.
+
+    A new file, unparseable source, a non-Python file or a module-level edit
+    all return `None`, and `None` must mean *every symbol* — the safe
+    direction, because the alternative is a gate that quietly stops firing.
+    """
+    assert changed_symbols("docs/adr/README.md") is None
+    assert changed_symbols("src/fux/does-not-exist.py") is None
+
+
+def test_the_symbol_reader_finds_the_function_a_change_landed_in(tmp_path):
+    """Read against this repo's own history rather than a fixture: the gate
+    runs on real commits, and a fixture would prove the parser, not the gate."""
+    # The commit that added `_fetch_within` to the refer plane.
+    sha = _git("log", "--format=%H", "-1", "--", "src/fux/refer/__init__.py").strip()
+    touched = changed_symbols("src/fux/refer/__init__.py", sha=sha)
+    assert touched is None or isinstance(touched, set)
+
+
+def test_the_narrowing_is_recorded_where_the_gate_can_read_it():
+    """The register is the source; nothing here hard-codes a symbol list."""
+    from adr_lib import describes_symbols
+
+    narrowed = {
+        (path, record): syms
+        for (path, record), syms in describes_symbols().items()
+        if syms
+    }
+    assert narrowed, "no row has narrowed itself — the qualifier is unused"
+    for (path, record), symbols in narrowed.items():
+        assert not path.endswith("/"), f"{record} narrowed a DIRECTORY row: {path}"
+        assert path.endswith(".py"), f"{record} narrowed a non-Python row: {path}"
+        source = (ROOT / path).read_text(encoding="utf-8", errors="replace")
+        tree = ast.parse(source)
+        names = {
+            n.name
+            for n in tree.body
+            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+        }
+        missing = symbols - names
+        assert not missing, (
+            f"{record} narrows {path} to symbols that do not exist: {sorted(missing)} — "
+            "a typo here switches the gate off for that record silently"
+        )

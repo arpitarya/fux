@@ -44,6 +44,7 @@ def answer_via_refer(
     citations: list[tuple[str, str, str]],
     *,
     tune: "Tune | None" = None,
+    cache_ttl_seconds: int = 0,
 ) -> Bundle | None:
     """Fetch, verify, re-score and assemble the ranked candidates. **W-108.**
 
@@ -99,9 +100,25 @@ def answer_via_refer(
             "rerank_weight": tune.rerank_weight,
         }
     )
+    # ⚠ **`cache_ttl_seconds` was hard-coded to the `Policy` default, so every
+    # `ttl=` in every repo was DEAD at ask time** (W-140 row 6, fixed
+    # 2026-09-11). [ADR-URL-FRESHNESS](../../../docs/adr/0149_url-freshness.md)
+    # decision 11 resolves the interval as `min(policy, line)` precisely so a
+    # line can narrow and never widen — and with the policy pinned at `0`,
+    # `min(0, 86400)` made the `cached` verdict unreachable by construction. The
+    # arithmetic was right; nothing could ever set the left operand.
+    #
+    # **Still `0` unless the caller asks** (`--cache-ttl`), so W-60 verdict F
+    # holds exactly as before: a caller who did not ask for caching cannot be
+    # served a cached byte.
     try:
         bundle = refer(
-            root, query, list(citations), policy=Policy(mode=ALWAYS), fetcher=fetch, **sizes
+            root,
+            query,
+            list(citations),
+            policy=Policy(mode=ALWAYS, cache_ttl_seconds=cache_ttl_seconds),
+            fetcher=fetch,
+            **sizes,
         )
     finally:
         close()

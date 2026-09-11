@@ -582,6 +582,17 @@ written into `args.json`.
   exactly the shape this file exists to keep out of the CLI. One caller today,
   and a second one is a design question, not a convenience.
 
+**`--cache-ttl` is a FLAG and deliberately not a `[cli.answer]` key** (W-140
+row 6, 2026-09-11). It decides whether `fux answer` may serve a previously
+fetched copy — *what the verb does*, not how it prints — and this file's whole
+subject is rendering. Putting it here would be the defect row 10 closed the
+same day, where `[cli.json] enabled` decided whether `fux hooks` installed
+anything.
+
+⚠ **The line this draws, for the next key somebody wants:** if absent and
+present produce different *bytes fetched, written or committed*, it is not an
+output default.
+
 ### Consequences
 
 ⚠ **Two defects this build produced and caught, recorded because neither was

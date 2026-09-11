@@ -606,6 +606,30 @@ class Verification:
         }
 
 
+def _cited_of(entry) -> tuple[str, str]:
+    """One cited document as `(name, sha)`, from either shape.
+
+    ⚠ **The name is half the comparison and was missing from it** (W-140 row 7,
+    2026-09-11). An INDEX-path answer cites no fetched bytes, so its subject
+    carries no digest by design — and comparing shas alone made every index
+    receipt compare `""` against `""`. This module's own docstring named that
+    hazard (*"two empty strings compare EQUAL"*) and guarded the receipt shape
+    against it while the comparison itself still read one field.
+
+    With the name in the tuple, an index receipt reproduces when the same
+    document is cited and drifts when a different one is — which is the whole
+    claim an index-path answer can make.
+    """
+    return (_name_of(entry), _sha_of(entry))
+
+
+def _name_of(entry) -> str:
+    if not isinstance(entry, dict):
+        return ""
+    # in-toto ResourceDescriptor `name`, or fux's internal `id`.
+    return str(entry.get("name") or entry.get("id") or "")
+
+
 def _sha_of(entry) -> str:
     """The sha of one cited document, from either shape.
 
@@ -678,7 +702,29 @@ def verify(root: Path, payload: dict, *, rerun=None) -> Verification:
     if inputs.get("index") != now_index:
         return Verification(DRIFTED_CORPUS, note="the committed index differs")
 
-    expected = tuple(_sha_of(s) for s in payload.get("subject") or [])
+    expected = tuple(_cited_of(s) for s in payload.get("subject") or [])
+    # 🔴 **Decision 14, in code at last: `fux verify` NEVER FETCHES** (W-140
+    # row 7, fixed 2026-09-11). `--rerun` called the refer plane, which fetches
+    # every citation — so the verb Arpit ruled offline went to the network, and
+    # the receipt of a refer-path answer was compared against freshly fetched
+    # bytes. Two machines, one receipt, different verdicts: exactly the failure
+    # decision 14 names.
+    #
+    # **The honest verdict for a refer receipt is `unverifiable`**, not a
+    # reproduction nobody could perform offline and not a `drifted:corpus` that
+    # names the wrong cause. The freshness question the receipt's own
+    # `verdicts` already answered, at answer time, by the plane whose job it is.
+    if rerun is not None and engine.get("path") == "refer":
+        return Verification(
+            UNVERIFIABLE,
+            note=(
+                "this answer came from the refer plane, and re-running it would "
+                "fetch; `fux verify` never does (ADR-PROVENANCE decision 14). "
+                "Inputs match; the fetched-byte verdicts are in the receipt's "
+                "own `verdicts`"
+            ),
+            expected=expected,
+        )
     if rerun is None:
         return Verification(
             UNVERIFIABLE,
@@ -693,7 +739,7 @@ def verify(root: Path, payload: dict, *, rerun=None) -> Verification:
     # ⚠ `rerun` hands back fux's own `{id, sha}`, NOT ResourceDescriptors — it
     # is an internal callback, not a receipt. `_sha_of` reads both shapes so the
     # comparison cannot silently compare a digest against an empty string.
-    actual = tuple(_sha_of(s) for s in again or [])
+    actual = tuple(_cited_of(s) for s in again or [])
     if actual == expected:
         return Verification(REPRODUCED, expected=expected, actual=actual)
     return Verification(

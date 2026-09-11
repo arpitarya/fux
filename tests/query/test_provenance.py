@@ -310,10 +310,16 @@ def test_matching_inputs_without_a_rerun_is_unverifiable_not_reproduced(tmp_path
     assert "not re-run" in result.note
 
 
-def test_a_rerun_that_returns_the_same_shas_reproduces(tmp_path):
+def test_a_rerun_that_returns_the_same_citation_reproduces(tmp_path):
+    """⚠ `path="index"`, because that is the only path a rerun may take.
+
+    This read `path="refer"` until 2026-09-11, when decision 14 — *`fux verify`
+    NEVER FETCHES* — finally reached the code (W-140 row 7). A refer answer
+    cannot be re-run offline, so it is `unverifiable` now; see below.
+    """
     _corpus(tmp_path)
     subject = [{"id": "file:mesh.md", "loc": "mesh.md:L1-L2", "sha": "abc123"}]
-    payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=subject)
+    payload = provenance.receipt(tmp_path, "rollback", path="index", subject=subject)
     result = provenance.verify(tmp_path, payload, rerun=lambda q: [{"id": "file:mesh.md", "sha": "abc123"}])
     assert result.verdict == provenance.REPRODUCED
 
@@ -321,11 +327,57 @@ def test_a_rerun_that_returns_the_same_shas_reproduces(tmp_path):
 def test_changed_bytes_drift_on_the_corpus(tmp_path):
     _corpus(tmp_path)
     subject = [{"id": "file:mesh.md", "loc": "mesh.md:L1-L2", "sha": "abc123"}]
-    payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=subject)
+    payload = provenance.receipt(tmp_path, "rollback", path="index", subject=subject)
     result = provenance.verify(tmp_path, payload, rerun=lambda q: [{"id": "file:mesh.md", "sha": "def456"}])
     assert result.verdict == provenance.DRIFTED_CORPUS
-    assert result.expected == ("abc123",)
-    assert result.actual == ("def456",)
+    assert result.expected == (("file:mesh.md", "abc123"),)
+    assert result.actual == (("file:mesh.md", "def456"),)
+
+
+# -- W-140 row 7: the verb Arpit ruled offline went to the network ----------
+
+
+def test_a_refer_receipt_is_unverifiable_rather_than_re_fetched(tmp_path):
+    """🔴 `--rerun` called the refer plane, which fetches every citation.
+
+    Decision 14 is Arpit's ruling and names the failure exactly: one receipt,
+    two machines, same minute, different verdicts — a laptop on the VPN says
+    `reproduced`, a CI runner cannot say anything. The code did the thing the
+    ruling forbids, and the receipt of a refer answer was compared against
+    bytes fetched right then.
+    """
+    _corpus(tmp_path)
+    subject = [{"id": "file:mesh.md", "loc": "mesh.md:L1-L2", "sha": "abc123"}]
+    payload = provenance.receipt(tmp_path, "rollback", path="refer", subject=subject)
+
+    def never_called(query):  # pragma: no cover - the point is that it is not
+        raise AssertionError("verify re-ran a refer answer, which fetches")
+
+    result = provenance.verify(tmp_path, payload, rerun=never_called)
+    assert result.verdict == provenance.UNVERIFIABLE
+    assert "never does" in result.note and "decision 14" in result.note
+    assert result.expected == (("file:mesh.md", "abc123"),)
+
+
+def test_an_index_receipt_with_no_digest_does_not_reproduce_by_accident(tmp_path):
+    """🔴 Two empty shas compared EQUAL, and an index subject has no digest.
+
+    `_sha_of`'s own docstring named this hazard and guarded the receipt shape
+    against it, while the comparison itself still read one field — so an
+    index-path receipt could report `reproduced` against a completely different
+    document. The name is half the comparison now.
+    """
+    _corpus(tmp_path)
+    subject = [{"id": "file:mesh.md", "loc": "mesh.md"}]  # index path: no sha
+    payload = provenance.receipt(tmp_path, "rollback", path="index", subject=subject)
+
+    same = provenance.verify(tmp_path, payload, rerun=lambda q: [{"id": "file:mesh.md"}])
+    assert same.verdict == provenance.REPRODUCED
+
+    other = provenance.verify(tmp_path, payload, rerun=lambda q: [{"id": "file:other.md"}])
+    assert other.verdict == provenance.DRIFTED_CORPUS, (
+        "a different document cited, and both digests empty, read as reproduced"
+    )
 
 
 def test_an_edited_index_drifts_on_the_corpus(tmp_path):

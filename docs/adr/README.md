@@ -475,18 +475,31 @@ the relation *look* enforced while asserting things nobody checked.
 
 <!-- DESCRIBES-TABLE-START -->
 
+**A component may be narrowed to SYMBOLS: `` `path::name,name` ``.** The gate
+then demands that record only when the change touches one of those top-level
+`def`s or `class`es. A bare path means the whole file and is the default —
+every row written before 2026-09-11 is one, and a describer that has not
+narrowed itself is still describing everything.
+
+⚠ **Narrow a row only when you can show the symbol list is the record's WHOLE
+reach in that file.** A too-narrow list switches the gate off silently, which
+is worse than the noise it removes — `tests/test_adr_freshness.py` checks every
+named symbol exists, and nothing can check that the list is complete. The two
+rows narrowed so far were each verified by reading every mention in the file
+(W-140 row 20).
+
 | component | record | why it reaches in |
 |---|---|---|
 | `src/fux/cli.py` | ADR-OUTPUT | decision 10 binds **every gated flag** in this file to `default=None`. Owned by ADR-CLI, constrained here — and the constraint failing silently is precisely how six flags shipped at `default=False` |
 | `src/fux/query/__init__.py` | ADR-CONFIDENCE | the confidence block is assembled and emitted here (`confidence_out`, `_fill_confidence`), while ADR-ASK owns the module for the scan and unification |
-| `src/fux/query/__init__.py` | ADR-OUTPUT | the emission gate (`_show_band`, `_gated`) lives here — where a rendering decision reaches into a file whose subject is the query itself |
+| `src/fux/query/__init__.py::_show_band,_gated,_print_index_answer,_print_refer_answer,cmd_ask,cmd_find,cmd_answer` | ADR-OUTPUT | the emission gate (`_show_band`, `_gated`) lives here — where a rendering decision reaches into a file whose subject is the query itself |
 | `src/fux/derive/accel.py` | ADR-CONFIDENCE | `stats_out` is passed through here so the accelerator and the scan agree about `df`/`n`. **The differential law is what makes this load-bearing**: if only one path carried it, the two would disagree about how confident fux is |
 | `src/fux/query/rank.py` | ADR-TUNE | `[priority]` is DATA in ADR-TUNE and RESOLUTION on `rank.py::Weighting` — the register's own ownership note already says so, which is what made this row checkable rather than asserted |
 | `src/fux/ingest/run.py` | ADR-PII | the redaction pass, and its position between `content_sha` and `extract_fields` — decision 3, which is the whole record. Also `_pii_ruleset_moved`, the reuse invalidation. Owned by ADR-INGEST for the walk |
 | `src/fux/enrich.py` | ADR-PII | `enrich=` for `url:` documents — `_document_text` reading the retained blob, and the single synthetic `.fux/sources/urls` scope. Owned by ADR-ENRICH for enrichment itself |
 | `src/fux/ingest/sourcelist.py` | ADR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
 | `src/fux/config.py` | ADR-PII | `[sources.url] enrich` — the source-wide layer |
-| `src/fux/cli.py` | ADR-PII | `_require_pii_rules` and `PII_EXEMPT` — decision 17's refusal, placed before dispatch so a verb added later is gated without knowing it. Owned by ADR-CLI for the verb surface; the rule and its exemptions are this record's |
+| `src/fux/cli.py::_require_pii_rules,main` | ADR-PII | `_require_pii_rules` and `PII_EXEMPT` — decision 17's refusal, placed before dispatch so a verb added later is gated without knowing it. Owned by ADR-CLI for the verb surface; the rule and its exemptions are this record's |
 | `src/fux/setup.py` | ADR-PII | writes `.fux/pii.toml` from the starter, write-if-missing — the half of decision 17 that makes the refusal fixable. Owned by ADR-DOTFUX for scaffolding |
 | `src/fux/store/fuxdir.py` | ADR-PII | `pii.toml`'s row in `COMMITTED_FILES` — **the ruleset is committed, and that is the decision** (decision 1): a redaction rule that lived on a gitignored path would redact one clone and not the next, so the file has to sit in the category `fux doctor` audits. Owned by ADR-DOTFUX for the layout |
 | `src/fux/ingest/urlsrc.py` | ADR-ACQUIRED | retention lives in `fetch_all()` and **never inside a fetcher** (decision 5) — W-86 P8's precedent, so every fetcher gains it with no line changed in any of them. Owned by ADR-FETCHER for the contract itself |

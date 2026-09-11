@@ -859,6 +859,13 @@ and [ADR-URL-LIST](0116_url-list.md) carries it. **Three defects in one day
 where a verb's behaviour came from the wrong layer**: the output config, the
 engine defaults, and an unread flag.
 
+**`fux answer --cache-ttl DURATION`** (W-140 row 6, 2026-09-11). The surface's
+first flag whose value is a duration, and it is parsed by
+`sourcelist.parse_duration` — the source list's own grammar — so `--cache-ttl
+1x` and a hand-written `ttl=1x` fail identically
+([ADR-URL-FRESHNESS](0149_url-freshness.md) decision 10). A second duration
+parser on this surface would be the drift that decision exists to prevent.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

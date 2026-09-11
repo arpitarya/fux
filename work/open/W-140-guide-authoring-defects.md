@@ -28,12 +28,9 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 6 | **`answer` runs with the fetch cache off**: `ttl=` never applies, `cached` is unreachable, `update=never` does not stop the answer-time fetch. | `query/refer_answer.py` ~104 | ADR-URL-FRESHNESS d11/d15 · ADR-REFER d20 · ADR-ACQUIRED |
-| 7 | **`verify` misreports**: a `source: index` receipt and an unreachable URL both give `drifted:corpus`, not `unverifiable`; `--rerun` fetches. **(guide: ANSWER)** | `query/__init__.py` ~994, ~1075 | ADR-PROVENANCE d14 |
 | 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
-| 20 | ⚠ **The freshness gate's `describes` relation is per FILE, so a change to one function in `ingest/run.py` demands a line in three records that do not describe it.** Twice in one session (2026-09-11) that produced a record edit whose only content was *nothing here changed*. Per-symbol describes, or an explicit exemption, would fix it | `tests/test_adr_freshness.py`, `docs/adr/README.md` §Ownership | ADR-OWNERSHIP |
 
 ## 2 · Records that disagree with the code
 
@@ -209,6 +206,38 @@ then refresh this repo's renderings.
   must not turn a correct re-index into a reported failure — and the result is
   recorded in the run status.
   [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md). 2026-09-11.
+
+- **Row 6 — every `ttl=` in every repo was dead at ask time.** `answer` built
+  its policy with `cache_ttl_seconds` at the default `0`, and decision 11
+  resolves the interval as `min(policy, line)` — so `min(0, 86400)` made the
+  `cached` verdict unreachable by construction. The arithmetic was right;
+  nothing could set its left operand. `--cache-ttl` is the way to ask, parsed
+  by the source list's own duration grammar; the default stays `0`, so W-60
+  verdict F holds. ⚠ **The row's third claim was wrong**: `update=never` not
+  stopping an answer-time fetch is ADR-URL-FRESHNESS decision 15 working —
+  `ttl=` is ask-time, `update=` is update-time, and merging them is what that
+  decision exists to prevent. 2026-09-11.
+
+- **Row 7 — `fux verify --rerun` fetched, in the one verb ruled never to.**
+  It called the refer plane, so ADR-PROVENANCE decision 14 — *`fux verify`
+  NEVER FETCHES*, Arpit, 2026-08-27 — was contradicted by the code for sixteen
+  days, and the failure that decision names in its own words (one receipt, two
+  machines, different verdicts) was the shipped behaviour. The re-run re-ranks
+  from the committed index alone now, and a refer-path receipt is
+  `unverifiable` naming the ruling. 🔴 **And the comparison read only the
+  digest** — an index-path subject has none by design, so `""` compared equal
+  to `""` and an index receipt could report `reproduced` against a different
+  document. Cited documents compare as `(name, sha)`. 2026-09-11.
+
+- **Row 20 — the freshness gate demanded records with nothing to say.** A
+  describer row may now narrow itself to symbols (`` `path::name,name` ``), and
+  the gate demands that record only when the change touches one of them. A bare
+  path still means the whole file, and an undecidable diff demands everybody —
+  **it narrows on a fact, never on a guess**. ⚠ **Two rows narrowed, not
+  twenty**: a too-short list disables a record silently, which is worse than the
+  noise, so a row is narrowed only by someone who has read that record's whole
+  reach in the file. [ADR-OWNERSHIP](../../docs/adr/0146_ownership.md).
+  2026-09-11.
 
 ## Definition of done
 

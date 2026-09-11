@@ -107,14 +107,18 @@ per document in `audit.documents[]` (`freshness`, `indexed_sha`, `fetched_sha`,
 | `current` | read now; matches what was indexed | cite plainly with `loc` |
 | `stale` | read now; **changed since indexing** | quote it — it is the **current** text — and say the index is behind (a stale winner drops the band to `partial`) |
 | `as-ingested` | source unreachable; compared against the bytes kept in `.fux/acquired/` at ingest (retained unless the URL line says `keep=false`) | "as of the last ingest; the source could not be reached" |
-| `cached` | served from the local fetch cache | "checked recently, not just now" |
+| `cached` | served from the local fetch cache — **only when you pass `--cache-ttl`** | "checked recently, not just now" |
 | `unverified` | not read — no fetcher, fetch failed, or file gone from the working tree | that document supplied **no passage**; never call it confirmed |
 
 - **An `as-ingested` note saying *"the index disagrees with the bytes it was
   built from"*** is an index defect, not a changed source. Say so.
-- **Do not rely on a URL line's `ttl=` or `update=never` to keep `answer`
-  offline.** Read `citation.freshness` (or `--audit`) on every answer instead of
-  assuming what was or was not fetched.
+- **`answer` goes out for every citation unless you ask otherwise.**
+  `--cache-ttl 15m` serves a copy fetched within the window instead; a URL
+  line's own `ttl=` can only **narrow** that, never widen it, so without the
+  flag no line's `ttl=` applies and `cached` never appears. ⚠ **`update=never`
+  is update-time and does NOT keep `answer` offline** — that is by design
+  (ADR-URL-FRESHNESS decision 15), not a defect. Read `citation.freshness` (or
+  `--audit`) rather than assuming what was fetched.
 - ⚠ **A `note` naming the fetcher** — it raised, returned no bytes, or returned
   a type no decoder claims — means the live fetch was not used: the verdict is
   `as-ingested` (kept bytes) or `unverified`, never `current`. The note says
@@ -155,19 +159,21 @@ failure decides:
 | verdict | exit | means |
 |---|---|---|
 | `drifted:config` | 1 | engine version differs, or `.fux/tune.toml` differs (or appeared) |
-| `drifted:corpus` | 1 | the committed index differs, or `--rerun` cited different bytes |
-| `unverifiable` | 1 | not a fux receipt, an older receipt format, no index here — **or inputs match but `--rerun` was not passed** |
-| `reproduced` | 0 | `--rerun` cited the same shas, in the same order |
+| `drifted:corpus` | 1 | the committed index differs, or `--rerun` cited a different document |
+| `unverifiable` | 1 | not a fux receipt, an older format, no index here, `--rerun` was not passed — **or the receipt came from a `refer` answer** |
+| `reproduced` | 0 | `--rerun` cited the same documents, in the same order |
 
+- 🔴 **`fux verify` NEVER FETCHES**, by ruling (ADR-PROVENANCE decision 14). So
+  a **`source: refer` receipt is `unverifiable`** with `--rerun`: its answer was
+  assembled from bytes fetched at answer time, and reproducing that would mean
+  going out again — which would make one receipt verify differently on a laptop
+  and in CI. **The fetched-byte verdicts you want are already in the receipt's
+  own `verdicts`**, recorded when the answer was given.
 - ⚠ **Without `--rerun` the best possible verdict is `unverifiable`** (*"inputs
   match; the answer was not re-run"*). That is not a pass.
-- ⚠ **`--rerun` re-answers through the same read path as `answer`:** local files
-  come from the working tree (an uncommitted edit shows as `drifted:corpus`) and
-  `url:` documents are fetched again. An unreachable URL drops its passages,
-  which also reads as `drifted:corpus`. Check `actual` against `expected`.
-- ⚠ **A receipt from a `source: index` answer names no shas**, so `--rerun`
-  reports `drifted:corpus` even when nothing changed. Only `refer` receipts are
-  meaningful evidence.
+- **`--rerun` re-ranks from the committed index only**, so it is deterministic
+  on any machine. A local file edited since the receipt changes the index
+  digest and shows as `drifted:corpus`.
 - **Upgrading fux makes every older receipt `drifted:config`.**
 
 **`--journal` stores the question in plaintext** in a local, gitignored file,

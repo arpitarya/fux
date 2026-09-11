@@ -930,7 +930,9 @@ def cmd_answer(args) -> int:
     no_refer_flag = getattr(args, "no_refer", False)
 
     if not no_refer_flag:
-        referred = _answer_via_refer(root, args.query, results, tune)
+        referred = _answer_via_refer(
+            root, args.query, results, tune, _cache_ttl_of(args)
+        )
         if referred is not None:
             _declare_change_since_last_ask(root, args.query, referred)
             # ⚠ **The UPGRADED block, not the one `run_query` produced.**
@@ -1067,17 +1069,23 @@ def cmd_verify(args) -> int:
             # produced with `--expand` compares two different queries and
             # reports `drifted` for a reason that has nothing to do with the
             # corpus.
+            # 🔴 **This called `_answer_via_refer`, which FETCHES** — in the
+            # one verb Arpit ruled must never go to the network
+            # ([ADR-PROVENANCE](../../docs/adr/0143_provenance.md) decision
+            # 14). Fixed 2026-09-11 (W-140 row 7). A refer-path receipt does
+            # not reach here at all now: `provenance.verify` returns
+            # `unverifiable` before the callback runs, because an answer
+            # assembled from fetched bytes cannot be reproduced from what is
+            # committed, and saying so is the honest verdict.
+            #
+            # What remains is the index path, which is deterministic on any
+            # machine — which is the property decision 14 exists to protect.
             results, _ = run_query(
                 root, query, ANSWER_TOP, force_scan=_force_scan(args), expand=replay_expand,
             )
             if not results:
                 return []
-            bundle = _answer_via_refer(root, query, results, _tune(root))
-            if bundle is None:
-                return []
-            return [
-                {"id": c.doc_id, "sha": c.sha} for c in bundle.assembled.citations
-            ]
+            return [{"id": results[0].id, "loc": results[0].loc}]
 
     result = provenance.verify(root, payload, rerun=rerun)
     if args.json:
@@ -1109,7 +1117,30 @@ def _block_dict(block) -> dict:
     return block.as_dict()
 
 
-def _answer_via_refer(root: Path, query: str, results: list[AskResult], tune: "Tune"):
+def _cache_ttl_of(args) -> int:
+    """`--cache-ttl` as seconds, validated by the source list's own parser.
+
+    ⚠ **One validator, deliberately** — [ADR-URL-FRESHNESS](../../../docs/adr/0149_url-freshness.md)
+    decision 10 says `--ttl 1x` and a hand-written `ttl=1x` must fail
+    identically, and a second duration parser here would be the drift that
+    decision exists to prevent.
+    """
+    raw = getattr(args, "cache_ttl", None)
+    if raw is None:
+        return 0
+    from ..ingest.sourcelist import parse_duration
+
+    seconds = parse_duration(str(raw))
+    if seconds is None:
+        raise FuxError(
+            f"--cache-ttl {raw!r}: must be `0` or <integer><s|m|h|d>, e.g. `15m` or `1h`"
+        )
+    return seconds
+
+
+def _answer_via_refer(
+    root: Path, query: str, results: list[AskResult], tune: "Tune", cache_ttl_seconds: int = 0
+):
     """`None` when NO candidate produced a usable citation — never raises.
 
     Takes the ranked list since W-108 and reads each candidate's indexed `sha`
@@ -1129,7 +1160,9 @@ def _answer_via_refer(root: Path, query: str, results: list[AskResult], tune: "T
         citations.append((result.id, result.loc, record["sha"]))
     if not citations:
         return None
-    return answer_via_refer(root, query, citations, tune=tune)
+    return answer_via_refer(
+        root, query, citations, tune=tune, cache_ttl_seconds=cache_ttl_seconds
+    )
 
 
 def _declare_change_since_last_ask(root: Path, query: str, bundle) -> None:

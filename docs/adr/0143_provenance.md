@@ -339,6 +339,26 @@ supplied (W-109, 2026-09-05).**
 ⚠ **L8 is why this is legal**: an expansion is a use record, so it lives on the
 receipt and the journal, both gitignored, and reaches no committed byte.
 
+**Decision 14 reached the code on 2026-09-11, sixteen days after it was ruled**
+(W-140 row 7). `--rerun` called `_answer_via_refer`, which fetches every
+citation — so the one verb ruled never to touch the network did, on every
+re-run, and a refer-path receipt was compared against bytes fetched right then.
+**The failure decision 14 names in its own words was the behaviour shipped.**
+
+- **A `refer` receipt with `--rerun` is `unverifiable` now**, naming the ruling
+  and pointing at the receipt's own `verdicts` — which already answer the
+  freshness question, from the plane whose job it is, at the time it mattered.
+  That is the cost of the ruling, paid where a reader can see it, rather than a
+  `reproduced` nobody could obtain offline.
+- **The rerun re-ranks from the committed index alone**, so it is deterministic
+  on any machine — the property decision 14 exists to protect.
+- 🔴 **And the comparison read only the digest.** An index-path subject carries
+  no digest by design, so `""` compared equal to `""` and an index receipt could
+  report `reproduced` against a **different document**. `_sha_of`'s own
+  docstring named that hazard and guarded the receipt's shape against it while
+  the comparison itself still read one field. Cited documents compare as
+  `(name, sha)` now.
+
 ### Consequences
 
 - **Easier:** a wrong ranking is diagnosable from the output — matched terms,

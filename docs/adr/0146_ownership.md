@@ -206,6 +206,35 @@ src/fux/query/rank.py        ADR-RANKING         ADR-TUNE
       a diff touched. **Whoever reopens this is reopening a declined option, not
       arguing against a decided one.**
 
+**The `describes` relation may narrow itself to SYMBOLS** (W-140 row 20,
+2026-09-11): `` `path::name,name` `` in the register's component column, and
+the gate demands that record only when the change touches one of those
+top-level definitions.
+
+- 🔴 **Why it was needed.** The relation is per FILE, and
+  `src/fux/query/__init__.py` is described by four records while
+  `src/fux/ingest/run.py` is described by two. Changing one function in either
+  demanded a line in every one of them — and the lines that had nothing to say
+  said *nothing here changed*. **Written twice in one session, then seven
+  records in one change**, at which point it stopped being a nuisance and
+  became noise that teaches a reader to skip record edits. A gate whose output
+  is routinely ignorable is a gate that has stopped working.
+- **A bare path still means the whole file**, so every row written before this
+  is unchanged. Narrowing on absence would have switched the gate off across
+  most of the table.
+- **An undecidable diff demands everybody.** A new file, unparseable source, a
+  non-Python file, or an edit outside every top-level block returns *cannot
+  tell*, and the gate treats that as every symbol. **It may narrow on a fact
+  and never on a guess** — the alternative is a check that quietly stops
+  firing, which is the failure this record exists to prevent.
+- ⚠ **The dangerous direction is a list that is too SHORT**, and nothing can
+  check for it. A test asserts every named symbol exists (a typo would
+  otherwise disable a record silently); completeness is judgment, so a row is
+  narrowed only by someone who has read every mention of that record's subject
+  in the file. **Two rows are narrowed today** — ADR-PII on `cli.py` and
+  ADR-OUTPUT on `query/__init__.py` — each verified that way, and the rest are
+  left whole deliberately rather than swept.
+
 ### Consequences
 
 - **Every describes row is a row someone must maintain.** The relation is only

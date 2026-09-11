@@ -356,6 +356,20 @@ which reads the candidate order. `answer` gains no flag: `--phrase`, `--under`
 and `--all` are `find`'s, and `tie` is not in `answer`'s payload because
 `answer` returns one answer rather than a ranking.
 
+**`answer` takes `--cache-ttl`, and `verify` stopped re-answering through this
+verb's fetching path** (W-140 rows 6 and 7, 2026-09-11).
+
+- **`--cache-ttl`** is the only way to ask for a cached copy. `cmd_answer` built
+  its policy with the default `0`, so `min(policy, line)` made every URL line's
+  `ttl=` dead and the `cached` verdict unreachable —
+  [ADR-URL-FRESHNESS](0149_url-freshness.md) carries the arithmetic and why the
+  default stays `0`.
+- 🔴 **`fux verify --rerun` called this verb's refer path, which fetches**,
+  breaking [ADR-PROVENANCE](0143_provenance.md) decision 14 — Arpit's ruling
+  that verify never goes to the network. The rerun re-ranks from the committed
+  index alone now, and a receipt from a refer answer is `unverifiable` rather
+  than compared against bytes fetched on the spot.
+
 ### Consequences
 
 - **The passage carries the document's frontmatter block.** `refer/_chunk.py`

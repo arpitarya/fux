@@ -538,6 +538,15 @@ not made fux more certain, and `separation` computed over a filtered list would
 say they had. Same reasoning as decision 10's refusal to rescale for fusion,
 one surface along.
 
+⚠ **Touched 2026-09-11 by a change to `query/__init__.py` that this record does
+not describe** — `--cache-ttl` reaching `cmd_answer`, and `cmd_verify`'s re-run
+no longer fetching. **The block, its floors and `_fill_confidence` are
+unchanged.** This row is exactly the case
+[ADR-OWNERSHIP](0146_ownership.md)'s new symbol qualifier exists for, and it is
+deliberately NOT narrowed yet: this record's reach in that module spans nine
+functions including `cmd_ask` and `run_query`, so a short list would switch the
+gate off silently — worse than the line you are reading.
+
 ### Consequences
 
 **`support` is bounded by `--top`, and cannot honestly be a corpus-wide count.**

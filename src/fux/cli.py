@@ -535,6 +535,28 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="skip the refer plane; answer from the index's own structure alone",
     )
+    # ⚠ **The only way to ask for caching, and until 2026-09-11 there was none**
+    # (W-140 row 6). [ADR-URL-FRESHNESS](docs/adr/0149_url-freshness.md)
+    # decision 11 resolves the interval as `min(policy, line)` -- *a line may
+    # narrow it and can never widen it* -- and `answer` built its policy with
+    # the default `0`. `min(0, anything)` is `0`, so every `ttl=` in every repo
+    # was dead at ask time and the `cached` verdict was unreachable by
+    # construction. The arithmetic was right; nothing could set the left operand.
+    #
+    # A FLAG, not a config key: ADR-OUTPUT's `[cli.*]` chooses rendering and may
+    # never change what a verb does, which is the defect row 10 closed the same
+    # day. Default stays `0`, so a caller who does not ask still cannot be
+    # served a cached byte (W-60 verdict F).
+    p_answer.add_argument(
+        "--cache-ttl",
+        metavar="DURATION",
+        default=None,
+        help=(
+            "serve a previously fetched copy for this long instead of re-fetching "
+            "(e.g. 15m, 1h, 0 = off, the default). A URL line's own `ttl=` can "
+            "only narrow this, never widen it"
+        ),
+    )
     # ADR-PROVENANCE. Three flags rather than one, because they are three
     # different asks and conflating them would make the strongest one
     # (`--journal`, which WRITES) reachable by accident.

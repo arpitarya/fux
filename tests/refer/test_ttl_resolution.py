@@ -113,3 +113,61 @@ def test_an_UNCONFIGURED_repo_reads_nothing_and_does_not_raise(tmp_path):
     """
     assert not (tmp_path / "fux.toml").exists()
     assert refer_mod._declared_ttls(tmp_path) == {}
+
+
+# -- W-140 row 6: the knob that lied for real, not in theory -----------------
+
+
+def test_answer_built_its_policy_with_caching_off_so_every_ttl_was_dead():
+    """🔴 The arithmetic above was right and nothing could set its left operand.
+
+    `answer_via_refer` constructed `Policy(mode=ALWAYS)` — `cache_ttl_seconds`
+    at its default `0` — so `min(0, declared)` was `0` for every URL in every
+    repo. `ttl=` was the knob this file exists to prove is not a lie, and it
+    was a lie everywhere `fux answer` ran, with the `cached` verdict
+    unreachable by construction.
+
+    Pinned by reading the source: a behavioural test would need a fetcher, a
+    clock and a cache directory to say what one line says.
+    """
+    import inspect
+
+    from fux.query import refer_answer
+
+    body = inspect.getsource(refer_answer.answer_via_refer)
+    assert "cache_ttl_seconds=cache_ttl_seconds" in body, (
+        "the caller's cache policy must reach the Policy the refer plane is given"
+    )
+    assert "Policy(mode=ALWAYS)" not in body, "a hard-coded policy makes every ttl= dead"
+
+
+def test_the_caller_still_gets_no_cache_unless_it_asks():
+    """W-60 verdict F, held by arithmetic: the default is still 0."""
+    import inspect
+
+    from fux.query.refer_answer import answer_via_refer
+
+    default = inspect.signature(answer_via_refer).parameters["cache_ttl_seconds"].default
+    assert default == 0
+
+
+def test_the_flag_is_parsed_by_the_source_lists_own_duration_parser():
+    """One validator — `--ttl 1x` and `ttl=1x` must fail identically (decision 10)."""
+    from fux.errors import FuxError
+    from fux.query import _cache_ttl_of
+
+    class Args:
+        cache_ttl = "15m"
+
+    assert _cache_ttl_of(Args()) == 900
+
+    class Bad:
+        cache_ttl = "1x"
+
+    with pytest.raises(FuxError, match="must be `0` or"):
+        _cache_ttl_of(Bad())
+
+    class Absent:
+        pass
+
+    assert _cache_ttl_of(Absent()) == 0

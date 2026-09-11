@@ -61,6 +61,24 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **`fux verify --rerun` fetched.** ADR-PROVENANCE decision 14 is a ruling
+  that `fux verify` never goes to the network — one receipt must not verify
+  differently on a laptop with a VPN and in CI. `--rerun` called the refer
+  plane, which fetches every citation. It re-ranks from the committed index
+  alone now, and a receipt from a `source: refer` answer reports
+  `unverifiable` rather than being compared against bytes fetched on the spot;
+  its fetched-byte verdicts were already recorded in the receipt. **An index
+  receipt could also report `reproduced` against a different document** — its
+  subject carries no digest, and two empty shas compared equal; citations
+  compare as `(name, sha)` now.
+
+- 🔴 **Every `ttl=` was dead at ask time, and `cached` was unreachable.**
+  `fux answer` built its freshness policy with caching off, and a URL line's
+  `ttl=` may only narrow the caller's policy, never widen it — so `min(0, …)`
+  was always `0`. **`fux answer --cache-ttl 15m`** is how to ask; the default
+  stays off, so nobody who did not ask can be served a cached byte
+  ([ADR-URL-FRESHNESS](docs/adr/0149_url-freshness.md)).
+
 - **The background re-index rebuilds the accelerator.** Every CLI verb builds
   it where the shards are written, so `ask --fast` never pays for one; the
   detached runner skipped it, leaving the derived plane stale after every
