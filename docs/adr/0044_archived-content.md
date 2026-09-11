@@ -353,6 +353,15 @@ knob half of the same gap.
 and is easy to miss** — it lives inside ADR-ENRICH, and before this decision it
 was not discoverable from this record at all. That was the whole of W-127.
 
+⚠ **`update` joined the URL grammar on the same day as `archived` and took
+THREE layers where `archived` takes two** — and the contrast is decision 1a's
+reasoning working, not an inconsistency. `archived` is a fact about **one
+document**, so a source-wide *"everything I fetch is retired"* describes no
+corpus anybody has. `update` is a policy about **reaching** a source, so
+`[sources.url] update = "never"` pins a whole intranet wiki in one line and any
+page can exempt itself. **Same grammar, opposite layer counts, one rule deciding
+both:** does the value describe the document, or the route to it?
+
 ### Consequences
 
 - ⚠ **`is_archived_loc()` has exactly one definition**, used by both the ingest

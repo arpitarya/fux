@@ -818,6 +818,16 @@ that silently applied itself from a config file would make `fux find` return a
 different set of paths in two clones of the same repo. It is per-invocation by
 design.
 
+**`fux add <URL> --no-update`** records `update=never`
+([ADR-URL-LIST](0026_url-list.md) decision 14): this document is pinned and
+`fux update` will not fetch it again.
+
+⚠ **That `add` still fetches ONCE, and `--help` says so rather than only this
+record.** One fetch is what makes the line ingestable at all — a pinned URL that
+was never fetched has no record to freeze. The flag governs every run after.
+A person reading `--no-update` and expecting no network at all would be
+reasonable, which is why the correction belongs in the terminal.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

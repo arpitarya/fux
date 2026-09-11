@@ -593,6 +593,25 @@ beside `priors.superseded_ids`' `supersedes:` edges and under the same three
 rules — the successor must exist, never itself, and a malformed enrichment
 retires nothing. [ADR-ENRICH](0047_enrich.md) decisions 17-18.
 
+**A pinned URL is a `POLICY` skip, taken before the fetch and carried forward
+after it.** `update=never` ([ADR-URL-LIST](0026_url-list.md) decision 14) filters
+the resolved list between `resolve_urls` and `fetch_all`.
+
+- **`POLICY`, not `UNFETCHED`** — decision 15's split says `POLICY` means *the
+  declaration did its job*, which is exactly this. `UNFETCHED` claims the bytes
+  failed to arrive, and it would put the URL into `.fux/enrich/queue.tsv`: a
+  committed work item, in front of the whole team, that no amount of enrichment
+  discharges.
+- 🔴 **`url_meta` stays the WHOLE list, so the record carries forward.** Pinning
+  freezes a document; it must never drop one. Carry-forward is keyed on every
+  resolved URL rather than on what this run fetched — the same property that
+  keeps a failed fetch's record alive — so narrowing that keying would turn
+  `update=never` into a delayed deletion.
+- ⚠ **A carried `url:` record is not re-extracted, so a pinned document's
+  extraction is frozen too** — including its redaction. [ADR-PII](0060_pii.md)
+  carries that consequence, which is the one place this filter is load-bearing
+  beyond bandwidth.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in

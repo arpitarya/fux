@@ -434,13 +434,19 @@ def _overrides(args, spec: sourcelist.ListSpec) -> dict[str, str]:
         ("meta", ("plain", "hashed")),
         ("archived", ("archived",)),
         ("keep", ("keep", "no_keep")),
+        ("update", ("no_update",)),
     )
     #: Flags that NAME a boolean attribute rather than carrying its value.
     #: `--cdp` records `fetch=cdp` -- the flag is the value. `--no-keep`
     #: records `keep=false`, where it is not.
+    #:
+    #: ⚠ **`--no-update` records `update=never`, not `update=false`.** The
+    #: attribute is two WORDS (`auto`/`never`), deliberately, so it can never be
+    #: mistaken for the duration-valued `ttl=` sitting beside it.
     boolean = {
         "archived": {"archived": "true"},
         "keep": {"keep": "true", "no_keep": "false"},
+        "update": {"no_update": "never"},
     }
     overrides: dict[str, str] = {}
     for attribute, flags in pairs:

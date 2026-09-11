@@ -355,6 +355,15 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--archived", action="store_true", help="dirs: record archived=true")
         p.add_argument("--keep", action="store_true", help="URLs: record keep=true - retain the fetched bytes in .fux/acquired/ (the default)")
         p.add_argument("--no-keep", action="store_true", help="URLs: record keep=false - do not retain the fetched bytes")
+        p.add_argument(
+            "--no-update",
+            action="store_true",
+            help=(
+                "URLs: record update=never - pin this document. `fux update` will not "
+                "fetch it again. NOTE this add still fetches ONCE, which is what makes "
+                "the line ingestable; the flag governs every run after"
+            ),
+        )
         p.add_argument("--ttl", metavar="D", help="URLs: record ttl=D - how long a citation may go unchecked at ask time (0, 30s, 15m, 1h, 7d)")
         p.add_argument("--dry-run", action="store_true", help="print the line and the plan; write nothing")
 

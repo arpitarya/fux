@@ -155,6 +155,20 @@ three-layer resolution is one of the things that proposal has to answer for.
 
 **Nothing about retention, eviction or the bound changed.**
 
+**`update=never` makes this plane's value visible, and its absence costly.**
+[ADR-URL-LIST](0026_url-list.md) decision 14 lets a line say *never fetch this
+again*, and the two pairings are not equivalent:
+
+| pairing | what a citation is worth |
+|---|---|
+| `update=never keep=true` | **the coherent one.** The bytes are here, `fux answer` verifies against them and reports `as-ingested`, and no socket opens. *More* offline, with the grain of L4 |
+| `update=never keep=false` | **legal and lossy.** Nothing was retained and nothing will be fetched, so the document is frozen at whatever statistics its last ingest produced with nothing to check it against |
+
+**The lossy pair is disclosed, never refused** — `fux doctor` counts the pinned
+lines and names the ones with no retained bytes. It is coherent for a document
+that genuinely never changes and surprising to have chosen by accident, which is
+a warning's shape rather than a refusal's.
+
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.

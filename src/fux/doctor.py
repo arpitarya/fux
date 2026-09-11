@@ -1138,6 +1138,7 @@ def _url_health(root: Path) -> Check:
         parts.append(f"{summary.failing} failing")
     if policy is not None:
         parts.append(policy)
+    parts.extend(_pinned_note(root))
     note = _rate_limit_note()
     if note is not None:
         parts.append(note)
@@ -1155,6 +1156,52 @@ def _url_health(root: Path) -> Check:
             "fux never deletes a URL record; remove the line from .fux/sources/urls yourself"
         )
     return Check("url sources", not summary.failing_urls, detail, level="warn")
+
+
+def _pinned_note(root: Path) -> list[str]:
+    """`update=never` lines, counted — and the lossy pair named (W-113).
+
+    A pinned URL is a URL `fux update` will never go out for again, which is a
+    fact somebody looking at a stale corpus needs and could otherwise learn only
+    by reading every line of `.fux/sources/urls`.
+
+    ⚠ **`update=never` + `keep=false` is legal and lossy, so it is DISCLOSED
+    and never refused.** With no retained bytes there is nothing for `fux
+    answer` to verify a citation against and nothing to re-derive from: the
+    document is frozen at whatever statistics its last ingest produced. That is
+    a coherent thing to want for a document that genuinely never changes, and a
+    surprising thing to have chosen by accident — which is exactly the shape
+    that belongs in a warning rather than in a refusal.
+
+    Reads the committed list, never the network, and resolves through the same
+    three layers everything else does so a source-wide `update = "never"` is
+    counted too.
+    """
+    from .config import load as load_config
+    from .ingest import urlsrc
+
+    try:
+        config = load_config(root)
+        if config.url is None:
+            return []
+        resolved = urlsrc.resolve_urls(urlsrc.read_urls(root, config.url.urls_file), config.url)
+    except Exception:
+        # The list or the config is another row's finding -- `fux.toml loads`
+        # and `url sources` both name it. Never two reports for one cause.
+        return []
+    pinned = [e for e in resolved if e.update == "never"]
+    if not pinned:
+        return []
+    parts = [f"{len(pinned)} pinned (update=never; never re-fetched)"]
+    lossy = sorted(e.url for e in pinned if not e.keep)
+    if lossy:
+        shown = ", ".join(lossy[:3])
+        more = f" (+{len(lossy) - 3} more)" if len(lossy) > 3 else ""
+        parts.append(
+            f"{len(lossy)} of them keep=false, so there are no retained bytes to verify "
+            f"a citation against: {shown}{more}"
+        )
+    return parts
 
 
 def _parallel_policy(root: Path) -> str | None:

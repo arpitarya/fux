@@ -83,7 +83,7 @@ from ..errors import FuxError
 from ..progress import NULL as _NULL_PROGRESS
 from . import edges as edges_mod
 from . import extract as extract_mod
-from . import fuxignore, sourcelist, urlsrc
+from . import fuxignore, gitdir, sourcelist, urlsrc
 from .edges import TAG_PREFIX
 from .gitdir import (
     UNFETCHED,
@@ -200,6 +200,35 @@ def run(
         # reconciliation and carry-forward key on, so narrowing it here would
         # turn a scoped fetch into a corpus-wide deletion.
         to_fetch = resolved if only_urls is None else [e for e in resolved if e.url in only_urls]
+        # W-113 (Arpit, ruling R-1). A line that says `update=never` is PINNED:
+        # fux does not go out for it, ever, on any run.
+        #
+        # 🔴 **Filtered HERE, before `fetch_all`, and that placement is the
+        # decision.** `fetch_all` groups by `fetcher_path` and calls
+        # `load_fetcher`, which **imports consumer Python**. A pinned URL must
+        # not cause a consumer's fetcher module to execute at import time, so
+        # the skip has to happen above the grouping rather than inside the
+        # per-URL loop. No import, no connect, no socket.
+        #
+        # ⚠ **It is a POLICY skip, not a third kind.** `POLICY` already means
+        # *the declaration did its job*, which is exactly this; `UNFETCHED`
+        # would say the bytes failed to arrive and put the URL in front of
+        # someone as a problem. The record carries forward below through
+        # `url_meta`, untouched -- pinning freezes a document, it never drops
+        # one.
+        pinned = [e for e in to_fetch if e.update == "never"]
+        if pinned:
+            to_fetch = [e for e in to_fetch if e.update != "never"]
+            url_skipped_pinned = [
+                gitdir.Skipped(
+                    rel_path=e.url,
+                    reason="update=never; pinned, no fetch attempted",
+                    kind=gitdir.POLICY,
+                )
+                for e in pinned
+            ]
+        else:
+            url_skipped_pinned = []
         # Fork 3: hand the fetcher's `validate()` what we last saw, so a URL
         # whose token has not moved costs no body fetch. `known_tokens` is read
         # from gitignored runtime state, so a wiped `.fux/runtime/` means every
@@ -229,7 +258,7 @@ def run(
             doc_id = f"url:{url}"
             if doc_id in existing_urls:
                 carried[doc_id] = existing_urls[doc_id]
-        skipped = skipped + url_skipped
+        skipped = skipped + url_skipped + url_skipped_pinned
         fresh = {f"url:{fu.url}": fu.content for fu in fetched}
         # W-82 3.1: record how this run went, per URL. Only on the networked
         # path -- an offline `fux ingest` fetches nothing, so it learns nothing

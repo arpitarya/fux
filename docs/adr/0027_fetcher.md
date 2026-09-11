@@ -413,6 +413,23 @@ boundary. **The contract stays at six functions**, and a per-URL attribute
 arriving without touching it is the evidence that the split is in the right
 place.
 
+🔴 **A pinned URL never resolves a fetcher, and that is a contract property
+rather than an optimisation.** `update=never`
+([ADR-URL-LIST](0026_url-list.md) decision 14) is filtered **above**
+`fetch_all`'s grouping, not inside its per-URL loop.
+
+- **`load_fetcher` imports consumer Python and executes whatever sits at module
+  level.** A fetcher is entirely within its rights to open a session, read a
+  credential file or start a browser there — `cdp.py` connects in `connect()`
+  precisely because this record drew the line, and nothing forces a consumer's
+  file to be as disciplined.
+- **So a skip inside the loop would be correct about the network and wrong about
+  everything else.** *Pinned* has to mean **no import, no connect, no socket**,
+  and the only placement that delivers all three is above the grouping that
+  decides which fetcher to load.
+- **Checkable:** a fetcher file that raises at import time, and a list whose
+  every line is pinned, must complete an ingest.
+
 ### Consequences
 
 - **The contract survived gaining a second caller unchanged.** The refer plane

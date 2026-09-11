@@ -304,6 +304,19 @@ URLS = ListSpec(
         # corpus anybody has. `dirs` made the same call for the same reason
         # (ADR-DIR-LIST), and matching it keeps one attribute with one shape.
         Attribute("archived", ("true", "false"), "false"),
+        # W-113, 2026-09-05 (Arpit, ruling R-1). ADR-URL-LIST: whether `fux
+        # update` goes out for this line **at all**.
+        #
+        # 🔴 **TWO WORDS, NEVER A DURATION, and that is the decision.** `ttl=`
+        # sits two attributes above and is **ask-time**: it bounds how long a
+        # citation may go uncited-and-unchecked inside `fux answer`. This is
+        # **update-time**. The moment `update=` accepted `24h` the two would be
+        # indistinguishable at a glance and conflated in the first support
+        # thread that mentioned either.
+        #
+        # `auto` is today's behaviour, byte for byte -- the list is committed,
+        # so silence has to resolve to what every existing clone already does.
+        Attribute("update", ("auto", "never"), "auto"),
     ),
     validate=_url_reason,
 )

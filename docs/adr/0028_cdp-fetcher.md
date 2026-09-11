@@ -355,6 +355,28 @@ which the session-gated sites this fetcher exists for routinely refuse. The word
 "validate" invites the opposite reading, which is why the docstring and this
 decision both say it outright.
 
+**Accepted as the ETag criterion by Arpit on 2026-09-05 (ruling R-1), with no
+code** — the acceptance is of this decision as written, limit included. What he
+asked for *instead* of chasing the bandwidth is a declared knob:
+[ADR-URL-LIST](0026_url-list.md) decision 14's `update = auto|never`. 🔴 **That
+knob is not this saving.** It buys bandwidth by giving up freshness; this would
+have bought the check cheaply and stayed fresh. Neither substitutes for the
+other, and a reader who conflates them will believe fux got a saving it did not.
+
+**Veto condition, and it is a condition to check rather than an event to await:**
+
+> **Re-cost request-stage interception if either becomes true.** (a) A consumer
+> reports refresh bandwidth as a blocker. (b) A corpus with more than a few
+> hundred `update=auto` URLs is deployed behind a metered or proxied network.
+>
+> The design that would deliver the original promise is `Fetch.requestPaused` at
+> the **Request** stage, injecting `If-None-Match` and letting the server answer
+> `304`. **Not costed, not built, and not authorised** — naming it here is so
+> nobody re-derives it, not so anybody builds it.
+>
+> **How to check:** `fux doctor`'s `url sources` row reports the pinned count;
+> the un-pinned remainder of `.fux/sources/urls` is (b)'s number.
+
 **13. `LAUNCH_CHROME` defaults to `False`, and the default is the feature.** A
 browser this file launched is signed in to nothing, so every URL worth a browser
 comes back as a login page. It flipped from `True` on 2026-09-01 — the old

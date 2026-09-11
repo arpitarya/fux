@@ -85,6 +85,15 @@ class UrlEntry:
     #: layer, because `archived` is a fact about one document rather than a
     #: policy about how to reach a source.
     archived: bool = False
+    #: ADR-URL-LIST: whether `fux update` goes out for this URL **at all**.
+    #: `"auto"` is today's behaviour; `"never"` pins the document and no socket
+    #: is opened for it -- the fetcher is not even resolved, so a consumer's
+    #: fetcher module is never imported on its account.
+    #:
+    #: ⚠ **Update-time, and `ttl` above is ask-time.** They are different
+    #: clocks and this one is deliberately not a clock at all: two words, never
+    #: a duration.
+    update: str = "auto"
 
 
 def load_fetcher(root: Path, rel_path: str):
@@ -176,6 +185,15 @@ def resolve_urls(entries: list[sourcelist.Entry], source) -> list[UrlEntry]:
                 # source-wide middle layer because each is a policy about
                 # REACHING a source; `archived` is a fact about one document.
                 archived=entry.attrs.get("archived") == "true",
+                # Three layers again, exactly like `keep`/`ttl`/`enrich`, and
+                # for the same reason: *whether to go out* is a policy about
+                # REACHING a source, so a source-wide setting is meaningful --
+                # a whole intranet wiki can be pinned in one line.
+                update=(
+                    entry.attrs["update"]
+                    if "update" in entry.declared
+                    else getattr(source, "update", "auto")
+                ),
             )
         )
     return resolved

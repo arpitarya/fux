@@ -8,6 +8,49 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ## [Unreleased]
 
+### Added
+
+- **`update = auto|never` on a URL line** (W-113,
+  [ADR-URL-LIST](docs/adr/0026_url-list.md) decision 14). A line could say how
+  to reach a document and how long a citation could go unchecked, and could not
+  say whether to go back for it at all. `update=never` pins the document:
+  `fux update` opens no socket for it and **does not even import your fetcher**
+  on its account. Resolved through the same three layers as `keep`/`ttl`/`enrich`
+  — built-in default, `[sources.url] update`, then the line — so a whole wiki
+  pins in one line and a single page can exempt itself. `fux add <URL>
+  --no-update` writes it; ⚠ that add still fetches **once**, which is what makes
+  the line ingestable. Default `auto`: **a corpus that declares nothing is
+  byte-identical to before.**
+  - 🔴 **It buys bandwidth by giving up freshness, and it is NOT the ETag
+    saving.** CDP intercepts at the response stage, so the body has already
+    crossed the wire ([ADR-CDP-FETCHER](docs/adr/0028_cdp-fetcher.md) decision
+    12, now carrying the veto that re-costs request-stage interception).
+  - ⚠ **`update=never` + `keep=false` is legal and lossy** — nothing retained
+    and nothing fetched, so the document is frozen with nothing to verify a
+    citation against. `fux doctor` counts the pinned lines and names those ones.
+  - 🔴 **A pinned URL can never be re-redacted, `--full` included**
+    ([ADR-PII](docs/adr/0060_pii.md)). Its record is carried forward verbatim,
+    so a new `.fux/pii.toml` rule cannot reach it. Documented, not fixed.
+- **`fux doctor` gains `fux.toml loads`.** A config the loader refuses used to
+  produce a **green doctor beside an exit-1 ingest** — every config-dependent
+  check degraded to `skipped (no readable fux.toml)` at warn level, each
+  correctly, and collectively they deleted the finding. The new row is an
+  **error** and prints the loader's own message verbatim
+  ([ADR-DOCTOR](docs/adr/0064_doctor.md) decision 4).
+- **`fux-decoder` and `fux-usage` now install for Copilot** (`.github/skills/`),
+  so all three committed-write skills reach all four vendors (W-118,
+  [ADR-AGENT-POLICY](docs/adr/0042_agent-policy.md) decision 14a).
+
+### Fixed
+
+- **The shipped `fux-decoder` skill was missing its chunking section.** Fux's own
+  committed rendering had gained it and the **template had not**, so every
+  `fux setup` since shipped a decoder guide with no explanation of how a
+  decoder's headings become citable passages. `.github/agents/fux.agent.md` had
+  drifted the other way, losing the command-resolution ladder. Both repaired, and
+  a test now asserts every committed agent file still equals the template that
+  ships ([ADR-AGENT-POLICY](docs/adr/0042_agent-policy.md) decision 14b).
+
 ### Changed
 
 - ⚠ **BREAKING — the types list is `.fux/formats.toml`** (W-130,

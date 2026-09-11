@@ -322,6 +322,17 @@ list was part of why `.fux/sources/types` became `.fux/formats.toml`.
 file's form now carries weight outside this record — a later proposal to change
 it is a change to an argument other records rest on, not a local edit.
 
+⚠ **A pinned URL is never checked against these rules, because nothing is ever
+fetched for it.** The refusal check sits inside `fetch_all()`, after `_unpack`
+and before persist and decode (decision 1) — and a line carrying `update=never`
+([ADR-URL-LIST](0026_url-list.md) decision 14) is filtered out **above**
+`fetch_all`, so no response exists to refuse. That is correct rather than a gap:
+a refusal rule describes what a *fetched response* may not be, and there is no
+response. **What it means in practice is that a document indexed before it
+started serving a login page stays indexed**, with a citation that says
+`as-ingested`, and no refusal counter moves. The rules never fired, so nothing
+in `fux doctor`'s never-fired list is evidence either way for a pinned URL.
+
 ### Consequences
 
 **Easier.** A refusal that used to become a record now becomes a skip with a

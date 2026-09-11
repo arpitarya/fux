@@ -29,7 +29,7 @@ def _defaults(spec=sourcelist.URLS, **overrides):
     `enrich` joined `URLS` (W-100) -- the attributes moved and the tests did
     not. A test written against the *spec* cannot rot that way, which is what
     this module's own docstring claims it does. The set itself is pinned once,
-    deliberately, in `test_the_url_attribute_set_is_exactly_these_six`: an
+    deliberately, in `test_the_url_attribute_set_is_exactly_these_seven`: an
     attribute appearing without anybody noticing is the failure this file
     still has to catch.
     """
@@ -70,7 +70,7 @@ def test_the_loader_dedupes_and_sorts_so_file_order_is_presentation_only():
 # -- attributes ------------------------------------------------------------
 
 
-def test_the_url_attribute_set_is_exactly_these_six():
+def test_the_url_attribute_set_is_exactly_these_seven():
     """The one place the URL attribute set is written out, on purpose.
 
     Every other test here derives from the spec so it survives a new
@@ -78,11 +78,15 @@ def test_the_url_attribute_set_is_exactly_these_six():
     as one failing assertion naming what appeared, rather than as five
     unrelated ones (W-100) or as nothing at all.
 
-    It did its job on 2026-09-11: `archived` joined and this was the single
-    failure that named it.
+    It has now done its job twice on 2026-09-11: `archived` joined, and then
+    `update` did, and each time this was the single failure that named it.
+
+    🔴 **Every default here must be today's behaviour.** The URL list is
+    committed, so a default that is not the status quo silently moves every
+    existing clone the moment it upgrades.
     """
     assert [a.name for a in sourcelist.URLS.attributes] == [
-        "fetch", "meta", "keep", "ttl", "enrich", "archived",
+        "fetch", "meta", "keep", "ttl", "enrich", "archived", "update",
     ]
     assert _defaults() == {
         "fetch": "http",
@@ -91,7 +95,24 @@ def test_the_url_attribute_set_is_exactly_these_six():
         "ttl": "24h",        # ADR-URL-FRESHNESS: not 0; see decision on the default
         "enrich": "false",   # ADR-PII: enrichment is always opted into
         "archived": "false", # ADR-ARCHIVED-CONTENT: declared, never inferred
+        "update": "auto",    # ADR-URL-LIST: today's behaviour, byte for byte
     }
+
+
+def test_update_is_two_words_and_never_a_duration():
+    """🔴 W-113's whole boundary, asserted rather than trusted.
+
+    `ttl=` is **ask-time** — how long a citation may go unchecked inside `fux
+    answer`. `update=` is **update-time** — whether `fux update` goes out at
+    all. The moment `update=` accepts `24h` the two are indistinguishable at a
+    glance, and the first person to conflate them will be right to.
+    """
+    update = next(a for a in sourcelist.URLS.attributes if a.name == "update")
+    assert update.values == ("auto", "never")
+    assert update.validate is None, (
+        "`update` has gained a validator, which is how a closed word set becomes "
+        "a typed value. `ttl` is the typed one; this must stay two words"
+    )
 
 
 def test_archived_is_the_same_attribute_on_both_lists():

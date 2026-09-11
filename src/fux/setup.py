@@ -378,6 +378,21 @@ fetcher      = ".fux/fetchers/http.py"  # the file a line with no `fetch=` uses,
 urls_file    = ".fux/sources/urls"
 meta         = "hashed"                 # the floor; a line may loosen it to plain
 
+# WHETHER `fux update` GOES OUT FOR THESE URLs AT ALL. "auto" (the default) is
+# today's behaviour; "never" pins every URL from this source -- no socket is
+# opened for it and your fetcher file is not even imported on its account.
+# A line's own `update=` wins, so one wiki can be pinned and one page exempted.
+#
+# THIS IS NOT `ttl`, AND IT TAKES NO DURATION. `ttl=` is ASK-time: how long
+# `fux answer` may cite a document without re-checking it. `update=` is
+# UPDATE-time: whether fux ever goes and looks again. Two words, never a clock.
+#
+# It buys BANDWIDTH by giving up FRESHNESS. Pair it with `keep=true` (the
+# default) and the retained bytes still verify every citation offline; pair it
+# with `keep=false` and the document is frozen at its last statistics with
+# nothing to check against. `fux doctor` reports that combination.
+#update      = "auto"
+
 # HOW MANY URLs MAY BE IN FLIGHT AT ONCE, across `fux add <URL>`, `fux update`
 # and `fux ingest --refresh-urls`. (`fux ask` verifies cited URLs one at a time,
 # and `fux build` opens no socket at all -- neither is affected.)

@@ -330,6 +330,18 @@ fetch. It is the [W-83](../../work/WORKLOG.md) shape again: a record can be
 accepted, a component can be assigned, and nothing mechanical reads the record
 against the code.
 
+**`[sources.url] update`** — the source-wide layer of the URL list's
+`update=` attribute ([ADR-URL-LIST](0026_url-list.md) decision 14). `"auto"` or
+`"never"`; a line still wins; anything else is refused by name with the two legal
+values in the message, like every other closed-set key here.
+
+⚠ **It is validated as a CLOSED WORD SET and not through the duration grammar**,
+which is the one thing about it worth recording in this record. `ttl` two keys
+above goes through `sourcelist.parse_duration` precisely so a hand-written
+`ttl=1x` and `[sources.url] ttl = "1x"` fail identically (decision 12). `update`
+must never acquire that treatment: it is update-time where `ttl` is ask-time,
+and a duration here would make the two indistinguishable at a glance.
+
 ### Consequences
 
 - **The config fits on a screen**, so a new consumer reads all of it.

@@ -190,16 +190,18 @@ this record**, not a config addition — which is what makes decision 9's
 unknown-key error safe to be strict about: the error is never wrong, because
 there is nothing legitimate it can reject.
 
-⚠ **"Two" is the ORIGINAL set and it is now six** — `fetch`, `meta`, `keep`,
-`ttl`, `enrich`, and `archived` (2026-09-11, W-126,
-[ADR-ARCHIVED-CONTENT](0044_archived-content.md) decision 1a). The sentence is
-left as written because **the closure is the decision and the count never
-was**; what this ⚠ records is that the rule has been exercised six times and
-held each time. The count lives in
-`tests/ingest/test_sourcelist.py::test_the_url_attribute_set_is_exactly_these_six`,
+⚠ **"Two" is the ORIGINAL set and it is now seven** — `fetch`, `meta`, `keep`,
+`ttl`, `enrich`, `archived` (2026-09-11, W-126,
+[ADR-ARCHIVED-CONTENT](0044_archived-content.md) decision 1a) and `update`
+(2026-09-11, W-113, decision 14 below). The sentence is left as written because
+**the closure is the decision and the count never was**; what this ⚠ records is
+that the rule has been exercised seven times and held each time. The count
+lives in
+`tests/ingest/test_sourcelist.py::test_the_url_attribute_set_is_exactly_these_seven`,
 which is deliberately the one test in that file that does **not** derive from
-the spec — so a seventh attribute arrives as a single failing assertion naming
-itself rather than as silence. **It did exactly that for `archived`.**
+the spec — so an eighth attribute arrives as a single failing assertion naming
+itself rather than as silence. **It did exactly that for `archived`, and then
+again for `update` on the same day.**
 
 ⚠ **`archived` also makes `DIRS`' attribute set a strict SUBSET of `URLS`'**,
 which was not true before and cost a test its second half: the old
@@ -228,8 +230,8 @@ not that a key is always present**, and an attribute with nothing to state has
 no policy to make visible.
 
 **Nothing existing is affected, and that is checkable, not asserted:** `fetch`,
-`meta`, `keep`, `ttl`, `archived` and `enrich` all have non-empty defaults, so
-all six are still written at their default. The carve-out reaches exactly the
+`meta`, `keep`, `ttl`, `archived`, `enrich` and `update` all have non-empty
+defaults, so all seven are still written at their default. The carve-out reaches exactly the
 attributes a future record gives an empty default to — and giving one an empty
 default is now a decision with a visible consequence rather than a free choice.
 
@@ -240,6 +242,64 @@ fux**, and that is worth reporting: a completeness check turns *"the list is not
 edited manually"* from a policy into an observation anyone can make. The check
 belongs to `fux doctor`; the rule is here because it is a property of the
 format.
+
+**14. `update = auto|never` — whether `fux update` goes out for a line at all**
+(Arpit, 2026-09-05, ruling R-1; built 2026-09-11). A line could say how to reach
+a document, how to store it and how long a citation could go unchecked, and
+**could not say whether to go back for it.**
+
+- **Two words, and it takes NO duration.** `auto` is today's behaviour; `never`
+  pins the document.
+- 🔴 **`ttl=` is ASK-time and this is UPDATE-time.** `ttl` bounds how long `fux
+  answer` may cite without re-checking ([ADR-URL-FRESHNESS](0059_url-freshness.md));
+  `update` decides whether fux ever looks again. **The moment `update=` accepted
+  `24h` the two would be indistinguishable at a glance**, and the first person
+  to conflate them in a support thread would be right to. That is why the value
+  set is closed words and why a test asserts it carries no validator.
+- **Three layers**, like `keep`/`ttl`/`enrich` and unlike `archived`: *whether
+  to go out* is a policy about **reaching** a source, so `[sources.url] update`
+  is meaningful — a whole intranet wiki can be pinned in one line and a single
+  page exempted by its own.
+- **`fux add <URL> --no-update` writes `update=never`.** ⚠ **That add still
+  fetches once** — one fetch is what makes the line ingestable at all; the flag
+  governs every run after, and `--help` says so rather than only this record.
+
+**14a. The skip is `POLICY`, and it happens BEFORE the fetcher is resolved.**
+
+- **`POLICY` already means *the declaration did its job*** — no third `kind` was
+  added. `UNFETCHED` would say the bytes failed to arrive, which puts the URL in
+  front of somebody as a problem and, through `enrich/queue.tsv`, in front of
+  the whole team.
+- 🔴 **Filtered above `fetch_all`'s grouping, and that placement is the
+  decision, not an optimisation.** `fetch_all` groups by `fetcher_path` and
+  calls `load_fetcher`, which **imports consumer Python and runs whatever sits
+  at its module level** — a fetcher is free to open a session there. Filtering
+  inside the per-URL loop would be correct about the network and wrong about
+  everything else. Pinned means *no import, no connect, no socket*.
+- **Pinning freezes a document; it never drops one.** Carry-forward keys on the
+  whole resolved list, so a URL that stops being fetched keeps the record it
+  already has. A narrower keying would make `update=never` a delayed deletion.
+
+**14b. `update=never` + `keep=false` is legal, lossy, and DISCLOSED rather than
+refused.** With no retained bytes there is nothing for `fux answer` to verify a
+citation against: the document is frozen at whatever statistics its last ingest
+produced. That is coherent for a document that genuinely never changes and
+surprising to have chosen by accident — a warning's shape, not a refusal's.
+`fux doctor` counts the pinned lines and names the lossy ones
+([ADR-DOCTOR](0064_doctor.md)). The coherent pair is `update=never keep=true`:
+the bytes sit in `.fux/acquired/`, `answer` verifies against them and reports
+`as-ingested` ([ADR-ACQUIRED](0057_acquired-plane.md)), and nothing opens a
+socket — *more* offline, with the grain of L4.
+
+🔴 **14c. This is NOT the ETag saving, and the records must not let a later
+reader think it was.** `update=never` buys **bandwidth** by giving up
+**freshness**. The ETag promise was *"check cheaply and stay fresh"*, and CDP
+intercepts at the **response** stage, so the body has already crossed the wire —
+a matching ETag saves the decode and the shard comparison, not the transfer
+([ADR-CDP-FETCHER](0028_cdp-fetcher.md) decision 12). The only thing that would
+deliver the original promise is **request-stage interception**, injecting
+`If-None-Match` and letting the server answer `304`. **Not costed, not built,
+and not authorised by this decision** — see that record's veto.
 
 ### The attribute set
 
@@ -252,6 +312,7 @@ a correctly generated file, never happens.
 |---|---|---|---|---|
 | **`fetch`** | `http` · `cdp` | `http` | [ADR-HTTP-FETCHER](0029_http-fetcher.md) · [ADR-CDP-FETCHER](0028_cdp-fetcher.md) | **no** — it selects *who* retrieves the document, not what the record says. A record does not carry which fetcher produced it |
 | **`meta`** | `plain` · `hashed` | `hashed` (L5) | [ADR-CONFIG](0023_config.md) · [ADR-RECORD](0019_index-record.md) | **yes** — `plain` writes `title` + `phrases`, `hashed` writes `title_h` instead. The value is recorded per record, so a record read years later still says which rule wrote it |
+| **`update`** | `auto` · `never` | `auto` | this record, decision 14 | **no** — it decides whether fux goes out, not what a record says. ⚠ It changes committed bytes *over time* by preventing them from being refreshed, which is the opposite of the question this column asks |
 
 **`fetch` is a routing decision.** A name resolves to
 `<fetchers dir>/<name>.py`, the directory being the parent of

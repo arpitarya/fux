@@ -342,6 +342,17 @@ not.
   check degrades to `skipped`, name the row that does fail. If none does, the
   degradation is a hole rather than politeness.
 
+⚠ **A SIXTH worked instance, 2026-09-11, and it is the cheap shape.** The
+`fux.toml` template gained a **commented** `#update = "auto"` block documenting
+[ADR-URL-LIST](0026_url-list.md) decision 14. Per this decision it reaches **new
+repos only** — and here that costs nothing, because the key's default *is*
+today's behaviour and an existing repo that never learns the key behaves
+identically. **Contrast the fifth instance above**, where the template lost a
+table that an old `fux.toml` still carried and a loader refusal was owed.
+**The test is not "did the template change" but "can an old file now be
+wrong?"** — a new key at the status-quo default cannot be, and a removed key
+always is.
+
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
 The two files fux can put there ship as package data with an extension Python's

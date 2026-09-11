@@ -150,7 +150,7 @@ authoritative about the row.**
 | `types list usable` | error | a types list with no live pattern — `read_types` refuses it, so ingest stops | [ADR-TYPES](0038_types-list.md) decision 10 |
 | `fuxignore usable` | warn | the `.fuxignore` patterns parse, and duplicates | [ADR-FUXIGNORE](0055_fuxignore.md) |
 | `fetcher optional functions` | warn | which of `validate()` / `is_rate_limited()` the consumer's fetcher implements — **read as text, never imported** | [ADR-FETCHER](0027_fetcher.md) decisions 12–13 |
-| `url sources` | warn | per-URL health from the committed index | [ADR-URL-LIST](0026_url-list.md) |
+| `url sources` | warn | per-URL health from the committed index, the concurrency policy, and **the `update=never` count with the `keep=false` ones named** — a pinned URL is one `fux update` will never go out for again, which is otherwise learnable only by reading every line of the list | [ADR-URL-LIST](0026_url-list.md) decisions 14/14b |
 | `background runner` | warn | is a runner live, how many documents pend, is the lock held or stale, did the last run fail. **Read-only: a stale lock is named, never cleared** | [ADR-MAINTENANCE](0039_hooks.md) decision 1c |
 | `url daemon` | warn | the refresh daemon's state | [ADR-URL-FRESHNESS](0059_url-freshness.md) |
 | `accelerator` | warn | built, fresh or stale against the committed index | [ADR-T1-ACCELERATOR](0020_accelerator.md) |

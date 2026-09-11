@@ -490,6 +490,20 @@ for the same reason `--all` was: this record constrains *every gated flag* in
 the next reader "fixes" it to `default=None` and gives it a three-state
 resolution it has no file to resolve against.
 
+⚠ **`fux add --no-update` joins that set on 2026-09-11**, and for exactly the
+reason above: it writes `update=never` into `.fux/sources/urls`
+([ADR-URL-LIST](0026_url-list.md) decision 14), gates no rendering, and reads
+nothing from `.fux/output.toml`. It is correct as a plain `store_true`.
+
+**One property makes it *safely* outside decision 10 rather than merely
+outside it**, and it is worth stating because the next source-list flag may not
+have it: `--no-update` writes an attribute whose absent-vs-false collapse has
+**no consequence**. The flag either writes `update=never` on the line or writes
+nothing, and the list's own reader supplies `auto` for silence. Decision 10's
+hazard — *a committed file value that the flag can never express* — needs a
+committed file the flag shadows, and this one writes that file rather than
+reading it.
+
 ⚠ **No output default changed on 2026-09-02, and the new argument is not even
 a flag.** `fux enrich` gained an optional positional `TARGET`
 ([ADR-CLI](0011_cli-surface.md) decision 2a, [ADR-ENRICH](0047_enrich.md)

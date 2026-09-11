@@ -304,6 +304,27 @@ has none, and whoever removes it should know that before deleting the seam.
 still the single definition, and `[sources.url] ttl` still validates through it
 rather than through a second copy ([ADR-CONFIG](0023_config.md) decision 12).
 
+15. 🔴 **`ttl` is ASK-TIME. It does not reach `fux update`, and the attribute
+    that does is `update=`.** Two clocks sit on the same line and this is the
+    sentence that keeps them apart.
+
+    | attribute | when it acts | what it decides |
+    |---|---|---|
+    | **`ttl=`** *(this record)* | **ask time** — inside `fux answer` | how long a citation may go **unchecked** before fux re-verifies it |
+    | **`update=`** ([ADR-URL-LIST](0026_url-list.md) decision 14) | **update time** — `fux update`, `fux ingest --refresh-urls` | whether fux goes back for the document **at all** |
+
+    - **`ttl=0` is not `update=never`.** `ttl=0` means *check on every answer*
+      — maximally networked. `update=never` means *never fetch again* —
+      maximally offline. Opposite ends of different axes, and a reader who
+      merges them will configure the opposite of what they meant.
+    - **`update=` is two words and takes no duration, deliberately**, so the two
+      can never be confused at a glance. That is recorded where the attribute is
+      defined rather than restated here.
+    - **A pinned URL's `ttl` is not dead.** `update=never keep=true` still
+      verifies at ask time against the retained bytes and reports `as-ingested`;
+      `ttl` still bounds how often that comparison is redone. Pinning removes
+      the socket, not the verification.
+
 ### Consequences
 
 **Easier.** An offline or signed-out corpus keeps answering, with citations that
