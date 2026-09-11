@@ -24,6 +24,12 @@ play: the worklog is the granular, per-exchange trail.
 - **Next:** the single immediate next step.
 ```
 
+## 2026-09-11 — W-137: laws own 0001–0100; every other record will start at 0101  ·  Cowork (Opus)
+- **Asked:** renumber the ADRs — ADR-CLI `0011` → `0101`; laws start at 1 and may go up to 100 (renumber if they pass it); keep the gap as placeholders, no dummy documents.
+- **Did:** wrote `scripts/renumber-adrs.py` (one-shot: 54 non-law records +90; rewrites exact `NNNN_slug.md` tokens and the register's link text; skips `.fux/index`, `.fux/runtime`, `archive/v0.26*`). **Dry-run on a copy caught a real bug** — edits computed before the move would have recreated every old path — fixed (move first, then rewrite) and re-verified: 1 639 tokens in 126 files, unresolved ADR links 442 → 442, no leftover old paths. Filed **W-137**; Arpit chose to have Claude Code run it once no other session is mid-change.
+- **Decided / open:** ⚠ the first new law will take `0011`, ADR-CLI's ordinal until the renumber — the hazard W-82 ruling 7 named; W-137 requires the register note to say so. The convention and CLAUDE.md's range line change in W-137's commit, not before. Nothing renamed yet.
+- **Next:** Claude Code runs W-137 on a quiet tree.
+
 ## 2026-09-11 — seven items closed, and two measurements that say *stop*  ·  Claude Code (Opus)
 - **Asked:** read OPEN-WORK, implement everything, close everything.
 - **Did:** `77ec3a1`…`bc70055`. Closed **W-132** (`RULE-SINCE`'s fifth entry, baseline to
@@ -48,8 +54,16 @@ play: the worklog is the granular, per-exchange trail.
 - **Two findings worth carrying:** a run with no corpus hash cannot be paired against a later
   one (it bit twice in one day); and the 2026-08-28 report's `median 0.448` matches no statistic
   of its own evidence — **the frozen file is not edited**, the evidence wins.
-- **Next:** **W-116** is fully unblocked (both stated blockers were stale) and is a paired
-  before/after run someone can start; compute its headroom first.
+- **Then W-116 ran too** (`82ca8eb`). It measured what W-115 moved — **304 of 954 documents**,
+  de-confounded from `max_phrases` with a third arm — and **found a regression W-115 had
+  shipped**: 96 documents (86 `.jsonl`, 10 `.json`) titled **`Record 1`** in a heavily-weighted
+  field, none the other way. The decoder was violating the contract its own skill documents.
+  Fixed, with a third drift gate. 🔴 **W-115 stays UNMEASURED FOR QUALITY** — the graded corpus
+  is byte-identical across the arms (zero headroom) and the corpus that moves has no goldens.
+- **Next:** the remaining agent-lane items are **W-122** (L0's generated block + the config
+  gate), the **`heading` negative-control rebuild**, **W-97 T1** (`rerank_weight` is the one
+  knob with headroom), **W-107 Phases 1–4** and **W-106**'s owed two-architecture arm. None is
+  blocked on a ruling.
 
 ## 2026-09-11 — W-136 prompt 1: Quillfern Cold Logistics and ten deliberately messy seed documents  ·  Cowork (Opus)
 - **Asked:** create the fictional company for Codex's step and say what it does; the ten documents must be inconsistent — with/without frontmatter, legacy YAML, structured or not, professional or amateur, big and small, edited by several people.

@@ -1,1 +1,1 @@
-✓ W-132 W-118 W-135 W-113 W-134 W-133 + `fux doctor` + ADR-DOCTOR · 🔴 inbox 2: abstention re-run (20/20, 0 flips) + the four-priors instrument · → next: W-116 (unblocked, paired before/after W-115, headroom first)
+✓ 8 items closed (W-132 W-118 W-135 W-113 W-134 W-133 W-116 + `fux doctor`) + ADR-DOCTOR · 🔴 inbox 2: abstention re-run + the four-priors instrument · → next: W-122, the heading control, W-97 T1 — none blocked
