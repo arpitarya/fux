@@ -125,9 +125,10 @@ hops, halved for each hop beyond the first (`[graph] hop_decay`, default 0.5).
 **No path** is `"paths": []` with exit `0` (text: `No route from … within 2 hop(s).`).
 **Empty is an answer** — report it; do not widen `--hops` until something appears.
 
-⚠ **`path` does NOT check that either document exists.** A typo returns the same
-empty `paths`, exit `0`. **Run `fux explain` on both ends first** — it fails loudly
-for a document id (a `tag:` id is never reported missing).
+**`path` refuses an end that is not in the index**, naming which one
+(`… is not in the index (FROM)`, exit `1`). So an empty `paths` means the two
+documents are real and unconnected — a finding, not a typo. `fux explain`
+refuses an unknown `tag:` the same way.
 
 **Inbound edges ("what links to this ADR?") have no verb.** Read the derived
 plane `fux build` writes, one `[src, kind, dst, grade]` per edge:

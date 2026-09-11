@@ -34,7 +34,7 @@ then refresh this repo's renderings.
 | 9 | **The merge driver's refusal says re-run `fux ingest`**, which cannot read a shard with conflict markers. **(guide: MAINTAIN)** | `maintain/mergedriver.py` ~201 | ADR-MERGE-DRIVER d6 |
 | 10 | **`fux hooks` installs nothing when `[cli.json] enabled = true`** — it only reports. **(guide: MAINTAIN)** | `maintain/__init__.py` ~113 | ADR-MAINTENANCE |
 | 11 | **The background runner never rebuilds the accelerator.** | `maintain/runner.py` ~534 | ADR-MAINTENANCE 2a |
-| 12 | **`fux path` never checks FROM/TO exist** (empty, exit 0); `explain tag:x` is never missing; `--hops` is unbounded (hops 7 > 60 s on ~960 docs). **(guide: GRAPH)** | `graph/__init__.py` | ADR-GRAPH |
+| 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
 | 15 | **No fetch timeout is enforced** — `timeout_seconds` is recorded and read nowhere. | `refer/freshness.py` ~44 | ADR-REFER |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
@@ -122,6 +122,18 @@ then refresh this repo's renderings.
   create the duplicate source of truth W-122 exists to remove — and this defect
   (`types_file`, `acquired_max_bytes`) is the evidence for that gate, not a
   separate task. 2026-09-11.
+
+- **Row 12, the two halves that were defects rather than forks.** `fux path`
+  validated neither end: a typo printed *No route … within N hop(s)* and exited
+  **0**, byte-identical to the honest answer for two real unconnected documents.
+  `explain` had been fixed for this in W-63 and the verb beside it kept it —
+  so the check is now one function both verbs call. A `tag:` id was never
+  checked on either verb, because the test read the committed index and a tag
+  has no record there; the **plane** answers for tags now.
+  [ADR-GRAPH](../../docs/adr/0126_graph.md) carries both, plus the control
+  test that honest emptiness still exits 0. `GRAPH-SKILL.md` loses *"run
+  `fux explain` on both ends first"*. **The `--hops` third of the row stays
+  open as a fork.** 2026-09-11.
 
 ## Definition of done
 

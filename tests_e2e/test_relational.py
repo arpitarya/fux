@@ -140,3 +140,51 @@ def test_graph_verbs_ask_for_a_build_rather_than_crashing(linked, tmp_path):
     assert result.returncode == 1
     assert "fux build" in result.stderr
     assert "Traceback" not in result.stderr
+
+
+# -- W-140 row 12: a typo must not read as an answer -------------------------
+
+
+def _run_failing(cwd: Path, *args: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, "-m", "fux.cli", *args], cwd=cwd, capture_output=True, text=True
+    )
+
+
+def test_path_refuses_a_from_that_is_not_in_the_index(linked):
+    """🔴 It printed *No route … within N hop(s)* and exited 0.
+
+    A true sentence about a document that does not exist, and byte-identical
+    to the answer for two real documents that are genuinely unrelated — so a
+    typo read as a finding. `explain` was fixed for exactly this in W-63; the
+    verb next door kept the defect.
+    """
+    result = _run_failing(linked, "path", "docs/does-not-exist.md", "docs/adr-storage.md")
+    assert result.returncode == 1
+    assert "not in the index (FROM)" in result.stderr
+
+
+def test_path_names_which_end_was_wrong(linked):
+    result = _run_failing(linked, "path", "docs/adr-storage.md", "docs/typo.md")
+    assert result.returncode == 1
+    assert "not in the index (TO)" in result.stderr
+
+
+def test_path_still_answers_honestly_for_two_real_unrelated_documents(linked):
+    """The control. Refusing a typo must not turn an honest empty into an error."""
+    cases = load_pairs("nopath")
+    case = cases[0]
+    result = _run(linked, "path", case["from"], case["to"], "--json", "--hops", str(case["hops"]))
+    assert json.loads(result.stdout)["paths"] == []
+
+
+def test_explain_refuses_a_tag_that_does_not_exist(linked):
+    """A tag is a node in the plane, so the plane is what knows it.
+
+    The existence check read the committed index, where a tag has no record,
+    so `explain tag:typo` fell through to *has no recorded relationships* —
+    which reads as *this tag exists and links nowhere*.
+    """
+    result = _run_failing(linked, "explain", "tag:definitely-not-a-tag")
+    assert result.returncode == 1
+    assert "is not a tag in this index" in result.stderr

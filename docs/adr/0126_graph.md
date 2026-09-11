@@ -237,6 +237,32 @@ cannot read two different files — a neighbourhood around seeds ranked under
 weights that did not choose them is the failure that would make the saving worth
 nothing.
 
+**A verb refuses a node nothing knows about, and says which end.** `path`
+validated neither `FROM` nor `TO` until 2026-09-11 (W-140 row 12): a typo
+printed *No route from … within N hop(s)* and exited **0**, byte-identical to
+the honest answer for two real, unconnected documents. `explain` had been fixed
+for exactly this in W-63 — *three states, not two* — and the verb beside it kept
+the defect, which is what a per-verb fix leaves behind.
+
+- **The check is one function now**, used by both verbs, so the next verb that
+  takes a node id inherits it instead of re-deriving it.
+- ⚠ **A `tag:` id was never checked at all**, on either verb: the test read the
+  committed index and a tag has no record there. A tag is a node in the **plane**,
+  so the plane answers for it — an unknown tag refuses rather than reporting *no
+  recorded relationships*, which reads as *this tag exists and links nowhere*.
+- **Honest emptiness is unchanged and pinned by a control test.** Refusing a
+  typo must never turn a real negative into an error; that is the whole value of
+  `path`.
+
+⚠ **`--hops` is still unbounded, and that is a fork this record has not
+resolved.** Measured 2026-09-11: `--hops 7` on ~960 documents runs over a
+minute, because simple-path enumeration grows steeply and a tag shared by a
+thousand documents makes them all mutually two hops apart (the same property
+decision above names). **Capping the argument, warning above a threshold, or
+bounding the walk's work are three different answers** with different costs to
+a small graph, and picking one silently inside a defect fix would be the wrong
+place to decide it. Filed in `work/OPEN-WORK.md`.
+
 ### Consequences
 
 - **`ask` is untouched, and that is asserted.**

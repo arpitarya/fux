@@ -78,6 +78,36 @@ def _resolve_doc(root: Path, given: str) -> str:
     return f"file:{given}"
 
 
+def _refuse_unknown(root: Path, plane, node_id: str, *, flag: str) -> None:
+    """Refuse a node nothing knows about, naming which kind it was.
+
+    ⚠ **`fux path` validated neither end until 2026-09-11** (W-140 row 12). A
+    typo'd path printed *No route from … within N hop(s)* and exited **0** —
+    a true sentence about a document that does not exist, and indistinguishable
+    from the answer for two real documents that are genuinely unrelated. That
+    is the same *three states, not two* defect `explain` was fixed for in W-63,
+    on the verb next door.
+
+    ⚠ **And `explain tag:x` skipped the check entirely**, because the existence
+    test was written for documents and a tag has no record in the index. A tag
+    is a node in the plane, so the plane is what knows it — an unknown tag now
+    refuses instead of reporting *no recorded relationships*, which reads as
+    *this tag exists and links nowhere*.
+    """
+    if node_id.startswith(TAG_PREFIX):
+        if node_id not in plane.graph.nodes:
+            raise FuxError(
+                f"{node_id} is not a tag in this index. `fux explain` on a document "
+                "lists the tags it declares"
+            )
+        return
+    if node_id not in _committed_ids(root):
+        raise FuxError(
+            f"{node_id} is not in the index{flag}. `fux find` locates a document; "
+            "`fux add` puts one in"
+        )
+
+
 def _committed_ids(root: Path) -> set[str]:
     """The ids the committed index holds — the corpus, not the graph.
 
@@ -105,11 +135,10 @@ def cmd_explain(args) -> int:
         # the corpus at all — its own comment said the two were different and
         # then treated them the same. A `fux remove`d document answering as
         # though it were still indexed is the case that made it visible.
-        if not doc_id.startswith(TAG_PREFIX) and doc_id not in _committed_ids(root):
-            raise FuxError(
-                f"{doc_id} is not in the index. `fux find` locates a document; "
-                "`fux add` puts one in"
-            )
+        # **The tag half was still missing until W-140 row 12**: the check
+        # read the index, a tag is not in it, so `explain tag:typo` fell
+        # straight through to the empty answer.
+        _refuse_unknown(root, plane, doc_id, flag="")
         if args.json:
             print(json_mod.dumps({"doc": doc_id, "edges": [], "community": None}, indent=2))
         else:
@@ -202,6 +231,10 @@ def cmd_path(args) -> int:
     plane = plane_mod.load(root)
     src = _resolve_doc(root, args.src)
     dst = _resolve_doc(root, args.dst)
+    # Both ends, before the search: *no route* and *no such document* are
+    # different answers and `path` gave the first one for both.
+    _refuse_unknown(root, plane, src, flag=" (FROM)")
+    _refuse_unknown(root, plane, dst, flag=" (TO)")
 
     # `--hops` bounds the search and stays a CLI argument; `hop_decay` only
     # orders what the search found. See `walk.routes` for why the boundary is

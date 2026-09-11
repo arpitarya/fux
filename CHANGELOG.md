@@ -61,6 +61,14 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- **`fux path` refuses an end that is not in the index**, naming which
+  (`… is not in the index (FROM)`, exit 1). It printed `No route from … within
+  N hop(s)` and exited 0 — the same answer as for two real, unconnected
+  documents, so a typo read as a finding. `fux explain` now refuses an unknown
+  `tag:` too; neither verb checked tags at all
+  ([ADR-GRAPH](docs/adr/0126_graph.md)). An empty `paths` still exits 0 and
+  still means what it says.
+
 - **`fux doctor` gains a `tune.toml loads` row.** A tune file that did not parse
   left every row green — `fux ingest` reads only `[index]` from it, so the index
   stayed clean while `ask`, `find`, `answer`, `graph` and `path` all refused.
