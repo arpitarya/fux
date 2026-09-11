@@ -274,6 +274,7 @@ def _layout(root: Path) -> list[Check]:
         )
     )
     checks.append(_output_config_health(root))
+    checks.append(_tune_config_health(root))
     checks.append(_types_health(root))
     checks.append(_ignore_health(root))
     checks.append(_fetcher_capabilities(root))
@@ -913,6 +914,42 @@ def _output_config_health(root: Path) -> Check:
         "the current defaults out (this is the only way to configure `fux mcp`, which has no flags)",
         level="warn",
     )
+
+
+def _tune_config_health(root: Path) -> Check:
+    """Will `.fux/tune.toml` load — the file whose breakage doctor could not see.
+
+    ⚠ **A broken tune file left `doctor` green** until 2026-09-11 (W-140 row
+    13), and that is the worst shape for this particular file: `fux ingest`
+    reads only `[index]` through `index_limits`, so a bad ranking knob **does
+    not stop an ingest by design** ([ADR-TUNE](../../docs/adr/0135_tuning.md)
+    decision 13) — while `ask`, `find` and `answer` refuse. So the repo indexes
+    cleanly, doctor says every row is fine, and every query fails.
+
+    **A hard error, not a warning**, unlike `output.toml` being absent. An
+    absent tune file is a repo running engine defaults, which is legitimate and
+    common; a tune file that does not load is a file somebody wrote and nothing
+    reads, and every query in the repo is already failing.
+
+    The check calls `tune.load` itself rather than re-parsing: a second parser
+    would answer a question the real one does not ask.
+    """
+    from . import tune as tune_mod
+
+    path = root / tune_mod.TUNE_NAME
+    if not path.is_file():
+        return Check("tune.toml loads", True, f"{tune_mod.TUNE_NAME} is absent - engine defaults")
+    try:
+        tune_mod.load(root)
+    except FuxError as exc:
+        return Check(
+            "tune.toml loads",
+            False,
+            f"{exc} - `ask`, `find` and `answer` refuse while this stands; "
+            "`fux tune > .fux/tune.toml` rewrites the defaults, and `--no-tune` "
+            "skips the file for one command",
+        )
+    return Check("tune.toml loads", True, f"{tune_mod.TUNE_NAME}: parsed, every key valid")
 
 
 def _types_health(root: Path) -> Check:

@@ -19,7 +19,7 @@
 
 ### fux build
 
-- 🟠 **W-140** · `agent` — 14 code defects and 13 record/code disagreements left, none 🔴; four closed 2026-09-11. [detail](open/W-140-guide-authoring-defects.md)
+- 🟠 **W-140** · `agent` — 12 code defects and 13 record/code disagreements left, none 🔴; six closed and one moved to W-122 on 2026-09-11. [detail](open/W-140-guide-authoring-defects.md)
 - 🔴 **W-138** · `agent` — rewrite the ~40 artifacts that still use the playground as an instrument, and add the guard test. [detail](open/W-138-reconcile-with-l9.md)
 - 🟠 **W-139** · `agent`, after W-138 — build fux-benchmark: seven corpora, two versions, latency and ranked lists kept. [detail](open/W-139-benchmark-per-l9.md)
 - 🔴 **W-122** · `agent` — generate CLAUDE.md's law section, consolidate the doc-only schemas, gate ADR-CONFIG against `config.py`. [detail](open/W-122-adrs-are-the-source.md)

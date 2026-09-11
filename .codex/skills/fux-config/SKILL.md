@@ -34,8 +34,10 @@ diff <(fux output) .fux/output.toml
 fux doctor --json    # rows: "fux.toml loads", "output.toml present", "ranking priors"
 ```
 
-⚠ **`fux doctor` has no row for `tune.toml`.** A broken tune file surfaces on
-`fux ask`, `find`, `answer`, `graph`, `path` — not on `doctor`.
+**`fux doctor`'s `tune.toml loads` row is the fastest check.** It quotes the
+loader's own refusal. ⚠ **A broken tune file does not stop `fux ingest`** — it
+reads only `[index]` — so an index can be clean while every query in the repo
+refuses.
 
 ⚠ **`fux ask` and `fux find` keep answering on a `fux.toml` that `fux ingest`
 refuses.** A query succeeding proves nothing about `fux.toml`; the

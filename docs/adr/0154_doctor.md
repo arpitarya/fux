@@ -240,6 +240,23 @@ thing: a `.doctor-probe` file it immediately unlinks, to answer *is `.fux/`
 writable*. L8's gitignored-path rule is not reached because there is no record
 of use to keep.
 
+**10. The `tune.toml loads` row** (2026-09-11, W-140 row 13). A tune file that
+does not parse left every `doctor` row green, and that is the worst possible
+shape for **this** file specifically:
+
+- **`fux ingest` reads only `[index]`** through `index_limits`, because a bad
+  ranking knob must not fail an ingest or a hook
+  ([ADR-TUNE](0135_tuning.md) decision 13) — while `ask`, `find`, `answer`,
+  `graph` and `path` all refuse. So the index is clean, every check says fine,
+  and every query in the repo fails.
+- **An error, not a warning**, unlike an absent `output.toml`. Absent means
+  engine defaults, which is a legitimate repo; unparseable means a file
+  somebody wrote that nothing reads, and the queries are already failing.
+- **It calls `tune.load` and quotes what comes back**, the way the
+  `fux.toml loads` row quotes the config loader. A second parser here would
+  answer a question the real one does not ask — decision 6's *name the fix*
+  with the fix's own words.
+
 ### Consequences
 
 - ✅ **A change to one check opens two records, not eight** — this one, and the

@@ -61,6 +61,12 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- **`fux doctor` gains a `tune.toml loads` row.** A tune file that did not parse
+  left every row green — `fux ingest` reads only `[index]` from it, so the index
+  stayed clean while `ask`, `find`, `answer`, `graph` and `path` all refused.
+  The row quotes the loader's own refusal and fails as an **error**
+  ([ADR-DOCTOR](docs/adr/0154_doctor.md) decision 10).
+
 - **`fux add <URL> --no-update` now fetches once**, as `--help` and the record
   always said. It wrote the line, fetched nothing and exited 1 — the pin filter
   ran above the fetch and did not know an add was in progress. Every run after

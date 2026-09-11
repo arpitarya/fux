@@ -1203,3 +1203,63 @@ def test_a_missing_pii_file_is_an_error_row_and_fails_the_command(tmp_path, monk
     assert not row.ok and row.level == "error"
     assert "fux setup" in row.detail
     assert doctor.cmd_doctor(argparse.Namespace(json=False)) == 1
+
+
+# -- W-140 row 13: the file whose breakage doctor could not see --------------
+
+
+def test_a_broken_tune_file_fails_the_doctor(tmp_path):
+    """🔴 It left doctor GREEN, which is the worst shape for this file.
+
+    `fux ingest` reads only `[index]` from `tune.toml`, so a bad ranking knob
+    deliberately does not stop an ingest (ADR-TUNE decision 13) — while `ask`,
+    `find` and `answer` refuse. The repo therefore indexes cleanly, doctor
+    reports every row fine, and every query in it fails.
+    """
+    _git_repo(tmp_path)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 'not a number'\n", encoding="utf-8")
+
+    check = _check(doctor.run(tmp_path), "tune.toml loads")
+    assert not check.ok
+    assert check.level == "error"
+    assert not all(c.ok for c in doctor.run(tmp_path))
+
+
+def test_the_tune_row_quotes_the_loaders_own_words(tmp_path):
+    """One wording, from the parser that actually refuses — never a second one
+    here that can drift from it."""
+    from fux import tune
+    from fux.errors import FuxError
+
+    _git_repo(tmp_path)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 'nope'\n", encoding="utf-8")
+
+    try:
+        tune.load(tmp_path)
+    except FuxError as exc:
+        loader_said = str(exc)
+    else:  # pragma: no cover - the fixture is invalid by construction
+        pytest.fail("the fixture stopped being invalid")
+
+    assert loader_said in _check(doctor.run(tmp_path), "tune.toml loads").detail
+
+
+def test_a_valid_tune_file_passes(tmp_path):
+    _git_repo(tmp_path)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux").mkdir(exist_ok=True)
+    (tmp_path / ".fux" / "tune.toml").write_text("[ranking]\nrerank_weight = 0.5\n", encoding="utf-8")
+    assert _check(doctor.run(tmp_path), "tune.toml loads").ok
+
+
+def test_no_tune_file_is_not_a_problem(tmp_path):
+    """Absent means engine defaults — legitimate and common, unlike a file that
+    somebody wrote and nothing can read."""
+    _git_repo(tmp_path)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    check = _check(doctor.run(tmp_path), "tune.toml loads")
+    assert check.ok and "absent" in check.detail

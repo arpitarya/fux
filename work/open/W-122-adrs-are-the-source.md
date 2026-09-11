@@ -219,3 +219,43 @@ CLAUDE.md block and its test, the config consolidation, and the key-tree gate.
 Any change to a law's *meaning* — L0 moves where laws live and how they rank;
 it re-words none of L1–L8. The four runtime schemas. `tune.specimen()`. The
 per-law records' rationale content, which is already correct.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🔴 **W-122 — the remainder of L0: the generated `CLAUDE.md` block, the config
+  consolidation, and the gate.** `agent` · *(records: ADR-LAW-0 · ADR-LAWS ·
+  ADR-CONFIG · ADR-TUNE · ADR-OWNERSHIP)* · **Arpit ruled this 2026-09-06**: a
+  rule is stated in exactly one ADR and every other artifact links rather than
+  restates; a record that conflicts with a Law is **void in the conflicting
+  part**; a Law changes only on his ruling, named in the record.
+
+  **What is left, re-derived 2026-09-11:**
+
+  - **`CLAUDE.md`'s law section becomes generated and test-asserted.** It is
+    still the normative home and the ruling says it stops being one. Until this
+    lands, `CLAUDE.md` §Non-negotiable constraints and the nine records can
+    disagree while both look correct — which is the exact restatement hazard
+    L0 names.
+  - 🔴 **The config consolidation has NOT happened.** `src/fux/config.schema.json`
+    and `src/fux/derive/runtime.schema.json` both still exist (verified
+    2026-09-11) and both were assessed documentation-only; the four
+    runtime-loaded schemas stay, because they **enforce** rather than
+    **describe**. ⚠ A schema nothing parses drifts silently — which is how the
+    phantom `[sources] types_file` key came to exist at all.
+  - **The gate R-2 asked for**: ADR-CONFIG's fenced key tree ↔ `config.py` as a
+    parser, **both directions**, so *a key is real only if it is in the tree*.
+    That is how `acquired_max_bytes` rotted in prose, and how `types_file`
+    rotted until W-130 removed it.
+    ⚠ **W-140 row 8 moved here on 2026-09-11 rather than being fixed on its
+    own**: *unknown `fux.toml` keys are silently ignored*. Rejecting one needs a
+    set of real keys to compare against, which is this gate's tree — hand-writing
+    a second set in `config.py` would build the duplicate source of truth this
+    item exists to remove. **The silent-ignore is the symptom; the tree is the
+    fix**, and `.fux/tune.toml` already rejects unknown keys by name, so the
+    behaviour to match is in the repo.
+
+  — [detail](W-122-adrs-are-the-source.md) `filed: 2026-09-06`

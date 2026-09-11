@@ -31,12 +31,10 @@ then refresh this repo's renderings.
 | 5 | **`fux add <URL>` writes every attribute**, so `[sources.url]` `fetcher`/`meta`/`keep`/`ttl`/`update` never reach CLI-written lines. **(guide: SOURCES, FETCHER)** | `sources.py` | ADR-URL-LIST d14 |
 | 6 | **`answer` runs with the fetch cache off**: `ttl=` never applies, `cached` is unreachable, `update=never` does not stop the answer-time fetch. | `query/refer_answer.py` ~104 | ADR-URL-FRESHNESS d11/d15 · ADR-REFER d20 · ADR-ACQUIRED |
 | 7 | **`verify` misreports**: a `source: index` receipt and an unreachable URL both give `drifted:corpus`, not `unverifiable`; `--rerun` fetches. **(guide: ANSWER)** | `query/__init__.py` ~994, ~1075 | ADR-PROVENANCE d14 |
-| 8 | **Unknown `fux.toml` keys are silently ignored.** | `config.py` ~154 | ADR-CONFIG |
 | 9 | **The merge driver's refusal says re-run `fux ingest`**, which cannot read a shard with conflict markers. **(guide: MAINTAIN)** | `maintain/mergedriver.py` ~201 | ADR-MERGE-DRIVER d6 |
 | 10 | **`fux hooks` installs nothing when `[cli.json] enabled = true`** — it only reports. **(guide: MAINTAIN)** | `maintain/__init__.py` ~113 | ADR-MAINTENANCE |
 | 11 | **The background runner never rebuilds the accelerator.** | `maintain/runner.py` ~534 | ADR-MAINTENANCE 2a |
 | 12 | **`fux path` never checks FROM/TO exist** (empty, exit 0); `explain tag:x` is never missing; `--hops` is unbounded (hops 7 > 60 s on ~960 docs). **(guide: GRAPH)** | `graph/__init__.py` | ADR-GRAPH |
-| 13 | **`fux doctor` has no `tune.toml` row** — a broken tune file leaves doctor green. **(guide: CONFIG, pointers)** | `doctor.py` ~345, ~758 | ADR-DOCTOR · ADR-TUNE |
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
 | 15 | **No fetch timeout is enforced** — `timeout_seconds` is recorded and read nowhere. | `refer/freshness.py` ~44 | ADR-REFER |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
@@ -107,6 +105,23 @@ then refresh this repo's renderings.
   `request_stop` every writing verb calls) before the read. Both failures were
   inside a combined `tests tests_e2e` run; two such runs are clean after.
   2026-09-11.
+
+- **Row 13 — `fux doctor` had no `tune.toml` row.** The worst shape for this
+  file: `fux ingest` reads only `[index]`, so a bad ranking knob leaves a clean
+  index and a green doctor while every query in the repo refuses. `doctor` now
+  calls `tune.load` and quotes its refusal — an **error**, not a warning, unlike
+  an absent `output.toml`. [ADR-DOCTOR](../../docs/adr/0154_doctor.md) decision
+  10. `CONFIG-SKILL.md` and all three config pointers lose the workaround.
+  2026-09-11.
+
+- **Row 8 — unknown `fux.toml` keys are silently ignored — MOVED to W-122, not
+  fixed here.** The fix is a key set to validate against, and
+  [W-122](W-122-adrs-are-the-source.md) already owns exactly that as gate R-2:
+  *ADR-CONFIG's fenced key tree ↔ `config.py`, both directions, so a key is
+  real only if it is in the tree*. Hand-writing a second key set here would
+  create the duplicate source of truth W-122 exists to remove — and this defect
+  (`types_file`, `acquired_max_bytes`) is the evidence for that gate, not a
+  separate task. 2026-09-11.
 
 ## Definition of done
 

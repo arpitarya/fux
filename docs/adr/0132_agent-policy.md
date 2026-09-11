@@ -552,7 +552,10 @@ from the template. Row 2 followed the same day: `PII-SKILL.md`'s *"a frontmatter
 its *"file paths are not redacted"* names the note ingest prints. Rows 3 and 4
 followed: `SOURCES-SKILL.md` had told readers to pin a URL in **two steps** and
 to work around `--failed` by hand, and both workarounds are gone with the
-defects that caused them. **`fux setup` does not rewrite a rendering that already
+defects that caused them. Row 13 took `CONFIG-SKILL.md` and all three
+config pointers: *"`fux doctor` has no row for `tune.toml`"* became the row's
+name, which is the shape a guide should have had from the start — a workaround
+is a defect with a sentence wrapped around it. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that
 edits a template and stops has left this repo's own copies stating the old
 behaviour.

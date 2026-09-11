@@ -18,7 +18,7 @@ changes ranking or output for everyone.
 - **Judge a tuning change per query, by rank**, against expectations written
   down before the edit - never by one query or an average score.
 - **`[index]` in tune.toml re-extracts the whole committed index.**
-- Check `fux.toml` with `fux doctor --json`; it cannot see `tune.toml`, so
-  run one `fux ask "..." --json` too. Restart `fux mcp` after editing `[mcp]`.
+- Check both with `fux doctor --json` - the `fux.toml loads` and
+  `tune.toml loads` rows. Restart `fux mcp` after editing `[mcp]`.
 
 Full procedure: the `fux-config` skill.
