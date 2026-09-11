@@ -5,7 +5,7 @@ description: Write a new Fux decoder, or edit an existing one, in .fux/decoders/
 
 # Writing a Fux decoder
 
-A **decoder** turns one file format into Markdown so Fux can index it. Sixteen
+A **decoder** turns one file format into Markdown so Fux can index it. Seventeen
 ship with Fux and live in `.fux/decoders/` in this repository — **those copies
 are what run**, not the ones inside the installed package.
 
@@ -67,6 +67,24 @@ def decode(path, rel_path: str) -> str | None:   # a real file, removed after
 
 Prefer bytes. It is testable from memory, cannot read anything it was not
 handed, and works for content that never had a path.
+
+**Your headings ARE your chunking. There is nothing to declare.**
+
+`refer/_chunk.py` derives what a citable passage is from the heading depth you
+emit, with one rule: *a short section folds forward only into a section nested
+inside it.* So:
+
+| you emit | you get |
+|---|---|
+| a run of siblings — `## Slide 1`, `## Slide 2`, … | one passage each, never merged, however short |
+| a heading with nested subheadings | one passage per section, stubs folded into the enclosing one |
+| a Markdown table | one passage per row, header repeated |
+| one heading | the whole file, one passage |
+
+⚠ **If your format's unit is a slide, message, page or record, emit them as
+SIBLINGS at one level under a `# <filename>` title.** That is the whole
+mechanism — a short unit beside a long one is safe because they are siblings,
+not because anything was declared. See `docs/adr/0063_chunking.md`.
 
 **Files starting with `_` are helpers, not decoders** — the loader skips them.
 Put shared code there.
@@ -211,12 +229,12 @@ each already cost a defect in the shipped set:
 
 | you want | go to |
 |---|---|
-| the decision of record | `docs/adr/0042_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
-| the sixteen shipped decoders | `.fux/decoders/` in this repo |
+| the decision of record | `docs/adr/0049_decode.md` — §1 for the shape, §2 for the protocol and every per-format judgement |
+| the seventeen shipped decoders | `.fux/decoders/` in this repo |
 | the loader, the override rule, the registry | `fux.decode.__init__` — read its module docstring |
 | where decoding joins ingest | `fux.ingest.parse.parse_document` |
 | which files are walked at all | `.fux/formats.toml`, and `docs/adr/0038_types-list.md` |
-| what `.fux/` may contain | `docs/adr/0003_fux-directory.md` |
+| what `.fux/` may contain | `docs/adr/0012_fux-directory.md` |
 | worked tests to copy | `tests/decode/test_formats.py` — fixtures are built in the test, never committed as binaries, so the input is readable beside the assertion |
 
 **When you finish:** say which files you changed, which formats are affected,

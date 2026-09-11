@@ -222,11 +222,12 @@ Start from [`TEMPLATE.md`](TEMPLATE.md).
 | [0061](0061_expand.md) | **ADR-EXPAND** | The caller supplies the vocabulary (`--expand`, scored at `expand_weight`) and fuses its own phrasings (`-q`, RRF in rank space); a document matching only supplied terms is never returned | accepted | yes |
 | [0062](0062_tabular.md) | **ADR-TABULAR** | Tabular documents — one passage per row, `max_table_rows` (500 -> 20 000; `.fux/tune.toml [index]` since 2026-09-11), and the two silent data losses that hid behind both | accepted | yes |
 | [0063](0063_chunking.md) | **ADR-CHUNKING** | A chunk does three jobs and one span cannot do all three — the one fold rule that derives every unit from heading depth with nothing declared, the boundary ladder that makes every document quotable, and why small-to-big was rejected | accepted | yes |
+| [0064](0064_doctor.md) | **ADR-DOCTOR** | The health command — fifteen checks, one owner. `warn` is the default and `error` is reserved for a repo a verb will refuse; a check that degrades to `skipped` must name the row that does fail; `fux doctor` never repairs. Carved out of ADR-DOTFUX so a change to one check stops demanding eight records | accepted | yes |
 | [0002](0002_LAW-0-authority.md) | **ADR-LAW-0** | L0 — a rule is stated in exactly one ADR and every other artifact links to it; the Law records outrank every other record and a conflicting record is void in the conflicting part; a Law changes only on Arpit's ruling | accepted | yes |
 
 > ## The number line was renumbered on 2026-09-06, and W-82 ruling 7 was overridden
 >
-> **`0001`–`0063`, contiguous, no holes.** `0001` is the router
+> **`0001`–`0064`, contiguous, no holes.** `0001` is the router
 > [ADR-LAWS](0001_LAWS.md); `0002`–`0009` are the eight law records; `0010`
 > upward is every other record, in its previous order.
 >
@@ -333,7 +334,7 @@ table does not grant.
 | `src/fux/progress.py` | ADR-CLI | the progress plane — stderr-only, TTY-gated, counts not clocks |
 | `src/fux/config.py` | ADR-CONFIG | `fux.toml`'s schema, the opaque `[sources.url.config]` table, and the tables refused by name rather than ignored |
 | `src/fux/tune.py` | ADR-TUNE | `.fux/tune.toml` — the loader, the closed key set, the two refusals, and the `[priority]` data. **The priority RESOLUTION is not here**: it lives on `query/rank.py::Weighting`, next to the bound that has to agree with it |
-| `src/fux/doctor.py` | ADR-DOTFUX | the committed-vs-derived assertions, the URL section, the runner check and the **fetcher-capability notice** — all read-only, all offline. The notice is decision 6's own named mechanism (*a `doctor` check, never a rewrite*) applied to [ADR-FETCHER](0027_fetcher.md) decisions 12–13; it reads the consumer's fetcher **as text and never imports it** |
+| `src/fux/doctor.py` | ADR-DOCTOR | every check, its level, and the register naming whose subject each one reports on. **Carved out of ADR-DOTFUX for a different DECISION, not a different concern** (Arpit, 2026-09-11): the layout assertions are still ADR-DOTFUX's subject, but this file's subject is the health command itself — and seven records describing one file made the freshness gate demand all eight for any change to any check |
 | `src/fux/setup.py` | ADR-DOTFUX | the second scaffolding moment — the consumer-owned files, write-if-missing |
 | `src/fux/store/` | ADR-INDEX-LIFECYCLE | canonical bytes, shard addressing, writer/reader, collisions, and the declared record shape |
 | `src/fux/store/fuxdir.py` | ADR-DOTFUX | the `.fux/` layout generator — and the **three** kind declarations (`COMMITTED`, `DERIVED`, `ACQUIRED`) the generated README table is built from |
@@ -433,7 +434,6 @@ the relation *look* enforced while asserting things nobody checked.
 | `src/fux/enrich.py` | ADR-PII | `enrich=` for `url:` documents — `_document_text` reading the retained blob, and the single synthetic `.fux/sources/urls` scope. Owned by ADR-ENRICH for enrichment itself |
 | `src/fux/ingest/sourcelist.py` | ADR-PII | `enrich` on the URL list, resolved through the same three layers as `keep` and `ttl` |
 | `src/fux/config.py` | ADR-PII | `[sources.url] enrich` — the source-wide layer |
-| `src/fux/doctor.py` | ADR-PII | `_pii_health` — a missing `pii.toml` is an **error** row (decision 17); otherwise compiles every pattern offline and states the scope. ⚠ It cannot see an over-broad rule, and says so |
 | `src/fux/cli.py` | ADR-PII | `_require_pii_rules` and `PII_EXEMPT` — decision 17's refusal, placed before dispatch so a verb added later is gated without knowing it. Owned by ADR-CLI for the verb surface; the rule and its exemptions are this record's |
 | `src/fux/setup.py` | ADR-PII | writes `.fux/pii.toml` from the starter, write-if-missing — the half of decision 17 that makes the refusal fixable. Owned by ADR-DOTFUX for scaffolding |
 | `src/fux/store/fuxdir.py` | ADR-PII | `pii.toml`'s row in `COMMITTED_FILES` — **the ruleset is committed, and that is the decision** (decision 1): a redaction rule that lived on a gitignored path would redact one clone and not the next, so the file has to sit in the category `fux doctor` audits. Owned by ADR-DOTFUX for the layout |
@@ -447,21 +447,15 @@ the relation *look* enforced while asserting things nobody checked.
 | `src/fux/refer/__init__.py` | ADR-URL-FRESHNESS | both `as-ingested` fallback points in `_obtain`, and `min(policy, declared)` — decision 11's arithmetic, which is where a per-URL value is prevented from widening a caller's policy |
 | `src/fux/refer/source.py` | ADR-URL-FRESHNESS | `from_acquired`, and decision 6's rule that it **imports** `_decode_fetched` and `sanitize` rather than reimplementing them — the property the whole fallback rests on |
 | `src/fux/store/fuxdir.py` | ADR-ACQUIRED | the `ACQUIRED` declaration and its `.gitignore` line. Owned by ADR-DOTFUX for the layout; this is the record that added the third kind |
-| `src/fux/doctor.py` | ADR-ACQUIRED | `_acquired_health` — blob count, total bytes, the 80%-of-cap warning, and the gitignore assertion that fails as an **error** rather than a warning |
 | `src/fux/mcp.py` | ADR-OUTPUT | decisions 11, 16 and 17 reach in directly: `[mcp]`'s closed key set (`top` only, `band` refused by name), `tools/list` advertising the RESOLVED `top` rather than a literal (the W-83-class defect this decision exists to prevent), and `[mcp]` being loaded once at `serve()` start rather than per search. Owned by ADR-MCP for the protocol itself; this is a rendering decision reaching into the module that serves it |
 
 | `src/fux/query/__init__.py` | ADR-ANSWER | `cmd_answer` and both printers live here — `ANSWER_TOP`, the refer/index fork, `_freshness_of`. ⚠ **Added 2026-09-05 because this record owned NOTHING and therefore could never be opened by the gate**: W-108 rewrote the `answer` verb and the freshness check demanded ADR-ASK, ADR-CONFIDENCE, ADR-OUTPUT, ADR-REFER and ADR-URL-FRESHNESS — every record except the one whose entire subject is the verb. Owned by ADR-ASK for the scan and unification |
 | `src/fux/query/refer_answer.py` | ADR-ANSWER | the seam between `cmd_answer` and `refer()` — the candidate list, and `_load_fetchers`' per-URL dispatch. Owned by ADR-ASK under its `src/fux/query/` claim |
 | `src/fux/refer/_rescore.py` | ADR-RERANK | `passage_boost` and the bounded multiplicative uplift reach in here (decision 9) — the same constant that reorders documents scores their passages. Owned by ADR-REFER under its `src/fux/refer/` claim |
-| `src/fux/doctor.py` | ADR-REFUSAL | `_refusal_health` — how many rules load, how many responses each has refused (cumulative, from `urlstate.refused`), and **the rules that have never fired**, which is what a typo'd condition looks like. Decision 11 |
-| `src/fux/doctor.py` | ADR-DECODE | `_decoder_bindings` — the one binding fault no ingest can catch: a `[decoders]` binding on an extension **no indexed document has**. Extending is legal by design, so nothing errors and the line indexes nothing forever |
-| `src/fux/doctor.py` | ADR-URL-FRESHNESS | `freshness_counts` and `AS_INGESTED_VETO_SHARE` — this record's veto instrument, shared verbatim with ADR-ACQUIRED's identical one so the quarter has a single home |
-| `src/fux/doctor.py` | ADR-INGEST | `_recency_prior` — whether any document carries an `mtime`. A corpus copied out of its git repository loses every one, and `ingest/priors.py` is where they come from |
 | `src/fux/maintain/urlstate.py` | ADR-REFUSAL | `refused` and `record_refusals` — the counter's storage, in the file ADR-MAINTENANCE owns, on `rate_limited`'s shape with the key turned from host to rule |
 | `src/fux/ingest/urlsrc.py` | ADR-URL-FRESHNESS | `_record_refusals` in `fetch_all()` — see ADR-REFUSAL decision 11; the counting sits beside the refusal check the row above places |
 | `src/fux/ingest/sourcelist.py` | ADR-ARCHIVED-CONTENT | `archived` on both lists — `dirs` since 2026-08-22 and `urls` since 2026-09-11 (decision 1a), the same name, values and default on each. ⚠ **Added because this record OWNED NOTHING in `src/` and could therefore never be opened by the freshness gate** — the [ADR-ANSWER](0015_answer.md) precedent above, exactly: W-126 amended this record and the gate demanded seven others instead |
 | `src/fux/ingest/urlsrc.py` | ADR-ARCHIVED-CONTENT | `UrlEntry.archived`, and `resolve_urls` applying **two** layers to it where `keep` and `ttl` take three — the absence of a source-wide layer is decision 1a's call, not an omission |
 | `src/fux/ingest/run.py` | ADR-ARCHIVED-CONTENT | `_archived_url_ids` and `_with_archived` — the declaration reaching a record, including a CARRIED one, which is the half that makes a retired page declarable at all. Owned by ADR-INGEST for the walk |
-| `src/fux/doctor.py` | ADR-ARCHIVED-CONTENT | the `ranking priors` row's `archived_weight` line, and the count of documents the dead prior would have acted on — this record's decision 6 default, disclosed where an author can see it |
 <!-- DESCRIBES-TABLE-END -->
 

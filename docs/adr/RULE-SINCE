@@ -56,7 +56,43 @@
 # ⚠ A FIFTH ENTRY HERE WOULD MEAN THAT FIX FAILED. It is ADR-OWNERSHIP veto
 # condition 6. Read decision 9 before adding one, and prefer fixing the check.
 #
+# 2026-09-11 — THE FIFTH ENTRY. THE BASELINE MOVES, AND DECISION 9 DID NOT FAIL.
+#
+# Ruled by Arpit, 2026-09-11: "fix only the latest, leave the old ones" —
+# confirmed in the same exchange as STOP AUDITING OLD COMMITS.
+#
+# THE CAUSE IS A NEW ONE, and saying so is the point of this entry. The four
+# entries above are one cause in four shapes — a record, a relation or a number
+# arriving AFTER a commit and convicting it retroactively. Decision 9 fixed that
+# cause and it is still fixed: the gate reads `git show <sha>:docs/adr/README.md`
+# and judges every commit against the register as it stood at that commit.
+#
+# What convicts `94231b2` is a different cause and is not retroactive at all.
+# The `describes` relation is FILE-SCOPED; the descriptions are KEY-SCOPED. That
+# commit added the single string "codex" to `[agents] install` in
+# `src/fux/config.py`. ADR-ACQUIRED, ADR-PII and ADR-URL-FRESHNESS each describe
+# `config.py` because each owns keys in it — and none of them owns that key. The
+# register was correct at the commit, is correct now, and the gate is reading it
+# correctly. It is the SCOPE of `describes` that over-fires, not its history.
+#
+# DECLINED IN THE SAME EXCHANGE, and recorded as declined rather than judged on
+# merit:
+#   (a) rebasing `94231b2` to touch three records it has nothing to do with;
+#   (b) key-scoped `describes` — the real fix, and much the largest;
+#   (d) a one-sha waiver list.
+#
+# THE COST, stated rather than buried, and it is the largest yet: every commit
+# up to and including `ce425c7` is no longer re-auditable by this gate. That is
+# the entire history before 2026-09-11.
+#
+# ⚠ THIS DOES NOT FIX THE OVER-FIRING. The next commit that touches
+# `src/fux/config.py` for any reason will again be required to touch every
+# record describing that file, whichever key it actually changed. This entry
+# buys one red commit, not the defect. ADR-OWNERSHIP veto condition 6 has
+# FIRED, by ruling, and that record says so.
+#
 # Previous baselines:
 #   1fc51a7257efeb943c512809bc531c7817dbc753
 #   301c65af310424d266ad40a4e22961722a586d97
-9bb870ef7dc4c25386cca15d999bcb2b4e7a81f5
+#   9bb870ef7dc4c25386cca15d999bcb2b4e7a81f5
+ce425c7764822938912219a00e7b9a2720961289

@@ -50,6 +50,43 @@ def _check(checks, name):
     return next(c for c in checks if c.name == name)
 
 
+# -- does fux.toml load? (ADR-DOCTOR / ADR-DOTFUX decision 6) -----------------
+
+
+def test_a_fux_toml_the_loader_refuses_makes_doctor_red(tmp_path):
+    """🔴 **The defect this closes: a green doctor beside an exit-1 ingest.**
+
+    Every config-dependent check degrades to `skipped (no readable fux.toml)` at
+    warn level — each individually correct, and collectively they reported `[OK]`
+    for a repo where `fux ingest` exits 1. The one verb whose job is to name the
+    fix was the one verb that did not name it."""
+    _git_repo(tmp_path)
+    # the `max_parallel` refusal (W-85): required, never implicit
+    (tmp_path / "fux.toml").write_text("[sources.url]\n", encoding="utf-8")
+    checks = doctor.run(tmp_path)
+    loads = _check(checks, "fux.toml loads")
+    assert not loads.ok
+    assert loads.level == "error"
+    # the loader's own words, verbatim — not a second wording that can drift
+    assert "max_parallel must be present" in loads.detail
+    assert not all(c.ok for c in checks)
+
+
+def test_a_loadable_fux_toml_passes(tmp_path):
+    _git_repo(tmp_path)
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    assert _check(doctor.run(tmp_path), "fux.toml loads").ok
+
+
+def test_no_fux_toml_at_all_is_a_warning_not_a_failure(tmp_path):
+    """`find_root` accepts a bare `.git` checkout, and a repo that has not run
+    `fux setup` has no config to refuse. Failing here would fire on every one of
+    them — the false positive that trains people to ignore a red doctor."""
+    _git_repo(tmp_path)
+    loads = _check(doctor.run(tmp_path), "fux.toml loads")
+    assert loads.ok and loads.level == "warn"
+
+
 def test_index_ignored_by_a_blanket_rule_is_an_error(tmp_path):
     _git_repo(tmp_path)
     (tmp_path / ".gitignore").write_text(".fux/*\n", encoding="utf-8")

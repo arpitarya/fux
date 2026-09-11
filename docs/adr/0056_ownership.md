@@ -174,6 +174,38 @@ src/fux/query/rank.py        ADR-RANKING         ADR-TUNE
      always meant, and what the gate's own docstring had been claiming while the
      code did the opposite.
 
+10. 🔴 **`describes` is FILE-scoped and the descriptions it encodes are
+    KEY-scoped. Veto condition 6 has fired, by Arpit's ruling of 2026-09-11, and
+    the baseline moved.** Recorded here because the veto says *check, do not
+    wait* — and it was checked and it was true.
+
+    - **What fired it.** `94231b2` added the single string `"codex"` to
+      `[agents] install` in `src/fux/config.py`. Three records describe that
+      file — ADR-ACQUIRED, ADR-PII, ADR-URL-FRESHNESS — because each owns
+      **keys** in it, and **none of them owns that key**. The gate demanded all
+      three. It was right about the table and wrong about the change.
+    - ⚠ **Decision 9 did NOT fail, and the distinction is the whole entry.**
+      Veto 6 was written expecting a fifth `RULE-SINCE` entry to mean
+      *retroactive conviction is back*. This is not that. The register was
+      correct at that commit and is correct now; `_register_at` read it
+      correctly. **A fourth shape of the old cause and a first instance of a new
+      one look identical from the baseline line, and only the prose tells them
+      apart** — which is why `RULE-SINCE`'s fifth entry leads with the cause.
+    - **The remedy Arpit ruled** — *"fix only the latest, leave the old ones"* —
+      is that the baseline moves to `ce425c7`. **The cost is every commit before
+      2026-09-11 losing re-auditability**, the largest such cost yet, and it is
+      stated in `RULE-SINCE` rather than buried here.
+    - 🔴 **THE OVER-FIRING IS NOT FIXED.** The next commit that touches
+      `src/fux/config.py` for any reason will again be required to touch every
+      record describing that file, whatever key it changed. This decision buys
+      one red commit; it does not buy the defect.
+    - **Key-scoped `describes` was DECLINED, not rejected on merit**, in the
+      same exchange, alongside rebasing the offending commit and a one-sha
+      waiver list. It remains the real fix and it remains large: it makes the
+      describes table a key grid, and it needs a parser that can say which keys
+      a diff touched. **Whoever reopens this is reopening a declined option, not
+      arguing against a decided one.**
+
 ### Consequences
 
 - **Every describes row is a row someone must maintain.** The relation is only
@@ -236,6 +268,12 @@ src/fux/query/rank.py        ADR-RANKING         ADR-TUNE
 6. **`docs/adr/RULE-SINCE` gains a fourth entry.** Decision 9 was supposed to
    end the need to move the baseline for this cause; a new entry naming a
    reassignment, a renumber or a new record means it did not.
+   ⚠ **FIRED 2026-09-11 — and on a cause this condition did not anticipate.**
+   The fifth entry names **file-scoped `describes` against key-scoped
+   descriptions**, which is neither a reassignment, a renumber nor a new record,
+   so decision 9 is intact. **Read decision 10 before reading this as decision 9
+   failing.** The condition stands as written for a sixth entry, and it now
+   carries the lesson that *the baseline moved* is not by itself a diagnosis.
 4. **A describes row carries no reason.** Unauditable rows accumulate until
    nobody can tell which relations are real.
 5. **A record describes more than a handful of components while owning none.**

@@ -190,7 +190,7 @@ def _repo_root(start: Path | None) -> list[Check]:
     root = find_root(start)
     if root is None:
         return [Check("repo root", False, "no fux.toml or .git found above the current directory")]
-    checks = [Check("repo root", True, str(root))]
+    checks = [Check("repo root", True, str(root)), _config_loads(root)]
     fux_dir = root / ".fux"
     try:
         fux_dir.mkdir(exist_ok=True)
@@ -202,6 +202,45 @@ def _repo_root(start: Path | None) -> list[Check]:
         checks.append(Check(".fux/ writable", False, str(exc)))
     checks.extend(_layout(root))
     return checks
+
+
+def _config_loads(root: Path) -> Check:
+    """Does `fux.toml` actually load? An **error**, and the loader's own message.
+
+    🔴 **Without this row, `fux doctor` reported `[OK]` for a repo where every
+    other verb exits 1.** A `fux.toml` the loader refuses — an unknown key, a
+    missing `max_parallel`, malformed TOML — takes `ingest`, `ask` and the rest
+    out, while `doctor` printed `fetcher optional functions: skipped (no
+    readable fux.toml)` at **warn** level and called the run green. The one verb
+    whose job is to name the fix was the one verb that did not name it.
+
+    - **The loader's message is reproduced verbatim, not paraphrased.** It
+      already names the key and what is wrong with it; a second wording of the
+      same failure is a restatement that can drift from the thing enforcing it.
+    - **`error`, not `warn`.** Every downstream check that touches config
+      degrades to a skipped warning by design — each is individually correct to
+      do so, and collectively they made the whole command green. This row is
+      what makes the *cause* fail, so the skips can stay warnings.
+    - **A missing `fux.toml` is NOT this check's failure.** `find_root` accepts
+      a `.git`-only directory, and a repo with no `fux.toml` has nothing to
+      refuse — that is `repo root`'s finding, and `fux setup`'s job.
+    """
+    from .config import load as load_config
+
+    name = "fux.toml loads"
+    if not (root / "fux.toml").is_file():
+        # `find_root` accepts a bare `.git` checkout. Nothing to load, nothing
+        # to refuse — reporting a failure here would fire on every repo that
+        # simply has not run `fux setup` yet.
+        return Check(name, True, "no fux.toml (run `fux setup` to write one)", level="warn")
+    try:
+        load_config(root)
+    except FuxError as exc:
+        # Verbatim, and the only place doctor renders a loader error. It may
+        # carry an em-dash, which is why nothing here interpolates it into an
+        # ASCII-by-invariant string.
+        return Check(name, False, str(exc))
+    return Check(name, True, "fux.toml")
 
 
 def _layout(root: Path) -> list[Check]:

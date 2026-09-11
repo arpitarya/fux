@@ -410,11 +410,55 @@ and the doc's own crux is weaker than it was written:**
   was correct only *because* `claude` usually installs, which is an assumption
   about the filesystem in all but name. Decision 5 refuses exactly that.
 
-**What shipped is `fux-enrich` only**, because the ruling named it.
-`fux-decoder` and `fux-usage` still have no `.github/skills/` rendering. ⚠
-**That is now the asymmetry**, inverted from the one this session opened with,
-and it is held by a test rather than by a sentence
-(`test_the_two_rosters_differ_only_where_a_record_says_so`).
+**What shipped on 2026-09-06 was `fux-enrich` only**, because that ruling named
+it — leaving `fux-decoder` and `fux-usage` with no `.github/skills/` rendering.
+
+**14a. The asymmetry is CLOSED: all three skills reach all four surfaces**
+(Arpit, 2026-09-11 — *yes*, for Claude, Copilot, Kiro and Codex). Decision 14
+widens to the full set, on its own reasoning rather than a new one: the
+byte-identity argument and the `install = ["copilot"]` hole were never specific
+to `fux-enrich`, and holding two skills back on a ruling that had simply not
+been asked about them was the sentence, not the argument.
+
+- ⚠ **`fux-usage` is ADDITIVE for Copilot, not a replacement.** Copilot already
+  gets it ambiently as `.github/instructions/fux-usage.instructions.md`
+  (`applyTo: "**"`), which is short prose. The skill is the
+  progressive-disclosure operating manual the other three vendors get. **Both
+  ship**; dropping either would leave Copilot the one vendor missing one of
+  them, which is decision 5's hole in miniature.
+- ⚠ **The double-load hazard is unchanged and still unmeasured.** Copilot reads
+  `.claude/skills` too (decision 13), so a default install now shows it three
+  same-name pairs instead of one. The bound is the same one decision 14 argued:
+  identical bytes, so idempotent, with a hard duplicate-name **error** the only
+  live failure. The compare doc's reopen-trigger is that observed error and it
+  **stands**.
+- **Held by tests, not by a sentence**: `test_the_three_rosters_no_longer_differ_at_all`
+  (any divergence, either direction) and
+  `test_every_committed_write_skill_reaches_every_skill_surface` (asserted
+  against the named surface set, so deleting a vendor fails rather than making
+  three empty rosters agree).
+
+**14b. 🔴 The byte-identity claim was FALSE when it was written, and is now
+asserted rather than trusted.** Decision 10's *"agreement by construction — one
+template, N destinations"* is only true if nobody edits a rendering, and
+`_write_if_missing` never rewrites a file that exists, so this repo's own copies
+were editable by hand with nothing comparing them.
+
+- **`fa47760` edited `.claude/skills/fux-decoder/SKILL.md` in place** — adding
+  the chunking contract, correcting the decoder count, renaming the worked
+  example — and **none of it reached the template**. Every `fux setup` from then
+  until 2026-09-11 shipped a decoder guide with no section on how a decoder's
+  headings become citable passages.
+- **`.github/agents/fux.agent.md` had drifted the other way**: the template
+  gained the command-resolution ladder and this repo's committed copy, already
+  present, never received it.
+- **Found by writing the check, not by reading the file** —
+  `test_this_repos_own_agent_files_still_match_the_templates_that_ship`, added
+  in this change. It is the **second strike** on skill-roster drift (the first
+  being `fux-enrich` on one surface while its twin was on three), so it is
+  gated in the change that records it, per CLAUDE.md.
+- **The repair direction is one-way and the test says so in its message:** edit
+  the template, delete the rendering, re-run `fux setup`.
 
 
 ### Consequences
@@ -463,7 +507,7 @@ and it is held by a test rather than by a sentence
 | **Opt-in behind a flag** | **drafted this way and overruled.** A flag nobody knows about means the policy layer exists in the product and in no repository, and the failure it prevents is *silent*. The trust concern the flag answered is instead met by decision 6's mandatory announcement plus `--no-agents` |
 | **Generate the renderings from the canonical policy** | a handful of short files do not earn a generator; decision 2's conformance test buys the same guarantee at a fraction of the machinery |
 | **Ship the skills as steering too, "so they always apply"** | rejected under decision 9a: a skill that writes committed code and changes ranking must never enter every request |
-| **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | **not rejected — deferred to a compare doc.** Copilot already reads `.claude/skills` (decision 13), so in the default install this writes a *second* copy of a skill Copilot can already load, with the same `name:`. Whether that collides is **not known**, and shipping on a guess is the failure this project pays for elsewhere. [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md) |
+| **Write `.github/skills/fux-decoder/` now that Copilot has a skill surface** | ✅ **ACCEPTED BY RULING, 2026-09-11** — see decision 14a. It was deferred here, not rejected: Copilot already reads `.claude/skills` (decision 13), so this writes a *second* copy under one `name:`, and whether that collides is still **not known**. What changed is not that evidence — it is Arpit's ruling that the `install = ["copilot"]` hole outweighs an unmeasured duplicate-name risk whose worst case is a hard error, not divergent instructions. `fux-usage` came with it. [`copilot-skill-surface`](../../work/compare/copilot-skill-surface.compare.md)'s reopen-trigger — an **observed** error — is unchanged and still live |
 | **Give Codex its own `AGENTS.md` template** | it already has the right one. `AGENTS.md` is vendor-neutral by W-82 ruling 16 and carries the verbatim block; a Codex-specific copy would be a second rendering of a policy that has exactly one |
 
 ### Reference (required)

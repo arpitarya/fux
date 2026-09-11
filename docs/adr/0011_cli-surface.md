@@ -402,6 +402,7 @@ Read-only. Every check prints `[OK]` or the reason it is not.
 $ fux doctor
 [OK] python version: 3.11, fux 0.32.0
 [OK] repo root: /root/fuxlab/demo
+[OK] fux.toml loads: fux.toml
 [OK] .fux/ writable: /root/fuxlab/demo/.fux
 [OK] index not gitignored: the committed index is tracked
 [OK] .fux/ layout declared: every entry is declared
@@ -412,6 +413,11 @@ $ fux doctor
 The gitignore check is not decoration: a `.fux/*` blanket silently eating the
 committed index is the failure mode [ADR-DOTFUX](0012_fux-directory.md) was
 written around.
+
+**Every check, its level, and whose subject it reports on, is
+[ADR-DOCTOR](0064_doctor.md)'s** — including why `fux.toml loads` exists, and the
+rule that a check degrading to `skipped` must name the row that does fail. This
+record owns the **verb**: its flags, its exit codes and its `--json` shape.
 
 **`--json` is not optional on this verb.** `doctor` is where an agent asks
 whether the repo is healthy, and a status an agent cannot parse is not a status

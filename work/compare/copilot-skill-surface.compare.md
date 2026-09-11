@@ -8,15 +8,21 @@ timestamp: 2026-09-06T00:00:00Z
 
 # Copilot's skill surface — write `.github/skills/`, or don't? — Comparison
 
-> **Verdict: A — write `.github/skills/`.** ✅ **Ruled by Arpit 2026-09-06,
-> overruling this document's proposed C.** Shipped for `fux-enrich`; the
-> decoder and usage rows were not asked for and did not ship.
+> **Verdict: A — write `.github/skills/`, for ALL THREE skills.**
+> ✅ **Ruled by Arpit 2026-09-06**, overruling this document's proposed C, and
+> **widened by him on 2026-09-11** to cover `fux-decoder` and `fux-usage` as
+> well. The 2026-09-06 ruling shipped `fux-enrich` alone because that is what
+> was asked about; the 2026-09-11 ruling closes the roster.
 > **Confidence:** medium-high — see *The crux, corrected* below: the collision
 > this doc called *unknown* is bounded much more tightly than it was written,
-> because the two copies are **byte-identical by construction**.
+> because the copies are **byte-identical by construction**.
+> ⚠ **Widening does not weaken the crux and does not re-measure it.** Three
+> same-name pairs instead of one is three instances of one bounded risk, not a
+> new one.
 > **Reopen when:** Copilot is observed to **error** (not merely double-load) on
 > two project skills sharing a `name:`, in any repository where both
-> `.github/skills/fux-enrich/` and `.claude/skills/fux-enrich/` exist.
+> `.github/skills/<name>/` and `.claude/skills/<name>/` exist — for **any** of
+> `fux-enrich`, `fux-decoder`, `fux-usage`.
 
 ## Context
 
@@ -96,7 +102,7 @@ move and the one this project already relies on for the verbatim block.**
 
 ## Consequences
 
-**Shipped under A:** `AGENT_FILES["copilot"]` gains
+**Shipped under A, 2026-09-06:** `AGENT_FILES["copilot"]` gains
 `.github/skills/fux-enrich/SKILL.md` and no template;
 [ADR-AGENT-POLICY](../../docs/adr/0042_agent-policy.md) decision 9a is amended
 (its *"the two skill surfaces — Claude and Kiro"* was a count doing a rule's
@@ -104,12 +110,29 @@ job), decision 14 records the ruling, and decision 13 is marked superseded **in
 effect, not in substance** — the cross-read is unchanged, it is simply no
 longer how Copilot reaches this skill.
 
-⚠ **`fux-decoder` and `fux-usage` did NOT get `.github/skills/` rows.** The
-ruling named `fux-enrich`. That leaves a roster difference between two skills
-of the same risk class — the *inverse* of the asymmetry this session opened by
-finding — and it is held by
-`test_the_two_rosters_differ_only_where_a_record_says_so` rather than by a
-sentence, so closing it is a deliberate act and leaving it is a visible one.
+**Shipped under A, 2026-09-11 — the roster closes.** `fux-decoder` and
+`fux-usage` gain their `.github/skills/` rows, still with no new template. The
+asymmetry this section was written to keep visible is gone, and the test that
+held it is replaced by two that assert the opposite:
+`test_the_three_rosters_no_longer_differ_at_all` (any divergence, either
+direction) and `test_every_committed_write_skill_reaches_every_skill_surface`
+(against the four surfaces by name, so deleting a vendor fails rather than
+making three empty rosters agree). ADR-AGENT-POLICY decision 14a.
+
+⚠ **`fux-usage` is additive for Copilot**, which already receives it ambiently
+as `instructions/fux-usage.instructions.md`. Both ship: the instructions file is
+short `applyTo: "**"` prose, the skill is the operating manual every other
+vendor gets.
+
+🔴 **A finding this widening produced, and it is not about Copilot.** Rendering
+the third surface exposed that **byte-identity by construction was not true** —
+`fux setup` never rewrites an existing file, so fux's own committed renderings
+were hand-editable with nothing comparing them, and two had drifted
+(`.claude/skills/fux-decoder/SKILL.md` ahead of its template since `fa47760`;
+`.github/agents/fux.agent.md` behind its own). **The crux above rests on that
+identity**, so it is now asserted by
+`test_this_repos_own_agent_files_still_match_the_templates_that_ship` rather
+than assumed. ADR-AGENT-POLICY decision 14b.
 
 ## References
 

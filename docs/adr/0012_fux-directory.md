@@ -7,7 +7,7 @@ status: accepted
 amended: 2026-09-11
 date: 2026-08-18
 feature: "the layout of `.fux/`, the two scaffolding moments, and the invariants that keep both honest"
-owns: [src/fux/store/fuxdir.py, src/fux/doctor.py, src/fux/setup.py]
+owns: [src/fux/store/fuxdir.py, src/fux/setup.py]
 laws: [L2, L3, L5]
 timestamp: 2026-08-18T00:00:00Z
 ---
@@ -326,14 +326,21 @@ not.
   which had to be checked here rather than assumed. Verified 2026-09-11 on a
   scratch repo carrying `[decode] max_table_rows = 500`: `fux ingest` exits 1
   naming the move, and `fux doctor` completes every other row.
-- 🔴 **But `doctor` does not NAME it.** It degrades to `fetcher optional
-  functions: skipped (no readable fux.toml)` and reports that as `[OK]` — so a
-  repo whose `fux.toml` refuses to load gets a **green doctor beside a broken
-  ingest**, the wrong way round for the verb whose job is to name the fix. It is
-  the same shape as decision 19, one step milder: there the refusal took
-  `doctor` out, here it leaves `doctor` running and uninformative. Filed as open
-  work rather than patched in this change, because the fix is a new `doctor` row
-  and this record does not own `doctor`'s row set.
+- ✅ **And `doctor` now NAMES it — fixed 2026-09-11**, in the change after the
+  one that filed it. It used to degrade to `fetcher optional functions: skipped
+  (no readable fux.toml)` and report that as `[OK]`, so a repo whose `fux.toml`
+  refuses got a **green doctor beside a broken ingest** — the same shape as
+  decision 19, one step milder: there the refusal took `doctor` out, here it
+  left `doctor` running and uninformative. The fix is one row, `fux.toml loads`,
+  at **error** level, printing the loader's own message verbatim
+  ([ADR-DOCTOR](0011_cli-surface.md) §`fux doctor`, which owns the row set).
+- ⚠ **What made it invisible is worth more than the row.** No check was wrong.
+  Each one deferred — *an unreadable `fux.toml` is `_repo_root`'s business*,
+  *`_config`'s finding to report* — under the sound rule that a health command
+  must not raise twice for one cause. **The finding evaporated because every
+  check that saw it deferred to a check that did not exist.** So: whenever a
+  check degrades to `skipped`, name the row that does fail. If none does, the
+  degradation is a hole rather than politeness.
 
 **7. `fetchers/` is consumer code and fux never rewrites it.** It is loaded by
 path, and only under the two fenced paths — `fux add <URL>` and `fux update`.
@@ -343,7 +350,7 @@ import machinery cannot resolve, so **fux copies them and never imports them**
 linters that skip hidden directories by default (ruff does) will not lint them.
 
 **8. `decoders/` is consumer code too, and the copies are what run.** `fux
-setup` writes all sixteen built-in decoders there, write-if-missing, and **the
+setup` writes all seventeen built-in decoders there, write-if-missing, and **the
 modules inside the installed package are not consulted while a copy exists** —
 so a consumer invited to override a decoder can read the ones they are
 overriding, in their own repo.

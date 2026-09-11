@@ -230,9 +230,21 @@ measured failure.
 write a decoder* had lived only in a module docstring and in §2 — **the
 agent-facing half of a record, which is not where a consumer looks.**
 
-- Rendered to `.claude/skills/fux-decoder/` and `.kiro/skills/fux-decoder/`.
-  **Never to an ambient surface**: it writes committed Python that changes what
-  is indexed ([ADR-AGENT-POLICY](0042_agent-policy.md) decision 9a).
+- **Rendered to all four skill surfaces** — `.claude/skills/`, `.kiro/skills/`,
+  `.codex/skills/` and, since Arpit's ruling of 2026-09-11,
+  `.github/skills/fux-decoder/` ([ADR-AGENT-POLICY](0042_agent-policy.md)
+  decision 14a). **Never to an ambient surface**: it writes committed Python
+  that changes what is indexed (decision 9a). Every skill surface is
+  progressive-disclosure, which is what admits a fourth without touching that
+  rule — the exclusion that survives is the ambient one, and only that one.
+- ⚠ **The rendering is not automatically the template.** `fux setup` never
+  rewrites a file that already exists, so this repo's own committed copy is
+  hand-editable and a hand edit reaches **no user**. That happened: `fa47760`
+  added the chunking contract to `.claude/skills/fux-decoder/SKILL.md` and not
+  to `DECODER-SKILL.md`, so every install between then and 2026-09-11 shipped a
+  decoder guide missing it. Pinned since by
+  `test_this_repos_own_agent_files_still_match_the_templates_that_ship`
+  (ADR-AGENT-POLICY decision 14b). **Edit the template, not the rendering.**
 - **Exempt from the verbatim policy block** — a build procedure, not a rendering
   of the archived-results policy, pinned by a test.
 - **It carries the reasoning, not just the recipe**: the contract with a *why*

@@ -368,26 +368,86 @@ def test_no_committed_write_skill_reaches_an_ambient_surface():
             assert "/skills/" in rel, f"{template} -> {rel}"
 
 
-def test_the_two_rosters_differ_only_where_a_record_says_so():
-    """⚠ **A known, recorded asymmetry** — not a free-floating difference.
-    `fux-enrich` reaches `.github/skills/` and `fux-decoder` does not, because
-    Arpit's 2026-09-06 ruling named `fux-enrich`. Both are legal under the rule
-    above; only one was asked for.
+#: Every skill surface Fux installs to — the four progressive-disclosure
+#: planes, one per vendor. **Ambient planes are deliberately absent**: the rule
+#: that keeps a committed-write skill off `instructions/` and `steering/` is
+#: what these three templates are held to (ADR-AGENT-POLICY decision 14).
+SKILL_SURFACES = {".claude/skills", ".github/skills", ".kiro/skills", ".codex/skills"}
 
-    **This test exists so the gap cannot go quiet the way the last one did** —
-    `fux-enrich` shipped to one surface for a year while its twin shipped to
-    three, and nothing failed. Close it by adding the decoder row, and this
-    test tells you to delete its exception."""
-    def surfaces(template):
-        return {
-            rel.rsplit("/", 2)[0]
-            for files in setup_mod.AGENT_FILES.values()
-            for rel, tpl in files
-            if tpl == template
-        }
 
-    assert surfaces("ENRICH-SKILL.md") - surfaces("DECODER-SKILL.md") == {".github/skills"}
-    assert surfaces("DECODER-SKILL.md") - surfaces("ENRICH-SKILL.md") == set()
+def _surfaces(template):
+    return {
+        rel.rsplit("/", 2)[0]
+        for files in setup_mod.AGENT_FILES.values()
+        for rel, tpl in files
+        if tpl == template
+    }
+
+
+def test_the_three_rosters_no_longer_differ_at_all():
+    """**The exception is GONE, and that is the assertion.** This test was
+    written while `fux-enrich` reached `.github/skills/` and `fux-decoder` did
+    not — a recorded asymmetry, because Arpit's 2026-09-06 ruling had named only
+    one of them. He ruled the other way on **2026-09-11**: `fux-decoder` and
+    `fux-usage` go to Copilot too.
+
+    **It exists so a gap cannot go quiet the way the last one did** —
+    `fux-enrich` shipped to one surface while its twin shipped to three, and
+    nothing failed. Now any divergence at all fails, in either direction."""
+    assert _surfaces("ENRICH-SKILL.md") == _surfaces("DECODER-SKILL.md")
+    assert _surfaces("ENRICH-SKILL.md") == _surfaces("USAGE-SKILL.md")
+
+
+def test_this_repos_own_agent_files_still_match_the_templates_that_ship():
+    """🔴 **The drift this catches has already happened, in `fa47760`.**
+
+    `_write_if_missing` never rewrites a file that is already there, so this
+    repo's own renderings are writable by hand and a hand edit reaches **no
+    user**. `fa47760` added the chunking contract, corrected the decoder count
+    and renamed the worked example — all three to
+    `.claude/skills/fux-decoder/SKILL.md` and **none of them to the template**.
+    Every `fux setup` between then and 2026-09-11 shipped a decoder guide
+    missing the section that tells a decoder author how their headings become
+    passages. Nothing failed, because nothing compared them.
+
+    ⚠ **This is the exact claim `setup.py` makes about itself** — *"agreement by
+    construction -- one template, N destinations"* — asserted rather than
+    trusted. Two strikes (CLAUDE.md): the first was `fux-enrich` reaching one
+    surface while its twin reached three, which
+    `test_the_three_rosters_no_longer_differ_at_all` now gates; this is the
+    second, in a different shape, so it is gated in the change that records it.
+
+    **If this fails: edit the TEMPLATE, delete the rendering, re-run
+    `fux setup`.** Never the other way round."""
+    root = Path(__file__).resolve().parents[1]
+    pairs = [(rel, tpl) for files in setup_mod.AGENT_FILES.values() for rel, tpl in files]
+    # the vendor-neutral root file lives outside `AGENT_FILES` (W-82 ruling 16)
+    # and drifts by exactly the same mechanism, so it is added by hand here too.
+    pairs.append((setup_mod.AGENTS_FILE, setup_mod.AGENTS_TEMPLATE))
+    stale = []
+    for rel, template in pairs:
+        committed = root / rel
+        if not committed.exists():  # not installed in this repo
+            continue
+        if committed.read_bytes() != setup_mod.agent_template_bytes(template):
+            stale.append(f"{rel}  !=  templates/agents/{template}")
+    assert not stale, (
+        "this repo's committed agent files have drifted from the templates that "
+        "ship to users:\n  " + "\n  ".join(sorted(stale))
+    )
+
+
+def test_every_committed_write_skill_reaches_every_skill_surface():
+    """Arpit, 2026-09-11: *yes* — all four vendors, all three skills. Asserted
+    against the surface set by name rather than against each other, so deleting
+    a vendor from `AGENT_FILES` fails here instead of silently making three
+    equally-empty rosters agree.
+
+    ⚠ `fux-archived-results` is **ambient policy, not a committed-write skill**
+    — Codex gets it through the repo-root `AGENTS.md` and Copilot through
+    `instructions/` — so it is deliberately out of this assertion."""
+    for template in ("DECODER-SKILL.md", "USAGE-SKILL.md", "ENRICH-SKILL.md"):
+        assert _surfaces(template) == SKILL_SURFACES, template
 
 
 def test_codex_alone_still_gets_the_root_agents_file(tmp_path):

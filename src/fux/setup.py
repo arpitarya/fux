@@ -147,7 +147,16 @@ AGENT_FILES: dict[str, tuple[tuple[str, str], ...]] = {
         # idempotent and the residual risk is a hard duplicate-name error, not
         # divergent instructions. Written anyway because `install =
         # ["copilot"]` **alone** must not silently get nothing.
+        #
+        # ⚠ **`fux-usage` also reaches Copilot AMBIENTLY**, one line above, as
+        # `instructions/fux-usage.instructions.md`. The skill is **additive, not
+        # a replacement**: the instructions file is `applyTo: "**"` prose that
+        # says *resolve the binary, read the JSON*; the skill is the
+        # progressive-disclosure operating manual Claude, Kiro and Codex get.
+        # Removing either would make Copilot the one vendor missing one of them.
         (".github/skills/fux-enrich/SKILL.md", "ENRICH-SKILL.md"),
+        (".github/skills/fux-usage/SKILL.md", "USAGE-SKILL.md"),
+        (".github/skills/fux-decoder/SKILL.md", "DECODER-SKILL.md"),
     ),
     "kiro": (
         (".kiro/steering/fux-archived-results.md", "steering-fux-archived-results.md"),
