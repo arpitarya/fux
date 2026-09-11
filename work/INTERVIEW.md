@@ -38,6 +38,7 @@ valuable judgement, but not the state of play.
 - **W-121** — closed; evidence kept, recorded in ADR-TABULAR.
 - **W-134** — fux-playground repaired on Arpit's ruling (`3b4d275`: `docs` back in the source list, goldens saved); left is a current index + `check.py --rows`.
 - **Enrichment re-run question** — closed; the lesson is in §4.
+- **W-135** — Arpit ratified the headroom obligation: per endpoint and direction, observed vs proven, 0 → Inconclusive, no minimum, dated test. ADR-RS is written in W-135's change, not before.
 - **Order:** W-132 → W-118; W-133 and W-134 independent. OPEN-WORK rule 9: no git housekeeping in the queue.
 
 ### `.fux/pii.toml` is REQUIRED now (2026-09-11, Cowork — W-128 + W-129, uncommitted)
@@ -47,26 +48,21 @@ valuable judgement, but not the state of play.
 - **Rules may name a checksum** (`validate = "luhn" | "verhoeff"`), a closed engine set — decision 16. **The starter covers US and Canadian identifiers** (SSN, ITIN, MBI, SIN on; EIN, postal code, NANP phone off) — decision 12a. Allowlists, shared packs and path scoping were offered and not chosen.
 - ⚠ W-128's code rode into `fa47760` unannounced; its records and all of W-129 are uncommitted.
 
-### W-130 landed: the types list is `.fux/types.toml` (2026-09-11, Cowork, uncommitted)
+### W-130 landed: the types list is `.fux/formats.toml` (2026-09-11, Cowork)
 
-- **What changed:** `include` + `[decoders]` in `.fux/types.toml` replaced the
+- **What changed:** `include` + `[decoders]` in `.fux/formats.toml` replaced the
   line-grammar `.fux/sources/types` — [ADR-TYPES](../docs/adr/0038_types-list.md)
-  decision 12, built on Arpit's "go" to the
-  [compare doc](compare/types-toml.compare.md). This repo's own list is
-  converted.
-- ⚠ **The old file is refused everywhere**, and `fux setup` converts it. A
-  session that meets *"moved to .fux/types.toml"* in another repo runs `fux setup`
-  and deletes the old file — it does not re-create `sources/types`.
-- 🔴 **Not committed, and the commit is not straightforward.**
-  `test_adr_freshness` flags five records — ADR-ACQUIRED, ADR-ARCHIVED-CONTENT,
-  ADR-PII, ADR-REFUSAL, ADR-URL-FRESHNESS — that only *describe* keys in
-  `config.py`/`doctor.py`/`sourcelist.py` this change never touched. **Same
-  file-scoped over-fire as the `94231b2bf` inbox row** — left for that ruling,
-  not worked around.
-- ⚠ **Verified in the Cowork container, not on the Mac:** 3209 unit + 80 e2e
-  green on the Mac's tree (the three failures are the over-fire above, the
-  pre-existing `94231b2bf` red, and a W-134 link another session had not yet
-  written). The conversion re-ingested byte-identical.
+  decision 12, committed in `607ca88` as `types.toml` and **renamed to
+  `formats.toml` the same day** on Arpit's ruling (uncommitted). `types.toml` was
+  never pushed, so it has no refusal path.
+- ⚠ **The old `.fux/sources/types` is refused everywhere**, and `fux setup`
+  converts it. A session that meets *"moved to .fux/formats.toml"* in another repo
+  runs `fux setup` and deletes the old file — it does not re-create `sources/types`.
+- ⚠ **Code names did not change**: `typesfile.py`, `read_types`, `--types`,
+  ADR-TYPES. Only the file on disk is `formats.toml`.
+- **Verified in the Cowork container on the Mac's tree after the rename:** 3208
+  unit + 80 e2e green; the one failure is the pre-existing `94231b2bf` freshness
+  red.
 
 ### `[index]` in tune.toml: `max_phrases` (12 -> 32) and `max_table_rows` (2026-09-11, latest — uncommitted)
 

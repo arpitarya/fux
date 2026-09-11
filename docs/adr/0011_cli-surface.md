@@ -146,7 +146,7 @@ what makes a flat verb sufficient here rather than merely mandated. They write
 every attribute explicitly ([ADR-URL-LIST](0026_url-list.md) decision 12) and
 edit one line, so a human's grouping comments survive.
 
-⚠ **Since 2026-09-11 the type list is `.fux/types.toml`** ([ADR-TYPES](0038_types-list.md)
+⚠ **Since 2026-09-11 the type list is `.fux/formats.toml`** ([ADR-TYPES](0038_types-list.md)
 decision 12), and every verb hands a `--types` edit to `ingest/typesfile.py`
 instead of the line grammar. **The one-line rule holds there too**: `add` inserts
 one glob into `include`, or one `ext = "module"` into `[decoders]` when a decoder
@@ -588,7 +588,7 @@ $ fux add
   handbook archived=false
 
 * 1 line(s) do not state every attribute, so fux did not write them. They load fine (the reader is lenient); `fux add <entry>` rewrites one in full.
-.fux/types.toml:
+.fux/formats.toml:
   *.adoc
   *.markdown
   *.md
@@ -608,7 +608,7 @@ refusing.
 
 | flag | verb | effect |
 |---|---|---|
-| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path, edited in `.fux/types.toml` (ADR-TYPES decision 12). ⚠ Since 2026-09-01 `add` also records the binding — a `[decoders]` line naming the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([ADR-TYPES](0038_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
+| `--types` | `add` · `remove` | the entry is a file-type pattern, not a path, edited in `.fux/formats.toml` (ADR-TYPES decision 12). ⚠ Since 2026-09-01 `add` also records the binding — a `[decoders]` line naming the module that would have read the pattern anyway, resolved from the LIVE registry so the written line preserves today's dispatch rather than describing it ([ADR-TYPES](0038_types-list.md) decision 11). There is **no `--decoder` flag**: the binding is a property of the extension, so overriding one is a file edit, not a per-invocation choice |
 | `--cdp` / `--http` | `add` | URLs: record `fetch=`. Both at once is an error, not a silent pick |
 | `--plain` / `--hashed` | `add` | URLs: record `meta=`. Same rule |
 | `--archived` | `add` | dirs: record `archived=true` |

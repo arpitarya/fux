@@ -1,1 +1,1 @@
-✓ W-130 + rule 9 + playground repair committed · five describers amended for the types-list move (each with a real stake, not filler) · 3212 unit + 80 e2e green · 🔴 test_adr_freshness still red on 94231b2bf — over-firing, ruling owed · next: 3 inbox rows past 5d (headroom 14d, partial goldens 14d, W-87 15d)
+✓ formats.toml rename verified on the Mac and committed · 3209 unit + 80 e2e green · index re-ingested (60 shards) and verified converged · 🔴 test_adr_freshness still red on 94231b2bf, ruling owed · next: W-132 → W-118; W-133/134/135 in parallel

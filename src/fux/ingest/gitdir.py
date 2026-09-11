@@ -38,7 +38,7 @@ three hold:
    (ADR-DIR-LIST, W-45's verdict E) — the **deprecated** home for exclusions,
    still honoured, and `fux ingest` warns when a pattern is stated here *and*
    in `.fuxignore`;
-3. its name matches the **type allowlist** — `.fux/types.toml` if that file
+3. its name matches the **type allowlist** — `.fux/formats.toml` if that file
    exists, otherwise the built-in `DEFAULT_TYPES` (ADR-TYPES, W-55's verdict G).
 
 **No rule inside that trio beats another**, so there is nothing to remember
@@ -277,7 +277,7 @@ def _default_types() -> tuple[str, ...]:
     default that grew when a consumer dropped a `logdoc.py` into
     `.fux/decoders/` would mean **adding a decoder silently starts indexing a
     new file type** — and what counts as a document must stay a committed line
-    a human wrote in `.fux/types.toml`.
+    a human wrote in `.fux/formats.toml`.
     """
     from .. import decode as decode_mod
 
@@ -293,7 +293,7 @@ class TypeFilter:
 
     ⚠ **There is no `deny` any more** (ADR-TYPES decision 12, 2026-09-11). The
     `!` subtraction the old line grammar carried was already the deprecated
-    spelling of an exclusion; `.fux/types.toml` has no such key, and
+    spelling of an exclusion; `.fux/formats.toml` has no such key, and
     `.fux/.fuxignore` is the one home for keeping a file out.
     """
 
@@ -306,7 +306,7 @@ class TypeFilter:
 
 
 def read_types(root: Path, rel_path: str = TYPES_FILE) -> TypeFilter:
-    """The type allowlist: `.fux/types.toml` if present, else the built-in.
+    """The type allowlist: `.fux/formats.toml` if present, else the built-in.
 
     **Absent means the default applies, never "index everything".** Indexing
     everything is the behaviour W-55 was filed about; and it does not mean

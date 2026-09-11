@@ -1,0 +1,27 @@
+id,document,annotator_1,annotator_2,annotator_3,votes,in_dispute,resolved
+q020,docs/runbook-mesh-rollback-legacy.md,1,1,1,3,no,relevant
+q020,docs/runbook-gateway-rollback.md,1,1,1,3,no,relevant
+q020,docs/adr-0019-calder-gateway.md,0,1,1,2,yes,relevant
+q020,docs/reference-calderctl.md,0,0,1,1,no,not relevant
+q021,docs/reference-deployment-tiers.md,1,1,1,3,no,relevant
+q021,docs/adr-0019-calder-gateway.md,1,1,1,3,no,relevant
+q021,docs/postmortem-checkout-outage.md,0,1,1,2,yes,relevant
+q027,docs/runbook-gateway-rollback.md,1,1,1,3,no,relevant
+q027,docs/runbook-mesh-rollback-legacy.md,1,1,1,3,no,relevant
+q027,docs/postmortem-checkout-outage.md,0,1,1,2,yes,relevant
+q027,docs/guide-oncall-rota.md,0,0,1,1,no,not relevant
+q032,docs/adr-0007-helix-mesh.md,1,1,1,3,no,relevant
+q032,docs/adr-0019-calder-gateway.md,1,1,1,3,no,relevant
+q032,docs/runbook-mesh-rollback-legacy.md,0,1,1,2,yes,relevant
+q032,docs/reference-calderctl.md,0,0,1,1,no,not relevant
+q032,docs/guide-onboarding.md,0,0,1,1,no,not relevant
+q039,docs/policy-data-retention.md,1,1,1,3,no,relevant
+q039,docs/guide-onboarding.md,1,1,1,3,no,relevant
+q039,docs/reference-calderctl.md,0,1,1,2,yes,relevant
+q042,docs/adr-0019-calder-gateway.md,1,1,1,3,no,relevant
+q042,docs/reference-calderctl.md,1,1,1,3,no,relevant
+q042,docs/runbook-gateway-rollback.md,0,1,1,2,yes,relevant
+q042,docs/runbook-mesh-rollback-legacy.md,0,1,1,2,yes,relevant
+q050,docs/postmortem-checkout-outage.md,1,1,1,3,no,relevant
+q050,docs/runbook-mesh-rollback-legacy.md,0,1,1,2,yes,relevant
+q050,docs/runbook-gateway-rollback.md,0,1,1,2,yes,relevant

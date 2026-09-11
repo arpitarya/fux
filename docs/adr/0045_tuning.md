@@ -190,7 +190,7 @@ will do without reading fux's source.
 the tunables FREEZE at setup.** `fux setup` is write-if-missing (decision 3), so
 a later change to `K1`, `B`, `FIELD_WEIGHTS` or any `Tune` default reaches a
 repo that has never run setup and **does not reach one that has**. Same trade as
-the types list (`.fux/types.toml`); the remedy [ADR-DOTFUX](0012_fux-directory.md) decision 6
+the types list (`.fux/formats.toml`); the remedy [ADR-DOTFUX](0012_fux-directory.md) decision 6
 names is **a loader refusal or a `fux doctor` check, never a rewrite**, and
 neither is built.
 

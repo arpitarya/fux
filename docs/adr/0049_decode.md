@@ -277,9 +277,9 @@ is what it means for dispatch.
 
 ⚠ **Where the binding lives moved on 2026-09-11** ([ADR-TYPES](0038_types-list.md)
 decision 12): it was `decoder=<module>` on a `*.ext` line of `.fux/sources/types`,
-and is `<ext> = "<module>"` under `[decoders]` in `.fux/types.toml`.
+and is `<ext> = "<module>"` under `[decoders]` in `.fux/formats.toml`.
 `_declared_bindings` reads it through `ingest/typesfile.py` and passes `_bind` a
-**location string** (`.fux/types.toml:14 (decoders.geojson)`) instead of a line
+**location string** (`.fux/formats.toml:14 (decoders.geojson)`) instead of a line
 number, because a parsed TOML value carries no position. **`_bound_extension`
 is deleted, not moved**: its one job was refusing a path-scoped binding, which a
 key that IS an extension cannot express. A leftover `.fux/sources/types` is a

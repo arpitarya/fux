@@ -340,7 +340,7 @@ against the code.
   surprising. Worth the surprise: the alternative is folklore about where 256
   comes from.
 - **A third source-list path constant lives here, with no key at all.**
-  `DEFAULT_TYPES_FILE = ".fux/types.toml"` joins `dirs_file` and `urls_file`
+  `DEFAULT_TYPES_FILE = ".fux/formats.toml"` joins `dirs_file` and `urls_file`
   because paths have one home — but it has **no `fux.toml` key**, deliberately:
   the types list is optional, its absence is meaningful (the built-in default
   applies), and a key whose only job is to relocate an optional file is surface

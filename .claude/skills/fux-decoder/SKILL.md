@@ -124,7 +124,7 @@ def decode(raw: bytes, rel_path: str) -> str | None:
 ```
 
 **Then make the type indexable.** A decoder alone is not enough — the walker
-still filters on `.fux/types.toml`. Bind each extension to your module under
+still filters on `.fux/formats.toml`. Bind each extension to your module under
 `[decoders]`; a bound extension is a document, and fux checks the binding
 against the module it names:
 
@@ -234,7 +234,7 @@ each already cost a defect in the shipped set:
 | the seventeen shipped decoders | `.fux/decoders/` in this repo |
 | the loader, the override rule, the registry | `fux.decode.__init__` — read its module docstring |
 | where decoding joins ingest | `fux.ingest.parse.parse_document` |
-| which files are walked at all | `.fux/types.toml`, and `docs/adr/0038_types-list.md` |
+| which files are walked at all | `.fux/formats.toml`, and `docs/adr/0038_types-list.md` |
 | what `.fux/` may contain | `docs/adr/0003_fux-directory.md` |
 | worked tests to copy | `tests/decode/test_formats.py` — fixtures are built in the test, never committed as binaries, so the input is readable beside the assertion |
 

@@ -40,7 +40,7 @@ DEFAULT_DIRS_FILE = ".fux/sources/dirs"
 #: Optional. Absent means the built-in allowlist in `gitdir.DEFAULT_TYPES`.
 #: TOML, beside the other `.fux/*.toml` policy files -- read and written by
 #: `ingest/typesfile.py` (ADR-TYPES decision 12).
-DEFAULT_TYPES_FILE = ".fux/types.toml"
+DEFAULT_TYPES_FILE = ".fux/formats.toml"
 #: Where the types list lived until 2026-09-11, in the line grammar `dirs` and
 #: `urls` still use. **Refused, never read**: a file fux silently ignored would
 #: put the built-in default in its place and change the index with nothing

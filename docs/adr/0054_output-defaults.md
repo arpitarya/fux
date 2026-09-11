@@ -257,7 +257,7 @@ null
     **The cost, stated rather than hidden: the defaults FREEZE at setup.**
     `fux setup` is write-if-missing, so a later change to `BUILT_IN` reaches a
     repo that has never run setup and does not reach one that has. Same trade
-    the types list (`.fux/types.toml`) and `fux.toml`'s `max_parallel` already make; the
+    the types list (`.fux/formats.toml`) and `fux.toml`'s `max_parallel` already make; the
     remedy is the one ADR-DOTFUX decision 6 names — **a loader refusal or a
     `fux doctor` check, never a rewrite.**
 

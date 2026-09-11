@@ -181,7 +181,7 @@ it.** Absent when false, so no existing record changes shape.
   query the token `current`.
 - ⚠ **"Both source lists" now means EVERY committed source list** (2026-09-11).
   When decision 1a was written the line grammar parsed three files — `dirs`,
-  `urls` and `types`. `types` moved to `.fux/types.toml` that day
+  `urls` and `types`. `types` moved to `.fux/formats.toml` that day
   ([the comparison](../../work/compare/types-toml.compare.md), ADR-TYPES
   decision 12), so the two lists carrying `archived` are now **all** of them.
   The sentence did not change; what it covers did, and it covers more.

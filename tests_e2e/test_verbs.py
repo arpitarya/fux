@@ -434,7 +434,7 @@ def test_machine_data_beside_a_document_is_not_indexed(tmp_path):
 def test_a_types_file_replaces_the_default(tmp_path):
     _write_fixture(tmp_path)
     (tmp_path / "docs" / "note.rst").write_text("Pruning notes\n=============\n", encoding="utf-8")
-    (tmp_path / ".fux" / "types.toml").write_text('include = ["*.rst"]\n', encoding="utf-8")
+    (tmp_path / ".fux" / "formats.toml").write_text('include = ["*.rst"]\n', encoding="utf-8")
 
     _run(tmp_path, "ingest")
     found = _run(tmp_path, "find", "pruning", "--json").stdout
@@ -463,7 +463,7 @@ def test_setup_writes_the_types_file_with_the_default_spelled_out(tmp_path):
     """A consumer should not have to read fux's source to learn what a document is."""
     (tmp_path / "docs").mkdir()
     _run(tmp_path, "setup")
-    types = (tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8")
+    types = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
     assert '"*.md"' in types and '"*.adoc"' in types
 
     # ⚠ Was `assert "No .json" in types`. `.json` rejoined the default on
@@ -501,7 +501,7 @@ def test_setup_converts_a_leftover_types_file_and_ingest_refuses_until_it_is_gon
     assert refused.returncode == 1 and "fux setup" in refused.stderr
 
     out = _run(tmp_path, "setup").stdout
-    assert (tmp_path / ".fux" / "types.toml").is_file()
+    assert (tmp_path / ".fux" / "formats.toml").is_file()
     assert "now delete .fux/sources/types" in out and legacy.is_file()
     legacy.unlink()
     _run(tmp_path, "ingest")

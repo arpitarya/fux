@@ -120,7 +120,7 @@ def _corpus(tmp_path, *, types='include = ["*.md"]\n', dirs="docs\nsrc\n", ignor
     (tmp_path / "src/app.py").write_text("print('x')\n")
     (tmp_path / ".fux/sources").mkdir(parents=True)
     (tmp_path / ".fux/sources/dirs").write_text(dirs)
-    (tmp_path / ".fux/types.toml").write_text(types)
+    (tmp_path / ".fux/formats.toml").write_text(types)
     if ignore is not None:
         (tmp_path / ".fux/.fuxignore").write_text(ignore)
     return tmp_path
@@ -131,7 +131,7 @@ def _walk(root):
         root,
         source_dirs(root, ".fux/sources/dirs"),
         excludes=source_excludes(root, ".fux/sources/dirs"),
-        types=read_types(root, ".fux/types.toml"),
+        types=read_types(root, ".fux/formats.toml"),
         ignores=fuxignore.read(root),
     )
     return [f.rel_path for f in files], {s.rel_path: s.reason for s in skipped}
@@ -225,7 +225,7 @@ def test_no_fuxignore_means_no_warnings_however_many_exclusions_exist(tmp_path):
 
 
 def test_the_types_list_has_no_exclusions_to_duplicate(tmp_path):
-    """ADR-TYPES decision 12: `.fux/types.toml` has no `!`, so the warning's types
+    """ADR-TYPES decision 12: `.fux/formats.toml` has no `!`, so the warning's types
     half is gone rather than silently always-empty."""
     import inspect
 

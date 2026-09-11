@@ -48,7 +48,7 @@ them carries `archived: true`.
 ```mermaid
 flowchart LR
     D[".fux/sources/dirs<br/>! subtracts · archived= declared"] --> I["ingest"]
-    T[".fux/types.toml<br/>what counts as a document"] --> I
+    T[".fux/formats.toml<br/>what counts as a document"] --> I
     U[".fux/sources/urls<br/>fetch= meta= declared"] --> I
     I --> R["records<br/>archived: true when declared"]
     R --> X["ADR-ARCHIVED-CONTENT<br/>ranking · marker · disclaimer"]
@@ -59,7 +59,7 @@ flowchart LR
 
 ```text
   .fux/sources/dirs   (! subtracts, archived=) --+
-  .fux/types.toml     (what is a document)     --+--> ingest --> records carrying
+  .fux/formats.toml     (what is a document)     --+--> ingest --> records carrying
   .fux/sources/urls   (fetch=, meta=)          --+            archived: true when declared
                                                                     |
                                                                     v
@@ -103,7 +103,7 @@ inflated by them.
 ### Decision
 
 **1. Source directories live in `.fux/sources/dirs`**, one entry per line, a
-committed file beside `urls` (and beside `types` until it became `.fux/types.toml`
+committed file beside `urls` (and beside `types` until it became `.fux/formats.toml`
 on 2026-09-11 — [ADR-TYPES](0038_types-list.md) decision 12). `[sources] dirs` in `fux.toml` is a
 **retired key that errors with instructions**
 ([ADR-CONFIG](0023_config.md) decision 10).
@@ -193,7 +193,7 @@ is indirect — see [ADR-URL-LIST](0026_url-list.md) §The `dirs` attribute set.
 **3a. An explicitly added file does not outrank the type allowlist. A
 `.fuxignore` `!` line does.**
 `fux add docs/architecture.pdf` writes the line, and the document is still
-skipped if `.fux/types.toml` does not admit it — the verb says so, and says
+skipped if `.fux/formats.toml` does not admit it — the verb says so, and says
 which command would change it. This follows from the three conditions being a
 **conjunction with no precedence**; what could plausibly have been read as an
 override is the command. Making an `add` win would produce **a document indexed
@@ -240,7 +240,7 @@ different authorship, and the reader is lenient for both.
   the failure the exclusion work was opened about, so silence was not an option.
 - **`fux.toml` stops being where the corpus is defined.** It keeps policy; the
   *what* lives in three committed lists — two under `.fux/sources/`, plus
-  `.fux/types.toml`. Config is how the engine
+  `.fux/formats.toml`. Config is how the engine
   behaves; the source lists are what it looks at.
 - ⚠ **The archived declaration is only as honest as the person writing it.** A
   derived signal cannot be forgotten; a declared one can. What it buys is
@@ -304,7 +304,7 @@ grep -rn "archive/" src/fux/ --include=*.py
 
 # 2. still one line-grammar parser for dirs and urls
 grep -rln "def parse(" src/fux/ingest/
-# expect: sourcelist.py, plus typesfile.py (.fux/types.toml, ADR-TYPES decision 12)
+# expect: sourcelist.py, plus typesfile.py (.fux/formats.toml, ADR-TYPES decision 12)
 #         and fuxignore.py (.fux/.fuxignore, ADR-FUXIGNORE)
 
 # 3. the attribute set is still closed at two

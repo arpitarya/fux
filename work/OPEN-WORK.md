@@ -15,7 +15,7 @@ The two run **concurrently**; never order one against the other.
 
 *Named here so a session leads with it instead of burying it. **Ages are
 recomputed against the reading date, never copied** — a queue that copies its
-ages stops flagging its own oldest item. As of **2026-09-11, three rows are past
+ages stops flagging its own oldest item. As of **2026-09-11, two rows are past
 CLAUDE.md's 5-day threshold**, and a session names each, with its age, in its
 first output.*
 
@@ -38,7 +38,6 @@ failure mode here with a perfect record.
 
 | what he decides | filed | age |
 |---|---|---|
-| **Ratify the headroom obligation** into [ADR-RS](../docs/adr/0043_predictions.md) — under *adr update* | 2026-08-28 | 14d |
 | **The 7 `partial` goldens** — needs a human or a third blind reader; under *testing* | 2026-08-28 | 14d |
 | **W-87 — what "good" means**, Part B blocked on a corpus that was wiped | 2026-08-27 | 15d |
 | 🔴 **W-116 — the chunking change re-ranked the corpus unmeasured**, on his own 2026-09-06 ruling that a defect fix does not wait on a measurement. Recorded as unmeasured in ADR-DECODE, ADR-REFER and ADR-EXTRACTED. Blocked behind **W-56** (`fux-lab` does not exist); here so the gap is not forgotten | 2026-09-06 | 5d |
@@ -313,21 +312,16 @@ failure mode here with a perfect record.
   the number existed: that suite rewards exactly what the reranker does, and
   `c = 0` is a property of the generator, not a safety result.
 
-- **Ratify the headroom obligation into [ADR-RS](../docs/adr/0043_predictions.md).**
-  `arpit` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* · **W-95 is
-  built, run and filed**
-  ([2026-08-28](regression/2026-08-28-benchmark-contested/report.md)): a
-  contested-answer suite whose `--selftest` **asserts** that candidates are
-  separable only by the property under test. On its primary endpoint, with
-  **94 of 120 queries of headroom**, shipped-default `HEAD` and `1.0.0` are
-  **both at 21.7 %** against a 25 % chance level — 0 discordant. 🔴 **The
-  reusable rule, which is what W-95's row was the only home of: a power table
-  says how many queries; it NEVER says whether the queries are HARD.** The
-  proposed standing obligation — *every paired run states, for each endpoint,
-  the current score and how many queries could change, beside the power figure*
-  — is a **decision**, so it needs ratifying rather than filing. It earned its
-  place immediately: it caught a saturated control inside the run that
-  introduced it. `filed: 2026-08-28`
+- 🟢 **W-135 — the headroom obligation enters ADR-RS.** `agent` ·
+  *(record: [ADR-RS](../docs/adr/0043_predictions.md) · `tests/test_regression_runs.py`)* ·
+  **Ratified by Arpit 2026-09-11.** Every paired run reports, per endpoint and **per
+  direction** (improvement / regression), how many queries could have changed; the count
+  is **proven** only with a feature-off/on arm or a generator self-test, else
+  **unproven**; **0 headroom → Inconclusive**; **no minimum**. A dated test enforces it
+  for new runs. Grounding: W-95's
+  [C6 table](regression/2026-08-28-benchmark-contested/report.md) — 94 could-change on
+  proximity, 0 on the saturated `heading` control that "passed". —
+  [detail](open/W-135-headroom-obligation.md) `filed: 2026-08-28` · `ruled: 2026-09-11`
 
 ---
 

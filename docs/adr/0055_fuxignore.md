@@ -180,7 +180,7 @@ header.**
 
 **4. `.fuxignore` is read first and decides in BOTH directions.**
 
-- A path it **ignores** is skipped, whatever `.fux/types.toml` allows and
+- A path it **ignores** is skipped, whatever `.fux/formats.toml` allows and
   whatever `.fux/sources/dirs` includes.
 - A path it **explicitly re-includes** with `!` skips past the `dirs`
   exclusions and the type allowlist entirely.
@@ -211,7 +211,7 @@ delete — the `dirs` one.
 
 ⚠ **Amended 2026-09-11: the types half of this decision is gone.** It read *"the
 `!` lines in `sources/dirs` and `sources/types` still work"*. The types list is
-`.fux/types.toml` now and has **no subtraction at all**
+`.fux/formats.toml` now and has **no subtraction at all**
 ([ADR-TYPES](0038_types-list.md) decisions 2a and 12): a `!` glob there is a
 loud error naming this file, and `fux setup`'s conversion of the old file moves
 each `!` line here — **above the first hand-written pattern**, so a re-include
@@ -226,7 +226,7 @@ edit produces the opposite of what the other file says, silently. The warning
 is early for that, not for today.
 
 **6. Absent, empty, or all-comments means nothing is ignored — and that is
-safe here.** The same shape is a loud error for `.fux/types.toml`
+safe here.** The same shape is a loud error for `.fux/formats.toml`
 (ADR-TYPES decision 3) because a present-but-empty allowlist empties the index.
 This file only ever subtracts by default, so an empty one cannot. It therefore
 has **no built-in default**: shipping guesses in an ignore file means its first
@@ -290,7 +290,7 @@ hide. A block line hides nothing new: the path was **already** not indexed when
 the line was written, by a rule that was already in force.
 
 ⚠ **What it DOES change: the list now decides.** A block line is a real ignore,
-so it **freezes** the verdict that produced it. Widen `.fux/types.toml` and
+so it **freezes** the verdict that produced it. Widen `.fux/formats.toml` and
 the listed `.py` files stay out. Write content into a file listed as `empty` and
 it stays out, still labelled `empty`. **The freeze was stated and accepted**
 rather than avoided — it is what "put the list in `.fuxignore`" means, and the
@@ -377,7 +377,7 @@ same question.
   Rejected: it inverts ADR-TYPES from an allowlist to a denylist, and *"a
   denylist is never finished — the next generated format nobody has heard of
   arrives indexed"* (ADR-TYPES decision 1) is unanswered by anything in this
-  record. The allowlist stays in the types list (`.fux/types.toml` since
+  record. The allowlist stays in the types list (`.fux/formats.toml` since
   ADR-TYPES decision 12); only exclusion moves.
 - **Keep `!` meaning *subtract* here, for consistency with `sources/`.**
   Rejected: it makes the file a `.fuxignore` in name only, and the negation

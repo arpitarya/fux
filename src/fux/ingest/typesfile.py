@@ -1,4 +1,4 @@
-"""`.fux/types.toml` — which files are documents, and which decoder reads each.
+"""`.fux/formats.toml` — which files are documents, and which decoder reads each.
 
 **Two keys, and the set is closed** (ADR-TYPES decision 12):
 

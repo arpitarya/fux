@@ -293,7 +293,7 @@ optional `validate` callable because a duration cannot be a closed enum — and
 `decoder` on the types list was the only other user.
 
 **`decoder`'s spec did not disappear, it went vestigial.** `.fux/sources/types`
-became `.fux/types.toml` ([the comparison](../../work/compare/types-toml.compare.md),
+became `.fux/formats.toml` ([the comparison](../../work/compare/types-toml.compare.md),
 ADR-TYPES decision 12), and `sourcelist.TYPES` survives only as the `fux add
 --types` dispatch token and as the grammar `fux setup` reads when converting a
 legacy file. **So the typed-attribute machinery has exactly one live user, and

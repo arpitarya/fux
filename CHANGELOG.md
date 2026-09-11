@@ -10,7 +10,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Changed
 
-- ⚠ **BREAKING — the types list is `.fux/types.toml`** (W-130,
+- ⚠ **BREAKING — the types list is `.fux/formats.toml`** (W-130,
   [ADR-TYPES](docs/adr/0038_types-list.md) decision 12). It was
   `.fux/sources/types`, a line-grammar file. The new file has two keys:
   `include` (globs that are already text) and `[decoders]` (`ext = "module"`,
@@ -19,7 +19,7 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
   binding can no longer be written at all. **Upgrading:** a repo with the old
   file stops at `ingest`, `ask`, `doctor` and every `fux add/remove --types`
   with an error naming the fix — run `fux setup`, which writes
-  `.fux/types.toml` from the old file (moving its `!` lines to `.fuxignore`),
+  `.fux/formats.toml` from the old file (moving its `!` lines to `.fuxignore`),
   then delete `.fux/sources/types`. Verified on this repo: the converted file
   re-ingests to a **byte-identical** index and `.fuxignore`.
 - `[sources] types_file` in `fux.toml` is now refused by name.

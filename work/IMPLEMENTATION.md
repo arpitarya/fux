@@ -24,6 +24,17 @@ Rules:
 
 ## W-130 — the types list becomes `.fux/types.toml` (2026-09-11)
 
+⚠ **Renamed the same day: `.fux/types.toml` → `.fux/formats.toml`** (Arpit;
+reasons in ADR-TYPES decision 12). The rows below describe `607ca88`, which
+shipped the `types.toml` name. The rename is path-only — the file's bytes, the
+allowlist and the code names are unchanged — and it needs no refusal path
+because `types.toml` was never pushed. After it: 3208 unit + 80 e2e green in the
+container on the Mac's tree; the one failure is the pre-existing `94231b2bf` red.
+⚠ **The committed index moved with it and was re-ingested before the commit** — 60 shards,
+because the corpus itself changed (`formats.toml` in, `types.toml` out, and the day's doc
+edits). Verified stable: the repeat run reports **0 changed / 939 carried / 0 shards
+written**, so the re-ingest converged rather than merely running.
+
 **Arpit's ask of 2026-09-11**, taken through a compare doc because it reversed
 ADR-TYPES' recorded rejection of a TOML types list; verdict **D** and all six
 sub-forks ruled as proposed ("go").

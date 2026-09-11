@@ -38,7 +38,7 @@ archive/v0.26/tests_e2e/corpus/docs/binary.md   # binary
 
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
 # exclusions belong -- this file is read before anything else, so a line here
-# beats .fux/sources/dirs and .fux/types.toml both.
+# beats .fux/sources/dirs and .fux/formats.toml both.
 #
 #   build/                 a DIRECTORY named build, at any depth (and all of it)
 #   *.log                  a name glob; `*` never crosses a `/`
@@ -59,14 +59,14 @@ archive/v0.26/tests_e2e/corpus/docs/binary.md   # binary
 #
 # A `!` LINE OVERRIDES THE TYPE ALLOWLIST. `!*.py` really does index Python --
 # as RAW BYTES, because no decoder claims .py, which is the exact shape
-# .fux/types.toml exists to prevent. It takes a line you wrote to get there.
+# .fux/formats.toml exists to prevent. It takes a line you wrote to get there.
 #
 # ONE DIVERGENCE FROM GIT, ON PURPOSE: a `#` after whitespace starts a comment,
 # so `*.log   # noisy` is a pattern plus a note. Git reads that whole line as a
 # pattern and matches nothing.
 #
 # THIS FILE IS OPTIONAL AND STARTS EMPTY. Absent or all-comments means nothing
-# is ignored -- unlike .fux/types.toml, where an empty file is an error,
+# is ignored -- unlike .fux/formats.toml, where an empty file is an error,
 # because this one only ever subtracts and so can never empty an index.
 #
 # See ADR-FUXIGNORE.

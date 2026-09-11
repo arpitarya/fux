@@ -316,7 +316,7 @@ _TYPES_CONVERTED_HEADER = """\
 _FUXIGNORE = """\
 # What fux does NOT index. Same grammar as .gitignore, and it is the ONE place
 # exclusions belong -- this file is read before anything else, so a line here
-# beats .fux/sources/dirs and .fux/types.toml both.
+# beats .fux/sources/dirs and .fux/formats.toml both.
 #
 #   build/                 a DIRECTORY named build, at any depth (and all of it)
 #   *.log                  a name glob; `*` never crosses a `/`
@@ -337,14 +337,14 @@ _FUXIGNORE = """\
 #
 # A `!` LINE OVERRIDES THE TYPE ALLOWLIST. `!*.py` really does index Python --
 # as RAW BYTES, because no decoder claims .py, which is the exact shape
-# .fux/types.toml exists to prevent. It takes a line you wrote to get there.
+# .fux/formats.toml exists to prevent. It takes a line you wrote to get there.
 #
 # ONE DIVERGENCE FROM GIT, ON PURPOSE: a `#` after whitespace starts a comment,
 # so `*.log   # noisy` is a pattern plus a note. Git reads that whole line as a
 # pattern and matches nothing.
 #
 # THIS FILE IS OPTIONAL AND STARTS EMPTY. Absent or all-comments means nothing
-# is ignored -- unlike .fux/types.toml, where an empty file is an error,
+# is ignored -- unlike .fux/formats.toml, where an empty file is an error,
 # because this one only ever subtracts and so can never empty an index.
 #
 # See ADR-FUXIGNORE.
@@ -459,7 +459,7 @@ class SetupReport:
     #: 2: write-if-missing makes the coverage absent precisely where a repo
     #: already has its own conventions, which is where it is most needed.
     skipped_agents_md: bool = False
-    #: True when `.fux/types.toml` was written FROM a leftover `.fux/sources/types`
+    #: True when `.fux/formats.toml` was written FROM a leftover `.fux/sources/types`
     #: (ADR-TYPES decision 12). Announced, because the old file still has to be
     #: deleted by hand and fux refuses to run until it is.
     converted_types: bool = False
@@ -551,7 +551,7 @@ def _seed_dirs(root: Path) -> bytes:
 
 
 def _seed_types() -> bytes:
-    """`.fux/types.toml`, with the built-in default spelled out.
+    """`.fux/formats.toml`, with the built-in default spelled out.
 
     **A header alone is not a types file.** A file that admits nothing is one
     `read_types` refuses — so writing comments by themselves made `fux setup`
@@ -589,7 +589,7 @@ def _seed_types() -> bytes:
 
 
 def _convert_legacy_types(root: Path, report: "SetupReport") -> None:
-    """Write `.fux/types.toml` from a leftover `.fux/sources/types` (ADR-TYPES decision 12).
+    """Write `.fux/formats.toml` from a leftover `.fux/sources/types` (ADR-TYPES decision 12).
 
     **Only when the new file is missing** — setup is write-if-missing, and a
     repo holding both has already decided; `read_types` tells it to delete the

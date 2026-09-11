@@ -316,7 +316,7 @@ carries the flag). Neither fact suppresses the other, and a reader who assumed
 ⚠ **`.fux/refusals.toml` was cited by name as precedent on 2026-09-11.** The
 [types-as-TOML comparison](../../work/compare/types-toml.compare.md) §1 listed
 it among the four hand-edited `.fux/` policy files already in TOML, and that
-list was part of why `.fux/sources/types` became `.fux/types.toml`.
+list was part of why `.fux/sources/types` became `.fux/formats.toml`.
 
 **No refusal decision is amended.** The consequence worth recording is that this
 file's form now carries weight outside this record — a later proposal to change

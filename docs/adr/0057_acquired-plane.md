@@ -141,7 +141,7 @@ of the attribute**, and `UrlEntry` now holds an example of each. Held by
 asserts `config.UrlSource` never grows the key.
 
 ⚠ **`keep` is still resolved from a LINE, and 2026-09-11 is when that stopped
-being the only option.** `.fux/sources/types` became `.fux/types.toml` that day
+being the only option.** `.fux/sources/types` became `.fux/formats.toml` that day
 ([the comparison](../../work/compare/types-toml.compare.md), ADR-TYPES decision
 12), so the shared line grammar in `sourcelist.py` now parses **two** committed
 lists rather than three.

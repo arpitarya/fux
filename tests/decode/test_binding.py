@@ -1,4 +1,4 @@
-"""`.fux/types.toml` binds an extension to the decoder that reads it, and fux
+"""`.fux/formats.toml` binds an extension to the decoder that reads it, and fux
 checks the binding instead of trusting it — ADR-TYPES decisions 11 and 12 and
 ADR-DECODE decision 13, ruled by Arpit 2026-09-01 and 2026-09-11.
 
@@ -32,8 +32,8 @@ def repo(tmp_path: Path) -> Path:
 
 
 def _types(root: Path, include=(), **decoders: str) -> None:
-    """Write `.fux/types.toml` in the canonical layout fux itself writes."""
-    (root / ".fux" / "types.toml").write_text(
+    """Write `.fux/formats.toml` in the canonical layout fux itself writes."""
+    (root / ".fux" / "formats.toml").write_text(
         typesfile.render(list(include), decoders), encoding="utf-8"
     )
 
@@ -53,7 +53,7 @@ def _decoder(root: Path, name: str, extensions: str, marker: str = "x") -> None:
 
 
 def _parse(text: str) -> typesfile.TypesList:
-    return typesfile.parse(text, origin=".fux/types.toml")
+    return typesfile.parse(text, origin=".fux/formats.toml")
 
 
 def test_a_binding_parses_onto_its_extension():
@@ -141,7 +141,7 @@ def test_an_error_names_the_key_and_the_line_when_it_can():
     so the key is always named and the line only when a scan finds exactly one."""
     with pytest.raises(FuxError) as caught:
         _parse('include = [\n  "*.md",\n]\n\n[decoders]\ngeojson = "Json"\n')
-    assert ".fux/types.toml:6 (decoders.geojson)" in str(caught.value)
+    assert ".fux/formats.toml:6 (decoders.geojson)" in str(caught.value)
 
 
 # -- resolution --------------------------------------------------------------
@@ -274,7 +274,7 @@ def test_a_leftover_line_grammar_file_stops_dispatch_loudly(repo: Path):
     decoder than the index was built with."""
     (repo / ".fux" / "sources").mkdir()
     (repo / ".fux" / "sources" / "types").write_text("*.geojson decoder=json\n", encoding="utf-8")
-    with pytest.raises(FuxError, match="moved to .fux/types.toml"):
+    with pytest.raises(FuxError, match="moved to .fux/formats.toml"):
         registry(repo)
 
 

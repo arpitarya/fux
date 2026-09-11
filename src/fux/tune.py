@@ -614,7 +614,7 @@ def load(root: Path, *, enabled: bool = True) -> Tune:
 def specimen() -> str:
     """The file `fux setup` writes -- **live lines, not comments.**
 
-    Ruled by Arpit 2026-08-27, the same ruling `.fux/types.toml` and
+    Ruled by Arpit 2026-08-27, the same ruling `.fux/formats.toml` and
     `.fux/output.toml` got the same day: a file of nothing but comments is a
     menu, and a consumer should be able to read what fux will do without
     reading fux's source. Every value here is `Tune`'s own default, so a repo
@@ -623,7 +623,7 @@ def specimen() -> str:
     ⚠ **The cost, stated rather than hidden: the tunables FREEZE at setup.**
     `fux setup` is write-if-missing, so a later change to `K1`, `B`,
     `FIELD_WEIGHTS` or a `Tune` field reaches a repo that has never run setup
-    and does not reach one that has. Same trade as `.fux/types.toml`; same
+    and does not reach one that has. Same trade as `.fux/formats.toml`; same
     remedy, and ADR-DOTFUX decision 6 names it -- **a loader refusal or a `fux
     doctor` check, never a rewrite.**
 

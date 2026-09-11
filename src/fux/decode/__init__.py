@@ -109,7 +109,7 @@ CONSUMER_DIR = ".fux/decoders"
 #: were one module because ODF puts every kind of document in the same
 #: `content.xml`. `.ipynb` was one. Six extensions in total leave
 #: `DEFAULT_TYPES`, which decision 9 derives from this tuple, so a corpus
-#: containing them stops being walked unless `.fux/types.toml` opts them
+#: containing them stops being walked unless `.fux/formats.toml` opts them
 #: back in — and nothing can, because no built-in claims them any more.
 BUILTIN_MODULES: tuple[str, ...] = (
     "csv",
@@ -254,7 +254,7 @@ def registry(root: Path | None = None) -> dict[str, Decoder]:
        extension is what makes an override a replacement rather than a race:
        two files both claiming `.html` would otherwise resolve by whichever the
        loader reached first (ADR-DECODE decision 5).
-    3. **A `[decoders]` binding in `.fux/types.toml` wins over both** — and it
+    3. **A `[decoders]` binding in `.fux/formats.toml` wins over both** — and it
        is checked, not trusted. A line naming a module that does not exist is a
        hard error, and so is one that takes an extension away from the decoder
        that claims it and gives it to a module that does not. **Giving a
@@ -368,7 +368,7 @@ _BINDINGS: dict[tuple[str, int, int, bool], dict[str, tuple[str, str]]] = {}
 
 
 def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
-    """Extension (`.csv`) -> (decoder name, where it was declared), from `.fux/types.toml`.
+    """Extension (`.csv`) -> (decoder name, where it was declared), from `.fux/formats.toml`.
 
     Empty when there is no root or no types file — which is the built-in
     default, where nothing is declared and every extension resolves through the
@@ -417,7 +417,7 @@ def _declared_bindings(root: Path | None) -> dict[str, tuple[str, str]]:
 
 
 def declared_bindings(root: Path | None) -> dict[str, str]:
-    """Extension -> the decoder module `.fux/types.toml` binds it to.
+    """Extension -> the decoder module `.fux/formats.toml` binds it to.
 
     The public half of `_declared_bindings`, which also carries the location a
     resolution error needs. **`fux doctor` is the caller**: a binding on
@@ -454,7 +454,7 @@ def builtin_extensions() -> tuple[str, ...]:
     mean that dropping a `logdoc.py` into `.fux/decoders/` silently starts
     walking every `.log` file in the repo. **Adding a decoder must not, by
     itself, change what is indexed**: a consumer says what is a document in
-    `.fux/types.toml`, which is a committed line a human wrote.
+    `.fux/formats.toml`, which is a committed line a human wrote.
     """
     out: set[str] = set()
     for name in BUILTIN_MODULES:

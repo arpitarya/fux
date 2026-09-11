@@ -153,7 +153,7 @@ def test_the_default_never_grows_from_a_consumer_decoder(tmp_path):
 
 def _types_toml(tmp_path, text: str) -> None:
     (tmp_path / ".fux").mkdir(parents=True, exist_ok=True)
-    (tmp_path / ".fux" / "types.toml").write_text(text, encoding="utf-8")
+    (tmp_path / ".fux" / "formats.toml").write_text(text, encoding="utf-8")
 
 
 def test_a_types_file_replaces_the_default_rather_than_extending_it(tmp_path):

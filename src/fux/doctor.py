@@ -580,7 +580,7 @@ def _refusal_health(root: Path) -> Check:
 
 
 def _decoder_bindings(root: Path) -> Check:
-    """`[decoders]` in `.fux/types.toml` — does every binding still resolve?
+    """`[decoders]` in `.fux/formats.toml` — does every binding still resolve?
 
     **W-101 item 2.** `registry()` refuses a binding that names a module which
     does not exist, and one that takes an extension away from the decoder that
@@ -865,7 +865,7 @@ def _types_health(root: Path) -> Check:
 
     Three ways it cannot, each of which `read_types` refuses:
 
-    1. **A leftover `.fux/sources/types`.** The list moved to `.fux/types.toml`
+    1. **A leftover `.fux/sources/types`.** The list moved to `.fux/formats.toml`
        on 2026-09-11 (ADR-TYPES decision 12), and a repo that ran `fux setup`
        before then still has the old file. ADR-DOTFUX decision 6: when a change
        must reach existing repos the mechanism is *a loader refusal or a

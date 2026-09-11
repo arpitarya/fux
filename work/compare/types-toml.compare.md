@@ -1,21 +1,25 @@
 ---
 type: Compare Doc
 title: The types file as TOML
-description: Whether `.fux/sources/types` becomes `.fux/types.toml`, and in what shape — a reversal of ADR-TYPES' recorded rejection of a TOML types list.
+description: Whether `.fux/sources/types` becomes `.fux/formats.toml`, and in what shape — a reversal of ADR-TYPES' recorded rejection of a TOML types list.
 status: accepted
 timestamp: 2026-09-11T00:00:00Z
 ---
 
-# `.fux/sources/types` → `.fux/types.toml` — Comparison
+# `.fux/sources/types` → `.fux/formats.toml` — Comparison
 
 > **Verdict: ACCEPTED (Arpit, 2026-09-11) — D, and F1–F6 exactly as proposed.**
+> ⚠ **F1's file was renamed the same day: `.fux/types.toml` → `.fux/formats.toml`**
+> (Arpit, after `map.toml` and `decoders.toml` were weighed — reasons in
+> ADR-TYPES decision 12). Every mention in this doc now reads `formats.toml`;
+> the doc's file name keeps `types-toml` so its links do not break.
 > Shipped the same day as [ADR-TYPES](../../docs/adr/0038_types-list.md)
 > decision 12. Two refinements the build found, both recorded there: F3's
 > *stated twice* check is **exact-case** (`"*.CSV"` beside `csv` admits other
 > files), and F5's conversion **refuses** an upper-case bound pattern rather
 > than change the allowlist. Converting this repo re-ingested byte-identical.
 >
-> **Proposed verdict, as filed: D — `.fux/types.toml`, an `include` glob array
+> **Proposed verdict, as filed: D — `.fux/formats.toml`, an `include` glob array
 > plus a `[decoders]` table keyed by extension.**
 >
 > **Arpit's ask (2026-09-11, Cowork):** *"convert it to .toml or .yaml file and
@@ -57,7 +61,7 @@ timestamp: 2026-09-11T00:00:00Z
   `tune.toml`, `output.toml`, `refusals.toml`, `pii.toml`. `sources/dirs` and
   `sources/urls` are not.
 
-- **`.fux/types.toml` would never be indexed itself.** The walker skips
+- **`.fux/formats.toml` would never be indexed itself.** The walker skips
   dot-prefixed path parts (`gitdir.py`, `part.startswith(".")`), so the `toml`
   decoder never sees it.
 
@@ -73,8 +77,8 @@ timestamp: 2026-09-11T00:00:00Z
 |---|---|---|
 | **A** | `.fux/sources/types` | unchanged — the shared line grammar |
 | **B** | `.fux/types` | unchanged grammar, moved only |
-| **C** | `.fux/types.toml` | `[[type]]` array of tables, one per pattern (`pattern`, `decoder`, `exclude`) — the chat pick |
-| **D** | `.fux/types.toml` | `include = [...]` plus `[decoders] ext = "module"` — **proposed** |
+| **C** | `.fux/formats.toml` | `[[type]]` array of tables, one per pattern (`pattern`, `decoder`, `exclude`) — the chat pick |
+| **D** | `.fux/formats.toml` | `include = [...]` plus `[decoders] ext = "module"` — **proposed** |
 | E | `.fux/types.yaml` | ⛔ eliminated — Arpit chose TOML; YAML also needs a third-party parser named by its own record under L1 |
 
 **D — the default as `fux setup` would write it (abridged):**
@@ -151,11 +155,11 @@ pattern = "*.md"
 
 | # | fork | proposed | alternative |
 |---|---|---|---|
-| F1 | location | **`.fux/types.toml`** — Arpit's ask, recorded as his ruling | `.fux/sources/types.toml`, keeping the three lists together |
+| F1 | location | **`.fux/formats.toml`** — Arpit's ask, recorded as his ruling | `.fux/sources/formats.toml`, keeping the three lists together |
 | F2 | shape | **D** | C — the chat pick, on the false premise in §0 |
 | F3 | does a binding admit its extension? | **yes** (Ruff's rule). `[decoders] csv` makes `*.csv` a document; `*.csv` also in `include` is a loud *stated twice* error | no — admission only through `include`; a bound-but-not-included extension is an error |
 | F4 | subtraction (`!`) | **dropped.** `.fux/.fuxignore` is already the home and `!` here the deprecated spelling (ADR-TYPES 2a, ADR-FUXIGNORE decision 5); a new format should not ship a deprecated spelling | carry `exclude = [...]` |
-| F5 | an existing `.fux/sources/types` | **loud error** from `ingest` and `doctor` while it exists; `fux setup` writes `.fux/types.toml` converted from it (only if the new file is missing) and says to delete the old one; its `!` lines become `.fuxignore` lines | no migration — ADR-DECODE decision 17 is the precedent, Arpit's call for the decoder rename |
+| F5 | an existing `.fux/sources/types` | **loud error** from `ingest` and `doctor` while it exists; `fux setup` writes `.fux/formats.toml` converted from it (only if the new file is missing) and says to delete the old one; its `!` lines become `.fuxignore` lines | no migration — ADR-DECODE decision 17 is the precedent, Arpit's call for the decoder rename |
 | F6 | error positions | **key path always** (`decoders.geojson`), plus the line number when a scan finds exactly one line for it | key path only |
 
 ⛔ **Disqualified for F5: silently ignoring the old file.** The default would
@@ -217,7 +221,7 @@ writer's refuse-don't-reformat rule and F5's conversion are judgment no test
 catches.
 
 **Why ADR-TYPES is not amended yet:** Law zero puts the record change in the
-same change as the behaviour. A record describing `.fux/types.toml` today would
+same change as the behaviour. A record describing `.fux/formats.toml` today would
 describe code fux does not have — which CLAUDE.md calls worse than no record.
 
 ## 8 — Reopen-trigger

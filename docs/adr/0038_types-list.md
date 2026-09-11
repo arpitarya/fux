@@ -1,11 +1,11 @@
 ---
 type: ADR
 name: ADR-TYPES
-title: "ADR-TYPES (0038) — which files are documents: a built-in allowlist, overridable by .fux/types.toml and by .fuxignore"
+title: "ADR-TYPES (0038) — which files are documents: a built-in allowlist, overridable by .fux/formats.toml and by .fuxignore"
 description: "Prose plus every format a built-in decoder reads is compiled in as an allowlist; a committed types file replaces it, and .fux/.fuxignore outranks it in both directions. Absent means the default, never everything and never nothing."
 status: accepted
 date: 2026-08-20
-feature: the file-type allowlist and `.fux/types.toml`
+feature: the file-type allowlist and `.fux/formats.toml`
 owns: ["src/fux/ingest/typesfile.py"]
 laws: [L1, L3]
 timestamp: 2026-08-20T00:00:00Z
@@ -26,7 +26,7 @@ lockfiles, generated OpenAPI specs and vendored fixtures — the same waste, one
 corpus at a time.
 
 **An allowlist is compiled in, and a consumer can replace it** by committing
-`.fux/types.toml`. Absent means the default applies — never *index
+`.fux/formats.toml`. Absent means the default applies — never *index
 everything*, which was the defect, and never *index nothing*, which looks like
 a broken engine.
 
@@ -83,7 +83,7 @@ flowchart TD
 Replacing the default — the file wins entirely:
 
 ```console
-$ cat .fux/types.toml
+$ cat .fux/formats.toml
 include = [
   "*.md",
 ]
@@ -99,8 +99,8 @@ docs/run.sh: not an indexed file type
 An empty allowlist is refused rather than silently emptying the index:
 
 ```console
-$ printf 'include = []\n' > .fux/types.toml && fux ingest
-error: .fux/types.toml: lists no file types - `include` and `[decoders]` are both
+$ printf 'include = []\n' > .fux/formats.toml && fux ingest
+error: .fux/formats.toml: lists no file types - `include` and `[decoders]` are both
 empty - so nothing would be indexed. Delete the file to take the built-in default
 (…), or add at least one entry
 ```
@@ -109,8 +109,8 @@ A leftover line-grammar file is refused, never quietly ignored:
 
 ```console
 $ fux ingest
-error: .fux/sources/types is the old types list; it moved to .fux/types.toml
-(ADR-TYPES decision 12). Run `fux setup` to write .fux/types.toml from it - its
+error: .fux/sources/types is the old types list; it moved to .fux/formats.toml
+(ADR-TYPES decision 12). Run `fux setup` to write .fux/formats.toml from it - its
 `!` lines become .fux/.fuxignore lines - then delete .fux/sources/types. …
 ```
 
@@ -167,14 +167,14 @@ registry.** A default that grew when a consumer dropped a `logdoc.py` into
 file type**. What counts as a document stays a committed line a human wrote.
 Pinned by `test_the_default_never_grows_from_a_consumer_decoder`.
 
-**2. `.fux/types.toml` replaces the default when it exists.** It does not
+**2. `.fux/formats.toml` replaces the default when it exists.** It does not
 extend it. Its shape is decision 12's.
 
 **2a. `.fux/.fuxignore` is where exclusions belong, and the types list has no
 subtraction at all.** [ADR-FUXIGNORE](0055_fuxignore.md) decision 5 made
 `.fuxignore` the home and this file's `!` line the deprecated spelling.
 ⚠ **Since 2026-09-11 the deprecated spelling is gone** (decision 12, fork F4):
-`.fux/types.toml` has no `exclude` key, a `!` glob in `include` is a loud error
+`.fux/formats.toml` has no `exclude` key, a `!` glob in `include` is a loud error
 naming `.fuxignore`, and `fux setup`'s conversion moves every old `!` line
 there.
 
@@ -358,10 +358,10 @@ hand-written one may stay silent.
 **A prose format carries no binding**, because no decoder is in its path — it
 is an `include` glob. (Under the line grammar, `render_line` omitted an
 attribute at an EMPTY default for this reason, the one narrowing of
-[ADR-URL-LIST](0026_url-list.md) decision 12; `.fux/types.toml` refuses an empty
+[ADR-URL-LIST](0026_url-list.md) decision 12; `.fux/formats.toml` refuses an empty
 binding outright, because `md = ""` binds nothing.)
 
-**12. The types list is `.fux/types.toml` — an `include` glob array and a
+**12. The types list is `.fux/formats.toml` — an `include` glob array and a
 `[decoders]` table keyed by extension — and the old `.fux/sources/types` is
 refused, never read.** Asked by Arpit 2026-09-11 (*"convert it to .toml … and put
 it in .fux dir rather than .fux/sources"*); the fork and all six sub-forks ruled
@@ -382,12 +382,24 @@ geojson = "json"
 
 | fork | ruled |
 |---|---|
-| F1 location | **`.fux/types.toml`**, beside `tune.toml`, `output.toml`, `refusals.toml` and `pii.toml` — not in `.fux/sources/` |
+| F1 location | **`.fux/formats.toml`** — named `types.toml` for a few hours on 2026-09-11, then renamed on Arpit's ruling the same day (see below) — beside `tune.toml`, `output.toml`, `refusals.toml` and `pii.toml` — not in `.fux/sources/` |
 | F2 shape | **`include` + `[decoders]`**, not an array of per-pattern tables. Entries were never order-sensitive (the loader sorts), so an ordered list would spend TOML's verbosity on an order nothing reads |
 | F3 does a binding admit? | **yes.** `[decoders] csv` makes `*.csv` a document; `"*.csv"` also in `include` is a loud *stated twice* error. Exact case only: `"*.CSV"` beside `csv` admits different files and is legal |
 | F4 subtraction | **none** — decision 2a |
-| F5 the old file | **refused** by `read_types`, by `decode` and by every `fux source` verb, and reported by `fux doctor`; `fux setup` **converts** it when `.fux/types.toml` is missing, moving `!` lines to `.fuxignore` above the first hand-written pattern, and tells the human to delete the old file |
+| F5 the old file | **refused** by `read_types`, by `decode` and by every `fux source` verb, and reported by `fux doctor`; `fux setup` **converts** it when `.fux/formats.toml` is missing, moving `!` lines to `.fuxignore` above the first hand-written pattern, and tells the human to delete the old file |
 | F6 error positions | the **key** always (`decoders.geojson`); `:lineno` only when a scan finds exactly one line |
+
+**Why `formats.toml`, and not `types.toml`, `map.toml` or `decoders.toml`** (Arpit,
+2026-09-11). The file answers *which file formats are documents, and which
+decoder reads each* — and "format" is the word this record already uses for
+exactly that. `types` collides with MIME types and type systems. `map` names no
+concern, where every sibling (`tune`, `output`, `pii`, `refusals`) does.
+`decoders.toml` would sit beside `.fux/decoders/` and read as configuration for
+those modules, and half the file — `include` — has no decoder in it. **The code
+names stay** (`typesfile.py`, `read_types`, `--types`, ADR-TYPES): renaming the
+flag breaks every script that calls it, for a cosmetic gain. ⚠ **`types.toml`
+has no refusal path**: it was committed locally and never pushed or released, so
+no repo but this one ever held it, and this repo was renamed in the same change.
 
 **Why a reversal of a recorded rejection was acceptable.** §Alternatives
 rejected *"a `[sources] types` TOML array"* for three reasons. Two do not reach
@@ -458,7 +470,7 @@ nothing had ever read it.
   cost ADR-FUXIGNORE decision 4 pays for the file meaning what its name says,
   and **nothing has been measured about how often anyone reaches for it.**
 - **Three lists, two places**: `.fux/sources/dirs` says *where*,
-  `.fux/types.toml` says *what* — and, since decision 11, *read by what* — and
+  `.fux/formats.toml` says *what* — and, since decision 11, *read by what* — and
   `.fux/sources/urls` says *what else*. ⚠ **Until decision 12 all three sat under
   `.fux/sources/` on one grammar**; the types list left both.
 - 🔴 **Decision 12's costs, stated.** The three source lists no longer share one

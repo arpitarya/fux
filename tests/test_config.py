@@ -253,7 +253,7 @@ def test_the_scaffolded_fux_toml_has_no_decode_table():
 
 def test_a_types_file_key_is_refused_by_name(tmp_path):
     """`config.schema.json` advertised `[sources] types_file` and nothing read it;
-    the types list is always `.fux/types.toml` (ADR-TYPES decision 12)."""
+    the types list is always `.fux/formats.toml` (ADR-TYPES decision 12)."""
     import pytest
 
     from fux.config import load

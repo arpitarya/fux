@@ -217,7 +217,7 @@ of a key. This is the property [ADR-RECORD](0019_index-record.md) already gives
 
 ⚠ **Narrowed 2026-09-01: an attribute whose default is the EMPTY STRING is
 omitted at that default.** ⚠ **Moot for `types` since 2026-09-11**: the types
-list left this grammar for `.fux/types.toml` ([ADR-TYPES](0038_types-list.md)
+list left this grammar for `.fux/formats.toml` ([ADR-TYPES](0038_types-list.md)
 decision 12), so the grammar now parses **two** committed lists. The narrowing
 below stands as written for any future empty-default attribute. `types` gained `decoder=` ([ADR-TYPES](0038_types-list.md)
 decision 11), whose empty default means *no binding declared* — and writing a

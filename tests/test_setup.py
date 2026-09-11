@@ -168,8 +168,8 @@ def test_the_written_types_file_spells_the_default_out_as_live_lines(tmp_path):
     from fux.ingest.gitdir import DEFAULT_TYPES
 
     setup_mod.run(tmp_path)
-    text = (tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8")
-    listed = typesfile.parse(text, origin="types.toml")
+    text = (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8")
+    listed = typesfile.parse(text, origin="formats.toml")
     bindings = {ext.lstrip("."): name for ext, name in builtin_bindings().items()}
     assert listed.decoders == bindings
     assert set(listed.include) == {g for g in DEFAULT_TYPES if typesfile.pattern_extension(g) not in bindings}
@@ -190,7 +190,7 @@ def test_a_freshly_set_up_repo_indexes_its_own_readme(tmp_path):
 
 def test_setup_never_overwrites_an_edited_types_file(tmp_path):
     setup_mod.run(tmp_path)
-    listing = tmp_path / ".fux" / "types.toml"
+    listing = tmp_path / ".fux" / "formats.toml"
     listing.write_text('include = ["*.md"]\n', encoding="utf-8")
     setup_mod.run(tmp_path)
     assert listing.read_text(encoding="utf-8") == 'include = ["*.md"]\n'
@@ -209,8 +209,8 @@ def test_setup_converts_a_leftover_line_grammar_types_file(tmp_path, capsys):
 
     _legacy(tmp_path, "# mine\n*.md\ndocs/*.txt\n*.csv decoder=csv\n*.geojson decoder=json\n")
     report = setup_mod.run(tmp_path)
-    assert report.converted_types and ".fux/types.toml" in report.written
-    listed = typesfile.parse((tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8"), origin="t")
+    assert report.converted_types and ".fux/formats.toml" in report.written
+    listed = typesfile.parse((tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8"), origin="t")
     assert listed.include == ("*.md", "docs/*.txt")
     assert listed.decoders == {"csv": "csv", "geojson": "json"}
     assert (tmp_path / ".fux" / "sources" / "types").is_file(), "the old file is the human's to delete"
@@ -265,11 +265,11 @@ def test_bang_lines_move_to_fuxignore_above_the_first_hand_pattern(tmp_path):
 
 def test_setup_leaves_both_files_alone_when_the_new_one_exists(tmp_path):
     (tmp_path / ".fux").mkdir()
-    (tmp_path / ".fux" / "types.toml").write_text('include = ["*.md"]\n', encoding="utf-8")
+    (tmp_path / ".fux" / "formats.toml").write_text('include = ["*.md"]\n', encoding="utf-8")
     _legacy(tmp_path, "*.rst\n")
     report = setup_mod.run(tmp_path)
     assert not report.converted_types
-    assert (tmp_path / ".fux" / "types.toml").read_text(encoding="utf-8") == 'include = ["*.md"]\n'
+    assert (tmp_path / ".fux" / "formats.toml").read_text(encoding="utf-8") == 'include = ["*.md"]\n'
 
 
 def test_setup_bootstraps_a_bare_directory(tmp_path, monkeypatch, capsys):

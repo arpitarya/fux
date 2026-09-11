@@ -55,7 +55,7 @@ def _dirs(repo):
 
 
 def _types(repo):
-    return (repo / ".fux" / "types.toml").read_text(encoding="utf-8")
+    return (repo / ".fux" / "formats.toml").read_text(encoding="utf-8")
 
 
 def _add(repo, monkeypatch, args):
@@ -153,7 +153,7 @@ def test_a_prose_type_is_an_include_glob_because_no_decoder_reads_it(repo, monke
 def test_adding_a_type_edits_one_line_and_keeps_a_comment(repo, monkeypatch):
     """The writer's contract, unchanged by the move to TOML: one line changes and a
     human's comment inside the array survives."""
-    (repo / ".fux" / "types.toml").write_text(
+    (repo / ".fux" / "formats.toml").write_text(
         '# mine\ninclude = [\n  "*.md",  # our docs\n  "*.txt",\n]\n', encoding="utf-8"
     )
     _add(repo, monkeypatch, _args("*.rst", types=True))
@@ -166,14 +166,14 @@ def test_the_writer_refuses_a_layout_it_did_not_write(repo, monkeypatch):
     from fux.errors import FuxError
 
     original = 'include = ["*.md", "*.txt"]\n'
-    (repo / ".fux" / "types.toml").write_text(original, encoding="utf-8")
+    (repo / ".fux" / "formats.toml").write_text(original, encoding="utf-8")
     with pytest.raises(FuxError, match="will not edit it"):
         _add(repo, monkeypatch, _args("*.rst", types=True))
     assert _types(repo) == original
 
 
 def test_a_bare_glob_moves_into_decoders_when_it_gains_a_binding(repo, monkeypatch, capsys):
-    (repo / ".fux" / "types.toml").write_text('include = [\n  "*.md",\n  "*.pdf",\n]\n', encoding="utf-8")
+    (repo / ".fux" / "formats.toml").write_text('include = [\n  "*.md",\n  "*.pdf",\n]\n', encoding="utf-8")
     _add(repo, monkeypatch, _args("*.pdf", types=True))
     text = _types(repo)
     assert '"*.pdf"' not in text and '\npdf = "pdf"\n' in text
@@ -197,7 +197,7 @@ def test_a_leftover_line_grammar_types_file_stops_the_verb(repo, monkeypatch):
     (repo / ".fux" / "sources" / "types").write_text("*.md\n", encoding="utf-8")
     with pytest.raises(FuxError, match="fux setup"):
         _add(repo, monkeypatch, _args("*.pdf", types=True))
-    assert not (repo / ".fux" / "types.toml").exists()
+    assert not (repo / ".fux" / "formats.toml").exists()
 
 
 def test_flags_decide_what_is_recorded(repo, monkeypatch):
@@ -477,7 +477,7 @@ def test_bare_add_lists_every_list(repo, monkeypatch, capsys):
     capsys.readouterr()
     _add(repo, monkeypatch, _args(None))
     out = capsys.readouterr().out
-    assert "sources/dirs" in out and "sources/urls" in out and ".fux/types.toml" in out
+    assert "sources/dirs" in out and "sources/urls" in out and ".fux/formats.toml" in out
     assert "https://x.test/a fetch=http meta=hashed" in out
 
 

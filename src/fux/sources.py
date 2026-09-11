@@ -1,7 +1,7 @@
 """`fux add` / `fux remove` / `fux update` — the corpus, as a first-class verb.
 
 The three committed source lists (`.fux/sources/dirs`, `.fux/sources/urls` and
-`.fux/types.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
+`.fux/formats.toml`) are what fux indexes. Until W-63 only one of them had a command — `fux url` — so
 the corpus, the thing the whole engine is about, was the part of fux you
 maintained by hand.
 
@@ -55,7 +55,7 @@ disappearance of a key.
 
 ## `types` is TOML, and its editor is `typesfile`
 
-Since 2026-09-11 the types list is `.fux/types.toml` (ADR-TYPES decision 12),
+Since 2026-09-11 the types list is `.fux/formats.toml` (ADR-TYPES decision 12),
 so every verb here branches on `sourcelist.TYPES` and hands the edit to
 [`ingest/typesfile.py`](ingest/typesfile.py). **The rule above still holds** —
 one line of the file changes, every other byte is kept — and the editor
@@ -165,12 +165,12 @@ def _read(path: Path, spec: sourcelist.ListSpec) -> list[sourcelist.Entry]:
 
 
 def _types_root(path: Path) -> Path:
-    """The repo root a `.fux/types.toml` path sits in."""
+    """The repo root a `.fux/formats.toml` path sits in."""
     return path.parents[len(Path(DEFAULT_TYPES_FILE).parts) - 1]
 
 
 def _type_entries(path: Path) -> list[sourcelist.Entry]:
-    """`.fux/types.toml` as the entries every verb here already speaks.
+    """`.fux/formats.toml` as the entries every verb here already speaks.
 
     **An `include` glob and a `[decoders]` binding are both a pattern** to a
     verb: `*.md` with no decoder, `*.csv` with `decoder=csv`. Each is complete by
@@ -197,7 +197,7 @@ def _type_entries(path: Path) -> list[sourcelist.Entry]:
 
 
 def _add_type(path: Path, value: str, overrides: dict[str, str]) -> tuple[str, str, str]:
-    """`add` for `.fux/types.toml`: a binding if a decoder reads it, an `include` glob if not.
+    """`add` for `.fux/formats.toml`: a binding if a decoder reads it, an `include` glob if not.
 
     **A bare `*.ext` already in `include` moves** when it gains a decoder — the
     file may not state one extension twice (ADR-TYPES decision 12), and fux's
