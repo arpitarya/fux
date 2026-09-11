@@ -362,6 +362,13 @@ corpus anybody has. `update` is a policy about **reaching** a source, so
 page can exempt itself. **Same grammar, opposite layer counts, one rule deciding
 both:** does the value describe the document, or the route to it?
 
+⚠ **Touched 2026-09-11 by a change to `ingest/run.py` that this record does not
+describe.** The redact phase gained a path probe ([ADR-PII](0150_pii.md)
+decision 19b). `_archived_url_ids` and `_with_archived` — the half of that file
+this record owns the description of — are unchanged, and the note is recorded
+here only because the freshness gate reads whole files and a reader of this
+record deserves to know which of the two it was.
+
 ### Consequences
 
 - ⚠ **`is_archived_loc()` has exactly one definition**, used by both the ingest

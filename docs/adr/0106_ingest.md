@@ -612,6 +612,13 @@ the resolved list between `resolve_urls` and `fetch_all`.
   carries that consequence, which is the one place this filter is load-bearing
   beyond bandwidth.
 
+⚠ **The walk gained a second thing to say on stderr, 2026-09-11.** Beside the
+skip notice, a run whose `pii.toml` rules match a document's own **path** now
+prints one note naming those documents. **It redacts nothing and changes no
+committed byte** — `loc` and `id` are addresses, and this walk's output is
+unchanged. Why it is a note rather than a redaction, and why silence was
+rejected, is [ADR-PII](0150_pii.md) decision 19b.
+
 ### Consequences
 
 - **Ingest cost is O(corpus) in parsing and edge resolution, O(changed) in

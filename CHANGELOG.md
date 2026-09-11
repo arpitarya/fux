@@ -61,6 +61,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **A frontmatter `title:` was committed unredacted.** Only a document's body
+  was redacted, and `title:` wins over every heading — so a document whose body
+  read `[PII:email]` could carry the address in its committed title, and in the
+  title field's terms on every record. The title is redacted in the same pass as
+  the body now; **re-ingest to clean an index built before this**
+  ([ADR-PII](docs/adr/0150_pii.md) decision 19a).
+
+- ⚠ **A document's PATH is never redacted, and ingest now says so.** `loc` is
+  the address `fux answer` fetches with and `id` is the key the index is sorted
+  on, so a redacted path addresses nothing. A run whose rules match a path
+  prints a note naming those documents; renaming the file or ignoring it is the
+  consumer's call ([ADR-PII](docs/adr/0150_pii.md) decision 19b).
+
 - 🔴 **No URL citation was ever verified live.** The refer plane's fetch step
   still required a fetcher to return a `str`, while the fetcher contract has
   returned `(bytes, content type)` since 2026-08-26. Every `url:` citation

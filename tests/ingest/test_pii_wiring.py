@@ -9,6 +9,7 @@ source and report `stale` forever — a defect that presents as a working featur
 from __future__ import annotations
 
 import ast
+import json
 from pathlib import Path
 
 import pytest
@@ -56,34 +57,67 @@ def _redact_calls():
     ]
 
 
-def test_run_py_redacts_exactly_the_two_sources_of_committed_vocabulary():
+def test_run_py_redacts_every_source_of_committed_vocabulary_and_nothing_else():
     """Redaction must not reach the sha map, the queue, or the acquired plane.
 
-    ⚠ **This asserted ONE call site until 2026-09-01, and the assertion was
-    doing its job when it broke** (W-102). There are two sources of committed
-    vocabulary, not one: a document's own body, and the enrichment body that
-    becomes `ctx`. The redact phase walks `parsed`, which holds only the first,
-    so the second reached `.fux/index/` unredacted while ADR-PII decision 1 read
-    as though it could not.
+    ⚠ **This asserted ONE call site until 2026-09-01, TWO until 2026-09-11, and
+    the assertion was doing its job both times.** Each failure was a source of
+    committed vocabulary arriving with no pass of its own:
 
-    The count is pinned at **two** rather than loosened to "at least one",
-    because the failure this file exists to catch is a third source of `ctx`
-    arriving with no pass of its own — which is exactly what happened last time,
-    and a `>=` would have let it through in silence.
+    - **2026-09-01 (W-102)** — the enrichment body that becomes `ctx`. The
+      redact phase walks `parsed`, which does not hold it.
+    - **2026-09-11 (W-140 row 2)** — the **frontmatter title**. `_title` prefers
+      `meta["title"]` over any heading, and it is committed verbatim as
+      `record["title"]` on a plain-meta record and tokenized on every record.
+      A document could carry `[PII:email]` in its body and the address in its
+      title.
+
+    The fourth call is the **path probe**, which redacts nothing: it asks
+    whether a rule matches a document's own address so ingest can say so. A path
+    is the key the index is sorted on and the address `answer` fetches with, so
+    it can be reported and never rewritten.
+
+    The count is pinned rather than loosened to "at least one", because what
+    this file exists to catch is a new source of committed vocabulary slipping
+    in unredacted — and a `>=` would let exactly that through in silence.
     """
     calls = _redact_calls()
-    assert len(calls) == 2, (
-        "expected exactly two redaction sites — the parsed document body and "
-        "the enrichment body. A third source of committed vocabulary needs its "
-        "own pass; a redaction that moved needs this test read, not this number "
-        "raised"
+    assert len(calls) == 4, (
+        "expected four redaction sites — the parsed document body, the "
+        "frontmatter title, the path probe that reports rather than rewrites, "
+        "and the enrichment body. A new source of committed vocabulary needs "
+        "its own pass; a redaction that moved needs this test read, not this "
+        "number raised"
     )
-    args = sorted(
-        (a.attr if isinstance(a, ast.Attribute) else a.id) for a in (c.args[1] for c in calls)
+
+    def _arg_name(node) -> str:
+        if isinstance(node, ast.Attribute):
+            return node.attr
+        if isinstance(node, ast.Name):
+            return node.id
+        if isinstance(node, ast.Call):  # the path probe: `_loc_of(doc_id)`
+            return node.func.id if isinstance(node.func, ast.Name) else node.func.attr
+        return type(node).__name__
+
+    args = sorted(_arg_name(c.args[1]) for c in calls)
+    assert args == ["_loc_of", "body", "body", "front"], (
+        f"redaction is being applied to {args} — it must reach a document body, "
+        "a frontmatter title and an enrichment body, probe a path, and never a "
+        "sha map, a queue, or acquired bytes"
     )
-    assert args == ["body", "body"], (
-        f"redaction is being applied to {args} — it must reach a document body "
-        "and an enrichment body, never a sha map, a queue, or acquired bytes"
+
+
+def test_the_path_probe_rewrites_nothing(tmp_path):
+    """The address is reported, never redacted — a redacted path addresses nothing.
+
+    Pinned by reading the source: the probe's first return value is discarded.
+    If someone ever assigns it back, `loc` stops being the path the refer plane
+    reads and every citation in the index becomes unfetchable.
+    """
+    text = _source()
+    assert "_, loc_hits = pii_mod.redact(pii_rules, _loc_of(doc_id))" in text, (
+        "the path probe must discard the rewritten string — writing it back "
+        "would make `loc` unaddressable"
     )
 
 
@@ -233,3 +267,78 @@ def test_ingest_refuses_a_repo_with_no_pii_file(tmp_path):
     assert not (tmp_path / ".fux" / "index").exists() or not any(
         (tmp_path / ".fux" / "index").iterdir()
     ), "nothing may reach the committed index before the refusal"
+
+
+# -- W-140 row 2: the title, and the address that cannot be redacted ---------
+
+
+def _repo_with_rule(tmp_path, files: dict[str, str]):
+    """A minimal repo with one email rule, ready to ingest."""
+    listing = tmp_path / ".fux" / "sources" / "dirs"
+    listing.parent.mkdir(parents=True, exist_ok=True)
+    listing.write_text("docs\n", encoding="utf-8")
+    (tmp_path / "fux.toml").write_text("[sources]\n", encoding="utf-8")
+    (tmp_path / ".fux" / "pii.toml").write_text(
+        "[[rule]]\nname = 'email'\npattern = '[\\w.]+@[\\w.]+\\.\\w+'\n"
+        "replacement = '[PII:email]'\n",
+        encoding="utf-8",
+    )
+    for rel, text in files.items():
+        path = tmp_path / rel
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+
+def test_a_frontmatter_title_is_redacted_like_the_body(tmp_path):
+    """W-140 row 2, reproduced on macOS 2026-09-11 before it was fixed.
+
+    The body said `[PII:email]` and the title beside it said the address, in
+    plain text, in the committed record — because `_title` prefers
+    `meta["title"]` and only the body was ever redacted.
+    """
+    from fux import store
+    from fux.ingest.run import run
+
+    _repo_with_rule(
+        tmp_path,
+        {"docs/handover.md": "---\ntitle: Escalate to jane.roe@acme.example\n---\n\nAlso jane.roe@acme.example.\n"},
+    )
+    run(tmp_path)
+    record = store.read_index(tmp_path)["file:docs/handover.md"]
+
+    assert record["title"] == "Escalate to [PII:email]"
+    assert "jane.roe" not in json.dumps(record), (
+        "the address survives somewhere in the record — the title field, a term, "
+        "or a phrase"
+    )
+
+
+def test_a_path_that_matches_a_rule_is_reported_because_it_cannot_be_redacted(tmp_path, capsys):
+    """The one leak this plane can only report.
+
+    `loc` is the address `fux answer` fetches with and `id` is the key the index
+    is sorted and diffed on. Rewriting either makes the document unreachable, so
+    the answer is a note on stderr — silence would leave a real leak looking
+    exactly like a clean run.
+    """
+    from fux import store
+    from fux.ingest.run import run
+
+    _repo_with_rule(tmp_path, {"docs/contact-john.doe@acme.example.md": "# Notes\n\nplain\n"})
+    run(tmp_path)
+
+    note = capsys.readouterr().err
+    assert "document path(s) match a pii.toml rule" in note
+    assert "docs/contact-john.doe@acme.example.md" in note
+    # And the address is still the address: the record stays fetchable.
+    record = store.read_index(tmp_path)["file:docs/contact-john.doe@acme.example.md"]
+    assert record["loc"] == "docs/contact-john.doe@acme.example.md"
+
+
+def test_a_clean_corpus_says_nothing_about_paths(tmp_path, capsys):
+    """The note must fire on a match, never on every ingest with rules loaded."""
+    from fux.ingest.run import run
+
+    _repo_with_rule(tmp_path, {"docs/a.md": "# A\n\nplain body\n"})
+    run(tmp_path)
+    assert "document path(s) match" not in capsys.readouterr().err

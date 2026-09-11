@@ -170,8 +170,13 @@ from the working tree under the new rules.
 
 ## 7 · What redaction does not cover
 
-- ⚠ **A frontmatter `title:` is committed unredacted** as the document's title.
-- ⚠ **File paths are not redacted** — a value in a filename lands in `loc`.
+- ⚠ **A document's own PATH is never redacted** — it is the address `fux answer`
+  fetches with and the key the index is sorted on, so a redacted one addresses
+  nothing. **Ingest prints a note** naming the documents whose path matches a
+  rule (`N document path(s) match a pii.toml rule …`); the fix is to rename the
+  file or `.fuxignore` it, and neither is something fux may do for you.
+- **A frontmatter `title:` IS redacted**, like the body, since 2026-09-11. On an
+  index built before that, re-ingest before believing a title.
 - ⚠ **URL documents are re-redacted only when their bytes are fetched again.**
   An offline `fux ingest` — `--full` included — carries URL records as they
   are, and an `update=never` URL is never re-fetched. After a rule change, run
@@ -200,7 +205,7 @@ python probe.py .fux/pii.toml .fux/index    # any REDACT line here is a value co
 - **Don't read an `answer` quote containing a value as a redaction failure.**
 - **Don't look for PII in `--list-skipped`** — nothing is skipped.
 - **Don't claim a rule change swept the corpus** until URL documents were
-  re-fetched and titles and paths were checked.
+  re-fetched and the path note was read.
 - **Don't add or loosen a rule as a side effect** of another task.
 
 Related skills: fux-usage, fux-search, fux-answer, fux-graph, fux-sources, fux-index, fux-maintain, fux-config, fux-mcp, fux-fetcher, fux-decoder, fux-enrich, fux-archived-results.

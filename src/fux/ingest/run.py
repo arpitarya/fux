@@ -404,15 +404,52 @@ def run(
     #: the extract loop, which incremental ingest skips. Merging the two would
     #: claim a completeness the second half does not have.
     pii_ctx_hits: dict[str, int] = {}
+    #: Documents whose own ADDRESS matches a rule. **Not redactable** — see the
+    #: warning below — so they are counted and named rather than silently kept.
+    pii_in_loc: list[str] = []
     if pii_rules:
         with progress.phase("redact", len(parsed)) as p:
             for doc_id, doc in parsed.items():
                 body, hits = pii_mod.redact(pii_rules, doc.body)
+                # ⚠ **The frontmatter title is the THIRD source of committed
+                # vocabulary and it was unredacted until 2026-09-11** (W-140
+                # row 2). `_title` prefers `meta["title"]` over any heading, and
+                # that string is committed verbatim as `record["title"]` on a
+                # plain-meta record AND tokenized into the title field on every
+                # record. A body could say `[PII:email]` while the title beside
+                # it said the address. Headings were always safe — they are cut
+                # from the body, after this pass.
+                meta = doc.meta
+                front = meta.get("title")
+                if isinstance(front, str) and front:
+                    redacted_title, title_hits = pii_mod.redact(pii_rules, front)
+                    if title_hits:
+                        meta = {**meta, "title": redacted_title}
+                        for name, count in title_hits.items():
+                            hits[name] = hits.get(name, 0) + count
                 if hits:
-                    parsed[doc_id] = replace(doc, body=body)
+                    parsed[doc_id] = replace(doc, meta=meta, body=body)
                     for name, count in hits.items():
                         pii_body_hits[name] = pii_body_hits.get(name, 0) + count
+                # ⚠ **A document's own path CANNOT be redacted, and this is the
+                # one leak this plane can only report.** `loc` is the address
+                # `fux answer` fetches with and `id` is the key the whole index
+                # is sorted and diffed on; a redacted path addresses nothing.
+                # Silence here is the worse option: ADR-PII's stated cost is
+                # that a bad rule is invisible, and so is this.
+                _, loc_hits = pii_mod.redact(pii_rules, _loc_of(doc_id))
+                if loc_hits:
+                    pii_in_loc.append(doc_id)
                 p.update(1)
+    if pii_in_loc:
+        shown = ", ".join(sorted(pii_in_loc)[:3])
+        more = f" (+{len(pii_in_loc) - 3} more)" if len(pii_in_loc) > 3 else ""
+        print(
+            f"note: {len(pii_in_loc)} document path(s) match a pii.toml rule and are "
+            f"committed as-is - a path is an address, not content, and is never "
+            f"redacted: {shown}{more}",
+            file=sys.stderr,
+        )
 
     # Extraction is the expensive half — 92% of a full ingest, profiled at
     # 1 000 docs — so it is where the bar earns its place (W-64).

@@ -28,7 +28,6 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 2 | 🔴 **PII leaks past redaction:** a frontmatter `title:` is committed unredacted (only the body is redacted), and a value in a filename lands in `loc`. **(guide: PII)** | `ingest/extract.py` ~139, `ingest/run.py` ~410 | ADR-PII |
 | 3 | **`fux add <URL> --no-update` never fetches** — pinned URLs are dropped before the fetch, exit 1. `cli.py` help and CHANGELOG say it fetches once. **(guide: SOURCES)** | `ingest/run.py` ~216 | ADR-URL-LIST d14 |
 | 4 | **`fux update --failed` is parsed and never read.** **(guide: SOURCES)** | `cli.py` ~405 | ADR-CLI |
 | 5 | **`fux add <URL>` writes every attribute**, so `[sources.url]` `fetcher`/`meta`/`keep`/`ttl`/`update` never reach CLI-written lines. **(guide: SOURCES, FETCHER)** | `sources.py` | ADR-URL-LIST d14 |
@@ -74,8 +73,36 @@ then refresh this repo's renderings.
   `FETCHER-SKILL.md` lost the workaround they named, and this repo's four
   renderings of each were refreshed. 2026-09-11.
 
+- **Row 2 — PII past redaction.** Both halves reproduced on macOS first. The
+  frontmatter `title:` is now redacted in the same pass as the body, so the
+  title field and its terms are built from redacted text
+  ([ADR-PII](../../docs/adr/0150_pii.md) decision 19a). **A path cannot be
+  redacted** — `loc` is an address and `id` is the index's key — so ingest
+  prints a note naming the documents whose path matches a rule (19b). The
+  pinned "exactly two redaction sites" test was the thing that caught the
+  title as a third source; it now pins four and says why. `PII-SKILL.md` and
+  its four renderings updated. 2026-09-11.
+
 ## Definition of done
 
 Each row: reproduce on the Mac, then fix the code **or** amend the record, update
 any guide marked **(guide)**, re-render this repo's copies, and delete the row.
 The file closes when both sections are empty.
+
+## From OPEN-WORK (moved 2026-09-11)
+
+*Moved here verbatim when OPEN-WORK became one-to-two-line rows (Arpit, 2026-09-11). Links are rewritten for this directory.*
+
+*This is what the queue said at the move. Re-derive it before believing it (OPEN-WORK rule 4).*
+
+- 🔴 **W-140 — the defects writing the operating guides uncovered.** `agent` · *(records:
+  ADR-REFER · ADR-PII · ADR-URL-LIST · ADR-PROVENANCE · ADR-MAINTENANCE · ADR-CONFIG ·
+  and the disagreements listed in the file)* · Checking ten new skills against the code
+  (ADR-AGENT-POLICY decision 15) found **18 code defects** and **13 records that disagree with the
+  code**. ⚠ Guides name workarounds for several: **fix the defect and the guide in one
+  change.** **Row 1 is closed** (URL citations were never verified live — the refer plane
+  rejected the fetcher contract's tuple, so no `url:` citation ever reached `current`;
+  fixed, recorded as ADR-URL-FRESHNESS 6a, both guides and all four renderings updated).
+  **Row 2 is the remaining 🔴** — a frontmatter `title:` or a filename carries PII past
+  redaction. Row 19 was added from this repo's own suite. —
+  [detail](W-140-guide-authoring-defects.md) `filed: 2026-09-11`

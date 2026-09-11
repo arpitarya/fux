@@ -547,7 +547,9 @@ code. Nothing enforces that; this sentence is the guard.
 W-140 row 1 — the refer plane rejecting the fetcher contract's tuple — was
 fixed, and `ANSWER-SKILL.md` and `FETCHER-SKILL.md` lost the workaround they
 named in the same commit, with this repo's four renderings of each refreshed
-from the template. **`fux setup` does not rewrite a rendering that already
+from the template. Row 2 followed the same day: `PII-SKILL.md`'s *"a frontmatter
+`title:` is committed unredacted"* is now a statement that it is redacted, and
+its *"file paths are not redacted"* names the note ingest prints. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that
 edits a template and stops has left this repo's own copies stating the old
 behaviour.
