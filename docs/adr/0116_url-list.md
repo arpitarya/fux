@@ -263,6 +263,19 @@ a document, how to store it and how long a citation could go unchecked, and
 - **`fux add <URL> --no-update` writes `update=never`.** ⚠ **That add still
   fetches once** — one fetch is what makes the line ingestable at all; the flag
   governs every run after, and `--help` says so rather than only this record.
+  🔴 **It did not, from the day it landed until 2026-09-11** (W-140 row 3). The
+  filter below ran above the fetch and knew nothing about an add, so the add
+  wrote the line, fetched nothing and exited **1** with *the line is written;
+  the fetch failed: update=never*. Three artifacts promised the fetch — this
+  bullet, `--help` and the CHANGELOG — and the code contradicted all three.
+  **`cmd_add` now passes the URL it just wrote as `first_fetch`, and that set
+  has exactly one populator**, asserted by a test: a wider one would make the
+  pin advisory.
+  ⚠ **A pinned line written BY HAND is still never fetched, and that is a real
+  gap.** `fux add` on an existing line reports `unchanged` and ingests nothing,
+  so such a line has no record and no document, and nothing says so —
+  [ADR-MAINTENANCE](0129_hooks.md) decision 5a's never-fetched reporting
+  is the place that would.
 
 **14a. The skip is `POLICY`, and it happens BEFORE the fetcher is resolved.**
 

@@ -549,7 +549,10 @@ fixed, and `ANSWER-SKILL.md` and `FETCHER-SKILL.md` lost the workaround they
 named in the same commit, with this repo's four renderings of each refreshed
 from the template. Row 2 followed the same day: `PII-SKILL.md`'s *"a frontmatter
 `title:` is committed unredacted"* is now a statement that it is redacted, and
-its *"file paths are not redacted"* names the note ingest prints. **`fux setup` does not rewrite a rendering that already
+its *"file paths are not redacted"* names the note ingest prints. Rows 3 and 4
+followed: `SOURCES-SKILL.md` had told readers to pin a URL in **two steps** and
+to work around `--failed` by hand, and both workarounds are gone with the
+defects that caused them. **`fux setup` does not rewrite a rendering that already
 exists**, so refreshing them is a copy, not a re-run of setup; a session that
 edits a template and stops has left this repo's own copies stating the old
 behaviour.

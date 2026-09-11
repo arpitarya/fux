@@ -103,9 +103,11 @@ flags for one attribute, is an error and writes nothing. There is no flag for
 ⚠ **`--dry-run` never fetches.** It cannot tell you whether a URL works; see the
 `fux-fetcher` skill for testing one.
 
-⚠ **`fux add <URL> --no-update` does not fetch, so the page never gets indexed** —
-it exits `1` with `the line is written; the fetch failed: update=never …`. Pin in
-two steps: `fux add <URL>`, then `fux add <URL> --no-update --no-fetch`.
+**`fux add <URL> --no-update` fetches once, then never again.** One fetch is
+what makes the line ingestable at all; the pin governs every run after it,
+`--all` and `--full` included. ⚠ **A pinned line written BY HAND into
+`.fux/sources/urls` is never fetched** — `fux add` on a line that already exists
+reports `unchanged` and ingests nothing, so it has no record and no document.
 
 ⚠ **A URL needs `[sources.url]` in `fux.toml`**, including `max_parallel`.
 Without it the line is recorded and nothing can fetch it.
@@ -143,14 +145,14 @@ files out on their own. `fux add X` refuses while the `!` line exists.
 - **A failed fetch keeps the prior record.** To drop a dead page, `fux remove` it.
 - **Exit is `0` even when fetches fail.** Read stderr for
   `! <url> — <reason>; prior record kept`.
-- **Pinned lines (`update=never`) are never fetched**, even by name.
+- **Pinned lines (`update=never`) are never fetched**, even by name. Only the
+  `fux add` that writes the line gets its one fetch.
 - `--check` prints `stale  <path>` / `gone   <path>` lines, then `N stale.` or
-  `nothing has drifted.`; it never checks URLs and always exits `0`.
-
-⚠ **`--failed` is accepted but does not narrow the fetch in this version.** For
-failing URLs, take them from `fux update`'s `!` lines (or the `url sources`
-check in `fux doctor --json`, which names URLs failing 5+ runs in a row) and
-run `fux update <URL>` for each.
+  `nothing has drifted.`; it never checks URLs and always exits `0` — **drift is
+  a fact, not a failure**, so read the output, never the status.
+- **`--failed` fetches exactly the URLs whose last run failed** (`fail_streak >
+  0`) and nothing else. It is the most specific selector, so it wins over
+  `--all`; with nothing failing it fetches nothing and says so.
 
 ## 6 · "Why isn't file X indexed?"
 

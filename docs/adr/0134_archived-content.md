@@ -364,10 +364,13 @@ both:** does the value describe the document, or the route to it?
 
 ⚠ **Touched 2026-09-11 by a change to `ingest/run.py` that this record does not
 describe.** The redact phase gained a path probe ([ADR-PII](0150_pii.md)
-decision 19b). `_archived_url_ids` and `_with_archived` — the half of that file
-this record owns the description of — are unchanged, and the note is recorded
-here only because the freshness gate reads whole files and a reader of this
-record deserves to know which of the two it was.
+decision 19b), and later the same day the pinned-URL filter gained the add's one
+fetch ([ADR-URL-LIST](0116_url-list.md) decision 14). `_archived_url_ids` and
+`_with_archived` — the half of that file this record owns the description of —
+are unchanged by both, and the note is recorded here only because the freshness
+gate reads whole files and a reader of this record deserves to know which half
+it was. ⚠ **An `archived=true` line and an `update=never` line are independent**:
+pinning a retired page is legal and means what both words mean.
 
 ### Consequences
 

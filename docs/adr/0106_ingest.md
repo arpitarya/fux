@@ -612,6 +612,12 @@ the resolved list between `resolve_urls` and `fetch_all`.
   carries that consequence, which is the one place this filter is load-bearing
   beyond bandwidth.
 
+⚠ **The pinned-URL filter gained its one exemption, 2026-09-11.** A line
+declaring `update=never` is dropped above `fetch_all`'s grouping — except the
+URL `fux add` has just written, which gets the single fetch
+[ADR-URL-LIST](0116_url-list.md) decision 14 always promised it. The walk is
+otherwise unchanged, and no other caller may populate that set.
+
 ⚠ **The walk gained a second thing to say on stderr, 2026-09-11.** Beside the
 skip notice, a run whose `pii.toml` rules match a document's own **path** now
 prints one note naming those documents. **It redacts nothing and changes no

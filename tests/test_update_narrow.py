@@ -98,3 +98,55 @@ def test_an_excluded_entry_is_never_a_target(tmp_path):
     listed = [Entry("https://a.test/x", exclude=True)]
     targeted, _ = _narrow(tmp_path, listed, all_urls=False)
     assert targeted == set()
+
+
+# -- W-140 row 4: `--failed` was parsed and never read -----------------------
+
+
+def _with_fail_streaks(root: Path, streaks: dict[str, int]) -> None:
+    from fux.maintain import urlstate
+
+    state = urlstate.read(root)
+    for url, streak in streaks.items():
+        health = state.urls.setdefault(url, urlstate.UrlHealth())
+        health.fail_streak = streak
+    urlstate.write(root, state)
+
+
+def test_failed_selects_exactly_the_urls_whose_last_run_failed(tmp_path):
+    """The flag existed, was documented, and did nothing.
+
+    Until 2026-09-11 `fux update --failed` fell through to the ordinary narrow
+    pass: it fetched the *stale* set and reported success. A flag that silently
+    does something else is worse than one that errors, because the report reads
+    as though the retry happened.
+    """
+    _with_fail_streaks(tmp_path, {"https://a.test/x": 2, "https://b.test/y": 0})
+    dirty.record(tmp_path, ["url:https://c.test/z"])
+
+    targeted, why = _narrow(tmp_path, LISTED, all_urls=False, failed_only=True)
+
+    assert targeted == {"https://a.test/x"}, "the dirty URL is not a failing one"
+    assert "--failed" in why
+
+
+def test_failed_wins_over_all_because_it_is_the_more_specific_selector(tmp_path):
+    """Asking for the failures and getting a full sweep is the same defect again."""
+    _with_fail_streaks(tmp_path, {"https://a.test/x": 1})
+    targeted, _ = _narrow(tmp_path, LISTED, all_urls=True, failed_only=True)
+    assert targeted == {"https://a.test/x"}
+
+
+def test_failed_never_fetches_a_url_that_is_no_longer_listed(tmp_path):
+    """url-state outlives a source list; a removed line must not come back."""
+    _with_fail_streaks(tmp_path, {"https://gone.test/x": 3, "https://a.test/x": 1})
+    targeted, _ = _narrow(tmp_path, LISTED, all_urls=False, failed_only=True)
+    assert targeted == {"https://a.test/x"}
+
+
+def test_failed_with_nothing_failing_fetches_nothing(tmp_path):
+    """The empty set and `None` mean opposite things — this one means nothing to do."""
+    dirty.record(tmp_path, ["url:https://c.test/z"])
+    targeted, why = _narrow(tmp_path, LISTED, all_urls=False, failed_only=True)
+    assert targeted == set(), "an empty set is 'fetch nothing', never 'sweep everything'"
+    assert "0 with a failing last run" in why

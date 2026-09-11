@@ -302,3 +302,69 @@ def test_a_corpus_that_declares_nothing_is_byte_identical(tmp_path):
     run(a, refresh_urls=True)
     run(b, refresh_urls=True)
     assert store.read_index(a) == store.read_index(b)
+
+
+# -- W-140 row 3: the add's one fetch ---------------------------------------
+
+
+def test_the_add_that_writes_a_pinned_line_still_fetches_it_once(tmp_path):
+    """ADR-URL-LIST decision 14, which the code contradicted for six days.
+
+    `fux add <URL> --no-update` wrote the line, fetched nothing and exited 1
+    saying *the fetch failed* — because the pin filter ran above the fetch and
+    did not know an add was in progress. `--help` and the CHANGELOG both
+    promised the one fetch; a pin freezes a document and cannot freeze one
+    that was never fetched.
+    """
+    from fux import store
+    from fux.ingest.run import run
+
+    _repo(tmp_path, ["https://x.test/pinned update=never"])
+    report = run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"})
+
+    assert "url:https://x.test/pinned" in store.read_index(tmp_path)
+    assert not [s for s in report.skipped if s.rel_path == "https://x.test/pinned"]
+
+
+def test_the_exemption_is_that_url_and_no_other(tmp_path):
+    """One add, one fetch. A second pinned line in the same list stays frozen."""
+    from fux import store
+    from fux.ingest.run import run
+
+    _repo(
+        tmp_path,
+        ["https://x.test/added update=never", "https://x.test/other update=never"],
+    )
+    run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/added"})
+
+    index = store.read_index(tmp_path)
+    assert "url:https://x.test/added" in index
+    assert "url:https://x.test/other" not in index
+
+
+def test_a_later_run_pins_the_line_the_add_fetched(tmp_path):
+    """The flag governs every run after — including `--all` and `--full`."""
+    from fux.ingest.run import run
+
+    _repo(tmp_path, ["https://x.test/pinned update=never"])
+    run(tmp_path, refresh_urls=True, first_fetch={"https://x.test/pinned"})
+
+    report = run(tmp_path, refresh_urls=True, full=True)
+    pinned = [s for s in report.skipped if s.rel_path == "https://x.test/pinned"]
+    assert len(pinned) == 1 and pinned[0].kind == "policy"
+
+
+def test_cmd_add_passes_the_url_it_just_wrote_and_nothing_else():
+    """The set has exactly one populator. Read from the source, because a second
+    caller passing a wider set would re-open the hole quietly."""
+    import inspect
+
+    from fux import sources
+
+    body = inspect.getsource(sources)
+    assert body.count("first_fetch=") == 3, (
+        "first_fetch appears in exactly three places — the `_ingest` signature, "
+        "its forward, and `cmd_add`'s single call. A fourth needs this test "
+        "read, not this number raised: a wider set re-opens the hole quietly"
+    )
+    assert "first_fetch=only_urls" in body

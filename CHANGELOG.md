@@ -61,6 +61,18 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- **`fux add <URL> --no-update` now fetches once**, as `--help` and the record
+  always said. It wrote the line, fetched nothing and exited 1 — the pin filter
+  ran above the fetch and did not know an add was in progress. Every run after
+  the add is still pinned ([ADR-URL-LIST](docs/adr/0116_url-list.md) decision
+  14). ⚠ A pinned line written **by hand** into `.fux/sources/urls` is still
+  never fetched and so has no record.
+
+- **`fux update --failed` now narrows the fetch.** The flag was parsed and never
+  read: it fell through to the ordinary narrow pass and fetched the *stale* set
+  instead. It selects the URLs whose last run failed (`fail_streak > 0`) and
+  wins over `--all`.
+
 - 🔴 **A frontmatter `title:` was committed unredacted.** Only a document's body
   was redacted, and `title:` wins over every heading — so a document whose body
   read `[PII:email]` could carry the address in its committed title, and in the

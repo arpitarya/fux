@@ -526,11 +526,13 @@ def _rel(root: Path, path: Path) -> str:
         return str(path)
 
 
-def _ingest(root: Path, args, *, refresh_urls: bool = False, only_urls=None):
+def _ingest(root: Path, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
     """Every verb's single way into the index (L3). Imported lazily (ADR-CLI 7)."""
     from .ingest import ingest_and_report
 
-    return ingest_and_report(root, args, refresh_urls=refresh_urls, only_urls=only_urls)
+    return ingest_and_report(
+        root, args, refresh_urls=refresh_urls, only_urls=only_urls, first_fetch=first_fetch
+    )
 
 
 def _index_ids(root: Path) -> set[str]:
@@ -622,7 +624,15 @@ def cmd_add(args) -> int:
             refresh, only_urls = True, {entry}
             print(f"fetching  {entry} (network — this URL only)", file=sys.stderr)
 
-    report = _ingest(root, args, refresh_urls=refresh, only_urls=only_urls)
+    # ⚠ **The add's ONE fetch, and the only exemption a pin has.**
+    # `--no-update` writes `update=never`, and until 2026-09-11 the ingest
+    # filter dropped the line before the fetch — so the add wrote a line,
+    # fetched nothing, and exited 1 saying the fetch failed, while `--help` and
+    # [ADR-URL-LIST](../docs/adr/0116_url-list.md) decision 14 both promised one
+    # fetch (W-140 row 3). Every run after this one is pinned.
+    report = _ingest(
+        root, args, refresh_urls=refresh, only_urls=only_urls, first_fetch=only_urls
+    )
 
     skipped = next((s for s in report.skipped if s.rel_path == entry), None)
     if skipped is None:
@@ -822,7 +832,12 @@ def cmd_update(args) -> int:
         listed = _read(list_path(root, sourcelist.URLS), sourcelist.URLS) if config.url else []
         refresh = bool(listed)
         if refresh:
-            only_urls, why = _narrow(root, listed, all_urls=getattr(args, "all", False))
+            only_urls, why = _narrow(
+                root,
+                listed,
+                all_urls=getattr(args, "all", False),
+                failed_only=getattr(args, "failed", False),
+            )
             if only_urls is not None and not only_urls:
                 print(f"nothing to fetch — {why}", file=sys.stderr)
                 refresh = False
@@ -854,7 +869,7 @@ def cmd_update(args) -> int:
     return 0
 
 
-def _narrow(root: Path, listed, *, all_urls: bool):
+def _narrow(root: Path, listed, *, all_urls: bool, failed_only: bool = False):
     """Which URLs `fux update` fetches, and one line saying why.
 
     **W-82 ruling 3, landed 2026-08-28:** narrow is the DEFAULT and `--all`
@@ -882,6 +897,25 @@ def _narrow(root: Path, listed, *, all_urls: bool):
     """
     from .maintain import dirty as dirty_mod
 
+    # ⚠ **`--failed` was PARSED AND NEVER READ** from the day it landed until
+    # 2026-09-11 (W-140 row 4). `fux update --failed` ran the ordinary narrow
+    # pass, so it fetched the *stale* set and reported it as a success — a flag
+    # that silently does something else is worse than one that errors.
+    #
+    # **It is the most specific selector, so it wins over `--all`.** Asking for
+    # the failures and getting a full sweep would be the same defect again in a
+    # different costume, and argparse cannot express "more specific" — only
+    # "mutually exclusive", which would break every script already passing both.
+    if failed_only:
+        from .maintain import urlstate as urlstate_mod
+
+        known = {e.value for e in listed if not e.exclude}
+        failing = {
+            url
+            for url, health in urlstate_mod.read(root).urls.items()
+            if health.fail_streak > 0 and url in known
+        }
+        return failing, f"{len(failing)} with a failing last run (`--failed`)"
     if all_urls:
         return None, "`--all`"
     if not dirty_mod.is_readable(root):

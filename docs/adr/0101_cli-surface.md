@@ -828,6 +828,20 @@ was never fetched has no record to freeze. The flag governs every run after.
 A person reading `--no-update` and expecting no network at all would be
 reasonable, which is why the correction belongs in the terminal.
 
+⚠ **A flag that is parsed and never read is worse than one that errors, and
+this surface had one for six days.** `fux update --failed` was declared, helped
+and documented — *fetch only the URLs whose last run failed* — and fell through
+to the ordinary narrow pass, so it fetched the **stale** set and reported that
+as a success. Nothing in the surface capture could show it: the flag parsed, the
+command exited 0, and the summary was a true statement about a different
+selection. Fixed 2026-09-11 (W-140 row 4); `--failed` is the most specific
+selector and wins over `--all`, because answering a narrower request with a
+wider sweep is the same defect wearing a different hat.
+
+**What this costs the capture:** a verbatim capture proves a flag is *accepted*,
+never that it is *read*. The gap is closed for this flag by a test that asserts
+the selection, not the output.
+
 ### Consequences
 
 - 🔴 **`_apply_output_defaults` no longer degrades when `.fux/output.toml` is

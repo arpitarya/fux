@@ -127,6 +127,7 @@ def run(
     *,
     refresh_urls: bool = False,
     only_urls: set[str] | None = None,
+    first_fetch: set[str] | None = None,
     full: bool = False,
     progress=None,
     should_stop=None,
@@ -140,6 +141,12 @@ def run(
     the whole run still ends in the one `write_index` call below, so a scoped
     fetch and a full refresh produce the same bytes for everything they agree
     about (L3). `None` means every listed URL.
+
+    `first_fetch` is the URL `fux add` has **just written**, and it is the only
+    thing that may fetch a line declaring `update=never`. A pin freezes a
+    document; it cannot freeze one that was never fetched, so the add that
+    creates the line gets its single fetch and every run after it is pinned
+    (ADR-URL-LIST decision 14). Nothing else ever populates this set.
 
     `should_stop` is the **cooperative stop** the deferred runner is halted by
     (W-66 Phase 2, ADR-MAINTENANCE decision 1d). It is polled between units of
@@ -216,9 +223,21 @@ def run(
         # someone as a problem. The record carries forward below through
         # `url_meta`, untouched -- pinning freezes a document, it never drops
         # one.
-        pinned = [e for e in to_fetch if e.update == "never"]
+        #
+        # ⚠ **ONE exemption, and it is the one the record always named:
+        # `first_fetch`.** [ADR-URL-LIST](../../docs/adr/0116_url-list.md)
+        # decision 14 says *`fux add <URL> --no-update` ... still fetches once —
+        # one fetch is what makes the line ingestable at all; the flag governs
+        # every run after*. The filter did not know about the add, so that add
+        # wrote the line, fetched nothing and exited 1 (W-140 row 3, fixed
+        # 2026-09-11). `cmd_add` passes the URL it just wrote, and nothing else
+        # ever populates this set — a pin is still absolute for every later run,
+        # `--all` and `--full` included.
+        first_fetch = first_fetch or set()
+        pinned = [e for e in to_fetch if e.update == "never" and e.url not in first_fetch]
         if pinned:
-            to_fetch = [e for e in to_fetch if e.update != "never"]
+            frozen = {e.url for e in pinned}
+            to_fetch = [e for e in to_fetch if e.url not in frozen]
             url_skipped_pinned = [
                 gitdir.Skipped(
                     rel_path=e.url,

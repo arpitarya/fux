@@ -109,7 +109,7 @@ def cmd_ingest(args) -> int:
     return 0
 
 
-def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=None):
+def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=None, first_fetch=None):
     """Run one ingest and print its summary. **The only ingest the verbs call.**
 
     `fux add`, `fux remove` and `fux update` all end here rather than each
@@ -135,6 +135,7 @@ def ingest_and_report(args_root, args, *, refresh_urls: bool = False, only_urls=
             args_root,
             refresh_urls=refresh_urls,
             only_urls=only_urls,
+            first_fetch=first_fetch,
             full=getattr(args, "full", False),
             progress=progress,
         )

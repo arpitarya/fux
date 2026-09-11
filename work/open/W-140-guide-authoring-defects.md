@@ -28,8 +28,6 @@ then refresh this repo's renderings.
 
 | # | defect | where | record |
 |---|---|---|---|
-| 3 | **`fux add <URL> --no-update` never fetches** — pinned URLs are dropped before the fetch, exit 1. `cli.py` help and CHANGELOG say it fetches once. **(guide: SOURCES)** | `ingest/run.py` ~216 | ADR-URL-LIST d14 |
-| 4 | **`fux update --failed` is parsed and never read.** **(guide: SOURCES)** | `cli.py` ~405 | ADR-CLI |
 | 5 | **`fux add <URL>` writes every attribute**, so `[sources.url]` `fetcher`/`meta`/`keep`/`ttl`/`update` never reach CLI-written lines. **(guide: SOURCES, FETCHER)** | `sources.py` | ADR-URL-LIST d14 |
 | 6 | **`answer` runs with the fetch cache off**: `ttl=` never applies, `cached` is unreachable, `update=never` does not stop the answer-time fetch. | `query/refer_answer.py` ~104 | ADR-URL-FRESHNESS d11/d15 · ADR-REFER d20 · ADR-ACQUIRED |
 | 7 | **`verify` misreports**: a `source: index` receipt and an unreachable URL both give `drifted:corpus`, not `unverifiable`; `--rerun` fetches. **(guide: ANSWER)** | `query/__init__.py` ~994, ~1075 | ADR-PROVENANCE d14 |
@@ -45,6 +43,7 @@ then refresh this repo's renderings.
 | 17 | **Starter refusal rules refuse real wiki pages** (`viewpage.action`, `.aspx`, `.php`); `suspiciously-small-document`'s comment says *warn* but it refuses. **(guide: FETCHER)** | `templates/refusals.toml.txt` | ADR-REFUSAL |
 | 18 | **Small ones:** `.fux/.gitignore` misses `__pycache__/` under `decoders/`/`fetchers/`; a re-run of `setup` always prints the `AGENTS.md` paste note; the generated `urls` header says "two attributes" and "re-fetches every line"; the starter `pii.toml` and doctor point at `tools/pii-probe/probe.py`, which is not in the package. | `setup.py`, `store/fuxdir.py`, `doctor.py` ~484 | ADR-DOTFUX · ADR-PII |
 | 19 | ⚠ **`tests_e2e/test_maintenance.py::test_the_driver_resolves_what_git_cannot` failed once and passed on re-run** (2026-09-11, macOS): the merge resolved but `file:docs/aa.md` came back at `ver` 1. A hooked repo re-indexes in the background, so the assertion may be racing the runner. **Seen once — a second occurrence makes it a gate** (CLAUDE.md two-strikes) | `tests_e2e/test_maintenance.py` ~102 | ADR-MAINTENANCE |
+| 20 | ⚠ **The freshness gate's `describes` relation is per FILE, so a change to one function in `ingest/run.py` demands a line in three records that do not describe it.** Twice in one session (2026-09-11) that produced a record edit whose only content was *nothing here changed*. Per-symbol describes, or an explicit exemption, would fix it | `tests/test_adr_freshness.py`, `docs/adr/README.md` §Ownership | ADR-OWNERSHIP |
 
 ## 2 · Records that disagree with the code
 
@@ -82,6 +81,22 @@ then refresh this repo's renderings.
   pinned "exactly two redaction sites" test was the thing that caught the
   title as a third source; it now pins four and says why. `PII-SKILL.md` and
   its four renderings updated. 2026-09-11.
+
+- **Row 3 — `fux add <URL> --no-update` never fetched.** Three artifacts
+  promised the one fetch (ADR-URL-LIST decision 14, `--help`, the CHANGELOG)
+  and the pin filter, which runs above `fetch_all`'s grouping, knew nothing
+  about an add. `cmd_add` now passes the URL it just wrote as `first_fetch`,
+  and a test pins that the set has exactly one populator — a wider one would
+  make the pin advisory. ⚠ **A pinned line written by hand is still never
+  fetched**: recorded in decision 14 as the gap it is, owed to
+  ADR-MAINTENANCE 5a. 2026-09-11.
+
+- **Row 4 — `fux update --failed` was parsed and never read.** It fell through
+  to the ordinary narrow pass, fetching the *stale* set and reporting that as a
+  success. It now selects `fail_streak > 0` intersected with what is still
+  listed, and wins over `--all` as the more specific selector. ADR-CLI carries
+  what a verbatim surface capture cannot prove: that a flag is read, not merely
+  accepted. 2026-09-11.
 
 ## Definition of done
 
