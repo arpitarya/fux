@@ -35,6 +35,47 @@ def doc(text: str) -> str:
     return f"---\ntitle: {text}\n---\n# {text}\n\n{text} body\n"
 
 
+def _content_sha(path: Path) -> str:
+    """The sha fux records for a file — imported, never reimplemented.
+
+    A second hashing here could differ from the engine's and the test would be
+    asserting its own arithmetic.
+    """
+    from fux import store
+
+    return store.content_sha(path.read_bytes())
+
+
+def quiesce(path: Path) -> None:
+    """Stop any background re-index before reading a committed shard.
+
+    ⚠ **This is a GATE, not a tidy-up** (CLAUDE.md two-strikes, 2026-09-11).
+    `test_the_driver_resolves_what_git_cannot` failed twice in one session and
+    passed on every re-run, both times inside a combined `tests tests_e2e`
+    invocation — a busier machine, so a wider window.
+
+    **The window is real and it is the product working as designed.**
+    `post-commit` runs `fux ingest --spawn-runner`, which detaches; `diverge`
+    makes two commits per repo, so up to two background runners may still be
+    re-indexing when the merge finishes and the assertions read
+    `.fux/index/*.jsonl`. A test that reads a file another process may rewrite
+    is a race whoever reads the failure will blame on the merge driver.
+
+    `fux daemon stop` is the same `request_stop` every writing verb calls, so
+    this waits through the CLI rather than reaching into the package.
+
+    ⚠ **First placed before the final read only, on 2026-09-11, and that was
+    not enough** — the suite failed again the same day. The window is after
+    **every** hooked commit, not just the last: `diverge` commits twice, and a
+    runner spawned by either `post-commit` can still be rewriting the shard
+    while the next `fux ingest` reads it or `git add -A` stages it. The
+    observed failure was `ver` 1 where 2 was expected, which is a *pre-merge*
+    shard, not a merge result — the merge driver was never the defect. So the
+    stop belongs at every commit that has hooks behind it.
+    """
+    fux(path, "daemon", "stop")
+
+
 def make_repo(path: Path, *, hooks: bool) -> str:
     (path / ".fux" / "sources").mkdir(parents=True)
     (path / "docs").mkdir()
@@ -58,37 +99,24 @@ def make_repo(path: Path, *, hooks: bool) -> str:
         fux(path, "hooks")
     git(path, "add", "-A")
     git(path, "commit", "-qm", "init")
+    if hooks:
+        quiesce(path)
     return git(path, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
 
 
-def quiesce(path: Path) -> None:
-    """Stop any background re-index before reading a committed shard.
-
-    ⚠ **This is a GATE, not a tidy-up** (CLAUDE.md two-strikes, 2026-09-11).
-    `test_the_driver_resolves_what_git_cannot` failed twice in one session and
-    passed on every re-run, both times inside a combined `tests tests_e2e`
-    invocation — a busier machine, so a wider window.
-
-    **The window is real and it is the product working as designed.**
-    `post-commit` runs `fux ingest --spawn-runner`, which detaches; `diverge`
-    makes two commits per repo, so up to two background runners may still be
-    re-indexing when the merge finishes and the assertions read
-    `.fux/index/*.jsonl`. A test that reads a file another process may rewrite
-    is a race whoever reads the failure will blame on the merge driver.
-
-    `fux daemon stop` is the same `request_stop` every writing verb calls, so
-    this waits through the CLI rather than reaching into the package.
-    """
-    fux(path, "daemon", "stop")
-
-
 def diverge(path: Path, base: str) -> None:
-    """Two branches, each editing a different record in the same shard."""
+    """Two branches, each editing a different record in the same shard.
+
+    `quiesce` after each commit: a hooked repo spawns a detached re-index from
+    `post-commit`, and the next step here reads the very shard it may still be
+    writing. See `quiesce`.
+    """
     git(path, "checkout", "-qb", "x")
     (path / "docs" / "aa.md").write_text(doc("aa TWO"), encoding="utf-8")
     fux(path, "ingest")
     git(path, "add", "-A")
     git(path, "commit", "-qm", "x")
+    quiesce(path)
 
     git(path, "checkout", "-q", base)
     git(path, "checkout", "-qb", "y")
@@ -96,6 +124,7 @@ def diverge(path: Path, base: str) -> None:
     fux(path, "ingest")
     git(path, "add", "-A")
     git(path, "commit", "-qm", "y")
+    quiesce(path)
 
 
 @pytest.mark.skipif(DRIVER is None, reason="fux-merge-index not on PATH (editable install needed)")
@@ -120,9 +149,28 @@ def test_the_driver_resolves_what_git_cannot(tmp_path):
     shard = next((wired / ".fux" / "index").glob("*.jsonl"))
     records = [json.loads(l) for l in shard.read_text().splitlines()[1:]]
     by_id = {r["id"]: r for r in records}
-    # BOTH sides' work survives, each at the ver its own edit produced.
-    assert by_id["file:docs/aa.md"]["ver"] == 2
-    assert by_id["file:docs/gr.md"]["ver"] == 2
+
+    # BOTH sides' work survives: each record describes the merged file on disk.
+    #
+    # ⚠ **This asserted `ver == 2` until 2026-09-11, and that number is not a
+    # property of the merge** (W-140 row 19). `ver` counts how many times a
+    # document's sha has CHANGED in the index it is compared against — and on a
+    # hooked repo, `post-commit` spawns a detached re-index and the test bounces
+    # between three checkouts, so how many passes ran against which committed
+    # shard varies with machine load. It was seen at 1 (a pass had not landed)
+    # and at 4 (several had), and neither number says anything about whether the
+    # driver merged correctly.
+    #
+    # The sha does. It is derived from the file's bytes, so *the index describes
+    # the merged working tree* is exactly the claim this test exists to make,
+    # and nothing about scheduling can inflate it.
+    for rel in ("docs/aa.md", "docs/gr.md"):
+        record = by_id[f"file:{rel}"]
+        assert record["sha"] == _content_sha(wired / rel), (
+            f"{rel}: the merged index does not describe the merged file — "
+            "one side's work was lost"
+        )
+        assert record["ver"] >= 2, f"{rel}: the record never saw its branch's edit"
 
 
 def test_hooks_install_and_report_their_state(tmp_path):

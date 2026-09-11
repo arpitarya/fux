@@ -522,6 +522,36 @@ that had already finished, and one was reachable from nowhere at all:
    differs from the built-in default for its extension is a line somebody
    typed, and that is the only place a typo can be.
 
+**`.fux/.gitignore` carries a FOURTH kind of line: `__pycache__/`** (W-140
+row 18, 2026-09-11). It is not a plane and never will be — it is CPython's
+litter beside the modules `fux setup` writes into `.fux/decoders/` and
+`.fux/fetchers/`, which ingest imports on the first run.
+
+- **A repo whose own `.gitignore` carries the Python line never saw it**, which
+  is why it survived: every repo fux was developed in had one. A repo that does
+  not gets untracked bytecode inside the directory fux has just told it to
+  commit.
+- **By NAME and as a directory**, never `*.py[co]` and never a wildcard — a
+  consumer's decoder and fetcher are committed Python, and an ignore that
+  reached them would drop the product from git silently. That is the rule at
+  the top of this file, holding for a line that is not a plane.
+
+**The starter `.fux/sources/urls` header is DERIVED from the list spec**, not
+transcribed. It said *"Two attributes, and the set is closed"* while the spec
+had grown to seven, and *"`fux update` re-fetches every line"*, which stopped
+being true when narrow-by-default landed and again when `update=never` did.
+Every repo set up in between committed both sentences. `_seed_types` already
+had the rule this needed — *derived, never transcribed* — so the file cannot
+disagree with the engine that wrote it.
+
+**`fux setup` announces a hand-written `AGENTS.md`, not its own.** The
+announcement fires on a file fux did not write; it read *kept* instead, so
+every run after the first re-printed the entire template at a file fux had
+written, which already says what the note says is missing. The policy marker
+decides it now — the same marker `tests/test_agent_policy_agreement.py`
+compares on, so the two cannot disagree about what *fux's policy is in this
+file* means.
+
 ### Consequences
 
 - **The dotdir is safe to explain in one table.** A newcomer's first question —

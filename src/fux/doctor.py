@@ -482,7 +482,11 @@ def _redaction_note(root: Path, rules) -> str:
                 " (enrichment counts cover the documents that run re-extracted, not the "
                 "whole corpus - `fux ingest --full` counts all of them)"
             )
-    note += ". A big number is a hint, not a finding: see tools/pii-probe/"
+    # ⚠ **`tools/pii-probe/` is in the fux REPOSITORY, not in the wheel**
+    # (W-140 row 18): `packages = ["src/fux"]`. Pointing a consumer at a path
+    # they do not have is worse than pointing at nothing, so this names the
+    # skill `fux setup` wrote into their repo, which carries a copy.
+    note += ". A big number is a hint, not a finding: probe it (the `fux-pii` skill carries the script)"
     return note
 
 

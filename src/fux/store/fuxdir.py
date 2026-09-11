@@ -104,6 +104,15 @@ _GITIGNORE = (
     "# reachable. Both are ignored; only one can be regenerated.\n"
     + "".join(f"{name}/\n" for name in DERIVED)
     + "".join(f"{name}/\n" for name in ACQUIRED)
+    # ⚠ **Not a plane -- CPython's litter beside the committed Python**
+    # (W-140 row 18, 2026-09-11). `fux setup` writes real modules into
+    # `.fux/decoders/` and `.fux/fetchers/` and ingest imports them, so
+    # `__pycache__/` appears next to files a consumer is supposed to commit.
+    # Every repo whose own .gitignore happens to carry the Python line was
+    # fine; one that does not sees untracked bytecode in the directory fux
+    # just told them to commit. By NAME, like everything else here, and
+    # matching at any depth under `.fux/` is exactly the scope wanted.
+    + "__pycache__/\n"
 )
 
 

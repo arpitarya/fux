@@ -418,3 +418,68 @@ def test_setup_writes_the_pii_starter_and_never_rewrites_it(tmp_path):
     path.write_text("# redact nothing, on purpose\n", encoding="utf-8")
     setup_mod.run(tmp_path, agents=False)
     assert path.read_text(encoding="utf-8") == "# redact nothing, on purpose\n"
+
+
+# -- W-140 row 18: three statements fux shipped that were not true -----------
+
+
+def test_a_re_run_of_setup_does_not_re_print_the_agents_snippet(tmp_path, capsys):
+    """It printed the whole template on EVERY run after the first.
+
+    The note is for a repo whose `AGENTS.md` fux did not write — *nothing here
+    tells them the index exists*. After one `fux setup`, the file that gets
+    kept is fux's own, which says exactly that, and the announcement fired on
+    it anyway.
+    """
+    from fux import setup as setup_mod
+
+    setup_mod.run(tmp_path)
+    capsys.readouterr()
+
+    report = setup_mod.run(tmp_path)
+    assert (tmp_path / "AGENTS.md").is_file()
+    assert not report.skipped_agents_md, "fux's own AGENTS.md is not a hand-written one"
+
+
+def test_a_hand_written_agents_md_still_gets_the_snippet(tmp_path):
+    """The case the announcement exists for, unchanged."""
+    from fux import setup as setup_mod
+
+    (tmp_path / "AGENTS.md").write_text("# our own house rules\n", encoding="utf-8")
+    report = setup_mod.run(tmp_path)
+    assert report.skipped_agents_md
+
+
+def test_the_urls_header_is_derived_from_the_spec(tmp_path):
+    """It said *"Two attributes, and the set is closed"* while there were seven.
+
+    `keep`, `ttl`, `enrich`, `archived` and `update` all landed after the header
+    was written, and every repo set up in between committed the sentence.
+    """
+    from fux.ingest.sourcelist import URLS
+    from fux.setup import _urls_header
+
+    header = _urls_header()
+    assert f"# {len(URLS.attributes)} attributes" in header
+    for attr in URLS.attributes:
+        assert f"{attr.name}=" in header, f"{attr.name} is in the spec and not in the header"
+
+
+def test_the_urls_header_does_not_promise_a_full_sweep(tmp_path):
+    """`fux update` stopped re-fetching every line when narrow-by-default landed."""
+    from fux.setup import _urls_header
+
+    assert "re-fetches every line" not in _urls_header()
+
+
+def test_the_starter_pii_file_points_at_a_probe_the_consumer_has(tmp_path):
+    """`tools/pii-probe/` is in the fux repository, not in the wheel.
+
+    Pointing a consumer at a path they do not have is worse than pointing at
+    nothing: they conclude their install is broken.
+    """
+    from fux.setup import template_bytes
+
+    starter = template_bytes("pii.toml.txt").decode("utf-8")
+    assert "python3 tools/pii-probe/probe.py" not in starter
+    assert "fux-pii" in starter, "name the skill that actually carries the script"

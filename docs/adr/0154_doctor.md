@@ -257,6 +257,12 @@ shape for **this** file specifically:
   answer a question the real one does not ask — decision 6's *name the fix*
   with the fix's own words.
 
+**The redaction note names an instrument the reader has** (W-140 row 18,
+2026-09-11). It ended *see tools/pii-probe/* — a path that exists in the fux
+repository and in no consumer's install. It names the `fux-pii` skill instead,
+which `fux setup` wrote into their repo. See
+[ADR-PII](0150_pii.md) decision 20.
+
 ### Consequences
 
 - ✅ **A change to one check opens two records, not eight** — this one, and the

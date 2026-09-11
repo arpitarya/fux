@@ -89,6 +89,11 @@ DECODERS_DIR = "decoders"
 AGENTS_FILE = "AGENTS.md"
 AGENTS_TEMPLATE = "AGENTS.md"
 
+#: The begin marker of the verbatim policy block, matched by PREFIX exactly as
+#: `tests/test_agent_policy_agreement.py` matches it — the marker line carries a
+#: trailing reminder, so the full line is not a stable string to compare.
+POLICY_BEGIN = "<!-- fux:policy:begin v1"
+
 #: **The operating guides** (ADR-AGENT-POLICY decision 15, Arpit 2026-09-11):
 #: one skill per job the CLI supports, written to every skill surface from ONE
 #: template each -- decision 10's agreement by construction, ten more times.
@@ -512,20 +517,43 @@ install = ["claude", "codex", "copilot", "kiro"]
 #: object, so the comment cannot drift from the behaviour the way the constant
 #: itself did before W-83 made it effective. `tests/test_setup.py` asserts it.
 
-_URLS_HEADER = """\
+def _urls_header() -> str:
+    """The starter `.fux/sources/urls`, with its attribute table DERIVED.
+
+    ⚠ **It was transcribed, and it went stale** (W-140 row 18, fixed
+    2026-09-11). The header said *"Two attributes, and the set is closed"*
+    while the spec had grown to seven — `keep`, `ttl`, `enrich`, `archived`
+    and `update` all landed after it was written — and it said
+    *"`fux update` re-fetches every line"*, which stopped being true when
+    narrow-by-default landed (W-82 ruling 3) and again when `update=never` did.
+    Every repo set up in between got both sentences committed into it.
+
+    `_seed_types` already had the rule: **derived, never transcribed**, so the
+    file cannot disagree with the engine that wrote it.
+    """
+    from .ingest.sourcelist import URLS
+
+    pairs = [
+        (f"{a.name}={'|'.join(a.values) if a.values else '<duration>'}", a.default)
+        for a in URLS.attributes
+    ]
+    width = max(len(spelling) for spelling, _ in pairs)
+    table = "\n".join(f"#   {spelling:<{width}}  default {default}" for spelling, default in pairs)
+    return f"""\
 # The URLs fux indexes. One per line. `#` starts a comment at the start of a
 # line or after whitespace -- NOT inside a URL, so a fragment survives.
 #
-# Two attributes, and the set is closed:
-#   fetch=http|cdp    which file under .fux/fetchers/ retrieves this URL
-#   meta=hashed|plain whether the index may hold readable display text
+# {len(URLS.attributes)} attributes, and the set is closed:
+{table}
 #
 #   https://example.com/handbook/oncall    fetch=http meta=hashed
-#   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed
+#   https://wiki.corp/display/ENG/runbook  fetch=cdp  meta=hashed ttl=7d
 #
 # `fux add <URL>` writes a line here with every attribute stated, and fetches
-# that one URL. `fux update` re-fetches every line. Those are the engine's two
-# networked paths; every other command is offline. See ADR-URL-LIST.
+# that one URL once. `fux update` re-fetches the lines known to be stale --
+# `--all` every line, `--failed` the ones whose last run failed, and never a
+# line that says `update=never`. Those are the engine's two networked paths;
+# every other command is offline. See ADR-URL-LIST.
 """
 
 
@@ -775,6 +803,20 @@ def _write_agents(root: Path, report: SetupReport, agents: tuple[str, ...]) -> N
                 report.outside.append(rel)
 
 
+def _carries_policy(path: Path) -> bool:
+    """Does this `AGENTS.md` already carry fux's policy block?
+
+    The same marker `tests/test_agent_policy_agreement.py` compares on, so the
+    two cannot disagree about what "fux's policy is in this file" means. A
+    consumer who pasted the snippet by hand counts as carrying it — which is
+    the point: they were told once and they did it.
+    """
+    try:
+        return POLICY_BEGIN in path.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+
+
 def _write_root_agents(root: Path, report: SetupReport) -> None:
     """Write `AGENTS.md`, or announce that we did not — W-82 ruling 16.
 
@@ -792,7 +834,14 @@ def _write_root_agents(root: Path, report: SetupReport) -> None:
     # DECLARED, never sniffed*. Reading the outcome off the report keeps one
     # decision in one place instead of two that can disagree.
     _write_if_missing(root / AGENTS_FILE, agent_template_bytes(AGENTS_TEMPLATE), report, root)
-    if AGENTS_FILE in report.kept:
+    if AGENTS_FILE in report.kept and not _carries_policy(root / AGENTS_FILE):
+        # ⚠ **Kept is not the same as HAND-WRITTEN** (W-140 row 18, fixed
+        # 2026-09-11). After the first `fux setup`, fux's own `AGENTS.md` is
+        # the file that gets kept — so every later run printed *this repo
+        # already has AGENTS.md ... nothing here tells them the index exists*
+        # and re-printed the whole template, about a file fux had written that
+        # says exactly that. The announcement is for a file fux did NOT write,
+        # so the policy marker is what decides it, not the report.
         report.skipped_agents_md = True
     if len(report.written) > before:
         # Repo root is outside `.fux/`, so decision 6's announcement applies
@@ -832,7 +881,7 @@ def run(root: Path, *, agents: bool = True) -> SetupReport:
         )
 
     _write_if_missing(root / DEFAULT_DIRS_FILE, _seed_dirs(root), report, root)
-    _write_if_missing(root / DEFAULT_URLS_FILE, _URLS_HEADER.encode("utf-8"), report, root)
+    _write_if_missing(root / DEFAULT_URLS_FILE, _urls_header().encode("utf-8"), report, root)
     # Header only, no patterns: an ignore file that arrives with guesses in it
     # is one whose first act is to hide a document nobody asked it to hide.
     # Empty is a legal, meaningful state here (ADR-FUXIGNORE decision 6) in a

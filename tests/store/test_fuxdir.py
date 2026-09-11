@@ -31,21 +31,43 @@ def test_ensure_layout_never_overwrites_consumer_edits(tmp_path):
     assert (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8") == "mine too\n"
 
 
-def test_gitignore_lists_only_derived_dirs_and_never_a_wildcard(tmp_path):
+def test_gitignore_lists_the_derived_planes_the_blobs_and_the_bytecode(tmp_path):
     """⚠ **Gitignored is not the same as derived** (ADR-ACQUIRED).
 
     `acquired/` is the third category: gitignored like `runtime/` and *not*
     rebuildable, because a blob can only be re-ACQUIRED and only while the
     source still answers. It belongs in this file for the same reason
     `runtime/` does and in `DERIVED` for none.
+
+    ⚠ **`__pycache__/` is a FOURTH kind and not a plane at all** (W-140 row
+    18): CPython's litter beside the modules `fux setup` writes into
+    `.fux/decoders/` and `.fux/fetchers/`, which ingest imports. Without the
+    line, a repo whose own `.gitignore` lacks the Python entry shows untracked
+    bytecode inside the directory fux just told it to commit.
     """
     fuxdir.ensure_layout(tmp_path)
     text = (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8")
     entries = [l.strip() for l in text.splitlines() if l.strip() and not l.startswith("#")]
-    assert entries == [f"{name}/" for name in (*fuxdir.DERIVED, *fuxdir.ACQUIRED)]
+    assert entries == [
+        *(f"{name}/" for name in (*fuxdir.DERIVED, *fuxdir.ACQUIRED)),
+        "__pycache__/",
+    ]
     assert "*" not in entries
     for committed in fuxdir.COMMITTED:  # a committed plane must never be listed
         assert f"{committed}/" not in entries
+
+
+def test_the_bytecode_rule_does_not_hide_a_committed_python_file(tmp_path):
+    """The line is `__pycache__/` — a directory — never `*.py[co]` or a wildcard.
+
+    A consumer's decoder and fetcher are committed Python. An ignore that
+    reached them would drop the product from git silently, which is the exact
+    failure the no-wildcard rule above exists to prevent.
+    """
+    fuxdir.ensure_layout(tmp_path)
+    text = (tmp_path / ".fux" / ".gitignore").read_text(encoding="utf-8")
+    assert "*.py" not in text
+    assert "__pycache__/" in text.splitlines()
 
 
 def test_generated_files_are_ascii_with_lf_only(tmp_path):

@@ -61,6 +61,17 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- **Four things `fux setup` shipped that were not true.** `.fux/.gitignore`
+  carries `__pycache__/`, so the bytecode beside a consumer's committed decoder
+  and fetcher stops showing as untracked. A re-run no longer re-prints the whole
+  `AGENTS.md` snippet at the file fux itself wrote. The starter
+  `.fux/sources/urls` header is generated from the list spec — it said *two
+  attributes* while there were seven, and promised `fux update` re-fetches every
+  line, which narrow-by-default ended. The starter `pii.toml` and `doctor` stop
+  pointing at `tools/pii-probe/probe.py`, which ships in the repository and not
+  in the wheel; both name the `fux-pii` skill, which carries the script.
+  **Existing repos keep their files** — setup is write-if-missing.
+
 - 🔴 **`fux hooks` installed nothing in a repo with `[cli.json] enabled = true`.**
   It read the resolved `--json` to choose between installing and reporting, and
   the output config fills that field — so the command whose job is to wire the

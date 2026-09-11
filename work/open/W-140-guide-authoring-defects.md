@@ -37,7 +37,6 @@ then refresh this repo's renderings.
 | 15 | **No fetch timeout is enforced** — `timeout_seconds` is recorded and read nowhere. | `refer/freshness.py` ~44 | ADR-REFER |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
 | 17 | **Starter refusal rules refuse real wiki pages** (`viewpage.action`, `.aspx`, `.php`); `suspiciously-small-document`'s comment says *warn* but it refuses. **(guide: FETCHER)** | `templates/refusals.toml.txt` | ADR-REFUSAL |
-| 18 | **Small ones:** `.fux/.gitignore` misses `__pycache__/` under `decoders/`/`fetchers/`; a re-run of `setup` always prints the `AGENTS.md` paste note; the generated `urls` header says "two attributes" and "re-fetches every line"; the starter `pii.toml` and doctor point at `tools/pii-probe/probe.py`, which is not in the package. | `setup.py`, `store/fuxdir.py`, `doctor.py` ~484 | ADR-DOTFUX · ADR-PII |
 | 20 | ⚠ **The freshness gate's `describes` relation is per FILE, so a change to one function in `ingest/run.py` demands a line in three records that do not describe it.** Twice in one session (2026-09-11) that produced a record edit whose only content was *nothing here changed*. Per-symbol describes, or an explicit exemption, would fix it | `tests/test_adr_freshness.py`, `docs/adr/README.md` §Ownership | ADR-OWNERSHIP |
 
 ## 2 · Records that disagree with the code
@@ -93,16 +92,28 @@ then refresh this repo's renderings.
   what a verbatim surface capture cannot prove: that a flag is read, not merely
   accepted. 2026-09-11.
 
-- **Row 19 — the merge-driver e2e test raced a background re-index.** It fired
-  a **second** time the same day, which is CLAUDE.md's two-strikes trigger, so
-  it is a gate rather than another note. Diagnosed: `post-commit` runs
-  `fux ingest --spawn-runner`, `diverge` makes two commits per repo, and the
-  assertions read `.fux/index/*.jsonl` while up to two detached runners may
-  still be writing — the product working as designed, and a test reading a file
-  another process may rewrite. `quiesce()` calls `fux daemon stop` (the same
-  `request_stop` every writing verb calls) before the read. Both failures were
-  inside a combined `tests tests_e2e` run; two such runs are clean after.
-  2026-09-11.
+- **Row 19 — the merge-driver e2e test asserted a number that is not a
+  property of the merge.** ⚠ **The first diagnosis was wrong and the first gate
+  did not hold** — it failed again the same day with the quiesce in place, and
+  the third failure is what gave the real answer.
+
+  - **What it asserted:** `ver == 2` on both records after the merge. `ver`
+    counts how many times a document's sha has **changed relative to the index
+    it is compared against** — and this fixture bounces between three checkouts
+    on a hooked repo, where `post-commit` spawns a detached re-index. How many
+    passes land against which committed shard varies with machine load. It was
+    observed at **1** (a pass had not landed) and at **4** (several had), and
+    neither number says anything about whether the driver merged correctly.
+  - **What it asserts now:** each record's `sha` equals the content sha of the
+    merged file on disk — *the index describes the merged working tree*, which
+    is the claim the test exists to make, and nothing about scheduling can
+    inflate it. `ver >= 2` keeps the *an edit happened* signal.
+  - **`quiesce()` stays and moved earlier** — after every hooked commit, not
+    just before the final read. Staging a shard a detached runner may be
+    rewriting is a real hazard even when nothing asserts on it.
+  - ⚠ **The merge driver was never the defect**, and two sessions' worth of
+    suspicion pointed at it because the failing assertion sat under it.
+    2026-09-11.
 
 - **Row 13 — `fux doctor` had no `tune.toml` row.** The worst shape for this
   file: `fux ingest` reads only `[index]`, so a bad ranking knob leaves a clean
@@ -151,6 +162,18 @@ then refresh this repo's renderings.
   resolver keeps the flag as typed so an explicit `fux hooks --json` still
   reports. **ADR-OUTPUT's claim that a rendering config's blast radius is the
   resolver was false for one verb** and now says so. 2026-09-11.
+
+- **Row 18 — the four small ones, all four of them statements fux shipped that
+  were not true.** `.fux/.gitignore` now carries `__pycache__/` (by name, as a
+  directory — a wildcard would drop a consumer's committed decoder from git);
+  `fux setup` announces a **hand-written** `AGENTS.md` rather than re-printing
+  the whole template at the file it wrote itself, decided by the policy marker;
+  the starter `urls` header is **derived from the list spec**, so it can no
+  longer say *two attributes* while there are seven, or promise a full sweep
+  `fux update` stopped doing; and the starter `pii.toml` and `doctor`'s
+  redaction note stop pointing at `tools/pii-probe/probe.py`, which is in the
+  repository and not in the wheel. ADR-DOTFUX, ADR-PII decision 20, ADR-DOCTOR.
+  2026-09-11.
 
 ## Definition of done
 

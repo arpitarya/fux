@@ -169,6 +169,12 @@ lines and names the ones with no retained bytes. It is coherent for a document
 that genuinely never changes and surprising to have chosen by accident, which is
 a warning's shape rather than a refusal's.
 
+⚠ **Touched 2026-09-11 by a change to `.fux/.gitignore`'s generator that this
+record does not describe.** `__pycache__/` joined the file
+([ADR-DOTFUX](0102_fux-directory.md)); `acquired/`'s line, and the reason it is
+gitignored-but-not-derived, are unchanged. Recorded here because the freshness
+gate reads whole files and a reader deserves to know which half moved.
+
 ### Consequences
 
 **Easier.** A citation can be checked offline against the exact bytes that produced it — a stronger claim than comparing two fetches, which is why `refer/source.py` verifies with the same fetcher a document was ingested with: *a document fetched two ways is two documents*. A retained original removes that whole class of false staleness, and the browser-session fetcher stops being needed at answer time.
