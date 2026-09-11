@@ -510,6 +510,21 @@ it.
   radius is the resolver. Any other verb that branches on `args.json` for
   anything but formatting has the same defect.
 
+**The background pass rebuilds the derived accelerator** (W-140 row 11,
+2026-09-11). `ingest_and_report` — the path every CLI verb takes — builds it
+where the shards were just written, *so `ask` never pays for a build*. The
+runner calls `run()` directly and skipped that, so **the job whose whole
+purpose is keeping a repo current left the one derived plane behind** and
+handed the cost to the next `--fast` query.
+
+- **Best-effort, and after the outcome is decided.** The accelerator is
+  disposable by design, the shards are already written and correct, and a build
+  failure must never turn a successful re-index into a reported failure. It is
+  recorded in the run status instead, where `fux doctor` can read it.
+- **A missed build was never a wrong answer**, because `accel.is_fresh` checks
+  the build stamp against the shards — it was a slower query and a plane that
+  quietly stopped being maintained by the thing that maintains everything else.
+
 ### Consequences
 
 - **There is no path into a committed shard that skips L5.** That is the

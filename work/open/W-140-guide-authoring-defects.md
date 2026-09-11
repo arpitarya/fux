@@ -30,7 +30,6 @@ then refresh this repo's renderings.
 |---|---|---|---|
 | 6 | **`answer` runs with the fetch cache off**: `ttl=` never applies, `cached` is unreachable, `update=never` does not stop the answer-time fetch. | `query/refer_answer.py` ~104 | ADR-URL-FRESHNESS d11/d15 · ADR-REFER d20 · ADR-ACQUIRED |
 | 7 | **`verify` misreports**: a `source: index` receipt and an unreachable URL both give `drifted:corpus`, not `unverifiable`; `--rerun` fetches. **(guide: ANSWER)** | `query/__init__.py` ~994, ~1075 | ADR-PROVENANCE d14 |
-| 11 | **The background runner never rebuilds the accelerator.** | `maintain/runner.py` ~534 | ADR-MAINTENANCE 2a |
 | 12 | **`fux path --hops` is unbounded** — `--hops 7` runs over a minute on ~960 documents, because simple-path enumeration grows steeply and one shared tag makes a thousand documents mutually two hops apart. **Three answers, none obviously right: cap the argument, warn above a threshold, or bound the walk's work.** A fork, so it needs a compare doc — [ADR-GRAPH](../../docs/adr/0126_graph.md) §Consequences states it | `graph/walk.py`, `cli.py` | ADR-GRAPH |
 | 14 | **`fux update --check` always exits 0** and has no `--json`. **(guide: INDEX, MAINTAIN)** | `sources.py` | ADR-CLI |
 | 16 | **URL documents keep old redactions after a `pii.toml` change** until re-fetched, `--full` included — the record says this only for `update=never`. **(guide: PII)** | `ingest/run.py` ~187 | ADR-PII |
@@ -201,6 +200,15 @@ then refresh this repo's renderings.
   Python cannot interrupt a blocking socket in consumer code. A timeout raises
   `FuxError`, so it degrades down the path that already existed.
   [ADR-REFER](../../docs/adr/0127_refer-plane.md). 2026-09-11.
+
+- **Row 11 — the background runner never rebuilt the accelerator.** Every CLI
+  verb builds it where the shards are written so `ask --fast` never pays; the
+  runner called `run()` directly and skipped it, leaving the one derived plane
+  stale after every background pass and handing the cost to the next query. It
+  builds now, best-effort and after the outcome is decided — a disposable plane
+  must not turn a correct re-index into a reported failure — and the result is
+  recorded in the run status.
+  [ADR-MAINTENANCE](../../docs/adr/0129_hooks.md). 2026-09-11.
 
 ## Definition of done
 

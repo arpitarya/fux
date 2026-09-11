@@ -361,3 +361,45 @@ def test_a_wedged_runner_refuses_the_write_rather_than_racing_it(tmp_path, monke
 
     with pytest.raises(FuxError, match="did not stop when asked"):
         ingest_and_report(tmp_path, Args())
+
+
+# -- W-140 row 11: the background pass left the derived plane behind ---------
+
+
+def test_a_background_pass_rebuilds_the_accelerator(tmp_path):
+    """🔴 It re-indexed and left the accelerator stale, every time.
+
+    `ingest_and_report` — the path every CLI verb takes — builds the
+    accelerator where the shards were just written, so `ask --fast` never pays
+    for a build. The runner calls `run()` directly and skipped it, so the job
+    whose whole purpose is keeping a repo current left the one derived plane
+    behind and handed the cost to the next query.
+    """
+    from fux.derive import accel
+
+    _corpus(tmp_path)
+    assert runner.run_once(tmp_path) == "ok"
+
+    assert accel.is_fresh(tmp_path), "the accelerator does not match the shards just written"
+    assert runner.last_run(tmp_path)["accelerator"] == "built"
+
+
+def test_a_failed_accelerator_build_does_not_fail_the_re_index(tmp_path, monkeypatch):
+    """The shards are already written and correct.
+
+    The accelerator is disposable by design — `fux build` recreates it from the
+    committed index — so a build failure must be recorded, never turned into a
+    reported failure of a re-index that succeeded.
+    """
+    import fux.derive
+
+    _corpus(tmp_path)
+
+    def explode(root, **kwargs):
+        raise RuntimeError("no space left")
+
+    monkeypatch.setattr(fux.derive, "build", explode)
+    assert runner.run_once(tmp_path) == "ok"
+    status = runner.last_run(tmp_path)
+    assert status["outcome"] == "ok"
+    assert "no space left" in status["accelerator"]

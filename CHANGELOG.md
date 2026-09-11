@@ -61,6 +61,13 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- **The background re-index rebuilds the accelerator.** Every CLI verb builds
+  it where the shards are written, so `ask --fast` never pays for one; the
+  detached runner skipped it, leaving the derived plane stale after every
+  background pass. Best-effort and recorded in the run status — a disposable
+  plane must not fail a correct re-index
+  ([ADR-MAINTENANCE](docs/adr/0129_hooks.md)).
+
 - 🔴 **The answer-time fetch timeout bounded nothing.** `timeout_seconds` was
   validated, stamped into every answer bundle and printed by `--audit`, and no
   code read it — so a consumer fetcher that blocked forever hung `fux answer`

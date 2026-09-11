@@ -565,7 +565,35 @@ def run_once(root: Path) -> str:
             if not dirty.read(root) or passes >= MAX_PASSES:
                 break
 
-        _write_status(root, "ok", docs=report.doc_count, changed=report.changed_count, passes=passes)
+        # ⚠ **The derived accelerator was left stale by every background pass**
+        # until 2026-09-11 (W-140 row 11). `ingest_and_report` — the path every
+        # CLI verb takes — rebuilds it right where the shards were written, so
+        # `ask --fast` never pays for a build. This runner calls `run()`
+        # directly and skipped that, so the job that exists to keep a repo
+        # current left the one derived plane behind, and the next `--fast`
+        # query paid the cost the runner was supposed to absorb.
+        #
+        # **Best-effort, and after the status is decided.** The accelerator is
+        # disposable by design (`fux build` recreates it from the committed
+        # index), so failing to build one must never turn a successful
+        # re-index into a reported failure — the shards are already written and
+        # correct. The stamp check makes a missed build a slower query, never a
+        # wrong answer.
+        accelerator = "built"
+        try:
+            from ..derive import build as build_accelerator
+
+            build_accelerator(root)
+        except Exception as exc:  # noqa: BLE001 - recorded, never fatal
+            accelerator = f"failed: {type(exc).__name__}: {exc}"
+        _write_status(
+            root,
+            "ok",
+            docs=report.doc_count,
+            changed=report.changed_count,
+            passes=passes,
+            accelerator=accelerator,
+        )
         return "ok"
     finally:
         release(root)
