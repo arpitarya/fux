@@ -43,6 +43,19 @@ history is archived at [`archive/v0.26/CHANGELOG.md`](archive/v0.26/CHANGELOG.md
 
 ### Fixed
 
+- 🔴 **`.jsonl` and `.json` documents lost their title.** Since 2026-09-06 a
+  record-oriented decoder emitted `## Record 1` / `## Item 1` as its **first**
+  heading and no document title, so `extract.py`'s shallowest-heading rule made
+  *every* such document titled `Record 1` — in a heavily-weighted field.
+  Measured over this repo: **96 documents** (86 `.jsonl`, 10 `.json`) lost a real
+  title and **not one gained anything**
+  ([the run](work/regression/2026-09-11-w116-chunking/report.md),
+  [ADR-DECODE](docs/adr/0049_decode.md) decision 11a). Both decoders now emit a
+  `# <filename>` title with the records as siblings beneath it — which is what
+  `DECODER-SKILL.md` told decoder authors to do all along.
+  - ⚠ **Run `fux ingest --full` to pick this up.** Reuse is keyed on a
+    document's content sha and a decoder change moves no bytes, so a plain
+    `fux ingest` carries the old records forward.
 - **The shipped `fux-decoder` skill was missing its chunking section.** Fux's own
   committed rendering had gained it and the **template had not**, so every
   `fux setup` since shipped a decoder guide with no explanation of how a

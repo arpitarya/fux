@@ -49,6 +49,15 @@ failure mode here with a perfect record.
 
 ### fux build
 
+- 🟢 **W-137 — renumber the ADRs: laws own `0001`–`0100`, every other record starts at `0101`.**
+  `agent` · *(records: the register [`docs/adr/README.md`](../docs/adr/README.md) §The convention ·
+  every record path)* · **Arpit, 2026-09-11.** `0011`–`0100` stay empty as reserved
+  law placeholders (no dummy files); ADR-CLI `0011` → `0101` … ADR-DOCTOR `0064` → `0154`.
+  `scripts/renumber-adrs.py` is written and dry-run clean on a copy (54 moves, 1 639
+  path links in 126 files, no new broken link). **Runs when no other session is
+  mid-change**, as one commit with the convention update, a re-ingest and both suites.
+  — [detail](open/W-137-adr-renumber-laws-to-100.md) `filed: 2026-09-11`
+
 - 🔴 **W-122 — the remainder of L0: the generated `CLAUDE.md` block, the config
   consolidation, and the gate.** `agent` · *(records: ADR-LAW-0 · ADR-LAWS ·
   ADR-CONFIG · ADR-TUNE · ADR-OWNERSHIP)* · ✅ **L0 and the nine-record rename
@@ -115,25 +124,22 @@ failure mode here with a perfect record.
   [`golden/README.md`](golden/README.md) — [detail](open/W-136-golden-benchmark.md)
   `filed: 2026-09-11`
 
-- 🔴 **W-116** · `agent` · *(record: [ADR-RS](../docs/adr/0043_predictions.md))* ·
-  **W-115 re-ranked the corpus and NOTHING was measured.** Two populations
-  moved: every document containing a fenced code block (the fence fix — in this
-  repo, most of them), and every document of the formats whose decoder gained a
-  heading skeleton or a depth cap. Arpit ruled on 2026-09-06 that these land as
-  **defect fixes** rather than wait on a measurement — a `# comment` in a bash
-  block was never a heading — and that ruling is recorded in all three ADRs.
-  ⚠ **What it does not do is make them measured**, and no doc may cite them as
-  such. ✅ **UNBLOCKED 2026-09-11 — both stated blockers are gone.** `fux-lab` was
-  never missing (W-56 rebuilt it 2026-08-20), and the playground now has a current
-  index and a `check.py --rows` writer (W-134, playground `fece5a3`). **Nothing
-  is waiting: this is a paired before/after run someone can start.**
-  ⚠ **Report it under [ADR-RS](../docs/adr/0043_predictions.md) decision 22** —
-  per endpoint, per direction, observed/proven/unproven. 🔴 **Compute the headroom
-  FIRST**: the 2026-09-11 four-priors probe found three of four ranking priors
-  move 0 of 50 goldens on this corpus, so *"this corpus can see the change"* is
-  a thing to establish rather than assume. The arms are two engine builds, so the
-  index must be rebuilt under each — the fence fix changes extraction.
-  `filed: 2026-09-06`
+- 🔴 **W-115 is STILL UNMEASURED FOR QUALITY, and now it is known why.** `agent`,
+  **needs a corpus decision** · *(records: [ADR-RS](../docs/adr/0043_predictions.md) ·
+  [ADR-DECODE](../docs/adr/0049_decode.md))* · ⚠ **W-116 itself is CLOSED** — the run is filed
+  ([2026-09-11-w116-chunking](regression/2026-09-11-w116-chunking/report.md)) and it measured
+  **what moved**: 304 of 954 documents (31.9 %) and `+12 560` term entries on fux's own repo,
+  de-confounded from `max_phrases` with a third arm. 🔴 **It also found a regression W-115 shipped
+  and fixed it**: 96 documents (86 `.jsonl`, 10 `.json`) had lost a real title to `Record 1` /
+  `Item 1` in a heavily-weighted field, none gained anything, and the decoder was violating the
+  contract its own skill documents.
+  🔴 **What remains open is the quality question, and it has no instrument.** The corpus with
+  goldens (**playground**) produces a **byte-identical index across the arms** — zero headroom,
+  proven — and the corpus that can see the change (**fux's own repo**) has **no goldens**. So
+  *"did ranking get better?"* cannot be asked today. **No document may cite W-115 as measured.**
+  ⚠ **Do not point this at the playground again**; that is what W-116's row did and it was wrong.
+  **The likely instrument is [W-136](open/W-136-golden-benchmark.md)**, whose whole purpose is a
+  graded corpus at scale. `filed: 2026-09-06` · `re-scoped: 2026-09-11`
 
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0045_tuning.md) ·
   [ADR-RS](../docs/adr/0043_predictions.md))* · **the knob sweep — which

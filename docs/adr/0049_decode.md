@@ -256,6 +256,39 @@ agent-facing half of a record, which is not where a consumer looks.**
   during the build produced plausible text rather than an error, and a test
   asserting *decoding succeeded* passes on every one of them.**
 
+**11a. 🔴 A record-oriented decoder emits a `# <filename>` TITLE, and the
+records as SIBLINGS beneath it.** Measured 2026-09-11 and fixed the same day.
+
+- **What went wrong.** `jsonl` and `json`'s record-array branch gained a
+  per-record `## Record N` / `## Item N` heading on 2026-09-06 so that
+  `refer/_chunk.py` had a boundary to split on — correct, and it emitted **no
+  document title at all**. `extract.py` takes the **shallowest** heading, so
+  every such document was titled **`Record 1`** in a heavily-weighted field.
+- **The measurement** ([W-116's run](../../work/regression/2026-09-11-w116-chunking/report.md)):
+  over this repo's 954 documents, **96 lost a real title to a generic one** —
+  86 `.jsonl` and 10 `.json`, `decoys.jsonl` → `Record 1`,
+  `queries.jsonl` → `Record 1` — and **not one gained anything.** It is
+  strictly a loss.
+- ⚠ **The shipped decoder was violating the contract its OWN skill documents.**
+  `DECODER-SKILL.md` says, in the section restored to the template the same
+  day: *if your format's unit is a slide, message, page or record, emit them as
+  SIBLINGS at one level under a `# <filename>` title*. The guidance was right
+  and the built-in ignored it.
+- **Only on the record-array branch.** A non-array JSON document's own keys
+  already produce a `#`-level heading through `_walk(depth=1)`; prefixing a
+  filename there would demote every real heading by a level for no gain.
+- ⚠ **`toml`, `yaml` and `ini` also emit no filename title** — pre-existing,
+  **not** part of this regression, and **not changed here**: their behaviour
+  did not move in W-115, and widening a defect fix into an unmeasured
+  improvement is how a repair becomes a ranking change nobody measured.
+  Recorded so it is a decision next time rather than a discovery.
+- 🔴 **A decoder change does NOT invalidate carried extraction.** Reuse is keyed
+  on the document's content sha, and a decoder fix moves no document's bytes —
+  so `fux ingest` carries the old records forward and **only `fux ingest --full`
+  applies the fix.** The same hole `pii.toml` and `[index]` each closed with a
+  digest; there is no decoder digest. **Stated, not fixed** — it is
+  [ADR-INGEST](0016_ingest.md)'s reuse key, not this record's.
+
 **12. The enrichment queue — what fux could not read, written down.** Before
 this, **nothing in fux could *say* a document needs a model.**
 [ADR-ENRICH](0047_enrich.md) decision 4 derives scope from a declaration; a

@@ -52,7 +52,17 @@ def decode(raw: bytes, rel_path: str) -> str | None:
             break
     if not records:
         return None
-    lines: list[str] = []
+    # 🔴 **A `# <filename>` TITLE, and the sibling records under it.**
+    # Without it the first `## Record 1` becomes the document's TITLE --
+    # `extract.py` takes the shallowest heading -- so every `.jsonl` in a
+    # corpus was titled "Record 1" in a heavily-weighted field. Measured
+    # 2026-09-11 over this repo: **96 documents** (86 `.jsonl`, 10 `.json`)
+    # lost a real title to a generic one, and **not one gained anything**.
+    # It is also exactly what `DECODER-SKILL.md` tells a decoder author to
+    # do -- *emit them as SIBLINGS at one level under a `# <filename>`
+    # title* -- so the shipped decoder was violating its own documented
+    # contract.
+    lines: list[str] = [f"# {rel_path.rsplit('/', 1)[-1]}"]
     for index, record in enumerate(records, start=1):
         block: list[str] = []
         _walk(record, block, depth=2, label=None)

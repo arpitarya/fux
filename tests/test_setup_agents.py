@@ -475,3 +475,40 @@ def test_a_partial_declaration_without_codex_writes_no_root_agents_file(tmp_path
     (root / "fux.toml").write_text('[sources]\n[agents]\ninstall = ["claude"]\n', encoding="utf-8")
     setup_mod.run(root)
     assert not (root / setup_mod.AGENTS_FILE).exists()
+
+
+def test_this_repos_own_decoders_still_match_the_package_modules():
+    """🔴 **The same drift, a third time, in `.fux/decoders/`.**
+
+    `fux setup` writes the built-in decoders into `.fux/decoders/` **write-if-
+    missing**, and [ADR-DOTFUX](../docs/adr/0012_fux-directory.md) decision 8
+    makes those copies *what actually run* — the package modules are not
+    consulted while a copy exists. So a fix to `src/fux/decode/` reaches **this
+    repository not at all**, silently, exactly as a template fix did not reach
+    `.claude/skills/`.
+
+    **That is correct for a CONSUMER**, whose overrides must survive an upgrade.
+    It is wrong here: fux's own repo is where these modules come from, so its
+    copies are a rendering and must equal their source.
+
+    ⚠ **The gate is scoped to THIS repository and asserts nothing about
+    anyone else's** — a consumer's divergent decoder is the feature.
+
+    **If this fails: fix `src/fux/decode/<name>.py`, then copy it over.**
+    Never the other way round."""
+    root = Path(__file__).resolve().parents[1]
+    package, committed = root / "src" / "fux" / "decode", root / ".fux" / "decoders"
+    if not committed.is_dir():  # pragma: no cover - a checkout without `fux setup`
+        pytest.skip("no .fux/decoders/ in this checkout")
+    drift = []
+    for copy in sorted(committed.glob("*.py")):
+        source = package / copy.name
+        if not source.is_file():
+            drift.append(f"{copy.name}: no module at src/fux/decode/{copy.name}")
+        elif copy.read_bytes() != source.read_bytes():
+            drift.append(f".fux/decoders/{copy.name}  !=  src/fux/decode/{copy.name}")
+    assert not drift, (
+        "this repo's committed decoders have drifted from the package modules they "
+        "were copied from, so a fix in src/fux/decode/ is not what runs here:\n  "
+        + "\n  ".join(drift)
+    )

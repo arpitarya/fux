@@ -81,6 +81,19 @@ def decode(raw: bytes, rel_path: str) -> str | None:
         return None
     lines: list[str] = []
     if _is_record_array(data):
+        # 🔴 **A `# <filename>` TITLE, and the sibling items under it.** Without
+        # it the first `## Item 1` becomes the document's TITLE -- `extract.py`
+        # takes the shallowest heading. Measured 2026-09-11 over this repo: with
+        # `jsonl` this cost **96 documents** a real title in a heavily-weighted
+        # field, and **not one gained anything**. It is also what
+        # `DECODER-SKILL.md` tells a decoder author to do, so the shipped
+        # decoder was violating its own documented contract.
+        #
+        # ⚠ **Only on the record-array branch.** A non-array document's own keys
+        # already produce a `#`-level heading through `_walk(depth=1)`, and
+        # prefixing a filename there would demote every real heading by a level
+        # for no gain.
+        lines.append(f"# {rel_path.rsplit('/', 1)[-1]}")
         # ⚠ **A top-level array emitted NO heading at all until 2026-09-06.**
         # `_walk` on a list with `label=None` emits nothing and recurses, so an
         # export of six records decoded to one undivided block: `refer/_chunk.py`
