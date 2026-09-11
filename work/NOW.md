@@ -1,1 +1,1 @@
-✓ W-137 — the ADR renumber landed: laws own 0001–0100, every other record 0101+ (54 moved). → W-122 next, unblocked.
+✓ OPEN-WORK cleaned (369→336): six tombstone blocks gone, W-110's voided gate and W-87's stale W-134 blocker corrected. → W-122 next.

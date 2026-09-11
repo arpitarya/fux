@@ -40,7 +40,7 @@ failure mode here with a perfect record.
 |---|---|---|
 | 🔴 **Does the abstention result gate anything?** **Re-run done, and the answer is the same: 20 of 20 `answerable: true`, 0 ids flipped** — fourteen days and five ranking changes later ([the run](regression/2026-09-11-blind-unanswerable-rerun/report.md)). Band, separation and the `separation_floor` are each **demonstrated not to be the lever**. No threshold is proposed and R10 stays unmeasured — picking a floor from these 20 fits it to the set that exposed the problem | 2026-08-28 | 14d |
 | 🔴 **The four no-op priors — pick an instrument, or close the knob.** The remeasure you ordered **cannot run**: three of the four priors move **0 of 50** goldens at every value including `0.0`, because the playground declares no `supersedes:` key on any branch of its history ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **(a)** declare it (one frontmatter line — changes the committed index and every number filed against it), **(b)** build a purpose-made corpus, or **(c)** close the knob on the structural argument, which needs no corpus | 2026-09-11 | 0d |
-| **W-136 phase 1 — run prompt 1 in Codex.** Codex writes the 10 seed documents into `work/golden/seed/` and the ~100 questions with answers into `work/golden/golden-answer/answers.jsonl` (Claude never reads it). Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
+| **W-136 phase 1 — run prompt 1 in Codex.** Codex writes the 10 seed documents into `work/golden/seed/` and ~100 questions with answers — **the key goes where you say**: Codex first asks *file (`golden-answer/answers.jsonl`) or chat?* (Claude never reads it). Prompt: [`golden/prompts/1-codex-seed.md`](golden/prompts/1-codex-seed.md) · process: [`golden/README.md`](golden/README.md) | 2026-09-11 | 0d |
 | **W-87 Part B — accept R-11?** Retarget Part B at the two corpora that exist — the repaired `fux-playground` (10 docs, 50 goldens) and `fux-benchmark` `t10000` — and retire the dependency on `acme`/`orbit`, which were wiped with their generator. Proposal: [`proposals/unblock-2026-09-05.md`](proposals/unblock-2026-09-05.md) R-11 | 2026-08-27 | 15d |
 
 ---
@@ -51,13 +51,12 @@ failure mode here with a perfect record.
 
 - 🔴 **W-122 — the remainder of L0: the generated `CLAUDE.md` block, the config
   consolidation, and the gate.** `agent` · *(records: ADR-LAW-0 · ADR-LAWS ·
-  ADR-CONFIG · ADR-TUNE · ADR-OWNERSHIP)* · ✅ **L0 and the nine-record rename
-  landed** (`5cf30bc`, `5912afb`). **Arpit ruled this
-  2026-09-06**: a rule is stated in exactly one ADR and every other artifact
-  links rather than restates; a record that conflicts with a Law is **void in
-  the conflicting part**; a Law changes only on his ruling, named in the record.
+  ADR-CONFIG · ADR-TUNE · ADR-OWNERSHIP)* · **Arpit ruled this 2026-09-06**: a
+  rule is stated in exactly one ADR and every other artifact links rather than
+  restates; a record that conflicts with a Law is **void in the conflicting
+  part**; a Law changes only on his ruling, named in the record.
 
-  **What is actually left, re-derived 2026-09-11:**
+  **What is left, re-derived 2026-09-11:**
 
   - **`CLAUDE.md`'s law section becomes generated and test-asserted.** It is
     still the normative home and the ruling says it stops being one. Until this
@@ -68,9 +67,8 @@ failure mode here with a perfect record.
     and `src/fux/derive/runtime.schema.json` both still exist (verified
     2026-09-11) and both were assessed documentation-only; the four
     runtime-loaded schemas stay, because they **enforce** rather than
-    **describe**. ⚠ The phantom `[sources] types_file` key was one symptom of
-    exactly this — a schema nothing parses drifts silently. **Removed 2026-09-11
-    (W-130)**: the entry is gone and `load()` refuses the key by name.
+    **describe**. ⚠ A schema nothing parses drifts silently — which is how the
+    phantom `[sources] types_file` key came to exist at all.
   - **The gate R-2 asked for**: ADR-CONFIG's fenced key tree ↔ `config.py` as a
     parser, **both directions**, so *a key is real only if it is in the tree*.
     That is how `acquired_max_bytes` rotted in prose, and how `types_file`
@@ -78,29 +76,13 @@ failure mode here with a perfect record.
 
   — [detail](open/W-122-adrs-are-the-source.md) `filed: 2026-09-06`
 
-- 🟠 **Search v3 — seven items, RATIFIED by Arpit 2026-09-05; all seven now
-  `agent`** · *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 ·
-  one detail file each under [`open/`](open/README.md))* · **Opus** executes,
-  in his stated order: ~~W-108~~ (**landed 2026-09-05** —
-  [IMPLEMENTATION](IMPLEMENTATION.md), [the run](regression/2026-09-05-answer-top3/report.md)) →
-  ~~W-107 Phase 0~~ + ~~W-106~~ (**both measured 2026-09-05** —
-  [`node-log-divergence`](regression/2026-09-05-node-log-divergence/report.md),
-  [`vector-gate`](regression/2026-09-05-vector-gate/report.md); **Phase 0 is
-  CLOSED — Arpit ruled option (b) on 2026-09-06**, W-106 filed **without a
-  verdict** on his ruling) →
-  **W-107 Phases 1–4** → ~~W-109~~ (**landed 2026-09-05, gate 16-0** —
-  [the run](regression/2026-09-05-expand/report.md)) → ~~W-110~~ (**built
-  2026-09-05; its gate is AMBIGUOUS and in the inbox above** —
-  [the run](regression/2026-09-05-doc2query/report.md)) → ~~W-111~~ (**landed
-  2026-09-05** — [the run](regression/2026-09-05-declared-ties/report.md)) →
-  **W-112**. ✅ **W-107 Phases 1–4 are UNBLOCKED**: the last unstruck decision
-  in the ratification — Phase 0's `log()` choice — was ruled **(b), equal after
-  `round(9)`**, on 2026-09-06, and the pre-registration is frozen in full
-  (sha `0e3b4c8`). 🔴 **W-112 alone is still on Arpit**: a corpus and a compare
-  doc. `filed: 2026-09-04` · `ratified: 2026-09-05`
-  - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **MEASURED 2026-09-05, and NO VERDICT FILED** ([the run](regression/2026-09-05-vector-gate/report.md)) — Arpit's ruling, because **DENSE-CHUNK's frozen bar cannot be tested**: the playground's index was `fux.index.v1` (unreadable by this engine) and it has **no enrichment**, so *today's ask* is **28/50** against that control's **32/50**. Retrieval: both correctly-configured arms net **zero** (6/6 and 5/5 fixed/broken) and each moves **1 of 9** vocabulary-gap failures. 🔴 **The finding is reproducibility**: two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, 41/50 top-5 orderings discordant. ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only here) and a corpus.
-  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. **Phase 0 is CLOSED** ([the run](regression/2026-09-05-node-log-divergence/report.md) + [`ADDENDUM-IDF`](regression/2026-09-05-node-log-divergence/ADDENDUM-IDF.md) + [`ADDENDUM-GLIBC`](regression/2026-09-05-node-log-divergence/ADDENDUM-GLIBC.md)). Arpit ruled **(b) — scores equal after `round(9)`, ordering byte-equal** on 2026-09-06; [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is **frozen in full**, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and the rule now lives in [ADR-RANKING decision 8a](../docs/adr/0111_ranking.md). ▶ **Phase 1 starts.** ⚠ The glibc number came from a Linux container, not from [`log-probe.yml`](../.github/workflows/log-probe.yml), which is **still unrun**; musl, Windows and Node 20 stay unmeasured and §4 still requires all three OSes before an arm is called green.
-  - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **STILL BLOCKED, and the blocker changed shape.** W-106 produced no PASS to unblock it, and it produced something the plane's design has to answer: **a pinned committed vector is an artefact of one implementation** — two correct implementations of one model share **0 of 125** int8 vectors ([the run](regression/2026-09-05-vector-gate/report.md)). The determinism claim can only ever be *"same clone + same embedder build"*, never *"same model"*. **Blocked on: a restored corpus (W-87 Part B), a re-run gate, and the compare doc Arpit must rule on.**
+- 🟠 **Search v3 — what is left of it: W-107 Phases 1–4, then W-112.** ·
+  *(spec: [`proposals/search-v3.md`](proposals/search-v3.md) §8 · one detail
+  file each under [`open/`](open/README.md))* · **Opus** executes, in Arpit's
+  ratified order: **W-107 Phases 1–4** → **W-112**. `ratified: 2026-09-05`
+  - **[W-107](open/W-107-node-read-plane.md)** · `agent` · *(**ADR-NODE-SEARCH** new · ADR-RANKING · ADR-MCP)* · the Node read plane — `npx fux-search ask|find|answer|explain|graph|path|mcp`, zero deps, one contract, a third arm of the differential law. ▶ **Phase 1 starts; nothing blocks it.** Phase 0's `log()` question is settled and the rule lives in [ADR-RANKING decision 8a](../docs/adr/0111_ranking.md) — scores equal after `round(9)`, ordering byte-equal; [`PRE-REGISTRATION-NODE.md`](benchmark/PRE-REGISTRATION-NODE.md) is frozen in full, sha `0e3b4c80bf9e6a3ad122cb4e0db4f81adf04693fd47047fa24dd9edc7cb037a7`, and Phases 1–4 build against it. ⚠ **§4 still requires all three OSes before an arm is called green**, and only glibc/arm64 has been touched — [`log-probe.yml`](../.github/workflows/log-probe.yml) is **unrun**, so musl, Windows and Node 20 are unmeasured. `filed: 2026-09-04`
+  - **[W-106](open/W-106-vector-gate.md)** · `agent` · *(no record — a run)* · **the gate is measured and closed without a verdict** (Arpit's ruling — DENSE-CHUNK's frozen bar could not be tested: the playground's index was `fux.index.v1` and it carries no enrichment). 🔴 **What it found instead, and what W-112 has to answer: a pinned committed vector is an artefact of one implementation.** Two implementations of one model agree to **cosine 0.9964** and share **0 of 125** int8 vectors, with 41/50 top-5 orderings discordant ([the run](regression/2026-09-05-vector-gate/report.md)). ⚠ **The DoD's `pooling: mean` is wrong for BGE** and the misconfigured arm scored best. **Still owed: the two-architecture arm** (arm64 only so far) **and a corpus.** `filed: 2026-09-04`
+  - **[W-112](open/W-112-vector-plane.md)** · `arpit` · *(**ADR-VECTORS** new · ADR-DOTFUX · ADR-INGEST · ADR-ASK · ADR-PROVENANCE)* · the vector plane — `fux embed`, pinned `.fux/vectors/`, `--qvec`, rank-space fusion; fux never computes a vector. 🔴 **Blocked on three things:** a restored corpus (W-87 Part B), a re-run gate, and a compare doc Arpit must rule on. ⚠ **The determinism claim the design can actually make is *"same clone + same embedder build"*, never *"same model"*** — W-106's `0 of 125` is why. `filed: 2026-09-04`
 
 ### testing
 
@@ -117,20 +99,15 @@ failure mode here with a perfect record.
 
 - 🔴 **W-115 is STILL UNMEASURED FOR QUALITY, and now it is known why.** `agent`,
   **needs a corpus decision** · *(records: [ADR-RS](../docs/adr/0133_predictions.md) ·
-  [ADR-DECODE](../docs/adr/0139_decode.md))* · ⚠ **W-116 itself is CLOSED** — the run is filed
-  ([2026-09-11-w116-chunking](regression/2026-09-11-w116-chunking/report.md)) and it measured
-  **what moved**: 304 of 954 documents (31.9 %) and `+12 560` term entries on fux's own repo,
-  de-confounded from `max_phrases` with a third arm. 🔴 **It also found a regression W-115 shipped
-  and fixed it**: 96 documents (86 `.jsonl`, 10 `.json`) had lost a real title to `Record 1` /
-  `Item 1` in a heavily-weighted field, none gained anything, and the decoder was violating the
-  contract its own skill documents.
-  🔴 **What remains open is the quality question, and it has no instrument.** The corpus with
-  goldens (**playground**) produces a **byte-identical index across the arms** — zero headroom,
-  proven — and the corpus that can see the change (**fux's own repo**) has **no goldens**. So
-  *"did ranking get better?"* cannot be asked today. **No document may cite W-115 as measured.**
-  ⚠ **Do not point this at the playground again**; that is what W-116's row did and it was wrong.
-  **The likely instrument is [W-136](open/W-136-golden-benchmark.md)**, whose whole purpose is a
-  graded corpus at scale. `filed: 2026-09-06` · `re-scoped: 2026-09-11`
+  [ADR-DECODE](../docs/adr/0139_decode.md))* · **The question has no instrument.**
+  The corpus with goldens (**playground**) produces a **byte-identical index across
+  the arms** — zero headroom, proven — and the corpus that can see the change
+  (**fux's own repo**) has **no goldens**. So *"did ranking get better?"* cannot be
+  asked today, and **no document may cite W-115 as measured.**
+  ⚠ **Do not point this at the playground again** — that has been tried and it was
+  wrong. **The likely instrument is [W-136](open/W-136-golden-benchmark.md)**, whose
+  whole purpose is a graded corpus at scale.
+  `filed: 2026-09-06` · `re-scoped: 2026-09-11`
 
 - **W-97** · `agent` · *(record: [ADR-TUNE](../docs/adr/0135_tuning.md) ·
   [ADR-RS](../docs/adr/0133_predictions.md))* · **the knob sweep — which
@@ -141,28 +118,29 @@ failure mode here with a perfect record.
   knob — the generated suite **selects**, the hand-graded playground **vetoes**
   (bar: 0 broken; `q022`/`q033` named in advance for `superseded_weight`), a
   latency fence **prices**. Output is a **candidate table with no
-  recommendation**; the change stays an ADR-TUNE amendment Arpit ratifies, and
-  the four-priors item's *"remeasure first"* ruling is untouched. ⚠ **A THIRD knob joined on 2026-09-05**: `expand_weight`, shipped at `0.2` (Query2doc's 1:5) and **untested by [W-109's gate](regression/2026-09-05-expand/report.md)**, which ran every arm at that one value. It is the first knob this sweep has a corpus that can actually see move — 16 goldens changed state under it. ⚠ **And `rerank_weight` now moves TWO mechanisms**, not one: since W-108 it also scales the refer plane's passage proximity, which the sweep's design assumed it did not. **Re-derived in code and written into T1 on 2026-09-05 as a stated limit** — T1.a/T1.c read `ask` rows and do not fetch, so **T1.d's veto is the exposed leg**; the bar is unchanged and the verdict now owes the sentence. Scope is `rerank_weight`
-  and `superseded_weight` only — `k1`/`b`, field weights and recency have no
-  instrument with headroom (§6 lists the generator kinds owed).
-  ✅ **One of the two blockers is CLEARED: `bench.py quality --tune TABLE.KEY=VALUE`
-  landed 2026-09-05** — written before the warm-up, refusing to score if the
-  committed index moved (T0.b enforced per pass rather than checked after),
-  omission deleting `tune.toml` rather than writing an empty one, and every row
-  carrying `tune` + `index_sha` so a pairing asserts a shared index **from the
-  rows**. Smoke-run on `t100`, rows deleted: **no number from it is a result.**
-  ⚠ **`expand_weight` is now in §1's defaults table and §6's out-of-scope
-  table** — it was in neither, and §1 claims to be read from source. It cannot
-  join this sweep: **no suite here passes `--expand`**, so no query can move it.
-  ✅ **The per-query rows blocker is CLEARED** — W-134 landed 2026-09-11
-  (playground `fece5a3`, `check.py --rows`). 🔴 **But T2's veto leg is blocked by
-  something else, found the same day**: `superseded_weight` moves **0 of 50**
-  goldens at every value on that corpus, because it declares no `supersedes:`
-  key ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **The
-  named veto queries `q022`/`q033` cannot be broken by a knob that reaches
-  neither.** T2 waits on the same instrument decision as the four-priors item
-  above. **T1 (`rerank_weight`) is unaffected** — it has 13/37 proven headroom
-  on this corpus and is runnable now. —
+  recommendation**; the change stays an ADR-TUNE amendment Arpit ratifies.
+  Scope is `rerank_weight` and `superseded_weight` only — `k1`/`b`, field
+  weights and recency have no instrument with headroom (§6 lists the generator
+  kinds owed).
+
+  ▶ **T1 (`rerank_weight`) is runnable now** — 13/37 proven headroom on this
+  corpus, and both of its tooling blockers are gone (`bench.py quality --tune
+  TABLE.KEY=VALUE`, and per-query rows via `check.py --rows`).
+
+  🔴 **T2 (`superseded_weight`) cannot run**: the knob moves **0 of 50** goldens
+  at every value on that corpus, because it declares no `supersedes:` key
+  ([the run](regression/2026-09-11-four-priors-headroom/report.md)). **The named
+  veto queries `q022`/`q033` cannot be broken by a knob that reaches neither.**
+  T2 waits on the same instrument decision as the four-priors item below.
+
+  ⚠ **`rerank_weight` moves TWO mechanisms, not one** — since W-108 it also
+  scales the refer plane's passage proximity, which this sweep's design assumed
+  it did not. T1.a/T1.c read `ask` rows and do not fetch, so **T1.d's veto is the
+  exposed leg**; the bar is unchanged and the verdict owes that sentence.
+  ⚠ **`expand_weight` ships at `0.2` (Query2doc's 1:5) and is untested** —
+  [W-109's gate](regression/2026-09-05-expand/report.md) ran every arm at that one
+  value. It is in §1's defaults table and §6's out-of-scope table, and **it cannot
+  join this sweep: no suite here passes `--expand`**, so no query can move it. —
   [detail](open/W-97-tuner-knob-sweep.md) `filed: 2026-08-28`
 
 - **The `heading` negative control is saturated and must be rebuilt.** `agent` ·
@@ -174,15 +152,16 @@ failure mode here with a perfect record.
   The fix is a control with headroom by construction — e.g. distractors that are
   *also* heading-matched. `filed: 2026-08-28`
 
-- **W-87** · `arpit` ·
+- **W-87** · `agent` (the `judged` series) **and** `arpit` (Part B) ·
   *(record: [ADR-QUALITY](../docs/adr/0141_quality-contract.md))* · **what
-  "good" means, then measure.** P0, P1, P3, P4 and P5 are closed and
-  `recall@k` now exists. ⚠ **Two things keep it open:** the `judged` series
-  has never been exercised (no judged run exists), and **Part B cannot run**
-  — `acme` and `orbit` went in the 2026-08-20 wipe with their generator, and
-  `tools/pruning-eval/` hard-codes reading them. **Part B is Arpit's ruling on
-  R-11** (inbox); the `judged` series is agent work once W-134 lands. —
-  [detail](open/W-87-what-good-means.md)
+  "good" means, then measure.** ⚠ **Two things keep it open:**
+  - **The `judged` series has never been exercised** — no judged run exists.
+    ▶ **This is `agent` work and is runnable now**; its input (a playground with
+    a current index and per-query rows) is in place.
+  - 🔴 **Part B cannot run.** `acme` and `orbit` went in the 2026-08-20 wipe with
+    their generator, and `tools/pruning-eval/` hard-codes reading them. **Part B
+    is Arpit's ruling on R-11** (inbox). —
+  [detail](open/W-87-what-good-means.md) `filed: 2026-08-27`
 
 ### adr update
 
@@ -190,9 +169,7 @@ failure mode here with a perfect record.
   *(records: [ADR-CONFIDENCE](../docs/adr/0142_confidence.md) ·
   [ADR-TUNE](../docs/adr/0135_tuning.md) ·
   [ADR-ARCHIVED-CONTENT](../docs/adr/0134_archived-content.md) ·
-  [ADR-RS](../docs/adr/0133_predictions.md))* · ⚠ **Merged 2026-09-11 from FOUR
-  rows — two inbox lines, W-94, and this one** — which between them said the
-  same thing about one decision blocked on one action. `filed: 2026-08-28` ·
+  [ADR-RS](../docs/adr/0133_predictions.md))* · `filed: 2026-08-28` ·
   `ruled: 2026-09-11`
 
   | knob | ships at | what it would act on |
@@ -205,11 +182,6 @@ failure mode here with a perfect record.
   **Each is built, wired, reads its input, and multiplies by one.** So on
   ranking priors, `HEAD` **is** `1.0.0` — which explains the shipped-default
   nulls better than a saturated corpus did.
-
-  ✅ **The disclosure half SHIPPED 2026-09-11.** `fux doctor`'s `ranking priors`
-  row names every dead prior *and the count of documents it would have acted
-  on*: **391 of this repo's own documents declare `archived=true`**. It refuses
-  to recommend a value, test-bound.
 
   🟠 **Arpit ruled 2026-09-11: REMEASURE, then decide** — not ship, not close.
   **Lane: `agent` for the remeasure, then back to Arpit with the result.**
@@ -248,13 +220,8 @@ failure mode here with a perfect record.
   argument, which needs no corpus at all. The item's own text says a NO is a
   success; this is not a NO, it is *cannot ask*.
 
-  **What the remeasure needs, none of which exists today:**
+  **What the remeasure still needs:**
 
-  - 🔴 **The hand-graded playground, indexed, with per-query rows** — the only
-    corpus with queries whose correct answer IS the retired document. The
-    v1-vs-HEAD benchmark corpus **cannot see the failure mode by construction**.
-    Repaired by Arpit's 2026-09-11 ruling; the index and the rows are
-    W-134, which landed 2026-09-11 (playground `fece5a3`).
   - **A frozen pre-registration** naming its `k`, its arms and the `0 broken`
     bar *before* the first number ([ADR-QUALITY](../docs/adr/0141_quality-contract.md)
     decision 2a). ⚠ W-110's gate was VOIDED for exactly the omission this would
